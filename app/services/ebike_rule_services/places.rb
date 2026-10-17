@@ -16,12 +16,15 @@ module EbikeRuleServices
       "CA-NT" => "Northwest Territories", "CA-NU" => "Nunavut", "CA-ON" => "Ontario", "CA-PE" => "Prince Edward Island",
       "CA-QC" => "Quebec", "CA-SK" => "Saskatchewan", "CA-YT" => "Yukon"
     }.freeze
+    COUNTRY_NAMES = StatesAndCountries.countries.to_h { [it[:iso], it[:name]] }.freeze
 
-    # The states, then the rest by name
     def all = us_states + outside_us
 
+    # A state's without reading the catalog
     def find(code)
-      all.find { it[:code] == code } if code.is_a?(String)
+      return unless code.is_a?(String)
+
+      (code.start_with?("US-") ? us_states : outside_us).find { it[:code] == code }
     end
 
     def us?(place) = place[:abbr].present?
@@ -30,26 +33,27 @@ module EbikeRuleServices
     # for an EU member, the EU
     def from_location(location_hash)
       state = StateLaws.state_from_location(location_hash)
-      return find("US-#{state[:abbr]}") if state
+      return us_state(state) if state
 
       iso = location_hash[:country_id] && Country.where(id: location_hash[:country_id]).pick(:iso)
       return if iso.blank?
 
+      places = outside_us
       region = location_hash[:region_string]
-      outside_us.find { it[:code].start_with?("#{iso}-") && region.present? && [it[:name], it[:code].delete_prefix("#{iso}-")].include?(region) } ||
-        find(iso) || (find("EU") if EU_MEMBERS.include?(iso))
+      places.find { it[:code].start_with?("#{iso}-") && [it[:name], it[:code].delete_prefix("#{iso}-")].include?(region) } ||
+        places.find { it[:code] == iso } || (places.find { it[:code] == "EU" } if EU_MEMBERS.include?(iso))
     end
 
-    def us_states = StateLaws::STATES.map { {code: "US-#{it[:abbr]}", name: it[:name], abbr: it[:abbr]} }
+    def us_states = StateLaws::STATES.map { us_state(it) }
 
-    def outside_us = StateLaws.places.keys.map { {code: it, name: name(it)} }.sort_by { it[:name] }
+    def outside_us = StateLaws.places.keys.map { {code: it, name: REGION_NAMES[it] || COUNTRY_NAMES[it] || it} }.sort_by { it[:name] }
 
     #
     # private below here
     #
 
-    def name(code) = REGION_NAMES[code] || StatesAndCountries.countries.find { it[:iso] == code }&.dig(:name) || code
+    def us_state(state) = {code: "US-#{state[:abbr]}", name: state[:name], abbr: state[:abbr]}
 
-    conceal :name
+    conceal :us_state
   end
 end

@@ -24,14 +24,14 @@ module Pages
         def outside_us
           return @outside_us if defined?(@outside_us)
 
-          @outside_us = @place && !EbikeRuleServices::Places.us?(@place) && EbikeRuleServices::StateLaws.places[@place[:code]]
+          @outside_us = @place && EbikeRuleServices::StateLaws.places[@place[:code]]
         end
 
         def cards = @cards ||= class_cards
 
         def class_cards
           if outside_us
-            outside_us[:classes].map { class_card(classification: EbikeRuleServices::StateLaws.classification(it)) }
+            outside_us[:classes].map { class_card(classification: it) }
           elsif state_classes
             state_classes.map { class_card(classification: it) }
           else

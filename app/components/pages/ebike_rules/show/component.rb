@@ -25,10 +25,7 @@ module Pages
         def form_path = @lookup.place ? ebike_rules_place_path(@lookup.place[:code]) : ebike_rules_path
 
         # The states, and the place outside the US whose page this is. Each reads "California (US-CA)", searchable by its code
-        def place_options
-          states = EbikeRuleServices::Places.us_states
-          combobox_options(states + ([@lookup.place].compact - states))
-        end
+        def place_options = combobox_options(EbikeRuleServices::Places.us_states | [@lookup.place].compact)
 
         def country_options = combobox_options(EbikeRuleServices::Places.outside_us)
 

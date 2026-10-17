@@ -115,8 +115,8 @@
             <% end %>
 
             <p class="tw:mt-4">
-              <%= link_to translation(".check_in_state", state: state[:name]), ebike_rules_place_path("US-#{state[:abbr]}", anchor: "check"),
-                class: "twlink tw:font-semibold", data: {check_state: "US-#{state[:abbr]}"} %>
+              <%= link_to translation(".check_in_state", state: state[:name]), ebike_rules_place_path(state[:code], anchor: "check"),
+                class: "twlink tw:font-semibold", data: {check_state: state[:code]} %>
             </p>
           </div>
         </div>

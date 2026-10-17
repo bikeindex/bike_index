@@ -335,7 +335,7 @@ class ModelViewer {
       years: this.yearRange(),
       vehicle_type: presence(typeLabel(vehicle)),
       type: vehicle.type,
-      e_vehicle_class: this.#withRulesLink(this.eVehicleClass()),
+      e_vehicle_class: this.eVehicleClass(),
       cargo_vehicle: isCargo(this.data),
       cargo: this.cargo(),
       primary_activity: this.withoutParenthetical(vehicle.primary_activity),
@@ -422,7 +422,7 @@ class ModelViewer {
   // As /ebike-rules shows them: its US classes' tiles in order, an optional one's outlined, and an e-moto's, alone where
   // it's out of class as sold, and outlined in place of its optional throttle's where that would put it there. Without
   // any, its classes' names
-  eVehicleClass () {
+  #classTiles () {
     if (this.outOfClass === 'stock') return classBadges(['emoto'])
     const ids = this.vehicle.classifiedModes.flatMap((mode) => mode.ids)
     const numbers = [...new Set(ids.map((id) => id.match(US_CLASS)?.[1]).filter(Boolean))].sort()
@@ -434,7 +434,9 @@ class ModelViewer {
     return tiles.length ? classBadges(tiles) : presence(this.classificationNames(this.#sortedClassifications(this.vehicle)))
   }
 
-  #withRulesLink (classes) {
+  // Its classes beside its /ebike-rules check
+  eVehicleClass () {
+    const classes = this.#classTiles()
     return classes && html`<div class="tw:flex tw:flex-wrap tw:items-end tw:gap-x-3 tw:gap-y-1"><div>${classes}</div><a class="twlink tw:text-sm"
       href=${`/ebike-rules?vehicle_models=${this.data.id}`}>View on e-bike rules</a></div>`
   }
@@ -643,7 +645,7 @@ class ModelViewer {
     const rated = array(vehicle.motors).map((motor) => motor.rated_power).filter(isNumber)
     const specs = [['Motor', rated.length ? presenter.measurement(sum(rated), 'w') : null], ['Top speed', fastest(of('assist'))], ['Throttle', throttle]]
     const certifications = certificationsOf(array(vehicle.motors).map((motor) => motor.certification))
-    return html`<div class="tw:mb-6">${bikeSummary({ vehicleType: this.data.type, tiles: this.#withRulesLink(this.eVehicleClass()), specs, ...certifications })}</div>`
+    return html`<div class="tw:mb-6">${bikeSummary({ vehicleType: this.data.type, tiles: this.eVehicleClass(), specs, ...certifications })}</div>`
   }
 
   // One per motor index across the compared vehicles, motors alike but for their drive wheel as one

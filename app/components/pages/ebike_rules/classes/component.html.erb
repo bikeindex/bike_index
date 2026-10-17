@@ -20,11 +20,7 @@
         <div class="tw:mt-7 tw:flex tw:flex-col tw:gap-8">
           <% outside_us[:laws].each do |law| %>
             <%= render(UI::Card::Component.new(shadow: true, additional_classes: "tw:rounded-lg tw:p-6!")) do %>
-              <h3 class="tw:mb-2 tw:font-header tw:text-xl tw:font-extrabold">
-                <%= law[:name] %>
-              </h3>
-
-              <%= render(Pages::EbikeRules::LawSummary::Component.new(law:)) %>
+              <%= render(Pages::EbikeRules::LawSummary::Component.new(law:, titled: true)) %>
             <% end %>
           <% end %>
         </div>

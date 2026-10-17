@@ -25,11 +25,10 @@ class EbikeRulesController < ApplicationController
 
     detected_place = EbikeRuleServices::Places.from_location(request_location_hash)
     if place.nil?
-      # which place it goes to depends on where the visitor is, so neither Cloudflare nor a browser keeps it
+      # which place it goes to depends on where the visitor is, so neither Cloudflare nor a browser keeps it. A bike
+      # comes along, as from Bike Book's link; a frame's check waits for the place the form hasn't chosen
       response.headers["Cache-Control"] = "no-store"
-      if detected_place && (LOOKUP_PARAMS.map(&:to_s) & request.query_parameters.keys).none?
-        return redirect_to place_path(detected_place, request.query_parameters)
-      end
+      return redirect_to place_path(detected_place, request.query_parameters) if detected_place && !turbo_frame_request?
     end
 
     assign_meta(place)
@@ -50,10 +49,8 @@ class EbikeRulesController < ApplicationController
   def place_for(code)
     return unless code.is_a?(String)
 
-    upcased = code.upcase
-    state = (code.length == 2) && EbikeRuleServices::StateLaws.state(code)
-    place = EbikeRuleServices::Places.find(upcased) unless state && code == code.downcase
-    place || (EbikeRuleServices::Places.find("US-#{upcased}") if state)
+    us = (state = EbikeRuleServices::StateLaws.state(code)) && EbikeRuleServices::Places.find("US-#{state[:abbr]}")
+    (code == code.downcase && us) || EbikeRuleServices::Places.find(code.upcase) || us
   end
 
   def default_title = translation(:title, controller_method: :show)
@@ -63,7 +60,11 @@ class EbikeRulesController < ApplicationController
     return @page_title = default_title if place.nil?
 
     name = place[:name]
-    law = EbikeRuleServices::StateLaws.find(place[:abbr]) || EbikeRuleServices::StateLaws.places.dig(place[:code], :laws)&.first
+    law = if EbikeRuleServices::Places.us?(place)
+      EbikeRuleServices::StateLaws.find(place[:abbr])
+    else
+      EbikeRuleServices::StateLaws.places.dig(place[:code], :laws)&.first
+    end
     @page_url = ebike_rules_place_url(place[:code])
     @page_title = translation(:state_title, state: name, controller_method: :show)
     @page_description = if law

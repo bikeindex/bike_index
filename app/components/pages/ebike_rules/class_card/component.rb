@@ -54,13 +54,11 @@ module Pages
            body: rules ? translation(".emoto_summary") : translation(".emoto_limits_body")}
         end
 
-        # Under its jurisdiction where the catalog names one, other than the place's own; a state's own classes leave it out
+        # Under its jurisdiction where the catalog names one; a place's own classes leave it out
         def classification_card
-          jurisdiction = classification[:jurisdiction] unless classification[:jurisdiction] == @place&.dig(:code)
-          {either: classification[:either], title: classification[:name], tag: jurisdiction, body: classification[:description],
+          {either: classification[:either], title: classification[:name], tag: classification[:jurisdiction], body: classification[:description],
            assist: classification[:throttle] ? translation(".throttle") : translation(".pedal"),
-           speed: classification[:mph] && (classification[:metric] ? translation(".kmh", kmh: classification[:kmh]) : translation(".mph", mph: classification[:mph])),
-           motor: watts}
+           speed: classification[:mph] && render(Pages::EbikeRules::RuleValue::Component.new(law: classification, id: :speed)), motor: watts}
         end
 
         def watts

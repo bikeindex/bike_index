@@ -58,7 +58,7 @@ module EbikeRuleServices
     def e_bike_law_ids = parsed[:e_bike_laws]
 
     # By ISO 3166-2 code, each place outside the US the catalog classifies e-vehicles in: its e-bike laws, or without
-    # one of its own its country's, and its other classifications' IDs, slowest first and off-highway last
+    # one of its own its country's, and its other classes, slowest first and off-highway last
     def places = vocabulary("places") { parse_places(it) } || {}
 
     # nil for anything but an abbreviation, such as a query's array
@@ -130,16 +130,14 @@ module EbikeRuleServices
       by_place = records.filter_map { |id, record| [record["jurisdiction"], id, record] if metric?(record) }.group_by(&:first)
       # one of a wider law's ahead of the place's own, as Ontario's Power-Assisted Bicycle is of its Cargo one
       laws = by_place.transform_values do |place_entries|
-        place_entries.select { it[2]["e_bike_law"] }.each_with_index.sort_by { |(_, _, record), index| [record["groups"].present? ? 0 : 1, index] }
-          .map { |(_, id, record), _| law(id, record) }
+        place_entries.select { it[2]["e_bike_law"] }.partition { it[2]["groups"].present? }.flatten(1).map { law(it[1], it[2]) }
       end
       by_place.to_h do |code, place_entries|
-        others = place_entries.reject { it[2]["e_bike_law"] }
-        [code, {laws: laws[code].presence || laws[code.split("-").first].to_a, classes: by_speed(others).map { it[1] }}]
+        others = by_speed(place_entries.reject { it[2]["e_bike_law"] }).map { |_, id, record| state_class(id, record) }
+        [code, {laws: laws[code].presence || laws[code.split("-").first].to_a, classes: others}]
       end
     end
 
-    # The law, then the rest by_speed
     def state_classes(entries, law_id)
       law, others = entries.partition { it[1] == law_id }
       (law + by_speed(others)).map { |_, id, record| state_class(id, record) }

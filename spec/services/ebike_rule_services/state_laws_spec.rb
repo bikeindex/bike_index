@@ -104,7 +104,7 @@ RSpec.describe EbikeRuleServices::StateLaws do
         restrictions: [include(rule: "No licence, registration or insurance is needed")])]
       expect(places["EU"][:classes]).to eq []
       expect(places["CA-NB"][:laws]).to match [include(id: "evc/ca/power_assisted_bicycle", kmh: 32)]
-      expect(places["CA-NB"][:classes]).to eq ["evc/ca/nb/motorcycle"]
+      expect(places["CA-NB"][:classes]).to match [include(id: "evc/ca/nb/motorcycle", name: "Motorcycle", throttle: true)]
       expect(described_class.find("CO")).to include(metric: false)
     end
   end

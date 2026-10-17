@@ -100,6 +100,14 @@ RSpec.describe EbikeRulesController, type: :request do
       expect(page).to have_css("[data-hw-combobox-prefilled-display-value='Indiana (US-IN)']")
         .and have_text("We detected Indiana")
         .and have_no_css("[role='alert']")
+
+      # a bike comes along, as from Bike Book's link, to be checked there
+      get "/ebike-rules", params: {vehicle_models: "m/specialized/2025/haul_st"}, headers: indiana
+      expect(response).to redirect_to("/ebike-rules/US-IN?vehicle_models=m%2Fspecialized%2F2025%2Fhaul_st")
+
+      # but a frame's check waits for the place the form hasn't chosen
+      get "/ebike-rules", params: {vehicle_models: "m/specialized/2025/haul_st"}, headers: indiana.merge("Turbo-Frame" => "ebike-rules-check")
+      expect(response).to have_http_status(:ok)
     end
 
     it "renders a state's page with its own meta tags, whatever bike is checked on it" do
@@ -374,7 +382,7 @@ RSpec.describe EbikeRulesController, type: :request do
       get "/ebike-rules", params: {state: "", vehicle_models: ""}
       expect(response).to redirect_to("/ebike-rules?vehicle_models=")
 
-      get "/ebike-rules", params: {vehicle_models: ""}, headers: indiana
+      get "/ebike-rules", params: {vehicle_models: ""}
 
       expect(page).to have_css("[role='alert']", text: "Choose a state.")
         .and have_css("[role='alert']", text: "Pick a bike from the list, or enter its details manually.")
