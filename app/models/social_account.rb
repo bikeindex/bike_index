@@ -38,9 +38,6 @@
 class SocialAccount < ApplicationRecord
   include Geocodeable
 
-  # Replaced by postal_code and region_record_id, to be dropped
-  self.ignored_columns += %w[zipcode state_id]
-
   has_many :social_posts, dependent: :destroy
 
   validates \

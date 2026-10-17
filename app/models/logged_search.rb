@@ -36,15 +36,11 @@
 #  index_logged_searches_on_country_id       (country_id)
 #  index_logged_searches_on_organization_id  (organization_id)
 #  index_logged_searches_on_request_id       (request_id)
-#  index_logged_searches_on_state_id         (state_id)
 #  index_logged_searches_on_user_id          (user_id)
 #
 class LoggedSearch < AnalyticsRecord
   include AddressRecordedWithinBoundingBox
   include Geocodeable
-
-  # Replaced by postal_code and region_record_id, to be dropped
-  self.ignored_columns += %w[zipcode state_id]
 
   ENDPOINT_ENUM = {
     web_bikes: 0,

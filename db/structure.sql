@@ -3601,8 +3601,6 @@ CREATE TABLE public.social_accounts (
     last_error character varying,
     last_error_at timestamp without time zone,
     street character varying,
-    zipcode character varying,
-    state_id bigint,
     country_id bigint,
     postal_code character varying,
     region_record_id bigint,
@@ -7960,6 +7958,7 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261017210000'),
 ('20261017200000'),
 ('20261017120000'),
 ('20261005170000'),
