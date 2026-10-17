@@ -17,7 +17,6 @@ RSpec.shared_context :geocoder_default_location do
     }
   end
 
-  # registration_info's address keys
   let(:default_location_registration_info) do
     {
       street: "278 Broadway",
