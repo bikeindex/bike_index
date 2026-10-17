@@ -39,6 +39,7 @@ RSpec.describe Admin::BulkImportsController, type: :request do
       bulk_import = assigns(:bulk_import)
       expect(bulk_import.organization_id).to be_nil
       expect(bulk_import.no_notify).to be_falsey
+      expect(bulk_import.no_duplicate).to be_truthy
     end
     context "passed params" do
       let(:current_organization) { FactoryBot.create(:organization) }
@@ -70,14 +71,14 @@ RSpec.describe Admin::BulkImportsController, type: :request do
         expect(bulk_import.progress).to eq "pending"
         expect(bulk_import.organization).to eq current_organization
         expect(bulk_import.send_email).to be_falsey
-        expect(bulk_import.no_duplicate).to be_falsey
+        expect(bulk_import.no_duplicate).to be_truthy
         expect(bulk_import.kind).to eq "organization_import"
         expect(BulkImportJob).to have_enqueued_sidekiq_job(bulk_import.id)
       end
-      context "no_duplicate" do
+      context "no_duplicate unchecked" do
         it "creates" do
           expect {
-            post base_url, params: {bulk_import: valid_attrs.merge(no_duplicate: "1", no_notify: "false")}
+            post base_url, params: {bulk_import: valid_attrs.merge(no_duplicate: "0", no_notify: "false")}
           }.to change(BulkImport, :count).by 1
 
           bulk_import = BulkImport.last
@@ -86,7 +87,7 @@ RSpec.describe Admin::BulkImportsController, type: :request do
           expect(bulk_import.progress).to eq "pending"
           expect(bulk_import.organization).to eq current_organization
           expect(bulk_import.send_email).to be_truthy
-          expect(bulk_import.no_duplicate).to be_truthy
+          expect(bulk_import.no_duplicate).to be_falsey
           expect(bulk_import.kind).to eq "organization_import"
           expect(BulkImportJob).to have_enqueued_sidekiq_job(bulk_import.id)
         end

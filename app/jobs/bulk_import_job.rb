@@ -168,7 +168,7 @@ class BulkImportJob < ApplicationJob
         extra_registration_number: row[:secondary_serial],
         send_email: @bulk_import.send_email,
         creation_organization_id: @bulk_import.organization_id,
-        no_duplicate: @bulk_import.no_duplicate
+        no_duplicate: @bulk_import.no_duplicate_for?(row[:serial_number])
       }.merge(self.class.address_record_attributes(row[:address], country_id: @country_id)),
       impound_record: impound_attrs || {},
       stolen_record: @bulk_import.stolen_record_attrs,
