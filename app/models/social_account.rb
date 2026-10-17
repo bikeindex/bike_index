@@ -20,23 +20,23 @@
 #  national         :boolean          default(FALSE), not null
 #  neighborhood     :string
 #  postal_code      :string
+#  region_string    :string
 #  screen_name      :string           not null
 #  street           :string
+#  street_2         :string
 #  user_secret      :string           not null
 #  user_token       :string           not null
-#  zipcode          :string
 #  created_at       :datetime         not null
 #  updated_at       :datetime         not null
 #  country_id       :bigint
 #  region_record_id :bigint
-#  state_id         :bigint
 #
 # Indexes
 #
 #  index_social_accounts_on_screen_name  (screen_name)
 #
 class SocialAccount < ApplicationRecord
-  include GeocodeableLegacy
+  include Geocodeable
 
   has_many :social_posts, dependent: :destroy
 
@@ -50,6 +50,9 @@ class SocialAccount < ApplicationRecord
 
   validates :screen_name, uniqueness: true
 
+  attr_accessor :skip_geocoding
+
+  after_validation :address_record_geocode, if: :should_be_geocoded?
   before_save :reverse_geocode, if: :should_be_reverse_geocoded?
   before_save :fetch_account_info
 
@@ -64,7 +67,7 @@ class SocialAccount < ApplicationRecord
       account.neighborhood = geo.neighborhood
       country = Country.friendly_find(geo.country)
       account.country = country
-      account.state = State.friendly_find(geo.state_code) if country&.united_states?
+      account.region_record = State.friendly_find(geo.state_code) if country&.united_states?
     end
   end
 
@@ -108,6 +111,9 @@ class SocialAccount < ApplicationRecord
     }
   end
 
+  # Only shown in admin
+  def self.permitted_visible_attribute(_, default: nil) = :street
+
   def self.get_post(post_id)
     default_account.get_post(post_id)
   end
@@ -120,6 +126,8 @@ class SocialAccount < ApplicationRecord
       default_account_for_country(obj&.country)
     ].flatten.compact.uniq
   end
+
+  def publicly_visible_attribute = :street
 
   def account_url
     "https://twitter.com/#{screen_name}"
@@ -200,10 +208,14 @@ class SocialAccount < ApplicationRecord
     platform_client.status(post_id)
   end
 
+  def should_be_geocoded?
+    skip_geocoding.blank? && address_changed?
+  end
+
   def should_be_reverse_geocoded?
-    !skip_geocoding? &&
+    skip_geocoding.blank? &&
       latitude.present? &&
-      (state.blank? || state_id_changed?)
+      (region_record.blank? || region_record_id_changed?)
   end
 
   private

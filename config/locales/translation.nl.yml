@@ -4807,6 +4807,9 @@ nl:
       send_it: Stuur het!
       subject: Onderwerp
       your_message: Uw bericht
+      message_template: 'Serienummer van de fiets (indien van toepassing): URL voor
+        registratie bij Bike Index (indien van toepassing): Waarmee ik hulp nodig
+        heb: '
     index:
       contact_us: Neem contact met ons op!
       have_a_question_we_havent_answered: Heeft u een vraag die we niet hebben beantwoord?
@@ -4814,6 +4817,9 @@ nl:
       log_in_to_send_a_comment: Log in om een reactie te sturen!
       you_can_reach_us_at_contact_html: U kunt ons bereiken op %{contact_link}, of
         stuur uw bericht hier naartoe.
+      the_more_detail_you_can_share: Hoe meer details u kunt delen, hoe sneller we
+        u kunnen helpen. Als uw vraag over een specifieke fiets gaat, vermeld dan
+        het serienummer of uw Bike Index-registratie-URL.
   manufacturers:
     index:
       manufacturers_we_know_about: Fabrikanten die we kennen
