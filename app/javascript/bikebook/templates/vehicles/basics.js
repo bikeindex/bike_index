@@ -3,9 +3,8 @@ import { amountDisplay, missing } from 'bikebook/templates/helpers'
 import { collapse } from 'bikebook/templates/ui/collapse'
 import { copyButton } from 'bikebook/templates/ui/copy_button'
 import { table } from 'bikebook/templates/ui/table'
-import { priced } from 'bikebook/templates/vehicles/comparison_table'
 import { basicsOf, simpleFormat } from 'bikebook/templates/vehicles/model_viewer'
-import { array, present } from 'bikebook/templates/values'
+import { array, isNumber, present } from 'bikebook/templates/values'
 
 // `only` ones once a shown model is electric, suspended, a cargo vehicle or sold outside the visitor's market, the rest once one lists it, and `differing`
 // ones where the models' values of it differ
@@ -34,6 +33,9 @@ const MAX_WIDTHS = { 4: 'tw:max-w-[calc(12.5rem+2000px)]', 5: 'tw:max-w-[calc(12
 const manufacturerLine = (manufacturer) => present(manufacturer)
   ? html`<p class="tw:text-[11px] tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">${manufacturer}</p>`
   : nothing
+
+// years come newest first
+const priced = (vehicle) => array(vehicle.years).find((year) => isNumber(year.original_msrp))
 
 const EXCERPT_LENGTH = 200
 

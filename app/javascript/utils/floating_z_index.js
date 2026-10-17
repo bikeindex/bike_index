@@ -8,16 +8,21 @@ const FLOOR = 1051
 // the modal band within a session of hovering
 const open = []
 
+const remove = (element) => {
+  const index = open.indexOf(element)
+  if (index >= 0) open.splice(index, 1)
+}
+
 const renumber = () => open.forEach((element, index) => { element.style.zIndex = FLOOR + index })
 
 // Puts `element` above every other open one, though it's open already
 export function claimFloatingZIndex (element) {
-  if (open.includes(element)) open.splice(open.indexOf(element), 1)
+  remove(element)
   open.push(element)
   renumber()
 }
 
 export function releaseFloatingZIndex (element) {
-  if (open.includes(element)) open.splice(open.indexOf(element), 1)
+  remove(element)
   renumber()
 }

@@ -10,9 +10,8 @@ const market = (presenter, id) => {
 // A motor's specs, with a subsection per operating mode, but its certification, which the electric summary beside it
 // badges
 export const motorSection = ({ presenter, heading, motor, others }) => {
-  const { humanized } = presenter.kit.motor
+  const { humanized, labels } = presenter.kit.motor
   const fields = except(presenter.kit.motor.fields, ['certification'])
-  const labels = presenter.kit.motor.labels
   // the identity rows list every mode's classification
   const modeFields = except(presenter.kit.motor.mode_fields, ['e_vehicle_classifications'])
   const display = (each) => ({

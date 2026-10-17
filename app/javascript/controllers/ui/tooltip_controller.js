@@ -42,8 +42,8 @@ export default class extends Controller {
   // The one under the pointer goes on top, though another was opened since
   showOnHover () {
     this.hoverActive = true
+    if (this.isOpen) claimFloatingZIndex(this.tooltipTarget)
     this.sync()
-    claimFloatingZIndex(this.tooltipTarget)
   }
 
   hideOnHover () {

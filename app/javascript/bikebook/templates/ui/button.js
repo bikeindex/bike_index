@@ -14,6 +14,6 @@ export const buttonClasses = ({ size = 'md', htmlClass, color = 'secondary' }) =
   'tw:inline-flex tw:items-center tw:justify-center tw:gap-1.5 tw:cursor-pointer', htmlClass,
   'tw:focus:outline-none tw:focus:ring-3 tw:is-active:focus:ring-3',
   'tw:disabled:opacity-50 tw:disabled:cursor-not-allowed tw:aria-disabled:opacity-50 tw:aria-disabled:cursor-not-allowed',
-  color !== 'link' && `tw:rounded-lg tw:font-medium tw:transition-colors ${SIZES[size]}`, color !== 'link' && 'tw:no-underline',
+  color !== 'link' && `tw:rounded-lg tw:font-medium tw:transition-colors ${SIZES[size]} tw:no-underline`,
   COLORS[color], ACTIVE_COLORS[color]
 ].filter(Boolean).join(' ')

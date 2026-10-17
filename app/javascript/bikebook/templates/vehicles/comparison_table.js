@@ -7,8 +7,6 @@ import { seriesBorders } from 'bikebook/templates/vehicles/geometry_overlay'
 import { cargoAt, isCargo, tireWidth, wheelsAt } from 'bikebook/templates/vehicles/model_viewer'
 import { array, isNumber, join, present, slice, sum } from 'bikebook/templates/values'
 
-// years come newest first
-export const priced = (vehicle) => array(vehicle.years).find((year) => isNumber(year.original_msrp))
 const GEOMETRY = ['reach', 'stack', 'top_tube_effective', 'head_angle', 'seat_angle', 'chainstay', 'standover', 'wheelbase']
 // the size's, so it closes the geometry
 const WEIGHT = { label: 'Weight', read: (vehicle, size) => size?.geometry?.total_weight, better: -1, unit: 'kg' }
@@ -49,7 +47,7 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], besid
       label: `${presenter.humanize(position)} wheel`,
       read: (vehicle) => wheels.get(vehicle)[position].parts,
       better: 0,
-      parts: (_, parts) => parts.map(([key, number, content], index) => [key, number, index < parts.length - 1 ? join([content, ',']) : content]),
+      parts: (parts) => parts.map(([key, number, content], index) => [key, number, index < parts.length - 1 ? join([content, ',']) : content]),
       amount: tireDifference
     },
     {
@@ -78,7 +76,7 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], besid
 
   const partsCell = (row, value, baseParts, vehicle) => {
     const comparing = compared(row, vehicle)
-    return html`<span class="tw:inline-flex tw:items-start tw:gap-x-1">${row.parts(presenter, value).map(([key, number, content]) =>
+    return html`<span class="tw:inline-flex tw:items-start tw:gap-x-1">${row.parts(value).map(([key, number, content]) =>
       html`<span>${content}${comparing ? changed(row, number, baseParts.get(key), String) : nothing}</span>`)}</span>`
   }
 
@@ -93,7 +91,7 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], besid
 
   const records = (rows) => rows.map((row) => [row, named.map((vehicle, index) => row.read(vehicle, sizes[index]))])
     .filter(([, values]) => values.some(present)).map(([row, values]) => {
-      const baseParts = new Map(row.parts && present(values[0]) ? row.parts(presenter, values[0]) : [])
+      const baseParts = new Map(row.parts && present(values[0]) ? row.parts(values[0]) : [])
       return {
         label: row.label,
         cell: (index) => {

@@ -7,7 +7,7 @@ import { emptyState } from 'bikebook/templates/vehicles/empty_state'
 import { frameGeometry } from 'bikebook/frame_geometry'
 import { geometryOverlay, seriesBorders } from 'bikebook/templates/vehicles/geometry_overlay'
 import { jumpTo, VIEWS } from 'bikebook/templates/vehicles/jump_to'
-import { basicsOf, componentsOf, modelViewer, motorsOf, runningGearOf, sizesOf } from 'bikebook/templates/vehicles/model_viewer'
+import { componentsOf, modelViewer, motorsOf, photoOf, runningGearOf, sizesOf } from 'bikebook/templates/vehicles/model_viewer'
 import { present } from 'bikebook/templates/values'
 import { searching, toQuery } from 'bikebook/query'
 import { VehiclePresenter } from 'bikebook/vehicle_presenter'
@@ -60,7 +60,7 @@ export class VehicleViewer {
         ? html`<p class="tw:mb-1 tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">${manufacturer}</p>`
         : nothing}<div class="tw:flex tw:items-baseline tw:gap-1"><h3 class="tw:text-2xl tw:leading-tight tw:font-extrabold">${model}</h3>${
           copyButton({ value, label: 'Copy ID', tooltip: true })}</div></div><div
-        class="tw:shrink-0">${basicsOf({ presenter, data }).photo('tw:h-14 tw:w-21')}</div></header>${lead(data, value)}${present(data[key])
+        class="tw:shrink-0">${photoOf({ presenter, data }, 'tw:h-14 tw:w-21')}</div></header>${lead(data, value)}${present(data[key])
         ? content(data, value)
         : html`<p class="twless-strong">${none}</p>`}</section>`
     })

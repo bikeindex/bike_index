@@ -33,7 +33,7 @@ const groupsetSummary = ({ groupset }) => {
   const name = compact([named ? null : manufacturer, description]).join(' ')
   return electronic ? join([name, 'electronic'], ' · ') : name
 }
-export const typeLabel = (each) => [each.type, each.type_detail].filter(present).join(' · ')
+const typeLabel = (each) => [each.type, each.type_detail].filter(present).join(' · ')
 
 // One vehicle's card, marked where it differs from `others`
 export const modelViewer = (args) => new ModelViewer(args).render()
@@ -79,13 +79,14 @@ export const wheelSize = (presenter, bsd) => new ModelViewer({ presenter, data: 
 // A vehicle's names, photo and the fields the Overview lists
 export const basicsOf = ({ presenter, data, outOfClass }) => new ModelViewer({ presenter, data, others: [], outOfClass }).basics()
 
+// A vehicle's stock photo in `frame`, without the rest of what basicsOf works out
+export const photoOf = ({ presenter, data }, frame) => new ModelViewer({ presenter, data, others: [] }).stockPhoto(frame)
+
 // A vehicle's sizes, each with its geometry, `selectedSize` ringed and marked where they differ from `others`', the rest
 // linked to `sizePath(name)`
 export const sizesOf = ({ presenter, data, others, selectedSize, sizePath }) => new ModelViewer({ presenter, data, others, selectedSize, sizePath }).sizes()
 
-// A vehicle's motors, each with its battery, marked where they differ from `others`'
-// alternating between columns, so one alone keeps a column's width, as in the full card
-// Its electric summary beside its motors
+// A vehicle's electric summary beside its motors, each with its battery, marked where they differ from `others`'
 export const motorsOf = ({ presenter, data, others, outOfClass }) => {
   const viewer = new ModelViewer({ presenter, data, others, outOfClass })
   return sideBySide([viewer.electricSummary(), viewer.motorSections()])
@@ -301,14 +302,18 @@ class ModelViewer {
     })
   }
 
+  stockPhoto (frame) {
+    const { vehicle } = this
+    return this.photo(vehicle.stock_photo, [vehicle.manufacturer, vehicle.model].filter(present).join(' '), frame)
+  }
+
   basics () {
     const { vehicle } = this
-    const title = [vehicle.manufacturer, vehicle.model].filter(present).join(' ')
     const description = present(vehicle.description) ? html`<div class="tw:space-y-2">${simpleFormat(vehicle.description)}</div>` : null
     return {
       manufacturer: vehicle.manufacturer,
       model: vehicle.model,
-      photo: (frame) => this.photo(vehicle.stock_photo, title, frame),
+      photo: (frame) => this.stockPhoto(frame),
       electric: present(vehicle.motors),
       model_group: vehicle.vehicle_model_group,
       years: this.yearRange(),
@@ -598,7 +603,6 @@ class ModelViewer {
     return truthy(value) ? join(compact([this.presenter.measurement(value, 'mm'), suffix])) : null
   }
 
-  // One per motor index across the compared vehicles, motors alike but for their drive wheel as one
   // As /ebike-rules shows a bike: its class tiles, its motor, top assisted speed and throttle, and its certifications
   electricSummary () {
     const { presenter, vehicle } = this
@@ -606,8 +610,8 @@ class ModelViewer {
 
     const of = (kind) => vehicle.classifiedModes.filter(({ mode }) => mode === kind)
     const fastest = (modes) => {
-      const speeds = modes.map(({ maxSpeed }) => maxSpeed).filter(isNumber)
-      return speeds.length ? presenter.measurement(Math.max(...speeds), 'km/h') : null
+      const speed = highest(modes.map(({ maxSpeed }) => maxSpeed))
+      return speed == null ? null : presenter.measurement(speed, 'km/h')
     }
     const throttles = of('throttle')
     const throttleSpeed = fastest(throttles)
@@ -618,6 +622,7 @@ class ModelViewer {
     return html`<div class="tw:mb-6">${bikeSummary({ vehicleType: this.data.type, tiles: this.eVehicleClass(), specs, ...certifications })}</div>`
   }
 
+  // One per motor index across the compared vehicles, motors alike but for their drive wheel as one
   motorSections () {
     const [motors, ...othersMotors] = [this.vehicle, ...this.others].map((vehicle) => mergedMotors(vehicle.motors ?? []))
     const count = Math.max(motors.length, ...othersMotors.map((each) => each.length))
@@ -766,8 +771,7 @@ class ModelViewer {
       : nothing}${present(content) ? definitionListContainer({ content }) : nothing}</section>`
   }
 
-  // the rest of its drivetrain in a tooltip, on a dash where no groupset's listed
-  // "MicroShift, 1x9", the rest of its drivetrain in a tooltip
+  // "MicroShift, 1x9", the rest of its drivetrain in a tooltip, on a dash where neither is listed
   groupsetWithDrivetrain () {
     const groupset = presence(join([groupsetSummary(this.vehicle), this.#gearCount()].filter(present), ', '))
     const drivetrain = this.drivetrainTooltip()
