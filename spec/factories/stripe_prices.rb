@@ -14,16 +14,18 @@ FactoryBot.define do
     end
 
     factory :stripe_price_basic, traits: [:test_stripe_id] do
-      stripe_id { "price_0Qs5p2m0T0GBfX0vhLrGLAAi" }
+      amount_cents { 500 }
+      stripe_id { "price_0URHtsm0T0GBfX0vxXWA0L8a" }
     end
 
     factory :stripe_price_basic_yearly, traits: [:test_stripe_id] do
       interval { "yearly" }
-      amount_cents { 4999 }
-      stripe_id { "price_0Qs5rim0T0GBfX0vE7Q7cyoG" }
+      amount_cents { 5000 }
+      stripe_id { "price_0URHtrm0T0GBfX0vyZZE9fGL" }
 
       factory :stripe_price_basic_yearly_cad do
         currency_enum { "cad" }
+        amount_cents { 4999 }
         stripe_id { "price_0Qs61bm0T0GBfX0vjadfNRv8" }
       end
 
