@@ -1,0 +1,503 @@
+<% helpers.content_for(:header) do %>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&family=Open+Sans:wght@600;800&display=swap"
+    rel="stylesheet"
+  >
+<% end %>
+
+<% container = "tw:mx-auto tw:max-w-7xl tw:px-5 tw:lg:px-14" %>
+<% eyebrow = "tw:text-[10.5px] tw:font-extrabold tw:tracking-widest tw:uppercase tw:lg:text-[11.5px]" %>
+<% muted = "tw:text-[#666] tw:dark:text-gray-400" %>
+<% ink = "tw:text-[#2c3e50] tw:dark:text-gray-100" %>
+<% h2 = "tw:font-header tw:text-2xl tw:font-extrabold tw:lg:text-[34px] #{ink}" %>
+<% card = "tw:rounded-lg tw:border tw:border-[#e0e0e0] tw:bg-white tw:dark:border-gray-700 tw:dark:bg-gray-800" %>
+<% band = "tw:border-[#e0e0e0] tw:bg-[#f8f8f8] tw:dark:border-gray-700 tw:dark:bg-gray-800/60" %>
+<% selectable = "tw:transition-colors tw:hover:border-[#a9d2f0] tw:is-active:border-blue-600 tw:is-active:ring-1 tw:is-active:ring-blue-600" %>
+<% row = "tw:group/row tw:flex tw:cursor-pointer tw:items-center tw:gap-3 tw:px-3.5 tw:py-4 tw:xs:gap-4 tw:xs:px-4.5 tw:has-focus-visible:ring-3 tw:has-focus-visible:ring-blue-500/40 #{card} #{selectable}" %>
+<% amount_classes = "tw:font-header tw:text-[19px] tw:font-extrabold tw:group-has-checked/row:text-blue-600 tw:lg:text-[22px] tw:dark:group-has-checked/row:text-blue-400 #{ink}" %>
+
+<%# the callout's 40px padding and 16px type don't fit a label in the 404px card %>
+<% submit_button = ->(text) { render UI::Button::Component.new(text:, color: :primary, size: :callout, type: "submit", html_class: "tw:mt-2 tw:w-full tw:px-4! tw:text-xs! tw:xs:text-sm!", data: {donate__page_target: "submit"}) } %>
+
+<div
+  class="
+    tw:group/donate tw:-mt-(--nav-gap) tw:-mb-18 tw:bg-white tw:text-[#444]
+    tw:dark:bg-gray-900 tw:dark:text-gray-200
+  "
+  data-controller="donate--page"
+  data-donate--page-monthly-label-value="<%= monthly_label("%{amount}") %>"
+  data-donate--page-one-time-label-value="<%= one_time_label("%{amount}") %>"
+  data-donate--page-currency-symbol-value="<%= @currency.symbol %>"
+>
+  <div class="tw:grid tw:grid-cols-3 tw:gap-[3px] tw:bg-[#2c3e50] tw:md:grid-cols-7">
+    <% WALL_PHOTOS.each do |url| %>
+      <%= image_tag url,
+      alt: translation(".wall_photo_alt"),
+      class: "tw:h-26 tw:w-full tw:object-cover tw:max-md:last:hidden tw:md:h-40 tw:lg:h-55" %>
+    <% end %>
+  </div>
+
+  <section class="tw:pt-6.5 tw:md:pb-10 tw:lg:pt-11.5 <%= container %>">
+    <div
+      class="
+        tw:flex tw:flex-col tw:gap-6 tw:lg:flex-row tw:lg:items-start
+        tw:lg:gap-14
+      "
+    >
+      <div class="tw:flex tw:flex-1 tw:flex-col tw:gap-4.5">
+        <p class="tw:mb-0 tw:text-[#cc0000] <%= eyebrow %>">
+          <%= translation(".eyebrow") %>
+        </p>
+
+        <h1 class="tw:mb-0 tw:font-header tw:text-[31px] tw:leading-[1.07] tw:font-extrabold tw:tracking-[-.01em] tw:md:text-[42px] tw:xl:text-[52px] tw:xl:leading-[1.04] <%= ink %>">
+          <%= translation(".headline") %>
+        </h1>
+
+        <p
+          class="
+            tw:mb-0 tw:max-w-160 tw:text-base tw:leading-[1.55] tw:xl:text-[19px]
+            <%= muted %>
+          "
+        >
+          <span class="tw:lg:hidden"><%= translation(".lede_short") %></span>
+          <span class="tw:hidden tw:lg:inline"><%= translation(".lede") %></span>
+        </p>
+
+        <dl
+          class="
+            tw:mb-0 tw:grid tw:max-w-150 tw:grid-cols-2 tw:gap-x-7
+            tw:gap-y-4.5
+          "
+        >
+          <% stats.each do |value, label| %>
+            <div
+              class="
+                tw:border-t-2 tw:border-[#e0e0e0] tw:pt-2.75
+                tw:dark:border-gray-700
+              "
+            >
+              <dt
+                class="
+                  tw:font-header tw:text-[21px] tw:font-extrabold
+                  tw:text-blue-600 tw:lg:text-[28px] tw:dark:text-blue-400
+                "
+              >
+                <%= value %>
+              </dt>
+
+              <dd class="tw:mb-0 tw:text-[13px] tw:lg:text-[14.5px] <%= muted %>">
+                <%= label %>
+              </dd>
+            </div>
+          <% end %>
+        </dl>
+      </div>
+
+      <div
+        id="donate-form"
+        class="tw:-mx-5 tw:flex tw:scroll-mt-4 tw:flex-col tw:gap-4 tw:border-y tw:px-5 tw:py-6.5 tw:md:mx-auto tw:md:w-full tw:md:max-w-xl tw:md:rounded-lg tw:md:border tw:md:p-6.5 tw:lg:mx-0 tw:lg:w-101 tw:lg:shrink-0 <%= band %>"
+      >
+        <h2 class="tw:mb-0 tw:font-header tw:text-[22px] tw:font-extrabold tw:lg:text-2xl <%= ink %>">
+          <%= translation(".form_title") %>
+        </h2>
+
+        <% if monthly? %>
+          <div
+            class="
+              tw:flex tw:border-b tw:border-[#e0e0e0]
+              tw:dark:border-gray-700
+            "
+            role="radiogroup"
+            aria-label="<%= translation(".cadence") %>"
+          >
+            <% [["monthly", translation(".monthly")], ["one-time", translation(".one_time")]].each do |cadence, label| %>
+              <label
+                class="
+                  tw:-mb-px tw:flex-1 tw:cursor-pointer tw:border-b-3
+                  tw:border-transparent tw:py-2.75 tw:text-center tw:text-sm
+                  tw:font-semibold tw:tracking-wider tw:text-[#666]
+                  tw:uppercase tw:has-checked:border-blue-500
+                  tw:has-checked:text-blue-500
+                  tw:has-focus-visible:bg-blue-50 tw:lg:text-[15px]
+                  tw:dark:text-gray-400
+                  tw:dark:has-focus-visible:bg-gray-700
+                "
+              >
+                <%= radio_button_tag :donate_cadence,
+              cadence,
+              (cadence == "one-time") == one_time?,
+              id: "donate-cadence-#{cadence}",
+              class: "tw:sr-only",
+              autocomplete: "off",
+              data: {
+                donate__page_target: "cadence",
+                action: "donate--page#update",
+              } %>
+
+                <%= label %>
+              </label>
+            <% end %>
+          </div>
+        <% end %>
+
+        <div
+          class="
+            tw:flex tw:flex-col tw:gap-4
+            tw:group-has-[#donate-cadence-one-time:checked]/donate:hidden
+          "
+        >
+          <% if @member || monthly? %>
+            <div
+              class="
+                tw:rounded-lg tw:border tw:border-[#a9d2f0] tw:bg-[#e8f3fc]
+                tw:px-3.75 tw:py-3.25 tw:text-[14.5px] tw:text-[#444]
+                tw:dark:border-blue-900 tw:dark:bg-blue-950
+                tw:dark:text-gray-200
+              "
+            >
+              <% if @member %>
+                <p class="tw:mb-1"><%= translation(".already_member") %></p>
+                <%= link_to translation(".manage_membership"),
+              edit_membership_path,
+              class: "twlink tw:font-bold" %>
+              <% else %>
+                <p class="tw:mb-1">
+                  <%= translation(".membership_note",
+                amounts: tiers.map { |level, _, _| tier_amount(level) }.to_sentence) %>
+                </p>
+                <%= link_to translation(".membership_link"),
+              membership_path,
+              class: "twlink tw:font-bold" %>
+              <% end %>
+            </div>
+          <% end %>
+
+          <% if monthly? %>
+            <%= form_tag membership_path, method: :post, class: "tw:flex tw:flex-col tw:gap-2.25", data: {donate__page_target: "monthlyForm"} do %>
+              <%= hidden_field_tag "membership[set_interval]", "monthly", id: nil %>
+              <%= hidden_field_tag :currency, @currency.slug, id: nil %>
+              <%= hidden_field_tag :referral_source, @referral_source, id: nil %>
+
+              <fieldset class="tw:flex tw:flex-col tw:gap-2.25">
+                <legend class="tw:sr-only">
+                  <%= translation(".monthly") %>
+                </legend>
+
+                <% tiers.each do |level, name, benefit| %>
+                  <label class="<%= row %>">
+                    <%= radio_button_tag "membership[level]",
+                    level,
+                    level == default_tier,
+                    class: "tw:sr-only",
+                    autocomplete: "off",
+                    data: {
+                      amount: tier_amount(level),
+                      action: "donate--page#update",
+                    } %>
+
+                    <span class="tw:min-w-12 tw:shrink-0 <%= amount_classes %>">
+                      <%= tier_amount(level) %>
+                    </span>
+
+                    <span class="tw:flex tw:flex-col">
+                      <span class="tw:text-[15.5px] tw:font-extrabold <%= ink %>">
+                        <%= name %>
+                      </span>
+
+                      <span class="tw:text-[13.5px] tw:leading-snug <%= muted %>">
+                        <%= benefit %>
+                      </span>
+                    </span>
+
+                    <%= radio_mark %>
+                  </label>
+                <% end %>
+              </fieldset>
+
+              <%= submit_button.(monthly_submit) %>
+            <% end %>
+          <% end %>
+        </div>
+
+        <%= form_tag payments_path,
+        method: :post,
+        class:
+          class_names(
+            "tw:flex-col tw:gap-2.25",
+            monthly? ? "tw:hidden tw:group-has-[#donate-cadence-one-time:checked]/donate:flex" : "tw:flex",
+          ),
+        data: {
+          donate__page_target: "oneTimeForm",
+        } do %>
+          <%= hidden_field_tag "payment[kind]", "donation", id: nil %>
+          <%= hidden_field_tag "payment[currency]", @currency.name, id: nil %>
+          <%= hidden_field_tag "payment[email]", @email, id: nil %>
+          <%= hidden_field_tag "payment[referral_source]", @referral_source, id: nil %>
+
+          <fieldset class="tw:flex tw:flex-col tw:gap-2.25">
+            <legend class="tw:sr-only"><%= translation(".one_time") %></legend>
+
+            <% ONE_TIME_AMOUNTS.each do |amount| %>
+              <label class="<%= row %>">
+                <%= radio_button_tag "payment[amount_cents]",
+                amount * 100,
+                amount == selected_one_time,
+                class: "tw:sr-only",
+                autocomplete: "off",
+                data: {
+                  amount: money(amount),
+                  donate__page_target: "oneTimeAmount",
+                  action: "donate--page#selectPreset",
+                } %>
+
+                <span class="<%= amount_classes %>"><%= money(amount) %></span>
+
+                <%= radio_mark %>
+              </label>
+            <% end %>
+          </fieldset>
+
+          <label
+            class="
+              tw:flex tw:items-center tw:gap-1.5 tw:rounded-[5px] tw:border
+              tw:border-[#e0e0e0] tw:bg-white tw:px-3.5
+              tw:has-focus:border-blue-500 tw:has-focus:ring-3
+              tw:has-focus:ring-blue-500/25 tw:dark:border-gray-700
+              tw:dark:bg-gray-800
+            "
+          >
+            <span class="tw:font-bold <%= muted %>" aria-hidden="true"><%= @currency.symbol %></span>
+            <span class="tw:sr-only"><%= translation(".other_amount") %></span>
+
+            <input
+              type="number"
+              min="1"
+              step="0.01"
+              inputmode="decimal"
+              autocomplete="off"
+              name="payment[amount]"
+              value="<%= custom_amount %>"
+              placeholder="<%= translation(".other_amount") %>"
+              class="
+                tw:w-full tw:border-0 tw:bg-transparent tw:py-3.5
+                tw:text-[15.5px] tw:outline-none tw:focus:ring-0
+              "
+              data-donate--page-target="customAmount"
+              data-action="input->donate--page#customInput"
+            >
+          </label>
+
+          <%= submit_button.(one_time_submit) %>
+        <% end %>
+
+        <p class="tw:mb-0 tw:text-[13.5px] <%= muted %>">
+          <span class="tw:lg:hidden"><%= translation(".fine_print_short") %></span>
+          <span class="tw:hidden tw:lg:inline"><%= translation(".fine_print") %></span>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="tw:border-y tw:py-5.5 tw:lg:border-b-0 tw:lg:py-11 <%= band %>">
+    <div class="<%= container %>">
+      <p class="tw:mb-2 tw:text-purple-500 tw:dark:text-purple-300 <%= eyebrow %>">
+        <%= translation(".major_eyebrow") %>
+      </p>
+
+      <h2 class="tw:mb-2 <%= h2 %>"><%= translation(".major_title") %></h2>
+
+      <p class="tw:mb-6 tw:hidden tw:max-w-180 tw:text-[17px] tw:md:block <%= muted %>">
+        <%= translation(".major_body") %>
+      </p>
+
+      <div
+        class="
+          tw:mt-4 tw:flex tw:flex-col tw:gap-4 tw:md:flex-row
+          tw:md:flex-wrap tw:lg:flex-nowrap
+        "
+      >
+        <% major_gifts.each do |amount, label| %>
+          <a
+            href="<%= donate_path(initial_amount: amount, source: @referral_source, anchor: "donate-form") %>"
+            class="tw:flex tw:flex-col tw:gap-1 tw:p-5.5 tw:text-inherit tw:no-underline tw:focus-visible:ring-3 tw:focus-visible:ring-blue-500/40 tw:focus-visible:outline-none tw:md:flex-1 tw:lg:w-59 tw:lg:flex-none <%= card %> <%= selectable %>"
+            data-amount="<%= amount %>"
+            data-donate--page-target="majorGift"
+            data-action="donate--page#selectMajor"
+          >
+            <span class="tw:font-header tw:text-[28px] tw:font-extrabold tw:lg:text-[38px] <%= ink %>">
+              <%= money(amount) %>
+            </span>
+
+            <span class="tw:text-xs tw:font-bold tw:uppercase <%= muted %>">
+              <%= label %>
+            </span>
+          </a>
+        <% end %>
+
+        <div
+          class="
+            tw:py-1 tw:md:basis-full tw:md:rounded-lg tw:md:border
+            tw:md:border-[#e0e0e0] tw:md:bg-white tw:md:p-5.5 tw:lg:flex-1
+            tw:lg:basis-auto tw:dark:md:border-gray-700
+            tw:dark:md:bg-gray-800
+          "
+        >
+          <h3 class="tw:mb-2 tw:hidden tw:text-[17px] tw:font-extrabold tw:md:block <%= ink %>">
+            <%= translation(".other_ways_title") %>
+          </h3>
+
+          <ul class="tw:mb-2 tw:flex tw:list-none tw:flex-col tw:gap-2 tw:pl-0">
+            <% [translation(".other_ways_daf"), translation(".other_ways_stock"), translation(".other_ways_match")].each do |way| %>
+              <li class="tw:flex tw:gap-2.5 tw:text-[15px] <%= muted %>">
+                <span
+                  class="
+                    tw:mt-2.5 tw:size-1.25 tw:shrink-0 tw:rounded-full
+                    tw:bg-purple-500
+                  "
+                ></span>
+
+                <%= way %>
+              </li>
+            <% end %>
+          </ul>
+
+          <%= mail_to "donate@bikeindex.org",
+          translation(".larger_gift_link"),
+          class: "twlink tw:text-[15px] tw:font-bold" %>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section
+    class="
+      tw:border-b tw:border-[#e0e0e0] tw:py-5.5 tw:lg:py-11
+      tw:dark:border-gray-700
+    "
+  >
+    <div class="<%= container %>">
+      <h2 class="tw:mb-5 <%= h2 %>"><%= translation(".uses_title") %></h2>
+
+      <div class="tw:grid tw:gap-3.5 tw:md:grid-cols-2 tw:lg:grid-cols-4">
+        <% money_uses.each do |icon, circle, title, body| %>
+          <div class="tw:flex tw:gap-4 tw:p-5 tw:lg:flex-col tw:lg:gap-3 tw:lg:bg-[#f8f8f8] tw:lg:p-5.5 <%= card %>">
+            <span
+              class="
+                tw:flex tw:size-10 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:text-white
+                <%= circle %>
+              "
+            >
+              <%= helpers.inline_svg_tag("icons/#{icon}.svg", class: "tw:size-5", aria_hidden: true) %>
+            </span>
+
+            <div>
+              <h3 class="tw:mb-1 tw:text-[16.5px] tw:font-extrabold tw:lg:text-[17.5px] <%= ink %>">
+                <%= title %>
+              </h3>
+
+              <p class="tw:mb-0 tw:text-[14.5px] <%= muted %>"><%= body %></p>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <% if @recovery_displays.any? %>
+    <section class="tw:hidden tw:border-b tw:py-11 tw:md:block <%= band %>">
+      <div class="<%= container %>">
+        <div
+          class="
+            tw:mb-5 tw:flex tw:flex-wrap tw:items-end tw:justify-between
+            tw:gap-2
+          "
+        >
+          <div>
+            <h2 class="tw:mb-1 <%= h2 %>">
+              <%= translation(".stories_title") %>
+            </h2>
+
+            <p class="tw:mb-0 tw:text-[17px] <%= muted %>">
+              <%= translation(".stories_subhead") %>
+            </p>
+          </div>
+
+          <%= link_to translation(".stories_link"),
+          recovery_stories_path,
+          class: "twlink tw:text-[15.5px] tw:font-bold" %>
+        </div>
+
+        <ul
+          class="
+            tw:mb-0 tw:grid tw:list-none tw:grid-cols-2 tw:gap-4 tw:pl-0
+            tw:lg:grid-cols-4
+          "
+        >
+          <% @recovery_displays.each do |recovery_display| %>
+            <li class="tw:overflow-hidden tw:transition tw:duration-300 tw:hover:-translate-y-1.25 tw:hover:shadow-[0_10px_30px_rgba(44,62,80,.16)] <%= card %>">
+              <%= image_tag recovery_display.photo_url,
+              alt: recovery_display.image_alt,
+              class: "tw:h-42 tw:w-full tw:object-cover" %>
+
+              <div class="tw:p-4">
+                <p class="tw:mb-2 tw:text-[15px] tw:text-[#444] tw:dark:text-gray-200">
+                  <%= recovery_display.quote %>
+                </p>
+
+                <p class="tw:mb-0 tw:flex tw:flex-wrap tw:items-baseline tw:gap-x-2">
+                  <span class="tw:text-[13.5px] tw:font-extrabold <%= ink %>">
+                    <%= recovery_display.quote_by %>
+                  </span>
+
+                  <span class="tw:text-[11.5px] <%= muted %>">
+                    <%= translation(".recovered") %>
+                    <%= render(UI::Time::Component.new(time: recovery_display.recovered_at)) %>
+                  </span>
+                </p>
+              </div>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+    </section>
+  <% end %>
+
+  <section class="tw:bg-blue-600 tw:py-6 tw:text-white tw:lg:py-11">
+    <div
+      class="
+        tw:flex tw:flex-col tw:gap-5 tw:md:flex-row tw:md:items-center tw:lg:gap-9
+        <%= container %>
+      "
+    >
+      <%= image_tag "kelsey/illustrations/comic-assets_bike-love-1.png",
+      alt: "",
+      class: "tw:hidden tw:w-30 tw:shrink-0 tw:lg:block" %>
+
+      <div class="tw:flex-1">
+        <p
+          class="
+            tw:mb-1 tw:font-header tw:text-[23px] tw:leading-tight
+            tw:font-extrabold tw:md:text-[26px] tw:xl:text-[32px]
+          "
+        >
+          <%= translation(".cta_headline") %>
+        </p>
+
+        <p class="tw:mb-0 tw:hidden tw:text-[17px] tw:md:block">
+          <%= translation(".cta_sub") %>
+        </p>
+      </div>
+
+      <%= render UI::Button::Component.new(
+        text: submit_label,
+        color: :yellow,
+        size: :callout,
+        html_class: "tw:w-full tw:md:w-auto tw:max-md:px-4! tw:max-xs:text-xs!",
+        data: {
+          donate__page_target: "submit",
+          action: "donate--page#submitActive"
+        }
+      ) %>
+    </div>
+  </section>
+</div>
