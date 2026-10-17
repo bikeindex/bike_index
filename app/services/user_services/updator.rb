@@ -27,8 +27,8 @@ module UserServices
 
       # Skip user.bikes' default_includes — with_street's where.not + LIMIT 1
       # would otherwise force a 6-table LEFT JOIN to find one row.
-      # Ordering by bikes.id walks bikes_pkey across the whole table for a user
-      # with thousands of bikes; ownerships.id walks their (user_id, id) index
+      # Ordering by bikes.id walks bikes_pkey for users with thousands of bikes;
+      # ownerships.id uses the (user_id, id) index
       def bikes_for_user(user)
         Bike.unscoped.without_deleted.where(example: false)
           .joins(:current_ownership).where(ownerships: {user_id: user.id})

@@ -7406,7 +7406,7 @@ CREATE INDEX index_ownerships_on_sale_id ON public.ownerships USING btree (sale_
 -- Name: index_ownerships_on_user_id_and_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_ownerships_on_user_id_and_id ON public.ownerships USING btree (user_id, id);
+CREATE INDEX index_ownerships_on_user_id_and_id ON public.ownerships USING btree (user_id, id) WHERE (user_id IS NOT NULL);
 
 
 --
