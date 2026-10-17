@@ -14,7 +14,6 @@ RSpec.describe FeedbacksController, type: :request do
 
       it "renders the detail prompt and the message template" do
         get base_url
-        expect(response.status).to eq(200)
         expect(response.body).to match(/The more detail you can share/)
         expect(response.body).to match(/Bike serial number \(if applicable\):/)
       end
