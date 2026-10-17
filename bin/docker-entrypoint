@@ -38,10 +38,8 @@ SQL
   # OAuth seed every deploy to (re)provision and repair that app on databases
   # that already exist. Nothing schedules the Stripe price sync, and review apps
   # carry test-mode keys, so sync the real prices over the seeded placeholders.
-  # Sandbox env only; non-fatal so neither can block boot.
   if [ "$RAILS_ENV" == "sandbox" ]; then
-    ./bin/rails runner db/seeds/seed_oauth_app.rb || true
-    ./bin/rails runner "StripeJobs::UpdatePricesJob.new.perform" || true
+    ./bin/rails runner 'StripeJobs::UpdatePricesJob.perform_async; load "db/seeds/seed_oauth_app.rb"' || true
   fi
 fi
 
