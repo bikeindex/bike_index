@@ -51,12 +51,14 @@ def seed_recovery_display(bike:, location:, photo_filename:, recovered_at:, reco
   # without sidekiq, since the homepage filters on it
   recovery_display = RecoveryDisplay.new(stolen_record:, recovered_at:, quote_by:, location_string:, quote:,
     skip_callback_job: true)
-  # save! goes inside the block - ActiveStorage re-reads the io to upload it
-  File.open(photo_path) do |file|
-    recovery_display.photo.attach(io: file, filename: photo_filename)
-    recovery_display.save!
+  SeedHelpers.without_clock do
+    # save! goes inside the block - ActiveStorage re-reads the io to upload it
+    File.open(photo_path) do |file|
+      recovery_display.photo.attach(io: file, filename: photo_filename)
+      recovery_display.save!
+    end
+    ImageJobs::ProcessRecoveryDisplayPhotoJob.new.perform(recovery_display.id)
   end
-  ImageJobs::ProcessRecoveryDisplayPhotoJob.new.perform(recovery_display.id)
   recovery_display
 end
 
