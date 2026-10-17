@@ -48,11 +48,6 @@ en:
           join_yearly: Join as %{level} — %{price}/yr
           keep_bike_index_free: Keep Bike Index free for every rider
           keeps_free: Keeps free
-          lede: >-
-            Membership is a monthly donation to Bike Index, a nonprofit. It pays for
-            the registry and the stolen bike alerts that get bikes home, and it funds
-            the new tools we build next. Registering a bike and reporting a theft
-            will always be free. Members are the reason we can promise that.
           live: Live
           member_gear: Member gear
           member_gear_body: >-
@@ -62,6 +57,11 @@ en:
           members_keep_it_free: A million bikes are registered. Members keep it free
             for the next million.
           monthly: Monthly
+          monthly_donation_lede: >-
+            Membership is a monthly donation to Bike Index. It pays for the registry
+            and the stolen bike alerts that get bikes home, and it funds the new tools
+            we build next. Registering a bike and reporting a theft will always be
+            free. Members are the reason we can promise that.
           new_tools_for_bike_owners: New tools for bike owners
           next: Next
           next_ebike_database_body: A Global UL-certification database
