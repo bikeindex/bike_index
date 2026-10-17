@@ -9,3 +9,5 @@ en:
           class_unknown_aria: E-bike class unknown
           emoto: E-moto
           emoto_aria: E-moto, not an e-bike
+          optional_throttle: w/ optional throttle
+          optional_upgrade: w/ optional upgrade

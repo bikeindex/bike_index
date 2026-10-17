@@ -57,6 +57,11 @@ Rails.application.routes.draw do
   get "recovery_stories", to: "welcome#recovery_stories", as: :recovery_stories
   get "bikebook", to: "bikebook#show"
   get "bikebook/*vehicle_model", to: "bikebook#vehicle", format: false
+  # a catalog model's own id, its manufacturer, year and model
+  get "m/*vehicle_model", to: "bikebook#vehicle", format: false, constraints: {vehicle_model: %r{[a-z0-9_]+/\d{4}/[a-z0-9_]+}}
+  # an e-vehicle classification's id, whose card the page shows
+  get "evc/*classification", to: redirect(status: 302) { |params, _request| "/bikebook?classifications=evc/#{params[:classification]}" },
+    format: false, constraints: {classification: %r{[a-z0-9_]+(/[a-z0-9_]+)*}}
   if Integrations::Bikebook::Catalog::LOCAL_DIRECTORY
     mount Rack::Files.new(Integrations::Bikebook::Catalog::LOCAL_DIRECTORY) => Integrations::Bikebook::Catalog::LOCAL_PATH
   end

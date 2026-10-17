@@ -10,8 +10,9 @@ const KEY = 'bikebook_tips_dismissed'
 export default class extends Controller {
   static targets = ['tips', 'prompt', 'restore']
 
+  // a classification's card, shown alone, has neither
   connect () {
-    this.#show(!this.#dismissed)
+    if (this.hasTipsTarget) this.#show(!this.#dismissed)
   }
 
   dismiss () {

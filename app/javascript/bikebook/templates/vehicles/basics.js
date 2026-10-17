@@ -1,14 +1,16 @@
 import { html, nothing } from 'lit-html'
 import { amountDisplay, missing } from 'bikebook/templates/helpers'
+import { collapse } from 'bikebook/templates/ui/collapse'
+import { copyButton } from 'bikebook/templates/ui/copy_button'
 import { table } from 'bikebook/templates/ui/table'
 import { priced } from 'bikebook/templates/vehicles/comparison_table'
 import { basicsOf, simpleFormat } from 'bikebook/templates/vehicles/model_viewer'
-import { CERTIFICATION_LABEL } from 'bikebook/templates/vehicles/motor_section'
-import { present } from 'bikebook/templates/values'
+import { array, present } from 'bikebook/templates/values'
 
-// `only` ones once a shown model is electric, suspended or a cargo vehicle, the rest once one lists it, and `differing`
+// `only` ones once a shown model is electric, suspended, a cargo vehicle or sold outside the visitor's market, the rest once one lists it, and `differing`
 // ones where the models' values of it differ
 const FIELDS = [
+  { label: 'Markets', key: 'markets', only: 'outside_market' },
   { label: 'Model group', key: 'model_group' },
   { label: 'Years', key: 'years' },
   { label: 'Vehicle type', key: 'vehicle_type', differing: 'type' },
@@ -20,7 +22,7 @@ const FIELDS = [
   { label: 'Groupset', key: 'groupset' },
   { label: 'Price', key: 'price' },
   { label: 'E-vehicle class', key: 'e_vehicle_class', only: 'electric' },
-  { label: CERTIFICATION_LABEL, key: 'certification', only: 'electric' },
+  { label: 'Electric Certification', key: 'certification', only: 'electric' },
   { label: 'Description', key: 'description' }
 ]
 // the label column's 12.5rem and 12rem per model, so a phone scrolls the table rather than squeezing it. One model's
@@ -35,7 +37,8 @@ const manufacturerLine = (manufacturer) => present(manufacturer)
 
 const EXCERPT_LENGTH = 200
 
-// `text`'s first 200 characters, cut at a word and keeping its paragraphs, with a button for the whole of it as `content`
+// `text`'s first 200 characters, cut at a word and keeping its paragraphs, which a collapse swaps for the whole of it as
+// `content`
 const readMore = (text, content) => {
   const raw = String(text).replace(/\r\n?/g, '\n').trim()
   if (raw.length <= EXCERPT_LENGTH) return content
@@ -43,20 +46,26 @@ const readMore = (text, content) => {
   // the next character too, so a cut landing on a word's end keeps the word
   const words = raw.slice(0, EXCERPT_LENGTH + 1).replace(/\s+\S*$/, '').slice(0, EXCERPT_LENGTH)
   const excerpt = `${words.replace(/[\s,.;:—–-]+$/, '')}…`
-  return html`<div class="tw:group/read-more" data-controller="bikebook--read-more"><div class="tw:space-y-2 tw:group-data-expanded/read-more:hidden">${
-    simpleFormat(excerpt)}</div><div
-    class="tw:hidden tw:group-data-expanded/read-more:block">${content}</div><button type="button" aria-expanded="false" class="twlink tw:mt-1 tw:text-sm"
-    data-bikebook--read-more-target="button" data-action="bikebook--read-more#toggle"><span class="tw:group-data-expanded/read-more:hidden">Read more</span><span
-    class="tw:hidden tw:group-data-expanded/read-more:inline">Show less</span></button></div>`
+  return html`<div class="tw:group/read-more" data-controller="ui--collapse"><div
+    class="tw:space-y-2 tw:group-has-[[aria-expanded=true]]/read-more:hidden">${simpleFormat(excerpt)}</div><div class="tw:hidden"
+    data-ui--collapse-target="content">${content}</div>${collapse({
+      color: 'link',
+      chevron: 'trailing',
+      htmlClass: 'tw:group/more tw:mt-1 tw:text-sm',
+      content: html`<span class="tw:group-aria-expanded/more:hidden">Read more</span><span class="tw:hidden tw:group-aria-expanded/more:inline">Show less</span>`
+    })}</div>`
 }
 
 // The models' names, photos and headline fields side by side in a table, one model's as two's
 export const basics = ({ presenter, vehicles }) => {
-  const shown = vehicles.map(({ data }) => {
+  const shown = vehicles.map(({ data, value, outOfClass, outsideMarket }) => {
     const price = priced(data)
-    const fields = basicsOf({ presenter, data })
+    const fields = basicsOf({ presenter, data, outOfClass })
     return {
       ...fields,
+      value,
+      markets: array(data.markets).map((code) => presenter.vocabulary.names?.markets?.[code] ?? code).join(', '),
+      outside_market: outsideMarket,
       price: price && amountDisplay(price.original_msrp, price.original_msrp_currency, presenter.vocabulary.currencies),
       description: fields.description && readMore(data.description, fields.description)
     }
@@ -74,7 +83,8 @@ const compared = (vehicles, fields) => html`<section aria-label=${vehicles.lengt
   columns: [
     { label: html`<span class="tw:sr-only">Field</span>`, rowHeader: true, classes: 'tw:w-50 tw:px-2.5! tw:py-2! tw:align-top tw:font-bold', cell: ({ label }) => label },
     ...vehicles.map((vehicle) => ({
-      label: html`${vehicle.photo('tw:mb-2 tw:aspect-[4/3]')}${manufacturerLine(vehicle.manufacturer)}${vehicle.model}`,
+      label: html`${vehicle.photo('tw:mb-2 tw:aspect-[4/3]')}${manufacturerLine(vehicle.manufacturer)}<span class="tw:inline-flex tw:items-baseline tw:gap-1">${
+        vehicle.model}${copyButton({ value: vehicle.value, label: 'Copy ID', tooltip: true })}</span>`,
       classes: 'tw:px-2.5! tw:py-2! tw:align-top',
       cellClass: ({ key }) => key === 'description' ? 'tw:text-sm' : '',
       cell: ({ key, only }) => {

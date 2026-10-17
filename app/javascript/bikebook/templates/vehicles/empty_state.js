@@ -35,9 +35,14 @@ const featuredCards = ({ featured, vehiclePath, ...card }) => html`<ul aria-labe
   >${featured.map((model) => modelCard({ model, href: vehiclePath(model.id), ...card }))}</ul>`
 
 // With nothing picked, how the page works and comparisons to start from, or once they're dismissed, a prompt, and under
-// either what the search leaves and some of it
-export const emptyState = ({ url, filtered, count, featured, ...cards }) => html`<div class="tw:mt-3" data-controller="bikebook--tips"><div
-  data-bikebook--tips-target="tips"><section aria-label="How to use Bike Book" tabindex="-1"
+// either what the search leaves and some of it. A classification's card, shown alone, leaves out the first two
+export const emptyState = ({ url, filtered, count, featured, ...cards }) => html`<div class="tw:mt-3" data-controller="bikebook--tips">${url.searchParams.get('classifications')
+  ? nothing
+  : tips(url)}${filtered || featured.length
+  ? searchNote({ count, filtered })
+  : nothing}${featured.length ? featuredCards({ featured, ...cards }) : nothing}</div>`
+
+const tips = (url) => html`<div data-bikebook--tips-target="tips"><section aria-label="How to use Bike Book" tabindex="-1"
   class="tw:relative tw:flex tw:flex-col tw:gap-5 tw:rounded-md tw:border tw:border-dashed tw:border-gray-300 tw:px-7 tw:py-6 tw:outline-none
   tw:dark:border-gray-600"><ol class="tw:m-0 tw:grid tw:list-none tw:gap-6 tw:p-0 tw:sm:grid-cols-3">${steps.map(([title, description], index) =>
     html`<li class="tw:flex tw:gap-3"><span aria-hidden="true" class="tw:flex tw:size-7 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full
@@ -49,6 +54,4 @@ export const emptyState = ({ url, filtered, count, featured, ...cards }) => html
   tw:dark:hover:text-gray-200">${x('tw:h-3 tw:w-3')}</button></section></div><div hidden data-bikebook--tips-target="prompt"><div class="tw:rounded-md
   tw:border tw:border-dashed tw:border-gray-300 tw:px-4 tw:py-6 tw:text-center tw:dark:border-gray-600"><p class="tw:text-xs tw:font-bold tw:tracking-wider
   tw:text-[#715eb2] tw:uppercase tw:dark:text-[#a99bd6]">Nothing selected yet</p><p class="tw:mt-1 tw:text-sm tw:text-gray-500">Pick a bike above to start
-  comparing. <button type="button" class="twlink" data-bikebook--tips-target="restore" data-action="bikebook--tips#restore">Show tips</button></p></div></div>${filtered || featured.length
-  ? searchNote({ count, filtered })
-  : nothing}${featured.length ? featuredCards({ featured, ...cards }) : nothing}</div>`
+  comparing. <button type="button" class="twlink" data-bikebook--tips-target="restore" data-action="bikebook--tips#restore">Show tips</button></p></div></div>`

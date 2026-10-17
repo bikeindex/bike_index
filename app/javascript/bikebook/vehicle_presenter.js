@@ -90,6 +90,22 @@ export class VehiclePresenter {
     return this.#unitSystems(metric, inCentimeters ? join([metric, ' ', html`<span class="tw:text-xs twless-strong">(${shown})</span>`]) : shown)
   }
 
+  // In feet and inches, or centimeters in metric: "6' 4"", "194 cm"
+  length (millimeters) {
+    return this.#unitSystems(this.#centimeters(millimeters),
+      join(this.#feetAndInches().map(({ part, convert }) => this.labeled(this.rounded(convert(millimeters)), 'mm', part)), ' '))
+  }
+
+  // Spelled out, the other system's after: "6 feet, 4 inches (194 cm)", "194 cm (6 feet, 4 inches)"
+  lengthInWords (millimeters) {
+    const [centimeters, words] = [this.#centimeters(millimeters), this.#inWords(millimeters)]
+    return this.#unitSystems(join([centimeters, ` (${words})`]), join([words, ' (', centimeters, ')']))
+  }
+
+  #centimeters (millimeters) {
+    return this.labeled(this.rounded(millimeters / this.kit.conversions.mm.cm), 'cm', this.kit.presenter.centimeters)
+  }
+
   // all three read "136.5 × 66.6 × 137 cm" (L × W × H); fewer name each, "136.5 cm long"
   dimensions (dimensions) {
     const { cm } = this.kit.conversions.mm
@@ -110,12 +126,6 @@ export class VehiclePresenter {
       values.map(([key, mm]) => join([`${this.humanize(key)}: `, exact[index](mm)]))
     ))
     return this.#unitSystems(metricSystem, imperialSystem)
-  }
-
-  // in one system rather than the viewer's, as a market's own page gives it
-  measurementIn (value, unit, imperial) {
-    const [part] = imperial ? this.#imperialParts(unit) : []
-    return part ? this.labeled(this.rounded(part.convert(value)), unit, part.part) : this.labeled(value, unit)
   }
 
   #unitSystems (metric, imperial) {
@@ -211,6 +221,11 @@ export class VehiclePresenter {
 
   rounded (value) {
     return roundHalfUp(value * 10) / 10
+  }
+
+  // A motor's operating mode, "Pedal assist" rather than the catalog's bare "assist"
+  modeLabel (mode) {
+    return mode === 'assist' ? 'Pedal assist' : this.humanize(mode)
   }
 
   humanize (text) {

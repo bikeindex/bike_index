@@ -318,10 +318,25 @@
 
   <%= render(Pages::Bikebook::DonateStrip::Component.new) %>
 
-  <%# The US classes' and the e-moto's tiles the Overview shows, each a tooltip of its card %>
-  <% [1, 2, 3, nil].each do |e_bike_class| %>
-    <template data-bikebook-class-badge="<%= e_bike_class || "emoto" %>">
-      <%= render(Pages::EbikeRules::ClassTile::Component.new(e_bike_class:, explained: true)) %>
+  <%#
+    The tiles the Overview shows, as /ebike-rules does: the US classes', each also as only an optional mode brings it,
+    and the e-moto's, also as only an optional throttle brings it, each a tooltip of its card
+  %>
+
+  <% [*[1, 2, 3, nil].product([nil]), *[1, 2, 3].product(%w[throttle assist]), [nil, "throttle"]].each do |e_bike_class, optional| %>
+    <template
+      data-bikebook-class-badge="<%= [e_bike_class || "emoto", optional].compact.join("/") %>"
+    >
+      <%= render(Pages::EbikeRules::ClassTile::Component.new(e_bike_class:, optional:, size: :lg, explained: true)) %>
+    </template>
+  <% end %>
+
+  <%# The UL badges the Overview's certifications show, as /ebike-rules does, each a tooltip of what it means %>
+  <% [[2849, :certified], [2271, :certified], [nil, :unknown]].each do |standard, status| %>
+    <template
+      data-bikebook-ul-badge="<%= [standard, status].compact.join("/") %>"
+    >
+      <%= render(Pages::EbikeRules::UlBadge::Component.new(standard:, status:)) %>
     </template>
   <% end %>
 

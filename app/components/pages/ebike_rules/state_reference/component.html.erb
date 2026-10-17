@@ -133,7 +133,7 @@
 
             <p class="tw:mt-4">
               <%= link_to translation(".check_in_state", state: state[:name]), ebike_rules_state_path(state[:abbr].downcase, anchor: "check"),
-                class: "twlink tw:font-semibold" %>
+                class: "twlink tw:font-semibold", data: {check_state: state[:abbr]} %>
             </p>
           </div>
         </div>

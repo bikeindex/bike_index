@@ -28,6 +28,8 @@ module EbikeRuleServices
 
     def row(id, status, note, **args) = {id:, status:, note:, args:}
 
+    def abbreviation(law) = law[:id][EbikeRuleServices::StateLaws::STATE_ID, 1]&.upcase
+
     # Each class a bike carries has to be recognized
     def classes_rule(law, bike)
       classes = bike.e_bike_classes
@@ -35,6 +37,8 @@ module EbikeRuleServices
         row(:classes, :check, :class_unknown)
       elsif bike.e_bike_class.nil?
         row(:classes, :fail, :not_classified)
+      elsif bike.out_of_class_in?(abbreviation(law))
+        row(:classes, :fail, :classes_not_permitted, e_bike_classes: classes)
       # limits not yet in force describe the coming law, so the rider checks the law's dated rules for today's
       elsif (date = law[:limits_start_on])
         row(:classes, :check, :classes_start_on, date:)
@@ -42,6 +46,8 @@ module EbikeRuleServices
         row(:classes, :info, :own_classes)
       elsif (unrecognized = classes - law[:classes]).none?
         row(:classes, :pass, :classes_recognized, e_bike_classes: classes)
+      elsif (unrecognized - bike.optional_classes.keys).none?
+        row(:classes, :check, :optional_classes_not_recognized, e_bike_classes: unrecognized)
       else
         row(:classes, :fail, :classes_not_recognized, e_bike_classes: unrecognized)
       end
@@ -68,6 +74,9 @@ module EbikeRuleServices
       past = bike.assists_past_mph
       if (date = law[:limits_start_on])
         row(:speed, :info, :limits_start_on, date:)
+      # Class 3's 28 mph, though its record gives its assist a slower top speed
+      elsif bike.out_of_class_in?(abbreviation(law))
+        row(:speed, :fail, :class_3_speed_with_throttle, mph: [mph, 28].compact.max)
       elsif past && cap
         (cap <= past) ? row(:speed, :fail, :speed_past_cap, past:, cap:) : row(:speed, :check, :speed_past, past:, cap:)
       elsif mph.nil? && past.nil?
@@ -81,9 +90,16 @@ module EbikeRuleServices
       end
     end
 
+    # A throttle it's only sold with as an option leaves it legal without one
     def throttle_rule(law, bike)
+      rule = throttle_row(law, bike)
+      (bike.optional_throttle? && rule[:status] == :fail) ? row(:throttle, :check, :optional_throttle_not_allowed) : rule
+    end
+
+    def throttle_row(law, bike)
       return row(:throttle, :pass, :no_throttle) unless bike.throttle
       return row(:throttle, :fail, :throttle_not_allowed) if law[:throttle] == false
+      return row(:throttle, :fail, :throttle_with_class_3_assist) if bike.class_3_throttle_banned?(abbreviation(law))
       return row(:throttle, :check, :throttle_not_stated) if law[:throttle].nil?
 
       case bike.e_bike_class
@@ -105,6 +121,6 @@ module EbikeRuleServices
       end
     end
 
-    conceal :row, :classes_rule, :power_rule, :speed_rule, :throttle_rule, :class_3_throttle
+    conceal :row, :abbreviation, :classes_rule, :power_rule, :speed_rule, :throttle_rule, :throttle_row, :class_3_throttle
   end
 end
