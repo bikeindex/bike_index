@@ -51,12 +51,12 @@ CREATE TABLE public.logged_searches (
     street character varying,
     neighborhood character varying,
     city character varying,
-    zipcode character varying,
     country_id bigint,
-    state_id bigint,
     processed boolean DEFAULT false,
     postal_code character varying,
-    region_record_id bigint
+    region_record_id bigint,
+    region_string character varying,
+    street_2 character varying
 );
 
 
@@ -296,13 +296,6 @@ CREATE INDEX index_logged_searches_on_request_id ON public.logged_searches USING
 
 
 --
--- Name: index_logged_searches_on_state_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_logged_searches_on_state_id ON public.logged_searches USING btree (state_id);
-
-
---
 -- Name: index_logged_searches_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -358,6 +351,8 @@ CREATE INDEX index_versions_on_item_type_and_item_id ON public.versions USING bt
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261017210000'),
+('20261017200000'),
 ('20261017120000'),
 ('20260425121709'),
 ('20260318174948'),

@@ -34,7 +34,7 @@
     <% end %>
 
     <% table.column(sortable: "city", label: "IP Location", classes: "tw:text-xs") do |logged_search| %>
-      <%= logged_search.address(country: [:name, :skip_default]) %>
+      <%= logged_search.formatted_address_string %>
     <% end %>
 
     <% table.column(label: "Query") do |logged_search| %>
