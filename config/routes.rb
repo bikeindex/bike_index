@@ -154,6 +154,7 @@ Rails.application.routes.draw do
   resource :my_account, only: %i[show update destroy] do
     post :toggle_show_redesign
     resources :messages, only: %i[index show create], controller: "my_accounts/messages"
+    resource :membership, only: %i[show], controller: "my_accounts/memberships"
     resources :marketplace_listings, only: %i[update], controller: "my_accounts/marketplace_listings"
     resources :organization_roles, only: %i[update destroy], controller: "my_accounts/organization_roles"
   end
