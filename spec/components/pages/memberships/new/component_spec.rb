@@ -21,7 +21,8 @@ RSpec.describe Pages::Memberships::New::Component, type: :component do
 
   it "renders the plans with plus selected" do
     expect(component).to have_css("h1", text: "Keep Bike Index free for every rider")
-    expect(component).to have_text("1M+")
+    expect(component).to have_text("1.2M+")
+    expect(component).to have_css("h2", text: "1.2 million bikes are registered. Members keep it free for the next million.")
     expect(component).to have_text("18,263")
     expect(component).to have_text("$38M+")
     expect(component).to have_text("Plans from $5 a month")
@@ -31,7 +32,7 @@ RSpec.describe Pages::Memberships::New::Component, type: :component do
     expect(component).to have_css("[data-memberships--new-target='summary']", text: "Plus membership, $15 a month")
     expect(component).to have_css("[data-memberships--new-target='join']", text: "Join as Plus — $15/mo", count: 2)
     expect(component).to have_text("$150")
-    expect(component).to have_css("details[name='membership-faq']", count: 5)
+    expect(component).to have_css("details", count: 5)
     expect(component).to have_css("details[open]", count: 1)
     expect(component).to have_link("Or make a one-time donation", href: "/donate")
     expect(component).to_not have_link("Read more recovery stories")
@@ -55,6 +56,24 @@ RSpec.describe Pages::Memberships::New::Component, type: :component do
 
     it "falls back to plus" do
       expect(component).to have_checked_field("membership_level_plus", visible: :all)
+    end
+  end
+
+  context "with a whole number of millions of bikes" do
+    let(:options) { super().merge(bikes_count: 2_000_999) }
+
+    it "drops the decimal" do
+      expect(component).to have_text("2M+")
+      expect(component).to have_css("h2", text: "2 million bikes are registered.")
+    end
+  end
+
+  context "with fewer than a million bikes" do
+    let(:options) { super().merge(bikes_count: 456_789) }
+
+    it "shows the whole count" do
+      expect(component).to have_text("456,789+")
+      expect(component).to have_css("h2", text: "456,789 bikes are registered.")
     end
   end
 
