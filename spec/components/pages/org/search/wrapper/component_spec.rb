@@ -41,6 +41,9 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
     expect(component).to have_css("[data-ui--collapse-target='content'].tw\\:hidden\\!", visible: :all)
     expect(component).to have_css("input[type='checkbox']", visible: :all)
     expect(component).to have_button("Column settings", visible: :all)
+    # the search page's org--search spans the form too, so the card runs only the columns
+    card_controllers = component.at_css(".search-results-card")["data-controller"].split
+    expect(card_controllers).to eq %w[ui--collapse ui--column-settings ui--table-column-order]
     # footer
     expect(component).to have_text("showing 1–10 of 25")
     expect(component).to have_css("select#per_page_select")
@@ -120,7 +123,7 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
       # no results frame above this card, so nothing sets [busy] and there's no loading swap
       expect(component).not_to have_css(".search-results-card", visible: :all)
       expect(component).not_to have_text("Loading results...")
-      expect(component).to have_css("[data-controller~='org--search-column-settings']")
+      expect(component).to have_css("[data-controller~='org--search'][data-controller~='ui--column-settings']")
       expect(component).to have_button("Column settings", visible: :all)
       # the header's button is the only one - the panel doesn't carry the legacy one
       expect(component).to have_css("[data-ui--collapse-target='trigger']", count: 1, visible: :all)

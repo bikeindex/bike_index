@@ -15,6 +15,35 @@ RSpec.describe UI::ColumnSettings::Component, type: :component do
     expect(component).to have_button("default")
   end
 
+  context "with always_visible and hints" do
+    let(:component) do
+      render_inline(described_class.new(columns: {view_cell: "View", color_cell: "Color"}, defaults: %i[color_cell],
+        always_visible: %i[view_cell], hints: {color_cell: "Frame colors"}))
+    end
+
+    it "checks the always-visible column, leaving it out of the controller's reach, and hints under a label" do
+      expect(component).to have_field("View", checked: true, disabled: true, visible: :all)
+      expect(component.at_css("input[name='view_cell']")["data-ui--column-settings-target"]).to be_nil
+      expect(component.at_css("label:has(#column_settings_color_cell) small").text).to eq "Frame colors"
+    end
+  end
+
+  context "with field_name" do
+    let(:component) do
+      render_inline(described_class.new(columns: {"serial" => "Serial", "color" => "Color"}, defaults: %w[serial],
+        field_name: "export[headers][]", checked: %w[color]))
+    end
+
+    it "renders a form's fields, open, with the controller on the panel and no storage key" do
+      expect(component).not_to have_css("[data-ui--collapse-target]")
+      expect(component).to have_css("[data-controller='ui--column-settings']:not([data-ui--column-settings-storage-key-value])")
+      expect(component).to have_text("Included columns")
+      expect(component).to have_field("export_headers_serial", with: "serial", checked: false)
+      expect(component).to have_field("export[headers][]", with: "color", checked: true)
+      expect(component.at_css("input[value='serial']")["data-default"]).to eq "true"
+    end
+  end
+
   describe ".data_attributes" do
     it "runs the collapse and the column settings off the storage key" do
       expect(described_class.data_attributes(storage_key: "adminThings")).to eq(controller: "ui--collapse ui--column-settings",

@@ -5,5 +5,6 @@ en:
       column_settings:
         all: all
         default: default
+        included_columns: Included columns
         none: none
         visible_columns: Visible columns
