@@ -145,6 +145,8 @@ module EbikeRuleServices
         watt_cap: record["max_power"],
         mph: mph(record["max_speed"]),
         throttle: record["throttle"],
+        # false where a Class 3 can't have a throttle at all, as California's can't
+        class_3_throttle: record["class_3_throttle"],
         restrictions: record["restrictions"].to_a.map { restriction(it) },
         limits_start_on: date(record["limits_start_on"]),
         sources: web_pages(record["sources"])

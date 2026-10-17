@@ -12,7 +12,7 @@ const DETAILS = ['manual', 'top_speed', 'throttle', 'watts']
 // The bike field is a stand-in until the catalog loads, since the combobox must have its source
 // before it connects, and stays one if the catalog fails, leaving the details. Each state has its own
 // page, so the state is the form's path rather than a field. There's no submit button: a pick or a
-// change to the details loads its check into the result frame, advancing the URL to the check's own.
+// change to the details loads its check into the result frame, replacing the URL with the check's own.
 // The form's data-details says which the check is of: a picked "model", whose details its check copies
 // into the panel; "custom" details changed from the model's; or "manual" details with no model
 export default class extends Controller {
@@ -60,21 +60,39 @@ export default class extends Controller {
     this.#visit(this.#checkUrl ?? this.element.action)
   }
 
+  // A state's link in the rules below picks it here, as its option would, rather than loading its page
+  checkInState (event) {
+    const link = event.target.closest('a[data-check-state]')
+    if (!link || event.metaKey || event.ctrlKey || event.shiftKey) return
+
+    event.preventDefault()
+    this.stateTarget.querySelector(`[role=option][data-value="${link.dataset.checkState}"]`).click()
+    this.chooseState()
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  // A pick, by an option's press or Enter, noted before the gem selects it: its selection event reads the same as the
+  // one it announces on connecting or on a blur
+  notePick ({ type, target }) {
+    this.picking = type === 'keydown' || Boolean(target.closest('[role=option]'))
+  }
+
   // The gem leaves the autocompleted part of a pick selected, and the catalog's "(current)" says
-  // nothing a picked model needs. It also announces the prefilled model on connecting, which keeps the
-  // page's custom details
+  // nothing a picked model needs. Its announcement keeps the page's custom details, which a pick of
+  // their model returns to its own
   chooseBike ({ detail } = {}) {
     const input = this.comboboxSlotTarget.querySelector('input[role=combobox]')
     if (detail?.value && input) {
       input.value = input.value.replace(/ \(current\)$/, '')
       input.setSelectionRange(input.value.length, input.value.length)
     }
-    if (detail?.value && detail.value !== this.model) {
+    if (detail?.value && (detail.value !== this.model || this.picking)) {
       this.model = detail.value
       this.#setMode('model')
       // the pick's name, without the catalog's years
       this.legendTarget.textContent = this.modelLegendValue.replace('%{model}', input.value.replace(/ \([^)]*\)$/, ''))
     }
+    this.picking = false
     this.#check()
   }
 
@@ -124,7 +142,7 @@ export default class extends Controller {
     if (url === this.lastUrl) return
 
     this.lastUrl = url
-    Turbo.visit(url, { frame: RESULT_FRAME, action: 'advance' })
+    Turbo.visit(url, { frame: RESULT_FRAME, action: 'replace' })
   }
 
   // A state's own classes, where it doesn't use the three. The gem announces a prefilled state on connecting,

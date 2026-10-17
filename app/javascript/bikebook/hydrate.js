@@ -5,7 +5,7 @@ import { numberDisplay } from 'bikebook/templates/helpers'
 import { filterOption } from 'bikebook/templates/filter_option'
 import { pickedClassifications, renderClassCards } from 'bikebook/templates/vehicles/class_cards'
 import { tooltip } from 'bikebook/templates/ui/tooltip'
-import { FILTERS, LISTS, RANGES, SINGLES, toQuery } from 'bikebook/query'
+import { FILTERS, LISTS, RANGES, SINGLES, searching, toQuery } from 'bikebook/query'
 import { fragmentOf, renderInto } from 'bikebook/render'
 import { preferredSize } from 'bikebook/sizes'
 import { VehicleViewer } from 'bikebook/vehicle_viewer'
@@ -25,8 +25,7 @@ const fillFields = (root, filters) => {
   for (const field of ['year', 'price']) panelOf(root).setAttribute(`data-bikebook--catalog-filters-${field}-dir-value`, filters[`${field}_dir`] === 'asc' ? 'asc' : 'desc')
   for (const name of [...LISTS, ...SINGLES]) root.getElementById(`${name}-hw-hidden-field`).setAttribute('value', filters[name])
   for (const name of RANGES) root.querySelector(`input[name="${name}"]`).setAttribute('value', filters[name])
-  // a state's abbreviation, or US
-  const jurisdiction = filters.jurisdiction || panelOf(root).getAttribute(JURISDICTION_ATTRIBUTE)
+  const { jurisdiction } = filters
   const state = root.querySelector(`#jurisdiction-hw-listbox [role="option"][data-value="${CSS.escape(jurisdiction)}"]`)
   if (state) {
     root.getElementById('jurisdiction-hw-hidden-field').setAttribute('value', jurisdiction)
@@ -43,15 +42,19 @@ const legalClasses = (root, filters, { e_vehicle_classifications: classification
   if (filters.market && filters.market !== 'US') {
     return Object.keys(classifications).filter((id) => classifications[id].e_bike_law && classifications[id].jurisdiction === filters.market)
   }
-  const jurisdiction = filters.jurisdiction || panelOf(root).getAttribute(JURISDICTION_ATTRIBUTE)
-  const classes = root.querySelector(`[data-jurisdiction="${CSS.escape(jurisdiction)}"]`) ?? root.querySelector('[data-jurisdiction="US"]')
+  const classes = root.querySelector(`[data-jurisdiction="${CSS.escape(filters.jurisdiction)}"]`) ?? root.querySelector('[data-jurisdiction="US"]')
   return [...classes.querySelectorAll('input[name="electric"]')].map(({ value }) => value).filter((value) => value !== 'out_of_class')
 }
 
-// `url`'s filters, "all" markets as Any, without which it's the panel's default
+// `url`'s filters, "all" markets as Any, without which it and the jurisdiction - a state's abbreviation, or US - are the
+// panel's defaults
 const urlFilters = (root, url) => {
   const filters = Object.fromEntries(FILTERS.map((name) => [name, url.searchParams.get(name) ?? '']))
-  return { ...filters, market: filters.market === 'all' ? '' : filters.market || panelOf(root).getAttribute(MARKET_ATTRIBUTE) }
+  return {
+    ...filters,
+    market: filters.market === 'all' ? '' : filters.market || panelOf(root).getAttribute(MARKET_ATTRIBUTE),
+    jurisdiction: filters.jurisdiction || panelOf(root).getAttribute(JURISDICTION_ATTRIBUTE)
+  }
 }
 
 // as the catalog reads them: a renamed slug as its new one, and a value naming no option dropped
@@ -79,10 +82,21 @@ export async function unpickedVehicles (catalog, page, url) {
   return new VehicleViewer(catalog.kit, catalog.vocabulary).render([], url, null, await unpicked(catalog, page, filtersAt(catalog, page, url)))
 }
 
+const pickedOf = (catalog, url, { market }) => catalog.vehicles(url.searchParams.get('vehicle_models')?.split(',') ?? [], { market })
+
+// The picked vehicles' place for `url`'s jurisdiction, which decides which are out of class there, and market, which
+// which are sold elsewhere
+export async function pickedVehicles (catalog, page, url) {
+  const filters = filtersAt(catalog, page, url)
+  const found = await pickedOf(catalog, url, filters)
+  return new VehicleViewer(catalog.kit, catalog.vocabulary, filters.jurisdiction).render(found.slice(0, MAX_COMPARE), url, preferredSize(), {})
+}
+
 // The page at `url` while the catalog loads: its filters live and filled in from the URL, their values as it has them, and
 // its comboboxes, whose options are the catalog's, disabled. `status` stands in for the vehicles
 export function loadingShell (shell, url, status) {
   const root = shell.content.cloneNode(true)
+  panelOf(root).hidden = !searching(url)
   fillFields(root, urlFilters(root, url))
   for (const field of root.querySelectorAll('.hw-combobox')) {
     field.inert = true
@@ -100,7 +114,7 @@ export function loadingShell (shell, url, status) {
 export async function hydrate (catalog, source, shell, url) {
   const { kit } = catalog
   const root = shell.content.cloneNode(true)
-  const params = url.searchParams
+  panelOf(root).hidden = !searching(url)
   for (const name of [...LISTS, ...SINGLES]) root.getElementById(`${name}-hw-listbox`).append(fragmentOf(catalog.options[name].map(filterOption)))
 
   // the visitor's country, when it's a market with models
@@ -108,7 +122,7 @@ export async function hydrate (catalog, source, shell, url) {
   const located = panel.getAttribute(MARKET_ATTRIBUTE)
   panel.setAttribute(MARKET_ATTRIBUTE, catalog.options.market.some(({ value, count }) => value === located && count) ? located : '')
   const filters = filtersAt(catalog, root, url)
-  const [found, { filteredCount }] = await Promise.all([catalog.vehicles(params.get('vehicle_models')?.split(',') ?? []), catalog.search(filters, 0, 0)])
+  const [found, { filteredCount }] = await Promise.all([pickedOf(catalog, url, filters), catalog.search(filters, 0, 0)])
   const vehicles = found.slice(0, MAX_COMPARE)
   const classifications = catalog.vocabulary.e_vehicle_classifications
   const cards = pickedClassifications(url, classifications)
@@ -132,7 +146,7 @@ export async function hydrate (catalog, source, shell, url) {
     if (display) combobox(root, name).dataset.hwComboboxPrefilledDisplayValue = display
   }
 
-  const viewer = new VehicleViewer(kit, catalog.vocabulary)
+  const viewer = new VehicleViewer(kit, catalog.vocabulary, filters.jurisdiction)
   for (const input of root.querySelectorAll('input[name="electric"]')) {
     const id = input.value.replace(/^class_/, 'evc/us/class_')
     const classification = catalog.vocabulary.e_vehicle_classifications[id]

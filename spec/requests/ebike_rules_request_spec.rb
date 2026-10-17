@@ -120,16 +120,21 @@ RSpec.describe EbikeRulesController, type: :request do
       get "/ebike-rules/co", params: {vehicle_models: "m/specialized/2025/haul_st"}
 
       expect(page).to have_css("[role='status']",
-        text: "Your Specialized Haul ST is legal to ride in Colorado as a Class 2 and 3 e-bike.")
+        text: "Your Specialized Haul ST is legal to ride in Colorado as a Class 3 e-bike, and as Class 2 with its optional throttle.")
         .and have_css("li", text: "Classes 2 and 3 are recognized")
-        .and have_css("li", text: "Throttle stops at 20 mph")
+        .and have_css("li", text: "Optional throttle stops at 20 mph")
+        .and have_css("dd", text: "Optional, to 20")
         .and have_css("[data-ebike-rules--lookup-display-value='Specialized Haul ST 2025']")
-        .and have_link("View full BikeBook entry", href: "/bikebook?vehicle_models=m%2Fspecialized%2F2025%2Fhaul_st")
+        .and have_link("View full BikeBook entry", href: "/bikebook?vehicle_models=m%2Fspecialized%2F2025%2Fhaul_st&view=motors")
         .and have_title("Colorado e-bike laws", exact: true)
-      # each class's tile a tooltip of its US class card
+      # each class's tile a tooltip of its US class card, in order, the optional throttle's captioned
       tiles = page.all("[data-controller~='ui--tooltip']:has(> button [role='img'])")
       expect(tiles.map { it.find("> button [role='img']")[:"aria-label"] }).to eq(["Class 2 e-bike", "Class 3 e-bike"])
       expect(tiles.map { it.find("[role='tooltip'] h3", visible: :all).text(:all).strip }).to eq(["Class 2", "Class 3"])
+      # ending in its catalog ID, a copy away
+      expect(tiles.map { it.find("[role='tooltip'] code", visible: :all).text(:all).strip }).to eq(["evc/us/class_2", "evc/us/class_3"])
+      expect(tiles.first).to have_css("[role='tooltip'] button[title='Copy ID']", visible: :all)
+      expect(page).to have_css("div:has(> [data-controller~='ui--tooltip'] [aria-label='Class 2 e-bike']) > span", text: "w/ optional throttle")
       expect(page.find("link[rel='canonical']", visible: :all)[:href]).to eq "http://www.example.com/ebike-rules/co"
       expect(meta("og:url")).to eq "http://www.example.com/ebike-rules/co"
     end
@@ -179,6 +184,37 @@ RSpec.describe EbikeRulesController, type: :request do
       expect(page).to have_css("[role='status']", text: "Your Specialized Haul ST is legal to ride in Alaska")
       expect(page.find("#state-ak > h3")).to have_no_text("In review")
       expect(meta("description")).to_not include("still reviewing")
+    end
+
+    it "checks a Class 3 with a stock throttle as out of class in California alone" do
+      get "/ebike-rules/ca", params: {vehicle_models: "m/aventon/2026/level_4_adv"}
+
+      expect(page).to have_css("[role='status']", text: "Your Aventón Level 4 ADV is not permitted as an e-bike under current California rules.")
+      expect(page.all("[role='status'] li").map(&:text)).to eq ["It is a Class 2 and Class 3 e-bike, which is not permitted.",
+        "It may be regulated as a moped or motor vehicle instead, which can require registration and a license."]
+      # its speed and throttle fail too, which the classes' note already gives as the reason
+      speed = page.find("li", text: /Top assisted speed\s*28\W*mph\s*Assists to 28\W*mph, not allowed with a throttle/)
+      throttle = page.find("li", text: /Throttle\s*Allowed\s*Not allowed with Class 3 assist/)
+      [speed, throttle].each { expect(it).to have_css("[role='img'][aria-label='Does not meet this rule']") }
+
+      get "/ebike-rules/co", params: {vehicle_models: "m/aventon/2026/level_4_adv"}
+      expect(page).to have_css("[role='status']", text: "Your Aventón Level 4 ADV is legal to ride in Colorado as a Class 2 and 3 e-bike")
+
+      # as is one entered by hand, which is both classes as such a model is
+      get "/ebike-rules/ca", params: {manual: "1", top_speed: "28", throttle: "1"}
+      expect(page).to have_css("[role='status'] li", text: "It is a Class 2 and Class 3 e-bike, which is not permitted.")
+      # under the e-moto's tile rather than its classes'
+      expect(page.all("section[aria-live] [data-controller~='ui--tooltip'] > button[aria-label$='e-bike']").map { it[:"aria-label"] }).to eq ["E-moto, not an e-bike"]
+
+      # a throttle sold separately isn't the bike's as sold, but an option, which would put it in no class: its Class 3
+      # tile, then the e-moto's captioned with the throttle
+      get "/ebike-rules/ca", params: {vehicle_models: "m/specialized/2025/haul_st"}
+      expect(page).to have_css("[role='status']", text: "Your Specialized Haul ST is legal to ride in California as a Class 3 e-bike, without its optional throttle.")
+        .and have_no_css("[role='status'] li")
+        .and have_css("li", text: /Throttle\s*Allowed\s*It's legal only without its optional throttle/)
+      expect(page.all("section[aria-live] [data-controller~='ui--tooltip'] > button[aria-label$='e-bike']").map { it[:"aria-label"] })
+        .to eq ["Class 3 e-bike", "E-moto, not an e-bike"]
+      expect(page).to have_css("section[aria-live] div:has(> [data-controller~='ui--tooltip'] [aria-label='E-moto, not an e-bike']) > span", text: "w/ optional throttle")
     end
 
     it "moves a state from the query, or in capitals, to its own page, and 404s one that isn't a state" do
@@ -258,7 +294,7 @@ RSpec.describe EbikeRulesController, type: :request do
         .and have_css("[role='status'] li", text: "Assists past 28 mph, over the 28 mph limit.")
         .and have_text("Entered manually").and have_no_text("Entered manually · Class")
         .and have_css("dd", text: "Over 28 mph")
-        .and have_text("Look for the UL mark on the frame label.")
+        .and have_text("Look for the UL mark on the frame and battery labels.")
         .and have_checked_field("top_speed", with: "29")
     end
 

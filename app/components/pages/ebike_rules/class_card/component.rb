@@ -5,12 +5,13 @@ module Pages
     module ClassCard
       # A class as "E-bike classes, explained" cards it: a US class from its number, any other `classification`, or
       # else the e-moto, each with the `state`'s own rules for it. Unframed, it's a tooltip's body; in a `frame_id`,
-      # the one Bike Book loads
+      # the one Bike Book loads. A `catalog_id` closes it, a copy away
       class Component < ApplicationComponent
         FRAME_ID = "ebike-rules-class-card"
 
-        def initialize(e_bike_class: nil, classification: nil, state: nil, framed: true, frame_id: nil)
+        def initialize(e_bike_class: nil, classification: nil, state: nil, framed: true, frame_id: nil, catalog_id: nil)
           @e_bike_class = e_bike_class
+          @catalog_id = catalog_id
           @classification = classification
           @state = state
           @framed = framed

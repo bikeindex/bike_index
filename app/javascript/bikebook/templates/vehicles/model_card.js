@@ -18,10 +18,10 @@ export const modelCard = ({ model, href, placeholderUrl, currencies }) => {
   return html`<li class="tw:relative tw:flex tw:flex-col tw:rounded-xl tw:border tw:border-gray-200 tw:bg-white tw:transition tw:focus-within:z-10
   tw:hover:z-10 tw:hover:-translate-y-0.5 tw:hover:shadow-lg tw:active:translate-y-0.5 tw:hover:active:translate-y-0 tw:dark:border-gray-700
   tw:dark:bg-gray-800"><div class="tw:group tw:relative tw:h-40 tw:rounded-t-[11px] tw:bg-white" data-controller=${model.stock_photo
-    ? 'bikebook--image-fallback'
+    ? 'image-fallback'
     : nothing} data-broken=${model.stock_photo ? nothing : ''}>${model.stock_photo
     ? html`<img alt=${model.display} loading="lazy" class="tw:h-full tw:w-full tw:rounded-t-[11px] tw:object-contain tw:p-2 tw:group-data-broken:hidden"
-      data-action="error->bikebook--image-fallback#fail" src=${model.stock_photo}>`
+      data-action="error->image-fallback#fallBack" src=${model.stock_photo}>`
     : nothing}<img alt=${model.display} class="tw:hidden tw:h-full tw:w-full tw:rounded-t-[11px] tw:bg-gray-100 tw:object-contain tw:p-8
     tw:group-data-broken:block tw:dark:bg-gray-900" src=${placeholderUrl}>${model.msrp_cents == null
     ? nothing

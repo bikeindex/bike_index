@@ -6,8 +6,8 @@ RSpec.describe Pages::EbikeRules::Results::Component, type: :component do
   before { stub_bikebook_catalog }
 
   let(:bike) do
-    EbikeRuleServices::Bike.new(bikebook_id: "m/trek/2025/verve", manufacturer_name: "Trek", model: "Verve+ 2", first_year: 2025,
-      e_bike_class: 1, class_unknown: false, e_vehicle_classifications: [], watts: 250, peak_watts: nil, top_assist_mph: 20, throttle: false, throttle_mph: nil,
+    EbikeRuleServices::Bike.new(bikebook_id: "m/trek/2025/verve", manufacturer_name: "Trek", model: "Verve+ 2", first_year: 2025, vehicle_type: "bike",
+      e_bike_class: 1, class_unknown: false, e_vehicle_classifications: [], optional_classes: {}, watts: 250, peak_watts: nil, top_assist_mph: 20, throttle: false, stock_throttle: false, throttle_mph: nil,
       ul2849: :certified, ul2271: :unknown, photo_url: "https://bikebook.bikeindex.org/trek/2025/verve.jpg")
   end
   let(:abbreviation) { "IN" }
@@ -22,10 +22,11 @@ RSpec.describe Pages::EbikeRules::Results::Component, type: :component do
       .and have_css("[role='status']", text: "Your Trek Verve+ 2 is legal to ride in Indiana as a Class 1 e-bike.")
       .and have_css("img[src='https://bikebook.bikeindex.org/trek/2025/verve.jpg'][alt='Trek Verve+ 2']")
       .and have_css("[role='img'][aria-label='Class 1 e-bike']")
-      .and have_text("2025 model · BikeBook")
+      .and have_css("p", text: /\A\s*2025 model\s*\z/)
       .and have_css("dd", text: "Not provided", count: 0)
+      # the certification it carries alone, without the one it's not known to
       .and have_text("UL 2849 Certified")
-      .and have_text("UL 2271 status unknown")
+      .and have_no_text("UL 2271")
       .and have_css("li", text: /Classes recognized\s*Classes 1, 2, and 3\s*Class 1 is recognized/)
       .and have_css("li [role='img'][aria-label='Meets this rule']", count: 4)
       .and have_css("li", text: "Class 3 riders must be 15 or older")
@@ -40,11 +41,12 @@ RSpec.describe Pages::EbikeRules::Results::Component, type: :component do
 
     it "renders the rule to check, with no photo and unknown certifications" do
       expect(component).to have_css("[role='status']", text: "Legal, with rules to check")
-        .and have_css("[role='status']", text: "Your e-bike is legal to ride in Colorado as a Class 3 e-bike, with 1 rule to check.")
+        .and have_css("[role='status']", text: "Your e-bike is legal to ride in Colorado as a Class 2 and 3 e-bike, with 1 rule to check.")
         .and have_css("[role='status'] li", text: "Throttle must cut out at 20 mph.")
-        .and have_text("Entered manually · Class 3")
+        .and have_css("p", text: /\A\s*Entered manually\s*\z/)
         .and have_css("dd", text: "28 mph")
         .and have_text("Entered by you, not verified by BikeBook.")
+        .and have_text("Certification unknown").and have_no_text("E-bike electrical system")
         .and have_no_css("img")
     end
   end
@@ -52,7 +54,7 @@ RSpec.describe Pages::EbikeRules::Results::Component, type: :component do
   context "with an e-moto" do
     let(:bike) do
       super().with(e_bike_class: nil, e_vehicle_classifications: ["evc/us/ca/off_highway_electric_motorcycle"], watts: 12_500,
-        top_assist_mph: nil, throttle: true)
+        top_assist_mph: nil, throttle: true, stock_throttle: true)
     end
     let(:abbreviation) { "TX" }
 

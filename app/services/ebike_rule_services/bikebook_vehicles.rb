@@ -18,7 +18,7 @@ module EbikeRuleServices
 
     def attributes_from(record)
       motors = record["motors"]
-      modes = motors.flat_map { it["operating_modes"] || [] }
+      modes = updated(motors.flat_map { it["operating_modes"] || [] })
       throttle_modes = modes.select { it["mode"] == "throttle" }
       certifications = motors.map { it["certification"] }.join(", ")
       classifications = modes.flat_map { Array(it["e_vehicle_classifications"]) }.uniq
@@ -28,14 +28,17 @@ module EbikeRuleServices
         manufacturer_name: record["manufacturer"],
         model: record["model"],
         first_year: record["first_year"],
+        vehicle_type: record["type"] || "bike",
         e_bike_class: e_bike_class(tiers, modes, throttle_modes),
         class_unknown: tiers.none? && mph(modes).nil?,
         e_vehicle_classifications: classifications,
+        optional_classes: optional_classes(modes),
         # a state's cap is on the motors together
         watts: total(motors, "rated_power"),
         peak_watts: total(motors, "peak_power"),
         top_assist_mph: mph(modes.select { it["mode"] == "assist" }),
         throttle: throttle_modes.any?,
+        stock_throttle: stock_throttle?(record, throttle_modes),
         throttle_mph: mph(throttle_modes),
         ul2849: certifications.include?("UL 2849") ? :certified : :unknown,
         ul2271: certifications.include?("UL 2271") ? :certified : :unknown,
@@ -59,6 +62,32 @@ module EbikeRuleServices
       throttle_modes.any? ? 2 : 1
     end
 
+    # A throttle propulsion with no throttle mode is a stock throttle
+    def stock_throttle?(record, throttle_modes)
+      return Array(record["propulsion"]).include?("throttle") if throttle_modes.none?
+
+      throttle_modes.any? { stock?(it) }
+    end
+
+    # None when every class is, as it's then sold as none of them
+    def optional_classes(modes)
+      stock, optional = modes.partition { stock?(it) }
+      numbers = ->(mode) { Array(mode["e_vehicle_classifications"]).filter_map { it[BikebookCatalog::US_CLASS, 1]&.to_i } }
+      sold = stock.flat_map(&numbers)
+      return {} if sold.none?
+
+      optional.flat_map { |mode| (numbers.call(mode) - sold).map { [it, mode["mode"]] } }.to_h
+    end
+
+    # An app update unlocks a mode the bike is sold with
+    def stock?(mode) = [nil, "stock", "app_update"].include?(mode["availability"])
+
+    # An app update replaces the modes of its kind the bike leaves the factory with, as a Class 3 assist does a Class 1's
+    def updated(modes)
+      kinds = modes.filter_map { it["mode"] if it["availability"] == "app_update" }
+      modes.reject { [nil, "stock"].include?(it["availability"]) && kinds.include?(it["mode"]) }
+    end
+
     def total(motors, power) = motors.filter_map { it[power] }.then { it.sum if it.any? }
 
     def mph(modes)
@@ -66,6 +95,6 @@ module EbikeRuleServices
       kilometers && UnitSystem.kilometers_to_miles(kilometers).round
     end
 
-    conceal :attributes_from, :e_bike_class, :total, :mph
+    conceal :attributes_from, :e_bike_class, :stock_throttle?, :optional_classes, :stock?, :updated, :total, :mph
   end
 end

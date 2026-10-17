@@ -1,26 +1,30 @@
 import { html, nothing } from 'lit-html'
 import { basics } from 'bikebook/templates/vehicles/basics'
+import { copyButton } from 'bikebook/templates/ui/copy_button'
 import { chosenSizes, pickedSizes, sizesParam } from 'bikebook/sizes'
 import { comparisonTable } from 'bikebook/templates/vehicles/comparison_table'
 import { emptyState } from 'bikebook/templates/vehicles/empty_state'
 import { frameGeometry } from 'bikebook/frame_geometry'
 import { geometryOverlay, seriesBorders } from 'bikebook/templates/vehicles/geometry_overlay'
 import { jumpTo, VIEWS } from 'bikebook/templates/vehicles/jump_to'
-import { basicsOf, componentsOf, modelViewer, motorsOf, runningGearOf, sizesOf } from 'bikebook/templates/vehicles/model_viewer'
+import { componentsOf, modelViewer, motorsOf, photoOf, runningGearOf, sizesOf } from 'bikebook/templates/vehicles/model_viewer'
 import { present } from 'bikebook/templates/values'
-import { toQuery } from 'bikebook/query'
+import { searching, toQuery } from 'bikebook/query'
 import { VehiclePresenter } from 'bikebook/vehicle_presenter'
 
 // The compared vehicles' cards, from catalog blocks
 export class VehicleViewer {
-  constructor (kit, vocabulary) {
+  // false where `jurisdiction`'s law bars a Class 3's throttle, as California's does
+  constructor (kit, vocabulary, jurisdiction) {
     this.presenter = new VehiclePresenter(kit, vocabulary)
+    this.class3Throttle = !Object.values(vocabulary.e_vehicle_classifications)
+      .some((record) => record.jurisdiction === `US-${jurisdiction}` && record.class_3_throttle === false)
   }
 
   // The vehicles at `url` in the view it picks, whose links keep its other params, compared in the sizes it picks or
   // the nearest to the `preferredSize`. With none, the `search`'s count, whether filters narrow it, and its featured models
   render (vehicles, url, preferredSize, search) {
-    const { presenter } = this
+    const { presenter, class3Throttle } = this
     if (vehicles.length === 0) {
       return emptyState({
         url,
@@ -57,17 +61,18 @@ export class VehicleViewer {
         tw:rounded-sm tw:border tw:border-gray-200 tw:bg-white tw:pt-4 tw:pb-6 tw:[--gutter:--spacing(6)] tw:dark:border-gray-700 tw:dark:bg-gray-800
         ${keyed ? seriesBorders(compared.frames, index).top : ''} ${comparing ? 'tw:md:max-w-[56rem] tw:lg:flex-1' : 'tw:lg:w-[56rem] tw:lg:shrink-0'}"><header data-align-row="header" class="tw:flex tw:items-start tw:justify-between tw:gap-4"><div>${present(manufacturer)
         ? html`<p class="tw:mb-1 tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">${manufacturer}</p>`
-        : nothing}<h3 class="tw:text-2xl tw:leading-tight tw:font-extrabold">${model}</h3></div><div
-        class="tw:shrink-0">${basicsOf({ presenter, data }).photo('tw:h-14 tw:w-21')}</div></header>${lead ? html`<div data-align-row="lead">${lead(data, value)}</div>` : nothing}${present(data[key])
+        : nothing}<div class="tw:flex tw:items-baseline tw:gap-1"><h3 class="tw:text-2xl tw:leading-tight tw:font-extrabold">${model}</h3>${
+          copyButton({ value, label: 'Copy ID', tooltip: true })}</div></div><div
+        class="tw:shrink-0">${photoOf({ presenter, data }, 'tw:h-14 tw:w-21')}</div></header>${lead ? html`<div data-align-row="lead">${lead(data, value)}</div>` : nothing}${present(data[key])
         ? content(data, value)
         : html`<p class="twless-strong">${none}</p>`}</section>`
     })
     const views = {
-      basics: () => basics({ presenter, vehicles }),
+      basics: () => basics({ presenter, vehicles, class3Throttle }),
       // the overlay beside the table once the window is wide, above it until then
       geometry: () => html`<div class="tw:flex tw:flex-col tw:min-[1500px]:mx-[calc(50%-50vw)] tw:min-[1500px]:w-screen tw:min-[1500px]:flex-row
         tw:min-[1500px]:items-start tw:min-[1500px]:gap-6 tw:min-[1500px]:px-4">${geometryOverlay({ ...compared, beside: true })}${
-        comparisonTable({ ...compared, part: 'geometry', beside: true })}</div>${cardRow('tw:mt-6', cards('sizes', 'No sizes listed', (data, value) =>
+        comparisonTable({ ...compared, beside: true })}</div>${cardRow('tw:mt-6', cards('sizes', 'No sizes listed', (data, value) =>
         html`<div class="tw:-mx-(--gutter)">${sizesOf({ presenter, data, others: others(value), selectedSize: selectedSizes.get(value), sizePath: sizePath(value) })}</div>`,
       { keyed: true }))}`,
       components: () => {
@@ -75,17 +80,23 @@ export class VehicleViewer {
         return cardRow('tw:mt-6', cards('components', 'No components listed', (data, value) => components.get(value),
           { lead: (data, value) => runningGearOf({ presenter, data, others: others(value) }) }), true)
       },
-      motors: () => cardRow('tw:mt-6', cards('motors', 'No motor', (data, value) => motorsOf({ presenter, data, others: others(value) }))),
+      motors: () => cardRow('tw:mt-6', cards('motors', 'No motor', (data, value) => motorsOf({ presenter, data, others: others(value), class3Throttle }))),
       all: () => {
         const full = vehicles.map(({ data, value }, index) => {
           const remaining = values.filter((each) => each !== value)
           const removePath = pathWith(url, { vehicle_models: remaining.join(','), vehicle_sizes: sizesParam(remaining, picked) })
-          return modelViewer({ presenter, data, value, comparing, idSuffix: index + 1, others: others(value), removePath, selectedSize: selectedSizes.get(value), sizePath: sizePath(value) })
+          return modelViewer({
+            presenter, data, value, comparing, idSuffix: index + 1, others: others(value), removePath, selectedSize: selectedSizes.get(value), sizePath: sizePath(value), class3Throttle
+          })
         })
-        return html`${comparisonTable({ ...compared, part: 'all' })}${geometryOverlay(compared)}${cardRow('tw:mt-8', full)}`
+        return cardRow('tw:mt-6', full)
       }
     }
-    return html`${jumpTo(view, (each) => pathWith(url, { view: each === 'basics' ? '' : each }), shown)}${views[view]()}`
+    // a model opened alone, its search hidden, has a tab to show it: "Search other cargo bikes"
+    const lone = !searching(url) && vehicles.length === 1
+    const type = lone && (presenter.named(presenter.kit.schemas.vehicle, vehicles[0].data).type || 'bike')
+    const searchTab = lone ? { label: `Search other ${type.toLowerCase()}s`, href: pathWith(url, { search: '1' }) } : null
+    return html`${jumpTo(view, (each) => pathWith(url, { view: each === 'basics' ? '' : each }), shown, searchTab)}${views[view]()}`
   }
 }
 

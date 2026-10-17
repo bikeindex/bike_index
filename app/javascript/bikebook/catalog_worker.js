@@ -90,10 +90,19 @@ const block = (key) => {
   return blocks.get(key)
 }
 
-async function vehicles ({ ids }) {
+// A block leaves out the markets of a model sold in its maker's primary market alone, which the index resolves.
+// `outsideMarket` where it isn't sold in `market`, blank for any
+async function vehicles ({ ids, market }) {
   const found = await Promise.all(ids.map(async (value) => {
     const key = blockKey(value)
-    return { value, display: byId.get(value)?.display, data: manifest.blocks[key] && (await block(key))[value] }
+    const data = manifest.blocks[key] && (await block(key))[value]
+    const model = byId.get(value)
+    return {
+      value,
+      display: model?.display,
+      data: data && { ...data, markets: data.markets ?? model?.markets },
+      outsideMarket: Boolean(market) && !model?.markets.includes(market)
+    }
   }))
   return found.filter(({ data }) => data)
 }
@@ -135,7 +144,7 @@ function matching (params) {
 // `legalClasses` are the e-bike classes legal where the visitor is, by which every e-bike is legal where there are none
 function featured ({ params, legalClasses }) {
   const { COUNT, requirements, preferences, quotas } = rules
-  const legalEbike = (model) => !legalClasses.length || legalClasses.some((propulsion) => propelled(model, propulsion))
+  const legalEbike = (model) => !legalClasses.length || legalClasses.some((propulsion) => propelled(model, propulsion, params.jurisdiction))
   const filtered = sorted(params).filter(filter(params))
   const candidates = requirements.reduce((models, requirement) => {
     const passing = models.filter((model) => requirement(model, { legalEbike }))
@@ -193,7 +202,10 @@ function filter (params) {
   const chosen = list(params.primary_activity)
   const allowed = new Set(activities.filter(({ slug, family }) => chosen.includes(slug) || chosen.includes(family)).map(({ slug }) => slug))
   const manufacturers = list(params.manufacturer)
-  const propulsions = list(params.electric)
+  // checked classes are the e-vehicles wanted, which the e-Vehicle (motorized) they check would widen to all of them
+  const electric = list(params.electric)
+  const classes = electric.filter((value) => value !== '0' && value !== '1')
+  const propulsions = classes.length ? classes : electric
   const types = list(params.vehicle_type)
   const [yearMin, yearMax, priceMin, priceMax] = ['year_min', 'year_max', 'price_min', 'price_max']
     .map((name) => params[name] ? parseInt(params[name], 10) || 0 : null)
@@ -201,7 +213,7 @@ function filter (params) {
   return (model) =>
     (allowed.size === 0 || allowed.has(model.primary_activity)) &&
     (manufacturers.length === 0 || manufacturers.includes(model.manufacturer)) &&
-    (propulsions.length === 0 || propulsions.some((propulsion) => propelled(model, propulsion))) &&
+    (propulsions.length === 0 || propulsions.some((propulsion) => propelled(model, propulsion, params.jurisdiction))) &&
     (!params.suspension || (params.suspension === 'has' ? model.suspension !== 'rigid' : model.suspension === params.suspension)) &&
     (types.length === 0 || types.includes(model.vehicle_type)) &&
     (!params.model_configuration || model.model_configuration === params.model_configuration) &&
@@ -212,11 +224,13 @@ function filter (params) {
       (priceMin == null || model.msrp_cents >= priceMin * 100) && (priceMax == null || model.msrp_cents <= priceMax * 100)))
 }
 
-// out_of_class is the catalog's own marker, as a model with no classified mode is unknown rather than out of class.
-// A state's class matches the models carrying its groups
-function propelled ({ electric, e_vehicle_classifications: carried = [] }, propulsion) {
+// out_of_class is the catalog's own marker, as a model with no classified mode is unknown rather than out of class, and
+// out_of_class/US-CA its marker for one in no class in that state alone, where it's out of class rather than the US
+// classes it carries. A state's class matches the models carrying its groups
+function propelled ({ electric, e_vehicle_classifications: carried = [] }, propulsion, jurisdiction) {
   if (propulsion === '0' || propulsion === '1') return electric === (propulsion === '1')
   const id = propulsion.replace(/^class_/, 'evc/us/class_')
+  if (/^(out_of_class|evc\/us\/class_\d)$/.test(id) && carried.includes(`out_of_class/US-${jurisdiction}`)) return id === 'out_of_class'
   return [id, ...(classifications[id]?.groups ?? [])].some((classification) => carried.includes(classification))
 }
 

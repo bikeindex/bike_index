@@ -20,6 +20,7 @@ export default class extends Controller {
     this.yearArrowTarget.textContent = this.#arrow(this.yearDirValue)
     this.priceArrowTarget.textContent = this.#arrow(this.priceDirValue)
     this.#showClasses()
+    this.#classifyPropulsion()
     this.#refreshSummary()
     if (!this.element.closest('[inert]')) this.#writeUrl()
   }
@@ -39,6 +40,7 @@ export default class extends Controller {
   // the page follows the URL's filters
   apply () {
     this.#showClasses()
+    this.#classifyPropulsion()
     this.#syncCombobox()
     this.#refreshSummary()
     this.#writeUrl()
@@ -65,6 +67,17 @@ export default class extends Controller {
     }
   }
 
+  // A checked class is an e-vehicle's, so it checks e-Vehicle (motorized) and rules out Human powered
+  #classifyPropulsion () {
+    const classed = this.#classes.length > 0
+    const [human, motorized] = ['0', '1'].map((value) => this.element.querySelector(`input[name="electric"][value="${value}"]`))
+    human.disabled = classed
+    if (!classed) return
+
+    human.checked = false
+    motorized.checked = true
+  }
+
   #syncCombobox () {
     const fieldset = this.vehicleComboboxTarget.querySelector('.hw-combobox')
     const url = new URL(fieldset.dataset.hwComboboxAsyncSrcValue, window.location.origin)
@@ -76,7 +89,8 @@ export default class extends Controller {
   }
 
   // The URL leaves out the default market and jurisdiction, so a shared link opens in its reader's own -
-  // but not a jurisdiction with a class checked, which another's would hide and uncheck
+  // but not a jurisdiction with a class checked, which another's would hide and uncheck. It says the search shows, once
+  // it does
   #writeUrl () {
     const url = new URL(window.location)
     const filters = this.#filters
@@ -85,7 +99,8 @@ export default class extends Controller {
     this.#applyParams(url, {
       ...filters,
       market: filters.market === this.defaultMarketValue ? '' : filters.market || 'all',
-      jurisdiction: jurisdiction === this.defaultJurisdictionValue && !classChecked ? '' : jurisdiction
+      jurisdiction: jurisdiction === this.defaultJurisdictionValue && !classChecked ? '' : jurisdiction,
+      search: this.element.hidden ? '' : '1'
     })
     replaceUrl(url)
     this.refreshClear()
@@ -115,10 +130,12 @@ export default class extends Controller {
     for (const [key, value] of Object.entries(params)) value ? url.searchParams.set(key, value) : url.searchParams.delete(key)
   }
 
-  // a clear keeps the market and e-bike classification, so they alone leave nothing to clear
+  // a clear keeps the market and e-bike classification, so they alone - with the e-Vehicle (motorized) they check -
+  // leave nothing to clear
   #refreshSummary () {
     const { market, jurisdiction, electric, ...filters } = this.#filters
-    const filtered = Object.values(filters).some(Boolean) || electric.split(',').some((value) => value && !this.#classes.includes(value))
+    const kept = this.#classes.length ? [...this.#classes, '1'] : []
+    const filtered = Object.values(filters).some(Boolean) || electric.split(',').some((value) => value && !kept.includes(value))
     for (const link of this.clearTargets) link.hidden = !filtered
     this.summaryTarget.replaceChildren(...this.#summary.map(([label, value]) => {
       const item = document.createElement('li')

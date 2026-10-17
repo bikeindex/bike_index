@@ -10,7 +10,8 @@ class BikebookController < ApplicationController
     render_page
   end
 
-  # /bikebook/m/segway/2025/gt3_pro, or without its m/, picks that vehicle ahead of any already picked
+  # /bikebook/m/segway/2025/gt3_pro, or without its m/, or its id alone, /m/segway/2025/gt3_pro, picks that vehicle ahead
+  # of any already picked
   def vehicle
     path = params[:vehicle_model]
     id = "m/#{path.delete_prefix("m/")}"

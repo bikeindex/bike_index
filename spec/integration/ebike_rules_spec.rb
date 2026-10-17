@@ -7,6 +7,7 @@ RSpec.describe "E-bike rules", :js, type: :system do
 
   it "checks a BikeBook model or one entered by hand as each is chosen, keeping it in the URL" do
     visit ebike_rules_path
+    history_length = page.evaluate_script("history.length")
     type_into(find_field("Bike model", disabled: false, wait: 10), "haul")
     # US models alone, so not its Canadian one of the same name
     expect(page).to have_css("[role='option']", count: 1)
@@ -22,7 +23,7 @@ RSpec.describe "E-bike rules", :js, type: :system do
     type_into(find_field("State"), "Colorado")
     retry_on_detach { find("[role='option']", text: "Colorado").click }
     expect(page).to have_css("[role='status']",
-      text: "Your Specialized Haul ST is legal to ride in Colorado as a Class 2 and 3 e-bike.")
+      text: "Your Specialized Haul ST is legal to ride in Colorado as a Class 3 e-bike, and as Class 2 with its optional throttle.")
     expect(page).to have_current_path("/ebike-rules/co?vehicle_models=m%2Fspecialized%2F2025%2Fhaul_st")
     expect(page).to have_title("Colorado e-bike laws")
     expect(find_field("Bike model", disabled: false, wait: 10).value).to eq "Specialized Haul ST"
@@ -54,12 +55,13 @@ RSpec.describe "E-bike rules", :js, type: :system do
     expect(page).to have_css("#ebike-rules-classes h3", text: "Bicycle With Electric Assist")
       .and have_no_css("#ebike-rules-classes h3", text: "Class 1")
 
-    # back returns to Colorado's check, rather than to a snapshot that leaves for New York again
-    page.go_back
+    # each check replaced the URL, adding nothing to the history
+    expect(page.evaluate_script("history.length")).to eq history_length
+
+    type_into(find_field("State"), "Colorado")
+    retry_on_detach { find("[role='option']", text: "Colorado").click }
     expect(page).to have_css("[role='status']", text: "This isn't an e-bike under current Colorado rules.")
-    expect(page).to have_field("State", with: "Colorado (CO)")
     expect(page).to have_css("#ebike-rules-classes h2", text: "E-bike classes, explained")
-    wait_for_stimulus("ebike-rules--lookup")
     expect(page).to have_current_path("/ebike-rules/co?#{custom_query}")
 
     # clearing the model leaves its custom details, checked on their own
@@ -90,9 +92,21 @@ RSpec.describe "E-bike rules", :js, type: :system do
     find("label", text: "20 mph").click
     expect(page).to have_css("[role='status']", text: "Your e-bike is legal to ride in Colorado as a Class 1 e-bike.")
     expect(page).to have_current_path("/ebike-rules/co?manual=1&top_speed=20")
+
+    # details changed from a model return to its own once it's picked again
+    type_into(find_field("Bike model"), "haul")
+    retry_on_detach { find("[role='option']", text: "Specialized Haul ST").click }
+    expect(page).to have_current_path("/ebike-rules/co?vehicle_models=m%2Fspecialized%2F2025%2Fhaul_st")
+    fill_in "Motor wattage (W)", with: "1000"
+    find_field("Motor wattage (W)").send_keys(:enter)
+    expect(page).to have_css("legend", exact_text: "Custom details")
+    type_into(find_field("Bike model"), "haul")
+    retry_on_detach { find("[role='option']", text: "Specialized Haul ST").click }
+    expect(page).to have_current_path("/ebike-rules/co?vehicle_models=m%2Fspecialized%2F2025%2Fhaul_st")
+    expect(page).to have_field("Motor wattage (W)", with: "700").and have_css("legend", exact_text: "Specialized Haul ST details")
   end
 
-  it "filters the states, opens the one an old link's anchor names, and links each to its page" do
+  it "filters the states, opens the one an old link's anchor names, and checks a bike in each from its rules" do
     visit "#{ebike_rules_path}#state-pa"
     expect(page).to have_css("#state-panel-pa", text: "Its own definition: Pedalcycle With Electric Assist")
 
@@ -107,9 +121,13 @@ RSpec.describe "E-bike rules", :js, type: :system do
     # its hash replaces the URL's, without a history entry
     expect(page.evaluate_script("location.hash")).to eq "#state-nj"
     expect(page.evaluate_script("history.length")).to eq history_length
+    # its link picks it in the form at the top, rather than loading its page, which would clear the filter
+    wait_for_stimulus("ebike-rules--lookup")
     click_link "Check an e-bike in New Jersey"
+    expect(page).to have_field("State", with: "New Jersey (NJ)", obscured: false)
     expect(page).to have_current_path("/ebike-rules/nj")
-    expect(page).to have_field("State", with: "New Jersey (NJ)")
     expect(page).to have_title("New Jersey e-bike laws")
+    expect(page).to have_field("Filter states", with: "new")
+    expect(page).to have_css("#ebike-rules-classes h2", text: "New Jersey e-bike classes")
   end
 end

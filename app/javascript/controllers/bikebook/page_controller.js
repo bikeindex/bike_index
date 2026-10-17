@@ -1,8 +1,10 @@
 import { Controller } from '@hotwired/stimulus'
 import { CatalogComboboxSource, loadCatalog, renderCounts } from 'bikebook/catalog'
-import { hydrate, loadingShell, unpickedVehicles } from 'bikebook/hydrate'
+import { hydrate, loadingShell, pickedVehicles, unpickedVehicles } from 'bikebook/hydrate'
 import { keepPermanent, renderInto } from 'bikebook/render'
 import { readable } from 'bikebook/replace_url'
+import { searching } from 'bikebook/query'
+import { collapse } from 'utils/collapse_utils'
 import { SearchLog } from 'bikebook/search_log'
 import { realigned, storePreferredSize, withSize } from 'bikebook/sizes'
 import { renderClassCards, withClassifications } from 'bikebook/templates/vehicles/class_cards'
@@ -76,10 +78,12 @@ export default class extends Controller {
 
     event.preventDefault()
     const inPlace = link.closest('[data-in-place]')
-    inPlace
-      ? this.#go(link.closest('#vehicle-viewers') ? this.#changedBy(url) : url, [window.scrollX, window.scrollY],
-        { focus: inPlace.dataset.inPlace || false, replace: Boolean(link.closest('[data-replace]')) })
-      : this.#go(url)
+    if (!inPlace) return this.#go(url)
+
+    const next = link.closest('#vehicle-viewers') ? this.#changedBy(url) : url
+    // one that shows the search a lone model hid, as its tab does, is a step back can undo, and opens it
+    const reveal = !searching(new URL(window.location.href)) && searching(next)
+    this.#go(next, [window.scrollX, window.scrollY], { focus: inPlace.dataset.inPlace || false, replace: Boolean(link.closest('[data-replace]')) && !reveal, reveal })
   }
 
   // A comparison table's size, which the others follow when it's the first vehicle's, and which a later
@@ -90,16 +94,23 @@ export default class extends Controller {
     this.pageTarget.querySelector(`select[data-bikebook--page-vehicle-param="${CSS.escape(vehicle)}"]`)?.focus({ preventScroll: true })
   }
 
-  // A filter changes in place, which with nothing picked the featured models and their count follow, unless the page
+  // A filter changes in place, which with nothing picked the featured models and their count follow, and the picked
+  // ones a jurisdiction or market, which decide which are out of class and which are sold elsewhere, unless the page
   // renders or the filters change again first
   async refilter () {
     const viewers = this.pageTarget.querySelector('#vehicle-viewers')
-    if (!this.catalog || !viewers?.querySelector(':scope > [data-controller~="bikebook--tips"]')) return
+    const url = new URL(window.location.href)
+    const unpicked = viewers?.querySelector(':scope > [data-controller~="bikebook--tips"]')
+    const placeChanged = ['jurisdiction', 'market'].some((name) => url.searchParams.get(name) !== this.#renderedUrl?.searchParams.get(name))
+    if (!this.catalog || !viewers || (!unpicked && !placeChanged)) return
 
     const render = this.#renders
     const refilter = ++this.#refilters
-    const vehicles = await unpickedVehicles(this.catalog, this.pageTarget, new URL(window.location.href))
-    if (render === this.#renders && refilter === this.#refilters) renderInto(viewers, vehicles)
+    const vehicles = await (unpicked ? unpickedVehicles : pickedVehicles)(this.catalog, this.pageTarget, url)
+    if (render === this.#renders && refilter === this.#refilters) {
+      renderInto(viewers, vehicles)
+      this.#renderedUrl = url
+    }
   }
 
   restore () {
@@ -138,7 +149,7 @@ export default class extends Controller {
 
   // `focus` selects what to focus, the search where it selects nothing, unless a field of the page's has focus, which
   // keeps it and any value it hasn't yet changed to. Until the catalog loads, the page is its loading shell
-  async #render (url, scroll, { focus = '[autofocus]' } = {}) {
+  async #render (url, scroll, { focus = '[autofocus]', reveal = false } = {}) {
     if (!this.catalog) return this.pageTarget.replaceChildren(loadingShell(this.shellTarget, url, this.status))
 
     const render = ++this.#renders
@@ -152,6 +163,11 @@ export default class extends Controller {
     this.dispatch('before-render')
     const active = this.pageTarget.contains(document.activeElement) && document.activeElement.id ? document.activeElement : null
     this.pageTarget.replaceChildren(keepPermanent(rendered.content, this.pageTarget))
+    if (reveal) {
+      const search = this.pageTarget.querySelector('[data-controller~="bikebook--catalog-filters"]')
+      search.classList.add('tw:hidden')
+      collapse('show', search)
+    }
     this.#renderedUrl = url
     document.title = rendered.title ?? this.titleValue
     const kept = active && this.pageTarget.querySelector(`#${CSS.escape(active.id)}`)

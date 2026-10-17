@@ -6,8 +6,8 @@ RSpec.describe EbikeRuleServices::Evaluator do
   before { stub_bikebook_catalog }
 
   let(:attributes) do
-    {bikebook_id: "m/x/2025/y", manufacturer_name: "X", model: "Y", first_year: 2025, e_bike_class: 1, class_unknown: false, e_vehicle_classifications: [],
-     watts: 250, peak_watts: nil, top_assist_mph: 20, throttle: false, throttle_mph: nil, ul2849: :unknown, ul2271: :unknown, photo_url: nil}
+    {bikebook_id: "m/x/2025/y", manufacturer_name: "X", model: "Y", first_year: 2025, vehicle_type: "bike", e_bike_class: 1, class_unknown: false, e_vehicle_classifications: [], optional_classes: {},
+     watts: 250, peak_watts: nil, top_assist_mph: 20, throttle: false, stock_throttle: false, throttle_mph: nil, ul2849: :unknown, ul2271: :unknown, photo_url: nil}
   end
   let(:bike) { EbikeRuleServices::Bike.new(**attributes) }
   let(:abbreviation) { "IN" }
@@ -38,7 +38,7 @@ RSpec.describe EbikeRuleServices::Evaluator do
 
   context "with a Class 3 bike with a throttle in Colorado" do
     let(:abbreviation) { "CO" }
-    let(:attributes) { super().merge(e_bike_class: 3, top_assist_mph: 28, throttle: true) }
+    let(:attributes) { super().merge(e_bike_class: 3, top_assist_mph: 28, throttle: true, stock_throttle: true) }
 
     it "is legal, with its throttle to check" do
       expect(statuses).to eq(classes: :pass, power: :pass, speed: :pass, throttle: :check)
@@ -71,11 +71,29 @@ RSpec.describe EbikeRuleServices::Evaluator do
       expect(statuses).to eq(classes: :pass, power: :pass, speed: :pass, throttle: :pass)
       expect(described_class.verdict(rules)).to eq :green
     end
+
+    context "with a stock throttle" do
+      let(:attributes) { super().merge(throttle: true, stock_throttle: true) }
+
+      it "fails it as in no class, as California's law bars a Class 3's throttle" do
+        expect(law[:class_3_throttle]).to be false
+        expect(statuses).to eq(classes: :fail, power: :pass, speed: :fail, throttle: :fail)
+        expect(rules.first).to include(note: :classes_not_permitted)
+      end
+
+      context "under a law that doesn't bar it" do
+        let(:law) { EbikeRuleServices::StateLaws.find("CA").merge(class_3_throttle: nil) }
+
+        it "checks its throttle as any three-class state's" do
+          expect(statuses).to eq(classes: :pass, power: :pass, speed: :pass, throttle: :check)
+        end
+      end
+    end
   end
 
   context "with a bike that is both Class 2 and Class 3" do
     let(:attributes) do
-      super().merge(e_bike_class: 3, e_vehicle_classifications: %w[evc/us/class_2 evc/us/class_3], top_assist_mph: 28, throttle: true, throttle_mph: 20)
+      super().merge(e_bike_class: 3, e_vehicle_classifications: %w[evc/us/class_2 evc/us/class_3], top_assist_mph: 28, throttle: true, stock_throttle: true, throttle_mph: 20)
     end
 
     it "recognizes both" do
@@ -104,7 +122,7 @@ RSpec.describe EbikeRuleServices::Evaluator do
   end
 
   context "with a motor over the cap and a Class 1 throttle" do
-    let(:attributes) { super().merge(watts: 1_000, throttle: true) }
+    let(:attributes) { super().merge(watts: 1_000, throttle: true, stock_throttle: true) }
 
     it "fails" do
       expect(statuses.select { |_id, status| status == :fail }.keys).to eq %i[power throttle]
@@ -125,15 +143,28 @@ RSpec.describe EbikeRuleServices::Evaluator do
 
   context "with a throttle in a state that allows none" do
     let(:abbreviation) { "NJ" }
-    let(:attributes) { super().merge(e_bike_class: 2, throttle: true) }
+    let(:attributes) { super().merge(e_bike_class: 2, throttle: true, stock_throttle: true) }
 
     it "fails on the throttle" do
       expect(rules.find { it[:id] == :throttle }).to include(status: :fail, note: :throttle_not_allowed)
     end
   end
 
+  context "with a Class 1 bike whose optional throttle makes it Class 2, in a state with Class 1 alone and no throttle" do
+    let(:abbreviation) { "NJ" }
+    let(:attributes) do
+      super().merge(e_bike_class: 2, e_vehicle_classifications: %w[evc/us/class_1 evc/us/class_2], optional_classes: {2 => "throttle"}, throttle: true)
+    end
+
+    it "is legal as sold, with the throttle to leave off" do
+      expect(rules.first).to include(status: :check, note: :optional_classes_not_recognized, args: {e_bike_classes: [2]})
+      expect(rules.last).to include(status: :check, note: :optional_throttle_not_allowed)
+      expect(described_class.verdict(rules)).to eq :yellow
+    end
+  end
+
   context "with a bike that has no class" do
-    let(:attributes) { super().merge(e_bike_class: nil, watts: 1_700, top_assist_mph: 50, throttle: true) }
+    let(:attributes) { super().merge(e_bike_class: nil, watts: 1_700, top_assist_mph: 50, throttle: true, stock_throttle: true) }
 
     it "fails" do
       expect(statuses).to eq(classes: :fail, power: :fail, speed: :fail, throttle: :info)
@@ -154,7 +185,7 @@ RSpec.describe EbikeRuleServices::Evaluator do
 
   context "with a throttle under a law that doesn't say whether one is allowed" do
     let(:law) { EbikeRuleServices::StateLaws.find("IN").merge(throttle: nil) }
-    let(:attributes) { super().merge(e_bike_class: 2, throttle: true) }
+    let(:attributes) { super().merge(e_bike_class: 2, throttle: true, stock_throttle: true) }
 
     it "is one to check rather than a failure" do
       expect(rules.last).to include(status: :check, note: :throttle_not_stated)

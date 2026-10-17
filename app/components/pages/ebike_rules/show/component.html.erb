@@ -14,17 +14,6 @@
     "
   >
     <div class="tw:pt-[clamp(36px,6vw,64px)] tw:pb-28 <%= SECTION_CLASSES %>">
-      <span
-        class="
-          tw:mb-4.5 tw:inline-block tw:rounded-full tw:bg-blue-100 tw:px-3.5
-          tw:py-1.5 tw:text-[13px] tw:font-bold tw:tracking-[.08em]
-          tw:text-blue-600 tw:uppercase tw:dark:bg-blue-950
-          tw:dark:text-blue-300
-        "
-      >
-        <%= translation(".bike_index_nonprofit") %>
-      </span>
-
       <h1
         class="
           tw:mb-3.5 tw:font-header tw:text-[clamp(34px,6vw,54px)]
@@ -51,7 +40,7 @@
   >
     <%= form_with url: form_path, method: :get, html: {aria: {label: translation(".form_label")}},
       class: "tw:group/lookup tw:flex tw:flex-col tw:gap-3.5 tw:rounded-lg tw:border tw:border-gray-200 tw:bg-white tw:p-[clamp(18px,4vw,32px)] tw:shadow-[0_10px_30px_rgba(44,62,80,.16)] tw:dark:border-gray-700 tw:dark:bg-gray-800",
-      data: {controller: "ebike-rules--lookup", action: "turbo:frame-load@document->ebike-rules--lookup#checkLoaded", details: details_mode,
+      data: {controller: "ebike-rules--lookup", action: "turbo:frame-load@document->ebike-rules--lookup#checkLoaded click@window->ebike-rules--lookup#checkInState", details: details_mode,
              "ebike-rules--lookup-manifest-url-value": @manifest_url,
              "ebike-rules--lookup-path-value": ebike_rules_path,
              "ebike-rules--lookup-display-value": bike_display,
@@ -143,7 +132,11 @@
 
               <div
                 data-ebike-rules--lookup-target="comboboxSlot"
-                data-action="hw-combobox:selection->ebike-rules--lookup#chooseBike"
+                data-action="
+                  hw-combobox:selection->ebike-rules--lookup#chooseBike
+                  pointerdown->ebike-rules--lookup#notePick:capture
+                  keydown.enter->ebike-rules--lookup#notePick:capture
+                "
               >
                 <input
                   id="vehicle_models"
