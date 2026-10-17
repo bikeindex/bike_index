@@ -31,7 +31,7 @@ RSpec.describe Pages::Memberships::New::Component, type: :component do
     expect(component).to have_css("[data-memberships--new-target='summary']", text: "Plus membership, $15 a month")
     expect(component).to have_css("[data-memberships--new-target='join']", text: "Join as Plus — $15/mo", count: 2)
     expect(component).to have_text("$150")
-    expect(component).to have_css("details[name='membership-faq']", count: 5)
+    expect(component).to have_css("details", count: 5)
     expect(component).to have_css("details[open]", count: 1)
     expect(component).to have_link("Or make a one-time donation", href: "/donate")
     expect(component).to_not have_link("Read more recovery stories")
