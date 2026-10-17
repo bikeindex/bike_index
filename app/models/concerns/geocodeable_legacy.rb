@@ -10,6 +10,10 @@ module GeocodeableLegacy
     geocoded_by :address
     before_validation :clean_state_and_street_data
     after_validation :bike_index_geocode, if: :should_be_geocoded? # Geocode using our own geocode process
+    # create/update rather than save so it runs after the model's own before_save callbacks,
+    # which can still assign state (SocialAccount#reverse_geocode)
+    before_create :write_renamed_address_columns
+    before_update :write_renamed_address_columns
 
     # TODO: Make without_location be without_street everywhere (removing with_location, etc)
     scope :with_location, -> { where.not(latitude: nil) }
@@ -194,6 +198,13 @@ module GeocodeableLegacy
   end
 
   private
+
+  # postal_code and region_record_id are replacing zipcode and state_id.
+  # Backfills::RenamedAddressColumnsJob copies the rows written before this
+  def write_renamed_address_columns
+    self.postal_code = zipcode
+    self.region_record_id = state_id
+  end
 
   # remove ", CA" for things like "Sacramento, CA"
   # Assign state if not assigned.

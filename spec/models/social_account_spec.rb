@@ -31,6 +31,15 @@ RSpec.describe SocialAccount, type: :model do
 
       social_account.save
     end
+
+    it "writes postal_code and region_record_id, including the state reverse geocoding assigns" do
+      state = FactoryBot.create(:state_new_york)
+      social_account = FactoryBot.create(:social_account, :in_nyc_legacy, state_id: nil, account_info: {name: "name"})
+      expect(social_account).to have_attributes(postal_code: "10007", region_record_id: nil)
+
+      social_account.update(skip_geocoding: false)
+      expect(social_account.reload).to have_attributes(state_id: state.id, region_record_id: state.id)
+    end
   end
 
   describe "#fetch_account_info" do
