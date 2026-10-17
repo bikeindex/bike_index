@@ -14,6 +14,9 @@ module OrgServices
         graduated_notification = find_or_build_graduated_notification(organization:, user:, params:)
         bike = graduated_notification.bike || default_bike(organization:, user:)
         Emails::GraduatedNotification::Component.new(graduated_notification:, bike:, email_preview: true, versioned:)
+      elsif OrganizationMessage.kinds.key?(kind)
+        organization_message = find_or_build_organization_message(kind:, organization:, user:)
+        Emails::OrganizationMessage::Component.new(organization_message:, versioned:)
       elsif %w[impound_claim_approved impound_claim_denied].include?(kind)
         Emails::ImpoundClaimApprovedOrDenied::Component.new(
           impound_claim: find_or_build_impound_claim(kind:, organization:, params:), versioned:
@@ -66,6 +69,13 @@ module OrgServices
         GraduatedNotification.new(organization_id: organization.id, bike: default_bike(organization:, user:))
     end
 
+    def find_or_build_organization_message(kind:, organization:, user:)
+      organization_messages = organization.organization_messages
+      organization_messages.where(kind:).last ||
+        organization_messages.build(kind:, sender: user, bike: default_bike(organization:, user:),
+          message: "The message you write to the owner")
+    end
+
     def default_bike(organization:, user:)
       bike = organization.created_bikes.reorder(:id).last
       bike ||= organization.bikes.reorder(:id).last
@@ -96,6 +106,6 @@ module OrgServices
     end
 
     conceal :find_or_build_parking_notification, :find_or_build_graduated_notification,
-      :default_bike, :default_stolen_bike
+      :find_or_build_organization_message, :default_bike, :default_stolen_bike
   end
 end

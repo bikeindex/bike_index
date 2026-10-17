@@ -19,7 +19,7 @@ RSpec.describe Organized::OrganizationMessagesController, type: :request do
 
       organization_message = OrganizationMessage.last
       expect(organization_message).to have_attributes(bike_id: bike.id, organization_id: current_organization.id,
-        sender_id: current_user.id, receiver_id: owner.id, receiver_email: owner.email)
+        sender_id: current_user.id, receiver_id: owner.id, receiver_email: owner.email, kind: "general_message")
 
       EmailJobs::OrganizationMessageJob.drain
       mail = ActionMailer::Base.deliveries.last

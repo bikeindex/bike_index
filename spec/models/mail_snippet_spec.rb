@@ -31,6 +31,7 @@ RSpec.describe MailSnippet, type: :model do
         impound_claim_approved
         impound_claim_denied
         graduated_notification
+        general_message
       ]
     end
     it "is target" do
