@@ -1,0 +1,8 @@
+---
+en:
+  components:
+    pages:
+      ebike_rules:
+        check:
+          outside_us: Bike checks cover US states for now. %{place}'s e-bike laws
+            are below.

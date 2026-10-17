@@ -10,8 +10,8 @@ const DETAILS = ['manual', 'top_speed', 'throttle', 'watts']
 
 // Connects to data-controller='ebike-rules--lookup'
 // The bike field is a stand-in until the catalog loads, since the combobox must have its source
-// before it connects, and stays one if the catalog fails, leaving the details. Each state has its own
-// page, so the state is the form's path rather than a field. There's no submit button: a pick or a
+// before it connects, and stays one if the catalog fails, leaving the details. Each place has its own
+// page, so the place is the form's path rather than a field. There's no submit button: a pick or a
 // change to the details loads its check into the result frame, replacing the URL with the check's own.
 // The form's data-details says which the check is of: a picked "model", whose details its check copies
 // into the panel; "custom" details changed from the model's; or "manual" details with no model
@@ -46,13 +46,13 @@ export default class extends Controller {
     this.observers.forEach((observer) => observer.disconnect())
   }
 
-  // A check in the form comes along to the new state, whose page it loads even without one for its title;
-  // clearing the state leaves the check waiting for one
+  // A check in the form comes along to the new place, whose page it loads even without one for its title;
+  // clearing the place leaves the check waiting for one
   chooseState () {
-    const abbreviation = this.#stateField.value.toLowerCase()
-    this.element.action = abbreviation ? `${this.pathValue}/${abbreviation}` : this.pathValue
+    const code = this.#stateField.value
+    this.element.action = code ? `${this.pathValue}/${code}` : this.pathValue
     this.#loadClasses()
-    if (!abbreviation) {
+    if (!code) {
       document.title = this.titleValue
       return this.#awaitState()
     }
@@ -60,7 +60,7 @@ export default class extends Controller {
     this.#visit(this.#checkUrl ?? this.element.action)
   }
 
-  // A state's link in the rules below picks it here, as its option would, rather than loading its page
+  // A place's link in the rules below picks it here, as its option would, rather than loading its page
   checkInState (event) {
     const link = event.target.closest('a[data-check-state]')
     if (!link || event.metaKey || event.ctrlKey || event.shiftKey) return
@@ -145,7 +145,7 @@ export default class extends Controller {
     Turbo.visit(url, { frame: RESULT_FRAME, action: 'replace' })
   }
 
-  // A state's own classes, where it doesn't use the three. The gem announces a prefilled state on connecting,
+  // A place's own classes, where it doesn't use the three. The gem announces a prefilled place on connecting,
   // which is the page's own
   #loadClasses () {
     const path = new URL(this.element.action).pathname

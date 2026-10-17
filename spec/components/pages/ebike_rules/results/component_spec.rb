@@ -12,7 +12,7 @@ RSpec.describe Pages::EbikeRules::Results::Component, type: :component do
   end
   let(:abbreviation) { "IN" }
   let(:lookup) do
-    EbikeRuleServices::Lookup.new(state: EbikeRuleServices::StateLaws.state(abbreviation), detected_state: nil, bikebook_id: bike.bikebook_id,
+    EbikeRuleServices::Lookup.new(place: EbikeRuleServices::Places.find("US-#{abbreviation}"), detected_place: nil, bikebook_id: bike.bikebook_id,
       manual: false, manual_mph: 20, manual_watts: nil, manual_throttle: true, bike:, errors: [], submitted: true)
   end
   let(:component) { render_inline(described_class.new(lookup:)) }

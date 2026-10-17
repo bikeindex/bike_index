@@ -18,8 +18,18 @@ module Pages
           case @id
           when :classes then classes
           when :power then @law[:watt_cap] ? translation(".watts_html", watts: number_display(@law[:watt_cap])) : translation(".no_cap")
-          when :speed then @law[:mph] ? translation(".mph_html", mph: number_display(@law[:mph])) : translation(".no_cap")
+          when :speed then speed
           else @law[:throttle] ? translation(".allowed") : translation(".not_allowed")
+          end
+        end
+
+        def speed
+          if @law[:mph].nil?
+            translation(".no_cap")
+          elsif @law[:metric]
+            translation(".kmh_html", kmh: number_display(@law[:kmh]))
+          else
+            translation(".mph_html", mph: number_display(@law[:mph]))
           end
         end
 

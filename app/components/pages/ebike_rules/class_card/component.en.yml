@@ -30,6 +30,7 @@ en:
             Top speed over 28 mph, throttle speed over 20 mph, or motors over 750W
             make it an e-moto.
           id: ID
+          kmh: "%{kmh} km/h"
           motor: Motor
           motor_cap: "≤750W"
           mph: "%{mph} mph"

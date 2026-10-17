@@ -41,7 +41,7 @@ export const renderClassCards = (root, ids, classifications) => {
   slot.dataset.key = key
   const { frameId, src } = slot.dataset
   const frame = (suffix, params, content = nothing, state = '') =>
-    html`<turbo-frame id=${`${frameId}-${suffix}`} src=${`${src}${state && `/${state.toLowerCase()}`}?${toQuery(params)}`}>${content}</turbo-frame>`
+    html`<turbo-frame id=${`${frameId}-${suffix}`} src=${`${src}${state && `/US-${state}`}?${toQuery(params)}`}>${content}</turbo-frame>`
   const cards = shown.map((id) => {
     const number = id.match(US_CLASS)?.[1]
     const permanent = number && jurisdiction ? `${id} ${jurisdiction}` : id

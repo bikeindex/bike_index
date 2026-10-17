@@ -96,6 +96,19 @@ RSpec.describe EbikeRuleServices::StateLaws do
     end
   end
 
+  describe "places" do
+    it "has each place outside the US's e-bike laws in km/h, or its country's without its own, and its other classes" do
+      places = described_class.places
+      expect(places.keys).to match_array %w[CA EU CA-NB]
+      expect(places["EU"][:laws]).to match [include(id: "evc/eu/epac", kmh: 25, mph: 16, watt_cap: 250, throttle: false, metric: true,
+        restrictions: [include(rule: "No licence, registration or insurance is needed")])]
+      expect(places["EU"][:classes]).to eq []
+      expect(places["CA-NB"][:laws]).to match [include(id: "evc/ca/power_assisted_bicycle", kmh: 32)]
+      expect(places["CA-NB"][:classes]).to eq ["evc/ca/nb/motorcycle"]
+      expect(described_class.find("CO")).to include(metric: false)
+    end
+  end
+
   describe "class_3_rules" do
     it "is the state's e-bike law's helmet, age and path rules for a Class 3" do
       rules = described_class.class_3_rules("CA").pluck(:rule)

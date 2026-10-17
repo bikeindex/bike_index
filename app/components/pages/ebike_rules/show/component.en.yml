@@ -26,6 +26,7 @@ en:
           change: change?
           check_my_bike: Check my bike
           compare_html: Want to compare multiple bikes? %{link}
+          country: Country
           custom_details: Custom details
           details_legend: Your bike's details
           detected_html: We detected <strong>%{state}</strong> —
@@ -46,6 +47,7 @@ en:
           model_details: "%{model} details"
           motor_wattage: Motor wattage (W)
           mph: "%{mph} mph"
+          not_in_us_html: Not in the US? %{switch_country}
           over_28_mph: Over 28 mph
           parent_step_1_body: >-
             Many states set a minimum age for Class 3, and some for every class. Look
@@ -81,10 +83,13 @@ en:
           register_band_heading: Registered bikes are recovered 2× more often when
             stolen. Registration is free.
           register_your_bike: Register your bike
+          select_country: Select a country
           select_state: Select your state
           state: State
           state_error: Choose a state.
           subheading: Enter your state and bike to see your state's rules.
+          switch_country: switch country
+          switch_country_title: Switch country
           top_speed: What is its top speed?
           ul_2271_body: >-
             Tests the lithium-ion battery pack on its own. Common on bikes and replacement
