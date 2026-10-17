@@ -44,11 +44,13 @@ module Pages
         def bikes_display
           return safe_join([number_display(@bikes_count), "+"]) if @bikes_count < 1_000_000
 
-          safe_join([number_display(@bikes_count / 1_000_000), "M+"])
+          millions = number_with_precision(@bikes_count / 1_000_000.0, precision: 1, round_mode: :floor,
+            strip_insignificant_zeros: true)
+          safe_join([millions, "M+"])
         end
 
         def stats
-          [{value: bikes_display, label: translation(".bikes_registered_free")},
+          [{value: bikes_display, label: translation(".bikes_registered")},
             {value: number_display(@recoveries_count), label: translation(".stolen_bikes_recovered")},
             {value: render(Atoms::CurrencyMillions::Component.new(dollars_usd: @recoveries_value)),
              label: translation(".value_returned_to_owners")},

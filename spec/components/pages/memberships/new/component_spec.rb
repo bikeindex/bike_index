@@ -21,7 +21,7 @@ RSpec.describe Pages::Memberships::New::Component, type: :component do
 
   it "renders the plans with plus selected" do
     expect(component).to have_css("h1", text: "Keep Bike Index free for every rider")
-    expect(component).to have_text("1M+")
+    expect(component).to have_text("1.2M+")
     expect(component).to have_text("18,263")
     expect(component).to have_text("$38M+")
     expect(component).to have_text("Plans from $5 a month")
@@ -55,6 +55,14 @@ RSpec.describe Pages::Memberships::New::Component, type: :component do
 
     it "falls back to plus" do
       expect(component).to have_checked_field("membership_level_plus", visible: :all)
+    end
+  end
+
+  context "with a whole number of millions of bikes" do
+    let(:options) { super().merge(bikes_count: 2_000_999) }
+
+    it "drops the decimal" do
+      expect(component).to have_text("2M+")
     end
   end
 

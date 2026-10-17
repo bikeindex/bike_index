@@ -6,7 +6,7 @@ en:
         new:
           become_a_member: Become a member
           bike_index_membership: Bike Index membership
-          bikes_registered_free: bikes registered, free
+          bikes_registered: bikes registered
           builds_next: Builds next
           choose_your_membership: Choose your membership
           cycling_cap: Cycling cap
