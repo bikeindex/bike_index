@@ -208,8 +208,8 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
   context "with caching", :caching do
     include_context :caching_basic
 
-    def render_table
-      with_request_url("/o/#{organization.to_param}/registrations") { render_inline(described_class.new(**options)) }
+    def render_table(**extra)
+      with_request_url("/o/#{organization.to_param}/registrations") { render_inline(described_class.new(**options, **extra)) }
     end
 
     it "keys each row to the organization's version" do
@@ -218,6 +218,18 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
 
       organization.update(name: "Renamed org")
       expect(fragments_written { render_table }.count).to eq 1
+    end
+
+    context "with bike_stickers enabled" do
+      let(:enabled_feature_slugs) { %w[bike_search bike_stickers] }
+      let(:bike_sticker) { FactoryBot.create(:bike_sticker, organization:) }
+
+      it "serves rows assigning a sticker from the same cache, the assign column hidden in both" do
+        expect(fragments_written { render_table }.count).to eq 1
+        expect(page).to have_css("td.assign_bike_sticker_cell.tw\\:hidden", visible: :all)
+        expect(fragments_written { render_table(bike_sticker:) }).to eq([])
+        expect(page).to have_css("td.assign_bike_sticker_cell.tw\\:hidden", visible: :all)
+      end
     end
   end
 end
