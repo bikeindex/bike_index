@@ -163,7 +163,7 @@ class ModelViewer {
 
   photo (photo, titleText, frame = 'tw:mb-6 tw:aspect-[3/2]') {
     return html`<div class="tw:group tw:order-first" data-controller=${present(photo) ? 'image-fallback' : nothing} data-broken=${present(photo) ? nothing : ''}>${present(photo)
-      ? html`<a target="_blank" rel="noopener" class="${frame} tw:block tw:overflow-hidden tw:rounded-md tw:border tw:border-gray-200 tw:dark:border-gray-700 tw:bg-white tw:p-2 tw:group-data-broken:hidden"
+      ? html`<a target="_blank" rel="noopener" class="${frame} tw:block tw:group-data-broken:hidden"
         href=${photo}><img alt=${titleText} loading="lazy" class="tw:size-full tw:rounded-sm tw:object-contain" data-action="error->image-fallback#fallBack" src=${photo}></a>`
       : nothing}<div class="${frame} tw:hidden tw:flex-col tw:items-center tw:justify-center tw:gap-2 tw:rounded-md
       tw:border tw:border-dashed tw:border-gray-200 tw:dark:border-gray-700 tw:text-gray-400 tw:group-data-broken:flex tw:dark:text-gray-500"><img
@@ -335,7 +335,7 @@ class ModelViewer {
       years: this.yearRange(),
       vehicle_type: presence(typeLabel(vehicle)),
       type: vehicle.type,
-      e_vehicle_class: this.eVehicleClass(),
+      e_vehicle_class: this.#withRulesLink(this.eVehicleClass()),
       cargo_vehicle: isCargo(this.data),
       cargo: this.cargo(),
       primary_activity: this.withoutParenthetical(vehicle.primary_activity),
@@ -434,6 +434,11 @@ class ModelViewer {
     return tiles.length ? classBadges(tiles) : presence(this.classificationNames(this.#sortedClassifications(this.vehicle)))
   }
 
+  #withRulesLink (classes) {
+    return classes && html`<div class="tw:flex tw:flex-wrap tw:items-end tw:gap-x-3 tw:gap-y-1"><div>${classes}</div><a class="twlink tw:text-sm"
+      href=${`/ebike-rules?vehicle_models=${this.data.id}`}>View on e-bike rules</a></div>`
+  }
+
   // As EbikeRuleServices::BikebookVehicles has them: the US classes only a mode it isn't sold with brings, by that mode,
   // and none when every class is
   #optionalClasses () {
@@ -512,8 +517,8 @@ class ModelViewer {
     const parts = partsOf(content).filter((part) => part !== '' && part != null && part !== nothing)
     const lastMarkup = parts.findLastIndex((part) => typeof part !== 'string' && typeof part !== 'number')
     const [, head, last] = parts.slice(lastMarkup + 1).join('').match(KEEP_TOGETHER) ?? []
-    if (!last || (lastMarkup >= 0 && !head)) return html`<span class="tw:whitespace-nowrap">${content} ${tip}</span>`
-    return join([...parts.slice(0, lastMarkup + 1), head ?? '', html`<span class="tw:whitespace-nowrap">${last} ${tip}</span>`])
+    if (!last || (lastMarkup >= 0 && !head)) return html`<span class="keep-together tw:whitespace-nowrap">${content} ${tip}</span>`
+    return join([...parts.slice(0, lastMarkup + 1), head ?? '', html`<span class="keep-together tw:whitespace-nowrap">${last} ${tip}</span>`])
   }
 
   measurements (values, unit, separator) {
@@ -576,15 +581,18 @@ class ModelViewer {
     return [...presenter.rowsFor(this.kit.viewer.suspension_fields, suspension, { labels: this.kit.viewer.suspension_labels, display: suspensionValue }), ...componentRows]
   }
 
-  // "160 mm / 150 mm", rigid where an end isn't suspended, with both ends' tooltips in one
+  // "160 mm / 150 mm", or "60 mm front (no rear suspension)" for one end, with both ends' tooltips in one
   suspensionTravels () {
     const ends = this.vehicle.suspension
     if (blank(ends)) return html`<span class="twless-strong">Rigid</span>`
 
-    const travels = ['front', 'rear'].map((position) => ends[position] ? this.travelLead(ends[position]) ?? 'unknown' : html`<span class="twless-strong">rigid</span>`)
+    const [front, rear] = ['front', 'rear'].map((position) => ends[position] && (this.travelLead(ends[position]) ?? 'unknown'))
+    const travels = front && rear
+      ? join([front, rear], ' / ')
+      : front ? join([front, ' front (no rear suspension)']) : join([rear, ' rear (no front suspension)'])
     const body = join(Object.entries(ends).map(([position, end]) => html`<span class="tw:block tw:font-bold">${this.presenter.humanize(position)} suspension</span>${
       this.tooltipRows(this.suspensionRows(end))}`), html`<span class="tw:block tw:h-2"></span>`)
-    return this.withTooltip(join(travels, ' / '), body)
+    return this.withTooltip(travels, body)
   }
 
   // travel can come from the fork or shock itself
@@ -635,7 +643,7 @@ class ModelViewer {
     const rated = array(vehicle.motors).map((motor) => motor.rated_power).filter(isNumber)
     const specs = [['Motor', rated.length ? presenter.measurement(sum(rated), 'w') : null], ['Top speed', fastest(of('assist'))], ['Throttle', throttle]]
     const certifications = certificationsOf(array(vehicle.motors).map((motor) => motor.certification))
-    return html`<div class="tw:mb-6">${bikeSummary({ vehicleType: this.data.type, tiles: this.eVehicleClass(), specs, ...certifications })}</div>`
+    return html`<div class="tw:mb-6">${bikeSummary({ vehicleType: this.data.type, tiles: this.#withRulesLink(this.eVehicleClass()), specs, ...certifications })}</div>`
   }
 
   // One per motor index across the compared vehicles, motors alike but for their drive wheel as one
