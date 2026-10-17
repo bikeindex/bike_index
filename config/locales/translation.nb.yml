@@ -2711,6 +2711,8 @@ nb:
       send_it: Sende det!
       subject: Emne
       your_message: Din beskjed
+      message_template: 'Sykkelens serienummer (hvis aktuelt): URL for registrering
+        av sykkelindeks (hvis aktuelt): Det jeg trenger hjelp med: '
     index:
       contact_us: Kontakt oss!
       have_a_question_we_havent_answered: Har du et spørsmål vi ikke har svart på?
@@ -2718,6 +2720,9 @@ nb:
       log_in_to_send_a_comment: Logg inn for å sende en kommentar!
       you_can_reach_us_at_contact_html: Du kan nå oss på %{contact_link}, eller sende
         meldingen din her.
+      the_more_detail_you_can_share: Jo flere detaljer du kan dele, desto raskere
+        kan vi hjelpe. Hvis spørsmålet ditt gjelder en spesifikk sykkel, ta med serienummeret
+        eller registreringsadressen for Bike Index.
   info:
     about:
       about_bike_index: Om Bike Index
