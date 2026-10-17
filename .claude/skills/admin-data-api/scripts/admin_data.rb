@@ -156,8 +156,9 @@ def array_length(value)
 end
 
 # "nothing abnormal" verdicts. A queue backlogs at latency > 30s or size > 400 (not
-# transient depth). PgHero hit rates and unused/duplicate indexes are informational,
-# and "System stats not enabled" is a disabled feature, not a fault.
+# transient depth), and a slow query over 10% of query time. PgHero hit rates and
+# unused/duplicate indexes are informational, and "System stats not enabled" is a
+# disabled feature, not a fault.
 def sidekiq_verdict(data)
   stats = data["stats"] || {}
   processes = data["processes"] || []
@@ -193,8 +194,8 @@ def pghero_verdict(data)
   reasons << "transaction_id_danger" if array_length(data["transaction_id_danger"]) > 0
   reasons << "autovacuum_danger=#{array_length(data["autovacuum_danger"])}" if array_length(data["autovacuum_danger"]) > 0
   reasons << "index_hit_rate=#{data["index_hit_rate"]}" if data["index_hit_rate"] && data["index_hit_rate"].to_f < 0.90
-  heavy_slow = Array(data["slow_queries"]).select { it.is_a?(Hash) && it["total_percent"].to_f > SLOW_QUERY_PERCENT }.length
-  reasons << "slow_queries over #{SLOW_QUERY_PERCENT}% of query time=#{heavy_slow}" if heavy_slow > 0
+  heavy_slow = Array(data["slow_queries"]).select { it.is_a?(Hash) && it["total_percent"].to_f > 10 }.length
+  reasons << "slow_queries over 10% of query time=#{heavy_slow}" if heavy_slow > 0
   max_conn = (data["settings"] || {})["max_connections"] || "?"
   <<~OUT.chomp
     summary: connections=#{data["total_connections"]}/#{max_conn} db=#{data["database_size"]} running=#{array_length(data["running_queries"])} index_hit=#{data["index_hit_rate"].to_s[0, 5]} table_hit(info)=#{data["table_hit_rate"].to_s[0, 5]} unused_indexes=#{array_length(data["unused_indexes"])}
@@ -203,10 +204,7 @@ def pghero_verdict(data)
   OUT
 end
 
-# PgHero's dashboard "Slow queries": average_time >= 20ms over >= 100 calls. One
-# over SLOW_QUERY_PERCENT of total query time is abnormal
-SLOW_QUERY_PERCENT = 10
-
+# PgHero's dashboard "Slow queries": average_time >= 20ms over >= 100 calls
 def slow_query_lines(data)
   slow = data["slow_queries"]
   return "slow_queries: not returned (query stats disabled, or endpoint not yet deployed)" unless slow.is_a?(Array)
