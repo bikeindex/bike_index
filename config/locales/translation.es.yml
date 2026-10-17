@@ -6974,6 +6974,8 @@ es:
           class_unknown_aria: Clase de bicicleta eléctrica desconocida
           emoto: Moto eléctrica
           emoto_aria: E-moto, no una bicicleta eléctrica
+          optional_throttle: con acelerador opcional
+          optional_upgrade: con actualización opcional
         law_details:
           from: 'Desde %{date}:'
           from_until: 'Desde %{starts_on} hasta %{ends_on}:'
@@ -6991,7 +6993,6 @@ es:
           class_3_throttle: El acelerador debe cortarse a 20 mph.
           classes_start_on: Las clases entran en vigor %{date}. Hasta entonces, consulte
             las reglas vigentes del estado.
-          entered_manually: Introducido manualmente · Clase %{n}
           fails_rule: No cumple con esta regla.
           falls_under: En %{state}, se encuentra dentro de %{name}, lo que puede requerir
             registro y licencia.
@@ -7020,7 +7021,6 @@ es:
           no_watt_cap: No existe límite de potencia en la ley estatal.
           not_classified: No es una bicicleta eléctrica de Clase 1, 2 o 3.
           not_permitted: No está permitido
-          not_provided: No se proporciona
           own_classes: El estado establece sus propios límites en lugar de las tres
             clases estándar.
           recovered_more_often: Las bicicletas robadas se recuperan dos veces más
@@ -7047,7 +7047,6 @@ es:
           throttle_not_allowed: El estado no permite un acelerador
           throttle_not_stated: La ley estatal no especifica si se permite un acelerador.
           top_speed: Velocidad máxima
-          ul_certification: Certificación UL
           watts_html: "%{watts}W"
           watts_not_provided: Potencia del motor no proporcionada
           watts_over_cap_html: El motor %{watts}W supera la capacidad %{cap}W
@@ -7072,10 +7071,8 @@ es:
           class_3_throttle_within_html: El acelerador se detiene a %{mph} mph
           class_unknown_check_label: BikeBook no indica su clase ni su velocidad máxima,
             así que compruebe la clase en su etiqueta.
-          entered_manually_unclassified: Introducido manualmente
           entered_unverified: Ingresado por usted, no verificado por BikeBook.
           full_bikebook_entry: Ver la entrada completa en BikeBook
-          model_year_bikebook: "%{year} modelo · BikeBook"
           over_mph_html: Más de %{mph} mph
           red_headline_manual: Esto no es una bicicleta eléctrica según las normas
             %{state} vigentes.
@@ -7091,6 +7088,34 @@ es:
             other: Se reconocen las clases %{n}.
           read_more: Leer más
           stock_photo: Foto de archivo
+          answer_optional: Opcional
+          as_class_with_optional_throttle: como Clase %{n} con su acelerador opcional
+          as_class_with_optional_upgrade: como Clase %{n} con una actualización opcional
+          class_3_optional_throttle_within_html: El acelerador opcional se detiene
+            a %{mph} mph.
+          class_3_speed_with_throttle_html: Ayuda a %{mph} mph, no permitido con acelerador.
+          class_n: Clase %{n}
+          classes_not_permitted: Es una bicicleta eléctrica %{classes}, lo cual no
+            está permitido.
+          green_headline_optional: Tu %{name} es legal para circular en %{state} como
+            bicicleta eléctrica de clase %{n} y %{optional}.
+          manually_entered: Introducido manualmente
+          model_year: Modelo %{year}
+          optional_classes_not_recognized:
+            one: La clase %{n} no se reconoce aquí, por lo que solo es legal tal como
+              se vende.
+            other: Las clases %{n} no se reconocen aquí, por lo que es legal solo
+              como se vende.
+          optional_throttle_not_allowed: Es legal únicamente sin su acelerador opcional.
+          optional_to_html: Opcional, a %{mph}
+          throttle_with_class_3_assist: No permitido con asistencia de Clase 3
+          yellow_headline_optional:
+            one: Tu %{name} es legal para circular en %{state} como una bicicleta
+              eléctrica de clase %{n}, y %{optional}, con la regla %{count} a verificar.
+            other: Tu %{name} es legal para circular en %{state} como una bicicleta
+              eléctrica de clase %{n}, y %{optional}, con %{count} reglas para verificar.
+          yellow_headline_without_throttle: Tu %{name} es legal para circular en %{state}
+            como una bicicleta eléctrica de Clase %{n}, sin su acelerador opcional.
         rule_label:
           classes: Clases reconocidas
           power: condensador de potencia del motor
@@ -7215,7 +7240,6 @@ es:
           over_28_mph: Más de 28 mph
           top_speed: "¿Cuál es su velocidad máxima?"
           visit_bikebook_link: Visita BikeBook.
-          bike_index_nonprofit: Índice de bicicletas · Organización sin fines de lucro
           custom_details: Detalles personalizados
           details_legend: Detalles de tu bicicleta
           model_details: "%{model} detalles"
@@ -7242,18 +7266,16 @@ es:
           certified: Certificado UL %{standard}
           meaning_2271_certified: La batería superó las pruebas de seguridad UL contra
             sobrecarga, cortocircuito e impacto.
-          meaning_2271_unknown: Todavía no disponemos de datos de certificación de
-            la batería. Consulte la etiqueta de la batería.
-          meaning_2849_unknown: Todavía no disponemos de datos de certificación del
-            sistema para este modelo. Busque la marca UL en la etiqueta del marco.
           scope_2271: Paquete de baterías
           scope_2849: Sistema eléctrico para bicicletas eléctricas
-          status_unknown: Estado desconocido de UL %{standard}
-          meaning_2271_check_label: Comprueba la etiqueta de la batería.
-          meaning_2849_check_label: Busque la marca UL en la etiqueta del marco.
           meaning_2849_system_certified: Todo el sistema eléctrico (motor, batería,
             cargador y controlador) superó conjuntamente las pruebas de seguridad
             eléctrica y contra incendios.
+          certification_unknown: Certificación desconocida
+          meaning_check_labels: Busque la marca UL en el marco y en las etiquetas
+            de la batería.
+          meaning_unknown: Todavía no disponemos de datos de certificación para este
+            modelo. Busque la marca UL en el chasis y en las etiquetas de la batería.
         classes:
           classes_heading: Clases de bicicletas eléctricas, explicadas
           classes_intro: La mayoría de los estados utilizan un sistema de tres clases.
@@ -7300,11 +7322,16 @@ es:
           not_an_ebike: No es una bicicleta eléctrica
           watts_max: "≤%{watts}W"
           watts_min: "%{watts}W+"
+          copy_id: Copiar ID
+          id: IDENTIFICACIÓN
+        bike_summary:
+          classification: Clasificación E-%{vehicle_type}
+          electric_certification: Certificación eléctrica
+          not_provided: No se proporciona
       memberships:
         new:
           become_a_member: Hazte miembro
           bike_index_membership: Membresía de Bike Index
-          bikes_registered_free: bicicletas registradas, gratis
           builds_next: Construye a continuación
           choose_your_membership: Elige tu membresía
           cycling_cap: gorra de ciclismo
@@ -7345,19 +7372,12 @@ es:
           join_yearly: Únete como %{level} — %{price}/año
           keep_bike_index_free: Mantengamos Bike Index gratuito para todos los ciclistas.
           keeps_free: Se mantiene gratis
-          lede: La membresía consiste en una donación mensual a Bike Index, una organización
-            sin fines de lucro. Esta donación cubre el registro y las alertas de bicicletas
-            robadas que permiten recuperarlas, además de financiar las nuevas herramientas
-            que desarrollamos. Registrar una bicicleta y denunciar un robo siempre
-            será gratuito. Gracias a nuestros miembros, podemos garantizarlo.
           live: Vivir
           member_gear: Equipo de miembro
           member_gear_body: Los miembros Plus reciben la gorra de ciclismo Bike Index.
             Los patrocinadores reciben la camiseta de protección solar. Ambas prendas
             están diseñadas por Kelsey Graywill y te las enviamos por correo después
             de que te unas.
-          members_keep_it_free: Un millón de bicicletas están registradas. Los miembros
-            mantienen el servicio gratuito para el próximo millón.
           monthly: Mensual
           new_tools_for_bike_owners: Nuevas herramientas para propietarios de bicicletas
           next: Próximo
@@ -7414,6 +7434,16 @@ es:
           wear_the_shield: Lleva el escudo
           what_members_make_possible: Lo que los miembros hacen posible
           yearly: Anual
+          bikes_registered: bicicletas matriculadas
+          bikes_registered_keep_it_free: "%{bikes} Las bicicletas están registradas.
+            Los miembros lo mantienen gratis para el próximo millón."
+          millions_registered_keep_it_free: "%{millions} millones de bicicletas están
+            registradas. Los miembros lo mantienen gratis para el próximo millón."
+          monthly_donation_lede: La membresía es una donación mensual a Bike Index.
+            Con ella se financia el registro y las alertas de bicicletas robadas,
+            que permiten recuperarlas, y también se financian las nuevas herramientas
+            que desarrollamos. Registrar una bicicleta y denunciar un robo siempre
+            será gratuito. Gracias a nuestros miembros podemos garantizarlo.
     shared_blocks:
       footer:
         about: Acerca
