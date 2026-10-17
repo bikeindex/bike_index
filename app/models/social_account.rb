@@ -42,6 +42,7 @@ class SocialAccount < ApplicationRecord
   self.ignored_columns += %w[zipcode state_id]
 
   has_many :social_posts, dependent: :destroy
+
   validates \
     :consumer_key,
     :consumer_secret,
@@ -49,11 +50,10 @@ class SocialAccount < ApplicationRecord
     :user_token,
     :screen_name,
     presence: true
+
   validates :screen_name, uniqueness: true
+
   attr_accessor :skip_geocoding
-
-
-
 
   after_validation :address_record_geocode, if: :should_be_geocoded?
   before_save :reverse_geocode, if: :should_be_reverse_geocoded?
