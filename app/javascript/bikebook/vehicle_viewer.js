@@ -14,14 +14,17 @@ import { VehiclePresenter } from 'bikebook/vehicle_presenter'
 
 // The compared vehicles' cards, from catalog blocks
 export class VehicleViewer {
-  constructor (kit, vocabulary) {
+  // false where `jurisdiction`'s law bars a Class 3's throttle, as California's does
+  constructor (kit, vocabulary, jurisdiction) {
     this.presenter = new VehiclePresenter(kit, vocabulary)
+    this.class3Throttle = !Object.values(vocabulary.e_vehicle_classifications)
+      .some((record) => record.jurisdiction === `US-${jurisdiction}` && record.class_3_throttle === false)
   }
 
   // The vehicles at `url` in the view it picks, whose links keep its other params, compared in the sizes it picks or
   // the nearest to the `preferredSize`. With none, the `search`'s count, whether filters narrow it, and its featured models
   render (vehicles, url, preferredSize, search) {
-    const { presenter } = this
+    const { presenter, class3Throttle } = this
     if (vehicles.length === 0) {
       return emptyState({
         url,
@@ -65,7 +68,7 @@ export class VehicleViewer {
         : html`<p class="twless-strong">${none}</p>`}</section>`
     })
     const views = {
-      basics: () => basics({ presenter, vehicles }),
+      basics: () => basics({ presenter, vehicles, class3Throttle }),
       // the overlay beside the table once the window is wide, above it until then
       geometry: () => html`<div class="tw:flex tw:flex-col tw:min-[1500px]:mx-[calc(50%-50vw)] tw:min-[1500px]:w-screen tw:min-[1500px]:flex-row
         tw:min-[1500px]:items-start tw:min-[1500px]:gap-6 tw:min-[1500px]:px-4">${geometryOverlay({ ...compared, beside: true })}${
@@ -74,13 +77,13 @@ export class VehicleViewer {
       { keyed: true }))}`,
       components: () => cardRow('tw:mt-6', cards('components', 'No components listed', (data, value) => componentsOf({ presenter, data, others: others(value) }),
         { lead: (data, value) => runningGearOf({ presenter, data, others: others(value) }) })),
-      motors: () => cardRow('tw:mt-6', cards('motors', 'No motor', (data, value) => motorsOf({ presenter, data, others: others(value), outOfClass: vehicles.find((each) => each.value === value)?.outOfClass }))),
+      motors: () => cardRow('tw:mt-6', cards('motors', 'No motor', (data, value) => motorsOf({ presenter, data, others: others(value), class3Throttle }))),
       all: () => {
-        const full = vehicles.map(({ data, value, outOfClass }, index) => {
+        const full = vehicles.map(({ data, value }, index) => {
           const remaining = values.filter((each) => each !== value)
           const removePath = pathWith(url, { vehicle_models: remaining.join(','), vehicle_sizes: sizesParam(remaining, picked) })
           return modelViewer({
-            presenter, data, value, comparing, idSuffix: index + 1, others: others(value), removePath, selectedSize: selectedSizes.get(value), sizePath: sizePath(value), outOfClass
+            presenter, data, value, comparing, idSuffix: index + 1, others: others(value), removePath, selectedSize: selectedSizes.get(value), sizePath: sizePath(value), class3Throttle
           })
         })
         return cardRow('tw:mt-6', full)

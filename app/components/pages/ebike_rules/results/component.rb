@@ -70,10 +70,10 @@ module Pages
         # [class, the optional mode that alone brings it] by class. In no class here, the e-moto's alone, and in none
         # with an optional throttle, its classes but the throttle's, then the e-moto's with the throttle's caption
         def tiles
-          return [[nil, nil]] if @bike.out_of_class_in?(@state[:abbr])
+          return [[nil, nil]] if @bike.out_of_class_under?(@law)
 
           classes = @bike.e_bike_classes.map { [it, @bike.optional_classes[it]] }
-          return classes unless @bike.optionally_out_of_class_in?(@state[:abbr])
+          return classes unless @bike.optionally_out_of_class_under?(@law)
 
           classes.reject { |_, mode| mode == "throttle" } + [[nil, "throttle"]]
         end
@@ -83,7 +83,7 @@ module Pages
         def optional_clause
           @optional_clause ||= @bike.optional_classes.filter_map { |n, mode|
             next unless @law[:classes].none? || @law[:classes].include?(n)
-            next if mode == "throttle" && @bike.optionally_out_of_class_in?(@state[:abbr])
+            next if mode == "throttle" && @bike.optionally_out_of_class_under?(@law)
 
             (mode == "throttle") ? translation(".as_class_with_optional_throttle", n:) : translation(".as_class_with_optional_upgrade", n:)
           }.to_sentence

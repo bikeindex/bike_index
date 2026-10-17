@@ -77,7 +77,7 @@ export const tireWidth = (presenter, width) => new ModelViewer({ presenter, data
 export const wheelSize = (presenter, bsd) => new ModelViewer({ presenter, data: {}, others: [] }).wheelSizeName(bsd)
 
 // A vehicle's names, photo and the fields the Overview lists
-export const basicsOf = ({ presenter, data, outOfClass }) => new ModelViewer({ presenter, data, others: [], outOfClass }).basics()
+export const basicsOf = ({ presenter, data, class3Throttle }) => new ModelViewer({ presenter, data, others: [], class3Throttle }).basics()
 
 // A vehicle's stock photo in `frame`, without the rest of what basicsOf works out
 export const photoOf = ({ presenter, data }, frame) => new ModelViewer({ presenter, data, others: [] }).stockPhoto(frame)
@@ -87,8 +87,8 @@ export const photoOf = ({ presenter, data }, frame) => new ModelViewer({ present
 export const sizesOf = ({ presenter, data, others, selectedSize, sizePath }) => new ModelViewer({ presenter, data, others, selectedSize, sizePath }).sizes()
 
 // A vehicle's electric summary beside its motors, each with its battery, marked where they differ from `others`'
-export const motorsOf = ({ presenter, data, others, outOfClass }) => {
-  const viewer = new ModelViewer({ presenter, data, others, outOfClass })
+export const motorsOf = ({ presenter, data, others, class3Throttle }) => {
+  const viewer = new ModelViewer({ presenter, data, others, class3Throttle })
   return sideBySide([viewer.electricSummary(), viewer.motorSections()])
 }
 
@@ -106,14 +106,13 @@ const sideBySide = (columns) => html`<div class="tw:@container"><div class="tw:f
 export const componentsOf = ({ presenter, data, others }) => html`<div class="tw:space-y-4">${new ModelViewer({ presenter, data, others }).components()}</div>`
 
 class ModelViewer {
-  // `outOfClass` where the jurisdiction viewed from has it in no class, as California does a Class 3 with a throttle:
-  // 'stock' as it's sold, or 'throttle' with its optional one
-  constructor ({ presenter, data, value, comparing, idSuffix, others, removePath, selectedSize, sizePath, outOfClass = null }) {
-    this.outOfClass = outOfClass
+  // `class3Throttle` false where the viewing jurisdiction's law bars a Class 3's throttle
+  constructor ({ presenter, data, value, comparing, idSuffix, others, removePath, selectedSize, sizePath, class3Throttle }) {
     this.presenter = presenter
     this.kit = presenter.kit
     this.data = data
     this.vehicle = this.#normalize(data)
+    this.outOfClass = class3Throttle === false ? this.#throttledClass3() : null
     this.others = others.map((other) => this.#normalize(other))
     Object.assign(this, { value, comparing, idSuffix, removePath, selectedSize, sizePath })
   }
@@ -171,6 +170,16 @@ class ModelViewer {
     const suspension = Object.fromEntries(Object.keys(this.kit.viewer.suspensions)
       .map((position) => [position, this.#suspension(vehicle, position)]).filter(([, values]) => values != null))
     return { ...vehicle, frame, suspension, type_name: typeLabel(vehicle), classifiedModes: this.#classifiedModes(data) }
+  }
+
+  // As EbikeRuleServices::Bike has it, a Class 3's throttle: 'stock' as it's sold with one, as a throttle propulsion
+  // with no throttle mode is, or 'throttle' with an optional one
+  #throttledClass3 () {
+    const modes = this.vehicle.classifiedModes
+    if (!modes.some(({ ids }) => ids.includes('evc/us/class_3'))) return null
+    const throttles = modes.filter(({ mode }) => mode === 'throttle')
+    if (throttles.length ? throttles.some(stock) : array(this.data.propulsion).includes('throttle')) return 'stock'
+    return throttles.length ? 'throttle' : null
   }
 
   // An app update replaces the modes of its kind the bike leaves the factory with, as a Class 3 assist does a Class 1's

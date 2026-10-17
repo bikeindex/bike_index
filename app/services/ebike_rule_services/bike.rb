@@ -39,13 +39,13 @@ module EbikeRuleServices
 
     def optional_throttle? = throttle && !stock_throttle
 
-    # California's Class 3 can't propel itself (Vehicle Code §312.5), so one with a stock throttle is in no class
-    # there, as the catalog's out_of_class/US-CA marks it, and one with an optional throttle is in none with it
-    def out_of_class_in?(abbreviation) = class_3_throttle_banned?(abbreviation) && stock_throttle
+    # Under a law whose Class 3 can't have a throttle, as California's (Vehicle Code §312.5), one with a stock throttle
+    # is in no class, and one with an optional throttle is in none with it
+    def out_of_class_under?(law) = class_3_throttle_banned?(law) && stock_throttle
 
-    def optionally_out_of_class_in?(abbreviation) = class_3_throttle_banned?(abbreviation) && optional_throttle?
+    def optionally_out_of_class_under?(law) = class_3_throttle_banned?(law) && optional_throttle?
 
-    def class_3_throttle_banned?(abbreviation) = abbreviation == "CA" && e_bike_classes.include?(3)
+    def class_3_throttle_banned?(law) = law&.dig(:class_3_throttle) == false && e_bike_classes.include?(3)
 
     # Entered by hand as faster than any class, so its top speed is only known to be past Class 3's
     def assists_past_mph = (28 if manual? && e_bike_class.nil?)

@@ -82,13 +82,14 @@ export async function unpickedVehicles (catalog, page, url) {
   return new VehicleViewer(catalog.kit, catalog.vocabulary).render([], url, null, await unpicked(catalog, page, filtersAt(catalog, page, url)))
 }
 
-const pickedOf = (catalog, url, { jurisdiction, market }) => catalog.vehicles(url.searchParams.get('vehicle_models')?.split(',') ?? [], { jurisdiction, market })
+const pickedOf = (catalog, url, { market }) => catalog.vehicles(url.searchParams.get('vehicle_models')?.split(',') ?? [], { market })
 
 // The picked vehicles' place for `url`'s jurisdiction, which decides which are out of class there, and market, which
 // which are sold elsewhere
 export async function pickedVehicles (catalog, page, url) {
-  const found = await pickedOf(catalog, url, filtersAt(catalog, page, url))
-  return new VehicleViewer(catalog.kit, catalog.vocabulary).render(found.slice(0, MAX_COMPARE), url, preferredSize(), {})
+  const filters = filtersAt(catalog, page, url)
+  const found = await pickedOf(catalog, url, filters)
+  return new VehicleViewer(catalog.kit, catalog.vocabulary, filters.jurisdiction).render(found.slice(0, MAX_COMPARE), url, preferredSize(), {})
 }
 
 // The page at `url` while the catalog loads: its filters live and filled in from the URL, their values as it has them, and
@@ -145,7 +146,7 @@ export async function hydrate (catalog, source, shell, url) {
     if (display) combobox(root, name).dataset.hwComboboxPrefilledDisplayValue = display
   }
 
-  const viewer = new VehicleViewer(kit, catalog.vocabulary)
+  const viewer = new VehicleViewer(kit, catalog.vocabulary, filters.jurisdiction)
   for (const input of root.querySelectorAll('input[name="electric"]')) {
     const id = input.value.replace(/^class_/, 'evc/us/class_')
     const classification = catalog.vocabulary.e_vehicle_classifications[id]

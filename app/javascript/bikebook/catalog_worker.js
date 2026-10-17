@@ -90,22 +90,9 @@ const block = (key) => {
   return blocks.get(key)
 }
 
-// California's Class 3 can't propel itself, so one with a stock throttle is out of class there, 'stock', as the catalog's
-// out_of_class/US-CA marks it, and one with an optional throttle is with it, 'throttle', which nothing marks
-const outOfClass = (model, data, jurisdiction) => {
-  if (model?.e_vehicle_classifications.includes(`out_of_class/US-${jurisdiction}`)) return 'stock'
-  const modes = (data?.motors ?? []).flatMap((motor) => motor.operating_modes ?? [])
-  const throttles = modes.filter(({ mode }) => mode === 'throttle')
-  // an app update unlocks a mode the bike is sold with, as the page's model_viewer has it, which a worker can't import
-  const optionalThrottle = throttles.length > 0 && throttles.every(({ availability }) => ![undefined, null, 'stock', 'app_update'].includes(availability))
-  const class3 = modes.some((mode) => (mode.e_vehicle_classifications ?? []).includes('evc/us/class_3'))
-  return jurisdiction === 'CA' && class3 && optionalThrottle ? 'throttle' : null
-}
-
-// A block leaves out the markets of a model sold in its maker's primary market alone, which the index resolves, and the
-// marker of one out of class in a state alone: `outOfClass` in `jurisdiction`, a state's abbreviation. `outsideMarket`
-// where it isn't sold in `market`, blank for any
-async function vehicles ({ ids, jurisdiction, market }) {
+// A block leaves out the markets of a model sold in its maker's primary market alone, which the index resolves.
+// `outsideMarket` where it isn't sold in `market`, blank for any
+async function vehicles ({ ids, market }) {
   const found = await Promise.all(ids.map(async (value) => {
     const key = blockKey(value)
     const data = manifest.blocks[key] && (await block(key))[value]
@@ -114,7 +101,6 @@ async function vehicles ({ ids, jurisdiction, market }) {
       value,
       display: model?.display,
       data: data && { ...data, markets: data.markets ?? model?.markets },
-      outOfClass: outOfClass(model, data, jurisdiction),
       outsideMarket: Boolean(market) && !model?.markets.includes(market)
     }
   }))
