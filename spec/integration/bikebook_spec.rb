@@ -7,8 +7,7 @@ RSpec.describe "Bikebook", :js, type: :system do
 
   def vehicle_field = find_field("Select a bike, choose multiple to compare them")
 
-  # The filters' hidden listboxes hold ~160 options, which Capybara text-filters a round trip each -
-  # page-wide, one pass can outlast its wait on a loaded runner
+  # Page-wide, the filters' ~160 hidden options cost Capybara a round trip each, a pass outlasting its wait
   def vehicle_option = "#vehicle_models-hw-listbox [role='option']"
 
   # The overlay showing a combobox's selection with its code muted spans the input, though it rendered in the closed filters
@@ -704,7 +703,7 @@ RSpec.describe "Bikebook", :js, type: :system do
       m/aventon/2025/aventure_3 m/aventon/2025/aventure_3_step_through m/aventon/2024/sinch_2_5 m/aventon/2025/pace_4_step_through
       m/aventon/2026/soltera_3_adv m/aventon/2024/soltera_2_5]
     click_on "Search them"
-    expect(page).to have_css("#vehicle_models-hw-listbox [role='option']", minimum: 1)
+    expect(page).to have_css(vehicle_option, minimum: 1)
     vehicle_field.send_keys(:escape)
     # titled by the newest year it's sold in, as the search's cards title a bike, over the years it's been sold
     haul_st = featured.find("li", text: "Specialized Haul ST")
