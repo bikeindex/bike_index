@@ -3,13 +3,16 @@
 In a `.claude/worktrees/…` checkout, `bin/workspace_setup --without_seeds` comes first
 (SKILL.md).
 
-Ruby comes from [mise](https://mise.jdx.dev/), but Claude Code's shell sometimes spawns
-subprocesses without its shims on PATH, so bare `ruby` is `/usr/bin/ruby` (2.6). **Ruby
-is installed; PATH is wrong** — don't reinstall or edit the Gemfile. It shows up as:
+Ruby comes from [mise](https://mise.jdx.dev/). macOS's `path_helper` puts `/usr/bin` ahead
+of its shims in every non-interactive shell, so the `mise-shims.sh` SessionStart hook
+re-prepends them for each Bash command, subagents' included. A shell that rebuilds PATH
+still gets `/usr/bin/ruby` (2.6).
+**Ruby is installed; PATH is wrong** — don't reinstall or edit the Gemfile. It shows up as:
 
 - `Could not find 'bundler' (4.0.x)` from `bundle`, or from a `bin/` script that boots Rails
 - `uninitialized constant Pathname` or `undefined method 'intersect?' for Array` from a
   `bin/` script (`bin/rspec`, `bin/lint`)
+- a `syntax error` from bare `ruby -c`/`ruby -e` on an endless `def` or `{x:}` shorthand
 
 ```bash
 ruby -v   # not the .tool-versions pin? then:

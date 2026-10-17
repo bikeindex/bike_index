@@ -14,5 +14,11 @@ RSpec.describe API::V1::ManufacturersController, type: :request do
       expect(response.headers["Access-Control-Allow-Headers"]).to eq("Origin, X-Requested-With, Content-Type, Accept, Authorization")
       expect(response.headers["Access-Control-Max-Age"]).to eq("1728000")
     end
+    it "finds one manufacturer by query" do
+      m = FactoryBot.create(:manufacturer, name: "AAAA manufacturer")
+      get base_url, params: {query: "aaaa manufacturer", just_names: true}, headers: {format: :json}
+      expect(response.code).to eq("200")
+      expect(json_result["manufacturer"]["name"]).to eq(m.name)
+    end
   end
 end

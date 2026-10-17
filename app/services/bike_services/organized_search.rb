@@ -34,11 +34,12 @@ module BikeServices
 
     # Ignored where it isn't searchable, as the disabled field is. Only a stolen bike's own
     # coordinates are safe to search - any other's can be its owner's or its organization's
-    def location(bikes, location, distance, organization:, search_all: false, search_status: nil, ip_address: nil)
+    def location(bikes, location, distance, organization:, search_all: false, search_status: nil, ip_address: nil,
+      distance_unit: nil)
       return bikes if location.blank? || location.match?(/anywhere/i) ||
         !location_searchable?(organization:, search_all:, search_status:)
 
-      proximity = BikeSearchable.proximity_bounding_box(location, distance, ip_address)
+      proximity = BikeSearchable.proximity_bounding_box(location, distance, ip_address, distance_unit:)
       return bikes.none if proximity.nil?
 
       bounding_box = proximity[:bounding_box]

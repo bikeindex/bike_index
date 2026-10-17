@@ -55,6 +55,11 @@ RSpec.describe API::V1::BikesController, type: :request do
       get "#{base_url}/#{bike.id}", params: {format: :json}
       expect(response.code).to eq("200")
     end
+    it "doesn't show a hidden bike" do
+      bike = FactoryBot.create(:bike, user_hidden: true)
+      get "#{base_url}/#{bike.id}", params: {format: :json}
+      expect(response.code).to eq("404")
+    end
   end
 
   describe "create" do

@@ -148,7 +148,7 @@ module StravaJobs
     def mark_requests_deleted(strava_request)
       strava_request.update(response_status: :integration_deleted)
       StravaRequest.pending.where(strava_integration_id: strava_request.strava_integration_id)
-        .find_each { strava_request.update(response_status: :integration_deleted) }
+        .find_each { |pending_request| pending_request.update(response_status: :integration_deleted) }
     end
   end
 end

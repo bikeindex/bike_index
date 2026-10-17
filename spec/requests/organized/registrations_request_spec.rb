@@ -385,7 +385,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         expect(response.body).to include("Results don&#39;t include currently impounded vehicles.")
         expect(response.body).to_not include(organization_impound_records_path(organization_id: current_organization.to_param))
         expect(assigns(:interpreted_params)[:stolenness]).to eq "all"
-        expect(assigns(:interpreted_params)).to match_hash_indifferently({stolenness: "all"})
+        expect(assigns(:interpreted_params)).to match_hash_indifferently({stolenness: "all", distance_unit: "km"})
       end
     end
 

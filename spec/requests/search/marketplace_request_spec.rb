@@ -26,7 +26,7 @@ RSpec.describe Search::MarketplaceController, type: :request do
         get base_url
         expect(flash).to be_blank
         expect(response).to render_template("index")
-        expect(assigns(:interpreted_params)).to eq(stolenness: "all")
+        expect(assigns(:interpreted_params)).to eq(distance_unit: "km", stolenness: "all")
         expect(assigns(:bikes)).to be_blank
       end
 
@@ -44,7 +44,7 @@ RSpec.describe Search::MarketplaceController, type: :request do
           get "#{base_url}?search_no_js=true"
           expect(response.code).to eq("200")
           expect(response).to render_template(:index)
-          expect(assigns(:interpreted_params)).to eq(stolenness: "all")
+          expect(assigns(:interpreted_params)).to eq(distance_unit: "km", stolenness: "all")
           expect(assigns(:bikes).pluck(:id)).to eq([item.id])
           expect(assigns(:result_view)).to eq :cards
 
@@ -186,7 +186,7 @@ RSpec.describe Search::MarketplaceController, type: :request do
 
           expect(response.body).to include("<turbo-frame id=\"page_1\">")
           expect(response).to render_template(:index)
-          expect(assigns(:interpreted_params)).to eq(stolenness: "all")
+          expect(assigns(:interpreted_params)).to eq(distance_unit: "km", stolenness: "all")
           expect(assigns(:bikes).pluck(:id)).to eq([item.id])
           # Expect there to be a link to the bike
           expect(response.body).to match(/href="\/bikes\/#{item.id}"/)
@@ -230,7 +230,7 @@ RSpec.describe Search::MarketplaceController, type: :request do
 
         context "geocoder_stubbed_bounding_box" do
           let(:ip_address) { "23.115.69.69" }
-          let(:interpreted_params_location) { {stolenness: "all", location: default_location[:formatted_address], bounding_box:, distance: 50} }
+          let(:interpreted_params_location) { {stolenness: "all", location: default_location[:formatted_address], bounding_box:, distance: 50, distance_unit: "km"} }
           let(:headers) { {"HTTP_CF_CONNECTING_IP" => ip_address} }
           include_context :geocoder_stubbed_bounding_box
           include_context :geocoder_default_location
@@ -245,17 +245,17 @@ RSpec.describe Search::MarketplaceController, type: :request do
             expect(response.status).to eq 200
             expect(response).to render_template(:index)
             expect(flash).to_not be_present
-            expect(assigns(:interpreted_params)).to eq(stolenness: "all")
+            expect(assigns(:interpreted_params)).to eq(distance_unit: "km", stolenness: "all")
             expect(assigns(:bikes).map(&:id)).to match_array([item.id, marketplace_listing_nyc.item_id])
             # Test cycle_type
             get "#{base_url}?marketplace_scope=for_sale&query_items%5B%5D=v_18", as: :turbo_stream
             expect(response).to render_template(:index)
-            expect(assigns(:interpreted_params)).to eq(stolenness: "all", cycle_type: :"personal-mobility")
+            expect(assigns(:interpreted_params)).to eq(distance_unit: "km", stolenness: "all", cycle_type: :"personal-mobility")
             expect(assigns(:bikes).map(&:id)).to eq([item.id])
             # Test motorized, invalid marketplace_scope
             get "#{base_url}?marketplace_scope=not_for_sale&query_items%5B%5D=p_10", as: :turbo_stream
             expect(response).to render_template(:index)
-            expect(assigns(:interpreted_params)).to eq(stolenness: "all", propulsion_type: :motorized)
+            expect(assigns(:interpreted_params)).to eq(distance_unit: "km", stolenness: "all", propulsion_type: :motorized)
             expect(assigns(:bikes).map(&:id)).to eq([item.id])
             # Test location
             get "#{base_url}?marketplace_scope=for_sale_proximity", as: :turbo_stream
@@ -263,10 +263,10 @@ RSpec.describe Search::MarketplaceController, type: :request do
             expect(assigns(:interpreted_params)).to eq interpreted_params_location
             expect(assigns(:bikes).map(&:id)).to eq([marketplace_listing_nyc.item_id])
 
-            # with below minimum distance
+            # with below minimum distance - a mile, in kilometers
             get "#{base_url}?marketplace_scope=for_sale_proximity&distance=0.01", as: :turbo_stream
             expect(response.status).to eq 200
-            expect(assigns(:interpreted_params)).to eq interpreted_params_location.merge(distance: 1)
+            expect(assigns(:interpreted_params)).to eq interpreted_params_location.merge(distance: 1.61)
             expect(assigns(:bikes).map(&:id)).to eq([marketplace_listing_nyc.item_id])
             expect(flash[:notice]).to be_blank
           end

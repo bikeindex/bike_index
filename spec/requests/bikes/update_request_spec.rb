@@ -16,6 +16,16 @@ RSpec.describe "BikesController#update", type: :request do
       expect(bike.bike_stickers.count).to eq 0
     end
   end
+  context "with an invalid update" do
+    it "shows the error rather than saving" do
+      patch base_url, params: {bike: {primary_frame_color_id: ""}, edit_template: "bike_details"}
+      expect(response).to redirect_to(edit_bike_url(bike, edit_template: "bike_details"))
+      expect(flash[:error]).to be_present
+      expect(flash[:success]).to be_blank
+      expect(bike.reload.primary_frame_color_id).to be_present
+    end
+  end
+
   context "updating vehicle_type and propulsion_type" do
     it "ensures valid propulsion_type for cycle_type" do
       expect(bike.reload.cycle_type).to eq "bike"
@@ -362,21 +372,6 @@ RSpec.describe "BikesController#update", type: :request do
         receive_notifications: "1",
         id: stolen_record.id
       }
-    end
-
-    context "with legacy stolen attribute names" do
-      let(:legacy_stolen_params) do
-        stolen_params.except(:postal_code, :region_record_id).merge(zipcode: "10007", state_id: state.id)
-      end
-      it "updates with the renamed attributes" do
-        expect(bike.reload.current_stolen_record_id).to eq stolen_record.id
-        patch base_url, params: {bike: {stolen: "true", stolen_records_attributes: {"0" => legacy_stolen_params}}}
-        expect(flash[:success]).to be_present
-        stolen_record.reload
-        expect(stolen_record.street).to eq "278 Broadway"
-        expect(stolen_record.postal_code).to eq "10007"
-        expect(stolen_record.region_record_id).to eq state.id
-      end
     end
 
     it "clears the existing alert image" do

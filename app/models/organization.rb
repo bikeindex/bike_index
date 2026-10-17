@@ -431,7 +431,7 @@ class Organization < ApplicationRecord
   def metric_units?
     return @metric_units if defined?(@metric_units)
 
-    @metric_units = Country.metric_units?(location_address_records.order(:id).pick(:country_id))
+    @metric_units = UnitSystem.metric?(country_id: location_address_records.order(:id).pick(:country_id))
   end
 
   def search_coordinates

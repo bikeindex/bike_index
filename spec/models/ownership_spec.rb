@@ -378,6 +378,21 @@ RSpec.describe Ownership, type: :model do
         organization.update(send_self_registration_email: true)
         expect(ownership.reload.calculated_send_email).to be_truthy
       end
+
+      context "auto_user is contact@bikeindex.org" do
+        let(:auto_user) { FactoryBot.create(:organization_auto_user, organization:, email: "contact@bikeindex.org") }
+
+        it "is false even when the organization sends self registration emails" do
+          organization.update(send_self_registration_email: true)
+          expect(ownership.reload.calculated_send_email).to be_falsey
+        end
+      end
+    end
+    context "registered to contact@bikeindex.org" do
+      let(:ownership) { Ownership.new(bike:, owner_email: "contact@bikeindex.org") }
+      it "is false" do
+        expect(ownership.calculated_send_email).to be_falsey
+      end
     end
   end
 
@@ -612,6 +627,17 @@ RSpec.describe Ownership, type: :model do
         expect(bike.reload.user&.id).to eq user.id
         expect(bike.current_ownership.owner_name).to eq "New name"
         expect(bike.owner_name).to eq "New name"
+      end
+
+      context "claimed by an account without a name" do
+        let(:user) { FactoryBot.create(:user_confirmed, name: nil, email: bike.owner_email) }
+
+        it "keeps the registration_info name" do
+          expect(user).to be_present
+          bike.current_ownership.mark_claimed
+          expect(bike.reload.user&.id).to eq user.id
+          expect(bike.owner_name).to eq "Cool Name"
+        end
       end
       context "cleaned_registration_info" do
         let(:registration_info) { {user_name: "George", bike_code: "9998888", phone: "(111) 222-4444", student_id: "1222", organization_affiliation: "employee"} }

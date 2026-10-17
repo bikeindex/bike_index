@@ -11,7 +11,8 @@ RSpec.describe OrganizationStolenMessage, type: :model do
       expect(Organization.with_stolen_message.pluck(:id)).to eq([])
       expect(organization_stolen_message.reload.organization_id).to eq organization.id
       expect(organization_stolen_message.kind).to eq "area"
-      expect(organization_stolen_message.search_radius_miles).to eq OrganizationStolenMessage::DEFAULT_RADIUS_MILES
+      # No location, so metric - and the default is a round number of kilometers
+      expect(organization_stolen_message.search_radius_kilometers).to eq 100
       organization_stolen_message.update(is_enabled: true, body: "  ", kind: "association")
       expect(organization_stolen_message.is_enabled).to be_falsey
       expect(organization_stolen_message.body).to eq nil

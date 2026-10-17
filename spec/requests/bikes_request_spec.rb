@@ -527,6 +527,11 @@ RSpec.describe BikesController, type: :request do
         expect(assigns(:bike_sticker)).to eq bike_sticker_unclaimed
         expect(assigns(:show_organization_bikes)).to be_falsey
         expect(session[:passive_organization_id]).to eq "0"
+
+        register_link = Nokogiri::HTML(response.body).at_css("a[href*='/register/new']")["href"]
+        expect { get register_link }.to change(BParam, :count).by 1
+        expect(BParam.last).to have_attributes(origin: "register_flow",
+          bike_sticker_code: bike_sticker_unclaimed.pretty_code, creation_organization_id: organization.id)
       end
 
       context "user is a member of the sticker's organization" do

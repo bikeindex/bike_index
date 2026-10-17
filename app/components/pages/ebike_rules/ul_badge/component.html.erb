@@ -1,0 +1,24 @@
+<%= render(UI::Tooltip::Component.new) do |tooltip| %>
+  <% tooltip.with_body { meaning } %>
+
+  <span class="tw:inline-flex tw:items-center tw:gap-2.5 tw:rounded-sm tw:py-2 tw:pr-4 tw:pl-2 tw:text-left tw:dark:bg-gray-700 <%= BACKGROUNDS.fetch(@status) %>">
+    <%= render(Pages::EbikeRules::StatusIcon::Component.new(status: ICON_STATUSES.fetch(@status), size: :md)) %>
+
+    <span class="tw:leading-tight">
+      <span
+        class="
+          tw:block tw:text-sm tw:font-bold tw:text-slate-900
+          tw:dark:text-gray-100
+        "
+      >
+        <%= title %>
+      </span>
+
+      <% if certified? %>
+        <span class="tw:block tw:text-xs tw:text-gray-700 tw:dark:text-gray-300">
+          <%= scope %>
+        </span>
+      <% end %>
+    </span>
+  </span>
+<% end %>

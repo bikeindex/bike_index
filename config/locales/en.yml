@@ -915,9 +915,6 @@ en:
           address_required: "(or location) of this abandoned bike required"
         payment:
           requires_email_or_org: Requires an email address or organization
-        recovery_display:
-          quote_too_long: That quote is too long. Please shorten it to be less than
-            300 characters
         theft_alert:
           must_be_later_than_start_time: must be later than start time
           must_be_present: must be present
@@ -1749,6 +1746,14 @@ en:
           already_signed_in: You're already signed in!
         turnstile_verified:
           verify_not_a_robot: Please confirm you're not a robot
+    ebike_rules:
+      show:
+        state_description: "%{state} e-bike law: %{law}"
+        state_description_in_review: >-
+          We're still reviewing %{state}'s e-bike law. Check your e-bike's class,
+          motor and speed, and see how the e-bike classes work.
+        state_title: "%{state} e-bike laws"
+        title: E-bike rules
     feedbacks:
       block_the_spam:
         please_sign_in: Please sign in to send that message
@@ -1766,12 +1771,8 @@ en:
       find_lock:
         not_your_lock: Whoops, that's not your lock!
     memberships:
-      edit:
-        free_membership: >-
-          Bike Index has given you a free membership. Please email support@bikeindex.org
-          if you have questions.
-        no_active_membership: You don't have an active membership, you'll have to
-          sign up for a new one.
+      create:
+        already_a_member: You already have a membership.
     my_accounts:
       edit:
         delete_account: Delete account
@@ -2302,7 +2303,7 @@ en:
     - Saturday
     formats:
       default: "%Y-%m-%d"
-      long: "%B %d, %Y"
+      long: "%B %-d, %Y"
       short: "%b %d"
     month_names:
     -
@@ -2430,6 +2431,8 @@ en:
   feedbacks:
     form:
       email_address: Email address
+      message_template: "Bike serial number (if applicable): \nBike Index registration
+        URL (if applicable): \nWhat I need help with: "
       name: Name
       send_it: Send it!
       subject: Subject
@@ -2439,6 +2442,10 @@ en:
       have_a_question_we_havent_answered: Have a question we haven't answered?
       help_with_bike_index: Help with Bike Index
       log_in_to_send_a_comment: Log in to send a comment!
+      the_more_detail_you_can_share: >-
+        The more detail you can share, the faster we can help. If your question is
+        about a specific bike, include the serial number or your Bike Index registration
+        URL.
       you_can_reach_us_at_contact_html: You can reach us at %{contact_link}, or send
         your message right here.
   gflash:
@@ -4007,6 +4014,7 @@ en:
       notifications_email: This is the email we send notifications to
       personal_information_for_user: Personal Information for %{user_name}
       preferred_language: Preferred language
+      preferred_unit_system: Units
       primary_email: Primary email
       receive_the_bike_index_newsletter: Receive the Bike Index newsletter
       remove_email: Remove email
@@ -4017,6 +4025,9 @@ en:
       time_single_format_small: "(not today, yesterday, etc)"
       unconfirmed: unconfirmed!
       unconfirmed_emails: Unconfirmed emails
+      unit_system_automatic: Automatic, from your location
+      unit_system_imperial: Imperial (miles, inches)
+      unit_system_metric: Metric (kilometers, millimeters)
       verified: verified
       why_you_should_text: read why you should
     sharing:
@@ -4553,6 +4564,13 @@ en:
           Bike Index?
         select_email: Select email
         send_emails_directly: Send emails directly to unclaimed bike owners.
+        send_self_registration_email_html: Send email for registrations sent to <code>%{email}</code>
+        send_self_registration_email_includes_unregistered: This includes unregistered
+          notifications.
+        send_self_registration_email_note: >-
+          By default, Bike Index no longer sends email when a vehicle is registered
+          to your organization registration email. Check this box if you want to receive
+          email for registrations with an owner email of %{email}.
         square_image: Use a square image for best results
         stolen_emails: Stolen emails
         unclaimed_registration_definition: >-
@@ -5056,6 +5074,7 @@ en:
     register_flow:
       date_found_required: Please tell us when you found it
       date_stolen_required: Please tell us when it was stolen
+      description_stolen_required: Please tell us what happened
       email_required: Email is required to register
       location_found_required: Please tell us where you found it
       location_stolen_required: Please tell us where it was stolen

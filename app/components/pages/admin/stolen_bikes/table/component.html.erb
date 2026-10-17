@@ -1,0 +1,128 @@
+<% bulk_actions = capture do %>
+  <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+    <%= render(UI::Button::Component.new(text: "Approve selected", color: :primary, size: :sm, type: :submit, name: :bulk_action, value: :approve)) %>
+    <%= render(UI::Button::Component.new(text: "Mark spam", size: :sm, type: :submit, name: :bulk_action, value: :spam)) %>
+
+    <%= render(UI::Button::Component.new(text: "Delete selected", color: :error, size: :sm, type: :submit, name: :bulk_action, value: :delete,
+      onclick: "return confirm('Delete the selected bikes?')")) %>
+  </div>
+<% end %>
+
+<%# twfullbleed reads the twwiderow container %>
+<div class="twwiderow tw:mb-4">
+  <%= form_with(url: bulk_update_admin_stolen_bikes_path, method: :post,
+  class: "tw:col-span-full tw:min-w-0 tw:rounded-xl tw:twfullbleed #{UI::Card::Component::BASE_CLASSES}",
+  data: UI::ColumnSettings::Component.data_attributes(storage_key: "adminStolenBikesColumns", controllers: "table-multi-checkbox", orderable: true)) do %>
+    <%# Full bleed drops the card's gutter, so the header meets the page's %>
+    <div
+      class="
+        tw:flex tw:flex-wrap tw:items-center tw:justify-end tw:gap-x-4
+        tw:gap-y-2 tw:py-3 tw:@min-[672px]/twwiderow:px-4
+      "
+    >
+      <div class="tw:ml-auto tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+        <%# The footer's copy is the one a phone reaches after checking rows %>
+        <div class="tw:hidden tw:sm:block"><%= bulk_actions %></div>
+        <%= render(UI::Collapse::Component.new(text: "Column settings", chevron: :trailing, size: :sm)) %>
+      </div>
+    </div>
+
+    <%= render(UI::ColumnSettings::Component.new(columns: COLUMNS, defaults: DEFAULT_COLUMNS, narrow_hidden: %i[photo_cell created_at_cell])) %>
+
+    <% duplicate_counts = self.duplicate_counts %>
+    <% location = method(:location) %>
+
+    <%# Full bleed takes the table over the admin gutter, past the card, so it's clipped here %>
+    <div
+      class="
+        tw:overflow-hidden
+        tw:@max-[672px]/twwiderow:mx-[calc(var(--gutter)*-1)]
+      "
+    >
+      <%= render(UI::CardTable::Component.new(records: rows, render_sortable: true, sort_state: @sort_state)) do |table| %>
+        <% table.column(label: button_tag(check_mark, type: "button", class: "twlink tw:cursor-pointer tw:border-0 tw:bg-transparent tw:p-0",
+      title: "Toggle all checked", aria: {label: "Toggle all checked"}, data: {action: "click->table-multi-checkbox#toggleAll"})) do |(stolen_record)| %>
+          <div class="tw:flex tw:items-center tw:gap-3">
+            <%= check_box_tag "sr_selected[#{stolen_record.id}]", stolen_record.id, false,
+          aria: {label: "Select stolen record #{stolen_record.id}"}, data: {"table-multi-checkbox-target" => "checkbox"} %>
+
+            <%= render(UI::ButtonLink::Component.new(text: "View", href: edit_admin_stolen_bike_path(stolen_record, stolen_record_id: true), size: :sm)) %>
+          </div>
+        <% end %>
+
+        <% table.column(label: COLUMNS[:photo_cell], classes: "hideableColumn photo_cell") do |(_stolen_record, bike)| %>
+          <%= render(Atoms::BikeThumbnail::Component.new(bike:)) %>
+        <% end %>
+
+        <% table.column(sortable: "created_at", label: COLUMNS[:created_at_cell], classes: "hideableColumn created_at_cell") do |(stolen_record)| %>
+          <%= link_to edit_admin_stolen_bike_path(stolen_record, stolen_record_id: true), class: "twlink tw:font-bold tw:whitespace-nowrap" do %>
+            <%= render(UI::Time::Component.new(time: stolen_record.created_at)) %>
+          <% end %>
+        <% end %>
+
+        <% table.column(sortable: "date_stolen", label: COLUMNS[:date_stolen_cell], classes: "hideableColumn date_stolen_cell tw:whitespace-nowrap") do |(stolen_record)| %>
+          <%= render(UI::Time::Component.new(time: stolen_record.date_stolen)) %>
+        <% end %>
+
+        <% table.column(label: COLUMNS[:bike_cell], classes: "hideableColumn bike_cell") do |(_stolen_record, bike)| %>
+          <% if bike.present? %>
+            <%= link_to edit_admin_bike_path(bike), class: "twlink" do %>
+              <strong><%= bike.mnfg_name %></strong>
+              <%= bike.frame_model %>
+            <% end %>
+            <%= render(Atoms::Admin::Badges::BikeHiddenExplanation::Component.new(bike:)) %>
+          <% else %>
+            <span class="tw:text-amber-600">no bike</span>
+          <% end %>
+        <% end %>
+
+        <% table.column(label: COLUMNS[:value_cell], classes: "hideableColumn value_cell") do |(stolen_record)| %>
+          <% if stolen_record.estimated_value.present? %>
+            $<%= number_display(stolen_record.estimated_value) %>
+          <% end %>
+        <% end %>
+
+        <% table.column(label: COLUMNS[:theft_description_cell], classes: "hideableColumn theft_description_cell tw:min-w-64") do |(stolen_record)| %>
+          <%= stolen_record.theft_description %>
+        <% end %>
+
+        <% table.column(label: COLUMNS[:location_cell], classes: "hideableColumn location_cell") do |(stolen_record)| %>
+          <%= location.call(stolen_record) %>
+        <% end %>
+
+        <% table.column(label: COLUMNS[:police_department_cell], classes: "hideableColumn police_department_cell") do |(stolen_record)| %>
+          <%= stolen_record.police_report_department %>
+        <% end %>
+
+        <% table.column(label: COLUMNS[:police_report_cell], classes: "hideableColumn police_report_cell") do |(stolen_record)| %>
+          <%= stolen_record.police_report_number %>
+        <% end %>
+
+        <% table.column(label: COLUMNS[:duplicates_cell], classes: "hideableColumn duplicates_cell tw:text-center") do |(_stolen_record, bike)| %>
+          <% duplicate_count = bike && duplicate_counts[bike.id] %>
+
+          <% if duplicate_count.present? %>
+            <%= link_to number_display(duplicate_count), admin_bike_path(bike, active_tab: "duplicates"), class: "twlink tw:font-bold" %>
+          <% end %>
+        <% end %>
+
+        <% table.column(label: COLUMNS[:owner_cell], classes: "hideableColumn owner_cell tw:leading-none") do |(stolen_record, bike)| %>
+          <% if bike.present? %>
+            <%= bike.owner_email %>
+            <%= render(Atoms::Admin::Badges::User::Component.new(user: bike.user)) %>
+            <br>
+            <%= link_to "Contact owner", edit_admin_stolen_bike_path(stolen_record, stolen_record_id: true, anchor: "contact-owner"), class: "twlink tw:text-xs" %>
+          <% end %>
+        <% end %>
+
+        <% table.column(label: COLUMNS[:approved_cell], classes: "hideableColumn approved_cell tw:text-center") do |(stolen_record)| %>
+          <%= check_mark if stolen_record.approved %>
+        <% end %>
+      <% end %>
+    </div>
+
+    <div class="tw:border-t tw:border-gray-100 tw:px-4 tw:py-3 tw:dark:border-gray-700">
+      <%= bulk_actions %>
+    </div>
+  <% end %>
+</div>

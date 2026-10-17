@@ -1,0 +1,7 @@
+<%= tag.div(class: WRAPPER_CLASSES, data: wrapper_data) do %>
+  <%= render(UI::Table::Component.new(**@table_options, classes: TABLE_CLASSES, unbordered: true)) do |table| %>
+    <% @columns.each_with_index do |(options, block), index| %>
+      <% table.column(**column_options(options, index), &block) %>
+    <% end %>
+  <% end %>
+<% end %>
