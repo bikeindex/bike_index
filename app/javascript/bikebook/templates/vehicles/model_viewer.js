@@ -44,6 +44,7 @@ const stock = ({ availability }) => [undefined, null, 'stock', 'app_update'].inc
 const WIDE_TIRE = 50
 const MAX_LOAD = 'Max load (rider + cargo)'
 const GROSS_WEIGHT = 'Gross weight rating (bike + rider + cargo)'
+const FRAME_LABELS = { max_weight_total: MAX_LOAD, gross_weight_rating: GROSS_WEIGHT }
 
 export const US_CLASS = /^evc\/us\/class_(\d)$/
 // (tire_width / 25.4).round(1) is a Float, so a whole inch still reads 2.0
@@ -410,15 +411,15 @@ class ModelViewer {
     const { presenter } = this
     const { max_weight_total: maxLoad, gross_weight_rating: gross } = this.data.frame ?? {}
     const riders = (size ? [size] : array(this.data.sizes)).map((each) => each.geometry?.max_weight_rider).filter(isNumber)
-    const range = () => join([...new Set([Math.min(...riders), Math.max(...riders)])].map((kg) => presenter.measurement(kg, 'kg')), '–')
-    const limit = isNumber(maxLoad) ? maxLoad : gross
-    if (!isNumber(limit)) return riders.length ? join(['Max rider weight ', range()]) : null
+    const riderLimit = () => join([`${this.kit.geometry.labels.max_weight_rider} `,
+      join([...new Set([Math.min(...riders), Math.max(...riders)])].map((kg) => presenter.measurement(kg, 'kg')), '–')])
+    const [limit, label, text] = isNumber(maxLoad) ? [maxLoad, 'Max load', MAX_LOAD] : [gross, 'Gross weight rating', GROSS_WEIGHT]
+    if (!isNumber(limit)) return riders.length ? riderLimit() : null
 
     const cargo = this.data.cargo?.max_weight_cargo
     const lines = [isNumber(maxLoad) && isNumber(gross) && html`${GROSS_WEIGHT} ${presenter.measurement(gross, 'kg')}`,
-      riders.some((kg) => kg !== limit) && html`Max rider weight ${range()}`,
+      riders.some((kg) => kg !== limit) && riderLimit(),
       isNumber(cargo) && html`Max cargo weight ${presenter.measurement(cargo, 'kg')}`].filter(Boolean)
-    const [label, text] = isNumber(maxLoad) ? ['Max load', MAX_LOAD] : ['Gross weight rating', GROSS_WEIGHT]
     const body = html`${text}${lines.map((line) => html`<span class="tw:block">${line}</span>`)}`
     return html`${label} ${presenter.measurement(limit, 'kg')} ${tooltip({ text, body })}`
   }
@@ -555,7 +556,7 @@ class ModelViewer {
   }
 
   frame () {
-    return section({ heading: 'Frame', content: this.presenter.measurementRows(this.specRows('frame', undefined, { max_weight_total: MAX_LOAD, gross_weight_rating: GROSS_WEIGHT })) })
+    return section({ heading: 'Frame', content: this.presenter.measurementRows(this.specRows('frame', undefined, FRAME_LABELS)) })
   }
 
   suspensionSummary (suspension) {

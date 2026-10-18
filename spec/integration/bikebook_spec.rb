@@ -1233,6 +1233,10 @@ RSpec.describe "Bikebook", :js, type: :system do
           renderInto(container, viewer.render([{ value: 'm/x/2026/hauler', data: vehicle }], new URL(`/bikebook?view=${view}&vehicle_models=m/x/2026/hauler&vehicle_sizes=L`, window.location.href), null))
           return [...container.querySelectorAll('tbody tr')].find((row) => row.innerText.startsWith('Cargo'))
         }
+        const frame = (vehicle) => {
+          renderInto(container, viewer.render([{ value: 'm/x/2026/hauler', data: vehicle }], new URL('/bikebook?view=all&vehicle_models=m/x/2026/hauler', window.location.href), null))
+          return [...[...container.querySelectorAll('section')].find((section) => /^frame$/i.test(section.querySelector('h2')?.innerText)).querySelectorAll('dl > div')].map(text)
+        }
         const tooltip = (row) => {
           const shown = row.querySelector("[role='tooltip']")
           shown.classList.remove('tw:hidden')
@@ -1244,9 +1248,7 @@ RSpec.describe "Bikebook", :js, type: :system do
           tooltip(cargo('basics', rated)), ...((row) => [text(row), tooltip(row)])(cargo('basics', { ...data, frame: { gross_weight_rating: 200 } })),
           text(cargo('basics', { ...data, cargo: { max_weight_cargo: 80 } })),
           ...((row) => [text(row), tooltip(row)])(cargo('basics', { model: 'Long', type: 'cargo_bike', cargo: { length: 787 }, sizes: [{ name: 'L', geometry: { wheelbase: 1356 } }],
-            wheels: [{ bsd: 406, tire_width: 89, position: ['front'] }, { bsd: 406, tire_width: 89, position: ['rear'] }] }))]
-        renderInto(container, viewer.render([{ value: 'm/x/2026/hauler', data: rated }], new URL('/bikebook?view=all&vehicle_models=m/x/2026/hauler', window.location.href), null))
-        shown.push(...[...[...container.querySelectorAll('section')].find((section) => section.querySelector('h2')?.innerText.match(/^frame$/i)).querySelectorAll('dl > div')].map(text))
+            wheels: [{ bsd: 406, tire_width: 89, position: ['front'] }, { bsd: 406, tire_width: 89, position: ['rear'] }] })), ...frame(rated)]
         container.remove()
         return shown
       })()
