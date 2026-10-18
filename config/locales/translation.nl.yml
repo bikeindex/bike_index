@@ -7045,6 +7045,7 @@ nl:
           not_allowed: Niet toegestaan
           own_definition: 'De eigen definitie: %{name}'
           watts_html: "%{watts}W"
+          kmh_html: "%{kmh} km/u"
         show:
           answer_no: Nee
           answer_yes: Ja
@@ -7152,6 +7153,11 @@ nl:
           custom_details: Aangepaste details
           details_legend: De gegevens van uw fiets
           model_details: "%{model} details"
+          country: Land
+          not_in_us_html: Niet in de VS? %{switch_country}
+          select_country: Selecteer een land
+          switch_country: land wijzigen
+          switch_country_title: Land wijzigen
         state_reference:
           compiling: We verzamelen momenteel de regels voor e-bikes van %{state} op
             basis van gegevens van de staatslegislatuur en de RDW. Kom binnenkort
@@ -7194,6 +7200,8 @@ nl:
           state_classes_intro: "%{state} gebruikt niet het drieklassensysteem dat
             de meeste staten hanteren. De wetgeving van deze staat deelt e-bikes en
             andere elektrische tweewielers in plaats daarvan in deze klassen in."
+          other_classes: Andere elektrische voertuigen in %{place}
+          place_heading: Wetgeving rondom e-bikes in %{place}
         rule_citation:
           source: bron
         class_card:
@@ -7238,6 +7246,9 @@ nl:
           classification: E-%{vehicle_type} classificatie
           electric_certification: Elektrische certificering
           not_provided: Niet verstrekt
+        check:
+          outside_us: De fietscontroles gelden voorlopig alleen in de VS. De wetgeving
+            voor e-bikes in %{place} staat hieronder.
       memberships:
         new:
           become_a_member: Word lid

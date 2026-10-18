@@ -7136,6 +7136,7 @@ es:
           not_allowed: No está permitido
           own_definition: 'Su propia definición: %{name}'
           watts_html: "%{watts}W"
+          kmh_html: "%{kmh} km/h"
         show:
           answer_no: 'No'
           answer_yes: Sí
@@ -7248,6 +7249,11 @@ es:
           custom_details: Detalles personalizados
           details_legend: Detalles de tu bicicleta
           model_details: "%{model} detalles"
+          country: País
+          not_in_us_html: "¿No estás en EE. UU.? %{switch_country}"
+          select_country: Seleccione un país
+          switch_country: cambiar de país
+          switch_country_title: Cambiar de país
         state_reference:
           compiling: Estamos recopilando las normas sobre bicicletas eléctricas de
             %{state} de la legislatura estatal y del DMV. Vuelva pronto.
@@ -7290,6 +7296,8 @@ es:
           state_classes_intro: "%{state} no utiliza el sistema de tres clases que
             usan la mayoría de los estados. Su ley clasifica las bicicletas eléctricas
             y otros vehículos eléctricos de dos ruedas en estas clases."
+          other_classes: Otros vehículos eléctricos en %{place}
+          place_heading: Leyes sobre bicicletas eléctricas en %{place}
         rule_citation:
           source: fuente
         class_card:
@@ -7333,6 +7341,10 @@ es:
           classification: Clasificación E-%{vehicle_type}
           electric_certification: Certificación eléctrica
           not_provided: No se proporciona
+        check:
+          outside_us: Por ahora, los controles de bicicletas se aplican a los estados
+            de EE. UU. A continuación se muestran las leyes sobre bicicletas eléctricas
+            de %{place}.
       memberships:
         new:
           become_a_member: Hazte miembro
