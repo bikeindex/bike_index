@@ -7,6 +7,8 @@ module EbikeRuleServices
     extend Functionable
 
     CHECKED_COUNTRIES = %w[US CA].freeze
+    # Canada's e-bike laws all stop the motor here
+    CANADA_SPEED_CAP_KMH = 32
     EU_MEMBERS = %w[AT BE BG CY CZ DE DK EE ES FI FR GR HR HU IE IT LT LU LV MT NL PL PT RO SE SI SK].freeze
     # The catalog names classifications, not the places they're in
     REGION_NAMES = {
@@ -30,13 +32,12 @@ module EbikeRuleServices
 
     def us?(place) = place[:abbr].present?
 
-    # The country whose regions the page picks between: the place's where they check a bike, else the US
-    def checked_country(place)
-      country = place && (us?(place) ? "US" : place[:code].split("-").first)
-      CHECKED_COUNTRIES.include?(country) ? country : "US"
-    end
+    def country(place) = place[:code].split("-").first
 
-    def checks?(place) = place[:code].include?("-") && CHECKED_COUNTRIES.include?(place[:code].split("-").first)
+    # The country whose regions the page picks between: the place's where they check a bike, else the US
+    def checked_country(place) = (place && CHECKED_COUNTRIES.include?(country(place))) ? country(place) : "US"
+
+    def checks?(place) = place[:code].include?("-") && CHECKED_COUNTRIES.include?(country(place))
 
     def regions(country) = (country == "US") ? us_states : outside_us.select { it[:code].start_with?("#{country}-") }
 

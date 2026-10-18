@@ -65,6 +65,8 @@ module EbikeRuleServices
     # country's e-bike falls into there, a motor vehicle's, as New Brunswick's Motor Driven Cycle
     def place_law(code, today: Time.zone.today) = places.dig(code, :law)&.then { in_force(it, today) }
 
+    def place_laws(today: Time.zone.today) = places.transform_values { it[:law]&.then { in_force(it, today) } }
+
     # nil for anything but an abbreviation, such as a query's array
     def state(abbreviation)
       STATES.find { it[:abbr] == abbreviation.upcase } if abbreviation.is_a?(String)

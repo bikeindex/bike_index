@@ -69,11 +69,11 @@ class EbikeRulesController < ApplicationController
 
   def default_title = translation(:title, controller_method: :show)
 
-  # The page a place cleared from the form goes to: /ebike-rules, or a checked country's own
+  # The title of the page a place cleared from the form goes to: /ebike-rules, or a checked country's own
   def country_title(country)
     return default_title if country == "US"
 
-    translation(:state_title, state: EbikeRuleServices::Places.find(country)&.dig(:name) || country, controller_method: :show)
+    translation(:state_title, state: EbikeRuleServices::Places::COUNTRY_NAMES[country], controller_method: :show)
   end
 
   # The place's own, however the page was reached - a check's bike params don't change them

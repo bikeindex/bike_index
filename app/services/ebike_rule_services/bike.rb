@@ -22,15 +22,15 @@ module EbikeRuleServices
       classes = (e_bike_class == 3 && throttle) ? [2, 3] : [e_bike_class].compact
       new(bikebook_id: nil, manufacturer_name: nil, model: nil, first_year: nil, vehicle_type: "bike", e_bike_class:, class_unknown: false,
         e_vehicle_classifications: classes.map { "evc/us/class_#{it}" }, optional_classes: {}, watts:, peak_watts: nil,
-        top_assist_mph: (top_mph if e_bike_class), top_assist_kmh: (UnitSystem.miles_to_kilometers(top_mph).round if e_bike_class),
-        assists_past_kmh: (45 unless e_bike_class), throttle:, stock_throttle: throttle, throttle_mph: nil, throttle_kmh: nil,
-        ul2849: :unrecorded, ul2271: :unrecorded, photo_url: nil)
+        top_assist_mph: (top_mph if e_bike_class), top_assist_kmh: nil, assists_past_kmh: nil, throttle:, stock_throttle: throttle,
+        throttle_mph: nil, throttle_kmh: nil, ul2849: :unrecorded, ul2271: :unrecorded, photo_url: nil)
     end
 
-    # Entered as within a Canadian law's 32 km/h, or past it, which is past Class 1 and 2's 20 mph too
+    # Entered as within a Canadian law's cap, or past it, which is past Class 1 and 2's 20 mph too
     def self.manual_metric(top_kmh:, watts:, throttle:)
-      within = top_kmh <= 32
-      manual(top_mph: within ? 20 : 29, watts:, throttle:).with(top_assist_kmh: (top_kmh if within), assists_past_kmh: (32 unless within))
+      cap = EbikeRuleServices::Places::CANADA_SPEED_CAP_KMH
+      within = top_kmh <= cap
+      manual(top_mph: within ? 20 : 29, watts:, throttle:).with(top_assist_kmh: (top_kmh if within), assists_past_kmh: (cap unless within))
     end
 
     def manual? = bikebook_id.nil?

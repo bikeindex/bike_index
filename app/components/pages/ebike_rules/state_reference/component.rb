@@ -28,7 +28,8 @@ module Pages
             laws = EbikeRuleServices::StateLaws.laws
             EbikeRuleServices::Places.us_states.map { it.merge(id: it[:abbr].downcase, law: laws[it[:abbr]]) }
           else
-            EbikeRuleServices::Places.regions(@country).map { it.merge(id: it[:code].downcase, law: EbikeRuleServices::StateLaws.place_law(it[:code])) }
+            laws = EbikeRuleServices::StateLaws.place_laws
+            EbikeRuleServices::Places.regions(@country).map { it.merge(id: it[:code].downcase, law: laws[it[:code]]) }
           end
         end
 

@@ -97,8 +97,7 @@ module EbikeRuleServices
       end
     end
 
-    # Without a speed on record, one to check, as neither the record nor the classes say it's under the cap. Limits not
-    # yet in force are the coming law's, and today's are in its dated rules
+    # Without a speed on record, one to check, as neither the record nor the classes say it's under the cap
     def metric_speed_rule(law, bike)
       cap = law[:kmh]
       kmh = bike.top_kmh

@@ -14,11 +14,10 @@ module Pages
         OUT_OF_CLASS_NOTES = %i[class_3_speed_with_throttle throttle_with_class_3_assist].freeze
         NAME_CLASSES = "tw:mt-1 tw:font-header tw:text-[clamp(22px,3vw,26px)] tw:leading-tight tw:font-extrabold"
 
-        # A check outside the US is of a law's limits in km/h, rather than of the three classes
         def initialize(lookup:)
           @bike = lookup.bike
           @state = lookup.place
-          @us = EbikeRuleServices::Places.us?(@state)
+          @us = lookup.us?
           @law = lookup.law
           @rules = @law ? EbikeRuleServices::Evaluator.rules(law: @law, bike: @bike) : []
           @verdict = EbikeRuleServices::Evaluator.verdict(@rules)
@@ -135,11 +134,23 @@ module Pages
 
         def other_classification
           name = @us && EbikeRuleServices::StateLaws.classification_name(@state[:abbr], @bike.e_vehicle_classifications)
-          if name
-            translation(".falls_under", state: @state[:name], name:)
+          name ? translation(".falls_under", state: @state[:name], name:) : copy[:may_be_moped]
+        end
+
+        # The copy that names a state, and Canada's in its place
+        def copy
+          @copy ||= if @us
+            {your_state: translation(".your_state"), still_reviewing_body: translation(".still_reviewing_body"),
+             may_be_moped: translation(".may_be_moped")}
           else
-            @us ? translation(".may_be_moped") : translation(".may_be_moped_canada")
+            {your_state: translation(".your_province"), still_reviewing_body: translation(".still_reviewing_province_body"),
+             may_be_moped: translation(".may_be_moped_canada")}
           end
+        end
+
+        def source
+          link = link_to(translation(".bikebook_name"), bikebook_path(vehicle_models: @law[:id]), class: "twlink")
+          @us ? translation(".source_html", link:) : translation(".law_source_html", link:)
         end
 
         def rule_count(status) = @rules.count { it[:status] == status }
@@ -218,10 +229,10 @@ module Pages
               [key, number_display(value)]
             end
           end
-          (metric_note(row[:note], args) unless @us) || us_note(row, args)
+          (metric_note(row[:note], args) if @law[:metric]) || us_note(row, args)
         end
 
-        # Where it reads differently in km/h, or under a law outside the US. nil where it doesn't
+        # nil where it reads the same as a US law's
         def metric_note(note, args)
           case note
           when :no_e_bike_category then translation(".no_e_bike_category")
