@@ -50,7 +50,7 @@ export default class extends Controller {
   // clearing the place leaves the check waiting for one
   chooseState () {
     const code = this.#stateField.value
-    this.element.action = code ? `${this.pathValue}/${code}` : this.pathValue
+    this.element.action = code ? `${this.pathValue}/${code.replace('-', '/')}` : this.pathValue
     this.#loadClasses()
     if (!code) {
       document.title = this.titleValue

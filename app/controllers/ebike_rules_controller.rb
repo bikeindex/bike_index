@@ -5,13 +5,14 @@ class EbikeRulesController < ApplicationController
 
   def show
     # a form's place - the lookup's without JavaScript, or the country switch's - which can't send it to the place's own page
-    if (key = %w[state country].find { params.key?(it) })
-      chosen = place_for(params[key])
-      query = request.query_parameters.except(key)
+    query = request.query_parameters
+    if (key = %w[state country].find { query.key?(it) })
+      chosen = place_for(query[key])
+      query = query.except(key)
       return redirect_to(chosen ? place_path(chosen, query) : ebike_rules_path(query), status: :moved_permanently)
     end
 
-    code = params[:place]
+    code = params[:country] && [params[:country], params[:region]].compact.join("-")
     place = code && (place_for(code) || raise(ActionController::RoutingError, "Not Found"))
     return redirect_to(place_path(place, request.query_parameters), status: :moved_permanently) if place && place[:code] != code
     if turbo_frame_request_id == Pages::EbikeRules::Classes::Component::FRAME_ID
@@ -42,7 +43,8 @@ class EbikeRulesController < ApplicationController
 
   private
 
-  def place_path(place, query = {}) = ebike_rules_place_path(place[:code], query)
+  # US-CA's is /ebike-rules/US/CA
+  def place_path(place, query = {}) = ebike_rules_place_path(*place[:code].split("-"), query)
 
   # Two lowercase letters were a US state's before places outside the US had pages, as two uppercase ones still are
   # where no place has them. The rest are a place's code in any case
@@ -65,7 +67,7 @@ class EbikeRulesController < ApplicationController
     else
       EbikeRuleServices::StateLaws.places.dig(place[:code], :laws)&.first
     end
-    @page_url = ebike_rules_place_url(place[:code])
+    @page_url = ebike_rules_place_url(*place[:code].split("-"))
     @page_title = translation(:state_title, state: name, controller_method: :show)
     @page_description = if law
       translation(:state_description, state: name, law: law[:description], controller_method: :show)

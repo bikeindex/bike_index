@@ -22,7 +22,7 @@ module Pages
         private
 
         # The place's own page; without JavaScript, the controller sends a chosen place there
-        def form_path = @lookup.place ? ebike_rules_place_path(@lookup.place[:code]) : ebike_rules_path
+        def form_path = @lookup.place ? ebike_rules_place_path(*@lookup.place[:code].split("-")) : ebike_rules_path
 
         # The states, and the place outside the US whose page this is. Each reads "California (US-CA)", searchable by its code
         def place_options = combobox_options(EbikeRuleServices::Places.us_states | [@lookup.place].compact)
