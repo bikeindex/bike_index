@@ -99,13 +99,25 @@ RSpec.describe EbikeRuleServices::StateLaws do
   describe "places" do
     it "has each place outside the US's e-bike laws in km/h, or its country's without its own, and its other classes" do
       places = described_class.places
-      expect(places.keys).to match_array %w[CA EU CA-NB]
+      expect(places.keys).to match_array %w[CA EU CA-NB CA-ON]
       expect(places["EU"][:laws]).to match [include(id: "evc/eu/epac", kmh: 25, mph: 16, watt_cap: 250, throttle: false, metric: true,
         restrictions: [include(rule: "No licence, registration or insurance is needed")])]
       expect(places["EU"][:classes]).to eq []
       expect(places["CA-NB"][:laws]).to match [include(id: "evc/ca/power_assisted_bicycle", kmh: 32)]
-      expect(places["CA-NB"][:classes]).to match [include(id: "evc/ca/nb/motorcycle", name: "Motorcycle", throttle: true)]
+      expect(places["CA-NB"][:classes]).to match [include(id: "evc/ca/nb/motor_driven_cycle", kmh: 50),
+        include(id: "evc/ca/nb/motorcycle", name: "Motorcycle", throttle: true)]
       expect(described_class.find("CO")).to include(metric: false)
+    end
+  end
+
+  describe "place_law" do
+    it "is the place's own e-bike law, or without one, the motor vehicle its country's e-bike falls in with" do
+      expect(described_class.place_law("CA-ON")).to include(name: "Power-Assisted Bicycle", kmh: 32, watt_cap: 500, metric: true)
+      expect(described_class.place_law("CA-ON")).not_to include(:motor_vehicle)
+      expect(described_class.place_law("CA-NB")).to include(name: "Motor Driven Cycle", kmh: 50, motor_vehicle: true,
+        restrictions: include(include(rule: a_string_starting_with("Registered with one plate"))))
+      expect(described_class.place_law("CA")).to include(id: "evc/ca/power_assisted_bicycle")
+      expect(described_class.place_law("CA-QC")).to be_nil
     end
   end
 

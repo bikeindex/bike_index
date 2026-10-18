@@ -3,7 +3,8 @@
 module Pages
   module EbikeRules
     module Show
-      # The form is a plain GET, so a result is a link
+      # The form is a plain GET, so a result is a link. A Canadian page picks a province rather than a state, and says
+      # nothing of the US
       class Component < ApplicationComponent
         EYEBROW_CLASSES = "tw:text-xs tw:font-bold tw:tracking-[.08em] tw:uppercase tw:text-blue-600 tw:dark:text-blue-400"
         HEADING_CLASSES = "tw:font-header tw:text-[clamp(26px,4vw,34px)] tw:leading-tight tw:font-extrabold"
@@ -24,10 +25,29 @@ module Pages
         # The place's own page; without JavaScript, the controller sends a chosen place there
         def form_path = @lookup.place ? ebike_rules_place_path(*@lookup.place[:code].split("-")) : ebike_rules_path
 
-        # The states, and the place outside the US whose page this is. Each reads "California (US-CA)", searchable by its code
-        def place_options = combobox_options(EbikeRuleServices::Places.us_states | [@lookup.place].compact)
+        def us? = @lookup.country == "US"
 
-        def country_options = combobox_options(EbikeRuleServices::Places.outside_us)
+        # A checked country's regions; for the US, its states, and the place outside the US whose page this is. Each
+        # reads "California (US-CA)", searchable by its code
+        def place_options
+          places = us? ? EbikeRuleServices::Places.us_states | [@lookup.place].compact : EbikeRuleServices::Places.regions(@lookup.country)
+          combobox_options(places)
+        end
+
+        # a country's own page has none of its regions picked
+        def place_value = @lookup.place&.dig(:code)&.then { |code| code if place_options.any? { it[:abbr] == code } }
+
+        # Where clearing the place goes: the country's page
+        def country_path = us? ? ebike_rules_path : ebike_rules_place_path(@lookup.country)
+
+        # Outside the US, the US, and the other countries
+        def country_options
+          places = EbikeRuleServices::Places.outside_us
+          return combobox_options(places) if us?
+
+          [{name: EbikeRuleServices::Places::COUNTRY_NAMES["US"], abbr: "US"}] +
+            combobox_options(places.reject { it[:code].split("-").first == @lookup.country })
+        end
 
         def combobox_options(places) = places.map { {name: it[:name], abbr: it[:code]} }
 
@@ -65,17 +85,41 @@ module Pages
         # Named for the model, which the browser renames for a later pick
         def details_legend = model ? translation(".model_details", model: model.make_and_model) : translation(".details_legend")
 
+        # Canada's laws all stop the motor at 32 km/h
         def top_speed_entries
+          return [{value: 32, label: translation(".kmh", kmh: 32)}, {value: 33, label: translation(".over_kmh", kmh: 32)}] unless us?
+
           [{value: 20, label: translation(".mph", mph: 20)}, {value: 28, label: translation(".mph", mph: 28)},
             {value: 29, label: translation(".over_28_mph")}]
+        end
+
+        # The copy that names a state, the US's classes or its laws, and Canada's in their place
+        def copy
+          @copy ||= if us?
+            {subheading: translation(".subheading"), state: translation(".state"), select_state: translation(".select_state"),
+             state_error: translation(".state_error"), location_not_shared: translation(".location_not_shared"),
+             watts_placeholder: translation(".watts_placeholder"), parents_body: translation(".parents_body"),
+             parents_link: translation(".parents_link"), banned_body: translation(".banned_body"), disclaimer: translation(".disclaimer")}
+          else
+            {subheading: translation(".subheading_canada"), state: translation(".province"), select_state: translation(".select_province"),
+             state_error: translation(".province_error"), location_not_shared: translation(".location_not_shared_canada"),
+             watts_placeholder: translation(".watts_placeholder_canada"), parents_body: translation(".parents_body_canada"),
+             parents_link: translation(".parents_link_canada"), banned_body: translation(".banned_body_canada"),
+             disclaimer: translation(".disclaimer_canada")}
+          end
+        end
+
+        def not_in_country(switch_country)
+          us? ? translation(".not_in_us_html", switch_country:) : translation(".not_in_canada_html", switch_country:)
         end
 
         def throttle_entries = [{value: 1, label: translation(".answer_yes")}, {value: 0, label: translation(".answer_no")}]
 
         def parent_steps
           [
-            [translation(".parent_step_1_title"), translation(".parent_step_1_body")],
-            [translation(".parent_step_2_title"), translation(".parent_step_2_body")],
+            [translation(".parent_step_1_title"), us? ? translation(".parent_step_1_body") : translation(".parent_step_1_body_canada")],
+            us? ? [translation(".parent_step_2_title"), translation(".parent_step_2_body")] :
+              [translation(".parent_step_2_title_canada"), translation(".parent_step_2_body_canada")],
             [translation(".parent_step_3_title"), translation(".parent_step_3_body")],
             [translation(".parent_step_4_title"), translation(".parent_step_4_body")],
             [translation(".parent_step_5_title"), translation(".parent_step_5_body")],

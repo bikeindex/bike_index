@@ -2,10 +2,11 @@
 
 module EbikeRuleServices
   # Where /ebike-rules has rules, by ISO 3166-2 code: the US states, with their abbreviation, and the places outside
-  # the US the catalog classifies e-vehicles in. Only a US state's page checks a bike
+  # the US the catalog classifies e-vehicles in. A US state's page checks a bike, as a Canadian province's does
   module Places
     extend Functionable
 
+    CHECKED_COUNTRIES = %w[US CA].freeze
     EU_MEMBERS = %w[AT BE BG CY CZ DE DK EE ES FI FR GR HR HU IE IT LT LU LV MT NL PL PT RO SE SI SK].freeze
     # The catalog names classifications, not the places they're in
     REGION_NAMES = {
@@ -28,6 +29,16 @@ module EbikeRuleServices
     end
 
     def us?(place) = place[:abbr].present?
+
+    # The country whose regions the page picks between: the place's where they check a bike, else the US
+    def checked_country(place)
+      country = place && (us?(place) ? "US" : place[:code].split("-").first)
+      CHECKED_COUNTRIES.include?(country) ? country : "US"
+    end
+
+    def checks?(place) = place[:code].include?("-") && CHECKED_COUNTRIES.include?(place[:code].split("-").first)
+
+    def regions(country) = (country == "US") ? us_states : outside_us.select { it[:code].start_with?("#{country}-") }
 
     # From a request's Cloudflare location headers: a US state, else a region the catalog has, else its country, or
     # for an EU member, the EU

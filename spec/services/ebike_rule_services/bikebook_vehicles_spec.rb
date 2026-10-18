@@ -21,7 +21,9 @@ RSpec.describe EbikeRuleServices::BikebookVehicles do
 
       expect(bike).to have_attributes(bikebook_id: "m/specialized/2025/haul_st", manufacturer_name: "Specialized",
         model: "Haul ST", first_year: 2025, e_bike_class: 3, class_unknown: false, e_vehicle_classifications: %w[evc/us/class_3 evc/us/class_2], optional_classes: {2 => "throttle"}, watts: 700, top_assist_mph: 28, throttle: true,
-        stock_throttle: false, throttle_mph: 20, ul2849: :certified, ul2271: :certified, manual?: false)
+        stock_throttle: false, throttle_mph: 20, ul2849: :certified, ul2271: :certified, manual?: false,
+        # as the catalog records them
+        top_assist_kmh: 45, throttle_kmh: 32, top_kmh: 45, assists_past_kmh: nil)
     end
 
     it "has a stock throttle from a throttle mode sold with it, or a throttle propulsion with no throttle mode" do

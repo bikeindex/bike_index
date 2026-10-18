@@ -7,13 +7,22 @@ class EbikeRulesController < ApplicationController
     # a form's place - the lookup's without JavaScript, or the country switch's - which can't send it to the place's own page
     query = request.query_parameters
     if (key = %w[state country].find { query.key?(it) })
-      chosen = place_for(query[key])
-      query = query.except(key)
-      return redirect_to(chosen ? place_path(chosen, query) : ebike_rules_path(query), status: :moved_permanently)
+      code, query = query[key], query.except(key)
+      chosen = place_for(code)
+      path = if chosen
+        place_path(chosen, query)
+      elsif code == "US"
+        ebike_rules_place_path("US", query)
+      else
+        ebike_rules_path(query)
+      end
+      return redirect_to(path, status: :moved_permanently)
     end
 
     code = params[:country] && [params[:country], params[:region]].compact.join("-")
-    place = code && (place_for(code) || raise(ActionController::RoutingError, "Not Found"))
+    # /ebike-rules/US, the US chosen from outside it, which picks no state
+    us_chosen = code == "US"
+    place = place_for(code) || raise(ActionController::RoutingError, "Not Found") if code && !us_chosen
     return redirect_to(place_path(place, request.query_parameters), status: :moved_permanently) if place && place[:code] != code
     if turbo_frame_request_id == Pages::EbikeRules::Classes::Component::FRAME_ID
       return render(Pages::EbikeRules::Classes::Component.new(place:))
@@ -25,6 +34,8 @@ class EbikeRulesController < ApplicationController
     end
 
     detected_place = EbikeRuleServices::Places.from_location(request_location_hash)
+    # where they chose it, rather than sending them back
+    detected_place = nil if us_chosen && detected_place && !EbikeRuleServices::Places.us?(detected_place)
     if place.nil?
       # which place it goes to depends on where the visitor is, so neither Cloudflare nor a browser keeps it. A bike
       # comes along, as from Bike Book's link; a frame's check waits for the place the form hasn't chosen
@@ -33,12 +44,13 @@ class EbikeRulesController < ApplicationController
     end
 
     assign_meta(place)
+    @page_url = ebike_rules_url if us_chosen
     lookup = EbikeRuleServices::Lookup.from_params(params.permit(*LOOKUP_PARAMS), place:, detected_place:)
     return render(Pages::EbikeRules::Check::Component.new(lookup:, page_title: @page_title)) if turbo_frame_request?
 
     registered_count, recoveries_count = Counts.retrieve_many("total_bikes", "recoveries")
     render Pages::EbikeRules::Show::Component.new(lookup:, manifest_url: Integrations::Bikebook::Catalog::MANIFEST_URL,
-      registered_count:, recoveries_count:, page_title: @page_title, default_title:)
+      registered_count:, recoveries_count:, page_title: @page_title, default_title: country_title(lookup.country))
   end
 
   private
@@ -56,6 +68,13 @@ class EbikeRulesController < ApplicationController
   end
 
   def default_title = translation(:title, controller_method: :show)
+
+  # The page a place cleared from the form goes to: /ebike-rules, or a checked country's own
+  def country_title(country)
+    return default_title if country == "US"
+
+    translation(:state_title, state: EbikeRuleServices::Places.find(country)&.dig(:name) || country, controller_method: :show)
+  end
 
   # The place's own, however the page was reached - a check's bike params don't change them
   def assign_meta(place)

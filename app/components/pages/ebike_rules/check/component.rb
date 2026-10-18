@@ -26,9 +26,9 @@ module Pages
 
         def outside_us_note
           place = @lookup.place
-          return if place.nil? || EbikeRuleServices::Places.us?(place)
+          return if place.nil? || EbikeRuleServices::Places.checks?(place) || EbikeRuleServices::Places::CHECKED_COUNTRIES.include?(place[:code])
 
-          tag.p(translation(".outside_us", place: place[:name]), class: "#{Pages::EbikeRules::Show::Component::SECTION_CLASSES} tw:mt-6 " \
+          tag.p(translation(".outside_checked_countries", place: place[:name]), class: "#{Pages::EbikeRules::Show::Component::SECTION_CLASSES} tw:mt-6 " \
             "tw:text-[15px] tw:text-gray-700 tw:dark:text-gray-300")
         end
       end
