@@ -5,20 +5,11 @@ import { collapseField } from 'utils/collapse_utils'
 
 const RESULT_VIEW_KEY = 'orgRegistrationResultView'
 
-// The registration search's fields that Organized::ImpoundRecordsController also reads, by
-// its name for each
-const IMPOUND_SEARCH_PARAMS = {
-  'query_items[]': 'query_items[]',
-  query: 'query',
-  serial: 'serial',
-  search_email: 'search_email',
-  search_unregisteredness: 'search_unregisteredness',
-  period: 'period',
-  start_time: 'start_time',
-  end_time: 'end_time',
-  location: 'search_location',
-  distance: 'search_proximity'
-}
+// The registration search's fields that Organized::ImpoundRecordsController also reads, and
+// the two it names differently
+const IMPOUND_SEARCH_PARAMS = ['query_items[]', 'query', 'serial', 'search_email', 'search_unregisteredness',
+  'period', 'start_time', 'end_time', 'location', 'distance']
+const IMPOUND_SEARCH_RENAMES = { location: 'search_location', distance: 'search_proximity' }
 
 // Connects to data-controller='org--search'
 export default class extends Controller {
@@ -136,7 +127,7 @@ export default class extends Controller {
 
     const status = document.querySelector('input[type=radio][name=search_status][form="Search_Form"]:checked')?.value
     const searchAll = this.hasSearchAllTarget && this.searchAllTarget.checked
-    const searchable = JSON.parse(checkbox.dataset.locationableStatuses).includes(status) || (checkbox.dataset.regAddress === 'true' && !searchAll)
+    const searchable = checkbox.dataset.locationableStatus === status || (checkbox.dataset.regAddress === 'true' && !searchAll)
 
     checkbox.disabled = !searchable
     if (this.hasLocationSearchHintTarget) this.locationSearchHintTarget.hidden = searchable
@@ -209,8 +200,8 @@ export default class extends Controller {
 
     const url = new URL(event.currentTarget.href)
     url.search = new URLSearchParams([...new FormData(form)]
-      .filter(([name, value]) => IMPOUND_SEARCH_PARAMS[name] && value !== '')
-      .map(([name, value]) => [IMPOUND_SEARCH_PARAMS[name], value]))
+      .filter(([name, value]) => IMPOUND_SEARCH_PARAMS.includes(name) && value !== '')
+      .map(([name, value]) => [IMPOUND_SEARCH_RENAMES[name] ?? name, value]))
     event.currentTarget.href = url
   }
 

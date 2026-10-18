@@ -12,6 +12,7 @@ export default class extends Controller {
   static values = { storageKey: String }
 
   connect () {
+    if (!this.hasStorageKeyValue) return
     this.apply()
     document.addEventListener('turbo:frame-render', this.handleFrameRender)
   }
@@ -26,7 +27,6 @@ export default class extends Controller {
   }
 
   apply () {
-    if (!this.hasStorageKeyValue) return
     const stored = storedArray(this.storageKeyValue)
     const isDefault = this.isDefault
     this.checkboxTargets.forEach(checkbox => {

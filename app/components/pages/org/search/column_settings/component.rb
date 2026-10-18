@@ -31,7 +31,7 @@ module Pages
           def panel_options
             {columns: @settings.panel_columns.to_h { [it, label(it)] }, defaults: @settings.initially_checked_columns,
              always_visible: ComponentStructs::OrgSearchSettings::ALWAYS_VISIBLE_COLUMNS,
-             hints: @settings.panel_columns.to_h { [it, @settings.panel_hint(it)] }.compact}
+             hints: @settings.panel_hints}
           end
 
           def export_options

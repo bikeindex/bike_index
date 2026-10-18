@@ -26,10 +26,10 @@ module BikeServices
         .where("bike_organization_notes.body ILIKE ?", query_string)
     end
 
-    LOCATIONABLE_STATUSES = %w[stolen].freeze
+    LOCATIONABLE_STATUS = "stolen"
 
     def location_searchable?(organization:, search_all:, search_status:)
-      LOCATIONABLE_STATUSES.include?(search_status) || registration_address_searchable?(organization:, search_all:)
+      search_status == LOCATIONABLE_STATUS || registration_address_searchable?(organization:, search_all:)
     end
 
     # Ignored where it isn't searchable, as the disabled field is. Only a stolen bike's own
@@ -44,7 +44,7 @@ module BikeServices
 
       bounding_box = proximity[:bounding_box]
       stolen = bikes.status_stolen.within_bounding_box(bounding_box)
-      return stolen if search_status == "stolen"
+      return stolen if search_status == LOCATIONABLE_STATUS
 
       # EXISTS rather than IN: an IN subquery inside an OR can't use an index, so it scans
       # every address record

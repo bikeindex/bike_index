@@ -202,10 +202,7 @@ module ComponentStructs
       @panel_labels ||= column_renames.merge(PANEL_LABEL_KEYS.transform_values { translation(it) })
     end
 
-    def panel_hint(cell_name)
-      key = PANEL_HINT_KEYS[cell_name.to_sym]
-      translation(key) if key
-    end
+    def panel_hints = PANEL_HINT_KEYS.to_h { |cell, key| [cell.to_s, translation(key)] }
 
     def sort_column_label(sort)
       cell = SORTABLE_COLUMN_CELLS[sort]
@@ -223,8 +220,6 @@ module ComponentStructs
         ("acknowledgment_cell" if @organization.enabled?("registration_sequences"))
       ].compact.uniq
     end
-
-    def always_visible?(cell_name) = ALWAYS_VISIBLE_COLUMNS.include?(cell_name)
 
     def panel_columns
       @panel_columns ||= (enabled_columns + ALWAYS_VISIBLE_COLUMNS).sort_by { |cell| panel_labels[cell.to_sym] }
