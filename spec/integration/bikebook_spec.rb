@@ -157,7 +157,7 @@ RSpec.describe "Bikebook", :js, type: :system do
         const rows = rowsOf([{ model: 'Electric', type: 'cargo_bike', motors: [{ rated_power: 250 }], wheels: wheels(622, 584), suspension: { front: { travel: 120 } } },
           { model: 'Acoustic', type: 'bike', wheels: wheels(622, 622) }])
         const cells = (label) => [...rows.find((each) => each.querySelector('th').textContent.trim() === label).querySelectorAll('td')]
-        return [cells('E-vehicle class').map((cell) => [cell.textContent.trim(), cell.querySelector('.twless-strong[class~="tw:italic"]') != null]),
+        return [cells('E-vehicle class').map((cell) => [cell.textContent.trim(), cell.querySelector('.twless-strong') != null]),
           cells('Electric Certification').map((cell) => [...cell.querySelectorAll('button')].map((badge) => badge.textContent.replace(/\\s+/g, ' ').trim())),
           cells('Wheel size').map((cell) => cell.textContent.replace(/\\s+/g, ' ').trim()), cells('Vehicle type').map((cell) => cell.textContent.trim()),
           cells('Suspension front/rear').map((cell) => [cell.textContent.replace(/\\s+/g, ' ').trim(), [...cell.querySelectorAll('.twless-strong')].map((each) => each.textContent)]),
@@ -165,7 +165,7 @@ RSpec.describe "Bikebook", :js, type: :system do
             .filter((row) => /Wheel size|Vehicle type|Suspension/.test(row.textContent)).length]
       })()
     JS
-    expect(classes).to eq([[["—", false], ["not e-vehicle", true]], [["? Certification unknown"], []], ["700 C front, 650 B rear", "700 C"], ["Cargo Bike", "Bike"], [["120 mm / rigid ? Front suspensionTravel: 120 mm", ["rigid"]], ["Rigid", ["Rigid"]]], 0])
+    expect(classes).to eq([[["—", false], ["not e-vehicle", true]], [["? Certification unknown"], []], ["700 C front, 650 B rear", "700 C"], ["Cargo Bike", "Bike"], [["120 mm front (no rear suspension) ? Front suspensionTravel: 120 mm", []], ["Rigid", ["Rigid"]]], 0])
     # a description over 200 characters is cut at a word, its paragraphs kept, and one within them is whole
     excerpts = page.evaluate_script(<<~JS)
       (async () => {
@@ -705,9 +705,9 @@ RSpec.describe "Bikebook", :js, type: :system do
     click_on "Search them"
     expect(page).to have_css(vehicle_option, minimum: 1)
     vehicle_field.send_keys(:escape)
-    # titled by the newest year it's sold in, as the search's cards title a bike, over the years it's been sold
+    # titled without a year, over the years it's been sold
     haul_st = featured.find("li", text: "Specialized Haul ST")
-    expect(haul_st).to have_link(exact_text: "#{Time.current.year} Specialized Haul ST").and have_text("2025–current")
+    expect(haul_st).to have_link(exact_text: "Specialized Haul ST").and have_css("strong", exact_text: "2025–current")
     # each is picked as the search's option is
     haul_st.find("a").click
     expect(page).to have_css("[aria-label='Overview'] thead th", text: "Haul ST")
@@ -716,6 +716,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     overview = find("[aria-label='Overview']")
     expect(overview.all("td button[aria-label$=' e-bike']").map { it[:"aria-label"] }).to eq ["Class 2 e-bike", "Class 3 e-bike"]
     expect(overview).to have_css("td", text: "w/ optional throttle")
+    expect(overview).to have_link("View on e-bike rules", href: "/ebike-rules?vehicle_models=m/specialized/2025/haul_st")
     expect(page).to have_css(".hw-combobox__chip", text: "Specialized Haul ST")
     # filters leaving no legal e-bike feature what they do leave
     visit bikebook_path(vehicle_type: "e_motorcycle")

@@ -4,36 +4,36 @@ class EbikeRulesController < ApplicationController
   LOOKUP_PARAMS = %i[vehicle_models manual top_speed watts throttle].freeze
 
   def show
-    # the form's state without JavaScript, which can't send it to the state's own page
-    if params.key?(:state)
-      chosen = EbikeRuleServices::StateLaws.state(params[:state])
-      query = request.query_parameters.except("state")
-      return redirect_to(chosen ? state_path(chosen, query) : ebike_rules_path(query), status: :moved_permanently)
+    # a form's place - the lookup's without JavaScript, or the country switch's - which can't send it to the place's own page
+    query = request.query_parameters
+    if (key = %w[state country].find { query.key?(it) })
+      chosen = place_for(query[key])
+      query = query.except(key)
+      return redirect_to(chosen ? place_path(chosen, query) : ebike_rules_path(query), status: :moved_permanently)
     end
 
-    abbr = params[:abbr]
-    state = abbr && (EbikeRuleServices::StateLaws.state(abbr) || raise(ActionController::RoutingError, "Not Found"))
-    return redirect_to(state_path(state, request.query_parameters), status: :moved_permanently) if abbr && abbr != abbr.downcase
+    code = params[:country] && [params[:country], params[:region]].compact.join("-")
+    place = code && (place_for(code) || raise(ActionController::RoutingError, "Not Found"))
+    return redirect_to(place_path(place, request.query_parameters), status: :moved_permanently) if place && place[:code] != code
     if turbo_frame_request_id == Pages::EbikeRules::Classes::Component::FRAME_ID
-      return render(Pages::EbikeRules::Classes::Component.new(state:))
+      return render(Pages::EbikeRules::Classes::Component.new(place:))
     end
     if turbo_frame_request_id&.start_with?(Pages::EbikeRules::ClassCard::Component::FRAME_ID)
       e_bike_class = params[:e_bike_class].to_i.then { it if (1..3).cover?(it) }
       classification = params[:classification].presence&.then { EbikeRuleServices::StateLaws.classification(it) || raise(ActionController::RoutingError, "Not Found") }
-      return render(Pages::EbikeRules::ClassCard::Component.new(e_bike_class:, classification:, state:, frame_id: turbo_frame_request_id))
+      return render(Pages::EbikeRules::ClassCard::Component.new(e_bike_class:, classification:, place:, frame_id: turbo_frame_request_id))
     end
 
-    detected_state = EbikeRuleServices::StateLaws.state_from_location(request_location_hash)
-    if state.nil?
-      # which state it goes to depends on where the visitor is, so neither Cloudflare nor a browser keeps it
+    detected_place = EbikeRuleServices::Places.from_location(request_location_hash)
+    if place.nil?
+      # which place it goes to depends on where the visitor is, so neither Cloudflare nor a browser keeps it. A bike
+      # comes along, as from Bike Book's link; a frame's check waits for the place the form hasn't chosen
       response.headers["Cache-Control"] = "no-store"
-      if detected_state && (LOOKUP_PARAMS.map(&:to_s) & request.query_parameters.keys).none?
-        return redirect_to state_path(detected_state, request.query_parameters)
-      end
+      return redirect_to place_path(detected_place, request.query_parameters) if detected_place && !turbo_frame_request?
     end
 
-    assign_meta(state)
-    lookup = EbikeRuleServices::Lookup.from_params(params.permit(*LOOKUP_PARAMS), state:, detected_state:)
+    assign_meta(place)
+    lookup = EbikeRuleServices::Lookup.from_params(params.permit(*LOOKUP_PARAMS), place:, detected_place:)
     return render(Pages::EbikeRules::Check::Component.new(lookup:, page_title: @page_title)) if turbo_frame_request?
 
     registered_count, recoveries_count = Counts.retrieve_many("total_bikes", "recoveries")
@@ -43,17 +43,31 @@ class EbikeRulesController < ApplicationController
 
   private
 
-  def state_path(state, query = {}) = ebike_rules_state_path(state[:abbr].downcase, query)
+  # US-CA's is /ebike-rules/US/CA
+  def place_path(place, query = {}) = ebike_rules_place_path(*place[:code].split("-"), query)
+
+  # Two lowercase letters were a US state's before places outside the US had pages, as two uppercase ones still are
+  # where no place has them. The rest are a place's code in any case
+  def place_for(code)
+    return unless code.is_a?(String)
+
+    us = (state = EbikeRuleServices::StateLaws.state(code)) && EbikeRuleServices::Places.find("US-#{state[:abbr]}")
+    (code == code.downcase && us) || EbikeRuleServices::Places.find(code.upcase) || us
+  end
 
   def default_title = translation(:title, controller_method: :show)
 
-  # The state's own, however the page was reached - a check's bike params don't change them
-  def assign_meta(state)
-    return @page_title = default_title if state.nil?
+  # The place's own, however the page was reached - a check's bike params don't change them
+  def assign_meta(place)
+    return @page_title = default_title if place.nil?
 
-    name = state[:name]
-    law = EbikeRuleServices::StateLaws.find(state[:abbr])
-    @page_url = ebike_rules_state_url(state[:abbr].downcase)
+    name = place[:name]
+    law = if EbikeRuleServices::Places.us?(place)
+      EbikeRuleServices::StateLaws.find(place[:abbr])
+    else
+      EbikeRuleServices::StateLaws.places.dig(place[:code], :laws)&.first
+    end
+    @page_url = ebike_rules_place_url(*place[:code].split("-"))
     @page_title = translation(:state_title, state: name, controller_method: :show)
     @page_description = if law
       translation(:state_description, state: name, law: law[:description], controller_method: :show)

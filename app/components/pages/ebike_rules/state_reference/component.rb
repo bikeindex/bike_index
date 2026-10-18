@@ -5,7 +5,6 @@ module Pages
     module StateReference
       # Rendered whole, so search engines read the collapsed rules too
       class Component < ApplicationComponent
-        RULE_IDS = %i[classes power speed throttle].freeze
         # Open, a state's row becomes a card across the whole grid
         STATE_CLASSES = "tw:border-b tw:border-gray-200 tw:dark:border-gray-700 tw:has-[[aria-expanded=true]]:col-span-full " \
           "tw:has-[[aria-expanded=true]]:my-4 tw:has-[[aria-expanded=true]]:rounded-lg tw:has-[[aria-expanded=true]]:border " \
@@ -19,7 +18,7 @@ module Pages
 
         def laws = @laws ||= EbikeRuleServices::StateLaws.laws
 
-        def states = EbikeRuleServices::StateLaws::STATES.map { it.merge(law: laws[it[:abbr]]) }
+        def states = EbikeRuleServices::Places.us_states.map { it.merge(law: laws[it[:abbr]]) }
 
         def class_system(law)
           classes = law[:classes]

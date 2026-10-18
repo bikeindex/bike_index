@@ -102,24 +102,7 @@
             data-ui--collapse-target="content"
           >
             <% if (law = state[:law]) %>
-              <p
-                class="
-                  tw:mb-3 tw:max-w-[720px] tw:text-[15px] tw:text-gray-700
-                  tw:dark:text-gray-300
-                "
-              >
-                <%= law[:description] %>
-              </p>
-              <div class="tw:mb-4">
-                <%= render(UI::DefinitionList::Container::Component.new(term: :below)) do %>
-                  <% RULE_IDS.each do |id| %>
-                    <%= render(UI::DefinitionList::Row::Component.new(label: render(Pages::EbikeRules::RuleLabel::Component.new(id:)))) do %>
-                      <%= render(Pages::EbikeRules::RuleValue::Component.new(law:, id:)) %>
-                    <% end %>
-                  <% end %>
-                <% end %>
-              </div>
-              <%= render(Pages::EbikeRules::LawDetails::Component.new(law:)) %>
+              <%= render(Pages::EbikeRules::LawSummary::Component.new(law:)) %>
             <% else %>
               <p
                 class="
@@ -132,8 +115,8 @@
             <% end %>
 
             <p class="tw:mt-4">
-              <%= link_to translation(".check_in_state", state: state[:name]), ebike_rules_state_path(state[:abbr].downcase, anchor: "check"),
-                class: "twlink tw:font-semibold", data: {check_state: state[:abbr]} %>
+              <%= link_to translation(".check_in_state", state: state[:name]), ebike_rules_place_path("US", state[:abbr], anchor: "check"),
+                class: "twlink tw:font-semibold", data: {check_state: state[:code]} %>
             </p>
           </div>
         </div>

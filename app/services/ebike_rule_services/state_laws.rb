@@ -57,6 +57,10 @@ module EbikeRuleServices
     # The classifications that are an e-bike law or class anywhere, as the EU's EPAC is, rather than a motor vehicle's
     def e_bike_law_ids = parsed[:e_bike_laws]
 
+    # By ISO 3166-2 code, each place outside the US the catalog classifies e-vehicles in: its e-bike laws, or without
+    # one of its own its country's, and its other classes, slowest first and off-highway last
+    def places = vocabulary("places") { parse_places(it) } || {}
+
     # nil for anything but an abbreviation, such as a query's array
     def state(abbreviation)
       STATES.find { it[:abbr] == abbreviation.upcase } if abbreviation.is_a?(String)
@@ -122,17 +126,37 @@ module EbikeRuleServices
       }
     end
 
-    # The law, then slowest first, and off-highway last
+    def parse_places(records)
+      by_place = records.filter_map { |id, record| [record["jurisdiction"], id, record] if metric?(record) }.group_by(&:first)
+      # one of a wider law's ahead of the place's own, as Ontario's Power-Assisted Bicycle is of its Cargo one
+      laws = by_place.transform_values do |place_entries|
+        place_entries.select { it[2]["e_bike_law"] }.partition { it[2]["groups"].present? }.flatten(1).map { law(it[1], it[2]) }
+      end
+      by_place.to_h do |code, place_entries|
+        others = by_speed(place_entries.reject { it[2]["e_bike_law"] }).map { |_, id, record| state_class(id, record) }
+        [code, {laws: laws[code].presence || laws[code.split("-").first].to_a, classes: others}]
+      end
+    end
+
     def state_classes(entries, law_id)
-      entries.each_with_index.sort_by { |(_, id, record), index|
-        [(id == law_id) ? 0 : 1, record["groups"].to_a.include?(OFF_HIGHWAY) ? 1 : 0, record["max_speed"] || Float::INFINITY, index]
-      }.map { |(_, id, record), _| state_class(id, record) }
+      law, others = entries.partition { it[1] == law_id }
+      (law + by_speed(others)).map { |_, id, record| state_class(id, record) }
+    end
+
+    # Slowest first, and off-highway last
+    def by_speed(entries)
+      entries.each_with_index.sort_by { |(_, _, record), index|
+        [record["groups"].to_a.include?(OFF_HIGHWAY) ? 1 : 0, record["max_speed"] || Float::INFINITY, index]
+      }.map(&:first)
     end
 
     def state_class(id, record)
       {id:, name: record["name"], description: record["description"], throttle: record["throttle"], mph: mph(record["max_speed"]),
-       watt_cap: record["max_power"], min_watts: record["min_power"]}
+       kmh: record["max_speed"], metric: metric?(record), watt_cap: record["max_power"], min_watts: record["min_power"]}
     end
+
+    # Outside the US, where a limit reads in km/h
+    def metric?(record) = record["jurisdiction"].present? && !record["jurisdiction"].match?(/\AUS\b/)
 
     def mph(kilometers) = kilometers&.then { UnitSystem.kilometers_to_miles(it).round }
 
@@ -144,6 +168,8 @@ module EbikeRuleServices
         classes: record["groups"].to_a.filter_map { it[BikebookCatalog::US_CLASS, 1]&.to_i }.sort,
         watt_cap: record["max_power"],
         mph: mph(record["max_speed"]),
+        kmh: record["max_speed"],
+        metric: metric?(record),
         throttle: record["throttle"],
         # false where a Class 3 can't have a throttle at all, as California's can't
         class_3_throttle: record["class_3_throttle"],
@@ -170,6 +196,6 @@ module EbikeRuleServices
 
     def upcoming(date, today) = (date if date&.>(today))
 
-    conceal :parsed, :classifications, :vocabulary, :parse, :state_classes, :state_class, :mph, :law, :restriction, :web_pages, :date, :in_force, :current, :upcoming
+    conceal :parsed, :classifications, :vocabulary, :parse, :parse_places, :state_classes, :by_speed, :state_class, :metric?, :mph, :law, :restriction, :web_pages, :date, :in_force, :current, :upcoming
   end
 end

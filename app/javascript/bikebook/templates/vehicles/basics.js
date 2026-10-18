@@ -92,7 +92,7 @@ const compared = (vehicles, fields) => html`<section aria-label=${vehicles.lengt
       cell: ({ key, only }) => {
         if (present(vehicle[key])) return vehicle[key]
         if (only !== 'electric' || vehicle.electric) return missing
-        return key === 'e_vehicle_class' ? html`<span class="twless-strong tw:italic">not e-vehicle</span>` : nothing
+        return key === 'e_vehicle_class' ? html`<span class="twless-strong">not e-vehicle</span>` : nothing
       }
     }))
   ]

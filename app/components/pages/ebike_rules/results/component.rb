@@ -16,7 +16,7 @@ module Pages
 
         def initialize(lookup:)
           @bike = lookup.bike
-          @state = lookup.state
+          @state = lookup.place
           @law = lookup.law
           @rules = @law ? EbikeRuleServices::Evaluator.rules(law: @law, bike: @bike) : []
           @verdict = EbikeRuleServices::Evaluator.verdict(@rules)
