@@ -155,8 +155,9 @@
     @apply tw:ui-table-bordered-th-last;
   }
   /* A 🔎 or tooltip "?" stays on the line of what it follows. Only the whole cell
-     works: Chromium still breaks after a preceding element that wraps */
-  .ui-table td:has(.keep-with-previous) {
+     works: Chromium still breaks after a preceding element that wraps. A .keep-together
+     already holds it with its last word, so the rest of the cell can wrap */
+  .ui-table td:has(.keep-with-previous:not(.keep-together *)) {
     @apply tw:whitespace-nowrap;
   }
 }

@@ -8,6 +8,7 @@ module Pages
         EYEBROW_CLASSES = "tw:text-xs tw:font-bold tw:tracking-[.08em] tw:uppercase tw:text-blue-600 tw:dark:text-blue-400"
         HEADING_CLASSES = "tw:font-header tw:text-[clamp(26px,4vw,34px)] tw:leading-tight tw:font-extrabold"
         SECTION_CLASSES = "tw:mx-auto tw:max-w-[1120px] tw:px-[clamp(16px,4vw,32px)]"
+        COUNTRY_MODAL_ID = "ebike-rules-switch-country"
 
         def initialize(lookup:, manifest_url:, registered_count:, recoveries_count:, page_title:, default_title:)
           @lookup = lookup
@@ -20,8 +21,15 @@ module Pages
 
         private
 
-        # The state's own page; without JavaScript, the controller sends a chosen state there
-        def form_path = @lookup.state ? ebike_rules_state_path(@lookup.state[:abbr].downcase) : ebike_rules_path
+        # The place's own page; without JavaScript, the controller sends a chosen place there
+        def form_path = @lookup.place ? ebike_rules_place_path(*@lookup.place[:code].split("-")) : ebike_rules_path
+
+        # The states, and the place outside the US whose page this is. Each reads "California (US-CA)", searchable by its code
+        def place_options = combobox_options(EbikeRuleServices::Places.us_states | [@lookup.place].compact)
+
+        def country_options = combobox_options(EbikeRuleServices::Places.outside_us)
+
+        def combobox_options(places) = places.map { {name: it[:name], abbr: it[:code]} }
 
         def field_error(field, text)
           return unless error?(field)
@@ -42,7 +50,7 @@ module Pages
           end
         end
 
-        def detected? = @lookup.detected_state.present? && @lookup.state == @lookup.detected_state
+        def detected? = @lookup.detected_place.present? && @lookup.place == @lookup.detected_place
 
         # The picked model. Custom details are the checked bike, so it's looked up on its own
         def model
