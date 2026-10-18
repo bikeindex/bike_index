@@ -398,10 +398,6 @@ RSpec.describe "Bikebook", :js, type: :system do
         const data = { model: 'Enduro', frame: { material: 'aluminum', coil_compatible: true }, groupset: { manufacturer: 'SRAM', description: 'GX Eagle', electronic: false },
           drivetrain: ['1_front', '12_rear'], gearing: { front: [32], rear: [10, 52] },
           suspension: { front: { travel: 170, spring: 'air', lockout: true }, rear: { travel: 160, shock_length: 157.5, shock_stroke: 62.5, spring: 'coil' } } }
-        // schema 0.24.6's, which the fixture's kit predates
-        kit.viewer.suspension_fields = { ...kit.viewer.suspension_fields, spring: {}, lockout: {} }
-        kit.viewer.suspension_labels = { ...kit.viewer.suspension_labels, spring: 'Spring', lockout: 'Lockout' }
-        kit.viewer.frame_fields = { ...kit.viewer.frame_fields, coil_compatible: {} }
         const viewer = new VehicleViewer(kit, vocabulary)
         const render = (view) => fragmentOf(viewer.render([{ value: 'm/x/2026/enduro', data }], new URL(`/bikebook?view=${view}`, window.location.href), null))
         const text = (element) => element.textContent.replace(/\\s+/g, ' ').trim()
@@ -1214,16 +1210,16 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(description).to have_css("[role='button'][aria-expanded='true']", exact_text: "Show less")
       .and have_css("[role='button'] [data-ui--collapse-target='chevron'].tw\\:rotate-90")
     expect(description).to have_text("MIK-compatible rear rack").and have_no_css("p", text: /…\z/)
-    # a cargo bike's max weight and cargo area, on the Overview under its total length and above the size in its geometry
-    expect(page).to have_css("[aria-label='Overview'] tr", text: /\ACargo\s*Total length 167\.3\W*cm \?\s*Max weight 190\W*kg \?\z/)
-    find("[aria-label='Overview'] button[aria-label='Max weight is cargo and rider']").click
+    # a cargo bike's max load and cargo area, on the Overview under its total length and above the size in its geometry
+    expect(page).to have_css("[aria-label='Overview'] tr", text: /\ACargo\s*Total length 167\.3\W*cm \?\s*Max load 190\W*kg \?\z/)
+    find("[aria-label='Overview'] button[aria-label='Max load (rider + cargo)']").click
     # its rider limit the same, which leaves it out, and its cargo's
-    expect(page).to have_css("[role='tooltip']", text: /\AMax weight is cargo and rider\s*Max cargo weight 60\W*kg\z/, visible: true)
+    expect(page).to have_css("[role='tooltip']", text: /\AMax load \(rider \+ cargo\)\s*Max cargo weight 60\W*kg\z/, visible: true)
     click_link "Sizes & geometry"
-    expect(page).to have_css("[aria-label='Sizes & geometry comparison'] tr", text: /\ACargo\s*Max weight 190\W*kg \?\z/)
+    expect(page).to have_css("[aria-label='Sizes & geometry comparison'] tr", text: /\ACargo\s*Max load 190\W*kg \?\z/)
     expect(all("[aria-label='Sizes & geometry comparison'] tbody th").map(&:text).each_cons(2)).to include(%w[Cargo Size])
-    # without a max weight, its total payload, and a rider limit apart from it in the max weight's tooltip: its
-    # sizes' range, or the compared size's
+    # without a max load, its gross weight rating, and without either its rider limit; a rider limit apart from either,
+    # and a gross rating beside a max load, in its tooltip: its sizes' range, or the compared size's. Its Frame lists both
     payloads = page.evaluate_script(<<~JS)
       (async () => {
         const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
@@ -1237,35 +1233,44 @@ RSpec.describe "Bikebook", :js, type: :system do
           renderInto(container, viewer.render([{ value: 'm/x/2026/hauler', data: vehicle }], new URL(`/bikebook?view=${view}&vehicle_models=m/x/2026/hauler&vehicle_sizes=L`, window.location.href), null))
           return [...container.querySelectorAll('tbody tr')].find((row) => row.innerText.startsWith('Cargo'))
         }
+        const frame = (vehicle) => {
+          renderInto(container, viewer.render([{ value: 'm/x/2026/hauler', data: vehicle }], new URL('/bikebook?view=all&vehicle_models=m/x/2026/hauler', window.location.href), null))
+          return [...[...container.querySelectorAll('section')].find((section) => /^frame$/i.test(section.querySelector('h2')?.innerText)).querySelectorAll('dl > div')].map(text)
+        }
         const tooltip = (row) => {
           const shown = row.querySelector("[role='tooltip']")
           shown.classList.remove('tw:hidden')
           return text(shown)
         }
         const weighed = { ...data, frame: { max_weight_total: 200 } }
+        const rated = { ...data, frame: { max_weight_total: 160, gross_weight_rating: 200 } }
         const shown = [text(cargo('basics', data)), text(cargo('geometry', data)), tooltip(cargo('basics', weighed)), tooltip(cargo('geometry', weighed)),
+          tooltip(cargo('basics', rated)), ...((row) => [text(row), tooltip(row)])(cargo('basics', { ...data, frame: { gross_weight_rating: 200 } })),
           text(cargo('basics', { ...data, cargo: { max_weight_cargo: 80 } })),
           ...((row) => [text(row), tooltip(row)])(cargo('basics', { model: 'Long', type: 'cargo_bike', cargo: { length: 787 }, sizes: [{ name: 'L', geometry: { wheelbase: 1356 } }],
-            wheels: [{ bsd: 406, tire_width: 89, position: ['front'] }, { bsd: 406, tire_width: 89, position: ['rear'] }] }))]
+            wheels: [{ bsd: 406, tire_width: 89, position: ['front'] }, { bsd: 406, tire_width: 89, position: ['rear'] }] })), ...frame(rated)]
         container.remove()
         return shown
       })()
     JS
-    expect(payloads).to match([/\ACargo 150\W*kg–180\W*kg total payload\z/, /\ACargo 180\W*kg total payload\z/,
-      /\AMax weight is cargo and rider Max rider weight 150\W*kg–180\W*kg\z/, /\AMax weight is cargo and rider Max rider weight 180\W*kg\z/,
-      # a cargo limit alone, with no max weight's tooltip to go in, isn't shown
-      /\ACargo 150\W*kg–180\W*kg total payload\z/,
+    expect(payloads).to match([/\ACargo Max rider weight 150\W*kg–180\W*kg\z/, /\ACargo Max rider weight 180\W*kg\z/,
+      /\AMax load \(rider \+ cargo\) Max rider weight 150\W*kg–180\W*kg\z/, /\AMax load \(rider \+ cargo\) Max rider weight 180\W*kg\z/,
+      /\AMax load \(rider \+ cargo\) Gross weight rating \(bike \+ rider \+ cargo\) 200\W*kg Max rider weight 150\W*kg–180\W*kg\z/,
+      /\ACargo Gross weight rating 200\W*kg \?\z/, /\AGross weight rating \(bike \+ rider \+ cargo\) Max rider weight 150\W*kg–180\W*kg\z/,
+      # a cargo limit alone, with no limit's tooltip to go in, isn't shown
+      /\ACargo Max rider weight 150\W*kg–180\W*kg\z/,
       # its wheelbase and wheels' total length beside its cargo area's, each spelled out in their tooltip
       /\ACargo Total length 194\W*cm, Cargo 78\.7\W*cm \?\z/,
-      /\ATotal length: 194\W*cm \(6 feet, 4\.4 inches\) \(total length is the wheelbase plus each wheel’s radius, estimating its tire based on its width\) Cargo length: 78\.7\W*cm \(2 feet, 7 inches\)\z/])
+      /\ATotal length: 194\W*cm \(6 feet, 4\.4 inches\) \(total length is the wheelbase plus each wheel’s radius, estimating its tire based on its width\) Cargo length: 78\.7\W*cm \(2 feet, 7 inches\)\z/,
+      /\AMax load \(rider \+ cargo\) 160\W*kg\z/, /\AGross weight rating \(bike \+ rider \+ cargo\) 200\W*kg\z/])
     click_link "All"
     expect(page).to have_css("section div", text: /\AE-vehicle class\s*US Class 3 \?\s*w\/ optional throttle US Class 2 \?\z/, wait: 10)
     expect(page).to have_css("dd > span.tw\\:block", text: /\Aw\/ optional throttle US Class 2/)
-    # years keyed by year, read newest first, each with its colorways, and the system weight limit with the frame
+    # years keyed by year, read newest first, each with its colorways, and the max load with the frame
     years = find("article h1", text: "Haul ST").ancestor("article").find("h2", text: /\Amodel years\z/i).ancestor("section")
     expect(years.all("tr").map { it.first("td").text }).to eq %w[2026 2025]
     expect(years).to have_text("Satin Obsidian").and have_text("Gloss White Mountains")
-    expect(find("h2", text: /\Aframe\z/i).ancestor("section")).to have_text(/Max weight total\W*190\W*kg/)
+    expect(find("h2", text: /\Aframe\z/i).ancestor("section")).to have_text(/Max load \(rider \+ cargo\)\W*190\W*kg/)
 
     # beside its Canadian model, sold outside the visitor's market, the Overview leads with each one's, until any market will do
     visit bikebook_path(vehicle_models: "m/specialized/2025/haul_st,m/specialized/2025/haul_st_ca", filters: 1)
