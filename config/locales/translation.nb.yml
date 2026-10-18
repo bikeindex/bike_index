@@ -6840,6 +6840,7 @@ nb:
           not_allowed: Ikke tillatt
           own_definition: 'Sin egen definisjon: %{name}'
           watts_html: "%{watts}W"
+          kmh_html: "%{kmh} km/t"
         show:
           answer_no: Nei
           answer_yes: Ja
@@ -6938,6 +6939,11 @@ nb:
           custom_details: Tilpassede detaljer
           details_legend: Detaljer om sykkelen din
           model_details: "%{model} detaljer"
+          country: Land
+          not_in_us_html: Ikke i USA? %{switch_country}
+          select_country: Velg et land
+          switch_country: bytte land
+          switch_country_title: Bytt land
         state_reference:
           compiling: Vi samler %{state}s elsykkelregler fra delstatsforsamlingen og
             DMV. Sjekk tilbake snart.
@@ -6977,6 +6983,8 @@ nb:
           state_classes_intro: "%{state} bruker ikke treklassesystemet som de fleste
             stater har. Loven deres sorterer elsykler og andre elektriske tohjulinger
             i disse klassene i stedet."
+          other_classes: Andre elektriske kjøretøy i %{place}
+          place_heading: Elsykkellover i %{place}
         rule_citation:
           source: kilde
         class_card:
@@ -7017,6 +7025,9 @@ nb:
           classification: E-%{vehicle_type}-klassifisering
           electric_certification: Elektrisk sertifisering
           not_provided: Ikke oppgitt
+        check:
+          outside_us: Sykkelkontrollene dekker amerikanske stater foreløpig. %{place}
+            sine lover for elsykler finner du nedenfor.
       memberships:
         new:
           become_a_member: Bli medlem
