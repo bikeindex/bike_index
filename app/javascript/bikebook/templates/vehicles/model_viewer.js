@@ -42,6 +42,9 @@ export const modelViewer = (args) => new ModelViewer(args).render()
 const stock = ({ availability }) => [undefined, null, 'stock', 'app_update'].includes(availability)
 
 const WIDE_TIRE = 50
+const MAX_LOAD = 'Max load (rider + cargo)'
+const GROSS_WEIGHT = 'Gross weight rating (bike + rider + cargo)'
+
 export const US_CLASS = /^evc\/us\/class_(\d)$/
 // (tire_width / 25.4).round(1) is a Float, so a whole inch still reads 2.0
 const tireInches = (presenter, millimeters) => presenter.labeled(presenter.rounded(millimeters / 25.4).toFixed(1), 'in', presenter.kit.inches)
@@ -69,7 +72,7 @@ const modes = (key) => (vehicle) => highest(array(vehicle.motors).flatMap((motor
 // cargo_bike, cargo_tricycle and their _rear kinds
 export const isCargo = (data) => /^cargo_/.test(data.type ?? '')
 
-// A vehicle's max weight, or else its total payload in `size`, and its cargo area
+// A vehicle's max load or gross weight rating, or else its rider limit in `size`, and its cargo area
 export const cargoAt = (presenter, data, size) => new ModelViewer({ presenter, data, others: [] }).cargo(size)
 
 export const tireWidth = (presenter, width) => new ModelViewer({ presenter, data: {}, others: [] }).tireWidthSummary(width, null)
@@ -364,7 +367,7 @@ class ModelViewer {
     return join([join(standard.map((name) => this.tooltipped(name, tooltips)), ', '), ...optionals])
   }
 
-  // "Total length 6' 4", Cargo 2' 7" ?", each spelled out in its tooltip, over "Max weight 200 kg ?". Without a `size`, as
+  // "Total length 6' 4", Cargo 2' 7" ?", each spelled out in its tooltip, over "Max load 200 kg ?". Without a `size`, as
   // the Overview has none, its total length, which a size's geometry has a row of its own for
   cargo (size) {
     const { presenter } = this
@@ -401,22 +404,23 @@ class ModelViewer {
     return lengths.length ? [...new Set([Math.min(...lengths), Math.max(...lengths)])] : []
   }
 
-  // The max weight, with a separate rider limit and the cargo's in its tooltip, or without one, the total payload: in
-  // `size`, or its sizes' range
+  // The max load, or without one the gross weight rating, with the other limits in its tooltip, or without either the
+  // rider limit: in `size`, or its sizes' range
   #cargoWeight (size) {
     const { presenter } = this
-    const maxWeight = this.data.frame?.max_weight_total
+    const { max_weight_total: maxLoad, gross_weight_rating: gross } = this.data.frame ?? {}
     const riders = (size ? [size] : array(this.data.sizes)).map((each) => each.geometry?.max_weight_rider).filter(isNumber)
     const range = () => join([...new Set([Math.min(...riders), Math.max(...riders)])].map((kg) => presenter.measurement(kg, 'kg')), '–')
-    if (isNumber(maxWeight)) {
-      const text = 'Max weight is cargo and rider'
-      const cargo = this.data.cargo?.max_weight_cargo
-      const lines = [riders.some((kg) => kg !== maxWeight) && html`Max rider weight ${range()}`,
-        isNumber(cargo) && html`Max cargo weight ${presenter.measurement(cargo, 'kg')}`].filter(Boolean)
-      const body = html`${text}${lines.map((line) => html`<span class="tw:block">${line}</span>`)}`
-      return html`Max weight ${presenter.measurement(maxWeight, 'kg')} ${tooltip({ text, body })}`
-    }
-    return riders.length ? join([range(), ' total payload']) : null
+    const limit = isNumber(maxLoad) ? maxLoad : gross
+    if (!isNumber(limit)) return riders.length ? join(['Max rider weight ', range()]) : null
+
+    const cargo = this.data.cargo?.max_weight_cargo
+    const lines = [isNumber(maxLoad) && isNumber(gross) && html`${GROSS_WEIGHT} ${presenter.measurement(gross, 'kg')}`,
+      riders.some((kg) => kg !== limit) && html`Max rider weight ${range()}`,
+      isNumber(cargo) && html`Max cargo weight ${presenter.measurement(cargo, 'kg')}`].filter(Boolean)
+    const [label, text] = isNumber(maxLoad) ? ['Max load', MAX_LOAD] : ['Gross weight rating', GROSS_WEIGHT]
+    const body = html`${text}${lines.map((line) => html`<span class="tw:block">${line}</span>`)}`
+    return html`${label} ${presenter.measurement(limit, 'kg')} ${tooltip({ text, body })}`
   }
 
   // As /ebike-rules shows them: its US classes' tiles in order, an optional one's outlined, and an e-moto's, alone where
@@ -551,7 +555,7 @@ class ModelViewer {
   }
 
   frame () {
-    return section({ heading: 'Frame', content: this.presenter.measurementRows(this.specRows('frame')) })
+    return section({ heading: 'Frame', content: this.presenter.measurementRows(this.specRows('frame', undefined, { max_weight_total: MAX_LOAD, gross_weight_rating: GROSS_WEIGHT })) })
   }
 
   suspensionSummary (suspension) {
