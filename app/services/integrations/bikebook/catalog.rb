@@ -46,8 +46,9 @@ module Integrations
         JSON.parse(LOCAL_DIRECTORY ? File.read(File.join(LOCAL_DIRECTORY, path)) : connection.get(path).body)
       end
 
-      # A vehicle's page waits on it, so it gives up well inside rack-timeout's 30s
-      def connection = Faraday.new(url: URL, request: {timeout: 5}) { it.response :raise_error }
+      # An uncached file can take over 5s to start, and a page waits on up to three - the manifest, the vocabulary
+      # and a model's block - which together give up inside rack-timeout's 30s
+      def connection = Faraday.new(url: URL, request: {open_timeout: 2, timeout: 7}) { it.response :raise_error }
 
       conceal :cached, :read, :connection
     end

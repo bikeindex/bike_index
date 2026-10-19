@@ -482,6 +482,10 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_css("#vehicle-models-count", exact_text: "(30 matching models)")
     find_field("Manufacturers").click
     find("#manufacturer-hw-listbox [role='option']", text: "Kris Holm (5)").click
+    # picked by a click, it keeps the focus, so Escape closes the list it reopens for another pick
+    expect(page).to have_css("#manufacturer:focus[aria-expanded='true']")
+    send_keys(:escape)
+    expect(page).to have_css("#manufacturer[aria-expanded='false']")
     expect(page).to have_css("[data-async-id='manufacturer'] .hw-combobox__chip", text: "Kris Holm")
     expect(page).to have_css("#vehicle-models-count", exact_text: "(5 matching models)")
     # checked propulsions match any of them
@@ -751,6 +755,16 @@ RSpec.describe "Bikebook", :js, type: :system do
     picks = featured.all("a").map { it[:href][/vehicle_models=(.+)/, 1] }
     expect(picks).to include("m/aventon/2025/aventure_m")
     expect(picks).not_to include("m/aventon/2026/level_4_adv", "m/aventon/2026/level_4_adv_step_through")
+
+    # Price leads the order once clicked, and a second click turns it around
+    prices = ->(list) { list.all("li").map { it.text[/\$([\d,]+)/, 1].to_s.delete(",").to_i } }
+    click_on "More filters", match: :first
+    within("#vehicle-filters") { click_on "Price" }
+    expect(page).to have_current_path(/[?&]sort=price\b/).and have_css("#vehicle-filters button[aria-pressed='true']", text: "Price")
+    expect(page).to have_css("[aria-label='Models to compare']") { prices.call(it) == prices.call(it).sort.reverse }
+    within("#vehicle-filters") { click_on "Price" }
+    expect(page).to have_current_path(/[?&]price_dir=asc\b/)
+    expect(page).to have_css("[aria-label='Models to compare']") { (listed = prices.call(it)) == listed.sort && listed.uniq.size > 1 }
   end
 
   it "keeps each compared vehicle's size in the URL, the others nearest the first's by top tube unless picked" do

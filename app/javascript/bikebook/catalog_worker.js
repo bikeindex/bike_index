@@ -186,13 +186,17 @@ const outranks = (a, b) => {
   return index !== -1 && a[index]
 }
 
-// Newest and priciest first unless asked otherwise, kept per pair of directions so a query only has to filter
-function sorted ({ year_dir: yearDir, price_dir: priceDir }) {
-  const key = `${yearDir}/${priceDir}`
+// Newest and priciest first unless asked otherwise, by year then price unless `sort` puts price first, which leaves the
+// unpriced last either way. Kept per order, so a query only has to filter
+function sorted ({ sort, year_dir: yearDir, price_dir: priceDir }) {
+  const key = `${sort}/${yearDir}/${priceDir}`
   if (!orders.has(key)) {
     const direction = (dir) => dir === 'asc' ? 1 : -1
-    orders.set(key, [...models].sort((a, b) =>
-      direction(yearDir) * (a.sortYear - b.sortYear) || direction(priceDir) * (a.sortPrice - b.sortPrice) || (a.id < b.id ? -1 : 1)))
+    const byYear = (a, b) => direction(yearDir) * (a.sortYear - b.sortYear)
+    const byPrice = (a, b) => direction(priceDir) * (a.sortPrice - b.sortPrice)
+    const unpriced = (a, b) => (a.msrp_cents == null) - (b.msrp_cents == null)
+    const ranks = sort === 'price' ? [unpriced, byPrice, byYear] : [byYear, byPrice]
+    orders.set(key, [...models].sort((a, b) => ranks.reduce((order, rank) => order || rank(a, b), 0) || (a.id < b.id ? -1 : 1)))
   }
   return orders.get(key)
 }

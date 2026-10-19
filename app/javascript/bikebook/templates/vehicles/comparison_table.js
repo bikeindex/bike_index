@@ -7,6 +7,10 @@ import { seriesBorders } from 'bikebook/templates/vehicles/geometry_overlay'
 import { cargoAt, isCargo, tireWidth, wheelsAt } from 'bikebook/templates/vehicles/model_viewer'
 import { array, isNumber, join, present, slice, sum } from 'bikebook/templates/values'
 
+// A row header's cell classes that keep it in view as a phone scrolls the table across, at its scroller's edge rather than
+// inside its gutter
+export const PINNED_ROW_HEADER = 'tw:max-md:sticky tw:max-md:-left-(--gutter) tw:max-md:z-10 tw:max-md:border-r tw:max-md:bg-inherit'
+
 const GEOMETRY = ['reach', 'stack', 'top_tube_effective', 'head_angle', 'seat_angle', 'chainstay', 'standover', 'wheelbase']
 // the size's, so it closes the geometry
 const WEIGHT = { label: 'Weight', read: (vehicle, size) => size?.geometry?.total_weight, better: -1, unit: 'kg' }
@@ -102,7 +106,7 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], besid
         }
       }
     })
-  const size = { label: 'Size', cell: sizeCell, className: 'tw:bg-blue-50 tw:dark:bg-blue-950' }
+  const size = { label: 'Size', cell: sizeCell, className: 'tw:bg-blue-50! tw:dark:bg-blue-950!' }
   const sizeRows = sizes.some(Boolean) ? [size] : []
   const cargos = new Map(named.map((vehicle, index) => [vehicle, cargoAt(presenter, vehicles[index].data, sizes[index])]))
   const cargoRows = vehicles.some(({ data }) => isCargo(data)) ? records([{ label: 'Cargo', read: (vehicle) => cargos.get(vehicle) }]) : []
@@ -115,7 +119,7 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], besid
     classes: 'tw:mx-auto tw:min-w-[min(100%,78rem)]!',
     records: rows,
     columns: [
-      { label: html`<span class="tw:sr-only">Spec</span>`, rowHeader: true, classes: 'tw:font-bold tw:whitespace-nowrap tw:align-top', cellClass: (record) => record.className, cell: (record) => record.label },
+      { label: html`<span class="tw:sr-only">Spec</span>`, rowHeader: true, classes: 'tw:font-bold tw:max-md:min-w-28 tw:md:whitespace-nowrap tw:align-top', cellClass: (record) => `${PINNED_ROW_HEADER} ${record.className ?? ''}`, cell: (record) => record.label },
       ...named.map((vehicle, index) => {
         const border = seriesBorders(frames, index)
         return {

@@ -27,6 +27,50 @@
   }
 }
 
+/* A component group's table, which a card narrower than its five columns stacks: each component its type, then what
+ * it has of the rest. Important over the table's own cell borders, widths and padding */
+@layer components {
+  .bikebook-components {
+    container: bikebook-components / inline-size;
+  }
+
+  @container bikebook-components (width < 40rem) {
+    .bikebook-components :is(table, thead, tbody) {
+      display: block;
+    }
+
+    .bikebook-components tr {
+      @apply tw:flex tw:flex-wrap tw:gap-x-2 tw:border-gray-200 tw:px-2 tw:py-1.5 tw:text-sm tw:dark:border-gray-700;
+    }
+
+    .bikebook-components tbody tr {
+      @apply tw:border-t;
+    }
+
+    .bikebook-components :is(th, td) {
+      @apply tw:block tw:w-auto! tw:rounded-none! tw:border-0! tw:p-0!;
+    }
+
+    .bikebook-components thead th:not(:first-child),
+    .bikebook-components td:empty {
+      display: none;
+    }
+
+    .bikebook-components td:first-child {
+      @apply tw:basis-full tw:font-bold;
+    }
+
+    /* Detail and position, beside the manufacturer */
+    .bikebook-components td:is(:nth-child(2), :nth-child(3)) {
+      @apply tw:text-gray-500 tw:dark:text-gray-400;
+    }
+
+    .bikebook-components td:last-child {
+      @apply tw:basis-full;
+    }
+  }
+}
+
 /* The vehicle combobox lists hundreds of models under its matching count, which stays in view */
 .bikebook .hw-combobox {
   --hw-listbox-height: 24rem;

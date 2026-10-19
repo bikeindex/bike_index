@@ -22,6 +22,7 @@ const JURISDICTION_ATTRIBUTE = 'data-bikebook--catalog-filters-default-jurisdict
 
 // The fields as `filters` set them, none of which needs the catalog
 const fillFields = (root, filters) => {
+  panelOf(root).setAttribute('data-bikebook--catalog-filters-sort-value', filters.sort === 'price' ? 'price' : 'year')
   for (const field of ['year', 'price']) panelOf(root).setAttribute(`data-bikebook--catalog-filters-${field}-dir-value`, filters[`${field}_dir`] === 'asc' ? 'asc' : 'desc')
   for (const name of [...LISTS, ...SINGLES]) root.getElementById(`${name}-hw-hidden-field`).setAttribute('value', filters[name])
   for (const name of RANGES) root.querySelector(`input[name="${name}"]`).setAttribute('value', filters[name])

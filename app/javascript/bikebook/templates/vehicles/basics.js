@@ -3,6 +3,7 @@ import { amountDisplay, missing } from 'bikebook/templates/helpers'
 import { collapse } from 'bikebook/templates/ui/collapse'
 import { copyButton } from 'bikebook/templates/ui/copy_button'
 import { table } from 'bikebook/templates/ui/table'
+import { PINNED_ROW_HEADER } from 'bikebook/templates/vehicles/comparison_table'
 import { basicsOf, simpleFormat } from 'bikebook/templates/vehicles/model_viewer'
 import { array, isNumber, present } from 'bikebook/templates/values'
 
@@ -83,7 +84,7 @@ const compared = (vehicles, fields) => html`<section aria-label=${vehicles.lengt
   classes: `${vehicles.length === 1 ? 'tw:w-full tw:md:w-[calc(50%+6.25rem)] tw:md:min-w-0!' : 'tw:w-full'} tw:table-fixed ${MIN_WIDTHS[vehicles.length] ?? MIN_WIDTHS.at(-1)} ${vehicles.length > 3 ? `tw:mx-auto ${MAX_WIDTHS[vehicles.length] ?? MAX_WIDTHS[5]}` : ''}`,
   records: fields,
   columns: [
-    { label: html`<span class="tw:sr-only">Field</span>`, rowHeader: true, classes: 'tw:w-50 tw:px-2.5! tw:py-2! tw:align-top tw:font-bold', cell: ({ label }) => label },
+    { label: html`<span class="tw:sr-only">Field</span>`, rowHeader: true, classes: 'tw:w-32 tw:md:w-50 tw:px-2.5! tw:py-2! tw:align-top tw:font-bold', cellClass: () => PINNED_ROW_HEADER, cell: ({ label }) => label },
     ...vehicles.map((vehicle) => ({
       label: html`${vehicle.photo('tw:mb-2 tw:aspect-[4/3]')}${manufacturerLine(vehicle.manufacturer)}<span class="tw:inline-flex tw:items-baseline tw:gap-1">${
         vehicle.model}${copyButton({ value: vehicle.value, label: 'Copy ID', tooltip: true })}</span>`,
