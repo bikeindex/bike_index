@@ -13,7 +13,7 @@ module EbikeRuleServices
     # Corrections the catalog doesn't carry yet: `either` limits are alternatives, and NOT_AN_EBIKE folds a
     # class into the one e-moto entry, listed last. New Jersey's law counts an electric motorized bicycle as
     # a motorcycle, and a dirt bike is one too
-    NOT_AN_EBIKE = {id: "out_of_class", not_an_ebike: true}.freeze
+    NOT_AN_EBIKE = {id: "evc/out_of_class", not_an_ebike: true}.freeze
     CLASS_OVERRIDES = {
       "evc/us/nj/motorized_bicycle" => {either: true},
       "evc/us/nj/electric_motorized_bicycle" => NOT_AN_EBIKE,

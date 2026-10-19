@@ -224,13 +224,13 @@ function filter (params) {
       (priceMin == null || model.msrp_cents >= priceMin * 100) && (priceMax == null || model.msrp_cents <= priceMax * 100)))
 }
 
-// out_of_class is the catalog's own marker, as a model with no classified mode is unknown rather than out of class, and
-// out_of_class/US-CA its marker for one in no class in that state alone, where it's out of class rather than the US
+// evc/out_of_class is the catalog's own marker, as a model with no classified mode is unknown rather than out of class,
+// and evc/out_of_class/US-CA its marker for one in no class in that state alone, where it's out of class rather than the US
 // classes it carries. A state's class matches the models carrying its groups
 function propelled ({ electric, e_vehicle_classifications: carried = [] }, propulsion, jurisdiction) {
   if (propulsion === '0' || propulsion === '1') return electric === (propulsion === '1')
   const id = propulsion.replace(/^class_/, 'evc/us/class_')
-  if (/^(out_of_class|evc\/us\/class_\d)$/.test(id) && carried.includes(`out_of_class/US-${jurisdiction}`)) return id === 'out_of_class'
+  if (/^evc\/(out_of_class|us\/class_\d)$/.test(id) && carried.includes(`evc/out_of_class/US-${jurisdiction}`)) return id === 'evc/out_of_class'
   return [id, ...(classifications[id]?.groups ?? [])].some((classification) => carried.includes(classification))
 }
 

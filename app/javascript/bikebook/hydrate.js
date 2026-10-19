@@ -31,7 +31,7 @@ const fillFields = (root, filters) => {
     root.getElementById('jurisdiction-hw-hidden-field').setAttribute('value', jurisdiction)
     combobox(root, 'jurisdiction').dataset.hwComboboxPrefilledDisplayValue = state.dataset.autocompletableAs
   }
-  // out_of_class is in a state's classes as well as the US ones; the jurisdiction's hidden ones uncheck on connecting
+  // evc/out_of_class is in a state's classes as well as the US ones; the jurisdiction's hidden ones uncheck on connecting
   for (const value of filters.electric.split(',')) root.querySelectorAll(`input[name="electric"][value="${CSS.escape(value)}"]`).forEach((input) => input.setAttribute('checked', ''))
 }
 
@@ -43,7 +43,7 @@ const legalClasses = (root, filters, { e_vehicle_classifications: classification
     return Object.keys(classifications).filter((id) => classifications[id].e_bike_law && classifications[id].jurisdiction === filters.market)
   }
   const classes = root.querySelector(`[data-jurisdiction="${CSS.escape(filters.jurisdiction)}"]`) ?? root.querySelector('[data-jurisdiction="US"]')
-  return [...classes.querySelectorAll('input[name="electric"]')].map(({ value }) => value).filter((value) => value !== 'out_of_class')
+  return [...classes.querySelectorAll('input[name="electric"]')].map(({ value }) => value).filter((value) => value !== 'evc/out_of_class')
 }
 
 // `url`'s filters, "all" markets as Any, without which it and the jurisdiction - a state's abbreviation, or US - are the
