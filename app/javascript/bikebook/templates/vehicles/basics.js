@@ -78,7 +78,7 @@ export const basics = ({ presenter, vehicles, class3Throttle }) => {
 }
 
 const compared = (vehicles, fields) => html`<section aria-label=${vehicles.length > 1 ? 'Overview comparison' : 'Overview'} class="tw:mt-6 ${vehicles.length > 3
-  ? 'tw:mx-[calc(50%-50vw)] tw:w-screen tw:px-4'
+  ? 'tw:twpagebleed tw:px-4'
   : ''}">${table({
   classes: `${vehicles.length === 1 ? 'tw:w-full tw:md:w-[calc(50%+6.25rem)] tw:md:min-w-0!' : 'tw:w-full'} tw:table-fixed ${MIN_WIDTHS[vehicles.length] ?? MIN_WIDTHS.at(-1)} ${vehicles.length > 3 ? `tw:mx-auto ${MAX_WIDTHS[vehicles.length] ?? MAX_WIDTHS[5]}` : ''}`,
   records: fields,

@@ -111,7 +111,7 @@ export const geometryOverlay = ({ presenter, vehicles, sizes, frames, beside = f
   // out to the screen's edges on a phone, as the cards below it are
   return html`<section aria-label="Geometry overlay" data-controller=${overlay ? 'bikebook--geometry-overlay' : nothing} class="tw:mx-auto tw:mt-6
     tw:w-full tw:max-w-4xl tw:space-y-3 tw:rounded-sm tw:border tw:border-gray-200 tw:bg-white tw:p-4 tw:dark:border-gray-700 tw:dark:bg-gray-800
-    tw:max-[500px]:mx-[calc(50%-50vw)] tw:max-[500px]:w-screen tw:max-[500px]:rounded-none tw:max-[500px]:border-x-0 ${beside
+    tw:max-[500px]:twpagebleed tw:max-[500px]:rounded-none tw:max-[500px]:border-x-0 ${beside
       ? 'tw:min-[1500px]:mx-0 tw:min-[1500px]:basis-2/5 tw:min-[1500px]:shrink-0'
       : ''}">${sectionHeading('Geometry overlay')}${
     overlay ? drawing(presenter, drawn, labelled) : nothing}${missingNote}</section>`

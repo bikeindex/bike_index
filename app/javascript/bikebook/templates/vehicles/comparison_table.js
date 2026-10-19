@@ -111,7 +111,7 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], besid
 
   // Out to the window's edges, the table at least the page's 78rem column and wider as its vehicles need, scrolling
   // only once it's the window's width; its own min-w-full would make it the window's width
-  return html`<section aria-label="Sizes & geometry comparison" class="tw:mt-6 tw:mx-[calc(50%-50vw)] tw:w-screen tw:px-4 ${beside ? 'tw:min-[1500px]:mx-0 tw:min-[1500px]:w-auto tw:min-[1500px]:min-w-0 tw:min-[1500px]:flex-1 tw:min-[1500px]:px-0' : ''}">${table({
+  return html`<section aria-label="Sizes & geometry comparison" class="tw:mt-6 tw:twpagebleed tw:px-4 ${beside ? 'tw:min-[1500px]:mx-0 tw:min-[1500px]:w-auto tw:min-[1500px]:min-w-0 tw:min-[1500px]:flex-1 tw:min-[1500px]:px-0' : ''}">${table({
     classes: 'tw:mx-auto tw:min-w-[min(100%,78rem)]!',
     records: rows,
     columns: [
