@@ -455,6 +455,17 @@ RSpec.describe EbikeRulesController, type: :request do
       get "/ebike-rules", params: {state: "", vehicle_models: ""}
       expect(response).to redirect_to("/ebike-rules?vehicle_models=")
 
+      # on a checked country's page, it waits for one there
+      get "/ebike-rules/CA/ON", params: {state: "", vehicle_models: ""}
+      expect(response).to redirect_to("/ebike-rules/CA?vehicle_models=")
+      get "/ebike-rules/US", params: {state: "", vehicle_models: ""}
+      expect(response).to redirect_to("/ebike-rules/US?vehicle_models=")
+      get "/ebike-rules/EU", params: {state: "", vehicle_models: ""}
+      expect(response).to redirect_to("/ebike-rules?vehicle_models=")
+
+      get "/ebike-rules/CA", params: {vehicle_models: ""}
+      expect(page).to have_css("[role='alert']", text: "Choose a province or territory.")
+
       get "/ebike-rules", params: {vehicle_models: ""}
 
       expect(page).to have_css("[role='alert']", text: "Choose a state.")

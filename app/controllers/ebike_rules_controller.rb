@@ -13,6 +13,9 @@ class EbikeRulesController < ApplicationController
         place_path(chosen, query)
       elsif code == "US"
         ebike_rules_place_path("US", query)
+      # no place picked waits for one on the page's country, as the form does with JavaScript
+      elsif code.blank? && (country = page_country)
+        ebike_rules_place_path(country, query)
       else
         ebike_rules_path(query)
       end
@@ -67,7 +70,15 @@ class EbikeRulesController < ApplicationController
     (code == code.downcase && us) || EbikeRuleServices::Places.find(code.upcase) || us
   end
 
-  def default_title = translation(:title, controller_method: :show)
+  # The checked country of the page a form was sent from, /ebike-rules/US's too
+  def page_country
+    country, region = request.path_parameters.values_at(:country, :region)
+    page = country && place_for([country, region].compact.join("-"))
+    country = EbikeRuleServices::Places.country(page) if page
+    country if EbikeRuleServices::Places::CHECKED_COUNTRIES.include?(country)
+  end
+
+  def default_title =translation(:title, controller_method: :show)
 
   # The title of the page a place cleared from the form goes to: /ebike-rules, or a checked country's own
   def country_title(country)
