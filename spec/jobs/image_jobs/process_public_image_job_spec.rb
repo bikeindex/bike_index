@@ -163,6 +163,21 @@ RSpec.describe ImageJobs::ProcessPublicImageJob, type: :job do
     end
   end
 
+  context "truncated heic" do
+    let(:public_image) do
+      data = File.binread(Rails.root.join("spec/fixtures/bike_photo-gps.heic")).first(60_000)
+      FactoryBot.create(:public_image, imageable: bike, file: {io: StringIO.new(data), filename: "truncated.heic"})
+    end
+
+    it "removes the image rather than raising" do
+      blob
+
+      expect { instance.perform(public_image.id) }.to change(PublicImage.unscoped, :count).by(-1)
+      Sidekiq::ActiveJob::Wrapper.drain # purge_later
+      expect(ActiveStorage::Blob.exists?(blob.id)).to be_falsey
+    end
+  end
+
   context "imageable that isn't a bike" do
     let(:public_image) { FactoryBot.create(:public_image, :with_attached_file, imageable: FactoryBot.create(:organization)) }
 

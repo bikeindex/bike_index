@@ -11,7 +11,12 @@ module ImageJobs
       return unless public_image&.file_needs_processing?
 
       blob = public_image.file.blob
-      prepare_image(blob) unless blob.binx_data.to_h["stripped"] # A second pass would re-encode
+      begin
+        prepare_image(blob) unless blob.binx_data.to_h["stripped"] # A second pass would re-encode
+      rescue Vips::Error
+        # A file vips can't read (a truncated upload) never renders, and keeps its GPS - retrying won't change it
+        return public_image.destroy
+      end
       # Not `preprocessed` - those generate off the un-stripped original, racing the strip
       PublicImage::VARIANTS.each_key { |size| public_image.file.variant(size).processed }
 
