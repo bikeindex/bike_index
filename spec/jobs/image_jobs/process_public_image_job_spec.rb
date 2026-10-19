@@ -163,23 +163,6 @@ RSpec.describe ImageJobs::ProcessPublicImageJob, type: :job do
     end
   end
 
-  # Production uploads like this raised on every Sidekiq retry
-  context "truncated heic" do
-    let(:image_path) { "spec/fixtures/bike_photo-gps.heic" }
-    let(:public_image) do
-      data = File.binread(Rails.root.join(image_path), 60_000)
-      FactoryBot.create(:public_image, imageable: bike, file: {io: StringIO.new(data), filename: "truncated.heic"})
-    end
-
-    it "removes the image rather than raising" do
-      blob
-
-      expect { instance.perform(public_image.id) }.to change(PublicImage, :count).by(-1)
-      Sidekiq::ActiveJob::Wrapper.drain # purge_later
-      expect(ActiveStorage::Blob.exists?(blob.id)).to be_falsey
-    end
-  end
-
   context "imageable that isn't a bike" do
     let(:public_image) { FactoryBot.create(:public_image, :with_attached_file, imageable: FactoryBot.create(:organization)) }
 

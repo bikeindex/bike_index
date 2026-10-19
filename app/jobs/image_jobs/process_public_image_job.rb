@@ -11,10 +11,7 @@ module ImageJobs
       return unless public_image&.file_needs_processing?
 
       blob = public_image.file.blob
-      unless blob.binx_data.to_h["stripped"] # A second pass would re-encode
-        # Unreadable (a truncated upload) - retrying won't fix it, and it'd keep its GPS
-        return public_image.destroy unless prepare_image(blob)
-      end
+      prepare_image(blob) unless blob.binx_data.to_h["stripped"] # A second pass would re-encode
       # Not `preprocessed` - those generate off the un-stripped original, racing the strip
       PublicImage::VARIANTS.each_key { |size| public_image.file.variant(size).processed }
 
@@ -33,15 +30,11 @@ module ImageJobs
     def prepare_image(blob)
       to_webp = PublicImage::WEBP_SOURCE_TYPES.include?(blob.content_type)
       prepared = blob.open do |file|
-        next unless readable?(file)
-
         source = ImageProcessing::Vips.source(file).saver(strip: true)
         # n: -1 keeps every gif frame; vips reads page one otherwise. Not when converting -
         # pages there are a tiff's scans, which shouldn't become an animation
         to_webp ? source.convert("webp").call : source.loader(n: -1).call
       end
-      return unless prepared
-
       # Before the upload, which re-identifies content_type using the filename
       blob.filename = "#{blob.filename.base}.webp" if to_webp
       blob.upload(prepared) # Resets checksum/byte_size, which still describe the pre-strip bytes
@@ -49,14 +42,6 @@ module ImageJobs
       stamp!(blob, "stripped" => true)
     ensure
       prepared&.close!
-    end
-
-    # Header only, so it fails on the file itself and not a save it can't make (webp caps at 16383px)
-    def readable?(file)
-      Vips::Image.new_from_file(file.path)
-      true
-    rescue Vips::Error
-      false
     end
 
     # Not metadata - a direct upload posts that, so a client could claim to be processed.
