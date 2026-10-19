@@ -21,7 +21,7 @@ RSpec.describe EbikeRulesController, type: :request do
         .and have_css("[role='option']", text: "District of Columbia", visible: :all)
         .and have_css("[role='option']", text: "Wyoming", visible: :all)
         .and have_css("form[action='/ebike-rules']")
-        .and have_text("Location not shared")
+        .and have_css("[data-inline-note]", text: "Choose your state from the list.")
         .and have_css("[data-ebike-rules--lookup-manifest-url-value='#{Integrations::Bikebook::Catalog::MANIFEST_URL}']")
         .and have_no_css("[role='status']")
         .and have_no_css("[role='alert']")
@@ -296,6 +296,10 @@ RSpec.describe EbikeRulesController, type: :request do
       expect(page).to have_css("#ebike-rules-switch-country [role='option']", text: "United States (US)", visible: :all)
         .and have_css("#ebike-rules-switch-country [role='option']", text: "European Union (EU)", visible: :all)
         .and have_no_css("#ebike-rules-switch-country [role='option']", text: "Ontario", visible: :all)
+
+      # without a bike, a prompt to pick one
+      get "/ebike-rules/CA"
+      expect(page).to have_css("[data-inline-note]", text: "Choose your province or territory from the list.")
     end
 
     it "checks a bike against a province's law, in km/h" do

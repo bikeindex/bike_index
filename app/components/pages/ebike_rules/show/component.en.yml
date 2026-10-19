@@ -28,6 +28,8 @@ en:
             then inspected on an ongoing basis to keep the listing.
           certification_involves_heading: What certification involves
           check_my_bike: Check my bike
+          choose_province: Choose your province or territory from the list.
+          choose_state: Choose your state from the list.
           compare_html: Want to compare multiple bikes? %{link}
           country: Country
           custom_details: Custom details
@@ -50,9 +52,6 @@ en:
           how_to_check_lookup: Look the model up above. BikeBook shows certification
             where it's on record.
           kmh: "%{kmh} km/h"
-          location_not_shared: Location not shared. Choose your state from the list.
-          location_not_shared_canada: Location not shared. Choose your province or
-            territory from the list.
           model_details: "%{model} details"
           motor_wattage: Motor wattage (W)
           mph: "%{mph} mph"

@@ -86,13 +86,11 @@
             </p>
           </template>
 
-          <%# The detected place shares a line with the country switch, until a pick clears it %>
+          <%# A note on the place runs on into the country switch, until a pick clears it %>
           <div
             class="
-              tw:flex tw:flex-col tw:gap-2 tw:has-[[data-detected]]:flex-row
-              tw:has-[[data-detected]]:flex-wrap
-              tw:has-[[data-detected]]:items-center
-              tw:has-[[data-detected]]:gap-x-1
+              tw:flex tw:flex-col tw:gap-2 tw:has-[[data-inline-note]]:block
+              tw:has-[[data-inline-note]]:[&_p]:inline
             "
           >
             <div
@@ -103,19 +101,19 @@
                 <%= field_error(:state, copy[:state_error]) %>
               <% elsif detected? %>
                 <p
-                  class="
-                    tw:flex tw:items-center tw:gap-1.5 tw:text-[13px]
-                    tw:text-gray-700 tw:dark:text-gray-300
-                  "
-                  data-detected
+                  class="tw:text-[13px] tw:text-gray-700 tw:dark:text-gray-300"
+                  data-inline-note
                 >
-                  <%= helpers.inline_svg_tag("icons/map-pin.svg", class: "tw:size-3.5 tw:flex-none tw:text-blue-600", aria_hidden: true) %>
+                  <%= helpers.inline_svg_tag("icons/map-pin.svg", class: "tw:inline tw:size-3.5 tw:align-[-2px] tw:text-blue-600", aria_hidden: true) %>
 
                   <span><%= translation(".detected_place_html", state: @lookup.detected_place[:name]) %></span>
                 </p>
               <% elsif place_value.nil? %>
-                <p class="tw:text-[13px] tw:text-gray-700 tw:dark:text-gray-300">
-                  <%= copy[:location_not_shared] %>
+                <p
+                  class="tw:text-[13px] tw:text-gray-700 tw:dark:text-gray-300"
+                  data-inline-note
+                >
+                  <%= copy[:choose_place] %>
                 </p>
               <% end %>
             </div>

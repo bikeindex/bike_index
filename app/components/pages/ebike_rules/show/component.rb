@@ -96,7 +96,7 @@ module Pages
         def copy
           @copy ||= if us?
             {subheading: translation(".subheading"), state: translation(".state"), select_state: translation(".select_state"),
-             state_error: translation(".state_error"), location_not_shared: translation(".location_not_shared"),
+             state_error: translation(".state_error"), choose_place: translation(".choose_state"),
              not_in_country: translation(".not_in_us_html", switch_country:), watts_placeholder: translation(".watts_placeholder"),
              parents_body: translation(".parents_body"), parents_link: translation(".parents_link"),
              parent_step_1_body: translation(".parent_step_1_body"), parent_step_2_title: translation(".parent_step_2_title"),
@@ -104,7 +104,7 @@ module Pages
              disclaimer: translation(".disclaimer")}
           else
             {subheading: translation(".subheading_canada"), state: translation(".province"), select_state: translation(".select_province"),
-             state_error: translation(".province_error"), location_not_shared: translation(".location_not_shared_canada"),
+             state_error: translation(".province_error"), choose_place: translation(".choose_province"),
              not_in_country: translation(".not_in_canada_html", switch_country:), watts_placeholder: translation(".watts_placeholder_canada"),
              parents_body: translation(".parents_body_canada"), parents_link: translation(".parents_link_canada"),
              parent_step_1_body: translation(".parent_step_1_body_canada"), parent_step_2_title: translation(".parent_step_2_title_canada"),
