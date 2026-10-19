@@ -38,7 +38,7 @@ const typeLabel = (each) => [each.type, each.type_detail].filter(present).join('
 // One vehicle's card, marked where it differs from `others`
 export const modelViewer = (args) => new ModelViewer(args).render()
 
-// A mode the bike is sold with, as one an app update unlocks is, as EbikeRuleServices::BikebookVehicles has it
+// A mode the bike is sold with. One an app update unlocks is stock, not optional, as EbikeRuleServices::BikebookVehicles has it
 const stock = ({ availability }) => [undefined, null, 'stock', 'app_update'].includes(availability)
 
 const WIDE_TIRE = 50
