@@ -7,10 +7,11 @@ module EbikeRuleServices
   # vehicle_type is its catalog type, "cargo_bike". stock_throttle is a throttle it's sold with, rather than one sold separately. optional_classes are the US classes only
   # a mode it isn't sold with - an upgrade, an app update - brings, by that mode's name, "throttle" or "assist".
   # ul2849 and ul2271 are :certified or :unknown, or :unrecorded for a bike entered by hand. watts is rated power, which
-  # states cap; peak_watts only stands in for a model the catalog records no rating for
+  # states cap; peak_watts only stands in for a model the catalog records no rating for. Speeds are in km/h too, as the
+  # catalog records them, for a law outside the US; assists_past_kmh is a hand entry's, past any speed it gives
   Bike = Data.define(:bikebook_id, :manufacturer_name, :model, :first_year, :vehicle_type, :e_bike_class, :class_unknown,
-    :e_vehicle_classifications, :optional_classes, :watts, :peak_watts, :top_assist_mph, :throttle, :stock_throttle, :throttle_mph, :ul2849,
-    :ul2271, :photo_url) do
+    :e_vehicle_classifications, :optional_classes, :watts, :peak_watts, :top_assist_mph, :top_assist_kmh, :assists_past_kmh,
+    :throttle, :stock_throttle, :throttle_mph, :throttle_kmh, :ul2849, :ul2271, :photo_url) do
     # Classed by the federal limits, as BikebookVehicles classes an unclassified model; over 28 mph is none. A Class 3
     # with a throttle is Class 2 as well, as a model whose assist reaches 28 mph and whose throttle stops at 20 is
     def self.manual(top_mph:, watts:, throttle:)
@@ -20,8 +21,16 @@ module EbikeRuleServices
       end
       classes = (e_bike_class == 3 && throttle) ? [2, 3] : [e_bike_class].compact
       new(bikebook_id: nil, manufacturer_name: nil, model: nil, first_year: nil, vehicle_type: "bike", e_bike_class:, class_unknown: false,
-        e_vehicle_classifications: classes.map { "evc/us/class_#{it}" }, optional_classes: {},
-        watts:, peak_watts: nil, top_assist_mph: (top_mph if e_bike_class), throttle:, stock_throttle: throttle, throttle_mph: nil, ul2849: :unrecorded, ul2271: :unrecorded, photo_url: nil)
+        e_vehicle_classifications: classes.map { "evc/us/class_#{it}" }, optional_classes: {}, watts:, peak_watts: nil,
+        top_assist_mph: (top_mph if e_bike_class), top_assist_kmh: nil, assists_past_kmh: nil, throttle:, stock_throttle: throttle,
+        throttle_mph: nil, throttle_kmh: nil, ul2849: :unrecorded, ul2271: :unrecorded, photo_url: nil)
+    end
+
+    # Entered as within a Canadian law's cap, or past it, which is past Class 1 and 2's 20 mph too
+    def self.manual_metric(top_kmh:, watts:, throttle:)
+      cap = EbikeRuleServices::Places::CANADA_SPEED_CAP_KMH
+      within = top_kmh <= cap
+      manual(top_mph: within ? 20 : 29, watts:, throttle:).with(top_assist_kmh: (top_kmh if within), assists_past_kmh: (cap unless within))
     end
 
     def manual? = bikebook_id.nil?
@@ -49,6 +58,9 @@ module EbikeRuleServices
 
     # Entered by hand as faster than any class, so its top speed is only known to be past Class 3's
     def assists_past_mph = (28 if manual? && e_bike_class.nil?)
+
+    # A law outside the US caps the motor's speed however it's reached
+    def top_kmh = [top_assist_kmh, throttle_kmh].compact.max
 
     def make_and_model = [manufacturer_name, model].compact.join(" ")
   end

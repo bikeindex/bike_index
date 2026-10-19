@@ -10,6 +10,10 @@ en:
             New York City requires e-bikes and batteries sold there to meet UL 2849
             or UL 2271 (Local Law 39 of 2023). Universities, housing providers and
             transit agencies are adopting similar rules for indoor storage and charging.
+          banned_body_canada: >-
+            Universities, housing providers and transit agencies are adopting rules
+            for storing and charging e-bikes indoors, and certification is what they
+            look for.
           banned_heading: Why uncertified bikes are being banned
           battery_safety: Battery and fire safety
           bike_error: Pick a bike from the list, or enter its details manually.
@@ -23,16 +27,20 @@ en:
             short-circuit, impact, water and thermal-runaway tests. The factory is
             then inspected on an ongoing basis to keep the listing.
           certification_involves_heading: What certification involves
-          change: change?
           check_my_bike: Check my bike
+          choose_province: Choose your province or territory from the list.
+          choose_state: Choose your state from the list.
           compare_html: Want to compare multiple bikes? %{link}
           country: Country
           custom_details: Custom details
           details_legend: Your bike's details
-          detected_html: We detected <strong>%{state}</strong> —
+          detected_place_html: We detected <strong>%{state}</strong>.
           disclaimer: >-
             Bike Index is a 501(c)(3) nonprofit. State law summaries are for reference,
             not legal advice.
+          disclaimer_canada: >-
+            Bike Index is a nonprofit. Provincial and territorial law summaries are
+            for reference, not legal advice.
           for_parents: For parents
           form_label: E-bike compliance lookup
           has_throttle: Has a throttle?
@@ -43,20 +51,29 @@ en:
           how_to_check_heading: How to check a bike
           how_to_check_lookup: Look the model up above. BikeBook shows certification
             where it's on record.
-          location_not_shared: Location not shared. Choose your state from the list.
+          kmh: "%{kmh} km/h"
           model_details: "%{model} details"
           motor_wattage: Motor wattage (W)
           mph: "%{mph} mph"
+          not_in_canada_html: Not in Canada? %{switch_country}
           not_in_us_html: Not in the US? %{switch_country}
           over_28_mph: Over 28 mph
+          over_kmh: Over %{kmh} km/h
           parent_step_1_body: >-
             Many states set a minimum age for Class 3, and some for every class. Look
             up your state before you choose a bike.
+          parent_step_1_body_canada: >-
+            Most provinces set a minimum age to ride an e-bike, from 12 to 18. Look
+            up yours before you choose a bike.
           parent_step_1_title: Check the age rules
           parent_step_2_body: >-
             Pedal-assist only, no throttle, and it stops helping at 20 mph. It's the
             easiest class to learn and allowed in the most places.
+          parent_step_2_body_canada: >-
+            No throttle, so the motor helps only while they pedal. It's the easiest
+            kind of e-bike to learn on.
           parent_step_2_title: Start with Class 1
+          parent_step_2_title_canada: Start with pedal-assist
           parent_step_3_body: >-
             Your child should already brake, signal, look over their shoulder and
             hold a straight line on a regular bike. Practice on the e-bike somewhere
@@ -77,17 +94,27 @@ en:
             E-bikes are heavier and faster than the bikes most kids learn on. Before
             you buy, find out what your state and town allow, and make sure your child
             is ready to ride one safely.
+          parents_body_canada: >-
+            E-bikes are heavier and faster than the bikes most kids learn on. Before
+            you buy, find out what your province and town allow, and make sure your
+            child is ready to ride one safely.
           parents_heading: Buying an e-bike for your child?
           parents_link: Look up your state's age and helmet rules
+          parents_link_canada: Look up your province's age and helmet rules
+          province: Province or territory
+          province_error: Choose a province or territory.
           recoveries_html: "%{number} recoveries"
           register_band_heading: Registered bikes are recovered 2× more often when
             stolen. Registration is free.
           register_your_bike: Register your bike
           select_country: Select a country
+          select_province: Select your province or territory
           select_state: Select your state
           state: State
           state_error: Choose a state.
           subheading: Enter your state and bike to see your state's rules.
+          subheading_canada: Enter your province or territory and bike to see its
+            rules.
           switch_country: switch country
           switch_country_title: Switch country
           top_speed: What is its top speed?
@@ -113,3 +140,4 @@ en:
             an e-bike comes indoors.
           visit_bikebook_link: Visit BikeBook.
           watts_placeholder: e.g. 750
+          watts_placeholder_canada: e.g. 500

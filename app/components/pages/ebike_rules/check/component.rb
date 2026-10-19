@@ -18,17 +18,17 @@ module Pages
             # A frame response's layout has no title, and the state's is in this one
             # a picked model's details, which the browser copies into the details panel
             safe_join([tag.span(hidden: true, data: {page_title: @page_title, bike_details: @lookup.details.to_json}),
-              (render(Pages::EbikeRules::Results::Component.new(lookup: @lookup)) if @lookup.result?), outside_us_note].compact)
+              (render(Pages::EbikeRules::Results::Component.new(lookup: @lookup)) if @lookup.result?), outside_checked_countries_note].compact)
           end
         end
 
         private
 
-        def outside_us_note
+        def outside_checked_countries_note
           place = @lookup.place
-          return if place.nil? || EbikeRuleServices::Places.us?(place)
+          return if place.nil? || EbikeRuleServices::Places::CHECKED_COUNTRIES.include?(EbikeRuleServices::Places.country(place))
 
-          tag.p(translation(".outside_us", place: place[:name]), class: "#{Pages::EbikeRules::Show::Component::SECTION_CLASSES} tw:mt-6 " \
+          tag.p(translation(".outside_checked_countries", place: place[:name]), class: "#{Pages::EbikeRules::Show::Component::SECTION_CLASSES} tw:mt-6 " \
             "tw:text-[15px] tw:text-gray-700 tw:dark:text-gray-300")
         end
       end

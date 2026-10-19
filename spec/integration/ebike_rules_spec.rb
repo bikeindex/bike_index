@@ -124,22 +124,38 @@ RSpec.describe "E-bike rules", :js, type: :system do
     # its link picks it in the form at the top, rather than loading its page, which would clear the filter
     wait_for_stimulus("ebike-rules--lookup")
     click_link "Check an e-bike in New Jersey"
-    expect(page).to have_field("State", with: "New Jersey (US-NJ)", obscured: false)
+    expect(page).to have_field("State", with: "New Jersey (NJ)", obscured: false)
     expect(page).to have_current_path("/ebike-rules/US/NJ")
     expect(page).to have_title("New Jersey e-bike laws")
     expect(page).to have_field("Filter states", with: "new")
     expect(page).to have_css("#ebike-rules-classes h2", text: "New Jersey e-bike classes")
 
-    # a place outside the US, from the switch under the state, shows its laws rather than checking a bike
+    # Canada, from the switch under the state, picks a province to check a bike against, among its models
     click_button "switch country"
     within("#ebike-rules-switch-country") do
       type_into(find_field("Country"), "Canada")
       retry_on_detach { find("[role='option']", text: "Canada").click }
     end
     expect(page).to have_current_path("/ebike-rules/CA")
-    expect(page).to have_field("State", with: "Canada (CA)")
-    expect(page).to have_text("Bike checks cover US states for now. Canada's e-bike laws are below.")
+    expect(page).to have_field("Province or territory", with: "")
     expect(page).to have_css("#ebike-rules-classes h3", text: "Canadian Power-Assisted Bicycle")
       .and have_css("#ebike-rules-classes dd", text: "32 km/h")
+    wait_for_stimulus("ebike-rules--lookup")
+    type_into(find_field("Province or territory"), "Ontario")
+    retry_on_detach { find("[role='option']", text: "Ontario").click }
+    expect(page).to have_css("#ebike-rules-classes h2", text: "E-bike laws in Ontario")
+    type_into(find_field("Bike model", disabled: false, wait: 10), "haul")
+    expect(page).to have_css("[role='option']", count: 1)
+    retry_on_detach { find("[role='option']", text: "Specialized Haul ST").click }
+    expect(page).to have_css("[role='status']", text: "Your Specialized Haul ST is legal to ride in Ontario under the Power-Assisted Bicycle rules.")
+    expect(page).to have_current_path("/ebike-rules/CA/ON?vehicle_models=m%2Fspecialized%2F2025%2Fhaul_st_ca")
+    expect(page).to have_title("Ontario e-bike laws")
+    expect(page).to have_checked_field("top_speed", with: "32", visible: :all).and have_field("Motor wattage (W)", with: "500")
+
+    # clearing the province leaves the bike waiting on Canada's page
+    find("[data-ebike-rules--lookup-target='state'] .hw-combobox__handle").click
+    expect(page).to have_current_path("/ebike-rules/CA?vehicle_models=m%2Fspecialized%2F2025%2Fhaul_st_ca")
+    expect(page).to have_no_css("[role='status']")
+    expect(page).to have_css("#ebike-rules-classes h2", text: "E-bike laws in Canada")
   end
 end

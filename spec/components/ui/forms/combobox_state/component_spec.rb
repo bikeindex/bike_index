@@ -24,6 +24,15 @@ RSpec.describe UI::Forms::ComboboxState::Component, type: :component do
     end
   end
 
+  context "with states submitting their own values" do
+    let(:options) { {states: [{name: "Ontario", abbr: "ON", value: "CA-ON"}], html_options: {value: "CA-ON"}} }
+
+    it "submits the value, showing the abbreviation" do
+      expect(component).to have_css("[role='option'][data-value='CA-ON']", text: "Ontario (ON)", visible: :all)
+      expect(component).to have_css("[data-hw-combobox-prefilled-display-value='Ontario (ON)']")
+    end
+  end
+
   context "with ids, on a form" do
     let(:california) { FactoryBot.create(:state_california) }
     let(:address_record) { AddressRecord.new(region_record_id: california.id) }

@@ -20,6 +20,7 @@ module EbikeRuleServices
       motors = record["motors"]
       modes = updated(motors.flat_map { it["operating_modes"] || [] })
       throttle_modes = modes.select { it["mode"] == "throttle" }
+      assist_modes = modes.select { it["mode"] == "assist" }
       certifications = motors.map { it["certification"] }.join(", ")
       classifications = modes.flat_map { Array(it["e_vehicle_classifications"]) }.uniq
       tiers = classifications - EbikeRuleServices::StateLaws.e_bike_law_ids
@@ -36,10 +37,13 @@ module EbikeRuleServices
         # a state's cap is on the motors together
         watts: total(motors, "rated_power"),
         peak_watts: total(motors, "peak_power"),
-        top_assist_mph: mph(modes.select { it["mode"] == "assist" }),
+        top_assist_mph: mph(assist_modes),
+        top_assist_kmh: kmh(assist_modes),
+        assists_past_kmh: nil,
         throttle: throttle_modes.any?,
         stock_throttle: stock_throttle?(record, throttle_modes),
         throttle_mph: mph(throttle_modes),
+        throttle_kmh: kmh(throttle_modes),
         ul2849: certifications.include?("UL 2849") ? :certified : :unknown,
         ul2271: certifications.include?("UL 2271") ? :certified : :unknown,
         photo_url: record["stock_photo"]
@@ -90,11 +94,10 @@ module EbikeRuleServices
 
     def total(motors, power) = motors.filter_map { it[power] }.then { it.sum if it.any? }
 
-    def mph(modes)
-      kilometers = modes.filter_map { it["max_speed"] }.max
-      kilometers && UnitSystem.kilometers_to_miles(kilometers).round
-    end
+    def mph(modes) = kmh(modes)&.then { UnitSystem.kilometers_to_miles(it).round }
 
-    conceal :attributes_from, :e_bike_class, :stock_throttle?, :optional_classes, :stock?, :updated, :total, :mph
+    def kmh(modes) = modes.filter_map { it["max_speed"] }.max
+
+    conceal :attributes_from, :e_bike_class, :stock_throttle?, :optional_classes, :stock?, :updated, :total, :mph, :kmh
   end
 end

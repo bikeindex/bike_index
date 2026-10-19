@@ -29,7 +29,7 @@
           tw:dark:text-gray-300
         "
       >
-        <%= translation(".subheading") %>
+        <%= copy[:subheading] %>
       </p>
     </div>
   </section>
@@ -43,6 +43,7 @@
       data: {controller: "ebike-rules--lookup", action: "turbo:frame-load@document->ebike-rules--lookup#checkLoaded click@window->ebike-rules--lookup#checkInState", details: details_mode,
              "ebike-rules--lookup-manifest-url-value": @manifest_url,
              "ebike-rules--lookup-path-value": ebike_rules_path,
+             "ebike-rules--lookup-country-path-value": country_path,
              "ebike-rules--lookup-display-value": bike_display,
              "ebike-rules--lookup-legend-value": translation(".details_legend"),
              "ebike-rules--lookup-model-legend-value": translation(".model_details", model: "%{model}"),
@@ -60,14 +61,14 @@
         "
       >
         <div class="tw:flex tw:min-w-0 tw:flex-[2_1_220px] tw:flex-col tw:gap-2">
-          <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :state, label_text: translation(".state"),
+          <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :state, label_text: copy[:state],
             optional_badge: false, wrapper_class: nil)) do %>
             <div
               data-ebike-rules--lookup-target="state"
               data-action="hw-combobox:selection->ebike-rules--lookup#chooseState"
             >
               <%= render(UI::Forms::ComboboxState::Component.new(states: place_options,
-                html_options: {value: @lookup.place&.dig(:code), placeholder: translation(".select_state"),
+                html_options: {value: place_value, placeholder: copy[:select_state],
                                aria: {invalid: (true if error?(:state))}})) %>
             </div>
           <% end %>
@@ -81,40 +82,46 @@
                 tw:dark:text-red-400
               "
             >
-              <%= translation(".state_error") %>
+              <%= copy[:state_error] %>
             </p>
           </template>
 
-          <div data-ebike-rules--lookup-target="stateNote" class="tw:contents">
-            <% if error?(:state) %>
-              <%= field_error(:state, translation(".state_error")) %>
-            <% elsif detected? %>
-              <p
-                class="
-                  tw:flex tw:items-center tw:gap-1.5 tw:text-[13px]
-                  tw:text-gray-700 tw:dark:text-gray-300
-                "
-              >
-                <%= helpers.inline_svg_tag("icons/map-pin.svg", class: "tw:size-3.5 tw:flex-none tw:text-blue-600", aria_hidden: true) %>
+          <%# A note on the place runs on into the country switch, until a pick clears it %>
+          <div
+            class="
+              tw:flex tw:flex-col tw:gap-2 tw:has-[[data-inline-note]]:block
+              tw:has-[[data-inline-note]]:[&_p]:inline
+            "
+          >
+            <div
+              data-ebike-rules--lookup-target="stateNote"
+              class="tw:contents"
+            >
+              <% if error?(:state) %>
+                <%= field_error(:state, copy[:state_error]) %>
+              <% elsif detected? %>
+                <p
+                  class="tw:text-[13px] tw:text-gray-700 tw:dark:text-gray-300"
+                  data-inline-note
+                >
+                  <%= helpers.inline_svg_tag("icons/map-pin.svg", class: "tw:inline tw:size-3.5 tw:align-[-2px] tw:text-blue-600", aria_hidden: true) %>
 
-                <span>
-                  <%= translation(".detected_html", state: @lookup.detected_place[:name]) %>
+                  <span><%= translation(".detected_place_html", state: @lookup.detected_place[:name]) %></span>
+                </p>
+              <% elsif place_value.nil? %>
+                <p
+                  class="tw:text-[13px] tw:text-gray-700 tw:dark:text-gray-300"
+                  data-inline-note
+                >
+                  <%= copy[:choose_place] %>
+                </p>
+              <% end %>
+            </div>
 
-                  <%= render(UI::Button::Component.new(text: translation(".change"), color: :link,
-                  data: {action: "ebike-rules--lookup#focusState"})) %>
-                </span>
-              </p>
-            <% elsif @lookup.place.nil? %>
-              <p class="tw:text-[13px] tw:text-gray-700 tw:dark:text-gray-300">
-                <%= translation(".location_not_shared") %>
-              </p>
-            <% end %>
+            <p class="tw:text-[13px] tw:text-gray-700 tw:dark:text-gray-300">
+              <%= copy[:not_in_country] %>
+            </p>
           </div>
-
-          <p class="tw:text-[13px] tw:text-gray-700 tw:dark:text-gray-300">
-            <%= translation(".not_in_us_html", switch_country: render(UI::Button::Component.new(text: translation(".switch_country"),
-              color: :link, html_class: "twlink-underlined", commandfor: COUNTRY_MODAL_ID, command: "show-modal"))) %>
-          </p>
         </div>
 
         <div class="tw:flex tw:min-w-0 tw:flex-[4_1_300px] tw:flex-col tw:gap-2">
@@ -129,7 +136,7 @@
             optional_badge: false, wrapper_class: nil)) do %>
               <%# Stamped once the catalog loads, so the combobox searches it from its first keystroke %>
               <template data-ebike-rules--lookup-target="combobox">
-                <%= render(UI::Forms::Combobox::Component.new(name: "vehicle_models", src: bikebook_path(electric: 1, market: "US"),
+                <%= render(UI::Forms::Combobox::Component.new(name: "vehicle_models", src: bikebook_path(electric: 1, market: @lookup.country),
                 dialog_label: translation(".bike_model"),
                 html_options: {value: @lookup.bikebook_id, placeholder: translation(".bike_placeholder"),
                                aria: {invalid: (true if error?(:bike))}})) %>
@@ -217,7 +224,7 @@
           <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :watts, kind: :number_field,
             label_text: translation(".motor_wattage"), optional_badge: false, wrapper_class: "tw:flex-[1_1_150px]",
             html_options: {value: @lookup.details[:watts], min: 1, inputmode: "numeric", autocomplete: "off",
-                           placeholder: translation(".watts_placeholder"), class: "tw:min-h-12 tw:text-base!",
+                           placeholder: copy[:watts_placeholder], class: "tw:min-h-12 tw:text-base!",
                            data: {action: "keydown.enter->ebike-rules--lookup#checkDetails:prevent"}})) %>
         </div>
       <% end %>
@@ -261,7 +268,7 @@
             tw:dark:text-gray-300
           "
         >
-          <%= translation(".parents_body") %>
+          <%= copy[:parents_body] %>
         </p>
 
         <a
@@ -271,7 +278,7 @@
             tw:font-semibold
           "
         >
-          <%= translation(".parents_link") %>
+          <%= copy[:parents_link] %>
           <span aria-hidden="true">→</span>
         </a>
       </div>
@@ -413,7 +420,7 @@
             tw:dark:text-gray-300
           "
         >
-          <%= translation(".banned_body") %>
+          <%= copy[:banned_body] %>
         </p>
       </div>
 
@@ -470,7 +477,7 @@
     </div>
   </section>
 
-  <%= render(Pages::EbikeRules::StateReference::Component.new) %>
+  <%= render(Pages::EbikeRules::StateReference::Component.new(country: @lookup.country)) %>
 
   <p
     class="
@@ -478,6 +485,6 @@
       tw:text-[13px] tw:text-white/75
     "
   >
-    <%= translation(".disclaimer") %>
+    <%= copy[:disclaimer] %>
   </p>
 </div>
