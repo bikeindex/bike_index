@@ -266,7 +266,7 @@ module IntegrationSpecHelpers
       const controller = window.Stimulus.getControllerForElementAndIdentifier(element, "hw-combobox")
       if (!controller?.hasAsyncSrcValue) return done()
       const giveUpAt = performance.now() + 10000
-      const settle = () => (controller.callbackQueue.length && performance.now() < giveUpAt)
+      const settle = () => (controller._isPending && performance.now() < giveUpAt)
         ? setTimeout(settle, 50) : requestAnimationFrame(() => requestAnimationFrame(done))
       setTimeout(settle, controller.debounceIntervalValue)
     JS
