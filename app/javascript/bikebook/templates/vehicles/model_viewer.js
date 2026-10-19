@@ -81,7 +81,7 @@ export const tireWidth = (presenter, width) => new ModelViewer({ presenter, data
 export const wheelSize = (presenter, bsd) => new ModelViewer({ presenter, data: {}, others: [] }).wheelSizeName(bsd)
 
 // A vehicle's names, photo and the fields the Overview lists
-export const basicsOf = ({ presenter, data, throttleBarredIn }) => new ModelViewer({ presenter, data, others: [], throttleBarredIn }).basics()
+export const basicsOf = ({ presenter, data, outOfClassId }) => new ModelViewer({ presenter, data, others: [], outOfClassId }).basics()
 
 // A vehicle's stock photo in `frame`, without the rest of what basicsOf works out
 export const photoOf = ({ presenter, data }, frame) => new ModelViewer({ presenter, data, others: [] }).stockPhoto(frame)
@@ -91,8 +91,8 @@ export const photoOf = ({ presenter, data }, frame) => new ModelViewer({ present
 export const sizesOf = ({ presenter, data, others, selectedSize, sizePath }) => new ModelViewer({ presenter, data, others, selectedSize, sizePath }).sizes()
 
 // A vehicle's electric summary beside its motors, each with its battery, marked where they differ from `others`'
-export const motorsOf = ({ presenter, data, others, throttleBarredIn }) => {
-  const viewer = new ModelViewer({ presenter, data, others, throttleBarredIn })
+export const motorsOf = ({ presenter, data, others, outOfClassId }) => {
+  const viewer = new ModelViewer({ presenter, data, others, outOfClassId })
   return sideBySide([viewer.electricSummary(), viewer.motorSections()])
 }
 
@@ -117,15 +117,15 @@ export const componentsOf = ({ presenter, vehicles, others }) => {
 }
 
 class ModelViewer {
-  // `throttleBarredIn` the viewing jurisdiction's code, US-CA, where its law bars a Class 3's throttle
-  constructor ({ presenter, data, value, comparing, idSuffix, others, removePath, selectedSize, sizePath, throttleBarredIn }) {
+  // `outOfClassId` the viewing state's out of class marker, evc/out_of_class/us/ca, where its law bars a Class 3's throttle
+  constructor ({ presenter, data, value, comparing, idSuffix, others, removePath, selectedSize, sizePath, outOfClassId }) {
     this.presenter = presenter
     this.kit = presenter.kit
     this.data = data
     this.vehicle = this.#normalize(data)
-    this.outOfClass = throttleBarredIn ? this.#throttledClass3() : null
+    this.outOfClass = outOfClassId ? this.#throttledClass3() : null
     this.others = others.map((other) => this.#normalize(other))
-    Object.assign(this, { value, comparing, idSuffix, removePath, selectedSize, sizePath, throttleBarredIn })
+    Object.assign(this, { value, comparing, idSuffix, removePath, selectedSize, sizePath, outOfClassId })
   }
 
   render () {
@@ -428,14 +428,14 @@ class ModelViewer {
   // it's out of class as sold, and outlined in place of its optional throttle's where that would put it there, both with
   // that jurisdiction's ID. Without any, its classes' names
   #classTiles () {
-    if (this.outOfClass === 'stock') return classBadges([`emoto/${this.throttleBarredIn}`])
+    if (this.outOfClass === 'stock') return classBadges([`emoto/${this.outOfClassId}`])
     const ids = this.vehicle.classifiedModes.flatMap((mode) => mode.ids)
     const numbers = [...new Set(ids.map((id) => id.match(US_CLASS)?.[1]).filter(Boolean))].sort()
     const optional = this.#optionalClasses()
     const throttled = this.outOfClass === 'throttle'
     const classes = numbers.filter((number) => !(throttled && optional.get(number) === 'throttle'))
       .map((number) => optional.has(number) ? `${number}/${optional.get(number)}` : number)
-    const tiles = [...classes, ...(this.#emoto(ids) ? ['emoto'] : throttled ? [`emoto/throttle/${this.throttleBarredIn}`] : [])]
+    const tiles = [...classes, ...(this.#emoto(ids) ? ['emoto'] : throttled ? [`emoto/throttle/${this.outOfClassId}`] : [])]
     return tiles.length ? classBadges(tiles) : presence(this.classificationNames(this.#sortedClassifications(this.vehicle)))
   }
 

@@ -18,7 +18,7 @@ const copies = (attribute, keys, classes) => {
 }
 
 // The US classes' tiles by number, '2/throttle' for one only an optional throttle brings, and 'emoto' the e-moto's,
-// 'emoto/US-CA' out of class in that jurisdiction alone, each a tooltip of its card
+// 'emoto/evc/out_of_class/us/ca' with that state's out of class marker, each a tooltip of its card
 export const classBadges = (classes) => copies('data-bikebook-class-badge', classes, 'tw:flex tw:gap-2')
 
 // The UL badges for a bike's statuses, as Pages::EbikeRules::BikeSummary has them: the certifications it carries, else
