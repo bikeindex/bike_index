@@ -120,7 +120,7 @@ export async function hydrate (catalog, source, shell, url) {
   // the visitor's country, when it's a market with models
   const panel = panelOf(root)
   const located = panel.getAttribute(MARKET_ATTRIBUTE)
-  panel.setAttribute(MARKET_ATTRIBUTE, catalog.options.market.some(({ value, count }) => value === located && count) ? located : '')
+  panel.setAttribute(MARKET_ATTRIBUTE, catalog.options.market.some(({ value }) => value === located) ? located : '')
   const filters = filtersAt(catalog, root, url)
   const [found, { filteredCount }] = await Promise.all([pickedOf(catalog, url, filters), catalog.search(filters, 0, 0)])
   const vehicles = found.slice(0, MAX_COMPARE)

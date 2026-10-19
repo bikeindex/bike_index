@@ -593,10 +593,10 @@ RSpec.describe "Bikebook", :js, type: :system do
     click_on "More filters", match: :first
     expect(page).to have_field("Market", with: "Canada (CA)")
     find_field("Market").click
-    # by name rather than the catalog's order, which is by code
+    # by name rather than the catalog's order, which is by code, and only those with models
     # each with its code, as a state's shown, rather than a count
     markets = all("#market-hw-listbox [role='option']").map(&:text)
-    expect(markets.first(6)).to eq ["Any", "Argentina (AR)", "Australia (AU)", "Canada (CA)", "China (CN)", "European Union (EU)"]
+    expect(markets).to eq ["Any", "Canada (CA)", "China (CN)", "United Arab Emirates (AE)", "United States (US)"]
     find("#market-hw-listbox [role='option']", exact_text: "Any").click
     expect(page).to have_css("#vehicle-models-count", exact_text: "(30 matching models)")
     expect(page).to have_current_path(/[?&]market=all\b/)
