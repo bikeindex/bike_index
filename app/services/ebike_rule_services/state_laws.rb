@@ -59,8 +59,8 @@ module EbikeRuleServices
       classifications[id]&.merge(CLASS_OVERRIDES.fetch(id, {}))
     end
 
-    # The catalog's marker for a vehicle in no class, or in none in `jurisdiction` alone: evc/out_of_class/US-CA
-    def out_of_class_id(jurisdiction = nil) = [NOT_AN_EBIKE[:id], jurisdiction].compact.join("/")
+    # The catalog's marker for a vehicle in no class, or in none in `jurisdiction` alone, US-CA's evc/out_of_class/us/ca
+    def out_of_class_id(jurisdiction = nil) = [NOT_AN_EBIKE[:id], jurisdiction&.downcase&.tr("-", "/")].compact.join("/")
 
     # By ISO 3166-2 code, the states whose law bars a Class 3's throttle, as California's does
     def class_3_throttle_bars = laws.filter_map { |abbreviation, law| "US-#{abbreviation}" if law[:class_3_throttle] == false }

@@ -740,7 +740,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_css("[aria-label='Overview comparison'] td button[aria-label='E-moto, not an e-bike']", count: 2, wait: 10)
     expect(tiles.call).to eq [["E-moto, not an e-bike"], ["Class 3 e-bike", "E-moto, not an e-bike"]]
     expect(all("[aria-label='Overview comparison'] td button[aria-label$='e-bike'] + [role='tooltip'] code", visible: :all).map { it.text(:all).strip })
-      .to eq ["evc/out_of_class/US-CA", "evc/us/class_3", "evc/out_of_class/US-CA"]
+      .to eq ["evc/out_of_class/us/ca", "evc/us/class_3", "evc/out_of_class/us/ca"]
     choose_option("Jurisdiction", "Colorado")
     expect(page).to have_no_css("[aria-label='Overview comparison'] td button[aria-label='E-moto, not an e-bike']")
     expect(tiles.call).to eq [["Class 2 e-bike", "Class 3 e-bike"], ["Class 2 e-bike", "Class 3 e-bike"]]
@@ -1200,8 +1200,8 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_css("#classification-cards li", text: "Riders must be 16 or older to ride a Class 3")
     expect(cards_asked.count).to eq 3
     # as is an out of class marker, which the vocabulary has no record of, its card the e-moto's
-    type_into(vehicle_field, "evc/out_of_class/US-CA")
-    retry_on_detach { find("[role='option'][data-value='evc/out_of_class/US-CA']", text: "Out of class in California").click }
+    type_into(vehicle_field, "evc/out_of_class/us/ca")
+    retry_on_detach { find("[role='option'][data-value='evc/out_of_class/us/ca']", text: "Out of class in California").click }
     expect(page).to have_css("#classification-cards h3", exact_text: "Not an e-bike", wait: 10)
     expect(page).to have_css(".hw-combobox__chip", text: "Out of class in California")
 
