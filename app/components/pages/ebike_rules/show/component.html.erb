@@ -62,7 +62,7 @@
       >
         <div class="tw:flex tw:min-w-0 tw:flex-[2_1_220px] tw:flex-col tw:gap-2">
           <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :state, label_text: copy[:state],
-            optional_badge: false, wrapper_class: "tw:contents")) do %>
+            optional_badge: false, wrapper_class: nil)) do %>
             <div
               data-ebike-rules--lookup-target="state"
               data-action="hw-combobox:selection->ebike-rules--lookup#chooseState"
@@ -135,7 +135,7 @@
             "
           >
             <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :vehicle_models, label_text: translation(".bike_model"),
-            optional_badge: false, wrapper_class: "tw:contents")) do %>
+            optional_badge: false, wrapper_class: nil)) do %>
               <%# Stamped once the catalog loads, so the combobox searches it from its first keystroke %>
               <template data-ebike-rules--lookup-target="combobox">
                 <%= render(UI::Forms::Combobox::Component.new(name: "vehicle_models", src: bikebook_path(electric: 1, market: @lookup.country),
@@ -171,7 +171,7 @@
           </p>
         </div>
 
-        <noscript class="tw:flex tw:flex-[1_0_170px] tw:sm:pt-7">
+        <noscript class="tw:flex tw:flex-[1_0_170px] tw:sm:pt-6">
           <%= render(UI::Button::Component.new(text: translation(".check_my_bike"), color: :primary, size: :lg,
             type: "submit", html_class: "tw:min-h-12 tw:w-full tw:justify-center")) %>
         </noscript>
@@ -197,7 +197,7 @@
 
         <div class="tw:flex tw:flex-wrap tw:items-start tw:gap-5">
           <%# Each control centered in the wattage field's height, so their text lines up %>
-          <div class="tw:flex tw:flex-[2_1_260px] tw:flex-col tw:gap-1.5">
+          <div class="tw:flex-[2_1_260px]">
             <span id="manual-top-speed-label" class="twlabel"><%= translation(".top_speed") %></span>
 
             <div
@@ -210,7 +210,7 @@
             </div>
           </div>
 
-          <div class="tw:flex tw:flex-[1_1_150px] tw:flex-col tw:gap-1.5">
+          <div class="tw:flex-[1_1_150px]">
             <span id="manual-throttle-label" class="twlabel"><%= translation(".has_throttle") %></span>
 
             <div
@@ -223,13 +223,11 @@
             </div>
           </div>
 
-          <div class="tw:flex tw:flex-[1_1_150px] tw:flex-col tw:gap-1.5">
-            <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :watts, kind: :number_field,
-              label_text: translation(".motor_wattage"), optional_badge: false, wrapper_class: "tw:contents",
-              html_options: {value: @lookup.details[:watts], min: 1, inputmode: "numeric", autocomplete: "off",
-                             placeholder: copy[:watts_placeholder], class: "tw:min-h-12 tw:text-base!",
-                             data: {action: "keydown.enter->ebike-rules--lookup#checkDetails:prevent"}})) %>
-          </div>
+          <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :watts, kind: :number_field,
+            label_text: translation(".motor_wattage"), optional_badge: false, wrapper_class: "tw:flex-[1_1_150px]",
+            html_options: {value: @lookup.details[:watts], min: 1, inputmode: "numeric", autocomplete: "off",
+                           placeholder: copy[:watts_placeholder], class: "tw:min-h-12 tw:text-base!",
+                           data: {action: "keydown.enter->ebike-rules--lookup#checkDetails:prevent"}})) %>
         </div>
       <% end %>
     <% end %>
