@@ -7138,11 +7138,57 @@ it:
               %{n} e %{optional}, con %{count} regole da verificare.
           yellow_headline_without_throttle: La tua %{name} è legale da guidare in
             %{state} come e-bike di classe %{n}, senza l'acceleratore opzionale.
+          green_headline_law: Il tuo %{name} è autorizzato a circolare in %{state}
+            secondo le regole %{law}.
+          kmh_html: "%{kmh} km/h"
+          law_source_html: 'Fonte: catalogo di leggi sulle e-bike di %{link}. I riassunti
+            sono a scopo informativo e non costituiscono consulenza legale.'
+          may_be_moped_canada: Potrebbe essere regolamentato come ciclomotore o veicolo
+            a motore, il che potrebbe richiedere immatricolazione e patente.
+          no_e_bike_category: Qui non esiste una categoria per le e-bike, quindi controlla
+            le norme relative a patente, immatricolazione e casco.
+          no_speed_cap_in_law: Non è previsto alcun limite di velocità nella sua legge.
+          no_watt_cap_in_law: Nessun limite di potenza nella sua legge
+          optional_to_kmh_html: Opzionale, fino a %{kmh} km/h
+          over_kmh_html: Oltre %{kmh} km/h
+          speed_over_cap_kmh_html: Assiste fino a %{kmh} km/h, oltre il limite di
+            %{cap} km/h
+          speed_past_cap_kmh_html: Assiste oltre %{past} km/h, oltre il limite %{cap}
+            km/h
+          speed_past_kmh_html: Assiste oltre %{past} km/h; verificare che si fermi
+            entro %{cap} km/h
+          speed_to_check_kmh_html: BikeBook non indica la sua velocità massima, quindi
+            verifica che il motore si fermi a %{cap} km/h
+          speed_within_cap_kmh_html: Assiste fino a %{kmh} km/h, entro il limite
+          still_reviewing_province_body: Consulta il ministero dei trasporti della
+            tua provincia o territorio per le normative vigenti sulle e-bike. Nella
+            maggior parte dei casi, la potenza dei motori delle e-bike è limitata
+            a 500 W e la velocità assistita a 32 km/h.
+          throttle_allowed_in_law: Acceleratore consentito
+          throttle_not_allowed_in_law: La sua legge non consente un acceleratore
+          throttle_not_stated_in_law: La sua legge non dice se è consentito un acceleratore
+          watts_to_check_html: Verifica che il suo motore abbia una potenza nominale
+            pari o inferiore a %{cap}W.
+          yellow_headline_law:
+            one: Il tuo %{name} è legale per guidare in %{state} secondo le regole
+              %{law}, con la regola %{count} da verificare.
+            other: Il tuo %{name} è legale per guidare in %{state} secondo le regole
+              %{law}, con %{count} regole da verificare.
+          yellow_headline_law_without_throttle: Il tuo %{name} è legale per circolare
+            in %{state} secondo le regole %{law}, senza l'acceleratore opzionale.
+          yellow_headline_motor_vehicle_law:
+            one: Il tuo %{name} potrebbe essere legale per guidare in %{state} secondo
+              le regole %{law}, con la regola %{count} da verificare.
+            other: Il tuo %{name} potrebbe essere legale per guidare in %{state} secondo
+              le regole %{law}, con %{count} regole da verificare.
+          yes_to_kmh_html: Sì, fino a %{kmh} km/h
+          your_province: La tua provincia o territorio
         rule_label:
           classes: Classi riconosciute
           power: Limite di potenza del motore
           speed: Massima velocità assistita
           throttle: Acceleratore elettrico
+          vehicle: Regolamentato come
         rule_value:
           allowed: Consentito
           classes:
@@ -7174,10 +7220,8 @@ it:
             impatto, resistenza all'acqua e instabilità termica. Lo stabilimento viene
             poi ispezionato periodicamente per mantenere la certificazione.
           certification_involves_heading: Cosa comporta la certificazione
-          change: modifica?
           check_my_bike: Controlla la mia bici
           compare_html: Vuoi confrontare più biciclette? %{link}
-          detected_html: Abbiamo rilevato <strong>%{state}</strong> —
           disclaimer: Bike Index è un'organizzazione no-profit 501(c)(3). I riassunti
             delle leggi statali sono forniti a titolo di riferimento e non costituiscono
             consulenza legale.
@@ -7189,8 +7233,6 @@ it:
             batteria e del telaio.
           how_to_check_2: Cerca quel numero in UL Product iQ.
           how_to_check_heading: Come controllare una bicicletta
-          location_not_shared: La posizione non viene condivisa. Seleziona il tuo
-            stato dall'elenco.
           motor_wattage: Potenza del motore (W)
           mph: "%{mph} mph"
           parent_step_1_body: Molti stati stabiliscono un'età minima per la Classe
@@ -7273,6 +7315,37 @@ it:
           select_country: Seleziona un paese
           switch_country: cambiare paese
           switch_country_title: Cambiare paese
+          banned_body_canada: Università, enti gestori di alloggi e aziende di trasporto
+            pubblico stanno adottando normative per la conservazione e la ricarica
+            delle e-bike al chiuso, e la certificazione è ciò che ricercano.
+          choose_province: Seleziona la tua provincia o il tuo territorio dall'elenco.
+          choose_state: Seleziona il tuo stato dall'elenco.
+          detected_place_html: Abbiamo rilevato <strong>%{state}</strong> .
+          disclaimer_canada: Bike Index è un'organizzazione senza scopo di lucro.
+            I riassunti delle leggi provinciali e territoriali sono forniti a titolo
+            informativo e non costituiscono consulenza legale.
+          kmh: "%{kmh} km/h"
+          not_in_canada_html: Non sei in Canada? %{switch_country}
+          over_kmh: Oltre %{kmh} km/h
+          parent_step_1_body_canada: Nella maggior parte delle province è prevista
+            un'età minima per guidare una e-bike, che va dai 12 ai 18 anni. Verifica
+            l'età minima nella tua provincia prima di scegliere una bicicletta.
+          parent_step_2_body_canada: Non ha l'acceleratore, quindi il motore aiuta
+            solo quando si pedala. È il tipo di e-bike più facile da imparare.
+          parent_step_2_title_canada: Inizia con la pedalata assistita
+          parents_body_canada: Le e-bike sono più pesanti e veloci delle biciclette
+            tradizionali che la maggior parte dei bambini usa per imparare ad andare
+            in bicicletta. Prima di acquistarle, informatevi sulle normative vigenti
+            nella vostra provincia e città e assicuratevi che vostro figlio sia pronto
+            a utilizzarle in sicurezza.
+          parents_link_canada: Consulta le norme sull'età e sull'uso del casco in
+            vigore nella tua provincia.
+          province: Provincia o territorio
+          province_error: Scegli una provincia o un territorio.
+          select_province: Seleziona la tua provincia o territorio
+          subheading_canada: Inserisci la tua provincia o territorio e la tua bicicletta
+            per visualizzare le relative regole.
+          watts_placeholder_canada: ad esempio 500
         state_reference:
           compiling: Stiamo raccogliendo le normative sulle e-bike di %{state} provenienti
             dalla legislatura statale e dal DMV. Tornate a trovarci presto.
@@ -7292,6 +7365,19 @@ it:
           only_classes:
             one: Solo la classe %{classes}
             other: Solo classi %{classes}
+          all_on_file_canada: Ogni provincia e territorio in archivio
+          compiling_canada: Stiamo raccogliendo le normative sulle e-bike di %{state}
+            dal suo ministero della legislazione e dei trasporti. Tornate a trovarci
+            presto.
+          filter_placeholder_canada: Digita una provincia o un territorio
+          filter_provinces: Filtra province e territori
+          heading_canada: Normativa sulle biciclette elettriche per provincia e territorio
+          limits_subheading_canada: Ogni provincia e territorio. Aprine uno per visualizzarne
+            i confini, le regole e le fonti.
+          no_match_canada: Nessuna provincia o territorio corrisponde. Prova con un
+            altro nome.
+          on_file_of_total_canada_html: "%{number} delle %{total} province e territori
+            registrati · altri in fase di revisione"
         ul_badge:
           certified: Certificato UL %{standard}
           meaning_2271_certified: Il pacco batterie ha superato i test di sicurezza
@@ -7364,8 +7450,9 @@ it:
           electric_certification: Certificazione elettrica
           not_provided: Non fornito
         check:
-          outside_us: Per ora i controlli sulle biciclette riguardano gli stati degli
-            Stati Uniti. Le leggi sulle e-bike di %{place} sono riportate di seguito.
+          outside_checked_countries: Per ora i controlli sulle biciclette riguardano
+            gli stati degli Stati Uniti e le province canadesi. Le leggi sulle e-bike
+            di %{place} sono riportate di seguito.
       memberships:
         new:
           become_a_member: Diventa membro
