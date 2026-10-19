@@ -86,35 +86,44 @@
             </p>
           </template>
 
-          <div data-ebike-rules--lookup-target="stateNote" class="tw:contents">
-            <% if error?(:state) %>
-              <%= field_error(:state, copy[:state_error]) %>
-            <% elsif detected? %>
-              <p
-                class="
-                  tw:flex tw:items-center tw:gap-1.5 tw:text-[13px]
-                  tw:text-gray-700 tw:dark:text-gray-300
-                "
-              >
-                <%= helpers.inline_svg_tag("icons/map-pin.svg", class: "tw:size-3.5 tw:flex-none tw:text-blue-600", aria_hidden: true) %>
+          <%# The detected place shares a line with the country switch, until a pick clears it %>
+          <div
+            class="
+              tw:flex tw:flex-col tw:gap-2 tw:has-[[data-detected]]:flex-row
+              tw:has-[[data-detected]]:flex-wrap
+              tw:has-[[data-detected]]:items-center
+              tw:has-[[data-detected]]:gap-x-1
+            "
+          >
+            <div
+              data-ebike-rules--lookup-target="stateNote"
+              class="tw:contents"
+            >
+              <% if error?(:state) %>
+                <%= field_error(:state, copy[:state_error]) %>
+              <% elsif detected? %>
+                <p
+                  class="
+                    tw:flex tw:items-center tw:gap-1.5 tw:text-[13px]
+                    tw:text-gray-700 tw:dark:text-gray-300
+                  "
+                  data-detected
+                >
+                  <%= helpers.inline_svg_tag("icons/map-pin.svg", class: "tw:size-3.5 tw:flex-none tw:text-blue-600", aria_hidden: true) %>
 
-                <span>
-                  <%= translation(".detected_html", state: @lookup.detected_place[:name]) %>
+                  <span><%= translation(".detected_place_html", state: @lookup.detected_place[:name]) %></span>
+                </p>
+              <% elsif place_value.nil? %>
+                <p class="tw:text-[13px] tw:text-gray-700 tw:dark:text-gray-300">
+                  <%= copy[:location_not_shared] %>
+                </p>
+              <% end %>
+            </div>
 
-                  <%= render(UI::Button::Component.new(text: translation(".change"), color: :link,
-                  data: {action: "ebike-rules--lookup#focusState"})) %>
-                </span>
-              </p>
-            <% elsif place_value.nil? %>
-              <p class="tw:text-[13px] tw:text-gray-700 tw:dark:text-gray-300">
-                <%= copy[:location_not_shared] %>
-              </p>
-            <% end %>
+            <p class="tw:text-[13px] tw:text-gray-700 tw:dark:text-gray-300">
+              <%= copy[:not_in_country] %>
+            </p>
           </div>
-
-          <p class="tw:text-[13px] tw:text-gray-700 tw:dark:text-gray-300">
-            <%= copy[:not_in_country] %>
-          </p>
         </div>
 
         <div class="tw:flex tw:min-w-0 tw:flex-[4_1_300px] tw:flex-col tw:gap-2">

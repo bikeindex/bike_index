@@ -27,13 +27,12 @@ en:
             short-circuit, impact, water and thermal-runaway tests. The factory is
             then inspected on an ongoing basis to keep the listing.
           certification_involves_heading: What certification involves
-          change: change?
           check_my_bike: Check my bike
           compare_html: Want to compare multiple bikes? %{link}
           country: Country
           custom_details: Custom details
           details_legend: Your bike's details
-          detected_html: We detected <strong>%{state}</strong> —
+          detected_place_html: We detected <strong>%{state}</strong>.
           disclaimer: >-
             Bike Index is a 501(c)(3) nonprofit. State law summaries are for reference,
             not legal advice.

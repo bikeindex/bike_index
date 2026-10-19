@@ -98,7 +98,7 @@ RSpec.describe EbikeRulesController, type: :request do
 
       follow_redirect!(headers: indiana)
       expect(page).to have_css("[data-hw-combobox-prefilled-display-value='Indiana (US-IN)']")
-        .and have_text("We detected Indiana")
+        .and have_text("We detected Indiana.")
         .and have_no_css("[role='alert']")
 
       # a bike comes along, as from Bike Book's link, to be checked there
@@ -345,7 +345,7 @@ RSpec.describe EbikeRulesController, type: :request do
       expect(response).to redirect_to("/ebike-rules/CA/ON")
 
       follow_redirect!(headers: ontario)
-      expect(page).to have_text("We detected Ontario")
+      expect(page).to have_text("We detected Ontario.")
 
       get "/ebike-rules", headers: {"HTTP_CF_IPCOUNTRY" => "CA", "HTTP_CF_REGION" => "Quebec"}
       expect(response).to redirect_to("/ebike-rules/CA")
