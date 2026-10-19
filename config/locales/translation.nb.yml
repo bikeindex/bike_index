@@ -6825,11 +6825,53 @@ nb:
               %{n} og %{optional}, med %{count}-regler som må kontrolleres.
           yellow_headline_without_throttle: Det er lovlig å sykle på %{name}-en din
             som en elsykkel i klasse %{n} uten den valgfrie gasspedalen.
+          green_headline_law: Det er lovlig å sykle i %{name}-en din i %{state} i
+            henhold til %{law}-reglene.
+          kmh_html: "%{kmh} km/t"
+          law_source_html: 'Kilde: %{link}s katalog over elsykkellovgivning. Sammendragene
+            er kun for referanse, ikke juridisk rådgivning.'
+          may_be_moped_canada: Den kan i stedet være regulert som moped eller motorvogn,
+            noe som kan kreve registrering og førerkort.
+          no_e_bike_category: Det er ingen elsykkelkategori her, så sjekk førerkort-,
+            registrerings- og hjelmreglene for denne.
+          no_speed_cap_in_law: Ingen fartsgrense i loven sin
+          no_watt_cap_in_law: Ingen effektgrense i loven sin
+          optional_to_kmh_html: Valgfritt, til %{kmh} km/t
+          over_kmh_html: Over %{kmh} km/t
+          speed_over_cap_kmh_html: Assisterer til %{kmh} km/t, over %{cap} km/t-grensen
+          speed_past_cap_kmh_html: Assisterer forbi %{past} km/t, over %{cap} km/t-grensen
+          speed_past_kmh_html: Assisterer etter %{past} km/t; sjekk at den stopper
+            innen %{cap} km/t
+          speed_to_check_kmh_html: BikeBook oppgir ikke toppfarten, så sjekk at motoren
+            stopper ved %{cap} km/t
+          speed_within_cap_kmh_html: Hjelper opp til %{kmh} km/t, innenfor grensen
+          still_reviewing_province_body: Sjekk samferdselsdepartementet i din provins
+            eller ditt territorium for gjeldende regler for elsykler. De fleste elsykkelmotorer
+            har en effekt på 500 W og en assistert hastighet på 32 km/t.
+          throttle_allowed_in_law: Gass tillatt
+          throttle_not_allowed_in_law: Loven tillater ikke gass
+          throttle_not_stated_in_law: Loven sier ikke om det er tillatt med gass.
+          watts_to_check_html: Sjekk at motoren er nominell til %{cap}W eller mindre
+          yellow_headline_law:
+            one: Det er lovlig å sykle i %{name}-en din i %{state} under %{law}-reglene,
+              med %{count}-regelen for å sjekke.
+            other: Det er lovlig å sykle i %{name}-en din i %{state} under %{law}-reglene,
+              med %{count}-regler som må kontrolleres.
+          yellow_headline_law_without_throttle: Det er lovlig å kjøre %{name}-en din
+            i %{state} under %{law}-reglene, uten den valgfrie gasspedalen.
+          yellow_headline_motor_vehicle_law:
+            one: Det kan være lovlig å sykle i %{name}-en din i %{state} under %{law}-reglene,
+              med %{count}-regelen for å sjekke.
+            other: Det kan være lovlig å sykle i %{name}-en din i %{state} under %{law}-reglene,
+              og det må sjekkes %{count}-reglene.
+          yes_to_kmh_html: Ja, til %{kmh} km/t
+          your_province: Din provins eller ditt territorium
         rule_label:
           classes: Klasser anerkjent
           power: Motoreffektbegrensning
           speed: Topp assistert hastighet
           throttle: Gasspedal
+          vehicle: Regulert som
         rule_value:
           allowed: Tillatt
           classes:
@@ -6859,10 +6901,8 @@ nb:
             runaway. Fabrikken inspiseres deretter kontinuerlig for å opprettholde
             godkjenningen.
           certification_involves_heading: Hva sertifisering innebærer
-          change: endre?
           check_my_bike: Sjekk sykkelen min
           compare_html: Vil du sammenligne flere sykler? %{link}
-          detected_html: Vi oppdaget <strong>%{state}</strong> —
           disclaimer: Bike Index er en ideell organisasjon med 501(c)(3)-lovgivning.
             Sammendrag av statlige lover er kun for referanse, ikke juridisk rådgivning.
           for_parents: For foreldre
@@ -6872,7 +6912,6 @@ nb:
           how_to_check_1: Finn UL-merket og filnummeret på batteriet og rammeetiketten.
           how_to_check_2: Søk etter nummeret i UL Product iQ.
           how_to_check_heading: Slik sjekker du en sykkel
-          location_not_shared: Stedet er ikke delt. Velg staten din fra listen.
           motor_wattage: Motoreffekt (W)
           mph: "%{mph} mph"
           parent_step_1_body: Mange stater setter en minimumsalder for klasse 3, og
@@ -6944,6 +6983,33 @@ nb:
           select_country: Velg et land
           switch_country: bytte land
           switch_country_title: Bytt land
+          banned_body_canada: Universiteter, boligleverandører og transportbyråer
+            innfører regler for oppbevaring og lading av elsykler innendørs, og sertifisering
+            er det de ser etter.
+          choose_province: Velg provinsen eller territoriet ditt fra listen.
+          choose_state: Velg staten din fra listen.
+          detected_place_html: Vi oppdaget <strong>%{state}</strong> .
+          disclaimer_canada: Bike Index er en ideell organisasjon. Sammendrag av provinsielle
+            og territoriale lover er kun for referanse, ikke juridisk rådgivning.
+          kmh: "%{kmh} km/t"
+          not_in_canada_html: Ikke i Canada? %{switch_country}
+          over_kmh: Over %{kmh} km/t
+          parent_step_1_body_canada: De fleste provinser setter en minimumsalder for
+            å sykle på elsykkel, fra 12 til 18 år. Sjekk din alder før du velger en
+            sykkel.
+          parent_step_2_body_canada: Ingen gass, så motoren hjelper bare mens de tråkker.
+            Det er den enkleste typen elsykkel å lære å kjøre på.
+          parent_step_2_title_canada: Start med pedalassistanse
+          parents_body_canada: Elsykler er tyngre og raskere enn syklene de fleste
+            barn lærer seg å bruke. Før du kjøper, finn ut hva fylket og byen din
+            tillater, og sørg for at barnet ditt er klart til å sykle på en trygt.
+          parents_link_canada: Slå opp alders- og hjelmreglene i din provins
+          province: Provins eller territorium
+          province_error: Velg en provins eller et territorium.
+          select_province: Velg provinsen eller territoriet ditt
+          subheading_canada: Gå inn i provinsen eller territoriet ditt og sykle for
+            å se reglene.
+          watts_placeholder_canada: f.eks. 500
         state_reference:
           compiling: Vi samler %{state}s elsykkelregler fra delstatsforsamlingen og
             DMV. Sjekk tilbake snart.
@@ -6963,6 +7029,18 @@ nb:
           only_classes:
             one: Kun klasse %{classes}
             other: Kun klasser %{classes}
+          all_on_file_canada: Alle provinser og territorier som er registrert
+          compiling_canada: Vi samler %{state}s elsykkelregler fra deres lovgivning
+            og samferdselsdepartement. Sjekk tilbake snart.
+          filter_placeholder_canada: Skriv inn en provins eller et territorium
+          filter_provinces: Filtrer provinser og territorier
+          heading_canada: Elsykkellover etter provins og territorium
+          limits_subheading_canada: Hver provins og hvert territorium. Åpne en for
+            å se grensene, reglene og kildene.
+          no_match_canada: Ingen provinser eller territorier samsvarer. Prøv et annet
+            navn.
+          on_file_of_total_canada_html: "%{number} av %{total} provinser og territorier
+            registrert · andre under gjennomgang"
         ul_badge:
           certified: UL %{standard}-sertifisert
           meaning_2271_certified: Batteripakken har bestått UL-sikkerhetstester for
@@ -7026,8 +7104,9 @@ nb:
           electric_certification: Elektrisk sertifisering
           not_provided: Ikke oppgitt
         check:
-          outside_us: Sykkelkontrollene dekker amerikanske stater foreløpig. %{place}
-            sine lover for elsykler finner du nedenfor.
+          outside_checked_countries: Sykkelkontrollene dekker foreløpig amerikanske
+            stater og kanadiske provinser. %{place}s lover for elsykler finner du
+            nedenfor.
       memberships:
         new:
           become_a_member: Bli medlem

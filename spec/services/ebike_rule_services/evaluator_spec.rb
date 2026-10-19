@@ -7,7 +7,8 @@ RSpec.describe EbikeRuleServices::Evaluator do
 
   let(:attributes) do
     {bikebook_id: "m/x/2025/y", manufacturer_name: "X", model: "Y", first_year: 2025, vehicle_type: "bike", e_bike_class: 1, class_unknown: false, e_vehicle_classifications: [], optional_classes: {},
-     watts: 250, peak_watts: nil, top_assist_mph: 20, throttle: false, stock_throttle: false, throttle_mph: nil, ul2849: :unknown, ul2271: :unknown, photo_url: nil}
+     watts: 250, peak_watts: nil, top_assist_mph: 20, top_assist_kmh: 32, assists_past_kmh: nil, throttle: false, stock_throttle: false,
+     throttle_mph: nil, throttle_kmh: nil, ul2849: :unknown, ul2271: :unknown, photo_url: nil}
   end
   let(:bike) { EbikeRuleServices::Bike.new(**attributes) }
   let(:abbreviation) { "IN" }
@@ -208,6 +209,55 @@ RSpec.describe EbikeRuleServices::Evaluator do
     it "informs rather than fails" do
       expect(statuses).to include(power: :info, speed: :info)
       expect(described_class.verdict(rules)).to eq :green
+    end
+  end
+
+  context "under a Canadian province's law" do
+    let(:law) { EbikeRuleServices::StateLaws.place_law("CA-ON") }
+
+    it "checks its limits in km/h, with no classes" do
+      expect(statuses).to eq(power: :pass, speed: :pass, throttle: :pass)
+      expect(rules.find { it[:id] == :speed }).to include(note: :speed_within_cap, args: {kmh: 32})
+      expect(described_class.verdict(rules)).to eq :green
+    end
+
+    context "with a motor over its cap and a throttle past its speed" do
+      let(:attributes) { super().merge(e_bike_class: 3, watts: 750, top_assist_kmh: 32, throttle: true, stock_throttle: true, throttle_kmh: 45) }
+
+      it "fails both, and allows the throttle" do
+        expect(rules).to match [include(id: :power, status: :fail, note: :watts_over_cap, args: {watts: 750, cap: 500}),
+          include(id: :speed, status: :fail, note: :speed_over_cap, args: {kmh: 45, cap: 32}),
+          include(id: :throttle, status: :pass, note: :throttle_allowed)]
+      end
+    end
+
+    context "with neither its power nor its speed on record" do
+      let(:attributes) { super().merge(watts: nil, top_assist_kmh: nil) }
+
+      it "checks both, as its cap is under what many e-bikes are rated" do
+        expect(rules.first(2)).to match [include(status: :check, note: :watts_to_check, args: {cap: 500}),
+          include(status: :check, note: :speed_to_check, args: {cap: 32})]
+        expect(described_class.verdict(rules)).to eq :yellow
+      end
+    end
+
+    context "with a bike entered by hand as past 32 km/h" do
+      let(:bike) { EbikeRuleServices::Bike.manual_metric(top_kmh: 33, watts: 250, throttle: false) }
+
+      it "fails the speed" do
+        expect(rules.find { it[:id] == :speed }).to include(status: :fail, note: :speed_past_cap, args: {past: 32, cap: 32})
+      end
+    end
+
+    context "in a province with no e-bike law, where an e-bike falls in with a motor vehicle" do
+      let(:law) { EbikeRuleServices::StateLaws.place_law("CA-NB") }
+
+      it "checks it against that vehicle's limits, with its licence and registration to check" do
+        expect(law).to include(name: "Motor Driven Cycle", kmh: 50, motor_vehicle: true)
+        expect(rules.first).to include(id: :vehicle, status: :check, note: :no_e_bike_category)
+        expect(statuses).to include(power: :pass, speed: :pass)
+        expect(described_class.verdict(rules)).to eq :yellow
+      end
     end
   end
 

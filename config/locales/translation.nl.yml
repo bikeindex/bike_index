@@ -7030,11 +7030,58 @@ nl:
               van klasse %{n}, en %{optional}, met %{count} regels om te controleren.
           yellow_headline_without_throttle: Je %{name} mag legaal in %{state} rijden
             als een %{n} e-bike, zonder de optionele gashendel.
+          green_headline_law: Je %{name} mag legaal in %{state} rijden volgens de
+            %{law}-regels.
+          kmh_html: "%{kmh} km/u"
+          law_source_html: 'Bron: %{link}''s catalogus van wetgeving betreffende e-bikes.
+            Samenvattingen dienen ter referentie en zijn geen juridisch advies.'
+          may_be_moped_canada: Het kan ook zijn dat het voertuig als bromfiets of
+            motorvoertuig wordt gereguleerd, waarvoor registratie en een rijbewijs
+            vereist kunnen zijn.
+          no_e_bike_category: Er is hier geen aparte categorie voor e-bikes, dus controleer
+            de regels voor rijbewijs, registratie en helmplicht.
+          no_speed_cap_in_law: Er is geen snelheidslimiet in de wetgeving.
+          no_watt_cap_in_law: Er is geen maximumvermogen vastgelegd in de wet.
+          optional_to_kmh_html: Optioneel, naar %{kmh} km/u
+          over_kmh_html: Meer dan %{kmh} km/u
+          speed_over_cap_kmh_html: Assistentie tot %{kmh} km/u, boven de %{cap} km/u
+            limiet
+          speed_past_cap_kmh_html: Assistentie bij snelheden boven %{past} km/u, boven
+            de %{cap} km/u-limiet
+          speed_past_kmh_html: Assisteert voorbij %{past} km/u; controleer of het
+            stopt bij %{cap} km/u.
+          speed_to_check_kmh_html: BikeBook vermeldt de topsnelheid niet, dus controleer
+            of de motor stopt bij %{cap} km/u.
+          speed_within_cap_kmh_html: Assistentie tot %{kmh} km/u, binnen de limiet
+          still_reviewing_province_body: Raadpleeg het ministerie van Transport van
+            uw provincie of territorium voor de actuele regelgeving met betrekking
+            tot e-bikes. De meeste ministeries stellen een maximumvermogen van e-bikemotoren
+            van 500W en een maximumsnelheid met trapondersteuning van 32 km/u.
+          throttle_allowed_in_law: Gashendel toegestaan
+          throttle_not_allowed_in_law: De wet staat geen gashendel toe.
+          throttle_not_stated_in_law: De wet zegt niet of een gasklep is toegestaan.
+          watts_to_check_html: Controleer of de motor een vermogen heeft van %{cap}W
+            of minder.
+          yellow_headline_law:
+            one: Je %{name} mag legaal in %{state} rijden volgens de %{law}-regels,
+              met %{count}-regel om te controleren.
+            other: Je %{name} mag legaal in %{state} rijden volgens de %{law}-regels,
+              waarbij de %{count}-regels nog gecontroleerd moeten worden.
+          yellow_headline_law_without_throttle: Je %{name} mag legaal in %{state}
+            rijden volgens de %{law}-regels, zonder de optionele gashendel.
+          yellow_headline_motor_vehicle_law:
+            one: Je %{name} mag mogelijk legaal in %{state} rijden volgens de %{law}-regels,
+              waarbij %{count}-regel nog gecontroleerd moet worden.
+            other: Je %{name} mag mogelijk legaal in %{state} rijden volgens de %{law}-regels,
+              waarbij de %{count}-regels nog gecontroleerd moeten worden.
+          yes_to_kmh_html: Ja, tot %{kmh} km/u
+          your_province: Uw provincie of territorium
         rule_label:
           classes: Erkende klassen
           power: Motorvermogenscapaciteit
           speed: Maximale ondersteunde snelheid
           throttle: Elektrisch gaspedaal
+          vehicle: Gereguleerd als
         rule_value:
           allowed: Toegestaan
           classes:
@@ -7064,10 +7111,8 @@ nl:
             en thermische oververhitting. De fabriek wordt vervolgens continu geïnspecteerd
             om de certificering te behouden.
           certification_involves_heading: Wat certificering inhoudt
-          change: wijziging?
           check_my_bike: Kijk eens naar mijn fiets
           compare_html: Wil je meerdere fietsen vergelijken? %{link}
-          detected_html: We hebben <strong>%{state}</strong> gedetecteerd —
           disclaimer: Bike Index is een 501(c)(3) non-profitorganisatie. Samenvattingen
             van de wetgeving van de betreffende staat dienen ter referentie en zijn
             geen juridisch advies.
@@ -7080,8 +7125,6 @@ nl:
             van de accu en het frame.
           how_to_check_2: Zoek dat nummer op in UL Product iQ.
           how_to_check_heading: Hoe controleer je een fiets?
-          location_not_shared: Locatie niet gedeeld. Kies uw provincie/staat uit de
-            lijst.
           motor_wattage: Motorvermogen (W)
           mph: "%{mph} mph"
           parent_step_1_body: Veel staten hanteren een minimumleeftijd voor klasse
@@ -7158,6 +7201,36 @@ nl:
           select_country: Selecteer een land
           switch_country: land wijzigen
           switch_country_title: Land wijzigen
+          banned_body_canada: Universiteiten, woningbouworganisaties en openbaarvervoersbedrijven
+            stellen regels op voor het stallen en opladen van e-bikes binnenshuis,
+            en certificering is waar ze naar op zoek zijn.
+          choose_province: Kies uw provincie of territorium uit de lijst.
+          choose_state: Kies uw staat uit de lijst.
+          detected_place_html: We hebben <strong>%{state}</strong> gedetecteerd.
+          disclaimer_canada: Bike Index is een non-profitorganisatie. Samenvattingen
+            van provinciale en territoriale wetgeving dienen ter referentie en zijn
+            geen juridisch advies.
+          kmh: "%{kmh} km/u"
+          not_in_canada_html: Niet in Canada? %{switch_country}
+          over_kmh: Meer dan %{kmh} km/u
+          parent_step_1_body_canada: De meeste provincies hanteren een minimumleeftijd
+            voor het rijden op een e-bike, tussen de 12 en 18 jaar. Controleer de
+            minimumleeftijd in jouw regio voordat je een fiets koopt.
+          parent_step_2_body_canada: Geen gashendel, dus de motor helpt alleen mee
+            tijdens het trappen. Het is het makkelijkste type e-bike om op te leren
+            rijden.
+          parent_step_2_title_canada: Begin met trapondersteuning.
+          parents_body_canada: E-bikes zijn zwaarder en sneller dan de fietsen waarop
+            de meeste kinderen leren fietsen. Voordat je er een koopt, moet je nagaan
+            wat er in jouw provincie en gemeente is toegestaan en ervoor zorgen dat
+            je kind er veilig op kan rijden.
+          parents_link_canada: Raadpleeg de leeftijds- en helmregels van jouw provincie.
+          province: Provincie of territorium
+          province_error: Kies een provincie of territorium.
+          select_province: Selecteer uw provincie of territorium.
+          subheading_canada: Voer je provincie of territorium in en fiets om de regels
+            te bekijken.
+          watts_placeholder_canada: bijv. 500
         state_reference:
           compiling: We verzamelen momenteel de regels voor e-bikes van %{state} op
             basis van gegevens van de staatslegislatuur en de RDW. Kom binnenkort
@@ -7178,6 +7251,20 @@ nl:
           only_classes:
             one: Alleen klasse %{classes}
             other: Alleen klassen %{classes}
+          all_on_file_canada: Elke provincie en elk territorium dat geregistreerd
+            staat
+          compiling_canada: We verzamelen momenteel de e-bike-regels van %{state}
+            op basis van wetgeving en informatie van het ministerie van Transport.
+            Kom binnenkort terug voor meer informatie.
+          filter_placeholder_canada: Typ een provincie of territorium
+          filter_provinces: Filter provincies en gebieden
+          heading_canada: Wetgeving rondom e-bikes per provincie en territorium
+          limits_subheading_canada: Elke provincie en elk territorium. Open er een
+            om de grenzen, regels en bronnen te bekijken.
+          no_match_canada: Geen provincies of territoria komen overeen. Probeer een
+            andere naam.
+          on_file_of_total_canada_html: "%{number} van %{total} provincies en territoria
+            geregistreerd · overige in beoordeling"
         ul_badge:
           certified: UL %{standard} gecertificeerd
           meaning_2271_certified: Het accupakket heeft de UL-veiligheidstests voor
@@ -7247,8 +7334,9 @@ nl:
           electric_certification: Elektrische certificering
           not_provided: Niet verstrekt
         check:
-          outside_us: De fietscontroles gelden voorlopig alleen in de VS. De wetgeving
-            voor e-bikes in %{place} staat hieronder.
+          outside_checked_countries: De fietscontroles gelden voorlopig alleen in
+            Amerikaanse staten en Canadese provincies. De wetgeving voor e-bikes in
+            %{place} staat hieronder.
       memberships:
         new:
           become_a_member: Word lid

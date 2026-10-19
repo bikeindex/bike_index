@@ -17,7 +17,7 @@ const DETAILS = ['manual', 'top_speed', 'throttle', 'watts']
 // into the panel; "custom" details changed from the model's; or "manual" details with no model
 export default class extends Controller {
   static targets = ['combobox', 'comboboxSlot', 'state', 'stateNote', 'stateNeeded', 'manual', 'legend']
-  static values = { manifestUrl: String, path: String, display: String, failedText: String, title: String, legend: String, modelLegend: String }
+  static values = { manifestUrl: String, path: String, countryPath: String, display: String, failedText: String, title: String, legend: String, modelLegend: String }
 
   async connect () {
     this.lastUrl = window.location.href.split('#')[0]
@@ -47,10 +47,10 @@ export default class extends Controller {
   }
 
   // A check in the form comes along to the new place, whose page it loads even without one for its title;
-  // clearing the place leaves the check waiting for one
+  // clearing the place leaves the check waiting for one, on its country's page
   chooseState () {
     const code = this.#stateField.value
-    this.element.action = code ? `${this.pathValue}/${code.replace('-', '/')}` : this.pathValue
+    this.element.action = code ? `${this.pathValue}/${code.replace('-', '/')}` : this.countryPathValue
     this.#loadClasses()
     if (!code) {
       document.title = this.titleValue

@@ -59,7 +59,13 @@ module EbikeRuleServices
 
     # By ISO 3166-2 code, each place outside the US the catalog classifies e-vehicles in: its e-bike laws, or without
     # one of its own its country's, and its other classes, slowest first and off-highway last
-    def places = vocabulary("places") { parse_places(it) } || {}
+    def places = vocabulary("places_with_laws") { parse_places(it) } || {}
+
+    # What a bike is checked against in a place outside the US: its own e-bike law, or without one, the class its
+    # country's e-bike falls into there, a motor vehicle's, as New Brunswick's Motor Driven Cycle
+    def place_law(code, today: Time.zone.today) = places.dig(code, :law)&.then { in_force(it, today) }
+
+    def place_laws(today: Time.zone.today) = places.transform_values { it[:law]&.then { in_force(it, today) } }
 
     # nil for anything but an abbreviation, such as a query's array
     def state(abbreviation)
@@ -133,9 +139,17 @@ module EbikeRuleServices
         place_entries.select { it[2]["e_bike_law"] }.partition { it[2]["groups"].present? }.flatten(1).map { law(it[1], it[2]) }
       end
       by_place.to_h do |code, place_entries|
-        others = by_speed(place_entries.reject { it[2]["e_bike_law"] }).map { |_, id, record| state_class(id, record) }
-        [code, {laws: laws[code].presence || laws[code.split("-").first].to_a, classes: others}]
+        country_laws = laws[code.split("-").first].to_a
+        others = by_speed(place_entries.reject { it[2]["e_bike_law"] })
+        [code, {laws: laws[code].presence || country_laws, classes: others.map { |_, id, record| state_class(id, record) },
+                law: laws[code]&.first || motor_vehicle_law(others, country_laws)}]
       end
+    end
+
+    def motor_vehicle_law(entries, country_laws)
+      ids = country_laws.map { it[:id] }
+      _, id, record = entries.find { it[2]["groups"].to_a.intersect?(ids) }
+      id && law(id, record).merge(motor_vehicle: true)
     end
 
     def state_classes(entries, law_id)
@@ -196,6 +210,6 @@ module EbikeRuleServices
 
     def upcoming(date, today) = (date if date&.>(today))
 
-    conceal :parsed, :classifications, :vocabulary, :parse, :parse_places, :state_classes, :by_speed, :state_class, :metric?, :mph, :law, :restriction, :web_pages, :date, :in_force, :current, :upcoming
+    conceal :parsed, :classifications, :vocabulary, :parse, :parse_places, :motor_vehicle_law, :state_classes, :by_speed, :state_class, :metric?, :mph, :law, :restriction, :web_pages, :date, :in_force, :current, :upcoming
   end
 end
