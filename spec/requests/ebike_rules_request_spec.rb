@@ -84,6 +84,11 @@ RSpec.describe EbikeRulesController, type: :request do
       # one the state's law folds into the e-moto, as its classes do
       get "/ebike-rules/US/NJ", params: {classification: "evc/us/nj/dirt_bike"}, headers: frame.call("evc-us-nj-dirt_bike")
       expect(page).to have_css("turbo-frame#ebike-rules-class-card-evc-us-nj-dirt_bike h3", text: "Not an e-bike")
+      # as is the catalog's marker for one out of class, in a state whose law bars a Class 3's throttle, but no other
+      get "/ebike-rules", params: {classification: "evc/out_of_class/US-CA"}, headers: frame.call("evc-out_of_class-US-CA")
+      expect(page).to have_css("turbo-frame#ebike-rules-class-card-evc-out_of_class-US-CA h3", text: "Not an e-bike")
+      get "/ebike-rules", params: {classification: "evc/out_of_class/US-CO"}, headers: frame.call("evc-out_of_class-US-CO")
+      expect(response).to have_http_status(:not_found)
 
       get "/ebike-rules", params: {classification: "evc/nothing"}, headers: frame.call("evc-nothing")
       expect(response).to have_http_status(:not_found)

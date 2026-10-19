@@ -150,7 +150,8 @@ export async function hydrate (catalog, source, shell, url) {
   for (const input of root.querySelectorAll('input[name="electric"]')) {
     const id = input.value.replace(/^class_/, 'evc/us/class_')
     const classification = catalog.vocabulary.e_vehicle_classifications[id]
-    if (classification) input.closest('label').after(fragmentOf(tooltip({ text: classification.title, body: viewer.presenter.classificationTooltip(id) })))
+    // a marker's checkbox has the page's own tooltip
+    if (classification && !classification.marker) input.closest('label').after(fragmentOf(tooltip({ text: classification.title, body: viewer.presenter.classificationTooltip(id) })))
   }
 
   renderInto(root.getElementById('vehicle-viewers'), viewer.render(vehicles, url, preferredSize(),

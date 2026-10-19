@@ -9,9 +9,11 @@ const PARAM = 'classifications'
 
 const hasCard = (id, classifications) => Boolean(classifications[id])
 
-// A search that's a classification's exact ID offers it, unless it's `selected`
+// A search that's a classification's exact ID, in any case, as evc/out_of_class/US-CA's has capitals, offers it, unless
+// it's `selected`
 export const classificationOption = (query, selected, classifications) => {
-  const id = String(query ?? '').trim().toLowerCase()
+  const typed = String(query ?? '').trim().toLowerCase()
+  const id = Object.keys(classifications).find((key) => key.toLowerCase() === typed)
   const label = classifications[id]?.label
   return label && !selected.includes(id) ? filterOption({ value: id, display: label, name: label }) : null
 }

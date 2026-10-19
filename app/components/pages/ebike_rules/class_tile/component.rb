@@ -40,7 +40,7 @@ module Pages
           end
         end
 
-        def catalog_id = @e_bike_class ? "evc/us/class_#{@e_bike_class}" : [EbikeRuleServices::StateLaws::NOT_AN_EBIKE[:id], @out_of_class_in].compact.join("/")
+        def catalog_id = @e_bike_class ? "evc/us/class_#{@e_bike_class}" : EbikeRuleServices::StateLaws.out_of_class_id(@out_of_class_in)
 
         def caption = (@optional == "throttle") ? translation(".optional_throttle") : translation(".optional_upgrade")
 

@@ -1199,6 +1199,11 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_css("#classification-cards h3", exact_text: "Moped, up to 2 hp and 30 mph", wait: 10)
     expect(page).to have_css("#classification-cards li", text: "Riders must be 16 or older to ride a Class 3")
     expect(cards_asked.count).to eq 3
+    # as is an out of class marker, which the vocabulary has no record of, its card the e-moto's
+    type_into(vehicle_field, "evc/out_of_class/US-CA")
+    retry_on_detach { find("[role='option'][data-value='evc/out_of_class/US-CA']", text: "Out of class in California").click }
+    expect(page).to have_css("#classification-cards h3", exact_text: "Not an e-bike", wait: 10)
+    expect(page).to have_css(".hw-combobox__chip", text: "Out of class in California")
 
     # a class that only comes with an optional mode goes on its own line, after the mode
     visit bikebook_path(vehicle_models: "m/specialized/2025/haul_st")

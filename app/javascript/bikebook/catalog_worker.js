@@ -47,15 +47,17 @@ async function load ({ manifestUrl, ids, jurisdictions, rulesUrl }) {
     sortPrice: model.msrp_cents ?? 0
   }))
   byId = new Map(models.map((model) => [model.id, model]))
+  // the index's labels, which the vocabulary's records replace, for the out of class markers it has none of: "Out of class in California"
+  const labels = Object.entries(index.filter_options.e_vehicle_classification).map(([id, label]) => [id, { label, title: label, marker: true }])
   // "California Moped", which its name leaves off the state of, and a group has none; "US Class 3 e-bike"
-  classifications = Object.fromEntries(Object.entries(vocabulary.e_vehicle_classifications).map(([id, record]) => {
+  classifications = Object.fromEntries([...labels, ...Object.entries(vocabulary.e_vehicle_classifications).map(([id, record]) => {
     const code = record.jurisdiction
     const state = code?.startsWith('US-') && (jurisdictions[code] ?? code)
     const label = [state || code, record.name].filter(Boolean).join(' ')
     // "Alabama (AL)", "United States"
     const jurisdictionName = state ? `${state} (${code.slice(3)})` : code && (jurisdictions[code] ?? code)
     return [id, { ...record, label, jurisdiction_name: jurisdictionName, title: /^Class \d+$/.test(record.name) ? `${label} e-bike` : label }]
-  }))
+  })])
   return { vocabulary: { ...vocabulary, e_vehicle_classifications: classifications }, kit, options: options(index) }
 }
 
