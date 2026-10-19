@@ -124,7 +124,7 @@ RSpec.describe "E-bike rules", :js, type: :system do
     # its link picks it in the form at the top, rather than loading its page, which would clear the filter
     wait_for_stimulus("ebike-rules--lookup")
     click_link "Check an e-bike in New Jersey"
-    expect(page).to have_field("State", with: "New Jersey (US-NJ)", obscured: false)
+    expect(page).to have_field("State", with: "New Jersey (NJ)", obscured: false)
     expect(page).to have_current_path("/ebike-rules/US/NJ")
     expect(page).to have_title("New Jersey e-bike laws")
     expect(page).to have_field("Filter states", with: "new")

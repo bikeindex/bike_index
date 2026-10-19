@@ -97,7 +97,7 @@ RSpec.describe EbikeRulesController, type: :request do
       expect(response.headers["Cache-Control"]).to eq "no-store"
 
       follow_redirect!(headers: indiana)
-      expect(page).to have_css("[data-hw-combobox-prefilled-display-value='Indiana (US-IN)']")
+      expect(page).to have_css("[data-hw-combobox-prefilled-display-value='Indiana (IN)']")
         .and have_text("We detected Indiana.")
         .and have_no_css("[role='alert']")
 
@@ -114,7 +114,7 @@ RSpec.describe EbikeRulesController, type: :request do
       get "/ebike-rules/US/CO"
 
       expect(response).to have_http_status(:ok)
-      expect(page).to have_css("[data-hw-combobox-prefilled-display-value='Colorado (US-CO)']")
+      expect(page).to have_css("[data-hw-combobox-prefilled-display-value='Colorado (CO)']")
         .and have_css("form[action='/ebike-rules/US/CO']")
         .and have_no_css("[role='alert']")
         .and have_no_css("[role='status']")
@@ -270,7 +270,8 @@ RSpec.describe EbikeRulesController, type: :request do
       expect(response).to have_http_status(:ok)
       expect(page).to have_title("Canada e-bike laws", exact: true)
         .and have_css("input[role='combobox'][placeholder='Select your province or territory']")
-        .and have_css("[data-ebike-rules--lookup-target='state'] [role='option']", text: "Ontario (CA-ON)", visible: :all)
+        .and have_css("[data-ebike-rules--lookup-target='state'] [role='option']", text: "Ontario (ON)", visible: :all)
+        .and have_css("[data-ebike-rules--lookup-target='state'] [role='option'][data-value='CA-ON']", visible: :all)
         .and have_no_css("[data-ebike-rules--lookup-target='state'] [role='option']", text: "Colorado", visible: :all)
         .and have_css("form[action='/ebike-rules/CA'][data-ebike-rules--lookup-country-path-value='/ebike-rules/CA']")
         # with a bike and no province, there's nothing to check it against
@@ -301,7 +302,7 @@ RSpec.describe EbikeRulesController, type: :request do
       get "/ebike-rules/CA/ON", params: {vehicle_models: "m/specialized/2025/haul_st_ca"}
 
       expect(page).to have_title("Ontario e-bike laws", exact: true)
-        .and have_css("[data-hw-combobox-prefilled-display-value='Ontario (CA-ON)']")
+        .and have_css("[data-hw-combobox-prefilled-display-value='Ontario (ON)']")
         .and have_css("[role='status']", text: "Your Specialized Haul ST is legal to ride in Ontario under the Power-Assisted Bicycle rules.")
         .and have_css("li", text: /Top assisted speed\s*32 km\/h\s*Assists to 32 km\/h, within the limit/)
         .and have_css("dd", text: "Optional, to 32 km/h")
@@ -336,7 +337,8 @@ RSpec.describe EbikeRulesController, type: :request do
       # the country switch lists the places outside the US, and the state picker the states alone with this one
       expect(page).to have_css("#ebike-rules-switch-country [role='option']", text: "Canada (CA)", visible: :all)
         .and have_no_css("#ebike-rules-switch-country [role='option']", text: "Colorado", visible: :all)
-        .and have_css("[data-ebike-rules--lookup-target='state'] [role='option']", text: "Colorado (US-CO)", visible: :all)
+        .and have_css("#ebike-rules-switch-country [role='option'][data-value='CA-ON']", text: "Ontario (CA-ON)", visible: :all)
+        .and have_css("[data-ebike-rules--lookup-target='state'] [role='option'][data-value='US-CO']", text: "Colorado (CO)", visible: :all)
     end
 
     it "sends a visitor Cloudflare locates outside the US to their place's page, a region's or else its country's" do

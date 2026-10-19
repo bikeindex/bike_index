@@ -26,7 +26,7 @@ export default class extends Controller {
 }
 
 // The abbreviation is read from the "(OR)" every option ends in, since what it submits may be an id, or a code's last
-// part, the "OR" of "(US-OR)"
+// part, the "ON" of "(CA-ON)"
 function score (option, query) {
   const name = option.textContent.trim().toLowerCase()
   if (!query || name.endsWith(`(${query})`) || name.endsWith(`-${query})`)) return 0

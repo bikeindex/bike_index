@@ -27,8 +27,7 @@ module Pages
 
         def us? = @lookup.us?
 
-        # A checked country's regions; for the US, its states, and the place outside the US whose page this is. Each
-        # reads "California (US-CA)", searchable by its code
+        # A checked country's regions; for the US, its states, and the place outside the US whose page this is
         def place_options
           @place_options ||= combobox_options(us? ? EbikeRuleServices::Places.us_states | [@lookup.place].compact :
             EbikeRuleServices::Places.regions(@lookup.country))
@@ -48,7 +47,8 @@ module Pages
             combobox_options(places.reject { EbikeRuleServices::Places.country(it) == @lookup.country })
         end
 
-        def combobox_options(places) = places.map { {name: it[:name], abbr: it[:code]} }
+        # Each submits its code, and reads "California (CA)", or "New South Wales (AU-NSW)" outside the page's country
+        def combobox_options(places) = places.map { {name: it[:name], abbr: it[:code].delete_prefix("#{@lookup.country}-"), value: it[:code]} }
 
         def field_error(field, text)
           return unless error?(field)
