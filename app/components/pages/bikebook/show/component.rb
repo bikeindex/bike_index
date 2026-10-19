@@ -25,6 +25,9 @@ module Pages
         def jurisdiction_names = {"US" => translation(".united_states")}
           .merge(EbikeRuleServices::StateLaws::STATES.to_h { ["US-#{it[:abbr]}", it[:name]] })
 
+        # By ISO 3166-2 code, the jurisdictions whose law bars a Class 3's throttle, as California's does
+        def class_3_throttle_bars = EbikeRuleServices::StateLaws.laws.filter_map { |abbr, law| "US-#{abbr}" if law[:class_3_throttle] == false }
+
         # The US classes, then the states' own, which /ebike-rules shows too; a state without them uses the US ones
         def class_groups
           us = [{id: "class_1", name: translation(".us_class_1")}, {id: "class_2", name: translation(".us_class_2")},

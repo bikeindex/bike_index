@@ -12,8 +12,9 @@ module Pages
           lg: {tile: "tw:size-19", label: "tw:text-[11px]", number: "tw:text-[40px]", icon: "tw:size-8"}
         }.freeze
 
-        def initialize(e_bike_class:, class_unknown: false, optional: nil, size: :md, explained: false)
+        def initialize(e_bike_class:, class_unknown: false, optional: nil, size: :md, explained: false, out_of_class_in: nil)
           @e_bike_class = e_bike_class
+          @out_of_class_in = out_of_class_in
           @optional = optional
           @class_unknown = class_unknown
           @size = SIZES.fetch(size)
@@ -39,7 +40,7 @@ module Pages
           end
         end
 
-        def catalog_id = @e_bike_class ? "evc/us/class_#{@e_bike_class}" : EbikeRuleServices::StateLaws::NOT_AN_EBIKE[:id]
+        def catalog_id = @e_bike_class ? "evc/us/class_#{@e_bike_class}" : [EbikeRuleServices::StateLaws::NOT_AN_EBIKE[:id], @out_of_class_in].compact.join("/")
 
         def caption = (@optional == "throttle") ? translation(".optional_throttle") : translation(".optional_upgrade")
 

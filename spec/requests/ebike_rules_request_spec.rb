@@ -211,8 +211,9 @@ RSpec.describe EbikeRulesController, type: :request do
       # as is one entered by hand, which is both classes as such a model is
       get "/ebike-rules/US/CA", params: {manual: "1", top_speed: "28", throttle: "1"}
       expect(page).to have_css("[role='status'] li", text: "It is a Class 2 and Class 3 e-bike, which is not permitted.")
-      # under the e-moto's tile rather than its classes'
+      # under the e-moto's tile rather than its classes', with California's out of class ID
       expect(page.all("section[aria-live] [data-controller~='ui--tooltip'] > button[aria-label$='e-bike']").map { it[:"aria-label"] }).to eq ["E-moto, not an e-bike"]
+      expect(page.find("section[aria-live] [role='tooltip'] code", visible: :all).text(:all).strip).to eq "out_of_class/US-CA"
 
       # a throttle sold separately isn't the bike's as sold, but an option, which would put it in no class: its Class 3
       # tile, then the e-moto's captioned with the throttle
@@ -223,6 +224,7 @@ RSpec.describe EbikeRulesController, type: :request do
       expect(page.all("section[aria-live] [data-controller~='ui--tooltip'] > button[aria-label$='e-bike']").map { it[:"aria-label"] })
         .to eq ["Class 3 e-bike", "E-moto, not an e-bike"]
       expect(page).to have_css("section[aria-live] div:has(> [data-controller~='ui--tooltip'] [aria-label='E-moto, not an e-bike']) > span", text: "w/ optional throttle")
+      expect(page.all("section[aria-live] [role='tooltip'] code", visible: :all).map { it.text(:all).strip }).to eq ["evc/us/class_3", "out_of_class/US-CA"]
     end
 
     it "moves a place from the query, or a state's old path, to its own page, and 404s one that isn't a place" do

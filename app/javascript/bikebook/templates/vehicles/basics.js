@@ -59,10 +59,10 @@ const readMore = (text, content) => {
 }
 
 // The models' names, photos and headline fields side by side in a table, one model's as two's
-export const basics = ({ presenter, vehicles, class3Throttle }) => {
+export const basics = ({ presenter, vehicles, throttleBarredIn }) => {
   const shown = vehicles.map(({ data, value, outsideMarket }) => {
     const price = priced(data)
-    const fields = basicsOf({ presenter, data, class3Throttle })
+    const fields = basicsOf({ presenter, data, throttleBarredIn })
     return {
       ...fields,
       value,

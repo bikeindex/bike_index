@@ -734,11 +734,13 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_current_path("/bikebook?search=1&filters=1")
 
     # one the catalog has out of class in California is the e-moto's tile there, one whose optional throttle would put it
-    # there its Class 3 then the e-moto's outlined, and their classes' again in another state
+    # there its Class 3 then the e-moto's outlined, each e-moto's with California's ID, and their classes' again in another state
     visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_adv,m/specialized/2025/haul_st", jurisdiction: "CA", filters: 1)
     tiles = -> { all("[aria-label='Overview comparison'] td:has(button[aria-label$='e-bike'])").map { |cell| cell.all("button[aria-label$='e-bike']").map { it[:"aria-label"] } } }
     expect(page).to have_css("[aria-label='Overview comparison'] td button[aria-label='E-moto, not an e-bike']", count: 2, wait: 10)
     expect(tiles.call).to eq [["E-moto, not an e-bike"], ["Class 3 e-bike", "E-moto, not an e-bike"]]
+    expect(all("[aria-label='Overview comparison'] td button[aria-label$='e-bike'] + [role='tooltip'] code", visible: :all).map { it.text(:all).strip })
+      .to eq ["out_of_class/US-CA", "evc/us/class_3", "out_of_class/US-CA"]
     choose_option("Jurisdiction", "Colorado")
     expect(page).to have_no_css("[aria-label='Overview comparison'] td button[aria-label='E-moto, not an e-bike']")
     expect(tiles.call).to eq [["Class 2 e-bike", "Class 3 e-bike"], ["Class 2 e-bike", "Class 3 e-bike"]]

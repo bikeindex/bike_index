@@ -86,7 +86,8 @@
             <% summary.with_tiles do %>
               <span class="tw:flex tw:gap-2">
                 <% tiles.each do |e_bike_class, optional| %>
-                  <%= render(Pages::EbikeRules::ClassTile::Component.new(e_bike_class:, class_unknown: @bike.class_unknown, optional:, size: :lg, explained: true)) %>
+                  <%= render(Pages::EbikeRules::ClassTile::Component.new(e_bike_class:, class_unknown: @bike.class_unknown, optional:, size: :lg, explained: true,
+                    out_of_class_in: (@state[:code] if @bike.class_3_throttle_banned?(@law)))) %>
                 <% end %>
               </span>
             <% end %>
