@@ -3,7 +3,12 @@ module Admin
     include Binxtils::SortableTable
     include Admin::TokenAccessible
 
+    token_accessible :index, :show
+
+    LINK_PARAM_KEYS = %w[sort direction page per_page reference_bike_id bike_ids].freeze
+
     around_action :set_reading_role, only: %i[index show]
+    helper_method :link_params
 
     def index
       return dashboard unless params[:search_view] == "segments"
@@ -71,11 +76,16 @@ module Admin
 
     private
 
-    # Tooling reads the JSON - an HTML page would copy a query-string token into its links
+    # Tooling reads the JSON - a token in an HTML page's URL would sit in browser history and copied links
     def require_index_admin!
       return head(:not_acceptable) if token_request? && !request.format.json?
 
       super
+    end
+
+    # url_for reads host, protocol and the like from its hash, so links only carry the page's own params
+    def link_params
+      request.query_parameters.select { |key, _| key.start_with?("search_") || LINK_PARAM_KEYS.include?(key) }
     end
 
     def dashboard

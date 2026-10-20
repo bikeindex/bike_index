@@ -16,7 +16,7 @@
 </p>
 
 <p class="tw:mt-4">
-  <%= link_to "Refresh review queues", url_for(request.query_parameters), class: "twlink" %>
+  <%= link_to "Refresh review queues", url_for(link_params), class: "twlink" %>
   ·
   <%= link_to "Review existing serial-segment groups", admin_duplicate_bikes_path(search_view: "segments"), class: "twlink" %>
 </p>

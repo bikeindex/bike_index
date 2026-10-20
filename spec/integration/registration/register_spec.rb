@@ -268,7 +268,8 @@ RSpec.describe "Register flow", :js, type: :system do
     fill_in "report[address_record_attributes][street]", with: "278 Broadway"
     fill_in "report[address_record_attributes][city]", with: "New York"
     # The whole address is required alongside the street and city the server checks
-    select state.name, from: "report[address_record_attributes][region_record_id]"
+    type_into("#report_address_record_attributes_region_record_id", state.abbreviation)
+    click_combobox_option(state.name)
     fill_in "report[address_record_attributes][postal_code]", with: "10007"
 
     click_button "Complete Bike Registration"
@@ -521,7 +522,8 @@ RSpec.describe "Register flow", :js, type: :system do
         click_combobox_option("Red")
         fill_in_verified "bike[serial_number]", with: "R2UP1234"
         click_button "Complete Bike Registration"
-        expect(page).to have_content("Registration complete")
+        # Attaching the blob reads its first bytes back from R2 to identify it, inside the submit
+        expect(page).to have_content("Registration complete", wait: 15)
 
         public_image = Bike.last.public_images.first
         expect(public_image.file.attached?).to be_truthy

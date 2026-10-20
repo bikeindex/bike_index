@@ -8,6 +8,7 @@ if ENV["LOCAL_CHROME_OVERRIDE"]
       browser_type: :chromium,
       headless: true,
       viewport: {width: 1920, height: 1080},
+      permissions: ["clipboard-read", "clipboard-write"],
       ignoreHTTPSErrors: true,
       args: [
         "--no-sandbox",

@@ -32,6 +32,8 @@ binx_cat -l worker               # list the files that would be streamed
 
 Both need mise's Ruby ahead of the system one (`undefined method 'filter_map'` or a `syntax error` in `~/bin/binx_logs` means `/usr/bin/ruby` 2.6 ran them) — prefix the command with `PATH="$(dirname "$(mise which ruby)"):$PATH"`.
 
+**`binx_logs` refuses to run in a Conductor workspace** — it has to download into the base checkout (`git worktree list | head -1`). If that checkout's `tmp/` already holds a recent pull, search its files directly with `rg -z -I` rather than asking for a fresh download; `binx_cat` only reads the current checkout's `tmp/`.
+
 `binx_logs` leaves the rotated archives gzipped on disk (`tmp/<server>-production.log.<date>-<n>.gz`) alongside today's still-rotating, uncompressed log (`tmp/current-production-<server>.log`). **Always read them through `binx_cat <server>`** — it decompresses the archives and concatenates everything in chronological order on the fly. Don't glob the files yourself, and don't build your own concatenated copy: a day of web logs is ~630 MB uncompressed, and decompression is cheap next to the search, so streaming is free.
 
 **Review both by default.** A question framed around requests ("why are we 500ing") usually has half its answer in the worker log: the job that poisoned the cache, the Honeybadger client silently dropping error reports, a worker process crash-looping. Only skip a server when the user explicitly scopes to one.

@@ -348,6 +348,8 @@
       not a verified identity.
     </p>
 
+    <% contact_link_params = link_params.except("page") # cell blocks run in the component, outside the view's helpers %>
+
     <%= render UI::Table::Component.new(records: listed_contact_groups, classes: "tw:mt-2") do |table| %>
       <% table.column(label: "Contact") do |group| %>
         <div class="tw:font-semibold">Contact <%= group.number %></div>
@@ -397,18 +399,18 @@
       <% end %>
 
       <% table.column(label: "") do |group| %>
-        <%= link_to "Show these records", url_for(request.query_parameters.except("page").merge("search_contact" => group.number)), class: "twlink tw:whitespace-nowrap" %>
+        <%= link_to "Show these records", url_for(contact_link_params.merge("search_contact" => group.number)), class: "twlink tw:whitespace-nowrap" %>
       <% end %>
     <% end %>
 
     <% if listed_contact_groups.size < contact_groups.size %>
       <p class="tw:mt-2 tw:text-sm">
         Showing the <%= number_display(listed_contact_groups.size) %> largest.
-        <%= link_to "Show all #{contact_groups.size} contact groups", url_for(request.query_parameters.merge("search_all_contacts" => 1)), class: "twlink" %>
+        <%= link_to "Show all #{contact_groups.size} contact groups", url_for(link_params.merge("search_all_contacts" => 1)), class: "twlink" %>
       </p>
     <% elsif contact_groups.size > 10 %>
       <p class="tw:mt-2 tw:text-sm">
-        <%= link_to "Show only the 10 largest contact groups", url_for(request.query_parameters.except("search_all_contacts")), class: "twlink" %>
+        <%= link_to "Show only the 10 largest contact groups", url_for(link_params.except("search_all_contacts")), class: "twlink" %>
       </p>
     <% end %>
   </section>
@@ -429,9 +431,9 @@
   <% if @bikes_count > 3 %>
     <p class="tw:text-sm">
       <% if sort_direction == "desc" %>
-        <%= link_to "Show oldest first", url_for(request.query_parameters.except("page", "sort", "direction")), class: "twlink" %>
+        <%= link_to "Show oldest first", url_for(link_params.except("page", "sort", "direction")), class: "twlink" %>
       <% else %>
-        <%= link_to "Show newest first", url_for(request.query_parameters.except("page").merge("sort" => "created_at", "direction" => "desc")), class: "twlink" %>
+        <%= link_to "Show newest first", url_for(link_params.except("page").merge("sort" => "created_at", "direction" => "desc")), class: "twlink" %>
       <% end %>
     </p>
   <% end %>
@@ -439,7 +441,7 @@
   <% if @contact_group %>
     <p class="tw:text-sm">
       Filtered to one initial contact.
-      <%= link_to "Show all #{@bikes_count} records", url_for(request.query_parameters.except("page", "search_contact")), class: "twlink" %>
+      <%= link_to "Show all #{@bikes_count} records", url_for(link_params.except("page", "search_contact")), class: "twlink" %>
     </p>
   <% end %>
 

@@ -67,7 +67,7 @@ module Pages
 
           # Step 1's email settles who this is for, so the name is only asked for here
           def user_name_required?
-            !@b_param.self_made?(@current_user)
+            !BikeServices::Register.owner_name_known?(@b_param, @current_user)
           end
 
           def own_emails = @own_emails ||= @current_user&.own_emails || []
@@ -76,7 +76,8 @@ module Pages
           def owner_name_data
             return {} unless @flow.single_page?
 
-            {controller: "register--owner-name", "register--owner-name-own-emails-value": own_emails.to_json,
+            {controller: "register--owner-name",
+             "register--owner-name-own-emails-value": (@current_user&.name.present? ? own_emails : []).to_json,
              action: "input@window->register--owner-name#update form-persist:restored@window->register--owner-name#update"}
           end
 

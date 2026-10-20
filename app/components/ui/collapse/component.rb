@@ -2,6 +2,7 @@
 
 module UI
   module Collapse
+    # Template Dependency: UI::Button::Component
     # The trigger for a ui--collapse controller on an ancestor, which keeps
     # aria-expanded and the chevron's rotation in sync with its content.
     # chevron: true leads the label with it, :trailing follows. A block renders in place of text.

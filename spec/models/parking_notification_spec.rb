@@ -14,6 +14,14 @@ RSpec.describe ParkingNotification, type: :model do
       expect(bike.status).to eq "status_abandoned"
       expect(parking_notification.organization).to be_nil
     end
+    context "bike registered to contact@bikeindex.org" do
+      let(:bike) { FactoryBot.create(:bike, owner_email: "contact@bikeindex.org") }
+      let(:parking_notification) { FactoryBot.create(:parking_notification, bike:) }
+      it "doesn't send email" do
+        expect(parking_notification.owner_known?).to be_truthy
+        expect(parking_notification.send_email?).to be_falsey
+      end
+    end
     context "organized record" do
       let(:organization) { FactoryBot.create(:organization) }
       let(:bike) { FactoryBot.create(:bike, created_at: Time.current - 2.weeks) }
@@ -177,6 +185,28 @@ RSpec.describe ParkingNotification, type: :model do
       expect(parking_notification.retrieval_link_token).to be_blank
       expect(parking_notification.bike.unregistered_parking_notification?).to be_truthy
       expect(organization.parking_notifications.bikes.pluck(:id)).to eq([bike.id])
+    end
+  end
+
+  describe "registered to the organization's auto_user" do
+    let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[parking_notifications impound_bikes]) }
+    let(:auto_user) { FactoryBot.create(:organization_auto_user, organization:) }
+    let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization, owner_email: auto_user.email) }
+    let(:parking_notification) { FactoryBot.create(:parking_notification_organized, organization:, user: auto_user, bike:, kind: "impound_notification") }
+    it "doesn't email the auto_user" do
+      ActionMailer::Base.deliveries = []
+      Sidekiq::Testing.inline! { parking_notification }
+      expect(parking_notification.reload.impound_record).to be_present
+      expect(parking_notification.unregistered_bike?).to be_falsey
+      expect(ActionMailer::Base.deliveries).to be_empty
+    end
+    context "organization sends self registration emails" do
+      before { organization.update(send_self_registration_email: true) }
+      it "emails the auto_user" do
+        ActionMailer::Base.deliveries = []
+        Sidekiq::Testing.inline! { parking_notification }
+        expect(ActionMailer::Base.deliveries.map(&:to)).to eq([[auto_user.email]])
+      end
     end
   end
 

@@ -204,7 +204,9 @@ RSpec.configure do |config|
     DatabaseCleaner.start
   end
 
-  config.after(:each) do |example|
+  # append_after, so it runs behind Capybara.reset_sessions! - which waits out the requests still
+  # in flight - rather than truncating under them
+  config.append_after(:each) do |example|
     next if example.metadata[:context_state]
 
     DatabaseCleaner.clean

@@ -386,13 +386,17 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
       let!(:strava_request) do
         StravaRequest.create!(user_id: 1, strava_integration_id: -1, request_type: :list_activities)
       end
+      let!(:other_request) do
+        StravaRequest.create!(user_id: 1, strava_integration_id: -1, request_type: :fetch_activity)
+      end
 
-      it "marks request as integration_deleted without setting requested_at" do
+      it "marks the integration's requests as integration_deleted without setting requested_at" do
         instance.perform(strava_request.id)
 
         strava_request.reload
         expect(strava_request.requested_at).to be_nil
         expect(strava_request.response_status).to eq("integration_deleted")
+        expect(other_request.reload.response_status).to eq("integration_deleted")
         expect(StravaRequest.pending.pluck(:id)).to eq([])
       end
     end

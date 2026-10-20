@@ -21,11 +21,11 @@ module Admin
     private
 
     def sortable_columns
-      %w[created_at updated_at deleted_at last_updated_activities_at user_id status activities_downloaded_count].freeze
+      %w[created_at updated_at deleted_at last_updated_activities_at user_id status strava_id activities_downloaded_count].freeze
     end
 
     def sortable_opts
-      sortable_order(StravaIntegration)
+      sortable_order((sort_column == "strava_id") ? "strava_id::bigint" : StravaIntegration)
     end
 
     def permission_levels

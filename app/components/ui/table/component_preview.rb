@@ -63,6 +63,17 @@ module UI
         end
       end
 
+      # A transposed table: each row a measure named by its row header
+      def row_headers
+        cryptids = sample_records.first(3)
+        render(UI::Table::Component.new(records: %i[region credibility sightings])) do |table|
+          table.column(label: tag.span("Measure", class: "tw:sr-only"), row_header: true) { |measure| measure.to_s.humanize }
+          cryptids.each do |cryptid|
+            table.column(label: cryptid.name) { |measure| (measure == :sightings) ? number_with_delimiter(cryptid.sightings) : cryptid.public_send(measure) }
+          end
+        end
+      end
+
       # @!endgroup
 
       private

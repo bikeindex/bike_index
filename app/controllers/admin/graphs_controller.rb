@@ -30,6 +30,19 @@ module Admin
       end
     end
 
+    # not_web_bikebook stacks its serial searches on the rest, so the stack is the total
+    def logged_searches
+      daily = Counts.logged_searches(@time_range.first.to_date..@time_range.last.to_date)
+        .transform_keys { it.strftime(helpers.group_by_format(@time_range, :group_by_day)) }
+      chart_data = if params[:search_endpoint] == "not_web_bikebook"
+        [{name: "Serial", data: daily.transform_values { it["not_web_bikebook_serial"] }},
+          {name: "No serial", data: daily.transform_values { it["not_web_bikebook"] - it["not_web_bikebook_serial"] }}]
+      else
+        [{name: "Bike Book", data: daily.transform_values { it["web_bikebook"] }}]
+      end
+      render json: chart_data.chart_json
+    end
+
     def bikes_table
       render Pages::Admin::Graphs::BikesTable::Component.new(kind: params[:table_kind], bikes: matching_bikes,
         time_range: @time_range, sortable_params: graphs_sortable_params), layout: false

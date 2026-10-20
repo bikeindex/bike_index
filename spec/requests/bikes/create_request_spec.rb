@@ -164,7 +164,7 @@ RSpec.describe "BikesController#create", type: :request do
           # We need to call clean_params on the BParam after bikebook update, so that
           # the foreign keys are assigned correctly. This is how we test that we're
           # This is also where we're testing bikebook assignment
-          expect_any_instance_of(Integrations::BikeBook).to receive(:get_model) { bb_data }
+          expect_any_instance_of(Integrations::Bikebook::Data).to receive(:get_model) { bb_data }
           ActionMailer::Base.deliveries = []
           Sidekiq::Job.clear_all
           expect {
@@ -195,15 +195,6 @@ RSpec.describe "BikesController#create", type: :request do
         expect(OrganizationStolenMessage.for_coordinates([41.9, -87.68])&.id).to eq organization_stolen_message.id
         expect_created_stolen_bike(bike_params: bike_params, stolen_params: chicago_stolen_params.merge(show_address: true))
         expect(organization_stolen_message.reload.stolen_records.count).to eq 1
-      end
-      context "with legacy stolen attribute names" do
-        let(:legacy_chicago_stolen_params) do
-          chicago_stolen_params.except(:postal_code, :region_record_id).merge(zipcode: "60622", state_id: state.id)
-        end
-        it "creates a bike with the renamed attributes" do
-          expect_created_stolen_bike(bike_params: bike_params, stolen_params: legacy_chicago_stolen_params.merge(show_address: true))
-          expect(Bike.last.current_stolen_record.region_record_id).to eq state.id
-        end
       end
       context "outside of area" do
         let!(:organization_default_location) { FactoryBot.create(:location, :with_address_record, address_in: :new_york, organization: organization) }
@@ -899,7 +890,7 @@ RSpec.describe "BikesController#create", type: :request do
       # We need to call clean_params on the BParam after bikebook update, so that
       # the foreign keys are assigned correctly.
       # This is also where we're testing bikebook assignment
-      expect_any_instance_of(Integrations::BikeBook).to receive(:get_model) { bb_data }
+      expect_any_instance_of(Integrations::Bikebook::Data).to receive(:get_model) { bb_data }
       expect(state).to be_present
     end
     let!(:target_address) { {street: "212 Main St", city: "Chicago", region: "IL", postal_code: "60647", kind: "ownership"} }

@@ -1,14 +1,14 @@
 # Hosting images from the Claude Code web sandbox
 
-SKILL.md's browser route can't run here: the MCP browser can't verify github.com,
-and the uploader needs a logged-in session no headless browser can get — fixing the
-first buys nothing while the second stands.
+SKILL.md's route can't run here: there's no `gh`, so nothing can `--attach`.
 
 So this route commits the images to the PR's branch instead, and posts through the
 GitHub MCP tools. It stands in for **all** of SKILL.md: step 1's PR lookup and step
-8's posting are the MCP calls below, steps 2 to 7 are one script, step 9 is `curl`.
+3's posting are the MCP calls below, the upload is one script, step 4 is `curl`.
+Unlike `--attach`, the script hands back URLs before anything is posted, so the body
+is composed with them rather than with local paths.
 
-Use it only when `$CLAUDE_CODE_REMOTE` is `true`. Elsewhere the browser uploader's
+Use it only when `$CLAUDE_CODE_REMOTE` is `true`. Elsewhere `--attach`'s
 `user-attachments` URLs are permanent and leave no commits behind.
 
 ## Hosting
@@ -29,9 +29,11 @@ The blob stays reachable through the branch's history, so those URLs keep servin
 after the deletion while the PR's **Files changed** stays empty.
 
 **Post the tags verbatim — never rewrap them as `![](url)`.** The MCP server
-backticks a markdown image's URL, posting an `<img>` with no `src`; links and HTML
-`<img>` pass through untouched. Widths belong to the caller — the `pr` skill's table
-wants `width="500"` desktop, `"250"` mobile.
+backticks a markdown image's URL, posting an `<img>` with no `src`. `add_issue_comment`
+backticks an HTML `<img>`'s `src` too (#4562), while `update_issue_comment` passes it
+untouched — so create the comment, then always `update_issue_comment` it with the
+same body, which also drops the appended footer. Widths belong to the caller — the
+`pr` skill's table wants `width="500"` desktop, `"250"` mobile.
 
 **Call it once, after every capture including the base branch's.** Each call costs
 two commits and a push, and it refuses on a detached HEAD, so it can't run mid-checkout
@@ -52,7 +54,7 @@ session goes through can't upload one.
 
 ## Posting, without `gh`
 
-Same rules as SKILL.md step 8 — one `## Screenshots` comment per PR, edited in place.
+Same rules as SKILL.md step 3 — one `## Screenshots` comment per PR, edited in place.
 Find it by `get_me`'s login and a body starting `## Screenshots`, paging through
 `get_comments` since on a busy PR it won't be on the first page.
 

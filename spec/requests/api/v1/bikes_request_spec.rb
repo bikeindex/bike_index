@@ -4,7 +4,7 @@ base_url = "/api/v1/bikes"
 RSpec.describe API::V1::BikesController, type: :request do
   describe "index" do
     it "loads the page and have the correct headers" do
-      FactoryBot.create(:bike, handlebar_type: "flat")
+      FactoryBot.create(:bike, handlebar_type: "horizontal")
       get base_url, params: {format: :json}
       bike = json_result["bikes"].first
       expect(bike["id"]).to be_present
@@ -54,6 +54,11 @@ RSpec.describe API::V1::BikesController, type: :request do
       bike = FactoryBot.create(:bike)
       get "#{base_url}/#{bike.id}", params: {format: :json}
       expect(response.code).to eq("200")
+    end
+    it "doesn't show a hidden bike" do
+      bike = FactoryBot.create(:bike, user_hidden: true)
+      get "#{base_url}/#{bike.id}", params: {format: :json}
+      expect(response.code).to eq("404")
     end
   end
 

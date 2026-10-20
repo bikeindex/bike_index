@@ -39,8 +39,9 @@ module UI
         def chip(option)
           value = option[:value].to_s
 
-          tag.label(class: @label_classes) do
-            radio_button_tag(@name, value, value == @selected, @html_options) +
+          # aria-disabled on the label is what UI::Button's disabled classes key off
+          tag.label(class: @label_classes, "aria-disabled": (true if option[:disabled])) do
+            radio_button_tag(@name, value, value == @selected, @html_options.merge(disabled: option[:disabled])) +
               tag.span(option[:label].html_safe)
           end
         end

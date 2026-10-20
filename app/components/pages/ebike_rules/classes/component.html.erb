@@ -1,0 +1,61 @@
+<%= helpers.turbo_frame_tag(FRAME_ID, class: ["tw:block", @additional_classes]) do %>
+  <section
+    class="
+      tw:border-y tw:border-gray-200 tw:bg-gray-50 tw:dark:border-gray-700
+      tw:dark:bg-gray-900
+    "
+  >
+    <div class="tw:py-[clamp(40px,7vw,64px)] <%= Pages::EbikeRules::Show::Component::SECTION_CLASSES %>">
+      <h2 class="<%= Pages::EbikeRules::Show::Component::HEADING_CLASSES %>">
+        <% if outside_us %>
+          <%= translation(".place_heading", place: @place[:name]) %>
+        <% elsif state_classes %>
+          <%= translation(".state_classes_heading", state: @place[:name]) %>
+        <% else %>
+          <%= translation(".classes_heading") %>
+        <% end %>
+      </h2>
+
+      <% if outside_us %>
+        <div class="tw:mt-7 tw:flex tw:flex-col tw:gap-8">
+          <% outside_us[:laws].each do |law| %>
+            <%= render(UI::Card::Component.new(shadow: true, additional_classes: "tw:rounded-lg tw:p-6!")) do %>
+              <%= render(Pages::EbikeRules::LawSummary::Component.new(law:, titled: true)) %>
+            <% end %>
+          <% end %>
+        </div>
+
+        <% if cards.any? %>
+          <h3 class="tw:mt-10 tw:mb-4 tw:font-header tw:text-xl tw:font-extrabold">
+            <%= translation(".other_classes", place: @place[:name]) %>
+          </h3>
+        <% end %>
+      <% else %>
+        <p
+          class="
+            tw:mt-2 tw:mb-7 tw:max-w-[640px] tw:text-[17px] tw:text-gray-700
+            tw:dark:text-gray-300
+          "
+        >
+          <% if state_classes %>
+            <%= translation(".state_classes_intro", state: @place[:name]) %>
+          <% else %>
+            <%= translation(".classes_intro") %>
+          <% end %>
+        </p>
+      <% end %>
+
+      <div
+        class="
+          tw:grid
+          tw:grid-cols-[repeat(auto-fit,minmax(min(100%,240px),1fr))]
+          tw:gap-4
+        "
+      >
+        <% cards.each do |card| %>
+          <%= render(card) %>
+        <% end %>
+      </div>
+    </div>
+  </section>
+<% end %>

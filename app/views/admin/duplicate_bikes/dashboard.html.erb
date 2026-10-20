@@ -144,13 +144,13 @@
   <div class="tw:mt-2 tw:flex tw:flex-wrap tw:gap-2">
     <% cue_link_classes = "tw:rounded-full tw:border tw:border-gray-300 tw:px-3 tw:py-1 tw:text-sm tw:no-underline! tw:text-inherit! tw:hover:bg-gray-100 tw:is-active:border-blue-500 tw:is-active:bg-blue-50 tw:is-active:font-semibold tw:dark:border-gray-600 tw:dark:hover:bg-gray-700 tw:dark:is-active:bg-blue-950" %>
 
-    <%= render UI::ActiveLink::Component.new(path: url_for(request.query_parameters.except("search_cue", "page")), match_params: {search_cue: [nil]}, class: cue_link_classes) do %>
+    <%= render UI::ActiveLink::Component.new(path: url_for(link_params.except("search_cue", "page")), match_params: {search_cue: [nil]}, class: cue_link_classes) do %>
       All groups
       <span class="tw:text-gray-600 tw:dark:text-gray-400"><%= number_display(@queue_groups_count) %></span>
     <% end %>
 
     <% cue_filters.each do |cue, label| %>
-      <%= render UI::ActiveLink::Component.new(path: url_for(request.query_parameters.except("page").merge("search_cue" => cue)), match_params: {search_cue: cue}, class: cue_link_classes) do %>
+      <%= render UI::ActiveLink::Component.new(path: url_for(link_params.except("page").merge("search_cue" => cue)), match_params: {search_cue: cue}, class: cue_link_classes) do %>
         <%= label %>
         <span class="tw:text-gray-600 tw:dark:text-gray-400"><%= number_display(@cue_counts[cue]) %></span>
       <% end %>
@@ -167,7 +167,7 @@
     ["Newest first registration", "first_at", "desc"],
     ["Oldest first registration", "first_at", "asc"]
   ].each do |label, sort, direction| %>
-    <%= render UI::ActiveLink::Component.new(path: url_for(request.query_parameters.except("page").merge("sort" => sort, "direction" => direction)), match_params: {sort: (sort == "record_count") ? [nil, sort] : sort, direction: (direction == "desc") ? [nil, direction] : direction}, class: cue_link_classes) do %>
+    <%= render UI::ActiveLink::Component.new(path: url_for(link_params.except("page").merge("sort" => sort, "direction" => direction)), match_params: {sort: (sort == "record_count") ? [nil, sort] : sort, direction: (direction == "desc") ? [nil, direction] : direction}, class: cue_link_classes) do %>
       <%= label %>
     <% end %>
   <% end %>
@@ -180,7 +180,7 @@
   <% if @cue %>
     with the cue <strong><%= cue_filters[@cue] %></strong>, of
     <%= number_display(@queue_groups_count) %> groups in this queue
-    (<%= link_to "show all", url_for(request.query_parameters.except("search_cue", "page")), class: "twlink" %>)
+    (<%= link_to "show all", url_for(link_params.except("search_cue", "page")), class: "twlink" %>)
   <% end %>
   <% if @organization %>
     for <strong><%= @organization.name %></strong>

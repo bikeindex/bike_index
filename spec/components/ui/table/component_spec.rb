@@ -43,6 +43,22 @@ RSpec.describe UI::Table::Component, type: :component do
     end
   end
 
+  context "with a row_header column" do
+    let(:component) do
+      render_inline(described_class.new(records:)) do |table|
+        table.column(label: "Name", row_header: true) { |r| r.name }
+        table.column(label: "Email") { |r| r.email }
+      end
+    end
+
+    it "renders each row's header as a th" do
+      expect(component).to have_css("tbody th[scope='row']", count: 2)
+      expect(component).to have_css("tbody th[scope='row']", text: "Bob")
+      expect(component).to have_css("td", text: "bob@example.com")
+      expect(component).to have_no_css("td", text: "Bob")
+    end
+  end
+
   context "with custom classes" do
     let(:component) do
       render_inline(described_class.new(records:, classes: "custom-class")) do |table|

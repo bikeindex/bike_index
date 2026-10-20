@@ -26,6 +26,8 @@ RSpec.shared_context :cloudflare_test_storage do
   # `purge`: an attached blob's destroy hits a foreign key, which purge rescues, so it never
   # reaches storage - the rows go with the transaction anyway.
   after do
+    # A shared context's after runs ahead of Capybara's reset, which is what waits for requests
+    Capybara.current_session.server&.wait_for_pending_requests
     without_http_stubbing do
       ActiveStorage::Blob.where(service_name: "cloudflare_test").each(&:delete)
     end

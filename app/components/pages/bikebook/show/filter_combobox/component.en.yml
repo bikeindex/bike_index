@@ -1,0 +1,8 @@
+---
+en:
+  components:
+    pages:
+      bikebook:
+        show:
+          filter_combobox:
+            any: Any

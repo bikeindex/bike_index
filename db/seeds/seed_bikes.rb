@@ -49,14 +49,12 @@ def seed_recovery_display(bike:, location:, photo_filename:, recovered_at:, reco
 
   # skip_callback_job because the job runs inline below instead - photo_url has to exist
   # without sidekiq, since the homepage filters on it
-  recovery_display = RecoveryDisplay.new(stolen_record:, recovered_at:, quote_by:, location_string:, quote:,
+  recovery_display = RecoveryDisplay.create!(stolen_record:, recovered_at:, quote_by:, location_string:, quote:,
     skip_callback_job: true)
-  # save! goes inside the block - ActiveStorage re-reads the io to upload it
-  File.open(photo_path) do |file|
-    recovery_display.photo.attach(io: file, filename: photo_filename)
-    recovery_display.save!
+  SeedHelpers.without_clock do
+    File.open(photo_path) { |file| recovery_display.photo.attach(io: file, filename: photo_filename) }
+    ImageJobs::ProcessRecoveryDisplayPhotoJob.new.perform(recovery_display.id)
   end
-  ImageJobs::ProcessRecoveryDisplayPhotoJob.new.perform(recovery_display.id)
   recovery_display
 end
 
@@ -509,6 +507,7 @@ rm_components = [
 rm_bike = seed_bike(
   creator:, user:, origin: "organization_form", label: "Riese & Müller bike",
   params: {bike: bike_params(owner_email: rm_owner.email, manufacturer_id: rm_manufacturer.id).merge(
+    serial_number: "LOAD4ROHLOFF01",
     creation_organization_id: brakebills_org.id.to_s,
     cycle_type: "cargo",
     propulsion_type: "pedal-assist",
