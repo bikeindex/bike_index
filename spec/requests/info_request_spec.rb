@@ -79,12 +79,15 @@ RSpec.describe InfoController, type: :request do
     end
 
     describe "donate" do
-      it "renders the donation forms" do
+      include_context :active_stripe_prices
+
+      it "renders the donation forms with the active prices" do
         get "/donate?source=newsletter"
         expect(response.status).to eq(200)
         expect(response).to render_template("layouts/application")
         expect(response.body).to include("Fund the next recovery")
         expect(response.body).to match(/name="referral_source"[^>]*value="newsletter"/)
+        expect(response.body).to include("Become a member — $15/month")
       end
 
       context "signed in with a membership" do
@@ -202,6 +205,8 @@ RSpec.describe InfoController, type: :request do
       expect(assigns(:show_general_alert)).to be_truthy
     end
     context "donate" do
+      include_context :active_stripe_prices
+
       it "renders without show alert" do
         get "/donate"
         expect(response.code).to eq("200")

@@ -7,8 +7,6 @@ module Pages
       # payment. The cadence radios switch between the two forms in CSS, so both submit
       # without javascript - the donate--page controller only keeps the labels in step.
       class Component < ApplicationComponent
-        # Checkout charges the level's active monthly StripePrice, which has to match these
-        MONTHLY_TIERS = {basic: 5, plus: 15, patron: 50}.freeze
         ONE_TIME_AMOUNTS = [25, 50, 100].freeze
         MAJOR_AMOUNTS = [500, 1000].freeze
 
@@ -20,10 +18,13 @@ module Pages
           wh198hgo27wt25cc83xhwzi4h439
         ].map { "https://uploads.bikeindex.org/#{it}" }.freeze
 
-        def initialize(recovery_displays:, currency: Currency.default, initial_amount: nil, referral_source: nil,
+        def initialize(stripe_prices:, recovery_displays:, initial_amount: nil, referral_source: nil,
           current_user: nil)
+          @currency = stripe_prices.first&.currency_obj || Currency.default
+          @monthly_prices = stripe_prices.select(&:monthly?).to_h do
+            [it.membership_level.to_sym, MoneyFormatter.money_format_no_cents_if_whole(it.amount_cents, @currency.slug)]
+          end
           @recovery_displays = recovery_displays
-          @currency = currency
           @initial_amount = initial_amount.to_i if initial_amount.to_i.positive?
           @referral_source = referral_source
           @email = current_user&.email
@@ -42,7 +43,7 @@ module Pages
 
         def money(dollars) = MoneyFormatter.money_format_without_cents(dollars * 100, @currency)
 
-        def tier_amount(level) = money(MONTHLY_TIERS[level])
+        def tier_amount(level) = @monthly_prices[level]
 
         def monthly_label(amount) = translation(".monthly_submit", amount:)
 
@@ -58,7 +59,7 @@ module Pages
           [
             [abbreviated(Counts.total_bikes), translation(".stat_bikes")],
             [number_display(Counts.recoveries), translation(".stat_recoveries")],
-            [safe_join([@currency.symbol, number_display((Counts.recoveries_value / 1_000_000.0).round(1)), "M"]),
+            [render(Atoms::CurrencyMillions::Component.new(dollars_usd: Counts.recoveries_value)),
               translation(".stat_value")],
             [safe_join([number_display(Counts.organizations.floor(-2)), "+"]), translation(".stat_partners")]
           ]

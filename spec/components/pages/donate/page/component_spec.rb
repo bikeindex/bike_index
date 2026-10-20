@@ -3,7 +3,14 @@
 require "rails_helper"
 
 RSpec.describe Pages::Donate::Page::Component, type: :component do
-  let(:options) { {recovery_displays: [], initial_amount:, current_user:, referral_source: "newsletter"} }
+  let(:options) { {stripe_prices:, recovery_displays: [], initial_amount:, current_user:, referral_source: "newsletter"} }
+  let(:currency_enum) { "usd" }
+  let(:stripe_prices) do
+    {basic: 500, plus: 1500, patron: 5000}.flat_map do |membership_level, amount_cents|
+      [FactoryBot.build(:stripe_price, membership_level:, currency_enum:, amount_cents:),
+        FactoryBot.build(:stripe_price, membership_level:, currency_enum:, interval: "yearly", amount_cents: amount_cents * 10)]
+    end
+  end
   let(:initial_amount) { nil }
   let(:current_user) { nil }
   let(:component) { render_inline(described_class.new(**options)) }
@@ -16,6 +23,18 @@ RSpec.describe Pages::Donate::Page::Component, type: :component do
     expect(component).to have_css("input[name='payment[amount_cents]'][value='5000'][checked]")
     expect(component).to have_css("input[type='hidden'][name='payment[amount_cents]'][disabled]", visible: :all)
     expect(component).to have_css("img[src='#{described_class::WALL_PHOTOS.first}']", count: 1)
+  end
+
+  context "with CAD prices" do
+    let(:currency_enum) { "cad" }
+    before { stripe_prices.find { it.patron? && it.monthly? }.amount_cents = 4999 }
+
+    it "renders the monthly prices in that currency" do
+      expect(component).to have_button("Become a member — $15/month", count: 2)
+      expect(component).to have_text("$49.99")
+      expect(component).to have_css("form[action='/membership'] input[name='currency'][value='cad']", visible: :all)
+      expect(component).to have_css("input[name='payment[currency]'][value='CAD']", visible: :all)
+    end
   end
 
   context "with a preset initial_amount" do
