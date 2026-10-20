@@ -87,14 +87,16 @@ module Pages
         def without_throttle? = @rules.select { it[:status] == :check }.map { it[:note] } == [:optional_throttle_not_allowed]
 
         # [class, the optional mode that alone brings it] by class. In no class here, the e-moto's alone, and in none
-        # with an optional throttle, its classes but the throttle's, then the e-moto's with the throttle's caption
+        # with an optional throttle, its classes but the throttle's, then the e-moto's with the throttle's caption, each
+        # e-moto's with the state's out of class marker
         def tiles
-          return [[nil, nil]] if @bike.out_of_class_under?(@law)
+          out_of_class_id = EbikeRuleServices::StateLaws.out_of_class_id(@state[:abbr]) if @us
+          return [[nil, nil, out_of_class_id]] if @bike.out_of_class_under?(@law)
 
           classes = @bike.e_bike_classes.map { [it, @bike.optional_classes[it]] }
           return classes unless @bike.optionally_out_of_class_under?(@law)
 
-          classes.reject { |_, mode| mode == "throttle" } + [[nil, "throttle"]]
+          classes.reject { |_, mode| mode == "throttle" } + [[nil, "throttle", out_of_class_id]]
         end
 
         # "and as Class 2 with its optional throttle", of the optional classes the state recognizes, and not a throttle's

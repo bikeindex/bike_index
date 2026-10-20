@@ -63,7 +63,7 @@ module EbikeRuleServices
     def out_of_class_id(abbreviation) = "#{NOT_AN_EBIKE[:id]}/us/#{abbreviation.downcase}"
 
     # The markers of the states whose law bars a Class 3's throttle, as California's does
-    def out_of_class_ids = laws.filter_map { |abbreviation, law| out_of_class_id(abbreviation) if law[:class_3_throttle] == false }
+    def out_of_class_ids = parsed[:laws].filter_map { |abbreviation, law| out_of_class_id(abbreviation) if law[:class_3_throttle] == false }
 
     # The classifications that are an e-bike law or class anywhere, as the EU's EPAC is, rather than a motor vehicle's
     def e_bike_law_ids = parsed[:e_bike_laws]

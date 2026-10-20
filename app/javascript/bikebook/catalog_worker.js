@@ -47,7 +47,7 @@ async function load ({ manifestUrl, ids, jurisdictions, rulesUrl }) {
     sortPrice: model.msrp_cents ?? 0
   }))
   byId = new Map(models.map((model) => [model.id, model]))
-  // the index's labels, which the vocabulary's records replace, for the out of class markers it has none of: "Out of class in California"
+  // the index labels the out of class markers, which the vocabulary has no record of: "Out of class in California"
   const labels = Object.entries(index.filter_options.e_vehicle_classification).map(([id, label]) => [id, { label, title: label, marker: true }])
   // "California Moped", which its name leaves off the state of, and a group has none; "US Class 3 e-bike"
   classifications = Object.fromEntries([...labels, ...Object.entries(vocabulary.e_vehicle_classifications).map(([id, record]) => {
@@ -70,7 +70,7 @@ function options ({ manufacturers, vehicle_types: vehicleTypes, filter_options: 
     manufacturer: Object.entries(manufacturers).filter(([slug]) => perManufacturer.has(slug)).sort(([, a], [, b]) => a.localeCompare(b))
       .map(([value, display]) => ({ value, display, count: perManufacturer.get(value) })),
     vehicle_type: counted('vehicle_type', vehicleTypes.map(({ slug, name }) => [slug, name])),
-    // "Canada (CA)", as UI::Forms::ComboboxState shows a state. Only those with models, as most the catalog names have none
+    // "Canada (CA)", as UI::Forms::ComboboxState shows a state; only those with models, as most of the catalog's have none
     market: counted('market', Object.entries(market).sort(([, a], [, b]) => a.localeCompare(b))).filter(({ count }) => count)
       .map((option) => ({ ...option, name: option.display, display: `${option.display} (${option.value})` })),
     ...Object.fromEntries(Object.entries(filterOptions).map(([name, labels]) => [name, counted(name, Object.entries(labels))]))

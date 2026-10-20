@@ -14,11 +14,13 @@ import { VehiclePresenter } from 'bikebook/vehicle_presenter'
 
 // The compared vehicles' cards, from catalog blocks
 export class VehicleViewer {
-  // `jurisdiction`'s out of class marker, evc/out_of_class/us/ca, where the catalog has one, as its law bars a Class 3's throttle
+  // `jurisdiction`'s out of class marker, evc/out_of_class/us/ca, where its law bars a Class 3's throttle, as
+  // EbikeRuleServices::StateLaws.out_of_class_ids has them
   constructor (kit, vocabulary, jurisdiction) {
     this.presenter = new VehiclePresenter(kit, vocabulary)
-    const marker = `evc/out_of_class/us/${jurisdiction?.toLowerCase()}`
-    this.outOfClassId = vocabulary.e_vehicle_classifications[marker] ? marker : null
+    const barred = Object.values(vocabulary.e_vehicle_classifications)
+      .some((record) => record.jurisdiction === `US-${jurisdiction}` && record.class_3_throttle === false)
+    this.outOfClassId = barred ? `evc/out_of_class/us/${jurisdiction.toLowerCase()}` : null
   }
 
   // The vehicles at `url` in the view it picks, whose links keep its other params, compared in the sizes it picks or

@@ -324,7 +324,7 @@
     bars a Class 3's throttle, each a tooltip of its card
   %>
 
-  <% ([1, 2, 3].product([nil, "throttle", "assist"], [nil]) + [nil].product([nil, "throttle"], [nil, *EbikeRuleServices::StateLaws.out_of_class_ids])).each do |e_bike_class, optional, out_of_class_id| %>
+  <% ([1, 2, 3].product([nil, "throttle", "assist"]) + [nil].product([nil, "throttle"], [nil, *EbikeRuleServices::StateLaws.out_of_class_ids])).each do |e_bike_class, optional, out_of_class_id| %>
     <template
       data-bikebook-class-badge="<%= [e_bike_class || "emoto", optional, out_of_class_id].compact.join("/") %>"
     >
