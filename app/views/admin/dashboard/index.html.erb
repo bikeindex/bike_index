@@ -68,4 +68,37 @@
       </p>
     </div>
   </div>
+
+  <hr>
+
+  <% daily_logged_searches = Counts.logged_searches(@time_range.first.to_date..Date.current).values %>
+
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="mt-4">
+        Index searches
+      </h2>
+
+      <p>
+        <%= number_display(daily_logged_searches.sum { it["not_web_bikebook"] }) %>
+        past week
+        <em>(<%= number_display(daily_logged_searches.sum { it["not_web_bikebook_serial"] }) %> with serial)</em>
+      </p>
+
+      <%= render(UI::Chart::Component.new(series: logged_searches_admin_graphs_path(search_endpoint: "not_web_bikebook", period: "week"), stacked: true)) %>
+    </div>
+
+    <div class="col-md-6">
+      <h2 class="mt-4">
+        Bike Book searches
+      </h2>
+
+      <p>
+        <%= number_display(daily_logged_searches.sum { it["web_bikebook"] }) %>
+        past week
+      </p>
+
+      <%= render(UI::Chart::Component.new(series: logged_searches_admin_graphs_path(search_endpoint: "web_bikebook", period: "week"))) %>
+    </div>
+  </div>
 <% end %>

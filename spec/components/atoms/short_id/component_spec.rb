@@ -7,9 +7,10 @@ RSpec.describe Atoms::ShortId::Component, type: :component do
   let(:component) { render_inline(instance) }
   let(:options) { {short_id: "r/21J-HW"} }
 
-  it "renders the short_id in a monospace code block" do
+  it "renders the short_id in a monospace code block with a copy button" do
     expect(component).to have_css("code", text: "r/21J-HW")
     expect(component.to_html).to include("tw:font-mono")
+    expect(component).to have_css("button[title='Copy ID'][data-ui--copy-button-text-value='r/21J-HW']")
   end
 
   context "with a record" do
@@ -18,14 +19,6 @@ RSpec.describe Atoms::ShortId::Component, type: :component do
 
     it "renders the record's short_id" do
       expect(component).to have_css("code", text: record.short_id)
-    end
-  end
-
-  context "with html_class" do
-    let(:options) { {short_id: "r/36", html_class: "tw:text-base"} }
-
-    it "appends the extra classes" do
-      expect(component).to have_css("code.tw\\:text-base", text: "r/36")
     end
   end
 

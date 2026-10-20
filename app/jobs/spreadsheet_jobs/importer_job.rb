@@ -2,7 +2,7 @@ module SpreadsheetJobs
   class ImporterJob < ApplicationJob
     RESOURCES_URL = "https://raw.githubusercontent.com/bikeindex/bike_data/refs/heads/main/data".freeze
     # Maps each importer module (e.g. Spreadsheets::Manufacturers) to its CSV filename in the bike_data repo
-    IMPORTERS = {"manufacturers" => "manufacturers", "primary_activities" => "primary_activities", "components" => "component_types"}.freeze
+    IMPORTERS = {"manufacturers" => "manufacturers", "primary_activities" => "primary_activities", "components" => "component_types", "wheel_sizes" => "wheel_sizes"}.freeze
     # db/seeds.rb runs this inline, so a transient blip reaching GitHub would abort the
     # whole seed (e.g. CI). Retry a few times before giving up.
     DOWNLOAD_ATTEMPTS = 3

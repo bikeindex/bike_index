@@ -60,6 +60,20 @@ RSpec.describe UI::Dropdown::Component, :js, type: :system do
     end
   end
 
+  context "with two dropdowns" do
+    it "closes the open one when the other opens" do
+      visit "/rails/view_components/ui/dropdown/component/two_dropdowns"
+
+      click_button("First")
+      expect(page).to have_css('button[aria-expanded="true"]', text: "First")
+
+      click_button("Second")
+      expect(page).to have_css('button[aria-expanded="true"]', text: "Second")
+      expect(page).to have_css('button[aria-expanded="false"]', text: "First")
+      expect(page).to have_no_text("First item")
+    end
+  end
+
   context "when the widest entry is wider than the button" do
     it "widens the menu to fit it on one line, without exceeding the viewport" do
       visit "/rails/view_components/ui/dropdown/component/long_entry"

@@ -1,0 +1,123 @@
+<%# a catalog that didn't answer has no laws, which would otherwise be kept for the day %>
+<% cache_if(on_file.positive?, cache_key) do %>
+  <section
+    id="state-laws"
+    class="
+      tw:mx-auto tw:max-w-[1120px] tw:px-[clamp(16px,4vw,32px)]
+      tw:py-[clamp(44px,8vw,72px)]
+    "
+    data-controller="ebike-rules--state-filter"
+  >
+    <div class="tw:mb-5 tw:flex tw:flex-wrap tw:items-end tw:gap-x-8 tw:gap-y-4">
+      <div class="tw:flex-[1_1_360px]">
+        <h2
+          class="
+            tw:font-header tw:text-[clamp(26px,4vw,34px)] tw:leading-tight
+            tw:font-extrabold
+          "
+        >
+          <%= copy[:heading] %>
+        </h2>
+
+        <p class="tw:mt-2 tw:text-[17px] tw:text-gray-700 tw:dark:text-gray-300">
+          <%= copy[:limits_subheading] %>
+        </p>
+      </div>
+
+      <div class="tw:min-w-60 tw:flex-[0_1_300px]">
+        <label class="twlabel" for="state-filter"><%= copy[:filter_states] %></label>
+
+        <input
+          id="state-filter"
+          type="search"
+          class="twinput tw:min-h-12 tw:text-base!"
+          placeholder="<%= copy[:filter_placeholder] %>"
+          autocomplete="off"
+          data-action="ebike-rules--state-filter#filter"
+          data-ebike-rules--state-filter-target="field"
+        >
+      </div>
+    </div>
+
+    <p
+      class="tw:mb-3 tw:text-sm tw:text-gray-700 tw:dark:text-gray-300"
+      data-ebike-rules--state-filter-target="count"
+      data-matching-template="<%= translation(".matching_of_total", number: "__number__", total: states.size) %>"
+    >
+      <%= (on_file == states.size) ? copy[:all_on_file] : copy[:on_file_of_total] %>
+    </p>
+
+    <p
+      class="tw:hidden tw:py-6 tw:text-gray-700 tw:dark:text-gray-300"
+      data-ebike-rules--state-filter-target="empty"
+    >
+      <%= copy[:no_match] %>
+    </p>
+
+    <div
+      class="
+        tw:grid tw:grid-cols-[repeat(auto-fill,minmax(min(100%,320px),1fr))]
+        tw:gap-x-6 tw:border-t tw:border-gray-200 tw:dark:border-gray-700
+      "
+    >
+      <% states.each do |state| %>
+        <div
+          id="state-<%= state[:id] %>"
+          class="<%= STATE_CLASSES %>"
+          data-controller="ui--collapse"
+          data-ebike-rules--state-filter-target="state"
+          data-action="click->ebike-rules--state-filter#link keydown.enter->ebike-rules--state-filter#link keydown.space->ebike-rules--state-filter#link"
+          data-name="<%= state[:name] %>"
+        >
+          <h3>
+            <%= render(UI::Collapse::Component.new(chevron: :trailing, color: :link,
+              html_class: "tw:flex! tw:min-h-13 tw:w-full tw:items-center tw:gap-3 tw:px-1 tw:py-1 tw:text-base tw:font-semibold tw:aria-expanded:px-4",
+              aria: {controls: "state-panel-#{state[:id]}"})) do %>
+              <span class="tw:flex-1 tw:text-left"><%= state[:name] %></span>
+
+              <% if us? && state[:law] && !EbikeRuleServices::StateLaws.three_classes?(state[:law]) %>
+                <span
+                  class="
+                    tw:text-sm tw:font-normal tw:text-gray-500
+                    tw:dark:text-gray-400
+                  "
+                >
+                  <%= class_system(state[:law]) %>
+                </span>
+              <% end %>
+
+              <% unless state[:law] %>
+                <%= render(UI::Badge::Component.new(text: translation(".in_review"))) %>
+              <% end %>
+            <% end %>
+          </h3>
+
+          <div
+            id="state-panel-<%= state[:id] %>"
+            class="tw:hidden tw:px-4 tw:pb-5"
+            data-ui--collapse-target="content"
+          >
+            <% if (law = state[:law]) %>
+              <%# a law outside the US is named for what it regulates, rather than for the classes it recognizes %>
+              <%= render(Pages::EbikeRules::LawSummary::Component.new(law:, titled: !us?)) %>
+            <% else %>
+              <p
+                class="
+                  tw:max-w-[720px] tw:text-[15px] tw:text-gray-700
+                  tw:dark:text-gray-300
+                "
+              >
+                <%= compiling(state) %>
+              </p>
+            <% end %>
+
+            <p class="tw:mt-4">
+              <%= link_to translation(".check_in_state", state: state[:name]), ebike_rules_place_path(*state[:code].split("-"), anchor: "check"),
+                class: "twlink tw:font-semibold", data: {check_state: state[:code]} %>
+            </p>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </section>
+<% end %>

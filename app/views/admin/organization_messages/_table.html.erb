@@ -1,0 +1,29 @@
+<%# locals: (collection:, render_sortable: false, skip_bike: false) %>
+
+<%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
+  <% table.column(sortable: "created_at", lower_right: ->(record) { tag.span(record.id, class: "only-dev-visible") }) do |organization_message| %>
+    <%= render UI::Time::Component.new(time: organization_message.created_at) %>
+  <% end %>
+
+  <% table.column(sortable: "organization_id") do |organization_message| %>
+    <%= render Atoms::Admin::TableCells::Organization::Component.new(sort_state:, organization: organization_message.organization, render_search: render_sortable, short_name: true) %>
+  <% end %>
+
+  <% unless skip_bike %>
+    <% table.column(sortable: "bike_id") do |organization_message| %>
+      <%= render Atoms::Admin::TableCells::Bike::Component.new(sort_state:, bike: organization_message.bike, bike_id: organization_message.bike_id, bike_link_path: admin_bike_path(organization_message.bike_id, active_tab: "messages"), render_search: render_sortable) %>
+    <% end %>
+  <% end %>
+
+  <% table.column(label: "Message") do |organization_message| %>
+    <span title="<%= organization_message.message %>"><%= organization_message.message.truncate(100) %></span>
+  <% end %>
+
+  <% table.column(sortable: "sender_id") do |organization_message| %>
+    <%= render Atoms::Admin::TableCells::User::Component.new(sort_state:, user: organization_message.sender, render_search: render_sortable) %>
+  <% end %>
+
+  <% table.column(sortable: "receiver_id") do |organization_message| %>
+    <%= render Atoms::Admin::TableCells::User::Component.new(sort_state:, user: organization_message.receiver, email: organization_message.receiver_email, render_search: render_sortable) %>
+  <% end %>
+<% end %>

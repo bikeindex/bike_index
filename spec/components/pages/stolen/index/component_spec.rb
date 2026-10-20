@@ -44,11 +44,10 @@ RSpec.describe Pages::Stolen::Index::Component, type: :component do
       Array.new(5) { |i| FactoryBot.create(:recovery_display_with_photo, quote: "Quote #{i}", quote_by: "Owner #{i}") }
     end
 
-    it "renders the first four, hiding the last two on mobile" do
+    it "renders the first four" do
       expect(component).to have_css("ul > li blockquote", count: 4)
       expect(component).to have_text("Quote 3")
       expect(component).to_not have_text("Quote 4")
-      expect(component).to have_css("li.tw\\:hidden blockquote", count: 2)
     end
   end
 end

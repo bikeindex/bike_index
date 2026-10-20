@@ -119,7 +119,8 @@ RSpec.describe UI::Forms::Combobox::Component, :js, type: :system do
 
       expect(page).to have_css(overlay, text: "Cargo Bike (front storage)")
 
-      fill_in "Cycle type", with: "uni"
+      # A prefix ("uni") autocompletes inline to the whole option, which reads as the selection
+      fill_in "Cycle type", with: "cycle"
 
       expect(page).to have_no_css(overlay)
 

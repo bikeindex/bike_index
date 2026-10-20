@@ -59,6 +59,8 @@ module AdminHelper
       admin_user_path(obj.user_id)
     elsif obj.instance_of?(UserAlert)
       admin_user_alerts_path(user_id: obj.user_id)
+    elsif obj.instance_of?(OrganizationMessage)
+      admin_organization_messages_path(search_bike_id: obj.bike_id)
     elsif obj.instance_of?(Blog)
       admin_news_path(obj) # blogs are administered as news
     else

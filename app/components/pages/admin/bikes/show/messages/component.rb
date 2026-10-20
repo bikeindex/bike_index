@@ -18,6 +18,11 @@ module Pages
               @notifications ||= @bike.notifications.includes(:notifiable).order(created_at: :desc)
             end
 
+            def organization_messages
+              @organization_messages ||= @bike.organization_messages.includes(:organization, :sender, :receiver)
+                .order(created_at: :desc)
+            end
+
             def feedbacks = @feedbacks ||= Feedback.bike(@bike.id).order(created_at: :desc)
 
             def user_alerts = @user_alerts ||= UserAlert.where(bike_id: @bike.id).order(created_at: :desc)

@@ -55,6 +55,19 @@ Rails.application.routes.draw do
   end
 
   get "recovery_stories", to: "welcome#recovery_stories", as: :recovery_stories
+  get "bikebook", to: "bikebook#show"
+  get "bikebook/*vehicle_model", to: "bikebook#vehicle", format: false
+  # a catalog model's own id, its manufacturer, year and model
+  get "m/*vehicle_model", to: "bikebook#vehicle", format: false, constraints: {vehicle_model: %r{[a-z0-9_]+/\d{4}/[a-z0-9_]+}}
+  # an e-vehicle classification's id, whose card the page shows
+  get "evc/*classification", to: redirect(status: 302) { |params, _request| "/bikebook?classifications=evc/#{params[:classification]}" },
+    format: false, constraints: {classification: %r{[a-z0-9_]+(/[a-z0-9_]+)*}}
+  if Integrations::Bikebook::Catalog::LOCAL_DIRECTORY
+    mount Rack::Files.new(Integrations::Bikebook::Catalog::LOCAL_DIRECTORY) => Integrations::Bikebook::Catalog::LOCAL_PATH
+  end
+  get "ebike-rules", to: "ebike_rules#show", as: :ebike_rules
+  get "ebike-rules/:country(/:region)", to: "ebike_rules#show", as: :ebike_rules_place, constraints: {country: /[a-z]{2}/i, region: /[a-z0-9]{1,3}/i}
+  get "e-bike-rules(/*rest)", to: redirect { |_, request| request.fullpath.sub("/e-bike-rules", "/ebike-rules") }
 
   resource :session, only: %i[new create destroy] do
     collection do
@@ -141,6 +154,7 @@ Rails.application.routes.draw do
   resource :my_account, only: %i[show update destroy] do
     post :toggle_show_redesign
     resources :messages, only: %i[index show create], controller: "my_accounts/messages"
+    resource :membership, only: %i[show], controller: "my_accounts/memberships"
     resources :marketplace_listings, only: %i[update], controller: "my_accounts/marketplace_listings"
     resources :organization_roles, only: %i[update destroy], controller: "my_accounts/organization_roles"
   end
@@ -222,6 +236,7 @@ Rails.application.routes.draw do
     resources :marketplace, only: [] do
       collection { get :counts }
     end
+    get "/bikebook", to: "bikebook#index", as: :bikebook
   end
 
   # Short_id forms the resources :id segment can't match; before resources, as with registrations above
@@ -310,7 +325,7 @@ Rails.application.routes.draw do
     %i[
       bike_sticker_updates email_bans exports graduated_notifications invoices logged_searches
       mailchimp_data model_attestations model_audits
-      notifications organization_landing_pages organization_statuses paper_trail_versions
+      notifications organization_landing_pages organization_messages organization_statuses paper_trail_versions
       parking_notifications public_images
       strava_activities strava_gears strava_requests
       stripe_prices stripe_subscriptions user_alerts user_bans user_registration_organizations
@@ -351,6 +366,7 @@ Rails.application.routes.draw do
 
     resources :stolen_bikes do
       member { post :approve }
+      collection { post :bulk_update }
     end
     resources :customer_contacts, only: %i[create show]
     resources :recoveries do
@@ -363,6 +379,7 @@ Rails.application.routes.draw do
       collection do
         get :tables
         get :variable
+        get :logged_searches
         get :bikes_table
       end
     end
@@ -505,6 +522,7 @@ Rails.application.routes.draw do
     resources :emails, only: %i[index show edit update]
     resources :parking_notifications
     resources :graduated_notifications, only: %w[index show]
+    resources :organization_messages, only: %i[create]
     resources :impound_records, only: %i[index show update]
     resources :impound_claims, only: %i[index show update]
     resources :stickers, only: %i[index show edit update]
@@ -545,8 +563,8 @@ Rails.application.routes.draw do
   get "*id", to: "registrations#show", constraints: {id: %r{[rR]/.*}}, format: false
   # Short bike_version URLs: /v/<short_id> (and /V/...)
   get "*id", to: "bike_versions#show", constraints: {id: %r{[vV]/.*}}, format: false
-  # Short marketplace_listing URLs: /m/<short_id> (and /M/...)
-  get "*id", to: "marketplace_listings#show", constraints: {id: %r{[mM]/.*}}, format: false
+  # Short marketplace_listing URLs: /f/<short_id> (and /F/...)
+  get "*id", to: "marketplace_listings#show", constraints: {id: %r{[fF]/.*}}, format: false
 
   get "*unmatched_route", to: "errors#not_found" if Rails.env.production? || Rails.env.sandbox? # Handle 404s with lograge
 end

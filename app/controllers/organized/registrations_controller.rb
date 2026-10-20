@@ -28,7 +28,9 @@ module Organized
         @chart_open = Binxtils::InputNormalizer.boolean(params[:chart_open]) ? "1" : "0"
         @result_view = Pages::Org::Search::Wrapper::Component.permitted_result_view(params[:search_result_view])
         @render_results = Binxtils::InputNormalizer.boolean(params[:search_no_js]) || turbo_request?
-        @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_registration_search_params, ip: forwarded_ip_address)
+        @interpreted_params = BikeSearchable.searchable_interpreted_params(
+          permitted_org_registration_search_params.merge(distance_unit: search_distance_unit), ip: forwarded_ip_address
+        )
         @per_page = permitted_per_page(default: 10)
 
         if create_export?
@@ -87,11 +89,13 @@ module Organized
     def settings
       @page_title = I18n.t("meta_titles.registration_form_settings")
       render Pages::Org::RegisterSettings::Component.new(organization: current_organization, old_view: old_register_view?,
+        old_unregistered_notification_view: old_unregistered_notification_view?,
         **BikeServices::Register.session_settings(session[:register_settings], current_organization.id))
     end
 
     # An unchecked box turns its setting off; the old view disables them, so the session keeps theirs
     def switches
+      session[:old_unregistered_notification_view] = params[:old_unregistered_notification_view].present?
       if params[:old_view].present?
         session[:old_register_view] = true
         return redirect_to new_organization_bike_path(organization_id: current_organization.to_param)
@@ -247,11 +251,13 @@ module Organized
       bikes = BikeServices::OrganizedSearch.notes(bikes, params[:search_notes], org) if params[:search_notes].present? && org.present?
       if org.present?
         bikes = BikeServices::OrganizedSearch.location(bikes, @interpreted_params[:location], @interpreted_params[:distance],
-          organization: org, search_all: @search_all, search_status:, ip_address: forwarded_ip_address)
+          organization: org, search_all: @search_all, search_status:, ip_address: forwarded_ip_address,
+          distance_unit: @interpreted_params[:distance_unit])
       end
       bikes = BikeServices::OrganizedSearch.stickers(bikes, @search_stickers)
       bikes = BikeServices::OrganizedSearch.address(bikes, @search_address)
-      bikes = BikeServices::OrganizedSearch.status(bikes, search_status)
+      bikes = BikeServices::OrganizedSearch.status(bikes, search_status,
+        organization_bikes: org.present? && !@search_all)
       bikes = unregisteredness_scoped(bikes)
       if params[:search_model_audit_id].present?
         @model_audit = ModelAudit.find_by_id(params[:search_model_audit_id])
@@ -367,7 +373,7 @@ module Organized
       return false if @interpreted_params[:stolenness]&.downcase != "all"
 
       # A distance is only a search alongside a location
-      @interpreted_params.except(:stolenness, :distance).values.reject(&:blank?).none?
+      @interpreted_params.except(:stolenness, :distance, :distance_unit).values.reject(&:blank?).none?
     end
 
     def directly_create_export?(bikes_count)

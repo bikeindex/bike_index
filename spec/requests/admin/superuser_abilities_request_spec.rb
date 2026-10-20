@@ -63,6 +63,18 @@ RSpec.describe Admin::SuperuserAbilitiesController, type: :request do
       end
     end
 
+    context "superuser limited to superuser_abilities" do
+      let(:current_user) { FactoryBot.create(:user_confirmed) }
+      let!(:superuser_ability) { SuperuserAbility.create(user: current_user, controller_name: "superuser_abilities") }
+      it "doesn't create" do
+        expect {
+          post base_url, params: {superuser_ability: {user_identifier: current_user.email, controller_name: ""}}
+        }.to_not change(SuperuserAbility, :count)
+        expect(response).to redirect_to(admin_superuser_abilities_path)
+        expect(current_user.reload.superuser?).to be_falsey
+      end
+    end
+
     context "with an unmatched user" do
       it "renders new" do
         expect {
