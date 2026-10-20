@@ -1,0 +1,93 @@
+---
+en:
+  components:
+    pages:
+      donate:
+        page:
+          already_member: >-
+            You're already a Bike Index member - thank you! You can change your tier
+            or payment details from your membership settings.
+          cadence: How often to give
+          cta_headline: A million bikes are registered. Not one owner paid to be there.
+          cta_sub: Keep it free for the next million.
+          eyebrow: Recovered and returned
+          fine_print: >-
+            Bike Index is a 501(c)(3) nonprofit, EIN 81-4296194. Your donation is
+            tax-deductible in the US. Cancel a monthly gift any time.
+          fine_print_short: 501(c)(3) nonprofit, EIN 81-4296194. Tax-deductible in
+            the US.
+          form_title: Fund the next recovery
+          headline: Every bike above came home because the registry was free
+          larger_gift_link: Talk to us about a larger gift
+          lede: >-
+            Bike Index is a nonprofit. Registration costs nothing, searching costs
+            nothing, and reporting a theft costs nothing — which is why a million
+            bikes are in the registry and why police departments and shops actually
+            use it. Donations are what keep it that way.
+          lede_short: >-
+            Bike Index is a nonprofit. Registration, search, and theft reports cost
+            nothing. Donations are what keep it that way.
+          major_benefactor: Benefactor
+          major_body: >-
+            Gifts at this level go toward partner onboarding, cross-border theft investigations,
+            and the engineering behind promoted alerts.
+          major_eyebrow: Major giving
+          major_partner: Partner
+          major_title: Larger gifts move whole cities onto the registry
+          manage_membership: Manage your membership
+          membership_link: What membership includes
+          membership_note: >-
+            Monthly support makes you a Bike Index member: marketplace listings, a
+            member badge, and perks that grow as we build them. Tiers are %{amounts}
+            a month.
+          monthly: Monthly
+          monthly_submit: Become a member — %{amount}/month
+          one_time: One-time
+          one_time_submit: Donate %{amount}
+          other_amount: Other amount
+          other_ways_daf: Donor-advised fund grants — we can send our EIN and grant
+            details.
+          other_ways_match: >-
+            Employer matching — many employers will match a donation at no extra cost
+            to you.
+          other_ways_stock: Gifts of stock or crypto, which avoid capital gains on
+            appreciated assets.
+          other_ways_title: Other ways to give at this level
+          recovered: Recovered
+          stat_bikes: bikes registered, free
+          stat_partners: partner shops, police departments, and cities
+          stat_recoveries: stolen bikes recovered
+          stat_value: value returned to owners
+          stories_link: Read more recovery stories
+          stories_subhead: Every recovery is reported by the person who got their
+            bike back.
+          stories_title: In their owners' words
+          tier_basic: Basic membership
+          tier_basic_benefit: List bikes in the marketplace, a member badge, and faster
+            support
+          tier_patron: Patron membership
+          tier_patron_benefit: Everything in Plus, top marketplace placement, Patron
+            shirt and badge
+          tier_plus: Plus membership
+          tier_plus_benefit: >-
+            Everything in Basic, a free promoted alert if your bike is stolen, and
+            a member cap
+          uses_alerts_body: >-
+            The stolen bike alert system and the promoted alerts that push a listing
+            into feeds around the theft.
+          uses_alerts_title: Alerts that reach people
+          uses_free_body: >-
+            Servers, support, and the search tools that shops and police use at no
+            charge. No paywall, no tiers, no selling rider data.
+          uses_free_title: Registration stays free
+          uses_owners_body: >-
+            The marketplace, where a listing starts from a bike already in the registry
+            — built to make selling a stolen bike harder. More owner tools are on
+            the way.
+          uses_owners_title: Features for bike owners
+          uses_partners_body: >-
+            Onboarding new shops, departments, and cities, and the long-running theft-ring
+            investigations that come out of the registry data.
+          uses_partners_title: Partners and investigations
+          uses_title: Where the money goes
+          wall_photo_alt: A bike recovered through Bike Index

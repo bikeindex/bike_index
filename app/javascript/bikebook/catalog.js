@@ -26,14 +26,16 @@ export async function loadCatalog (manifestUrl, ids = [], jurisdictions = {}) {
   })
 
   try {
-    const { vocabulary, kit, options, modelsCount } = await call('load', { manifestUrl: new URL(manifestUrl, window.location.href).href, ids, jurisdictions })
+    const { vocabulary, kit, options } = await call('load', {
+      manifestUrl: new URL(manifestUrl, window.location.href).href, ids, jurisdictions, rulesUrl: import.meta.resolve('bikebook/featured_rules')
+    })
     return {
       vocabulary,
       kit,
       options,
-      modelsCount,
       search: (params, page, perPage) => call('search', { params, page, perPage }),
-      vehicles: (ids) => call('vehicles', { ids }),
+      featured: (params, legalClasses) => call('featured', { params, legalClasses }),
+      vehicles: (ids, { market } = {}) => call('vehicles', { ids, market }),
       displays: (ids) => call('displays', { ids })
     }
   } catch (error) {

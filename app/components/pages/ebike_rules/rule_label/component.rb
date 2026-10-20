@@ -17,6 +17,7 @@ module Pages
           when :classes then translation(".classes")
           when :power then translation(".power")
           when :speed then translation(".speed")
+          when :vehicle then translation(".vehicle")
           else translation(".throttle")
           end
         end

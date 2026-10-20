@@ -17,7 +17,7 @@ export const geometryCard = ({ presenter, size, others, selected, href }) => {
     const [label, unit] = key.split(presenter.unitSuffix)
     return [presenter.humanize(label), value, unit || 'mm', otherExtras.some((each) => !equal(each[key], value)), key]
   })
-  return html`<div aria-current=${selected ? 'true' : nothing} class="tw:w-max tw:shrink-0 tw:space-y-3 tw:rounded-sm tw:border ${selected
+  return html`<div aria-current=${selected ? 'true' : nothing} data-ui--tabs-target=${selected ? 'active' : nothing} class="tw:w-max tw:shrink-0 tw:space-y-3 tw:rounded-sm tw:border ${selected
     ? 'tw:border-purple-500 tw:ring-2 tw:ring-purple-500/40'
     : 'tw:border-gray-200 tw:dark:border-gray-700'} tw:bg-white tw:dark:bg-gray-800 tw:p-4"><h3
     class="tw:text-lg tw:font-bold">${href && present(size.name) && !selected

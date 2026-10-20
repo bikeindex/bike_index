@@ -938,6 +938,7 @@ RSpec.describe "Bikes API V3", type: :request do
         expect(bike.current_stolen_record_id).to be_present
         expect(bike.current_stolen_record.police_report_number).to eq(bike_attrs[:stolen_record][:police_report_number])
         expect(bike.current_stolen_record.phone).to eq("1234567890")
+        expect(bike.current_stolen_record.postal_code).to eq "10007"
         expect(bike.current_stolen_record.show_address).to be_falsey
       end
     end

@@ -158,11 +158,13 @@ RSpec.describe UI::Tooltip::Component, :js, type: :system do
     find("body").click
     expect(commit_tooltip).not_to be_visible
 
-    # Click layering pushes each clicked tooltip's z-index higher
-    tooltip_ids.each { |id| find("[aria-describedby='#{id}']").click }
-    z_indexes = tooltip_ids.map { |id| tooltip_z_index(id).to_i }
-    expect(z_indexes).to eq z_indexes.sort
-    expect(z_indexes.last).to be > z_indexes.first
+    # One hovered goes above one held open, though another was open when it opened and has closed since
+    first, second, third = tooltip_ids.first(3)
+    find("[aria-describedby='#{first}']").click
+    find("[aria-describedby='#{second}']").click
+    find("[aria-describedby='#{third}']").hover
+    expect(find_by_id(second)).to be_visible
+    expect(tooltip_z_index(third).to_i).to be > tooltip_z_index(second).to_i
   end
 
   it "is accessible in dark mode" do

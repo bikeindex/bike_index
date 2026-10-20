@@ -124,6 +124,18 @@ RSpec.describe BikebookController, type: :request do
       expect(response).to redirect_to("/bikebook?vehicle_models=m/segway/2025/gt3_pro")
     end
 
+    it "redirects from the vehicle's id alone" do
+      get "/m/velotric/2024/fold_1"
+      expect(response).to redirect_to("/bikebook?vehicle_models=m/velotric/2024/fold_1")
+    end
+
+    it "redirects from an e-vehicle classification's id to its card" do
+      get "/evc/us/class_3"
+      expect(response).to redirect_to("/bikebook?classifications=evc/us/class_3")
+      get "/evc/off_highway_motorcycle"
+      expect(response).to redirect_to("/bikebook?classifications=evc/off_highway_motorcycle")
+    end
+
     context "without its m/, and with vehicles already picked" do
       it "picks it ahead of them, keeping the query" do
         get "/bikebook/segway/2025/gt3_pro", params: {vehicle_models: "m/aventon/2022/level_2,m/segway/2025/gt3_pro", filters: "1"}

@@ -121,6 +121,17 @@ rtk proxy git diff origin/main...HEAD --name-only --diff-filter=A -- app/assets/
 
 Check each against `frontend-conventions`' image and icon rules: an original elsewhere in the repo (a design handoff's comes resized and renamed), an existing icon, or a plain character that should be text. Replace a duplicate with what already exists and delete it.
 
+### The controller audit
+
+**Required when the branch adds a Stimulus controller or wires one to new markup.** List both:
+
+```bash
+rtk proxy git diff origin/main...HEAD --name-only --diff-filter=A -- app/javascript/controllers
+rtk proxy git diff origin/main...HEAD -G 'data-controller|controller:' --name-only
+```
+
+For each controller named, look for one that already does its job — a shared one in `app/javascript/controllers/ui/` or the top level, or a sibling in another namespace — and for two in the branch's namespace doing the same thing. Fold a duplicate into the shared one, an option on it rather than a second controller, and delete the copy. `bikebook--center-current` into `ui--tabs` and `bikebook--image-fallback` into `image-fallback` are the pattern. Name each one you kept and what it does that nothing shared covers.
+
 ### The cycle-type translation check
 
 `AGENTS.md`'s Translations section has the rule; this is how to find the branch's violations:

@@ -21,4 +21,11 @@ RSpec.describe MoneyFormatter do
       end
     end
   end
+
+  describe "money_format_no_cents_if_whole" do
+    it "drops only whole cents" do
+      expect(described_class.money_format_no_cents_if_whole(1500)).to eq "$15"
+      expect(described_class.money_format_no_cents_if_whole(999, "EUR")).to eq "€9.99"
+    end
+  end
 end

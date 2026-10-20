@@ -2237,12 +2237,6 @@ nl:
           left_organization: Je hebt %{org_name} verlaten.
           unable_to_leave: 'Kan %{org_name} niet verlaten: neem contact op met support@bikeindex.org
             voor hulp.'
-    memberships:
-      edit:
-        free_membership: Bike Index heeft u een gratis lidmaatschap gegeven. Stuur
-          een e-mail naar support@bikeindex.org als u vragen hebt.
-        no_active_membership: Als u nog geen actief lidmaatschap heeft, moet u zich
-          aanmelden voor een nieuw lidmaatschap.
     search:
       registrations:
         set_interpreted_params:
@@ -2293,6 +2287,9 @@ nl:
           bekijk hoe de e-bikeklassen werken.
         state_title: "%{state} e-bike wetgeving"
         title: Regels voor e-bikes
+    memberships:
+      create:
+        already_a_member: Je hebt al een lidmaatschap.
   customer_mailer:
     additional_email_confirmation:
       html:
@@ -4474,6 +4471,7 @@ nl:
       name_required: De naam van de eigenaar is vereist voor registratie.
       unable_to_save: Het is ons niet gelukt om uw registratie op te slaan. Probeer
         het later opnieuw.
+      description_stolen_required: Vertel ons alstublieft wat er is gebeurd.
     menu_items_account:
       logout: Uitloggen
       marketplace_messages: Marktplaatsberichten
@@ -4809,6 +4807,9 @@ nl:
       send_it: Stuur het!
       subject: Onderwerp
       your_message: Uw bericht
+      message_template: 'Serienummer van de fiets (indien van toepassing): URL voor
+        registratie bij Bike Index (indien van toepassing): Waarmee ik hulp nodig
+        heb: '
     index:
       contact_us: Neem contact met ons op!
       have_a_question_we_havent_answered: Heeft u een vraag die we niet hebben beantwoord?
@@ -4816,6 +4817,9 @@ nl:
       log_in_to_send_a_comment: Log in om een reactie te sturen!
       you_can_reach_us_at_contact_html: U kunt ons bereiken op %{contact_link}, of
         stuur uw bericht hier naartoe.
+      the_more_detail_you_can_share: Hoe meer details u kunt delen, hoe sneller we
+        u kunnen helpen. Als uw vraag over een specifieke fiets gaat, vermeld dan
+        het serienummer of uw Bike Index-registratie-URL.
   manufacturers:
     index:
       manufacturers_we_know_about: Fabrikanten die we kennen
@@ -5631,6 +5635,8 @@ nl:
         copy_id: Kopieer ID
       sticker:
         copy_sticker: Kopieersticker
+      recovery_display_card:
+        recovered: Hersteld
     pages:
       messages:
         thread_show:
@@ -6437,6 +6443,25 @@ nl:
             update_marketplace_listing: Update marktplaatsvermelding!
             updated: Bijgewerkt
             user_hidden: Verborgen voor andere gebruikers
+        memberships:
+          show:
+            complimentary: Bike Index heeft je dit lidmaatschap aangeboden, dus je
+              hoeft er niet voor te betalen.
+            ends: Einde
+            manage_billing: Facturering beheren
+            new_members_pay: Nieuwe %{level}-leden betalen %{current_price}.
+            not_a_member: Je bent geen lid van Bike Index.
+            per_month: per maand
+            per_year: per jaar
+            see_membership_tiers: Bekijk de verschillende lidmaatschapsniveaus
+            started: Gestart
+            you_are_a_member: Je bent een %{level}-lid
+            you_pay_less: Je betaalt minder dan nieuwe leden. %{level} is nu %{current_price},
+              en je behoudt je prijs zolang je lidmaatschap actief blijft en je dit
+              abonnement blijft gebruiken.
+            you_pay_the_current_price: U betaalt de huidige prijs voor %{level}.
+            your_membership: Uw lidmaatschap
+            your_price: Uw prijs
       sales:
         new_form:
           record_sale: Recordverkoop
@@ -6485,7 +6510,6 @@ nl:
             is gestolen.
           questions_people_ask_at_2am: Vragen die mensen om 2 uur 's nachts stellen
           read_more_recovery_stories: Lees meer herstelverhalen
-          recovered: Hersteld
           recoveries_reported_by_owners: Recent teruggevonden dieren, zoals gemeld
             door hun eigenaren.
           recovery_record: Herstelverslag
@@ -6827,8 +6851,6 @@ nl:
           filter_combobox:
             any: Elk
           byline: Een gratis naslagwerk van Bike Index, het non-profit fietsregister.
-          tagline_html: De fietsenbibliotheek van de wereld — zoek, vergelijk en vind
-            je volgende fiets tussen de %{models_count}+ modellen.
           tagline: 'De wereldwijde fietsenbibliotheek: zoek, vergelijk en vind je
             volgende fiets.'
           about_bikebook_label: Over BikeBook
@@ -6853,7 +6875,6 @@ nl:
           any_market: Elke markt
           market: Markt
           clear_filters: Filters wissen
-          jurisdiction_for_e_vehicles: jurisdictie voor elektrische voertuigen
         donate_strip:
           donate: Schenken
           pitch: Dit fantastische product wordt u aangeboden door de non-profitorganisatie
@@ -6866,6 +6887,8 @@ nl:
           class_unknown_aria: E-bike klasse onbekend
           emoto: E-moto
           emoto_aria: E-moto, geen e-bike
+          optional_throttle: met optionele gashendel
+          optional_upgrade: met optionele upgrade
         law_details:
           from: 'Van %{date}:'
           from_until: 'Van %{starts_on} tot %{ends_on}:'
@@ -6883,7 +6906,6 @@ nl:
           class_3_throttle: Het gaspedaal moet bij 32 km/u (20 mph) worden uitgeschakeld.
           classes_start_on: De lessen gaan in %{date}. Tot die tijd kunt u de actuele
             regels van de staat raadplegen.
-          entered_manually: Handmatig ingevoerd · Klasse %{n}
           fails_rule: Voldoet niet aan deze regel.
           falls_under: In %{state} valt het onder %{name}, waarvoor registratie en
             een vergunning vereist kunnen zijn.
@@ -6912,7 +6934,6 @@ nl:
           no_watt_cap: Geen maximumvermogen in de staatswet
           not_classified: Het is geen e-bike van klasse 1, 2 of 3.
           not_permitted: Niet toegestaan
-          not_provided: Niet verstrekt
           own_classes: De staat stelt zijn eigen grenzen vast in plaats van de drie
             standaardklassen.
           recovered_more_often: Gestolen fietsen worden twee keer zo vaak teruggevonden
@@ -6939,7 +6960,6 @@ nl:
           throttle_not_stated: De wetgeving van de staat zegt niet of een gasklep
             is toegestaan.
           top_speed: Topsnelheid
-          ul_certification: UL-certificering
           watts_html: "%{watts}W"
           watts_not_provided: Motorvermogen niet opgegeven
           watts_over_cap_html: "%{watts}W motor overschrijdt de %{cap}W capaciteit"
@@ -6964,10 +6984,8 @@ nl:
           class_3_throttle_within_html: Gashendel stopt bij %{mph} mph
           class_unknown_check_label: BikeBook vermeldt de klasse of topsnelheid niet,
             dus controleer de klasse op het label.
-          entered_manually_unclassified: Handmatig ingevoerd
           entered_unverified: Invoer door u, niet geverifieerd door BikeBook.
           full_bikebook_entry: Bekijk het volledige BikeBook-artikel
-          model_year_bikebook: "%{year} model · BikeBook"
           over_mph_html: Meer dan %{mph} mph
           red_headline_manual: Dit is geen e-bike volgens de huidige %{state} regels.
           speed_past_cap_html: Assistentie bij snelheden boven %{past} mph, boven
@@ -6982,11 +7000,88 @@ nl:
             other: De klassen %{n} worden erkend.
           read_more: Lees meer
           stock_photo: Stock foto
+          answer_optional: Optioneel
+          as_class_with_optional_throttle: als klasse %{n} met zijn optionele gashendel
+          as_class_with_optional_upgrade: als klasse %{n} met een optionele upgrade
+          class_3_optional_throttle_within_html: Optionele gashendel stopt bij %{mph}
+            mph
+          class_3_speed_with_throttle_html: Assistentie tot %{mph} mph, niet toegestaan
+            met gashendel
+          class_n: Klasse %{n}
+          classes_not_permitted: Het is een %{classes} e-bike, wat niet is toegestaan.
+          green_headline_optional: Je %{name} mag legaal gebruikt worden in %{state}
+            als een klasse %{n} e-bike, en %{optional}.
+          manually_entered: Handmatig ingevoerd
+          model_year: "%{year} model"
+          optional_classes_not_recognized:
+            one: Klasse %{n} wordt hier niet herkend, dus het is alleen legaal zoals
+              het verkocht wordt.
+            other: De klassen %{n} worden hier niet herkend, dus het is alleen legaal
+              zoals het verkocht wordt.
+          optional_throttle_not_allowed: Het is alleen legaal zonder de optionele
+            gasklep.
+          optional_to_html: Optioneel, naar %{mph}
+          throttle_with_class_3_assist: Niet toegestaan met assistentie van klasse
+            3
+          yellow_headline_optional:
+            one: Je %{name} mag legaal gebruikt worden in %{state} als een klasse
+              %{n} e-bike, en %{optional}, met %{count} regel om te controleren.
+            other: Je %{name} mag legaal gebruikt worden in %{state} als een e-bike
+              van klasse %{n}, en %{optional}, met %{count} regels om te controleren.
+          yellow_headline_without_throttle: Je %{name} mag legaal in %{state} rijden
+            als een %{n} e-bike, zonder de optionele gashendel.
+          green_headline_law: Je %{name} mag legaal in %{state} rijden volgens de
+            %{law}-regels.
+          kmh_html: "%{kmh} km/u"
+          law_source_html: 'Bron: %{link}''s catalogus van wetgeving betreffende e-bikes.
+            Samenvattingen dienen ter referentie en zijn geen juridisch advies.'
+          may_be_moped_canada: Het kan ook zijn dat het voertuig als bromfiets of
+            motorvoertuig wordt gereguleerd, waarvoor registratie en een rijbewijs
+            vereist kunnen zijn.
+          no_e_bike_category: Er is hier geen aparte categorie voor e-bikes, dus controleer
+            de regels voor rijbewijs, registratie en helmplicht.
+          no_speed_cap_in_law: Er is geen snelheidslimiet in de wetgeving.
+          no_watt_cap_in_law: Er is geen maximumvermogen vastgelegd in de wet.
+          optional_to_kmh_html: Optioneel, naar %{kmh} km/u
+          over_kmh_html: Meer dan %{kmh} km/u
+          speed_over_cap_kmh_html: Assistentie tot %{kmh} km/u, boven de %{cap} km/u
+            limiet
+          speed_past_cap_kmh_html: Assistentie bij snelheden boven %{past} km/u, boven
+            de %{cap} km/u-limiet
+          speed_past_kmh_html: Assisteert voorbij %{past} km/u; controleer of het
+            stopt bij %{cap} km/u.
+          speed_to_check_kmh_html: BikeBook vermeldt de topsnelheid niet, dus controleer
+            of de motor stopt bij %{cap} km/u.
+          speed_within_cap_kmh_html: Assistentie tot %{kmh} km/u, binnen de limiet
+          still_reviewing_province_body: Raadpleeg het ministerie van Transport van
+            uw provincie of territorium voor de actuele regelgeving met betrekking
+            tot e-bikes. De meeste ministeries stellen een maximumvermogen van e-bikemotoren
+            van 500W en een maximumsnelheid met trapondersteuning van 32 km/u.
+          throttle_allowed_in_law: Gashendel toegestaan
+          throttle_not_allowed_in_law: De wet staat geen gashendel toe.
+          throttle_not_stated_in_law: De wet zegt niet of een gasklep is toegestaan.
+          watts_to_check_html: Controleer of de motor een vermogen heeft van %{cap}W
+            of minder.
+          yellow_headline_law:
+            one: Je %{name} mag legaal in %{state} rijden volgens de %{law}-regels,
+              met %{count}-regel om te controleren.
+            other: Je %{name} mag legaal in %{state} rijden volgens de %{law}-regels,
+              waarbij de %{count}-regels nog gecontroleerd moeten worden.
+          yellow_headline_law_without_throttle: Je %{name} mag legaal in %{state}
+            rijden volgens de %{law}-regels, zonder de optionele gashendel.
+          yellow_headline_motor_vehicle_law:
+            one: Je %{name} mag mogelijk legaal in %{state} rijden volgens de %{law}-regels,
+              waarbij %{count}-regel nog gecontroleerd moet worden.
+            other: Je %{name} mag mogelijk legaal in %{state} rijden volgens de %{law}-regels,
+              waarbij de %{count}-regels nog gecontroleerd moeten worden.
+          yes_to_kmh_html: Ja, tot %{kmh} km/u
+          your_province: Uw provincie of territorium
         rule_label:
           classes: Erkende klassen
           power: Motorvermogenscapaciteit
           speed: Maximale ondersteunde snelheid
           throttle: Elektrisch gaspedaal
+          vehicle: Gereguleerd als
         rule_value:
           allowed: Toegestaan
           classes:
@@ -6997,6 +7092,7 @@ nl:
           not_allowed: Niet toegestaan
           own_definition: 'De eigen definitie: %{name}'
           watts_html: "%{watts}W"
+          kmh_html: "%{kmh} km/u"
         show:
           answer_no: Nee
           answer_yes: Ja
@@ -7015,10 +7111,8 @@ nl:
             en thermische oververhitting. De fabriek wordt vervolgens continu geïnspecteerd
             om de certificering te behouden.
           certification_involves_heading: Wat certificering inhoudt
-          change: wijziging?
           check_my_bike: Kijk eens naar mijn fiets
           compare_html: Wil je meerdere fietsen vergelijken? %{link}
-          detected_html: We hebben <strong>%{state}</strong> gedetecteerd —
           disclaimer: Bike Index is een 501(c)(3) non-profitorganisatie. Samenvattingen
             van de wetgeving van de betreffende staat dienen ter referentie en zijn
             geen juridisch advies.
@@ -7031,8 +7125,6 @@ nl:
             van de accu en het frame.
           how_to_check_2: Zoek dat nummer op in UL Product iQ.
           how_to_check_heading: Hoe controleer je een fiets?
-          location_not_shared: Locatie niet gedeeld. Kies uw provincie/staat uit de
-            lijst.
           motor_wattage: Motorvermogen (W)
           mph: "%{mph} mph"
           parent_step_1_body: Veel staten hanteren een minimumleeftijd voor klasse
@@ -7101,10 +7193,44 @@ nl:
           over_28_mph: Meer dan 45 km/u
           top_speed: Wat is de topsnelheid?
           visit_bikebook_link: Bezoek BikeBook.
-          bike_index_nonprofit: Fietsindex · Non-profit
           custom_details: Aangepaste details
           details_legend: De gegevens van uw fiets
           model_details: "%{model} details"
+          country: Land
+          not_in_us_html: Niet in de VS? %{switch_country}
+          select_country: Selecteer een land
+          switch_country: land wijzigen
+          switch_country_title: Land wijzigen
+          banned_body_canada: Universiteiten, woningbouworganisaties en openbaarvervoersbedrijven
+            stellen regels op voor het stallen en opladen van e-bikes binnenshuis,
+            en certificering is waar ze naar op zoek zijn.
+          choose_province: Kies uw provincie of territorium uit de lijst.
+          choose_state: Kies uw staat uit de lijst.
+          detected_place_html: We hebben <strong>%{state}</strong> gedetecteerd.
+          disclaimer_canada: Bike Index is een non-profitorganisatie. Samenvattingen
+            van provinciale en territoriale wetgeving dienen ter referentie en zijn
+            geen juridisch advies.
+          kmh: "%{kmh} km/u"
+          not_in_canada_html: Niet in Canada? %{switch_country}
+          over_kmh: Meer dan %{kmh} km/u
+          parent_step_1_body_canada: De meeste provincies hanteren een minimumleeftijd
+            voor het rijden op een e-bike, tussen de 12 en 18 jaar. Controleer de
+            minimumleeftijd in jouw regio voordat je een fiets koopt.
+          parent_step_2_body_canada: Geen gashendel, dus de motor helpt alleen mee
+            tijdens het trappen. Het is het makkelijkste type e-bike om op te leren
+            rijden.
+          parent_step_2_title_canada: Begin met trapondersteuning.
+          parents_body_canada: E-bikes zijn zwaarder en sneller dan de fietsen waarop
+            de meeste kinderen leren fietsen. Voordat je er een koopt, moet je nagaan
+            wat er in jouw provincie en gemeente is toegestaan en ervoor zorgen dat
+            je kind er veilig op kan rijden.
+          parents_link_canada: Raadpleeg de leeftijds- en helmregels van jouw provincie.
+          province: Provincie of territorium
+          province_error: Kies een provincie of territorium.
+          select_province: Selecteer uw provincie of territorium.
+          subheading_canada: Voer je provincie of territorium in en fiets om de regels
+            te bekijken.
+          watts_placeholder_canada: bijv. 500
         state_reference:
           compiling: We verzamelen momenteel de regels voor e-bikes van %{state} op
             basis van gegevens van de staatslegislatuur en de RDW. Kom binnenkort
@@ -7125,23 +7251,33 @@ nl:
           only_classes:
             one: Alleen klasse %{classes}
             other: Alleen klassen %{classes}
+          all_on_file_canada: Elke provincie en elk territorium dat geregistreerd
+            staat
+          compiling_canada: We verzamelen momenteel de e-bike-regels van %{state}
+            op basis van wetgeving en informatie van het ministerie van Transport.
+            Kom binnenkort terug voor meer informatie.
+          filter_placeholder_canada: Typ een provincie of territorium
+          filter_provinces: Filter provincies en gebieden
+          heading_canada: Wetgeving rondom e-bikes per provincie en territorium
+          limits_subheading_canada: Elke provincie en elk territorium. Open er een
+            om de grenzen, regels en bronnen te bekijken.
+          no_match_canada: Geen provincies of territoria komen overeen. Probeer een
+            andere naam.
+          on_file_of_total_canada_html: "%{number} van %{total} provincies en territoria
+            geregistreerd · overige in beoordeling"
         ul_badge:
           certified: UL %{standard} gecertificeerd
           meaning_2271_certified: Het accupakket heeft de UL-veiligheidstests voor
             overladen, kortsluiting en stoten doorstaan.
-          meaning_2271_unknown: We hebben nog geen gegevens over de batterijcertificering.
-            Controleer het label op de batterij.
-          meaning_2849_unknown: We hebben nog geen systeemcertificeringsgegevens voor
-            dit model. Zoek naar het UL-keurmerk op het frame-etiket.
           scope_2271: Batterijpakket
           scope_2849: Elektrisch systeem van een e-bike
-          status_unknown: UL %{standard} status onbekend
-          meaning_2271_check_label: Controleer het label op de batterij.
-          meaning_2849_check_label: Zoek naar het UL-keurmerk op het label van het
-            frame.
           meaning_2849_system_certified: Het complete elektrische systeem (motor,
             accu, lader en controller) heeft gezamenlijk de brandveiligheids- en elektrische
             veiligheidstests doorstaan.
+          certification_unknown: Certificering onbekend
+          meaning_check_labels: Zoek naar het UL-keurmerk op het frame en de batterijlabels.
+          meaning_unknown: We hebben nog geen certificeringsgegevens voor dit model.
+            Let op het UL-keurmerk op het frame en de batterijlabels.
         classes:
           classes_heading: E-bike lessen, uitgelegd
           classes_intro: De meeste staten hanteren een systeem met drie klassen. Je
@@ -7151,6 +7287,8 @@ nl:
           state_classes_intro: "%{state} gebruikt niet het drieklassensysteem dat
             de meeste staten hanteren. De wetgeving van deze staat deelt e-bikes en
             andere elektrische tweewielers in plaats daarvan in deze klassen in."
+          other_classes: Andere elektrische voertuigen in %{place}
+          place_heading: Wetgeving rondom e-bikes in %{place}
         rule_citation:
           source: bron
         class_card:
@@ -7189,6 +7327,130 @@ nl:
           not_an_ebike: Geen e-bike
           watts_max: "≤%{watts}W"
           watts_min: "%{watts}W+"
+          copy_id: Kopieer ID
+          id: ID
+        bike_summary:
+          classification: E-%{vehicle_type} classificatie
+          electric_certification: Elektrische certificering
+          not_provided: Niet verstrekt
+        check:
+          outside_checked_countries: De fietscontroles gelden voorlopig alleen in
+            Amerikaanse staten en Canadese provincies. De wetgeving voor e-bikes in
+            %{place} staat hieronder.
+      memberships:
+        new:
+          become_a_member: Word lid
+          bike_index_membership: Lidmaatschap van Bike Index
+          builds_next: Bouwt volgende
+          choose_your_membership: Kies uw lidmaatschap
+          cycling_cap: Fietsmuts
+          every_tier_keeps_it_free: Elk abonnementsniveau houdt de registratie gratis
+            en financiert nieuwe functies. Hogere abonnementsniveaus bieden meer bedankjes.
+          faq_cancel_answer: U kunt dit op elk gewenst moment doen via uw accountpagina.
+            Het wisselen tussen een maandelijks en een jaarlijks abonnement werkt
+            op dezelfde manier.
+          faq_cancel_question: Kan ik mijn abonnement wijzigen of annuleren?
+          faq_free_answer: Ja. Registreren, zoeken en diefstal melden is voor iedereen
+            gratis, voor altijd. Lidmaatschap is de manier waarop we ervoor zorgen
+            dat dit zo blijft.
+          faq_free_question: Is het registreren van een fiets nog steeds gratis als
+            ik geen lid word?
+          faq_gear_answer: Nadat je je hebt aangemeld, sturen we je een e-mail met
+            het verzoek om je postadres en verzenden we het product van daaruit.
+          faq_gear_question: Wanneer krijg ik mijn pet of shirt?
+          faq_marketplace_answer: Nee. Iedereen kan een geregistreerde fiets gratis
+            te koop aanbieden. Leden krijgen hun advertenties bovenaan de lijst.
+          faq_marketplace_question: Moet ik lid zijn om op de marktplaats te kunnen
+            verkopen?
+          faq_tax_answer: Bike Index is een 501(c)(3) non-profitorganisatie, EIN 81-4296194.
+            Lidmaatschappen en eenmalige donaties zijn fiscaal aftrekbaar in de VS.
+          faq_tax_question: Is het lidmaatschap fiscaal aftrekbaar?
+          free_alerts_body: Er worden meldingen van diefstal verstuurd naar winkels,
+            politiebureaus, campussen en fietsers in de buurt van de plek waar de
+            fiets is gestolen.
+          free_alerts_title: Meldingen van gestolen fietsen
+          free_partners_body: Het inwerken van nieuwe winkels, afdelingen en steden,
+            en het helpen van de politie bij het koppelen van teruggevonden fietsen
+            aan hun eigenaren.
+          free_partners_title: Partners en herstel
+          free_registration_body: Het registreren, zoeken en controleren van een tweedehands
+            fiets kost niets, voor fietsers, winkels en de politie. Wij verkopen geen
+            fietsgegevens.
+          free_registration_title: Registratie en zoeken
+          join_monthly: Word lid als %{level} — %{price}/maand
+          join_yearly: Word lid als %{level} — %{price}/jr
+          keep_bike_index_free: Houd Bike Index gratis voor elke fietser.
+          keeps_free: Houdt gratis
+          live: Leven
+          member_gear: Ledenuitrusting
+          member_gear_body: Plus-leden ontvangen de Bike Index-fietsmuts. Patrons
+            ontvangen het zonwerende shirt. Beide zijn ontworpen door Kelsey Graywill
+            en worden na je aanmelding naar je opgestuurd.
+          monthly: Maandelijks
+          new_tools_for_bike_owners: Nieuwe hulpmiddelen voor fietsbezitters
+          next: Volgende
+          next_ebike_database_body: Een wereldwijde UL-certificeringsdatabase
+          next_ebike_database_title: E-bike database
+          next_ios_app_body: Registreer en beheer fietsen via je telefoon.
+          next_ios_app_title: De iOS-app
+          next_marketplace_body: Alleen geregistreerde fietsen, gecontroleerd aan
+            de hand van diefstalrapporten.
+          next_marketplace_title: Een veiligere marktplaats
+          next_oem_parts_body: Fabrieksspecificaties en foto's voor elk model.
+          next_oem_parts_title: OEM-onderdelen en stockfoto's
+          next_versioning_body: Houd bij hoe je fiets verandert.
+          next_versioning_title: Fietsversie
+          official_registry: Het officiële register voor meer dan 1.000 politiekorpsen,
+            universiteiten, steden en winkels.
+          or_make_a_one_time_donation: Of doe een eenmalige donatie.
+          partner_organizations: partnerwinkels, politiekorpsen en steden
+          per_month: "/ maand"
+          per_year: "/ jaar"
+          perk_cycling_cap: Fiets Index leden fietspet
+          perk_everything_in_basic: Alles in Basic
+          perk_everything_in_basic_and_plus: Alles in Basic en Plus
+          perk_faster_support: Snellere reacties van de supportafdeling
+          perk_listings_promoted: Uw marktplaatsvermeldingen worden naar de top gepromoot.
+          perk_member_badge: Lidmaatschapsbadge op je Bike Index-profiel
+          perk_no_ads: Geen advertenties, mochten we die ooit laten zien.
+          perk_patron_badge: Patronbadge op je Bike Index-profiel
+          perk_promoted_alert: Een gratis, betaalde melding als uw fiets gestolen
+            wordt.
+          perk_sun_shirt: Fietsindex Patron zonneshirt
+          perk_top_listing_placement: Toppositie voor je advertentie op de marktplaats
+          plans_from: Plannen vanaf %{price} een maand
+          questions: Vragen
+          read_more_recovery_stories: Lees meer herstelverhalen
+          recommended: Aanbevolen
+          recoveries_reported_by_owners: Elke terugvinding wordt gemeld door de persoon
+            die zijn of haar fiets heeft teruggekregen.
+          stolen_bikes_recovered: Gestolen fietsen teruggevonden
+          summary_monthly: "%{level} lidmaatschap, %{price} een maand"
+          summary_yearly: "%{level} lidmaatschap, %{price} een jaar"
+          sun_shirt: Zonoverhemd
+          tax_deductible_cancel_any_time: Lidmaatschappen en eenmalige donaties zijn
+            fiscaal aftrekbaar in de VS. U kunt uw lidmaatschap op elk gewenst moment
+            wijzigen of opzeggen via uw account.
+          tax_deductible_ein: Lidmaatschappen en eenmalige donaties zijn fiscaal aftrekbaar
+            in de VS. Bike Index is een 501(c)(3) non-profitorganisatie, EIN 81-4296194.
+          the_registry_open_to_everyone: Het register is voor iedereen toegankelijk.
+          two_months_free: Twee maanden gratis
+          value_returned_to_owners: waarde teruggegeven aan eigenaren
+          view_your_membership: Bekijk uw %{level} lidmaatschap
+          wear_the_shield: Draag het schild
+          what_members_make_possible: Wat leden mogelijk maken
+          yearly: Jaarlijks
+          bikes_registered: geregistreerde fietsen
+          bikes_registered_keep_it_free: "%{bikes} fietsen zijn geregistreerd. Leden
+            houden het gratis voor de volgende miljoen."
+          millions_registered_keep_it_free: "%{millions} miljoen fietsen zijn geregistreerd.
+            Leden houden het gratis voor de volgende miljoen."
+          monthly_donation_lede: Het lidmaatschap is een maandelijkse donatie aan
+            Bike Index. Hiermee betalen we het register en de meldingen van gestolen
+            fietsen, zodat fietsen weer thuisgebracht worden. Ook financieren we de
+            nieuwe tools die we in de toekomst gaan ontwikkelen. Het registreren van
+            een fiets en het melden van een diefstal is altijd gratis. Dankzij onze
+            leden kunnen we dat garanderen.
     shared_blocks:
       footer:
         about: Over
