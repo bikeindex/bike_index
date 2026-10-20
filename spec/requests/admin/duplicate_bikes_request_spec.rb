@@ -56,6 +56,13 @@ RSpec.describe Admin::DuplicateBikesController, type: :request do
       expect(response.body).to include("Latest registration")
     end
 
+    it "keeps a crafted host or protocol out of its links" do
+      get base_url, params: {search_kind: "large_group", host: "evil.example", protocol: "javascript"}
+      expect(response.body).to include("search_kind=large_group")
+      expect(response.body).to_not include("evil.example")
+      expect(response.body).to_not include("javascript://")
+    end
+
     it "rechecks the listed groups' stolen veto live" do
       FactoryBot.create(:stolen_bike, serial_number: "EN 14764")
       get base_url, params: {search_kind: "large_group"}

@@ -2,7 +2,10 @@ module Admin
   class DuplicateBikesController < Admin::BaseController
     include Binxtils::SortableTable
 
+    LINK_PARAM_KEYS = %w[sort direction page per_page reference_bike_id bike_ids].freeze
+
     around_action :set_reading_role, only: %i[index show]
+    helper_method :link_params
 
     def index
       return dashboard unless params[:search_view] == "segments"
@@ -61,6 +64,11 @@ module Admin
     end
 
     private
+
+    # url_for reads host, protocol and the like from its hash, so links only carry the page's own params
+    def link_params
+      request.query_parameters.select { |key, _| key.start_with?("search_") || LINK_PARAM_KEYS.include?(key) }
+    end
 
     def dashboard
       @per_page = permitted_per_page(default: 25)

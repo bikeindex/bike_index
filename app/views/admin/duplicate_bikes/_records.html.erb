@@ -37,7 +37,7 @@
         </div>
 
         <div class="tw:text-sm">
-          <%= link_to "Contact #{contact_group.number}", url_for(request.query_parameters.except("page").merge("search_contact" => contact_group.number)), class: "twlink" %>
+          <%= link_to "Contact #{contact_group.number}", url_for(link_params.except("page").merge("search_contact" => contact_group.number)), class: "twlink" %>
 
           <span class="<%= muted %>">
             ·
@@ -82,7 +82,7 @@
 
         <div class="tw:flex tw:items-start tw:gap-3 tw:text-sm">
           <% unless bike == review.reference_bike %>
-            <%= link_to "Use as reference", url_for(request.query_parameters.merge("reference_bike_id" => bike.id)), class: "twlink tw:whitespace-nowrap" %>
+            <%= link_to "Use as reference", url_for(link_params.merge("reference_bike_id" => bike.id)), class: "twlink tw:whitespace-nowrap" %>
           <% end %>
 
           <%= render UI::Collapse::Component.new(text: "Details", chevron: :trailing, color: :link) %>
