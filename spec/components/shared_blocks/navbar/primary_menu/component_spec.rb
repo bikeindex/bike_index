@@ -14,7 +14,7 @@ RSpec.describe SharedBlocks::Navbar::PrimaryMenu::Component, type: :component do
 
   it "renders the signed out menu, with every item's state left to the browser" do
     expect(menu_links).to eq(["Search", "Marketplace", "Sign up", "log in", "Help",
-      "Stolen bike?", "Donate", "Blog", "Marketplace", "Search"])
+      "Stolen bike?", "Donate", "Register", "Marketplace", "Search"])
     expect(component).to_not have_css "#setting_submenu"
     expect(component).to_not have_css "#primary-main-menu a[aria-current]"
     expect(component.css("#primary-main-menu a[data-controller='ui--active-link']").count).to eq menu_links.count
@@ -37,8 +37,8 @@ RSpec.describe SharedBlocks::Navbar::PrimaryMenu::Component, type: :component do
       .to eq([nil] * 2)
     expect(links_named("Marketplace").map { |link| link["data-ui--active-link-match-paths-value"] })
       .to eq(["/search/marketplace"] * 2)
-    expect(links_named("Blog").map { |link| link["data-ui--active-link-match-paths-value"] })
-      .to eq(["/news/**"])
+    expect(links_named("Register").map { |link| link["data-ui--active-link-match-paths-value"] })
+      .to eq(["/register/**"])
   end
 
   context "with a passive_organization that searches its own registrations" do

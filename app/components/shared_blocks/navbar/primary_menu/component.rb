@@ -24,7 +24,7 @@ module SharedBlocks
             {label: translation(".help"), path: help_path},
             {label: translation(".stolen_bike"), path: stolen_index_path},
             {label: translation(".donate"), path: why_donate_path},
-            {label: translation(".blog"), path: news_index_path, match_paths: "#{news_index_path}/**"},
+            {label: translation(".register"), path: register_path, match_paths: "#{register_path}/**"},
             marketplace_item(:desktop),
             search_item(:desktop)]
         end
