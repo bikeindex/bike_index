@@ -7409,7 +7409,6 @@ nb:
           menu: Meny
           organization_crest: "%{org_name} våpenskjold"
         primary_menu:
-          blog: Blogg
           donate: Donere
           help: Hjelp
           log_in: Logg Inn
@@ -7417,6 +7416,8 @@ nb:
           search: Søk
           sign_up: Melde deg på
           stolen_bike: Stjålet sykkel?
+          register: Registrere
+          register_a_new_bike: Registrer en ny sykkel
         user_settings_menu:
           settings_menu: Innstillinger
         wrapper:

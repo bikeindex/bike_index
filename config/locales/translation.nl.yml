@@ -7649,7 +7649,6 @@ nl:
           menu: Menu
           organization_crest: "%{org_name} wapen"
         primary_menu:
-          blog: Blog
           donate: Schenken
           help: Helpen
           log_in: Log in
@@ -7657,6 +7656,8 @@ nl:
           search: Zoeken
           sign_up: Registreren
           stolen_bike: Fiets gestolen?
+          register: Registreer
+          register_a_new_bike: Registreer een nieuwe fiets
         user_settings_menu:
           settings_menu: Instellingen
         wrapper:
