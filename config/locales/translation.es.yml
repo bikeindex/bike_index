@@ -252,9 +252,6 @@ es:
         payment:
           requires_email_or_org: Requiere una dirección de correo electrónico o una
             organización.
-        recovery_display:
-          quote_too_long: Esa cita es demasiado larga. Por favor, acórtala para que
-            tenga menos de 300 caracteres.
         theft_alert:
           must_be_later_than_start_time: debe ser posterior a la hora de inicio
           must_be_present: debe estar presente
@@ -891,12 +888,11 @@ es:
         steel: Acero
         titanium: Titanio
       handlebar_type:
-        bmx: estilo BMX
         drop_bar: manillar de caída
-        flat: Plano o escalonado
         forward: Orientado hacia adelante
         other: No son manillares
         rearward: Orientación hacia atrás
+        horizontal: Plano o escalonado
       propulsion_type:
         foot_pedal: Pedal
         hand_pedal: Bicicleta de mano (pedal de mano)
@@ -2227,6 +2223,7 @@ es:
           owner_already_has_account: El propietario de este %{bike_type} ya tiene
             una cuenta en Bike Index. ¡Inicia sesión para reclamarlo!
           you_have_to_log_in: Lo sentimos, tienes que iniciar sesión.
+          sign_in_to_continue_registration: Inicia sesión para continuar con tu registro.
         ensure_member_of!:
           accept_tos_for_orgs: Por favor, acepte los términos de servicio para organizaciones.
           not_a_member_of_that_org: "¡No eres miembro de esa organización!"
@@ -2419,6 +2416,10 @@ es:
         available_impound_records:
           we_dont_know_location: Lo sentimos, no conocemos la ubicación "%{location}".
             Por favor, intente con otra ubicación.
+      organization_messages:
+        create:
+          sent: Mensaje enviado al propietario
+          unable_to_send: No se puede enviar - %{errors}
     ownerships:
       show:
         no_longer_your_bike: Eso solía ser tu %{bike_type}, ¡pero ya no lo es! Contáctanos
@@ -2530,12 +2531,6 @@ es:
     welcome:
       recovery_stories:
         no_stories_to_display: No hay historias de recuperación para mostrar
-    memberships:
-      edit:
-        free_membership: Bike Index te ha otorgado una membresía gratuita. Si tienes
-          alguna pregunta, envía un correo electrónico a support@bikeindex.org.
-        no_active_membership: No tienes una membresía activa, tendrás que registrarte
-          para obtener una nueva.
     search:
       registrations:
         set_interpreted_params:
@@ -2555,18 +2550,41 @@ es:
     register:
       acknowledge:
         acknowledge_everything: Marque todas las casillas para aceptar estas reglas.
+        safety_rules_updated: Las normas de seguridad se han actualizado; por favor,
+          revíselas de nuevo.
       confirm_email:
         confirmation_link_expired: Ese enlace de confirmación ha caducado; revisa
           tu correo electrónico para obtener uno nuevo.
         signed_in_as_other: Has iniciado sesión como %{email}, por lo que mantuvimos
           tu cuenta. El registro sigue guardado en la dirección de correo electrónico
           que te enviamos.
+        sign_out_to_agree: Has iniciado sesión como %{email}. Cierra sesión y vuelve
+          a abrir el enlace para aceptar las normas de seguridad.
       find_b_param:
         registration_not_found: No pudimos encontrar ese registro; inicie uno nuevo
           a continuación.
       sign_in_confirmed_user:
         unable_to_sign_in: Hemos confirmado tu correo electrónico, pero no pudimos
           iniciar sesión en esa cuenta.
+      redirect_to_single_page:
+        registered_for_owner: El %{bike_display} está registrado; le hemos enviado
+          un correo electrónico a %{email} para que puedan reclamarlo.
+        registered_own: Su %{bike_display} está registrado.
+        safety_rules_sent: El %{bike_display} está registrado; le hemos enviado por
+          correo electrónico a %{email} las normas de seguridad para que las acepte,
+          lo que finaliza el registro.
+    ebike_rules:
+      show:
+        state_description: "%{state} ley de bicicletas eléctricas: %{law}"
+        state_description_in_review: Todavía estamos revisando la ley de bicicletas
+          eléctricas de %{state}. Consulta la clase, el motor y la velocidad de tu
+          bicicleta eléctrica, y descubre cómo funcionan las clases de bicicletas
+          eléctricas.
+        state_title: "%{state} Leyes sobre bicicletas eléctricas"
+        title: Normativa sobre bicicletas eléctricas
+    memberships:
+      create:
+        already_a_member: Ya tienes una membresía.
   customer_mailer:
     additional_email_confirmation:
       html:
@@ -2772,6 +2790,8 @@ es:
       send_it: "¡Envíalo!"
       subject: Sujeto
       your_message: Tu mensaje
+      message_template: 'Número de serie de la bicicleta (si corresponde): URL de
+        registro en Bike Index (si corresponde): En qué necesito ayuda: '
     index:
       contact_us: "¡Contáctanos!"
       have_a_question_we_havent_answered: "¿Tienes alguna pregunta que no hayamos
@@ -2780,6 +2800,9 @@ es:
       log_in_to_send_a_comment: "¡Inicia sesión para enviar un comentario!"
       you_can_reach_us_at_contact_html: Puedes contactarnos en %{contact_link} o enviar
         tu mensaje aquí mismo.
+      the_more_detail_you_can_share: Cuanta más información nos proporcione, más rápido
+        podremos ayudarle. Si su pregunta se refiere a una bicicleta específica, incluya
+        el número de serie o la URL de registro de su bicicleta en Bike Index.
   info:
     about:
       about_bike_index: Acerca de Bike Index
@@ -4208,6 +4231,7 @@ es:
     register_step_2: Agregue los detalles de su %{cycle_type}
     search_marketplace_index: Mercado de índices de bicicletas
     strava_search_index: Índice de bicicletas Búsqueda en Strava
+    registration_form_settings: Configuración del formulario de registro
   money:
     currencies:
       en: Dólar estadounidense
@@ -4284,6 +4308,10 @@ es:
       unconfirmed_emails: Correos electrónicos no confirmados
       verified: verificado
       why_you_should_text: lee por qué deberías
+      preferred_unit_system: Unidades
+      unit_system_automatic: Automático, desde tu ubicación
+      unit_system_imperial: Sistema imperial (millas, pulgadas)
+      unit_system_metric: Sistema métrico (kilómetros, milímetros)
     sharing:
       choose_file: Seleccione archivo...
       create_page: Crear página
@@ -4320,25 +4348,16 @@ es:
     show:
       add_a_bike: Añade una bicicleta
       add_a_lock: Agregar un candado
-      add_a_photo: Añade una foto
-      add_it_now: "¡Añádelo ahora!"
-      bike_sticker: Pegatina para bicicleta
       bikes: bicicletas
       combination: Combinación
       edit: Editar
-      generally_connect_to_org: Algunas de tus bicicletas están asociadas con %{org_name},
-        pero esta no. En general, debes conectar todas tus bicicletas a %{org_name}.
-      ignore: ignorar
       key_serial: Clave de serie
-      location: Ubicación
       lock_type: Tipo de cerradura
       locks: cabellos
       manufacturer: Fabricante
       next: Próximos pasos
-      primary_colors: Colores primarios
       register_new_items: Registrar nuevos artículos
       registered: Registrado
-      serial: De serie
       sorry_your_bike_was_stolen: Lamentamos que te hayan robado tu %{bikes_last_type},
         pero esperamos que, con la ayuda de todos para buscarlo, lo recuperes.
       tell_us_more_about_yourself: Cuéntanos más sobre ti.
@@ -4347,16 +4366,11 @@ es:
       to_bike_index_thanks_for_signing_up: a Bike Index. ¡Gracias por registrarte!
       update_your_profile: Actualiza tu perfil
       updated: Actualizado
-      user_hidden: Oculto para otros usuarios
       welcome: Bienvenido
       you_have_no_registered_bikes: No tienes bicicletas registradas.
       you_have_no_registered_locks: No tienes cerraduras registradas.
       header_title: "%{current_user_name} en Índice de Bicicletas"
       membership_subtitle: "¡Gracias por ser miembro de Bike Index %{level}!"
-      edit_registration: Editar %{bike_type}
-      list_for_sale: Listado para la venta
-      mark_stolen: Marca %{bike_type} robada
-      update_marketplace_listing: "¡Actualiza tu anuncio en el mercado!"
     delete_account:
       delete_account: Eliminar cuenta
       delete_my_account: Eliminar mi cuenta y todas mis bicicletas registradas.
@@ -4623,6 +4637,8 @@ es:
           bicicleta y haz clic en <em>la pegatina del enlace</em> para conectarla
           con esta %{bike_sticker_kind}.
         update: Actualizar
+      new:
+        registration_form_settings: Configuración del formulario de registro
     bulk_imports:
       index:
         added: Agregado
@@ -4797,6 +4813,15 @@ es:
           no reclamadas se envían a su organización para su revisión y posterior reenvío
           al usuario final, ya que dichos usuarios no han optado por recibir notificaciones
           del Índice de Bicicletas.
+        send_self_registration_email_html: Enviar correo electrónico para inscripciones
+          enviadas a <code>%{email}</code>
+        send_self_registration_email_includes_unregistered: Esto incluye las notificaciones
+          no registradas.
+        send_self_registration_email_note: Por defecto, Bike Index ya no envía correos
+          electrónicos cuando se registra un vehículo con la dirección de correo electrónico
+          de registro de su organización. Marque esta casilla si desea recibir correos
+          electrónicos para los registros con una dirección de correo electrónico
+          del propietario de %{email}.
     stickers:
       edit:
         bike: Bicicleta
@@ -4925,6 +4950,8 @@ es:
       subject: Finaliza el informe de tu hallazgo %{cycle_type}
     partial_register_confirmation_stolen:
       subject: Finaliza la denuncia de tu %{cycle_type} robado.
+    organization_message:
+      subject: Mensaje de %{organization_name} sobre tu %{bike_type}
   payments:
     form:
       donation_header: "¡Ayúdanos a apoyar nuestros esfuerzos!"
@@ -5243,6 +5270,7 @@ es:
       manufacturer_required: El fabricante está obligado a registrarse.
       name_required: Se requiere el nombre del propietario para registrarse.
       unable_to_save: No podemos guardar ese registro, por favor inténtelo de nuevo.
+      description_stolen_required: Por favor, cuéntenos qué sucedió.
     menu_items_account:
       logout: Finalizar la sesión
       marketplace_messages: Mensajes del mercado
@@ -5254,7 +5282,6 @@ es:
       viewing_without_org: Visualización sin ninguna organización
       your_registrations: Sus registros
     menu_items_org:
-      add_a_bike: Añade una bicicleta
       add_an_impounded_vehicle: Agregar un vehículo incautado
       ascend_imports: Importaciones Ascend
       bulk_import_and_export: Importación y exportación a granel
@@ -5292,68 +5319,8 @@ es:
       in_super_admin: "%{org_name} en superadministrador"
       registrations_index: Registro de organizaciones
       search_all_registrations: Buscar en todos los registros
-  stolen:
-    index:
-      ambassador: embajador
-      bike_index: Bike Index
-      bike_index_will_broadcast: Bike Index publicará la información sobre tu bicicleta
-        robada en la cuenta local de Twitter de Bicicletas Robadas y la difundirá
-        a través de otras redes sociales. Nuestros datos de bicicletas robadas están
-        vinculados a LeadsOnline, por lo que si tu bicicleta aparece en el sistema,
-        se marcará y te contactaremos. Nuestra comunidad estará atenta a las diferentes
-        plataformas de reventa.
-      check_out_your_local_flea_market: Busca tu bicicleta en el mercadillo de tu
-        zona.
-      donation: donación
-      error: error
-      file_a_police_report: Presenta una denuncia policial. Si puedes, acude a tu
-        comisaría local y pide que un agente venga a tomarte declaración. ¡Haz que
-        se involucren en tu caso!
-      if_you_are_here_your_bike_was_probably_stolen: 'Si estás aquí, probablemente
-        te robaron la bicicleta. ¡Qué mala suerte!, pero estamos aquí para ayudarte.
-        Esto es lo que debes hacer:'
-      keep_an_eye_on_craigslist: Mantente atento a Craigslist. Configura una alerta
-        específica en ifttt.com para que te avise de los anuncios que coincidan con
-        tu bicicleta. También puedes usar aplicaciones como OfferUp y LetGo, ya que
-        se utilizan con frecuencia para la compraventa de bicicletas.
-      list_recent_stolen_bikes_html: Enumere las bicicletas robadas recientemente
-        en su sitio con nuestro %{stolen_widget_link}
-      look_for_local_stolen_bike_groups_on_face: Busca grupos locales de bicicletas
-        robadas en Facebook (busca 'bicicleta robada {nombre de la ciudad}'). Muchos
-        de estos grupos de voluntarios existen en todo el mundo y pueden ayudarte
-        en tus esfuerzos de recuperación.
-      make_sure_your_bike_is_registered_html: Asegúrate de que tu bicicleta esté registrada
-        en %{new_bike_link} y en cualquier registro local de tu comunidad. Marca tu
-        bicicleta como <strong>robada</strong> en Bike Index para que nuestra comunidad
-        pueda ayudarte.
-      other_recovery_tools: Otras herramientas de recuperación
-      please_fix_the_following: Por favor, corrija lo siguiente %{errors}
-      please_login_to_make_report_html: Por favor %{login_link} haga este informe
-      register_it: regístralo
-      report_a_bicycle_chop_shop: Denuncie un taller clandestino de desmantelamiento
-        de bicicletas.
-      report_bike_theft_issues: 'Denuncie los robos de bicicletas:'
-      report_someone_selling_a_stolen_bike: Denuncie a alguien que esté vendiendo
-        una bicicleta robada.
-      reporting_your_own_bike_stolen_html: "¿Quieres denunciar el robo de tu bicicleta?
-        Primero debes %{register_it_link}"
-      send_alert: "¡Enviar alerta!"
-      sign_in: iniciar sesión
-      stolen_widget: widget robado
-      tell_everyone_you_know: Cuéntale a todo el mundo que te robaron la bicicleta.
-        Usa todas tus redes sociales (Facebook, Instagram, Twitter, etc.) y envía
-        un mensaje de texto o correo electrónico a todos tus contactos.
-      we_wish_you_the_best_of_luck_html: Te deseamos mucha suerte en la recuperación
-        de tu bicicleta. Nos encantaría añadir tu historia a nuestra lista de %{recoveries_count}
-        bicicletas recuperadas. Si deseas apoyar nuestra causa, considera hacer una
-        donación %{donations_link} o unirte a nuestro programa %{ambassadors_link}.
-      what_happens_next: "¿Qué sucederá después?"
-      what_to_do_if_your_bike_is_stolen: Qué hacer si te roban la bicicleta
-      where_is_this_happening: "¿Dónde está ocurriendo esto? URL, dirección: cualquier
-        información que tengas"
-      your_email_address: Su dirección de correo electrónico
-      your_local_police_department_will_do_what: La policía local hará todo lo posible
-        por recuperar tu bicicleta. Mantente en contacto con ellos.
+      add_a_registration: Agregar un registro
+      registration_form_settings: Configuración del formulario de registro
   theft_alert_plans:
     theft_alert_plan:
       days: Días
@@ -5601,6 +5568,13 @@ es:
         just_a_few_steps_away_html: "¡Estás a solo unos pasos de registrar tu <strong>%{color_and_brand}</strong>
           en el registro de bicicletas más completo del mundo!"
         youre_almost_done: "¡Ya casi terminas!"
+        agree_to_the_safety_rules: Acepte las normas de seguridad.
+        review_the_rules: Revisa las reglas
+        safety_rules_owed_html: Tu <strong>%{color_and_brand}</strong> está registrado
+          con %{org_name} en Bike Index. Acepta las normas de seguridad de %{org_name}
+          para finalizar el registro.
+        link_signs_you_in: Este enlace te da acceso a Bike Index, así que no lo reenvíes.
+          Funciona durante %{days} días.
       confirmation_email:
         click_to_sign_in_html: ¡Haz clic en el botón <em>"Iniciar sesión</em> " para
           finalizar tu registro!
@@ -5616,6 +5590,12 @@ es:
           Funciona durante %{days} días.
         we_saved_your_registration_html: Hemos guardado tu registro para una <strong>%{color_and_brand}</strong>
           en el registro de bicicletas más completo del mundo.
+      organization_message:
+        reply_to_respond: Responda a este correo electrónico para responder a %{sender_email}.
+        sender_sent_you_a_message: "%{sender_email} de %{organization_name} te envió
+          un mensaje sobre tu %{bike_type}:"
+        sender_sent_you_a_message_html: "%{sender_email} de %{organization_name} te
+          envió un mensaje sobre tu %{link}:"
     ui:
       definition_list:
         row:
@@ -5689,6 +5669,8 @@ es:
             uploading: subir
         required_marker:
           required: requerido
+        combobox_state:
+          state: Estado
       alerts:
         base:
           error: Error
@@ -5718,6 +5700,11 @@ es:
         in_the_past_year: en el último año
         now: ahora
         to: a
+      column_settings:
+        all: todo
+        default: por defecto
+        none: ninguno
+        visible_columns: Columnas visibles
     atoms:
       serial:
         hidden: oculto
@@ -5735,6 +5722,12 @@ es:
         unregistered: 'No registrado por su propietario: creado a partir de una notificación
           de estacionamiento.'
         with_owner: Registrado y protegido. Con su dueño (no robado).
+      short_id:
+        copy_id: Copiar ID
+      sticker:
+        copy_sticker: Copiar pegatina
+      recovery_display_card:
+        recovered: Recuperado
     pages:
       messages:
         thread_show:
@@ -5804,6 +5797,7 @@ es:
             search_distance: Distancia de búsqueda
             search_location: Buscar ubicación
             within: dentro
+            kilometers_of: kilómetros de
           wrapper:
             e_vehicles_for_audit: 'Vehículos eléctricos para auditoría:'
             view_matching_any_audit: ver coincidencia con cualquier auditoría
@@ -5896,6 +5890,7 @@ es:
               al buscar todos los registros, a menos que se busquen únicamente los
               registros incautados o robados.
             show_location_search: mostrar búsqueda de ubicación
+            included_columns: Columnas incluidas
           column_settings_toggle:
             column_settings: Configuración de columnas
           settings_and_filters:
@@ -5926,10 +5921,6 @@ es:
             serial_label: 'De serie:'
             sticker_label: 'Etiqueta engomada:'
             view_all: ver todo
-          bike_card:
-            e_vehicle: Vehículo eléctrico
-            not_registered_with: No está registrado con %{org_name}
-            registered_with: Registrado con %{org_name}
         impound_records:
           index:
             all_bikes: Todas las bicicletas
@@ -5956,204 +5947,45 @@ es:
             created: Creado
             notification_number: Notificación#
             resolved: Resuelto
-      register:
-        acknowledgment_check:
-          i_name_html: Yo, %{name},
-          registrants_name: nombre del registrante
-        acknowledgment_progress:
-          progress_saved: Progreso guardado · Confirmación del vehículo eléctrico
-            · Paso %{number} de %{total}
-        back_link:
-          back: Atrás
-        page:
-          retry_failed: No pudimos guardar la información en este momento; no se ha
-            perdido nada de lo que ingresaste. Inténtalo de nuevo en un momento.
-        page_content:
-          electric_detected: "⚡️ Se detectó un vehículo eléctrico (motorizado)."
-          have_questions: "¿Tiene alguna pregunta sobre estas políticas?"
-          read_the_faq: Preguntas frecuentes sobre el reconocimiento de vehículos
-            eléctricos
-        review_summary:
-          a_quick_review: Un breve repaso de todo lo que usted reconoció.
-          a_quick_review_tap: Un breve repaso de todo lo que has confirmado. Pulsa
-            "Revisar" para volver a consultar un protocolo.
-          review: Revisar
-          youre_almost_done: Ya casi terminas.
-        step1:
-          bike_info_html: "%{cycle_type} información"
-          electric_helper: Verificamos que sean eléctricas para poder marcarlas y
-            comprobar su certificación.
-          electric_motorized: "⚡️ Eléctrico (motorizado)"
-          email: Email
-          email_placeholder: tú@ejemplo.com
-          email_school: "%{org_name} correo electrónico"
-          just_the_essentials: Solo lo esencial para empezar.
-          next: Próximo
-          no_need_to_wait: Le enviaremos un enlace de confirmación por correo electrónico;
-            no tiene que esperar para continuar.
-          register_your_vehicle: "¡Registra tu vehículo!"
-          register_your_vehicle_with_org: "¡Registra tu vehículo con %{org_name}!"
-          start_over: Volver a empezar
-          start_over_certain: "¿Empezar de nuevo?"
-          start_over_discards: Esto inicia un nuevo registro; nada de lo que haya
-            introducido aquí se conservará.
-          vehicle_type: Tipo de vehículo
-          yes_start_over: Sí, empezar de nuevo
-          your_info: Tu información
-        step2:
-          add_another_color: Añade otro color
-          add_your_bikes_details: Agregue los detalles de su %{cycle_type}
-          additional_serial_sticker_number: Número de serie/etiqueta adicional
-          affiliation: "%{org_name} afiliación"
-          are_you_certain: "¿Estás seguro?"
-          attach_photo: Adjuntar foto de %{cycle_type}
-          bike_details: "%{cycle_type} detalles"
-          bottom_bracket: Soporte inferior
-          cm: centímetro
-          color: Color
-          complete_registration: Registro completo %{cycle_type}
-          confirmation_link_sent: 'Te hemos enviado un enlace de confirmación a tu
-            correo electrónico. No tienes que esperar: puedes finalizar tu registro
-            ahora mismo.'
-          contact_info: Información de contacto
-          database_public_note: "¡Nuestra base de datos es pública! Podrás ajustar
-            la configuración de privacidad de las fotos individuales de tu registro
-            más adelante."
-          email: Email
-          enter_size: Introduzca el tamaño
-          found: Encontrado/Abandonado
-          found_description: Encontré esto %{cycle_type}
-          frame_size: Tamaño del marco
-          from_step_1: Desde el paso 1
-          head_tube: Tubo de dirección
-          how_to_find_serial: Cómo encontrar su número de serie
-          i_just_dont_know_the_serial: Simplemente no conozco el número de serie.
-          im_100_sure: Estoy 100% seguro
-          inches: pulgadas
-          information_for_org: Información para %{org_name}
-          is_a_handmade_frame: Es un marco hecho a mano
-          it_probably_has_a_serial_number: Probablemente tenga un número de serie.
-          missing_serial: Número de serie extraviado
-          model: Modelo
-          model_placeholder: Por ejemplo, Marlin 7
-          model_year: Año del modelo
-          model_year_placeholder: p. ej. 2023
-          more_useful_registration: Cuanto más añadas, más útil será el registro.
-          nevermind: No importa
-          next: Próximo
-          optional: opcional
-          or: o
-          owner_name: Nombre del propietario
-          owner_name_placeholder: Nombre y apellido
-          owner_registration: Registro del propietario
-          owner_registration_description: Registro para mí mismo o en nombre del propietario.
-          phone: Teléfono
-          phone_placeholder: "(555) 000-0000"
-          phone_required_found: Se requiere el teléfono para registrar un %{cycle_type}
-            encontrado.
-          phone_required_stolen: Se requiere el teléfono para registrar un %{cycle_type}
-            robado.
-          primary_color_blank: Color primario — por ejemplo, negro
-          read_how_to_find_html: Lea sobre %{how_to_find_link} <small>(se abre en
-            una ventana aparte)</small>
-          rear_dropouts: punteras traseras
-          register_with_org: Regístrate con %{org_name}
-          register_with_org_description: "%{org_name} podrá ver y ayudar a gestionar
-            este registro."
-          registration_type: Tipo de registro
-          remove_additional_color: Eliminar color
-          second_color_blank: Segundo color — por ejemplo, rojo
-          serial_help_intro: 'La mayoría de las bicicletas tienen su número de serie
-            grabado en el cuadro. Busca tu número de serie:'
-          serial_location_bottom_bracket: parte inferior del soporte inferior
-          serial_location_head_tube: en el tubo de dirección
-          serial_location_rear_dropouts: en las punteras traseras
-          serial_number: Número de serie
-          serial_placeholder: Obligatorio — o marcar como faltante
-          sticker_number: Número de pegatina del índice de bicicletas
-          sticker_placeholder: p. ej. A 471 829
-          stolen: Robado
-          stolen_description: Este %{cycle_type} ha sido robado.
-          student_id: Carné de estudiante
-          third_color_blank: Tercer color
-          up_to_3: hasta 3
-          very_very_few_bikes_html: "<em>Muy</em> pocos %{cycle_types} se fabrican
-            sin números de serie. A menos que este %{cycle_type}:"
-          view_serial_guide: Consulte la guía completa de números de serie.
-          was_made_before_1970: Fue fabricado antes de 1970.
-          wheres_my_serial: "¿Dónde está mi número de serie?"
-          without_serial: Este %{cycle_type} se hizo sin número de serie.
-          without_serial_number: Este %{cycle_type} se fabricó sin número de serie.
-          phone_required_org: Se requiere un teléfono para registrarse en %{org_name}.
-        step_acknowledgment:
-          continue: Continuar
-        step_acknowledgment_review:
-          complete_registration: Registro completo %{cycle_type}
-        step_confirm:
-          confirming_your_email: Confirmando tu correo electrónico
-          continue: Continuar
-          continue_where_you_left_off: Continúa y retomaremos donde lo dejaste.
-        step_finished:
-          add_impound_details: Añade detalles sobre dónde encontraste el %{cycle_type}
-          add_photos: Agrega fotos de tu %{cycle_type}
-          confirming_lets_you: 'Confirmar tu correo electrónico te permite:'
-          do_these_things: Haz estas cosas para tener la mejor oportunidad de recuperarlo.
-          finish_adding: Finaliza la adición de tu %{cycle_type} al Índice de Bicicletas
-          listed_as_found: El %{bike_display} aparece en Bike Index.
-          listed_as_stolen: Tu %{bike_display} aparece como robada en Bike Index.
-          owner_can_claim: Su propietario puede encontrarlo aquí y reclamarlo; le
-            enviaremos un correo electrónico cuando alguien lo haga.
-          progress_saved: Progreso guardado
-          register_another: Registrar otro vehículo
-          registered_for_owner_html: La %{bike_display} está registrada en Bike Index.
-            Le hemos enviado un correo electrónico a %{email} para que pueda reclamar
-            el registro.
-          registration_complete: "¡Registro completado!"
-          report_it_stolen: Finaliza la denuncia de tu %{cycle_type} robado y aprovecha
-            nuestra red comunitaria.
-          reported_stolen: Denunciado como robado
-          verify_your_email_html: 'Un paso más: verifica tu correo electrónico. Te
-            enviamos un enlace de confirmación a %{email}; haz clic en él para finalizar
-            tu registro. Toda la información que ingresaste se guardará.'
-          view_the_registration: Ver el registro
-          view_your_registration: Ver su registro
-          we_will_keep_watch: Tu %{bike_display} está registrada en Bike Index. La
-            vigilaremos; si se denuncia como robada, toda la comunidad estará pendiente.
-        step_report:
-          about_the_one_you_found: Acerca del %{cycle_type} que encontraste
-          address_where_you_found_it: Dirección donde lo encontraste
-          complete_registration: Registro completo %{cycle_type}
-          contact_and_sharing: Contacto y compartición
-          department_city: Departamento/ciudad
-          estimated_value: Valor estimado (%{currency})
-          have_proof_of_ownership: Tengo pruebas de que soy el propietario de este
-            %{cycle_type}
-          help_us_reunite: Ayúdanos a devolvérselo a su dueño.
-          how_did_you_find_it: "¿Cómo encontraste el %{cycle_type}?"
-          how_was_it_locked: "¿Cómo se bloqueó %{cycle_type}?"
-          how_was_the_lock_defeated: "¿Cómo se logró abrir la cerradura?"
-          next: Próximo
-          police_report: Informe policial
-          receive_notifications: Envíame un correo electrónico si tuiteamos sobre
-            esto %{cycle_type} o si encontramos una posible coincidencia.
-          report_number: Número de informe
-          report_your_stolen: Denuncie su %{cycle_type} robado
-          show_phone_police: Policía
-          show_phone_shops: Tiendas de bicicletas
-          show_phone_users: Usuarios de Bike Index que han iniciado sesión
-          the_more_we_know: Cuanto más sepamos, mayores serán las posibilidades de
-            recuperarlo.
-          theft_details: Detalles del robo
-          what_happened: "¿Qué pasó?"
-          what_happened_placeholder: Por ejemplo, estaba enganchado a un estante fuera
-            de la cafetería, y ya no estaba cuando volví a salir.
-          when_and_where: Cuándo y dónde
-          when_did_you_find_it: "¿Cuándo lo encontraste?"
-          when_was_it_stolen: "¿Cuándo fue robado el %{cycle_type}?"
-          where_was_it_stolen: "¿Dónde fue robado?"
-          who_can_see_your_phone: "¿Quién puede ver tu número de teléfono?"
-          without_a_report: Presentar una denuncia policial le da a su %{cycle_type}
-            la mejor oportunidad de regresar; puede agregar el número más tarde.
+          new:
+            create_parking_notification: Crear notificación de estacionamiento
+            internal_notes: "%{org_name} notas internas"
+            model: Modelo
+            new_unregistered_notification: Nueva notificación no registrada
+            not_shown_to_user: no se muestra al usuario
+            notification_because: Notificación porque
+            parking_notification: Aviso de estacionamiento
+            photo: Foto
+            registration_form_settings: Configuración del formulario de registro
+            serial_number: Número de serie
+            vehicle_info: Información del vehículo
+            vehicle_type: Tipo de vehículo
+        register_settings:
+          browser_only: Esta configuración solo se aplica a tu navegador; no afectará
+            a otros usuarios.
+          form_options: Opciones de formulario
+          old_view: Utilice la página de registro antigua
+          registration_form_settings: Configuración del formulario de registro
+          registration_page: Página de registro
+          separate_attestation: El solicitante completa la declaración jurada de registro
+            por separado.
+          separate_attestation_helper: Recibirán un correo electrónico informándoles
+            de que su registro no está completo, junto con un enlace para finalizarlo.
+          single_page: Formulario de registro de una sola página
+          update: Actualizar
+          old_unregistered_notification_view: Utilice la antigua página de notificación
+            para usuarios no registrados.
+          unregistered_notification_page: Página de notificación de usuarios no registrados
+        registrations:
+          new:
+            registration_form_settings: Configuración del formulario de registro
+        parking_notification_location:
+          address_or_intersection: Dirección o intersección
+          enter_address_manually: Introduzca la dirección manualmente
+          map_hint: Arrastra el mapa para que el marcador señale el lugar.
+          map_unavailable: No se pudo cargar el mapa; la ubicación aún estaba configurada
+            desde su dispositivo.
+          set_on_map: Colocar en el mapa
       registrations:
         show:
           bike_details:
@@ -6200,11 +6032,6 @@ es:
           contact_owner:
             contact_the_owner: Contacta con el propietario
             know_something_about_this_bike_type: "¿Sabes algo sobre esto %{bike_type}?"
-            link_url: URL del enlace
-            send_message: Enviar mensaje
-            where_did_you_see_this_bike: "¿Dónde viste esto %{bike_type}? Si nos contactas
-              por un anuncio que encontraste en línea, incluye un enlace en el campo
-              a continuación."
           current_alerts:
             claim_impound:
               add_a_stolen_bike: agregar un %{bike_type} robado
@@ -6305,21 +6132,29 @@ es:
               title: Actualizar el registro de incautación
             message_owner:
               know_something_about_this_bike_type: "¿Sabes algo sobre esto %{bike_type}?"
-              link_url: URL del enlace
-              send_message: Enviar mensaje
-              where_did_you_see_this_bike: "¿Dónde viste esto %{bike_type}? Si nos
-                contactas por un anuncio que encontraste en línea, incluye un enlace
-                en el campo a continuación."
               know_who_has_this_bike_type: "¿Sabes quién tiene este %{bike_type}?"
               what_do_you_need_to_ask: "¿Qué necesitas preguntar sobre esto %{bike_type}?
                 Incluye un enlace en el campo de abajo si hay alguno que te ayude."
+              general_message: Mensaje general
+              has_active_parking_notification: Este registro tiene una notificación
+                de estacionamiento activa.
+              message_about_theft: Mensaje sobre robo
+              message_the_owner_of_this_bike_type: Envía un mensaje al propietario
+                de este %{bike_type}
+              owner_turned_off_non_stolen_notifications: Este usuario ha desactivado
+                las notificaciones para vehículos que no han sido robados.
+              send_a_new_parking_notification_to_message_the_owner: 'Enviar una nueva
+                notificación de estacionamiento para avisar al propietario:'
+              send_parking_notification: Enviar notificación de estacionamiento
+              unavailable_phone_registration: Registrado por teléfono, por lo que
+                no hay correo electrónico que enviar.
+              unavailable_status: Los mensajes generales no están disponibles para
+                enviar a %{status}.
+              unavailable_vehicle_not_registered_with_organization: Los mensajes generales
+                solo se pueden enviar a vehículos registrados con %{organization_name}.
             parking_notification_form:
-              address_or_intersection: Dirección o intersección
               create_parking_notification: Crear una nueva notificación de estacionamiento
               impound_this_bike_type: Confiscar esto %{bike_type}
-              map_hint: Arrastra el mapa para que el marcador señale el lugar.
-              map_unavailable: No se pudo cargar el mapa; la ubicación aún estaba
-                configurada desde su dispositivo.
               not_shown_to_user: no se muestra al usuario
               parking_notification_notes: "%{org_name} notas internas"
             parking_notification_show:
@@ -6336,6 +6171,10 @@ es:
               view_notifications: Ver notificaciones
               view_notifications_active_html: "<strong>%{count}</strong> Activo"
               view_notifications_resolved_html: "<strong>%{count}</strong> Resuelto"
+            organization_message_form:
+              send_message: Enviar mensaje
+              what_do_you_want_to_tell_the_owner: "¿Qué quieres decirle al dueño de
+                este %{bike_type}?"
           owner_phone:
             or_call: O llame
           photos:
@@ -6447,6 +6286,14 @@ es:
             updated_by: Actualizado por %{user}
           subtitle:
             nickname: 'apodo: %{name}'
+          stolen_notification_form:
+            link_url: URL del enlace
+            send_message: Enviar mensaje
+            where_did_you_see_this_bike: "¿Dónde viste esto %{bike_type}? Si nos contactas
+              por un anuncio que encontraste en línea, incluye un enlace en el campo
+              a continuación."
+          share:
+            link_copied: Enlace copiado
       search:
         everything_combobox:
           made_by: hecho por
@@ -6476,31 +6323,10 @@ es:
           stolenness_proximity: Robado en la zona de búsqueda
           stolenness_stolen: Robado en cualquier lugar
           within: dentro
+          kilometers_of: kilómetros de
         result_view_select:
-          bike_box_view: Ver como lista
-          thumbnail_view: Ver como miniaturas
-      search_results:
-        bike_box:
-          ended_at: Finalizado
-          location: Ubicación
-          not_applicable: N / A
-          posted_at: Listado
-          price: Precio
-          primary_colors: Colores primarios
-          removed_from: Eliminado del índice de bicicletas
-          serial: De serie
-        container:
-          no_results: No se encontraron registros que coincidieran exactamente con
-            su búsqueda.
-        frame:
-          fetch_failed: No se pudieron cargar estos resultados; compruebe su conexión
-            e inténtelo de nuevo.
-          rate_limited: Se han realizado demasiadas búsquedas demasiado rápido; se
-            ha alcanzado el límite de solicitudes. Espere un momento y vuelva a intentarlo.
-          retry: Intentar otra vez
-        vehicle_thumbnail:
-          member: Miembro de Bike Index
-          registered_not_stolen: Registrado, no robado.
+          cards_view: Ver como tarjetas
+          list_view: Ver como lista
       sessions:
         sign_in_interstitial:
           click_button_to_continue: Haz clic en el botón de abajo para continuar.
@@ -6691,12 +6517,1040 @@ es:
           sync_running_in_background: La sincronización se está ejecutando en segundo
             plano. Esta página se actualizará automáticamente.
           syncing_activities: Sincronizando actividades...
+        show:
+          bike_box:
+            add_a_photo: Añade una foto
+            add_it_now: "¡Añádelo ahora!"
+            bike_sticker: Pegatina para bicicleta
+            edit_registration: Editar %{bike_type}
+            generally_connect_to_org: Algunas de tus bicicletas están asociadas con
+              %{org_name}, pero esta no. En general, debes conectar todas tus bicicletas
+              a %{org_name}.
+            ignore_this_suggestion: Ignora esta sugerencia.
+            list_for_sale: Listado para la venta
+            location: Ubicación
+            mark_stolen: Marca %{bike_type} robada
+            primary_colors: Colores primarios
+            registered: Registrado
+            serial: De serie
+            update_marketplace_listing: "¡Actualiza tu anuncio en el mercado!"
+            updated: Actualizado
+            user_hidden: Oculto para otros usuarios
+        memberships:
+          show:
+            complimentary: Bike Index te regaló esta membresía, así que no tienes
+              que pagarla.
+            ends: Fin
+            manage_billing: Gestionar la facturación
+            new_members_pay: Los nuevos miembros %{level} pagan %{current_price}.
+            not_a_member: No eres miembro de Bike Index.
+            per_month: por mes
+            per_year: por año
+            see_membership_tiers: Ver niveles de membresía
+            started: Comenzó
+            you_are_a_member: Eres miembro %{level}
+            you_pay_less: Usted paga menos que los nuevos miembros. %{level} ahora
+              es %{current_price}, y usted mantiene su precio mientras su membresía
+              permanezca activa y continúe con este plan.
+            you_pay_the_current_price: Usted paga el precio actual por %{level}.
+            your_membership: Tu membresía
+            your_price: Tu precio
       sales:
         new_form:
           record_sale: Venta récord
           sold_for: Cantidad vendida por
           transfer_to_html: Esto transferirá el registro a %{buyer_html} y cerrará
             el listado del mercado.
+      stolen:
+        index:
+          act_in_the_first_24_hours: Actúa en las primeras 24 horas.
+          bike_stolen: Robo de bicicleta
+          bikes_that_came_home: Bicicletas que volvieron a casa
+          email: Email
+          every_hour_it_sits_unregistered: Cada hora que permanece sin registrar es
+            una hora en la que nadie puede identificarlo.
+          faq_confront_answer: No. Llama a la policía, dales tu número de caso y un
+            enlace a tu ficha en Bike Index, y deja que ellos se pongan en contacto
+            contigo. Ha habido personas que han resultado heridas al intentar recuperar
+            una bicicleta por su cuenta.
+          faq_confront_question: "¿Debería enfrentarme a la persona que tiene mi bicicleta?"
+          faq_cost_answer: Registrar una bicicleta, marcarla como robada y usar las
+            herramientas de recuperación son gratuitos. Bike Index es una organización
+            sin fines de lucro financiada por donaciones, organizaciones asociadas
+            y alertas promocionales opcionales.
+          faq_cost_question: "¿Algo de esto cuesta dinero?"
+          faq_other_city_answer: El registro es internacional y las recuperaciones
+            se producen a cientos de kilómetros del lugar del robo. Tu anuncio permanece
+            activo y visible hasta que marques la bicicleta como recuperada.
+          faq_other_city_question: "¿Y si aparece en otra ciudad?"
+          faq_serial_question: No tengo mi número de serie.
+          faq_unregistered_question: Mi bicicleta nunca estuvo matriculada antes de
+            que me la robaran.
+          here_is_the_next_hour: Aquí está la próxima hora.
+          how_alerts_work: Cómo funcionan las alertas
+          more_resources: Más recursos
+          no_account_yet: "¿Aún no tienes cuenta? Al registrar una bicicleta robada,
+            se crea una. El registro es siempre gratuito."
+          partner_organizations: tiendas asociadas, departamentos de policía y ciudades
+          pillar_alerts_title: Alertas que viajan
+          pillar_network_title: Una red de voluntarios
+          promoted_alerts: Alertas promocionadas
+          promoted_alerts_body: Una alerta destacada muestra el anuncio de tu bicicleta
+            robada en las noticias de Facebook de la zona donde ocurrió el robo, además
+            de en nuestras propias redes sociales. Llega a personas que no están buscando
+            tu bicicleta, pero que la reconocerán atada a la puerta equivocada.
+          promoted_alerts_title: Deja tu bicicleta frente al barrio del que fue robada.
+          questions_people_ask_at_2am: Preguntas que la gente hace a las 2 de la madrugada.
+          read_more_recovery_stories: Lee más historias de recuperación
+          recoveries_reported_by_owners: Recuperaciones recientes, reportadas por
+            sus propietarios.
+          recovery_record: historial de recuperación
+          register_it: Regístrelo
+          register_your_stolen_bike: Registra tu bicicleta robada
+          register_your_stolen_bike_free: Registra tu bicicleta robada — gratis
+          report_a_bicycle_chop_shop: Un taller clandestino de desguace de bicicletas
+          report_bike_theft_issues: Denuncie los problemas de robo de bicicletas.
+          report_bike_theft_issues_subhead: "¿Has visto alguna moto robada a la venta
+            o un taller clandestino donde la desmantelan? Avísanos dónde."
+          report_someone_selling_a_stolen_bike: Alguien está vendiendo una bicicleta
+            robada.
+          reporting_your_own_bike_html: "¿Quieres denunciar el robo de tu bicicleta?
+            %{register_it_link} en su lugar."
+          resource_bay_area: Robado en el Área de la Bahía
+          resource_portland: Robado en Portland, Oregón.
+          resource_register_found: Registra una bicicleta encontrada
+          resource_safety_tips: Consejos de seguridad para recuperar tu propia bicicleta
+          resource_seattle: Robado en Seattle
+          resource_what_to_do: Qué hacer si te roban la bicicleta
+          resource_why_register: "¿Por qué registrar tus bicicletas en Bike Index?"
+          search_the_registry: Buscar en el registro
+          send_report: Enviar informe
+          sign_in: Iniciar sesión
+          sign_in_to_report_html: "%{sign_in_link} para hacer un informe."
+          step_alert_action: Comparte tu alerta
+          step_alert_body: Tu anuncio genera una alerta de bicicleta robada que se
+            puede compartir en redes sociales. Publícala, envíala a grupos de ciclistas
+            locales y páginas vecinales, y considera promocionarla para llegar a las
+            manzanas cercanas al lugar del robo.
+          step_alert_tag: 10 minutos
+          step_alert_title: Envía tu alerta
+          step_google_alerts_action: Configurar alertas de Google
+          step_google_alerts_body: Configura varias alertas de Google con detalles
+            que coincidan con tu bicicleta (marca, modelo, componentes distintivos,
+            color), para que te lleguen los nuevos anuncios y publicaciones que la
+            mencionen.
+          step_google_alerts_tag: 5 minutos
+          step_google_alerts_title: Configurar alertas de Google
+          step_listing_action: Edita tu anuncio
+          step_listing_body: Un anuncio con el número de informe policial, fotos claras
+            y cualquier marca de identificación permite a un agente actuar en cuestión
+            de minutos. Los anuncios vagos retrasan el proceso.
+          step_police_action: Encuentra tu línea de denuncia local
+          step_police_tag: 15 minutos
+          step_police_title: Presentar una denuncia policial
+          step_register_action: Registra tu bicicleta robada
+          step_register_tag: 3 min · gratis
+          step_register_title: Regístrelo como robado en Bike Index.
+          step_shops_action: Encuentra tiendas asociadas
+          step_shops_tag: 20 minutos
+          step_shops_title: Díselo a las tiendas cercanas
+          stolen_bikes_recovered: Recuperan bicicletas robadas
+          the_first_24_hours: Las primeras 24 horas
+          to_register_always: para registrarse, siempre
+          value_returned_to_owners: valor devuelto a los propietarios
+          where_is_this_happening: "¿Dónde está ocurriendo esto? Una URL, una dirección,
+            cualquier información que tengas"
+          why_registering_changes_the_odds: Por qué registrarse cambia las probabilidades
+          why_registering_subhead: Una bicicleta robada que nadie puede identificar
+            es simplemente una bicicleta usada. El registro permite que la tuya sea
+            identificable para quienes se dedican a la compraventa de bicicletas usadas.
+          work_top_to_bottom: Trabajar de arriba abajo.
+          your_bike_is_gone: Tu bicicleta ha desaparecido.
+          faq_serial_proof_answer: De todas formas, regístrala. Fotos, el recibo de
+            compra, los registros de mantenimiento del taller o la documentación del
+            seguro pueden ayudarte a identificar la moto. Añade todo lo que tengas
+            y consulta con el taller donde la vendiste; a menudo tienen el número
+            de serie registrado.
+          faq_unregistered_recovered_answer: Eso suele ocurrir. Puedes denunciarla
+            como robada ahora mismo; no es necesario que estuviera registrada previamente.
+            Muchas bicicletas se recuperan después de haber sido robadas.
+          lede_register_first: 'Seis pasos, en orden. Los dos primeros son los más
+            importantes: regístrate en Bike Index para que cualquiera que encuentre
+            tu bicicleta pueda contactarte y, a continuación, presenta una denuncia
+            policial.'
+          pillar_alerts_promoted_body: Tu anuncio se comparte en nuestras redes sociales
+            y se promociona en las publicaciones cercanas al lugar del robo. Cualquiera
+            que lo vea puede contactarte directamente.
+          pillar_network_millions_body: Millones de motociclistas, además de embajadores,
+            tiendas y socios de las fuerzas del orden, monitorean los anuncios de
+            reventa y denuncian los talleres clandestinos que piratean vehículos.
+          pillar_record_body: 'Cualquier persona puede buscar una bicicleta en Bike
+            Index de forma gratuita: tiendas de bicicletas, agentes de policía en
+            servicio, compradores antes de pagar.'
+          pillar_record_title: Un registro público
+          report_on_the_stolen_bike_page: Si hay una bicicleta robada en Bike Index
+            sobre la que quieres informar, envía un mensaje en la página de esa bicicleta
+            robada.
+          step_listing_report_number_tag: 1 minuto
+          step_listing_report_number_title: Agregar el número de informe policial
+            al Índice de Bicicletas
+          step_police_bring_body: El número de expediente es lo que permite que un
+            agente te devuelva la bicicleta en lugar de confiscarla, y en todos los
+            trámites posteriores se hace referencia a él. Ten a mano la dirección,
+            la hora en que fue confiscada y el número de serie (si lo tienes).
+          step_register_minimal_registration: Si tienes el número de serie y una foto
+            de la bicicleta, ayuda, pero incluso un registro mínimo con solo el color
+            y el modelo permite recuperar bicicletas robadas.
+          step_register_registry_body: Este es el interruptor que activa todo lo demás.
+            Tu bicicleta se registra en un registro público que las tiendas de bicicletas,
+            los departamentos de policía, las bases de datos de casas de empeño y
+            los compradores de bicicletas usadas consultan antes de tocar un cuadro
+            de segunda mano.
+          step_shops_recovered_body: Los ladrones llevan las bicicletas robadas a
+            reparar o a comprar repuestos. Las tiendas que consultan Bike Index son
+            las que permiten recuperar una gran parte de las bicicletas robadas.
+          three_minutes_and_no_cost: Tres minutos y sin coste alguno.
+      register:
+        parts:
+          acknowledgment_check:
+            i_name_html: Yo, %{name},
+            registrants_name: nombre del registrante
+          acknowledgment_progress:
+            progress_saved: Progreso guardado · Confirmación del vehículo eléctrico
+              · Paso %{number} de %{total}
+          back_link:
+            back: Atrás
+          page_content:
+            electric_detected: "⚡️ Se detectó un vehículo eléctrico (motorizado)."
+            have_questions: "¿Tiene alguna pregunta sobre estas políticas?"
+            read_the_faq: Preguntas frecuentes sobre el reconocimiento de vehículos
+              eléctricos
+          review_summary:
+            a_quick_review: Un breve repaso de todo lo que usted reconoció.
+            a_quick_review_tap: Un breve repaso de todo lo que has confirmado. Pulsa
+              "Revisar" para volver a consultar un protocolo.
+            review: Revisar
+            youre_almost_done: Ya casi terminas.
+          shell:
+            retry_failed: No pudimos guardar la información en este momento; no se
+              ha perdido nada de lo que ingresaste. Inténtalo de nuevo en un momento.
+          step1_fields:
+            bike_info_html: "%{cycle_type} información"
+            electric_helper: Verificamos que sean eléctricas para poder marcarlas
+              y comprobar su certificación.
+            electric_motorized: "⚡️ Eléctrico (motorizado)"
+            email: Email
+            email_placeholder: tú@ejemplo.com
+            email_school: "%{org_name} correo electrónico"
+            vehicle_type: Tipo de vehículo
+            your_info: Tu información
+          step1_submit:
+            next: Próximo
+            no_need_to_wait: Le enviaremos un enlace de confirmación por correo electrónico;
+              no tiene que esperar para continuar.
+            start_over: Volver a empezar
+            start_over_certain: "¿Empezar de nuevo?"
+            start_over_discards: Esto inicia un nuevo registro; nada de lo que haya
+              introducido aquí se conservará.
+            yes_start_over: Sí, empezar de nuevo
+          step2_fields:
+            additional_serial_sticker_number: Número de serie/etiqueta adicional
+            affiliation: "%{org_name} afiliación"
+            are_you_certain: "¿Estás seguro?"
+            attach_photo: Adjuntar foto de %{cycle_type}
+            bike_details: "%{cycle_type} detalles"
+            bottom_bracket: Soporte inferior
+            cm: centímetro
+            complete_registration: Registro completo %{cycle_type}
+            contact_info: Información de contacto
+            database_public_note: "¡Nuestra base de datos es pública! Podrás ajustar
+              la configuración de privacidad de las fotos individuales de tu registro
+              más adelante."
+            email: Email
+            enter_size: Introduzca el tamaño
+            found: Encontrado/Abandonado
+            found_description: Encontré esto %{cycle_type}
+            frame_size: Tamaño del marco
+            from_step_1: Desde el paso 1
+            head_tube: Tubo de dirección
+            how_to_find_serial: Cómo encontrar su número de serie
+            i_just_dont_know_the_serial: Simplemente no conozco el número de serie.
+            im_100_sure: Estoy 100% seguro
+            inches: pulgadas
+            information_for_org: Información para %{org_name}
+            is_a_handmade_frame: Es un marco hecho a mano
+            it_probably_has_a_serial_number: Probablemente tenga un número de serie.
+            missing_serial: Número de serie extraviado
+            model: Modelo
+            model_placeholder: Por ejemplo, Marlin 7
+            model_year: Año del modelo
+            model_year_placeholder: p. ej. 2023
+            nevermind: No importa
+            next: Próximo
+            optional: opcional
+            or: o
+            owner_name: Nombre del propietario
+            owner_name_placeholder: Nombre y apellido
+            owner_registration: Registro del propietario
+            owner_registration_description: Registro para mí mismo o en nombre del
+              propietario.
+            phone: Teléfono
+            phone_placeholder: "(555) 000-0000"
+            phone_required_found: Se requiere el teléfono para registrar un %{cycle_type}
+              encontrado.
+            phone_required_org: Se requiere un teléfono para registrarse en %{org_name}.
+            phone_required_stolen: Se requiere el teléfono para registrar un %{cycle_type}
+              robado.
+            read_how_to_find_html: Lea sobre %{how_to_find_link} <small>(se abre en
+              una ventana aparte)</small>
+            rear_dropouts: punteras traseras
+            register_with_org: Regístrate con %{org_name}
+            register_with_org_description: "%{org_name} podrá ver y ayudar a gestionar
+              este registro."
+            registration_type: Tipo de registro
+            serial_help_intro: 'La mayoría de las bicicletas tienen su número de serie
+              grabado en el cuadro. Busca tu número de serie:'
+            serial_location_bottom_bracket: parte inferior del soporte inferior
+            serial_location_head_tube: en el tubo de dirección
+            serial_location_rear_dropouts: en las punteras traseras
+            serial_number: Número de serie
+            serial_placeholder: Obligatorio — o marcar como faltante
+            sticker_number: Número de pegatina del índice de bicicletas
+            sticker_placeholder: p. ej. A 471 829
+            stolen: Robado
+            stolen_description: Este %{cycle_type} ha sido robado.
+            student_id: Carné de estudiante
+            very_very_few_bikes_html: "<em>Muy</em> pocos %{cycle_types} se fabrican
+              sin números de serie. A menos que este %{cycle_type}:"
+            view_serial_guide: Consulte la guía completa de números de serie.
+            was_made_before_1970: Fue fabricado antes de 1970.
+            wheres_my_serial: "¿Dónde está mi número de serie?"
+            without_serial: Este %{cycle_type} se hizo sin número de serie.
+            without_serial_number: Este %{cycle_type} se fabricó sin número de serie.
+          color_fields:
+            add_another_color: Añade otro color
+            color: Color
+            primary_color_blank: Color primario — por ejemplo, negro
+            remove_additional_color: Eliminar color
+            second_color_blank: Segundo color — por ejemplo, rojo
+            third_color_blank: Tercer color
+            up_to_3: hasta 3
+        views:
+          confirm:
+            confirming_your_email: Confirmando tu correo electrónico
+            continue: Continuar
+            continue_where_you_left_off: Continúa y retomaremos donde lo dejaste.
+          step1:
+            just_the_essentials: Solo lo esencial para empezar.
+            register_your_vehicle: "¡Registra tu vehículo!"
+            register_your_vehicle_with_org: "¡Registra tu vehículo con %{org_name}!"
+          step2:
+            add_your_bikes_details: Agregue los detalles de su %{cycle_type}
+            confirmation_link_sent: 'Te hemos enviado un enlace de confirmación a
+              tu correo electrónico. No tienes que esperar: puedes finalizar tu registro
+              ahora mismo.'
+            more_useful_registration: Cuanto más añadas, más útil será el registro.
+          step_acknowledgment:
+            continue: Continuar
+          step_finished:
+            add_impound_details: Añade detalles sobre dónde encontraste el %{cycle_type}
+            add_photos: Agrega fotos de tu %{cycle_type}
+            confirming_lets_you: 'Confirmar tu correo electrónico te permite:'
+            do_these_things: Haz estas cosas para tener la mejor oportunidad de recuperarlo.
+            finish_adding: Finaliza la adición de tu %{cycle_type} al Índice de Bicicletas
+            listed_as_found: El %{bike_display} aparece en Bike Index.
+            listed_as_stolen: Tu %{bike_display} aparece como robada en Bike Index.
+            owner_can_claim: Su propietario puede encontrarlo aquí y reclamarlo; le
+              enviaremos un correo electrónico cuando alguien lo haga.
+            progress_saved: Progreso guardado
+            register_another: Registrar otro vehículo
+            registered_for_owner_html: La %{bike_display} está registrada en Bike
+              Index. Le hemos enviado un correo electrónico a %{email} para que pueda
+              reclamar el registro.
+            registration_complete: "¡Registro completado!"
+            report_it_stolen: Finaliza la denuncia de tu %{cycle_type} robado y aprovecha
+              nuestra red comunitaria.
+            reported_stolen: Denunciado como robado
+            verify_your_email_html: 'Un paso más: verifica tu correo electrónico.
+              Te enviamos un enlace de confirmación a %{email}; haz clic en él para
+              finalizar tu registro. Toda la información que ingresaste se guardará.'
+            view_the_registration: Ver el registro
+            view_your_registration: Ver su registro
+            we_will_keep_watch: Tu %{bike_display} está registrada en Bike Index.
+              La vigilaremos; si se denuncia como robada, toda la comunidad estará
+              pendiente.
+            safety_rules_sent_html: La %{bike_display} está registrada en Bike Index.
+              Le hemos enviado por correo electrónico a %{email} las normas de seguridad
+              para que las acepte, con lo que finaliza el registro.
+          step_report:
+            about_the_one_you_found: Acerca del %{cycle_type} que encontraste
+            address_where_you_found_it: Dirección donde lo encontraste
+            complete_registration: Registro completo %{cycle_type}
+            contact_and_sharing: Contacto y compartición
+            department_city: Departamento/ciudad
+            estimated_value: Valor estimado (%{currency})
+            have_proof_of_ownership: Tengo pruebas de que soy el propietario de este
+              %{cycle_type}
+            help_us_reunite: Ayúdanos a devolvérselo a su dueño.
+            how_did_you_find_it: "¿Cómo encontraste el %{cycle_type}?"
+            how_was_it_locked: "¿Cómo se bloqueó %{cycle_type}?"
+            how_was_the_lock_defeated: "¿Cómo se logró abrir la cerradura?"
+            next: Próximo
+            police_report: Informe policial
+            receive_notifications: Envíame un correo electrónico si tuiteamos sobre
+              esto %{cycle_type} o si encontramos una posible coincidencia.
+            report_number: Número de informe
+            report_your_stolen: Denuncie su %{cycle_type} robado
+            show_phone_police: Policía
+            show_phone_shops: Tiendas de bicicletas
+            show_phone_users: Usuarios de Bike Index que han iniciado sesión
+            the_more_we_know: Cuanto más sepamos, mayores serán las posibilidades
+              de recuperarlo.
+            theft_details: Detalles del robo
+            what_happened: "¿Qué pasó?"
+            what_happened_placeholder: Por ejemplo, estaba enganchado a un estante
+              fuera de la cafetería, y ya no estaba cuando volví a salir.
+            when_and_where: Cuándo y dónde
+            when_did_you_find_it: "¿Cuándo lo encontraste?"
+            when_was_it_stolen: "¿Cuándo fue robado el %{cycle_type}?"
+            where_was_it_stolen: "¿Dónde fue robado?"
+            who_can_see_your_phone: "¿Quién puede ver tu número de teléfono?"
+            without_a_report: Presentar una denuncia policial le da a su %{cycle_type}
+              la mejor oportunidad de regresar; puede agregar el número más tarde.
+          step_review:
+            complete_registration: Registro completo %{cycle_type}
+      bikebook:
+        show:
+          any_activity: Cualquier actividad
+          any_configuration: Cualquier configuración
+          any_manufacturer: Cualquier fabricante
+          any_suspension: Cualquier suspensión
+          any_vehicle_type: Cualquier tipo de vehículo
+          applied_filters: Filtros aplicados
+          configuration: Configuración
+          failed: El catálogo no se cargó. Recarga la página para intentarlo de nuevo.
+          loading: Cargando el catálogo…
+          max: Máximo
+          min: Min
+          more_filters: Más filtros
+          price: Precio
+          search_placeholder: Buscar por fabricante o modelo…
+          sort: Clasificar
+          suspension: Suspensión
+          year: Año
+          filter_combobox:
+            any: Cualquier
+          byline: Un enlace gratuito de Bike Index, el registro de bicicletas sin
+            ánimo de lucro.
+          tagline: 'La biblioteca mundial de bicicletas: busca, compara y encuentra
+            tu próxima bici.'
+          about_bikebook_label: Acerca de BikeBook
+          activities: Actividades
+          activity_examples: "(p. ej., ciclismo de montaña, ciclocross, etc.)"
+          configuration_examples: "(completo/conjunto de fotogramas)"
+          human_powered: Impulsado por energía humana (acústico)
+          manufacturers: fabricantes
+          out_of_class_details: Vehículos motorizados, pero ninguno de los clasificados
+            como Clase 1, 2 o 3 en EE. UU., como un ciclomotor, una motocicleta o
+            una moto eléctrica todoterreno.
+          propulsion: Propulsión
+          select_a_bike: Selecciona una bicicleta, elige varias para compararlas.
+          us_class_1: Clase 1 de EE. UU.
+          us_class_2: Clase 2 de EE. UU.
+          us_class_3: Clase 3 de EE. UU.
+          vehicle_types: Tipos de vehículos
+          e_bike_classification: clasificación de bicicletas eléctricas
+          e_vehicle_motorized: Vehículo eléctrico (motorizado)
+          jurisdiction: Jurisdicción
+          out_of_class_label: Fuera de clase
+          united_states: Estados Unidos
+          any_market: Cualquier mercado
+          market: Mercado
+          clear_filters: Filtros transparentes
+        donate_strip:
+          donate: Donar
+          pitch: Este fantástico producto es posible gracias a la organización sin
+            ánimo de lucro Bike Index. Ayúdanos a cubrir los gastos de nuestro servidor.
+          region: Dona a Bike Index
+      ebike_rules:
+        class_tile:
+          class: Clase
+          class_aria: Bicicleta eléctrica de clase %{n}
+          class_unknown_aria: Clase de bicicleta eléctrica desconocida
+          emoto: Moto eléctrica
+          emoto_aria: E-moto, no una bicicleta eléctrica
+          optional_throttle: con acelerador opcional
+          optional_upgrade: con actualización opcional
+        law_details:
+          from: 'Desde %{date}:'
+          from_until: 'Desde %{starts_on} hasta %{ends_on}:'
+          limits_start_on: Estos límites entran en vigor %{date}. Hasta entonces,
+            las reglas que se indican a continuación establecen lo que se aplica.
+          restrictions: Normas y restricciones
+          sources: Fuentes
+          until: 'Hasta %{date}:'
+        results:
+          answer_no: 'No'
+          answer_yes: Sí
+          being_compiled: Las normas para este estado se están recopilando a partir
+            de fuentes primarias.
+          class_1_throttle: Las motocicletas de Clase 1 no pueden tener acelerador.
+          class_3_throttle: El acelerador debe cortarse a 20 mph.
+          classes_start_on: Las clases entran en vigor %{date}. Hasta entonces, consulte
+            las reglas vigentes del estado.
+          fails_rule: No cumple con esta regla.
+          falls_under: En %{state}, se encuentra dentro de %{name}, lo que puede requerir
+            registro y licencia.
+          for_your_information: Para tu información
+          gray_detail: Tu %{name} está catalogada como una bicicleta eléctrica de
+            clase %{n}. Consulta las normas locales en el %{state} DMV.
+          gray_detail_unclassified: Tu %{name} no figura como bicicleta eléctrica
+            de Clase 1, 2 o 3. Consulta las normas locales en el DMV de %{state}.
+          gray_headline: Todavía no tenemos registradas las normas sobre bicicletas
+            eléctricas de %{state}.
+          green_headline: Tu %{name} es legal para circular en %{state} como bicicleta
+            eléctrica de Clase %{n}.
+          has_throttle: Tiene acelerador
+          is_registered: "¿Está matriculada esta bicicleta?"
+          legal_to_ride: Es legal conducirlo
+          legal_with_rules: Legal, con reglas para verificar
+          limits_start_on: Estos límites entran en vigor %{date}
+          manual_bike_name: bicicleta eléctrica
+          may_be_moped: En su lugar, podría estar regulado como un ciclomotor o un
+            vehículo a motor, lo que podría requerir matriculación y permiso de conducir.
+          meets_rule: Cumple con esta regla
+          motor: Motor
+          mph_html: "%{mph} mph"
+          no_speed_cap: No hay límite de velocidad en la ley estatal.
+          no_throttle: Sin acelerador
+          no_watt_cap: No existe límite de potencia en la ley estatal.
+          not_classified: No es una bicicleta eléctrica de Clase 1, 2 o 3.
+          not_permitted: No está permitido
+          own_classes: El estado establece sus propios límites en lugar de las tres
+            clases estándar.
+          recovered_more_often: Las bicicletas robadas se recuperan dos veces más
+            a menudo cuando están registradas.
+          red_headline: Su %{name} no está permitido como bicicleta eléctrica según
+            las normas %{state} vigentes.
+          register_free: Regístrate en Bike Index — gratis
+          rule_to_check: Regla para comprobar
+          rules_not_on_file: Reglas no archivadas
+          source_html: 'Fuente: Catálogo de leyes estatales de %{link}. Los resúmenes
+            son solo de referencia y no constituyen asesoramiento legal.'
+          speed_not_provided: Velocidad máxima no proporcionada
+          speed_over_cap_html: Ayuda a %{mph} mph, por encima del límite de %{cap}
+            mph
+          speed_within_cap_html: Ayuda a %{mph} mph, dentro del límite
+          still_reviewing: Todavía estamos revisando las reglas de %{state}.
+          still_reviewing_body: Consulta la página web del Departamento de Vehículos
+            Motorizados (DMV) o de la legislatura de tu estado para conocer las normas
+            vigentes sobre bicicletas eléctricas. La mayoría de los estados limitan
+            la potencia de los motores de las bicicletas eléctricas a 750 W y la velocidad
+            asistida a 20 mph (Clase 1-2) o 28 mph (Clase 3).
+          throttle: Acelerador
+          throttle_allowed: Acelerador permitido para la Clase 2
+          throttle_not_allowed: El estado no permite un acelerador
+          throttle_not_stated: La ley estatal no especifica si se permite un acelerador.
+          top_speed: Velocidad máxima
+          watts_html: "%{watts}W"
+          watts_not_provided: Potencia del motor no proporcionada
+          watts_over_cap_html: El motor %{watts}W supera la capacidad %{cap}W
+          watts_within_cap_html: El motor %{watts}W está dentro de la tapa
+          yellow_headline:
+            one: Tu %{name} es legal para circular en %{state} como una bicicleta
+              eléctrica de clase %{n}, con la regla %{count} a verificar.
+            other: Tu %{name} es legal para circular en %{state} como bicicleta eléctrica
+              de clase %{n}, con %{count} reglas que debes consultar.
+          yellow_headline_class_unknown:
+            one: Tu %{name} puede ser legal para viajar en %{state}, con la regla
+              %{count} para verificar.
+            other: Tu %{name} puede ser legal para viajar en %{state}, con %{count}
+              reglas para verificar.
+          yes_to_html: Sí, a %{mph}
+          your_bike: Tu bicicleta
+          your_ebike: Tu bicicleta eléctrica
+          your_state: Tu estado
+          bikebook_name: Libro de bicicletas
+          class_3_throttle_over_html: El acelerador funciona hasta %{mph} mph, más
+            allá de las 20 mph se permite el acelerador de un Clase 3.
+          class_3_throttle_within_html: El acelerador se detiene a %{mph} mph
+          class_unknown_check_label: BikeBook no indica su clase ni su velocidad máxima,
+            así que compruebe la clase en su etiqueta.
+          entered_unverified: Ingresado por usted, no verificado por BikeBook.
+          full_bikebook_entry: Ver la entrada completa en BikeBook
+          over_mph_html: Más de %{mph} mph
+          red_headline_manual: Esto no es una bicicleta eléctrica según las normas
+            %{state} vigentes.
+          speed_past_cap_html: Ayuda a superar %{past} mph, por encima del límite
+            de %{cap} mph
+          speed_past_html: Ayuda a superar %{past} mph; comprueba que se detenga a
+            %{cap} mph.
+          classes_not_recognized:
+            one: La clase %{n} no se reconoce aquí.
+            other: Las clases %{n} no se reconocen aquí.
+          classes_recognized:
+            one: Se reconoce la clase %{n}.
+            other: Se reconocen las clases %{n}.
+          read_more: Leer más
+          stock_photo: Foto de archivo
+          answer_optional: Opcional
+          as_class_with_optional_throttle: como Clase %{n} con su acelerador opcional
+          as_class_with_optional_upgrade: como Clase %{n} con una actualización opcional
+          class_3_optional_throttle_within_html: El acelerador opcional se detiene
+            a %{mph} mph.
+          class_3_speed_with_throttle_html: Ayuda a %{mph} mph, no permitido con acelerador.
+          class_n: Clase %{n}
+          classes_not_permitted: Es una bicicleta eléctrica %{classes}, lo cual no
+            está permitido.
+          green_headline_optional: Tu %{name} es legal para circular en %{state} como
+            bicicleta eléctrica de clase %{n} y %{optional}.
+          manually_entered: Introducido manualmente
+          model_year: Modelo %{year}
+          optional_classes_not_recognized:
+            one: La clase %{n} no se reconoce aquí, por lo que solo es legal tal como
+              se vende.
+            other: Las clases %{n} no se reconocen aquí, por lo que es legal solo
+              como se vende.
+          optional_throttle_not_allowed: Es legal únicamente sin su acelerador opcional.
+          optional_to_html: Opcional, a %{mph}
+          throttle_with_class_3_assist: No permitido con asistencia de Clase 3
+          yellow_headline_optional:
+            one: Tu %{name} es legal para circular en %{state} como una bicicleta
+              eléctrica de clase %{n}, y %{optional}, con la regla %{count} a verificar.
+            other: Tu %{name} es legal para circular en %{state} como una bicicleta
+              eléctrica de clase %{n}, y %{optional}, con %{count} reglas para verificar.
+          yellow_headline_without_throttle: Tu %{name} es legal para circular en %{state}
+            como una bicicleta eléctrica de Clase %{n}, sin su acelerador opcional.
+          green_headline_law: Tu %{name} tiene permiso para viajar en %{state} según
+            las reglas %{law}.
+          kmh_html: "%{kmh} km/h"
+          law_source_html: 'Fuente: Catálogo de leyes sobre bicicletas eléctricas
+            de %{link}. Los resúmenes son solo de referencia y no constituyen asesoramiento
+            legal.'
+          may_be_moped_canada: En su lugar, podría estar regulado como un ciclomotor
+            o un vehículo a motor, lo que podría requerir matriculación y permiso
+            de conducir.
+          no_e_bike_category: Aquí no hay categoría para bicicletas eléctricas, así
+            que consulta las normas sobre licencia, matriculación y casco de esta
+            bicicleta.
+          no_speed_cap_in_law: No hay límite de velocidad en su ley.
+          no_watt_cap_in_law: No hay límite de potencia en su ley.
+          optional_to_kmh_html: Opcional, hasta %{kmh} km/h
+          over_kmh_html: Más de %{kmh} km/h
+          speed_over_cap_kmh_html: Ayuda a %{kmh} km/h, por encima del límite de %{cap}
+            km/h
+          speed_past_cap_kmh_html: Ayuda a superar los %{past} km/h, por encima del
+            límite de %{cap} km/h
+          speed_past_kmh_html: Ayuda a superar %{past} km/h; comprueba que se detenga
+            a %{cap} km/h.
+          speed_to_check_kmh_html: BikeBook no indica su velocidad máxima, así que
+            compruebe que el motor se detiene a %{cap} km/h.
+          speed_within_cap_kmh_html: Ayuda a %{kmh} km/h, dentro del límite
+          still_reviewing_province_body: Consulta la normativa vigente sobre bicicletas
+            eléctricas en el ministerio de transporte de tu provincia o territorio.
+            La mayoría limita la potencia de los motores de las bicicletas eléctricas
+            a 500 W y la velocidad asistida a 32 km/h.
+          throttle_allowed_in_law: Acelerador permitido
+          throttle_not_allowed_in_law: Su ley no permite un acelerador
+          throttle_not_stated_in_law: Su ley no especifica si se permite un acelerador.
+          watts_to_check_html: Compruebe que su motor tenga una potencia nominal de
+            %{cap}W o inferior.
+          yellow_headline_law:
+            one: Tu %{name} es legal para viajar en %{state} según las reglas %{law},
+              con la regla %{count} para verificar.
+            other: Tu %{name} es legal para viajar en %{state} según las reglas %{law},
+              con reglas %{count} para verificar.
+          yellow_headline_law_without_throttle: Tu %{name} es legal para circular
+            en %{state} según las reglas %{law}, sin su acelerador opcional.
+          yellow_headline_motor_vehicle_law:
+            one: Tu %{name} puede ser legal para montar en %{state} según las reglas
+              %{law}, con la regla %{count} para verificar.
+            other: Tu %{name} puede ser legal para montar en %{state} según las reglas
+              %{law}, con reglas %{count} para verificar.
+          yes_to_kmh_html: Sí, a %{kmh} km/h
+          your_province: Su provincia o territorio
+        rule_label:
+          classes: Clases reconocidas
+          power: condensador de potencia del motor
+          speed: Velocidad máxima asistida
+          throttle: Acelerador
+          vehicle: Regulado como
+        rule_value:
+          allowed: Permitido
+          classes:
+            one: Clase %{classes}
+            other: Clases %{classes}
+          mph_html: "%{mph} mph"
+          no_cap: Sin límite
+          not_allowed: No está permitido
+          own_definition: 'Su propia definición: %{name}'
+          watts_html: "%{watts}W"
+          kmh_html: "%{kmh} km/h"
+        show:
+          answer_no: 'No'
+          answer_yes: Sí
+          banned_body: La ciudad de Nueva York exige que las bicicletas eléctricas
+            y las baterías que se venden allí cumplan con las normas UL 2849 o UL
+            2271 (Ley Local 39 de 2023). Las universidades, los proveedores de vivienda
+            y las agencias de transporte público están adoptando normas similares
+            para el almacenamiento y la carga en interiores.
+          banned_heading: "¿Por qué se prohíben las bicicletas no certificadas?"
+          battery_safety: Seguridad de baterías y contra incendios
+          bike_error: Selecciona una bicicleta de la lista o introduce sus datos manualmente.
+          bike_model: Modelo de bicicleta
+          bike_placeholder: Busca tu bicicleta (marca, modelo, año)
+          bikes_registered_html: "%{number} bicicletas registradas"
+          certification_involves_body: Un laboratorio de pruebas reconocido a nivel
+            nacional somete las muestras de producción a pruebas de sobrecarga, cortocircuito,
+            impacto, resistencia al agua y sobrecalentamiento. Posteriormente, la
+            fábrica es inspeccionada periódicamente para mantener su certificación.
+          certification_involves_heading: "¿Qué implica la certificación?"
+          check_my_bike: Revisa mi bicicleta
+          compare_html: "¿Quieres comparar varias bicicletas? %{link}"
+          disclaimer: Bike Index es una organización sin fines de lucro 501(c)(3).
+            Los resúmenes de las leyes estatales son solo de referencia y no constituyen
+            asesoramiento legal.
+          for_parents: Para padres
+          form_label: Consulta de cumplimiento de normativas para bicicletas eléctricas
+          has_throttle: "¿Tiene acelerador?"
+          heading: Conozca las normas para bicicletas eléctricas.
+          how_to_check_1: Busque la marca UL y el número de archivo en la etiqueta
+            de la batería y del marco.
+          how_to_check_2: Busque ese número en UL Product iQ.
+          how_to_check_heading: Cómo revisar una bicicleta
+          motor_wattage: Potencia del motor (W)
+          mph: "%{mph} mph"
+          parent_step_1_body: Muchos estados establecen una edad mínima para la Clase
+            3, y algunos para todas las clases. Consulta la normativa de tu estado
+            antes de elegir una bicicleta.
+          parent_step_1_title: Consulta las normas de edad.
+          parent_step_2_body: Solo cuenta con asistencia al pedaleo, sin acelerador,
+            y deja de ayudar a 32 km/h. Es la categoría más fácil de aprender y está
+            permitida en la mayoría de los lugares.
+          parent_step_2_title: Comienza con la Clase 1
+          parent_step_3_body: Tu hijo ya debería frenar, señalizar, mirar por encima
+            del hombro y mantener una línea recta en una bicicleta normal. Practica
+            primero con la bicicleta eléctrica en un lugar tranquilo.
+          parent_step_3_title: Asegúrate de que puedan manejarlo.
+          parent_step_4_body: 'Repasemos las zonas de tu ciudad donde se pueden usar
+            bicicletas eléctricas y los caminos que llevas al colegio: normas sobre
+            el uso del casco, aceras, senderos y cualquier normativa del colegio o
+            campus.'
+          parent_step_4_title: Aprendamos juntos las normas locales.
+          parent_step_5_body: Elige una bicicleta con certificación UL 2849. Cárgala
+            sobre una superficie dura, lejos de las salidas, con el cargador incluido
+            y nunca la dejes desatendida durante la noche.
+          parent_step_5_title: Compra productos con certificación UL y cárgalos de
+            forma segura.
+          parent_step_6_body: Las bicicletas infantiles también son robadas. El registro
+            es gratuito y solo toma unos dos minutos.
+          parent_step_6_title: Registra la bicicleta
+          parents_body: Las bicicletas eléctricas son más pesadas y rápidas que las
+            bicicletas con las que la mayoría de los niños aprenden a usarlas. Antes
+            de comprar una, infórmese sobre las regulaciones estatales y municipales,
+            y asegúrese de que su hijo esté preparado para usarla de forma segura.
+          parents_heading: "¿Estás pensando en comprar una bicicleta eléctrica para
+            tu hijo/a?"
+          parents_link: Consulta las normas sobre edad y uso de casco de tu estado.
+          recoveries_html: "%{number} recuperaciones"
+          register_band_heading: Las bicicletas registradas se recuperan dos veces
+            más a menudo cuando son robadas. El registro es gratuito.
+          register_your_bike: Registra tu bicicleta
+          select_state: Seleccione su estado
+          state: Estado
+          state_error: Elige un estado.
+          subheading: Introduce tu estado y tu bicicleta para ver las normas de tu
+            estado.
+          ul_2271_body: Prueba la batería de iones de litio de forma independiente.
+            Es común en bicicletas y baterías de repuesto; no cubre el cargador ni
+            el motor.
+          ul_2271_scope: El paquete de baterías
+          ul_2271_test_1: Fuga térmica de la célula y del paquete
+          ul_2271_test_2: Aplastar, impactar y caer
+          ul_2271_test_3: Fallos en el sistema de gestión de la batería
+          ul_2849_body: Prueba la batería, el motor, el cargador y el controlador
+            funcionando conjuntamente como un solo sistema. Este es el estándar que
+            exigen la mayoría de las ciudades y campus universitarios.
+          ul_2849_scope: El sistema eléctrico completo de la bicicleta eléctrica
+          ul_2849_test_1: Protección contra sobrecarga y cortocircuito
+          ul_2849_test_2: Exposición al agua, vibración y caída
+          ul_2849_test_3: Seguridad del cargador y del cableado
+          ul_heading: Por qué es importante la certificación UL
+          ul_intro: Los incendios de baterías de iones de litio se inician rápidamente
+            y son difíciles de extinguir. La certificación UL significa que un laboratorio
+            independiente ha probado la bicicleta o la batería para detectar incendios
+            y fallas eléctricas. Cada vez más universidades, propietarios y ciudades
+            exigen esta certificación antes de permitir el acceso de bicicletas eléctricas
+            a espacios cerrados.
+          watts_placeholder: p. ej. 750
+          bikebook_didnt_load: BikeBook no se cargó. Introduce los datos de tu bicicleta
+            a continuación.
+          bikebook_loading: Cargando BikeBook…
+          how_to_check_lookup: Consulta el modelo que aparece más arriba. BikeBook
+            muestra la certificación cuando está registrada.
+          over_28_mph: Más de 28 mph
+          top_speed: "¿Cuál es su velocidad máxima?"
+          visit_bikebook_link: Visita BikeBook.
+          custom_details: Detalles personalizados
+          details_legend: Detalles de tu bicicleta
+          model_details: "%{model} detalles"
+          country: País
+          not_in_us_html: "¿No estás en EE. UU.? %{switch_country}"
+          select_country: Seleccione un país
+          switch_country: cambiar de país
+          switch_country_title: Cambiar de país
+          banned_body_canada: Las universidades, las empresas de alojamiento y las
+            agencias de transporte público están adoptando normas para el almacenamiento
+            y la carga de bicicletas eléctricas en interiores, y la certificación
+            es un requisito fundamental.
+          choose_province: Seleccione su provincia o territorio de la lista.
+          choose_state: Elige tu estado de la lista.
+          detected_place_html: Hemos detectado <strong>%{state}</strong> .
+          disclaimer_canada: Bike Index es una organización sin fines de lucro. Los
+            resúmenes de las leyes provinciales y territoriales son solo para referencia,
+            no constituyen asesoramiento legal.
+          kmh: "%{kmh} km/h"
+          not_in_canada_html: "¿No estás en Canadá? %{switch_country}"
+          over_kmh: Más de %{kmh} km/h
+          parent_step_1_body_canada: La mayoría de las provincias establecen una edad
+            mínima para usar una bicicleta eléctrica, que oscila entre los 12 y los
+            18 años. Consulta la normativa de tu provincia antes de elegir una bicicleta.
+          parent_step_2_body_canada: No tiene acelerador, así que el motor solo ayuda
+            mientras se pedalea. Es el tipo de bicicleta eléctrica más fácil para
+            aprender a montar.
+          parent_step_2_title_canada: Comience con asistencia al pedaleo.
+          parents_body_canada: Las bicicletas eléctricas son más pesadas y rápidas
+            que las bicicletas con las que la mayoría de los niños aprenden a usarlas.
+            Antes de comprar una, infórmese sobre las normas de su provincia y municipio,
+            y asegúrese de que su hijo esté preparado para usarla de forma segura.
+          parents_link_canada: Consulta las normas sobre edad y uso de casco de tu
+            provincia.
+          province: Provincia o territorio
+          province_error: Elija una provincia o territorio.
+          select_province: Seleccione su provincia o territorio.
+          subheading_canada: Ingresa tu provincia o territorio y ve a tu bicicleta
+            para ver sus reglas.
+          watts_placeholder_canada: p. ej. 500
+        state_reference:
+          compiling: Estamos recopilando las normas sobre bicicletas eléctricas de
+            %{state} de la legislatura estatal y del DMV. Vuelva pronto.
+          filter_placeholder: Escribe el nombre de un estado
+          filter_states: Estados del filtro
+          heading: Leyes sobre bicicletas eléctricas por estado
+          in_review: En revisión
+          limits_subheading: Los 50 estados y el Distrito de Columbia. Abra un estado
+            para ver sus límites, reglas y fuentes.
+          matching_of_total: "%{number} de %{total} coincide"
+          on_file_of_total_html: "%{number} de %{total} estados y DC en archivo ·
+            otros en revisión"
+          all_on_file: Todos los 50 estados y el Distrito de Columbia están archivados.
+          check_in_state: Consulta una bicicleta eléctrica en %{state}
+          no_match: No se encontraron coincidencias de estado. Pruebe con otro nombre.
+          not_three_classes: No son 3 clases
+          only_classes:
+            one: Solo la clase %{classes}
+            other: Clases %{classes} solamente
+          all_on_file_canada: Cada provincia y territorio registrado
+          compiling_canada: Estamos recopilando la normativa sobre bicicletas eléctricas
+            de %{state} a partir de su legislación y del Ministerio de Transportes.
+            Vuelva a consultar pronto.
+          filter_placeholder_canada: Escriba una provincia o territorio
+          filter_provinces: Filtrar provincias y territorios
+          heading_canada: Leyes sobre bicicletas eléctricas por provincia y territorio.
+          limits_subheading_canada: Cada provincia y territorio. Abre uno para ver
+            sus límites, normas y fuentes.
+          no_match_canada: No se encontraron coincidencias de provincias o territorios.
+            Pruebe con otro nombre.
+          on_file_of_total_canada_html: "%{number} de %{total} provincias y territorios
+            archivados · otros en revisión"
+        ul_badge:
+          certified: Certificado UL %{standard}
+          meaning_2271_certified: La batería superó las pruebas de seguridad UL contra
+            sobrecarga, cortocircuito e impacto.
+          scope_2271: Paquete de baterías
+          scope_2849: Sistema eléctrico para bicicletas eléctricas
+          meaning_2849_system_certified: Todo el sistema eléctrico (motor, batería,
+            cargador y controlador) superó conjuntamente las pruebas de seguridad
+            eléctrica y contra incendios.
+          certification_unknown: Certificación desconocida
+          meaning_check_labels: Busque la marca UL en el marco y en las etiquetas
+            de la batería.
+          meaning_unknown: Todavía no disponemos de datos de certificación para este
+            modelo. Busque la marca UL en el chasis y en las etiquetas de la batería.
+        classes:
+          classes_heading: Clases de bicicletas eléctricas, explicadas
+          classes_intro: La mayoría de los estados utilizan un sistema de tres clases.
+            Tu clase determina la velocidad a la que ayuda el motor, si se permite
+            el uso del acelerador y dónde puedes circular.
+          state_classes_heading: "%{state} clases de bicicletas eléctricas"
+          state_classes_intro: "%{state} no utiliza el sistema de tres clases que
+            usan la mayoría de los estados. Su ley clasifica las bicicletas eléctricas
+            y otros vehículos eléctricos de dos ruedas en estas clases."
+          other_classes: Otros vehículos eléctricos en %{place}
+          place_heading: Leyes sobre bicicletas eléctricas en %{place}
+        rule_citation:
+          source: fuente
+        class_card:
+          assist: Asistir
+          class_1_body: El motor solo ayuda mientras pedaleas y se detiene a 32 km/h.
+            Está permitido en la mayoría de los lugares donde se permite circular
+            con una bicicleta normal.
+          class_1_tag: Solo con asistencia al pedaleo
+          class_2_body: Un acelerador permite mover la bicicleta sin pedalear, hasta
+            32 km/h. En algunos senderos y parques no se permite el uso de aceleradores.
+          class_2_tag: Acelerador
+          class_3_body: Pedaleo asistido hasta 45 km/h, con velocímetro. Suele incluir
+            la obligación de usar casco, una edad mínima y limitaciones en los caminos.
+          class_3_summary: Pedaleo asistido hasta 45 km/h, con velocímetro.
+          class_3_tag: Asistencia al pedaleo más rápida
+          class_n: Clase %{n}
+          motor: Motor
+          motor_cap: "≤750W"
+          mph: "%{mph} mph"
+          or: o
+          pedal: Pedal
+          state_specifics: "%{state} detalles"
+          throttle: Acelerador
+          top_assist: Asistencia superior
+          emoto_limits_body: Una velocidad máxima superior a 45 km/h, una velocidad
+            de aceleración superior a 32 km/h o un motor de más de 750 W la convierten
+            en una moto eléctrica. En la mayoría de los estados, se consideran ciclomotores
+            o motocicletas, lo que puede requerir matriculación, seguro y permiso
+            de conducir.
+          emoto_motor: 750W+
+          emoto_speed: 28+ mph
+          emoto_summary: Una velocidad máxima superior a 45 km/h, una velocidad de
+            aceleración superior a 32 km/h o motores de más de 750 W la convierten
+            en una moto eléctrica.
+          not_an_ebike: No es una bicicleta eléctrica
+          watts_max: "≤%{watts}W"
+          watts_min: "%{watts}W+"
+          copy_id: Copiar ID
+          id: IDENTIFICACIÓN
+        bike_summary:
+          classification: Clasificación E-%{vehicle_type}
+          electric_certification: Certificación eléctrica
+          not_provided: No se proporciona
+        check:
+          outside_checked_countries: Por ahora, los controles de bicicletas abarcan
+            los estados de EE. UU. y las provincias canadienses. A continuación se
+            muestran las leyes sobre bicicletas eléctricas de %{place}.
+      memberships:
+        new:
+          become_a_member: Hazte miembro
+          bike_index_membership: Membresía de Bike Index
+          builds_next: Construye a continuación
+          choose_your_membership: Elige tu membresía
+          cycling_cap: gorra de ciclismo
+          every_tier_keeps_it_free: Cada nivel mantiene el registro gratuito y financia
+            nuevas funciones. Los niveles superiores incluyen más agradecimientos.
+          faq_cancel_answer: En cualquier momento, desde la página de tu cuenta. Cambiar
+            entre suscripción mensual y anual funciona de la misma manera.
+          faq_cancel_question: "¿Puedo cambiar de nivel o cancelar?"
+          faq_free_answer: Sí. Registrarse, buscar y denunciar un robo es gratis para
+            todos, para siempre. La membresía es la forma en que financiamos que siga
+            siendo así.
+          faq_free_question: "¿Registrar una bicicleta sigue siendo gratis aunque
+            no me haga socio?"
+          faq_gear_answer: Una vez que te registres, te enviaremos un correo electrónico
+            para solicitarte tu dirección postal y realizaremos el envío desde allí.
+          faq_gear_question: "¿Cuándo recibiré mi gorra o camiseta?"
+          faq_marketplace_answer: No. Cualquiera puede publicar un anuncio de una
+            bicicleta registrada sin costo alguno. Los miembros consiguen que sus
+            anuncios aparezcan en los primeros puestos.
+          faq_marketplace_question: "¿Necesito ser miembro para vender en la plataforma?"
+          faq_tax_answer: Bike Index es una organización sin fines de lucro 501(c)(3),
+            EIN 81-4296194. Las membresías y las donaciones únicas son deducibles
+            de impuestos en los EE. UU.
+          faq_tax_question: "¿La cuota de socio es deducible de impuestos?"
+          free_alerts_body: Los informes de robo se envían a tiendas, departamentos
+            de policía, campus universitarios y ciclistas que se encuentren cerca
+            del lugar donde se sustrajo la bicicleta.
+          free_alerts_title: Alertas de bicicletas robadas
+          free_partners_body: Incorporar nuevos comercios, departamentos y ciudades,
+            y ayudar a la policía a identificar a sus propietarios en relación con
+            las bicicletas recuperadas.
+          free_partners_title: Socios y recuperaciones
+          free_registration_body: Registrar, buscar y verificar una bicicleta usada
+            es gratuito para ciclistas, tiendas y policía. No vendemos datos de los
+            ciclistas.
+          free_registration_title: Registro y búsqueda
+          join_monthly: Únete como %{level} — %{price}/mo
+          join_yearly: Únete como %{level} — %{price}/año
+          keep_bike_index_free: Mantengamos Bike Index gratuito para todos los ciclistas.
+          keeps_free: Se mantiene gratis
+          live: Vivir
+          member_gear: Equipo de miembro
+          member_gear_body: Los miembros Plus reciben la gorra de ciclismo Bike Index.
+            Los patrocinadores reciben la camiseta de protección solar. Ambas prendas
+            están diseñadas por Kelsey Graywill y te las enviamos por correo después
+            de que te unas.
+          monthly: Mensual
+          new_tools_for_bike_owners: Nuevas herramientas para propietarios de bicicletas
+          next: Próximo
+          next_ebike_database_body: Base de datos global de certificación UL
+          next_ebike_database_title: Base de datos de bicicletas eléctricas
+          next_ios_app_body: Registra y gestiona tus bicicletas desde tu teléfono.
+          next_ios_app_title: La aplicación iOS
+          next_marketplace_body: Solo se admiten bicicletas matriculadas, con historial
+            de robos verificado.
+          next_marketplace_title: Un mercado más seguro
+          next_oem_parts_body: Especificaciones de fábrica y fotos para cada modelo.
+          next_oem_parts_title: Piezas OEM e imágenes de stock
+          next_versioning_body: Lleva un registro de los cambios que haga tu bicicleta.
+          next_versioning_title: Versión de bicicletas
+          official_registry: El registro oficial de más de 1.000 departamentos de
+            policía, universidades, ciudades y tiendas.
+          or_make_a_one_time_donation: O bien, haga una donación única.
+          partner_organizations: tiendas asociadas, departamentos de policía y ciudades
+          per_month: "/ mes"
+          per_year: "/ año"
+          perk_cycling_cap: Gorra de ciclismo para miembros de Bike Index
+          perk_everything_in_basic: Todo en básico
+          perk_everything_in_basic_and_plus: Todo incluido en los paquetes Básico
+            y Plus.
+          perk_faster_support: Respuestas de soporte más rápidas
+          perk_listings_promoted: Tus anuncios en el mercado se promocionan a la parte
+            superior.
+          perk_member_badge: Insignia de miembro en tu perfil de Bike Index.
+          perk_no_ads: Sin anuncios, si es que alguna vez los mostramos.
+          perk_patron_badge: Insignia de patrocinador en tu perfil de Bike Index
+          perk_promoted_alert: Una alerta promocional gratuita si te roban la bicicleta.
+          perk_sun_shirt: Camiseta de protección solar Bike Index Patron
+          perk_top_listing_placement: Posicionamiento destacado en el mercado
+          plans_from: Planes de %{price} al mes
+          questions: Preguntas
+          read_more_recovery_stories: Lee más historias de recuperación
+          recommended: Recomendado
+          recoveries_reported_by_owners: Cada recuperación es reportada por la persona
+            que recuperó su bicicleta.
+          stolen_bikes_recovered: Recuperan bicicletas robadas
+          summary_monthly: "%{level} membresía, %{price} un mes"
+          summary_yearly: "%{level} membresía, %{price} un año"
+          sun_shirt: Camisa de sol
+          tax_deductible_cancel_any_time: Las membresías y las donaciones únicas son
+            deducibles de impuestos en los Estados Unidos. Puedes cambiar de nivel
+            o cancelar tu membresía en cualquier momento desde tu cuenta.
+          tax_deductible_ein: Las membresías y las donaciones únicas son deducibles
+            de impuestos en los Estados Unidos. Bike Index es una organización sin
+            fines de lucro 501(c)(3), EIN 81-4296194.
+          the_registry_open_to_everyone: El registro, abierto a todos
+          two_months_free: Dos meses gratis
+          value_returned_to_owners: valor devuelto a los propietarios
+          view_your_membership: Consulta tu membresía %{level}
+          wear_the_shield: Lleva el escudo
+          what_members_make_possible: Lo que los miembros hacen posible
+          yearly: Anual
+          bikes_registered: bicicletas matriculadas
+          bikes_registered_keep_it_free: "%{bikes} Las bicicletas están registradas.
+            Los miembros lo mantienen gratis para el próximo millón."
+          millions_registered_keep_it_free: "%{millions} millones de bicicletas están
+            registradas. Los miembros lo mantienen gratis para el próximo millón."
+          monthly_donation_lede: La membresía es una donación mensual a Bike Index.
+            Con ella se financia el registro y las alertas de bicicletas robadas,
+            que permiten recuperarlas, y también se financian las nuevas herramientas
+            que desarrollamos. Registrar una bicicleta y denunciar un robo siempre
+            será gratuito. Gracias a nuestros miembros podemos garantizarlo.
     shared_blocks:
       footer:
         about: Acerca
@@ -6737,6 +7591,7 @@ es:
         vendor_terms: condiciones de venta
         where_we_are: Dónde estamos
         who_we_serve: A quién servimos
+        ebike_checker: comprobador de bicicletas eléctricas
       law_enforcement_donation:
         bikeindex_is_a_nonprofit: Bike Index es una organización sin fines de lucro
           501(c)(3). Dependemos de donaciones para brindar estos servicios. Recomendamos
@@ -6784,7 +7639,6 @@ es:
           subscription_expired_html: Tu suscripción a Bike Index ha caducado. Ponte
             en contacto con %{email_link} para reactivarla.
         organized_shop_integration_alert:
-          add_a_bike: Añade una bicicleta
           already_viewing_add_a_bike_page: Ya estás viendo esta página.
           ascend_card_title: Ascender
           dismiss: Despedir
@@ -6802,6 +7656,7 @@ es:
             que vendas quedará registrada a nombre de tu cliente en Bike Index.
           pos_callout_title: Registra las bicicletas automáticamente desde tu punto
             de venta.
+          add_a_registration: Agregar un registro
       navbar:
         org_sidebar:
           admin_panel: PANEL DE ADMINISTRACIÓN
@@ -6862,6 +7717,34 @@ es:
           finish_the_required_steps: completar los pasos requeridos
           not_registered_yet_html: Tu %{manufacturer} %{cycle_type} aún no está registrado.
             Por favor %{finish_link}
+      search_results:
+        bike_box:
+          ended_at: Finalizado
+          location: Ubicación
+          not_applicable: N / A
+          posted_at: Listado
+          price: Precio
+          primary_colors: Colores primarios
+          removed_from: Eliminado del índice de bicicletas
+          serial: De serie
+        bike_card:
+          e_vehicle: Vehículo eléctrico
+          member_listing: Miembro de Bike Index
+          member_listing_tooltip: Este vendedor es miembro de Bike Index.
+          not_registered_with: No está registrado con %{org_name}
+          registered_with: Registrado con %{org_name}
+        bike_list_item:
+          e_vehicle: Vehículo eléctrico
+          member_listing: Miembro de Bike Index
+          member_listing_tooltip: Este vendedor es miembro de Bike Index.
+          not_registered_with: No está registrado con %{org_name}
+          registered_with: Registrado con %{org_name}
+        frame:
+          fetch_failed: No se pudieron cargar estos resultados; compruebe su conexión
+            e inténtelo de nuevo.
+          rate_limited: Se han realizado demasiadas búsquedas demasiado rápido; se
+            ha alcanzado el límite de solicitudes. Espere un momento y vuelva a intentarlo.
+          retry: Intentar otra vez
   user_emails:
     confirm:
       confirm_email: Confirmar correo electrónico

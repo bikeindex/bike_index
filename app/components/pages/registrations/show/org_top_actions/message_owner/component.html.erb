@@ -13,20 +13,49 @@
       <%= heading %>
     </h2>
 
-    <div class="tw:mt-3">
-      <%= form_with(model: message_notification, url: stolen_notifications_path, data: {controller: "csrf-refresh form-persist", "form-persist-key-value": "contact-owner-#{@bike.id}", action: "input->form-persist#save submit->form-persist#clear"}) do |form| %>
-        <%= form.hidden_field :bike_id, value: @bike.id %>
+    <% if @owner_notifications_off %>
+      <p class="tw:mt-3">
+        <%= translation(".owner_turned_off_non_stolen_notifications") %>
+      </p>
+    <% elsif parking_notification_only? %>
+      <p class="tw:mt-3">
+        <%= translation(".has_active_parking_notification") %>
+      </p>
+      <p class="tw:mt-4">
+        <%= translation(".send_a_new_parking_notification_to_message_the_owner") %>
+      </p>
 
-        <%= form.text_area :message, required: true, rows: 6, placeholder: message_placeholder, class: "twinput tw:w-full" %>
+      <div class="tw:mt-3">
+        <%= render(UI::Button::Component.new(text: translation(".send_parking_notification"), color: :secondary, data: {"panel-name": "parking", action: "registrations--show--action-panels#toggle"})) %>
+      </div>
+    <% else %>
+      <div data-controller="registrations--show--message-owner">
+        <div class="tw:mt-3 tw:flex tw:items-center tw:gap-2">
+          <%= render(UI::Forms::RadioButtonGroup::Component.new(name: message_kind_name, selected: organization_message? ? "general" : "theft", entries: [{value: "theft", label: translation(".message_about_theft")}, {value: "general", label: translation(".general_message"), disabled: !organization_message?}], html_options: {data: {action: "registrations--show--message-owner#select"}})) %>
 
-        <%= form.text_field :reference_url, placeholder: translation(".link_url"), class: "twinput tw:mt-2 tw:w-full" %>
-
-        <div class="tw:mt-3">
-          <%= render(UI::Button::Component.new(text: translation(".send_message"), color: :primary, type: "submit")) %>
+          <% if unavailable_reason_text %>
+            <%= render(UI::Tooltip::Component.new(text: unavailable_reason_text)) %>
+          <% end %>
         </div>
-      <% end %>
-    </div>
 
-    <%= render(Pages::Registrations::Show::OwnerPhone::Component.new(phone: owner_phone)) %>
+        <% if organization_message? %>
+          <div
+            class="tw:mt-3"
+            data-registrations--show--message-owner-target="organizationMessage"
+          >
+            <%= render(Pages::Registrations::Show::OrgTopActions::OrganizationMessageForm::Component.new(bike: @bike, organization: @organization)) %>
+          </div>
+        <% end %>
+
+        <div
+          class="tw:mt-3 <%= "tw:hidden" if organization_message? %>"
+          data-registrations--show--message-owner-target="stolenNotification"
+        >
+          <%= render(Pages::Registrations::Show::StolenNotificationForm::Component.new(bike: @bike, placeholder: (translation(".what_do_you_need_to_ask", bike_type: @bike.type) if impounded?))) %>
+        </div>
+      </div>
+
+      <%= render(Pages::Registrations::Show::OwnerPhone::Component.new(phone: owner_phone)) %>
+    <% end %>
   <% end %>
 </div>

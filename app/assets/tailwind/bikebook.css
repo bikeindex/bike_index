@@ -1,0 +1,81 @@
+/* /bikebook (Pages::Bikebook::Show and app/javascript/bikebook) */
+
+/* Marks where a compared vehicle's spec differs from the first one's, in the comparison view */
+@utility spec-diff {
+  [data-comparison] & {
+    @apply tw:bg-yellow-50 tw:dark:bg-yellow-950;
+  }
+}
+
+@layer components {
+  /* Undoes legacy bootstrap's red inline code */
+  .bikebook code {
+    color: inherit;
+    background-color: transparent;
+    padding: 0;
+    font-size: inherit;
+  }
+
+  /* The model viewer's JSON fills the column beside its card on desktop, rather than
+   * scrolling inside a box of its own */
+  .twjson-panel .highlightjs-json {
+    @apply tw:lg:absolute tw:lg:inset-0;
+  }
+
+  .twjson-panel .highlightjs-json pre {
+    @apply tw:max-h-[70vh] tw:lg:h-full tw:lg:max-h-none;
+  }
+
+  /* A component group's table, which a card narrower than its five columns stacks, a row to each component - its
+   * columns style their cells. Important over the table's own cell borders, widths and padding */
+  .bikebook-components {
+    container: bikebook-components / inline-size;
+  }
+
+  @container bikebook-components (width < 40rem) {
+    .bikebook-components :is(table, thead, tbody) {
+      display: block;
+    }
+
+    .bikebook-components tr {
+      @apply tw:flex tw:flex-wrap tw:gap-x-2 tw:border-gray-200 tw:px-2 tw:py-1.5 tw:text-sm tw:dark:border-gray-700;
+    }
+
+    .bikebook-components tbody tr {
+      @apply tw:border-t;
+    }
+
+    .bikebook-components :is(th, td) {
+      @apply tw:block tw:w-auto! tw:rounded-none! tw:border-0! tw:p-0!;
+    }
+
+    .bikebook-components thead th:not(:first-child),
+    .bikebook-components td:empty {
+      display: none;
+    }
+  }
+}
+
+/* The vehicle combobox lists hundreds of models under its matching count, which stays in view */
+.bikebook .hw-combobox {
+  --hw-listbox-height: 24rem;
+}
+
+.bikebook .hw-combobox__group__label {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background-color: var(--hw-component-bg-color);
+}
+
+/* Compared models' chips drag to reorder (bikebook--chip-reorder); touch-action keeps a
+ * touch-drag from scrolling the page */
+[data-controller~="bikebook--chip-reorder"] .hw-combobox__chip {
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+[data-controller~="bikebook--chip-reorder"] [data-hw-combobox-chip]:active .hw-combobox__chip {
+  cursor: grabbing;
+}

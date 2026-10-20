@@ -60,6 +60,10 @@
         <dd>
           <code><%= @result.email_domain.presence || "(missing)" %></code>
         </dd>
+        <dt class="tw:font-semibold">Asserted name</dt>
+        <dd>
+          <%= @result.name.presence || "(missing)" %>
+        </dd>
         <dt class="tw:font-semibold">Organization domain</dt>
         <dd><code><%= @organization.user_email_domain %></code></dd>
       <% end %>

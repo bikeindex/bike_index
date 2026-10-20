@@ -141,7 +141,7 @@ class UsersController < ApplicationController
   # this action should only be for terms of service (or vendor_terms_of_service)
   def update
     @user = current_user
-    if @user.present? && params[:user].present? && @user.update(permitted_parameters)
+    if @user.present? && params[:user].present? && @user.update(permitted_terms_parameters)
       if params.dig(:user, :terms_of_service).present?
         if Binxtils::InputNormalizer.boolean(params.dig(:user, :terms_of_service))
           flash[:success] = translation(:you_can_use_bike_index)
@@ -219,14 +219,23 @@ class UsersController < ApplicationController
     {sign_up: sign_in_partner, return_to: emailable_return_to}.compact_blank
   end
 
+  def permitted_terms_parameters
+    params.require(:user).permit(:terms_of_service, :notification_newsletters)
+  end
+
   def permitted_password_reset_parameters
     params.require(:user).permit(:password, :password_confirmation)
   end
 
-  # Signed in users (e.g. passwordless users setting their first password) don't need the emailed token
+  # Signed in passwordless users setting their first password don't need the emailed token.
+  # Anyone else signed in changes it on my account, which asks for the current password
   def find_user_from_token_for_password_reset!
     @token = params[:token].presence
-    return @user = current_user if @token.blank? && current_user.present?
+    if @token.blank? && current_user.present?
+      return @user = current_user if current_user.passwordless_user?
+
+      return redirect_to(edit_my_account_path(edit_template: "password"))
+    end
 
     @user = User.find_for_auth_token("token_for_password_reset", @token)
     return redirect_forced_saml(@user.email) if @user.present? && !@user.auth_token_expired?("token_for_password_reset")

@@ -1,0 +1,8 @@
+---
+en:
+  components:
+    pages:
+      org:
+        registrations:
+          new:
+            registration_form_settings: Registration form settings

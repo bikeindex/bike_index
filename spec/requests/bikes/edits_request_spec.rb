@@ -387,13 +387,21 @@ RSpec.describe Bikes::EditsController, type: :request do
 
   context "strava_gear template" do
     let!(:strava_integration) { FactoryBot.create(:strava_integration, :synced, user: current_user) }
-    let!(:strava_gear) { FactoryBot.create(:strava_gear, strava_integration:, strava_id: "b12345", name: "My Road Bike") }
+    let!(:strava_gear) do
+      FactoryBot.create(:strava_gear, strava_integration:, strava_id: "b12345", name: "My Road Bike",
+        total_distance_kilometers: 100)
+    end
 
     it "renders versions template with strava gear fields" do
       get "#{base_url}/strava_gear"
       expect(response.code).to eq("200")
       expect(response).to render_template(:versions)
       expect(response.body).to include("My Road Bike")
+      expect(Capybara.string(response.body).find("option[value='b12345']").text.squish).to eq "My Road Bike (100 km)"
+
+      current_user.update(preferred_unit_system: "imperial")
+      get "#{base_url}/strava_gear"
+      expect(Capybara.string(response.body).find("option[value='b12345']").text.squish).to eq "My Road Bike (62 miles)"
     end
 
     it "renders versions template without strava when not connected" do

@@ -205,6 +205,14 @@ RSpec.describe BikeSearchable do
               expect(BikeSearchable.searchable_interpreted_params(query_params.except(:distance), ip: ip_address)).to eq target
             end
           end
+          context "in kilometers" do
+            let(:query_params) { {stolenness: "proximity", location: "these parts", distance: "100", distance_unit: "km"} }
+            let(:target) { {stolenness: "proximity", location: "these parts", distance: 100, distance_unit: "km", bounding_box:} }
+            it "boxes the distance in kilometers" do
+              expect(BikeSearchable.searchable_interpreted_params(query_params, ip: ip_address)).to eq target
+              expect(Geocoder::Calculations).to have_received(:bounding_box).with("these parts", 100, units: :km)
+            end
+          end
           context "with a broken bounding box" do
             let(:nan) { 0.0 / 0 }
             # Override bounding box stub in geocoder_default_location shared_context

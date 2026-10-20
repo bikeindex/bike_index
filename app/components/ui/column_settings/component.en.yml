@@ -1,0 +1,9 @@
+---
+en:
+  components:
+    ui:
+      column_settings:
+        all: all
+        default: default
+        none: none
+        visible_columns: Visible columns

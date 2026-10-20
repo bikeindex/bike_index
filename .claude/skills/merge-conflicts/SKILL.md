@@ -72,6 +72,7 @@ When git leaves `<<<<<<<` / `=======` / `>>>>>>>` markers:
 - **Consider the branch's purpose.** What is this branch trying to accomplish? A conflict resolution that quietly drops the branch's intent (or reverts something `main` deliberately changed) is a bug, even if it compiles.
 - **Ask when it isn't clear-cut.** If you can't confidently tell which side should win, or the two changes are semantically entangled, stop and ask the user rather than guessing. A wrong silent resolution is worse than a question.
 - **Both sides added at the same spot? Order matters.** Keeping both isn't enough when either block has side effects. If the incoming block ends by reloading the page, anything of yours that depends on unsaved state has to come *after* it — concatenated the other way it still passes while testing nothing.
+- **Taking one side resolves the marked blocks, not the file.** `git checkout --ours`/`--theirs` replaces the whole file, discarding the other side's hunks that merged cleanly around the conflict. Delete the unwanted half of each `<<<<<<<` block instead; `git checkout -m -- <file>` restores the markers if you already reached for it.
 - **Don't blanket-replace a renamed string.** Two call sites that shared a string can have legitimately diverged; `sed`-ing the whole file changes the one that shouldn't move.
 - **A conflicted `schema_migrations` list takes both versions.** Each side appended its own migration, so keep both lines in descending order — in `db/structure.sql` and `db/primary_replica_structure.sql` alike — then `bin/rails db:migrate` to re-dump. Never hand-edit the structure files.
 - After resolving, verify the result actually makes sense — the merged code should reflect both intents, not just parse. Run the relevant tests if the conflict touched logic.
@@ -87,6 +88,8 @@ git diff origin/<base> -- app/ lib/ config/   # then account for every file list
 ```
 
 Every differing file must be explainable as *this branch's work* (or a sibling branch you're intentionally stacked on). Anything else is a resurrection or a stray. For a file that's mostly wrong, don't hand-patch hunks — `git checkout origin/<base> -- <file>` and re-apply your change on top.
+
+**Reverting a file to the base's version *before* you've merged that base takes whatever the base has gained since** — commits your branch doesn't have, landing in your diff as your own work, and breaking against the code around them. `git checkout $(git merge-base origin/main HEAD) -- <file>` is the version your branch actually forked from.
 
 **Resolving two files to opposite sides breaks the interface between them**, and neither looks wrong on its own. Taking the base's version of a component while the helper that calls it auto-merges keeping your argument is an unknown-keyword error on every render, past an audit that reports both files as expected. Whenever you reset a file that has callers, grep the arguments you dropped: `git grep -n '<kwarg>' -- app` should come back empty, or only where the base still accepts it.
 

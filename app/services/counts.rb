@@ -3,7 +3,9 @@ module Counts
 
   STORAGE_KEY = "counts_#{Rails.env}".freeze
 
-  COUNT_KEYS = %w[total_bikes stolen_bikes recoveries recoveries_value week_creation_chart organizations].freeze
+  COUNT_KEYS = %w[total_bikes stolen_bikes recoveries recoveries_value week_creation_chart logged_searches organizations].freeze
+
+  LOGGED_SEARCH_KINDS = %w[web_bikebook not_web_bikebook not_web_bikebook_serial].freeze
 
   RECOVERY_AVERAGE_VALUE = 2103 # updated with calculated_recovery_average_value on 2026-4-11
 
@@ -14,6 +16,10 @@ module Counts
 
   def retrieve_for(count_key)
     RedisPool.conn { |r| r.hget STORAGE_KEY, count_key }.to_i
+  end
+
+  def retrieve_many(*count_keys)
+    RedisPool.conn { |r| r.hmget STORAGE_KEY, *count_keys }.map(&:to_i)
   end
 
   def count_keys
@@ -45,6 +51,14 @@ module Counts
     chart_data.present? ? JSON.parse(chart_data) : chart_data
   end
 
+  # {date => {kind => count}}, zeros for a day that hasn't been stored
+  def logged_searches(dates)
+    stored = RedisPool.conn { |r| r.hmget STORAGE_KEY, *dates.map { "logged_searches_#{it}" } }
+    dates.zip(stored).to_h do |date, counts|
+      [date, LOGGED_SEARCH_KINDS.to_h { [it, 0] }.merge(JSON.parse(counts || "{}"))]
+    end
+  end
+
   def assign_stolen_bikes
     assign_for("stolen_bikes", Bike.status_stolen.count)
   end
@@ -64,6 +78,19 @@ module Counts
 
   def assign_week_creation_chart
     assign_for("week_creation_chart", Bike.unscoped.where(created_at: beginning_of_week..Time.current).group_by_day(:created_at).count.to_json)
+  end
+
+  # Yesterday too, so the searches after the last run before midnight get counted
+  def assign_logged_searches
+    [Date.yesterday, Date.current].each do |date|
+      logged_searches = LoggedSearch.where(request_at: date.all_day)
+      not_bikebook = logged_searches.not_web_bikebook
+      assign_for("logged_searches_#{date}", {
+        web_bikebook: logged_searches.web_bikebook.count,
+        not_web_bikebook: not_bikebook.count,
+        not_web_bikebook_serial: not_bikebook.serial.count
+      }.to_json)
+    end
   end
 
   def recoveries

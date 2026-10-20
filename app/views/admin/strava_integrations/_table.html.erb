@@ -49,7 +49,7 @@
     <% end %>
   <% end %>
 
-  <% table.column(label: "Athlete ID") do |strava_integration| %>
+  <% table.column(sortable: "strava_id", label: "Athlete ID") do |strava_integration| %>
     <small><%= number_display(strava_integration.strava_id) %></small>
   <% end %>
 

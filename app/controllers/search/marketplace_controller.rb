@@ -13,8 +13,12 @@ module Search
 
       if @render_results
         # Member listings (seller_member) sort first, then by recency, paginated together.
+        # The listing is in each result's cache key, so without preloading it every card
+        # queries for one before its cache can answer. preload, not includes: the relation
+        # already eager-loads, and joins would go through the DISTINCT subquery LIMIT needs
         @pagy, @bikes = pagy(:countish,
-          searched_bikes.reorder("marketplace_listings.seller_member DESC, marketplace_listings.published_at DESC"),
+          searched_bikes.reorder("marketplace_listings.seller_member DESC, marketplace_listings.published_at DESC")
+            .preload(current_marketplace_listing: {address_record: %i[country region_record]}),
           limit: 12, page: @page, max_pages: MAX_INDEX_PAGE)
       end
 
@@ -56,19 +60,8 @@ module Search
     end
 
     def proximity_hash
-      location, coordinates = BikeSearchable.search_location(params[:location], forwarded_ip_address)
-      return {} if location.blank?
-
-      distance = GeocodeHelper.permitted_distance(params[:distance],
-        default_distance: GeocodeHelper::DEFAULT_MARKETPLACE_DISTANCE)
-      bounding_box = if coordinates.present?
-        GeocodeHelper.bounding_box(coordinates, distance)
-      else
-        GeocodeHelper.bounding_box(location, distance)
-      end
-      return {} if bounding_box.empty?
-
-      {distance:, location:, bounding_box:}
+      BikeSearchable.proximity_bounding_box(params[:location], params[:distance], forwarded_ip_address,
+        distance_unit: search_distance_unit, default_distance: GeocodeHelper::DEFAULT_MARKETPLACE_DISTANCE) || {}
     end
 
     def set_interpreted_params
@@ -83,15 +76,13 @@ module Search
       end
 
       @page = permitted_page(max: MAX_INDEX_PAGE)
-      @search_kind = :marketplace
       @search_obj_name = "Listings"
-      @result_view = Pages::SearchResults::Container::Component
-        .permitted_result_view(params[:search_result_view], default: :thumbnail)
+      @result_view = SharedBlocks::SearchResults::Container::Component.permitted_result_view(params[:search_result_view])
     end
 
     def permitted_search_params
       # Switching to for_sale will get location, but it doesn't currently work
-      params.permit(*Bike.permitted_search_params).merge(stolenness: "all")
+      params.permit(*Bike.permitted_search_params).merge(stolenness: "all", distance_unit: search_distance_unit)
     end
 
     def listing_search_params

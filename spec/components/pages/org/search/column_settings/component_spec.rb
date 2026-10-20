@@ -15,13 +15,13 @@ RSpec.describe Pages::Org::Search::ColumnSettings::Component, type: :component d
 
   describe ".column_settings_data_attributes" do
     it "runs a caller's own controller alongside its two" do
-      attributes = described_class.column_settings_data_attributes(settings, controllers: "org--multi-search")
+      attributes = described_class.column_settings_data_attributes(controllers: "org--multi-search")
       expect(attributes[:controller]).to eq "org--multi-search org--search org--search-column-settings"
       expect(attributes.keys).not_to include(:"ui--collapse-storage-key-value")
     end
 
     it "adds the collapse with collapse: true" do
-      attributes = described_class.column_settings_data_attributes(settings, collapse: true)
+      attributes = described_class.column_settings_data_attributes(collapse: true)
       expect(attributes[:controller]).to eq "ui--collapse org--search org--search-column-settings"
       expect(attributes[:"ui--collapse-storage-key-value"]).to eq "orgRegistrationColumnsOpen"
     end
@@ -34,6 +34,19 @@ RSpec.describe Pages::Org::Search::ColumnSettings::Component, type: :component d
     expect(component).not_to have_text("Export CSV")
     expect(component).to have_field("view_cell", checked: true, disabled: true, visible: :all)
     expect(component.at_css("[data-ui--collapse-target='content']")[:class]).to include("tw:hidden!")
+  end
+
+  context "with export_headers" do
+    let(:instance) { described_class.new(settings:, export_headers: %w[serial]) }
+
+    it "renders the export form's column fields, open, without the View button" do
+      expect(component).not_to have_css("[data-ui--collapse-target]")
+      expect(component).to have_text("Included columns")
+      expect(component).to have_field("export[headers][]", with: "serial", checked: true)
+      expect(component).to have_field("export[headers][]", with: "registered_at", checked: false)
+      expect(component.at_css("input[value='registered_at']")["data-default"]).to eq "true"
+      expect(component).not_to have_field("view_cell")
+    end
   end
 
   context "with open: true" do

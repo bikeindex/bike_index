@@ -23,7 +23,7 @@ module Pages
           @currency_sym = (currency || Currency.default).symbol.to_s
           @price_min_amount = price_min_amount
           @price_max_amount = price_max_amount
-          @result_view = Pages::SearchResults::Container::Component.permitted_result_view(result_view)
+          @result_view = SharedBlocks::SearchResults::Container::Component.permitted_result_view(result_view)
           @search_obj_name = search_obj_name
         end
 
@@ -40,7 +40,7 @@ module Pages
         def kind_select_options
           kind_scope = @marketplace_scope || @interpreted_params[:stolenness]
 
-          @interpreted_params.slice(:location, :distance).merge(kind_scope:)
+          @interpreted_params.slice(:location, :distance, :distance_unit).merge(kind_scope:)
         end
 
         def query

@@ -14,19 +14,21 @@
 #  longitude         :float
 #  neighborhood      :string
 #  page              :integer
+#  postal_code       :string
 #  processed         :boolean          default(FALSE)
 #  query_items       :jsonb
+#  region_string     :string
 #  request_at        :datetime
 #  serial_normalized :string
 #  stolenness        :integer
 #  street            :string
-#  zipcode           :string
+#  street_2          :string
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
 #  country_id        :bigint
 #  organization_id   :bigint
+#  region_record_id  :bigint
 #  request_id        :uuid
-#  state_id          :bigint
 #  user_id           :bigint
 #
 # Indexes
@@ -34,11 +36,11 @@
 #  index_logged_searches_on_country_id       (country_id)
 #  index_logged_searches_on_organization_id  (organization_id)
 #  index_logged_searches_on_request_id       (request_id)
-#  index_logged_searches_on_state_id         (state_id)
 #  index_logged_searches_on_user_id          (user_id)
 #
 class LoggedSearch < AnalyticsRecord
-  include GeocodeableLegacy
+  include AddressRecordedWithinBoundingBox
+  include Geocodeable
 
   ENDPOINT_ENUM = {
     web_bikes: 0,
@@ -63,7 +65,8 @@ class LoggedSearch < AnalyticsRecord
     web_serials_containing: 19,
     web_close_serials: 20,
     web_marketplace: 21,
-    web_marketplace_count: 22
+    web_marketplace_count: 22,
+    web_bikebook: 23
   }.freeze
 
   STOLENNESS_ENUM = {all: 0, non: 1, stolen: 2, impounded: 3, for_sale: 4}.freeze
@@ -91,11 +94,12 @@ class LoggedSearch < AnalyticsRecord
     ENDPOINT_ENUM.keys.freeze
   end
 
+  # Only shown in admin
+  def self.permitted_visible_attribute(_, default: nil) = :street
+
   def unprocessed?
     !processed
   end
 
-  def should_be_geocoded?
-    false # don't geocode automatically, handle it with background job
-  end
+  def publicly_visible_attribute = :street
 end

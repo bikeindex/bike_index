@@ -444,6 +444,18 @@ RSpec.describe Bike, type: :model do
     end
   end
 
+  describe "unfinished_registration?" do
+    let(:bike) { FactoryBot.create(:bike) }
+    let!(:acknowledgment) { FactoryBot.create(:registration_sequence_acknowledgment_pending, bike:) }
+
+    it "is true until the safety rules are agreed to" do
+      expect(bike.unfinished_registration?).to be_truthy
+
+      acknowledgment.update(acknowledged_at: Time.current)
+      expect(bike.unfinished_registration?).to be_falsey
+    end
+  end
+
   describe "visible_by?" do
     let(:owner) { User.new }
     let(:superuser) { FactoryBot.create(:superuser) }
@@ -794,6 +806,14 @@ RSpec.describe Bike, type: :model do
           expect(bike.frame_size).to eq("xxl")
           expect(bike.frame_size_unit).to eq("ordinal")
         end
+      end
+    end
+
+    it "distinguishes small from extra small and large from extra large" do
+      {"small" => "s", "x-small" => "xs", "Extra Small" => "xs", "large" => "l", "x-large" => "xl", "extra large" => "xl"}.each do |input, size|
+        bike = Bike.new(frame_size: input)
+        bike.send(:clean_frame_size)
+        expect(bike.frame_size).to eq(size), "#{input} => #{bike.frame_size}"
       end
     end
 
@@ -1386,6 +1406,15 @@ RSpec.describe Bike, type: :model do
     end
   end
 
+  describe "registration_sequence_applies?" do
+    it "is only an e-vehicle's, and never an unregistered parking notification's" do
+      expect(Bike.new(propulsion_type: "foot-pedal").registration_sequence_applies?).to be_falsey
+      expect(Bike.new(propulsion_type: "pedal-assist").registration_sequence_applies?).to be_truthy
+      expect(Bike.new(propulsion_type: "pedal-assist", status: "unregistered_parking_notification")
+        .registration_sequence_applies?).to be_falsey
+    end
+  end
+
   describe "serial_display" do
     it "returns the serial" do
       expect(Bike.new(serial_number: "AAbbCC").serial_display).to eq "AABBCC"
@@ -1453,6 +1482,7 @@ RSpec.describe Bike, type: :model do
           expect(bike.serial_display).to eq "Hidden"
           expect(bike.serial_display(bike.user)).to eq "HELLO PARTY"
           expect(bike.serial_display(impound_user)).to eq "HELLO PARTY"
+          expect(bike.serial_display(organization: impound_record.organization)).to eq "HELLO PARTY"
         end
       end
       context "when user shares an organization with the bike" do
@@ -1466,6 +1496,11 @@ RSpec.describe Bike, type: :model do
           expect(bike.authorized?(org_user)).to be_falsey
           expect(bike.send(:can_see_hidden_serial?, org_user)).to be_truthy
           expect(bike.serial_display(org_user)).to eq "HELLO PARTY"
+        end
+
+        it "shows serial for the organization, without a user" do
+          expect(bike.reload.serial_display(organization:)).to eq "HELLO PARTY"
+          expect(bike.serial_display(organization: FactoryBot.create(:organization))).to eq "Hidden"
         end
       end
     end
@@ -1715,7 +1750,7 @@ RSpec.describe Bike, type: :model do
       bike.update(year: 1999, frame_material: "steel",
         secondary_frame_color_id: FactoryBot.create(:color).id,
         tertiary_frame_color_id: FactoryBot.create(:color).id,
-        handlebar_type: "bmx",
+        handlebar_type: "forward",
         propulsion_type: "throttle",
         cycle_type: "unicycle",
         frame_size: "56", frame_size_unit: "foo",
@@ -1725,6 +1760,16 @@ RSpec.describe Bike, type: :model do
       expect(bike.current_stolen_record_id).to eq(stolen_record.id)
       expect(bike.propulsion_type_throttle?).to be_truthy
       expect(bike.propulsion_type_pedal_assist?).to be_falsey
+    end
+  end
+
+  describe "fetch_current_stolen_record" do
+    let(:bike) { FactoryBot.create(:bike) }
+    let!(:stolen_record) { FactoryBot.create(:stolen_record, bike:) }
+    it "repairs a stale current_stolen_record_id on save" do
+      bike.update_column :current_stolen_record_id, nil
+      Bike.find(bike.id).save
+      expect(bike.reload.current_stolen_record_id).to eq stolen_record.id
     end
   end
 
@@ -1969,6 +2014,13 @@ RSpec.describe Bike, type: :model do
       let!(:user_alert) { FactoryBot.create(:user_alert_stolen_bike_without_location, bike: bike, user: owner) }
       it "counts all them" do
         expect(bike.reload.messages_count).to eq 4
+      end
+    end
+    context "organization_message" do
+      let!(:organization_message) { FactoryBot.create(:organization_message) }
+      let(:bike) { organization_message.bike }
+      it "is 1" do
+        expect(bike.reload.messages_count).to eq 1
       end
     end
   end

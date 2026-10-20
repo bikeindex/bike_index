@@ -47,13 +47,13 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
     # bike data in cells
     expect(component).to have_text(bike.mnfg_name)
     # the table bleeds to the page's edges once the card is full bleed
-    expect(component.at_css("div:has(> [data-controller~='org--bikes-table-overflow'])")[:class].split)
+    expect(component.at_css("div:has(> [data-controller~='ui--table-overflow'])")[:class].split)
       .to include(*described_class::TABLE_BLEED_CLASSES.split)
     # the card marks itself for the frame's loading swap, and the rows swap off the
     # frame's tw:group for the spinner that replaces them
     expect(component).to have_css(".search-results-card", visible: :all)
     expect(component).to have_css(".tw\\:group-\\[\\[busy\\]\\]\\:block", visible: :all)
-    expect(component.at_css("div:has(> [data-controller~='org--bikes-table-overflow'])")[:class].split)
+    expect(component.at_css("div:has(> [data-controller~='ui--table-overflow'])")[:class].split)
       .to include("tw:group-[[busy]]:hidden")
     expect(component).to have_text("Loading results...")
   end
@@ -124,7 +124,7 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
       expect(component).to have_button("Column settings", visible: :all)
       # the header's button is the only one - the panel doesn't carry the legacy one
       expect(component).to have_css("[data-ui--collapse-target='trigger']", count: 1, visible: :all)
-      expect(component.at_css("div:has(> [data-controller~='org--bikes-table-overflow'])")[:class].split)
+      expect(component.at_css("div:has(> [data-controller~='ui--table-overflow'])")[:class].split)
         .not_to include(*described_class::TABLE_BLEED_CLASSES.split)
     end
 
@@ -181,10 +181,6 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
   end
 
   context "when bike is user_hidden and org cannot edit" do
-    let(:current_user) { FactoryBot.create(:organization_role_claimed, organization:).user }
-    let(:options) do
-      super().merge(current_user:)
-    end
     let(:bike) do
       FactoryBot.create(:bike_organized,
         creation_organization: organization,
@@ -195,7 +191,7 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
 
     it "renders the serial number" do
       expect(component).to have_css("tbody tr", count: 1)
-      expect(component).to have_text(bike.serial_display(current_user))
+      expect(component).to have_text(bike.serial_display(organization:))
     end
   end
 

@@ -39,23 +39,11 @@
           command="close"
           aria-label="Close"
           class="
-            tw:text-gray-400 tw:hover:text-gray-600
+            tw:p-1 tw:text-gray-400 tw:hover:text-gray-600
             tw:dark:hover:text-gray-300
           "
         >
-          <svg
-            class="tw:h-5 tw:w-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
+          <%= helpers.inline_svg_tag("icons/x.svg", class: "tw:h-3 tw:w-3", aria_hidden: true) %>
         </button>
       </div>
     <% end %>

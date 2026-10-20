@@ -1,0 +1,11 @@
+<%= translation("sender_sent_you_a_message", sender_email:, organization_name:, bike_type: bike.type) %>
+
+---
+
+<%= @organization_message.message %>
+
+---
+
+<%= translation("reply_to_respond", sender_email:) %>
+
+<%= bike_url(bike) %>

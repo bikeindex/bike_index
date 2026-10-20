@@ -52,7 +52,7 @@ class OrganizationStolenMessage < ApplicationRecord
   end
 
   def self.max_search_radius_kilometers
-    miles_to_kilometers(MAX_SEARCH_RADIUS)
+    UnitSystem.miles_to_kilometers(MAX_SEARCH_RADIUS)
   end
 
   def self.for(organization)

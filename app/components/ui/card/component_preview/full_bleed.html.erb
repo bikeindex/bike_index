@@ -7,3 +7,9 @@
     Big mood shabby chic cornhole yuccie PBR&amp;B vegan.
   <% end %>
 </div>
+
+<div class="twwiderow twwiderow-3 tw:mt-6 tw:gap-y-6">
+  <% ["Man braid sustainable solarpunk.", "Vexillologist grailed marxism schlitz.", "Big mood shabby chic cornhole."].each do |text| %>
+    <%= render(UI::Card::Component.new(full_bleed: true)) { text } %>
+  <% end %>
+</div>

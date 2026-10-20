@@ -17,6 +17,7 @@ RSpec.describe Pages::Admin::Bikes::Summary::Details::Component, type: :componen
     expect(component).to have_content("owner@bikeindex.org")
     expect(component).to have_content("self reg")
     expect(component).to_not have_content("status:")
+    expect(component).to have_link("No Image", href: "/bikes/#{bike.id}?organization_id=false")
   end
 
   context "with display_dev_info" do

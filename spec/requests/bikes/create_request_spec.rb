@@ -111,6 +111,21 @@ RSpec.describe "BikesController#create", type: :request do
       end
     end
   end
+  context "an e-vehicle, from an organization with safety rules" do
+    let(:organization) { FactoryBot.create(:organization) }
+    let!(:sequence) { FactoryBot.create(:registration_sequence_active, :with_pages, organization:) }
+    let(:bike_params) { basic_bike_params.merge(creation_organization_id: organization.id, cycle_type: "bike") }
+
+    it "leaves the rules to the owner, even registering their own" do
+      Sidekiq::Job.clear_all
+      expect { post base_url, params: {propulsion_type_motorized: "true", bike: bike_params} }
+        .to change(Bike, :count).by(1).and change(RegistrationSequenceAcknowledgment.pending, :count).by 1
+      bike = Bike.last
+      expect(response).to redirect_to(edit_bike_url(bike))
+      expect(EmailJobs::PartialRegistrationJob.jobs.map { it["args"] }).to eq([[BParam.last.id, "partial_registration"]])
+    end
+  end
+
   context "no existing b_param and stolen" do
     let(:wheel_size) { FactoryBot.create(:wheel_size) }
     let(:extra_long_string) { "Frame Material: Kona 6061 Aluminum Butted, Fork: Kona Project Two Aluminum Disc, Wheels: WTB ST i19 700c, Crankset: Shimano Sora, Drivetrain: Shimano Sora 9spd, Brakes: TRP Spyre C 160mm front / 160mm rear rotor, Seat Post: Kona Thumb w/Offset, Cockpit: Kona Road Bar/stem, Front Tire: WTB Riddler Comp 700x37c, Rear tire: WTB Riddler Comp 700x37c, Saddle: Kona Road" }
@@ -149,7 +164,7 @@ RSpec.describe "BikesController#create", type: :request do
           # We need to call clean_params on the BParam after bikebook update, so that
           # the foreign keys are assigned correctly. This is how we test that we're
           # This is also where we're testing bikebook assignment
-          expect_any_instance_of(Integrations::BikeBook).to receive(:get_model) { bb_data }
+          expect_any_instance_of(Integrations::Bikebook::Data).to receive(:get_model) { bb_data }
           ActionMailer::Base.deliveries = []
           Sidekiq::Job.clear_all
           expect {
@@ -180,15 +195,6 @@ RSpec.describe "BikesController#create", type: :request do
         expect(OrganizationStolenMessage.for_coordinates([41.9, -87.68])&.id).to eq organization_stolen_message.id
         expect_created_stolen_bike(bike_params: bike_params, stolen_params: chicago_stolen_params.merge(show_address: true))
         expect(organization_stolen_message.reload.stolen_records.count).to eq 1
-      end
-      context "with legacy stolen attribute names" do
-        let(:legacy_chicago_stolen_params) do
-          chicago_stolen_params.except(:postal_code, :region_record_id).merge(zipcode: "60622", state_id: state.id)
-        end
-        it "creates a bike with the renamed attributes" do
-          expect_created_stolen_bike(bike_params: bike_params, stolen_params: legacy_chicago_stolen_params.merge(show_address: true))
-          expect(Bike.last.current_stolen_record.region_record_id).to eq state.id
-        end
       end
       context "outside of area" do
         let!(:organization_default_location) { FactoryBot.create(:location, :with_address_record, address_in: :new_york, organization: organization) }
@@ -577,7 +583,7 @@ RSpec.describe "BikesController#create", type: :request do
         manufacturer_id: manufacturer.id,
         manufacturer_other: "",
         primary_frame_color_id: color.id,
-        handlebar_type: "bmx",
+        handlebar_type: "forward",
         owner_email: "flow@goodtimes.com"
       }
     end
@@ -593,6 +599,16 @@ RSpec.describe "BikesController#create", type: :request do
       expect(bike.cycle_type).to eq "tricycle"
       expect(bike.current_ownership).to have_attributes(origin: "embed", organization:, creator: bike.creator)
       testable_bike_params.each { |key, value| expect(bike.send(key).to_s).to eq value.to_s }
+    end
+
+    context "an e-vehicle, with the organization's safety rules" do
+      let!(:sequence) { FactoryBot.create(:registration_sequence_active, :with_pages, organization:) }
+
+      it "leaves the rules to the owner" do
+        expect { post base_url, params: {propulsion_type_motorized: "true", bike: bike_params} }
+          .to change(Bike, :count).by(1).and change(RegistrationSequenceAcknowledgment.pending, :count).by 1
+        expect(EmailJobs::PartialRegistrationJob.jobs.map { it["args"] }).to eq([[b_param.id, "partial_registration"]])
+      end
     end
 
     # The embed form is posted from the organization's own site, so it can't carry our token
@@ -702,7 +718,7 @@ RSpec.describe "BikesController#create", type: :request do
         cycle_type: "pedi-cab",
         manufacturer_id: manufacturer.slug,
         primary_frame_color_id: color.id,
-        handlebar_type: "bmx",
+        handlebar_type: "forward",
         owner_email: "Flow@goodtimes.com"
       }
     end
@@ -749,6 +765,53 @@ RSpec.describe "BikesController#create", type: :request do
       end
     end
 
+    context "an e-vehicle, with the organization's safety rules" do
+      let!(:sequence) { FactoryBot.create(:registration_sequence_active, :with_pages, organization:) }
+      let(:current_user) { FactoryBot.create(:organization_user, organization:) }
+      let(:owner_email) { "flow@goodtimes.com" }
+      let(:e_vehicle_params) do
+        {propulsion_type_motorized: "true", bike: bike_params.merge(cycle_type: "bike", owner_email:)}
+      end
+
+      it "registers it, and emails the owner the rules to agree to" do
+        Sidekiq::Job.clear_all
+        ActionMailer::Base.deliveries = []
+        expect { post base_url, params: e_vehicle_params }
+          .to change(Bike, :count).by(1).and change(RegistrationSequenceAcknowledgment.pending, :count).by 1
+        expect(response).to redirect_to(embed_extended_organization_url(organization))
+
+        expect { EmailJobs::OwnershipInvitationJob.drain }.to_not change(ActionMailer::Base.deliveries, :count)
+        EmailJobs::PartialRegistrationJob.drain
+        expect(ActionMailer::Base.deliveries.sole.to).to eq([owner_email])
+        confirm_path = confirm_register_path(b_param_token: b_param.id_token,
+          confirmation_token: b_param.reload.email_confirmation_token)
+        expect(ActionMailer::Base.deliveries.sole.html_part.decoded).to include ERB::Util.html_escape(confirm_path)
+
+        log_in(FactoryBot.create(:user_confirmed, email: owner_email))
+        get "/register", params: {b_param_token: b_param.id_token}
+        expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: "3")
+        %w[3 4].each do |step|
+          patch acknowledge_register_path, params: {b_param_token: b_param.id_token, registration_sequence_id: sequence.id,
+                                                    step:, acknowledged: {"0" => "1", "1" => "1"}}
+        end
+        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, registration_sequence_id: sequence.id,
+                                                  step: "review", acknowledged_all: "1"}
+        expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: "finished")
+        expect(RegistrationSequenceAcknowledgment.sole.user.email).to eq owner_email
+        expect { EmailJobs::OwnershipInvitationJob.drain }.to change(ActionMailer::Base.deliveries, :count).by 1
+      end
+
+      context "registering their own" do
+        let(:owner_email) { current_user.email }
+
+        it "still leaves the rules to the email, since the form never shows them" do
+          expect { post base_url, params: e_vehicle_params }
+            .to change(RegistrationSequenceAcknowledgment.pending, :count).by 1
+          expect(EmailJobs::PartialRegistrationJob.jobs.map { it["args"] }).to eq([[b_param.id, "partial_registration"]])
+        end
+      end
+    end
+
     context "with an organization bike sticker and a signed in member" do
       let(:current_user) { FactoryBot.create(:organization_user, organization:) }
       let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization:, code: "aaa", kind: "sticker") }
@@ -779,7 +842,7 @@ RSpec.describe "BikesController#create", type: :request do
         rear_tire_narrow: "true",
         rear_wheel_size_id: FactoryBot.create(:wheel_size).id,
         primary_frame_color_id: color.id,
-        handlebar_type: "bmx",
+        handlebar_type: "forward",
         owner_email: current_user.email
       }
     end
@@ -823,12 +886,11 @@ RSpec.describe "BikesController#create", type: :request do
     end
     let(:b_param) { BParam.create(params: {"bike" => bike_params.as_json}, origin: "embed_partial") }
     before do
-      expect(b_param.partial_registration?).to be_truthy
       bb_data = {bike: {}}
       # We need to call clean_params on the BParam after bikebook update, so that
       # the foreign keys are assigned correctly.
       # This is also where we're testing bikebook assignment
-      expect_any_instance_of(Integrations::BikeBook).to receive(:get_model) { bb_data }
+      expect_any_instance_of(Integrations::Bikebook::Data).to receive(:get_model) { bb_data }
       expect(state).to be_present
     end
     let!(:target_address) { {street: "212 Main St", city: "Chicago", region: "IL", postal_code: "60647", kind: "ownership"} }

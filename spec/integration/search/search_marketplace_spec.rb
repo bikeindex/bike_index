@@ -60,7 +60,7 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
   end
 
   def visible_bike_ids
-    page.all("[data-test-id^='vehicle-thumbnail-linkspan-']").map { |el| el["data-test-id"].split("-").last.to_i }
+    page.all("[data-test-id^='search-result-card-']").map { |el| el["data-test-id"].split("-").last.to_i }
   end
 
   # Reach the marketplace the way a user does: from the homepage, click the
@@ -85,6 +85,13 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     expect(page).to have_css(".hw-combobox__option", text: display_name, wait: 5)
     click_combobox_option(display_name)
     find("#search-button").click
+  end
+
+  # The form sits outside the results frame, so it settles after the URL and the card
+  # count a back/forward already waited on
+  def expect_primary_activity(record, display_name)
+    expect(page).to have_field("primary_activity", with: display_name, wait: 10)
+    expect(page).to have_field("primary_activity-hw-hidden-field", with: record.id.to_s, type: "hidden", wait: 10)
   end
 
   # Hold back the unfiltered results the frame eager-loads on arrival, so the example
@@ -147,7 +154,7 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
 
     dispatch_turbo_load_once_frame_leads_url
     search_primary_activity("Mountain biking")
-    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 6)
+    expect(page).to have_css("[data-test-id^='search-result-card-']", wait: 10, count: 6)
 
     # The unfiltered results are only now allowed to arrive - they mustn't take over. The
     # wait covers a round trip the release only now starts, for this file's slowest response.
@@ -158,7 +165,7 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     # Turbo was allowed to render it
     expect(page).to have_css("body[data-test-superseded-results-rejected]", wait: 30)
     expect(page).to have_css("body[data-test-superseded-results-rejected='true']")
-    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", count: 6)
+    expect(page).to have_css("[data-test-id^='search-result-card-']", count: 6)
     expect(page).to have_current_path(/primary_activity=#{primary_activity.id}/)
   end
 
@@ -169,7 +176,7 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     visit_marketplace_via_nav
 
     # Page 1 holds the first 12: the 2 members sort first, then standard listings
-    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 12)
+    expect(page).to have_css("[data-test-id^='search-result-card-']", wait: 10, count: 12)
     # The 2 promoted bikes show the member badge and appear above the standard listings
     expect(page).to have_text("Bike Index member")
     expect(visible_bike_ids.first(2)).to match_array(promoted_bike_ids)
@@ -182,7 +189,7 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     expect(page).to have_text("Loading more...")
     scroll_to_lazy_load
     # All 17 listings now visible (2 promoted + 15 standard); promoted bikes are not duplicated
-    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 17)
+    expect(page).to have_css("[data-test-id^='search-result-card-']", wait: 10, count: 17)
     expect(visible_bike_ids).to match_array(visible_bike_ids.uniq)
 
     # Change the search filters By adding a max price and submit via pressing enter
@@ -190,12 +197,12 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     fill_in "price_max_amount", with: "1300"
     find_field("price_max_amount").send_keys(:return)
     # Page 1 holds the first 12 (2 members ≤ $1300 sort first, then standard)
-    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 12)
+    expect(page).to have_css("[data-test-id^='search-result-card-']", wait: 10, count: 12)
     # Verify lazy frame exists
     expect(page).to have_css("turbo-frame#page_2[loading='lazy']", visible: :all)
     scroll_to_lazy_load
     # 2 promoted + 14 standard ≤ $1300 = 16 total
-    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 16)
+    expect(page).to have_css("[data-test-id^='search-result-card-']", wait: 10, count: 16)
 
     # And then search "Yuba" without price filter
     # Which will return 8 bikes - so the page won't have the ability to scroll. Verify that it works correctly
@@ -210,7 +217,7 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     end
     find("#search-button").click
     # Should load new results
-    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 8)
+    expect(page).to have_css("[data-test-id^='search-result-card-']", wait: 10, count: 8)
     expect(page).not_to have_text("Bike Index member")
     # Should NOT have a lazy-loading frame for page 2
     expect(page).not_to have_css("turbo-frame#page_2")
@@ -223,24 +230,23 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     search_primary_activity("Mountain biking")
     # 6 of the 15 listings have the "Mountain biking" primary activity (a count of
     # 6 also confirms Yuba was cleared - otherwise the two filters would intersect)
-    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 6)
+    expect(page).to have_css("[data-test-id^='search-result-card-']", wait: 10, count: 6)
     # Only 6 results, so there's nothing to lazy-load on a second page
     expect(page).not_to have_css("turbo-frame#page_2")
     # The selection persists after the search - the hidden field carries the id,
     # the visible input shows the display name
-    expect(find("#primary_activity-hw-hidden-field", visible: false).value).to eq primary_activity.id.to_s
-    expect(find("#primary_activity").value).to eq "Mountain biking"
+    expect_primary_activity(primary_activity, "Mountain biking")
 
     # Switching to the list layout re-runs the search rather than dropping its filters
-    choose("search_result_view_bike_box", allow_label_click: true)
-    expect(page).to have_css(".bike-box-item", wait: 10, count: 6)
-    expect(page).to have_no_css("[data-test-id^='vehicle-thumbnail-linkspan-']")
-    expect(page).to have_current_path(/search_result_view=bike_box/)
+    choose("search_result_view_list", allow_label_click: true)
+    expect(page).to have_css("[data-test-id^='search-result-row-']", wait: 10, count: 6)
+    expect(page).to have_no_css("[data-test-id^='search-result-card-']")
+    expect(page).to have_current_path(/search_result_view=list/)
     expect(page).to have_current_path(/primary_activity=#{primary_activity.id}/)
 
-    choose("search_result_view_thumbnail", allow_label_click: true)
-    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 6)
-    expect(page).to have_no_css(".bike-box-item")
+    choose("search_result_view_cards", allow_label_click: true)
+    expect(page).to have_css("[data-test-id^='search-result-card-']", wait: 10, count: 6)
+    expect(page).to have_no_css("[data-test-id^='search-result-row-']")
   end
 
   # search_no_js reaches riders who do have JS: Search::RegistrationsController
@@ -250,22 +256,22 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
   it "hands a search_no_js render back to infinite scroll, except on the last page" do
     page.current_window.resize_to(1280, 900)
     visit "/search/marketplace?search_no_js=true"
-    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 12)
+    expect(page).to have_css("[data-test-id^='search-result-card-']", wait: 10, count: 12)
 
     # The links a rider without JS would have used are gone, the frame's spinner shows
     expect(page).to have_no_link(exact_text: "2")
     expect(page).to have_text("Loading more...")
     scroll_to_lazy_load
-    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 17)
+    expect(page).to have_css("[data-test-id^='search-result-card-']", wait: 10, count: 17)
 
     # The last page has no frame to scroll into, so its links stay - they're the only
     # way out for a rider who deep-linked here
     visit "/search/marketplace?search_no_js=true&page=2"
-    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 5)
+    expect(page).to have_css("[data-test-id^='search-result-card-']", wait: 10, count: 5)
     expect(page).to have_no_text("Loading more...")
     # Following one navigates the results frame, like registrations search - so page 1
     # comes back in infinite-scroll mode, with no links of its own. Don't count
-    # thumbnails here: the click leaves the page scrolled down, so page 2 may already
+    # cards here: the click leaves the page scrolled down, so page 2 may already
     # be lazy-loading.
     click_link(exact_text: "1")
     expect(page).to have_css("turbo-frame#page_2[loading='lazy']", visible: :all, wait: 10)
@@ -275,33 +281,31 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
   # :flaky retry: a programmatic go_forward to a form-submitted (turbo advance)
   # history entry can intermittently no-op in WebDriver (the URL stays on the back
   # entry). It's a harness artifact - a real browser does back/forward reliably -
-  # so retry on CI.
+  # so retry on CI. The form's values aren't part of that artifact.
   it "keeps results and the primary_activity form in sync across back/forward", :flaky do
     visit_marketplace_via_nav
     # First 12 on the unfiltered page (the 2 members sort first)
-    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 12)
+    expect(page).to have_css("[data-test-id^='search-result-card-']", wait: 10, count: 12)
     # Filter by "Mountain biking" (6 listings), then "Road cycling" (9 listings).
     # The two counts differ, so a settled count proves which search the frame holds.
     search_primary_activity("Mountain biking")
-    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 6)
-    expect(find("#primary_activity").value).to eq "Mountain biking"
+    expect(page).to have_css("[data-test-id^='search-result-card-']", wait: 10, count: 6)
+    expect_primary_activity(primary_activity, "Mountain biking")
 
     search_primary_activity("Road cycling")
-    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 9)
-    expect(find("#primary_activity").value).to eq "Road cycling"
+    expect(page).to have_css("[data-test-id^='search-result-card-']", wait: 10, count: 9)
+    expect_primary_activity(other_primary_activity, "Road cycling")
 
     # Back to the Mountain biking search - results and the combobox reconcile to it
     page.go_back
     expect(page).to have_current_path(/primary_activity=#{primary_activity.id}/, wait: 10)
-    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 6)
-    expect(find("#primary_activity").value).to eq "Mountain biking"
-    expect(find("#primary_activity-hw-hidden-field", visible: false).value).to eq primary_activity.id.to_s
+    expect(page).to have_css("[data-test-id^='search-result-card-']", wait: 10, count: 6)
+    expect_primary_activity(primary_activity, "Mountain biking")
 
     # Forward to the Road cycling search - everything reconciles back to it
     page.go_forward
     expect(page).to have_current_path(/primary_activity=#{other_primary_activity.id}/, wait: 10)
-    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 9)
-    expect(find("#primary_activity").value).to eq "Road cycling"
-    expect(find("#primary_activity-hw-hidden-field", visible: false).value).to eq other_primary_activity.id.to_s
+    expect(page).to have_css("[data-test-id^='search-result-card-']", wait: 10, count: 9)
+    expect_primary_activity(other_primary_activity, "Road cycling")
   end
 end

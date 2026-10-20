@@ -48,7 +48,7 @@ class ApplicationComponent < ViewComponent::Base
     @component_translation_scope ||= [:components] + component_namespace + [component_name]
   end
 
-  # The component name. For example, Pages::SearchResults::BikeBox::Component => BikeBox
+  # The component name. For example, SharedBlocks::SearchResults::BikeBox::Component => BikeBox
   def component_name
     set_name_and_namespace unless defined?(@component_name)
     @component_name

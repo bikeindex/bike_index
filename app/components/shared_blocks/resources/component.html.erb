@@ -16,8 +16,8 @@
       </p>
 
       <div class="le-hero-buttons">
-        <%= link_to "Design Resources", "#design-resources", class: "le-btn-primary" %>
-        <%= link_to "Development Resources", "#dev-resources", class: "le-btn-primary" %>
+        <%= render(UI::ButtonLink::Component.new(text: "Design Resources", href: "#design-resources", color: :yellow, size: :callout)) %>
+        <%= render(UI::ButtonLink::Component.new(text: "Development Resources", href: "#dev-resources", color: :yellow, size: :callout)) %>
       </div>
     </div>
   </section>

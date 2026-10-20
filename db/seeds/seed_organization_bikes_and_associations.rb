@@ -225,19 +225,12 @@ puts "Seeding non-cycle types and e-vehicles"
 end
 
 # --- Bike Sticker Batch "BR" for Brakebills ---
-puts "Creating bike sticker batch BR with 20 stickers..."
-sticker_batch = BikeStickerBatch.create!(
-  prefix: "BR",
-  organization: brakebills,
-  user: member,
-  code_number_length: 4
-)
-sticker_batch.create_codes(20, initial_code_integer: 0)
+puts "Creating bike sticker batch BR with 101 stickers..."
+sticker_batch = BikeStickerBatch.create!(prefix: "BR", organization: brakebills, user: member)
+sticker_batch.create_codes(101, initial_code_integer: 1)
 
-# Assign 3 stickers to bikes
-brakebills_bikes = brakebills.bikes.limit(3)
-sticker_batch.bike_stickers.limit(3).each_with_index do |sticker, i|
-  sticker.claim(user: member, bike: brakebills_bikes[i])
-  puts "  Assigned sticker #{sticker.code} to bike ##{brakebills_bikes[i].id}"
+sticker_bike = brakebills.bikes.find_by!(serial_number: "LOAD4ROHLOFF01")
+sticker_batch.bike_stickers.where(code_integer: 1..3).order(:code_integer).each do |sticker|
+  sticker.claim(user: member, bike: sticker_bike)
+  puts "  Assigned sticker #{sticker.pretty_code} to bike ##{sticker_bike.id}"
 end
-puts "Bike sticker batch BR seeded with 20 stickers (3 assigned to bikes)"

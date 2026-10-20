@@ -6,7 +6,11 @@ module UI
     # and localStorage persistence. The URL panel is tall enough to reach over what
     # follows it while it opens.
     class ComponentPreview < ApplicationComponentPreview
-      # @!group Persistence
+      # @!group Variants
+      def with_block
+        {template: "ui/collapse/component_preview/with_block"}
+      end
+
       def with_url_param
         {template: "ui/collapse/component_preview/with_url_param"}
       end

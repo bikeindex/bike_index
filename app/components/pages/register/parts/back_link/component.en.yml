@@ -1,0 +1,8 @@
+---
+en:
+  components:
+    pages:
+      register:
+        parts:
+          back_link:
+            back: Back

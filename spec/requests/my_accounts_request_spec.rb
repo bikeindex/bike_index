@@ -219,6 +219,8 @@ RSpec.describe MyAccountsController, type: :request do
         expect(response).to render_template("edit")
         expect(response).to render_template(partial: "_root")
         expect(response).to render_template("layouts/application")
+        expect(Capybara.string(response.body)).to have_select("user_preferred_unit_system",
+          options: ["Automatic, from your location", "Metric (kilometers, millimeters)", "Imperial (miles, inches)"])
       end
     end
     context "application layout" do
@@ -812,6 +814,22 @@ RSpec.describe MyAccountsController, type: :request do
         expect(flash[:success]).to be_blank
         expect(response).to render_template(:edit)
         expect(current_user.reload.preferred_language).to eq(nil)
+      end
+    end
+
+    describe "preferred_unit_system" do
+      it "updates, and blank leaves it to the location" do
+        patch base_url, params: {id: current_user.username, user: {preferred_unit_system: "imperial"}}
+        expect(flash[:success]).to be_present
+        expect(current_user.reload.preferred_unit_system).to eq "imperial"
+
+        patch base_url, params: {id: current_user.username, user: {preferred_unit_system: ""}}
+        expect(current_user.reload.preferred_unit_system).to be_nil
+
+        patch base_url, params: {id: current_user.username, user: {preferred_unit_system: "furlongs"}}
+        expect(flash[:success]).to be_blank
+        expect(response).to render_template(:edit)
+        expect(current_user.reload.preferred_unit_system).to be_nil
       end
     end
   end

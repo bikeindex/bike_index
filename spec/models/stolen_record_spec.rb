@@ -150,6 +150,20 @@ RSpec.describe StolenRecord, type: :model do
     end
   end
 
+  describe "legacy_attrs_renamed" do
+    let(:attrs) { {"address" => "100 Main St", "zipcode" => "60622", "state_id" => 12, "city" => "Chicago"} }
+    it "renames to the current attributes" do
+      expect(StolenRecord.legacy_attrs_renamed(attrs))
+        .to eq({"street" => "100 Main St", "postal_code" => "60622", "region_record_id" => 12, "city" => "Chicago"})
+    end
+    context "with both legacy and current names" do
+      let(:attrs) { {"zipcode" => "60622", "postal_code" => "10007", "address" => "100 Main St", "street" => ""} }
+      it "prefers the current name unless it's blank" do
+        expect(StolenRecord.legacy_attrs_renamed(attrs)).to eq({"postal_code" => "10007", "street" => "100 Main St"})
+      end
+    end
+  end
+
   describe "scopes" do
     it "default scopes to current" do
       expect(StolenRecord.all.to_sql).to eq(StolenRecord.unscoped.where(current: true).to_sql)
@@ -299,6 +313,19 @@ RSpec.describe StolenRecord, type: :model do
       let(:date) { Date.strptime("07-22-1913", "%m-%d-%Y") }
       it "it sets the year to not last century" do
         expect(result.to_date.to_s).to eq("2013-07-22")
+      end
+    end
+    # A one-digit year raised in production
+    context "single digit year" do
+      let(:date) { "000#{Time.current.year % 10}-01-01T09:45" }
+      it "sets the latest year ending in that digit" do
+        expect(result.to_date.to_s).to eq("#{Time.current.year}-01-01")
+      end
+      context "digit after this year's" do
+        let(:date) { "000#{(Time.current.year + 1) % 10}-01-01T09:45" }
+        it "sets the year a decade back" do
+          expect(result.to_date.to_s).to eq("#{Time.current.year - 9}-01-01")
+        end
       end
     end
     context "date next year" do

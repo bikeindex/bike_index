@@ -80,7 +80,7 @@ module Bikeindex
     # and render it as a 500 before it can reach this filter. Above them it never fires.
     config.middleware.insert_after ActionDispatch::DebugExceptions, IpSpoofAttackFilter
     config.middleware.use Rack::Deflater
-    config.middleware.insert 0, Rack::UTF8Sanitizer
+    config.middleware.insert 0, Rack::UTF8Sanitizer, sanitize_null_bytes: true
 
     # Add middleware to make i18n configuration thread-safe
     config.middleware.use I18n::Middleware

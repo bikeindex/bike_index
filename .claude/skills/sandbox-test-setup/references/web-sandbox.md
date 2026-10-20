@@ -36,8 +36,7 @@ geocoder key being referer-restricted, not a failure. An unseeded database doesn
 so — counters read zero, comboboxes match nothing. Re-seed from scratch with
 `DISABLE_DATABASE_ENVIRONMENT_CHECK=1 bundle exec rails db:reset` (~2 min).
 
-`bin/setup` seeds only an empty database — `db:seed` dies on duplicates over seeded
-records.
+`db:seed` over a seeded database prints `Database already seeded` and changes nothing.
 
 ## How the script gets Ruby
 

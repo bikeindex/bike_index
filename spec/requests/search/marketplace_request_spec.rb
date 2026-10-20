@@ -26,7 +26,7 @@ RSpec.describe Search::MarketplaceController, type: :request do
         get base_url
         expect(flash).to be_blank
         expect(response).to render_template("index")
-        expect(assigns(:interpreted_params)).to eq(stolenness: "all")
+        expect(assigns(:interpreted_params)).to eq(distance_unit: "km", stolenness: "all")
         expect(assigns(:bikes)).to be_blank
       end
 
@@ -44,9 +44,9 @@ RSpec.describe Search::MarketplaceController, type: :request do
           get "#{base_url}?search_no_js=true"
           expect(response.code).to eq("200")
           expect(response).to render_template(:index)
-          expect(assigns(:interpreted_params)).to eq(stolenness: "all")
+          expect(assigns(:interpreted_params)).to eq(distance_unit: "km", stolenness: "all")
           expect(assigns(:bikes).pluck(:id)).to eq([item.id])
-          expect(assigns(:result_view)).to eq :thumbnail
+          expect(assigns(:result_view)).to eq :cards
 
           expect(marketplace_listing_nyc).to be_present
           # Searching with serial doesn't render registrations with serials similar
@@ -60,14 +60,14 @@ RSpec.describe Search::MarketplaceController, type: :request do
           # FWIW, this doesn't fail anyway - but it's a reminder, don't search similar serials on marketplace
           expect(response.body).to_not match "with serials similar"
 
-          get "#{base_url}?search_no_js=true&currency=eur&price_min_amount=501&search_result_view=bike_box"
+          get "#{base_url}?search_no_js=true&currency=eur&price_min_amount=501&search_result_view=list"
           expect(response).to render_template(:index)
           # Not doing anything with currency yet, so it only uses default
           # expect(assigns(:currency).symbol).to eq "€"
           expect(assigns(:currency).symbol).to eq "$"
           expect(assigns(:price_min_amount)).to eq 501
           expect(assigns(:price_max_amount)).to be_nil
-          expect(assigns(:result_view)).to eq :bike_box
+          expect(assigns(:result_view)).to eq :list
           expect(assigns(:bikes).pluck(:id)).to eq([marketplace_listing.item_id])
         end
       end
@@ -186,10 +186,10 @@ RSpec.describe Search::MarketplaceController, type: :request do
 
           expect(response.body).to include("<turbo-frame id=\"page_1\">")
           expect(response).to render_template(:index)
-          expect(assigns(:interpreted_params)).to eq(stolenness: "all")
+          expect(assigns(:interpreted_params)).to eq(distance_unit: "km", stolenness: "all")
           expect(assigns(:bikes).pluck(:id)).to eq([item.id])
-          # Expect there to be a link to the bike url
-          expect(response.body).to match(/href="#{ENV["BASE_URL"]}\/bikes\/#{item.id}"/)
+          # Expect there to be a link to the bike
+          expect(response.body).to match(/href="\/bikes\/#{item.id}"/)
 
           expect(marketplace_listing_nyc).to be_present
           get "#{base_url}?price_max_amount=500", as: :turbo_stream
@@ -230,7 +230,7 @@ RSpec.describe Search::MarketplaceController, type: :request do
 
         context "geocoder_stubbed_bounding_box" do
           let(:ip_address) { "23.115.69.69" }
-          let(:interpreted_params_location) { {stolenness: "all", location: default_location[:formatted_address], bounding_box:, distance: 50} }
+          let(:interpreted_params_location) { {stolenness: "all", location: default_location[:formatted_address], bounding_box:, distance: 50, distance_unit: "km"} }
           let(:headers) { {"HTTP_CF_CONNECTING_IP" => ip_address} }
           include_context :geocoder_stubbed_bounding_box
           include_context :geocoder_default_location
@@ -245,17 +245,17 @@ RSpec.describe Search::MarketplaceController, type: :request do
             expect(response.status).to eq 200
             expect(response).to render_template(:index)
             expect(flash).to_not be_present
-            expect(assigns(:interpreted_params)).to eq(stolenness: "all")
+            expect(assigns(:interpreted_params)).to eq(distance_unit: "km", stolenness: "all")
             expect(assigns(:bikes).map(&:id)).to match_array([item.id, marketplace_listing_nyc.item_id])
             # Test cycle_type
             get "#{base_url}?marketplace_scope=for_sale&query_items%5B%5D=v_18", as: :turbo_stream
             expect(response).to render_template(:index)
-            expect(assigns(:interpreted_params)).to eq(stolenness: "all", cycle_type: :"personal-mobility")
+            expect(assigns(:interpreted_params)).to eq(distance_unit: "km", stolenness: "all", cycle_type: :"personal-mobility")
             expect(assigns(:bikes).map(&:id)).to eq([item.id])
             # Test motorized, invalid marketplace_scope
             get "#{base_url}?marketplace_scope=not_for_sale&query_items%5B%5D=p_10", as: :turbo_stream
             expect(response).to render_template(:index)
-            expect(assigns(:interpreted_params)).to eq(stolenness: "all", propulsion_type: :motorized)
+            expect(assigns(:interpreted_params)).to eq(distance_unit: "km", stolenness: "all", propulsion_type: :motorized)
             expect(assigns(:bikes).map(&:id)).to eq([item.id])
             # Test location
             get "#{base_url}?marketplace_scope=for_sale_proximity", as: :turbo_stream
@@ -263,10 +263,10 @@ RSpec.describe Search::MarketplaceController, type: :request do
             expect(assigns(:interpreted_params)).to eq interpreted_params_location
             expect(assigns(:bikes).map(&:id)).to eq([marketplace_listing_nyc.item_id])
 
-            # with below minimum distance
+            # with below minimum distance - a mile, in kilometers
             get "#{base_url}?marketplace_scope=for_sale_proximity&distance=0.01", as: :turbo_stream
             expect(response.status).to eq 200
-            expect(assigns(:interpreted_params)).to eq interpreted_params_location.merge(distance: 1)
+            expect(assigns(:interpreted_params)).to eq interpreted_params_location.merge(distance: 1.61)
             expect(assigns(:bikes).map(&:id)).to eq([marketplace_listing_nyc.item_id])
             expect(flash[:notice]).to be_blank
           end
@@ -284,6 +284,35 @@ RSpec.describe Search::MarketplaceController, type: :request do
               expect(response.body).to match(/we don&#39;t know the location/)
             end
           end
+        end
+      end
+
+      # The cards are the org search's, where they badge the registering organization and
+      # link to its org pages. The public page reaches them through Container, which has no
+      # organization to hand on. (Not the registration address, the third thing an org sees:
+      # publishing a listing replaces the bike's own address record with the listing's, so
+      # there's no second address to leak here - the container spec covers that one.)
+      context "with a registration of an organization's" do
+        let(:organization) { FactoryBot.create(:organization) }
+        let!(:organized_bike) do
+          FactoryBot.create(:bike_organized, :with_primary_activity, :with_ownership_claimed,
+            creation_organization: organization)
+        end
+        let!(:organized_listing) do
+          FactoryBot.create(:marketplace_listing, :for_sale, item: organized_bike, amount_cents: 300_00)
+        end
+
+        it "renders none of what the org search adds" do
+          expect(organized_listing.reload.status).to eq "for_sale"
+          expect(organized_bike.reload.organized?(organization)).to be true
+          get base_url, as: :turbo_stream
+          expect(response).to have_http_status(:success)
+          expect(assigns(:bikes).pluck(:id)).to include(organized_bike.id)
+          # The card rendered, so the absences below aren't a missing card
+          expect(response.body).to match(/href="\/bikes\/#{organized_bike.id}"/)
+
+          expect(response.body).to_not include("Registered with")
+          expect(response.body).to_not include("organization_id=")
         end
       end
     end

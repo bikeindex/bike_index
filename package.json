@@ -4,7 +4,7 @@
     "@herb-tools/formatter": "^0.10.3",
     "@herb-tools/linter": "^0.10.3",
     "axe-core": "4.12.1",
-    "playwright": "1.60.0",
+    "playwright": "1.63.0",
     "standard": "*"
   },
   "scripts": {

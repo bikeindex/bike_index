@@ -82,16 +82,16 @@ export default class extends Controller {
     return this.element.querySelector('turbo-frame#chart_card_frame')
   }
 
-  // Pages::SearchResults::Frame's, which the loading overlay's CSS reaches the same way
+  // SharedBlocks::SearchResults::Frame's, which the loading overlay's CSS reaches the same way
   get resultsFrame () {
     return this.element.querySelector('.search-results-frame-wrapper > turbo-frame')
   }
 
   // The notes and location fields, each named by data-field. One opens if an input in it has
-  // a value, or if it was left open
+  // a value, or if it was left open. A hidden input's value isn't something entered
   initOptionalFields (duration) {
     this.optionalFieldTargets.forEach(field => {
-      const hasValue = [...field.querySelectorAll('input')].some(input => input.value.length > 0)
+      const hasValue = [...field.querySelectorAll('input:not([type=hidden])')].some(input => input.value.length > 0)
       const open = hasValue || localStorage.getItem(field.dataset.storageKey) === 'true'
       this.setOptionalField(field.dataset.field, open, duration)
     })
