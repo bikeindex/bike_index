@@ -8,7 +8,7 @@ import { cargoAt, isCargo, tireWidth, wheelsAt } from 'bikebook/templates/vehicl
 import { array, isNumber, join, present, slice, sum } from 'bikebook/templates/values'
 
 // A row header's cell classes that keep it in view as a phone scrolls the table across, at its scroller's edge rather than
-// inside its gutter
+// inside its gutter. Its inherited background outranks a row's own, which takes `!`
 export const PINNED_ROW_HEADER = 'tw:max-md:sticky tw:max-md:-left-(--gutter) tw:max-md:z-10 tw:max-md:border-r tw:max-md:bg-inherit'
 
 const GEOMETRY = ['reach', 'stack', 'top_tube_effective', 'head_angle', 'seat_angle', 'chainstay', 'standover', 'wheelbase']

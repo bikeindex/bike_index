@@ -761,7 +761,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     click_on "More filters", match: :first
     within("#vehicle-filters") { click_on "Price" }
     expect(page).to have_current_path(/[?&]sort=price\b/).and have_css("#vehicle-filters button[aria-pressed='true']", text: "Price")
-    expect(page).to have_css("[aria-label='Models to compare']") { prices.call(it) == prices.call(it).sort.reverse }
+    expect(page).to have_css("[aria-label='Models to compare']") { (listed = prices.call(it)) == listed.sort.reverse }
     within("#vehicle-filters") { click_on "Price" }
     expect(page).to have_current_path(/[?&]price_dir=asc\b/)
     expect(page).to have_css("[aria-label='Models to compare']") { (listed = prices.call(it)) == listed.sort && listed.uniq.size > 1 }

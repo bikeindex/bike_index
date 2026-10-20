@@ -30,7 +30,6 @@ export default class extends Controller {
     this.element.querySelector('#vehicle-filters input:not([type=hidden])')?.focus()
   }
 
-  // A field leads the order once clicked, and flips its direction when clicked leading
   toggleSort ({ params: { field } }) {
     const dir = `${field}DirValue`
     if (this.sortValue === field) this[dir] = this[dir] === 'desc' ? 'asc' : 'desc'
