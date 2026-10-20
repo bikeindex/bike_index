@@ -7771,7 +7771,6 @@ it:
           menu: Menu
           organization_crest: "%{org_name} cresta"
         primary_menu:
-          blog: Blog
           donate: Donare
           help: Aiuto
           log_in: accedi
@@ -7779,6 +7778,8 @@ it:
           search: Cerca
           sign_up: Iscriviti
           stolen_bike: Bicicletta rubata?
+          register: Registro
+          register_a_new_bike: Registra una nuova bicicletta
         user_settings_menu:
           settings_menu: Impostazioni
         wrapper:
