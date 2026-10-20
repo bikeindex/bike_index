@@ -86,7 +86,7 @@ RSpec.describe InfoController, type: :request do
         expect(response.status).to eq(200)
         expect(response).to render_template("layouts/application")
         expect(response.body).to include("Fund the next recovery")
-        expect(response.body).to match(/name="referral_source"[^>]*value="newsletter"/)
+        expect(response.body).to match(/name="payment\[referral_source\]"[^>]*value="newsletter"/)
         expect(response.body).to include("Become a member — $15/month")
       end
 
@@ -99,6 +99,22 @@ RSpec.describe InfoController, type: :request do
           expect(response.status).to eq(200)
           expect(response.body).to include(edit_membership_path)
           expect(response.body).to_not include('action="/membership"')
+        end
+      end
+
+      context "with a currency" do
+        before do
+          stripe_prices.each do |stripe_price|
+            FactoryBot.create(:stripe_price, stripe_price.slice(:membership_level, :interval)
+              .merge(currency_enum: "cad", amount_cents: stripe_price.amount_cents + 299))
+          end
+        end
+
+        it "checks out in it, showing its monthly prices" do
+          get "/donate?currency=cad"
+          expect(response.body).to match(/name="currency"[^>]*value="cad"/)
+          expect(response.body).to match(/name="payment\[currency\]"[^>]*value="CAD"/)
+          expect(response.body).to include("Become a member — $17.99/month")
         end
       end
 
@@ -161,6 +177,12 @@ RSpec.describe InfoController, type: :request do
     it "redirects support_the_index" do
       get "/support_the_index"
       expect(response).to redirect_to donate_path
+    end
+    it "keeps the params donate reads" do
+      %w[/support_bike_index /support_the_index /support_the_bike_index].each do |path|
+        get "#{path}?source=newsletter&initial_amount=500&currency=cad&other=x"
+        expect(response).to redirect_to donate_url(source: "newsletter", initial_amount: "500", currency: "cad")
+      end
     end
     it "redirects support_the_index" do
       get "/support_bike_index"

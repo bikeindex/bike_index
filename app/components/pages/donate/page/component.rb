@@ -33,7 +33,9 @@ module Pages
 
         private
 
-        def one_time? = @member || @initial_amount.present?
+        def monthly? = !@member
+
+        def one_time? = !monthly? || @initial_amount.present?
 
         def custom_amount
           @initial_amount unless ONE_TIME_AMOUNTS.include?(@initial_amount)
@@ -41,7 +43,11 @@ module Pages
 
         def selected_one_time = @initial_amount || 50
 
-        def money(dollars) = MoneyFormatter.money_format_without_cents(dollars * 100, @currency)
+        def money(dollars)
+          return MoneyFormatter.money_format_without_cents(dollars * 100, @currency) if dollars % 1 == 0
+
+          MoneyFormatter.money_format(dollars * 100, @currency)
+        end
 
         def tier_amount(level) = @monthly_prices[level]
 

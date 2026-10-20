@@ -16,11 +16,7 @@ module Pages
 
         private
 
-        def stripe_prices
-          {basic: 500, plus: 1500, patron: 5000}.map do |membership_level, amount_cents|
-            StripePrice.new(membership_level:, interval: "monthly", amount_cents:)
-          end
-        end
+        def stripe_prices = StripePrice.active_for(Currency.default)
       end
     end
   end

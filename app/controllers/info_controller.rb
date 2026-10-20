@@ -102,7 +102,7 @@ class InfoController < ApplicationController
   private
 
   def redirect_to_donation_or_payment
-    params[:amount].present? ? redirect_to_payment : redirect_to(donate_url)
+    params[:amount].present? ? redirect_to_payment : redirect_to(donate_url(params.permit(:source, :initial_amount, :currency)))
   end
 
   def redirect_to_payment

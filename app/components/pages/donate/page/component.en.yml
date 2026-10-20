@@ -38,8 +38,8 @@ en:
           membership_link: What membership includes
           membership_note: >-
             Monthly support makes you a Bike Index member: marketplace listings, a
-            member badge, and perks that grow as we build them. Tiers are %{basic},
-            %{plus} and %{patron} a month.
+            member badge, and perks that grow as we build them. Tiers are %{amounts}
+            a month.
           monthly: Monthly
           monthly_submit: Become a member — %{amount}/month
           one_time: One-time
