@@ -17,34 +17,23 @@ module SharedBlocks
         private
 
         def menu_items
-          [search_item(:mobile),
-            marketplace_item(:mobile),
-            register_item(:mobile),
+          [*side_items(:mobile),
             {type: :divider, item_class: SIDE_CLASSES.fetch(:mobile)},
             *account_items,
             {label: translation(".help"), path: help_path},
             {label: translation(".stolen_bike"), path: stolen_index_path},
             {label: translation(".donate"), path: why_donate_path},
-            register_item(:desktop),
-            marketplace_item(:desktop),
-            search_item(:desktop)]
+            # Desktop items float right, so reversing them keeps the mobile order on screen
+            *side_items(:desktop).reverse]
         end
 
-        # Active anywhere in the registration search — any stolenness, a query, page 2 — which
-        # naming no match_params gets: the stolenness this happens to link to isn't compared
-        def search_item(side)
-          {label: translation(".search"), path: helpers.default_bike_search_path,
-           item_class: SIDE_CLASSES.fetch(side)}
-        end
-
-        def marketplace_item(side)
-          {label: translation(".marketplace"), path: search_marketplace_path,
-           item_class: SIDE_CLASSES.fetch(side)}
-        end
-
-        def register_item(side)
-          {label: translation(".register"), path: register_path, match_paths: "#{register_path}/**",
-           item_class: SIDE_CLASSES.fetch(side)}
+        # Search is active anywhere in the registration search — any stolenness, a query, page 2 —
+        # which naming no match_params gets: the stolenness this happens to link to isn't compared
+        def side_items(side)
+          [{label: translation(".search"), path: helpers.default_bike_search_path},
+            {label: translation(".marketplace"), path: search_marketplace_path},
+            {label: translation(".register"), path: register_path, match_paths: "#{register_path}/**"}]
+            .map { it.merge(item_class: SIDE_CLASSES.fetch(side)) }
         end
 
         def account_items
