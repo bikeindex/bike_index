@@ -23,6 +23,7 @@ RSpec.describe "Admin news", :js, type: :system do
 
     find_field("blog_content_tag_names").click
     find('[role="option"]', text: "Partners").click
+    find_field("blog_content_tag_names").click
     find('[role="option"]', text: "Theft prevention").click
     find('[aria-label="Remove Partners"]').click
     send_keys(:escape)
