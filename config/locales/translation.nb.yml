@@ -2467,12 +2467,6 @@ nb:
     welcome:
       recovery_stories:
         no_stories_to_display: Ingen gjenopprettingshistorier å vise
-    memberships:
-      edit:
-        free_membership: Bike Index har gitt deg et gratis medlemskap. Send en e-post
-          til support@bikeindex.org hvis du har spørsmål.
-        no_active_membership: Du har ikke et aktivt medlemskap, du må registrere deg
-          for et nytt.
     search:
       registrations:
         set_interpreted_params:
@@ -2520,6 +2514,9 @@ nb:
           fungerer.
         state_title: "%{state} lover om elsykler"
         title: Regler for elsykkel
+    memberships:
+      create:
+        already_a_member: Du har allerede et medlemskap.
   customer_mailer:
     additional_email_confirmation:
       html:
@@ -2714,6 +2711,8 @@ nb:
       send_it: Sende det!
       subject: Emne
       your_message: Din beskjed
+      message_template: 'Sykkelens serienummer (hvis aktuelt): URL for registrering
+        av sykkelindeks (hvis aktuelt): Det jeg trenger hjelp med: '
     index:
       contact_us: Kontakt oss!
       have_a_question_we_havent_answered: Har du et spørsmål vi ikke har svart på?
@@ -2721,6 +2720,9 @@ nb:
       log_in_to_send_a_comment: Logg inn for å sende en kommentar!
       you_can_reach_us_at_contact_html: Du kan nå oss på %{contact_link}, eller sende
         meldingen din her.
+      the_more_detail_you_can_share: Jo flere detaljer du kan dele, desto raskere
+        kan vi hjelpe. Hvis spørsmålet ditt gjelder en spesifikk sykkel, ta med serienummeret
+        eller registreringsadressen for Bike Index.
   info:
     about:
       about_bike_index: Om Bike Index
@@ -5028,6 +5030,7 @@ nb:
       manufacturer_required: Produsenten er pålagt å registrere seg
       name_required: Eiernavn kreves for registrering
       unable_to_save: Vi kan ikke lagre registreringen. Prøv på nytt.
+      description_stolen_required: Fortell oss hva som skjedde
     menu_items_account:
       logout: Logg ut
       marketplace_messages: Markedsplassmeldinger
@@ -5448,6 +5451,11 @@ nb:
         in_the_past_year: i løpet av det siste året
         now: nå
         to: til
+      column_settings:
+        all: Alle
+        default: misligholde
+        none: ingen
+        visible_columns: Synlige kolonner
     atoms:
       serial:
         hidden: skjult
@@ -5468,6 +5476,8 @@ nb:
         copy_id: Kopier ID
       sticker:
         copy_sticker: Kopier klistremerke
+      recovery_display_card:
+        recovered: Gjenopprettet
     pages:
       messages:
         thread_show:
@@ -6255,6 +6265,25 @@ nb:
             update_marketplace_listing: Oppdater markedsplassoppføringen!
             updated: Oppdatert
             user_hidden: Skjult for andre brukere
+        memberships:
+          show:
+            complimentary: Bike Index ga deg dette medlemskapet, så du betaler ikke
+              for det.
+            ends: Slutter
+            manage_billing: Administrer fakturering
+            new_members_pay: Nye %{level}-medlemmer betaler %{current_price}.
+            not_a_member: Du er ikke medlem av Bike Index.
+            per_month: per måned
+            per_year: per år
+            see_membership_tiers: Se medlemskapsnivåer
+            started: Startet
+            you_are_a_member: Du er et %{level}-medlem
+            you_pay_less: Du betaler mindre enn nye medlemmer. %{level} er nå %{current_price},
+              og du beholder prisen så lenge medlemskapet ditt er aktivt og du forblir
+              på dette abonnementet.
+            you_pay_the_current_price: Du betaler gjeldende pris for %{level}.
+            your_membership: Ditt medlemskap
+            your_price: Din pris
       sales:
         new_form:
           record_sale: Rekordsalg
@@ -6301,7 +6330,6 @@ nb:
           promoted_alerts_title: Sett sykkelen foran nabolaget den ble tatt fra
           questions_people_ask_at_2am: Spørsmål folk stiller klokken 02:00
           read_more_recovery_stories: Les flere historier om gjenoppretting
-          recovered: Gjenopprettet
           recoveries_reported_by_owners: Nylige gjenopprettinger, rapportert av eierne.
           recovery_record: Gjenopprettingslogg
           register_it: Registrer det
@@ -6628,8 +6656,6 @@ nb:
           filter_combobox:
             any: Noen
           byline: En gratis referanse fra Bike Index, det ideelle sykkelregisteret.
-          tagline_html: Verdens sykkelbibliotek – søk, sammenlign og finn din neste
-            sykkeltur på tvers av %{models_count}+ modeller.
           tagline: Verdens sykkelbibliotek – søk, sammenlign og finn din neste sykkeltur.
           about_bikebook_label: Om BikeBook
           activities: Aktiviteter
@@ -6652,6 +6678,7 @@ nb:
           united_states: USA
           any_market: Ethvert marked
           market: Marked
+          clear_filters: Fjern filtre
         donate_strip:
           donate: Donere
           pitch: Dette kule produktet er levert av den ideelle organisasjonen Bike
@@ -6663,6 +6690,9 @@ nb:
           class_aria: Klasse %{n} elsykkel
           class_unknown_aria: Elsykkelklasse ukjent
           emoto: Elmotorsykkel
+          emoto_aria: Elmotorsykkel, ikke elsykkel
+          optional_throttle: med valgfri gasspedal
+          optional_upgrade: med valgfri oppgradering
         law_details:
           from: 'Fra %{date}:'
           from_until: 'Fra %{starts_on} til %{ends_on}:'
@@ -6679,7 +6709,6 @@ nb:
           class_3_throttle: Gassen må slås av ved 32 km/t
           classes_start_on: Kursene trer i kraft %{date}. Inntil da, sjekk statens
             gjeldende regler
-          entered_manually: Angitt manuelt · Klasse %{n}
           fails_rule: Oppfyller ikke denne regelen
           falls_under: I %{state} faller den inn under %{name}, som kan kreve registrering
             og lisens.
@@ -6707,7 +6736,6 @@ nb:
           no_watt_cap: Ingen maktbegrensning i statsloven
           not_classified: Det er ikke en elsykkel i klasse 1, 2 eller 3.
           not_permitted: Ikke tillatt
-          not_provided: Ikke oppgitt
           own_classes: Staten setter sine egne grenser i stedet for de tre standardklassene
           recovered_more_often: Stjålne sykler blir funnet dobbelt så ofte når de
             er registrert.
@@ -6731,7 +6759,6 @@ nb:
           throttle_not_allowed: Staten tillater ikke gassregulering
           throttle_not_stated: Statens lov sier ikke om det er tillatt med gass
           top_speed: Toppfart
-          ul_certification: UL-sertifisering
           watts_html: "%{watts}W"
           watts_not_provided: Motoreffekt ikke oppgitt
           watts_over_cap_html: "%{watts}W-motoren overskrider %{cap}W-grensen"
@@ -6756,10 +6783,8 @@ nb:
           class_3_throttle_within_html: Gasspedalen stopper ved %{mph} mph
           class_unknown_check_label: BikeBook oppgir ikke klasse eller toppfart, så
             sjekk klassen på etiketten
-          entered_manually_unclassified: Angitt manuelt
           entered_unverified: Registrert av deg, ikke bekreftet av BikeBook.
           full_bikebook_entry: Se hele BikeBook-innlegget
-          model_year_bikebook: "%{year} modell · BikeBook"
           over_mph_html: Over %{mph} mph
           red_headline_manual: Dette er ikke en elsykkel i henhold til gjeldende %{state}-regler.
           speed_past_cap_html: Assisterer forbi %{past} mph, over %{cap} mph-grensen
@@ -6773,11 +6798,80 @@ nb:
             other: Klasser %{n} er gjenkjent
           read_more: Les mer
           stock_photo: Arkivfoto
+          answer_optional: Valgfri
+          as_class_with_optional_throttle: som klasse %{n} med valgfri gasspedal
+          as_class_with_optional_upgrade: som klasse %{n} med en valgfri oppgradering
+          class_3_optional_throttle_within_html: Valgfri gassstopp ved %{mph} mph
+          class_3_speed_with_throttle_html: Assisterer til %{mph} mph, ikke tillatt
+            med gasspedal
+          class_n: Klasse %{n}
+          classes_not_permitted: Det er en %{classes} elsykkel, som ikke er tillatt
+          green_headline_optional: Det er lovlig å sykle på %{name}-en din som en
+            elsykkel i klasse %{n} og %{optional}.
+          manually_entered: Angitt manuelt
+          model_year: "%{year}-modell"
+          optional_classes_not_recognized:
+            one: Klasse %{n} gjenkjennes ikke her, så den er bare lovlig slik den
+              selges
+            other: Klasser %{n} er ikke anerkjent her, så det er bare lovlig slik
+              det selges.
+          optional_throttle_not_allowed: Det er bare lovlig uten den valgfrie gasspedalen
+          optional_to_html: Valgfritt, til %{mph}
+          throttle_with_class_3_assist: Ikke tillatt med klasse 3-assistanse
+          yellow_headline_optional:
+            one: Det er lovlig å sykle på %{name}-en din som en elsykkel i klasse
+              %{n} og %{optional}, med %{count}-regelen for å kontrollere.
+            other: Det er lovlig å sykle på %{name}-en din som en elsykkel i klasse
+              %{n} og %{optional}, med %{count}-regler som må kontrolleres.
+          yellow_headline_without_throttle: Det er lovlig å sykle på %{name}-en din
+            som en elsykkel i klasse %{n} uten den valgfrie gasspedalen.
+          green_headline_law: Det er lovlig å sykle i %{name}-en din i %{state} i
+            henhold til %{law}-reglene.
+          kmh_html: "%{kmh} km/t"
+          law_source_html: 'Kilde: %{link}s katalog over elsykkellovgivning. Sammendragene
+            er kun for referanse, ikke juridisk rådgivning.'
+          may_be_moped_canada: Den kan i stedet være regulert som moped eller motorvogn,
+            noe som kan kreve registrering og førerkort.
+          no_e_bike_category: Det er ingen elsykkelkategori her, så sjekk førerkort-,
+            registrerings- og hjelmreglene for denne.
+          no_speed_cap_in_law: Ingen fartsgrense i loven sin
+          no_watt_cap_in_law: Ingen effektgrense i loven sin
+          optional_to_kmh_html: Valgfritt, til %{kmh} km/t
+          over_kmh_html: Over %{kmh} km/t
+          speed_over_cap_kmh_html: Assisterer til %{kmh} km/t, over %{cap} km/t-grensen
+          speed_past_cap_kmh_html: Assisterer forbi %{past} km/t, over %{cap} km/t-grensen
+          speed_past_kmh_html: Assisterer etter %{past} km/t; sjekk at den stopper
+            innen %{cap} km/t
+          speed_to_check_kmh_html: BikeBook oppgir ikke toppfarten, så sjekk at motoren
+            stopper ved %{cap} km/t
+          speed_within_cap_kmh_html: Hjelper opp til %{kmh} km/t, innenfor grensen
+          still_reviewing_province_body: Sjekk samferdselsdepartementet i din provins
+            eller ditt territorium for gjeldende regler for elsykler. De fleste elsykkelmotorer
+            har en effekt på 500 W og en assistert hastighet på 32 km/t.
+          throttle_allowed_in_law: Gass tillatt
+          throttle_not_allowed_in_law: Loven tillater ikke gass
+          throttle_not_stated_in_law: Loven sier ikke om det er tillatt med gass.
+          watts_to_check_html: Sjekk at motoren er nominell til %{cap}W eller mindre
+          yellow_headline_law:
+            one: Det er lovlig å sykle i %{name}-en din i %{state} under %{law}-reglene,
+              med %{count}-regelen for å sjekke.
+            other: Det er lovlig å sykle i %{name}-en din i %{state} under %{law}-reglene,
+              med %{count}-regler som må kontrolleres.
+          yellow_headline_law_without_throttle: Det er lovlig å kjøre %{name}-en din
+            i %{state} under %{law}-reglene, uten den valgfrie gasspedalen.
+          yellow_headline_motor_vehicle_law:
+            one: Det kan være lovlig å sykle i %{name}-en din i %{state} under %{law}-reglene,
+              med %{count}-regelen for å sjekke.
+            other: Det kan være lovlig å sykle i %{name}-en din i %{state} under %{law}-reglene,
+              og det må sjekkes %{count}-reglene.
+          yes_to_kmh_html: Ja, til %{kmh} km/t
+          your_province: Din provins eller ditt territorium
         rule_label:
           classes: Klasser anerkjent
           power: Motoreffektbegrensning
           speed: Topp assistert hastighet
           throttle: Gasspedal
+          vehicle: Regulert som
         rule_value:
           allowed: Tillatt
           classes:
@@ -6788,6 +6882,7 @@ nb:
           not_allowed: Ikke tillatt
           own_definition: 'Sin egen definisjon: %{name}'
           watts_html: "%{watts}W"
+          kmh_html: "%{kmh} km/t"
         show:
           answer_no: Nei
           answer_yes: Ja
@@ -6806,10 +6901,8 @@ nb:
             runaway. Fabrikken inspiseres deretter kontinuerlig for å opprettholde
             godkjenningen.
           certification_involves_heading: Hva sertifisering innebærer
-          change: endre?
           check_my_bike: Sjekk sykkelen min
           compare_html: Vil du sammenligne flere sykler? %{link}
-          detected_html: Vi oppdaget <strong>%{state}</strong> —
           disclaimer: Bike Index er en ideell organisasjon med 501(c)(3)-lovgivning.
             Sammendrag av statlige lover er kun for referanse, ikke juridisk rådgivning.
           for_parents: For foreldre
@@ -6819,7 +6912,6 @@ nb:
           how_to_check_1: Finn UL-merket og filnummeret på batteriet og rammeetiketten.
           how_to_check_2: Søk etter nummeret i UL Product iQ.
           how_to_check_heading: Slik sjekker du en sykkel
-          location_not_shared: Stedet er ikke delt. Velg staten din fra listen.
           motor_wattage: Motoreffekt (W)
           mph: "%{mph} mph"
           parent_step_1_body: Mange stater setter en minimumsalder for klasse 3, og
@@ -6883,10 +6975,41 @@ nb:
           over_28_mph: Over 45 km/t
           top_speed: Hva er toppfarten?
           visit_bikebook_link: Besøk BikeBook.
-          bike_index_nonprofit: Sykkelindeks · Ideell organisasjon
           custom_details: Tilpassede detaljer
           details_legend: Detaljer om sykkelen din
           model_details: "%{model} detaljer"
+          country: Land
+          not_in_us_html: Ikke i USA? %{switch_country}
+          select_country: Velg et land
+          switch_country: bytte land
+          switch_country_title: Bytt land
+          banned_body_canada: Universiteter, boligleverandører og transportbyråer
+            innfører regler for oppbevaring og lading av elsykler innendørs, og sertifisering
+            er det de ser etter.
+          choose_province: Velg provinsen eller territoriet ditt fra listen.
+          choose_state: Velg staten din fra listen.
+          detected_place_html: Vi oppdaget <strong>%{state}</strong> .
+          disclaimer_canada: Bike Index er en ideell organisasjon. Sammendrag av provinsielle
+            og territoriale lover er kun for referanse, ikke juridisk rådgivning.
+          kmh: "%{kmh} km/t"
+          not_in_canada_html: Ikke i Canada? %{switch_country}
+          over_kmh: Over %{kmh} km/t
+          parent_step_1_body_canada: De fleste provinser setter en minimumsalder for
+            å sykle på elsykkel, fra 12 til 18 år. Sjekk din alder før du velger en
+            sykkel.
+          parent_step_2_body_canada: Ingen gass, så motoren hjelper bare mens de tråkker.
+            Det er den enkleste typen elsykkel å lære å kjøre på.
+          parent_step_2_title_canada: Start med pedalassistanse
+          parents_body_canada: Elsykler er tyngre og raskere enn syklene de fleste
+            barn lærer seg å bruke. Før du kjøper, finn ut hva fylket og byen din
+            tillater, og sørg for at barnet ditt er klart til å sykle på en trygt.
+          parents_link_canada: Slå opp alders- og hjelmreglene i din provins
+          province: Provins eller territorium
+          province_error: Velg en provins eller et territorium.
+          select_province: Velg provinsen eller territoriet ditt
+          subheading_canada: Gå inn i provinsen eller territoriet ditt og sykle for
+            å se reglene.
+          watts_placeholder_canada: f.eks. 500
         state_reference:
           compiling: Vi samler %{state}s elsykkelregler fra delstatsforsamlingen og
             DMV. Sjekk tilbake snart.
@@ -6906,22 +7029,43 @@ nb:
           only_classes:
             one: Kun klasse %{classes}
             other: Kun klasser %{classes}
+          all_on_file_canada: Alle provinser og territorier som er registrert
+          compiling_canada: Vi samler %{state}s elsykkelregler fra deres lovgivning
+            og samferdselsdepartement. Sjekk tilbake snart.
+          filter_placeholder_canada: Skriv inn en provins eller et territorium
+          filter_provinces: Filtrer provinser og territorier
+          heading_canada: Elsykkellover etter provins og territorium
+          limits_subheading_canada: Hver provins og hvert territorium. Åpne en for
+            å se grensene, reglene og kildene.
+          no_match_canada: Ingen provinser eller territorier samsvarer. Prøv et annet
+            navn.
+          on_file_of_total_canada_html: "%{number} av %{total} provinser og territorier
+            registrert · andre under gjennomgang"
         ul_badge:
           certified: UL %{standard}-sertifisert
           meaning_2271_certified: Batteripakken har bestått UL-sikkerhetstester for
             overlading, kortslutning og støt.
-          meaning_2271_unknown: Vi har ikke data om batterisertifisering ennå. Sjekk
-            etiketten på batteriet.
-          meaning_2849_unknown: Vi har ikke systemsertifiseringsdata for denne modellen
-            ennå. Se etter UL-merket på rammeetiketten.
           scope_2271: Batteripakke
           scope_2849: Elsykkelens elektriske system
-          status_unknown: UL %{standard} status ukjent
-          meaning_2271_check_label: Sjekk etiketten på batteriet.
-          meaning_2849_check_label: Se etter UL-merket på rammeetiketten.
           meaning_2849_system_certified: Hele det elektriske systemet (motor, batteri,
             lader og kontroller) bestod brann- og elsikkerhetstester sammen.
+          certification_unknown: Ukjent sertifisering
+          meaning_check_labels: Se etter UL-merket på rammen og batterietikettene.
+          meaning_unknown: Vi har ikke sertifiseringsdata for denne modellen ennå.
+            Se etter UL-merket på rammen og batterietikettene.
         classes:
+          classes_heading: Elsykkelkurs, forklart
+          classes_intro: De fleste stater bruker et treklassesystem. Klassen din bestemmer
+            hvor fort motoren hjelper, om det er tillatt med gass og hvor du kan kjøre.
+          state_classes_heading: "%{state} elsykkelkurs"
+          state_classes_intro: "%{state} bruker ikke treklassesystemet som de fleste
+            stater har. Loven deres sorterer elsykler og andre elektriske tohjulinger
+            i disse klassene i stedet."
+          other_classes: Andre elektriske kjøretøy i %{place}
+          place_heading: Elsykkellover i %{place}
+        rule_citation:
+          source: kilde
+        class_card:
           assist: Assistere
           class_1_body: Motoren hjelper bare mens du tråkker og stopper ved 32 km/t.
             Tillatt de fleste steder kan en vanlig sykkel kjøre.
@@ -6934,9 +7078,14 @@ nb:
           class_3_summary: Pedalassistanse til 45 km/t, med speedometer.
           class_3_tag: Raskere pedalassistanse
           class_n: Klasse %{n}
-          classes_heading: Elsykkelkurs, forklart
-          classes_intro: De fleste stater bruker et treklassesystem. Klassen din bestemmer
-            hvor fort motoren hjelper, om det er tillatt med gass og hvor du kan kjøre.
+          motor: Motor
+          motor_cap: "≤750W"
+          mph: "%{mph} mph"
+          or: eller
+          pedal: Fotpedal
+          state_specifics: "%{state} spesifikasjoner"
+          throttle: Gasspedal
+          top_assist: Topp assist
           emoto_limits_body: Toppfart over 45 km/t, gasshastighet over 32 km/t eller
             motorer over 750 W gjør den til en elmotorsykkel. De fleste stater behandler
             disse som mopeder eller motorsykler, som kan kreve registrering, forsikring
@@ -6945,23 +7094,208 @@ nb:
           emoto_speed: 28+ mph
           emoto_summary: Toppfart over 45 km/t, gasshastighet over 32 km/t eller motorer
             over 750 W gjør den til en elmotorsykkel.
-          motor: Motor
-          motor_cap: "≤750W"
-          mph: "%{mph} mph"
           not_an_ebike: Ikke en elsykkel
-          or: eller
-          pedal: Fotpedal
-          state_classes_heading: "%{state} elsykkelkurs"
-          state_classes_intro: "%{state} bruker ikke treklassesystemet som de fleste
-            stater har. Loven deres sorterer elsykler og andre elektriske tohjulinger
-            i disse klassene i stedet."
-          state_specifics: "%{state} spesifikasjoner"
-          throttle: Gasspedal
-          top_assist: Topp assist
           watts_max: "≤%{watts}W"
           watts_min: "%{watts}W+"
-        rule_citation:
-          source: kilde
+          copy_id: Kopier ID
+          id: ID
+        bike_summary:
+          classification: E-%{vehicle_type}-klassifisering
+          electric_certification: Elektrisk sertifisering
+          not_provided: Ikke oppgitt
+        check:
+          outside_checked_countries: Sykkelkontrollene dekker foreløpig amerikanske
+            stater og kanadiske provinser. %{place}s lover for elsykler finner du
+            nedenfor.
+      memberships:
+        new:
+          become_a_member: Bli medlem
+          bike_index_membership: Bike Index-medlemskap
+          builds_next: Bygger neste
+          choose_your_membership: Velg medlemskapet ditt
+          cycling_cap: Sykkelhette
+          every_tier_keeps_it_free: Hvert nivå holder registeret gratis og finansierer
+            nye funksjoner. Høyere nivåer kommer med flere takk.
+          faq_cancel_answer: Når som helst, fra kontosiden din. Veksle mellom månedlig
+            og årlig fungerer på samme måte.
+          faq_cancel_question: Kan jeg endre nivåer eller avbryte?
+          faq_free_answer: Ja. Registrering, søking og rapportering av tyveri er gratis
+            for alle, for alltid. Medlemskap er måten vi betaler for å holde det slik.
+          faq_free_question: Er det fortsatt gratis å registrere en sykkel selv om
+            jeg ikke blir medlem?
+          faq_gear_answer: Etter at du har registrert deg, sender vi deg en e-post
+            med en postadresse og sender den derfra.
+          faq_gear_question: Når får jeg capsen eller skjorten min?
+          faq_marketplace_answer: Nei. Hvem som helst kan registrere en sykkel uten
+            gebyrer. Medlemmer får annonsene sine forfremmet til toppen.
+          faq_marketplace_question: Må jeg være medlem for å selge på markedsplassen?
+          faq_tax_answer: Bike Index er en ideell organisasjon underlagt 501(c)(3)-loven,
+            EIN 81-4296194. Medlemskap og engangsdonasjoner er fradragsberettigede
+            i USA.
+          faq_tax_question: Er medlemskap fradragsberettiget?
+          free_alerts_body: Tyverirapporter sendes til butikker, politiavdelinger,
+            skoler og syklister i nærheten av der sykkelen ble stjålet.
+          free_alerts_title: Varsler om stjålne sykler
+          free_partners_body: Introduksjon av nye butikker, avdelinger og byer, og
+            hjelp til politiet med å matche gjenvunnede sykler med eierne deres.
+          free_partners_title: Partnere og inndrivelser
+          free_registration_body: Det koster ingenting å registrere, søke etter og
+            sjekke en brukt sykkel, verken for syklister, butikker eller politi. Vi
+            selger ikke syklistdata.
+          free_registration_title: Registrering og søk
+          join_monthly: Bli med som %{level} — %{price}/mnd
+          join_yearly: Bli med som %{level} — %{price}/år
+          keep_bike_index_free: Hold Bike Index gratis for alle syklister
+          keeps_free: Holder seg fri
+          live: Aktiv
+          member_gear: Medlemsutstyr
+          member_gear_body: Pluss at medlemmer får sykkelluen fra Bike Index. Kunder
+            får solskjorten. Begge er designet av Kelsey Graywill, og vi sender dem
+            til deg i posten etter at du har blitt medlem.
+          monthly: Månedlig
+          new_tools_for_bike_owners: Nye verktøy for sykkeleiere
+          next: Neste
+          next_ebike_database_body: En global UL-sertifiseringsdatabase
+          next_ebike_database_title: Elsykkeldatabase
+          next_ios_app_body: Registrer og administrer sykler fra telefonen din
+          next_ios_app_title: iOS-appen
+          next_marketplace_body: Kun registrerte sykler, kontrollert mot tyverirapporter
+          next_marketplace_title: En tryggere markedsplass
+          next_oem_parts_body: Fabrikkspesifikasjoner og bilder for hver modell
+          next_oem_parts_title: OEM-deler og arkivbilder
+          next_versioning_body: Hold oversikt over når sykkelen din endres
+          next_versioning_title: Sykkelversjonering
+          official_registry: Det offisielle registeret for mer enn 1000 politiavdelinger,
+            universiteter, byer og butikker
+          or_make_a_one_time_donation: Eller gi en engangsdonasjon
+          partner_organizations: partnerbutikker, politiavdelinger og byer
+          per_month: "/ måned"
+          per_year: "/ år"
+          perk_cycling_cap: Sykkelkappe for medlemmer av Bike Index
+          perk_everything_in_basic: Alt i Basic
+          perk_everything_in_basic_and_plus: Alt i Basic og Plus
+          perk_faster_support: Raskere supportresponser
+          perk_listings_promoted: Markedsplassoppføringene dine ble forfremmet til
+            toppen
+          perk_member_badge: Medlemsmerke på Bike Index-profilen din
+          perk_no_ads: Ingen annonser, hvis vi noen gang viser dem
+          perk_patron_badge: Kundemerke på Bike Index-profilen din
+          perk_promoted_alert: Et gratis varsel hvis sykkelen din blir stjålet
+          perk_sun_shirt: Bike Index Patron solskjorte
+          perk_top_listing_placement: Toppplassering på markedsplassen
+          plans_from: Planer fra %{price} i måneden
+          questions: Spørsmål
+          read_more_recovery_stories: Les flere historier om gjenoppretting
+          recommended: Anbefalt
+          recoveries_reported_by_owners: Hver gjenoppretting rapporteres av personen
+            som fikk sykkelen sin tilbake.
+          stolen_bikes_recovered: stjålne sykler funnet
+          summary_monthly: "%{level} medlemskap, %{price} i måneden"
+          summary_yearly: "%{level} medlemskap, %{price} per år"
+          sun_shirt: Solskjorte
+          tax_deductible_cancel_any_time: Medlemskap og engangsdonasjoner er fradragsberettigede
+            i USA. Du kan når som helst endre nivå eller si opp medlemskapet fra kontoen
+            din.
+          tax_deductible_ein: Medlemskap og engangsdonasjoner er fradragsberettigede
+            i USA. Bike Index er en ideell organisasjon under 501(c)(3), EIN 81-4296194.
+          the_registry_open_to_everyone: Registeret, åpent for alle
+          two_months_free: To måneder gratis
+          value_returned_to_owners: verdi tilbakeført til eierne
+          view_your_membership: Se ditt %{level}-medlemskap
+          wear_the_shield: Bruk skjoldet
+          what_members_make_possible: Hva medlemmer gjør mulig
+          yearly: Årlig
+          bikes_registered: registrerte sykler
+          bikes_registered_keep_it_free: "%{bikes} sykler er registrert. Medlemmer
+            beholder det gratis den neste millionen."
+          millions_registered_keep_it_free: "%{millions} millioner sykler er registrert.
+            Medlemmer beholder det gratis den neste millionen."
+          monthly_donation_lede: Medlemskap er en månedlig donasjon til Bike Index.
+            Det betaler for registeret og varslingene om stjålne sykler som får sykler
+            hjem, og det finansierer de nye verktøyene vi bygger videre. Det vil alltid
+            være gratis å registrere en sykkel og rapportere et tyveri. Medlemmer
+            er grunnen til at vi kan love det.
+      donate:
+        page:
+          already_member: Du er allerede medlem av Bike Index – takk! Du kan endre
+            nivået eller betalingsinformasjonen din fra medlemsinnstillingene dine.
+          cadence: Hvor ofte å gi
+          cta_headline: En million sykler er registrert. Ikke én eier betalte for
+            å være der.
+          cta_sub: Hold det gratis for den neste millionen.
+          eyebrow: Gjenopprettet og returnert
+          fine_print: Bike Index er en ideell organisasjon under 501(c)(3), EIN 81-4296194.
+            Donasjonen din er fradragsberettiget i USA. Du kan når som helst avbryte
+            en månedlig gave.
+          fine_print_short: 501(c)(3) ideell organisasjon, EIN 81-4296194. Fradragsberettiget
+            i USA.
+          form_title: Finansier den neste gjenopprettingen
+          headline: Alle syklene ovenfor kom hjem fordi registeret var gratis
+          larger_gift_link: Snakk med oss om en større gave
+          lede: Bike Index er en ideell organisasjon. Registrering koster ingenting,
+            søking koster ingenting, og rapportering av tyveri koster ingenting –
+            og det er derfor en million sykler er i registeret, og hvorfor politiavdelinger
+            og butikker faktisk bruker det. Donasjoner er det som holder det slik.
+          lede_short: Bike Index er en ideell organisasjon. Registrering, ransaking
+            og tyverirapporter koster ingenting. Donasjoner er det som holder det
+            slik.
+          major_benefactor: Velgjører
+          major_body: Gaver på dette nivået går til onboarding av partnere, etterforskning
+            av tyveri på tvers av landegrenser og ingeniørarbeidet bak promoterte
+            varsler.
+          major_eyebrow: Stor gaver
+          major_partner: Partner
+          major_title: Større gaver flytter hele byer inn i registeret
+          manage_membership: Administrer medlemskapet ditt
+          membership_link: Hva medlemskapet inkluderer
+          membership_note: 'Månedlig støtte gjør deg til et Bike Index-medlem: markedsplassoppføringer,
+            et medlemsmerke og fordeler som vokser etter hvert som vi bygger dem.
+            Nivåene er %{amounts} per måned.'
+          monthly: Månedlig
+          monthly_submit: Bli medlem — %{amount}/måned
+          one_time: Engangsbruk
+          one_time_submit: Doner %{amount}
+          other_amount: Annet beløp
+          other_ways_daf: Giverstyrte fondstilskudd – vi kan sende deg EIN-nummeret
+            ditt og stipendinformasjonen din.
+          other_ways_match: Arbeidsgivermatching – mange arbeidsgivere vil matche
+            en donasjon uten ekstra kostnad for deg.
+          other_ways_stock: Gaver i form av aksjer eller kryptovaluta, som unngår
+            kapitalgevinster på verdiøkende eiendeler.
+          other_ways_title: Andre måter å gi på dette nivået
+          recovered: Gjenopprettet
+          stat_bikes: sykler registrert, gratis
+          stat_partners: partnerbutikker, politiavdelinger og byer
+          stat_recoveries: stjålne sykler funnet
+          stat_value: verdi tilbakeført til eierne
+          stories_link: Les flere historier om gjenoppretting
+          stories_subhead: Hver gjenoppretting rapporteres av personen som fikk sykkelen
+            sin tilbake.
+          stories_title: Med eiernes ord
+          tier_basic: Grunnleggende medlemskap
+          tier_basic_benefit: List opp sykler på markedsplassen, et medlemsmerke og
+            raskere støtte
+          tier_patron: Patronmedlemskap
+          tier_patron_benefit: Alt i Plus, topp plassering på markedsplassen, Patron-skjorte
+            og -merke
+          tier_plus: Pluss-medlemskap
+          tier_plus_benefit: Alt i Basic, et gratis promoteringsvarsel hvis sykkelen
+            din blir stjålet og et medlemskapstak
+          uses_alerts_body: Varslingssystemet for stjålne sykler og de promoterte
+            varslene som legger ut en oppføring i feeder om tyveriet.
+          uses_alerts_title: Varsler som når ut til folk
+          uses_free_body: Servere, support og søkeverktøyene som butikker og politi
+            bruker er gratis. Ingen betalingsmur, ingen nivåer, ingen salg av passasjerdata.
+          uses_free_title: Registreringen forblir gratis
+          uses_owners_body: Markedsplassen, der en oppføring starter fra en sykkel
+            som allerede er i registeret – bygget for å gjøre det vanskeligere å selge
+            en stjålet sykkel. Flere verktøy for eieren er på vei.
+          uses_owners_title: Funksjoner for sykkeleiere
+          uses_partners_body: Introduksjon av nye butikker, avdelinger og byer, og
+            de langvarige tyveriundersøkelsene som kommer ut av registerdataene.
+          uses_partners_title: Partnere og etterforskninger
+          uses_title: Hvor pengene går
+          wall_photo_alt: En sykkel funnet gjennom Bike Index
     shared_blocks:
       footer:
         about: Om
@@ -7075,7 +7409,6 @@ nb:
           menu: Meny
           organization_crest: "%{org_name} våpenskjold"
         primary_menu:
-          blog: Blogg
           donate: Donere
           help: Hjelp
           log_in: Logg Inn
@@ -7083,6 +7416,8 @@ nb:
           search: Søk
           sign_up: Melde deg på
           stolen_bike: Stjålet sykkel?
+          register: Registrere
+          register_a_new_bike: Registrer en ny sykkel
         user_settings_menu:
           settings_menu: Innstillinger
         wrapper:

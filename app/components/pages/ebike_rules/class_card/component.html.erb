@@ -1,0 +1,83 @@
+<% content = capture do %>
+  <div class="tw:flex tw:items-center tw:gap-3.5">
+    <%= render(Pages::EbikeRules::ClassTile::Component.new(e_bike_class: card[:n])) unless classification %>
+
+    <div>
+      <h3 class="tw:font-header tw:text-xl tw:font-extrabold">
+        <%= card[:title] %>
+      </h3>
+
+      <% if card[:tag] %>
+        <p class="tw:text-[15px] tw:text-gray-700 tw:dark:text-gray-300">
+          <%= card[:tag] %>
+        </p>
+      <% end %>
+    </div>
+  </div>
+
+  <% rows = [[translation(".assist"), card[:assist]], [translation(".top_assist"), card[:speed]], [translation(".motor"), card[:motor]]].select(&:last) %>
+
+  <% if rows.any? %>
+    <%# An either card's columns are as wide as their values, which leaves room for each "or" %>
+    <div class="tw:border-y tw:border-gray-200 tw:py-3 tw:dark:border-gray-700 <%= "tw:[&>dl]:flex tw:[&>dl]:gap-x-8 tw:[&>dl>div]:relative" if card[:either] %>">
+      <%= render(UI::DefinitionList::Container::Component.new(term: :below)) do %>
+        <% rows.each_with_index do |(label, value), index| %>
+          <%= render(UI::DefinitionList::Row::Component.new(label:, value: row_value(value, or_after: card[:either] && index < rows.size - 1))) %>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+
+  <p class="tw:text-[15px] tw:leading-relaxed tw:text-gray-700 tw:dark:text-gray-300">
+    <%= card[:body] %>
+  </p>
+
+  <% if card[:rules] %>
+    <div
+      class="
+        tw:text-[15px] tw:leading-relaxed tw:text-gray-700
+        tw:dark:text-gray-300
+      "
+      data-controller="ui--collapse"
+    >
+      <%= render(UI::Collapse::Component.new(text: translation(".state_specifics", state: @place&.dig(:name)), chevron: :trailing, color: :link)) %>
+
+      <ul
+        class="tw:mt-2 tw:hidden tw:list-disc tw:space-y-1 tw:pl-5 tw:text-sm"
+        data-ui--collapse-target="content"
+      >
+        <% card[:rules].each do |restriction| %>
+          <li>
+            <%= restriction[:rule] %>
+            <%= render(Pages::EbikeRules::RuleCitation::Component.new(restriction:)) %>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <% if @catalog_id %>
+    <%= render(UI::DefinitionList::Container::Component.new) do %>
+      <%= render(UI::DefinitionList::Row::Component.new(label: translation(".id"))) do %>
+        <%= render(UI::CopyableCode::Component.new(value: @catalog_id, label: translation(".copy_id"))) %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>
+
+<% card_html = capture do %>
+  <% if @framed %>
+    <%= render(UI::Card::Component.new(shadow: true, additional_classes: "tw:flex tw:flex-col tw:gap-4 tw:rounded-lg tw:p-6!")) { content } %>
+  <% else %>
+    <div
+      class="
+        tw:flex tw:w-72 tw:flex-col tw:gap-4 tw:p-2 tw:text-gray-900
+        tw:dark:text-gray-100
+      "
+    >
+      <%= content %>
+    </div>
+  <% end %>
+<% end %>
+
+<%= @frame_id ? helpers.turbo_frame_tag(@frame_id) { card_html } : card_html %>

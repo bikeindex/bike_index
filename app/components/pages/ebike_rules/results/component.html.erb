@@ -68,43 +68,30 @@
       <% end %>
 
       <div class="tw:flex tw:flex-col tw:gap-5 tw:p-[clamp(18px,3vw,28px)]">
-        <div class="tw:flex tw:items-start tw:gap-4">
-          <div class="tw:min-w-0 tw:flex-1">
-            <span class="<%= EYEBROW_CLASSES %>"><%= translation(".your_bike") %></span>
+        <div>
+          <span class="<%= EYEBROW_CLASSES %>"><%= translation(".your_bike") %></span>
 
-            <h2 class="<%= NAME_CLASSES %>">
-              <%= @bike.manual? ? translation(".your_ebike") : @bike.make_and_model %>
-            </h2>
+          <h2 class="<%= NAME_CLASSES %>">
+            <%= @bike.manual? ? translation(".your_ebike") : @bike.make_and_model %>
+          </h2>
 
-            <p class="tw:mt-1 tw:text-[15px] tw:text-gray-700 tw:dark:text-gray-300">
-              <%= subline %>
-            </p>
-          </div>
-
-          <div class="tw:flex tw:flex-none tw:gap-2">
-            <% @bike.e_bike_classes.each do |e_bike_class| %>
-              <%= render(Pages::EbikeRules::ClassTile::Component.new(e_bike_class:, class_unknown: @bike.class_unknown, size: :lg)) %>
-            <% end %>
-          </div>
+          <p class="tw:mt-1 tw:text-[15px] tw:text-gray-700 tw:dark:text-gray-300">
+            <%= subline %>
+          </p>
         </div>
 
-        <div class="tw:border-y tw:border-gray-200 tw:py-4 tw:dark:border-gray-700">
-          <%= render(UI::DefinitionList::Container::Component.new(term: :below)) do %>
-            <% specs.each do |label, value| %>
-              <%= render(UI::DefinitionList::Row::Component.new(label:, value:, render_with_no_value: true,
-                no_value_text: translation(".not_provided"))) %>
+        <%= render(Pages::EbikeRules::BikeSummary::Component.new(vehicle_type: @bike.vehicle_type, specs:, ul2849: @bike.ul2849, ul2271: @bike.ul2271)) do |summary| %>
+          <%# the three US classes, which a law outside the US doesn't sort by %>
+          <% if @us %>
+            <% summary.with_tiles do %>
+              <span class="tw:flex tw:gap-2">
+                <% tiles.each do |e_bike_class, optional, out_of_class_id| %>
+                  <%= render(Pages::EbikeRules::ClassTile::Component.new(e_bike_class:, class_unknown: @bike.class_unknown, optional:, size: :lg, explained: true, out_of_class_id:)) %>
+                <% end %>
+              </span>
             <% end %>
           <% end %>
-        </div>
-
-        <div class="tw:flex tw:flex-col tw:gap-3.5">
-          <h3 class="tw:text-[15px] tw:font-bold">
-            <%= translation(".ul_certification") %>
-          </h3>
-
-          <%= render(Pages::EbikeRules::UlBadge::Component.new(standard: 2849, status: @bike.ul2849)) %>
-          <%= render(Pages::EbikeRules::UlBadge::Component.new(standard: 2271, status: @bike.ul2271)) %>
-        </div>
+        <% end %>
 
         <% if @bike.manual? %>
           <p
@@ -116,7 +103,7 @@
             <%= translation(".entered_unverified") %>
           </p>
         <% else %>
-          <%= link_to bikebook_path(vehicle_models: @bike.bikebook_id), class: "twlink tw:inline-flex tw:items-center tw:gap-1.5 tw:text-[15px] tw:font-semibold" do %>
+          <%= link_to bikebook_path(vehicle_models: @bike.bikebook_id, view: "motors"), class: "twlink tw:inline-flex tw:items-center tw:gap-1.5 tw:text-[15px] tw:font-semibold" do %>
             <%= translation(".full_bikebook_entry") %>
             <%= helpers.inline_svg_tag("icons/external-link.svg", class: "tw:size-4", aria_hidden: true) %>
           <% end %>
@@ -126,7 +113,7 @@
 
     <%= render(UI::Card::Component.new(shadow: true, additional_classes: "tw:flex tw:flex-col tw:gap-4 tw:rounded-lg tw:p-[clamp(18px,3vw,28px)]!")) do %>
       <div>
-        <span class="<%= EYEBROW_CLASSES %>"><%= translation(".your_state") %></span>
+        <span class="<%= EYEBROW_CLASSES %>"><%= copy[:your_state] %></span>
         <h2 class="<%= NAME_CLASSES %>"><%= @state[:name] %></h2>
 
         <p class="tw:mt-1.5 tw:text-[15px] tw:text-gray-700 tw:dark:text-gray-300">
@@ -164,7 +151,7 @@
         </div>
 
         <p class="tw:text-[13px] tw:text-gray-700 tw:dark:text-gray-300">
-          <%= translation(".source_html", link: link_to(translation(".bikebook_name"), bikebook_path(vehicle_models: @law[:id]), class: "twlink")) %>
+          <%= source %>
         </p>
       <% else %>
         <div
@@ -175,7 +162,7 @@
           "
         >
           <strong class="tw:text-[15px]"><%= translation(".still_reviewing", state: @state[:name]) %></strong>
-          <span class="tw:text-[15px] tw:text-gray-700 tw:dark:text-gray-300"><%= translation(".still_reviewing_body") %></span>
+          <span class="tw:text-[15px] tw:text-gray-700 tw:dark:text-gray-300"><%= copy[:still_reviewing_body] %></span>
         </div>
       <% end %>
     <% end %>

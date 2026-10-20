@@ -33,6 +33,7 @@ SeedHelpers.with_clock do
   require File.expand_path("db/seeds/seed_organized_emails", Rails.root)
   require File.expand_path("db/seeds/seed_registration_sequence_template", Rails.root)
   require File.expand_path("db/seeds/seed_oauth_app", Rails.root)
+  require File.expand_path("db/seeds/seed_stripe_prices", Rails.root)
 end
 require File.expand_path("db/seeds/seed_counts", Rails.root)
 

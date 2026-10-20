@@ -1,0 +1,25 @@
+---
+en:
+  components:
+    pages:
+      my_account:
+        memberships:
+          show:
+            complimentary: Bike Index gave you this membership, so you don't pay for
+              it.
+            ends: Ends
+            manage_billing: Manage billing
+            new_members_pay: New %{level} members pay %{current_price}.
+            not_a_member: You aren't a Bike Index member.
+            per_month: per month
+            per_year: per year
+            see_membership_tiers: See membership tiers
+            started: Started
+            you_are_a_member: You're a %{level} member
+            you_pay_less: >-
+              You pay less than new members. %{level} is now %{current_price}, and
+              you keep your price as long as your membership stays active and you
+              stay on this plan.
+            you_pay_the_current_price: You pay the current price for %{level}.
+            your_membership: Your membership
+            your_price: Your price

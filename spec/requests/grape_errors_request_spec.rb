@@ -7,6 +7,8 @@ RSpec.describe GrapeErrors do
       expect(described_class.status_for(ActiveRecord::RecordNotFound.new)).to eq 404
       expect(described_class.status_for(APIAuthorization::Errors::OAuthUnauthorizedError.new(nil))).to eq 401
       expect(described_class.status_for(APIAuthorization::Errors::OAuthForbiddenError.new(nil))).to eq 403
+      expect(described_class.status_for(ActionController::BadRequest.new)).to eq 400
+      expect(described_class.status_for(ActionDispatch::Http::Parameters::ParseError.new("bad json"))).to eq 400
       expect(described_class.status_for(StandardError.new("boom"))).to eq 500
     end
 

@@ -39,8 +39,10 @@ export default class extends Controller {
     this.close()
   }
 
+  // The one under the pointer goes on top, though another was opened since
   showOnHover () {
     this.hoverActive = true
+    if (this.isOpen) claimFloatingZIndex(this.tooltipTarget)
     this.sync()
   }
 
@@ -94,7 +96,7 @@ export default class extends Controller {
   open () {
     if (this.isOpen) return
     this.isOpen = true
-    this.tooltipTarget.style.zIndex = claimFloatingZIndex(this.tooltipTarget)
+    claimFloatingZIndex(this.tooltipTarget)
     this.tooltipTarget.classList.remove('tw:hidden')
     document.addEventListener('keydown', this.keydownEscape)
     this.cleanup = autoUpdate(this.triggerTarget, this.tooltipTarget, () => this.updatePosition())

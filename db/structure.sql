@@ -3635,9 +3635,11 @@ CREATE TABLE public.social_accounts (
     last_error character varying,
     last_error_at timestamp without time zone,
     street character varying,
-    zipcode character varying,
-    state_id bigint,
-    country_id bigint
+    country_id bigint,
+    postal_code character varying,
+    region_record_id bigint,
+    region_string character varying,
+    street_2 character varying
 );
 
 
@@ -6568,6 +6570,13 @@ CREATE INDEX index_bikes_current_manufacturer_listing_order ON public.bikes USIN
 
 
 --
+-- Name: index_bikes_current_stolen_or_impounded_on_location; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bikes_current_stolen_or_impounded_on_location ON public.bikes USING btree (latitude, longitude) WHERE ((status = ANY (ARRAY[1, 3])) AND (example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL));
+
+
+--
 -- Name: index_bikes_on_creation_organization_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7443,10 +7452,10 @@ CREATE INDEX index_ownerships_on_sale_id ON public.ownerships USING btree (sale_
 
 
 --
--- Name: index_ownerships_on_user_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_ownerships_on_user_id_and_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_ownerships_on_user_id ON public.ownerships USING btree (user_id);
+CREATE INDEX index_ownerships_on_user_id_and_id ON public.ownerships USING btree (user_id, id) WHERE (user_id IS NOT NULL);
 
 
 --
@@ -8026,6 +8035,11 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261017210000'),
+('20261017200000'),
+('20261017174533'),
+('20261017174532'),
+('20261017120000'),
 ('20261014120000'),
 ('20261005170000'),
 ('20261005120000'),

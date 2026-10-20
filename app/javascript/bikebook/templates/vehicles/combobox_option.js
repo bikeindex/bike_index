@@ -11,10 +11,10 @@ const yearBadge = ({ first_year: first, final_year: final }) => {
   return first < new Date().getFullYear() ? html`<span class="tw:flex tw:items-baseline tw:gap-x-1">${years(`${first}-`)}${CURRENT}</span>` : CURRENT
 }
 
-const thumb = (photo, placeholderUrl) => html`<span class="tw:group tw:shrink-0" data-controller=${photo ? 'bikebook--image-fallback' : nothing}
+const thumb = (photo, placeholderUrl) => html`<span class="tw:group tw:shrink-0" data-controller=${photo ? 'image-fallback' : nothing}
   data-broken=${photo ? nothing : ''}>${photo
     ? html`<img alt="" loading="lazy" class="tw:h-8 tw:w-12 tw:rounded-sm tw:object-contain tw:group-data-broken:hidden"
-      data-action="error->bikebook--image-fallback#fail" src=${photo}>`
+      data-action="error->image-fallback#fallBack" src=${photo}>`
     : nothing}<span class="tw:hidden tw:h-8 tw:w-12 tw:items-center tw:justify-center tw:rounded-sm tw:bg-gray-100
     tw:group-data-broken:flex tw:dark:bg-gray-800"><img alt="" class="tw:h-6 tw:w-6" src=${placeholderUrl}></span></span>`
 
@@ -34,9 +34,3 @@ export const comboboxOption = ({ model, placeholderUrl, currencies }) => {
     class="tw:flex tw:items-center tw:gap-x-2">${thumb(model.stock_photo, placeholderUrl)}<span class="tw:min-w-0 tw:flex-1"><span
     class="tw:block tw:text-base"><strong>${model.manufacturer_name}</strong>${model.model ? ` ${model.model}` : nothing}</span>${details}</span></span></li>`
 }
-
-// An e-vehicle classification's option: its title and id
-export const classificationOption = ({ id, display }) => html`<li id=${uuid()} role="option" tabindex="-1" class="hw-combobox__option"
-  data-action="click->hw-combobox#selectOnClick" data-filterable-as=${display} data-autocompletable-as=${display} data-value=${id}
-  aria-selected="false"><span class="tw:block tw:text-base"><strong>${display}</strong></span><span class="tw:block tw:font-mono tw:text-xs
-  tw:text-gray-400 tw:dark:text-gray-500">${id}</span></li>`

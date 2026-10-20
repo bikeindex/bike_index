@@ -10,11 +10,11 @@ class BikebookController < ApplicationController
     render_page
   end
 
-  # /bikebook/m/segway/2025/gt3_pro, or without its m/, picks that vehicle ahead of any already picked,
-  # as /bikebook/evc/us/class_3 does that e-vehicle classification
+  # /bikebook/m/segway/2025/gt3_pro, or without its m/, or its id alone, /m/segway/2025/gt3_pro, picks that vehicle ahead
+  # of any already picked
   def vehicle
     path = params[:vehicle_model]
-    id = path.start_with?("evc/") ? path : "m/#{path.delete_prefix("m/")}"
+    id = "m/#{path.delete_prefix("m/")}"
     picked = params[:vehicle_models].to_s.split(",")
     vehicle_models = [id, *picked].uniq
     query = request.query_parameters.merge("vehicle_models" => vehicle_models.join(","))
@@ -48,6 +48,6 @@ class BikebookController < ApplicationController
     @twitter_card = "summary" unless @page_image
     @page_image ||= helpers.image_url("logos/bikebook_icon.png")
     render Pages::Bikebook::Show::Component.new(manifest_url: Integrations::Bikebook::Catalog::MANIFEST_URL,
-      market: request.env["HTTP_CF_IPCOUNTRY"]), status:
+      market: request.env["HTTP_CF_IPCOUNTRY"], state: EbikeRuleServices::StateLaws.state_from_location(request_location_hash)), status:
   end
 end

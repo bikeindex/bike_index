@@ -1,74 +1,26 @@
 import { html, nothing } from 'lit-html'
-import { amountDisplay } from 'bikebook/templates/helpers'
+import { OVERALL_LENGTH_ESTIMATE } from 'bikebook/frame_geometry'
+import { missing } from 'bikebook/templates/helpers'
 import { table } from 'bikebook/templates/ui/table'
 import { tooltip } from 'bikebook/templates/ui/tooltip'
-import { seriesBorder } from 'bikebook/templates/vehicles/geometry_overlay'
-import { brakesAt, tireWidth, typeLabel, wheelsAt } from 'bikebook/templates/vehicles/model_viewer'
+import { seriesBorders } from 'bikebook/templates/vehicles/geometry_overlay'
+import { cargoAt, isCargo, tireWidth, wheelsAt } from 'bikebook/templates/vehicles/model_viewer'
 import { array, isNumber, join, present, slice, sum } from 'bikebook/templates/values'
 
-// years come newest first
-const priced = (vehicle) => array(vehicle.years).find((year) => isNumber(year.original_msrp))
-const currency = (vehicle) => priced(vehicle)?.original_msrp_currency ?? 'USD'
-const highest = (values) => values.some(isNumber) ? Math.max(...values.filter(isNumber)) : null
-const motors = (key) => (vehicle) => highest(array(vehicle.motors).map((motor) => motor[key]))
-const modes = (key) => (vehicle) => highest(array(vehicle.motors).flatMap((motor) => array(motor.operating_modes)).map((mode) => mode[key]))
-// A position's teeth, and how many: drivetrain's "12_rear", else as many as are listed, which rear can't say when it
-// lists only its smallest and largest cog
-const gearing = (position) => (vehicle) => {
-  const teeth = array(vehicle.gearing?.[position])
-  const speeds = array(vehicle.drivetrain).map((each) => String(each).match(new RegExp(`^(\\d+)[ _]${position}$`, 'i'))?.[1]).find(Boolean)
-  if (teeth.length === 0 && !speeds) return null
-  return { teeth, count: speeds ? Number(speeds) : position === 'rear' && teeth.length === 2 ? null : teeth.length }
-}
-// Gearing as [key, number, content] parts, each with a number compared with the first vehicle's part of the same key:
-// the cogs' count, then each chainring, or the smallest and largest cog. Keyed from both ends, so a single chainring
-// compares with the largest
-const gearingParts = (cogs) => (presenter, { count, teeth }) => {
-  const shown = cogs ? [...new Set([teeth[0], teeth.at(-1)])] : teeth
-  return [
-    ...(count == null ? [] : [['count', cogs ? count : null, shown.length ? `${count}:` : String(count)]]),
-    ...shown.map((tooth, index) => {
-      const last = index === shown.length - 1
-      const key = last ? 'largest' : index === 0 ? 'smallest' : `chainring_${index}`
-      return [key, tooth, join([presenter.measurement(tooth, last ? 'teeth' : null), last ? '' : cogs ? '–' : ','])]
-    })
-  ]
-}
+// A row header's cell classes that keep it in view as a phone scrolls the table across, at its scroller's edge rather than
+// inside its gutter. Its inherited background outranks a row's own, which takes `!`
+export const PINNED_ROW_HEADER = 'tw:max-md:sticky tw:max-md:-left-(--gutter) tw:max-md:z-10 tw:max-md:border-r tw:max-md:bg-inherit'
 
 const GEOMETRY = ['reach', 'stack', 'top_tube_effective', 'head_angle', 'seat_angle', 'chainstay', 'standover', 'wheelbase']
-
-// `better` is the sign of a difference that's an improvement: a lower price, a longer range. 0 for one that's
-// neither, and none for a value that isn't compared. `parts` splits a value whose parts are each compared, and
-// `amount` shows a difference, given the number it's of
-const SPECS = [
-  { label: 'Year', read: (vehicle) => array(vehicle.years)[0]?.year, better: 1, format: String },
-  {
-    label: 'Price',
-    read: (vehicle) => priced(vehicle)?.original_msrp,
-    better: -1,
-    format: (cents, vehicle, presenter) => amountDisplay(cents, currency(vehicle), presenter.vocabulary.currencies),
-    comparable: (vehicle, first) => currency(vehicle) === currency(first)
-  },
-  { label: 'Vehicle type', read: typeLabel },
-  { label: 'Frame material', read: (vehicle) => vehicle.frame?.material },
-  { label: 'Rated power', read: motors('rated_power'), better: 1, unit: 'w' },
-  { label: 'Peak power', read: motors('peak_power'), better: 1, unit: 'w' },
-  { label: 'Torque', read: motors('max_torque'), better: 1, unit: 'nm' },
-  { label: 'Battery', read: motors('battery_size'), better: 1, unit: 'wh' },
-  { label: 'Range', read: modes('range_claimed'), better: 1, unit: 'km' },
-  { label: 'Top speed', read: modes('max_speed'), better: 1, unit: 'km/h' },
-  { label: 'Front travel', read: (vehicle, size) => size?.geometry?.travel_front ?? vehicle.suspension?.front?.travel, better: 1, unit: 'mm' },
-  { label: 'Rear travel', read: (vehicle, size) => size?.geometry?.travel_rear ?? vehicle.suspension?.rear?.travel, better: 1, unit: 'mm' }
-]
 // the size's, so it closes the geometry
 const WEIGHT = { label: 'Weight', read: (vehicle, size) => size?.geometry?.total_weight, better: -1, unit: 'kg' }
-const GEARING = [
-  { label: 'Chainrings', read: gearing('front'), better: 1, parts: gearingParts(false) },
-  { label: 'Cogs', read: gearing('rear'), better: 1, parts: gearingParts(true) }
-]
 
-// The compared models' headline specs side by side in their `sizes`, each column's numbers against the first's
-export const comparisonTable = ({ presenter, vehicles, sizes, frames = [] }) => {
+// The compared models' sizes, wheels and frames side by side in their `sizes`, each column's numbers against the
+// first's, keyed to the overlay by `frames`. `beside` the overlay, it shares a row with it once the window is wide enough.
+// A row's `better` is the sign of a difference that's an improvement, a longer wheelbase, 0 for one that's neither, and
+// none for a value that isn't compared. `parts` splits a value whose parts are each compared, and `amount` shows a
+// difference, given the number it's of
+export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], beside = false }) => {
   const named = vehicles.map(({ data }) => presenter.named(presenter.kit.schemas.vehicle, data))
   const [first] = named
   const show = (row, value, vehicle) => row.format?.(value, vehicle, presenter) ?? (row.unit ? presenter.measurement(value, row.unit, row.key) : value)
@@ -83,16 +35,14 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [] }) => 
       amount: (change) => presenter.measurement(change, unit, key, { difference: true })
     }
   })
-  const missing = html`<span class="twless-strong">—</span>`
   const wheels = new Map(named.map((vehicle, index) => [vehicle, wheelsAt(presenter, vehicles[index].data, sizes[index])]))
   const length = {
     ...geometry.find(({ key }) => key === 'wheelbase'),
-    label: html`Overall length (est.) ${tooltip({ text: 'The wheelbase plus each wheel’s radius, estimating its tire as tall as it’s wide' })}`,
+    label: html`Overall length (est.) ${tooltip({ text: `Overall length is ${OVERALL_LENGTH_ESTIMATE}` })}`,
     read: (vehicle) => {
       const listed = frames[named.indexOf(vehicle)]?.wheels
       return listed ? presenter.rounded(sum(Object.values(listed))) : null
-    },
-    better: 0
+    }
   }
   // in mm, though a wide tire reads in inches
   const tireDifference = (change) => presenter.measurement(change, 'mm')
@@ -101,7 +51,7 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [] }) => 
       label: `${presenter.humanize(position)} wheel`,
       read: (vehicle) => wheels.get(vehicle)[position].parts,
       better: 0,
-      parts: (_, parts) => parts.map(([key, number, content], index) => [key, number, index < parts.length - 1 ? join([content, ',']) : content]),
+      parts: (parts) => parts.map(([key, number, content], index) => [key, number, index < parts.length - 1 ? join([content, ',']) : content]),
       amount: tireDifference
     },
     {
@@ -112,8 +62,6 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [] }) => 
       amount: tireDifference
     }
   ])
-  const brakes = new Map(named.map((vehicle, index) => [vehicle, brakesAt(presenter, vehicles[index].data, sizes[index])]))
-  const brakeRows = [{ label: 'Brakes', read: (vehicle) => brakes.get(vehicle).types }, { label: 'Brake rotors', read: (vehicle) => brakes.get(vehicle).rotors }]
 
   const changed = (row, number, base, fallback) => {
     if (!isNumber(number) || !isNumber(base)) return nothing
@@ -126,13 +74,13 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [] }) => 
     return html`<span class="tw:block tw:text-xs ${color} tw:[&_span[title]]:text-gray-400 tw:dark:[&_span[title]]:text-gray-500">${
       change > 0 ? '+' : '−'}${row.amount?.(Math.abs(change)) ?? fallback(Math.abs(change))}</span>`
   }
-  const compared = (row, vehicle) => vehicle !== first && row.better !== undefined && (row.comparable?.(vehicle, first) ?? true)
+  const compared = (row, vehicle) => vehicle !== first && row.better !== undefined
 
   const difference = (row, value, base, vehicle) => compared(row, vehicle) ? changed(row, value, base, (amount) => show(row, amount, vehicle)) : nothing
 
   const partsCell = (row, value, baseParts, vehicle) => {
     const comparing = compared(row, vehicle)
-    return html`<span class="tw:inline-flex tw:items-start tw:gap-x-1">${row.parts(presenter, value).map(([key, number, content]) =>
+    return html`<span class="tw:inline-flex tw:items-start tw:gap-x-1">${row.parts(value).map(([key, number, content]) =>
       html`<span>${content}${comparing ? changed(row, number, baseParts.get(key), String) : nothing}</span>`)}</span>`
   }
 
@@ -147,7 +95,7 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [] }) => 
 
   const records = (rows) => rows.map((row) => [row, named.map((vehicle, index) => row.read(vehicle, sizes[index]))])
     .filter(([, values]) => values.some(present)).map(([row, values]) => {
-      const baseParts = new Map(row.parts && present(values[0]) ? row.parts(presenter, values[0]) : [])
+      const baseParts = new Map(row.parts && present(values[0]) ? row.parts(values[0]) : [])
       return {
         label: row.label,
         cell: (index) => {
@@ -158,28 +106,28 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [] }) => 
         }
       }
     })
-  const geometryRecords = records([...geometry, length, WEIGHT])
-  const geometryHeading = { label: html`<span class="tw:block tw:pt-3 tw:text-xs tw:tracking-wider tw:text-[#715eb2] tw:uppercase">Geometry</span>`, cell: () => nothing }
-  const rows = [
-    ...(sizes.some(Boolean) ? [{ label: 'Size', cell: sizeCell }] : []),
-    ...records([...SPECS, ...wheelRows, ...brakeRows, ...GEARING]),
-    ...(geometryRecords.length ? [geometryHeading, ...geometryRecords] : [])
-  ]
+  const size = { label: 'Size', cell: sizeCell, className: 'tw:bg-blue-50! tw:dark:bg-blue-950!' }
+  const sizeRows = sizes.some(Boolean) ? [size] : []
+  const cargos = new Map(named.map((vehicle, index) => [vehicle, cargoAt(presenter, vehicles[index].data, sizes[index])]))
+  const cargoRows = vehicles.some(({ data }) => isCargo(data)) ? records([{ label: 'Cargo', read: (vehicle) => cargos.get(vehicle) }]) : []
+  const rows = [...records(wheelRows), ...cargoRows, ...sizeRows, ...records([...geometry, length, WEIGHT])]
+  if (rows.length === 0) return nothing
 
   // Out to the window's edges, the table at least the page's 78rem column and wider as its vehicles need, scrolling
   // only once it's the window's width; its own min-w-full would make it the window's width
-  return html`<section aria-label="Comparison" class="tw:mt-6 tw:mx-[calc(50%-50vw)] tw:w-screen tw:px-4">${table({
+  return html`<section aria-label="Sizes & geometry comparison" class="tw:mt-6 tw:twpagebleed tw:px-4 ${beside ? 'tw:min-[1500px]:mx-0 tw:min-[1500px]:w-auto tw:min-[1500px]:min-w-0 tw:min-[1500px]:flex-1 tw:min-[1500px]:px-0' : ''}">${table({
     classes: 'tw:mx-auto tw:min-w-[min(100%,78rem)]!',
     records: rows,
     columns: [
-      { label: html`<span class="tw:sr-only">Spec</span>`, rowHeader: true, classes: 'tw:font-bold tw:whitespace-nowrap tw:align-top', cell: (record) => record.label },
+      { label: html`<span class="tw:sr-only">Spec</span>`, rowHeader: true, classes: 'tw:font-bold tw:max-md:min-w-28 tw:md:whitespace-nowrap tw:align-top', cellClass: (record) => `${PINNED_ROW_HEADER} ${record.className ?? ''}`, cell: (record) => record.label },
       ...named.map((vehicle, index) => {
-        const border = seriesBorder(frames, index)
+        const border = seriesBorders(frames, index)
         return {
           label: html`<span class="tw:block tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">${vehicle.manufacturer}</span>${vehicle.model}`,
           classes: 'tw:min-w-48 tw:align-top',
+          headerClasses: border.top,
           // a model's name can wrap in its header, but not a value
-          cellClass: (record) => `tw:whitespace-nowrap ${record === rows.at(-1) ? border : ''}`,
+          cellClass: (record) => `tw:whitespace-nowrap ${record.className ?? ''}`,
           cell: (record) => record.cell(index)
         }
       })
