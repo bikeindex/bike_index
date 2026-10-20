@@ -43,8 +43,7 @@ async function load ({ manifestUrl, ids, jurisdictions, rulesUrl }) {
     activity_name: activityNames[model.primary_activity],
     type_name: typeNames[model.vehicle_type],
     searchText: `${model.display}\n${model.id}`.toLowerCase(),
-    sortYear: model.final_year ?? currentYear,
-    sortPrice: model.msrp_cents ?? 0
+    sortYear: model.final_year ?? currentYear
   }))
   byId = new Map(models.map((model) => [model.id, model]))
   // "California Moped", which its name leaves off the state of, and a group has none; "US Class 3 e-bike"
@@ -186,13 +185,16 @@ const outranks = (a, b) => {
   return index !== -1 && a[index]
 }
 
-// Newest and priciest first unless asked otherwise, kept per pair of directions so a query only has to filter
-function sorted ({ year_dir: yearDir, price_dir: priceDir }) {
-  const key = `${yearDir}/${priceDir}`
+// Newest and priciest first unless asked otherwise, by year then price unless `sort` puts price first, the unpriced last
+// either way. Kept per order, so a query only has to filter
+function sorted ({ sort, year_dir: yearDir, price_dir: priceDir }) {
+  const key = `${sort}/${yearDir}/${priceDir}`
   if (!orders.has(key)) {
     const direction = (dir) => dir === 'asc' ? 1 : -1
-    orders.set(key, [...models].sort((a, b) =>
-      direction(yearDir) * (a.sortYear - b.sortYear) || direction(priceDir) * (a.sortPrice - b.sortPrice) || (a.id < b.id ? -1 : 1)))
+    const byYear = (a, b) => direction(yearDir) * (a.sortYear - b.sortYear)
+    const byPrice = (a, b) => (a.msrp_cents == null) - (b.msrp_cents == null) || direction(priceDir) * (a.msrp_cents - b.msrp_cents)
+    const [first, second] = sort === 'price' ? [byPrice, byYear] : [byYear, byPrice]
+    orders.set(key, [...models].sort((a, b) => first(a, b) || second(a, b) || (a.id < b.id ? -1 : 1)))
   }
   return orders.get(key)
 }

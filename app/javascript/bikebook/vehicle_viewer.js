@@ -50,9 +50,9 @@ export class VehicleViewer {
     const rowClasses = comparing
       ? 'tw:justify-center-safe tw:overflow-x-auto tw:max-md:snap-x tw:max-md:snap-mandatory tw:max-md:px-4 tw:max-md:*:w-[85vw] tw:max-md:*:shrink-0 tw:max-md:*:snap-center'
       : 'tw:flex-col tw:lg:flex-row tw:lg:justify-center'
-    const cardRow = (margin, cards, aligned = false) => html`<div ?data-comparison=${comparing} data-controller=${comparing && aligned ? 'bikebook--align-rows' : nothing} class="${margin} tw:max-[500px]:mx-[calc(50%-50vw)] tw:max-[500px]:w-screen ${comparing
-      ? 'tw:md:mx-[calc(50%-50vw)] tw:md:w-screen tw:md:px-4'
-      : 'tw:lg:mx-[calc(50%-50vw)] tw:lg:w-screen tw:lg:px-4'}"><div class="tw:flex tw:gap-8 ${rowClasses}">${cards}</div></div>`
+    const cardRow = (margin, cards, aligned = false) => html`<div ?data-comparison=${comparing} data-controller=${comparing && aligned ? 'bikebook--align-rows' : nothing} class="${margin} tw:max-[500px]:twpagebleed ${comparing
+      ? 'tw:md:twpagebleed tw:md:px-4'
+      : 'tw:lg:twpagebleed tw:lg:px-4'}"><div class="tw:flex tw:gap-8 ${rowClasses}">${cards}</div></div>`
     // each vehicle's `key` on a card of its own, named as its full card is, after whatever `lead` shows
     // `keyed`, each topped in its frame's color in the overlay
     const cards = (key, none, content, { lead, keyed = false } = {}) => vehicles.map(({ data, value }, index) => {
@@ -70,7 +70,7 @@ export class VehicleViewer {
     const views = {
       basics: () => basics({ presenter, vehicles, class3Throttle }),
       // the overlay beside the table once the window is wide, above it until then
-      geometry: () => html`<div class="tw:flex tw:flex-col tw:min-[1500px]:mx-[calc(50%-50vw)] tw:min-[1500px]:w-screen tw:min-[1500px]:flex-row
+      geometry: () => html`<div class="tw:flex tw:flex-col tw:min-[1500px]:twpagebleed tw:min-[1500px]:flex-row
         tw:min-[1500px]:items-start tw:min-[1500px]:gap-6 tw:min-[1500px]:px-4">${geometryOverlay({ ...compared, beside: true })}${
         comparisonTable({ ...compared, beside: true })}</div>${cardRow('tw:mt-6', cards('sizes', 'No sizes listed', (data, value) =>
         html`<div class="tw:-mx-(--gutter)">${sizesOf({ presenter, data, others: others(value), selectedSize: selectedSizes.get(value), sizePath: sizePath(value) })}</div>`,

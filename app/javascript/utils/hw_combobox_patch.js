@@ -7,10 +7,21 @@ import HwComboboxController from 'controllers/hw_combobox_controller'
 // gem's lazy turbo-frame (`source.prime(controller)`), in the browser rather than asking the server
 export const localSources = new WeakMap()
 
+// Pressing an option would blur the input onto the page, which a multiselect then reopens its list over -
+// open, with nothing focused to hear Escape or to blur from. The click back in still selects the display,
+// as it did after that blur
+const keepFocusOnPick = (event) => {
+  if (!event.target.closest('[role=option]')) return
+
+  event.preventDefault()
+  event.currentTarget.querySelectorAll('[role=combobox]').forEach((input) => clickedSinceFocus.delete(input))
+}
+
 const connect = HwComboboxController.prototype.connect
 HwComboboxController.prototype.connect = function () {
   const source = localSources.get(this.element)
   if (source?.prime) this.element.querySelector('.hw_combobox__pagination__wrapper turbo-frame')?.remove()
+  this.element.addEventListener('mousedown', keepFocusOnPick)
   connect.call(this)
   source?.prime?.(this)
 }
@@ -115,10 +126,9 @@ const clickedSinceFocus = new WeakSet()
 
 const forgetClicks = ({ currentTarget }) => clickedSinceFocus.delete(currentTarget)
 
-// The entering click, not the focus: step 1 autofocuses its manufacturer, so the first
-// click there brings no focus event to hang this on. By click the caret is already placed,
-// so the selection sticks without preventing anything, and the gem's own refocus while
-// filtering never selects - that would make the next keystroke replace the query
+// The entering click, not the focus: step 1 autofocuses its manufacturer, and a pick keeps
+// the focus, so the first click there brings no focus event to hang this on. The gem's own
+// refocus while filtering never selects - that would make the next keystroke replace the query
 const selectDisplay = ({ currentTarget }) => {
   if (clickedSinceFocus.has(currentTarget)) return
 
@@ -126,10 +136,17 @@ const selectDisplay = ({ currentTarget }) => {
   if (currentTarget.value) currentTarget.select()
 }
 
+// Pressing inside a focused input's selected text places the caret only once the click is
+// over, collapsing the selection selectDisplay just made
+const holdCaret = (event) => {
+  if (document.activeElement === event.currentTarget && !clickedSinceFocus.has(event.currentTarget)) event.preventDefault()
+}
+
 // Stimulus calls these per element, for targets the gem declares but leaves without a
 // callback -- the seam that also reaches the small-viewport dialog's own combobox
 const listenForClickIntoFocus = function (input) {
   input.addEventListener('focus', forgetClicks)
+  input.addEventListener('mousedown', holdCaret)
   input.addEventListener('click', selectDisplay)
 }
 

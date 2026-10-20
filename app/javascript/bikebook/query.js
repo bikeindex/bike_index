@@ -8,7 +8,7 @@ export const searching = (url) => {
   return url.searchParams.has('search') || models.length !== 1 || classifications.length > 0
 }
 
-export const FILTERS = [...LISTS, ...SINGLES, ...RANGES, 'electric', 'jurisdiction', 'year_dir', 'price_dir']
+export const FILTERS = [...LISTS, ...SINGLES, ...RANGES, 'electric', 'jurisdiction', 'sort', 'year_dir', 'price_dir']
 
 // to_query: keys sorted and CGI-escaped, blank values dropped, commas and slashes left readable
 export const toQuery = (params) => {
