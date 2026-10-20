@@ -19,12 +19,13 @@ module SharedBlocks
         def menu_items
           [search_item(:mobile),
             marketplace_item(:mobile),
+            register_item(:mobile),
             {type: :divider, item_class: SIDE_CLASSES.fetch(:mobile)},
             *account_items,
             {label: translation(".help"), path: help_path},
             {label: translation(".stolen_bike"), path: stolen_index_path},
             {label: translation(".donate"), path: why_donate_path},
-            {label: translation(".register"), path: register_path, match_paths: "#{register_path}/**"},
+            register_item(:desktop),
             marketplace_item(:desktop),
             search_item(:desktop)]
         end
@@ -38,6 +39,11 @@ module SharedBlocks
 
         def marketplace_item(side)
           {label: translation(".marketplace"), path: search_marketplace_path,
+           item_class: SIDE_CLASSES.fetch(side)}
+        end
+
+        def register_item(side)
+          {label: translation(".register"), path: register_path, match_paths: "#{register_path}/**",
            item_class: SIDE_CLASSES.fetch(side)}
         end
 
