@@ -106,10 +106,9 @@ const clickedSinceFocus = new WeakSet()
 const forgetClicks = ({ currentTarget }) => clickedSinceFocus.delete(currentTarget)
 
 // The entering click, not the focus: step 1 autofocuses its manufacturer, so the first
-// click there brings no focus event to hang this on. On its release, which would otherwise
-// collapse a selection it lands inside - the gem selects the display as it refocuses after
-// a pick. Its refocus while filtering never selects - that would make the next keystroke
-// replace the query
+// click there brings no focus event to hang this on. On its release, which would collapse the
+// selection the gem's refocus after a pick leaves. Its refocus while filtering never selects -
+// that would make the next keystroke replace the query
 const selectDisplay = (event) => {
   const input = event.currentTarget
   if (clickedSinceFocus.has(input)) return
