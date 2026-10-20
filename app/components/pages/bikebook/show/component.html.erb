@@ -320,14 +320,15 @@
 
   <%#
     The tiles the Overview shows, as /ebike-rules does: the US classes', each also as only an optional mode brings it,
-    and the e-moto's, also as only an optional throttle brings it, each a tooltip of its card
+    and the e-moto's, also as only an optional throttle brings it, and each also out of class in a jurisdiction whose law
+    bars a Class 3's throttle, each a tooltip of its card
   %>
 
-  <% ([1, 2, 3].product([nil, "throttle", "assist"]) + [[nil, nil], [nil, "throttle"]]).each do |e_bike_class, optional| %>
+  <% ([1, 2, 3].product([nil, "throttle", "assist"]) + [nil].product([nil, "throttle"], [nil, *EbikeRuleServices::StateLaws.out_of_class_ids])).each do |e_bike_class, optional, out_of_class_id| %>
     <template
-      data-bikebook-class-badge="<%= [e_bike_class || "emoto", optional].compact.join("/") %>"
+      data-bikebook-class-badge="<%= [e_bike_class || "emoto", optional, out_of_class_id].compact.join("/") %>"
     >
-      <%= render(Pages::EbikeRules::ClassTile::Component.new(e_bike_class:, optional:, size: :lg, explained: true)) %>
+      <%= render(Pages::EbikeRules::ClassTile::Component.new(e_bike_class:, optional:, size: :lg, explained: true, out_of_class_id:)) %>
     </template>
   <% end %>
 

@@ -83,7 +83,7 @@ module EbikeRuleServices
       optional.flat_map { |mode| (numbers.call(mode) - sold).map { [it, mode["mode"]] } }.to_h
     end
 
-    # An app update unlocks a mode the bike is sold with
+    # A mode an app update unlocks is stock, not optional: a Class 1 whose app updates it to Class 3 is sold as a Class 3
     def stock?(mode) = [nil, "stock", "app_update"].include?(mode["availability"])
 
     # An app update replaces the modes of its kind the bike leaves the factory with, as a Class 3 assist does a Class 1's

@@ -46,15 +46,17 @@ async function load ({ manifestUrl, ids, jurisdictions, rulesUrl }) {
     sortYear: model.final_year ?? currentYear
   }))
   byId = new Map(models.map((model) => [model.id, model]))
+  // the index labels the out of class markers, which the vocabulary has no record of: "Out of class in California"
+  const labels = Object.entries(index.filter_options.e_vehicle_classification).map(([id, label]) => [id, { label, title: label, marker: true }])
   // "California Moped", which its name leaves off the state of, and a group has none; "US Class 3 e-bike"
-  classifications = Object.fromEntries(Object.entries(vocabulary.e_vehicle_classifications).map(([id, record]) => {
+  classifications = Object.fromEntries([...labels, ...Object.entries(vocabulary.e_vehicle_classifications).map(([id, record]) => {
     const code = record.jurisdiction
     const state = code?.startsWith('US-') && (jurisdictions[code] ?? code)
     const label = [state || code, record.name].filter(Boolean).join(' ')
     // "Alabama (AL)", "United States"
     const jurisdictionName = state ? `${state} (${code.slice(3)})` : code && (jurisdictions[code] ?? code)
     return [id, { ...record, label, jurisdiction_name: jurisdictionName, title: /^Class \d+$/.test(record.name) ? `${label} e-bike` : label }]
-  }))
+  })])
   return { vocabulary: { ...vocabulary, e_vehicle_classifications: classifications }, kit, options: options(index) }
 }
 
@@ -67,8 +69,8 @@ function options ({ manufacturers, vehicle_types: vehicleTypes, filter_options: 
     manufacturer: Object.entries(manufacturers).filter(([slug]) => perManufacturer.has(slug)).sort(([, a], [, b]) => a.localeCompare(b))
       .map(([value, display]) => ({ value, display, count: perManufacturer.get(value) })),
     vehicle_type: counted('vehicle_type', vehicleTypes.map(({ slug, name }) => [slug, name])),
-    // "Canada (CA)", as UI::Forms::ComboboxState shows a state
-    market: counted('market', Object.entries(market).sort(([, a], [, b]) => a.localeCompare(b)))
+    // "Canada (CA)", as UI::Forms::ComboboxState shows a state; only those with models, as most of the catalog's have none
+    market: counted('market', Object.entries(market).sort(([, a], [, b]) => a.localeCompare(b))).filter(({ count }) => count)
       .map((option) => ({ ...option, name: option.display, display: `${option.display} (${option.value})` })),
     ...Object.fromEntries(Object.entries(filterOptions).map(([name, labels]) => [name, counted(name, Object.entries(labels))]))
   }
@@ -226,13 +228,13 @@ function filter (params) {
       (priceMin == null || model.msrp_cents >= priceMin * 100) && (priceMax == null || model.msrp_cents <= priceMax * 100)))
 }
 
-// out_of_class is the catalog's own marker, as a model with no classified mode is unknown rather than out of class, and
-// out_of_class/US-CA its marker for one in no class in that state alone, where it's out of class rather than the US
+// evc/out_of_class is the catalog's own marker, as a model with no classified mode is unknown rather than out of class,
+// and evc/out_of_class/us/ca its marker for one in no class in that state alone, where it's out of class rather than the US
 // classes it carries. A state's class matches the models carrying its groups
 function propelled ({ electric, e_vehicle_classifications: carried = [] }, propulsion, jurisdiction) {
   if (propulsion === '0' || propulsion === '1') return electric === (propulsion === '1')
   const id = propulsion.replace(/^class_/, 'evc/us/class_')
-  if (/^(out_of_class|evc\/us\/class_\d)$/.test(id) && carried.includes(`out_of_class/US-${jurisdiction}`)) return id === 'out_of_class'
+  if (/^evc\/(out_of_class|us\/class_\d)$/.test(id) && carried.includes(`evc/out_of_class/us/${jurisdiction?.toLowerCase()}`)) return id === 'evc/out_of_class'
   return [id, ...(classifications[id]?.groups ?? [])].some((classification) => carried.includes(classification))
 }
 

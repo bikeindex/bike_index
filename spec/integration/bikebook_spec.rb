@@ -597,10 +597,10 @@ RSpec.describe "Bikebook", :js, type: :system do
     click_on "More filters", match: :first
     expect(page).to have_field("Market", with: "Canada (CA)")
     find_field("Market").click
-    # by name rather than the catalog's order, which is by code
+    # by name rather than the catalog's order, which is by code, and only those with models
     # each with its code, as a state's shown, rather than a count
     markets = all("#market-hw-listbox [role='option']").map(&:text)
-    expect(markets.first(6)).to eq ["Any", "Argentina (AR)", "Australia (AU)", "Canada (CA)", "China (CN)", "European Union (EU)"]
+    expect(markets).to eq ["Any", "Canada (CA)", "China (CN)", "United Arab Emirates (AE)", "United States (US)"]
     find("#market-hw-listbox [role='option']", exact_text: "Any").click
     expect(page).to have_css("#vehicle-models-count", exact_text: "(30 matching models)")
     expect(page).to have_current_path(/[?&]market=all\b/)
@@ -738,11 +738,13 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_current_path("/bikebook?search=1&filters=1")
 
     # one the catalog has out of class in California is the e-moto's tile there, one whose optional throttle would put it
-    # there its Class 3 then the e-moto's outlined, and their classes' again in another state
+    # there its Class 3 then the e-moto's outlined, each e-moto's with California's ID, and their classes' again in another state
     visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_adv,m/specialized/2025/haul_st", jurisdiction: "CA", filters: 1)
     tiles = -> { all("[aria-label='Overview comparison'] td:has(button[aria-label$='e-bike'])").map { |cell| cell.all("button[aria-label$='e-bike']").map { it[:"aria-label"] } } }
     expect(page).to have_css("[aria-label='Overview comparison'] td button[aria-label='E-moto, not an e-bike']", count: 2, wait: 10)
     expect(tiles.call).to eq [["E-moto, not an e-bike"], ["Class 3 e-bike", "E-moto, not an e-bike"]]
+    expect(all("[aria-label='Overview comparison'] td button[aria-label$='e-bike'] + [role='tooltip'] code", visible: :all).map { it.text(:all).strip })
+      .to eq ["evc/out_of_class/us/ca", "evc/us/class_3", "evc/out_of_class/us/ca"]
     choose_option("Jurisdiction", "Colorado")
     expect(page).to have_no_css("[aria-label='Overview comparison'] td button[aria-label='E-moto, not an e-bike']")
     expect(tiles.call).to eq [["Class 2 e-bike", "Class 3 e-bike"], ["Class 2 e-bike", "Class 3 e-bike"]]
@@ -1211,6 +1213,11 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_css("#classification-cards h3", exact_text: "Moped, up to 2 hp and 30 mph", wait: 10)
     expect(page).to have_css("#classification-cards li", text: "Riders must be 16 or older to ride a Class 3")
     expect(cards_asked.count).to eq 3
+    # as is an out of class marker, which the vocabulary has no record of, its card the e-moto's
+    type_into(vehicle_field, "evc/out_of_class/us/ca")
+    retry_on_detach { find("[role='option'][data-value='evc/out_of_class/us/ca']", text: "Out of class in California").click }
+    expect(page).to have_css("#classification-cards h3", exact_text: "Not an e-bike", wait: 10)
+    expect(page).to have_css(".hw-combobox__chip", text: "Out of class in California")
 
     # a class that only comes with an optional mode goes on its own line, after the mode
     visit bikebook_path(vehicle_models: "m/specialized/2025/haul_st")

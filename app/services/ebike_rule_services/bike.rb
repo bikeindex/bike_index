@@ -5,7 +5,7 @@ module EbikeRuleServices
   # which has no bikebook_id. e_bike_class is nil for a motorized vehicle that isn't Class 1, 2 or 3, or
   # whose record says too little to tell, which is class_unknown. e_vehicle_classifications are the ids its record carries.
   # vehicle_type is its catalog type, "cargo_bike". stock_throttle is a throttle it's sold with, rather than one sold separately. optional_classes are the US classes only
-  # a mode it isn't sold with - an upgrade, an app update - brings, by that mode's name, "throttle" or "assist".
+  # a mode it isn't sold with - an upgrade, never an app update, which is stock - brings, by that mode's name, "throttle" or "assist".
   # ul2849 and ul2271 are :certified or :unknown, or :unrecorded for a bike entered by hand. watts is rated power, which
   # states cap; peak_watts only stands in for a model the catalog records no rating for. Speeds are in km/h too, as the
   # catalog records them, for a law outside the US; assists_past_kmh is a hand entry's, past any speed it gives

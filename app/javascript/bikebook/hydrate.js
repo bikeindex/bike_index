@@ -32,7 +32,7 @@ const fillFields = (root, filters) => {
     root.getElementById('jurisdiction-hw-hidden-field').setAttribute('value', jurisdiction)
     combobox(root, 'jurisdiction').dataset.hwComboboxPrefilledDisplayValue = state.dataset.autocompletableAs
   }
-  // out_of_class is in a state's classes as well as the US ones; the jurisdiction's hidden ones uncheck on connecting
+  // evc/out_of_class is in a state's classes as well as the US ones; the jurisdiction's hidden ones uncheck on connecting
   for (const value of filters.electric.split(',')) root.querySelectorAll(`input[name="electric"][value="${CSS.escape(value)}"]`).forEach((input) => input.setAttribute('checked', ''))
 }
 
@@ -44,7 +44,7 @@ const legalClasses = (root, filters, { e_vehicle_classifications: classification
     return Object.keys(classifications).filter((id) => classifications[id].e_bike_law && classifications[id].jurisdiction === filters.market)
   }
   const classes = root.querySelector(`[data-jurisdiction="${CSS.escape(filters.jurisdiction)}"]`) ?? root.querySelector('[data-jurisdiction="US"]')
-  return [...classes.querySelectorAll('input[name="electric"]')].map(({ value }) => value).filter((value) => value !== 'out_of_class')
+  return [...classes.querySelectorAll('input[name="electric"]')].map(({ value }) => value).filter((value) => value !== 'evc/out_of_class')
 }
 
 // `url`'s filters, "all" markets as Any, without which it and the jurisdiction - a state's abbreviation, or US - are the
@@ -121,7 +121,7 @@ export async function hydrate (catalog, source, shell, url) {
   // the visitor's country, when it's a market with models
   const panel = panelOf(root)
   const located = panel.getAttribute(MARKET_ATTRIBUTE)
-  panel.setAttribute(MARKET_ATTRIBUTE, catalog.options.market.some(({ value, count }) => value === located && count) ? located : '')
+  panel.setAttribute(MARKET_ATTRIBUTE, catalog.options.market.some(({ value }) => value === located) ? located : '')
   const filters = filtersAt(catalog, root, url)
   const [found, { filteredCount }] = await Promise.all([pickedOf(catalog, url, filters), catalog.search(filters, 0, 0)])
   const vehicles = found.slice(0, MAX_COMPARE)
@@ -151,7 +151,8 @@ export async function hydrate (catalog, source, shell, url) {
   for (const input of root.querySelectorAll('input[name="electric"]')) {
     const id = input.value.replace(/^class_/, 'evc/us/class_')
     const classification = catalog.vocabulary.e_vehicle_classifications[id]
-    if (classification) input.closest('label').after(fragmentOf(tooltip({ text: classification.title, body: viewer.presenter.classificationTooltip(id) })))
+    // a marker's checkbox has the page's own tooltip
+    if (classification && !classification.marker) input.closest('label').after(fragmentOf(tooltip({ text: classification.title, body: viewer.presenter.classificationTooltip(id) })))
   }
 
   renderInto(root.getElementById('vehicle-viewers'), viewer.render(vehicles, url, preferredSize(),
