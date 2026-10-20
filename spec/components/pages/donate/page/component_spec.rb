@@ -3,14 +3,8 @@
 require "rails_helper"
 
 RSpec.describe Pages::Donate::Page::Component, type: :component do
+  include_context :active_stripe_prices
   let(:options) { {stripe_prices:, recovery_displays: [], initial_amount:, current_user:, referral_source: "newsletter"} }
-  let(:currency_enum) { "usd" }
-  let(:stripe_prices) do
-    {basic: 500, plus: 1500, patron: 5000}.flat_map do |membership_level, amount_cents|
-      [FactoryBot.build(:stripe_price, membership_level:, currency_enum:, amount_cents:),
-        FactoryBot.build(:stripe_price, membership_level:, currency_enum:, interval: "yearly", amount_cents: amount_cents * 10)]
-    end
-  end
   let(:initial_amount) { nil }
   let(:current_user) { nil }
   let(:component) { render_inline(described_class.new(**options)) }
