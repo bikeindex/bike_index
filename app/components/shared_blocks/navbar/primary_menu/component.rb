@@ -32,8 +32,13 @@ module SharedBlocks
         def side_items(side)
           [{label: translation(".search"), path: helpers.default_bike_search_path},
             {label: translation(".marketplace"), path: search_marketplace_path},
-            {label: translation(".register"), path: register_path, match_paths: "#{register_path}/**"}]
+            register_item(side)]
             .map { it.merge(item_class: SIDE_CLASSES.fetch(side)) }
+        end
+
+        def register_item(side)
+          label = (side == :mobile) ? translation(".register_a_new_bike") : translation(".register")
+          {label:, path: register_path, match_paths: "#{register_path}/**"}
         end
 
         def account_items

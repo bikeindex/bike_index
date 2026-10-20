@@ -9,6 +9,7 @@ en:
           log_in: log in
           marketplace: Marketplace
           register: Register
+          register_a_new_bike: Register a new bike
           search: Search
           sign_up: Sign up
           stolen_bike: Stolen bike?
