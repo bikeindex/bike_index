@@ -673,8 +673,8 @@
           <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :state, label_text: translation(".checker_state"),
             required: true, wrapper_class: "")) do %>
             <%= render(UI::Forms::Select::Component.new(form_builder: f, attribute: :state, required: true,
-              option_tags: EbikeRuleServices::StateLaws::STATES.map { [it[:name], it[:abbr]] },
-              options: {selected: @checker_state, prompt: translation(".checker_choose_state")})) %>
+              option_tags: EbikeRuleServices::StateLaws::STATES.map { [it[:name], "US-#{it[:abbr]}"] },
+              options: {selected: @checker_state && "US-#{@checker_state}", prompt: translation(".checker_choose_state")})) %>
           <% end %>
 
           <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :top_speed, label_text: translation(".checker_top_speed"),
