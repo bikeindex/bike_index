@@ -3,7 +3,8 @@
 module Pages
   module LandingPages
     module ForCitiesEducation
-      # The e-bike education flow as three example organizations would set it up
+      # The e-bike education flow as three example organizations would set it up, rendered
+      # through the registration flow's own acknowledgment parts
       class Component < ApplicationComponent
         DEFAULT_ORGANIZATION = :school
         # Here rather than on the cities page, which would put that page in this cached fragment's digest
@@ -13,77 +14,63 @@ module Pages
 
         def organizations = @organizations ||= build_organizations
 
+        # The city's programs carry its pages, each adding a page of its own
         def build_organizations
-          city = translation(".city_name")
-          school = translation(".school_name")
-          housing = translation(".housing_name")
+          city = sequence(translation(".city_name"), translation(".city_name"))
+          city_pages = pages(city, [battery, city_riding, city_rules])
+          school = sequence(translation(".school_name"), translation(".school_tab"))
+          housing = sequence(translation(".housing_name"), translation(".housing_tab"))
+          riverside = sequence(translation(".riverside_name"), translation(".riverside_tab"))
           [
-            {key: :city, tab: city, name: city, blurb: translation(".city_blurb"),
-             steps: [battery(city, translation(".city_battery_sub")), city_riding(city), city_rules(city), consent(city)]},
-            {key: :school, tab: translation(".school_tab"), name: school, blurb: translation(".school_blurb"),
-             steps: [battery(city, translation(".school_battery_sub")), school_riding(school), school_rules(school), consent(school)]},
-            {key: :housing, tab: translation(".housing_tab"), name: housing, blurb: translation(".housing_blurb"),
-             steps: [housing_battery(housing), city_riding(city), housing_rules(housing), consent(housing)]}
+            {key: :city, blurb: translation(".city_blurb"), sequence: city, pages: city_pages},
+            {key: :school, blurb: translation(".school_campus_blurb"), sequence: school, pages: city_pages + pages(school, [school_rules])},
+            {key: :housing, blurb: translation(".housing_building_blurb"), sequence: housing, pages: city_pages + pages(housing, [housing_rules])},
+            {key: :riverside, blurb: translation(".riverside_blurb"), sequence: riverside, pages: city_pages + pages(riverside, [riverside_rules])}
           ]
         end
 
-        def battery(set_by, sub, rules = [translation(".battery_rule_charger"), translation(".battery_rule_unattended"), translation(".battery_rule_flammable")])
-          {category: translation(".battery_category"), title: translation(".battery_title"), sub:, set_by:, detected: true, rules:}
+        # Unsaved - an example to render, not one to keep
+        def sequence(name, short_name) = RegistrationSequence.new(organization: Organization.new(name:, short_name:))
+
+        def pages(sequence, attributes) = attributes.map { RegistrationSequencePage.new(registration_sequence: sequence, **it) }
+
+        def page(title:, rules:, subtitle: nil, heading: nil, organization_specific: false)
+          {title:, heading:, subtitle:, organization_specific:, body: tag.ul(safe_join(rules.map { tag.li(it) })).to_s}
         end
 
-        def housing_battery(set_by)
-          battery(set_by, translation(".housing_battery_sub"),
-            [translation(".housing_battery_rule_room"), translation(".housing_battery_rule_certified"), translation(".housing_battery_rule_report")])
+        def battery
+          page(title: translation(".battery_category"), heading: translation(".battery_title"), subtitle: translation(".city_battery_sub"),
+            rules: [translation(".battery_rule_charger"), translation(".battery_rule_unattended"), translation(".battery_rule_flammable")])
         end
 
-        # Titled by its category, which the template falls back to
-        def riding(set_by, sub, rules) = {category: translation(".riding_category"), sub:, set_by:, rules:}
-
-        def city_riding(set_by)
-          riding(set_by, translation(".city_riding_sub"),
-            [translation(".city_riding_rule_helmet"), translation(".city_riding_rule_lanes"), translation(".city_riding_rule_sidewalks")])
+        def city_riding
+          page(title: translation(".riding_category"), subtitle: translation(".city_riding_sub"),
+            rules: [translation(".city_riding_rule_helmet"), translation(".city_riding_rule_lanes"), translation(".city_riding_rule_sidewalks")])
         end
 
-        def school_riding(set_by)
-          riding(set_by, translation(".school_riding_sub"),
-            [translation(".school_riding_rule_helmet"), translation(".school_riding_rule_passenger"),
-              translation(".school_riding_rule_traffic"), translation(".school_riding_rule_guardian")])
+        def city_rules
+          page(title: translation(".city_rules_category"), heading: translation(".city_rules_title"), subtitle: translation(".city_rules_sub"),
+            organization_specific: true,
+            rules: [translation(".city_rule_class_3"), translation(".city_rule_parking"), translation(".city_rule_classes")])
         end
 
-        def city_rules(set_by)
-          {category: translation(".city_rules_category"), title: translation(".city_rules_title"), sub: translation(".city_rules_sub"),
-           set_by:, organization_badge: true,
-           rules: [translation(".city_rule_class_3"), translation(".city_rule_parking"), translation(".city_rule_classes")]}
+        def school_rules
+          page(title: translation(".school_rules_category"), heading: translation(".school_rules_title"), subtitle: translation(".school_rules_sub"),
+            organization_specific: true,
+            rules: [translation(".school_rule_class_1"), translation(".school_rule_walk"), translation(".school_rule_traffic"), translation(".school_rule_guardian")])
         end
 
-        def school_rules(set_by)
-          {category: translation(".school_rules_category"), title: translation(".school_rules_title"), sub: translation(".school_rules_sub"),
-           set_by:, organization_badge: true,
-           rules: [translation(".school_rule_class_1"), translation(".school_rule_walk")]}
+        def housing_rules
+          page(title: translation(".housing_rules_category"), heading: translation(".housing_rules_title"), subtitle: translation(".housing_rules_sub"),
+            organization_specific: true, rules: [translation(".housing_rule_storage"), translation(".housing_rule_sticker")])
         end
 
-        def housing_rules(set_by)
-          {category: translation(".housing_rules_category"), title: translation(".housing_rules_title"), sub: translation(".housing_rules_sub"),
-           set_by:, organization_badge: true,
-           rules: [translation(".housing_rule_storage"), translation(".housing_rule_sticker")]}
+        def riverside_rules
+          page(title: translation(".riverside_rules_category"), organization_specific: true,
+            rules: [translation(".riverside_rule_parking"), translation(".riverside_rule_charging")])
         end
 
-        def consent(name)
-          {category: translation(".consent_category"), title: translation(".consent_title"), sub: translation(".consent_sub", name:),
-           set_by: translation(".bike_index"), rules: [translation(".consent_rule_read"), translation(".consent_rule_agree")]}
-        end
-
-        def progress(filled:, total:, label:)
-          bar = tag.div(class: "tw:mb-3 tw:grid tw:grid-flow-col tw:auto-cols-fr tw:gap-1.5", aria: {hidden: true}) do
-            safe_join((1..total).map { tag.span(class: "tw:h-1.25 tw:rounded-sm #{(it <= filled) ? "tw:bg-purple-500" : "tw:bg-gray-200 tw:dark:bg-gray-700"}") })
-          end
-          bar + tag.div(class: "tw:mb-4.5 tw:text-[13px] tw:font-semibold tw:text-gray-600 tw:dark:text-gray-400") do
-            helpers.inline_svg_tag("icons/check.svg", class: "tw:inline tw:size-3.5 tw:stroke-3 tw:align-[-2px] tw:text-[#2e8b57]", aria_hidden: true) +
-              " " + translation(".progress_saved_html", label:)
-          end
-        end
-
-        def rule_count(organization) = organization[:steps].sum { it[:rules].size }
+        def rule_count(pages) = pages.sum { it.bullets.size }
       end
     end
   end

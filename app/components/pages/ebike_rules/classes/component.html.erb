@@ -8,11 +8,11 @@
     <div class="tw:py-[clamp(40px,7vw,64px)] <%= Pages::EbikeRules::Show::Component::SECTION_CLASSES %>">
       <h2 class="<%= Pages::EbikeRules::Show::Component::HEADING_CLASSES %>">
         <% if outside_us %>
-          <%= translation(".place_heading", place: @place[:name]) %>
+          <%= unbroken_hyphen(translation(".place_heading", place: @place[:name])) %>
         <% elsif state_classes %>
-          <%= translation(".state_classes_heading", state: @place[:name]) %>
+          <%= unbroken_hyphen(translation(".state_classes_heading", state: @place[:name])) %>
         <% else %>
-          <%= translation(".classes_heading") %>
+          <%= unbroken_hyphen(translation(".classes_heading")) %>
         <% end %>
       </h2>
 

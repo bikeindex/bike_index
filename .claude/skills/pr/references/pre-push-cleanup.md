@@ -145,6 +145,17 @@ The second one is load-bearing: a model's `errors.add(:base, "…")` reaches a f
 
 Read each hit. Key names (`about_this_bike:`), the product name ("Bike Index"), and copy that really is bike-only are fine; a value saying "bike" about the registration is not. `Pages::Registrations::Show::CurrentAlerts::ClaimImpound` and `Pages::Registrations::Show::WrapperConsumer` are the pattern for fixing one, and `spec/components/pages/registrations/show/current_alerts/claim_impound/component_spec.rb` shows how to cover it.
 
+### The product-name check
+
+Copy spells the products "Bike Index" and "BikeBook" — never "BikeIndex", "Bike index", "Bike Book" or "Bikebook":
+
+```bash
+rtk proxy git diff origin/main...HEAD -- '*.yml' '*.erb' '*.haml' '*.rb' '*.js' '*.md' |
+  grep -nE '^\+[^+].*(BikeIndex|[Bb]ike index|Bike [Bb]ook|[Bb]ike book|Bikebook)'
+```
+
+Fix every hit in copy. Code identifiers (`BikeIndexFormBuilder`, `Bikebook::`, `bikebook_path`) and the `BikeIndex.org` domain are fine.
+
 ### Only if you have rtk: `rtk proxy` anything you grep or count
 
 Skip this section if `rtk` isn't installed — nothing below applies to a plain shell.

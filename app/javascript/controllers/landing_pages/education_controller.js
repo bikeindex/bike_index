@@ -1,21 +1,20 @@
 import { Controller } from '@hotwired/stimulus'
+import { urlParam, setUrlParam } from 'utils/url_param'
 
 // Connects to data-controller='landing-pages--education'
 // Steps are switched by visibility rather than collapse_utils' display toggle, which would
-// collapse the grid cell they share
+// collapse the grid cell they share. Each step's own register--acknowledgment gates its Continue
 export default class extends Controller {
-  static targets = ['step', 'summary', 'continue', 'done']
+  static targets = ['step', 'summary', 'done']
 
   connect () {
     this.index = 0
-    this.reached = 0
-    this.check()
+    if (urlParam('education_step')) this.sync()
   }
 
-  // Every step, not just the one changed: a reload can restore the boxes' checks, and
-  // Firefox the buttons' disabled too
-  check () {
-    this.stepTargets.forEach((step, index) => { this.continueTargets[index].disabled = !this.complete(step) })
+  // Every tab is on the step in the URL - 1-based, one past the last step being the done panel
+  sync () {
+    this.show((Number(urlParam('education_step')) || 1) - 1, { focus: false })
   }
 
   next () {
@@ -31,25 +30,25 @@ export default class extends Controller {
   }
 
   restart () {
-    this.element.querySelectorAll('input[type=checkbox]').forEach(box => { box.checked = false })
-    this.check()
-    this.reached = 0
+    this.element.querySelectorAll('input[type=checkbox]').forEach(box => {
+      box.checked = false
+      box.dispatchEvent(new Event('change'))
+    })
     this.show(0)
   }
 
-  // An index past the last step is the done panel, which a step still unchecked turns the rider back from
-  show (index) {
-    const incomplete = this.stepTargets.findIndex(step => !this.complete(step))
-    this.index = (index >= this.stepTargets.length && incomplete !== -1) ? incomplete : index
-    this.reached = Math.max(this.reached, this.index)
+  // An index past the last step is the done panel - reachable with earlier steps unchecked,
+  // since this is a demo rather than a registration
+  show (index, { focus = true } = {}) {
+    this.index = Math.min(index, this.stepTargets.length)
 
     const current = this.stepTargets[this.index] || this.doneTarget
     ;[...this.stepTargets, this.doneTarget].forEach(panel => panel.classList.toggle('tw:invisible', panel !== current))
-    current.querySelector('h3').focus()
+    if (focus) current.focus()
+    setUrlParam('education_step', this.index + 1)
 
     this.summaryTargets.forEach((summary, summaryIndex) => {
-      summary.disabled = summaryIndex > this.reached
-      summary.toggleAttribute('data-passed', summaryIndex < this.index && this.complete(this.stepTargets[summaryIndex]))
+      summary.toggleAttribute('data-passed', summaryIndex !== this.index && this.complete(this.stepTargets[summaryIndex]))
       summary.ariaCurrent = summaryIndex === this.index ? 'step' : null
     })
   }

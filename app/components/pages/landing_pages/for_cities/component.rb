@@ -10,6 +10,11 @@ module Pages
         INTRO_CLASSES = "tw:text-[17px] tw:leading-relaxed tw:text-pretty tw:text-gray-600 tw:dark:text-gray-300"
         ICON_DISC_CLASSES = "tw:flex tw:size-11 tw:flex-none tw:items-center tw:justify-center tw:rounded-full tw:text-white"
         MODAL_ID = "cities-demo-modal"
+        # The hero's mockups sit in phone frames, so they read as screenshots rather than fields to fill
+        # in. zoom shrinks a whole phone, so the two stay side by side on a small screen
+        PHONE_CLASSES = "tw:mx-auto tw:flex tw:w-full tw:max-w-[340px] tw:min-w-0 tw:min-h-[640px] tw:flex-col tw:rounded-[2.25rem] tw:bg-slate-900 tw:p-2 tw:shadow-[0_18px_40px_rgba(44,62,80,.28)] " \
+          "tw:[zoom:0.45] tw:min-[480px]:[zoom:0.6] tw:min-[640px]:[zoom:0.8] tw:min-[800px]:[zoom:1]"
+        PHONE_SCREEN_CLASSES = "tw:flex-1 tw:overflow-hidden tw:rounded-[1.75rem] tw:bg-[#f3f4f6] tw:text-gray-900"
 
         # checker_state: the abbreviation of the visitor's state, which the checker starts on
         def initialize(feedback: Feedback.new, checker_state: nil)
@@ -19,6 +24,14 @@ module Pages
         end
 
         private
+
+        def phone_status_bar
+          tag.div(class: "tw:relative tw:flex tw:items-center tw:justify-between tw:px-6 tw:pt-2.5 tw:pb-1 tw:text-[11px] tw:font-semibold") do
+            safe_join([tag.span("9:41"),
+              tag.span(class: "tw:absolute tw:top-2 tw:left-1/2 tw:h-5 tw:w-20 tw:-translate-x-1/2 tw:rounded-full tw:bg-slate-900"),
+              tag.span(class: "tw:flex tw:h-2.5 tw:w-5 tw:rounded-[3px] tw:border tw:border-gray-900 tw:p-px") { tag.span(class: "tw:w-3/4 tw:rounded-[1px] tw:bg-gray-900") }])
+          end
+        end
 
         def stats
           [
@@ -90,11 +103,15 @@ module Pages
           [translation(".checker_point_bikebook"), translation(".checker_point_states"), translation(".checker_point_program")]
         end
 
-        def top_speed_options
-          [[translation(".checker_speed_20"), 20], [translation(".checker_speed_28"), 28], [translation(".checker_speed_over_28"), 29]]
+        # In /ebike-rules' shape: "California (CA)", submitting US-CA, which it reads as the state rather than Canada
+        def state_options = EbikeRuleServices::Places.us_states.map { {name: it[:name], abbr: it[:code].delete_prefix("US-"), value: it[:code]} }
+
+        def top_speed_entries
+          [{value: 20, label: translation(".checker_speed_20")}, {value: 28, label: translation(".checker_speed_28")},
+            {value: 29, label: translation(".checker_speed_over_28")}]
         end
 
-        def throttle_options = [[translation(".answer_no"), 0], [translation(".answer_yes"), 1]]
+        def throttle_entries = [{value: 1, label: translation(".answer_yes")}, {value: 0, label: translation(".answer_no")}]
 
         def field_tools
           [
@@ -107,7 +124,6 @@ module Pages
 
         def partnership_points
           [
-            [translation(".partnership_nonprofit_title"), translation(".partnership_nonprofit_body")],
             [translation(".partnership_fees_title"), translation(".partnership_fees_body")],
             [translation(".partnership_data_title"), translation(".partnership_data_body")],
             [translation(".partnership_support_title"), translation(".partnership_support_body")]

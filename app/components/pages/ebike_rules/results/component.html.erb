@@ -20,7 +20,7 @@
           tw:font-bold
         "
       >
-        <%= render(Atoms::UnbrokenHyphens::Component.new(text: headline)) %>
+        <%= unbroken_hyphen(headline) %>
       </p>
 
       <% if details.any? %>

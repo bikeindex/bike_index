@@ -9,11 +9,13 @@ module Pages
         class Component < ApplicationComponent
           # first: the flow's opening page, where the registrant is told why these appeared
           # checkbox_name: the rules submit as checkbox_name[index]; nil leaves them decorative
-          def initialize(page:, first: false, checkbox_name: nil, checked: false)
+          # heading_tag: below h1 where the page is embedded in another, as on /for_cities
+          def initialize(page:, first: false, checkbox_name: nil, checked: false, heading_tag: :h1)
             @page = page
             @first = first
             @checkbox_name = checkbox_name
             @checked = checked
+            @heading_tag = heading_tag
           end
 
           private
@@ -25,6 +27,11 @@ module Pages
           # What the editor promised - "Template" when admin previews the template
           def badge_name
             sequence&.badge_name
+          end
+
+          # The template's rules are Bike Index's
+          def set_by_name
+            sequence&.organization&.name || translation(".bike_index")
           end
 
           def checkbox_name(index)

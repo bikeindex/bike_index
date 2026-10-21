@@ -14,15 +14,13 @@ en:
           checker_choose_state: Choose a state
           checker_eyebrow: E-bike compliance checker
           checker_form_heading: Check an e-bike
-          checker_form_note: Opens the full checker, with your state's rules and the
-            statutes behind them
           checker_heading: Know your e-bike rules.
           checker_intro: >-
             A free public tool from Bike Index. Riders pick their state and bike and
             see, in under 30 seconds, whether it's legal to ride, what certification
             it carries, and what rules apply. The answer leads straight to registration.
           checker_point_bikebook: >-
-            Class, motor, top speed, and UL certification from Bike Book's catalog
+            Class, motor, top speed, and UL certification from BikeBook's catalog
             of e-bike models
           checker_point_program: >-
             Inside your program, staff see the class and compliance status of every
@@ -43,11 +41,11 @@ en:
           child_neighborhood_note: "+3 local rules"
           child_school_name: Westbrook Middle School
           child_school_note: Stricter riding rules + campus policies
-          community_watch_body: >-
-            Volunteers watch Craigslist, Facebook Marketplace, and OfferUp for stolen
-            bikes. Spotters can reach owners without either side's contact details
-            being shared.
           community_watch_lead: A community watch, too.
+          community_watch_users_body: >-
+            Bike Index users watch Craigslist, Facebook Marketplace, and OfferUp for
+            stolen bikes. Spotters can reach owners without either side's contact
+            details being shared.
           contact_heading: Talk to us about your city.
           contact_intro: >-
             Every partnership starts with a short discovery call. Tell us what your
@@ -72,7 +70,7 @@ en:
             content. Staff at each level manage only their own rules.
           faq_account_question: Who manages the account?
           faq_checker_answer: >-
-            Bike details come from Bike Book, a catalog of e-bike models with their
+            Bike details come from BikeBook, a catalog of e-bike models with their
             class, motor, speed, and UL certification. State rules are listed with
             the statutes behind them.
           faq_checker_question: Where does the compliance checker get its data?
@@ -120,8 +118,8 @@ en:
             Search by serial from the website or admin panel for the same registration
             and attestation record.
           field_serial_title: Serial number lookup
-          heading: Register every bike in your city. E-bike riders learn your rules
-            too.
+          heading_educate: Register every bike in your city. Educate E-bike riders
+            about your city's rules.
           hero_image_alt: A bike in a superhero cape
           hierarchy_city_body: >-
             Local ordinances, age limits, helmet rules, and where e-bikes can ride.
@@ -186,18 +184,15 @@ en:
           partnership_eyebrow: Partnership
           partnership_fees_body: Free for residents to register.
           partnership_fees_title: No per-registration fees
-          partnership_heading: A nonprofit partner, running within days.
+          partnership_heading: Your nonprofit partner
           partnership_intro: >-
-            Bike Index has run the world's most widely used nonprofit bike registry
-            since 2013. City partnerships need no dedicated IT staff, and most are
-            running within days of setup.
-          partnership_nonprofit_body: A 501(c)(3) nonprofit, EIN 81-4296194.
-          partnership_nonprofit_title: Nonprofit since 2013
+            Bike Index has been the world's most widely used bike registry since 2013.
+            City partnerships need no dedicated IT staff, and most are running within
+            days of setup.
           partnership_support_body: >-
             We configure your branded organization and education flow, train your
             staff, and maintain the platform.
           partnership_support_title: Setup, training, and support
-          pill: Bike Index for Cities · Nonprofit since 2013
           program_education_body: >-
             E-bike riders are taken into your education flow as part of registering.
             Staff can see any bike's class, battery certification, and signed attestation.
@@ -252,8 +247,8 @@ en:
             a form on your website, or a QR sticker.
           registration_step_1_title: Residents register
           registration_step_2_body: >-
-            Bike Book identifies the model and its class, and the rider completes
-            your education flow. Regular bikes skip it.
+            BikeBook identifies the model and its class, and the rider completes your
+            education flow. Regular bikes skip it.
           registration_step_2_title: E-bikes get classified
           registration_step_3_body: >-
             Status (registered, stolen, or recovered), make, model, color, and serial.

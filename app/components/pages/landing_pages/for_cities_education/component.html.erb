@@ -1,9 +1,12 @@
 <%# The same for every visitor, so its translations and inlined icons are worth keeping %>
 <% cache(self.class.cache_digest) do %>
-  <div data-controller="landing-pages--tabs">
+  <div
+    data-controller="landing-pages--tabs"
+    data-landing-pages--tabs-param-value="education"
+  >
     <div
       class="
-        tw:mb-8 tw:flex tw:gap-1 tw:border-b tw:border-gray-200
+        tw:mb-8 tw:flex tw:border-b tw:border-gray-200 tw:sm:gap-1
         tw:dark:border-gray-700
       "
       role="tablist"
@@ -15,7 +18,7 @@
         <button
           type="button"
           class="
-            tw:-mb-px tw:flex-1 tw:border-b-3 tw:border-transparent tw:px-2
+            tw:-mb-px tw:flex-1 tw:border-b-3 tw:border-transparent tw:px-1
             tw:py-3 tw:text-sm tw:font-bold tw:text-gray-600
             tw:hover:text-slate-900 tw:aria-selected:border-blue-600
             tw:aria-selected:text-slate-900 tw:sm:flex-none tw:sm:px-4
@@ -33,12 +36,18 @@
           data-landing-pages--tabs-target="button"
           data-action="click->landing-pages--tabs#select keydown->landing-pages--tabs#keydown"
         >
-          <%= organization[:tab] %>
+          <%= organization[:sequence].organization.short_name %>
         </button>
       <% end %>
     </div>
 
     <% organizations.each do |organization| %>
+      <% sequence = organization[:sequence] %>
+      <% name = sequence.organization.name %>
+      <% sequence_pages = organization[:pages] %>
+      <% total = sequence_pages.size + 1 %>
+      <% register_flow = BikeServices::RegisterFlow.new(page_count: sequence_pages.size) %>
+
       <div
         id="tab-<%= organization[:key] %>"
         class="
@@ -49,6 +58,7 @@
         aria-labelledby="tab-button-<%= organization[:key] %>"
         data-landing-pages--tabs-target="panel"
         data-controller="landing-pages--education"
+        data-action="landing-pages--tabs:activated->landing-pages--education#sync"
       >
         <div class="tw:lg:col-start-1">
           <div
@@ -61,7 +71,7 @@
           </div>
 
           <div class="tw:font-header tw:text-[26px] tw:font-extrabold">
-            <%= organization[:name] %>
+            <%= name %>
           </div>
 
           <p
@@ -86,7 +96,8 @@
               tw:bg-white tw:dark:border-gray-700 tw:dark:bg-gray-800
             "
           >
-            <% organization[:steps].each_with_index do |step, index| %>
+            <% [*sequence_pages.map { [it.title, translation(".rule_count", count: it.bullets.size)] },
+                [translation(".consent_category"), nil]].each_with_index do |(label, meta), index| %>
               <li
                 class="
                   tw:not-first:border-t tw:not-first:border-gray-200
@@ -98,14 +109,11 @@
                   class="
                     tw:group tw:flex tw:w-full tw:cursor-pointer
                     tw:items-center tw:gap-3.5 tw:px-4 tw:py-3.5
-                    tw:text-left tw:disabled:cursor-default
-                    tw:aria-[current=step]:bg-blue-50
+                    tw:text-left tw:aria-[current=step]:bg-blue-50
                     tw:dark:aria-[current=step]:bg-blue-950
                   "
                   <% if index.zero? %>
                     aria-current="step"
-                  <% else %>
-                    disabled
                   <% end %>
                   data-landing-pages--education-target="summary"
                   data-action="landing-pages--education#go"
@@ -128,16 +136,18 @@
                   </span>
 
                   <span class="tw:min-w-0 tw:flex-1">
-                    <span class="tw:block tw:text-[15px] tw:font-bold"><%= step[:category] %></span>
+                    <span class="tw:block tw:text-[15px] tw:font-bold"><%= label %></span>
 
-                    <span
-                      class="
-                        tw:block tw:text-[13px] tw:text-gray-600
-                        tw:dark:text-gray-400
-                      "
-                    >
-                      <%= translation(".step_meta", count: step[:rules].size, set_by: step[:set_by]) %>
-                    </span>
+                    <% if meta %>
+                      <span
+                        class="
+                          tw:block tw:text-[13px] tw:text-gray-600
+                          tw:dark:text-gray-400
+                        "
+                      >
+                        <%= meta %>
+                      </span>
+                    <% end %>
                   </span>
                 </button>
               </li>
@@ -158,84 +168,23 @@
             Every step shares one grid cell, hidden by visibility rather than display, so the card
             keeps the tallest step's height instead of jumping as the rider moves through them
           %>
-          <% total = organization[:steps].size %>
 
-          <% organization[:steps].each_with_index do |step, index| %>
+          <% sequence_pages.each_with_index do |page, index| %>
             <div
               role="group"
-              aria-labelledby="education-<%= organization[:key] %>-<%= index %>-title"
-              class="tw:[grid-area:1/1] <%= "tw:invisible" unless index.zero? %>"
+              aria-label="<%= page.title %>"
+              tabindex="-1"
+              class="tw:scroll-mt-24 tw:[grid-area:1/1] tw:focus:outline-none <%= "tw:invisible" unless index.zero? %>"
               data-landing-pages--education-target="step"
+              data-controller="register--acknowledgment"
             >
-              <%= progress(filled: index + 1, total:, label: translation(".step_n_of_total_html", n: number_display(index + 1), total: number_display(total))) %>
-
-              <div class="tw:mb-3 tw:flex tw:flex-wrap tw:gap-2">
-                <% if step[:detected] %>
-                  <%= render(UI::Badge::Component.new(text: translation(".electric_detected"), color: :warning)) %>
-                <% end %>
-
-                <% if step[:organization_badge] %>
-                  <%= render(UI::Badge::Component.new(text: organization[:name], color: :notice)) %>
-                <% end %>
-              </div>
-
-              <h3
-                id="education-<%= organization[:key] %>-<%= index %>-title"
-                class="
-                  tw:mb-1.5 tw:scroll-mt-24 tw:font-header tw:text-2xl
-                  tw:leading-tight tw:font-extrabold tw:focus:outline-none
-                "
-                tabindex="-1"
-              >
-                <%= step[:title] || step[:category] %>
-              </h3>
-
-              <p
-                class="
-                  tw:mb-5.5 tw:text-[15px] tw:text-gray-600
-                  tw:dark:text-gray-300
-                "
-              >
-                <%= step[:sub] %>
-              </p>
-
-              <div
-                class="
-                  tw:mb-2.5 tw:flex tw:items-baseline tw:justify-between
-                  tw:gap-3
-                "
-              >
-                <span
-                  class="
-                    tw:text-xs tw:font-bold tw:tracking-[.08em]
-                    tw:text-gray-600 tw:uppercase tw:dark:text-gray-400
-                  "
-                >
-                  <%= step[:category] %>
-                </span>
-
-                <span
-                  class="
-                    tw:text-right tw:text-xs tw:font-semibold
-                    tw:text-purple-500 tw:dark:text-purple-300
-                  "
-                >
-                  <%= translation(".set_by", set_by: step[:set_by]) %>
-                </span>
-              </div>
-
-              <%= render(UI::Card::Component.new(divided: true, additional_classes: "tw:overflow-hidden")) do %>
-                <% step[:rules].each_with_index do |rule, rule_index| %>
-                  <%= render(UI::Forms::Checkbox::Component.new(label: rule,
-                  name: "education_#{organization[:key]}_#{index}_#{rule_index}",
-                  class_name: "tw:mb-0 tw:gap-3.5! tw:px-4 tw:py-3.5 tw:text-[15px] tw:font-normal tw:transition-colors tw:has-checked:bg-blue-50 tw:dark:has-checked:bg-blue-950",
-                  html_options: {data: {action: "landing-pages--education#check"}})) %>
-                <% end %>
-              <% end %>
+              <%= render(Pages::Register::Parts::Progress::Component.new(flow: register_flow, step: BikeServices::Register.step_for_page_index(index))) %>
+              <%= render(Pages::Register::Parts::AcknowledgmentProgress::Component.new(number: index + 1, total:)) %>
+              <%= render(Pages::Register::Parts::PageContent::Component.new(page:, first: index.zero?, heading_tag: :h3)) %>
 
               <%= render(UI::Button::Component.new(text: translation(".continue"), color: :primary, size: :lg,
               html_class: "tw:mt-5 tw:w-full tw:justify-center", disabled: true,
-              data: {"landing-pages--education-target": "continue", action: "landing-pages--education#next"})) %>
+              data: {"register--acknowledgment-target": "submit", action: "landing-pages--education#next"})) %>
 
               <% unless index.zero? %>
                 <div class="tw:mt-3 tw:text-center">
@@ -249,10 +198,43 @@
           <% end %>
 
           <div
-            class="tw:invisible tw:self-center tw:[grid-area:1/1]"
+            role="group"
+            aria-label="<%= translation(".consent_category") %>"
+            tabindex="-1"
+            class="
+              tw:invisible tw:scroll-mt-24 tw:[grid-area:1/1]
+              tw:focus:outline-none
+            "
+            data-landing-pages--education-target="step"
+            data-controller="register--acknowledgment"
+          >
+            <%= render(Pages::Register::Parts::Progress::Component.new(flow: register_flow, step: "review")) %>
+            <%= render(Pages::Register::Parts::AcknowledgmentProgress::Component.new(number: total, total:)) %>
+            <%= render(Pages::Register::Parts::ReviewSummary::Component.new(pages: sequence_pages, heading_tag: :h3)) %>
+            <%= render(Pages::Register::Parts::AcknowledgmentCheck::Component.new(sequence:)) %>
+
+            <%= render(UI::Button::Component.new(text: translation(".complete_registration"), color: :primary, size: :lg,
+            html_class: "tw:w-full tw:justify-center", disabled: true,
+            data: {"register--acknowledgment-target": "submit", action: "landing-pages--education#next"})) %>
+
+            <div class="tw:mt-3 tw:text-center">
+              <%= render(UI::Button::Component.new(color: :link, html_class: "tw:text-sm tw:text-gray-600",
+              data: {action: "landing-pages--education#back"})) do %>
+                <span aria-hidden="true">←</span> <%= translation(".back") %>
+              <% end %>
+            </div>
+          </div>
+
+          <%# Only here - the real flow goes on to the registration's own finished page %>
+          <div
+            tabindex="-1"
+            class="
+              tw:invisible tw:scroll-mt-24 tw:self-center tw:[grid-area:1/1]
+              tw:focus:outline-none
+            "
             data-landing-pages--education-target="done"
           >
-            <%= progress(filled: total, total:, label: translation(".complete")) %>
+            <%= render(Pages::Register::Parts::Progress::Component.new(flow: register_flow, step: "review")) %>
 
             <div
               class="
@@ -262,13 +244,7 @@
             >
               <%= render(UI::Badge::Component.new(text: translation(".registered"), color: :notice, size: :lg)) %>
 
-              <h3
-                class="
-                  tw:mt-1 tw:scroll-mt-24 tw:font-header tw:text-2xl
-                  tw:font-extrabold tw:focus:outline-none
-                "
-                tabindex="-1"
-              >
+              <h3 class="tw:mt-1 tw:font-header tw:text-2xl tw:font-extrabold">
                 <%= translation(".all_set") %>
               </h3>
 
@@ -278,7 +254,7 @@
                   tw:dark:text-gray-300
                 "
               >
-                <%= translation(".done_message", count: rule_count(organization), name: organization[:name]) %>
+                <%= translation(".done_message", count: rule_count(sequence_pages), name:) %>
               </p>
 
               <%= render(UI::Button::Component.new(text: translation(".start_over"), color: :link,

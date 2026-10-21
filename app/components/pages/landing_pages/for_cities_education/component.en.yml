@@ -11,7 +11,6 @@ en:
           battery_rule_flammable: I will keep my battery away from flammable materials.
           battery_rule_unattended: I will never leave my battery charging unattended.
           battery_title: Looks like you have an e-bike!
-          bike_index: Bike Index
           city_battery_sub: Westbrook has a few e-bike rules to go over before you
             finish registering.
           city_blurb: >-
@@ -36,15 +35,8 @@ en:
           city_rules_category: City rules
           city_rules_sub: Class-based rules and local resources.
           city_rules_title: Where e-bikes can ride in Westbrook
-          complete: Complete
+          complete_registration: Complete registration
           consent_category: Final review & consent
-          consent_rule_agree: >-
-            I agree to follow them as a condition of registration, and understand
-            that not following them may result in revocation.
-          consent_rule_read: I have read and understood every rule in the previous
-            steps.
-          consent_sub: Confirm you understand the rules for %{name}.
-          consent_title: Review and sign
           continue: Continue
           done_message:
             one: >-
@@ -53,19 +45,9 @@ en:
             other: >-
               You confirmed all %{count} rules for %{name}. Your signed attestation
               is saved to your bike's registration.
-          electric_detected: Electric (motorized) detected
-          housing_battery_rule_certified: I will use only a UL 2849 or UL 2271 certified
-            battery.
-          housing_battery_rule_report: >-
-            I will report any battery that is damaged, swollen, or overheating to
-            building staff.
-          housing_battery_rule_room: >-
-            I will charge only in the designated charging room, never in my unit,
-            a hallway, or a stairwell.
-          housing_battery_sub: Charging rules for Westbrook Housing Authority buildings.
-          housing_blurb: >-
-            The housing authority rewrote the battery step for apartment buildings
-            and added its own storage rules.
+          housing_building_blurb: >-
+            Residents see the city's rules, then the housing authority's own rules
+            for storing and parking in its buildings.
           housing_name: Westbrook Housing Authority
           housing_rule_sticker: I will keep my registration sticker visible so staff
             can confirm my bike.
@@ -76,38 +58,39 @@ en:
           housing_rules_sub: Where to keep your e-bike at home.
           housing_rules_title: Storage and parking
           housing_tab: Housing Authority
-          progress_saved_html: Progress saved · E-bike education · %{label}
           registered: Registered
           riding_category: Riding practices
-          school_battery_sub: We have a few safety rules to go over before you can
-            finish registering.
-          school_blurb: >-
-            The middle school rewrote the riding step for younger riders and added
-            its own campus policies.
+          riverside_blurb: >-
+            Neighbors see the city's rules, then the program's own rules for the community
+            center.
+          riverside_name: Riverside Neighborhood Program
+          riverside_rule_charging: I will not charge my e-bike inside the Community
+            Center.
+          riverside_rule_parking: >-
+            I will park only at the community center's marked e-bike racks, never
+            on the levee path or against trees.
+          riverside_rules_category: Neighborhood rules
+          riverside_tab: Riverside
+          rule_count:
+            one: "%{count} rule"
+            other: "%{count} rules"
+          school_campus_blurb: >-
+            Students see the city's rules, then the middle school's own policies for
+            riding to campus.
           school_name: Westbrook Middle School
-          school_riding_rule_guardian: I have reviewed these rules with a parent or
-            guardian.
-          school_riding_rule_helmet: I will wear a helmet every time I ride.
-          school_riding_rule_passenger: I will never carry a passenger. One rider
-            per bike.
-          school_riding_rule_traffic: I will follow traffic laws and yield to pedestrians
-            and crossing guards.
-          school_riding_sub: Commitments for riding to and from school.
           school_rule_class_1: I will ride only a Class 1 e-bike to school.
+          school_rule_guardian: I have reviewed these rules with a parent or guardian.
+          school_rule_traffic: I will follow traffic laws and yield to pedestrians
+            and crossing guards.
           school_rule_walk: I will walk my bike from the front gate to the racks.
-          school_rules_category: Campus-specific rules
+          school_rules_category: School rules
           school_rules_sub: Your school has a few more rules for riding to campus.
           school_rules_title: Westbrook Middle campus policies
           school_tab: Westbrook Middle
-          set_by: Set by %{set_by}
           staff_edit: >-
             Your staff edit every step in the admin panel, no technical help needed.
             Each signed attestation is stored with the exact rules in effect that
             day.
           start_over: Start over
-          step_meta:
-            one: "%{count} rule · Set by %{set_by}"
-            other: "%{count} rules · Set by %{set_by}"
-          step_n_of_total_html: Step %{n} of %{total}
           tabs_label: Example organizations
           viewing_as: Viewing as

@@ -71,20 +71,57 @@ RSpec.describe "Landing page demo modals", :js, type: :system do
 
       within("#tab-school") do
         expect(page).to have_button("Continue", disabled: true)
-        # a step can't be jumped to before it's reached
-        expect(page).to have_button(text: "Riding practices", disabled: true)
+        find_button(text: "Riding practices").click
+        expect(page).to have_content("Westbrook rules for helmets, lanes, speed, and sidewalks.")
+        # The demo finishes from the final review alone, whatever's left unchecked before it
+        find_button(text: "Final review").click
+        check "have read, understood, and agree"
+        click_button "Complete registration"
+        expect(page).to have_content("You're all set.")
+        click_button "Start over"
+        expect(page).to have_content("Westbrook has a few e-bike rules to go over")
         check "I will charge only with a manufacturer-approved charger."
         check "I will never leave my battery charging unattended."
         expect(page).to have_button("Continue", disabled: true)
         check "I will keep my battery away from flammable materials."
         click_button "Continue"
-        expect(page).to have_content("Commitments for riding to and from school.")
+        expect(page).to have_content("Westbrook rules for helmets, lanes, speed, and sidewalks.")
         click_button "Back"
-        expect(page).to have_content("We have a few safety rules to go over")
-        expect(page).to have_button(text: "Final review", disabled: true)
+        expect(page).to have_content("Westbrook has a few e-bike rules to go over")
         find_button(text: "Riding practices").click
-        expect(page).to have_content("Commitments for riding to and from school.")
+        # The school carries the city's pages, then adds its own
+        expect(page).to have_content("Set by City of Westbrook")
+        check "I will wear a helmet whenever I ride if I am under 18."
+        check "I will ride in bike lanes where they exist and keep under 15 mph on shared paths."
+        check "I will not ride on sidewalks in the downtown business district."
+        click_button "Continue"
+        check "I will ride a Class 3 e-bike only if I am 16 or older, and not on the Riverside Trail."
+        check "I will park only at public bike racks, never blocking sidewalks, ramps, or doorways."
+        check "I know where to find Westbrook's free e-bike safety classes."
+        click_button "Continue"
+        expect(page).to have_content("Set by Westbrook Middle School")
+        check "I will ride only a Class 1 e-bike to school."
+        check "I will walk my bike from the front gate to the racks."
+        check "I will follow traffic laws and yield to pedestrians and crossing guards."
+        check "I have reviewed these rules with a parent or guardian."
+        click_button "Continue"
+        expect(page).to have_content("You're almost done.")
+        expect(page).to have_button("Complete registration", disabled: true)
+        check "have read, understood, and agree"
+        click_button "Complete registration"
+        expect(page).to have_content("You're all set.")
       end
+
+      # The tab and step are in the URL, so a reload comes back to them
+      click_button "Housing Authority"
+      within("#tab-housing") { find_button(text: "Building rules").click }
+      expect(page).to have_current_path(/education=housing/).and have_current_path(/education_step=4/)
+      page.refresh
+      expect(page).to have_css("[role=tab][aria-selected=true]", text: "Housing Authority")
+      within("#tab-housing") { expect(page).to have_content("Storage and parking") }
+      # Another tab opens on the same step - the city's fourth is its review
+      click_button "City of Westbrook"
+      within("#tab-city") { expect(page).to have_content("You're almost done.") }
 
       open_modal(find("section", text: "Talk to us about your city").find("button[commandfor]"))
       expect(page).to have_content("Schedule a demo")
