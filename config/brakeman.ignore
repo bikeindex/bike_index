@@ -425,20 +425,20 @@
     {
       "warning_type": "Cross-Site Scripting",
       "warning_code": 2,
-      "fingerprint": "4bf92dd97cc7d2637f63a334523e1379acaacb4a59d1be98bed00db0950c13bf",
+      "fingerprint": "d20bb555e57f69ef9fc929b66148d573da9959351da1645038e3dd00d50a7837",
       "check_name": "CrossSiteScripting",
       "message": "Unescaped model attribute",
       "file": "app/views/news/show.html.haml",
       "line": 33,
       "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
-      "code": "Blog.friendly_find(\"end-2020-with-a-donation-to-bike-index\").body",
+      "code": "Blog.friendly_find(params[:id]).body",
       "render_path": [
         {
           "type": "controller",
-          "class": "InfoController",
-          "method": "why_donate",
-          "line": 65,
-          "file": "app/controllers/info_controller.rb",
+          "class": "NewsController",
+          "method": "show",
+          "line": 40,
+          "file": "app/controllers/news_controller.rb",
           "rendered": {
             "name": "news/show",
             "file": "app/views/news/show.html.haml"
