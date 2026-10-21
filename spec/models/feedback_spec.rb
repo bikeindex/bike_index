@@ -50,9 +50,9 @@ RSpec.describe Feedback, type: :model do
 
     it "sets the body for a lead submitted with a blank message, and keeps its role" do
       feedback = Feedback.create(feedback_type: "lead_for_city", email: "staff@example.gov", name: "Portland",
-        body: "", contact_role: "Law enforcement")
+        body: "", contact_role: "law_enforcement")
       expect(feedback).to be_valid
-      expect(feedback.reload).to have_attributes(body: "lead", contact_role: "Law enforcement")
+      expect(feedback.reload).to have_attributes(body: "lead", contact_role: "law_enforcement")
     end
   end
 

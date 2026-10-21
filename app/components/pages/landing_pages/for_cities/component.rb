@@ -12,8 +12,6 @@ module Pages
         ICON_DISC_CLASSES = "tw:flex tw:size-11 tw:flex-none tw:items-center tw:justify-center tw:rounded-full tw:text-white"
         NEW_CLASSES = "tw:rounded-full tw:bg-[#ffd660] tw:px-2.5 tw:py-0.5 tw:text-xs tw:font-bold tw:text-slate-900"
         MODAL_ID = "cities-demo-modal"
-        # Digits and what a written number puts between them, "x" for an extension
-        PHONE_PATTERN = "[0-9 +\\(\\)\\.x\\-]*"
 
         # checker_state: the abbreviation of the visitor's state, which the checker starts on
         def initialize(feedback: Feedback.new, current_user: nil, checker_state: nil)
@@ -133,9 +131,11 @@ module Pages
 
         def next_steps = [translation(".contact_next_priorities"), translation(".contact_next_walkthrough"), translation(".contact_next_plan")]
 
+        # Values are keys rather than copy, so a lead's role reads the same whatever locale sent it
         def role_options
-          [translation(".role_city_staff"), translation(".role_law_enforcement"), translation(".role_school"),
-            translation(".role_housing"), translation(".role_elected"), translation(".role_other")]
+          [[translation(".role_city_staff"), "city_staff"], [translation(".role_law_enforcement"), "law_enforcement"],
+            [translation(".role_school"), "school"], [translation(".role_housing"), "housing"],
+            [translation(".role_elected"), "elected_official"], [translation(".role_other"), "other"]]
         end
       end
     end

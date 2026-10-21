@@ -111,14 +111,11 @@ en:
             Education only matters if staff can check it. Parking enforcement, community
             safety teams, and administrators can look up any bike and see what the
             rider agreed to.
-          field_message: Anything else we should know?
-          field_name: Your name
           field_organization: City or organization
           field_qr_body: >-
             Scan a bike's sticker with any phone to see its registration, including
             whether and when the rider completed the education flow.
           field_qr_title: QR code scan
-          field_role: Your role
           field_serial_body: >-
             Search by serial from the website or admin panel for the same registration
             and attestation record.
@@ -200,7 +197,6 @@ en:
             We configure your branded organization and education flow, train your
             staff, and maintain the platform.
           partnership_support_title: Setup, training, and support
-          phone_format: Numbers, spaces, and + ( ) . - x only
           pill: Bike Index for Cities · Nonprofit since 2013
           program_education_body: >-
             E-bike riders are taken into your education flow as part of registering.
@@ -267,7 +263,6 @@ en:
             Registration volume, e-bike share, and activity across programs, plus
             reports on recoveries and battery audits for city leadership.
           registration_step_4_title: You see it in the dashboard
-          request_name: request
           role_city_staff: City staff
           role_elected: Elected official
           role_housing: Housing or community program

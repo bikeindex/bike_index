@@ -6,9 +6,11 @@ import { Controller } from '@hotwired/stimulus'
 export default class extends Controller {
   static targets = ['step', 'summary', 'continue', 'done']
 
+  // A reload can restore the boxes' checks, and Firefox the buttons' disabled too
   connect () {
     this.index = 0
     this.reached = 0
+    this.stepTargets.forEach((step, index) => { this.continueTargets[index].disabled = !this.complete(step) })
   }
 
   check (event) {

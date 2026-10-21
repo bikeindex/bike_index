@@ -85,7 +85,7 @@
       Contact name: #{@feedback.contact_name}
   - if @feedback.contact_role.present?
     %p
-      Role: #{@feedback.contact_role}
+      Role: #{@feedback.contact_role.humanize}
   - if @feedback.phone_number.present?
     %p
       Phone: #{@feedback.phone_number}

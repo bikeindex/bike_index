@@ -72,6 +72,12 @@ export default class extends Controller {
     this.persist(false)
   }
 
+  // A form sent from the dialog leaves the page, so the referer it goes with - which the
+  // response may redirect back to - mustn't reopen the modal
+  submitted () {
+    this.persist(false)
+  }
+
   backdropClick (event) {
     if (event.target === this.element) {
       this.close()

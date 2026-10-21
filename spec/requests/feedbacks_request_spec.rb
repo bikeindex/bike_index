@@ -113,12 +113,22 @@ RSpec.describe FeedbacksController, type: :request do
         end
       end
 
-      context "from a demo modal, asking to return to its thank you" do
-        it "returns to the page at that anchor, without the param that reopens the modal" do
-          post base_url, params: {feedback: {name: "Chicago", feedback_type: "lead_for_city", email: "example@example.com"},
-                                  return_anchor: "lead-sent"},
-            headers: {"HTTP_REFERER" => "http://www.example.com/for_cities?modal_cities-demo-modal=1&utm_source=mail"}
-          expect(response).to redirect_to "http://www.example.com/for_cities?utm_source=mail#lead-sent"
+      context "from a demo modal that names where to return" do
+        let(:lead_params) { {name: "Chicago", feedback_type: "lead_for_city", email: "example@example.com"} }
+
+        it "returns there, not to the referer a failed submit left at /feedbacks" do
+          post base_url, params: {feedback: lead_params.merge(email: " "), return_to: "/for_cities#lead-sent"},
+            headers: {"HTTP_REFERER" => "http://www.example.com/for_cities", "HTTP_CF_IPCOUNTRY" => "US", "HTTP_CF_REGION" => "Indiana"}
+          expect(response).to render_template("landing_pages/for_cities")
+          expect(Capybara.string(response.body)).to have_select("state", selected: "Indiana")
+
+          post base_url, params: {feedback: lead_params, return_to: "/for_cities#lead-sent"},
+            headers: {"HTTP_REFERER" => "http://www.example.com/feedbacks"}
+          expect(response).to redirect_to "http://www.example.com/for_cities#lead-sent"
+
+          post base_url, params: {feedback: lead_params, return_to: "https://evil.example.org/for_cities"},
+            headers: {"HTTP_REFERER" => "http://www.example.com/for_cities"}
+          expect(response).to redirect_to "http://www.example.com/for_cities"
         end
       end
     end

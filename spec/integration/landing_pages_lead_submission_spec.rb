@@ -5,7 +5,7 @@ require "rails_helper"
 RSpec.describe "Landing page demo modals", :js, type: :system do
   def fill_in_and_submit_demo_form(name_label:, name_value:, contact_name: "Jane Doe", email: nil)
     expect(page).to have_content("Contact us for a free trial", wait: 5)
-    fill_in "Name", with: contact_name
+    fill_in "Your name", with: contact_name
     fill_in name_label, with: name_value
     fill_in "Phone number", with: "5551234567"
     fill_in "Email", with: email if email
@@ -24,7 +24,7 @@ RSpec.describe "Landing page demo modals", :js, type: :system do
       open_modal(first("button[commandfor]"))
 
       expect(page).to have_content("Contact us for a free trial", wait: 5)
-      fill_in "Name", with: "Jane Doe"
+      fill_in "Your name", with: "Jane Doe"
       fill_in "School", with: "Test University"
       fill_in "Phone number", with: "5551234567"
       fill_in "Email", with: "admin@testuni.edu"
@@ -34,7 +34,7 @@ RSpec.describe "Landing page demo modals", :js, type: :system do
       # have_content/have_field only match visible text, so these assert the modal
       # reopened (URL param) with entered data restored (form-persist localStorage)
       expect(page).to have_content("Contact us for a free trial", wait: 5)
-      expect(page).to have_field("Name", with: "Jane Doe")
+      expect(page).to have_field("Your name", with: "Jane Doe")
       expect(page).to have_field("School", with: "Test University")
       expect(page).to have_field("Phone number", with: "5551234567")
       expect(page).to have_field("Email", with: "admin@testuni.edu")
@@ -62,7 +62,7 @@ RSpec.describe "Landing page demo modals", :js, type: :system do
   context "for_cities" do
     let(:target_attributes) do
       {kind: "lead_for_city", name: "Portland", email: "staff@portland.gov", contact_name: "Jane Doe",
-       contact_role: "City staff", phone_number: "(555) 123-4567", body: "Starting with e-bikes", title: "New City lead: Portland"}
+       contact_role: "city_staff", phone_number: "(555) 123-4567 ext. 12", body: "Starting with e-bikes", title: "New City lead: Portland"}
     end
 
     it "walks through the education flow, then requests a demo from the contact section" do
@@ -104,7 +104,7 @@ RSpec.describe "Landing page demo modals", :js, type: :system do
       fill_in "Email", with: "staff@portland.gov"
       click_button "Request a demo"
       expect(page.evaluate_script("document.activeElement.id")).to eq "feedback_phone_number"
-      fill_in "Phone number", with: "(555) 123-4567"
+      fill_in "Phone number", with: "(555) 123-4567 ext. 12"
       fill_in "Anything else we should know?", with: "Starting with e-bikes"
 
       expect {
@@ -119,7 +119,7 @@ RSpec.describe "Landing page demo modals", :js, type: :system do
       EmailJobs::FeedbackNotificationJob.drain
       body = ActionMailer::Base.deliveries.last.body.encoded
       expect(body).to include("Role: City staff")
-      expect(body).to include("(555) 123-4567")
+      expect(body).to include("(555) 123-4567 ext. 12")
     end
   end
 
