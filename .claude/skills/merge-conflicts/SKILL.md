@@ -20,6 +20,8 @@ allowed-tools: Bash, Read, Edit, Write, Glob, Grep
 
 **Re-read `git branch --show-current` rather than trusting the branch from earlier in the session.** Conductor runs sessions concurrently, so another one can check this worktree out onto a different branch and commit to it while your conversation is open — and the base you resolved for the branch you *were* on is then the wrong base, merged into work you haven't read.
 
+**A local branch tracking a differently-named upstream — Conductor's `<name>-v1` on `origin/<name>` — gets switched to `<name>` first, without asking.** `git checkout <name>`, `git merge --no-edit <name>-v1` to carry anything only the `-v1` had, then `git branch -d <name>-v1`. When the checkout fails because `<name>` is checked out in another worktree, leave that worktree alone: stay on the `-v1` and push with `git push origin HEAD:<name>`.
+
 "Update from base", "sync with main", "this branch is behind", "merge the base in" all need a base branch to merge *from*. **Don't default to `main`.** A branch is often stacked on another feature branch, and merging `main` instead silently pulls the wrong history — the diff looks "already up to date" against `main` while the real base has commits you're missing. Resolve the base in this order:
 
 1. **A branch the user names** — "update from X" / "base is X" wins outright.

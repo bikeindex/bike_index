@@ -127,7 +127,7 @@ git push -u origin HEAD
 
 Don't report the local branch name differing from the name in the invocation when the branch has no upstream — pushing `HEAD` creates a matching remote, so it's benign. Only flag a mismatch when the local branch already tracks a differently-named upstream. If the push is rejected as non-fast-forward, go back to **Prepare the branch**.
 
-**A branch already tracking a differently-named upstream** — a Conductor `-v1` local on `origin/<name>` — takes `git push origin HEAD:<upstream-branch>` instead. `git push -u origin HEAD` creates a second remote branch and leaves the existing PR behind on the first.
+**A branch already tracking a differently-named upstream** — a Conductor `<name>-v1` local on `origin/<name>` — gets switched to `<name>` before pushing, without asking: `git checkout <name>`, `git merge --no-edit <name>-v1`, `git branch -d <name>-v1`. If `<name>` is checked out in another worktree, stay on the `-v1` and push `git push origin HEAD:<name>`. `git push -u origin HEAD` from the `-v1` creates a second remote branch and leaves the existing PR behind on the first.
 
 - **Open PR found above**: `gh pr edit <number> --title "..." --body-file <tmp-body-file>`. Refresh the title to match the current diff (that's what "update pr" expects) unless the user gave it a deliberate custom title — if unsure, keep the title and update only the body.
 
