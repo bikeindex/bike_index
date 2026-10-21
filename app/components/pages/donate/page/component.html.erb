@@ -21,7 +21,7 @@
 
 <div
   class="
-    tw:group/donate tw:-mt-(--nav-gap) tw:bg-white tw:text-[#444]
+    tw:group/donate tw:-mt-(--nav-gap) tw:-mb-18 tw:bg-white tw:text-[#444]
     tw:dark:bg-gray-900 tw:dark:text-gray-200
   "
   data-controller="donate--page"
@@ -461,7 +461,7 @@
   <% end %>
 
   <%= render(UI::CallToActionBanner::Component.new(heading: translation(".cta_headline"),
-    subheading: translation(".cta_sub"), max_width: "tw:max-w-7xl")) do %>
+    subheading: translation(".cta_sub"), wide: true)) do %>
     <%= render UI::Button::Component.new(
       text: submit_label,
       color: :yellow,

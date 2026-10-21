@@ -2,14 +2,13 @@
 
 module UI
   module CallToActionBanner
-    # The blue band that closes a page, with the action as its content. It cancels the
-    # footer's top margin, so it has to be the last thing on the page
+    # The blue band that closes a page, with the action as its content
     class Component < ApplicationComponent
-      def initialize(heading:, subheading: nil, illustration: true, max_width: "tw:max-w-6xl")
+      def initialize(heading:, subheading: nil, illustration: true, wide: false)
         @heading = heading
         @subheading = subheading
         @illustration = illustration
-        @max_width = max_width
+        @wide = wide
       end
     end
   end

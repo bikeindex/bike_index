@@ -3,8 +3,8 @@
 module SharedBlocks
   module MainContent
     module Content
-      # The two column shell for the informational pages, with a menu of related pages
-      # beside them
+      # The two column shell for the informational pages, with a menu of related pages -
+      # or the recovery record - beside them
       class Component < ApplicationComponent
         def initialize(blog:, related_blogs:, current_user:, controller_name:, action_name:)
           @blog = blog

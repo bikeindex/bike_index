@@ -1,5 +1,5 @@
-<section class="tw:-mb-18 tw:bg-blue-600 tw:text-white">
-  <div class="tw:mx-auto tw:flex tw:flex-col tw:gap-5 tw:px-5 tw:py-6 tw:md:flex-row tw:md:items-center tw:md:gap-9 tw:lg:px-14 tw:lg:py-11 <%= @max_width %>">
+<section class="tw:bg-blue-600 tw:text-white">
+  <div class="tw:mx-auto tw:flex tw:flex-col tw:gap-5 tw:px-5 tw:py-6 tw:md:flex-row tw:md:items-center tw:md:gap-9 tw:lg:px-14 tw:lg:py-11 <%= @wide ? "tw:max-w-7xl" : "tw:max-w-6xl" %>">
     <% if @illustration %>
       <%= image_tag("kelsey/illustrations/comic-assets_bike-love-1.png", alt: "", class: "tw:hidden tw:w-30 tw:shrink-0 tw:lg:block") %>
     <% end %>

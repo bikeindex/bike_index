@@ -1,5 +1,6 @@
 # Seed the blogs that top-level info pages render by slug — without the row, /membership
-# raises, and the navbar's and footer's stolen-bike link quietly redirects to /news. Bodies are the copy bikeindex.org serves, so review apps show the real page.
+# raises, and the navbar's and footer's stolen-bike link quietly redirects to /news.
+# Bodies are the copy bikeindex.org serves, so review apps show the real page.
 author = User.find_by(email: "admin@bikeindex.org") || User.first
 
 [
