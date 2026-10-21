@@ -34,6 +34,8 @@ Run the `gh` commands as written. The appendix at the bottom covers the one envi
 
 ### Check the working tree
 
+**First, a Conductor `<name>-v1` local tracking `origin/<name>` moves onto `<name>`** — `.claude/hooks/conductor-branch.sh` does it at session start; run it yourself if `git branch --show-current` still ends in `-v1`. Pushing from the `-v1` creates a second remote branch and leaves the PR behind.
+
 `git status` (no `-uall`). Everything below diffs `origin/main...HEAD`, which only sees **committed** work, and the merge in **Prepare the branch** needs a clean tree — so the tree has to be clean before you go further.
 
 - Uncommitted changes you made in this session: commit them now. Otherwise the cleanup, the classifier and the diff you describe all silently skip them, and the PR body describes the wrong diff.
@@ -125,9 +127,7 @@ If a bullet is turning into an essay, compress it to one sentence naming the *ki
 git push -u origin HEAD
 ```
 
-Don't report the local branch name differing from the name in the invocation when the branch has no upstream — pushing `HEAD` creates a matching remote, so it's benign. Only flag a mismatch when the local branch already tracks a differently-named upstream. If the push is rejected as non-fast-forward, go back to **Prepare the branch**.
-
-**A branch already tracking a differently-named upstream** — a Conductor `<name>-v1` local on `origin/<name>` — gets switched to `<name>` before pushing, without asking: `git checkout <name>`, `git merge --no-edit <name>-v1`, `git branch -d <name>-v1`. If `<name>` is checked out in another worktree, `git -C <that-worktree> checkout --detach` first; never stay on the `-v1`. `git push -u origin HEAD` from the `-v1` creates a second remote branch and leaves the existing PR behind on the first.
+Don't report the local branch name differing from the name in the invocation when the branch has no upstream — pushing `HEAD` creates a matching remote, so it's benign. If the push is rejected as non-fast-forward, go back to **Prepare the branch**.
 
 - **Open PR found above**: `gh pr edit <number> --title "..." --body-file <tmp-body-file>`. Refresh the title to match the current diff (that's what "update pr" expects) unless the user gave it a deliberate custom title — if unsure, keep the title and update only the body.
 

@@ -44,6 +44,11 @@
           {
             "type": "command",
             "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/mise-shims.sh"
+          },
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/conductor-branch.sh",
+            "statusMessage": "Moving a Conductor -v1 checkout onto its real branch"
           }
         ]
       },
