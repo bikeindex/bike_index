@@ -908,7 +908,7 @@
     </div>
   </section>
 
-  <%= render(Pages::LandingPages::DemoModal::Component.new(feedback: @feedback, current_user: @current_user, modal_id: MODAL_ID,
+  <%= render(Pages::LandingPages::DemoModal::Component.new(feedback: @feedback, modal_id: MODAL_ID,
     feedback_type: "lead_for_city", name_label: translation(".field_organization"), role_options:,
     title: translation(".schedule_a_demo"), submit_text: translation(".submit_demo"), submit_color: :primary,
     return_to: for_cities_path(anchor: "lead-sent"))) %>

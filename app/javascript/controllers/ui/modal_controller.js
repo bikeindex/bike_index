@@ -72,8 +72,7 @@ export default class extends Controller {
     this.persist(false)
   }
 
-  // A form sent from the dialog leaves the page, so the referer it goes with - which the
-  // response may redirect back to - mustn't reopen the modal
+  // A submit's referer is often where its response redirects, which mustn't reopen the modal
   submitted () {
     this.persist(false)
   }

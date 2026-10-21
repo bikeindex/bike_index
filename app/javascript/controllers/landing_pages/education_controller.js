@@ -6,16 +6,16 @@ import { Controller } from '@hotwired/stimulus'
 export default class extends Controller {
   static targets = ['step', 'summary', 'continue', 'done']
 
-  // A reload can restore the boxes' checks, and Firefox the buttons' disabled too
   connect () {
     this.index = 0
     this.reached = 0
-    this.stepTargets.forEach((step, index) => { this.continueTargets[index].disabled = !this.complete(step) })
+    this.check()
   }
 
-  check (event) {
-    const step = this.stepTargets.find(step => step.contains(event.target))
-    this.continueTargets[this.stepTargets.indexOf(step)].disabled = !this.complete(step)
+  // Every step, not just the one changed: a reload can restore the boxes' checks, and
+  // Firefox the buttons' disabled too
+  check () {
+    this.stepTargets.forEach((step, index) => { this.continueTargets[index].disabled = !this.complete(step) })
   }
 
   next () {
@@ -32,7 +32,7 @@ export default class extends Controller {
 
   restart () {
     this.element.querySelectorAll('input[type=checkbox]').forEach(box => { box.checked = false })
-    this.continueTargets.forEach(button => { button.disabled = true })
+    this.check()
     this.reached = 0
     this.show(0)
   }

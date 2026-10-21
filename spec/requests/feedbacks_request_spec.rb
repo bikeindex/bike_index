@@ -116,9 +116,9 @@ RSpec.describe FeedbacksController, type: :request do
       context "from a demo modal that names where to return" do
         let(:lead_params) { {name: "Chicago", feedback_type: "lead_for_city", email: "example@example.com"} }
 
-        it "returns there, not to the referer a failed submit left at /feedbacks" do
+        it "re-renders and returns there, not at the /feedbacks a failed submit left as the referer" do
           post base_url, params: {feedback: lead_params.merge(email: " "), return_to: "/for_cities#lead-sent"},
-            headers: {"HTTP_REFERER" => "http://www.example.com/for_cities", "HTTP_CF_IPCOUNTRY" => "US", "HTTP_CF_REGION" => "Indiana"}
+            headers: {"HTTP_REFERER" => "http://www.example.com/feedbacks", "HTTP_CF_IPCOUNTRY" => "US", "HTTP_CF_REGION" => "Indiana"}
           expect(response).to render_template("landing_pages/for_cities")
           expect(Capybara.string(response.body)).to have_select("state", selected: "Indiana")
 
@@ -161,7 +161,7 @@ RSpec.describe FeedbacksController, type: :request do
           log_in(user)
           expect {
             post base_url, params: {feedback: feedback_attrs.merge(body: "")},
-              headers: {"HTTP_REFERER" => for_schools_url}
+              headers: {"HTTP_REFERER" => "http://www.example.com/for_schools"}
           }.to change(EmailJobs::FeedbackNotificationJob.jobs, :count).by(0)
           expect(response).to render_template("landing_pages/for_schools")
           feedback = assigns(:feedback)

@@ -17,12 +17,12 @@ class FeedbacksController < ApplicationController
       else
         translation(:thanks_for_your_message)
       end
-      redirect_to(return_location)
+      redirect_to(form_page || help_path)
     else
       @page_errors = @feedback.errors
-      render(:index) && return if request.referer.blank?
+      render(:index) && return if form_page.blank?
 
-      re_path = Rails.application.routes.recognize_path(request.referer)
+      re_path = Rails.application.routes.recognize_path(URI(form_page).path)
       template = "#{re_path[:controller]}/#{re_path[:action]}"
       @force_landing_page_render = re_path[:controller] == "landing_pages"
       @page_id = [re_path[:controller], re_path[:action]].join("_")
@@ -47,9 +47,9 @@ class FeedbacksController < ApplicationController
     redirect_back(fallback_location: root_url) && (return true)
   end
 
-  # The form names its own return, since a submit that failed and re-rendered leaves the referer at /feedbacks
-  def return_location
-    url_from(params[:return_to]) || url_from(request.referer) || help_path
+  # A form can name its page, since one that failed and re-rendered leaves the referer at /feedbacks
+  def form_page
+    url_from(params[:return_to]) || url_from(request.referer)
   end
 
   def permitted_parameters

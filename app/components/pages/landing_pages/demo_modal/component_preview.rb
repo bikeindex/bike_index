@@ -10,8 +10,6 @@ module Pages
             name_label: "School",
             feedback_type: "lead_for_school",
             modal_id: "schools-demo-modal",
-            title: "Contact us for a free trial",
-            submit_text: "Let's chat",
             return_to: "/for_schools"
           ))
         end

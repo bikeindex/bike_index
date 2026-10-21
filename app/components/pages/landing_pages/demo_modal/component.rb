@@ -4,15 +4,13 @@ module Pages
   module LandingPages
     module DemoModal
       class Component < ApplicationComponent
-        # Needs a digit, and turns away an @ - an email in the wrong field. Anything else
-        # goes, since extensions and vanity numbers are written every which way
+        # A digit and no @ (an email in the wrong field) - extensions and vanity numbers
+        # are written too many ways to pin down further
         PHONE_PATTERN = "[^@]*[0-9][^@]*"
 
-        # return_to: where a sent request lands. The form carries it because once a failed
-        # submit has re-rendered the page, the referer is /feedbacks
         # role_options: [label, value] pairs, for a page that asks the visitor's role
-        def initialize(feedback:, feedback_type:, modal_id:, name_label:, return_to:, title:, submit_text:,
-          submit_color: :yellow, role_options: nil, current_user: nil)
+        def initialize(feedback:, feedback_type:, modal_id:, name_label:, return_to:, title: nil, submit_text: nil,
+          submit_color: :yellow, role_options: nil)
           @feedback = feedback
           @feedback_type = feedback_type
           @modal_id = modal_id
@@ -22,10 +20,13 @@ module Pages
           @submit_text = submit_text
           @submit_color = submit_color
           @role_options = role_options
-          @current_user = current_user
         end
 
         private
+
+        def title = @title || translation(".title")
+
+        def submit_text = @submit_text || translation(".submit_text")
 
         def form_controllers = ["form-persist strip-inputs", ("autofocus" if @feedback.errors.any?)].compact.join(" ")
       end

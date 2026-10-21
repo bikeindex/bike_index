@@ -12,9 +12,8 @@ module Pages
         MODAL_ID = "cities-demo-modal"
 
         # checker_state: the abbreviation of the visitor's state, which the checker starts on
-        def initialize(feedback: Feedback.new, current_user: nil, checker_state: nil)
+        def initialize(feedback: Feedback.new, checker_state: nil)
           @feedback = feedback
-          @current_user = current_user
           @checker_state = checker_state
           @total_bikes, @recoveries_value, @organizations = Counts.retrieve_many("total_bikes", "recoveries_value", "organizations")
         end
@@ -129,10 +128,10 @@ module Pages
 
         def next_steps = [translation(".contact_next_priorities"), translation(".contact_next_walkthrough"), translation(".contact_next_plan")]
 
-        # Values are keys rather than copy, so a lead's role reads the same whatever locale sent it
+        # Keys that humanize to the English label, so the admin email reads the same in any locale
         def role_options
           [[translation(".role_city_staff"), "city_staff"], [translation(".role_law_enforcement"), "law_enforcement"],
-            [translation(".role_school"), "school"], [translation(".role_housing"), "housing"],
+            [translation(".role_school"), "school_or_district"], [translation(".role_housing"), "housing_or_community_program"],
             [translation(".role_elected"), "elected_official"], [translation(".role_other"), "other"]]
         end
       end

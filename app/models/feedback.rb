@@ -43,11 +43,14 @@ class Feedback < ApplicationRecord
   belongs_to :user
   belongs_to :mailchimp_datum
 
-  validates_presence_of :body, :email, :title
+  validates_presence_of :email, :title
+  validates_presence_of :body, unless: :lead?
 
   attr_accessor :additional
 
   before_validation :set_calculated_attributes
+  # On save rather than validation, so a lead that fails doesn't come back to the form saying "lead"
+  before_save { self.body = "lead" if lead? && body.blank? }
 
   after_create :notify_admins
 
@@ -176,7 +179,6 @@ class Feedback < ApplicationRecord
     set_user_attrs
     self.email = EmailNormalizer.normalize(email)
     self.kind ||= calculated_kind
-    self.body = "lead" if lead? && body.blank?
     self.feedback_type ||= kind
   end
 
