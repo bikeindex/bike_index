@@ -97,12 +97,21 @@ RSpec.describe WelcomeController, type: :request do
       it "paginates, and redirects to the last valid page when the requested one is past the end" do
         get "/recovery_stories", params: {per_page: 2}
         expect(response.status).to eq(200)
-        expect(response).to render_template("recovery_stories")
         expect(assigns(:recovery_displays).count).to eq 2
+        expect(response.body).to include("Load more stories")
         expect(flash).to_not be_present
 
         get "/recovery_stories", params: {per_page: 2, page: 3}
         expect(response).to redirect_to(recovery_stories_path(page: 2))
+      end
+
+      it "renders only the requested page's frame for a load more" do
+        get "/recovery_stories", params: {per_page: 2, page: 2}, headers: {"Turbo-Frame" => "recovery_stories_page_2"}
+        expect(response.status).to eq(200)
+        expect(response.body).to include('<turbo-frame class="tw:contents" id="recovery_stories_page_2">')
+        expect(response.body).to include(ERB::Util.html_escape(quote))
+        expect(response.body).to_not include("Load more stories")
+        expect(response.body).to_not include("Fund the next recovery")
       end
     end
 
@@ -116,7 +125,6 @@ RSpec.describe WelcomeController, type: :request do
 
         get "/recovery_stories"
         expect(response.status).to eq(200)
-        expect(response).to render_template("recovery_stories")
         expect(assigns(:recovery_displays).count).to eq 1
         # passive_organization isn't re-authorized once it's in the session
         expect(session[:passive_organization_id]).to eq current_organization.id

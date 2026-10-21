@@ -45,4 +45,5 @@ else
   puts "workspace ID set to #{next_id}"
 end
 
+system(File.join(APP_ROOT, "bin/conductor_branch"))
 system(File.join(APP_ROOT, "bin/setup"), *ARGV) || abort("bin/setup failed")

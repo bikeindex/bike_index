@@ -6,12 +6,6 @@
   }
 }
 
-#recovery-stories-listing {
-  .recovery-block {
-    margin: 1rem auto;
-  }
-}
-
 #recovery-stories-container {
   width: 90%;
   margin: 35px auto 0 auto;
@@ -148,16 +142,6 @@ $recovery-text-bg: #fff;
     display: flex;
     justify-content: center;
     margin: 17%;
-  }
-}
-
-@media (min-width: $grid-breakpoint-xl) {
-  #recovery-stories-listing {
-    .recovery-stories-container {
-      width: 48%;
-      margin: 10px;
-      float: left;
-    }
   }
 }
 
