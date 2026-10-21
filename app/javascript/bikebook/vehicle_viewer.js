@@ -70,9 +70,10 @@ export class VehicleViewer {
         ? content(data, value)
         : html`<p class="twless-strong">${none}</p>`}</section>`
     })
+    const typeName = (data) => presenter.named(presenter.kit.schemas.vehicle, data).type || 'bike'
     // its type's drawing of `size`, said where it takes a typical one's figures
     const drawing = (data, size, figure, legend) => html`<figure class="tw:space-y-1"><div class="tw:mx-auto tw:max-w-xl tw:text-gray-800 tw:dark:text-gray-200">${figure}</div>${legend.some(({ listed }) => !listed)
-      ? html`<figcaption class="tw:text-center tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">${present(size?.name) ? `${size.name} drawn. ` : ''}Gray figures aren't listed, so they're drawn as they typically are on a ${String(presenter.named(presenter.kit.schemas.vehicle, data).type || 'bike').toLowerCase()}.</figcaption>`
+      ? html`<figcaption class="tw:text-center tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">${present(size?.name) ? `${size.name} drawn. ` : ''}Gray figures aren't listed, so they're drawn as they typically are on a ${typeName(data).toLowerCase()}.</figcaption>`
       : nothing}</figure>`
     const views = {
       basics: () => basics({ presenter, vehicles, outOfClassId }),
@@ -81,9 +82,9 @@ export class VehicleViewer {
         tw:min-[1500px]:items-start tw:min-[1500px]:gap-6 tw:min-[1500px]:px-4">${geometryOverlay({ ...compared, beside: true })}${
         comparisonTable({ ...compared, beside: true })}</div>${cardRow('tw:mt-6', cards('sizes', 'No sizes listed', (data, value) => {
         const size = sizes[values.indexOf(value)]
-        const { figure, legend } = cycleDrawing({ type: data.type, data, size, geometryKeys: Object.keys(presenter.kit.schemas.geometry) })
+        const { figure, legend } = cycleDrawing({ type: data.type, data, size, kit: presenter.kit })
         return html`${drawing(data, size, figure, legend)}<div class="tw:-mx-(--gutter)">${sizesOf({
-          presenter, data, others: others(value), selectedSize: selectedSizes.get(value), sizePath: sizePath(value), letters: new Map(legend.map((each) => [each.key, each]))
+          presenter, data, others: others(value), selectedSize: selectedSizes.get(value), sizePath: sizePath(value), letters: new Map(legend.map(({ key, letter }) => [key, letter]))
         })}</div>`
       }, { keyed: true }))}`,
       components: () => {
@@ -105,7 +106,7 @@ export class VehicleViewer {
     }
     // a model opened alone, its search hidden, has a tab to show it: "Search other cargo bikes"
     const lone = !searching(url) && vehicles.length === 1
-    const type = lone && (presenter.named(presenter.kit.schemas.vehicle, vehicles[0].data).type || 'bike')
+    const type = lone && typeName(vehicles[0].data)
     const searchTab = lone ? { label: `Search other ${type.toLowerCase()}s`, href: pathWith(url, { search: '1' }) } : null
     return html`${jumpTo(view, (each) => pathWith(url, { view: each === 'basics' ? '' : each }), shown, searchTab)}${views[view]()}`
   }

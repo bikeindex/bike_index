@@ -875,12 +875,7 @@ class ModelViewer {
     // selected one as ui--tabs does its active tab
     return html`<div data-controller="ui--tabs" class="tw:overflow-x-auto tw:px-(--gutter) tw:pb-3.5"><div data-ui--tabs-target="row"
       class="tw:flex tw:w-max tw:min-w-full tw:gap-4">${sizes.map((size) => geometryCard({
-        presenter: this.presenter,
-size,
-others,
-selected: present(this.selectedSize) && size.name === this.selectedSize,
-href: this.sizePath?.(size.name),
-        letters: this.letters
+        presenter: this.presenter, size, others, selected: present(this.selectedSize) && size.name === this.selectedSize, href: this.sizePath?.(size.name), letters: this.letters
       }))}</div></div>`
   }
 

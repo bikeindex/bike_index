@@ -10,10 +10,11 @@
   </div>
 </div>
 
-<% manifest_url = @manifest_url %>
-
 <%# a collapsed row is its own ui--collapse, so the trigger in its header opens both drawings %>
-<% collapsible = ->(row, drawing) { row.collapsed ? tag.div(drawing, class: "tw:hidden", data: {"ui--collapse-target": "content"}) : drawing } %>
+<% drawing = lambda do |row, model = nil|
+  div = tag.div(class: "tw:w-xl", data: {controller: "admin--cycle-drawing", "admin--cycle-drawing-type-value": row.type, "admin--cycle-drawing-type-detail-value": row.type_detail, "admin--cycle-drawing-model-value": model, "admin--cycle-drawing-manifest-url-value": @manifest_url})
+  row.collapsed ? tag.div(div, class: "tw:hidden", data: {"ui--collapse-target": "content"}) : div
+end %>
 
 <%= render(UI::Table::Component.new(records: @rows, row_attributes: ->(row) { {data: {controller: "ui--collapse", "ui--collapse-param-value": row.param}} if row.collapsed })) do |table| %>
   <% table.column(label: "Type", row_header: true) do |row| %>
@@ -32,29 +33,12 @@
   <% end %>
 
   <% table.column(label: "Typical", classes: "tw:align-top!") do |row| %>
-    <%= collapsible.call(row, capture do %>
-      <div
-        class="tw:w-xl"
-        data-controller="admin--cycle-drawing"
-        data-admin--cycle-drawing-type-value="<%= row.type %>"
-        data-admin--cycle-drawing-type-detail-value="<%= row.type_detail %>"
-        data-admin--cycle-drawing-manifest-url-value="<%= manifest_url %>"
-      ></div>
-    <% end) %>
+    <%= drawing.call(row) %>
   <% end %>
 
   <% table.column(label: "Catalog example", classes: "tw:align-top!") do |row| %>
     <% if row.example_model %>
-      <%= collapsible.call(row, capture do %>
-        <div
-          class="tw:w-xl"
-          data-controller="admin--cycle-drawing"
-          data-admin--cycle-drawing-type-value="<%= row.type %>"
-          data-admin--cycle-drawing-type-detail-value="<%= row.type_detail %>"
-          data-admin--cycle-drawing-model-value="<%= row.example_model %>"
-          data-admin--cycle-drawing-manifest-url-value="<%= manifest_url %>"
-        ></div>
-      <% end) %>
+      <%= drawing.call(row, row.example_model) %>
     <% else %>
       <span class="tw:text-gray-500">No catalog models</span>
     <% end %>

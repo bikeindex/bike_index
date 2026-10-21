@@ -4,7 +4,7 @@ import { figureLetter } from 'bikebook/templates/vehicles/cycle_drawing'
 import { array, equal, except, isHash, presence, present } from 'bikebook/templates/values'
 
 // A size's geometry, marked where the same-named size in `others` differs, and ringed when it's the size compared, its
-// name otherwise a link to `href`, which compares it in place. A figure in `letters`, by key, is lettered as its drawing has it
+// name otherwise a link to `href`, which compares it in place. A figure in `letters`, a key's letter, is lettered as its drawing has it
 export const geometryCard = ({ presenter, size, others, selected, href, letters = new Map() }) => {
   const { labels, extras_key: extrasKey, dimensions } = presenter.kit.geometry
   const geometry = size.geometry ?? {}
@@ -19,8 +19,9 @@ export const geometryCard = ({ presenter, size, others, selected, href, letters 
     return [presenter.humanize(label), value, unit || 'mm', otherExtras.some((each) => !equal(each[key], value)), key]
   })
   // a hash's row, as overall dimensions are, lettered with each of its fields drawn
-  const lettersFor = (key) => letters.has(key) ? [letters.get(key)] : [...letters.values()].filter((each) => each.key.startsWith(`${key}.`))
-  const lettered = (each) => each.map(([label, ...row]) => [html`${lettersFor(row[3]).map(figureLetter)}${label}`, ...row])
+  const lettersFor = (key) => letters.has(key) ? [letters.get(key)] : [...letters].filter(([each]) => each.startsWith(`${key}.`)).map(([, letter]) => letter)
+  const lettered = (rows) => rows.map(([label, value, unit, differs, key, ...rest]) =>
+    [html`${lettersFor(key).map((letter) => figureLetter({ letter, listed: present(value) }))}${label}`, value, unit, differs, key, ...rest])
   return html`<div aria-current=${selected ? 'true' : nothing} data-ui--tabs-target=${selected ? 'active' : nothing} class="tw:w-max tw:shrink-0 tw:space-y-3 tw:rounded-sm tw:border ${selected
     ? 'tw:border-purple-500 tw:ring-2 tw:ring-purple-500/40'
     : 'tw:border-gray-200 tw:dark:border-gray-700'} tw:bg-white tw:dark:bg-gray-800 tw:p-4"><h3

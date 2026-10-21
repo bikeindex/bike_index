@@ -4,10 +4,10 @@ import { TYPICAL_GEOMETRY } from 'bikebook/typical_geometry'
 // figures that size the front triangle, without any of which a frame would be all estimate
 const SIZING = ['reach', 'stack', 'top_tube_effective', 'front_center', 'head_tube']
 
-const radians = (degrees) => degrees * Math.PI / 180
+export const radians = (degrees) => degrees * Math.PI / 180
 const cot = (angle) => 1 / Math.tan(angle)
 // a right triangle's other side, 0 where the figures it's from don't make one
-const leg = (hypotenuse, side) => Math.sqrt(Math.max(hypotenuse ** 2 - side ** 2, 0))
+export const leg = (hypotenuse, side) => Math.sqrt(Math.max(hypotenuse ** 2 - side ** 2, 0))
 
 export const builtWheel = (data, size, position) => array(data.wheels).find((each) => each.configured !== false &&
   array(each.position).includes(position) && (!each.sizes || array(each.sizes).includes(size?.name)))

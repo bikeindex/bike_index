@@ -1,5 +1,5 @@
 import { html, nothing, svg } from 'lit-html'
-import { drawingViews, listedFigure } from 'bikebook/cycle_drawings'
+import { arc, drawingViews, listedFigure, minus, plus, polar, scale } from 'bikebook/cycle_drawings'
 
 const LISTED = '#715eb2'
 const TYPICAL = '#9ca3af'
@@ -9,22 +9,8 @@ const WEIGHTS = { frame: 3.5, part: 2.5, thin: 1.25, ghost: 1.25 }
 // lettering heights between a dimension's lanes
 const LANE = 2.6
 
-export const LABELS = {
-  stack: 'Stack',
-  reach: 'Reach',
-  top_tube_effective: 'Top tube (effective)',
-  head_tube: 'Head tube',
-  head_angle: 'Head angle',
-  seat_tube_ct: 'Seat tube (center to top)',
-  seat_angle: 'Seat angle',
-  chainstay: 'Chainstay',
-  wheelbase: 'Wheelbase',
-  bb_drop: 'BB drop',
-  bb_height: 'BB height',
-  standover: 'Standover',
-  fork_rake: 'Fork rake / offset',
-  trail: 'Trail',
-  crank_length: 'Crank length',
+// labels for the figures the kit's geometry labels don't name
+const LABELS = {
   rear_rack_length: 'Rear rack length',
   captain_top_tube: 'Captain top tube',
   captain_seat_tube: 'Captain seat tube',
@@ -37,7 +23,6 @@ export const LABELS = {
   handlebar_height: 'Handlebar height',
   handlebar_height_min: 'Handlebar height, lowest',
   handlebar_height_max: 'Handlebar height, highest',
-  handlebar_width: 'Handlebar width',
   frame_offset: 'Upper frame offset',
   wheel_size: 'Wheel diameter',
   wheel_front: 'Front wheel diameter',
@@ -67,10 +52,6 @@ export const LABELS = {
   'dimensions_folded.height': 'Folded height'
 }
 
-const plus = ([x, y], [dx, dy]) => [x + dx, y + dy]
-const minus = ([x1, y1], [x2, y2]) => [x1 - x2, y1 - y2]
-const scale = ([x, y], factor) => [x * factor, y * factor]
-const polar = (length, degrees) => [length * Math.cos(degrees * Math.PI / 180), length * Math.sin(degrees * Math.PI / 180)]
 const point = ([x, y]) => `${Math.round(x * 10) / 10},${Math.round(-y * 10) / 10}`
 const pathData = (points, closed) => `M${points.map(point).join('L')}${closed ? 'Z' : ''}`
 
@@ -108,8 +89,7 @@ const placed = (dim, font) => {
   if (dim.kind === 'angle') {
     const radius = dim.radius * font
     const middle = (dim.from + dim.to) / 2
-    const arcPoints = Array.from({ length: 13 }, (_, index) => plus(dim.center, polar(radius, dim.from + (dim.to - dim.from) * index / 12)))
-    return { line: arcPoints, extensions: [], badge: plus(dim.center, polar(radius + font, middle)), arrowSize: 0 }
+    return { line: arc(dim.center, radius, dim.from, dim.to, 12), extensions: [], badge: plus(dim.center, polar(radius + font, middle)), arrowSize: 0 }
   }
   const [start, end] = dimensionLine(dim, LANE * font)
   const span = minus(end, start)
@@ -165,11 +145,10 @@ const renderDimension = ({ placement, letter, listed, key }, font, highlight) =>
     fill="white" stroke="none" font-size=${font} font-weight="700" text-anchor="middle" dominant-baseline="central">${letter}</text></g>`
 }
 
-// `type`'s drawing, or its `typeDetail`'s, of `data` in `size`, each figure it dimensions lettered on it, and the legend of them: { letter,
-// key, label, value, unit, listed, extra }, `listed` where the size lists it rather than taking its type's typical, and `extra`
-// where it isn't one of the `geometryKeys` the kit's schema has, so lists it in extra_measurements, those lettered last. Each
-// dimension carries data-figure, its key, and the `highlight` one is drawn over the rest
-export const cycleDrawing = ({ type, typeDetail, data = {}, size, geometryKeys, highlight }) => {
+// `type`'s drawing, or its `typeDetail`'s, of `data` in `size`, and the legend of its lettered figures: `listed` where the size
+// lists one rather than taking its type's typical, `derived` where the wheels give it, and `extra`, lettered last, where the
+// `kit`'s geometry schema doesn't have it. Each figure's marks carry data-figure, and the `highlight` one's are drawn on top
+export const cycleDrawing = ({ type, data = {}, typeDetail = data.type_detail, size, kit, highlight }) => {
   const { views, listed } = drawingViews({ type, typeDetail, data, size })
   const flattened = views.map((view) => ({ ...view, shapes: [view.shapes].flat(Infinity).filter(Boolean) }))
   // lettering sized to the views side by side
@@ -178,19 +157,29 @@ export const cycleDrawing = ({ type, typeDetail, data = {}, size, geometryKeys, 
   const font = span / 36
 
   const dims = flattened.flatMap((view) => view.dims)
-  const extra = (key) => Boolean(geometryKeys) && !key.startsWith('wheel_') && !geometryKeys.includes(key.split('.')[0])
+  const dimFor = (key) => dims.find((each) => each.key === key)
+  const extra = (key) => Boolean(kit) && !dimFor(key).derived && !(key.split('.')[0] in kit.schemas.geometry)
   const drawn = [...new Set(dims.map(({ key }) => key))]
   const keys = [...drawn.filter((key) => !extra(key)), ...drawn.filter(extra)]
   const letter = (key) => String.fromCharCode(65 + keys.indexOf(key))
   const legend = keys.map((key) => {
-    const dim = dims.find((each) => each.key === key)
+    const dim = dimFor(key)
     const isListed = dim.listed ?? listed(key)
     const value = dim.value ?? (isListed ? listedFigure(size, key) : null) ?? measured(dim)
     const angular = dim.kind === 'angle'
-    return { letter: letter(key), key, label: LABELS[key] ?? key, value: angular ? Math.round(value * 10) / 10 : Math.round(value), unit: angular ? '°' : 'mm', listed: isListed, extra: extra(key) }
+    return {
+      letter: letter(key),
+      key,
+      label: kit?.geometry.labels[key] ?? LABELS[key] ?? key,
+      value: angular ? Math.round(value * 10) / 10 : Math.round(value),
+      unit: angular ? '°' : 'mm',
+      listed: isListed,
+      derived: Boolean(dim.derived),
+      extra: extra(key)
+    }
   })
   const laidOut = flattened.map((view) => {
-    const placedDims = view.dims.map((dim) => ({ key: dim.key, letter: letter(dim.key), listed: legend[keys.indexOf(dim.key)].listed, placement: placed(dim, font) }))
+    const placedDims = view.dims.map((dim) => ({ ...legend[keys.indexOf(dim.key)], placement: placed(dim, font) }))
     const points = [...view.shapes.flatMap(shapePoints), ...placedDims.flatMap(({ placement }) =>
       [...placement.line, ...[[-1, -1], [1, 1]].map((corner) => plus(placement.badge, scale(corner, font)))])]
     return { ...view, dims: placedDims, bounds: extent(points) }
@@ -209,7 +198,7 @@ export const cycleDrawing = ({ type, typeDetail, data = {}, size, geometryKeys, 
   const top = Math.max(...positioned.map(({ bounds, dy }) => bounds.top + dy)) + font
   const bottom = Math.min(...positioned.map(({ bounds, dy }) => bounds.bottom + dy)) - (positioned.length > 1 ? font * 2.5 : font)
 
-  const figure = svg`<svg role="img" aria-label=${`${[type, typeDetail ?? data.type_detail].filter(Boolean).join(' ')} drawing, ${legend.map(({ letter, label }) => `${letter}: ${label}`).join(', ')}`}
+  const figure = svg`<svg role="img" aria-label=${`${[type, typeDetail].filter(Boolean).join(' ')} drawing, ${legend.map(({ letter, label }) => `${letter}: ${label}`).join(', ')}`}
     viewBox=${[left, -top, right - left, top - bottom].map(Math.round).join(' ')} class="tw:h-auto tw:max-h-96 tw:w-full"
     font-family="ui-sans-serif, system-ui, sans-serif">${positioned.map((view) => svg`<g transform=${`translate(${view.dx} ${-view.dy})`}>${view.plan
       ? nothing

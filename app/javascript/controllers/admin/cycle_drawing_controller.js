@@ -1,8 +1,9 @@
 import { Controller } from '@hotwired/stimulus'
 import { html, nothing, render } from 'lit-html'
+import { withFigures } from 'bikebook/cycle_drawings'
+import { chosenSizes } from 'bikebook/sizes'
 import { buttonClasses } from 'bikebook/templates/ui/button'
 import { cycleDrawing } from 'bikebook/templates/vehicles/cycle_drawing'
-import { array } from 'bikebook/templates/values'
 
 const catalogFiles = new Map()
 const MODEL_BLOCK = /^m\/([a-z0-9_]+\/\d{4})\//
@@ -14,41 +15,28 @@ const catalogFile = (manifestUrl, path) => {
   return catalogFiles.get(url.href)
 }
 
-// The figures the catalog's geometry schema has, rather than gathering in extra_measurements
-const fetchGeometryKeys = async (manifestUrl) =>
-  Object.keys((await catalogFile(manifestUrl, (await catalogFile(manifestUrl)).kit)).kit.schemas.geometry)
+const fetchKit = async (manifestUrl) => (await catalogFile(manifestUrl, (await catalogFile(manifestUrl)).kit)).kit
 
-// A catalog model and its middle size, null for one the catalog hasn't published
+// A catalog model and the size Bikebook first shows it in, null for one the catalog hasn't published
 const fetchModel = async (manifestUrl, id) => {
   const block = (await catalogFile(manifestUrl)).blocks[id.match(MODEL_BLOCK)[1]]
   const data = block && (await catalogFile(manifestUrl, block)).models[id]
-  if (!data) return null
-  const sizes = array(data.sizes)
-  return { id, data, size: sizes[Math.floor(sizes.length / 2)] }
+  return data ? { id, data, size: chosenSizes([{ value: id, data }])[0] } : null
 }
 
 // Its Sizes & geometry view, with the size drawn here picked
 const geometryPath = (id, size) => `/bikebook?${new URLSearchParams({ vehicle_models: id, view: 'geometry', ...(size?.name ? { vehicle_sizes: size.name } : {}) })}`
 
-// `size` with each of `figures`, a key as dimensions.length for one inside a hash
-const withFigures = (size, figures) => ({
-  ...size,
-  geometry: Object.entries(figures).reduce((geometry, [key, value]) => {
-    const [name, field] = key.split('.')
-    return field ? { ...geometry, [name]: { ...geometry[name], [field]: value } } : { ...geometry, [name]: value }
-  }, size?.geometry ?? {})
-})
-
 // Connects to data-controller='admin--cycle-drawing'
-// Draws a vehicle type, or a type_detail of it, a catalog model's middle size where it's given one, redrawn as a figure's input changes
+// Draws a vehicle type, or a type_detail of it, in a catalog model's size where it's given one, redrawn as a figure's input changes
 export default class extends Controller {
   static values = { type: String, typeDetail: String, model: String, manifestUrl: String }
 
   async connect () {
     this.figures = {}
     this.highlight = null
-    this.geometryKeys = await fetchGeometryKeys(this.manifestUrlValue)
-    this.vehicle = this.modelValue ? await fetchModel(this.manifestUrlValue, this.modelValue) : { data: {} }
+    const [kit, vehicle] = await Promise.all([fetchKit(this.manifestUrlValue), this.modelValue ? fetchModel(this.manifestUrlValue, this.modelValue) : { data: {} }])
+    Object.assign(this, { kit, vehicle })
     this.vehicle
       ? this.draw()
       : render(html`<p class="tw:text-gray-500"><code>${this.modelValue}</code> isn't in the published catalog yet</p>`, this.element)
@@ -75,7 +63,7 @@ export default class extends Controller {
   draw () {
     const { id, data, size } = this.vehicle
     const { figure, legend } = cycleDrawing({
-      type: this.typeValue, typeDetail: this.typeDetailValue || undefined, data, size: withFigures(size, this.figures), geometryKeys: this.geometryKeys, highlight: this.highlight
+      type: this.typeValue, typeDetail: this.typeDetailValue || undefined, data, size: withFigures(size, this.figures), kit: this.kit, highlight: this.highlight
     })
     const extras = legend.filter(({ extra }) => extra)
     // the model's line held open when there's none, so a typical drawing lines up with its example's
@@ -92,10 +80,10 @@ export default class extends Controller {
     ?disabled=${Object.keys(this.figures).length === 0} @click=${() => this.reset()}>Reset</button></div>`, this.element)
   }
 
-  // the legend's figures, down one column then the next, each an input but the wheels' diameters
+  // the legend's figures, down one column then the next, each an input but those the wheels give
   figureList (figures) {
     const idPrefix = [this.typeValue, this.typeDetailValue, this.modelValue].filter(Boolean).join('-').replaceAll('/', '-')
-    return html`<ol class="tw:mt-2 tw:columns-2 tw:gap-4 tw:text-xs">${figures.map(({ letter, key, label, value, unit, listed }) =>
+    return html`<ol class="tw:mt-2 tw:columns-2 tw:gap-4 tw:text-xs">${figures.map(({ letter, key, label, value, unit, listed, derived }) =>
     html`<li class="tw:mb-1 tw:flex tw:break-inside-avoid tw:items-baseline tw:gap-2 ${key === this.highlight
       ? 'tw:font-bold tw:text-blue-500'
       : listed ? '' : 'tw:text-gray-500'}"><button type="button" aria-label=${`Highlight ${label}`} aria-pressed=${String(key === this.highlight)}
@@ -103,10 +91,10 @@ export default class extends Controller {
       tw:border-0! tw:p-0! tw:text-xs tw:font-bold tw:text-white tw:focus:outline-none! tw:focus-visible:ring-2 tw:focus-visible:ring-blue-500/40 ${key === this.highlight
         ? 'tw:bg-blue-500'
         : listed ? 'tw:bg-[#715eb2]' : 'tw:bg-gray-400'}">${letter}</button><label for=${`${idPrefix}-${key}`}
-      class="tw:grow">${label}</label>${key.startsWith('wheel_')
+      class="tw:grow">${label}</label>${derived
       ? html`<span class="tw:font-mono">${value} ${unit}</span>`
       : html`<input type="number" step="any" name=${key} id=${`${idPrefix}-${key}`} autocomplete="off"
         class="twinput tw:w-20! tw:py-0.5! tw:text-right tw:text-xs!" .value=${String(value)} @input=${(event) => this.edit(event)}><span
-        class="tw:w-6">${unit === '°' ? '°' : 'mm'}</span>`}</li>`)}</ol>`
+        class="tw:w-6">${unit}</span>`}</li>`)}</ol>`
   }
 }

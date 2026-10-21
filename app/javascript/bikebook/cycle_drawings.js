@@ -1,22 +1,22 @@
-import { builtWheel, frameGeometry, outerRadius } from 'bikebook/frame_geometry'
+import { builtWheel, frameGeometry, leg, radians } from 'bikebook/frame_geometry'
 import { array, isNumber } from 'bikebook/templates/values'
 
 // Each vehicle type's drawing, in mm with y up from the ground and the rider facing +x, as views of shapes and the
 // dimensions lettered on them, keyed type/type_detail for a detail drawn its own way. A figure the size doesn't list is
 // drawn at its type's typical one, in `defaults`
 
-const radians = (degrees) => degrees * Math.PI / 180
-const polar = (length, degrees) => [length * Math.cos(radians(degrees)), length * Math.sin(radians(degrees))]
-const plus = (point, ...vectors) => vectors.reduce(([x, y], [dx, dy]) => [x + dx, y + dy], point)
-const minus = ([x1, y1], [x2, y2]) => [x1 - x2, y1 - y2]
-const scale = ([x, y], factor) => [x * factor, y * factor]
+export const polar = (length, degrees) => [length * Math.cos(radians(degrees)), length * Math.sin(radians(degrees))]
+export const plus = (point, ...vectors) => vectors.reduce(([x, y], [dx, dy]) => [x + dx, y + dy], point)
+export const minus = ([x1, y1], [x2, y2]) => [x1 - x2, y1 - y2]
+export const scale = ([x, y], factor) => [x * factor, y * factor]
 const unit = (vector) => scale(vector, 1 / Math.hypot(...vector))
 const lerp = (a, b, t) => plus(a, scale(minus(b, a), t))
 const dot = ([x1, y1], [x2, y2]) => x1 * x2 + y1 * y2
-const arc = (center, radius, from, to, steps = 24) => Array.from({ length: steps + 1 }, (_, index) => plus(center, polar(radius, from + (to - from) * index / steps)))
+export const arc = (center, radius, from, to, steps = 24) => Array.from({ length: steps + 1 }, (_, index) => plus(center, polar(radius, from + (to - from) * index / steps)))
 // where a line from `point` along `direction` reaches height `y`
 const atHeight = (point, direction, y) => plus(point, scale(direction, (y - point[1]) / direction[1]))
-const leg = (hypotenuse, side) => Math.sqrt(Math.max(hypotenuse ** 2 - side ** 2, 0))
+// up and back at `degrees` from the ground, as a head tube or seat tube rises
+const rising = (degrees) => polar(1, 180 - degrees)
 
 const path = (weight) => (...points) => ({ kind: 'path', points, weight })
 const tube = path('frame')
@@ -24,7 +24,7 @@ const part = path('part')
 const thin = path('thin')
 const ghost = path('ghost')
 const panel = (...points) => ({ kind: 'path', points, weight: 'part', closed: true, fill: true })
-const box = ([x0, y0], [x1, y1], make = panel) => make([x0, y0], [x1, y0], [x1, y1], [x0, y1], ...(make === panel ? [] : [[x0, y0]]))
+const box = ([x0, y0], [x1, y1], make = panel) => ({ ...make([x0, y0], [x1, y0], [x1, y1], [x0, y1]), closed: true })
 const ring = (center, radius, weight = 'thin', fill = false) => ({ kind: 'circle', center, radius, weight, fill })
 const wheel = (center, { r, tire }) => [ring(center, r, 'part'), ring(center, Math.max(r - tire, r * 0.6)), ring(center, Math.max(r * 0.07, 6), 'thin', true)]
 // a wheel seen end on, across `lateral`
@@ -42,16 +42,16 @@ const dropBar = (clamp) => part(clamp, plus(clamp, [75, 5]), plus(clamp, [100, -
 const h = (key, a, b, lane = 0, options = {}) => ({ kind: 'h', key, a, b, lane, ...options })
 const v = (key, a, b, lane = 0, options = {}) => ({ kind: 'v', key, a, b, lane, ...options })
 const d = (key, a, b, lane = 0, options = {}) => ({ kind: 'd', key, a, b, lane, ...options })
-// counterclockwise from `from` to `to` degrees, `radius` in lettering heights
-const angle = (key, center, from, to, radius = 2.6) => ({ kind: 'angle', key, center, from, to, radius })
-const across = (key, center, { r, listed }) => h(key, plus(center, [-r, 0]), plus(center, [r, 0]), 0, { base: center[1], value: 2 * r, listed })
+// `degrees` up from the ground behind `center`, `radius` in lettering heights
+const angle = (key, center, degrees, radius = 2.6) => ({ kind: 'angle', key, center, from: 180 - degrees, to: 180, radius })
+const across = (key, center, { r, listed }) => h(key, plus(center, [-r, 0]), plus(center, [r, 0]), 0, { base: center[1], value: 2 * r, listed, derived: true })
 const fromGround = (key, point, lane = 0, options = {}) => v(key, [point[0], 0], point, lane, { base: point[0], ...options })
 const overall = (key, from, to, lane = -2.6) => h(key, [from, 0], [to, 0], lane, { base: 0 })
 
 const ROAD = /^(road|track|atb_)/
 
-// frameGeometry's frame with its bottom bracket at `bbHeight` off the ground, taking `defaults` for whatever it can't
-// draw without, and `fallback`'s wheels where it lists none
+// frameGeometry's frame standing on the ground, taking `defaults` for whatever it can't draw without, and `fallback`'s
+// wheels where it lists none
 const bikeFrame = ({ data, size, defaults }, fallback) => {
   const fallbackWheels = [{ bsd: fallback.bsd, tire_width: fallback.tire, position: ['front', 'rear'] }]
   const settle = (built, geometry, attempts) => {
@@ -88,8 +88,7 @@ const stepTube = (frame, standover) => {
   const end = atHeight(bb, seat, Math.max(standover - 30, bb[1] + 90))
   const lowX = lerp(end, start, 0.45)[0]
   const low = [lowX, Math.max(standover, floor(lowX))]
-  const points = quadratic(start, minus(scale(low, 2), scale(plus(start, end), 0.5)), end).map(([x, y]) => [x, Math.max(y, floor(x))])
-  return points
+  return quadratic(start, minus(scale(low, 2), scale(plus(start, end), 0.5)), end).map(([x, y]) => [x, Math.max(y, floor(x))])
 }
 
 // The bench a moto-style bike's rider sits on, its front over the seat tube and the rest out back, the top tube running
@@ -126,7 +125,8 @@ const bikeDims = (frame, { fig }, detail) => {
   const headAngle = Math.atan2(steering[1], -steering[0]) * 180 / Math.PI
   const seatAngle = Math.atan2(seat[1], -seat[0]) * 180 / Math.PI
   const seatAtStack = atHeight(bb, seat, headTop[1])
-  const topTube = detail === 'bench_seat' ? bench(frame, { fig }).under : seatTop
+  const seated = bench(frame, { fig })
+  const topTube = detail === 'bench_seat' ? seated.under : seatTop
   // just forward of the bottom bracket, between the BB height's line and the seat tube's out in front: on the top tube, or a
   // step-through's step tube
   const standoverX = bb[0] + 75
@@ -140,34 +140,29 @@ const bikeDims = (frame, { fig }, detail) => {
     h('reach', bb, headTop, 1.1),
     h('top_tube_effective', seatAtStack, headTop, 2.3),
     d('head_tube', headTop, headBottom, 1),
-    angle('head_angle', ground, 180 - headAngle, 180, 3.4),
-    ...(detail === 'bench_seat' ? [] : [d('seat_tube_ct', bb, seatTop, -1.8), angle('seat_angle', bb, 180 - seatAngle, 180, 3.4)]),
+    angle('head_angle', ground, headAngle, 3.4),
+    ...(detail === 'bench_seat' ? [] : [d('seat_tube_ct', bb, seatTop, -1.8), angle('seat_angle', bb, seatAngle, 3.4)]),
     d('chainstay', bb, rearAxle, 1),
     overall('wheelbase', rearAxle[0], frontAxle[0], -1.6),
     v('bb_drop', rearAxle, bb, -1, { base: rearAxle[0] }),
     fromGround('bb_height', bb),
     fromGround('standover', standoverAt, 0, { t: detail === 'step_through' ? 0.7 : 0.5 }),
     d('fork_rake', foot, frontAxle, -0.6, { guides: [[headBottom, foot]] }),
-    h('trail', ground, [frontAxle[0], 0], -0.7, { base: 0 })
+    h('trail', ground, [frontAxle[0], 0], -0.7, { base: 0 }),
+    ...(detail === 'bench_seat'
+      ? [fromGround('seat_height', seated.front, 0, { base: seated.front[0] - 40 }), h('seat_length', seated.back, seated.front, 0.8),
+          fromGround('handlebar_height', atHeight(headTop, steering, fig('handlebar_height')), 1.2, { base: frontAxle[0] + frame.frontWheel.r })]
+      : [])
   ]
 }
 
 // A bike, `detail` a type_detail drawn its own way: a step-through's low tube or a moto-style bench
 const bike = (detail, fallback = { bsd: 622, tire: 30 }) => (context) => {
   const frame = bikeFrame(context, fallback)
-  const { front, back } = bench(frame, context)
-  const riser = atHeight(frame.headTop, axes(frame).steering, context.fig('handlebar_height'))
-  return [{
-    name: 'Side',
-    shapes: bikeShapes(frame, context, detail),
-    dims: [...bikeDims(frame, context, detail), ...(detail === 'bench_seat'
-      ? [fromGround('seat_height', front, 0, { base: front[0] - 40 }), h('seat_length', back, front, 0.8),
-          fromGround('handlebar_height', riser, 1.2, { base: frame.frontAxle[0] + frame.frontWheel.r })]
-      : [])]
-  }]
+  return [{ name: 'Side', shapes: bikeShapes(frame, context, detail), dims: bikeDims(frame, context, detail) }]
 }
 
-const BIKE = { stack: 570, reach: 390, head_tube: 150, head_angle: 72, seat_angle: 73.5, chainstay: 420, bb_drop: 70, fork_rake: 45, stem_length: 100, crank_length: 172.5 }
+const BIKE = { stack: 570, reach: 390, head_tube: 150, head_angle: 72, seat_angle: 73.5, chainstay: 420, bb_drop: 70, fork_rake: 45, stem_length: 100 }
 
 // A longtail's frame, its rack back from the seat stay over the rear wheel and past it
 const longtail = (context) => {
@@ -190,7 +185,7 @@ const tandem = ({ fig, listed, wheel: wheelAt }) => {
   const stoker = minus(captain, [fig('boom_tube'), 0])
   const rearAxle = [stoker[0] - leg(fig('chainstay'), fig('bb_drop')), rearWheel.r]
   const frontAxle = [rearAxle[0] + fig('wheelbase'), frontWheel.r]
-  const steeringUp = polar(1, 180 - fig('head_angle'))
+  const steeringUp = rising(fig('head_angle'))
   const headTop = (listed('stack') && listed('reach')) || !listed('wheelbase')
     ? plus(captain, [fig('reach'), fig('stack')])
     : plus(frontAxle, scale(steeringUp, frontWheel.r + 380 + fig('head_tube')), polar(fig('fork_rake'), -fig('head_angle')))
@@ -215,7 +210,7 @@ const tandem = ({ fig, listed, wheel: wheelAt }) => {
       d('stoker_seat_tube', stoker, stokerTop, 1),
       h('boom_tube', stoker, captain, -1.1),
       d('chainstay', stoker, rearAxle, 1),
-      angle('head_angle', headBottom, 180 - fig('head_angle'), 180),
+      angle('head_angle', headBottom, fig('head_angle')),
       overall('wheelbase', rearAxle[0], frontAxle[0], -2.4)
     ]
   }]
@@ -227,7 +222,7 @@ const longJohn = ({ fig, wheel: wheelAt }) => {
   const bb = [0, fig('bb_height')]
   const rearAxle = [-leg(fig('chainstay'), bb[1] - rearWheel.r), rearWheel.r]
   const frontAxle = [rearAxle[0] + fig('wheelbase'), frontWheel.r]
-  const up = polar(1, 180 - fig('head_angle'))
+  const up = rising(fig('head_angle'))
   const headBottom = plus(frontAxle, scale(up, frontWheel.r + 90))
   const headTop = plus(headBottom, scale(up, fig('head_tube')))
   const seatTop = plus(bb, polar(480, 180 - fig('seat_angle')))
@@ -246,8 +241,8 @@ const longJohn = ({ fig, wheel: wheelAt }) => {
     dims: [
       h('top_tube_effective', seatTop, riderHead, 1.4),
       d('chainstay', bb, rearAxle, 1),
-      angle('seat_angle', bb, 180 - fig('seat_angle'), 180, 3.4),
-      angle('head_angle', headBottom, 180 - fig('head_angle'), 180),
+      angle('seat_angle', bb, fig('seat_angle'), 3.4),
+      angle('head_angle', headBottom, fig('head_angle')),
       fromGround('bb_height', bb),
       fromGround('standover', lerp(riderFoot, bb, 0.4)),
       overall('wheelbase', rearAxle[0], frontAxle[0], -1.4),
@@ -260,11 +255,11 @@ const balanceBike = ({ fig, wheel: wheelAt }) => {
   const [rearWheel, frontWheel] = [wheelAt(['rear'], { bsd: 203, tire: 50 }), wheelAt(['front'], { bsd: 203, tire: 50 })]
   const rearAxle = [0, rearWheel.r]
   const frontAxle = [fig('wheelbase'), frontWheel.r]
-  const up = polar(1, 180 - fig('head_angle'))
+  const up = rising(fig('head_angle'))
   const headBottom = plus(frontAxle, scale(up, frontWheel.r + 50))
   const headTop = plus(headBottom, scale(up, fig('head_tube')))
   const cluster = [fig('wheelbase') * 0.3, fig('standover')]
-  const seat = polar(1, 180 - 75)
+  const seat = rising(75)
   const [high, low] = ['seat_height_max', 'seat_height_min'].map((key) => atHeight(cluster, seat, fig(key) - 15))
   const [barHigh, barLow] = ['handlebar_height_max', 'handlebar_height_min'].map((key) => atHeight(headTop, up, fig(key)))
   return [{
@@ -277,7 +272,7 @@ const balanceBike = ({ fig, wheel: wheelAt }) => {
       fromGround('handlebar_height_max', barHigh, 1.2, { base: frontAxle[0] + frontWheel.r }),
       fromGround('handlebar_height_min', barLow, 2.4, { base: frontAxle[0] + frontWheel.r }),
       fromGround('standover', plus(cluster, [60, -20])),
-      angle('head_angle', headBottom, 180 - fig('head_angle'), 180, 2),
+      angle('head_angle', headBottom, fig('head_angle'), 2),
       across('wheel_size', rearAxle, rearWheel),
       overall('wheelbase', rearAxle[0], frontAxle[0], -1.4)
     ]
@@ -355,11 +350,11 @@ const tricycle = ({ paired }) => ({ fig, wheel: wheelAt }) => {
   const rearAxle = [0, rearWheel.r]
   const frontAxle = [fig('wheelbase'), frontWheel.r]
   const frontBox = paired === 'front'
-  const up = polar(1, 180 - fig('head_angle'))
+  const up = rising(fig('head_angle'))
   const headBottom = frontBox ? plus(frontAxle, [-frontWheel.r - 160, frontWheel.r + 520]) : plus(frontAxle, scale(up, frontWheel.r + 90))
   const headTop = plus(headBottom, scale(up, 160))
   const bb = [fig('wheelbase') * (frontBox ? 0.2 : 0.42), 300]
-  const seatUp = polar(1, 180 - 70)
+  const seatUp = rising(70)
   const top = atHeight(bb, seatUp, fig('seat_height_max'))
   const low = atHeight(bb, seatUp, fig('seat_height_min'))
   const bar = atHeight(headTop, up, fig('handlebar_height'))
@@ -418,7 +413,7 @@ const recumbent = ({ bsd }) => ({ fig, wheel: wheelAt, data }) => {
       part(seatFront, seatBack, backTop), part([frontAxle[0] - 60, frontAxle[1] + 40], stick), handlebar(stick)],
     dims: [
       fromGround('seat_height', seatBack, 0, { base: seatBack[0] - 30 }),
-      angle('seat_angle', seatBack, 180 - fig('seat_angle'), 180, 3),
+      angle('seat_angle', seatBack, fig('seat_angle'), 3),
       fromGround('bb_height', bb, 1.2, { base: bb[0] + fig('crank_length') }),
       overall('wheelbase', rearAxle[0], frontAxle[0], -1.4),
       overall('dimensions.length', rearAxle[0] - rearWheel.r, bb[0] + fig('crank_length'))
@@ -443,13 +438,13 @@ const trailBehind = ({ fig, wheel: wheelAt }) => {
   const rearWheel = wheelAt(['rear', 'center', 'front'], { bsd: 406, tire: 50 })
   const axle = [0, rearWheel.r]
   const bb = [260, 290]
-  const seatUp = polar(1, 180 - 72)
+  const seatUp = rising(72)
   const cluster = atHeight(bb, seatUp, 600)
   const top = atHeight(bb, seatUp, fig('seat_height'))
   const head = [520, fig('standover') + 60]
   const hitch = [head[0] + fig('tow_arm_length'), fig('hitch_height')]
   const towAxle = [hitch[0] - 380, 340]
-  const towSeat = polar(1, 180 - 73)
+  const towSeat = rising(73)
   return [{
     name: 'Side',
     shapes: [wheel(axle, rearWheel), ring(towAxle, 340, 'ghost'), ghost(towAxle, atHeight(hitch, towSeat, 300), plus(hitch, scale(towSeat, 150))),
@@ -470,13 +465,13 @@ const pediCab = ({ fig, wheel: wheelAt }) => {
   const [rearWheel, frontWheel] = [wheelAt(['rear', 'rear_left'], { bsd: 559, tire: 50 }), wheelAt(['front'], { bsd: 559, tire: 50 })]
   const rearAxle = [0, rearWheel.r]
   const frontAxle = [fig('wheelbase'), frontWheel.r]
-  const up = polar(1, 180 - 70)
+  const up = rising(70)
   const headBottom = plus(frontAxle, scale(up, frontWheel.r + 100))
   const headTop = plus(headBottom, scale(up, 180))
   const bb = [frontAxle[0] - 650, 300]
-  const seatUp = polar(1, 180 - 72)
+  const seatUp = rising(72)
   const top = atHeight(bb, seatUp, fig('seat_height'))
-  const bench = fig('bench_height')
+  const benchHeight = fig('bench_height')
   const roof = fig('dimensions.height')
   const back = rearAxle[0] - 420
   const canopy = arc([rearAxle[0], roof - 470], 470, 150, 30, 12)
@@ -484,10 +479,10 @@ const pediCab = ({ fig, wheel: wheelAt }) => {
     name: 'Side',
     shapes: [wheel(rearAxle, rearWheel), wheel(frontAxle, frontWheel), tube(frontAxle, headBottom, headTop), tube(lerp(headBottom, headTop, 0.3), bb, rearAxle),
       tube(bb, plus(bb, scale(seatUp, 380)), lerp(headBottom, headTop, 0.6)), part(plus(bb, scale(seatUp, 380)), top), saddle(top), part(headTop, plus(headTop, [-60, 120])), handlebar(plus(headTop, [-60, 120])),
-      box([back, bench - 80], [rearAxle[0] + 380, bench]), panel([back, bench], [back + 60, bench], [back + 20, bench + 450], [back - 40, bench + 450]),
-      tube([rearAxle[0], rearAxle[1]], [rearAxle[0], bench - 80]), part([back - 40, bench], canopy[0]), part([rearAxle[0] + 380, bench], canopy.at(-1)), part(...canopy)],
+      box([back, benchHeight - 80], [rearAxle[0] + 380, benchHeight]), panel([back, benchHeight], [back + 60, benchHeight], [back + 20, benchHeight + 450], [back - 40, benchHeight + 450]),
+      tube([rearAxle[0], rearAxle[1]], [rearAxle[0], benchHeight - 80]), part([back - 40, benchHeight], canopy[0]), part([rearAxle[0] + 380, benchHeight], canopy.at(-1)), part(...canopy)],
     dims: [
-      fromGround('bench_height', [rearAxle[0] + 200, bench]),
+      fromGround('bench_height', [rearAxle[0] + 200, benchHeight]),
       fromGround('seat_height', top, 0, { base: top[0] }),
       fromGround('dimensions.height', [rearAxle[0], roof], -1.2, { base: canopy[0][0] }),
       overall('wheelbase', rearAxle[0], frontAxle[0], -1.4),
@@ -501,7 +496,7 @@ const ellipticalBike = ({ fig, wheel: wheelAt }) => {
   const [rearWheel, frontWheel] = [wheelAt(['rear'], { bsd: 349, tire: 35 }), wheelAt(['front'], { bsd: 406, tire: 40 })]
   const rearAxle = [0, rearWheel.r]
   const frontAxle = [fig('wheelbase'), frontWheel.r]
-  const up = polar(1, 180 - 72)
+  const up = rising(72)
   const headBottom = plus(frontAxle, scale(up, frontWheel.r + 80))
   const bar = atHeight(headBottom, up, fig('operating_height'))
   const drive = [80, rearWheel.r + 40]
@@ -533,14 +528,15 @@ const scooter = ({ kick }) => ({ fig, either, listed, wheel: wheelAt }) => {
   const wheelbase = listed('wheelbase') || !listed('dimensions.length') ? fig('wheelbase') : fig('dimensions.length') - rearWheel.r - frontWheel.r
   const rearAxle = [0, rearWheel.r]
   const frontAxle = [wheelbase, frontWheel.r]
-  const up = polar(1, 180 - 80)
+  const up = rising(80)
   const deck = [rearAxle[0] + rearWheel.r * 0.3, frontAxle[0] - frontWheel.r - 50]
+  const alongDeck = (t) => deck[0] + (deck[1] - deck[0]) * t
   const deckTop = fig('deck_height')
   const deckBottom = deckTop - 45
   const crown = plus(frontAxle, scale(up, frontWheel.r + 60))
   const bar = atHeight(frontAxle, up, either('handlebar_height', 'dimensions.height'))
   const seated = listed('seat_height')
-  const seat = [lerp([deck[0], 0], [deck[1], 0], 0.35)[0], fig('seat_height')]
+  const seat = [alongDeck(0.35), fig('seat_height')]
   const body = (stemTo) => [wheel(rearAxle, rearWheel), wheel(frontAxle, frontWheel), box([deck[0], deckBottom], [deck[1], deckTop]),
     part(...arc(rearAxle, rearWheel.r + 15, 40, 160, 8)), tube([deck[1], (deckTop + deckBottom) / 2], crown), tube(frontAxle, crown, stemTo), handlebar(stemTo)]
   const sideView = {
@@ -549,8 +545,8 @@ const scooter = ({ kick }) => ({ fig, either, listed, wheel: wheelAt }) => {
     dims: [
       fromGround('handlebar_height', bar, 1.2, { base: frontAxle[0] + frontWheel.r }),
       fromGround('dimensions.height', bar, 2.4, { base: frontAxle[0] + frontWheel.r }),
-      fromGround('deck_height', [lerp([deck[0], 0], [deck[1], 0], 0.7)[0], deckTop], 0, { side: -1 }),
-      ...(kick ? [] : [fromGround('ground_clearance', [lerp([deck[0], 0], [deck[1], 0], 0.85)[0], deckBottom])]),
+      fromGround('deck_height', [alongDeck(0.7), deckTop], 0, { side: -1 }),
+      ...(kick ? [] : [fromGround('ground_clearance', [alongDeck(0.85), deckBottom])]),
       ...(seated ? [fromGround('seat_height', seat, -1.2, { base: rearAxle[0] - rearWheel.r })] : []),
       h('deck_length', [deck[0], deckTop], [deck[1], deckTop], 0.8),
       across('wheel_size', frontAxle, frontWheel),
@@ -643,7 +639,7 @@ const eMotorcycle = ({ fig, either, wheel: wheelAt }) => {
   const [rearWheel, frontWheel] = [wheelAt(['rear'], { bsd: 457, tire: 110 }), wheelAt(['front'], { bsd: 483, tire: 80 })]
   const rearAxle = [0, rearWheel.r]
   const frontAxle = [fig('wheelbase'), frontWheel.r]
-  const up = polar(1, 180 - fig('head_angle'))
+  const up = rising(fig('head_angle'))
   const headBottom = plus(frontAxle, scale(up, frontWheel.r + 380))
   const headTop = plus(headBottom, scale(up, 170))
   const bar = atHeight(headTop, up, either('handlebar_height', 'dimensions.height'))
@@ -665,7 +661,7 @@ const eMotorcycle = ({ fig, either, wheel: wheelAt }) => {
       fromGround('ground_clearance', [lerp(pivot, headBottom, 0.35)[0], belly]),
       fromGround('handlebar_height', bar, 1.2, { base: frontAxle[0] + frontWheel.r }),
       fromGround('dimensions.height', bar, 2.4, { base: frontAxle[0] + frontWheel.r }),
-      angle('head_angle', headBottom, 180 - fig('head_angle'), 180),
+      angle('head_angle', headBottom, fig('head_angle')),
       across('wheel_front', frontAxle, frontWheel),
       across('wheel_rear', rearAxle, rearWheel),
       overall('wheelbase', rearAxle[0], frontAxle[0], -1.4),
@@ -760,34 +756,34 @@ const bikeTrailer = ({ fig, wheel: wheelAt }) => {
   }]
 }
 
-const SCOOTER = { wheelbase: 820, deck_height: 170, deck_length: 520, deck_width: 170, handlebar_height: 1150, handlebar_width: 480, 'dimensions.length': 1100, 'dimensions.height': 1180, 'dimensions_folded.length': 1100, 'dimensions_folded.height': 480, ground_clearance: 120, seat_height: 800, seat_length: 300 }
-const TRICYCLE = { wheelbase: 1200, head_angle: 70, seat_height_min: 750, seat_height_max: 950, handlebar_height: 1080, standover: 320, track_width: 680, box_length: 600, box_height: 300, box_width: 560, 'dimensions.width': 720 }
+const SCOOTER = { wheelbase: 820, deck_height: 170, deck_width: 170, handlebar_height: 1150, handlebar_width: 480, 'dimensions_folded.height': 480, seat_height: 800, seat_length: 300 }
+const TRICYCLE = { wheelbase: 1200, head_angle: 70, seat_height_min: 750, seat_height_max: 950, handlebar_height: 1080, standover: 320, track_width: 680, box_length: 600, box_height: 300, box_width: 560 }
 
-export const CYCLE_DRAWINGS = {
-  bike: { draw: bike(), defaults: { ...BIKE, standover: 780 } },
+const CYCLE_DRAWINGS = {
+  bike: { draw: bike(), defaults: BIKE },
   'bike/step_through': { draw: bike('step_through'), defaults: { ...BIKE, standover: 450, head_angle: 70, seat_angle: 72 } },
   'bike/bench_seat': { draw: bike('bench_seat', { bsd: 406, tire: 100 }), defaults: { ...BIKE, stack: 560, reach: 430, head_angle: 66, chainstay: 460, seat_height: 840, seat_length: 620, handlebar_height: 1080 } },
-  tandem: { draw: tandem, defaults: { ...BIKE, wheelbase: 1750, boom_tube: 740, captain_seat_tube: 540, stoker_seat_tube: 460, stoker_seat_angle_degrees: 73.5, captain_top_tube: 580, stoker_top_tube_effective: 720, head_tube: 170 } },
+  tandem: { draw: tandem, defaults: { ...BIKE, wheelbase: 1750, boom_tube: 740, captain_seat_tube: 540, stoker_seat_tube: 460, stoker_seat_angle_degrees: 73.5, head_tube: 170 } },
   unicycle: { draw: unicycle, defaults: { seat_height: 880, crank_length: 125 } },
   tricycle: { draw: tricycle({ paired: 'rear' }), defaults: TRICYCLE },
-  'tricycle/tadpole': { draw: recumbent({ bsd: 507 }), defaults: { wheelbase: 1380, seat_height: 420, seat_angle: 55, bb_height: 480, crank_length: 165, track_width: 820, 'dimensions.width': 880 } },
+  'tricycle/tadpole': { draw: recumbent({ bsd: 507 }), defaults: { wheelbase: 1380, seat_height: 420, seat_angle: 55, bb_height: 480, crank_length: 165, track_width: 820 } },
   stroller: { draw: stroller, defaults: { wheelbase: 620, handlebar_height: 1040, 'dimensions.height': 1080, 'dimensions_folded.length': 700, 'dimensions_folded.height': 340 } },
-  recumbent: { draw: recumbent({ bsd: 406 }), defaults: { wheelbase: 1060, seat_height: 300, seat_angle: 42, bb_height: 400, crank_length: 155, track_width: 780, 'dimensions.width': 820 } },
+  recumbent: { draw: recumbent({ bsd: 406 }), defaults: { wheelbase: 1060, seat_height: 300, seat_angle: 42, bb_height: 400, crank_length: 155, track_width: 780 } },
   bike_trailer: { draw: bikeTrailer, defaults: { 'dimensions.length': 1450, 'dimensions.height': 900, 'dimensions.width': 800 } },
   wheelchair: { draw: wheelchair, defaults: { seat_height: 490, seat_depth: 430, backrest_height: 420, seat_width: 420, 'dimensions.width': 640 } },
   cargo_bike: { draw: longJohn, defaults: { bb_height: 290, chainstay: 450, wheelbase: 1800, head_angle: 70, head_tube: 100, seat_angle: 70, top_tube_effective: 600 } },
   tall_bike: { draw: tallBike, defaults: { ...BIKE, frame_offset: 560 } },
   penny_farthing: { draw: pennyFarthing, defaults: { wheelbase: 980, seat_height: 1450, crank_length: 130 } },
   cargo_bike_rear: { draw: longtail, defaults: { ...BIKE, chainstay: 640, rear_rack_length: 820 } },
-  cargo_tricycle: { draw: tricycle({ paired: 'front' }), defaults: { ...TRICYCLE, wheelbase: 1750, box_length: 900, box_height: 550, box_width: 800, track_width: 780, 'dimensions.width': 880 } },
+  cargo_tricycle: { draw: tricycle({ paired: 'front' }), defaults: { ...TRICYCLE, wheelbase: 1750, box_length: 900, box_height: 550, box_width: 800, track_width: 780 } },
   cargo_tricycle_rear: { draw: tricycle({ paired: 'rear' }), defaults: { ...TRICYCLE, box_length: 900, box_height: 400, box_width: 700, track_width: 760 } },
   trail_behind: { draw: trailBehind, defaults: { seat_height: 760, standover: 560, hitch_height: 900, tow_arm_length: 900 } },
   pedi_cab: { draw: pediCab, defaults: { wheelbase: 2000, seat_height: 1000, bench_height: 700, 'dimensions.height': 1950 } },
   e_scooter: { draw: scooter({ kick: false }), defaults: SCOOTER },
   epamd: { draw: personalMobility, defaults: { 'dimensions.height': 740, 'dimensions.width': 200, pedal_height: 220 } },
-  scooter: { draw: scooter({ kick: true }), defaults: { ...SCOOTER, wheelbase: 620, deck_height: 90, deck_length: 460, deck_width: 120, handlebar_height: 860, handlebar_width: 400, 'dimensions.height': 860 } },
+  scooter: { draw: scooter({ kick: true }), defaults: { ...SCOOTER, wheelbase: 620, deck_height: 90, deck_width: 120, handlebar_height: 860, handlebar_width: 400 } },
   skateboard: { draw: skateboard, defaults: { 'dimensions.length': 820, 'dimensions.width': 210, wheelbase: 450, deck_height: 110 } },
-  e_motorcycle: { draw: eMotorcycle, defaults: { wheelbase: 1300, head_angle: 64, handlebar_height: 1150, seat_height: 880, seat_length: 650, ground_clearance: 300, 'dimensions.height': 1150 } },
+  e_motorcycle: { draw: eMotorcycle, defaults: { wheelbase: 1300, head_angle: 64, handlebar_height: 1150, seat_height: 880, seat_length: 650, ground_clearance: 300 } },
   elliptical_bike: { draw: ellipticalBike, defaults: { wheelbase: 1350, operating_height: 1400, platform_height: 200, stride_length: 500, stride_height: 150 } },
   balance_bike: { draw: balanceBike, defaults: { wheelbase: 560, head_angle: 70, head_tube: 90, standover: 300, seat_height_min: 290, seat_height_max: 420, handlebar_height_min: 460, handlebar_height_max: 540 } }
 }
@@ -800,8 +796,17 @@ export const listedFigure = (size, key) => {
   return isNumber(value) ? value : null
 }
 
+// `size` with each of `figures`, keyed as listedFigure takes them
+export const withFigures = (size, figures) => ({
+  ...size,
+  geometry: Object.entries(figures).reduce((geometry, [key, value]) => {
+    const [name, field] = key.split('.')
+    return field ? { ...geometry, [name]: { ...geometry[name], [field]: value } } : { ...geometry, [name]: value }
+  }, size?.geometry ?? {})
+})
+
 // The views `type`, or its `typeDetail`, draws `data` in `size`
-export const drawingViews = ({ type, data = {}, typeDetail = data.type_detail, size }) => {
+export const drawingViews = ({ type, data, typeDetail, size }) => {
   const { draw, defaults } = CYCLE_DRAWINGS[`${type}/${typeDetail}`] ?? CYCLE_DRAWINGS[type] ?? CYCLE_DRAWINGS.bike
   const listed = (key) => listedFigure(size, key) !== null
   const fig = (key) => listedFigure(size, key) ?? defaults[key]
@@ -809,7 +814,7 @@ export const drawingViews = ({ type, data = {}, typeDetail = data.type_detail, s
   const wheelAt = (positions, fallback) => {
     const built = positions.map((position) => builtWheel(data, size, position)).find((each) => isNumber(each?.bsd))
     const tire = built?.tire_width ?? built?.max_tire_width ?? fallback.tire
-    return built ? { r: outerRadius({ bsd: built.bsd, tire_width: tire }), tire: tire || 30, listed: true } : { r: fallback.bsd / 2 + fallback.tire, tire: fallback.tire || 30, listed: false }
+    return { r: (built?.bsd ?? fallback.bsd) / 2 + tire, tire: tire || 30, listed: Boolean(built) }
   }
   // the first of `keys` it lists, else the first's typical
   const either = (...keys) => fig(keys.find(listed) ?? keys[0])

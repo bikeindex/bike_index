@@ -6,9 +6,10 @@ module Pages
       # Each cycle type's Bikebook drawing at its typical figures, and of a catalog model of that type, followed by
       # its type_details that Bikebook draws their own way
       class Component < ApplicationComponent
-        Row = Data.define(:name, :type, :type_detail, :example_model, :collapsed) do
-          # the URL param a collapsed row opens from
+        Row = Data.define(:name, :type, :type_detail, :example_model) do
           def param = [type, type_detail].compact.join("_")
+
+          def collapsed = example_model.nil? || Pages::Admin::CycleTypeDrawings::Component::COLLAPSED_TYPES.include?(type)
         end
 
         # by Bikebook vehicle type, those that start collapsed though they have a catalog example
@@ -56,12 +57,10 @@ module Pages
         }.freeze
 
         def initialize(cycle_types:, manifest_url:)
-          # the collapsed rows, those with no catalog example and COLLAPSED_TYPES, last
           @rows = cycle_types.flat_map do |cycle_type|
             type = BIKEBOOK_TYPES[cycle_type.slug] || cycle_type.slug.to_s.underscore
             [nil, *TYPE_DETAILS[type]].map do |type_detail|
-              example_model = EXAMPLE_MODELS[[type, type_detail].compact.join("/")]
-              Row.new(name: cycle_type.name, type:, type_detail:, example_model:, collapsed: example_model.nil? || COLLAPSED_TYPES.include?(type))
+              Row.new(name: cycle_type.name, type:, type_detail:, example_model: EXAMPLE_MODELS[[type, type_detail].compact.join("/")])
             end
           end.partition { !it.collapsed }.flatten
           @manifest_url = manifest_url
