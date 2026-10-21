@@ -8,9 +8,7 @@ module Pages
         EYEBROW_CLASSES = "tw:mb-2.5 tw:text-[13px] tw:font-bold tw:tracking-[.08em] tw:uppercase"
         HEADING_CLASSES = "tw:mb-3.5 tw:font-header tw:text-[clamp(28px,3.4vw,38px)] tw:leading-[1.15] tw:font-extrabold tw:text-balance"
         INTRO_CLASSES = "tw:text-[17px] tw:leading-relaxed tw:text-pretty tw:text-gray-600 tw:dark:text-gray-300"
-        CARD_CLASSES = "tw:rounded-lg tw:border tw:border-gray-200 tw:bg-white tw:p-6 tw:shadow-sm tw:dark:border-gray-700 tw:dark:bg-gray-800"
         ICON_DISC_CLASSES = "tw:flex tw:size-11 tw:flex-none tw:items-center tw:justify-center tw:rounded-full tw:text-white"
-        NEW_CLASSES = "tw:rounded-full tw:bg-[#ffd660] tw:px-2.5 tw:py-0.5 tw:text-xs tw:font-bold tw:text-slate-900"
         MODAL_ID = "cities-demo-modal"
 
         # checker_state: the abbreviation of the visitor's state, which the checker starts on

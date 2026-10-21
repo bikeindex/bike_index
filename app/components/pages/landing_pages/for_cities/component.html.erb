@@ -39,16 +39,9 @@
     <div class="tw:flex tw:flex-col tw:gap-10 tw:pt-16 tw:pb-14 <%= SECTION_CLASSES %>">
       <div class="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-8">
         <div class="tw:max-w-[780px] tw:flex-[1_1_520px]">
-          <span
-            class="
-              tw:mb-5 tw:inline-block tw:rounded-full tw:bg-blue-100
-              tw:px-3.5 tw:py-1.5 tw:text-[13px] tw:font-bold
-              tw:tracking-[.08em] tw:text-blue-600 tw:uppercase
-              tw:dark:bg-blue-950 tw:dark:text-blue-300
-            "
-          >
-            <%= translation(".pill") %>
-          </span>
+          <div class="tw:mb-5">
+            <%= render(UI::Badge::Component.new(text: translation(".pill"), color: :notice, size: :lg)) %>
+          </div>
 
           <h1
             class="
@@ -186,14 +179,9 @@
             <%= translation(".mock_progress") %>
           </div>
 
-          <span
-            class="
-              tw:self-start tw:rounded-full tw:bg-[#fff6d6] tw:px-2.25
-              tw:py-0.75 tw:text-[11px] tw:font-bold tw:text-[#b45309]
-            "
-          >
-            <%= translation(".mock_detected") %>
-          </span>
+          <div>
+            <%= render(UI::Badge::Component.new(text: translation(".mock_detected"), color: :warning, size: :xs)) %>
+          </div>
 
           <div>
             <div class="tw:text-[19px] tw:font-bold">
@@ -311,7 +299,7 @@
             </span>
 
             <% if card[:new] %>
-              <span class="<%= NEW_CLASSES %>"><%= translation(".new") %></span>
+              <%= render(UI::Badge::Component.new(text: translation(".new"), color: :yellow)) %>
             <% else %>
               <span
                 class="tw:font-header tw:text-[15px] tw:font-black tw:text-gray-300"
@@ -372,29 +360,31 @@
       "
     >
       <% registration_steps.each_with_index do |(title, body), index| %>
-        <li class="<%= CARD_CLASSES %>">
-          <div
-            class="
-              tw:mb-3 tw:font-header tw:text-[15px] tw:font-black
-              tw:text-blue-600 tw:dark:text-blue-400
-            "
-            aria-hidden="true"
-          >
-            0<%= index + 1 %>
-          </div>
+        <li>
+          <%= render(UI::Card::Component.new(shadow: true, additional_classes: "tw:h-full tw:rounded-lg! tw:p-6!")) do %>
+            <div
+              class="
+                tw:mb-3 tw:font-header tw:text-[15px] tw:font-black
+                tw:text-blue-600 tw:dark:text-blue-400
+              "
+              aria-hidden="true"
+            >
+              0<%= index + 1 %>
+            </div>
 
-          <h3 class="tw:mb-1.5 tw:font-header tw:text-lg tw:font-bold">
-            <%= title %>
-          </h3>
+            <h3 class="tw:mb-1.5 tw:font-header tw:text-lg tw:font-bold">
+              <%= title %>
+            </h3>
 
-          <p
-            class="
-              tw:text-[15px] tw:leading-relaxed tw:text-gray-600
-              tw:dark:text-gray-300
-            "
-          >
-            <%= body %>
-          </p>
+            <p
+              class="
+                tw:text-[15px] tw:leading-relaxed tw:text-gray-600
+                tw:dark:text-gray-300
+              "
+            >
+              <%= body %>
+            </p>
+          <% end %>
         </li>
       <% end %>
     </ol>
@@ -480,7 +470,7 @@
           </p>
         </div>
 
-        <div class="tw:flex tw:items-start tw:gap-3.5 tw:px-5.5 tw:py-5 <%= CARD_CLASSES %>">
+        <%= render(UI::Card::Component.new(shadow: true, additional_classes: "tw:flex tw:items-start tw:gap-3.5 tw:rounded-lg! tw:px-5.5 tw:py-5")) do %>
           <span class="tw:size-10! tw:bg-slate-900 <%= ICON_DISC_CLASSES %>">
             <%= helpers.inline_svg_tag("icons/list.svg", class: "tw:size-5", aria_hidden: true) %>
           </span>
@@ -494,7 +484,7 @@
               <%= translation(".hot_sheet_body") %>
             </p>
           </div>
-        </div>
+        <% end %>
 
         <div class="<%= Pages::LandingPages::ForCitiesEducation::Component::STICKER_CLASSES %>">
           <%= image_tag "kelsey/illustrations/comic-assets_bike-hero.png", alt: "", loading: "lazy", width: 96, height: 72, class: "tw:h-18 tw:w-auto tw:flex-none" %>
@@ -561,7 +551,7 @@
             <div class="tw:flex tw:flex-col tw:items-center">
               <div class="tw:h-6 tw:w-0.5 tw:bg-gray-300 tw:dark:bg-gray-600"></div>
 
-              <div class="tw:w-full tw:p-4! tw:text-center <%= CARD_CLASSES %>">
+              <%= render(UI::Card::Component.new(shadow: true, additional_classes: "tw:w-full tw:rounded-lg! tw:text-center")) do %>
                 <div class="tw:font-header tw:text-base tw:font-bold">
                   <%= name %>
                 </div>
@@ -574,7 +564,7 @@
                 >
                   <%= note %>
                 </div>
-              </div>
+              <% end %>
             </div>
           <% end %>
         </div>
@@ -637,7 +627,7 @@
         <div class="tw:mb-2.5 tw:flex tw:items-center tw:gap-2.5">
           <span class="tw:mb-0! tw:text-blue-600 tw:dark:text-blue-400 <%= EYEBROW_CLASSES %>"><%= translation(".checker_eyebrow") %></span>
 
-          <span class="<%= NEW_CLASSES %>"><%= translation(".new") %></span>
+          <%= render(UI::Badge::Component.new(text: translation(".new"), color: :yellow)) %>
         </div>
 
         <h2 class="<%= HEADING_CLASSES %>">
@@ -661,39 +651,40 @@
       </div>
 
       <%# The checker's own form for a bike entered by hand, so a check lands on its result %>
-      <%= form_with url: ebike_rules_path, method: :get, local: true,
-        class: "tw:flex tw:w-full tw:max-w-[520px] tw:flex-col tw:gap-4.5 tw:justify-self-center tw:rounded-lg tw:border tw:border-gray-200 tw:bg-white tw:p-7 tw:shadow-[0_4px_12px_rgba(44,62,80,.12)] tw:dark:border-gray-700 tw:dark:bg-gray-800" do |f| %>
-        <%= f.hidden_field :manual, value: 1, id: nil %>
+      <%= render(UI::Card::Component.new(additional_classes: "tw:w-full tw:max-w-[520px] tw:justify-self-center tw:rounded-lg! tw:p-7! tw:shadow-[0_4px_12px_rgba(44,62,80,.12)]")) do %>
+        <%= form_with url: ebike_rules_path, method: :get, local: true, class: "tw:flex tw:flex-col tw:gap-4.5" do |f| %>
+          <%= f.hidden_field :manual, value: 1, id: nil %>
 
-        <h3 class="tw:font-header tw:text-xl tw:font-extrabold">
-          <%= translation(".checker_form_heading") %>
-        </h3>
+          <h3 class="tw:font-header tw:text-xl tw:font-extrabold">
+            <%= translation(".checker_form_heading") %>
+          </h3>
 
-        <div class="twfieldrow">
-          <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :state, label_text: translation(".checker_state"),
+          <div class="twfieldrow">
+            <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :state, label_text: translation(".checker_state"),
             required: true, wrapper_class: "")) do %>
-            <%= render(UI::Forms::Select::Component.new(form_builder: f, attribute: :state, required: true,
+              <%= render(UI::Forms::Select::Component.new(form_builder: f, attribute: :state, required: true,
               option_tags: EbikeRuleServices::StateLaws::STATES.map { [it[:name], "US-#{it[:abbr]}"] },
               options: {selected: @checker_state && "US-#{@checker_state}", prompt: translation(".checker_choose_state")})) %>
-          <% end %>
+            <% end %>
 
-          <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :top_speed, label_text: translation(".checker_top_speed"),
+            <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :top_speed, label_text: translation(".checker_top_speed"),
             optional_badge: false, wrapper_class: "")) do %>
-            <%= render(UI::Forms::Select::Component.new(form_builder: f, attribute: :top_speed, option_tags: top_speed_options)) %>
-          <% end %>
+              <%= render(UI::Forms::Select::Component.new(form_builder: f, attribute: :top_speed, option_tags: top_speed_options)) %>
+            <% end %>
 
-          <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :throttle, label_text: translation(".checker_throttle"),
+            <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :throttle, label_text: translation(".checker_throttle"),
             optional_badge: false, wrapper_class: "")) do %>
-            <%= render(UI::Forms::Select::Component.new(form_builder: f, attribute: :throttle, option_tags: throttle_options)) %>
-          <% end %>
-        </div>
+              <%= render(UI::Forms::Select::Component.new(form_builder: f, attribute: :throttle, option_tags: throttle_options)) %>
+            <% end %>
+          </div>
 
-        <%= render(UI::Button::Component.new(text: translation(".checker_submit"), color: :primary, size: :lg,
+          <%= render(UI::Button::Component.new(text: translation(".checker_submit"), color: :primary, size: :lg,
           type: "submit", html_class: "tw:w-full tw:justify-center")) %>
 
-        <p class="tw:text-center tw:text-xs tw:text-gray-600 tw:dark:text-gray-400">
-          <%= translation(".checker_form_note") %>
-        </p>
+          <p class="tw:text-center tw:text-xs tw:text-gray-600 tw:dark:text-gray-400">
+            <%= translation(".checker_form_note") %>
+          </p>
+        <% end %>
       <% end %>
     </div>
   </section>
@@ -725,7 +716,7 @@
         "
       >
         <% field_tools.each do |tool| %>
-          <div class="<%= CARD_CLASSES %>">
+          <%= render(UI::Card::Component.new(shadow: true, additional_classes: "tw:rounded-lg! tw:p-6!")) do %>
             <span class="tw:mb-3.5 <%= ICON_DISC_CLASSES %> <%= tool[:color] %>">
               <%= helpers.inline_svg_tag(tool[:icon], class: "tw:size-5.5", aria_hidden: true) %>
             </span>
@@ -742,7 +733,7 @@
             >
               <%= tool[:body] %>
             </p>
-          </div>
+          <% end %>
         <% end %>
       </div>
     </div>
@@ -871,7 +862,7 @@
         </ul>
       </div>
 
-      <div class="tw:p-7! tw:shadow-[0_4px_12px_rgba(44,62,80,.12)]! <%= CARD_CLASSES %>">
+      <%= render(UI::Card::Component.new(additional_classes: "tw:rounded-lg! tw:p-7! tw:shadow-[0_4px_12px_rgba(44,62,80,.12)]")) do %>
         <%# A sent request returns here, which :target turns into a thank you in place of the call to action %>
         <div
           id="lead-sent"
@@ -913,7 +904,7 @@
           <%= render(UI::Button::Component.new(text: translation(".schedule_a_demo"), color: :primary, size: :callout,
             commandfor: MODAL_ID, command: "show-modal")) %>
         </div>
-      </div>
+      <% end %>
     </div>
   </section>
 

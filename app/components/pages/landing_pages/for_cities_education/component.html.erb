@@ -153,15 +153,7 @@
           </div>
         </div>
 
-        <div
-          class="
-            tw:grid tw:w-full tw:max-w-[520px] tw:justify-self-center
-            tw:rounded-lg tw:border tw:border-gray-200 tw:bg-white tw:px-7
-            tw:pt-7 tw:pb-6 tw:shadow-[0_4px_12px_rgba(44,62,80,.12)]
-            tw:lg:col-start-2 tw:lg:row-span-2 tw:lg:row-start-1
-            tw:dark:border-gray-700 tw:dark:bg-gray-800
-          "
-        >
+        <%= render(UI::Card::Component.new(additional_classes: "tw:grid tw:w-full tw:max-w-[520px] tw:justify-self-center tw:rounded-lg! tw:px-7 tw:pt-7 tw:pb-6 tw:shadow-[0_4px_12px_rgba(44,62,80,.12)] tw:lg:col-start-2 tw:lg:row-span-2 tw:lg:row-start-1")) do %>
           <%#
             Every step shares one grid cell, hidden by visibility rather than display, so the card
             keeps the tallest step's height instead of jumping as the rider moves through them
@@ -232,19 +224,14 @@
                 </span>
               </div>
 
-              <div
-                class="
-                  tw:overflow-hidden tw:rounded-lg tw:border
-                  tw:border-gray-200 tw:dark:border-gray-700
-                "
-              >
+              <%= render(UI::Card::Component.new(divided: true, additional_classes: "tw:overflow-hidden")) do %>
                 <% step[:rules].each_with_index do |rule, rule_index| %>
                   <%= render(UI::Forms::Checkbox::Component.new(label: rule,
                   name: "education_#{organization[:key]}_#{index}_#{rule_index}",
-                  class_name: "tw:mb-0 tw:gap-3.5! tw:px-4 tw:py-3.5 tw:text-[15px] tw:font-normal tw:transition-colors tw:not-first:border-t tw:not-first:border-gray-200 tw:has-checked:bg-blue-50 tw:dark:not-first:border-gray-700 tw:dark:has-checked:bg-blue-950",
+                  class_name: "tw:mb-0 tw:gap-3.5! tw:px-4 tw:py-3.5 tw:text-[15px] tw:font-normal tw:transition-colors tw:has-checked:bg-blue-50 tw:dark:has-checked:bg-blue-950",
                   html_options: {data: {action: "landing-pages--education#check"}})) %>
                 <% end %>
-              </div>
+              <% end %>
 
               <%= render(UI::Button::Component.new(text: translation(".continue"), color: :primary, size: :lg,
               html_class: "tw:mt-5 tw:w-full tw:justify-center", disabled: true,
@@ -298,7 +285,7 @@
               html_class: "tw:mt-1.5 tw:text-sm tw:font-semibold", data: {action: "landing-pages--education#restart"})) %>
             </div>
           </div>
-        </div>
+        <% end %>
       </div>
     <% end %>
   </div>
