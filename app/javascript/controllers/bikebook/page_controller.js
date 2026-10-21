@@ -81,9 +81,11 @@ export default class extends Controller {
     if (!inPlace) return this.#go(url)
 
     const next = link.closest('#vehicle-viewers') ? this.#changedBy(url) : url
-    // one that shows the search a lone model hid, as its tab does, is a step back can undo, and opens it
+    // one that shows the search a lone model hid, as its tab does, is a step back can undo, and opens and focuses it
     const reveal = !searching(new URL(window.location.href)) && searching(next)
-    this.#go(next, [window.scrollX, window.scrollY], { focus: inPlace.dataset.inPlace || false, replace: Boolean(link.closest('[data-replace]')) && !reveal, reveal })
+    this.#go(next, [window.scrollX, window.scrollY], {
+      focus: reveal ? '[autofocus]' : inPlace.dataset.inPlace || false, replace: Boolean(link.closest('[data-replace]')) && !reveal, reveal
+    })
   }
 
   // A comparison table's size, which the others follow when it's the first vehicle's, and which a later
@@ -189,6 +191,7 @@ export default class extends Controller {
   #fail (error) {
     console.error(error)
     this.status.textContent = this.failedTextValue
+    for (const input of this.pageTarget.querySelectorAll('[data-awaiting-catalog]')) input.placeholder = ''
     if (!this.pageTarget.contains(this.status)) this.pageTarget.replaceChildren(this.status)
   }
 }

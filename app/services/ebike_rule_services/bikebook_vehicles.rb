@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module EbikeRuleServices
-  # A Bike Book model's e-bike specs, read from the published catalog, which /bikebook searches
+  # A BikeBook model's e-bike specs, read from the published catalog, which /bikebook searches
   module BikebookVehicles
     extend Functionable
 

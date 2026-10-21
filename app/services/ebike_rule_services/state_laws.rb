@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module EbikeRuleServices
-  # Each state's e-bike law, from the e-vehicle classifications in Bike Book's catalog
+  # Each state's e-bike law, from the e-vehicle classifications in BikeBook's catalog
   module StateLaws
     extend Functionable
 
