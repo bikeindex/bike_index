@@ -25,7 +25,7 @@ class WelcomeController < ApplicationController
   end
 
   def recovery_stories
-    @pagy, @recovery_displays = pagy(:countish, RecoveryDisplay.with_attached_photo_processed,
+    @pagy, @recovery_displays = pagy(:countish, RecoveryDisplay.with_attached_photo_processed.reorder(recovered_at: :desc, id: :desc),
       limit: permitted_per_page(default: Pages::RecoveryStories::Index::Component::PER_PAGE), page: permitted_page)
 
     flash.now[:notice] = translation(:no_stories_to_display) if @recovery_displays.load.empty?
@@ -33,7 +33,8 @@ class WelcomeController < ApplicationController
       Counts.retrieve_many("total_bikes", "recoveries", "recoveries_value", "organizations")
 
     render Pages::RecoveryStories::Index::Component.new(recovery_displays: @recovery_displays, pagy: @pagy,
-      total_bikes:, recoveries_count:, recoveries_value:, organizations_count:, currency: current_currency)
+      total_bikes:, recoveries_count:, recoveries_value:, organizations_count:,
+      stripe_prices: StripePrice.active_for(current_currency), current_user:)
   end
 
   # Adding for testing purposes - so we can test where the root url for a user goes - sethherr, 2019-7-9

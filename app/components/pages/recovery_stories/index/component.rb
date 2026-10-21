@@ -14,14 +14,14 @@ module Pages
         PURPLE_OUTLINE = "tw:border-2! tw:border-purple-500! tw:normal-case! tw:text-purple-500! tw:hover:bg-purple-500! tw:hover:text-white!"
 
         def initialize(recovery_displays:, pagy:, total_bikes:, recoveries_count:, recoveries_value:,
-          organizations_count:, currency:)
+          organizations_count:, stripe_prices:, current_user: nil)
           @recovery_displays = recovery_displays
           @pagy = pagy
           @total_bikes = total_bikes
           @recoveries_count = recoveries_count
           @recoveries_value = recoveries_value
           @organizations_count = organizations_count
-          @currency = currency
+          @form = Pages::Donate::Form::Component.new(stripe_prices:, current_user:, referral_source: REFERRAL_SOURCE)
         end
 
         private
@@ -39,37 +39,6 @@ module Pages
           return number_display(@total_bikes) if @total_bikes < 1_000_000
 
           safe_join([number_display(@total_bikes / 1_000_000), "M+"])
-        end
-
-        def membership_options
-          priced([{value: "basic", cents: 500, note: translation(".basic_membership")},
-            {value: "plus", cents: 1500, note: translation(".plus_membership"), checked: true},
-            {value: "patron", cents: 5000, note: translation(".patron_membership")}]) { translation(".become_a_member", amount: it) }
-        end
-
-        def donation_options
-          priced([{value: 25, cents: 2500, note: translation(".donation_search")},
-            {value: 50, cents: 5000, note: translation(".donation_alerts"), checked: true},
-            {value: 100, cents: 10_000, note: translation(".donation_partners")}]) { translation(".donate_amount", amount: it) }
-        end
-
-        def priced(options)
-          options.map do |option|
-            amount = MoneyFormatter.money_format_without_cents(option[:cents], @currency.slug)
-            option.merge(amount:, label: yield(amount))
-          end
-        end
-
-        def gift_forms
-          [{id: "gift_monthly", url: new_membership_path, name: :membership_level, options: membership_options,
-            hidden: {referral_source: REFERRAL_SOURCE, currency: @currency.slug}, classes: "tw:flex tw:group-has-[#gift-cadence-one-time:checked]:hidden"},
-            {id: "gift_one_time", url: donate_path, name: :initial_amount, options: donation_options,
-             hidden: {source: REFERRAL_SOURCE}, classes: "tw:hidden tw:group-has-[#gift-cadence-one-time:checked]:flex"}]
-        end
-
-        def cadences
-          [{id: "gift-cadence-monthly", label: translation(".monthly"), checked: true},
-            {id: "gift-cadence-one-time", label: translation(".one_time")}]
         end
 
         def next_page_path = recovery_stories_path(page: @pagy.next, per_page: (@pagy.limit unless @pagy.limit == PER_PAGE))

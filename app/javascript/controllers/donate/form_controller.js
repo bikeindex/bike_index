@@ -1,10 +1,10 @@
 import { Controller } from '@hotwired/stimulus'
 
-// Connects to data-controller='donate--page'
+// Connects to data-controller='donate--form'
 // The cadence radios show and hide the two forms in CSS; this keeps every submit label on
 // the selected amount, and unchecks the presets while an other amount is typed
 export default class extends Controller {
-  static targets = ['cadence', 'monthlyForm', 'oneTimeForm', 'oneTimeAmount', 'customAmount', 'majorGift', 'submit']
+  static targets = ['cadence', 'monthlyForm', 'oneTimeForm', 'oneTimeAmount', 'customAmount', 'submit']
   static values = { monthlyLabel: String, oneTimeLabel: String, currencySymbol: String }
 
   connect () {
@@ -25,13 +25,13 @@ export default class extends Controller {
     this.update()
   }
 
-  selectMajor (event) {
-    event.preventDefault()
+  selectAmount ({ detail: { amount } }) {
     const oneTime = this.cadenceTargets.find(radio => radio.value === 'one-time')
     if (oneTime) oneTime.checked = true
-    this.customAmountTarget.value = event.currentTarget.dataset.amount
+    this.customAmountTarget.value = amount
     this.customInput()
-    this.element.querySelector('#donate-form').scrollIntoView({ behavior: 'smooth' })
+    // the card the page put the form in, heading included
+    this.element.parentElement.scrollIntoView({ behavior: 'smooth' })
   }
 
   submitActive () {
@@ -44,11 +44,7 @@ export default class extends Controller {
     const label = isOneTime ? this.oneTimeLabelValue : this.monthlyLabelValue
     const text = label.replace('%{amount}', this.selectedAmount(isOneTime))
     this.submitTargets.forEach(button => { button.textContent = text })
-
-    const customDollars = isOneTime && this.customAmountTarget.value
-    this.majorGiftTargets.forEach(card => {
-      card.dataset.active = card.dataset.amount === customDollars
-    })
+    this.dispatch('change', { target: window, detail: { label: text, customAmount: isOneTime ? this.customAmountTarget.value : '' } })
   }
 
   // Without a monthly form there are no cadence tabs, only the one-time form

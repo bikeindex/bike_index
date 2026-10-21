@@ -113,6 +113,21 @@ RSpec.describe WelcomeController, type: :request do
         expect(response.body).to_not include("Load more stories")
         expect(response.body).to_not include("Fund the next recovery")
       end
+
+      context "when stories share a recovered_at" do
+        let(:recovered_at) { Time.current.beginning_of_day + 6.hours }
+        let!(:recovery_displays) { FactoryBot.create_list(:recovery_display, 4, recovered_at:) }
+
+        # Postgres returns ties in whatever order a plan reads them, so a page
+        # boundary through them can repeat one story and skip another
+        it "breaks ties by id" do
+          shown = [1, 2, 3].flat_map do |page|
+            get "/recovery_stories", params: {per_page: 2, page:}
+            assigns(:recovery_displays).map(&:id)
+          end
+          expect(shown).to eq(RecoveryDisplay.reorder(recovered_at: :desc, id: :desc).pluck(:id))
+        end
+      end
     end
 
     context "with an organization the user has since left" do

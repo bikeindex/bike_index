@@ -10,8 +10,11 @@
         <div class="tw:h-50 tw:bg-gray-100"></div>
       <% end %>
 
-      <div class="tw:flex tw:flex-col tw:gap-3 tw:p-5">
-        <blockquote class="tw:m-0 tw:border-0 tw:p-0 tw:text-base tw:leading-[1.55]">
+      <%= tag.div(class: "tw:flex tw:flex-col tw:gap-3 tw:p-5", data: {controller: "recovery-stories--translate-quote", recovery_stories__translate_quote_locale_value: I18n.locale}) do %>
+        <blockquote
+          class="tw:m-0 tw:border-0 tw:p-0 tw:text-base tw:leading-[1.55]"
+          data-recovery-stories--translate-quote-target="quote"
+        >
           <%= recovery_display.quote %>
         </blockquote>
 
@@ -26,8 +29,16 @@
             <%= translation(".recovered") %>
             <%= render(UI::Time::Component.new(time: recovery_display.recovered_at)) %>
           </span>
+
+          <span
+            class="tw:text-[12.5px] tw:text-gray-500"
+            data-recovery-stories--translate-quote-target="credit"
+            hidden
+          >
+            <%= translation(".translated_from_english") %>
+          </span>
         </p>
-      </div>
+      <% end %>
     <% end %>
   <% end %>
 
@@ -182,107 +193,15 @@
 
         <div
           class="
-            tw:group tw:flex tw:flex-col tw:gap-4 tw:rounded-lg tw:bg-white
-            tw:p-7 tw:text-gray-700 tw:shadow-lg
+            tw:flex tw:flex-col tw:gap-4 tw:rounded-lg tw:bg-white tw:p-7
+            tw:text-gray-700 tw:shadow-lg
           "
         >
           <h3 class="tw:text-2xl <%= h2_classes %>">
             <%= translation(".fund_the_next_recovery") %>
           </h3>
 
-          <fieldset class="tw:m-0 tw:flex tw:border-0 tw:border-b tw:border-gray-200 tw:p-0">
-            <legend class="tw:sr-only"><%= translation(".how_often") %></legend>
-
-            <% cadences.each do |cadence| %>
-              <label
-                class="
-                  tw:-mb-px tw:flex-1 tw:cursor-pointer tw:border-b-3
-                  tw:border-transparent tw:py-2.75 tw:text-center
-                  tw:text-[15px] tw:font-semibold tw:tracking-wider
-                  tw:text-gray-600 tw:uppercase
-                  tw:has-checked:border-blue-500
-                  tw:has-checked:text-blue-500 tw:has-focus-visible:ring-2
-                  tw:has-focus-visible:ring-blue-500/40
-                "
-              >
-                <%= radio_button_tag(:gift_cadence, cadence[:id], cadence[:checked], id: cadence[:id], class: "tw:sr-only") %>
-                <%= cadence[:label] %>
-              </label>
-            <% end %>
-          </fieldset>
-
-          <% gift_forms.each do |gift_form| %>
-            <%= form_tag(gift_form[:url], method: :get, id: gift_form[:id], enforce_utf8: false,
-              class: "#{gift_form[:classes]} tw:flex-col tw:gap-4",
-              data: {controller: "recovery-stories--gift-picker"}) do %>
-              <% gift_form[:hidden].each do |name, value| %>
-                <%= hidden_field_tag(name, value, id: nil) %>
-              <% end %>
-
-              <fieldset class="tw:m-0 tw:flex tw:flex-col tw:gap-2.25 tw:border-0 tw:p-0">
-                <legend class="tw:sr-only">
-                  <%= translation(".choose_an_amount") %>
-                </legend>
-
-                <% gift_form[:options].each do |option| %>
-                  <label
-                    class="
-                      tw:group/amount tw:flex tw:cursor-pointer
-                      tw:items-center tw:gap-3.5 tw:rounded-lg tw:border-2
-                      tw:border-gray-200 tw:bg-white tw:px-4.25 tw:py-3.75
-                      tw:transition-colors tw:has-checked:border-blue-600
-                      tw:has-focus-visible:ring-2
-                      tw:has-focus-visible:ring-blue-500/40
-                    "
-                  >
-                    <%= radio_button_tag(gift_form[:name], option[:value], option[:checked],
-                      id: "#{gift_form[:id]}_#{option[:value]}", class: "tw:sr-only",
-                      data: {label: option[:label], action: "change->recovery-stories--gift-picker#update"}) %>
-
-                    <span
-                      class="
-                        tw:min-w-14 tw:font-header tw:text-[22px]
-                        tw:font-extrabold tw:text-slate-900
-                        tw:group-has-checked/amount:text-blue-600
-                      "
-                    >
-                      <%= option[:amount] %>
-                    </span>
-
-                    <span
-                      class="
-                        tw:min-w-0 tw:flex-1 tw:text-sm tw:leading-[1.45]
-                        tw:text-gray-600
-                      "
-                    >
-                      <%= option[:note] %>
-                    </span>
-
-                    <span
-                      class="
-                        tw:size-5.5 tw:flex-none tw:rounded-full
-                        tw:border-[1.5px] tw:border-gray-300 tw:bg-white
-                        tw:group-has-checked/amount:border-blue-600
-                        tw:group-has-checked/amount:bg-blue-600
-                      "
-                      aria-hidden="true"
-                    ></span>
-                  </label>
-                <% end %>
-              </fieldset>
-
-              <%= render(UI::Button::Component.new(color: :yellow, size: :callout, type: "submit",
-                html_class: "tw:w-full tw:px-4! tw:py-3.5!")) do %>
-                <span data-recovery-stories--gift-picker-target="cta">
-                  <%= gift_form[:options].find { it[:checked] }[:label] %>
-                </span>
-              <% end %>
-            <% end %>
-          <% end %>
-
-          <p class="tw:m-0 tw:text-[13px] tw:leading-normal tw:text-gray-600">
-            <%= translation(".tax_deductible") %>
-          </p>
+          <%= render(@form) %>
         </div>
       </div>
     </section>
