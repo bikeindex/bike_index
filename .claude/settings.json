@@ -44,11 +44,6 @@
           {
             "type": "command",
             "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/mise-shims.sh"
-          },
-          {
-            "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/conductor-branch.sh",
-            "statusMessage": "Moving a Conductor -v1 checkout onto its real branch"
           }
         ]
       },
@@ -66,6 +61,11 @@
             "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/worktree-setup.sh",
             "timeout": 900,
             "statusMessage": "Running bin/workspace_setup for this worktree"
+          },
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/bin/conductor_branch",
+            "statusMessage": "Moving a Conductor -v1 checkout onto its real branch"
           }
         ]
       }

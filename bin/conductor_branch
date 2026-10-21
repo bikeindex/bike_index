@@ -1,0 +1,27 @@
+#!/bin/bash
+# Conductor names a workspace's branch <name>-v1 when another worktree already
+# holds <name>. Move this checkout onto <name> itself, so commits land on the
+# branch the PR shows.
+set -u
+cd "$(dirname "$0")/.." || exit 0
+
+LOCAL=$(git branch --show-current)
+[[ "$LOCAL" =~ -v[0-9]+$ ]] || exit 0
+UPSTREAM=$(git rev-parse --abbrev-ref '@{u}' 2>/dev/null) || exit 0
+NAME=${UPSTREAM#origin/}
+[[ "$LOCAL" =~ ^"$NAME"-v[0-9]+$ ]] || exit 0
+
+HOLDER=$(git for-each-ref --format='%(worktreepath)' "refs/heads/$NAME")
+# --detach leaves that worktree's files and index as they are
+[[ -n "$HOLDER" ]] && git -C "$HOLDER" checkout -q --detach
+
+if ! { git checkout -q "$NAME" && git merge -q --no-edit "$LOCAL"; }; then
+  git merge --abort 2>/dev/null
+  git checkout -q "$LOCAL"
+  [[ -n "$HOLDER" ]] && git -C "$HOLDER" checkout -q "$NAME"
+  echo "Still on $LOCAL: it doesn't merge cleanly into $NAME. ${HOLDER:+Run git -C $HOLDER checkout --detach, then }git checkout $NAME, git merge $LOCAL, resolve it per the merge-conflicts skill, and git branch -D $LOCAL."
+  exit 0
+fi
+# -d also wants it merged into its upstream, which unpushed work on it isn't
+git branch -q -D "$LOCAL"
+echo "Moved this checkout from $LOCAL onto $NAME${HOLDER:+, detaching $HOLDER to free it}."
