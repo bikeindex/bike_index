@@ -45,8 +45,14 @@ module ImageJobs
       )
       processed_blob.analyze
 
-      recovery_display.photo_processed.attach(processed_blob)
-      recovery_display
+      # The photo's analysis touches the display, which can enqueue a second job that got this far too
+      recovery_display.with_lock do
+        if recovery_display.photo_processed.attached? && !force_regenerate
+          processed_blob.purge
+        else
+          recovery_display.photo_processed.attach(processed_blob)
+        end
+      end
     end
 
     def generate_square_image(photo)
