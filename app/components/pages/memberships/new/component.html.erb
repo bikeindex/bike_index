@@ -476,31 +476,12 @@
     </div>
   </section>
 
-  <section class="tw:bg-blue-600 tw:text-white">
-    <div
-      class="
-        tw:mx-auto tw:flex tw:max-w-6xl tw:flex-col tw:gap-6 tw:px-5 tw:py-8
-        tw:md:flex-row tw:md:items-center tw:md:gap-9 tw:lg:px-14
-        tw:lg:py-11
-      "
-    >
-      <%= image_tag("membership/bike-love.png", alt: "", class: "tw:hidden tw:w-30 tw:shrink-0 tw:md:block") %>
-
-      <h2
-        class="
-          tw:m-0 tw:flex-1 tw:font-header tw:text-[22px] tw:font-extrabold
-          tw:text-white tw:lg:text-[32px]
-        "
-      >
-        <%= members_keep_it_free %>
-      </h2>
-
-      <%= render(UI::ButtonLink::Component.new(href: "#membership-plans", color: :yellow, size: :callout,
-        html_class: "tw:shrink-0", data: {action: "memberships--new#scrollToPlans"})) do %>
-        <span data-memberships--new-target="join">
-          <%= labels(@level, @interval)[:join] %>
-        </span>
-      <% end %>
-    </div>
-  </section>
+  <%= render(UI::CallToActionBanner::Component.new(heading: members_keep_it_free)) do %>
+    <%= render(UI::ButtonLink::Component.new(href: "#membership-plans", color: :yellow, size: :callout,
+      data: {action: "memberships--new#scrollToPlans"})) do %>
+      <span data-memberships--new-target="join">
+        <%= labels(@level, @interval)[:join] %>
+      </span>
+    <% end %>
+  <% end %>
 </div>
