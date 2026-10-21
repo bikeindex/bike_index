@@ -5,7 +5,7 @@ import { copyButton } from 'bikebook/templates/ui/copy_button'
 import { table } from 'bikebook/templates/ui/table'
 import { PINNED_ROW_HEADER } from 'bikebook/templates/vehicles/comparison_table'
 import { basicsOf, simpleFormat } from 'bikebook/templates/vehicles/model_viewer'
-import { array, compact, isNumber, join, presence, present } from 'bikebook/templates/values'
+import { array, isNumber, join, present } from 'bikebook/templates/values'
 
 // `only` ones once a shown model is electric, suspended, a cargo vehicle or sold outside the visitor's market, the rest once one lists it, and `differing`
 // ones where the models' values of it differ
@@ -75,7 +75,7 @@ export const basics = ({ presenter, vehicles, outOfClassId }) => {
       value,
       markets: array(data.markets).map((code) => presenter.vocabulary.names?.markets?.[code] ?? code).join(', '),
       outside_market: outsideMarket,
-      years: join(compact([presence(fields.years), manufacturerPage(data)]), ' '),
+      years: join([fields.years, manufacturerPage(data)].filter(present), ' '),
       price: price && amountDisplay(price.original_msrp, price.original_msrp_currency, presenter.vocabulary.currencies),
       description: fields.description && readMore(data.description, fields.description)
     }

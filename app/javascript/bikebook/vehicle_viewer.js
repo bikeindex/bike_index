@@ -95,11 +95,11 @@ export class VehicleViewer {
       }
     }
     // a model opened alone, its search hidden, has a tab to show it filtered to its type: "Search other cargo bikes"
-    const lone = !searching(url) && vehicles.length === 1
-    const type = lone && (presenter.named(presenter.kit.schemas.vehicle, vehicles[0].data).type || 'bike')
-    const searchTab = lone
-      ? { label: `Search other ${type.toLowerCase()}s`, href: pathWith(url, { search: '1', vehicle_type: vehicles[0].data.type || 'bike' }) }
-      : null
+    const lone = !searching(url) && vehicles.length === 1 && vehicles[0].data
+    const searchTab = lone && {
+      label: `Search other ${(presenter.named(presenter.kit.schemas.vehicle, lone).type || 'bike').toLowerCase()}s`,
+      href: pathWith(url, { search: '1', vehicle_type: lone.type || 'bike' })
+    }
     return html`${jumpTo(view, (each) => pathWith(url, { view: each === 'basics' ? '' : each }), shown, searchTab)}${views[view]()}`
   }
 }

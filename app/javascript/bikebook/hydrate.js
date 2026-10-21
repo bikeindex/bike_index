@@ -97,14 +97,16 @@ export async function pickedVehicles (catalog, page, url) {
 // its comboboxes, whose options are the catalog's, disabled. `status` stands in for the vehicles
 export function loadingShell (shell, url, status) {
   const root = shell.content.cloneNode(true)
-  panelOf(root).hidden = !searching(url)
+  const panel = panelOf(root)
+  panel.hidden = !searching(url)
   const filters = urlFilters(root, url)
   fillFields(root, filters)
   // one holding what only the catalog names, rather than the Any it isn't
-  for (const name of ['vehicle_models', ...LISTS, ...SINGLES].filter((each) => (filters[each] ?? url.searchParams.get(each)))) {
-    const input = combobox(root, name).querySelector('.hw-combobox__input')
-    combobox(root, name).dataset.hwComboboxPrefilledDisplayValue = ''
-    input.placeholder = panelOf(root).dataset.loadingPlaceholder
+  for (const name of ['vehicle_models', ...LISTS, ...SINGLES].filter((each) => filters[each] ?? url.searchParams.get(each))) {
+    const field = combobox(root, name)
+    const input = field.querySelector('.hw-combobox__input')
+    field.dataset.hwComboboxPrefilledDisplayValue = ''
+    input.placeholder = panel.dataset.loadingPlaceholder
     input.dataset.awaitingCatalog = ''
   }
   for (const field of root.querySelectorAll('.hw-combobox')) {

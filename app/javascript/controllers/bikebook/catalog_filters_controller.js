@@ -166,8 +166,8 @@ export default class extends Controller {
     // the classes alone, without the jurisdiction they're of
     const boxes = inputs.filter(({ type }) => type === 'checkbox')
     if (boxes.length) return boxes.filter(({ checked }) => checked).map(({ labels }) => labels[0].textContent.trim()).join(', ')
-    // an amount, under its currency's prefix, with its thousands separated, and a year as it is
-    const { filterPrefix: prefix } = field.dataset
+    // a year ungrouped, unlike an amount
+    const prefix = field.dataset.filterPrefix
     const [min, max] = inputs.map(({ value }) => value && (prefix ? `${prefix}${Number(value).toLocaleString('en-US')}` : value))
     if (min && max) return `${min}–${max}`
     return min ? `from ${min}` : max && `up to ${max}`
