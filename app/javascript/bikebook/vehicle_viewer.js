@@ -3,6 +3,7 @@ import { basics } from 'bikebook/templates/vehicles/basics'
 import { copyButton } from 'bikebook/templates/ui/copy_button'
 import { chosenSizes, pickedSizes, sizesParam } from 'bikebook/sizes'
 import { comparisonTable } from 'bikebook/templates/vehicles/comparison_table'
+import { cycleDrawing } from 'bikebook/templates/vehicles/cycle_drawing'
 import { emptyState } from 'bikebook/templates/vehicles/empty_state'
 import { frameGeometry } from 'bikebook/frame_geometry'
 import { geometryOverlay, seriesBorders } from 'bikebook/templates/vehicles/geometry_overlay'
@@ -69,14 +70,22 @@ export class VehicleViewer {
         ? content(data, value)
         : html`<p class="twless-strong">${none}</p>`}</section>`
     })
+    // its type's drawing of `size`, said where it takes a typical one's figures
+    const drawing = (data, size, figure, legend) => html`<figure class="tw:space-y-1"><div class="tw:mx-auto tw:max-w-xl tw:text-gray-800 tw:dark:text-gray-200">${figure}</div>${legend.some(({ listed }) => !listed)
+      ? html`<figcaption class="tw:text-center tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">${present(size?.name) ? `${size.name} drawn. ` : ''}Gray figures aren't listed, so they're drawn as they typically are on a ${String(presenter.named(presenter.kit.schemas.vehicle, data).type || 'bike').toLowerCase()}.</figcaption>`
+      : nothing}</figure>`
     const views = {
       basics: () => basics({ presenter, vehicles, outOfClassId }),
       // the overlay beside the table once the window is wide, above it until then
       geometry: () => html`<div class="tw:flex tw:flex-col tw:min-[1500px]:twpagebleed tw:min-[1500px]:flex-row
         tw:min-[1500px]:items-start tw:min-[1500px]:gap-6 tw:min-[1500px]:px-4">${geometryOverlay({ ...compared, beside: true })}${
-        comparisonTable({ ...compared, beside: true })}</div>${cardRow('tw:mt-6', cards('sizes', 'No sizes listed', (data, value) =>
-        html`<div class="tw:-mx-(--gutter)">${sizesOf({ presenter, data, others: others(value), selectedSize: selectedSizes.get(value), sizePath: sizePath(value) })}</div>`,
-      { keyed: true }))}`,
+        comparisonTable({ ...compared, beside: true })}</div>${cardRow('tw:mt-6', cards('sizes', 'No sizes listed', (data, value) => {
+        const size = sizes[values.indexOf(value)]
+        const { figure, legend } = cycleDrawing({ type: data.type, data, size, geometryKeys: Object.keys(presenter.kit.schemas.geometry) })
+        return html`${drawing(data, size, figure, legend)}<div class="tw:-mx-(--gutter)">${sizesOf({
+          presenter, data, others: others(value), selectedSize: selectedSizes.get(value), sizePath: sizePath(value), letters: new Map(legend.map((each) => [each.key, each]))
+        })}</div>`
+      }, { keyed: true }))}`,
       components: () => {
         const components = componentsOf({ presenter, vehicles, others })
         return cardRow('tw:mt-6', cards('components', 'No components listed', (data, value) => components.get(value),

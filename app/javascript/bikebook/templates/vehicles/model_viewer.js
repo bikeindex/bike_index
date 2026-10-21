@@ -87,8 +87,9 @@ export const basicsOf = ({ presenter, data, outOfClassId }) => new ModelViewer({
 export const photoOf = ({ presenter, data }, frame) => new ModelViewer({ presenter, data, others: [] }).stockPhoto(frame)
 
 // A vehicle's sizes, each with its geometry, `selectedSize` ringed and marked where they differ from `others`', the rest
-// linked to `sizePath(name)`
-export const sizesOf = ({ presenter, data, others, selectedSize, sizePath }) => new ModelViewer({ presenter, data, others, selectedSize, sizePath }).sizes()
+// linked to `sizePath(name)`, and each figure in `letters` lettered as its drawing has it
+export const sizesOf = ({ presenter, data, others, selectedSize, sizePath, letters }) =>
+  new ModelViewer({ presenter, data, others, selectedSize, sizePath, letters }).sizes()
 
 // A vehicle's electric summary beside its motors, each with its battery, marked where they differ from `others`'
 export const motorsOf = ({ presenter, data, others, outOfClassId }) => {
@@ -118,14 +119,14 @@ export const componentsOf = ({ presenter, vehicles, others }) => {
 
 class ModelViewer {
   // `outOfClassId` the viewing state's out of class marker, evc/out_of_class/us/ca, where its law bars a Class 3's throttle
-  constructor ({ presenter, data, value, comparing, idSuffix, others, removePath, selectedSize, sizePath, outOfClassId }) {
+  constructor ({ presenter, data, value, comparing, idSuffix, others, removePath, selectedSize, sizePath, outOfClassId, letters }) {
     this.presenter = presenter
     this.kit = presenter.kit
     this.data = data
     this.vehicle = this.#normalize(data)
     this.outOfClass = outOfClassId ? this.#throttledClass3() : null
     this.others = others.map((other) => this.#normalize(other))
-    Object.assign(this, { value, comparing, idSuffix, removePath, selectedSize, sizePath, outOfClassId })
+    Object.assign(this, { value, comparing, idSuffix, removePath, selectedSize, sizePath, outOfClassId, letters })
   }
 
   render () {
@@ -874,7 +875,12 @@ class ModelViewer {
     // selected one as ui--tabs does its active tab
     return html`<div data-controller="ui--tabs" class="tw:overflow-x-auto tw:px-(--gutter) tw:pb-3.5"><div data-ui--tabs-target="row"
       class="tw:flex tw:w-max tw:min-w-full tw:gap-4">${sizes.map((size) => geometryCard({
-        presenter: this.presenter, size, others, selected: present(this.selectedSize) && size.name === this.selectedSize, href: this.sizePath?.(size.name)
+        presenter: this.presenter,
+size,
+others,
+selected: present(this.selectedSize) && size.name === this.selectedSize,
+href: this.sizePath?.(size.name),
+        letters: this.letters
       }))}</div></div>`
   }
 

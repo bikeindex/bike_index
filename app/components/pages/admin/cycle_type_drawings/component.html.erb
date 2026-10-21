@@ -1,0 +1,62 @@
+<div class="admin-subnav">
+  <div class="col">
+    <h1>Cycle types</h1>
+
+    <p>
+      Bikebook's drawing of each type, and of each type detail it draws its own
+      way. Change a figure to redraw it; gray ones aren't listed, so they're
+      drawn at the type's typical figure.
+    </p>
+  </div>
+</div>
+
+<% manifest_url = @manifest_url %>
+
+<%# a collapsed row is its own ui--collapse, so the trigger in its header opens both drawings %>
+<% collapsible = ->(row, drawing) { row.collapsed ? tag.div(drawing, class: "tw:hidden", data: {"ui--collapse-target": "content"}) : drawing } %>
+
+<%= render(UI::Table::Component.new(records: @rows, row_attributes: ->(row) { {data: {controller: "ui--collapse", "ui--collapse-param-value": row.param}} if row.collapsed })) do |table| %>
+  <% table.column(label: "Type", row_header: true) do |row| %>
+    <strong><%= row.name %></strong>
+    <code class="tw:text-xs"><%= row.type %></code>
+
+    <% if row.type_detail %>
+      <br>
+      <span class="tw:text-xs">type detail: <%= row.type_detail %></span>
+    <% end %>
+
+    <% if row.collapsed %>
+      <br>
+      <%= render(UI::Collapse::Component.new(text: "Show drawings", chevron: true, color: :link)) %>
+    <% end %>
+  <% end %>
+
+  <% table.column(label: "Typical", classes: "tw:align-top!") do |row| %>
+    <%= collapsible.call(row, capture do %>
+      <div
+        class="tw:w-xl"
+        data-controller="admin--cycle-drawing"
+        data-admin--cycle-drawing-type-value="<%= row.type %>"
+        data-admin--cycle-drawing-type-detail-value="<%= row.type_detail %>"
+        data-admin--cycle-drawing-manifest-url-value="<%= manifest_url %>"
+      ></div>
+    <% end) %>
+  <% end %>
+
+  <% table.column(label: "Catalog example", classes: "tw:align-top!") do |row| %>
+    <% if row.example_model %>
+      <%= collapsible.call(row, capture do %>
+        <div
+          class="tw:w-xl"
+          data-controller="admin--cycle-drawing"
+          data-admin--cycle-drawing-type-value="<%= row.type %>"
+          data-admin--cycle-drawing-type-detail-value="<%= row.type_detail %>"
+          data-admin--cycle-drawing-model-value="<%= row.example_model %>"
+          data-admin--cycle-drawing-manifest-url-value="<%= manifest_url %>"
+        ></div>
+      <% end) %>
+    <% else %>
+      <span class="tw:text-gray-500">No catalog models</span>
+    <% end %>
+  <% end %>
+<% end %>
