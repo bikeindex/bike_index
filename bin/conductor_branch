@@ -11,14 +11,27 @@ UPSTREAM=$(git rev-parse --abbrev-ref '@{u}' 2>/dev/null) || exit 0
 NAME=${UPSTREAM#origin/}
 [[ "$LOCAL" =~ ^"$NAME"-v[0-9]+$ ]] || exit 0
 
+# workspace setup and the SessionStart hook can run at once; the second leaves it to the first
+LOCK="$(git rev-parse --absolute-git-dir)/conductor_branch.lock"
+mkdir "$LOCK" 2>/dev/null || exit 0
+trap 'rmdir "$LOCK"' EXIT
+
+# a workspace deleted without `git worktree remove` still holds its branch
+git worktree prune
 HOLDER=$(git for-each-ref --format='%(worktreepath)' "refs/heads/$NAME")
 # --detach leaves that worktree's files and index as they are
 [[ -n "$HOLDER" ]] && git -C "$HOLDER" checkout -q --detach
+reattach() { [[ -n "$HOLDER" ]] && git -C "$HOLDER" checkout -q "$NAME"; }
 
-if ! { git checkout -q "$NAME" && git merge -q --no-edit "$LOCAL"; }; then
-  git merge --abort 2>/dev/null
+if ! CHECKOUT_ERROR=$(git checkout -q "$NAME" 2>&1); then
+  reattach
+  echo "Still on $LOCAL: git checkout $NAME failed - fix this and re-run bin/conductor_branch before committing: $CHECKOUT_ERROR"
+  exit 0
+fi
+if ! git merge -q --no-edit "$LOCAL" >/dev/null 2>&1; then
+  git merge --abort
   git checkout -q "$LOCAL"
-  [[ -n "$HOLDER" ]] && git -C "$HOLDER" checkout -q "$NAME"
+  reattach
   echo "Still on $LOCAL: it doesn't merge cleanly into $NAME. ${HOLDER:+Run git -C $HOLDER checkout --detach, then }git checkout $NAME, git merge $LOCAL, resolve it per the merge-conflicts skill, and git branch -D $LOCAL."
   exit 0
 fi
