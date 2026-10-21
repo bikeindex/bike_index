@@ -1,4 +1,4 @@
-<div class="tw:bg-white tw:text-gray-500">
+<div class="tw:-mb-18 tw:bg-white tw:text-gray-500">
   <section class="tw:border-b tw:border-gray-200">
     <div
       class="
@@ -420,32 +420,9 @@
     </div>
   </section>
 
-  <section class="tw:bg-blue-600 tw:text-white">
-    <div
-      class="
-        tw:mx-auto tw:flex tw:max-w-6xl tw:flex-col tw:gap-4 tw:px-5 tw:py-6
-        tw:md:flex-row tw:md:items-center tw:md:justify-between tw:md:gap-8
-        tw:lg:px-14 tw:lg:py-11
-      "
-    >
-      <div>
-        <h2
-          class="
-            tw:m-0 tw:font-header tw:text-[22px] tw:font-extrabold
-            tw:text-white tw:lg:text-[32px]
-          "
-        >
-          <%= translation(".every_hour_it_sits_unregistered") %>
-        </h2>
-
-        <p class="tw:m-0 tw:mt-2 tw:hidden tw:text-[17px] tw:sm:block">
-          <%= translation(".three_minutes_and_no_cost") %>
-        </p>
-      </div>
-
-      <%= render(UI::ButtonLink::Component.new(href: register_stolen_path,
-        text: translation(".register_your_stolen_bike"), color: :yellow,
-        size: :callout, html_class: "tw:shrink-0")) %>
-    </div>
-  </section>
+  <%= render(UI::CallToActionBanner::Component.new(heading: translation(".every_hour_it_sits_unregistered"),
+    subheading: translation(".three_minutes_and_no_cost"), illustration: false)) do %>
+    <%= render(UI::ButtonLink::Component.new(href: register_stolen_path,
+      text: translation(".register_your_stolen_bike"), color: :yellow, size: :callout)) %>
+  <% end %>
 </div>
