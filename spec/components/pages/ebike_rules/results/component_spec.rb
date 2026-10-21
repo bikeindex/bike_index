@@ -18,7 +18,7 @@ RSpec.describe Pages::EbikeRules::Results::Component, type: :component do
   end
   let(:component) { render_inline(described_class.new(lookup:)) }
 
-  it "renders a legal bike, its Bike Book photo, specs and certifications, and its state's law" do
+  it "renders a legal bike, its BikeBook photo, specs and certifications, and its state's law" do
     expect(component).to have_css("[role='status']", text: "Legal to ride")
       .and have_css("[role='status']", text: "Your Trek Verve+ 2 is legal to ride in Indiana as a Class 1 e-bike.")
       .and have_css("img[src='https://bikebook.bikeindex.org/trek/2025/verve.jpg'][alt='Trek Verve+ 2']")

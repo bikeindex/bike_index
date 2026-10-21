@@ -41,7 +41,7 @@ class EbikeRulesController < ApplicationController
     detected_place = nil if us_chosen && detected_place && !EbikeRuleServices::Places.us?(detected_place)
     if place.nil?
       # which place it goes to depends on where the visitor is, so neither Cloudflare nor a browser keeps it. A bike
-      # comes along, as from Bike Book's link; a frame's check waits for the place the form hasn't chosen
+      # comes along, as from BikeBook's link; a frame's check waits for the place the form hasn't chosen
       response.headers["Cache-Control"] = "no-store"
       return redirect_to place_path(detected_place, request.query_parameters) if detected_place && !turbo_frame_request?
     end

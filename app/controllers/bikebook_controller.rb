@@ -42,12 +42,13 @@ class BikebookController < ApplicationController
     render_page(status: :service_unavailable)
   end
 
-  def render_page(title = "Bikebook", status: :ok)
+  def render_page(title = "BikeBook", status: :ok)
     @page_title = title
     # the icon is taller than wide, which the large card crops to a banner
     @twitter_card = "summary" unless @page_image
     @page_image ||= helpers.image_url("logos/bikebook_icon.png")
     render Pages::Bikebook::Show::Component.new(manifest_url: Integrations::Bikebook::Catalog::MANIFEST_URL,
-      market: request.env["HTTP_CF_IPCOUNTRY"], state: EbikeRuleServices::StateLaws.state_from_location(request_location_hash)), status:
+      market: request.env["HTTP_CF_IPCOUNTRY"], state: EbikeRuleServices::StateLaws.state_from_location(request_location_hash),
+      query: request.query_parameters), status:
   end
 end

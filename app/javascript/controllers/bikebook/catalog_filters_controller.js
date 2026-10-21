@@ -157,15 +157,18 @@ export default class extends Controller {
 
   #describe (field) {
     const inputs = [...field.querySelectorAll('input[name]')]
+    // what the catalog names, which leaves out a value while it loads
     if (field.matches('.hw-combobox')) {
       return inputs[0].value.split(',').filter(Boolean)
-        .map((value) => field.querySelector(`[role="option"][data-value="${CSS.escape(value)}"]`)?.dataset.autocompletableAs ?? value)
+        .flatMap((value) => field.querySelector(`[role="option"][data-value="${CSS.escape(value)}"]`)?.dataset.autocompletableAs ?? [])
         .join(', ')
     }
     // the classes alone, without the jurisdiction they're of
     const boxes = inputs.filter(({ type }) => type === 'checkbox')
     if (boxes.length) return boxes.filter(({ checked }) => checked).map(({ labels }) => labels[0].textContent.trim()).join(', ')
-    const [min, max] = inputs.map(({ value }) => value && `${field.dataset.filterPrefix}${value}`)
+    // an amount, under its currency's prefix, with its thousands separated, and a year as it is
+    const { filterPrefix: prefix } = field.dataset
+    const [min, max] = inputs.map(({ value }) => value && (prefix ? `${prefix}${Number(value).toLocaleString('en-US')}` : value))
     if (min && max) return `${min}–${max}`
     return min ? `from ${min}` : max && `up to ${max}`
   }
