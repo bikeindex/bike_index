@@ -26,19 +26,20 @@ const ghost = path('ghost')
 const panel = (...points) => ({ kind: 'path', points, weight: 'part', closed: true, fill: true })
 const box = ([x0, y0], [x1, y1], make = panel) => ({ ...make([x0, y0], [x1, y0], [x1, y1], [x0, y1]), closed: true })
 const ring = (center, radius, weight = 'thin', fill = false) => ({ kind: 'circle', center, radius, weight, fill })
-const wheel = (center, { r, tire }) => [ring(center, r, 'part'), ring(center, Math.max(r - tire, r * 0.6)), ring(center, Math.max(r * 0.07, 6), 'thin', true)]
+// its tire's outside, and its rim's bead seat inside the tire
+const wheel = (center, { r, tire }) => [ring(center, r, 'part'), tire ? ring(center, r - tire) : [], ring(center, Math.max(r * 0.07, 6), 'thin', true)]
 // a wheel seen end on, across `lateral`
-const tread = (lateral, { r, tire }) => box([lateral - tire / 2, 0], [lateral + tire / 2, 2 * r])
+const tread = (lateral, { r, tire }) => box([lateral - (tire || 30) / 2, 0], [lateral + (tire || 30) / 2, 2 * r])
 // seen from above, at `x` forward and `lateral`
-const footprint = (x, lateral, { r, tire }) => box([x - r, lateral - tire / 2], [x + r, lateral + tire / 2])
+const footprint = (x, lateral, { r, tire }) => box([x - r, lateral - (tire || 30) / 2], [x + r, lateral + (tire || 30) / 2])
 const saddle = (top, length = 250) => part(plus(top, [-length * 0.62, 10]), plus(top, [length * 0.38, 0]))
 const handlebar = (center) => ring(center, 14, 'part', true)
 const dropBar = (clamp) => part(clamp, plus(clamp, [75, 5]), plus(clamp, [100, -40]), plus(clamp, [80, -115]), plus(clamp, [30, -125]))
 
 // A lettered dimension. h and v measure across x and y, a `lane` of lettering out from the furthest of `a` and `b`, else
-// from `base`; d along a to b, a lane to its left. `value` where it isn't what's drawn, `listed` where it isn't its key's, and
-// `side`, 1 or -1, where a span too short to letter over isn't lettered out the side its lane goes. `guides`, more dashed
-// connectors, to show what it measures from where nothing drawn does
+// from `base`; d along a to b, a lane to its left. `value` where it isn't what's drawn, `listed` where it isn't its key's, `last`
+// to letter it after the rest, and `side`, 1 or -1, where a span too short to letter over isn't lettered out the side its lane
+// goes. `guides`, more dashed connectors, to show what it measures from where nothing drawn does
 const h = (key, a, b, lane = 0, options = {}) => ({ kind: 'h', key, a, b, lane, ...options })
 const v = (key, a, b, lane = 0, options = {}) => ({ kind: 'v', key, a, b, lane, ...options })
 const d = (key, a, b, lane = 0, options = {}) => ({ kind: 'd', key, a, b, lane, ...options })
@@ -47,6 +48,11 @@ const angle = (key, center, degrees, radius = 2.6) => ({ kind: 'angle', key, cen
 const across = (key, center, { r, listed }) => h(key, plus(center, [-r, 0]), plus(center, [r, 0]), 0, { base: center[1], value: 2 * r, listed, derived: true })
 const fromGround = (key, point, lane = 0, options = {}) => v(key, [point[0], 0], point, lane, { base: point[0], ...options })
 const overall = (key, from, to, lane = -2.6) => h(key, [from, 0], [to, 0], lane, { base: 0 })
+// each tire's width, from the ground up to its rim, lettered after its drawing's other figures on the side away from the
+// other wheel
+const tires = (rearAxle, rearWheel, frontAxle, frontWheel) => [['tire_width_rear', rearAxle, rearWheel, -1], ['tire_width_front', frontAxle, frontWheel, 1]]
+  .filter(([, , { tire }]) => tire)
+  .map(([key, [x, y], { r, tire, tireListed }, side]) => v(key, [x, y - r], [x, y - r + tire], 0, { base: x, side, value: tire, listed: tireListed, derived: true, last: true }))
 
 const ROAD = /^(road|track|atb_)/
 
@@ -62,11 +68,15 @@ const bikeFrame = ({ data, size, defaults }, fallback) => {
   }
   const { frame, built } = settle({ ...data, wheels: array(data.wheels).length ? data.wheels : fallbackWheels }, size?.geometry ?? {}, 4)
   const lift = ([x, y]) => [x, y + frame.bottomBracketHeight]
+  const tireOf = (position, r) => {
+    const { bsd, tire_width: tireWidth } = builtWheel(built, size, position) ?? {}
+    return { r, tire: isNumber(bsd) ? r - bsd / 2 : tireWidth ?? fallback.tire, tireListed: isNumber(tireWidth) }
+  }
   return {
     bb: lift([0, 0]),
     ...Object.fromEntries(['rearAxle', 'frontAxle', 'headTop', 'headBottom', 'seatTop', 'seatBottom'].map((key) => [key, lift(frame[key])])),
-    rearWheel: { r: frame.rearRadius, tire: builtWheel(built, size, 'rear')?.tire_width ?? fallback.tire },
-    frontWheel: { r: frame.frontRadius, tire: builtWheel(built, size, 'front')?.tire_width ?? fallback.tire }
+    rearWheel: tireOf('rear', frame.rearRadius),
+    frontWheel: tireOf('front', frame.frontRadius)
   }
 }
 
@@ -144,6 +154,7 @@ const bikeDims = (frame, { fig }, detail) => {
     ...(detail === 'bench_seat' ? [] : [d('seat_tube_ct', bb, seatTop, -1.8), angle('seat_angle', bb, seatAngle, 3.4)]),
     d('chainstay', bb, rearAxle, 1),
     overall('wheelbase', rearAxle[0], frontAxle[0], -1.6),
+    ...tires(rearAxle, frame.rearWheel, frontAxle, frame.frontWheel),
     v('bb_drop', rearAxle, bb, -1, { base: rearAxle[0] }),
     fromGround('bb_height', bb),
     fromGround('standover', standoverAt, 0, { t: detail === 'step_through' ? 0.7 : 0.5 }),
@@ -211,7 +222,8 @@ const tandem = ({ fig, listed, wheel: wheelAt }) => {
       h('boom_tube', stoker, captain, -1.1),
       d('chainstay', stoker, rearAxle, 1),
       angle('head_angle', headBottom, fig('head_angle')),
-      overall('wheelbase', rearAxle[0], frontAxle[0], -2.4)
+      overall('wheelbase', rearAxle[0], frontAxle[0], -2.4),
+      ...tires(rearAxle, rearWheel, frontAxle, frontWheel)
     ]
   }]
 }
@@ -246,6 +258,7 @@ const longJohn = ({ fig, wheel: wheelAt }) => {
       fromGround('bb_height', bb),
       fromGround('standover', lerp(riderFoot, bb, 0.4)),
       overall('wheelbase', rearAxle[0], frontAxle[0], -1.4),
+      ...tires(rearAxle, rearWheel, frontAxle, frontWheel),
       overall('dimensions.length', rearAxle[0] - rearWheel.r, frontAxle[0] + frontWheel.r)
     ]
   }]
@@ -274,7 +287,8 @@ const balanceBike = ({ fig, wheel: wheelAt }) => {
       fromGround('standover', plus(cluster, [60, -20])),
       angle('head_angle', headBottom, fig('head_angle'), 2),
       across('wheel_size', rearAxle, rearWheel),
-      overall('wheelbase', rearAxle[0], frontAxle[0], -1.4)
+      overall('wheelbase', rearAxle[0], frontAxle[0], -1.4),
+      ...tires(rearAxle, rearWheel, frontAxle, frontWheel)
     ]
   }]
 }
@@ -298,7 +312,8 @@ const tallBike = (context) => {
       fromGround('standover', lerp(seatTop, headTop, 0.55)),
       fromGround('bb_height', bb, 1.4, { base: lower.frontAxle[0] + lower.frontWheel.r }),
       v('frame_offset', lower.bb, bb, -1.2),
-      overall('wheelbase', lower.rearAxle[0], lower.frontAxle[0], -1.4)
+      overall('wheelbase', lower.rearAxle[0], lower.frontAxle[0], -1.4),
+      ...tires(lower.rearAxle, lower.rearWheel, lower.frontAxle, lower.frontWheel)
     ]
   }]
 }
@@ -321,7 +336,8 @@ const pennyFarthing = ({ fig, wheel: wheelAt }) => {
       across('wheel_rear', rearAxle, rearWheel),
       fromGround('seat_height', plus(top, [0, 10]), -1.4, { base: rearAxle[0] - rearWheel.r }),
       d('crank_length', frontAxle, plus(frontAxle, polar(fig('crank_length'), -60)), -0.8),
-      overall('wheelbase', rearAxle[0], frontAxle[0], -1.4)
+      overall('wheelbase', rearAxle[0], frontAxle[0], -1.4),
+      ...tires(rearAxle, rearWheel, frontAxle, frontWheel)
     ]
   }]
 }
@@ -376,7 +392,8 @@ const tricycle = ({ paired }) => ({ fig, wheel: wheelAt }) => {
       fromGround('standover', step),
       h('box_length', ...(frontBox ? [[frontAxle[0] - fig('box_length') / 2, 0], [frontAxle[0] + fig('box_length') / 2, 0]] : [[rearAxle[0] - fig('box_length') / 2, 0], [rearAxle[0] + fig('box_length') / 2, 0]]), 0.8,
         { base: (frontBox ? frontAxle[1] + 60 : 2 * rearWheel.r + 40) + fig('box_height') }),
-      overall('wheelbase', rearAxle[0], frontAxle[0], -1.4)
+      overall('wheelbase', rearAxle[0], frontAxle[0], -1.4),
+      ...tires(rearAxle, rearWheel, frontAxle, frontWheel)
     ]
   }
   const track = fig('track_width')
@@ -416,6 +433,7 @@ const recumbent = ({ bsd }) => ({ fig, wheel: wheelAt, data }) => {
       angle('seat_angle', seatBack, fig('seat_angle'), 3),
       fromGround('bb_height', bb, 1.2, { base: bb[0] + fig('crank_length') }),
       overall('wheelbase', rearAxle[0], frontAxle[0], -1.4),
+      ...tires(rearAxle, rearWheel, frontAxle, frontWheel),
       overall('dimensions.length', rearAxle[0] - rearWheel.r, bb[0] + fig('crank_length'))
     ]
   }
@@ -486,6 +504,7 @@ const pediCab = ({ fig, wheel: wheelAt }) => {
       fromGround('seat_height', top, 0, { base: top[0] }),
       fromGround('dimensions.height', [rearAxle[0], roof], -1.2, { base: canopy[0][0] }),
       overall('wheelbase', rearAxle[0], frontAxle[0], -1.4),
+      ...tires(rearAxle, rearWheel, frontAxle, frontWheel),
       overall('dimensions.length', back - 40, frontAxle[0] + frontWheel.r)
     ]
   }]
@@ -516,6 +535,7 @@ const ellipticalBike = ({ fig, wheel: wheelAt }) => {
       v('stride_height', platform, plus(platform, [0, 2 * strideY]), 0, { base: stride[0] + strideX + 40 }),
       fromGround('operating_height', bar, 1.2, { base: frontAxle[0] + frontWheel.r }),
       overall('wheelbase', rearAxle[0], frontAxle[0], -1.4),
+      ...tires(rearAxle, rearWheel, frontAxle, frontWheel),
       overall('dimensions.length', rearAxle[0] - rearWheel.r, frontAxle[0] + frontWheel.r)
     ]
   }]
@@ -551,6 +571,7 @@ const scooter = ({ kick }) => ({ fig, either, listed, wheel: wheelAt }) => {
       h('deck_length', [deck[0], deckTop], [deck[1], deckTop], 0.8),
       across('wheel_size', frontAxle, frontWheel),
       overall('wheelbase', rearAxle[0], frontAxle[0], -1.4),
+      ...tires(rearAxle, rearWheel, frontAxle, frontWheel),
       overall('dimensions.length', rearAxle[0] - rearWheel.r, frontAxle[0] + frontWheel.r)
     ]
   }
@@ -665,6 +686,7 @@ const eMotorcycle = ({ fig, either, wheel: wheelAt }) => {
       across('wheel_front', frontAxle, frontWheel),
       across('wheel_rear', rearAxle, rearWheel),
       overall('wheelbase', rearAxle[0], frontAxle[0], -1.4),
+      ...tires(rearAxle, rearWheel, frontAxle, frontWheel),
       overall('dimensions.length', rearAxle[0] - rearWheel.r, frontAxle[0] + frontWheel.r)
     ]
   }]
@@ -724,6 +746,7 @@ const stroller = ({ fig, listed, wheel: wheelAt }) => {
       fromGround('handlebar_height', grip, -1.2, { base: grip[0] - 15 }),
       fromGround('dimensions.height', [grip[0], Math.max(fig('dimensions.height'), grip[1])], -2.4, { base: grip[0] - 15 }),
       overall('wheelbase', rearAxle[0], frontAxle[0], -1.4),
+      ...tires(rearAxle, rearWheel, frontAxle, frontWheel),
       overall('dimensions.length', grip[0] - 15, frontAxle[0] + frontWheel.r)
     ]
   }, {
@@ -814,7 +837,7 @@ export const drawingViews = ({ type, data, typeDetail, size }) => {
   const wheelAt = (positions, fallback) => {
     const built = positions.map((position) => builtWheel(data, size, position)).find((each) => isNumber(each?.bsd))
     const tire = built?.tire_width ?? built?.max_tire_width ?? fallback.tire
-    return { r: (built?.bsd ?? fallback.bsd) / 2 + tire, tire: tire || 30, listed: Boolean(built) }
+    return { r: (built?.bsd ?? fallback.bsd) / 2 + tire, tire, listed: Boolean(built), tireListed: isNumber(built?.tire_width) }
   }
   // the first of `keys` it lists, else the first's typical
   const either = (...keys) => fig(keys.find(listed) ?? keys[0])

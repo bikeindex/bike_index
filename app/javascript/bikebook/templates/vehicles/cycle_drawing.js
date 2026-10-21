@@ -27,6 +27,8 @@ const LABELS = {
   wheel_size: 'Wheel diameter',
   wheel_front: 'Front wheel diameter',
   wheel_rear: 'Rear wheel diameter',
+  tire_width_front: 'Front tire width',
+  tire_width_rear: 'Rear tire width',
   box_length: 'Cargo box length',
   track_width: 'Track width',
   hitch_height: 'Hitch height',
@@ -160,7 +162,7 @@ export const cycleDrawing = ({ type, data = {}, typeDetail = data.type_detail, s
   const dimFor = (key) => dims.find((each) => each.key === key)
   const extra = (key) => Boolean(kit) && !dimFor(key).derived && !(key.split('.')[0] in kit.schemas.geometry)
   const drawn = [...new Set(dims.map(({ key }) => key))]
-  const keys = [...drawn.filter((key) => !extra(key)), ...drawn.filter(extra)]
+  const keys = [...drawn.filter((key) => !extra(key) && !dimFor(key).last), ...drawn.filter((key) => !extra(key) && dimFor(key).last), ...drawn.filter(extra)]
   const letter = (key) => String.fromCharCode(65 + keys.indexOf(key))
   const legend = keys.map((key) => {
     const dim = dimFor(key)
