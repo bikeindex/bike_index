@@ -5,7 +5,7 @@ module Pages
     module ClassCard
       # A class as "E-bike classes, explained" cards it: a US class from its number, any other `classification`, or
       # else the e-moto, each with the `place`'s own rules for it. Unframed, it's a tooltip's body; in a `frame_id`,
-      # the one Bike Book loads. A `catalog_id` closes it, a copy away
+      # the one BikeBook loads. A `catalog_id` closes it, a copy away
       class Component < ApplicationComponent
         FRAME_ID = "ebike-rules-class-card"
 

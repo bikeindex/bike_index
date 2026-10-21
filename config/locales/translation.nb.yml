@@ -7215,6 +7215,87 @@ nb:
             hjem, og det finansierer de nye verktøyene vi bygger videre. Det vil alltid
             være gratis å registrere en sykkel og rapportere et tyveri. Medlemmer
             er grunnen til at vi kan love det.
+      donate:
+        page:
+          already_member: Du er allerede medlem av Bike Index – takk! Du kan endre
+            nivået eller betalingsinformasjonen din fra medlemsinnstillingene dine.
+          cadence: Hvor ofte å gi
+          cta_headline: En million sykler er registrert. Ikke én eier betalte for
+            å være der.
+          cta_sub: Hold det gratis for den neste millionen.
+          eyebrow: Gjenopprettet og returnert
+          fine_print: Bike Index er en ideell organisasjon under 501(c)(3), EIN 81-4296194.
+            Donasjonen din er fradragsberettiget i USA. Du kan når som helst avbryte
+            en månedlig gave.
+          fine_print_short: 501(c)(3) ideell organisasjon, EIN 81-4296194. Fradragsberettiget
+            i USA.
+          form_title: Finansier den neste gjenopprettingen
+          headline: Alle syklene ovenfor kom hjem fordi registeret var gratis
+          larger_gift_link: Snakk med oss om en større gave
+          lede: Bike Index er en ideell organisasjon. Registrering koster ingenting,
+            søking koster ingenting, og rapportering av tyveri koster ingenting –
+            og det er derfor en million sykler er i registeret, og hvorfor politiavdelinger
+            og butikker faktisk bruker det. Donasjoner er det som holder det slik.
+          lede_short: Bike Index er en ideell organisasjon. Registrering, ransaking
+            og tyverirapporter koster ingenting. Donasjoner er det som holder det
+            slik.
+          major_benefactor: Velgjører
+          major_body: Gaver på dette nivået går til onboarding av partnere, etterforskning
+            av tyveri på tvers av landegrenser og ingeniørarbeidet bak promoterte
+            varsler.
+          major_eyebrow: Stor gaver
+          major_partner: Partner
+          major_title: Større gaver flytter hele byer inn i registeret
+          manage_membership: Administrer medlemskapet ditt
+          membership_link: Hva medlemskapet inkluderer
+          membership_note: 'Månedlig støtte gjør deg til et Bike Index-medlem: markedsplassoppføringer,
+            et medlemsmerke og fordeler som vokser etter hvert som vi bygger dem.
+            Nivåene er %{amounts} per måned.'
+          monthly: Månedlig
+          monthly_submit: Bli medlem — %{amount}/måned
+          one_time: Engangsbruk
+          one_time_submit: Doner %{amount}
+          other_amount: Annet beløp
+          other_ways_daf: Giverstyrte fondstilskudd – vi kan sende deg EIN-nummeret
+            ditt og stipendinformasjonen din.
+          other_ways_match: Arbeidsgivermatching – mange arbeidsgivere vil matche
+            en donasjon uten ekstra kostnad for deg.
+          other_ways_stock: Gaver i form av aksjer eller kryptovaluta, som unngår
+            kapitalgevinster på verdiøkende eiendeler.
+          other_ways_title: Andre måter å gi på dette nivået
+          recovered: Gjenopprettet
+          stat_bikes: sykler registrert, gratis
+          stat_partners: partnerbutikker, politiavdelinger og byer
+          stat_recoveries: stjålne sykler funnet
+          stat_value: verdi tilbakeført til eierne
+          stories_link: Les flere historier om gjenoppretting
+          stories_subhead: Hver gjenoppretting rapporteres av personen som fikk sykkelen
+            sin tilbake.
+          stories_title: Med eiernes ord
+          tier_basic: Grunnleggende medlemskap
+          tier_basic_benefit: List opp sykler på markedsplassen, et medlemsmerke og
+            raskere støtte
+          tier_patron: Patronmedlemskap
+          tier_patron_benefit: Alt i Plus, topp plassering på markedsplassen, Patron-skjorte
+            og -merke
+          tier_plus: Pluss-medlemskap
+          tier_plus_benefit: Alt i Basic, et gratis promoteringsvarsel hvis sykkelen
+            din blir stjålet og et medlemskapstak
+          uses_alerts_body: Varslingssystemet for stjålne sykler og de promoterte
+            varslene som legger ut en oppføring i feeder om tyveriet.
+          uses_alerts_title: Varsler som når ut til folk
+          uses_free_body: Servere, support og søkeverktøyene som butikker og politi
+            bruker er gratis. Ingen betalingsmur, ingen nivåer, ingen salg av passasjerdata.
+          uses_free_title: Registreringen forblir gratis
+          uses_owners_body: Markedsplassen, der en oppføring starter fra en sykkel
+            som allerede er i registeret – bygget for å gjøre det vanskeligere å selge
+            en stjålet sykkel. Flere verktøy for eieren er på vei.
+          uses_owners_title: Funksjoner for sykkeleiere
+          uses_partners_body: Introduksjon av nye butikker, avdelinger og byer, og
+            de langvarige tyveriundersøkelsene som kommer ut av registerdataene.
+          uses_partners_title: Partnere og etterforskninger
+          uses_title: Hvor pengene går
+          wall_photo_alt: En sykkel funnet gjennom Bike Index
     shared_blocks:
       footer:
         about: Om
@@ -7328,7 +7409,6 @@ nb:
           menu: Meny
           organization_crest: "%{org_name} våpenskjold"
         primary_menu:
-          blog: Blogg
           donate: Donere
           help: Hjelp
           log_in: Logg Inn
@@ -7336,6 +7416,8 @@ nb:
           search: Søk
           sign_up: Melde deg på
           stolen_bike: Stjålet sykkel?
+          register: Registrere
+          register_a_new_bike: Registrer en ny sykkel
         user_settings_menu:
           settings_menu: Innstillinger
         wrapper:
