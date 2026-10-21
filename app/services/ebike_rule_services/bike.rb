@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module EbikeRuleServices
-  # A bike checked against a state's e-bike rules: a Bike Book model, or one entered by hand,
+  # A bike checked against a state's e-bike rules: a BikeBook model, or one entered by hand,
   # which has no bikebook_id. e_bike_class is nil for a motorized vehicle that isn't Class 1, 2 or 3, or
   # whose record says too little to tell, which is class_unknown. e_vehicle_classifications are the ids its record carries.
   # vehicle_type is its catalog type, "cargo_bike". stock_throttle is a throttle it's sold with, rather than one sold separately. optional_classes are the US classes only

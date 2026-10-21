@@ -6,7 +6,7 @@ module Pages
       class ComponentPreview < ApplicationComponentPreview
         def default
           render(Pages::Donate::Page::Component.new(stripe_prices:,
-            recovery_displays: RecoveryDisplay.joins(:photo_processed_attachment).limit(4)))
+            recovery_displays: RecoveryDisplay.with_photo.limit(4)))
         end
 
         # From a major gift link, or a newsletter's "donate $500"

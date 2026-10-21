@@ -6,7 +6,7 @@ module Pages
       # A UL certification a bike carries, or for one carrying neither, that its certification is unknown, each a tooltip of
       # what it means for the bike
       class Component < ApplicationComponent
-        # Bike Book records a certification, not its absence, so a bike is never shown as uncertified
+        # BikeBook records a certification, not its absence, so a bike is never shown as uncertified
         BACKGROUNDS = {certified: "tw:bg-[#e8f5ee]", unknown: "tw:bg-[#fff6da]", unrecorded: "tw:bg-[#fff6da]"}.freeze
         ICON_STATUSES = {certified: :pass, unknown: :unknown_warning, unrecorded: :unknown_warning}.freeze
 

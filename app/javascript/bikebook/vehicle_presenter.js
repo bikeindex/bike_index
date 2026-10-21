@@ -25,7 +25,8 @@ const FEET_AND_INCHES = ["'", '"']
 
 export class VehiclePresenter {
   constructor (kit, vocabulary) {
-    this.kit = kit
+    // the extras' bb_drop_low as the catalog's own labels write "BB Drop"
+    this.kit = { ...kit, acronyms: { ...kit.acronyms, bb: 'BB' } }
     // the catalog names carbon "Carbon or Composite"
     const materials = { ...vocabulary.names[MATERIALS], carbon: 'Carbon/Composite' }
     this.vocabulary = { ...vocabulary, names: { ...vocabulary.names, [MATERIALS]: materials } }

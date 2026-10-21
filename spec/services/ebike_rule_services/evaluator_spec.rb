@@ -174,7 +174,7 @@ RSpec.describe EbikeRuleServices::Evaluator do
     end
   end
 
-  context "with a bike whose class Bike Book can't tell" do
+  context "with a bike whose class BikeBook can't tell" do
     let(:attributes) { super().merge(e_bike_class: nil, class_unknown: true, watts: 500, top_assist_mph: nil) }
 
     it "is one to check rather than a failure" do

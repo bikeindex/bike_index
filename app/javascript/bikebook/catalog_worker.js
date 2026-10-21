@@ -148,7 +148,7 @@ function featured ({ params, legalClasses }) {
   const legalEbike = (model) => !legalClasses.length || legalClasses.some((propulsion) => propelled(model, propulsion, params.jurisdiction))
   const filtered = sorted(params).filter(filter(params))
   const candidates = requirements.reduce((models, requirement) => {
-    const passing = models.filter((model) => requirement(model, { legalEbike }))
+    const passing = models.filter((model) => requirement(model, { legalEbike, params }))
     return passing.length ? passing : models
   }, filtered)
   const count = Math.min(COUNT, candidates.length)

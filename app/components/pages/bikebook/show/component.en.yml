@@ -24,6 +24,7 @@ en:
           human_powered: Human powered (Acoustic)
           jurisdiction: Jurisdiction
           loading: Loading the catalog…
+          loading_placeholder: Loading…
           manufacturers: Manufacturers
           market: Market
           max: Max

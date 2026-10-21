@@ -106,7 +106,7 @@ RSpec.describe EbikeRulesController, type: :request do
         .and have_text("We detected Indiana.")
         .and have_no_css("[role='alert']")
 
-      # a bike comes along, as from Bike Book's link, to be checked there
+      # a bike comes along, as from BikeBook's link, to be checked there
       get "/ebike-rules", params: {vehicle_models: "m/specialized/2025/haul_st"}, headers: indiana
       expect(response).to redirect_to("/ebike-rules/US/IN?vehicle_models=m%2Fspecialized%2F2025%2Fhaul_st")
 
@@ -294,7 +294,7 @@ RSpec.describe EbikeRulesController, type: :request do
         .and have_text("Provincial and territorial law summaries")
       # but the country switch's way back to it
       expect(page.find("main").text.remove("United States (US)")).not_to match(/\b(US|U\.S\.|mph|states?|DMV|Class [123])\b/)
-      # Bike Book's models sold in Canada
+      # BikeBook's models sold in Canada
       expect(response.body).to include("/bikebook?electric=1&amp;market=CA")
       expect(page.all("[data-ebike-rules--state-filter-target='state']").count).to eq 2
       expect(meta("description")).to start_with("Canada e-bike law:")
