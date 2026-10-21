@@ -460,42 +460,17 @@
     </section>
   <% end %>
 
-  <section class="tw:bg-blue-600 tw:py-6 tw:text-white tw:lg:py-11">
-    <div
-      class="
-        tw:flex tw:flex-col tw:gap-5 tw:md:flex-row tw:md:items-center tw:lg:gap-9
-        <%= container %>
-      "
-    >
-      <%= image_tag "kelsey/illustrations/comic-assets_bike-love-1.png",
-      alt: "",
-      class: "tw:hidden tw:w-30 tw:shrink-0 tw:lg:block" %>
-
-      <div class="tw:flex-1">
-        <p
-          class="
-            tw:mb-1 tw:font-header tw:text-[23px] tw:leading-tight
-            tw:font-extrabold tw:md:text-[26px] tw:xl:text-[32px]
-          "
-        >
-          <%= translation(".cta_headline") %>
-        </p>
-
-        <p class="tw:mb-0 tw:hidden tw:text-[17px] tw:md:block">
-          <%= translation(".cta_sub") %>
-        </p>
-      </div>
-
-      <%= render UI::Button::Component.new(
-        text: submit_label,
-        color: :yellow,
-        size: :callout,
-        html_class: "tw:w-full tw:md:w-auto tw:max-md:px-4! tw:max-xs:text-xs!",
-        data: {
-          donate__page_target: "submit",
-          action: "donate--page#submitActive"
-        }
-      ) %>
-    </div>
-  </section>
+  <%= render(UI::CallToActionBanner::Component.new(heading: translation(".cta_headline"),
+    subheading: translation(".cta_sub"), wide: true)) do %>
+    <%= render UI::Button::Component.new(
+      text: submit_label,
+      color: :yellow,
+      size: :callout,
+      html_class: "tw:w-full tw:md:w-auto tw:max-md:px-4! tw:max-xs:text-xs!",
+      data: {
+        donate__page_target: "submit",
+        action: "donate--page#submitActive"
+      }
+    ) %>
+  <% end %>
 </div>

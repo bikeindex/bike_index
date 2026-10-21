@@ -10,6 +10,8 @@ class InfoController < ApplicationController
       redirect_to(news_path) && return
     elsif @blog.title_slug == Blog.membership_slug
       redirect_to("/membership") && return
+    elsif @blog.title_slug == Blog.why_donate_slug
+      redirect_to(donate_path) && return
     elsif @blog.id == Blog.theft_rings_id
       redirect_to("/theft-rings") && return
     elsif @blog.blog?
@@ -55,11 +57,6 @@ class InfoController < ApplicationController
     @blog = Blog.friendly_find(Blog.membership_slug)
     @page_id = "news_show" # Override to make styles same as news
     render "show"
-  end
-
-  def why_donate
-    @blog = Blog.friendly_find(Blog.why_donate_slug)
-    render "/news/show"
   end
 
   def donate
