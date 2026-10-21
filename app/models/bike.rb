@@ -73,29 +73,30 @@
 #
 # Indexes
 #
-#  index_bikes_current_listing_order               (listing_order) WHERE ((example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL))
-#  index_bikes_current_manufacturer_listing_order  (manufacturer_id,listing_order DESC) WHERE ((example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL))
-#  index_bikes_on_creation_organization_id         (creation_organization_id) WHERE (creation_organization_id IS NOT NULL)
-#  index_bikes_on_current_ownership_id             (current_ownership_id)
-#  index_bikes_on_current_stolen_record_id         (current_stolen_record_id) WHERE (current_stolen_record_id IS NOT NULL)
-#  index_bikes_on_deleted_at                       (deleted_at) WHERE (deleted_at IS NOT NULL)
-#  index_bikes_on_example                          (example) WHERE (example IS NOT NULL)
-#  index_bikes_on_latitude_and_longitude           (latitude,longitude)
-#  index_bikes_on_listing_order                    (listing_order)
-#  index_bikes_on_lower_frame_model                ("left"(lower(frame_model), 255))
-#  index_bikes_on_lower_mnfg_name                  (lower((mnfg_name)::text))
-#  index_bikes_on_manufacturer_id                  (manufacturer_id)
-#  index_bikes_on_model_audit_id                   (model_audit_id) WHERE (model_audit_id IS NOT NULL)
-#  index_bikes_on_owner_email_trgm                 (owner_email) USING gin
-#  index_bikes_on_primary_activity_id              (primary_activity_id) WHERE (primary_activity_id IS NOT NULL)
-#  index_bikes_on_primary_frame_color_id           (primary_frame_color_id)
-#  index_bikes_on_search_vector                    (search_vector) USING gin
-#  index_bikes_on_secondary_frame_color_id         (secondary_frame_color_id) WHERE (secondary_frame_color_id IS NOT NULL)
-#  index_bikes_on_serial_normalized_no_space_trgm  (serial_normalized_no_space) WHERE ((example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL)) USING gin
-#  index_bikes_on_serial_normalized_tsvector       (to_tsvector('simple'::regconfig, (serial_normalized)::text)) WHERE ((example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL)) USING gin
-#  index_bikes_on_status                           (status)
-#  index_bikes_on_tertiary_frame_color_id          (tertiary_frame_color_id) WHERE (tertiary_frame_color_id IS NOT NULL)
-#  index_bikes_on_user_hidden                      (user_hidden) WHERE (user_hidden IS NOT NULL)
+#  index_bikes_current_listing_order                    (listing_order) WHERE ((example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL))
+#  index_bikes_current_manufacturer_listing_order       (manufacturer_id,listing_order DESC) WHERE ((example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL))
+#  index_bikes_current_stolen_or_impounded_on_location  (latitude,longitude) WHERE ((status = ANY (ARRAY[1, 3])) AND (example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL))
+#  index_bikes_on_creation_organization_id              (creation_organization_id) WHERE (creation_organization_id IS NOT NULL)
+#  index_bikes_on_current_ownership_id                  (current_ownership_id)
+#  index_bikes_on_current_stolen_record_id              (current_stolen_record_id) WHERE (current_stolen_record_id IS NOT NULL)
+#  index_bikes_on_deleted_at                            (deleted_at) WHERE (deleted_at IS NOT NULL)
+#  index_bikes_on_example                               (example) WHERE (example IS NOT NULL)
+#  index_bikes_on_latitude_and_longitude                (latitude,longitude)
+#  index_bikes_on_listing_order                         (listing_order)
+#  index_bikes_on_lower_frame_model                     ("left"(lower(frame_model), 255))
+#  index_bikes_on_lower_mnfg_name                       (lower((mnfg_name)::text))
+#  index_bikes_on_manufacturer_id                       (manufacturer_id)
+#  index_bikes_on_model_audit_id                        (model_audit_id) WHERE (model_audit_id IS NOT NULL)
+#  index_bikes_on_owner_email_trgm                      (owner_email) USING gin
+#  index_bikes_on_primary_activity_id                   (primary_activity_id) WHERE (primary_activity_id IS NOT NULL)
+#  index_bikes_on_primary_frame_color_id                (primary_frame_color_id)
+#  index_bikes_on_search_vector                         (search_vector) USING gin
+#  index_bikes_on_secondary_frame_color_id              (secondary_frame_color_id) WHERE (secondary_frame_color_id IS NOT NULL)
+#  index_bikes_on_serial_normalized_no_space_trgm       (serial_normalized_no_space) WHERE ((example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL)) USING gin
+#  index_bikes_on_serial_normalized_tsvector            (to_tsvector('simple'::regconfig, (serial_normalized)::text)) WHERE ((example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL)) USING gin
+#  index_bikes_on_status                                (status)
+#  index_bikes_on_tertiary_frame_color_id               (tertiary_frame_color_id) WHERE (tertiary_frame_color_id IS NOT NULL)
+#  index_bikes_on_user_hidden                           (user_hidden) WHERE (user_hidden IS NOT NULL)
 #
 class Bike < ApplicationRecord
   include ActiveModel::Dirty
@@ -500,6 +501,12 @@ class Bike < ApplicationRecord
   # Might be more sophisticated someday...
   def serial_hidden?
     status_impounded? || unregistered_parking_notification?
+  end
+
+  # Only e-vehicles agree to an organization's safety rules, and an unregistered parking
+  # notification has no registrant to agree to them
+  def registration_sequence_applies?
+    motorized? && !unregistered_parking_notification?
   end
 
   def not_updated_by_user?

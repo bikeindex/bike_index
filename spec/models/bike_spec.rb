@@ -1406,6 +1406,15 @@ RSpec.describe Bike, type: :model do
     end
   end
 
+  describe "registration_sequence_applies?" do
+    it "is only an e-vehicle's, and never an unregistered parking notification's" do
+      expect(Bike.new(propulsion_type: "foot-pedal").registration_sequence_applies?).to be_falsey
+      expect(Bike.new(propulsion_type: "pedal-assist").registration_sequence_applies?).to be_truthy
+      expect(Bike.new(propulsion_type: "pedal-assist", status: "unregistered_parking_notification")
+        .registration_sequence_applies?).to be_falsey
+    end
+  end
+
   describe "serial_display" do
     it "returns the serial" do
       expect(Bike.new(serial_number: "AAbbCC").serial_display).to eq "AABBCC"

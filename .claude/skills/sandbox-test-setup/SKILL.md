@@ -13,7 +13,7 @@ description: >-
   (4.0.x)`, `command not found: rspec`, `uninitialized constant Pathname` or `undefined method 'intersect?' for Array` from a
   `bin/` script, `Sprockets::Rails::Helper::AssetNotFound`, `tailwind.css is not
   present`, `LoadError: Could not open library 'vips.so.42'`, `executable not found:
-  "identify"`, or a Playwright browser-not-found, build-number mismatch or `Running as
+  "identify"`, or a Playwright browser-not-found, build-number mismatch, `Playwright::Error: timeout: expected float, got undefined` or `Running as
   root without --no-sandbox is not supported`. The fix is almost never a reinstall or a
   Gemfile edit — it's a PATH, an env var, or a service that isn't running.
 ---
@@ -75,6 +75,15 @@ Confirm, then `rm -rf public/assets` (gitignored, no need to ask):
 ```bash
 grep -o "controllers/[a-z_/]*controller[^\"]*" public/assets/.sprockets-manifest.json | head
 ```
+
+## Every `:js` spec failing in Playwright setup means `node_modules` lags the gem
+
+`playwright-ruby-client` drives the `playwright` npm package, and a merge from main
+bumps both together. Until `npm install` catches up, every `:js` example fails in
+`spec/support/capybara.rb` with `Playwright::Error: timeout: expected float, got
+undefined`, which names neither version. Compare `node -e
+'console.log(require("playwright/package.json").version)'` with `package.json`'s pin,
+then `npm install && npx playwright install chromium`.
 
 ## Who starts `bin/dev`
 

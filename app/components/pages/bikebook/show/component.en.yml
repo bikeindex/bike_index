@@ -4,33 +4,47 @@ en:
     pages:
       bikebook:
         show:
-          about_bikebook: About Bike Book
-          activity: Activity
+          about_bikebook_label: About BikeBook
+          activities: Activities
+          activity_examples: "(e.g. Mountain Biking, Cyclocross, etc)"
           any_activity: Any activity
           any_configuration: Any configuration
           any_manufacturer: Any manufacturer
-          any_motorized: Any motorized
+          any_market: Any market
           any_suspension: Any suspension
           any_vehicle_type: Any vehicle type
           applied_filters: Applied filters
           byline: A free reference from Bike Index, the non-profit bike registry.
+          clear_filters: Clear filters
           configuration: Configuration
+          configuration_examples: "(complete/frameset)"
+          e_bike_classification: e-bike classification
+          e_vehicle_motorized: e-Vehicle (motorized)
           failed: The catalog didn't load. Reload the page to try again.
+          human_powered: Human powered (Acoustic)
+          jurisdiction: Jurisdiction
           loading: Loading the catalog…
-          manufacturer: Manufacturer
+          loading_placeholder: Loading…
+          manufacturers: Manufacturers
+          market: Market
           max: Max
           min: Min
           more_filters: More filters
-          motorized: Motorized
+          out_of_class_details: >-
+            Motorized, but none of US Classes 1, 2 or 3, like a moped, motorcycle
+            or off-highway e-moto.
+          out_of_class_label: Out of Class
           price: Price
+          propulsion: Propulsion
           search_placeholder: Search by manufacturer or model…
+          select_a_bike: Select a bike, choose multiple to compare them
           sort: Sort
           suspension: Suspension
           tagline: The world’s bicycle library — search, compare, and find your next
             ride.
-          tagline_html: >-
-            The world’s bicycle library — search, compare, and find your next ride
-            across %{models_count}+ models.
-          vehicle_type: Vehicle type
-          view_a_vehicle: View a vehicle
+          united_states: United States
+          us_class_1: US Class 1
+          us_class_2: US Class 2
+          us_class_3: US Class 3
+          vehicle_types: Vehicle types
           year: Year

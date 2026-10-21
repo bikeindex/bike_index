@@ -1,6 +1,9 @@
 import { html } from 'lit-html'
 import { join } from 'bikebook/templates/values'
 
+// A missing value, as light as a unit, which twless-strong isn't
+export const missing = html`<span class="tw:text-gray-400 tw:dark:text-gray-500">—</span>`
+
 // ApplicationComponentHelper
 
 // SecureRandom's, since crypto.randomUUID is only in secure contexts

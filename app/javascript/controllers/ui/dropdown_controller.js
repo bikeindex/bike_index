@@ -37,7 +37,7 @@ export default class extends Controller {
     // toggle stops propagation, so other dropdowns' clickOutside never sees this click
     window.dispatchEvent(new CustomEvent('ui--dropdown:opened', { detail: this.element }))
     this.menuTarget.classList.remove('tw:hidden')
-    this.menuTarget.style.zIndex = claimFloatingZIndex(this.menuTarget)
+    claimFloatingZIndex(this.menuTarget)
     this.buttonTarget.setAttribute('aria-expanded', 'true')
     await this.updatePosition()
     this.addEventListeners()

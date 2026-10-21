@@ -1,5 +1,8 @@
 {
   "enabledMcpjsonServers": ["playwright"],
+  "attribution": {
+    "pr": ""
+  },
   "permissions": {
     "allow": [
       "Bash(bin/workspace_setup:*)",

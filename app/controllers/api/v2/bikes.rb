@@ -32,9 +32,9 @@ module API
             optional :phone, type: String, desc: "Owner's phone number, **required to create stolen**"
             optional :city, type: String, desc: "City where stolen <br> **required to create stolen**"
             optional :country, type: String, case_insensitive_country: true, desc: "Country the bike was stolen"
-            optional :zipcode, type: String, desc: "Where the bike was stolen from"
+            optional :zipcode, type: String, as: :postal_code, desc: "Where the bike was stolen from"
             optional :state, type: String, desc: "State postal abbreviation if in US - e.g. OR, IL, NY"
-            optional :address, type: String, desc: "Public. Use an intersection if you'd prefer the specific address not be revealed"
+            optional :address, type: String, as: :street, desc: "Public. Use an intersection if you'd prefer the specific address not be revealed"
             optional :date_stolen, type: Integer, desc: "When was the bike stolen (defaults to current time)"
 
             optional :police_report_number, type: String, desc: "Police report number"

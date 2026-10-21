@@ -1,3 +1,15 @@
+export const LISTS = ['primary_activity', 'manufacturer', 'vehicle_type']
+export const SINGLES = ['suspension', 'model_configuration', 'market']
+export const RANGES = ['year_min', 'year_max', 'price_min', 'price_max']
+// Whether the search shows: asked for, or with anything but a single model picked - a classification's card counts, as
+// its chip is in the search - as a link straight to one opens it. Pages::Bikebook::Show::Component#placeholder_class mirrors it
+export const searching = (url) => {
+  const [models, classifications] = ['vehicle_models', 'classifications'].map((name) => String(url.searchParams.get(name) ?? '').split(',').filter(Boolean))
+  return url.searchParams.has('search') || models.length !== 1 || classifications.length > 0
+}
+
+export const FILTERS = [...LISTS, ...SINGLES, ...RANGES, 'electric', 'jurisdiction', 'sort', 'year_dir', 'price_dir']
+
 // to_query: keys sorted and CGI-escaped, blank values dropped, commas and slashes left readable
 export const toQuery = (params) => {
   const cgiEscape = (text) => encodeURIComponent(text).replace(/[!'()*]/g, (character) => `%${character.charCodeAt(0).toString(16).toUpperCase()}`)

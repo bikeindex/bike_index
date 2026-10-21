@@ -15,12 +15,13 @@ RSpec.describe Pages::Register::Views::StepReport::Component, type: :component d
 
     expect(page).to have_field("report[police_report_number]")
     expect(page).to have_button("Complete Bike Registration")
-    # When and where are what a theft has to answer, so they open blank and required
+    # When, where and what happened are what a theft has to answer, so they're required
     date = page.find("input[name='report[date]'].dateInputUpdateZone")
     expect(date[:value]).to be_blank
     expect(date[:required]).to be_present
     expect(page.find("input[name='report[address_record_attributes][street]']")[:required]).to be_present
     expect(page.find("input[name='report[address_record_attributes][city]']")[:required]).to be_present
+    expect(page.find("textarea[name='report[theft_description]']")[:required]).to be_present
     # The rest of it isn't
     expect(page.find("input[name='report[police_report_number]']")[:required]).to be_blank
     expect(page).to have_css("input[name='report[timezone]'].hiddenFieldTimezone", visible: :all)

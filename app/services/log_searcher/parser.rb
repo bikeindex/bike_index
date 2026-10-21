@@ -16,7 +16,8 @@ module LogSearcher
       "Search::RegistrationsController#serials_containing" => :web_serials_containing,
       "Search::RegistrationsController#similar_serials" => :web_close_serials,
       "Search::MarketplaceController#index" => :web_marketplace,
-      "Search::MarketplaceController#counts" => :web_marketplace_count
+      "Search::MarketplaceController#counts" => :web_marketplace_count,
+      "Search::BikebookController#index" => :web_bikebook
     }.freeze
 
     ROUTE_ENDPOINTS = {

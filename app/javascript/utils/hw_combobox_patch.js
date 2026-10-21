@@ -7,10 +7,21 @@ import HwComboboxController from 'controllers/hw_combobox_controller'
 // gem's lazy turbo-frame (`source.prime(controller)`), in the browser rather than asking the server
 export const localSources = new WeakMap()
 
+// Pressing an option would blur the input onto the page, which a multiselect then reopens its list over -
+// open, with nothing focused to hear Escape or to blur from. The click back in still selects the display,
+// as it did after that blur
+const keepFocusOnPick = (event) => {
+  if (!event.target.closest('[role=option]')) return
+
+  event.preventDefault()
+  event.currentTarget.querySelectorAll('[role=combobox]').forEach((input) => clickedSinceFocus.delete(input))
+}
+
 const connect = HwComboboxController.prototype.connect
 HwComboboxController.prototype.connect = function () {
   const source = localSources.get(this.element)
   if (source?.prime) this.element.querySelector('.hw_combobox__pagination__wrapper turbo-frame')?.remove()
+  this.element.addEventListener('mousedown', keepFocusOnPick)
   connect.call(this)
   source?.prime?.(this)
 }
@@ -25,10 +36,35 @@ HwComboboxController.prototype._requestChips = function (values) {
   return source ? source.chips(this, values) : requestChips.call(this, values)
 }
 
+// A paste fills the input without opening it, and closing is what commits a pick, from the options it shows -
+// so it's expanded at once, as prepareToFilter does
+const pickFirst = (combobox) => {
+  if (combobox._isClosed) {
+    combobox.open()
+    combobox._expand()
+  }
+  combobox.close('hw:keyHandler:enter')
+}
+
+// Counts the edits a local source answers, so an Enter ahead of its answer (a paste, entered at once) waits for it
+const filterAndSelect = HwComboboxController.prototype.filterAndSelect
+HwComboboxController.prototype.filterAndSelect = function (event) {
+  this.edits = (this.edits ?? 0) + 1
+  filterAndSelect.call(this, event)
+}
+
 const filterAsync = HwComboboxController.prototype._filterAsync
-HwComboboxController.prototype._filterAsync = function (inputType) {
+HwComboboxController.prototype._filterAsync = async function (inputType) {
   const source = localSources.get(this.element)
-  return source ? source.filter(this, inputType) : filterAsync.call(this, inputType)
+  if (!source) return filterAsync.call(this, inputType)
+
+  const edits = this.edits
+  await source.filter(this, inputType)
+  this.answeredEdits = edits
+  if (this.enterPending && edits === this.edits) {
+    this.enterPending = false
+    pickFirst(this)
+  }
 }
 
 // hotwire_combobox 0.4.1 finds an option by interpolating the raw value into
@@ -45,7 +81,18 @@ HwComboboxController.prototype._optionElementWithValue = function (value) {
 // nothing to pick breaks the form's implicit submission -- unlike every other
 // input. Only handle the key while there's an option to choose.
 const navigate = HwComboboxController.prototype.navigate
+// A query in a local source's combobox is to pick from, though it's closed, rather than submit
 HwComboboxController.prototype.navigate = function (event) {
+  if (event.key === 'Enter' && localSources.get(this.element)?.filter && this._fullQuery) {
+    if (this.edits !== this.answeredEdits) {
+      this.enterPending = true
+      return event.preventDefault()
+    }
+    if (this._isClosed) {
+      event.preventDefault()
+      return pickFirst(this)
+    }
+  }
   if (event.key === 'Enter' && this._isClosed) return
 
   navigate.call(this, event)
@@ -79,10 +126,9 @@ const clickedSinceFocus = new WeakSet()
 
 const forgetClicks = ({ currentTarget }) => clickedSinceFocus.delete(currentTarget)
 
-// The entering click, not the focus: step 1 autofocuses its manufacturer, so the first
-// click there brings no focus event to hang this on. By click the caret is already placed,
-// so the selection sticks without preventing anything, and the gem's own refocus while
-// filtering never selects - that would make the next keystroke replace the query
+// The entering click, not the focus: step 1 autofocuses its manufacturer, and a pick keeps
+// the focus, so the first click there brings no focus event to hang this on. The gem's own
+// refocus while filtering never selects - that would make the next keystroke replace the query
 const selectDisplay = ({ currentTarget }) => {
   if (clickedSinceFocus.has(currentTarget)) return
 
@@ -90,10 +136,17 @@ const selectDisplay = ({ currentTarget }) => {
   if (currentTarget.value) currentTarget.select()
 }
 
+// Pressing inside a focused input's selected text places the caret only once the click is
+// over, collapsing the selection selectDisplay just made
+const holdCaret = (event) => {
+  if (document.activeElement === event.currentTarget && !clickedSinceFocus.has(event.currentTarget)) event.preventDefault()
+}
+
 // Stimulus calls these per element, for targets the gem declares but leaves without a
 // callback -- the seam that also reaches the small-viewport dialog's own combobox
 const listenForClickIntoFocus = function (input) {
   input.addEventListener('focus', forgetClicks)
+  input.addEventListener('mousedown', holdCaret)
   input.addEventListener('click', selectDisplay)
 }
 
@@ -156,4 +209,18 @@ HwComboboxController.prototype._openInDialog = function () {
 
   this.dialogTarget.addEventListener('close', dismiss, { signal: listeners.signal })
   RENDER_EVENTS.forEach(name => document.addEventListener(name, dismiss, { signal: listeners.signal }))
+}
+
+// A combobox set or cleared from code goes through the gem, so its hidden field, its input and a
+// rich display all agree - assigning the hidden field leaves the rest showing what it held
+export function selectComboboxValue (combobox, value) {
+  const option = [...combobox.querySelectorAll('[role=listbox] [role=option]')]
+    .find((element) => element.dataset.value === String(value))
+  option?.click()
+}
+
+// clear() empties the selection without an event; the keyup is what the rich display listens for
+export function clearCombobox (combobox) {
+  window.Stimulus.getControllerForElementAndIdentifier(combobox, 'hw-combobox')?.clear()
+  combobox.querySelector('[role=combobox]')?.dispatchEvent(new window.KeyboardEvent('keyup'))
 }

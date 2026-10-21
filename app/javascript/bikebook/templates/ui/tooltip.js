@@ -10,12 +10,14 @@ const BUTTON_CLASS = 'keep-with-previous tw:inline-flex tw:items-center tw:justi
 const SURFACE_CLASS = 'tw:bg-white tw:border-gray-200 tw:dark:bg-gray-800 tw:dark:border-gray-700'
 
 // UI::Tooltip::Component. `content` is the trigger, the "?" button without it; `body` fills the
-// tooltip in place of `text`
-export const tooltip = ({ text, body, content }) => {
+// tooltip in place of `text`. `button`, as its tooltip_button slot, is a trigger of its own, given the label and the id
+// its aria-describedby names
+export const tooltip = ({ text, body, content, button }) => {
   const id = `tooltip-${randomHex(4)}`
-  return html`<span class="tw:inline-block" data-controller="ui--tooltip" data-action=${TRIGGER_ACTIONS}><button type="button"
-    aria-label=${text || nothing} aria-describedby=${id} data-ui--tooltip-target="trigger"
-    class=${content ? TRIGGER_CLASS : BUTTON_CLASS}>${content ?? '?'}</button> <span role="tooltip" id=${id}
+  return html`<span class="tw:inline-block" data-controller="ui--tooltip" data-action=${TRIGGER_ACTIONS}>${button
+    ? button({ label: text || nothing, id })
+    : html`<button type="button" aria-label=${text || nothing} aria-describedby=${id} data-ui--tooltip-target="trigger"
+    class=${content ? TRIGGER_CLASS : BUTTON_CLASS}>${content ?? '?'}</button>`} <span role="tooltip" id=${id}
     data-ui--tooltip-target="tooltip" class="tw:twtext-color tw:hidden tw:pointer-events-none tw:whitespace-normal tw:w-max tw:max-w-[min(24rem,90vw)]
     tw:rounded tw:text-left tw:px-2 tw:py-1 tw:font-sans tw:text-xs tw:font-normal tw:normal-case tw:border tw:shadow-lg tw:z-50 ${SURFACE_CLASS}">${body ?? text}<span
     aria-hidden="true" data-ui--tooltip-target="arrow" class="tw:absolute tw:h-2 tw:w-2 tw:rotate-45 tw:border-solid ${SURFACE_CLASS}"></span></span></span>`

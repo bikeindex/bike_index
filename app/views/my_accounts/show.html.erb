@@ -172,7 +172,7 @@
   </div>
 </div>
 
-<% unless current_user.paid_organization_registration? %>
+<% if OrganizedMailer.render_donation?(user: current_user, emails: [current_user.email]) %>
   <%# Cache this render callout to avoid allocations %>
   <% cache("donation_modal2") do %>
     <%= render "/shared/donation_modal" %>

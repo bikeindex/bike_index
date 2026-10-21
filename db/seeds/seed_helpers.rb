@@ -22,6 +22,15 @@ module SeedHelpers
     travel_to([Time.current + rand(60..130).minutes, @clock_end].min)
   end
 
+  # R2 rejects a request signed with a clock more than 15 minutes off (RequestTimeTooSkewed)
+  def without_clock
+    seeded_time = Time.current
+    travel_back
+    yield
+  ensure
+    travel_to(seeded_time)
+  end
+
   def sync_updated_at(since:)
     connection = ActiveRecord::Base.connection
     tables = connection.select_values(<<~SQL)

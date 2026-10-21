@@ -38,5 +38,7 @@ pin "@rails/activestorage", to: "activestorage.esm.js"
 # "app/javascript/controllers" gives them, which would fetch the graph they import on every page
 pin_all_from "app/javascript/bikebook", under: "bikebook", preload: false
 pin_all_from "app/javascript/controllers/bikebook", under: "controllers/bikebook", preload: false
+# /ebike-rules searches the catalog with /bikebook's modules
+pin_all_from "app/javascript/controllers/ebike_rules", under: "controllers/ebike_rules", preload: false
 pin "lit-html", to: "lit-html.js", preload: false
 pin "lit-html/directive.js", to: "lit-html--directive.js", preload: false

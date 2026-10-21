@@ -203,6 +203,10 @@ module ControllerHelpers
     session[:old_register_view].present?
   end
 
+  def old_unregistered_notification_view?
+    session[:old_unregistered_notification_view].present?
+  end
+
   def show_general_alert
     return @show_general_alert = false if @skip_general_alert || current_user.blank? ||
       render_donation_request?
@@ -445,7 +449,7 @@ module ControllerHelpers
     redirect_to(my_account_url) && return
   end
 
-  def require_index_admin!
+  def require_index_admin!(controller_name: self.controller_name, action_name: self.action_name)
     if current_user.present?
       return true if current_user.superuser?(controller_name:, action_name:)
     end

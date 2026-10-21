@@ -23,6 +23,10 @@ Drive Playwright MCP to capture screenshots of pages served by `bin/dev`. Caller
 pass `(url-path, page-slug)` pairs, optionally with per-URL interaction steps, and
 get back local PNG paths.
 
+## Who runs this
+
+From a session with history, hand this skill to a subagent the way `AGENTS.md`'s **Who runs this** describes — `model: "sonnet"` (it works out how to drive each page; the pages are chosen) — briefed with the `(url-path, page-slug)` pairs and any interaction steps per page, who to sign in as (or signed out), and the base ref when the caller wants before/after. It replies with the PNG paths keyed by page, viewport and branch/base, and any capture it couldn't diagnose. It closes the shared Playwright browser when it's done, so finish with any page this session still needs first.
+
 ## Output filenames (load-bearing — callers parse these)
 
 `tmp/pr_screenshots/<branch>-<page>-<timestamp>-{desktop,mobile}.png`, where `<branch>=$(git rev-parse --abbrev-ref HEAD | tr '/' '-')` and `<timestamp>=$(date +%Y%m%d-%H%M%S)`. Cross-branch shots get an extra `-base-` segment.
@@ -110,6 +114,8 @@ If the returned content height is **less than the viewport height**, `browser_re
 **The sidebar scrolls inside itself, so `body.scrollHeight` doesn't say whether its lower rows are in the shot.** At 1440×900 its own scroller overflows, and a row near the bottom captures as absent. Measure the row you're there for and resize the viewport height past its `getBoundingClientRect().bottom`. On mobile the sidebar is behind `button[aria-label="Menu"]` — open it, and run the same open-the-menu step on the base branch so the pair compares like for like. That state is an overlay taller than the viewport over a much longer page, which is one of the two cases to capture `fullPage: false` — the other is below.
 
 **Viewport-only is the caller's call, never yours — except when the diff's subject is a `position: fixed` or `sticky` element.** `fullPage` paints it once, where it sits at scroll 0, and nowhere else: on the 10,007px `/accept_vendor_terms` its bottom bar landed at y=798 with the remaining 9,100px of that column bare. Capture those at `fullPage: false`, scrolled to where the element pins. When the caller asks for it — "viewport only", "above the fold", "just the mobile viewport" — drop `fullPage` for the size they named and leave the other one full page.
+
+**`/bikebook` renders whatever catalog the dev server points it at.** With `BIKEBOOK_CATALOG_DIRECTORY` set it's a local `/bikebook_catalog/` that can trail *or lead* the published one by schema versions, so a capture of a schema change against the wrong one shows nothing new. Compare the two manifests' `schema_version` and capture against the one the diff reads — when that's the published one, `page.route` `/bikebook_catalog/` to `https://bikebook-catalog.bikeindex.org/catalog/` in `browser_run_code_unsafe`, on both branches. Without the variable the page fetches the published catalog itself, which the web sandbox's browser can't reach — no cards render; `page.route` `https://bikebook-catalog.bikeindex.org/**` to `route.fulfill` its `route.fetch()` with an `access-control-allow-origin: *` header.
 
 **Settle before the screenshot.** Stimulus + Chartkick render after document load; either `browser_wait_for` on a known element or pause ~500ms–1s. Otherwise charts capture mid-draw. **`loading="lazy"` images capture blank below the fold** — `fullPage` stitching never scrolls them into view (the search results, marketplace and `/stolen` recoveries use it). Set `loading = 'eager'` on them and wait for every `naturalWidth` before the shot.
 
