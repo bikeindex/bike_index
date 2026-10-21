@@ -7451,6 +7451,91 @@ nl:
             nieuwe tools die we in de toekomst gaan ontwikkelen. Het registreren van
             een fiets en het melden van een diefstal is altijd gratis. Dankzij onze
             leden kunnen we dat garanderen.
+      donate:
+        page:
+          already_member: Je bent al lid van Bike Index - bedankt! Je kunt je lidmaatschapsniveau
+            of betaalgegevens wijzigen via je lidmaatschapsinstellingen.
+          cadence: Hoe vaak moet je het geven?
+          cta_headline: Er staan een miljoen fietsen geregistreerd. Geen enkele eigenaar
+            heeft betaald om erbij te zijn.
+          cta_sub: Houd het gratis voor de volgende miljoen.
+          eyebrow: Hersteld en teruggebracht
+          fine_print: Bike Index is een 501(c)(3) non-profitorganisatie, EIN 81-4296194.
+            Uw donatie is fiscaal aftrekbaar in de VS. U kunt uw maandelijkse donatie
+            op elk gewenst moment stopzetten.
+          fine_print_short: 501(c)(3) non-profitorganisatie, EIN 81-4296194. Fiscaal
+            aftrekbaar in de VS.
+          form_title: Financier het volgende herstel
+          headline: Alle bovenstaande fietsen zijn mee naar huis genomen omdat de
+            registratie gratis was.
+          larger_gift_link: Neem contact met ons op voor een grotere gift.
+          lede: Bike Index is een non-profitorganisatie. Registratie is gratis, zoeken
+            is gratis en het melden van diefstal is gratis. Daarom staan er een miljoen
+            fietsen in het register en maken politiediensten en fietsenwinkels er
+            gebruik van. Donaties zorgen ervoor dat dit zo blijft.
+          lede_short: Bike Index is een non-profitorganisatie. Registratie, zoeken
+            en diefstalmeldingen zijn gratis. Donaties maken dit mogelijk.
+          major_benefactor: Weldoener
+          major_body: Donaties op dit niveau worden gebruikt voor het inwerken van
+            partners, grensoverschrijdende diefstalonderzoeken en de technische ontwikkeling
+            van gepromote waarschuwingen.
+          major_eyebrow: Grote donaties
+          major_partner: Partner
+          major_title: Grotere giften zorgen ervoor dat hele steden op de schenkingslijst
+            komen te staan.
+          manage_membership: Beheer uw lidmaatschap
+          membership_link: Wat het lidmaatschap inhoudt
+          membership_note: 'Met een maandelijkse bijdrage word je lid van Bike Index:
+            je krijgt toegang tot de marktplaats, een ledenbadge en extra voordelen
+            die we blijven ontwikkelen. De abonnementen kosten %{amounts} per maand.'
+          monthly: Maandelijks
+          monthly_submit: Word lid — %{amount}/maand
+          one_time: Eenmalig
+          one_time_submit: Doneer %{amount}
+          other_amount: Ander bedrag
+          other_ways_daf: Subsidies via donorfondsen — we kunnen ons EIN-nummer en
+            de subsidiegegevens doorgeven.
+          other_ways_match: Bijdragen van werkgevers — veel werkgevers verdubbelen
+            een donatie zonder extra kosten voor u.
+          other_ways_stock: Schenkingen van aandelen of cryptovaluta, waarmee vermogenswinstbelasting
+            op waardestijgingen wordt vermeden.
+          other_ways_title: Andere manieren om op dit niveau te doneren
+          recovered: Hersteld
+          stat_bikes: fietsen geregistreerd, gratis
+          stat_partners: partnerwinkels, politiekorpsen en steden
+          stat_recoveries: Gestolen fietsen teruggevonden
+          stat_value: waarde teruggegeven aan eigenaren
+          stories_link: Lees meer herstelverhalen
+          stories_subhead: Elke terugvinding wordt gemeld door de persoon die zijn
+            of haar fiets heeft teruggekregen.
+          stories_title: In de woorden van hun eigenaren
+          tier_basic: Basislidmaatschap
+          tier_basic_benefit: Plaats je fietsen op de marktplaats, ontvang een ledenbadge
+            en profiteer van snellere ondersteuning.
+          tier_patron: Patronlidmaatschap
+          tier_patron_benefit: Alles in Plus, topnotering in de markt, Patron-shirt
+            en -badge
+          tier_plus: Plus-lidmaatschap
+          tier_plus_benefit: Alles in Basic, een gratis promotiemelding als je fiets
+            gestolen wordt, en een ledenlimiet.
+          uses_alerts_body: Het systeem voor het melden van gestolen fietsen en de
+            bijbehorende promotiemeldingen die een advertentie in de feeds rondom
+            de diefstal weergeven.
+          uses_alerts_title: Waarschuwingen die mensen bereiken
+          uses_free_body: Servers, ondersteuning en de zoektools die winkels en politie
+            gebruiken, zijn gratis beschikbaar. Geen betaalmuur, geen abonnementen,
+            geen verkoop van gebruikersgegevens.
+          uses_free_title: Registratie blijft gratis.
+          uses_owners_body: De marktplaats, waar een advertentie begint met een fiets
+            die al in het register staat, is ontworpen om de verkoop van een gestolen
+            fiets te bemoeilijken. Meer tools voor eigenaren zijn in ontwikkeling.
+          uses_owners_title: Kenmerken voor fietseigenaren
+          uses_partners_body: Het inwerken van nieuwe winkels, afdelingen en steden,
+            en de langlopende onderzoeken naar diefstalbendes die voortkomen uit de
+            registergegevens.
+          uses_partners_title: Partners en onderzoeken
+          uses_title: Waar gaat het geld naartoe?
+          wall_photo_alt: Een fiets teruggevonden via Bike Index
     shared_blocks:
       footer:
         about: Over
@@ -7564,7 +7649,6 @@ nl:
           menu: Menu
           organization_crest: "%{org_name} wapen"
         primary_menu:
-          blog: Blog
           donate: Schenken
           help: Helpen
           log_in: Log in
@@ -7572,6 +7656,8 @@ nl:
           search: Zoeken
           sign_up: Registreren
           stolen_bike: Fiets gestolen?
+          register: Registreer
+          register_a_new_bike: Registreer een nieuwe fiets
         user_settings_menu:
           settings_menu: Instellingen
         wrapper:
