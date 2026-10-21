@@ -37,7 +37,8 @@ const handlebar = (center) => ring(center, 14, 'part', true)
 const dropBar = (clamp) => part(clamp, plus(clamp, [75, 5]), plus(clamp, [100, -40]), plus(clamp, [80, -115]), plus(clamp, [30, -125]))
 
 // A lettered dimension. h and v measure across x and y, a `lane` of lettering out from the furthest of `a` and `b`, else
-// from `base`; d along a to b, a lane to its left. `value` where it isn't what's drawn, `listed` where it isn't its key's, `last`
+// from `base`; d along a to b, a lane to its left. `value` where it isn't what's drawn, `listed` where it isn't its key's,
+// `calculated` where the size doesn't list it but it's worked out from figures the size does, `last`
 // to letter it after the rest, and `side`, 1 or -1, where a span too short to letter over isn't lettered out the side its lane
 // goes. `guides`, more dashed connectors, to show what it measures from where nothing drawn does
 const h = (key, a, b, lane = 0, options = {}) => ({ kind: 'h', key, a, b, lane, ...options })
@@ -62,21 +63,25 @@ const bikeFrame = ({ data, size, defaults }, fallback) => {
   const fallbackWheels = [{ bsd: fallback.bsd, tire_width: fallback.tire, position: ['front', 'rear'] }]
   const settle = (built, geometry, attempts) => {
     const frame = frameGeometry(built, { ...size, geometry })
-    if (frame.missing.length === 0 || attempts === 0) return { frame, built }
+    if (frame.missing.length === 0 || attempts === 0) return { frame, built, geometry }
     return settle(frame.missing.includes('wheel_size') ? { ...built, wheels: fallbackWheels } : built,
       { ...geometry, ...Object.fromEntries(frame.missing.filter((key) => key in defaults).map((key) => [key, defaults[key]])) }, attempts - 1)
   }
-  const { frame, built } = settle({ ...data, wheels: array(data.wheels).length ? data.wheels : fallbackWheels }, size?.geometry ?? {}, 4)
+  const { frame, built, geometry } = settle({ ...data, wheels: array(data.wheels).length ? data.wheels : fallbackWheels }, size?.geometry ?? {}, 4)
+  const defaulted = built.wheels === fallbackWheels || Object.keys(geometry).some((key) => !(key in (size?.geometry ?? {})))
   const lift = ([x, y]) => [x, y + frame.bottomBracketHeight]
   const tireOf = (position, r) => {
     const { bsd, tire_width: tireWidth } = builtWheel(built, size, position) ?? {}
-    return { r, tire: isNumber(bsd) ? r - bsd / 2 : tireWidth ?? fallback.tire, tireListed: isNumber(tireWidth) }
+    return { r, tire: isNumber(bsd) ? r - bsd / 2 : tireWidth ?? fallback.tire, tireListed: isNumber(tireWidth) && built.wheels !== fallbackWheels }
   }
   return {
     bb: lift([0, 0]),
     ...Object.fromEntries(['rearAxle', 'frontAxle', 'headTop', 'headBottom', 'seatTop', 'seatBottom'].map((key) => [key, lift(frame[key])])),
     rearWheel: tireOf('rear', frame.rearRadius),
-    frontWheel: tireOf('front', frame.frontRadius)
+    frontWheel: tireOf('front', frame.frontRadius),
+    // whether it works `key` out from the figures the size lists: one it records calculating, or any it measures once
+    // nothing it's drawn from is typical. Taking a default could feed any of them, so rules them all out
+    calculates: (key) => !defaulted && (frame.calculated.includes(key) || (frame.assumed.length === 0 && !frame.typicalWheel))
   }
 }
 
@@ -129,7 +134,10 @@ const bikeShapes = (frame, { fig, data }, detail) => {
   return [wheel(rearAxle, frame.rearWheel), wheel(frontAxle, frame.frontWheel), body]
 }
 
-const bikeDims = (frame, { fig }, detail) => {
+// the figures bikeDims measures off the frame, which it works out where the size doesn't list them
+const FRAME_FIGURES = ['stack', 'reach', 'top_tube_effective', 'head_tube', 'head_angle', 'seat_tube_ct', 'seat_angle', 'chainstay', 'wheelbase', 'bb_drop', 'bb_height', 'fork_rake', 'trail']
+
+const bikeDims = (frame, { fig, listed }, detail) => {
   const { bb, rearAxle, frontAxle, headTop, headBottom, seatTop } = frame
   const { steering, seat } = axes(frame)
   const headAngle = Math.atan2(steering[1], -steering[0]) * 180 / Math.PI
@@ -164,7 +172,7 @@ const bikeDims = (frame, { fig }, detail) => {
       ? [fromGround('seat_height', seated.front, 0, { base: seated.front[0] - 40 }), h('seat_length', seated.back, seated.front, 0.8),
           fromGround('handlebar_height', atHeight(headTop, steering, fig('handlebar_height')), 1.2, { base: frontAxle[0] + frame.frontWheel.r })]
       : [])
-  ]
+  ].map((dim) => FRAME_FIGURES.includes(dim.key) && !listed(dim.key) && frame.calculates(dim.key) ? { ...dim, calculated: true } : dim)
 }
 
 // A bike, `detail` a type_detail drawn its own way: a step-through's low tube or a moto-style bench

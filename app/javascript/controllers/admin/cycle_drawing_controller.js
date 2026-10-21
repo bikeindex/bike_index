@@ -83,14 +83,14 @@ export default class extends Controller {
   // the legend's figures, down one column then the next, each an input but those the wheels give
   figureList (figures) {
     const idPrefix = [this.typeValue, this.typeDetailValue, this.modelValue].filter(Boolean).join('-').replaceAll('/', '-')
-    return html`<ol class="tw:mt-2 tw:columns-2 tw:gap-4 tw:text-xs">${figures.map(({ letter, key, label, value, unit, listed, derived }) =>
+    return html`<ol class="tw:mt-2 tw:columns-2 tw:gap-4 tw:text-xs">${figures.map(({ letter, key, label, value, unit, listed, calculated, derived }) =>
     html`<li class="tw:mb-1 tw:flex tw:break-inside-avoid tw:items-baseline tw:gap-2 ${key === this.highlight
       ? 'tw:font-bold tw:text-blue-500'
-      : listed ? '' : 'tw:text-gray-500'}"><button type="button" aria-label=${`Highlight ${label}`} aria-pressed=${String(key === this.highlight)}
+      : listed || calculated ? '' : 'tw:text-gray-500'}"><button type="button" aria-label=${`Highlight ${label}`} aria-pressed=${String(key === this.highlight)}
       @click=${() => this.select(key)} class="tw:inline-flex tw:size-5 tw:shrink-0 tw:cursor-pointer tw:items-center tw:justify-center tw:rounded-full
       tw:border-0! tw:p-0! tw:text-xs tw:font-bold tw:text-white tw:focus:outline-none! tw:focus-visible:ring-2 tw:focus-visible:ring-blue-500/40 ${key === this.highlight
         ? 'tw:bg-blue-500'
-        : listed ? 'tw:bg-[#715eb2]' : 'tw:bg-gray-400'}">${letter}</button><label for=${`${idPrefix}-${key}`}
+        : listed ? 'tw:bg-[#715eb2]' : calculated ? 'tw:bg-purple-300' : 'tw:bg-gray-400'}">${letter}</button><label for=${`${idPrefix}-${key}`}
       class="tw:grow">${label}</label>${derived
       ? html`<span class="tw:font-mono">${value} ${unit}</span>`
       : html`<input type="number" step="any" name=${key} id=${`${idPrefix}-${key}`} autocomplete="off"

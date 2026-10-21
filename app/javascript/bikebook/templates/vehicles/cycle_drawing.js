@@ -2,6 +2,8 @@ import { html, nothing, svg } from 'lit-html'
 import { arc, drawingViews, listedFigure, minus, plus, polar, scale } from 'bikebook/cycle_drawings'
 
 const LISTED = '#715eb2'
+// the theme's purple-300
+const CALCULATED = '#9a8fc4'
 const TYPICAL = '#9ca3af'
 // the OG Bike Index blue, the theme's blue-500
 const HIGHLIGHT = '#3397dc'
@@ -134,9 +136,9 @@ const renderShape = (shape) => {
 
 // Solid where it measures, dashed out to what it measures from. `highlight` the key of the one dimension to draw over the rest,
 // which fade
-const renderDimension = ({ placement, letter, listed, key }, font, highlight) => {
+const renderDimension = ({ placement, letter, listed, calculated, key }, font, highlight) => {
   const highlighted = key === highlight
-  const color = highlighted ? HIGHLIGHT : listed ? LISTED : TYPICAL
+  const color = highlighted ? HIGHLIGHT : listed ? LISTED : calculated ? CALCULATED : TYPICAL
   const { line, extensions, badge, arrowSize } = placement
   const heads = arrowSize ? [arrowhead(line[0], line[1], arrowSize), arrowhead(line.at(-1), line.at(-2), arrowSize)] : []
   return svg`<g data-figure=${key} cursor="pointer" stroke=${color} fill="none" stroke-width=${highlighted ? 2.5 : 1.25}
@@ -148,7 +150,8 @@ const renderDimension = ({ placement, letter, listed, key }, font, highlight) =>
 }
 
 // `type`'s drawing, or its `typeDetail`'s, of `data` in `size`, and the legend of its lettered figures: `listed` where the size
-// lists one rather than taking its type's typical, `derived` where the wheels give it, and `extra`, lettered last, where the
+// lists one, `calculated` where it's worked out from ones the size lists, and otherwise its type's typical, `derived` where
+// the wheels give it, and `extra`, lettered last, where the
 // `kit`'s geometry schema doesn't have it. Each figure's marks carry data-figure, and the `highlight` one's are drawn on top
 export const cycleDrawing = ({ type, data = {}, typeDetail = data.type_detail, size, kit, highlight }) => {
   const { views, listed } = drawingViews({ type, typeDetail, data, size })
@@ -176,6 +179,7 @@ export const cycleDrawing = ({ type, data = {}, typeDetail = data.type_detail, s
       value: angular ? Math.round(value * 10) / 10 : Math.round(value),
       unit: angular ? '°' : 'mm',
       listed: isListed,
+      calculated: !isListed && Boolean(dim.calculated),
       derived: Boolean(dim.derived),
       extra: extra(key)
     }

@@ -71,10 +71,15 @@ export class VehicleViewer {
         : html`<p class="twless-strong">${none}</p>`}</section>`
     })
     const typeName = (data) => presenter.named(presenter.kit.schemas.vehicle, data).type || 'bike'
-    // its type's drawing of `size`, said where it takes a typical one's figures
-    const drawing = (data, size, figure, legend) => html`<figure class="tw:space-y-1"><div class="tw:mx-auto tw:max-w-xl tw:text-gray-800 tw:dark:text-gray-200">${figure}</div>${legend.some(({ listed }) => !listed)
-      ? html`<figcaption class="tw:text-center tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">${present(size?.name) ? `${size.name} drawn. ` : ''}Gray figures aren't listed, so they're drawn as they typically are on a ${typeName(data).toLowerCase()}.</figcaption>`
-      : nothing}</figure>`
+    // its type's drawing of `size`, said where it works figures out or takes a typical one's
+    const drawing = (data, size, figure, legend) => {
+      const notes = [legend.some(({ calculated }) => calculated) && 'Light purple figures are worked out from the ones it lists.',
+        legend.some(({ listed, calculated }) => !listed && !calculated) && `Gray figures aren't listed, so they're drawn as they typically are on a ${typeName(data).toLowerCase()}.`]
+        .filter(Boolean)
+      return html`<figure class="tw:space-y-1"><div class="tw:mx-auto tw:max-w-xl tw:text-gray-800 tw:dark:text-gray-200">${figure}</div>${notes.length
+        ? html`<figcaption class="tw:text-center tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">${present(size?.name) ? `${size.name} drawn. ` : ''}${notes.join(' ')}</figcaption>`
+        : nothing}</figure>`
+    }
     const views = {
       basics: () => basics({ presenter, vehicles, outOfClassId }),
       // the overlay beside the table once the window is wide, above it until then
