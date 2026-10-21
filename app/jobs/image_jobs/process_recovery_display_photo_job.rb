@@ -45,7 +45,7 @@ module ImageJobs
       )
       processed_blob.analyze
 
-      # The photo's analysis touches the display, which can enqueue a second job that got this far too
+      # The photo's analysis touch can enqueue a concurrent job for this display
       recovery_display.with_lock do
         if recovery_display.photo_processed.attached? && !force_regenerate
           processed_blob.purge
