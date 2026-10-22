@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UI
-  module ColumnSettings
+  module TableColumnSettings
     # The checkboxes that pick a table's visible columns, collapsed until a UI::Collapse opens it.
     # Render it and the table inside an element given data_attributes
     class Component < ApplicationComponent
@@ -11,9 +11,9 @@ module UI
       # orderable: the hideable columns' headers drag to reorder them
       def self.data_attributes(storage_key:, controllers: nil, orderable: false)
         order = {"ui--table-column-order-storage-key-value": "#{storage_key}Order", action: ORDER_ACTIONS} if orderable
-        {controller: [controllers, "ui--collapse ui--column-settings", ("ui--table-column-order" if orderable)].compact.join(" "),
+        {controller: [controllers, "ui--collapse ui--table-column-settings", ("ui--table-column-order" if orderable)].compact.join(" "),
          "ui--collapse-storage-key-value": "#{storage_key}Open",
-         "ui--column-settings-storage-key-value": storage_key, **order}
+         "ui--table-column-settings-storage-key-value": storage_key, **order}
       end
 
       # columns: {cell_name => label}, each cell_name a class every cell in that column carries.
@@ -36,7 +36,7 @@ module UI
 
       def column_rows = (@columns.size / 3.0).ceil
 
-      def panel_data = @field_name ? {controller: "ui--column-settings"} : {"ui--collapse-target": "content"}
+      def panel_data = @field_name ? {controller: "ui--table-column-settings"} : {"ui--collapse-target": "content"}
 
       def checkbox_label(key, label)
         return label unless @hints[key]
@@ -46,8 +46,8 @@ module UI
 
       def checkbox_html_options(key)
         disabled = @always_visible.include?(key)
-        toggle = {"ui--column-settings-target": "checkbox", action: "ui--column-settings#update"} unless disabled
-        {id: "#{@field_name || "column_settings"}_#{key}".parameterize(separator: "_"), class: "tw:accent-blue-600", disabled:,
+        toggle = {"ui--table-column-settings-target": "checkbox", action: "ui--table-column-settings#update"} unless disabled
+        {id: "#{@field_name || "table_column_settings"}_#{key}".parameterize(separator: "_"), class: "tw:accent-blue-600", disabled:,
          data: {**toggle, default: @defaults.include?(key), narrow_hidden: @narrow_hidden.include?(key)}}
       end
     end

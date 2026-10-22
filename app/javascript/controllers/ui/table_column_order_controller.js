@@ -5,7 +5,7 @@ import { storedArray } from 'utils/stored_array'
 
 // Connects to data-controller='ui--table-column-order'
 // Drag a th.hideableColumn onto another to move its column. A column is named by its *_cell
-// class, as ui--column-settings names it. The hideable columns follow the fixed ones, so a
+// class, as ui--table-column-settings names it. The hideable columns follow the fixed ones, so a
 // row's are reordered by appending them.
 export default class extends Controller {
   static values = { storageKey: String }

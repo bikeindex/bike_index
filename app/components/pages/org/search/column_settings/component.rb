@@ -4,7 +4,7 @@ module Pages
   module Org
     module Search
       module ColumnSettings
-        # UI::ColumnSettings for an organization's registrations - the column panel, or the export
+        # UI::TableColumnSettings for an organization's registrations - the column panel, or the export
         # form's column picker. Its sidecar holds the copy for everything
         # ComponentStructs::OrgSearchSettings names — the column labels and the filters.
         class Component < ApplicationComponent
@@ -12,7 +12,7 @@ module Pages
 
           # Goes on the element holding the panel and its table, which the caller renders
           def self.column_settings_data_attributes(controllers: nil, orderable: true)
-            UI::ColumnSettings::Component.data_attributes(storage_key: STORAGE_KEY, controllers:, orderable:)
+            UI::TableColumnSettings::Component.data_attributes(storage_key: STORAGE_KEY, controllers:, orderable:)
           end
 
           # Opened from a Search::ColumnSettingsToggle the caller renders. export_headers: the
@@ -23,7 +23,7 @@ module Pages
           end
 
           def call
-            render(UI::ColumnSettings::Component.new(**(@export_headers ? export_options : panel_options)))
+            render(UI::TableColumnSettings::Component.new(**(@export_headers ? export_options : panel_options)))
           end
 
           private

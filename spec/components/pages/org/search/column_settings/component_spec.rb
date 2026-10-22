@@ -16,9 +16,9 @@ RSpec.describe Pages::Org::Search::ColumnSettings::Component, type: :component d
   describe ".column_settings_data_attributes" do
     it "runs a caller's own controllers alongside the shared column settings, off the org's storage key" do
       attributes = described_class.column_settings_data_attributes(controllers: "org--multi-search", orderable: false)
-      expect(attributes[:controller]).to eq "org--multi-search ui--collapse ui--column-settings"
+      expect(attributes[:controller]).to eq "org--multi-search ui--collapse ui--table-column-settings"
       expect(attributes[:"ui--collapse-storage-key-value"]).to eq "orgRegistrationColumnsOpen"
-      expect(attributes[:"ui--column-settings-storage-key-value"]).to eq "orgRegistrationColumns"
+      expect(attributes[:"ui--table-column-settings-storage-key-value"]).to eq "orgRegistrationColumns"
     end
 
     it "orders the columns by default" do
@@ -29,7 +29,7 @@ RSpec.describe Pages::Org::Search::ColumnSettings::Component, type: :component d
 
   it "renders the collapsed column panel, leaving its toggle and the export to the caller" do
     expect(component).to have_css("[data-ui--collapse-target='content']", visible: :all)
-    expect(component).to have_css("input[type='checkbox'][data-ui--column-settings-target='checkbox']", visible: :all)
+    expect(component).to have_css("input[type='checkbox'][data-ui--table-column-settings-target='checkbox']", visible: :all)
     expect(component).not_to have_button(visible: :all, text: /settings/i)
     expect(component).not_to have_text("Export CSV")
     expect(component.at_css("[data-ui--collapse-target='content']")[:class]).to include("tw:hidden!")
@@ -37,13 +37,13 @@ RSpec.describe Pages::Org::Search::ColumnSettings::Component, type: :component d
 
   it "keeps View checked, out of the controller's reach" do
     expect(component).to have_field("view_cell", checked: true, disabled: true, visible: :all)
-    expect(component.at_css("input[name='view_cell']")["data-ui--column-settings-target"]).to be_nil
+    expect(component.at_css("input[name='view_cell']")["data-ui--table-column-settings-target"]).to be_nil
   end
 
   it "labels the registration time columns, with the status column's hint" do
     expect(component).to have_text("Time - registration updated")
     expect(component).to have_text("Time - Registration status")
-    expect(component.at_css("label:has(#column_settings_occurred_at_cell) small").text)
+    expect(component.at_css("label:has(#table_column_settings_occurred_at_cell) small").text)
       .to eq "When registration was stolen, impounded, found or listed for sale"
   end
 
@@ -52,7 +52,7 @@ RSpec.describe Pages::Org::Search::ColumnSettings::Component, type: :component d
 
     it "renders the export form's column fields, open, on their own" do
       expect(component).not_to have_css("[data-ui--collapse-target]")
-      expect(component).to have_css("[data-controller='ui--column-settings']:not([data-ui--column-settings-storage-key-value])")
+      expect(component).to have_css("[data-controller='ui--table-column-settings']:not([data-ui--table-column-settings-storage-key-value])")
       expect(component).to have_text("Included columns")
       expect(component).to have_field("export[headers][]", with: "serial", checked: true)
       expect(component).to have_field("export_headers_registered_at", with: "registered_at", checked: false)

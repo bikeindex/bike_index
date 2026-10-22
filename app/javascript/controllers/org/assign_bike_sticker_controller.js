@@ -11,7 +11,7 @@ export default class extends Controller {
     this.updateLinks()
   }
 
-  // Not in the column panel, so ui--column-settings leaves it hidden
+  // Not in the column panel, so ui--table-column-settings leaves it hidden
   showColumn () {
     this.element.querySelectorAll('.assign_bike_sticker_cell').forEach(cell => cell.classList.remove('tw:hidden'))
     window.dispatchEvent(new Event('ui-table:refresh'))

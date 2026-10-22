@@ -3,8 +3,8 @@ import { storedArray } from 'utils/stored_array'
 
 /* global localStorage */
 
-// Connects to data-controller='ui--column-settings'
-// Goes on an element holding both a UI::ColumnSettings panel and its table. Each checkbox is
+// Connects to data-controller='ui--table-column-settings'
+// Goes on an element holding both a UI::TableColumnSettings panel and its table. Each checkbox is
 // named for the *_cell class every cell in its column carries. Without a storage key it's a
 // form's fields, which keep what the server checked and leave the table alone.
 export default class extends Controller {

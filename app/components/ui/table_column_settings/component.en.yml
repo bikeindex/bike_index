@@ -2,7 +2,7 @@
 en:
   components:
     ui:
-      column_settings:
+      table_column_settings:
         all: all
         default: default
         included_columns: Included columns
