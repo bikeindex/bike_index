@@ -39,6 +39,13 @@ RSpec.describe ApplicationComponentHelper, type: :helper do
     end
   end
 
+  describe "unbroken_hyphen" do
+    it "keeps each hyphenated word on one line, escaping the text around it" do
+      expect(helper.unbroken_hyphen("Know your e-bike & e-scooter rules"))
+        .to eq 'Know your <span class="tw:whitespace-nowrap">e-bike</span> &amp; <span class="tw:whitespace-nowrap">e-scooter</span> rules'
+    end
+  end
+
   describe "amount_display" do
     subject(:result) { helper.amount_display(payment, currency_name_suffix:) }
 

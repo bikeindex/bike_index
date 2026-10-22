@@ -6,7 +6,8 @@ description: >-
   `number_display` helper for numbers, `Counts` for site-wide figures
   (bikes registered, recoveries, organizations), the UI component library rule
   (every button is `UI::Button`/`UI::ButtonLink`, every
-  typeahead/autocomplete is `UI::Forms::Combobox`, never hand-rolled
+  typeahead/autocomplete is `UI::Forms::Combobox`, every FAQ is
+  `UI::Accordion`, never hand-rolled
   markup), that **helpers are deprecated — render a view component
   taking full keyword arguments instead of adding or extending one**,
   ViewComponent rules (when to write a partial instead, keyword arguments, instance variables,
@@ -93,6 +94,7 @@ Four of those carry a rule beyond "use the component":
 - **`UI::Tooltip` keeps its default `?` button trigger** unless the user explicitly says otherwise — never pass a label as the trigger content.
 - **A `UI::Forms::*` field gets its label from `UI::Forms::Group`** — render it inside a `Group` block, passing `form_builder:` when there is one. Holds for `Combobox`, `Select`, `TextEditor`, and `Files::Upload`, whose own `Upload` button is a second label for the same input and audits clean beside `Group`'s (`spec/components/ui/forms/group/component_system_spec.rb`) — never drop `Group` for a bare `<label>` to avoid it. A visually hidden label is the exception: `Group`'s label always carries a required/optional suffix, so use a bare `label_tag` with `twlabel tw:sr-only`, the way `Pages::Search::Form` does.
 - **Every typeahead / autocomplete goes through `UI::Forms::Combobox::Component`** — never a new Stimulus controller that fetches matches and renders its own menu. `spec/components/ui/forms/combobox` shows how to invoke it.
+- **Every FAQ / list of questions is `UI::Accordion::Component`** — `items:` as `[question, answer]` pairs. Never hand-rolled `<details>` or per-item `UI::Collapse` markup.
 - **Every chart goes through `UI::Chart::Component`** — chartkick's `column_chart`/`line_chart`/`pie_chart` helpers are pinned `preload: false` and fetched by the component's `ui--chart` controller, so a bare helper call renders the placeholder and nothing else. Pass `kind:` for a line or pie. A page with no Stimulus (`layout: false`) loads them itself: `app/views/welcome/bike_creation_graph.html.erb`.
 
 `Atoms::*` (`app/components/atoms/`) holds the small value-rendering components — `Atoms::Serial`, `Atoms::Sticker`, `Atoms::ShortId`, `Atoms::Phone`. Everything else is `UI::*`; older value renderers like `UI::AddressDisplay` predate the split and stay put. Render a serial with `Atoms::Serial::Component`.

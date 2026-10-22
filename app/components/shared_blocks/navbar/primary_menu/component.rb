@@ -22,7 +22,7 @@ module SharedBlocks
             *account_items,
             {label: translation(".help"), path: help_path},
             {label: translation(".stolen_bike"), path: stolen_index_path},
-            {label: translation(".donate"), path: why_donate_path},
+            {label: translation(".donate"), path: donate_path},
             # Desktop items float right, so reversing them keeps the mobile order on screen
             *side_items(:desktop).reverse]
         end

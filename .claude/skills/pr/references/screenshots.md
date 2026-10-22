@@ -108,4 +108,6 @@ Rules:
 
 When updating an existing screenshots comment, ask `github-pr-images` for its current body first, replace the `### <url-path>` block for any page you recaptured, and leave every other page's block alone, URLs and all — you're handing back a whole body, so anything you drop is dropped.
 
+**A recapture replaces, never appends.** The comment shows the branch as it is now, not a history: no dated or "After merging main" section, no superseded shots kept beside their replacements, and the base half of a block is recaptured along with the branch half. A newly captured state of an existing page — an open modal, a filled form — is its own `### <url-path> — <state>` block in the same table shape. Explanatory prose goes in your summary, not the comment. #4568's "After merging main (Oct 20)" section is the anti-pattern.
+
 Return the PR URL.

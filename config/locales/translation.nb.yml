@@ -6679,6 +6679,7 @@ nb:
           any_market: Ethvert marked
           market: Marked
           clear_filters: Fjern filtre
+          loading_placeholder: Laster inn…
         donate_strip:
           donate: Donere
           pitch: Dette kule produktet er levert av den ideelle organisasjonen Bike
@@ -7359,10 +7360,8 @@ nb:
           bike_index_store: Sykkelindeksbutikk
           design_and_developer_resources: Design og utviklerressurser
           donate: Donere
-          donate_today: Doner i dag
           help: Hjelp
           how_to_get_your_stolen_bike_back: Hvordan få tilbake den stjålne sykkelen
-          make_a_difference: Gjør en forskjell i sykkeltyveri
           other_pages: Andre sider
           protect_your_bike: Beskytt sykkelen din
           related: Relatert

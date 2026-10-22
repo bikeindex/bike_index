@@ -6967,6 +6967,7 @@ es:
           any_market: Cualquier mercado
           market: Mercado
           clear_filters: Filtros transparentes
+          loading_placeholder: Cargando…
         donate_strip:
           donate: Donar
           pitch: Este fantástico producto es posible gracias a la organización sin
@@ -7703,10 +7704,8 @@ es:
           bike_index_store: Tienda de índices de bicicletas
           design_and_developer_resources: Recursos de diseño y desarrollo
           donate: Donar
-          donate_today: Dona hoy
           help: Ayuda
           how_to_get_your_stolen_bike_back: Cómo recuperar tu bicicleta robada
-          make_a_difference: Marca la diferencia en la lucha contra el robo de bicicletas.
           other_pages: Otras páginas
           protect_your_bike: Registre su bicicleta
           related: Relacionado
