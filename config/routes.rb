@@ -322,7 +322,7 @@ Rails.application.routes.draw do
       :primary_activities
 
     %i[
-      bike_sticker_updates email_bans exports graduated_notifications invoices logged_searches
+      bike_sticker_updates cycle_types email_bans exports graduated_notifications invoices logged_searches
       mailchimp_data model_attestations model_audits
       notifications organization_landing_pages organization_messages organization_statuses paper_trail_versions
       parking_notifications public_images
