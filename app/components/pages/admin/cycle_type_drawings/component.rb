@@ -11,10 +11,10 @@ module Pages
           def collapsed = example_model.nil? || Pages::Admin::CycleTypeDrawings::Component::COLLAPSED_TYPES.include?(type)
         end
 
-        # by Bikebook vehicle type, those that start collapsed though they have a catalog example
+        # by BikeBook vehicle type, those that start collapsed though they have a catalog example
         COLLAPSED_TYPES = %w[skateboard wheelchair unicycle].freeze
 
-        # the CycleType slugs Bikebook's vehicle types name differently
+        # the CycleType slugs BikeBook's vehicle types name differently
         BIKEBOOK_TYPES = {
           trailer: "bike_trailer",
           cargo: "cargo_bike",
@@ -27,7 +27,7 @@ module Pages
           elliptical: "elliptical_bike"
         }.freeze
 
-        # by Bikebook vehicle type, or type/type_detail, the catalog model that fills in the most of its drawing
+        # by BikeBook vehicle type, or type/type_detail, the catalog model that fills in the most of its drawing
         EXAMPLE_MODELS = {
           "bike" => "m/specialized/2025/aethos_comp_shimano_105_di2_ca",
           "bike/step_through" => "m/aventon/2025/level_3_step_through",

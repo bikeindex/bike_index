@@ -151,9 +151,8 @@ const bikeShapes = (frame, context, detail) => {
   const { bb, rearAxle, frontAxle, headTop, headBottom, seatTop, seatBottom } = frame
   const { steering, seat } = axes(frame)
   const { bmx, stem, clamp } = cockpit(frame, context)
-  // a BMX's saddle down on its top tube
+  // a BMX's saddle down on and along its top tube
   const top = plus(seatTop, scale(seat, bmx ? 30 : 170))
-  // a BMX's saddle along its top tube
   const saddled = [tube(seatTop, seatBottom), part(seatTop, top), saddle(top, 150, bmx ? unit(minus(headTop, seatTop)) : [1, 0])]
   const { front, back, under, tail } = bench(frame, { fig })
   const riser = atHeight(headTop, steering, fig('handlebar_height'))
