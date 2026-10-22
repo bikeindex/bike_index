@@ -45,9 +45,7 @@ const bmxBar = (clamp, steering) => [part(clamp, plus(clamp, scale(steering, 229
 // `calculated` where the size doesn't list it but it's worked out from figures the size does, `fixed` where it can't
 // be set as a figure can, `unlettered` where it's plain without a letter, and `side`, 1 or -1, where a span too short to
 // letter over isn't lettered out the side its lane goes. `guides`, more dashed connectors, to show what it measures from where nothing drawn does
-const h = (key, a, b, lane = 0, options = {}) => ({ kind: 'h', key, a, b, lane, ...options })
-const v = (key, a, b, lane = 0, options = {}) => ({ kind: 'v', key, a, b, lane, ...options })
-const d = (key, a, b, lane = 0, options = {}) => ({ kind: 'd', key, a, b, lane, ...options })
+const [h, v, d] = ['h', 'v', 'd'].map((kind) => (key, a, b, lane = 0, options = {}) => ({ kind, key, a, b, lane, ...options }))
 // `degrees` up from the ground behind `center`, `radius` in lettering heights
 const angle = (key, center, degrees, radius = 2.6) => ({ kind: 'angle', key, center, from: 180 - degrees, to: 180, radius })
 const across = (key, center, { r, listed }) => h(key, plus(center, [-r, 0]), plus(center, [r, 0]), 0, { base: center[1], value: 2 * r, listed, derived: true, fixed: true })
@@ -138,16 +136,16 @@ const bench = (frame, { fig }) => {
   return { front, back, under: plus(front, [-40, -70]), tail: plus(back, [60, -70]) }
 }
 
-// Its tubes, and what its rider sits on and steers by, a `detail` swapping the top tube and saddle for its own
 // Its stem, up the steering axis from the head tube and out its length to the bar's clamp, a BMX's short where it lists
 // none. Drawn a tube's weight, heavier than its bar, so it's plain where it stops
 const cockpit = (frame, { fig, listed, data }) => {
-  const bmx = BMX.test(data.primary_activity ?? '')
+  const bmx = BMX.test(data.primary_activity)
   // over a spacer's height up the steerer, a BMX's stem straight on its headset
   const stem = plus(frame.headTop, scale(axes(frame).steering, bmx ? 10 : 30))
   return { bmx, stem, clamp: plus(stem, polar(bmx && !listed('stem_length') ? 50 : fig('stem_length'), 6)) }
 }
 
+// Its tubes, and what its rider sits on and steers by, a `detail` swapping the top tube and saddle for its own
 const bikeShapes = (frame, context, detail) => {
   const { fig, data } = context
   const { bb, rearAxle, frontAxle, headTop, headBottom, seatTop, seatBottom } = frame
@@ -165,7 +163,7 @@ const bikeShapes = (frame, context, detail) => {
     bench_seat: () => [tube(frontAxle, headBottom, headTop, under, tail, rearAxle, bb, headBottom), tube(bb, under),
       panel(front, back, plus(back, [0, -70]), plus(front, [-30, -70])), part(headTop, riser), handlebar(riser)]
   }[detail]?.() ?? [tube(frontAxle, headBottom, headTop, seatTop, rearAxle, bb, headBottom), ...saddled, tube(headTop, stem, clamp),
-    bmx ? bmxBar(clamp, steering) : ROAD.test(data.primary_activity ?? '') ? dropBar(clamp) : handlebar(clamp)]
+    bmx ? bmxBar(clamp, steering) : ROAD.test(data.primary_activity) ? dropBar(clamp) : handlebar(clamp)]
   return [wheel(rearAxle, frame.rearWheel), wheel(frontAxle, frame.frontWheel), body]
 }
 
@@ -913,5 +911,5 @@ export const drawingViews = ({ type, data, typeDetail, size }) => {
   // the first of `keys` it lists, else the first's typical
   const either = (...keys) => fig(keys.find(listed) ?? keys[0])
   const views = draw({ fig, either, listed, wheel: wheelAt, data, size, defaults, assume })
-  return { views, listed, framed, typical: [...typical] }
+  return { views: views.map((view) => ({ ...view, shapes: [view.shapes].flat(Infinity).filter(Boolean) })), listed, framed, typical: [...typical] }
 }

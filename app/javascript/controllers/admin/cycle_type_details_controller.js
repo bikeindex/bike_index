@@ -9,7 +9,7 @@ export default class extends Controller {
   static values = { examples: Object }
 
   connect () {
-    this.rowTargets.forEach((row) => typeDetails(row.dataset.type).toReversed().forEach((detail) => row.after(this.#detailRow(row, detail))))
+    this.rowTargets.forEach((row) => row.after(...typeDetails(row.dataset.type).map((detail) => this.#detailRow(row, detail))))
   }
 
   #detailRow (row, detail) {

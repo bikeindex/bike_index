@@ -59,7 +59,7 @@ const LABELS = {
 const point = ([x, y]) => `${Math.round(x * 10) / 10},${Math.round(-y * 10) / 10}`
 const pathData = (points, closed) => `M${points.map(point).join('L')}${closed ? 'Z' : ''}`
 
-const extent = (points) => {
+export const extent = (points) => {
   const [xs, ys] = [points.map(([x]) => x), points.map(([, y]) => y)]
   return { left: Math.min(...xs), right: Math.max(...xs), bottom: Math.min(...ys), top: Math.max(...ys) }
 }
@@ -124,7 +124,7 @@ const arrowhead = (tip, from, size) => {
 }
 
 // a rim hidden but for `rims`
-const renderShape = (shape, rims = true) => {
+export const renderShape = (shape, rims = true) => {
   const dashed = shape.weight === 'ghost'
   const common = { width: WEIGHTS[shape.weight], dash: dashed ? '6 5' : nothing, opacity: dashed ? 0.55 : nothing }
   return shape.kind === 'circle'
@@ -162,13 +162,12 @@ const renderDimension = ({ placement, letter, listed, calculated, key }, font, h
 // `highlight` one's are drawn on top
 export const cycleDrawing = ({ type, data = {}, typeDetail = data.type_detail, size, kit, highlight, figurePath }) => {
   const { views, listed } = drawingViews({ type, typeDetail, data, size })
-  const flattened = views.map((view) => ({ ...view, shapes: [view.shapes].flat(Infinity).filter(Boolean) }))
   // lettering sized to the views side by side
-  const extents = flattened.map(({ shapes }) => extent(shapes.flatMap(shapePoints)))
+  const extents = views.map(({ shapes }) => extent(shapes.flatMap(shapePoints)))
   const span = Math.max(extents.reduce((width, { left, right }) => width + right - left, 0) * 1.15, ...extents.map(({ top, bottom }) => top - bottom))
   const font = span / 36
 
-  const dims = flattened.flatMap((view) => view.dims)
+  const dims = views.flatMap((view) => view.dims)
   const dimFor = (key) => dims.find((each) => each.key === key)
   const extra = (key) => Boolean(kit) && !dimFor(key).derived && !(key.split('.')[0] in kit.schemas.geometry)
   const drawn = [...new Set(dims.map(({ key }) => key))]
@@ -192,7 +191,7 @@ export const cycleDrawing = ({ type, data = {}, typeDetail = data.type_detail, s
       extra: extra(key)
     }
   })
-  const laidOut = flattened.map((view) => {
+  const laidOut = views.map((view) => {
     const placedDims = view.dims.map((dim) => ({ ...legend[keys.indexOf(dim.key)], placement: placed(dim, font) }))
     const points = [...view.shapes.flatMap(shapePoints), ...placedDims.flatMap(({ placement, letter }) =>
       [...placement.line, ...(letter ? [[-1, -1], [1, 1]].map((corner) => plus(placement.badge, scale(corner, font))) : [])])]
@@ -231,7 +230,7 @@ export const cycleDrawing = ({ type, data = {}, typeDetail = data.type_detail, s
 export const sideView = ({ type, data = {}, typeDetail = data.type_detail, size }) => {
   const { views, typical, framed } = drawingViews({ type, typeDetail, data, size })
   const measures = (view, key) => view.dims.some((dim) => dim.key === key)
-  const shapes = [views[0].shapes].flat(Infinity).filter(Boolean)
+  const { shapes } = views[0]
   return {
     shapes: (rims) => shapes.map((shape) => renderShape(shape, rims)),
     points: shapes.flatMap(shapePoints),
@@ -240,13 +239,15 @@ export const sideView = ({ type, data = {}, typeDetail = data.type_detail, size 
   }
 }
 
+export const letterBackground = ({ listed, calculated, highlighted }) => highlighted && listed
+  ? 'tw:bg-[#3397dc]'
+  : listed ? 'tw:bg-[#715eb2]' : calculated ? 'tw:bg-purple-300' : 'tw:bg-gray-400'
+
 // A figure's letter, to set beside its `label` as the drawing has it and in its color, `highlighted` as the drawing is,
 // and a link to `href` where there's one
-export const figureLetter = ({ letter, listed, calculated = false, highlighted = false, href, label }) => {
+export const figureLetter = ({ letter, listed, calculated, highlighted, href, label }) => {
   const classes = `tw:mr-1.5 tw:inline-flex tw:size-4 tw:items-center tw:justify-center tw:rounded-full tw:align-text-bottom tw:text-[10px]
-    tw:leading-none tw:font-bold tw:text-white tw:no-underline! ${highlighted && listed
-    ? 'tw:bg-[#3397dc]'
-    : listed ? 'tw:bg-[#715eb2]' : calculated ? 'tw:bg-purple-300' : 'tw:bg-gray-400'}`
+    tw:leading-none tw:font-bold tw:text-white tw:no-underline! ${letterBackground({ listed, calculated, highlighted })}`
   return href
     ? html`<a href=${href} data-in-place="" data-replace="" aria-label=${`Highlight ${label}`} class=${classes}>${letter}</a>`
     : html`<span aria-hidden="true" class=${classes}>${letter}</span>`

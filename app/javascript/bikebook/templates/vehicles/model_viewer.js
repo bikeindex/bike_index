@@ -345,7 +345,6 @@ class ModelViewer {
       cargo_vehicle: isCargo(this.data),
       cargo: this.cargo(),
       primary_activity: this.withoutParenthetical(vehicle.primary_activity),
-      // its material, its detail after in small
       frame_material: present(vehicle.frame?.material) && present(vehicle.frame.material_detail)
         ? html`${vehicle.frame.material} <span class="tw:text-xs twless-strong">${vehicle.frame.material_detail}</span>`
         : vehicle.frame?.material ?? vehicle.frame?.material_detail,

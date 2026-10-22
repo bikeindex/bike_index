@@ -1,7 +1,7 @@
 import { html, nothing, svg } from 'lit-html'
 import { builtWheel, frameGeometry, outerRadius } from 'bikebook/frame_geometry'
 import { buttonClasses } from 'bikebook/templates/ui/button'
-import { sideView } from 'bikebook/templates/vehicles/cycle_drawing'
+import { extent, renderShape, sideView } from 'bikebook/templates/vehicles/cycle_drawing'
 import { tireWidth, wheelSize } from 'bikebook/templates/vehicles/model_viewer'
 import { sectionHeading } from 'bikebook/templates/vehicles/section'
 import { andSentence, equal, isNumber, join, present } from 'bikebook/templates/values'
@@ -30,8 +30,7 @@ const frame = ({ side, geometry: { rearAxle, frontAxle, rearRadius, frontRadius 
   svg`<g id=${`geometry-frame-${index}`} data-bikebook--geometry-overlay-target="frame" data-vehicle=${value} color=${series.color}
     opacity=${chosen >= 0 && chosen !== index ? 0.2 : nothing}><title>${label}</title>${side
     ? side.shapes(chosen === index)
-    : svg`${[[rearAxle, rearRadius], [frontAxle, frontRadius]].map(([[x, y], r]) => svg`<circle cx=${x} cy=${-y} r=${r} fill="none"
-      stroke="currentColor" stroke-width="2.5" vector-effect="non-scaling-stroke"></circle>`)}`}</g>`
+    : [[rearAxle, rearRadius], [frontAxle, frontRadius]].map(([center, radius]) => renderShape({ kind: 'circle', center, radius, weight: 'part' }))}</g>`
 
 // A [bsd, tire] wheel against the first's: the same size on a tire more than TIRE_GAP mm wider or narrower, or 700c
 // against 650b
@@ -135,9 +134,8 @@ const reach = ({ side, geometry: { rearAxle, frontAxle, rearRadius, frontRadius 
 
 const drawing = (presenter, drawn, labelled, selected) => {
   const chosen = selected === 'none' ? -1 : Math.max(drawn.findIndex(({ value }) => value === selected), 0)
-  const points = drawn.flatMap(reach)
-  const [xs, ys] = [points.map(([x]) => x), points.map(([, y]) => y)]
-  const [left, right, top] = [Math.min(BOUNDS.left, ...xs) - PADDING, Math.max(BOUNDS.right, ...xs) + PADDING, Math.max(BOUNDS.top, ...ys) + PADDING]
+  const bounds = extent([...drawn.flatMap(reach), [BOUNDS.left, 0], [BOUNDS.right, BOUNDS.top]])
+  const [left, right, top] = [bounds.left - PADDING, bounds.right + PADDING, bounds.top + PADDING]
   const notes = diameterNotes(presenter, labelled)
   const noted = drawn.filter(({ geometry }) => geometry.calculated?.length || geometry.assumed?.length || geometry.typicalWheel)
   const clause = (keys, how) => keys?.length ? `${figures(presenter, keys)} ${keys.length > 1 ? 'are' : 'is'} ${how}` : null

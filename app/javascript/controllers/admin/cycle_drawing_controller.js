@@ -2,16 +2,17 @@ import { Controller } from '@hotwired/stimulus'
 import { html, nothing, render } from 'lit-html'
 import { loadCatalog } from 'bikebook/catalog'
 import { withFigures } from 'bikebook/cycle_drawings'
+import { toQuery } from 'bikebook/query'
 import { chosenSizes } from 'bikebook/sizes'
 import { buttonClasses } from 'bikebook/templates/ui/button'
-import { cycleDrawing } from 'bikebook/templates/vehicles/cycle_drawing'
+import { cycleDrawing, letterBackground } from 'bikebook/templates/vehicles/cycle_drawing'
 
 const catalogs = new Map()
 // one catalog, and its worker, for every drawing on the page
 const catalogAt = (manifestUrl) => catalogs.get(manifestUrl) ?? catalogs.set(manifestUrl, loadCatalog(manifestUrl)).get(manifestUrl)
 
 // Its Sizes & geometry view, with the size drawn here picked
-const geometryPath = (id, size) => `/bikebook?${new URLSearchParams({ vehicle_models: id, view: 'geometry', ...(size?.name ? { vehicle_sizes: size.name } : {}) })}`
+const geometryPath = (id, size) => `/bikebook?${toQuery({ vehicle_models: id, view: 'geometry', vehicle_sizes: size?.name })}`
 
 // Connects to data-controller='admin--cycle-drawing'
 // Draws a vehicle type, or a type_detail of it, in a catalog model's size where it's given one, redrawn as a figure's input changes
@@ -72,20 +73,20 @@ export default class extends Controller {
   // the legend's figures, down one column then the next, each an input but those that can't be set
   figureList (figures) {
     const idPrefix = [this.typeValue, this.typeDetailValue, this.modelValue].filter(Boolean).join('-').replaceAll('/', '-')
-    return html`<ol class="tw:mt-2 tw:columns-2 tw:gap-4 tw:text-xs">${figures.map(({ letter, key, label, value, unit, listed, calculated, editable }) =>
-    html`<li class="tw:mb-1 tw:flex tw:break-inside-avoid tw:items-baseline tw:gap-2 ${key === this.highlight ? 'tw:font-bold' : ''} ${key === this.highlight && listed
+    return html`<ol class="tw:mt-2 tw:columns-2 tw:gap-4 tw:text-xs">${figures.map(({ letter, key, label, value, unit, listed, calculated, editable }) => {
+    const highlighted = key === this.highlight
+    return html`<li class="tw:mb-1 tw:flex tw:break-inside-avoid tw:items-baseline tw:gap-2 ${highlighted ? 'tw:font-bold' : ''} ${highlighted && listed
       ? 'tw:text-blue-500'
       : listed || calculated ? '' : 'tw:text-gray-500'}">${letter
-      ? html`<button type="button" aria-label=${`Highlight ${label}`} aria-pressed=${String(key === this.highlight)}
+      ? html`<button type="button" aria-label=${`Highlight ${label}`} aria-pressed=${String(highlighted)}
       @click=${() => this.select(key)} class="tw:inline-flex tw:size-5 tw:shrink-0 tw:cursor-pointer tw:items-center tw:justify-center tw:rounded-full
-      tw:border-0! tw:p-0! tw:text-xs tw:font-bold tw:text-white tw:focus:outline-none! tw:focus-visible:ring-2 tw:focus-visible:ring-blue-500/40 ${key === this.highlight && listed
-        ? 'tw:bg-blue-500'
-        : listed ? 'tw:bg-[#715eb2]' : calculated ? 'tw:bg-purple-300' : 'tw:bg-gray-400'}">${letter}</button>`
+      tw:border-0! tw:p-0! tw:text-xs tw:font-bold tw:text-white tw:focus:outline-none! tw:focus-visible:ring-2 tw:focus-visible:ring-blue-500/40 ${letterBackground({ listed, calculated, highlighted })}">${letter}</button>`
       : html`<span class="tw:w-5 tw:shrink-0"></span>`}<label for=${`${idPrefix}-${key}`}
       class="tw:grow">${label}</label>${!editable
       ? html`<span class="tw:font-mono">${value} ${unit}</span>`
       : html`<input type="number" step="any" name=${key} id=${`${idPrefix}-${key}`} autocomplete="off"
         class="twinput tw:w-20! tw:py-0.5! tw:text-right tw:text-xs!" .value=${String(value)} @input=${(event) => this.edit(event)}><span
-        class="tw:w-6">${unit}</span>`}</li>`)}</ol>`
+        class="tw:w-6">${unit}</span>`}</li>`
+  })}</ol>`
   }
 }

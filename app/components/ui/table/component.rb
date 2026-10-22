@@ -59,8 +59,6 @@ module UI
 
       def cache_records_for(record) = Array(@cache_records&.call(record))
 
-      def row_attributes_for(record) = @row_attributes&.call(record) || {}
-
       def footer?
         @columns.any?(&:footer)
       end

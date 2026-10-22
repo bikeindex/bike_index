@@ -21,7 +21,7 @@ end %>
   data-controller="admin--cycle-type-details"
   data-admin--cycle-type-details-examples-value="<%= Pages::Admin::CycleTypeDrawings::Component::EXAMPLE_MODELS.to_json %>"
 >
-  <%= render(UI::Table::Component.new(records: @rows, row_attributes: ->(row) { {data: {"admin--cycle-type-details-target": "row", type: row.type, **(row.collapsed ? {controller: "ui--collapse", "ui--collapse-param-value": row.type} : {})}} })) do |table| %>
+  <%= render(UI::Table::Component.new(records: @rows, row_attributes: ->(row) { {data: {"admin--cycle-type-details-target": "row", type: row.type, **({controller: "ui--collapse", "ui--collapse-param-value": row.type} if row.collapsed)}} })) do |table| %>
     <% table.column(label: "Type", row_header: true) do |row| %>
       <strong><%= row.name %></strong>
       <code class="tw:text-xs"><%= row.type %></code>

@@ -31,7 +31,7 @@ RSpec.describe "Admin cycle types", :js, type: :system do
     # typical, and its example model from the catalog, in the size BikeBook first shows it in
     within(row("type detail: step_through")) do
       expect(page).to have_css("svg[role='img']", count: 2, wait: 10)
-      expect(page).to have_link(href: /vehicle_models=m%2Faventon%2F2026%2Flevel_4_rec_step_through&view=geometry/)
+      expect(page).to have_link(href: %r{vehicle_models=m/aventon/2026/level_4_rec_step_through&(vehicle_sizes=[^&]+&)?view=geometry})
     end
     within(row("type detail: bench_seat")) { expect(page).to have_text("No catalog models") }
     within(row("type detail: tadpole")) do
