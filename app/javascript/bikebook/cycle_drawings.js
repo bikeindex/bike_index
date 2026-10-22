@@ -201,9 +201,9 @@ const bikeDims = (frame, context, detail) => {
     // negative where the bottom bracket rises above the axles, as a BMX's does
     v('bb_drop', rearAxle, bb, -1, { base: rearAxle[0], value: rearAxle[1] - bb[1] }),
     fromGround('bb_height', bb),
-    // from the bottom bracket where it's listed lower than that, as a BMX's is
-    fig('standover') < bb[1]
-      ? v('standover', [standoverAt[0], bb[1]], standoverAt, 0, { base: standoverAt[0] })
+    // up from the bottom bracket where it lists it so, as a BMX's or dirt jumper's chart does
+    listed('standover_above_bb')
+      ? v('standover_above_bb', [standoverAt[0], bb[1]], standoverAt, 0, { base: standoverAt[0] })
       : fromGround('standover', standoverAt, 0, { t: detail === 'step_through' ? 0.7 : 0.5 }),
     d('fork_rake', foot, frontAxle, -0.6, { guides: [[headBottom, foot]] }),
     h('trail', ground, [frontAxle[0], 0], -0.7, { base: 0 }),

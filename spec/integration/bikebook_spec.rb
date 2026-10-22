@@ -914,6 +914,17 @@ RSpec.describe "BikeBook", :js, type: :system do
       [[367, 567], %w[reach stack], %w[fork_rake fork_length_a2c head_tube]], [339, {"bsd" => 622, "tire" => 28, "rimListed" => true}], 341,
       {"missing" => %w[reach stack top_tube_effective front_center head_tube], "wheels" => {"rearRadius" => 351, "frontRadius" => 351, "wheelbase" => 1020}},
       [[], %w[fork_rake fork_length_a2c head_tube]]])
+    # a BMX's unlisted seat tube runs its top tube over its standover above the bottom bracket, the same as over its
+    # standover from the ground, else is its kind's typical
+    seat_tubes = page.evaluate_script(<<~JS)
+      import('bikebook/frame_geometry').then(({ frameGeometry }) => {
+        const data = { wheels: [{ bsd: 622, tire_width: 40, position: ['front', 'rear'] }], primary_activity: 'bmx' }
+        const geometry = { head_angle: 72, chainstay: 420, wheelbase: 1020, seat_angle: 73, fork_rake: 45, bb_drop: 70 }
+        const seatTube = (extra) => Math.round(Math.hypot(...frameGeometry(data, { geometry: { ...geometry, ...extra } }).seatTop))
+        return [seatTube({ standover_above_bb: 235 }), seatTube({ standover: 516 }), seatTube({})]
+      })
+    JS
+    expect(seat_tubes).to eq([128, 128, 240])
 
     size_select.call("Current EXP").select("Small")
     expect_size.call("Current EXP", "Small")

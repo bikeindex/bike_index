@@ -129,10 +129,10 @@ export const frameGeometry = (data, size) => {
   const headBottom = steering(headTube)
   const seat = radians(seatAngle)
   const listedSeatTube = geometry.seat_tube_ct ?? geometry.seat_tube_ctc
-  // a BMX's where it lists none: as tall as runs its top tube over the standover it lists - from the bottom bracket where
-  // that's lower than it, as BMX spec sheets measure it - else its kind's typical
-  const overBracket = isNumber(typical.seat_tube) && listed('standover')
-    ? geometry.standover - (geometry.standover < rear - drop ? 0 : rear - drop)
+  // a BMX's where it lists none: as tall as runs its top tube over its standover above the bottom bracket, else its
+  // kind's typical
+  const overBracket = isNumber(typical.seat_tube)
+    ? geometry.standover_above_bb ?? (listed('standover') ? geometry.standover - (rear - drop) : null)
     : null
   const underStandover = known(overBracket)
     ? (overBracket * reach - stack * STANDOVER_X) / (Math.sin(seat) * (reach - STANDOVER_X) + Math.cos(seat) * (stack - overBracket))

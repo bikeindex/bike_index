@@ -19,6 +19,7 @@ const LABELS = {
   stoker_seat_tube: 'Stoker seat tube',
   boom_tube: 'Boom tube',
   seat_height: 'Seat height',
+  standover_above_bb: 'Standover above BB',
   seat_height_min: 'Seat height, lowest',
   seat_height_max: 'Seat height, highest',
   handlebar_height: 'Handlebar height',
