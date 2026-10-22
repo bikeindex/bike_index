@@ -190,6 +190,18 @@ RSpec.describe UI::Table::Component, type: :component do
     end
   end
 
+  context "with orderable" do
+    it "gives each hideable column's header a drag handle for ui--table-column-order" do
+      result = render_inline(described_class.new(records:, orderable: true)) do |table|
+        table.column(label: "Name") { |r| r.name }
+        table.column(label: "Email", classes: "hideableColumn email_cell") { |r| r.email }
+      end
+
+      expect(result).to have_css("th.email_cell [data-ui--table-column-order-target='handle']")
+      expect(result).to have_css("[data-ui--table-column-order-target='handle']", count: 1)
+    end
+  end
+
   context "with unbordered" do
     it "removes border-r and border-t classes from th and td" do
       result = render_inline(described_class.new(records:, unbordered: true)) do |table|

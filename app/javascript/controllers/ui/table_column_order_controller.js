@@ -4,26 +4,31 @@ import { storedArray } from 'utils/stored_array'
 /* global localStorage */
 
 // Connects to data-controller='ui--table-column-order'
-// Drag a th.hideableColumn onto another to move its column. A column is named by its *_cell
-// class, as ui--table-column-settings names it. The hideable columns follow the fixed ones, so a
-// row's are reordered by appending them.
+// Drag a th.hideableColumn by its UI::DragHandle onto another to move its column. A column is
+// named by its *_cell class, as ui--table-column-settings names it. The hideable columns follow
+// the fixed ones, so a row's are reordered by appending them.
 export default class extends Controller {
+  static targets = ['handle']
   static values = { storageKey: String }
 
   connect () {
-    this.headers.forEach(th => {
-      th.draggable = true
-      th.style.cursor = 'grab'
-    })
     this.applyOrder(storedArray(this.storageKeyValue))
   }
 
+  // Pressed inside a selection of the header's text, a drag would carry the text instead
+  handleTargetConnected (handle) {
+    handle.draggable = true
+    handle.addEventListener('mousedown', () => window.getSelection().removeAllRanges())
+  }
+
+  // Only from a handle, so dragging a header's sort link doesn't move its column
   dragStart (event) {
+    if (!this.handleTargets.includes(event.target)) return
     const th = this.header(event)
-    if (!th) return
     this.dragged = this.cellName(th)
     event.dataTransfer.effectAllowed = 'move'
     event.dataTransfer.setData('text/plain', this.dragged)
+    event.dataTransfer.setDragImage(th, 0, 0)
   }
 
   dragOver (event) {

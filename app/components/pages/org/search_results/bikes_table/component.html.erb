@@ -2,7 +2,7 @@
 <%# so instance variables resolve to nil inside them — closures capture these. %>
 <% organization = @organization %>
 
-<%= render(UI::CardTable::Component.new(data: table_wrapper_data_attributes, records: @bikes, cache_key: [@organization, self.class.cache_digest], render_sortable: @render_sortable, sort_state: @sort_state)) do |table| %>
+<%= render(UI::CardTable::Component.new(data: table_wrapper_data_attributes, records: @bikes, cache_key: [@organization, self.class.cache_digest], render_sortable: @render_sortable, sort_state: @sort_state, orderable: @orderable)) do |table| %>
   <%# Called per cell rather than captured: each tooltip mints its own id %>
   <% hidden_html = method(:hidden_not_registered_tag) %>
   <% email_hidden = translation(".email_hidden") %>

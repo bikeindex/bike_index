@@ -7,7 +7,8 @@ module Pages
         # The organization registrations table: bike rows with every org column.
         # Extracted from Pages::Org::Search::Wrapper so it can render on its own, without
         # the search form, column settings, or pagination (e.g. a user's other
-        # registrations on the show page). Pass render_sortable to enable sort links.
+        # registrations on the show page). Pass render_sortable to enable sort links, and orderable
+        # inside a ui--table-column-order.
         class Component < ApplicationComponent
           # The organization's registration fields that follow a column, in order. The rest come
           # after the columns every organization has
@@ -16,11 +17,12 @@ module Pages
             serial_number: %w[reg_extra_registration_number]
           }.freeze
 
-          def initialize(organization:, bikes:, render_sortable: false,
+          def initialize(organization:, bikes:, render_sortable: false, orderable: false,
             sort_state: ComponentStructs::SortState.new, bike_sticker: nil, settings: nil)
             @organization = organization
             @bikes = bikes
             @render_sortable = render_sortable
+            @orderable = orderable
             @sort_state = sort_state
             @bike_sticker = bike_sticker
             @settings = settings

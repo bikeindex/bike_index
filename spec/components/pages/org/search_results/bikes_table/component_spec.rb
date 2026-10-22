@@ -26,6 +26,17 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
     expect(component.css("th").first["class"]).to include("tw:sticky")
     expect(component).to have_css("th:nth-child(2).photo_cell", text: "Photo")
     expect(component).to have_css("tbody td.color_cell", text: bike.primary_frame_color.name)
+    # Not orderable unless a caller wraps it in ui--table-column-order
+    expect(component).not_to have_css("[data-ui--table-column-order-target='handle']")
+  end
+
+  context "with orderable" do
+    let(:options) { {organization:, bikes:, orderable: true} }
+
+    it "gives each hideable column a drag handle, and View none" do
+      expect(component.css("th.hideableColumn").map { it.css("[data-ui--table-column-order-target='handle']").count }.uniq).to eq [1]
+      expect(component.css("th").first.css("[data-ui--table-column-order-target='handle']")).to be_empty
+    end
   end
 
   context "with a pedal bike and an e-bike" do
