@@ -3789,41 +3789,6 @@ nb:
       use_ascend: Bruk Ascend?
       use_lightspeed_retail: Bruker du Lightspeed Retail?
       used_at_bike_shops_everywhere: Brukes i sykkelbutikker overalt
-    for_cities:
-      actually_get_people_registered_and_do_it_: Faktisk få folk registrert. Og gjør
-        det billig.
-      bike_index_for_cities: Sykkelindeks for byer
-      bike_index_is_the_community_registration_: Bike Index er det foretrukne registreringssystemet
-        for lokalsamfunn. Vi er sykkelregistreringssystemet for %{organization_counts}
-        organisasjoner - lokalsamfunn i alle verdenshjørner. Bli med i det mest brukte
-        sykkelregistreringsnettverket i verden.
-      bike_index_new_dashboard: Nytt dashbord for sykkelindeks som er nyttig for å
-        bekjempe sykkelkriminalitet
-      bike_index_organization_impounding: Beslaglegge sykler med Bike Index
-      bike_index_unveils_partnership_with_the_c: Bike Index avduker partnerskap med
-        byen Palo Alto
-      bring_together_bike_shops_schools_municip: Samle sykkelbutikker, skoler, kommunale
-        avdelinger og rettshåndhevelse for å registrere sykler i ett system. Borte
-        er tiden med å vente på at folk ikke kommer inn for å registrere syklene sine,
-        eller lurer på om den andre avdelingen tok seg av det. Bike Index samler alt
-        på ett håndterlig sted.
-      check_out: Sjekk ut vår
-      cities_deck: byers partnerdekk
-      embed_a_bike_index_registration_form: Legg inn et sykkelregistreringsskjema
-        på nettstedet ditt
-      engage_your_residents_and_recover_their_b: Engasjer beboerne dine og finn syklene
-        deres, og de vil elske deg for alltid.
-      mitigate_the_registration_mess: Redusere registreringsrotet
-      no_more_index_cards_or_excel_sheets_give_: Ingen flere kartotekkort eller excelark.
-        Gi innbyggerne verktøyene til å registrere seg fra en smarttelefon på mindre
-        enn to minutter, og bruk disse registreringene til å gjenopprette og returnere
-        stjålne sykler.
-      our_community_is_your_community: Vårt fellesskap er ditt fellesskap
-      plug_your_city_in_nationally: Koble byen til nasjonalt.
-      related_articles: 'Relaterte artikler:'
-      trusted_by_municipalities_everywhere: Betrodd av kommuner overalt
-      used_by_municipalities_everywhere: Brukes av kommuner overalt
-      schedule_a_demo: Planlegg en demonstrasjon
     for_community_groups:
       bike_index_for_community_groups: Sykkelindeks for fellesskapsgrupper
       bike_index_launches_new_ambassadors_progr: Bike Index lanserer nytt Ambassadors-program
@@ -6444,6 +6409,8 @@ nb:
             electric_detected: "⚡️ Elektrisk (motorisert) oppdaget"
             have_questions: Har du spørsmål om disse retningslinjene?
             read_the_faq: Vanlige spørsmål om bekreftelse av elbiler
+            bike_index: Sykkelindeks
+            set_by: Sett av %{name}
           review_summary:
             a_quick_review: En rask gjennomgang av alt du har bekreftet.
             a_quick_review_tap: En rask gjennomgang av alt du har bekreftet. Trykk
@@ -7297,6 +7264,351 @@ nb:
           uses_partners_title: Partnere og etterforskninger
           uses_title: Hvor pengene går
           wall_photo_alt: En sykkel funnet gjennom Bike Index
+      landing_pages:
+        demo_modal:
+          field_message: Noe annet vi burde vite?
+          field_name: Navnet ditt
+          field_role: Din rolle
+          phone_hint: Et telefonnummer, med sifrene
+          request_name: forespørsel
+          submit_text: La oss prate
+          title: Kontakt oss for en gratis prøveperiode
+        for_cities:
+          answer_no: Nei
+          answer_yes: Ja
+          back_to_cities: Tilbake til sykkelindeksen for byer
+          call_body: Fortell oss litt om byen din, så tar vi kontakt for å finne et
+            tidspunkt for en prat.
+          call_heading: Bestill en introduksjonssamtale
+          cape_logo_alt: Bike Index-skjold med kappe
+          checker_choose_state: Velg en stat
+          checker_eyebrow: Samsvarskontroll for elsykkel
+          checker_form_heading: Sjekk en elsykkel
+          checker_heading: Kjenn reglene for elsykkel.
+          checker_intro: Et gratis offentlig verktøy fra Bike Index. Syklister velger
+            stat og sykkel og ser, på under 30 sekunder, om det er lovlig å sykle,
+            hvilket sertifikat den har og hvilke regler som gjelder. Svaret leder
+            rett til registrering.
+          checker_point_bikebook: Klasse, motor, toppfart og UL-sertifisering fra
+            BikeBooks katalog over elsykkelmodeller
+          checker_point_program: Inne i programmet ditt ser personalet klassen og
+            samsvarsstatusen til hver registrerte elsykkel
+          checker_point_states: Statlige regler om klasser, motorkapsler, toppfart
+            og gassregulering, med lovhenvisninger
+          checker_speed_20: 20 mph
+          checker_speed_28: 45 km/t
+          checker_speed_over_28: Over 45 km/t
+          checker_state: Stat
+          checker_submit: Sjekk reglene
+          checker_throttle: Gasspedal
+          checker_top_speed: Topp assistert hastighet
+          child_housing_name: Maple Court Apartments
+          child_housing_note: Regler for lading og lagring
+          child_neighborhood_name: Riverside nabolagsprogram
+          child_neighborhood_note: "+2 lokale regler"
+          child_school_name: Westbrook ungdomsskole
+          child_school_note: Strengere kjøreregler + campusregler
+          community_watch_lead: En samfunnsvakt også.
+          community_watch_users_body: Bike Index-brukere følger med på Craigslist,
+            Facebook Marketplace og OfferUp for å finne stjålne sykler. Syklerobservatører
+            kan nå eiere uten at noen av sidenes kontaktinformasjon deles.
+          contact_heading: Snakk med oss om byen din.
+          contact_intro: Ethvert partnerskap starter med en kort introduksjonssamtale.
+            Fortell oss hva byen din jobber med, så viser vi deg hvordan Bike Index
+            passer inn.
+          contact_next_plan: Tydelige neste steg for å få byen din satt opp
+          contact_next_priorities: En samtale om byens prioriteringer, enten det er
+            elsykler, gjenfinning av stjålne sykler eller registrering
+          contact_next_walkthrough: En gjennomgang av hvordan Bike Index ville fungere
+            for byen din og dens programmer
+          education_eyebrow: Elsykkelopplæring
+          education_heading: Rytterne lærer reglene som gjelder for dem.
+          education_intro: 'Når noen registrerer en elsykkel, veileder Bike Index
+            dem gjennom en kort opplæringsprosess før registreringen bekreftes: batterier
+            og lading, syklepraksis, dine egne regler og et signert samtykke. Målet
+            er reell forståelse, ikke en avkrysningsboks. Velg en organisasjon for
+            å se hvordan prosessen endrer seg.'
+          faq_account_answer: Byen er mororganisasjonen. Skoler, leilighetskomplekser
+            og andre programmer kan være underkontoer med eget personale og utdanningsinnhold.
+            Ansatte på hvert nivå administrerer kun sine egne regler.
+          faq_account_question: Hvem administrerer kontoen?
+          faq_checker_answer: Sykkeldetaljer kommer fra BikeBook, en katalog over
+            elsykkelmodeller med klasse, motor, hastighet og UL-sertifisering. Statlige
+            regler er oppført med forskriftene bak dem.
+          faq_checker_question: Hvor får samsvarskontrolløren dataene sine fra?
+          faq_cost_answer: Det er ingen gebyrer per registrering, og registreringen
+            er gratis for innbyggere. Vi vil gå gjennom prisene for byen din under
+            en introduksjonssamtale.
+          faq_cost_question: Hva koster det?
+          faq_heading: Spørsmål
+          faq_import_answer: Nei. Eksisterende registreringer kan importeres fra et
+            regneark.
+          faq_import_question: Vi har allerede registreringsdata. Skal vi begynne
+            på nytt?
+          faq_police_answer: Betjenter og byansatte kan dele autorisert tilgang til
+            samme administrasjonspanel, søke etter hvilken som helst sykkel etter
+            serienummer og bruke hotsheet-arket for stjålne sykler for sitt område.
+          faq_police_question: Hvordan bruker politiet det?
+          faq_regular_answer: Ja. Alle sykler kan registreres. Elsykkelopplæringstrinnene
+            vises bare når en syklist registrerer en elsykkel.
+          faq_regular_question: Fungerer det for vanlige sykler også?
+          faq_rules_answer: Ja, som en bypartner. Start fra standardflyten i Bike
+            Index eller fra et blankt ark. Byens ansatte redigerer språket i administrasjonspanelet
+            uten behov for teknisk hjelp.
+          faq_rules_question: Kan vi skrive våre egne elsykkelregler?
+          field_attestations_body: Hver attestasjon lagres med regelen som gjaldt
+            da rytteren registrerte seg, slik at du har en varig, reviderbar oversikt.
+          field_attestations_title: Lagrede attester
+          field_battery_body: Finn ut hvilke sykler i byen din som har UL 2849- eller
+            UL 2271-sertifiserte batterier, og bruk dataene til å forme retningslinjer
+            og kontakt med andre.
+          field_battery_title: Batterisertifiseringsrevisjoner
+          field_eyebrow: Elsykkelhåndtering i felten
+          field_heading: Koble hvilken som helst sykkel på gaten til historikken sin.
+          field_intro: Opplæring betyr bare noe hvis de ansatte kan sjekke det. Parkeringshåndhevelse,
+            sikkerhetsteam i lokalsamfunnet og administratorer kan slå opp hvilken
+            som helst sykkel og se hva syklisten har samtykket til.
+          field_organization: By eller organisasjon
+          field_qr_body: Skann klistremerket til en sykkel med en hvilken som helst
+            telefon for å se registreringen, inkludert om og når syklisten fullførte
+            opplæringsprosessen.
+          field_qr_title: QR-kodeskanning
+          field_serial_body: Søk etter serienummer fra nettstedet eller administrasjonspanelet
+            for samme registrerings- og attestasjonspost.
+          field_serial_title: Oppslag av serienummer
+          heading_educate: Registrer alle sykler i byen din. Lær elsykkelsyklister
+            om byens regler.
+          hero_image_alt: En sykkel i en superheltkappe
+          hierarchy_city_body: Lokale forskrifter, aldersgrenser, hjelmregler og hvor
+            elsykler kan brukes. Alle syklister i byen ser dem.
+          hierarchy_city_title: Byen setter grunnlinjen
+          hierarchy_dashboard_body: Byansatte ser registreringer på tvers av alle
+            programmene. Ansatte ved hvert program administrerer kun sine egne regler
+            og tilleggsregler.
+          hierarchy_dashboard_title: Ett dashbord for alle
+          hierarchy_eyebrow: Ny · Elsykkelhåndtering
+          hierarchy_heading: Byen din setter grunnlinjen. Hvert program legger til
+            sitt eget.
+          hierarchy_intro: Regler for elsykler varierer etter kontekst. En ungdomsskole
+            kan være strengere enn byen, og et leilighetskompleks kan ha sine egne
+            lade- og lagringsregler. Bike Index setter opp byen din som overordnet
+            organisasjon, med hvert program som en underordnet konto. Byens regler
+            gjelder overalt, og hvert program legger til sine egne.
+          hierarchy_programs_body: En skole, et leilighetskompleks eller et nabolagsprogram
+            kan omskrive ethvert trinn eller legge til sitt eget, med sine egne ord.
+          hierarchy_programs_title: Programmer legger til sine egne
+          hot_sheet_body: En utskrivbar liste over stjålne sykler i ditt område med
+            eiernes telefonnumre, oppdatert i sanntid for politiet ditt.
+          hot_sheet_title: Stjålet Bike Hot Sheet
+          mock_batteries: Batterier og lading
+          mock_bike_info: Sykkelinformasjon
+          mock_continue: Fortsette
+          mock_detected: Elektrisk (motorisert) oppdaget
+          mock_electric: Elektrisk (motorisert)
+          mock_electric_help: Sjekk elektriske slik at vi flagger elsykler og verifiserer
+            sertifisering.
+          mock_manufacturer: Produsent
+          mock_next: Neste
+          mock_progress: Fremdrift lagret · Bekreftelse av elbil · Trinn 1 av 4
+          mock_rule_certified: Jeg vil kun bruke batterier som er sertifisert i henhold
+            til UL 2849 / UL 2271 (eller tilsvarende).
+          mock_rule_charger: Jeg lader kun med produsentens lader, aldri uten tilsyn
+            eller i en gang eller utgangsvei.
+          mock_rule_report: Jeg vil slutte å bruke det og rapportere eventuelle skadede,
+            hovne eller overopphetede batterier.
+          mock_sub: Westbrook har noen sikkerhetsregler du må gjennomgå før du kan
+            fullføre registreringen.
+          mock_title: Ser ut som du har et elbil!
+          mock_traditional_bike: Tradisjonell sykkel
+          mock_traditional_bike_note: "(2 hjul, 1 sete, pedaler)"
+          mock_vehicle_type: Bil type
+          nav_checker: Statskontrollør
+          nav_education: Regler for elsykkel
+          nav_faq: Vanlige spørsmål
+          nav_label: Sykkelindeks for byer
+          nav_recovery: Bedring
+          nav_registration: Registrering
+          new: Ny
+          open_the_checker: Åpne hele kontrolløren
+          parent_name: Byen Westbrook
+          parent_note: Batteri, kjøring og byregler
+          parent_organization: Foreldreorganisasjon
+          partnership_data_body: Byen eier sine data og kan eksportere dem når som
+            helst.
+          partnership_data_title: Dine data forblir dine
+          partnership_eyebrow: Samarbeid
+          partnership_fees_body: Gratis for beboere å registrere seg.
+          partnership_fees_title: Ingen gebyrer per registrering
+          partnership_heading: Din ideelle partner
+          partnership_intro: Bike Index har vært verdens mest brukte sykkelregister
+            siden 2013. Bypartnerskap trenger ingen dedikert IT-personell, og de fleste
+            kjører innen få dager etter oppsett.
+          partnership_support_body: Vi konfigurerer din merkevareorganisasjon og opplæringsflyt,
+            opplærer dine ansatte og vedlikeholder plattformen.
+          partnership_support_title: Oppsett, opplæring og støtte
+          program_education_body: Elsykkelsyklister tas med i opplæringsprosessen
+            din som en del av registreringen. Ansatte kan se hvilken som helst sykkels
+            klasse, batterisertifisering og signert attestasjon.
+          program_education_link: Se utdanningsflyten
+          program_education_title: Elsykkelopplæring
+          program_eyebrow: Hva programmet ditt dekker
+          program_heading: Det starter med registrering.
+          program_intro: 'Registrering og gjenfinning av stjålne sykler har vært kjernen
+            i Bike Index siden 2013. Elsykkelopplæring er det nye laget på toppen:
+            Når en syklist registrerer en elsykkel, lærer de reglene dine før registreringen
+            er fullført.'
+          program_recovery_body: En registrert sykkel kan bli funnet igjen. Politimyndigheter,
+            pluss butikker og frivillige søker i registeret.
+          program_recovery_link: Hvordan restitusjon fungerer
+          program_recovery_title: Gjenfinning av stjålet sykkel
+          program_registration_body: Hver sykkel får en registrering med serienummer,
+            bilder og eier. Registreringer fra butikker, skoler, kommunale etater
+            og samfunnsprogrammer havner i ett søkbart register.
+          program_registration_link: Slik fungerer registreringen
+          program_registration_title: Registrering
+          recovery_eyebrow: Politi og gjenfinning av stjålne sykler
+          recovery_heading: Når en sykkel blir stjålet, får hele nettverket vite det.
+          recovery_intro: Gjenfinning av stjålne sykler er Bike Index' grunnleggende
+            mål. Mer enn 100 politimyndigheter bruker Bike Index direkte, og sykkelbutikker,
+            pantelånere og videresalgsplattformer kan sjekke et serienummer før et
+            salg går gjennom.
+          recovery_step_1_body: Statusen endres umiddelbart og vises for alle som
+            søker etter den serien.
+          recovery_step_1_title: Eieren rapporterer den som STJÅLET
+          recovery_step_2_body: Ved en trafikkontroll, et besøk i en pantelånerbutikk
+            eller en sjekk av bilen, finner de opp merke, modell, farge, bilde, eierkontakt
+            og statushistorikk.
+          recovery_step_2_title: Betjenter sjekker i felten
+          recovery_step_3_body: Når en serienummer samsvarer, kontakter betjentene
+            eieren direkte, uten lang behandlingstid i eiendomsrommet.
+          recovery_step_3_title: Sykkelen går hjem
+          registration_eyebrow: Registrering
+          registration_heading: Alle sykler i byen din, i ett søkbart register.
+          registration_import_body: Importer dem fra et regneark. Ansatte kan også
+            legge til sykler manuelt og sende meldinger til eiere etter registreringsdato,
+            sykkeltype eller status for elbil.
+          registration_import_lead: Har du allerede registreringer?
+          registration_intro: Registreringer fra sykkelbutikker, skoler, byavdelinger
+            og samfunnsprogrammer havner på ett sted som innbyggere, byansatte og
+            politi bruker. Det fungerer for alle sykler, ikke bare elsykler.
+          registration_step_1_body: Under to minutter fra hvilken som helst telefon,
+            via en bymerket landingsside, et skjema på nettstedet ditt eller et QR-klistremerke.
+          registration_step_1_title: Beboerregistrering
+          registration_step_2_body: BikeBook identifiserer modellen og klassen, og
+            syklisten fullfører opplæringsprosessen. Vanlige sykler hopper over den.
+          registration_step_2_title: Elsykler blir klassifisert
+          registration_step_3_body: Status (registrert, stjålet eller gjenfunnet),
+            merke, modell, farge og serienummer. Offiserer og ansatte finner det opp
+            etter serienummer.
+          registration_step_3_title: Hver sykkel får en side
+          registration_step_4_body: Registreringsvolum, elsykkeldeling og aktivitet
+            på tvers av programmer, pluss rapporter om gjenoppretting og batterirevisjoner
+            for byens ledelse.
+          registration_step_4_title: Du ser det på dashbordet
+          role_city_staff: Byens ansatte
+          role_elected: Valgt tjenestemann
+          role_housing: Bolig- eller samfunnsprogram
+          role_law_enforcement: Rettshåndhevelse
+          role_other: Annen
+          role_school: Skole eller distrikt
+          schedule_a_demo: Planlegg en demonstrasjon
+          sent_body: Vi tar kontakt med deg via e-post for å avtale en oppfølgingssamtale.
+          sent_heading: Takk. Vi tar kontakt snart.
+          stat_agencies: rettshåndhevelsesbyråer
+          stat_agencies_count: 100+
+          stat_bikes: registrerte sykler
+          stat_organizations: partnerorganisasjoner
+          stat_recovered: i stjålne sykler gjenfunnet
+          stolen_banner_body: Alle som slår opp serienummeret ser at den er stjålet,
+            og hvordan de kan nå eieren.
+          stolen_banner_title: Stjålet
+          subheading: Bike Index er det ideelle registeret som politiet og sykkelbutikker
+            allerede søker etter for å finne stjålne sykler. Sykler starter med å
+            registrere sykkelen sin. Hvis det er en elsykkel, går de rett inn i en
+            kort opplæringsprosess med byens regler.
+          submit_demo: Be om en demonstrasjon
+        for_cities_education:
+          all_set: Du er klar.
+          back: Tilbake
+          battery_category: Batterier og lading
+          battery_rule_charger: Jeg lader kun med en produsentgodkjent lader.
+          battery_rule_flammable: Jeg vil holde batteriet mitt unna brennbare materialer.
+          battery_rule_unattended: Jeg kommer aldri til å la batteriet mitt lade uten
+            tilsyn.
+          battery_title: Ser ut som du har en elsykkel!
+          city_battery_sub: Westbrook har noen elsykkelregler du må gå gjennom før
+            du fullfører registreringen.
+          city_blurb: Alle ryttere i Westbrook ser byens batteri-, sykkel- og lokale
+            regler, enten de registrerer seg på egenhånd eller gjennom et program.
+          city_name: Byen Westbrook
+          city_riding_rule_helmet: Jeg bruker hjelm når jeg sykler hvis jeg er under
+            18 år.
+          city_riding_rule_lanes: Jeg vil sykle i sykkelfelt der det finnes, og holde
+            meg under 24 km/t på delte stier.
+          city_riding_rule_sidewalks: Jeg vil ikke sykle på fortauene i sentrums forretningsstrøket.
+          city_riding_sub: Westbrook har regler for hjelmer, kjørefelt, fart og fortau.
+          city_rule_class_3: Jeg vil bare sykle på en elsykkel i klasse 3 hvis jeg
+            er 16 år eller eldre, og ikke på Riverside Trail.
+          city_rule_classes: Jeg vet hvor jeg finner Westbrooks gratis sikkerhetskurs
+            for elsykler.
+          city_rule_parking: Jeg parkerer kun ved offentlige sykkelstativer, og blokkerer
+            aldri fortau, ramper eller døråpninger.
+          city_rules_category: Byens regler
+          city_rules_sub: Klassebaserte regler og lokale ressurser.
+          city_rules_title: Hvor elsykler kan sykle i Westbrook
+          complete_registration: Fullfør registreringen
+          consent_category: Endelig gjennomgang og samtykke
+          continue: Fortsette
+          done_message:
+            one: Du bekreftet %{count}-regelen for %{name}. Din signerte attestasjon
+              er lagret i sykkelens registreringsnummer.
+            other: Du bekreftet alle %{count}-regler for %{name}. Din signerte bekreftelse
+              er lagret i sykkelens registreringsnummer.
+          housing_building_blurb: Beboerne ser byens regler, deretter bygningsadministrasjonens
+            egne regler for lagring og parkering ved de to bygningene.
+          housing_name: Maple Court Apartments
+          housing_rule_sticker: Jeg vil oppbevare registreringsklistremerket mitt
+            synlig slik at personalet kan bekrefte sykkelen min.
+          housing_rule_storage: Jeg oppbevarer elsykkelen min i sykkelrommet, aldri
+            i delte ganger eller utgangsveier.
+          housing_rules_category: Byggeregler
+          housing_rules_sub: Hvor du kan oppbevare elsykkelen din hjemme.
+          housing_rules_title: Oppbevaring og parkering
+          housing_tab: Lønnretten
+          registered: Registrert
+          riding_category: Rideøvelser
+          riverside_blurb: Naboene ser byens regler, deretter programmets egne regler
+            for samfunnshuset.
+          riverside_name: Riverside nabolagsprogram
+          riverside_rule_charging: Jeg kommer ikke til å lade elsykkelen min inne
+            i samfunnshuset.
+          riverside_rule_parking: Jeg parkerer kun ved de merkede elsykkelstativene
+            på samfunnshuset, aldri på stien langs demningen eller inntil trær.
+          riverside_rules_category: Naboregler
+          riverside_tab: Elvebredden
+          rule_count:
+            one: "%{count}-regel"
+            other: "%{count} regler"
+          school_campus_blurb: Elevene ser byens regler, deretter ungdomsskolens egne
+            retningslinjer for sykling til campus.
+          school_name: Westbrook ungdomsskole
+          school_rule_class_1: Jeg kommer kun til å sykle med elsykkel i klasse 1
+            til skolen.
+          school_rule_guardian: Jeg har gjennomgått disse reglene med en forelder
+            eller verge.
+          school_rule_traffic: Jeg vil følge trafikkreglene og gi vikeplikt for fotgjengere
+            og kryssingsvakter.
+          school_rule_walk: Jeg går sykkelen min fra hovedporten til stativene.
+          school_rules_category: Skoleregler
+          school_rules_sub: Skolen din har noen flere regler for å sykle til campus.
+          school_rules_title: Retningslinjer for Westbrook Middle campus
+          school_tab: Westbrook Middle
+          staff_edit: Dine ansatte redigerer hvert trinn i administrasjonspanelet,
+            uten behov for teknisk hjelp. Hver signerte attestasjon lagres med de
+            nøyaktige reglene som gjelder den dagen.
+          start_over: Start på nytt
+          tabs_label: Eksempelorganisasjoner
+          viewing_as: Viser som
     shared_blocks:
       footer:
         about: Om
