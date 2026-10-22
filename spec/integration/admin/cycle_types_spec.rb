@@ -44,8 +44,11 @@ RSpec.describe "Admin cycle types", :js, type: :system do
       typical = first("[data-controller='admin--cycle-drawing']")
       within(typical) do
         expect(page).to have_button("Reset", disabled: true)
-        fill_in "Stack", with: "700"
-        expect(page).to have_field("Stack", with: "700")
+        fill_in "Stack", with: "700.5"
+        expect(page).to have_field("Stack", with: "700.5")
+        # a cleared figure stays clear to type into, drawn as the size lists it meanwhile
+        fill_in "Stack", with: ""
+        expect(page).to have_field("Stack", with: "", placeholder: "570")
         click_button "Reset"
         expect(page).to have_field("Stack", with: "570")
         expect(page).to have_button("Reset", disabled: true)

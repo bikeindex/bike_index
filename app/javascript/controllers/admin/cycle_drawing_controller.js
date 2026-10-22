@@ -1,5 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
-import { html, nothing, render } from 'lit-html'
+import { html, noChange, nothing, render } from 'lit-html'
+import { Directive, directive } from 'lit-html/directive.js'
 import { loadCatalog } from 'bikebook/catalog'
 import { withFigures } from 'bikebook/cycle_drawings'
 import { toQuery } from 'bikebook/query'
@@ -13,6 +14,19 @@ const catalogAt = (manifestUrl) => catalogs.get(manifestUrl) ?? catalogs.set(man
 
 // Its Sizes & geometry view, with the size drawn here picked
 const geometryPath = (id, size) => `/bikebook?${toQuery({ vehicle_models: id, view: 'geometry', vehicle_sizes: size?.name })}`
+
+// An input's value, set only where it reads otherwise: a half-typed "700." or "-" reads as 700 or '', which writing
+// back would lose
+const inputValue = directive(class extends Directive {
+  render () {
+    return noChange
+  }
+
+  update ({ element }, [value]) {
+    if (element.value !== value) element.value = value
+    return noChange
+  }
+})
 
 // Connects to data-controller='admin--cycle-drawing'
 // Draws a vehicle type, or a type_detail of it, in a catalog model's size where it's given one, redrawn as a figure's input changes
@@ -32,10 +46,10 @@ export default class extends Controller {
       : render(html`<p class="tw:text-gray-500"><code>${this.modelValue}</code> isn't in the published catalog yet</p>`, this.element)
   }
 
-  // a cleared figure goes back to what the size lists
+  // each figure as typed, which its input shows rather than the legend's rounding of it, a cleared one drawn as the size
+  // lists it
   edit ({ target }) {
-    const { [target.name]: _, ...rest } = this.figures
-    this.figures = target.value === '' ? rest : { ...rest, [target.name]: Number(target.value) }
+    this.figures = { ...this.figures, [target.name]: target.value }
     this.draw()
   }
 
@@ -52,8 +66,9 @@ export default class extends Controller {
 
   draw () {
     const { id, data, size } = this.vehicle
+    const figures = Object.fromEntries(Object.entries(this.figures).filter(([, value]) => value !== '').map(([key, value]) => [key, Number(value)]))
     const { figure, legend } = cycleDrawing({
-      type: this.typeValue, typeDetail: this.typeDetailValue || undefined, data, size: withFigures(size, this.figures), kit: this.kit, highlight: this.highlight
+      type: this.typeValue, typeDetail: this.typeDetailValue || undefined, data, size: withFigures(size, figures), kit: this.kit, highlight: this.highlight
     })
     const extras = legend.filter(({ extra }) => extra)
     // the model's line held open when there's none, so a typical drawing lines up with its example's
@@ -85,7 +100,7 @@ export default class extends Controller {
       class="tw:grow">${label}</label>${!editable
       ? html`<span class="tw:font-mono">${value} ${unit}</span>`
       : html`<input type="number" step="any" name=${key} id=${`${idPrefix}-${key}`} autocomplete="off"
-        class="twinput tw:w-20! tw:py-0.5! tw:text-right tw:text-xs!" .value=${String(value)} @input=${(event) => this.edit(event)}><span
+        class="twinput tw:w-20! tw:py-0.5! tw:text-right tw:text-xs!" ${inputValue(this.figures[key] ?? String(value))} placeholder=${String(value)} @input=${(event) => this.edit(event)}><span
         class="tw:w-6">${unit}</span>`}</li>`
   })}</ol>`
   }
