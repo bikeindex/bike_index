@@ -37,13 +37,14 @@ module Admin
         bikes = Bike.unscoped.where(id: bike_ids)
       else
         @duplicate_group = DuplicateBikeGroup.find(params[:id])
-        bikes = @duplicate_group.bikes
+        # Admins review every record in the group, including hidden and deleted ones
+        bikes = @duplicate_group.bikes.unscope(where: %i[example user_hidden deleted_at likely_spam])
       end
 
       # Summaries cover every record, so the whole group loads; the largest whole-serial group is a few hundred
       all_bikes = bikes.default_includes.includes(:manufacturer, :creation_organization, :marketplace_listings,
         :bike_organizations, :bike_stickers, :public_images, ownerships: :organization).reorder(:created_at, :id).to_a
-      raise ActiveRecord::RecordNotFound if bike_ids && all_bikes.size != bike_ids.size
+      raise ActiveRecord::RecordNotFound if all_bikes.empty? || bike_ids && all_bikes.size != bike_ids.size
       @bikes_count = all_bikes.size
       @reference_bike = if params[:reference_bike_id].present?
         all_bikes.find { it.id == params[:reference_bike_id].to_i } || raise(ActiveRecord::RecordNotFound)
