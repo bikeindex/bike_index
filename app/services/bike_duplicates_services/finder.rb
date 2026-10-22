@@ -34,8 +34,7 @@ module BikeDuplicatesServices
       json = RedisPool.conn { it.get(SNAPSHOT_KEY) }
       return parse_snapshot(json) if json
 
-      claimed = RedisPool.conn { it.set(PREPARING_KEY, Time.current.to_i, nx: true, ex: PREPARING_TTL.to_i) }
-      BikeJobs::PrepareDuplicateReviewJob.perform_async if claimed
+      enqueue_group_snapshot
       nil
     end
 
@@ -192,6 +191,16 @@ module BikeDuplicatesServices
     # A customer registering their own bike: the website, a shop's embed form or a sticker
     def customer_origins = Ownership::ORIGIN_WEBSITE_REG + %w[embed embed_extended embed_partial]
 
+    def enqueue_group_snapshot
+      return unless RedisPool.conn { it.set(PREPARING_KEY, Time.current.to_i, nx: true, ex: PREPARING_TTL.to_i) }
+
+      BikeJobs::PrepareDuplicateReviewJob.perform_async
+    rescue
+      # Release the claim, so the next visit enqueues again rather than waiting out PREPARING_TTL
+      RedisPool.conn { it.del(PREPARING_KEY) }
+      raise
+    end
+
     def enum_sql(enum, *keys) = enum.values_at(*keys.map(&:to_sym)).join(", ")
 
     def parse_snapshot(json)
@@ -203,6 +212,6 @@ module BikeDuplicatesServices
       {generated_at: Time.zone.parse(snapshot["generated_at"]), groups:}
     end
 
-    conceal :customer_origins, :enum_sql, :parse_snapshot, :stolen_serial_bikes, :query, :test_bikes_sql
+    conceal :customer_origins, :enqueue_group_snapshot, :enum_sql, :parse_snapshot, :stolen_serial_bikes, :query, :test_bikes_sql
   end
 end

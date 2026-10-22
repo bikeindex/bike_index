@@ -38,6 +38,13 @@ RSpec.describe Admin::DuplicateBikesController, type: :request do
       expect(assigns(:groups).map { it["record_count"] }).to eq [11]
     end
 
+    it "tries again on the next visit when the job can't be enqueued" do
+      RedisPool.conn { it.del(finder::SNAPSHOT_KEY) }
+      allow(BikeJobs::PrepareDuplicateReviewJob).to receive(:perform_async).and_raise(RedisClient::CannotConnectError)
+      expect { finder.fetch_group_snapshot }.to raise_error(RedisClient::CannotConnectError)
+      expect(RedisPool.conn { it.get(finder::PREPARING_KEY) }).to be_nil
+    end
+
     it "shows tentative cues and narrows by them reversibly" do
       get base_url, params: {search_kind: "large_group"}
       expect(response.code).to eq "200"
@@ -92,9 +99,10 @@ RSpec.describe Admin::DuplicateBikesController, type: :request do
   end
 
   describe "show" do
-    it "reviews a serial-segment group and offers to ignore it" do
+    it "reviews every record in a serial-segment group, hidden ones included, and offers to ignore it" do
       duplicate_group = DuplicateBikeGroup.create
       pair.each { NormalizedSerialSegment.create(bike: it, duplicate_bike_group: duplicate_group, segment: "WTU123456") }
+      pair.last.update_column(:user_hidden, true)
       get "#{base_url}/#{duplicate_group.id}"
       expect(response.code).to eq "200"
       expect(assigns(:bikes_count)).to eq 2
