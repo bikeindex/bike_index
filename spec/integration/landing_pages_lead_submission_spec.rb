@@ -113,11 +113,11 @@ RSpec.describe "Landing page demo modals", :js, type: :system do
       end
 
       # The tab and step are in the URL, so a reload comes back to them
-      click_button "Housing Authority"
+      click_button "Maple Court"
       within("#tab-housing") { find_button(text: "Building rules").click }
       expect(page).to have_current_path(/education=housing/).and have_current_path(/education_step=4/)
       page.refresh
-      expect(page).to have_css("[role=tab][aria-selected=true]", text: "Housing Authority")
+      expect(page).to have_css("[role=tab][aria-selected=true]", text: "Maple Court")
       within("#tab-housing") { expect(page).to have_content("Storage and parking") }
       # Another tab opens on the same step - the city's fourth is its review
       click_button "City of Westbrook"

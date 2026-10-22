@@ -46,9 +46,9 @@ en:
               You confirmed all %{count} rules for %{name}. Your signed attestation
               is saved to your bike's registration.
           housing_building_blurb: >-
-            Residents see the city's rules, then the housing authority's own rules
-            for storing and parking in its buildings.
-          housing_name: Westbrook Housing Authority
+            Residents see the city's rules, then building management's own rules for
+            storing and parking at its two buildings.
+          housing_name: Maple Court Apartments
           housing_rule_sticker: I will keep my registration sticker visible so staff
             can confirm my bike.
           housing_rule_storage: >-
@@ -57,7 +57,7 @@ en:
           housing_rules_category: Building rules
           housing_rules_sub: Where to keep your e-bike at home.
           housing_rules_title: Storage and parking
-          housing_tab: Housing Authority
+          housing_tab: Maple Court
           registered: Registered
           riding_category: Riding practices
           riverside_blurb: >-

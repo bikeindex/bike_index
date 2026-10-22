@@ -1,6 +1,10 @@
+<% if (url = sent_from_url) %>
+  <% helpers.content_for(:header) { javascript_tag("history.replaceState(history.state, '', #{url.to_json})") } %>
+<% end %>
+
 <%= render(UI::Modal::Component.new(id: @modal_id, title:, open: @feedback.errors.any?)) do |modal| %>
   <% modal.with_body do %>
-    <%= form_for @feedback, html: {data: {controller: form_controllers,
+    <%= form_for @feedback, html: {data: {controller: form_controllers, "form-persist-save-value": @feedback.errors.any?,
       action: "input->form-persist#save submit->strip-inputs#submit submit->form-persist#clear"}} do |f| %>
       <%= render(UI::Alerts::ObjectError::Component.new(object: @feedback, name: translation(".request_name"))) %>
 

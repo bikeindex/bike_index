@@ -19,7 +19,7 @@ class FeedbacksController < ApplicationController
       end
       redirect_to(form_page || help_path)
     else
-      @page_errors = @feedback.errors
+      @page_errors = @feedback.errors unless params[:return_to] # a demo modal shows its own
       render(:index) && return if form_page.blank?
 
       re_path = Rails.application.routes.recognize_path(URI(form_page).path)

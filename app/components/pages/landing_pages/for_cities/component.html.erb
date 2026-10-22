@@ -75,8 +75,8 @@
           class: "tw:h-auto tw:w-full tw:max-w-28 tw:justify-self-end tw:min-[640px]:max-w-40 tw:min-[900px]:col-start-2 tw:min-[900px]:row-span-2 tw:min-[900px]:row-start-1 tw:min-[900px]:max-w-none" %>
       </div>
 
-      <%# The caption describes it, and its phones are inert so their fields don't take clicks %>
-      <figure
+      <%# Its phones are inert so their fields don't take clicks %>
+      <div
         class="
           tw:mx-auto tw:grid tw:w-full tw:max-w-[980px] tw:cursor-default
           tw:grid-cols-[1fr_auto_1fr] tw:items-stretch tw:select-none
@@ -238,16 +238,7 @@
             </div>
           </div>
         </div>
-
-        <figcaption
-          class="
-            tw:col-span-3 tw:mt-6 tw:text-center tw:text-[13px]
-            tw:text-gray-600 tw:dark:text-gray-400
-          "
-        >
-          <%= translation(".mock_caption") %>
-        </figcaption>
-      </figure>
+      </div>
     </div>
   </section>
 
@@ -547,7 +538,7 @@
 
             <div class="tw:h-6 tw:w-0.5 tw:bg-gray-300 tw:dark:bg-gray-600"></div>
 
-            <%= render(UI::Card::Component.new(shadow: true, additional_classes: "tw:w-full tw:rounded-lg! tw:text-center")) do %>
+            <%= render(UI::Card::Component.new(additional_classes: "tw:w-full tw:rounded-lg! tw:text-center")) do %>
               <div class="tw:font-header tw:text-base tw:font-bold">
                 <%= name %>
               </div>
@@ -780,54 +771,15 @@
     </div>
   </section>
 
-  <section
-    id="faq"
-    class="tw:mx-auto tw:max-w-[840px] tw:scroll-mt-16 tw:px-6 tw:py-20"
-  >
-    <h2 class="tw:mb-7! <%= HEADING_CLASSES %>">
-      <%= translation(".faq_heading") %>
-    </h2>
+  <section id="faq" class="tw:scroll-mt-16 tw:py-20 <%= SECTION_CLASSES %>">
+    <div class="tw:flex tw:flex-col tw:gap-4 tw:lg:flex-row tw:lg:gap-14">
+      <h2 class="tw:lg:w-85 tw:lg:shrink-0 <%= HEADING_CLASSES %>">
+        <%= translation(".faq_heading") %>
+      </h2>
 
-    <div class="tw:border-t tw:border-gray-200 tw:dark:border-gray-700">
-      <% faqs.each_with_index do |(question, answer), index| %>
-        <details
-          class="tw:group tw:border-b tw:border-gray-200 tw:dark:border-gray-700"
-          name="cities-faq"
-          <% if index.zero? %>
-            open
-          <% end %>
-        >
-          <summary
-            class="
-              tw:flex tw:cursor-pointer tw:list-none tw:items-center
-              tw:justify-between tw:gap-4 tw:py-5 tw:font-header tw:text-lg
-              tw:font-bold tw:[&::-webkit-details-marker]:hidden
-            "
-          >
-            <%= question %>
-
-            <span
-              class="
-                tw:flex-none tw:text-2xl tw:font-normal tw:text-blue-600
-                tw:transition-transform tw:group-open:rotate-45
-                tw:dark:text-blue-400
-              "
-              aria-hidden="true"
-            >
-              +
-            </span>
-          </summary>
-
-          <p
-            class="
-              tw:mb-5 tw:max-w-[720px] tw:leading-[1.65] tw:text-pretty
-              tw:text-gray-600 tw:dark:text-gray-300
-            "
-          >
-            <%= answer %>
-          </p>
-        </details>
-      <% end %>
+      <div class="tw:flex-1">
+        <%= render(UI::Accordion::Component.new(items: faqs)) %>
+      </div>
     </div>
   </section>
 

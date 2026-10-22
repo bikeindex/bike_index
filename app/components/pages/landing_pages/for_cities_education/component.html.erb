@@ -58,7 +58,7 @@
         aria-labelledby="tab-button-<%= organization[:key] %>"
         data-landing-pages--tabs-target="panel"
         data-controller="landing-pages--education"
-        data-action="landing-pages--tabs:activated->landing-pages--education#sync"
+        data-action="landing-pages--tabs:activated->landing-pages--education#sync click->landing-pages--education#guard:capture"
       >
         <div class="tw:lg:col-start-1">
           <div

@@ -35,10 +35,10 @@ en:
           checker_submit: Check the rules
           checker_throttle: Throttle
           checker_top_speed: Top assisted speed
-          child_housing_name: Westbrook Housing Authority
+          child_housing_name: Maple Court Apartments
           child_housing_note: Charging and storage rules
           child_neighborhood_name: Riverside Neighborhood Program
-          child_neighborhood_note: "+3 local rules"
+          child_neighborhood_note: "+2 local rules"
           child_school_name: Westbrook Middle School
           child_school_note: Stricter riding rules + campus policies
           community_watch_lead: A community watch, too.
@@ -65,7 +65,7 @@ en:
             understanding, not a checkbox. Pick an organization to see how the flow
             changes.
           faq_account_answer: >-
-            The city is the parent organization. Schools, housing authorities, and
+            The city is the parent organization. Schools, apartment complexes, and
             other programs can be child accounts with their own staff and education
             content. Staff at each level manage only their own rules.
           faq_account_question: Who manages the account?
@@ -78,7 +78,7 @@ en:
             There are no per-registration fees, and registering is free for residents.
             We'll go over pricing for your city on a discovery call.
           faq_cost_question: What does it cost?
-          faq_heading: Questions cities ask
+          faq_heading: Questions
           faq_import_answer: No. Existing registrations can be imported from a spreadsheet.
           faq_import_question: We already have registration data. Do we start over?
           faq_police_answer: >-
@@ -133,12 +133,12 @@ en:
           hierarchy_heading: Your city sets the baseline. Each program adds its own.
           hierarchy_intro: >-
             E-bike rules vary by context. A middle school may be stricter than the
-            city, and a housing authority may have its own charging and storage rules.
+            city, and an apartment complex may have its own charging and storage rules.
             Bike Index sets up your city as the parent organization, with each program
             as a child account. City rules apply everywhere, and each program adds
             its own.
           hierarchy_programs_body: >-
-            A school, housing authority, or neighborhood program can rewrite any step
+            A school, apartment complex, or neighborhood program can rewrite any step
             or add its own, in its own words.
           hierarchy_programs_title: Programs add their own
           hot_sheet_body: >-
@@ -147,7 +147,6 @@ en:
           hot_sheet_title: Stolen Bike Hot Sheet
           mock_batteries: Batteries & charging
           mock_bike_info: Bike info
-          mock_caption: Regular bikes skip the acknowledgment and finish registering.
           mock_continue: Continue
           mock_detected: Electric (motorized) detected
           mock_electric: Electric (motorized)

@@ -120,7 +120,7 @@ RSpec.describe FeedbacksController, type: :request do
           post base_url, params: {feedback: lead_params.merge(email: " "), return_to: "/for_cities#lead-sent"},
             headers: {"HTTP_REFERER" => "http://www.example.com/feedbacks", "HTTP_CF_IPCOUNTRY" => "US", "HTTP_CF_REGION" => "Indiana"}
           expect(response).to render_template("landing_pages/for_cities")
-          expect(Capybara.string(response.body)).to have_select("state", selected: "Indiana")
+          expect(Capybara.string(response.body)).to have_field("state", type: :hidden, with: "US-IN")
 
           post base_url, params: {feedback: lead_params, return_to: "/for_cities#lead-sent"},
             headers: {"HTTP_REFERER" => "http://www.example.com/feedbacks"}

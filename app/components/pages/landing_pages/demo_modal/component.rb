@@ -29,6 +29,20 @@ module Pages
         def submit_text = @submit_text || translation(".submit_text")
 
         def form_controllers = ["form-persist strip-inputs", ("autofocus" if @feedback.errors.any?)].compact.join(" ")
+
+        # A failed send re-renders at POST /feedbacks. The page it came from goes back in the address
+        # bar, with the modal open, so a reload returns there
+        def sent_from_url
+          return unless request.post? && @feedback.errors.any?
+
+          uri = URI.parse(request.referer.to_s)
+          uri.query = URI.encode_www_form(URI.decode_www_form(uri.query.to_s).reject { |key, _| key == modal_param } + [[modal_param, "1"]])
+          uri.to_s
+        rescue URI::InvalidURIError
+          nil
+        end
+
+        def modal_param = "modal_#{@modal_id}"
       end
     end
   end
