@@ -103,8 +103,7 @@ module Pages
           [translation(".checker_point_bikebook"), translation(".checker_point_states"), translation(".checker_point_program")]
         end
 
-        # In /ebike-rules' shape: "California (CA)", submitting US-CA, which it reads as the state rather than Canada
-        def state_options = EbikeRuleServices::Places.us_states.map { {name: it[:name], abbr: it[:code].delete_prefix("US-"), value: it[:code]} }
+        def state_options = EbikeRuleServices::Places.combobox_options(EbikeRuleServices::Places.us_states, country: "US")
 
         def top_speed_entries
           [{value: 20, label: translation(".checker_speed_20")}, {value: 28, label: translation(".checker_speed_28")},

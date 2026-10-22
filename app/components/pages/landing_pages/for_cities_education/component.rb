@@ -3,11 +3,12 @@
 module Pages
   module LandingPages
     module ForCitiesEducation
-      # The e-bike education flow as three example organizations would set it up, rendered
+      # The e-bike education flow as example organizations would set it up, rendered
       # through the registration flow's own acknowledgment parts
       class Component < ApplicationComponent
         DEFAULT_ORGANIZATION = :school
         # Here rather than on the cities page, which would put that page in this cached fragment's digest
+        PANEL_CLASSES = "tw:scroll-mt-24 tw:[grid-area:1/1] tw:focus:outline-none"
         STICKER_CLASSES = "tw:flex tw:items-center tw:gap-4 tw:rounded-lg tw:border-3 tw:border-black tw:bg-white tw:px-5 tw:py-4.5 tw:shadow-[4px_4px_0_#111] tw:dark:bg-gray-800"
 
         private
@@ -16,7 +17,7 @@ module Pages
 
         # The city's programs carry its pages, each adding a page of its own
         def build_organizations
-          city = sequence(translation(".city_name"), translation(".city_name"))
+          city = sequence(translation(".city_name"))
           city_pages = pages(city, [battery, city_riding, city_rules])
           school = sequence(translation(".school_name"), translation(".school_tab"))
           housing = sequence(translation(".housing_name"), translation(".housing_tab"))
@@ -30,7 +31,7 @@ module Pages
         end
 
         # Unsaved - an example to render, not one to keep
-        def sequence(name, short_name) = RegistrationSequence.new(organization: Organization.new(name:, short_name:))
+        def sequence(name, short_name = name) = RegistrationSequence.new(organization: Organization.new(name:, short_name:))
 
         def pages(sequence, attributes) = attributes.map { RegistrationSequencePage.new(registration_sequence: sequence, **it) }
 
@@ -70,7 +71,13 @@ module Pages
             rules: [translation(".riverside_rule_parking"), translation(".riverside_rule_charging")])
         end
 
-        def rule_count(pages) = pages.sum { it.bullets.size }
+        def back_button
+          tag.div(class: "tw:mt-3 tw:text-center") do
+            render(UI::Button::Component.new(color: :link, html_class: "tw:text-sm tw:text-gray-600", data: {action: "landing-pages--education#back"})) do
+              safe_join([tag.span("←", aria: {hidden: true}), translation(".back")], " ")
+            end
+          end
+        end
       end
     end
   end

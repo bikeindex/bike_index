@@ -9,7 +9,7 @@ module Pages
         class Component < ApplicationComponent
           # first: the flow's opening page, where the registrant is told why these appeared
           # checkbox_name: the rules submit as checkbox_name[index]; nil leaves them decorative
-          # heading_tag: below h1 where the page is embedded in another, as on /for_cities
+          # heading_tag: below h1 where the page is embedded in another
           def initialize(page:, first: false, checkbox_name: nil, checked: false, heading_tag: :h1)
             @page = page
             @first = first
