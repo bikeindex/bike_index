@@ -75,7 +75,6 @@
           class: "tw:h-auto tw:w-full tw:max-w-28 tw:justify-self-end tw:min-[640px]:max-w-40 tw:min-[900px]:col-start-2 tw:min-[900px]:row-span-2 tw:min-[900px]:row-start-1 tw:min-[900px]:max-w-none" %>
       </div>
 
-      <%# Its phones are inert so their fields don't take clicks %>
       <div
         class="
           tw:mx-auto tw:grid tw:w-full tw:max-w-[980px] tw:cursor-default
@@ -645,7 +644,6 @@
             <%= translation(".checker_form_heading") %>
           </h3>
 
-          <%# The /ebike-rules page's own controls, so the card is that page's form in miniature %>
           <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :state, label_text: translation(".checker_state"),
             required: true, wrapper_class: nil)) do %>
             <%= render(UI::Forms::ComboboxState::Component.new(states: state_options,
