@@ -22,7 +22,7 @@
     <%= render UI::Badge::Component.new(text: "Test-marked", color: :purple, size: :sm, title: "Bike Index administrators organization or the designated test contact, including historical links.") %>
   <% end %>
 
-  <% if contacts.any? { BikeServices::DuplicateReviewCues.review_contact?(it) } %>
+  <% if contacts.any? { BikeDuplicatesServices::Cues.review_contact?(it) } %>
     <%= render UI::Badge::Component.new(text: "Example-domain contact", color: :orange, size: :sm, title: "A reserved example domain on the initial, current or account email. Not a test classification.") %>
   <% end %>
 

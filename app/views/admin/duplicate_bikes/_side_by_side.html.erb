@@ -7,7 +7,7 @@
 <%# [label, values to compare, markup to show] - a row whose values differ is highlighted %>
 <% rows = [
      ["Registered", nil, bikes.map { render(UI::Time::Component.new(time: it.created_at)) }],
-     *DuplicateBikeReview::FIELDS.keys.map do |field|
+     *BikeDuplicatesServices::Review::FIELDS.keys.map do |field|
        values = bikes.map { review.field_value(it, field) }
        [field, values, field.end_with?("serial") ? values.map { serial.call(it) } : values]
      end,

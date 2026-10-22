@@ -1,5 +1,5 @@
 <%# locals: (groups:, representatives:, organizations:, kind:) %>
-<% same_owner_queue = BikeServices::DuplicateReviewFinder::SAME_OWNER_KINDS.include?(kind) %>
+<% same_owner_queue = BikeDuplicatesServices::Finder::SAME_OWNER_KINDS.include?(kind) %>
 
 <%= render UI::Table::Component.new(records: groups) do |table| %>
   <% table.column(label: "Shared serial and manufacturer · review cues") do |group| %>
@@ -25,9 +25,9 @@
         <%= render UI::Badge::Component.new(text: "Stolen history — do not merge", color: :error, solid: true, size: :sm, title: "A stolen report exists on this whole serial now, possibly on a record outside this group.") %>
       <% end %>
 
-      <% cues = BikeServices::DuplicateReviewCues.group_cues(group) %>
+      <% cues = group["cues"] %>
 
-      <% if same_owner_queue && cues.any? { DuplicateBikeReview::SEPARATE_REVIEW_CUES.include?(it.key) } %>
+      <% if same_owner_queue && cues.any? { BikeDuplicatesServices::Review::SEPARATE_REVIEW_CUES.include?(it.key) } %>
         <%= render UI::Badge::Component.new(text: "Separate review before any invitation", color: :error, size: :sm, title: "A standards, product-code, test or example-contact cue keeps this group out of the same-owner path until reviewed.") %>
       <% end %>
 
@@ -62,7 +62,7 @@
     <% bike = representatives[group["reference_id"]] %>
 
     <% if group["email_count"] == 1 && group["missing_email_count"].zero? %>
-      <% ownership = DuplicateBikeReview.initial_ownership(bike) %>
+      <% ownership = BikeDuplicatesServices::Review.initial_ownership(bike) %>
       <div class="tw:text-xs tw:text-gray-600 tw:dark:text-gray-400">
         Every record's initial contact (unverified)
       </div>

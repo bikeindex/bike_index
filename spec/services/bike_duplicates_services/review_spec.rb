@@ -1,12 +1,12 @@
 require "spec_helper"
 require "active_support/all"
 require "functionable"
-require_relative "../../app/services/serial_normalizer"
-require_relative "../../app/services/bike_services/duplicate_review_finder"
-require_relative "../../app/services/bike_services/duplicate_review_cues"
-require_relative "../../app/services/duplicate_bike_review"
+require_relative "../../../app/services/serial_normalizer"
+require_relative "../../../app/services/bike_duplicates_services/finder"
+require_relative "../../../app/services/bike_duplicates_services/cues"
+require_relative "../../../app/services/bike_duplicates_services/review"
 
-RSpec.describe DuplicateBikeReview do
+RSpec.describe BikeDuplicatesServices::Review do
   let(:ownership_class) { Struct.new(:id, :previous_ownership_id, :created_at, :user_id, :owner_email, :is_phone, :claimed, :claimed_at, :pos_kind) }
   let(:bike_class) { Struct.new(:id, :serial_normalized_no_space, :manufacturer_id, :manufacturer_other, :ownerships, :current_ownership) }
   let(:email) { ["customer", "example.invalid"].join("@") }

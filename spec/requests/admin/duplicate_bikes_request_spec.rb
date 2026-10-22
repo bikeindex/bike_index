@@ -17,14 +17,27 @@ RSpec.describe Admin::DuplicateBikesController, type: :request do
       FactoryBot.create(:bike, :with_ownership, manufacturer:, serial_number: "WTU123456", owner_email: "pair@bikeindex.org", frame_model: "Other model",
         propulsion_type: "pedal-assist")]
   end
-  let(:database) { ActiveRecord::Base.connection_db_config.database }
-  let(:cache) { BikeServices::DuplicateReviewFinder.cache }
-  let(:cache_key) { BikeServices::DuplicateReviewFinder.cache_key(database) }
+  let(:finder) { BikeDuplicatesServices::Finder }
 
-  before { cache.write(cache_key, {generated_at: Time.current, groups: BikeServices::DuplicateReviewFinder.groups}) }
-  after { cache.delete(cache_key) }
+  before { finder.store_group_snapshot }
+  after { RedisPool.conn { it.del(finder::SNAPSHOT_KEY, finder::PREPARING_KEY) } }
 
   describe "dashboard" do
+    it "prepares the groups in the background, once" do
+      RedisPool.conn { it.del(finder::SNAPSHOT_KEY) }
+      expect {
+        get base_url
+        get base_url
+      }.to change(BikeJobs::PrepareDuplicateReviewJob.jobs, :count).by 1
+      expect(response.code).to eq "200"
+      expect(response).to render_template(:preparing)
+
+      BikeJobs::PrepareDuplicateReviewJob.drain
+      get base_url, params: {search_kind: "large_group"}
+      expect(response).to render_template(:dashboard)
+      expect(assigns(:groups).map { it["record_count"] }).to eq [11]
+    end
+
     it "shows tentative cues and narrows by them reversibly" do
       get base_url, params: {search_kind: "large_group"}
       expect(response.code).to eq "200"
@@ -40,11 +53,11 @@ RSpec.describe Admin::DuplicateBikesController, type: :request do
     end
 
     it "sorts groups by size or registration date" do
-      groups = BikeServices::DuplicateReviewFinder.groups.select { it["kind"] == "large_group" }
-      # Cached largest first, like the query
-      cache.write(cache_key, {generated_at: Time.current, groups: [
-        groups.first.merge("record_count" => 12, "reference_id" => 0, "first_at" => 2.years.ago, "last_at" => 1.year.ago)
-      ] + groups})
+      12.times do |index|
+        FactoryBot.create(:bike, :with_ownership, manufacturer:, serial_number: "0LDGR0UP1", owner_email: "older#{index}@bikeindex.org",
+          created_at: Time.current - 2.years + index.days)
+      end
+      finder.store_group_snapshot
 
       get base_url, params: {search_kind: "large_group"}
       expect(assigns(:groups).map { it["record_count"] }).to eq [12, 11]
@@ -74,11 +87,20 @@ RSpec.describe Admin::DuplicateBikesController, type: :request do
       user = FactoryBot.create(:user_confirmed)
       shop_bike = FactoryBot.create(:bike_lightspeed_pos, manufacturer:, serial_number: "HAND0FF123", owner_email: user.email, created_at: 2.days.ago)
       FactoryBot.create(:bike, :with_ownership_claimed, user:, manufacturer:, serial_number: "HAND0FF123")
-      expect(BikeServices::DuplicateReviewFinder.groups.find { it["bike_ids"].include?(shop_bike.id) }["kind"]).to eq "handoff_priority"
+      expect(finder.groups.find { it["bike_ids"].include?(shop_bike.id) }["kind"]).to eq "handoff_priority"
     end
   end
 
   describe "show" do
+    it "reviews a serial-segment group and offers to ignore it" do
+      duplicate_group = DuplicateBikeGroup.create
+      pair.each { NormalizedSerialSegment.create(bike: it, duplicate_bike_group: duplicate_group, segment: "WTU123456") }
+      get "#{base_url}/#{duplicate_group.id}"
+      expect(response.code).to eq "200"
+      expect(assigns(:bikes_count)).to eq 2
+      expect(response.body).to include("Ignore group", ignore_duplicate_toggle_admin_bikes_path(id: duplicate_group.id))
+    end
+
     it "summarizes a large group and filters to one contact" do
       get "#{base_url}/serial", params: {reference_bike_id: marked_bikes.first.id}
       expect(response.code).to eq "200"
@@ -133,7 +155,7 @@ RSpec.describe Admin::DuplicateBikesController, type: :request do
       placeholders = Array.new(2) { FactoryBot.create(:bike, :with_ownership, manufacturer: brand, serial_number: "MOTOBECANE") }
       get "#{base_url}/compare", params: {bike_ids: placeholders.map(&:id).join(",")}
       expect(response.body).to include("this serial is a placeholder (manufacturer name Motobecane)")
-      expect(BikeServices::DuplicateReviewFinder.groups.find { it["serial"] == "M0T08ECANE" }["kind"]).to eq "not_a_serial"
+      expect(finder.groups.find { it["serial"] == "M0T08ECANE" }["kind"]).to eq "not_a_serial"
     end
 
     it "vetoes a record's own stolen history when its serial is blank" do
