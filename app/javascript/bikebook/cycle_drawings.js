@@ -251,14 +251,15 @@ const tandem = ({ fig, listed, wheel: wheelAt }) => {
   const headBottom = plus(headTop, scale(steeringUp, -fig('head_tube')))
   const captainTop = plus(captain, polar(fig('captain_seat_tube'), 180 - fig('seat_angle')))
   const stokerTop = plus(stoker, polar(fig('stoker_seat_tube'), 180 - fig('stoker_seat_angle_degrees')))
-  // the stoker's bar on a stem clamped up the captain's seat post, reaching back toward the stoker
+  const captainSaddle = plus(captainTop, polar(170, 180 - fig('seat_angle')))
+  // the stoker's bar on a short stem clamped up the captain's seat post, just behind the captain's saddle
   const stokerClamp = plus(captainTop, polar(100, 180 - fig('seat_angle')))
-  const stokerBar = plus(stokerClamp, [-230, 40])
+  const stokerBar = plus(captainSaddle, [-90, -40])
   return [{
     name: 'Side',
     shapes: [wheel(rearAxle, rearWheel), wheel(frontAxle, frontWheel),
       tube(frontAxle, headBottom, headTop, captainTop, captain, headBottom), tube(captain, stoker, stokerTop, captainTop), tube(stoker, rearAxle, stokerTop),
-      part(captainTop, plus(captainTop, polar(170, 180 - fig('seat_angle')))), saddle(plus(captainTop, polar(170, 180 - fig('seat_angle')))),
+      part(captainTop, captainSaddle), saddle(captainSaddle),
       part(stokerTop, plus(stokerTop, polar(170, 180 - fig('stoker_seat_angle_degrees')))), saddle(plus(stokerTop, polar(170, 180 - fig('stoker_seat_angle_degrees')))),
       part(stokerClamp, stokerBar), handlebar(stokerBar),
       tube(headTop, plus(headTop, scale(steeringUp, 30)), plus(headTop, scale(steeringUp, 30), [100, 10])), dropBar(plus(headTop, scale(steeringUp, 30), [100, 10]))],
