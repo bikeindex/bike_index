@@ -3,12 +3,11 @@
 module Pages
   module Admin
     module CycleTypeDrawings
-      # Each cycle type's Bikebook drawing at its typical figures, and of a catalog model of that type, followed by
-      # its type_details that Bikebook draws their own way
+      # Each cycle type's BikeBook drawing at its typical figures, and of a catalog model of that type. The
+      # admin--cycle-type-details controller follows each with its type_details BikeBook draws their own way, whose list is
+      # the drawings' own
       class Component < ApplicationComponent
-        Row = Data.define(:name, :type, :type_detail, :example_model) do
-          def param = [type, type_detail].compact.join("_")
-
+        Row = Data.define(:name, :type, :example_model) do
           def collapsed = example_model.nil? || Pages::Admin::CycleTypeDrawings::Component::COLLAPSED_TYPES.include?(type)
         end
 
@@ -27,9 +26,6 @@ module Pages
           "non-e-skateboard": "skateboard",
           elliptical: "elliptical_bike"
         }.freeze
-
-        # by Bikebook vehicle type
-        TYPE_DETAILS = {"bike" => %w[step_through bench_seat], "tricycle" => %w[tadpole]}.freeze
 
         # by Bikebook vehicle type, or type/type_detail, the catalog model that fills in the most of its drawing
         EXAMPLE_MODELS = {
@@ -57,11 +53,9 @@ module Pages
         }.freeze
 
         def initialize(cycle_types:, manifest_url:)
-          @rows = cycle_types.flat_map do |cycle_type|
+          @rows = cycle_types.map do |cycle_type|
             type = BIKEBOOK_TYPES[cycle_type.slug] || cycle_type.slug.to_s.underscore
-            [nil, *TYPE_DETAILS[type]].map do |type_detail|
-              Row.new(name: cycle_type.name, type:, type_detail:, example_model: EXAMPLE_MODELS[[type, type_detail].compact.join("/")])
-            end
+            Row.new(name: cycle_type.name, type:, example_model: EXAMPLE_MODELS[type])
           end.partition { !it.collapsed }.flatten
           @manifest_url = manifest_url
         end

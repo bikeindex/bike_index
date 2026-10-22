@@ -1,28 +1,14 @@
 import { Controller } from '@hotwired/stimulus'
 import { html, nothing, render } from 'lit-html'
+import { loadCatalog } from 'bikebook/catalog'
 import { withFigures } from 'bikebook/cycle_drawings'
 import { chosenSizes } from 'bikebook/sizes'
 import { buttonClasses } from 'bikebook/templates/ui/button'
 import { cycleDrawing } from 'bikebook/templates/vehicles/cycle_drawing'
 
-const catalogFiles = new Map()
-const MODEL_BLOCK = /^m\/([a-z0-9_]+\/\d{4})\//
-
-// A published catalog file, the manifest when it's given no `path`, fetched once
-const catalogFile = (manifestUrl, path) => {
-  const url = new URL(path ?? manifestUrl, new URL(manifestUrl, window.location.href))
-  if (!catalogFiles.has(url.href)) catalogFiles.set(url.href, fetch(url).then((response) => response.json()))
-  return catalogFiles.get(url.href)
-}
-
-const fetchKit = async (manifestUrl) => (await catalogFile(manifestUrl, (await catalogFile(manifestUrl)).kit)).kit
-
-// A catalog model and the size Bikebook first shows it in, null for one the catalog hasn't published
-const fetchModel = async (manifestUrl, id) => {
-  const block = (await catalogFile(manifestUrl)).blocks[id.match(MODEL_BLOCK)[1]]
-  const data = block && (await catalogFile(manifestUrl, block)).models[id]
-  return data ? { id, data, size: chosenSizes([{ value: id, data }])[0] } : null
-}
+const catalogs = new Map()
+// one catalog, and its worker, for every drawing on the page
+const catalogAt = (manifestUrl) => catalogs.get(manifestUrl) ?? catalogs.set(manifestUrl, loadCatalog(manifestUrl)).get(manifestUrl)
 
 // Its Sizes & geometry view, with the size drawn here picked
 const geometryPath = (id, size) => `/bikebook?${new URLSearchParams({ vehicle_models: id, view: 'geometry', ...(size?.name ? { vehicle_sizes: size.name } : {}) })}`
@@ -35,8 +21,11 @@ export default class extends Controller {
   async connect () {
     this.figures = {}
     this.highlight = null
-    const [kit, vehicle] = await Promise.all([fetchKit(this.manifestUrlValue), this.modelValue ? fetchModel(this.manifestUrlValue, this.modelValue) : { data: {} }])
-    Object.assign(this, { kit, vehicle })
+    const catalog = await catalogAt(this.manifestUrlValue)
+    // a model in the size BikeBook first shows it in
+    const [found] = this.modelValue ? await catalog.vehicles([this.modelValue]) : [{ data: {} }]
+    this.kit = catalog.kit
+    this.vehicle = found && { id: found.value, data: found.data, size: found.value && chosenSizes([found])[0] }
     this.vehicle
       ? this.draw()
       : render(html`<p class="tw:text-gray-500"><code>${this.modelValue}</code> isn't in the published catalog yet</p>`, this.element)
@@ -80,18 +69,20 @@ export default class extends Controller {
     ?disabled=${Object.keys(this.figures).length === 0} @click=${() => this.reset()}>Reset</button></div>`, this.element)
   }
 
-  // the legend's figures, down one column then the next, each an input but those the wheels give
+  // the legend's figures, down one column then the next, each an input but those that can't be set
   figureList (figures) {
     const idPrefix = [this.typeValue, this.typeDetailValue, this.modelValue].filter(Boolean).join('-').replaceAll('/', '-')
-    return html`<ol class="tw:mt-2 tw:columns-2 tw:gap-4 tw:text-xs">${figures.map(({ letter, key, label, value, unit, listed, calculated, derived }) =>
-    html`<li class="tw:mb-1 tw:flex tw:break-inside-avoid tw:items-baseline tw:gap-2 ${key === this.highlight
-      ? 'tw:font-bold tw:text-blue-500'
-      : listed || calculated ? '' : 'tw:text-gray-500'}"><button type="button" aria-label=${`Highlight ${label}`} aria-pressed=${String(key === this.highlight)}
+    return html`<ol class="tw:mt-2 tw:columns-2 tw:gap-4 tw:text-xs">${figures.map(({ letter, key, label, value, unit, listed, calculated, editable }) =>
+    html`<li class="tw:mb-1 tw:flex tw:break-inside-avoid tw:items-baseline tw:gap-2 ${key === this.highlight ? 'tw:font-bold' : ''} ${key === this.highlight && listed
+      ? 'tw:text-blue-500'
+      : listed || calculated ? '' : 'tw:text-gray-500'}">${letter
+      ? html`<button type="button" aria-label=${`Highlight ${label}`} aria-pressed=${String(key === this.highlight)}
       @click=${() => this.select(key)} class="tw:inline-flex tw:size-5 tw:shrink-0 tw:cursor-pointer tw:items-center tw:justify-center tw:rounded-full
-      tw:border-0! tw:p-0! tw:text-xs tw:font-bold tw:text-white tw:focus:outline-none! tw:focus-visible:ring-2 tw:focus-visible:ring-blue-500/40 ${key === this.highlight
+      tw:border-0! tw:p-0! tw:text-xs tw:font-bold tw:text-white tw:focus:outline-none! tw:focus-visible:ring-2 tw:focus-visible:ring-blue-500/40 ${key === this.highlight && listed
         ? 'tw:bg-blue-500'
-        : listed ? 'tw:bg-[#715eb2]' : calculated ? 'tw:bg-purple-300' : 'tw:bg-gray-400'}">${letter}</button><label for=${`${idPrefix}-${key}`}
-      class="tw:grow">${label}</label>${derived
+        : listed ? 'tw:bg-[#715eb2]' : calculated ? 'tw:bg-purple-300' : 'tw:bg-gray-400'}">${letter}</button>`
+      : html`<span class="tw:w-5 tw:shrink-0"></span>`}<label for=${`${idPrefix}-${key}`}
+      class="tw:grow">${label}</label>${!editable
       ? html`<span class="tw:font-mono">${value} ${unit}</span>`
       : html`<input type="number" step="any" name=${key} id=${`${idPrefix}-${key}`} autocomplete="off"
         class="twinput tw:w-20! tw:py-0.5! tw:text-right tw:text-xs!" .value=${String(value)} @input=${(event) => this.edit(event)}><span

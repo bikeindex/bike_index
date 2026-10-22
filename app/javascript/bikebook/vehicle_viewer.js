@@ -5,8 +5,7 @@ import { chosenSizes, pickedSizes, sizesParam } from 'bikebook/sizes'
 import { comparisonTable } from 'bikebook/templates/vehicles/comparison_table'
 import { cycleDrawing } from 'bikebook/templates/vehicles/cycle_drawing'
 import { emptyState } from 'bikebook/templates/vehicles/empty_state'
-import { frameGeometry } from 'bikebook/frame_geometry'
-import { geometryOverlay, seriesBorders } from 'bikebook/templates/vehicles/geometry_overlay'
+import { geometryOverlay, overlayFrames, seriesBorders } from 'bikebook/templates/vehicles/geometry_overlay'
 import { jumpTo, VIEWS } from 'bikebook/templates/vehicles/jump_to'
 import { componentsOf, modelViewer, motorsOf, photoOf, runningGearOf, sizesOf } from 'bikebook/templates/vehicles/model_viewer'
 import { present } from 'bikebook/templates/values'
@@ -49,7 +48,10 @@ export class VehicleViewer {
     const baseline = vehicles[0]
     const others = (value) => value === baseline.value ? [] : [baseline.data]
     const sizePath = (value) => (name) => pathWith(url, { vehicle_sizes: sizesParam(values, { ...picked, [value]: name }) })
-    const compared = { presenter, vehicles, sizes, frames: vehicles.map(({ data }, index) => frameGeometry(data, sizes[index])) }
+    // a figure's letter lights it on each drawing, card and table row, until it's clicked again
+    const highlight = url.searchParams.get('figure')
+    const figurePath = (key) => pathWith(url, { figure: key === highlight ? '' : key })
+    const compared = { presenter, vehicles, sizes, frames: overlayFrames(vehicles, sizes) }
     const rowClasses = comparing
       ? 'tw:justify-center-safe tw:overflow-x-auto tw:max-md:snap-x tw:max-md:snap-mandatory tw:max-md:px-4 tw:max-md:*:w-[85vw] tw:max-md:*:shrink-0 tw:max-md:*:snap-center'
       : 'tw:flex-col tw:lg:flex-row tw:lg:justify-center'
@@ -64,7 +66,7 @@ export class VehicleViewer {
         tw:rounded-sm tw:border tw:border-gray-200 tw:bg-white tw:pt-4 tw:pb-6 tw:[--gutter:--spacing(6)] tw:dark:border-gray-700 tw:dark:bg-gray-800
         ${keyed ? seriesBorders(compared.frames, index).top : ''} ${comparing ? 'tw:md:max-w-[56rem] tw:lg:flex-1' : 'tw:lg:w-[56rem] tw:lg:shrink-0'}"><header data-align-row="header" class="tw:flex tw:items-start tw:justify-between tw:gap-4"><div>${present(manufacturer)
         ? html`<p class="tw:mb-1 tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">${manufacturer}</p>`
-        : nothing}<div class="tw:flex tw:items-baseline tw:gap-1"><h3 class="tw:text-2xl tw:leading-tight tw:font-extrabold">${model}</h3>${
+        : nothing}<div class="tw:text-2xl tw:leading-tight"><h3 class="tw:inline tw:font-extrabold">${model}</h3> ${
           copyButton({ value, label: 'Copy ID', tooltip: true })}</div></div><div
         class="tw:shrink-0">${photoOf({ presenter, data }, 'tw:h-14 tw:w-21')}</div></header>${lead ? html`<div data-align-row="lead">${lead(data, value)}</div>` : nothing}${present(data[key])
         ? content(data, value)
@@ -84,12 +86,25 @@ export class VehicleViewer {
       basics: () => basics({ presenter, vehicles, outOfClassId }),
       // the overlay beside the table once the window is wide, above it until then
       geometry: () => html`<div class="tw:flex tw:flex-col tw:min-[1500px]:twpagebleed tw:min-[1500px]:flex-row
-        tw:min-[1500px]:items-start tw:min-[1500px]:gap-6 tw:min-[1500px]:px-4">${geometryOverlay({ ...compared, beside: true })}${
-        comparisonTable({ ...compared, beside: true })}</div>${cardRow('tw:mt-6', cards('sizes', 'No sizes listed', (data, value) => {
+        tw:min-[1500px]:items-start tw:min-[1500px]:gap-6 tw:min-[1500px]:px-4">${geometryOverlay({ ...compared, selected: url.searchParams.get('overlay_selected'), beside: true })}${
+        comparisonTable({ ...compared, highlight, beside: true })}</div>${cardRow('tw:mt-6', cards('sizes', 'No sizes listed', (data, value) => {
         const size = sizes[values.indexOf(value)]
-        const { figure, legend } = cycleDrawing({ type: data.type, data, size, kit: presenter.kit })
-        return html`${drawing(data, size, figure, legend)}<div class="tw:-mx-(--gutter)">${sizesOf({
-          presenter, data, others: others(value), selectedSize: selectedSizes.get(value), sizePath: sizePath(value), letters: new Map(legend.map(({ key, letter }) => [key, letter]))
+        const { figure, legend } = cycleDrawing({ type: data.type, data, size, kit: presenter.kit, highlight, figurePath })
+        // drawn only where its size lists some of its frame: overall dimensions, wheels and a cargo area alone would be all
+        // it drew of its own
+        const framed = legend.some(({ letter, listed, editable, extra, key }) => letter && listed && editable && !extra && !key.startsWith('dimensions'))
+        return html`${framed ? drawing(data, size, figure, legend) : nothing}<div class="tw:-mx-(--gutter)">${sizesOf({
+          presenter,
+          data,
+          others: others(value),
+          selectedSize: selectedSizes.get(value),
+          sizePath: sizePath(value),
+          lettering: framed && {
+            letters: new Map(legend.filter(({ letter }) => letter).map(({ key, letter }) => [key, letter])),
+            highlight,
+            figurePath,
+            drawn: { id: value, name: size?.name, figures: legend.filter(({ letter, listed }) => letter && !listed) }
+          }
         })}</div>`
       }, { keyed: true }))}`,
       components: () => {

@@ -13,7 +13,6 @@ const LANE = 2.6
 
 // labels for the figures the kit's geometry labels don't name
 const LABELS = {
-  rear_rack_length: 'Rear rack length',
   captain_top_tube: 'Captain top tube',
   captain_seat_tube: 'Captain seat tube',
   stoker_top_tube_effective: 'Stoker top tube',
@@ -32,6 +31,7 @@ const LABELS = {
   tire_width_front: 'Front tire width',
   tire_width_rear: 'Rear tire width',
   box_length: 'Cargo box length',
+  'cargo.length': 'Cargo length',
   track_width: 'Track width',
   hitch_height: 'Hitch height',
   tow_arm_length: 'Tow arm length',
@@ -123,37 +123,44 @@ const arrowhead = (tip, from, size) => {
   return [tip, plus(plus(tip, along), across), minus(plus(tip, along), across)]
 }
 
-const renderShape = (shape) => {
+// a rim hidden but for `rims`
+const renderShape = (shape, rims = true) => {
   const dashed = shape.weight === 'ghost'
   const common = { width: WEIGHTS[shape.weight], dash: dashed ? '6 5' : nothing, opacity: dashed ? 0.55 : nothing }
   return shape.kind === 'circle'
     ? svg`<circle cx=${shape.center[0]} cy=${-shape.center[1]} r=${shape.radius} fill=${shape.fill ? 'currentColor' : 'none'} stroke="currentColor"
-      stroke-width=${common.width} stroke-dasharray=${common.dash} opacity=${common.opacity} vector-effect="non-scaling-stroke"></circle>`
+      stroke-width=${common.width} stroke-dasharray=${common.dash} opacity=${common.opacity} vector-effect="non-scaling-stroke"
+      ?data-rim=${shape.rim} display=${shape.rim && !rims ? 'none' : nothing}></circle>`
     : svg`<path d=${pathData(shape.points, shape.closed)} fill=${shape.fill ? 'currentColor' : 'none'} fill-opacity="0.07" stroke="currentColor"
       stroke-width=${common.width} stroke-dasharray=${common.dash} opacity=${common.opacity} stroke-linecap="round" stroke-linejoin="round"
       vector-effect="non-scaling-stroke"></path>`
 }
 
 // Solid where it measures, dashed out to what it measures from. `highlight` the key of the one dimension to draw over the rest,
-// which fade
-const renderDimension = ({ placement, letter, listed, calculated, key }, font, highlight) => {
+// which fade, in blue where it's listed and its own color where it isn't, and each following its `figurePath` where there's one, as bikebook--page follows a link: Turbo can't read
+// an SVG link's href
+const renderDimension = ({ placement, letter, listed, calculated, key }, font, highlight, figurePath) => {
   const highlighted = key === highlight
-  const color = highlighted ? HIGHLIGHT : listed ? LISTED : calculated ? CALCULATED : TYPICAL
+  const color = highlighted && listed ? HIGHLIGHT : listed ? LISTED : calculated ? CALCULATED : TYPICAL
   const { line, extensions, badge, arrowSize } = placement
   const heads = arrowSize ? [arrowhead(line[0], line[1], arrowSize), arrowhead(line.at(-1), line.at(-2), arrowSize)] : []
-  return svg`<g data-figure=${key} cursor="pointer" stroke=${color} fill="none" stroke-width=${highlighted ? 2.5 : 1.25}
+  return svg`<g data-figure=${key} data-href=${figurePath?.(key) ?? nothing} data-in-place=${figurePath ? '' : nothing}
+    data-replace=${figurePath ? '' : nothing} cursor="pointer" stroke=${color} fill="none" stroke-width=${highlighted ? 2.5 : 1.25}
     opacity=${highlight && !highlighted ? 0.25 : nothing}>${extensions.map((each) =>
     svg`<path d=${pathData(each)} stroke-width="0.75" stroke-dasharray="4 3" vector-effect="non-scaling-stroke"></path>`)}<path
     d=${pathData(line)} vector-effect="non-scaling-stroke"></path>${heads.map((each) =>
-    svg`<path d=${pathData(each, true)} fill=${color} stroke="none"></path>`)}<circle cx=${badge[0]} cy=${-badge[1]} r=${font * 0.8} fill=${color} stroke="none"></circle><text x=${badge[0]} y=${-badge[1]}
-    fill="white" stroke="none" font-size=${font} font-weight="700" text-anchor="middle" dominant-baseline="central">${letter}</text></g>`
+    svg`<path d=${pathData(each, true)} fill=${color} stroke="none"></path>`)}${letter
+    ? svg`<circle cx=${badge[0]} cy=${-badge[1]} r=${font * 0.8} fill=${color} stroke="none"></circle><text x=${badge[0]} y=${-badge[1]}
+      fill="white" stroke="none" font-size=${font} font-weight="700" text-anchor="middle" dominant-baseline="central">${letter}</text>`
+    : nothing}</g>`
 }
 
-// `type`'s drawing, or its `typeDetail`'s, of `data` in `size`, and the legend of its lettered figures: `listed` where the size
-// lists one, `calculated` where it's worked out from ones the size lists, and otherwise its type's typical, `derived` where
-// the wheels give it, and `extra`, lettered last, where the
-// `kit`'s geometry schema doesn't have it. Each figure's marks carry data-figure, and the `highlight` one's are drawn on top
-export const cycleDrawing = ({ type, data = {}, typeDetail = data.type_detail, size, kit, highlight }) => {
+// `type`'s drawing, or its `typeDetail`'s, of `data` in `size`, and the legend of its figures, lettered but those marked
+// `unlettered`: `listed` where the size lists one, `calculated` where it's worked out from ones the size lists, and otherwise
+// its type's typical, `editable` where it can be set as a figure, and `extra`, lettered last, where the `kit`'s geometry
+// schema doesn't have it, as figures the wheels give don't count. Each figure's marks carry data-figure, and the
+// `highlight` one's are drawn on top
+export const cycleDrawing = ({ type, data = {}, typeDetail = data.type_detail, size, kit, highlight, figurePath }) => {
   const { views, listed } = drawingViews({ type, typeDetail, data, size })
   const flattened = views.map((view) => ({ ...view, shapes: [view.shapes].flat(Infinity).filter(Boolean) }))
   // lettering sized to the views side by side
@@ -165,8 +172,9 @@ export const cycleDrawing = ({ type, data = {}, typeDetail = data.type_detail, s
   const dimFor = (key) => dims.find((each) => each.key === key)
   const extra = (key) => Boolean(kit) && !dimFor(key).derived && !(key.split('.')[0] in kit.schemas.geometry)
   const drawn = [...new Set(dims.map(({ key }) => key))]
-  const keys = [...drawn.filter((key) => !extra(key) && !dimFor(key).last), ...drawn.filter((key) => !extra(key) && dimFor(key).last), ...drawn.filter(extra)]
-  const letter = (key) => String.fromCharCode(65 + keys.indexOf(key))
+  const lettered = [...drawn.filter((key) => !extra(key) && !dimFor(key).unlettered), ...drawn.filter(extra)]
+  const keys = [...lettered, ...drawn.filter((key) => dimFor(key).unlettered)]
+  const letter = (key) => lettered.includes(key) ? String.fromCharCode(65 + lettered.indexOf(key)) : null
   const legend = keys.map((key) => {
     const dim = dimFor(key)
     const isListed = dim.listed ?? listed(key)
@@ -180,14 +188,14 @@ export const cycleDrawing = ({ type, data = {}, typeDetail = data.type_detail, s
       unit: angular ? '°' : 'mm',
       listed: isListed,
       calculated: !isListed && Boolean(dim.calculated),
-      derived: Boolean(dim.derived),
+      editable: !dim.fixed,
       extra: extra(key)
     }
   })
   const laidOut = flattened.map((view) => {
     const placedDims = view.dims.map((dim) => ({ ...legend[keys.indexOf(dim.key)], placement: placed(dim, font) }))
-    const points = [...view.shapes.flatMap(shapePoints), ...placedDims.flatMap(({ placement }) =>
-      [...placement.line, ...[[-1, -1], [1, 1]].map((corner) => plus(placement.badge, scale(corner, font)))])]
+    const points = [...view.shapes.flatMap(shapePoints), ...placedDims.flatMap(({ placement, letter }) =>
+      [...placement.line, ...(letter ? [[-1, -1], [1, 1]].map((corner) => plus(placement.badge, scale(corner, font))) : [])])]
     return { ...view, dims: placedDims, bounds: extent(points) }
   })
 
@@ -204,21 +212,42 @@ export const cycleDrawing = ({ type, data = {}, typeDetail = data.type_detail, s
   const top = Math.max(...positioned.map(({ bounds, dy }) => bounds.top + dy)) + font
   const bottom = Math.min(...positioned.map(({ bounds, dy }) => bounds.bottom + dy)) - (positioned.length > 1 ? font * 2.5 : font)
 
-  const figure = svg`<svg role="img" aria-label=${`${[type, typeDetail].filter(Boolean).join(' ')} drawing, ${legend.map(({ letter, label }) => `${letter}: ${label}`).join(', ')}`}
+  const figure = svg`<svg role="img" aria-label=${`${[type, typeDetail].filter(Boolean).join(' ')} drawing, ${legend.map(({ letter, label }) => letter ? `${letter}: ${label}` : label).join(', ')}`}
     viewBox=${[left, -top, right - left, top - bottom].map(Math.round).join(' ')} class="tw:h-auto tw:max-h-96 tw:w-full"
     font-family="ui-sans-serif, system-ui, sans-serif">${positioned.map((view) => svg`<g transform=${`translate(${view.dx} ${-view.dy})`}>${view.plan
       ? nothing
       : svg`<path d=${pathData([[view.bounds.left, 0], [view.bounds.right, 0]])} stroke="currentColor" opacity="0.25" stroke-width="1"
-        vector-effect="non-scaling-stroke"></path>`}${view.shapes.map(renderShape)}${[...view.dims.filter(({ key }) => key !== highlight), ...view.dims.filter(({ key }) => key === highlight)]
-        .map((dim) => renderDimension(dim, font, highlight))}${positioned.length > 1
+        vector-effect="non-scaling-stroke"></path>`}${view.shapes.map((shape) => renderShape(shape))}${[...view.dims.filter(({ key }) => key !== highlight), ...view.dims.filter(({ key }) => key === highlight)]
+        .map((dim) => renderDimension(dim, font, highlight, figurePath))}${positioned.length > 1
       ? svg`<text x=${(view.bounds.left + view.bounds.right) / 2} y=${-(bottom - view.dy + font)} fill="currentColor" opacity="0.6" font-size=${font}
         text-anchor="middle">${view.name}</text>`
       : nothing}</g>`)}</svg>`
   return { figure, legend }
 }
 
-// A figure's letter, to set beside its label as the drawing has it
-export const figureLetter = ({ letter, listed }) => html`<span aria-hidden="true" class="tw:mr-1.5 tw:inline-flex tw:size-4 tw:items-center
-  tw:justify-center tw:rounded-full tw:align-text-bottom tw:text-[10px] tw:leading-none tw:font-bold tw:text-white ${listed
-    ? 'tw:bg-[#715eb2]'
-    : 'tw:bg-gray-400'}">${letter}</span>`
+// `type`'s side view, or its `typeDetail`'s, of `data` in `size`, its bottom bracket over the origin on the ground, to
+// lay over others' unlettered: its shapes, their rims shown but for `rims` false, the points they reach, and the figures
+// it draws at their typical, but those only another view measures, and whether it's `framed`
+export const sideView = ({ type, data = {}, typeDetail = data.type_detail, size }) => {
+  const { views, typical, framed } = drawingViews({ type, typeDetail, data, size })
+  const measures = (view, key) => view.dims.some((dim) => dim.key === key)
+  const shapes = [views[0].shapes].flat(Infinity).filter(Boolean)
+  return {
+    shapes: (rims) => shapes.map((shape) => renderShape(shape, rims)),
+    points: shapes.flatMap(shapePoints),
+    typical: typical.filter((key) => measures(views[0], key) || !views.some((view) => measures(view, key))),
+    framed
+  }
+}
+
+// A figure's letter, to set beside its `label` as the drawing has it and in its color, `highlighted` as the drawing is,
+// and a link to `href` where there's one
+export const figureLetter = ({ letter, listed, calculated = false, highlighted = false, href, label }) => {
+  const classes = `tw:mr-1.5 tw:inline-flex tw:size-4 tw:items-center tw:justify-center tw:rounded-full tw:align-text-bottom tw:text-[10px]
+    tw:leading-none tw:font-bold tw:text-white tw:no-underline! ${highlighted && listed
+    ? 'tw:bg-[#3397dc]'
+    : listed ? 'tw:bg-[#715eb2]' : calculated ? 'tw:bg-purple-300' : 'tw:bg-gray-400'}`
+  return href
+    ? html`<a href=${href} data-in-place="" data-replace="" aria-label=${`Highlight ${label}`} class=${classes}>${letter}</a>`
+    : html`<span aria-hidden="true" class=${classes}>${letter}</span>`
+}
