@@ -88,9 +88,9 @@ module Pages
 
         # [class, the optional mode that alone brings it] by class. In no class here, the e-moto's alone, and in none
         # with an optional throttle, its classes but the throttle's, then the e-moto's with the throttle's caption, each
-        # e-moto's with the state's out of class marker. Sold in no class the state recognizes, as a Class 3 in New Jersey,
-        # the e-moto's alone, under the general marker
+        # e-moto's with the state's out of class marker
         def tiles
+          # sold in no class the state recognizes, as a Class 3 in New Jersey, under the general marker
           return [[nil, nil]] if unrecognized_classes?
 
           out_of_class_id = EbikeRuleServices::StateLaws.out_of_class_id(@state[:abbr]) if @us
@@ -102,7 +102,7 @@ module Pages
           classes.reject { |_, mode| mode == "throttle" } + [[nil, "throttle", out_of_class_id]]
         end
 
-        def unrecognized_classes? = @law.present? && @bike.e_bike_class.present? && @law[:classes].any? && !@law[:classes].intersect?(@bike.stock_e_bike_classes)
+        def unrecognized_classes? = @rules.any? { it[:note] == :classes_not_recognized } && !@law[:classes].intersect?(@bike.stock_e_bike_classes)
 
         # "and as Class 2 with its optional throttle", of the optional classes the state recognizes, and not a throttle's
         # where it would put the bike in no class
@@ -140,11 +140,11 @@ module Pages
         end
 
         def falls_under
-          name = other_classification&.dig(:name)
-          name ? translation(".falls_under_name", state: @state[:name], name:) : copy[:may_be_moped]
+          return copy[:may_be_moped] unless other_classification
+
+          translation(".falls_under_name", state: @state[:name], name: other_classification[:name])
         end
 
-        # The state's own class it falls under instead, which the status lists the rules of
         def other_classification
           return @other_classification if defined?(@other_classification)
 

@@ -86,9 +86,9 @@ module EbikeRuleServices
     # The state's classification for a vehicle with these classifications, other than its e-bike law: its own, or one
     # sharing their group, with its restrictions in force
     def other_classification(abbreviation, ids, today: Time.zone.today)
-      groups = parsed[:groups]
+      parsed => {groups:, tiers:}
       shared = ids.flat_map { [it, *groups[it]] }
-      parsed[:tiers][abbreviation]&.find { it[:ids].intersect?(shared) }
+      tiers[abbreviation]&.find { it[:ids].intersect?(shared) }
         &.then { {name: it[:name], restrictions: current(it[:restrictions], today).select { it[:starts_on].nil? }} }
     end
 
