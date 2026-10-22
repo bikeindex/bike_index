@@ -1,5 +1,5 @@
-<% kinds = BikeServices::DuplicateReviewFinder::KINDS %>
-<% cue_filters = BikeServices::DuplicateReviewCues::FILTERS %>
+<% kinds = BikeDuplicatesServices::Finder::KINDS %>
+<% cue_filters = BikeDuplicatesServices::Cues::FILTERS %>
 
 <h1>Duplicate registration review</h1>
 
@@ -36,8 +36,8 @@
       Test markers are the Bike Index administrators organization and the
       designated test contact, in current or historical links. They identify a
       review scope, not permission to delete. Groups of
-      <%= BikeServices::DuplicateReviewFinder::LARGE_GROUP_MINIMUM %> or more
-      need serial validation.
+      <%= BikeDuplicatesServices::Finder::LARGE_GROUP_MINIMUM %> or more need
+      serial validation.
     </p>
 
     <p>
@@ -57,7 +57,7 @@
       bicycle. Other review cues are tentative and never move a group between
       queues: a standards designation in the serial (ISO/EN and similar), a
       serial repeated on many registrations or shared by
-      <%= BikeServices::DuplicateReviewCues::REPEATED_CONTACT_MINIMUM %> or more
+      <%= BikeDuplicatesServices::Cues::REPEATED_CONTACT_MINIMUM %> or more
       contacts, test markers, initial contacts on a reserved example domain, and
       one shared initial contact. Hover a cue for its reason. Same contact or
       similar spelling does not prove the same bicycle, a correct address or
@@ -66,7 +66,7 @@
   </div>
 </div>
 
-<% same_owner_kinds = BikeServices::DuplicateReviewFinder::SAME_OWNER_KINDS %>
+<% same_owner_kinds = BikeDuplicatesServices::Finder::SAME_OWNER_KINDS %>
 
 <% queue_sections = {
      "Likely same owner — review for a future merge invitation" => same_owner_kinds,

@@ -28,7 +28,7 @@ module Admin
         reference = Bike.unscoped.find(params[:reference_bike_id])
         return head :bad_request if reference.manufacturer_id.nil? || reference.serial_normalized_no_space.to_s.length < 6
 
-        bikes = BikeServices::DuplicateReviewFinder.serial_bikes(reference)
+        bikes = BikeDuplicatesServices::Finder.serial_bikes(reference)
       elsif params[:id] == "compare"
         bike_ids = Array(params[:bike_ids]).flat_map { |value| value.to_s.split(",") }
           .filter_map { |value| Integer(value.strip, exception: false) }.select(&:positive?).uniq
@@ -37,12 +37,12 @@ module Admin
         bikes = Bike.unscoped.where(id: bike_ids)
       else
         @duplicate_group = DuplicateBikeGroup.find(params[:id])
-        bikes = Bike.unscoped.where(id: @duplicate_group.normalized_serial_segments.select(:bike_id))
+        bikes = @duplicate_group.bikes
       end
 
       # Summaries cover every record, so the whole group loads; the largest whole-serial group is a few hundred
-      all_bikes = bikes.includes(:manufacturer, :primary_frame_color, :current_ownership, :creation_organization,
-        :marketplace_listings, ownerships: :organization).order(:created_at, :id).to_a
+      all_bikes = bikes.default_includes.includes(:manufacturer, :creation_organization, :marketplace_listings,
+        :bike_organizations, :bike_stickers, :public_images, ownerships: :organization).reorder(:created_at, :id).to_a
       raise ActiveRecord::RecordNotFound if bike_ids && all_bikes.size != bike_ids.size
       @bikes_count = all_bikes.size
       @reference_bike = if params[:reference_bike_id].present?
@@ -51,22 +51,20 @@ module Admin
         all_bikes.min_by(&:id)
       end
       @stolen_record_counts = StolenRecord.unscoped.where(bike_id: all_bikes.map(&:id)).group(:bike_id).count
-      @review = DuplicateBikeReview.new(bikes: all_bikes, reference_bike: @reference_bike, stolen_record_counts: @stolen_record_counts,
-        manufacturer_names: BikeServices::DuplicateReviewCues.cached_manufacturer_name_serials)
+      @review = BikeDuplicatesServices::Review.new(bikes: all_bikes, reference_bike: @reference_bike, stolen_record_counts: @stolen_record_counts,
+        manufacturer_names: BikeDuplicatesServices::Cues.fetch_manufacturer_name_serials)
       @contact_group = @review.contact_groups.find { it.number == params[:search_contact].to_i }
       @per_page = permitted_per_page(default: 25)
       listed_bikes = @contact_group&.bikes || all_bikes
       listed_bikes = listed_bikes.reverse if sort_direction == "desc"
       @pagy, @bikes = pagy(:offset, listed_bikes, limit: @per_page, page: permitted_page)
-      @test_bike_ids = BikeServices::DuplicateReviewFinder.test_bike_ids(all_bikes.map(&:id)).to_set
-      @serial_stolen = BikeServices::DuplicateReviewFinder.stolen_serials?(all_bikes.map(&:serial_normalized_no_space).uniq)
+      @test_bike_ids = BikeDuplicatesServices::Finder.test_bike_ids(all_bikes.map(&:id)).to_set
+      @serial_stolen = BikeDuplicatesServices::Finder.stolen_serials?(all_bikes.map(&:serial_normalized_no_space).uniq)
       @checks = @review.readiness_checks(serial_stolen: @serial_stolen, test_count: @test_bike_ids.size)
       @readiness = @review.readiness(@checks)
 
       respond_to do |format|
         format.html do
-          # Only the HTML shows these, and only for the listed records
-          ActiveRecord::Associations::Preloader.new(records: @bikes, associations: %i[bike_organizations bike_stickers public_images]).call
           account_ids = all_bikes.flat_map { |bike| bike.ownerships.map(&:user_id) }.compact.uniq
           @account_emails = User.unscoped.where(id: account_ids).pluck(:id, :email).to_h
         end
@@ -90,23 +88,19 @@ module Admin
 
     def dashboard
       @per_page = permitted_per_page(default: 25)
-      database = ActiveRecord::Base.connection_db_config.database
-      cache = BikeServices::DuplicateReviewFinder.cache
-      @group_snapshot = cache.read(BikeServices::DuplicateReviewFinder.cache_key(database))
+      @group_snapshot = BikeDuplicatesServices::Finder.fetch_group_snapshot
       unless @group_snapshot
-        prepare_dashboard(database, cache)
-        html_status, json_status, label = @preparation_failed ? [:service_unavailable, :service_unavailable, "failed"] : [:ok, :accepted, "preparing"]
         return respond_to do |format|
-          format.html { render :preparing, status: html_status }
-          format.json { render json: {status: label}, status: json_status }
+          format.html { render :preparing }
+          format.json { render json: {status: "preparing"}, status: :accepted }
         end
       end
       summary = @group_snapshot[:groups].group_by { it["kind"] }
-      @queues = BikeServices::DuplicateReviewFinder::KINDS.to_h do |kind, label|
+      @queues = BikeDuplicatesServices::Finder::KINDS.to_h do |kind, label|
         kind_groups = summary.fetch(kind, [])
         [kind, {label:, groups: kind_groups.size, records: kind_groups.sum { it["record_count"] }}]
       end
-      @kind = params[:search_kind].presence_in(BikeServices::DuplicateReviewFinder::KINDS.keys) || "handoff_priority"
+      @kind = params[:search_kind].presence_in(BikeDuplicatesServices::Finder::KINDS.keys) || "handoff_priority"
       groups = summary.fetch(@kind, [])
       if params[:search_organization_id].present?
         @organization = Organization.unscoped.find(params[:search_organization_id])
@@ -117,9 +111,9 @@ module Admin
         groups = groups.select { it["bike_ids"].include?(bike_id) }
       end
       @queue_groups_count = groups.size
-      @cue = params[:search_cue].presence_in(BikeServices::DuplicateReviewCues::FILTERS.keys)
-      groups, @cue_counts = BikeServices::DuplicateReviewCues.filter(groups, @cue)
-      # The cache is already largest first; other sorts keep the lowest bike ID first on ties
+      @cue = params[:search_cue].presence_in(BikeDuplicatesServices::Cues::FILTERS.keys)
+      groups, @cue_counts = BikeDuplicatesServices::Cues.filter(groups, @cue)
+      # The snapshot is already largest first; other sorts keep the lowest bike ID first on ties
       unless sort_column == default_column && sort_direction == default_direction
         sign = (sort_direction == "desc") ? -1 : 1
         groups = groups.sort_by { [sign * it[sort_column].to_f, it["reference_id"]] }
@@ -128,7 +122,7 @@ module Admin
       @registrations_count = groups.sum { it["record_count"] }
       @pagy, @groups = pagy(:offset, groups, limit: @per_page, page: permitted_page)
       # The snapshot can be an hour old, so the listed groups' stolen veto is read live
-      stolen_serials = BikeServices::DuplicateReviewFinder.stolen_serials(@groups.map { it["serial"] })
+      stolen_serials = BikeDuplicatesServices::Finder.stolen_serials(@groups.map { it["serial"] })
       @groups = @groups.map { it.merge("serial_stolen" => stolen_serials.include?(it["serial"])) }
       respond_to do |format|
         format.html do
@@ -151,8 +145,7 @@ module Admin
 
     def group_json(group)
       group.slice("reference_id", "bike_ids", "manufacturer_id", "serial", "record_count", "first_at", "last_at", "kind",
-        "serial_stolen", "test_count", "email_count", "account_count", "organization_ids", "handoff_priority")
-        .merge("cues" => BikeServices::DuplicateReviewCues.group_cues(group))
+        "serial_stolen", "test_count", "email_count", "account_count", "organization_ids", "handoff_priority", "cues")
     end
 
     def review_json
@@ -177,27 +170,7 @@ module Admin
           "stolen_record_count" => @stolen_record_counts[bike.id] || 0)
     end
 
-    def prepare_dashboard(database, cache)
-      key = BikeServices::DuplicateReviewFinder.preparation_key(database)
-      token = SecureRandom.uuid
-      acquired = BikeServices::DuplicateReviewFinder.with_preparation_lock(cache) do
-        cache.read(key)
-        cache.write(key, token, unless_exist: true, expires_in: 30.minutes)
-      end
-      unless acquired
-        @preparation_failed = cache.read(key).nil?
-        return
-      end
-
-      begin
-        BikeJobs::PrepareDuplicateReviewJob.perform_async(database, token)
-      rescue RedisClient::Error
-        @preparation_failed = true
-        cache.delete(key) if cache.read(key) == token
-      end
-    end
-
-    # Comparison records sort by registration; dashboard groups (cached hashes) by record count,
+    # Comparison records sort by registration; dashboard groups (snapshot hashes) by record count,
     # first or latest registration. The segments view has a fixed order
     def sortable_columns
       (action_name == "show") ? %w[created_at] : %w[record_count first_at last_at]
@@ -225,7 +198,7 @@ module Admin
         .pluck(:duplicate_bike_group_id, Arel.sql("COUNT(DISTINCT bikes.id)"),
           Arel.sql("COUNT(DISTINCT NULLIF(bikes.serial_normalized_no_space, ''))"),
           Arel.sql("COUNT(DISTINCT bikes.manufacturer_id)"),
-          Arel.sql("COUNT(DISTINCT bikes.id) FILTER (WHERE #{BikeServices::DuplicateReviewFinder.stolen_history_sql("bikes")})"))
+          Arel.sql("COUNT(DISTINCT bikes.id) FILTER (WHERE #{BikeDuplicatesServices::Finder.stolen_history_sql("bikes")})"))
         .to_h { |id, count, serials, manufacturers, stolen| [id, {count:, serials:, manufacturers:, stolen:}] }
     end
   end

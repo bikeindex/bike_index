@@ -1,8 +1,9 @@
 require "spec_helper"
+require "active_support/all"
 require "functionable"
-require_relative "../../../app/services/bike_services/duplicate_review_finder"
+require_relative "../../../app/services/bike_duplicates_services/finder"
 
-RSpec.describe BikeServices::DuplicateReviewFinder do
+RSpec.describe BikeDuplicatesServices::Finder do
   let(:group) do
     {"serial_stolen" => false, "record_count" => 2, "test_count" => 0,
      "pos_count" => 0, "customer_count" => 2, "claimed_count" => 0,

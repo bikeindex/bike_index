@@ -2,10 +2,10 @@ require "spec_helper"
 require "active_support/all"
 require "functionable"
 require_relative "../../../app/services/serial_normalizer"
-require_relative "../../../app/services/bike_services/duplicate_review_finder"
-require_relative "../../../app/services/bike_services/duplicate_review_cues"
+require_relative "../../../app/services/bike_duplicates_services/finder"
+require_relative "../../../app/services/bike_duplicates_services/cues"
 
-RSpec.describe BikeServices::DuplicateReviewCues do
+RSpec.describe BikeDuplicatesServices::Cues do
   let(:group) do
     {"serial" => "WTU123456", "record_count" => 2, "test_count" => 0, "review_contact_count" => 0,
      "email_count" => 2, "missing_email_count" => 0, "account_count" => 2, "missing_account_count" => 0}
@@ -57,6 +57,7 @@ RSpec.describe BikeServices::DuplicateReviewCues do
     single = group.merge("email_count" => 1)
     test_marked = group.merge("test_count" => 1)
     expect(described_class.group_cues(single).map(&:key)).to eq ["single_contact"]
+    single, test_marked = [single, test_marked].map { it.merge("cues" => described_class.group_cues(it)) }
     expect(described_class.filter([single, test_marked], "none").first).to eq [single]
     expect(described_class.filter([single, test_marked], "test_marker").first).to eq [test_marked]
     expect(described_class.filter([single, test_marked], "unknown").first).to eq [single, test_marked]

@@ -2,8 +2,8 @@
 
 # Tentative review cues for a duplicate registration group. A cue says where to look and why,
 # never that a registration is fake, a test or the same physical bicycle as another.
-module BikeServices
-  module DuplicateReviewCues
+module BikeDuplicatesServices
+  module Cues
     extend Functionable
 
     Cue = Data.define(:key, :label, :reason, :color)
@@ -21,7 +21,7 @@ module BikeServices
       .to_h { [it, SerialNormalizer.no_space(SerialNormalizer.normalized_and_corrected(it))] }.freeze
     # Typed into the serial field in place of one. A whole-serial match only: a real serial
     # containing one of these words is not affected. Reviewer-curated, extend as found.
-    # Other brand names are caught by manufacturer_name_serials
+    # Other brand names are caught by fetch_manufacturer_name_serials
     PLACEHOLDER_SERIALS = ["NO SERIAL NUMBER", "NOSERIAL", "NO NUMBER", "NOT ASSIGNED", "NOT RECORDED",
       "NOT AVAILABLE", "UNAVAILABLE", "UNSURE", "NOT SURE", "PENDING", "PRESALE", "ON ORDER", "PLACEHOLDER",
       "TO BE SPECIFIED", "TO BE ADDED", "TBD SPECIAL ORDER", "TBD BUILDING", "ADD SERIAL", "ADD LATER",
@@ -53,24 +53,17 @@ module BikeServices
       STANDARD_DESIGNATIONS.find { |_designation, marking| normalized.any? { it.include?(marking) } }&.first
     end
 
-    # Normalized manufacturer names: a brand typed as the serial ("Brompton", "Motobecane") is a placeholder
-    def manufacturer_name_serials
-      Manufacturer.pluck(:name).filter_map do |name|
-        normalized = SerialNormalizer.no_space(SerialNormalizer.normalized_and_corrected(name))
-        [normalized, name] if normalized.to_s.length >= 6
-      end.to_h
-    end
-
-    def cached_manufacturer_name_serials
-      # A new manufacturer raises the max id, a rename the max updated_at
-      version = Manufacturer.unscope(:order).pick(Arel.sql("max(id)"), Arel.sql("max(updated_at)"))
-      Rails.cache.fetch(["duplicate_review_manufacturer_name_serials", *version], expires_in: 1.day) do
-        manufacturer_name_serials
+    # Normalized manufacturer names: a brand typed as the serial ("Brompton", "Motobecane") is a placeholder.
+    # A new or renamed manufacturer moves the max updated_at, so the key changes rather than expiring.
+    # A time in a cache key keeps only its second, so the key uses all of it
+    def fetch_manufacturer_name_serials
+      Rails.cache.fetch(["duplicate_review_manufacturer_name_serials", Manufacturer.maximum(:updated_at).to_f]) do
+        calculated_manufacturer_name_serials
       end
     end
 
     # Whether the whole normalized serial is a known placeholder, part number, manufacturer name
-    # or one repeated character. manufacturer_names: is manufacturer_name_serials, or the part of it in use
+    # or one repeated character. manufacturer_names: is fetch_manufacturer_name_serials, or the part of it in use
     def not_a_serial(serial, manufacturer_names: {})
       serial = serial.to_s
       if PLACEHOLDER_SERIALS.key?(serial)
@@ -93,7 +86,7 @@ module BikeServices
       marking = standard_marking(serials)
       not_serial = Array(serials).filter_map { not_a_serial(it, manufacturer_names:) }.first
       code_reasons = [
-        ("repeated on #{record_count} live registrations" if record_count >= DuplicateReviewFinder::LARGE_GROUP_MINIMUM),
+        ("repeated on #{record_count} live registrations" if record_count >= Finder::LARGE_GROUP_MINIMUM),
         ("shared by #{contact_count} different initial contact emails" if contact_count >= REPEATED_CONTACT_MINIMUM),
         ("matches the model text on #{model_match_count} #{"record".pluralize(model_match_count)}" if model_match_count.positive?)
       ].compact
@@ -147,10 +140,10 @@ module BikeServices
         (group["account_count"] == 1 && group["missing_account_count"].zero?)
     end
 
-    # The groups matching filter (all of them for an unknown one) and every filter's count,
-    # building each group's cues once
+    # The groups matching filter (all of them for an unknown one) and every filter's count.
+    # Groups carry their cues, built once when they're prepared
     def filter(groups, filter)
-      keyed = groups.map { |group| [group, group_cues(group).map(&:key)] }
+      keyed = groups.map { |group| [group, group["cues"].map(&:key)] }
       counts = FILTERS.keys.to_h { |key| [key, keyed.count { matches_filter?(it.last, key) }] }
       filtered = FILTERS.key?(filter) ? keyed.filter_map { |group, keys| group if matches_filter?(keys, filter) } : groups
       [filtered, counts]
@@ -160,11 +153,18 @@ module BikeServices
     # private below here
     #
 
+    def calculated_manufacturer_name_serials
+      Manufacturer.pluck(:name).filter_map do |name|
+        normalized = SerialNormalizer.no_space(SerialNormalizer.normalized_and_corrected(name))
+        [normalized, name] if normalized.to_s.length >= 6
+      end.to_h
+    end
+
     # One shared contact is context rather than a reason to doubt the serial
     def matches_filter?(keys, filter)
       (filter == "none") ? (keys - ["single_contact"]).none? : keys.include?(filter)
     end
 
-    conceal :matches_filter?
+    conceal :calculated_manufacturer_name_serials, :matches_filter?
   end
 end

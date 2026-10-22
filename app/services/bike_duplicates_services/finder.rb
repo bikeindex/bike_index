@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-module BikeServices
-  module DuplicateReviewFinder
+module BikeDuplicatesServices
+  module Finder
     extend Functionable
 
     LARGE_GROUP_MINIMUM = 10
@@ -19,38 +19,43 @@ module BikeServices
     }.freeze
     # Queues a future merge invitation could draw from; the rest need separate review
     SAME_OWNER_KINDS = %w[handoff_priority shop_customer same_identity].freeze
+    # The integrations whose registrations are a shop's sale
+    POS_KINDS = %w[lightspeed_pos ascend_pos].freeze
 
-    def cache
-      return Rails.cache unless Rails.cache.is_a?(ActiveSupport::Cache::NullStore)
+    SNAPSHOT_KEY = "duplicate_review_group_snapshot"
+    PREPARING_KEY = "duplicate_review_group_snapshot_preparing"
+    SNAPSHOT_TTL = 1.hour
+    # Longer than the query takes; if the job dies, the next visit after this enqueues another
+    PREPARING_TTL = 30.minutes
 
-      directory = Rails.root.join("tmp", "duplicate_review_cache")
-      FileUtils.mkdir_p(directory, mode: 0o700)
-      File.chmod(0o700, directory)
-      ActiveSupport::Cache::FileStore.new(directory)
+    # The dashboard's groups, or nil while they're prepared. The query takes most of a minute in
+    # production, so a miss enqueues the job - once across every server - rather than running it here
+    def fetch_group_snapshot
+      json = RedisPool.conn { it.get(SNAPSHOT_KEY) }
+      return parse_snapshot(json) if json
+
+      claimed = RedisPool.conn { it.set(PREPARING_KEY, Time.current.to_i, nx: true, ex: PREPARING_TTL.to_i) }
+      BikeJobs::PrepareDuplicateReviewJob.perform_async if claimed
+      nil
     end
 
-    def with_preparation_lock(cache)
-      return yield unless cache.is_a?(ActiveSupport::Cache::FileStore)
-
-      File.open(File.join(cache.cache_path, "duplicate_review_preparation.lock"), File::RDWR | File::CREAT, 0o600) do |file|
-        file.flock(File::LOCK_EX)
-        yield
-      end
+    def store_group_snapshot
+      snapshot = ActiveRecord::Base.connected_to(role: :reading, prevent_writes: true) { {generated_at: Time.current, groups:} }
+      RedisPool.conn { it.set(SNAPSHOT_KEY, snapshot.to_json, ex: SNAPSHOT_TTL.to_i) }
+    ensure
+      RedisPool.conn { it.del(PREPARING_KEY) }
     end
-
-    def cache_key(database) = ["duplicate_review_groups_v8", database]
-
-    def preparation_key(database) = ["duplicate_review_groups_preparing_v8", database]
 
     def groups
-      manufacturer_names = DuplicateReviewCues.manufacturer_name_serials
+      manufacturer_names = Cues.fetch_manufacturer_name_serials
       ActiveRecord::Base.connection.select_all(query).to_a.map do |group|
         group["manufacturer_name_serial"] = manufacturer_names[group["serial"]]
-        group.merge("kind" => kind(group),
+        group = group.merge("kind" => kind(group),
           "bike_ids" => JSON.parse(group["bike_ids"]),
           "organization_ids" => JSON.parse(group["organization_ids"] || "[]"),
           "first_at" => group["first_at"].in_time_zone,
           "last_at" => group["last_at"].in_time_zone)
+        group.merge("cues" => Cues.group_cues(group))
       end
     end
 
@@ -58,14 +63,14 @@ module BikeServices
     # so it outranks the rest
     def kind(group)
       return "stolen_history" if group["serial_stolen"]
-      return "not_a_serial" if DuplicateReviewCues.not_a_serial(group["serial"], manufacturer_names: DuplicateReviewCues.group_manufacturer_names(group))
+      return "not_a_serial" if Cues.not_a_serial(group["serial"], manufacturer_names: Cues.group_manufacturer_names(group))
       return "internal_test" if group["test_count"] == group["record_count"]
       return "mixed_test" if group["test_count"].positive?
       return "large_group" if group["record_count"] >= LARGE_GROUP_MINIMUM
       return "handoff_priority" if group["handoff_priority"]
       return "pos_repeat" if group["pos_count"] == group["record_count"] && group["ever_claimed_count"].zero? && group["transfer_count"].zero? && group["email_count"] == 1 && group["missing_email_count"].zero? && group["organization_count"] == 1 && group["missing_organization_count"].zero?
       return "shop_customer" if group["record_count"] == 2 && group["pos_count"] == 1 && group["customer_count"] == 1 && group["pos_first"]
-      return "same_identity" if DuplicateReviewCues.single_contact?(group)
+      return "same_identity" if Cues.single_contact?(group)
 
       "unresolved"
     end
@@ -77,7 +82,7 @@ module BikeServices
 
     # Current, historical or recovered: any of them vetoes merging a whole serial
     def stolen_history_sql(table)
-      "(#{table}.status = 1 OR #{table}.current_stolen_record_id IS NOT NULL" \
+      "(#{table}.status = #{Bike::STATUS_ENUM[:status_stolen]} OR #{table}.current_stolen_record_id IS NOT NULL" \
         " OR EXISTS (SELECT 1 FROM stolen_records WHERE stolen_records.bike_id = #{table}.id))"
     end
 
@@ -133,8 +138,9 @@ module BikeServices
         ), registrations AS (
           SELECT b.*, o.user_id, coalesce(o.organization_id, b.creation_organization_id) organization_id,
             CASE WHEN o.is_phone IS NOT TRUE AND btrim(o.owner_email) ~ '^[^@[:space:]]+@[^@[:space:]]+$' THEN lower(btrim(o.owner_email)) END email,
-            coalesce(o.pos_kind IN (2, 3), false) pos,
-            coalesce(o.origin IN (0, 1, 2, 3, 7, 13, 14, 15, 16) AND coalesce(o.pos_kind, 0) NOT IN (1, 2, 3, 4, 6), false) customer,
+            coalesce(o.pos_kind IN (#{enum_sql(Organization::POS_KIND_ENUM, *POS_KINDS)}), false) pos,
+            coalesce(o.origin IN (#{enum_sql(Ownership::ORIGIN_ENUM, *customer_origins)})
+              AND coalesce(o.pos_kind, #{Organization::POS_KIND_ENUM[:no_pos]}) NOT IN (#{enum_sql(Organization::POS_KIND_ENUM, *Organization.pos_kinds.select { Organization.pos?(it) })}), false) customer,
             coalesce(o.claimed OR o.claimed_at IS NOT NULL, false) claimed,
             coalesce((o.claimed OR o.claimed_at IS NOT NULL) AND o.user_id IS NOT NULL AND o.creator_id = o.user_id
               AND o.creator_id IS DISTINCT FROM g.auto_user_id, false) self_registered,
@@ -162,7 +168,7 @@ module BikeServices
           count(*) FILTER (WHERE ever_claimed)::integer ever_claimed_count,
           count(*) FILTER (WHERE transferred)::integer transfer_count,
           count(DISTINCT email)::integer email_count, count(*) FILTER (WHERE email IS NULL)::integer missing_email_count,
-          count(*) FILTER (WHERE #{DuplicateReviewCues.review_contact_sql("email")})::integer review_contact_count,
+          count(*) FILTER (WHERE #{Cues.review_contact_sql("email")})::integer review_contact_count,
           count(DISTINCT user_id)::integer account_count, count(*) FILTER (WHERE user_id IS NULL)::integer missing_account_count,
           count(DISTINCT organization_id)::integer organization_count, count(*) FILTER (WHERE organization_id IS NULL)::integer missing_organization_count,
           jsonb_agg(DISTINCT organization_id) FILTER (WHERE organization_id IS NOT NULL) organization_ids,
@@ -172,7 +178,7 @@ module BikeServices
           count(*) = 2 AND count(*) FILTER (WHERE pos) = 1 AND count(*) FILTER (WHERE customer AND self_registered) = 1
             AND min(created_at) FILTER (WHERE pos) < min(created_at) FILTER (WHERE customer)
             AND count(*) FILTER (WHERE pos AND ever_claimed) = 0
-            AND count(*) FILTER (WHERE transferred OR marketplace OR NOT current_identity_matches OR current_impound_record_id IS NOT NULL OR status IS DISTINCT FROM 0) = 0
+            AND count(*) FILTER (WHERE transferred OR marketplace OR NOT current_identity_matches OR current_impound_record_id IS NOT NULL OR status IS DISTINCT FROM #{Bike::STATUS_ENUM[:status_with_owner]}) = 0
             AND count(DISTINCT email) = 1 AND count(email) = 2 AND count(DISTINCT user_id) = 1 AND count(user_id) = 2
             AND count(DISTINCT nullif(lower(btrim(frame_model)), '')) <= 1 AND count(DISTINCT year) <= 1
             AND count(DISTINCT nullif(lower(btrim(manufacturer_other)), '')) <= 1
@@ -183,6 +189,20 @@ module BikeServices
       SQL
     end
 
-    conceal :stolen_serial_bikes, :query, :test_bikes_sql
+    # A customer registering their own bike: the website, a shop's embed form or a sticker
+    def customer_origins = Ownership::ORIGIN_WEBSITE_REG + %w[embed embed_extended embed_partial]
+
+    def enum_sql(enum, *keys) = enum.values_at(*keys.map(&:to_sym)).join(", ")
+
+    def parse_snapshot(json)
+      snapshot = JSON.parse(json)
+      groups = snapshot["groups"].map do |group|
+        group.merge("first_at" => Time.zone.parse(group["first_at"]), "last_at" => Time.zone.parse(group["last_at"]),
+          "cues" => group["cues"].map { Cues::Cue.new(**it.symbolize_keys.merge(color: it["color"].to_sym)) })
+      end
+      {generated_at: Time.zone.parse(snapshot["generated_at"]), groups:}
+    end
+
+    conceal :customer_origins, :enum_sql, :parse_snapshot, :stolen_serial_bikes, :query, :test_bikes_sql
   end
 end
