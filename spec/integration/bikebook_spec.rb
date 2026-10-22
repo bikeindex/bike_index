@@ -218,16 +218,18 @@ RSpec.describe "BikeBook", :js, type: :system do
     scroller_left, scroller_right = edges.call(sizes_card.find("[data-controller~='ui--tabs']"))
     expect([scroller_left - card_left, card_right - scroller_right]).to all(be <= 1)
     # the overlay draws a frame from the figures it lists and those they work out, and one it can't work out as its
-    # wheels alone - its wheelbase apart - on the drawn frame's rear axle, saying which it's missing
+    # wheels alone - its wheelbase apart - from the same rear wheel spot, saying which it's missing
     within("[aria-label='Geometry overlay']") do
       expect(first("ul").all("li").map(&:text)).to eq(["Aventón Level 4 REC Step-Through Regular", "Aventón Level 2 Step-Through S/M"])
       frames = all("svg[role='img'] > g", visible: :all)
       expect(frames.map { it.has_css?("path", visible: :all) }).to eq([true, false])
       wheels = frames.last.all("circle", visible: :all).map { it[:cx].to_f }
-      expect(wheels).to match([be < 0, be > 0])
+      expect(wheels.first).to eq 0
+      # the drawn frame's rear wheel on the same spot
+      expect(frames.first.all("circle", visible: :all).map { it[:cx].to_f }.min).to eq 0
       expect(wheels.last - wheels.first).to be_within(0.1).of(1095)
       expect(page).to have_text(/Aventón Level 2 Step-Through doesn't list its BB Drop, Head Angle, .* or the measures to calculate them, so only its wheels/)
-        .and have_text("are drawn, the rear axle on Aventón Level 4 REC Step-Through's.")
+        .and have_text("so only its wheels are drawn.")
       # the same wheel size, its tires too near each other's for the wheel note
       expect(page).to have_no_text("diameter")
     end
@@ -551,10 +553,9 @@ RSpec.describe "BikeBook", :js, type: :system do
     click_link "Sizes & geometry"
     # the label column's header and the five vehicles'
     expect(page).to have_css("[aria-label='Sizes & geometry comparison'] thead th", count: 6)
-    # a vehicle whose type's drawing takes a figure at its typical is its wheels alone, the rear axle on the first frame's,
-    # under a note naming those figures
+    # a vehicle whose type's drawing takes a figure at its typical is its wheels alone, under a note naming those figures
     expect(page).to have_css("[aria-label='Geometry overlay'] p + ul li", exact_text: "Segway GT3 Pro doesn't list its Deck height or the " \
-      "measures to calculate them, so only its wheels are drawn, the rear axle on Aventón Level 4 REC Step-Through's.")
+      "measures to calculate them, so only its wheels are drawn.")
     expect(page).to have_css("[aria-label='Geometry overlay'] p", exact_text: "Note: missing geometry information:")
     # the table at least the page's column, scrolling only past the window's width
     table_fit = page.evaluate_script(<<~JS)

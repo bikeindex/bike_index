@@ -224,13 +224,18 @@ export const cycleDrawing = ({ type, data = {}, typeDetail = data.type_detail, s
   return { figure, legend }
 }
 
-// `type`'s side view, or its `typeDetail`'s, of `data` in `size`, its bottom bracket over the origin on the ground, to
-// lay over others' unlettered: its shapes, their rims shown but for `rims` false, the points they reach, and the figures
-// it draws at their typical, but those only another view measures, and whether it's `framed`
+// `type`'s side view, or its `typeDetail`'s, of `data` in `size`, its rear wheel standing on the origin, to lay over
+// others' unlettered: its shapes, their rims shown but for `rims` false, the points they reach, and the figures it draws
+// at their typical, but those only another view measures, and whether it's `framed`
 export const sideView = ({ type, data = {}, typeDetail = data.type_detail, size }) => {
   const { views, typical, framed } = drawingViews({ type, typeDetail, data, size })
   const measures = (view, key) => view.dims.some((dim) => dim.key === key)
-  const { shapes } = views[0]
+  // the hindmost tire on the ground, as a towing bike's ghost isn't
+  const grounded = views[0].shapes.filter(({ kind, weight, center, radius }) => kind === 'circle' && weight !== 'ghost' && Math.abs(center[1] - radius) < 1)
+  const back = grounded.length ? Math.min(...grounded.map(({ center }) => center[0])) : 0
+  const shapes = views[0].shapes.map((shape) => shape.kind === 'circle'
+    ? { ...shape, center: plus(shape.center, [-back, 0]) }
+    : { ...shape, points: shape.points.map((point) => plus(point, [-back, 0])) })
   return {
     shapes: (rims) => shapes.map((shape) => renderShape(shape, rims)),
     points: shapes.flatMap(shapePoints),
