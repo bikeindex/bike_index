@@ -88,8 +88,11 @@ module Pages
 
         # [class, the optional mode that alone brings it] by class. In no class here, the e-moto's alone, and in none
         # with an optional throttle, its classes but the throttle's, then the e-moto's with the throttle's caption, each
-        # e-moto's with the state's out of class marker
+        # e-moto's with the state's out of class marker. Sold in no class the state recognizes, as a Class 3 in New Jersey,
+        # the e-moto's alone, under the general marker
         def tiles
+          return [[nil, nil]] if unrecognized_classes?
+
           out_of_class_id = EbikeRuleServices::StateLaws.out_of_class_id(@state[:abbr]) if @us
           return [[nil, nil, out_of_class_id]] if @bike.out_of_class_under?(@law)
 
@@ -98,6 +101,8 @@ module Pages
 
           classes.reject { |_, mode| mode == "throttle" } + [[nil, "throttle", out_of_class_id]]
         end
+
+        def unrecognized_classes? = @law.present? && @bike.e_bike_class.present? && @law[:classes].any? && !@law[:classes].intersect?(@bike.stock_e_bike_classes)
 
         # "and as Class 2 with its optional throttle", of the optional classes the state recognizes, and not a throttle's
         # where it would put the bike in no class
@@ -120,7 +125,7 @@ module Pages
         def details
           @details ||= case @verdict
           when :yellow then without_throttle? ? [] : notes(:check)
-          when :red then [*notes(:fail), other_classification]
+          when :red then [*notes(:fail), falls_under]
           when :gray then @us ? [gray_detail] : []
           else []
           end
@@ -134,9 +139,16 @@ module Pages
           end
         end
 
+        def falls_under
+          name = other_classification&.dig(:name)
+          name ? translation(".falls_under_name", state: @state[:name], name:) : copy[:may_be_moped]
+        end
+
+        # The state's own class it falls under instead, which the status lists the rules of
         def other_classification
-          name = @us && EbikeRuleServices::StateLaws.classification_name(@state[:abbr], @bike.e_vehicle_classifications)
-          name ? translation(".falls_under", state: @state[:name], name:) : copy[:may_be_moped]
+          return @other_classification if defined?(@other_classification)
+
+          @other_classification = (EbikeRuleServices::StateLaws.other_classification(@state[:abbr], @bike.e_vehicle_classifications) if @us)
         end
 
         # The copy that names a state, and Canada's in its place
@@ -151,7 +163,7 @@ module Pages
         end
 
         def source
-          link = link_to(translation(".bikebook_name"), bikebook_path(vehicle_models: @law[:id]), class: "twlink")
+          link = link_to(translation(".bikebook_name"), ReadableQuery.path(bikebook_path, vehicle_models: @law[:id]), class: "twlink")
           @us ? translation(".source_html", link:) : translation(".law_source_html", link:)
         end
 
@@ -255,9 +267,10 @@ module Pages
         def us_note(row, args)
           case row[:note]
           when :classes_recognized then translation(".classes_recognized", count: row[:args][:e_bike_classes].size, **args)
-          when :classes_not_recognized then translation(".classes_not_recognized", count: row[:args][:e_bike_classes].size, **args)
+          when :classes_not_recognized
+            translation(".classes_not_recognized_in", count: row[:args][:e_bike_classes].size, state: @state[:name], **args)
           when :optional_classes_not_recognized
-            translation(".optional_classes_not_recognized", count: row[:args][:e_bike_classes].size, **args)
+            translation(".optional_classes_not_recognized_in", count: row[:args][:e_bike_classes].size, state: @state[:name], **args)
           when :optional_throttle_not_allowed then translation(".optional_throttle_not_allowed")
           when :classes_not_permitted
             translation(".classes_not_permitted", classes: row[:args][:e_bike_classes].map { translation(".class_n", n: it) }.to_sentence)

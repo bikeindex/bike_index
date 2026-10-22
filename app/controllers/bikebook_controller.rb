@@ -23,9 +23,7 @@ class BikebookController < ApplicationController
       sizes = picked.zip(params[:vehicle_sizes].split(",")).to_h
       query["vehicle_sizes"] = vehicle_models.map { sizes[it] }.join(",").sub(/,+\z/, "")
     end
-    # unescaped, as the page writes its own URLs
-    query = query.to_query.gsub("%2F", "/").gsub("%2C", ",")
-    redirect_to "#{bikebook_path}?#{query}"
+    redirect_to ReadableQuery.path(bikebook_path, query)
   end
 
   private

@@ -83,11 +83,13 @@ module EbikeRuleServices
       STATES.find { it[:abbr] == abbreviation.upcase } if abbreviation.is_a?(String)
     end
 
-    # The state's name for a vehicle with these classifications, other than its e-bike law: its own, or one sharing their group
-    def classification_name(abbreviation, ids)
+    # The state's classification for a vehicle with these classifications, other than its e-bike law: its own, or one
+    # sharing their group, with its restrictions in force
+    def other_classification(abbreviation, ids, today: Time.zone.today)
       groups = parsed[:groups]
       shared = ids.flat_map { [it, *groups[it]] }
-      parsed[:tiers][abbreviation]&.find { |_name, tier_ids| tier_ids.intersect?(shared) }&.first
+      parsed[:tiers][abbreviation]&.find { it[:ids].intersect?(shared) }
+        &.then { {name: it[:name], restrictions: current(it[:restrictions], today).select { it[:starts_on].nil? }} }
     end
 
     # From a request's Cloudflare location headers
@@ -102,7 +104,7 @@ module EbikeRuleServices
     # private below here
     #
 
-    def parsed = vocabulary("state_laws_with_e_bike_laws") { parse(it) } || {laws: {}, tiers: {}, groups: {}, classes: {}, motorcycles: {}, e_bike_laws: []}
+    def parsed = vocabulary("state_laws_with_tier_restrictions") { parse(it) } || {laws: {}, tiers: {}, groups: {}, classes: {}, motorcycles: {}, e_bike_laws: []}
 
     # apart from parsed, which every state's lookup reads
     def classifications
@@ -126,7 +128,7 @@ module EbikeRuleServices
         .to_h { |abbreviation, id, record| [abbreviation, law(id, record)] }
       {
         laws:,
-        tiers: tiers.group_by(&:first).transform_values { it.map { |_, id, record| [record["name"], [id, *record["groups"]]] } },
+        tiers: tiers.group_by(&:first).transform_values { it.map { |_, id, record| {name: record["name"], ids: [id, *record["groups"]], restrictions: record["restrictions"].to_a.map { restriction(it) }} } },
         groups: records.filter_map { |id, record| [id, record["groups"]] if record["groups"] }.to_h,
         e_bike_laws: records.filter_map { |id, record| id if record["e_bike_law"] },
         classes: states.group_by(&:first).filter_map { |abbreviation, entries|
