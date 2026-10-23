@@ -9,7 +9,8 @@ import { Controller } from '@hotwired/stimulus'
 // Wire data-action="input->form-persist#save change->form-persist#save
 // hw-combobox:selection->form-persist#save submit->form-persist#clear".
 // The storage key defaults to pathname + the form's action (see derivedKey);
-// set data-form-persist-key-value only when that isn't unique per form.
+// set data-form-persist-key-value only when that isn't unique per form. save-value writes the
+// form as rendered, for a server that sent back what was submitted - submit cleared the draft.
 // A restore that changed something is announced as form-persist:restored on window - one
 // that found no draft announces nothing. A controller whose UI hangs off restored fields
 // listens for it and reconciles in its own connect, since a lazily loaded module can
@@ -20,12 +21,15 @@ const DEBOUNCE_MS = 400
 const TTL_MS = 604800000 // 1 week
 
 export default class extends Controller {
-  static values = { key: String }
+  static values = { key: String, save: Boolean }
 
   connect () {
     // Deferred so siblings connecting alongside this one hear the restore. A later one
     // won't, whatever the delay -- it reconciles in its own connect.
-    this.restoreTimer = setTimeout(() => this.restore(), 0)
+    this.restoreTimer = setTimeout(() => {
+      this.restore()
+      if (this.saveValue) this.write()
+    }, 0)
     // Flush a pending debounced write before the page unloads, so quickly
     // typing then reloading doesn't drop the last keystrokes.
     this.boundFlush = this.flush.bind(this)

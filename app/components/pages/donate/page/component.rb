@@ -13,9 +13,9 @@ module Pages
         # Hand-picked recovery story photos that show the whole bike - the newest story
         # photos are as often a serial sticker or a selfie
         WALL_PHOTOS = %w[
-          x2d8tfop08gvzy7lsicfi2fwkzcg 6pbg4mj2fnhrw3pbvsyrm93t4n2z aq90e5l3o00eacqqnkw38k0fyk1h
-          y1zx6uj63nr24sq13l40umjqu0iy okl6evn1b2rxevijirssjbtk4hvj 3x24hijp2tw39cn1potgkqo7hdtb
-          wh198hgo27wt25cc83xhwzi4h439
+          zifmz9ievoovtx971osxccoexyw3 yato0hk1laa4us6otl49uyzldoqu aq90e5l3o00eacqqnkw38k0fyk1h
+          gfpgif7uxjy2y7rh11n36uzbfxdd owvsv1dvbn2ljtwglyebih6vwyce xfgqrcjh7ejblp6cffy77a85gotg
+          eslpqitkldruibfba8uwt8j0x63v
         ].map { "https://uploads.bikeindex.org/#{it}" }.freeze
 
         def initialize(stripe_prices:, recovery_displays:, initial_amount: nil, referral_source: nil,
@@ -74,7 +74,7 @@ module Pages
         def abbreviated(count)
           return number_display(count) if count < 1_000_000
 
-          safe_join([number_display(count / 1_000_000), "M+"])
+          "#{number_with_precision(count / 1_000_000.0, precision: 1, round_mode: :floor, strip_insignificant_zeros: true)}M+"
         end
 
         def tiers
@@ -90,12 +90,14 @@ module Pages
         end
 
         def money_uses
-          [
-            ["lucide-search", "tw:bg-blue-600", translation(".uses_free_title"), translation(".uses_free_body")],
-            ["lucide-megaphone", "tw:bg-purple-500", translation(".uses_alerts_title"), translation(".uses_alerts_body")],
-            ["lucide-handshake", "tw:bg-[#2c3e50]", translation(".uses_partners_title"), translation(".uses_partners_body")],
-            ["lucide-store", "tw:bg-blue-500", translation(".uses_owners_title"), translation(".uses_owners_body")]
-          ]
+          [{icon: "icons/lucide-search.svg", circle: "tw:bg-blue-600",
+            title: translation(".uses_free_title"), body: translation(".uses_free_body")},
+            {icon: "icons/lucide-megaphone.svg", circle: "tw:bg-purple-500",
+             title: translation(".uses_alerts_title"), body: translation(".uses_alerts_body")},
+            {icon: "icons/lucide-handshake.svg", circle: "tw:bg-slate-900",
+             title: translation(".uses_partners_title"), body: translation(".uses_partners_body")},
+            {icon: "icons/lucide-store.svg", circle: "tw:bg-blue-500",
+             title: translation(".uses_owners_title"), body: translation(".uses_owners_body")}]
         end
 
         def radio_mark

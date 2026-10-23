@@ -10,6 +10,8 @@ class InfoController < ApplicationController
       redirect_to(news_path) && return
     elsif @blog.title_slug == Blog.membership_slug
       redirect_to("/membership") && return
+    elsif @blog.title_slug == Blog.why_donate_slug
+      redirect_to(donate_path) && return
     elsif @blog.id == Blog.theft_rings_id
       redirect_to("/theft-rings") && return
     elsif @blog.blog?
@@ -57,24 +59,19 @@ class InfoController < ApplicationController
     render "show"
   end
 
-  def why_donate
-    @blog = Blog.friendly_find(Blog.why_donate_slug)
-    render "/news/show"
-  end
-
   def donate
     # amount is a fixed payment, which the payments page takes
     return redirect_to_payment if params[:amount].present?
 
     @page_title = "Support Bike Index"
     @skip_general_alert = true
-    render Pages::Donate::Page::Component.new(
+    render SharedBlocks::Marketing::Wrapper::Component.new(page: Pages::Donate::Page::Component.new(
       stripe_prices: StripePrice.active_for(current_currency),
-      recovery_displays: RecoveryDisplay.joins(:photo_processed_attachment).with_attached_photo_processed.limit(4),
+      recovery_displays: RecoveryDisplay.with_photo,
       initial_amount: params[:initial_amount],
       referral_source: params[:source],
       current_user:
-    )
+    ))
   end
 
   def support_bike_index

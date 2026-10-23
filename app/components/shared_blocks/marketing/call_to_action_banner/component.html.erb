@@ -1,0 +1,26 @@
+<section class="tw:bg-blue-600 tw:text-white">
+  <div class="tw:flex tw:flex-col tw:gap-5 tw:py-6 tw:md:flex-row tw:md:items-center tw:md:gap-9 tw:lg:py-11 <%= SharedBlocks::Marketing::Wrapper::Component::CONTAINER_CLASSES %>">
+    <% if @illustration %>
+      <%= image_tag("kelsey/illustrations/comic-assets_bike-love-1.png", alt: "", class: "tw:hidden tw:w-30 tw:shrink-0 tw:lg:block") %>
+    <% end %>
+
+    <div class="tw:flex-1">
+      <h2
+        class="
+          tw:m-0 tw:font-header tw:text-[22px] tw:leading-tight
+          tw:font-extrabold tw:text-white tw:lg:text-[32px]
+        "
+      >
+        <%= @heading %>
+      </h2>
+
+      <% if @subheading.present? %>
+        <p class="tw:m-0 tw:mt-2 tw:hidden tw:text-[17px] tw:sm:block">
+          <%= @subheading %>
+        </p>
+      <% end %>
+    </div>
+
+    <div class="tw:shrink-0"><%= content %></div>
+  </div>
+</section>
