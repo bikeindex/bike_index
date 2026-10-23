@@ -58,6 +58,12 @@ body.dark .hw-combobox {
   overflow-wrap: anywhere;
 }
 
+/* The gem's multiselect input keeps half the field (--hw-combobox-width / 2),
+   so it would wrap below chips that leave room to type beside them. */
+.hw-combobox.hw-combobox--multiple .hw-combobox__input {
+  min-width: 5rem;
+}
+
 /* While the rich-display overlay covers the input (UI::Forms::Combobox
    rich_display:), the input's own text is transparent — so the autocomplete's
    selected range would otherwise show as a stray highlight over the overlay. */

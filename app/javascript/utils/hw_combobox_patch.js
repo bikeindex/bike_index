@@ -56,6 +56,20 @@ HwComboboxController.prototype._filterAsync = async function (inputType) {
   }
 }
 
+// A multiselect's Escape makes no chip of the option the gem locks in, but the gem still announces
+// it as a selection
+const close = HwComboboxController.prototype.close
+HwComboboxController.prototype.close = function (inputType) {
+  this.dismissing = this._isMultiselect && inputType === 'hw:keyHandler:escape'
+  close.call(this, inputType)
+  this.dismissing = false
+}
+
+const dispatchSelectionEvent = HwComboboxController.prototype._dispatchSelectionEvent
+HwComboboxController.prototype._dispatchSelectionEvent = function (previousValue) {
+  if (!this.dismissing) dispatchSelectionEvent.call(this, previousValue)
+}
+
 // The gem swallows Enter whether or not the listbox is open, so a combobox with
 // nothing to pick breaks the form's implicit submission -- unlike every other
 // input. Only handle the key while there's an option to choose.
