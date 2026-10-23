@@ -11,7 +11,7 @@ RSpec.describe Search::BikebookController, type: :request do
   describe "rack_attack" do
     include_context :rack_attack
 
-    # Bikebook makes no request per page, so its searches' logs don't spend the per-page budget
+    # BikeBook makes no request per page, so its searches' logs don't spend the per-page budget
     it "throttles at the API limit, not the lower per-page limit" do
       throttled = rack_attack_throttled_response(limit: Rack::Attack::API_MAX_REQUESTS) do
         get "/search/bikebook", params: {q: "gt3"}

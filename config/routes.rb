@@ -47,6 +47,7 @@ Rails.application.routes.draw do
 
   get "for_advocacy", to: redirect("/for_community_groups")
   get "for_shops", to: redirect("/for_bike_shops")
+  get "ucmerced", to: redirect("/register/new?organization_id=uc-merced")
   get "ambassadors", to: redirect("/ambassadors_how_to") # Because convenience
   get "ambassadors/new", to: redirect("https://docs.google.com/forms/d/e/1FAIpQLSenRXqarY4KFNw1AQ3u5iHwIaaIpgy6cb1sD3YTSQiR0ICeCQ/viewform"), as: :new_ambassador
 
@@ -323,7 +324,7 @@ Rails.application.routes.draw do
       :primary_activities
 
     %i[
-      bike_sticker_updates email_bans exports graduated_notifications invoices logged_searches
+      bike_sticker_updates cycle_types email_bans exports graduated_notifications invoices logged_searches
       mailchimp_data model_attestations model_audits
       notifications organization_landing_pages organization_messages organization_statuses paper_trail_versions
       parking_notifications public_images
@@ -471,8 +472,8 @@ Rails.application.routes.draw do
     how_not_to_buy_stolen lightspeed membership].freeze.each do |page|
     get page, controller: "info", action: page
   end
-  get "why-donate", to: "info#why_donate", as: "why_donate"
-  get "why_donate", to: redirect("/why-donate")
+  get "why-donate", to: redirect("/donate")
+  get "why_donate", to: redirect("/donate")
   get "lightspeed_integration", to: redirect("/lightspeed")
   get "/info/how-to-get-your-stolen-bike-back", controller: "info", action: "show", id: "how-to-get-your-stolen-bike-back", as: :get_your_stolen_bike_back
   resources :info, only: %i[show]

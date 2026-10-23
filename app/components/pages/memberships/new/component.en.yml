@@ -97,10 +97,7 @@ en:
           perk_top_listing_placement: Top listing placement on the marketplace
           plans_from: Plans from %{price} a month
           questions: Questions
-          read_more_recovery_stories: Read more recovery stories
           recommended: Recommended
-          recoveries_reported_by_owners: Every recovery is reported by the person
-            who got their bike back.
           stolen_bikes_recovered: stolen bikes recovered
           summary_monthly: "%{level} membership, %{price} a month"
           summary_yearly: "%{level} membership, %{price} a year"

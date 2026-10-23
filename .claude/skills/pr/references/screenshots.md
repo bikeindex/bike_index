@@ -60,7 +60,7 @@ Re-invoke `frontend-screenshots` with the same `(url-path, page-slug)` pairs, pa
 Two things the checkout itself does, either side of it:
 
 - **`bin/rails tailwindcss:build` after each checkout when the diff deletes or rewrites a template, as well as when it touches `app/assets/tailwind/**`; `bin/rails dartsass:build` too when it touches `app/assets/stylesheets/**`.** Tailwind builds from a scan of the templates, so a branch that deletes one drops that template's classes from the build — #4414 removed `VehicleThumbnail` and with it `tw:aspect-square`, leaving the base's own grid to render unstyled in a shot the PR then gets blamed for. The watcher doesn't rebuild on a checkout, so the base capture otherwise renders the branch's CSS — a before/after that silently shows the same styling twice. A diff that moves a rule *between* the two pipelines needs both, or the base renders the rule twice over. Verify by grepping `app/assets/builds/{tailwind,revised,admin}.css` for a selector the branch moves; build both again on the way back.
-- **`bin/dev` restarts, so the first navigate after a checkout can hit `ERR_CONNECTION_REFUSED`.** Poll `curl -fs "$BASE_URL/"` until it answers rather than treating it as a failed capture.
+- **`bin/dev` restarts, so the first navigate after a checkout can hit `ERR_CONNECTION_REFUSED` or `ERR_ABORTED`.** Poll `curl -fs "$BASE_URL/"` until it answers rather than treating it as a failed capture.
 
 ## 4. Compose the Screenshots comment and hand it back
 
@@ -107,5 +107,7 @@ Rules:
 - Use `<img src=... width=...>` rather than `![]()` so the widths render predictably in GitHub's table cells. ~500 for desktop, ~250 for mobile fits a side-by-side cell layout cleanly.
 
 When updating an existing screenshots comment, ask `github-pr-images` for its current body first, replace the `### <url-path>` block for any page you recaptured, and leave every other page's block alone, URLs and all — you're handing back a whole body, so anything you drop is dropped.
+
+**A recapture replaces, never appends.** The comment shows the branch as it is now, not a history: no dated or "After merging main" section, no superseded shots kept beside their replacements, and the base half of a block is recaptured along with the branch half. A newly captured state of an existing page — an open modal, a filled form — is its own `### <url-path> — <state>` block in the same table shape. Explanatory prose goes in your summary, not the comment. #4568's "After merging main (Oct 20)" section is the anti-pattern.
 
 Return the PR URL.

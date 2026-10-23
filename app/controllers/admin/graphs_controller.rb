@@ -38,7 +38,7 @@ module Admin
         [{name: "Serial", data: daily.transform_values { it["not_web_bikebook_serial"] }},
           {name: "No serial", data: daily.transform_values { it["not_web_bikebook"] - it["not_web_bikebook_serial"] }}]
       else
-        [{name: "Bike Book", data: daily.transform_values { it["web_bikebook"] }}]
+        [{name: "BikeBook", data: daily.transform_values { it["web_bikebook"] }}]
       end
       render json: chart_data.chart_json
     end

@@ -24,9 +24,9 @@ en:
           class_unknown_check_label: BikeBook doesn't list its class or top speed,
             so check the class on its label
           classes_not_permitted: It is a %{classes} e-bike, which is not permitted
-          classes_not_recognized:
-            one: Class %{n} isn't recognized here
-            other: Classes %{n} aren't recognized here
+          classes_not_recognized_in:
+            one: Class %{n} isn't recognized in %{state}
+            other: Classes %{n} aren't recognized in %{state}
           classes_recognized:
             one: Class %{n} is recognized
             other: Classes %{n} are recognized
@@ -34,9 +34,7 @@ en:
             current rules
           entered_unverified: Entered by you, not verified by BikeBook.
           fails_rule: Does not meet this rule
-          falls_under: >-
-            In %{state}, it falls under %{name}, which can require registration and
-            a license.
+          falls_under_name: In %{state}, it falls under %{name}.
           for_your_information: For your information
           full_bikebook_entry: View full BikeBook entry
           gray_detail: >-
@@ -84,12 +82,14 @@ en:
           no_watt_cap_in_law: No power cap in its law
           not_classified: It isn't a Class 1, 2 or 3 e-bike
           not_permitted: Not permitted
-          optional_classes_not_recognized:
-            one: Class %{n} isn't recognized here, so it's legal only as sold
-            other: Classes %{n} aren't recognized here, so it's legal only as sold
+          optional_classes_not_recognized_in:
+            one: Class %{n} isn't recognized in %{state}, so it's legal only as sold
+            other: Classes %{n} aren't recognized in %{state}, so it's legal only
+              as sold
           optional_throttle_not_allowed: It's legal only without its optional throttle
           optional_to_html: Optional, to %{mph}
           optional_to_kmh_html: Optional, to %{kmh} km/h
+          other_classification_rules: "%{name} rules"
           over_kmh_html: Over %{kmh} km/h
           over_mph_html: Over %{mph} mph
           own_classes: The state sets its own limits rather than the three standard
@@ -129,7 +129,6 @@ en:
             Check your province's or territory's transportation ministry for current
             e-bike rules. Most cap e-bike motors at 500W and assisted speed at 32
             km/h.
-          stock_photo: Stock photo
           throttle: Throttle
           throttle_allowed: Throttle allowed for Class 2
           throttle_allowed_in_law: Throttle allowed

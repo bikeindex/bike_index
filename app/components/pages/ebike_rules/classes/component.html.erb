@@ -6,15 +6,17 @@
     "
   >
     <div class="tw:py-[clamp(40px,7vw,64px)] <%= Pages::EbikeRules::Show::Component::SECTION_CLASSES %>">
-      <h2 class="<%= Pages::EbikeRules::Show::Component::HEADING_CLASSES %>">
-        <% if outside_us %>
-          <%= translation(".place_heading", place: @place[:name]) %>
-        <% elsif state_classes %>
-          <%= translation(".state_classes_heading", state: @place[:name]) %>
-        <% else %>
-          <%= translation(".classes_heading") %>
-        <% end %>
-      </h2>
+      <% heading, intro = if outside_us
+        [unbroken_hyphen(translation(".place_heading", place: @place[:name]))]
+      elsif state_classes
+        [unbroken_hyphen(translation(".state_classes_heading", state: @place[:name])),
+          translation(".state_classes_intro", state: @place[:name])]
+      else
+        [unbroken_hyphen(translation(".classes_heading")), translation(".classes_intro")]
+      end %>
+
+      <%= render(SharedBlocks::Marketing::SectionHeading::Component.new(heading:, intro:,
+        html_class: ("tw:mb-7 tw:max-w-[640px]" if intro))) %>
 
       <% if outside_us %>
         <div class="tw:mt-7 tw:flex tw:flex-col tw:gap-8">
@@ -30,19 +32,6 @@
             <%= translation(".other_classes", place: @place[:name]) %>
           </h3>
         <% end %>
-      <% else %>
-        <p
-          class="
-            tw:mt-2 tw:mb-7 tw:max-w-[640px] tw:text-[17px] tw:text-gray-700
-            tw:dark:text-gray-300
-          "
-        >
-          <% if state_classes %>
-            <%= translation(".state_classes_intro", state: @place[:name]) %>
-          <% else %>
-            <%= translation(".classes_intro") %>
-          <% end %>
-        </p>
       <% end %>
 
       <div
