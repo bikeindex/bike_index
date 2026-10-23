@@ -5384,15 +5384,12 @@ nl:
         protecting_your_bike_here: hier je fiets beschermen
         read_more_about_prefix: Lees meer over
         recovered_bike_type: hersteld / gevonden %{bike_type}
-        secure_both_wheels_either_with_two_ulocks: Beveilig beide wielen - hetzij
-          met twee U-sloten, of één U-slot en één zware kabel.
         sign_up_on_bikeindexorg_to_claim_your_bik: Meld je aan op BikeIndex.org om
           je %{bike_type} te claimen en te bewerken, foto's te uploaden en ervoor
           te zorgen dat je nooit je vertrouwde ros uit het oog verliest!
         stolen_bike_type: gestolen %{bike_type}
         thanks_for_adding_this_bike_type_you_found: Bedankt voor het toevoegen van
           deze %{bike_type} die je aan Bike Index hebt gevonden
-        use_a_ulock: Gebruik een U-Lock.
         were_sorry_your_bike_type_was_stolen: Het spijt ons dat uw %{bike_type} is
           gestolen.
         when_you_do: wanneer je dat doet!
@@ -5422,13 +5419,16 @@ nl:
         stolen_guidance: Als je fiets gestolen wordt, log dan direct in op Bike Index
           en meld hem als gestolen om ons opsporingsnetwerk te activeren.
         theft_victims_illustration: Illustratie van slachtoffers van diefstal
-        ulock_illustration: U-slot illustratie
         updated_registration_guidance: Als u verhuist, uw fiets verkoopt of er andere
           wijzigingen aan aanbrengt, zorg er dan voor dat de registratie is bijgewerkt,
           zodat de gegevens correct en bruikbaar blijven.
         view_your_bike: Bekijk je fiets
         what_if_my_bike_gets_stolen: Wat als mijn fiets gestolen wordt?
         whats_next: Wat volgt?
+        secure_both_wheels_either_with_two_ulocks: Beveilig beide wielen - met twee
+          U-sloten, of met één U-slot en één stevige kabel.
+        ulock_illustration: U-slot illustratie
+        use_a_ulock: Gebruik een U-slot.
       organization_invitation:
         hello: Hallo %{name},
         join_org: Doe mee met %{org_name}
@@ -6476,9 +6476,6 @@ nl:
           promoted_alerts_title: Zet je fiets terug voor de wijk waar hij vandaan
             is gestolen.
           questions_people_ask_at_2am: Vragen die mensen om 2 uur 's nachts stellen
-          read_more_recovery_stories: Lees meer herstelverhalen
-          recoveries_reported_by_owners: Recent teruggevonden dieren, zoals gemeld
-            door hun eigenaren.
           recovery_record: Herstelverslag
           register_it: Registreer het
           register_your_stolen_bike: Registreer je gestolen fiets
@@ -7389,10 +7386,7 @@ nl:
           perk_top_listing_placement: Toppositie voor je advertentie op de marktplaats
           plans_from: Plannen vanaf %{price} een maand
           questions: Vragen
-          read_more_recovery_stories: Lees meer herstelverhalen
           recommended: Aanbevolen
-          recoveries_reported_by_owners: Elke terugvinding wordt gemeld door de persoon
-            die zijn of haar fiets heeft teruggekregen.
           stolen_bikes_recovered: Gestolen fietsen teruggevonden
           summary_monthly: "%{level} lidmaatschap, %{price} een maand"
           summary_yearly: "%{level} lidmaatschap, %{price} een jaar"
@@ -7469,14 +7463,10 @@ nl:
           other_ways_stock: Schenkingen van aandelen of cryptovaluta, waarmee vermogenswinstbelasting
             op waardestijgingen wordt vermeden.
           other_ways_title: Andere manieren om op dit niveau te doneren
-          recovered: Hersteld
           stat_bikes: fietsen geregistreerd, gratis
           stat_partners: partnerwinkels, politiekorpsen en steden
           stat_recoveries: Gestolen fietsen teruggevonden
           stat_value: waarde teruggegeven aan eigenaren
-          stories_link: Lees meer herstelverhalen
-          stories_subhead: Elke terugvinding wordt gemeld door de persoon die zijn
-            of haar fiets heeft teruggekregen.
           stories_title: In de woorden van hun eigenaren
           tier_basic: Basislidmaatschap
           tier_basic_benefit: Plaats je fietsen op de marktplaats, ontvang een ledenbadge
@@ -8063,6 +8053,12 @@ nl:
           rate_limited: Te veel zoekopdrachten te snel achter elkaar — je hebt een
             limiet bereikt. Wacht even en probeer het opnieuw.
           retry: Probeer het opnieuw
+      marketing:
+        recovery_stories:
+          no_recoveries: Er zijn geen herstelgevallen.
+          read_more_recovery_stories: Lees meer herstelverhalen
+          reported_by_owners: Elke terugvinding wordt gemeld door de persoon die zijn
+            of haar fiets heeft teruggekregen.
   user_emails:
     confirm:
       confirm_email: E-mail bevestigen

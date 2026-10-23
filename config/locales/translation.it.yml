@@ -5483,15 +5483,12 @@ it:
         protecting_your_bike_here: Proteggiamo la tua bicicletta qui
         read_more_about_prefix: Scopri di più su
         recovered_bike_type: recuperato/trovato %{bike_type}
-        secure_both_wheels_either_with_two_ulocks: Fissate entrambe le ruote, utilizzando
-          due lucchetti a U oppure un lucchetto a U e un cavo robusto.
         sign_up_on_bikeindexorg_to_claim_your_bik: Registrati su BikeIndex.org per
           richiedere il tuo %{bike_type}, modificarlo, caricare foto e assicurarti
           di non perdere mai di vista la tua fidata bici!
         stolen_bike_type: rubato %{bike_type}
         thanks_for_adding_this_bike_type_you_found: Grazie per aver aggiunto questo
           %{bike_type} che hai trovato a Bike Index
-        use_a_ulock: Utilizza un lucchetto a U.
         were_sorry_your_bike_type_was_stolen: Ci dispiace che il tuo %{bike_type}
           sia stato rubato.
         when_you_do: quando lo fai!
@@ -5520,13 +5517,16 @@ it:
         stolen_guidance: Se la tua bicicletta viene rubata, accedi immediatamente
           a Bike Index e segnalala come rubata per attivare la nostra rete di recupero.
         theft_victims_illustration: Illustrazione di vittime di furto
-        ulock_illustration: Illustrazione di un lucchetto a U
         updated_registration_guidance: Se cambi casa, vendi la tua moto o apporti
           modifiche, aggiorna la registrazione in modo che i dati rimangano accurati
           e utili.
         view_your_bike: Visualizza la tua bici
         what_if_my_bike_gets_stolen: E se mi rubassero la bicicletta?
         whats_next: Cosa succederà ora?
+        secure_both_wheels_either_with_two_ulocks: Fissate entrambe le ruote, utilizzando
+          due lucchetti a U oppure un lucchetto a U e un cavo robusto.
+        ulock_illustration: Illustrazione di un lucchetto a U
+        use_a_ulock: Utilizza un lucchetto a U.
       organization_invitation:
         hello: Ciao %{name},
         join_org: Unisciti a %{org_name}
@@ -6583,8 +6583,6 @@ it:
             è stata presa
           questions_people_ask_at_2am: Domande che le persone si pongono alle 2 del
             mattino
-          read_more_recovery_stories: Leggi altre storie di guarigione
-          recoveries_reported_by_owners: Recuperi recenti, segnalati dai proprietari.
           recovery_record: Registro dei guasti
           register_it: Registralo
           register_your_stolen_bike: Registra la tua bicicletta rubata
@@ -7504,10 +7502,7 @@ it:
           perk_top_listing_placement: Primo posto nella classifica del marketplace
           plans_from: Piani a partire da %{price} un mese
           questions: Domande
-          read_more_recovery_stories: Leggi altre storie di guarigione
           recommended: Raccomandato
-          recoveries_reported_by_owners: Ogni ritrovamento viene segnalato dalla persona
-            che ha recuperato la propria bicicletta.
           stolen_bikes_recovered: biciclette rubate recuperate
           summary_monthly: "%{level} abbonamento, %{price} al mese"
           summary_yearly: "%{level} iscrizione, %{price} un anno"
@@ -7590,14 +7585,10 @@ it:
             evitare le imposte sulle plusvalenze derivanti dall'apprezzamento del
             valore degli asset.
           other_ways_title: Altri modi per donare a questo livello
-          recovered: Riparato
           stat_bikes: biciclette registrate, gratis
           stat_partners: negozi partner, dipartimenti di polizia e città
           stat_recoveries: biciclette rubate recuperate
           stat_value: valore restituito ai proprietari
-          stories_link: Leggi altre storie di guarigione
-          stories_subhead: Ogni ritrovamento viene segnalato dalla persona che ha
-            recuperato la propria bicicletta.
           stories_title: Nelle parole dei loro proprietari
           tier_basic: Abbonamento base
           tier_basic_benefit: Pubblicazione di biciclette sul marketplace, badge di
@@ -8199,6 +8190,12 @@ it:
           rate_limited: 'Troppe ricerche in troppo breve: il numero di ricerche è
             limitato. Attendi un attimo, poi riprova.'
           retry: Riprova
+      marketing:
+        recovery_stories:
+          no_recoveries: Non ci sono recuperi
+          read_more_recovery_stories: Leggi altre storie di guarigione
+          reported_by_owners: Ogni ritrovamento viene segnalato dalla persona che
+            ha recuperato la propria bicicletta.
   user_emails:
     confirm:
       confirm_email: Conferma email
