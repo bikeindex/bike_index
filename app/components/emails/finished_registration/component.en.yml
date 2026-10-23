@@ -75,7 +75,7 @@ en:
         updated_registration_guidance: >-
           If you move, sell, or make any changes to your %{bike_type}, update the
           registration so the record stays accurate and useful.
-        use_a_ulock: Use a U-Lock.
+        use_a_ulock_or_foldable_lock: Use a U-Lock or a heavy duty foldable lock.
         view_your_bike: View your %{bike_type}
         were_sorry_your_bike_type_was_stolen: We're sorry your %{bike_type} was stolen.
         what_if_my_bike_gets_stolen: What if my %{bike_type} gets stolen?
