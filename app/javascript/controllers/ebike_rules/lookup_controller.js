@@ -2,7 +2,7 @@ import { Controller } from '@hotwired/stimulus'
 import { Turbo } from '@hotwired/turbo-rails'
 import { CatalogComboboxSource, loadCatalog } from 'bikebook/catalog'
 import { localSources } from 'utils/hw_combobox_patch'
-import { replaceUrl } from 'bikebook/replace_url'
+import { readable, replaceUrl } from 'bikebook/replace_url'
 
 const RESULT_FRAME = 'ebike-rules-check'
 const CLASSES_FRAME = 'ebike-rules-classes'
@@ -77,6 +77,13 @@ export default class extends Controller {
     this.picking = type === 'keydown' || Boolean(target.closest('[role=option]'))
   }
 
+  // The gem announces a selection only when it changes, so a pick of the model already chosen - to return custom
+  // details to its own - is left for once the gem has handled the press
+  repick () {
+    const value = this.comboboxSlotTarget.querySelector('[data-hw-combobox-target=hiddenField]')?.value
+    if (this.picking && value === this.model) this.chooseBike({ detail: { value } })
+  }
+
   // The gem leaves the autocompleted part of a pick selected, and the catalog's "(current)" says
   // nothing a picked model needs. Its announcement keeps the page's custom details, which a pick of
   // their model returns to its own
@@ -109,10 +116,12 @@ export default class extends Controller {
     this.stateTarget.querySelector('input[role=combobox]').focus()
   }
 
-  // A frame load keeps the page's title, which names the state, and shows its verdict wherever it lands
+  // A frame load keeps the page's title, which names the state, and shows its verdict wherever it lands.
+  // Turbo re-escapes the check's URL on the way into history
   checkLoaded ({ target }) {
     if (target.id !== RESULT_FRAME) return
 
+    replaceUrl(new URL(window.location.href))
     const { pageTitle, bikeDetails } = target.querySelector('[data-page-title]')?.dataset ?? {}
     if (pageTitle) document.title = pageTitle
     if (this.#mode === 'model' && bikeDetails) this.#fill(JSON.parse(bikeDetails))
@@ -125,7 +134,7 @@ export default class extends Controller {
     fields.delete('state')
     if (this.#mode === 'model') DETAILS.forEach((name) => fields.delete(name))
     for (const [name, value] of [...fields]) if (value === '') fields.delete(name)
-    if (fields.get('vehicle_models') || fields.get('top_speed')) return `${this.element.action}?${new URLSearchParams(fields)}`
+    if (fields.get('vehicle_models') || fields.get('top_speed')) return readable(new URL(`${this.element.action}?${new URLSearchParams(fields)}`))
   }
 
   // Without a check left in the form - a cleared bike - there's nothing to ask the server for

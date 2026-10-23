@@ -108,7 +108,7 @@ RSpec.describe EbikeRulesController, type: :request do
 
       # a bike comes along, as from BikeBook's link, to be checked there
       get "/ebike-rules", params: {vehicle_models: "m/specialized/2025/haul_st"}, headers: indiana
-      expect(response).to redirect_to("/ebike-rules/US/IN?vehicle_models=m%2Fspecialized%2F2025%2Fhaul_st")
+      expect(response).to redirect_to("/ebike-rules/US/IN?vehicle_models=m/specialized/2025/haul_st")
 
       # but a frame's check waits for the place the form hasn't chosen
       get "/ebike-rules", params: {vehicle_models: "m/specialized/2025/haul_st"}, headers: indiana.merge("Turbo-Frame" => "ebike-rules-check")
@@ -138,7 +138,7 @@ RSpec.describe EbikeRulesController, type: :request do
         .and have_css("li", text: "Optional throttle stops at 20 mph")
         .and have_css("dd", text: "Optional, to 20")
         .and have_css("[data-ebike-rules--lookup-display-value='Specialized Haul ST 2025']")
-        .and have_link("View full BikeBook entry", href: "/bikebook?vehicle_models=m%2Fspecialized%2F2025%2Fhaul_st&view=motors")
+        .and have_link("View full BikeBook entry", href: "/bikebook?vehicle_models=m/specialized/2025/haul_st&view=motors")
         .and have_title("Colorado e-bike laws", exact: true)
       # each class's tile a tooltip of its US class card, in order, the optional throttle's captioned
       tiles = page.all("[data-controller~='ui--tooltip']:has(> button [role='img'])")
@@ -234,7 +234,7 @@ RSpec.describe EbikeRulesController, type: :request do
 
     it "moves a place from the query, or a state's old path, to its own page, and 404s one that isn't a place" do
       get "/ebike-rules", params: {state: "US-CO", vehicle_models: "m/specialized/2025/haul_st"}
-      expect(response).to redirect_to("/ebike-rules/US/CO?vehicle_models=m%2Fspecialized%2F2025%2Fhaul_st")
+      expect(response).to redirect_to("/ebike-rules/US/CO?vehicle_models=m/specialized/2025/haul_st")
       expect(response).to have_http_status(:moved_permanently)
 
       get "/ebike-rules/US/NY", params: {state: "IN", vehicle_models: ""}
