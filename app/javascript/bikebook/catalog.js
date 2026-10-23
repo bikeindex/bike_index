@@ -45,7 +45,7 @@ export async function loadCatalog (manifestUrl, ids = [], jurisdictions = {}) {
 }
 
 // Answers a hotwire_combobox async filter with the markup the gem's own turbo-stream response would
-// carry, so its callbacks and paging run unchanged
+// carry, so its selection and paging run unchanged
 export class CatalogComboboxSource {
   #generation = 0
 
@@ -63,7 +63,8 @@ export class CatalogComboboxSource {
     const query = new URL(combobox.asyncSrcValue, window.location.origin).searchParams
     this.params = { ...Object.fromEntries(query), q: combobox._fullQuery }
     this.#generation++
-    await this.#render(combobox, 0, { inputType, primed, callbackId: primed ? undefined : combobox._enqueueCallback() })
+    // The gem settles a pending filter only on an input type, as its own request falls back to
+    await this.#render(combobox, 0, { inputType: primed ? undefined : inputType || 'hw:unspecifiedInput', primed })
   }
 
   // The gem fetches the first page through a lazy turbo-frame on first open; list it here instead
@@ -71,7 +72,7 @@ export class CatalogComboboxSource {
     return this.filter(combobox, undefined, { primed: true })
   }
 
-  async #render (combobox, page, { inputType, callbackId, primed }) {
+  async #render (combobox, page, { inputType, primed }) {
     const generation = this.#generation
     const { total, filteredCount, unfiltered, models, nextPage } = await this.catalog.search(this.params, page, this.catalog.kit.per_page)
     if ((page && generation !== this.#generation) || !combobox.element.isConnected) return
@@ -80,7 +81,7 @@ export class CatalogComboboxSource {
     const listbox = combobox._actingListbox
     const options = models.map((model) => comboboxOption({ model, placeholderUrl: this.catalog.kit.placeholder_url, currencies: this.catalog.vocabulary.currencies }))
     const pagination = html`<li id=${`${forId}__hw_combobox_pagination__wrapper`} class="hw_combobox__pagination__wrapper"
-      data-hw-combobox-target="endOfOptionsStream" data-input-type=${inputType ?? nothing} data-callback-id=${callbackId ?? nothing} aria-hidden="true"></li>`
+      data-hw-combobox-target="endOfOptionsStream" data-input-type=${inputType ?? nothing} aria-hidden="true"></li>`
     document.getElementById(`${forId}__hw_combobox_pagination__wrapper`)?.remove()
     if (page === 0) {
       const offered = classificationOption(this.params.q, String(this.params.vehicle_models ?? '').split(','), this.catalog.vocabulary.e_vehicle_classifications)
