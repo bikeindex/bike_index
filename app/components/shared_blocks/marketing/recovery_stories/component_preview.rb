@@ -6,7 +6,7 @@ module SharedBlocks
       class ComponentPreview < ApplicationComponentPreview
         def default
           render(SharedBlocks::Marketing::RecoveryStories::Component.new(heading: "Bikes that came home",
-            recovery_displays: RecoveryDisplay.with_photo.limit(4)))
+            recovery_displays: RecoveryDisplay.with_photo))
         end
 
         def without_stories

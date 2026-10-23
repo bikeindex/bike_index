@@ -2,7 +2,7 @@
   <section class="tw:border-b tw:border-gray-200">
     <div class="tw:flex tw:flex-col tw:gap-10 tw:pt-8 tw:pb-8 tw:lg:flex-row tw:lg:items-center tw:lg:gap-16 tw:lg:pt-16 tw:lg:pb-14 <%= SharedBlocks::Marketing::Wrapper::Component::CONTAINER_CLASSES %>">
       <div class="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:gap-5">
-        <p class="tw:m-0 tw:text-purple-500 <%= SharedBlocks::Marketing::SectionHeading::Component::EYEBROW_CLASSES %>">
+        <p class="tw:m-0 <%= SharedBlocks::Marketing::SectionHeading::Component.eyebrow_classes(:purple) %>">
           <%= translation(".bike_index_membership") %>
         </p>
 

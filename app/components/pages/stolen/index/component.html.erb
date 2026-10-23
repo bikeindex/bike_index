@@ -59,12 +59,7 @@
         tw:lg:border tw:lg:p-5.5
       "
     >
-      <h2
-        class="
-          tw:m-0 tw:text-[11.5px] tw:font-extrabold tw:tracking-widest
-          tw:text-gray-400 tw:uppercase
-        "
-      >
+      <h2 class="tw:m-0 <%= SharedBlocks::Marketing::SectionHeading::Component.eyebrow_classes(:gray) %>">
         <%= translation(".recovery_record") %>
       </h2>
 
@@ -163,12 +158,7 @@
       "
     >
       <div class="tw:flex-1">
-        <div
-          class="
-            tw:text-[11.5px] tw:font-extrabold tw:tracking-widest
-            tw:text-purple-500 tw:uppercase
-          "
-        >
+        <div class="<%= SharedBlocks::Marketing::SectionHeading::Component.eyebrow_classes(:purple) %>">
           <%= translation(".promoted_alerts") %>
         </div>
 
@@ -220,10 +210,7 @@
     >
       <h2
         id="stolen-more-resources"
-        class="
-          tw:m-0 tw:mt-2 tw:mb-4 tw:text-[11.5px] tw:font-extrabold
-          tw:tracking-widest tw:text-gray-400 tw:uppercase
-        "
+        class="tw:m-0 tw:mt-2 tw:mb-4 <%= SharedBlocks::Marketing::SectionHeading::Component.eyebrow_classes(:gray) %>"
       >
         <%= translation(".more_resources") %>
       </h2>
@@ -244,7 +231,12 @@
   <div class="<%= section_inner %>">
     <%= render(SharedBlocks::Marketing::SectionHeading::Component.new(heading: translation(".report_bike_theft_issues"))) %>
 
-    <div class="tw:flex tw:max-w-190 tw:flex-col tw:gap-2 <%= subhead_classes %>">
+    <div
+      class="
+        tw:mt-1 tw:mb-4 tw:flex tw:max-w-190 tw:flex-col tw:gap-2
+        tw:text-[15px] tw:text-gray-500 tw:lg:mb-6 tw:lg:text-[17px]
+      "
+    >
       <p class="tw:m-0">
         <%= translation(".report_bike_theft_issues_subhead") %>
         <%= translation(".reporting_your_own_bike_html", register_it_link: link_to(translation(".register_it"), register_stolen_path, class: "twlink")) %>

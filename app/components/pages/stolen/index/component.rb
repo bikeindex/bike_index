@@ -15,7 +15,7 @@ module Pages
           @recoveries_count = recoveries_count
           @recoveries_value = recoveries_value
           @organizations_count = organizations_count
-          @recovery_displays = recovery_displays.first(4)
+          @recovery_displays = recovery_displays
         end
 
         private
@@ -97,8 +97,6 @@ module Pages
         def promoted_alerts_path = news_path("bike-indexs-new-promoted-alerts-are-the-megaphone-crooks-dont-want-you")
 
         def section_inner = "#{SharedBlocks::Marketing::Wrapper::Component::CONTAINER_CLASSES} tw:py-6 tw:lg:py-12"
-
-        def subhead_classes = "tw:mt-1 tw:mb-4 tw:text-[15px] tw:text-gray-500 tw:lg:mb-6 tw:lg:text-[17px]"
       end
     end
   end

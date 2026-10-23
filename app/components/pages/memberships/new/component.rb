@@ -17,7 +17,7 @@ module Pages
           @recoveries_count = recoveries_count
           @recoveries_value = recoveries_value
           @organizations_count = organizations_count
-          @recovery_displays = recovery_displays.first(4)
+          @recovery_displays = recovery_displays
           @referral_source = referral_source
           @membership = membership
           @level = Membership::LEVEL_ENUM.key?(level&.to_sym) ? level.to_sym : :plus

@@ -1,12 +1,11 @@
 <% container = SharedBlocks::Marketing::Wrapper::Component::CONTAINER_CLASSES %>
 <% eyebrow = "tw:text-[10.5px] tw:font-extrabold tw:tracking-widest tw:uppercase tw:lg:text-[11.5px]" %>
 <% muted = "tw:text-[#666] tw:dark:text-gray-400" %>
-<% ink = "tw:text-[#2c3e50] tw:dark:text-gray-100" %>
 <% card = "tw:rounded-lg tw:border tw:border-[#e0e0e0] tw:bg-white tw:dark:border-gray-700 tw:dark:bg-gray-800" %>
 <% band = "tw:border-[#e0e0e0] tw:bg-[#f8f8f8] tw:dark:border-gray-700 tw:dark:bg-gray-800/60" %>
 <% selectable = "tw:transition-colors tw:hover:border-[#a9d2f0] tw:is-active:border-blue-600 tw:is-active:ring-1 tw:is-active:ring-blue-600" %>
 <% row = "tw:group/row tw:flex tw:cursor-pointer tw:items-center tw:gap-3 tw:px-3.5 tw:py-4 tw:xs:gap-4 tw:xs:px-4.5 tw:has-focus-visible:ring-3 tw:has-focus-visible:ring-blue-500/40 #{card} #{selectable}" %>
-<% amount_classes = "tw:font-header tw:text-[19px] tw:font-extrabold tw:group-has-checked/row:text-blue-600 tw:lg:text-[22px] tw:dark:group-has-checked/row:text-blue-400 #{ink}" %>
+<% amount_classes = "tw:font-header tw:text-[19px] tw:font-extrabold tw:group-has-checked/row:text-blue-600 tw:lg:text-[22px] tw:dark:group-has-checked/row:text-blue-400" %>
 
 <%# the callout's 40px padding and 16px type don't fit a label in the 404px card %>
 <% submit_button = ->(text) { render UI::Button::Component.new(text:, color: :primary, size: :callout, type: "submit", html_class: "tw:mt-2 tw:w-full tw:px-4! tw:text-xs! tw:xs:text-sm!", data: {donate__page_target: "submit"}) } %>
@@ -33,7 +32,13 @@
           <%= translation(".eyebrow") %>
         </p>
 
-        <h1 class="tw:mb-0 tw:font-header tw:text-[31px] tw:leading-[1.07] tw:font-extrabold tw:tracking-[-.01em] tw:md:text-[42px] tw:xl:text-[52px] tw:xl:leading-[1.04] <%= ink %>">
+        <h1
+          class="
+            tw:mb-0 tw:font-header tw:text-[31px] tw:leading-[1.07]
+            tw:font-extrabold tw:tracking-[-.01em] tw:md:text-[42px]
+            tw:xl:text-[52px] tw:xl:leading-[1.04]
+          "
+        >
           <%= translation(".headline") %>
         </h1>
 
@@ -54,7 +59,12 @@
         id="donate-form"
         class="tw:-mx-5 tw:flex tw:scroll-mt-4 tw:flex-col tw:gap-4 tw:border-y tw:px-5 tw:py-6.5 tw:md:mx-auto tw:md:w-full tw:md:max-w-xl tw:md:rounded-lg tw:md:border tw:md:p-6.5 tw:lg:mx-0 tw:lg:w-101 tw:lg:shrink-0 tw:lg:self-start <%= band %>"
       >
-        <h2 class="tw:mb-0 tw:font-header tw:text-[22px] tw:font-extrabold tw:lg:text-2xl <%= ink %>">
+        <h2
+          class="
+            tw:mb-0 tw:font-header tw:text-[22px] tw:font-extrabold
+            tw:lg:text-2xl
+          "
+        >
           <%= translation(".form_title") %>
         </h2>
 
@@ -155,7 +165,7 @@
                     </span>
 
                     <span class="tw:flex tw:flex-col">
-                      <span class="tw:text-[15.5px] tw:font-extrabold <%= ink %>">
+                      <span class="tw:text-[15.5px] tw:font-extrabold">
                         <%= name %>
                       </span>
 
@@ -272,7 +282,12 @@
             data-donate--page-target="majorGift"
             data-action="donate--page#selectMajor"
           >
-            <span class="tw:font-header tw:text-[28px] tw:font-extrabold tw:lg:text-[38px] <%= ink %>">
+            <span
+              class="
+                tw:font-header tw:text-[28px] tw:font-extrabold
+                tw:lg:text-[38px]
+              "
+            >
               <%= money(amount) %>
             </span>
 
@@ -290,7 +305,7 @@
             tw:dark:md:bg-gray-800
           "
         >
-          <h3 class="tw:mb-2 tw:hidden tw:text-[17px] tw:font-extrabold tw:md:block <%= ink %>">
+          <h3 class="tw:mb-2 tw:hidden tw:text-[17px] tw:font-extrabold tw:md:block">
             <%= translation(".other_ways_title") %>
           </h3>
 

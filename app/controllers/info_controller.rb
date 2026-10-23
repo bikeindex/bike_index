@@ -67,7 +67,7 @@ class InfoController < ApplicationController
     @skip_general_alert = true
     render SharedBlocks::Marketing::Wrapper::Component.new(page: Pages::Donate::Page::Component.new(
       stripe_prices: StripePrice.active_for(current_currency),
-      recovery_displays: RecoveryDisplay.with_photo.limit(4),
+      recovery_displays: RecoveryDisplay.with_photo,
       initial_amount: params[:initial_amount],
       referral_source: params[:source],
       current_user:

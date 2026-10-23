@@ -8,7 +8,7 @@ module SharedBlocks
       class Component < ApplicationComponent
         def initialize(heading:, recovery_displays:)
           @heading = heading
-          @recovery_displays = recovery_displays
+          @recovery_displays = recovery_displays.first(4)
         end
       end
     end
