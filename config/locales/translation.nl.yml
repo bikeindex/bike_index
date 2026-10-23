@@ -5543,6 +5543,8 @@ nl:
           required: verplicht
         combobox_state:
           state: Staat
+        combobox:
+          no_matches: Geen overeenkomsten
       alerts:
         base:
           error: Fout
@@ -6474,9 +6476,6 @@ nl:
           promoted_alerts_title: Zet je fiets terug voor de wijk waar hij vandaan
             is gestolen.
           questions_people_ask_at_2am: Vragen die mensen om 2 uur 's nachts stellen
-          read_more_recovery_stories: Lees meer herstelverhalen
-          recoveries_reported_by_owners: Recent teruggevonden dieren, zoals gemeld
-            door hun eigenaren.
           recovery_record: Herstelverslag
           register_it: Registreer het
           register_your_stolen_bike: Registreer je gestolen fiets
@@ -6875,8 +6874,6 @@ nl:
           classes_start_on: De lessen gaan in %{date}. Tot die tijd kunt u de actuele
             regels van de staat raadplegen.
           fails_rule: Voldoet niet aan deze regel.
-          falls_under: In %{state} valt het onder %{name}, waarvoor registratie en
-            een vergunning vereist kunnen zijn.
           for_your_information: Ter informatie
           gray_detail: Uw %{name} staat geregistreerd als een e-bike van klasse %{n}.
             Raadpleeg de %{state} RDW voor de lokale regels.
@@ -6960,14 +6957,10 @@ nl:
             de %{cap} mph-limiet
           speed_past_html: Ondersteunt voorbij %{past} mph; controleer of het stopt
             bij %{cap} mph
-          classes_not_recognized:
-            one: Klasse %{n} wordt hier niet herkend.
-            other: De klassen %{n} worden hier niet herkend.
           classes_recognized:
             one: Klasse %{n} wordt herkend
             other: De klassen %{n} worden erkend.
           read_more: Lees meer
-          stock_photo: Stock foto
           answer_optional: Optioneel
           as_class_with_optional_throttle: als klasse %{n} met zijn optionele gashendel
           as_class_with_optional_upgrade: als klasse %{n} met een optionele upgrade
@@ -6981,11 +6974,6 @@ nl:
             als een klasse %{n} e-bike, en %{optional}.
           manually_entered: Handmatig ingevoerd
           model_year: "%{year} model"
-          optional_classes_not_recognized:
-            one: Klasse %{n} wordt hier niet herkend, dus het is alleen legaal zoals
-              het verkocht wordt.
-            other: De klassen %{n} worden hier niet herkend, dus het is alleen legaal
-              zoals het verkocht wordt.
           optional_throttle_not_allowed: Het is alleen legaal zonder de optionele
             gasklep.
           optional_to_html: Optioneel, naar %{mph}
@@ -7044,6 +7032,16 @@ nl:
               waarbij de %{count}-regels nog gecontroleerd moeten worden.
           yes_to_kmh_html: Ja, tot %{kmh} km/u
           your_province: Uw provincie of territorium
+          classes_not_recognized_in:
+            one: Klasse %{n} wordt niet herkend in %{state}
+            other: Klassen %{n} worden niet herkend in %{state}
+          falls_under_name: In %{state} valt het onder %{name}.
+          optional_classes_not_recognized_in:
+            one: Klasse %{n} wordt niet herkend in %{state}, dus het is alleen legaal
+              zoals het verkocht wordt.
+            other: De klassen %{n} worden niet herkend in %{state}, dus het is alleen
+              legaal zoals het verkocht wordt.
+          other_classification_rules: "%{name} regels"
         rule_label:
           classes: Erkende klassen
           power: Motorvermogenscapaciteit
@@ -7388,10 +7386,7 @@ nl:
           perk_top_listing_placement: Toppositie voor je advertentie op de marktplaats
           plans_from: Plannen vanaf %{price} een maand
           questions: Vragen
-          read_more_recovery_stories: Lees meer herstelverhalen
           recommended: Aanbevolen
-          recoveries_reported_by_owners: Elke terugvinding wordt gemeld door de persoon
-            die zijn of haar fiets heeft teruggekregen.
           stolen_bikes_recovered: Gestolen fietsen teruggevonden
           summary_monthly: "%{level} lidmaatschap, %{price} een maand"
           summary_yearly: "%{level} lidmaatschap, %{price} een jaar"
@@ -7468,14 +7463,10 @@ nl:
           other_ways_stock: Schenkingen van aandelen of cryptovaluta, waarmee vermogenswinstbelasting
             op waardestijgingen wordt vermeden.
           other_ways_title: Andere manieren om op dit niveau te doneren
-          recovered: Hersteld
           stat_bikes: fietsen geregistreerd, gratis
           stat_partners: partnerwinkels, politiekorpsen en steden
           stat_recoveries: Gestolen fietsen teruggevonden
           stat_value: waarde teruggegeven aan eigenaren
-          stories_link: Lees meer herstelverhalen
-          stories_subhead: Elke terugvinding wordt gemeld door de persoon die zijn
-            of haar fiets heeft teruggekregen.
           stories_title: In de woorden van hun eigenaren
           tier_basic: Basislidmaatschap
           tier_basic_benefit: Plaats je fietsen op de marktplaats, ontvang een ledenbadge
@@ -8062,6 +8053,12 @@ nl:
           rate_limited: Te veel zoekopdrachten te snel achter elkaar — je hebt een
             limiet bereikt. Wacht even en probeer het opnieuw.
           retry: Probeer het opnieuw
+      marketing:
+        recovery_stories:
+          no_recoveries: Er zijn geen herstelgevallen.
+          read_more_recovery_stories: Lees meer herstelverhalen
+          reported_by_owners: Elke terugvinding wordt gemeld door de persoon die zijn
+            of haar fiets heeft teruggekregen.
   user_emails:
     confirm:
       confirm_email: E-mail bevestigen

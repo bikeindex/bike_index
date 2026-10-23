@@ -5643,6 +5643,8 @@ it:
           required: richiesto
         combobox_state:
           state: Stato
+        combobox:
+          no_matches: Nessuna partita
       alerts:
         base:
           error: Errore
@@ -6581,8 +6583,6 @@ it:
             è stata presa
           questions_people_ask_at_2am: Domande che le persone si pongono alle 2 del
             mattino
-          read_more_recovery_stories: Leggi altre storie di guarigione
-          recoveries_reported_by_owners: Recuperi recenti, segnalati dai proprietari.
           recovery_record: Registro dei guasti
           register_it: Registralo
           register_your_stolen_bike: Registra la tua bicicletta rubata
@@ -6984,8 +6984,6 @@ it:
           classes_start_on: Le lezioni entreranno in vigore %{date}. Nel frattempo,
             verifica le norme vigenti nello stato.
           fails_rule: Non soddisfa questa regola
-          falls_under: In %{state}, rientra in %{name}, che può richiedere la registrazione
-            e una licenza.
           for_your_information: Per vostra informazione
           gray_detail: Il tuo %{name} è classificato come e-bike di classe %{n}. Consulta
             il %{state} DMV per le normative locali.
@@ -7067,14 +7065,10 @@ it:
           speed_past_cap_html: Assiste oltre %{past} mph, oltre il limite %{cap} mph
           speed_past_html: Assiste oltre %{past} mph; verificare che si fermi entro
             %{cap} mph
-          classes_not_recognized:
-            one: La classe %{n} non è riconosciuta qui
-            other: Le classi %{n} non sono riconosciute qui
           classes_recognized:
             one: La classe %{n} è riconosciuta
             other: Le classi %{n} sono riconosciute
           read_more: Per saperne di più
-          stock_photo: Foto di repertorio
           answer_optional: Opzionale
           as_class_with_optional_throttle: come Classe %{n} con il suo acceleratore
             opzionale
@@ -7089,11 +7083,6 @@ it:
             come e-bike di classe %{n} e %{optional}.
           manually_entered: Inserito manualmente
           model_year: modello %{year}
-          optional_classes_not_recognized:
-            one: La classe %{n} non è riconosciuta qui, quindi è legale solo come
-              venduta
-            other: Le classi %{n} non sono riconosciute qui, quindi è legale solo
-              come venduto
           optional_throttle_not_allowed: È legale solo senza l'acceleratore opzionale.
           optional_to_html: Opzionale, per %{mph}
           throttle_with_class_3_assist: Non consentito con assistenza di Classe 3
@@ -7149,6 +7138,16 @@ it:
               le regole %{law}, con %{count} regole da verificare.
           yes_to_kmh_html: Sì, fino a %{kmh} km/h
           your_province: La tua provincia o territorio
+          classes_not_recognized_in:
+            one: La classe %{n} non è riconosciuta in %{state}
+            other: Le classi %{n} non sono riconosciute in %{state}
+          falls_under_name: In %{state}, rientra in %{name}.
+          optional_classes_not_recognized_in:
+            one: La classe %{n} non è riconosciuta in %{state}, quindi è legale solo
+              come venduta
+            other: Le classi %{n} non sono riconosciute in %{state}, quindi è legale
+              solo come venduto
+          other_classification_rules: "%{name} regole"
         rule_label:
           classes: Classi riconosciute
           power: Limite di potenza del motore
@@ -7503,10 +7502,7 @@ it:
           perk_top_listing_placement: Primo posto nella classifica del marketplace
           plans_from: Piani a partire da %{price} un mese
           questions: Domande
-          read_more_recovery_stories: Leggi altre storie di guarigione
           recommended: Raccomandato
-          recoveries_reported_by_owners: Ogni ritrovamento viene segnalato dalla persona
-            che ha recuperato la propria bicicletta.
           stolen_bikes_recovered: biciclette rubate recuperate
           summary_monthly: "%{level} abbonamento, %{price} al mese"
           summary_yearly: "%{level} iscrizione, %{price} un anno"
@@ -7589,14 +7585,10 @@ it:
             evitare le imposte sulle plusvalenze derivanti dall'apprezzamento del
             valore degli asset.
           other_ways_title: Altri modi per donare a questo livello
-          recovered: Riparato
           stat_bikes: biciclette registrate, gratis
           stat_partners: negozi partner, dipartimenti di polizia e città
           stat_recoveries: biciclette rubate recuperate
           stat_value: valore restituito ai proprietari
-          stories_link: Leggi altre storie di guarigione
-          stories_subhead: Ogni ritrovamento viene segnalato dalla persona che ha
-            recuperato la propria bicicletta.
           stories_title: Nelle parole dei loro proprietari
           tier_basic: Abbonamento base
           tier_basic_benefit: Pubblicazione di biciclette sul marketplace, badge di
@@ -8198,6 +8190,12 @@ it:
           rate_limited: 'Troppe ricerche in troppo breve: il numero di ricerche è
             limitato. Attendi un attimo, poi riprova.'
           retry: Riprova
+      marketing:
+        recovery_stories:
+          no_recoveries: Non ci sono recuperi
+          read_more_recovery_stories: Leggi altre storie di guarigione
+          reported_by_owners: Ogni ritrovamento viene segnalato dalla persona che
+            ha recuperato la propria bicicletta.
   user_emails:
     confirm:
       confirm_email: Conferma email
