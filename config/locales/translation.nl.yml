@@ -6875,8 +6875,6 @@ nl:
           classes_start_on: De lessen gaan in %{date}. Tot die tijd kunt u de actuele
             regels van de staat raadplegen.
           fails_rule: Voldoet niet aan deze regel.
-          falls_under: In %{state} valt het onder %{name}, waarvoor registratie en
-            een vergunning vereist kunnen zijn.
           for_your_information: Ter informatie
           gray_detail: Uw %{name} staat geregistreerd als een e-bike van klasse %{n}.
             Raadpleeg de %{state} RDW voor de lokale regels.
@@ -6960,14 +6958,10 @@ nl:
             de %{cap} mph-limiet
           speed_past_html: Ondersteunt voorbij %{past} mph; controleer of het stopt
             bij %{cap} mph
-          classes_not_recognized:
-            one: Klasse %{n} wordt hier niet herkend.
-            other: De klassen %{n} worden hier niet herkend.
           classes_recognized:
             one: Klasse %{n} wordt herkend
             other: De klassen %{n} worden erkend.
           read_more: Lees meer
-          stock_photo: Stock foto
           answer_optional: Optioneel
           as_class_with_optional_throttle: als klasse %{n} met zijn optionele gashendel
           as_class_with_optional_upgrade: als klasse %{n} met een optionele upgrade
@@ -6981,11 +6975,6 @@ nl:
             als een klasse %{n} e-bike, en %{optional}.
           manually_entered: Handmatig ingevoerd
           model_year: "%{year} model"
-          optional_classes_not_recognized:
-            one: Klasse %{n} wordt hier niet herkend, dus het is alleen legaal zoals
-              het verkocht wordt.
-            other: De klassen %{n} worden hier niet herkend, dus het is alleen legaal
-              zoals het verkocht wordt.
           optional_throttle_not_allowed: Het is alleen legaal zonder de optionele
             gasklep.
           optional_to_html: Optioneel, naar %{mph}
@@ -7044,6 +7033,16 @@ nl:
               waarbij de %{count}-regels nog gecontroleerd moeten worden.
           yes_to_kmh_html: Ja, tot %{kmh} km/u
           your_province: Uw provincie of territorium
+          classes_not_recognized_in:
+            one: Klasse %{n} wordt niet herkend in %{state}
+            other: Klassen %{n} worden niet herkend in %{state}
+          falls_under_name: In %{state} valt het onder %{name}.
+          optional_classes_not_recognized_in:
+            one: Klasse %{n} wordt niet herkend in %{state}, dus het is alleen legaal
+              zoals het verkocht wordt.
+            other: De klassen %{n} worden niet herkend in %{state}, dus het is alleen
+              legaal zoals het verkocht wordt.
+          other_classification_rules: "%{name} regels"
         rule_label:
           classes: Erkende klassen
           power: Motorvermogenscapaciteit

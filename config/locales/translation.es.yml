@@ -6965,8 +6965,6 @@ es:
           classes_start_on: Las clases entran en vigor %{date}. Hasta entonces, consulte
             las reglas vigentes del estado.
           fails_rule: No cumple con esta regla.
-          falls_under: En %{state}, se encuentra dentro de %{name}, lo que puede requerir
-            registro y licencia.
           for_your_information: Para tu información
           gray_detail: Tu %{name} está catalogada como una bicicleta eléctrica de
             clase %{n}. Consulta las normas locales en el %{state} DMV.
@@ -7051,14 +7049,10 @@ es:
             de %{cap} mph
           speed_past_html: Ayuda a superar %{past} mph; comprueba que se detenga a
             %{cap} mph.
-          classes_not_recognized:
-            one: La clase %{n} no se reconoce aquí.
-            other: Las clases %{n} no se reconocen aquí.
           classes_recognized:
             one: Se reconoce la clase %{n}.
             other: Se reconocen las clases %{n}.
           read_more: Leer más
-          stock_photo: Foto de archivo
           answer_optional: Opcional
           as_class_with_optional_throttle: como Clase %{n} con su acelerador opcional
           as_class_with_optional_upgrade: como Clase %{n} con una actualización opcional
@@ -7072,11 +7066,6 @@ es:
             bicicleta eléctrica de clase %{n} y %{optional}.
           manually_entered: Introducido manualmente
           model_year: Modelo %{year}
-          optional_classes_not_recognized:
-            one: La clase %{n} no se reconoce aquí, por lo que solo es legal tal como
-              se vende.
-            other: Las clases %{n} no se reconocen aquí, por lo que es legal solo
-              como se vende.
           optional_throttle_not_allowed: Es legal únicamente sin su acelerador opcional.
           optional_to_html: Opcional, a %{mph}
           throttle_with_class_3_assist: No permitido con asistencia de Clase 3
@@ -7135,6 +7124,16 @@ es:
               %{law}, con reglas %{count} para verificar.
           yes_to_kmh_html: Sí, a %{kmh} km/h
           your_province: Su provincia o territorio
+          classes_not_recognized_in:
+            one: La clase %{n} no se reconoce en %{state}.
+            other: Las clases %{n} no se reconocen en %{state}.
+          falls_under_name: En %{state}, se encuentra dentro de %{name}.
+          optional_classes_not_recognized_in:
+            one: La clase %{n} no se reconoce en %{state}, por lo que solo es legal
+              tal como se vende.
+            other: Las clases %{n} no se reconocen en %{state}, por lo que es legal
+              solo como se vende.
+          other_classification_rules: Reglas %{name}
         rule_label:
           classes: Clases reconocidas
           power: condensador de potencia del motor
