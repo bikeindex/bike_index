@@ -96,6 +96,12 @@ RSpec.describe "Bikebook", :js, type: :system do
 
     vehicle_field.click
     expect(page).to have_css(".hw-combobox__group__label", text: /\(30 matching models\)/i)
+    # a query matching nothing says so, and Enter keeps it open to edit
+    type_into(vehicle_field, "zzqq")
+    expect(page).to have_css(".hw-combobox__group__label", text: /\(0 matching models\)/i)
+    vehicle_field.send_keys(:enter)
+    expect(page).to have_field("Select a bike, choose multiple to compare them", with: "zzqq")
+    expect(vehicle_field["aria-expanded"]).to eq "true"
 
     type_into(vehicle_field, "level 4 rec")
     expect(page).to have_css(".hw-combobox__group__label", text: /\(2 matching models\)/i)

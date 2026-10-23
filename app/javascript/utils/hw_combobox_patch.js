@@ -25,6 +25,10 @@ HwComboboxController.prototype._requestChips = function (values) {
   return source ? source.chips(this, values) : requestChips.call(this, values)
 }
 
+// Closing clears a query that matches nothing, so it stays open to say so - unless the query is free text to keep
+const keepsUnmatchedQuery = (combobox) =>
+  Boolean(combobox._fullQuery) && !combobox._allowNew && combobox._visibleOptionElements.length === 0
+
 // A paste fills the input without opening it, and closing is what commits a pick, from the options it shows -
 // so it's expanded at once, as prepareToFilter does
 const pickFirst = (combobox) => {
@@ -32,7 +36,7 @@ const pickFirst = (combobox) => {
     combobox.open()
     combobox._expand()
   }
-  combobox.close('hw:keyHandler:enter')
+  if (!keepsUnmatchedQuery(combobox)) combobox.close('hw:keyHandler:enter')
 }
 
 // Counts the edits a local source answers, so an Enter ahead of its answer (a paste, entered at once) waits for it
@@ -87,6 +91,7 @@ HwComboboxController.prototype.navigate = function (event) {
     }
   }
   if (event.key === 'Enter' && this._isClosed) return
+  if (event.key === 'Enter' && keepsUnmatchedQuery(this)) return event.preventDefault()
 
   navigate.call(this, event)
 }
