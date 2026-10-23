@@ -5483,15 +5483,12 @@ it:
         protecting_your_bike_here: Proteggiamo la tua bicicletta qui
         read_more_about_prefix: Scopri di più su
         recovered_bike_type: recuperato/trovato %{bike_type}
-        secure_both_wheels_either_with_two_ulocks: Fissate entrambe le ruote, utilizzando
-          due lucchetti a U oppure un lucchetto a U e un cavo robusto.
         sign_up_on_bikeindexorg_to_claim_your_bik: Registrati su BikeIndex.org per
           richiedere il tuo %{bike_type}, modificarlo, caricare foto e assicurarti
           di non perdere mai di vista la tua fidata bici!
         stolen_bike_type: rubato %{bike_type}
         thanks_for_adding_this_bike_type_you_found: Grazie per aver aggiunto questo
           %{bike_type} che hai trovato a Bike Index
-        use_a_ulock: Utilizza un lucchetto a U.
         were_sorry_your_bike_type_was_stolen: Ci dispiace che il tuo %{bike_type}
           sia stato rubato.
         when_you_do: quando lo fai!
@@ -5520,13 +5517,16 @@ it:
         stolen_guidance: Se la tua bicicletta viene rubata, accedi immediatamente
           a Bike Index e segnalala come rubata per attivare la nostra rete di recupero.
         theft_victims_illustration: Illustrazione di vittime di furto
-        ulock_illustration: Illustrazione di un lucchetto a U
         updated_registration_guidance: Se cambi casa, vendi la tua moto o apporti
           modifiche, aggiorna la registrazione in modo che i dati rimangano accurati
           e utili.
         view_your_bike: Visualizza la tua bici
         what_if_my_bike_gets_stolen: E se mi rubassero la bicicletta?
         whats_next: Cosa succederà ora?
+        secure_both_wheels_with_locking_skewers: Fissa entrambe le ruote con perni
+          di bloccaggio, un cavo robusto e uno o due lucchetti a U.
+        use_a_ulock_or_foldable_lock: Utilizza un lucchetto a U o un lucchetto pieghevole
+          resistente.
       organization_invitation:
         hello: Ciao %{name},
         join_org: Unisciti a %{org_name}

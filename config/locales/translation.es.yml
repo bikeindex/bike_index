@@ -5475,15 +5475,12 @@ es:
         protecting_your_bike_here: Proteja su bicicleta aquí
         read_more_about_prefix: Lea más sobre
         recovered_bike_type: recuperado/encontrado %{bike_type}
-        secure_both_wheels_either_with_two_ulocks: Asegure ambas ruedas, ya sea con
-          dos candados en U o con un candado en U y un cable resistente.
         sign_up_on_bikeindexorg_to_claim_your_bik: Regístrate en BikeIndex.org para
           reclamar tu %{bike_type} y editarlo, subir fotos y asegurarte de no perder
           nunca de vista a tu fiel corcel.
         stolen_bike_type: robado %{bike_type}
         thanks_for_adding_this_bike_type_you_found: Gracias por añadir este %{bike_type}
           que encontraste al Índice de Bicicletas.
-        use_a_ulock: Utilice un candado en U.
         were_sorry_your_bike_type_was_stolen: Lamentamos que su %{bike_type} haya
           sido robado.
         when_you_do: "¡Cuando lo hagas!"
@@ -5512,13 +5509,16 @@ es:
         stolen_guidance: Si te roban la bicicleta, inicia sesión en Bike Index inmediatamente
           y márcala como robada para activar nuestra red de recuperación.
         theft_victims_illustration: Ilustración de víctimas de robo
-        ulock_illustration: Ilustración de un candado en U
         updated_registration_guidance: Si te mudas, vendes o realizas cualquier modificación
           en tu bicicleta, actualiza la matrícula para que el registro siga siendo
           preciso y útil.
         view_your_bike: Ver tu bicicleta
         what_if_my_bike_gets_stolen: "¿Qué pasa si me roban la bicicleta?"
         whats_next: "¿Qué sigue?"
+        secure_both_wheels_with_locking_skewers: Asegure ambas ruedas con cierres
+          de seguridad, un cable resistente y un candado en U o dos candados en U.
+        use_a_ulock_or_foldable_lock: Utilice un candado en U o un candado plegable
+          de alta resistencia.
       organization_invitation:
         hello: Hola %{name},
         join_org: Únete a %{org_name}
