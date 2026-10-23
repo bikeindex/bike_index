@@ -497,10 +497,8 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(page).to have_css("#vehicle-models-count", exact_text: "(32 matching models)")
     find_field("Manufacturers").click
     find("#manufacturer-hw-listbox [role='option']", text: "Kris Holm (5)").click
-    # picked by a click, it keeps the focus, so Escape closes the list it reopens for another pick
-    expect(page).to have_css("#manufacturer:focus[aria-expanded='true']")
-    send_keys(:escape)
-    expect(page).to have_css("#manufacturer[aria-expanded='false']")
+    # picked by a click, it closes the list but keeps the focus, for another pick
+    expect(page).to have_css("#manufacturer:focus[aria-expanded='false']")
     expect(page).to have_css("[data-async-id='manufacturer'] .hw-combobox__chip", text: "Kris Holm")
     expect(page).to have_css("#vehicle-models-count", exact_text: "(5 matching models)")
     # checked propulsions match any of them
