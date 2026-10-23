@@ -150,6 +150,20 @@ RSpec.describe StolenRecord, type: :model do
     end
   end
 
+  describe "legacy_attrs_renamed" do
+    let(:attrs) { {"address" => "100 Main St", "zipcode" => "60622", "state_id" => 12, "city" => "Chicago"} }
+    it "renames to the current attributes" do
+      expect(StolenRecord.legacy_attrs_renamed(attrs))
+        .to eq({"street" => "100 Main St", "postal_code" => "60622", "region_record_id" => 12, "city" => "Chicago"})
+    end
+    context "with both legacy and current names" do
+      let(:attrs) { {"zipcode" => "60622", "postal_code" => "10007", "address" => "100 Main St", "street" => ""} }
+      it "prefers the current name unless it's blank" do
+        expect(StolenRecord.legacy_attrs_renamed(attrs)).to eq({"postal_code" => "10007", "street" => "100 Main St"})
+      end
+    end
+  end
+
   describe "scopes" do
     it "default scopes to current" do
       expect(StolenRecord.all.to_sql).to eq(StolenRecord.unscoped.where(current: true).to_sql)

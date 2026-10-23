@@ -1,8 +1,10 @@
 import { Controller } from '@hotwired/stimulus'
 import { CatalogComboboxSource, loadCatalog, renderCounts } from 'bikebook/catalog'
-import { hydrate, loadingShell } from 'bikebook/hydrate'
-import { keepPermanent } from 'bikebook/render'
+import { hydrate, loadingShell, pickedVehicles, unpickedVehicles } from 'bikebook/hydrate'
+import { keepPermanent, renderInto } from 'bikebook/render'
 import { readable } from 'bikebook/replace_url'
+import { searching } from 'bikebook/query'
+import { collapse } from 'utils/collapse_utils'
 import { SearchLog } from 'bikebook/search_log'
 import { realigned, storePreferredSize, withSize } from 'bikebook/sizes'
 import { renderClassCards, withClassifications } from 'bikebook/templates/vehicles/class_cards'
@@ -16,12 +18,13 @@ const stamped = (state) => ({ ...state, bikebook: uuid() })
 // Searches and compares the published catalog in the browser. A pick submits the form, and it, a
 // link to this page and each history step render the page afresh from the shell, without a request
 export default class extends Controller {
-  static targets = ['shell', 'page', 'status', 'tagline', 'countedTagline']
+  static targets = ['shell', 'page', 'status']
   static values = { manifestUrl: String, jurisdictions: Object, failedText: String, title: String, searchLogUrl: String }
 
   #scrolls = new Map()
   #searchLog
   #renders = 0
+  #refilters = 0
   #renderedUrl
 
   // The loading shell holds the status until the catalog's first render replaces it, and a failure puts it back
@@ -47,7 +50,6 @@ export default class extends Controller {
       renderClassCards(document, picked.split(','), this.catalog.vocabulary.e_vehicle_classifications)
       if (!primed) this.#searchLog.typed({ ...Object.fromEntries(new URL(window.location.href).searchParams), q, count: total })
     })
-    this.#countModels()
     // filters set while it loaded are in the URL, and the reader stays where they've scrolled to
     const current = new URL(window.location.href)
     this.#render(current, [window.scrollX, window.scrollY])
@@ -63,23 +65,27 @@ export default class extends Controller {
     this.#go(realigned(withClassifications(url, this.catalog.vocabulary.e_vehicle_classifications)), [window.scrollX, window.scrollY])
   }
 
-  // A plain click on a link to this page, such as a card's remove link, which an in-place link renders without
-  // scrolling, focusing what the data-in-place on it or an ancestor selects rather than the search, and one inside a
+  // A plain click on a link to this page, such as a card's remove link, or on a drawing's figure's data-href, which an
+  // in-place link renders without scrolling, focusing what the data-in-place on it or an ancestor selects rather than the search, and one inside a
   // data-replace in place of the history entry it's on. One among the vehicles was written when the page rendered, so
   // only what it changes from that goes onto the URL, which filters and panels have moved on since
   follow (event) {
-    const link = event.target.closest('a[href]')
+    const link = event.target.closest('a[href], [data-href]')
     if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || link.target) return
 
-    const url = new URL(link.href)
+    const url = new URL(link.getAttribute('href') ?? link.dataset.href, window.location.href)
     if (url.origin !== window.location.origin || url.pathname !== window.location.pathname) return
 
     event.preventDefault()
     const inPlace = link.closest('[data-in-place]')
-    inPlace
-      ? this.#go(link.closest('#vehicle-viewers') ? this.#changedBy(url) : url, [window.scrollX, window.scrollY],
-        { focus: inPlace.dataset.inPlace || false, replace: Boolean(link.closest('[data-replace]')) })
-      : this.#go(url)
+    if (!inPlace) return this.#go(url)
+
+    const next = link.closest('#vehicle-viewers') ? this.#changedBy(url) : url
+    // one that shows the search a lone model hid, as its tab does, is a step back can undo, and opens and focuses it
+    const reveal = !searching(new URL(window.location.href)) && searching(next)
+    this.#go(next, [window.scrollX, window.scrollY], {
+      focus: reveal ? '[autofocus]' : inPlace.dataset.inPlace || false, replace: Boolean(link.closest('[data-replace]')) && !reveal, reveal
+    })
   }
 
   // A comparison table's size, which the others follow when it's the first vehicle's, and which a later
@@ -88,6 +94,25 @@ export default class extends Controller {
     if (first) storePreferredSize(JSON.parse(target.selectedOptions[0].dataset.size))
     await this.#go(withSize(new URL(window.location.href), vehicle, target.value), [window.scrollX, window.scrollY])
     this.pageTarget.querySelector(`select[data-bikebook--page-vehicle-param="${CSS.escape(vehicle)}"]`)?.focus({ preventScroll: true })
+  }
+
+  // A filter changes in place, which with nothing picked the featured models and their count follow, and the picked
+  // ones a jurisdiction or market, which decide which are out of class and which are sold elsewhere, unless the page
+  // renders or the filters change again first
+  async refilter () {
+    const viewers = this.pageTarget.querySelector('#vehicle-viewers')
+    const url = new URL(window.location.href)
+    const unpicked = viewers?.querySelector(':scope > [data-controller~="bikebook--tips"]')
+    const placeChanged = ['jurisdiction', 'market'].some((name) => url.searchParams.get(name) !== this.#renderedUrl?.searchParams.get(name))
+    if (!this.catalog || !viewers || (!unpicked && !placeChanged)) return
+
+    const render = this.#renders
+    const refilter = ++this.#refilters
+    const vehicles = await (unpicked ? unpickedVehicles : pickedVehicles)(this.catalog, this.pageTarget, url)
+    if (render === this.#renders && refilter === this.#refilters) {
+      renderInto(viewers, vehicles)
+      this.#renderedUrl = url
+    }
   }
 
   restore () {
@@ -126,7 +151,7 @@ export default class extends Controller {
 
   // `focus` selects what to focus, the search where it selects nothing, unless a field of the page's has focus, which
   // keeps it and any value it hasn't yet changed to. Until the catalog loads, the page is its loading shell
-  async #render (url, scroll, { focus = '[autofocus]' } = {}) {
+  async #render (url, scroll, { focus = '[autofocus]', reveal = false } = {}) {
     if (!this.catalog) return this.pageTarget.replaceChildren(loadingShell(this.shellTarget, url, this.status))
 
     const render = ++this.#renders
@@ -140,6 +165,11 @@ export default class extends Controller {
     this.dispatch('before-render')
     const active = this.pageTarget.contains(document.activeElement) && document.activeElement.id ? document.activeElement : null
     this.pageTarget.replaceChildren(keepPermanent(rendered.content, this.pageTarget))
+    if (reveal) {
+      const search = this.pageTarget.querySelector('[data-controller~="bikebook--catalog-filters"]')
+      search.classList.add('tw:hidden')
+      collapse('show', search)
+    }
     this.#renderedUrl = url
     document.title = rendered.title ?? this.titleValue
     const kept = active && this.pageTarget.querySelector(`#${CSS.escape(active.id)}`)
@@ -157,19 +187,11 @@ export default class extends Controller {
     }
   }
 
-  // down to the thousand (a smaller catalog's leading place), so the tagline stays true as the catalog grows
-  #countModels () {
-    const { modelsCount } = this.catalog
-    const place = 10 ** Math.min(3, String(modelsCount).length - 1)
-    const tagline = this.countedTaglineTarget.content.cloneNode(true)
-    tagline.querySelector('[data-models-count]').textContent = (Math.floor(modelsCount / place) * place).toLocaleString('en-US')
-    this.taglineTarget.replaceChildren(tagline)
-  }
-
   // in place of the spinner, below the loading shell's search, where it's still showing
   #fail (error) {
     console.error(error)
     this.status.textContent = this.failedTextValue
+    for (const input of this.pageTarget.querySelectorAll('[data-awaiting-catalog]')) input.placeholder = ''
     if (!this.pageTarget.contains(this.status)) this.pageTarget.replaceChildren(this.status)
   }
 }

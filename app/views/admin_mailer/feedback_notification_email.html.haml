@@ -83,6 +83,9 @@
   - if @feedback.contact_name.present?
     %p
       Contact name: #{@feedback.contact_name}
+  - if @feedback.contact_role.present?
+    %p
+      Role: #{@feedback.contact_role.humanize}
   - if @feedback.phone_number.present?
     %p
       Phone: #{@feedback.phone_number}

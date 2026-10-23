@@ -17,28 +17,29 @@ module SharedBlocks
         private
 
         def menu_items
-          [search_item(:mobile),
-            marketplace_item(:mobile),
+          [*side_items(:mobile),
             {type: :divider, item_class: SIDE_CLASSES.fetch(:mobile)},
             *account_items,
             {label: translation(".help"), path: help_path},
             {label: translation(".stolen_bike"), path: stolen_index_path},
-            {label: translation(".donate"), path: why_donate_path},
-            {label: translation(".blog"), path: news_index_path, match_paths: "#{news_index_path}/**"},
-            marketplace_item(:desktop),
-            search_item(:desktop)]
+            {label: translation(".donate"), path: donate_path},
+            # Desktop items float right, so reversing them keeps the mobile order on screen
+            *side_items(:desktop).reverse]
         end
 
-        # Active anywhere in the registration search — any stolenness, a query, page 2 — which
-        # naming no match_params gets: the stolenness this happens to link to isn't compared
-        def search_item(side)
-          {label: translation(".search"), path: helpers.default_bike_search_path,
-           item_class: SIDE_CLASSES.fetch(side)}
+        # Search is active anywhere in the registration search — any stolenness, a query, page 2 —
+        # which naming no match_params gets: the stolenness this happens to link to isn't compared
+        def side_items(side)
+          [{label: translation(".search"), path: helpers.default_bike_search_path},
+            {label: translation(".marketplace"), path: search_marketplace_path,
+             match_paths: [search_marketplace_path, marketplace_how_it_works_path]},
+            register_item(side)]
+            .map { it.merge(item_class: SIDE_CLASSES.fetch(side)) }
         end
 
-        def marketplace_item(side)
-          {label: translation(".marketplace"), path: search_marketplace_path,
-           match_paths: [search_marketplace_path, marketplace_how_it_works_path], item_class: SIDE_CLASSES.fetch(side)}
+        def register_item(side)
+          label = (side == :mobile) ? translation(".register_a_new_bike") : translation(".register")
+          {label:, path: register_path, match_paths: "#{register_path}/**"}
         end
 
         def account_items

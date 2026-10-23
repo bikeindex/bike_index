@@ -109,6 +109,10 @@ VCR.configure do |config|
   end
 end
 
+# CarrierWave's SSRF filter resolves the host over real DNS, which VCR can't intercept,
+# and a slow lookup fails a remote_*_url download silently
+CarrierWave.configure { |config| config.skip_ssrf_protection = true }
+
 # retry flaky specs on CI
 if ENV["RETRY_FLAKY"]
   require "rspec/retry"

@@ -19,6 +19,7 @@
     data-action="bikebook--tips:filters@window->ui--collapse#show bikebook--tips:filters@window->bikebook--catalog-filters#focusFirst"
     data-bikebook--catalog-filters-default-market-value="<%= @market %>"
     data-bikebook--catalog-filters-default-jurisdiction-value="<%= @jurisdiction %>"
+    data-loading-placeholder="<%= translation(".loading_placeholder") %>"
     data-ui--collapse-param-value="filters"
   >
     <%# Labels the combobox below, which renders none of its own %>
@@ -217,7 +218,6 @@
                 "
                 data-bikebook--catalog-filters-target="field classification"
                 data-filter-label="<%= translation(".e_bike_classification") %>"
-                data-jurisdiction-label="<%= translation(".jurisdiction_for_e_vehicles") %>"
                 data-action="change->bikebook--catalog-filters#apply <%= Pages::Bikebook::Show::FilterCombobox::Component::SELECTION_ACTIONS %>"
               >
                 <legend class="twlabel tw:px-1">
@@ -266,9 +266,9 @@
   data-bikebook--page-manifest-url-value="<%= @manifest_url %>"
   data-bikebook--page-jurisdictions-value="<%= jurisdiction_names.to_json %>"
   data-bikebook--page-failed-text-value="<%= translation(".failed") %>"
-  data-bikebook--page-title-value="Bikebook"
+  data-bikebook--page-title-value="BikeBook"
   data-bikebook--page-search-log-url-value="<%= search_bikebook_path %>"
-  data-action="submit->bikebook--page#visit click->bikebook--page#follow popstate@window->bikebook--page#restore scroll@window->bikebook--page#track"
+  data-action="submit->bikebook--page#visit click->bikebook--page#follow popstate@window->bikebook--page#restore scroll@window->bikebook--page#track bikebook--catalog-filters:change->bikebook--page#refilter"
 >
   <section
     aria-label="<%= translation(".about_bikebook_label") %>"
@@ -280,6 +280,7 @@
   >
     <a
       href="<%= bikebook_path %>"
+      aria-label="BikeBook"
       class="tw:flex tw:shrink-0 tw:items-center tw:gap-3 tw:no-underline!"
     >
       <%= helpers.inline_svg_tag("logos/bikebook_mark.svg", class: "tw:h-12 tw:w-auto tw:text-[#2980ba]", aria_hidden: true) %>
@@ -308,11 +309,7 @@
           tw:sm:text-xl tw:dark:text-slate-100
         "
       >
-        <span data-bikebook--page-target="tagline"><%= translation(".tagline") %></span>
-
-        <template data-bikebook--page-target="countedTagline">
-          <%= translation(".tagline_html", models_count: tag.span(data: {models_count: true})) %>
-        </template>
+        <%= translation(".tagline") %>
       </h1>
 
       <p class="tw:m-0 tw:text-[13px] tw:text-gray-600 tw:dark:text-gray-400">
@@ -323,10 +320,26 @@
 
   <%= render(Pages::Bikebook::DonateStrip::Component.new) %>
 
-  <%# The US classes' and the e-moto's tiles the Overview shows, each a tooltip of its card %>
-  <% [1, 2, 3, nil].each do |e_bike_class| %>
-    <template data-bikebook-class-badge="<%= e_bike_class || "emoto" %>">
-      <%= render(Pages::EbikeRules::ClassTile::Component.new(e_bike_class:, explained: true)) %>
+  <%#
+    The tiles the Overview shows, as /ebike-rules does: the US classes', each also as only an optional mode brings it,
+    and the e-moto's, also as only an optional throttle brings it, and each also out of class in a jurisdiction whose law
+    bars a Class 3's throttle, each a tooltip of its card
+  %>
+
+  <% ([1, 2, 3].product([nil, "throttle", "assist"]) + [nil].product([nil, "throttle"], [nil, *EbikeRuleServices::StateLaws.out_of_class_ids])).each do |e_bike_class, optional, out_of_class_id| %>
+    <template
+      data-bikebook-class-badge="<%= [e_bike_class || "emoto", optional, out_of_class_id].compact.join("/") %>"
+    >
+      <%= render(Pages::EbikeRules::ClassTile::Component.new(e_bike_class:, optional:, size: :lg, explained: true, out_of_class_id:)) %>
+    </template>
+  <% end %>
+
+  <%# The UL badges the Overview's certifications show, as /ebike-rules does, each a tooltip of what it means %>
+  <% [[2849, :certified], [2271, :certified], [nil, :unknown]].each do |standard, status| %>
+    <template
+      data-bikebook-ul-badge="<%= [standard, status].compact.join("/") %>"
+    >
+      <%= render(Pages::EbikeRules::UlBadge::Component.new(standard:, status:)) %>
     </template>
   <% end %>
 
@@ -337,7 +350,7 @@
     </template>
   <% end %>
 
-  <%# DM Sans is the Bike Book logo's face, loaded for its letters alone %>
+  <%# DM Sans is the BikeBook logo's face, loaded for its letters alone %>
   <% helpers.content_for(:header) do %>
     <link
       href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700&text=BikeBok&display=swap"
@@ -360,7 +373,7 @@
 
     <div data-bikebook--page-target="page">
       <%# Placeholder until the catalog loads %>
-      <div inert><%= search %></div>
+      <div inert class="<%= placeholder_class %>"><%= search %></div>
 
       <div
         class="

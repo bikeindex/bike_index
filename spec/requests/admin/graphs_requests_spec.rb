@@ -134,7 +134,7 @@ RSpec.describe Admin::GraphsController, type: :request do
       Counts.assign_logged_searches
       get "#{base_url}/logged_searches", params: {search_endpoint: "web_bikebook", period: "week"}
       expect(response.status).to eq(200)
-      expect(json_result.map { [it["name"], it["data"].sum(&:last)] }).to eq([["Bike Book", 1]])
+      expect(json_result.map { [it["name"], it["data"].sum(&:last)] }).to eq([["BikeBook", 1]])
 
       get "#{base_url}/logged_searches", params: {search_endpoint: "not_web_bikebook", period: "week"}
       expect(response.status).to eq(200)

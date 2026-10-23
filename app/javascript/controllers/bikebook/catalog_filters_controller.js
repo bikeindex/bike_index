@@ -8,6 +8,7 @@ import { readable, replaceUrl } from 'bikebook/replace_url'
 export default class extends Controller {
   static targets = ['vehicleCombobox', 'yearArrow', 'priceArrow', 'summary', 'field', 'classification', 'clear']
   static values = {
+    sort: { type: String, default: 'year' },
     yearDir: { type: String, default: 'desc' },
     priceDir: { type: String, default: 'desc' },
     defaultMarket: String,
@@ -17,9 +18,9 @@ export default class extends Controller {
   // Rewritten on connect too, as rendering drops stale values. Not from the loading placeholder,
   // whose empty fields would clear the URL's filters
   connect () {
-    this.yearArrowTarget.textContent = this.#arrow(this.yearDirValue)
-    this.priceArrowTarget.textContent = this.#arrow(this.priceDirValue)
+    this.#showSort()
     this.#showClasses()
+    this.#classifyPropulsion()
     this.#refreshSummary()
     if (!this.element.closest('[inert]')) this.#writeUrl()
   }
@@ -31,16 +32,20 @@ export default class extends Controller {
 
   toggleSort ({ params: { field } }) {
     const dir = `${field}DirValue`
-    this[dir] = this[dir] === 'desc' ? 'asc' : 'desc'
-    this[`${field}ArrowTarget`].textContent = this.#arrow(this[dir])
+    if (this.sortValue === field) this[dir] = this[dir] === 'desc' ? 'asc' : 'desc'
+    this.sortValue = field
+    this.#showSort()
     this.apply()
   }
 
+  // the page follows the URL's filters
   apply () {
     this.#showClasses()
+    this.#classifyPropulsion()
     this.#syncCombobox()
     this.#refreshSummary()
     this.#writeUrl()
+    this.dispatch('change')
   }
 
   // A multiselect fires hw-combobox:selection before it writes the hidden field,
@@ -63,6 +68,17 @@ export default class extends Controller {
     }
   }
 
+  // A checked class is an e-vehicle's, so it checks e-Vehicle (motorized) and rules out Human powered
+  #classifyPropulsion () {
+    const classed = this.#classes.length > 0
+    const [human, motorized] = ['0', '1'].map((value) => this.element.querySelector(`input[name="electric"][value="${value}"]`))
+    human.disabled = classed
+    if (!classed) return
+
+    human.checked = false
+    motorized.checked = true
+  }
+
   #syncCombobox () {
     const fieldset = this.vehicleComboboxTarget.querySelector('.hw-combobox')
     const url = new URL(fieldset.dataset.hwComboboxAsyncSrcValue, window.location.origin)
@@ -74,7 +90,8 @@ export default class extends Controller {
   }
 
   // The URL leaves out the default market and jurisdiction, so a shared link opens in its reader's own -
-  // but not a jurisdiction with a class checked, which another's would hide and uncheck
+  // but not a jurisdiction with a class checked, which another's would hide and uncheck. It says the search shows, once
+  // it does
   #writeUrl () {
     const url = new URL(window.location)
     const filters = this.#filters
@@ -83,7 +100,8 @@ export default class extends Controller {
     this.#applyParams(url, {
       ...filters,
       market: filters.market === this.defaultMarketValue ? '' : filters.market || 'all',
-      jurisdiction: jurisdiction === this.defaultJurisdictionValue && !classChecked ? '' : jurisdiction
+      jurisdiction: jurisdiction === this.defaultJurisdictionValue && !classChecked ? '' : jurisdiction,
+      search: this.element.hidden ? '' : '1'
     })
     replaceUrl(url)
     this.refreshClear()
@@ -107,16 +125,19 @@ export default class extends Controller {
   #applyParams (url, filters = this.#filters) {
     const params = {
       ...filters,
+      sort: this.sortValue === 'price' ? 'price' : '',
       year_dir: this.yearDirValue === 'asc' ? 'asc' : '',
       price_dir: this.priceDirValue === 'asc' ? 'asc' : ''
     }
     for (const [key, value] of Object.entries(params)) value ? url.searchParams.set(key, value) : url.searchParams.delete(key)
   }
 
-  // a clear keeps the market and e-bike classification, so they alone leave nothing to clear
+  // a clear keeps the market and e-bike classification, so they alone - with the e-Vehicle (motorized) they check -
+  // leave nothing to clear
   #refreshSummary () {
     const { market, jurisdiction, electric, ...filters } = this.#filters
-    const filtered = Object.values(filters).some(Boolean) || electric.split(',').some((value) => value && !this.#classes.includes(value))
+    const kept = this.#classes.length ? [...this.#classes, '1'] : []
+    const filtered = Object.values(filters).some(Boolean) || electric.split(',').some((value) => value && !kept.includes(value))
     for (const link of this.clearTargets) link.hidden = !filtered
     this.summaryTarget.replaceChildren(...this.#summary.map(([label, value]) => {
       const item = document.createElement('li')
@@ -129,30 +150,25 @@ export default class extends Controller {
 
   // Market is left out, as every visit starts with one
   get #summary () {
-    return this.fieldTargets.filter((field) => !field.querySelector('input[name="market"]')).map((field) => {
-      const [value, label = field.dataset.filterLabel] = [this.#describe(field)].flat()
-      return [label, value]
-    }).filter(([, value]) => value)
+    return this.fieldTargets.filter((field) => !field.querySelector('input[name="market"]'))
+      .map((field) => [field.dataset.filterLabel, this.#describe(field)])
+      .filter(([, value]) => value)
   }
 
   #describe (field) {
     const inputs = [...field.querySelectorAll('input[name]')]
+    // what the catalog names, which leaves out a value while it loads
     if (field.matches('.hw-combobox')) {
       return inputs[0].value.split(',').filter(Boolean)
-        .map((value) => field.querySelector(`[role="option"][data-value="${CSS.escape(value)}"]`)?.dataset.autocompletableAs ?? value)
+        .flatMap((value) => field.querySelector(`[role="option"][data-value="${CSS.escape(value)}"]`)?.dataset.autocompletableAs ?? [])
         .join(', ')
     }
+    // the classes alone, without the jurisdiction they're of
     const boxes = inputs.filter(({ type }) => type === 'checkbox')
-    if (boxes.length) {
-      const checked = boxes.filter(({ checked }) => checked).map(({ labels }) => labels[0].textContent.trim()).join(', ')
-      // a state stands alone, as the jurisdiction, read from its option, as the combobox may not have filled its input yet
-      const jurisdiction = field.querySelector('input[name="jurisdiction"]')
-      if (!jurisdiction || field.classList.contains('tw:hidden')) return checked
-      const state = jurisdiction.value && field.querySelector(`[role="option"][data-value="${CSS.escape(jurisdiction.value)}"]`)
-        ?.dataset.autocompletableAs.replace(/ \(\w+\)$/, '')
-      return checked ? `${checked} (${state || field.querySelector('[role="combobox"]').placeholder})` : [state, field.dataset.jurisdictionLabel]
-    }
-    const [min, max] = inputs.map(({ value }) => value && `${field.dataset.filterPrefix}${value}`)
+    if (boxes.length) return boxes.filter(({ checked }) => checked).map(({ labels }) => labels[0].textContent.trim()).join(', ')
+    // a year ungrouped, unlike an amount
+    const prefix = field.dataset.filterPrefix
+    const [min, max] = inputs.map(({ value }) => value && (prefix ? `${prefix}${Number(value).toLocaleString('en-US')}` : value))
     if (min && max) return `${min}–${max}`
     return min ? `from ${min}` : max && `up to ${max}`
   }
@@ -163,6 +179,14 @@ export default class extends Controller {
     return Object.fromEntries([...new Set(inputs.map(({ name }) => name))].map((name) => [name, inputs
       .filter((input) => input.name === name && (input.type !== 'checkbox' || input.checked))
       .map(({ value }) => value).join(',')]))
+  }
+
+  #showSort () {
+    for (const field of ['year', 'price']) {
+      const arrow = this[`${field}ArrowTarget`]
+      arrow.textContent = this.#arrow(this[`${field}DirValue`])
+      arrow.closest('button').setAttribute('aria-pressed', field === this.sortValue)
+    }
   }
 
   #arrow (dir) {

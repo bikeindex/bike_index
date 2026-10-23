@@ -7,10 +7,21 @@ import HwComboboxController from 'controllers/hw_combobox_controller'
 // gem's lazy turbo-frame (`source.prime(controller)`), in the browser rather than asking the server
 export const localSources = new WeakMap()
 
+// Pressing the list - an option, a label, "No matches" - or the field beside its chips would blur the input
+// onto the page, leaving it open with nothing focused to hear Escape or to blur from. The click back in still
+// selects the display, as it did after that blur
+const keepFocusOnPick = (event) => {
+  if (!event.target.closest('[role=listbox]') && !event.target.matches('.hw-combobox__main__wrapper')) return
+
+  event.preventDefault()
+  event.currentTarget.querySelectorAll('[role=combobox]').forEach((input) => clickedSinceFocus.delete(input))
+}
+
 const connect = HwComboboxController.prototype.connect
 HwComboboxController.prototype.connect = function () {
   const source = localSources.get(this.element)
   if (source?.prime) this.element.querySelector('.hw_combobox__pagination__wrapper turbo-frame')?.remove()
+  this.element.addEventListener('mousedown', keepFocusOnPick)
   connect.call(this)
   source?.prime?.(this)
 }
@@ -56,17 +67,23 @@ HwComboboxController.prototype._filterAsync = async function (inputType) {
   }
 }
 
-// hotwire_combobox 0.4.1 finds an option by interpolating the raw value into
-// `[data-value='<value>']`; a value containing a quote (e.g. a search term like
-// `2011'`) builds an invalid selector and throws a SyntaxError, which aborts the
-// multiselect reset. Match on the attribute instead so any value is safe.
-HwComboboxController.prototype._optionElementWithValue = function (value) {
-  return Array.from(
-    this._actingListbox.querySelectorAll(`[${this.filterableAttributeValue}]`)
-  ).find(option => option.getAttribute('data-value') === value) || null
+// Closing on Enter clears a query that matches nothing, so it stays open to say so - unless it's free text to
+// keep. And a multiselect's Escape makes no chip of the option the gem locks in, but the gem still announces it
+const close = HwComboboxController.prototype.close
+HwComboboxController.prototype.close = function (inputType) {
+  if (inputType === 'hw:keyHandler:enter' && this._isQueried && !this._allowNew && !this._visibleOptionElements.length) return
+
+  this.dismissing = this._isMultiselect && inputType === 'hw:keyHandler:escape'
+  close.call(this, inputType)
+  this.dismissing = false
 }
 
-// It also swallows Enter whether or not the listbox is open, so a combobox with
+const dispatchSelectionEvent = HwComboboxController.prototype._dispatchSelectionEvent
+HwComboboxController.prototype._dispatchSelectionEvent = function (previousValue) {
+  if (!this.dismissing) dispatchSelectionEvent.call(this, previousValue)
+}
+
+// The gem swallows Enter whether or not the listbox is open, so a combobox with
 // nothing to pick breaks the form's implicit submission -- unlike every other
 // input. Only handle the key while there's an option to choose.
 const navigate = HwComboboxController.prototype.navigate
@@ -115,10 +132,9 @@ const clickedSinceFocus = new WeakSet()
 
 const forgetClicks = ({ currentTarget }) => clickedSinceFocus.delete(currentTarget)
 
-// The entering click, not the focus: step 1 autofocuses its manufacturer, so the first
-// click there brings no focus event to hang this on. By click the caret is already placed,
-// so the selection sticks without preventing anything, and the gem's own refocus while
-// filtering never selects - that would make the next keystroke replace the query
+// The entering click, not the focus: step 1 autofocuses its manufacturer, and a pick keeps
+// the focus, so the first click there brings no focus event to hang this on. The gem's own
+// refocus while filtering never selects - that would make the next keystroke replace the query
 const selectDisplay = ({ currentTarget }) => {
   if (clickedSinceFocus.has(currentTarget)) return
 
@@ -126,10 +142,17 @@ const selectDisplay = ({ currentTarget }) => {
   if (currentTarget.value) currentTarget.select()
 }
 
+// Pressing inside a focused input's selected text places the caret only once the click is
+// over, collapsing the selection selectDisplay just made
+const holdCaret = (event) => {
+  if (document.activeElement === event.currentTarget && !clickedSinceFocus.has(event.currentTarget)) event.preventDefault()
+}
+
 // Stimulus calls these per element, for targets the gem declares but leaves without a
 // callback -- the seam that also reaches the small-viewport dialog's own combobox
 const listenForClickIntoFocus = function (input) {
   input.addEventListener('focus', forgetClicks)
+  input.addEventListener('mousedown', holdCaret)
   input.addEventListener('click', selectDisplay)
 }
 
