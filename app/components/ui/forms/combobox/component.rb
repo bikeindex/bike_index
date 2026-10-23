@@ -62,8 +62,9 @@ module UI
           helpers.hw_combobox_tag(@name, @options_or_src, **@combobox_options, **default_id, **combobox_attrs) do |component|
             component.customize_input(class: STACKED_INPUT_CLASSES) if stacked?
             # combobox.css shows it once a query leaves no option
-            component.customize_listbox(data: {no_matches: translation(".no_matches")})
-            component.customize_dialog_listbox(data: {no_matches: translation(".no_matches")})
+            data = {no_matches: translation(".no_matches")}
+            component.customize_listbox(data:)
+            component.customize_dialog_listbox(data:)
           end
         end
 

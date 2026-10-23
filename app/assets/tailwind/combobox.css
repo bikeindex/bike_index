@@ -64,22 +64,22 @@ body.dark .hw-combobox {
   min-width: 5rem;
 }
 
-/* A query that leaves no option says so (UI::Forms::Combobox's data-no-matches),
-   once any request for it has answered. A group rendered with no options - its
-   label its only child - is a source labelling its own empty result (/bikebook's
-   "(0 matching models)"), which the gem would hide along with the groups a query
-   emptied. `:has()` can't nest, which is why it's matched by the label. */
+/* A group rendered with no options - its label its only child - is a source's own
+   empty result (/bikebook's "(0 matching models)"), which the gem would hide along
+   with the groups a query emptied. */
 .hw-combobox__group:has(> .hw-combobox__group__label:only-child) {
   display: block;
 }
 
-.hw-combobox__listbox:has(.hw-combobox__group__label:only-child) {
+.hw-combobox__listbox:has(> .hw-combobox__group > .hw-combobox__group__label:only-child) {
   border-color: var(--hw-border-color);
 }
 
-.hw-combobox__main__wrapper:has(> .hw-combobox__input[data-queried]:not([data-pending])) > .hw-combobox__listbox,
-.hw-combobox__dialog:has(.hw-combobox__dialog__input[data-queried]:not([data-pending])) .hw-combobox__dialog__listbox {
-  &[data-no-matches]:not(:has([role="option"]:not([hidden]), .hw-combobox__group__label:only-child)) {
+/* UI::Forms::Combobox's "No matches", once the query's request has answered.
+   `:has()` can't nest, so an empty group is matched by its label. */
+.hw-combobox__input[data-queried]:not([data-pending]) ~ .hw-combobox__listbox,
+.hw-combobox__dialog__input[data-queried]:not([data-pending]) ~ .hw-combobox__dialog__listbox {
+  &[data-no-matches]:not(:has([role="option"]:not([hidden]), > .hw-combobox__group > .hw-combobox__group__label:only-child)) {
     /* the gem leaves the listbox clear, its options carrying the background */
     background-color: var(--hw-option-bg-color);
     border-color: var(--hw-border-color);

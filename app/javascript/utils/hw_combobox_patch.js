@@ -7,11 +7,11 @@ import HwComboboxController from 'controllers/hw_combobox_controller'
 // gem's lazy turbo-frame (`source.prime(controller)`), in the browser rather than asking the server
 export const localSources = new WeakMap()
 
-// Pressing an option would blur the input onto the page, which a multiselect then reopens its list over -
-// open, with nothing focused to hear Escape or to blur from. The click back in still selects the display,
-// as it did after that blur
+// Pressing the list - an option, a label, "No matches" - or the field beside its chips would blur the input
+// onto the page, leaving it open with nothing focused to hear Escape or to blur from. The click back in still
+// selects the display, as it did after that blur
 const keepFocusOnPick = (event) => {
-  if (!event.target.closest('[role=option]')) return
+  if (!event.target.closest('[role=listbox]') && !event.target.matches('.hw-combobox__main__wrapper')) return
 
   event.preventDefault()
   event.currentTarget.querySelectorAll('[role=combobox]').forEach((input) => clickedSinceFocus.delete(input))
@@ -36,10 +36,6 @@ HwComboboxController.prototype._requestChips = function (values) {
   return source ? source.chips(this, values) : requestChips.call(this, values)
 }
 
-// Closing clears a query that matches nothing, so it stays open to say so - unless the query is free text to keep
-const keepsUnmatchedQuery = (combobox) =>
-  Boolean(combobox._fullQuery) && !combobox._allowNew && combobox._visibleOptionElements.length === 0
-
 // A paste fills the input without opening it, and closing is what commits a pick, from the options it shows -
 // so it's expanded at once, as prepareToFilter does
 const pickFirst = (combobox) => {
@@ -47,7 +43,7 @@ const pickFirst = (combobox) => {
     combobox.open()
     combobox._expand()
   }
-  if (!keepsUnmatchedQuery(combobox)) combobox.close('hw:keyHandler:enter')
+  combobox.close('hw:keyHandler:enter')
 }
 
 // Counts the edits a local source answers, so an Enter ahead of its answer (a paste, entered at once) waits for it
@@ -71,10 +67,12 @@ HwComboboxController.prototype._filterAsync = async function (inputType) {
   }
 }
 
-// A multiselect's Escape makes no chip of the option the gem locks in, but the gem still announces
-// it as a selection
+// Closing on Enter clears a query that matches nothing, so it stays open to say so - unless it's free text to
+// keep. And a multiselect's Escape makes no chip of the option the gem locks in, but the gem still announces it
 const close = HwComboboxController.prototype.close
 HwComboboxController.prototype.close = function (inputType) {
+  if (inputType === 'hw:keyHandler:enter' && this._isQueried && !this._allowNew && !this._visibleOptionElements.length) return
+
   this.dismissing = this._isMultiselect && inputType === 'hw:keyHandler:escape'
   close.call(this, inputType)
   this.dismissing = false
@@ -102,7 +100,6 @@ HwComboboxController.prototype.navigate = function (event) {
     }
   }
   if (event.key === 'Enter' && this._isClosed) return
-  if (event.key === 'Enter' && keepsUnmatchedQuery(this)) return event.preventDefault()
 
   navigate.call(this, event)
 }
@@ -161,17 +158,6 @@ const listenForClickIntoFocus = function (input) {
 
 HwComboboxController.prototype.comboboxTargetConnected = listenForClickIntoFocus
 HwComboboxController.prototype.dialogComboboxTargetConnected = listenForClickIntoFocus
-
-// A press on the field beside its chips, which leave blank space where they wrap, would take focus from an
-// open combobox's input - the gem's own wrapper click only focuses it as it opens
-HwComboboxController.prototype.mainWrapperTargetConnected = function (wrapper) {
-  wrapper.addEventListener('mousedown', (event) => {
-    if (event.target !== wrapper) return
-
-    event.preventDefault()
-    this._actingCombobox.focus()
-  })
-}
 
 // The dialog is the small-screen picker, but the gem measures the window the combobox is
 // in - so an iframe narrower than the breakpoint got it on a desktop, where it can't

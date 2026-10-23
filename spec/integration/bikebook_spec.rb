@@ -101,7 +101,7 @@ RSpec.describe "BikeBook", :js, type: :system do
     type_into(vehicle_field, "zzqq")
     expect(page).to have_css(".hw-combobox__group__label", text: /\(0 matching models\)/i)
     vehicle_field.send_keys(:enter)
-    expect(page).to have_field("Select a bike, choose multiple to compare them", with: "zzqq")
+    expect(vehicle_field.value).to eq "zzqq"
     expect(vehicle_field["aria-expanded"]).to eq "true"
 
     type_into(vehicle_field, "level 4 rec")
