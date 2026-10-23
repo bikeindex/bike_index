@@ -1,4 +1,4 @@
-import { copyableCode } from 'bikebook/templates/ui/copyable_code'
+import { copyableCode } from 'bikebook/templates/atoms/copyable_code'
 import { section } from 'bikebook/templates/vehicles/section'
 import { array, blank, compact, except, join, presence, present, slice } from 'bikebook/templates/values'
 
