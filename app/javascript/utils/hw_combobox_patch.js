@@ -144,6 +144,17 @@ const listenForClickIntoFocus = function (input) {
 HwComboboxController.prototype.comboboxTargetConnected = listenForClickIntoFocus
 HwComboboxController.prototype.dialogComboboxTargetConnected = listenForClickIntoFocus
 
+// A press on the field beside its chips, which leave blank space where they wrap, would take focus from an
+// open combobox's input - the gem's own wrapper click only focuses it as it opens
+HwComboboxController.prototype.mainWrapperTargetConnected = function (wrapper) {
+  wrapper.addEventListener('mousedown', (event) => {
+    if (event.target !== wrapper) return
+
+    event.preventDefault()
+    this._actingCombobox.focus()
+  })
+}
+
 // The dialog is the small-screen picker, but the gem measures the window the combobox is
 // in - so an iframe narrower than the breakpoint got it on a desktop, where it can't
 // escape the frame to be full-screen anyway.

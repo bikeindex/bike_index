@@ -24,6 +24,9 @@ RSpec.describe "Admin news", :js, type: :system do
     find_field("blog_content_tag_names").click
     find('[role="option"]', text: "Partners").click
     find_field("blog_content_tag_names").click
+    # a press on the field beside its chips leaves the open listbox's input focused
+    find_field("blog_content_tag_names").ancestor(".hw-combobox__main__wrapper").click(x: 4, y: 4, offset: :top_left)
+    expect(page).to have_field("blog_content_tag_names", focused: true)
     find('[role="option"]', text: "Theft prevention").click
     find('[aria-label="Remove Partners"]').click
     send_keys(:escape)
