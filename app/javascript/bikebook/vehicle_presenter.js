@@ -95,9 +95,7 @@ export class VehiclePresenter {
       : this.labeled(value, unit)
     if (parts.length === 0 || (inCentimeters && difference)) return metric
 
-    // no feet under a foot: 9", not 0' 9"
-    const imperial = join(parts.filter(({ convert }, index) => !(feet && index === 0 && convert(value) === 0))
-      .map(({ part, convert }) => this.labeled(this.rounded(convert(value)), unit, part)), ' ')
+    const imperial = join((feet ? this.#significant(parts, value) : parts).map(({ part, convert }) => this.labeled(this.rounded(convert(value)), unit, part)), ' ')
     // rounded to the inch, so the exact length is a hover away
     const shown = feet ? this.#tooltipped(imperial, compact([this.#inWords(value), inCentimeters ? null : metric])) : imperial
     // muted by its color, as an opacity would fade the tooltip inside it too
@@ -129,11 +127,7 @@ export class VehiclePresenter {
     const centimeters = (mm, unit = 'cm') => this.labeled(this.rounded(mm / cm), unit, this.kit.presenter.centimeters)
     const metric = values.map(([key, mm], index) => [key, centimeters(mm, full && index < values.length - 1 ? null : 'cm')])
     const feetAndInches = this.#feetAndInches()
-    // leading parts that come to zero are left out: no "0'" before a length under a foot
-    const imperial = values.map(([key, mm]) => {
-      const first = feetAndInches.findIndex(({ convert }) => convert(mm) !== 0)
-      return [key, join((first < 0 ? [] : feetAndInches.slice(first)).map(({ part, convert }) => this.labeled(convert(mm), 'mm', part)), ' ')]
-    })
+    const imperial = values.map(([key, mm]) => [key, join(this.#significant(feetAndInches, mm).map(({ part, convert }) => this.labeled(convert(mm), 'mm', part)), ' ')])
     const exact = [(mm) => this.labeled(this.rounded(mm), 'mm'), (mm) => join([this.#inWords(mm), ' (', centimeters(mm), ')'])]
     const [metricSystem, imperialSystem] = [metric, imperial].map((parts, index) => this.#tooltipped(
       full ? join(parts.map(([, part]) => part), ' × ') : join(parts.map(([key, part]) => join([part, ' ', this.kit.presenter.dimension_words[key]])), ', '),
@@ -207,6 +201,12 @@ export class VehiclePresenter {
 
   #inches (millimeters) {
     return millimeters / this.kit.conversions.mm.in
+  }
+
+  // `parts` from the first that `millimeters` doesn't come to zero in: 9", not 0' 9"
+  #significant (parts, millimeters) {
+    const first = parts.findIndex(({ convert }) => convert(millimeters) !== 0)
+    return first < 0 ? parts.slice(-1) : parts.slice(first)
   }
 
   // "3 feet, 2.6 inches", leaving off a part that's zero

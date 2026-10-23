@@ -125,6 +125,9 @@ const quadratic = (start, control, end, steps = 16) => Array.from({ length: step
   return plus(scale(start, (1 - t) ** 2), scale(control, 2 * (1 - t) * t), scale(end, t ** 2))
 })
 
+// where a step tube meets the seat tube rising along `seat` from `bb`
+const stepEnd = (bb, seat, standover) => atHeight(bb, seat, Math.max(standover - 30, bb[1] + 90))
+
 // A step-through's tube, from part way down the head tube through its lowest point to the seat tube, never closer to the
 // down tube than a tube's width
 const stepTube = (frame, standover) => {
@@ -132,7 +135,7 @@ const stepTube = (frame, standover) => {
   const { seat } = axes(frame)
   const floor = (x) => x < bb[0] || x > headBottom[0] ? -Infinity : lerp(bb, headBottom, (x - bb[0]) / (headBottom[0] - bb[0]))[1] + 50
   const start = lerp(headTop, headBottom, 0.3)
-  const end = atHeight(bb, seat, Math.max(standover - 30, bb[1] + 90))
+  const end = stepEnd(bb, seat, standover)
   const lowX = lerp(end, start, 0.45)[0]
   const low = [lowX, Math.max(standover, floor(lowX))]
   return quadratic(start, minus(scale(low, 2), scale(plus(start, end), 0.5)), end).map(([x, y]) => [x, Math.max(y, floor(x))])
@@ -253,7 +256,7 @@ const longtail = (context) => {
 // A tandem, its captain's figures a bike's and its stoker's those prefixed `stoker_`, `detail` 'step_through' for a step
 // tube in place of each rider's top tube
 const tandem = (detail) => (context) => {
-  const { fig, listed, assume, wheel: wheelAt, data } = context
+  const { fig, listed, assume, wheel: wheelAt, data, size } = context
   const [rearWheel, frontWheel] = [wheelAt(['rear'], { bsd: 622, tire: 35 }), wheelAt(['front'], { bsd: 622, tire: 35 })]
   const captainSeat = polar(fig('seat_tube_ct'), 180 - fig('seat_angle'))
   const stokerSeat = polar(fig('stoker_seat_tube_ct'), 180 - fig('stoker_seat_angle_degrees'))
@@ -269,23 +272,23 @@ const tandem = (detail) => (context) => {
   const headTop = (listed('stack') && listed('reach')) || !listed('wheelbase')
     ? plus(captain, [fig('reach'), fig('stack')])
     : plus(frontAxle, scale([steeringUp[1], -steeringUp[0]], -fig('fork_rake')), scale(steeringUp,
-      leg(listed('fork_length_a2c') ? fig('fork_length_a2c') : assume('fork_length_a2c', frontWheel.r + 50), fig('fork_rake')) + fig('head_tube')))
+      leg(listedFigure(size, 'fork_length_a2c') ?? assume('fork_length_a2c', frontWheel.r + 50), fig('fork_rake')) + fig('head_tube')))
   const headBottom = plus(headTop, scale(steeringUp, -fig('head_tube')))
   const foot = plus(headTop, scale(steeringUp, dot(minus(frontAxle, headTop), steeringUp)))
   const captainTop = plus(captain, captainSeat)
-  const { stem, clamp } = cockpit({ bb: captain, headTop, headBottom, seatTop: captainTop }, context)
+  const captainFrame = { bb: captain, headTop, headBottom, seatTop: captainTop }
+  const { stem, clamp } = cockpit(captainFrame, context)
   const stokerTop = plus(stoker, stokerSeat)
   const captainSaddle = plus(captainTop, polar(170, 180 - fig('seat_angle')))
+  const stokerSaddle = plus(stokerTop, polar(170, 180 - fig('stoker_seat_angle_degrees')))
   // the stoker's bar on a short stem clamped up the captain's seat post, just behind the captain's saddle
   const stokerClamp = plus(captainTop, polar(100, 180 - fig('seat_angle')))
   const stokerBar = plus(captainSaddle, [-90, -40])
   const stepped = detail === 'step_through'
   // the captain's down from the head tube to the seat tube over its standover, the stoker's on back from there to the
   // stoker's seat tube over theirs
-  const captainStep = stepped ? stepTube({ bb: captain, headTop, headBottom, seatTop: captainTop }, fig('standover')) : []
-  const stokerStep = stepped
-    ? [captainStep.at(-1), atHeight(stoker, minus(stokerTop, stoker), Math.max(fig('stoker_standover') - 30, stoker[1] + 90))]
-    : []
+  const captainStep = stepped ? stepTube(captainFrame, fig('standover')) : []
+  const stokerStep = stepped ? [captainStep.at(-1), stepEnd(stoker, minus(stokerTop, stoker), fig('stoker_standover'))] : []
   const lowest = (points) => points.reduce((low, each) => each[1] < low[1] ? each : low)
   return [{
     name: 'Side',
@@ -294,7 +297,7 @@ const tandem = (detail) => (context) => {
       : [tube(frontAxle, headBottom, headTop, captainTop, captain, headBottom), tube(captain, stoker, stokerTop, captainTop)]),
     tube(stoker, rearAxle, stokerTop),
     post(captainTop, captainSaddle), saddle(captainSaddle),
-    post(stokerTop, plus(stokerTop, polar(170, 180 - fig('stoker_seat_angle_degrees')))), saddle(plus(stokerTop, polar(170, 180 - fig('stoker_seat_angle_degrees')))),
+    post(stokerTop, stokerSaddle), saddle(stokerSaddle),
     post(stokerClamp, stokerBar), seatPart(handlebar(stokerBar)),
     tube(headTop, stem, clamp), bar(data, clamp)],
     dims: [

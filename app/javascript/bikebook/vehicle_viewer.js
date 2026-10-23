@@ -77,9 +77,8 @@ export class VehicleViewer {
     // they're all that kind of bike's
     const drawing = (data, size, { figure, legend, typicalKind }) => {
       const notes = [legend.some(({ calculated }) => calculated) && 'Light purple figures are calculated from the listed ones.',
-        legend.some(({ listed, calculated }) => !listed && !calculated) && (typicalKind
-          ? `Gray figures aren't listed, so they're estimated from typical values on ${typicalKind}s.`
-          : `Gray figures aren't listed, so they're estimated from average values on ${typeName(data).toLowerCase()}s.`)]
+        legend.some(({ listed, calculated }) => !listed && !calculated) &&
+          `Gray figures aren't listed, so they're estimated from ${typicalKind ? 'typical' : 'average'} values on ${typicalKind ?? typeName(data).toLowerCase()}s.`]
         .filter(Boolean)
       return html`<figure class="tw:space-y-1"><div class="tw:mx-auto tw:max-w-xl tw:text-gray-800 tw:dark:text-gray-200">${figure}</div>${notes.length
         ? html`<figcaption class="tw:text-center tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">${present(size?.name) && array(data.sizes).length > 1 ? `${size.name} drawn. ` : ''}${notes.join(' ')}</figcaption>`
@@ -95,10 +94,10 @@ export class VehicleViewer {
       const shown = own.filter(({ legend }) => framed(legend))
       if (shown.length < 2) return own
       const span = Math.max(...shown.map((each) => each.span))
-      const scaled = own.map((each, index) => framed(each.legend) ? draw(index, { span }) : each)
+      const scaled = own.map((each, index) => framed(each.legend) && each.span !== span ? draw(index, { span }) : each)
       const bounds = scaled.filter(({ legend }) => framed(legend)).map((each) => each.bounds)
       const box = { width: Math.max(...bounds.map(({ left, right }) => right - left)), top: Math.max(...bounds.map(({ top }) => top)), bottom: Math.min(...bounds.map(({ bottom }) => bottom)) }
-      return scaled.map((each, index) => framed(each.legend) ? draw(index, { span, box }) : each)
+      return scaled.map((each) => framed(each.legend) ? { ...each, figure: each.within(box) } : each)
     }
     const views = {
       basics: () => basics({ presenter, vehicles, outOfClassId }),

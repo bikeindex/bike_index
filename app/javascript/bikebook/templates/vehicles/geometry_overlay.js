@@ -20,6 +20,8 @@ const TIRE_GAP = 10
 // rather than the drawing refitting
 const BOUNDS = { left: -460, right: 1685, top: 1140 }
 
+export const wheelName = (presenter, bsd) => presenter.vocabulary.wheel_sizes[bsd]?.name ?? `${bsd} mm BSD`
+
 const figures = (presenter, keys) => andSentence(keys.map((key) => presenter.kit.geometry.labels[key] ?? presenter.humanize(key)))
 
 // A frame drawn whole as its type's side view, else its wheels alone, faded while another is chosen
@@ -27,7 +29,7 @@ const frame = ({ side, geometry: { rearAxle, frontAxle, rearRadius, frontRadius 
   svg`<g id=${`geometry-frame-${index}`} data-bikebook--geometry-overlay-target="frame" data-vehicle=${value} color=${series.color}
     data-action="click->bikebook--geometry-overlay#pick" cursor="pointer"
     opacity=${chosen >= 0 && chosen !== index ? 0.2 : nothing}><title>${label}</title>${side
-    ? side.shapes
+    ? side.shapes.map(renderShape)
     : [[rearAxle, rearRadius], [frontAxle, frontRadius]].map(([center, radius]) => renderShape({ kind: 'circle', center, radius, weight: 'part' }))}</g>`
 
 // A [bsd, tire] wheel against the first's: the same size on a tire more than TIRE_GAP mm wider or narrower, or 700c
@@ -48,7 +50,7 @@ const diameterNotes = (presenter, compared) => {
     const title = html`<em>${vehicle.title}</em>'s`
     const described = (position) => {
       const [bsd, tire] = wheel(vehicle, position)
-      return [presenter.vocabulary.wheel_sizes[bsd]?.name ?? `${bsd} mm BSD`, mm(tire), mm(2 * outerRadius(vehicle.builtWheels[position]))]
+      return [wheelName(presenter, bsd), mm(tire), mm(2 * outerRadius(vehicle.builtWheels[position]))]
     }
     if (positions.length === 2 && equal(wheel(vehicle, 'front'), wheel(vehicle, 'rear'))) {
       const [size, tire, diameter] = described('front')

@@ -4,7 +4,7 @@ import { OVERALL_LENGTH_ESTIMATE } from 'bikebook/frame_geometry'
 import { missing } from 'bikebook/templates/helpers'
 import { table } from 'bikebook/templates/ui/table'
 import { tooltip } from 'bikebook/templates/ui/tooltip'
-import { seriesBorders } from 'bikebook/templates/vehicles/geometry_overlay'
+import { seriesBorders, wheelName } from 'bikebook/templates/vehicles/geometry_overlay'
 import { cargoAt, isCargo, tireWidth, typeLabel, wheelsAt } from 'bikebook/templates/vehicles/model_viewer'
 import { array, isNumber, join, present, slice, sum } from 'bikebook/templates/values'
 
@@ -41,7 +41,6 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], highl
   const wheels = new Map(named.map((vehicle, index) => [vehicle, wheelsAt(presenter, vehicles[index].data, sizes[index])]))
   const wheelbase = geometry.find(({ key }) => key === 'wheelbase')
   const specified = (vehicle) => listedFigure(sizes[named.indexOf(vehicle)], 'dimensions.length')
-  // the size's own where it lists one
   const length = {
     ...wheelbase,
     label: html`Overall length (est.) ${tooltip({ text: `Overall length is ${OVERALL_LENGTH_ESTIMATE}` })}`,
@@ -84,11 +83,11 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], highl
   const difference = (row, value, base, vehicle) => compared(row, vehicle) ? changed(row, value, base, (amount) => show(row, amount, vehicle)) : nothing
 
   // a wheel of another size than the first's is larger or smaller, rather than a number of mm
-  const wheelName = (bsd) => presenter.vocabulary.wheel_sizes[bsd]?.name ?? `${bsd} mm BSD`
   const resized = (bsd, base) => {
     if (!isNumber(bsd) || !isNumber(base) || bsd === base) return nothing
-    const text = `${wheelName(bsd)} wheels are ${bsd > base ? 'larger' : 'smaller'} diameter than ${wheelName(base)}`
-    return html`<span class="tw:block tw:text-xs"><span class="tw:font-bold ${bsd > base ? BETTER : WORSE}">${bsd > base ? '+' : '−'}</span> ${tooltip({ text })}</span>`
+    const larger = bsd > base
+    const text = `${wheelName(presenter, bsd)} wheels are ${larger ? 'larger' : 'smaller'} diameter than ${wheelName(presenter, base)}`
+    return html`<span class="tw:block tw:text-xs"><span class="tw:font-bold ${larger ? BETTER : WORSE}">${larger ? '+' : '−'}</span> ${tooltip({ text })}</span>`
   }
 
   const partsCell = (row, value, baseParts, vehicle) => {
@@ -125,7 +124,6 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], highl
   const sizeRows = sizes.some(Boolean) ? [size] : []
   const cargos = new Map(named.map((vehicle, index) => [vehicle, cargoAt(presenter, vehicles[index].data, sizes[index])]))
   const cargoRows = vehicles.some(({ data }) => isCargo(data)) ? records([{ label: 'Cargo', read: (vehicle) => cargos.get(vehicle) }]) : []
-  // only where they differ
   const typeRows = new Set(named.map(typeLabel)).size > 1 ? records([{ label: 'Vehicle type', read: typeLabel }]) : []
   const rows = [...typeRows, ...records(wheelRows), ...cargoRows, ...sizeRows, ...records([...geometry, length, WEIGHT])]
   if (rows.length === 0) return nothing
