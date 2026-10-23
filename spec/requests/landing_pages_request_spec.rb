@@ -7,9 +7,9 @@ RSpec.describe LandingPagesController, type: :request do
     end
   end
 
-  describe "/uc-merced" do
+  describe "/ucmerced" do
     it "redirects to registering with uc-merced" do
-      expect(get("/uc-merced")).to redirect_to(new_register_path(organization_id: "uc-merced"))
+      expect(get("/ucmerced")).to redirect_to(new_register_path(organization_id: "uc-merced"))
     end
   end
 
