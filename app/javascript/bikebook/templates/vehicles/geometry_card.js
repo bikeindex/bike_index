@@ -1,8 +1,11 @@
 import { html, nothing } from 'lit-html'
 import { definitionListContainer } from 'bikebook/templates/ui/definition_list/container'
 import { definitionListRow } from 'bikebook/templates/ui/definition_list/row'
+import { tooltip } from 'bikebook/templates/ui/tooltip'
 import { figureLetter } from 'bikebook/templates/vehicles/cycle_drawing'
 import { array, equal, except, isHash, presence, present } from 'bikebook/templates/values'
+
+const LABEL_TOOLTIPS = { standover_above_bb: 'Some bikes (typically BMX and dirt jumpers) list standover from the bottom bracket, instead of the ground' }
 
 // A size's geometry, marked where the same-named size in `others` differs, and ringed when it's the size compared, its
 // name otherwise a link to `href`, which compares it in place. A figure in `letters`, a key's letter, is lettered as its drawing has it.
@@ -34,7 +37,8 @@ export const geometryCard = ({ presenter, size, others, selected, href, letters 
   // a hash's row, as overall dimensions are, lettered with each of its fields drawn
   const lettersFor = (key) => [...letters].filter(([each]) => each === key || each.startsWith(`${key}.`))
   const lettered = (rows) => rows.map(([label, value, unit, differs, key, ...rest]) => [html`${lettersFor(key).map(([figure, letter]) =>
-    figureLetter({ letter, listed: present(value), highlighted: figure === highlight, href: figurePath?.(figure), label }))}${label}`, value, unit, differs, key, ...rest])
+    figureLetter({ letter, listed: present(value), highlighted: figure === highlight, href: figurePath?.(figure), label }))}${label}${
+    LABEL_TOOLTIPS[key] ? html` ${tooltip({ text: LABEL_TOOLTIPS[key] })}` : nothing}`, value, unit, differs, key, ...rest])
   const unlisted = drawn && equal(drawn.name, size.name) ? drawn.figures : []
   const notes = unlisted.length
     ? html`<div data-controller="bikebook--figure-note" data-bikebook--figure-note-card-value=${`${drawn.id} ${size.name ?? ''}`}>${unlisted.map(({ key, letter, label, value, unit, calculated }) =>

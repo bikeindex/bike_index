@@ -15,8 +15,9 @@ const items = (content) => listed(content)?.[0].flatMap(items) ?? [content]
 const mark = (content) => html`<span class="tw:spec-diff">${content}</span>`
 
 const MATERIALS = 'frame.material'
+const TOP_TUBES = 'frame.top_tube'
 // lengths in centimeters, with an imperial viewer's feet and inches after
-const IN_CENTIMETERS = ['wheelbase', 'standover']
+const IN_CENTIMETERS = ['wheelbase', 'standover', 'standover_above_bb']
 const SINGULAR = { feet: 'foot', inches: 'inch' }
 
 // The names, units and lookups the vehicle templates present a model's data with
@@ -25,14 +26,23 @@ const FEET_AND_INCHES = ["'", '"']
 
 export class VehiclePresenter {
   constructor (kit, vocabulary) {
-    // the extras' bb_drop_low as the catalog's own labels write "BB Drop"
-    this.kit = { ...kit, acronyms: { ...kit.acronyms, bb: 'BB' } }
-    // the catalog names carbon "Carbon or Composite"
+    // the extras' bb_drop_low as the catalog's own labels write "BB Drop", and standover above it short, as its tooltip
+    // explains it
+    this.kit = {
+      ...kit,
+      acronyms: { ...kit.acronyms, bb: 'BB' },
+      geometry: { ...kit.geometry, labels: { ...kit.geometry.labels, standover_above_bb: 'Standover above BB' } }
+    }
+    // the catalog names carbon "Carbon or Composite", and leaves its top tubes and target riders unnamed
     const materials = { ...vocabulary.names[MATERIALS], carbon: 'Carbon/Composite' }
-    this.vocabulary = { ...vocabulary, names: { ...vocabulary.names, [MATERIALS]: materials } }
+    const topTubes = { step_through: 'Step-through', sloping: 'Sloping', horizontal: 'Horizontal', ...vocabulary.names[TOP_TUBES] }
+    const riders = { kid: 'Kids', woman: "Women's", adaptive: 'Adaptive', ...vocabulary.names.target_riders }
+    this.vocabulary = { ...vocabulary, names: { ...vocabulary.names, [MATERIALS]: materials, [TOP_TUBES]: topTubes, target_riders: riders } }
     this.half = new RegExp(kit.shis.half)
     this.shisPattern = new RegExp(kit.shis.pattern)
-    this.imperialLengths = kit.imperial_lengths.map(({ pattern, parts }) => ({ pattern: new RegExp(pattern), parts }))
+    // standover above the bottom bracket in feet and inches, as a wheelbase is, where the kit's standover reads in inches
+    this.imperialLengths = [{ pattern: /^standover_above_bb$/, parts: kit.feet_and_inches },
+      ...kit.imperial_lengths.map(({ pattern, parts }) => ({ pattern: new RegExp(pattern), parts }))]
     this.unitSuffix = new RegExp(kit.geometry.unit_suffix)
     this.componentGroups = new Map(Object.entries(kit.component_groups).flatMap(([group, types]) => types.map((type) => [type, group])))
   }
@@ -85,10 +95,13 @@ export class VehiclePresenter {
       : this.labeled(value, unit)
     if (parts.length === 0 || (inCentimeters && difference)) return metric
 
-    const imperial = join(parts.map(({ part, convert }) => this.labeled(this.rounded(convert(value)), unit, part)), ' ')
+    // no feet under a foot: 9", not 0' 9"
+    const imperial = join(parts.filter(({ convert }, index) => !(feet && index === 0 && convert(value) === 0))
+      .map(({ part, convert }) => this.labeled(this.rounded(convert(value)), unit, part)), ' ')
     // rounded to the inch, so the exact length is a hover away
     const shown = feet ? this.#tooltipped(imperial, compact([this.#inWords(value), inCentimeters ? null : metric])) : imperial
-    return this.#unitSystems(metric, inCentimeters ? join([metric, ' ', html`<span class="tw:text-xs twless-strong">(${shown})</span>`]) : shown)
+    // muted by its color, as an opacity would fade the tooltip inside it too
+    return this.#unitSystems(metric, inCentimeters ? join([metric, ' ', html`<span class="tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">(${shown})</span>`]) : shown)
   }
 
   // In feet and inches, or centimeters in metric: "6' 4"", "194 cm"

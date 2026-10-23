@@ -8,7 +8,7 @@ import { emptyState } from 'bikebook/templates/vehicles/empty_state'
 import { geometryOverlay, overlayFrames, seriesBorders } from 'bikebook/templates/vehicles/geometry_overlay'
 import { jumpTo, VIEWS } from 'bikebook/templates/vehicles/jump_to'
 import { componentsOf, modelViewer, motorsOf, photoOf, runningGearOf, sizesOf } from 'bikebook/templates/vehicles/model_viewer'
-import { present } from 'bikebook/templates/values'
+import { array, present } from 'bikebook/templates/values'
 import { searching, toQuery } from 'bikebook/query'
 import { VehiclePresenter } from 'bikebook/vehicle_presenter'
 
@@ -73,40 +73,59 @@ export class VehicleViewer {
         : html`<p class="twless-strong">${none}</p>`}</section>`
     })
     const typeName = (data) => presenter.named(presenter.kit.schemas.vehicle, data).type || 'bike'
-    // its type's drawing of `size`, said where it works figures out or takes a typical one's
-    const drawing = (data, size, figure, legend) => {
-      const notes = [legend.some(({ calculated }) => calculated) && 'Light purple figures are worked out from the ones it lists.',
-        legend.some(({ listed, calculated }) => !listed && !calculated) && `Gray figures aren't listed, so they're drawn as they typically are on a ${typeName(data).toLowerCase()}.`]
+    // its type's drawing of `size`, said where it works figures out or takes a typical one's: its `typicalKind`'s where
+    // they're all that kind of bike's
+    const drawing = (data, size, { figure, legend, typicalKind }) => {
+      const notes = [legend.some(({ calculated }) => calculated) && 'Light purple figures are calculated from the listed ones.',
+        legend.some(({ listed, calculated }) => !listed && !calculated) && (typicalKind
+          ? `Gray figures aren't listed, so they're estimated from typical values on ${typicalKind}s.`
+          : `Gray figures aren't listed, so they're estimated from average values on ${typeName(data).toLowerCase()}s.`)]
         .filter(Boolean)
       return html`<figure class="tw:space-y-1"><div class="tw:mx-auto tw:max-w-xl tw:text-gray-800 tw:dark:text-gray-200">${figure}</div>${notes.length
-        ? html`<figcaption class="tw:text-center tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">${present(size?.name) ? `${size.name} drawn. ` : ''}${notes.join(' ')}</figcaption>`
+        ? html`<figcaption class="tw:text-center tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">${present(size?.name) && array(data.sizes).length > 1 ? `${size.name} drawn. ` : ''}${notes.join(' ')}</figcaption>`
         : nothing}</figure>`
+    }
+    // drawn only where its size lists some of its frame: overall dimensions, wheels and a cargo area alone would be all
+    // it drew of its own
+    const framed = (legend) => legend.some(({ letter, listed, editable, extra, key }) => letter && listed && editable && !extra && !key.startsWith('dimensions'))
+    // each one's drawing, those drawn at the largest's scale and on the same ground, so they line up across the cards
+    const sizeDrawings = () => {
+      const draw = (index, options) => cycleDrawing({ type: vehicles[index].data.type, data: vehicles[index].data, size: sizes[index], kit: presenter.kit, highlight, figurePath, ...options })
+      const own = vehicles.map((_, index) => draw(index))
+      const shown = own.filter(({ legend }) => framed(legend))
+      if (shown.length < 2) return own
+      const span = Math.max(...shown.map((each) => each.span))
+      const scaled = own.map((each, index) => framed(each.legend) ? draw(index, { span }) : each)
+      const bounds = scaled.filter(({ legend }) => framed(legend)).map((each) => each.bounds)
+      const box = { width: Math.max(...bounds.map(({ left, right }) => right - left)), top: Math.max(...bounds.map(({ top }) => top)), bottom: Math.min(...bounds.map(({ bottom }) => bottom)) }
+      return scaled.map((each, index) => framed(each.legend) ? draw(index, { span, box }) : each)
     }
     const views = {
       basics: () => basics({ presenter, vehicles, outOfClassId }),
       // the overlay beside the table once the window is wide, above it until then
-      geometry: () => html`<div class="tw:flex tw:flex-col tw:min-[1500px]:twpagebleed tw:min-[1500px]:flex-row
+      geometry: () => {
+        const drawings = sizeDrawings()
+        return html`<div class="tw:flex tw:flex-col tw:min-[1500px]:twpagebleed tw:min-[1500px]:flex-row
         tw:min-[1500px]:items-start tw:min-[1500px]:gap-6 tw:min-[1500px]:px-4">${geometryOverlay({ ...compared, selected: url.searchParams.get('overlay_selected'), beside: true })}${
         comparisonTable({ ...compared, highlight, beside: true })}</div>${cardRow('tw:mt-6', cards('sizes', 'No sizes listed', (data, value) => {
         const size = sizes[values.indexOf(value)]
-        const { figure, legend } = cycleDrawing({ type: data.type, data, size, kit: presenter.kit, highlight, figurePath })
-        // drawn only where its size lists some of its frame: overall dimensions, wheels and a cargo area alone would be all
-        // it drew of its own
-        const framed = legend.some(({ letter, listed, editable, extra, key }) => letter && listed && editable && !extra && !key.startsWith('dimensions'))
-        return html`${framed ? drawing(data, size, figure, legend) : nothing}<div class="tw:-mx-(--gutter)">${sizesOf({
+        const drawn = drawings[values.indexOf(value)]
+        const { legend } = drawn
+        return html`${framed(legend) ? drawing(data, size, drawn) : nothing}<div class="tw:-mx-(--gutter)">${sizesOf({
           presenter,
           data,
           others: others(value),
           selectedSize: selectedSizes.get(value),
           sizePath: sizePath(value),
-          lettering: framed && {
+          lettering: framed(legend) && {
             letters: new Map(legend.filter(({ letter }) => letter).map(({ key, letter }) => [key, letter])),
             highlight,
             figurePath,
             drawn: { id: value, name: size?.name, figures: legend.filter(({ letter, listed }) => letter && !listed) }
           }
         })}</div>`
-      }, { keyed: true }))}`,
+      }, { keyed: true }))}`
+      },
       components: () => {
         const components = componentsOf({ presenter, vehicles, others })
         return cardRow('tw:mt-6', cards('components', 'No components listed', (data, value) => components.get(value),
