@@ -29,12 +29,28 @@ const matching = (sizes, name) => name == null
 const medium = (sizes) => matching(sizes, 'M') ?? sizes[Math.floor((sizes.length - 1) / 2)]
 
 const gap = (a, b) => typeof a === 'number' && typeof b === 'number' ? Math.abs(a - b) : Infinity
-// The size whose effective top tube is nearest `target`'s, reach breaking a tie
+// the heights of the riders a size fits, [min, max], open where it lists only the other
+const riders = (size) => {
+  const [min, max] = ['min_rider_height', 'max_rider_height'].map((key) => size?.geometry?.[key])
+  return [min, max].some((each) => typeof each === 'number') ? [min ?? -Infinity, max ?? Infinity] : null
+}
+// how far apart the riders `size` and `target` fit are, 0 where they overlap, and how few of them they share
+const ridersApart = (size, target) => {
+  if (!riders(size)) return [Infinity, Infinity]
+  const [[min, max], [targetMin, targetMax]] = [riders(size), riders(target)]
+  const shared = Math.min(max, targetMax) - Math.max(min, targetMin)
+  return [Math.max(-shared, 0), -shared]
+}
+// The size nearest `target`: for its riders, where `target` and any of `sizes` list their heights, else by effective top
+// tube, then reach, each breaking a tie in the one before
 const nearest = (sizes, target) => {
-  const distance = (size) => ['top_tube_effective', 'reach'].map((key) => gap(size.geometry?.[key], target?.geometry?.[key]))
+  const byRiders = riders(target) && sizes.some(riders)
+  const distance = (size) => [...(byRiders ? ridersApart(size, target) : []),
+    ...['top_tube_effective', 'reach'].map((key) => gap(size.geometry?.[key], target?.geometry?.[key]))]
   const closer = (size, best) => {
-    const [[topTube, reach], [bestTopTube, bestReach]] = [distance(size), distance(best)]
-    return topTube < bestTopTube || (topTube === bestTopTube && reach < bestReach)
+    const [mine, theirs] = [distance(size), distance(best)]
+    const differs = mine.findIndex((each, index) => each !== theirs[index])
+    return differs >= 0 && mine[differs] < theirs[differs]
   }
   return sizes.filter((size) => distance(size)[0] < Infinity).reduce((best, size) => best && !closer(size, best) ? best : size, null)
 }
@@ -71,7 +87,7 @@ export const withSize = (url, id, name) => withPicked(url, { ...pickedSizes(url)
 export const realigned = (url, previous = new URL(window.location.href)) => withPicked(url, pickedSizes(previous))
 
 // Each vehicle's size: its pick, else the first's preferred size and the others' the first's, each the nearest
-// by top tube, else by name, else medium
+// for its riders or by top tube, else by name, else medium
 export const chosenSizes = (vehicles, { picked = {}, preferred } = {}) => {
   const choose = ({ value, data }, target) => {
     const sizes = array(data.sizes)

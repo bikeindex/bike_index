@@ -1,13 +1,17 @@
 import { array, isNumber } from 'bikebook/templates/values'
 import { TYPICAL_GEOMETRY } from 'bikebook/typical_geometry'
 
-// figures that size the front triangle, without any of which a frame would be all estimate
+// figures that size the front triangle, without any of which a frame would be all estimate - but a BMX's, whose typical
+// fork and head tube stand on its front axle and steering axis
 const SIZING = ['reach', 'stack', 'top_tube_effective', 'front_center', 'head_tube']
 
-const radians = (degrees) => degrees * Math.PI / 180
+// mm ahead of the bottom bracket a size's standover is measured
+export const STANDOVER_X = 75
+
+export const radians = (degrees) => degrees * Math.PI / 180
 const cot = (angle) => 1 / Math.tan(angle)
 // a right triangle's other side, 0 where the figures it's from don't make one
-const leg = (hypotenuse, side) => Math.sqrt(Math.max(hypotenuse ** 2 - side ** 2, 0))
+export const leg = (hypotenuse, side) => Math.sqrt(Math.max(hypotenuse ** 2 - side ** 2, 0))
 
 export const builtWheel = (data, size, position) => array(data.wheels).find((each) => each.configured !== false &&
   array(each.position).includes(position) && (!each.sizes || array(each.sizes).includes(size?.name)))
@@ -37,11 +41,12 @@ export const frameGeometry = (data, size) => {
   const known = (...values) => values.every(isNumber)
   const [rearRadius, frontRadius] = ['rear', 'front'].map((position) => outerRadius(builtWheel(data, size, position)))
   const wheels = known(rearRadius, frontRadius, geometry.wheelbase) ? { rearRadius, frontRadius, wheelbase: geometry.wheelbase } : null
-  if (!SIZING.some(listed)) return { missing: SIZING, wheels }
+  const typical = TYPICAL_GEOMETRY[data.primary_activity] ?? {}
+  const steered = isNumber(typical.crown) && listed('head_angle') && (listed('wheelbase') || listed('front_center'))
+  if (!SIZING.some(listed) && !steered) return { missing: SIZING, wheels }
 
   const { wheelbase, top_tube_effective: topTube } = geometry
   const fork = array(data.components).find((each) => each.type === 'fork')
-  const typical = TYPICAL_GEOMETRY[data.primary_activity] ?? {}
   const headAngle = listed('head_angle') ? radians(geometry.head_angle) : null
   const listedRake = geometry.fork_rake ?? fork?.dimensions?.offset
   // where it lists no wheels, the rear's height under the bottom bracket, and the front's from its trail and rake
@@ -124,7 +129,16 @@ export const frameGeometry = (data, size) => {
   const headBottom = steering(headTube)
   const seat = radians(seatAngle)
   const listedSeatTube = geometry.seat_tube_ct ?? geometry.seat_tube_ctc
-  const seatTube = listedSeatTube ?? stack / Math.sin(seat)
+  // a BMX's where it lists none: as tall as runs its top tube over its standover above the bottom bracket, else its
+  // kind's typical
+  const overBracket = isNumber(typical.seat_tube)
+    ? geometry.standover_above_bb ?? (listed('standover') ? geometry.standover - (rear - drop) : null)
+    : null
+  const underStandover = known(overBracket)
+    ? (overBracket * reach - stack * STANDOVER_X) / (Math.sin(seat) * (reach - STANDOVER_X) + Math.cos(seat) * (stack - overBracket))
+    : null
+  const standoverSeatTube = underStandover > 0 && underStandover < stack / Math.sin(seat) ? underStandover : null
+  const seatTube = listedSeatTube ?? standoverSeatTube ?? typical.seat_tube ?? stack / Math.sin(seat)
   const seatTop = [-seatTube * Math.cos(seat), seatTube * Math.sin(seat)]
   // a seat tube slacker than the effective angle runs ahead of the bottom bracket, so it ends on the down tube
   const slope = cot(radians(actualSeatAngle))
@@ -136,7 +150,8 @@ export const frameGeometry = (data, size) => {
   const assumed = [
     ['fork_rake', !isNumber(workedRake)],
     ['fork_length_a2c', !isNumber(listedForkLength) && (stackFromFork || !listed('head_tube'))],
-    ['head_tube', isNumber(assumedHeadTube) && stackFromFork]
+    ['head_tube', isNumber(assumedHeadTube) && stackFromFork],
+    ['seat_tube_ct', !isNumber(listedSeatTube) && !isNumber(standoverSeatTube) && isNumber(typical.seat_tube)]
   ].filter(([, taken]) => taken).map(([key]) => key)
   const rearRim = builtWheel(data, size, 'rear')?.bsd
 

@@ -65,15 +65,15 @@ export default class extends Controller {
     this.#go(realigned(withClassifications(url, this.catalog.vocabulary.e_vehicle_classifications)), [window.scrollX, window.scrollY])
   }
 
-  // A plain click on a link to this page, such as a card's remove link, which an in-place link renders without
-  // scrolling, focusing what the data-in-place on it or an ancestor selects rather than the search, and one inside a
+  // A plain click on a link to this page, such as a card's remove link, or on a drawing's figure's data-href, which an
+  // in-place link renders without scrolling, focusing what the data-in-place on it or an ancestor selects rather than the search, and one inside a
   // data-replace in place of the history entry it's on. One among the vehicles was written when the page rendered, so
   // only what it changes from that goes onto the URL, which filters and panels have moved on since
   follow (event) {
-    const link = event.target.closest('a[href]')
+    const link = event.target.closest('a[href], [data-href]')
     if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || link.target) return
 
-    const url = new URL(link.href)
+    const url = new URL(link.getAttribute('href') ?? link.dataset.href, window.location.href)
     if (url.origin !== window.location.origin || url.pathname !== window.location.pathname) return
 
     event.preventDefault()

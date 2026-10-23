@@ -87,8 +87,10 @@ export const basicsOf = ({ presenter, data, outOfClassId }) => new ModelViewer({
 export const photoOf = ({ presenter, data }, frame) => new ModelViewer({ presenter, data, others: [] }).stockPhoto(frame)
 
 // A vehicle's sizes, each with its geometry, `selectedSize` ringed and marked where they differ from `others`', the rest
-// linked to `sizePath(name)`
-export const sizesOf = ({ presenter, data, others, selectedSize, sizePath }) => new ModelViewer({ presenter, data, others, selectedSize, sizePath }).sizes()
+// linked to `sizePath(name)`, and each figure lettered as its drawing has it by `lettering`, geometryCard's letters,
+// highlight and figurePath
+export const sizesOf = ({ presenter, data, others, selectedSize, sizePath, lettering }) =>
+  new ModelViewer({ presenter, data, others, selectedSize, sizePath, lettering }).sizes()
 
 // A vehicle's electric summary beside its motors, each with its battery, marked where they differ from `others`'
 export const motorsOf = ({ presenter, data, others, outOfClassId }) => {
@@ -118,14 +120,14 @@ export const componentsOf = ({ presenter, vehicles, others }) => {
 
 class ModelViewer {
   // `outOfClassId` the viewing state's out of class marker, evc/out_of_class/us/ca, where its law bars a Class 3's throttle
-  constructor ({ presenter, data, value, comparing, idSuffix, others, removePath, selectedSize, sizePath, outOfClassId }) {
+  constructor ({ presenter, data, value, comparing, idSuffix, others, removePath, selectedSize, sizePath, outOfClassId, lettering }) {
     this.presenter = presenter
     this.kit = presenter.kit
     this.data = data
     this.vehicle = this.#normalize(data)
     this.outOfClass = outOfClassId ? this.#throttledClass3() : null
     this.others = others.map((other) => this.#normalize(other))
-    Object.assign(this, { value, comparing, idSuffix, removePath, selectedSize, sizePath, outOfClassId })
+    Object.assign(this, { value, comparing, idSuffix, removePath, selectedSize, sizePath, outOfClassId, lettering })
   }
 
   render () {
@@ -135,8 +137,8 @@ class ModelViewer {
     const titleText = [vehicle.manufacturer, vehicle.model].filter(present).join(' ')
     const header = html`<header><div class="tw:flex tw:items-start tw:gap-4">${present(vehicle.manufacturer)
       ? html`<p class="tw:mb-1 tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">${vehicle.manufacturer}</p>`
-      : nothing}${removeLink({ label: `Remove ${titleText}`, href: this.removePath })}</div><div class="tw:flex tw:items-baseline tw:justify-between tw:gap-4"><div class="tw:flex tw:items-baseline tw:gap-1"><h1
-      class="tw:text-2xl tw:leading-tight tw:font-extrabold">${vehicle.model}</h1>${copyButton({ value: this.value, label: 'Copy ID', tooltip: true })}</div>${collapse({
+      : nothing}${removeLink({ label: `Remove ${titleText}`, href: this.removePath })}</div><div class="tw:flex tw:items-baseline tw:justify-between tw:gap-4"><div class="tw:text-2xl tw:leading-tight"><h1
+      class="tw:inline tw:font-extrabold">${vehicle.model}</h1> ${copyButton({ value: this.value, label: 'Copy ID', tooltip: true })}</div>${collapse({
         size: 'sm',
         htmlClass: 'tw:shrink-0 tw:whitespace-nowrap',
         attributes: { 'aria-controls': jsonPanelId, 'aria-label': 'Toggle JSON' },
@@ -343,7 +345,9 @@ class ModelViewer {
       cargo_vehicle: isCargo(this.data),
       cargo: this.cargo(),
       primary_activity: this.withoutParenthetical(vehicle.primary_activity),
-      frame_material: vehicle.frame?.material,
+      frame_material: present(vehicle.frame?.material) && present(vehicle.frame.material_detail)
+        ? html`${vehicle.frame.material} <span class="tw:text-xs twless-strong">${vehicle.frame.material_detail}</span>`
+        : vehicle.frame?.material ?? vehicle.frame?.material_detail,
       ...this.wheelSizes(),
       suspended: present(vehicle.suspension),
       suspension: this.suspensionTravels(),
@@ -688,6 +692,21 @@ class ModelViewer {
     return array(vehicle.wheels).filter((wheel) => wheel.configured !== false)
   }
 
+  // `size`'s wheels as [label, content], each its size, labelled as Wheels labels it, over its tire: front and rear as one
+  // where they're the same size and tire
+  sizeWheels (size) {
+    const [front, rear] = ['front', 'rear'].map((position) => at(this.builtWheels(), position, size)[0])
+    const rows = (wheelLabel, tireLabel, wheel) => {
+      const tire = compact([wheel.tire_width != null ? this.tireWidthSummary(wheel.tire_width, '') : null, wheel.tire_system?.replaceAll('_', ' ')])
+      return [[wheelLabel, wheel.bsd != null ? this.wheelSizeName(wheel.bsd) : null], [tireLabel, tire.length ? join(tire, ', ') : null]]
+        .filter(([, content]) => content != null)
+    }
+    const fitted = (wheel) => slice(wheel, ['bsd', 'tire_width', 'tire_system'])
+    const label = this.presenter.positionLabel.bind(this.presenter)
+    if (front && rear && equal(fitted(front), fitted(rear))) return rows(label(['front', 'rear']), 'Tires', front)
+    return [['front', front], ['rear', rear]].filter(([, wheel]) => wheel).flatMap(([position, wheel]) => rows(label(position), `${label(position)} tire`, wheel))
+  }
+
   // the wheels the frame takes but the build doesn't come with, as [bsd, max_tire_width, positions]
   clearances (vehicle = this.vehicle) {
     const groups = new Map()
@@ -874,7 +893,15 @@ class ModelViewer {
     // selected one as ui--tabs does its active tab
     return html`<div data-controller="ui--tabs" class="tw:overflow-x-auto tw:px-(--gutter) tw:pb-3.5"><div data-ui--tabs-target="row"
       class="tw:flex tw:w-max tw:min-w-full tw:gap-4">${sizes.map((size) => geometryCard({
-        presenter: this.presenter, size, others, selected: present(this.selectedSize) && size.name === this.selectedSize, href: this.sizePath?.(size.name)
+        presenter: this.presenter,
+        size,
+        others,
+        selected: present(this.selectedSize) && size.name === this.selectedSize,
+        href: this.sizePath?.(size.name),
+        ...this.lettering,
+        wheels: this.sizeWheels(size),
+        cargo: this.vehicle.cargo,
+        otherCargos: this.others.map((other) => other.cargo)
       }))}</div></div>`
   }
 
