@@ -2,6 +2,6 @@
 
 class MarketplaceController < ApplicationController
   def how_it_works
-    render Pages::Marketplace::HowItWorks::Component.new
+    render SharedBlocks::Marketing::Wrapper::Component.new(page: Pages::Marketplace::HowItWorks::Component.new)
   end
 end

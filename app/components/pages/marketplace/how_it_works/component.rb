@@ -5,20 +5,18 @@ module Pages
     module HowItWorks
       # "PRO TIP!" is Bangers in the design; Montserrat stands in rather than loading a font for one heading
       class Component < ApplicationComponent
-        SECTION_CLASSES = "tw:mx-auto tw:max-w-[1200px] tw:px-[clamp(20px,4vw,40px)]"
-        HEADING_CLASSES = "tw:font-header tw:text-[clamp(26px,3.5vw,30px)] tw:leading-tight tw:font-extrabold"
+        SECTION_CLASSES = SharedBlocks::Marketing::Wrapper::Component::CONTAINER_CLASSES
         CARD_CLASSES = "tw:flex tw:flex-col tw:gap-2.5 tw:rounded-lg tw:border tw:border-gray-200 tw:bg-white tw:shadow-[0_4px_12px_rgba(44,62,80,.12)] tw:dark:border-gray-700 tw:dark:bg-gray-800"
         BODY_CLASSES = "tw:text-gray-600 tw:dark:text-gray-300"
 
         private
 
         def checks
-          [
-            [translation(".registered_bikes_only"), translation(".registered_bikes_only_body")],
-            [translation(".checked_for_theft"), translation(".checked_for_theft_body")],
-            [translation(".ownership_transfers"), translation(".ownership_transfers_body")],
-            [translation(".bike_index_members"), translation(".bike_index_members_body")]
-          ]
+          [{icon: "icons/bike.svg", title: translation(".registered_bikes_only"), body: translation(".registered_bikes_only_body")},
+            {icon: "icons/searcher.svg", title: translation(".checked_for_theft"), body: translation(".checked_for_theft_body")},
+            {icon: "icons/handshake.svg", title: translation(".ownership_transfers"), body: translation(".ownership_transfers_body")},
+            {icon: "icons/badge-check.svg", title: translation(".bike_index_members"), body: translation(".bike_index_members_body")}]
+            .map { it.merge(circle: "tw:bg-blue-600") }
         end
 
         def step_lists
