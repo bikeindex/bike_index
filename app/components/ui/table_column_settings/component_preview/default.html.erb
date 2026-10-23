@@ -9,7 +9,7 @@
 
   <%= render(UI::TableColumnSettings::Component.new(columns:, defaults: %i[color_cell size_cell], narrow_hidden: %i[size_cell])) %>
 
-  <%= render(UI::CardTable::Component.new(records: rows, orderable: true)) do |table| %>
+  <%= render(UI::CardTable::Component.new(records: rows)) do |table| %>
     <% table.column(label: "Name") { |row| row[0] } %>
 
     <% columns.each_with_index do |(cell_name, label), index| %>

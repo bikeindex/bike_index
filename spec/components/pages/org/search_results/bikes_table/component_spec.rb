@@ -26,17 +26,9 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
     expect(component.css("th").first["class"]).to include("tw:sticky")
     expect(component).to have_css("th:nth-child(2).photo_cell", text: "Photo")
     expect(component).to have_css("tbody td.color_cell", text: bike.primary_frame_color.name)
-    # Not orderable unless a caller wraps it in ui--table-column-order
-    expect(component).not_to have_css("[data-ui--table-column-order-target='handle']")
-  end
-
-  context "with orderable" do
-    let(:options) { {organization:, bikes:, orderable: true} }
-
-    it "gives each hideable column a drag handle, and View none" do
-      expect(component.css("th.hideableColumn").map { it.css("[data-ui--table-column-order-target='handle']").count }.uniq).to eq [1]
-      expect(component.css("th").first.css("[data-ui--table-column-order-target='handle']")).to be_empty
-    end
+    # A drag handle per hideable column, and none for View
+    expect(component.css("th.hideableColumn").map { it.css("[data-ui--table-column-order-target='handle']").count }.uniq).to eq [1]
+    expect(component.css("th").first.css("[data-ui--table-column-order-target='handle']")).to be_empty
   end
 
   context "with a pedal bike and an e-bike" do
@@ -101,11 +93,12 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
       expect(header_cells.index("reg_address_cell")).to be > header_cells.index("propulsion_type_cell")
     end
 
+    # text: rather than exact_text:, past the drag handle's glyph that only CSS hides
     it "heads the columns with the shared labels" do
-      expect(component).to have_css("th.avery_cell", normalize_ws: true, exact_text: "Avery Exportable")
-      expect(component).to have_css("th.propulsion_type_cell", normalize_ws: true, exact_text: "E-vehicle (propulsion)")
+      expect(component).to have_css("th.avery_cell", normalize_ws: true, text: "Avery Exportable")
+      expect(component).to have_css("th.propulsion_type_cell", normalize_ws: true, text: "E-vehicle (propulsion)")
       expect(component).to have_css("th.notes_cell", normalize_ws: true,
-        exact_text: "Registration Notes by #{organization.short_name}")
+        text: "Registration Notes by #{organization.short_name}")
     end
   end
 

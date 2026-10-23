@@ -39,7 +39,7 @@
         tw:@max-[672px]/twwiderow:mx-[calc(var(--gutter)*-1)]
       "
     >
-      <%= render(UI::CardTable::Component.new(records: rows, render_sortable: true, sort_state: @sort_state, orderable: true)) do |table| %>
+      <%= render(UI::CardTable::Component.new(records: rows, render_sortable: true, sort_state: @sort_state)) do |table| %>
         <% table.column(label: button_tag(check_mark, type: "button", class: "twlink tw:cursor-pointer tw:border-0 tw:bg-transparent tw:p-0",
       title: "Toggle all checked", aria: {label: "Toggle all checked"}, data: {action: "click->table-multi-checkbox#toggleAll"})) do |(stolen_record)| %>
           <div class="tw:flex tw:items-center tw:gap-3">

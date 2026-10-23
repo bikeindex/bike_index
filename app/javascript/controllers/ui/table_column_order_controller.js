@@ -15,11 +15,15 @@ export default class extends Controller {
     this.applyOrder(storedArray(this.storageKeyValue))
   }
 
-  // Pressed inside a selection of the header's text, a drag would carry the text instead
+  // Reconnects each time applyOrder moves its header, which the shared listener makes harmless
   handleTargetConnected (handle) {
+    handle.classList.remove('tw:hidden')
     handle.draggable = true
-    handle.addEventListener('mousedown', () => window.getSelection().removeAllRanges())
+    handle.addEventListener('mousedown', this.#clearSelection)
   }
+
+  // Pressed inside a selection of the header's text, a drag would carry the text instead
+  #clearSelection = () => window.getSelection().removeAllRanges()
 
   // Only from a handle, so dragging a header's sort link doesn't move its column
   dragStart (event) {
