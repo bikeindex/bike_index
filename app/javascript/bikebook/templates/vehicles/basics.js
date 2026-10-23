@@ -3,8 +3,9 @@ import { amountDisplay, missing } from 'bikebook/templates/helpers'
 import { collapse } from 'bikebook/templates/ui/collapse'
 import { copyButton } from 'bikebook/templates/ui/copy_button'
 import { table } from 'bikebook/templates/ui/table'
+import { PINNED_ROW_HEADER } from 'bikebook/templates/vehicles/comparison_table'
 import { basicsOf, simpleFormat } from 'bikebook/templates/vehicles/model_viewer'
-import { array, isNumber, present } from 'bikebook/templates/values'
+import { array, isNumber, join, present } from 'bikebook/templates/values'
 
 // `only` ones once a shown model is electric, suspended, a cargo vehicle or sold outside the visitor's market, the rest once one lists it, and `differing`
 // ones where the models' values of it differ
@@ -37,6 +38,12 @@ const manufacturerLine = (manufacturer) => present(manufacturer)
 // years come newest first
 const priced = (vehicle) => array(vehicle.years).find((year) => isNumber(year.original_msrp))
 
+// the newest year's page still on the manufacturer's site, rather than an archived one
+const manufacturerPage = (vehicle) => {
+  const url = array(vehicle.years).find((year) => year.url_live && present(year.url))?.url
+  return url && html`<small class="tw:text-gray-500 tw:dark:text-gray-400"><a class="twlink-underlined" href=${url}>manufacturer's page</a></small>`
+}
+
 const EXCERPT_LENGTH = 200
 
 // `text`'s first 200 characters, cut at a word and keeping its paragraphs, which a collapse swaps for the whole of it as
@@ -59,15 +66,16 @@ const readMore = (text, content) => {
 }
 
 // The models' names, photos and headline fields side by side in a table, one model's as two's
-export const basics = ({ presenter, vehicles, class3Throttle }) => {
+export const basics = ({ presenter, vehicles, outOfClassId }) => {
   const shown = vehicles.map(({ data, value, outsideMarket }) => {
     const price = priced(data)
-    const fields = basicsOf({ presenter, data, class3Throttle })
+    const fields = basicsOf({ presenter, data, outOfClassId })
     return {
       ...fields,
       value,
       markets: array(data.markets).map((code) => presenter.vocabulary.names?.markets?.[code] ?? code).join(', '),
       outside_market: outsideMarket,
+      years: join([fields.years, manufacturerPage(data)].filter(present), ' '),
       price: price && amountDisplay(price.original_msrp, price.original_msrp_currency, presenter.vocabulary.currencies),
       description: fields.description && readMore(data.description, fields.description)
     }
@@ -78,12 +86,12 @@ export const basics = ({ presenter, vehicles, class3Throttle }) => {
 }
 
 const compared = (vehicles, fields) => html`<section aria-label=${vehicles.length > 1 ? 'Overview comparison' : 'Overview'} class="tw:mt-6 ${vehicles.length > 3
-  ? 'tw:mx-[calc(50%-50vw)] tw:w-screen tw:px-4'
+  ? 'tw:twpagebleed tw:px-4'
   : ''}">${table({
   classes: `${vehicles.length === 1 ? 'tw:w-full tw:md:w-[calc(50%+6.25rem)] tw:md:min-w-0!' : 'tw:w-full'} tw:table-fixed ${MIN_WIDTHS[vehicles.length] ?? MIN_WIDTHS.at(-1)} ${vehicles.length > 3 ? `tw:mx-auto ${MAX_WIDTHS[vehicles.length] ?? MAX_WIDTHS[5]}` : ''}`,
   records: fields,
   columns: [
-    { label: html`<span class="tw:sr-only">Field</span>`, rowHeader: true, classes: 'tw:w-50 tw:px-2.5! tw:py-2! tw:align-top tw:font-bold', cell: ({ label }) => label },
+    { label: html`<span class="tw:sr-only">Field</span>`, rowHeader: true, classes: 'tw:w-32 tw:md:w-50 tw:px-2.5! tw:py-2! tw:align-top tw:font-bold', cellClass: () => PINNED_ROW_HEADER, cell: ({ label }) => label },
     ...vehicles.map((vehicle) => ({
       label: html`${vehicle.photo('tw:mb-2 tw:aspect-[4/3]')}${manufacturerLine(vehicle.manufacturer)}<span class="tw:inline-flex tw:items-baseline tw:gap-1">${
         vehicle.model}${copyButton({ value: vehicle.value, label: 'Copy ID', tooltip: true })}</span>`,

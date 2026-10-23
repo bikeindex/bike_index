@@ -1,0 +1,250 @@
+<%# The same for every visitor, so its translations and inlined icons are worth keeping %>
+<% cache(self.class.cache_digest) do %>
+  <div
+    data-controller="landing-pages--tabs"
+    data-landing-pages--tabs-param-value="education"
+  >
+    <div
+      class="
+        tw:mb-8 tw:flex tw:border-b tw:border-gray-200 tw:sm:gap-1
+        tw:dark:border-gray-700
+      "
+      role="tablist"
+      aria-label="<%= translation(".tabs_label") %>"
+    >
+      <% organizations.each do |organization| %>
+        <% active = organization[:key] == DEFAULT_ORGANIZATION %>
+
+        <button
+          type="button"
+          class="
+            tw:-mb-px tw:flex-1 tw:border-b-3 tw:border-transparent tw:px-1
+            tw:py-3 tw:text-sm tw:font-bold tw:text-gray-600
+            tw:hover:text-slate-900 tw:aria-selected:border-blue-600
+            tw:aria-selected:text-slate-900 tw:sm:flex-none tw:sm:px-4
+            tw:sm:text-[15px] tw:sm:whitespace-nowrap tw:dark:text-gray-400
+            tw:dark:hover:text-white tw:dark:aria-selected:text-white
+          "
+          id="tab-button-<%= organization[:key] %>"
+          role="tab"
+          aria-selected="<%= active %>"
+          aria-controls="tab-<%= organization[:key] %>"
+          <% unless active %>
+            tabindex="-1"
+          <% end %>
+          data-tab="<%= organization[:key] %>"
+          data-landing-pages--tabs-target="button"
+          data-action="click->landing-pages--tabs#select keydown->landing-pages--tabs#keydown"
+        >
+          <%= organization[:sequence].organization.short_name %>
+        </button>
+      <% end %>
+    </div>
+
+    <% organizations.each do |organization| %>
+      <% sequence = organization[:sequence] %>
+      <% name = sequence.organization.name %>
+      <% sequence_pages = organization[:pages] %>
+      <% total = sequence_pages.size + 1 %>
+      <% register_flow = BikeServices::RegisterFlow.new(page_count: sequence_pages.size) %>
+
+      <div
+        id="tab-<%= organization[:key] %>"
+        class="
+          tw:grid tw:items-start tw:gap-x-10 tw:gap-y-6 tw:not-[.active]:hidden tw:lg:grid-cols-2
+          <%= "active" if organization[:key] == DEFAULT_ORGANIZATION %>
+        "
+        role="tabpanel"
+        aria-labelledby="tab-button-<%= organization[:key] %>"
+        data-landing-pages--tabs-target="panel"
+        data-controller="landing-pages--education"
+        data-action="landing-pages--tabs:activated->landing-pages--education#sync click->landing-pages--education#guard:capture"
+      >
+        <div class="tw:lg:col-start-1">
+          <div
+            class="
+              tw:mb-1.5 tw:text-[13px] tw:font-bold tw:tracking-[.06em]
+              tw:text-gray-600 tw:uppercase tw:dark:text-gray-400
+            "
+          >
+            <%= translation(".viewing_as") %>
+          </div>
+
+          <div class="tw:font-header tw:text-[26px] tw:font-extrabold">
+            <%= name %>
+          </div>
+
+          <p
+            class="
+              tw:mt-2 tw:text-base tw:text-pretty tw:text-gray-600
+              tw:dark:text-gray-300
+            "
+          >
+            <%= organization[:blurb] %>
+          </p>
+        </div>
+
+        <div
+          class="
+            tw:order-last tw:flex tw:flex-col tw:gap-5 tw:lg:order-none
+            tw:lg:col-start-1
+          "
+        >
+          <ol
+            class="
+              tw:overflow-hidden tw:rounded-lg tw:border tw:border-gray-200
+              tw:bg-white tw:dark:border-gray-700 tw:dark:bg-gray-800
+            "
+          >
+            <% [*sequence_pages.map { [it.title, translation(".rule_count", count: it.bullets.size)] },
+                [translation(".consent_category"), nil]].each_with_index do |(label, meta), index| %>
+              <li
+                class="
+                  tw:not-first:border-t tw:not-first:border-gray-200
+                  tw:dark:not-first:border-gray-700
+                "
+              >
+                <button
+                  type="button"
+                  class="
+                    tw:group tw:flex tw:w-full tw:cursor-pointer
+                    tw:items-center tw:gap-3.5 tw:px-4 tw:py-3.5
+                    tw:text-left tw:aria-[current=step]:bg-blue-50
+                    tw:dark:aria-[current=step]:bg-blue-950
+                  "
+                  <% if index.zero? %>
+                    aria-current="step"
+                  <% end %>
+                  data-landing-pages--education-target="summary"
+                  data-action="landing-pages--education#go"
+                  data-landing-pages--education-index-param="<%= index %>"
+                >
+                  <span
+                    class="
+                      tw:flex tw:size-7 tw:flex-none tw:items-center
+                      tw:justify-center tw:rounded-full tw:bg-gray-100
+                      tw:text-sm tw:font-bold tw:text-gray-600
+                      tw:group-aria-[current=step]:bg-blue-600
+                      tw:group-aria-[current=step]:text-white
+                      tw:group-data-passed:bg-blue-600
+                      tw:group-data-passed:text-white tw:dark:bg-gray-700
+                      tw:dark:text-gray-300
+                    "
+                  >
+                    <span class="tw:group-data-passed:hidden"><%= index + 1 %></span>
+                    <%= helpers.inline_svg_tag("icons/check.svg", class: "tw:hidden tw:size-3.5 tw:stroke-[3.5] tw:group-data-passed:block", aria_hidden: true) %>
+                  </span>
+
+                  <span class="tw:min-w-0 tw:flex-1">
+                    <span class="tw:block tw:text-[15px] tw:font-bold"><%= label %></span>
+
+                    <% if meta %>
+                      <span
+                        class="
+                          tw:block tw:text-[13px] tw:text-gray-600
+                          tw:dark:text-gray-400
+                        "
+                      >
+                        <%= meta %>
+                      </span>
+                    <% end %>
+                  </span>
+                </button>
+              </li>
+            <% end %>
+          </ol>
+
+          <div class="<%= STICKER_CLASSES %>">
+            <%= image_tag "kelsey/illustrations/comic-assets_bike-bell.png", alt: "", loading: "lazy", width: 65, height: 64, class: "tw:h-16 tw:w-auto tw:flex-none" %>
+
+            <p class="tw:text-[15px] tw:leading-normal">
+              <%= translation(".staff_edit") %>
+            </p>
+          </div>
+        </div>
+
+        <%= render(UI::Card::Component.new(additional_classes: "tw:grid tw:w-full tw:max-w-[520px] tw:justify-self-center tw:rounded-lg! tw:px-7 tw:pt-7 tw:pb-6 tw:shadow-[0_4px_12px_rgba(44,62,80,.12)] tw:lg:col-start-2 tw:lg:row-span-2 tw:lg:row-start-1")) do %>
+          <%#
+            Every step shares one grid cell, hidden by visibility rather than display, so the card
+            keeps the tallest step's height instead of jumping as the rider moves through them
+          %>
+
+          <% sequence_pages.each_with_index do |page, index| %>
+            <div
+              role="group"
+              aria-label="<%= page.title %>"
+              tabindex="-1"
+              class="<%= PANEL_CLASSES %> <%= "tw:invisible" unless index.zero? %>"
+              data-landing-pages--education-target="step"
+              data-controller="register--acknowledgment"
+            >
+              <%= render(Pages::Register::Parts::Progress::Component.new(flow: register_flow, step: BikeServices::Register.step_for_page_index(index))) %>
+              <%= render(Pages::Register::Parts::AcknowledgmentProgress::Component.new(number: index + 1, total:)) %>
+              <%= render(Pages::Register::Parts::PageContent::Component.new(page:, first: index.zero?, heading_tag: :h3)) %>
+
+              <%= render(UI::Button::Component.new(text: translation(".continue"), color: :primary, size: :lg,
+              html_class: "tw:mt-5 tw:w-full tw:justify-center", disabled: true,
+              data: {"register--acknowledgment-target": "submit", action: "landing-pages--education#next"})) %>
+
+              <%= back_button unless index.zero? %>
+            </div>
+          <% end %>
+
+          <div
+            role="group"
+            aria-label="<%= translation(".consent_category") %>"
+            tabindex="-1"
+            class="tw:invisible <%= PANEL_CLASSES %>"
+            data-landing-pages--education-target="step"
+            data-controller="register--acknowledgment"
+          >
+            <%= render(Pages::Register::Parts::Progress::Component.new(flow: register_flow, step: "review")) %>
+            <%= render(Pages::Register::Parts::AcknowledgmentProgress::Component.new(number: total, total:)) %>
+            <%= render(Pages::Register::Parts::ReviewSummary::Component.new(pages: sequence_pages, heading_tag: :h3)) %>
+            <%= render(Pages::Register::Parts::AcknowledgmentCheck::Component.new(sequence:)) %>
+
+            <%= render(UI::Button::Component.new(text: translation(".complete_registration"), color: :primary, size: :lg,
+            html_class: "tw:w-full tw:justify-center", disabled: true,
+            data: {"register--acknowledgment-target": "submit", action: "landing-pages--education#next"})) %>
+
+            <%= back_button %>
+          </div>
+
+          <%# Only here - the real flow goes on to the registration's own finished page %>
+          <div
+            tabindex="-1"
+            class="tw:invisible tw:self-center <%= PANEL_CLASSES %>"
+            data-landing-pages--education-target="done"
+          >
+            <%= render(Pages::Register::Parts::Progress::Component.new(flow: register_flow, step: "review")) %>
+
+            <div
+              class="
+                tw:flex tw:flex-col tw:items-center tw:gap-2.5 tw:px-2
+                tw:pt-6 tw:pb-2 tw:text-center
+              "
+            >
+              <%= render(UI::Badge::Component.new(text: translation(".registered"), color: :notice, size: :lg)) %>
+
+              <h3 class="tw:mt-1 tw:font-header tw:text-2xl tw:font-extrabold">
+                <%= translation(".all_set") %>
+              </h3>
+
+              <p
+                class="
+                  tw:max-w-[360px] tw:text-[15px] tw:text-gray-600
+                  tw:dark:text-gray-300
+                "
+              >
+                <%= translation(".done_message", count: sequence_pages.sum { it.bullets.size }, name:) %>
+              </p>
+
+              <%= render(UI::Button::Component.new(text: translation(".start_over"), color: :link,
+              html_class: "tw:mt-1.5 tw:text-sm tw:font-semibold", data: {action: "landing-pages--education#restart"})) %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+<% end %>

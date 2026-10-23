@@ -87,10 +87,10 @@ RSpec.describe EbikeRuleServices::StateLaws do
 
       # New Jersey's motorcycles, its electric motorized bicycle and dirt bike among them, are the one e-moto, last
       expect(described_class.classes("NJ").pluck(:id))
-        .to eq ["evc/us/nj/electric_bicycle", "evc/us/nj/motorized_bicycle", "out_of_class"]
+        .to eq ["evc/us/nj/electric_bicycle", "evc/us/nj/motorized_bicycle", "evc/out_of_class"]
       expect(described_class.classes("NJ").first).to include(name: "Low-Speed Electric Bicycle", throttle: false, mph: 20, watt_cap: nil)
       expect(described_class.classes("NJ").second).to include(mph: 28, either: true)
-      expect(described_class.classes("NJ").third).to eq(id: "out_of_class", not_an_ebike: true)
+      expect(described_class.classes("NJ").third).to eq(id: "evc/out_of_class", not_an_ebike: true)
       expect(described_class.classes("CO")).to be_nil
       expect(described_class.classes("WY")).to be_nil
     end

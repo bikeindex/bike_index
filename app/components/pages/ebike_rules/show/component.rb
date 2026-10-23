@@ -47,8 +47,7 @@ module Pages
             combobox_options(places.reject { EbikeRuleServices::Places.country(it) == @lookup.country })
         end
 
-        # Each submits its code, and reads "California (CA)", or "New South Wales (AU-NSW)" outside the page's country
-        def combobox_options(places) = places.map { {name: it[:name], abbr: it[:code].delete_prefix("#{@lookup.country}-"), value: it[:code]} }
+        def combobox_options(places) = EbikeRuleServices::Places.combobox_options(places, country: @lookup.country)
 
         def field_error(field, text)
           return unless error?(field)

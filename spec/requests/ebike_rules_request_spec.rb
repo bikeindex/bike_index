@@ -84,6 +84,11 @@ RSpec.describe EbikeRulesController, type: :request do
       # one the state's law folds into the e-moto, as its classes do
       get "/ebike-rules/US/NJ", params: {classification: "evc/us/nj/dirt_bike"}, headers: frame.call("evc-us-nj-dirt_bike")
       expect(page).to have_css("turbo-frame#ebike-rules-class-card-evc-us-nj-dirt_bike h3", text: "Not an e-bike")
+      # as is the catalog's marker for one out of class, in a state whose law bars a Class 3's throttle, but no other
+      get "/ebike-rules", params: {classification: "evc/out_of_class/us/ca"}, headers: frame.call("evc-out_of_class-us-ca")
+      expect(page).to have_css("turbo-frame#ebike-rules-class-card-evc-out_of_class-us-ca h3", text: "Not an e-bike")
+      get "/ebike-rules", params: {classification: "evc/out_of_class/us/co"}, headers: frame.call("evc-out_of_class-us-co")
+      expect(response).to have_http_status(:not_found)
 
       get "/ebike-rules", params: {classification: "evc/nothing"}, headers: frame.call("evc-nothing")
       expect(response).to have_http_status(:not_found)
@@ -101,7 +106,7 @@ RSpec.describe EbikeRulesController, type: :request do
         .and have_text("We detected Indiana.")
         .and have_no_css("[role='alert']")
 
-      # a bike comes along, as from Bike Book's link, to be checked there
+      # a bike comes along, as from BikeBook's link, to be checked there
       get "/ebike-rules", params: {vehicle_models: "m/specialized/2025/haul_st"}, headers: indiana
       expect(response).to redirect_to("/ebike-rules/US/IN?vehicle_models=m%2Fspecialized%2F2025%2Fhaul_st")
 
@@ -211,8 +216,9 @@ RSpec.describe EbikeRulesController, type: :request do
       # as is one entered by hand, which is both classes as such a model is
       get "/ebike-rules/US/CA", params: {manual: "1", top_speed: "28", throttle: "1"}
       expect(page).to have_css("[role='status'] li", text: "It is a Class 2 and Class 3 e-bike, which is not permitted.")
-      # under the e-moto's tile rather than its classes'
+      # under the e-moto's tile rather than its classes', with California's out of class ID
       expect(page.all("section[aria-live] [data-controller~='ui--tooltip'] > button[aria-label$='e-bike']").map { it[:"aria-label"] }).to eq ["E-moto, not an e-bike"]
+      expect(page.find("section[aria-live] [role='tooltip'] code", visible: :all).text(:all).strip).to eq "evc/out_of_class/us/ca"
 
       # a throttle sold separately isn't the bike's as sold, but an option, which would put it in no class: its Class 3
       # tile, then the e-moto's captioned with the throttle
@@ -223,6 +229,7 @@ RSpec.describe EbikeRulesController, type: :request do
       expect(page.all("section[aria-live] [data-controller~='ui--tooltip'] > button[aria-label$='e-bike']").map { it[:"aria-label"] })
         .to eq ["Class 3 e-bike", "E-moto, not an e-bike"]
       expect(page).to have_css("section[aria-live] div:has(> [data-controller~='ui--tooltip'] [aria-label='E-moto, not an e-bike']) > span", text: "w/ optional throttle")
+      expect(page.all("section[aria-live] [role='tooltip'] code", visible: :all).map { it.text(:all).strip }).to eq ["evc/us/class_3", "evc/out_of_class/us/ca"]
     end
 
     it "moves a place from the query, or a state's old path, to its own page, and 404s one that isn't a place" do
@@ -287,7 +294,7 @@ RSpec.describe EbikeRulesController, type: :request do
         .and have_text("Provincial and territorial law summaries")
       # but the country switch's way back to it
       expect(page.find("main").text.remove("United States (US)")).not_to match(/\b(US|U\.S\.|mph|states?|DMV|Class [123])\b/)
-      # Bike Book's models sold in Canada
+      # BikeBook's models sold in Canada
       expect(response.body).to include("/bikebook?electric=1&amp;market=CA")
       expect(page.all("[data-ebike-rules--state-filter-target='state']").count).to eq 2
       expect(meta("description")).to start_with("Canada e-bike law:")

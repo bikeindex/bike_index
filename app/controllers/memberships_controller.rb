@@ -4,8 +4,7 @@ class MembershipsController < ApplicationController
   def new
     @initial_level = params[:membership_level]
     @referral_source = referral_source_from_params
-    @stripe_prices = complete_stripe_prices(current_currency) ||
-      StripePrice.active.where(currency_enum: Currency.default.slug)
+    @stripe_prices = StripePrice.active_for(current_currency)
   end
 
   def create
@@ -30,13 +29,6 @@ class MembershipsController < ApplicationController
   end
 
   private
-
-  # Falls back to the default currency unless this one has a price for every level and interval
-  def complete_stripe_prices(currency)
-    stripe_prices = StripePrice.active.where(currency_enum: currency.slug).to_a
-    pairs = stripe_prices.map { [it.membership_level, it.interval] }.uniq
-    stripe_prices if pairs.size == Membership::LEVEL_ENUM.size * StripePrice::INTERVAL_ENUM.size
-  end
 
   def stripe_price_parameters
     mem_params = params.require(:membership).permit(:level, :set_interval)

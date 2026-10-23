@@ -5,6 +5,8 @@ RSpec.describe MembershipsController, type: :request do
   let(:re_record_interval) { 60.days }
 
   describe "new" do
+    include_context :active_stripe_prices
+
     context "user not logged in" do
       it "renders" do
         get "#{base_url}/new"
@@ -25,12 +27,10 @@ RSpec.describe MembershipsController, type: :request do
         end
       end
       context "with currency=cad" do
-        let!(:stripe_prices) do
-          %w[usd cad].flat_map do |currency_enum|
-            Membership::LEVEL_ENUM.keys.flat_map do |membership_level|
-              %w[monthly yearly].map do |interval|
-                FactoryBot.create(:stripe_price, currency_enum:, membership_level:, interval:, amount_cents: 1500)
-              end
+        let!(:cad_stripe_prices) do
+          Membership::LEVEL_ENUM.keys.flat_map do |membership_level|
+            %w[monthly yearly].map do |interval|
+              FactoryBot.create(:stripe_price, currency_enum: "cad", membership_level:, interval:, amount_cents: 1500)
             end
           end
         end
@@ -44,7 +44,7 @@ RSpec.describe MembershipsController, type: :request do
         end
 
         context "with a CAD price missing" do
-          before { stripe_prices.last.update(active: false) }
+          before { cad_stripe_prices.last.update(active: false) }
 
           it "renders with the default currency" do
             get "#{base_url}/new?currency=cad"

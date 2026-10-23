@@ -22,6 +22,7 @@ const JURISDICTION_ATTRIBUTE = 'data-bikebook--catalog-filters-default-jurisdict
 
 // The fields as `filters` set them, none of which needs the catalog
 const fillFields = (root, filters) => {
+  panelOf(root).setAttribute('data-bikebook--catalog-filters-sort-value', filters.sort === 'price' ? 'price' : 'year')
   for (const field of ['year', 'price']) panelOf(root).setAttribute(`data-bikebook--catalog-filters-${field}-dir-value`, filters[`${field}_dir`] === 'asc' ? 'asc' : 'desc')
   for (const name of [...LISTS, ...SINGLES]) root.getElementById(`${name}-hw-hidden-field`).setAttribute('value', filters[name])
   for (const name of RANGES) root.querySelector(`input[name="${name}"]`).setAttribute('value', filters[name])
@@ -31,7 +32,7 @@ const fillFields = (root, filters) => {
     root.getElementById('jurisdiction-hw-hidden-field').setAttribute('value', jurisdiction)
     combobox(root, 'jurisdiction').dataset.hwComboboxPrefilledDisplayValue = state.dataset.autocompletableAs
   }
-  // out_of_class is in a state's classes as well as the US ones; the jurisdiction's hidden ones uncheck on connecting
+  // evc/out_of_class is in a state's classes as well as the US ones; the jurisdiction's hidden ones uncheck on connecting
   for (const value of filters.electric.split(',')) root.querySelectorAll(`input[name="electric"][value="${CSS.escape(value)}"]`).forEach((input) => input.setAttribute('checked', ''))
 }
 
@@ -43,7 +44,7 @@ const legalClasses = (root, filters, { e_vehicle_classifications: classification
     return Object.keys(classifications).filter((id) => classifications[id].e_bike_law && classifications[id].jurisdiction === filters.market)
   }
   const classes = root.querySelector(`[data-jurisdiction="${CSS.escape(filters.jurisdiction)}"]`) ?? root.querySelector('[data-jurisdiction="US"]')
-  return [...classes.querySelectorAll('input[name="electric"]')].map(({ value }) => value).filter((value) => value !== 'out_of_class')
+  return [...classes.querySelectorAll('input[name="electric"]')].map(({ value }) => value).filter((value) => value !== 'evc/out_of_class')
 }
 
 // `url`'s filters, "all" markets as Any, without which it and the jurisdiction - a state's abbreviation, or US - are the
@@ -96,8 +97,18 @@ export async function pickedVehicles (catalog, page, url) {
 // its comboboxes, whose options are the catalog's, disabled. `status` stands in for the vehicles
 export function loadingShell (shell, url, status) {
   const root = shell.content.cloneNode(true)
-  panelOf(root).hidden = !searching(url)
-  fillFields(root, urlFilters(root, url))
+  const panel = panelOf(root)
+  panel.hidden = !searching(url)
+  const filters = urlFilters(root, url)
+  fillFields(root, filters)
+  // one holding what only the catalog names, rather than the Any it isn't
+  for (const name of ['vehicle_models', ...LISTS, ...SINGLES].filter((each) => filters[each] ?? url.searchParams.get(each))) {
+    const field = combobox(root, name)
+    const input = field.querySelector('.hw-combobox__input')
+    field.dataset.hwComboboxPrefilledDisplayValue = ''
+    input.placeholder = panel.dataset.loadingPlaceholder
+    input.dataset.awaitingCatalog = ''
+  }
   for (const field of root.querySelectorAll('.hw-combobox')) {
     field.inert = true
     field.querySelector('.hw-combobox__input').disabled = true
@@ -120,7 +131,7 @@ export async function hydrate (catalog, source, shell, url) {
   // the visitor's country, when it's a market with models
   const panel = panelOf(root)
   const located = panel.getAttribute(MARKET_ATTRIBUTE)
-  panel.setAttribute(MARKET_ATTRIBUTE, catalog.options.market.some(({ value, count }) => value === located && count) ? located : '')
+  panel.setAttribute(MARKET_ATTRIBUTE, catalog.options.market.some(({ value }) => value === located) ? located : '')
   const filters = filtersAt(catalog, root, url)
   const [found, { filteredCount }] = await Promise.all([pickedOf(catalog, url, filters), catalog.search(filters, 0, 0)])
   const vehicles = found.slice(0, MAX_COMPARE)
@@ -150,7 +161,8 @@ export async function hydrate (catalog, source, shell, url) {
   for (const input of root.querySelectorAll('input[name="electric"]')) {
     const id = input.value.replace(/^class_/, 'evc/us/class_')
     const classification = catalog.vocabulary.e_vehicle_classifications[id]
-    if (classification) input.closest('label').after(fragmentOf(tooltip({ text: classification.title, body: viewer.presenter.classificationTooltip(id) })))
+    // a marker's checkbox has the page's own tooltip
+    if (classification && !classification.marker) input.closest('label').after(fragmentOf(tooltip({ text: classification.title, body: viewer.presenter.classificationTooltip(id) })))
   }
 
   renderInto(root.getElementById('vehicle-viewers'), viewer.render(vehicles, url, preferredSize(),
