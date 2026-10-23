@@ -59,7 +59,7 @@
   <% if @catalog_id %>
     <%= render(UI::DefinitionList::Container::Component.new) do %>
       <%= render(UI::DefinitionList::Row::Component.new(label: translation(".id"))) do %>
-        <%= render(UI::CopyableCode::Component.new(value: @catalog_id, label: translation(".copy_id"))) %>
+        <%= render(Atoms::CopyableCode::Component.new(value: @catalog_id, label: translation(".copy_id"))) %>
       <% end %>
     <% end %>
   <% end %>

@@ -1,7 +1,7 @@
 import { html, nothing } from 'lit-html'
 import { fragmentOf } from 'bikebook/render'
 import { numberDisplay } from 'bikebook/templates/helpers'
-import { copyableCode } from 'bikebook/templates/ui/copyable_code'
+import { copyableCode } from 'bikebook/templates/atoms/copyable_code'
 import { definitionListRow } from 'bikebook/templates/ui/definition_list/row'
 import { tooltip } from 'bikebook/templates/ui/tooltip'
 import { array, blank, compact, equal, isHash, isTemplate, join, listed } from 'bikebook/templates/values'
