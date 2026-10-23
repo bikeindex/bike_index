@@ -197,6 +197,7 @@ class Bike < ApplicationRecord
 
   scope :motorized, -> { where(propulsion_type: PropulsionType::MOTORIZED) }
   scope :current, -> { where(example: false, user_hidden: false, deleted_at: nil, likely_spam: false) }
+  # Starts from unscoped, so it drops anything chained before it - call it on Bike, not an association
   scope :current_with_user_hidden, -> { unscoped.non_example.not_spam.without_deleted }
   scope :claimed, -> { includes(:ownerships).where(ownerships: {claimed: true}) }
   scope :unclaimed, -> { includes(:ownerships).where(ownerships: {claimed: false}) }
