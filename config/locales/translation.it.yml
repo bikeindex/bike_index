@@ -5643,6 +5643,8 @@ it:
           required: richiesto
         combobox_state:
           state: Stato
+        combobox:
+          no_matches: Nessuna partita
       alerts:
         base:
           error: Errore

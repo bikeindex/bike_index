@@ -5387,6 +5387,8 @@ nb:
           required: nødvendig
         combobox_state:
           state: Stat
+        combobox:
+          no_matches: Ingen treff
       alerts:
         base:
           error: Feil

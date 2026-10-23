@@ -5634,6 +5634,8 @@ es:
           required: requerido
         combobox_state:
           state: Estado
+        combobox:
+          no_matches: No hay coincidencias
       alerts:
         base:
           error: Error

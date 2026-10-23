@@ -5543,6 +5543,8 @@ nl:
           required: verplicht
         combobox_state:
           state: Staat
+        combobox:
+          no_matches: Geen overeenkomsten
       alerts:
         base:
           error: Fout
