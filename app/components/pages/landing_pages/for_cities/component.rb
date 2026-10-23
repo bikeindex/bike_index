@@ -4,10 +4,7 @@ module Pages
   module LandingPages
     module ForCities
       class Component < ApplicationComponent
-        SECTION_CLASSES = "tw:mx-auto tw:max-w-[1200px] tw:px-6"
-        EYEBROW_CLASSES = "tw:mb-2.5 tw:text-[13px] tw:font-bold tw:tracking-[.08em] tw:uppercase"
-        HEADING_CLASSES = "tw:mb-3.5 tw:font-header tw:text-[clamp(28px,3.4vw,38px)] tw:leading-[1.15] tw:font-extrabold tw:text-balance"
-        INTRO_CLASSES = "tw:text-[17px] tw:leading-relaxed tw:text-pretty tw:text-gray-600 tw:dark:text-gray-300"
+        SECTION_CLASSES = SharedBlocks::Marketing::Wrapper::Component::CONTAINER_CLASSES
         ICON_DISC_CLASSES = "tw:flex tw:size-11 tw:flex-none tw:items-center tw:justify-center tw:rounded-full tw:text-white"
         MODAL_ID = "cities-demo-modal"
         # The hero's mockups sit in phone frames, so they read as screenshots rather than fields to fill
