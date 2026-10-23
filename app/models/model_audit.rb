@@ -117,7 +117,7 @@ class ModelAudit < ApplicationRecord
     end
 
     def counted_matching_bikes(bikes)
-      bikes.current_with_user_hidden
+      bikes.non_example.not_spam.without_deleted
     end
 
     def counted_matching_bikes_count(bikes)

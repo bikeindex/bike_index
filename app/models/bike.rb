@@ -196,8 +196,8 @@ class Bike < ApplicationRecord
   after_commit :remove_address_record_if_deleted
 
   scope :motorized, -> { where(propulsion_type: PropulsionType::MOTORIZED) }
-  scope :current_with_user_hidden, -> { where(example: false, deleted_at: nil, likely_spam: false) }
-  scope :current, -> { current_with_user_hidden.where(user_hidden: false) }
+  scope :current, -> { where(example: false, user_hidden: false, deleted_at: nil, likely_spam: false) }
+  scope :current_with_user_hidden, -> { unscoped.non_example.not_spam.without_deleted }
   scope :claimed, -> { includes(:ownerships).where(ownerships: {claimed: true}) }
   scope :unclaimed, -> { includes(:ownerships).where(ownerships: {claimed: false}) }
   scope :not_stolen, -> { where.not(status: %w[status_stolen status_abandoned]) }
@@ -220,7 +220,6 @@ class Bike < ApplicationRecord
   scope :example, -> { unscoped.where(example: true) }
   scope :non_example, -> { where(example: false) }
   scope :ignored, -> { where(example: true).or(where.not(deleted_at: nil)).or(where(likely_spam: true)) }
-  scope :with_user_hidden, -> { unscoped.current_with_user_hidden }
   # An organization sees its own impounded bikes even when they're hidden - only chain it off the org's bikes
   scope :status_impounded_with_user_hidden, -> { unscope(where: :user_hidden).status_impounded }
   scope :default_includes, -> { includes(:primary_frame_color, :secondary_frame_color, :tertiary_frame_color, :current_stolen_record, :current_ownership) }
