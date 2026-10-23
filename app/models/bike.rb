@@ -196,7 +196,8 @@ class Bike < ApplicationRecord
   after_commit :remove_address_record_if_deleted
 
   scope :motorized, -> { where(propulsion_type: PropulsionType::MOTORIZED) }
-  scope :current, -> { where(example: false, user_hidden: false, deleted_at: nil, likely_spam: false) }
+  scope :current_with_user_hidden, -> { where(example: false, deleted_at: nil, likely_spam: false) }
+  scope :current, -> { current_with_user_hidden.where(user_hidden: false) }
   scope :claimed, -> { includes(:ownerships).where(ownerships: {claimed: true}) }
   scope :unclaimed, -> { includes(:ownerships).where(ownerships: {claimed: false}) }
   scope :not_stolen, -> { where.not(status: %w[status_stolen status_abandoned]) }
