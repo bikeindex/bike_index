@@ -9,8 +9,9 @@ module UI
 
       # Pass cache_key (normally self.class.cache_digest) to enable per-row fragment caching.
       # cache_records: mirror the controller's `includes`, or the row serves those records stale.
+      # row_attributes: a record's <tr> attributes, a hash as tag.tr takes them.
       # orderable: the hideable columns' headers carry a UI::DragHandle for ui--table-column-order
-      def initialize(records:, sort_state: ComponentStructs::SortState.new, cache_key: nil, cache_records: nil, classes: nil, unbordered: false, render_sortable: false, sticky: false, orderable: false)
+      def initialize(records:, sort_state: ComponentStructs::SortState.new, cache_key: nil, cache_records: nil, classes: nil, unbordered: false, render_sortable: false, sticky: false, row_attributes: nil, orderable: false)
         @records = records
         @sort_state = sort_state
         @cache_key = cache_key
@@ -19,6 +20,7 @@ module UI
         @bordered = !unbordered
         @render_sortable = render_sortable
         @sticky = sticky
+        @row_attributes = row_attributes
         @orderable = orderable
         @columns = []
       end

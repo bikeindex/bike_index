@@ -25,6 +25,35 @@
   .twjson-panel .highlightjs-json pre {
     @apply tw:max-h-[70vh] tw:lg:h-full tw:lg:max-h-none;
   }
+
+  /* A component group's table, which a card narrower than its five columns stacks, a row to each component - its
+   * columns style their cells. Important over the table's own cell borders, widths and padding */
+  .bikebook-components {
+    container: bikebook-components / inline-size;
+  }
+
+  @container bikebook-components (width < 40rem) {
+    .bikebook-components :is(table, thead, tbody) {
+      display: block;
+    }
+
+    .bikebook-components tr {
+      @apply tw:flex tw:flex-wrap tw:gap-x-2 tw:border-gray-200 tw:px-2 tw:py-1.5 tw:text-sm tw:dark:border-gray-700;
+    }
+
+    .bikebook-components tbody tr {
+      @apply tw:border-t;
+    }
+
+    .bikebook-components :is(th, td) {
+      @apply tw:block tw:w-auto! tw:rounded-none! tw:border-0! tw:p-0!;
+    }
+
+    .bikebook-components thead th:not(:first-child),
+    .bikebook-components td:empty {
+      display: none;
+    }
+  }
 }
 
 /* The vehicle combobox lists hundreds of models under its matching count, which stays in view */

@@ -8,6 +8,8 @@ en:
           classes_intro: >-
             Most states use a three-class system. Your class decides how fast the
             motor helps, whether a throttle is allowed, and where you can ride.
+          other_classes: Other electric vehicles in %{place}
+          place_heading: E-bike laws in %{place}
           state_classes_heading: "%{state} e-bike classes"
           state_classes_intro: >-
             %{state} doesn’t use the three-class system most states do. Its law sorts

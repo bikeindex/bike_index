@@ -59,6 +59,19 @@ RSpec.describe UI::Table::Component, type: :component do
     end
   end
 
+  context "with row_attributes" do
+    let(:component) do
+      render_inline(described_class.new(records:, row_attributes: ->(record) { {data: {name: record.name}} if record.name == "Bob" })) do |table|
+        table.column(label: "Name") { |r| r.name }
+      end
+    end
+
+    it "puts each record's attributes on its row" do
+      expect(component).to have_css("tbody tr[data-name='Bob']", text: "Bob")
+      expect(component).to have_css("tbody tr:not([data-name])", text: "Alice")
+    end
+  end
+
   context "with custom classes" do
     let(:component) do
       render_inline(described_class.new(records:, classes: "custom-class")) do |table|

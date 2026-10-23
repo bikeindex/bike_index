@@ -9,9 +9,10 @@ module Pages
         # it passes no path - and its subtitle drops the invitation to tap one.
         class Component < ApplicationComponent
           # page_path: ->(index) { the path back to page `index` }
-          def initialize(pages:, page_path: nil)
+          def initialize(pages:, page_path: nil, heading_tag: :h1)
             @pages = pages
             @page_path = page_path
+            @heading_tag = heading_tag
           end
 
           private

@@ -315,5 +315,6 @@
     </div>
   </section>
 
-  <%= render(Pages::LandingPages::DemoModal::Component.new(feedback: @feedback, current_user: @current_user, name_label: "School", feedback_type: "lead_for_school", modal_id: "schools-demo-modal")) %>
+  <%= render(Pages::LandingPages::DemoModal::Component.new(feedback: @feedback, name_label: "School", feedback_type: "lead_for_school", modal_id: "schools-demo-modal",
+    return_to: for_schools_path)) %>
 </div>

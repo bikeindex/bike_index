@@ -7,17 +7,18 @@ RSpec.describe Pages::EbikeRules::Results::Component, type: :component do
 
   let(:bike) do
     EbikeRuleServices::Bike.new(bikebook_id: "m/trek/2025/verve", manufacturer_name: "Trek", model: "Verve+ 2", first_year: 2025, vehicle_type: "bike",
-      e_bike_class: 1, class_unknown: false, e_vehicle_classifications: [], optional_classes: {}, watts: 250, peak_watts: nil, top_assist_mph: 20, throttle: false, stock_throttle: false, throttle_mph: nil,
-      ul2849: :certified, ul2271: :unknown, photo_url: "https://bikebook.bikeindex.org/trek/2025/verve.jpg")
+      e_bike_class: 1, class_unknown: false, e_vehicle_classifications: [], optional_classes: {}, watts: 250, peak_watts: nil, top_assist_mph: 20,
+      top_assist_kmh: 32, assists_past_kmh: nil, throttle: false, stock_throttle: false, throttle_mph: nil, throttle_kmh: nil, ul2849: :certified, ul2271: :unknown, photo_url: "https://bikebook.bikeindex.org/trek/2025/verve.jpg")
   end
   let(:abbreviation) { "IN" }
+  let(:code) { "US-#{abbreviation}" }
   let(:lookup) do
-    EbikeRuleServices::Lookup.new(state: EbikeRuleServices::StateLaws.state(abbreviation), detected_state: nil, bikebook_id: bike.bikebook_id,
-      manual: false, manual_mph: 20, manual_watts: nil, manual_throttle: true, bike:, errors: [], submitted: true)
+    EbikeRuleServices::Lookup.new(place: EbikeRuleServices::Places.find(code), detected_place: nil, bikebook_id: bike.bikebook_id,
+      manual: false, manual_top_speed: 20, manual_watts: nil, manual_throttle: true, bike:, errors: [], submitted: true)
   end
   let(:component) { render_inline(described_class.new(lookup:)) }
 
-  it "renders a legal bike, its Bike Book photo, specs and certifications, and its state's law" do
+  it "renders a legal bike, its BikeBook photo, specs and certifications, and its state's law" do
     expect(component).to have_css("[role='status']", text: "Legal to ride")
       .and have_css("[role='status']", text: "Your Trek Verve+ 2 is legal to ride in Indiana as a Class 1 e-bike.")
       .and have_css("img[src='https://bikebook.bikeindex.org/trek/2025/verve.jpg'][alt='Trek Verve+ 2']")
@@ -63,6 +64,45 @@ RSpec.describe Pages::EbikeRules::Results::Component, type: :component do
         .and have_css("[role='status'] li", text: "12,500W motor exceeds the 750W cap.")
         .and have_css("[role='status'] li", text: "In Texas, it falls under Off-Highway Motorcycle, which can require registration and a license.")
         .and have_css("button[aria-label='E-moto, not an e-bike'] + [role='tooltip'] h3", text: "Not an e-bike", visible: :all)
+        .and have_css("[role='tooltip'] code", text: /\A\s*evc\/out_of_class\s*\z/, visible: :all)
+    end
+  end
+
+  context "in a Canadian province" do
+    let(:code) { "CA-ON" }
+
+    it "checks its law's limits in km/h, with nothing of the US's classes" do
+      expect(component).to have_css("[role='status']", text: "Your Trek Verve+ 2 is legal to ride in Ontario under the Power-Assisted Bicycle rules.")
+        .and have_css("li", text: /Top assisted speed\s*32 km\/h\s*Assists to 32 km\/h, within the limit/)
+        .and have_css("dd", text: "32 km/h")
+        .and have_text("Your province or territory")
+        .and have_text("Riders must be 16 or older")
+        .and have_text("catalog of e-bike law")
+        .and have_no_css("[role='img'][aria-label='Class 1 e-bike']")
+        .and have_no_text("Classes recognized")
+        .and have_no_text("mph")
+    end
+
+    context "with a motor over its cap" do
+      let(:bike) { super().with(watts: 750, throttle: true, stock_throttle: true, throttle_kmh: 32) }
+
+      it "isn't permitted" do
+        expect(component).to have_css("[role='status']", text: "Your Trek Verve+ 2 is not permitted as an e-bike under current Ontario rules.")
+          .and have_css("[role='status'] li", text: "750W motor exceeds the 500W cap.")
+          .and have_css("[role='status'] li", text: "which can require registration and a licence.")
+          .and have_css("dd", text: "Yes, to 32 km/h")
+      end
+    end
+
+    context "with no e-bike law, where an e-bike falls in with a motor vehicle" do
+      let(:code) { "CA-NB" }
+
+      it "may be legal under that vehicle's rules, with its licence and registration to check" do
+        expect(component).to have_css("[role='status']", text: "Your Trek Verve+ 2 may be legal to ride in New Brunswick under the Motor Driven Cycle rules, " \
+          "with 1 rule to check.")
+          .and have_css("li", text: /Regulated as\s*Motor Driven Cycle\s*There's no e-bike category here/)
+          .and have_css("li", text: "Registered with one plate")
+      end
     end
   end
 

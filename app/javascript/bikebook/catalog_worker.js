@@ -43,19 +43,20 @@ async function load ({ manifestUrl, ids, jurisdictions, rulesUrl }) {
     activity_name: activityNames[model.primary_activity],
     type_name: typeNames[model.vehicle_type],
     searchText: `${model.display}\n${model.id}`.toLowerCase(),
-    sortYear: model.final_year ?? currentYear,
-    sortPrice: model.msrp_cents ?? 0
+    sortYear: model.final_year ?? currentYear
   }))
   byId = new Map(models.map((model) => [model.id, model]))
+  // the index labels the out of class markers, which the vocabulary has no record of: "Out of class in California"
+  const labels = Object.entries(index.filter_options.e_vehicle_classification).map(([id, label]) => [id, { label, title: label, marker: true }])
   // "California Moped", which its name leaves off the state of, and a group has none; "US Class 3 e-bike"
-  classifications = Object.fromEntries(Object.entries(vocabulary.e_vehicle_classifications).map(([id, record]) => {
+  classifications = Object.fromEntries([...labels, ...Object.entries(vocabulary.e_vehicle_classifications).map(([id, record]) => {
     const code = record.jurisdiction
     const state = code?.startsWith('US-') && (jurisdictions[code] ?? code)
     const label = [state || code, record.name].filter(Boolean).join(' ')
     // "Alabama (AL)", "United States"
     const jurisdictionName = state ? `${state} (${code.slice(3)})` : code && (jurisdictions[code] ?? code)
     return [id, { ...record, label, jurisdiction_name: jurisdictionName, title: /^Class \d+$/.test(record.name) ? `${label} e-bike` : label }]
-  }))
+  })])
   return { vocabulary: { ...vocabulary, e_vehicle_classifications: classifications }, kit, options: options(index) }
 }
 
@@ -68,8 +69,8 @@ function options ({ manufacturers, vehicle_types: vehicleTypes, filter_options: 
     manufacturer: Object.entries(manufacturers).filter(([slug]) => perManufacturer.has(slug)).sort(([, a], [, b]) => a.localeCompare(b))
       .map(([value, display]) => ({ value, display, count: perManufacturer.get(value) })),
     vehicle_type: counted('vehicle_type', vehicleTypes.map(({ slug, name }) => [slug, name])),
-    // "Canada (CA)", as UI::Forms::ComboboxState shows a state
-    market: counted('market', Object.entries(market).sort(([, a], [, b]) => a.localeCompare(b)))
+    // "Canada (CA)", as UI::Forms::ComboboxState shows a state; only those with models, as most of the catalog's have none
+    market: counted('market', Object.entries(market).sort(([, a], [, b]) => a.localeCompare(b))).filter(({ count }) => count)
       .map((option) => ({ ...option, name: option.display, display: `${option.display} (${option.value})` })),
     ...Object.fromEntries(Object.entries(filterOptions).map(([name, labels]) => [name, counted(name, Object.entries(labels))]))
   }
@@ -147,7 +148,7 @@ function featured ({ params, legalClasses }) {
   const legalEbike = (model) => !legalClasses.length || legalClasses.some((propulsion) => propelled(model, propulsion, params.jurisdiction))
   const filtered = sorted(params).filter(filter(params))
   const candidates = requirements.reduce((models, requirement) => {
-    const passing = models.filter((model) => requirement(model, { legalEbike }))
+    const passing = models.filter((model) => requirement(model, { legalEbike, params }))
     return passing.length ? passing : models
   }, filtered)
   const count = Math.min(COUNT, candidates.length)
@@ -186,13 +187,16 @@ const outranks = (a, b) => {
   return index !== -1 && a[index]
 }
 
-// Newest and priciest first unless asked otherwise, kept per pair of directions so a query only has to filter
-function sorted ({ year_dir: yearDir, price_dir: priceDir }) {
-  const key = `${yearDir}/${priceDir}`
+// Newest and priciest first unless asked otherwise, by year then price unless `sort` puts price first, the unpriced last
+// either way. Kept per order, so a query only has to filter
+function sorted ({ sort, year_dir: yearDir, price_dir: priceDir }) {
+  const key = `${sort}/${yearDir}/${priceDir}`
   if (!orders.has(key)) {
     const direction = (dir) => dir === 'asc' ? 1 : -1
-    orders.set(key, [...models].sort((a, b) =>
-      direction(yearDir) * (a.sortYear - b.sortYear) || direction(priceDir) * (a.sortPrice - b.sortPrice) || (a.id < b.id ? -1 : 1)))
+    const byYear = (a, b) => direction(yearDir) * (a.sortYear - b.sortYear)
+    const byPrice = (a, b) => (a.msrp_cents == null) - (b.msrp_cents == null) || direction(priceDir) * (a.msrp_cents - b.msrp_cents)
+    const [first, second] = sort === 'price' ? [byPrice, byYear] : [byYear, byPrice]
+    orders.set(key, [...models].sort((a, b) => first(a, b) || second(a, b) || (a.id < b.id ? -1 : 1)))
   }
   return orders.get(key)
 }
@@ -224,13 +228,13 @@ function filter (params) {
       (priceMin == null || model.msrp_cents >= priceMin * 100) && (priceMax == null || model.msrp_cents <= priceMax * 100)))
 }
 
-// out_of_class is the catalog's own marker, as a model with no classified mode is unknown rather than out of class, and
-// out_of_class/US-CA its marker for one in no class in that state alone, where it's out of class rather than the US
+// evc/out_of_class is the catalog's own marker, as a model with no classified mode is unknown rather than out of class,
+// and evc/out_of_class/us/ca its marker for one in no class in that state alone, where it's out of class rather than the US
 // classes it carries. A state's class matches the models carrying its groups
 function propelled ({ electric, e_vehicle_classifications: carried = [] }, propulsion, jurisdiction) {
   if (propulsion === '0' || propulsion === '1') return electric === (propulsion === '1')
   const id = propulsion.replace(/^class_/, 'evc/us/class_')
-  if (/^(out_of_class|evc\/us\/class_\d)$/.test(id) && carried.includes(`out_of_class/US-${jurisdiction}`)) return id === 'out_of_class'
+  if (/^evc\/(out_of_class|us\/class_\d)$/.test(id) && carried.includes(`evc/out_of_class/us/${jurisdiction?.toLowerCase()}`)) return id === 'evc/out_of_class'
   return [id, ...(classifications[id]?.groups ?? [])].some((classification) => carried.includes(classification))
 }
 

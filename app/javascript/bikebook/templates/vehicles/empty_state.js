@@ -42,7 +42,7 @@ export const emptyState = ({ url, filtered, count, featured, ...cards }) => html
   ? searchNote({ count, filtered })
   : nothing}${featured.length ? featuredCards({ featured, ...cards }) : nothing}</div>`
 
-const tips = (url) => html`<div data-bikebook--tips-target="tips"><section aria-label="How to use Bike Book" tabindex="-1"
+const tips = (url) => html`<div data-bikebook--tips-target="tips"><section aria-label="How to use BikeBook" tabindex="-1"
   class="tw:relative tw:flex tw:flex-col tw:gap-5 tw:rounded-md tw:border tw:border-dashed tw:border-gray-300 tw:px-7 tw:py-6 tw:outline-none
   tw:dark:border-gray-600"><ol class="tw:m-0 tw:grid tw:list-none tw:gap-6 tw:p-0 tw:sm:grid-cols-3">${steps.map(([title, description], index) =>
     html`<li class="tw:flex tw:gap-3"><span aria-hidden="true" class="tw:flex tw:size-7 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full

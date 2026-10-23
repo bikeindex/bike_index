@@ -19,6 +19,7 @@
     data-action="bikebook--tips:filters@window->ui--collapse#show bikebook--tips:filters@window->bikebook--catalog-filters#focusFirst"
     data-bikebook--catalog-filters-default-market-value="<%= @market %>"
     data-bikebook--catalog-filters-default-jurisdiction-value="<%= @jurisdiction %>"
+    data-loading-placeholder="<%= translation(".loading_placeholder") %>"
     data-ui--collapse-param-value="filters"
   >
     <%# Labels the combobox below, which renders none of its own %>
@@ -265,7 +266,7 @@
   data-bikebook--page-manifest-url-value="<%= @manifest_url %>"
   data-bikebook--page-jurisdictions-value="<%= jurisdiction_names.to_json %>"
   data-bikebook--page-failed-text-value="<%= translation(".failed") %>"
-  data-bikebook--page-title-value="Bikebook"
+  data-bikebook--page-title-value="BikeBook"
   data-bikebook--page-search-log-url-value="<%= search_bikebook_path %>"
   data-action="submit->bikebook--page#visit click->bikebook--page#follow popstate@window->bikebook--page#restore scroll@window->bikebook--page#track bikebook--catalog-filters:change->bikebook--page#refilter"
 >
@@ -279,6 +280,7 @@
   >
     <a
       href="<%= bikebook_path %>"
+      aria-label="BikeBook"
       class="tw:flex tw:shrink-0 tw:items-center tw:gap-3 tw:no-underline!"
     >
       <%= helpers.inline_svg_tag("logos/bikebook_mark.svg", class: "tw:h-12 tw:w-auto tw:text-[#2980ba]", aria_hidden: true) %>
@@ -320,14 +322,15 @@
 
   <%#
     The tiles the Overview shows, as /ebike-rules does: the US classes', each also as only an optional mode brings it,
-    and the e-moto's, also as only an optional throttle brings it, each a tooltip of its card
+    and the e-moto's, also as only an optional throttle brings it, and each also out of class in a jurisdiction whose law
+    bars a Class 3's throttle, each a tooltip of its card
   %>
 
-  <% ([1, 2, 3].product([nil, "throttle", "assist"]) + [[nil, nil], [nil, "throttle"]]).each do |e_bike_class, optional| %>
+  <% ([1, 2, 3].product([nil, "throttle", "assist"]) + [nil].product([nil, "throttle"], [nil, *EbikeRuleServices::StateLaws.out_of_class_ids])).each do |e_bike_class, optional, out_of_class_id| %>
     <template
-      data-bikebook-class-badge="<%= [e_bike_class || "emoto", optional].compact.join("/") %>"
+      data-bikebook-class-badge="<%= [e_bike_class || "emoto", optional, out_of_class_id].compact.join("/") %>"
     >
-      <%= render(Pages::EbikeRules::ClassTile::Component.new(e_bike_class:, optional:, size: :lg, explained: true)) %>
+      <%= render(Pages::EbikeRules::ClassTile::Component.new(e_bike_class:, optional:, size: :lg, explained: true, out_of_class_id:)) %>
     </template>
   <% end %>
 
@@ -347,7 +350,7 @@
     </template>
   <% end %>
 
-  <%# DM Sans is the Bike Book logo's face, loaded for its letters alone %>
+  <%# DM Sans is the BikeBook logo's face, loaded for its letters alone %>
   <% helpers.content_for(:header) do %>
     <link
       href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700&text=BikeBok&display=swap"
@@ -370,7 +373,7 @@
 
     <div data-bikebook--page-target="page">
       <%# Placeholder until the catalog loads %>
-      <div inert><%= search %></div>
+      <div inert class="<%= placeholder_class %>"><%= search %></div>
 
       <div
         class="

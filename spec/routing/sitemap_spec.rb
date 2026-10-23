@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe "Sitemaps pages" do
   it "includes non-info/landing controller pages" do
-    target_info_paths = %w[help donate why-donate where]
+    target_info_paths = %w[help donate where]
     expect((SitemapPages::INFORMATION & target_info_paths).count).to eq target_info_paths.count
 
     target_additional_paths = %w[recovery_stories documentation/api_v3 stolen]

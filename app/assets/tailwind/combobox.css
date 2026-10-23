@@ -61,6 +61,12 @@ body.dark .hw-combobox {
 /* While the rich-display overlay covers the input (UI::Forms::Combobox
    rich_display:), the input's own text is transparent — so the autocomplete's
    selected range would otherwise show as a stray highlight over the overlay. */
+/* UI::Modal's panel clips its overflow, which would cut off a listbox opening
+   past its bottom edge, so the panel makes room while one is open. */
+[data-controller~="ui--modal"] > div:has(.hw-combobox__listbox:not([hidden])) {
+  padding-bottom: var(--hw-listbox-height);
+}
+
 .hw-combobox__input[data-rich-display-shown]::selection {
   background-color: transparent;
 }

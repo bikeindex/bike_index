@@ -3966,43 +3966,6 @@ es:
       use_ascend: "¿Usar Ascend?"
       use_lightspeed_retail: "¿Utilizas Lightspeed Retail?"
       used_at_bike_shops_everywhere: Se utiliza en todas las tiendas de bicicletas.
-    for_cities:
-      actually_get_people_registered_and_do_it_: Consigan que la gente se registre.
-        Y háganlo a bajo costo.
-      bike_index_for_cities: Índice de bicicletas para ciudades
-      bike_index_is_the_community_registration_: Bike Index es el sistema de registro
-        comunitario preferido. Somos el sistema de registro de bicicletas de las organizaciones
-        %{organization_counts}, comunidades en todos los rincones del mundo. Únete
-        a la red de registro de bicicletas más utilizada a nivel mundial.
-      bike_index_new_dashboard: El nuevo panel de control del Índice de Bicicletas
-        resulta útil para combatir los delitos relacionados con las bicicletas.
-      bike_index_organization_impounding: Incautación de bicicletas con Bike Index
-      bike_index_unveils_partnership_with_the_c: Bike Index anuncia su colaboración
-        con la ciudad de Palo Alto.
-      bring_together_bike_shops_schools_municip: Reúne a tiendas de bicicletas, escuelas,
-        departamentos municipales y fuerzas del orden para registrar bicicletas en
-        un solo sistema. Se acabaron los días de esperar a que la gente no se presentara
-        a registrar sus bicicletas o de preguntarse si otro departamento se había
-        encargado del trámite. Bike Index centraliza todo en un único lugar fácil
-        de gestionar.
-      check_out: Echa un vistazo a nuestra
-      cities_deck: Ciudades asociadas a la plataforma
-      embed_a_bike_index_registration_form: Integre un formulario de registro de bicicletas
-        en su sitio web.
-      engage_your_residents_and_recover_their_b: Involucre a sus residentes y recupere
-        sus bicicletas, y le estarán eternamente agradecidos.
-      mitigate_the_registration_mess: Mitigar el caos del registro
-      no_more_index_cards_or_excel_sheets_give_: Se acabaron las fichas y las hojas
-        de cálculo. Ofrezca a sus ciudadanos las herramientas para registrarse desde
-        un teléfono inteligente en menos de dos minutos y utilice estos registros
-        para recuperar y devolver las bicicletas robadas.
-      our_community_is_your_community: Nuestra comunidad es tu comunidad.
-      plug_your_city_in_nationally: Ingresa tu ciudad a nivel nacional.
-      related_articles: 'Artículos relacionados:'
-      trusted_by_municipalities_everywhere: Con la confianza de los municipios de
-        todo el mundo.
-      used_by_municipalities_everywhere: Utilizado por los municipios de todo el mundo.
-      schedule_a_demo: Solicite una demostración
     for_community_groups:
       bike_index_for_community_groups: Índice de bicicletas para grupos comunitarios
       bike_index_launches_new_ambassadors_progr: Bike Index lanza un nuevo programa
@@ -6725,6 +6688,8 @@ es:
             have_questions: "¿Tiene alguna pregunta sobre estas políticas?"
             read_the_faq: Preguntas frecuentes sobre el reconocimiento de vehículos
               eléctricos
+            bike_index: Bike Index
+            set_by: Establecido por %{name}
           review_summary:
             a_quick_review: Un breve repaso de todo lo que usted reconoció.
             a_quick_review_tap: Un breve repaso de todo lo que has confirmado. Pulsa
@@ -6967,6 +6932,7 @@ es:
           any_market: Cualquier mercado
           market: Mercado
           clear_filters: Filtros transparentes
+          loading_placeholder: Cargando…
         donate_strip:
           donate: Donar
           pitch: Este fantástico producto es posible gracias a la organización sin
@@ -7121,11 +7087,60 @@ es:
               eléctrica de clase %{n}, y %{optional}, con %{count} reglas para verificar.
           yellow_headline_without_throttle: Tu %{name} es legal para circular en %{state}
             como una bicicleta eléctrica de Clase %{n}, sin su acelerador opcional.
+          green_headline_law: Tu %{name} tiene permiso para viajar en %{state} según
+            las reglas %{law}.
+          kmh_html: "%{kmh} km/h"
+          law_source_html: 'Fuente: Catálogo de leyes sobre bicicletas eléctricas
+            de %{link}. Los resúmenes son solo de referencia y no constituyen asesoramiento
+            legal.'
+          may_be_moped_canada: En su lugar, podría estar regulado como un ciclomotor
+            o un vehículo a motor, lo que podría requerir matriculación y permiso
+            de conducir.
+          no_e_bike_category: Aquí no hay categoría para bicicletas eléctricas, así
+            que consulta las normas sobre licencia, matriculación y casco de esta
+            bicicleta.
+          no_speed_cap_in_law: No hay límite de velocidad en su ley.
+          no_watt_cap_in_law: No hay límite de potencia en su ley.
+          optional_to_kmh_html: Opcional, hasta %{kmh} km/h
+          over_kmh_html: Más de %{kmh} km/h
+          speed_over_cap_kmh_html: Ayuda a %{kmh} km/h, por encima del límite de %{cap}
+            km/h
+          speed_past_cap_kmh_html: Ayuda a superar los %{past} km/h, por encima del
+            límite de %{cap} km/h
+          speed_past_kmh_html: Ayuda a superar %{past} km/h; comprueba que se detenga
+            a %{cap} km/h.
+          speed_to_check_kmh_html: BikeBook no indica su velocidad máxima, así que
+            compruebe que el motor se detiene a %{cap} km/h.
+          speed_within_cap_kmh_html: Ayuda a %{kmh} km/h, dentro del límite
+          still_reviewing_province_body: Consulta la normativa vigente sobre bicicletas
+            eléctricas en el ministerio de transporte de tu provincia o territorio.
+            La mayoría limita la potencia de los motores de las bicicletas eléctricas
+            a 500 W y la velocidad asistida a 32 km/h.
+          throttle_allowed_in_law: Acelerador permitido
+          throttle_not_allowed_in_law: Su ley no permite un acelerador
+          throttle_not_stated_in_law: Su ley no especifica si se permite un acelerador.
+          watts_to_check_html: Compruebe que su motor tenga una potencia nominal de
+            %{cap}W o inferior.
+          yellow_headline_law:
+            one: Tu %{name} es legal para viajar en %{state} según las reglas %{law},
+              con la regla %{count} para verificar.
+            other: Tu %{name} es legal para viajar en %{state} según las reglas %{law},
+              con reglas %{count} para verificar.
+          yellow_headline_law_without_throttle: Tu %{name} es legal para circular
+            en %{state} según las reglas %{law}, sin su acelerador opcional.
+          yellow_headline_motor_vehicle_law:
+            one: Tu %{name} puede ser legal para montar en %{state} según las reglas
+              %{law}, con la regla %{count} para verificar.
+            other: Tu %{name} puede ser legal para montar en %{state} según las reglas
+              %{law}, con reglas %{count} para verificar.
+          yes_to_kmh_html: Sí, a %{kmh} km/h
+          your_province: Su provincia o territorio
         rule_label:
           classes: Clases reconocidas
           power: condensador de potencia del motor
           speed: Velocidad máxima asistida
           throttle: Acelerador
+          vehicle: Regulado como
         rule_value:
           allowed: Permitido
           classes:
@@ -7136,6 +7151,7 @@ es:
           not_allowed: No está permitido
           own_definition: 'Su propia definición: %{name}'
           watts_html: "%{watts}W"
+          kmh_html: "%{kmh} km/h"
         show:
           answer_no: 'No'
           answer_yes: Sí
@@ -7155,10 +7171,8 @@ es:
             impacto, resistencia al agua y sobrecalentamiento. Posteriormente, la
             fábrica es inspeccionada periódicamente para mantener su certificación.
           certification_involves_heading: "¿Qué implica la certificación?"
-          change: "¿cambiar?"
           check_my_bike: Revisa mi bicicleta
           compare_html: "¿Quieres comparar varias bicicletas? %{link}"
-          detected_html: Hemos detectado <strong>%{state}</strong> —
           disclaimer: Bike Index es una organización sin fines de lucro 501(c)(3).
             Los resúmenes de las leyes estatales son solo de referencia y no constituyen
             asesoramiento legal.
@@ -7170,8 +7184,6 @@ es:
             de la batería y del marco.
           how_to_check_2: Busque ese número en UL Product iQ.
           how_to_check_heading: Cómo revisar una bicicleta
-          location_not_shared: Ubicación no compartida. Seleccione su estado de la
-            lista.
           motor_wattage: Potencia del motor (W)
           mph: "%{mph} mph"
           parent_step_1_body: Muchos estados establecen una edad mínima para la Clase
@@ -7248,6 +7260,43 @@ es:
           custom_details: Detalles personalizados
           details_legend: Detalles de tu bicicleta
           model_details: "%{model} detalles"
+          country: País
+          not_in_us_html: "¿No estás en EE. UU.? %{switch_country}"
+          select_country: Seleccione un país
+          switch_country: cambiar de país
+          switch_country_title: Cambiar de país
+          banned_body_canada: Las universidades, las empresas de alojamiento y las
+            agencias de transporte público están adoptando normas para el almacenamiento
+            y la carga de bicicletas eléctricas en interiores, y la certificación
+            es un requisito fundamental.
+          choose_province: Seleccione su provincia o territorio de la lista.
+          choose_state: Elige tu estado de la lista.
+          detected_place_html: Hemos detectado <strong>%{state}</strong> .
+          disclaimer_canada: Bike Index es una organización sin fines de lucro. Los
+            resúmenes de las leyes provinciales y territoriales son solo para referencia,
+            no constituyen asesoramiento legal.
+          kmh: "%{kmh} km/h"
+          not_in_canada_html: "¿No estás en Canadá? %{switch_country}"
+          over_kmh: Más de %{kmh} km/h
+          parent_step_1_body_canada: La mayoría de las provincias establecen una edad
+            mínima para usar una bicicleta eléctrica, que oscila entre los 12 y los
+            18 años. Consulta la normativa de tu provincia antes de elegir una bicicleta.
+          parent_step_2_body_canada: No tiene acelerador, así que el motor solo ayuda
+            mientras se pedalea. Es el tipo de bicicleta eléctrica más fácil para
+            aprender a montar.
+          parent_step_2_title_canada: Comience con asistencia al pedaleo.
+          parents_body_canada: Las bicicletas eléctricas son más pesadas y rápidas
+            que las bicicletas con las que la mayoría de los niños aprenden a usarlas.
+            Antes de comprar una, infórmese sobre las normas de su provincia y municipio,
+            y asegúrese de que su hijo esté preparado para usarla de forma segura.
+          parents_link_canada: Consulta las normas sobre edad y uso de casco de tu
+            provincia.
+          province: Provincia o territorio
+          province_error: Elija una provincia o territorio.
+          select_province: Seleccione su provincia o territorio.
+          subheading_canada: Ingresa tu provincia o territorio y ve a tu bicicleta
+            para ver sus reglas.
+          watts_placeholder_canada: p. ej. 500
         state_reference:
           compiling: Estamos recopilando las normas sobre bicicletas eléctricas de
             %{state} de la legislatura estatal y del DMV. Vuelva pronto.
@@ -7267,6 +7316,19 @@ es:
           only_classes:
             one: Solo la clase %{classes}
             other: Clases %{classes} solamente
+          all_on_file_canada: Cada provincia y territorio registrado
+          compiling_canada: Estamos recopilando la normativa sobre bicicletas eléctricas
+            de %{state} a partir de su legislación y del Ministerio de Transportes.
+            Vuelva a consultar pronto.
+          filter_placeholder_canada: Escriba una provincia o territorio
+          filter_provinces: Filtrar provincias y territorios
+          heading_canada: Leyes sobre bicicletas eléctricas por provincia y territorio.
+          limits_subheading_canada: Cada provincia y territorio. Abre uno para ver
+            sus límites, normas y fuentes.
+          no_match_canada: No se encontraron coincidencias de provincias o territorios.
+            Pruebe con otro nombre.
+          on_file_of_total_canada_html: "%{number} de %{total} provincias y territorios
+            archivados · otros en revisión"
         ul_badge:
           certified: Certificado UL %{standard}
           meaning_2271_certified: La batería superó las pruebas de seguridad UL contra
@@ -7290,6 +7352,8 @@ es:
           state_classes_intro: "%{state} no utiliza el sistema de tres clases que
             usan la mayoría de los estados. Su ley clasifica las bicicletas eléctricas
             y otros vehículos eléctricos de dos ruedas en estas clases."
+          other_classes: Otros vehículos eléctricos en %{place}
+          place_heading: Leyes sobre bicicletas eléctricas en %{place}
         rule_citation:
           source: fuente
         class_card:
@@ -7333,6 +7397,10 @@ es:
           classification: Clasificación E-%{vehicle_type}
           electric_certification: Certificación eléctrica
           not_provided: No se proporciona
+        check:
+          outside_checked_countries: Por ahora, los controles de bicicletas abarcan
+            los estados de EE. UU. y las provincias canadienses. A continuación se
+            muestran las leyes sobre bicicletas eléctricas de %{place}.
       memberships:
         new:
           become_a_member: Hazte miembro
@@ -7449,6 +7517,475 @@ es:
             que permiten recuperarlas, y también se financian las nuevas herramientas
             que desarrollamos. Registrar una bicicleta y denunciar un robo siempre
             será gratuito. Gracias a nuestros miembros podemos garantizarlo.
+      donate:
+        page:
+          already_member: Ya eres miembro de Bike Index. ¡Gracias! Puedes cambiar
+            tu nivel o los detalles de pago desde la configuración de tu membresía.
+          cadence: "¿Con qué frecuencia se debe dar?"
+          cta_headline: Un millón de bicicletas están registradas. Ni un solo propietario
+            pagó para estar allí.
+          cta_sub: Que siga siendo gratuito para el próximo millón.
+          eyebrow: Recuperado y regresado
+          fine_print: Bike Index es una organización sin fines de lucro 501(c)(3),
+            EIN 81-4296194. Su donación es deducible de impuestos en los EE. UU. Puede
+            cancelar su donación mensual en cualquier momento.
+          fine_print_short: Organización sin fines de lucro 501(c)(3), EIN 81-4296194.
+            Deducible de impuestos en los EE. UU.
+          form_title: Financiar la próxima recuperación
+          headline: Todas las bicicletas mencionadas anteriormente regresaron a casa
+            porque el registro era gratuito.
+          larger_gift_link: Háblanos sobre una donación mayor.
+          lede: Bike Index es una organización sin fines de lucro. Registrarse es
+            gratis, buscar bicicletas es gratis y denunciar un robo es gratis; por
+            eso hay un millón de bicicletas registradas y por eso la policía y las
+            tiendas lo utilizan. Las donaciones son lo que permite que siga funcionando.
+          lede_short: Bike Index es una organización sin fines de lucro. El registro,
+            la búsqueda y los informes de robo son gratuitos. Las donaciones son las
+            que permiten que siga siendo así.
+          major_benefactor: Benefactor
+          major_body: Las donaciones de este nivel se destinan a la incorporación
+            de socios, las investigaciones de robos transfronterizos y el desarrollo
+            de las alertas promocionales.
+          major_eyebrow: Donaciones importantes
+          major_partner: Pareja
+          major_title: Las donaciones más grandes hacen que ciudades enteras se incluyan
+            en la lista de regalos.
+          manage_membership: Gestiona tu membresía
+          membership_link: Qué incluye la membresía
+          membership_note: 'El apoyo mensual te convierte en miembro de Bike Index:
+            listados en el mercado, una insignia de miembro y ventajas que se amplían
+            a medida que las desarrollamos. Los niveles cuestan %{amounts} al mes.'
+          monthly: Mensual
+          monthly_submit: Hazte miembro — %{amount}/mes
+          one_time: Una sola vez
+          one_time_submit: Donar %{amount}
+          other_amount: Otra cantidad
+          other_ways_daf: 'Subvenciones de fondos de donaciones asesoradas: podemos
+            enviar nuestro número de identificación fiscal (EIN) y los detalles de
+            la subvención.'
+          other_ways_match: 'Donaciones de la empresa: muchas empresas igualarán tu
+            donación sin coste adicional para ti.'
+          other_ways_stock: Donaciones de acciones o criptomonedas, que evitan el
+            impuesto sobre las ganancias de capital derivadas de la apreciación de
+            los activos.
+          other_ways_title: Otras formas de donar a este nivel
+          recovered: Recuperado
+          stat_bikes: bicicletas registradas, gratis
+          stat_partners: tiendas asociadas, departamentos de policía y ciudades
+          stat_recoveries: Recuperan bicicletas robadas
+          stat_value: valor devuelto a los propietarios
+          stories_link: Lee más historias de recuperación
+          stories_subhead: Cada recuperación es reportada por la persona que recuperó
+            su bicicleta.
+          stories_title: En palabras de sus dueños
+          tier_basic: membresía básica
+          tier_basic_benefit: Publica tus bicicletas en el mercado, obtén una insignia
+            de miembro y asistencia más rápida.
+          tier_patron: Membresía de patrocinador
+          tier_patron_benefit: Todo incluido en Plus, mejor posicionamiento en el
+            mercado, camiseta y distintivo de Patrocinador.
+          tier_plus: Membresía Plus
+          tier_plus_benefit: Todo lo incluido en el paquete Básico, una alerta promocional
+            gratuita si te roban la bicicleta y un límite de miembros.
+          uses_alerts_body: El sistema de alerta de bicicletas robadas y las alertas
+            promocionadas que muestran un anuncio en los feeds relacionados con el
+            robo.
+          uses_alerts_title: Alertas que llegan a las personas
+          uses_free_body: Servidores, soporte y herramientas de búsqueda que utilizan
+            tiendas y policía, sin costo alguno. Sin muro de pago, sin niveles de
+            suscripción, sin venta de datos de usuarios.
+          uses_free_title: La inscripción sigue siendo gratuita.
+          uses_owners_body: El mercado, donde se publica un anuncio a partir de una
+            bicicleta ya registrada, fue diseñado para dificultar la venta de una
+            bicicleta robada. Próximamente habrá más herramientas para los propietarios.
+          uses_owners_title: Características para propietarios de bicicletas
+          uses_partners_body: La incorporación de nuevas tiendas, departamentos y
+            ciudades, y las investigaciones a largo plazo sobre redes de robo que
+            surgen de los datos del registro.
+          uses_partners_title: Socios e investigaciones
+          uses_title: "¿Adónde va el dinero?"
+          wall_photo_alt: Una bicicleta recuperada a través de Bike Index.
+      landing_pages:
+        demo_modal:
+          field_message: "¿Hay algo más que debamos saber?"
+          field_name: Su nombre
+          field_role: Tu papel
+          phone_hint: Un número de teléfono, con sus dígitos
+          request_name: pedido
+          submit_text: Hablemos
+          title: Contáctanos para una prueba gratuita.
+        for_cities:
+          answer_no: 'No'
+          answer_yes: Sí
+          back_to_cities: Volver al índice de bicicletas para ciudades
+          call_body: Cuéntanos un poco sobre tu ciudad y nos pondremos en contacto
+            contigo para encontrar un momento para hablar.
+          call_heading: Reserva una llamada de presentación
+          cape_logo_alt: Escudo de Bike Index con capa
+          checker_choose_state: Elige un estado
+          checker_eyebrow: Comprobador de conformidad de bicicletas eléctricas
+          checker_form_heading: Echa un vistazo a una bicicleta eléctrica
+          checker_heading: Conozca las normas para bicicletas eléctricas.
+          checker_intro: Bike Index es una herramienta pública gratuita. Los ciclistas
+            seleccionan su estado y su bicicleta y, en menos de 30 segundos, pueden
+            comprobar si es legal circular con ella, qué certificación posee y qué
+            normas se aplican. La respuesta permite registrarla directamente.
+          checker_point_bikebook: Clase, motor, velocidad máxima y certificación UL
+            del catálogo de modelos de bicicletas eléctricas de BikeBook.
+          checker_point_program: Dentro de su programa, el personal puede ver la clase
+            y el estado de cumplimiento de cada bicicleta eléctrica registrada.
+          checker_point_states: Normativa estatal sobre clases, límites de cilindrada,
+            velocidad máxima y aceleradores, con referencias a los estatutos.
+          checker_speed_20: 20 mph
+          checker_speed_28: 28 mph
+          checker_speed_over_28: Más de 28 mph
+          checker_state: Estado
+          checker_submit: Consulta las reglas
+          checker_throttle: Acelerador
+          checker_top_speed: Velocidad máxima asistida
+          child_housing_name: Apartamentos Maple Court
+          child_housing_note: Normas de carga y almacenamiento
+          child_neighborhood_name: Programa Vecinal de Riverside
+          child_neighborhood_note: "+2 reglas locales"
+          child_school_name: Escuela secundaria Westbrook
+          child_school_note: Normas de equitación más estrictas + políticas del campus
+          community_watch_lead: También hay una patrulla vecinal.
+          community_watch_users_body: Los usuarios de Bike Index buscan bicicletas
+            robadas en Craigslist, Facebook Marketplace y OfferUp. Quienes las encuentren
+            pueden contactar a los propietarios sin compartir los datos de contacto
+            de ninguna de las partes.
+          contact_heading: Cuéntanos sobre tu ciudad.
+          contact_intro: Toda colaboración comienza con una breve llamada inicial.
+            Cuéntenos en qué está trabajando su ciudad y le mostraremos cómo Bike
+            Index puede ayudarle.
+          contact_next_plan: Pasos claros a seguir para preparar tu ciudad
+          contact_next_priorities: Una conversación sobre las prioridades de tu ciudad,
+            ya sean bicicletas eléctricas, recuperación de bicicletas robadas o matriculación.
+          contact_next_walkthrough: Un recorrido por cómo funcionaría Bike Index para
+            su ciudad y sus programas.
+          education_eyebrow: educación sobre bicicletas eléctricas
+          education_heading: Los ciclistas aprenden las reglas que les corresponden.
+          education_intro: 'Cuando alguien registra una bicicleta eléctrica, Bike
+            Index le ofrece una breve guía antes de confirmar el registro: baterías
+            y carga, prácticas de conducción, normas personales y consentimiento firmado.
+            El objetivo es lograr una comprensión profunda, no solo marcar una casilla.
+            Seleccione una organización para ver cómo cambia el proceso.'
+          faq_account_answer: La ciudad es la organización matriz. Las escuelas, los
+            complejos de apartamentos y otros programas pueden funcionar como entidades
+            subsidiarias con su propio personal y contenido educativo. El personal
+            de cada nivel gestiona únicamente sus propias normas.
+          faq_account_question: "¿Quién gestiona la cuenta?"
+          faq_checker_answer: Los detalles de las bicicletas provienen de BikeBook,
+            un catálogo de modelos de bicicletas eléctricas que incluye su clase,
+            motor, velocidad y certificación UL. Las normas estatales se enumeran
+            junto con las leyes que las respaldan.
+          faq_checker_question: "¿De dónde obtiene sus datos el verificador de cumplimiento?"
+          faq_cost_answer: No hay cuotas de inscripción y el registro es gratuito
+            para los residentes. Analizaremos los precios para su ciudad en una llamada
+            inicial.
+          faq_cost_question: "¿Cuánto cuesta?"
+          faq_heading: Preguntas
+          faq_import_answer: No. Los registros existentes se pueden importar desde
+            una hoja de cálculo.
+          faq_import_question: Ya tenemos los datos de registro. ¿Empezamos de nuevo?
+          faq_police_answer: Los agentes y el personal municipal pueden compartir
+            el acceso autorizado al mismo panel de administración, buscar cualquier
+            bicicleta por número de serie y utilizar la lista de bicicletas robadas
+            de su zona.
+          faq_police_question: "¿Cómo lo utiliza la policía?"
+          faq_regular_answer: Sí. Se puede registrar cualquier bicicleta. Los pasos
+            de formación sobre bicicletas eléctricas solo aparecen cuando el usuario
+            registra una bicicleta eléctrica.
+          faq_regular_question: "¿Funciona también para bicicletas normales?"
+          faq_rules_answer: Sí, como socio de la ciudad. Puede comenzar con el flujo
+            estándar del Índice de Bicicletas o desde cero. El personal de la ciudad
+            edita el texto en el panel de administración, sin necesidad de asistencia
+            técnica.
+          faq_rules_question: "¿Podemos establecer nuestras propias normas para las
+            bicicletas eléctricas?"
+          field_attestations_body: Cada certificación se guarda con la normativa vigente
+            en el momento de la inscripción del ciclista, de modo que se dispone de
+            un registro permanente y auditable.
+          field_attestations_title: Certificaciones almacenadas
+          field_battery_body: Descubre qué bicicletas de tu ciudad utilizan baterías
+            con certificación UL 2849 o UL 2271, y usa esos datos para definir políticas
+            y campañas de concienciación.
+          field_battery_title: auditorías de certificación de baterías
+          field_eyebrow: Gestión de bicicletas eléctricas sobre el terreno
+          field_heading: Conecta cualquier bicicleta de la calle con su registro.
+          field_intro: La educación solo importa si el personal puede verificarla.
+            Los agentes de control de estacionamiento, los equipos de seguridad comunitaria
+            y los administradores pueden consultar cualquier bicicleta y ver a qué
+            se comprometió el ciclista.
+          field_organization: Ciudad u organización
+          field_qr_body: Escanea la pegatina de una bicicleta con cualquier teléfono
+            para ver su registro, incluyendo si el ciclista completó el programa de
+            formación y cuándo lo hizo.
+          field_qr_title: escaneo del código QR
+          field_serial_body: Busque por número de serie en el sitio web o en el panel
+            de administración el mismo registro de registro y certificación.
+          field_serial_title: Búsqueda de número de serie
+          heading_educate: Registra todas las bicicletas de tu ciudad. Informa a los
+            usuarios de bicicletas eléctricas sobre las normas de tu ciudad.
+          hero_image_alt: Una bicicleta con capa de superhéroe
+          hierarchy_city_body: Ordenanzas locales, límites de edad, normas sobre el
+            uso del casco y zonas donde se permite circular en bicicleta eléctrica.
+            Todos los ciclistas de la ciudad las ven.
+          hierarchy_city_title: La ciudad establece el punto de partida
+          hierarchy_dashboard_body: El personal municipal revisa las inscripciones
+            de todos los programas. El personal de cada programa gestiona únicamente
+            sus propias normas y participantes.
+          hierarchy_dashboard_title: Un panel de control para todos.
+          hierarchy_eyebrow: Nuevo · Gestión de bicicletas eléctricas
+          hierarchy_heading: Tu ciudad establece el punto de partida. Cada programa
+            añade el suyo propio.
+          hierarchy_intro: Las normas para bicicletas eléctricas varían según el contexto.
+            Una escuela secundaria puede ser más estricta que la ciudad, y un complejo
+            de apartamentos puede tener sus propias normas de carga y almacenamiento.
+            Bike Index configura a tu ciudad como la organización principal, con cada
+            programa como una cuenta secundaria. Las normas de la ciudad se aplican
+            en todas partes, y cada programa añade las suyas.
+          hierarchy_programs_body: Una escuela, un complejo de apartamentos o un programa
+            vecinal puede reescribir cualquier paso o agregar el suyo propio, con
+            sus propias palabras.
+          hierarchy_programs_title: Los programas añaden los suyos propios
+          hot_sheet_body: Una lista imprimible de bicicletas robadas en su área con
+            los números de teléfono de los propietarios, actualizada en tiempo real
+            para su departamento de policía.
+          hot_sheet_title: Lista de bicicletas robadas
+          mock_batteries: Baterías y carga
+          mock_bike_info: Información sobre bicicletas
+          mock_continue: Continuar
+          mock_detected: Eléctrico (motorizado) detectado
+          mock_electric: Eléctrico (motorizado)
+          mock_electric_help: Verificamos que sean eléctricas para poder marcarlas
+            y comprobar su certificación.
+          mock_manufacturer: Fabricante
+          mock_next: Próximo
+          mock_progress: Progreso guardado · Confirmación del vehículo eléctrico ·
+            Paso 1 de 4
+          mock_rule_certified: Solo utilizaré baterías certificadas según las normas
+            UL 2849 / UL 2271 (o equivalentes).
+          mock_rule_charger: Solo cargaré el dispositivo con el cargador del fabricante,
+            nunca lo dejaré desatendido ni en un pasillo o ruta de salida.
+          mock_rule_report: Dejaré de usar la batería e informaré sobre cualquier
+            daño, hinchazón o sobrecalentamiento.
+          mock_sub: Westbrook tiene algunas normas de seguridad que debes repasar
+            antes de poder completar la inscripción.
+          mock_title: "¡Parece que tienes un vehículo eléctrico!"
+          mock_traditional_bike: Bicicleta tradicional
+          mock_traditional_bike_note: "(2 ruedas, 1 asiento, pedales)"
+          mock_vehicle_type: Tipo de vehículo
+          nav_checker: comprobador de estado
+          nav_education: Normativa sobre bicicletas eléctricas
+          nav_faq: Preguntas frecuentes
+          nav_label: Índice de bicicletas para ciudades
+          nav_recovery: Recuperación
+          nav_registration: Registro
+          new: Nuevo
+          open_the_checker: Abrir el verificador completo
+          parent_name: Ciudad de Westbrook
+          parent_note: Normas sobre baterías, conducción y normativas municipales
+          parent_organization: Organización matriz
+          partnership_data_body: La ciudad es propietaria de sus datos y puede exportarlos
+            en cualquier momento.
+          partnership_data_title: Tus datos siguen siendo tuyos.
+          partnership_eyebrow: Asociación
+          partnership_fees_body: El registro es gratuito para los residentes.
+          partnership_fees_title: Sin cuotas de inscripción
+          partnership_heading: Su socio sin fines de lucro
+          partnership_intro: Bike Index ha sido el registro de bicicletas más utilizado
+            del mundo desde 2013. Las colaboraciones con ciudades no requieren personal
+            informático especializado, y la mayoría entran en funcionamiento a los
+            pocos días de su configuración.
+          partnership_support_body: Configuramos la organización y el flujo educativo
+            según su marca, capacitamos a su personal y mantenemos la plataforma.
+          partnership_support_title: Configuración, capacitación y soporte
+          program_education_body: Los usuarios de bicicletas eléctricas se integran
+            en el proceso de formación durante el registro. El personal puede consultar
+            la clase de la bicicleta, la certificación de la batería y la declaración
+            firmada.
+          program_education_link: Observa el flujo educativo
+          program_education_title: educación sobre bicicletas eléctricas
+          program_eyebrow: Qué abarca su programa
+          program_heading: Todo comienza con el registro.
+          program_intro: 'El registro y la recuperación de bicicletas robadas han
+            sido la base de Bike Index desde 2013. La formación sobre bicicletas eléctricas
+            es la nueva capa que se añade: cuando un ciclista registra una bicicleta
+            eléctrica, aprende las normas antes de que finalice el registro.'
+          program_recovery_body: Es posible localizar una bicicleta matriculada. Las
+            fuerzas del orden, junto con tiendas y voluntarios, consultan el registro.
+          program_recovery_link: Cómo funciona la recuperación
+          program_recovery_title: Recuperación de bicicletas robadas
+          program_registration_body: Cada bicicleta tiene un registro con número de
+            serie, fotos y nombre del propietario. Los registros de tiendas, escuelas,
+            departamentos municipales y programas comunitarios se almacenan en un
+            registro único que permite realizar búsquedas.
+          program_registration_link: Cómo funciona el registro
+          program_registration_title: Registro
+          recovery_eyebrow: Recuperación de bicicletas robadas y aplicación de la
+            ley
+          recovery_heading: Cuando roban una bicicleta, toda la red se entera.
+          recovery_intro: La recuperación de bicicletas robadas es la misión fundacional
+            de Bike Index. Más de 100 agencias policiales utilizan Bike Index directamente,
+            y las tiendas de bicicletas, las casas de empeño y las plataformas de
+            reventa pueden verificar el número de serie antes de que se concrete la
+            venta.
+          recovery_step_1_body: El estado cambia inmediatamente y aparece para cualquiera
+            que busque ese número de serie.
+          recovery_step_1_title: El propietario denuncia que fue robado.
+          recovery_step_2_body: En un control de tráfico, una llamada a una casa de
+            empeños o una redada, obtienen información sobre la marca, el modelo,
+            el color, la foto, los datos de contacto del propietario y el historial
+            de estado del vehículo.
+          recovery_step_2_title: Los oficiales realizan una inspección en el terreno.
+          recovery_step_3_body: Cuando se produce una coincidencia con un número de
+            serie, los agentes se ponen en contacto directamente con el propietario,
+            sin necesidad de un largo proceso de registro en la sala de objetos incautados.
+          recovery_step_3_title: La bicicleta vuelve a casa.
+          registration_eyebrow: Registro
+          registration_heading: Todas las bicicletas de tu ciudad, en un registro
+            con función de búsqueda.
+          registration_import_body: Importarlas desde una hoja de cálculo. El personal
+            también puede añadir bicicletas manualmente y enviar mensajes a los propietarios
+            según la fecha de matriculación, el tipo de bicicleta o si es un vehículo
+            eléctrico.
+          registration_import_lead: "¿Ya tienes inscripciones?"
+          registration_intro: Los registros de tiendas de bicicletas, escuelas, departamentos
+            municipales y programas comunitarios se centralizan en un único lugar
+            que utilizan residentes, personal municipal y policía. Funciona para todo
+            tipo de bicicletas, no solo para las eléctricas.
+          registration_step_1_body: En menos de dos minutos desde cualquier teléfono,
+            a través de una página de destino con la marca de la ciudad, un formulario
+            en su sitio web o una pegatina con código QR.
+          registration_step_1_title: Registro de residentes
+          registration_step_2_body: BikeBook identifica el modelo y su clase, y el
+            ciclista completa el proceso de aprendizaje. Las bicicletas convencionales
+            no lo incluyen.
+          registration_step_2_title: Las bicicletas eléctricas se clasifican
+          registration_step_3_body: Estado (registrado, robado o recuperado), marca,
+            modelo, color y número de serie. Los agentes y el personal lo buscan por
+            número de serie.
+          registration_step_3_title: Cada bicicleta tiene su propia página.
+          registration_step_4_body: Volumen de inscripciones, datos sobre el uso compartido
+            de bicicletas eléctricas y la actividad en todos los programas, además
+            de informes sobre recuperaciones y auditorías de baterías para los líderes
+            de la ciudad.
+          registration_step_4_title: Lo ves en el panel de control
+          role_city_staff: personal de la ciudad
+          role_elected: funcionario electo
+          role_housing: Programa de vivienda o comunitario
+          role_law_enforcement: fuerzas del orden
+          role_other: Otro
+          role_school: Escuela o distrito
+          schedule_a_demo: Solicite una demostración
+          sent_body: Nos pondremos en contacto contigo por correo electrónico para
+            programar tu llamada inicial.
+          sent_heading: Gracias. Nos pondremos en contacto con usted pronto.
+          stat_agencies: agencias de aplicación de la ley
+          stat_agencies_count: Más de 100
+          stat_bikes: bicicletas matriculadas
+          stat_organizations: organizaciones asociadas
+          stat_recovered: en bicicletas robadas recuperadas
+          stolen_banner_body: Cualquiera que busque su número de serie verá que es
+            robado y cómo contactar con el propietario.
+          stolen_banner_title: Robado
+          subheading: Bike Index es el registro sin fines de lucro que la policía
+            y las tiendas de bicicletas ya utilizan para recuperar bicicletas robadas.
+            Los ciclistas comienzan registrando su bicicleta. Si se trata de una bicicleta
+            eléctrica, acceden directamente a una breve sesión informativa sobre las
+            normas de su ciudad.
+          submit_demo: Solicita una demostración
+        for_cities_education:
+          all_set: Ya está todo listo.
+          back: Atrás
+          battery_category: Baterías y carga
+          battery_rule_charger: Solo cargaré el dispositivo con un cargador aprobado
+            por el fabricante.
+          battery_rule_flammable: Mantendré la batería alejada de materiales inflamables.
+          battery_rule_unattended: Jamás dejaré la batería cargando sin supervisión.
+          battery_title: "¡Parece que tienes una bicicleta eléctrica!"
+          city_battery_sub: Westbrook tiene algunas normas para las bicicletas eléctricas
+            que debes repasar antes de finalizar tu registro.
+          city_blurb: Todos los ciclistas de Westbrook conocen las normas municipales
+            sobre baterías, circulación y otros aspectos relacionados con el tráfico,
+            tanto si se registran por su cuenta como si lo hacen a través de un programa.
+          city_name: Ciudad de Westbrook
+          city_riding_rule_helmet: Si soy menor de 18 años, usaré casco siempre que
+            monte en bicicleta.
+          city_riding_rule_lanes: Circularé por los carriles bici donde existan y
+            mantendré una velocidad inferior a 24 km/h en los senderos compartidos.
+          city_riding_rule_sidewalks: No circularé por las aceras en el distrito comercial
+            del centro.
+          city_riding_sub: Normas de Westbrook sobre cascos, carriles, velocidad y
+            aceras.
+          city_rule_class_3: Solo usaré una bicicleta eléctrica de Clase 3 si tengo
+            16 años o más, y no en el sendero Riverside Trail.
+          city_rule_classes: Sé dónde encontrar las clases gratuitas de seguridad
+            para bicicletas eléctricas de Westbrook.
+          city_rule_parking: Solo aparcaré en los aparcamientos públicos para bicicletas,
+            sin bloquear nunca las aceras, las rampas ni las entradas.
+          city_rules_category: Reglamento de la ciudad
+          city_rules_sub: Reglas basadas en clases y recursos locales.
+          city_rules_title: Dónde se pueden usar bicicletas eléctricas en Westbrook
+          complete_registration: Completar el registro
+          consent_category: Revisión final y consentimiento
+          continue: Continuar
+          done_message:
+            one: Usted confirmó la regla %{count} para %{name}. Su declaración firmada
+              se guardó en el registro de su motocicleta.
+            other: Has confirmado todas las reglas %{count} para %{name}. Tu declaración
+              firmada se ha guardado en el registro de tu bicicleta.
+          housing_building_blurb: Los residentes consultan las normas municipales
+            y, a continuación, las normas propias de la administración del edificio
+            para el almacenamiento y el estacionamiento en sus dos edificios.
+          housing_name: Apartamentos Maple Court
+          housing_rule_sticker: Dejaré mi pegatina de matriculación a la vista para
+            que el personal pueda confirmar que mi moto es mía.
+          housing_rule_storage: Guardaré mi bicicleta eléctrica en el cuarto de bicicletas,
+            nunca en pasillos compartidos ni en zonas de salida.
+          housing_rules_category: Normas de construcción
+          housing_rules_sub: Dónde guardar la bicicleta eléctrica en casa.
+          housing_rules_title: Almacenamiento y estacionamiento
+          housing_tab: Corte del Arce
+          registered: Registrado
+          riding_category: Prácticas de equitación
+          riverside_blurb: Los vecinos ven las normas de la ciudad y luego las normas
+            propias del programa para el centro comunitario.
+          riverside_name: Programa Vecinal de Riverside
+          riverside_rule_charging: No cargaré mi bicicleta eléctrica dentro del Centro
+            Comunitario.
+          riverside_rule_parking: Aparcaré únicamente en los aparcamientos para bicicletas
+            eléctricas señalizados del centro comunitario, nunca en el sendero del
+            dique ni junto a los árboles.
+          riverside_rules_category: Reglas del vecindario
+          riverside_tab: Orilla
+          rule_count:
+            one: Regla %{count}
+            other: Reglas %{count}
+          school_campus_blurb: Los alumnos conocen las normas de la ciudad y, a continuación,
+            las normas propias de la escuela secundaria para ir en transporte público
+            al campus.
+          school_name: Escuela secundaria Westbrook
+          school_rule_class_1: Solo iré al colegio en bicicleta eléctrica de Clase
+            1.
+          school_rule_guardian: He revisado estas reglas con uno de mis padres o tutor
+            legal.
+          school_rule_traffic: Respetaré las normas de tráfico y cederé el paso a
+            los peatones y a los agentes de cruce.
+          school_rule_walk: Iré caminando con mi bicicleta desde la puerta principal
+            hasta los aparcabicicletas.
+          school_rules_category: Normas escolares
+          school_rules_sub: Tu escuela tiene algunas reglas adicionales para ir al
+            campus en bicicleta.
+          school_rules_title: Políticas del campus de Westbrook Middle
+          school_tab: Westbrook Middle
+          staff_edit: Tu personal puede editar cada paso en el panel de administración,
+            sin necesidad de asistencia técnica. Cada certificación firmada se almacena
+            con las reglas exactas vigentes ese día.
+          start_over: Volver a empezar
+          tabs_label: Organizaciones de ejemplo
+          viewing_as: Considerando como
     shared_blocks:
       footer:
         about: Acerca
@@ -7513,10 +8050,8 @@ es:
           bike_index_store: Tienda de índices de bicicletas
           design_and_developer_resources: Recursos de diseño y desarrollo
           donate: Donar
-          donate_today: Dona hoy
           help: Ayuda
           how_to_get_your_stolen_bike_back: Cómo recuperar tu bicicleta robada
-          make_a_difference: Marca la diferencia en la lucha contra el robo de bicicletas.
           other_pages: Otras páginas
           protect_your_bike: Registre su bicicleta
           related: Relacionado
@@ -7563,7 +8098,6 @@ es:
           menu: Menú
           organization_crest: "%{org_name} cresta"
         primary_menu:
-          blog: Blog
           donate: Donar
           help: Ayuda
           log_in: conectarse
@@ -7571,6 +8105,8 @@ es:
           search: Buscar
           sign_up: Inscríbete
           stolen_bike: "¿Bicicleta robada?"
+          register: Registro
+          register_a_new_bike: Registre su bicicleta
         user_settings_menu:
           settings_menu: Ajustes
         wrapper:

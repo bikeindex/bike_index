@@ -7,7 +7,7 @@ module UI
       # ids: true, its State record's id, for a form field like region_record_id.
       #
       # Pass `states:` to narrow the list, in StatesAndCountries.states' {name:, abbr:} shape, with id:
-      # too for ids: true. html_options (form:, value:, placeholder:, required:, etc.) are forwarded to
+      # too for ids: true, or value: to submit something other than the abbreviation. html_options (form:, value:, placeholder:, required:, etc.) are forwarded to
       # UI::Forms::Combobox::Component, which renders no label -- wrap it in a UI::Forms::Group block to
       # get one. Without JavaScript it falls back to a select.
       #
@@ -36,7 +36,7 @@ module UI
 
         def option(state)
           abbreviation = "(#{state[:abbr]})"
-          {display: "#{state[:name]} #{abbreviation}", value: @ids ? state.fetch(:id) : state[:abbr],
+          {display: "#{state[:name]} #{abbreviation}", value: @ids ? state.fetch(:id) : state.fetch(:value, state[:abbr]),
            content: safe_join([state[:name], " ", tag.span(abbreviation, class: "tw:text-gray-500")])}
         end
       end

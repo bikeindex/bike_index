@@ -4,7 +4,7 @@ module Integrations
       require "net/http"
 
       # Registration blocks on this, so it has to give up well inside rack-timeout's 30s -
-      # Net::HTTP defaults to 60s. Dropping the lookup only costs bike book data
+      # Net::HTTP defaults to 60s. Dropping the lookup only costs BikeBook data
       TIMEOUT_SECONDS = 5
 
       def make_request(query, method = nil)
