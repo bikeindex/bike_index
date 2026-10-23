@@ -23,12 +23,10 @@ module Pages
         def register_stolen_path = new_register_path(status: "status_stolen")
 
         def stats
-          [{value: number_display(@recoveries_count), label: translation(".stolen_bikes_recovered")},
-            {value: render(Atoms::CurrencyMillions::Component.new(dollars_usd: @recoveries_value)),
-             label: translation(".value_returned_to_owners")},
-            {value: safe_join([number_display(@organizations_count), "+"]),
-             label: translation(".partner_organizations")},
-            {value: as_currency(0), label: translation(".to_register_always")}]
+          [[number_display(@recoveries_count), translation(".stolen_bikes_recovered")],
+            [render(Atoms::CurrencyMillions::Component.new(dollars_usd: @recoveries_value)), translation(".value_returned_to_owners")],
+            [safe_join([number_display(@organizations_count), "+"]), translation(".partner_organizations")],
+            [as_currency(0), translation(".to_register_always")]]
         end
 
         def steps
@@ -98,11 +96,9 @@ module Pages
 
         def promoted_alerts_path = news_path("bike-indexs-new-promoted-alerts-are-the-megaphone-crooks-dont-want-you")
 
-        def section_inner = "tw:mx-auto tw:max-w-6xl tw:px-5 tw:py-6 tw:lg:px-14 tw:lg:py-12"
+        def section_inner = "#{SharedBlocks::Marketing::Wrapper::Component::CONTAINER_CLASSES} tw:py-6 tw:lg:py-12"
 
-        def h2_classes = "tw:m-0 tw:font-header tw:text-[23px] tw:font-extrabold tw:text-slate-900 tw:lg:text-[34px]"
-
-        def subhead_classes = "tw:mt-1 tw:mb-4 tw:text-[15px] tw:lg:mb-6 tw:lg:text-[17px]"
+        def subhead_classes = "tw:mt-1 tw:mb-4 tw:text-[15px] tw:text-gray-500 tw:lg:mb-6 tw:lg:text-[17px]"
       end
     end
   end

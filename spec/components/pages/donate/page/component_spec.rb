@@ -19,6 +19,14 @@ RSpec.describe Pages::Donate::Page::Component, type: :component do
     expect(component).to have_css("img[src='#{described_class::WALL_PHOTOS.first}']", count: 1)
   end
 
+  context "with over a million bikes" do
+    before { Counts.assign_for("total_bikes", 1_199_999) }
+
+    it "floors the count to a tenth of a million" do
+      expect(component).to have_text("1.1M+")
+    end
+  end
+
   context "with CAD prices" do
     let(:currency_enum) { "cad" }
     before { stripe_prices.find { it.patron? && it.monthly? }.amount_cents = 4999 }

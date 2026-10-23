@@ -74,7 +74,7 @@ module Pages
         def abbreviated(count)
           return number_display(count) if count < 1_000_000
 
-          safe_join([number_display(count / 1_000_000), "M+"])
+          "#{number_with_precision(count / 1_000_000.0, precision: 1, round_mode: :floor, strip_insignificant_zeros: true)}M+"
         end
 
         def tiers
@@ -90,12 +90,14 @@ module Pages
         end
 
         def money_uses
-          [
-            ["lucide-search", "tw:bg-blue-600", translation(".uses_free_title"), translation(".uses_free_body")],
-            ["lucide-megaphone", "tw:bg-purple-500", translation(".uses_alerts_title"), translation(".uses_alerts_body")],
-            ["lucide-handshake", "tw:bg-[#2c3e50]", translation(".uses_partners_title"), translation(".uses_partners_body")],
-            ["lucide-store", "tw:bg-blue-500", translation(".uses_owners_title"), translation(".uses_owners_body")]
-          ]
+          [{icon: "icons/lucide-search.svg", circle: "tw:bg-blue-600",
+            title: translation(".uses_free_title"), body: translation(".uses_free_body")},
+            {icon: "icons/lucide-megaphone.svg", circle: "tw:bg-purple-500",
+             title: translation(".uses_alerts_title"), body: translation(".uses_alerts_body")},
+            {icon: "icons/lucide-handshake.svg", circle: "tw:bg-slate-900",
+             title: translation(".uses_partners_title"), body: translation(".uses_partners_body")},
+            {icon: "icons/lucide-store.svg", circle: "tw:bg-blue-500",
+             title: translation(".uses_owners_title"), body: translation(".uses_owners_body")}]
         end
 
         def radio_mark

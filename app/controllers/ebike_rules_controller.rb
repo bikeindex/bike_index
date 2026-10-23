@@ -52,8 +52,9 @@ class EbikeRulesController < ApplicationController
     return render(Pages::EbikeRules::Check::Component.new(lookup:, page_title: @page_title)) if turbo_frame_request?
 
     registered_count, recoveries_count = Counts.retrieve_many("total_bikes", "recoveries")
-    render Pages::EbikeRules::Show::Component.new(lookup:, manifest_url: Integrations::Bikebook::Catalog::MANIFEST_URL,
-      registered_count:, recoveries_count:, page_title: @page_title, default_title: country_title(lookup.country))
+    render SharedBlocks::Marketing::Wrapper::Component.new(page: Pages::EbikeRules::Show::Component.new(lookup:,
+      manifest_url: Integrations::Bikebook::Catalog::MANIFEST_URL, registered_count:, recoveries_count:,
+      page_title: @page_title, default_title: country_title(lookup.country)))
   end
 
   private
