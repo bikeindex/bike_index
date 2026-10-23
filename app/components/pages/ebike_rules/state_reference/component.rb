@@ -3,6 +3,7 @@
 module Pages
   module EbikeRules
     module StateReference
+      # Template Dependency: SharedBlocks::Marketing::Wrapper::Component
       # Rendered whole, so search engines read the collapsed rules too. The US's states, or another checked country's
       # regions, each under the law a bike's checked against there
       class Component < ApplicationComponent
