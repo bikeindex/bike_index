@@ -220,7 +220,7 @@ class Bike < ApplicationRecord
   scope :example, -> { unscoped.where(example: true) }
   scope :non_example, -> { where(example: false) }
   scope :ignored, -> { where(example: true).or(where.not(deleted_at: nil)).or(where(likely_spam: true)) }
-  scope :with_user_hidden, -> { unscoped.non_example.not_spam.without_deleted }
+  scope :with_user_hidden, -> { unscoped.current_with_user_hidden }
   # An organization sees its own impounded bikes even when they're hidden - only chain it off the org's bikes
   scope :status_impounded_with_user_hidden, -> { unscope(where: :user_hidden).status_impounded }
   scope :default_includes, -> { includes(:primary_frame_color, :secondary_frame_color, :tertiary_frame_color, :current_stolen_record, :current_ownership) }
