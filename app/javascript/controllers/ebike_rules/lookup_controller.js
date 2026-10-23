@@ -77,6 +77,13 @@ export default class extends Controller {
     this.picking = type === 'keydown' || Boolean(target.closest('[role=option]'))
   }
 
+  // The gem announces a selection only when it changes, so a pick of the model already chosen - to return custom
+  // details to its own - is left for once the gem has handled the press
+  repick () {
+    const value = this.comboboxSlotTarget.querySelector('[data-hw-combobox-target=hiddenField]')?.value
+    if (this.picking && value === this.model) this.chooseBike({ detail: { value } })
+  }
+
   // The gem leaves the autocompleted part of a pick selected, and the catalog's "(current)" says
   // nothing a picked model needs. Its announcement keeps the page's custom details, which a pick of
   // their model returns to its own

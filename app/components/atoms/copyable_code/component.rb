@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module UI
+module Atoms
   module CopyableCode
     class Component < ApplicationComponent
       strip_trailing_whitespace

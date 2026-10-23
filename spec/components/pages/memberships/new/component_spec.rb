@@ -35,7 +35,7 @@ RSpec.describe Pages::Memberships::New::Component, type: :component do
     expect(component).to have_css("[data-ui--collapse-target='content']", count: 5, visible: :all)
     expect(component).to have_css("[data-ui--collapse-target='content']:not(.tw\\:hidden)", count: 1, visible: :all)
     expect(component).to have_link("Or make a one-time donation", href: "/donate")
-    expect(component).to_not have_link("Read more recovery stories")
+    expect(component).to have_link("Read more recovery stories", href: "/recovery_stories")
 
     labels = JSON.parse(component.css("#membership_level_patron").first["data-labels"])
     expect(labels).to eq({"monthly" => {"summary" => "Patron membership, $50 a month", "join" => "Join as Patron — $50/mo"},

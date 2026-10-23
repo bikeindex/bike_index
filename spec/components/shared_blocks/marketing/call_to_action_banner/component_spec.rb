@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe UI::CallToActionBanner::Component, type: :component do
+RSpec.describe SharedBlocks::Marketing::CallToActionBanner::Component, type: :component do
   let(:options) { {heading: "Members keep it free"} }
   let(:component) { render_inline(described_class.new(**options)) { "<a href='/join'>Join</a>".html_safe } }
 
