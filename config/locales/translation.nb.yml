@@ -5270,10 +5270,10 @@ nb:
         view_your_bike: Se sykkelen din
         what_if_my_bike_gets_stolen: Hva om sykkelen min blir stjålet?
         whats_next: Hva skjer nå?
-        secure_both_wheels_either_with_two_ulocks: Sikre begge hjulene – enten med
-          to U-låser, eller én U-lås og én kraftig vaier.
-        ulock_illustration: U-lås-illustrasjon
-        use_a_ulock: Bruk en U-lås.
+        secure_both_wheels_with_locking_skewers: Sikre begge hjulene – med låsespyder,
+          en kraftig vaier og en eller to U-låser.
+        use_a_ulock_or_foldable_lock: Bruk en U-lås eller en kraftig sammenleggbar
+          lås.
       organization_invitation:
         hello: Hei %{name},
         join_org: Bli med %{org_name}

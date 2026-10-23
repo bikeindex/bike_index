@@ -5523,10 +5523,10 @@ it:
         view_your_bike: Visualizza la tua bici
         what_if_my_bike_gets_stolen: E se mi rubassero la bicicletta?
         whats_next: Cosa succederà ora?
-        secure_both_wheels_either_with_two_ulocks: Fissate entrambe le ruote, utilizzando
-          due lucchetti a U oppure un lucchetto a U e un cavo robusto.
-        ulock_illustration: Illustrazione di un lucchetto a U
-        use_a_ulock: Utilizza un lucchetto a U.
+        secure_both_wheels_with_locking_skewers: Fissa entrambe le ruote con perni
+          di bloccaggio, un cavo robusto e uno o due lucchetti a U.
+        use_a_ulock_or_foldable_lock: Utilizza un lucchetto a U o un lucchetto pieghevole
+          resistente.
       organization_invitation:
         hello: Ciao %{name},
         join_org: Unisciti a %{org_name}

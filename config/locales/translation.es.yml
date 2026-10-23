@@ -5515,10 +5515,10 @@ es:
         view_your_bike: Ver tu bicicleta
         what_if_my_bike_gets_stolen: "¿Qué pasa si me roban la bicicleta?"
         whats_next: "¿Qué sigue?"
-        secure_both_wheels_either_with_two_ulocks: Asegure ambas ruedas, ya sea con
-          dos candados en U o con un candado en U y un cable resistente.
-        ulock_illustration: Ilustración de un candado en U
-        use_a_ulock: Utilice un candado en U.
+        secure_both_wheels_with_locking_skewers: Asegure ambas ruedas con cierres
+          de seguridad, un cable resistente y un candado en U o dos candados en U.
+        use_a_ulock_or_foldable_lock: Utilice un candado en U o un candado plegable
+          de alta resistencia.
       organization_invitation:
         hello: Hola %{name},
         join_org: Únete a %{org_name}
