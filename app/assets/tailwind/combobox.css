@@ -80,6 +80,8 @@ body.dark .hw-combobox {
 .hw-combobox__main__wrapper:has(> .hw-combobox__input[data-queried]:not([data-pending])) > .hw-combobox__listbox,
 .hw-combobox__dialog:has(.hw-combobox__dialog__input[data-queried]:not([data-pending])) .hw-combobox__dialog__listbox {
   &[data-no-matches]:not(:has([role="option"]:not([hidden]), .hw-combobox__group__label:only-child)) {
+    /* the gem leaves the listbox clear, its options carrying the background */
+    background-color: var(--hw-option-bg-color);
     border-color: var(--hw-border-color);
 
     &::before {
