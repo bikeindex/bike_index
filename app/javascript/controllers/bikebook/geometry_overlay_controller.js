@@ -11,9 +11,9 @@ const DURATION = 400
 const easeInOut = (progress) => progress < 0.5 ? 4 * progress ** 3 : 1 - (-2 * progress + 2) ** 3 / 2
 
 // Connects to data-controller='bikebook--geometry-overlay'
-// A legend button fades the other frames and draws its own over them, its rims alone shown, until it's pressed again.
-// Any but the first's, or none, goes on the URL as overlay_selected. A frame redrawn in another size moves there from
-// the last
+// A legend button fades the other frames and draws its own over them until it's pressed again, as clicking a frame
+// presses its button. Any but the first's, or none, goes on the URL as overlay_selected. A frame redrawn in another size
+// moves there from the last
 export default class extends Controller {
   static targets = ['frame', 'button', 'top']
 
@@ -32,12 +32,17 @@ export default class extends Controller {
     this.buttonTargets.forEach((button) => button.setAttribute('aria-pressed', pressed && button === currentTarget))
     this.frameTargets.forEach((frame, each) => {
       pressed && each !== index ? frame.setAttribute('opacity', '0.2') : frame.removeAttribute('opacity')
-      frame.querySelectorAll('[data-rim]').forEach((rim) => pressed && each === index ? rim.removeAttribute('display') : rim.setAttribute('display', 'none'))
     })
     pressed ? this.topTarget.setAttribute('href', `#${this.frameTargets[index].id}`) : this.topTarget.removeAttribute('href')
     const url = new URL(window.location.href)
     pressed && index === 0 ? url.searchParams.delete('overlay_selected') : url.searchParams.set('overlay_selected', pressed ? currentTarget.dataset.vehicle : 'none')
     replaceUrl(url)
+  }
+
+  // the frame clicked, or the one drawn over the rest that the top's a copy of
+  pick ({ currentTarget }) {
+    const frame = currentTarget === this.topTarget ? this.element.querySelector(currentTarget.getAttribute('href')) : currentTarget
+    this.buttonTargets[this.frameTargets.indexOf(frame)]?.click()
   }
 
   #parts () {

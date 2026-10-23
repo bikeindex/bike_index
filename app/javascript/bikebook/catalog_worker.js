@@ -38,8 +38,7 @@ async function load ({ manifestUrl, ids, jurisdictions, rulesUrl }) {
   activities = index.primary_activities
   models = index.models.map((model) => ({
     ...model,
-    // a photo stored under its model's id is published as its extension alone
-    stock_photo: model.photo?.includes('/') ? model.photo : model.photo && `${index.stock_photos}/${path(model.id)}.${model.photo}`,
+    stock_photo: model.photo && `${index.stock_photos}/${path(model.id)}.${model.photo}`,
     activity_name: activityNames[model.primary_activity],
     type_name: typeNames[model.vehicle_type],
     searchText: `${model.display}\n${model.id}`.toLowerCase(),

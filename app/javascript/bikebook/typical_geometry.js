@@ -34,7 +34,7 @@ export const TYPICAL_GEOMETRY = {
   mtb_downhill: { kind: 'downhill mountain bike', rim: null, tire: inches(2.5), fork_rake: 52 },
   mtb_freeride: { kind: 'freeride mountain bike', rim: null, tire: inches(2.3) },
   dj: { kind: 'dirt jump bike', rim: 559, tire: inches(2.25) },
-  bmx: { kind: 'BMX', fork_rake: 28, head_tube: 119, crown: 63, seat_tube: 240 },
-  bmx_race: { kind: 'BMX', fork_rake: 28, head_tube: 119, crown: 63, seat_tube: 240 },
-  bmx_freestyle: { kind: 'BMX', fork_rake: 28, head_tube: 119, crown: 63, seat_tube: 240 }
+  bmx: { kind: 'BMX bike', fork_rake: 28, head_tube: 119, crown: 63, seat_tube: 240 },
+  bmx_race: { kind: 'BMX bike', fork_rake: 28, head_tube: 119, crown: 63, seat_tube: 240 },
+  bmx_freestyle: { kind: 'BMX bike', fork_rake: 28, head_tube: 119, crown: 63, seat_tube: 240 }
 }

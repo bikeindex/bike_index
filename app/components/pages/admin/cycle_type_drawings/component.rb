@@ -33,6 +33,7 @@ module Pages
           "bike/step_through" => "m/aventon/2025/level_3_step_through",
           "bike/bench_seat" => "m/cycrown/2026/run_mini",
           "tandem" => "m/co_motion/2018/kalapuya_shimano_ultegra_r8000_2x11",
+          "tandem/step_through" => "m/sun/2025/brickell_tandem_cb_step_thru",
           "unicycle" => "m/nimbus_unicycles/2014/muni_24",
           "tricycle" => "m/sun/2022/miami_sun_traditional_24_step_thru",
           "tricycle/tadpole" => "m/reactive_adaptations/2025/hammerhead",

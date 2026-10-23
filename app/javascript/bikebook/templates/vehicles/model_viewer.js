@@ -33,7 +33,10 @@ const groupsetSummary = ({ groupset }) => {
   const name = compact([named ? null : manufacturer, description]).join(' ')
   return electronic ? join([name, 'electronic'], ' · ') : name
 }
-const typeLabel = (each) => [each.type, each.type_detail].filter(present).join(' · ')
+// "Cargo Bike Rear · Kids & Women's · Long tail": its type, target riders and detail, and a step-through frame's after,
+// its top tube named or not
+export const typeLabel = (each) => [each.type, array(each.target_riders).join(' & '), each.type_detail,
+  /^step[_-]through$/i.test(each.frame?.top_tube ?? '') && 'Step-through'].filter(present).join(' · ')
 
 // One vehicle's card, marked where it differs from `others`
 export const modelViewer = (args) => new ModelViewer(args).render()
@@ -60,7 +63,7 @@ export const wheelsAt = (presenter, data, size) => {
     const built = at(viewer.builtWheels(), position, size)[0]
     const widths = at(viewer.vehicle.wheels, position, size).map((wheel) => wheel.max_tire_width).filter((width) => typeof width === 'number')
     return [position, {
-      parts: built && viewer.wheelParts({ ...built, sizes: null }, { fitting: false }).map(([key, content]) => [key, key === 'tire' ? built.tire_width : null, content]),
+      parts: built && viewer.wheelParts({ ...built, sizes: null }, { fitting: false }).map(([key, content]) => [key, { size: built.bsd, tire: built.tire_width }[key] ?? null, content]),
       maxTire: widths.length ? Math.max(...widths) : null
     }]
   }))
@@ -171,9 +174,9 @@ class ModelViewer {
     return html`<div class="tw:group tw:order-first" data-controller=${present(photo) ? 'image-fallback' : nothing} data-broken=${present(photo) ? nothing : ''}>${present(photo)
       ? html`<a target="_blank" rel="noopener" class="${frame} tw:block tw:group-data-broken:hidden"
         href=${photo}><img alt=${titleText} loading="lazy" class="tw:size-full tw:rounded-sm tw:object-contain" data-action="error->image-fallback#fallBack" src=${photo}></a>`
-      : nothing}<div class="${frame} tw:hidden tw:flex-col tw:items-center tw:justify-center tw:gap-2 tw:rounded-md
+      : nothing}<div class="${frame} tw:hidden tw:flex-col tw:items-center tw:justify-center tw:gap-2 tw:rounded-md tw:p-1
       tw:border tw:border-dashed tw:border-gray-200 tw:dark:border-gray-700 tw:text-gray-400 tw:group-data-broken:flex tw:dark:text-gray-500"><img
-      alt="" class="tw:h-16 tw:w-16" src=${this.kit.placeholder_url}><span class="tw:text-sm">No photo</span></div></div>`
+      alt="" class="tw:aspect-square tw:h-16 tw:min-h-0 tw:w-auto" src=${this.kit.placeholder_url}><span class="tw:text-sm tw:leading-none">No photo</span></div></div>`
   }
 
   // Values by their vocabulary names, then the frame's mount labels and each suspension's values
@@ -347,7 +350,7 @@ class ModelViewer {
       primary_activity: this.withoutParenthetical(vehicle.primary_activity),
       frame_material: present(vehicle.frame?.material) && present(vehicle.frame.material_detail)
         ? html`${vehicle.frame.material} <span class="tw:text-xs twless-strong">${vehicle.frame.material_detail}</span>`
-        : vehicle.frame?.material ?? vehicle.frame?.material_detail,
+        : vehicle.frame?.material,
       ...this.wheelSizes(),
       suspended: present(vehicle.suspension),
       suspension: this.suspensionTravels(),

@@ -20,14 +20,16 @@ const TIRE_GAP = 10
 // rather than the drawing refitting
 const BOUNDS = { left: -460, right: 1685, top: 1140 }
 
+export const wheelName = (presenter, bsd) => presenter.vocabulary.wheel_sizes[bsd]?.name ?? `${bsd} mm BSD`
+
 const figures = (presenter, keys) => andSentence(keys.map((key) => presenter.kit.geometry.labels[key] ?? presenter.humanize(key)))
 
-// A frame drawn whole as its type's side view, its rims only while it's `chosen`, else its wheels alone, faded while
-// another is chosen
+// A frame drawn whole as its type's side view, else its wheels alone, faded while another is chosen
 const frame = ({ side, geometry: { rearAxle, frontAxle, rearRadius, frontRadius }, series, label, value }, index, chosen) =>
   svg`<g id=${`geometry-frame-${index}`} data-bikebook--geometry-overlay-target="frame" data-vehicle=${value} color=${series.color}
+    data-action="click->bikebook--geometry-overlay#pick" cursor="pointer"
     opacity=${chosen >= 0 && chosen !== index ? 0.2 : nothing}><title>${label}</title>${side
-    ? side.shapes(chosen === index)
+    ? side.shapes.map(renderShape)
     : [[rearAxle, rearRadius], [frontAxle, frontRadius]].map(([center, radius]) => renderShape({ kind: 'circle', center, radius, weight: 'part' }))}</g>`
 
 // A [bsd, tire] wheel against the first's: the same size on a tire more than TIRE_GAP mm wider or narrower, or 700c
@@ -48,7 +50,7 @@ const diameterNotes = (presenter, compared) => {
     const title = html`<em>${vehicle.title}</em>'s`
     const described = (position) => {
       const [bsd, tire] = wheel(vehicle, position)
-      return [presenter.vocabulary.wheel_sizes[bsd]?.name ?? `${bsd} mm BSD`, mm(tire), mm(2 * outerRadius(vehicle.builtWheels[position]))]
+      return [wheelName(presenter, bsd), mm(tire), mm(2 * outerRadius(vehicle.builtWheels[position]))]
     }
     if (positions.length === 2 && equal(wheel(vehicle, 'front'), wheel(vehicle, 'rear'))) {
       const [size, tire, diameter] = described('front')
@@ -141,7 +143,8 @@ const drawing = (presenter, drawn, labelled, selected) => {
   return html`<svg
     role="img" aria-label=${`Frames on the same ground, their rear wheels lined up: ${drawn.map(({ label }) => label).join('; ')}`}
     viewBox=${[left, -top, right - left, top + PADDING].map(Math.round).join(' ')} class="tw:h-auto tw:w-full">${drawn.map((each, index) =>
-    frame(each, index, chosen))}<use data-bikebook--geometry-overlay-target="top" href=${chosen < 0 ? nothing : `#geometry-frame-${chosen}`}></use></svg><ul
+    frame(each, index, chosen))}<use data-bikebook--geometry-overlay-target="top" data-action="click->bikebook--geometry-overlay#pick" cursor="pointer"
+    href=${chosen < 0 ? nothing : `#geometry-frame-${chosen}`}></use></svg><ul
     class="tw:flex tw:flex-wrap tw:gap-2">${drawn.map(({ series, title, size, value }, index) =>
       html`<li><button type="button" class=${buttonClasses({ size: 'sm' })} aria-pressed=${String(index === chosen)} data-vehicle=${value}
         data-bikebook--geometry-overlay-target="button" data-action="bikebook--geometry-overlay#toggle"><svg aria-hidden="true" class="tw:shrink-0" width="24" height="8"><line stroke=${series.color}
@@ -151,7 +154,7 @@ const drawing = (presenter, drawn, labelled, selected) => {
       : nothing}${noted.length
       ? html`<ul class="tw:list-disc tw:space-y-1 tw:pl-5 tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">${noted.map(({ title, geometry }) =>
         html`<li><em>${title}</em>'s ${join([clause(geometry.calculated, 'calculated from its other measures'),
-          clause(geometry.assumed, `estimated based on a typical ${geometry.typicalKind}`),
+          clause(geometry.assumed, `estimated from typical values on ${geometry.typicalKind}s`),
           geometry.typicalWheel && tires(geometry.typicalWheel)].filter(Boolean), '. Its ')}.</li>`)}</ul>`
       : nothing}`
 }
