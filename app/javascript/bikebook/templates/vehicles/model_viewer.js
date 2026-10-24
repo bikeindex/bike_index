@@ -783,15 +783,27 @@ class ModelViewer {
     return this.keepTogether(join([tireInches(presenter, tireWidth), suffix]), tooltip({ text: `${tireWidth} mm` }))
   }
 
-  // "700 C × 40 mm", or "700 C × 40 mm front, 650 B × 47 mm rear"
+  // "700 C × 40 mm", or "700 C × 40 mm front, 650 B × 47 mm rear", over the widest tire they take
   wheelSizes () {
     const [front, rear] = ['front', 'rear'].map((position) => new Map(this.builtWheels()
       .filter((wheel) => wheel.bsd && array(wheel.position).includes(position)).map((wheel) => [`${wheel.bsd}/${wheel.tire_width}`, wheel])))
     const names = (wheels) => join([...wheels.values()].map((wheel) =>
       join(compact([this.wheelSizeName(wheel.bsd), wheel.tire_width != null ? this.tireWidthSummary(wheel.tire_width, '') : null]), ' × ')), ' / ')
-    return equal([...front.keys()], [...rear.keys()])
+    const sizes = equal([...front.keys()], [...rear.keys()])
       ? (front.size ? names(front) : null)
       : join(compact([front.size ? join([names(front), ' front']) : null, rear.size ? join([names(rear), ' rear']) : null]), ', ')
+    const tireMax = this.tireMax()
+    return tireMax ? join(compact([sizes, tireMax]), html`<br>`) : sizes
+  }
+
+  // "2.4 in tire max", or "2.4 in front, 2.6 in rear tire max"
+  tireMax () {
+    const [front, rear] = ['front', 'rear'].map((position) =>
+      highest(this.builtWheels().filter((wheel) => array(wheel.position).includes(position)).map((wheel) => wheel.max_tire_width)))
+    if (front === rear) return front == null ? null : this.tireWidthSummary(front, 'tire max')
+
+    const widths = compact([front != null ? join([this.tireWidthSummary(front, ''), ' front']) : null, rear != null ? join([this.tireWidthSummary(rear, ''), ' rear']) : null])
+    return join([join(widths, ', '), ' tire max'])
   }
 
   wheelSizeName (bsd) {
