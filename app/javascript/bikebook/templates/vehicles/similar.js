@@ -71,12 +71,12 @@ const controls = (listed, { weights, sameManufacturer, otherPropulsion, sameConf
   data-ui--collapse-target="content" class="tw:hidden tw:w-full"><div class="twwiderow">${card({
     fullBleed: true,
     additionalClasses: 'tw:col-span-full tw:mt-3 tw:space-y-4',
-    content: html`<div class="tw:text-right">${toggle}</div><fieldset>${legend('Strategy')}<div class="tw:mt-1">${radioButtonGroup({
+    content: html`<div class="tw:text-right">${toggle}</div><fieldset aria-label="Strategy">${radioButtonGroup({
     name: 'strategy',
     selected: preset,
     entries: [...Object.entries(PRESETS).map(([value, { label }]) => ({ value, label })), { value: 'custom', label: 'Custom', disabled: preset !== 'custom' }],
     attributes: { 'data-bikebook--similar-target': 'strategy', 'data-action': 'bikebook--similar#strategy:stop' }
-  })}</div></fieldset><fieldset>${legend('Weightings')}<div class="tw:mt-1 tw:grid tw:gap-x-6 tw:gap-y-5 tw:sm:grid-cols-2
+  })}</fieldset><fieldset>${legend('Weightings')}<div class="tw:mt-1 tw:grid tw:gap-x-6 tw:gap-y-5 tw:sm:grid-cols-2
   tw:lg:grid-cols-3">${Object.keys(GROUPS).map((group) => {
     const scored = listed.includes(group)
     // an unlisted group's slider a bare track in a slider's box, showing no weight, which stays the URL's or a strategy's
