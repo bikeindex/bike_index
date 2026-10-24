@@ -4143,6 +4143,9 @@ es:
     strava_search_index: Vincula tu equipo de Strava con tus registros de Bike Index.
       Busca, filtra y actualiza tus actividades en lote para asignar equipo a las
       rutas que no lo tengan.
+    marketplace_how_it_works: Cómo funciona la compraventa en el mercado de Bike Index,
+      donde todas las bicicletas están registradas y no se pueden publicar las que
+      han sido reportadas como robadas.
   meta_titles:
     bikes_index: Resultados de la búsqueda
     bikes_new: "¡Inscribe una bicicleta!"
@@ -4195,6 +4198,7 @@ es:
     search_marketplace_index: Mercado de índices de bicicletas
     strava_search_index: Índice de bicicletas Búsqueda en Strava
     registration_form_settings: Configuración del formulario de registro
+    marketplace_how_it_works: Cómo funciona el mercado de Bike Index
   money:
     currencies:
       en: Dólar estadounidense
@@ -6292,6 +6296,21 @@ es:
         result_view_select:
           cards_view: Ver como tarjetas
           list_view: Ver como lista
+        marketplace_intro:
+          bike_index_members: Miembros de Bike Index
+          checked_for_theft: Revisado por robo
+          description: Bike Index es una organización sin fines de lucro que ayuda
+            a recuperar bicicletas robadas. En nuestra plataforma solo se muestran
+            bicicletas registradas, para que puedas comprar bicicletas usadas con
+            la seguridad de que no han sido reportadas como robadas.
+          heading: Mercado de bicicletas usadas del registro de bicicletas.
+          hide_intro: Ocultar introducción
+          how_buying_works: Cómo funciona la compra
+          how_selling_works: Cómo funciona la venta
+          marketplace_title: Mercado de índices de bicicletas
+          ownership_transfers: Transferencias de propiedad
+          registered_bikes_only: Solo bicicletas matriculadas
+          what_makes_this_different: "¿Qué hace que esto sea diferente?"
       sessions:
         sign_in_interstitial:
           click_button_to_continue: Haz clic en el botón de abajo para continuar.
@@ -7977,6 +7996,105 @@ es:
           start_over: Volver a empezar
           tabs_label: Organizaciones de ejemplo
           viewing_as: Considerando como
+      marketplace:
+        how_it_works:
+          across_town_heading: Al otro lado de la ciudad o al otro lado del país.
+          across_town_intro: Cada venta se realiza entre particulares. Bike Index
+            no gestiona los pagos ni los envíos, por lo que comprador y vendedor acuerdan
+            directamente el precio, el pago y la entrega.
+          back_to_marketplace: Volver al mercado
+          bike_index_members: Miembros de Bike Index
+          bike_index_members_body: Los vendedores que apoyan a Bike Index mediante
+            una membresía muestran una insignia de miembro de Bike Index en sus anuncios.
+          browse_bikes: Explorar bicicletas
+          buying_a_bike: Comprar una bicicleta
+          checked_for_theft: Revisado por robo
+          checked_for_theft_body: Una bicicleta reportada como robada en Bike Index
+            no puede aparecer en la lista.
+          contact_the_seller: Contacta con el vendedor
+          contact_the_seller_member_badge_body: Haz preguntas y coordina una hora
+            para ver la bicicleta. Busca la insignia de miembro de Bike Index.
+          find_a_bike: Encuentra una bicicleta
+          find_a_bike_body: Busca en las descripciones de los anuncios, elige un tipo
+            de actividad principal y establece un rango de precios. Selecciona "En
+            venta en la zona de búsqueda" para ver bicicletas cerca de ti, o "En venta
+            en cualquier lugar" para verlas todas.
+          hand_off_or_ship: Entregar o enviar
+          hand_off_or_ship_body: Reúnete con los compradores locales en algún lugar
+            público. Para compradores de fuera de la ciudad, utiliza un servicio de
+            envío de bicicletas como BikeFlights.
+          heading: Cómo funciona el mercado de Bike Index
+          intro: Queremos que este sea el lugar más fácil y confiable para comprar
+            y vender bicicletas usadas. Todas las bicicletas anunciadas están registradas
+            en Bike Index, y las ventas se realizan directamente entre usted y el
+            otro ciclista.
+          local_pickup: Recogida local
+          local_pickup_body: Reúnete en persona, prueba la moto y verifica el número
+            de serie antes de pagar. El vendedor te transfiere la matrícula en el
+            acto.
+          mark_it_for_sale: Marcarlo para la venta
+          mark_it_for_sale_body: Desde la página de tu moto, añade el precio, fotos
+            y su estado. Las especificaciones provienen de tu registro.
+          ownership_transfers: Transferencias de propiedad
+          ownership_transfers_body: Una vez realizada la venta, el vendedor transfiere
+            la titularidad del vehículo al comprador. El nuevo propietario figura
+            en los registros desde el primer día.
+          pay_and_take_ownership: Paga y toma posesión
+          pay_and_take_ownership_body: Usted paga directamente al vendedor. Ellos
+            le transfieren el registro de Bike Index.
+          pro_tip: "¡CONSEJO PROFESIONAL!"
+          pro_tip_heading: Algunos hábitos contribuyen a que las ventas entre particulares
+            sean seguras.
+          ready_heading: "¿Listo para encontrar tu próxima bicicleta?"
+          register_your_bike: Registra tu bicicleta
+          register_your_bike_body: "¿Ya te registraste? Puedes saltarte esta parte.
+            Si no, solo te llevará dos minutos y es gratis para siempre."
+          registered_bikes_only: Solo bicicletas matriculadas
+          registered_bikes_only_body: Solo puedes publicar anuncios de bicicletas
+            que estén registradas en Bike Index, por lo que cada anuncio está vinculado
+            a un número de registro y de serie reales.
+          see_it_or_ship_it: Véalo o envíelo
+          see_it_or_ship_it_body: "¿Vives en la zona? Pruébala y comprueba que el
+            número de serie del cuadro coincide con el del anuncio. ¿Vives fuera de
+            la ciudad? Acuerda el envío con el vendedor y pídele una foto del número
+            de serie."
+          sell_your_bike: Vende tu bicicleta
+          selling_a_bike: Vendo una bicicleta
+          shipping: Envío a un comprador de fuera de la ciudad.
+          shipping_body: No hay problema en realizar el envío. Los vendedores pueden
+            usar un servicio de envío de bicicletas como BikeFlights. Acuerden de
+            antemano quién paga el envío y el embalaje, compartan el número de seguimiento
+            y transfieran la matrícula una vez que el comprador tenga la bicicleta.
+          tip_be_wary: Desconfía de cualquiera que te presione para que actúes con
+            rapidez o te pida que pagues de maneras inusuales.
+          tip_check_serial: Antes de pagar, compruebe que el número de serie del marco
+            coincide con el de la descripción.
+          tip_public_place: "¿Van a reunirse cerca de casa? Elijan un lugar público
+            concurrido durante el día."
+          tip_registration_transferred: Asegúrese de que el registro se transfiera
+            a su nombre una vez realizada la venta.
+          tip_shipping: "¿Envío? Solicite fotos adicionales, incluyendo el número
+            de serie, y utilice un método de pago con protección al comprador."
+          transfer_ownership: Transferencia de propiedad
+          transfer_ownership_body: Una vez recibido el pago, transfiere la bicicleta
+            al correo electrónico del comprador en Bike Index.
+          trust_not_guarantee: Una señal de confianza, no una garantía.
+          trust_not_guarantee_body: Todas las motos aquí están registradas, y una
+            moto reportada como robada no puede aparecer en la lista, lo cual dice
+            mucho sobre la moto. Esto no garantiza la honestidad de quien la compra
+            o la vende. Haz preguntas, guarda tus mensajes y confía en tu intuición.
+          what_we_check: Lo que comprobamos
+          why_a_marketplace: "¿Por qué un mercado?"
+          why_heading: Comprar una bicicleta usada no debería significar arriesgarse
+            a comprar una robada.
+          why_registry: Bike Index es un registro de bicicletas gratuito y sin ánimo
+            de lucro. Durante años, hemos ayudado a los ciclistas a registrar sus
+            bicicletas y a recuperarlas cuando se las roban.
+          why_we_know: La mayoría de los sitios web de venta de bicicletas usadas
+            desconocen la historia de las bicicletas que publican. Nosotros sí. Dado
+            que todas las bicicletas que aparecen en nuestro sitio están registradas,
+            no podemos publicar aquellas que han sido reportadas como robadas, y el
+            registro acompaña a la bicicleta hasta su nuevo propietario.
     shared_blocks:
       footer:
         about: Acerca
