@@ -138,6 +138,8 @@ export const scorer = (models, { format, fields }, activities) => {
     frame_material: fields.frame_material ?? models.map(() => null)
   }
   const indexes = new Map(models.map((model, index) => [model.id, index]))
+  // by its maker, as makers share names, and its first word where it has no group
+  const modelGroups = models.map((model) => `${model.manufacturer}/${model.model_group ?? model.model.split(' ')[0]}`)
 
   // each numeric field's interquartile range in a family, or in the catalog where the family has too few values
   const scales = new Map()
@@ -182,7 +184,7 @@ export const scorer = (models, { format, fields }, activities) => {
 
     const scored = []
     models.forEach((candidate, index) => {
-      if (index === target || candidate.model_group === model.model_group || (candidate.electric === model.electric) === otherPropulsion ||
+      if (index === target || modelGroups[index] === modelGroups[target] || (candidate.electric === model.electric) === otherPropulsion ||
         (!differentTypes && candidate.vehicle_type !== model.vehicle_type) ||
         (sameConfiguration && (candidate.model_configuration === 'complete') !== (model.model_configuration === 'complete')) ||
         (sameWheels && ['front_bsd', 'rear_bsd'].some((field) => columns[field][target] != null && columns[field][index] !== columns[field][target])) ||
@@ -198,11 +200,11 @@ export const scorer = (models, { format, fields }, activities) => {
         total += weight * KINDS[kind](columns[field][target], value, scale)
       }
       const score = (total + (available - shared) * UNLISTED) / available
-      if (shared >= MIN_SHARED * available && score < MAX_SCORE) scored.push({ model: candidate, score })
+      if (shared >= MIN_SHARED * available && score < MAX_SCORE) scored.push({ index, score })
     })
     const grouped = new Set()
-    const closest = scored.sort((a, b) => a.score - b.score).map(({ model }) => model)
-      .filter(({ model_group: group }) => !grouped.has(group) && grouped.add(group))
-    return { groups, models: closest.slice(0, COUNT) }
+    const closest = scored.sort((a, b) => a.score - b.score)
+      .filter(({ index }) => !grouped.has(modelGroups[index]) && grouped.add(modelGroups[index]))
+    return { groups, models: closest.slice(0, COUNT).map(({ index }) => models[index]) }
   }
 }

@@ -10,6 +10,9 @@ const UNDER_PRICE_CENTS = 150000
 const MAX_PRICE_CENTS = 1000000
 const AROUND_PRICE_CENTS = [550000, 650000]
 
+// by its maker, as makers share names, and its first word where it has no group, as similarity's is
+const modelGroup = ({ manufacturer, model_group: group, model }) => `${manufacturer}/${group ?? model.split(' ')[0]}`
+
 // A model whose `key` none of the picks share
 const unseen = (key) => (model, { picked }) => !picked.some((each) => key(each) === key(model))
 
@@ -26,7 +29,7 @@ export const requirements = [
 export const preferences = [
   unseen(({ manufacturer }) => manufacturer),
   unseen(({ primary_activity: activity }) => activity),
-  unseen(({ model_group: group }) => group),
+  unseen(modelGroup),
   ({ model_configuration: configuration }) => configuration === 'complete'
 ]
 

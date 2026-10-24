@@ -1849,17 +1849,18 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(page).to have_css("#similar-m-aventon-2024-soltera_2_5").and have_no_css("#similar-m-aventon-2026-soltera_3_adv")
     expect(page).to have_no_current_path(/weights=/)
 
-    # once five are compared, only theirs link
-    visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_rec,m/aventon/2022/level_2,m/aventon/2026/current_adv,m/aventon/2026/current_exp",
-      similar: 1)
+    # once ten are compared, only theirs link
+    nine = %w[2026/level_4_rec 2022/level_2 2026/current_adv 2026/current_exp 2025/level_3 2025/aventure_m 2024/abound_sr
+      2026/level_4_adv 2025/pace_4_step_through].map { "m/aventon/#{it}" }
+    visit bikebook_path(vehicle_models: nine.join(","), similar: 1)
     click_link "Soltera 2.5", wait: 10
-    expect(page).to have_css("[aria-label='Overview comparison'] thead th", count: 6, wait: 10)
-    expect(page).to have_text("Compare up to 5 at once. Remove one to add another.")
+    expect(page).to have_css("[aria-label='Overview comparison'] thead th", count: 11, wait: 10)
+    expect(page).to have_text("Compare up to 10 at once. Remove one to add another.")
     expect(page).to have_css("#similar-m-aventon-2026-pace_5_rec_step_through[aria-disabled='true']:not([href])")
     # an overview photo's × takes its model out of the comparison and the combobox
     within("[aria-label='Overview comparison']") { find("[aria-label='Remove Aventón Soltera 2.5']").click }
     expect(page).to have_css("#similar-m-aventon-2026-pace_5_rec_step_through[href]", wait: 10)
-    expect(page).to have_css(".hw-combobox__chip", count: 4).and have_no_css(".hw-combobox__chip", text: "Soltera 2.5")
+    expect(page).to have_css(".hw-combobox__chip", count: 9).and have_no_css(".hw-combobox__chip", text: "Soltera 2.5")
 
     # a human powered model's matching e-vehicles, and neither for a type that's always electric
     visit bikebook_path(vehicle_models: "m/specialized/2027/crux_5_s_level_sram_red_xplr", similar: 1, adjust: 1)
