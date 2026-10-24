@@ -39,7 +39,6 @@ const KINDS = {
 // are compared by their logs, so twice the price is as far at any price
 export const GROUPS = {
   handlebar: { label: 'Handlebar type', fields: { handlebar_type: 'same' } },
-  activity: { label: 'Primary activity', fields: { primary_activity: 'same' } },
   geometry: { label: 'Geometry', fields: { head_angle: 'numeric', seat_angle: 'numeric', stack_reach: 'numeric', bb_drop: 'numeric', chainstay_gap: 'numeric' } },
   wheels: { label: 'Wheel size & tire clearance', same: 'wheels & tires', fields: { front_bsd: 'numeric', rear_bsd: 'numeric', tire_clearance: 'numeric' } },
   suspension: { label: 'Suspension', same: 'suspension travel', fields: { travel_front: 'numeric', travel_rear: 'numeric', suspension: 'same' } },
@@ -49,11 +48,12 @@ export const GROUPS = {
   material: { label: 'Frame material', fields: { frame_material: 'same' } },
   weight: { label: 'Weight', fields: { total_weight: 'numeric' } },
   mounts: { label: 'Mounts', fields: { mounts: 'overlap', bottle_mounts: 'numeric' } },
-  price: { label: 'Price', fields: { price: 'numeric' } }
+  price: { label: 'Price', fields: { price: 'numeric' } },
+  activity: { label: 'Primary activity', fields: { primary_activity: 'same' } }
 }
 
 // price low by default, as a tiebreaker, and weight, as much of it is what the others weigh already
-const GENERAL = { handlebar: 5, activity: 1, geometry: 4, wheels: 3, suspension: 3, ebike: 3, groupset: 2, year: 2, material: 2, weight: 1, mounts: 1, price: 1 }
+const GENERAL = { handlebar: 5, geometry: 4, wheels: 3, suspension: 3, ebike: 3, groupset: 2, year: 2, material: 2, weight: 1, mounts: 1, price: 1, activity: 1 }
 export const PRESETS = {
   general: { label: 'General', weights: GENERAL }
 }
