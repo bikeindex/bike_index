@@ -1,0 +1,198 @@
+<div
+  class="
+    tw:group tw:flex tw:flex-col tw:gap-6 tw:rounded-lg tw:border
+    tw:border-gray-200 tw:bg-white tw:px-4 tw:py-6 tw:sm:gap-8 tw:sm:px-8
+    tw:sm:py-7 tw:lg:flex-row
+  "
+  data-controller="register--landing-donation"
+  data-register--landing-donation-custom-label-value="<%= translation(".donate", amount: "$%{amount}") %>"
+  data-register--landing-donation-donate-label-value="<%= translation(".donate_short") %>"
+>
+  <div class="tw:flex tw:items-start tw:gap-4 tw:sm:gap-5 tw:lg:flex-1">
+    <%= image_tag("kelsey/illustrations/comic-assets_bike-love-1.png", alt: "",
+      class: "tw:w-14 tw:shrink-0 tw:sm:w-22", loading: "lazy") %>
+
+    <div>
+      <div
+        class="
+          tw:text-xs tw:font-extrabold tw:tracking-widest tw:text-purple-500
+          tw:uppercase
+        "
+      >
+        <%= translation(".keep_it_free") %>
+      </div>
+
+      <h2
+        class="
+          tw:m-0 tw:mt-1 tw:font-header tw:text-xl tw:leading-tight
+          tw:font-extrabold tw:text-slate-900 tw:sm:text-2xl
+        "
+      >
+        <%= translation(".a_million_bikes") %>
+      </h2>
+
+      <p class="tw:m-0 tw:mt-2 tw:text-[14.5px]">
+        <%= translation(".donations_keep_it_free") %>
+      </p>
+    </div>
+  </div>
+
+  <div class="tw:flex tw:min-w-0 tw:flex-col tw:gap-3.5 tw:lg:flex-2">
+    <div
+      class="
+        tw:flex tw:flex-wrap tw:items-end tw:justify-between tw:gap-3
+        tw:border-b tw:border-gray-200
+      "
+    >
+      <h3
+        class="
+          tw:m-0 tw:pb-2 tw:font-header tw:text-xl tw:font-extrabold
+          tw:text-slate-900
+        "
+      >
+        <%= translation(".fund_the_next_recovery") %>
+      </h3>
+
+      <fieldset class="tw:m-0 tw:flex tw:border-0 tw:p-0">
+        <legend class="tw:sr-only"><%= translation(".how_often") %></legend>
+
+        <label class="<%= cadence_classes %>">
+          <input
+            type="radio"
+            name="landing_donation_cadence"
+            value="monthly"
+            class="tw:sr-only"
+            checked
+            autocomplete="off"
+          >
+
+          <%= translation(".monthly") %>
+        </label>
+
+        <label class="<%= cadence_classes %>">
+          <input
+            type="radio"
+            name="landing_donation_cadence"
+            value="one_time"
+            class="tw:sr-only"
+            autocomplete="off"
+            data-one-time
+          >
+
+          <%= translation(".one_time") %>
+        </label>
+      </fieldset>
+    </div>
+
+    <%= form_tag(new_membership_path, method: :get, enforce_utf8: false,
+      class: "tw:m-0 tw:flex tw:flex-col tw:gap-3.5 tw:group-has-[[data-one-time]:checked]:hidden") do %>
+      <fieldset class="tw:m-0 tw:grid tw:gap-2.5 tw:border-0 tw:p-0 tw:sm:grid-cols-3">
+        <legend class="tw:sr-only"><%= translation(".monthly") %></legend>
+
+        <% membership_tiles.each do |tile| %>
+          <label class="<%= tile_classes %>">
+            <span class="tw:flex tw:flex-wrap tw:items-baseline tw:gap-x-3 tw:sm:block">
+              <span
+                class="
+                  tw:block tw:font-header tw:text-[22px] tw:font-extrabold
+                  tw:text-slate-900
+                "
+              >
+                <%= tile[:amount] %>
+              </span>
+
+              <span class="tw:block tw:text-[13px] tw:font-bold tw:text-gray-700">
+                <%= tile[:name] %>
+              </span>
+            </span>
+
+            <%= radio_button_tag("membership_level", tile[:value], tile[:checked], id: nil, autocomplete: "off",
+              class: RADIO_CLASSES, data: {label: tile[:label], action: "register--landing-donation#update"}) %>
+          </label>
+        <% end %>
+      </fieldset>
+
+      <div class="<%= CTA_ROW_CLASSES %>">
+        <%= render(UI::Button::Component.new(text: translation(".become_a_member_short"), type: "submit",
+          color: :primary, size: :callout, html_class: CTA_CLASSES,
+          data: {"register--landing-donation-target": "monthlyCta"})) %>
+
+        <p class="<%= FINE_PRINT_CLASSES %>">
+          <%= translation(".tax_deductible_us") %>
+          <%= translation(".cancel_any_time") %>
+          <%= link_to(translation(".what_membership_includes"), membership_path, class: "twlink tw:font-bold") %>
+        </p>
+      </div>
+    <% end %>
+
+    <%# The custom amount has no name: the controller submits it in the tiles' place %>
+    <%= form_tag(donate_path, method: :get, enforce_utf8: false,
+      class: "tw:m-0 tw:hidden tw:flex-col tw:gap-3.5 tw:group-has-[[data-one-time]:checked]:flex",
+      data: {action: "formdata->register--landing-donation#formdata"}) do %>
+      <fieldset
+        class="
+          tw:m-0 tw:grid tw:grid-cols-2 tw:gap-2.5 tw:border-0 tw:p-0
+          tw:sm:grid-cols-4
+        "
+      >
+        <legend class="tw:sr-only"><%= translation(".one_time") %></legend>
+
+        <% one_time_tiles.each do |tile| %>
+          <label class="<%= tile_classes %>">
+            <span
+              class="
+                tw:font-header tw:text-[22px] tw:font-extrabold
+                tw:text-slate-900
+              "
+            >
+              <%= tile[:amount] %>
+            </span>
+
+            <%= radio_button_tag("initial_amount", tile[:value], tile[:checked], id: nil, autocomplete: "off",
+              class: RADIO_CLASSES, data: {label: tile[:label], action: "register--landing-donation#select"}) %>
+          </label>
+        <% end %>
+
+        <%# Hidden until the controller connects, since nothing submits it without one %>
+        <label
+          class="
+            tw:mb-0 tw:hidden tw:min-w-0 tw:items-center tw:gap-1
+            tw:rounded-lg tw:border tw:border-gray-200 tw:bg-white tw:px-4
+            tw:font-normal tw:focus-within:border-blue-600
+            tw:focus-within:ring-1 tw:focus-within:ring-blue-600
+            tw:has-invalid:border-red-500
+          "
+          data-register--landing-donation-target="customField"
+        >
+          <span class="tw:font-semibold tw:text-gray-700">$</span>
+          <span class="tw:sr-only"><%= translation(".other_amount") %></span>
+
+          <input
+            type="number"
+            min="1"
+            step="1"
+            inputmode="numeric"
+            autocomplete="off"
+            placeholder="<%= translation(".other") %>"
+            class="
+              tw:w-full tw:min-w-0 tw:border-0 tw:bg-transparent tw:py-3
+              tw:outline-none tw:sm:py-4
+            "
+            data-register--landing-donation-target="custom"
+            data-action="input->register--landing-donation#customize"
+          >
+        </label>
+      </fieldset>
+
+      <div class="<%= CTA_ROW_CLASSES %>">
+        <%= render(UI::Button::Component.new(text: translation(".donate_short"), type: "submit",
+          color: :primary, size: :callout, html_class: CTA_CLASSES,
+          data: {"register--landing-donation-target": "oneTimeCta"})) %>
+
+        <p class="<%= FINE_PRINT_CLASSES %>">
+          <%= translation(".tax_deductible_us") %>
+        </p>
+      </div>
+    <% end %>
+  </div>
+</div>
