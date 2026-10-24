@@ -1,5 +1,6 @@
 import { html, nothing } from 'lit-html'
 import { buttonClasses } from 'bikebook/templates/ui/button'
+import { card } from 'bikebook/templates/ui/card'
 import { collapse } from 'bikebook/templates/ui/collapse'
 import { iconChevron } from 'bikebook/templates/ui/icon_chevron'
 import { checkbox } from 'bikebook/templates/ui/forms/checkbox'
@@ -66,7 +67,10 @@ const controls = (listed, { weights, sameManufacturer, otherPropulsion }, type, 
   const toggle = collapse({ content: 'Adjust comparison algorithm', chevron: true, color: 'link', size: 'sm', htmlClass: 'tw:text-sm' })
   return html`<div class="tw:hidden tw:similar-open:contents" data-controller="ui--collapse"
   data-ui--collapse-param-value="adjust"><div class="tw:ml-auto tw:has-[[aria-expanded=true]]:hidden">${toggle}</div><div
-  data-ui--collapse-target="content" class="tw:hidden tw:w-full"><div class="tw:mt-3 tw:space-y-4 tw:rounded-lg tw:border tw:border-gray-200 tw:p-4 tw:dark:border-gray-700"><div class="tw:text-right">${toggle}</div><fieldset>${legend('Strategy')}<div class="tw:mt-1">${radioButtonGroup({
+  data-ui--collapse-target="content" class="tw:hidden tw:w-full"><div class="twwiderow">${card({
+    fullBleed: true,
+    additionalClasses: 'tw:col-span-full tw:mt-3 tw:space-y-4',
+    content: html`<div class="tw:text-right">${toggle}</div><fieldset>${legend('Strategy')}<div class="tw:mt-1">${radioButtonGroup({
     name: 'strategy',
     selected: preset,
     entries: [...Object.entries(PRESETS).map(([value, { label }]) => ({ value, label })), { value: 'custom', label: 'Custom', disabled: preset !== 'custom' }],
@@ -89,7 +93,8 @@ const controls = (listed, { weights, sameManufacturer, otherPropulsion }, type, 
     })}</div>`
   })}</div></fieldset><fieldset>${legend('Other settings')}<div class="tw:mt-1 tw:space-y-1">${
     setting('same_manufacturer', `Include ${type}s from the same manufacturer`, sameManufacturer, 'sameManufacturer')}${
-    propulsion ? setting('other_propulsion', propulsion, otherPropulsion, 'otherPropulsion') : nothing}</div></fieldset></div></div></div>`
+    propulsion ? setting('other_propulsion', propulsion, otherPropulsion, 'otherPropulsion') : nothing}</div></fieldset>`
+  })}</div></div></div>`
 }
 
 const setting = (name, label, checked, target) => checkbox({

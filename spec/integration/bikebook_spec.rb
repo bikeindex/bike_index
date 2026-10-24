@@ -1370,6 +1370,8 @@ RSpec.describe "BikeBook", :js, type: :system do
         "bikebook/templates/ui/tooltip#tooltip", "{ body: html`<em>Internal</em> routing` }")
 
       expect_template(UI::Badge::Component.new(text: "Bike"), "bikebook/templates/ui/badge#badge", "{ text: 'Bike' }")
+      expect_template(UI::Card::Component.new(full_bleed: true, additional_classes: "tw:mt-3").with_content("Weightings"),
+        "bikebook/templates/ui/card#card", "{ content: 'Weightings', fullBleed: true, additionalClasses: 'tw:mt-3' }")
 
       expect_template(UI::Forms::Checkbox::Component.new(name: "same_manufacturer", label: "Include", checked: true, class_name: "tw:mb-0",
         html_options: {id: "similar-same_manufacturer", data: {action: "x"}}), "bikebook/templates/ui/forms/checkbox#checkbox",
@@ -1707,6 +1709,12 @@ RSpec.describe "BikeBook", :js, type: :system do
     JS
     expect(boxes.uniq.count).to eq 1
     expect(page).to have_css("div:has(> fieldset) > div > [role='button']:focus", text: "Adjust comparison algorithm")
+    # out to the page's gutter on a phone, as More filters' card is
+    size = page.current_window.size
+    page.current_window.resize_to(390, 844)
+    adjust_card = "getComputedStyle(document.querySelector(\"[aria-label='Similar models'] div:has(> fieldset)\"))"
+    expect(page.evaluate_script("[#{adjust_card}.borderLeftWidth, #{adjust_card}.paddingLeft]")).to eq %w[0px 0px]
+    page.current_window.resize_to(*size)
     check "Include bikes from the same manufacturer"
     expect(page).to have_current_path(/[?&]same_manufacturer=1\b/)
     # and the other propulsion's, an e-bike's human powered ones
