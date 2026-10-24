@@ -8,9 +8,10 @@
 # disk (ingress is free). The one-time assets block seeds style, glyphs and
 # sprites; comment it out after the first run.
 #
-# Run it from the Actions tab - no input needed, it resolves and streams the
-# latest Protomaps planet build automatically. Refresh the tiles quarterly; the last
-# step purges the Cloudflare cache for you.
+# Runs every other month, or from the Actions tab - no input needed, it resolves and
+# streams the latest Protomaps planet build automatically. That leaves a month inside
+# the quarter spec/config/map_tiles_spec.rb allows to rerun a failed one by hand. The
+# last step purges the Cloudflare cache for you.
 #
 # No outage during this ~hour stream: R2 swaps the object only at multipart
 # completion, so reads keep getting the old archive (first-ever seed aside).
@@ -20,7 +21,8 @@
 # R2_MAPS_ACCESS_KEY_SECRET - the token must be scoped to ONLY the bikeindex-maps
 # bucket (Object Read & Write). Plus CLOUDFLARE_ZONE_ID and CLOUDFLARE_PURGE_TOKEN
 # (a token scoped to Cache Purge on the bikeindex.org zone) for the final purge.
-# Add required reviewers to the environment to gate who can run it.
+# Add required reviewers to the environment to gate who can run it - a scheduled
+# run waits for their approval too.
 #
 # One-time R2 + Cloudflare setup, before the first run:
 #   Bucket:      bikeindex-maps  (SEPARATE from the uploads bucket - this one is public)
@@ -38,6 +40,11 @@ name: Upload basemap
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "17 9 1 2-12/2 *"
+
+concurrency:
+  group: upload-basemap
 
 jobs:
   upload:
