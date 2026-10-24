@@ -35,9 +35,9 @@ module Admin
       daily = Counts.logged_searches(@time_range.first.to_date..@time_range.last.to_date)
         .transform_keys { it.strftime(helpers.group_by_format(@time_range, :group_by_day)) }
       chart_data = if params[:search_endpoint] == "not_web_bikebook"
-        [{name: "Serial", data: daily.transform_values { it["not_web_bikebook_serial"] }},
-          {name: "Marketplace", data: daily.transform_values { it["web_marketplace_no_serial"] }},
-          {name: "Other", data: daily.transform_values { it["not_web_bikebook"] - it["not_web_bikebook_serial"] - it["web_marketplace_no_serial"] }}]
+        [{name: "General", data: daily.transform_values { it["not_web_bikebook"] - it["not_web_bikebook_serial"] - it["web_marketplace_no_serial"] }},
+          {name: "Serial", data: daily.transform_values { it["not_web_bikebook_serial"] }},
+          {name: "Marketplace", data: daily.transform_values { it["web_marketplace_no_serial"] }}]
       else
         [{name: "BikeBook", data: daily.transform_values { it["web_bikebook"] }},
           {name: "E-bike rules", data: daily.transform_values { it["web_ebike_rules"] }}]

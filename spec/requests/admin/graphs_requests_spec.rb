@@ -133,7 +133,7 @@ RSpec.describe Admin::GraphsController, type: :request do
     let!(:marketplace_searches) { FactoryBot.create_list(:logged_search, 4, endpoint: :web_marketplace, request_at:) }
     let!(:marketplace_serial_search) { FactoryBot.create(:logged_search, endpoint: :web_marketplace, serial_normalized: "XXX", request_at:) }
 
-    it "charts the stored counts: bikebook and ebike rules searches, and the rest split by serial and marketplace" do
+    it "charts the stored counts: bikebook and ebike rules searches, and the rest split into general, serial and marketplace" do
       Counts.assign_logged_searches
       get "#{base_url}/logged_searches", params: {search_endpoint: "web_bikebook", period: "week"}
       expect(response.status).to eq(200)
@@ -141,7 +141,7 @@ RSpec.describe Admin::GraphsController, type: :request do
 
       get "#{base_url}/logged_searches", params: {search_endpoint: "not_web_bikebook", period: "week"}
       expect(response.status).to eq(200)
-      expect(json_result.map { [it["name"], it["data"].sum(&:last)] }).to eq([["Serial", 2], ["Marketplace", 4], ["Other", 2]])
+      expect(json_result.map { [it["name"], it["data"].sum(&:last)] }).to eq([["General", 2], ["Serial", 2], ["Marketplace", 4]])
     end
   end
 
