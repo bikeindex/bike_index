@@ -5,6 +5,7 @@ import { collapse } from 'bikebook/templates/ui/collapse'
 import { copyButton } from 'bikebook/templates/ui/copy_button'
 import { table } from 'bikebook/templates/ui/table'
 import { PINNED_ROW_HEADER } from 'bikebook/templates/vehicles/comparison_table'
+import { marketNote } from 'bikebook/templates/vehicles/market_note'
 import { removeLink } from 'bikebook/templates/vehicles/remove_link'
 import { basicsOf, simpleFormat } from 'bikebook/templates/vehicles/model_viewer'
 import { array, isNumber, join, present } from 'bikebook/templates/values'
@@ -74,7 +75,7 @@ const viewGroup = (groupPath, value, shownGroup) => html`<a href=${groupPath(val
 // The models' names, photos and headline fields side by side in a table, one model's as two's, each photo with an ×
 // to the page without it at `removePath`, each column's last cell with its `bottoms` classes and the table's section with
 // its `sectionClasses`
-export const basics = ({ presenter, vehicles, outOfClassId, removePath, groupPath, shownGroup, bottoms = [], sectionClasses = '' }) => {
+export const basics = ({ presenter, vehicles, market, outOfClassId, removePath, groupPath, shownGroup, bottoms = [], sectionClasses = '' }) => {
   const shown = vehicles.map(({ data, value, outsideMarket }, index) => {
     const price = priced(data)
     const fields = basicsOf({ presenter, data, outOfClassId })
@@ -85,6 +86,7 @@ export const basics = ({ presenter, vehicles, outOfClassId, removePath, groupPat
       model_group: fields.model_group && join([fields.model_group, viewGroup(groupPath, value, shownGroup)], ' '),
       markets: array(data.markets).map((code) => presenter.vocabulary.names?.markets?.[code] ?? code).join(', '),
       outside_market: outsideMarket,
+      market_note: marketNote({ markets: array(data.markets), market, names: presenter.vocabulary.names?.markets }),
       years: join([fields.years, manufacturerPage(data)].filter(present), ' '),
       price: price && amountDisplay(price.original_msrp, price.original_msrp_currency, presenter.vocabulary.currencies),
       description: fields.description && readMore(data.description, fields.description)
@@ -108,7 +110,7 @@ const compared = (vehicles, fields, bottoms, sectionClasses) => html`<section ar
         href: vehicle.removeHref,
         corner: true
       })}${manufacturerLine(vehicle.manufacturer)}<span class="tw:inline-flex tw:items-baseline tw:gap-1">${
-        vehicle.model}${copyButton({ value: vehicle.value, label: 'Copy ID', tooltip: true })}</span>`,
+        vehicle.model}${vehicle.market_note}${copyButton({ value: vehicle.value, label: 'Copy ID', tooltip: true })}</span>`,
       classes: 'tw:px-2.5! tw:py-2! tw:align-top',
       headerClasses: 'tw:relative',
       cellClass: ({ key }) => [key === 'description' && 'tw:text-sm', key === fields.at(-1).key && bottoms[index]].filter(Boolean).join(' '),
