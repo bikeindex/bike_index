@@ -66,6 +66,9 @@ module API
         raise StandardError unless params[:bike].present?
 
         params[:bike][:creation_organization_id] = @organization.id
+        # POS integrations re-send the same sale, so match an existing bike unless explicitly told not to
+        no_duplicate = params[:bike][:no_duplicate]
+        params[:bike][:no_duplicate] = no_duplicate.nil? || Binxtils::InputNormalizer.boolean(no_duplicate)
         @b_param = BParam.create(creator_id: @organization.auto_user.id, params: permitted_b_params, origin: "api_v1")
         bike = BikeServices::Creator.new.create_bike(@b_param)
         if @b_param.errors.blank? && @b_param.bike_errors.blank? && bike.present? && bike.errors.blank?

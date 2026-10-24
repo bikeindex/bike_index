@@ -148,6 +148,31 @@ RSpec.describe API::V1::BikesController, type: :request do
         expect(ActionMailer::Base.deliveries.last.subject).to eq "Confirm your #{organization.name} Bike Index registration"
       end
 
+      context "without no_duplicate" do
+        def post_bike(attrs = {}) = post "/api/v1/bikes", params: bike_hash.merge(bike: bike_hash[:bike].except(:no_duplicate).merge(attrs)).as_json
+
+        it "returns the existing bike for a repeated send, and creates for a different serial or email" do
+          expect { post_bike }.to change(Bike, :count).by(1)
+          expect(response.code).to eq("200")
+          bike = Bike.where(serial_number: "SSOMESERIAL").first
+          expect(json_result.dig("bike", "api_url")).to end_with("/api/v1/bikes/#{bike.id}")
+          first_result = json_result
+
+          expect { post_bike }.to change(Bike, :count).by(0)
+          expect(response.code).to eq("200")
+          expect(json_result).to eq first_result
+          expect(bike.reload.ownerships.count).to eq 1
+
+          expect { post_bike(serial_number: "OTHERSERIAL") }.to change(Bike, :count).by(1)
+          expect { post_bike(owner_email: "other@example.com") }.to change(Bike, :count).by(1)
+        end
+
+        it "creates a duplicate when no_duplicate is false" do
+          expect { 2.times { post_bike(no_duplicate: false) } }.to change(Bike, :count).by(2)
+          expect(response.code).to eq("200")
+        end
+      end
+
       context "new pos_integrator format" do
         # We're switching to use numeric id rather than slug, because the slugs change :(
         it "creates correctly", :flaky do
