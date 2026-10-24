@@ -6861,6 +6861,10 @@ nl:
           market: Markt
           clear_filters: Filters wissen
           loading_placeholder: Laden…
+          any_frame_material: Elk framemateriaal
+          any_handlebar_type: Elk type stuur
+          frame_material: Frame materiaal
+          handlebar_type: Type stuur
         donate_strip:
           donate: Schenken
           pitch: Dit fantastische product wordt u aangeboden door de non-profitorganisatie

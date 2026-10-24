@@ -6971,6 +6971,10 @@ it:
           market: Mercato
           clear_filters: Filtri trasparenti
           loading_placeholder: Caricamento…
+          any_frame_material: Qualsiasi materiale per la struttura
+          any_handlebar_type: Qualsiasi tipo di manubrio
+          frame_material: Materiale del telaio
+          handlebar_type: Tipo di manubrio
         donate_strip:
           donate: Donare
           pitch: Questo fantastico prodotto è offerto dall'organizzazione no-profit
