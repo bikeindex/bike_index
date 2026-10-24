@@ -8,10 +8,10 @@
 # disk (ingress is free). The one-time assets block seeds style, glyphs and
 # sprites; comment it out after the first run.
 #
-# Runs monthly, or from the Actions tab - no input needed, it resolves and streams
-# the latest Protomaps planet build automatically. Monthly leaves two retries inside
-# the quarter spec/config/map_tiles_spec.rb allows. The last step purges the
-# Cloudflare cache for you.
+# Runs every other month, or from the Actions tab - no input needed, it resolves and
+# streams the latest Protomaps planet build automatically. That leaves a month inside
+# the quarter spec/config/map_tiles_spec.rb allows to rerun a failed one by hand. The
+# last step purges the Cloudflare cache for you.
 #
 # No outage during this ~hour stream: R2 swaps the object only at multipart
 # completion, so reads keep getting the old archive (first-ever seed aside).
@@ -41,7 +41,7 @@ name: Upload basemap
 on:
   workflow_dispatch:
   schedule:
-    - cron: "17 9 1 * *"
+    - cron: "17 9 1 */2 *"
 
 concurrency:
   group: upload-basemap
