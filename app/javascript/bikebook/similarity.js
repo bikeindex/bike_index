@@ -39,6 +39,7 @@ const KINDS = {
 // are compared by their logs, so twice the price is as far at any price
 export const GROUPS = {
   handlebar: { label: 'Handlebar type', fields: { handlebar_type: 'same' } },
+  activity: { label: 'Primary activity', fields: { primary_activity: 'same' } },
   geometry: { label: 'Geometry', fields: { head_angle: 'numeric', seat_angle: 'numeric', stack_reach: 'numeric', bb_drop: 'numeric', chainstay_gap: 'numeric' } },
   wheels: { label: 'Wheel size & tire clearance', same: 'wheels & tires', fields: { front_bsd: 'numeric', rear_bsd: 'numeric', tire_clearance: 'numeric' } },
   suspension: { label: 'Suspension', same: 'suspension travel', fields: { travel_front: 'numeric', travel_rear: 'numeric', suspension: 'same' } },
@@ -52,7 +53,7 @@ export const GROUPS = {
 }
 
 // price low by default, as a tiebreaker, and weight, as much of it is what the others weigh already
-const GENERAL = { handlebar: 5, geometry: 4, wheels: 3, suspension: 3, ebike: 3, groupset: 2, year: 2, material: 2, weight: 1, mounts: 1, price: 1 }
+const GENERAL = { handlebar: 5, activity: 1, geometry: 4, wheels: 3, suspension: 3, ebike: 3, groupset: 2, year: 2, material: 2, weight: 1, mounts: 1, price: 1 }
 export const PRESETS = {
   general: { label: 'General', weights: GENERAL }
 }
@@ -124,6 +125,7 @@ export const scorer = (models, { format, fields }, activities) => {
     groupset: fields.groupset_series.map(tier),
     suspension: models.map((model) => model.suspension ?? null),
     handlebar_type: models.map((model) => model.handlebar_type ?? null),
+    primary_activity: models.map((model) => model.primary_activity ?? null),
     // its first, as one still sold isn't as new as it is current
     first_year: models.map(({ first_year: first }) => first ?? null),
     price: models.map((model) => log(model.msrp_cents)),
