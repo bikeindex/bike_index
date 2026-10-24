@@ -126,7 +126,7 @@ module Counts
   # The marketplace's counts lookup accompanies each of its searches, so it isn't one
   def logged_search_kind(endpoint, serial)
     case endpoint&.to_sym
-    when :web_bikebook, :web_ebike_rules, :web_marketplace then endpoint
+    when *LoggedSearch.bikebook_endpoints, :web_marketplace then endpoint
     when :web_marketplace_count then nil
     when *LoggedSearch.organized_endpoints then serial ? "organized_serial" : "organized"
     else serial ? "user_serial" : "user"
