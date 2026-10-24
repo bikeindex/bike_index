@@ -6951,6 +6951,10 @@ es:
           market: Mercado
           clear_filters: Filtros transparentes
           loading_placeholder: Cargando…
+          any_frame_material: Cualquier material de marco
+          any_handlebar_type: Cualquier tipo de manillar
+          frame_material: Material del marco
+          handlebar_type: Tipo de manillar
         donate_strip:
           donate: Donar
           pitch: Este fantástico producto es posible gracias a la organización sin
