@@ -38,7 +38,7 @@ RSpec.describe SharedBlocks::Navbar::PrimaryMenu::Component, type: :component do
     expect(links_named("Search").map { |link| link["data-ui--active-link-match-params-value"] })
       .to eq([nil] * 2)
     expect(links_named("Marketplace").map { |link| link["data-ui--active-link-match-paths-value"] })
-      .to eq(["/search/marketplace"] * 2)
+      .to eq(["/search/marketplace /marketplace/how-it-works"] * 2)
     expect((links_named("Register a new bike") + links_named("Register"))
       .map { |link| link["data-ui--active-link-match-paths-value"] }).to eq(["/register/**"] * 2)
   end
