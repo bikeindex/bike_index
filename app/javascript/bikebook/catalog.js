@@ -26,13 +26,23 @@ export async function loadCatalog (manifestUrl, ids = [], jurisdictions = {}) {
   })
 
   try {
-    const { vocabulary, kit, options } = await call('load', {
-      manifestUrl: new URL(manifestUrl, window.location.href).href, ids, jurisdictions, rulesUrl: import.meta.resolve('bikebook/featured_rules')
+    const { vocabulary, kit, options, comparable } = await call('load', {
+      manifestUrl: new URL(manifestUrl, window.location.href).href,
+      ids,
+      jurisdictions,
+      rulesUrl: import.meta.resolve('bikebook/featured_rules'),
+      similarityUrl: import.meta.resolve('bikebook/similarity')
     })
     return {
       vocabulary,
       kit,
       options,
+      comparable,
+      // null, as for a comparison format it doesn't know, where the comparison doesn't load
+      similar: (model, settings, market) => call('similar', { model, settings, market }).catch((error) => {
+        console.error(error)
+        return null
+      }),
       search: (params, page, perPage) => call('search', { params, page, perPage }),
       featured: (params, legalClasses) => call('featured', { params, legalClasses }),
       vehicles: (ids, { market } = {}) => call('vehicles', { ids, market }),

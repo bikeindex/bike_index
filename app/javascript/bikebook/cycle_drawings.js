@@ -38,6 +38,9 @@ const seatPart = (shape) => ({ ...shape, seat: true })
 const saddle = (top, length = 150, along = [1, 0]) =>
   seatPart(part(plus(top, scale(along, -length * 0.37), scale([-along[1], along[0]], 10)), plus(top, scale(along, length * 0.63))))
 const post = (...points) => seatPart(part(...points))
+// a stem, or what stands in for one, and the bar on it, `cockpit` so the geometry overlay can leave them out where it lists
+// no stem length. Not a bar drawn at a handlebar height, which places it
+const cockpitParts = (...shapes) => shapes.flat().map((shape) => ({ ...shape, cockpit: true }))
 const ghostSaddle = (top, length) => seatPart(ghost(...saddle(top, length).points))
 const handlebar = (center) => ring(center, 14, 'part', true)
 const dropBar = (clamp) => part(clamp, plus(clamp, [70, -10]), plus(clamp, [100, -45]), plus(clamp, [80, -115]), plus(clamp, [30, -125]))
@@ -171,11 +174,11 @@ const bikeShapes = (frame, context, detail) => {
   const riser = atHeight(headTop, steering, fig('handlebar_height'))
   const body = {
     step_through: () => [tube(frontAxle, headBottom, headTop), tube(seatTop, rearAxle, bb, headBottom), tube(...stepTube(frame, fig('standover'))),
-      ...saddled, tube(headTop, stem, clamp), bar(data, clamp)],
+      ...saddled, cockpitParts(tube(headTop, stem, clamp), bar(data, clamp))],
     bench_seat: () => [tube(frontAxle, headBottom, headTop, under, tail, rearAxle, bb, headBottom), tube(bb, under),
       seatPart(panel(front, back, plus(back, [0, -70]), plus(front, [-30, -70]))), part(headTop, riser), handlebar(riser)]
-  }[detail]?.() ?? [tube(frontAxle, headBottom, headTop, seatTop, rearAxle, bb, headBottom), ...saddled, tube(headTop, stem, clamp),
-    bmx ? bmxBar(clamp, steering) : bar(data, clamp)]
+  }[detail]?.() ?? [tube(frontAxle, headBottom, headTop, seatTop, rearAxle, bb, headBottom), ...saddled,
+    cockpitParts(tube(headTop, stem, clamp), bmx ? bmxBar(clamp, steering) : bar(data, clamp))]
   return [wheel(rearAxle, frame.rearWheel), wheel(frontAxle, frame.frontWheel), body]
 }
 
@@ -299,7 +302,7 @@ const tandem = (detail) => (context) => {
     post(captainTop, captainSaddle), saddle(captainSaddle),
     post(stokerTop, stokerSaddle), saddle(stokerSaddle),
     post(stokerClamp, stokerBar), seatPart(handlebar(stokerBar)),
-    tube(headTop, stem, clamp), bar(data, clamp)],
+    cockpitParts(tube(headTop, stem, clamp), bar(data, clamp))],
     dims: [
       v('stack', captain, headTop, 0.8),
       h('reach', captain, headTop, 1.1),
@@ -348,7 +351,7 @@ const longJohn = (context) => {
     shapes: [wheel(rearAxle, rearWheel), wheel(frontAxle, frontWheel),
       tube(rearAxle, bb, riderFoot, [boxFront, beamY], headBottom, headTop), tube(frontAxle, headBottom), tube(seatTop, bb), tube(seatTop, rearAxle),
       tube(riderHead, riderFoot),
-      post(seatTop, top), saddle(top), part(riderHead, plus(riderHead, [-20, 160])), handlebar(plus(riderHead, [-20, 160]))],
+      post(seatTop, top), saddle(top), cockpitParts(part(riderHead, plus(riderHead, [-20, 160])), handlebar(plus(riderHead, [-20, 160])))],
     dims: [
       h('top_tube_effective', seatTop, riderHead, 1.4),
       d('chainstay', bb, rearAxle, 1),
@@ -408,7 +411,7 @@ const tallBike = (context) => {
     shapes: [wheel(lower.rearAxle, lower.rearWheel), wheel(lower.frontAxle, lower.frontWheel),
       tube(lower.frontAxle, lower.headBottom, lower.headTop, lower.seatTop, lower.rearAxle, lower.bb, lower.headBottom), tube(lower.seatTop, lower.bb),
       tube(lower.headTop, headBottom, headTop, seatTop, bb, headBottom), tube(lower.seatTop, bb), thin(bb, lower.bb),
-      post(seatTop, top), saddle(top), part(headTop, clamp), handlebar(clamp)],
+      post(seatTop, top), saddle(top), cockpitParts(part(headTop, clamp), handlebar(clamp))],
     dims: [
       fromGround('seat_height', plus(top, [0, 10]), -1.4, { base: lower.rearAxle[0] - lower.rearWheel.r }),
       fromGround('standover', lerp(seatTop, headTop, 0.55)),
@@ -432,7 +435,7 @@ const pennyFarthing = ({ fig, wheel: wheelAt }) => {
   return [{
     name: 'Side',
     shapes: [wheel(rearAxle, rearWheel), wheel(frontAxle, frontWheel), tube(frontAxle, head), tube(...backbone, plus(rearAxle, [30, rearWheel.r + 30]), rearAxle),
-      post(seat, top), saddle(plus(top, [0, 10]), 120), part(head, bar), handlebar(bar)],
+      post(seat, top), saddle(plus(top, [0, 10]), 120), cockpitParts(part(head, bar), handlebar(bar))],
     dims: [
       across('wheel_front', frontAxle, frontWheel),
       across('wheel_rear', rearAxle, rearWheel),
@@ -529,7 +532,7 @@ const recumbent = ({ bsd }) => ({ fig, wheel: wheelAt, data }) => {
   const side = {
     name: 'Side',
     shapes: [wheel(rearAxle, rearWheel), wheel(frontAxle, frontWheel), tube(rearAxle, pivot, [frontAxle[0], frontAxle[1] + 30], bb), tube(pivot, seatBack),
-      part(seatFront, seatBack, backTop), part([frontAxle[0] - 60, frontAxle[1] + 40], stick), handlebar(stick)],
+      part(seatFront, seatBack, backTop), cockpitParts(part([frontAxle[0] - 60, frontAxle[1] + 40], stick), handlebar(stick))],
     dims: [
       fromGround('seat_height', seatBack, 0, { base: seatBack[0] - 30 }),
       angle('seat_angle', seatBack, fig('seat_angle'), 3),
@@ -568,7 +571,7 @@ const trailBehind = ({ fig, wheel: wheelAt }) => {
   return [{
     name: 'Side',
     shapes: [wheel(axle, rearWheel), ring(towAxle, 340, 'ghost'), ghost(towAxle, atHeight(hitch, towSeat, 300), plus(hitch, scale(towSeat, 150))),
-      tube(axle, bb, cluster, axle), tube(cluster, head, bb), tube(head, hitch), post(cluster, top), saddle(top), part(head, plus(head, [30, 160])), handlebar(plus(head, [30, 160]))],
+      tube(axle, bb, cluster, axle), tube(cluster, head, bb), tube(head, hitch), post(cluster, top), saddle(top), cockpitParts(part(head, plus(head, [30, 160])), handlebar(plus(head, [30, 160])))],
     dims: [
       fromGround('seat_height', top, -1.2, { base: -rearWheel.r }),
       fromGround('standover', lerp(cluster, head, 0.5)),
@@ -598,7 +601,7 @@ const pediCab = ({ fig, wheel: wheelAt }) => {
   return [{
     name: 'Side',
     shapes: [wheel(rearAxle, rearWheel), wheel(frontAxle, frontWheel), tube(frontAxle, headBottom, headTop), tube(lerp(headBottom, headTop, 0.3), bb, rearAxle),
-      tube(bb, plus(bb, scale(seatUp, 380)), lerp(headBottom, headTop, 0.6)), post(plus(bb, scale(seatUp, 380)), top), saddle(top), part(headTop, plus(headTop, [-60, 120])), handlebar(plus(headTop, [-60, 120])),
+      tube(bb, plus(bb, scale(seatUp, 380)), lerp(headBottom, headTop, 0.6)), post(plus(bb, scale(seatUp, 380)), top), saddle(top), cockpitParts(part(headTop, plus(headTop, [-60, 120])), handlebar(plus(headTop, [-60, 120]))),
       box([back, benchHeight - 80], [rearAxle[0] + 380, benchHeight]), panel([back, benchHeight], [back + 60, benchHeight], [back + 20, benchHeight + 450], [back - 40, benchHeight + 450]),
       tube([rearAxle[0], rearAxle[1]], [rearAxle[0], benchHeight - 80]), part([back - 40, benchHeight], canopy[0]), part([rearAxle[0] + 380, benchHeight], canopy.at(-1)), part(...canopy)],
     dims: [

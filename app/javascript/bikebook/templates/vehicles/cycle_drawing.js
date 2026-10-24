@@ -234,22 +234,25 @@ export const cycleDrawing = ({ type, data = {}, typeDetail = data.type_detail, s
 
 // `type`'s side view, or its `typeDetail`'s, of `data` in `size`, its rear wheel standing on the origin, to lay over
 // others' unlettered: its shapes, the points they reach, and the figures it draws at their typical, but those only
-// another view measures, and whether it's `framed`
+// another view measures, whether it's `framed`, and whether it's `stemless`, its stem and bar left out
 export const sideView = ({ type, data = {}, typeDetail = data.type_detail, size }) => {
-  const { views, typical, framed } = drawingViews({ type, typeDetail, data, size })
+  const { views, typical, framed, listed } = drawingViews({ type, typeDetail, data, size })
   const measures = (view, key) => view.dims.some((dim) => dim.key === key)
   // the hindmost tire on the ground, as a towing bike's ghost isn't
   const grounded = views[0].shapes.filter(({ kind, weight, center, radius }) => kind === 'circle' && weight !== 'ghost' && Math.abs(center[1] - radius) < 1)
   const back = grounded.length ? Math.min(...grounded.map(({ center }) => center[0])) : 0
-  // without its seatposts, saddles and rims, which only clutter frames laid over each other
-  const shapes = views[0].shapes.filter(({ seat, rim }) => !seat && !rim).map((shape) => shape.kind === 'circle'
+  // without its seatposts, saddles and rims, which only clutter frames laid over each other, or a stem and bar it
+  // doesn't list the length of, which would only be a guess at where its rider steers from
+  const stemless = !listed('stem_length') && views[0].shapes.some(({ cockpit }) => cockpit)
+  const shapes = views[0].shapes.filter(({ seat, rim, cockpit }) => !seat && !rim && !(stemless && cockpit)).map((shape) => shape.kind === 'circle'
     ? { ...shape, center: plus(shape.center, [-back, 0]) }
     : { ...shape, points: shape.points.map((point) => plus(point, [-back, 0])) })
   return {
     shapes,
     points: shapes.flatMap(shapePoints),
     typical: typical.filter((key) => measures(views[0], key) || !views.some((view) => measures(view, key))),
-    framed
+    framed,
+    stemless
   }
 }
 

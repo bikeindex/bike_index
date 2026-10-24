@@ -33,9 +33,9 @@ const groupsetSummary = ({ groupset }) => {
   const name = compact([named ? null : manufacturer, description]).join(' ')
   return electronic ? join([name, 'electronic'], ' · ') : name
 }
-// "Cargo Bike Rear · Kids & Women's · Long tail": its type, target riders and detail, and a step-through frame's after,
-// its top tube named or not
-export const typeLabel = (each) => [each.type, array(each.target_riders).join(' & '), each.type_detail,
+// "Cargo Bike Rear · Kids & Women's · Long tail": its type, target riders unless `riders` is false, and detail, and a
+// step-through frame's after, its top tube named or not
+export const typeLabel = (each, { riders = true } = {}) => [each.type, riders && array(each.target_riders).join(' & '), each.type_detail,
   /^step[_-]through$/i.test(each.frame?.top_tube ?? '') && 'Step-through'].filter(present).join(' · ')
 
 // One vehicle's card, marked where it differs from `others`
@@ -342,12 +342,13 @@ class ModelViewer {
       electric: present(vehicle.motors),
       model_group: vehicle.vehicle_model_group,
       years: this.yearRange(),
-      vehicle_type: presence(typeLabel(vehicle)),
+      vehicle_type: presence(typeLabel(vehicle, { riders: false })),
       type: vehicle.type,
       e_vehicle_class: this.eVehicleClass(),
       cargo_vehicle: isCargo(this.data),
       cargo: this.cargo(),
-      primary_activity: this.withoutParenthetical(vehicle.primary_activity),
+      // "Kids & Women's MTB: Trail", its riders ahead of the activity rather than in its type
+      primary_activity: presence(join([array(vehicle.target_riders).join(' & '), this.withoutParenthetical(vehicle.primary_activity)].filter(present), ' ')),
       frame_material: present(vehicle.frame?.material) && present(vehicle.frame.material_detail)
         ? html`${vehicle.frame.material} <span class="tw:text-xs twless-strong">${vehicle.frame.material_detail}</span>`
         : vehicle.frame?.material,
@@ -824,11 +825,14 @@ class ModelViewer {
       : nothing}${present(content) ? definitionListContainer({ content }) : nothing}</section>`
   }
 
-  // "MicroShift, 1x9", the rest of its drivetrain in a tooltip, on a dash where neither is listed
+  // "SRAM · GX · 1x12", the whole groupset and the rest of its drivetrain in a tooltip, on a dash where none is listed
   groupsetWithDrivetrain () {
-    const groupset = presence(join([groupsetSummary(this.vehicle), this.#gearCount()].filter(present), ', '))
-    const drivetrain = this.drivetrainTooltip()
-    return drivetrain ? this.withTooltip(groupset ?? missing, drivetrain) : groupset
+    const { manufacturer, series, description, electronic } = this.vehicle.groupset ?? {}
+    const shown = presence(join([manufacturer, series, this.#gearCount()].filter(present), ' · '))
+    const groupset = [['Groupset manufacturer', manufacturer], ['Groupset series', series], ['Groupset description', description],
+      ['Electronic', electronic == null ? null : electronic ? 'Yes' : 'No']].filter(([, value]) => present(value))
+    const rows = [...groupset, ...this.drivetrainRows()]
+    return rows.length ? this.withTooltip(shown ?? missing, this.tooltipRows(rows)) : shown
   }
 
   // Its chainrings by its cogs, "1x9", or "singlespeed" for one of each
@@ -846,11 +850,10 @@ class ModelViewer {
     return [...this.specRows('gearing', this.kit.schemas.vehicle.gearing.fields, counted), ...this.specRows('frame', fields)]
   }
 
-  // the Drivetrain section's rows but the groupset, as a tooltip lists them
-  drivetrainTooltip () {
+  // the Drivetrain section's rows but the groupset
+  drivetrainRows () {
     const labels = drivetrainLabels(this.vehicle.drivetrain)
-    const rows = [...(labels.length ? [['Drivetrain', labels.join(', ')]] : []), ...this.gearingRows()]
-    return rows.length ? this.tooltipRows(rows) : null
+    return [...(labels.length ? [['Drivetrain', labels.join(', ')]] : []), ...this.gearingRows()]
   }
 
   // a list, so against a model that isn't electronic, that alone is marked

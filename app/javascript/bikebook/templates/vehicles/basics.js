@@ -4,6 +4,7 @@ import { collapse } from 'bikebook/templates/ui/collapse'
 import { copyButton } from 'bikebook/templates/ui/copy_button'
 import { table } from 'bikebook/templates/ui/table'
 import { PINNED_ROW_HEADER } from 'bikebook/templates/vehicles/comparison_table'
+import { removeLink } from 'bikebook/templates/vehicles/remove_link'
 import { basicsOf, simpleFormat } from 'bikebook/templates/vehicles/model_viewer'
 import { array, isNumber, join, present } from 'bikebook/templates/values'
 
@@ -65,14 +66,17 @@ const readMore = (text, content) => {
     })}</div>`
 }
 
-// The models' names, photos and headline fields side by side in a table, one model's as two's
-export const basics = ({ presenter, vehicles, outOfClassId }) => {
+// The models' names, photos and headline fields side by side in a table, one model's as two's, each photo with an ×
+// to the page without it at `removePath`, each column's last cell with its `bottoms` classes and the table's section with
+// its `sectionClasses`
+export const basics = ({ presenter, vehicles, outOfClassId, removePath, bottoms = [], sectionClasses = '' }) => {
   const shown = vehicles.map(({ data, value, outsideMarket }) => {
     const price = priced(data)
     const fields = basicsOf({ presenter, data, outOfClassId })
     return {
       ...fields,
       value,
+      removeHref: removePath(value),
       markets: array(data.markets).map((code) => presenter.vocabulary.names?.markets?.[code] ?? code).join(', '),
       outside_market: outsideMarket,
       years: join([fields.years, manufacturerPage(data)].filter(present), ' '),
@@ -82,21 +86,26 @@ export const basics = ({ presenter, vehicles, outOfClassId }) => {
   })
   const fields = FIELDS.filter((field) => (field.only ? shown.some((each) => each[field.only]) : shown.some((each) => present(each[field.key]))) &&
     (!field.differing || new Set(shown.map((each) => each[field.differing])).size > 1))
-  return compared(shown, fields)
+  return compared(shown, fields, bottoms, sectionClasses)
 }
 
-const compared = (vehicles, fields) => html`<section aria-label=${vehicles.length > 1 ? 'Overview comparison' : 'Overview'} class="tw:mt-6 ${vehicles.length > 3
+const compared = (vehicles, fields, bottoms, sectionClasses) => html`<section aria-label=${vehicles.length > 1 ? 'Overview comparison' : 'Overview'} class="tw:mt-6 ${vehicles.length > 3
   ? 'tw:twpagebleed tw:px-4'
-  : ''}">${table({
+  : ''} ${sectionClasses}">${table({
   classes: `${vehicles.length === 1 ? 'tw:w-full tw:md:w-[calc(50%+6.25rem)] tw:md:min-w-0!' : 'tw:w-full'} tw:table-fixed ${MIN_WIDTHS[vehicles.length] ?? MIN_WIDTHS.at(-1)} ${vehicles.length > 3 ? `tw:mx-auto ${MAX_WIDTHS[vehicles.length] ?? MAX_WIDTHS[5]}` : ''}`,
   records: fields,
   columns: [
     { label: html`<span class="tw:sr-only">Field</span>`, rowHeader: true, classes: 'tw:w-32 tw:md:w-50 tw:px-2.5! tw:py-2! tw:align-top tw:font-bold', cellClass: () => PINNED_ROW_HEADER, cell: ({ label }) => label },
-    ...vehicles.map((vehicle) => ({
-      label: html`${vehicle.photo('tw:mb-2 tw:aspect-[4/3]')}${manufacturerLine(vehicle.manufacturer)}<span class="tw:inline-flex tw:items-baseline tw:gap-1">${
+    ...vehicles.map((vehicle, index) => ({
+      label: html`${vehicle.photo('tw:mb-2 tw:aspect-[4/3]')}${removeLink({
+        label: `Remove ${[vehicle.manufacturer, vehicle.model].filter(present).join(' ')}`,
+        href: vehicle.removeHref,
+        corner: true
+      })}${manufacturerLine(vehicle.manufacturer)}<span class="tw:inline-flex tw:items-baseline tw:gap-1">${
         vehicle.model}${copyButton({ value: vehicle.value, label: 'Copy ID', tooltip: true })}</span>`,
       classes: 'tw:px-2.5! tw:py-2! tw:align-top',
-      cellClass: ({ key }) => key === 'description' ? 'tw:text-sm' : '',
+      headerClasses: 'tw:relative',
+      cellClass: ({ key }) => [key === 'description' && 'tw:text-sm', key === fields.at(-1).key && bottoms[index]].filter(Boolean).join(' '),
       cell: ({ key, only }) => {
         if (present(vehicle[key])) return vehicle[key]
         if (only !== 'electric' || vehicle.electric) return missing

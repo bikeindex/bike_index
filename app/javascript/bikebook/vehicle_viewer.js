@@ -5,12 +5,18 @@ import { chosenSizes, pickedSizes, sizesParam } from 'bikebook/sizes'
 import { comparisonTable } from 'bikebook/templates/vehicles/comparison_table'
 import { cycleDrawing } from 'bikebook/templates/vehicles/cycle_drawing'
 import { emptyState } from 'bikebook/templates/vehicles/empty_state'
+import { compareToggle, similarResults, similarSection } from 'bikebook/templates/vehicles/similar'
 import { geometryOverlay, overlayFrames, seriesBorders } from 'bikebook/templates/vehicles/geometry_overlay'
 import { jumpTo, VIEWS } from 'bikebook/templates/vehicles/jump_to'
+import { modelCard } from 'bikebook/templates/vehicles/model_card'
+import { removeLink } from 'bikebook/templates/vehicles/remove_link'
 import { componentsOf, modelViewer, motorsOf, photoOf, runningGearOf, sizesOf } from 'bikebook/templates/vehicles/model_viewer'
 import { array, present } from 'bikebook/templates/values'
 import { searching, toQuery } from 'bikebook/query'
 import { VehiclePresenter } from 'bikebook/vehicle_presenter'
+
+// rather than the kit's max_compare, which the catalog publishes as 3
+export const MAX_COMPARE = 5
 
 // The compared vehicles' cards, from catalog blocks
 export class VehicleViewer {
@@ -24,8 +30,9 @@ export class VehicleViewer {
   }
 
   // The vehicles at `url` in the view it picks, whose links keep its other params, compared in the sizes it picks or
-  // the nearest to the `preferredSize`. With none, the `search`'s count, whether filters narrow it, and its featured models
-  render (vehicles, url, preferredSize, search) {
+  // the nearest to the `preferredSize`. With none, the `search`'s count, whether filters narrow it, and its featured models.
+  // `similar` puts the models most like the first above the views, its settings, and its `results` once they're scored
+  render (vehicles, url, preferredSize, search, similar = null) {
     const { presenter, outOfClassId } = this
     if (vehicles.length === 0) {
       return emptyState({
@@ -47,6 +54,10 @@ export class VehicleViewer {
     const values = vehicles.map(({ value }) => value)
     const baseline = vehicles[0]
     const others = (value) => value === baseline.value ? [] : [baseline.data]
+    const removePath = (value) => {
+      const remaining = values.filter((each) => each !== value)
+      return pathWith(url, { vehicle_models: remaining.join(','), vehicle_sizes: sizesParam(remaining, picked) })
+    }
     const sizePath = (value) => (name) => pathWith(url, { vehicle_sizes: sizesParam(values, { ...picked, [value]: name }) })
     // a figure's letter lights it on each drawing, card and table row, until it's clicked again
     const highlight = url.searchParams.get('figure')
@@ -58,13 +69,18 @@ export class VehicleViewer {
     const cardRow = (margin, cards, aligned = false) => html`<div ?data-comparison=${comparing} data-controller=${comparing && aligned ? 'bikebook--align-rows' : nothing} class="${margin} tw:max-[500px]:twpagebleed ${comparing
       ? 'tw:md:twpagebleed tw:md:px-4'
       : 'tw:lg:twpagebleed tw:lg:px-4'}"><div class="tw:flex tw:gap-8 ${rowClasses}">${cards}</div></div>`
-    // each vehicle's `key` on a card of its own, named as its full card is, after whatever `lead` shows
+    // each vehicle's `key` on a card of its own, named as its full card is, after whatever `lead` shows, with the overview's ×
     // `keyed`, each topped in its frame's color in the overlay
     const cards = (key, none, content, { lead, keyed = false } = {}) => vehicles.map(({ data, value }, index) => {
       const { manufacturer, model } = presenter.named(presenter.kit.schemas.vehicle, data)
-      return html`<section aria-label=${`${[manufacturer, model].filter(present).join(' ')} ${key}`} class="twgutter tw:w-full tw:min-w-0 tw:space-y-4
+      const name = [manufacturer, model].filter(present).join(' ')
+      return html`<section aria-label=${`${name} ${key}`} class="twgutter tw:relative tw:w-full tw:min-w-0 tw:space-y-4
         tw:rounded-sm tw:border tw:border-gray-200 tw:bg-white tw:pt-4 tw:pb-6 tw:[--gutter:--spacing(6)] tw:dark:border-gray-700 tw:dark:bg-gray-800
-        ${keyed ? seriesBorders(compared.frames, index).top : ''} ${comparing ? 'tw:md:max-w-[56rem] tw:lg:flex-1' : 'tw:lg:w-[56rem] tw:lg:shrink-0'}"><header data-align-row="header" class="tw:flex tw:items-start tw:justify-between tw:gap-4"><div>${present(manufacturer)
+        ${keyed ? seriesBorders(compared.frames, index).top : ''} ${comparing ? 'tw:md:max-w-[56rem] tw:lg:flex-1' : 'tw:lg:w-[56rem] tw:lg:shrink-0'}">${removeLink({
+        label: `Remove ${name}`,
+        href: removePath(value),
+        corner: true
+      })}<header data-align-row="header" class="tw:flex tw:items-start tw:justify-between tw:gap-4"><div>${present(manufacturer)
         ? html`<p class="tw:mb-1 tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">${manufacturer}</p>`
         : nothing}<div class="tw:text-2xl tw:leading-tight"><h3 class="tw:inline tw:font-extrabold">${model}</h3> ${
           copyButton({ value, label: 'Copy ID', tooltip: true })}</div></div><div
@@ -100,7 +116,32 @@ export class VehicleViewer {
       return scaled.map((each) => framed(each.legend) ? { ...each, figure: each.within(box) } : each)
     }
     const views = {
-      basics: () => basics({ presenter, vehicles, outOfClassId }),
+      // the overlay while the similar models are open, each column's bottom in its frame's color
+      basics: () => {
+        const overlaid = comparing && similar
+        const bottoms = overlaid
+          ? vehicles.map((_, index) => {
+            const { variable } = seriesBorders(compared.frames, index)
+            return variable && `${variable} tw:group-has-[#similar-toggle[aria-expanded=true]]/viewers:border-b-4 tw:group-has-[#similar-toggle[aria-expanded=true]]/viewers:border-b-(--series)!`
+          })
+          : []
+        // the overlay left of the table once the window is wide, as Sizes & geometry's is, beneath it until then
+        if (!overlaid) return basics({ presenter, vehicles, outOfClassId, removePath })
+        return html`<div class="tw:flex tw:flex-col tw:min-[1500px]:group-has-[#similar-toggle[aria-expanded=true]]/viewers:twpagebleed
+          tw:min-[1500px]:group-has-[#similar-toggle[aria-expanded=true]]/viewers:flex-row tw:min-[1500px]:group-has-[#similar-toggle[aria-expanded=true]]/viewers:items-start
+          tw:min-[1500px]:group-has-[#similar-toggle[aria-expanded=true]]/viewers:gap-6 tw:min-[1500px]:group-has-[#similar-toggle[aria-expanded=true]]/viewers:px-4">${basics({
+          presenter,
+          vehicles,
+          outOfClassId,
+          removePath,
+          bottoms,
+          sectionClasses: 'tw:min-[1500px]:group-has-[#similar-toggle[aria-expanded=true]]/viewers:mx-0 tw:min-[1500px]:group-has-[#similar-toggle[aria-expanded=true]]/viewers:w-auto ' +
+            'tw:min-[1500px]:group-has-[#similar-toggle[aria-expanded=true]]/viewers:min-w-0 tw:min-[1500px]:group-has-[#similar-toggle[aria-expanded=true]]/viewers:flex-1 ' +
+            'tw:min-[1500px]:group-has-[#similar-toggle[aria-expanded=true]]/viewers:px-0'
+        })}<div class="tw:hidden tw:group-has-[#similar-toggle[aria-expanded=true]]/viewers:contents">${geometryOverlay({
+          ...compared, selected: url.searchParams.get('overlay_selected'), beside: true
+        })}</div></div>`
+      },
       // the overlay beside the table once the window is wide, above it until then
       geometry: () => {
         const drawings = sizeDrawings()
@@ -132,13 +173,9 @@ export class VehicleViewer {
       },
       motors: () => cardRow('tw:mt-6', cards('motors', 'No motor', (data, value) => motorsOf({ presenter, data, others: others(value), outOfClassId }))),
       all: () => {
-        const full = vehicles.map(({ data, value }, index) => {
-          const remaining = values.filter((each) => each !== value)
-          const removePath = pathWith(url, { vehicle_models: remaining.join(','), vehicle_sizes: sizesParam(remaining, picked) })
-          return modelViewer({
-            presenter, data, value, comparing, idSuffix: index + 1, others: others(value), removePath, selectedSize: selectedSizes.get(value), sizePath: sizePath(value), outOfClassId
-          })
-        })
+        const full = vehicles.map(({ data, value }, index) => modelViewer({
+          presenter, data, value, comparing, idSuffix: index + 1, others: others(value), removePath: removePath(value), selectedSize: selectedSizes.get(value), sizePath: sizePath(value), outOfClassId
+        }))
         return cardRow('tw:mt-6', full)
       }
     }
@@ -148,7 +185,52 @@ export class VehicleViewer {
       label: `Search other ${typeName(lone).toLowerCase()}s`,
       href: pathWith(url, { search: '1', vehicle_type: lone.type || 'bike' })
     }
-    return html`${jumpTo(view, (each) => pathWith(url, { view: each === 'basics' ? '' : each }), shown, searchTab)}${views[view]()}`
+    // above the views
+    const similarModels = similar
+      ? similarSection({
+        vehicle: baseline.value,
+        model: presenter.named(presenter.kit.schemas.vehicle, baseline.data).model,
+        type: typeName(baseline.data).toLowerCase(),
+        vehicleType: baseline.data.type,
+        electric: present(baseline.data.motors),
+        settings: similar,
+        groups: similar.results?.groups,
+        results: similar.results === undefined ? undefined : this.similarResults(url, similar.results),
+        searchShown: searching(url)
+      })
+      : nothing
+    return html`${similarModels}${jumpTo(view, (each) => pathWith(url, { view: each === 'basics' ? '' : each }), shown, searchTab)}${views[view]()}`
+  }
+
+  // What opens the models most like the first of `vehicles` from the search's More filters lines, where `similar` offers them
+  compareToggle (vehicles, similar) {
+    if (!similar || !vehicles.length) return nothing
+    const { model, type } = this.presenter.named(this.presenter.kit.schemas.vehicle, vehicles[0].data)
+    return compareToggle({ type: (type || 'bike').toLowerCase(), model })
+  }
+
+  // The cards of the models most like the first at `url`, each a link adding it to the comparison there or taking it out,
+  // which renders in place, focusing it again
+  similarResults (url, results) {
+    const { kit, vocabulary } = this.presenter
+    const values = url.searchParams.get('vehicle_models')?.split(',').filter(Boolean) ?? []
+    const full = values.length >= MAX_COMPARE && MAX_COMPARE
+    const picked = pickedSizes(url)
+    const cards = results?.models.map((model) => {
+      const active = values.includes(model.id)
+      const next = active ? values.filter((value) => value !== model.id) : [...values, model.id]
+      const id = `similar-${model.id.replaceAll('/', '-')}`
+      return modelCard({
+        model,
+        href: active || !full ? pathWith(url, { vehicle_models: next.join(','), vehicle_sizes: sizesParam(next, picked) }) : null,
+        placeholderUrl: kit.placeholder_url,
+        currencies: vocabulary.currencies,
+        toggle: true,
+        active,
+        attributes: { id, 'data-in-place': `#${id}` }
+      })
+    })
+    return similarResults({ results, cards, full })
   }
 }
 

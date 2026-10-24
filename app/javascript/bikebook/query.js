@@ -8,6 +8,12 @@ export const searching = (url) => {
   return url.searchParams.has('search') || models.length !== 1 || classifications.length > 0
 }
 
+// `filters` with a range given backwards, 2026 to 2020, the way round it was meant
+export const ordered = (filters) => ['year', 'price'].reduce((each, name) => {
+  const [min, max] = [`${name}_min`, `${name}_max`]
+  return each[min] && each[max] && Number(each[min]) > Number(each[max]) ? { ...each, [min]: each[max], [max]: each[min] } : each
+}, filters)
+
 export const FILTERS = [...LISTS, ...SINGLES, ...RANGES, 'electric', 'jurisdiction', 'sort', 'year_dir', 'price_dir']
 
 // to_query: keys sorted and CGI-escaped, blank values dropped, commas and slashes left readable

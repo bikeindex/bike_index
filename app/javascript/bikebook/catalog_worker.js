@@ -11,6 +11,8 @@ let manifest = null
 let base = null
 let last = null
 let rules = null
+let similarityUrl = null
+let similarity = null
 const blocks = new Map()
 const orders = new Map()
 
@@ -25,7 +27,8 @@ const path = (id) => id.replace(/^m\//, '')
 const blockKey = (id) => path(id).split('/').slice(0, 2).join('/')
 
 // The blocks `ids` are in load alongside the index rather than after it
-async function load ({ manifestUrl, ids, jurisdictions, rulesUrl }) {
+async function load ({ manifestUrl, ids, jurisdictions, rulesUrl, similarityUrl: similarityModule }) {
+  similarityUrl = similarityModule
   ;[manifest, rules] = await Promise.all([fetchJson(manifestUrl), import(rulesUrl)])
   if (manifest.format !== FORMAT) throw new Error(`catalog format ${manifest.format} isn't ${FORMAT}`)
 
@@ -41,6 +44,8 @@ async function load ({ manifestUrl, ids, jurisdictions, rulesUrl }) {
     stock_photo: model.photo && `${index.stock_photos}/${path(model.id)}.${model.photo}`,
     activity_name: activityNames[model.primary_activity],
     type_name: typeNames[model.vehicle_type],
+    // by its maker, as makers share names, and its first word where it has no group
+    model_group: `${model.manufacturer}/${model.model_group ?? model.model.split(' ')[0]}`,
     searchText: `${model.display}\n${model.id}`.toLowerCase(),
     sortYear: model.final_year ?? currentYear
   }))
@@ -56,7 +61,7 @@ async function load ({ manifestUrl, ids, jurisdictions, rulesUrl }) {
     const jurisdictionName = state ? `${state} (${code.slice(3)})` : code && (jurisdictions[code] ?? code)
     return [id, { ...record, label, jurisdiction_name: jurisdictionName, title: /^Class \d+$/.test(record.name) ? `${label} e-bike` : label }]
   })])
-  return { vocabulary: { ...vocabulary, e_vehicle_classifications: classifications }, kit, options: options(index) }
+  return { vocabulary: { ...vocabulary, e_vehicle_classifications: classifications }, kit, options: options(index), comparable: Boolean(manifest.comparison) }
 }
 
 // Each filter's choices, with how many models choosing it alone matches. Propulsion's checkboxes show no counts
@@ -105,6 +110,20 @@ async function vehicles ({ ids, market }) {
     }
   }))
   return found.filter(({ data }) => data)
+}
+
+// Fetched once something asks how alike models are. Null for a comparison format the scorer doesn't know
+const scorer = () => {
+  similarity ??= Promise.all([fetchJson(new URL(manifest.comparison, base)), import(similarityUrl)])
+    .then(([comparison, { scorer }]) => scorer(models, comparison, activities), (error) => {
+      similarity = null
+      throw error
+    })
+  return similarity
+}
+
+async function similar ({ model, settings, market }) {
+  return (await scorer())?.(model, settings, market) ?? null
 }
 
 function displays ({ ids }) {
@@ -239,7 +258,7 @@ function propelled ({ electric, e_vehicle_classifications: carried = [] }, propu
 
 self.onmessage = async ({ data: { id, type, ...args } }) => {
   try {
-    self.postMessage({ id, result: await { load, search, featured, vehicles, displays }[type](args) })
+    self.postMessage({ id, result: await { load, search, featured, vehicles, displays, similar }[type](args) })
   } catch (error) {
     self.postMessage({ id, error: error.message })
   }

@@ -8,11 +8,11 @@ import { andSentence, equal, isNumber, join, present } from 'bikebook/templates/
 
 // UI::Chart::Component::COLORS, one per compared model; forced, or the table cells' dark border color wins
 export const SERIES = [
-  { color: '#3498db', bottom: 'tw:border-b-[#3498db]!', top: 'tw:border-t-[#3498db]!' },
-  { color: '#DC2626', bottom: 'tw:border-b-[#DC2626]!', top: 'tw:border-t-[#DC2626]!' },
-  { color: '#7C3AED', bottom: 'tw:border-b-[#7C3AED]!', top: 'tw:border-t-[#7C3AED]!' },
-  { color: '#D97706', bottom: 'tw:border-b-[#D97706]!', top: 'tw:border-t-[#D97706]!' },
-  { color: '#059669', bottom: 'tw:border-b-[#059669]!', top: 'tw:border-t-[#059669]!' }
+  { color: '#3498db', variable: 'tw:[--series:#3498db]', top: 'tw:border-t-[#3498db]!' },
+  { color: '#DC2626', variable: 'tw:[--series:#DC2626]', top: 'tw:border-t-[#DC2626]!' },
+  { color: '#7C3AED', variable: 'tw:[--series:#7C3AED]', top: 'tw:border-t-[#7C3AED]!' },
+  { color: '#D97706', variable: 'tw:[--series:#D97706]', top: 'tw:border-t-[#D97706]!' },
+  { color: '#059669', variable: 'tw:[--series:#059669]', top: 'tw:border-t-[#059669]!' }
 ]
 const PADDING = 30
 const TIRE_GAP = 10
@@ -81,13 +81,15 @@ export const overlayFrames = (vehicles, sizes) => vehicles.map(({ data }, index)
   return { ...frame, side: unlisted.length === 0 ? side : null, unlisted }
 })
 
-// The top and bottom borders that key a comparison table column to its frame, which the overlay draws in the same order
+// The top border that keys a comparison table column to its frame, which the overlay draws in the same order, and its
+// color as --series
 export const seriesBorders = (frames, index) => overlaid(frames) && drawable(frames[index])
-  ? { top: `tw:border-t-4 ${SERIES[index].top}`, bottom: `tw:border-b-4 ${SERIES[index].bottom}` }
-  : { top: '', bottom: '' }
+  ? { top: `tw:border-t-4 ${SERIES[index].top}`, variable: SERIES[index].variable }
+  : { top: '', variable: '' }
 
 // The compared models' frames in their `sizes`, their rear wheels standing on the same spot, each over the ones the
-// comparison table columns left of it. A frame it can't draw is its wheels alone where they're listed. Lone wheels aren't drawn, only said what they're missing. The
+// comparison table columns left of it. A frame it can't draw is its wheels alone where they're listed. Lone wheels aren't drawn, only said what they're missing,
+// as a stem and bar it lists no stem length for aren't. The
 // `selected` vehicle's over the rest, the others faded, the first drawn's unless it's another or 'none'
 export const geometryOverlay = ({ presenter, vehicles, sizes, frames, selected, beside = false }) => {
   const named = vehicles.map(({ data }) => presenter.named(presenter.kit.schemas.vehicle, data))
@@ -102,24 +104,25 @@ export const geometryOverlay = ({ presenter, vehicles, sizes, frames, selected, 
     const { rearRadius, frontRadius, wheelbase } = each.geometry.wheels
     return { ...each, geometry: { rearAxle: [0, rearRadius], frontAxle: [wheelbase, frontRadius], rearRadius, frontRadius } }
   })
-  const undrawn = labelled.filter(({ side }) => !side)
   if (drawn.length === 0) return nothing
 
   const overlay = drawn.length > 1 || drawn.some(({ side }) => side)
-  const missingNote = undrawn.length
-    ? noteList('missing geometry information', undrawn.map(({ title, geometry: { unlisted, wheels } }) => {
-      const none = `${figures(presenter, unlisted)} or the measures to calculate them`
-      return html`<li><em>${title}</em> doesn't list its ${none}, so ${!wheels || !overlay
-        ? "it can't be drawn"
-        : 'only its wheels are drawn'}.</li>`
-    }))
-    : nothing
+  // a stem missing only beside one that's drawn
+  const stemDrawn = drawn.some(({ side }) => side?.shapes.some(({ cockpit }) => cockpit))
+  const missing = labelled.flatMap(({ title, side, geometry: { unlisted, wheels } }) => {
+    if (side) return side.stemless && stemDrawn ? [html`<li><em>${title}</em> doesn't list its ${figures(presenter, ['stem_length'])}, so its stem and handlebar aren't drawn.</li>`] : []
+    const none = `${figures(presenter, unlisted)} or the measures to calculate them`
+    return [html`<li><em>${title}</em> doesn't list its ${none}, so ${!wheels || !overlay
+      ? "it can't be drawn"
+      : 'only its wheels are drawn'}.</li>`]
+  })
+  const missingNote = missing.length ? noteList('missing geometry information', missing) : nothing
 
   // out to the screen's edges on a phone, as the cards below it are
   return html`<section aria-label="Geometry overlay" data-controller=${overlay ? 'bikebook--geometry-overlay' : nothing} class="tw:mx-auto tw:mt-6
     tw:w-full tw:max-w-4xl tw:space-y-3 tw:rounded-sm tw:border tw:border-gray-200 tw:bg-white tw:p-4 tw:dark:border-gray-700 tw:dark:bg-gray-800
     tw:max-[500px]:twpagebleed tw:max-[500px]:rounded-none tw:max-[500px]:border-x-0 ${beside
-      ? 'tw:min-[1500px]:mx-0 tw:min-[1500px]:basis-2/5 tw:min-[1500px]:shrink-0'
+      ? 'tw:min-[1500px]:order-first tw:min-[1500px]:mx-0 tw:min-[1500px]:basis-2/5 tw:min-[1500px]:shrink-0'
       : ''}">${sectionHeading('Geometry overlay')}${
     overlay ? drawing(presenter, drawn, labelled, selected) : nothing}${missingNote}</section>`
 }
