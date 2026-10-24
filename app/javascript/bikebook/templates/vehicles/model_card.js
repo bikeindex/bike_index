@@ -11,12 +11,13 @@ const cardYears = ({ first_year: first, final_year: final }) => {
   return !first || first === year ? year : `${first}–${final ?? 'current'}`
 }
 
-// A catalog model as the search's cards show a bike: its photo and price, linking to `href`
+// A catalog model as the search's cards show a bike: its photo and price, linking to `href` everywhere but its tooltips
 export const modelCard = ({ model, href, placeholderUrl, currencies }) => {
   const years = cardYears(model)
   return html`<li class="tw:relative tw:flex tw:flex-col tw:rounded-xl tw:border tw:border-gray-200 tw:bg-white tw:transition tw:focus-within:z-10
   tw:hover:z-10 tw:hover:-translate-y-0.5 tw:hover:shadow-lg tw:active:translate-y-0.5 tw:hover:active:translate-y-0 tw:dark:border-gray-700
-  tw:dark:bg-gray-800"><div class="tw:group tw:relative tw:h-40 tw:rounded-t-[11px] tw:bg-white" data-controller=${model.stock_photo
+  tw:dark:bg-gray-800
+  tw:[&_[data-controller~=ui--tooltip]]:relative tw:[&_[data-controller~=ui--tooltip]]:z-20"><div class="tw:group tw:relative tw:h-40 tw:rounded-t-[11px] tw:bg-white" data-controller=${model.stock_photo
     ? 'image-fallback'
     : nothing} data-broken=${model.stock_photo ? nothing : ''}>${model.stock_photo
     ? html`<img alt=${model.display} loading="lazy" class="tw:h-full tw:w-full tw:rounded-t-[11px] tw:object-contain tw:p-2 tw:group-data-broken:hidden"
@@ -31,6 +32,6 @@ export const modelCard = ({ model, href, placeholderUrl, currencies }) => {
   class="tw:absolute tw:inset-0 tw:z-10"></span></a></h3>${years || model.activity_name
     ? html`<p class="tw:m-0 tw:text-sm tw:text-gray-500"><strong>${years}</strong> ${model.activity_name}</p>`
     : nothing}<div class="tw:flex tw:flex-wrap tw:items-center tw:gap-1.5">${model.electric
-    ? html`<span class="tw:relative tw:z-20">${badge({ text: '⚡', title: 'E-vehicle', color: 'purple' })}</span>`
+    ? badge({ text: '⚡', title: 'E-vehicle', color: 'purple' })
     : nothing}${model.type_name ? badge({ text: model.type_name, color: model.electric ? 'purple' : 'gray' }) : nothing}</div></div></li>`
 }
