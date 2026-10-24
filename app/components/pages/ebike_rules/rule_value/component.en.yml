@@ -8,6 +8,7 @@ en:
           classes:
             one: Class %{classes}
             other: Classes %{classes}
+          kmh_html: "%{kmh} km/h"
           mph_html: "%{mph} mph"
           no_cap: No cap
           not_allowed: Not allowed

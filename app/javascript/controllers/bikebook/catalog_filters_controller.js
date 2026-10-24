@@ -1,4 +1,5 @@
 import { Controller } from '@hotwired/stimulus'
+import { ordered, RANGES } from 'bikebook/query'
 import { readable, replaceUrl } from 'bikebook/replace_url'
 
 /* global CSS */
@@ -8,6 +9,7 @@ import { readable, replaceUrl } from 'bikebook/replace_url'
 export default class extends Controller {
   static targets = ['vehicleCombobox', 'yearArrow', 'priceArrow', 'summary', 'field', 'classification', 'clear']
   static values = {
+    sort: { type: String, default: 'year' },
     yearDir: { type: String, default: 'desc' },
     priceDir: { type: String, default: 'desc' },
     defaultMarket: String,
@@ -17,8 +19,7 @@ export default class extends Controller {
   // Rewritten on connect too, as rendering drops stale values. Not from the loading placeholder,
   // whose empty fields would clear the URL's filters
   connect () {
-    this.yearArrowTarget.textContent = this.#arrow(this.yearDirValue)
-    this.priceArrowTarget.textContent = this.#arrow(this.priceDirValue)
+    this.#showSort()
     this.#showClasses()
     this.#classifyPropulsion()
     this.#refreshSummary()
@@ -32,13 +33,15 @@ export default class extends Controller {
 
   toggleSort ({ params: { field } }) {
     const dir = `${field}DirValue`
-    this[dir] = this[dir] === 'desc' ? 'asc' : 'desc'
-    this[`${field}ArrowTarget`].textContent = this.#arrow(this[dir])
+    if (this.sortValue === field) this[dir] = this[dir] === 'desc' ? 'asc' : 'desc'
+    this.sortValue = field
+    this.#showSort()
     this.apply()
   }
 
   // the page follows the URL's filters
   apply () {
+    this.#orderRanges()
     this.#showClasses()
     this.#classifyPropulsion()
     this.#syncCombobox()
@@ -51,6 +54,13 @@ export default class extends Controller {
   // so defer a tick to read the picked value.
   applySelection () {
     setTimeout(() => this.apply(), 0)
+  }
+
+  // a range typed backwards turned the way round it was meant
+  #orderRanges () {
+    const fields = RANGES.map((name) => this.element.querySelector(`input[name="${name}"]`))
+    const values = ordered(Object.fromEntries(fields.map(({ name, value }) => [name, value])))
+    for (const field of fields) field.value = values[field.name]
   }
 
   // The classes are the US market's, by state - a state without its own uses the US ones - and a hidden
@@ -124,6 +134,7 @@ export default class extends Controller {
   #applyParams (url, filters = this.#filters) {
     const params = {
       ...filters,
+      sort: this.sortValue === 'price' ? 'price' : '',
       year_dir: this.yearDirValue === 'asc' ? 'asc' : '',
       price_dir: this.priceDirValue === 'asc' ? 'asc' : ''
     }
@@ -155,15 +166,18 @@ export default class extends Controller {
 
   #describe (field) {
     const inputs = [...field.querySelectorAll('input[name]')]
+    // what the catalog names, which leaves out a value while it loads
     if (field.matches('.hw-combobox')) {
       return inputs[0].value.split(',').filter(Boolean)
-        .map((value) => field.querySelector(`[role="option"][data-value="${CSS.escape(value)}"]`)?.dataset.autocompletableAs ?? value)
+        .flatMap((value) => field.querySelector(`[role="option"][data-value="${CSS.escape(value)}"]`)?.dataset.autocompletableAs ?? [])
         .join(', ')
     }
     // the classes alone, without the jurisdiction they're of
     const boxes = inputs.filter(({ type }) => type === 'checkbox')
     if (boxes.length) return boxes.filter(({ checked }) => checked).map(({ labels }) => labels[0].textContent.trim()).join(', ')
-    const [min, max] = inputs.map(({ value }) => value && `${field.dataset.filterPrefix}${value}`)
+    // a year ungrouped, unlike an amount
+    const prefix = field.dataset.filterPrefix
+    const [min, max] = inputs.map(({ value }) => value && (prefix ? `${prefix}${Number(value).toLocaleString('en-US')}` : value))
     if (min && max) return `${min}–${max}`
     return min ? `from ${min}` : max && `up to ${max}`
   }
@@ -174,6 +188,14 @@ export default class extends Controller {
     return Object.fromEntries([...new Set(inputs.map(({ name }) => name))].map((name) => [name, inputs
       .filter((input) => input.name === name && (input.type !== 'checkbox' || input.checked))
       .map(({ value }) => value).join(',')]))
+  }
+
+  #showSort () {
+    for (const field of ['year', 'price']) {
+      const arrow = this[`${field}ArrowTarget`]
+      arrow.textContent = this.#arrow(this[`${field}DirValue`])
+      arrow.closest('button').setAttribute('aria-pressed', field === this.sortValue)
+    }
   }
 
   #arrow (dir) {

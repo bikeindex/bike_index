@@ -17,6 +17,7 @@ RSpec.describe Admin::LoggedSearchesController, type: :request do
     context "with a bikebook search" do
       let!(:logged_search) { FactoryBot.create(:logged_search, endpoint: :web_bikes) }
       let!(:bikebook_search) { FactoryBot.create(:logged_search, endpoint: :web_bikebook) }
+      let!(:ebike_rules_search) { FactoryBot.create(:logged_search, endpoint: :web_ebike_rules) }
       it "filters to not_web_bikebook" do
         get base_url, params: {search_endpoint: "not_web_bikebook"}
         expect(response.status).to eq(200)

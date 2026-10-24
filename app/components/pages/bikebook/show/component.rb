@@ -9,16 +9,25 @@ module Pages
       class Component < ApplicationComponent
         # market is the visitor's CF-IPCountry, which Cloudflare sends as XX, or T1 over Tor, when it can't
         # tell; state is theirs in the US
-        def initialize(manifest_url:, market:, state:)
+        def initialize(manifest_url:, market:, state:, query:)
           @manifest_url = manifest_url
           @market = %w[XX T1].include?(market) ? "US" : market.presence || "US"
           @jurisdiction = state&.dig(:abbr) || "US"
+          @query = query
         end
 
         private
 
+        # The search until bikebook--page fills it in from the URL: hidden as searching() hides a lone model's, and blank
+        # where the URL sets anything
+        def placeholder_class
+          models, classifications = %w[vehicle_models classifications].map { @query[it].to_s.split(",").compact_blank }
+          return "tw:hidden" if models.one? && classifications.none? && !@query.key?("search")
+          "tw:invisible" if @query.except("search").any?
+        end
+
         # The closed filters' and the open card's, so it's beside whichever shows
-        def more_filters = render(UI::Collapse::Component.new(text: translation(".more_filters"), chevron: :trailing,
+        def more_filters = render(UI::Collapse::Component.new(text: translation(".more_filters"), chevron: true,
           color: :link, html_class: "tw:ml-auto", aria: {controls: "vehicle-filters"}))
 
         # By the ISO 3166-2 codes the catalog's classifications name their jurisdictions by

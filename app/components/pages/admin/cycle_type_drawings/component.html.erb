@@ -1,0 +1,47 @@
+<div class="admin-subnav">
+  <div class="col">
+    <h1>Cycle types</h1>
+
+    <p>
+      BikeBook's drawing of each type, and of each type detail it draws its own
+      way. Change a figure to redraw it. Light purple figures aren't listed but
+      are worked out from those that are, and gray ones are drawn at the type's
+      typical figure.
+    </p>
+  </div>
+</div>
+
+<%# a collapsed row is its own ui--collapse, so the trigger in its header opens both drawings %>
+<% drawing = lambda do |row, model = nil|
+  div = tag.div(class: "tw:w-xl", data: {controller: "admin--cycle-drawing", "admin--cycle-drawing-type-value": row.type, "admin--cycle-drawing-model-value": model, "admin--cycle-drawing-manifest-url-value": @manifest_url})
+  row.collapsed ? tag.div(div, class: "tw:hidden", data: {"ui--collapse-target": "content"}) : div
+end %>
+
+<div
+  data-controller="admin--cycle-type-details"
+  data-admin--cycle-type-details-examples-value="<%= Pages::Admin::CycleTypeDrawings::Component::EXAMPLE_MODELS.to_json %>"
+>
+  <%= render(UI::Table::Component.new(records: @rows, row_attributes: ->(row) { {data: {"admin--cycle-type-details-target": "row", type: row.type, **({controller: "ui--collapse", "ui--collapse-param-value": row.type} if row.collapsed)}} })) do |table| %>
+    <% table.column(label: "Type", row_header: true) do |row| %>
+      <strong><%= row.name %></strong>
+      <code class="tw:text-xs"><%= row.type %></code>
+
+      <% if row.collapsed %>
+        <br>
+        <%= render(UI::Collapse::Component.new(text: "Show drawings", chevron: true, color: :link)) %>
+      <% end %>
+    <% end %>
+
+    <% table.column(label: "Typical", classes: "tw:align-top!") do |row| %>
+      <%= drawing.call(row) %>
+    <% end %>
+
+    <% table.column(label: "Catalog example", classes: "tw:align-top!") do |row| %>
+      <% if row.example_model %>
+        <%= drawing.call(row, row.example_model) %>
+      <% else %>
+        <span class="tw:text-gray-500">No catalog models</span>
+      <% end %>
+    <% end %>
+  <% end %>
+</div>

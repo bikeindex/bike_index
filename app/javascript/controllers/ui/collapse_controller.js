@@ -1,7 +1,7 @@
 import { Controller } from '@hotwired/stimulus'
 import { collapse } from 'utils/collapse_utils'
 
-/* global localStorage */
+/* global localStorage, requestAnimationFrame */
 
 // Connects to data-controller='ui--collapse'
 // Animates [data-ui--collapse-target=content] open/closed. Optionally rotates a
@@ -10,7 +10,8 @@ import { collapse } from 'utils/collapse_utils'
 // data-ui--collapse-param-value set, the open state persists to the URL query
 // (?param=1, ?param=0 collapsed) so it survives reloads and navigation; with
 // data-ui--collapse-storage-key-value it persists to localStorage instead, for a panel
-// whose state is the rider's preference rather than part of the address.
+// whose state is the rider's preference rather than part of the address. A toggle that
+// opens it dispatches ui--collapse:shown, for content loaded once it's wanted.
 export default class extends Controller {
   static targets = ['content', 'chevron', 'trigger']
   static values = { param: String, storageKey: String, direction: String }
@@ -75,6 +76,21 @@ export default class extends Controller {
   setExpanded (expanding, duration) {
     this.applyExpanded(expanding, duration)
     this.persist(expanding)
+    this.keepFocus(expanding)
+    if (expanding) this.dispatch('shown')
+  }
+
+  // A focused trigger the toggle hides - inside the content it collapses, or in what an open panel hides - hands focus
+  // to one still showing, rather than dropping it to the page
+  keepFocus (expanding) {
+    const focused = this.triggerTargets.find((trigger) => trigger === document.activeElement)
+    if (!focused) return
+
+    const showing = (trigger) => trigger.checkVisibility() && (expanding || !this.contentTargets.some((content) => content.contains(trigger)))
+    // once the styles keyed off aria-expanded apply
+    requestAnimationFrame(() => {
+      if (!showing(focused)) this.triggerTargets.find(showing)?.focus()
+    })
   }
 
   applyExpanded (expanding, duration) {

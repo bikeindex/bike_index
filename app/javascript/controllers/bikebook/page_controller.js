@@ -1,6 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
 import { CatalogComboboxSource, loadCatalog, renderCounts } from 'bikebook/catalog'
-import { hydrate, loadingShell, pickedVehicles, unpickedVehicles } from 'bikebook/hydrate'
+import { hydrate, loadingShell, pickedVehicles, rescoredSimilar, unpickedVehicles } from 'bikebook/hydrate'
 import { keepPermanent, renderInto } from 'bikebook/render'
 import { readable } from 'bikebook/replace_url'
 import { searching } from 'bikebook/query'
@@ -25,6 +25,7 @@ export default class extends Controller {
   #searchLog
   #renders = 0
   #refilters = 0
+  #rescores = 0
   #renderedUrl
 
   // The loading shell holds the status until the catalog's first render replaces it, and a failure puts it back
@@ -65,15 +66,15 @@ export default class extends Controller {
     this.#go(realigned(withClassifications(url, this.catalog.vocabulary.e_vehicle_classifications)), [window.scrollX, window.scrollY])
   }
 
-  // A plain click on a link to this page, such as a card's remove link, which an in-place link renders without
-  // scrolling, focusing what the data-in-place on it or an ancestor selects rather than the search, and one inside a
+  // A plain click on a link to this page, such as a card's remove link, or on a drawing's figure's data-href, which an
+  // in-place link renders without scrolling, focusing what the data-in-place on it or an ancestor selects rather than the search, and one inside a
   // data-replace in place of the history entry it's on. One among the vehicles was written when the page rendered, so
   // only what it changes from that goes onto the URL, which filters and panels have moved on since
   follow (event) {
-    const link = event.target.closest('a[href]')
+    const link = event.target.closest('a[href], [data-href]')
     if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || link.target) return
 
-    const url = new URL(link.href)
+    const url = new URL(link.getAttribute('href') ?? link.dataset.href, window.location.href)
     if (url.origin !== window.location.origin || url.pathname !== window.location.pathname) return
 
     event.preventDefault()
@@ -81,9 +82,11 @@ export default class extends Controller {
     if (!inPlace) return this.#go(url)
 
     const next = link.closest('#vehicle-viewers') ? this.#changedBy(url) : url
-    // one that shows the search a lone model hid, as its tab does, is a step back can undo, and opens it
+    // one that shows the search a lone model hid, as its tab does, is a step back can undo, and opens and focuses it
     const reveal = !searching(new URL(window.location.href)) && searching(next)
-    this.#go(next, [window.scrollX, window.scrollY], { focus: inPlace.dataset.inPlace || false, replace: Boolean(link.closest('[data-replace]')) && !reveal, reveal })
+    this.#go(next, [window.scrollX, window.scrollY], {
+      focus: reveal ? '[autofocus]' : inPlace.dataset.inPlace || false, replace: Boolean(link.closest('[data-replace]')) && !reveal, reveal
+    })
   }
 
   // A comparison table's size, which the others follow when it's the first vehicle's, and which a later
@@ -111,6 +114,26 @@ export default class extends Controller {
       renderInto(viewers, vehicles)
       this.#renderedUrl = url
     }
+  }
+
+  // The page as it is, rendered where the reader is, such as once a section that's scored when open first opens
+  refresh () {
+    this.#render(new URL(window.location.href), [window.scrollX, window.scrollY], { focus: false })
+  }
+
+  // The similar models' section opened from a toggle outside it, its own toggle taking focus
+  compareSimilar () {
+    const toggle = this.pageTarget.querySelector('#similar-toggle')
+    toggle.click()
+    toggle.focus()
+  }
+
+  // The similar models by the settings their controls set, unless the page renders or they change again first
+  async rescore ({ detail: { vehicle, settings } }) {
+    const render = this.#renders
+    const rescore = ++this.#rescores
+    const results = await rescoredSimilar(this.catalog, this.pageTarget, new URL(window.location.href), vehicle, settings)
+    if (render === this.#renders && rescore === this.#rescores) renderInto(this.pageTarget.querySelector('#similar-results'), results)
   }
 
   restore () {
@@ -189,6 +212,7 @@ export default class extends Controller {
   #fail (error) {
     console.error(error)
     this.status.textContent = this.failedTextValue
+    for (const input of this.pageTarget.querySelectorAll('[data-awaiting-catalog]')) input.placeholder = ''
     if (!this.pageTarget.contains(this.status)) this.pageTarget.replaceChildren(this.status)
   }
 }

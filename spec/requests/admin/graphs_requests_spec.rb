@@ -129,12 +129,13 @@ RSpec.describe Admin::GraphsController, type: :request do
     let!(:bikebook_search) { FactoryBot.create(:logged_search, endpoint: :web_bikebook, serial_normalized: "XXX", request_at:) }
     let!(:serial_search) { FactoryBot.create(:logged_search, endpoint: :web_bikes, serial_normalized: "XXX", request_at:) }
     let!(:no_serial_searches) { FactoryBot.create_list(:logged_search, 2, endpoint: :api_v3_bikes, request_at:) }
+    let!(:ebike_rules_searches) { FactoryBot.create_list(:logged_search, 3, endpoint: :web_ebike_rules, request_at:) }
 
-    it "charts the stored counts: bikebook searches, and the rest split by serial" do
+    it "charts the stored counts: bikebook and ebike rules searches, and the rest split by serial" do
       Counts.assign_logged_searches
       get "#{base_url}/logged_searches", params: {search_endpoint: "web_bikebook", period: "week"}
       expect(response.status).to eq(200)
-      expect(json_result.map { [it["name"], it["data"].sum(&:last)] }).to eq([["Bike Book", 1]])
+      expect(json_result.map { [it["name"], it["data"].sum(&:last)] }).to eq([["BikeBook", 1], ["E-bike rules", 3]])
 
       get "#{base_url}/logged_searches", params: {search_endpoint: "not_web_bikebook", period: "week"}
       expect(response.status).to eq(200)

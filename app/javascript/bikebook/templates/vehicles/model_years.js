@@ -12,7 +12,7 @@ export const modelYears = ({ presenter, years, others }) => {
   const rows = years.map((year) => {
     const counterparts = others.map((otherYears) => array(otherYears).find((each) => each.year === year.year))
     const highlight = (keys, lacking = false) => counterparts.some((other) => other ? !equal(slice(other, keys), slice(year, keys)) : lacking) ? 'tw:spec-diff' : ''
-    const label = blank(year.url) ? year.year : html`<a class="twlink" title=${year.url_is_official ? 'Official page' : nothing} href=${year.url}>${year.year}</a>`
+    const label = blank(year.url) ? year.year : html`<a class="twlink" href=${year.url}>${year.year}</a>`
     const money = blank(year.original_msrp)
       ? nothing
       : html`<span class="tw:font-mono tw:text-sm">${amountDisplay(year.original_msrp, year.original_msrp_currency, presenter.vocabulary.currencies)}</span>`

@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://api.stripe.com/v1/checkout/sessions/cs_test_a1OjyvijhWCbD9a9qWzUfM7UisfeWgROJx7tEF8Nc92PCP1uR1vjmXngCa
+    uri: https://api.stripe.com/v1/checkout/sessions/cs_<R2_TEST_ACCESS_KEY>_a1OjyvijhWCbD9a9qWzUfM7UisfeWgROJx7tEF8Nc92PCP1uR1vjmXngCa
     body:
       encoding: US-ASCII
       string: ''
@@ -10,7 +10,7 @@ http_interactions:
       User-Agent:
       - Stripe/v1 RubyBindings/13.4.1
       X-Stripe-Client-Telemetry:
-      - '{"last_request_metrics":{"request_id":"req_uDWu440Opxpgmh","request_duration_ms":202}}'
+      - '{"last_request_metrics":{"request_id":"req_SxPadef4MPAFiT","request_duration_ms":109}}'
       Stripe-Version:
       - 2025-01-27.acacia
       Accept-Encoding:
@@ -25,11 +25,11 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Mon, 27 Jul 2026 22:15:47 GMT
+      - Tue, 20 Oct 2026 17:43:48 GMT
       Content-Type:
       - application/json
       Content-Length:
-      - '2601'
+      - '2675'
       Connection:
       - keep-alive
       Access-Control-Allow-Credentials:
@@ -48,14 +48,14 @@ http_interactions:
       Content-Security-Policy:
       - base-uri 'none'; default-src 'none'; form-action 'none'; frame-ancestors 'none';
         img-src 'self'; script-src 'self' 'report-sample'; style-src 'self'; worker-src
-        'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=RSo8Fh-Oxgaepd33JOlm_awlX79qslsr9ajrnadxSvrw4HPWN1_g3vxzyH38WmKIHgXVoULwizC5b27O;
+        'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=CCHjen-Mh5WkkzJrF-_14-f41oA3GEDGAwjnoYR41veSqdOprFOiEx5UoFxl5pq96YuuAdOtUA08p5wH;
         report-to csp
       Report-To:
-      - '{"group":"csp","max_age":8640,"endpoints":[{"url":"https://q.stripe.com/csp-report-v2?q=RSo8Fh-Oxgaepd33JOlm_awlX79qslsr9ajrnadxSvrw4HPWN1_g3vxzyH38WmKIHgXVoULwizC5b27O&t=1"}],"include_subdomains":true}'
+      - '{"group":"csp","max_age":8640,"endpoints":[{"url":"https://q.stripe.com/csp-report-v2?q=CCHjen-Mh5WkkzJrF-_14-f41oA3GEDGAwjnoYR41veSqdOprFOiEx5UoFxl5pq96YuuAdOtUA08p5wH&t=1"}],"include_subdomains":true}'
       Reporting-Endpoints:
-      - csp="https://q.stripe.com/csp-report-v2?q=RSo8Fh-Oxgaepd33JOlm_awlX79qslsr9ajrnadxSvrw4HPWN1_g3vxzyH38WmKIHgXVoULwizC5b27O&t=1"
+      - csp="https://q.stripe.com/csp-report-v2?q=CCHjen-Mh5WkkzJrF-_14-f41oA3GEDGAwjnoYR41veSqdOprFOiEx5UoFxl5pq96YuuAdOtUA08p5wH&t=1"
       Request-Id:
-      - req_48DAyRVveX0xhj
+      - req_cU32Q70NGnkLL3
       Stripe-Version:
       - 2025-01-27.acacia
       Vary:
@@ -63,7 +63,7 @@ http_interactions:
       X-Stripe-Priority-Routing-Enabled:
       - 'true'
       X-Stripe-Routing-Context-Priority-Tier:
-      - api-testmode
+      - api-<R2_TEST_ACCESS_KEY>mode
       X-Wc:
       - 3c3
       Strict-Transport-Security:
@@ -72,11 +72,12 @@ http_interactions:
       encoding: UTF-8
       string: |-
         {
-          "id": "cs_test_a1OjyvijhWCbD9a9qWzUfM7UisfeWgROJx7tEF8Nc92PCP1uR1vjmXngCa",
+          "id": "cs_<R2_TEST_ACCESS_KEY>_a1OjyvijhWCbD9a9qWzUfM7UisfeWgROJx7tEF8Nc92PCP1uR1vjmXngCa",
           "object": "checkout.session",
           "adaptive_pricing": null,
           "after_expiration": null,
           "allow_promotion_codes": null,
+          "allowed_payment_method_types": null,
           "amount_subtotal": 500000,
           "amount_total": 500000,
           "automatic_tax": {
@@ -112,7 +113,7 @@ http_interactions:
           "customer_details": {
             "address": null,
             "business_name": null,
-            "email": "testly@bikeindex.org",
+            "email": "<R2_TEST_ACCESS_KEY>ly@bikeindex.org",
             "individual_name": null,
             "name": null,
             "phone": null,
@@ -128,6 +129,7 @@ http_interactions:
           "livemode": false,
           "locale": null,
           "managed_payments": null,
+          "marketing_attributions": null,
           "metadata": {},
           "mode": "payment",
           "origin_context": null,
@@ -174,10 +176,10 @@ http_interactions:
           "url": null,
           "wallet_options": null
         }
-  recorded_at: Mon, 27 Jul 2026 22:15:47 GMT
+  recorded_at: Tue, 20 Oct 2026 17:43:48 GMT
 - request:
     method: get
-    uri: https://api.stripe.com/v1/checkout/sessions/cs_test_a1OjyvijhWCbD9a9qWzUfM7UisfeWgROJx7tEF8Nc92PCP1uR1vjmXngCa
+    uri: https://api.stripe.com/v1/checkout/sessions/cs_<R2_TEST_ACCESS_KEY>_a1OjyvijhWCbD9a9qWzUfM7UisfeWgROJx7tEF8Nc92PCP1uR1vjmXngCa
     body:
       encoding: US-ASCII
       string: ''
@@ -185,7 +187,7 @@ http_interactions:
       User-Agent:
       - Stripe/v1 RubyBindings/13.4.1
       X-Stripe-Client-Telemetry:
-      - '{"last_request_metrics":{"request_id":"req_vzASIXFKuQ7kEl","request_duration_ms":171}}'
+      - '{"last_request_metrics":{"request_id":"req_DBuQ9InYtGp4SU","request_duration_ms":145}}'
       Stripe-Version:
       - 2025-01-27.acacia
       Accept-Encoding:
@@ -200,11 +202,11 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Fri, 21 Aug 2026 06:25:48 GMT
+      - Tue, 20 Oct 2026 17:44:33 GMT
       Content-Type:
       - application/json
       Content-Length:
-      - '2601'
+      - '2675'
       Connection:
       - keep-alive
       Access-Control-Allow-Credentials:
@@ -223,14 +225,14 @@ http_interactions:
       Content-Security-Policy:
       - base-uri 'none'; default-src 'none'; form-action 'none'; frame-ancestors 'none';
         img-src 'self'; script-src 'self' 'report-sample'; style-src 'self'; worker-src
-        'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=nnQQAVi1kYGssht6I8L5Xqq-zxHe4O6xDuR0ewxKFWdYbgeSX6pf5OagDAFUIGIrmPFkwS8s9xAJDiyH;
+        'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=GJGKoWoIwgczVPNgU6u3TIuKvRrvt84jLSU92F7_WpuSkdPtDFNmul4_u6cHibIbayrwYo4M2SkAkwIy;
         report-to csp
       Report-To:
-      - '{"group":"csp","max_age":8640,"endpoints":[{"url":"https://q.stripe.com/csp-report-v2?q=nnQQAVi1kYGssht6I8L5Xqq-zxHe4O6xDuR0ewxKFWdYbgeSX6pf5OagDAFUIGIrmPFkwS8s9xAJDiyH&t=1"}],"include_subdomains":true}'
+      - '{"group":"csp","max_age":8640,"endpoints":[{"url":"https://q.stripe.com/csp-report-v2?q=GJGKoWoIwgczVPNgU6u3TIuKvRrvt84jLSU92F7_WpuSkdPtDFNmul4_u6cHibIbayrwYo4M2SkAkwIy&t=1"}],"include_subdomains":true}'
       Reporting-Endpoints:
-      - csp="https://q.stripe.com/csp-report-v2?q=nnQQAVi1kYGssht6I8L5Xqq-zxHe4O6xDuR0ewxKFWdYbgeSX6pf5OagDAFUIGIrmPFkwS8s9xAJDiyH&t=1"
+      - csp="https://q.stripe.com/csp-report-v2?q=GJGKoWoIwgczVPNgU6u3TIuKvRrvt84jLSU92F7_WpuSkdPtDFNmul4_u6cHibIbayrwYo4M2SkAkwIy&t=1"
       Request-Id:
-      - req_joEgBmF1ZEQSL4
+      - req_oSfXfeCsL28s2d
       Stripe-Version:
       - 2025-01-27.acacia
       Vary:
@@ -238,7 +240,7 @@ http_interactions:
       X-Stripe-Priority-Routing-Enabled:
       - 'true'
       X-Stripe-Routing-Context-Priority-Tier:
-      - api-testmode
+      - api-<R2_TEST_ACCESS_KEY>mode
       X-Wc:
       - 3c3
       Strict-Transport-Security:
@@ -247,11 +249,12 @@ http_interactions:
       encoding: UTF-8
       string: |-
         {
-          "id": "cs_test_a1OjyvijhWCbD9a9qWzUfM7UisfeWgROJx7tEF8Nc92PCP1uR1vjmXngCa",
+          "id": "cs_<R2_TEST_ACCESS_KEY>_a1OjyvijhWCbD9a9qWzUfM7UisfeWgROJx7tEF8Nc92PCP1uR1vjmXngCa",
           "object": "checkout.session",
           "adaptive_pricing": null,
           "after_expiration": null,
           "allow_promotion_codes": null,
+          "allowed_payment_method_types": null,
           "amount_subtotal": 500000,
           "amount_total": 500000,
           "automatic_tax": {
@@ -287,7 +290,7 @@ http_interactions:
           "customer_details": {
             "address": null,
             "business_name": null,
-            "email": "testly@bikeindex.org",
+            "email": "<R2_TEST_ACCESS_KEY>ly@bikeindex.org",
             "individual_name": null,
             "name": null,
             "phone": null,
@@ -303,6 +306,7 @@ http_interactions:
           "livemode": false,
           "locale": null,
           "managed_payments": null,
+          "marketing_attributions": null,
           "metadata": {},
           "mode": "payment",
           "origin_context": null,
@@ -349,5 +353,5 @@ http_interactions:
           "url": null,
           "wallet_options": null
         }
-  recorded_at: Fri, 21 Aug 2026 06:25:48 GMT
+  recorded_at: Tue, 20 Oct 2026 17:44:33 GMT
 recorded_with: VCR 6.4.0

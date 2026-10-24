@@ -5,15 +5,17 @@ module Pages
     module ClassTile
       # An e-bike class's navy tile, a gray one for a class the catalog can't tell, or the red e-moto tile for a bike with
       # no class. `optional` is the mode - "throttle" or "assist" - that alone brings a class, whose tile is outlined and
-      # captioned with it. `explained`, a class's or the e-moto's tile is a tooltip of its card, with its catalog ID
+      # captioned with it. `explained`, a class's or the e-moto's tile is a tooltip of its card, with its catalog ID: the
+      # e-moto's `out_of_class_id`, evc/out_of_class/us/ca, for a vehicle in no class in that state alone
       class Component < ApplicationComponent
         SIZES = {
           md: {tile: "tw:size-14", label: "tw:text-[9px]", number: "tw:text-[28px]", icon: "tw:size-6"},
           lg: {tile: "tw:size-19", label: "tw:text-[11px]", number: "tw:text-[40px]", icon: "tw:size-8"}
         }.freeze
 
-        def initialize(e_bike_class:, class_unknown: false, optional: nil, size: :md, explained: false)
+        def initialize(e_bike_class:, class_unknown: false, optional: nil, size: :md, explained: false, out_of_class_id: nil)
           @e_bike_class = e_bike_class
+          @out_of_class_id = out_of_class_id
           @optional = optional
           @class_unknown = class_unknown
           @size = SIZES.fetch(size)
@@ -39,7 +41,7 @@ module Pages
           end
         end
 
-        def catalog_id = @e_bike_class ? "evc/us/class_#{@e_bike_class}" : EbikeRuleServices::StateLaws::NOT_AN_EBIKE[:id]
+        def catalog_id = @e_bike_class ? "evc/us/class_#{@e_bike_class}" : @out_of_class_id || EbikeRuleServices::StateLaws::NOT_AN_EBIKE[:id]
 
         def caption = (@optional == "throttle") ? translation(".optional_throttle") : translation(".optional_upgrade")
 

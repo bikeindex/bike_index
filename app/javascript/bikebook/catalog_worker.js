@@ -11,8 +11,13 @@ let manifest = null
 let base = null
 let last = null
 let rules = null
+let similarityUrl = null
+let similarity = null
+let comparison = null
+let lastSimilar = null
 const blocks = new Map()
 const orders = new Map()
+const sold = new Map()
 
 const fetchJson = async (url) => {
   const response = await fetch(url)
@@ -25,53 +30,65 @@ const path = (id) => id.replace(/^m\//, '')
 const blockKey = (id) => path(id).split('/').slice(0, 2).join('/')
 
 // The blocks `ids` are in load alongside the index rather than after it
-async function load ({ manifestUrl, ids, jurisdictions, rulesUrl }) {
+async function load ({ manifestUrl, ids, jurisdictions, rulesUrl, similarityUrl: similarityModule }) {
+  similarityUrl = similarityModule
   ;[manifest, rules] = await Promise.all([fetchJson(manifestUrl), import(rulesUrl)])
   if (manifest.format !== FORMAT) throw new Error(`catalog format ${manifest.format} isn't ${FORMAT}`)
 
   base = new URL(manifestUrl, self.location)
   ids.map(blockKey).filter((key) => manifest.blocks[key]).forEach((key) => block(key).catch(() => {}))
-  const [index, vocabulary, { kit }] = await Promise.all([manifest.index, manifest.vocabulary, manifest.kit].map((file) => fetchJson(new URL(file, base))))
+  // the comparison for its frame materials as well as how alike models are; without it neither is offered
+  const [index, vocabulary, { kit }, loaded] = await Promise.all([...[manifest.index, manifest.vocabulary, manifest.kit].map((file) => fetchJson(new URL(file, base))),
+    manifest.comparison && fetchJson(new URL(manifest.comparison, base)).catch(() => null)])
+  comparison = loaded
   const currentYear = new Date().getFullYear()
   const activityNames = vocabulary.names.primary_activity ?? {}
   const typeNames = Object.fromEntries(index.vehicle_types.map(({ slug, name }) => [slug, name]))
   activities = index.primary_activities
-  models = index.models.map((model) => ({
+  models = index.models.map((model, position) => ({
     ...model,
-    // a photo stored under its model's id is published as its extension alone
-    stock_photo: model.photo?.includes('/') ? model.photo : model.photo && `${index.stock_photos}/${path(model.id)}.${model.photo}`,
+    frame_material: comparison?.fields.frame_material?.[position] ?? null,
+    stock_photo: model.photo && `${index.stock_photos}/${path(model.id)}.${model.photo}`,
     activity_name: activityNames[model.primary_activity],
     type_name: typeNames[model.vehicle_type],
+    // by its maker, as makers share names, and its first word where it has no group
+    group_key: `${model.manufacturer}/${model.model_group ?? model.model.split(' ')[0]}`,
     searchText: `${model.display}\n${model.id}`.toLowerCase(),
-    sortYear: model.final_year ?? currentYear,
-    sortPrice: model.msrp_cents ?? 0
+    sameModel: `${model.manufacturer}/${model.model.toLowerCase()}`,
+    sortYear: model.final_year ?? currentYear
   }))
   byId = new Map(models.map((model) => [model.id, model]))
+  // the index labels the out of class markers, which the vocabulary has no record of: "Out of class in California"
+  const labels = Object.entries(index.filter_options.e_vehicle_classification).map(([id, label]) => [id, { label, title: label, marker: true }])
   // "California Moped", which its name leaves off the state of, and a group has none; "US Class 3 e-bike"
-  classifications = Object.fromEntries(Object.entries(vocabulary.e_vehicle_classifications).map(([id, record]) => {
+  classifications = Object.fromEntries([...labels, ...Object.entries(vocabulary.e_vehicle_classifications).map(([id, record]) => {
     const code = record.jurisdiction
     const state = code?.startsWith('US-') && (jurisdictions[code] ?? code)
     const label = [state || code, record.name].filter(Boolean).join(' ')
     // "Alabama (AL)", "United States"
     const jurisdictionName = state ? `${state} (${code.slice(3)})` : code && (jurisdictions[code] ?? code)
     return [id, { ...record, label, jurisdiction_name: jurisdictionName, title: /^Class \d+$/.test(record.name) ? `${label} e-bike` : label }]
-  }))
-  return { vocabulary: { ...vocabulary, e_vehicle_classifications: classifications }, kit, options: options(index) }
+  })])
+  return { vocabulary: { ...vocabulary, e_vehicle_classifications: classifications }, kit, options: options(index, vocabulary.names), comparable: Boolean(comparison) }
 }
 
 // Each filter's choices, with how many models choosing it alone matches. Propulsion's checkboxes show no counts
-function options ({ manufacturers, vehicle_types: vehicleTypes, filter_options: { electric, e_vehicle_classification: classification, market, ...filterOptions } }) {
+function options ({ manufacturers, vehicle_types: vehicleTypes, filter_options: { electric, e_vehicle_classification: classification, market, ...filterOptions } }, names) {
   const counted = (name, choices) => choices.map(([value, display]) => ({ value, display, count: models.filter(filter({ [name]: value })).length }))
+  const sellers = new Set(models.flatMap(({ markets }) => markets))
   const perManufacturer = models.reduce((counts, { manufacturer }) => counts.set(manufacturer, (counts.get(manufacturer) ?? 0) + 1), new Map())
   return {
     primary_activity: counted('primary_activity', activities.map(({ slug, name }) => [slug, name])),
     manufacturer: Object.entries(manufacturers).filter(([slug]) => perManufacturer.has(slug)).sort(([, a], [, b]) => a.localeCompare(b))
       .map(([value, display]) => ({ value, display, count: perManufacturer.get(value) })),
     vehicle_type: counted('vehicle_type', vehicleTypes.map(({ slug, name }) => [slug, name])),
-    // "Canada (CA)", as UI::Forms::ComboboxState shows a state
-    market: counted('market', Object.entries(market).sort(([, a], [, b]) => a.localeCompare(b)))
-      .map((option) => ({ ...option, name: option.display, display: `${option.display} (${option.value})` })),
-    ...Object.fromEntries(Object.entries(filterOptions).map(([name, labels]) => [name, counted(name, Object.entries(labels))]))
+    // "Canada (CA)", as UI::Forms::ComboboxState shows a state; only those with models sold there, as most have none
+    market: Object.entries(market).sort(([, a], [, b]) => a.localeCompare(b)).filter(([value]) => sellers.has(value))
+      .map(([value, display]) => ({ value, name: display, display: `${display} (${value})` })),
+    ...Object.fromEntries(Object.entries(filterOptions).map(([name, labels]) => [name, counted(name, Object.entries(labels))])),
+    // by the vocabulary, as the index offers no choices of these
+    ...Object.fromEntries([['handlebar_type', 'handlebar_type'], ['frame_material', 'frame.material']]
+      .map(([name, vocabulary]) => [name, counted(name, Object.entries(names[vocabulary] ?? {})).filter(({ count }) => count)]))
   }
 }
 
@@ -107,6 +124,23 @@ async function vehicles ({ ids, market }) {
   return found.filter(({ data }) => data)
 }
 
+// Imported once something asks how alike models are. Null without a comparison, or one in a format the scorer doesn't know
+const scorer = () => {
+  similarity ??= import(similarityUrl).then(({ scorer }) => comparison && scorer(models, comparison, activities), (error) => {
+    similarity = null
+    throw error
+  })
+  return similarity
+}
+
+// the last scoring kept, as the page asks again on each render while the section is open
+async function similar ({ model, settings }) {
+  const score = await scorer()
+  const key = JSON.stringify({ model, settings })
+  if (lastSimilar?.key !== key) lastSimilar = { key, result: score?.(model, settings) ?? null }
+  return lastSimilar.result
+}
+
 function displays ({ ids }) {
   return ids.map((id) => byId.get(id)?.display ?? null)
 }
@@ -130,11 +164,9 @@ function matching (params) {
   const passes = filter(params)
   const filtered = sorted(params).filter(passes)
   const needle = (params.q ?? '').trim().toLowerCase()
-  const selected = new Set(list(params.vehicle_models))
   const exact = needle.startsWith('m/') && byId.get(needle)
   const words = needle.split(/\s+/).filter(Boolean)
-  const found = (exact ? [exact] : filtered.filter(({ searchText }) => words.every((word) => searchText.includes(word))))
-    .filter(({ id }) => !selected.has(id))
+  const found = exact ? [exact] : filtered.filter(({ searchText }) => words.every((word) => searchText.includes(word)))
   const whole = ({ searchText }) => searchText.includes(needle)
   const matches = needle ? [...found.filter(whole), ...found.filter((model) => !whole(model))] : found
   return { filteredCount: filtered.length, matches, unfiltered: Boolean(exact) && matches.length > 0 && !passes(exact) }
@@ -147,7 +179,7 @@ function featured ({ params, legalClasses }) {
   const legalEbike = (model) => !legalClasses.length || legalClasses.some((propulsion) => propelled(model, propulsion, params.jurisdiction))
   const filtered = sorted(params).filter(filter(params))
   const candidates = requirements.reduce((models, requirement) => {
-    const passing = models.filter((model) => requirement(model, { legalEbike }))
+    const passing = models.filter((model) => requirement(model, { legalEbike, params }))
     return passing.length ? passing : models
   }, filtered)
   const count = Math.min(COUNT, candidates.length)
@@ -180,22 +212,56 @@ function featured ({ params, legalClasses }) {
   return { count: filtered.length, featured: candidates.filter((model) => picked.includes(model)) }
 }
 
+// The models of the `model` id's group by year, newest first, each under the newest it's sold in - so each once, and a
+// current one in this year
+function group ({ model: id }) {
+  const model = byId.get(id)
+  if (!model?.model_group) return null
+
+  const years = new Map()
+  for (const each of sorted({}).filter((each) => each.manufacturer === model.manufacturer && each.model_group === model.model_group && each.first_year)) {
+    const year = Math.max(each.first_year, each.sortYear)
+    years.set(year, [...(years.get(year) ?? []), each])
+  }
+  return {
+    name: model.model_group,
+    manufacturer: model.manufacturer_name,
+    years: [...years].sort(([a], [b]) => b - a).map(([year, models]) => ({ year, models }))
+  }
+}
+
 // Whether `a` wins at the first rank the two differ at
 const outranks = (a, b) => {
   const index = a.findIndex((value, each) => value !== b[each])
   return index !== -1 && a[index]
 }
 
-// Newest and priciest first unless asked otherwise, kept per pair of directions so a query only has to filter
-function sorted ({ year_dir: yearDir, price_dir: priceDir }) {
-  const key = `${yearDir}/${priceDir}`
+// Newest and priciest first unless asked otherwise, by year then price unless `sort` puts price first, the unpriced last
+// either way. Kept per order, so a query only has to filter
+function sorted ({ sort, year_dir: yearDir, price_dir: priceDir }) {
+  const key = `${sort}/${yearDir}/${priceDir}`
   if (!orders.has(key)) {
     const direction = (dir) => dir === 'asc' ? 1 : -1
-    orders.set(key, [...models].sort((a, b) =>
-      direction(yearDir) * (a.sortYear - b.sortYear) || direction(priceDir) * (a.sortPrice - b.sortPrice) || (a.id < b.id ? -1 : 1)))
+    const byYear = (a, b) => direction(yearDir) * (a.sortYear - b.sortYear)
+    const byPrice = (a, b) => (a.msrp_cents == null) - (b.msrp_cents == null) || direction(priceDir) * (a.msrp_cents - b.msrp_cents)
+    const [first, second] = sort === 'price' ? [byPrice, byYear] : [byYear, byPrice]
+    orders.set(key, [...models].sort((a, b) => first(a, b) || second(a, b) || (a.id < b.id ? -1 : 1)))
   }
   return orders.get(key)
 }
+
+const soldIn = (market) => {
+  if (!sold.has(market)) {
+    sold.set(market, models.filter(({ markets }) => markets.includes(market))
+      .reduce((names, model) => names.set(model.sameModel, [...(names.get(model.sameModel) ?? []), model]), new Map()))
+  }
+  return sold.get(market)
+}
+
+// A market's search has the models sold elsewhere too, but not e-vehicles, which its own laws class, nor one it sells
+// its own of in the same years
+const inMarket = (model, market) => model.markets.includes(market) || (!model.electric &&
+  !soldIn(market).get(model.sameModel)?.some((each) => each.first_year <= model.sortYear && model.first_year <= each.sortYear))
 
 // A family matches its flavors; slugs naming no activity filter nothing
 function filter (params) {
@@ -217,26 +283,28 @@ function filter (params) {
     (!params.suspension || (params.suspension === 'has' ? model.suspension !== 'rigid' : model.suspension === params.suspension)) &&
     (types.length === 0 || types.includes(model.vehicle_type)) &&
     (!params.model_configuration || model.model_configuration === params.model_configuration) &&
-    (!params.market || model.markets.includes(params.market)) &&
+    (!params.handlebar_type || model.handlebar_type === params.handlebar_type) &&
+    (!params.frame_material || model.frame_material === params.frame_material) &&
+    (!params.market || inMarket(model, params.market)) &&
     (yearMin == null || model.sortYear >= yearMin) &&
     (yearMax == null || (model.first_year ?? 0) <= yearMax) &&
     ((priceMin == null && priceMax == null) || (model.msrp_cents > 0 &&
       (priceMin == null || model.msrp_cents >= priceMin * 100) && (priceMax == null || model.msrp_cents <= priceMax * 100)))
 }
 
-// out_of_class is the catalog's own marker, as a model with no classified mode is unknown rather than out of class, and
-// out_of_class/US-CA its marker for one in no class in that state alone, where it's out of class rather than the US
+// evc/out_of_class is the catalog's own marker, as a model with no classified mode is unknown rather than out of class,
+// and evc/out_of_class/us/ca its marker for one in no class in that state alone, where it's out of class rather than the US
 // classes it carries. A state's class matches the models carrying its groups
 function propelled ({ electric, e_vehicle_classifications: carried = [] }, propulsion, jurisdiction) {
   if (propulsion === '0' || propulsion === '1') return electric === (propulsion === '1')
   const id = propulsion.replace(/^class_/, 'evc/us/class_')
-  if (/^(out_of_class|evc\/us\/class_\d)$/.test(id) && carried.includes(`out_of_class/US-${jurisdiction}`)) return id === 'out_of_class'
+  if (/^evc\/(out_of_class|us\/class_\d)$/.test(id) && carried.includes(`evc/out_of_class/us/${jurisdiction?.toLowerCase()}`)) return id === 'evc/out_of_class'
   return [id, ...(classifications[id]?.groups ?? [])].some((classification) => carried.includes(classification))
 }
 
 self.onmessage = async ({ data: { id, type, ...args } }) => {
   try {
-    self.postMessage({ id, result: await { load, search, featured, vehicles, displays }[type](args) })
+    self.postMessage({ id, result: await { load, search, featured, group, vehicles, displays, similar }[type](args) })
   } catch (error) {
     self.postMessage({ id, error: error.message })
   }
