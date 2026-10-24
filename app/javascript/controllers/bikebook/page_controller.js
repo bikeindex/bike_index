@@ -164,12 +164,7 @@ export default class extends Controller {
     // what turbo:before-render is to a Turbo page, which an open combobox dialog closes on
     this.dispatch('before-render')
     const active = this.pageTarget.contains(document.activeElement) && document.activeElement.id ? document.activeElement : null
-    const open = this.pageTarget.querySelector('[data-stays-open] [aria-expanded="true"]')?.id
     this.pageTarget.replaceChildren(keepPermanent(rendered.content, this.pageTarget))
-    if (open) {
-      this.pageTarget.querySelector(`[data-stays-open] #${CSS.escape(open)}`)?.closest('[data-controller~="ui--dropdown"]')
-        .setAttribute('data-ui--dropdown-open-value', 'true')
-    }
     if (reveal) {
       const search = this.pageTarget.querySelector('[data-controller~="bikebook--catalog-filters"]')
       search.classList.add('tw:hidden')

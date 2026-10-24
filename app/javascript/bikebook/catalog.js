@@ -5,7 +5,7 @@ import { classificationOption } from 'bikebook/templates/vehicles/class_cards'
 import { comboboxOption } from 'bikebook/templates/vehicles/combobox_option'
 import { fragmentOf, renderInto } from 'bikebook/render'
 
-/* global IntersectionObserver, Worker */
+/* global CSS, IntersectionObserver, Worker */
 
 // `jurisdictions` names the codes classifications are in, which the catalog doesn't
 export async function loadCatalog (manifestUrl, ids = [], jurisdictions = {}) {
@@ -134,6 +134,14 @@ export const renderChips = (combobox, chips) => {
     html`<div data-hw-combobox-chip=""><div class="hw-combobox__chip">${handle}<span>${display}</span><span tabindex="0" class="hw-combobox__chip__remover"
       aria-label=${`Remove ${display}`} data-action="click->hw-combobox#removeChip:stop keydown->hw-combobox#navigateChip"
       data-hw-combobox-target="chipDismisser" data-hw-combobox-value-param=${value}></span></div></div>`)))
+}
+
+// The chips of a combobox listing every option it has, named by them
+export const optionChips = {
+  chips: ({ element }, chosen) => renderChips(element, String(chosen).split(',').filter(Boolean).flatMap((value) => {
+    const option = element.querySelector(`[role="option"][data-value="${CSS.escape(value)}"]`)
+    return option ? [{ value, display: option.dataset.autocompletableAs }] : []
+  }))
 }
 
 const group = (label, options) => {

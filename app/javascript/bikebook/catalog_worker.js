@@ -178,8 +178,8 @@ function featured ({ params, legalClasses }) {
   return { count: filtered.length, featured: candidates.filter((model) => picked.includes(model)) }
 }
 
-// The models of the `model` id's group sold in any of `years`, or this one where it has some and else its newest, and every year it
-// has any in. Its newest first, as the search sorts them
+// The models of the `model` id's group sold in any of `years`, in the order they were picked - or this one where it has some and else its newest - and every year it
+// has any in, newest first. Its models newest first, as the search sorts them
 function group ({ model: id, years: asked }) {
   const model = byId.get(id)
   if (!model?.model_group) return null
@@ -189,7 +189,7 @@ function group ({ model: id, years: asked }) {
     .map((each) => [each, each.first_year, Math.max(each.first_year, each.sortYear)])
   const years = [...new Set(spans.flatMap(([, first, last]) => Array.from({ length: last - first + 1 }, (_, index) => first + index)))]
     .sort((a, b) => b - a)
-  const picked = years.filter((year) => asked.includes(year))
+  const picked = [...new Set(asked)].filter((year) => years.includes(year))
   const shown = picked.length ? picked : [years.includes(currentYear) ? currentYear : years[0]]
   const models = spans.filter(([, first, last]) => shown.some((year) => first <= year && year <= last)).map(([each]) => each)
   return { name: model.model_group, manufacturer: model.manufacturer_name, shown, years, models }

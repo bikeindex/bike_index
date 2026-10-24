@@ -109,7 +109,6 @@ export class VehicleViewer {
       })}${group
         ? modelGroup({
           group,
-          yearsPath: (years) => pathWith(url, { group_years: years.join(',') }),
           vehiclePath: (id) => pathWith(url, { vehicle_models: id, vehicle_sizes: '', group: '', group_years: '' }),
           placeholderUrl: presenter.kit.placeholder_url,
           currencies: presenter.vocabulary.currencies

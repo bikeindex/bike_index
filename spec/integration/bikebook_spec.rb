@@ -139,18 +139,14 @@ RSpec.describe "BikeBook", :js, type: :system do
     group_cards = -> { all("[aria-labelledby='model-group-name'] li h3").map(&:text) }
     expect(page).to have_css("#model-group h2", exact_text: "Level")
     expect(group_cards.call).to include("Aventón Level 4 REC Step-Through")
-    click_button "Open Group year menu"
-    # the menu stays open as years toggle on and off, down to the last
-    within("[aria-labelledby='model-group-name'] [role='menu']") do
-      expect(all("a").map(&:text).last).to eq "2022"
-      this_year = find("[aria-checked='true']").text[/\d+/]
-      click_link "2023"
-      expect(page).to have_css("[aria-checked='true']", count: 2)
-      click_link this_year
-      expect(page).to have_css("[aria-checked='true']", count: 1).and have_css("#group-year-2023[aria-checked='true']")
-      click_link "2023"
-      expect(page).to have_css("[aria-checked='true']", count: 1).and have_css("#group-year-2023[aria-checked='true']")
-    end
+    year_chips = -> { all("#group-years .hw-combobox__chip").map(&:text) }
+    this_year = year_chips.call.sole
+    expect(all("#group_years-hw-listbox [role='option']", visible: :all).map { it.text(:all) }.last).to eq "2022"
+    type_into(find("#group_years"), "2023")
+    find("#group_years-hw-listbox [role='option']", text: "2023").click
+    expect(page).to have_current_path(/[?&]group_years=#{this_year},2023\b/)
+    expect(year_chips.call).to eq([this_year, "2023"])
+    find("[aria-label='Remove #{this_year}']").click
     expect(page).to have_current_path(/[?&]group_years=2023\b/)
     expect(page).to have_css("[aria-label='Level models in 2023']")
     expect(group_cards.call).to eq(["Aventón Level 2", "Aventón Level 2 Step-Through"])
@@ -1280,6 +1276,7 @@ RSpec.describe "BikeBook", :js, type: :system do
 
     # a model picked again compares in a size of its own, which goes on the URL in its place
     visit bikebook_path(vehicle_models: "m/aventon/2026/current_adv", view: "geometry", search: 1)
+    expect(page).to have_css("[aria-label='Sizes & geometry comparison']", wait: 10)
     type_into(vehicle_field, "current adv")
     retry_on_detach { find(vehicle_option, text: "Aventón Current ADV already selected").click }
     expect(page).to have_css(".hw-combobox__chip", text: "Aventón Current ADV", count: 2)
@@ -1344,17 +1341,6 @@ RSpec.describe "BikeBook", :js, type: :system do
 
       expect_template(UI::IconChevron::Component.new(size: :md), "bikebook/templates/ui/icon_chevron#iconChevron", "{ size: 'md' }")
       expect_template(UI::IconChevron::Component.new, "bikebook/templates/ui/icon_chevron#iconChevron", "undefined")
-      expect_template(UI::IconChevron::Component.new(direction: :down, size: :md), "bikebook/templates/ui/icon_chevron#iconChevron",
-        "{ direction: 'down', size: 'md' }")
-      # its slots fill while it renders
-      year_menu = ApplicationController.render(inline: <<~ERB, layout: false)
-        <%= render(UI::Dropdown::Component.new(name: "Group year", button_size: :sm)) do |menu|
-          menu.with_button { "2026" }
-          menu.with_entry_item { link_to "2025", "/bikebook?group_years=2025" }
-        end %>
-      ERB
-      expect_template(year_menu, "bikebook/templates/ui/dropdown#dropdown",
-        "{ name: 'Group year', button: '2026', buttonSize: 'sm', entries: [html`<a href=\"/bikebook?group_years=2025\">2025</a>`] }")
 
       expect_template(UI::DragHandle::Component.new(controller: "bikebook--chip-reorder", html_class: "tw:mr-1"),
         "bikebook/templates/ui/drag_handle#dragHandle", "{ controller: 'bikebook--chip-reorder', htmlClass: 'tw:mr-1' }")

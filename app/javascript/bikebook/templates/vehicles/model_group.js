@@ -1,28 +1,29 @@
 import { html, nothing } from 'lit-html'
-import { dropdown } from 'bikebook/templates/ui/dropdown'
+import { localSources } from 'utils/hw_combobox_patch'
+import { optionChips } from 'bikebook/catalog'
+import { fragmentOf } from 'bikebook/render'
+import { filterOption } from 'bikebook/templates/filter_option'
 import { MODEL_CARDS_CLASSES, modelCard } from 'bikebook/templates/vehicles/model_card'
 
-// Which of a model group's years are `shown`, toggled by `yearsPath`, and the models sold in any of them - each card linking to
-// `vehiclePath` of its model. A toggle replaces the history entry, and the menu stays open across the render it causes
-export const modelGroup = ({ group: { name, manufacturer, shown, years, models }, yearsPath, vehiclePath, ...card }) => html`<section
-  id="model-group" tabindex="-1" aria-labelledby="model-group-name" class="tw:mt-8 tw:focus:outline-none" data-in-place="#group-year"
-  data-replace><p class="tw:mb-1 tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">${manufacturer}</p><div
-  class="tw:flex tw:items-baseline tw:gap-3" data-stays-open><h2 id="model-group-name" class="tw:text-2xl tw:leading-tight
-  tw:font-extrabold">${name}</h2>${dropdown({
-    name: 'Group year',
-    button: shown.join(', '),
-    buttonSize: 'sm',
-    entries: years.map((each) => yearToggle(each, shown, yearsPath))
-  })}</div><ul aria-label=${`${name} models in ${shown.join(', ')}`} class="tw:mt-3 ${MODEL_CARDS_CLASSES}">${models.map((model) =>
-    modelCard({ model, href: vehiclePath(model.id), ...card }))}</ul></section>`
+// A model group's models sold in any of the `shown` years, which the combobox beside its name picks - each card
+// linking to `vehiclePath` of its model
+export const modelGroup = ({ group: { name, manufacturer, shown, years, models }, vehiclePath, ...card }) => html`<section
+  id="model-group" tabindex="-1" aria-labelledby="model-group-name" class="tw:mt-8 tw:focus:outline-none"><p class="tw:mb-1
+  tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">${manufacturer}</p><div class="tw:relative tw:z-20 tw:flex tw:flex-wrap
+  tw:items-baseline tw:gap-x-4 tw:gap-y-2"><h2 id="model-group-name" class="tw:text-2xl tw:leading-tight tw:font-extrabold">${name}</h2>${yearsField(
+    `${manufacturer} ${name} ${shown}`, years, shown)}</div><ul aria-label=${`${name} models in ${[...shown].sort().join(', ')}`}
+  class="tw:mt-3 ${MODEL_CARDS_CLASSES}">${models.map((model) => modelCard({ model, href: vehiclePath(model.id), ...card }))}</ul></section>`
 
-// the last year shown stays, rather than leaving none
-const yearToggle = (year, shown, yearsPath) => {
-  const checked = shown.includes(year)
-  const toggled = checked ? shown.filter((each) => each !== year) : [...shown, year].sort((a, b) => b - a)
-  return html`<a href=${yearsPath(toggled.length ? toggled : shown)} id="group-year-${year}" role="menuitemcheckbox"
-    aria-checked=${checked ? 'true' : 'false'} class="tw:flex! tw:items-center tw:gap-2"><span aria-hidden="true" class="tw:inline-flex
-    tw:size-4 tw:items-center tw:justify-center tw:rounded-sm tw:border tw:text-xs ${checked
-      ? 'tw:border-purple-500 tw:bg-purple-500 tw:text-white'
-      : 'tw:border-gray-400'}">${checked ? '✓' : nothing}</span>${year}</a>`
+// A copy of the page's group years combobox. Permanent while the years it shows are, so the render a pick causes
+// keeps it open as it was
+const yearsField = (permanent, years, shown) => {
+  const form = document.querySelector('template[data-bikebook-group-years]')?.content.querySelector('form').cloneNode(true)
+  if (!form) return nothing
+
+  form.id = 'group-years'
+  form.dataset.permanent = permanent
+  form.querySelector('#group_years-hw-listbox').append(fragmentOf(years.map((year) => filterOption({ value: year, display: year }))))
+  form.querySelector('#group_years-hw-hidden-field').setAttribute('value', shown.join(','))
+  localSources.set(form.querySelector('.hw-combobox'), optionChips)
+  return form
 }

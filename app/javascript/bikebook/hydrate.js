@@ -1,6 +1,6 @@
 import { html } from 'lit-html'
 import { localSources } from 'utils/hw_combobox_patch'
-import { renderChips, renderCounts } from 'bikebook/catalog'
+import { optionChips, renderChips, renderCounts } from 'bikebook/catalog'
 import { numberDisplay } from 'bikebook/templates/helpers'
 import { filterOption } from 'bikebook/templates/filter_option'
 import { pickedClassifications, renderClassCards } from 'bikebook/templates/vehicles/class_cards'
@@ -177,13 +177,6 @@ export async function hydrate (catalog, source, shell, url) {
     vehicles.length ? {} : await unpicked(catalog, root, filters), group))
 
   localSources.set(combobox(root, 'vehicle_models'), source)
-  for (const name of LISTS) {
-    localSources.set(combobox(root, name), {
-      chips: ({ element }, chosen) => renderChips(element, String(chosen).split(',').filter(Boolean).flatMap((value) => {
-        const option = element.querySelector(`[role="option"][data-value="${CSS.escape(value)}"]`)
-        return option ? [{ value, display: option.dataset.autocompletableAs }] : []
-      }))
-    })
-  }
+  for (const name of LISTS) localSources.set(combobox(root, name), optionChips)
   return { content: root, title: vehicles[0]?.display }
 }
