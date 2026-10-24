@@ -350,20 +350,6 @@
     </template>
   <% end %>
 
-  <%# The years of a model group the Overview shows, its options and chips added in the browser %>
-  <template data-bikebook-group-years>
-    <%= form_with url: bikebook_path, method: :get, class: "tw:w-72 tw:max-w-full",
-        data: {controller: "bikebook--auto-submit",
-               action: "hw-combobox:selection->bikebook--auto-submit#submit hw-combobox:removal->bikebook--auto-submit#submit"} do %>
-      <%= render(UI::Forms::Combobox::Component.new(
-        name: "group_years",
-        multiselect_chip_src: bikebook_path,
-        dialog_label: translation(".group_years"),
-        html_options: {value: "", placeholder: translation(".add_a_year"), aria: {label: translation(".group_years")}}
-      )) %>
-    <% end %>
-  </template>
-
   <%# DM Sans is the BikeBook logo's face, loaded for its letters alone %>
   <% helpers.content_for(:header) do %>
     <link

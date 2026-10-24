@@ -178,21 +178,22 @@ function featured ({ params, legalClasses }) {
   return { count: filtered.length, featured: candidates.filter((model) => picked.includes(model)) }
 }
 
-// The models of the `model` id's group sold in any of `years`, in the order they were picked - or this one where it has some and else its newest - and every year it
-// has any in, newest first. Its models newest first, as the search sorts them
-function group ({ model: id, years: asked }) {
+// The models of the `model` id's group by year, newest first, each under the newest it's sold in - so each once, and a
+// current one in this year
+function group ({ model: id }) {
   const model = byId.get(id)
   if (!model?.model_group) return null
 
-  const currentYear = new Date().getFullYear()
-  const spans = sorted({}).filter((each) => each.manufacturer === model.manufacturer && each.model_group === model.model_group && each.first_year)
-    .map((each) => [each, each.first_year, Math.max(each.first_year, each.sortYear)])
-  const years = [...new Set(spans.flatMap(([, first, last]) => Array.from({ length: last - first + 1 }, (_, index) => first + index)))]
-    .sort((a, b) => b - a)
-  const picked = [...new Set(asked)].filter((year) => years.includes(year))
-  const shown = picked.length ? picked : [years.includes(currentYear) ? currentYear : years[0]]
-  const models = spans.filter(([, first, last]) => shown.some((year) => first <= year && year <= last)).map(([each]) => each)
-  return { name: model.model_group, manufacturer: model.manufacturer_name, shown, years, models }
+  const years = new Map()
+  for (const each of sorted({}).filter((each) => each.manufacturer === model.manufacturer && each.model_group === model.model_group && each.first_year)) {
+    const year = Math.max(each.first_year, each.sortYear)
+    years.set(year, [...(years.get(year) ?? []), each])
+  }
+  return {
+    name: model.model_group,
+    manufacturer: model.manufacturer_name,
+    years: [...years].sort(([a], [b]) => b - a).map(([year, models]) => ({ year, models }))
+  }
 }
 
 // Whether `a` wins at the first rank the two differ at

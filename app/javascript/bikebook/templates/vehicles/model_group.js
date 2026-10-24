@@ -1,29 +1,23 @@
-import { html, nothing } from 'lit-html'
-import { localSources } from 'utils/hw_combobox_patch'
-import { optionChips } from 'bikebook/catalog'
-import { fragmentOf } from 'bikebook/render'
-import { filterOption } from 'bikebook/templates/filter_option'
+import { html } from 'lit-html'
 import { MODEL_CARDS_CLASSES, modelCard } from 'bikebook/templates/vehicles/model_card'
 
-// A model group's models sold in any of the `shown` years, which the combobox beside its name picks - each card
-// linking to `vehiclePath` of its model
-export const modelGroup = ({ group: { name, manufacturer, shown, years, models }, vehiclePath, ...card }) => html`<section
-  id="model-group" tabindex="-1" aria-labelledby="model-group-name" class="tw:mt-8 tw:focus:outline-none"><p class="tw:mb-1
-  tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">${manufacturer}</p><div class="tw:relative tw:z-20 tw:flex tw:flex-wrap
-  tw:items-baseline tw:gap-x-4 tw:gap-y-2"><h2 id="model-group-name" class="tw:text-2xl tw:leading-tight tw:font-extrabold">${name}</h2>${yearsField(
-    `${manufacturer} ${name} ${shown}`, years, shown)}</div><ul aria-label=${`${name} models in ${[...shown].sort().join(', ')}`}
-  class="tw:mt-3 ${MODEL_CARDS_CLASSES}">${models.map((model) => modelCard({ model, href: vehiclePath(model.id), ...card }))}</ul></section>`
+// whole years, as many as make a page of at least this many models
+const PAGE_SIZE = 24
 
-// A copy of the page's group years combobox. Permanent while the years it shows are, so the render a pick causes
-// keeps it open as it was
-const yearsField = (permanent, years, shown) => {
-  const form = document.querySelector('template[data-bikebook-group-years]')?.content.querySelector('form').cloneNode(true)
-  if (!form) return nothing
+// A model group's models under each year, newest first, a page at a time as the reader scrolls - each card linking to
+// `vehiclePath` of its model
+export const modelGroup = ({ group: { name, manufacturer, years }, vehiclePath, ...card }) => html`<section id="model-group"
+  tabindex="-1" aria-labelledby="model-group-name" class="tw:mt-8 tw:focus:outline-none" data-controller="bikebook--infinite-scroll"><p
+  class="tw:mb-1 tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">${manufacturer}</p><h2 id="model-group-name"
+  class="tw:text-2xl tw:leading-tight tw:font-extrabold">${name}</h2>${pages(years).map((page, index) => html`<div
+  ?hidden=${index > 0} data-bikebook--infinite-scroll-target="page">${page.map(({ year, models }) => html`<h3
+  id="model-group-${year}" class="tw:mt-6 tw:mb-3 tw:text-lg tw:font-bold">${year}</h3><ul aria-labelledby="model-group-${year}"
+  class=${MODEL_CARDS_CLASSES}>${models.map((model) => modelCard({ model, href: vehiclePath(model.id), ...card }))}</ul>`)}</div>`)}<div
+  data-bikebook--infinite-scroll-target="sentinel"></div></section>`
 
-  form.id = 'group-years'
-  form.dataset.permanent = permanent
-  form.querySelector('#group_years-hw-listbox').append(fragmentOf(years.map((year) => filterOption({ value: year, display: year }))))
-  form.querySelector('#group_years-hw-hidden-field').setAttribute('value', shown.join(','))
-  localSources.set(form.querySelector('.hw-combobox'), optionChips)
-  return form
-}
+const pages = (years) => years.reduce((paged, year) => {
+  const last = paged.at(-1)
+  return last && last.reduce((count, { models }) => count + models.length, 0) < PAGE_SIZE
+    ? [...paged.slice(0, -1), [...last, year]]
+    : [...paged, [year]]
+}, [])

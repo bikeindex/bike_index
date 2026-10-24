@@ -134,22 +134,31 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(page).to have_current_path("/bikebook?search=1&vehicle_models=m/aventon/2026/level_4_rec_step_through")
     # for the search logs, what the reader typed once they stopped, and then what they picked
     expect(logged).to eq ["count=2&q=level+4+rec", "vehicle_models=m/aventon/2026/level_4_rec_step_through"]
-    # its model group's models under the overview, this year's until another is picked
+    # its model group's models under the overview, each under the newest year it's sold in - the current ones this year's
     within(find("[aria-label='Overview'] tr", text: /\AModel group/)) { click_link "View group" }
     group_cards = -> { all("[aria-labelledby='model-group-name'] li h3").map(&:text) }
     expect(page).to have_css("#model-group h2", exact_text: "Level")
-    expect(group_cards.call).to include("Aventón Level 4 REC Step-Through")
-    year_chips = -> { all("#group-years .hw-combobox__chip").map(&:text) }
-    this_year = year_chips.call.sole
-    expect(all("#group_years-hw-listbox [role='option']", visible: :all).map { it.text(:all) }.last).to eq "2022"
-    type_into(find("#group_years"), "2023")
-    find("#group_years-hw-listbox [role='option']", text: "2023").click
-    expect(page).to have_current_path(/[?&]group_years=#{this_year},2023\b/)
-    expect(year_chips.call).to eq([this_year, "2023"])
-    find("[aria-label='Remove #{this_year}']").click
-    expect(page).to have_current_path(/[?&]group_years=2023\b/)
-    expect(page).to have_css("[aria-label='Level models in 2023']")
-    expect(group_cards.call).to eq(["Aventón Level 2", "Aventón Level 2 Step-Through"])
+    expect(all("#model-group > div > h3").map(&:text)).to eq([Time.current.year.to_s])
+    expect(group_cards.call).to match_array(["Aventón Level 2", "Aventón Level 2 Step-Through", "Aventón Level 3", "Aventón Level 3 Step-Through",
+      "Aventón Level 4 ADV", "Aventón Level 4 ADV Step-Through", "Aventón Level 4 REC", "Aventón Level 4 REC Step-Through"])
+    # a longer one a page of years at a time, the next as the reader nears its end
+    page.evaluate_script(<<~JS)
+      (async () => {
+        const [{ render }, { modelGroup }] = await Promise.all([import('lit-html'), import('bikebook/templates/vehicles/model_group')])
+        const years = Array.from({ length: 10 }, (_, index) => ({ year: 2026 - index, models: Array.from({ length: 6 }, (_, each) =>
+          ({ id: `m/test/${2026 - index}/model_${each}`, manufacturer_name: 'Test', model: `${2026 - index} Model ${each}`, first_year: 2026 - index, final_year: 2026 - index })) }))
+        const container = document.createElement('div')
+        render(modelGroup({ group: { name: 'Long', manufacturer: 'Test', years }, vehiclePath: (id) => id, placeholderUrl: '', currencies: {} }), container)
+        document.getElementById('model-group').replaceWith(container)
+      })()
+    JS
+    years_shown = -> { all("#model-group > div > h3").map(&:text) }
+    expect(page).to have_css("#model-group h2", exact_text: "Long")
+    expect(years_shown.call).to eq(%w[2026 2025 2024 2023])
+    page.scroll_to(:bottom)
+    expect(page).to have_css("#model-group > div > h3", count: 8)
+    page.scroll_to(:bottom)
+    expect(years_shown.call).to eq(%w[2026 2025 2024 2023 2022 2021 2020 2019 2018 2017])
     # and hidden again
     click_link "View group"
     expect(page).to have_no_css("#model-group")
