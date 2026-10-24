@@ -49,6 +49,7 @@ class EbikeRulesController < ApplicationController
     assign_meta(place)
     @page_url = ebike_rules_url if us_chosen
     lookup = EbikeRuleServices::Lookup.from_params(params.permit(*LOOKUP_PARAMS), place:, detected_place:)
+    @logged_search = lookup.submitted
     return render(Pages::EbikeRules::Check::Component.new(lookup:, page_title: @page_title)) if turbo_frame_request?
 
     registered_count, recoveries_count = Counts.retrieve_many("total_bikes", "recoveries")
@@ -58,6 +59,12 @@ class EbikeRulesController < ApplicationController
   end
 
   private
+
+  # LogSearcher stores a check's log line as a search
+  def append_info_to_payload(payload)
+    super
+    payload[:logged_search] = true if @logged_search
+  end
 
   # US-CA's is /ebike-rules/US/CA
   def place_path(place, query = {}) = ReadableQuery.path(ebike_rules_place_path(*place[:code].split("-")), query)

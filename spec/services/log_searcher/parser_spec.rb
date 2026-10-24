@@ -112,9 +112,9 @@ RSpec.describe LogSearcher::Parser do
         end
       end
       context "ebike rules" do
-        let(:status) { 200 }
         let(:params) { {vehicle_models: "m/specialized/2025/haul_st", country: "US", region: "CA"} }
-        let(:log_line) { %(I, [2026-10-22T17:41:03.512907 #812331]  INFO -- : [c1d7e2a4-3b9f-4e58-a6d1-8f2c0b7e9a35] {"method":"GET","path":"/ebike-rules/US/CA","format":"html","controller":"EbikeRulesController","action":"show","status":#{status},"duration":38.27,"remote_ip":"157.131.200.8","u_id":85,"params":#{params.to_json},"message":"[#{status}] GET /ebike-rules/US/CA (EbikeRulesController#show)"}) }
+        let(:marked) { ',"logged_search":true' }
+        let(:log_line) { %(I, [2026-10-22T17:41:03.512907 #812331]  INFO -- : [c1d7e2a4-3b9f-4e58-a6d1-8f2c0b7e9a35] {"method":"GET","path":"/ebike-rules/US/CA","format":"html","controller":"EbikeRulesController","action":"show","status":200,"duration":38.27,"remote_ip":"157.131.200.8","u_id":85,"params":#{params.to_json}#{marked},"message":"[200] GET /ebike-rules/US/CA (EbikeRulesController#show)"}) }
         let(:target) do
           {request_at: Time.parse("2026-10-22T17:41:03.512907 UTC"),
            request_id: "c1d7e2a4-3b9f-4e58-a6d1-8f2c0b7e9a35",
@@ -132,20 +132,9 @@ RSpec.describe LogSearcher::Parser do
         it "parses" do
           expect(described_class.parse_log_line(log_line)).to match_hash_indifferently target
         end
-        context "with a top speed" do
-          let(:params) { {top_speed: "20", throttle: "true", country: "US", region: "CA"} }
-          it "parses" do
-            expect(described_class.parse_log_line(log_line)).to match_hash_indifferently target
-          end
-        end
         context "a page view" do
           let(:params) { {country: "US", region: "CA"} }
-          it "is not a search" do
-            expect(described_class.parse_log_line(log_line)).to be_nil
-          end
-        end
-        context "a redirect" do
-          let(:status) { 301 }
+          let(:marked) { "" }
           it "is not a search" do
             expect(described_class.parse_log_line(log_line)).to be_nil
           end

@@ -152,6 +152,17 @@ RSpec.describe EbikeRulesController, type: :request do
       expect(meta("og:url")).to eq "http://www.example.com/ebike-rules/US/CO"
     end
 
+    it "marks a check's log line for LogSearcher, and not a page view's or a redirect's" do
+      marks = []
+      ActiveSupport::Notifications.subscribed(->(event) { marks << event.payload[:logged_search] }, "process_action.action_controller") do
+        get "/ebike-rules/US/CO"
+        get "/ebike-rules", params: {state: "CO", vehicle_models: "m/specialized/2025/haul_st"}
+        get "/ebike-rules/US/CO", params: {vehicle_models: "m/specialized/2025/haul_st"}
+        get "/ebike-rules/US/CO", params: {manual: "1", top_speed: "20"}, headers: {"Turbo-Frame" => "ebike-rules-check"}
+      end
+      expect(marks).to eq [nil, nil, true, true]
+    end
+
     context "with the catalog failing", :caching do
       include_context :caching_basic
       include ActiveSupport::Testing::TimeHelpers

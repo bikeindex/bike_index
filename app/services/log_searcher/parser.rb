@@ -87,18 +87,14 @@ module LogSearcher
     def parse_endpoint(opts)
       if opts["message"].present?
         endpoint = CONTROLLER_ENDPOINTS[opts["message"].split("(").last.delete(")")]
-        endpoint unless endpoint == :web_ebike_rules && !ebike_rules_check?(opts)
+        # its page views share the action, so it marks its checks
+        endpoint if endpoint != :web_ebike_rules || opts["logged_search"]
       elsif %w[/api/v2/bikes_search /api/v2/bikes_search/stolen
         /api/v2/bikes_search/non_stolen].include?(opts["path"])
         :api_v2_bikes
       else
         ROUTE_ENDPOINTS[opts["path"]]
       end
-    end
-
-    # Its page views and redirects aren't checks, which are of a model or a top speed
-    def ebike_rules_check?(opts)
-      opts["status"] == 200 && opts["params"].to_h.values_at("vehicle_models", "top_speed").any?(&:present?)
     end
 
     def organization_from_params(params)
@@ -149,6 +145,6 @@ module LogSearcher
       end
     end
 
-    conceal :includes_query?, :parse_endpoint, :ebike_rules_check?, :organization_from_params, :page_for, :parse_request_time, :scrub_null_bytes, :stolenness_for
+    conceal :includes_query?, :parse_endpoint, :organization_from_params, :page_for, :parse_request_time, :scrub_null_bytes, :stolenness_for
   end
 end

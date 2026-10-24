@@ -30,8 +30,7 @@ module Admin
       end
     end
 
-    # Each chart's series stack to its total: not_web_bikebook's serial searches on the rest, and the e-bike rules
-    # checks on BikeBook's searches
+    # Each chart's series stack to its total
     def logged_searches
       daily = Counts.logged_searches(@time_range.first.to_date..@time_range.last.to_date)
         .transform_keys { it.strftime(helpers.group_by_format(@time_range, :group_by_day)) }
