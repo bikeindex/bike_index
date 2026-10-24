@@ -1672,6 +1672,11 @@ RSpec.describe "BikeBook", :js, type: :system do
     # opened from the search's More filters line, its section above the views collapsed until then
     compare = find_button("Compare similar bikes to Level 4 REC", wait: 10)
     expect(compare).to have_xpath("../following-sibling::*[@aria-controls='vehicle-filters']")
+    # beneath the line once it's carded around applied filters
+    visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_rec,m/aventon/2022/level_2", manufacturer: "aventon")
+    expect(find_button("Compare similar bikes to Level 4 REC", wait: 10)).to have_no_xpath("ancestor::*[ul[@aria-label='Applied filters']]")
+    visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_rec,m/aventon/2022/level_2")
+    compare = find_button("Compare similar bikes to Level 4 REC", wait: 10)
     expect(page).to have_css("[aria-label='Similar models'] + #vehicle-views")
     expect(page).to have_no_css("[aria-label='Similar models to compare']").and have_no_css("[aria-label='Geometry overlay']")
       .and have_no_css("#similar-toggle")

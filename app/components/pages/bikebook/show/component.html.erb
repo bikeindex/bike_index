@@ -49,17 +49,18 @@
       <% end %>
     </div>
 
-    <%# Carded only around applied filters %>
+    <%# Carded only around applied filters, the similar models' toggle then beneath it %>
     <div
       class="
-        tw:mt-3 tw:flex tw:items-baseline tw:gap-x-4
+        tw:group/bar tw:peer/bar tw:mt-3 tw:flex tw:items-baseline
+        tw:gap-x-4
         tw:group-has-[[aria-controls=vehicle-filters][aria-expanded=true]]:hidden
         tw:has-[li]:rounded-lg tw:has-[li]:border
         tw:has-[li]:border-gray-200 tw:has-[li]:px-4 tw:has-[li]:py-2
         tw:dark:has-[li]:border-gray-700
       "
     >
-      <span data-similar-slot class="tw:contents"></span>
+      <span data-similar-slot class="tw:contents tw:group-has-[li]/bar:hidden"></span>
       <%= clear_filters %>
 
       <ul
@@ -69,6 +70,13 @@
       ></ul>
 
       <%= more_filters %>
+    </div>
+
+    <div class="tw:mt-2 tw:hidden tw:peer-has-[li]/bar:block">
+      <div
+        data-similar-slot
+        class="tw:group-has-[[aria-controls=vehicle-filters][aria-expanded=true]]:hidden"
+      ></div>
     </div>
 
     <div
