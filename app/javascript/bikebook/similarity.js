@@ -64,13 +64,13 @@ export const GROUPS = {
 // weight low by default, as much of it is what the others weigh already
 const GENERAL = { handlebar: 5, geometry: 4, tires: 4, suspension: 3, ebike: 3, groupset: 2, price: 2, material: 2, weight: 1, mounts: 1, year: 1, activity: 1 }
 export const PRESETS = {
-  general: { label: 'General', weights: GENERAL }
+  general: { label: 'Default weights', weights: GENERAL }
 }
 
 // The preset whose weights `weights` are in each of `groups`, or custom
 export const presetOf = (weights, groups) => Object.keys(PRESETS).find((key) => groups.every((group) => PRESETS[key].weights[group] === weights[group])) ?? 'custom'
 
-// `weights=geometry.5,price.0`, each slider differing from General's
+// `weights=geometry.5,price.0`, each slider differing from the default weights
 export const weightsFrom = (param) => {
   const set = Object.fromEntries(String(param ?? '').split(',').map((pair) => pair.split('.'))
     .filter(([group, weight]) => group in GROUPS && /^\d+$/.test(weight)).map(([group, weight]) => [group, Math.min(MAX_WEIGHT, Number(weight))]))

@@ -1779,7 +1779,7 @@ RSpec.describe "BikeBook", :js, type: :system do
     find("[role='button']", text: "Adjust comparison algorithm").click
     # its toggle moved into the card it opens, a slider for each group, those the model lists nothing of disabled
     expect(page).to have_field("Frame material", with: "2")
-    # a bare track, showing no weight, though General's is 2
+    # a bare track, showing no weight, though the default is 2
     groupset = find_field("Groupset", disabled: true).ancestor("[data-controller='ui--forms--range']")
     expect(groupset).to have_text("Not listed for this bike").and have_css("output", visible: :hidden)
     expect(page.evaluate_script("getComputedStyle(document.querySelector('#similar-groupset'), '::-webkit-slider-thumb').appearance")).to eq "none"
@@ -1792,11 +1792,11 @@ RSpec.describe "BikeBook", :js, type: :system do
       })
     JS
     expect(boxes.uniq.count).to eq 1
-    expect(page).to have_css("div:has(> fieldset) > div > [role='button']:focus", text: "Adjust comparison algorithm")
+    expect(page).to have_css("div:has(> div > fieldset) > div > [role='button']:focus", text: "Adjust comparison algorithm")
     # out to the page's gutter on a phone, as More filters' card is
     size = page.current_window.size
     page.current_window.resize_to(390, 844)
-    adjust_card = "getComputedStyle(document.querySelector(\"[aria-label='Similar models'] div:has(> fieldset)\"))"
+    adjust_card = "getComputedStyle(document.querySelector(\"[aria-label='Similar models'] div:has(> div > fieldset)\"))"
     expect(page.evaluate_script("[#{adjust_card}.borderLeftWidth, #{adjust_card}.paddingLeft]")).to eq %w[0px 0px]
     page.current_window.resize_to(*size)
     # every e-bike in the fixture is an Aventón
@@ -1820,7 +1820,14 @@ RSpec.describe "BikeBook", :js, type: :system do
     # the closest of each model group, its own, other propulsions and other vehicle types left out, other activities in
     expect(cards.call).to eq %w[similar-m-aventon-2026-pace_5_rec_step_through similar-m-aventon-2025-aventure_3_step_through
       similar-m-aventon-2024-soltera_2_5 similar-m-aventon-2026-ramblas_adv similar-m-aventon-2024-sinch_2_5]
-    expect(page).to have_checked_field("General", visible: :all).and have_field("Custom", disabled: true, visible: :all)
+    expect(page).to have_checked_field("Default weights", visible: :all).and have_field("Custom", disabled: true, visible: :all)
+    # Custom says it's chosen by a slider, on hovering it though it's disabled
+    find("button[aria-describedby]", exact_text: "Custom").hover
+    expect(page).to have_css("[role='tooltip']", text: "If you change a weight, this will be selected")
+    # its toggle with nothing beneath it but the card's own spacing
+    toggle_gap = "(() => { const toggle = document.querySelector(\"[aria-label='Similar models'] [data-ui--collapse-param-value='adjust'] .tw\\\\:text-right\"); " \
+      "return toggle.nextElementSibling.getBoundingClientRect().top - toggle.getBoundingClientRect().bottom })()"
+    expect(page.evaluate_script(toggle_gap)).to eq 0
 
     # a card adds its model to the comparison, in place and focused again, and takes it out
     click_link "Soltera 2.5"
@@ -1833,11 +1840,11 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(page).to have_css("[aria-label='Overview comparison'] thead th", count: 3, wait: 10)
     expect(find("#similar-m-aventon-2024-soltera_2_5").ancestor("li")).to have_no_text("Comparing")
 
-    # a slider moved off General's weights chooses Custom, rescoring the cards
+    # a slider moved off the default weights chooses Custom, rescoring the cards
     find_field("E-vehicle motor and battery").send_keys(:home)
     find_field("Tire clearance").send_keys(:home)
     expect(page).to have_css("output[for='similar-tires']", exact_text: "0")
-    expect(page).to have_checked_field("Custom", visible: :all).and have_no_checked_field("General", visible: :all)
+    expect(page).to have_checked_field("Custom", visible: :all).and have_no_checked_field("Default weights", visible: :all)
     expect(page).to have_css("#similar-m-aventon-2026-soltera_3_adv").and have_no_css("#similar-m-aventon-2024-soltera_2_5")
     expect(page).to have_current_path(/[?&]weights=tires\.0,ebike\.0(&|\z)/)
 
@@ -1846,8 +1853,8 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(page).to have_field("Tire clearance", with: "0", wait: 10)
     expect(page).to have_checked_field("Custom", visible: :all).and have_unchecked_field("Skip bikes from the same manufacturer")
     expect(page).to have_css("#similar-m-aventon-2026-soltera_3_adv").and have_no_css("#similar-m-aventon-2024-soltera_2_5")
-    # and General puts its weights back
-    choose "General", allow_label_click: true
+    # and Default weights puts them back
+    choose "Default weights", allow_label_click: true
     expect(page).to have_field("Tire clearance", with: "4").and have_field("E-vehicle motor and battery", with: "3")
     expect(page).to have_field("Custom", disabled: true, visible: :all)
     expect(page).to have_css("#similar-m-aventon-2024-soltera_2_5").and have_no_css("#similar-m-aventon-2026-soltera_3_adv")

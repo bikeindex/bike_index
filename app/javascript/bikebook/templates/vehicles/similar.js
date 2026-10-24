@@ -6,6 +6,7 @@ import { iconChevron } from 'bikebook/templates/ui/icon_chevron'
 import { checkbox } from 'bikebook/templates/ui/forms/checkbox'
 import { radioButtonGroup } from 'bikebook/templates/ui/forms/radio_button_group'
 import { range } from 'bikebook/templates/ui/forms/range'
+import { tooltip } from 'bikebook/templates/ui/tooltip'
 import { GROUPS, MAX_WEIGHT, PRESETS, presetOf } from 'bikebook/similarity'
 
 // CycleType::ALWAYS_MOTORIZED, by the catalog's slugs
@@ -57,6 +58,8 @@ export const similarSection = ({ vehicle, model, type, vehicleType, electric, co
       : html`<p class="tw:mt-4 tw:text-sm tw:text-gray-500">Finding similar ${type}s…</p>`}</div></section>`
 }
 
+const CUSTOM = tooltip({ body: 'If you change a weight, this will be selected', content: 'Custom' })
+
 const legend = (text) => html`<legend class="twlabel">${text}</legend>`
 
 // Custom is chosen only by moving a slider off every preset, each of the `listed` groups', the rest's disabled, as the
@@ -70,11 +73,11 @@ const controls = (listed, { weights, skipManufacturer, otherPropulsion, sameConf
   data-ui--collapse-param-value="adjust"><div class="tw:ml-auto tw:has-[[aria-expanded=true]]:hidden">${toggle}</div><div
   data-ui--collapse-target="content" class="tw:hidden tw:w-full"><div class="twwiderow">${card({
     fullBleed: true,
-    additionalClasses: 'tw:col-span-full tw:mt-3 tw:space-y-4',
-    content: html`<div class="tw:text-right">${toggle}</div><fieldset aria-label="Strategy">${radioButtonGroup({
+    additionalClasses: 'tw:col-span-full tw:mt-3',
+    content: html`<div class="tw:text-right">${toggle}</div><div class="tw:space-y-4"><fieldset aria-label="Strategy">${radioButtonGroup({
     name: 'strategy',
     selected: preset,
-    entries: [...Object.entries(PRESETS).map(([value, { label }]) => ({ value, label })), { value: 'custom', label: 'Custom', disabled: preset !== 'custom' }],
+    entries: [...Object.entries(PRESETS).map(([value, { label }]) => ({ value, label })), { value: 'custom', label: CUSTOM, disabled: preset !== 'custom' }],
     attributes: { 'data-bikebook--similar-target': 'strategy', 'data-action': 'bikebook--similar#strategy:stop' }
   })}</fieldset><fieldset>${legend('Weightings')}<div class="tw:mt-1 tw:grid tw:gap-x-6 tw:gap-y-5 tw:sm:grid-cols-2
   tw:lg:grid-cols-3">${Object.keys(GROUPS).map((group) => {
@@ -96,7 +99,7 @@ const controls = (listed, { weights, skipManufacturer, otherPropulsion, sameConf
     setting('skip_manufacturer', `Skip ${type}s from the same manufacturer`, skipManufacturer)}${
     propulsion ? setting('other_propulsion', propulsion, otherPropulsion) : nothing}${setting('same_configuration', configuration, sameConfiguration)}${
     setting('same_wheels', `Only match ${type}s with the same wheel size`, sameWheels)}${
-    setting('different_types', 'Include different vehicle types', differentTypes)}</div></fieldset>`
+    setting('different_types', 'Include different vehicle types', differentTypes)}</div></fieldset></div>`
   })}</div></div></div>`
 }
 
