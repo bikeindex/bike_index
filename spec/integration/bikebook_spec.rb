@@ -277,6 +277,7 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(page).to have_css("select[aria-label='Size of Level 2 Step-Through'] option[selected]", exact_text: "M/L")
     within("[aria-label='Sizes & geometry comparison']") do
       expect(page).to have_css("thead th", text: "Level 2 Step-Through")
+      expect(page).to have_css("thead th button[aria-label='Copy ID (m/aventon/2022/level_2_step_through)']")
       # keyed to the overlay by its frame's color along its head, its wheels' where it's only them
       expect(all("thead th").map { it[:class].include?("tw:border-t-4") }).to eq([false, true, true])
       # in the frame's color in dark mode too, over the cells' own dark border
