@@ -68,13 +68,13 @@ export const weightsFrom = (param) => {
   return { ...GENERAL, ...set }
 }
 
-// The URL's weights, whether same_manufacturer=1 includes the model's maker's others, whether other_propulsion=1
+// The URL's weights, whether skip_manufacturer=1 leaves out the model's maker's others, whether other_propulsion=1
 // matches only those electric where it isn't, or human powered where it's electric, whether same_configuration=1
 // matches only complete models where it's complete, or frames and framesets where it isn't, and whether
 // different_types=1 includes other vehicle types
 export const settingsFrom = (params) => ({
   weights: weightsFrom(params.get('weights')),
-  sameManufacturer: params.get('same_manufacturer') === '1',
+  skipManufacturer: params.get('skip_manufacturer') === '1',
   otherPropulsion: params.get('other_propulsion') === '1',
   sameConfiguration: params.get('same_configuration') === '1',
   differentTypes: params.get('different_types') === '1'
@@ -150,12 +150,12 @@ export const scorer = (models, { format, fields }, activities) => {
     return scales.get(key)
   }
 
-  // The `COUNT` models most like the one `id` names, of its propulsion, scored by `weights`, its maker's only with
-  // `sameManufacturer`, those of the other propulsion instead with `otherPropulsion`, which leaves its e-bike fields
+  // The `COUNT` models most like the one `id` names, of its propulsion, scored by `weights`, its maker's left out with
+  // `skipManufacturer`, those of the other propulsion instead with `otherPropulsion`, which leaves its e-bike fields
   // unscored, only those complete as it is or isn't with `sameConfiguration`, and other vehicle types only with
   // `differentTypes`, each the closest of its model group; and the sliders whose fields it has values for. Its own model
   // group's are always left out
-  return (id, { weights, sameManufacturer, otherPropulsion, sameConfiguration, differentTypes }) => {
+  return (id, { weights, skipManufacturer, otherPropulsion, sameConfiguration, differentTypes }) => {
     const target = indexes.get(id)
     if (target == null) return null
 
@@ -183,7 +183,7 @@ export const scorer = (models, { format, fields }, activities) => {
       if (index === target || candidate.model_group === model.model_group || (candidate.electric === model.electric) === otherPropulsion ||
         (!differentTypes && candidate.vehicle_type !== model.vehicle_type) ||
         (sameConfiguration && (candidate.model_configuration === 'complete') !== (model.model_configuration === 'complete')) ||
-        (!sameManufacturer && candidate.manufacturer === model.manufacturer) ||
+        (skipManufacturer && candidate.manufacturer === model.manufacturer) ||
         required.some(({ field, kind, scale }) => columns[field][index] == null || KINDS[kind](columns[field][target], columns[field][index], scale) > 0)) return
 
       let shared = 0

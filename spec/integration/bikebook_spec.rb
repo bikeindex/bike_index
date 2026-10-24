@@ -1695,8 +1695,8 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(sides.call.then { |(overlay, overview)| overlay.last < overview.first }).to be true
     page.current_window.resize_to(*size)
     expect(page).to have_current_path(/[?&]similar=1\b/)
-    # every commuting e-bike in the fixture is an Aventón, whose others are left out until they're asked for
-    expect(page).to have_text("No similar models are in the catalog.", wait: 10)
+    # its maker's others in, unless they're skipped
+    expect(page).to have_css("#similar-m-aventon-2026-pace_5_rec_step_through", wait: 10)
     find("[role='button']", text: "Adjust comparison algorithm").click
     # its toggle moved into the card it opens, a slider for each group, those the model lists nothing of disabled
     expect(page).to have_field("Frame material", with: "2")
@@ -1720,8 +1720,11 @@ RSpec.describe "BikeBook", :js, type: :system do
     adjust_card = "getComputedStyle(document.querySelector(\"[aria-label='Similar models'] div:has(> fieldset)\"))"
     expect(page.evaluate_script("[#{adjust_card}.borderLeftWidth, #{adjust_card}.paddingLeft]")).to eq %w[0px 0px]
     page.current_window.resize_to(*size)
-    check "Include bikes from the same manufacturer"
-    expect(page).to have_current_path(/[?&]same_manufacturer=1\b/)
+    # every e-bike in the fixture is an Aventón
+    check "Skip bikes from the same manufacturer"
+    expect(page).to have_current_path(/[?&]skip_manufacturer=1\b/).and have_text("No similar models are in the catalog.")
+    uncheck "Skip bikes from the same manufacturer"
+    expect(page).to have_no_current_path(/skip_manufacturer/).and have_css("#similar-m-aventon-2026-pace_5_rec_step_through")
     # and the other propulsion's, an e-bike's human powered ones, and other vehicle types
     expect(page).to have_css("legend", exact_text: "Other settings")
     check "Show matching human powered bikes"
@@ -1747,7 +1750,7 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(page).to have_css("#similar-m-aventon-2024-soltera_2_5:focus")
     expect(compared.call).to eq %w[m/aventon/2026/level_4_rec m/aventon/2022/level_2 m/aventon/2024/soltera_2_5]
     expect(find("#similar-m-aventon-2024-soltera_2_5").ancestor("li")).to have_text("Comparing")
-    expect(page).to have_text("Hide similar bikes").and have_checked_field("Include bikes from the same manufacturer")
+    expect(page).to have_text("Hide similar bikes").and have_unchecked_field("Skip bikes from the same manufacturer")
     click_link "Soltera 2.5"
     expect(page).to have_css("[aria-label='Overview comparison'] thead th", count: 3, wait: 10)
     expect(find("#similar-m-aventon-2024-soltera_2_5").ancestor("li")).to have_no_text("Comparing")
@@ -1763,7 +1766,7 @@ RSpec.describe "BikeBook", :js, type: :system do
     # kept in the URL, open
     refresh
     expect(page).to have_field("Wheel size & tire clearance", with: "0", wait: 10)
-    expect(page).to have_checked_field("Custom", visible: :all).and have_checked_field("Include bikes from the same manufacturer")
+    expect(page).to have_checked_field("Custom", visible: :all).and have_unchecked_field("Skip bikes from the same manufacturer")
     expect(page).to have_css("#similar-m-aventon-2026-soltera_3_adv").and have_no_css("#similar-m-aventon-2024-soltera_2_5")
     # and General puts its weights back
     choose "General", allow_label_click: true
@@ -1774,7 +1777,7 @@ RSpec.describe "BikeBook", :js, type: :system do
 
     # once five are compared, only theirs link
     visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_rec,m/aventon/2022/level_2,m/aventon/2026/current_adv,m/aventon/2026/current_exp",
-      similar: 1, same_manufacturer: 1)
+      similar: 1)
     click_link "Soltera 2.5", wait: 10
     expect(page).to have_css("[aria-label='Overview comparison'] thead th", count: 6, wait: 10)
     expect(page).to have_text("Compare up to 5 at once. Remove one to add another.")

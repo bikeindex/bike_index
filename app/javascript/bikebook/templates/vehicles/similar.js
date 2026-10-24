@@ -62,7 +62,7 @@ const legend = (text) => html`<legend class="twlabel">${text}</legend>`
 // Custom is chosen only by moving a slider off every preset, each of the `listed` groups', the rest's disabled, as the
 // model has nothing of theirs to compare. Its own ui--collapse, outside the section's content so its
 // toggle can share a line with the section's, laid into the section's row by display: contents
-const controls = (listed, { weights, sameManufacturer, otherPropulsion, sameConfiguration, differentTypes }, type, propulsion, configuration) => {
+const controls = (listed, { weights, skipManufacturer, otherPropulsion, sameConfiguration, differentTypes }, type, propulsion, configuration) => {
   const preset = presetOf(weights, listed)
   // its toggle moving into the card it opens, as More filters' does
   const toggle = collapse({ content: 'Adjust comparison algorithm', chevron: true, color: 'link', size: 'sm', htmlClass: 'tw:text-sm' })
@@ -93,7 +93,7 @@ const controls = (listed, { weights, sameManufacturer, otherPropulsion, sameConf
       attributes: { id: `similar-${group}`, disabled: !scored, 'data-bikebook--similar-target': scored && 'weight' }
     })}</div>`
   })}</div></fieldset><fieldset>${legend('Other settings')}<div class="tw:mt-1 tw:space-y-1">${
-    setting('same_manufacturer', `Include ${type}s from the same manufacturer`, sameManufacturer)}${
+    setting('skip_manufacturer', `Skip ${type}s from the same manufacturer`, skipManufacturer)}${
     propulsion ? setting('other_propulsion', propulsion, otherPropulsion) : nothing}${setting('same_configuration', configuration, sameConfiguration)}${
     setting('different_types', 'Include different vehicle types', differentTypes)}</div></fieldset>`
   })}</div></div></div>`
