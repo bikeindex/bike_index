@@ -74,10 +74,10 @@ const controls = (listed, { weights, sameManufacturer, otherPropulsion }, type, 
   })}</div></fieldset><fieldset>${legend('Weightings')}<div class="tw:mt-1 tw:grid tw:gap-x-6 tw:gap-y-5 tw:sm:grid-cols-2
   tw:lg:grid-cols-3">${groups.map((group) => {
     const scored = listed.includes(group)
-    // an unlisted group's slider a bare track, showing no weight, which stays the URL's or a strategy's
+    // an unlisted group's slider a bare track in a slider's box, showing no weight, which stays the URL's or a strategy's
     return html`<div class=${scored
       ? ''
-      : 'tw:[&_output]:invisible tw:[&_input]:appearance-none tw:[&_input]:my-1.25 tw:[&_input]:h-1.5 tw:[&_input]:rounded-full tw:[&_input]:bg-gray-200 tw:dark:[&_input]:bg-gray-700 ' +
+      : 'tw:[&_output]:invisible tw:[&_input]:appearance-none tw:[&_input]:h-4 tw:[&_input]:py-1 tw:[&_input]:bg-clip-content tw:[&_input]:rounded-full tw:[&_input]:bg-gray-200 tw:dark:[&_input]:bg-gray-700 ' +
         'tw:[&_input::-webkit-slider-thumb]:appearance-none tw:[&_input::-moz-range-thumb]:opacity-0'}>${range({
       name: group,
       label: GROUPS[group].label,

@@ -1689,6 +1689,15 @@ RSpec.describe "BikeBook", :js, type: :system do
     groupset = find_field("Groupset", disabled: true).ancestor("[data-controller='ui--forms--range']")
     expect(groupset).to have_text("Not listed for this bike").and have_css("output", visible: :hidden)
     expect(page.evaluate_script("getComputedStyle(document.querySelector('#similar-groupset'), '::-webkit-slider-thumb').appearance")).to eq "none"
+    # level with a listed one's
+    boxes = page.evaluate_script(<<~JS)
+      ['#similar-groupset', '#similar-geometry'].map((id) => {
+        const input = document.querySelector(id)
+        const [box, wrapper] = [input, input.closest("[data-controller='ui--forms--range']")].map((each) => each.getBoundingClientRect())
+        return [box.top - wrapper.top, box.height]
+      })
+    JS
+    expect(boxes.uniq.count).to eq 1
     expect(page).to have_css("div:has(> fieldset) > div > [role='button']:focus", text: "Adjust comparison algorithm")
     check "Include bikes from the same manufacturer"
     expect(page).to have_current_path(/[?&]same_manufacturer=1\b/)
