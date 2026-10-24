@@ -3,14 +3,30 @@ import { storedArray } from 'utils/stored_array'
 
 /* global localStorage */
 
-// Connects to data-controller='ui--column-settings'
-// Goes on an element holding both a UI::ColumnSettings panel and its table. Each checkbox is
-// named for the *_cell class every cell in its column carries.
+// Connects to data-controller='ui--table-column-settings'
+// Goes on an element holding both a UI::TableColumnSettings panel and its table. Each checkbox is
+// named for the *_cell class every cell in its column carries. Without a storage key it's a
+// form's fields, which keep what the server checked and leave the table alone.
 export default class extends Controller {
   static targets = ['checkbox']
   static values = { storageKey: String }
 
   connect () {
+    if (!this.hasStorageKeyValue) return
+    this.apply()
+    document.addEventListener('turbo:frame-render', this.handleFrameRender)
+  }
+
+  disconnect () {
+    document.removeEventListener('turbo:frame-render', this.handleFrameRender)
+  }
+
+  // A frame inside brings its checkboxes and cells back unpicked
+  handleFrameRender = (event) => {
+    if (this.element.contains(event.target)) this.apply()
+  }
+
+  apply () {
     const stored = storedArray(this.storageKeyValue)
     const isDefault = this.isDefault
     this.checkboxTargets.forEach(checkbox => {
@@ -33,6 +49,7 @@ export default class extends Controller {
 
   // Saved only from a change, so the defaults a load applies are worked out afresh each time
   update () {
+    if (!this.hasStorageKeyValue) return
     const checked = this.checkboxTargets.filter(checkbox => checkbox.checked).map(checkbox => checkbox.name)
     localStorage.setItem(this.storageKeyValue, JSON.stringify(checked))
     this.showColumns()

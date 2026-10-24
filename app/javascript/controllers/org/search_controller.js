@@ -5,6 +5,12 @@ import { collapseField } from 'utils/collapse_utils'
 
 const RESULT_VIEW_KEY = 'orgRegistrationResultView'
 
+// The registration search's fields that Organized::ImpoundRecordsController also reads, and
+// the two it names differently
+const IMPOUND_SEARCH_PARAMS = ['query_items[]', 'query', 'serial', 'search_email', 'search_unregisteredness',
+  'period', 'start_time', 'end_time', 'location', 'distance']
+const IMPOUND_SEARCH_RENAMES = { location: 'search_location', distance: 'search_proximity' }
+
 // Connects to data-controller='org--search'
 export default class extends Controller {
   static targets = ['perPage', 'optionalField', 'optionalFieldCheckbox', 'filterSummary', 'periodLabel', 'searchAll', 'searchAllHint', 'locationSearchHint']
@@ -31,6 +37,8 @@ export default class extends Controller {
   handleFrameRender = (event) => {
     this.syncResultView()
     this.syncPeriodLabel()
+    // A back/forward moves the radios - search--form restores them from the URL
+    this.syncFilterSummary()
     this.syncLocationSearch()
     this.endSubmitSpinner()
     if (event.target === this.resultsFrame) this.reloadChart()
@@ -119,7 +127,7 @@ export default class extends Controller {
 
     const status = document.querySelector('input[type=radio][name=search_status][form="Search_Form"]:checked')?.value
     const searchAll = this.hasSearchAllTarget && this.searchAllTarget.checked
-    const searchable = JSON.parse(checkbox.dataset.locationableStatuses).includes(status) || (checkbox.dataset.regAddress === 'true' && !searchAll)
+    const searchable = checkbox.dataset.locationableStatus === status || (checkbox.dataset.regAddress === 'true' && !searchAll)
 
     checkbox.disabled = !searchable
     if (this.hasLocationSearchHintTarget) this.locationSearchHintTarget.hidden = searchable
@@ -182,6 +190,19 @@ export default class extends Controller {
 
     ;[...form.elements].filter(element => element.type === 'submit')
       .forEach(element => element.dispatchEvent(new Event('spinner:reset')))
+  }
+
+  // The form as it stands, so a field typed but not yet searched carries over too. It
+  // rewrites the href rather than navigating, so a modifier-click still opens a tab
+  searchImpoundRecords (event) {
+    const form = document.getElementById('Search_Form')
+    if (!form) return
+
+    const url = new URL(event.currentTarget.href)
+    url.search = new URLSearchParams([...new FormData(form)]
+      .filter(([name, value]) => IMPOUND_SEARCH_PARAMS.includes(name) && value !== '')
+      .map(([name, value]) => [IMPOUND_SEARCH_RENAMES[name] ?? name, value]))
+    event.currentTarget.href = url
   }
 
   perPageChanged () {

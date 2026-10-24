@@ -56,8 +56,7 @@
     <%= render(Atoms::RegistrationStatusBadge::Component.new(bike:, skip_with_owner: true, size: :xs)) %>
   <% end %>
 
-  <% table.column(sortable: "occurred_at", label: settings.column_renames[:occurred_at_cell], classes: "hideableColumn occurred_at_cell",
-      header_tooltip: translation(".occurred_at_tooltip")) do |bike| %>
+  <% table.column(sortable: "occurred_at", label: settings.column_renames[:occurred_at_cell], classes: "hideableColumn occurred_at_cell") do |bike| %>
     <%= render(UI::Time::Component.new(time: bike.occurred_at)) %>
   <% end %>
 
@@ -176,6 +175,7 @@
         <% end %>
       <% end %>
     <% end %>
+    <%# Rendered hidden for every search, so the rows cache under one key - org--assign-bike-sticker shows it %>
     <% table.column(label: translation(".assign_bike_sticker"), classes: "assign_bike_sticker_cell tw:hidden") do |bike| %>
       <small>
         <a data-bike-id="<%= bike.id %>">
