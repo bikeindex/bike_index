@@ -39,7 +39,7 @@ async function load ({ manifestUrl, ids, jurisdictions, rulesUrl, similarityUrl:
   // the comparison for its frame materials as well as how alike models are; without it neither is offered
   const [index, vocabulary, { kit }, loaded] = await Promise.all([...[manifest.index, manifest.vocabulary, manifest.kit].map((file) => fetchJson(new URL(file, base))),
     manifest.comparison && fetchJson(new URL(manifest.comparison, base)).catch(() => null)])
-  comparison = loaded ?? null
+  comparison = loaded
   const currentYear = new Date().getFullYear()
   const activityNames = vocabulary.names.primary_activity ?? {}
   const typeNames = Object.fromEntries(index.vehicle_types.map(({ slug, name }) => [slug, name]))
@@ -50,6 +50,8 @@ async function load ({ manifestUrl, ids, jurisdictions, rulesUrl, similarityUrl:
     stock_photo: model.photo && `${index.stock_photos}/${path(model.id)}.${model.photo}`,
     activity_name: activityNames[model.primary_activity],
     type_name: typeNames[model.vehicle_type],
+    // by its maker, as makers share names, and its first word where it has no group
+    group_key: `${model.manufacturer}/${model.model_group ?? model.model.split(' ')[0]}`,
     searchText: `${model.display}\n${model.id}`.toLowerCase(),
     sortYear: model.final_year ?? currentYear
   }))

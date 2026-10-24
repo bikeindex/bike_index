@@ -124,22 +124,21 @@ export const scorer = (models, { format, fields }, activities) => {
 
   const familyBySlug = new Map(activities.map(({ slug, family }) => [slug, family]))
   const families = models.map((model) => familyBySlug.get(model.primary_activity) ?? null)
+  const attribute = (key) => models.map((model) => model[key] ?? null)
   const columns = {
     ...fields,
     battery_size: fields.battery_size.map(log),
     groupset: fields.groupset_series.map(tier),
-    suspension: models.map((model) => model.suspension ?? null),
-    handlebar_type: models.map((model) => model.handlebar_type ?? null),
-    primary_activity: models.map((model) => model.primary_activity ?? null),
+    suspension: attribute('suspension'),
+    handlebar_type: attribute('handlebar_type'),
+    primary_activity: attribute('primary_activity'),
     // its first, as one still sold isn't as new as it is current
-    first_year: models.map(({ first_year: first }) => first ?? null),
+    first_year: attribute('first_year'),
     price: models.map((model) => log(model.msrp_cents)),
     // which a catalog published before bikebook added it lacks
     frame_material: fields.frame_material ?? models.map(() => null)
   }
   const indexes = new Map(models.map((model, index) => [model.id, index]))
-  // by its maker, as makers share names, and its first word where it has no group
-  const modelGroups = models.map((model) => `${model.manufacturer}/${model.model_group ?? model.model.split(' ')[0]}`)
 
   // each numeric field's interquartile range in a family, or in the catalog where the family has too few values
   const scales = new Map()
@@ -153,12 +152,9 @@ export const scorer = (models, { format, fields }, activities) => {
     return scales.get(key)
   }
 
-  // The `COUNT` models most like the one `id` names, of its propulsion, scored by `weights`, its maker's left out with
-  // `skipManufacturer`, those of the other propulsion instead with `otherPropulsion`, which leaves its e-bike fields
-  // unscored, only those complete as it is or isn't with `sameConfiguration`, only its wheel sizes, where it lists them,
-  // with `sameWheels`, and other vehicle types only with
-  // `differentTypes`, each the closest of its model group; and the sliders whose fields it has values for. Its own model
-  // group's are always left out
+  // The `COUNT` models most like the one `id` names by `weights`, narrowed as settingsFrom's settings say, each the
+  // closest of its model group and never of its own; and the sliders whose fields it has values for. `otherPropulsion`
+  // leaves its e-bike fields unscored, and `sameWheels` requires only the wheels it lists
   return (id, { weights, skipManufacturer, otherPropulsion, sameConfiguration, sameWheels, differentTypes }) => {
     const target = indexes.get(id)
     if (target == null) return null
@@ -172,22 +168,22 @@ export const scorer = (models, { format, fields }, activities) => {
         group,
         field,
         kind,
-        scale: kind === 'numeric' || kind === 'year' ? scaleOf(field, family) : null,
+        scale: KINDS[kind] === numeric ? scaleOf(field, family) : null,
         weight: (weights[group] ?? 0) / own.length
       }))
     })
     const groups = [...new Set(listed.map(({ group }) => group))]
     const weighted = listed.filter(({ group, weight }) => weight > 0 && !(otherPropulsion && group === 'ebike'))
     const available = weighted.reduce((total, { weight }) => total + weight, 0)
-    const required = weighted.filter(({ group, kind }) => weights[group] === MAX_WEIGHT && REQUIRABLE.includes(kind))
+    const required = [...weighted.filter(({ group, kind }) => weights[group] === MAX_WEIGHT && REQUIRABLE.includes(kind)),
+      ...(sameWheels ? ['front_bsd', 'rear_bsd'].filter((field) => columns[field][target] != null).map((field) => ({ field, kind: 'same' })) : [])]
     if (!available) return { groups, models: [] }
 
     const scored = []
     models.forEach((candidate, index) => {
-      if (index === target || modelGroups[index] === modelGroups[target] || (candidate.electric === model.electric) === otherPropulsion ||
+      if (index === target || candidate.group_key === model.group_key || (candidate.electric === model.electric) === otherPropulsion ||
         (!differentTypes && candidate.vehicle_type !== model.vehicle_type) ||
         (sameConfiguration && (candidate.model_configuration === 'complete') !== (model.model_configuration === 'complete')) ||
-        (sameWheels && ['front_bsd', 'rear_bsd'].some((field) => columns[field][target] != null && columns[field][index] !== columns[field][target])) ||
         (skipManufacturer && candidate.manufacturer === model.manufacturer) ||
         required.some(({ field, kind, scale }) => columns[field][index] == null || KINDS[kind](columns[field][target], columns[field][index], scale) > 0)) return
 
@@ -204,7 +200,7 @@ export const scorer = (models, { format, fields }, activities) => {
     })
     const grouped = new Set()
     const closest = scored.sort((a, b) => a.score - b.score)
-      .filter(({ index }) => !grouped.has(modelGroups[index]) && grouped.add(modelGroups[index]))
+      .filter(({ index }) => !grouped.has(models[index].group_key) && grouped.add(models[index].group_key))
     return { groups, models: closest.slice(0, COUNT).map(({ index }) => models[index]) }
   }
 }

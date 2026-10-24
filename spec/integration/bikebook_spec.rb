@@ -1797,18 +1797,13 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(page).to have_no_current_path(/skip_manufacturer/).and have_css("#similar-m-aventon-2026-pace_5_rec_step_through")
     # and the other propulsion's, an e-bike's human powered ones, and other vehicle types
     expect(page).to have_css("legend", exact_text: "Other settings")
-    check "Show matching human powered bikes"
-    expect(page).to have_current_path(/[?&]other_propulsion=1\b/)
-    uncheck "Show matching human powered bikes"
-    expect(page).to have_no_current_path(/other_propulsion/)
-    check "Only complete bikes"
-    expect(page).to have_current_path(/[?&]same_configuration=1\b/)
-    uncheck "Only complete bikes"
-    expect(page).to have_no_current_path(/same_configuration/)
-    check "Only match bikes with the same wheel size"
-    expect(page).to have_current_path(/[?&]same_wheels=1\b/)
-    uncheck "Only match bikes with the same wheel size"
-    expect(page).to have_no_current_path(/same_wheels/)
+    {"Show matching human powered bikes" => "other_propulsion", "Only complete bikes" => "same_configuration",
+     "Only match bikes with the same wheel size" => "same_wheels"}.each do |label, param|
+      check label
+      expect(page).to have_current_path(/[?&]#{param}=1\b/)
+      uncheck label
+      expect(page).to have_no_current_path(/#{param}/)
+    end
     check "Include different vehicle types"
     expect(page).to have_current_path(/[?&]different_types=1\b/).and have_css("#similar-m-aventon-2025-abound_lr")
     uncheck "Include different vehicle types"
@@ -1881,28 +1876,24 @@ RSpec.describe "BikeBook", :js, type: :system do
         // each alike in its geometry, wheels and weight, as a catalog model lists most of them
         const alike = { head_angle: 70, seat_angle: 74, stack_reach: 1.5, bb_drop: 70, chainstay_gap: 80, front_bsd: 622, rear_bsd: 622, tire_clearance: 45, total_weight: 10 }
         const fields = { ...Object.fromEntries(names.map((name) => [name, [null, null, null]])), ...Object.fromEntries(Object.entries(alike).map(([name, value]) => [name, [value, value, value]])) }
-        const model = (id, electric, handlebar_type, suspension, activity = 'commuting') => ({ id, electric, handlebar_type, suspension, vehicle_type: 'bike', model_configuration: 'complete', manufacturer: id, model_group: id, primary_activity: activity, markets: ['US'] })
-        const score = scorer([model('e', true), model('other_e', true), model('acoustic', false)], { format: 2, fields: { ...fields, battery_size: [500, 500, null] } },
-          [{ slug: 'commuting', family: 'urban' }])
+        const model = (id, electric, handlebar_type, suspension, activity = 'commuting') => ({ id, electric, handlebar_type, suspension, vehicle_type: 'bike', model_configuration: 'complete', manufacturer: id, group_key: id, primary_activity: activity, markets: ['US'] })
+        const urban = [{ slug: 'commuting', family: 'urban' }]
+        const scoring = (models, extra = {}, activities = urban) => scorer(models, { format: 2, fields: { ...fields, ...extra } }, activities)
+        const score = scoring([model('e', true), model('other_e', true), model('acoustic', false)], { battery_size: [500, 500, null] })
         const propulsions = ['', 'other_propulsion=1'].map((query) => score('e', settingsFrom(new URLSearchParams(query))).models.map(({ id }) => id))
-        const materials = scorer([model('a', false), model('steel', false), model('aluminum', false)],
-          { format: 2, fields: { ...fields, frame_material: ['aluminum', 'steel', 'aluminum'] } }, [{ slug: 'commuting', family: 'urban' }])
-        const bars = scorer([model('a', false, 'drop_bar'), model('flat', false, 'horizontal'), model('drop', false, 'drop_bar')], { format: 2, fields }, [{ slug: 'commuting', family: 'urban' }])
+        const materials = scoring([model('a', false), model('steel', false), model('aluminum', false)], { frame_material: ['aluminum', 'steel', 'aluminum'] })
+        const bars = scoring([model('a', false, 'drop_bar'), model('flat', false, 'horizontal'), model('drop', false, 'drop_bar')])
         const ids = (score, query = '') => score('a', settingsFrom(new URLSearchParams(query))).models.map(({ id }) => id)
-        const types = scorer([model('a', false), { ...model('cargo', false), vehicle_type: 'cargo_bike' }, model('bike', false)], { format: 2, fields },
-          [{ slug: 'commuting', family: 'urban' }])
-        const far = scorer([model('a', false), model('near', false), model('far', false)], { format: 2, fields: { ...fields, ...Object.fromEntries(Object.entries(alike).map(([name, value]) => [name, [value, value, value + 10]])) } },
-          [{ slug: 'commuting', family: 'urban' }])
-        const groupsets = scorer([model('a', false), model('tiagra', false), model('s1000', false)],
-          { format: 2, fields: { ...fields, groupset_series: ['S-1000', 'Tiagra', 'S1000'] } }, [{ slug: 'commuting', family: 'urban' }])
-        const suspensions = scorer([model('a', false, null, 'rigid'), model('full', false, null, 'full'), model('steel', false, null, 'rigid')],
-          { format: 2, fields: { ...fields, frame_material: ['aluminum', 'aluminum', 'steel'] } }, [{ slug: 'commuting', family: 'urban' }])
-        const activities = scorer([model('a', false), model('touring', false, null, null, 'touring'), model('commuting', false)], { format: 2, fields },
-          [{ slug: 'commuting', family: 'urban' }, { slug: 'touring', family: 'urban' }])
-        const configurations = scorer([model('a', false), { ...model('frame', false), model_configuration: 'frame' }, model('complete', false)], { format: 2, fields },
-          [{ slug: 'commuting', family: 'urban' }])
-        const wheels = scorer([model('a', false), model('small', false), model('road', false)],
-          { format: 2, fields: { ...fields, front_bsd: [622, 584, 622], rear_bsd: [622, 584, 622] } }, [{ slug: 'commuting', family: 'urban' }])
+        const types = scoring([model('a', false), { ...model('cargo', false), vehicle_type: 'cargo_bike' }, model('bike', false)])
+        const far = scoring([model('a', false), model('near', false), model('far', false)],
+          Object.fromEntries(Object.entries(alike).map(([name, value]) => [name, [value, value, value + 10]])))
+        const groupsets = scoring([model('a', false), model('tiagra', false), model('s1000', false)], { groupset_series: ['S-1000', 'Tiagra', 'S1000'] })
+        const suspensions = scoring([model('a', false, null, 'rigid'), model('full', false, null, 'full'), model('steel', false, null, 'rigid')],
+          { frame_material: ['aluminum', 'aluminum', 'steel'] })
+        const activities = scoring([model('a', false), model('touring', false, null, null, 'touring'), model('commuting', false)], {},
+          [...urban, { slug: 'touring', family: 'urban' }])
+        const configurations = scoring([model('a', false), { ...model('frame', false), model_configuration: 'frame' }, model('complete', false)])
+        const wheels = scoring([model('a', false), model('small', false), model('road', false)], { front_bsd: [622, 584, 622], rear_bsd: [622, 584, 622] })
         return [...propulsions, ids(types), ids(types, 'different_types=1'), ids(configurations), ids(configurations, 'same_configuration=1'),
           ids(wheels), ids(wheels, 'same_wheels=1'), ids(materials), ids(bars), ids(bars, 'weights=handlebar.4'), ids(far), ids(groupsets), ids(suspensions), ids(activities)]
       })()
