@@ -18,8 +18,6 @@ const MAX_SCORE = 0.8
 const MIN_SHARED = 0.4
 // an activity family with fewer values than this is scaled by the whole catalog's
 const MIN_FAMILY_VALUES = 30
-// geometry changes faster on mountain bikes
-const YEAR_FAMILY_WEIGHTS = { mtb: 2 }
 const FIXED_SCALES = { first_year: 2, groupset: 1 }
 
 // the kinds whose same is a match rather than a nearness, which a slider at its top requires
@@ -164,7 +162,7 @@ export const scorer = (models, { format, fields }, activities) => {
         field,
         kind,
         scale: kind === 'numeric' || kind === 'year' ? scaleOf(field, family) : null,
-        weight: (weights[group] ?? 0) / own.length * (kind === 'year' ? YEAR_FAMILY_WEIGHTS[family] ?? 1 : 1)
+        weight: (weights[group] ?? 0) / own.length
       }))
     })
     const groups = [...new Set(listed.map(({ group }) => group))]
