@@ -185,7 +185,7 @@ class RegistrationSequence < ApplicationRecord
     throw :abort
   end
 
-  # The register flow only reads an organization's own sequence, never the template
+  # Activating a template replaces the last one, so its rules are never withdrawn
   def enqueue_after_change_job
     CallbackJobs::AfterRegistrationSequenceChangeJob.perform_async(id) unless template?
   end
