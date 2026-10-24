@@ -352,7 +352,7 @@ class ModelViewer {
       frame_material: present(vehicle.frame?.material) && present(vehicle.frame.material_detail)
         ? html`${vehicle.frame.material} <span class="tw:text-xs twless-strong">${vehicle.frame.material_detail}</span>`
         : vehicle.frame?.material,
-      ...this.wheelSizes(),
+      wheel_size: this.wheelSizes(),
       suspended: present(vehicle.suspension),
       suspension: this.suspensionTravels(),
       groupset: this.groupsetWithDrivetrain(),
@@ -784,16 +784,15 @@ class ModelViewer {
     return this.keepTogether(join([tireInches(presenter, tireWidth), suffix]), tooltip({ text: `${tireWidth} mm` }))
   }
 
-  // "700 C", or "700 C front, 650 B rear", and their BSDs to compare them by, as a name can carry a tooltip
+  // "700 C × 40 mm", or "700 C × 40 mm front, 650 B × 47 mm rear"
   wheelSizes () {
-    const bsds = ['front', 'rear'].map((position) =>
-      [...new Set(this.builtWheels().filter((wheel) => wheel.bsd && array(wheel.position).includes(position)).map((wheel) => wheel.bsd))])
-    const names = (each) => join(each.map((bsd) => this.wheelSizeName(bsd)), ' / ')
-    const [front, rear] = bsds
-    const wheelSize = equal(front, rear)
-      ? (front.length ? names(front) : null)
-      : join(compact([front.length ? join([names(front), ' front']) : null, rear.length ? join([names(rear), ' rear']) : null]), ', ')
-    return { wheel_size: wheelSize, wheel_bsds: JSON.stringify(bsds) }
+    const [front, rear] = ['front', 'rear'].map((position) => new Map(this.builtWheels()
+      .filter((wheel) => wheel.bsd && array(wheel.position).includes(position)).map((wheel) => [`${wheel.bsd}/${wheel.tire_width}`, wheel])))
+    const names = (wheels) => join([...wheels.values()].map((wheel) =>
+      join(compact([this.wheelSizeName(wheel.bsd), wheel.tire_width != null ? this.tireWidthSummary(wheel.tire_width, '') : null]), ' × ')), ' / ')
+    return equal([...front.keys()], [...rear.keys()])
+      ? (front.size ? names(front) : null)
+      : join(compact([front.size ? join([names(front), ' front']) : null, rear.size ? join([names(rear), ' rear']) : null]), ', ')
   }
 
   wheelSizeName (bsd) {

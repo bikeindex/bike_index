@@ -109,7 +109,6 @@ export const geometryOverlay = ({ presenter, vehicles, sizes, frames, selected, 
     const { rearRadius, frontRadius, wheelbase } = each.geometry.wheels
     return { ...each, geometry: { rearAxle: [0, rearRadius], frontAxle: [wheelbase, frontRadius], rearRadius, frontRadius } }
   })
-  if (drawn.length === 0) return nothing
 
   const overlay = drawn.length > 1 || drawn.some(({ side }) => side)
   // a stem missing only beside one that's drawn

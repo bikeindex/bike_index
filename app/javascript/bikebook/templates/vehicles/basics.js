@@ -19,7 +19,7 @@ const FIELDS = [
   { label: 'Cargo', key: 'cargo', only: 'cargo_vehicle' },
   { label: 'Primary activity', key: 'primary_activity' },
   { label: 'Frame material', key: 'frame_material' },
-  { label: 'Wheel size', key: 'wheel_size', differing: 'wheel_bsds' },
+  { label: 'Wheel & tire size', key: 'wheel_size' },
   { label: 'Suspension front/rear', key: 'suspension', only: 'suspended' },
   { label: 'Groupset', key: 'groupset' },
   { label: 'Price', key: 'price' },
