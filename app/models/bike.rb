@@ -738,11 +738,13 @@ class Bike < ApplicationRecord
   end
 
   def valid_mailing_address?
-    address_record = registration_address_record
-    return false if address_record&.street.blank? || address_record.city.blank?
+    registration_record = registration_address_record
+    registration_record&.street.present? && registration_record.city.present? &&
+      !registration_address_organization_default?(creation_organization)
+  end
 
-    default_address_record = creation_organization&.default_location&.address_record
-    address_record.internal_address_attrs != default_address_record&.internal_address_attrs
+  def registration_address_organization_default?(organization)
+    registration_address_record&.internal_address_attrs == organization&.default_address_record&.internal_address_attrs
   end
 
   def mailing_address_record

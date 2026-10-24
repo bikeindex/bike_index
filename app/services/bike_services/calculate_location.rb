@@ -62,13 +62,13 @@ module BikeServices
         bike.current_impound_record&.address_record,
         bike.current_parking_notification,
         registration_record,
-        bike.creation_organization&.default_location&.address_record
+        bike.creation_organization&.default_address_record
       ].compact
       record = records.find { it.street.present? } || records.find { it.latitude.present? }
       return {} if record.blank?
 
       # Only ever respond with the coordinates
-      coordinates = {"latitude" => record.latitude, "longitude" => record.longitude}
+      coordinates = record.slice("latitude", "longitude")
       (record == registration_record) ? coordinates.merge("address_record_id" => record.id) : coordinates
     end
 

@@ -218,18 +218,13 @@
                     <% if bike_attr == "address" %>
                       <td><%= translation(".address") %></td>
                       <td>
-                        <% address_record = @bike.registration_address_record %>
-
-                        <% if @bike.valid_mailing_address? %>
+                        <% unless @bike.registration_address_organization_default?(@organization) %>
                           <small>
-                            <%= render UI::AddressDisplay::Component.new(address_record:, visible_attribute: :street) %>
+                            <%= render UI::AddressDisplay::Component.new(address_record: @bike.registration_address_record, visible_attribute: :street) %>
                           </small>
-                        <% else %>
-                          <%# Don't show address if it's the organizations default address %>
-                          <% unless address_record&.internal_address_attrs == @organization.default_location&.address_record&.internal_address_attrs %>
-                            <%= render UI::AddressDisplay::Component.new(address_record:, visible_attribute: :street) %>
-                            <br>
-                          <% end %>
+                        <% end %>
+
+                        <% unless @bike.valid_mailing_address? %>
                           <span class="text-warning">
                             <small>invalid address</small>
                           </span>

@@ -260,7 +260,7 @@ module BikeServices
         # notification will update it
         ParkingNotification.create!(b_param.parking_notification_params.merge(bike_id: bike.id))
       else
-        address_attrs = bike.address_record&.internal_address_attrs.to_h.slice(*ParkingNotification.attribute_names)
+        address_attrs = Geocodeable.attrs_to_duplicate(bike).slice(*ParkingNotification.attribute_names)
         ParkingNotification.create(address_attrs.merge(
           kind: b_param.bike["parking_notification_kind"],
           bike_id: bike.id,

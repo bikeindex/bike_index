@@ -6,7 +6,7 @@ module UI
       KINDS = %i[multiline single_line]
       def initialize(address_record: nil, visible_attribute: nil, render_country: false, kind: nil)
         @kind = KINDS.include?(kind) ? kind : KINDS.first
-        @address_record = address_record.is_a?(AddressRecord) ? address_record : nil
+        @address_record = address_record
         @visible_attribute = AddressRecord.permitted_visible_attribute(visible_attribute)
         @render_country = render_country
       end
@@ -36,12 +36,8 @@ module UI
       end
 
       def final_line
-        line_parts = [@address_record.region]
-        line_parts += [@address_record.postal_code] unless @visible_attribute == :city
-
-        line_parts = [@address_record.city, line_parts.join(" ")]
-        line_parts += [@address_record.country_name] if @render_country
-
+        region_postal = [@address_record.region, (@address_record.postal_code unless @visible_attribute == :city)].compact.join(" ")
+        line_parts = [@address_record.city, region_postal, (@address_record.country_name if @render_country)]
         content_tag(:span, line_parts.compact.join(", "), class: line_classes)
       end
 
