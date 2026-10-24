@@ -92,8 +92,14 @@ export class CatalogComboboxSource {
     const forId = combobox.element.dataset.asyncId
     const listbox = combobox._actingListbox
     const picked = String(this.params.vehicle_models ?? '').split(',')
+    const { kit, vocabulary } = this.catalog
     const options = models.map((model) => comboboxOption({
-      model, selected: picked.includes(model.id), placeholderUrl: this.catalog.kit.placeholder_url, currencies: this.catalog.vocabulary.currencies
+      model,
+      selected: picked.includes(model.id),
+      placeholderUrl: kit.placeholder_url,
+      currencies: vocabulary.currencies,
+      market: this.params.market,
+      marketNames: vocabulary.names.markets
     }))
     const pagination = html`<li id=${`${forId}__hw_combobox_pagination__wrapper`} class="hw_combobox__pagination__wrapper"
       data-hw-combobox-target="endOfOptionsStream" data-input-type=${inputType ?? nothing} aria-hidden="true"></li>`

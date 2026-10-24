@@ -78,7 +78,8 @@ const unpicked = async (catalog, root, filters) => ({
 
 // The vehicles' place with nothing picked, for `url`'s filters, which change in `page` without rendering it afresh
 export async function unpickedVehicles (catalog, page, url) {
-  return new VehicleViewer(catalog.kit, catalog.vocabulary).render([], url, null, await unpicked(catalog, page, filtersAt(catalog, page, url)))
+  const filters = filtersAt(catalog, page, url)
+  return new VehicleViewer(catalog.kit, catalog.vocabulary, filters).render([], url, null, await unpicked(catalog, page, filters))
 }
 
 const pickedOf = (catalog, url, { market }) => catalog.vehicles(url.searchParams.get('vehicle_models')?.split(',') ?? [], { market })
@@ -94,7 +95,7 @@ const similarOf = async (catalog, url, vehicles) => {
 // The similar models' cards for `vehicle` by its `settings`, which change without rendering the page afresh
 export async function rescoredSimilar (catalog, page, url, vehicle, settings) {
   const filters = filtersAt(catalog, page, url)
-  return new VehicleViewer(catalog.kit, catalog.vocabulary, filters.jurisdiction).similarResults(url, await catalog.similar(vehicle, settings))
+  return new VehicleViewer(catalog.kit, catalog.vocabulary, filters).similarResults(url, await catalog.similar(vehicle, settings))
 }
 
 // the model group `url`'s overview shows, of one of its vehicles
@@ -111,7 +112,7 @@ export async function pickedVehicles (catalog, page, url) {
   const filters = filtersAt(catalog, page, url)
   const [found, group] = await Promise.all([pickedOf(catalog, url, filters), groupOf(catalog, url)])
   const vehicles = found.slice(0, MAX_COMPARE)
-  return new VehicleViewer(catalog.kit, catalog.vocabulary, filters.jurisdiction).render(vehicles, url, preferredSize(), {},
+  return new VehicleViewer(catalog.kit, catalog.vocabulary, filters).render(vehicles, url, preferredSize(), {},
     { group, similar: await similarOf(catalog, url, vehicles) })
 }
 
@@ -179,7 +180,7 @@ export async function hydrate (catalog, source, shell, url) {
     if (display) combobox(root, name).dataset.hwComboboxPrefilledDisplayValue = display
   }
 
-  const viewer = new VehicleViewer(kit, catalog.vocabulary, filters.jurisdiction)
+  const viewer = new VehicleViewer(kit, catalog.vocabulary, filters)
   for (const input of root.querySelectorAll('input[name="electric"]')) {
     const id = input.value.replace(/^class_/, 'evc/us/class_')
     const classification = catalog.vocabulary.e_vehicle_classifications[id]

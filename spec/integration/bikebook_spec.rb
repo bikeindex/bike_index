@@ -705,7 +705,7 @@ RSpec.describe "BikeBook", :js, type: :system do
     # its own models and the others sold elsewhere, but for e-vehicles
     expect(page).to have_css("#vehicle-models-count", exact_text: "(8 matching models)", wait: 10)
     type_into(vehicle_field, "haul")
-    expect(page).to have_css(vehicle_option, count: 1, text: "$3,599.99")
+    expect(page).to have_css(vehicle_option, count: 1, text: "$3,599.99").and have_no_css(vehicle_option, text: "(Canada)")
     # and for one sold here in the same years, whose own it shows
     type_into(vehicle_field, "kh24")
     expect(page).to have_css(vehicle_option, count: 1).and have_css("#{vehicle_option}[data-value='m/kris_holm/2023/kh24']")
@@ -714,7 +714,8 @@ RSpec.describe "BikeBook", :js, type: :system do
     # but a model's exact id finds it, though the market leaves it out, saying so rather than counting it
     type_into(vehicle_field, "m/specialized/2025/haul_st")
     expect(page).to have_css(".hw-combobox__group__label", exact_text: "(model doesn't match filters)")
-    expect(page).to have_css(vehicle_option, count: 1).and have_no_css(vehicle_option, text: "$3,599.99")
+    # named for the market it's sold in, which the visitor's isn't
+    expect(page).to have_css(vehicle_option, count: 1, text: "Specialized Haul ST (United States)").and have_no_css(vehicle_option, text: "$3,599.99")
     type_into(vehicle_field, "m/specialized/2025/haul_st_ca")
     expect(page).to have_css(".hw-combobox__group__label", exact_text: "(1 matching model)")
 
@@ -835,6 +836,8 @@ RSpec.describe "BikeBook", :js, type: :system do
     # titled without a year, over the years it's been sold
     haul_st = featured.find("li", text: "Specialized Haul ST")
     expect(haul_st).to have_link(exact_text: "Specialized Haul ST").and have_css("strong", exact_text: "2025–current")
+    # one sold outside the visitor's market names where it is
+    expect(featured).to have_link(exact_text: "Kris Holm KH36 (Canada)")
     # each is picked as the search's option is
     haul_st.find("a").click
     expect(page).to have_css("[aria-label='Overview'] thead th", text: "Haul ST")
@@ -1726,8 +1729,11 @@ RSpec.describe "BikeBook", :js, type: :system do
     # beside its Canadian model, sold outside the visitor's market, the Overview leads with each one's, until any market will do
     visit bikebook_path(vehicle_models: "m/specialized/2025/haul_st,m/specialized/2025/haul_st_ca", filters: 1)
     expect(page).to have_css("[aria-label='Overview comparison'] tbody tr:first-child", text: /\AMarkets\s*United States\s*Canada\z/, wait: 10)
+    expect(page).to have_css("[aria-label='Overview comparison'] thead th", text: /Haul ST\s+\(Canada\)/)
+      .and have_no_css("[aria-label='Overview comparison'] thead th", text: "(United States)")
     choose_option("Market", "Any")
     expect(page).to have_no_css("[aria-label='Overview comparison'] th", exact_text: "Markets")
+      .and have_no_css("[aria-label='Overview comparison'] thead th", text: "(Canada)")
 
     # its Canadian model, published resolved from it: its own market, price and motor, and no US class
     visit bikebook_path(vehicle_models: "m/specialized/2025/haul_st,m/specialized/2025/haul_st_ca", view: "all")

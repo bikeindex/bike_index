@@ -22,12 +22,13 @@ export const MAX_COMPARE = 10
 // The compared vehicles' cards, from catalog blocks
 export class VehicleViewer {
   // `jurisdiction`'s out of class marker, evc/out_of_class/us/ca, where its law bars a Class 3's throttle, as
-  // EbikeRuleServices::StateLaws.out_of_class_ids has them
-  constructor (kit, vocabulary, jurisdiction) {
+  // EbikeRuleServices::StateLaws.out_of_class_ids has them. Model cards name the markets of those `market` doesn't sell
+  constructor (kit, vocabulary, { jurisdiction, market } = {}) {
     this.presenter = new VehiclePresenter(kit, vocabulary)
     const barred = Object.values(vocabulary.e_vehicle_classifications)
       .some((record) => record.jurisdiction === `US-${jurisdiction}` && record.class_3_throttle === false)
     this.outOfClassId = barred ? `evc/out_of_class/us/${jurisdiction.toLowerCase()}` : null
+    this.card = { placeholderUrl: kit.placeholder_url, currencies: vocabulary.currencies, market, marketNames: vocabulary.names.markets }
   }
 
   // The vehicles at `url` in the view it picks, each under its key, whose links keep its other params, compared in the
@@ -43,8 +44,7 @@ export class VehicleViewer {
       return emptyState({
         url,
         vehiclePath: (id) => pathWith(url, { vehicle_models: id }),
-        placeholderUrl: presenter.kit.placeholder_url,
-        currencies: presenter.vocabulary.currencies,
+        ...this.card,
         ...search
       })
     }
@@ -122,13 +122,12 @@ export class VehicleViewer {
     const views = {
       // the overlay while the similar models are open, each column's bottom in its frame's color
       basics: () => {
-        const overview = { presenter, vehicles, outOfClassId, removePath, groupPath: (value) => pathWith(url, { group: value }), shownGroup: group && url.searchParams.get('group') }
+        const overview = { presenter, vehicles, market: this.card.market, outOfClassId, removePath, groupPath: (value) => pathWith(url, { group: value }), shownGroup: group && url.searchParams.get('group') }
         const groupModels = group
           ? modelGroup({
             group,
             vehiclePath: (id) => pathWith(url, { vehicle_models: id, vehicle_sizes: '', group: '' }),
-            placeholderUrl: presenter.kit.placeholder_url,
-            currencies: presenter.vocabulary.currencies
+            ...this.card
           })
           : nothing
         if (!comparing || similar?.results === undefined) return html`${basics(overview)}${groupModels}`
@@ -216,7 +215,6 @@ export class VehicleViewer {
   // The cards of the models most like the first at `url`, each a link adding it to the comparison there or taking it out,
   // which renders in place, focusing it again
   similarResults (url, results) {
-    const { kit, vocabulary } = this.presenter
     const values = paramList(url, 'vehicle_models').filter(Boolean)
     const full = values.length >= MAX_COMPARE && MAX_COMPARE
     const cards = results?.models.map((model) => {
@@ -226,8 +224,7 @@ export class VehicleViewer {
       return modelCard({
         model,
         href: active || !full ? comparedPath(url, next) : null,
-        placeholderUrl: kit.placeholder_url,
-        currencies: vocabulary.currencies,
+        ...this.card,
         toggle: true,
         active,
         attributes: { id, 'data-in-place': `#${id}` }
