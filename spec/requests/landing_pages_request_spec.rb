@@ -7,6 +7,12 @@ RSpec.describe LandingPagesController, type: :request do
     end
   end
 
+  describe "/ucmerced" do
+    it "redirects to registering with uc-merced" do
+      expect(get("/ucmerced")).to redirect_to(new_register_path(organization_id: "uc-merced"))
+    end
+  end
+
   describe "#for_cities" do
     it "starts the checker on the visitor's state, and asks for one without a location" do
       get "/for_cities", headers: {"HTTP_CF_IPCOUNTRY" => "US", "HTTP_CF_REGION" => "Indiana"}

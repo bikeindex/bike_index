@@ -5475,15 +5475,12 @@ es:
         protecting_your_bike_here: Proteja su bicicleta aquí
         read_more_about_prefix: Lea más sobre
         recovered_bike_type: recuperado/encontrado %{bike_type}
-        secure_both_wheels_either_with_two_ulocks: Asegure ambas ruedas, ya sea con
-          dos candados en U o con un candado en U y un cable resistente.
         sign_up_on_bikeindexorg_to_claim_your_bik: Regístrate en BikeIndex.org para
           reclamar tu %{bike_type} y editarlo, subir fotos y asegurarte de no perder
           nunca de vista a tu fiel corcel.
         stolen_bike_type: robado %{bike_type}
         thanks_for_adding_this_bike_type_you_found: Gracias por añadir este %{bike_type}
           que encontraste al Índice de Bicicletas.
-        use_a_ulock: Utilice un candado en U.
         were_sorry_your_bike_type_was_stolen: Lamentamos que su %{bike_type} haya
           sido robado.
         when_you_do: "¡Cuando lo hagas!"
@@ -5512,13 +5509,16 @@ es:
         stolen_guidance: Si te roban la bicicleta, inicia sesión en Bike Index inmediatamente
           y márcala como robada para activar nuestra red de recuperación.
         theft_victims_illustration: Ilustración de víctimas de robo
-        ulock_illustration: Ilustración de un candado en U
         updated_registration_guidance: Si te mudas, vendes o realizas cualquier modificación
           en tu bicicleta, actualiza la matrícula para que el registro siga siendo
           preciso y útil.
         view_your_bike: Ver tu bicicleta
         what_if_my_bike_gets_stolen: "¿Qué pasa si me roban la bicicleta?"
         whats_next: "¿Qué sigue?"
+        secure_both_wheels_with_locking_skewers: Asegure ambas ruedas con cierres
+          de seguridad, un cable resistente y un candado en U o dos candados en U.
+        use_a_ulock_or_foldable_lock: Utilice un candado en U o un candado plegable
+          de alta resistencia.
       organization_invitation:
         hello: Hola %{name},
         join_org: Únete a %{org_name}
@@ -5634,6 +5634,8 @@ es:
           required: requerido
         combobox_state:
           state: Estado
+        combobox:
+          no_matches: No hay coincidencias
       alerts:
         base:
           error: Error
@@ -6564,9 +6566,6 @@ es:
             tu bicicleta, pero que la reconocerán atada a la puerta equivocada.
           promoted_alerts_title: Deja tu bicicleta frente al barrio del que fue robada.
           questions_people_ask_at_2am: Preguntas que la gente hace a las 2 de la madrugada.
-          read_more_recovery_stories: Lee más historias de recuperación
-          recoveries_reported_by_owners: Recuperaciones recientes, reportadas por
-            sus propietarios.
           recovery_record: historial de recuperación
           register_it: Regístrelo
           register_your_stolen_bike: Registra tu bicicleta robada
@@ -6965,8 +6964,6 @@ es:
           classes_start_on: Las clases entran en vigor %{date}. Hasta entonces, consulte
             las reglas vigentes del estado.
           fails_rule: No cumple con esta regla.
-          falls_under: En %{state}, se encuentra dentro de %{name}, lo que puede requerir
-            registro y licencia.
           for_your_information: Para tu información
           gray_detail: Tu %{name} está catalogada como una bicicleta eléctrica de
             clase %{n}. Consulta las normas locales en el %{state} DMV.
@@ -7051,14 +7048,10 @@ es:
             de %{cap} mph
           speed_past_html: Ayuda a superar %{past} mph; comprueba que se detenga a
             %{cap} mph.
-          classes_not_recognized:
-            one: La clase %{n} no se reconoce aquí.
-            other: Las clases %{n} no se reconocen aquí.
           classes_recognized:
             one: Se reconoce la clase %{n}.
             other: Se reconocen las clases %{n}.
           read_more: Leer más
-          stock_photo: Foto de archivo
           answer_optional: Opcional
           as_class_with_optional_throttle: como Clase %{n} con su acelerador opcional
           as_class_with_optional_upgrade: como Clase %{n} con una actualización opcional
@@ -7072,11 +7065,6 @@ es:
             bicicleta eléctrica de clase %{n} y %{optional}.
           manually_entered: Introducido manualmente
           model_year: Modelo %{year}
-          optional_classes_not_recognized:
-            one: La clase %{n} no se reconoce aquí, por lo que solo es legal tal como
-              se vende.
-            other: Las clases %{n} no se reconocen aquí, por lo que es legal solo
-              como se vende.
           optional_throttle_not_allowed: Es legal únicamente sin su acelerador opcional.
           optional_to_html: Opcional, a %{mph}
           throttle_with_class_3_assist: No permitido con asistencia de Clase 3
@@ -7135,6 +7123,16 @@ es:
               %{law}, con reglas %{count} para verificar.
           yes_to_kmh_html: Sí, a %{kmh} km/h
           your_province: Su provincia o territorio
+          classes_not_recognized_in:
+            one: La clase %{n} no se reconoce en %{state}.
+            other: Las clases %{n} no se reconocen en %{state}.
+          falls_under_name: En %{state}, se encuentra dentro de %{name}.
+          optional_classes_not_recognized_in:
+            one: La clase %{n} no se reconoce en %{state}, por lo que solo es legal
+              tal como se vende.
+            other: Las clases %{n} no se reconocen en %{state}, por lo que es legal
+              solo como se vende.
+          other_classification_rules: Reglas %{name}
         rule_label:
           classes: Clases reconocidas
           power: condensador de potencia del motor
@@ -7486,10 +7484,7 @@ es:
           perk_top_listing_placement: Posicionamiento destacado en el mercado
           plans_from: Planes de %{price} al mes
           questions: Preguntas
-          read_more_recovery_stories: Lee más historias de recuperación
           recommended: Recomendado
-          recoveries_reported_by_owners: Cada recuperación es reportada por la persona
-            que recuperó su bicicleta.
           stolen_bikes_recovered: Recuperan bicicletas robadas
           summary_monthly: "%{level} membresía, %{price} un mes"
           summary_yearly: "%{level} membresía, %{price} un año"
@@ -7569,14 +7564,10 @@ es:
             impuesto sobre las ganancias de capital derivadas de la apreciación de
             los activos.
           other_ways_title: Otras formas de donar a este nivel
-          recovered: Recuperado
           stat_bikes: bicicletas registradas, gratis
           stat_partners: tiendas asociadas, departamentos de policía y ciudades
           stat_recoveries: Recuperan bicicletas robadas
           stat_value: valor devuelto a los propietarios
-          stories_link: Lee más historias de recuperación
-          stories_subhead: Cada recuperación es reportada por la persona que recuperó
-            su bicicleta.
           stories_title: En palabras de sus dueños
           tier_basic: membresía básica
           tier_basic_benefit: Publica tus bicicletas en el mercado, obtén una insignia
@@ -8179,6 +8170,12 @@ es:
           rate_limited: Se han realizado demasiadas búsquedas demasiado rápido; se
             ha alcanzado el límite de solicitudes. Espere un momento y vuelva a intentarlo.
           retry: Intentar otra vez
+      marketing:
+        recovery_stories:
+          no_recoveries: No hay recuperaciones
+          read_more_recovery_stories: Lee más historias de recuperación
+          reported_by_owners: Cada recuperación es reportada por la persona que recuperó
+            su bicicleta.
   user_emails:
     confirm:
       confirm_email: Confirmar correo electrónico

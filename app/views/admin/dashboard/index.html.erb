@@ -94,11 +94,12 @@
       </h2>
 
       <p>
-        <%= number_display(daily_logged_searches.sum { it["web_bikebook"] }) %>
+        <%= number_display(daily_logged_searches.sum { it["web_bikebook"] + it["web_ebike_rules"] }) %>
         past week
+        <em>(<%= number_display(daily_logged_searches.sum { it["web_ebike_rules"] }) %> from e-bike rules)</em>
       </p>
 
-      <%= render(UI::Chart::Component.new(series: logged_searches_admin_graphs_path(search_endpoint: "web_bikebook", period: "week"))) %>
+      <%= render(UI::Chart::Component.new(series: logged_searches_admin_graphs_path(search_endpoint: "web_bikebook", period: "week"), stacked: true)) %>
     </div>
   </div>
 <% end %>

@@ -5232,15 +5232,12 @@ nb:
         protecting_your_bike_here: beskytte sykkelen din her
         read_more_about_prefix: Les mer om
         recovered_bike_type: gjenopprettet/funnet %{bike_type}
-        secure_both_wheels_either_with_two_ulocks: Sikre begge hjulene - enten med
-          to U-låser, eller en U-lås og en kraftig kabel.
         sign_up_on_bikeindexorg_to_claim_your_bik: Registrer deg på BikeIndex.org
           for å kreve din %{bike_type} og redigere den, last opp bilder og sørg for
           at du aldri mister oversikten over din pålitelige hest!
         stolen_bike_type: stjålet %{bike_type}
         thanks_for_adding_this_bike_type_you_found: Takk for at du la til denne %{bike_type}
           du fant til Bike Index
-        use_a_ulock: Bruk en U-lås.
         were_sorry_your_bike_type_was_stolen: Vi beklager at %{bike_type} ble stjålet.
         when_you_do: når du gjør det!
         you_added_a_bike_type_on_bike_index: Du la til en %{bike_type} på Bike Index
@@ -5267,13 +5264,16 @@ nb:
         stolen_guidance: Hvis sykkelen din noen gang blir stjålet, logg inn på Bike
           Index umiddelbart og merk den som stjålet for å aktivere vårt gjenopprettingsnettverk.
         theft_victims_illustration: Illustrasjon av tyveriofre
-        ulock_illustration: U-lås-illustrasjon
         updated_registration_guidance: Hvis du flytter, selger eller gjør endringer
           på sykkelen din, må du oppdatere registreringen slik at den forblir nøyaktig
           og nyttig.
         view_your_bike: Se sykkelen din
         what_if_my_bike_gets_stolen: Hva om sykkelen min blir stjålet?
         whats_next: Hva skjer nå?
+        secure_both_wheels_with_locking_skewers: Sikre begge hjulene – med låsespyder,
+          en kraftig vaier og en eller to U-låser.
+        use_a_ulock_or_foldable_lock: Bruk en U-lås eller en kraftig sammenleggbar
+          lås.
       organization_invitation:
         hello: Hei %{name},
         join_org: Bli med %{org_name}
@@ -5387,6 +5387,8 @@ nb:
           required: nødvendig
         combobox_state:
           state: Stat
+        combobox:
+          no_matches: Ingen treff
       alerts:
         base:
           error: Feil
@@ -6294,8 +6296,6 @@ nb:
             vil gjenkjenne den låst til feil veranda.
           promoted_alerts_title: Sett sykkelen foran nabolaget den ble tatt fra
           questions_people_ask_at_2am: Spørsmål folk stiller klokken 02:00
-          read_more_recovery_stories: Les flere historier om gjenoppretting
-          recoveries_reported_by_owners: Nylige gjenopprettinger, rapportert av eierne.
           recovery_record: Gjenopprettingslogg
           register_it: Registrer det
           register_your_stolen_bike: Registrer den stjålne sykkelen din
@@ -6678,8 +6678,6 @@ nb:
           classes_start_on: Kursene trer i kraft %{date}. Inntil da, sjekk statens
             gjeldende regler
           fails_rule: Oppfyller ikke denne regelen
-          falls_under: I %{state} faller den inn under %{name}, som kan kreve registrering
-            og lisens.
           for_your_information: Til din informasjon
           gray_detail: Din %{name} er oppført som en elsykkel i klasse %{n}. Sjekk
             %{state} DMV for lokale regler.
@@ -6758,14 +6756,10 @@ nb:
           speed_past_cap_html: Assisterer forbi %{past} mph, over %{cap} mph-grensen
           speed_past_html: Assisterer forbi %{past} mph; sjekk at den stopper ved
             %{cap} mph
-          classes_not_recognized:
-            one: Klassen %{n} gjenkjennes ikke her
-            other: Klasser %{n} gjenkjennes ikke her
           classes_recognized:
             one: Klasse %{n} er gjenkjent
             other: Klasser %{n} er gjenkjent
           read_more: Les mer
-          stock_photo: Arkivfoto
           answer_optional: Valgfri
           as_class_with_optional_throttle: som klasse %{n} med valgfri gasspedal
           as_class_with_optional_upgrade: som klasse %{n} med en valgfri oppgradering
@@ -6778,11 +6772,6 @@ nb:
             elsykkel i klasse %{n} og %{optional}.
           manually_entered: Angitt manuelt
           model_year: "%{year}-modell"
-          optional_classes_not_recognized:
-            one: Klasse %{n} gjenkjennes ikke her, så den er bare lovlig slik den
-              selges
-            other: Klasser %{n} er ikke anerkjent her, så det er bare lovlig slik
-              det selges.
           optional_throttle_not_allowed: Det er bare lovlig uten den valgfrie gasspedalen
           optional_to_html: Valgfritt, til %{mph}
           throttle_with_class_3_assist: Ikke tillatt med klasse 3-assistanse
@@ -6834,6 +6823,16 @@ nb:
               og det må sjekkes %{count}-reglene.
           yes_to_kmh_html: Ja, til %{kmh} km/t
           your_province: Din provins eller ditt territorium
+          classes_not_recognized_in:
+            one: Klassen %{n} gjenkjennes ikke i %{state}
+            other: Klassene %{n} gjenkjennes ikke i %{state}
+          falls_under_name: I %{state} faller den inn under %{name}.
+          optional_classes_not_recognized_in:
+            one: Klasse %{n} gjenkjennes ikke i %{state}, så den er bare lovlig slik
+              den selges.
+            other: Klassene %{n} gjenkjennes ikke i %{state}, så de er bare lovlige
+              slik de selges.
+          other_classification_rules: "%{name} regler"
         rule_label:
           classes: Klasser anerkjent
           power: Motoreffektbegrensning
@@ -7153,10 +7152,7 @@ nb:
           perk_top_listing_placement: Toppplassering på markedsplassen
           plans_from: Planer fra %{price} i måneden
           questions: Spørsmål
-          read_more_recovery_stories: Les flere historier om gjenoppretting
           recommended: Anbefalt
-          recoveries_reported_by_owners: Hver gjenoppretting rapporteres av personen
-            som fikk sykkelen sin tilbake.
           stolen_bikes_recovered: stjålne sykler funnet
           summary_monthly: "%{level} medlemskap, %{price} i måneden"
           summary_yearly: "%{level} medlemskap, %{price} per år"
@@ -7231,14 +7227,10 @@ nb:
           other_ways_stock: Gaver i form av aksjer eller kryptovaluta, som unngår
             kapitalgevinster på verdiøkende eiendeler.
           other_ways_title: Andre måter å gi på dette nivået
-          recovered: Gjenopprettet
           stat_bikes: sykler registrert, gratis
           stat_partners: partnerbutikker, politiavdelinger og byer
           stat_recoveries: stjålne sykler funnet
           stat_value: verdi tilbakeført til eierne
-          stories_link: Les flere historier om gjenoppretting
-          stories_subhead: Hver gjenoppretting rapporteres av personen som fikk sykkelen
-            sin tilbake.
           stories_title: Med eiernes ord
           tier_basic: Grunnleggende medlemskap
           tier_basic_benefit: List opp sykler på markedsplassen, et medlemsmerke og
@@ -7799,6 +7791,12 @@ nb:
           rate_limited: For mange søk for raskt – du er frekvensbegrenset. Vent et
             øyeblikk, og prøv på nytt.
           retry: Prøv igjen
+      marketing:
+        recovery_stories:
+          no_recoveries: Det er ingen inndrivelser
+          read_more_recovery_stories: Les flere historier om gjenoppretting
+          reported_by_owners: Hver gjenoppretting rapporteres av personen som fikk
+            sykkelen sin tilbake.
   user_emails:
     confirm:
       confirm_email: Bekreft e-post
