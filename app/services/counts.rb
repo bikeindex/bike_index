@@ -5,7 +5,7 @@ module Counts
 
   COUNT_KEYS = %w[total_bikes stolen_bikes recoveries recoveries_value week_creation_chart logged_searches organizations].freeze
 
-  LOGGED_SEARCH_KINDS = %w[web_bikebook web_ebike_rules not_web_bikebook not_web_bikebook_serial].freeze
+  LOGGED_SEARCH_KINDS = %w[web_bikebook web_ebike_rules not_web_bikebook not_web_bikebook_serial web_marketplace_no_serial].freeze
 
   RECOVERY_AVERAGE_VALUE = 2103 # updated with calculated_recovery_average_value on 2026-4-11
 
@@ -89,7 +89,8 @@ module Counts
         web_bikebook: logged_searches.web_bikebook.count,
         web_ebike_rules: logged_searches.web_ebike_rules.count,
         not_web_bikebook: not_bikebook.count,
-        not_web_bikebook_serial: not_bikebook.serial.count
+        not_web_bikebook_serial: not_bikebook.serial.count,
+        web_marketplace_no_serial: logged_searches.web_marketplace.where(serial_normalized: nil).count
       }.to_json)
     end
   end

@@ -56,8 +56,10 @@ RSpec.describe Counts do
     let!(:serial_search) { FactoryBot.create(:logged_search, endpoint: :web_bikes, serial_normalized: "XXX", request_at:) }
     let!(:no_serial_search) { FactoryBot.create(:logged_search, endpoint: :api_v3_bikes, request_at:) }
     let!(:ebike_rules_search) { FactoryBot.create(:logged_search, endpoint: :web_ebike_rules, request_at:) }
+    let!(:marketplace_search) { FactoryBot.create(:logged_search, endpoint: :web_marketplace, request_at:) }
+    let!(:marketplace_serial_search) { FactoryBot.create(:logged_search, endpoint: :web_marketplace, serial_normalized: "XXX", request_at:) }
     let!(:yesterday_search) { FactoryBot.create(:logged_search, endpoint: :web_bikebook, request_at: request_at - 1.minute) }
-    let(:empty_counts) { {"web_bikebook" => 0, "web_ebike_rules" => 0, "not_web_bikebook" => 0, "not_web_bikebook_serial" => 0} }
+    let(:empty_counts) { {"web_bikebook" => 0, "web_ebike_rules" => 0, "not_web_bikebook" => 0, "not_web_bikebook_serial" => 0, "web_marketplace_no_serial" => 0} }
 
     it "stores yesterday's and today's counts" do
       dates = [Date.current - 2.days, Date.yesterday, Date.current]
@@ -66,7 +68,7 @@ RSpec.describe Counts do
       expect(Counts.logged_searches(dates)).to eq(
         Date.current - 2.days => empty_counts,
         Date.yesterday => empty_counts.merge("web_bikebook" => 1),
-        Date.current => {"web_bikebook" => 1, "web_ebike_rules" => 1, "not_web_bikebook" => 2, "not_web_bikebook_serial" => 1}
+        Date.current => {"web_bikebook" => 1, "web_ebike_rules" => 1, "not_web_bikebook" => 4, "not_web_bikebook_serial" => 2, "web_marketplace_no_serial" => 1}
       )
     end
   end

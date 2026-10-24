@@ -82,7 +82,7 @@
       <p>
         <%= number_display(daily_logged_searches.sum { it["not_web_bikebook"] }) %>
         past week
-        <em>(<%= number_display(daily_logged_searches.sum { it["not_web_bikebook_serial"] }) %> with serial)</em>
+        <em>(<%= number_display(daily_logged_searches.sum { it["not_web_bikebook_serial"] }) %> with serial, <%= number_display(daily_logged_searches.sum { it["web_marketplace_no_serial"] }) %> marketplace)</em>
       </p>
 
       <%= render(UI::Chart::Component.new(series: logged_searches_admin_graphs_path(search_endpoint: "not_web_bikebook", period: "week"), stacked: true)) %>
