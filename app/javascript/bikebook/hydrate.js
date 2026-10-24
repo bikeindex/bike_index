@@ -97,13 +97,22 @@ export async function rescoredSimilar (catalog, page, url, vehicle, settings) {
   return new VehicleViewer(catalog.kit, catalog.vocabulary, filters.jurisdiction).similarResults(url, await catalog.similar(vehicle, settings))
 }
 
+// the model group `url`'s overview shows, of one of its vehicles
+const groupOf = (catalog, url) => {
+  const id = url.searchParams.get('group')
+  const view = url.searchParams.get('view')
+  const picked = url.searchParams.get('vehicle_models')?.split(',').slice(0, MAX_COMPARE) ?? []
+  return picked.includes(id) && (!view || view === 'basics') ? catalog.group(id) : null
+}
+
 // The picked vehicles' place for `url`'s jurisdiction, which decides which are out of class there, and market, which
 // which are sold elsewhere
 export async function pickedVehicles (catalog, page, url) {
   const filters = filtersAt(catalog, page, url)
-  const vehicles = (await pickedOf(catalog, url, filters)).slice(0, MAX_COMPARE)
+  const [found, group] = await Promise.all([pickedOf(catalog, url, filters), groupOf(catalog, url)])
+  const vehicles = found.slice(0, MAX_COMPARE)
   return new VehicleViewer(catalog.kit, catalog.vocabulary, filters.jurisdiction).render(vehicles, url, preferredSize(), {},
-    await similarOf(catalog, url, vehicles))
+    { group, similar: await similarOf(catalog, url, vehicles) })
 }
 
 // The page at `url` while the catalog loads: its filters live and filled in from the URL, their values as it has them, and
@@ -146,7 +155,7 @@ export async function hydrate (catalog, source, shell, url) {
   const located = panel.getAttribute(MARKET_ATTRIBUTE)
   panel.setAttribute(MARKET_ATTRIBUTE, catalog.options.market.some(({ value }) => value === located) ? located : '')
   const filters = filtersAt(catalog, root, url)
-  const [found, { filteredCount }] = await Promise.all([pickedOf(catalog, url, filters), catalog.search(filters, 0, 0)])
+  const [found, { filteredCount }, group] = await Promise.all([pickedOf(catalog, url, filters), catalog.search(filters, 0, 0), groupOf(catalog, url)])
   const vehicles = found.slice(0, MAX_COMPARE)
   const classifications = catalog.vocabulary.e_vehicle_classifications
   const cards = pickedClassifications(url, classifications)
@@ -180,7 +189,7 @@ export async function hydrate (catalog, source, shell, url) {
 
   const similar = await similarOf(catalog, url, vehicles)
   renderInto(root.getElementById('vehicle-viewers'), viewer.render(vehicles, url, preferredSize(),
-    vehicles.length ? {} : await unpicked(catalog, root, filters), similar))
+    vehicles.length ? {} : await unpicked(catalog, root, filters), { group, similar }))
   for (const slot of root.querySelectorAll('[data-similar-slot]')) renderInto(slot, viewer.compareToggle(vehicles, similar))
 
   localSources.set(combobox(root, 'vehicle_models'), source)

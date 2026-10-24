@@ -161,11 +161,9 @@ function matching (params) {
   const passes = filter(params)
   const filtered = sorted(params).filter(passes)
   const needle = (params.q ?? '').trim().toLowerCase()
-  const selected = new Set(list(params.vehicle_models))
   const exact = needle.startsWith('m/') && byId.get(needle)
   const words = needle.split(/\s+/).filter(Boolean)
-  const found = (exact ? [exact] : filtered.filter(({ searchText }) => words.every((word) => searchText.includes(word))))
-    .filter(({ id }) => !selected.has(id))
+  const found = exact ? [exact] : filtered.filter(({ searchText }) => words.every((word) => searchText.includes(word)))
   const whole = ({ searchText }) => searchText.includes(needle)
   const matches = needle ? [...found.filter(whole), ...found.filter((model) => !whole(model))] : found
   return { filteredCount: filtered.length, matches, unfiltered: Boolean(exact) && matches.length > 0 && !passes(exact) }
@@ -209,6 +207,24 @@ function featured ({ params, legalClasses }) {
     picked.push(best.model)
   }
   return { count: filtered.length, featured: candidates.filter((model) => picked.includes(model)) }
+}
+
+// The models of the `model` id's group by year, newest first, each under the newest it's sold in - so each once, and a
+// current one in this year
+function group ({ model: id }) {
+  const model = byId.get(id)
+  if (!model?.model_group) return null
+
+  const years = new Map()
+  for (const each of sorted({}).filter((each) => each.manufacturer === model.manufacturer && each.model_group === model.model_group && each.first_year)) {
+    const year = Math.max(each.first_year, each.sortYear)
+    years.set(year, [...(years.get(year) ?? []), each])
+  }
+  return {
+    name: model.model_group,
+    manufacturer: model.manufacturer_name,
+    years: [...years].sort(([a], [b]) => b - a).map(([year, models]) => ({ year, models }))
+  }
 }
 
 // Whether `a` wins at the first rank the two differ at
@@ -272,7 +288,7 @@ function propelled ({ electric, e_vehicle_classifications: carried = [] }, propu
 
 self.onmessage = async ({ data: { id, type, ...args } }) => {
   try {
-    self.postMessage({ id, result: await { load, search, featured, vehicles, displays, similar }[type](args) })
+    self.postMessage({ id, result: await { load, search, featured, group, vehicles, displays, similar }[type](args) })
   } catch (error) {
     self.postMessage({ id, error: error.message })
   }

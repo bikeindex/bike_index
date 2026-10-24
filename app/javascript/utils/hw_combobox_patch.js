@@ -33,7 +33,7 @@ HwComboboxController.prototype._requestChips = function (values) {
   if (!values) return
 
   const source = localSources.get(this.element)
-  return source ? source.chips(this, values) : requestChips.call(this, values)
+  return source ? source.chips(this, values, { adding: this.addingChip }) : requestChips.call(this, values)
 }
 
 // A paste fills the input without opening it, and closing is what commits a pick, from the options it shows -
@@ -215,6 +215,70 @@ HwComboboxController.prototype._openInDialog = function () {
 
   this.dialogTarget.addEventListener('close', dismiss, { signal: listeners.signal })
   RENDER_EVENTS.forEach(name => document.addEventListener(name, dismiss, { signal: listeners.signal }))
+}
+
+// A repeatable multiselect (data-repeatable) takes a value picked again, as a chip of its own, where the gem keeps its
+// values as a set - and removing a chip takes off its own pick, the field and its chips being in the same order
+const repeats = (controller) => controller._isMultiselect && controller.element.hasAttribute('data-repeatable')
+const picks = (controller) => controller.hiddenFieldTarget.value.split(',').filter(Boolean)
+const setPicks = (controller, values) => {
+  controller.hiddenFieldTarget.value = values.join(',')
+  controller._syncRequired()
+}
+
+Object.defineProperty(HwComboboxController.prototype, '_fieldValueArray', {
+  configurable: true,
+  get () {
+    return repeats(this) ? picks(this) : Reflect.get(Object.getPrototypeOf(HwComboboxController.prototype), '_fieldValueArray', this)
+  }
+})
+
+// its picks' options stay to pick again, rather than hidden
+const resetMultiselectionMarks = HwComboboxController.prototype._resetMultiselectionMarks
+HwComboboxController.prototype._resetMultiselectionMarks = function () {
+  if (!repeats(this)) resetMultiselectionMarks.call(this)
+}
+
+const beforeClearing = HwComboboxController.prototype._beforeClearingMultiselectQuery
+HwComboboxController.prototype._beforeClearingMultiselectQuery = function (callback) {
+  if (!repeats(this)) return beforeClearing.call(this, callback)
+
+  const { dataset } = this.hiddenFieldTarget
+  if (dataset.valueForMultiselect) callback(dataset.displayForMultiselect, dataset.valueForMultiselect)
+  dataset.displayForMultiselect = ''
+  dataset.valueForMultiselect = ''
+}
+
+const addToFieldValue = HwComboboxController.prototype._addToFieldValue
+HwComboboxController.prototype._addToFieldValue = function (value) {
+  repeats(this) ? setPicks(this, [...picks(this), String(value)]) : addToFieldValue.call(this, value)
+}
+
+// its chip's place, which the field's value is at
+const removeChip = HwComboboxController.prototype.removeChip
+HwComboboxController.prototype.removeChip = function (event) {
+  this.removingAt = [...this.element.querySelectorAll('[data-hw-combobox-value-param]')].indexOf(event.currentTarget)
+  removeChip.call(this, event)
+}
+
+const removeFromFieldValue = HwComboboxController.prototype._removeFromFieldValue
+HwComboboxController.prototype._removeFromFieldValue = function (value) {
+  if (!repeats(this)) return removeFromFieldValue.call(this, value)
+
+  const values = picks(this)
+  const at = values[this.removingAt] === String(value) ? this.removingAt : values.indexOf(String(value))
+  setPicks(this, values.filter((_, index) => index !== at))
+}
+
+// a pick's chip, which a local source draws though the value's already chipped
+const createChip = HwComboboxController.prototype._createChip
+HwComboboxController.prototype._createChip = function () {
+  this.addingChip = true
+  try {
+    createChip.call(this)
+  } finally {
+    this.addingChip = false
+  }
 }
 
 // A combobox set or cleared from code goes through the gem, so its hidden field, its input and a

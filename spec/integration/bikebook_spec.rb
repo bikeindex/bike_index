@@ -134,6 +134,35 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(page).to have_current_path("/bikebook?search=1&vehicle_models=m/aventon/2026/level_4_rec_step_through")
     # for the search logs, what the reader typed once they stopped, and then what they picked
     expect(logged).to eq ["count=2&q=level+4+rec", "vehicle_models=m/aventon/2026/level_4_rec_step_through"]
+    # its model group's models under the overview, each under the newest year it's sold in - the current ones this year's
+    within(find("[aria-label='Overview'] tr", text: /\AModel group/)) { click_link "View group" }
+    group_cards = -> { all("[aria-labelledby='model-group-name'] li h3").map(&:text) }
+    expect(page).to have_css("#model-group h2", exact_text: "Level")
+    expect(all("#model-group > div > h3").map(&:text)).to eq([Time.current.year.to_s])
+    expect(group_cards.call).to match_array(["Aventón Level 2", "Aventón Level 2 Step-Through", "Aventón Level 3", "Aventón Level 3 Step-Through",
+      "Aventón Level 4 ADV", "Aventón Level 4 ADV Step-Through", "Aventón Level 4 REC", "Aventón Level 4 REC Step-Through"])
+    # a longer one a page of years at a time, the next as the reader nears its end
+    page.evaluate_script(<<~JS)
+      (async () => {
+        const [{ render }, { modelGroup }] = await Promise.all([import('lit-html'), import('bikebook/templates/vehicles/model_group')])
+        const years = Array.from({ length: 10 }, (_, index) => ({ year: 2026 - index, models: Array.from({ length: 6 }, (_, each) =>
+          ({ id: `m/test/${2026 - index}/model_${each}`, manufacturer_name: 'Test', model: `${2026 - index} Model ${each}`, first_year: 2026 - index, final_year: 2026 - index })) }))
+        const container = document.createElement('div')
+        render(modelGroup({ group: { name: 'Long', manufacturer: 'Test', years }, vehiclePath: (id) => id, placeholderUrl: '', currencies: {} }), container)
+        document.getElementById('model-group').replaceWith(container)
+      })()
+    JS
+    years_shown = -> { all("#model-group > div > h3").map(&:text) }
+    expect(page).to have_css("#model-group h2", exact_text: "Long")
+    expect(years_shown.call).to eq(%w[2026 2025 2024 2023])
+    page.scroll_to(:bottom)
+    expect(page).to have_css("#model-group > div > h3", count: 8)
+    page.scroll_to(:bottom)
+    expect(years_shown.call).to eq(%w[2026 2025 2024 2023 2022 2021 2020 2019 2018 2017])
+    # and hidden again
+    click_link "View group"
+    expect(page).to have_no_css("#model-group")
+    expect(page).to have_current_path("/bikebook?search=1&vehicle_models=m/aventon/2026/level_4_rec_step_through")
 
     # A second pick, found by its id, compares the two: a table of each against the first, and the
     # second's card highlighting where it differs
@@ -312,14 +341,33 @@ RSpec.describe "BikeBook", :js, type: :system do
     # under its frame, wheels, brakes, suspension and drivetrain
     headings = find("section[aria-label='Aventón Level 2 Step-Through components']").all("h2").map { it.text.downcase }
     expect(headings.first(5)).to eq(["frame", "wheels", "brakes", "suspension", "drivetrain"])
-    # each row level with the other card's, its blank standing in where only the other has the component
+    # each row level with the other card's, its blank standing in where only the other has the component. Read two
+    # frames on, as bikebook--align-rows sizes them in the frame after the cards render
     tops = page.evaluate_script(<<~JS)
-      [...document.querySelectorAll("section[aria-label$=' components']")].map((card) => [...card.querySelectorAll('[data-align-row]')]
-        .map((row) => [row.dataset.alignRow, Math.round(row.getBoundingClientRect().top)]))
+      new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve(
+        [...document.querySelectorAll("section[aria-label$=' components']")].map((card) => [...card.querySelectorAll('[data-align-row]')]
+          .map((row) => [row.dataset.alignRow, Math.round(row.getBoundingClientRect().top)]))))))
     JS
     expect(tops.first.map(&:first)).to eq(tops.last.map(&:first))
     expect(page).to have_css("section[aria-label$=' components'] tbody tr", exact_text: "")
     expect(tops.first.zip(tops.last).map { |(_, first), (_, last)| (first - last).abs }).to all(be <= 1)
+    # each group's components that match in both first, then those both have, then those one has, the second card
+    # marking where they differ
+    cells = page.evaluate_script(<<~JS)
+      [...document.querySelectorAll("section[aria-label$=' components']")].map((card) => [...card.querySelectorAll('tbody')].map((group) =>
+        [...group.querySelectorAll('tr')].map((row) => [row.textContent.trim() !== '', !row.querySelector('.tw\\\\:spec-diff')])))
+    JS
+    ranks = cells.first.zip(cells.last).map do |first, last|
+      first.zip(last).map { |(had, _), (other_had, same)|
+        if [had, other_had].count(true) == 2
+          same ? 0 : 1
+        else
+          2
+        end
+      }
+    end
+    expect(ranks.flatten.tally).to include(0 => 4, 1 => be_positive, 2 => be_positive)
+    expect(ranks).to all(satisfy { |rows| rows == rows.sort })
     # and their motors and batteries, a tab only an e-vehicle gets
     click_link "Motor & Battery"
     expect(page).to have_css("[data-comparison] section[aria-label$=' motors']", count: 2)
@@ -632,6 +680,14 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(card_rows.call).to eq 1
     expect(scrolls_sideways.call).to be true
     page.current_window.resize_to(1920, 1080)
+
+    # up to ten, in the search and compared, the picks past them left off
+    eleven = %w[m/aventon/2026/current_adv m/aventon/2026/current_exp m/aventon/2026/level_4_adv m/aventon/2026/level_4_adv_step_through
+      m/aventon/2026/level_4_rec m/aventon/2026/level_4_rec_step_through m/aventon/2026/pace_5_rec_step_through m/aventon/2026/ramblas_adv
+      m/aventon/2026/soltera_3_adv m/aventon/2022/level_2 m/aventon/2022/level_2_step_through]
+    visit bikebook_path(vehicle_models: eleven.join(","))
+    expect(page).to have_css("[aria-label='Overview comparison'] thead th", count: 11, wait: 10)
+    expect(page).to have_css(".hw-combobox__chip", count: 10).and have_no_css(".hw-combobox__chip", text: "Level 2 Step-Through")
   end
 
   it "searches the visitor's market and shows their state's classes until others are chosen, leaving them out of the URL" do
@@ -861,7 +917,7 @@ RSpec.describe "BikeBook", :js, type: :system do
         const { chosenSizes } = await import('bikebook/sizes')
         const size = (name, topTube, reach, riders = {}) => ({ name, geometry: { top_tube_effective: topTube, reach, ...riders } })
         const riders = (min, max) => ({ min_rider_height: min, max_rider_height: max })
-        const vehicle = (value, ...sizes) => ({ value, data: { sizes: sizes.map((each) => typeof each === 'string' ? { name: each } : each) } })
+        const vehicle = (key, ...sizes) => ({ key, data: { sizes: sizes.map((each) => typeof each === 'string' ? { name: each } : each) } })
         const names = (vehicles, options) => chosenSizes(vehicles, options).map((each) => each?.name ?? 'none')
         const canyon = vehicle('canyon', size('S', 546, 390), size('M', 555, 393), size('L', 569, 401))
         const bianchi = vehicle('bianchi', size('53', 536, 393), size('55', 550, 397), size('57', 560, 402))
@@ -1318,6 +1374,17 @@ RSpec.describe "BikeBook", :js, type: :system do
     # 650b against 700c, whatever their tires
     expect(diameters.call).to eq(["Aventón Level 4 ADV's 650 B wheels with 56 mm tires are approximately 696 mm diameter",
       "Aventón Current EXP's 700 C wheels with 64 mm tires are approximately 750 mm diameter"])
+
+    # a model picked again compares in a size of its own, which goes on the URL in its place
+    visit bikebook_path(vehicle_models: "m/aventon/2026/current_adv", view: "geometry", search: 1)
+    expect(page).to have_css("[aria-label='Sizes & geometry comparison']", wait: 10)
+    type_into(vehicle_field, "current adv")
+    retry_on_detach { find(vehicle_option, text: "Aventón Current ADV already selected").click }
+    expect(page).to have_css(".hw-combobox__chip", text: "Aventón Current ADV", count: 2)
+    all("select[aria-label='Size of Current ADV']", count: 2, wait: 10).last.select("Small")
+    expect(page).to have_current_path(/[?&]vehicle_sizes=,Small(&|\z)/)
+    expect(all("select[aria-label='Size of Current ADV'] option[selected]", count: 2).map(&:text)).to eq(["Extra Large", "Small"])
+    expect(all("[aria-label='Geometry overlay'] li").map(&:text)).to eq(["Aventón Current ADV Extra Large", "Aventón Current ADV Small"])
   end
 
   it "shows every weight in pounds to a viewer who prefers imperial units" do
@@ -1399,6 +1466,9 @@ RSpec.describe "BikeBook", :js, type: :system do
       expect_template(UI::IconChevron::Component.new(size: :md), "bikebook/templates/ui/icon_chevron#iconChevron", "{ size: 'md' }")
       expect_template(UI::IconChevron::Component.new, "bikebook/templates/ui/icon_chevron#iconChevron", "undefined")
 
+      expect_template(UI::DragHandle::Component.new(controller: "bikebook--chip-reorder", html_class: "tw:mr-1"),
+        "bikebook/templates/ui/drag_handle#dragHandle", "{ controller: 'bikebook--chip-reorder', htmlClass: 'tw:mr-1' }")
+
       expect_template(UI::Tabs::Component.new(nav_label: "Views", turbo: true, margin_classes: "tw:mt-2", tabs: [
         ComponentStructs::Shapes.tab("Overview", "/bikebook", active: true), ComponentStructs::Shapes.tab("All", "/bikebook?view=all", count: 1200)
       ]), "bikebook/templates/ui/tabs#tabs", <<~JS)
@@ -1432,7 +1502,7 @@ RSpec.describe "BikeBook", :js, type: :system do
 
       # the overlay's frames and the comparison columns keyed to them, in the charts' colors
       series = page.evaluate_script("import('bikebook/templates/vehicles/geometry_overlay').then(({ SERIES }) => SERIES)")
-      expect(series.map { it["color"] }).to eq(UI::Chart::Component::COLORS.first(5))
+      expect(series.map { it["color"] }).to eq(UI::Chart::Component::COLORS)
       expect(series).to all(satisfy { |each| [each["variable"], each["top"]] == ["tw:[--series:#{each["color"]}]", "tw:border-t-[#{each["color"]}]!"] })
 
       expect_template(Atoms::CopyableCode::Component.new(value: "m/trek/2025/fetch", label: "Copy ID"),

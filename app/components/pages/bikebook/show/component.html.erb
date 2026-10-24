@@ -43,7 +43,7 @@
         dialog_label: translation(".select_a_bike"),
         html_options: {value: "",
                        placeholder: translation(".search_placeholder"),
-                       data: {controller: "bikebook--chip-reorder"},
+                       data: {controller: "bikebook--chip-reorder", repeatable: true},
                        input: {autofocus: true, data: {"bikebook--focus-shortcut-target": "field"}}}
       )) %>
       <% end %>
