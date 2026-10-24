@@ -30,7 +30,7 @@ export const modelCard = ({ model, href, placeholderUrl, currencies }) => {
   class="tw:twtext-color tw:hover:underline"><strong>${model.manufacturer_name}</strong> ${model.model}<span
   class="tw:absolute tw:inset-0 tw:z-10"></span></a></h3>${years || model.activity_name
     ? html`<p class="tw:m-0 tw:text-sm tw:text-gray-500"><strong>${years}</strong> ${model.activity_name}</p>`
-    : nothing}<div class="tw:relative tw:z-20 tw:flex tw:flex-wrap tw:items-center tw:gap-1.5">${model.electric
-    ? badge({ text: '⚡', title: 'E-vehicle', color: 'purple' })
+    : nothing}<div class="tw:flex tw:flex-wrap tw:items-center tw:gap-1.5">${model.electric
+    ? html`<span class="tw:relative tw:z-20">${badge({ text: '⚡', title: 'E-vehicle', color: 'purple' })}</span>`
     : nothing}${model.type_name ? badge({ text: model.type_name, color: model.electric ? 'purple' : 'gray' }) : nothing}</div></div></li>`
 }
