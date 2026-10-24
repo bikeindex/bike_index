@@ -12,7 +12,12 @@ export const SERIES = [
   { color: '#DC2626', bottom: 'tw:border-b-[#DC2626]!', top: 'tw:border-t-[#DC2626]!' },
   { color: '#7C3AED', bottom: 'tw:border-b-[#7C3AED]!', top: 'tw:border-t-[#7C3AED]!' },
   { color: '#D97706', bottom: 'tw:border-b-[#D97706]!', top: 'tw:border-t-[#D97706]!' },
-  { color: '#059669', bottom: 'tw:border-b-[#059669]!', top: 'tw:border-t-[#059669]!' }
+  { color: '#059669', bottom: 'tw:border-b-[#059669]!', top: 'tw:border-t-[#059669]!' },
+  { color: '#DB2777', bottom: 'tw:border-b-[#DB2777]!', top: 'tw:border-t-[#DB2777]!' },
+  { color: '#475569', bottom: 'tw:border-b-[#475569]!', top: 'tw:border-t-[#475569]!' },
+  { color: '#0891B2', bottom: 'tw:border-b-[#0891B2]!', top: 'tw:border-t-[#0891B2]!' },
+  { color: '#65A30D', bottom: 'tw:border-b-[#65A30D]!', top: 'tw:border-t-[#65A30D]!' },
+  { color: '#EA580C', bottom: 'tw:border-b-[#EA580C]!', top: 'tw:border-t-[#EA580C]!' }
 ]
 const PADDING = 30
 const TIRE_GAP = 10
@@ -25,8 +30,8 @@ export const wheelName = (presenter, bsd) => presenter.vocabulary.wheel_sizes[bs
 const figures = (presenter, keys) => andSentence(keys.map((key) => presenter.kit.geometry.labels[key] ?? presenter.humanize(key)))
 
 // A frame drawn whole as its type's side view, else its wheels alone, faded while another is chosen
-const frame = ({ side, geometry: { rearAxle, frontAxle, rearRadius, frontRadius }, series, label, value }, index, chosen) =>
-  svg`<g id=${`geometry-frame-${index}`} data-bikebook--geometry-overlay-target="frame" data-vehicle=${value} color=${series.color}
+const frame = ({ side, geometry: { rearAxle, frontAxle, rearRadius, frontRadius }, series, label, key }, index, chosen) =>
+  svg`<g id=${`geometry-frame-${index}`} data-bikebook--geometry-overlay-target="frame" data-vehicle=${key} color=${series.color}
     data-action="click->bikebook--geometry-overlay#pick" cursor="pointer"
     opacity=${chosen >= 0 && chosen !== index ? 0.2 : nothing}><title>${label}</title>${side
     ? side.shapes.map(renderShape)
@@ -95,7 +100,7 @@ export const geometryOverlay = ({ presenter, vehicles, sizes, frames, selected, 
     const title = [vehicle.manufacturer, vehicle.model].filter(present).join(' ')
     const size = sizes[index]?.name
     const builtWheels = Object.fromEntries(['front', 'rear'].map((position) => [position, builtWheel(vehicles[index].data, sizes[index], position)]))
-    return { geometry: frames[index], side: frames[index].side, series: SERIES[index], title, size, builtWheels, label: present(size) ? `${title}, ${size}` : title, value: vehicles[index].value }
+    return { geometry: frames[index], side: frames[index].side, series: SERIES[index], title, size, builtWheels, label: present(size) ? `${title}, ${size}` : title, key: vehicles[index].key }
   })
   const drawn = labelled.filter(({ geometry }) => drawable(geometry)).map((each) => {
     if (each.side) return each
@@ -130,7 +135,7 @@ const reach = ({ side, geometry: { rearAxle, frontAxle, rearRadius, frontRadius 
   : [[rearAxle[0] - rearRadius, 0], [frontAxle[0] + frontRadius, 2 * Math.max(rearRadius, frontRadius)]]
 
 const drawing = (presenter, drawn, labelled, selected) => {
-  const chosen = selected === 'none' ? -1 : Math.max(drawn.findIndex(({ value }) => value === selected), 0)
+  const chosen = selected === 'none' ? -1 : Math.max(drawn.findIndex(({ key }) => key === selected), 0)
   const bounds = extent([...drawn.flatMap(reach), [BOUNDS.left, 0], [BOUNDS.right, BOUNDS.top]])
   const [left, right, top] = [bounds.left - PADDING, bounds.right + PADDING, bounds.top + PADDING]
   const notes = diameterNotes(presenter, labelled)
@@ -145,8 +150,8 @@ const drawing = (presenter, drawn, labelled, selected) => {
     viewBox=${[left, -top, right - left, top + PADDING].map(Math.round).join(' ')} class="tw:h-auto tw:w-full">${drawn.map((each, index) =>
     frame(each, index, chosen))}<use data-bikebook--geometry-overlay-target="top" data-action="click->bikebook--geometry-overlay#pick" cursor="pointer"
     href=${chosen < 0 ? nothing : `#geometry-frame-${chosen}`}></use></svg><ul
-    class="tw:flex tw:flex-wrap tw:gap-2">${drawn.map(({ series, title, size, value }, index) =>
-      html`<li><button type="button" class=${buttonClasses({ size: 'sm' })} aria-pressed=${String(index === chosen)} data-vehicle=${value}
+    class="tw:flex tw:flex-wrap tw:gap-2">${drawn.map(({ series, title, size, key }, index) =>
+      html`<li><button type="button" class=${buttonClasses({ size: 'sm' })} aria-pressed=${String(index === chosen)} data-vehicle=${key}
         data-bikebook--geometry-overlay-target="button" data-action="bikebook--geometry-overlay#toggle"><svg aria-hidden="true" class="tw:shrink-0" width="24" height="8"><line stroke=${series.color}
         x1="2" y1="4" x2="22" y2="4" stroke-width="4" stroke-linecap="round"></line></svg><span>${title}${
         present(size) ? html` <span class="tw:opacity-65">${size}</span>` : nothing}</span></button></li>`)}</ul>${notes.length
