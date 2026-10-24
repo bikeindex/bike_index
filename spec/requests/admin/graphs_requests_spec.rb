@@ -132,8 +132,9 @@ RSpec.describe Admin::GraphsController, type: :request do
     let!(:ebike_rules_searches) { FactoryBot.create_list(:logged_search, 3, endpoint: :web_ebike_rules, request_at:) }
     let!(:marketplace_searches) { FactoryBot.create_list(:logged_search, 4, endpoint: :web_marketplace, request_at:) }
     let!(:marketplace_serial_search) { FactoryBot.create(:logged_search, endpoint: :web_marketplace, serial_normalized: "XXX", request_at:) }
+    let!(:organized_serial_search) { FactoryBot.create(:logged_search, endpoint: :org_bikes, serial_normalized: "XXX", request_at:) }
 
-    it "charts the stored counts: bikebook and ebike rules searches, and the rest split into general, serial and marketplace" do
+    it "charts the stored counts: bikebook and ebike rules searches, and the rest split by org, user, serial and marketplace" do
       Counts.assign_logged_searches
       get "#{base_url}/logged_searches", params: {search_endpoint: "web_bikebook", period: "week"}
       expect(response.status).to eq(200)
@@ -141,7 +142,7 @@ RSpec.describe Admin::GraphsController, type: :request do
 
       get "#{base_url}/logged_searches", params: {search_endpoint: "not_web_bikebook", period: "week"}
       expect(response.status).to eq(200)
-      expect(json_result.map { [it["name"], it["data"].sum(&:last)] }).to eq([["General", 2], ["Serial", 2], ["Marketplace", 4]])
+      expect(json_result.map { [it["name"], it["data"].sum(&:last)] }).to eq([["Org", 0], ["Org serial", 1], ["User", 2], ["User serial", 1], ["Marketplace", 5]])
     end
   end
 
