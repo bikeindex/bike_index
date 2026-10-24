@@ -6664,6 +6664,10 @@ nb:
           market: Marked
           clear_filters: Fjern filtre
           loading_placeholder: Laster inn…
+          any_frame_material: Ethvert rammemateriale
+          any_handlebar_type: Alle typer styrer
+          frame_material: Rammemateriale
+          handlebar_type: Styre type
         donate_strip:
           donate: Donere
           pitch: Dette kule produktet er levert av den ideelle organisasjonen Bike
