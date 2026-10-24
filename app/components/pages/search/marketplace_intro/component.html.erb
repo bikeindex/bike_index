@@ -75,13 +75,14 @@
         </div>
       </div>
 
-      <%= image_tag "kelsey/illustrations/comic-assets_bike-hero.png", alt: "",
-        class: "tw:hidden tw:w-full tw:md:block" %>
+      <%# Lazy, so it isn't fetched where it's hidden - below md, or while the intro is collapsed %>
+      <%= image_tag "kelsey/illustrations/comic-assets_bike-hero.png", alt: "", loading: "lazy", width: 1768, height: 1320,
+        class: "tw:hidden tw:h-auto tw:w-full tw:md:block" %>
 
       <%# After the content, so tabbing reaches the intro before the control that hides it %>
       <%= render(UI::Button::Component.new(color: :secondary, aria: {label: translation(".hide_intro")},
         data: {action: "search--marketplace-intro#hide"},
-        html_class: "tw:absolute tw:top-0 tw:right-0 tw:size-8 tw:rounded-full! tw:border-0! tw:bg-gray-100! tw:p-0! tw:text-slate-900 tw:dark:bg-gray-800! tw:dark:text-gray-100")) do %>
+        html_class: "tw:absolute tw:top-0 tw:right-0 tw:size-8 tw:rounded-full! tw:border-0! tw:bg-gray-100! tw:p-0! tw:text-slate-900 tw:hover:bg-gray-200! tw:dark:bg-gray-800! tw:dark:text-gray-100 tw:dark:hover:bg-gray-700!")) do %>
         <%= helpers.inline_svg_tag("icons/x.svg", class: "tw:size-3", aria_hidden: true) %>
       <% end %>
     </div>

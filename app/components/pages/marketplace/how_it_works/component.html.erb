@@ -55,7 +55,7 @@
 
     <div class="tw:grid tw:gap-3 tw:md:grid-cols-2 tw:md:gap-4.5 tw:lg:grid-cols-4">
       <% checks.each do |check| %>
-        <%= render(SharedBlocks::Marketing::IconFeature::Component.new(**check, card: true)) %>
+        <%= render(SharedBlocks::Marketing::IconFeature::Component.new(**check, circle: "tw:bg-blue-600", card: true)) %>
       <% end %>
     </div>
   </div>
@@ -98,25 +98,15 @@
         tw:gap-5
       "
     >
-      <div class="tw:p-7 <%= CARD_CLASSES %>">
-        <h3 class="tw:text-xl tw:font-bold">
-          <%= translation(".local_pickup") %>
-        </h3>
+      <% delivery_options.each do |title, body| %>
+        <%= render(UI::Card::Component.new(additional_classes: "tw:flex tw:flex-col tw:gap-2.5 tw:rounded-lg! tw:p-7! tw:shadow-[0_4px_12px_rgba(44,62,80,.12)]")) do %>
+          <h3 class="tw:text-xl tw:font-bold"><%= title %></h3>
 
-        <p class="tw:m-0 tw:leading-[1.6] <%= BODY_CLASSES %>">
-          <%= translation(".local_pickup_body") %>
-        </p>
-      </div>
-
-      <div class="tw:p-7 <%= CARD_CLASSES %>">
-        <h3 class="tw:text-xl tw:font-bold">
-          <%= translation(".shipping") %>
-        </h3>
-
-        <p class="tw:m-0 tw:leading-[1.6] <%= BODY_CLASSES %>">
-          <%= translation(".shipping_body") %>
-        </p>
-      </div>
+          <p class="tw:m-0 tw:leading-[1.6] <%= BODY_CLASSES %>">
+            <%= body %>
+          </p>
+        <% end %>
+      <% end %>
     </div>
 
     <div class="tw:flex tw:max-w-[760px] tw:flex-col tw:gap-2 tw:pt-2">

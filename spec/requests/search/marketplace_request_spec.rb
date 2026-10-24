@@ -19,6 +19,10 @@ RSpec.describe Search::MarketplaceController, type: :request do
     get base_url
     expect(response.body).to match(/data-search--marketplace-intro-target="expanded"\s+class=""/)
 
+    # a tracking param isn't a search
+    get "#{base_url}?utm_source=newsletter&fbclid=abc&query="
+    expect(response.body).to match(/data-search--marketplace-intro-target="expanded"\s+class=""/)
+
     get "#{base_url}?price_min_amount=100"
     expect(response.body).to match(/data-search--marketplace-intro-target="expanded"\s+class="tw:hidden"/)
 

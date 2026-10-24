@@ -13,6 +13,8 @@ RSpec.describe "Marketplace intro", :js, type: :system do
     visit "/"
     within("#primary-main-menu") { click_link "Marketplace" }
     expect(page).to have_css("h1", text: intro_heading)
+    # The search form's combobox gets the aria-expanded axe requires when its JS connects
+    expect(page).to have_css("#primary_activity[aria-expanded='false']", wait: 10)
     expect_axe_clean
 
     find("button[aria-label='Hide intro']").click
@@ -40,7 +42,11 @@ RSpec.describe "Marketplace intro", :js, type: :system do
     # a search isn't a dismissal
     expect(browser_cookie_value(cookie_name)).to be_nil
 
-    click_button "What makes this different?"
+    # Turbo restores the whole page for the URL Back lands on, intro included
+    page.go_back
+    expect(page).to have_current_path("/search/marketplace")
+    expect(page).to have_css("h1", text: intro_heading)
+
     click_link "How selling works"
     expect(page).to have_css("h1", text: "How the Bike Index Marketplace works")
     within("#primary-main-menu") do

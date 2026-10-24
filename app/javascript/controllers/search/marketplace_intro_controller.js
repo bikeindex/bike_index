@@ -26,8 +26,6 @@ export default class extends Controller {
 
   // A search moves focus nowhere, and leaves the cookie alone - it isn't a dismissal
   collapse () {
-    if (!this.expandedTarget.checkVisibility()) return
-
     this.swap(this.expandedTarget, this.collapsedTarget)
   }
 

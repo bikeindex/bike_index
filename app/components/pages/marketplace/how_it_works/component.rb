@@ -6,7 +6,6 @@ module Pages
       # "PRO TIP!" is Bangers in the design; Montserrat stands in rather than loading a font for one heading
       class Component < ApplicationComponent
         SECTION_CLASSES = SharedBlocks::Marketing::Wrapper::Component::CONTAINER_CLASSES
-        CARD_CLASSES = "tw:flex tw:flex-col tw:gap-2.5 tw:rounded-lg tw:border tw:border-gray-200 tw:bg-white tw:shadow-[0_4px_12px_rgba(44,62,80,.12)] tw:dark:border-gray-700 tw:dark:bg-gray-800"
         BODY_CLASSES = "tw:text-gray-600 tw:dark:text-gray-300"
 
         private
@@ -16,7 +15,11 @@ module Pages
             {icon: "icons/searcher.svg", title: translation(".checked_for_theft"), body: translation(".checked_for_theft_body")},
             {icon: "icons/handshake.svg", title: translation(".ownership_transfers"), body: translation(".ownership_transfers_body")},
             {icon: "icons/badge-check.svg", title: translation(".bike_index_members"), body: translation(".bike_index_members_body")}]
-            .map { it.merge(circle: "tw:bg-blue-600") }
+        end
+
+        def delivery_options
+          [[translation(".local_pickup"), translation(".local_pickup_body")],
+            [translation(".shipping"), translation(".shipping_body")]]
         end
 
         def step_lists

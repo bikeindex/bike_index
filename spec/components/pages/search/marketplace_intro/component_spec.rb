@@ -6,8 +6,8 @@ RSpec.describe Pages::Search::MarketplaceIntro::Component, type: :component do
   include Rails.application.routes.url_helpers
 
   let(:dismissed) { false }
-  let(:searched) { false }
-  let(:component) { render_inline(described_class.new(dismissed:, searched:)) }
+  let(:query_parameters) { {} }
+  let(:component) { render_inline(described_class.new(dismissed:, query_parameters:)) }
   let(:expanded) { "[data-search--marketplace-intro-target='expanded']" }
   let(:collapsed) { "[data-search--marketplace-intro-target='collapsed']" }
 
