@@ -56,13 +56,13 @@ export const GROUPS = {
   year: { label: 'Year', fields: { first_year: 'year' } },
   material: { label: 'Frame material', fields: { frame_material: 'same' } },
   weight: { label: 'Weight', fields: { total_weight: 'numeric' } },
-  mounts: { label: 'Mounts', fields: { mounts: 'overlap', bottle_mounts: 'numeric' } },
+  mounts: { label: 'Mounts (e.g. fender, rack, bottles)', same: 'mounts', fields: { mounts: 'overlap', bottle_mounts: 'numeric' } },
   price: { label: 'Price', fields: { price: 'numeric' } },
   activity: { label: 'Primary activity', fields: { primary_activity: 'same' } }
 }
 
 // price low by default, as a tiebreaker, and weight, as much of it is what the others weigh already
-const GENERAL = { handlebar: 5, geometry: 4, tires: 4, suspension: 3, ebike: 3, groupset: 2, year: 2, material: 2, weight: 1, mounts: 1, price: 1, activity: 1 }
+const GENERAL = { handlebar: 5, geometry: 4, tires: 4, suspension: 3, ebike: 3, groupset: 2, year: 1, material: 2, weight: 1, mounts: 1, price: 1, activity: 1 }
 export const PRESETS = {
   general: { label: 'General', weights: GENERAL }
 }
