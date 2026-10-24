@@ -33,11 +33,14 @@ TOKEN_KEY = LOCAL ? "ADMIN_DATA_LOCAL_TOKEN" : "ADMIN_DATA_TOKEN"
 PRODUCTION_ONLY_COMMANDS = %w[authorize-url set-tokens refresh].freeze
 
 BUG_REPORTS = "/admin/bug_reports" # Admin pages rather than API routes, same admin token
+DUPLICATE_BIKES = "/admin/duplicate_bikes"
 PATHS = {
   "sidekiq" => "/api/admin_data/sidekiq",
   "pghero" => "/api/admin_data/pghero",
   "bug_reports" => "#{BUG_REPORTS}.json",
-  "missing_manufacturers" => "/admin/bikes/missing_manufacturer.json"
+  "missing_manufacturers" => "/admin/bikes/missing_manufacturer.json",
+  "duplicates" => "#{DUPLICATE_BIKES}.json",
+  "duplicate_comparison" => "#{DUPLICATE_BIKES}/serial.json"
 }.freeze
 
 def env_get(key)
@@ -126,9 +129,12 @@ end
 
 # token_request, refreshing the token and retrying once on a 401. Returns body or nil -
 # anything else (403, a 422 from update) is reported rather than retried.
+# 202 is a duplicate review still preparing - its body says so
+def success?(status) = [200, 202].include?(status)
+
 def with_token(method, path, form: nil)
   status, body = token_request(method, path, form:)
-  return body if status == 200
+  return body if success?(status)
   if status && status != 401
     warn body.to_s[0, 500]
     return nil
@@ -138,7 +144,7 @@ def with_token(method, path, form: nil)
   return nil unless refresh_token!
 
   status, body = token_request(method, path, form:)
-  (status == 200) ? body : nil
+  success?(status) ? body : nil
 end
 
 def get_endpoint(endpoint, params = {})

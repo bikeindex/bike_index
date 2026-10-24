@@ -24,6 +24,7 @@ Production JSON reachable with the admin OAuth token:
 - `GET https://bikeindex.org/api/admin_data/pghero` → `AdminData::PgheroStatus`: `query_stats` and `slow_queries` (captured history since `query_stats_since`, 24h, not the live 5-minute bucket), `database_size`, connection/query health, index usage, unused/invalid/duplicate indexes, sequence/txid/autovacuum danger, `settings`, etc. Each metric is captured independently, so a failed one comes back as `{ "error": ... }` in its slot instead of blanking the payload.
 - `GET /admin/bug_reports.json`, `GET /admin/bug_reports/:id.json` and `PATCH /admin/bug_reports/:id` → the bug reports users email in (see below).
 - `GET /admin/bikes/missing_manufacturer.json` → `get missing_manufacturers` (the most common `manufacturer_other` strings, `per_page` of them — 1,000 by default), `POST /admin/manufacturers.json` → `create-manufacturers`, and `PATCH /admin/manufacturers/:slug.json` → `update-manufacturer`.
+- `GET /admin/duplicate_bikes.json` and `GET /admin/duplicate_bikes/serial.json?reference_bike_id=` → the duplicate registration review queues and comparisons (see below).
 
 `create-manufacturers` reads a JSON array on stdin and skips any name that already finds a manufacturer:
 
@@ -33,7 +34,7 @@ Production JSON reachable with the admin OAuth token:
 JSON
 ```
 
-Auth is a Bearer token gated on the admin Doorkeeper app **and** a superuser ability named for the controller (`admin_data`, `bug_reports`, `bikes`, `manufacturers`; a universal ability covers all). Controllers: `app/controllers/api/admin_data_controller.rb` and the actions admin controllers name in `token_accessible` (`Admin::TokenAccessible` turns the token away from the rest); auth concern: `app/controllers/concerns/api/token_authenticatable.rb`.
+Auth is a Bearer token gated on the admin Doorkeeper app **and** a superuser ability named for the controller (`admin_data`, `bug_reports`, `bikes`, `manufacturers`, `duplicate_bikes`; a universal ability covers all). Controllers: `app/controllers/api/admin_data_controller.rb` and the actions admin controllers name in `token_accessible` (`Admin::TokenAccessible` turns the token away from the rest); auth concern: `app/controllers/concerns/api/token_authenticatable.rb`.
 
 All operations go through the helper:
 
@@ -78,6 +79,19 @@ It fetches sidekiq then pghero and prints a `summary:` line and an `OK`/`ABNORMA
 `show-bug-report` returns the one report — the same fields the index lists, so use it once a search has found the id. `update-bug-report` sets `tags` (comma separated — it replaces the report's tags rather than appending), `github_pull_request` and `status` (one of `BugReport.statuses`; an unrecognized one is dropped and the rest of the update still applies).
 
 Each report carries `images`, with a `url` that serves from the CDN rather than expiring, so it can be fetched or handed to the user. Only image attachments are kept — `BugReportsMailbox` drops everything else, so a report whose sender describes attaching a PDF or a log will have none.
+
+## Duplicate registrations
+
+```
+.claude/skills/admin-data-api/scripts/admin_data.rb get duplicates search_kind=large_group sort=last_at per_page=10
+.claude/skills/admin-data-api/scripts/admin_data.rb get duplicate_comparison reference_bike_id=412735 search_contact=2
+```
+
+`get duplicates` is the dashboard: `queues` (per-kind label, group and record counts), `cue_counts`, `total_count`, and a page of `groups` — each with `reference_id`, `bike_ids`, the normalized `serial`, `kind`, `cues` (key, label, reason) and `serial_stolen`. It filters like the page: `search_kind` (a `BikeDuplicatesServices::Finder::KINDS` key, default `handoff_priority`), `search_cue`, `search_bike_id`, `search_organization_id`, `sort` (`record_count`, `first_at`, `last_at`) and `direction`. Groups are prepared in the background: a `202` with `{"status": "preparing"}` means it's building — retry in a minute.
+
+`get duplicate_comparison reference_bike_id=<bike_id>` (a group's `reference_id`, or any bike) returns every live registration sharing that bike's whole normalized serial and manufacturer: `serial_stolen`, `not_a_serial`, `readiness` and `checks`, `cues`, `shared_fields`, `differing_fields`, `contact_groups` (numbered, with `bike_ids` — no emails) and a page of `records` (`search_contact`, `page`, `direction=desc`; `total_count` is the list being paged, `records_count` the whole group).
+
+Both are read-only evidence. Stolen history anywhere on the serial is a hard merge veto; a shared contact doesn't prove the same bicycle; counts are registration groups, not duplicate bicycles. The JSON leaves out contact emails, but `records` carry stored serials — keep those out of anything that leaves the session.
 
 ## Against a dev server
 
