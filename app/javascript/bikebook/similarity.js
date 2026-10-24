@@ -40,7 +40,7 @@ const KINDS = {
 export const GROUPS = {
   handlebar: { label: 'Handlebar type', fields: { handlebar_type: 'same' } },
   geometry: { label: 'Geometry', fields: { head_angle: 'numeric', seat_angle: 'numeric', stack_reach: 'numeric', bb_drop: 'numeric', chainstay_gap: 'numeric' } },
-  wheels: { label: 'Wheel size & tire clearance', same: 'wheels & tires', fields: { front_bsd: 'numeric', rear_bsd: 'numeric', tire_clearance: 'numeric' } },
+  tires: { label: 'Tire clearance', fields: { tire_clearance: 'numeric' } },
   suspension: { label: 'Suspension', same: 'suspension travel', fields: { travel_front: 'numeric', travel_rear: 'numeric', suspension: 'same' } },
   ebike: { label: 'E-vehicle motor and battery', same: 'motor and battery attributes', fields: { modes: 'set', assist_speed: 'numeric', throttle_speed: 'numeric', battery_size: 'numeric', motor_kind: 'same' } },
   groupset: { label: 'Groupset', fields: { groupset: 'numeric' } },
@@ -53,7 +53,7 @@ export const GROUPS = {
 }
 
 // price low by default, as a tiebreaker, and weight, as much of it is what the others weigh already
-const GENERAL = { handlebar: 5, geometry: 4, wheels: 3, suspension: 3, ebike: 3, groupset: 2, year: 2, material: 2, weight: 1, mounts: 1, price: 1, activity: 1 }
+const GENERAL = { handlebar: 5, geometry: 4, tires: 4, suspension: 3, ebike: 3, groupset: 2, year: 2, material: 2, weight: 1, mounts: 1, price: 1, activity: 1 }
 export const PRESETS = {
   general: { label: 'General', weights: GENERAL }
 }
@@ -70,13 +70,14 @@ export const weightsFrom = (param) => {
 
 // The URL's weights, whether skip_manufacturer=1 leaves out the model's maker's others, whether other_propulsion=1
 // matches only those electric where it isn't, or human powered where it's electric, whether same_configuration=1
-// matches only complete models where it's complete, or frames and framesets where it isn't, and whether
-// different_types=1 includes other vehicle types
+// matches only complete models where it's complete, or frames and framesets where it isn't, whether same_wheels=1
+// matches only its wheel sizes, and whether different_types=1 includes other vehicle types
 export const settingsFrom = (params) => ({
   weights: weightsFrom(params.get('weights')),
   skipManufacturer: params.get('skip_manufacturer') === '1',
   otherPropulsion: params.get('other_propulsion') === '1',
   sameConfiguration: params.get('same_configuration') === '1',
+  sameWheels: params.get('same_wheels') === '1',
   differentTypes: params.get('different_types') === '1'
 })
 
@@ -152,10 +153,11 @@ export const scorer = (models, { format, fields }, activities) => {
 
   // The `COUNT` models most like the one `id` names, of its propulsion, scored by `weights`, its maker's left out with
   // `skipManufacturer`, those of the other propulsion instead with `otherPropulsion`, which leaves its e-bike fields
-  // unscored, only those complete as it is or isn't with `sameConfiguration`, and other vehicle types only with
+  // unscored, only those complete as it is or isn't with `sameConfiguration`, only its wheel sizes, where it lists them,
+  // with `sameWheels`, and other vehicle types only with
   // `differentTypes`, each the closest of its model group; and the sliders whose fields it has values for. Its own model
   // group's are always left out
-  return (id, { weights, skipManufacturer, otherPropulsion, sameConfiguration, differentTypes }) => {
+  return (id, { weights, skipManufacturer, otherPropulsion, sameConfiguration, sameWheels, differentTypes }) => {
     const target = indexes.get(id)
     if (target == null) return null
 
@@ -183,6 +185,7 @@ export const scorer = (models, { format, fields }, activities) => {
       if (index === target || candidate.model_group === model.model_group || (candidate.electric === model.electric) === otherPropulsion ||
         (!differentTypes && candidate.vehicle_type !== model.vehicle_type) ||
         (sameConfiguration && (candidate.model_configuration === 'complete') !== (model.model_configuration === 'complete')) ||
+        (sameWheels && ['front_bsd', 'rear_bsd'].some((field) => columns[field][target] != null && columns[field][index] !== columns[field][target])) ||
         (skipManufacturer && candidate.manufacturer === model.manufacturer) ||
         required.some(({ field, kind, scale }) => columns[field][index] == null || KINDS[kind](columns[field][target], columns[field][index], scale) > 0)) return
 
