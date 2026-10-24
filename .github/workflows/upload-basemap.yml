@@ -41,7 +41,7 @@ name: Upload basemap
 on:
   workflow_dispatch:
   schedule:
-    - cron: "17 9 1 */2 *"
+    - cron: "17 9 1 2-12/2 *"
 
 concurrency:
   group: upload-basemap
