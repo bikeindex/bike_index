@@ -3271,6 +3271,40 @@ ALTER SEQUENCE public.pghero_query_stats_id_seq OWNED BY public.pghero_query_sta
 
 
 --
+-- Name: pos_registration_matches; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.pos_registration_matches (
+    id bigint NOT NULL,
+    bike_id bigint NOT NULL,
+    pos_bike_id bigint NOT NULL,
+    user_id bigint NOT NULL,
+    status integer DEFAULT 0 NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: pos_registration_matches_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.pos_registration_matches_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: pos_registration_matches_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.pos_registration_matches_id_seq OWNED BY public.pos_registration_matches.id;
+
+
+--
 -- Name: primary_activities; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -5127,6 +5161,13 @@ ALTER TABLE ONLY public.pghero_query_stats ALTER COLUMN id SET DEFAULT nextval('
 
 
 --
+-- Name: pos_registration_matches id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.pos_registration_matches ALTER COLUMN id SET DEFAULT nextval('public.pos_registration_matches_id_seq'::regclass);
+
+
+--
 -- Name: primary_activities id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -5997,6 +6038,14 @@ ALTER TABLE ONLY public.payments
 
 ALTER TABLE ONLY public.pghero_query_stats
     ADD CONSTRAINT pghero_query_stats_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pos_registration_matches pos_registration_matches_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.pos_registration_matches
+    ADD CONSTRAINT pos_registration_matches_pkey PRIMARY KEY (id);
 
 
 --
@@ -7473,6 +7522,27 @@ CREATE INDEX index_pghero_query_stats_on_database_and_captured_at ON public.pghe
 
 
 --
+-- Name: index_pos_registration_matches_on_bike_id_and_pos_bike_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_pos_registration_matches_on_bike_id_and_pos_bike_id ON public.pos_registration_matches USING btree (bike_id, pos_bike_id);
+
+
+--
+-- Name: index_pos_registration_matches_on_pos_bike_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_pos_registration_matches_on_pos_bike_id ON public.pos_registration_matches USING btree (pos_bike_id);
+
+
+--
+-- Name: index_pos_registration_matches_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_pos_registration_matches_on_user_id ON public.pos_registration_matches USING btree (user_id);
+
+
+--
 -- Name: index_primary_activities_on_primary_activity_family_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7965,6 +8035,7 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261020153612'),
 ('20261017210000'),
 ('20261017200000'),
 ('20261017174533'),
