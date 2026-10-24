@@ -542,6 +542,14 @@ RSpec.describe BikeServices::Creator do
           end
         end
       end
+      context "placeholder serial" do
+        let(:serial) { "Not Assigned" }
+        it "stores unknown and finds no duplicate" do
+          expect(existing_bike.serial_number).to eq "unknown"
+          expect_no_duplicate
+          expect(b_param.created_bike).to have_attributes(serial_number: "unknown", serial_normalized: nil)
+        end
+      end
       context "user_hidden" do
         it "finds duplicate" do
           existing_bike.update(marked_user_hidden: true)
