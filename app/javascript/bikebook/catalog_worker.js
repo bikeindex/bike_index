@@ -186,8 +186,8 @@ function group ({ model: id, year }) {
 
   const currentYear = new Date().getFullYear()
   const spans = sorted({}).filter((each) => each.manufacturer === model.manufacturer && each.model_group === model.model_group && each.first_year)
-    .map((each) => [each, each.first_year, each.final_year ?? Math.max(each.first_year, currentYear)])
-  const years = [...new Set(spans.flatMap(([, first, last]) => Array.from({ length: last - first + 1 }, (_, index) => last - index)))]
+    .map((each) => [each, each.first_year, Math.max(each.first_year, each.sortYear)])
+  const years = [...new Set(spans.flatMap(([, first, last]) => Array.from({ length: last - first + 1 }, (_, index) => first + index)))]
     .sort((a, b) => b - a)
   const asked = parseInt(year, 10)
   const shown = years.includes(asked) ? asked : years.includes(currentYear) ? currentYear : years[0]

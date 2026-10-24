@@ -85,18 +85,20 @@ export async function unpickedVehicles (catalog, page, url) {
 
 const pickedOf = (catalog, url, { market }) => catalog.vehicles(url.searchParams.get('vehicle_models')?.split(',') ?? [], { market })
 
-// the model group `url` shows, of one of the `vehicles`
-const groupOf = (catalog, url, vehicles) => {
+// the model group `url`'s overview shows, of one of its vehicles
+const groupOf = (catalog, url) => {
   const id = url.searchParams.get('group')
-  return vehicles.some(({ value }) => value === id) ? catalog.group(id, url.searchParams.get('group_year')) : null
+  const view = url.searchParams.get('view')
+  const picked = url.searchParams.get('vehicle_models')?.split(',').slice(0, MAX_COMPARE) ?? []
+  return picked.includes(id) && (!view || view === 'basics') ? catalog.group(id, url.searchParams.get('group_year')) : null
 }
 
 // The picked vehicles' place for `url`'s jurisdiction, which decides which are out of class there, and market, which
 // which are sold elsewhere
 export async function pickedVehicles (catalog, page, url) {
   const filters = filtersAt(catalog, page, url)
-  const vehicles = (await pickedOf(catalog, url, filters)).slice(0, MAX_COMPARE)
-  return new VehicleViewer(catalog.kit, catalog.vocabulary, filters.jurisdiction).render(vehicles, url, preferredSize(), {}, await groupOf(catalog, url, vehicles))
+  const [found, group] = await Promise.all([pickedOf(catalog, url, filters), groupOf(catalog, url)])
+  return new VehicleViewer(catalog.kit, catalog.vocabulary, filters.jurisdiction).render(found.slice(0, MAX_COMPARE), url, preferredSize(), {}, group)
 }
 
 // The page at `url` while the catalog loads: its filters live and filled in from the URL, their values as it has them, and
@@ -139,7 +141,7 @@ export async function hydrate (catalog, source, shell, url) {
   const located = panel.getAttribute(MARKET_ATTRIBUTE)
   panel.setAttribute(MARKET_ATTRIBUTE, catalog.options.market.some(({ value }) => value === located) ? located : '')
   const filters = filtersAt(catalog, root, url)
-  const [found, { filteredCount }] = await Promise.all([pickedOf(catalog, url, filters), catalog.search(filters, 0, 0)])
+  const [found, { filteredCount }, group] = await Promise.all([pickedOf(catalog, url, filters), catalog.search(filters, 0, 0), groupOf(catalog, url)])
   const vehicles = found.slice(0, MAX_COMPARE)
   const classifications = catalog.vocabulary.e_vehicle_classifications
   const cards = pickedClassifications(url, classifications)
@@ -172,7 +174,7 @@ export async function hydrate (catalog, source, shell, url) {
   }
 
   renderInto(root.getElementById('vehicle-viewers'), viewer.render(vehicles, url, preferredSize(),
-    vehicles.length ? {} : await unpicked(catalog, root, filters), await groupOf(catalog, url, vehicles)))
+    vehicles.length ? {} : await unpicked(catalog, root, filters), group))
 
   localSources.set(combobox(root, 'vehicle_models'), source)
   for (const name of LISTS) {

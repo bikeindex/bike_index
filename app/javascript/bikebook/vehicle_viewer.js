@@ -24,13 +24,14 @@ export class VehicleViewer {
     this.outOfClassId = barred ? `evc/out_of_class/us/${jurisdiction.toLowerCase()}` : null
   }
 
-  // The vehicles at `url` in the view it picks, whose links keep its other params, compared in the sizes it picks or
-  // the nearest to the `preferredSize`, the overview over the `group` it shows. With none, the `search`'s count, whether
-  // filters narrow it, and its featured models
+  // The vehicles at `url` in the view it picks, each under its key, whose links keep its other params, compared in the
+  // sizes it picks or the nearest to the `preferredSize`, the overview over the `group` it shows. With none, the
+  // `search`'s count, whether filters narrow it, and its featured models
   render (picks, url, preferredSize, search, group = null) {
     const { presenter, outOfClassId } = this
-    // a model picked more than once by its key, which its sizes and selection are under
-    const vehicles = picks.map((vehicle, index, all) => ({ ...vehicle, key: vehicleKeys(all.map(({ value }) => value))[index] }))
+    const values = picks.map(({ value }) => value)
+    const keys = vehicleKeys(values)
+    const vehicles = picks.map((vehicle, index) => ({ ...vehicle, key: keys[index] }))
     if (vehicles.length === 0) {
       return emptyState({
         url,
@@ -48,8 +49,6 @@ export class VehicleViewer {
     const picked = pickedSizes(url)
     const sizes = chosenSizes(vehicles, { picked, preferred: preferredSize })
     const selectedSizes = new Map(vehicles.map(({ key }, index) => [key, sizes[index]?.name]))
-    const values = vehicles.map(({ value }) => value)
-    const keys = vehicles.map(({ key }) => key)
     const baseline = vehicles[0]
     const others = (key) => key === baseline.key ? [] : [baseline.data]
     const sizePath = (key) => (name) => pathWith(url, { vehicle_sizes: sizesParam(values, { ...picked, [key]: name }) })
@@ -63,8 +62,8 @@ export class VehicleViewer {
     const cardRow = (margin, cards, aligned = false) => html`<div ?data-comparison=${comparing} data-controller=${comparing && aligned ? 'bikebook--align-rows' : nothing} class="${margin} tw:max-[500px]:twpagebleed ${comparing
       ? 'tw:md:twpagebleed tw:md:px-4'
       : 'tw:lg:twpagebleed tw:lg:px-4'}"><div class="tw:flex tw:gap-8 ${rowClasses}">${cards}</div></div>`
-    // each vehicle's `field` on a card of its own, named as its full card is, after whatever `lead` shows, each given
-    // its data and key. `keyed`, each topped in its frame's color in the overlay
+    // each vehicle's `field` on a card of its own, named as its full card is, after whatever `lead` shows
+    // `keyed`, each topped in its frame's color in the overlay
     const cards = (field, none, content, { lead, keyed = false } = {}) => vehicles.map(({ data, value, key }, index) => {
       const { manufacturer, model } = presenter.named(presenter.kit.schemas.vehicle, data)
       return html`<section aria-label=${`${[manufacturer, model].filter(present).join(' ')} ${field}`} class="twgutter tw:w-full tw:min-w-0 tw:space-y-4
@@ -74,7 +73,7 @@ export class VehicleViewer {
         : nothing}<div class="tw:text-2xl tw:leading-tight"><h3 class="tw:inline tw:font-extrabold">${model}</h3> ${
           copyButton({ value, label: 'Copy ID', tooltip: true })}</div></div><div
         class="tw:shrink-0">${photoOf({ presenter, data }, 'tw:h-14 tw:w-21')}</div></header>${lead ? html`<div data-align-row="lead">${lead(data, key)}</div>` : nothing}${present(data[field])
-        ? content(data, key)
+        ? content(data, key, index)
         : html`<p class="twless-strong">${none}</p>`}</section>`
     })
     const typeName = (data) => presenter.named(presenter.kit.schemas.vehicle, data).type || 'bike'
@@ -121,9 +120,9 @@ export class VehicleViewer {
         const drawings = sizeDrawings()
         return html`<div class="tw:flex tw:flex-col tw:min-[1500px]:twpagebleed tw:min-[1500px]:flex-row
         tw:min-[1500px]:items-start tw:min-[1500px]:gap-6 tw:min-[1500px]:px-4">${geometryOverlay({ ...compared, selected: url.searchParams.get('overlay_selected'), beside: true })}${
-        comparisonTable({ ...compared, highlight, beside: true })}</div>${cardRow('tw:mt-6', cards('sizes', 'No sizes listed', (data, key) => {
-        const size = sizes[keys.indexOf(key)]
-        const drawn = drawings[keys.indexOf(key)]
+        comparisonTable({ ...compared, highlight, beside: true })}</div>${cardRow('tw:mt-6', cards('sizes', 'No sizes listed', (data, key, index) => {
+        const size = sizes[index]
+        const drawn = drawings[index]
         const { legend } = drawn
         return html`${framed(legend) ? drawing(data, size, drawn) : nothing}<div class="tw:-mx-(--gutter)">${sizesOf({
           presenter,
@@ -148,11 +147,8 @@ export class VehicleViewer {
       motors: () => cardRow('tw:mt-6', cards('motors', 'No motor', (data, key) => motorsOf({ presenter, data, others: others(key), outOfClassId }))),
       all: () => {
         const full = vehicles.map(({ data, value, key }, index) => {
-          const remaining = values.filter((_, each) => each !== index)
-          const kept = keys.filter((_, each) => each !== index)
-          // the sizes of those left, under the keys they're left with
-          const left = Object.fromEntries(vehicleKeys(remaining).map((each, at) => [each, picked[kept[at]]]))
-          const removePath = pathWith(url, { vehicle_models: remaining.join(','), vehicle_sizes: sizesParam(remaining, left) })
+          const without = (list) => list.filter((_, each) => each !== index).join(',')
+          const removePath = pathWith(url, { vehicle_models: without(values), vehicle_sizes: without(keys.map((each) => picked[each] ?? '')).replace(/,+$/, '') })
           return modelViewer({
             presenter, data, value, comparing, idSuffix: index + 1, others: others(key), removePath, selectedSize: selectedSizes.get(key), sizePath: sizePath(key), outOfClassId
           })

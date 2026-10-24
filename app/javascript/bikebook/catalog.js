@@ -109,7 +109,7 @@ export class CatalogComboboxSource {
     observer.observe(wrapper)
   }
 
-  // An id the catalog lacks gets no chip, and one the render already chipped no second, unless it's `adding` one picked again
+  // No chip for an id the catalog lacks, nor for one already chipped unless `adding` it as a repeat pick
   async chips (combobox, values, { adding = false } = {}) {
     const chipped = new Set([...combobox.element.querySelectorAll('[data-hw-combobox-value-param]')].map((remover) => remover.dataset.hwComboboxValueParam))
     const ids = String(values).split(',').filter((id) => id && (adding || !chipped.has(id)))

@@ -72,7 +72,7 @@ export const vehicleKeys = (ids) => ids.map((id, index) => {
   return time > 1 ? `${id}#${time}` : id
 })
 
-// vehicle_sizes is each vehicle's picked size in vehicle_models' order, blank where it has none, by its key
+// vehicle_sizes is each vehicle's picked size in vehicle_models' order, blank where it has none
 export const paramList = (url, param) => url.searchParams.get(param)?.split(',') ?? []
 export const pickedSizes = (url) => {
   const sizes = paramList(url, PARAM)

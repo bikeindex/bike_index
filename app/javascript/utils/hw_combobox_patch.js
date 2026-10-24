@@ -226,17 +226,10 @@ const setPicks = (controller, values) => {
   controller._syncRequired()
 }
 
-const inherited = (name) => {
-  for (let prototype = HwComboboxController.prototype; prototype; prototype = Object.getPrototypeOf(prototype)) {
-    const descriptor = Object.getOwnPropertyDescriptor(prototype, name)
-    if (descriptor) return descriptor
-  }
-}
-const fieldValueArray = inherited('_fieldValueArray').get
 Object.defineProperty(HwComboboxController.prototype, '_fieldValueArray', {
   configurable: true,
   get () {
-    return repeats(this) ? picks(this) : fieldValueArray.call(this)
+    return repeats(this) ? picks(this) : Reflect.get(Object.getPrototypeOf(HwComboboxController.prototype), '_fieldValueArray', this)
   }
 })
 
