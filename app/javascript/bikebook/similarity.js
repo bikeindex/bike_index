@@ -20,9 +20,15 @@ const MIN_SHARED = 0.4
 const MIN_FAMILY_VALUES = 30
 const FIXED_SCALES = { first_year: 2, groupset: 1 }
 
+// more than the model's as far as this much of the same less is, as a roomier frame still fits its tires
+const ROOMIER = 0.75
+
 // the kinds whose same is a match rather than a nearness, which a slider at its top requires
 const REQUIRABLE = ['same', 'set', 'year']
+// the kinds measured in their field's scales
+const SCALED = ['numeric', 'year', 'roomier']
 
+const complete = ({ model_configuration: configuration }) => configuration === 'complete'
 const numeric = (a, b, scale) => a === b ? 0 : Math.min(CAP, Math.abs(a - b) / scale)
 
 // Each kind's distance between two values, both present, in its field's scales
@@ -30,6 +36,7 @@ const KINDS = {
   numeric,
   // a numeric whose same is a match, as a model's first year is
   year: numeric,
+  roomier: (a, b, scale) => numeric(a, b, scale) * (b > a ? ROOMIER : 1),
   same: (a, b) => a === b ? 0 : MISMATCH,
   set: (a, b) => a.length === b.length && a.every((value) => b.includes(value)) ? 0 : MISMATCH,
   overlap: (a, b) => MISMATCH * (1 - a.filter((value) => b.includes(value)).length / new Set([...a, ...b]).size)
@@ -42,7 +49,7 @@ const KINDS = {
 export const GROUPS = {
   handlebar: { label: 'Handlebar type', fields: { handlebar_type: 'same' } },
   geometry: { label: 'Geometry', separate: true, shares: { head_angle: 3 }, fields: { head_angle: 'numeric', seat_angle: 'numeric', stack_reach: 'numeric', bb_drop: 'numeric', chainstay_gap: 'numeric' } },
-  tires: { label: 'Tire clearance', fields: { tire_clearance: 'numeric' } },
+  tires: { label: 'Tire clearance', fields: { tire_clearance: 'roomier' } },
   suspension: { label: 'Suspension', same: 'suspension travel', fields: { travel_front: 'numeric', travel_rear: 'numeric', suspension: 'same' } },
   ebike: { label: 'E-vehicle motor and battery', same: 'motor and battery attributes', fields: { modes: 'set', assist_speed: 'numeric', throttle_speed: 'numeric', battery_size: 'numeric', motor_kind: 'same' } },
   groupset: { label: 'Groupset', fields: { groupset: 'numeric' } },
@@ -171,7 +178,7 @@ export const scorer = (models, { format, fields }, activities) => {
         group,
         field,
         kind,
-        scale: KINDS[kind] === numeric ? scaleOf(field, family) : null,
+        scale: SCALED.includes(kind) ? scaleOf(field, family) : null,
         weight: (weights[group] ?? 0) * (shares[field] ?? 1) / divisor
       }))
     })
@@ -186,7 +193,7 @@ export const scorer = (models, { format, fields }, activities) => {
     models.forEach((candidate, index) => {
       if (index === target || candidate.group_key === model.group_key || (candidate.electric === model.electric) === otherPropulsion ||
         (!differentTypes && candidate.vehicle_type !== model.vehicle_type) ||
-        (sameConfiguration && (candidate.model_configuration === 'complete') !== (model.model_configuration === 'complete')) ||
+        (sameConfiguration && complete(candidate) !== complete(model)) ||
         (skipManufacturer && candidate.manufacturer === model.manufacturer) ||
         required.some(({ field, kind, scale }) => columns[field][index] == null || KINDS[kind](columns[field][target], columns[field][index], scale) > 0)) return
 
@@ -194,7 +201,9 @@ export const scorer = (models, { format, fields }, activities) => {
       let total = 0
       for (const { field, kind, scale, weight } of weighted) {
         const value = columns[field][index]
-        if (value == null || (field === 'price' && candidate.msrp_currency !== model.msrp_currency)) continue
+        // a frame's weight isn't a whole bike's
+        if (value == null || (field === 'price' && candidate.msrp_currency !== model.msrp_currency) ||
+          (field === 'total_weight' && complete(candidate) !== complete(model))) continue
         shared += weight
         total += weight * KINDS[kind](columns[field][target], value, scale)
       }

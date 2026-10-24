@@ -1818,8 +1818,8 @@ RSpec.describe "BikeBook", :js, type: :system do
     uncheck "Include different vehicle types"
     expect(page).to have_no_current_path(/different_types/).and have_no_css("#similar-m-aventon-2025-abound_lr")
     # the closest of each model group, its own, other propulsions and other vehicle types left out, other activities in
-    expect(cards.call).to eq %w[similar-m-aventon-2026-pace_5_rec_step_through similar-m-aventon-2024-soltera_2_5
-      similar-m-aventon-2025-aventure_3_step_through similar-m-aventon-2026-ramblas_adv similar-m-aventon-2024-sinch_2_5]
+    expect(cards.call).to eq %w[similar-m-aventon-2026-pace_5_rec_step_through similar-m-aventon-2025-aventure_3_step_through
+      similar-m-aventon-2024-soltera_2_5 similar-m-aventon-2026-ramblas_adv similar-m-aventon-2024-sinch_2_5]
     expect(page).to have_checked_field("General", visible: :all).and have_field("Custom", disabled: true, visible: :all)
 
     # a card adds its model to the comparison, in place and focused again, and takes it out
@@ -1874,6 +1874,7 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(page).to have_no_text("Show matching")
     # the other propulsion's instead with other_propulsion, without its e-bike fields counting against them, other vehicle
     # types with different_types, a frame only without same_configuration, other wheel sizes only without same_wheels,
+    # more tire clearance nearer than as much less but not than less that's nearer, a frame's weight not held against it,
     # and a frame of the same material and bars of the same type closer, and only the same type with its slider at the top. None
     # nearly as far as one it knows nothing about, a groupset's tier however its series is written, and a slider's whole
     # weight on the fields the model lists, a rigid frame's suspension outweighing its material, and its own activity
@@ -1903,11 +1904,15 @@ RSpec.describe "BikeBook", :js, type: :system do
           [...urban, { slug: 'touring', family: 'urban' }])
         const configurations = scoring([model('a', false), { ...model('frame', false), model_configuration: 'frame' }, model('complete', false)])
         const wheels = scoring([model('a', false), model('small', false), model('road', false)], { front_bsd: [622, 584, 622], rear_bsd: [622, 584, 622] })
+        const clearances = [[28, 36], [28, 40]].map(([tight, roomy]) => scoring([model('a', false), model(String(tight), false), model(String(roomy), false)],
+          { tire_clearance: [32, tight, roomy] }))
+        const weighed = scoring([model('a', false), model('complete', false), { ...model('frame', false), model_configuration: 'frame_fork' }],
+          { total_weight: [10, 3, 3] })
         return [...propulsions, ids(types), ids(types, 'different_types=1'), ids(configurations), ids(configurations, 'same_configuration=1'),
-          ids(wheels), ids(wheels, 'same_wheels=1'), ids(materials), ids(bars), ids(bars, 'weights=handlebar.4'), ids(far), ids(groupsets), ids(suspensions), ids(activities)]
+          ids(wheels), ids(wheels, 'same_wheels=1'), ...clearances.map((each) => ids(each)), ids(weighed), ids(materials), ids(bars), ids(bars, 'weights=handlebar.4'), ids(far), ids(groupsets), ids(suspensions), ids(activities)]
       })()
     JS
-    expect(matched).to eq([["other_e"], ["acoustic"], ["bike"], ["cargo", "bike"], ["frame", "complete"], ["complete"], ["small", "road"], ["road"], ["aluminum", "steel"], ["drop"], ["drop", "flat"], ["near"], ["s1000", "tiagra"], ["steel", "full"], ["commuting", "touring"]])
+    expect(matched).to eq([["other_e"], ["acoustic"], ["bike"], ["cargo", "bike"], ["complete", "frame"], ["complete"], ["small", "road"], ["road"], ["36", "28"], ["28", "40"], ["frame", "complete"], ["aluminum", "steel"], ["drop"], ["drop", "flat"], ["near"], ["s1000", "tiagra"], ["steel", "full"], ["commuting", "touring"]])
   end
 
   it "keeps the search and its filters while the catalog loads, and says so when it doesn't" do
