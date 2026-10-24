@@ -37,8 +37,9 @@ export const compareToggle = ({ type, model }) => html`<button type="button" dat
 // Collapsed until it's wanted, the models most like the first compared, `model`, whose `results` bikebook--similar scores
 // once it opens, and the controls that rescore them in place. With the search showing, its toggle shows only once it's
 // open, compareToggle opening it
-export const similarSection = ({ vehicle, model, type, vehicleType, electric, settings, groups, results, searchShown }) => {
+export const similarSection = ({ vehicle, model, type, vehicleType, electric, complete, settings, groups, results, searchShown }) => {
   const propulsion = electric ? !ALWAYS_MOTORIZED.includes(vehicleType) && `Show matching human powered ${type}s` : `Show matching e-${type}s`
+  const configuration = complete ? `Only complete ${type}s` : 'Only frames & forks'
   const scored = results !== undefined
   const label = html`<span class="tw:group-aria-expanded/similar:hidden">${compareLabel(type, model)}</span><span
     class="tw:hidden tw:group-aria-expanded/similar:inline">Hide similar ${type}s</span>`
@@ -50,7 +51,7 @@ export const similarSection = ({ vehicle, model, type, vehicleType, electric, se
       color: 'link',
       htmlClass: `tw:group/similar ${searchShown ? 'tw:not-aria-expanded:hidden' : ''}`,
       attributes: { id: 'similar-toggle' }
-    })}${scored && groups?.length ? controls(groups, settings, type, propulsion) : nothing}<div data-ui--collapse-target="content"
+    })}${scored && groups?.length ? controls(groups, settings, type, propulsion, configuration) : nothing}<div data-ui--collapse-target="content"
     class="tw:hidden tw:w-full">${scored
       ? html`<div id="similar-results">${results}</div>`
       : html`<p class="tw:mt-4 tw:text-sm tw:text-gray-500">Finding similar ${type}s…</p>`}</div></section>`
@@ -61,7 +62,7 @@ const legend = (text) => html`<legend class="twlabel">${text}</legend>`
 // Custom is chosen only by moving a slider off every preset, each of the `listed` groups', the rest's disabled, as the
 // model has nothing of theirs to compare. Its own ui--collapse, outside the section's content so its
 // toggle can share a line with the section's, laid into the section's row by display: contents
-const controls = (listed, { weights, sameManufacturer, otherPropulsion, differentTypes }, type, propulsion) => {
+const controls = (listed, { weights, sameManufacturer, otherPropulsion, sameConfiguration, differentTypes }, type, propulsion, configuration) => {
   const preset = presetOf(weights, listed)
   // its toggle moving into the card it opens, as More filters' does
   const toggle = collapse({ content: 'Adjust comparison algorithm', chevron: true, color: 'link', size: 'sm', htmlClass: 'tw:text-sm' })
@@ -93,7 +94,8 @@ const controls = (listed, { weights, sameManufacturer, otherPropulsion, differen
     })}</div>`
   })}</div></fieldset><fieldset>${legend('Other settings')}<div class="tw:mt-1 tw:space-y-1">${
     setting('same_manufacturer', `Include ${type}s from the same manufacturer`, sameManufacturer)}${
-    propulsion ? setting('other_propulsion', propulsion, otherPropulsion) : nothing}${setting('different_types', 'Include different vehicle types', differentTypes)}</div></fieldset>`
+    propulsion ? setting('other_propulsion', propulsion, otherPropulsion) : nothing}${setting('same_configuration', configuration, sameConfiguration)}${
+    setting('different_types', 'Include different vehicle types', differentTypes)}</div></fieldset>`
   })}</div></div></div>`
 }
 

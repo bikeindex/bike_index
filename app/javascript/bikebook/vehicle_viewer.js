@@ -183,6 +183,7 @@ export class VehicleViewer {
         type: typeName(presenter, baseline.data).toLowerCase(),
         vehicleType: baseline.data.type,
         electric: present(baseline.data.motors),
+        complete: (baseline.data.model_configuration ?? 'complete') === 'complete',
         settings: similar,
         groups: similar.results?.groups,
         results: similar.results === undefined ? undefined : this.similarResults(url, similar.results),

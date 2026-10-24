@@ -1723,6 +1723,10 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(page).to have_current_path(/[?&]other_propulsion=1\b/)
     uncheck "Show matching human powered bikes"
     expect(page).to have_no_current_path(/other_propulsion/)
+    check "Only complete bikes"
+    expect(page).to have_current_path(/[?&]same_configuration=1\b/)
+    uncheck "Only complete bikes"
+    expect(page).to have_no_current_path(/same_configuration/)
     check "Include different vehicle types"
     expect(page).to have_current_path(/[?&]different_types=1\b/).and have_css("#similar-m-aventon-2025-abound_lr")
     uncheck "Include different vehicle types"
@@ -1782,7 +1786,7 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(page).to have_css("legend", exact_text: "Other settings", wait: 10)
     expect(page).to have_no_text("Show matching")
     # the other propulsion's instead with other_propulsion, without its e-bike fields counting against them, other vehicle
-    # types with different_types, and a frame of the same material and bars of the same type closer, and only the same type with its slider at the top. None
+    # types with different_types, a frame only without same_configuration, and a frame of the same material and bars of the same type closer, and only the same type with its slider at the top. None
     # nearly as far as one it knows nothing about, a groupset's tier however its series is written, and a slider's whole
     # weight on the fields the model lists, a rigid frame's suspension outweighing its material, and its own activity
     # closer than another of its family
@@ -1793,7 +1797,7 @@ RSpec.describe "BikeBook", :js, type: :system do
         // each alike in its geometry, wheels and weight, as a catalog model lists most of them
         const alike = { head_angle: 70, seat_angle: 74, stack_reach: 1.5, bb_drop: 70, chainstay_gap: 80, front_bsd: 622, rear_bsd: 622, tire_clearance: 45, total_weight: 10 }
         const fields = { ...Object.fromEntries(names.map((name) => [name, [null, null, null]])), ...Object.fromEntries(Object.entries(alike).map(([name, value]) => [name, [value, value, value]])) }
-        const model = (id, electric, handlebar_type, suspension, activity = 'commuting') => ({ id, electric, handlebar_type, suspension, vehicle_type: 'bike', manufacturer: id, model_group: id, primary_activity: activity, markets: ['US'] })
+        const model = (id, electric, handlebar_type, suspension, activity = 'commuting') => ({ id, electric, handlebar_type, suspension, vehicle_type: 'bike', model_configuration: 'complete', manufacturer: id, model_group: id, primary_activity: activity, markets: ['US'] })
         const score = scorer([model('e', true), model('other_e', true), model('acoustic', false)], { format: 2, fields: { ...fields, battery_size: [500, 500, null] } },
           [{ slug: 'commuting', family: 'urban' }])
         const propulsions = ['', 'other_propulsion=1'].map((query) => score('e', settingsFrom(new URLSearchParams(query))).models.map(({ id }) => id))
@@ -1811,10 +1815,12 @@ RSpec.describe "BikeBook", :js, type: :system do
           { format: 2, fields: { ...fields, frame_material: ['aluminum', 'aluminum', 'steel'] } }, [{ slug: 'commuting', family: 'urban' }])
         const activities = scorer([model('a', false), model('touring', false, null, null, 'touring'), model('commuting', false)], { format: 2, fields },
           [{ slug: 'commuting', family: 'urban' }, { slug: 'touring', family: 'urban' }])
-        return [...propulsions, ids(types), ids(types, 'different_types=1'), ids(materials), ids(bars), ids(bars, 'weights=handlebar.4'), ids(far), ids(groupsets), ids(suspensions), ids(activities)]
+        const configurations = scorer([model('a', false), { ...model('frame', false), model_configuration: 'frame' }, model('complete', false)], { format: 2, fields },
+          [{ slug: 'commuting', family: 'urban' }])
+        return [...propulsions, ids(types), ids(types, 'different_types=1'), ids(configurations), ids(configurations, 'same_configuration=1'), ids(materials), ids(bars), ids(bars, 'weights=handlebar.4'), ids(far), ids(groupsets), ids(suspensions), ids(activities)]
       })()
     JS
-    expect(matched).to eq([["other_e"], ["acoustic"], ["bike"], ["cargo", "bike"], ["aluminum", "steel"], ["drop"], ["drop", "flat"], ["near"], ["s1000", "tiagra"], ["steel", "full"], ["commuting", "touring"]])
+    expect(matched).to eq([["other_e"], ["acoustic"], ["bike"], ["cargo", "bike"], ["frame", "complete"], ["complete"], ["aluminum", "steel"], ["drop"], ["drop", "flat"], ["near"], ["s1000", "tiagra"], ["steel", "full"], ["commuting", "touring"]])
   end
 
   it "keeps the search and its filters while the catalog loads, and says so when it doesn't" do
