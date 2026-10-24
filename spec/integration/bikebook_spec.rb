@@ -1761,7 +1761,7 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(page).to have_css("legend", exact_text: "Other settings", wait: 10)
     expect(page).to have_no_text("Show matching")
     # the other propulsion's instead with other_propulsion, without its e-bike fields counting against them, and a frame
-    # of the same material and bars of the same type closer
+    # of the same material and bars of the same type closer, and only the same type with its slider at the top
     matched = page.evaluate_script(<<~JS)
       (async () => {
         const { GROUPS, scorer, settingsFrom } = await import('bikebook/similarity')
@@ -1773,10 +1773,11 @@ RSpec.describe "BikeBook", :js, type: :system do
         const materials = scorer([model('a', false), model('steel', false), model('aluminum', false)],
           { format: 2, fields: { ...fields, frame_material: ['aluminum', 'steel', 'aluminum'] } }, [{ slug: 'commuting', family: 'urban' }])
         const bars = scorer([model('a', false, 'drop_bar'), model('flat', false, 'horizontal'), model('drop', false, 'drop_bar')], { format: 2, fields }, [{ slug: 'commuting', family: 'urban' }])
-        return [...propulsions, ...[materials, bars].map((each) => each('a', settingsFrom(new URLSearchParams()), 'US').models.map(({ id }) => id))]
+        const ids = (score, query = '') => score('a', settingsFrom(new URLSearchParams(query)), 'US').models.map(({ id }) => id)
+        return [...propulsions, ids(materials), ids(bars), ids(bars, 'weights=handlebar.4')]
       })()
     JS
-    expect(matched).to eq([["other_e"], ["acoustic"], ["aluminum", "steel"], ["drop", "flat"]])
+    expect(matched).to eq([["other_e"], ["acoustic"], ["aluminum", "steel"], ["drop"], ["drop", "flat"]])
   end
 
   it "keeps the search and its filters while the catalog loads, and says so when it doesn't" do

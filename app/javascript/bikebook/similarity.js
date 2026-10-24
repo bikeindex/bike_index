@@ -20,6 +20,9 @@ const MIN_FAMILY_VALUES = 30
 const YEAR_FAMILY_WEIGHTS = { mtb: 2 }
 const FIXED_SCALES = { year: 2, groupset: 1 }
 
+// the kinds whose same is a match rather than a nearness, which a slider at its top requires
+const REQUIRABLE = ['same', 'set', 'range']
+
 // Each kind's distance between two values, both present, in its field's scales
 const KINDS = {
   numeric: (a, b, scale) => a === b ? 0 : Math.min(CAP, Math.abs(a - b) / scale),
@@ -159,6 +162,7 @@ export const scorer = (models, { format, fields }, activities) => {
     const groups = [...new Set(listed.map(({ group }) => group))]
     const weighted = listed.filter(({ group, weight }) => weight > 0 && !(otherPropulsion && group === 'ebike'))
     const available = weighted.reduce((total, { weight }) => total + weight, 0)
+    const required = weighted.filter(({ group, kind }) => weights[group] === MAX_WEIGHT && REQUIRABLE.includes(kind))
     if (!available) return { groups, models: [] }
 
     const scored = []
@@ -166,7 +170,8 @@ export const scorer = (models, { format, fields }, activities) => {
       if (index === target || families[index] !== family || candidate.vehicle_type !== model.vehicle_type ||
         (candidate.electric === model.electric) === otherPropulsion || candidate.model_configuration !== model.model_configuration ||
         (market && !candidate.markets.includes(market)) ||
-        candidate.model_group === model.model_group || (!sameManufacturer && candidate.manufacturer === model.manufacturer)) return
+        candidate.model_group === model.model_group || (!sameManufacturer && candidate.manufacturer === model.manufacturer) ||
+        required.some(({ field, kind, scale }) => columns[field][index] == null || KINDS[kind](columns[field][target], columns[field][index], scale) > 0)) return
 
       let shared = 0
       let total = 0
