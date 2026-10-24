@@ -45,6 +45,7 @@ From a session with history, hand this skill to a subagent the way `AGENTS.md`'s
   A gem the merge bumped does the same: the running server keeps the version it booted with, so a
   method the new one adds is a `NoMethodError` until `bin/rails restart`.
 - If `mcp__playwright__*` tools aren't registered, tell the user to run `claude mcp add playwright -- npx -y @playwright/mcp@latest` and restart.
+- **`Error reading storage state from …/ms-playwright/mcp-auth.json: ENOENT`** on the first call means the file `.mcp.json`'s `--storage-state` names is missing. It's in the home folder, so ask the user to create it (`{"cookies":[],"origins":[]}`) rather than writing it yourself, and skip the capture until they have.
 - **Check the workspace DB has records before planning a real-page capture** — `Bike.count` comes
   back 0 in a workspace whose `db:seed` never ran, so only preview routes render. Seed it (it's the
   per-workspace throwaway DB), or capture previews. In the web sandbox the seed is already running
