@@ -140,11 +140,18 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(page).to have_css("#model-group h2", exact_text: "Level")
     expect(group_cards.call).to include("Aventón Level 4 REC Step-Through")
     click_button "Open Group year menu"
+    # the menu stays open as years toggle on and off, down to the last
     within("[aria-labelledby='model-group-name'] [role='menu']") do
       expect(all("a").map(&:text).last).to eq "2022"
+      this_year = find("[aria-checked='true']").text[/\d+/]
       click_link "2023"
+      expect(page).to have_css("[aria-checked='true']", count: 2)
+      click_link this_year
+      expect(page).to have_css("[aria-checked='true']", count: 1).and have_css("#group-year-2023[aria-checked='true']")
+      click_link "2023"
+      expect(page).to have_css("[aria-checked='true']", count: 1).and have_css("#group-year-2023[aria-checked='true']")
     end
-    expect(page).to have_current_path(/[?&]group_year=2023\b/)
+    expect(page).to have_current_path(/[?&]group_years=2023\b/)
     expect(page).to have_css("[aria-label='Level models in 2023']")
     expect(group_cards.call).to eq(["Aventón Level 2", "Aventón Level 2 Step-Through"])
     # and hidden again
@@ -1343,11 +1350,11 @@ RSpec.describe "BikeBook", :js, type: :system do
       year_menu = ApplicationController.render(inline: <<~ERB, layout: false)
         <%= render(UI::Dropdown::Component.new(name: "Group year", button_size: :sm)) do |menu|
           menu.with_button { "2026" }
-          menu.with_entry_item { link_to "2025", "/bikebook?group_year=2025" }
+          menu.with_entry_item { link_to "2025", "/bikebook?group_years=2025" }
         end %>
       ERB
       expect_template(year_menu, "bikebook/templates/ui/dropdown#dropdown",
-        "{ name: 'Group year', button: '2026', buttonSize: 'sm', entries: [html`<a href=\"/bikebook?group_year=2025\">2025</a>`] }")
+        "{ name: 'Group year', button: '2026', buttonSize: 'sm', entries: [html`<a href=\"/bikebook?group_years=2025\">2025</a>`] }")
 
       expect_template(UI::DragHandle::Component.new(controller: "bikebook--chip-reorder", html_class: "tw:mr-1"),
         "bikebook/templates/ui/drag_handle#dragHandle", "{ controller: 'bikebook--chip-reorder', htmlClass: 'tw:mr-1' }")

@@ -105,12 +105,12 @@ export class VehicleViewer {
     }
     const views = {
       basics: () => html`${basics({
-        presenter, vehicles, outOfClassId, groupPath: (value) => pathWith(url, { group: value, group_year: '' }), shownGroup: group && url.searchParams.get('group')
+        presenter, vehicles, outOfClassId, groupPath: (value) => pathWith(url, { group: value, group_years: '' }), shownGroup: group && url.searchParams.get('group')
       })}${group
         ? modelGroup({
           group,
-          yearPath: (year) => pathWith(url, { group_year: year }),
-          vehiclePath: (id) => pathWith(url, { vehicle_models: id, vehicle_sizes: '', group: '', group_year: '' }),
+          yearsPath: (years) => pathWith(url, { group_years: years.join(',') }),
+          vehiclePath: (id) => pathWith(url, { vehicle_models: id, vehicle_sizes: '', group: '', group_years: '' }),
           placeholderUrl: presenter.kit.placeholder_url,
           currencies: presenter.vocabulary.currencies
         })

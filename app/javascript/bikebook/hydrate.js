@@ -90,7 +90,7 @@ const groupOf = (catalog, url) => {
   const id = url.searchParams.get('group')
   const view = url.searchParams.get('view')
   const picked = url.searchParams.get('vehicle_models')?.split(',').slice(0, MAX_COMPARE) ?? []
-  return picked.includes(id) && (!view || view === 'basics') ? catalog.group(id, url.searchParams.get('group_year')) : null
+  return picked.includes(id) && (!view || view === 'basics') ? catalog.group(id, (url.searchParams.get('group_years') ?? '').split(',').map(Number)) : null
 }
 
 // The picked vehicles' place for `url`'s jurisdiction, which decides which are out of class there, and market, which

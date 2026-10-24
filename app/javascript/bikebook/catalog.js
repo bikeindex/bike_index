@@ -36,7 +36,7 @@ export async function loadCatalog (manifestUrl, ids = [], jurisdictions = {}) {
       options,
       search: (params, page, perPage) => call('search', { params, page, perPage }),
       featured: (params, legalClasses) => call('featured', { params, legalClasses }),
-      group: (id, year) => call('group', { model: id, year }),
+      group: (id, years) => call('group', { model: id, years }),
       vehicles: (ids, { market } = {}) => call('vehicles', { ids, market }),
       displays: (ids) => call('displays', { ids })
     }
