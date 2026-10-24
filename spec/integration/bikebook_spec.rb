@@ -126,7 +126,9 @@ RSpec.describe "BikeBook", :js, type: :system do
     badge.click
     expect(page).to have_css("[role='tooltip'] h3", exact_text: "Class #{badge[:"aria-label"][/\d/]}", visible: true)
     expect(find("[aria-label='Overview']").all("tbody tr > th").map(&:text))
-      .to eq(["Model group", "Years", "Primary activity", "Frame material", "Suspension front/rear", "Groupset", "Price", "E-vehicle class", "Electric Certification", "Description"])
+      .to eq(["Model group", "Years", "Primary activity", "Frame material", "Wheel & tire size", "Suspension front/rear", "Groupset", "Price", "E-vehicle class", "Electric Certification", "Description"])
+    # a tire over 50 mm in inches, its mm in a tooltip
+    expect(find("[aria-label='Overview'] tr", text: /\AWheel & tire size/).find("td").text(:all).squish).to eq "650 B × 2.2 in ? 56 mm"
     # no groupset listed, so its gear count alone, with the rest of its drivetrain in the tooltip
     expect(find("[aria-label='Overview'] tr", text: /\AGroupset/).find("td").text(:all).squish).to match(/\A1x8 \? Drivetrain: /)
     expect(find("[aria-label='Overview']")).to have_text("The Level 4 REC").and have_button("Read more")
@@ -181,28 +183,28 @@ RSpec.describe "BikeBook", :js, type: :system do
     # what differs is only marked further down
     expect(find("[aria-label='Overview comparison']")).to have_no_css(".tw\\:spec-diff")
     # beside an e-vehicle, one without a motor says it isn't one rather than missing its class, and an unlisted
-    # certification is unknown, as the motor's section says. Wheel sizes and vehicle types show only where they differ, and
-    # each end's travel once one is suspended, its specs under its heading in one tooltip
+    # certification is unknown, as the motor's section says. Wheel and tire sizes always show, vehicle types only where they
+    # differ, and each end's travel once one is suspended, its specs under its heading in one tooltip
     classes = page.evaluate_script(<<~JS)
       (async () => {
         const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
         const [{ VehiclePresenter }, { basics }, { fragmentOf }, { kit }, vocabulary] = await Promise.all([import('bikebook/vehicle_presenter'),
           import('bikebook/templates/vehicles/basics'), import('bikebook/render'), catalog('kit.json'), catalog('vocabulary.json')])
-        const wheels = (front, rear) => [{ bsd: front, position: ['front'] }, { bsd: rear, position: ['rear'] }]
+        const wheels = (front, rear, tire) => [{ bsd: front, tire_width: tire, position: ['front'] }, { bsd: rear, tire_width: tire, position: ['rear'] }]
         const rowsOf = (datas) => [...fragmentOf(basics({ presenter: new VehiclePresenter(kit, vocabulary), vehicles: datas.map((data, index) => ({ value: String(index), data })) }))
           .querySelectorAll('tbody tr')]
         const rows = rowsOf([{ model: 'Electric', type: 'cargo_bike', motors: [{ rated_power: 250 }], wheels: wheels(622, 584), suspension: { front: { travel: 120 } } },
-          { model: 'Acoustic', type: 'bike', wheels: wheels(622, 622) }])
+          { model: 'Acoustic', type: 'bike', wheels: wheels(622, 622, 40) }])
         const cells = (label) => [...rows.find((each) => each.querySelector('th').textContent.trim() === label).querySelectorAll('td')]
         return [cells('E-vehicle class').map((cell) => [cell.textContent.trim(), cell.querySelector('.twless-strong') != null]),
           cells('Electric Certification').map((cell) => [...cell.querySelectorAll('button')].map((badge) => badge.textContent.replace(/\\s+/g, ' ').trim())),
-          cells('Wheel size').map((cell) => cell.textContent.replace(/\\s+/g, ' ').trim()), cells('Vehicle type').map((cell) => cell.textContent.trim()),
+          cells('Wheel & tire size').map((cell) => cell.textContent.replace(/\\s+/g, ' ').trim()), cells('Vehicle type').map((cell) => cell.textContent.trim()),
           cells('Suspension front/rear').map((cell) => [cell.textContent.replace(/\\s+/g, ' ').trim(), [...cell.querySelectorAll('.twless-strong')].map((each) => each.textContent)]),
           rowsOf([{ model: 'One', type: 'bike', wheels: wheels(622, 622) }, { model: 'Two', type: 'bike', wheels: wheels(622, 622) }])
-            .filter((row) => /Wheel size|Vehicle type|Suspension/.test(row.textContent)).length]
+            .map((row) => row.querySelector('th').textContent.trim()).filter((label) => /Wheel|Vehicle type|Suspension/.test(label))]
       })()
     JS
-    expect(classes).to eq([[["—", false], ["not e-vehicle", true]], [["? Certification unknown"], []], ["700 C front, 650 B rear", "700 C"], ["Cargo Bike", "Bike"], [["120 mm front (no rear suspension) ? Front suspensionTravel: 120 mm", []], ["Rigid", ["Rigid"]]], 0])
+    expect(classes).to eq([[["—", false], ["not e-vehicle", true]], [["? Certification unknown"], []], ["700 C front, 650 B rear", "700 C × 40 mm"], ["Cargo Bike", "Bike"], [["120 mm front (no rear suspension) ? Front suspensionTravel: 120 mm", []], ["Rigid", ["Rigid"]]], ["Wheel & tire size"]])
     # a description over 200 characters is cut at a word, its paragraphs kept, and one within them is whole
     excerpts = page.evaluate_script(<<~JS)
       (async () => {
