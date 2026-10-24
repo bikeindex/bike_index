@@ -8,7 +8,7 @@
   <div class="tw:mx-auto tw:mb-6 tw:max-w-7xl tw:px-4">
     <%= render Pages::Search::MarketplaceIntro::Component.new(
       dismissed: cookies[Pages::Search::MarketplaceIntro::Component::COOKIE_NAME].present?,
-      query_parameters: request.query_parameters) %>
+      searched: searched?) %>
 
     <%= render Pages::Search::Form::Component.new(target_search_path: search_marketplace_path,
       target_frame: :marketplace_results_frame, interpreted_params: @interpreted_params,

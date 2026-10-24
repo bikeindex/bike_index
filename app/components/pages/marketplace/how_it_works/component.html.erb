@@ -24,12 +24,10 @@
         <%= translation(".intro") %>
       </p>
 
-      <div class="tw:flex tw:flex-wrap tw:gap-3">
-        <%= call_to_action_buttons %>
-      </div>
+      <%= call_to_action_buttons %>
     </div>
 
-    <%= image_tag "kelsey/illustrations/comic-assets_bike-hero.png", alt: "",
+    <%= image_tag "kelsey/illustrations/comic-assets_bike-hero.png", alt: "", width: 1768, height: 1320,
       class: "tw:h-auto tw:w-full tw:max-w-[420px] tw:justify-self-center" %>
   </div>
 </section>
@@ -49,15 +47,13 @@
   </div>
 </section>
 
-<section class="tw:bg-gray-50 tw:dark:bg-gray-900">
-  <div class="tw:flex tw:flex-col tw:gap-8 tw:py-16 <%= SECTION_CLASSES %>">
-    <%= render(SharedBlocks::Marketing::SectionHeading::Component.new(heading: translation(".what_we_check"))) %>
+<section class="tw:flex tw:flex-col tw:gap-8 tw:py-16 <%= SECTION_CLASSES %>">
+  <%= render(SharedBlocks::Marketing::SectionHeading::Component.new(heading: translation(".what_we_check"))) %>
 
-    <div class="tw:grid tw:gap-3 tw:md:grid-cols-2 tw:md:gap-4.5 tw:lg:grid-cols-4">
-      <% checks.each do |check| %>
-        <%= render(SharedBlocks::Marketing::IconFeature::Component.new(**check, circle: "tw:bg-blue-600", card: true)) %>
-      <% end %>
-    </div>
+  <div class="tw:grid tw:gap-3 tw:md:grid-cols-2 tw:md:gap-4.5 tw:lg:grid-cols-4">
+    <% checks.each do |check| %>
+      <%= render(SharedBlocks::Marketing::IconFeature::Component.new(**check, circle: "tw:bg-blue-600", card: true)) %>
+    <% end %>
   </div>
 </section>
 
@@ -131,6 +127,7 @@
     "
   >
     <div class="tw:flex tw:flex-col tw:gap-2">
+      <%# Bangers in the design; Montserrat stands in rather than loading a font for one heading %>
       <h2
         class="
           tw:font-header tw:text-3xl tw:font-black tw:tracking-[.03em]
@@ -159,7 +156,5 @@
 </section>
 
 <%= render(SharedBlocks::Marketing::CallToActionBanner::Component.new(heading: translation(".ready_heading"))) do %>
-  <div class="tw:flex tw:flex-wrap tw:gap-3">
-    <%= call_to_action_buttons %>
-  </div>
+  <%= call_to_action_buttons %>
 <% end %>
