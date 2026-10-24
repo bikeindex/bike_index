@@ -619,7 +619,7 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(page).to have_css("#vehicle-models-count", exact_text: "(1 matching model)")
     expect(page).to have_current_path(/[?&]frame_material=carbon\b/).and have_current_path(/[?&]handlebar_type=drop_bar\b/)
     within("#vehicle-filters") { click_link "Clear filters" }
-    expect(page).to have_css("#vehicle-models-count", exact_text: "(32 matching models)")
+    expect(page).to have_css("#vehicle-models-count", exact_text: "(33 matching models)")
     # and from the open panel, where the market and e-bike classification are nothing to clear, and stay through a clear
     find_field("Market").click
     find("#market-hw-listbox [role='option']", text: "United States (US)").click
