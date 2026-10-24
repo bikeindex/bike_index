@@ -70,8 +70,7 @@ const readMore = (text, content) => {
 const viewGroup = (groupPath, value, shownGroup) => html`<a href=${groupPath(value === shownGroup ? '' : value)}
   class=${buttonClasses({ size: 'sm', htmlClass: 'tw:ml-2' })} aria-current=${value === shownGroup ? 'true' : nothing} data-in-place="#model-group">View group</a>`
 
-// The models' names, photos and headline fields side by side in a table, one model's as two's, its model group's
-// `groupPath` showing the group, or the `shownGroup` hiding it
+// The models' names, photos and headline fields side by side in a table, one model's as two's
 export const basics = ({ presenter, vehicles, outOfClassId, groupPath, shownGroup }) => {
   const shown = vehicles.map(({ data, value, outsideMarket }) => {
     const price = priced(data)
