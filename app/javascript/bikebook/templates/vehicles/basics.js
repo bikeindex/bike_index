@@ -1,5 +1,6 @@
 import { html, nothing } from 'lit-html'
 import { amountDisplay, missing } from 'bikebook/templates/helpers'
+import { buttonClasses } from 'bikebook/templates/ui/button'
 import { collapse } from 'bikebook/templates/ui/collapse'
 import { copyButton } from 'bikebook/templates/ui/copy_button'
 import { table } from 'bikebook/templates/ui/table'
@@ -27,9 +28,18 @@ const FIELDS = [
 ]
 // the label column's 12.5rem and 12rem per model, so a phone scrolls the table rather than squeezing it. One model's
 // column is as wide as each of two's, the label's 12.5rem and half what's left
-const MIN_WIDTHS = ['', '', 'tw:min-w-[36.5rem]!', 'tw:min-w-[48.5rem]!', 'tw:min-w-[60.5rem]!', 'tw:min-w-[72.5rem]!']
+const MIN_WIDTHS = ['', '', 'tw:min-w-[36.5rem]!', 'tw:min-w-[48.5rem]!', 'tw:min-w-[60.5rem]!', 'tw:min-w-[72.5rem]!', 'tw:min-w-[84.5rem]!',
+  'tw:min-w-[96.5rem]!', 'tw:min-w-[108.5rem]!', 'tw:min-w-[120.5rem]!', 'tw:min-w-[132.5rem]!']
 // past three models, out of the page's column toward the window's edges, each model's column up to 500px
-const MAX_WIDTHS = { 4: 'tw:max-w-[calc(12.5rem+2000px)]', 5: 'tw:max-w-[calc(12.5rem+2500px)]' }
+const MAX_WIDTHS = {
+  4: 'tw:max-w-[calc(12.5rem+2000px)]',
+  5: 'tw:max-w-[calc(12.5rem+2500px)]',
+  6: 'tw:max-w-[calc(12.5rem+3000px)]',
+  7: 'tw:max-w-[calc(12.5rem+3500px)]',
+  8: 'tw:max-w-[calc(12.5rem+4000px)]',
+  9: 'tw:max-w-[calc(12.5rem+4500px)]',
+  10: 'tw:max-w-[calc(12.5rem+5000px)]'
+}
 
 const manufacturerLine = (manufacturer) => present(manufacturer)
   ? html`<p class="tw:text-[11px] tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">${manufacturer}</p>`
@@ -65,14 +75,20 @@ const readMore = (text, content) => {
     })}</div>`
 }
 
-// The models' names, photos and headline fields side by side in a table, one model's as two's
-export const basics = ({ presenter, vehicles, outOfClassId }) => {
+// shows the model's group under the overview, or once it's shown, hides it
+const viewGroup = (path, shown) => html`<a href=${path} class=${buttonClasses({ size: 'sm', htmlClass: 'tw:ml-2' })}
+  aria-current=${shown ? 'true' : nothing} data-in-place="#model-group">View group</a>`
+
+// The models' names, photos and headline fields side by side in a table, one model's as two's, its model group's
+// `groupPath` showing the group, or the `shownGroup` hiding it
+export const basics = ({ presenter, vehicles, outOfClassId, groupPath, shownGroup }) => {
   const shown = vehicles.map(({ data, value, outsideMarket }) => {
     const price = priced(data)
     const fields = basicsOf({ presenter, data, outOfClassId })
     return {
       ...fields,
       value,
+      model_group: fields.model_group && join([fields.model_group, viewGroup(groupPath(value === shownGroup ? '' : value), value === shownGroup)], ' '),
       markets: array(data.markets).map((code) => presenter.vocabulary.names?.markets?.[code] ?? code).join(', '),
       outside_market: outsideMarket,
       years: join([fields.years, manufacturerPage(data)].filter(present), ' '),
@@ -88,7 +104,7 @@ export const basics = ({ presenter, vehicles, outOfClassId }) => {
 const compared = (vehicles, fields) => html`<section aria-label=${vehicles.length > 1 ? 'Overview comparison' : 'Overview'} class="tw:mt-6 ${vehicles.length > 3
   ? 'tw:twpagebleed tw:px-4'
   : ''}">${table({
-  classes: `${vehicles.length === 1 ? 'tw:w-full tw:md:w-[calc(50%+6.25rem)] tw:md:min-w-0!' : 'tw:w-full'} tw:table-fixed ${MIN_WIDTHS[vehicles.length] ?? MIN_WIDTHS.at(-1)} ${vehicles.length > 3 ? `tw:mx-auto ${MAX_WIDTHS[vehicles.length] ?? MAX_WIDTHS[5]}` : ''}`,
+  classes: `${vehicles.length === 1 ? 'tw:w-full tw:md:w-[calc(50%+6.25rem)] tw:md:min-w-0!' : 'tw:w-full'} tw:table-fixed ${MIN_WIDTHS[vehicles.length] ?? MIN_WIDTHS.at(-1)} ${vehicles.length > 3 ? `tw:mx-auto ${MAX_WIDTHS[vehicles.length] ?? MAX_WIDTHS[10]}` : ''}`,
   records: fields,
   columns: [
     { label: html`<span class="tw:sr-only">Field</span>`, rowHeader: true, classes: 'tw:w-32 tw:md:w-50 tw:px-2.5! tw:py-2! tw:align-top tw:font-bold', cellClass: () => PINNED_ROW_HEADER, cell: ({ label }) => label },

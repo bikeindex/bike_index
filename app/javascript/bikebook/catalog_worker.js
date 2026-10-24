@@ -130,11 +130,9 @@ function matching (params) {
   const passes = filter(params)
   const filtered = sorted(params).filter(passes)
   const needle = (params.q ?? '').trim().toLowerCase()
-  const selected = new Set(list(params.vehicle_models))
   const exact = needle.startsWith('m/') && byId.get(needle)
   const words = needle.split(/\s+/).filter(Boolean)
-  const found = (exact ? [exact] : filtered.filter(({ searchText }) => words.every((word) => searchText.includes(word))))
-    .filter(({ id }) => !selected.has(id))
+  const found = exact ? [exact] : filtered.filter(({ searchText }) => words.every((word) => searchText.includes(word)))
   const whole = ({ searchText }) => searchText.includes(needle)
   const matches = needle ? [...found.filter(whole), ...found.filter((model) => !whole(model))] : found
   return { filteredCount: filtered.length, matches, unfiltered: Boolean(exact) && matches.length > 0 && !passes(exact) }
@@ -178,6 +176,23 @@ function featured ({ params, legalClasses }) {
     picked.push(best.model)
   }
   return { count: filtered.length, featured: candidates.filter((model) => picked.includes(model)) }
+}
+
+// The models of the `model` id's group sold in `year`, or this one where it has some and else its newest, and every year it has
+// any in. Its newest first, as the search sorts them
+function group ({ model: id, year }) {
+  const model = byId.get(id)
+  if (!model?.model_group) return null
+
+  const currentYear = new Date().getFullYear()
+  const spans = sorted({}).filter((each) => each.manufacturer === model.manufacturer && each.model_group === model.model_group && each.first_year)
+    .map((each) => [each, each.first_year, each.final_year ?? Math.max(each.first_year, currentYear)])
+  const years = [...new Set(spans.flatMap(([, first, last]) => Array.from({ length: last - first + 1 }, (_, index) => last - index)))]
+    .sort((a, b) => b - a)
+  const asked = parseInt(year, 10)
+  const shown = years.includes(asked) ? asked : years.includes(currentYear) ? currentYear : years[0]
+  const models = spans.filter(([, first, last]) => first <= shown && shown <= last).map(([each]) => each)
+  return { name: model.model_group, manufacturer: model.manufacturer_name, year: shown, years, models }
 }
 
 // Whether `a` wins at the first rank the two differ at
@@ -239,7 +254,7 @@ function propelled ({ electric, e_vehicle_classifications: carried = [] }, propu
 
 self.onmessage = async ({ data: { id, type, ...args } }) => {
   try {
-    self.postMessage({ id, result: await { load, search, featured, vehicles, displays }[type](args) })
+    self.postMessage({ id, result: await { load, search, featured, group, vehicles, displays }[type](args) })
   } catch (error) {
     self.postMessage({ id, error: error.message })
   }

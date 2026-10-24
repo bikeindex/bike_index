@@ -1,5 +1,6 @@
 import { html, nothing } from 'lit-html'
 import { numberDisplay, uuid } from 'bikebook/templates/helpers'
+import { dragHandle } from 'bikebook/templates/ui/drag_handle'
 import { classificationOption } from 'bikebook/templates/vehicles/class_cards'
 import { comboboxOption } from 'bikebook/templates/vehicles/combobox_option'
 import { fragmentOf, renderInto } from 'bikebook/render'
@@ -35,6 +36,7 @@ export async function loadCatalog (manifestUrl, ids = [], jurisdictions = {}) {
       options,
       search: (params, page, perPage) => call('search', { params, page, perPage }),
       featured: (params, legalClasses) => call('featured', { params, legalClasses }),
+      group: (id, year) => call('group', { model: id, year }),
       vehicles: (ids, { market } = {}) => call('vehicles', { ids, market }),
       displays: (ids) => call('displays', { ids })
     }
@@ -107,10 +109,10 @@ export class CatalogComboboxSource {
     observer.observe(wrapper)
   }
 
-  // An id the catalog lacks gets no chip, and one the render already chipped no second
-  async chips (combobox, values) {
+  // An id the catalog lacks gets no chip, and one the render already chipped no second, unless it's `adding` one picked again
+  async chips (combobox, values, { adding = false } = {}) {
     const chipped = new Set([...combobox.element.querySelectorAll('[data-hw-combobox-value-param]')].map((remover) => remover.dataset.hwComboboxValueParam))
-    const ids = String(values).split(',').filter((id) => id && !chipped.has(id))
+    const ids = String(values).split(',').filter((id) => id && (adding || !chipped.has(id)))
     if (ids.length === 0) return
 
     const displays = await this.catalog.displays(ids)
@@ -122,11 +124,14 @@ export class CatalogComboboxSource {
   }
 }
 
-// The gem's selection chip partial, ahead of the field
-export const renderChips = (combobox, chips) => combobox.querySelector('[data-hw-combobox-target~="combobox"]').before(fragmentOf(chips.map(({ value, display }) =>
-  html`<div data-hw-combobox-chip=""><div class="hw-combobox__chip"><span>${display}</span><span tabindex="0" class="hw-combobox__chip__remover"
-    aria-label=${`Remove ${display}`} data-action="click->hw-combobox#removeChip:stop keydown->hw-combobox#navigateChip"
-    data-hw-combobox-target="chipDismisser" data-hw-combobox-value-param=${value}></span></div></div>`)))
+// The gem's selection chip partial, ahead of the field, gripped where bikebook--chip-reorder drags them
+export const renderChips = (combobox, chips) => {
+  const handle = combobox.matches('[data-controller~="bikebook--chip-reorder"]') ? dragHandle({ controller: 'bikebook--chip-reorder', htmlClass: 'tw:mr-1' }) : nothing
+  combobox.querySelector('[data-hw-combobox-target~="combobox"]').before(fragmentOf(chips.map(({ value, display }) =>
+    html`<div data-hw-combobox-chip=""><div class="hw-combobox__chip">${handle}<span>${display}</span><span tabindex="0" class="hw-combobox__chip__remover"
+      aria-label=${`Remove ${display}`} data-action="click->hw-combobox#removeChip:stop keydown->hw-combobox#navigateChip"
+      data-hw-combobox-target="chipDismisser" data-hw-combobox-value-param=${value}></span></div></div>`)))
+}
 
 const group = (label, options) => {
   const id = uuid()

@@ -1,12 +1,13 @@
 import { html, nothing } from 'lit-html'
 import { basics } from 'bikebook/templates/vehicles/basics'
 import { copyButton } from 'bikebook/templates/ui/copy_button'
-import { chosenSizes, pickedSizes, sizesParam } from 'bikebook/sizes'
+import { chosenSizes, pickedSizes, sizesParam, vehicleKeys } from 'bikebook/sizes'
 import { comparisonTable } from 'bikebook/templates/vehicles/comparison_table'
 import { cycleDrawing } from 'bikebook/templates/vehicles/cycle_drawing'
 import { emptyState } from 'bikebook/templates/vehicles/empty_state'
 import { geometryOverlay, overlayFrames, seriesBorders } from 'bikebook/templates/vehicles/geometry_overlay'
 import { jumpTo, VIEWS } from 'bikebook/templates/vehicles/jump_to'
+import { modelGroup } from 'bikebook/templates/vehicles/model_group'
 import { componentsOf, modelViewer, motorsOf, photoOf, runningGearOf, sizesOf } from 'bikebook/templates/vehicles/model_viewer'
 import { array, present } from 'bikebook/templates/values'
 import { searching, toQuery } from 'bikebook/query'
@@ -24,9 +25,12 @@ export class VehicleViewer {
   }
 
   // The vehicles at `url` in the view it picks, whose links keep its other params, compared in the sizes it picks or
-  // the nearest to the `preferredSize`. With none, the `search`'s count, whether filters narrow it, and its featured models
-  render (vehicles, url, preferredSize, search) {
+  // the nearest to the `preferredSize`, the overview over the `group` it shows. With none, the `search`'s count, whether
+  // filters narrow it, and its featured models
+  render (picks, url, preferredSize, search, group = null) {
     const { presenter, outOfClassId } = this
+    // a model picked more than once by its key, which its sizes and selection are under
+    const vehicles = picks.map((vehicle, index, all) => ({ ...vehicle, key: vehicleKeys(all.map(({ value }) => value))[index] }))
     if (vehicles.length === 0) {
       return emptyState({
         url,
@@ -43,11 +47,12 @@ export class VehicleViewer {
     const comparing = vehicles.length > 1
     const picked = pickedSizes(url)
     const sizes = chosenSizes(vehicles, { picked, preferred: preferredSize })
-    const selectedSizes = new Map(vehicles.map(({ value }, index) => [value, sizes[index]?.name]))
+    const selectedSizes = new Map(vehicles.map(({ key }, index) => [key, sizes[index]?.name]))
     const values = vehicles.map(({ value }) => value)
+    const keys = vehicles.map(({ key }) => key)
     const baseline = vehicles[0]
-    const others = (value) => value === baseline.value ? [] : [baseline.data]
-    const sizePath = (value) => (name) => pathWith(url, { vehicle_sizes: sizesParam(values, { ...picked, [value]: name }) })
+    const others = (key) => key === baseline.key ? [] : [baseline.data]
+    const sizePath = (key) => (name) => pathWith(url, { vehicle_sizes: sizesParam(values, { ...picked, [key]: name }) })
     // a figure's letter lights it on each drawing, card and table row, until it's clicked again
     const highlight = url.searchParams.get('figure')
     const figurePath = (key) => pathWith(url, { figure: key === highlight ? '' : key })
@@ -58,18 +63,18 @@ export class VehicleViewer {
     const cardRow = (margin, cards, aligned = false) => html`<div ?data-comparison=${comparing} data-controller=${comparing && aligned ? 'bikebook--align-rows' : nothing} class="${margin} tw:max-[500px]:twpagebleed ${comparing
       ? 'tw:md:twpagebleed tw:md:px-4'
       : 'tw:lg:twpagebleed tw:lg:px-4'}"><div class="tw:flex tw:gap-8 ${rowClasses}">${cards}</div></div>`
-    // each vehicle's `key` on a card of its own, named as its full card is, after whatever `lead` shows
-    // `keyed`, each topped in its frame's color in the overlay
-    const cards = (key, none, content, { lead, keyed = false } = {}) => vehicles.map(({ data, value }, index) => {
+    // each vehicle's `field` on a card of its own, named as its full card is, after whatever `lead` shows, each given
+    // its data and key. `keyed`, each topped in its frame's color in the overlay
+    const cards = (field, none, content, { lead, keyed = false } = {}) => vehicles.map(({ data, value, key }, index) => {
       const { manufacturer, model } = presenter.named(presenter.kit.schemas.vehicle, data)
-      return html`<section aria-label=${`${[manufacturer, model].filter(present).join(' ')} ${key}`} class="twgutter tw:w-full tw:min-w-0 tw:space-y-4
+      return html`<section aria-label=${`${[manufacturer, model].filter(present).join(' ')} ${field}`} class="twgutter tw:w-full tw:min-w-0 tw:space-y-4
         tw:rounded-sm tw:border tw:border-gray-200 tw:bg-white tw:pt-4 tw:pb-6 tw:[--gutter:--spacing(6)] tw:dark:border-gray-700 tw:dark:bg-gray-800
         ${keyed ? seriesBorders(compared.frames, index).top : ''} ${comparing ? 'tw:md:max-w-[56rem] tw:lg:flex-1' : 'tw:lg:w-[56rem] tw:lg:shrink-0'}"><header data-align-row="header" class="tw:flex tw:items-start tw:justify-between tw:gap-4"><div>${present(manufacturer)
         ? html`<p class="tw:mb-1 tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">${manufacturer}</p>`
         : nothing}<div class="tw:text-2xl tw:leading-tight"><h3 class="tw:inline tw:font-extrabold">${model}</h3> ${
           copyButton({ value, label: 'Copy ID', tooltip: true })}</div></div><div
-        class="tw:shrink-0">${photoOf({ presenter, data }, 'tw:h-14 tw:w-21')}</div></header>${lead ? html`<div data-align-row="lead">${lead(data, value)}</div>` : nothing}${present(data[key])
-        ? content(data, value)
+        class="tw:shrink-0">${photoOf({ presenter, data }, 'tw:h-14 tw:w-21')}</div></header>${lead ? html`<div data-align-row="lead">${lead(data, key)}</div>` : nothing}${present(data[field])
+        ? content(data, key)
         : html`<p class="twless-strong">${none}</p>`}</section>`
     })
     const typeName = (data) => presenter.named(presenter.kit.schemas.vehicle, data).type || 'bike'
@@ -100,43 +105,56 @@ export class VehicleViewer {
       return scaled.map((each) => framed(each.legend) ? { ...each, figure: each.within(box) } : each)
     }
     const views = {
-      basics: () => basics({ presenter, vehicles, outOfClassId }),
+      basics: () => html`${basics({
+        presenter, vehicles, outOfClassId, groupPath: (value) => pathWith(url, { group: value, group_year: '' }), shownGroup: group && url.searchParams.get('group')
+      })}${group
+        ? modelGroup({
+          group,
+          yearPath: (year) => pathWith(url, { group_year: year }),
+          vehiclePath: (id) => pathWith(url, { vehicle_models: id, vehicle_sizes: '', group: '', group_year: '' }),
+          placeholderUrl: presenter.kit.placeholder_url,
+          currencies: presenter.vocabulary.currencies
+        })
+        : nothing}`,
       // the overlay beside the table once the window is wide, above it until then
       geometry: () => {
         const drawings = sizeDrawings()
         return html`<div class="tw:flex tw:flex-col tw:min-[1500px]:twpagebleed tw:min-[1500px]:flex-row
         tw:min-[1500px]:items-start tw:min-[1500px]:gap-6 tw:min-[1500px]:px-4">${geometryOverlay({ ...compared, selected: url.searchParams.get('overlay_selected'), beside: true })}${
-        comparisonTable({ ...compared, highlight, beside: true })}</div>${cardRow('tw:mt-6', cards('sizes', 'No sizes listed', (data, value) => {
-        const size = sizes[values.indexOf(value)]
-        const drawn = drawings[values.indexOf(value)]
+        comparisonTable({ ...compared, highlight, beside: true })}</div>${cardRow('tw:mt-6', cards('sizes', 'No sizes listed', (data, key) => {
+        const size = sizes[keys.indexOf(key)]
+        const drawn = drawings[keys.indexOf(key)]
         const { legend } = drawn
         return html`${framed(legend) ? drawing(data, size, drawn) : nothing}<div class="tw:-mx-(--gutter)">${sizesOf({
           presenter,
           data,
-          others: others(value),
-          selectedSize: selectedSizes.get(value),
-          sizePath: sizePath(value),
+          others: others(key),
+          selectedSize: selectedSizes.get(key),
+          sizePath: sizePath(key),
           lettering: framed(legend) && {
             letters: new Map(legend.filter(({ letter }) => letter).map(({ key, letter }) => [key, letter])),
             highlight,
             figurePath,
-            drawn: { id: value, name: size?.name, figures: legend.filter(({ letter, listed }) => letter && !listed) }
+            drawn: { id: key, name: size?.name, figures: legend.filter(({ letter, listed }) => letter && !listed) }
           }
         })}</div>`
       }, { keyed: true }))}`
       },
       components: () => {
         const components = componentsOf({ presenter, vehicles, others })
-        return cardRow('tw:mt-6', cards('components', 'No components listed', (data, value) => components.get(value),
-          { lead: (data, value) => runningGearOf({ presenter, data, others: others(value) }) }), true)
+        return cardRow('tw:mt-6', cards('components', 'No components listed', (data, key) => components.get(key),
+          { lead: (data, key) => runningGearOf({ presenter, data, others: others(key) }) }), true)
       },
-      motors: () => cardRow('tw:mt-6', cards('motors', 'No motor', (data, value) => motorsOf({ presenter, data, others: others(value), outOfClassId }))),
+      motors: () => cardRow('tw:mt-6', cards('motors', 'No motor', (data, key) => motorsOf({ presenter, data, others: others(key), outOfClassId }))),
       all: () => {
-        const full = vehicles.map(({ data, value }, index) => {
-          const remaining = values.filter((each) => each !== value)
-          const removePath = pathWith(url, { vehicle_models: remaining.join(','), vehicle_sizes: sizesParam(remaining, picked) })
+        const full = vehicles.map(({ data, value, key }, index) => {
+          const remaining = values.filter((_, each) => each !== index)
+          const kept = keys.filter((_, each) => each !== index)
+          // the sizes of those left, under the keys they're left with
+          const left = Object.fromEntries(vehicleKeys(remaining).map((each, at) => [each, picked[kept[at]]]))
+          const removePath = pathWith(url, { vehicle_models: remaining.join(','), vehicle_sizes: sizesParam(remaining, left) })
           return modelViewer({
-            presenter, data, value, comparing, idSuffix: index + 1, others: others(value), removePath, selectedSize: selectedSizes.get(value), sizePath: sizePath(value), outOfClassId
+            presenter, data, value, comparing, idSuffix: index + 1, others: others(key), removePath, selectedSize: selectedSizes.get(key), sizePath: sizePath(key), outOfClassId
           })
         })
         return cardRow('tw:mt-6', full)
