@@ -13,6 +13,7 @@ let last = null
 let rules = null
 const blocks = new Map()
 const orders = new Map()
+const sold = new Map()
 
 const fetchJson = async (url) => {
   const response = await fetch(url)
@@ -68,9 +69,10 @@ function options ({ manufacturers, vehicle_types: vehicleTypes, filter_options: 
     manufacturer: Object.entries(manufacturers).filter(([slug]) => perManufacturer.has(slug)).sort(([, a], [, b]) => a.localeCompare(b))
       .map(([value, display]) => ({ value, display, count: perManufacturer.get(value) })),
     vehicle_type: counted('vehicle_type', vehicleTypes.map(({ slug, name }) => [slug, name])),
-    // "Canada (CA)", as UI::Forms::ComboboxState shows a state; only those with models, as most of the catalog's have none
-    market: counted('market', Object.entries(market).sort(([, a], [, b]) => a.localeCompare(b))).filter(({ count }) => count)
-      .map((option) => ({ ...option, name: option.display, display: `${option.display} (${option.value})` })),
+    // "Canada (CA)", as UI::Forms::ComboboxState shows a state; only those with models sold there, as most of the catalog's
+    // have none
+    market: Object.entries(market).sort(([, a], [, b]) => a.localeCompare(b)).filter(([value]) => soldIn(value).size)
+      .map(([value, display]) => ({ value, name: display, display: `${display} (${value})` })),
     ...Object.fromEntries(Object.entries(filterOptions).map(([name, labels]) => [name, counted(name, Object.entries(labels))]))
   }
 }
@@ -216,6 +218,22 @@ function sorted ({ sort, year_dir: yearDir, price_dir: priceDir }) {
   return orders.get(key)
 }
 
+// The models sold in `market`, by their maker and name
+const soldIn = (market) => {
+  if (!sold.has(market)) {
+    sold.set(market, models.filter(({ markets }) => markets.includes(market))
+      .reduce((names, model) => names.set(sameModel(model), [...(names.get(sameModel(model)) ?? []), model]), new Map()))
+  }
+  return sold.get(market)
+}
+
+const sameModel = ({ manufacturer, model }) => `${manufacturer}/${model.toLowerCase()}`
+
+// A market's search has the models sold elsewhere too, but not e-vehicles, which its own laws class, nor one it sells
+// its own of in the same years
+const inMarket = (model, market) => model.markets.includes(market) || (!model.electric &&
+  !soldIn(market).get(sameModel(model))?.some((each) => each.first_year <= model.sortYear && model.first_year <= each.sortYear))
+
 // A family matches its flavors; slugs naming no activity filter nothing
 function filter (params) {
   const chosen = list(params.primary_activity)
@@ -236,7 +254,7 @@ function filter (params) {
     (!params.suspension || (params.suspension === 'has' ? model.suspension !== 'rigid' : model.suspension === params.suspension)) &&
     (types.length === 0 || types.includes(model.vehicle_type)) &&
     (!params.model_configuration || model.model_configuration === params.model_configuration) &&
-    (!params.market || model.markets.includes(params.market)) &&
+    (!params.market || inMarket(model, params.market)) &&
     (yearMin == null || model.sortYear >= yearMin) &&
     (yearMax == null || (model.first_year ?? 0) <= yearMax) &&
     ((priceMin == null && priceMax == null) || (model.msrp_cents > 0 &&
