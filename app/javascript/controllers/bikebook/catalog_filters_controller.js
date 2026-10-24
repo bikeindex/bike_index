@@ -1,4 +1,5 @@
 import { Controller } from '@hotwired/stimulus'
+import { ordered, RANGES } from 'bikebook/query'
 import { readable, replaceUrl } from 'bikebook/replace_url'
 
 /* global CSS */
@@ -40,6 +41,7 @@ export default class extends Controller {
 
   // the page follows the URL's filters
   apply () {
+    this.#orderRanges()
     this.#showClasses()
     this.#classifyPropulsion()
     this.#syncCombobox()
@@ -52,6 +54,13 @@ export default class extends Controller {
   // so defer a tick to read the picked value.
   applySelection () {
     setTimeout(() => this.apply(), 0)
+  }
+
+  // a range typed backwards turned the way round it was meant
+  #orderRanges () {
+    const fields = RANGES.map((name) => this.element.querySelector(`input[name="${name}"]`))
+    const values = ordered(Object.fromEntries(fields.map(({ name, value }) => [name, value])))
+    for (const field of fields) field.value = values[field.name]
   }
 
   // The classes are the US market's, by state - a state without its own uses the US ones - and a hidden

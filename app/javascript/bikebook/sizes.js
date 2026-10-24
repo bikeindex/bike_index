@@ -55,7 +55,7 @@ const nearest = (sizes, target) => {
   return sizes.filter((size) => distance(size)[0] < Infinity).reduce((best, size) => best && !closer(size, best) ? best : size, null)
 }
 
-// The first vehicle's last picked size, { name, geometry }, which a first vehicle with none picked takes the nearest of
+// The first vehicle's last picked size, { name, geometry }, which a first vehicle with none picked takes by name, else the nearest
 export const preferredSize = () => {
   try {
     return JSON.parse(window.localStorage.getItem(KEY))
@@ -92,12 +92,12 @@ export const withSize = (url, key, name) => withPicked(url, { ...pickedSizes(url
 // `url` with each size following its vehicle from `previous`, whose vehicles it's reordered, added to or removed from
 export const realigned = (url, previous = new URL(window.location.href)) => withPicked(url, pickedSizes(previous))
 
-// Each vehicle's size: its pick, else the first's preferred size and the others' the first's, each the nearest
-// for its riders or by top tube, else by name, else medium
+// Each vehicle's size: its pick, else the first's preferred size and the others' the first's, each the one of its name,
+// else the nearest for its riders or by top tube, else medium
 export const chosenSizes = (vehicles, { picked = {}, preferred } = {}) => {
   const choose = ({ key, data }, target) => {
     const sizes = array(data.sizes)
-    return matching(sizes, picked[key]) ?? nearest(sizes, target) ?? matching(sizes, target?.name) ?? medium(sizes)
+    return matching(sizes, picked[key]) ?? matching(sizes, target?.name) ?? nearest(sizes, target) ?? medium(sizes)
   }
   const [first, ...others] = vehicles
   const firstSize = first && choose(first, preferred)

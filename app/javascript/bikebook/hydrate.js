@@ -5,15 +5,13 @@ import { numberDisplay } from 'bikebook/templates/helpers'
 import { filterOption } from 'bikebook/templates/filter_option'
 import { pickedClassifications, renderClassCards } from 'bikebook/templates/vehicles/class_cards'
 import { tooltip } from 'bikebook/templates/ui/tooltip'
-import { FILTERS, LISTS, RANGES, SINGLES, searching, toQuery } from 'bikebook/query'
+import { FILTERS, LISTS, RANGES, SINGLES, ordered, searching, toQuery } from 'bikebook/query'
 import { fragmentOf, renderInto } from 'bikebook/render'
 import { preferredSize } from 'bikebook/sizes'
-import { VehicleViewer } from 'bikebook/vehicle_viewer'
+import { settingsFrom } from 'bikebook/similarity'
+import { MAX_COMPARE, VehicleViewer } from 'bikebook/vehicle_viewer'
 
 /* global CSS */
-
-// rather than the kit's max_compare, which the catalog publishes as 3
-const MAX_COMPARE = 10
 
 const combobox = (root, name) => root.getElementById(`${name}-hw-hidden-field`).closest('.hw-combobox')
 const panelOf = (root) => root.querySelector('[data-controller~="bikebook--catalog-filters"]')
@@ -47,10 +45,10 @@ const legalClasses = (root, filters, { e_vehicle_classifications: classification
   return [...classes.querySelectorAll('input[name="electric"]')].map(({ value }) => value).filter((value) => value !== 'evc/out_of_class')
 }
 
-// `url`'s filters, "all" markets as Any, without which it and the jurisdiction - a state's abbreviation, or US - are the
-// panel's defaults
+// `url`'s filters, its ranges in order and "all" markets as Any, without which it and the jurisdiction - a state's
+// abbreviation, or US - are the panel's defaults
 const urlFilters = (root, url) => {
-  const filters = Object.fromEntries(FILTERS.map((name) => [name, url.searchParams.get(name) ?? '']))
+  const filters = ordered(Object.fromEntries(FILTERS.map((name) => [name, url.searchParams.get(name) ?? ''])))
   return {
     ...filters,
     market: filters.market === 'all' ? '' : filters.market || panelOf(root).getAttribute(MARKET_ATTRIBUTE),
@@ -85,6 +83,20 @@ export async function unpickedVehicles (catalog, page, url) {
 
 const pickedOf = (catalog, url, { market }) => catalog.vehicles(url.searchParams.get('vehicle_models')?.split(',') ?? [], { market })
 
+// The models most like the first of `vehicles` where the catalog publishes what it compares, scored once their section
+// is open
+const similarOf = async (catalog, url, vehicles) => {
+  if (!catalog.comparable || !vehicles.length) return null
+  const settings = settingsFrom(url.searchParams)
+  return { ...settings, results: url.searchParams.get('similar') === '1' ? await catalog.similar(vehicles[0].value, settings) : undefined }
+}
+
+// The similar models' cards for `vehicle` by its `settings`, which change without rendering the page afresh
+export async function rescoredSimilar (catalog, page, url, vehicle, settings) {
+  const filters = filtersAt(catalog, page, url)
+  return new VehicleViewer(catalog.kit, catalog.vocabulary, filters.jurisdiction).similarResults(url, await catalog.similar(vehicle, settings))
+}
+
 // the model group `url`'s overview shows, of one of its vehicles
 const groupOf = (catalog, url) => {
   const id = url.searchParams.get('group')
@@ -98,7 +110,9 @@ const groupOf = (catalog, url) => {
 export async function pickedVehicles (catalog, page, url) {
   const filters = filtersAt(catalog, page, url)
   const [found, group] = await Promise.all([pickedOf(catalog, url, filters), groupOf(catalog, url)])
-  return new VehicleViewer(catalog.kit, catalog.vocabulary, filters.jurisdiction).render(found.slice(0, MAX_COMPARE), url, preferredSize(), {}, group)
+  const vehicles = found.slice(0, MAX_COMPARE)
+  return new VehicleViewer(catalog.kit, catalog.vocabulary, filters.jurisdiction).render(vehicles, url, preferredSize(), {},
+    { group, similar: await similarOf(catalog, url, vehicles) })
 }
 
 // The page at `url` while the catalog loads: its filters live and filled in from the URL, their values as it has them, and
@@ -173,8 +187,10 @@ export async function hydrate (catalog, source, shell, url) {
     if (classification && !classification.marker) input.closest('label').after(fragmentOf(tooltip({ text: classification.title, body: viewer.presenter.classificationTooltip(id) })))
   }
 
+  const similar = await similarOf(catalog, url, vehicles)
   renderInto(root.getElementById('vehicle-viewers'), viewer.render(vehicles, url, preferredSize(),
-    vehicles.length ? {} : await unpicked(catalog, root, filters), group))
+    vehicles.length ? {} : await unpicked(catalog, root, filters), { group, similar }))
+  for (const slot of root.querySelectorAll('[data-similar-slot]')) renderInto(slot, viewer.compareToggle(vehicles, similar))
 
   localSources.set(combobox(root, 'vehicle_models'), source)
   for (const name of LISTS) {
