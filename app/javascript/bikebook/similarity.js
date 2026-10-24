@@ -10,28 +10,31 @@ export const MAX_WEIGHT = 5
 const CAP = 3
 // a categorical field that differs
 const MISMATCH = 2
-// a field the candidate doesn't list, so listing less never looks closer, and the score a candidate has to beat to show,
-// as one further away is less like it than one it knows nothing about
+// a field the candidate doesn't list, so listing less never looks closer
 const UNLISTED = 1
+// the score a candidate has to beat to show, short of an unlisted field's, as a thin pool's last are otherwise its leftovers
+const MAX_SCORE = 0.8
 // of the weight the model has values for, what a candidate has to share, or one listing almost nothing matches everything
 const MIN_SHARED = 0.4
 // an activity family with fewer values than this is scaled by the whole catalog's
 const MIN_FAMILY_VALUES = 30
 // geometry changes faster on mountain bikes
 const YEAR_FAMILY_WEIGHTS = { mtb: 2 }
-const FIXED_SCALES = { year: 2, groupset: 1 }
+const FIXED_SCALES = { first_year: 2, groupset: 1 }
 
 // the kinds whose same is a match rather than a nearness, which a slider at its top requires
-const REQUIRABLE = ['same', 'set', 'range']
+const REQUIRABLE = ['same', 'set', 'year']
+
+const numeric = (a, b, scale) => a === b ? 0 : Math.min(CAP, Math.abs(a - b) / scale)
 
 // Each kind's distance between two values, both present, in its field's scales
 const KINDS = {
-  numeric: (a, b, scale) => a === b ? 0 : Math.min(CAP, Math.abs(a - b) / scale),
+  numeric,
+  // a numeric whose same is a match, as a model's first year is
+  year: numeric,
   same: (a, b) => a === b ? 0 : MISMATCH,
   set: (a, b) => a.length === b.length && a.every((value) => b.includes(value)) ? 0 : MISMATCH,
-  overlap: (a, b) => MISMATCH * (1 - a.filter((value) => b.includes(value)).length / new Set([...a, ...b]).size),
-  // the years between two [first, final] ranges, none where they overlap
-  range: ([firstA, finalA], [firstB, finalB], scale) => Math.min(CAP, Math.max(0, firstB - finalA, firstA - finalB) / scale)
+  overlap: (a, b) => MISMATCH * (1 - a.filter((value) => b.includes(value)).length / new Set([...a, ...b]).size)
 }
 
 // Each slider's fields, each of `kind`, and what its top end matches where that isn't its label; battery size and price
@@ -43,7 +46,7 @@ export const GROUPS = {
   suspension: { label: 'Suspension', same: 'suspension travel', fields: { travel_front: 'numeric', travel_rear: 'numeric', suspension: 'same' } },
   ebike: { label: 'E-vehicle motor and battery', same: 'motor and battery attributes', fields: { modes: 'set', assist_speed: 'numeric', throttle_speed: 'numeric', battery_size: 'numeric', motor_kind: 'same' } },
   groupset: { label: 'Groupset', fields: { groupset: 'numeric' } },
-  year: { label: 'Year', fields: { year: 'range' } },
+  year: { label: 'Year', fields: { first_year: 'year' } },
   material: { label: 'Frame material', fields: { frame_material: 'same' } },
   weight: { label: 'Weight', fields: { total_weight: 'numeric' } },
   mounts: { label: 'Mounts', fields: { mounts: 'overlap', bottle_mounts: 'numeric' } },
@@ -117,14 +120,14 @@ export const scorer = (models, { format, fields }, activities) => {
 
   const familyBySlug = new Map(activities.map(({ slug, family }) => [slug, family]))
   const families = models.map((model) => familyBySlug.get(model.primary_activity) ?? null)
-  const currentYear = new Date().getFullYear()
   const columns = {
     ...fields,
     battery_size: fields.battery_size.map(log),
     groupset: fields.groupset_series.map(tier),
     suspension: models.map((model) => model.suspension ?? null),
     handlebar_type: models.map((model) => model.handlebar_type ?? null),
-    year: models.map(({ first_year: first, final_year: final }) => first ? [first, final ?? Math.max(first, currentYear)] : null),
+    // its first, as one still sold isn't as new as it is current
+    first_year: models.map(({ first_year: first }) => first ?? null),
     price: models.map((model) => log(model.msrp_cents)),
     // which a catalog published before bikebook added it lacks
     frame_material: fields.frame_material ?? models.map(() => null)
@@ -153,13 +156,17 @@ export const scorer = (models, { format, fields }, activities) => {
 
     const model = models[target]
     const family = families[target]
-    const listed = Object.entries(GROUPS).flatMap(([group, { fields }]) => Object.entries(fields).map(([field, kind]) => ({
-      group,
-      field,
-      kind,
-      scale: kind === 'numeric' || kind === 'range' ? scaleOf(field, family) : null,
-      weight: (weights[group] ?? 0) / Object.keys(fields).length * (field === 'year' ? YEAR_FAMILY_WEIGHTS[family] ?? 1 : 1)
-    }))).filter(({ field }) => columns[field][target] != null)
+    // each slider's weight shared among the fields the model lists, so a rigid bike, listing no travel, counts its suspension in full
+    const listed = Object.entries(GROUPS).flatMap(([group, { fields }]) => {
+      const own = Object.entries(fields).filter(([field]) => columns[field][target] != null)
+      return own.map(([field, kind]) => ({
+        group,
+        field,
+        kind,
+        scale: kind === 'numeric' || kind === 'year' ? scaleOf(field, family) : null,
+        weight: (weights[group] ?? 0) / own.length * (kind === 'year' ? YEAR_FAMILY_WEIGHTS[family] ?? 1 : 1)
+      }))
+    })
     const groups = [...new Set(listed.map(({ group }) => group))]
     const weighted = listed.filter(({ group, weight }) => weight > 0 && !(otherPropulsion && group === 'ebike'))
     const available = weighted.reduce((total, { weight }) => total + weight, 0)
@@ -183,7 +190,7 @@ export const scorer = (models, { format, fields }, activities) => {
         total += weight * KINDS[kind](columns[field][target], value, scale)
       }
       const score = (total + (available - shared) * UNLISTED) / available
-      if (shared >= MIN_SHARED * available && score < UNLISTED) scored.push({ model: candidate, score })
+      if (shared >= MIN_SHARED * available && score < MAX_SCORE) scored.push({ model: candidate, score })
     })
     const grouped = new Set()
     const closest = scored.sort((a, b) => a.score - b.score).map(({ model }) => model)

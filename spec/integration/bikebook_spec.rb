@@ -1735,19 +1735,19 @@ RSpec.describe "BikeBook", :js, type: :system do
     find_field("Wheel size & tire clearance").send_keys(:home)
     expect(page).to have_css("output[for='similar-wheels']", exact_text: "0")
     expect(page).to have_checked_field("Custom", visible: :all).and have_no_checked_field("General", visible: :all)
-    expect(page).to have_css("[aria-label='Similar models to compare'] li:first-child a", text: "Soltera 2.5")
+    expect(page).to have_css("[aria-label='Similar models to compare'] li:last-child a", text: "Soltera 3 ADV")
     expect(page).to have_current_path(/[?&]weights=wheels\.0,ebike\.0(&|\z)/)
 
     # kept in the URL, open
     refresh
     expect(page).to have_field("Wheel size & tire clearance", with: "0", wait: 10)
     expect(page).to have_checked_field("Custom", visible: :all).and have_checked_field("Include bikes from the same manufacturer")
-    expect(page).to have_css("[aria-label='Similar models to compare'] li:first-child a", text: "Soltera 2.5")
+    expect(page).to have_css("[aria-label='Similar models to compare'] li:last-child a", text: "Soltera 3 ADV")
     # and General puts its weights back
     choose "General", allow_label_click: true
     expect(page).to have_field("Wheel size & tire clearance", with: "3").and have_field("E-vehicle motor and battery", with: "3")
     expect(page).to have_field("Custom", disabled: true, visible: :all)
-    expect(page).to have_css("[aria-label='Similar models to compare'] li:first-child a", text: "Pace 5 REC Step-Through")
+    expect(page).to have_css("[aria-label='Similar models to compare'] li:last-child a", text: "Soltera 2.5")
     expect(page).to have_no_current_path(/weights=/)
 
     # once five are compared, only theirs link
@@ -1770,16 +1770,18 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(page).to have_no_text("Show matching")
     # the other propulsion's instead with other_propulsion, without its e-bike fields counting against them, and a frame
     # of the same material and bars of the same type closer, and only the same type with its slider at the top. None
-    # less like it than one it knows nothing about, and a groupset's tier however its series is written
+    # nearly as far as one it knows nothing about, a groupset's tier however its series is written, and a slider's whole
+    # weight on the fields the model lists, a rigid frame's suspension outweighing its material
     matched = page.evaluate_script(<<~JS)
       (async () => {
         const { GROUPS, scorer, settingsFrom } = await import('bikebook/similarity')
         const names = [...Object.values(GROUPS).flatMap(({ fields }) => Object.keys(fields)), 'groupset_series']
         // each alike in its geometry, wheels and weight, as a catalog model lists most of them
         const alike = { head_angle: 70, seat_angle: 74, stack_reach: 1.5, bb_drop: 70, chainstay_gap: 80, front_bsd: 622, rear_bsd: 622, tire_clearance: 45, total_weight: 10 }
-        const fields = { ...Object.fromEntries(names.map((name) => [name, [null, null, null]])), ...Object.fromEntries(Object.entries(alike).map(([name, value]) => [name, [value, value, value]])), battery_size: [500, 500, null] }
-        const model = (id, electric, handlebar_type) => ({ id, electric, handlebar_type, vehicle_type: 'bike', manufacturer: id, model_group: id, primary_activity: 'commuting', markets: ['US'] })
-        const score = scorer([model('e', true), model('other_e', true), model('acoustic', false)], { format: 2, fields }, [{ slug: 'commuting', family: 'urban' }])
+        const fields = { ...Object.fromEntries(names.map((name) => [name, [null, null, null]])), ...Object.fromEntries(Object.entries(alike).map(([name, value]) => [name, [value, value, value]])) }
+        const model = (id, electric, handlebar_type, suspension) => ({ id, electric, handlebar_type, suspension, vehicle_type: 'bike', manufacturer: id, model_group: id, primary_activity: 'commuting', markets: ['US'] })
+        const score = scorer([model('e', true), model('other_e', true), model('acoustic', false)], { format: 2, fields: { ...fields, battery_size: [500, 500, null] } },
+          [{ slug: 'commuting', family: 'urban' }])
         const propulsions = ['', 'other_propulsion=1'].map((query) => score('e', settingsFrom(new URLSearchParams(query)), 'US').models.map(({ id }) => id))
         const materials = scorer([model('a', false), model('steel', false), model('aluminum', false)],
           { format: 2, fields: { ...fields, frame_material: ['aluminum', 'steel', 'aluminum'] } }, [{ slug: 'commuting', family: 'urban' }])
@@ -1789,10 +1791,12 @@ RSpec.describe "BikeBook", :js, type: :system do
           [{ slug: 'commuting', family: 'urban' }])
         const groupsets = scorer([model('a', false), model('tiagra', false), model('s1000', false)],
           { format: 2, fields: { ...fields, groupset_series: ['S-1000', 'Tiagra', 'S1000'] } }, [{ slug: 'commuting', family: 'urban' }])
-        return [...propulsions, ids(materials), ids(bars), ids(bars, 'weights=handlebar.4'), ids(far), ids(groupsets)]
+        const suspensions = scorer([model('a', false, null, 'rigid'), model('full', false, null, 'full'), model('steel', false, null, 'rigid')],
+          { format: 2, fields: { ...fields, frame_material: ['aluminum', 'aluminum', 'steel'] } }, [{ slug: 'commuting', family: 'urban' }])
+        return [...propulsions, ids(materials), ids(bars), ids(bars, 'weights=handlebar.4'), ids(far), ids(groupsets), ids(suspensions)]
       })()
     JS
-    expect(matched).to eq([["other_e"], ["acoustic"], ["aluminum", "steel"], ["drop"], ["drop", "flat"], ["near"], ["s1000", "tiagra"]])
+    expect(matched).to eq([["other_e"], ["acoustic"], ["aluminum", "steel"], ["drop"], ["drop", "flat"], ["near"], ["s1000", "tiagra"], ["steel", "full"]])
   end
 
   it "keeps the search and its filters while the catalog loads, and says so when it doesn't" do
