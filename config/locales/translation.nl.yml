@@ -3709,6 +3709,9 @@ nl:
     strava_search_index: Koppel je Strava-uitrusting aan je Bike Index-registraties.
       Zoek, filter en update je activiteiten in één keer om uitrusting toe te wijzen
       aan ritten die deze nog niet hebben.
+    marketplace_how_it_works: Hoe werkt kopen en verkopen op de Bike Index Marketplace,
+      waar elke fiets geregistreerd staat en een als gestolen opgegeven fiets niet
+      te koop aangeboden kan worden.
   meta_titles:
     bikes_index: Zoekresultaten
     bikes_new: Registreer een fiets!
@@ -3761,6 +3764,7 @@ nl:
     search_marketplace_index: Fietsindex Marktplaats
     strava_search_index: Fietsindex Strava-zoekfunctie
     registration_form_settings: Instellingen voor het registratieformulier
+    marketplace_how_it_works: Hoe de Bike Index Marketplace werkt
   organized:
     ambassador_dashboards:
       getting_started:
@@ -6207,6 +6211,21 @@ nl:
         result_view_select:
           cards_view: Bekijk als kaarten
           list_view: Weergeven als lijst
+        marketplace_intro:
+          bike_index_members: Bike Index-leden
+          checked_for_theft: Gecontroleerd op diefstal
+          description: Bike Index is een non-profitorganisatie die gestolen fietsen
+            helpt terug te vinden. Op onze marktplaats worden alleen geregistreerde
+            fietsen aangeboden, zodat u een tweedehands fiets kunt kopen zonder dat
+            deze als gestolen is opgegeven.
+          heading: De marktplaats voor tweedehands fietsen van het fietsenregister.
+          hide_intro: Intro verbergen
+          how_buying_works: Hoe kopen werkt
+          how_selling_works: Hoe verkopen werkt
+          marketplace_title: Fietsindex Marktplaats
+          ownership_transfers: Eigendomsoverdrachten
+          registered_bikes_only: Alleen geregistreerde fietsen
+          what_makes_this_different: Wat maakt dit anders?
       sessions:
         sign_in_interstitial:
           click_button_to_continue: Klik op de onderstaande knop om verder te gaan.
@@ -7861,6 +7880,106 @@ nl:
           start_over: Begin opnieuw
           tabs_label: Voorbeelden van organisaties
           viewing_as: Beschouwen als
+      marketplace:
+        how_it_works:
+          across_town_heading: Aan de andere kant van de stad of aan de andere kant
+            van het land.
+          across_town_intro: Elke verkoop vindt plaats tussen particulieren. Bike
+            Index verzorgt geen betalingen of verzending, dus koper en verkoper spreken
+            onderling de prijs, betaling en levering af.
+          back_to_marketplace: Terug naar de marktplaats
+          bike_index_members: Bike Index-leden
+          bike_index_members_body: Verkopers die Bike Index steunen met een lidmaatschap,
+            tonen een Bike Index-lidmaatschapsbadge bij hun advertenties.
+          browse_bikes: Bekijk fietsen
+          buying_a_bike: Een fiets kopen
+          checked_for_theft: Gecontroleerd op diefstal
+          checked_for_theft_body: Een fiets die als gestolen is opgegeven bij Bike
+            Index kan niet worden vermeld.
+          contact_the_seller: Neem contact op met de verkoper
+          contact_the_seller_member_badge_body: Stel vragen en maak een afspraak om
+            de fiets te bekijken. Let op het Bike Index-ledenlogo.
+          find_a_bike: Zoek een fiets
+          find_a_bike_body: Zoek in de beschrijvingen van de advertenties, kies een
+            primair activiteitstype en stel een prijsbereik in. Kies 'Te koop in zoekgebied'
+            om fietsen bij u in de buurt te zien, of 'Te koop overal' om alles te
+            zien.
+          hand_off_or_ship: Overhandigen of verzenden
+          hand_off_or_ship_body: Spreek met lokale kopers af op een openbare plek.
+            Voor kopers van buiten de stad kunt u gebruikmaken van een fietstransportdienst
+            zoals BikeFlights.
+          heading: Hoe de Bike Index Marketplace werkt
+          intro: Wij willen dat dit de gemakkelijkste en meest betrouwbare plek is
+            om een gebruikte fiets te kopen en te verkopen. Elke fiets die hier te
+            koop staat, is geregistreerd op Bike Index en de verkoop vindt rechtstreeks
+            plaats tussen jou en de andere fietser.
+          local_pickup: Ophalen op locatie
+          local_pickup_body: Ontmoet elkaar persoonlijk, maak een proefrit en controleer
+            het serienummer voordat u betaalt. De verkoper draagt het kentekenbewijs
+            direct aan u over.
+          mark_it_for_sale: Markeer het als te koop
+          mark_it_for_sale_body: Voeg vanaf de pagina van je fiets een prijs, foto's
+            en een beschrijving van de staat toe. De specificaties zijn afkomstig
+            van je kentekenbewijs.
+          ownership_transfers: Eigendomsoverdrachten
+          ownership_transfers_body: Na de verkoop draagt de verkoper het kentekenbewijs
+            over aan de koper. De nieuwe eigenaar staat vanaf dag één geregistreerd.
+          pay_and_take_ownership: Betaal en neem het in bezit
+          pay_and_take_ownership_body: Je betaalt rechtstreeks aan de verkoper. Die
+            draagt de Bike Index-registratie vervolgens aan jou over.
+          pro_tip: PRO TIP!
+          pro_tip_heading: Enkele gewoontes zorgen ervoor dat verkoop van persoon
+            tot persoon veilig blijft.
+          ready_heading: Klaar om je volgende fiets te vinden?
+          register_your_bike: Registreer uw fiets
+          register_your_bike_body: Al geregistreerd? Sla dit gedeelte over. Zo niet,
+            dan duurt het ongeveer twee minuten en is het voor altijd gratis.
+          registered_bikes_only: Alleen geregistreerde fietsen
+          registered_bikes_only_body: Je kunt alleen een fiets aanbieden die geregistreerd
+            staat op Bike Index, dus elke advertentie is gekoppeld aan een geldig
+            registratie- en serienummer.
+          see_it_or_ship_it: Bekijk het of laat het verzenden.
+          see_it_or_ship_it_body: Kom langs? Maak een proefrit en controleer of het
+            serienummer op het frame overeenkomt met de beschrijving. Woon je niet
+            in de buurt? Spreek dan met de verkoper af hoe je het verzendt en vraag
+            om een foto van het serienummer.
+          sell_your_bike: Verkoop je fiets
+          selling_a_bike: Een fiets verkopen
+          shipping: Verzending naar een koper buiten de stad
+          shipping_body: Verzenden is geen probleem. Verkopers kunnen gebruikmaken
+            van een fietsverzendservice zoals BikeFlights. Spreek van tevoren af wie
+            de verzendkosten en verpakking betaalt, deel de trackinginformatie en
+            draag het kentekenbewijs over zodra de koper de fiets heeft ontvangen.
+          tip_be_wary: Wees op je hoede voor iedereen die aandringt op snelheid of
+            ongebruikelijke betaalmethoden.
+          tip_check_serial: Controleer voordat u betaalt of het serienummer op het
+            frame overeenkomt met de beschrijving.
+          tip_public_place: Spreek je lokaal af? Kies dan een drukke openbare plek
+            overdag.
+          tip_registration_transferred: Zorg ervoor dat de registratie op uw naam
+            wordt overgedragen zodra de verkoop is afgerond.
+          tip_shipping: Verzending? Vraag om extra foto's, inclusief het serienummer,
+            en gebruik een betaalmethode met kopersbescherming.
+          transfer_ownership: Eigendomsoverdracht
+          transfer_ownership_body: Zodra je betaald hebt, stuur je de fiets door naar
+            het e-mailadres van de koper op Bike Index.
+          trust_not_guarantee: Een teken van vertrouwen, geen garantie.
+          trust_not_guarantee_body: Alle fietsen hier zijn geregistreerd en een fiets
+            die als gestolen is opgegeven, kan niet te koop worden aangeboden. Dat
+            zegt veel over de fiets zelf. Het garandeert echter niet de eerlijkheid
+            van de koper of verkoper. Stel vragen, bewaar je berichten en vertrouw
+            op je instinct.
+          what_we_check: Wat we controleren
+          why_a_marketplace: Waarom een marktplaats?
+          why_heading: Een tweedehands fiets kopen zou niet moeten betekenen dat je
+            het risico loopt een gestolen fiets te krijgen.
+          why_registry: Bike Index is een gratis, non-profit fietsenregister. Al jaren
+            helpen we fietsers hun fietsen te registreren en terug te krijgen als
+            ze gestolen zijn.
+          why_we_know: De meeste websites voor tweedehands fietsen weten niets over
+            de fietsen die ze aanbieden. Wij wel. Omdat elke fiets die hier te koop
+            staat geregistreerd is, kan een gestolen fiets niet worden aangeboden
+            en de registratie blijft geldig voor de nieuwe eigenaar.
     shared_blocks:
       footer:
         about: Over
