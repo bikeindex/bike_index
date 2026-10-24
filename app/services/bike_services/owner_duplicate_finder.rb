@@ -22,7 +22,7 @@ module BikeServices
 
       candidate_user_ids = find_matching_user_ids(email, phone)
 
-      bikes ||= Bike.with_user_hidden
+      bikes ||= Bike.current_with_user_hidden
       matching_bikes = bikes.matching_serial(serial_normalized)
       # Only search by manufacturer_id if it's passed
       matching_bikes = matching_bikes.where(manufacturer_id: manufacturer_id) if manufacturer_id.present?

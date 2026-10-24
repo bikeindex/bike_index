@@ -5,7 +5,7 @@ module Counts
 
   COUNT_KEYS = %w[total_bikes stolen_bikes recoveries recoveries_value week_creation_chart logged_searches organizations].freeze
 
-  LOGGED_SEARCH_KINDS = %w[web_bikebook not_web_bikebook not_web_bikebook_serial].freeze
+  LOGGED_SEARCH_KINDS = %w[web_bikebook web_ebike_rules not_web_bikebook not_web_bikebook_serial].freeze
 
   RECOVERY_AVERAGE_VALUE = 2103 # updated with calculated_recovery_average_value on 2026-4-11
 
@@ -84,9 +84,10 @@ module Counts
   def assign_logged_searches
     [Date.yesterday, Date.current].each do |date|
       logged_searches = LoggedSearch.where(request_at: date.all_day)
-      not_bikebook = logged_searches.not_web_bikebook
+      not_bikebook = logged_searches.not_bikebook
       assign_for("logged_searches_#{date}", {
         web_bikebook: logged_searches.web_bikebook.count,
+        web_ebike_rules: logged_searches.web_ebike_rules.count,
         not_web_bikebook: not_bikebook.count,
         not_web_bikebook_serial: not_bikebook.serial.count
       }.to_json)

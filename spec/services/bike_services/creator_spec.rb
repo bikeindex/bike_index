@@ -549,7 +549,7 @@ RSpec.describe BikeServices::Creator do
           expect(b_param.reload.created_bike_id).to be_blank
           expect(b_param.no_duplicate?).to be_truthy
           expect(Bike.unscoped.pluck(:id)).to match_array([existing_bike.id])
-          expect(Bike.with_user_hidden.pluck(:id)).to match_array([existing_bike.id])
+          expect(Bike.current_with_user_hidden.pluck(:id)).to match_array([existing_bike.id])
           expect(Ownership.count).to eq 1
           expect(found_duplicate&.id).to eq existing_bike.id
           expect(instance.create_bike(b_param)&.id).to eq existing_bike.id
@@ -565,7 +565,7 @@ RSpec.describe BikeServices::Creator do
           existing_bike.destroy
           expect(b_param.no_duplicate?).to be_truthy
           expect(Bike.unscoped.pluck(:id)).to match_array([existing_bike.id])
-          expect(Bike.with_user_hidden.pluck(:id)).to match_array([])
+          expect(Bike.current_with_user_hidden.pluck(:id)).to match_array([])
           expect(Ownership.count).to eq 1
           bike = instance.create_bike(b_param)
           expect(Bike.pluck(:id)).to match_array([bike.id])
