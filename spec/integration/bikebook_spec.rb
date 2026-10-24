@@ -559,8 +559,16 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(page).to have_no_link("Clear filters").and have_no_css("[aria-label='Applied filters'] li")
     expect(page).to have_css(".hw-combobox__chip", count: 2).and have_css("[data-comparison] article", count: 2)
     expect(page).to have_no_current_path(/manufacturer|electric/)
-    # and from the open panel, where the market and e-bike classification are nothing to clear, and stay through a clear
+    # by frame material, which the comparison lists, and handlebar type
     click_on "More filters", match: :first
+    choose_option("Frame material", "Carbon or Composite")
+    expect(page).to have_css("#vehicle-models-count", exact_text: "(2 matching models)")
+    choose_option("Handlebar type", "Drop Bars")
+    expect(page).to have_css("#vehicle-models-count", exact_text: "(1 matching model)")
+    expect(page).to have_current_path(/[?&]frame_material=carbon\b/).and have_current_path(/[?&]handlebar_type=drop_bar\b/)
+    within("#vehicle-filters") { click_link "Clear filters" }
+    expect(page).to have_css("#vehicle-models-count", exact_text: "(32 matching models)")
+    # and from the open panel, where the market and e-bike classification are nothing to clear, and stay through a clear
     find_field("Market").click
     find("#market-hw-listbox [role='option']", text: "United States (US)").click
     expect(page).to have_css("#vehicle-models-count", exact_text: "(25 matching models)")

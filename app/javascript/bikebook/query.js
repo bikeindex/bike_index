@@ -1,5 +1,5 @@
 export const LISTS = ['primary_activity', 'manufacturer', 'vehicle_type']
-export const SINGLES = ['suspension', 'model_configuration', 'market']
+export const SINGLES = ['suspension', 'model_configuration', 'frame_material', 'handlebar_type', 'market']
 export const RANGES = ['year_min', 'year_max', 'price_min', 'price_max']
 // Whether the search shows: asked for, or with anything but a single model picked - a classification's card counts, as
 // its chip is in the search - as a link straight to one opens it. Pages::Bikebook::Show::Component#placeholder_class mirrors it
