@@ -10,7 +10,8 @@ export const MAX_WEIGHT = 5
 const CAP = 3
 // a categorical field that differs
 const MISMATCH = 2
-// a field the candidate doesn't list, so listing less never looks closer
+// a field the candidate doesn't list, so listing less never looks closer, and the score a candidate has to beat to show,
+// as one further away is less like it than one it knows nothing about
 const UNLISTED = 1
 // of the weight the model has values for, what a candidate has to share, or one listing almost nothing matches everything
 const MIN_SHARED = 0.4
@@ -82,7 +83,7 @@ const TIERS = Object.fromEntries([
   ['x3', 'x4', 'altus', 'acera', 'claris', '2300', 'nexus'],
   ['alivio', 'sora', 'cues', 'sx', 'x5', 'advent', 'mezzo'],
   ['tiagra', 'deore', 'nx', 'apex', 'x7', 'alfine', 'veloce', 'grx 400', 'grx 410', 'advent x', 'sword'],
-  ['105', 'rival', 'slx', 'gx', 'x9', 'x1', 'zee', 'deore lx', 'metrea', 'grx', 'grx 600', 'grx 610', 'centaur', 'potenza', 'ekar gt', 'eagle 70', 's1000'],
+  ['105', 'rival', 'slx', 'gx', 'x9', 'x1', 'zee', 'deore lx', 'metrea', 'grx', 'grx 600', 'grx 610', 'centaur', 'potenza', 'ekar gt', 'eagle 70', 's1000', 's 1000'],
   ['ultegra', 'force', 'xt', 'deore xt', 'x01', 'x0', 'saint', 'grx 800', 'grx 810', 'grx 820', 'chorus', 'athena', 'ekar', 'eagle 90'],
   ['dura ace', 'red', 'xtr', 'xx1', 'xx', 'xx sl', 'record', 'super record']
 ].flatMap((names, tier) => names.map((name) => [name, tier])))
@@ -181,7 +182,8 @@ export const scorer = (models, { format, fields }, activities) => {
         shared += weight
         total += weight * KINDS[kind](columns[field][target], value, scale)
       }
-      if (shared >= MIN_SHARED * available) scored.push({ model: candidate, score: (total + (available - shared) * UNLISTED) / available })
+      const score = (total + (available - shared) * UNLISTED) / available
+      if (shared >= MIN_SHARED * available && score < UNLISTED) scored.push({ model: candidate, score })
     })
     const grouped = new Set()
     const closest = scored.sort((a, b) => a.score - b.score).map(({ model }) => model)

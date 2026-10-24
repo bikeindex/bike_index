@@ -1761,12 +1761,15 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(page).to have_css("legend", exact_text: "Other settings", wait: 10)
     expect(page).to have_no_text("Show matching")
     # the other propulsion's instead with other_propulsion, without its e-bike fields counting against them, and a frame
-    # of the same material and bars of the same type closer, and only the same type with its slider at the top
+    # of the same material and bars of the same type closer, and only the same type with its slider at the top. None
+    # less like it than one it knows nothing about, and a groupset's tier however its series is written
     matched = page.evaluate_script(<<~JS)
       (async () => {
         const { GROUPS, scorer, settingsFrom } = await import('bikebook/similarity')
         const names = [...Object.values(GROUPS).flatMap(({ fields }) => Object.keys(fields)), 'groupset_series']
-        const fields = { ...Object.fromEntries(names.map((name) => [name, [null, null, null]])), head_angle: [70, 70, 70], battery_size: [500, 500, null] }
+        // each alike in its geometry, wheels and weight, as a catalog model lists most of them
+        const alike = { head_angle: 70, seat_angle: 74, stack_reach: 1.5, bb_drop: 70, chainstay_gap: 80, front_bsd: 622, rear_bsd: 622, tire_clearance: 45, total_weight: 10 }
+        const fields = { ...Object.fromEntries(names.map((name) => [name, [null, null, null]])), ...Object.fromEntries(Object.entries(alike).map(([name, value]) => [name, [value, value, value]])), battery_size: [500, 500, null] }
         const model = (id, electric, handlebar_type) => ({ id, electric, handlebar_type, vehicle_type: 'bike', manufacturer: id, model_group: id, primary_activity: 'commuting', markets: ['US'] })
         const score = scorer([model('e', true), model('other_e', true), model('acoustic', false)], { format: 2, fields }, [{ slug: 'commuting', family: 'urban' }])
         const propulsions = ['', 'other_propulsion=1'].map((query) => score('e', settingsFrom(new URLSearchParams(query)), 'US').models.map(({ id }) => id))
@@ -1774,10 +1777,14 @@ RSpec.describe "BikeBook", :js, type: :system do
           { format: 2, fields: { ...fields, frame_material: ['aluminum', 'steel', 'aluminum'] } }, [{ slug: 'commuting', family: 'urban' }])
         const bars = scorer([model('a', false, 'drop_bar'), model('flat', false, 'horizontal'), model('drop', false, 'drop_bar')], { format: 2, fields }, [{ slug: 'commuting', family: 'urban' }])
         const ids = (score, query = '') => score('a', settingsFrom(new URLSearchParams(query)), 'US').models.map(({ id }) => id)
-        return [...propulsions, ids(materials), ids(bars), ids(bars, 'weights=handlebar.4')]
+        const far = scorer([model('a', false), model('near', false), model('far', false)], { format: 2, fields: { ...fields, ...Object.fromEntries(Object.entries(alike).map(([name, value]) => [name, [value, value, value + 10]])) } },
+          [{ slug: 'commuting', family: 'urban' }])
+        const groupsets = scorer([model('a', false), model('tiagra', false), model('s1000', false)],
+          { format: 2, fields: { ...fields, groupset_series: ['S-1000', 'Tiagra', 'S1000'] } }, [{ slug: 'commuting', family: 'urban' }])
+        return [...propulsions, ids(materials), ids(bars), ids(bars, 'weights=handlebar.4'), ids(far), ids(groupsets)]
       })()
     JS
-    expect(matched).to eq([["other_e"], ["acoustic"], ["aluminum", "steel"], ["drop"], ["drop", "flat"]])
+    expect(matched).to eq([["other_e"], ["acoustic"], ["aluminum", "steel"], ["drop"], ["drop", "flat"], ["near"], ["s1000", "tiagra"]])
   end
 
   it "keeps the search and its filters while the catalog loads, and says so when it doesn't" do
