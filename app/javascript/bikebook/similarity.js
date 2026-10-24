@@ -34,6 +34,7 @@ const KINDS = {
 // are compared by their logs, so twice the price is as far at any price
 export const GROUPS = {
   geometry: { label: 'Geometry', fields: { head_angle: 'numeric', seat_angle: 'numeric', stack_reach: 'numeric', bb_drop: 'numeric', chainstay_gap: 'numeric' } },
+  handlebar: { label: 'Handlebar type', fields: { handlebar_type: 'same' } },
   wheels: { label: 'Wheel size & tire clearance', same: 'wheels & tires', fields: { front_bsd: 'numeric', rear_bsd: 'numeric', tire_clearance: 'numeric' } },
   suspension: { label: 'Suspension', same: 'suspension travel', fields: { travel_front: 'numeric', travel_rear: 'numeric', suspension: 'same' } },
   ebike: { label: 'E-vehicle motor and battery', same: 'motor and battery attributes', fields: { modes: 'set', assist_speed: 'numeric', throttle_speed: 'numeric', battery_size: 'numeric', motor_kind: 'same' } },
@@ -46,7 +47,7 @@ export const GROUPS = {
 }
 
 // price low by default, as a tiebreaker, and weight, as much of it is what the others weigh already
-const GENERAL = { geometry: 4, wheels: 3, suspension: 3, ebike: 3, groupset: 2, year: 2, material: 2, weight: 1, mounts: 1, price: 1 }
+const GENERAL = { geometry: 4, handlebar: 5, wheels: 3, suspension: 3, ebike: 3, groupset: 2, year: 2, material: 2, weight: 1, mounts: 1, price: 1 }
 export const PRESETS = {
   general: { label: 'General', weights: GENERAL }
 }
@@ -118,6 +119,7 @@ export const scorer = (models, { format, fields }, activities) => {
     battery_size: fields.battery_size.map(log),
     groupset: fields.groupset_series.map(tier),
     suspension: models.map((model) => model.suspension ?? null),
+    handlebar_type: models.map((model) => model.handlebar_type ?? null),
     year: models.map(({ first_year: first, final_year: final }) => first ? [first, final ?? Math.max(first, currentYear)] : null),
     price: models.map((model) => log(model.msrp_cents)),
     // which a catalog published before bikebook added it lacks

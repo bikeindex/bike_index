@@ -1752,21 +1752,22 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(page).to have_css("legend", exact_text: "Other settings", wait: 10)
     expect(page).to have_no_text("Show matching")
     # the other propulsion's instead with other_propulsion, without its e-bike fields counting against them, and a frame
-    # of the same material closer
+    # of the same material and bars of the same type closer
     matched = page.evaluate_script(<<~JS)
       (async () => {
         const { GROUPS, scorer, settingsFrom } = await import('bikebook/similarity')
         const names = [...Object.values(GROUPS).flatMap(({ fields }) => Object.keys(fields)), 'groupset_series']
         const fields = { ...Object.fromEntries(names.map((name) => [name, [null, null, null]])), head_angle: [70, 70, 70], battery_size: [500, 500, null] }
-        const model = (id, electric) => ({ id, electric, vehicle_type: 'bike', manufacturer: id, model_group: id, primary_activity: 'commuting', markets: ['US'] })
+        const model = (id, electric, handlebar_type) => ({ id, electric, handlebar_type, vehicle_type: 'bike', manufacturer: id, model_group: id, primary_activity: 'commuting', markets: ['US'] })
         const score = scorer([model('e', true), model('other_e', true), model('acoustic', false)], { format: 2, fields }, [{ slug: 'commuting', family: 'urban' }])
         const propulsions = ['', 'other_propulsion=1'].map((query) => score('e', settingsFrom(new URLSearchParams(query)), 'US').models.map(({ id }) => id))
         const materials = scorer([model('a', false), model('steel', false), model('aluminum', false)],
           { format: 2, fields: { ...fields, frame_material: ['aluminum', 'steel', 'aluminum'] } }, [{ slug: 'commuting', family: 'urban' }])
-        return [...propulsions, materials('a', settingsFrom(new URLSearchParams()), 'US').models.map(({ id }) => id)]
+        const bars = scorer([model('a', false, 'drop_bar'), model('flat', false, 'horizontal'), model('drop', false, 'drop_bar')], { format: 2, fields }, [{ slug: 'commuting', family: 'urban' }])
+        return [...propulsions, ...[materials, bars].map((each) => each('a', settingsFrom(new URLSearchParams()), 'US').models.map(({ id }) => id))]
       })()
     JS
-    expect(matched).to eq([["other_e"], ["acoustic"], ["aluminum", "steel"]])
+    expect(matched).to eq([["other_e"], ["acoustic"], ["aluminum", "steel"], ["drop", "flat"]])
   end
 
   it "keeps the search and its filters while the catalog loads, and says so when it doesn't" do
