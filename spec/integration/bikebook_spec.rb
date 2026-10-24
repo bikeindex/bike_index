@@ -1818,8 +1818,8 @@ RSpec.describe "BikeBook", :js, type: :system do
     uncheck "Include different vehicle types"
     expect(page).to have_no_current_path(/different_types/).and have_no_css("#similar-m-aventon-2025-abound_lr")
     # the closest of each model group, its own, other propulsions and other vehicle types left out, other activities in
-    expect(cards.call).to eq %w[similar-m-aventon-2026-pace_5_rec_step_through similar-m-aventon-2025-aventure_3_step_through
-      similar-m-aventon-2026-ramblas_adv similar-m-aventon-2024-soltera_2_5 similar-m-aventon-2024-sinch_2_5 similar-m-aventon-2026-current_adv]
+    expect(cards.call).to eq %w[similar-m-aventon-2026-pace_5_rec_step_through similar-m-aventon-2024-soltera_2_5
+      similar-m-aventon-2025-aventure_3_step_through similar-m-aventon-2026-ramblas_adv similar-m-aventon-2024-sinch_2_5]
     expect(page).to have_checked_field("General", visible: :all).and have_field("Custom", disabled: true, visible: :all)
 
     # a card adds its model to the comparison, in place and focused again, and takes it out

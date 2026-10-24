@@ -36,10 +36,12 @@ const KINDS = {
 }
 
 // Each slider's fields, each of `kind`, and what its top end matches where that isn't its label; battery size and price
-// are compared by their logs, so twice the price is as far at any price
+// are compared by their logs, so twice the price is as far at any price. A field's `shares` of its slider's weight are 1
+// unless it says otherwise, and `separate` fields measure different things, so their slider's weight grows by the root of
+// how many the model lists
 export const GROUPS = {
   handlebar: { label: 'Handlebar type', fields: { handlebar_type: 'same' } },
-  geometry: { label: 'Geometry', fields: { head_angle: 'numeric', seat_angle: 'numeric', stack_reach: 'numeric', bb_drop: 'numeric', chainstay_gap: 'numeric' } },
+  geometry: { label: 'Geometry', separate: true, shares: { head_angle: 3 }, fields: { head_angle: 'numeric', seat_angle: 'numeric', stack_reach: 'numeric', bb_drop: 'numeric', chainstay_gap: 'numeric' } },
   tires: { label: 'Tire clearance', fields: { tire_clearance: 'numeric' } },
   suspension: { label: 'Suspension', same: 'suspension travel', fields: { travel_front: 'numeric', travel_rear: 'numeric', suspension: 'same' } },
   ebike: { label: 'E-vehicle motor and battery', same: 'motor and battery attributes', fields: { modes: 'set', assist_speed: 'numeric', throttle_speed: 'numeric', battery_size: 'numeric', motor_kind: 'same' } },
@@ -162,14 +164,15 @@ export const scorer = (models, { format, fields }, activities) => {
     const model = models[target]
     const family = families[target]
     // each slider's weight shared among the fields the model lists, so a rigid bike, listing no travel, counts its suspension in full
-    const listed = Object.entries(GROUPS).flatMap(([group, { fields }]) => {
+    const listed = Object.entries(GROUPS).flatMap(([group, { fields, separate, shares = {} }]) => {
       const own = Object.entries(fields).filter(([field]) => columns[field][target] != null)
+      const divisor = own.reduce((sum, [field]) => sum + (shares[field] ?? 1), 0) / (separate ? Math.sqrt(own.length) : 1)
       return own.map(([field, kind]) => ({
         group,
         field,
         kind,
         scale: KINDS[kind] === numeric ? scaleOf(field, family) : null,
-        weight: (weights[group] ?? 0) / own.length
+        weight: (weights[group] ?? 0) * (shares[field] ?? 1) / divisor
       }))
     })
     const groups = [...new Set(listed.map(({ group }) => group))]
