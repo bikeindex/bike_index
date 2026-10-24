@@ -131,10 +131,10 @@ const scorer = () => {
 }
 
 // the last scoring kept, as the page asks again on each render while the section is open
-async function similar ({ model, settings, market }) {
+async function similar ({ model, settings }) {
   const score = await scorer()
-  const key = JSON.stringify({ model, settings, market })
-  if (lastSimilar?.key !== key) lastSimilar = { key, result: score?.(model, settings, market) ?? null }
+  const key = JSON.stringify({ model, settings })
+  if (lastSimilar?.key !== key) lastSimilar = { key, result: score?.(model, settings) ?? null }
   return lastSimilar.result
 }
 

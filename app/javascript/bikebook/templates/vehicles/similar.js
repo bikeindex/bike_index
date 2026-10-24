@@ -61,7 +61,7 @@ const legend = (text) => html`<legend class="twlabel">${text}</legend>`
 // Custom is chosen only by moving a slider off every preset, each of the `listed` groups', the rest's disabled, as the
 // model has nothing of theirs to compare. Its own ui--collapse, outside the section's content so its
 // toggle can share a line with the section's, laid into the section's row by display: contents
-const controls = (listed, { weights, sameManufacturer, otherPropulsion }, type, propulsion) => {
+const controls = (listed, { weights, sameManufacturer, otherPropulsion, differentTypes }, type, propulsion) => {
   const preset = presetOf(weights, listed)
   // its toggle moving into the card it opens, as More filters' does
   const toggle = collapse({ content: 'Adjust comparison algorithm', chevron: true, color: 'link', size: 'sm', htmlClass: 'tw:text-sm' })
@@ -92,11 +92,12 @@ const controls = (listed, { weights, sameManufacturer, otherPropulsion }, type, 
       attributes: { id: `similar-${group}`, disabled: !scored, 'data-bikebook--similar-target': scored && 'weight' }
     })}</div>`
   })}</div></fieldset><fieldset>${legend('Other settings')}<div class="tw:mt-1 tw:space-y-1">${
-    setting('same_manufacturer', `Include ${type}s from the same manufacturer`, sameManufacturer, 'sameManufacturer')}${
-    propulsion ? setting('other_propulsion', propulsion, otherPropulsion, 'otherPropulsion') : nothing}</div></fieldset>`
+    setting('same_manufacturer', `Include ${type}s from the same manufacturer`, sameManufacturer)}${
+    propulsion ? setting('other_propulsion', propulsion, otherPropulsion) : nothing}${setting('different_types', 'Include different vehicle types', differentTypes)}</div></fieldset>`
   })}</div></div></div>`
 }
 
-const setting = (name, label, checked, target) => checkbox({
-  name, label, checked, className: 'tw:mb-0 tw:text-sm tw:font-normal', attributes: { id: `similar-${name}`, 'data-bikebook--similar-target': target }
+// each a URL param of its name, 1 while it's checked
+const setting = (name, label, checked) => checkbox({
+  name, label, checked, className: 'tw:mb-0 tw:text-sm tw:font-normal', attributes: { id: `similar-${name}`, 'data-bikebook--similar-target': 'setting' }
 })

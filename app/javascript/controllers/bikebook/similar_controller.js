@@ -3,12 +3,12 @@ import { replaceUrl } from 'bikebook/replace_url'
 import { PRESETS, presetOf, settingsFrom, weightsFrom, weightsParam } from 'bikebook/similarity'
 
 // Connects to data-controller='bikebook--similar'
-// The similar models' weights and whether they include the model's maker's others, kept in the URL as they change, which
+// The similar models' weights and settings, kept in the URL as they change, which
 // the page rescores them by in place, once it's scored them on their section first opening.
 // A group the model lists nothing in has a disabled slider that's no weight target, so its weight stays the URL's or a
 // strategy's. A strategy's input events don't bubble, so they show each slider's value without rescoring for each
 export default class extends Controller {
-  static targets = ['weight', 'strategy', 'sameManufacturer', 'otherPropulsion']
+  static targets = ['weight', 'strategy', 'setting']
   static values = { vehicle: String, scored: Boolean }
 
   load () {
@@ -41,11 +41,7 @@ export default class extends Controller {
       }
     }
     const url = new URL(window.location.href)
-    const params = {
-      weights: weightsParam(weights),
-      same_manufacturer: this.sameManufacturerTarget.checked && '1',
-      other_propulsion: this.hasOtherPropulsionTarget && this.otherPropulsionTarget.checked && '1'
-    }
+    const params = { weights: weightsParam(weights), ...Object.fromEntries(this.settingTargets.map(({ name, checked }) => [name, checked && '1'])) }
     for (const [name, value] of Object.entries(params)) value ? url.searchParams.set(name, value) : url.searchParams.delete(name)
     replaceUrl(url)
     this.dispatch('change', { detail: { vehicle: this.vehicleValue, settings: settingsFrom(url.searchParams) } })

@@ -68,12 +68,14 @@ export const weightsFrom = (param) => {
   return { ...GENERAL, ...set }
 }
 
-// The URL's weights, whether same_manufacturer=1 includes the model's maker's others, and whether other_propulsion=1
-// matches only those electric where it isn't, or human powered where it's electric
+// The URL's weights, whether same_manufacturer=1 includes the model's maker's others, whether other_propulsion=1
+// matches only those electric where it isn't, or human powered where it's electric, and whether different_types=1
+// includes other vehicle types
 export const settingsFrom = (params) => ({
   weights: weightsFrom(params.get('weights')),
   sameManufacturer: params.get('same_manufacturer') === '1',
-  otherPropulsion: params.get('other_propulsion') === '1'
+  otherPropulsion: params.get('other_propulsion') === '1',
+  differentTypes: params.get('different_types') === '1'
 })
 
 export const weightsParam = (weights) => Object.keys(GROUPS).filter((group) => weights[group] !== GENERAL[group])
@@ -146,11 +148,11 @@ export const scorer = (models, { format, fields }, activities) => {
     return scales.get(key)
   }
 
-  // The `COUNT` models most like the one `id` names, of its type, propulsion, configuration and activity family, sold in
-  // `market`, scored by `weights`, its maker's only with `sameManufacturer`, those of the other propulsion instead with
-  // `otherPropulsion`, which leaves its e-bike fields unscored, each the closest of its model group; and the sliders whose
-  // fields it has values for. Its own model group's are always left out
-  return (id, { weights, sameManufacturer, otherPropulsion }, market) => {
+  // The `COUNT` models most like the one `id` names, of its propulsion, scored by `weights`, its maker's only with
+  // `sameManufacturer`, those of the other propulsion instead with `otherPropulsion`, which leaves its e-bike fields
+  // unscored, and other vehicle types only with `differentTypes`, each the closest of its model group; and the sliders
+  // whose fields it has values for. Its own model group's are always left out
+  return (id, { weights, sameManufacturer, otherPropulsion, differentTypes }) => {
     const target = indexes.get(id)
     if (target == null) return null
 
@@ -175,10 +177,9 @@ export const scorer = (models, { format, fields }, activities) => {
 
     const scored = []
     models.forEach((candidate, index) => {
-      if (index === target || families[index] !== family || candidate.vehicle_type !== model.vehicle_type ||
-        (candidate.electric === model.electric) === otherPropulsion || candidate.model_configuration !== model.model_configuration ||
-        (market && !candidate.markets.includes(market)) ||
-        candidate.model_group === model.model_group || (!sameManufacturer && candidate.manufacturer === model.manufacturer) ||
+      if (index === target || candidate.model_group === model.model_group || (candidate.electric === model.electric) === otherPropulsion ||
+        (!differentTypes && candidate.vehicle_type !== model.vehicle_type) ||
+        (!sameManufacturer && candidate.manufacturer === model.manufacturer) ||
         required.some(({ field, kind, scale }) => columns[field][index] == null || KINDS[kind](columns[field][target], columns[field][index], scale) > 0)) return
 
       let shared = 0
