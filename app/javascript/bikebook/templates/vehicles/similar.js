@@ -24,25 +24,26 @@ export const similarResults = ({ results, cards, full }) => {
     class="tw:mt-4 tw:grid tw:grid-cols-[repeat(auto-fill,minmax(17rem,1fr))] tw:gap-4 tw:twpagebleed tw:px-4">${cards}</ul>`
 }
 
+const compareLabel = (type, model) => `Compare similar ${type}s to ${model}`
+
 // On the search's More filters lines, what opens the similar models' section beneath them, whose own toggle takes over
 // once it's open. Not a ui--collapse trigger, which the search's own would claim
 export const compareToggle = ({ type, model }) => html`<button type="button" data-action="bikebook--page#compareSimilar" class=${buttonClasses({
   color: 'link',
-  htmlClass: 'tw:not-data-[active=true]:[font-weight:inherit] tw:group-has-[#similar-toggle[aria-expanded=true]]/bikebook:hidden'
-})}><span class="tw:inline-block"><span class="tw:flex">${iconChevron()}</span></span>Compare similar ${type}s to ${model}</button>`
+  htmlClass: 'tw:not-data-[active=true]:[font-weight:inherit] tw:similar-open:hidden'
+})}><span class="tw:inline-block"><span class="tw:flex">${iconChevron()}</span></span>${compareLabel(type, model)}</button>`
 
-// Collapsed until it's wanted, the models most like the first compared, `model`, whose `results` bikebook--similar has
-// scored once it opens. Under Adjust, on its toggle's line while it's open, the strategies, a slider for each of the `groups` it lists and whether to include
-// its maker's others and, unless it's a type that's always electric, only those of the other propulsion, which rescore them in place
-// With the search showing, its toggle shows only once it's open, compareToggle opening it
+// Collapsed until it's wanted, the models most like the first compared, `model`, whose `results` bikebook--similar scores
+// once it opens, and the controls that rescore them in place. With the search showing, its toggle shows only once it's
+// open, compareToggle opening it
 export const similarSection = ({ vehicle, model, type, vehicleType, electric, settings, groups, results, searchShown }) => {
   const propulsion = electric ? !ALWAYS_MOTORIZED.includes(vehicleType) && `Show matching human powered ${type}s` : `Show matching e-${type}s`
   const scored = results !== undefined
-  const label = html`<span class="tw:group-aria-expanded/similar:hidden">Compare similar ${type}s to ${model}</span><span
+  const label = html`<span class="tw:group-aria-expanded/similar:hidden">${compareLabel(type, model)}</span><span
     class="tw:hidden tw:group-aria-expanded/similar:inline">Hide similar ${type}s</span>`
-  return html`<section aria-label="Similar models" class="tw:group/section tw:flex tw:flex-wrap tw:items-baseline" data-controller="bikebook--similar ui--collapse"
+  return html`<section aria-label="Similar models" class="tw:flex tw:flex-wrap tw:items-baseline" data-controller="bikebook--similar ui--collapse"
     data-bikebook--similar-vehicle-value=${vehicle} data-bikebook--similar-scored-value=${scored} data-ui--collapse-param-value="similar"
-    data-action="input->bikebook--similar#change ui--collapse:shown->bikebook--similar#load">${collapse({
+    data-action="input->bikebook--similar#change ui--collapse:shown->bikebook--similar#load:self">${collapse({
       content: label,
       chevron: true,
       color: 'link',
@@ -60,19 +61,18 @@ const legend = (text) => html`<legend class="twlabel">${text}</legend>`
 // model has nothing of theirs to compare. Its own ui--collapse, outside the section's content so its
 // toggle can share a line with the section's, laid into the section's row by display: contents
 const controls = (listed, { weights, sameManufacturer, otherPropulsion }, type, propulsion) => {
-  const groups = Object.keys(GROUPS)
-  const preset = presetOf(weights, groups)
+  const preset = presetOf(weights, listed)
   // its toggle moving into the card it opens, as More filters' does
-  const toggle = () => collapse({ content: 'Adjust comparison algorithm', chevron: true, color: 'link', size: 'sm', htmlClass: 'tw:text-sm' })
-  return html`<div class="tw:hidden tw:group-has-[#similar-toggle[aria-expanded=true]]/section:contents" data-controller="ui--collapse"
-  data-ui--collapse-param-value="adjust"><div class="tw:ml-auto tw:has-[[aria-expanded=true]]:hidden">${toggle()}</div><div
-  data-ui--collapse-target="content" class="tw:hidden tw:w-full"><div class="tw:mt-3 tw:space-y-4 tw:rounded-lg tw:border tw:border-gray-200 tw:p-4 tw:dark:border-gray-700"><div class="tw:text-right">${toggle()}</div><fieldset>${legend('Strategy')}<div class="tw:mt-1">${radioButtonGroup({
+  const toggle = collapse({ content: 'Adjust comparison algorithm', chevron: true, color: 'link', size: 'sm', htmlClass: 'tw:text-sm' })
+  return html`<div class="tw:hidden tw:similar-open:contents" data-controller="ui--collapse"
+  data-ui--collapse-param-value="adjust"><div class="tw:ml-auto tw:has-[[aria-expanded=true]]:hidden">${toggle}</div><div
+  data-ui--collapse-target="content" class="tw:hidden tw:w-full"><div class="tw:mt-3 tw:space-y-4 tw:rounded-lg tw:border tw:border-gray-200 tw:p-4 tw:dark:border-gray-700"><div class="tw:text-right">${toggle}</div><fieldset>${legend('Strategy')}<div class="tw:mt-1">${radioButtonGroup({
     name: 'strategy',
     selected: preset,
     entries: [...Object.entries(PRESETS).map(([value, { label }]) => ({ value, label })), { value: 'custom', label: 'Custom', disabled: preset !== 'custom' }],
     attributes: { 'data-bikebook--similar-target': 'strategy', 'data-action': 'bikebook--similar#strategy:stop' }
   })}</div></fieldset><fieldset>${legend('Weightings')}<div class="tw:mt-1 tw:grid tw:gap-x-6 tw:gap-y-5 tw:sm:grid-cols-2
-  tw:lg:grid-cols-3">${groups.map((group) => {
+  tw:lg:grid-cols-3">${Object.keys(GROUPS).map((group) => {
     const scored = listed.includes(group)
     // an unlisted group's slider a bare track in a slider's box, showing no weight, which stays the URL's or a strategy's
     return html`<div class=${scored
@@ -87,19 +87,11 @@ const controls = (listed, { weights, sameManufacturer, otherPropulsion }, type, 
       max: MAX_WEIGHT,
       attributes: { id: `similar-${group}`, disabled: !scored, 'data-bikebook--similar-target': scored && 'weight' }
     })}</div>`
-  })}</div></fieldset><fieldset>${legend('Other settings')}<div class="tw:mt-1 tw:space-y-1">${checkbox({
-    name: 'same_manufacturer',
-    label: `Include ${type}s from the same manufacturer`,
-    checked: sameManufacturer,
-    className: 'tw:mb-0 tw:text-sm tw:font-normal',
-    attributes: { id: 'similar-same_manufacturer', 'data-bikebook--similar-target': 'sameManufacturer' }
-  })}${propulsion
-    ? checkbox({
-      name: 'other_propulsion',
-      label: propulsion,
-      checked: otherPropulsion,
-      className: 'tw:mb-0 tw:text-sm tw:font-normal',
-      attributes: { id: 'similar-other_propulsion', 'data-bikebook--similar-target': 'otherPropulsion' }
-    })
-    : nothing}</div></fieldset></div></div></div>`
+  })}</div></fieldset><fieldset>${legend('Other settings')}<div class="tw:mt-1 tw:space-y-1">${
+    setting('same_manufacturer', `Include ${type}s from the same manufacturer`, sameManufacturer, 'sameManufacturer')}${
+    propulsion ? setting('other_propulsion', propulsion, otherPropulsion, 'otherPropulsion') : nothing}</div></fieldset></div></div></div>`
 }
+
+const setting = (name, label, checked, target) => checkbox({
+  name, label, checked, className: 'tw:mb-0 tw:text-sm tw:font-normal', attributes: { id: `similar-${name}`, 'data-bikebook--similar-target': target }
+})

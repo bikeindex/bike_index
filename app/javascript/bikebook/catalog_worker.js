@@ -13,6 +13,7 @@ let last = null
 let rules = null
 let similarityUrl = null
 let similarity = null
+let lastSimilar = null
 const blocks = new Map()
 const orders = new Map()
 
@@ -122,8 +123,12 @@ const scorer = () => {
   return similarity
 }
 
+// the last scoring kept, as the page asks again on each render while the section is open
 async function similar ({ model, settings, market }) {
-  return (await scorer())?.(model, settings, market) ?? null
+  const score = await scorer()
+  const key = JSON.stringify({ model, settings, market })
+  if (lastSimilar?.key !== key) lastSimilar = { key, result: score?.(model, settings, market) ?? null }
+  return lastSimilar.result
 }
 
 function displays ({ ids }) {

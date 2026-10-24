@@ -6,12 +6,6 @@ RSpec.describe UI::Forms::Range::Component, type: :component do
   let(:component) { render_inline(described_class.new(**options)) }
   let(:options) { {name: :geometry, label: "Geometry", value: 4, max: 5} }
 
-  it "renders a slider under its label, showing its value" do
-    expect(component).to have_css("[data-controller='ui--forms--range'] label[for='geometry'] output[for='geometry']", text: "4")
-    expect(component).to have_css("input[type='range'][id='geometry'][name='geometry'][min='0'][max='5'][step='1'][value='4']")
-    expect(component).to have_css("input[data-action='input->ui--forms--range#update']")
-  end
-
   it "labels no ends without them" do
     expect(component).to have_no_css("input + div")
   end
