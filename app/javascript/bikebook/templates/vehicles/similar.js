@@ -49,7 +49,7 @@ export const similarSection = ({ vehicle, model, type, vehicleType, electric, co
       content: label,
       chevron: true,
       color: 'link',
-      htmlClass: `tw:group/similar ${searchShown ? 'tw:not-aria-expanded:hidden' : ''}`,
+      htmlClass: `tw:group/similar tw:aria-expanded:mt-3 ${searchShown ? 'tw:not-aria-expanded:hidden' : ''}`,
       attributes: { id: 'similar-toggle' }
     })}${scored && groups?.length ? controls(groups, settings, type, propulsion, configuration) : nothing}<div data-ui--collapse-target="content"
     class="tw:hidden tw:w-full">${scored
