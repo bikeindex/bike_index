@@ -108,7 +108,6 @@ export const geometryOverlay = ({ presenter, vehicles, sizes, frames, selected, 
     return { ...each, geometry: { rearAxle: [0, rearRadius], frontAxle: [wheelbase, frontRadius], rearRadius, frontRadius } }
   })
   const undrawn = labelled.filter(({ side }) => !side)
-  if (drawn.length === 0) return nothing
 
   const overlay = drawn.length > 1 || drawn.some(({ side }) => side)
   const missingNote = undrawn.length

@@ -1117,7 +1117,7 @@ RSpec.describe "BikeBook", :js, type: :system do
       [road, "Mullet's 700 C wheels with 64 mm tires are approximately 750 mm diameter"]])
     expect(page).to have_current_path(/[?&]vehicle_sizes=Small(&|\z)/)
 
-    # one frame to draw is drawn alone, and the overlay says what the other is missing
+    # one frame to draw is drawn alone, and the overlay says what the other is missing, as it does with none to draw
     lone = page.evaluate_script(<<~JS)
       (async () => {
         const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
@@ -1132,11 +1132,13 @@ RSpec.describe "BikeBook", :js, type: :system do
         const sizes = [road.sizes[0], bare.sizes[0]]
         const container = document.createElement('div')
         render(geometryOverlay({ presenter, vehicles, sizes, frames: overlayFrames(vehicles, sizes) }), container)
-        return [container.querySelectorAll("svg[role='img'] > g").length, [...container.querySelectorAll('li')].at(-1).textContent.replace(/\\s+/g, ' ').trim()]
+        const undrawn = document.createElement('div')
+        render(geometryOverlay({ presenter, vehicles: [vehicles[1]], sizes: [sizes[1]], frames: overlayFrames([vehicles[1]], [sizes[1]]) }), undrawn)
+        return [container, undrawn].map((each) => [each.querySelectorAll("svg[role='img'] > g").length, [...each.querySelectorAll('li')].at(-1).textContent.replace(/\\s+/g, ' ').trim()])
       })()
     JS
-    expect(lone).to eq([1, "Bare doesn't list its Reach, Stack, Top Tube (effective), Front Centre and Head Tube or the measures to calculate them, " \
-      "so it can't be drawn."])
+    bare = "Bare doesn't list its Reach, Stack, Top Tube (effective), Front Centre and Head Tube or the measures to calculate them, so it can't be drawn."
+    expect(lone).to eq([[1, bare], [0, bare]])
 
     # a cargo bike's cargo area on its size's card, its length lettered as its drawing measures it along the deck
     cargo = page.evaluate_script(<<~JS)
