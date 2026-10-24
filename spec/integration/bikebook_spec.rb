@@ -1274,7 +1274,7 @@ RSpec.describe "BikeBook", :js, type: :system do
     # a model picked again compares in a size of its own, which goes on the URL in its place
     visit bikebook_path(vehicle_models: "m/aventon/2026/current_adv", view: "geometry", search: 1)
     type_into(vehicle_field, "current adv")
-    retry_on_detach { find(vehicle_option, text: "Aventón Current ADV").click }
+    retry_on_detach { find(vehicle_option, text: "Aventón Current ADV already selected").click }
     expect(page).to have_css(".hw-combobox__chip", text: "Aventón Current ADV", count: 2)
     all("select[aria-label='Size of Current ADV']", count: 2, wait: 10).last.select("Small")
     expect(page).to have_current_path(/[?&]vehicle_sizes=,Small(&|\z)/)

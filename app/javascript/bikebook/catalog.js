@@ -81,7 +81,10 @@ export class CatalogComboboxSource {
 
     const forId = combobox.element.dataset.asyncId
     const listbox = combobox._actingListbox
-    const options = models.map((model) => comboboxOption({ model, placeholderUrl: this.catalog.kit.placeholder_url, currencies: this.catalog.vocabulary.currencies }))
+    const picked = String(this.params.vehicle_models ?? '').split(',')
+    const options = models.map((model) => comboboxOption({
+      model, selected: picked.includes(model.id), placeholderUrl: this.catalog.kit.placeholder_url, currencies: this.catalog.vocabulary.currencies
+    }))
     const pagination = html`<li id=${`${forId}__hw_combobox_pagination__wrapper`} class="hw_combobox__pagination__wrapper"
       data-hw-combobox-target="endOfOptionsStream" data-input-type=${inputType ?? nothing} aria-hidden="true"></li>`
     document.getElementById(`${forId}__hw_combobox_pagination__wrapper`)?.remove()
