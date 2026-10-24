@@ -69,16 +69,20 @@
         </div>
       <% end %>
 
-      <%# Above the card's link too, for the e-vehicle tooltip %>
-      <div class="tw:relative tw:z-20 tw:flex tw:flex-wrap tw:items-center tw:gap-1.5">
+      <%# Only the tooltipped badges sit above the card's link, so the rest of the row opens the bike %>
+      <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-1.5">
         <% if @bike.motorized? %>
-          <%= render(UI::Badge::Component.new(text: "⚡", title: translation(".e_vehicle"), color: :purple)) %>
+          <span class="tw:relative tw:z-20">
+            <%= render(UI::Badge::Component.new(text: "⚡", title: translation(".e_vehicle"), color: :purple)) %>
+          </span>
         <% end %>
 
         <%= render(UI::Badge::Component.new(text: @bike.type_titleize, color: @bike.motorized? ? :purple : :gray)) %>
 
         <% if render_member_badge? %>
-          <%= render(UI::Badge::Component.new(text: translation(".member_listing"), title: translation(".member_listing_tooltip"), color: :purple)) %>
+          <span class="tw:relative tw:z-20">
+            <%= render(UI::Badge::Component.new(text: translation(".member_listing"), title: translation(".member_listing_tooltip"), color: :purple)) %>
+          </span>
         <% end %>
       </div>
 
