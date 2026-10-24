@@ -43,6 +43,7 @@ async function load ({ manifestUrl, ids, jurisdictions, rulesUrl }) {
     activity_name: activityNames[model.primary_activity],
     type_name: typeNames[model.vehicle_type],
     searchText: `${model.display}\n${model.id}`.toLowerCase(),
+    sameModel: `${model.manufacturer}/${model.model.toLowerCase()}`,
     sortYear: model.final_year ?? currentYear
   }))
   byId = new Map(models.map((model) => [model.id, model]))
@@ -63,15 +64,15 @@ async function load ({ manifestUrl, ids, jurisdictions, rulesUrl }) {
 // Each filter's choices, with how many models choosing it alone matches. Propulsion's checkboxes show no counts
 function options ({ manufacturers, vehicle_types: vehicleTypes, filter_options: { electric, e_vehicle_classification: classification, market, ...filterOptions } }) {
   const counted = (name, choices) => choices.map(([value, display]) => ({ value, display, count: models.filter(filter({ [name]: value })).length }))
+  const sellers = new Set(models.flatMap(({ markets }) => markets))
   const perManufacturer = models.reduce((counts, { manufacturer }) => counts.set(manufacturer, (counts.get(manufacturer) ?? 0) + 1), new Map())
   return {
     primary_activity: counted('primary_activity', activities.map(({ slug, name }) => [slug, name])),
     manufacturer: Object.entries(manufacturers).filter(([slug]) => perManufacturer.has(slug)).sort(([, a], [, b]) => a.localeCompare(b))
       .map(([value, display]) => ({ value, display, count: perManufacturer.get(value) })),
     vehicle_type: counted('vehicle_type', vehicleTypes.map(({ slug, name }) => [slug, name])),
-    // "Canada (CA)", as UI::Forms::ComboboxState shows a state; only those with models sold there, as most of the catalog's
-    // have none
-    market: Object.entries(market).sort(([, a], [, b]) => a.localeCompare(b)).filter(([value]) => soldIn(value).size)
+    // "Canada (CA)", as UI::Forms::ComboboxState shows a state; only those with models sold there, as most have none
+    market: Object.entries(market).sort(([, a], [, b]) => a.localeCompare(b)).filter(([value]) => sellers.has(value))
       .map(([value, display]) => ({ value, name: display, display: `${display} (${value})` })),
     ...Object.fromEntries(Object.entries(filterOptions).map(([name, labels]) => [name, counted(name, Object.entries(labels))]))
   }
@@ -218,21 +219,18 @@ function sorted ({ sort, year_dir: yearDir, price_dir: priceDir }) {
   return orders.get(key)
 }
 
-// The models sold in `market`, by their maker and name
 const soldIn = (market) => {
   if (!sold.has(market)) {
     sold.set(market, models.filter(({ markets }) => markets.includes(market))
-      .reduce((names, model) => names.set(sameModel(model), [...(names.get(sameModel(model)) ?? []), model]), new Map()))
+      .reduce((names, model) => names.set(model.sameModel, [...(names.get(model.sameModel) ?? []), model]), new Map()))
   }
   return sold.get(market)
 }
 
-const sameModel = ({ manufacturer, model }) => `${manufacturer}/${model.toLowerCase()}`
-
 // A market's search has the models sold elsewhere too, but not e-vehicles, which its own laws class, nor one it sells
 // its own of in the same years
 const inMarket = (model, market) => model.markets.includes(market) || (!model.electric &&
-  !soldIn(market).get(sameModel(model))?.some((each) => each.first_year <= model.sortYear && model.first_year <= each.sortYear))
+  !soldIn(market).get(model.sameModel)?.some((each) => each.first_year <= model.sortYear && model.first_year <= each.sortYear))
 
 // A family matches its flavors; slugs naming no activity filter nothing
 function filter (params) {
