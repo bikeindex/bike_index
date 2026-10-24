@@ -34,7 +34,7 @@ module Admin
         @endpoint = params[:search_endpoint]
         logged_searches = case @endpoint
         when "not_web_bikes" then logged_searches.where.not(endpoint: :web_bikes)
-        when "not_web_bikebook" then logged_searches.not_web_bikebook
+        when "not_web_bikebook" then logged_searches.not_bikebook
         when "organized" then logged_searches.organized
         end
       elsif LoggedSearch.endpoints.key?(params[:search_endpoint])

@@ -111,6 +111,46 @@ RSpec.describe LogSearcher::Parser do
           expect(described_class.parse_log_line(log_line)).to match_hash_indifferently target
         end
       end
+      context "ebike rules" do
+        let(:status) { 200 }
+        let(:params) { {vehicle_models: "m/specialized/2025/haul_st", country: "US", region: "CA"} }
+        let(:log_line) { %(I, [2026-10-22T17:41:03.512907 #812331]  INFO -- : [c1d7e2a4-3b9f-4e58-a6d1-8f2c0b7e9a35] {"method":"GET","path":"/ebike-rules/US/CA","format":"html","controller":"EbikeRulesController","action":"show","status":#{status},"duration":38.27,"remote_ip":"157.131.200.8","u_id":85,"params":#{params.to_json},"message":"[#{status}] GET /ebike-rules/US/CA (EbikeRulesController#show)"}) }
+        let(:target) do
+          {request_at: Time.parse("2026-10-22T17:41:03.512907 UTC"),
+           request_id: "c1d7e2a4-3b9f-4e58-a6d1-8f2c0b7e9a35",
+           duration_ms: 38,
+           user_id: 85,
+           endpoint: :web_ebike_rules,
+           ip_address: "157.131.200.8",
+           query_items: params,
+           stolenness: :all,
+           includes_query: true,
+           organization_id: nil,
+           page: nil,
+           serial_normalized: nil}
+        end
+        it "parses" do
+          expect(described_class.parse_log_line(log_line)).to match_hash_indifferently target
+        end
+        context "with a top speed" do
+          let(:params) { {top_speed: "20", throttle: "true", country: "US", region: "CA"} }
+          it "parses" do
+            expect(described_class.parse_log_line(log_line)).to match_hash_indifferently target
+          end
+        end
+        context "a page view" do
+          let(:params) { {country: "US", region: "CA"} }
+          it "is not a search" do
+            expect(described_class.parse_log_line(log_line)).to be_nil
+          end
+        end
+        context "a redirect" do
+          let(:status) { 301 }
+          it "is not a search" do
+            expect(described_class.parse_log_line(log_line)).to be_nil
+          end
+        end
+      end
     end
     context "API" do
       let(:log_line) { 'I, [2023-10-23T00:20:29.448035 #666684]  INFO -- : [8f46986c-7d36-46f5-aeb6-9d4851de15b7] {"status":200,"method":"GET","path":"/api/v3/search/serials_containing","params":{"serial":"WCo2001xxxxx","serial_no_space":"WC02001XXXXX","raw_serial":"WC02001XXXXX","stolenness":"proximity","location":"you"},"host":"bikeindex.org","remote_ip":"11.222.33.4","u_id":1321,"format":"json","db":1879.08,"view":12.02999999999997,"duration":1891.11}' }
@@ -196,8 +236,8 @@ RSpec.describe LogSearcher::Parser do
       log_lines = File.read(log_path).split("\n")
       parsed_log_lines = log_lines.map { |l| described_class.parse_log_line(l) }.compact
       # These numbers will need to be updated, every time the example_log.log updates
-      expect(log_lines.count).to eq 32
-      expect(parsed_log_lines.count).to eq 26
+      expect(log_lines.count).to eq 34
+      expect(parsed_log_lines.count).to eq 27
 
       # It should have every endpoint
       logged_endpoints = parsed_log_lines.map { |l| l[:endpoint] }.uniq.sort

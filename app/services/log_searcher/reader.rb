@@ -16,6 +16,7 @@ module LogSearcher
       OrgPublic::ImpoundedBikesController#index
       Organized::ImpoundRecordsController#index
       ParkingNotificationsController#index
+      EbikeRulesController#show
       Search::].freeze
 
     # Remove search matches that contain bikesController index (which are already matched)

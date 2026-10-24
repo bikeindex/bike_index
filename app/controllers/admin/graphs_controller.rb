@@ -30,7 +30,8 @@ module Admin
       end
     end
 
-    # not_web_bikebook stacks its serial searches on the rest, so the stack is the total
+    # Each chart's series stack to its total: not_web_bikebook's serial searches on the rest, and the e-bike rules
+    # checks on BikeBook's searches
     def logged_searches
       daily = Counts.logged_searches(@time_range.first.to_date..@time_range.last.to_date)
         .transform_keys { it.strftime(helpers.group_by_format(@time_range, :group_by_day)) }
@@ -38,7 +39,8 @@ module Admin
         [{name: "Serial", data: daily.transform_values { it["not_web_bikebook_serial"] }},
           {name: "No serial", data: daily.transform_values { it["not_web_bikebook"] - it["not_web_bikebook_serial"] }}]
       else
-        [{name: "BikeBook", data: daily.transform_values { it["web_bikebook"] }}]
+        [{name: "BikeBook", data: daily.transform_values { it["web_bikebook"] }},
+          {name: "E-bike rules", data: daily.transform_values { it["web_ebike_rules"] }}]
       end
       render json: chart_data.chart_json
     end
