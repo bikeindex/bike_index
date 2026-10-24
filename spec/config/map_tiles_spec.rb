@@ -31,6 +31,6 @@ RSpec.describe "basemap" do
     last_modified = Time.zone.parse(response["last-modified"])
     expect(last_modified).to be > max_age.ago,
       "Basemap tiles are stale (last refreshed #{last_modified}). " \
-      "Go to GitHub Actions and run the Upload basemap workflow."
+      "The monthly Upload basemap workflow hasn't succeeded since - check its runs in GitHub Actions."
   end
 end
