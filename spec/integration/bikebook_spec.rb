@@ -5,7 +5,8 @@ require "rails_helper"
 RSpec.describe "BikeBook", :js, type: :system do
   after { WebMock.reset! }
 
-  def vehicle_field = find_field("Select a bike, choose multiple to compare them")
+  # labelled for the first picked vehicle's type
+  def vehicle_field(type = "a bike") = find_field("Select #{type}, choose multiple to compare them")
 
   # Page-wide, the filters' ~160 hidden options cost Capybara a round trip each, a pass outlasting its wait
   def vehicle_option = "#vehicle_models-hw-listbox [role='option']"
@@ -1630,7 +1631,7 @@ RSpec.describe "BikeBook", :js, type: :system do
 
     # a classification's exact id is an option, whose pick shows its /ebike-rules card above the vehicles, a US class's
     # its state jurisdiction's own with its rules
-    type_into(vehicle_field, "evc/us/class_3")
+    type_into(vehicle_field("an e-motorcycle"), "evc/us/class_3")
     retry_on_detach { find("[role='option'][data-value='evc/us/class_3']", text: "US Class 3").click }
     expect(page).to have_css("#classification-cards h3", exact_text: "Class 3")
     expect(page).to have_css(".hw-combobox__chip", text: "US Class 3")
@@ -1659,13 +1660,13 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(cards_asked.count).to eq 2
     expect(page.evaluate_script("window.fewestChips")).to eq 3
     # another's pick leaves the open one as it is, unrequested
-    type_into(vehicle_field, "evc/moped")
+    type_into(vehicle_field("an e-motorcycle"), "evc/moped")
     retry_on_detach { find("[role='option'][data-value='evc/moped']").click }
     expect(page).to have_css("#classification-cards h3", exact_text: "Moped, up to 2 hp and 30 mph", wait: 10)
     expect(page).to have_css("#classification-cards li", text: "Riders must be 16 or older to ride a Class 3")
     expect(cards_asked.count).to eq 3
     # as is an out of class marker, which the vocabulary has no record of, its card the e-moto's
-    type_into(vehicle_field, "evc/out_of_class/us/ca")
+    type_into(vehicle_field("an e-motorcycle"), "evc/out_of_class/us/ca")
     retry_on_detach { find("[role='option'][data-value='evc/out_of_class/us/ca']", text: "Out of class in California").click }
     expect(page).to have_css("#classification-cards h3", exact_text: "Not an e-bike", wait: 10)
     expect(page).to have_css(".hw-combobox__chip", text: "Out of class in California")

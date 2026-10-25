@@ -18,6 +18,16 @@ const panelOf = (root) => root.querySelector('[data-controller~="bikebook--catal
 const MARKET_ATTRIBUTE = 'data-bikebook--catalog-filters-default-market-value'
 const JURISDICTION_ATTRIBUTE = 'data-bikebook--catalog-filters-default-jurisdiction-value'
 
+// "Select an e-scooter, choose multiple to compare them" once the first of `vehicles` is one, both where the search
+// is labelled and its dialog on a phone
+const labelSearch = (root, { vehicle_type: types }, [first]) => {
+  const type = first && types.find(({ value }) => value === (first.data.type || 'bike'))?.display.toLowerCase()
+  if (!type) return
+  const text = `Select ${/^(?!uni)[aeiou]/.test(type) ? 'an' : 'a'} ${type}, choose multiple to compare them`
+  root.getElementById('vehicle-models-label').textContent = text
+  combobox(root, 'vehicle_models').querySelector('.hw-combobox__dialog__label').textContent = text
+}
+
 // The fields as `filters` set them, none of which needs the catalog
 const fillFields = (root, filters) => {
   panelOf(root).setAttribute('data-bikebook--catalog-filters-sort-value', filters.sort === 'price' ? 'price' : 'year')
@@ -165,6 +175,7 @@ export async function hydrate (catalog, source, shell, url) {
   const values = [...vehicles.map(({ value }) => value), ...cards].join(',')
 
   renderCounts(root, filteredCount)
+  labelSearch(root, catalog.options, vehicles)
   const manufacturers = catalog.options.manufacturer.length
   renderInto(root.getElementById('manufacturer-count'),
     html`(${numberDisplay(manufacturers)} ${tooltip({ text: `${manufacturers.toLocaleString('en-US')} manufacturers have models in the catalog` })})`)
