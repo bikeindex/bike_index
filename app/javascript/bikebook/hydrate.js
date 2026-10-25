@@ -24,6 +24,8 @@ const fillFields = (root, filters) => {
   for (const field of ['year', 'price']) panelOf(root).setAttribute(`data-bikebook--catalog-filters-${field}-dir-value`, filters[`${field}_dir`] === 'asc' ? 'asc' : 'desc')
   for (const name of [...LISTS, ...SINGLES]) root.getElementById(`${name}-hw-hidden-field`).setAttribute('value', filters[name])
   for (const name of RANGES) root.querySelector(`input[name="${name}"]`).setAttribute('value', filters[name])
+  const scope = root.querySelector(`input[name="market_scope"][value="${CSS.escape(filters.market_scope)}"]`) ?? root.querySelector('input[name="market_scope"][value=""]')
+  for (const input of root.querySelectorAll('input[name="market_scope"]')) input.toggleAttribute('checked', input === scope)
   const { jurisdiction } = filters
   const state = root.querySelector(`#jurisdiction-hw-listbox [role="option"][data-value="${CSS.escape(jurisdiction)}"]`)
   if (state) {

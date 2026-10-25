@@ -207,8 +207,22 @@
             label: translation(".handlebar_type"), placeholder: translation(".any_handlebar_type"))) %>
             </div>
 
-            <%= render(Pages::Bikebook::Show::FilterCombobox::Component.new(name: "market",
-          label: translation(".market"), placeholder: translation(".any_market"), rich_display: :inline)) %>
+            <div class="tw:flex tw:flex-col tw:gap-2">
+              <%= render(Pages::Bikebook::Show::FilterCombobox::Component.new(name: "market",
+            label: translation(".market"), placeholder: translation(".any_market"), any: false, rich_display: :inline)) %>
+
+              <fieldset
+                data-bikebook--catalog-filters-target="field"
+                data-action="change->bikebook--catalog-filters#apply"
+              >
+                <legend class="tw:sr-only">
+                  <%= translation(".market_scope") %>
+                </legend>
+
+                <%= render UI::Forms::RadioButtonGroup::Component.new(name: "market_scope", kind: :toggle, selected: "",
+                entries: market_scopes) %>
+              </fieldset>
+            </div>
 
             <div class="tw:flex tw:flex-col tw:gap-4 tw:sm:flex-row tw:sm:items-start">
               <fieldset

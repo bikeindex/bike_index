@@ -31,13 +31,16 @@ en:
           loading_placeholder: Loading…
           manufacturers: Manufacturers
           market: Market
+          market_scope: Models from other markets
           max: Max
           min: Min
           more_filters: More filters
+          only_your_market: Only your market
           out_of_class_details: >-
             Motorized, but none of US Classes 1, 2 or 3, like a moped, motorcycle
             or off-highway e-moto.
           out_of_class_label: Out of Class
+          prefer_your_market: Prefer your market
           price: Price
           propulsion: Propulsion
           search_placeholder: Search by manufacturer or model…

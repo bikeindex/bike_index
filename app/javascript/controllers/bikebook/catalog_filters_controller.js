@@ -4,6 +4,8 @@ import { readable, replaceUrl } from 'bikebook/replace_url'
 
 /* global CSS */
 
+const MARKET_FIELDS = ['market', 'market_scope']
+
 // Threads the filter panel's values into the vehicle combobox's async src and mirrors them
 // into the page URL, which the page renders the controls from (ui--collapse owns ?filters)
 export default class extends Controller {
@@ -108,7 +110,7 @@ export default class extends Controller {
     const classChecked = this.classificationTarget.querySelector('input:checked')
     this.#applyParams(url, {
       ...filters,
-      market: filters.market === this.defaultMarketValue ? '' : filters.market || 'all',
+      market: filters.market === this.defaultMarketValue ? '' : filters.market,
       jurisdiction: jurisdiction === this.defaultJurisdictionValue && !classChecked ? '' : jurisdiction,
       search: this.element.hidden ? '' : '1'
     })
@@ -116,12 +118,12 @@ export default class extends Controller {
     this.refreshClear()
   }
 
-  // A clear link's href: this page less its filters but the market and e-bike classification, which it renders afresh
-  // at their defaults. Set again as it's clicked, since the panel's own state and the picks reach the URL without a
-  // filter changing
+  // A clear link's href: this page less its filters but the market, how it narrows, and e-bike classification, which it
+  // renders afresh at their defaults. Set again as it's clicked, since the panel's own state and the picks reach the URL
+  // without a filter changing
   refreshClear () {
     const url = new URL(window.location)
-    for (const name of Object.keys(this.#filters).filter((name) => !['market', 'jurisdiction'].includes(name))) url.searchParams.delete(name)
+    for (const name of Object.keys(this.#filters).filter((name) => ![...MARKET_FIELDS, 'jurisdiction'].includes(name))) url.searchParams.delete(name)
     // propulsion shares classes' param
     if (this.#classes.length) url.searchParams.set('electric', this.#classes.join(','))
     for (const link of this.clearTargets) link.href = readable(url)
@@ -141,10 +143,10 @@ export default class extends Controller {
     for (const [key, value] of Object.entries(params)) value ? url.searchParams.set(key, value) : url.searchParams.delete(key)
   }
 
-  // a clear keeps the market and e-bike classification, so they alone - with the e-Vehicle (motorized) they check -
+  // a clear keeps the market, how it narrows, and e-bike classification, so they alone - with the e-Vehicle (motorized) they check -
   // leave nothing to clear
   #refreshSummary () {
-    const { market, jurisdiction, electric, ...filters } = this.#filters
+    const { market, market_scope: marketScope, jurisdiction, electric, ...filters } = this.#filters
     const kept = this.#classes.length ? [...this.#classes, '1'] : []
     const filtered = Object.values(filters).some(Boolean) || electric.split(',').some((value) => value && !kept.includes(value))
     for (const link of this.clearTargets) link.hidden = !filtered
@@ -157,9 +159,9 @@ export default class extends Controller {
     }))
   }
 
-  // Market is left out, as every visit starts with one
+  // The market's fields are left out, as every visit starts with them
   get #summary () {
-    return this.fieldTargets.filter((field) => !field.querySelector('input[name="market"]'))
+    return this.fieldTargets.filter((field) => !MARKET_FIELDS.some((name) => field.querySelector(`input[name="${name}"]`)))
       .map((field) => [field.dataset.filterLabel, this.#describe(field)])
       .filter(([, value]) => value)
   }
@@ -182,11 +184,11 @@ export default class extends Controller {
     return min ? `from ${min}` : max && `up to ${max}`
   }
 
-  // A set of checkboxes is one comma-joined value, blank when none is checked
+  // A set of checkboxes is one comma-joined value, blank when none is checked, and radios the checked one's
   get #filters () {
     const inputs = this.fieldTargets.flatMap((field) => [...field.querySelectorAll('input[name]')])
     return Object.fromEntries([...new Set(inputs.map(({ name }) => name))].map((name) => [name, inputs
-      .filter((input) => input.name === name && (input.type !== 'checkbox' || input.checked))
+      .filter((input) => input.name === name && (!['checkbox', 'radio'].includes(input.type) || input.checked))
       .map(({ value }) => value).join(',')]))
   }
 
