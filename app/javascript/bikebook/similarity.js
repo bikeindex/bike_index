@@ -1,5 +1,6 @@
 // How alike catalog models are, from the values the catalog publishes as `comparison`. The weights, scales and
-// presets are ours; the values are worked out by bikebook's Catalog::Comparison, so none is derived again here.
+// presets are ours; the values are worked out by bikebook's Catalog::Comparison, so none is derived again here but
+// the rider heights a size doesn't state.
 // Imported by the catalog's worker too, which has no importmap, so it imports nothing
 
 const FORMAT = 2
@@ -18,15 +19,23 @@ const MAX_SCORE = 0.8
 const MIN_SHARED = 0.4
 // an activity family with fewer values than this is scaled by the whole catalog's
 const MIN_FAMILY_VALUES = 30
-const FIXED_SCALES = { first_year: 2, groupset: 1 }
+const FIXED_SCALES = { first_year: 2, groupset: 1, rider_height: 60 }
+
+// in mm, the riders' heights between which every model comes in a size that fits: 5′5″ and 6′2″
+const SHORT = 1650
+const TALL = 1880
+// the span of riders' heights a size fits, where it states only one end or neither
+const SPAN = 100
+// a family with fewer sizes stating their riders than this estimates no others'
+const MIN_FIT_SIZES = 100
 
 // more than the model's as far as this much of the same less is, as a roomier frame still fits its tires
 const ROOMIER = 0.75
 
 // the kinds whose same is a match rather than a nearness, which a slider at its top requires
-const REQUIRABLE = ['same', 'set', 'year']
+const REQUIRABLE = ['same', 'set', 'year', 'fit']
 // the kinds measured in their field's scales
-const SCALED = ['numeric', 'year', 'roomier']
+const SCALED = ['numeric', 'year', 'roomier', 'fit']
 
 const complete = ({ model_configuration: configuration }) => configuration === 'complete'
 const numeric = (a, b, scale) => a === b ? 0 : Math.min(CAP, Math.abs(a - b) / scale)
@@ -37,6 +46,8 @@ const KINDS = {
   // a numeric whose same is a match, as a model's first year is
   year: numeric,
   roomier: (a, b, scale) => numeric(a, b, scale) * (b > a ? ROOMIER : 1),
+  // a rider's height from the heights a model's sizes fit, [shortest, tallest]
+  fit: (height, [smallest, largest], scale) => Math.min(CAP, Math.max(0, smallest - height, height - largest) / scale),
   same: (a, b) => a === b ? 0 : MISMATCH,
   set: (a, b) => a.length === b.length && a.every((value) => b.includes(value)) ? 0 : MISMATCH,
   overlap: (a, b) => MISMATCH * (1 - a.filter((value) => b.includes(value)).length / new Set([...a, ...b]).size)
@@ -45,10 +56,13 @@ const KINDS = {
 // Each slider's fields, each of `kind`, and what its top end matches where that isn't its label; battery size and price
 // are compared by their logs, so twice the price is as far at any price. A field's `shares` of its slider's weight are 1
 // unless it says otherwise, and `separate` fields measure different things, so their slider's weight grows by the root of
-// how many the model lists
+// how many the model lists. `unlisted` says why a model has none of a slider's values
 export const GROUPS = {
   handlebar: { label: 'Handlebar type', fields: { handlebar_type: 'same' } },
   geometry: { label: 'Geometry', separate: true, shares: { head_angle: 3 }, fields: { head_angle: 'numeric', seat_angle: 'numeric', stack_reach: 'numeric', bb_drop: 'numeric', chainstay_gap: 'numeric' } },
+  fit: { label: 'Rider size', unlisted: 'Only for sizes fitting riders under 5′5″ or over 6′2″', fields: { rider_height: 'fit' } },
+  // a kids' bike unlike any other, a women's or adaptive one only a little
+  riders: { label: 'Target riders', shares: { kid: 3 }, fields: { kid: 'same', target_riders: 'set' } },
   tires: { label: 'Tire clearance', fields: { tire_clearance: 'roomier' } },
   suspension: { label: 'Suspension', same: 'suspension travel', fields: { travel_front: 'numeric', travel_rear: 'numeric', suspension: 'same' } },
   ebike: { label: 'E-vehicle motor and battery', same: 'motor and battery attributes', fields: { modes: 'set', assist_speed: 'numeric', throttle_speed: 'numeric', battery_size: 'numeric', motor_kind: 'same' } },
@@ -62,7 +76,7 @@ export const GROUPS = {
 }
 
 // weight low by default, as much of it is what the others weigh already
-const GENERAL = { handlebar: 5, geometry: 4, tires: 4, suspension: 3, ebike: 3, groupset: 2, price: 2, material: 2, weight: 1, mounts: 1, year: 1, activity: 1 }
+const GENERAL = { handlebar: 5, geometry: 4, fit: 4, riders: 3, tires: 4, suspension: 3, ebike: 3, groupset: 2, price: 2, material: 2, weight: 1, mounts: 1, year: 1, activity: 1 }
 export const PRESETS = {
   general: { label: 'Default weights', weights: GENERAL }
 }
@@ -125,6 +139,13 @@ const iqr = (values) => {
   return quantile(sorted, 0.75) - quantile(sorted, 0.25)
 }
 const log = (value) => value > 0 ? Math.log(value) : null
+const mean = (values) => values.reduce((sum, value) => sum + value, 0) / values.length
+// the least squares line through `points`, [x, y]
+const line = (points) => {
+  const [meanX, meanY] = [0, 1].map((axis) => mean(points.map((point) => point[axis])))
+  const slope = mean(points.map(([x, y]) => (x - meanX) * (y - meanY))) / mean(points.map(([x]) => (x - meanX) ** 2))
+  return (x) => meanY + slope * (x - meanX)
+}
 
 // Scores the catalog's `models`, in the index's order, which the comparison's columns are in. Null for a format it
 // doesn't know
@@ -134,6 +155,10 @@ export const scorer = (models, { format, fields }, activities) => {
   const familyBySlug = new Map(activities.map(({ slug, family }) => [slug, family]))
   const families = models.map((model) => familyBySlug.get(model.primary_activity) ?? null)
   const attribute = (key) => models.map((model) => model[key] ?? null)
+  // a field a catalog published before bikebook added it lacks
+  const unpublished = models.map(() => null)
+  const riders = fields.target_riders && models.map((_, index) => fields.target_riders[index] ?? [])
+  const kids = riders?.map((each) => each.includes('kid')) ?? unpublished
   const columns = {
     ...fields,
     battery_size: fields.battery_size.map(log),
@@ -144,10 +169,41 @@ export const scorer = (models, { format, fields }, activities) => {
     // its first, as one still sold isn't as new as it is current
     first_year: attribute('first_year'),
     price: models.map((model) => log(model.msrp_cents)),
-    // which a catalog published before bikebook added it lacks
-    frame_material: fields.frame_material ?? models.map(() => null)
+    frame_material: fields.frame_material ?? unpublished,
+    kid: kids,
+    target_riders: riders?.map((each) => each.filter((rider) => rider !== 'kid')) ?? unpublished
   }
   const indexes = new Map(models.map((model, index) => [model.id, index]))
+
+  // Each size's riders' heights, [shortest, tallest], as it states them, else about the line through the middles of
+  // those its family's sizes state, by its stack plus reach, as a mountain bike's frame is longer than a road bike's for
+  // the same rider, or a kids' by its wheel size
+  const sizeValue = (field, index, size) => fields[field]?.[index]?.[size] ?? null
+  const stated = (index, size) => {
+    const [min, max] = ['size_min_rider_height', 'size_max_rider_height'].map((field) => sizeValue(field, index, size))
+    return min == null && max == null ? null : [min ?? max - SPAN, max ?? min + SPAN]
+  }
+  const measure = (index, size) => {
+    if (kids[index]) return fields.front_bsd[index]
+    const [stack, reach] = ['size_stack', 'size_reach'].map((field) => sizeValue(field, index, size))
+    return stack == null || reach == null ? null : stack + reach
+  }
+  const fitFamily = (index) => kids[index] ? 'kid' : families[index]
+  const sizes = models.map((_, index) => Array.from({ length: fields.size_names?.[index]?.length ?? 0 },
+    (_, size) => ({ stated: stated(index, size), measure: measure(index, size) })))
+  const stating = sizes.flatMap((each, index) => each.filter(({ stated, measure }) => stated != null && measure != null)
+    .map(({ stated: [min, max], measure }) => [fitFamily(index), measure, (min + max) / 2]))
+  const lines = new Map([...new Set(stating.map(([family]) => family))]
+    .map((family) => [family, stating.filter((point) => point[0] === family).map(([, measure, middle]) => [measure, middle])])
+    .filter(([, points]) => points.length >= MIN_FIT_SIZES).map(([family, points]) => [family, line(points)]))
+  const heights = sizes.map((each, index) => each.map(({ stated, measure }) => {
+    const estimate = lines.get(fitFamily(index))
+    return stated ?? (estimate && measure != null ? [estimate(measure) - SPAN / 2, estimate(measure) + SPAN / 2] : null)
+  }))
+  columns.rider_height = heights.map((each) => {
+    const known = each.filter(Boolean)
+    return known.length ? [Math.min(...known.map(([min]) => min)), Math.max(...known.map(([, max]) => max))] : null
+  })
 
   // each numeric field's interquartile range in a family, or in the catalog where the family has too few values
   const scales = new Map()
@@ -163,18 +219,25 @@ export const scorer = (models, { format, fields }, activities) => {
 
   // The `COUNT` models most like the one `id` names by `weights`, narrowed as settingsFrom's settings say, each the
   // closest of its model group and never of its own; and the sliders whose fields it has values for. `otherPropulsion`
-  // leaves its e-bike fields unscored, and `sameWheels` requires only the wheels it lists
-  return (id, { weights, skipManufacturer, otherPropulsion, sameConfiguration, sameWheels, differentTypes }) => {
+  // leaves its e-bike fields unscored, and `sameWheels` requires only the wheels it lists. Its sizes' index `size` is
+  // the rider's, whose fit is scored only where it's shorter or taller than any model fits
+  return (id, { weights, skipManufacturer, otherPropulsion, sameConfiguration, sameWheels, differentTypes, size }) => {
     const target = indexes.get(id)
     if (target == null) return null
 
     const model = models[target]
     const family = families[target]
+    const [min, max] = heights[target][size] ?? []
+    const height = min == null ? null : (min + max) / 2
+    const own = {
+      ...Object.fromEntries(Object.keys(columns).map((field) => [field, columns[field][target]])),
+      rider_height: height != null && (height < SHORT || height > TALL) ? height : null
+    }
     // each slider's weight shared among the fields the model lists, so a rigid bike, listing no travel, counts its suspension in full
     const listed = Object.entries(GROUPS).flatMap(([group, { fields, separate, shares = {} }]) => {
-      const own = Object.entries(fields).filter(([field]) => columns[field][target] != null)
-      const divisor = own.reduce((sum, [field]) => sum + (shares[field] ?? 1), 0) / (separate ? Math.sqrt(own.length) : 1)
-      return own.map(([field, kind]) => ({
+      const listed = Object.entries(fields).filter(([field]) => own[field] != null)
+      const divisor = listed.reduce((sum, [field]) => sum + (shares[field] ?? 1), 0) / (separate ? Math.sqrt(listed.length) : 1)
+      return listed.map(([field, kind]) => ({
         group,
         field,
         kind,
@@ -186,7 +249,7 @@ export const scorer = (models, { format, fields }, activities) => {
     const weighted = listed.filter(({ group, weight }) => weight > 0 && !(otherPropulsion && group === 'ebike'))
     const available = weighted.reduce((total, { weight }) => total + weight, 0)
     const required = [...weighted.filter(({ group, kind }) => weights[group] === MAX_WEIGHT && REQUIRABLE.includes(kind)),
-      ...(sameWheels ? ['front_bsd', 'rear_bsd'].filter((field) => columns[field][target] != null).map((field) => ({ field, kind: 'same' })) : [])]
+      ...(sameWheels ? ['front_bsd', 'rear_bsd'].filter((field) => own[field] != null).map((field) => ({ field, kind: 'same' })) : [])]
     if (!available) return { groups, models: [] }
 
     const scored = []
@@ -195,7 +258,7 @@ export const scorer = (models, { format, fields }, activities) => {
         (!differentTypes && candidate.vehicle_type !== model.vehicle_type) ||
         (sameConfiguration && complete(candidate) !== complete(model)) ||
         (skipManufacturer && candidate.manufacturer === model.manufacturer) ||
-        required.some(({ field, kind, scale }) => columns[field][index] == null || KINDS[kind](columns[field][target], columns[field][index], scale) > 0)) return
+        required.some(({ field, kind, scale }) => columns[field][index] == null || KINDS[kind](own[field], columns[field][index], scale) > 0)) return
 
       let shared = 0
       let total = 0
@@ -205,7 +268,7 @@ export const scorer = (models, { format, fields }, activities) => {
         if (value == null || (field === 'price' && candidate.msrp_currency !== model.msrp_currency) ||
           (field === 'total_weight' && complete(candidate) !== complete(model))) continue
         shared += weight
-        total += weight * KINDS[kind](columns[field][target], value, scale)
+        total += weight * KINDS[kind](own[field], value, scale)
       }
       const score = (total + (available - shared) * UNLISTED) / available
       if (shared >= MIN_SHARED * available && score < MAX_SCORE) scored.push({ index, score })
