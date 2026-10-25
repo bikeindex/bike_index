@@ -3,7 +3,7 @@ module Counts
 
   STORAGE_KEY = "counts_#{Rails.env}".freeze
 
-  COUNT_KEYS = %w[total_bikes stolen_bikes recoveries recoveries_value week_creation_chart logged_searches organizations].freeze
+  COUNT_KEYS = %w[total_bikes stolen_bikes recoveries recoveries_value week_creation_chart organizations].freeze
 
   LOGGED_SEARCH_KINDS = %w[web_bikebook web_ebike_rules organized organized_serial user user_serial web_marketplace].freeze
 

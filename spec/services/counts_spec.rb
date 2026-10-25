@@ -6,7 +6,7 @@ RSpec.describe Counts do
 
   describe "counts_keys" do
     it "has things" do
-      expect(Counts.count_keys.count).to eq 7
+      expect(Counts.count_keys.count).to eq 6
       expect(Counts.count_keys).to include("total_bikes")
       expect(Counts.count_keys).to include("organizations")
     end
