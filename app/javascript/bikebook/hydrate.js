@@ -90,7 +90,7 @@ const similarOf = async (catalog, url, vehicles) => {
   if (!catalog.comparable || !vehicles.length) return null
   const [{ value, data }] = vehicles
   const [size] = chosenSizes([{ key: value, data }], { picked: pickedSizes(url), preferred: preferredSize() })
-  const settings = { ...settingsFrom(url.searchParams), size: array(data.sizes).indexOf(size) }
+  const settings = settingsFrom(url.searchParams, array(data.sizes).indexOf(size))
   return { ...settings, results: url.searchParams.get('similar') === '1' ? await catalog.similar(value, settings) : undefined }
 }
 

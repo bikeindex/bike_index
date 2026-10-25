@@ -1912,7 +1912,7 @@ RSpec.describe "BikeBook", :js, type: :system do
         const propulsions = ['', 'other_propulsion=1'].map((query) => score('e', settingsFrom(new URLSearchParams(query))).models.map(({ id }) => id))
         const materials = scoring([model('a', false), model('steel', false), model('aluminum', false)], { frame_material: ['aluminum', 'steel', 'aluminum'] })
         const bars = scoring([model('a', false, 'drop_bar'), model('flat', false, 'horizontal'), model('drop', false, 'drop_bar')])
-        const ids = (score, query = '', size) => score('a', { ...settingsFrom(new URLSearchParams(query)), size }).models.map(({ id }) => id)
+        const ids = (score, query = '', size) => score('a', settingsFrom(new URLSearchParams(query), size)).models.map(({ id }) => id)
         const types = scoring([model('a', false), { ...model('cargo', false), vehicle_type: 'cargo_bike' }, model('bike', false)])
         const far = scoring([model('a', false), model('near', false), model('far', false)],
           Object.fromEntries(Object.entries(alike).map(([name, value]) => [name, [value, value, value + 10]])))
