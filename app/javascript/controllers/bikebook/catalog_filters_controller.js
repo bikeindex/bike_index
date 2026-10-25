@@ -9,7 +9,7 @@ const MARKET_FIELDS = ['market', 'market_scope']
 // Threads the filter panel's values into the vehicle combobox's async src and mirrors them
 // into the page URL, which the page renders the controls from (ui--collapse owns ?filters)
 export default class extends Controller {
-  static targets = ['vehicleCombobox', 'yearArrow', 'priceArrow', 'summary', 'field', 'classification', 'clear']
+  static targets = ['vehicleCombobox', 'yearArrow', 'priceArrow', 'summary', 'field', 'classification', 'clear', 'marketScope', 'marketName']
   static values = {
     sort: { type: String, default: 'year' },
     yearDir: { type: String, default: 'desc' },
@@ -22,6 +22,7 @@ export default class extends Controller {
   // whose empty fields would clear the URL's filters
   connect () {
     this.#showSort()
+    this.#showMarket()
     this.#showClasses()
     this.#classifyPropulsion()
     this.#refreshSummary()
@@ -44,6 +45,7 @@ export default class extends Controller {
   // the page follows the URL's filters
   apply () {
     this.#orderRanges()
+    this.#showMarket()
     this.#showClasses()
     this.#classifyPropulsion()
     this.#syncCombobox()
@@ -63,6 +65,14 @@ export default class extends Controller {
     const fields = RANGES.map((name) => this.element.querySelector(`input[name="${name}"]`))
     const values = ordered(Object.fromEntries(fields.map(({ name, value }) => [name, value])))
     for (const field of fields) field.value = values[field.name]
+  }
+
+  // How the market narrows names it, as the catalog does once it's in, and it narrows nothing without one
+  #showMarket () {
+    const { market } = this.#filters
+    this.marketScopeTarget.hidden = !market
+    const name = this.element.querySelector(`#market-hw-listbox [role="option"][data-value="${CSS.escape(market)}"]`)?.dataset.name
+    if (name) for (const target of this.marketNameTargets) target.textContent = name
   }
 
   // The classes are the US market's, by state - a state without its own uses the US ones - and a hidden

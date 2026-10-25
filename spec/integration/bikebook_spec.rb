@@ -629,7 +629,7 @@ RSpec.describe "BikeBook", :js, type: :system do
     find("#market-hw-listbox [role='option']", text: "United States (US)").click
     # any market's models, as the clears above kept it
     expect(page).to have_css("#vehicle-models-count", exact_text: "(33 matching models)")
-    choose "Only your market", allow_label_click: true
+    choose "Only United States", allow_label_click: true
     expect(page).to have_css("#vehicle-models-count", exact_text: "(26 matching models)")
     check "US Class 2"
     expect(page).to have_css("#vehicle-models-count", exact_text: "(18 matching models)")
@@ -639,7 +639,7 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(page).to have_css("#vehicle-models-count", exact_text: "(18 matching models)")
     expect(page).to have_no_current_path(/suspension/)
     expect(page).to have_checked_field("US Class 2").and have_checked_field("e-Vehicle (motorized)").and have_field("Market", with: "United States (US)")
-      .and have_checked_field("Only your market", visible: :all)
+      .and have_checked_field("Only United States", visible: :all)
     expect(page).to have_current_path(/[?&]market=US\b/).and have_current_path(/[?&]electric=1,class_2(&|\z)/)
       .and have_current_path(/[?&]market_scope=only\b/)
 
@@ -736,7 +736,8 @@ RSpec.describe "BikeBook", :js, type: :system do
     markets = all("#market-hw-listbox [role='option']").map(&:text)
     expect(markets).to eq ["Canada (CA)", "China (CN)", "United Arab Emirates (AE)", "United States (US)"]
     find_field("Market").send_keys(:escape)
-    expect(page).to have_checked_field("Prefer your market", visible: :all)
+    # named for the visitor's market
+    expect(page).to have_checked_field("Prefer vehicles Canada", visible: :all)
     choose "Any market", allow_label_click: true
     expect(page).to have_css("#vehicle-models-count", exact_text: "(33 matching models)")
     # a model sold outside the visitor's market names where it is
@@ -747,21 +748,24 @@ RSpec.describe "BikeBook", :js, type: :system do
     page.evaluate_script("new Promise((resolve) => setTimeout(resolve, 1100))")
     expect(logged.last).to end_with "&market_scope=any&q=Specialized+Haul+ST+%282025%29"
     # its own models alone
-    choose "Only your market", allow_label_click: true
+    choose "Only Canada", allow_label_click: true
     expect(page).to have_css("#vehicle-models-count", exact_text: "(6 matching models)")
     type_into(find_field("Market"), "united")
     find("#market-hw-listbox [role='option']", text: "United States (US)").click
     expect(page).to have_css("#vehicle-models-count", exact_text: "(26 matching models)")
+    # and then for the one picked
+    expect(page).to have_checked_field("Only United States", visible: :all).and have_field("Prefer vehicles United States", visible: :all)
     expect(page).to have_current_path(/[?&]market=US\b/)
     page.evaluate_script("new Promise((resolve) => setTimeout(resolve, 1100))")
     expect(logged.last).to eq "count=0&market=US&market_scope=only&q=Specialized+Haul+ST+%282025%29"
     # and stays out of the collapsed filters' summary
     expect(find("[aria-label='Applied filters']", visible: :all).text(:all)).to be_empty
 
-    # a market the catalog has no models in searches them all
+    # a market the catalog has no models in searches them all, with nothing for it to narrow
     page.driver.with_playwright_page { it.set_extra_http_headers("CF-IPCountry" => "JP") }
     visit bikebook_path
     expect(page).to have_css("#vehicle-models-count", exact_text: "(33 matching models)", wait: 10)
+    expect(page).to have_css("fieldset[hidden] input[name='market_scope']", count: 3, visible: :all)
 
     # and a visitor Cloudflare can't place searches the US
     page.driver.with_playwright_page { it.set_extra_http_headers("CF-IPCountry" => "XX") }
