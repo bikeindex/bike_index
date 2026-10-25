@@ -87,17 +87,17 @@ export async function unpickedVehicles (catalog, page, url) {
 const pickedOf = (catalog, url, { market }) => catalog.vehicles(url.searchParams.get('vehicle_models')?.split(',') ?? [], { market })
 
 // The models most like the first of `vehicles` where the catalog publishes what it compares, scored once their section
-// is open
-const similarOf = async (catalog, url, vehicles) => {
+// is open, of those the `filters`' market leaves
+const similarOf = async (catalog, url, vehicles, filters) => {
   if (!catalog.comparable || !vehicles.length) return null
   const settings = settingsFrom(url.searchParams)
-  return { ...settings, results: url.searchParams.get('similar') === '1' ? await catalog.similar(vehicles[0].value, settings) : undefined }
+  return { ...settings, results: url.searchParams.get('similar') === '1' ? await catalog.similar(vehicles[0].value, settings, filters) : undefined }
 }
 
 // The similar models' cards for `vehicle` by its `settings`, which change without rendering the page afresh
 export async function rescoredSimilar (catalog, page, url, vehicle, settings) {
   const filters = filtersAt(catalog, page, url)
-  return new VehicleViewer(catalog.kit, catalog.vocabulary, filters).similarResults(url, await catalog.similar(vehicle, settings))
+  return new VehicleViewer(catalog.kit, catalog.vocabulary, filters).similarResults(url, await catalog.similar(vehicle, settings, filters))
 }
 
 // the model group `url`'s overview shows, of one of its vehicles
@@ -115,7 +115,7 @@ export async function pickedVehicles (catalog, page, url) {
   const [found, group] = await Promise.all([pickedOf(catalog, url, filters), groupOf(catalog, url)])
   const vehicles = found.slice(0, MAX_COMPARE)
   return new VehicleViewer(catalog.kit, catalog.vocabulary, filters).render(vehicles, url, preferredSize(), {},
-    { group, similar: await similarOf(catalog, url, vehicles) })
+    { group, similar: await similarOf(catalog, url, vehicles, filters) })
 }
 
 // The page at `url` while the catalog loads: its filters live and filled in from the URL, their values as it has them, and
@@ -190,7 +190,7 @@ export async function hydrate (catalog, source, shell, url) {
     if (classification && !classification.marker) input.closest('label').after(fragmentOf(tooltip({ text: classification.title, body: viewer.presenter.classificationTooltip(id) })))
   }
 
-  const similar = await similarOf(catalog, url, vehicles)
+  const similar = await similarOf(catalog, url, vehicles, filters)
   renderInto(root.getElementById('vehicle-viewers'), viewer.render(vehicles, url, preferredSize(),
     vehicles.length ? {} : await unpicked(catalog, root, filters), { group, similar }))
   for (const slot of root.querySelectorAll('[data-similar-slot]')) renderInto(slot, viewer.compareToggle(vehicles, similar))

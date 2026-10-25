@@ -1903,6 +1903,13 @@ RSpec.describe "BikeBook", :js, type: :system do
     # a human powered model's matching e-vehicles, and neither for a type that's always electric
     visit bikebook_path(vehicle_models: "m/specialized/2027/crux_5_s_level_sram_red_xplr", similar: 1, adjust: 1)
     expect(page).to have_field("Show matching e-bikes", wait: 10)
+    # of the models the search's market leaves, as its e-bikes are Canada's, Canada's Haul ST rather than the closer US
+    # one, until any market will do
+    visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_rec", market: "CA", similar: 1, skip_manufacturer: 1, different_types: 1,
+      search: 1, filters: 1)
+    expect(page).to have_css("#similar-m-specialized-2025-haul_st_ca", wait: 10).and have_no_css("#similar-m-specialized-2025-haul_st")
+    choose "Any market", allow_label_click: true
+    expect(page).to have_css("#similar-m-specialized-2025-haul_st").and have_no_css("#similar-m-specialized-2025-haul_st_ca")
     visit bikebook_path(vehicle_models: "m/segway/2025/gt3_pro", similar: 1, adjust: 1)
     expect(page).to have_css("legend", exact_text: "Other settings", wait: 10)
     expect(page).to have_no_text("Show matching")

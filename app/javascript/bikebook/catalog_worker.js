@@ -132,11 +132,12 @@ const scorer = () => {
   return similarity
 }
 
-// the last scoring kept, as the page asks again on each render while the section is open
-async function similar ({ model, settings }) {
+// the last scoring kept, as the page asks again on each render while the section is open. Of the models `market` and
+// its `scope` leave, as the search's are
+async function similar ({ model, settings, market, scope }) {
   const score = await scorer()
-  const key = JSON.stringify({ model, settings })
-  if (lastSimilar?.key !== key) lastSimilar = { key, result: score?.(model, settings) ?? null }
+  const key = JSON.stringify({ model, settings, market, scope })
+  if (lastSimilar?.key !== key) lastSimilar = { key, result: score?.(model, settings, (candidate) => !market || inMarket(candidate, market, scope)) ?? null }
   return lastSimilar.result
 }
 

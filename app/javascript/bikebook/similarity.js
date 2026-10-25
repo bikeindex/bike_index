@@ -162,9 +162,9 @@ export const scorer = (models, { format, fields }, activities) => {
   }
 
   // The `COUNT` models most like the one `id` names by `weights`, narrowed as settingsFrom's settings say, each the
-  // closest of its model group and never of its own; and the sliders whose fields it has values for. `otherPropulsion`
-  // leaves its e-bike fields unscored, and `sameWheels` requires only the wheels it lists
-  return (id, { weights, skipManufacturer, otherPropulsion, sameConfiguration, sameWheels, differentTypes }) => {
+  // closest of its model group and never of its own, of those `included`; and the sliders whose fields it has values for.
+  // `otherPropulsion` leaves its e-bike fields unscored, and `sameWheels` requires only the wheels it lists
+  return (id, { weights, skipManufacturer, otherPropulsion, sameConfiguration, sameWheels, differentTypes }, included = () => true) => {
     const target = indexes.get(id)
     if (target == null) return null
 
@@ -191,7 +191,7 @@ export const scorer = (models, { format, fields }, activities) => {
 
     const scored = []
     models.forEach((candidate, index) => {
-      if (index === target || candidate.group_key === model.group_key || (candidate.electric === model.electric) === otherPropulsion ||
+      if (index === target || candidate.group_key === model.group_key || (candidate.electric === model.electric) === otherPropulsion || !included(candidate) ||
         (!differentTypes && candidate.vehicle_type !== model.vehicle_type) ||
         (sameConfiguration && complete(candidate) !== complete(model)) ||
         (skipManufacturer && candidate.manufacturer === model.manufacturer) ||

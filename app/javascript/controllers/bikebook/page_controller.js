@@ -98,13 +98,13 @@ export default class extends Controller {
   }
 
   // A filter changes in place, which with nothing picked the featured models and their count follow, and the picked
-  // ones a jurisdiction or market, which decide which are out of class and which are sold elsewhere, unless the page
-  // renders or the filters change again first
+  // ones a jurisdiction or market, which decide which are out of class, which are sold elsewhere and which similar ones
+  // show, unless the page renders or the filters change again first
   async refilter () {
     const viewers = this.pageTarget.querySelector('#vehicle-viewers')
     const url = new URL(window.location.href)
     const unpicked = viewers?.querySelector(':scope > [data-controller~="bikebook--tips"]')
-    const placeChanged = ['jurisdiction', 'market'].some((name) => url.searchParams.get(name) !== this.#renderedUrl?.searchParams.get(name))
+    const placeChanged = ['jurisdiction', 'market', 'market_scope'].some((name) => url.searchParams.get(name) !== this.#renderedUrl?.searchParams.get(name))
     if (!this.catalog || !viewers || (!unpicked && !placeChanged)) return
 
     const render = this.#renders

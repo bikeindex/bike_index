@@ -40,7 +40,7 @@ export async function loadCatalog (manifestUrl, ids = [], jurisdictions = {}) {
       options,
       comparable,
       // null, as for a comparison format it doesn't know, where the comparison doesn't load
-      similar: (model, settings) => call('similar', { model, settings }).catch((error) => {
+      similar: (model, settings, { market, market_scope: scope }) => call('similar', { model, settings, market, scope }).catch((error) => {
         console.error(error)
         return null
       }),
