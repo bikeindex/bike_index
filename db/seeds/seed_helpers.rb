@@ -5,6 +5,9 @@ module SeedHelpers
   extend Functionable
   extend ActiveSupport::Testing::TimeHelpers
 
+  # Published in the README, and .github/workflows/ios-e2e.yml signs in with it
+  PASSWORD = "pleaseplease12"
+
   # Seeded records are timestamped across the last week, rather than all at once:
   # the clock starts a week ago and each tick moves it forward, stopping at now.
   # Later seeds and jobs touch earlier records, so updated_at is reset to match
