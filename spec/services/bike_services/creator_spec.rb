@@ -271,7 +271,7 @@ RSpec.describe BikeServices::Creator do
       let!(:creator) { FactoryBot.create(:organization_user, organization:) }
       let(:state) { FactoryBot.create(:state_new_york) }
       let(:address_record_attributes) do
-        {street: "278 Broadway", city: "New York", postal_code: "10007", region_record_id: state.id, country_id: Country.united_states_id}
+        {street: "1 Main St", city: "Brooklyn", postal_code: "11222", region_record_id: state.id, country_id: Country.united_states_id}
       end
       let(:b_param) do
         BParam.create(origin: "organization_form", creator_id: creator.id, params: {
