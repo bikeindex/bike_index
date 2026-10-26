@@ -44,10 +44,6 @@ module Geocodeable
     latitude.present?
   end
 
-  def without_location?
-    latitude.blank?
-  end
-
   def without_street?
     street.blank?
   end
