@@ -1,6 +1,7 @@
 import { Controller } from '@hotwired/stimulus'
+import { storage } from 'utils/storage'
 
-/* global localStorage, setTimeout, clearTimeout, Date, window, CustomEvent, Event, CSS */
+/* global setTimeout, clearTimeout, Date, window, CustomEvent, Event, CSS */
 
 // Connects to data-controller="form-persist"
 // Mirrors form fields to localStorage so a draft survives page reloads —
@@ -19,14 +20,6 @@ import { Controller } from '@hotwired/stimulus'
 // older than TTL_MS.
 const DEBOUNCE_MS = 400
 const TTL_MS = 604800000 // 1 week
-
-// Where site data is blocked, even reading the localStorage property throws - and a full
-// quota throws on write
-const withStorage = (callback) => {
-  try {
-    callback(localStorage)
-  } catch {}
-}
 
 export default class extends Controller {
   static values = { key: String, save: Boolean }
@@ -69,7 +62,7 @@ export default class extends Controller {
   clear () {
     clearTimeout(this.timer)
     this.timer = null
-    withStorage((storage) => storage.removeItem(this.storageKey))
+    storage.removeItem(this.storageKey)
   }
 
   // Stored values only fill fields the server rendered empty — a field the
@@ -127,12 +120,12 @@ export default class extends Controller {
       data[hidden.name] = hidden.value
       data[`${hidden.name}::display`] = display.value
     })
-    withStorage((storage) => storage.setItem(this.storageKey, JSON.stringify({ savedAt: Date.now(), data })))
+    storage.setItem(this.storageKey, JSON.stringify({ savedAt: Date.now(), data }))
   }
 
   read () {
     try {
-      const { savedAt, data } = JSON.parse(localStorage.getItem(this.storageKey)) || {}
+      const { savedAt, data } = JSON.parse(storage.getItem(this.storageKey)) || {}
       if (savedAt == null || Date.now() - savedAt > TTL_MS) {
         this.clear()
         return {}
