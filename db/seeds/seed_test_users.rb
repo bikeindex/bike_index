@@ -3,7 +3,8 @@
 #
 # Idempotent, keyed on email: sandbox/review databases are long-lived and only
 # seed on first boot, so bin/docker-entrypoint re-runs this every deploy to
-# (re)create any account missing from databases that already exist.
+# create any account missing from databases that already exist. An existing
+# account, deleted included, is left alone, superuser ability and all.
 
 user_attrs = {
   admin: {name: "Admin User", email: "admin@bikeindex.org", password: "pleaseplease12", password_confirmation: "pleaseplease12", terms_of_service: true, vendor_terms_of_service: true, when_vendor_terms_of_service: Time.current},
@@ -19,9 +20,9 @@ user_attrs = {
 
 require File.expand_path("db/seeds/seed_helpers", Rails.root)
 
-user_attrs.values.each do |attributes|
-  next if User.find_by_email(attributes[:email])
+new_user_attrs = user_attrs.reject { |_key, attributes| User.unscoped.exists?(email: attributes[:email]) }
 
+new_user_attrs.each_value do |attributes|
   SeedHelpers.tick
   new_user = User.create! attributes
   new_user.confirm(new_user.confirmation_token)
@@ -29,11 +30,12 @@ user_attrs.values.each do |attributes|
 end
 
 # dev is a superuser too - some admin pages require both
-user_attrs.values_at(:admin, :dev).each do |attributes|
-  SuperuserAbility.find_or_create_by!(user: User.find_by(email: attributes[:email]))
+superuser_attrs = new_user_attrs.values_at(:admin, :dev).compact
+superuser_attrs.each do |attributes|
+  SuperuserAbility.create!(user: User.find_by(email: attributes[:email]))
 end
 
 # Group gate rather than per-actor — opting out writes users.feature_registration_show_legacy
-Flipper.enable_group(:bike_show_redesign_toggle, :superusers)
+Flipper.enable_group(:bike_show_redesign_toggle, :superusers) if superuser_attrs.any?
 
 puts "Users added successfully\n"

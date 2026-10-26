@@ -39,7 +39,11 @@ SQL
   # exist. Nothing schedules the Stripe price sync, and review apps carry
   # test-mode keys, so sync the real prices over the seeded placeholders.
   if [ "$RAILS_ENV" == "sandbox" ]; then
-    ./bin/rails runner 'StripeJobs::UpdatePricesJob.perform_async; load "db/seeds/seed_test_users.rb"; load "db/seeds/seed_transfer_bike.rb"; load "db/seeds/seed_oauth_app.rb"' || true
+    ./bin/rails runner 'StripeJobs::UpdatePricesJob.perform_async' || true
+    # A runner each, so one seed raising doesn't skip the rest
+    for seed in seed_test_users seed_transfer_bike seed_oauth_app; do
+      ./bin/rails runner "load \"db/seeds/$seed.rb\"" || true
+    done
   fi
 fi
 

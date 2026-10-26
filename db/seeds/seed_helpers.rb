@@ -15,10 +15,14 @@ module SeedHelpers
     yield
     sync_updated_at(since: clock_start)
   ensure
+    @clock_end = nil
     travel_back
   end
 
+  # A no-op outside with_clock, where bin/docker-entrypoint runs a seed on its own
   def tick
+    return unless @clock_end
+
     travel_to([Time.current + rand(60..130).minutes, @clock_end].min)
   end
 
@@ -60,5 +64,27 @@ module SeedHelpers
     total = prioritized.sum { |_id, priority| priority }
     target = rand(total)
     prioritized.find { |_id, priority| (target -= priority) < 0 }.first
+  end
+
+  def bike_params(owner_email:, manufacturer_id: nil)
+    {
+      cycle_type: "bike",
+      propulsion_type: "foot-pedal",
+      serial_number: (0...10).map { rand(65..90).chr }.join,
+      manufacturer_id: manufacturer_id || weighted_frame_maker_id,
+      primary_frame_color_id: Color.pluck(:id).sample,
+      rear_tire_narrow: "true",
+      handlebar_type: HandlebarType.slugs.first,
+      owner_email:
+    }
+  end
+
+  def seed_bike(creator:, user:, params:, origin: nil, label: "bike")
+    tick
+    b_param = BParam.create!(creator: user, params:)
+    b_param.origin = origin if origin
+    bike = creator.create_bike(b_param)
+    puts "\n #{label} error \n #{b_param.bike_errors}" if bike.errors.any?
+    bike
   end
 end
