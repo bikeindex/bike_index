@@ -20,6 +20,14 @@ import { Controller } from '@hotwired/stimulus'
 const DEBOUNCE_MS = 400
 const TTL_MS = 604800000 // 1 week
 
+// Where site data is blocked, even reading the localStorage property throws - and a full
+// quota throws on write. A draft is a convenience, so the form carries on without one
+const withStorage = (callback) => {
+  try {
+    callback(localStorage)
+  } catch {}
+}
+
 export default class extends Controller {
   static values = { key: String, save: Boolean }
 
@@ -61,7 +69,7 @@ export default class extends Controller {
   clear () {
     clearTimeout(this.timer)
     this.timer = null
-    localStorage.removeItem(this.storageKey)
+    withStorage((storage) => storage.removeItem(this.storageKey))
   }
 
   // Stored values only fill fields the server rendered empty — a field the
@@ -119,7 +127,7 @@ export default class extends Controller {
       data[hidden.name] = hidden.value
       data[`${hidden.name}::display`] = display.value
     })
-    localStorage.setItem(this.storageKey, JSON.stringify({ savedAt: Date.now(), data }))
+    withStorage((storage) => storage.setItem(this.storageKey, JSON.stringify({ savedAt: Date.now(), data })))
   }
 
   read () {
