@@ -21,7 +21,7 @@ const DEBOUNCE_MS = 400
 const TTL_MS = 604800000 // 1 week
 
 // Where site data is blocked, even reading the localStorage property throws - and a full
-// quota throws on write. A draft is a convenience, so the form carries on without one
+// quota throws on write
 const withStorage = (callback) => {
   try {
     callback(localStorage)
