@@ -3,6 +3,9 @@ module Admin
     include Binxtils::SortableTable
 
     LINK_PARAM_KEYS = %w[sort direction page per_page reference_bike_id bike_ids].freeze
+    # A review loads every record in the group. A segment shared by thousands of bikes ("000000") is
+    # sent back to the list rather than loaded; the largest whole-serial group is a few hundred
+    MAX_REVIEW_RECORDS = 500
 
     around_action :set_reading_role, only: %i[index show]
     helper_method :link_params
@@ -38,7 +41,13 @@ module Admin
         bikes = @duplicate_group.bikes.unscope(where: %i[example user_hidden deleted_at likely_spam])
       end
 
-      # Summaries cover every record, so the whole group loads; the largest whole-serial group is a few hundred
+      records_count = bikes.count
+      if records_count > MAX_REVIEW_RECORDS
+        flash[:error] = "#{records_count} records are too many to review together"
+        return redirect_to admin_duplicate_bikes_path(search_view: @duplicate_group && "segments")
+      end
+
+      # Summaries cover every record, so the whole group loads
       all_bikes = bikes.default_includes.includes(:manufacturer, :creation_organization, :marketplace_listings,
         :bike_organizations, :bike_stickers, :public_images, ownerships: :organization).reorder(:created_at, :id).to_a
       raise ActiveRecord::RecordNotFound if all_bikes.empty? || bike_ids && all_bikes.size != bike_ids.size
@@ -48,18 +57,12 @@ module Admin
       else
         all_bikes.min_by(&:id)
       end
-      @stolen_record_counts = StolenRecord.unscoped.where(bike_id: all_bikes.map(&:id)).group(:bike_id).count
-      @review = BikeDuplicatesServices::Review.new(bikes: all_bikes, reference_bike: @reference_bike, stolen_record_counts: @stolen_record_counts,
-        manufacturer_names: BikeDuplicatesServices::Cues.fetch_manufacturer_name_serials)
+      @review = BikeDuplicatesServices::Review.new(bikes: all_bikes, reference_bike: @reference_bike)
       @contact_group = @review.contact_groups.find { it.number == params[:search_contact].to_i }
       @per_page = permitted_per_page(default: 25)
       listed_bikes = @contact_group&.bikes || all_bikes
       listed_bikes = listed_bikes.reverse if sort_direction == "desc"
       @pagy, @bikes = pagy(:offset, listed_bikes, limit: @per_page, page: permitted_page)
-      @test_bike_ids = BikeDuplicatesServices::Finder.test_bike_ids(all_bikes.map(&:id)).to_set
-      @serial_stolen = BikeDuplicatesServices::Finder.stolen_serials?(all_bikes.map(&:serial_normalized_no_space).uniq)
-      account_ids = all_bikes.flat_map { |bike| bike.ownerships.map(&:user_id) }.compact.uniq
-      @account_emails = User.unscoped.where(id: account_ids).pluck(:id, :email).to_h
     end
 
     private

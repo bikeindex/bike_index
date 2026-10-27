@@ -1,7 +1,10 @@
-<%# locals: (groups:, representatives:, organizations:, kind:) %>
+<%# UI::Table runs each cell against itself, so the cells read locals rather than ivars %>
+<% representatives = @representatives %>
+<% organizations = @organizations %>
+<% kind = @kind %>
 <% same_owner_queue = BikeDuplicatesServices::Finder::SAME_OWNER_KINDS.include?(kind) %>
 
-<%= render UI::Table::Component.new(records: groups) do |table| %>
+<%= render UI::Table::Component.new(records: @groups) do |table| %>
   <% table.column(label: "Shared serial and manufacturer · review cues") do |group| %>
     <% bike = representatives[group["reference_id"]] %>
 

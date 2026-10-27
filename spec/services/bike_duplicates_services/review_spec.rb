@@ -28,10 +28,10 @@ RSpec.describe BikeDuplicatesServices::Review do
       expect(review.manufacturer_match(bike)).to eq "Manufacturer matches"
       expect(review.initial_ownership(reference)).to eq initial
       expect(review.account_match(bike, initial: true)).to eq "Same account"
-      expect(review.email_match(bike, initial: true)).to eq "Same email"
+      expect(review.email_evidence(bike, initial: true)).to eq "Exact normalized email"
       expect(review.contact_email(initial)).to eq email
       expect(review.account_match(bike)).to eq "Different accounts"
-      expect(review.email_match(bike)).to eq "Different emails"
+      expect(review.email_evidence(bike)).to eq "Different emails (identity unverified)"
       expect(review.claim_status(initial)).to eq "Unclaimed"
       expect(review.claim_status(nil)).to eq "Unavailable"
     end
@@ -84,14 +84,13 @@ RSpec.describe BikeDuplicatesServices::Review do
     let(:initial) { ownership_class.new(id: 1, user_id: 10, owner_email: " #{email.upcase} ") }
     before { current.owner_email = email }
     it "reports the exact normalized email match" do
-      expect(review.email_match(bike)).to eq "Same email"
+      expect(review.email_evidence(bike)).to eq "Exact normalized email"
     end
   end
 
   context "phone contact" do
     before { initial.is_phone = true }
     it "does not compare phone contacts as emails" do
-      expect(review.email_match(bike, initial: true)).to eq "Email unavailable"
       expect(review.contact_email(initial)).to be_nil
       expect(review.email_evidence(bike, initial: true)).to eq "Email unavailable"
     end
@@ -139,7 +138,7 @@ RSpec.describe BikeDuplicatesServices::Review do
     end
     it "does not equate absent identities" do
       expect(review.account_match(bike, initial: true)).to eq "Account unavailable"
-      expect(review.email_match(bike, initial: true)).to eq "Email unavailable"
+      expect(review.email_evidence(bike, initial: true)).to eq "Email unavailable"
       expect(review.contact_email(initial)).to be_nil
     end
   end
@@ -158,7 +157,7 @@ RSpec.describe BikeDuplicatesServices::Review do
       expect(review.serial_match(bike)).to eq "Whole serial unavailable"
       expect(review.manufacturer_match(bike)).to eq "Manufacturer unavailable"
       expect(review.account_match(bike, initial: true)).to eq "Account unavailable"
-      expect(review.email_match(bike, initial: true)).to eq "Email unavailable"
+      expect(review.email_evidence(bike, initial: true)).to eq "Email unavailable"
     end
   end
 
@@ -192,7 +191,7 @@ RSpec.describe BikeDuplicatesServices::Review do
 
     it "derives tentative cues from the loaded records" do
       expect(review.review_contact_count).to eq 2
-      expect(review.cues(test_count: 0).map(&:key)).to eq ["standard_marking", "review_contact"]
+      expect(review.cues.map(&:key)).to eq ["standard_marking", "review_contact"]
     end
   end
 
@@ -205,14 +204,13 @@ RSpec.describe BikeDuplicatesServices::Review do
           frame_model: "Roadster", ownerships: [ownership], current_ownership: ownership, marketplace_listings: [])
       end
     end
-    let(:stolen_record_counts) { {} }
-    let(:review) { described_class.new(bikes: pair, stolen_record_counts:) }
-    let(:checks) { review.readiness_checks(serial_stolen: false, test_count: 0) }
+    let(:review) { described_class.new(bikes: pair) }
+    let(:checks) { review.readiness_checks }
     let(:blocked_labels) { checks.select { it.status == :blocked }.map(&:label) }
 
     it "meets the strict evidence with one known, current, claiming account" do
       expect(checks.map(&:status).uniq).to eq [:pass]
-      expect(review.readiness(checks)).to eq :pass
+      expect(review.readiness).to eq :pass
     end
 
     context "with the same email on different accounts" do
@@ -220,17 +218,23 @@ RSpec.describe BikeDuplicatesServices::Review do
 
       it "keeps an email-only match tentative" do
         expect(checks.map(&:label)).to include("Same initial email only — tentative; shops and shared inboxes reuse emails")
-        expect(review.readiness(checks)).to eq :uncertain
+        expect(review.readiness).to eq :uncertain
       end
     end
 
-    it "vetoes stolen history and keeps test records out" do
-      expect(review.readiness(review.readiness_checks(serial_stolen: true, test_count: 0))).to eq :blocked
-      expect(review.readiness(review.readiness_checks(serial_stolen: false, test_count: 1))).to eq :blocked
+    it "vetoes stolen history on the whole serial" do
+      FactoryBot.create(:bike, :with_stolen_record, serial_number: "WTU 123456")
+      expect(review.readiness_checks.first.label).to eq "Stolen history on this whole serial (any record, manufacturer or status) is a hard merge veto"
+      expect(review.readiness).to eq :blocked
+    end
+
+    it "keeps test records out" do
+      allow(review).to receive(:test_count).and_return(1)
+      expect(review.readiness).to eq :blocked
     end
 
     context "with a stolen record on one record, deleted ones included" do
-      let(:stolen_record_counts) { {2 => 1} }
+      before { allow(review).to receive(:stolen_count) { |bike| (bike.id == 2) ? 1 : 0 } }
 
       it "vetoes it whatever the whole-serial lookup found" do
         expect(blocked_labels).to eq ["A record has its own stolen history, a hard merge veto whatever its serial"]

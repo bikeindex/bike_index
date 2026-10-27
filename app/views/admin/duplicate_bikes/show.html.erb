@@ -22,7 +22,7 @@
   </p>
 <% end %>
 
-<% if @serial_stolen %>
+<% if review.serial_stolen? %>
   <%= render UI::Alerts::Base::Component.new(kind: :error, margin_classes: "tw:mt-4", header: "Do not merge: this whole serial has stolen history") do %>
     The stolen report may be on a record outside this comparison. Recovered and
     deleted records still count. Preserve these records separately.
@@ -55,8 +55,8 @@
   </p>
 <% end %>
 
-<% checks = review.readiness_checks(serial_stolen: @serial_stolen, test_count: @test_bike_ids.size) %>
-<% readiness = review.readiness(checks) %>
+<% checks = review.readiness_checks %>
+<% readiness = review.readiness %>
 
 <section
   class="
@@ -116,7 +116,7 @@
   </ul>
 </section>
 
-<% cues = review.cues(test_count: @test_bike_ids.size) %>
+<% cues = review.cues %>
 
 <% if cues.any? %>
   <section class="tw:mt-6">
@@ -147,7 +147,7 @@
   <% stat_label = "tw:text-xs tw:uppercase tw:tracking-wide #{muted}" %>
   <% initial_ownerships = review.bikes.map { review.initial_ownership(it) } %>
   <% organizations = review.distribution { review.organization(it)&.name } %>
-  <% stolen_count = @stolen_record_counts.values.sum %>
+  <% stolen_count = review.stolen_records_count %>
 
   <div
     class="
@@ -210,12 +210,12 @@
     <div class="<%= stat_classes %>">
       <div class="<%= stat_label %>">Stolen records</div>
 
-      <div class="tw:text-xl tw:font-bold <%= "tw:text-red-700 tw:dark:text-red-400" if stolen_count.positive? || @serial_stolen %>">
+      <div class="tw:text-xl tw:font-bold <%= "tw:text-red-700 tw:dark:text-red-400" if stolen_count.positive? || review.serial_stolen? %>">
         <%= number_display(stolen_count) %>
       </div>
 
       <div class="tw:text-xs <%= muted %>">
-        <%= @serial_stolen ? "serial has stolen history" : "none on this serial" %>
+        <%= review.serial_stolen? ? "serial has stolen history" : "none on this serial" %>
       </div>
     </div>
 
@@ -223,7 +223,7 @@
       <div class="<%= stat_label %>">Test-marked</div>
 
       <div class="tw:text-xl tw:font-bold">
-        <%= number_display(@test_bike_ids.size) %>
+        <%= number_display(review.test_count) %>
       </div>
 
       <div class="tw:text-xs <%= muted %>">
@@ -453,10 +453,10 @@
   </p>
 
   <% if @bikes_count <= 3 %>
-    <%= render "side_by_side", review:, test_bike_ids: @test_bike_ids, stolen_record_counts: @stolen_record_counts, account_emails: @account_emails %>
+    <%= render Pages::Admin::DuplicateBikes::SideBySide::Component.new(review:, link_params:) %>
   <% else %>
     <%= render Atoms::Admin::PaginationWithCount::Component.new(collection: @bikes, index: admin_index_state, count: @contact_group&.bikes&.size || @bikes_count, viewing: "bike records") %>
-    <%= render "records", bikes: @bikes, review:, test_bike_ids: @test_bike_ids, stolen_record_counts: @stolen_record_counts, account_emails: @account_emails %>
+    <%= render Pages::Admin::DuplicateBikes::Records::Component.new(bikes: @bikes, review:, link_params:) %>
     <%= render Atoms::Admin::PaginationWithCount::Component.new(collection: @bikes, index: admin_index_state, skip_total: true, viewing: "bike records") %>
   <% end %>
 </section>

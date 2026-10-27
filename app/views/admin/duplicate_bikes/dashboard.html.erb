@@ -190,5 +190,5 @@
 </p>
 
 <%= render Atoms::Admin::PaginationWithCount::Component.new(collection: @groups, index: admin_index_state, count: @groups_count, viewing: "groups") %>
-<%= render "review_groups", groups: @groups, representatives: @representatives, organizations: @organizations, kind: @kind %>
+<%= render Pages::Admin::DuplicateBikes::ReviewGroups::Component.new(groups: @groups, representatives: @representatives, organizations: @organizations, kind: @kind) %>
 <%= render Atoms::Admin::PaginationWithCount::Component.new(collection: @groups, index: admin_index_state, skip_total: true, viewing: "groups") %>

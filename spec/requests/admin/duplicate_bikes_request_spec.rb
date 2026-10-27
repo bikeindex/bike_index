@@ -109,6 +109,15 @@ RSpec.describe Admin::DuplicateBikesController, type: :request do
       expect(response.body).to include("Ignore group", ignore_duplicate_toggle_admin_bikes_path(id: duplicate_group.id))
     end
 
+    it "sends a group too large to review back to the segments list" do
+      stub_const("Admin::DuplicateBikesController::MAX_REVIEW_RECORDS", 1)
+      duplicate_group = DuplicateBikeGroup.create
+      pair.each { NormalizedSerialSegment.create(bike: it, duplicate_bike_group: duplicate_group, segment: "WTU123456") }
+      get "#{base_url}/#{duplicate_group.id}"
+      expect(response).to redirect_to(admin_duplicate_bikes_path(search_view: "segments"))
+      expect(flash[:error]).to eq "2 records are too many to review together"
+    end
+
     it "summarizes a large group and filters to one contact" do
       get "#{base_url}/serial", params: {reference_bike_id: marked_bikes.first.id}
       expect(response.code).to eq "200"
@@ -151,11 +160,11 @@ RSpec.describe Admin::DuplicateBikesController, type: :request do
       expect(response.body).to include("Shop default? Confirm propulsion with the owner", "Meets the strict same-owner evidence")
     end
 
-    it "flags a placeholder serial as not a duplicate match" do
-      placeholders = Array.new(2) { FactoryBot.create(:bike, :with_ownership, manufacturer:, serial_number: "To be specified") }
-      get "#{base_url}/compare", params: {bike_ids: placeholders.map(&:id).join(",")}
+    it "flags a part-number serial as not a duplicate match" do
+      part_numbers = Array.new(2) { FactoryBot.create(:bike, :with_ownership, manufacturer:, serial_number: "SM-BBR60") }
+      get "#{base_url}/compare", params: {bike_ids: part_numbers.map(&:id).join(",")}
       expect(response.code).to eq "200"
-      expect(response.body).to include("Not a duplicate match: this serial is a placeholder (TO BE SPECIFIED)", "Not a candidate")
+      expect(response.body).to include("Not a duplicate match: this serial is a part number (Shimano SM-BBR60 bottom bracket)", "Not a candidate")
     end
 
     it "treats a manufacturer name typed as the serial as a placeholder" do
@@ -171,7 +180,7 @@ RSpec.describe Admin::DuplicateBikesController, type: :request do
         FactoryBot.create(:bike, :with_ownership, manufacturer:, serial_number: "unknown")]
       get "#{base_url}/compare", params: {bike_ids: bikes.map(&:id).join(",")}
       expect(response.code).to eq "200"
-      expect(assigns(:serial_stolen)).to be false
+      expect(assigns(:review).serial_stolen?).to be false
       expect(response.body).to include("Not a candidate", "A record has its own stolen history")
     end
 
