@@ -99,9 +99,13 @@ module Admin
       @groups_count = groups.size
       @registrations_count = groups.sum { it["record_count"] }
       @pagy, @groups = pagy(:offset, groups, limit: @per_page, page: permitted_page)
-      # The snapshot can be an hour old, so the listed groups' stolen veto is read live
+      # The snapshot can be hours old, so the listed groups' stolen veto is read live. Only the
+      # listed groups get their cues and times built
       stolen_serials = BikeDuplicatesServices::Finder.stolen_serials(@groups.map { it["serial"] })
-      @groups = @groups.map { it.merge("serial_stolen" => stolen_serials.include?(it["serial"])) }
+      @groups = @groups.map do |group|
+        group.merge("serial_stolen" => stolen_serials.include?(group["serial"]), "cues" => BikeDuplicatesServices::Cues.group_cues(group),
+          "first_at" => Time.zone.at(group["first_at"]), "last_at" => Time.zone.at(group["last_at"]))
+      end
       @representatives = Bike.unscoped.where(id: @groups.map { it["reference_id"] })
         .includes(:manufacturer, :ownerships).index_by(&:id)
       @organizations = Organization.unscoped.where(id: @groups.flat_map { it["organization_ids"] || [] }).index_by(&:id)

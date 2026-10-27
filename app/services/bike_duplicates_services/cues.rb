@@ -124,11 +124,10 @@ module BikeDuplicatesServices
     end
 
     # The groups matching filter (all of them for an unknown one) and every filter's count.
-    # Groups carry their cues, built once when they're prepared
+    # Groups carry their cue keys, found once when they're prepared
     def filter(groups, filter)
-      keyed = groups.map { |group| [group, group["cues"].map(&:key)] }
-      counts = FILTERS.keys.to_h { |key| [key, keyed.count { matches_filter?(it.last, key) }] }
-      filtered = FILTERS.key?(filter) ? keyed.filter_map { |group, keys| group if matches_filter?(keys, filter) } : groups
+      counts = FILTERS.keys.to_h { |key| [key, groups.count { matches_filter?(it["cue_keys"], key) }] }
+      filtered = FILTERS.key?(filter) ? groups.select { matches_filter?(it["cue_keys"], filter) } : groups
       [filtered, counts]
     end
 

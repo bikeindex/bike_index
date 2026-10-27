@@ -50,7 +50,7 @@ RSpec.describe BikeDuplicatesServices::Cues do
     single = group.merge("email_count" => 1)
     test_marked = group.merge("test_count" => 1)
     expect(described_class.group_cues(single).map(&:key)).to eq ["single_contact"]
-    single, test_marked = [single, test_marked].map { it.merge("cues" => described_class.group_cues(it)) }
+    single, test_marked = [single, test_marked].map { it.merge("cue_keys" => described_class.group_cues(it).map(&:key)) }
     expect(described_class.filter([single, test_marked], "none").first).to eq [single]
     expect(described_class.filter([single, test_marked], "test_marker").first).to eq [test_marked]
     expect(described_class.filter([single, test_marked], "unknown").first).to eq [single, test_marked]

@@ -285,7 +285,6 @@ Rails.application.routes.draw do
 
     resources :bikes do
       collection do
-        get :duplicates
         put :ignore_duplicate_toggle
         get :missing_manufacturer
         post :update_manufacturers

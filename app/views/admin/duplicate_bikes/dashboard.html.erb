@@ -9,7 +9,7 @@
   are groups and registration records, not confirmed duplicate bicycles.
   Computed
   <%= render UI::Time::Component.new(time: @group_snapshot[:generated_at]) %>,
-  kept for up to an hour.
+  and recomputed in the background once it's an hour old.
 </p>
 
 <%= render UI::Alerts::Base::Component.new(kind: :warning, margin_classes: "tw:mt-4", header: "Review only — no merging, deletion or customer emails") do %>

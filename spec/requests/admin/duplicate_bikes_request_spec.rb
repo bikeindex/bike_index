@@ -38,6 +38,14 @@ RSpec.describe Admin::DuplicateBikesController, type: :request do
       expect(assigns(:groups).map { it["record_count"] }).to eq [11]
     end
 
+    it "serves an hour-old snapshot while a fresh one is prepared" do
+      snapshot = JSON.parse(RedisPool.conn { it.get(finder::SNAPSHOT_KEY) })
+      RedisPool.conn { it.set(finder::SNAPSHOT_KEY, snapshot.merge("generated_at" => 61.minutes.ago.to_i).to_json) }
+      expect { get base_url, params: {search_kind: "large_group"} }.to change(BikeJobs::PrepareDuplicateReviewJob.jobs, :count).by 1
+      expect(response).to render_template(:dashboard)
+      expect(assigns(:groups).map { it["record_count"] }).to eq [11]
+    end
+
     it "tries again on the next visit when the job can't be enqueued" do
       RedisPool.conn { it.del(finder::SNAPSHOT_KEY) }
       allow(BikeJobs::PrepareDuplicateReviewJob).to receive(:perform_async).and_raise(RedisClient::CannotConnectError)
