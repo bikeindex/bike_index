@@ -265,7 +265,7 @@ RSpec.describe BulkImportJob, type: :job do
           expect(bike2.public_images.count).to eq 1
           expect(bike2.frame_size).to eq "m"
           expect(bike2.frame_size_unit).to eq "ordinal"
-          expect(bike2.registration_address).to_not be_present
+          expect(bike2.registration_address_record).to be_nil
           expect(bike2.phone).to be_nil
           expect(bike2.extra_registration_number).to eq "extra serial number"
           expect(bike2.owner_name).to eq "Sally"
@@ -335,7 +335,7 @@ RSpec.describe BulkImportJob, type: :job do
             description: "I love this, it's my favorite",
             frame_size: "29in",
             frame_size_unit: "in",
-            registration_address: {},
+            registration_address_record: nil,
             public_images: [],
             phone: "8887776666",
             extra_registration_number: nil,
@@ -354,7 +354,7 @@ RSpec.describe BulkImportJob, type: :job do
             year: nil,
             frame_size: "m",
             frame_size_unit: "ordinal",
-            registration_address: {},
+            registration_address_record: nil,
             phone: nil,
             extra_registration_number: "extra serial number",
             owner_name: "Sally",

@@ -1,0 +1,160 @@
+<section class="tw:bg-linear-160 tw:from-slate-900 tw:to-[#233140] tw:text-white">
+  <div class="tw:grid tw:grid-cols-[repeat(auto-fit,minmax(min(100%,420px),1fr))] tw:items-center tw:gap-12 tw:py-16 <%= SECTION_CLASSES %>">
+    <div class="tw:flex tw:flex-col tw:items-start tw:gap-5">
+      <%= link_to search_marketplace_path, class: "tw:text-sm tw:text-[#c9d3dc] tw:no-underline tw:hover:text-white tw:hover:underline" do %>
+        <span aria-hidden="true">←</span>
+        <%= translation(".back_to_marketplace") %>
+      <% end %>
+
+      <h1
+        class="
+          tw:font-header tw:text-[clamp(34px,4.5vw,52px)] tw:leading-[1.08]
+          tw:font-extrabold tw:tracking-[-.01em]
+        "
+      >
+        <%= translation(".heading") %>
+      </h1>
+
+      <p
+        class="
+          tw:m-0 tw:max-w-[560px] tw:text-lg tw:leading-[1.6]
+          tw:text-[#dfe6ec]
+        "
+      >
+        <%= translation(".intro") %>
+      </p>
+
+      <%= call_to_action_buttons %>
+    </div>
+
+    <%= image_tag "kelsey/illustrations/comic-assets_bike-hero.png", alt: "", width: 1768, height: 1320,
+      class: "tw:h-auto tw:w-full tw:max-w-[420px] tw:justify-self-center" %>
+  </div>
+</section>
+
+<section class="tw:grid tw:grid-cols-[repeat(auto-fit,minmax(min(100%,340px),1fr))] tw:gap-12 tw:py-16 <%= SECTION_CLASSES %>">
+  <%= render(SharedBlocks::Marketing::SectionHeading::Component.new(eyebrow: translation(".why_a_marketplace"),
+    eyebrow_color: :purple, heading: translation(".why_heading"))) %>
+
+  <div
+    class="
+      tw:flex tw:flex-col tw:gap-4 tw:text-[17px] tw:leading-[1.65]
+      tw:text-gray-700 tw:dark:text-gray-300
+    "
+  >
+    <p class="tw:m-0"><%= translation(".why_registry") %></p>
+    <p class="tw:m-0"><%= translation(".why_we_know") %></p>
+  </div>
+</section>
+
+<section class="tw:flex tw:flex-col tw:gap-8 tw:py-16 <%= SECTION_CLASSES %>">
+  <%= render(SharedBlocks::Marketing::SectionHeading::Component.new(heading: translation(".what_we_check"))) %>
+
+  <div class="tw:grid tw:gap-3 tw:md:grid-cols-2 tw:md:gap-4.5 tw:lg:grid-cols-4">
+    <% checks.each do |check| %>
+      <%= render(SharedBlocks::Marketing::IconFeature::Component.new(**check, circle: "tw:bg-blue-600", card: true)) %>
+    <% end %>
+  </div>
+</section>
+
+<section class="tw:grid tw:grid-cols-[repeat(auto-fit,minmax(min(100%,460px),1fr))] tw:gap-14 tw:py-16 <%= SECTION_CLASSES %>">
+  <% step_lists.each do |anchor, heading, steps, number_class| %>
+    <div id="<%= anchor %>" class="tw:flex tw:scroll-mt-4 tw:flex-col tw:gap-6">
+      <%= render(SharedBlocks::Marketing::SectionHeading::Component.new(heading:)) %>
+
+      <ol class="tw:m-0 tw:flex tw:list-none tw:flex-col tw:gap-6 tw:p-0">
+        <% steps.each.with_index(1) do |(title, body), number| %>
+          <li class="tw:grid tw:grid-cols-[40px_minmax(0,1fr)] tw:gap-4">
+            <span class="tw:flex tw:size-10 tw:items-center tw:justify-center tw:rounded-full tw:font-header tw:font-extrabold tw:text-white <%= number_class %>">
+              <%= number %>
+            </span>
+
+            <div class="tw:flex tw:flex-col tw:gap-1">
+              <h3 class="tw:text-lg tw:font-bold"><%= title %></h3>
+
+              <p class="tw:m-0 tw:leading-[1.55] <%= BODY_CLASSES %>">
+                <%= body %>
+              </p>
+            </div>
+          </li>
+        <% end %>
+      </ol>
+    </div>
+  <% end %>
+</section>
+
+<section class="tw:bg-gray-50 tw:dark:bg-gray-900">
+  <div class="tw:flex tw:flex-col tw:gap-8 tw:py-16 <%= SECTION_CLASSES %>">
+    <%= render(SharedBlocks::Marketing::SectionHeading::Component.new(heading: translation(".across_town_heading"),
+      intro: translation(".across_town_intro"), html_class: "tw:max-w-[760px]")) %>
+
+    <div
+      class="
+        tw:grid tw:grid-cols-[repeat(auto-fit,minmax(min(100%,340px),1fr))]
+        tw:gap-5
+      "
+    >
+      <% delivery_options.each do |title, body| %>
+        <%= render(UI::Card::Component.new(additional_classes: "tw:flex tw:flex-col tw:gap-2.5 tw:rounded-lg! tw:p-7! tw:shadow-[0_4px_12px_rgba(44,62,80,.12)]")) do %>
+          <h3 class="tw:text-xl tw:font-bold"><%= title %></h3>
+
+          <p class="tw:m-0 tw:leading-[1.6] <%= BODY_CLASSES %>">
+            <%= body %>
+          </p>
+        <% end %>
+      <% end %>
+    </div>
+
+    <div class="tw:flex tw:max-w-[760px] tw:flex-col tw:gap-2 tw:pt-2">
+      <h3 class="tw:text-xl tw:font-bold">
+        <%= translation(".trust_not_guarantee") %>
+      </h3>
+
+      <p class="tw:m-0 tw:leading-[1.65] tw:text-gray-700 tw:dark:text-gray-300">
+        <%= translation(".trust_not_guarantee_body") %>
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="tw:py-16 <%= SECTION_CLASSES %>">
+  <div
+    class="
+      tw:grid tw:grid-cols-[repeat(auto-fit,minmax(min(100%,300px),1fr))]
+      tw:items-start tw:gap-6 tw:rounded-lg tw:border-3 tw:border-[#111]
+      tw:px-8 tw:py-7 tw:shadow-[4px_4px_0_#111] tw:dark:border-gray-300
+      tw:dark:shadow-[4px_4px_0_var(--color-gray-300)]
+    "
+  >
+    <div class="tw:flex tw:flex-col tw:gap-2">
+      <%# Bangers in the design; Montserrat stands in rather than loading a font for one heading %>
+      <h2
+        class="
+          tw:font-header tw:text-3xl tw:font-black tw:tracking-[.03em]
+          tw:text-purple-500 tw:uppercase tw:italic tw:dark:text-purple-300
+        "
+      >
+        <%= translation(".pro_tip") %>
+      </h2>
+
+      <p class="tw:m-0 tw:text-xl tw:leading-[1.3] tw:font-bold">
+        <%= translation(".pro_tip_heading") %>
+      </p>
+    </div>
+
+    <ul
+      class="
+        tw:m-0 tw:flex tw:list-disc tw:flex-col tw:gap-2 tw:pl-5
+        tw:leading-[1.55] tw:text-gray-700 tw:dark:text-gray-300
+      "
+    >
+      <% safety_tips.each do |tip| %>
+        <li><%= tip %></li>
+      <% end %>
+    </ul>
+  </div>
+</section>
+
+<%= render(SharedBlocks::Marketing::CallToActionBanner::Component.new(heading: translation(".ready_heading"))) do %>
+  <%= call_to_action_buttons %>
+<% end %>

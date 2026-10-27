@@ -13,6 +13,6 @@ export const CURRENT_VIEW = '#vehicle-views [aria-current]'
 export const jumpTo = (current, path, views, search = null) => html`<div id="vehicle-views" class="tw:twpagebleed tw:px-4"
   data-in-place=${CURRENT_VIEW} data-replace>${tabs({
   navLabel: 'Views',
-  marginClasses: 'tw:mt-2',
+  marginClasses: 'tw:mt-6',
   tabs: [...views.map((view) => ({ label: VIEWS[view], href: path(view), active: view === current })), ...(search ? [search] : [])]
 })}</div>`

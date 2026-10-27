@@ -2,6 +2,7 @@ import { html, nothing } from 'lit-html'
 import { listedFigure } from 'bikebook/cycle_drawings'
 import { OVERALL_LENGTH_ESTIMATE } from 'bikebook/frame_geometry'
 import { missing } from 'bikebook/templates/helpers'
+import { copyButton } from 'bikebook/templates/ui/copy_button'
 import { table } from 'bikebook/templates/ui/table'
 import { tooltip } from 'bikebook/templates/ui/tooltip'
 import { seriesBorders, wheelName } from 'bikebook/templates/vehicles/geometry_overlay'
@@ -97,11 +98,11 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], highl
   }
 
   const sizeCell = (index) => {
-    const { data, value } = vehicles[index]
+    const { data, key } = vehicles[index]
     const options = array(data.sizes)
     if (options.length < 2) return options[0]?.name ?? missing
     return html`<select class="twinput tw:w-auto tw:py-1 tw:text-sm" aria-label=${`Size of ${named[index].model}`} data-action="bikebook--page#pickSize"
-      data-bikebook--page-vehicle-param=${value} data-bikebook--page-first-param=${index === 0}>${options.map((size) =>
+      data-bikebook--page-vehicle-param=${key} data-bikebook--page-first-param=${index === 0}>${options.map((size) =>
         html`<option value=${size.name} ?selected=${size === sizes[index]} data-size=${JSON.stringify({ name: size.name, geometry: slice(size.geometry, ['top_tube_effective', 'reach', 'min_rider_height', 'max_rider_height']) })}>${size.name}</option>`)}</select>`
   }
 
@@ -138,7 +139,8 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], highl
       ...named.map((vehicle, index) => {
         const border = seriesBorders(frames, index)
         return {
-          label: html`<span class="tw:block tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">${vehicle.manufacturer}</span>${vehicle.model}`,
+          label: html`<span class="tw:block tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">${vehicle.manufacturer}</span><span
+            class="tw:inline-flex tw:items-baseline tw:gap-1">${vehicle.model}${copyButton({ value: vehicles[index].value, label: 'Copy ID', tooltip: true })}</span>`,
           classes: 'tw:min-w-48 tw:align-top',
           headerClasses: border.top,
           // a model's name can wrap in its header, but not a value
