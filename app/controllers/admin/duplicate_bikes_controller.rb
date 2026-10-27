@@ -6,6 +6,9 @@ module Admin
     token_accessible :index, :show
 
     LINK_PARAM_KEYS = %w[sort direction page per_page reference_bike_id bike_ids].freeze
+    # A review loads every record in the group. A segment shared by thousands of bikes ("000000") is
+    # sent back to the list rather than loaded; the largest whole-serial group is a few hundred
+    MAX_REVIEW_RECORDS = 500
 
     around_action :set_reading_role, only: %i[index show]
     helper_method :link_params
@@ -41,7 +44,13 @@ module Admin
         bikes = @duplicate_group.bikes.unscope(where: %i[example user_hidden deleted_at likely_spam])
       end
 
-      # Summaries cover every record, so the whole group loads; the largest whole-serial group is a few hundred
+      records_count = bikes.count
+      if records_count > MAX_REVIEW_RECORDS
+        flash[:error] = "#{records_count} records are too many to review together"
+        return redirect_to admin_duplicate_bikes_path(search_view: @duplicate_group && "segments")
+      end
+
+      # Summaries cover every record, so the whole group loads
       all_bikes = bikes.default_includes.includes(:manufacturer, :creation_organization, :marketplace_listings,
         :bike_organizations, :bike_stickers, :public_images, ownerships: :organization).reorder(:created_at, :id).to_a
       raise ActiveRecord::RecordNotFound if all_bikes.empty? || bike_ids && all_bikes.size != bike_ids.size
@@ -51,24 +60,15 @@ module Admin
       else
         all_bikes.min_by(&:id)
       end
-      @stolen_record_counts = StolenRecord.unscoped.where(bike_id: all_bikes.map(&:id)).group(:bike_id).count
-      @review = BikeDuplicatesServices::Review.new(bikes: all_bikes, reference_bike: @reference_bike, stolen_record_counts: @stolen_record_counts,
-        manufacturer_names: BikeDuplicatesServices::Cues.fetch_manufacturer_name_serials)
+      @review = BikeDuplicatesServices::Review.new(bikes: all_bikes, reference_bike: @reference_bike)
       @contact_group = @review.contact_groups.find { it.number == params[:search_contact].to_i }
       @per_page = permitted_per_page(default: 25)
       listed_bikes = @contact_group&.bikes || all_bikes
       listed_bikes = listed_bikes.reverse if sort_direction == "desc"
       @pagy, @bikes = pagy(:offset, listed_bikes, limit: @per_page, page: permitted_page)
-      @test_bike_ids = BikeDuplicatesServices::Finder.test_bike_ids(all_bikes.map(&:id)).to_set
-      @serial_stolen = BikeDuplicatesServices::Finder.stolen_serials?(all_bikes.map(&:serial_normalized_no_space).uniq)
-      @checks = @review.readiness_checks(serial_stolen: @serial_stolen, test_count: @test_bike_ids.size)
-      @readiness = @review.readiness(@checks)
 
       respond_to do |format|
-        format.html do
-          account_ids = all_bikes.flat_map { |bike| bike.ownerships.map(&:user_id) }.compact.uniq
-          @account_emails = User.unscoped.where(id: account_ids).pluck(:id, :email).to_h
-        end
+        format.html
         format.json { render json: review_json }
       end
     end
@@ -122,9 +122,13 @@ module Admin
       @groups_count = groups.size
       @registrations_count = groups.sum { it["record_count"] }
       @pagy, @groups = pagy(:offset, groups, limit: @per_page, page: permitted_page)
-      # The snapshot can be an hour old, so the listed groups' stolen veto is read live
+      # The snapshot can be hours old, so the listed groups' stolen veto is read live. Only the
+      # listed groups get their cues and times built
       stolen_serials = BikeDuplicatesServices::Finder.stolen_serials(@groups.map { it["serial"] })
-      @groups = @groups.map { it.merge("serial_stolen" => stolen_serials.include?(it["serial"])) }
+      @groups = @groups.map do |group|
+        group.merge("serial_stolen" => stolen_serials.include?(group["serial"]), "cues" => BikeDuplicatesServices::Cues.group_cues(group),
+          "first_at" => Time.zone.at(group["first_at"]), "last_at" => Time.zone.at(group["last_at"]))
+      end
       respond_to do |format|
         format.html do
           @representatives = Bike.unscoped.where(id: @groups.map { it["reference_id"] })
@@ -150,12 +154,11 @@ module Admin
     end
 
     def review_json
-      {reference_bike_id: @reference_bike.id, records_count: @bikes_count, serial_stolen: @serial_stolen,
-       not_a_serial: @review.not_a_serial, readiness: @readiness, checks: @checks,
-       cues: @review.cues(test_count: @test_bike_ids.size),
+      {reference_bike_id: @reference_bike.id, records_count: @bikes_count, serial_stolen: @review.serial_stolen?,
+       not_a_serial: @review.not_a_serial, readiness: @review.readiness, checks: @review.readiness_checks, cues: @review.cues,
        shared_fields: @review.shared_fields.to_h { [it, @review.field_value(@reference_bike, it)] },
        differing_fields: @review.differing_fields.to_h { [it, @review.field_distribution(it)] },
-       contact_groups: @review.contact_groups, test_bike_ids: @test_bike_ids.to_a, contact_group: @contact_group&.number,
+       contact_groups: @review.contact_groups, test_bike_ids: @review.bikes.select { @review.test?(it) }.map(&:id), contact_group: @contact_group&.number,
        direction: sort_direction, page: @pagy.page, per_page: @per_page, total_count: @pagy.count,
        records: @bikes.map { record_json(it) }}
     end
@@ -167,8 +170,8 @@ module Admin
           "initial_organization_id" => @review.organization(bike)&.id, "initial_account_id" => initial&.user_id,
           "current_account_id" => bike.current_ownership&.user_id, "claim_status" => @review.claim_status(initial),
           "transferred" => @review.transferred?(bike), "contact_group" => @review.contact_group(bike)&.number,
-          "differences" => @review.differences(bike), "test" => @test_bike_ids.include?(bike.id),
-          "stolen_record_count" => @stolen_record_counts[bike.id] || 0)
+          "differences" => @review.differences(bike), "test" => @review.test?(bike),
+          "stolen_record_count" => @review.stolen_count(bike))
     end
 
     # Comparison records sort by registration; dashboard groups (snapshot hashes) by record count,

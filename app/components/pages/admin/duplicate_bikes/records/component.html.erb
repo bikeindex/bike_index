@@ -1,4 +1,3 @@
-<%# locals: (bikes:, review:, test_bike_ids:, stolen_record_counts:, account_emails:) %>
 <% muted = "tw:text-gray-600 tw:dark:text-gray-400" %>
 
 <div class="tw:mt-2 tw:rounded-md tw:border tw:border-gray-200 tw:dark:border-gray-700">
@@ -9,14 +8,13 @@
     <div></div>
   </div>
 
-  <% bikes.each do |bike| %>
-    <% contact_group = review.contact_group(bike) %>
-    <% differences = review.differences(bike) %>
-    <% stolen_count = stolen_record_counts[bike.id] || 0 %>
+  <% @bikes.each do |bike| %>
+    <% contact_group = @review.contact_group(bike) %>
+    <% differences = @review.differences(bike) %>
 
     <div
       data-controller="ui--collapse"
-      class="tw:border-b tw:border-gray-200 tw:px-3 tw:py-2 tw:last:border-b-0 tw:dark:border-gray-700 <%= "tw:bg-blue-50/50 tw:dark:bg-blue-950/40" if bike == review.reference_bike %>"
+      class="tw:border-b tw:border-gray-200 tw:px-3 tw:py-2 tw:last:border-b-0 tw:dark:border-gray-700 <%= "tw:bg-blue-50/50 tw:dark:bg-blue-950/40" if bike == @review.reference_bike %>"
     >
       <div
         class="
@@ -31,25 +29,25 @@
             <%= render UI::Time::Component.new(time: bike.created_at) %>
           </div>
 
-          <% if bike == review.reference_bike %>
+          <% if bike == @review.reference_bike %>
             <%= render UI::Badge::Component.new(text: "Reference", color: :notice, size: :xs) %>
           <% end %>
         </div>
 
         <div class="tw:text-sm">
-          <%= link_to "Contact #{contact_group.number}", url_for(link_params.except("page").merge("search_contact" => contact_group.number)), class: "twlink" %>
+          <%= link_to "Contact #{contact_group.number}", url_for(@link_params.except("page").merge("search_contact" => contact_group.number)), class: "twlink" %>
 
           <span class="<%= muted %>">
             ·
-            <%= review.claim_status(review.initial_ownership(bike)).downcase %>
+            <%= @review.claim_status(@review.initial_ownership(bike)).downcase %>
           </span>
 
           <div class="tw:truncate">
-            <%= review.source(bike) || "Unknown source" %>
+            <%= @review.source(bike) || "Unknown source" %>
           </div>
 
           <div class="tw:truncate <%= muted %>">
-            <%= review.organization(bike)&.name %>
+            <%= @review.organization(bike)&.name %>
           </div>
         </div>
 
@@ -66,7 +64,7 @@
                       tw:dark:bg-amber-950
                     "
                   >
-                    <%= review.field_value(bike, field) || "Blank" %>
+                    <%= @review.field_value(bike, field) || "Blank" %>
                   </span>
                 </span>
               <% end %>
@@ -76,13 +74,13 @@
           <% end %>
 
           <div class="tw:mt-1">
-            <%= render "record_flags", bike:, review:, test_marked: test_bike_ids.include?(bike.id), account_emails: %>
+            <%= render Pages::Admin::DuplicateBikes::RecordFlags::Component.new(bike:, review: @review) %>
           </div>
         </div>
 
         <div class="tw:flex tw:items-start tw:gap-3 tw:text-sm">
-          <% unless bike == review.reference_bike %>
-            <%= link_to "Use as reference", url_for(link_params.merge("reference_bike_id" => bike.id)), class: "twlink tw:whitespace-nowrap" %>
+          <% unless bike == @review.reference_bike %>
+            <%= link_to "Use as reference", url_for(@link_params.merge("reference_bike_id" => bike.id)), class: "twlink tw:whitespace-nowrap" %>
           <% end %>
 
           <%= render UI::Collapse::Component.new(text: "Details", chevron: :trailing, color: :link) %>
@@ -102,7 +100,7 @@
           <%= link_to "Public registration", bike_path(bike), class: "twlink" %>
         </p>
 
-        <%= render "record_detail", bike:, review:, stolen_count:, account_emails: %>
+        <%= render Pages::Admin::DuplicateBikes::RecordDetail::Component.new(bike:, review: @review) %>
       </div>
     </div>
   <% end %>

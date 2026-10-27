@@ -26,5 +26,5 @@
 <% end %>
 
 <%= render Atoms::Admin::PaginationWithCount::Component.new(collection: @duplicate_groups, index: admin_index_state, count: @duplicate_groups_count) %>
-<%= render "table", groups: @duplicate_groups, segments: @segments, statistics: @group_statistics %>
+<%= render Pages::Admin::DuplicateBikes::Table::Component.new(groups: @duplicate_groups, segments: @segments, statistics: @group_statistics) %>
 <%= render Atoms::Admin::PaginationWithCount::Component.new(collection: @duplicate_groups, index: admin_index_state, skip_total: true) %>

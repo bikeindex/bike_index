@@ -1,4 +1,5 @@
 import { array } from 'bikebook/templates/values'
+import { storage } from 'utils/storage'
 
 const KEY = 'bikebook:sizes'
 const PARAM = 'vehicle_sizes'
@@ -55,25 +56,31 @@ const nearest = (sizes, target) => {
   return sizes.filter((size) => distance(size)[0] < Infinity).reduce((best, size) => best && !closer(size, best) ? best : size, null)
 }
 
-// The first vehicle's last picked size, { name, geometry }, which a first vehicle with none picked takes the nearest of
+// The first vehicle's last picked size, { name, geometry }, which a first vehicle with none picked takes by name, else the nearest
 export const preferredSize = () => {
   try {
-    return JSON.parse(window.localStorage.getItem(KEY))
+    return JSON.parse(storage.getItem(KEY))
   } catch {
     return null
   }
 }
 
-export const storePreferredSize = (size) => window.localStorage.setItem(KEY, JSON.stringify(size))
+export const storePreferredSize = (size) => storage.setItem(KEY, JSON.stringify(size))
+
+// Each of `ids` as itself, and a model picked again as its id and which time: m/trek/2026/marlin_5#2
+export const vehicleKeys = (ids) => ids.map((id, index) => {
+  const time = ids.slice(0, index).filter((each) => each === id).length + 1
+  return time > 1 ? `${id}#${time}` : id
+})
 
 // vehicle_sizes is each vehicle's picked size in vehicle_models' order, blank where it has none
 export const paramList = (url, param) => url.searchParams.get(param)?.split(',') ?? []
 export const pickedSizes = (url) => {
   const sizes = paramList(url, PARAM)
-  return Object.fromEntries(paramList(url, 'vehicle_models').map((id, index) => [id, sizes[index]]).filter(([, size]) => size))
+  return Object.fromEntries(vehicleKeys(paramList(url, 'vehicle_models')).map((key, index) => [key, sizes[index]]).filter(([, size]) => size))
 }
 export const sizesParam = (ids, picked) => {
-  const sizes = ids.map((id) => picked[id] ?? '')
+  const sizes = vehicleKeys(ids).map((key) => picked[key] ?? '')
   return sizes.slice(0, sizes.findLastIndex(Boolean) + 1).join(',')
 }
 const withPicked = (url, picked) => {
@@ -82,16 +89,16 @@ const withPicked = (url, picked) => {
   value ? next.searchParams.set(PARAM, value) : next.searchParams.delete(PARAM)
   return next
 }
-export const withSize = (url, id, name) => withPicked(url, { ...pickedSizes(url), [id]: name })
+export const withSize = (url, key, name) => withPicked(url, { ...pickedSizes(url), [key]: name })
 // `url` with each size following its vehicle from `previous`, whose vehicles it's reordered, added to or removed from
 export const realigned = (url, previous = new URL(window.location.href)) => withPicked(url, pickedSizes(previous))
 
-// Each vehicle's size: its pick, else the first's preferred size and the others' the first's, each the nearest
-// for its riders or by top tube, else by name, else medium
+// Each vehicle's size: its pick, else the first's preferred size and the others' the first's, each the one of its name,
+// else the nearest for its riders or by top tube, else medium
 export const chosenSizes = (vehicles, { picked = {}, preferred } = {}) => {
-  const choose = ({ value, data }, target) => {
+  const choose = ({ key, data }, target) => {
     const sizes = array(data.sizes)
-    return matching(sizes, picked[value]) ?? nearest(sizes, target) ?? matching(sizes, target?.name) ?? medium(sizes)
+    return matching(sizes, picked[key]) ?? matching(sizes, target?.name) ?? nearest(sizes, target) ?? medium(sizes)
   }
   const [first, ...others] = vehicles
   const firstSize = first && choose(first, preferred)

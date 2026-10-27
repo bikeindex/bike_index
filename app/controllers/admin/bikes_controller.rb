@@ -52,10 +52,6 @@ module Admin
       redirect_back(fallback_location: root_url)
     end
 
-    def duplicates
-      redirect_to admin_duplicate_bikes_path(search_ignored: params[:show_ignored].present? ? "all" : "false")
-    end
-
     def ignore_duplicate_toggle
       duplicate_bike_group = DuplicateBikeGroup.find(params[:id])
       duplicate_bike_group.ignore = !duplicate_bike_group.ignore

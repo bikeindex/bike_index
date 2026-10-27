@@ -32,13 +32,6 @@ RSpec.describe Admin::BikesController, type: :request do
     end
   end
 
-  describe "duplicates" do
-    it "redirects to the duplicate registration review" do
-      get "#{base_url}/duplicates"
-      expect(response).to redirect_to(admin_duplicate_bikes_path(search_ignored: "false"))
-    end
-  end
-
   describe "missing_manufacturer" do
     let!(:bike) { FactoryBot.create(:bike, :with_ownership, manufacturer: Manufacturer.other, manufacturer_other: "Cool Bikes") }
     it "renders" do

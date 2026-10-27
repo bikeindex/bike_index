@@ -237,7 +237,7 @@ RSpec.describe BikeServices::Creator do
           expect(bike.creation_organization_id).to eq organization.id
           expect(bike.bike_organizations.count).to eq 1
           expect(bike.bike_organizations.first.can_edit_claimed).to be_truthy
-          expect(bike.registration_address.compact).to eq({"street" => "Somewhere Ville"})
+          expect(bike.registration_address_record.internal_address_attrs.compact).to eq({"street" => "Somewhere Ville"})
           expect(BikeServices::CalculateLocation.registration_address_source(bike)).to eq "initial_creation"
           expect(bike.address_record.attributes.compact.symbolize_keys.except(:id, :updated_at, :created_at)).to eq target_address_record.merge(bike_id: bike.id)
 
@@ -257,12 +257,37 @@ RSpec.describe BikeServices::Creator do
           expect(ownership.organization_id).to eq organization.id
           expect(ownership.owner_email).to eq "stuff@stuff.com"
           expect(ownership.owner_name).to eq "Sally"
-          expect(ownership.address_hash_legacy.reject { |_k, v| v.blank? }).to eq({"street" => "Somewhere Ville"})
+          expect(ownership.address_record.internal_address_attrs.compact).to eq({"street" => "Somewhere Ville"})
         end
 
         it "creates", :flaky do
           expect_bike_created_with_extra_attrs
         end
+      end
+    end
+
+    describe "creating abandoned bike" do
+      let(:organization) { FactoryBot.create(:organization_with_auto_user) }
+      let!(:creator) { FactoryBot.create(:organization_user, organization:) }
+      let(:state) { FactoryBot.create(:state_new_york) }
+      let(:address_record_attributes) do
+        {street: "1 Main St", city: "Brooklyn", postal_code: "11222", region_record_id: state.id, country_id: Country.united_states_id}
+      end
+      let(:b_param) do
+        BParam.create(origin: "organization_form", creator_id: creator.id, params: {
+          bike: {creation_organization_id: organization.id, serial_number: "abandoned-serial", owner_email: "abandoned@bikeindex.org",
+                 primary_frame_color_id: color.id, manufacturer_id: manufacturer.id, status: "status_abandoned",
+                 parking_notification_kind: "appears_abandoned_notification", address_record_attributes:}
+        })
+      end
+      it "creates a parking notification at the bike's address" do
+        allow(instance).to receive(:add_bike_book_data).and_return(nil)
+        bike = instance.create_bike(b_param)
+        expect(bike.errors).to_not be_present
+        expect(bike.reload.status).to eq "status_abandoned"
+        expect(bike.parking_notifications.count).to eq 1
+        expect(bike.parking_notifications.first).to have_attributes(address_record_attributes
+          .merge(kind: "appears_abandoned_notification", organization_id: organization.id, user_id: creator.id))
       end
     end
 
@@ -540,6 +565,14 @@ RSpec.describe BikeServices::Creator do
             expect(existing_bike.serial_normalized).to be_blank
             expect_no_duplicate
           end
+        end
+      end
+      context "placeholder serial" do
+        let(:serial) { "Not Assigned" }
+        it "stores unknown and finds no duplicate" do
+          expect(existing_bike.serial_number).to eq "unknown"
+          expect_no_duplicate
+          expect(b_param.created_bike).to have_attributes(serial_number: "unknown", serial_normalized: nil)
         end
       end
       context "user_hidden" do

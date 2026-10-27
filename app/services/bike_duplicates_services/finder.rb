@@ -24,25 +24,30 @@ module BikeDuplicatesServices
 
     SNAPSHOT_KEY = "duplicate_review_group_snapshot"
     PREPARING_KEY = "duplicate_review_group_snapshot_preparing"
-    SNAPSHOT_TTL = 1.hour
+    # Older snapshots are still served while a fresh one is prepared, so only the first visit waits
+    REFRESH_AFTER = 1.hour
+    SNAPSHOT_TTL = 1.day
     # Longer than the query takes; if the job dies, the next visit after this enqueues another
     PREPARING_TTL = 30.minutes
+    # Deletes the claim only if it's still the one passed in, not a newer job's
+    RELEASE_CLAIM_SCRIPT = 'if redis.call("get", KEYS[1]) == ARGV[1] then return redis.call("del", KEYS[1]) end'
 
-    # The dashboard's groups, or nil while they're prepared. The query takes most of a minute in
-    # production, so a miss enqueues the job - once across every server - rather than running it here
+    # The dashboard's groups, or nil until the first ones are prepared. The query takes most of a minute in
+    # production, so a missing or hour-old snapshot enqueues the job - once across every server - rather
+    # than running it here. Group times are epoch seconds and cues are keys, for Cues.group_cues to build
     def fetch_group_snapshot
       json = RedisPool.conn { it.get(SNAPSHOT_KEY) }
-      return parse_snapshot(json) if json
-
-      enqueue_group_snapshot
-      nil
+      snapshot = JSON.parse(json) if json
+      enqueue_group_snapshot if snapshot.nil? || snapshot["generated_at"] < REFRESH_AFTER.ago.to_i
+      snapshot && {generated_at: Time.zone.at(snapshot["generated_at"]), groups: snapshot["groups"]}
     end
 
-    def store_group_snapshot
-      snapshot = ActiveRecord::Base.connected_to(role: :reading, prevent_writes: true) { {generated_at: Time.current, groups:} }
+    # claim: the job's PREPARING_KEY value, released when it's done
+    def store_group_snapshot(claim: nil)
+      snapshot = ActiveRecord::Base.connected_to(role: :reading, prevent_writes: true) { {generated_at: Time.current.to_i, groups:} }
       RedisPool.conn { it.set(SNAPSHOT_KEY, snapshot.to_json, ex: SNAPSHOT_TTL.to_i) }
     ensure
-      RedisPool.conn { it.del(PREPARING_KEY) }
+      release_claim(claim) if claim
     end
 
     def groups
@@ -52,9 +57,9 @@ module BikeDuplicatesServices
         group = group.merge("kind" => kind(group),
           "bike_ids" => JSON.parse(group["bike_ids"]),
           "organization_ids" => JSON.parse(group["organization_ids"] || "[]"),
-          "first_at" => group["first_at"].in_time_zone,
-          "last_at" => group["last_at"].in_time_zone)
-        group.merge("cues" => Cues.group_cues(group))
+          "first_at" => group["first_at"].in_time_zone.to_i,
+          "last_at" => group["last_at"].in_time_zone.to_i)
+        group.merge("cue_keys" => Cues.group_cues(group).map(&:key))
       end
     end
 
@@ -192,26 +197,20 @@ module BikeDuplicatesServices
     def customer_origins = Ownership::ORIGIN_WEBSITE_REG + %w[embed embed_extended embed_partial]
 
     def enqueue_group_snapshot
-      return unless RedisPool.conn { it.set(PREPARING_KEY, Time.current.to_i, nx: true, ex: PREPARING_TTL.to_i) }
+      claim = SecureRandom.hex
+      return unless RedisPool.conn { it.set(PREPARING_KEY, claim, nx: true, ex: PREPARING_TTL.to_i) }
 
-      BikeJobs::PrepareDuplicateReviewJob.perform_async
+      BikeJobs::PrepareDuplicateReviewJob.perform_async(claim)
     rescue
       # Release the claim, so the next visit enqueues again rather than waiting out PREPARING_TTL
-      RedisPool.conn { it.del(PREPARING_KEY) }
+      release_claim(claim)
       raise
     end
 
+    def release_claim(claim) = RedisPool.conn { it.eval(RELEASE_CLAIM_SCRIPT, keys: [PREPARING_KEY], argv: [claim]) }
+
     def enum_sql(enum, *keys) = enum.values_at(*keys.map(&:to_sym)).join(", ")
 
-    def parse_snapshot(json)
-      snapshot = JSON.parse(json)
-      groups = snapshot["groups"].map do |group|
-        group.merge("first_at" => Time.zone.parse(group["first_at"]), "last_at" => Time.zone.parse(group["last_at"]),
-          "cues" => group["cues"].map { Cues::Cue.new(**it.symbolize_keys.merge(color: it["color"].to_sym)) })
-      end
-      {generated_at: Time.zone.parse(snapshot["generated_at"]), groups:}
-    end
-
-    conceal :customer_origins, :enqueue_group_snapshot, :enum_sql, :parse_snapshot, :stolen_serial_bikes, :query, :test_bikes_sql
+    conceal :customer_origins, :enqueue_group_snapshot, :enum_sql, :release_claim, :stolen_serial_bikes, :query, :test_bikes_sql
   end
 end

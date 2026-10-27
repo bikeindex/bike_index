@@ -1,7 +1,4 @@
-require "spec_helper"
-require "active_support/all"
-require "functionable"
-require_relative "../../../app/services/bike_duplicates_services/finder"
+require "rails_helper"
 
 RSpec.describe BikeDuplicatesServices::Finder do
   let(:group) do
@@ -31,11 +28,11 @@ RSpec.describe BikeDuplicatesServices::Finder do
   end
 
   it "takes placeholder and part-number serials out of every other duplicate queue" do
-    expect(described_class.kind(group.merge("serial" => "N05ER1A1NUM8ER", "test_count" => 2, "handoff_priority" => true))).to eq "not_a_serial"
+    expect(described_class.kind(group.merge("serial" => "5M88R60", "test_count" => 2, "handoff_priority" => true))).to eq "not_a_serial"
   end
 
-  it "keeps a stolen placeholder serial in the stolen queue" do
-    expect(described_class.kind(group.merge("serial" => "N05ER1A1NUM8ER", "serial_stolen" => true))).to eq "stolen_history"
+  it "keeps a stolen part-number serial in the stolen queue" do
+    expect(described_class.kind(group.merge("serial" => "5M88R60", "serial_stolen" => true))).to eq "stolen_history"
   end
 
   it "recognizes the strictly qualified handoff evidence" do

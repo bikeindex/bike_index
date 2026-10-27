@@ -19,17 +19,6 @@ module BikeDuplicatesServices
       "EN 14781", "EN 14872", "EN 15194", "EN 15532", "EN 17406", "EN 17128", "EN 14619", "EN 1888",
       "EN 12183", "EN 12184", "DIN 79100", "GB 3565", "GB 17761", "JIS D 9301", "CPSC", "CFR 1512"]
       .to_h { [it, SerialNormalizer.no_space(SerialNormalizer.normalized_and_corrected(it))] }.freeze
-    # Typed into the serial field in place of one. A whole-serial match only: a real serial
-    # containing one of these words is not affected. Reviewer-curated, extend as found.
-    # Other brand names are caught by fetch_manufacturer_name_serials
-    PLACEHOLDER_SERIALS = ["NO SERIAL NUMBER", "NOSERIAL", "NO NUMBER", "NOT ASSIGNED", "NOT RECORDED",
-      "NOT AVAILABLE", "UNAVAILABLE", "UNSURE", "NOT SURE", "PENDING", "PRESALE", "ON ORDER", "PLACEHOLDER",
-      "TO BE SPECIFIED", "TO BE ADDED", "TBD SPECIAL ORDER", "TBD BUILDING", "ADD SERIAL", "ADD LATER",
-      "WILL ADD", "WILL ADD LATER", "WILL UPDATE", "FILL IN LATER", "ADD AT BUILD", "ADD ON BUILD",
-      "ADD SN ON BUILD", "ADD UPON ARRIVAL", "DONT HAVE", "DONT HAVE IT", "I DONT HAVE IT", "CANT FIND",
-      "CANNOT FIND", "CANT READ", "UNREADABLE", "ILLEGIBLE", "HIDDEN", "STOLEN",
-      "BROMPTON"] # The manufacturer is "Brompton Bicycle", so the name rule misses it
-      .to_h { [SerialNormalizer.no_space(SerialNormalizer.normalized_and_corrected(it)), it] }.freeze
     # Component part numbers, which identify a model of part rather than one bicycle
     PART_NUMBER_SERIALS = {
       "170 FC-TY301" => "Shimano Tourney FC-TY301 crankset, 170 mm",
@@ -48,11 +37,6 @@ module BikeDuplicatesServices
       "none" => "No tentative cues"
     }.freeze
 
-    def standard_marking(serials)
-      normalized = Array(serials).compact.map { SerialNormalizer.no_space(it.to_s.upcase) }
-      STANDARD_DESIGNATIONS.find { |_designation, marking| normalized.any? { it.include?(marking) } }&.first
-    end
-
     # Normalized manufacturer names: a brand typed as the serial ("Brompton", "Motobecane") is a placeholder.
     # A new or renamed manufacturer moves the max updated_at, so the key changes rather than expiring.
     # A time in a cache key keeps only its second, so the key uses all of it
@@ -62,13 +46,12 @@ module BikeDuplicatesServices
       end
     end
 
-    # Whether the whole normalized serial is a known placeholder, part number, manufacturer name
-    # or one repeated character. manufacturer_names: is fetch_manufacturer_name_serials, or the part of it in use
+    # Whether the whole normalized serial is a known part number, manufacturer name or one repeated
+    # character. Placeholder text ("NOT ASSIGNED") is stored as unknown by SerialNormalizer, so it never groups.
+    # manufacturer_names: is fetch_manufacturer_name_serials, or the part of it in use
     def not_a_serial(serial, manufacturer_names: {})
       serial = serial.to_s
-      if PLACEHOLDER_SERIALS.key?(serial)
-        NotASerial.new(:placeholder, PLACEHOLDER_SERIALS[serial])
-      elsif PART_NUMBER_SERIALS.key?(serial)
+      if PART_NUMBER_SERIALS.key?(serial)
         NotASerial.new(:part_number, PART_NUMBER_SERIALS[serial])
       elsif manufacturer_names.key?(serial)
         NotASerial.new(:placeholder, "manufacturer name #{manufacturer_names[serial]}")
@@ -93,7 +76,7 @@ module BikeDuplicatesServices
       [
         (if not_serial
            Cue.new("not_a_serial", not_serial.label,
-             "The whole serial is #{not_serial.part_number? ? "a component part number" : "a placeholder"} on the reviewer-curated list, so sharing it does not suggest these records are the same bicycle.", :error)
+             "The whole serial is #{not_serial.part_number? ? "a component part number" : "a placeholder"}, so sharing it does not suggest these records are the same bicycle.", :error)
          end),
         (if marking
            Cue.new("standard_marking", "Possible standards marking: #{marking}",
@@ -141,17 +124,21 @@ module BikeDuplicatesServices
     end
 
     # The groups matching filter (all of them for an unknown one) and every filter's count.
-    # Groups carry their cues, built once when they're prepared
+    # Groups carry their cue keys, found once when they're prepared
     def filter(groups, filter)
-      keyed = groups.map { |group| [group, group["cues"].map(&:key)] }
-      counts = FILTERS.keys.to_h { |key| [key, keyed.count { matches_filter?(it.last, key) }] }
-      filtered = FILTERS.key?(filter) ? keyed.filter_map { |group, keys| group if matches_filter?(keys, filter) } : groups
+      counts = FILTERS.keys.to_h { |key| [key, groups.count { matches_filter?(it["cue_keys"], key) }] }
+      filtered = FILTERS.key?(filter) ? groups.select { matches_filter?(it["cue_keys"], filter) } : groups
       [filtered, counts]
     end
 
     #
     # private below here
     #
+
+    def standard_marking(serials)
+      normalized = Array(serials).compact.map { SerialNormalizer.no_space(it.to_s.upcase) }
+      STANDARD_DESIGNATIONS.find { |_designation, marking| normalized.any? { it.include?(marking) } }&.first
+    end
 
     def calculated_manufacturer_name_serials
       Manufacturer.pluck(:name).filter_map do |name|
@@ -165,6 +152,6 @@ module BikeDuplicatesServices
       (filter == "none") ? (keys - ["single_contact"]).none? : keys.include?(filter)
     end
 
-    conceal :calculated_manufacturer_name_serials, :matches_filter?
+    conceal :calculated_manufacturer_name_serials, :matches_filter?, :standard_marking
   end
 end

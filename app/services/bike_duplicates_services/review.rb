@@ -26,20 +26,17 @@ module BikeDuplicatesServices
       "Status" => ->(bike) { bike.status&.humanize }
     }.freeze
 
-    attr_reader :bikes, :reference_bike, :manufacturer_names
+    attr_reader :bikes, :reference_bike
 
     # The first ownership: no previous one, then the earliest
     def self.initial_ownership(bike)
       bike&.ownerships&.min_by { |ownership| [ownership.previous_ownership_id.nil? ? 0 : 1, ownership.created_at || Time.at(0), ownership.id || 0] }
     end
 
-    # manufacturer_names: is Cues.fetch_manufacturer_name_serials, so a brand typed as the serial is caught.
-    # stolen_record_counts: is every stolen record per bike ID, deleted ones included
-    def initialize(bikes:, reference_bike: nil, manufacturer_names: {}, stolen_record_counts: {})
+    # bikes: the loaded records, with their ownerships. What else the review needs, it loads once
+    def initialize(bikes:, reference_bike: nil)
       @bikes = bikes
       @reference_bike = reference_bike || bikes.first
-      @manufacturer_names = manufacturer_names
-      @stolen_record_counts = stolen_record_counts
     end
 
     def serial_match(bike)
@@ -74,28 +71,14 @@ module BikeDuplicatesServices
     end
 
     def account_match(bike, initial: false)
-      ownership = initial ? initial_ownership(bike) : bike.current_ownership
-      reference_ownership = initial ? initial_ownership(reference_bike) : reference_bike&.current_ownership
+      ownership, reference_ownership = ownership_pair(bike, initial:)
       return "Account unavailable" if ownership&.user_id.nil? || reference_ownership&.user_id.nil?
 
       (ownership.user_id == reference_ownership.user_id) ? "Same account" : "Different accounts"
     end
 
-    def email_match(bike, initial: false)
-      ownership = initial ? initial_ownership(bike) : bike.current_ownership
-      reference_ownership = initial ? initial_ownership(reference_bike) : reference_bike&.current_ownership
-      email = normalized_email(ownership)
-      reference_email = normalized_email(reference_ownership)
-      return "Email unavailable" if email.nil? || reference_email.nil?
-
-      (email == reference_email) ? "Same email" : "Different emails"
-    end
-
     def email_evidence(bike, initial: false)
-      ownership = initial ? initial_ownership(bike) : bike.current_ownership
-      reference_ownership = initial ? initial_ownership(reference_bike) : reference_bike&.current_ownership
-      email = normalized_email(ownership)
-      reference_email = normalized_email(reference_ownership)
+      email, reference_email = ownership_pair(bike, initial:).map { normalized_email(it) }
       return "Email unavailable" if email.nil? || reference_email.nil?
       return "Exact normalized email" if email == reference_email
       return "Same local part, different domains (identity unverified)" if email.split("@").first == reference_email.split("@").first
@@ -128,7 +111,26 @@ module BikeDuplicatesServices
 
     def transferred?(bike) = bike.ownerships.any?(&:previous_ownership_id)
 
-    def stolen_history?(bike) = bike.status_stolen? || bike.current_stolen_record_id.present? || @stolen_record_counts.key?(bike.id)
+    def stolen_history?(bike) = bike.status_stolen? || bike.current_stolen_record_id.present? || stolen_count(bike).positive?
+
+    # Every stolen record on the bike, deleted ones included
+    def stolen_count(bike) = stolen_record_counts.fetch(bike.id, 0)
+
+    def stolen_records_count = stolen_record_counts.values.sum
+
+    # Stolen history on any record sharing one of these whole serials, whatever its manufacturer
+    def serial_stolen?
+      return @serial_stolen if defined?(@serial_stolen)
+
+      @serial_stolen = BikeDuplicatesServices::Finder.stolen_serials?(bikes.map(&:serial_normalized_no_space).uniq)
+    end
+
+    # The same test-marker rule the dashboard queues use
+    def test?(bike) = test_bike_ids.include?(bike.id)
+
+    def test_count = test_bike_ids.size
+
+    def account_email(user_id) = account_emails[user_id]
 
     def shared_fields = @shared_fields ||= FIELDS.keys.select { field_distribution(it).size == 1 }
 
@@ -171,22 +173,29 @@ module BikeDuplicatesServices
       end
     end
 
-    def cues(test_count:)
-      @cues ||= {}
-      @cues[test_count] ||= build_cues(test_count)
-    end
+    def cues = @cues ||= build_cues
 
     # Whether this comparison meets the same-owner evidence a future invitation would need.
     # An assessment only: it sends nothing and merges nothing
-    def readiness_checks(serial_stolen:, test_count:)
+    def readiness_checks = @readiness_checks ||= build_readiness_checks
+
+    def readiness
+      return :blocked if readiness_checks.any? { it.status == :blocked }
+
+      (readiness_checks.any? { it.status == :uncertain }) ? :uncertain : :pass
+    end
+
+    private
+
+    def build_readiness_checks
       initials = bikes.map { initial_ownership(it) }
       accounts = initials.map { it&.user_id }
       emails = initials.map { normalized_email(it) }
-      separate_cues = cues(test_count:).select { SEPARATE_REVIEW_CUES.include?(it.key) }
+      separate_cues = cues.select { SEPARATE_REVIEW_CUES.include?(it.key) }
       serials = bikes.map { it.serial_normalized_no_space.to_s }
       manufacturer_ids = bikes.map(&:manufacturer_id)
       [
-        if serial_stolen
+        if serial_stolen?
           Check.new(:blocked, "Stolen history on this whole serial (any record, manufacturer or status) is a hard merge veto")
         elsif bikes.any? { stolen_history?(it) }
           Check.new(:blocked, "A record has its own stolen history, a hard merge veto whatever its serial")
@@ -219,15 +228,7 @@ module BikeDuplicatesServices
       ].compact
     end
 
-    def readiness(checks)
-      return :blocked if checks.any? { it.status == :blocked }
-
-      (checks.any? { it.status == :uncertain }) ? :uncertain : :pass
-    end
-
-    private
-
-    def build_cues(test_count)
+    def build_cues
       emails = initial_emails
       accounts = bikes.filter_map { initial_ownership(it)&.user_id }
       BikeDuplicatesServices::Cues.cues(serials: bikes.map(&:serial_normalized_no_space).uniq,
@@ -236,7 +237,22 @@ module BikeDuplicatesServices
         single_contact: [emails, accounts].any? { it.size == bikes.size && it.uniq.size == 1 })
     end
 
-    def pos?(bike) = %w[lightspeed_pos ascend_pos].include?(initial_ownership(bike)&.pos_kind)
+    def pos?(bike) = BikeDuplicatesServices::Finder::POS_KINDS.include?(initial_ownership(bike)&.pos_kind)
+
+    def ownership_pair(bike, initial:) = [bike, reference_bike].map { initial ? initial_ownership(it) : it&.current_ownership }
+
+    # Cues.fetch_manufacturer_name_serials, so a brand typed as the serial is caught
+    def manufacturer_names = @manufacturer_names ||= BikeDuplicatesServices::Cues.fetch_manufacturer_name_serials
+
+    def stolen_record_counts
+      @stolen_record_counts ||= StolenRecord.unscoped.where(bike_id: bikes.map(&:id)).group(:bike_id).count
+    end
+
+    def test_bike_ids = @test_bike_ids ||= BikeDuplicatesServices::Finder.test_bike_ids(bikes.map(&:id)).to_set
+
+    def account_emails
+      @account_emails ||= User.unscoped.where(id: bikes.flat_map { it.ownerships.map(&:user_id) }.compact.uniq).pluck(:id, :email).to_h
+    end
 
     def shop_default_propulsion?
       shop_default_at = bikes.select { pos?(it) && it.propulsion_type == "foot-pedal" }.map(&:created_at).min

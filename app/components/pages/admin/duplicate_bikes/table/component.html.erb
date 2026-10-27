@@ -1,6 +1,8 @@
-<%# locals: (groups:, segments:, statistics:) %>
+<%# UI::Table runs each cell against itself, so the cells read locals rather than ivars %>
+<% segments = @segments %>
+<% statistics = @statistics %>
 
-<%= render UI::Table::Component.new(records: groups) do |table| %>
+<%= render UI::Table::Component.new(records: @groups) do |table| %>
   <% table.column(label: "Group") do |group| %>
     <%= link_to "Review group ##{group.id}", admin_duplicate_bike_path(group), class: "twlink" %>
   <% end %>
