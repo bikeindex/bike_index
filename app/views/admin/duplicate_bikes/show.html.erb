@@ -35,8 +35,7 @@
   <%= render UI::Alerts::Base::Component.new(kind: :warning, margin_classes: "tw:mt-4", header: "Not a duplicate match: this serial is #{not_serial.part_number? ? "a part number" : "a placeholder"} (#{not_serial.value})") do %>
     These records share the serial because it was entered in place of a frame
     serial, so it says nothing about whether they are the same bicycle. Treat
-    each as its own registration. The placeholder and part-number list is
-    reviewer-curated and lives in
+    each as its own registration. Part numbers are listed in
     <span class="tw:font-mono">BikeDuplicatesServices::Cues</span>.
   <% end %>
 <% end %>

@@ -1,9 +1,4 @@
-require "spec_helper"
-require "active_support/all"
-require "functionable"
-require_relative "../../../app/services/serial_normalizer"
-require_relative "../../../app/services/bike_duplicates_services/finder"
-require_relative "../../../app/services/bike_duplicates_services/cues"
+require "rails_helper"
 
 RSpec.describe BikeDuplicatesServices::Cues do
   let(:group) do
@@ -12,23 +7,21 @@ RSpec.describe BikeDuplicatesServices::Cues do
   end
   let(:cue_keys) { described_class.group_cues(group).map(&:key) }
 
+  def cue_labels(serials) = described_class.cues(serials:, record_count: 2, contact_count: 2, test_count: 0, review_contact_count: 0, single_contact: false).map(&:label)
+
   it "finds standards designations through serial normalization" do
-    expect(described_class.standard_marking(["EN14764"])).to eq "EN 14764"
-    expect(described_class.standard_marking([SerialNormalizer.no_space(SerialNormalizer.normalized_and_corrected("iso 4210-2"))])).to eq "ISO 4210"
-    expect(described_class.standard_marking(["WTU123456", nil])).to be_nil
+    expect(cue_labels(["EN14764"])).to eq ["Possible standards marking: EN 14764"]
+    expect(cue_labels([SerialNormalizer.no_space(SerialNormalizer.normalized_and_corrected("iso 4210-2"))])).to eq ["Possible standards marking: ISO 4210"]
+    expect(cue_labels(["WTU123456", nil])).to eq []
   end
 
-  it "recognizes whole placeholder and part-number serials only" do
-    expect(described_class::PLACEHOLDER_SERIALS.keys).to all(be_present)
-    expect(described_class::PLACEHOLDER_SERIALS.values_at("N05ER1A1NUM8ER", "N0TA551GNED", "8R0MPT0N", "T08E5PEC1F1ED"))
-      .to eq ["NO SERIAL NUMBER", "NOT ASSIGNED", "BROMPTON", "TO BE SPECIFIED"]
+  it "recognizes whole part-number, manufacturer-name and repeated-character serials only" do
     expect(described_class.not_a_serial("170FCTY301")).to have_attributes(kind: :part_number)
     expect(described_class.not_a_serial("XXXXXXXX")).to have_attributes(kind: :placeholder)
-    expect(described_class.not_a_serial("8R0MPT0N1234")).to be_nil
     expect(described_class.not_a_serial("WTU123456")).to be_nil
     expect(described_class.not_a_serial("M0T08ECANE", manufacturer_names: {"M0T08ECANE" => "Motobecane"}).value).to eq "manufacturer name Motobecane"
-    expect(described_class.cues(serials: ["T08E5PEC1F1ED"], record_count: 2, contact_count: 2, test_count: 0, review_contact_count: 0, single_contact: false).map(&:label))
-      .to eq ["Placeholder, not a serial: TO BE SPECIFIED"]
+    expect(described_class.not_a_serial("M0T08ECANE1234", manufacturer_names: {"M0T08ECANE" => "Motobecane"})).to be_nil
+    expect(cue_labels(["5M88R60"])).to eq ["Part number, not a serial: Shimano SM-BBR60 bottom bracket"]
   end
 
   it "recognizes reserved example domains only" do

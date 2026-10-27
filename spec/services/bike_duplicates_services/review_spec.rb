@@ -1,10 +1,4 @@
-require "spec_helper"
-require "active_support/all"
-require "functionable"
-require_relative "../../../app/services/serial_normalizer"
-require_relative "../../../app/services/bike_duplicates_services/finder"
-require_relative "../../../app/services/bike_duplicates_services/cues"
-require_relative "../../../app/services/bike_duplicates_services/review"
+require "rails_helper"
 
 RSpec.describe BikeDuplicatesServices::Review do
   let(:ownership_class) { Struct.new(:id, :previous_ownership_id, :created_at, :user_id, :owner_email, :is_phone, :claimed, :claimed_at, :pos_kind) }
