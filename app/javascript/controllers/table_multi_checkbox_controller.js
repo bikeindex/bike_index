@@ -21,6 +21,7 @@ export default class extends Controller {
 
   // Checks the row's checkbox, so editing a row's fields selects it
   selectRow (event) {
+    if (event.target.type === 'checkbox') return
     const checkbox = event.target.closest('tr')?.querySelector('input[type=checkbox]')
     if (checkbox && !checkbox.disabled) checkbox.checked = true
   }
