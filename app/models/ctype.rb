@@ -23,8 +23,8 @@ class Ctype < ApplicationRecord
   belongs_to :cgroup
 
   has_many :components
-  validates_presence_of :cgroup
 
+  validates_presence_of :cgroup
 
   mount_uploader :image, AvatarUploader
 

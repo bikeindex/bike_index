@@ -34,7 +34,7 @@ RSpec.describe Admin::CtypesController, type: :request do
       it "renders the component group select as required" do
         get "#{base_url}/new"
         expect(response).to be_ok
-        expect(response.body).to match(/<select[^>]*required="required"[^>]*name="ctype\[cgroup_id\]"/)
+        expect(Capybara.string(response.body)).to have_css("label[for='ctype_cgroup_id'] + select#ctype_cgroup_id[required]")
       end
     end
 
