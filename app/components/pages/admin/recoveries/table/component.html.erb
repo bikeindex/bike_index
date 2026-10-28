@@ -118,9 +118,31 @@
 
         <% table.column(label: COLUMNS[:story_cell], classes: "hideableColumn story_cell tw:min-w-72") do |(recovery)| %>
           <% if editable.call(recovery) %>
-            <%= text_area_tag "display[#{recovery.id}][quote]", display_defaults.call(recovery)[:quote], rows: 5, maxlength: RecoveryDisplay::QUOTE_MAX_LENGTH,
-          class: "twinput", aria: {label: "Recovery story for recovery #{recovery.id}"}, data: {"admin--personal-info-target" => "field"} %>
-            <p class="tw:mt-1 tw:mb-0 tw:text-xs tw:text-amber-700 tw:empty:hidden" data-admin--personal-info-target="warning"></p>
+            <div
+              data-controller="admin--character-count"
+              data-admin--character-count-max-value="<%= RecoveryDisplay::QUOTE_MAX_LENGTH %>"
+            >
+              <%= text_area_tag "display[#{recovery.id}][quote]", display_defaults.call(recovery)[:quote], rows: 5, maxlength: RecoveryDisplay::QUOTE_MAX_LENGTH,
+          class: "twinput", aria: {label: "Recovery story for recovery #{recovery.id}"},
+          data: {"admin--personal-info-target" => "field", "admin--character-count-target" => "field", action: "input->admin--character-count#update"} %>
+
+              <div
+                class="
+                  tw:mt-1 tw:flex tw:items-start tw:justify-between tw:gap-2
+                  tw:text-xs
+                "
+              >
+                <p
+                  class="tw:m-0 tw:text-amber-700 tw:empty:hidden"
+                  data-admin--personal-info-target="warning"
+                ></p>
+
+                <span
+                  class="tw:ml-auto tw:text-gray-500 tw:tabular-nums"
+                  data-admin--character-count-target="total"
+                ></span>
+              </div>
+            </div>
           <% else %>
             <%= recovery.recovery_display&.quote || recovery.recovered_description %>
           <% end %>

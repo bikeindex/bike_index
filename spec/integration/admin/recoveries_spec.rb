@@ -10,7 +10,13 @@ RSpec.describe "Admin recoveries", :js, type: :system do
       recovered_description: "Got it back, call me at 555-123-4567")
   end
 
+  let!(:long_story_record) do
+    FactoryBot.create(:stolen_record_recovered, bike: FactoryBot.create(:bike, :with_ownership), can_share_recovery: true,
+      recovered_description: "Found it. " * 45)
+  end
+
   before do
+    long_story_record.update_column(:recovery_display_status, "waiting_on_decision")
     bike.owner.update(name: "Dr. Alex Chen")
     stolen_record.update_column(:recovery_display_status, "waiting_on_decision")
     Organization.example # Logging in lands on the admin dashboard, which reads it from the replica
@@ -24,8 +30,13 @@ RSpec.describe "Admin recoveries", :js, type: :system do
     expect(page).to have_content("Contains phone number")
     expect(find_field("display[#{stolen_record.id}][quote_by]").value).to eq "Alex"
 
+    # a prefilled story can be over the limit, which maxlength doesn't stop
+    expect(page).to have_css(".tw\\:text-red-600", text: "450/400")
+    expect(page).to have_content("#{story.value.length}/400")
+
     story.fill_in with: "Got it back."
     expect(page).to have_no_content("Contains phone number")
+    expect(page).to have_content("12/400")
 
     story.fill_in with: "Got it back, email me@example.com"
     expect(page).to have_content("Contains email address")
