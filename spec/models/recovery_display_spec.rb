@@ -102,6 +102,13 @@ RSpec.describe RecoveryDisplay, type: :model do
       recovery_display.update(quote_by: " ")
       expect(recovery_display.quote_by).to be_nil
     end
+
+    it "skips a title" do
+      expect(RecoveryDisplay.first_name("Dr. Alex Chen")).to eq "Alex"
+      expect(RecoveryDisplay.first_name("mrs Pat Smith")).to eq "Pat"
+      expect(RecoveryDisplay.first_name("Prof.")).to be_nil
+      expect(RecoveryDisplay.first_name("Drew Chen")).to eq "Drew"
+    end
   end
 
   describe "from_stolen_record_id" do

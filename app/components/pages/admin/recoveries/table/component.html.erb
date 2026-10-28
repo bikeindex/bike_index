@@ -9,7 +9,7 @@
 <div class="twwiderow tw:mb-4">
   <%= form_with(url: bulk_update_admin_recoveries_path, method: :post,
   class: "tw:col-span-full tw:min-w-0 tw:rounded-xl tw:twfullbleed #{UI::Card::Component::BASE_CLASSES}",
-  data: UI::ColumnSettings::Component.data_attributes(storage_key: "adminRecoveriesColumns", controllers: "table-multi-checkbox", orderable: true)) do %>
+  data: form_data) do %>
     <%# Full bleed drops the card's gutter, so the header meets the page's %>
     <div
       class="
@@ -119,7 +119,8 @@
         <% table.column(label: COLUMNS[:story_cell], classes: "hideableColumn story_cell tw:min-w-72") do |(recovery)| %>
           <% if editable.call(recovery) %>
             <%= text_area_tag "display[#{recovery.id}][quote]", display_defaults.call(recovery)[:quote], rows: 5, maxlength: RecoveryDisplay::QUOTE_MAX_LENGTH,
-          class: "twinput", aria: {label: "Recovery story for recovery #{recovery.id}"} %>
+          class: "twinput", aria: {label: "Recovery story for recovery #{recovery.id}"}, data: {"admin--personal-info-target" => "field"} %>
+            <p class="tw:mt-1 tw:mb-0 tw:text-xs tw:text-amber-700 tw:empty:hidden" data-admin--personal-info-target="warning"></p>
           <% else %>
             <%= recovery.recovery_display&.quote || recovery.recovered_description %>
           <% end %>

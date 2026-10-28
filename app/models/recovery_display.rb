@@ -19,6 +19,7 @@
 #
 class RecoveryDisplay < ActiveRecord::Base
   QUOTE_MAX_LENGTH = 400
+  HONORIFIC = /\A(mr|mrs|ms|mx|miss|dr|prof|professor|rev|sir|madam)\.?\z/i
 
   belongs_to :stolen_record
 
@@ -60,7 +61,7 @@ class RecoveryDisplay < ActiveRecord::Base
       }
     end
 
-    def first_name(name) = name&.split(/\s/)&.first
+    def first_name(name) = name&.split(/\s/)&.find { !HONORIFIC.match?(it) }
 
     def calculated_owner_name(bike)
       return unless bike&.current_ownership&.present? && bike&.owner.present?
