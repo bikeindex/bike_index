@@ -49,8 +49,8 @@ class RecoveryDisplay < ActiveRecord::Base
       new_record
     end
 
-    def attributes_from_stolen_record(stolen_record)
-      bike = Bike.unscoped.find_by_id(stolen_record.bike_id) if stolen_record.bike_id.present?
+    def attributes_from_stolen_record(stolen_record, bike: nil)
+      bike ||= Bike.unscoped.find_by_id(stolen_record.bike_id) if stolen_record.bike_id.present?
 
       {
         stolen_record:,
@@ -61,7 +61,7 @@ class RecoveryDisplay < ActiveRecord::Base
       }
     end
 
-    def first_name(name) = name&.split(/\s/)&.find { !HONORIFIC.match?(it) }
+    def first_name(name) = name.to_s.split.find { !HONORIFIC.match?(it) }
 
     def calculated_owner_name(bike)
       return unless bike&.current_ownership&.present? && bike&.owner.present?

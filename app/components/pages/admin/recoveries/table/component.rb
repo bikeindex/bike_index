@@ -38,25 +38,22 @@ module Pages
 
           private
 
-          # A bike can be user hidden or deleted
+          # A bike can be user hidden or deleted. Only a recovery waiting on a decision can be displayed,
+          # so only those get the defaults its editable fields start from
           def rows
             bikes = Bike.unscoped.where(id: @recoveries.map(&:bike_id))
               .includes(current_ownership: {user: %i[membership_active email_bans_active]}).index_by(&:id)
-            @recoveries.map { [it, bikes[it.bike_id]] }
+            @recoveries.map do |recovery|
+              bike = bikes[recovery.bike_id]
+              [recovery, bike, (RecoveryDisplay.attributes_from_stolen_record(recovery, bike:) if recovery.waiting_on_decision?)]
+            end
           end
 
           def form_data
             data = UI::ColumnSettings::Component.data_attributes(storage_key: "adminRecoveriesColumns",
               controllers: "table-multi-checkbox admin--personal-info", orderable: true)
-            data.merge(action: [data[:action], "input->admin--personal-info#check submit->admin--personal-info#confirmDisplay"].join(" "),
+            data.merge(action: [data[:action], "submit->admin--personal-info#confirmDisplay"].join(" "),
               "admin--personal-info-patterns-value": PERSONAL_INFO.transform_values { {label: it[:label], source: it[:pattern].source} }.to_json)
-          end
-
-          # Only a recovery waiting on a decision can be displayed, so only those are editable
-          def editable?(recovery) = recovery.waiting_on_decision?
-
-          def display_defaults(recovery)
-            RecoveryDisplay.attributes_from_stolen_record(recovery).slice(:quote, :quote_by, :location_string)
           end
         end
       end

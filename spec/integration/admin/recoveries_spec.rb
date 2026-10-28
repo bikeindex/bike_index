@@ -32,7 +32,6 @@ RSpec.describe "Admin recoveries", :js, type: :system do
 
     # a prefilled story can be over the limit, which maxlength doesn't stop
     expect(page).to have_css(".tw\\:text-red-600", text: "450/400")
-    expect(page).to have_content("#{story.value.length}/400")
 
     story.fill_in with: "Got it back."
     expect(page).to have_no_content("Contains phone number")

@@ -13,7 +13,7 @@ export default class extends Controller {
   }
 
   check ({ target }) {
-    if (this.fieldTargets.includes(target)) this.flag(target)
+    this.flag(target)
   }
 
   confirmDisplay (event) {
@@ -21,15 +21,16 @@ export default class extends Controller {
     const flagged = this.fieldTargets.filter(field => field.closest('tr').querySelector('input[type=checkbox]:checked') && this.labels(field).length)
     if (flagged.length === 0) return
     const message = `${flagged.length} selected ${flagged.length === 1 ? 'story still contains' : 'stories still contain'} a phone number, email or street address. Display anyway?`
-    if (!confirm(message)) event.preventDefault()
+    if (!window.confirm(message)) event.preventDefault()
   }
 
   flag (field) {
     const labels = this.labels(field)
-    field.classList.toggle('tw:ring-2', labels.length > 0)
-    field.classList.toggle('tw:ring-amber-400', labels.length > 0)
+    const flagged = labels.length > 0
+    field.classList.toggle('tw:ring-2', flagged)
+    field.classList.toggle('tw:ring-amber-400', flagged)
     this.warningTargets.find(warning => warning.closest('td') === field.closest('td')).textContent =
-      labels.length ? `Contains ${labels.join(', ')}` : ''
+      flagged ? `Contains ${labels.join(', ')}` : ''
   }
 
   labels (field) {

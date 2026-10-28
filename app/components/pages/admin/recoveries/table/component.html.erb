@@ -32,9 +32,6 @@
 
     <%= render(UI::ColumnSettings::Component.new(columns: COLUMNS, defaults: DEFAULT_COLUMNS, narrow_hidden: %i[photo_cell recovered_at_cell])) %>
 
-    <% editable = method(:editable?) %>
-    <% display_defaults = method(:display_defaults) %>
-
     <%# Full bleed takes the table over the admin gutter, past the card, so it's clipped here %>
     <div
       class="
@@ -47,7 +44,7 @@
         <% table.column(label: button_tag(check_mark, type: "button", class: "twlink tw:cursor-pointer tw:border-0 tw:bg-transparent tw:p-0",
       title: "Toggle all checked", aria: {label: "Toggle all checked"}, data: {action: "click->table-multi-checkbox#toggleAll"})) do |(recovery)| %>
           <div class="tw:flex tw:items-center tw:gap-3">
-            <%= check_box_tag "sr_selected[#{recovery.id}]", recovery.id, false, disabled: !editable.call(recovery),
+            <%= check_box_tag "sr_selected[#{recovery.id}]", recovery.id, false, disabled: !recovery.waiting_on_decision?,
           aria: {label: "Select recovery #{recovery.id}"}, data: {"table-multi-checkbox-target" => "checkbox"} %>
 
             <%= render(UI::ButtonLink::Component.new(text: "View", href: edit_admin_recovery_path(recovery), size: :sm)) %>
@@ -116,15 +113,12 @@
           <%= recovery.theft_description %>
         <% end %>
 
-        <% table.column(label: COLUMNS[:story_cell], classes: "hideableColumn story_cell tw:min-w-72") do |(recovery)| %>
-          <% if editable.call(recovery) %>
-            <div
-              data-controller="admin--character-count"
-              data-admin--character-count-max-value="<%= RecoveryDisplay::QUOTE_MAX_LENGTH %>"
-            >
-              <%= text_area_tag "display[#{recovery.id}][quote]", display_defaults.call(recovery)[:quote], rows: 5, maxlength: RecoveryDisplay::QUOTE_MAX_LENGTH,
+        <% table.column(label: COLUMNS[:story_cell], classes: "hideableColumn story_cell tw:min-w-72") do |(recovery, _bike, defaults)| %>
+          <% if recovery.waiting_on_decision? %>
+            <div data-controller="admin--character-count">
+              <%= text_area_tag "display[#{recovery.id}][quote]", defaults[:quote], rows: 5, maxlength: RecoveryDisplay::QUOTE_MAX_LENGTH,
           class: "twinput", aria: {label: "Recovery story for recovery #{recovery.id}"},
-          data: {"admin--personal-info-target" => "field", "admin--character-count-target" => "field", action: "input->admin--character-count#update"} %>
+          data: {"admin--personal-info-target" => "field", "admin--character-count-target" => "field", action: "input->admin--character-count#update input->admin--personal-info#check"} %>
 
               <div
                 class="
@@ -148,21 +142,16 @@
           <% end %>
         <% end %>
 
-        <% table.column(label: COLUMNS[:quote_by_cell], classes: "hideableColumn quote_by_cell tw:min-w-32") do |(recovery)| %>
-          <% if editable.call(recovery) %>
-            <%= text_field_tag "display[#{recovery.id}][quote_by]", display_defaults.call(recovery)[:quote_by], class: "twinput", autocomplete: "off",
-          aria: {label: "Display name for recovery #{recovery.id}"} %>
-          <% else %>
-            <%= recovery.recovery_display&.quote_by %>
-          <% end %>
-        <% end %>
+        <% %i[quote_by location_string].each do |field| %>
+          <% label = COLUMNS[:"#{field}_cell"] %>
 
-        <% table.column(label: COLUMNS[:location_string_cell], classes: "hideableColumn location_string_cell tw:min-w-32") do |(recovery)| %>
-          <% if editable.call(recovery) %>
-            <%= text_field_tag "display[#{recovery.id}][location_string]", display_defaults.call(recovery)[:location_string], class: "twinput", autocomplete: "off",
-          aria: {label: "Display location for recovery #{recovery.id}"} %>
-          <% else %>
-            <%= recovery.recovery_display&.location_string %>
+          <% table.column(label:, classes: "hideableColumn #{field}_cell tw:min-w-32") do |(recovery, _bike, defaults)| %>
+            <% if recovery.waiting_on_decision? %>
+              <%= text_field_tag "display[#{recovery.id}][#{field}]", defaults[field], class: "twinput", autocomplete: "off",
+            aria: {label: "#{label} for recovery #{recovery.id}"} %>
+            <% else %>
+              <%= recovery.recovery_display&.public_send(field) %>
+            <% end %>
           <% end %>
         <% end %>
 

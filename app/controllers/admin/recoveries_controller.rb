@@ -13,17 +13,18 @@ module Admin
     def index
       @per_page = permitted_per_page(default: 50)
       @pagy, @recoveries = pagy(:countish, available_recoveries.reorder(sortable_order(StolenRecord))
-        .includes(:country, :region_record, :recovery_display, :recovering_user), limit: @per_page, page: permitted_page)
+        .includes(:bike, :country, :region_record, :recovery_display, :recovering_user), limit: @per_page, page: permitted_page)
     end
 
     def bulk_update
       selected = params[:sr_selected].respond_to?(:keys) ? params[:sr_selected].keys : Array(params[:sr_selected])
       recoveries = StolenRecord.recovered.waiting_on_decision.where(id: selected).to_a
+      bulk_action = BULK_ACTIONS[params[:bulk_action]]
       if recoveries.none?
         flash[:error] = "No recoveries waiting on a decision selected!"
-      elsif BULK_ACTIONS.include?(params[:bulk_action])
+      elsif bulk_action
         count = send(:"bulk_#{params[:bulk_action]}", recoveries)
-        flash[:success] = "#{count} #{"recovery".pluralize(count)} #{BULK_ACTIONS.dig(params[:bulk_action], :done)}"
+        flash[:success] = "#{count} #{"recovery".pluralize(count)} #{bulk_action[:done]}"
       else
         flash[:error] = "Unknown action!"
       end
@@ -80,9 +81,9 @@ module Admin
     # Edits go to the display, not the recovery, which keeps what the owner wrote
     def build_recovery_display(stolen_record)
       edits = params.fetch(:display, {}).fetch(stolen_record.id.to_s, {}).permit(:quote, :quote_by, :location_string)
-      photo_url = Bike.unscoped.find_by_id(stolen_record.bike_id)&.image_url
-      RecoveryDisplay.new(RecoveryDisplay.attributes_from_stolen_record(stolen_record)
-        .merge(edits.to_h.symbolize_keys, remote_photo_url: photo_url))
+      bike = Bike.unscoped.find_by_id(stolen_record.bike_id)
+      RecoveryDisplay.new(RecoveryDisplay.attributes_from_stolen_record(stolen_record, bike:)
+        .merge(edits.to_h.symbolize_keys, remote_photo_url: bike&.image_url))
     end
 
     def sortable_columns
