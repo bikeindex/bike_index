@@ -1,7 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
 import { storedArray } from 'utils/stored_array'
-
-/* global localStorage */
+import { storage } from 'utils/storage'
 
 // Connects to data-controller='ui--table-column-order'
 // Drag a th.hideableColumn onto another to move its column. A column is named by its *_cell
@@ -45,7 +44,7 @@ export default class extends Controller {
     if (target === this.dragged) return
     const order = this.headers.map(header => this.cellName(header)).filter(name => name !== this.dragged)
     order.splice(order.indexOf(target) + (this.dropAfter ? 1 : 0), 0, this.dragged)
-    localStorage.setItem(this.storageKeyValue, JSON.stringify(order))
+    storage.setItem(this.storageKeyValue, JSON.stringify(order))
     this.applyOrder(order)
   }
 
