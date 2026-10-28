@@ -1,4 +1,5 @@
 import { array } from 'bikebook/templates/values'
+import { storage } from 'utils/storage'
 
 const KEY = 'bikebook:sizes'
 const PARAM = 'vehicle_sizes'
@@ -58,13 +59,13 @@ const nearest = (sizes, target) => {
 // The first vehicle's last picked size, { name, geometry }, which a first vehicle with none picked takes by name, else the nearest
 export const preferredSize = () => {
   try {
-    return JSON.parse(window.localStorage.getItem(KEY))
+    return JSON.parse(storage.getItem(KEY))
   } catch {
     return null
   }
 }
 
-export const storePreferredSize = (size) => window.localStorage.setItem(KEY, JSON.stringify(size))
+export const storePreferredSize = (size) => storage.setItem(KEY, JSON.stringify(size))
 
 // Each of `ids` as itself, and a model picked again as its id and which time: m/trek/2026/marlin_5#2
 export const vehicleKeys = (ids) => ids.map((id, index) => {

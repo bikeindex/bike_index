@@ -1,7 +1,8 @@
 import { Controller } from '@hotwired/stimulus'
 import { collapse } from 'utils/collapse_utils'
+import { storage } from 'utils/storage'
 
-/* global localStorage, requestAnimationFrame */
+/* global requestAnimationFrame */
 
 // Connects to data-controller='ui--collapse'
 // Animates [data-ui--collapse-target=content] open/closed. Optionally rotates a
@@ -69,7 +70,7 @@ export default class extends Controller {
   }
 
   get stored () {
-    return localStorage.getItem(this.storageKeyValue) === 'true'
+    return storage.getItem(this.storageKeyValue) === 'true'
   }
 
   // duration 0 restores state without animating
@@ -107,7 +108,7 @@ export default class extends Controller {
   }
 
   persist (expanding) {
-    if (this.hasStorageKeyValue) localStorage.setItem(this.storageKeyValue, String(expanding))
+    if (this.hasStorageKeyValue) storage.setItem(this.storageKeyValue, String(expanding))
     if (!this.hasParamValue) return
     const url = new URL(window.location)
     // Collapsed writes 0 rather than dropping the param: a caller rebuilding the query
