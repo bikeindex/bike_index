@@ -23,12 +23,14 @@ class Ctype < ApplicationRecord
   belongs_to :cgroup
 
   has_many :components
+  validates_presence_of :cgroup
+
 
   mount_uploader :image, AvatarUploader
 
   attr_accessor :cgroup_name, :image_cache
 
-  before_create :set_calculated_attributes
+  before_validation :set_calculated_attributes, on: :create
 
   def self.select_options
     normalize = ->(value) { value.to_s.downcase.gsub(/[^[:alnum:]]+/, "_") }
