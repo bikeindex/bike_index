@@ -21,8 +21,8 @@ module Pages
             shareable_cell: "Shareable"
           }.freeze
 
-          # Flagged as the story is edited, so JS compiles these case-insensitively too: no lookbehind or \A.
-          # Over-matching is fine, a flagged story only asks to be read
+          # JS compiles these too, case-insensitively: no lookbehind or \A. Over-matching is fine,
+          # a flagged story only asks to be read
           PERSONAL_INFO = {
             phone: {label: "phone number", pattern: /(\+?\d{1,2}[\s.-]?)?(\(\d{3}\)|\d{3})[\s.-]?\d{3}[\s.-]?\d{4}\b/i},
             email: {label: "email address", pattern: /[\w.+-]+@[\w-]+(\.[\w-]+)+/i},
@@ -38,8 +38,7 @@ module Pages
 
           private
 
-          # A bike can be user hidden or deleted. Only a recovery waiting on a decision can be displayed,
-          # so only those get the defaults its editable fields start from
+          # A bike can be user hidden or deleted
           def rows
             bikes = Bike.unscoped.where(id: @recoveries.map(&:bike_id))
               .includes(current_ownership: {user: %i[membership_active email_bans_active]}).index_by(&:id)
