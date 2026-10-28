@@ -1617,6 +1617,11 @@ RSpec.describe "BikeBook", :js, type: :system do
     # beside a vehicle that has none, a mode's classification
     visit bikebook_path(vehicle_models: "m/sur_ron/2026/ultra_bee_hp_x_us,m/segway/2025/gt3_pro", view: "all")
     classification = find("section div", text: /\AE-vehicle class\s*Off-Highway Motorcycle \?\z/, wait: 10)
+    # whose search, the first not a cycle, has no e-bike classes to filter by
+    click_on "More filters", match: :first
+    expect(page).to have_field("Human powered (Acoustic)").and have_no_field("US Class 2")
+    click_on "More filters", match: :first
+    expect(page).to have_no_css("#vehicle-filters")
     expect(classification).to have_xpath("ancestor::section[.//dt[text()='Propulsion']]")
     expect(page).to have_no_css("dt", exact_text: "Classifications")
     expect(page).to have_css("div", text: /\AMin rider age\s*18\W*yr\z/, visible: :all)
@@ -1779,6 +1784,31 @@ RSpec.describe "BikeBook", :js, type: :system do
     # opened from the search's More filters line, its section above the views collapsed until then
     compare = find_button("Compare similar bikes to Level 4 REC", wait: 10)
     expect(compare).to have_xpath("../following-sibling::*[@aria-controls='vehicle-filters']")
+    # and beneath the filters once they're open, its section's own toggle as far beneath them once that opens
+    click_on "More filters", match: :first
+    beneath_filters = lambda do |selector|
+      page.evaluate_script("[...document.querySelectorAll(#{selector.to_json})].find((each) => each.offsetParent).getBoundingClientRect().top - " \
+        "document.querySelector('#vehicle-filters .twwiderow > :first-child').getBoundingClientRect().bottom")
+    end
+    compare = find_button("Compare similar bikes to Level 4 REC")
+    expect(compare).to have_xpath("ancestor::*[@data-similar-slot][preceding-sibling::*[.//input[@name='market_scope']]]")
+    gap = beneath_filters.call("[data-similar-slot] button")
+    compare.click
+    expect(page).to have_css("#similar-toggle", text: "Hide similar bikes")
+    # once the filters' panel has eased to its new height
+    page.document.synchronize { raise Capybara::ExpectationNotMet unless beneath_filters.call("#similar-toggle") == gap }
+    # its adjustments at the foot of the filters' card, which they extend, rather than beside its toggle
+    expect(page).to have_no_css("[aria-label='Similar models'] [role='button']", text: "Adjust comparison algorithm", visible: :all)
+    find("#vehicle-filters [role='button']", text: "Adjust comparison algorithm").click
+    expect(find("#vehicle-filters #similar-adjustments")).to have_field("Tire clearance", with: "4")
+    # and back beside it, as open, once the filters close
+    click_on "More filters", match: :first
+    expect(find("[aria-label='Similar models']")).to have_field("Tire clearance", with: "4")
+    expect(page).to have_no_css("#similar-adjustments *", visible: :all).and have_no_css("#vehicle-filters")
+    # and into them again as they reopen, never in both
+    click_on "More filters", match: :first
+    expect(find("#similar-adjustments")).to have_field("Tire clearance", with: "4")
+    expect(page).to have_css("#similar-tires", count: 1, visible: :all)
     # beneath the line once it's carded around applied filters
     visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_rec,m/aventon/2022/level_2", manufacturer: "aventon")
     expect(find_button("Compare similar bikes to Level 4 REC", wait: 10)).to have_no_xpath("ancestor::*[ul[@aria-label='Applied filters']]")

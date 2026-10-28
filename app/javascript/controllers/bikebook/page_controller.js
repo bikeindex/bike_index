@@ -99,21 +99,28 @@ export default class extends Controller {
 
   // A filter changes in place, which with nothing picked the featured models and their count follow, and the picked
   // ones a jurisdiction or market, which decide which are out of class, which are sold elsewhere and which similar ones
-  // show, unless the page renders or the filters change again first
+  // show, or the filters opening, which hold the similar models' adjustments while they're open, unless the page renders
+  // or the filters change again first
   async refilter () {
     const viewers = this.pageTarget.querySelector('#vehicle-viewers')
     const url = new URL(window.location.href)
     const unpicked = viewers?.querySelector(':scope > [data-controller~="bikebook--tips"]')
-    const placeChanged = ['jurisdiction', 'market', 'market_scope'].some((name) => url.searchParams.get(name) !== this.#renderedUrl?.searchParams.get(name))
+    const placeChanged = ['jurisdiction', 'market', 'market_scope', 'filters'].some((name) => url.searchParams.get(name) !== this.#renderedUrl?.searchParams.get(name))
     if (!this.catalog || !viewers || (!unpicked && !placeChanged)) return
 
     const render = this.#renders
     const refilter = ++this.#refilters
-    const vehicles = await (unpicked ? unpickedVehicles : pickedVehicles)(this.catalog, this.pageTarget, url)
+    const { vehicles, adjustments } = await (unpicked ? unpickedVehicles : pickedVehicles)(this.catalog, this.pageTarget, url)
     if (render === this.#renders && refilter === this.#refilters) {
       renderInto(viewers, vehicles)
+      renderInto(this.pageTarget.querySelector('#similar-adjustments'), adjustments)
       this.#renderedUrl = url
     }
+  }
+
+  // the filters' panel opening or closing moves the similar models' adjustments, once there are any
+  toggleFilters ({ target }) {
+    if (target.getAttribute('data-ui--collapse-param-value') === 'filters' && this.pageTarget.querySelector('#similar-toggle')) this.refilter()
   }
 
   // The page as it is, rendered where the reader is, such as once a section that's scored when open first opens

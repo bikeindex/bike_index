@@ -84,10 +84,9 @@
       data-ui--collapse-target="content"
       class="tw:hidden"
     >
-      <div class="twwiderow tw:pb-6">
+      <div class="twwiderow tw:pb-6 tw:similar-open:pb-0">
         <%= render(UI::Card::Component.new(full_bleed: true, additional_classes: "tw:col-span-full tw:mt-3 tw:grid tw:gap-4 tw:lg:grid-cols-2 tw:lg:items-start")) do %>
           <div class="tw:flex tw:items-baseline tw:gap-x-4 tw:lg:col-span-2">
-            <span data-similar-slot class="tw:contents"></span>
             <%= clear_filters %>
             <%= more_filters %>
           </div>
@@ -287,7 +286,17 @@
               </fieldset>
             </div>
           </div>
+
+          <div
+            id="similar-adjustments"
+            class="tw:empty:hidden tw:lg:col-span-2"
+          ></div>
         <% end %>
+
+        <div
+          data-similar-slot
+          class="tw:col-span-full tw:mt-3 tw:similar-open:hidden"
+        ></div>
       </div>
     </div>
   </div>
@@ -300,7 +309,7 @@
   data-bikebook--page-failed-text-value="<%= translation(".failed") %>"
   data-bikebook--page-title-value="BikeBook"
   data-bikebook--page-search-log-url-value="<%= search_bikebook_path %>"
-  data-action="submit->bikebook--page#visit click->bikebook--page#follow popstate@window->bikebook--page#restore scroll@window->bikebook--page#track bikebook--catalog-filters:change->bikebook--page#refilter bikebook--similar:change->bikebook--page#rescore bikebook--similar:open->bikebook--page#refresh"
+  data-action="submit->bikebook--page#visit click->bikebook--page#follow popstate@window->bikebook--page#restore scroll@window->bikebook--page#track bikebook--catalog-filters:change->bikebook--page#refilter bikebook--similar:change->bikebook--page#rescore bikebook--similar:open->bikebook--page#refresh ui--collapse:shown->bikebook--page#toggleFilters ui--collapse:hidden->bikebook--page#toggleFilters"
 >
   <section
     aria-label="<%= translation(".about_bikebook_label") %>"

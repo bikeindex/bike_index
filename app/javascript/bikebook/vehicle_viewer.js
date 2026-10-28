@@ -5,7 +5,7 @@ import { chosenSizes, paramList, pickedSizes, sizesParam, vehicleKeys } from 'bi
 import { comparisonTable } from 'bikebook/templates/vehicles/comparison_table'
 import { cycleDrawing } from 'bikebook/templates/vehicles/cycle_drawing'
 import { emptyState } from 'bikebook/templates/vehicles/empty_state'
-import { compareToggle, similarResults, similarSection } from 'bikebook/templates/vehicles/similar'
+import { compareToggle, similarAdjustments, similarResults, similarSection } from 'bikebook/templates/vehicles/similar'
 import { geometryOverlay, overlayFrames, seriesBorders } from 'bikebook/templates/vehicles/geometry_overlay'
 import { jumpTo, VIEWS } from 'bikebook/templates/vehicles/jump_to'
 import { modelCard } from 'bikebook/templates/vehicles/model_card'
@@ -191,19 +191,32 @@ export class VehicleViewer {
     }
     const similarModels = similar
       ? similarSection({
-        vehicle: baseline.value,
+        ...this.#similarOf(baseline, similar),
         model: modelName(presenter, baseline.data),
-        type: typeName(presenter, baseline.data).toLowerCase(),
-        vehicleType: baseline.data.type,
-        electric: present(baseline.data.motors),
-        complete: (baseline.data.model_configuration ?? 'complete') === 'complete',
-        settings: similar,
-        groups: similar.results?.groups,
         results: similar.results === undefined ? undefined : this.similarResults(url, similar.results),
-        searchShown: searching(url)
+        searchShown: searching(url),
+        inFilters: filtersOpen(url)
       })
       : nothing
     return html`${similarModels}${jumpTo(view, (each) => pathWith(url, { view: each === 'basics' ? '' : each }), shown, searchTab)}${views[view]()}`
+  }
+
+  // The controls that rescore the models most like the first of `vehicles`, where `url`'s open filters hold them
+  similarAdjustments (url, vehicles, similar) {
+    return similar && vehicles.length && filtersOpen(url) ? similarAdjustments({ ...this.#similarOf(vehicles[0], similar), inFilters: true }) : nothing
+  }
+
+  #similarOf ({ value, data }, similar) {
+    return {
+      vehicle: value,
+      type: typeName(this.presenter, data).toLowerCase(),
+      vehicleType: data.type,
+      electric: present(data.motors),
+      complete: (data.model_configuration ?? 'complete') === 'complete',
+      settings: similar,
+      groups: similar.results?.groups,
+      scored: similar.results !== undefined
+    }
   }
 
   // What opens the models most like the first of `vehicles` from the search's More filters lines, where `similar` offers them
@@ -239,6 +252,8 @@ const pathWith = (url, params) => {
   const query = toQuery({ ...Object.fromEntries(url.searchParams), ...params })
   return query ? `${url.pathname}?${query}` : url.pathname
 }
+// as ui--collapse reads its param, the filters showing only with the search
+const filtersOpen = (url) => searching(url) && !['', '0', 'false', null].includes(url.searchParams.get('filters'))
 const typeName = (presenter, data) => presenter.named(presenter.kit.schemas.vehicle, data).type || 'bike'
 const modelName = (presenter, data) => presenter.named(presenter.kit.schemas.vehicle, data).model
 // comparing `ids`, each picked size following its vehicle

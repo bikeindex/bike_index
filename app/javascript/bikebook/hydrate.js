@@ -1,4 +1,4 @@
-import { html } from 'lit-html'
+import { html, nothing } from 'lit-html'
 import { localSources } from 'utils/hw_combobox_patch'
 import { renderChips, renderCounts } from 'bikebook/catalog'
 import { numberDisplay } from 'bikebook/templates/helpers'
@@ -16,6 +16,8 @@ import { MAX_COMPARE, VehicleViewer } from 'bikebook/vehicle_viewer'
 const combobox = (root, name) => root.getElementById(`${name}-hw-hidden-field`).closest('.hw-combobox')
 const panelOf = (root) => root.querySelector('[data-controller~="bikebook--catalog-filters"]')
 const MARKET_ATTRIBUTE = 'data-bikebook--catalog-filters-default-market-value'
+// CycleType::NOT_CYCLE_TYPE, by the catalog's slugs
+const NOT_CYCLE_TYPE = ['e_scooter', 'skateboard', 'epamd', 'stroller', 'wheelchair', 'e_motorcycle']
 const JURISDICTION_ATTRIBUTE = 'data-bikebook--catalog-filters-default-jurisdiction-value'
 
 // "Select an e-scooter, choose multiple to compare them" once the first of `vehicles` is one, both where the search
@@ -88,10 +90,11 @@ const unpicked = async (catalog, root, filters) => ({
   filtered: [...LISTS, ...SINGLES, ...RANGES, 'electric'].some((name) => name !== 'market' && filters[name])
 })
 
-// The vehicles' place with nothing picked, for `url`'s filters, which change in `page` without rendering it afresh
+// The vehicles' place with nothing picked, for `url`'s filters, which change in `page` without rendering it afresh, and
+// no similar models' adjustments for the filters to hold
 export async function unpickedVehicles (catalog, page, url) {
   const filters = filtersAt(catalog, page, url)
-  return new VehicleViewer(catalog.kit, catalog.vocabulary, filters).render([], url, null, await unpicked(catalog, page, filters))
+  return { vehicles: new VehicleViewer(catalog.kit, catalog.vocabulary, filters).render([], url, null, await unpicked(catalog, page, filters)), adjustments: nothing }
 }
 
 const pickedOf = (catalog, url, { market }) => catalog.vehicles(url.searchParams.get('vehicle_models')?.split(',') ?? [], { market })
@@ -119,13 +122,14 @@ const groupOf = (catalog, url) => {
 }
 
 // The picked vehicles' place for `url`'s jurisdiction, which decides which are out of class there, and market, which
-// which are sold elsewhere
+// which are sold elsewhere, and the similar models' adjustments where its open filters hold them
 export async function pickedVehicles (catalog, page, url) {
   const filters = filtersAt(catalog, page, url)
   const [found, group] = await Promise.all([pickedOf(catalog, url, filters), groupOf(catalog, url)])
   const vehicles = found.slice(0, MAX_COMPARE)
-  return new VehicleViewer(catalog.kit, catalog.vocabulary, filters).render(vehicles, url, preferredSize(), {},
-    { group, similar: await similarOf(catalog, url, vehicles, filters) })
+  const viewer = new VehicleViewer(catalog.kit, catalog.vocabulary, filters)
+  const similar = await similarOf(catalog, url, vehicles, filters)
+  return { vehicles: viewer.render(vehicles, url, preferredSize(), {}, { group, similar }), adjustments: viewer.similarAdjustments(url, vehicles, similar) }
 }
 
 // The page at `url` while the catalog loads: its filters live and filled in from the URL, their values as it has them, and
@@ -176,6 +180,7 @@ export async function hydrate (catalog, source, shell, url) {
 
   renderCounts(root, filteredCount)
   labelSearch(root, catalog.options, vehicles)
+  panel.setAttribute('data-bikebook--catalog-filters-cycle-value', !NOT_CYCLE_TYPE.includes(vehicles[0]?.data.type))
   const manufacturers = catalog.options.manufacturer.length
   renderInto(root.getElementById('manufacturer-count'),
     html`(${numberDisplay(manufacturers)} ${tooltip({ text: `${manufacturers.toLocaleString('en-US')} manufacturers have models in the catalog` })})`)
@@ -205,6 +210,7 @@ export async function hydrate (catalog, source, shell, url) {
   renderInto(root.getElementById('vehicle-viewers'), viewer.render(vehicles, url, preferredSize(),
     vehicles.length ? {} : await unpicked(catalog, root, filters), { group, similar }))
   for (const slot of root.querySelectorAll('[data-similar-slot]')) renderInto(slot, viewer.compareToggle(vehicles, similar))
+  renderInto(root.getElementById('similar-adjustments'), viewer.similarAdjustments(url, vehicles, similar))
 
   localSources.set(combobox(root, 'vehicle_models'), source)
   for (const name of LISTS) {

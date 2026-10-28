@@ -15,7 +15,8 @@ export default class extends Controller {
     yearDir: { type: String, default: 'desc' },
     priceDir: { type: String, default: 'desc' },
     defaultMarket: String,
-    defaultJurisdiction: String
+    defaultJurisdiction: String,
+    cycle: { type: Boolean, default: true }
   }
 
   // Rewritten on connect too, as rendering drops stale values. Not from the loading placeholder,
@@ -75,12 +76,12 @@ export default class extends Controller {
     if (name) for (const target of this.marketNameTargets) target.textContent = name
   }
 
-  // The classes are the US market's, by state - a state without its own uses the US ones - and a hidden
-  // class doesn't stay checked
+  // The classes are the US market's, by state - a state without its own uses the US ones - and none where the first
+  // picked vehicle isn't a cycle. A hidden class doesn't stay checked
   #showClasses () {
     const { market, jurisdiction } = this.#filters
     const groups = [...this.classificationTarget.querySelectorAll('[data-jurisdiction]')]
-    const shown = market === 'US' && (groups.find(({ dataset }) => dataset.jurisdiction === jurisdiction) ?? groups[0])
+    const shown = this.cycleValue && market === 'US' && (groups.find(({ dataset }) => dataset.jurisdiction === jurisdiction) ?? groups[0])
     this.classificationTarget.classList.toggle('tw:hidden', !shown)
     for (const group of groups) {
       const hidden = group !== shown

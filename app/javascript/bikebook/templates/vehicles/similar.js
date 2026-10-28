@@ -36,23 +36,22 @@ export const compareToggle = ({ type, model }) => html`<button type="button" dat
 })}><span class="tw:inline-block"><span class="tw:flex">${iconChevron()}</span></span>${compareLabel(type, model)}</button>`
 
 // Collapsed until it's wanted, the models most like the first compared, `model`, whose `results` bikebook--similar scores
-// once it opens, and the controls that rescore them in place. With the search showing, its toggle shows only once it's
-// open, compareToggle opening it
-export const similarSection = ({ vehicle, model, type, vehicleType, electric, complete, settings, groups, results, searchShown }) => {
-  const propulsion = electric ? !ALWAYS_MOTORIZED.includes(vehicleType) && `Show matching human powered ${type}s` : `Show matching e-${type}s`
-  const configuration = complete ? `Only complete ${type}s` : 'Only frames & forks'
+// once it opens, and the controls that rescore them in place unless the open filters hold them. With the search showing,
+// its toggle shows only once it's open, compareToggle opening it
+export const similarSection = ({ model, results, searchShown, inFilters, ...similar }) => {
+  const { vehicle, type } = similar
   const scored = results !== undefined
   const label = html`<span class="tw:group-aria-expanded/similar:hidden">${compareLabel(type, model)}</span><span
     class="tw:hidden tw:group-aria-expanded/similar:inline">Hide similar ${type}s</span>`
   return html`<section aria-label="Similar models" class="tw:flex tw:flex-wrap tw:items-baseline" data-controller="bikebook--similar ui--collapse"
     data-bikebook--similar-vehicle-value=${vehicle} data-bikebook--similar-scored-value=${scored} data-ui--collapse-param-value="similar"
-    data-action="input->bikebook--similar#change ui--collapse:shown->bikebook--similar#load:self">${collapse({
+    data-action="ui--collapse:shown->bikebook--similar#load:self">${collapse({
       content: label,
       chevron: true,
       color: 'link',
       htmlClass: `tw:group/similar tw:aria-expanded:mt-3 ${searchShown ? 'tw:not-aria-expanded:hidden' : ''}`,
       attributes: { id: 'similar-toggle' }
-    })}${scored && groups?.length ? controls(groups, settings, type, propulsion, configuration) : nothing}<div data-ui--collapse-target="content"
+    })}${inFilters ? nothing : similarAdjustments({ ...similar, scored })}<div data-ui--collapse-target="content"
     class="tw:hidden tw:w-full">${scored
       ? html`<div id="similar-results">${results}</div>`
       : html`<p class="tw:mt-4 tw:text-sm tw:text-gray-500">Finding similar ${type}s…</p>`}</div></section>`
@@ -62,19 +61,33 @@ const CUSTOM = tooltip({ body: 'If you change a weight, this will be selected', 
 
 const legend = (text) => html`<legend class="twlabel">${text}</legend>`
 
+// The controls that rescore the similar models once they're scored, each with its own bikebook--similar and ui--collapse.
+// Beside the section's toggle, outside its content so they share a line, laid into its row by display: contents, they open
+// a card of their own, their toggle moving into it as More filters' does; `inFilters`, at the foot of the open filters'
+// card, they extend it
+export const similarAdjustments = ({ vehicle, type, vehicleType, electric, complete, settings, groups, scored, inFilters = false }) => {
+  if (!scored || !groups?.length) return nothing
+
+  const propulsion = electric ? !ALWAYS_MOTORIZED.includes(vehicleType) && `Show matching human powered ${type}s` : `Show matching e-${type}s`
+  const configuration = complete ? `Only complete ${type}s` : 'Only frames & forks'
+  const fields = controls(groups, settings, type, propulsion, configuration)
+  const toggle = collapse({ content: 'Adjust comparison algorithm', chevron: true, color: 'link', size: 'sm', htmlClass: 'tw:text-sm' })
+  if (inFilters) {
+    return html`<div class="tw:hidden tw:similar-open:block" data-controller="bikebook--similar ui--collapse" data-ui--collapse-param-value="adjust"
+    data-bikebook--similar-vehicle-value=${vehicle} data-action="input->bikebook--similar#change">${toggle}<div data-ui--collapse-target="content"
+    class="tw:hidden"><div class="tw:mt-4">${fields}</div></div></div>`
+  }
+  return html`<div class="tw:hidden tw:similar-open:contents" data-controller="bikebook--similar ui--collapse" data-ui--collapse-param-value="adjust"
+  data-bikebook--similar-vehicle-value=${vehicle} data-action="input->bikebook--similar#change"><div
+  class="tw:ml-auto tw:has-[[aria-expanded=true]]:hidden">${toggle}</div><div data-ui--collapse-target="content" class="tw:hidden tw:w-full"><div
+  class="twwiderow">${card({ fullBleed: true, additionalClasses: 'tw:col-span-full tw:mt-3', content: html`<div class="tw:text-right">${toggle}</div>${fields}` })}</div></div></div>`
+}
+
 // Custom is chosen only by moving a slider off every preset, each of the `listed` groups', the rest's disabled, as the
-// model has nothing of theirs to compare. Its own ui--collapse, outside the section's content so its
-// toggle can share a line with the section's, laid into the section's row by display: contents
+// model has nothing of theirs to compare
 const controls = (listed, { weights, skipManufacturer, otherPropulsion, sameConfiguration, sameWheels, differentTypes }, type, propulsion, configuration) => {
   const preset = presetOf(weights, listed)
-  // its toggle moving into the card it opens, as More filters' does
-  const toggle = collapse({ content: 'Adjust comparison algorithm', chevron: true, color: 'link', size: 'sm', htmlClass: 'tw:text-sm' })
-  return html`<div class="tw:hidden tw:similar-open:contents" data-controller="ui--collapse"
-  data-ui--collapse-param-value="adjust"><div class="tw:ml-auto tw:has-[[aria-expanded=true]]:hidden">${toggle}</div><div
-  data-ui--collapse-target="content" class="tw:hidden tw:w-full"><div class="twwiderow">${card({
-    fullBleed: true,
-    additionalClasses: 'tw:col-span-full tw:mt-3',
-    content: html`<div class="tw:text-right">${toggle}</div><div class="tw:space-y-4"><fieldset aria-label="Strategy">${radioButtonGroup({
+  return html`<div class="tw:space-y-4"><fieldset aria-label="Strategy">${radioButtonGroup({
     name: 'strategy',
     selected: preset,
     entries: [...Object.entries(PRESETS).map(([value, { label }]) => ({ value, label })), { value: 'custom', label: CUSTOM, disabled: preset !== 'custom' }],
@@ -100,7 +113,6 @@ const controls = (listed, { weights, skipManufacturer, otherPropulsion, sameConf
     propulsion ? setting('other_propulsion', propulsion, otherPropulsion) : nothing}${setting('same_configuration', configuration, sameConfiguration)}${
     setting('same_wheels', `Only match ${type}s with the same wheel size`, sameWheels)}${
     setting('different_types', 'Include different vehicle types', differentTypes)}</div></fieldset></div>`
-  })}</div></div></div>`
 }
 
 // each a URL param of its name, 1 while it's checked
