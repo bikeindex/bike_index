@@ -56,9 +56,11 @@ class RecoveryDisplay < ActiveRecord::Base
         recovered_at: stolen_record.recovered_at,
         location_string: stolen_record.city,
         quote: stolen_record.recovered_description,
-        quote_by: calculated_owner_name(bike)&.split(/\s/)&.first
+        quote_by: first_name(calculated_owner_name(bike))
       }
     end
+
+    def first_name(name) = name&.split(/\s/)&.first
 
     def calculated_owner_name(bike)
       return unless bike&.current_ownership&.present? && bike&.owner.present?
@@ -75,7 +77,7 @@ class RecoveryDisplay < ActiveRecord::Base
     self.link = Binxtils::InputNormalizer.string(link)
     self.location_string = Binxtils::InputNormalizer.string(location_string)
     self.quote = Binxtils::InputNormalizer.string(quote)
-    self.quote_by = Binxtils::InputNormalizer.string(quote_by)
+    self.quote_by = self.class.first_name(Binxtils::InputNormalizer.string(quote_by))
   end
 
   def calculated_owner_name

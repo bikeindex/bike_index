@@ -2,12 +2,32 @@ module Admin
   class RecoveriesController < Admin::BaseController
     include Binxtils::SortableTable
 
+    # Each needs the ability its single-record action does
+    BULK_ACTIONS = {
+      "display" => {done: "displayed", ability: {controller_name: "recovery_displays", action_name: "create"}},
+      "not_displayed" => {done: "marked not displayable", ability: {controller_name: "recoveries", action_name: "update"}}
+    }.freeze
+
     helper_method :available_recoveries
 
     def index
       @per_page = permitted_per_page(default: 50)
       @pagy, @recoveries = pagy(:countish, available_recoveries.reorder(sortable_order(StolenRecord))
-        .includes(:bike, :country, :region_record), limit: @per_page, page: permitted_page)
+        .includes(:country, :region_record, :recovery_display, :recovering_user), limit: @per_page, page: permitted_page)
+    end
+
+    def bulk_update
+      selected = params[:sr_selected].respond_to?(:keys) ? params[:sr_selected].keys : Array(params[:sr_selected])
+      recoveries = StolenRecord.recovered.waiting_on_decision.where(id: selected).to_a
+      if recoveries.none?
+        flash[:error] = "No recoveries waiting on a decision selected!"
+      elsif BULK_ACTIONS.include?(params[:bulk_action])
+        count = send(:"bulk_#{params[:bulk_action]}", recoveries)
+        flash[:success] = "#{count} #{"recovery".pluralize(count)} #{BULK_ACTIONS.dig(params[:bulk_action], :done)}"
+      else
+        flash[:error] = "Unknown action!"
+      end
+      redirect_back(fallback_location: admin_recoveries_url)
     end
 
     def show
@@ -39,6 +59,31 @@ module Admin
     end
 
     private
+
+    def require_index_admin!
+      ability = BULK_ACTIONS.dig(params[:bulk_action], :ability) if action_name == "bulk_update"
+      ability ? super(**ability) : super
+    end
+
+    # Each returns how many it changed
+    def bulk_display(recoveries)
+      displays = recoveries.map { build_recovery_display(it) }
+      failed = displays.reject(&:save)
+      flash[:error] = "Unable to display: #{failed.map { "##{it.stolen_record_id} #{it.errors.full_messages.to_sentence}" }.join("; ")}" if failed.any?
+      displays.size - failed.size
+    end
+
+    def bulk_not_displayed(recoveries)
+      recoveries.count { it.update(recovery_display_status: "not_displayed") }
+    end
+
+    # Edits go to the display, not the recovery, which keeps what the owner wrote
+    def build_recovery_display(stolen_record)
+      edits = params.fetch(:display, {}).fetch(stolen_record.id.to_s, {}).permit(:quote, :quote_by, :location_string)
+      photo_url = Bike.unscoped.find_by_id(stolen_record.bike_id)&.image_url
+      RecoveryDisplay.new(RecoveryDisplay.attributes_from_stolen_record(stolen_record)
+        .merge(edits.to_h.symbolize_keys, remote_photo_url: photo_url))
+    end
 
     def sortable_columns
       %w[recovered_at date_stolen created_at recovery_display_status]

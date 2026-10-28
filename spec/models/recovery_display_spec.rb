@@ -95,6 +95,15 @@ RSpec.describe RecoveryDisplay, type: :model do
     end
   end
 
+  describe "quote_by" do
+    it "is only the first name" do
+      recovery_display = FactoryBot.create(:recovery_display, quote_by: "  Pat Smith ")
+      expect(recovery_display.quote_by).to eq "Pat"
+      recovery_display.update(quote_by: " ")
+      expect(recovery_display.quote_by).to be_nil
+    end
+  end
+
   describe "from_stolen_record_id" do
     it "doesn't break if stolen record isn't present" do
       recovery_display = RecoveryDisplay.from_stolen_record_id(69)

@@ -371,7 +371,7 @@ Rails.application.routes.draw do
     end
     resources :customer_contacts, only: %i[create show]
     resources :recoveries do
-      collection { post :approve }
+      collection { post :bulk_update }
     end
     resources :stolen_notifications do
       member { get :resend }
