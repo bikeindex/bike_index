@@ -61,6 +61,11 @@ if (honeybadgerApiKey) {
         if (notice.message?.includes('Maximum call stack size exceeded') && !fromOurCode) {
           return false
         }
+        // Firefox raises this when an extension holds a reference to a torn-down window; its
+        // frames come through as unknown:0, so the extension filter above misses it
+        if (notice.message?.includes("can't access dead object") && !fromOurCode) {
+          return false
+        }
       })
     })
     .catch(() => {})
