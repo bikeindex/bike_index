@@ -206,9 +206,10 @@ export class VehicleViewer {
     return similar && vehicles.length && filtersOpen(url) ? similarAdjustments({ ...this.#similarOf(vehicles[0], similar), inFilters: true }) : nothing
   }
 
-  #similarOf ({ value, data }, similar) {
+  #similarOf ({ value, data, current }, similar) {
     return {
       vehicle: value,
+      current,
       type: typeName(this.presenter, data).toLowerCase(),
       vehicleType: data.type,
       electric: present(data.motors),

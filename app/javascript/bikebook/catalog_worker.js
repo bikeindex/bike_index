@@ -106,8 +106,8 @@ const block = (key) => {
   return blocks.get(key)
 }
 
-// A block leaves out the markets of a model sold in its maker's primary market alone, which the index resolves.
-// `outsideMarket` where it isn't sold in `market`, blank for any
+// A block leaves out the markets of a model sold in its maker's primary market alone, which the index resolves, and
+// whether it's current. `outsideMarket` where it isn't sold in `market`, blank for any
 async function vehicles ({ ids, market }) {
   const found = await Promise.all(ids.map(async (value) => {
     const key = blockKey(value)
@@ -117,7 +117,8 @@ async function vehicles ({ ids, market }) {
       value,
       display: model?.display,
       data: data && { ...data, markets: data.markets ?? model?.markets },
-      outsideMarket: Boolean(market) && !model?.markets.includes(market)
+      outsideMarket: Boolean(market) && !model?.markets.includes(market),
+      current: Boolean(model) && model.final_year == null
     }
   }))
   return found.filter(({ data }) => data)

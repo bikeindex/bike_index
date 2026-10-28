@@ -65,12 +65,12 @@ const legend = (text) => html`<legend class="twlabel">${text}</legend>`
 // Beside the section's toggle, outside its content so they share a line, laid into its row by display: contents, they open
 // a card of their own, their toggle moving into it as More filters' does; `inFilters`, at the foot of the open filters'
 // card, they extend it
-export const similarAdjustments = ({ vehicle, type, vehicleType, electric, complete, settings, groups, scored, inFilters = false }) => {
+export const similarAdjustments = ({ vehicle, type, vehicleType, electric, complete, current, settings, groups, scored, inFilters = false }) => {
   if (!scored || !groups?.length) return nothing
 
   const propulsion = electric ? !ALWAYS_MOTORIZED.includes(vehicleType) && `Show matching human powered ${type}s` : `Show matching e-${type}s`
   const configuration = complete ? `Only complete ${type}s` : 'Only frames & forks'
-  const fields = controls(groups, settings, type, propulsion, configuration)
+  const fields = controls(groups, settings, type, propulsion, configuration, current)
   const toggle = collapse({ content: 'Adjust comparison algorithm', chevron: true, color: 'link', size: 'sm', htmlClass: 'tw:text-sm' })
   if (inFilters) {
     return html`<div class="tw:hidden tw:similar-open:block" data-controller="bikebook--similar ui--collapse" data-ui--collapse-param-value="adjust"
@@ -85,7 +85,7 @@ export const similarAdjustments = ({ vehicle, type, vehicleType, electric, compl
 
 // Custom is chosen only by moving a slider off every preset, each of the `listed` groups', the rest's disabled, as the
 // model has nothing of theirs to compare
-const controls = (listed, { weights, skipManufacturer, otherPropulsion, sameConfiguration, sameWheels, differentTypes }, type, propulsion, configuration) => {
+const controls = (listed, { weights, onlyCurrent, skipManufacturer, otherPropulsion, sameConfiguration, sameWheels, differentTypes }, type, propulsion, configuration, current) => {
   const preset = presetOf(weights, listed)
   return html`<div class="tw:space-y-4"><fieldset aria-label="Strategy">${radioButtonGroup({
     name: 'strategy',
@@ -109,13 +109,17 @@ const controls = (listed, { weights, skipManufacturer, otherPropulsion, sameConf
       attributes: { id: `similar-${group}`, disabled: !scored, 'data-bikebook--similar-target': scored && 'weight' }
     })}</div>`
   })}</div></fieldset><fieldset>${legend('Other settings')}<div class="tw:mt-1 tw:space-y-1">${
-    setting('skip_manufacturer', `Skip ${type}s from the same manufacturer`, skipManufacturer)}${
+    setting('only_current', `Only show current ${type}s`, onlyCurrent ?? current, current)}${setting('skip_manufacturer', `Skip ${type}s from the same manufacturer`, skipManufacturer)}${
     propulsion ? setting('other_propulsion', propulsion, otherPropulsion) : nothing}${setting('same_configuration', configuration, sameConfiguration)}${
     setting('same_wheels', `Only match ${type}s with the same wheel size`, sameWheels)}${
     setting('different_types', 'Include different vehicle types', differentTypes)}</div></fieldset></div>`
 }
 
-// each a URL param of its name, 1 while it's checked
-const setting = (name, label, checked) => checkbox({
-  name, label, checked, className: 'tw:mb-0 tw:text-sm tw:font-normal', attributes: { id: `similar-${name}`, 'data-bikebook--similar-target': 'setting' }
+// each a URL param of its name, 1 while it's checked, or 0 unchecked where it's `checkedByDefault`
+const setting = (name, label, checked, checkedByDefault = false) => checkbox({
+  name,
+  label,
+  checked,
+  className: 'tw:mb-0 tw:text-sm tw:font-normal',
+  attributes: { id: `similar-${name}`, 'data-bikebook--similar-target': 'setting', 'data-checked-by-default': checkedByDefault }
 })
