@@ -11,7 +11,7 @@ import { collapse } from 'utils/collapse_utils'
 // (?param=1, ?param=0 collapsed) so it survives reloads and navigation; with
 // data-ui--collapse-storage-key-value it persists to localStorage instead, for a panel
 // whose state is the rider's preference rather than part of the address. A toggle that
-// opens it dispatches ui--collapse:shown, for content loaded once it's wanted, and one that closes it ui--collapse:hidden.
+// opens it dispatches ui--collapse:shown, for content loaded once it's wanted.
 export default class extends Controller {
   static targets = ['content', 'chevron', 'trigger']
   static values = { param: String, storageKey: String, direction: String }
@@ -77,7 +77,7 @@ export default class extends Controller {
     this.applyExpanded(expanding, duration)
     this.persist(expanding)
     this.keepFocus(expanding)
-    this.dispatch(expanding ? 'shown' : 'hidden')
+    if (expanding) this.dispatch('shown')
   }
 
   // A focused trigger the toggle hides - inside the content it collapses, or in what an open panel hides - hands focus

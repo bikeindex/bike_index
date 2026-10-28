@@ -194,16 +194,15 @@ export class VehicleViewer {
         ...this.#similarOf(baseline, similar),
         model: modelName(presenter, baseline.data),
         results: similar.results === undefined ? undefined : this.similarResults(url, similar.results),
-        searchShown: searching(url),
-        inFilters: filtersOpen(url)
+        searchShown: searching(url)
       })
       : nothing
     return html`${similarModels}${jumpTo(view, (each) => pathWith(url, { view: each === 'basics' ? '' : each }), shown, searchTab)}${views[view]()}`
   }
 
-  // The controls that rescore the models most like the first of `vehicles`, where `url`'s open filters hold them
-  similarAdjustments (url, vehicles, similar) {
-    return similar && vehicles.length && filtersOpen(url) ? similarAdjustments({ ...this.#similarOf(vehicles[0], similar), inFilters: true }) : nothing
+  // The controls that rescore the models most like the first of `vehicles`, for the filters' card
+  similarAdjustments (vehicles, similar) {
+    return similar && vehicles.length ? similarAdjustments(this.#similarOf(vehicles[0], similar)) : nothing
   }
 
   #similarOf ({ value, data, current }, similar) {
@@ -253,8 +252,6 @@ const pathWith = (url, params) => {
   const query = toQuery({ ...Object.fromEntries(url.searchParams), ...params })
   return query ? `${url.pathname}?${query}` : url.pathname
 }
-// as ui--collapse reads its param, the filters showing only with the search
-const filtersOpen = (url) => searching(url) && !['', '0', 'false', null].includes(url.searchParams.get('filters'))
 const typeName = (presenter, data) => presenter.named(presenter.kit.schemas.vehicle, data).type || 'bike'
 const modelName = (presenter, data) => presenter.named(presenter.kit.schemas.vehicle, data).model
 // comparing `ids`, each picked size following its vehicle

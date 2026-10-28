@@ -1,6 +1,5 @@
 import { html, nothing } from 'lit-html'
 import { buttonClasses } from 'bikebook/templates/ui/button'
-import { card } from 'bikebook/templates/ui/card'
 import { collapse } from 'bikebook/templates/ui/collapse'
 import { iconChevron } from 'bikebook/templates/ui/icon_chevron'
 import { checkbox } from 'bikebook/templates/ui/forms/checkbox'
@@ -36,10 +35,10 @@ export const compareToggle = ({ type, model }) => html`<button type="button" dat
 })}><span class="tw:inline-block"><span class="tw:flex">${iconChevron()}</span></span>${compareLabel(type, model)}</button>`
 
 // Collapsed until it's wanted, the models most like the first compared, `model`, whose `results` bikebook--similar scores
-// once it opens, and the controls that rescore them in place unless the open filters hold them. With the search showing,
-// its toggle shows only once it's open, compareToggle opening it
-export const similarSection = ({ model, results, searchShown, inFilters, ...similar }) => {
-  const { vehicle, type } = similar
+// once it opens, and beside its toggle, while the filters are closed, what opens them at the controls that rescore them.
+// With the search showing, its toggle shows only once it's open, compareToggle opening it
+export const similarSection = ({ model, results, searchShown, ...similar }) => {
+  const { vehicle, type, groups } = similar
   const scored = results !== undefined
   const label = html`<span class="tw:group-aria-expanded/similar:hidden">${compareLabel(type, model)}</span><span
     class="tw:hidden tw:group-aria-expanded/similar:inline">Hide similar ${type}s</span>`
@@ -51,7 +50,7 @@ export const similarSection = ({ model, results, searchShown, inFilters, ...simi
       color: 'link',
       htmlClass: `tw:group/similar tw:aria-expanded:mt-3 ${searchShown ? 'tw:not-aria-expanded:hidden' : ''}`,
       attributes: { id: 'similar-toggle' }
-    })}${inFilters ? nothing : similarAdjustments({ ...similar, scored })}<div data-ui--collapse-target="content"
+    })}${scored && groups?.length ? adjustToggle : nothing}<div data-ui--collapse-target="content"
     class="tw:hidden tw:w-full">${scored
       ? html`<div id="similar-results">${results}</div>`
       : html`<p class="tw:mt-4 tw:text-sm tw:text-gray-500">Finding similar ${type}s…</p>`}</div></section>`
@@ -61,26 +60,25 @@ const CUSTOM = tooltip({ body: 'If you change a weight, this will be selected', 
 
 const legend = (text) => html`<legend class="twlabel">${text}</legend>`
 
-// The controls that rescore the similar models once they're scored, each with its own bikebook--similar and ui--collapse.
-// Beside the section's toggle, outside its content so they share a line, laid into its row by display: contents, they open
-// a card of their own, their toggle moving into it as More filters' does; `inFilters`, at the foot of the open filters'
-// card, they extend it
-export const similarAdjustments = ({ vehicle, type, vehicleType, electric, complete, current, settings, groups, scored, inFilters = false }) => {
+// Opens the filters at the similar models' adjustments, expanded
+const adjustToggle = html`<button type="button" data-action="bikebook--page#adjustSimilar" class=${buttonClasses({
+  color: 'link',
+  size: 'sm',
+  htmlClass: 'tw:ml-auto tw:hidden tw:text-sm tw:similar-open:inline-flex tw:filters-open:hidden'
+})}><span class="tw:inline-block"><span class="tw:flex">${iconChevron()}</span></span>Adjust comparison algorithm</button>`
+
+// The controls that rescore the similar models once they're scored, collapsed at the foot of the filters' card, which
+// they extend, with their own bikebook--similar
+export const similarAdjustments = ({ vehicle, type, vehicleType, electric, complete, current, settings, groups, scored }) => {
   if (!scored || !groups?.length) return nothing
 
   const propulsion = electric ? !ALWAYS_MOTORIZED.includes(vehicleType) && `Show matching human powered ${type}s` : `Show matching e-${type}s`
   const configuration = complete ? `Only complete ${type}s` : 'Only frames & forks'
-  const fields = controls(groups, settings, type, propulsion, configuration, current)
-  const toggle = collapse({ content: 'Adjust comparison algorithm', chevron: true, color: 'link', size: 'sm', htmlClass: 'tw:text-sm' })
-  if (inFilters) {
-    return html`<div class="tw:hidden tw:similar-open:block" data-controller="bikebook--similar ui--collapse" data-ui--collapse-param-value="adjust"
-    data-bikebook--similar-vehicle-value=${vehicle} data-action="input->bikebook--similar#change">${toggle}<div data-ui--collapse-target="content"
-    class="tw:hidden"><div class="tw:mt-4">${fields}</div></div></div>`
-  }
-  return html`<div class="tw:hidden tw:similar-open:contents" data-controller="bikebook--similar ui--collapse" data-ui--collapse-param-value="adjust"
-  data-bikebook--similar-vehicle-value=${vehicle} data-action="input->bikebook--similar#change"><div
-  class="tw:ml-auto tw:has-[[aria-expanded=true]]:hidden">${toggle}</div><div data-ui--collapse-target="content" class="tw:hidden tw:w-full"><div
-  class="twwiderow">${card({ fullBleed: true, additionalClasses: 'tw:col-span-full tw:mt-3', content: html`<div class="tw:text-right">${toggle}</div>${fields}` })}</div></div></div>`
+  return html`<section aria-label="Comparison algorithm" class="tw:hidden tw:similar-open:block" data-controller="bikebook--similar ui--collapse"
+    data-ui--collapse-param-value="adjust" data-bikebook--similar-vehicle-value=${vehicle} data-action="input->bikebook--similar#change">${collapse({
+      content: 'Adjust comparison algorithm', chevron: true, color: 'link', size: 'sm', htmlClass: 'tw:text-sm'
+    })}<div data-ui--collapse-target="content" class="tw:hidden"><div class="tw:mt-4">${
+      controls(groups, settings, type, propulsion, configuration, current)}</div></div></section>`
 }
 
 // Custom is chosen only by moving a slider off every preset, each of the `listed` groups', the rest's disabled, as the

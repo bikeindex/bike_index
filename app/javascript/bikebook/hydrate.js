@@ -122,14 +122,14 @@ const groupOf = (catalog, url) => {
 }
 
 // The picked vehicles' place for `url`'s jurisdiction, which decides which are out of class there, and market, which
-// which are sold elsewhere, and the similar models' adjustments where its open filters hold them
+// which are sold elsewhere, and the similar models' adjustments for the filters' card
 export async function pickedVehicles (catalog, page, url) {
   const filters = filtersAt(catalog, page, url)
   const [found, group] = await Promise.all([pickedOf(catalog, url, filters), groupOf(catalog, url)])
   const vehicles = found.slice(0, MAX_COMPARE)
   const viewer = new VehicleViewer(catalog.kit, catalog.vocabulary, filters)
   const similar = await similarOf(catalog, url, vehicles, filters)
-  return { vehicles: viewer.render(vehicles, url, preferredSize(), {}, { group, similar }), adjustments: viewer.similarAdjustments(url, vehicles, similar) }
+  return { vehicles: viewer.render(vehicles, url, preferredSize(), {}, { group, similar }), adjustments: viewer.similarAdjustments(vehicles, similar) }
 }
 
 // The page at `url` while the catalog loads: its filters live and filled in from the URL, their values as it has them, and
@@ -210,7 +210,7 @@ export async function hydrate (catalog, source, shell, url) {
   renderInto(root.getElementById('vehicle-viewers'), viewer.render(vehicles, url, preferredSize(),
     vehicles.length ? {} : await unpicked(catalog, root, filters), { group, similar }))
   for (const slot of root.querySelectorAll('[data-similar-slot]')) renderInto(slot, viewer.compareToggle(vehicles, similar))
-  renderInto(root.getElementById('similar-adjustments'), viewer.similarAdjustments(url, vehicles, similar))
+  renderInto(root.getElementById('similar-adjustments'), viewer.similarAdjustments(vehicles, similar))
 
   localSources.set(combobox(root, 'vehicle_models'), source)
   for (const name of LISTS) {

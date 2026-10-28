@@ -1797,18 +1797,13 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(page).to have_css("#similar-toggle", text: "Hide similar bikes")
     # once the filters' panel has eased to its new height
     page.document.synchronize { raise Capybara::ExpectationNotMet unless beneath_filters.call("#similar-toggle") == gap }
-    # its adjustments at the foot of the filters' card, which they extend, rather than beside its toggle
-    expect(page).to have_no_css("[aria-label='Similar models'] [role='button']", text: "Adjust comparison algorithm", visible: :all)
-    find("#vehicle-filters [role='button']", text: "Adjust comparison algorithm").click
-    expect(find("#vehicle-filters #similar-adjustments")).to have_field("Tire clearance", with: "4")
-    # and back beside it, as open, once the filters close
-    click_on "More filters", match: :first
-    expect(find("[aria-label='Similar models']")).to have_field("Tire clearance", with: "4")
-    expect(page).to have_no_css("#similar-adjustments *", visible: :all).and have_no_css("#vehicle-filters")
-    # and into them again as they reopen, never in both
-    click_on "More filters", match: :first
+    # its adjustments collapsed at the foot of the filters' card, which they extend, rather than beside its toggle
+    expect(page).to have_no_css("[aria-label='Similar models'] button", text: "Adjust comparison algorithm")
+    adjust = find("#vehicle-filters #similar-adjustments [role='button']", text: "Adjust comparison algorithm")
+    adjust.click
     expect(find("#similar-adjustments")).to have_field("Tire clearance", with: "4")
-    expect(page).to have_css("#similar-tires", count: 1, visible: :all)
+    adjust.click
+    expect(page).to have_no_field("Tire clearance")
     # beneath the line once it's carded around applied filters
     visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_rec,m/aventon/2022/level_2", manufacturer: "aventon")
     expect(find_button("Compare similar bikes to Level 4 REC", wait: 10)).to have_no_xpath("ancestor::*[ul[@aria-label='Applied filters']]")
@@ -1834,11 +1829,15 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(page).to have_current_path(/[?&]similar=1\b/)
     # its maker's others in, unless they're skipped
     expect(page).to have_css("#similar-m-aventon-2026-pace_5_rec_step_through", wait: 10)
-    find("[role='button']", text: "Adjust comparison algorithm").click
-    # its toggle moved into the card it opens, a slider for each group, those the model lists nothing of disabled
-    expect(page).to have_field("Frame material", with: "2")
+    # with the filters closed, beside its toggle what opens them at the adjustments, expanded, their own toggle focused: a
+    # slider for each group, those the model lists nothing of disabled
+    click_on "Adjust comparison algorithm"
+    expect(page).to have_css("#vehicle-filters #similar-adjustments [role='button']:focus", text: "Adjust comparison algorithm")
+    adjustments = find("#similar-adjustments")
+    expect(adjustments).to have_field("Frame material", with: "2")
+    expect(page).to have_no_css("[aria-label='Similar models'] button", text: "Adjust comparison algorithm")
     # a bare track, showing no weight, though the default is 2
-    groupset = find_field("Groupset", disabled: true).ancestor("[data-controller='ui--forms--range']")
+    groupset = adjustments.find_field("Groupset", disabled: true).ancestor("[data-controller='ui--forms--range']")
     expect(groupset).to have_text("Not listed for this bike").and have_css("output", visible: :hidden)
     expect(page.evaluate_script("getComputedStyle(document.querySelector('#similar-groupset'), '::-webkit-slider-thumb').appearance")).to eq "none"
     # level with a listed one's
@@ -1850,13 +1849,6 @@ RSpec.describe "BikeBook", :js, type: :system do
       })
     JS
     expect(boxes.uniq.count).to eq 1
-    expect(page).to have_css("div:has(> div > fieldset) > div > [role='button']:focus", text: "Adjust comparison algorithm")
-    # out to the page's gutter on a phone, as More filters' card is
-    size = page.current_window.size
-    page.current_window.resize_to(390, 844)
-    adjust_card = "getComputedStyle(document.querySelector(\"[aria-label='Similar models'] div:has(> div > fieldset)\"))"
-    expect(page.evaluate_script("[#{adjust_card}.borderLeftWidth, #{adjust_card}.paddingLeft]")).to eq %w[0px 0px]
-    page.current_window.resize_to(*size)
     # every e-bike in the fixture is an Aventón
     check "Skip bikes from the same manufacturer"
     expect(page).to have_current_path(/[?&]skip_manufacturer=1\b/).and have_text("No similar models are in the catalog.")
@@ -1882,10 +1874,6 @@ RSpec.describe "BikeBook", :js, type: :system do
     # Custom says it's chosen by a slider, on hovering it though it's disabled
     find("button[aria-describedby]", exact_text: "Custom").hover
     expect(page).to have_css("[role='tooltip']", text: "If you change a weight, this will be selected")
-    # its toggle with nothing beneath it but the card's own spacing
-    toggle_gap = "(() => { const toggle = document.querySelector(\"[aria-label='Similar models'] [data-ui--collapse-param-value='adjust'] .tw\\\\:text-right\"); " \
-      "return toggle.nextElementSibling.getBoundingClientRect().top - toggle.getBoundingClientRect().bottom })()"
-    expect(page.evaluate_script(toggle_gap)).to eq 0
 
     # a card adds its model to the comparison, in place and focused again, and takes it out
     click_link "Soltera 2.5"
@@ -1931,9 +1919,12 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(page).to have_css("#similar-m-aventon-2026-pace_5_rec_step_through[href]", wait: 10)
     expect(page).to have_css(".hw-combobox__chip", count: 9).and have_no_css(".hw-combobox__chip", text: "Soltera 2.5")
 
-    # a human powered model's matching e-vehicles, and neither for a type that's always electric
-    visit bikebook_path(vehicle_models: "m/specialized/2027/crux_5_s_level_sram_red_xplr", similar: 1, adjust: 1)
-    expect(page).to have_field("Show matching e-bikes", wait: 10)
+    # a human powered model's matching e-vehicles, and neither for a type that's always electric - opened alone, its
+    # adjustments showing the search they're in, which it hid
+    visit bikebook_path(vehicle_models: "m/specialized/2027/crux_5_s_level_sram_red_xplr", similar: 1)
+    click_on "Adjust comparison algorithm", wait: 10
+    expect(page).to have_field("Show matching e-bikes").and have_field("Select a bike, choose multiple to compare them")
+    expect(page).to have_current_path(/[?&]search=1&filters=1&adjust=1\b/)
     # of the models the search's market leaves, as its e-bikes are Canada's, and current ones, first of the other settings
     # and checked as it's current - which leaves none, Canada's Haul ST no longer sold
     visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_rec", market: "CA", similar: 1, skip_manufacturer: 1, different_types: 1,
@@ -1947,9 +1938,9 @@ RSpec.describe "BikeBook", :js, type: :system do
     choose "Any market", allow_label_click: true
     expect(page).to have_css("#similar-m-specialized-2025-haul_st").and have_no_css("#similar-m-specialized-2025-haul_st_ca")
     # and one no longer sold matches any year's by default
-    visit bikebook_path(vehicle_models: "m/specialized/2025/haul_st_ca", similar: 1, adjust: 1)
+    visit bikebook_path(vehicle_models: "m/specialized/2025/haul_st_ca", similar: 1, adjust: 1, search: 1, filters: 1)
     expect(page).to have_unchecked_field("Only show current cargo bikes", wait: 10)
-    visit bikebook_path(vehicle_models: "m/segway/2025/gt3_pro", similar: 1, adjust: 1)
+    visit bikebook_path(vehicle_models: "m/segway/2025/gt3_pro", similar: 1, adjust: 1, search: 1, filters: 1)
     expect(page).to have_css("legend", exact_text: "Other settings", wait: 10)
     expect(page).to have_no_text("Show matching")
     # the other propulsion's instead with other_propulsion, without its e-bike fields counting against them, other vehicle
