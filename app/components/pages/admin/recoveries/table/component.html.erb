@@ -7,9 +7,7 @@
 
 <%# twfullbleed reads the twwiderow container %>
 <div class="twwiderow tw:mb-4">
-  <%= form_with(url: form_url, method: :post,
-  class: "tw:col-span-full tw:min-w-0 tw:rounded-xl tw:twfullbleed #{UI::Card::Component::BASE_CLASSES}",
-  data: form_data) do %>
+  <%= wrapper do %>
     <%# Full bleed drops the card's gutter, so the header meets the page's %>
     <div
       class="
@@ -17,20 +15,25 @@
         tw:gap-y-2 tw:py-3 tw:@min-[672px]/twwiderow:px-4
       "
     >
-      <p class="tw:m-0 tw:text-xs tw:text-gray-500">
-        Edit the story, name and location to match our guidelines, then display.
-        Display names are first name only. Edits are saved to the display, not
-        the recovery.
-      </p>
+      <% if @editable %>
+        <p class="tw:m-0 tw:text-xs tw:text-gray-500">
+          Edit the story, name and location to match our guidelines, then
+          display. Display names are first name only. Edits are saved to the
+          display, not the recovery.
+        </p>
+      <% end %>
 
       <div class="tw:ml-auto tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-        <%# The footer's copy is the one a phone reaches after checking rows %>
-        <div class="tw:hidden tw:sm:block"><%= bulk_actions %></div>
+        <% if @editable %>
+          <%# The footer's copy is the one a phone reaches after checking rows %>
+          <div class="tw:hidden tw:sm:block"><%= bulk_actions %></div>
+        <% end %>
+
         <%= render(UI::Collapse::Component.new(text: "Column settings", chevron: :trailing, size: :sm)) %>
       </div>
     </div>
 
-    <%= render(UI::TableColumnSettings::Component.new(columns: COLUMNS, defaults: DEFAULT_COLUMNS, narrow_hidden: %i[photo_cell recovered_at_cell])) %>
+    <%= render(UI::TableColumnSettings::Component.new(columns: COLUMNS, defaults: default_columns, narrow_hidden: %i[photo_cell recovered_at_cell])) %>
 
     <%# Full bleed takes the table over the admin gutter, past the card, so it's clipped here %>
     <div
@@ -40,15 +43,17 @@
       "
       data-action="input->table-multi-checkbox#selectRow"
     >
-      <%= render(UI::CardTable::Component.new(records: rows, render_sortable: true, sort_state: @sort_state)) do |table| %>
-        <% table.column(label: button_tag(check_mark, type: "button", class: "twlink tw:cursor-pointer tw:border-0 tw:bg-transparent tw:p-0",
+      <%= render(UI::CardTable::Component.new(records: rows, render_sortable: @editable, sort_state: @sort_state)) do |table| %>
+        <% if @editable %>
+          <% table.column(label: button_tag(check_mark, type: "button", class: "twlink tw:cursor-pointer tw:border-0 tw:bg-transparent tw:p-0",
       title: "Toggle all checked", aria: {label: "Toggle all checked"}, data: {action: "click->table-multi-checkbox#toggleAll"})) do |(recovery, _bike, _defaults, selected)| %>
-          <div class="tw:flex tw:items-center tw:gap-3">
-            <%= check_box_tag "sr_selected[#{recovery.id}]", recovery.id, selected, disabled: !recovery.waiting_on_decision?,
+            <div class="tw:flex tw:items-center tw:gap-3">
+              <%= check_box_tag "sr_selected[#{recovery.id}]", recovery.id, selected, disabled: !recovery.waiting_on_decision?,
           aria: {label: "Select recovery #{recovery.id}"}, data: {"table-multi-checkbox-target" => "checkbox"} %>
 
-            <%= render(UI::ButtonLink::Component.new(text: "View", href: edit_admin_recovery_path(recovery), size: :sm)) %>
-          </div>
+              <%= render(UI::ButtonLink::Component.new(text: "View", href: edit_admin_recovery_path(recovery), size: :sm)) %>
+            </div>
+          <% end %>
         <% end %>
 
         <% table.column(label: COLUMNS[:photo_cell], classes: "hideableColumn photo_cell") do |(_recovery, bike)| %>
@@ -114,7 +119,7 @@
         <% end %>
 
         <% table.column(label: COLUMNS[:story_cell], classes: "hideableColumn story_cell tw:min-w-72") do |(recovery, _bike, defaults)| %>
-          <% if recovery.waiting_on_decision? %>
+          <% if defaults %>
             <div
               data-controller="admin--character-count"
               data-admin--character-count-max-value="<%= RecoveryDisplay::QUOTE_MAX_LENGTH %>"
@@ -149,7 +154,7 @@
           <% label = COLUMNS[:"#{field}_cell"] %>
 
           <% table.column(label:, classes: "hideableColumn #{field}_cell tw:min-w-32") do |(recovery, _bike, defaults)| %>
-            <% if recovery.waiting_on_decision? %>
+            <% if defaults %>
               <%= text_field_tag "display[#{recovery.id}][#{field}]", defaults[field], class: "twinput", autocomplete: "off",
             aria: {label: "#{label} for recovery #{recovery.id}"} %>
             <% else %>
@@ -172,8 +177,15 @@
       <% end %>
     </div>
 
-    <div class="tw:border-t tw:border-gray-100 tw:px-4 tw:py-3 tw:dark:border-gray-700">
-      <%= bulk_actions %>
-    </div>
+    <% if @editable %>
+      <div
+        class="
+          tw:border-t tw:border-gray-100 tw:px-4 tw:py-3
+          tw:dark:border-gray-700
+        "
+      >
+        <%= bulk_actions %>
+      </div>
+    <% end %>
   <% end %>
 </div>

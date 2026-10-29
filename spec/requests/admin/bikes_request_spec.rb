@@ -143,6 +143,19 @@ RSpec.describe Admin::BikesController, type: :request do
       expect(response).to redirect_to("#{base_url}/#{bike.id}/edit")
     end
 
+    context "with a recovery waiting on a decision" do
+      let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, bike:, recovered_description: "Got it back from the shop") }
+      before { stolen_record.update_column(:recovery_display_status, "waiting_on_decision") }
+      it "renders it without the bulk display form" do
+        get "#{base_url}/#{bike.id}?active_tab=recoveries"
+        expect(response.code).to eq("200")
+        expect(response.body).to include("Got it back from the shop")
+        expect(response.body).to_not include("display[#{stolen_record.id}][quote]")
+        expect(response.body).to_not include("sr_selected")
+        expect(response.body).to_not include("bulk_update")
+      end
+    end
+
     context "with an organization message" do
       let(:organization_message) { FactoryBot.create(:organization_message) }
       let(:bike) { organization_message.bike }

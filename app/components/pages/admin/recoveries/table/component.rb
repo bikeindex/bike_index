@@ -32,11 +32,12 @@ module Pages
           DEFAULT_COLUMNS = (COLUMNS.keys - %i[date_stolen_cell shareable_cell]).freeze
 
           # edits: {recovery_id => {quote:, quote_by:, location_string:}}, the rows a display failed
-          # on, which stay checked
-          def initialize(recoveries:, sort_state:, edits: {})
+          # on, which stay checked. editable: false leaves out the form, for a bike's own recoveries
+          def initialize(recoveries:, sort_state:, edits: {}, editable: true)
             @recoveries = recoveries
             @sort_state = sort_state
             @edits = edits
+            @editable = editable
           end
 
           private
@@ -47,13 +48,23 @@ module Pages
               .includes(current_ownership: {user: %i[membership_active email_bans_active]}).index_by(&:id)
             @recoveries.map do |recovery|
               bike = bikes[recovery.bike_id]
-              defaults = RecoveryDisplay.attributes_from_stolen_record(recovery, bike:).merge(@edits[recovery.id].to_h) if recovery.waiting_on_decision?
+              defaults = RecoveryDisplay.attributes_from_stolen_record(recovery, bike:).merge(@edits[recovery.id].to_h) if @editable && recovery.waiting_on_decision?
               [recovery, bike, defaults, @edits.key?(recovery.id)]
             end
           end
 
           # The filters ride along, so a failed display renders the same page
           def form_url = bulk_update_admin_recoveries_path(request.query_parameters)
+
+          # A bike's page has the bike already
+          def default_columns = @editable ? DEFAULT_COLUMNS : DEFAULT_COLUMNS - %i[photo_cell bike_cell]
+
+          def wrapper(&)
+            classes = "tw:col-span-full tw:min-w-0 tw:rounded-xl tw:twfullbleed #{UI::Card::Component::BASE_CLASSES}"
+            return form_with(url: form_url, method: :post, class: classes, data: form_data, &) if @editable
+
+            tag.div(class: classes, data: UI::TableColumnSettings::Component.data_attributes(storage_key: "adminBikeRecoveriesColumns", orderable: true), &)
+          end
 
           def form_data
             data = UI::TableColumnSettings::Component.data_attributes(storage_key: "adminRecoveriesColumns",
