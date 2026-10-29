@@ -5535,6 +5535,7 @@ nb:
             view_list: Liste
             view_table: Bord
             loading_results: Laster inn resultater...
+            per_page_option: "%{number} per side"
           chart_card:
             caption_search: Nåværende søk
             caption_year: Oversikt over fjoråret
@@ -5593,7 +5594,6 @@ nb:
             photo_cell: Foto
             view_cell: Utsikt
             acknowledgment_cell_panel: Tid - Registreringssekvens bekreftet
-            created_at_cell_panel: Tid - registrert
             filter_stolen_or_impounded_html: bare <strong>stjålet</strong> eller <strong>beslaglagt</strong>
             location_search_disabled_no_address: "%{org_name} samler ikke inn registreringsadresser,
               så bare stjålne og beslaglagte registreringer har en plassering. Filtrer
@@ -5602,16 +5602,35 @@ nb:
               søker etter alle registreringer, med mindre du bare søker etter beslaglagte
               og/eller stjålne registreringer.
             show_location_search: vis stedssøk
-            registration_status_at_cell_hint: Når registreringsnummeret ble stjålet,
-              beslaglagt, funnet eller lagt ut for salg
-            registration_status_at_cell_panel: Tid - Registreringsstatus
-            registration_updated_at_cell_panel: Tid - registreringen er oppdatert
+            all_bikes: Alle sykler
+            all_statuses: Alle statuser
+            impound_location_cell: plassering
+            impound_status_cell: Status for beslag
+            impound_updated_at_cell: Beslaglegging oppdatert
+            impound_updated_at_cell_panel: Tid - Beslagsregister oppdatert
+            impound_user_cell: Siste oppdatering
+            impounded_at_cell: Beslaglagt
+            impounded_at_cell_panel: Tid - Beslaglagt
+            impounded_from_cell: Beslaglagt fra
+            only_unregistered: Kun uregistrerte
+            only_user_registered: Kun bruker registrert
+            registered_cell_panel: Tid - Registrert
+            registration: 'Registrering:'
+            registration_updated_cell_panel: Tid - Registrering oppdatert
+            resolved_at_cell: Løst
+            resolved_at_cell_panel: Tid - Løst
+            status_at_cell_hint: når det blir stjålet, beslaglagt osv.
+            status_at_cell_panel: Tid - Status
+            status_records: "%{status} poster"
+            unregistered_cell: Uregistrert
           column_settings_toggle:
             column_settings: Kolonneinnstillinger
           settings_and_filters:
             date_range: 'Datoperiode:'
             search_settings_and_filters: Søkeinnstillinger og filtre
             filters: Filtre
+            impound_search: søket etter beslaglagte kjøretøy
+            view_in_impound_search_html: Vis i %{impound_search}
           search_all:
             search_all_html: Søk i alle registreringer <span class="twless-strong">(ikke
               bare %{org_name})</span>
@@ -5624,6 +5643,7 @@ nb:
             not_registered_with: Skjult fordi den ikke er registrert hos %{org_name}
             acknowledgment_title: Bekreftelse på registreringssekvens kl.
             view: Utsikt
+            toggle_all_checked: Slå av/på alle avkryssede
           multi_result_chip:
             no_results: ingen treff
           multi_results:
@@ -5636,16 +5656,8 @@ nb:
             view_all: se alle
         impound_records:
           index:
-            all_bikes: Alle sykler
-            all_statuses: Alle statuser
             cannot_update_with_kind: Denne oppføringen kan ikke oppdateres med «{kind}»
             hide_update: Skjul oppdatering
-            matching_impound_record:
-              one: samsvarende beslagsregister
-              other: samsvarende beslaglagte poster
-            only_unregistered: Kun uregistrerte
-            only_user_registered: Kun bruker registrert
-            status_records: "%{status} poster"
             update_multiple_records: Oppdater flere poster
         parking_notifications:
           index:
