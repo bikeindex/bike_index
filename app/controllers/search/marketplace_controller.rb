@@ -6,6 +6,7 @@ module Search
     before_action :render_ad
     before_action :set_interpreted_params
     around_action :set_reading_role
+    helper_method :searched?
 
     def index
       @render_results = Binxtils::InputNormalizer.boolean(params[:search_no_js]) || turbo_request?
@@ -87,6 +88,12 @@ module Search
 
     def listing_search_params
       params.permit(:currency, :price_min_amount, :price_max_amount)
+    end
+
+    # Any other query param - utm_source, fbclid - isn't a search
+    def searched?
+      params.permit(*Bike.permitted_search_params, :marketplace_scope, :page).merge(listing_search_params)
+        .compact_blank.present?
     end
 
     def amount_for(value)

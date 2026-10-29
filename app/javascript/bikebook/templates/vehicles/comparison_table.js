@@ -1,10 +1,12 @@
 import { html, nothing } from 'lit-html'
+import { listedFigure } from 'bikebook/cycle_drawings'
 import { OVERALL_LENGTH_ESTIMATE } from 'bikebook/frame_geometry'
 import { missing } from 'bikebook/templates/helpers'
+import { copyButton } from 'bikebook/templates/ui/copy_button'
 import { table } from 'bikebook/templates/ui/table'
 import { tooltip } from 'bikebook/templates/ui/tooltip'
-import { seriesBorders } from 'bikebook/templates/vehicles/geometry_overlay'
-import { cargoAt, isCargo, tireWidth, wheelsAt } from 'bikebook/templates/vehicles/model_viewer'
+import { seriesBorders, wheelName } from 'bikebook/templates/vehicles/geometry_overlay'
+import { cargoAt, isCargo, tireWidth, typeLabel, wheelsAt } from 'bikebook/templates/vehicles/model_viewer'
 import { array, isNumber, join, present, slice, sum } from 'bikebook/templates/values'
 
 // A row header's cell classes that keep it in view as a phone scrolls the table across, at its scroller's edge rather than
@@ -12,6 +14,8 @@ import { array, isNumber, join, present, slice, sum } from 'bikebook/templates/v
 export const PINNED_ROW_HEADER = 'tw:max-md:sticky tw:max-md:-left-(--gutter) tw:max-md:z-10 tw:max-md:border-r tw:max-md:bg-inherit'
 
 const GEOMETRY = ['reach', 'stack', 'top_tube_effective', 'head_angle', 'seat_angle', 'chainstay', 'standover', 'wheelbase']
+const BETTER = 'tw:text-green-700 tw:dark:text-green-400'
+const WORSE = 'tw:text-red-700 tw:dark:text-red-400'
 // the size's, so it closes the geometry
 const WEIGHT = { label: 'Weight', read: (vehicle, size) => size?.geometry?.total_weight, better: -1, unit: 'kg' }
 
@@ -36,13 +40,16 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], highl
     }
   })
   const wheels = new Map(named.map((vehicle, index) => [vehicle, wheelsAt(presenter, vehicles[index].data, sizes[index])]))
+  const wheelbase = geometry.find(({ key }) => key === 'wheelbase')
+  const specified = (vehicle) => listedFigure(sizes[named.indexOf(vehicle)], 'dimensions.length')
   const length = {
-    ...geometry.find(({ key }) => key === 'wheelbase'),
+    ...wheelbase,
     label: html`Overall length (est.) ${tooltip({ text: `Overall length is ${OVERALL_LENGTH_ESTIMATE}` })}`,
     read: (vehicle) => {
       const listed = frames[named.indexOf(vehicle)]?.wheels
-      return listed ? presenter.rounded(sum(Object.values(listed))) : null
-    }
+      return specified(vehicle) ?? (listed ? presenter.rounded(sum(Object.values(listed))) : null)
+    },
+    format: (value, vehicle) => isNumber(specified(vehicle)) ? html`${show(wheelbase, value, vehicle)} ${tooltip({ text: 'This value is specified' })}` : null
   }
   // in mm, though a wide tire reads in inches
   const tireDifference = (change) => presenter.measurement(change, 'mm')
@@ -67,9 +74,7 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], highl
     if (!isNumber(number) || !isNumber(base)) return nothing
     const change = presenter.rounded(number - base)
     if (change === 0) return html`<span class="tw:block tw:text-xs tw:text-gray-400 tw:dark:text-gray-500">-</span>`
-    const color = row.better === 0
-      ? 'tw:text-gray-500 tw:dark:text-gray-400'
-      : Math.sign(change) === row.better ? 'tw:text-green-700 tw:dark:text-green-400' : 'tw:text-red-700 tw:dark:text-red-400'
+    const color = row.better === 0 ? 'tw:text-gray-500 tw:dark:text-gray-400' : Math.sign(change) === row.better ? BETTER : WORSE
     // a currency symbol, which carries its name as a title, stays gray like a unit
     return html`<span class="tw:block tw:text-xs ${color} tw:[&_span[title]]:text-gray-400 tw:dark:[&_span[title]]:text-gray-500">${
       change > 0 ? '+' : '−'}${row.amount?.(Math.abs(change)) ?? fallback(Math.abs(change))}</span>`
@@ -78,18 +83,26 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], highl
 
   const difference = (row, value, base, vehicle) => compared(row, vehicle) ? changed(row, value, base, (amount) => show(row, amount, vehicle)) : nothing
 
+  // a wheel of another size than the first's is larger or smaller, rather than a number of mm
+  const resized = (bsd, base) => {
+    if (!isNumber(bsd) || !isNumber(base) || bsd === base) return nothing
+    const larger = bsd > base
+    const text = `${wheelName(presenter, bsd)} wheels are ${larger ? 'larger' : 'smaller'} diameter than ${wheelName(presenter, base)}`
+    return html`<span class="tw:block tw:text-xs"><span class="tw:font-bold ${larger ? BETTER : WORSE}">${larger ? '+' : '−'}</span> ${tooltip({ text })}</span>`
+  }
+
   const partsCell = (row, value, baseParts, vehicle) => {
     const comparing = compared(row, vehicle)
     return html`<span class="tw:inline-flex tw:items-start tw:gap-x-1">${row.parts(value).map(([key, number, content]) =>
-      html`<span>${content}${comparing ? changed(row, number, baseParts.get(key), String) : nothing}</span>`)}</span>`
+      html`<span>${content}${!comparing ? nothing : key === 'size' ? resized(number, baseParts.get(key)) : changed(row, number, baseParts.get(key), String)}</span>`)}</span>`
   }
 
   const sizeCell = (index) => {
-    const { data, value } = vehicles[index]
+    const { data, key } = vehicles[index]
     const options = array(data.sizes)
     if (options.length < 2) return options[0]?.name ?? missing
     return html`<select class="twinput tw:w-auto tw:py-1 tw:text-sm" aria-label=${`Size of ${named[index].model}`} data-action="bikebook--page#pickSize"
-      data-bikebook--page-vehicle-param=${value} data-bikebook--page-first-param=${index === 0}>${options.map((size) =>
+      data-bikebook--page-vehicle-param=${key} data-bikebook--page-first-param=${index === 0}>${options.map((size) =>
         html`<option value=${size.name} ?selected=${size === sizes[index]} data-size=${JSON.stringify({ name: size.name, geometry: slice(size.geometry, ['top_tube_effective', 'reach', 'min_rider_height', 'max_rider_height']) })}>${size.name}</option>`)}</select>`
   }
 
@@ -112,7 +125,8 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], highl
   const sizeRows = sizes.some(Boolean) ? [size] : []
   const cargos = new Map(named.map((vehicle, index) => [vehicle, cargoAt(presenter, vehicles[index].data, sizes[index])]))
   const cargoRows = vehicles.some(({ data }) => isCargo(data)) ? records([{ label: 'Cargo', read: (vehicle) => cargos.get(vehicle) }]) : []
-  const rows = [...records(wheelRows), ...cargoRows, ...sizeRows, ...records([...geometry, length, WEIGHT])]
+  const typeRows = new Set(named.map(typeLabel)).size > 1 ? records([{ label: 'Vehicle type', read: typeLabel }]) : []
+  const rows = [...typeRows, ...records(wheelRows), ...cargoRows, ...sizeRows, ...records([...geometry, length, WEIGHT])]
   if (rows.length === 0) return nothing
 
   // Out to the window's edges, the table at least the page's 78rem column and wider as its vehicles need, scrolling
@@ -125,7 +139,8 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], highl
       ...named.map((vehicle, index) => {
         const border = seriesBorders(frames, index)
         return {
-          label: html`<span class="tw:block tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">${vehicle.manufacturer}</span>${vehicle.model}`,
+          label: html`<span class="tw:block tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">${vehicle.manufacturer}</span><span
+            class="tw:inline-flex tw:items-baseline tw:gap-1">${vehicle.model}${copyButton({ value: vehicles[index].value, label: 'Copy ID', tooltip: true })}</span>`,
           classes: 'tw:min-w-48 tw:align-top',
           headerClasses: border.top,
           // a model's name can wrap in its header, but not a value

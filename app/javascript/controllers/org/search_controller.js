@@ -1,7 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
 import { collapseField } from 'utils/collapse_utils'
-
-/* global localStorage */
+import { storage } from 'utils/storage'
 
 const RESULT_VIEW_KEY = 'orgRegistrationResultView'
 
@@ -71,9 +70,9 @@ export default class extends Controller {
   syncResultView () {
     const params = new URLSearchParams(window.location.search)
     const inUrl = params.get('search_result_view')
-    if (inUrl) return localStorage.setItem(RESULT_VIEW_KEY, inUrl)
+    if (inUrl) return storage.setItem(RESULT_VIEW_KEY, inUrl)
 
-    const stored = localStorage.getItem(RESULT_VIEW_KEY)
+    const stored = storage.getItem(RESULT_VIEW_KEY)
     const frame = this.resultsFrame
     if (!stored || stored === this.resultViewValue || !frame) return
 
@@ -100,7 +99,7 @@ export default class extends Controller {
   initOptionalFields (duration) {
     this.optionalFieldTargets.forEach(field => {
       const hasValue = [...field.querySelectorAll('input:not([type=hidden])')].some(input => input.value.length > 0)
-      const open = hasValue || localStorage.getItem(field.dataset.storageKey) === 'true'
+      const open = hasValue || storage.getItem(field.dataset.storageKey) === 'true'
       this.setOptionalField(field.dataset.field, open, duration)
     })
   }
@@ -113,7 +112,7 @@ export default class extends Controller {
     const field = this.optionalFieldTargets.find(target => target.dataset.field === name)
     if (!field) return
     collapseField(field, open, duration)
-    localStorage.setItem(field.dataset.storageKey, String(open))
+    storage.setItem(field.dataset.storageKey, String(open))
     const checkbox = this.optionalFieldCheckboxTargets.find(target => target.dataset.field === name)
     if (checkbox) checkbox.checked = open
   }

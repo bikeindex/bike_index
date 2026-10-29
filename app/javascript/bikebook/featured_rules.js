@@ -10,9 +10,6 @@ const UNDER_PRICE_CENTS = 150000
 const MAX_PRICE_CENTS = 1000000
 const AROUND_PRICE_CENTS = [550000, 650000]
 
-// The index carries no model group, which a model's first word stands in for
-const modelGroup = ({ manufacturer, model }) => `${manufacturer}/${model.split(' ')[0]}`
-
 // A model whose `key` none of the picks share
 const unseen = (key) => (model, { picked }) => !picked.some((each) => key(each) === key(model))
 
@@ -29,7 +26,7 @@ export const requirements = [
 export const preferences = [
   unseen(({ manufacturer }) => manufacturer),
   unseen(({ primary_activity: activity }) => activity),
-  unseen(modelGroup),
+  unseen(({ group_key: group }) => group),
   ({ model_configuration: configuration }) => configuration === 'complete'
 ]
 

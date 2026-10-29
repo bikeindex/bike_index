@@ -1,6 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
 import { CatalogComboboxSource, loadCatalog, renderCounts } from 'bikebook/catalog'
-import { hydrate, loadingShell, pickedVehicles, unpickedVehicles } from 'bikebook/hydrate'
+import { hydrate, loadingShell, pickedVehicles, rescoredSimilar, unpickedVehicles } from 'bikebook/hydrate'
 import { keepPermanent, renderInto } from 'bikebook/render'
 import { readable } from 'bikebook/replace_url'
 import { searching } from 'bikebook/query'
@@ -25,6 +25,7 @@ export default class extends Controller {
   #searchLog
   #renders = 0
   #refilters = 0
+  #rescores = 0
   #renderedUrl
 
   // The loading shell holds the status until the catalog's first render replaces it, and a failure puts it back
@@ -113,6 +114,26 @@ export default class extends Controller {
       renderInto(viewers, vehicles)
       this.#renderedUrl = url
     }
+  }
+
+  // The page as it is, rendered where the reader is, such as once a section that's scored when open first opens
+  refresh () {
+    this.#render(new URL(window.location.href), [window.scrollX, window.scrollY], { focus: false })
+  }
+
+  // The similar models' section opened from a toggle outside it, its own toggle taking focus
+  compareSimilar () {
+    const toggle = this.pageTarget.querySelector('#similar-toggle')
+    toggle.click()
+    toggle.focus()
+  }
+
+  // The similar models by the settings their controls set, unless the page renders or they change again first
+  async rescore ({ detail: { vehicle, settings } }) {
+    const render = this.#renders
+    const rescore = ++this.#rescores
+    const results = await rescoredSimilar(this.catalog, this.pageTarget, new URL(window.location.href), vehicle, settings)
+    if (render === this.#renders && rescore === this.#rescores) renderInto(this.pageTarget.querySelector('#similar-results'), results)
   }
 
   restore () {

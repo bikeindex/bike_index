@@ -25,6 +25,9 @@
 /* /bikebook reads lengths, weights and speeds in imperial units below an `.imperial` ancestor */
 @custom-variant imperial (&:where(.imperial, .imperial *));
 
+/* /bikebook with its similar models open */
+@custom-variant similar-open (&:where(:has(#similar-toggle[aria-expanded=true]) *));
+
 /* The selected/pressed state of a button, link or menu item, however it's flagged —
  * including a <label> around a checked radio (UI::Forms::RadioButtonGroup).
  * Keep it the last @custom-variant: tailwind sorts custom variants in declaration

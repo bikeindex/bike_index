@@ -715,11 +715,11 @@ RSpec.describe MyAccountsController, type: :request do
         context "with multiple user_registration_organizations" do
           let(:organization2) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["reg_organization_affiliation"]) }
           let(:user_registration_organization2) { FactoryBot.create(:user_registration_organization, all_bikes: true, user: current_user, organization: organization2) }
-          let(:bike3_information) { {bike_sticker: "vvvv"}.merge(default_location_registration_address).as_json }
+          let(:bike3_information) { {bike_sticker: "vvvv"}.merge(default_location_registration_info).as_json }
           let(:bike3) { FactoryBot.create(:bike, :with_ownership_claimed, :with_address_record, address_in: :new_york, user: current_user, creation_registration_info: bike3_information) }
           let(:target_extra_info) do
             target_info.merge("organization_affiliation_#{organization2.id}" => "employee")
-              .merge(default_location_registration_address).as_json
+              .merge(default_location_registration_info).as_json
           end
           it "updates" do
             expect_bike1_initiated
@@ -738,7 +738,7 @@ RSpec.describe MyAccountsController, type: :request do
             bike1_organization2.destroy
 
             expect(bike3.reload.registration_info).to eq(bike3_information)
-            expect(bike3.address_hash_legacy).to eq default_location_registration_address.merge(country: "United States", street_2: nil).as_json
+            expect(bike3.address_record).to have_attributes default_location_address_record_attrs
 
             Sidekiq::Job.clear_all
             put base_url, params: {
@@ -773,18 +773,15 @@ RSpec.describe MyAccountsController, type: :request do
             expect(bike_organization1.overridden_by_user_registration?).to be_truthy
 
             expect(bike2.reload.bike_organizations.pluck(:organization_id)).to match_array([organization1.id, organization2.id])
-            expect(bike2.registration_info).to eq target_extra_info.merge(default_location_registration_address).as_json
+            expect(bike2.registration_info).to eq target_extra_info.merge(default_location_registration_info).as_json
             expect(bike2_organization1.can_edit_claimed).to be_falsey
             expect(bike2_organization1.overridden_by_user_registration?).to be_truthy
 
             expect(bike3.reload.organizations.pluck(:id)).to match_array([organization1.id])
-            target_bike3_info = bike3_information.merge(target_extra_info).merge(default_location_registration_address).as_json
+            target_bike3_info = bike3_information.merge(target_extra_info).merge(default_location_registration_info).as_json
             expect(bike3.registration_info).to eq target_bike3_info
 
             expect(current_user.reload.address_record).to have_attributes default_location_address_record_attrs.merge(kind: "user")
-
-            expect(current_user.address_hash_legacy)
-              .to eq default_location_registration_address.merge("country" => "United States", "street_2" => nil)
           end
         end
       end

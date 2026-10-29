@@ -4160,6 +4160,9 @@ it:
     strava_search_index: Associa la tua attrezzatura Strava alle tue registrazioni
       Bike Index. Cerca, filtra e aggiorna in blocco le tue attività per assegnare
       l'attrezzatura alle uscite in cui manca.
+    marketplace_how_it_works: Come funziona la compravendita sul marketplace di Bike
+      Index, dove ogni bicicletta è registrata e una denunciata come rubata non può
+      essere messa in vendita.
   meta_titles:
     bikes_index: Risultati della ricerca
     bikes_new: Registra una bicicletta!
@@ -4212,6 +4215,7 @@ it:
     search_marketplace_index: Mercato di Bike Index
     strava_search_index: Indice biciclette Ricerca Strava
     registration_form_settings: Impostazioni del modulo di registrazione
+    marketplace_how_it_works: Come funziona il marketplace di Bike Index
   money:
     currencies:
       en: USD
@@ -5483,15 +5487,12 @@ it:
         protecting_your_bike_here: Proteggiamo la tua bicicletta qui
         read_more_about_prefix: Scopri di più su
         recovered_bike_type: recuperato/trovato %{bike_type}
-        secure_both_wheels_either_with_two_ulocks: Fissate entrambe le ruote, utilizzando
-          due lucchetti a U oppure un lucchetto a U e un cavo robusto.
         sign_up_on_bikeindexorg_to_claim_your_bik: Registrati su BikeIndex.org per
           richiedere il tuo %{bike_type}, modificarlo, caricare foto e assicurarti
           di non perdere mai di vista la tua fidata bici!
         stolen_bike_type: rubato %{bike_type}
         thanks_for_adding_this_bike_type_you_found: Grazie per aver aggiunto questo
           %{bike_type} che hai trovato a Bike Index
-        use_a_ulock: Utilizza un lucchetto a U.
         were_sorry_your_bike_type_was_stolen: Ci dispiace che il tuo %{bike_type}
           sia stato rubato.
         when_you_do: quando lo fai!
@@ -5520,13 +5521,16 @@ it:
         stolen_guidance: Se la tua bicicletta viene rubata, accedi immediatamente
           a Bike Index e segnalala come rubata per attivare la nostra rete di recupero.
         theft_victims_illustration: Illustrazione di vittime di furto
-        ulock_illustration: Illustrazione di un lucchetto a U
         updated_registration_guidance: Se cambi casa, vendi la tua moto o apporti
           modifiche, aggiorna la registrazione in modo che i dati rimangano accurati
           e utili.
         view_your_bike: Visualizza la tua bici
         what_if_my_bike_gets_stolen: E se mi rubassero la bicicletta?
         whats_next: Cosa succederà ora?
+        secure_both_wheels_with_locking_skewers: Fissa entrambe le ruote con perni
+          di bloccaggio, un cavo robusto e uno o due lucchetti a U.
+        use_a_ulock_or_foldable_lock: Utilizza un lucchetto a U o un lucchetto pieghevole
+          resistente.
       organization_invitation:
         hello: Ciao %{name},
         join_org: Unisciti a %{org_name}
@@ -5643,6 +5647,8 @@ it:
           required: richiesto
         combobox_state:
           state: Stato
+        combobox:
+          no_matches: Nessuna partita
       alerts:
         base:
           error: Errore
@@ -6304,6 +6310,21 @@ it:
         result_view_select:
           cards_view: Visualizza come schede
           list_view: Visualizza come elenco
+        marketplace_intro:
+          bike_index_members: Membri di Bike Index
+          checked_for_theft: Verificato per furto
+          description: Bike Index è un'organizzazione no-profit che aiuta a recuperare
+            le biciclette rubate. Il nostro marketplace elenca solo biciclette registrate,
+            quindi puoi acquistare biciclette usate con la certezza che non siano
+            state denunciate come rubate.
+          heading: Il mercato delle biciclette usate del registro delle biciclette.
+          hide_intro: Nascondi l'introduzione
+          how_buying_works: Come funziona l'acquisto
+          how_selling_works: Come funziona la vendita
+          marketplace_title: Mercato di Bike Index
+          ownership_transfers: Trasferimenti di proprietà
+          registered_bikes_only: Solo biciclette immatricolate
+          what_makes_this_different: Cosa rende questo diverso?
       sessions:
         sign_in_interstitial:
           click_button_to_continue: Fai clic sul pulsante qui sotto per continuare
@@ -6581,8 +6602,6 @@ it:
             è stata presa
           questions_people_ask_at_2am: Domande che le persone si pongono alle 2 del
             mattino
-          read_more_recovery_stories: Leggi altre storie di guarigione
-          recoveries_reported_by_owners: Recuperi recenti, segnalati dai proprietari.
           recovery_record: Registro dei guasti
           register_it: Registralo
           register_your_stolen_bike: Registra la tua bicicletta rubata
@@ -6952,6 +6971,10 @@ it:
           market: Mercato
           clear_filters: Filtri trasparenti
           loading_placeholder: Caricamento…
+          any_frame_material: Qualsiasi materiale per la struttura
+          any_handlebar_type: Qualsiasi tipo di manubrio
+          frame_material: Materiale del telaio
+          handlebar_type: Tipo di manubrio
         donate_strip:
           donate: Donare
           pitch: Questo fantastico prodotto è offerto dall'organizzazione no-profit
@@ -6984,8 +7007,6 @@ it:
           classes_start_on: Le lezioni entreranno in vigore %{date}. Nel frattempo,
             verifica le norme vigenti nello stato.
           fails_rule: Non soddisfa questa regola
-          falls_under: In %{state}, rientra in %{name}, che può richiedere la registrazione
-            e una licenza.
           for_your_information: Per vostra informazione
           gray_detail: Il tuo %{name} è classificato come e-bike di classe %{n}. Consulta
             il %{state} DMV per le normative locali.
@@ -7067,14 +7088,10 @@ it:
           speed_past_cap_html: Assiste oltre %{past} mph, oltre il limite %{cap} mph
           speed_past_html: Assiste oltre %{past} mph; verificare che si fermi entro
             %{cap} mph
-          classes_not_recognized:
-            one: La classe %{n} non è riconosciuta qui
-            other: Le classi %{n} non sono riconosciute qui
           classes_recognized:
             one: La classe %{n} è riconosciuta
             other: Le classi %{n} sono riconosciute
           read_more: Per saperne di più
-          stock_photo: Foto di repertorio
           answer_optional: Opzionale
           as_class_with_optional_throttle: come Classe %{n} con il suo acceleratore
             opzionale
@@ -7089,11 +7106,6 @@ it:
             come e-bike di classe %{n} e %{optional}.
           manually_entered: Inserito manualmente
           model_year: modello %{year}
-          optional_classes_not_recognized:
-            one: La classe %{n} non è riconosciuta qui, quindi è legale solo come
-              venduta
-            other: Le classi %{n} non sono riconosciute qui, quindi è legale solo
-              come venduto
           optional_throttle_not_allowed: È legale solo senza l'acceleratore opzionale.
           optional_to_html: Opzionale, per %{mph}
           throttle_with_class_3_assist: Non consentito con assistenza di Classe 3
@@ -7149,6 +7161,16 @@ it:
               le regole %{law}, con %{count} regole da verificare.
           yes_to_kmh_html: Sì, fino a %{kmh} km/h
           your_province: La tua provincia o territorio
+          classes_not_recognized_in:
+            one: La classe %{n} non è riconosciuta in %{state}
+            other: Le classi %{n} non sono riconosciute in %{state}
+          falls_under_name: In %{state}, rientra in %{name}.
+          optional_classes_not_recognized_in:
+            one: La classe %{n} non è riconosciuta in %{state}, quindi è legale solo
+              come venduta
+            other: Le classi %{n} non sono riconosciute in %{state}, quindi è legale
+              solo come venduto
+          other_classification_rules: "%{name} regole"
         rule_label:
           classes: Classi riconosciute
           power: Limite di potenza del motore
@@ -7503,10 +7525,7 @@ it:
           perk_top_listing_placement: Primo posto nella classifica del marketplace
           plans_from: Piani a partire da %{price} un mese
           questions: Domande
-          read_more_recovery_stories: Leggi altre storie di guarigione
           recommended: Raccomandato
-          recoveries_reported_by_owners: Ogni ritrovamento viene segnalato dalla persona
-            che ha recuperato la propria bicicletta.
           stolen_bikes_recovered: biciclette rubate recuperate
           summary_monthly: "%{level} abbonamento, %{price} al mese"
           summary_yearly: "%{level} iscrizione, %{price} un anno"
@@ -7589,14 +7608,10 @@ it:
             evitare le imposte sulle plusvalenze derivanti dall'apprezzamento del
             valore degli asset.
           other_ways_title: Altri modi per donare a questo livello
-          recovered: Riparato
           stat_bikes: biciclette registrate, gratis
           stat_partners: negozi partner, dipartimenti di polizia e città
           stat_recoveries: biciclette rubate recuperate
           stat_value: valore restituito ai proprietari
-          stories_link: Leggi altre storie di guarigione
-          stories_subhead: Ogni ritrovamento viene segnalato dalla persona che ha
-            recuperato la propria bicicletta.
           stories_title: Nelle parole dei loro proprietari
           tier_basic: Abbonamento base
           tier_basic_benefit: Pubblicazione di biciclette sul marketplace, badge di
@@ -8007,6 +8022,107 @@ it:
           start_over: Ricominciare
           tabs_label: Esempi di organizzazioni
           viewing_as: Visualizzazione come
+      marketplace:
+        how_it_works:
+          across_town_heading: Dall'altra parte della città o dall'altra parte del
+            paese
+          across_town_intro: Ogni vendita avviene direttamente tra privati. Bike Index
+            non gestisce i pagamenti né le spedizioni, pertanto acquirente e venditore
+            si accordano direttamente su prezzo, pagamento e consegna.
+          back_to_marketplace: Torna al marketplace
+          bike_index_members: Membri di Bike Index
+          bike_index_members_body: I venditori che supportano Bike Index sottoscrivendo
+            un abbonamento mostrano un badge di membro Bike Index sui loro annunci.
+          browse_bikes: Sfoglia le biciclette
+          buying_a_bike: Acquistare una bicicletta
+          checked_for_theft: Verificato per furto
+          checked_for_theft_body: Una bicicletta segnalata come rubata su Bike Index
+            non può essere inserita nell'elenco.
+          contact_the_seller: Contatta il venditore
+          contact_the_seller_member_badge_body: Poni domande e fissa un appuntamento
+            per visionare la bici. Cerca il badge di membro di Bike Index.
+          find_a_bike: Trova una bicicletta
+          find_a_bike_body: Consulta le descrizioni degli annunci, seleziona un tipo
+            di attività principale e imposta un intervallo di prezzo. Scegli "In vendita
+            nell'area di ricerca" per visualizzare le biciclette nelle tue vicinanze,
+            oppure "In vendita ovunque" per visualizzare tutti gli annunci.
+          hand_off_or_ship: Consegnare o spedire
+          hand_off_or_ship_body: Incontra gli acquirenti locali in un luogo pubblico.
+            Per gli acquirenti fuori città, utilizza un servizio di spedizione biciclette
+            come BikeFlights.
+          heading: Come funziona il marketplace di Bike Index
+          intro: Vogliamo che questo sia il luogo più semplice e affidabile per comprare
+            e vendere una bici usata. Ogni bici in vendita è registrata su Bike Index
+            e le transazioni avvengono direttamente tra te e l'altro motociclista.
+          local_pickup: Ritiro in loco
+          local_pickup_body: Incontratevi di persona, provate la moto e controllate
+            il numero di serie prima di pagare. Il venditore vi trasferirà la proprietà
+            sul posto.
+          mark_it_for_sale: Mettilo in vendita
+          mark_it_for_sale_body: Dalla pagina della tua moto, aggiungi prezzo, foto
+            e condizioni. Le specifiche tecniche sono ricavate dalla registrazione.
+          ownership_transfers: Trasferimenti di proprietà
+          ownership_transfers_body: Una volta conclusa la vendita, il venditore trasferisce
+            la proprietà del veicolo all'acquirente. Il nuovo proprietario risulta
+            registrato fin dal primo giorno.
+          pay_and_take_ownership: Paga e prendi possesso
+          pay_and_take_ownership_body: Paghi direttamente il venditore, che poi trasferisce
+            a te la registrazione di Bike Index.
+          pro_tip: CONSIGLIO DA PROFESSIONISTA!
+          pro_tip_heading: Alcune abitudini contribuiscono a mantenere sicure le vendite
+            da persona a persona.
+          ready_heading: Pronto a trovare la tua prossima bicicletta?
+          register_your_bike: Registra la tua bicicletta
+          register_your_bike_body: Sei già registrato? Salta qui. Altrimenti, ci vogliono
+            circa due minuti ed è gratis, per sempre.
+          registered_bikes_only: Solo biciclette immatricolate
+          registered_bikes_only_body: È possibile inserire in vendita solo biciclette
+            registrate su Bike Index, pertanto ogni annuncio è collegato a una targa
+            e a un numero di serie reali.
+          see_it_or_ship_it: Vedilo o spediscilo
+          see_it_or_ship_it_body: Sei della zona? Provala e verifica che il numero
+            di serie sul telaio corrisponda a quello indicato nell'inserzione. Sei
+            fuori città? Concorda la spedizione con il venditore e chiedi una foto
+            del numero di serie.
+          sell_your_bike: Vendi la tua bicicletta
+          selling_a_bike: Vendita di una bicicletta
+          shipping: Spedizione a un acquirente fuori città
+          shipping_body: Non ci sono problemi a spedire. I venditori possono utilizzare
+            un servizio di spedizione biciclette come BikeFlights. Mettetevi d'accordo
+            in anticipo su chi paga le spese di spedizione e imballaggio, condividete
+            il codice di tracciamento e trasferite la proprietà della bicicletta una
+            volta che l'acquirente l'ha ricevuta.
+          tip_be_wary: Diffidate di chiunque insista per accelerare i tempi o proponga
+            modalità di pagamento insolite.
+          tip_check_serial: Prima di effettuare il pagamento, verifica che il numero
+            di serie sul telaio corrisponda a quello indicato nell'inserzione.
+          tip_public_place: Dovete incontrarvi in zona? Scegliete un luogo pubblico
+            frequentato durante il giorno.
+          tip_registration_transferred: Assicurati che la registrazione venga trasferita
+            a tuo nome al termine della vendita.
+          tip_shipping: Spedizione? Richiedi foto aggiuntive, incluso il numero di
+            serie, e utilizza un metodo di pagamento con protezione acquirente.
+          transfer_ownership: Trasferimento di proprietà
+          transfer_ownership_body: Una volta ricevuto il pagamento, trasferisci la
+            bicicletta all'indirizzo email dell'acquirente su Bike Index.
+          trust_not_guarantee: Un segno di fiducia, non una garanzia
+          trust_not_guarantee_body: Qui ogni bicicletta è registrata e una bicicletta
+            denunciata come rubata non può essere messa in vendita, il che la dice
+            lunga sulla sua qualità. Tuttavia, questo non garantisce l'onestà di chi
+            la compra o la vende. Fate domande, conservate i vostri messaggi e fidatevi
+            del vostro istinto.
+          what_we_check: Cosa controlliamo
+          why_a_marketplace: Perché un mercato?
+          why_heading: Acquistare una bicicletta usata non dovrebbe significare rischiare
+            di comprarne una rubata.
+          why_registry: Bike Index è un registro di biciclette gratuito e senza scopo
+            di lucro. Da anni aiutiamo i ciclisti a registrare le proprie biciclette
+            e a recuperarle in caso di furto.
+          why_we_know: La maggior parte dei siti di vendita di biciclette usate non
+            sa nulla delle biciclette che pubblicano. Noi sì. Poiché ogni annuncio
+            qui si riferisce a una bicicletta regolarmente registrata, una bicicletta
+            denunciata come rubata non può essere pubblicata e la registrazione segue
+            la bicicletta al suo nuovo proprietario.
     shared_blocks:
       footer:
         about: Di
@@ -8198,6 +8314,12 @@ it:
           rate_limited: 'Troppe ricerche in troppo breve: il numero di ricerche è
             limitato. Attendi un attimo, poi riprova.'
           retry: Riprova
+      marketing:
+        recovery_stories:
+          no_recoveries: Non ci sono recuperi
+          read_more_recovery_stories: Leggi altre storie di guarigione
+          reported_by_owners: Ogni ritrovamento viene segnalato dalla persona che
+            ha recuperato la propria bicicletta.
   user_emails:
     confirm:
       confirm_email: Conferma email

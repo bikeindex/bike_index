@@ -1,0 +1,104 @@
+---
+en:
+  components:
+    pages:
+      marketplace:
+        how_it_works:
+          across_town_heading: Across town or across the country
+          across_town_intro: >-
+            Every sale is person to person. Bike Index doesn’t handle payment or shipping,
+            so buyer and seller agree on price, payment and delivery between themselves.
+          back_to_marketplace: Back to marketplace
+          bike_index_members: Bike Index members
+          bike_index_members_body: >-
+            Sellers who support Bike Index with a membership show a Bike Index member
+            badge on their listings.
+          browse_bikes: Browse bikes
+          buying_a_bike: Buying a bike
+          checked_for_theft: Checked for theft
+          checked_for_theft_body: A bike reported stolen on Bike Index can’t be listed.
+          contact_the_seller: Contact the seller
+          contact_the_seller_member_badge_body: >-
+            Ask questions and arrange a time to see the bike. Look for the Bike Index
+            member badge.
+          find_a_bike: Find a bike
+          find_a_bike_body: >-
+            Search listing descriptions, pick a primary activity type, and set a price
+            range. Choose “For sale in search area” to see bikes near you, or “For
+            sale anywhere” to see everything.
+          hand_off_or_ship: Hand off or ship
+          hand_off_or_ship_body: >-
+            Meet local buyers somewhere public. For out-of-town buyers, ship with
+            a bike shipping service like BikeFlights.
+          heading: How the Bike Index Marketplace works
+          intro: >-
+            We want this to be the easiest, most trusted place to buy and sell a used
+            bike. Every bike listed is registered on Bike Index, and sales happen
+            directly between you and the other rider.
+          local_pickup: Local pickup
+          local_pickup_body: >-
+            Meet in person, test ride the bike, and check the serial before you pay.
+            The seller transfers the registration to you on the spot.
+          mark_it_for_sale: Mark it for sale
+          mark_it_for_sale_body: >-
+            From your bike’s page, add a price, photos and condition. Specs come from
+            your registration.
+          ownership_transfers: Ownership transfers
+          ownership_transfers_body: >-
+            When the sale is done, the seller transfers the registration to the buyer.
+            The new owner is on record from day one.
+          pay_and_take_ownership: Pay and take ownership
+          pay_and_take_ownership_body: You pay the seller directly. They transfer
+            the Bike Index registration to you.
+          pro_tip: PRO TIP!
+          pro_tip_heading: A few habits keep person-to-person sales safe.
+          ready_heading: Ready to find your next bike?
+          register_your_bike: Register your bike
+          register_your_bike_body: >-
+            Already registered? Skip ahead. If not, it takes about two minutes and
+            it’s free, forever.
+          registered_bikes_only: Registered bikes only
+          registered_bikes_only_body: >-
+            You can only list a bike that’s registered on Bike Index, so every listing
+            is tied to a real registration and serial number.
+          see_it_or_ship_it: See it or ship it
+          see_it_or_ship_it_body: >-
+            Local? Ride it and confirm the serial on the frame matches the listing.
+            Out of town? Agree on shipping with the seller and ask for a photo of
+            the serial.
+          sell_your_bike: Sell your bike
+          selling_a_bike: Selling a bike
+          shipping: Shipping to an out-of-town buyer
+          shipping_body: >-
+            It’s fine to ship. Sellers can use a bike shipping service like BikeFlights.
+            Agree up front on who pays for shipping and packing, share tracking, and
+            transfer the registration once the buyer has the bike.
+          tip_be_wary: Be wary of anyone who pushes to move fast or pay in unusual
+            ways.
+          tip_check_serial: Check that the serial on the frame matches the listing
+            before you pay.
+          tip_public_place: Meeting locally? Pick a busy public place during the day.
+          tip_registration_transferred: Make sure the registration is transferred
+            to you when the sale is done.
+          tip_shipping: >-
+            Shipping? Ask for extra photos, including the serial, and use a payment
+            method with buyer protection.
+          transfer_ownership: Transfer ownership
+          transfer_ownership_body: Once you’re paid, transfer the bike to the buyer’s
+            email on Bike Index.
+          trust_not_guarantee: A sign of trust, not a guarantee
+          trust_not_guarantee_body: >-
+            Every bike here is registered, and a bike reported stolen can’t be listed,
+            which says a lot about the bike. It doesn’t guarantee the honesty of the
+            person buying or selling it. Ask questions, keep your messages, and trust
+            your instincts.
+          what_we_check: What we check
+          why_a_marketplace: Why a marketplace?
+          why_heading: Buying used shouldn’t mean taking a chance on a stolen bike.
+          why_registry: >-
+            Bike Index is a free, nonprofit bike registry. For years we’ve helped
+            riders register their bikes and get them back when they’re stolen.
+          why_we_know: >-
+            Most used-bike sites don’t know anything about the bikes on them. We do.
+            Because every listing here is a registered bike, one reported stolen can’t
+            be listed, and the registration follows the bike to its new owner.

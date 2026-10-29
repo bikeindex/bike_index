@@ -47,6 +47,7 @@ Rails.application.routes.draw do
 
   get "for_advocacy", to: redirect("/for_community_groups")
   get "for_shops", to: redirect("/for_bike_shops")
+  get "ucmerced", to: redirect("/register/new?organization_id=uc-merced")
   get "ambassadors", to: redirect("/ambassadors_how_to") # Because convenience
   get "ambassadors/new", to: redirect("https://docs.google.com/forms/d/e/1FAIpQLSenRXqarY4KFNw1AQ3u5iHwIaaIpgy6cb1sD3YTSQiR0ICeCQ/viewform"), as: :new_ambassador
 
@@ -68,6 +69,7 @@ Rails.application.routes.draw do
   get "ebike-rules", to: "ebike_rules#show", as: :ebike_rules
   get "ebike-rules/:country(/:region)", to: "ebike_rules#show", as: :ebike_rules_place, constraints: {country: /[a-z]{2}/i, region: /[a-z0-9]{1,3}/i}
   get "e-bike-rules(/*rest)", to: redirect { |_, request| request.fullpath.sub("/e-bike-rules", "/ebike-rules") }
+  get "marketplace/how-it-works", to: "marketplace#how_it_works", as: :marketplace_how_it_works
 
   resource :session, only: %i[new create destroy] do
     collection do
