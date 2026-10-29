@@ -20,13 +20,14 @@ const MARKET_ATTRIBUTE = 'data-bikebook--catalog-filters-default-market-value'
 const NOT_CYCLE_TYPE = ['e_scooter', 'skateboard', 'epamd', 'stroller', 'wheelchair', 'e_motorcycle']
 const JURISDICTION_ATTRIBUTE = 'data-bikebook--catalog-filters-default-jurisdiction-value'
 
-// "Select an e-scooter, choose multiple to compare them" once the first of `vehicles` is one, both where the search
-// is labelled and its dialog on a phone
+// "Select an e-scooter, choose multiple to compare them" once the first of `vehicles` is one that isn't a bike, both
+// where the search is labelled and its dialog on a phone. The catalog names types in English, which picks the article
 const labelSearch = (root, { vehicle_type: types }, [first]) => {
-  const type = first && types.find(({ value }) => value === (first.data.type || 'bike'))?.display.toLowerCase()
+  const type = first?.data.type && first.data.type !== 'bike' && types.find(({ value }) => value === first.data.type)?.display.toLowerCase()
   if (!type) return
-  const text = `Select ${/^(?!uni)[aeiou]/.test(type) ? 'an' : 'a'} ${type}, choose multiple to compare them`
-  root.getElementById('vehicle-models-label').textContent = text
+  const label = root.getElementById('vehicle-models-label')
+  const text = label.dataset[/^(?!uni)[aeiou]/.test(type) ? 'anType' : 'aType'].replace('%{bike_type}', type)
+  label.textContent = text
   combobox(root, 'vehicle_models').querySelector('.hw-combobox__dialog__label').textContent = text
 }
 
@@ -59,13 +60,15 @@ const legalClasses = (root, filters, { e_vehicle_classifications: classification
   return [...classes.querySelectorAll('input[name="electric"]')].map(({ value }) => value).filter((value) => value !== 'evc/out_of_class')
 }
 
-// `url`'s filters, its ranges in order and "all" markets as Any, without which it and the jurisdiction - a state's
-// abbreviation, or US - are the panel's defaults
+// `url`'s filters, its ranges in order and an older link's "all" markets as any, without which the market and the
+// jurisdiction - a state's abbreviation, or US - are the panel's defaults
 const urlFilters = (root, url) => {
   const filters = ordered(Object.fromEntries(FILTERS.map((name) => [name, url.searchParams.get(name) ?? ''])))
+  const all = filters.market === 'all'
   return {
     ...filters,
-    market: filters.market === 'all' ? '' : filters.market || panelOf(root).getAttribute(MARKET_ATTRIBUTE),
+    market: (!all && filters.market) || panelOf(root).getAttribute(MARKET_ATTRIBUTE),
+    market_scope: all ? 'any' : filters.market_scope,
     jurisdiction: filters.jurisdiction || panelOf(root).getAttribute(JURISDICTION_ATTRIBUTE)
   }
 }

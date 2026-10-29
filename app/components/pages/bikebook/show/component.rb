@@ -34,7 +34,7 @@ module Pages
         # the visitor's until bikebook--catalog-filters names the one picked
         def market_scopes
           market = tag.span(I18n.t(@market, scope: :countries, default: @market), data: {"bikebook--catalog-filters-target": "marketName"})
-          [{value: "", label: translation(".prefer_market_html", market:)}, {value: "only", label: translation(".only_market_html", market:)},
+          [{value: "", label: translation(".prefer_market_sold_in_html", market:)}, {value: "only", label: translation(".only_market_html", market:)},
             {value: "any", label: translation(".any_market")}]
         end
 

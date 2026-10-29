@@ -738,7 +738,7 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(markets).to eq ["Canada (CA)", "China (CN)", "United Arab Emirates (AE)", "United States (US)"]
     find_field("Market").send_keys(:escape)
     # named for the visitor's market
-    expect(page).to have_checked_field("Prefer vehicles Canada", visible: :all)
+    expect(page).to have_checked_field("Prefer vehicles sold in Canada", visible: :all)
     choose "Any market", allow_label_click: true
     expect(page).to have_css("#vehicle-models-count", exact_text: "(33 matching models)")
     # a model sold outside the visitor's market names where it is
@@ -755,12 +755,22 @@ RSpec.describe "BikeBook", :js, type: :system do
     find("#market-hw-listbox [role='option']", text: "United States (US)").click
     expect(page).to have_css("#vehicle-models-count", exact_text: "(26 matching models)")
     # and then for the one picked
-    expect(page).to have_checked_field("Only United States", visible: :all).and have_field("Prefer vehicles United States", visible: :all)
+    expect(page).to have_checked_field("Only United States", visible: :all).and have_field("Prefer vehicles sold in United States", visible: :all)
     expect(page).to have_current_path(/[?&]market=US\b/)
     page.evaluate_script("new Promise((resolve) => setTimeout(resolve, 1100))")
     expect(logged.last).to eq "count=0&market=US&market_scope=only&q=Specialized+Haul+ST+%282025%29"
     # and stays out of the collapsed filters' summary
     expect(find("[aria-label='Applied filters']", visible: :all).text(:all)).to be_empty
+    # a cleared market is the visitor's again once a filter changes, as the URL leaving it out reads
+    find_field("Market").send_keys(*Array.new("United States (US)".length, :backspace), :escape)
+    find(:label, "Prefer vehicles sold in United States").click
+    expect(page).to have_css("#vehicle-models-count", exact_text: "(7 matching models)")
+    expect(page).to have_checked_field("Prefer vehicles sold in Canada", visible: :all).and have_no_current_path(/[?&]market=/)
+
+    # an older link's every market is any of the visitor's
+    visit bikebook_path(market: "all")
+    expect(page).to have_css("#vehicle-models-count", exact_text: "(33 matching models)", wait: 10)
+    expect(page).to have_checked_field("Any market", visible: :all)
 
     # a market the catalog has no models in searches them all, with nothing for it to narrow
     page.driver.with_playwright_page { it.set_extra_http_headers("CF-IPCountry" => "JP") }

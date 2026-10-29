@@ -195,12 +195,14 @@ export default class extends Controller {
     return min ? `from ${min}` : max && `up to ${max}`
   }
 
-  // A set of checkboxes is one comma-joined value, blank when none is checked, and radios the checked one's
+  // A set of checkboxes is one comma-joined value, blank when none is checked, and radios the checked one's. A cleared
+  // market is the default, as the URL leaving it out reads
   get #filters () {
     const inputs = this.fieldTargets.flatMap((field) => [...field.querySelectorAll('input[name]')])
-    return Object.fromEntries([...new Set(inputs.map(({ name }) => name))].map((name) => [name, inputs
+    const filters = Object.fromEntries([...new Set(inputs.map(({ name }) => name))].map((name) => [name, inputs
       .filter((input) => input.name === name && (!['checkbox', 'radio'].includes(input.type) || input.checked))
       .map(({ value }) => value).join(',')]))
+    return { ...filters, market: filters.market || this.defaultMarketValue }
   }
 
   #showSort () {
