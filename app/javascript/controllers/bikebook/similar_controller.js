@@ -9,7 +9,7 @@ import { PRESETS, presetOf, settingsFrom, weightsFrom, weightsParam } from 'bike
 // strategy's. A strategy's input events don't bubble, so they show each slider's value without rescoring for each
 export default class extends Controller {
   static targets = ['weight', 'strategy', 'setting']
-  static values = { vehicle: String, scored: Boolean }
+  static values = { vehicle: String, size: Number, scored: Boolean }
 
   load () {
     if (!this.scoredValue) this.dispatch('open')
@@ -44,6 +44,6 @@ export default class extends Controller {
     const params = { weights: weightsParam(weights), ...Object.fromEntries(this.settingTargets.map(({ name, checked }) => [name, checked && '1'])) }
     for (const [name, value] of Object.entries(params)) value ? url.searchParams.set(name, value) : url.searchParams.delete(name)
     replaceUrl(url)
-    this.dispatch('change', { detail: { vehicle: this.vehicleValue, settings: settingsFrom(url.searchParams) } })
+    this.dispatch('change', { detail: { vehicle: this.vehicleValue, settings: settingsFrom(url.searchParams, this.sizeValue) } })
   }
 }

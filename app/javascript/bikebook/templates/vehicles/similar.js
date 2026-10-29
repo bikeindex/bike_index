@@ -45,7 +45,7 @@ export const similarSection = ({ vehicle, model, type, vehicleType, electric, co
   const label = html`<span class="tw:group-aria-expanded/similar:hidden">${compareLabel(type, model)}</span><span
     class="tw:hidden tw:group-aria-expanded/similar:inline">Hide similar ${type}s</span>`
   return html`<section aria-label="Similar models" class="tw:flex tw:flex-wrap tw:items-baseline" data-controller="bikebook--similar ui--collapse"
-    data-bikebook--similar-vehicle-value=${vehicle} data-bikebook--similar-scored-value=${scored} data-ui--collapse-param-value="similar"
+    data-bikebook--similar-vehicle-value=${vehicle} data-bikebook--similar-size-value=${settings.size} data-bikebook--similar-scored-value=${scored} data-ui--collapse-param-value="similar"
     data-action="input->bikebook--similar#change ui--collapse:shown->bikebook--similar#load:self">${collapse({
       content: label,
       chevron: true,
@@ -89,7 +89,7 @@ const controls = (listed, { weights, skipManufacturer, otherPropulsion, sameConf
         'tw:[&_input::-webkit-slider-thumb]:appearance-none tw:[&_input::-moz-range-thumb]:opacity-0'}>${range({
       name: group,
       label: GROUPS[group].label,
-      minLabel: scored ? 'Ignore' : `Not listed for this ${type}`,
+      minLabel: scored ? 'Ignore' : GROUPS[group].unlisted ?? `Not listed for this ${type}`,
       maxLabel: scored ? `Only same ${GROUPS[group].same ?? GROUPS[group].label.toLowerCase()}` : null,
       value: scored ? weights[group] : 0,
       max: MAX_WEIGHT,
