@@ -6952,6 +6952,11 @@ es:
           any_handlebar_type: Cualquier tipo de manillar
           frame_material: Material del marco
           handlebar_type: Tipo de manillar
+          market_scope: Modelos de otros mercados
+          only_market_html: Solo %{market}
+          prefer_market_sold_in_html: Prefiero los vehículos vendidos en %{market}
+          select_a_vehicle_type: Seleccione un %{bike_type}, elija varios para compararlos.
+          select_an_vehicle_type: Seleccione un %{bike_type}, elija varios para compararlos.
         donate_strip:
           donate: Donar
           pitch: Este fantástico producto es posible gracias a la organización sin

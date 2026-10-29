@@ -6862,6 +6862,14 @@ nl:
           any_handlebar_type: Elk type stuur
           frame_material: Frame materiaal
           handlebar_type: Type stuur
+          market_scope: Modellen uit andere markten
+          only_market_html: Alleen %{market}
+          prefer_market_sold_in_html: Geef de voorkeur aan voertuigen die verkocht
+            worden in %{market}
+          select_a_vehicle_type: Selecteer een %{bike_type}, kies meerdere om ze te
+            vergelijken
+          select_an_vehicle_type: Selecteer een %{bike_type}, kies meerdere om ze
+            te vergelijken
         donate_strip:
           donate: Schenken
           pitch: Dit fantastische product wordt u aangeboden door de non-profitorganisatie
