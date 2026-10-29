@@ -166,9 +166,7 @@ module Pages
           # The search page declares org--search itself, on a div spanning the form and the
           # chart as well as this card
           def card_data_attributes
-            return Pages::Org::Search::ColumnSettings::Component::COLLAPSE_DATA if @search_page
-
-            Pages::Org::Search::ColumnSettings::Component.column_settings_data_attributes(collapse: true)
+            Pages::Org::Search::ColumnSettings::Component.column_settings_data_attributes(controllers: ("org--search" unless @search_page))
           end
         end
       end

@@ -26,10 +26,10 @@ module BikeServices
         .where("bike_organization_notes.body ILIKE ?", query_string)
     end
 
-    LOCATIONABLE_STATUSES = %w[stolen impounded stolen_or_impounded].freeze
+    LOCATIONABLE_STATUS = "stolen"
 
     def location_searchable?(organization:, search_all:, search_status:)
-      LOCATIONABLE_STATUSES.include?(search_status) || registration_address_searchable?(organization:, search_all:)
+      search_status == LOCATIONABLE_STATUS || registration_address_searchable?(organization:, search_all:)
     end
 
     # Ignored where it isn't searchable, as the disabled field is. Only a stolen bike's own
@@ -43,19 +43,15 @@ module BikeServices
       return bikes.none if proximity.nil?
 
       bounding_box = proximity[:bounding_box]
+      stolen = bikes.status_stolen.within_bounding_box(bounding_box)
+      return stolen if search_status == LOCATIONABLE_STATUS
+
       # EXISTS rather than IN: an IN subquery inside an OR can't use an index, so it scans
-      # every address record. Skipping the arm the status rules out keeps the lat/lng index
-      matches = []
-      matches << bikes.status_stolen.within_bounding_box(bounding_box) unless search_status == "impounded"
-      unless search_status == "stolen"
-        matches << bikes.where(ImpoundRecord.within_bounding_box(bounding_box)
-          .where("impound_records.id = bikes.current_impound_record_id").arel.exists)
-      end
-      if registration_address_searchable?(organization:, search_all:)
-        matches << bikes.where(AddressRecord.within_bounding_box(bounding_box)
-          .where("address_records.id = bikes.address_record_id").arel.exists)
-      end
-      matches.reduce(:or)
+      # every address and impound record. An impounded bike is where it's impounded
+      stolen.or(bikes.where(ImpoundRecord.within_bounding_box(bounding_box)
+        .where("impound_records.id = bikes.current_impound_record_id").arel.exists))
+        .or(bikes.where(AddressRecord.within_bounding_box(bounding_box)
+          .where("address_records.id = bikes.address_record_id").arel.exists))
     end
 
     def stickers(bikes, value)
@@ -79,14 +75,9 @@ module BikeServices
 
     # organization_bikes: the search is only the org's bikes, so it sees their hidden impounded ones
     def status(bikes, value, organization_bikes: false)
-      impounded = organization_bikes ? bikes.status_impounded_with_user_hidden : bikes.status_impounded
-      case value
-      when "all" then bikes.or(impounded)
-      when "not_impounded" then bikes.where.not(status: "status_impounded")
-      when "impounded" then impounded
-      when "stolen_or_impounded" then bikes.status_stolen.or(impounded)
-      else bikes.where(status: "status_#{value}")
-      end
+      return bikes.where(status: "status_#{value}") unless value == "all"
+
+      organization_bikes ? bikes.or(bikes.status_impounded_with_user_hidden) : bikes
     end
 
     #

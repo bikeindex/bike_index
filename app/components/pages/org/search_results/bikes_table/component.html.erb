@@ -230,6 +230,7 @@
         <% end %>
       <% end %>
     <% end %>
+    <%# Rendered hidden for every search, so the rows cache under one key - org--assign-bike-sticker shows it %>
     <% column.(label: translation(".assign_bike_sticker"), classes: "assign_bike_sticker_cell tw:hidden") do |bike| %>
       <small>
         <a data-bike-id="<%= bike.id %>">

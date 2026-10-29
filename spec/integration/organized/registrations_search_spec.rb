@@ -523,14 +523,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       expect(page).to have_css("th.serial_number_cell", visible: :visible, wait: 10)
       expect(page).to have_css("th.manufacturer_cell", visible: :hidden)
 
-      # Settings persisted open via localStorage; choose "only impounded"
-      expect_filters_open
-      choose("search_status_impounded", allow_label_click: true, visible: :all)
-      expect(page).to have_current_path(/search_status=impounded/, wait: 10)
-      expect(page).to have_css("table", wait: 10)
-      expect(page).to have_css("tbody tr", count: 1)
-
-      # Doesn't have export, because no csv_export feature
+      # Settings persisted open via localStorage. Doesn't have export, because no csv_export feature
       expect_filters_open
       expect(page).to_not have_link "Export CSV"
 
@@ -776,7 +769,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       expect(page).to have_field("location", with: "New York", wait: 10)
       expect(page).to have_field("distance", with: "50")
 
-      # Searching all, only a stolen or impounded status leaves location searchable
+      # Searching all, only the stolen status leaves location searchable
       check "search_all"
       expect(page).to have_current_path(/search_all=true/, wait: 10)
       expect(page).not_to have_current_path(/location=/)
