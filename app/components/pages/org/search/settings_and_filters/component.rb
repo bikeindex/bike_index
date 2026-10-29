@@ -16,8 +16,10 @@ module Pages
             :notes_search_label, :location_search_label, :location_search_disabled?,
             :location_search_disabled_hint, :organization, to: :@settings
 
-          def initialize(settings:, period:, start_time:, end_time:, sortable_search_params: {})
+          # impound_search_path: where "only impounded" points to, for an organization that impounds
+          def initialize(settings:, period:, start_time:, end_time:, sortable_search_params: {}, impound_search_path: nil)
             @settings = settings
+            @impound_search_path = impound_search_path
             @period = period
             @start_time = start_time
             @end_time = end_time

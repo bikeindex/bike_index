@@ -529,6 +529,11 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       expect(page).to have_current_path(/search_status=impounded/, wait: 10)
       expect(page).to have_css("table", wait: 10)
       expect(page).to have_css("tbody tr", count: 1)
+      # ...which the impound records search has its own statuses for
+      expect(page).to have_text("View in the impounded vehicles search")
+      impound_search_href = find_link("the impounded vehicles search")[:href]
+      expect(impound_search_href).to include("/o/#{organization.to_param}/impound_records?")
+      expect(impound_search_href).not_to include("search_status")
 
       # Doesn't have export, because no csv_export feature
       expect_filters_open
@@ -540,6 +545,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       expect(page).to have_css("table", wait: 10)
       expect(page).to have_css("tbody tr", count: 2)
       expect(page).to have_text("not stolen or impounded")
+      expect(page).to have_no_text("View in the impounded vehicles search")
 
       # Choose "All" to show everything
       choose("search_status_all", allow_label_click: true, visible: :all)

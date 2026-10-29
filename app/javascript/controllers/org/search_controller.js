@@ -6,7 +6,7 @@ const RESULT_VIEW_KEY = 'orgRegistrationResultView'
 
 // Connects to data-controller='org--search'
 export default class extends Controller {
-  static targets = ['perPage', 'optionalField', 'optionalFieldCheckbox', 'filterSummary', 'periodLabel', 'searchAll', 'searchAllHint', 'locationSearchHint']
+  static targets = ['perPage', 'optionalField', 'optionalFieldCheckbox', 'filterSummary', 'periodLabel', 'searchAll', 'searchAllHint', 'locationSearchHint', 'impoundSearchLink']
   // What the results rendered as, so a stored preference knows whether it has anything to ask for
   static values = { resultView: String }
 
@@ -14,6 +14,7 @@ export default class extends Controller {
     this.initOptionalFields(0)
     this.syncLocationSearch(0)
     this.syncResultView()
+    this.syncImpoundSearchLink()
     document.addEventListener('turbo:frame-render', this.handleFrameRender)
     document.addEventListener('turbo:before-fetch-request', this.handleFetchRequest)
     window.addEventListener('search:results-failed', this.stopChartSpinner)
@@ -33,6 +34,7 @@ export default class extends Controller {
     // A back/forward moves the radios - search--form restores them from the URL
     this.syncFilterSummary()
     this.syncLocationSearch()
+    this.syncImpoundSearchLink()
     this.endSubmitSpinner()
     if (event.target === this.resultsFrame) this.reloadChart()
   }
@@ -127,6 +129,23 @@ export default class extends Controller {
     checkbox.disabled = !searchable
     if (this.hasLocationSearchHintTarget) this.locationSearchHintTarget.hidden = searchable
     collapseField(field, searchable && checkbox.checked, duration)
+  }
+
+  // The impound records search has statuses and sorts of its own, and its own names for the
+  // location fields
+  syncImpoundSearchLink () {
+    if (!this.hasImpoundSearchLinkTarget) return
+    const params = new URLSearchParams(window.location.search)
+    this.impoundSearchLinkTarget.hidden = params.get('search_status') !== 'impounded'
+    ;['search_status', 'sort', 'direction'].forEach(name => params.delete(name))
+    ;[['location', 'search_location'], ['distance', 'search_proximity']].forEach(([from, to]) => {
+      if (params.has(from)) params.set(to, params.get(from))
+      params.delete(from)
+    })
+    const link = this.impoundSearchLinkTarget.querySelector('a')
+    const url = new URL(link.href)
+    url.search = params
+    link.href = url
   }
 
   // Bubbled from any field, so it picks out the one it's for

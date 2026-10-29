@@ -52,6 +52,29 @@ RSpec.describe Pages::Org::Search::SettingsAndFilters::Component, type: :compone
     end
   end
 
+  context "with an impound search to point to" do
+    let(:enabled_feature_slugs) { %w[bike_search impound_bikes] }
+    let(:impound_search_path) { "/o/#{organization.to_param}/impound_records" }
+    let(:options) { super().merge(impound_search_path:) }
+    let(:settings) { ComponentStructs::OrgSearchSettings.new(organization:, search_status:) }
+    let(:search_status) { "impounded" }
+
+    it "points only impounded at the impounded vehicles search" do
+      line = component.at_css("[data-org--search-target='impoundSearchLink']")
+      expect(line.text.squish).to eq "View in the impounded vehicles search"
+      expect(line.at_css("a")[:href]).to eq impound_search_path
+      expect(line[:hidden]).to be_nil
+    end
+
+    context "with another status" do
+      let(:search_status) { "stolen" }
+
+      it "renders the line hidden, for org--search to show" do
+        expect(component.at_css("[data-org--search-target='impoundSearchLink']")[:hidden]).to be_present
+      end
+    end
+  end
+
   context "with registration_notes enabled" do
     let(:enabled_feature_slugs) { %w[bike_search registration_notes] }
 

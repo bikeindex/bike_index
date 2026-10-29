@@ -38,7 +38,8 @@
             period: @period,
             start_time: @start_time,
             end_time: @end_time,
-            sortable_search_params:
+            sortable_search_params:,
+            impound_search_path: (organization_impound_records_path(organization_id: current_organization.to_param) if current_organization.enabled?("impound_bikes"))
           )
         )) do |form| %>
           <% if @bike_sticker.present? %>
