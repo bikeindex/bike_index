@@ -59,6 +59,8 @@ module UI
         classes.join(" ")
       end
 
+      def hideable? = @classes.to_s.split.include?("hideableColumn")
+
       def td_classes(bordered:)
         classes = ["tw:px-1 tw:py-1"]
         classes << if bordered

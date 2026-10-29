@@ -12,7 +12,7 @@
 <div class="twwiderow tw:mb-4">
   <%= form_with(url: bulk_update_admin_stolen_bikes_path, method: :post,
   class: "tw:col-span-full tw:min-w-0 tw:rounded-xl tw:twfullbleed #{UI::Card::Component::BASE_CLASSES}",
-  data: UI::ColumnSettings::Component.data_attributes(storage_key: "adminStolenBikesColumns", controllers: "table-multi-checkbox", orderable: true)) do %>
+  data: UI::TableColumnSettings::Component.data_attributes(storage_key: "adminStolenBikesColumns", controllers: "table-multi-checkbox", orderable: true)) do %>
     <%# Full bleed drops the card's gutter, so the header meets the page's %>
     <div
       class="
@@ -27,7 +27,7 @@
       </div>
     </div>
 
-    <%= render(UI::ColumnSettings::Component.new(columns: COLUMNS, defaults: DEFAULT_COLUMNS, narrow_hidden: %i[photo_cell created_at_cell])) %>
+    <%= render(UI::TableColumnSettings::Component.new(columns: COLUMNS, defaults: DEFAULT_COLUMNS, narrow_hidden: %i[photo_cell created_at_cell])) %>
 
     <% duplicate_counts = self.duplicate_counts %>
     <% location = method(:location) %>

@@ -39,7 +39,14 @@ module ComponentStructs
     ].freeze
 
     # The panel groups the time columns under "Time - "; the table headers keep the short names
-    PANEL_LABELED_COLUMNS = %i[created_at_cell updated_at_cell occurred_at_cell acknowledgment_cell].freeze
+    PANEL_LABEL_KEYS = {
+      created_at_cell: :created_at_cell_panel,
+      updated_at_cell: :registration_updated_at_cell_panel,
+      occurred_at_cell: :registration_status_at_cell_panel,
+      acknowledgment_cell: :acknowledgment_cell_panel
+    }.freeze
+
+    PANEL_HINT_KEYS = {occurred_at_cell: :registration_status_at_cell_hint}.freeze
 
     # Their labels name the organization, italicized with its preposition
     ORG_NAMED_COLUMNS = %i[notes_cell reg_organization_affiliation_cell reg_student_id_cell].freeze
@@ -202,8 +209,10 @@ module ComponentStructs
     end
 
     def panel_labels
-      @panel_labels ||= column_renames.merge(PANEL_LABELED_COLUMNS.to_h { [it, translation(:"#{it}_panel")] })
+      @panel_labels ||= column_renames.merge(PANEL_LABEL_KEYS.transform_values { translation(it) })
     end
+
+    def panel_hints = PANEL_HINT_KEYS.to_h { |cell, key| [cell.to_s, translation(key)] }
 
     def sort_column_label(sort)
       cell = SORTABLE_COLUMN_CELLS[sort]
@@ -221,8 +230,6 @@ module ComponentStructs
         ("acknowledgment_cell" if @organization.enabled?("registration_sequences"))
       ].compact.uniq
     end
-
-    def always_visible?(cell_name) = ALWAYS_VISIBLE_COLUMNS.include?(cell_name)
 
     def panel_columns
       @panel_columns ||= (enabled_columns + ALWAYS_VISIBLE_COLUMNS).sort_by { |cell| panel_labels[cell.to_sym] }

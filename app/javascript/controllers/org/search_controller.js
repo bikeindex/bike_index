@@ -30,6 +30,8 @@ export default class extends Controller {
   handleFrameRender = (event) => {
     this.syncResultView()
     this.syncPeriodLabel()
+    // A back/forward moves the radios - search--form restores them from the URL
+    this.syncFilterSummary()
     this.syncLocationSearch()
     this.endSubmitSpinner()
     if (event.target === this.resultsFrame) this.reloadChart()

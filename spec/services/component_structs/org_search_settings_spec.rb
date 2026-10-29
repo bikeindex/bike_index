@@ -129,11 +129,17 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
   describe "panel_labels" do
     it "prefixes the time columns, leaving the table headers short" do
       expect(instance.panel_labels[:created_at_cell]).to eq "Time - registered"
-      expect(instance.panel_labels[:updated_at_cell]).to eq "Time - updated"
-      expect(instance.panel_labels[:occurred_at_cell]).to eq "Time - status"
+      expect(instance.panel_labels[:updated_at_cell]).to eq "Time - registration updated"
+      expect(instance.panel_labels[:occurred_at_cell]).to eq "Time - Registration status"
       expect(instance.panel_labels[:acknowledgment_cell]).to eq "Time - Registration sequence acknowledged"
       expect(instance.column_renames[:created_at_cell]).to eq "Registered"
       expect(instance.panel_labels[:color_cell]).to eq "Color"
+    end
+  end
+
+  describe "panel_hints" do
+    it "explains the status time, and nothing else" do
+      expect(instance.panel_hints).to eq("occurred_at_cell" => "When registration was stolen, impounded, found or listed for sale")
     end
   end
 
