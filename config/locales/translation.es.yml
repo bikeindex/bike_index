@@ -5788,6 +5788,7 @@ es:
             view_list: Lista
             view_table: Mesa
             loading_results: Cargando resultados...
+            per_page_option: "%{number} por página"
           chart_card:
             caption_search: Búsqueda actual
             caption_year: Resumen del año pasado
@@ -5846,7 +5847,6 @@ es:
             photo_cell: Foto
             view_cell: Vista
             acknowledgment_cell_panel: Tiempo - Secuencia de registro reconocida
-            created_at_cell_panel: Hora - registrada
             filter_stolen_or_impounded_html: solo <strong>robado</strong> o <strong>confiscado</strong>
             location_search_disabled_no_address: "%{org_name} no recopila direcciones
               de registro, por lo que solo los registros robados o confiscados tienen
@@ -5855,16 +5855,35 @@ es:
               al buscar todos los registros, a menos que se busquen únicamente los
               registros incautados o robados.
             show_location_search: mostrar búsqueda de ubicación
-            registration_status_at_cell_hint: Cuando la matrícula fue robada, confiscada,
-              encontrada o puesta a la venta.
-            registration_status_at_cell_panel: Hora - Estado de registro
-            registration_updated_at_cell_panel: Hora - registro actualizado
+            all_bikes: Todas las bicicletas
+            all_statuses: Todos los estados
+            impound_location_cell: Ubicación
+            impound_status_cell: Estado de depósito
+            impound_updated_at_cell: Incautación actualizada
+            impound_updated_at_cell_panel: Hora - Registro de depósito actualizado
+            impound_user_cell: Último actualizador
+            impounded_at_cell: Incautado
+            impounded_at_cell_panel: Tiempo - Incautado
+            impounded_from_cell: Incautado de
+            only_unregistered: Solo usuarios no registrados
+            only_user_registered: Solo usuarios registrados
+            registered_cell_panel: Hora - Registrado
+            registration: 'Registro:'
+            registration_updated_cell_panel: Hora - Registro actualizado
+            resolved_at_cell: Resuelto
+            resolved_at_cell_panel: Tiempo - Resuelto
+            status_at_cell_hint: cuando es robado, confiscado, etc.
+            status_at_cell_panel: Hora - Estado
+            status_records: Registros %{status}
+            unregistered_cell: No registrado
           column_settings_toggle:
             column_settings: Configuración de columnas
           settings_and_filters:
             date_range: 'Rango de fechas:'
             search_settings_and_filters: Configuración y filtros de búsqueda
             filters: Filtros
+            impound_search: la búsqueda de vehículos incautados
+            view_in_impound_search_html: Ver en %{impound_search}
           search_all:
             search_all_html: Buscar en todos los registros <span class="twless-strong">(no
               solo en %{org_name})</span>
@@ -5877,6 +5896,7 @@ es:
             not_registered_with: Oculto porque no está registrado con %{org_name}
             acknowledgment_title: Confirmación de la secuencia de registro en
             view: Vista
+            toggle_all_checked: Activar/desactivar todas las selecciones
           multi_result_chip:
             no_results: no hay coincidencias
           multi_results:
@@ -5889,16 +5909,8 @@ es:
             view_all: ver todo
         impound_records:
           index:
-            all_bikes: Todas las bicicletas
-            all_statuses: Todos los estados
             cannot_update_with_kind: Este registro no se puede actualizar con '{kind}'.
             hide_update: Ocultar actualización
-            matching_impound_record:
-              one: registro de incautación coincidente
-              other: registros de incautación coincidentes
-            only_unregistered: Solo usuarios no registrados
-            only_user_registered: Solo usuarios registrados
-            status_records: Registros %{status}
             update_multiple_records: Actualizar varios registros
         parking_notifications:
           index:

@@ -5799,6 +5799,7 @@ it:
             view_list: Lista
             view_table: Tavolo
             loading_results: Caricamento dei risultati...
+            per_page_option: "%{number} per pagina"
           chart_card:
             caption_search: Ricerca attuale
             caption_year: Riepilogo dell'anno scorso
@@ -5857,7 +5858,6 @@ it:
             photo_cell: Foto
             view_cell: Visualizzazione
             acknowledgment_cell_panel: Sequenza di registrazione temporale confermata
-            created_at_cell_panel: Tempo - registrato
             filter_stolen_or_impounded_html: solo <strong>rubati</strong> o <strong>sequestrati</strong>
             location_search_disabled_no_address: "%{org_name} non raccoglie gli indirizzi
               di immatricolazione, quindi solo le immatricolazioni rubate o sequestrate
@@ -5867,16 +5867,35 @@ it:
               per località quando si cercano tutte le immatricolazioni, a meno che
               non si stiano cercando solo immatricolazioni sequestrate e/o rubate.
             show_location_search: mostra la ricerca della posizione
-            registration_status_at_cell_hint: Quando la registrazione è stata rubata,
-              sequestrata, ritrovata o messa in vendita
-            registration_status_at_cell_panel: Tempo - Stato della registrazione
-            registration_updated_at_cell_panel: Ora - registrazione aggiornata
+            all_bikes: Tutte le biciclette
+            all_statuses: Tutti gli stati
+            impound_location_cell: Luogo
+            impound_status_cell: stato di sequestro
+            impound_updated_at_cell: Blocco aggiornato
+            impound_updated_at_cell_panel: Ora - Registro dei sequestri aggiornato
+            impound_user_cell: Ultimo aggiornamento
+            impounded_at_cell: Sequestrato
+            impounded_at_cell_panel: Tempo - Sequestrato
+            impounded_from_cell: Sequestrato da
+            only_unregistered: Solo non registrati
+            only_user_registered: Solo utenti registrati
+            registered_cell_panel: Tempo - Registrato
+            registration: 'Registrazione:'
+            registration_updated_cell_panel: Ora - Registrazione aggiornata
+            resolved_at_cell: Risolto
+            resolved_at_cell_panel: Tempo - Risolto
+            status_at_cell_hint: quando rubato, sequestrato, ecc.
+            status_at_cell_panel: Tempo - Stato
+            status_records: "%{status} record"
+            unregistered_cell: Non registrato
           column_settings_toggle:
             column_settings: Impostazioni della colonna
           settings_and_filters:
             date_range: 'Intervallo di date:'
             search_settings_and_filters: Impostazioni e filtri di ricerca
             filters: Filtri
+            impound_search: la ricerca dei veicoli sequestrati
+            view_in_impound_search_html: Visualizza in %{impound_search}
           search_all:
             search_all_html: Cerca tutte le registrazioni <span class="twless-strong">(non
               solo %{org_name})</span>
@@ -5889,6 +5908,7 @@ it:
             not_registered_with: Nascosto perché non è registrato con %{org_name}
             acknowledgment_title: Conferma della sequenza di registrazione a
             view: Visualizzazione
+            toggle_all_checked: Seleziona tutto
           multi_result_chip:
             no_results: nessuna corrispondenza
           multi_results:
@@ -5901,16 +5921,8 @@ it:
             view_all: visualizza tutto
         impound_records:
           index:
-            all_bikes: Tutte le biciclette
-            all_statuses: Tutti gli stati
             cannot_update_with_kind: Questo record non può essere aggiornato con '{kind}'
             hide_update: Aggiornamento nascosto
-            matching_impound_record:
-              one: record di sequestro corrispondente
-              other: corrispondenti registri di sequestro
-            only_unregistered: Solo non registrati
-            only_user_registered: Solo utenti registrati
-            status_records: "%{status} record"
             update_multiple_records: Aggiorna più record
         parking_notifications:
           index:

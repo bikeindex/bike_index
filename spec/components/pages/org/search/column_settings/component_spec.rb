@@ -25,6 +25,11 @@ RSpec.describe Pages::Org::Search::ColumnSettings::Component, type: :component d
       expect(described_class.column_settings_data_attributes[:"ui--table-column-order-storage-key-value"])
         .to eq "orgRegistrationColumnsOrder"
     end
+
+    it "keeps the impound records search's choices apart" do
+      expect(described_class.column_settings_data_attributes(impound: true)[:"ui--table-column-settings-storage-key-value"])
+        .to eq "orgImpoundColumns"
+    end
   end
 
   it "renders the collapsed column panel, leaving its toggle and the export to the caller" do
@@ -41,10 +46,24 @@ RSpec.describe Pages::Org::Search::ColumnSettings::Component, type: :component d
   end
 
   it "labels the registration time columns, with the status column's hint" do
-    expect(component).to have_text("Time - registration updated")
-    expect(component).to have_text("Time - Registration status")
+    expect(component).to have_text("Time - Registration Updated")
+    expect(component).to have_text("Time - Status")
     expect(component.at_css("label:has(#table_column_settings_occurred_at_cell) small").text)
-      .to eq "When registration was stolen, impounded, found or listed for sale"
+      .to eq "when stolen, impounded, etc"
+  end
+
+  context "with impound settings" do
+    let(:enabled_feature_slugs) { %w[bike_search impound_bikes] }
+    let(:settings) { ComponentStructs::OrgSearchSettings.new(organization:, impound: true) }
+
+    it "lists the impound columns with the rest, on by default" do
+      checkboxes = ComponentStructs::OrgSearchSettings::IMPOUND_COLUMNS.map { component.at_css("input[name='#{it}']") }
+      expect(checkboxes.map { it["data-default"] }.uniq).to eq ["true"]
+      expect(component).to have_text("Time - Impounded", normalize_ws: true)
+      expect(component).to have_text("Time - Resolved")
+      expect(component).to have_text("Impound status")
+      expect(component.at_css("input[name='impound_id_cell']")["data-default"]).to eq "true"
+    end
   end
 
   context "with export_headers" do

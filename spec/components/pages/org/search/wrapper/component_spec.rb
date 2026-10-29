@@ -46,7 +46,7 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
     expect(card_controllers).to eq %w[ui--collapse ui--table-column-settings ui--table-column-order]
     # footer
     expect(component).to have_text("showing 1–10 of 25")
-    expect(component).to have_css("select#per_page_select")
+    expect(component).to have_css("select#per_page_select option[selected]", text: "10 per page")
     # bike data in cells
     expect(component).to have_text(bike.mnfg_name)
     # the table bleeds to the page's edges once the card is full bleed
