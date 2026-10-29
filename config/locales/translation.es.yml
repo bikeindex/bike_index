@@ -5669,9 +5669,10 @@ es:
         in_the_past_year: en el último año
         now: ahora
         to: a
-      column_settings:
+      table_column_settings:
         all: todo
         default: por defecto
+        included_columns: Columnas incluidas
         none: ninguno
         visible_columns: Columnas visibles
     atoms:
@@ -5810,7 +5811,6 @@ es:
             created_at_cell: Registrado
             creation_description_cell: Fuente
             cycle_type_cell: Tipo de vehículo
-            default: por defecto
             filter_impounded_html: únicamente <strong>confiscado</strong>
             filter_no_address_html: "<strong>Sin</strong> dirección"
             filter_no_sticker_html: "<strong>Sin</strong> pegatina"
@@ -5824,7 +5824,6 @@ es:
             impound_id_cell: ID del depósito
             manufacturer_cell: Fabricante
             model_cell: Modelo
-            none: ninguno
             owner_email_cell: Enviado a
             owner_name_cell: Nombre del propietario
             propulsion_type_cell: Vehículo eléctrico (propulsión)
@@ -5840,7 +5839,6 @@ es:
             unregistered: 'No registrado:'
             updated_at_cell: Actualizado
             url_cell: URL
-            visible_columns: Columnas visibles
             notes_cell_html: Notas de registro <em>de %{org_name}</em>
             reg_organization_affiliation_cell_html: Afiliación <em>en %{org_name}</em>
             reg_student_id_cell_html: Número de identificación del estudiante <em>%{org_name}</em>
@@ -5849,8 +5847,6 @@ es:
             view_cell: Vista
             acknowledgment_cell_panel: Tiempo - Secuencia de registro reconocida
             created_at_cell_panel: Hora - registrada
-            occurred_at_cell_panel: Hora - estado
-            updated_at_cell_panel: Hora - actualizada
             filter_stolen_or_impounded_html: solo <strong>robado</strong> o <strong>confiscado</strong>
             location_search_disabled_no_address: "%{org_name} no recopila direcciones
               de registro, por lo que solo los registros robados o confiscados tienen
@@ -5859,7 +5855,10 @@ es:
               al buscar todos los registros, a menos que se busquen únicamente los
               registros incautados o robados.
             show_location_search: mostrar búsqueda de ubicación
-            included_columns: Columnas incluidas
+            registration_status_at_cell_hint: Cuando la matrícula fue robada, confiscada,
+              encontrada o puesta a la venta.
+            registration_status_at_cell_panel: Hora - Estado de registro
+            registration_updated_at_cell_panel: Hora - registro actualizado
           column_settings_toggle:
             column_settings: Configuración de columnas
           settings_and_filters:
@@ -5877,8 +5876,6 @@ es:
             hidden: oculto
             not_registered_with: Oculto porque no está registrado con %{org_name}
             acknowledgment_title: Confirmación de la secuencia de registro en
-            occurred_at_tooltip: Cuando fue robado, confiscado, encontrado o puesto
-              a la venta
             view: Vista
           multi_result_chip:
             no_results: no hay coincidencias
