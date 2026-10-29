@@ -42,7 +42,8 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       expect(response.status).to eq(200)
       expect(response.body).to_not include("fbevents.js")
       expect(assigns(:current_organization)).to eq current_organization
-      expect(assigns(:search_status)).to eq "all"
+      # impound_bikes is enabled, so registrations leave impounded bikes out unless asked
+      expect(assigns(:search_status)).to eq "not_impounded"
       expect(assigns(:bikes).pluck(:id)).to eq([])
       expect(assigns(:search_stickers)).to eq false
       # create_export fails if the org doesn't have have csv_exports
@@ -55,19 +56,16 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       expect(response.status).to eq(200)
       expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
     end
-    it "includes impounded bikes, showing hidden ones only when they're the organization's" do
+    it "shows hidden bikes only when they're impounded" do
       impounded_bike.update(user_hidden: true)
       FactoryBot.create(:bike_organized, creation_organization: current_organization, user_hidden: true)
-      public_impounded_bike = FactoryBot.create(:bike, :impounded, user_hidden: true)
-      get base_url, params: {search_no_js: true}
-      expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, impounded_bike.id])
-      # The impound statuses are gone, so an older link's falls back to all
+      FactoryBot.create(:bike, :impounded, user_hidden: true)
       get base_url, params: {search_no_js: true, search_status: "impounded"}
-      expect(assigns(:search_status)).to eq "all"
+      expect(assigns(:bikes).pluck(:id)).to eq([impounded_bike.id])
+      get base_url, params: {search_no_js: true, search_status: "all"}
       expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, impounded_bike.id])
-      get base_url, params: {search_no_js: true, search_all: true}
-      expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, non_organization_bike.id])
-      expect(public_impounded_bike.reload.status).to eq "status_impounded"
+      get base_url, params: {search_no_js: true, search_status: "impounded", search_all: true}
+      expect(assigns(:bikes).pluck(:id)).to eq([])
     end
     describe "location search" do
       include_context :geocoder_stubbed_bounding_box
@@ -95,7 +93,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         expect(response.status).to eq(200)
         expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, bike_chicago.id, stolen_bike.id])
 
-        # Searching all, it's only searched alongside the stolen status
+        # Searching all, it's only searched alongside a stolen or impounded status
         get base_url, params: {search_no_js: true, location: "New York", distance: "50", search_all: true}
         expect(assigns(:bikes).pluck(:id)).to include(bike.id, bike_chicago.id, stolen_bike.id)
         expect(response.body).to include("You can&#39;t search location when searching all registrations")
@@ -382,9 +380,15 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         expect(response.status).to eq(200)
         expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, bike_with_sticker.id, impounded_bike.id])
         expect(assigns(:search_stickers)).to eq false
+        # Without impound_bikes there's no impoundedness to leave out
         expect(assigns(:search_status)).to eq "all"
         expect(assigns(:interpreted_params)[:stolenness]).to eq "all"
         expect(assigns(:interpreted_params)).to match_hash_indifferently({stolenness: "all", distance_unit: "km"})
+
+        # ... and no filtering by it either, the panel doesn't offer the impound statuses
+        get base_url, params: {search_no_js: true, search_status: "impounded"}
+        expect(assigns(:search_status)).to eq "all"
+        expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, bike_with_sticker.id, impounded_bike.id])
       end
     end
 
@@ -489,17 +493,17 @@ RSpec.describe Organized::RegistrationsController, type: :request do
 
     context "sorted by status at" do
       let!(:stolen_bike) { FactoryBot.create(:bike_organized, :with_stolen_record, creation_organization: current_organization, date_stolen: 3.days.ago) }
-      let!(:stolen_bike_later) { FactoryBot.create(:bike_organized, :with_stolen_record, creation_organization: current_organization, date_stolen: 1.day.ago) }
 
       it "sorts by occurred_at" do
+        impounded_bike
         expect(bike.reload.occurred_at).to be_nil
-        expect(stolen_bike.reload.occurred_at).to be < stolen_bike_later.reload.occurred_at
+        expect(stolen_bike.reload.occurred_at).to be < impounded_bike.reload.occurred_at
 
         get base_url, params: {search_no_js: true, search_status: "all", sort: "occurred_at", direction: "desc"}
-        expect(assigns(:bikes).map(&:id)).to eq([stolen_bike_later.id, stolen_bike.id, bike.id])
+        expect(assigns(:bikes).map(&:id)).to eq([impounded_bike.id, stolen_bike.id, bike.id])
 
         get base_url, params: {search_no_js: true, search_status: "all", sort: "occurred_at", direction: "asc"}
-        expect(assigns(:bikes).map(&:id)).to eq([stolen_bike.id, stolen_bike_later.id, bike.id])
+        expect(assigns(:bikes).map(&:id)).to eq([stolen_bike.id, impounded_bike.id, bike.id])
       end
     end
 

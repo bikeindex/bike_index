@@ -120,7 +120,7 @@ export default class extends Controller {
 
     const status = document.querySelector('input[type=radio][name=search_status][form="Search_Form"]:checked')?.value
     const searchAll = this.hasSearchAllTarget && this.searchAllTarget.checked
-    const searchable = checkbox.dataset.locationableStatus === status || (checkbox.dataset.regAddress === 'true' && !searchAll)
+    const searchable = JSON.parse(checkbox.dataset.locationableStatuses).includes(status) || (checkbox.dataset.regAddress === 'true' && !searchAll)
 
     checkbox.disabled = !searchable
     if (this.hasLocationSearchHintTarget) this.locationSearchHintTarget.hidden = searchable
