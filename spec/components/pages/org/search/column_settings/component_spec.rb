@@ -25,6 +25,11 @@ RSpec.describe Pages::Org::Search::ColumnSettings::Component, type: :component d
       expect(described_class.column_settings_data_attributes[:"ui--table-column-order-storage-key-value"])
         .to eq "orgRegistrationColumnsOrder"
     end
+
+    it "keeps the impound records search's choices apart" do
+      expect(described_class.column_settings_data_attributes(impound: true)[:"ui--table-column-settings-storage-key-value"])
+        .to eq "orgImpoundColumns"
+    end
   end
 
   it "renders the collapsed column panel, leaving its toggle and the export to the caller" do
@@ -51,15 +56,12 @@ RSpec.describe Pages::Org::Search::ColumnSettings::Component, type: :component d
     let(:enabled_feature_slugs) { %w[bike_search impound_bikes] }
     let(:settings) { ComponentStructs::OrgSearchSettings.new(organization:, impound: true) }
 
-    it "renders the impound columns as a group of their own, all on by default" do
-      expect(component).to have_text("Impound columns")
-      expect(component).to have_css("[data-controller='org--column-checkboxes']", count: 2, visible: :all)
-      impound_group = component.css("[data-controller='org--column-checkboxes']").last
-      expect(impound_group.css("input[type='checkbox']").map { it[:name] })
-        .to eq ComponentStructs::OrgSearchSettings::IMPOUND_COLUMNS
-      expect(impound_group.css("input[type='checkbox']").map { it["data-default"] }.uniq).to eq ["true"]
-      expect(impound_group.text).to include("Time - Impounded", "Time - impound record Updated", "Time - Resolved",
-        "Impound status", "Last updator", "Impounded from", "Unregistered")
+    it "lists the impound columns with the rest, on by default" do
+      checkboxes = ComponentStructs::OrgSearchSettings::IMPOUND_COLUMNS.map { component.at_css("input[name='#{it}']") }
+      expect(checkboxes.map { it["data-default"] }.uniq).to eq ["true"]
+      expect(component).to have_text("Time - Impounded", normalize_ws: true)
+      expect(component).to have_text("Time - Resolved")
+      expect(component).to have_text("Impound status")
       expect(component.at_css("input[name='impound_id_cell']")["data-default"]).to eq "true"
     end
   end

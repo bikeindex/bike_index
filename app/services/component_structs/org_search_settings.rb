@@ -46,7 +46,7 @@ module ComponentStructs
       unregistered_cell
     ].freeze
 
-    # The impound records search's own group in the panel, in this order, all on by default
+    # The impound records search's own columns, on by default
     IMPOUND_COLUMNS = %w[impounded_at_cell impound_updated_at_cell resolved_at_cell impound_status_cell
       impound_user_cell impounded_from_cell unregistered_cell].freeze
 
@@ -207,7 +207,6 @@ module ComponentStructs
     end
 
     def render_export? = !@impound && @organization.enabled?("csv_exports")
-    def impound_columns = @impound ? IMPOUND_COLUMNS : []
 
     def search_all? = @search_all
 
@@ -218,7 +217,7 @@ module ComponentStructs
       @initially_checked_columns ||= [
         *DEFAULT_COLUMNS,
         ("sticker_cell" if @organization.enabled?("bike_stickers")),
-        ("impound_id_cell" if @impound)
+        *(["impound_id_cell", *IMPOUND_COLUMNS] if @impound)
       ].compact
     end
 

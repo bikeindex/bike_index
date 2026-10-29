@@ -54,6 +54,8 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
       checkbox = component.at_css("td.multi-update-cell input[type='checkbox']")
       expect(checkbox[:form]).to eq Pages::Org::SearchResults::BikesTable::Component::MULTI_UPDATE_FORM_ID
       expect(component.at_css("td.multi-update-cell")[:class]).to include("tw:hidden")
+      # Ahead of the hideable columns, which reordering appends after the rest
+      expect(component.css("th")[1][:class]).to include("multi-update-cell")
     end
 
     it "renders when the bike was impounded, rather than when the record was created" do

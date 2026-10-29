@@ -25,7 +25,6 @@ en:
             filter_stolen_html: only <strong>stolen</strong>
             filter_with_address_html: only <strong>with</strong> address
             filter_with_stickers_html: only <strong>with</strong> stickers
-            impound_columns: Impound columns
             impound_id_cell: Impound ID
             impound_status_cell: Impound status
             impound_updated_at_cell: Impound updated

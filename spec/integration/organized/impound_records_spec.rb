@@ -69,13 +69,12 @@ RSpec.describe "Organized impound records index", :js, type: :system do
     # search_no_js should NOT be in the URL (removed by the JS controller)
     expect(page).not_to have_current_path(/search_no_js/)
 
-    # The impound columns are a group of their own in the column settings, all on by default
+    # The impound columns are in the column settings, on by default
     click_button "Column settings"
-    impound_columns = find("h3", text: "Impound columns").find(:xpath, "../..")
     expect(page).to have_css("th.impound_user_cell", text: /last updator/i)
-    within(impound_columns) { click_button "none" }
+    uncheck "Last updator"
     expect(page).to have_no_css("th.impound_user_cell")
-    within(impound_columns) { click_button "default" }
+    click_button "default"
     expect(page).to have_css("th.impound_user_cell")
     click_button "Column settings"
 

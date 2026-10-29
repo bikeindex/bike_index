@@ -166,7 +166,8 @@ module Pages
           # The search page declares org--search itself, on a div spanning the form and the
           # chart as well as this card
           def card_data_attributes
-            Pages::Org::Search::ColumnSettings::Component.column_settings_data_attributes(controllers: ("org--search" unless @search_page))
+            Pages::Org::Search::ColumnSettings::Component.column_settings_data_attributes(controllers: ("org--search" unless @search_page),
+              impound: !@impound_records.nil?)
           end
         end
       end

@@ -19,6 +19,14 @@
     <%= render(UI::ButtonLink::Component.new(text: view_label, href: bike_path(bike, organization_id: organization.to_param), size: :sm, data: {turbo_frame: "_top"})) %>
   <% end %>
 
+  <%# Before the hideable columns, which ui--table-column-order reorders by appending %>
+  <% if impound %>
+    <% select_all = button_tag(check_mark, type: "button", title: translation(".toggle_all_checked"), aria: {label: translation(".toggle_all_checked")}, class: "twlink tw:bg-transparent tw:border-0 tw:p-0 tw:cursor-pointer", data: {action: "click->table-multi-checkbox#toggleAll click->org--impound-update-multi#hideErrorIfChecked"}) %>
+    <% table.column(label: select_all, classes: multiselect_cell_classes) do |impound_record| %>
+      <%= check_box_tag "ids[#{impound_record.id}]", impound_record.id, false, form: MULTI_UPDATE_FORM_ID, data: {"table-multi-checkbox-target" => "checkbox", "update-kinds" => impound_record.update_multi_kinds.join(" "), action: "change->org--impound-update-multi#hideErrorIfChecked"} %>
+    <% end %>
+  <% end %>
+
   <% column.(label: settings.column_renames[:photo_cell], classes: "hideableColumn photo_cell") do |bike| %>
     <%= render(Atoms::BikeThumbnail::Component.new(bike:)) %>
   <% end %>
@@ -245,13 +253,6 @@
       <small>
         <%= BikeOrganizationNote.find_by(bike_id: bike.id, organization_id: organization.id)&.body %>
       </small>
-    <% end %>
-  <% end %>
-
-  <% if impound %>
-    <% select_all = button_tag(check_mark, type: "button", title: translation(".toggle_all_checked"), aria: {label: translation(".toggle_all_checked")}, class: "twlink tw:bg-transparent tw:border-0 tw:p-0 tw:cursor-pointer", data: {action: "click->table-multi-checkbox#toggleAll click->org--impound-update-multi#hideErrorIfChecked"}) %>
-    <% table.column(label: select_all, classes: multiselect_cell_classes) do |impound_record| %>
-      <%= check_box_tag "ids[#{impound_record.id}]", impound_record.id, false, form: MULTI_UPDATE_FORM_ID, data: {"table-multi-checkbox-target" => "checkbox", "update-kinds" => impound_record.update_multi_kinds.join(" "), action: "change->org--impound-update-multi#hideErrorIfChecked"} %>
     <% end %>
   <% end %>
 <% end %>
