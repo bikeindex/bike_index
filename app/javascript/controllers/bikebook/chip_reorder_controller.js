@@ -1,6 +1,8 @@
 import { Controller } from '@hotwired/stimulus'
+import { moveByKey } from 'utils/drag_handle'
 
-// Drag a multiselect combobox's chips to reorder its value, and so the compared vehicles.
+// Drag a multiselect combobox's chips to reorder its value, and so the compared vehicles, or move
+// one a place at a time by its UI::DragHandle's arrow keys.
 // Pointer events rather than native HTML5 drag, which is flaky across browsers and dead on touch
 export default class extends Controller {
   connect () {
@@ -14,6 +16,13 @@ export default class extends Controller {
   disconnect () {
     this.element.removeEventListener('pointerdown', this.#onPointerDown)
     this.#reset()
+  }
+
+  moveByKey (event) {
+    moveByKey(event, () => [...this.element.querySelectorAll('[data-hw-combobox-chip]')], (chip, target, after) => {
+      target.parentNode.insertBefore(chip, after ? target.nextSibling : target)
+      this.#syncOrder()
+    })
   }
 
   #onPointerDown = (event) => {

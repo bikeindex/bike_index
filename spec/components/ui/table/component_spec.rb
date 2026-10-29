@@ -211,7 +211,7 @@ RSpec.describe UI::Table::Component, type: :component do
       end
 
       expect(result).to have_css("th.email_cell [data-ui--table-column-order-target='handle']" \
-        "[class~='tw:in-data-[controller~=ui--table-column-order]:inline']", visible: :all)
+        "[class~='tw:in-data-[controller~=ui--table-column-order]:inline-block']", visible: :all)
       expect(result).to have_css("[data-ui--table-column-order-target='handle']", count: 1, visible: :all)
     end
   end

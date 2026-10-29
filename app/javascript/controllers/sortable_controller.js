@@ -1,9 +1,11 @@
 import { Controller } from '@hotwired/stimulus'
+import { moveByKey } from 'utils/drag_handle'
 
 // Connects to data-controller='sortable'
 // Pointer drag-to-reorder of [data-sortable-target=item] rows, grabbed by their
-// [data-sortable-target=handle] grip. A thin bar shows where the row will land; on release
-// the row is moved there and (when it has data-url) its new position is PATCHed.
+// [data-sortable-target=handle] grip, whose arrow keys move its row a place at a time. A thin bar
+// shows where the row will land; on release the row is moved there and (when it has data-url)
+// its new position is PATCHed.
 // Pointer events -- not native HTML5 draggable -- so a rich-text editor inside a row can't
 // swallow the drag and there is no native snap-back animation. Subclasses override reorder().
 export default class extends Controller {
@@ -74,6 +76,14 @@ export default class extends Controller {
     document.removeEventListener('pointerup', this.#onPointerUp)
     document.removeEventListener('pointercancel', this.#onPointerCancel)
     this.indicator.remove()
+  }
+
+  moveByKey (event) {
+    moveByKey(event, () => this.itemTargets, (item, target, after) => {
+      this.draggingItem = item
+      this.reorder(target, after)
+      this.draggingItem = null
+    })
   }
 
   // Default: move the dragged row next to the target, then persist its new position.

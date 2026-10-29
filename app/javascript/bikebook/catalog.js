@@ -137,11 +137,15 @@ export class CatalogComboboxSource {
   }
 }
 
-// The gem's selection chip partial, ahead of the field, gripped where bikebook--chip-reorder drags them
+// The gem's selection chip partial, ahead of the field, gripped where bikebook--chip-reorder drags them. Each grip's id
+// is its model's and its count among that model's repeats, so a render that recreates the chips keeps a grip's focus
 export const renderChips = (combobox, chips) => {
-  const handle = combobox.matches('[data-controller~="bikebook--chip-reorder"]') ? dragHandle({ controller: 'bikebook--chip-reorder', htmlClass: 'tw:mr-1' }) : nothing
-  combobox.querySelector('[data-hw-combobox-target~="combobox"]').before(fragmentOf(chips.map(({ value, display }) =>
-    html`<div data-hw-combobox-chip=""><div class="hw-combobox__chip">${handle}<span>${display}</span><span tabindex="0" class="hw-combobox__chip__remover"
+  const reorderable = combobox.matches('[data-controller~="bikebook--chip-reorder"]')
+  const chipped = [...combobox.querySelectorAll('[data-hw-combobox-value-param]')].map((remover) => remover.dataset.hwComboboxValueParam)
+  const values = [...chipped, ...chips.map(({ value }) => value)]
+  const handleId = (value, index) => `move-${value}-${values.slice(0, chipped.length + index).filter((each) => each === value).length}`
+  combobox.querySelector('[data-hw-combobox-target~="combobox"]').before(fragmentOf(chips.map(({ value, display }, index) =>
+    html`<div data-hw-combobox-chip=""><div class="hw-combobox__chip">${reorderable ? dragHandle({ controller: 'bikebook--chip-reorder', label: display, htmlClass: 'tw:mr-1', id: handleId(value, index) }) : nothing}<span>${display}</span><span tabindex="0" class="hw-combobox__chip__remover"
       aria-label=${`Remove ${display}`} data-action="click->hw-combobox#removeChip:stop keydown->hw-combobox#navigateChip"
       data-hw-combobox-target="chipDismisser" data-hw-combobox-value-param=${value}></span></div></div>`)))
 }

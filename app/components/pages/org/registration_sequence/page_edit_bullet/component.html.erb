@@ -2,7 +2,7 @@
   data-bullet-editors-target="item"
   class="tw:mb-2 tw:flex tw:items-start tw:gap-2"
 >
-  <%= render UI::DragHandle::Component.new(controller: "bullet-editors", html_class: "tw:pt-2") %>
+  <%= render UI::DragHandle::Component.new(controller: "bullet-editors", label: "bullet", html_class: "tw:pt-2") %>
 
   <div class="tw:flex-1">
     <%= render UI::Forms::TextEditor::Component.new(form_builder: bullet_builder, attribute: :content, size: :single_line, value: @value) %>

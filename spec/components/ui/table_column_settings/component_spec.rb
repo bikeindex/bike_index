@@ -52,11 +52,10 @@ RSpec.describe UI::TableColumnSettings::Component, type: :component do
     end
 
     context "orderable, with other controllers" do
-      it "adds the column order controller and its drag actions" do
+      it "adds the column order controller" do
         attributes = described_class.data_attributes(storage_key: "adminThings", controllers: "table-multi-checkbox", orderable: true)
         expect(attributes[:controller]).to eq "table-multi-checkbox ui--collapse ui--table-column-settings ui--table-column-order"
         expect(attributes[:"ui--table-column-order-storage-key-value"]).to eq "adminThingsOrder"
-        expect(attributes[:action]).to include("drop->ui--table-column-order#drop")
       end
     end
   end

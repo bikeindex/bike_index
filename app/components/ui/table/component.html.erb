@@ -10,8 +10,8 @@
           <th class="<%= [col.th_classes(bordered: @bordered, sortable_table:), sticky_th_classes].compact.join(" ") %>">
             <%# Shown by CSS rather than the controller, so the header doesn't shift when it connects %>
             <% if col.hideable? %>
-              <%= render(UI::DragHandle::Component.new(controller: "ui--table-column-order",
-                html_class: "tw:hidden tw:in-data-[controller~=ui--table-column-order]:inline tw:mr-1")) %>
+              <%= render(UI::DragHandle::Component.new(controller: "ui--table-column-order", label: col.header_label,
+                html_class: "tw:hidden tw:in-data-[controller~=ui--table-column-order]:inline-block tw:mr-1")) %>
             <% end %>
 
             <%= col.render_header(render_sortable: @render_sortable, current_sort:, current_direction:, sortable_url: method(:sortable_url), sort_icon: ->(direction) { render(UI::IconSorting::Component.new(direction:)) }) %>

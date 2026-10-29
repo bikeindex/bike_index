@@ -5,12 +5,9 @@ module UI
     # The checkboxes that pick a table's visible columns, collapsed until a UI::Collapse opens it.
     # Render it and the table inside an element given data_attributes
     class Component < ApplicationComponent
-      ORDER_ACTIONS = "dragstart->ui--table-column-order#dragStart dragover->ui--table-column-order#dragOver " \
-        "drop->ui--table-column-order#drop dragend->ui--table-column-order#dragEnd"
-
       # orderable: the hideable columns' headers drag to reorder them
       def self.data_attributes(storage_key:, controllers: nil, orderable: false)
-        order = {"ui--table-column-order-storage-key-value": "#{storage_key}Order", action: ORDER_ACTIONS} if orderable
+        order = {"ui--table-column-order-storage-key-value": "#{storage_key}Order"} if orderable
         {controller: [controllers, "ui--collapse ui--table-column-settings", ("ui--table-column-order" if orderable)].compact.join(" "),
          "ui--collapse-storage-key-value": "#{storage_key}Open",
          "ui--table-column-settings-storage-key-value": storage_key, **order}

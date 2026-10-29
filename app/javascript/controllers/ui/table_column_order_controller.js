@@ -1,11 +1,13 @@
 import { Controller } from '@hotwired/stimulus'
 import { storedArray } from 'utils/stored_array'
 import { storage } from 'utils/storage'
+import { moveByKey } from 'utils/drag_handle'
 
 // Connects to data-controller='ui--table-column-order'
-// Drag a th.hideableColumn by its UI::DragHandle onto another to move its column. A column is
-// named by its *_cell class, as ui--table-column-settings names it. The hideable columns follow
-// the fixed ones, so a row's are reordered by appending them.
+// Drag a th.hideableColumn by its UI::DragHandle to move its column, or move it a place at a time
+// by the handle's arrow keys. A column is named by its *_cell class, as ui--table-column-settings
+// names it. The hideable columns follow the fixed ones, so a row's are reordered by appending them.
+// Pointer events rather than native HTML5 drag, which is dead on touch and deaf to keys
 export default class extends Controller {
   static targets = ['handle']
   static values = { storageKey: String }
@@ -14,29 +16,39 @@ export default class extends Controller {
     this.applyOrder(storedArray(this.storageKeyValue))
   }
 
+  disconnect () {
+    this.#reset()
+  }
+
   // Reconnects each time applyOrder moves its header, which the shared listener makes harmless
   handleTargetConnected (handle) {
-    handle.draggable = true
-    handle.addEventListener('mousedown', this.#clearSelection)
+    handle.addEventListener('pointerdown', this.#onPointerDown)
   }
 
-  // Pressed inside a selection of the header's text, a drag would carry the text instead
-  #clearSelection = () => window.getSelection().removeAllRanges()
-
-  // Only from a handle, so dragging a header's sort link doesn't move its column
-  dragStart (event) {
-    if (!this.handleTargets.includes(event.target)) return
-    const th = this.header(event)
-    this.dragged = this.cellName(th)
-    event.dataTransfer.effectAllowed = 'move'
-    event.dataTransfer.setData('text/plain', this.dragged)
-    event.dataTransfer.setDragImage(th, 0, 0)
+  // Past the columns showing, not the ones unchecked
+  moveByKey (event) {
+    moveByKey(event, () => this.headers.filter(th => th.offsetParent), (th, target, after) => this.#move(th, target, after))
   }
 
-  dragOver (event) {
-    const th = this.header(event)
-    if (!th || !this.dragged) return
+  #onPointerDown = (event) => {
+    if (event.button !== 0) return
     event.preventDefault()
+    this.dragged = event.target.closest('th.hideableColumn')
+    this.dragged.classList.add('tw:opacity-50')
+    document.addEventListener('pointermove', this.#onPointerMove)
+    document.addEventListener('pointerup', this.#onPointerUp, { once: true })
+    // a touch gesture the browser takes over (scroll/zoom) fires pointercancel
+    document.addEventListener('pointercancel', this.#reset, { once: true })
+  }
+
+  // By the column under the pointer, so a finger needn't stay on the header row
+  #onPointerMove = (event) => {
+    this.#scrollToward(event.clientX)
+    const th = this.headers.find(header => {
+      const { left, right } = header.getBoundingClientRect()
+      return event.clientX >= left && event.clientX < right
+    })
+    if (!th) return
     const box = th.getBoundingClientRect()
     this.dropAfter = event.clientX > box.left + box.width / 2
     if (th !== this.indicated) this.clearIndicator()
@@ -44,21 +56,35 @@ export default class extends Controller {
     th.style.boxShadow = `inset ${this.dropAfter ? -2 : 2}px 0 #2563eb`
   }
 
-  drop (event) {
-    const th = this.header(event)
-    if (!th || !this.dragged) return
-    event.preventDefault()
-    const target = this.cellName(th)
-    if (target === this.dragged) return
-    const order = this.headers.map(header => this.cellName(header)).filter(name => name !== this.dragged)
-    order.splice(order.indexOf(target) + (this.dropAfter ? 1 : 0), 0, this.dragged)
-    storage.setItem(this.storageKeyValue, JSON.stringify(order))
-    this.applyOrder(order)
+  #onPointerUp = () => {
+    const { dragged, indicated, dropAfter } = this
+    this.#reset()
+    if (indicated && indicated !== dragged) this.#move(dragged, indicated, dropAfter)
   }
 
-  dragEnd () {
+  #reset = () => {
+    this.dragged?.classList.remove('tw:opacity-50')
     this.dragged = null
     this.clearIndicator()
+    document.removeEventListener('pointermove', this.#onPointerMove)
+    document.removeEventListener('pointerup', this.#onPointerUp)
+    document.removeEventListener('pointercancel', this.#reset)
+  }
+
+  // Near an edge of the table's scroller, as a native drag would
+  #scrollToward (clientX) {
+    const scroller = this.dragged.closest('table').parentElement
+    const { left, right } = scroller.getBoundingClientRect()
+    if (clientX < left + 40) scroller.scrollLeft -= 20
+    if (clientX > right - 40) scroller.scrollLeft += 20
+  }
+
+  #move (th, target, after) {
+    const name = this.cellName(th)
+    const order = this.headers.map(header => this.cellName(header)).filter(other => other !== name)
+    order.splice(order.indexOf(this.cellName(target)) + (after ? 1 : 0), 0, name)
+    storage.setItem(this.storageKeyValue, JSON.stringify(order))
+    this.applyOrder(order)
   }
 
   clearIndicator () {
@@ -82,10 +108,6 @@ export default class extends Controller {
 
   get headers () {
     return [...this.element.querySelectorAll('th.hideableColumn')]
-  }
-
-  header (event) {
-    return event.target.closest?.('th.hideableColumn')
   }
 
   cellName (element) {
