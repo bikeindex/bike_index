@@ -5421,9 +5421,10 @@ nb:
         in_the_past_year: i løpet av det siste året
         now: nå
         to: til
-      column_settings:
+      table_column_settings:
         all: Alle
         default: misligholde
+        included_columns: Inkluderte kolonner
         none: ingen
         visible_columns: Synlige kolonner
     atoms:
@@ -5557,7 +5558,6 @@ nb:
             created_at_cell: Registrert
             creation_description_cell: Kilde
             cycle_type_cell: Bil type
-            default: misligholde
             filter_impounded_html: bare <strong>beslaglagt</strong>
             filter_no_address_html: bare <strong>ingen</strong> adresse
             filter_no_sticker_html: bare <strong>uten</strong> klistremerke
@@ -5571,7 +5571,6 @@ nb:
             impound_id_cell: Beslags-ID
             manufacturer_cell: Produsent
             model_cell: Modell
-            none: ingen
             owner_email_cell: Sendt til
             owner_name_cell: Eiers navn
             propulsion_type_cell: Elbil (fremdrift)
@@ -5587,7 +5586,6 @@ nb:
             unregistered: 'Uregistrert:'
             updated_at_cell: Oppdatert
             url_cell: URL-adresse
-            visible_columns: Synlige kolonner
             notes_cell_html: Registreringsnotater <em>av %{org_name}</em>
             reg_organization_affiliation_cell_html: Tilknytning <em>i %{org_name}</em>
             reg_student_id_cell_html: Studentbevis <em>for %{org_name}</em>
@@ -5596,8 +5594,6 @@ nb:
             view_cell: Utsikt
             acknowledgment_cell_panel: Tid - Registreringssekvens bekreftet
             created_at_cell_panel: Tid - registrert
-            occurred_at_cell_panel: Tid - status
-            updated_at_cell_panel: Tid - oppdatert
             filter_stolen_or_impounded_html: bare <strong>stjålet</strong> eller <strong>beslaglagt</strong>
             location_search_disabled_no_address: "%{org_name} samler ikke inn registreringsadresser,
               så bare stjålne og beslaglagte registreringer har en plassering. Filtrer
@@ -5606,7 +5602,10 @@ nb:
               søker etter alle registreringer, med mindre du bare søker etter beslaglagte
               og/eller stjålne registreringer.
             show_location_search: vis stedssøk
-            included_columns: Inkluderte kolonner
+            registration_status_at_cell_hint: Når registreringsnummeret ble stjålet,
+              beslaglagt, funnet eller lagt ut for salg
+            registration_status_at_cell_panel: Tid - Registreringsstatus
+            registration_updated_at_cell_panel: Tid - registreringen er oppdatert
           column_settings_toggle:
             column_settings: Kolonneinnstillinger
           settings_and_filters:
@@ -5624,8 +5623,6 @@ nb:
             hidden: skjult
             not_registered_with: Skjult fordi den ikke er registrert hos %{org_name}
             acknowledgment_title: Bekreftelse på registreringssekvens kl.
-            occurred_at_tooltip: Når den ble stjålet, beslaglagt, funnet eller lagt
-              ut for salg
             view: Utsikt
           multi_result_chip:
             no_results: ingen treff
