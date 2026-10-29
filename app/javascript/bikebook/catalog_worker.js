@@ -54,7 +54,6 @@ async function load ({ manifestUrl, ids, jurisdictions, rulesUrl, similarityUrl:
     // by its maker, as makers share names, and its first word where it has no group
     group_key: `${model.manufacturer}/${model.model_group ?? model.model.split(' ')[0]}`,
     searchText: `${model.display}\n${model.id}`.toLowerCase(),
-    sameModel: `${model.manufacturer}/${model.model.toLowerCase()}`,
     sortYear: model.final_year ?? currentYear
   }))
   byId = new Map(models.map((model) => [model.id, model]))
@@ -107,8 +106,8 @@ const block = (key) => {
   return blocks.get(key)
 }
 
-// A block leaves out the markets of a model sold in its maker's primary market alone, which the index resolves.
-// `outsideMarket` where it isn't sold in `market`, blank for any
+// A block leaves out the markets of a model sold in its maker's primary market alone, which the index resolves, and
+// whether it's current. `outsideMarket` where it isn't sold in `market`, blank for any
 async function vehicles ({ ids, market }) {
   const found = await Promise.all(ids.map(async (value) => {
     const key = blockKey(value)
@@ -118,7 +117,8 @@ async function vehicles ({ ids, market }) {
       value,
       display: model?.display,
       data: data && { ...data, markets: data.markets ?? model?.markets },
-      outsideMarket: Boolean(market) && !model?.markets.includes(market)
+      outsideMarket: Boolean(market) && !model?.markets.includes(market),
+      current: Boolean(model) && model.final_year == null
     }
   }))
   return found.filter(({ data }) => data)
@@ -133,11 +133,12 @@ const scorer = () => {
   return similarity
 }
 
-// the last scoring kept, as the page asks again on each render while the section is open
-async function similar ({ model, settings }) {
+// the last scoring kept, as the page asks again on each render while the section is open. Of the models `market` and
+// its `scope` leave, as the search's are
+async function similar ({ model, settings, market, scope }) {
   const score = await scorer()
-  const key = JSON.stringify({ model, settings })
-  if (lastSimilar?.key !== key) lastSimilar = { key, result: score?.(model, settings) ?? null }
+  const key = JSON.stringify({ model, settings, market, scope })
+  if (lastSimilar?.key !== key) lastSimilar = { key, result: score?.(model, settings, (candidate) => !market || inMarket(candidate, market, scope)) ?? null }
   return lastSimilar.result
 }
 
@@ -250,18 +251,16 @@ function sorted ({ sort, year_dir: yearDir, price_dir: priceDir }) {
   return orders.get(key)
 }
 
-const soldIn = (market) => {
-  if (!sold.has(market)) {
-    sold.set(market, models.filter(({ markets }) => markets.includes(market))
-      .reduce((names, model) => names.set(model.sameModel, [...(names.get(model.sameModel) ?? []), model]), new Map()))
-  }
+// the manufacturers with models sold in `market`
+const sellingIn = (market) => {
+  if (!sold.has(market)) sold.set(market, new Set(models.filter(({ markets }) => markets.includes(market)).map(({ manufacturer }) => manufacturer)))
   return sold.get(market)
 }
 
-// A market's search has the models sold elsewhere too, but not e-vehicles, which its own laws class, nor one it sells
-// its own of in the same years
-const inMarket = (model, market) => model.markets.includes(market) || (!model.electric &&
-  !soldIn(market).get(model.sameModel)?.some((each) => each.first_year <= model.sortYear && model.first_year <= each.sortYear))
+// Its own models alone `only`, or every one for `any`. Preferring it, the default, adds the models sold elsewhere but
+// for e-vehicles, which its own laws class, and the makers it sells any of
+const inMarket = (model, market, scope) => scope === 'any' || model.markets.includes(market) ||
+  (scope !== 'only' && !model.electric && !sellingIn(market).has(model.manufacturer))
 
 // A family matches its flavors; slugs naming no activity filter nothing
 function filter (params) {
@@ -285,7 +284,7 @@ function filter (params) {
     (!params.model_configuration || model.model_configuration === params.model_configuration) &&
     (!params.handlebar_type || model.handlebar_type === params.handlebar_type) &&
     (!params.frame_material || model.frame_material === params.frame_material) &&
-    (!params.market || inMarket(model, params.market)) &&
+    (!params.market || inMarket(model, params.market, params.market_scope)) &&
     (yearMin == null || model.sortYear >= yearMin) &&
     (yearMax == null || (model.first_year ?? 0) <= yearMax) &&
     ((priceMin == null && priceMax == null) || (model.msrp_cents > 0 &&

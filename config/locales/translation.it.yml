@@ -5678,9 +5678,10 @@ it:
         in_the_past_year: nell'ultimo anno
         now: Ora
         to: a
-      column_settings:
+      table_column_settings:
         all: Tutti
         default: predefinito
+        included_columns: Colonne incluse
         none: nessuno
         visible_columns: Colonne visibili
     atoms:
@@ -5821,7 +5822,6 @@ it:
             created_at_cell: Registrato
             creation_description_cell: Fonte
             cycle_type_cell: Tipo di veicolo
-            default: predefinito
             filter_impounded_html: solo <strong>sequestrato</strong>
             filter_no_address_html: solo <strong>nessun</strong> indirizzo
             filter_no_sticker_html: solo <strong>senza</strong> adesivo
@@ -5835,7 +5835,6 @@ it:
             impound_id_cell: ID del sequestro
             manufacturer_cell: Produttore
             model_cell: Modello
-            none: nessuno
             owner_email_cell: Inviato a
             owner_name_cell: Nome del proprietario
             propulsion_type_cell: Veicolo elettrico (propulsione)
@@ -5851,7 +5850,6 @@ it:
             unregistered: 'Non registrato:'
             updated_at_cell: Fatto
             url_cell: URL
-            visible_columns: Colonne visibili
             notes_cell_html: Note di registrazione <em>di %{org_name}</em>
             reg_organization_affiliation_cell_html: Affiliazione <em>in %{org_name}</em>
             reg_student_id_cell_html: Numero di matricola dello studente <em>%{org_name}</em>
@@ -5860,8 +5858,6 @@ it:
             view_cell: Visualizzazione
             acknowledgment_cell_panel: Sequenza di registrazione temporale confermata
             created_at_cell_panel: Tempo - registrato
-            occurred_at_cell_panel: Tempo - stato
-            updated_at_cell_panel: Ora - aggiornato
             filter_stolen_or_impounded_html: solo <strong>rubati</strong> o <strong>sequestrati</strong>
             location_search_disabled_no_address: "%{org_name} non raccoglie gli indirizzi
               di immatricolazione, quindi solo le immatricolazioni rubate o sequestrate
@@ -5871,7 +5867,10 @@ it:
               per località quando si cercano tutte le immatricolazioni, a meno che
               non si stiano cercando solo immatricolazioni sequestrate e/o rubate.
             show_location_search: mostra la ricerca della posizione
-            included_columns: Colonne incluse
+            registration_status_at_cell_hint: Quando la registrazione è stata rubata,
+              sequestrata, ritrovata o messa in vendita
+            registration_status_at_cell_panel: Tempo - Stato della registrazione
+            registration_updated_at_cell_panel: Ora - registrazione aggiornata
           column_settings_toggle:
             column_settings: Impostazioni della colonna
           settings_and_filters:
@@ -5889,8 +5888,6 @@ it:
             hidden: nascosto
             not_registered_with: Nascosto perché non è registrato con %{org_name}
             acknowledgment_title: Conferma della sequenza di registrazione a
-            occurred_at_tooltip: Quando è stato rubato, sequestrato, ritrovato o messo
-              in vendita
             view: Visualizzazione
           multi_result_chip:
             no_results: nessuna corrispondenza

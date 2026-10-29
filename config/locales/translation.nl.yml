@@ -5579,9 +5579,10 @@ nl:
         in_the_past_year: in het afgelopen jaar
         now: nu
         to: Naar
-      column_settings:
+      table_column_settings:
         all: Alle
         default: standaard
+        included_columns: Inbegrepen kolommen
         none: geen
         visible_columns: Zichtbare kolommen
     atoms:
@@ -5723,7 +5724,6 @@ nl:
             created_at_cell: Geregistreerd
             creation_description_cell: Bron
             cycle_type_cell: 'Voertuigtype:'
-            default: standaard
             filter_impounded_html: alleen <strong>in beslag genomen</strong>
             filter_no_address_html: alleen <strong>geen</strong> adres
             filter_no_sticker_html: alleen <strong>geen</strong> sticker
@@ -5737,7 +5737,6 @@ nl:
             impound_id_cell: Inbeslagname-ID
             manufacturer_cell: Fabrikant
             model_cell: Model
-            none: geen
             owner_email_cell: Verzonden naar
             owner_name_cell: Eigenaar naam
             propulsion_type_cell: Elektrisch voertuig (aandrijving)
@@ -5753,7 +5752,6 @@ nl:
             unregistered: 'Niet geregistreerd:'
             updated_at_cell: Bijgewerkt
             url_cell: URL
-            visible_columns: Zichtbare kolommen
             notes_cell_html: Registratienotities <em>door %{org_name}</em>
             reg_organization_affiliation_cell_html: Affiliatie <em>in %{org_name}</em>
             reg_student_id_cell_html: Studentnummer <em>voor %{org_name}</em>
@@ -5762,8 +5760,6 @@ nl:
             view_cell: Weergave
             acknowledgment_cell_panel: Tijd - Registratievolgorde bevestigd
             created_at_cell_panel: Tijd - geregistreerd
-            occurred_at_cell_panel: Tijd - status
-            updated_at_cell_panel: Tijd - bijgewerkt
             filter_stolen_or_impounded_html: alleen <strong>gestolen</strong> of <strong>in
               beslag genomen</strong>
             location_search_disabled_no_address: "%{org_name} verzamelt geen registratieadressen,
@@ -5773,7 +5769,10 @@ nl:
               het doorzoeken van alle kentekens, tenzij je alleen zoekt naar in beslag
               genomen en/of gestolen kentekens.
             show_location_search: toon locatie zoeken
-            included_columns: Inbegrepen kolommen
+            registration_status_at_cell_hint: Wanneer een kentekenbewijs gestolen,
+              in beslag genomen, teruggevonden of te koop aangeboden is
+            registration_status_at_cell_panel: Tijd - Registratiestatus
+            registration_updated_at_cell_panel: Tijd - registratie bijgewerkt
           column_settings_toggle:
             column_settings: Kolominstellingen
           settings_and_filters:
@@ -5791,8 +5790,6 @@ nl:
             hidden: verborgen
             not_registered_with: Verborgen omdat het niet is geregistreerd bij %{org_name}
             acknowledgment_title: Bevestiging van de registratieprocedure bij
-            occurred_at_tooltip: Wanneer het gestolen, in beslag genomen, teruggevonden
-              of te koop aangeboden werd
             view: Weergave
           multi_result_chip:
             no_results: geen overeenkomsten
