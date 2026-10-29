@@ -85,9 +85,12 @@ module APIAuthorization
     # Before grape actions happen
     def before
       @endpoint_auth_declaration = env["api.endpoint"]&.options&.dig(:route_options, :authorizations)
-      return unless endpoint_protected?
-
-      doorkeeper_authorize!
+      if endpoint_protected?
+        doorkeeper_authorize!
+      elsif !doorkeeper_access_token&.accessible?
+        # A public endpoint ignores a bad token, but a valid one identifies the user
+        return
+      end
       # Assign the access_token and the user to the request object, so it can be accessed
       env["doorkeeper_access_token"] = doorkeeper_access_token
       env["doorkeeper_authorized_no_user"] = authorized_access_token_no_user?

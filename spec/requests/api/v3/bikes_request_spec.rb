@@ -112,6 +112,39 @@ RSpec.describe "Bikes API V3", type: :request do
       expect(response.headers["Access-Control-Request-Method"]).to eq("*")
     end
 
+    context "hidden bike" do
+      let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user:, user_hidden: true) }
+      let(:other_user_token) do
+        Doorkeeper::AccessToken.create!(application_id: doorkeeper_app.id, resource_owner_id: FactoryBot.create(:user_confirmed).id)
+      end
+
+      it "returns it only with the owner's token" do
+        expect(bike.reload.user_hidden).to be_truthy
+        get "/api/v3/bikes/#{bike.id}", params: {format: :json}
+        expect(response.code).to eq("404")
+
+        get "/api/v3/bikes/#{bike.id}", params: {format: :json, access_token: "invalid"}
+        expect(response.code).to eq("404")
+
+        get "/api/v3/bikes/#{bike.id}", params: {format: :json, access_token: other_user_token.token}
+        expect(response.code).to eq("404")
+
+        get "/api/v3/bikes/#{bike.id}", params: {format: :json, access_token: token.token}
+        expect(response.code).to eq("200")
+        expect(json_result["bike"]["id"]).to eq bike.id
+      end
+    end
+
+    context "unconfirmed user's token" do
+      let(:user) { FactoryBot.create(:user) }
+
+      it "returns a visible bike" do
+        expect(user.unconfirmed?).to be_truthy
+        get "/api/v3/bikes/#{bike.id}", params: {format: :json, access_token: token.token}
+        expect(response.code).to eq("200")
+      end
+    end
+
     describe "short_id" do
       # The short_id "/" is a real path separator here (e.g. /api/v3/bikes/r/35); the "_" and
       # "-" separators (see ShortId.decode) are accepted equivalents.

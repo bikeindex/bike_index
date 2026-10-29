@@ -101,7 +101,8 @@ module API
           short_id = (params[:prefix].present? ? "#{params[:prefix]}/#{params[:id]}" : params[:id]).to_s
           unless short_id.match?(/\As[\W_]/i)
             @bike = Bike.unscoped.find_id(short_id)
-            raise ActiveRecord::RecordNotFound unless @bike.visible_by?(current_user)
+            # current_user 403s an unconfirmed user's token, so only ask for it when the bike is hidden
+            raise ActiveRecord::RecordNotFound unless @bike.visible_by? || @bike.visible_by?(current_user)
             return @bike
           end
 
