@@ -30,6 +30,14 @@ module Pages
         def more_filters = render(UI::Collapse::Component.new(text: translation(".more_filters"), chevron: true,
           color: :link, html_class: "tw:ml-auto", aria: {controls: "vehicle-filters"}))
 
+        # How the market narrows the search, preferring it - the blank default - unless only it or any will do. Named for
+        # the visitor's until bikebook--catalog-filters names the one picked
+        def market_scopes
+          market = tag.span(I18n.t(@market, scope: :countries, default: @market), data: {"bikebook--catalog-filters-target": "marketName"})
+          [{value: "", label: translation(".prefer_market_sold_in_html", market:)}, {value: "only", label: translation(".only_market_html", market:)},
+            {value: "any", label: translation(".any_market")}]
+        end
+
         # By the ISO 3166-2 codes the catalog's classifications name their jurisdictions by
         def jurisdiction_names = {"US" => translation(".united_states")}
           .merge(EbikeRuleServices::StateLaws::STATES.to_h { ["US-#{it[:abbr]}", it[:name]] })

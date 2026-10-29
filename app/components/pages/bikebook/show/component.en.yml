@@ -31,17 +31,24 @@ en:
           loading_placeholder: Loading…
           manufacturers: Manufacturers
           market: Market
+          market_scope: Models from other markets
           max: Max
           min: Min
           more_filters: More filters
+          only_market_html: Only %{market}
           out_of_class_details: >-
             Motorized, but none of US Classes 1, 2 or 3, like a moped, motorcycle
             or off-highway e-moto.
           out_of_class_label: Out of Class
+          prefer_market_sold_in_html: Prefer vehicles sold in %{market}
           price: Price
           propulsion: Propulsion
           search_placeholder: Search by manufacturer or model…
           select_a_bike: Select a bike, choose multiple to compare them
+          select_a_vehicle_type: Select a %{bike_type}, choose multiple to compare
+            them
+          select_an_vehicle_type: Select an %{bike_type}, choose multiple to compare
+            them
           sort: Sort
           suspension: Suspension
           tagline: The world’s bicycle library — search, compare, and find your next
