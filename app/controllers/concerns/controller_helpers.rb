@@ -478,7 +478,8 @@ module ControllerHelpers
   end
 
   def invalid_return_to?(target)
-    return true if target.blank?
+    # The session is a cookie, which overflows past 4KB
+    return true if target.blank? || target.length > 2000
 
     # return_to can't be a sign in/up page, or we'll loop
     ["/users/new", "/session/new", "/session/magic_link", "/integrations", "/users/please_confirm_email"].any? { |r| target.match?(r) }
