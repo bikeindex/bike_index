@@ -96,13 +96,15 @@ RSpec.describe RecoveryDisplay, type: :model do
   end
 
   describe "quote_by" do
-    it "is only the first name" do
-      recovery_display = FactoryBot.create(:recovery_display, quote_by: "  Pat Smith ")
-      expect(recovery_display.quote_by).to eq "Pat"
+    it "keeps the whole name" do
+      recovery_display = FactoryBot.create(:recovery_display, quote_by: "  Portland Police Bureau ")
+      expect(recovery_display.quote_by).to eq "Portland Police Bureau"
       recovery_display.update(quote_by: " ")
       expect(recovery_display.quote_by).to be_nil
     end
+  end
 
+  describe "first_name" do
     it "skips a title" do
       expect(RecoveryDisplay.first_name("Dr. Alex Chen")).to eq "Alex"
       expect(RecoveryDisplay.first_name("mrs Pat Smith")).to eq "Pat"

@@ -13,22 +13,27 @@ module Admin
     def index
       @per_page = permitted_per_page(default: 50)
       @pagy, @recoveries = pagy(:countish, available_recoveries.reorder(sortable_order(StolenRecord))
-        .includes(:bike, :country, :region_record, :recovery_display, :recovering_user), limit: @per_page, page: permitted_page)
+        .includes(:country, :region_record, :recovery_display, :recovering_user), limit: @per_page, page: permitted_page)
     end
 
     def bulk_update
-      selected = params[:sr_selected].respond_to?(:keys) ? params[:sr_selected].keys : Array(params[:sr_selected])
-      recoveries = StolenRecord.recovered.waiting_on_decision.where(id: selected).to_a
+      recoveries = StolenRecord.recovered.waiting_on_decision.where(id: selected_ids(:sr_selected)).to_a
       bulk_action = BULK_ACTIONS[params[:bulk_action]]
       if recoveries.none?
         flash[:error] = "No recoveries waiting on a decision selected!"
       elsif bulk_action
         count = send(:"bulk_#{params[:bulk_action]}", recoveries)
-        flash[:success] = "#{count} #{"recovery".pluralize(count)} #{bulk_action[:done]}"
+        flash[:success] = "#{count} #{"recovery".pluralize(count)} #{bulk_action[:done]}" if count.positive?
       else
         flash[:error] = "Unknown action!"
       end
-      redirect_back(fallback_location: admin_recoveries_url)
+      return redirect_back(fallback_location: admin_recoveries_url) if @failed_edits.blank?
+
+      # Rendered rather than redirected, so the failed rows keep what the admin typed
+      flash.discard
+      set_period
+      index
+      render :index, status: :unprocessable_entity
     end
 
     def show
@@ -61,29 +66,39 @@ module Admin
 
     private
 
-    def require_index_admin!
-      ability = BULK_ACTIONS.dig(params[:bulk_action], :ability) if action_name == "bulk_update"
-      ability ? super(**ability) : super
-    end
-
     # Each returns how many it changed
     def bulk_display(recoveries)
-      displays = recoveries.map { build_recovery_display(it) }
-      failed = displays.reject(&:save)
-      flash[:error] = "Unable to display: #{failed.map { "##{it.stolen_record_id} #{it.errors.full_messages.to_sentence}" }.join("; ")}" if failed.any?
-      displays.size - failed.size
+      errors = recoveries.to_h { [it.id, display_error(it)] }.compact
+      if errors.any?
+        flash[:error] = "Unable to display: #{errors.map { |id, error| "##{id} #{error}" }.join("; ")}"
+        @failed_edits = errors.keys.index_with { display_edits(it) }
+      end
+      recoveries.size - errors.size
     end
 
     def bulk_not_displayed(recoveries)
       recoveries.count { it.update(recovery_display_status: "not_displayed") }
     end
 
-    # Edits go to the display, not the recovery, which keeps what the owner wrote
-    def build_recovery_display(stolen_record)
-      edits = params.fetch(:display, {}).fetch(stolen_record.id.to_s, {}).permit(:quote, :quote_by, :location_string)
+    # Returns why it wasn't displayed, if it wasn't. Edits go to the display, not the recovery,
+    # which keeps what the owner wrote
+    def display_error(stolen_record)
       bike = Bike.unscoped.find_by_id(stolen_record.bike_id)
-      RecoveryDisplay.new(RecoveryDisplay.attributes_from_stolen_record(stolen_record, bike:)
-        .merge(edits.to_h.symbolize_keys, remote_photo_url: bike&.image_url))
+      return "bike is hidden" if bike.present? && !bike.current?
+
+      # The lock makes a concurrent submit wait, then see this display
+      stolen_record.with_lock do
+        next "is already displayed" if RecoveryDisplay.unscoped.exists?(stolen_record_id: stolen_record.id)
+
+        attributes = RecoveryDisplay.attributes_from_stolen_record(stolen_record, bike:).merge(display_edits(stolen_record.id))
+        recovery_display = RecoveryDisplay.new(attributes.merge(quote_by: RecoveryDisplay.first_name(attributes[:quote_by]),
+          remote_photo_url: bike&.image_url))
+        recovery_display.errors.full_messages.to_sentence unless recovery_display.save
+      end
+    end
+
+    def display_edits(stolen_record_id)
+      params.fetch(:display, {}).fetch(stolen_record_id.to_s, {}).permit(:quote, :quote_by, :location_string).to_h.symbolize_keys
     end
 
     def sortable_columns

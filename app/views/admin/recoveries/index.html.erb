@@ -93,7 +93,7 @@
 <% end %>
 
 <% table_view = capture do %>
-  <%= render(Pages::Admin::Recoveries::Table::Component.new(recoveries: @recoveries, sort_state:)) %>
+  <%= render(Pages::Admin::Recoveries::Table::Component.new(recoveries: @recoveries, sort_state:, edits: @failed_edits.to_h)) %>
 <% end %>
 
 <%= render(Pages::Admin::IndexSkeleton::Component.new(

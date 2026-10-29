@@ -26,6 +26,16 @@ export default class extends Controller {
     if (checkbox && !checkbox.disabled) checkbox.checked = true
   }
 
+  // Editing a row checks it, so a submit button with data-discards-edits asks before acting on edited rows
+  confirmDiscard (event) {
+    if (!event.submitter?.dataset.discardsEdits) return
+    const edited = this.checkboxTargets.filter(cb => cb.checked &&
+      [...cb.closest('tr').querySelectorAll('input[type=text], textarea')].some(field => field.value !== field.defaultValue))
+    if (edited.length === 0) return
+    const message = `${edited.length} selected ${edited.length === 1 ? 'row has' : 'rows have'} edits, which this discards. Continue?`
+    if (!window.confirm(message)) event.preventDefault()
+  }
+
   // Enter in a checkbox, or a text field in a row, would submit the form through its first button, a bulk action
   ignoreFieldEnter = (event) => {
     const { type } = event.target

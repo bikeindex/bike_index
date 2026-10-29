@@ -78,7 +78,7 @@ class RecoveryDisplay < ActiveRecord::Base
     self.link = Binxtils::InputNormalizer.string(link)
     self.location_string = Binxtils::InputNormalizer.string(location_string)
     self.quote = Binxtils::InputNormalizer.string(quote)
-    self.quote_by = self.class.first_name(Binxtils::InputNormalizer.string(quote_by))
+    self.quote_by = Binxtils::InputNormalizer.string(quote_by)
   end
 
   def calculated_owner_name

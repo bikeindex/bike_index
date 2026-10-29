@@ -31,9 +31,12 @@ module Pages
 
           DEFAULT_COLUMNS = (COLUMNS.keys - %i[date_stolen_cell shareable_cell]).freeze
 
-          def initialize(recoveries:, sort_state:)
+          # edits: {recovery_id => {quote:, quote_by:, location_string:}}, the rows a display failed
+          # on, which stay checked
+          def initialize(recoveries:, sort_state:, edits: {})
             @recoveries = recoveries
             @sort_state = sort_state
+            @edits = edits
           end
 
           private
@@ -44,14 +47,18 @@ module Pages
               .includes(current_ownership: {user: %i[membership_active email_bans_active]}).index_by(&:id)
             @recoveries.map do |recovery|
               bike = bikes[recovery.bike_id]
-              [recovery, bike, (RecoveryDisplay.attributes_from_stolen_record(recovery, bike:) if recovery.waiting_on_decision?)]
+              defaults = RecoveryDisplay.attributes_from_stolen_record(recovery, bike:).merge(@edits[recovery.id].to_h) if recovery.waiting_on_decision?
+              [recovery, bike, defaults, @edits.key?(recovery.id)]
             end
           end
+
+          # The filters ride along, so a failed display renders the same page
+          def form_url = bulk_update_admin_recoveries_path(request.query_parameters)
 
           def form_data
             data = UI::TableColumnSettings::Component.data_attributes(storage_key: "adminRecoveriesColumns",
               controllers: "table-multi-checkbox admin--personal-info", orderable: true)
-            data.merge(action: [data[:action], "submit->admin--personal-info#confirmDisplay"].join(" "),
+            data.merge(action: [data[:action], "submit->admin--personal-info#confirmDisplay submit->table-multi-checkbox#confirmDiscard"].join(" "),
               "admin--personal-info-patterns-value": PERSONAL_INFO.transform_values { {label: it[:label], source: it[:pattern].source} }.to_json)
           end
         end

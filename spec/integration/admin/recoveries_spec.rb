@@ -47,5 +47,12 @@ RSpec.describe "Admin recoveries", :js, type: :system do
     click_button "Display selected", match: :first
     expect(page).to have_content("1 recovery displayed")
     expect(stolen_record.reload.recovery_display).to have_attributes(quote: "Got it back, thanks to Bike Index!", quote_by: "Alex")
+
+    # Editing checks the row, so marking it not displayable asks first. Still over the limit, it submits
+    find_field("display[#{long_story_record.id}][quote]").fill_in with: "Found it. " * 42
+    expect(page).to have_content("420/400")
+    accept_confirm(/1 selected row has edits/) { click_button "Mark not displayable", match: :first }
+    expect(page).to have_content("1 recovery marked not displayable")
+    expect(long_story_record.reload.recovery_display_status).to eq "not_displayed"
   end
 end
