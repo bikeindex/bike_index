@@ -15,7 +15,7 @@ module Organized
       @multi_update_open = Binxtils::InputNormalizer.boolean(params[:multi_update])
       @result_view = Pages::Org::Search::Wrapper::Component.permitted_result_view(params[:search_result_view])
       @search_proximity = GeocodeHelper.permitted_distance(params[:search_proximity],
-        min_distance: MIN_DISTANCE, default_distance: DEFAULT_DISTANCE)
+        min_distance: MIN_DISTANCE, default_distance: DEFAULT_DISTANCE, unit: search_distance_unit)
       @search_status = params[:search_status].presence_in(available_statuses) || available_statuses.first
       @search_unregisteredness = params[:search_unregisteredness]
         .presence_in(ComponentStructs::OrgImpoundSearchSettings::UNREGISTEREDNESS_LABELS.keys) || "all"
@@ -85,7 +85,7 @@ module Organized
     end
 
     def bike_search_params_present?
-      @interpreted_params.except(:stolenness).values.any? || @selected_query_items_options.any? || params[:search_email].present?
+      @interpreted_params.except(:stolenness, :distance_unit).values.any? || @selected_query_items_options.any? || params[:search_email].present?
     end
 
     def available_impound_records
@@ -112,7 +112,7 @@ module Organized
       end
 
       if params[:search_location].present?
-        bounding_box = GeocodeHelper.bounding_box(params[:search_location], @search_proximity)
+        bounding_box = GeocodeHelper.bounding_box(params[:search_location], @search_proximity, unit: search_distance_unit)
         if bounding_box.present?
           a_impound_records = a_impound_records.within_bounding_box(bounding_box)
         else

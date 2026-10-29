@@ -32,7 +32,7 @@
   <% end %>
 
   <% table.column(label: "Address") do |social_account| %>
-    <small class="less-strong"><%= social_account.address %></small>
+    <small class="less-strong"><%= social_account.formatted_address_string %></small>
   <% end %>
 
   <% table.column(label: "Neighborhood") do |social_account| %>
@@ -44,7 +44,7 @@
   <% end %>
 
   <% table.column(label: "State") do |social_account| %>
-    <small class="less-strong"><%= social_account.state&.abbreviation %></small>
+    <small class="less-strong"><%= social_account.region %></small>
   <% end %>
 
   <% table.column(sortable: "country") do |social_account| %>

@@ -202,7 +202,7 @@ module BikeAttributable
       return stock_photo_url.present? ? stock_photo_url : nil
     end
 
-    public_image = public_images.limit(1).first
+    public_image = public_images.first
     # PublicImage owns which backend a row is on
     return public_image.image_url(size) if public_image&.activestorage?
 

@@ -23,6 +23,10 @@ Drive Playwright MCP to capture screenshots of pages served by `bin/dev`. Caller
 pass `(url-path, page-slug)` pairs, optionally with per-URL interaction steps, and
 get back local PNG paths.
 
+## Who runs this
+
+From a session with history, hand this skill to a subagent the way `AGENTS.md`'s **Who runs this** describes — `model: "sonnet"` (it works out how to drive each page; the pages are chosen) — briefed with the `(url-path, page-slug)` pairs and any interaction steps per page, who to sign in as (or signed out), and the base ref when the caller wants before/after. It replies with the PNG paths keyed by page, viewport and branch/base, and any capture it couldn't diagnose. It closes the shared Playwright browser when it's done, so finish with any page this session still needs first.
+
 ## Output filenames (load-bearing — callers parse these)
 
 `tmp/pr_screenshots/<branch>-<page>-<timestamp>-{desktop,mobile}.png`, where `<branch>=$(git rev-parse --abbrev-ref HEAD | tr '/' '-')` and `<timestamp>=$(date +%Y%m%d-%H%M%S)`. Cross-branch shots get an extra `-base-` segment.
@@ -111,6 +115,8 @@ If the returned content height is **less than the viewport height**, `browser_re
 
 **Viewport-only is the caller's call, never yours — except when the diff's subject is a `position: fixed` or `sticky` element.** `fullPage` paints it once, where it sits at scroll 0, and nowhere else: on the 10,007px `/accept_vendor_terms` its bottom bar landed at y=798 with the remaining 9,100px of that column bare. Capture those at `fullPage: false`, scrolled to where the element pins. When the caller asks for it — "viewport only", "above the fold", "just the mobile viewport" — drop `fullPage` for the size they named and leave the other one full page.
 
+**`/bikebook` renders whatever catalog the dev server points it at.** With `BIKEBOOK_CATALOG_DIRECTORY` set it's a local `/bikebook_catalog/` that can trail *or lead* the published one by schema versions, so a capture of a schema change against the wrong one shows nothing new. Compare the two manifests' `schema_version` and capture against the one the diff reads — when that's the published one, `page.route` `/bikebook_catalog/` to `https://bikebook-catalog.bikeindex.org/catalog/` in `browser_run_code_unsafe`, on both branches. Without the variable the page fetches the published catalog itself, which the web sandbox's browser can't reach — no cards render; `page.route` `https://bikebook-catalog.bikeindex.org/**` to `route.fulfill` its `route.fetch()` with an `access-control-allow-origin: *` header.
+
 **Settle before the screenshot.** Stimulus + Chartkick render after document load; either `browser_wait_for` on a known element or pause ~500ms–1s. Otherwise charts capture mid-draw. **`loading="lazy"` images capture blank below the fold** — `fullPage` stitching never scrolls them into view (the search results, marketplace and `/stolen` recoveries use it). Set `loading = 'eager'` on them and wait for every `naturalWidth` before the shot.
 
 **Mid-interaction states are in scope.** When the caller asks for a dropdown open, a modal showing, a hover state, a partially-filled form, etc., drive Playwright between settle and the screenshot — `browser_click`, `browser_type`, `browser_press_key`, `browser_hover`, then wait for the UI to reach the target state (`browser_wait_for` on a marker element, or check via `browser_evaluate`) before `browser_take_screenshot`. Treat the interaction sequence as part of the page-slug — e.g. capture `combobox-open` after clicking + typing, distinct from a static `search-registrations` page-load shot. For cross-branch comparisons, run the *same* interaction sequence on each branch so the screenshots actually compare like-for-like.
@@ -176,7 +182,7 @@ When the caller wants before/after, repeat the capture loop against the base ref
 3. Diff `db/migrate/` between the branch and **`$BASE_AT`**, not `$BASE_REF`; abort if it changed — a branch-only migration leaves the DB schema ahead of the base's code, so base pages can error. A migration that only shows up against the ref's tip belongs to commits the branch never took, and detaching at the merge-base is what resolves it; aborting there abandons a capture that was fine. **So does aborting on a migration that only adds a table, or a column with a default** — nothing on the base reads either, so load the target page after detaching and abort only if it errors.
 4. `BRANCH=$(git rev-parse --abbrev-ref HEAD)`, `git checkout --detach $BASE_AT` (detached — checking out a branch name fails if a sibling worktree holds it; detached HEAD is allowed concurrently and is the same code), navigate the browser to force Rails to reload the changed files — the watcher can lag that first request, so confirm the page shows the base's markup (the changed element gone) and re-navigate if it doesn't — repeat capture into `...-base-...` filenames, then `git checkout $BRANCH`.
 
-A `Gemfile.lock` diff is **not** a reason to abort.
+A `Gemfile.lock` diff is **not** a reason to abort — but when it moves a gem the page loads (hotwire_combobox's JS and CSS), run `bundle install` and `bin/rails restart` after each checkout, or the base renders the branch's gem.
 
 **Don't call a pair identical with `cmp`.** Two captures of the *same* code routinely differ by a few dozen bytes, so byte-equality reports a change that isn't one (and its absence proves nothing). Compare pixels, and establish the noise floor before reading anything into a number — recapture one page without changing branches, and treat that count as zero:
 

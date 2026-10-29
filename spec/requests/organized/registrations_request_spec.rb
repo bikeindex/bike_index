@@ -383,7 +383,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         # Without impound_bikes there's no impoundedness to leave out
         expect(assigns(:search_status)).to eq "all"
         expect(assigns(:interpreted_params)[:stolenness]).to eq "all"
-        expect(assigns(:interpreted_params)).to match_hash_indifferently({stolenness: "all"})
+        expect(assigns(:interpreted_params)).to match_hash_indifferently({stolenness: "all", distance_unit: "km"})
 
         # ... and no filtering by it either, the panel doesn't offer the impound statuses
         get base_url, params: {search_no_js: true, search_status: "impounded"}

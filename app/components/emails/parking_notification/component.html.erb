@@ -52,7 +52,7 @@
 
 <% if show_pickup_link? %>
   <div class="mark-retrieved-box">
-    <%= link_to "I picked up my #{bike.type}", tokenized_url, "data-pm-no-track" => true, class: "binx-button" %>
+    <%= render(Emails::Partials::TokenLink::Component.new(href: tokenized_url, text: "I picked up my #{bike.type}")) %>
 
     <p>
       <em>

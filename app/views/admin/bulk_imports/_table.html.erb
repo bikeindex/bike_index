@@ -28,7 +28,7 @@
     <% end %>
 
     <% table.column(sortable: "user_id", label: "Creator") do |bulk_import| %>
-      <% if bulk_import.user_id.present? %>
+      <% if bulk_import.user.present? %>
         <%= bulk_import.user.display_name %>
       <% end %>
 

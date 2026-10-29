@@ -1,6 +1,5 @@
 import { Controller } from '@hotwired/stimulus'
-
-/* global localStorage */
+import { storage } from 'utils/storage'
 
 // Connects to data-controller='org--search-column-settings'
 export default class extends Controller {
@@ -49,10 +48,10 @@ export default class extends Controller {
   }
 
   selectStoredVisibleColumns () {
-    const stored = localStorage.getItem(this.storageKeyValue)
+    const stored = storage.getItem(this.storageKeyValue)
     let columns = null
     if (stored) {
-      try { columns = JSON.parse(stored) } catch { localStorage.removeItem(this.storageKeyValue) }
+      try { columns = JSON.parse(stored) } catch { storage.removeItem(this.storageKeyValue) }
     }
 
     this.toggleableCheckboxes.forEach(cb => {
@@ -66,7 +65,7 @@ export default class extends Controller {
     this.toggleableCheckboxes.forEach(cb => {
       if (cb.checked) checked.push(cb.name)
     })
-    localStorage.setItem(this.storageKeyValue, JSON.stringify(checked))
+    storage.setItem(this.storageKeyValue, JSON.stringify(checked))
 
     if (this.assignBikeStickerValue) {
       checked.push('assign_bike_sticker_cell')

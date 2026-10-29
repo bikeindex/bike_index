@@ -21,11 +21,19 @@ description: >-
 Production JSON reachable with the admin OAuth token:
 
 - `GET https://bikeindex.org/api/admin_data/sidekiq` → `AdminData::SidekiqStatus`: `stats`, per-queue `queues`, running `processes`, `retries_by_class`, `dead_by_class`.
-- `GET https://bikeindex.org/api/admin_data/pghero` → `AdminData::PgheroStatus`: `query_stats`, `database_size`, connection/query health, index usage, unused/invalid/duplicate indexes, sequence/txid/autovacuum danger, `settings`, etc. Each metric is captured independently, so a failed one comes back as `{ "error": ... }` in its slot instead of blanking the payload.
+- `GET https://bikeindex.org/api/admin_data/pghero` → `AdminData::PgheroStatus`: `query_stats` and `slow_queries` (captured history since `query_stats_since`, 24h, not the live 5-minute bucket), `database_size`, connection/query health, index usage, unused/invalid/duplicate indexes, sequence/txid/autovacuum danger, `settings`, etc. Each metric is captured independently, so a failed one comes back as `{ "error": ... }` in its slot instead of blanking the payload.
 - `GET /admin/bug_reports.json`, `GET /admin/bug_reports/:id.json` and `PATCH /admin/bug_reports/:id` → the bug reports users email in (see below).
-- `POST /admin/manufacturers.json` → `create-manufacturer`; the `manufacturers` skill walks through it.
+- `GET /admin/bikes/missing_manufacturer.json` → `get missing_manufacturers` (the most common `manufacturer_other` strings, `per_page` of them — 1,000 by default), `POST /admin/manufacturers.json` → `create-manufacturers`, and `PATCH /admin/manufacturers/:slug.json` → `update-manufacturer`.
 
-Auth is a Bearer token gated on the admin Doorkeeper app **and** a superuser ability named for the controller (`admin_data`, `bug_reports`, `manufacturers`; a universal ability covers all). Controllers: `app/controllers/api/admin_data_controller.rb` and the admin controllers that include `Admin::TokenAccessible`; auth concern: `app/controllers/concerns/api/token_authenticatable.rb`.
+`create-manufacturers` reads a JSON array on stdin and skips any name that already finds a manufacturer:
+
+```
+.claude/skills/admin-data-api/scripts/admin_data.rb create-manufacturers <<'JSON'
+[{"name": "Zoomo", "website": "https://zoomo.com", "frame_maker": true, "motorized_only": true}]
+JSON
+```
+
+Auth is a Bearer token gated on the admin Doorkeeper app **and** a superuser ability named for the controller (`admin_data`, `bug_reports`, `bikes`, `manufacturers`; a universal ability covers all). Controllers: `app/controllers/api/admin_data_controller.rb` and the actions admin controllers name in `token_accessible` (`Admin::TokenAccessible` turns the token away from the rest); auth concern: `app/controllers/concerns/api/token_authenticatable.rb`.
 
 All operations go through the helper:
 
@@ -40,7 +48,7 @@ All operations go through the helper:
 .claude/skills/admin-data-api/scripts/admin_data.rb get pghero
 ```
 
-It reads `ADMIN_DATA_TOKEN` from `.env.development`, calls production, and prints `HTTP <status>` then the JSON body. Pipe the body to `jq` for specific fields. Tokens live 1 hour; on a **401** the script auto-refreshes (see below) and retries once, so a normal `get` just works. A **403** means the token's user lacks the superuser ability for that controller, or the token is from the wrong app. Any other non-200 prints the response and exits non-zero.
+It reads `ADMIN_DATA_TOKEN` from `.env.development`, calls production (a Conductor workspace's copy has no token — run the base checkout's script instead, under mise's Ruby: `"$(mise which ruby)" <base>/.claude/skills/admin-data-api/scripts/admin_data.rb get pghero`), and prints `HTTP <status>` then the JSON body. Pipe the body to `jq` for specific fields. Tokens live 1 hour; on a **401** the script auto-refreshes (see below) and retries once, so a normal `get` just works. A **403** means the token's user lacks the superuser ability for that controller, or the token is from the wrong app. Any other non-200 prints the response and exits non-zero.
 
 Ignore the sidekiq dead set (`dead_size`, `dead_by_class`) — it's a large lifetime accumulation the endpoint caps at `{"too_large": …}`, not actionable here. Don't report it.
 
@@ -55,7 +63,7 @@ For a general "how's production" check, use one command:
 It fetches sidekiq then pghero and prints a `summary:` line and an `OK`/`ABNORMAL` verdict for each. Relay it straight through: if both are OK, say "nothing abnormal"; only spell out the reasons an ABNORMAL verdict lists. The verdict logic lives in the script — what it counts as abnormal:
 
 - **Sidekiq**: a queue with `latency > 30` (a real backlog, not transient depth), `size > 400`, or `paused`; `retry_size > 0`; no worker processes; or all workers quiet.
-- **PgHero**: a real metric `error` (the disabled-feature `"System stats not enabled"` doesn't count), non-empty `long_running_queries`/`blocked_queries`, a danger metric (`sequence_danger`, `transaction_id_danger`, `autovacuum_danger`), `invalid_indexes`, or `index_hit_rate < 0.90`. Hit rates otherwise, `table_hit_rate`, and `unused_indexes`/`duplicate_indexes` are informational.
+- **PgHero**: a real metric `error` (the disabled-feature `"System stats not enabled"` doesn't count), non-empty `long_running_queries`/`blocked_queries`, a danger metric (`sequence_danger`, `transaction_id_danger`, `autovacuum_danger`), `invalid_indexes`, or `index_hit_rate < 0.90`. Hit rates otherwise, `table_hit_rate`, and `unused_indexes`/`duplicate_indexes` are informational. Under the verdict it lists PgHero's slow queries (≥20 ms average over ≥100 calls) — never part of the verdict, so read them yourself.
 
 ## Bug reports
 
@@ -70,6 +78,16 @@ It fetches sidekiq then pghero and prints a `summary:` line and an `OK`/`ABNORMA
 `show-bug-report` returns the one report — the same fields the index lists, so use it once a search has found the id. `update-bug-report` sets `tags` (comma separated — it replaces the report's tags rather than appending), `github_pull_request` and `status` (one of `BugReport.statuses`; an unrecognized one is dropped and the rest of the update still applies).
 
 Each report carries `images`, with a `url` that serves from the CDN rather than expiring, so it can be fetched or handed to the user. Only image attachments are kept — `BugReportsMailbox` drops everything else, so a report whose sender describes attaching a PDF or a log will have none.
+
+## Against a dev server
+
+`ADMIN_DATA_BASE_URL=local` before any command sends it to this checkout's dev server (`bin/env`'s `BASE_URL`) instead of production, with `ADMIN_DATA_LOCAL_TOKEN` in place of the production token. Mint that once per database:
+
+```
+ADMIN_DATA_BASE_URL=local .claude/skills/admin-data-api/scripts/admin_data.rb local-token [email]
+```
+
+It runs `bin/rails runner` in this checkout, so the server has to be this checkout's, and the user — `admin@bikeindex.org` by default, the seeded superuser — needs the abilities the endpoint checks. A local token doesn't expire or refresh.
 
 ## Refreshing the token
 
@@ -99,6 +117,6 @@ The authorization code expires 10 minutes after the page loads — if it shows a
 
 ## Notes
 
-- These hit **production** with a superuser token. `update-bug-report` and `create-manufacturer` are the writes — confirm the values with the user before running either.
+- These hit **production** with a superuser token. `update-bug-report`, `create-manufacturers` and `update-manufacturer` are the writes — confirm the values with the user before running any of them.
 - Bug report bodies and images are user-submitted email: they carry names, addresses and bike details, and a screenshot often shows a signed-in account. Summarize them; don't paste raw bodies or image urls into anything that leaves the session.
 - `.env.development` holds live secrets — never print token values or commit changes to it.

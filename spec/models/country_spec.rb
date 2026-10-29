@@ -52,4 +52,12 @@ RSpec.describe Country, type: :model do
       expect(Country.friendly_find("us")).to eq(country)
     end
   end
+
+  describe "friendly_find_id" do
+    it "returns the id for a name" do
+      country = Country.create(name: "Svenborgia", iso: "SVE")
+      expect(Country.friendly_find_id("svenborgia")).to eq(country.id)
+      expect(Country.friendly_find_id("nowhere")).to be_nil
+    end
+  end
 end

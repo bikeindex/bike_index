@@ -35,11 +35,10 @@ module BikeJobs
           info_hash: post.details_hash
         )
 
-      if customer_contact.save
-        EmailStolenBikeAlertJob.perform_async(customer_contact.id)
-      else
-        raise ArgumentError, error_context(bike, post, customer_contact.errors.full_messages)
-      end
+      # Saving enqueues the email, in CustomerContact#create_notification
+      return if customer_contact.save
+
+      raise ArgumentError, error_context(bike, post, customer_contact.errors.full_messages)
     end
 
     def error_context(bike, post, errors = [])

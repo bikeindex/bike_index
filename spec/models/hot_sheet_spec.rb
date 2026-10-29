@@ -71,18 +71,26 @@ RSpec.describe HotSheet, type: :model do
     before { stub_const("HotSheet::RECIPIENTS_PER_EMAIL", 2) }
 
     it "builds a sheet for each batch of daily recipients, without saving them" do
-      hot_sheets = HotSheet.for(organization, Time.current.to_date)
+      hot_sheets = HotSheet.for(organization, hot_sheet_configuration.current_date)
       expect(hot_sheets.map(&:persisted?)).to eq([false, false])
-      expect(hot_sheets.map(&:sheet_date)).to eq([Time.current.to_date] * 2)
+      expect(hot_sheets.map(&:sheet_date)).to eq([hot_sheet_configuration.current_date] * 2)
       expect(hot_sheets.map { it.recipient_ids.count }).to eq([2, 1])
       expect(hot_sheets.flat_map(&:recipient_emails)).to match_array(organization_roles.map { it.user.email })
       # Every sheet renders the same bikes, and a recovered bike isn't one of them
       expect(hot_sheets.map(&:stolen_record_ids)).to eq([[stolen_record.id]] * 2)
     end
 
+    # UTC+14 is a day ahead of the app's zone for most of the day
+    context "in a time zone ahead of the app's" do
+      let!(:hot_sheet_configuration) { FactoryBot.create(:hot_sheet_configuration, organization:, timezone_str: "Pacific/Kiritimati") }
+      it "builds for the organization's day" do
+        expect(HotSheet.for(organization, hot_sheet_configuration.current_date).count).to eq 2
+      end
+    end
+
     context "for a past day" do
       it "builds nothing" do
-        expect(HotSheet.for(organization, Time.current.to_date - 1.day)).to eq([])
+        expect(HotSheet.for(organization, hot_sheet_configuration.current_date - 1.day)).to eq([])
       end
     end
 
@@ -96,7 +104,7 @@ RSpec.describe HotSheet, type: :model do
     context "with no recipients" do
       let!(:organization_roles) { [] }
       it "builds one sheet, with nobody to email" do
-        expect(HotSheet.for(organization, Time.current.to_date).map(&:recipient_ids)).to eq([[]])
+        expect(HotSheet.for(organization, hot_sheet_configuration.current_date).map(&:recipient_ids)).to eq([[]])
       end
     end
   end

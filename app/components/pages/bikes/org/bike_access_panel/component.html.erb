@@ -218,24 +218,13 @@
                     <% if bike_attr == "address" %>
                       <td><%= translation(".address") %></td>
                       <td>
-                        <% address = @bike.registration_address %>
-
-                        <% if @bike.valid_mailing_address? %>
+                        <% unless @bike.registration_address_organization_default?(@organization) %>
                           <small>
-                            <%= render UI::AddressDisplay::Component.new(address_record: BikeServices::CalculateLocation.registration_address_record(@bike), visible_attribute: :street) %>
+                            <%= render UI::AddressDisplay::Component.new(address_record: @bike.registration_address_record, visible_attribute: :street) %>
                           </small>
-                        <% else %>
-                          <%# Don't show address if it's the organizations default address %>
-                          <% unless address == @organization.default_location&.address_hash_legacy %>
-                            <% address.except("latitude", "longitude", "country").each do |k, v| %>
-                              <span class="less-strong">
-                                <%= k == "address" ? "street" : k %>:
-                              </span>
+                        <% end %>
 
-                              <%= v %>
-                              <br>
-                            <% end %>
-                          <% end %>
+                        <% unless @bike.valid_mailing_address? %>
                           <span class="text-warning">
                             <small>invalid address</small>
                           </span>
@@ -411,7 +400,7 @@
               <div class="tw:mt-2 tw:flex tw:items-center tw:justify-between">
                 <% if bike_organization_note.present? %>
                   <small class="tw:text-gray-500">
-                    <%= translation(".note_by", user: bike_organization_note.user.display_name) %>
+                    <%= translation(".note_by", user: bike_organization_note.user&.display_name) %>
 
                     <span class="localizeTime withPreposition">
                       <%= l bike_organization_note.updated_at, format: :convert_time %>

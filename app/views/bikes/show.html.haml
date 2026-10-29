@@ -134,7 +134,7 @@
               Does this look like your #{@bike.type}?
           %h3
             Claim
-            = @bike.current_impound_record.kind
+            = (@bike.current_impound_record || @impound_claim&.impound_record)&.kind
             #{@bike.type}
 
           %a.btn.btn-primary.btn-lg{ href: '#impound_claim', 'aria-controls' => 'impound_claim', 'data-toggle' => 'collapse' }

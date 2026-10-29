@@ -76,7 +76,11 @@
                   min: GeocodeHelper::MIN_DISTANCE, disabled: location_search_disabled?, data: {restores_from_url: true},
                   class: "twinput tw:w-24 fieldResetsCounts" %>
 
-                <span><%= translation(".miles_of") %></span>
+                <span>
+                  <%= (@interpreted_params[:distance_unit] == "km") ? translation(".kilometers_of") : translation(".miles_of") %>
+                </span>
+
+                <%= hidden_field_tag :distance_unit, @interpreted_params[:distance_unit], disabled: location_search_disabled? %>
 
                 <%= label_tag :location, translation(".search_location"), class: "twlabel tw:sr-only" %>
 

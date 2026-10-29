@@ -1,8 +1,10 @@
 /* /bikebook (Pages::Bikebook::Show and app/javascript/bikebook) */
 
-/* Marks where a compared vehicle's spec differs from the first one's */
+/* Marks where a compared vehicle's spec differs from the first one's, in the comparison view */
 @utility spec-diff {
-  @apply tw:bg-yellow-50 tw:dark:bg-yellow-950;
+  [data-comparison] & {
+    @apply tw:bg-yellow-50 tw:dark:bg-yellow-950;
+  }
 }
 
 @layer components {
@@ -22,6 +24,60 @@
 
   .twjson-panel .highlightjs-json pre {
     @apply tw:max-h-[70vh] tw:lg:h-full tw:lg:max-h-none;
+  }
+
+  /* A component group's table, which a card narrower than its five columns stacks, a row to each component - its
+   * columns style their cells. Important over the table's own cell borders, widths and padding */
+  .bikebook-components {
+    container: bikebook-components / inline-size;
+  }
+
+  /* A blank row, standing in for a component only a compared vehicle has, unstriped and ruled only by the table's
+   * edges - transparent rather than gone, so it keeps the height the other cards' rows match. Stacked, a row's top
+   * border closes the one above; wide, the row after a blank draws its own */
+  .bikebook-components tbody tr:not(:has(td:not(:empty))) {
+    @apply tw:bg-white tw:dark:bg-gray-900;
+
+    & + & {
+      @apply tw:border-transparent!;
+    }
+
+    & td:not(:first-child) {
+      @apply tw:border-l-transparent!;
+    }
+
+    &:not(:last-child) td {
+      @apply tw:border-b-transparent!;
+    }
+
+    @container bikebook-components (width >= 40rem) {
+      & + tr:has(td:not(:empty)) td {
+        @apply tw:shadow-[inset_0_1px_0_var(--tw-color-gray-200)] tw:dark:shadow-[inset_0_1px_0_var(--tw-color-gray-700)];
+      }
+    }
+  }
+
+  @container bikebook-components (width < 40rem) {
+    .bikebook-components :is(table, thead, tbody) {
+      display: block;
+    }
+
+    .bikebook-components tr {
+      @apply tw:flex tw:flex-wrap tw:gap-x-2 tw:border-gray-200 tw:px-2 tw:py-1.5 tw:text-sm tw:dark:border-gray-700;
+    }
+
+    .bikebook-components tbody tr {
+      @apply tw:border-t;
+    }
+
+    .bikebook-components :is(th, td) {
+      @apply tw:block tw:w-auto! tw:rounded-none! tw:border-0! tw:p-0!;
+    }
+
+    .bikebook-components thead th:not(:first-child),
+    .bikebook-components td:empty {
+      display: none;
+    }
   }
 }
 

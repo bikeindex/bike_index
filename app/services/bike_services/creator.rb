@@ -130,7 +130,7 @@ module BikeServices
       return nil unless b_param&.bike.present? && b_param.manufacturer_id.present?
       return nil unless b_param.bike["frame_model"].present? && b_param.bike["year"].present?
 
-      bb_data = Integrations::BikeBook.new.get_model({
+      bb_data = Integrations::Bikebook::Data.new.get_model({
         manufacturer: Manufacturer.find(b_param.bike["manufacturer_id"]).name,
         year: b_param.bike["year"],
         frame_model: b_param.bike["frame_model"]
@@ -260,12 +260,13 @@ module BikeServices
         # notification will update it
         ParkingNotification.create!(b_param.parking_notification_params.merge(bike_id: bike.id))
       else
-        parking_notification_attrs = bike.address_hash_legacy
-        parking_notification_attrs.merge!(kind: b_param.bike["parking_notification_kind"],
+        address_attrs = Geocodeable.attrs_to_duplicate(bike).slice(*ParkingNotification.attribute_names, "skip_geocoding")
+        ParkingNotification.create(address_attrs.merge(
+          kind: b_param.bike["parking_notification_kind"],
           bike_id: bike.id,
           user_id: bike.creator.id,
-          organization_id: b_param.creation_organization_id)
-        ParkingNotification.create(parking_notification_attrs)
+          organization_id: b_param.creation_organization_id
+        ))
       end
       # Reload to pick up changes from ProcessParkingNotificationJob (e.g. user_hidden cleared by impound).
       # attr_accessors persist through reload, so clear marked_user_hidden for impound notifications

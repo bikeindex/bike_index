@@ -3601,9 +3601,11 @@ CREATE TABLE public.social_accounts (
     last_error character varying,
     last_error_at timestamp without time zone,
     street character varying,
-    zipcode character varying,
-    state_id bigint,
-    country_id bigint
+    country_id bigint,
+    postal_code character varying,
+    region_record_id bigint,
+    region_string character varying,
+    street_2 character varying
 );
 
 
@@ -4499,7 +4501,8 @@ CREATE TABLE public.users (
     address_record_id bigint,
     can_send_many_marketplace_messages boolean DEFAULT false NOT NULL,
     feature_registration_show_legacy boolean DEFAULT false NOT NULL,
-    passwordless_user boolean DEFAULT false NOT NULL
+    passwordless_user boolean DEFAULT false NOT NULL,
+    preferred_unit_system integer
 );
 
 
@@ -6462,6 +6465,20 @@ CREATE INDEX index_bike_stickers_on_bike_sticker_batch_id ON public.bike_sticker
 
 
 --
+-- Name: index_bike_stickers_on_code_integer; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bike_stickers_on_code_integer ON public.bike_stickers USING btree (code_integer);
+
+
+--
+-- Name: index_bike_stickers_on_code_trgm; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bike_stickers_on_code_trgm ON public.bike_stickers USING gin (code public.gin_trgm_ops);
+
+
+--
 -- Name: index_bike_versions_on_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6494,6 +6511,20 @@ CREATE INDEX index_bike_versions_on_primary_activity_id ON public.bike_versions 
 --
 
 CREATE INDEX index_bikes_current_listing_order ON public.bikes USING btree (listing_order DESC) WHERE ((example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL));
+
+
+--
+-- Name: index_bikes_current_manufacturer_listing_order; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bikes_current_manufacturer_listing_order ON public.bikes USING btree (manufacturer_id, listing_order DESC) WHERE ((example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL));
+
+
+--
+-- Name: index_bikes_current_stolen_or_impounded_on_location; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bikes_current_stolen_or_impounded_on_location ON public.bikes USING btree (latitude, longitude) WHERE ((status = ANY (ARRAY[1, 3])) AND (example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL));
 
 
 --
@@ -7372,10 +7403,10 @@ CREATE INDEX index_ownerships_on_sale_id ON public.ownerships USING btree (sale_
 
 
 --
--- Name: index_ownerships_on_user_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_ownerships_on_user_id_and_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_ownerships_on_user_id ON public.ownerships USING btree (user_id);
+CREATE INDEX index_ownerships_on_user_id_and_id ON public.ownerships USING btree (user_id, id) WHERE (user_id IS NOT NULL);
 
 
 --
@@ -7729,6 +7760,13 @@ CREATE INDEX index_user_bans_on_user_id ON public.user_bans USING btree (user_id
 
 
 --
+-- Name: index_user_emails_on_email; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_emails_on_email ON public.user_emails USING btree (email);
+
+
+--
 -- Name: index_user_emails_on_email_confirmed; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7785,6 +7823,13 @@ CREATE INDEX index_users_on_email_trgm ON public.users USING gin (email public.g
 
 
 --
+-- Name: index_users_on_email_without_periods; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_users_on_email_without_periods ON public.users USING btree (replace((email)::text, '.'::text, ''::text)) WHERE (deleted_at IS NULL);
+
+
+--
 -- Name: index_users_on_magic_link_token_outstanding; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7817,6 +7862,13 @@ CREATE UNIQUE INDEX unique_assignment_to_ambassador ON public.ambassador_task_as
 --
 
 CREATE UNIQUE INDEX unique_schema_migrations ON public.schema_migrations USING btree (version);
+
+
+--
+-- Name: bikes_serial_normalized_tsvector; Type: STATISTICS; Schema: public; Owner: -
+--
+
+CREATE STATISTICS public.bikes_serial_normalized_tsvector ON to_tsvector('simple'::regconfig, serial_normalized::text) FROM public.bikes;
 
 
 --
@@ -7913,6 +7965,17 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261017210000'),
+('20261017200000'),
+('20261017174533'),
+('20261017174532'),
+('20261017120000'),
+('20261005170000'),
+('20261005120000'),
+('20261005003717'),
+('20261004230843'),
+('20261004225108'),
+('20261004180000'),
 ('20261001170000'),
 ('20260930161510'),
 ('20260930161509'),

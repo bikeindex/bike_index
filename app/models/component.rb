@@ -102,7 +102,7 @@ class Component < ApplicationRecord
   def set_is_stock
     return true if setting_is_stock
 
-    if id.present? && is_stock && description_changed? || component_model_changed?
+    if id.present? && is_stock && (description_changed? || component_model_changed?)
       self.is_stock = false
     end
   end

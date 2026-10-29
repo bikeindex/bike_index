@@ -6,6 +6,7 @@ module Search
     before_action :render_ad
     before_action :set_interpreted_params
     around_action :set_reading_role
+    helper_method :searched?
 
     def index
       @render_results = Binxtils::InputNormalizer.boolean(params[:search_no_js]) || turbo_request?
@@ -60,19 +61,8 @@ module Search
     end
 
     def proximity_hash
-      location, coordinates = BikeSearchable.search_location(params[:location], forwarded_ip_address)
-      return {} if location.blank?
-
-      distance = GeocodeHelper.permitted_distance(params[:distance],
-        default_distance: GeocodeHelper::DEFAULT_MARKETPLACE_DISTANCE)
-      bounding_box = if coordinates.present?
-        GeocodeHelper.bounding_box(coordinates, distance)
-      else
-        GeocodeHelper.bounding_box(location, distance)
-      end
-      return {} if bounding_box.empty?
-
-      {distance:, location:, bounding_box:}
+      BikeSearchable.proximity_bounding_box(params[:location], params[:distance], forwarded_ip_address,
+        distance_unit: search_distance_unit, default_distance: GeocodeHelper::DEFAULT_MARKETPLACE_DISTANCE) || {}
     end
 
     def set_interpreted_params
@@ -93,11 +83,17 @@ module Search
 
     def permitted_search_params
       # Switching to for_sale will get location, but it doesn't currently work
-      params.permit(*Bike.permitted_search_params).merge(stolenness: "all")
+      params.permit(*Bike.permitted_search_params).merge(stolenness: "all", distance_unit: search_distance_unit)
     end
 
     def listing_search_params
       params.permit(:currency, :price_min_amount, :price_max_amount)
+    end
+
+    # Any other query param - utm_source, fbclid - isn't a search
+    def searched?
+      params.permit(*Bike.permitted_search_params, :marketplace_scope, :page).merge(listing_search_params)
+        .compact_blank.present?
     end
 
     def amount_for(value)

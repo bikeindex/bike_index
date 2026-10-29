@@ -74,6 +74,30 @@ RSpec.describe "Register flow", :js, type: :system do
     expect(page).to have_field("b_param_manufacturer_id", with: "Kona")
   end
 
+  it "registers without a draft where the browser blocks storage" do
+    errors = []
+    page.driver.with_playwright_page do |playwright_page|
+      # Chrome with site data blocked throws on any read of the property
+      playwright_page.add_init_script(script: <<~JS)
+        Object.defineProperty(window, "localStorage", {
+          get () { throw new DOMException("Access is denied for this document.", "SecurityError") }
+        })
+      JS
+      playwright_page.on("pageerror", ->(error) { errors << error.message })
+    end
+
+    visit "/register/new"
+    type_into("#b_param_manufacturer_id", "Surly")
+    click_combobox_option("Surly")
+    fill_in "b_param[owner_email]", with: owner_email
+    sleep 0.5 # past form-persist's write debounce
+    click_button "Next"
+
+    wait_for_details_step
+    expect(BParam.last).to have_attributes(manufacturer_id: manufacturer.id, owner_email:)
+    expect(errors).to eq([])
+  end
+
   it "starts a registration, keeps a full details draft across a reload, and completes" do
     ActionMailer::Base.deliveries = []
     visit "/register/new"
@@ -268,7 +292,8 @@ RSpec.describe "Register flow", :js, type: :system do
     fill_in "report[address_record_attributes][street]", with: "278 Broadway"
     fill_in "report[address_record_attributes][city]", with: "New York"
     # The whole address is required alongside the street and city the server checks
-    select state.name, from: "report[address_record_attributes][region_record_id]"
+    type_into("#report_address_record_attributes_region_record_id", state.abbreviation)
+    click_combobox_option(state.name)
     fill_in "report[address_record_attributes][postal_code]", with: "10007"
 
     click_button "Complete Bike Registration"
