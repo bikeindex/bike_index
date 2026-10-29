@@ -68,7 +68,8 @@ module ComponentStructs
 
     # Each filter's values and their labels, once — `filter_groups` lays them out,
     # `filter_values` is the set the controller permits, and `active_search_filter_descriptions`
-    # names the ones in force. feature gates the whole row; blank is the row's "not filtering".
+    # names the ones in force. feature gates the whole row, value_feature an individual
+    # option; blank is the row's "not filtering".
     FILTER_GROUPS = {
       search_stickers: {label: :stickers, feature: "bike_stickers",
                         values: {with: :filter_with_stickers_html, none: :filter_no_sticker_html}},
@@ -76,7 +77,13 @@ module ComponentStructs
                        values: {with_street: :filter_with_address_html,
                                 without_street: :filter_no_address_html}},
       search_status: {label: :status, blank: "all",
-                      values: {stolen: :filter_stolen_html, with_owner: :filter_not_stolen_or_impounded_html}},
+                      value_feature: {not_impounded: "impound_bikes", impounded: "impound_bikes",
+                                      stolen_or_impounded: "impound_bikes"},
+                      values: {not_impounded: :filter_not_impounded_html,
+                               impounded: :filter_impounded_html,
+                               stolen: :filter_stolen_html,
+                               stolen_or_impounded: :filter_stolen_or_impounded_html,
+                               with_owner: :filter_not_stolen_or_impounded_html}},
       search_unregisteredness: {label: :unregistered,
                                 values: {only_unregistered: :filter_only_unregistered_html,
                                          only_registered: :filter_not_unregistered_html}}
@@ -151,9 +158,12 @@ module ComponentStructs
     # whole row is gated off. The search permits these and nothing else
     def self.filter_values(name, organization)
       group = FILTER_GROUPS.fetch(name)
-      return [] unless group[:feature].nil? || organization.enabled?(group[:feature])
+      enabled = ->(feature) { feature.nil? || organization.enabled?(feature) }
+      return [] unless enabled.call(group[:feature])
 
-      [group[:blank] || ""] + group[:values].keys.map(&:to_s)
+      [group[:blank] || ""] + group[:values].keys.filter_map do |value|
+        value.to_s if enabled.call(group[:value_feature]&.dig(value))
+      end
     end
 
     def initialize(organization:, interpreted_params: {}, sortable_search_params: {},
@@ -201,9 +211,9 @@ module ComponentStructs
 
     # Why it's disabled - with registration addresses, only because the search reaches past them
     def location_search_disabled_hint
-      return translation(:location_search_stolen_only_search_all) if @organization.enabled?("reg_address")
+      return translation(:location_search_disabled_search_all) if @organization.enabled?("reg_address")
 
-      translation(:location_search_stolen_only_no_address, org_name: @organization.short_name)
+      translation(:location_search_disabled_no_address, org_name: @organization.short_name)
     end
 
     def render_export? = !@impound && @organization.enabled?("csv_exports")
@@ -285,7 +295,11 @@ module ComponentStructs
     end
 
     def group_entries(group)
-      group[:values].map { |value, key| {value: value.to_s, label: translation(key)} }
+      group[:values].filter_map do |value, key|
+        next unless enabled_filter?(group[:value_feature]&.dig(value))
+
+        {value: value.to_s, label: translation(key)}
+      end
     end
 
     def translation(key, **)

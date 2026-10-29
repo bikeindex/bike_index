@@ -313,7 +313,12 @@ module Organized
       return @search_status if defined?(@search_status)
 
       valid_statuses = ComponentStructs::OrgSearchSettings.filter_values(:search_status, current_organization)
-      @search_status = valid_statuses.include?(params[:search_status]) ? params[:search_status] : "all"
+      @search_status = valid_statuses.include?(params[:search_status]) ? params[:search_status] : default_status
+    end
+
+    # An impound-enabled organization's registrations leave impounded bikes out unless asked
+    def default_status
+      current_organization.enabled?("impound_bikes") ? "not_impounded" : "all"
     end
 
     # An export reaches every matched bike, so it's refused once the search has widened
