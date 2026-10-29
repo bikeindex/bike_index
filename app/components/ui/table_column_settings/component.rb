@@ -16,7 +16,7 @@ module UI
       # columns: {cell_name => label}, each cell_name a class every cell in that column carries.
       # defaults: the cell_names shown until the viewer picks. narrow_hidden: defaults that start
       # hidden below Tailwind's sm breakpoint. always_visible: checked, and can't be unchecked.
-      # hints: {cell_name => text} under its label.
+      # hints: {cell_name => text} after its label.
       # field_name makes it a form's fields instead, open and on its own: the columns' keys are
       # their values, checked: the ones checked, and the table is left alone
       def initialize(columns:, defaults:, narrow_hidden: [], always_visible: [], hints: {}, field_name: nil, checked: [])
@@ -38,7 +38,7 @@ module UI
       def checkbox_label(key, label)
         return label unless @hints[key]
 
-        safe_join([label, tag.small(@hints[key], class: "tw:block tw:text-gray-400 tw:dark:text-gray-500")])
+        safe_join([label, " ", tag.small(@hints[key], class: "tw:text-gray-400 tw:dark:text-gray-500")])
       end
 
       def checkbox_html_options(key)

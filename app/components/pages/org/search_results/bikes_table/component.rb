@@ -16,10 +16,18 @@ module Pages
             serial_number: %w[reg_extra_registration_number]
           }.freeze
 
-          def initialize(organization:, bikes:, render_sortable: false,
-            sort_state: ComponentStructs::SortState.new, bike_sticker: nil, settings: nil)
+          # The impound records' multi-update form, which the checkboxes reach with form= - here
+          # rather than on the form, which the cached rows would then have to digest
+          MULTI_UPDATE_FORM_ID = "impoundRecordsMultiUpdateForm"
+
+          # impound_records: an impound search's rows, in place of bikes - which adds the impound
+          # columns and the multi-update checkboxes, shown with multiselect_visible
+          def initialize(organization:, bikes: [], impound_records: nil, multiselect_visible: false,
+            render_sortable: false, sort_state: ComponentStructs::SortState.new, bike_sticker: nil, settings: nil)
             @organization = organization
             @bikes = bikes
+            @impound_records = impound_records
+            @multiselect_visible = multiselect_visible
             @render_sortable = render_sortable
             @sort_state = sort_state
             @bike_sticker = bike_sticker
@@ -31,7 +39,21 @@ module Pages
           # Column labels and additional fields derive from the organization alone, so bare
           # settings are enough when a caller (e.g. Wrapper) doesn't pass its own in.
           def settings
-            @settings ||= ComponentStructs::OrgSearchSettings.new(organization: @organization)
+            @settings ||= ComponentStructs::OrgSearchSettings.new(organization: @organization, impound: impound?)
+          end
+
+          def impound? = !@impound_records.nil?
+
+          def cache_key = [@organization, self.class.cache_digest, (@multiselect_visible if impound?)]
+
+          # Everything an impound row renders besides its record. The claims decide its checkbox's
+          # update kinds, and a claim's writes don't touch the record
+          def cache_records
+            ->(impound_record) { [impound_record.bike, impound_record.user, impound_record.location, impound_record.impounded_from_address_record, *impound_record.impound_claims] } if impound?
+          end
+
+          def multiselect_cell_classes
+            ["multi-update-cell table-cell-check", ("tw:hidden" unless @multiselect_visible)].compact.join(" ")
           end
 
           # The organization's fields placed after column, or with :rest the ones placed nowhere

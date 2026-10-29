@@ -2,6 +2,7 @@ import { html, nothing } from 'lit-html'
 import { amountDisplay } from 'bikebook/templates/helpers'
 import { attributes } from 'bikebook/templates/attributes'
 import { badge } from 'bikebook/templates/ui/badge'
+import { marketNote } from 'bikebook/templates/vehicles/market_note'
 
 // SharedBlocks::SearchResults::BikeCard::Component::LIST_CLASSES
 export const MODEL_CARDS_CLASSES = 'tw:grid tw:grid-cols-[repeat(auto-fill,minmax(max(14rem,calc((100%_-_3rem)/4)),1fr))] tw:gap-4'
@@ -14,8 +15,8 @@ const cardYears = ({ first_year: first, final_year: final }) => {
 
 // A catalog model as the search's cards show a bike: its photo and price, linking to `href` everywhere but its tooltips,
 // `attributes` on the link. A `toggle`'s link adds it to the comparison, or takes it out once it's `active` there; without
-// an `href` it can't
-export const modelCard = ({ model, href, placeholderUrl, currencies, toggle = false, active = false, attributes: linkAttributes = {} }) => {
+// an `href` it can't. Its markets follow its name where `market` doesn't sell it
+export const modelCard = ({ model, href, placeholderUrl, currencies, market, marketNames, toggle = false, active = false, attributes: linkAttributes = {} }) => {
   const years = cardYears(model)
   return html`<li class="tw:relative tw:flex tw:flex-col tw:rounded-xl tw:border tw:bg-white tw:transition tw:focus-within:z-10 tw:dark:bg-gray-800
   tw:[&_[data-controller~=ui--tooltip]]:relative tw:[&_[data-controller~=ui--tooltip]]:z-20 ${active
@@ -34,7 +35,7 @@ export const modelCard = ({ model, href, placeholderUrl, currencies, toggle = fa
       tw:text-white">${amountDisplay(model.msrp_cents, model.msrp_currency, currencies)}</span>`}</div><div class="tw:flex tw:flex-col tw:gap-2
   tw:px-3 tw:pt-3 tw:pb-3.5"><h3 class="tw:m-0 tw:font-sans tw:text-base tw:leading-snug tw:normal-case"><a href=${href ?? nothing}
   ${attributes(linkAttributes)} aria-disabled=${href ? nothing : 'true'} class="tw:twtext-color tw:hover:underline"><strong>${model.manufacturer_name}</strong> ${
-    model.model}${toggle ? html`<span class="tw:sr-only">, ${active ? 'remove from' : 'add to'} the comparison</span>` : nothing}<span
+    model.model}${marketNote({ markets: model.markets, market, names: marketNames })}${toggle ? html`<span class="tw:sr-only">, ${active ? 'remove from' : 'add to'} the comparison</span>` : nothing}<span
   class="tw:absolute tw:inset-0 tw:z-10"></span></a></h3>${years || model.activity_name
     ? html`<p class="tw:m-0 tw:text-sm tw:text-gray-500"><strong>${years}</strong> ${model.activity_name}</p>`
     : nothing}<div class="tw:flex tw:flex-wrap tw:items-center tw:gap-1.5">${active

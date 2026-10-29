@@ -5669,9 +5669,10 @@ es:
         in_the_past_year: en el último año
         now: ahora
         to: a
-      column_settings:
+      table_column_settings:
         all: todo
         default: por defecto
+        included_columns: Columnas incluidas
         none: ninguno
         visible_columns: Columnas visibles
     atoms:
@@ -5787,6 +5788,7 @@ es:
             view_list: Lista
             view_table: Mesa
             loading_results: Cargando resultados...
+            per_page_option: "%{number} por página"
           chart_card:
             caption_search: Búsqueda actual
             caption_year: Resumen del año pasado
@@ -5810,7 +5812,6 @@ es:
             created_at_cell: Registrado
             creation_description_cell: Fuente
             cycle_type_cell: Tipo de vehículo
-            default: por defecto
             filter_impounded_html: únicamente <strong>confiscado</strong>
             filter_no_address_html: "<strong>Sin</strong> dirección"
             filter_no_sticker_html: "<strong>Sin</strong> pegatina"
@@ -5824,7 +5825,6 @@ es:
             impound_id_cell: ID del depósito
             manufacturer_cell: Fabricante
             model_cell: Modelo
-            none: ninguno
             owner_email_cell: Enviado a
             owner_name_cell: Nombre del propietario
             propulsion_type_cell: Vehículo eléctrico (propulsión)
@@ -5840,7 +5840,6 @@ es:
             unregistered: 'No registrado:'
             updated_at_cell: Actualizado
             url_cell: URL
-            visible_columns: Columnas visibles
             notes_cell_html: Notas de registro <em>de %{org_name}</em>
             reg_organization_affiliation_cell_html: Afiliación <em>en %{org_name}</em>
             reg_student_id_cell_html: Número de identificación del estudiante <em>%{org_name}</em>
@@ -5848,9 +5847,6 @@ es:
             photo_cell: Foto
             view_cell: Vista
             acknowledgment_cell_panel: Tiempo - Secuencia de registro reconocida
-            created_at_cell_panel: Hora - registrada
-            occurred_at_cell_panel: Hora - estado
-            updated_at_cell_panel: Hora - actualizada
             filter_stolen_or_impounded_html: solo <strong>robado</strong> o <strong>confiscado</strong>
             location_search_disabled_no_address: "%{org_name} no recopila direcciones
               de registro, por lo que solo los registros robados o confiscados tienen
@@ -5859,13 +5855,35 @@ es:
               al buscar todos los registros, a menos que se busquen únicamente los
               registros incautados o robados.
             show_location_search: mostrar búsqueda de ubicación
-            included_columns: Columnas incluidas
+            all_bikes: Todas las bicicletas
+            all_statuses: Todos los estados
+            impound_location_cell: Ubicación
+            impound_status_cell: Estado de depósito
+            impound_updated_at_cell: Incautación actualizada
+            impound_updated_at_cell_panel: Hora - Registro de depósito actualizado
+            impound_user_cell: Último actualizador
+            impounded_at_cell: Incautado
+            impounded_at_cell_panel: Tiempo - Incautado
+            impounded_from_cell: Incautado de
+            only_unregistered: Solo usuarios no registrados
+            only_user_registered: Solo usuarios registrados
+            registered_cell_panel: Hora - Registrado
+            registration: 'Registro:'
+            registration_updated_cell_panel: Hora - Registro actualizado
+            resolved_at_cell: Resuelto
+            resolved_at_cell_panel: Tiempo - Resuelto
+            status_at_cell_hint: cuando es robado, confiscado, etc.
+            status_at_cell_panel: Hora - Estado
+            status_records: Registros %{status}
+            unregistered_cell: No registrado
           column_settings_toggle:
             column_settings: Configuración de columnas
           settings_and_filters:
             date_range: 'Rango de fechas:'
             search_settings_and_filters: Configuración y filtros de búsqueda
             filters: Filtros
+            impound_search: la búsqueda de vehículos incautados
+            view_in_impound_search_html: Ver en %{impound_search}
           search_all:
             search_all_html: Buscar en todos los registros <span class="twless-strong">(no
               solo en %{org_name})</span>
@@ -5877,9 +5895,8 @@ es:
             hidden: oculto
             not_registered_with: Oculto porque no está registrado con %{org_name}
             acknowledgment_title: Confirmación de la secuencia de registro en
-            occurred_at_tooltip: Cuando fue robado, confiscado, encontrado o puesto
-              a la venta
             view: Vista
+            toggle_all_checked: Activar/desactivar todas las selecciones
           multi_result_chip:
             no_results: no hay coincidencias
           multi_results:
@@ -5892,16 +5909,8 @@ es:
             view_all: ver todo
         impound_records:
           index:
-            all_bikes: Todas las bicicletas
-            all_statuses: Todos los estados
             cannot_update_with_kind: Este registro no se puede actualizar con '{kind}'.
             hide_update: Ocultar actualización
-            matching_impound_record:
-              one: registro de incautación coincidente
-              other: registros de incautación coincidentes
-            only_unregistered: Solo usuarios no registrados
-            only_user_registered: Solo usuarios registrados
-            status_records: Registros %{status}
             update_multiple_records: Actualizar varios registros
         parking_notifications:
           index:
@@ -6955,6 +6964,11 @@ es:
           any_handlebar_type: Cualquier tipo de manillar
           frame_material: Material del marco
           handlebar_type: Tipo de manillar
+          market_scope: Modelos de otros mercados
+          only_market_html: Solo %{market}
+          prefer_market_sold_in_html: Prefiero los vehículos vendidos en %{market}
+          select_a_vehicle_type: Seleccione un %{bike_type}, elija varios para compararlos.
+          select_an_vehicle_type: Seleccione un %{bike_type}, elija varios para compararlos.
         donate_strip:
           donate: Donar
           pitch: Este fantástico producto es posible gracias a la organización sin

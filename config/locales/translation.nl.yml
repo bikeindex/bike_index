@@ -5579,9 +5579,10 @@ nl:
         in_the_past_year: in het afgelopen jaar
         now: nu
         to: Naar
-      column_settings:
+      table_column_settings:
         all: Alle
         default: standaard
+        included_columns: Inbegrepen kolommen
         none: geen
         visible_columns: Zichtbare kolommen
     atoms:
@@ -5700,6 +5701,7 @@ nl:
             view_list: Lijst
             view_table: Tafel
             loading_results: Resultaten laden...
+            per_page_option: "%{number} per pagina"
           chart_card:
             caption_search: Huidige zoekopdracht
             caption_year: Overzicht van vorig jaar
@@ -5723,7 +5725,6 @@ nl:
             created_at_cell: Geregistreerd
             creation_description_cell: Bron
             cycle_type_cell: 'Voertuigtype:'
-            default: standaard
             filter_impounded_html: alleen <strong>in beslag genomen</strong>
             filter_no_address_html: alleen <strong>geen</strong> adres
             filter_no_sticker_html: alleen <strong>geen</strong> sticker
@@ -5737,7 +5738,6 @@ nl:
             impound_id_cell: Inbeslagname-ID
             manufacturer_cell: Fabrikant
             model_cell: Model
-            none: geen
             owner_email_cell: Verzonden naar
             owner_name_cell: Eigenaar naam
             propulsion_type_cell: Elektrisch voertuig (aandrijving)
@@ -5753,7 +5753,6 @@ nl:
             unregistered: 'Niet geregistreerd:'
             updated_at_cell: Bijgewerkt
             url_cell: URL
-            visible_columns: Zichtbare kolommen
             notes_cell_html: Registratienotities <em>door %{org_name}</em>
             reg_organization_affiliation_cell_html: Affiliatie <em>in %{org_name}</em>
             reg_student_id_cell_html: Studentnummer <em>voor %{org_name}</em>
@@ -5761,9 +5760,6 @@ nl:
             photo_cell: Foto
             view_cell: Weergave
             acknowledgment_cell_panel: Tijd - Registratievolgorde bevestigd
-            created_at_cell_panel: Tijd - geregistreerd
-            occurred_at_cell_panel: Tijd - status
-            updated_at_cell_panel: Tijd - bijgewerkt
             filter_stolen_or_impounded_html: alleen <strong>gestolen</strong> of <strong>in
               beslag genomen</strong>
             location_search_disabled_no_address: "%{org_name} verzamelt geen registratieadressen,
@@ -5773,13 +5769,35 @@ nl:
               het doorzoeken van alle kentekens, tenzij je alleen zoekt naar in beslag
               genomen en/of gestolen kentekens.
             show_location_search: toon locatie zoeken
-            included_columns: Inbegrepen kolommen
+            all_bikes: Alle fietsen
+            all_statuses: Alle statussen
+            impound_location_cell: Plaats
+            impound_status_cell: Inbeslagname status
+            impound_updated_at_cell: Inbeslagname bijgewerkt
+            impound_updated_at_cell_panel: Tijd - Registratie van inbeslagname bijgewerkt
+            impound_user_cell: Laatste update
+            impounded_at_cell: In beslag genomen bij
+            impounded_at_cell_panel: Tijd - In beslag genomen
+            impounded_from_cell: In beslag genomen van
+            only_unregistered: Alleen niet-geregistreerde
+            only_user_registered: Alleen geregistreerde gebruikers
+            registered_cell_panel: Tijd - Geregistreerd
+            registration: 'Registratie:'
+            registration_updated_cell_panel: Tijd - Registratie bijgewerkt
+            resolved_at_cell: Vastbesloten
+            resolved_at_cell_panel: Tijd - Opgelost
+            status_at_cell_hint: wanneer gestolen, in beslag genomen, enz.
+            status_at_cell_panel: Tijd - Status
+            status_records: "%{status} records"
+            unregistered_cell: Niet geregistreerd
           column_settings_toggle:
             column_settings: Kolominstellingen
           settings_and_filters:
             date_range: 'Datumbereik:'
             search_settings_and_filters: Zoekinstellingen en filters
             filters: Filters
+            impound_search: de in beslag genomen voertuigen doorzoeking
+            view_in_impound_search_html: Bekijken in %{impound_search}
           search_all:
             search_all_html: Zoek in alle registraties <span class="twless-strong">(niet
               alleen %{org_name})</span>
@@ -5791,9 +5809,8 @@ nl:
             hidden: verborgen
             not_registered_with: Verborgen omdat het niet is geregistreerd bij %{org_name}
             acknowledgment_title: Bevestiging van de registratieprocedure bij
-            occurred_at_tooltip: Wanneer het gestolen, in beslag genomen, teruggevonden
-              of te koop aangeboden werd
             view: Weergave
+            toggle_all_checked: Alles aangevinkt weergeven/verbergen
           multi_result_chip:
             no_results: geen overeenkomsten
           multi_results:
@@ -5807,16 +5824,8 @@ nl:
             view_all: alles bekijken
         impound_records:
           index:
-            all_bikes: Alle fietsen
-            all_statuses: Alle statussen
             cannot_update_with_kind: Dit record kan niet worden bijgewerkt met '{kind}'.
             hide_update: Update verbergen
-            matching_impound_record:
-              one: overeenkomend inbeslagname record
-              other: overeenkomende inbeslagnamegegevens
-            only_unregistered: Alleen niet-geregistreerde
-            only_user_registered: Alleen geregistreerde gebruikers
-            status_records: "%{status} records"
             update_multiple_records: Meerdere records bijwerken
         parking_notifications:
           index:
@@ -6865,6 +6874,14 @@ nl:
           any_handlebar_type: Elk type stuur
           frame_material: Frame materiaal
           handlebar_type: Type stuur
+          market_scope: Modellen uit andere markten
+          only_market_html: Alleen %{market}
+          prefer_market_sold_in_html: Geef de voorkeur aan voertuigen die verkocht
+            worden in %{market}
+          select_a_vehicle_type: Selecteer een %{bike_type}, kies meerdere om ze te
+            vergelijken
+          select_an_vehicle_type: Selecteer een %{bike_type}, kies meerdere om ze
+            te vergelijken
         donate_strip:
           donate: Schenken
           pitch: Dit fantastische product wordt u aangeboden door de non-profitorganisatie

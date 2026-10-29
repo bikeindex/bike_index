@@ -5,7 +5,7 @@ import { chosenSizes, paramList, pickedSizes, sizesParam, vehicleKeys } from 'bi
 import { comparisonTable } from 'bikebook/templates/vehicles/comparison_table'
 import { cycleDrawing } from 'bikebook/templates/vehicles/cycle_drawing'
 import { emptyState } from 'bikebook/templates/vehicles/empty_state'
-import { compareToggle, similarResults, similarSection } from 'bikebook/templates/vehicles/similar'
+import { compareToggle, similarAdjustments, similarResults, similarSection } from 'bikebook/templates/vehicles/similar'
 import { geometryOverlay, overlayFrames, seriesBorders } from 'bikebook/templates/vehicles/geometry_overlay'
 import { jumpTo, VIEWS } from 'bikebook/templates/vehicles/jump_to'
 import { modelCard } from 'bikebook/templates/vehicles/model_card'
@@ -22,12 +22,13 @@ export const MAX_COMPARE = 10
 // The compared vehicles' cards, from catalog blocks
 export class VehicleViewer {
   // `jurisdiction`'s out of class marker, evc/out_of_class/us/ca, where its law bars a Class 3's throttle, as
-  // EbikeRuleServices::StateLaws.out_of_class_ids has them
-  constructor (kit, vocabulary, jurisdiction) {
+  // EbikeRuleServices::StateLaws.out_of_class_ids has them. Model cards name the markets of those `market` doesn't sell
+  constructor (kit, vocabulary, { jurisdiction, market } = {}) {
     this.presenter = new VehiclePresenter(kit, vocabulary)
     const barred = Object.values(vocabulary.e_vehicle_classifications)
       .some((record) => record.jurisdiction === `US-${jurisdiction}` && record.class_3_throttle === false)
     this.outOfClassId = barred ? `evc/out_of_class/us/${jurisdiction.toLowerCase()}` : null
+    this.card = { placeholderUrl: kit.placeholder_url, currencies: vocabulary.currencies, market, marketNames: vocabulary.names.markets }
   }
 
   // The vehicles at `url` in the view it picks, each under its key, whose links keep its other params, compared in the
@@ -43,8 +44,7 @@ export class VehicleViewer {
       return emptyState({
         url,
         vehiclePath: (id) => pathWith(url, { vehicle_models: id }),
-        placeholderUrl: presenter.kit.placeholder_url,
-        currencies: presenter.vocabulary.currencies,
+        ...this.card,
         ...search
       })
     }
@@ -122,13 +122,12 @@ export class VehicleViewer {
     const views = {
       // the overlay while the similar models are open, each column's bottom in its frame's color
       basics: () => {
-        const overview = { presenter, vehicles, outOfClassId, removePath, groupPath: (value) => pathWith(url, { group: value }), shownGroup: group && url.searchParams.get('group') }
+        const overview = { presenter, vehicles, market: this.card.market, outOfClassId, removePath, groupPath: (value) => pathWith(url, { group: value }), shownGroup: group && url.searchParams.get('group') }
         const groupModels = group
           ? modelGroup({
             group,
             vehiclePath: (id) => pathWith(url, { vehicle_models: id, vehicle_sizes: '', group: '' }),
-            placeholderUrl: presenter.kit.placeholder_url,
-            currencies: presenter.vocabulary.currencies
+            ...this.card
           })
           : nothing
         if (!comparing || similar?.results === undefined) return html`${basics(overview)}${groupModels}`
@@ -192,19 +191,32 @@ export class VehicleViewer {
     }
     const similarModels = similar
       ? similarSection({
-        vehicle: baseline.value,
+        ...this.#similarOf(baseline, similar),
         model: modelName(presenter, baseline.data),
-        type: typeName(presenter, baseline.data).toLowerCase(),
-        vehicleType: baseline.data.type,
-        electric: present(baseline.data.motors),
-        complete: (baseline.data.model_configuration ?? 'complete') === 'complete',
-        settings: similar,
-        groups: similar.results?.groups,
         results: similar.results === undefined ? undefined : this.similarResults(url, similar.results),
         searchShown: searching(url)
       })
       : nothing
     return html`${similarModels}${jumpTo(view, (each) => pathWith(url, { view: each === 'basics' ? '' : each }), shown, searchTab)}${views[view]()}`
+  }
+
+  // The controls that rescore the models most like the first of `vehicles`, for the filters' card
+  similarAdjustments (vehicles, similar) {
+    return similar && vehicles.length ? similarAdjustments(this.#similarOf(vehicles[0], similar)) : nothing
+  }
+
+  #similarOf ({ value, data, current }, similar) {
+    return {
+      vehicle: value,
+      current,
+      type: typeName(this.presenter, data).toLowerCase(),
+      vehicleType: data.type,
+      electric: present(data.motors),
+      complete: (data.model_configuration ?? 'complete') === 'complete',
+      settings: similar,
+      groups: similar.results?.groups,
+      scored: similar.results !== undefined
+    }
   }
 
   // What opens the models most like the first of `vehicles` from the search's More filters lines, where `similar` offers them
@@ -216,7 +228,6 @@ export class VehicleViewer {
   // The cards of the models most like the first at `url`, each a link adding it to the comparison there or taking it out,
   // which renders in place, focusing it again
   similarResults (url, results) {
-    const { kit, vocabulary } = this.presenter
     const values = paramList(url, 'vehicle_models').filter(Boolean)
     const full = values.length >= MAX_COMPARE && MAX_COMPARE
     const cards = results?.models.map((model) => {
@@ -226,8 +237,7 @@ export class VehicleViewer {
       return modelCard({
         model,
         href: active || !full ? comparedPath(url, next) : null,
-        placeholderUrl: kit.placeholder_url,
-        currencies: vocabulary.currencies,
+        ...this.card,
         toggle: true,
         active,
         attributes: { id, 'data-in-place': `#${id}` }

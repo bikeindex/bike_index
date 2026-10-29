@@ -10,9 +10,13 @@ module Pages
         class Component < ApplicationComponent
           STORAGE_KEY = "orgRegistrationColumns"
 
+          # The impound records search's columns differ, so its choices are kept apart
+          IMPOUND_STORAGE_KEY = "orgImpoundColumns"
+
           # Goes on the element holding the panel and its table, which the caller renders
-          def self.column_settings_data_attributes(controllers: nil, orderable: true)
-            UI::TableColumnSettings::Component.data_attributes(storage_key: STORAGE_KEY, controllers:, orderable:)
+          def self.column_settings_data_attributes(controllers: nil, orderable: true, impound: false)
+            UI::TableColumnSettings::Component.data_attributes(storage_key: impound ? IMPOUND_STORAGE_KEY : STORAGE_KEY,
+              controllers:, orderable:)
           end
 
           # Opened from a Search::ColumnSettingsToggle the caller renders. export_headers: the
