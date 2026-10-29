@@ -26,6 +26,9 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
     expect(component.css("th").first["class"]).to include("tw:sticky")
     expect(component).to have_css("th:nth-child(2).photo_cell", text: "Photo")
     expect(component).to have_css("tbody td.color_cell", text: bike.primary_frame_color.name)
+    # A drag handle per hideable column, and none for View
+    expect(component.css("th.hideableColumn").map { it.css("[data-ui--table-column-order-target='handle']").count }.uniq).to eq [1]
+    expect(component.css("th").first.css("[data-ui--table-column-order-target='handle']")).to be_empty
   end
 
   context "with a pedal bike and an e-bike" do
@@ -70,7 +73,7 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
       %w[bike_search avery_export bike_stickers impound_bikes registration_notes registration_sequences
         reg_address reg_extra_registration_number reg_organization_affiliation reg_phone reg_student_id]
     end
-    # The panel builds a checkbox per enabled_columns entry, and org--search-column-settings
+    # The panel builds a checkbox per enabled_columns entry, and ui--table-column-settings
     # only ever reveals a column whose cell class matches a checked one
     let(:settings) { ComponentStructs::OrgSearchSettings.new(organization:) }
 
@@ -90,11 +93,12 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
       expect(header_cells.index("reg_address_cell")).to be > header_cells.index("propulsion_type_cell")
     end
 
+    # text: rather than exact_text:, past the drag handle's glyph that only CSS hides
     it "heads the columns with the shared labels" do
-      expect(component).to have_css("th.avery_cell", normalize_ws: true, exact_text: "Avery Exportable")
-      expect(component).to have_css("th.propulsion_type_cell", normalize_ws: true, exact_text: "E-vehicle (propulsion)")
+      expect(component).to have_css("th.avery_cell", normalize_ws: true, text: "Avery Exportable")
+      expect(component).to have_css("th.propulsion_type_cell", normalize_ws: true, text: "E-vehicle (propulsion)")
       expect(component).to have_css("th.notes_cell", normalize_ws: true,
-        exact_text: "Registration Notes by #{organization.short_name}")
+        text: "Registration Notes by #{organization.short_name}")
     end
   end
 
@@ -208,8 +212,8 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
   context "with caching", :caching do
     include_context :caching_basic
 
-    def render_table
-      with_request_url("/o/#{organization.to_param}/registrations") { render_inline(described_class.new(**options)) }
+    def render_table(**extra)
+      with_request_url("/o/#{organization.to_param}/registrations") { render_inline(described_class.new(**options, **extra)) }
     end
 
     it "keys each row to the organization's version" do
@@ -218,6 +222,18 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
 
       organization.update(name: "Renamed org")
       expect(fragments_written { render_table }.count).to eq 1
+    end
+
+    context "with bike_stickers enabled" do
+      let(:enabled_feature_slugs) { %w[bike_search bike_stickers] }
+      let(:bike_sticker) { FactoryBot.create(:bike_sticker, organization:) }
+
+      it "serves rows assigning a sticker from the same cache, the assign column hidden in both" do
+        expect(fragments_written { render_table }.count).to eq 1
+        expect(page).to have_css("td.assign_bike_sticker_cell.tw\\:hidden", visible: :all)
+        expect(fragments_written { render_table(bike_sticker:) }).to eq([])
+        expect(page).to have_css("td.assign_bike_sticker_cell.tw\\:hidden", visible: :all)
+      end
     end
   end
 end

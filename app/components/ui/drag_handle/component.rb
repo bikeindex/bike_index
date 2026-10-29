@@ -2,8 +2,8 @@
 
 module UI
   module DragHandle
-    # Grip for sortable_controller (and subclasses). `controller` is the Stimulus identifier
-    # that owns the list, so the handle registers as that controller's "handle" target.
+    # Grip for a drag controller - sortable_controller (and subclasses), ui--table-column-order.
+    # `controller` is its Stimulus identifier, so the handle registers as its "handle" target.
     class Component < ApplicationComponent
       def initialize(controller:, html_class: nil)
         @controller = controller

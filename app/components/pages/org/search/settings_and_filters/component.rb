@@ -38,7 +38,8 @@ module Pages
               name: group[:name],
               selected: group[:selected],
               entries: group[:entries],
-              html_options: {form: "Search_Form", data: {action: "change->org--search#filterChanged"}}
+              html_options: {form: "Search_Form",
+                             data: {restores_from_url: true, action: "change->org--search#filterChanged"}}
             )
           end
         end
