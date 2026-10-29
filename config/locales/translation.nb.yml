@@ -6665,6 +6665,13 @@ nb:
           any_handlebar_type: Alle typer styrer
           frame_material: Rammemateriale
           handlebar_type: Styre type
+          market_scope: Modeller fra andre markeder
+          only_market_html: Kun %{market}
+          prefer_market_sold_in_html: Foretrekker kjøretøy solgt i %{market}
+          select_a_vehicle_type: Velg en %{bike_type}, velg flere for å sammenligne
+            dem
+          select_an_vehicle_type: Velg en %{bike_type}, velg flere for å sammenligne
+            dem
         donate_strip:
           donate: Donere
           pitch: Dette kule produktet er levert av den ideelle organisasjonen Bike

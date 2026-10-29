@@ -6972,6 +6972,13 @@ it:
           any_handlebar_type: Qualsiasi tipo di manubrio
           frame_material: Materiale del telaio
           handlebar_type: Tipo di manubrio
+          market_scope: Modelli provenienti da altri mercati
+          only_market_html: Solo %{market}
+          prefer_market_sold_in_html: Preferire veicoli venduti in %{market}
+          select_a_vehicle_type: Seleziona un %{bike_type}, scegli più opzioni per
+            confrontarle
+          select_an_vehicle_type: Seleziona un %{bike_type}, scegli più opzioni per
+            confrontarle
         donate_strip:
           donate: Donare
           pitch: Questo fantastico prodotto è offerto dall'organizzazione no-profit
