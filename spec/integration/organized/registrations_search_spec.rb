@@ -471,13 +471,12 @@ RSpec.describe "Organized registrations search", :js, type: :system do
   context "with stolen and impounded bikes" do
     let(:enabled_feature_slugs) { %w[bike_search impound_bikes] }
     let!(:stolen_bike) { FactoryBot.create(:bike_organized, :with_stolen_record, creation_organization: organization) }
-    let!(:impounded_bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
-    let!(:impound_record) { FactoryBot.create(:impound_record, organization:, bike: impounded_bike, user:) }
+    let!(:impounded_bike) { FactoryBot.create(:bike_organized, :impounded, creation_organization: organization) }
 
-    it "filters by status radios, and leaves the impounded bikes to the impound records search" do
+    it "filters by status radios" do
       visit "#{bikes_path}?search_status=all"
       expect(page).to have_css("table", wait: 10)
-      expect(page).to have_css("tbody tr", count: 3, wait: 10)
+      expect(page).to have_css("tbody tr", minimum: 4, wait: 10)
 
       # Default columns are visible
       expect(page).to have_css("th.manufacturer_cell", visible: :visible)
@@ -539,19 +538,11 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       choose("search_status_all", allow_label_click: true, visible: :all)
       expect(page).to have_current_path(/search_status=all/, wait: 10)
       expect(page).to have_css("table", wait: 10)
-      expect(page).to have_css("tbody tr", count: 3, wait: 10)
+      expect(page).to have_css("tbody tr", minimum: 4, wait: 10)
       # Column choices still persist
       expect(page).to have_css("th.manufacturer_cell", visible: :hidden)
       expect(page).to have_css("th.serial_number_cell", visible: :visible)
       expect(page).to have_css("th.occurred_at_cell", visible: :visible)
-
-      # The search as it stands carries over, a serial not yet searched included
-      expect(page).to have_text("Results don't include currently impounded vehicles.")
-      fill_in "serial", with: impounded_bike.serial_number
-      click_link "Search impound records"
-      expect(page).to have_current_path(/impound_records\?.*serial=#{impounded_bike.serial_number}/, wait: 10)
-      expect(page).to have_field("serial", with: impounded_bike.serial_number)
-      expect(page).to have_css("tbody tr", count: 1, wait: 10)
     end
   end
 

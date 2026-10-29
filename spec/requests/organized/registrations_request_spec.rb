@@ -55,17 +55,19 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       expect(response.status).to eq(200)
       expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
     end
-    it "leaves currently impounded bikes out, and links to the impound records search" do
-      expect(impounded_bike.reload.status).to eq "status_impounded"
-      get base_url
-      expect(response.body).to include("Results don&#39;t include currently impounded vehicles.")
-      expect(response.body).to include(organization_impound_records_path(organization_id: current_organization.to_param))
+    it "includes impounded bikes, showing hidden ones only when they're the organization's" do
+      impounded_bike.update(user_hidden: true)
+      FactoryBot.create(:bike_organized, creation_organization: current_organization, user_hidden: true)
+      public_impounded_bike = FactoryBot.create(:bike, :impounded, user_hidden: true)
       get base_url, params: {search_no_js: true}
-      expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
+      expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, impounded_bike.id])
       # The impound statuses are gone, so an older link's falls back to all
       get base_url, params: {search_no_js: true, search_status: "impounded"}
       expect(assigns(:search_status)).to eq "all"
-      expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
+      expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, impounded_bike.id])
+      get base_url, params: {search_no_js: true, search_all: true}
+      expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, non_organization_bike.id])
+      expect(public_impounded_bike.reload.status).to eq "status_impounded"
     end
     describe "location search" do
       include_context :geocoder_stubbed_bounding_box
@@ -372,18 +374,15 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         expect(response.status).to eq(200)
         expect(assigns(:current_organization)).to eq current_organization
         expect(assigns(:search_stickers)).to eq "none"
-        expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
+        expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, impounded_bike.id])
         expect(session[:passive_organization_id]).to eq current_organization.id
 
         # And searching without params returns expected result
         get base_url, params: {search_no_js: true}
         expect(response.status).to eq(200)
-        expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, bike_with_sticker.id])
+        expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, bike_with_sticker.id, impounded_bike.id])
         expect(assigns(:search_stickers)).to eq false
         expect(assigns(:search_status)).to eq "all"
-        # No impound records search to link to
-        expect(response.body).to include("Results don&#39;t include currently impounded vehicles.")
-        expect(response.body).to_not include(organization_impound_records_path(organization_id: current_organization.to_param))
         expect(assigns(:interpreted_params)[:stolenness]).to eq "all"
         expect(assigns(:interpreted_params)).to match_hash_indifferently({stolenness: "all", distance_unit: "km"})
       end
