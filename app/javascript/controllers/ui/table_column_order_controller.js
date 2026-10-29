@@ -2,18 +2,22 @@ import { Controller } from '@hotwired/stimulus'
 import { storedArray } from 'utils/stored_array'
 import { storage } from 'utils/storage'
 import { moveByKey } from 'utils/drag_handle'
+import { collapse } from 'utils/collapse_utils'
 
 // Connects to data-controller='ui--table-column-order'
 // Drag a th.hideableColumn by its UI::DragHandle to move its column, or move it a place at a time
 // by the handle's arrow keys. A column is named by its *_cell class, as ui--table-column-settings
 // names it. The hideable columns follow the fixed ones, so a row's are reordered by appending them.
+// The reset target shows while they're out of the order the page rendered them in.
 // Pointer events rather than native HTML5 drag, which is dead on touch and deaf to keys
 export default class extends Controller {
-  static targets = ['handle']
+  static targets = ['handle', 'reset']
   static values = { storageKey: String }
 
   connect () {
+    this.defaultOrder = this.headers.map(header => this.cellName(header))
     this.applyOrder(storedArray(this.storageKeyValue))
+    this.#toggleReset(0)
   }
 
   disconnect () {
@@ -85,6 +89,19 @@ export default class extends Controller {
     order.splice(order.indexOf(this.cellName(target)) + (after ? 1 : 0), 0, name)
     storage.setItem(this.storageKeyValue, JSON.stringify(order))
     this.applyOrder(order)
+    this.#toggleReset()
+  }
+
+  reset () {
+    storage.removeItem(this.storageKeyValue)
+    this.applyOrder(this.defaultOrder)
+    this.#toggleReset()
+  }
+
+  #toggleReset (duration) {
+    if (!this.hasResetTarget) return
+    const moved = this.headers.some((header, index) => this.cellName(header) !== this.defaultOrder[index])
+    collapse(moved ? 'show' : 'hide', this.resetTarget, duration)
   }
 
   clearIndicator () {

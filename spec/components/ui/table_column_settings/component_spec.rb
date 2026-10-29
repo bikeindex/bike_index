@@ -13,6 +13,7 @@ RSpec.describe UI::TableColumnSettings::Component, type: :component do
     expect(component).to have_css("input[name='name_cell'][data-default='true'][data-narrow-hidden='false'][data-ui--table-column-settings-target='checkbox']")
     expect(component).to have_css("input[name='color_cell'][data-default='true'][data-narrow-hidden='true']")
     expect(component).to have_button("default")
+    expect(component).to have_css("[data-ui--table-column-order-target='reset'].tw\\:hidden\\! button", text: "return to default order", visible: :all)
   end
 
   context "with always_visible and hints" do
@@ -41,6 +42,7 @@ RSpec.describe UI::TableColumnSettings::Component, type: :component do
       expect(component).to have_field("export_headers_serial", with: "serial", checked: false)
       expect(component).to have_field("export[headers][]", with: "color", checked: true)
       expect(component.at_css("input[value='serial']")["data-default"]).to eq "true"
+      expect(component).to have_no_css("[data-ui--table-column-order-target='reset']", visible: :all)
     end
   end
 
