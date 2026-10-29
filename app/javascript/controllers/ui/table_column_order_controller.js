@@ -16,7 +16,6 @@ export default class extends Controller {
 
   // Reconnects each time applyOrder moves its header, which the shared listener makes harmless
   handleTargetConnected (handle) {
-    handle.classList.remove('tw:hidden')
     handle.draggable = true
     handle.addEventListener('mousedown', this.#clearSelection)
   }
