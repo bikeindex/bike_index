@@ -30,7 +30,7 @@
       </div>
     </div>
 
-    <%= render(UI::ColumnSettings::Component.new(columns: COLUMNS, defaults: DEFAULT_COLUMNS, narrow_hidden: %i[photo_cell recovered_at_cell])) %>
+    <%= render(UI::TableColumnSettings::Component.new(columns: COLUMNS, defaults: DEFAULT_COLUMNS, narrow_hidden: %i[photo_cell recovered_at_cell])) %>
 
     <%# Full bleed takes the table over the admin gutter, past the card, so it's clipped here %>
     <div

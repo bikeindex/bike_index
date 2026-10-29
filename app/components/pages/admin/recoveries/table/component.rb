@@ -49,7 +49,7 @@ module Pages
           end
 
           def form_data
-            data = UI::ColumnSettings::Component.data_attributes(storage_key: "adminRecoveriesColumns",
+            data = UI::TableColumnSettings::Component.data_attributes(storage_key: "adminRecoveriesColumns",
               controllers: "table-multi-checkbox admin--personal-info", orderable: true)
             data.merge(action: [data[:action], "submit->admin--personal-info#confirmDisplay"].join(" "),
               "admin--personal-info-patterns-value": PERSONAL_INFO.transform_values { {label: it[:label], source: it[:pattern].source} }.to_json)
