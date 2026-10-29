@@ -42,6 +42,7 @@ module ComponentStructs
       resolved_at_cell
       impound_status_cell
       impound_user_cell
+      impound_location_cell
       impounded_from_cell
       unregistered_cell
     ].freeze
@@ -52,16 +53,16 @@ module ComponentStructs
 
     # The panel groups the time columns under "Time - "; the table headers keep the short names
     PANEL_LABEL_KEYS = {
-      created_at_cell: :created_at_cell_panel,
-      updated_at_cell: :registration_updated_at_cell_panel,
-      occurred_at_cell: :registration_status_at_cell_panel,
+      created_at_cell: :registered_cell_panel,
+      updated_at_cell: :registration_updated_cell_panel,
+      occurred_at_cell: :status_at_cell_panel,
       acknowledgment_cell: :acknowledgment_cell_panel,
       impounded_at_cell: :impounded_at_cell_panel,
       impound_updated_at_cell: :impound_updated_at_cell_panel,
       resolved_at_cell: :resolved_at_cell_panel
     }.freeze
 
-    PANEL_HINT_KEYS = {occurred_at_cell: :registration_status_at_cell_hint}.freeze
+    PANEL_HINT_KEYS = {occurred_at_cell: :status_at_cell_hint}.freeze
 
     # Their labels name the organization, italicized with its preposition
     ORG_NAMED_COLUMNS = %i[notes_cell reg_organization_affiliation_cell reg_student_id_cell].freeze
@@ -110,6 +111,7 @@ module ComponentStructs
       "updated_at" => :impound_updated_at_cell,
       "resolved_at" => :resolved_at_cell,
       "user_id" => :impound_user_cell,
+      "location_id" => :impound_location_cell,
       "display_id_integer" => :impound_id_cell
     }.freeze
 
@@ -227,7 +229,8 @@ module ComponentStructs
       @initially_checked_columns ||= [
         *DEFAULT_COLUMNS,
         ("sticker_cell" if @organization.enabled?("bike_stickers")),
-        *(["impound_id_cell", *IMPOUND_COLUMNS] if @impound)
+        *(["impound_id_cell", *IMPOUND_COLUMNS] if @impound),
+        ("impound_location_cell" if @impound && @organization.enabled?("impound_bikes_locations"))
       ].compact
     end
 

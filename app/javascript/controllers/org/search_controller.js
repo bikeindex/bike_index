@@ -2,13 +2,12 @@ import { Controller } from '@hotwired/stimulus'
 import { collapseField } from 'utils/collapse_utils'
 import { storage } from 'utils/storage'
 
-const RESULT_VIEW_KEY = 'orgRegistrationResultView'
-
 // Connects to data-controller='org--search'
 export default class extends Controller {
   static targets = ['perPage', 'optionalField', 'optionalFieldCheckbox', 'filterSummary', 'periodLabel', 'searchAll', 'searchAllHint', 'locationSearchHint', 'impoundSearchLink']
   // What the results rendered as, so a stored preference knows whether it has anything to ask for
-  static values = { resultView: String }
+  // and where it's kept - the impound records search keeps its own
+  static values = { resultView: String, resultViewKey: { type: String, default: 'orgRegistrationResultView' } }
 
   connect () {
     this.initOptionalFields(0)
@@ -68,9 +67,9 @@ export default class extends Controller {
     if (!this.hasResultViewValue) return
     const params = new URLSearchParams(window.location.search)
     const inUrl = params.get('search_result_view')
-    if (inUrl) return storage.setItem(RESULT_VIEW_KEY, inUrl)
+    if (inUrl) return storage.setItem(this.resultViewKeyValue, inUrl)
 
-    const stored = storage.getItem(RESULT_VIEW_KEY)
+    const stored = storage.getItem(this.resultViewKeyValue)
     const frame = this.resultsFrame
     if (!stored || stored === this.resultViewValue || !frame) return
 

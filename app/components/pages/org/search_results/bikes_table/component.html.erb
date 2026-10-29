@@ -64,6 +64,12 @@
       <%= impound_record.user&.display_name&.truncate(20) %>
     <% end %>
 
+    <% if organization.enabled?("impound_bikes_locations") %>
+      <% table.column(sortable: "location_id", label: settings.column_renames[:impound_location_cell], classes: "hideableColumn impound_location_cell") do |impound_record| %>
+        <small><%= impound_record.location&.name %></small>
+      <% end %>
+    <% end %>
+
     <% table.column(label: settings.column_renames[:impounded_from_cell], classes: "hideableColumn impounded_from_cell tw:leading-none") do |impound_record| %>
       <small>
         <%= render(UI::AddressDisplay::Component.new(address_record: impound_record.impounded_from_address_record, visible_attribute: :street, kind: :single_line)) %>

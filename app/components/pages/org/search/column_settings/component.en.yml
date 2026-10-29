@@ -14,7 +14,6 @@ en:
             avery_cell: Avery Exportable
             color_cell: Color
             created_at_cell: Registered
-            created_at_cell_panel: Time - registered
             creation_description_cell: Source
             cycle_type_cell: Vehicle type
             filter_impounded_html: only <strong>impounded</strong>
@@ -29,9 +28,10 @@ en:
             filter_with_address_html: only <strong>with</strong> address
             filter_with_stickers_html: only <strong>with</strong> stickers
             impound_id_cell: Impound ID
+            impound_location_cell: Location
             impound_status_cell: Impound status
             impound_updated_at_cell: Impound updated
-            impound_updated_at_cell_panel: Time - impound record Updated
+            impound_updated_at_cell_panel: Time - Impound Record Updated
             impound_user_cell: Last updator
             impounded_at_cell: Impounded
             impounded_at_cell_panel: Time - Impounded
@@ -58,17 +58,17 @@ en:
             reg_organization_affiliation_cell_html: Affiliation <em>in %{org_name}</em>
             reg_phone_cell: Phone
             reg_student_id_cell_html: Student ID <em>for %{org_name}</em>
+            registered_cell_panel: Time - Registered
             registration: 'Registration:'
-            registration_status_at_cell_hint: When registration was stolen, impounded,
-              found or listed for sale
-            registration_status_at_cell_panel: Time - Registration status
-            registration_updated_at_cell_panel: Time - registration updated
+            registration_updated_cell_panel: Time - Registration Updated
             resolved_at_cell: Resolved
             resolved_at_cell_panel: Time - Resolved
             serial_number_cell: Serial
             show_location_search: show location search
             show_notes_search: show notes search
             status: 'Status:'
+            status_at_cell_hint: when stolen, impounded, etc
+            status_at_cell_panel: Time - Status
             status_cell: Status
             status_records: "%{status} records"
             sticker_cell: Sticker

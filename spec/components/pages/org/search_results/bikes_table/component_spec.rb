@@ -47,6 +47,7 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
       expect(component).to have_css("td.impound_id_cell", text: impound_record.display_id)
       expect(component).to have_css("td.impound_user_cell", text: impound_record.user.display_name.truncate(20))
       expect(component).to have_css("td.unregistered_cell", text: /\S/)
+      expect(component).not_to have_css("th.impound_location_cell", visible: :all)
       # The search orders by the record, so only its columns sort
       expect(component).to have_css("th.impounded_at_cell a")
       expect(component).not_to have_css("th.manufacturer_cell a")
@@ -56,6 +57,20 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
       expect(component.at_css("td.multi-update-cell")[:class]).to include("tw:hidden")
       # Ahead of the hideable columns, which reordering appends after the rest
       expect(component.css("th")[1][:class]).to include("multi-update-cell")
+    end
+
+    context "with impound_bikes_locations" do
+      let(:enabled_feature_slugs) { %w[bike_search impound_bikes impound_bikes_locations] }
+      let(:location) { FactoryBot.create(:location, organization:, name: "Back lot", impound_location: true) }
+      let(:impound_record) { FactoryBot.create(:impound_record_with_organization, organization:, bike:, location:) }
+
+      it "renders a sortable location column, checked in the panel" do
+        expect(component).to have_css("th.impound_location_cell a", text: "Location")
+        expect(component).to have_css("td.impound_location_cell", text: "Back lot")
+        settings = ComponentStructs::OrgSearchSettings.new(organization:, impound: true)
+        expect(settings.initially_checked_columns).to include("impound_location_cell")
+        expect(settings.sort_column_label("location_id")).to eq "Location"
+      end
     end
 
     it "renders when the bike was impounded, rather than when the record was created" do

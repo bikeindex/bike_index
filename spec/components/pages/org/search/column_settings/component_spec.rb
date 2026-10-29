@@ -46,10 +46,10 @@ RSpec.describe Pages::Org::Search::ColumnSettings::Component, type: :component d
   end
 
   it "labels the registration time columns, with the status column's hint" do
-    expect(component).to have_text("Time - registration updated")
-    expect(component).to have_text("Time - Registration status")
+    expect(component).to have_text("Time - Registration Updated")
+    expect(component).to have_text("Time - Status")
     expect(component.at_css("label:has(#table_column_settings_occurred_at_cell) small").text)
-      .to eq "When registration was stolen, impounded, found or listed for sale"
+      .to eq "when stolen, impounded, etc"
   end
 
   context "with impound settings" do

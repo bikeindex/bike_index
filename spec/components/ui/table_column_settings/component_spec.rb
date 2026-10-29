@@ -21,7 +21,7 @@ RSpec.describe UI::TableColumnSettings::Component, type: :component do
         always_visible: %i[view_cell], hints: {color_cell: "Frame colors"}))
     end
 
-    it "checks the always-visible column, leaving it out of the controller's reach, and hints under a label" do
+    it "checks the always-visible column, leaving it out of the controller's reach, and hints after a label" do
       expect(component).to have_field("View", checked: true, disabled: true, visible: :all)
       expect(component.at_css("input[name='view_cell']")["data-ui--table-column-settings-target"]).to be_nil
       expect(component.at_css("label:has(#table_column_settings_color_cell) small").text).to eq "Frame colors"

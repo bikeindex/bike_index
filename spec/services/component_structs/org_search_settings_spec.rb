@@ -128,9 +128,9 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
 
   describe "panel_labels" do
     it "prefixes the time columns, leaving the table headers short" do
-      expect(instance.panel_labels[:created_at_cell]).to eq "Time - registered"
-      expect(instance.panel_labels[:updated_at_cell]).to eq "Time - registration updated"
-      expect(instance.panel_labels[:occurred_at_cell]).to eq "Time - Registration status"
+      expect(instance.panel_labels[:created_at_cell]).to eq "Time - Registered"
+      expect(instance.panel_labels[:updated_at_cell]).to eq "Time - Registration Updated"
+      expect(instance.panel_labels[:occurred_at_cell]).to eq "Time - Status"
       expect(instance.panel_labels[:acknowledgment_cell]).to eq "Time - Registration sequence acknowledged"
       expect(instance.column_renames[:created_at_cell]).to eq "Registered"
       expect(instance.panel_labels[:color_cell]).to eq "Color"
@@ -152,7 +152,7 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
 
   describe "panel_hints" do
     it "explains the status time, and nothing else" do
-      expect(instance.panel_hints).to eq("occurred_at_cell" => "When registration was stolen, impounded, found or listed for sale")
+      expect(instance.panel_hints).to eq("occurred_at_cell" => "when stolen, impounded, etc")
     end
   end
 
@@ -257,7 +257,7 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
 
   describe "export_header_label" do
     it "is the panel's label, or a legacy header's own name" do
-      expect(instance.export_header_label("registered_at")).to eq "Time - registered"
+      expect(instance.export_header_label("registered_at")).to eq "Time - Registered"
       expect(instance.export_header_label("owner_email")).to eq "Sent to"
       expect(instance.export_header_label("is_stolen")).to eq "Is stolen"
       expect(instance.export_header_label("address_2")).to eq "Address 2"

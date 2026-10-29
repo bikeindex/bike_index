@@ -8,7 +8,7 @@ require "rails_helper"
 # rendered DOM. Lives at the integration layer because the controllers react
 # to the rendered DOM.
 RSpec.describe "Organized impound records index", :js, type: :system do
-  let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[parking_notifications impound_bikes]) }
+  let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[parking_notifications impound_bikes bike_search]) }
   let(:user) { FactoryBot.create(:organization_admin, organization:) }
   let(:base_url) { "/o/#{organization.to_param}/impound_records" }
 
@@ -83,6 +83,12 @@ RSpec.describe "Organized impound records index", :js, type: :system do
     expect(page).to have_current_path(/search_result_view=cards/, wait: 10)
     expect(page).to have_no_css("turbo-frame#impound_records_results_frame table")
     expect(page).to have_no_button("Update multiple records")
+    # Stored apart from the registrations search's view
+    visit "/o/#{organization.to_param}/registrations"
+    expect(page).to have_css("turbo-frame#organized_bikes_results_frame[complete] table", wait: 10)
+    expect(page).not_to have_current_path(/search_result_view/)
+    visit base_url
+    expect(page).to have_current_path(/search_result_view=cards/, wait: 10)
     click_link "Table"
     expect(page).to have_css("turbo-frame#impound_records_results_frame table tbody tr", count: 4, wait: 10)
 
