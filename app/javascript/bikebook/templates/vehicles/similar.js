@@ -60,11 +60,13 @@ const CUSTOM = tooltip({ body: 'If you change a weight, this will be selected', 
 
 const legend = (text) => html`<legend class="twlabel">${text}</legend>`
 
-// Opens the filters at the similar models' adjustments, expanded
+// Opens the filters at the similar models' adjustments, expanded - shown only while the similar models are open and the
+// filters, which have their own, closed
 const adjustToggle = html`<button type="button" data-action="bikebook--page#adjustSimilar" class=${buttonClasses({
   color: 'link',
   size: 'sm',
-  htmlClass: 'tw:ml-auto tw:hidden tw:text-sm tw:similar-open:inline-flex tw:filters-open:hidden'
+  htmlClass: 'tw:ml-auto tw:text-sm ' +
+    'tw:[:is(body:not(:has(#similar-toggle[aria-expanded=true])),body:has([aria-controls=vehicle-filters][aria-expanded=true]))_&]:hidden'
 })}><span class="tw:inline-block"><span class="tw:flex">${iconChevron()}</span></span>Adjust comparison algorithm</button>`
 
 // The controls that rescore the similar models once they're scored, collapsed at the foot of the filters' card, which
@@ -83,7 +85,7 @@ export const similarAdjustments = ({ vehicle, type, vehicleType, electric, compl
 
 // Custom is chosen only by moving a slider off every preset, each of the `listed` groups', the rest's disabled, as the
 // model has nothing of theirs to compare
-const controls = (listed, { weights, onlyCurrent, skipManufacturer, otherPropulsion, sameConfiguration, sameWheels, differentTypes }, type, propulsion, configuration, current) => {
+const controls = (listed, { weights, includeNotCurrent, skipManufacturer, otherPropulsion, sameConfiguration, sameWheels, differentTypes }, type, propulsion, configuration, current) => {
   const preset = presetOf(weights, listed)
   return html`<div class="tw:space-y-4"><fieldset aria-label="Strategy">${radioButtonGroup({
     name: 'strategy',
@@ -107,7 +109,7 @@ const controls = (listed, { weights, onlyCurrent, skipManufacturer, otherPropuls
       attributes: { id: `similar-${group}`, disabled: !scored, 'data-bikebook--similar-target': scored && 'weight' }
     })}</div>`
   })}</div></fieldset><fieldset>${legend('Other settings')}<div class="tw:mt-1 tw:space-y-1">${
-    setting('only_current', `Only show current ${type}s`, onlyCurrent ?? current, current)}${setting('skip_manufacturer', `Skip ${type}s from the same manufacturer`, skipManufacturer)}${
+    setting('include_not_current', `Include ${type}s that are not current`, includeNotCurrent ?? !current, !current)}${setting('skip_manufacturer', `Skip ${type}s from the same manufacturer`, skipManufacturer)}${
     propulsion ? setting('other_propulsion', propulsion, otherPropulsion) : nothing}${setting('same_configuration', configuration, sameConfiguration)}${
     setting('same_wheels', `Only match ${type}s with the same wheel size`, sameWheels)}${
     setting('different_types', 'Include different vehicle types', differentTypes)}</div></fieldset></div>`

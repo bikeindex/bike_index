@@ -1829,6 +1829,11 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(page).to have_current_path(/[?&]similar=1\b/)
     # its maker's others in, unless they're skipped
     expect(page).to have_css("#similar-m-aventon-2026-pace_5_rec_step_through", wait: 10)
+    # hidden with the models
+    expect(page).to have_button("Adjust comparison algorithm")
+    find("#similar-toggle").click
+    expect(page).to have_no_button("Adjust comparison algorithm").and have_no_css("[aria-label='Similar models to compare']")
+    click_on "Compare similar bikes to Level 4 REC"
     # with the filters closed, beside its toggle what opens them at the adjustments, expanded, their own toggle focused: a
     # slider for each group, those the model lists nothing of disabled
     click_on "Adjust comparison algorithm"
@@ -1925,21 +1930,21 @@ RSpec.describe "BikeBook", :js, type: :system do
     click_on "Adjust comparison algorithm", wait: 10
     expect(page).to have_field("Show matching e-bikes").and have_field("Select a bike, choose multiple to compare them")
     expect(page).to have_current_path(/[?&]search=1&filters=1&adjust=1\b/)
-    # of the models the search's market leaves, as its e-bikes are Canada's, and current ones, first of the other settings
-    # and checked as it's current - which leaves none, Canada's Haul ST no longer sold
+    # of the models the search's market leaves, as its e-bikes are Canada's, and current ones, as it's current, those no
+    # longer sold included by the first of the other settings - which leaves none, Canada's Haul ST no longer sold
     visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_rec", market: "CA", similar: 1, skip_manufacturer: 1, different_types: 1,
       search: 1, filters: 1, adjust: 1)
-    expect(page).to have_checked_field("Only show current bikes", wait: 10).and have_text("No similar models are in the catalog.")
-    expect(find("legend", exact_text: "Other settings").ancestor("fieldset").first("label")).to have_text("Only show current bikes")
+    expect(page).to have_unchecked_field("Include bikes that are not current", wait: 10).and have_text("No similar models are in the catalog.")
+    expect(find("legend", exact_text: "Other settings").ancestor("fieldset").first("label")).to have_text("Include bikes that are not current")
     # any year's, then Canada's rather than the closer US one, until any market will do
-    uncheck "Only show current bikes"
-    expect(page).to have_current_path(/[?&]only_current=0\b/)
+    check "Include bikes that are not current"
+    expect(page).to have_current_path(/[?&]include_not_current=1\b/)
     expect(page).to have_css("#similar-m-specialized-2025-haul_st_ca").and have_no_css("#similar-m-specialized-2025-haul_st")
     choose "Any market", allow_label_click: true
     expect(page).to have_css("#similar-m-specialized-2025-haul_st").and have_no_css("#similar-m-specialized-2025-haul_st_ca")
     # and one no longer sold matches any year's by default
     visit bikebook_path(vehicle_models: "m/specialized/2025/haul_st_ca", similar: 1, adjust: 1, search: 1, filters: 1)
-    expect(page).to have_unchecked_field("Only show current cargo bikes", wait: 10)
+    expect(page).to have_checked_field("Include cargo bikes that are not current", wait: 10)
     visit bikebook_path(vehicle_models: "m/segway/2025/gt3_pro", similar: 1, adjust: 1, search: 1, filters: 1)
     expect(page).to have_css("legend", exact_text: "Other settings", wait: 10)
     expect(page).to have_no_text("Show matching")
