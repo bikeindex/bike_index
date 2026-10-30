@@ -115,6 +115,11 @@ class BulkImport < ApplicationRecord
     import_errors["bikes"] == "none_imported"
   end
 
+  # Rows that matched a bike registered before this import, so registered nothing new
+  def matched_count
+    data&.dig("matched_count").to_i
+  end
+
   def ascend_unprocessable?
     ascend? && organization_id.blank?
   end
@@ -149,7 +154,16 @@ class BulkImport < ApplicationRecord
   end
 
   def no_duplicate
-    ascend? || Binxtils::InputNormalizer.boolean(data&.dig("no_duplicate"))
+    return true if ascend?
+    # Stolen and impound imports stay opt-in: a duplicate skips the row's stolen or impound record
+    return data&.dig("no_duplicate") == true if stolen? || impounded?
+
+    data&.dig("no_duplicate") != false
+  end
+
+  # Short serials (e.g. "1") are often junk shared by distinct bikes with one owner email
+  def no_duplicate_for?(serial)
+    no_duplicate && SerialNormalizer.no_space(SerialNormalizer.normalized_and_corrected(serial)).to_s.length >= 6
   end
 
   def creator
@@ -221,7 +235,7 @@ class BulkImport < ApplicationRecord
     unless creator.present?
       add_file_error("Needs to have a user or an organization with an auto user", skip_save: true)
     end
-    if finished? && bikes.count == 0
+    if finished? && bikes.count == 0 && matched_count.zero?
       import_errors["bikes"] = "none_imported"
     end
     true
