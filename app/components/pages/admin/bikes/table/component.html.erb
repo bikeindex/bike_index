@@ -106,22 +106,20 @@
   <% end %>
 
   <% table.column(label: COLUMNS[:created_by_cell], classes: "hideableColumn created_by_cell") do |bike| %>
-    <div class="tw:relative">
-      <% if bike.creation_organization.present? %>
-        <%= link_to bike.creation_organization.name, admin_organization_path(bike.creation_organization.to_param) %>
-        <%= link_to search_emoji, admin_bikes_path(organization_id: bike.creation_organization.to_param), class: "small display-sortable-link" %>
-      <% end %>
+    <% if bike.creation_organization.present? %>
+      <%= link_to bike.creation_organization.name, admin_organization_path(bike.creation_organization.to_param) %>
+      <%= link_to search_emoji, admin_bikes_path(organization_id: bike.creation_organization.to_param), class: "small display-sortable-link" %>
+    <% end %>
 
-      <% if bike.creation_kind %>
-        <span class="tw:absolute tw:right-0 tw:bottom-0 tw:text-xs tw:text-gray-400">
-          <%= render(Atoms::Org::OriginDisplay::Component.new(ownership: bike.current_ownership)) %>
+    <% if bike.creation_kind %>
+      <span class="tw:block tw:text-xs tw:text-gray-400">
+        <%= render(Atoms::Org::OriginDisplay::Component.new(ownership: bike.current_ownership)) %>
 
-          <% if bike.bulk_import.present? %>
-            <%= render(UI::ButtonLink::Component.new(href: admin_bulk_import_path(bike.bulk_import), text: "import", color: :link_gray)) %>
-          <% end %>
-        </span>
-      <% end %>
-    </div>
+        <% if bike.bulk_import.present? %>
+          <%= render(UI::ButtonLink::Component.new(href: admin_bulk_import_path(bike.bulk_import), text: "import", color: :link_gray)) %>
+        <% end %>
+      </span>
+    <% end %>
   <% end %>
 
   <% table.column(label: COLUMNS[:cred_cell], classes: "hideableColumn cred_cell tw:text-right tw:text-xs") do |bike| %>
