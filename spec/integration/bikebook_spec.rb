@@ -1816,7 +1816,13 @@ RSpec.describe "BikeBook", :js, type: :system do
 
     # a model that isn't complete says what it is in a badge after its name, in its option and its title
     index = JSON.parse(BikebookCatalogHelpers::FIXTURES.join("index.json").read)
-    index["models"].find { it["id"] == "m/specialized/2027/crux_5_s_level_sram_red_xplr" }["model_configuration"] = "frame_fork"
+    index_crux = index["models"].find { it["id"] == "m/specialized/2027/crux_5_s_level_sram_red_xplr" }
+    ended = Time.current.year
+    index_crux["model_configuration"] = "frame_fork"
+    index_crux["first_year"] = ended + 1
+    # and one current but sold ahead of the calendar is newer than a pricier one that ended this year
+    index["models"] << index_crux.merge("id" => "m/specialized/#{ended}/crux_5_s_level", "first_year" => ended, "final_year" => ended,
+      "model" => "Crux 5 S-Level", "display" => "Specialized Crux 5 S-Level (#{ended})", "msrp_cents" => 1149999)
     crux = JSON.parse(BikebookCatalogHelpers::FIXTURES.join("models/specialized/2027.json").read)
     crux["models"]["m/specialized/2027/crux_5_s_level_sram_red_xplr"]["model_configuration"] = "frame_fork"
     page.driver.with_playwright_page do |playwright_page|
@@ -1830,6 +1836,8 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(page).to have_css("[aria-label='Overview'] thead th", text: /Crux 5 S-Level - SRAM RED XPLR\s*frame & fork\z/, wait: 10)
     type_into(vehicle_field, "crux")
     expect(page).to have_css(vehicle_option, text: /Specialized Crux 5 S-Level - SRAM RED XPLR\s*frame & fork/)
+    expect(all(vehicle_option, count: 2).map { it["data-value"] }).to eq ["m/specialized/2027/crux_5_s_level_sram_red_xplr",
+      "m/specialized/#{ended}/crux_5_s_level"]
   end
 
   it "puts the first model's most alike above its views, by a strategy or adjusted weights, each added to the comparison and taken out" do
