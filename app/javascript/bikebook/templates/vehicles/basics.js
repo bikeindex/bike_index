@@ -2,11 +2,11 @@ import { html, nothing } from 'lit-html'
 import { amountDisplay, missing } from 'bikebook/templates/helpers'
 import { buttonClasses } from 'bikebook/templates/ui/button'
 import { collapse } from 'bikebook/templates/ui/collapse'
-import { copyButton } from 'bikebook/templates/ui/copy_button'
 import { table } from 'bikebook/templates/ui/table'
 import { PINNED_ROW_HEADER } from 'bikebook/templates/vehicles/comparison_table'
 import { removeLink } from 'bikebook/templates/vehicles/remove_link'
 import { basicsOf, simpleFormat } from 'bikebook/templates/vehicles/model_viewer'
+import { vehicleTitle } from 'bikebook/templates/vehicles/vehicle_title'
 import { array, isNumber, join, present } from 'bikebook/templates/values'
 
 // `only` ones once a shown model is electric, suspended, a cargo vehicle or sold outside the visitor's market, the rest once one lists it, and `differing`
@@ -33,10 +33,6 @@ const MIN_WIDTH = 'tw:min-w-[calc(12.5rem+12rem*var(--models))]!'
 // past three models, out of the page's column toward the window's edges, each model's column up to 500px
 const MAX_WIDTH = 'tw:max-w-[calc(12.5rem+500px*var(--models))]'
 
-const manufacturerLine = (manufacturer) => present(manufacturer)
-  ? html`<p class="tw:text-[11px] tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">${manufacturer}</p>`
-  : nothing
-
 // years come newest first
 const priced = (vehicle) => array(vehicle.years).find((year) => isNumber(year.original_msrp))
 
@@ -47,6 +43,7 @@ const manufacturerPage = (vehicle) => {
 }
 
 const EXCERPT_LENGTH = 200
+const MARKETS_SHOWN = 3
 
 // `text`'s first 200 characters, cut at a word and keeping its paragraphs, which a collapse swaps for the whole of it as
 // `content`
@@ -67,6 +64,18 @@ const readMore = (text, content) => {
     })}</div>`
 }
 
+// The first MARKETS_SHOWN of `names`, the rest behind a gray link saying how many there are in all, which goes with
+// the ellipsis once it shows them
+const marketList = (names) => names.length <= MARKETS_SHOWN
+  ? names.join(', ')
+  : html`<span class="tw:group/markets" data-controller="ui--collapse">${names.slice(0, MARKETS_SHOWN).join(', ')}<span
+    class="tw:group-has-[[aria-expanded=true]]/markets:hidden">…</span><span class="tw:hidden"
+    data-ui--collapse-target="content">, ${names.slice(MARKETS_SHOWN).join(', ')}</span> ${collapse({
+      color: 'link_gray',
+      htmlClass: 'tw:text-sm tw:aria-expanded:hidden',
+      content: `${names.length} total`
+    })}</span>`
+
 // shows the `value`'s group under the overview, or once it's the `shownGroup`, hides it
 const viewGroup = (groupPath, value, shownGroup) => html`<a href=${groupPath(value === shownGroup ? '' : value)}
   class=${buttonClasses({ size: 'sm', htmlClass: 'tw:ml-2' })} aria-current=${value === shownGroup ? 'true' : nothing} data-in-place="#model-group">View group</a>`
@@ -74,7 +83,7 @@ const viewGroup = (groupPath, value, shownGroup) => html`<a href=${groupPath(val
 // The models' names, photos and headline fields side by side in a table, one model's as two's, each photo with an ×
 // to the page without it at `removePath`, each column's last cell with its `bottoms` classes and the table's section with
 // its `sectionClasses`
-export const basics = ({ presenter, vehicles, outOfClassId, removePath, groupPath, shownGroup, bottoms = [], sectionClasses = '' }) => {
+export const basics = ({ presenter, vehicles, market, outOfClassId, removePath, groupPath, shownGroup, bottoms = [], sectionClasses = '' }) => {
   const shown = vehicles.map(({ data, value, outsideMarket }, index) => {
     const price = priced(data)
     const fields = basicsOf({ presenter, data, outOfClassId })
@@ -83,8 +92,9 @@ export const basics = ({ presenter, vehicles, outOfClassId, removePath, groupPat
       value,
       removeHref: removePath(index),
       model_group: fields.model_group && join([fields.model_group, viewGroup(groupPath, value, shownGroup)], ' '),
-      markets: array(data.markets).map((code) => presenter.vocabulary.names?.markets?.[code] ?? code).join(', '),
+      markets: marketList(array(data.markets).map((code) => presenter.vocabulary.names?.markets?.[code] ?? code)),
       outside_market: outsideMarket,
+      title: vehicleTitle({ manufacturer: fields.manufacturer, model: fields.model, data, value, market, configurations: presenter.kit.model_configurations }),
       years: join([fields.years, manufacturerPage(data)].filter(present), ' '),
       price: price && amountDisplay(price.original_msrp, price.original_msrp_currency, presenter.vocabulary.currencies),
       description: fields.description && readMore(data.description, fields.description)
@@ -107,8 +117,7 @@ const compared = (vehicles, fields, bottoms, sectionClasses) => html`<section ar
         label: `Remove ${[vehicle.manufacturer, vehicle.model].filter(present).join(' ')}`,
         href: vehicle.removeHref,
         corner: true
-      })}${manufacturerLine(vehicle.manufacturer)}<span class="tw:inline-flex tw:items-baseline tw:gap-1">${
-        vehicle.model}${copyButton({ value: vehicle.value, label: 'Copy ID', tooltip: true })}</span>`,
+      })}${vehicle.title}`,
       classes: 'tw:px-2.5! tw:py-2! tw:align-top',
       headerClasses: 'tw:relative',
       cellClass: ({ key }) => [key === 'description' && 'tw:text-sm', key === fields.at(-1).key && bottoms[index]].filter(Boolean).join(' '),

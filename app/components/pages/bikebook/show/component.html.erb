@@ -24,7 +24,14 @@
   >
     <%# Labels the combobox below, which renders none of its own %>
     <label class="twlabel" for="vehicle_models">
-      <%= translation(".select_a_bike") %>
+      <span
+        id="vehicle-models-label"
+        data-a-type="<%= translation(".select_a_vehicle_type", bike_type: "%{bike_type}") %>"
+        data-an-type="<%= translation(".select_an_vehicle_type", bike_type: "%{bike_type}") %>"
+      >
+        <%= translation(".select_a_bike") %>
+      </span>
+
       <small id="vehicle-models-count" class="twless-strong"></small>
     </label>
 
@@ -46,6 +53,11 @@
                        data: {controller: "bikebook--chip-reorder", repeatable: true},
                        input: {autofocus: true, data: {"bikebook--focus-shortcut-target": "field"}}}
       )) %>
+
+        <%# Each chip's grip, cloned by bikebook/catalog's renderChips, which names its chip for %{name} %>
+        <template data-chip-grip>
+          <%= render(UI::DragHandle::Component.new(controller: "bikebook--chip-reorder", label: "%{name}", html_class: "tw:mr-1")) %>
+        </template>
       <% end %>
     </div>
 
@@ -84,10 +96,9 @@
       data-ui--collapse-target="content"
       class="tw:hidden"
     >
-      <div class="twwiderow tw:pb-6">
+      <div class="twwiderow tw:pb-6 tw:similar-open:pb-0">
         <%= render(UI::Card::Component.new(full_bleed: true, additional_classes: "tw:col-span-full tw:mt-3 tw:grid tw:gap-4 tw:lg:grid-cols-2 tw:lg:items-start")) do %>
           <div class="tw:flex tw:items-baseline tw:gap-x-4 tw:lg:col-span-2">
-            <span data-similar-slot class="tw:contents"></span>
             <%= clear_filters %>
             <%= more_filters %>
           </div>
@@ -207,8 +218,22 @@
             label: translation(".handlebar_type"), placeholder: translation(".any_handlebar_type"))) %>
             </div>
 
-            <%= render(Pages::Bikebook::Show::FilterCombobox::Component.new(name: "market",
-          label: translation(".market"), placeholder: translation(".any_market"), rich_display: :inline)) %>
+            <div class="tw:flex tw:flex-col tw:gap-2">
+              <%= render(Pages::Bikebook::Show::FilterCombobox::Component.new(name: "market",
+            label: translation(".market"), placeholder: translation(".any_market"), any: false, rich_display: :inline)) %>
+
+              <fieldset
+                data-bikebook--catalog-filters-target="field marketScope"
+                data-action="change->bikebook--catalog-filters#apply"
+              >
+                <legend class="tw:sr-only">
+                  <%= translation(".market_scope") %>
+                </legend>
+
+                <%= render UI::Forms::RadioButtonGroup::Component.new(name: "market_scope", kind: :toggle, selected: "",
+                entries: market_scopes) %>
+              </fieldset>
+            </div>
 
             <div class="tw:flex tw:flex-col tw:gap-4 tw:sm:flex-row tw:sm:items-start">
               <fieldset
@@ -273,7 +298,17 @@
               </fieldset>
             </div>
           </div>
+
+          <div
+            id="similar-adjustments"
+            class="tw:empty:hidden tw:lg:col-span-2"
+          ></div>
         <% end %>
+
+        <div
+          data-similar-slot
+          class="tw:col-span-full tw:mt-3 tw:similar-open:hidden"
+        ></div>
       </div>
     </div>
   </div>

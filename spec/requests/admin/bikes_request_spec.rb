@@ -30,6 +30,19 @@ RSpec.describe Admin::BikesController, type: :request do
         expect(assigns(:user_subject)).to eq user
       end
     end
+
+    context "user_id with deleted_only" do
+      let!(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user:) }
+      let!(:bike_deleted) { FactoryBot.create(:bike, :with_ownership_claimed, user:, deleted_at: Time.current) }
+      let(:user) { FactoryBot.create(:user_confirmed) }
+      it "finds the user's deleted bikes" do
+        get base_url, params: {user_id: user.id}
+        expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
+
+        get base_url, params: {user_id: user.id, search_status_deleted_only: true}
+        expect(assigns(:bikes).pluck(:id)).to eq([bike_deleted.id])
+      end
+    end
   end
 
   describe "duplicates" do

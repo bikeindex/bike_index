@@ -3,7 +3,7 @@ import { CatalogComboboxSource, loadCatalog, renderCounts } from 'bikebook/catal
 import { hydrate, loadingShell, pickedVehicles, rescoredSimilar, unpickedVehicles } from 'bikebook/hydrate'
 import { keepPermanent, renderInto } from 'bikebook/render'
 import { readable } from 'bikebook/replace_url'
-import { searching } from 'bikebook/query'
+import { NARROWING, searching } from 'bikebook/query'
 import { collapse } from 'utils/collapse_utils'
 import { SearchLog } from 'bikebook/search_log'
 import { realigned, storePreferredSize, withSize } from 'bikebook/sizes'
@@ -98,20 +98,22 @@ export default class extends Controller {
   }
 
   // A filter changes in place, which with nothing picked the featured models and their count follow, and the picked
-  // ones a jurisdiction or market, which decide which are out of class and which are sold elsewhere, unless the page
-  // renders or the filters change again first
+  // ones a jurisdiction or market, which decide which are out of class and which are sold elsewhere, or while the similar
+  // ones are open any that narrows them, unless the page renders or the filters change again first
   async refilter () {
     const viewers = this.pageTarget.querySelector('#vehicle-viewers')
     const url = new URL(window.location.href)
     const unpicked = viewers?.querySelector(':scope > [data-controller~="bikebook--tips"]')
-    const placeChanged = ['jurisdiction', 'market'].some((name) => url.searchParams.get(name) !== this.#renderedUrl?.searchParams.get(name))
-    if (!this.catalog || !viewers || (!unpicked && !placeChanged)) return
+    const names = url.searchParams.get('similar') === '1' ? NARROWING : ['jurisdiction', 'market', 'market_scope']
+    const changed = names.some((name) => url.searchParams.get(name) !== this.#renderedUrl?.searchParams.get(name))
+    if (!this.catalog || !viewers || (!unpicked && !changed)) return
 
     const render = this.#renders
     const refilter = ++this.#refilters
-    const vehicles = await (unpicked ? unpickedVehicles : pickedVehicles)(this.catalog, this.pageTarget, url)
+    const { vehicles, adjustments } = await (unpicked ? unpickedVehicles : pickedVehicles)(this.catalog, this.pageTarget, url)
     if (render === this.#renders && refilter === this.#refilters) {
       renderInto(viewers, vehicles)
+      renderInto(this.pageTarget.querySelector('#similar-adjustments'), adjustments)
       this.#renderedUrl = url
     }
   }
@@ -119,6 +121,21 @@ export default class extends Controller {
   // The page as it is, rendered where the reader is, such as once a section that's scored when open first opens
   refresh () {
     this.#render(new URL(window.location.href), [window.scrollX, window.scrollY], { focus: false })
+  }
+
+  // The filters opened at the similar models' adjustments, expanded, from beside the similar models' toggle - and the
+  // search they're in, where a lone model hid it, as a step back can undo
+  adjustSimilar () {
+    const url = new URL(window.location.href)
+    if (!searching(url)) {
+      for (const name of ['search', 'filters', 'adjust']) url.searchParams.set(name, '1')
+      return this.#go(url, [window.scrollX, window.scrollY], { focus: '#similar-adjustments [data-ui--collapse-target~="trigger"]', reveal: true })
+    }
+    const adjust = this.pageTarget.querySelector('#similar-adjustments [data-controller~="ui--collapse"]')
+    for (const element of [this.pageTarget.querySelector('[data-controller~="bikebook--catalog-filters"]'), adjust]) {
+      this.application.getControllerForElementAndIdentifier(element, 'ui--collapse').show()
+    }
+    adjust.querySelector('[data-ui--collapse-target~="trigger"]').focus()
   }
 
   // The similar models' section opened from a toggle outside it, its own toggle taking focus

@@ -70,6 +70,19 @@ module UI
         render(UI::Button::Component.new(text: "Link Disabled", color: :link, disabled: true))
       end
 
+      # The lesser way out, beside a primary action
+      def link_gray
+        render(UI::Button::Component.new(text: "Link gray", color: :link_gray))
+      end
+
+      def link_gray_active
+        render(UI::Button::Component.new(text: "Link Gray Active", color: :link_gray, active: true))
+      end
+
+      def link_gray_disabled
+        render(UI::Button::Component.new(text: "Link Gray Disabled", color: :link_gray, disabled: true))
+      end
+
       # Filled purple primary
       def purple
         render(UI::Button::Component.new(text: "Purple", color: :purple))
@@ -94,19 +107,6 @@ module UI
 
       def yellow_disabled
         render(UI::Button::Component.new(text: "Yellow Disabled", color: :yellow, disabled: true))
-      end
-
-      # The secondary call to action on a dark band, beside a yellow one
-      def outline_white
-        render_with_template(template: "ui/button/component_preview/outline_white", locals: {text: "Outline White", active: false, disabled: false})
-      end
-
-      def outline_white_active
-        render_with_template(template: "ui/button/component_preview/outline_white", locals: {text: "Outline White Active", active: true, disabled: false})
-      end
-
-      def outline_white_disabled
-        render_with_template(template: "ui/button/component_preview/outline_white", locals: {text: "Outline White Disabled", active: false, disabled: true})
       end
 
       # @!endgroup

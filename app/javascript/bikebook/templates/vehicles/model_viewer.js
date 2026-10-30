@@ -1,6 +1,5 @@
 import { html, nothing, render } from 'lit-html'
 import { frameGeometry, OVERALL_LENGTH_ESTIMATE } from 'bikebook/frame_geometry'
-import { copyButton } from 'bikebook/templates/ui/copy_button'
 import { missing, numberDisplay } from 'bikebook/templates/helpers'
 import { collapse } from 'bikebook/templates/ui/collapse'
 import { definitionListContainer } from 'bikebook/templates/ui/definition_list/container'
@@ -14,6 +13,7 @@ import { motorSection } from 'bikebook/templates/vehicles/motor_section'
 import { bikeSummary } from 'bikebook/templates/vehicles/bike_summary'
 import { certificationBadges, certificationsOf, classBadges } from 'bikebook/templates/vehicles/page_badges'
 import { removeLink } from 'bikebook/templates/vehicles/remove_link'
+import { manufacturerLine, modelLine } from 'bikebook/templates/vehicles/vehicle_title'
 import { disclosure, section } from 'bikebook/templates/vehicles/section'
 import { andSentence, array, blank, compact, equal, except, isNumber, join, partsOf, presence, present, slice, sum, truthy, upcaseFirst } from 'bikebook/templates/values'
 
@@ -123,14 +123,14 @@ export const componentsOf = ({ presenter, vehicles, others }) => {
 
 class ModelViewer {
   // `outOfClassId` the viewing state's out of class marker, evc/out_of_class/us/ca, where its law bars a Class 3's throttle
-  constructor ({ presenter, data, value, comparing, idSuffix, others, removePath, selectedSize, sizePath, outOfClassId, lettering }) {
+  constructor ({ presenter, data, value, market, comparing, idSuffix, others, removePath, selectedSize, sizePath, outOfClassId, lettering }) {
     this.presenter = presenter
     this.kit = presenter.kit
     this.data = data
     this.vehicle = this.#normalize(data)
     this.outOfClass = outOfClassId ? this.#throttledClass3() : null
     this.others = others.map((other) => this.#normalize(other))
-    Object.assign(this, { value, comparing, idSuffix, removePath, selectedSize, sizePath, outOfClassId, lettering })
+    Object.assign(this, { value, market, comparing, idSuffix, removePath, selectedSize, sizePath, outOfClassId, lettering })
   }
 
   render () {
@@ -138,10 +138,9 @@ class ModelViewer {
     const jsonPanelId = `vehicle-model-json-${this.idSuffix}`
     const base = 'tw:flex tw:flex-col tw:gap-6 tw:transition tw:duration-300 tw:lg:flex-row tw:lg:items-stretch'
     const titleText = [vehicle.manufacturer, vehicle.model].filter(present).join(' ')
-    const header = html`<header><div class="tw:flex tw:items-start tw:gap-4">${present(vehicle.manufacturer)
-      ? html`<p class="tw:mb-1 tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">${vehicle.manufacturer}</p>`
-      : nothing}${removeLink({ label: `Remove ${titleText}`, href: this.removePath })}</div><div class="tw:flex tw:items-baseline tw:justify-between tw:gap-4"><div class="tw:text-2xl tw:leading-tight"><h1
-      class="tw:inline tw:font-extrabold">${vehicle.model}</h1> ${copyButton({ value: this.value, label: 'Copy ID', tooltip: true })}</div>${collapse({
+    const header = html`<header><div class="tw:flex tw:items-start tw:gap-4">${manufacturerLine(vehicle.manufacturer)}${
+      removeLink({ label: `Remove ${titleText}`, href: this.removePath })}</div><div class="tw:flex tw:items-baseline tw:justify-between tw:gap-4">${
+      modelLine({ model: vehicle.model, data: this.data, value: this.value, market: this.market, configurations: this.kit.model_configurations, heading: 'h1' })}${collapse({
         size: 'sm',
         htmlClass: 'tw:shrink-0 tw:whitespace-nowrap',
         attributes: { 'aria-controls': jsonPanelId, 'aria-label': 'Toggle JSON' },

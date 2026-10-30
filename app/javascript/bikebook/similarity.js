@@ -77,17 +77,16 @@ export const weightsFrom = (param) => {
   return { ...GENERAL, ...set }
 }
 
-// The URL's weights, whether skip_manufacturer=1 leaves out the model's maker's others, whether other_propulsion=1
-// matches only those electric where it isn't, or human powered where it's electric, whether same_configuration=1
-// matches only complete models where it's complete, or frames and framesets where it isn't, whether same_wheels=1
-// matches only its wheel sizes, and whether different_types=1 includes other vehicle types
+// The URL's weights, whether include_not_current=1 matches models no longer sold too or 0 only current ones, null for the
+// model's being sold no longer to decide, whether skip_manufacturer=1 leaves out the model's maker's others, whether
+// same_configuration=1 matches only complete models where it's complete, or frames and framesets where it isn't, whether same_wheels=1
+// matches only its wheel sizes
 export const settingsFrom = (params) => ({
   weights: weightsFrom(params.get('weights')),
+  includeNotCurrent: { 1: true, 0: false }[params.get('include_not_current')] ?? null,
   skipManufacturer: params.get('skip_manufacturer') === '1',
-  otherPropulsion: params.get('other_propulsion') === '1',
   sameConfiguration: params.get('same_configuration') === '1',
-  sameWheels: params.get('same_wheels') === '1',
-  differentTypes: params.get('different_types') === '1'
+  sameWheels: params.get('same_wheels') === '1'
 })
 
 export const weightsParam = (weights) => Object.keys(GROUPS).filter((group) => weights[group] !== GENERAL[group])
@@ -162,9 +161,9 @@ export const scorer = (models, { format, fields }, activities) => {
   }
 
   // The `COUNT` models most like the one `id` names by `weights`, narrowed as settingsFrom's settings say, each the
-  // closest of its model group and never of its own; and the sliders whose fields it has values for. `otherPropulsion`
-  // leaves its e-bike fields unscored, and `sameWheels` requires only the wheels it lists
-  return (id, { weights, skipManufacturer, otherPropulsion, sameConfiguration, sameWheels, differentTypes }) => {
+  // closest of its model group and never of its own, of those `included`; and the sliders whose fields it has values for.
+  // One of the other propulsion leaves its e-bike fields unscored, and `sameWheels` requires only the wheels it lists
+  return (id, { weights, includeNotCurrent, skipManufacturer, sameConfiguration, sameWheels }, included = () => true) => {
     const target = indexes.get(id)
     if (target == null) return null
 
@@ -183,16 +182,22 @@ export const scorer = (models, { format, fields }, activities) => {
       }))
     })
     const groups = [...new Set(listed.map(({ group }) => group))]
-    const weighted = listed.filter(({ group, weight }) => weight > 0 && !(otherPropulsion && group === 'ebike'))
-    const available = weighted.reduce((total, { weight }) => total + weight, 0)
-    const required = [...weighted.filter(({ group, kind }) => weights[group] === MAX_WEIGHT && REQUIRABLE.includes(kind)),
-      ...(sameWheels ? ['front_bsd', 'rear_bsd'].filter((field) => columns[field][target] != null).map((field) => ({ field, kind: 'same' })) : [])]
-    if (!available) return { groups, models: [] }
+    const wheels = sameWheels ? ['front_bsd', 'rear_bsd'].filter((field) => columns[field][target] != null).map((field) => ({ field, kind: 'same' })) : []
+    const [same, other] = [listed, listed.filter(({ group }) => group !== 'ebike')].map((fields) => {
+      const weighted = fields.filter(({ weight }) => weight > 0)
+      return {
+        weighted,
+        available: weighted.reduce((total, { weight }) => total + weight, 0),
+        required: [...weighted.filter(({ group, kind }) => weights[group] === MAX_WEIGHT && REQUIRABLE.includes(kind)), ...wheels]
+      }
+    })
+    if (!same.available) return { groups, models: [] }
 
     const scored = []
     models.forEach((candidate, index) => {
-      if (index === target || candidate.group_key === model.group_key || (candidate.electric === model.electric) === otherPropulsion ||
-        (!differentTypes && candidate.vehicle_type !== model.vehicle_type) ||
+      const { weighted, available, required } = candidate.electric === model.electric ? same : other
+      if (!available || index === target || candidate.group_key === model.group_key || !included(candidate) ||
+        (!(includeNotCurrent ?? model.final_year != null) && candidate.final_year != null) ||
         (sameConfiguration && complete(candidate) !== complete(model)) ||
         (skipManufacturer && candidate.manufacturer === model.manufacturer) ||
         required.some(({ field, kind, scale }) => columns[field][index] == null || KINDS[kind](columns[field][target], columns[field][index], scale) > 0)) return

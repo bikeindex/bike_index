@@ -69,6 +69,13 @@ RSpec.describe Pages::Org::RegistrationSequence::PageForm::Component, :js, type:
       expect(first_bullet).to have_text("Store safely")
     end
 
+    expect_stale_after do
+      all("[aria-label='Move bullet']").first.send_keys(:down)
+
+      expect(first_bullet).to have_text("Store safely")
+      expect(page).to have_css("#drag-handle-status", text: "Position 2 of 2", visible: :all)
+    end
+
     # A new bullet row is new markup to audit
     click_button "+ Add bullet"
     expect(page).to have_css("lexxy-editor", count: 3, wait: 10)
