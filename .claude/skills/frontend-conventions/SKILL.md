@@ -8,8 +8,8 @@ description: >-
   (every button is `UI::Button`/`UI::ButtonLink`, every
   typeahead/autocomplete is `UI::Forms::Combobox`, every FAQ is
   `UI::Accordion`, never hand-rolled
-  markup; existing components before new ones, and no new `UI::*` argument
-  without the user's permission), that **helpers are deprecated — render a view component
+  markup; existing components before new ones — never a wrapper around one to
+  dodge asking for a new `UI::*` argument, which needs the user's permission), that **helpers are deprecated — render a view component
   taking full keyword arguments instead of adding or extending one**,
   ViewComponent rules (when to write a partial instead, keyword arguments, instance variables,
   `helpers.` prefix in templates), and `UI::Time::Component` for every
@@ -163,7 +163,7 @@ Bundle only what's cohesive — one subject, assembled in one place. `IndexState
 
 This project uses the ViewComponent gem to render components.
 
-- **Prefer an existing component to a new one.** Before creating one, look for a component that already renders the pattern — in `ui/`, `atoms/` and the sibling `pages/` namespaces — and render that.
+- **Prefer an existing component to a new one, extended if needed.** Before creating one, look for a component that already renders the pattern or its core — in `ui/`, `atoms/` and the sibling `pages/` namespaces. A new component whose template is mostly one existing `UI::*` component plus chrome is that component with an argument: ask to extend it (the no-new-argument rule above) rather than wrapping it to avoid asking. `UI::BulkTableCard`, folded into `UI::CardTable`'s `column_settings:`, is the pattern.
 - **Before creating a component, check it earns its class.** If its `component.rb` would hold nothing but `initialize` assigning arguments to ivars, and fewer than 3 callers render it, write a partial instead, with `<%# locals: (…) %>` at the top. An admin index table on `UI::Table` is the usual case: `admin/strava_gears/_table.html.erb` is the pattern, and `Pages::Admin::IndexSkeleton` renders the `_table` partial without a `table_view:`. A component earns its class with logic to name, a cache key to build, or a third caller; past that bar, prefer components to partials.
 - **If a view file only renders a single component, consider rendering it from the controller instead** (`render Foo::Component.new(...)`) and deleting the view file — the layout still wraps it.
 - Generate a new view component with `rails generate component ComponentName argument1 argument2`.
