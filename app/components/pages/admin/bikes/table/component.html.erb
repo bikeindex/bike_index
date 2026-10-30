@@ -3,10 +3,6 @@
   <style>.display-mnfg-link {display: none !important;}</style>
 <% end %>
 
-<% if @skip_user %>
-  <style>.user_cell {display: none !important;}</style>
-<% end %>
-
 <% unless @render_sortable %>
   <style>.display-sortable-link {display: none !important;}</style>
 <% end %>
@@ -15,8 +11,8 @@
   <style>.ui-table thead {display: none !important;}</style>
 <% end %>
 
-<%# The checkbox column is in the cached rows only where it renders %>
-<%= render(UI::CardTable::Component.new(records: @bikes, cache_key: [self.class.cache_digest, (:multi_check if @render_multi_check)].compact,
+<%# A column only some callers render is in the cached rows, so it keys them %>
+<%= render(UI::CardTable::Component.new(records: @bikes, cache_key: [self.class.cache_digest, (:multi_check if @render_multi_check), (:skip_user if @skip_user)].compact,
   render_sortable: @render_sortable, sort_state: @sort_state, **card_options,
   data: {controller: "update-cached-sortable-links", "update-cached-sortable-links-base-url-value": url_for(@sort_state.search_params)})) do |table| %>
   <% if @render_multi_check %>
@@ -37,22 +33,24 @@
     <%= render UI::Time::Component.new(time: bike.updated_by_user_fallback) %>
   <% end %>
 
-  <% table.column(sortable: "owner_email", label: COLUMNS[:user_cell], classes: "hideableColumn user_cell") do |bike| %>
-    <div class="tw:relative">
-      <%# Pass in search_url because caching breaks with url_for %>
-      <% search_url = bike.user.present? ? admin_bikes_path(user_id: bike.user.id) : admin_bikes_path(search_email: bike.owner_email) %>
-      <%= render Atoms::Admin::TableCells::User::Component.new(email: bike.owner_email, user: bike.user, search_url:, render_search: true) %>
+  <% unless @skip_user %>
+    <% table.column(sortable: "owner_email", label: COLUMNS[:user_cell], classes: "hideableColumn user_cell") do |bike| %>
+      <div class="tw:relative">
+        <%# Pass in search_url because caching breaks with url_for %>
+        <% search_url = bike.user.present? ? admin_bikes_path(user_id: bike.user.id) : admin_bikes_path(search_email: bike.owner_email) %>
+        <%= render Atoms::Admin::TableCells::User::Component.new(email: bike.owner_email, user: bike.user, search_url:, render_search: true) %>
 
-      <% if bike.claimed? %>
-        <span
-          class="tw:absolute tw:top-0 tw:right-0 <%= UI::Alerts::Base::Component::TEXT_CLASSES[:notice] %>"
-          title="<%= bike.type %> is claimed"
-          style="cursor: default"
-        >
-          <%= check_mark %>
-        </span>
-      <% end %>
-    </div>
+        <% if bike.claimed? %>
+          <span
+            class="tw:absolute tw:top-0 tw:right-0 <%= UI::Alerts::Base::Component::TEXT_CLASSES[:notice] %>"
+            title="<%= bike.type %> is claimed"
+            style="cursor: default"
+          >
+            <%= check_mark %>
+          </span>
+        <% end %>
+      </div>
+    <% end %>
   <% end %>
 
   <% table.column(sortable: "manufacturer_id", label: COLUMNS[:manufacturer_cell], classes: "hideableColumn manufacturer_cell") do |bike| %>

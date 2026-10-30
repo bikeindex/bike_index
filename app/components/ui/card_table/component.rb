@@ -8,6 +8,7 @@ module UI
     class Component < ApplicationComponent
       # Template Dependency: UI::Card::Component
       renders_one :description
+      # Rendered in both the header and the footer, so a form field here submits twice - it goes in description
       renders_one :actions
 
       # Descendant selectors, so they outrank the cell classes UI::Table gives every column

@@ -11,7 +11,6 @@
 <%= render(UI::CardTable::Component.new(records: @bikes,
   column_settings: {storage_key: "adminMissingManufacturerColumns", columns: COLUMNS, defaults: COLUMNS.keys, narrow_hidden: %i[created_by_cell]},
   form: {url: update_manufacturers_admin_bikes_path, method: :post})) do |table| %>
-  <%# Not in actions, which renders twice and would submit a second, blank manufacturer %>
   <% table.with_description do %>
     <div class="tw:flex tw:flex-wrap tw:items-end tw:gap-2">
       <%= render(UI::Forms::Group::Component.new(attribute: :manufacturer_id, label_text: Manufacturer.model_name.human, wrapper_class: "tw:mb-0 tw:min-w-64")) do %>

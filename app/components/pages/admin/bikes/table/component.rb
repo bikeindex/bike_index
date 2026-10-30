@@ -38,9 +38,9 @@ module Pages
           def card_options
             return {} if @no_show_header
 
-            defaults = @show_serial ? COLUMNS.keys : COLUMNS.keys - [:serial_cell]
-            column_settings = {storage_key: "adminBikesColumns", columns: @skip_user ? COLUMNS.except(:user_cell) : COLUMNS,
-                               defaults:, narrow_hidden: %i[updated_cell user_cell info_cell cred_cell]}
+            columns = @skip_user ? COLUMNS.except(:user_cell) : COLUMNS
+            defaults = @show_serial ? columns.keys : columns.keys - [:serial_cell]
+            column_settings = {storage_key: "adminBikesColumns", columns:, defaults:, narrow_hidden: %i[updated_cell user_cell info_cell cred_cell]}
             form = {url: get_destroy_admin_bike_path(id: "multi_delete"), method: :get} if @render_multi_check
             {column_settings:, form:}
           end

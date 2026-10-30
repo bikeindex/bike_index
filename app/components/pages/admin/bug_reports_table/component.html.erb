@@ -2,7 +2,6 @@
   column_settings: {storage_key: "adminBugReportsColumns", columns: COLUMNS, defaults: COLUMNS.keys, narrow_hidden: %i[receiver_cell member_cell invoiced_cell pull_request_cell]},
   form: {url: assign_tags_admin_bug_reports_path, method: :post},
   data: {controller: "update-cached-sortable-links", "update-cached-sortable-links-base-url-value": url_for(@sort_state.search_params)})) do |table| %>
-  <%# Not in actions, which renders twice and would submit a second, blank tags field %>
   <% table.with_description do %>
     <div class="tw:flex tw:flex-wrap tw:items-end tw:gap-2">
       <%= render(UI::Forms::Group::Component.new(attribute: :tags, label_text: "Tag to assign", wrapper_class: "tw:mb-0 tw:min-w-64")) do %>
