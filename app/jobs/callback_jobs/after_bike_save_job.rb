@@ -14,6 +14,7 @@ module CallbackJobs
       bike.update(updated_at: Time.current) && bike.reload if resave_bike
       bike.load_external_images
       update_matching_partial_registrations(bike)
+      BikeJobs::PosRegistrationMatchFinderJob.perform_async(bike_id) if new_bike?(bike)
       BikeJobs::DuplicateBikeFinderJob.perform_async(bike_id)
       if bike.present? && bike.listing_order != bike.calculated_listing_order
         bike.update_attribute :listing_order, bike.calculated_listing_order
@@ -58,8 +59,10 @@ module CallbackJobs
       }
     end
 
+    def new_bike?(bike) = bike.created_at > Time.current - 5.minutes
+
     def update_matching_partial_registrations(bike)
-      return true unless bike.created_at > Time.current - 5.minutes # skip unless new bike
+      return true unless new_bike?(bike)
 
       matches = BikeServices::Register.matching_partial_registrations(bike)
       return true if matches.none?
