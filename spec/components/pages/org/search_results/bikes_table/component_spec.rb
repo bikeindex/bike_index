@@ -3,17 +3,16 @@
 require "rails_helper"
 
 RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :component do
-  let(:instance) { described_class.new(**options) }
-  let(:component) do
-    with_request_url("/o/#{organization.to_param}/registrations") do
-      render_inline(instance)
-    end
-  end
+  let(:component) { render_table }
   let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs:) }
   let(:enabled_feature_slugs) { %w[bike_search] }
   let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
   let(:bikes) { [bike] }
   let(:options) { {organization:, bikes:} }
+
+  def render_table(**overrides)
+    with_request_url("/o/#{organization.to_param}/registrations") { render_inline(described_class.new(**options, **overrides)) }
+  end
 
   it "renders a table row with the bike data" do
     expect(component).to have_css("table")
@@ -29,6 +28,69 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
     # A drag handle per hideable column, and none for View
     expect(component.css("th.hideableColumn").map { it.css("[data-ui--table-column-order-target='handle']").count }.uniq).to eq [1]
     expect(component.css("th").first.css("[data-ui--table-column-order-target='handle']")).to be_empty
+  end
+
+  context "with impound_records" do
+    let(:enabled_feature_slugs) { %w[bike_search impound_bikes] }
+    let(:impound_record) { FactoryBot.create(:impound_record_with_organization, organization:, bike:, unregistered_bike: true) }
+    let(:options) do
+      {organization:, impound_records: [impound_record], render_sortable: true,
+       sort_state: ComponentStructs::SortState.new(sort: "impounded_at", direction: "desc")}
+    end
+
+    it "renders the record's bike, its impound columns, and a hidden multi-update checkbox" do
+      expect(component).to have_css("tbody tr", count: 1)
+      expect(component).to have_text(bike.mnfg_name)
+      expect(component).to have_css("td.impounded_at_cell a[href*='/impound_records/#{impound_record.display_id}']")
+      expect(component).to have_css("td.impound_status_cell", text: impound_record.status_humanized_short)
+      expect(component).to have_css("th.resolved_at_cell a", text: "Resolved")
+      expect(component).to have_css("td.impound_id_cell", text: impound_record.display_id)
+      expect(component).to have_css("td.impound_user_cell", text: impound_record.user.display_name.truncate(20))
+      expect(component).to have_css("td.unregistered_cell", text: /\S/)
+      expect(component).not_to have_css("th.impound_location_cell", visible: :all)
+      # The search orders by the record, so only its columns sort
+      expect(component).to have_css("th.impounded_at_cell a")
+      expect(component).not_to have_css("th.manufacturer_cell a")
+      expect(component).not_to have_css("th.occurred_at_cell [data-controller='ui--tooltip']")
+      checkbox = component.at_css("td.multi-update-cell input[type='checkbox']")
+      expect(checkbox[:form]).to eq Pages::Org::SearchResults::BikesTable::Component::MULTI_UPDATE_FORM_ID
+      expect(component.at_css("td.multi-update-cell")[:class]).to include("tw:hidden")
+      # Ahead of the hideable columns, which reordering appends after the rest
+      expect(component.css("th")[1][:class]).to include("multi-update-cell")
+    end
+
+    context "with impound_bikes_locations" do
+      let(:enabled_feature_slugs) { %w[bike_search impound_bikes impound_bikes_locations] }
+      let(:location) { FactoryBot.create(:location, organization:, name: "Back lot", impound_location: true) }
+      let(:impound_record) { FactoryBot.create(:impound_record_with_organization, organization:, bike:, location:) }
+
+      it "renders a sortable location column, checked in the panel" do
+        expect(component).to have_css("th.impound_location_cell a", text: "Location")
+        expect(component).to have_css("td.impound_location_cell", text: "Back lot")
+        settings = ComponentStructs::OrgSearchSettings.new(organization:, impound: true)
+        expect(settings.initially_checked_columns).to include("impound_location_cell")
+        expect(settings.sort_column_label("location_id")).to eq "Location"
+      end
+    end
+
+    it "renders when the bike was impounded, rather than when the record was created" do
+      impound_record.update(impounded_at: Time.current - 1.week)
+      expect(component).to have_css("td.impounded_at_cell .localizeTime",
+        exact_text: I18n.l(impound_record.impounded_at, format: :convert_time))
+    end
+
+    context "with caching", :caching do
+      include_context :caching_basic
+
+      it "busts the row when a claim is submitted, which leaves the record untouched" do
+        render_table(impound_records: [impound_record.reload])
+        expect(page.find("td.multi-update-cell input", visible: :all)["data-update-kinds"]).to include("transferred_to_new_owner")
+
+        FactoryBot.create(:impound_claim, impound_record:, organization:, status: "submitting")
+        expect(fragments_written { render_table(impound_records: [impound_record.reload]) }.count).to eq 1
+        expect(page.find("td.multi-update-cell input", visible: :all)["data-update-kinds"]).not_to include("transferred_to_new_owner")
+      end
+    end
   end
 
   context "with a pedal bike and an e-bike" do
@@ -211,10 +273,6 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
   # Which columns render follows the organization's features and fields
   context "with caching", :caching do
     include_context :caching_basic
-
-    def render_table(**extra)
-      with_request_url("/o/#{organization.to_param}/registrations") { render_inline(described_class.new(**options, **extra)) }
-    end
 
     it "keys each row to the organization's version" do
       expect(fragments_written { render_table }.first).to include(organization.cache_key_with_version)
