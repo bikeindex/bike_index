@@ -11,6 +11,10 @@ module Pages
         def render?
           @marketplace_listing.present?
         end
+
+        private
+
+        def show_shipping? = Flipper.enabled?(:marketplace_shipping, @marketplace_listing.seller)
       end
     end
   end
