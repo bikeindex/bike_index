@@ -153,17 +153,17 @@ class BulkImport < ApplicationRecord
     data["no_duplicate"] = Binxtils::InputNormalizer.boolean(val)
   end
 
-  # Stolen and impound imports stay opt-in: a duplicate skips the row's stolen or impound record
   def no_duplicate
     return true if ascend?
+    # Stolen and impound imports stay opt-in: a duplicate skips the row's stolen or impound record
+    return data&.dig("no_duplicate") == true if stolen? || impounded?
 
-    (stolen? || impounded?) ? data&.dig("no_duplicate") == true : data&.dig("no_duplicate") != false
+    data&.dig("no_duplicate") != false
   end
 
   # Short serials (e.g. "1") are often junk shared by distinct bikes with one owner email
   def no_duplicate_for?(serial)
-    ascend? || (no_duplicate &&
-      SerialNormalizer.no_space(SerialNormalizer.normalized_and_corrected(serial)).to_s.length >= 6)
+    no_duplicate && SerialNormalizer.no_space(SerialNormalizer.normalized_and_corrected(serial)).to_s.length >= 6
   end
 
   def creator
