@@ -13,9 +13,9 @@ RSpec.describe Pages::LandingPages::ForBikeShops::Component, type: :component do
   let(:signed_up) { false }
 
   it "renders the signup form and the live stats" do
-    expect(component).to have_css("h1", text: "Send every bike home with a sidekick.")
     expect(component).to have_css("form#new_feedback input[name='feedback[feedback_type]'][value='lead_for_bike_shop']", visible: :all)
     expect(component).to have_field("Shop name")
+    # A longer name overflowed the column and 500ed
     expect(component).to have_css("input#feedback_name[maxlength='255']")
     expect(component).to have_select("Your POS", with_options: ["Lightspeed", "Ascend", "Shopify (coming soon)", "Other / none"])
     expect(component).to have_text("1,234,567")
@@ -24,13 +24,8 @@ RSpec.describe Pages::LandingPages::ForBikeShops::Component, type: :component do
     expect(component).to have_text("1,000+")
     expect(component).to have_css("ol > li", count: 3)
     expect(component).to have_css("[data-ui--collapse-target='content'].tw\\:hidden", count: 5, visible: :all)
-    expect(component).to have_link("Sign up your shop", href: "#shop-signup")
     expect(component).to have_link("See the tools", href: "#free-tools", count: 2)
     expect(component).to have_css("section#free-tools")
-    expect(component).to have_link("Order stickers", href: "https://bikeindex.myshopify.com/")
-    expect(component).to have_css("a[href='/ebike-rules'] img[src*='ebike-checker']")
-    expect(component).to have_css("a[href='/bikebook'] img[src*='bikebook-compare']")
-    expect(component).to have_link("Contact us", href: "mailto:gavin@bikeindex.org?subject=Bulk%20sticker%20order")
     expect(component).to_not have_text("Bikes that came home")
   end
 

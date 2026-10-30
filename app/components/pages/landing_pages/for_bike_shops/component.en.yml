@@ -6,13 +6,13 @@ en:
         for_bike_shops:
           a_reason_to_trust_you: A reason to trust you.
           a_reason_to_trust_you_body: A free perk that shows you care after the sale.
-          bike_book: Bike Book
+          bike_book: BikeBook
           bike_book_body: >-
             Compare specifications, geometry, and a host of other features across
             thousands of bike models.
           bikes_registered_free: bikes registered, free
           bikes_that_came_home: Bikes that came home
-          browse_bike_book: Browse Bike Book
+          browse_bike_book: Browse BikeBook
           bulk_order_email_subject: Bulk sticker order
           check_your_state: Check your state
           choose_your_pos: Choose your POS
