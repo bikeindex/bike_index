@@ -30,6 +30,12 @@
           %em.small.less-strong= t(".file_removed_explanation")
         - else
           = link_to @bulk_import.file_url.truncate(100), @bulk_import.file_url
+    - if @bulk_import.matched_count.positive?
+      %tr
+        %td
+          = t(".matched_count")
+        %td
+          = number_with_delimiter(@bulk_import.matched_count)
     %tr
       %td
         = t(".creator")

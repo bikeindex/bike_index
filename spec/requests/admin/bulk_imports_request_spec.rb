@@ -28,6 +28,13 @@ RSpec.describe Admin::BulkImportsController, type: :request do
       action = "/admin/bulk_imports/#{bulk_import.id}?reprocess=true"
       expect(Capybara.string(response.body)).to have_css("form[action='#{action}'] input[name=_method][value=put]", visible: :hidden)
     end
+    context "with matching rows" do
+      let!(:bulk_import) { FactoryBot.create(:bulk_import, data: {"matched_count" => 3}) }
+      it "renders the count" do
+        get "#{base_url}/#{bulk_import.id}"
+        expect(Capybara.string(response.body)).to have_text("3 rows matching existing registrations")
+      end
+    end
   end
 
   describe "new" do

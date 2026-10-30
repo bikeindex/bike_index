@@ -481,6 +481,17 @@ RSpec.describe BulkImportJob, type: :job do
     it "creates one bike" do
       expect { instance.perform(bulk_import.id) }.to change(Bike, :count).by 1
       expect(bulk_import.reload.import_errors).to be_blank
+      # The repeated row matched a bike this import registered
+      expect(bulk_import.matched_count).to eq 0
+    end
+    context "file uploaded again" do
+      let(:bulk_import2) { FactoryBot.create(:bulk_import, progress: "pending", **bulk_import_attrs) }
+      it "counts the matching rows, and isn't empty" do
+        instance.perform(bulk_import.id)
+        expect { described_class.new.perform(bulk_import2.id) }.to change(Bike, :count).by 0
+        expect(bulk_import2.reload).to have_attributes(matched_count: 2, no_bikes?: false, import_errors: {})
+        expect(BulkImport.no_bikes.pluck(:id)).to eq([])
+      end
     end
     context "no_duplicate: false" do
       let(:bulk_import_attrs) { {no_duplicate: false} }

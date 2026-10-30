@@ -81,6 +81,8 @@ class BulkImportJob < ApplicationJob
 
     @bulk_import.unlink_tempfile
     @bulk_import.progress = "finished"
+    # Set after process_csv, since it reloads the import
+    @bulk_import.data = (@bulk_import.data || {}).merge("matched_count" => @matched_count) if @matched_count.to_i.positive?
     return @bulk_import.save unless @line_errors.any?
 
     # Using update_attribute here to avoid validation checks that sometimes block updating postgres json in rails
@@ -91,6 +93,7 @@ class BulkImportJob < ApplicationJob
 
   def process_csv(open_file)
     @line_errors = @bulk_import.line_errors || [] # We always need line_errors
+    @matched_count = @bulk_import.matched_count
     return false if @bulk_import.finished? # If url fails to load, this will catch
 
     # Grab the first line of the csv (which is the header line) and transform it
@@ -109,7 +112,12 @@ class BulkImportJob < ApplicationJob
       break false if @bulk_import.finished? # Means there was an error or we marked finished separately, so noop
 
       bike = register_bike(row_to_b_param_hash(row.to_h))
-      next if bike.blank? || bike.id.present?
+      next if bike.blank?
+      if bike.id.present?
+        # A bike this import registered has its ownership, so a repeated row isn't counted
+        @matched_count += 1 unless bike.ownerships.where(bulk_import_id: @bulk_import.id).exists?
+        next
+      end
 
       @line_errors << [row_index, bike.cleaned_error_messages]
     end

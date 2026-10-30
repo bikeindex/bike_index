@@ -115,6 +115,11 @@ class BulkImport < ApplicationRecord
     import_errors["bikes"] == "none_imported"
   end
 
+  # Rows that matched a bike registered before this import, so registered nothing new
+  def matched_count
+    data&.dig("matched_count").to_i
+  end
+
   def ascend_unprocessable?
     ascend? && organization_id.blank?
   end
@@ -230,7 +235,7 @@ class BulkImport < ApplicationRecord
     unless creator.present?
       add_file_error("Needs to have a user or an organization with an auto user", skip_save: true)
     end
-    if finished? && bikes.count == 0
+    if finished? && bikes.count == 0 && matched_count.zero?
       import_errors["bikes"] = "none_imported"
     end
     true
