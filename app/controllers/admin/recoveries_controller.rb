@@ -12,8 +12,7 @@ module Admin
 
     def index
       @per_page = permitted_per_page(default: 50)
-      @pagy, @recoveries = pagy(:countish, available_recoveries.reorder(sortable_order(StolenRecord))
-        .includes(:country, :region_record, :recovery_display, :recovering_user), limit: @per_page, page: permitted_page)
+      @pagy, @recoveries = pagy(:countish, available_recoveries.reorder(sortable_order(StolenRecord)), limit: @per_page, page: permitted_page)
     end
 
     def bulk_update
@@ -68,33 +67,44 @@ module Admin
 
     # Each returns how many it changed
     def bulk_display(recoveries)
-      errors = recoveries.to_h { [it.id, display_error(it)] }.compact
-      if errors.any?
-        flash[:error] = "Unable to display: #{errors.map { |id, error| "##{id} #{error}" }.join("; ")}"
-        @failed_edits = errors.keys.index_with { display_edits(it) }
-      end
+      errors = bulk_errors("display", recoveries) { display_error(it) }
+      @failed_edits = errors.keys.index_with { display_edits(it) } if errors.any?
       recoveries.size - errors.size
     end
 
     def bulk_not_displayed(recoveries)
-      recoveries.count { it.update(recovery_display_status: "not_displayed") }
+      recoveries.size - bulk_errors("mark not displayable", recoveries) { not_displayed_error(it) }.size
     end
 
-    # Returns why it wasn't displayed, if it wasn't. Edits go to the display, not the recovery,
-    # which keeps what the owner wrote
+    # The lock makes a concurrent submit wait, then see what it did. Returns {id => error}
+    def bulk_errors(verb, recoveries)
+      errors = recoveries.to_h { |stolen_record| [stolen_record.id, stolen_record.with_lock { yield stolen_record }] }.compact
+      flash[:error] = "Unable to #{verb}: #{errors.map { |id, error| "##{id} #{error}" }.join("; ")}" if errors.any?
+      errors
+    end
+
+    # Edits go to the display, not the recovery, which keeps what the owner wrote
     def display_error(stolen_record)
       bike = Bike.unscoped.find_by_id(stolen_record.bike_id)
       return "bike is hidden" if bike.present? && !bike.current?
 
-      # The lock makes a concurrent submit wait, then see this display
-      stolen_record.with_lock do
-        next "is already displayed" if RecoveryDisplay.unscoped.exists?(stolen_record_id: stolen_record.id)
+      decided = decided_error(stolen_record)
+      return decided if decided
 
-        attributes = RecoveryDisplay.attributes_from_stolen_record(stolen_record, bike:).merge(display_edits(stolen_record.id))
-        recovery_display = RecoveryDisplay.new(attributes.merge(quote_by: RecoveryDisplay.first_name(attributes[:quote_by]),
-          remote_photo_url: bike&.image_url))
-        recovery_display.errors.full_messages.to_sentence unless recovery_display.save
-      end
+      attributes = RecoveryDisplay.attributes_from_stolen_record(stolen_record, bike:).merge(display_edits(stolen_record.id))
+      recovery_display = RecoveryDisplay.new(attributes.merge(remote_photo_url: bike&.image_url))
+      recovery_display.errors.full_messages.to_sentence unless recovery_display.save
+    end
+
+    def not_displayed_error(stolen_record)
+      decided_error(stolen_record) ||
+        (stolen_record.errors.full_messages.to_sentence unless stolen_record.update(recovery_display_status: "not_displayed"))
+    end
+
+    def decided_error(stolen_record)
+      return "is already displayed" if RecoveryDisplay.unscoped.exists?(stolen_record_id: stolen_record.id)
+
+      "is #{stolen_record.recovery_display_status.humanize(capitalize: false)}" unless stolen_record.waiting_on_decision?
     end
 
     def display_edits(stolen_record_id)

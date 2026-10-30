@@ -44,6 +44,8 @@ module Pages
 
           # A bike can be user hidden or deleted
           def rows
+            ActiveRecord::Associations::Preloader.new(records: @recoveries.to_a,
+              associations: %i[country region_record recovery_display recovering_user]).call
             bikes = Bike.unscoped.where(id: @recoveries.map(&:bike_id))
               .includes(current_ownership: {user: %i[membership_active email_bans_active]}).index_by(&:id)
             @recoveries.map do |recovery|
@@ -53,24 +55,15 @@ module Pages
             end
           end
 
-          # The filters ride along, so a failed display renders the same page
-          def form_url = bulk_update_admin_recoveries_path(request.query_parameters)
-
           # A bike's page has the bike already
-          def default_columns = @editable ? DEFAULT_COLUMNS : DEFAULT_COLUMNS - %i[photo_cell bike_cell]
+          def card_options
+            options = {columns: COLUMNS, defaults: DEFAULT_COLUMNS, narrow_hidden: %i[photo_cell recovered_at_cell]}
+            return options.merge(storage_key: "adminBikeRecoveriesColumns", defaults: DEFAULT_COLUMNS - %i[photo_cell bike_cell]) unless @editable
 
-          def wrapper(&)
-            classes = "tw:col-span-full tw:min-w-0 tw:rounded-xl tw:twfullbleed #{UI::Card::Component::BASE_CLASSES}"
-            return form_with(url: form_url, method: :post, class: classes, data: form_data, &) if @editable
-
-            tag.div(class: classes, data: UI::TableColumnSettings::Component.data_attributes(storage_key: "adminBikeRecoveriesColumns", orderable: true), &)
-          end
-
-          def form_data
-            data = UI::TableColumnSettings::Component.data_attributes(storage_key: "adminRecoveriesColumns",
-              controllers: "table-multi-checkbox admin--personal-info", orderable: true)
-            data.merge(action: [data[:action], "submit->admin--personal-info#confirmDisplay submit->table-multi-checkbox#confirmDiscard"].join(" "),
-              "admin--personal-info-patterns-value": PERSONAL_INFO.transform_values { {label: it[:label], source: it[:pattern].source} }.to_json)
+            # The filters ride along, so a failed display renders the same page
+            options.merge(storage_key: "adminRecoveriesColumns", form: {url: bulk_update_admin_recoveries_path(request.query_parameters), method: :post},
+              data: {controller: "admin--personal-info", action: "submit->admin--personal-info#confirmDisplay",
+                     "admin--personal-info-patterns-value": PERSONAL_INFO.transform_values { {label: it[:label], source: it[:pattern].source} }.to_json})
           end
         end
       end

@@ -1,0 +1,56 @@
+<% if actions? %>
+  <% bulk_actions = capture do %>
+    <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+      <%= actions %>
+    </div>
+  <% end %>
+<% end %>
+
+<%# twfullbleed reads the twwiderow container %>
+<div class="twwiderow tw:mb-4">
+  <%= wrapper do %>
+    <%# Full bleed drops the card's gutter, so the header meets the page's %>
+    <div
+      class="
+        tw:flex tw:flex-wrap tw:items-center tw:justify-end tw:gap-x-4
+        tw:gap-y-2 tw:py-3 tw:@min-[672px]/twwiderow:px-4
+      "
+    >
+      <% if description? %>
+        <p class="tw:m-0 tw:text-xs tw:text-gray-500"><%= description %></p>
+      <% end %>
+
+      <div class="tw:ml-auto tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+        <% if actions? %>
+          <%# The footer's copy is the one a phone reaches after checking rows %>
+          <div class="tw:hidden tw:sm:block"><%= bulk_actions %></div>
+        <% end %>
+
+        <%= render(UI::Collapse::Component.new(text: "Column settings", chevron: :trailing, size: :sm)) %>
+      </div>
+    </div>
+
+    <%= render(UI::TableColumnSettings::Component.new(columns: @columns, defaults: @defaults, narrow_hidden: @narrow_hidden)) %>
+
+    <%# Full bleed takes the table over the admin gutter, past the card, so it's clipped here %>
+    <div
+      class="
+        tw:overflow-hidden
+        tw:@max-[672px]/twwiderow:mx-[calc(var(--gutter)*-1)]
+      "
+    >
+      <%= content %>
+    </div>
+
+    <% if actions? %>
+      <div
+        class="
+          tw:border-t tw:border-gray-100 tw:px-4 tw:py-3
+          tw:dark:border-gray-700
+        "
+      >
+        <%= bulk_actions %>
+      </div>
+    <% end %>
+  <% end %>
+</div>

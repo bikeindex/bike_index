@@ -63,11 +63,8 @@ class RecoveryDisplay < ActiveRecord::Base
 
     def first_name(name) = name.to_s.split.find { !HONORIFIC.match?(it) }
 
-    def calculated_owner_name(bike)
-      return unless bike&.current_ownership&.present? && bike&.owner.present?
-
-      bike.owner.name
-    end
+    # Not Ownership#owner, which falls back to the creator - a shop's staff, for an unclaimed bike
+    def calculated_owner_name(bike) = bike&.user&.name
   end
 
   def set_calculated_attributes

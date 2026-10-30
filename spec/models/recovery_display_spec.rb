@@ -113,6 +113,17 @@ RSpec.describe RecoveryDisplay, type: :model do
     end
   end
 
+  describe "calculated_owner_name" do
+    it "is the owner's, not the creator's of an unclaimed bike" do
+      bike = FactoryBot.create(:bike, :with_ownership, creator: FactoryBot.create(:user, name: "Shop Staff"))
+      expect(bike.owner.name).to eq "Shop Staff"
+      expect(RecoveryDisplay.calculated_owner_name(bike)).to be_nil
+      user = FactoryBot.create(:user, name: "Pat Smith")
+      bike.current_ownership.update(user:)
+      expect(RecoveryDisplay.calculated_owner_name(bike.reload)).to eq "Pat Smith"
+    end
+  end
+
   describe "from_stolen_record_id" do
     it "doesn't break if stolen record isn't present" do
       recovery_display = RecoveryDisplay.from_stolen_record_id(69)
