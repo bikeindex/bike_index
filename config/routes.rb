@@ -285,7 +285,6 @@ Rails.application.routes.draw do
 
     resources :bikes do
       collection do
-        get :duplicates
         put :ignore_duplicate_toggle
         get :missing_manufacturer
         post :update_manufacturers
@@ -295,6 +294,7 @@ Rails.application.routes.draw do
       end
       member { get :get_destroy }
     end
+    resources :duplicate_bikes, only: %i[index show]
     get "credibility_badges", to: "dashboard#credibility_badges"
     get "maintenance", to: "dashboard#maintenance"
     get "scheduled_jobs", to: "dashboard#scheduled_jobs"
