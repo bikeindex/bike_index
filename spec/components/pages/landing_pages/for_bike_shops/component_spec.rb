@@ -7,10 +7,9 @@ RSpec.describe Pages::LandingPages::ForBikeShops::Component, type: :component do
   let(:component) { render_inline(instance) }
   let(:options) do
     {total_bikes: 1_234_567, recoveries_count: 18_263, recoveries_value: 38_412_345, organizations_count: 1_000,
-     recovery_displays:, feedback: Feedback.new, signed_up:}
+     recovery_displays:, feedback: Feedback.new}
   end
   let(:recovery_displays) { [] }
-  let(:signed_up) { false }
 
   it "renders the signup form and the live stats" do
     expect(component).to have_css("form#new_feedback input[name='feedback[feedback_type]'][value='lead_for_bike_shop']", visible: :all)
@@ -29,14 +28,9 @@ RSpec.describe Pages::LandingPages::ForBikeShops::Component, type: :component do
     expect(component).to_not have_text("Bikes that came home")
   end
 
-  context "signed up" do
-    let(:signed_up) { true }
-
-    it "renders the success state instead of the form" do
-      expect(component).to have_text("You're in.")
-      expect(component).to have_text("We'll email you about connecting your POS.")
-      expect(component).to_not have_css("form#new_feedback")
-    end
+  it "returns a signup to the thank you that :target reveals" do
+    expect(component).to have_field("return_to", type: :hidden, with: "/for_bike_shops#shop-signed-up")
+    expect(component).to have_css("#shop-signed-up.tw\\:hidden", text: "You're in.", visible: :all)
   end
 
   context "with recovery displays" do

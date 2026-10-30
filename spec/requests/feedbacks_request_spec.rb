@@ -114,29 +114,20 @@ RSpec.describe FeedbacksController, type: :request do
       end
 
       context "from the bike shops page" do
-        it "creates a feedback and renders the signed up state" do
+        let(:lead_params) { {name: "Spoke Shop", feedback_type: "lead_for_bike_shop", email: "shop@example.com", body: "POS: Ascend"} }
+
+        it "returns a signup to the thank you, after a failed submit left the referer at /feedbacks" do
+          post base_url, params: {feedback: lead_params.merge(email: " "), return_to: "/for_bike_shops#shop-signed-up"},
+            headers: {"HTTP_REFERER" => "http://www.example.com/for_bike_shops"}
+          expect(response).to render_template("landing_pages/for_bike_shops")
+          expect(response.body).to include("Spoke Shop", "Email can&#39;t be blank")
+
           expect {
-            post base_url, params: {feedback: {name: "Spoke Shop", feedback_type: "lead_for_bike_shop",
-                                               email: "shop@example.com", body: "POS: Ascend"}},
-              headers: {"HTTP_REFERER" => "http://www.example.com/for_bike_shops"}
+            post base_url, params: {feedback: lead_params, return_to: "/for_bike_shops#shop-signed-up"},
+              headers: {"HTTP_REFERER" => "http://www.example.com/feedbacks"}
           }.to change(EmailJobs::FeedbackNotificationJob.jobs, :count).by(1)
-          expect(response).to redirect_to "http://www.example.com/for_bike_shops"
-          feedback = Feedback.last
-          expect(feedback.kind).to eq "lead_for_bike_shop"
-          expect(feedback.title).to eq "New Bike shop lead: Spoke Shop"
-          expect(feedback.body).to eq "POS: Ascend"
-
-          follow_redirect!
-          expect(response.body).to include("You&#39;re in.")
-        end
-
-        context "without an email" do
-          it "re-renders the page with the form" do
-            post base_url, params: {feedback: {name: "Spoke Shop", feedback_type: "lead_for_bike_shop", body: "POS: Ascend"}},
-              headers: {"HTTP_REFERER" => "http://www.example.com/for_bike_shops"}
-            expect(response).to render_template("landing_pages/for_bike_shops")
-            expect(response.body).to include("Spoke Shop")
-          end
+          expect(response).to redirect_to "http://www.example.com/for_bike_shops#shop-signed-up"
+          expect(Feedback.last).to have_attributes(kind: "lead_for_bike_shop", title: "New Bike shop lead: Spoke Shop", body: "POS: Ascend")
         end
       end
 

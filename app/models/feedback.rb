@@ -45,7 +45,7 @@ class Feedback < ApplicationRecord
 
   validates_presence_of :email, :title
   validates_presence_of :body, unless: :lead?
-  validates :name, length: {maximum: 255}
+  validates :name, :email, :title, length: {maximum: 255}
 
   attr_accessor :additional
 

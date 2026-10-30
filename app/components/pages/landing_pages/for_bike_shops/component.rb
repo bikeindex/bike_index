@@ -7,16 +7,17 @@ module Pages
         include MoneyHelper
 
         COMIC_BOX = "tw:rounded-lg tw:border-3 tw:border-black tw:bg-white tw:shadow-[4px_4px_0_#000]"
+        # Loaded by this page alone, so not a theme font
+        COMIC_FONT = "tw:font-['Bangers',cursive]"
 
         def initialize(total_bikes:, recoveries_count:, recoveries_value:, organizations_count:, recovery_displays:,
-          feedback:, signed_up: false, current_user: nil)
+          feedback:, current_user: nil)
           @total_bikes = total_bikes
           @recoveries_count = recoveries_count
           @recoveries_value = recoveries_value
           @organizations_count = organizations_count
           @recovery_displays = recovery_displays.first(3)
           @feedback = feedback
-          @signed_up = signed_up
           @current_user = current_user
         end
 
@@ -81,6 +82,11 @@ module Pages
              title: translation(".bike_book"), body: translation(".bike_book_body"), action: translation(".browse_bike_book")}]
         end
 
+        def sticker_prices
+          [[translation(".suggested_retail_price"), translation(".suggested_retail")],
+            [translation(".wholesale"), translation(".pricing_shown_in_cart")]]
+        end
+
         def faqs
           [[translation(".faq_cost_question"), translation(".faq_cost_answer")],
             [translation(".faq_pos_question"), translation(".faq_pos_answer")],
@@ -90,11 +96,9 @@ module Pages
             [translation(".faq_stickers_question"), translation(".faq_stickers_answer")]]
         end
 
-        def support_email = "support@bikeindex.org"
-
         def eyebrow_classes = "tw:m-0 tw:mb-2 tw:text-[13px] tw:font-bold tw:tracking-widest tw:uppercase"
 
-        def h2_classes = "tw:m-0 tw:font-header tw:font-extrabold tw:text-slate-900"
+        def heading_classes = "tw:m-0 tw:font-header tw:font-extrabold tw:text-slate-900"
 
         def section_inner = "tw:mx-auto tw:max-w-300 tw:px-6"
 
