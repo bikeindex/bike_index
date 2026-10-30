@@ -88,8 +88,7 @@ RSpec.describe Admin::UsersController, type: :request do
       let!(:bike_deleted) { FactoryBot.create(:bike, :with_ownership_claimed, user: user_subject, deleted_at: Time.current) }
       it "links to the deleted bikes" do
         get "#{base_url}/#{user_subject.id}/edit"
-        expect(response).to render_template :edit
-        link = Nokogiri::HTML(response.body).at_css("a[href='/admin/bikes?search_status_deleted_only=true&search_status_example=true&user_id=#{user_subject.id}']")
+        link = Nokogiri::HTML(response.body).at_css("a[href='#{admin_bikes_path(user_id: user_subject.id, search_status_deleted_only: true, search_status_example: true)}']")
         expect(link&.text).to eq "1 deleted"
       end
     end

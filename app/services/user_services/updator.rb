@@ -30,8 +30,7 @@ module UserServices
       # Ordering by bikes.id walks bikes_pkey for users with thousands of bikes;
       # ownerships.id uses the (user_id, id) index
       def bikes_for_user(user)
-        Bike.unscoped.without_deleted.where(example: false)
-          .joins(:current_ownership).where(ownerships: {user_id: user.id})
+        Bike.unscoped.without_deleted.where(example: false).current_owner(user.id)
           .order("ownerships.id")
       end
     end
