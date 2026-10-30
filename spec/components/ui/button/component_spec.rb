@@ -87,6 +87,24 @@ RSpec.describe UI::Button::Component, type: :component do
     end
   end
 
+  context "with link_gray color" do
+    let(:color) { :link_gray }
+
+    it "renders gray link styles, without a size" do
+      tokens = component.css("button").first["class"].split
+      expect(tokens).to include("tw:text-gray-500", "tw:not-disabled:not-aria-disabled:hover:underline")
+      expect(tokens).to_not include("twlink", "tw:no-underline", "tw:px-3", "tw:py-1.5", "tw:text-sm")
+    end
+
+    context "with non-default size" do
+      let(:size) { :lg }
+
+      it "raises ArgumentError" do
+        expect { instance }.to raise_error(ArgumentError, /size is not supported for link color/)
+      end
+    end
+  end
+
   context "with secondary color" do
     let(:color) { :secondary }
 

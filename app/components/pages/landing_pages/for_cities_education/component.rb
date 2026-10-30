@@ -73,7 +73,7 @@ module Pages
 
         def back_button
           tag.div(class: "tw:mt-3 tw:text-center") do
-            render(UI::Button::Component.new(color: :link, html_class: "tw:text-sm tw:text-gray-600", data: {action: "landing-pages--education#back"})) do
+            render(UI::Button::Component.new(color: :link_gray, html_class: "tw:text-sm", data: {action: "landing-pages--education#back"})) do
               safe_join([tag.span("←", aria: {hidden: true}), translation(".back")], " ")
             end
           end

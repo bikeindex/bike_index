@@ -94,9 +94,7 @@
           <span aria-hidden="true">→</span>
         <% end %>
 
-        <%= link_to lightspeed_path, class: "tw:text-[12px] tw:text-gray-500 tw:dark:text-gray-400 tw:no-underline tw:border-b tw:border-gray-300 tw:dark:border-gray-600 tw:hover:text-gray-900 tw:dark:hover:text-gray-100 tw:hover:border-gray-900 tw:dark:hover:border-gray-100" do %>
-          <%= translation(".how_integration_works") %>
-        <% end %>
+        <%= render(UI::ButtonLink::Component.new(href: lightspeed_path, text: translation(".how_integration_works"), color: :link_gray, html_class: "tw:text-[12px]")) %>
       </div>
     </div>
 
@@ -204,16 +202,7 @@
   </div>
 
   <footer class="tw:flex tw:justify-end tw:px-4 tw:pt-2 tw:pb-3">
-    <button
-      type="button"
-      data-action="click->org--pos-callout#dismissForever"
-      class="
-        tw:cursor-pointer tw:border-0 tw:bg-transparent tw:px-0.5 tw:py-1
-        tw:text-[12px] tw:text-gray-500 tw:hover:text-gray-600
-        tw:dark:text-gray-400 tw:dark:hover:text-gray-300
-      "
-    >
-      <%= translation(".dont_show_again") %>
-    </button>
+    <%= render(UI::Button::Component.new(text: translation(".dont_show_again"), color: :link_gray, html_class: "tw:text-[12px]",
+          data: {action: "click->org--pos-callout#dismissForever"})) %>
   </footer>
 </div>
