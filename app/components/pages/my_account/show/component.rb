@@ -3,15 +3,19 @@
 module Pages
   module MyAccount
     module Show
-      # The signed-in user's registrations: their bikes and locks, then the three prompts
-      # below them - profile, Strava and donating
+      # The signed-in user's bikes and locks, then the prompts under them
       class Component < ApplicationComponent
+        # The first is what falls back
+        VIEWS = %i[list grid].freeze
+
+        def self.permitted_view(view) = VIEWS.find { it.to_s == view.to_s } || VIEWS.first
+
         def initialize(user:, bikes:, pagy:, locks:, view:, locks_tab: false, page_params: {})
           @user = user
-          @bikes = bikes
+          @bikes = bikes.load
           @pagy = pagy
           @locks = locks.load
-          @view = Pages::MyAccount::Show::BikeBox::Component::VIEWS.include?(view&.to_sym) ? view.to_sym : :list
+          @view = view
           @locks_tab = locks_tab
           @page_params = page_params
         end
@@ -44,7 +48,7 @@ module Pages
         def unfinished_b_params = @unfinished_b_params ||= Pages::MyAccount::Show::BikeBox::Component.unfinished_b_params(@bikes)
 
         def bikes_with_alerts
-          @bikes.select { |bike| unfinished_b_params.key?(bike.id) || user_alerts.any? { it.bike_id == bike.id } }
+          @bikes_with_alerts ||= @bikes.select { |bike| unfinished_b_params.key?(bike.id) || user_alerts.any? { it.bike_id == bike.id } }
         end
 
         def link_bikes_path

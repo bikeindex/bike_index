@@ -154,7 +154,7 @@
   <%= render(Pages::MyAccount::StravaIntegration::Component.new(user: @user, link_bikes_path:)) %>
 
   <%= render(Pages::MyAccount::Show::PromptBar::Component.new(icon_classes: "tw:bg-purple-50 tw:text-purple-500 tw:dark:bg-purple-950 tw:dark:text-purple-300")) do |bar| %>
-    <% bar.with_icon { helpers.inline_svg_tag("icons/lucide-heart.svg", class: "tw:size-[22px]", aria_hidden: true) } %>
+    <% bar.with_icon { helpers.inline_svg_tag("icons/heart.svg", class: "tw:size-[22px] tw:fill-none", aria_hidden: true) } %>
     <% bar.with_title { translation(".bike_index_is_free") } %>
     <% bar.with_subtext { translation(".donations_keep_the_registry_running") } %>
 

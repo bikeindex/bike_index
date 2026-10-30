@@ -32,6 +32,8 @@ module Pages
           connected? && @strava_integration.pending?
         end
 
+        def in_progress? = syncing? || pending?
+
         def progress_percent
           @strava_integration.sync_progress_percent
         end

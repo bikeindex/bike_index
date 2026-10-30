@@ -88,9 +88,9 @@ class MyAccountsController < ApplicationController
 
   # A chosen view is kept in a cookie, so the next visit opens the way the last one left off
   def remembered_view
-    views = Pages::MyAccount::Show::BikeBox::Component::VIEWS.map(&:to_s)
-    cookies.permanent[:my_account_view] = params[:view] if views.include?(params[:view])
-    views.include?(cookies[:my_account_view]) ? cookies[:my_account_view] : views.first
+    chosen = Pages::MyAccount::Show::Component::VIEWS.find { it.to_s == params[:view] }
+    cookies.permanent[:my_account_view] = chosen.to_s if chosen
+    Pages::MyAccount::Show::Component.permitted_view(chosen || cookies[:my_account_view])
   end
 
   def edit_templates

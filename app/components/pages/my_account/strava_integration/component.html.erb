@@ -7,7 +7,7 @@
     Strava
     <% if error? %>
       <%= render(UI::Badge::Component.new(text: translation(".sync_error"), color: :error)) %>
-    <% elsif syncing? || pending? %>
+    <% elsif in_progress? %>
       <%= render(UI::Badge::Component.new(text: translation(".syncing"), color: :notice)) %>
     <% elsif synced? %>
       <%= render(UI::Badge::Component.new(text: translation(".connected"), color: :success)) %>
@@ -15,7 +15,7 @@
   <% end %>
 
   <% bar.with_subtext do %>
-    <% if syncing? || pending? %>
+    <% if in_progress? %>
       <% if pending? %>
         <span id="strava-pending-message"><%= translation(".strava_connected_pending") %></span>
       <% end %>

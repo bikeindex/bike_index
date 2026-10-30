@@ -16,6 +16,10 @@ RSpec.describe Pages::MyAccount::Show::BikeBox::Component, type: :component do
       unfinished_b_params: described_class.unfinished_b_params([bike]))
   end
 
+  it "has an accent for every colour a registration's status can badge as" do
+    expect(described_class::ACCENTS.keys).to include(*Atoms::RegistrationStatusBadge::Component::COLORS.values.uniq)
+  end
+
   it "renders the registration, with no alerts" do
     expect(component).to have_link(href: "/bikes/#{bike.id}")
     expect(component).to have_css("strong", text: "Surly")

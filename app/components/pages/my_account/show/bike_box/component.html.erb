@@ -1,8 +1,6 @@
-<li class="<%= class_names("tw:flex tw:flex-col", "tw:min-w-0": grid?) %>">
-  <% if @unfinished_b_param && !grid? %>
-    <div class="tw:mb-2">
-      <%= render(Pages::MyAccount::Show::BikeAlerts::Component.new(bike: @bike, current_user: @current_user, unfinished_b_param: @unfinished_b_param)) %>
-    </div>
+<li class="<%= class_names("tw:flex tw:flex-col tw:gap-2", "tw:min-w-0": grid?) %>">
+  <% unless grid? %>
+    <%= render(Pages::MyAccount::Show::BikeAlerts::Component.new(bike: @bike, current_user: @current_user, unfinished_b_param: @unfinished_b_param)) %>
   <% end %>
 
   <% cache(cache_key) do %>
@@ -116,7 +114,7 @@
             tw:font-semibold
           "
         >
-          <%= link_to translation(".edit_registration", bike_type: @bike.type_titleize&.downcase), edit_bike_path(@bike, edit_template: @bike.default_edit_template), class: "twlink tw:py-1" %>
+          <%= link_to translation(".edit_registration", bike_type: @bike.type), edit_bike_path(@bike, edit_template: @bike.default_edit_template), class: "twlink tw:py-1" %>
 
           <% if @bike.status_with_owner? %>
             <%= link_to sale_link_text, edit_bike_path(@bike, edit_template: "marketplace"), class: "tw:py-1 tw:text-purple-600 tw:dark:text-purple-300" %>
@@ -127,9 +125,7 @@
     <% end %>
   <% end %>
 
-  <% if @user_alerts.any? && !grid? %>
-    <div class="tw:mt-2">
-      <%= render(Pages::MyAccount::Show::BikeAlerts::Component.new(bike: @bike, current_user: @current_user, user_alerts: @user_alerts)) %>
-    </div>
+  <% unless grid? %>
+    <%= render(Pages::MyAccount::Show::BikeAlerts::Component.new(bike: @bike, current_user: @current_user, user_alerts: @user_alerts)) %>
   <% end %>
 </li>
