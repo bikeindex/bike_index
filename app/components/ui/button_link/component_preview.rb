@@ -80,19 +80,6 @@ module UI
       def yellow_disabled
         render(UI::ButtonLink::Component.new(text: "Yellow Disabled", href: "#", color: :yellow, disabled: true))
       end
-
-      # The secondary call to action on a dark band, beside a yellow one
-      def outline_white
-        render_with_template(template: "ui/button_link/component_preview/outline_white", locals: {text: "Outline White Link", active: false, disabled: false})
-      end
-
-      def outline_white_active
-        render_with_template(template: "ui/button_link/component_preview/outline_white", locals: {text: "Outline White Active", active: true, disabled: false})
-      end
-
-      def outline_white_disabled
-        render_with_template(template: "ui/button_link/component_preview/outline_white", locals: {text: "Outline White Disabled", active: false, disabled: true})
-      end
       # @!endgroup
 
       # @!group Extra types

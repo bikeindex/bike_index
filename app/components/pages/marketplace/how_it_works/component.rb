@@ -48,7 +48,7 @@ module Pages
             render(UI::ButtonLink::Component.new(href: search_marketplace_path, text: translation(".browse_bikes"),
               color: :yellow, size: :callout)) +
               render(UI::ButtonLink::Component.new(href: my_account_path, text: translation(".sell_your_bike"),
-                color: :outline_white, size: :callout))
+                color: :secondary, size: :callout))
           end
         end
       end
