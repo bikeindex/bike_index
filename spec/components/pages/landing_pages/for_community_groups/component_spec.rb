@@ -26,7 +26,6 @@ RSpec.describe Pages::LandingPages::ForCommunityGroups::Component, type: :compon
     expect(component).to have_link("Bike Index for bike shops", href: "/for_bike_shops")
     expect(component).to have_link("Embed a registration form",
       href: "/info/embed-a-bike-index-registration-form-on-your-website")
-    expect(component).to_not have_text("Recovered, in their own words")
   end
 
   context "with a whole number of millions" do
@@ -38,26 +37,10 @@ RSpec.describe Pages::LandingPages::ForCommunityGroups::Component, type: :compon
   end
 
   context "with recovery displays" do
-    let(:recovery_displays) do
-      FactoryBot.create_list(:recovery_display_with_photo, 4, quote: "Police found the bike", quote_by: "Sandy")
-    end
+    let(:recovery_displays) { [FactoryBot.create(:recovery_display_with_photo, quote: "Police found the bike")] }
 
-    it "renders the first three" do
-      expect(component).to have_text("Recovered, in their own words")
-      expect(component).to have_link("See all recovery stories", href: "/recovery_stories")
-      expect(component).to have_css("blockquote", text: "Police found the bike", count: 3)
-      expect(component).to have_css("strong", text: "Sandy", count: 3)
-      expect(component).to_not have_css("a blockquote")
-    end
-
-    context "with a link" do
-      let(:recovery_displays) do
-        [FactoryBot.create(:recovery_display_with_photo, quote: "Police found the bike", link: "https://example.com/story")]
-      end
-
-      it "links the card" do
-        expect(component).to have_css("a[href='https://example.com/story'] blockquote", text: "Police found the bike")
-      end
+    it "renders them" do
+      expect(component).to have_css("blockquote", text: "Police found the bike")
     end
   end
 end

@@ -4,12 +4,8 @@ module Pages
   module LandingPages
     module ForCommunityGroups
       class Component < ApplicationComponent
-        # The layout loads Montserrat at 400 and 700 only
-        FONTS_URL = "https://fonts.googleapis.com/css2?family=Bangers&family=Montserrat:wght@800;900&display=swap"
-        COMIC_CARD = "tw:rounded-lg tw:border-3 tw:border-[#111] tw:bg-white tw:shadow-[4px_4px_0_#111]"
-        CARD = "tw:rounded-lg tw:border tw:border-gray-200 tw:bg-white tw:shadow-[0_1px_3px_rgba(44,62,80,.12),0_1px_2px_rgba(44,62,80,.08)]"
-        STORY_CARD = "tw:flex tw:w-full tw:flex-col tw:overflow-hidden tw:text-gray-700 tw:no-underline #{CARD}"
-        LINKED_STORY_CARD = "tw:transition-all tw:duration-300 tw:hover:-translate-y-1.25 tw:hover:text-gray-700 tw:hover:shadow-[0_4px_12px_rgba(44,62,80,.12)]"
+        SECTION_CLASSES = SharedBlocks::Marketing::Wrapper::Component::CONTAINER_CLASSES
+        COMIC_CARD = "tw:rounded-lg tw:border-3 tw:border-[#111] tw:bg-white tw:shadow-[4px_4px_0_#111] tw:dark:bg-gray-800"
         OUTLINE = "tw:border-2! tw:border-blue-600! tw:normal-case! tw:text-blue-600! tw:hover:bg-blue-600! tw:hover:text-white!"
 
         # GObike Buffalo's tweet, quoted verbatim, so it isn't translated
@@ -17,7 +13,7 @@ module Pages
 
         def initialize(recovery_displays:, total_bikes:, recoveries_count:, recoveries_value:, organizations_count:,
           sign_up_path:)
-          @recovery_displays = recovery_displays.first(3)
+          @recovery_displays = recovery_displays
           @sign_up_path = sign_up_path
           @total_bikes = total_bikes
           @recoveries_count = recoveries_count
@@ -25,19 +21,13 @@ module Pages
           @organizations_count = organizations_count
         end
 
-        def before_render
-          helpers.content_for(:header) { stylesheet_link_tag(FONTS_URL) }
-        end
-
         private
 
         def stats
-          [{value: bikes_display, label: translation(".bikes_registered_free")},
-            {value: number_display(@recoveries_count), label: translation(".stolen_bikes_recovered")},
-            {value: render(Atoms::CurrencyMillions::Component.new(dollars_usd: @recoveries_value)),
-             label: translation(".value_returned_to_owners")},
-            {value: safe_join([number_display(@organizations_count), "+"]),
-             label: translation(".partner_organizations")}]
+          [[bikes_display, translation(".bikes_registered_free")],
+            [number_display(@recoveries_count), translation(".stolen_bikes_recovered")],
+            [render(Atoms::CurrencyMillions::Component.new(dollars_usd: @recoveries_value)), translation(".value_returned_to_owners")],
+            [safe_join([number_display(@organizations_count), "+"]), translation(".partner_organizations")]]
         end
 
         def bikes_display
@@ -54,12 +44,12 @@ module Pages
         end
 
         def steps
-          [{color: "tw:text-blue-600", title: translation(".step_spread_title"), body: translation(".step_spread_body")},
-            {color: "tw:text-blue-600", title: translation(".step_register_title"), body: translation(".step_register_body")},
-            {color: "tw:text-[#cc0000]",
-             title: translation(".step_stolen_title_html", stolen: tag.span(translation(".stolen"), class: "tw:text-[#cc0000]")),
+          [{color: "tw:text-blue-600 tw:dark:text-blue-400", title: translation(".step_spread_title"), body: translation(".step_spread_body")},
+            {color: "tw:text-blue-600 tw:dark:text-blue-400", title: translation(".step_register_title"), body: translation(".step_register_body")},
+            {color: "tw:text-[#cc0000] tw:dark:text-red-400",
+             title: translation(".step_stolen_title_html", stolen: tag.span(translation(".stolen"), class: "tw:text-[#cc0000] tw:dark:text-red-400")),
              body: translation(".step_stolen_body")},
-            {color: "tw:text-[#2e8b57]", title: translation(".step_home_title"), body: translation(".step_home_body")}]
+            {color: "tw:text-[#2e8b57] tw:dark:text-green-400", title: translation(".step_home_title"), body: translation(".step_home_body")}]
         end
 
         def ebike_topics
@@ -91,13 +81,9 @@ module Pages
             [translation(".become_an_ambassador"), news_path("bike-index-launches-ambassadors-program")]]
         end
 
-        def container = "tw:mx-auto tw:max-w-300 tw:px-6"
+        def callout_classes = "tw:flex tw:items-center tw:gap-x-3.5 tw:text-base tw:text-gray-600 tw:dark:text-gray-300"
 
-        def eyebrow_classes = "tw:m-0 tw:mb-2 tw:text-[13px] tw:font-bold tw:tracking-[.08em] tw:uppercase"
-
-        def h2_classes = "tw:m-0 tw:font-header tw:font-extrabold tw:text-balance tw:text-slate-900"
-
-        def callout_classes = "tw:flex tw:flex-wrap tw:items-center tw:gap-x-3.5 tw:gap-y-2.5 tw:text-base tw:text-gray-600"
+        def muted_classes = "tw:text-gray-600 tw:dark:text-gray-300"
       end
     end
   end
