@@ -1,4 +1,5 @@
 import { Controller } from '@hotwired/stimulus'
+/* global CSS, ResizeObserver */
 
 // Connects to data-controller='ui--forms--combobox-display'
 // (rendered by UI::Forms::Combobox rich_display:)
@@ -17,13 +18,15 @@ export default class extends Controller {
     // Read before the overlay ever paints the input transparent
     this.caretColor = window.getComputedStyle(this.input).color
     this.events().forEach(([target, event]) => target.addEventListener(event, this.sync))
-    window.addEventListener('resize', this.onResize)
+    // Observing the input rather than the window also measures one that rendered hidden, as it's shown
+    this.resizeObserver = new ResizeObserver(this.onResize)
+    this.resizeObserver.observe(this.input)
     this.sync()
   }
 
   disconnect () {
     this.events().forEach(([target, event]) => target.removeEventListener(event, this.sync))
-    window.removeEventListener('resize', this.onResize)
+    this.resizeObserver.disconnect()
   }
 
   // keyup catches arrow-key navigation, which sets the value without an input
@@ -75,14 +78,11 @@ export default class extends Controller {
     this.reposition()
   }
 
-  // Matched on the attribute rather than a `[data-value="…"]` selector, which a
-  // value containing a quote would make invalid (see utils/hw_combobox_patch.js)
   selectedOption () {
     const value = this.hiddenField?.value
     if (!value) return null
 
-    return [...this.element.querySelectorAll('[role="option"]')]
-      .find((option) => option.dataset.value === value)
+    return this.element.querySelector(`[role="option"][data-value="${CSS.escape(value)}"]`)
   }
 
   reposition () {

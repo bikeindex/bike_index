@@ -8,31 +8,6 @@ ca_state = State.find_by_abbreviation("CA")
 
 creator = BikeServices::Creator.new
 
-def bike_params(owner_email:, manufacturer_id: nil)
-  manufacturer_id ||= SeedHelpers.weighted_frame_maker_id
-  {
-    cycle_type: "bike",
-    propulsion_type: "foot-pedal",
-    serial_number: (0...10).map { rand(65..90).chr }.join,
-    manufacturer_id:,
-    primary_frame_color_id: Color.pluck(:id).sample,
-    rear_tire_narrow: "true",
-    handlebar_type: HandlebarType.slugs.first,
-    owner_email:
-  }
-end
-
-def seed_bike(creator:, user:, params:, origin: nil, label: "bike")
-  SeedHelpers.tick
-  b_param = BParam.create!(creator: user, params:)
-  b_param.origin = origin if origin
-  bike = creator.create_bike(b_param)
-  if bike.errors.any?
-    puts "\n #{label} error \n #{b_param.bike_errors}"
-  end
-  bike
-end
-
 # Builds the recovery display the homepage showcase renders. Latitude and longitude aren't
 # among StolenRecordUpdator's permitted attributes, so they have to be written after the fact.
 def seed_recovery_display(bike:, location:, photo_filename:, recovered_at:, recovered_description:, quote_by:, location_string:, quote:)
@@ -49,22 +24,20 @@ def seed_recovery_display(bike:, location:, photo_filename:, recovered_at:, reco
 
   # skip_callback_job because the job runs inline below instead - photo_url has to exist
   # without sidekiq, since the homepage filters on it
-  recovery_display = RecoveryDisplay.new(stolen_record:, recovered_at:, quote_by:, location_string:, quote:,
+  recovery_display = RecoveryDisplay.create!(stolen_record:, recovered_at:, quote_by:, location_string:, quote:,
     skip_callback_job: true)
-  # save! goes inside the block - ActiveStorage re-reads the io to upload it
-  File.open(photo_path) do |file|
-    recovery_display.photo.attach(io: file, filename: photo_filename)
-    recovery_display.save!
+  SeedHelpers.without_clock do
+    File.open(photo_path) { |file| recovery_display.photo.attach(io: file, filename: photo_filename) }
+    ImageJobs::ProcessRecoveryDisplayPhotoJob.new.perform(recovery_display.id)
   end
-  ImageJobs::ProcessRecoveryDisplayPhotoJob.new.perform(recovery_display.id)
   recovery_display
 end
 
 # --- 25 registered bikes ---
 25.times do |i|
-  bike = seed_bike(
+  bike = SeedHelpers.seed_bike(
     creator:, user:, origin: "organization_form", label: "Bike",
-    params: {bike: bike_params(owner_email: "testuser+#{i}@bikeindex.org")}
+    params: {bike: SeedHelpers.bike_params(owner_email: "testuser+#{i}@bikeindex.org")}
   )
   puts "New bike made by #{bike.manufacturer.name}" unless bike.errors.any?
 end
@@ -89,10 +62,10 @@ stolen_locations = [
 puts "Creating 10 stolen bikes in San Francisco and Oakland..."
 
 stolen_locations.each_with_index do |loc, i|
-  bike = seed_bike(
+  bike = SeedHelpers.seed_bike(
     creator:, user:, label: "Stolen bike",
     params: {
-      bike: bike_params(owner_email: "testuser+#{i + 50}@bikeindex.org")
+      bike: SeedHelpers.bike_params(owner_email: "testuser+#{i + 50}@bikeindex.org")
         .merge(status: "status_stolen", date_stolen: (Time.current - rand(4..24).hours).to_s),
       stolen_record: {
         latitude: loc[:latitude].to_s,
@@ -125,10 +98,10 @@ found_locations = [
 puts "Creating 2 found bikes (1 San Francisco, 1 Oakland)..."
 
 found_locations.each_with_index do |loc, i|
-  bike = seed_bike(
+  bike = SeedHelpers.seed_bike(
     creator:, user:, label: "Found bike",
     params: {
-      bike: bike_params(owner_email: "testuser+#{i + 60}@bikeindex.org")
+      bike: SeedHelpers.bike_params(owner_email: "testuser+#{i + 60}@bikeindex.org")
         .merge(status: "status_impounded"),
       impound_record: {
         address_record_attributes: {
@@ -156,10 +129,10 @@ puts "Creating found bike reported by user@bikeindex.org..."
 found_bike_location = {latitude: 37.7691, longitude: -122.4449, street: "1000 Stanyan St", city: "San Francisco", zipcode: "94117"}
 specialized_manufacturer = Manufacturer.friendly_find("Specialized")
 
-user_found_bike = seed_bike(
+user_found_bike = SeedHelpers.seed_bike(
   creator:, user:, label: "Found bike",
   params: {
-    bike: bike_params(owner_email: user.email, manufacturer_id: specialized_manufacturer&.id).merge(
+    bike: SeedHelpers.bike_params(owner_email: user.email, manufacturer_id: specialized_manufacturer&.id).merge(
       frame_model: "Sirrus",
       description: "Found unlocked near the Golden Gate Park tennis courts",
       status: "status_impounded"
@@ -190,9 +163,9 @@ cannondale_manufacturer = Manufacturer.friendly_find("Cannondale")
 
 puts "Creating 3 Cannondale bikes registered to Cannondale org..."
 3.times do |i|
-  bike = seed_bike(
+  bike = SeedHelpers.seed_bike(
     creator:, user:, origin: "organization_form", label: "Cannondale bike",
-    params: {bike: bike_params(
+    params: {bike: SeedHelpers.bike_params(
       owner_email: "testuser+cannondale#{i}@bikeindex.org",
       manufacturer_id: cannondale_manufacturer.id
     ).merge(creation_organization_id: cannondale_org.id.to_s)}
@@ -205,9 +178,9 @@ puts "Creating 1975 Viner Special Professional with photos..."
 viner_manufacturer = Manufacturer.friendly_find("Viner")
 orange = Color.friendly_find("Orange")
 
-viner_bike = seed_bike(
+viner_bike = SeedHelpers.seed_bike(
   creator:, user:, label: "Viner bike",
-  params: {bike: bike_params(owner_email: "user1@gmail.com", manufacturer_id: viner_manufacturer.id).merge(
+  params: {bike: SeedHelpers.bike_params(owner_email: "user1@gmail.com", manufacturer_id: viner_manufacturer.id).merge(
     primary_frame_color_id: orange&.id,
     year: 1975,
     frame_model: "Special Professional",
@@ -250,10 +223,10 @@ trek_components = [
   {ctype: "pedals", manufacturer: "Shimano", model: "XTR XC PD-M9200"}
 ]
 
-trek_bike = seed_bike(
+trek_bike = SeedHelpers.seed_bike(
   creator:, user:, label: "Stolen Trek bike",
   params: {
-    bike: bike_params(owner_email: "user_2@gmail.com", manufacturer_id: trek_manufacturer.id).merge(
+    bike: SeedHelpers.bike_params(owner_email: "user_2@gmail.com", manufacturer_id: trek_manufacturer.id).merge(
       primary_frame_color_id: black&.id,
       year: 2024,
       frame_model: "Top Fuel 9.9 XX AXS T-Type",
@@ -315,10 +288,10 @@ puts "Creating recovered Trek Marlin in Calgary..."
 silver = Color.friendly_find("Silver, gray or bare metal")
 calgary_location = {latitude: 51.0512, longitude: -114.0631, street: "917 Centre Ave NE", city: "Calgary", zipcode: "T2E 0C6"}
 
-recovered_bike = seed_bike(
+recovered_bike = SeedHelpers.seed_bike(
   creator:, user:, label: "Recovered Trek bike",
   params: {
-    bike: bike_params(owner_email: "user_3@gmail.com", manufacturer_id: trek_manufacturer.id).merge(
+    bike: SeedHelpers.bike_params(owner_email: "user_3@gmail.com", manufacturer_id: trek_manufacturer.id).merge(
       primary_frame_color_id: silver&.id,
       year: 2019,
       frame_model: "Marlin 6",
@@ -368,10 +341,10 @@ twenty_six_inch_id = WheelSize.id_for_bsd(559) # rear "26 inch"
 or_state = State.find_by_abbreviation("OR")
 portland_location = {latitude: 45.5231, longitude: -122.6765, street: "1120 SW 5th Ave", city: "Portland", zipcode: "97204"}
 
-recovered_cargo_bike = seed_bike(
+recovered_cargo_bike = SeedHelpers.seed_bike(
   creator:, user:, label: "Recovered Riese & Müller bike",
   params: {
-    bike: bike_params(owner_email: "user_4@gmail.com", manufacturer_id: rm_manufacturer&.id).merge(
+    bike: SeedHelpers.bike_params(owner_email: "user_4@gmail.com", manufacturer_id: rm_manufacturer&.id).merge(
       cycle_type: "cargo",
       propulsion_type: "pedal-assist",
       primary_frame_color_id: silver&.id,
@@ -419,10 +392,10 @@ puts "Creating recovered Viner Special Professional in Chicago..."
 il_state = State.find_by_abbreviation("IL")
 chicago_location = {latitude: 41.9103, longitude: -87.6773, street: "1800 N Milwaukee Ave", city: "Chicago", zipcode: "60647"}
 
-recovered_viner_bike = seed_bike(
+recovered_viner_bike = SeedHelpers.seed_bike(
   creator:, user:, label: "Recovered Viner bike",
   params: {
-    bike: bike_params(owner_email: "user_5@gmail.com", manufacturer_id: viner_manufacturer.id).merge(
+    bike: SeedHelpers.bike_params(owner_email: "user_5@gmail.com", manufacturer_id: viner_manufacturer.id).merge(
       primary_frame_color_id: orange&.id,
       year: 1975,
       frame_model: "Special Professional",
@@ -506,9 +479,10 @@ rm_components = [
   {ctype: "unknown", description: "RX Chip (für RX Services)"}
 ]
 
-rm_bike = seed_bike(
+rm_bike = SeedHelpers.seed_bike(
   creator:, user:, origin: "organization_form", label: "Riese & Müller bike",
-  params: {bike: bike_params(owner_email: rm_owner.email, manufacturer_id: rm_manufacturer.id).merge(
+  params: {bike: SeedHelpers.bike_params(owner_email: rm_owner.email, manufacturer_id: rm_manufacturer.id).merge(
+    serial_number: "LOAD4ROHLOFF01",
     creation_organization_id: brakebills_org.id.to_s,
     cycle_type: "cargo",
     propulsion_type: "pedal-assist",

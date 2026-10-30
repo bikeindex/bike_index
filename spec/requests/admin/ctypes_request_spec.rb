@@ -29,5 +29,39 @@ RSpec.describe Admin::CtypesController, type: :request do
         expect(sorted_ids.call).to eq([ctype_b.id, ctype_a.id])
       end
     end
+
+    describe "new" do
+      it "renders the component group select as required" do
+        get "#{base_url}/new"
+        expect(response).to be_ok
+        expect(Capybara.string(response.body)).to have_css("label[for='ctype_cgroup_id'] + select#ctype_cgroup_id[required]")
+      end
+    end
+
+    describe "create" do
+      let(:cgroup) { FactoryBot.create(:cgroup) }
+
+      it "requires a component group" do
+        expect {
+          post base_url, params: {ctype: {name: "Fender"}}
+        }.not_to change(Ctype, :count)
+        expect(response.status).to eq 422
+        expect(response).to render_template(:new)
+
+        post base_url, params: {ctype: {name: "Fender", cgroup_id: cgroup.id}}
+        expect(response).to redirect_to(admin_ctypes_url)
+        expect(Ctype.last.cgroup_id).to eq cgroup.id
+      end
+    end
+
+    describe "update" do
+      let(:ctype) { FactoryBot.create(:ctype) }
+
+      it "doesn't remove the component group" do
+        patch "#{base_url}/#{ctype.to_param}", params: {ctype: {cgroup_id: ""}}
+        expect(response.status).to eq 422
+        expect(ctype.reload.cgroup_id).to be_present
+      end
+    end
   end
 end

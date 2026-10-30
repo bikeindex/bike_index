@@ -1,7 +1,7 @@
 import { html, nothing } from 'lit-html'
 import { fragmentOf } from 'bikebook/render'
 import { numberDisplay } from 'bikebook/templates/helpers'
-import { copyableCode } from 'bikebook/templates/ui/copyable_code'
+import { copyableCode } from 'bikebook/templates/atoms/copyable_code'
 import { definitionListRow } from 'bikebook/templates/ui/definition_list/row'
 import { tooltip } from 'bikebook/templates/ui/tooltip'
 import { array, blank, compact, equal, isHash, isTemplate, join, listed } from 'bikebook/templates/values'
@@ -15,20 +15,34 @@ const items = (content) => listed(content)?.[0].flatMap(items) ?? [content]
 const mark = (content) => html`<span class="tw:spec-diff">${content}</span>`
 
 const MATERIALS = 'frame.material'
+const TOP_TUBES = 'frame.top_tube'
 // lengths in centimeters, with an imperial viewer's feet and inches after
-const IN_CENTIMETERS = ['wheelbase', 'standover']
+const IN_CENTIMETERS = ['wheelbase', 'standover', 'standover_above_bb']
 const SINGULAR = { feet: 'foot', inches: 'inch' }
 
 // The names, units and lookups the vehicle templates present a model's data with
+// read as part of their number, unmuted
+const FEET_AND_INCHES = ["'", '"']
+
 export class VehiclePresenter {
   constructor (kit, vocabulary) {
-    this.kit = kit
-    // the catalog names carbon "Carbon or Composite"
+    // the extras' bb_drop_low as the catalog's own labels write "BB Drop", and standover above it short, as its tooltip
+    // explains it
+    this.kit = {
+      ...kit,
+      acronyms: { ...kit.acronyms, bb: 'BB' },
+      geometry: { ...kit.geometry, labels: { ...kit.geometry.labels, standover_above_bb: 'Standover above BB' } }
+    }
+    // the catalog names carbon "Carbon or Composite", and leaves its top tubes and target riders unnamed
     const materials = { ...vocabulary.names[MATERIALS], carbon: 'Carbon/Composite' }
-    this.vocabulary = { ...vocabulary, names: { ...vocabulary.names, [MATERIALS]: materials } }
+    const topTubes = { step_through: 'Step-through', sloping: 'Sloping', horizontal: 'Horizontal', ...vocabulary.names[TOP_TUBES] }
+    const riders = { kid: 'Kids', woman: "Women's", adaptive: 'Adaptive', ...vocabulary.names.target_riders }
+    this.vocabulary = { ...vocabulary, names: { ...vocabulary.names, [MATERIALS]: materials, [TOP_TUBES]: topTubes, target_riders: riders } }
     this.half = new RegExp(kit.shis.half)
     this.shisPattern = new RegExp(kit.shis.pattern)
-    this.imperialLengths = kit.imperial_lengths.map(({ pattern, parts }) => ({ pattern: new RegExp(pattern), parts }))
+    // standover above the bottom bracket in feet and inches, as a wheelbase is, where the kit's standover reads in inches
+    this.imperialLengths = [{ pattern: /^standover_above_bb$/, parts: kit.feet_and_inches },
+      ...kit.imperial_lengths.map(({ pattern, parts }) => ({ pattern: new RegExp(pattern), parts }))]
     this.unitSuffix = new RegExp(kit.geometry.unit_suffix)
     this.componentGroups = new Map(Object.entries(kit.component_groups).flatMap(([group, types]) => types.map((type) => [type, group])))
   }
@@ -48,27 +62,27 @@ export class VehiclePresenter {
   }
 
   classificationName (id) {
-    return this.vocabulary.e_vehicle_classifications?.[id]?.label ?? id
+    return this.vocabulary.e_vehicle_classifications[id]?.label ?? id
   }
 
-  // A classification's tooltip, whose heading links to `path(id)`
-  classificationTooltip (id, path) {
+  // its description less the IDs it cites, beside the ID it shows
+  classificationTooltip (id) {
     const { title, description } = this.vocabulary.e_vehicle_classifications[id]
-    return html`<h3 class="tw:font-bold"><a class="twlink" href=${path(id)}>${title}</a></h3><span class="tw:mt-1 tw:flex tw:items-center tw:gap-2">ID ${
-      copyableCode({ value: id, label: 'Copy ID' })}</span><p class="tw:mt-1">${description}</p>`
+    return html`<h3 class="tw:font-bold">${title}</h3><span class="tw:mt-1 tw:flex tw:items-center tw:gap-2">ID ${
+      copyableCode({ value: id, label: 'Copy ID' })}</span><p class="tw:mt-1">${String(description ?? '').replace(/\s*\(evc\/[^)\s]+\)/g, '')}</p>`
   }
 
   // Each classification's name to its tooltip
-  classificationTooltips (path) {
-    return Object.fromEntries(Object.entries(this.vocabulary.e_vehicle_classifications ?? {})
-      .map(([id, { label }]) => [label, this.classificationTooltip(id, path)]))
+  classificationTooltips () {
+    return Object.fromEntries(Object.entries(this.vocabulary.e_vehicle_classifications)
+      .map(([id, { label }]) => [label, this.classificationTooltip(id)]))
   }
 
   // A `difference` of a length in centimeters leaves off its feet and inches
   measurement (value, unit = null, key = null, { difference = false } = {}) {
     if (value === true) return '✓'
     if (value === false) return '❌'
-    if (Array.isArray(value)) return join(value, ', ')
+    if (Array.isArray(value)) return join(value.map((item) => this.measurement(item, unit, key)), ', ')
     const [, count, each] = (unit && typeof value === 'string' && value.match(/^(\d+) x (\d+(?:\.\d+)?)$/)) || []
     if (each) return join([`${count} × `, this.measurement(this.rounded(parseFloat(each)), unit, key, { difference })])
     if (typeof value !== 'number') return isTemplate(value) ? value : String(value ?? '')
@@ -81,10 +95,27 @@ export class VehiclePresenter {
       : this.labeled(value, unit)
     if (parts.length === 0 || (inCentimeters && difference)) return metric
 
-    const imperial = join(parts.map(({ part, convert }) => this.labeled(this.rounded(convert(value)), unit, part)), ' ')
+    const imperial = join((feet ? this.#significant(parts, value) : parts).map(({ part, convert }) => this.labeled(this.rounded(convert(value)), unit, part)), ' ')
     // rounded to the inch, so the exact length is a hover away
     const shown = feet ? this.#tooltipped(imperial, compact([this.#inWords(value), inCentimeters ? null : metric])) : imperial
-    return this.#unitSystems(metric, inCentimeters ? join([metric, ' ', html`<span class="tw:text-xs twless-strong">(${shown})</span>`]) : shown)
+    // muted by its color, as an opacity would fade the tooltip inside it too
+    return this.#unitSystems(metric, inCentimeters ? join([metric, ' ', html`<span class="tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">(${shown})</span>`]) : shown)
+  }
+
+  // In feet and inches, or centimeters in metric: "6' 4"", "194 cm"
+  length (millimeters) {
+    return this.#unitSystems(this.#centimeters(millimeters),
+      join(this.#feetAndInches().map(({ part, convert }) => this.labeled(this.rounded(convert(millimeters)), 'mm', part)), ' '))
+  }
+
+  // Spelled out, the other system's after: "6 feet, 4 inches (194 cm)", "194 cm (6 feet, 4 inches)"
+  lengthInWords (millimeters) {
+    const [centimeters, words] = [this.#centimeters(millimeters), this.#inWords(millimeters)]
+    return this.#unitSystems(join([centimeters, ` (${words})`]), join([words, ' (', centimeters, ')']))
+  }
+
+  #centimeters (millimeters) {
+    return this.labeled(this.rounded(millimeters / this.kit.conversions.mm.cm), 'cm', this.kit.presenter.centimeters)
   }
 
   // all three read "136.5 × 66.6 × 137 cm" (L × W × H); fewer name each, "136.5 cm long"
@@ -93,14 +124,11 @@ export class VehiclePresenter {
     const words = Object.keys(this.kit.presenter.dimension_words)
     const values = words.filter((key) => dimensions[key] != null).map((key) => [key, dimensions[key]])
     const full = values.length === words.length
-    const metric = values.map(([key, mm], index) => [key, this.labeled(this.rounded(mm / cm), full && index < values.length - 1 ? null : 'cm', this.kit.presenter.centimeters)])
+    const centimeters = (mm, unit = 'cm') => this.labeled(this.rounded(mm / cm), unit, this.kit.presenter.centimeters)
+    const metric = values.map(([key, mm], index) => [key, centimeters(mm, full && index < values.length - 1 ? null : 'cm')])
     const feetAndInches = this.#feetAndInches()
-    // leading parts that come to zero are left out: no "0'" before a length under a foot
-    const imperial = values.map(([key, mm]) => {
-      const first = feetAndInches.findIndex(({ convert }) => convert(mm) !== 0)
-      return [key, join((first < 0 ? [] : feetAndInches.slice(first)).map(({ part, convert }) => this.labeled(convert(mm), 'mm', part)), ' ')]
-    })
-    const exact = [(mm) => this.labeled(this.rounded(mm), 'mm'), (mm) => this.#inWords(mm)]
+    const imperial = values.map(([key, mm]) => [key, join(this.#significant(feetAndInches, mm).map(({ part, convert }) => this.labeled(convert(mm), 'mm', part)), ' ')])
+    const exact = [(mm) => this.labeled(this.rounded(mm), 'mm'), (mm) => join([this.#inWords(mm), ' (', centimeters(mm), ')'])]
     const [metricSystem, imperialSystem] = [metric, imperial].map((parts, index) => this.#tooltipped(
       full ? join(parts.map(([, part]) => part), ' × ') : join(parts.map(([key, part]) => join([part, ' ', this.kit.presenter.dimension_words[key]])), ', '),
       values.map(([key, mm]) => join([`${this.humanize(key)}: `, exact[index](mm)]))
@@ -166,12 +194,19 @@ export class VehiclePresenter {
     const number = html`<span class="tw:font-mono">${numberDisplay(value)}</span>`
     if (blank(unit)) return number
     // a thin space, so the unit reads as part of the value
-    const gap = ['°', "'", '"'].includes(meta.label) ? '' : ' '
-    return join([number, gap, html`<span class="tw:text-xs tw:text-gray-400 tw:dark:text-gray-500" title=${meta.name ?? nothing}>${meta.label ?? unit}</span>`])
+    const gap = ['°', ...FEET_AND_INCHES].includes(meta.label) ? '' : ' '
+    const classes = FEET_AND_INCHES.includes(meta.label) ? nothing : 'tw:text-xs tw:text-gray-400 tw:dark:text-gray-500'
+    return join([number, gap, html`<span class=${classes} title=${meta.name ?? nothing}>${meta.label ?? unit}</span>`])
   }
 
   #inches (millimeters) {
     return millimeters / this.kit.conversions.mm.in
+  }
+
+  // `parts` from the first that `millimeters` doesn't come to zero in: 9", not 0' 9"
+  #significant (parts, millimeters) {
+    const first = parts.findIndex(({ convert }) => convert(millimeters) !== 0)
+    return first < 0 ? parts.slice(-1) : parts.slice(first)
   }
 
   // "3 feet, 2.6 inches", leaving off a part that's zero
@@ -200,6 +235,11 @@ export class VehiclePresenter {
 
   rounded (value) {
     return roundHalfUp(value * 10) / 10
+  }
+
+  // A motor's operating mode, "Pedal assist" rather than the catalog's bare "assist"
+  modeLabel (mode) {
+    return mode === 'assist' ? 'Pedal assist' : this.humanize(mode)
   }
 
   humanize (text) {

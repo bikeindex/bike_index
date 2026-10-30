@@ -80,6 +80,17 @@ RSpec.describe Admin::UsersController, type: :request do
       get "#{base_url}/#{user_subject.id}/edit"
       expect(response).to render_template :edit
       expect(response.body).to include(user_email.email)
+      expect(response.body).to_not include("deleted_only")
+    end
+
+    context "with deleted bikes" do
+      let!(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: user_subject) }
+      let!(:bike_deleted) { FactoryBot.create(:bike, :with_ownership_claimed, user: user_subject, deleted_at: Time.current) }
+      it "links to the deleted bikes" do
+        get "#{base_url}/#{user_subject.id}/edit"
+        link = Nokogiri::HTML(response.body).at_css("a[href='#{admin_bikes_path(user_id: user_subject.id, search_status_deleted_only: true, search_status_example: true)}']")
+        expect(link&.text).to eq "1 deleted"
+      end
     end
 
     # It rendered a link with ?method=delete, so deleting quietly did nothing but show the user again

@@ -1,15 +1,19 @@
 {
   "format": 2,
-  "published_at": "2026-10-05T15:05:04Z",
-  "schema_version": "0.23.1",
+  "published_at": "2026-10-09T18:43:06Z",
+  "schema_version": "0.25.3",
   "index": "index.json",
   "vocabulary": "vocabulary.json",
   "blocks": {
     "aventon/2022": "models/aventon/2022.json",
+    "aventon/2024": "models/aventon/2024.json",
+    "aventon/2025": "models/aventon/2025.json",
     "aventon/2026": "models/aventon/2026.json",
     "segway/2025": "models/segway/2025.json",
     "specialized/2025": "models/specialized/2025.json",
+    "specialized/2027": "models/specialized/2027.json",
     "sur_ron/2026": "models/sur_ron/2026.json"
   },
-  "kit": "kit.json"
+  "kit": "kit.json",
+  "comparison": "comparison.json"
 }

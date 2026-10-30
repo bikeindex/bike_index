@@ -33,6 +33,16 @@ RSpec.describe RecoveryDisplay, type: :model do
     end
   end
 
+  describe "quote length" do
+    let(:recovery_display) { FactoryBot.build(:recovery_display, quote: "a" * 400) }
+    it "allows 400 characters, not 401" do
+      expect(recovery_display).to be_valid
+      recovery_display.quote += "a"
+      expect(recovery_display).not_to be_valid
+      expect(recovery_display.errors.full_messages).to eq(["Quote is too long (maximum is 400 characters)"])
+    end
+  end
+
   describe "photo_processed? and image_processing" do
     let(:recovery_display) { RecoveryDisplay.new }
     it "is false by default" do

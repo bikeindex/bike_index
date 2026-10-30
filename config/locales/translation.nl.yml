@@ -241,8 +241,6 @@ nl:
           required: verplicht
         payment:
           requires_email_or_org: Vereist een e-mailadres of organisatie
-        recovery_display:
-          quote_too_long: Dat citaat is te lang. Kort deze in tot minder dan 300 tekens
         theft_alert:
           must_be_later_than_start_time: moet later zijn dan de starttijd
           must_be_present: Moet aanwezig zijn
@@ -2239,12 +2237,6 @@ nl:
           left_organization: Je hebt %{org_name} verlaten.
           unable_to_leave: 'Kan %{org_name} niet verlaten: neem contact op met support@bikeindex.org
             voor hulp.'
-    memberships:
-      edit:
-        free_membership: Bike Index heeft u een gratis lidmaatschap gegeven. Stuur
-          een e-mail naar support@bikeindex.org als u vragen hebt.
-        no_active_membership: Als u nog geen actief lidmaatschap heeft, moet u zich
-          aanmelden voor een nieuw lidmaatschap.
     search:
       registrations:
         set_interpreted_params:
@@ -2295,6 +2287,9 @@ nl:
           bekijk hoe de e-bikeklassen werken.
         state_title: "%{state} e-bike wetgeving"
         title: Regels voor e-bikes
+    memberships:
+      create:
+        already_a_member: Je hebt al een lidmaatschap.
   customer_mailer:
     additional_email_confirmation:
       html:
@@ -3582,41 +3577,6 @@ nl:
         op uw website
       bike_shops_deck: fietswinkel partner deck
       check_out: Bekijk onze
-    for_cities:
-      actually_get_people_registered_and_do_it_: Eigenlijk, mensen zich laten registreren.
-        En doe het goedkoop.
-      bike_index_for_cities: Bike Index voor steden
-      bike_index_is_the_community_registration_: Bike Index is het favoriete registratiesysteem
-        van de gemeenschap. Wij zijn het fietsregistratiesysteem van meer dan 600
-        organisaties - gemeenschappen in alle uithoeken van het land. Word lid van
-        het meest gebruikte fietsregistratienetwerk in het land.
-      bike_index_unveils_partnership_with_the_c: Bike Index onthult samenwerking met
-        de stad Palo Alto
-      bring_together_bike_shops_schools_municip: Breng fietsenwinkels, scholen, gemeentelijke
-        afdelingen en wetshandhavers samen om fietsen in één systeem te registreren.
-        Voorbij zijn de dagen van wachten op mensen die niet binnenkomen om hun fietsen
-        te registreren, of zich afvragen of die andere afdeling er voor heeft gezorgd.
-        Bike Index consolideert alles op één beheersbare plaats.
-      engage_your_residents_and_recover_their_b: Betrek uw bewoners, krijg hun fietsen
-        terug, en zij zullen voor altijd van u houden.
-      mitigate_the_registration_mess: Beperk de registratiepuinhoop
-      no_more_index_cards_or_excel_sheets_give_: Geen indexkaarten of excel sheets
-        meer. Geef uw burgers de tools om zich in minder dan twee minuten vanaf een
-        smartphone te registreren en gebruik deze registraties om gestolen fietsen
-        terug te krijgen en terug te brengen.
-      our_community_is_your_community: Onze gemeenschap is uw gemeenschap
-      plug_your_city_in_nationally: Sluit je stad landelijk aan.
-      related_articles: 'Gerelateerde artikelen:'
-      trusted_by_municipalities_everywhere: Overal vertrouwd door gemeenten
-      bike_index_new_dashboard: Nieuw fietsindexdashboard handig voor het bestrijden
-        van fietscriminaliteit
-      bike_index_organization_impounding: Fietsen in beslag nemen met Bike Index
-      embed_a_bike_index_registration_form: Een fietsregistratieformulier insluiten
-        op uw website
-      check_out: Bekijk onze
-      cities_deck: steden partner deck
-      used_by_municipalities_everywhere: Overal gebruikt door gemeenten
-      schedule_a_demo: Plan een demo
     for_community_groups:
       bike_index_for_community_groups: Bike Index voor Community's
       bike_index_launches_new_ambassadors_progr: Bike Index lanceert een nieuw Ambassadeurs
@@ -3749,6 +3709,9 @@ nl:
     strava_search_index: Koppel je Strava-uitrusting aan je Bike Index-registraties.
       Zoek, filter en update je activiteiten in één keer om uitrusting toe te wijzen
       aan ritten die deze nog niet hebben.
+    marketplace_how_it_works: Hoe werkt kopen en verkopen op de Bike Index Marketplace,
+      waar elke fiets geregistreerd staat en een als gestolen opgegeven fiets niet
+      te koop aangeboden kan worden.
   meta_titles:
     bikes_index: Zoekresultaten
     bikes_new: Registreer een fiets!
@@ -3801,6 +3764,7 @@ nl:
     search_marketplace_index: Fietsindex Marktplaats
     strava_search_index: Fietsindex Strava-zoekfunctie
     registration_form_settings: Instellingen voor het registratieformulier
+    marketplace_how_it_works: Hoe de Bike Index Marketplace werkt
   organized:
     ambassador_dashboards:
       getting_started:
@@ -4476,6 +4440,7 @@ nl:
       name_required: De naam van de eigenaar is vereist voor registratie.
       unable_to_save: Het is ons niet gelukt om uw registratie op te slaan. Probeer
         het later opnieuw.
+      description_stolen_required: Vertel ons alstublieft wat er is gebeurd.
     menu_items_account:
       logout: Uitloggen
       marketplace_messages: Marktplaatsberichten
@@ -4811,6 +4776,9 @@ nl:
       send_it: Stuur het!
       subject: Onderwerp
       your_message: Uw bericht
+      message_template: 'Serienummer van de fiets (indien van toepassing): URL voor
+        registratie bij Bike Index (indien van toepassing): Waarmee ik hulp nodig
+        heb: '
     index:
       contact_us: Neem contact met ons op!
       have_a_question_we_havent_answered: Heeft u een vraag die we niet hebben beantwoord?
@@ -4818,6 +4786,9 @@ nl:
       log_in_to_send_a_comment: Log in om een reactie te sturen!
       you_can_reach_us_at_contact_html: U kunt ons bereiken op %{contact_link}, of
         stuur uw bericht hier naartoe.
+      the_more_detail_you_can_share: Hoe meer details u kunt delen, hoe sneller we
+        u kunnen helpen. Als uw vraag over een specifieke fiets gaat, vermeld dan
+        het serienummer of uw Bike Index-registratie-URL.
   manufacturers:
     index:
       manufacturers_we_know_about: Fabrikanten die we kennen
@@ -5417,15 +5388,12 @@ nl:
         protecting_your_bike_here: hier je fiets beschermen
         read_more_about_prefix: Lees meer over
         recovered_bike_type: hersteld / gevonden %{bike_type}
-        secure_both_wheels_either_with_two_ulocks: Beveilig beide wielen - hetzij
-          met twee U-sloten, of één U-slot en één zware kabel.
         sign_up_on_bikeindexorg_to_claim_your_bik: Meld je aan op BikeIndex.org om
           je %{bike_type} te claimen en te bewerken, foto's te uploaden en ervoor
           te zorgen dat je nooit je vertrouwde ros uit het oog verliest!
         stolen_bike_type: gestolen %{bike_type}
         thanks_for_adding_this_bike_type_you_found: Bedankt voor het toevoegen van
           deze %{bike_type} die je aan Bike Index hebt gevonden
-        use_a_ulock: Gebruik een U-Lock.
         were_sorry_your_bike_type_was_stolen: Het spijt ons dat uw %{bike_type} is
           gestolen.
         when_you_do: wanneer je dat doet!
@@ -5455,13 +5423,16 @@ nl:
         stolen_guidance: Als je fiets gestolen wordt, log dan direct in op Bike Index
           en meld hem als gestolen om ons opsporingsnetwerk te activeren.
         theft_victims_illustration: Illustratie van slachtoffers van diefstal
-        ulock_illustration: U-slot illustratie
         updated_registration_guidance: Als u verhuist, uw fiets verkoopt of er andere
           wijzigingen aan aanbrengt, zorg er dan voor dat de registratie is bijgewerkt,
           zodat de gegevens correct en bruikbaar blijven.
         view_your_bike: Bekijk je fiets
         what_if_my_bike_gets_stolen: Wat als mijn fiets gestolen wordt?
         whats_next: Wat volgt?
+        secure_both_wheels_with_locking_skewers: Beveilig beide wielen met vergrendelbare
+          snelspanners, een stevige kabel en een of twee U-sloten.
+        use_a_ulock_or_foldable_lock: Gebruik een U-slot of een stevig opvouwbaar
+          slot.
       organization_invitation:
         hello: Hallo %{name},
         join_org: Doe mee met %{org_name}
@@ -5576,6 +5547,8 @@ nl:
           required: verplicht
         combobox_state:
           state: Staat
+        combobox:
+          no_matches: Geen overeenkomsten
       alerts:
         base:
           error: Fout
@@ -5606,6 +5579,16 @@ nl:
         in_the_past_year: in het afgelopen jaar
         now: nu
         to: Naar
+      table_column_settings:
+        all: Alle
+        default: standaard
+        included_columns: Inbegrepen kolommen
+        none: geen
+        visible_columns: Zichtbare kolommen
+        return_to_default_column_order: Terug naar de standaard kolomvolgorde
+      drag_handle:
+        move: Verplaats %{name}
+        moved: Positie %{position} van %{count}
     atoms:
       serial:
         hidden: verborgen
@@ -5628,6 +5611,8 @@ nl:
         copy_id: Kopieer ID
       sticker:
         copy_sticker: Kopieersticker
+      recovery_display_card:
+        recovered: Hersteld
     pages:
       messages:
         thread_show:
@@ -5720,6 +5705,7 @@ nl:
             view_list: Lijst
             view_table: Tafel
             loading_results: Resultaten laden...
+            per_page_option: "%{number} per pagina"
           chart_card:
             caption_search: Huidige zoekopdracht
             caption_year: Overzicht van vorig jaar
@@ -5743,7 +5729,6 @@ nl:
             created_at_cell: Geregistreerd
             creation_description_cell: Bron
             cycle_type_cell: 'Voertuigtype:'
-            default: standaard
             filter_impounded_html: alleen <strong>in beslag genomen</strong>
             filter_no_address_html: alleen <strong>geen</strong> adres
             filter_no_sticker_html: alleen <strong>geen</strong> sticker
@@ -5757,7 +5742,6 @@ nl:
             impound_id_cell: Inbeslagname-ID
             manufacturer_cell: Fabrikant
             model_cell: Model
-            none: geen
             owner_email_cell: Verzonden naar
             owner_name_cell: Eigenaar naam
             propulsion_type_cell: Elektrisch voertuig (aandrijving)
@@ -5773,7 +5757,6 @@ nl:
             unregistered: 'Niet geregistreerd:'
             updated_at_cell: Bijgewerkt
             url_cell: URL
-            visible_columns: Zichtbare kolommen
             notes_cell_html: Registratienotities <em>door %{org_name}</em>
             reg_organization_affiliation_cell_html: Affiliatie <em>in %{org_name}</em>
             reg_student_id_cell_html: Studentnummer <em>voor %{org_name}</em>
@@ -5781,9 +5764,6 @@ nl:
             photo_cell: Foto
             view_cell: Weergave
             acknowledgment_cell_panel: Tijd - Registratievolgorde bevestigd
-            created_at_cell_panel: Tijd - geregistreerd
-            occurred_at_cell_panel: Tijd - status
-            updated_at_cell_panel: Tijd - bijgewerkt
             filter_stolen_or_impounded_html: alleen <strong>gestolen</strong> of <strong>in
               beslag genomen</strong>
             location_search_disabled_no_address: "%{org_name} verzamelt geen registratieadressen,
@@ -5793,13 +5773,40 @@ nl:
               het doorzoeken van alle kentekens, tenzij je alleen zoekt naar in beslag
               genomen en/of gestolen kentekens.
             show_location_search: toon locatie zoeken
-            included_columns: Inbegrepen kolommen
+            all_bikes: Alle fietsen
+            all_statuses: Alle statussen
+            impound_location_cell: Plaats
+            impound_status_cell: Inbeslagname status
+            impound_updated_at_cell: Inbeslagname bijgewerkt
+            impound_updated_at_cell_panel: Tijd - Registratie van inbeslagname bijgewerkt
+            impound_user_cell: Laatste update
+            impounded_at_cell: In beslag genomen bij
+            impounded_at_cell_panel: Tijd - In beslag genomen
+            impounded_from_cell: In beslag genomen van
+            only_unregistered: Alleen niet-geregistreerde
+            only_user_registered: Alleen geregistreerde gebruikers
+            registered_cell_panel: Tijd - Geregistreerd
+            registration: 'Registratie:'
+            registration_updated_cell_panel: Tijd - Registratie bijgewerkt
+            resolved_at_cell: Vastbesloten
+            resolved_at_cell_panel: Tijd - Opgelost
+            status_at_cell_hint: wanneer gestolen, in beslag genomen, enz.
+            status_at_cell_panel: Tijd - Status
+            status_records: "%{status} records"
+            unregistered_cell: Niet geregistreerd
+            copy_column_order_from_impounded_vehicles_search: Kopieer de kolomvolgorde
+              van de zoekopdracht naar in beslag genomen voertuigen.
+            copy_column_order_from_registrations_search: Kopieer de kolomvolgorde
+              uit de zoekopdracht naar registraties.
+            impound_search_columns: Inbeslagname zoekkolommen
           column_settings_toggle:
             column_settings: Kolominstellingen
           settings_and_filters:
             date_range: 'Datumbereik:'
             search_settings_and_filters: Zoekinstellingen en filters
             filters: Filters
+            impound_search: de in beslag genomen voertuigen doorzoeking
+            view_in_impound_search_html: Bekijken in %{impound_search}
           search_all:
             search_all_html: Zoek in alle registraties <span class="twless-strong">(niet
               alleen %{org_name})</span>
@@ -5811,9 +5818,8 @@ nl:
             hidden: verborgen
             not_registered_with: Verborgen omdat het niet is geregistreerd bij %{org_name}
             acknowledgment_title: Bevestiging van de registratieprocedure bij
-            occurred_at_tooltip: Wanneer het gestolen, in beslag genomen, teruggevonden
-              of te koop aangeboden werd
             view: Weergave
+            toggle_all_checked: Alles aangevinkt weergeven/verbergen
           multi_result_chip:
             no_results: geen overeenkomsten
           multi_results:
@@ -5827,16 +5833,8 @@ nl:
             view_all: alles bekijken
         impound_records:
           index:
-            all_bikes: Alle fietsen
-            all_statuses: Alle statussen
             cannot_update_with_kind: Dit record kan niet worden bijgewerkt met '{kind}'.
             hide_update: Update verbergen
-            matching_impound_record:
-              one: overeenkomend inbeslagname record
-              other: overeenkomende inbeslagnamegegevens
-            only_unregistered: Alleen niet-geregistreerde
-            only_user_registered: Alleen geregistreerde gebruikers
-            status_records: "%{status} records"
             update_multiple_records: Meerdere records bijwerken
         parking_notifications:
           index:
@@ -5891,6 +5889,9 @@ nl:
           map_unavailable: De kaart kon niet worden geladen; de locatie was nog steeds
             ingesteld via uw apparaat.
           set_on_map: Op de kaart plaatsen
+        registration_sequence:
+          page_edit_bullet:
+            bullet: kogel
       registrations:
         show:
           bike_details:
@@ -6231,6 +6232,21 @@ nl:
         result_view_select:
           cards_view: Bekijk als kaarten
           list_view: Weergeven als lijst
+        marketplace_intro:
+          bike_index_members: Bike Index-leden
+          checked_for_theft: Gecontroleerd op diefstal
+          description: Bike Index is een non-profitorganisatie die gestolen fietsen
+            helpt terug te vinden. Op onze marktplaats worden alleen geregistreerde
+            fietsen aangeboden, zodat u een tweedehands fiets kunt kopen zonder dat
+            deze als gestolen is opgegeven.
+          heading: De marktplaats voor tweedehands fietsen van het fietsenregister.
+          hide_intro: Intro verbergen
+          how_buying_works: Hoe kopen werkt
+          how_selling_works: Hoe verkopen werkt
+          marketplace_title: Fietsindex Marktplaats
+          ownership_transfers: Eigendomsoverdrachten
+          registered_bikes_only: Alleen geregistreerde fietsen
+          what_makes_this_different: Wat maakt dit anders?
       sessions:
         sign_in_interstitial:
           click_button_to_continue: Klik op de onderstaande knop om verder te gaan.
@@ -6434,6 +6450,25 @@ nl:
             update_marketplace_listing: Update marktplaatsvermelding!
             updated: Bijgewerkt
             user_hidden: Verborgen voor andere gebruikers
+        memberships:
+          show:
+            complimentary: Bike Index heeft je dit lidmaatschap aangeboden, dus je
+              hoeft er niet voor te betalen.
+            ends: Einde
+            manage_billing: Facturering beheren
+            new_members_pay: Nieuwe %{level}-leden betalen %{current_price}.
+            not_a_member: Je bent geen lid van Bike Index.
+            per_month: per maand
+            per_year: per jaar
+            see_membership_tiers: Bekijk de verschillende lidmaatschapsniveaus
+            started: Gestart
+            you_are_a_member: Je bent een %{level}-lid
+            you_pay_less: Je betaalt minder dan nieuwe leden. %{level} is nu %{current_price},
+              en je behoudt je prijs zolang je lidmaatschap actief blijft en je dit
+              abonnement blijft gebruiken.
+            you_pay_the_current_price: U betaalt de huidige prijs voor %{level}.
+            your_membership: Uw lidmaatschap
+            your_price: Uw prijs
       sales:
         new_form:
           record_sale: Recordverkoop
@@ -6481,10 +6516,6 @@ nl:
           promoted_alerts_title: Zet je fiets terug voor de wijk waar hij vandaan
             is gestolen.
           questions_people_ask_at_2am: Vragen die mensen om 2 uur 's nachts stellen
-          read_more_recovery_stories: Lees meer herstelverhalen
-          recovered: Hersteld
-          recoveries_reported_by_owners: Recent teruggevonden dieren, zoals gemeld
-            door hun eigenaren.
           recovery_record: Herstelverslag
           register_it: Registreer het
           register_your_stolen_bike: Registreer je gestolen fiets
@@ -6605,6 +6636,8 @@ nl:
             have_questions: Heeft u vragen over dit beleid?
             read_the_faq: Veelgestelde vragen over de bevestiging van elektrische
               voertuigen
+            bike_index: Bike Index
+            set_by: Ingesteld door %{name}
           review_summary:
             a_quick_review: Een korte samenvatting van alles wat u hebt bevestigd.
             a_quick_review_tap: Een kort overzicht van alles wat je hebt bevestigd.
@@ -6816,7 +6849,6 @@ nl:
           max: Max
           min: Min
           more_filters: Meer filters
-          motorized: Gemotoriseerd
           price: Prijs
           search_placeholder: Zoeken op fabrikant of model…
           sort: Soort
@@ -6825,8 +6857,6 @@ nl:
           filter_combobox:
             any: Elk
           byline: Een gratis naslagwerk van Bike Index, het non-profit fietsregister.
-          tagline_html: De fietsenbibliotheek van de wereld — zoek, vergelijk en vind
-            je volgende fiets tussen de %{models_count}+ modellen.
           tagline: 'De wereldwijde fietsenbibliotheek: zoek, vergelijk en vind je
             volgende fiets.'
           about_bikebook_label: Over BikeBook
@@ -6835,7 +6865,6 @@ nl:
           configuration_examples: "(compleet/framework)"
           human_powered: Aangedreven door menskracht (akoestisch)
           manufacturers: Fabrikanten
-          out_of_class: Buiten de les
           out_of_class_details: Gemotoriseerd, maar niet van de Amerikaanse categorieën
             1, 2 of 3, zoals een bromfiets, motorfiets of elektrische terreinmotor.
           propulsion: Voortstuwing
@@ -6844,6 +6873,27 @@ nl:
           us_class_2: Amerikaanse klasse 2
           us_class_3: Amerikaanse klasse 3
           vehicle_types: Voertuigtypen
+          e_bike_classification: classificatie van e-bikes
+          e_vehicle_motorized: e-voertuig (gemotoriseerd)
+          jurisdiction: Rechtsgebied
+          out_of_class_label: Buiten de les
+          united_states: Verenigde Staten
+          any_market: Elke markt
+          market: Markt
+          clear_filters: Filters wissen
+          loading_placeholder: Laden…
+          any_frame_material: Elk framemateriaal
+          any_handlebar_type: Elk type stuur
+          frame_material: Frame materiaal
+          handlebar_type: Type stuur
+          market_scope: Modellen uit andere markten
+          only_market_html: Alleen %{market}
+          prefer_market_sold_in_html: Geef de voorkeur aan voertuigen die verkocht
+            worden in %{market}
+          select_a_vehicle_type: Selecteer een %{bike_type}, kies meerdere om ze te
+            vergelijken
+          select_an_vehicle_type: Selecteer een %{bike_type}, kies meerdere om ze
+            te vergelijken
         donate_strip:
           donate: Schenken
           pitch: Dit fantastische product wordt u aangeboden door de non-profitorganisatie
@@ -6855,6 +6905,9 @@ nl:
           class_aria: Klasse %{n} e-bike
           class_unknown_aria: E-bike klasse onbekend
           emoto: E-moto
+          emoto_aria: E-moto, geen e-bike
+          optional_throttle: met optionele gashendel
+          optional_upgrade: met optionele upgrade
         law_details:
           from: 'Van %{date}:'
           from_until: 'Van %{starts_on} tot %{ends_on}:'
@@ -6872,10 +6925,7 @@ nl:
           class_3_throttle: Het gaspedaal moet bij 32 km/u (20 mph) worden uitgeschakeld.
           classes_start_on: De lessen gaan in %{date}. Tot die tijd kunt u de actuele
             regels van de staat raadplegen.
-          entered_manually: Handmatig ingevoerd · Klasse %{n}
           fails_rule: Voldoet niet aan deze regel.
-          falls_under: In %{state} valt het onder %{name}, waarvoor registratie en
-            een vergunning vereist kunnen zijn.
           for_your_information: Ter informatie
           gray_detail: Uw %{name} staat geregistreerd als een e-bike van klasse %{n}.
             Raadpleeg de %{state} RDW voor de lokale regels.
@@ -6901,7 +6951,6 @@ nl:
           no_watt_cap: Geen maximumvermogen in de staatswet
           not_classified: Het is geen e-bike van klasse 1, 2 of 3.
           not_permitted: Niet toegestaan
-          not_provided: Niet verstrekt
           own_classes: De staat stelt zijn eigen grenzen vast in plaats van de drie
             standaardklassen.
           recovered_more_often: Gestolen fietsen worden twee keer zo vaak teruggevonden
@@ -6928,7 +6977,6 @@ nl:
           throttle_not_stated: De wetgeving van de staat zegt niet of een gasklep
             is toegestaan.
           top_speed: Topsnelheid
-          ul_certification: UL-certificering
           watts_html: "%{watts}W"
           watts_not_provided: Motorvermogen niet opgegeven
           watts_over_cap_html: "%{watts}W motor overschrijdt de %{cap}W capaciteit"
@@ -6953,29 +7001,105 @@ nl:
           class_3_throttle_within_html: Gashendel stopt bij %{mph} mph
           class_unknown_check_label: BikeBook vermeldt de klasse of topsnelheid niet,
             dus controleer de klasse op het label.
-          entered_manually_unclassified: Handmatig ingevoerd
           entered_unverified: Invoer door u, niet geverifieerd door BikeBook.
           full_bikebook_entry: Bekijk het volledige BikeBook-artikel
-          model_year_bikebook: "%{year} model · BikeBook"
           over_mph_html: Meer dan %{mph} mph
           red_headline_manual: Dit is geen e-bike volgens de huidige %{state} regels.
           speed_past_cap_html: Assistentie bij snelheden boven %{past} mph, boven
             de %{cap} mph-limiet
           speed_past_html: Ondersteunt voorbij %{past} mph; controleer of het stopt
             bij %{cap} mph
-          classes_not_recognized:
-            one: Klasse %{n} wordt hier niet herkend.
-            other: De klassen %{n} worden hier niet herkend.
           classes_recognized:
             one: Klasse %{n} wordt herkend
             other: De klassen %{n} worden erkend.
           read_more: Lees meer
-          stock_photo: Stock foto
+          answer_optional: Optioneel
+          as_class_with_optional_throttle: als klasse %{n} met zijn optionele gashendel
+          as_class_with_optional_upgrade: als klasse %{n} met een optionele upgrade
+          class_3_optional_throttle_within_html: Optionele gashendel stopt bij %{mph}
+            mph
+          class_3_speed_with_throttle_html: Assistentie tot %{mph} mph, niet toegestaan
+            met gashendel
+          class_n: Klasse %{n}
+          classes_not_permitted: Het is een %{classes} e-bike, wat niet is toegestaan.
+          green_headline_optional: Je %{name} mag legaal gebruikt worden in %{state}
+            als een klasse %{n} e-bike, en %{optional}.
+          manually_entered: Handmatig ingevoerd
+          model_year: "%{year} model"
+          optional_throttle_not_allowed: Het is alleen legaal zonder de optionele
+            gasklep.
+          optional_to_html: Optioneel, naar %{mph}
+          throttle_with_class_3_assist: Niet toegestaan met assistentie van klasse
+            3
+          yellow_headline_optional:
+            one: Je %{name} mag legaal gebruikt worden in %{state} als een klasse
+              %{n} e-bike, en %{optional}, met %{count} regel om te controleren.
+            other: Je %{name} mag legaal gebruikt worden in %{state} als een e-bike
+              van klasse %{n}, en %{optional}, met %{count} regels om te controleren.
+          yellow_headline_without_throttle: Je %{name} mag legaal in %{state} rijden
+            als een %{n} e-bike, zonder de optionele gashendel.
+          green_headline_law: Je %{name} mag legaal in %{state} rijden volgens de
+            %{law}-regels.
+          kmh_html: "%{kmh} km/u"
+          law_source_html: 'Bron: %{link}''s catalogus van wetgeving betreffende e-bikes.
+            Samenvattingen dienen ter referentie en zijn geen juridisch advies.'
+          may_be_moped_canada: Het kan ook zijn dat het voertuig als bromfiets of
+            motorvoertuig wordt gereguleerd, waarvoor registratie en een rijbewijs
+            vereist kunnen zijn.
+          no_e_bike_category: Er is hier geen aparte categorie voor e-bikes, dus controleer
+            de regels voor rijbewijs, registratie en helmplicht.
+          no_speed_cap_in_law: Er is geen snelheidslimiet in de wetgeving.
+          no_watt_cap_in_law: Er is geen maximumvermogen vastgelegd in de wet.
+          optional_to_kmh_html: Optioneel, naar %{kmh} km/u
+          over_kmh_html: Meer dan %{kmh} km/u
+          speed_over_cap_kmh_html: Assistentie tot %{kmh} km/u, boven de %{cap} km/u
+            limiet
+          speed_past_cap_kmh_html: Assistentie bij snelheden boven %{past} km/u, boven
+            de %{cap} km/u-limiet
+          speed_past_kmh_html: Assisteert voorbij %{past} km/u; controleer of het
+            stopt bij %{cap} km/u.
+          speed_to_check_kmh_html: BikeBook vermeldt de topsnelheid niet, dus controleer
+            of de motor stopt bij %{cap} km/u.
+          speed_within_cap_kmh_html: Assistentie tot %{kmh} km/u, binnen de limiet
+          still_reviewing_province_body: Raadpleeg het ministerie van Transport van
+            uw provincie of territorium voor de actuele regelgeving met betrekking
+            tot e-bikes. De meeste ministeries stellen een maximumvermogen van e-bikemotoren
+            van 500W en een maximumsnelheid met trapondersteuning van 32 km/u.
+          throttle_allowed_in_law: Gashendel toegestaan
+          throttle_not_allowed_in_law: De wet staat geen gashendel toe.
+          throttle_not_stated_in_law: De wet zegt niet of een gasklep is toegestaan.
+          watts_to_check_html: Controleer of de motor een vermogen heeft van %{cap}W
+            of minder.
+          yellow_headline_law:
+            one: Je %{name} mag legaal in %{state} rijden volgens de %{law}-regels,
+              met %{count}-regel om te controleren.
+            other: Je %{name} mag legaal in %{state} rijden volgens de %{law}-regels,
+              waarbij de %{count}-regels nog gecontroleerd moeten worden.
+          yellow_headline_law_without_throttle: Je %{name} mag legaal in %{state}
+            rijden volgens de %{law}-regels, zonder de optionele gashendel.
+          yellow_headline_motor_vehicle_law:
+            one: Je %{name} mag mogelijk legaal in %{state} rijden volgens de %{law}-regels,
+              waarbij %{count}-regel nog gecontroleerd moet worden.
+            other: Je %{name} mag mogelijk legaal in %{state} rijden volgens de %{law}-regels,
+              waarbij de %{count}-regels nog gecontroleerd moeten worden.
+          yes_to_kmh_html: Ja, tot %{kmh} km/u
+          your_province: Uw provincie of territorium
+          classes_not_recognized_in:
+            one: Klasse %{n} wordt niet herkend in %{state}
+            other: Klassen %{n} worden niet herkend in %{state}
+          falls_under_name: In %{state} valt het onder %{name}.
+          optional_classes_not_recognized_in:
+            one: Klasse %{n} wordt niet herkend in %{state}, dus het is alleen legaal
+              zoals het verkocht wordt.
+            other: De klassen %{n} worden niet herkend in %{state}, dus het is alleen
+              legaal zoals het verkocht wordt.
+          other_classification_rules: "%{name} regels"
         rule_label:
           classes: Erkende klassen
           power: Motorvermogenscapaciteit
           speed: Maximale ondersteunde snelheid
           throttle: Elektrisch gaspedaal
+          vehicle: Gereguleerd als
         rule_value:
           allowed: Toegestaan
           classes:
@@ -6986,10 +7110,10 @@ nl:
           not_allowed: Niet toegestaan
           own_definition: 'De eigen definitie: %{name}'
           watts_html: "%{watts}W"
+          kmh_html: "%{kmh} km/u"
         show:
           answer_no: Nee
           answer_yes: Ja
-          assist: Helpen
           banned_body: In New York City moeten e-bikes en accu's die daar verkocht
             worden voldoen aan UL 2849 of UL 2271 (Local Law 39 van 2023). Universiteiten,
             woningbouworganisaties en openbaarvervoersbedrijven nemen vergelijkbare
@@ -7005,32 +7129,11 @@ nl:
             en thermische oververhitting. De fabriek wordt vervolgens continu geïnspecteerd
             om de certificering te behouden.
           certification_involves_heading: Wat certificering inhoudt
-          change: wijziging?
           check_my_bike: Kijk eens naar mijn fiets
-          class_1_body: De motor ondersteunt alleen tijdens het trappen en stopt bij
-            32 km/u. Toegestaan op de meeste plaatsen waar een gewone fiets ook mag
-            komen.
-          class_1_tag: Alleen met trapondersteuning
-          class_2_body: Met een gashendel kan de fiets zonder te trappen tot wel 32
-            km/u (20 mph) worden aangedreven. Op sommige paden en in parken zijn gashendels
-            niet toegestaan.
-          class_2_tag: Elektrisch gaspedaal
-          class_3_body: Trapondersteuning tot 45 km/u, met snelheidsmeter. Vaak gelden
-            er helmplicht, een minimumleeftijd en beperkingen voor de routes.
-          class_3_tag: Snellere trapondersteuning
-          class_n: Klasse %{n}
-          classes_heading: E-bike lessen, uitgelegd
-          classes_intro: De meeste staten hanteren een systeem met drie klassen. Je
-            klasse bepaalt hoe snel de motor ondersteuning biedt, of je een gashendel
-            mag gebruiken en waar je mag rijden.
           compare_html: Wil je meerdere fietsen vergelijken? %{link}
-          detected_html: We hebben <strong>%{state}</strong> gedetecteerd —
           disclaimer: Bike Index is een 501(c)(3) non-profitorganisatie. Samenvattingen
             van de wetgeving van de betreffende staat dienen ter referentie en zijn
             geen juridisch advies.
-          emoto_motor: 750W+
-          emoto_speed: 28+ mph
-          enter_manually: Kun je je fiets niet vinden? Voer de gegevens in.
           for_parents: Voor ouders
           form_label: Informatie opzoeken over de naleving van de regelgeving voor
             e-bikes
@@ -7040,14 +7143,8 @@ nl:
             van de accu en het frame.
           how_to_check_2: Zoek dat nummer op in UL Product iQ.
           how_to_check_heading: Hoe controleer je een fiets?
-          location_not_shared: Locatie niet gedeeld. Kies uw provincie/staat uit de
-            lijst.
-          manual_legend: Voer de gegevens van uw fiets in.
-          motor: Motor
-          motor_cap: "≤750W"
           motor_wattage: Motorvermogen (W)
           mph: "%{mph} mph"
-          not_an_ebike: Geen e-bike
           parent_step_1_body: Veel staten hanteren een minimumleeftijd voor klasse
             3, en sommige voor elke klasse. Controleer de regels in uw staat voordat
             u een fiets kiest.
@@ -7077,8 +7174,6 @@ nl:
             kind er veilig op kan rijden.
           parents_heading: Een e-bike kopen voor je kind?
           parents_link: Raadpleeg de leeftijds- en helmregels van jouw staat.
-          pedal: Voetpedaal
-          pill: Bike Index · Non-profitorganisatie · Meer dan 10 jaar ervaring
           recoveries_html: "%{number} herstel"
           register_band_heading: Geregistreerde fietsen worden twee keer zo vaak teruggevonden
             als ze gestolen worden. Registratie is gratis.
@@ -7088,8 +7183,6 @@ nl:
           state_error: Kies een staat.
           subheading: Voer je staat en fietstype in om de regels van jouw staat te
             bekijken.
-          throttle: Elektrisch gaspedaal
-          top_assist: Top assistentie
           ul_2271_body: Test het lithium-ion-accupakket afzonderlijk. Komt vaak voor
             bij fietsen en vervangende accu's; het testpakket dekt niet de lader of
             de motor.
@@ -7113,17 +7206,49 @@ nl:
           bikebook_didnt_load: BikeBook kon niet worden geladen. Voer hieronder de
             gegevens van uw fiets in.
           bikebook_loading: BikeBook wordt geladen…
-          choose_by_bike_model: Selecteer op fietsmodel
-          emoto_limits_body: Een e-moto wordt beschouwd als een voertuig met een topsnelheid
-            van meer dan 45 km/u, een maximale snelheid van meer dan 32 km/u of een
-            motorvermogen van meer dan 750 watt. In de meeste staten worden deze voertuigen
-            behandeld als bromfietsen of motorfietsen, waarvoor registratie, verzekering
-            en een rijbewijs vereist kunnen zijn.
           how_to_check_lookup: Zoek het model hierboven op. BikeBook toont de certificering
             waar deze geregistreerd staat.
           over_28_mph: Meer dan 45 km/u
           top_speed: Wat is de topsnelheid?
           visit_bikebook_link: Bezoek BikeBook.
+          custom_details: Aangepaste details
+          details_legend: De gegevens van uw fiets
+          model_details: "%{model} details"
+          country: Land
+          not_in_us_html: Niet in de VS? %{switch_country}
+          select_country: Selecteer een land
+          switch_country: land wijzigen
+          switch_country_title: Land wijzigen
+          banned_body_canada: Universiteiten, woningbouworganisaties en openbaarvervoersbedrijven
+            stellen regels op voor het stallen en opladen van e-bikes binnenshuis,
+            en certificering is waar ze naar op zoek zijn.
+          choose_province: Kies uw provincie of territorium uit de lijst.
+          choose_state: Kies uw staat uit de lijst.
+          detected_place_html: We hebben <strong>%{state}</strong> gedetecteerd.
+          disclaimer_canada: Bike Index is een non-profitorganisatie. Samenvattingen
+            van provinciale en territoriale wetgeving dienen ter referentie en zijn
+            geen juridisch advies.
+          kmh: "%{kmh} km/u"
+          not_in_canada_html: Niet in Canada? %{switch_country}
+          over_kmh: Meer dan %{kmh} km/u
+          parent_step_1_body_canada: De meeste provincies hanteren een minimumleeftijd
+            voor het rijden op een e-bike, tussen de 12 en 18 jaar. Controleer de
+            minimumleeftijd in jouw regio voordat je een fiets koopt.
+          parent_step_2_body_canada: Geen gashendel, dus de motor helpt alleen mee
+            tijdens het trappen. Het is het makkelijkste type e-bike om op te leren
+            rijden.
+          parent_step_2_title_canada: Begin met trapondersteuning.
+          parents_body_canada: E-bikes zijn zwaarder en sneller dan de fietsen waarop
+            de meeste kinderen leren fietsen. Voordat je er een koopt, moet je nagaan
+            wat er in jouw provincie en gemeente is toegestaan en ervoor zorgen dat
+            je kind er veilig op kan rijden.
+          parents_link_canada: Raadpleeg de leeftijds- en helmregels van jouw provincie.
+          province: Provincie of territorium
+          province_error: Kies een provincie of territorium.
+          select_province: Selecteer uw provincie of territorium.
+          subheading_canada: Voer je provincie of territorium in en fiets om de regels
+            te bekijken.
+          watts_placeholder_canada: bijv. 500
         state_reference:
           compiling: We verzamelen momenteel de regels voor e-bikes van %{state} op
             basis van gegevens van de staatslegislatuur en de RDW. Kom binnenkort
@@ -7140,23 +7265,753 @@ nl:
           all_on_file: Alle 50 staten en DC geregistreerd.
           check_in_state: Check een e-bike in %{state}
           no_match: Geen enkele staat komt overeen. Probeer een andere naam.
+          not_three_classes: Geen 3 klassen
+          only_classes:
+            one: Alleen klasse %{classes}
+            other: Alleen klassen %{classes}
+          all_on_file_canada: Elke provincie en elk territorium dat geregistreerd
+            staat
+          compiling_canada: We verzamelen momenteel de e-bike-regels van %{state}
+            op basis van wetgeving en informatie van het ministerie van Transport.
+            Kom binnenkort terug voor meer informatie.
+          filter_placeholder_canada: Typ een provincie of territorium
+          filter_provinces: Filter provincies en gebieden
+          heading_canada: Wetgeving rondom e-bikes per provincie en territorium
+          limits_subheading_canada: Elke provincie en elk territorium. Open er een
+            om de grenzen, regels en bronnen te bekijken.
+          no_match_canada: Geen provincies of territoria komen overeen. Probeer een
+            andere naam.
+          on_file_of_total_canada_html: "%{number} van %{total} provincies en territoria
+            geregistreerd · overige in beoordeling"
         ul_badge:
           certified: UL %{standard} gecertificeerd
           meaning_2271_certified: Het accupakket heeft de UL-veiligheidstests voor
             overladen, kortsluiting en stoten doorstaan.
-          meaning_2271_unknown: We hebben nog geen gegevens over de batterijcertificering.
-            Controleer het label op de batterij.
-          meaning_2849_unknown: We hebben nog geen systeemcertificeringsgegevens voor
-            dit model. Zoek naar het UL-keurmerk op het frame-etiket.
           scope_2271: Batterijpakket
           scope_2849: Elektrisch systeem van een e-bike
-          status_unknown: UL %{standard} status onbekend
-          meaning_2271_check_label: Controleer het label op de batterij.
-          meaning_2849_check_label: Zoek naar het UL-keurmerk op het label van het
-            frame.
           meaning_2849_system_certified: Het complete elektrische systeem (motor,
             accu, lader en controller) heeft gezamenlijk de brandveiligheids- en elektrische
             veiligheidstests doorstaan.
+          certification_unknown: Certificering onbekend
+          meaning_check_labels: Zoek naar het UL-keurmerk op het frame en de batterijlabels.
+          meaning_unknown: We hebben nog geen certificeringsgegevens voor dit model.
+            Let op het UL-keurmerk op het frame en de batterijlabels.
+        classes:
+          classes_heading: E-bike lessen, uitgelegd
+          classes_intro: De meeste staten hanteren een systeem met drie klassen. Je
+            klasse bepaalt hoe snel de motor ondersteuning biedt, of je een gashendel
+            mag gebruiken en waar je mag rijden.
+          state_classes_heading: "%{state} e-bike lessen"
+          state_classes_intro: "%{state} gebruikt niet het drieklassensysteem dat
+            de meeste staten hanteren. De wetgeving van deze staat deelt e-bikes en
+            andere elektrische tweewielers in plaats daarvan in deze klassen in."
+          other_classes: Andere elektrische voertuigen in %{place}
+          place_heading: Wetgeving rondom e-bikes in %{place}
+        rule_citation:
+          source: bron
+        class_card:
+          assist: Helpen
+          class_1_body: De motor ondersteunt alleen tijdens het trappen en stopt bij
+            32 km/u. Toegestaan op de meeste plaatsen waar een gewone fiets ook mag
+            komen.
+          class_1_tag: Alleen met trapondersteuning
+          class_2_body: Met een gashendel kan de fiets zonder te trappen tot wel 32
+            km/u (20 mph) worden aangedreven. Op sommige paden en in parken zijn gashendels
+            niet toegestaan.
+          class_2_tag: Elektrisch gaspedaal
+          class_3_body: Trapondersteuning tot 45 km/u, met snelheidsmeter. Vaak gelden
+            er helmplicht, een minimumleeftijd en beperkingen voor de routes.
+          class_3_summary: Trapondersteuning tot 45 km/u, met snelheidsmeter.
+          class_3_tag: Snellere trapondersteuning
+          class_n: Klasse %{n}
+          motor: Motor
+          motor_cap: "≤750W"
+          mph: "%{mph} mph"
+          or: of
+          pedal: Voetpedaal
+          state_specifics: "%{state} specificaties"
+          throttle: Elektrisch gaspedaal
+          top_assist: Top assistentie
+          emoto_limits_body: Een e-moto wordt beschouwd als een voertuig met een topsnelheid
+            van meer dan 45 km/u, een maximale snelheid van meer dan 32 km/u of een
+            motorvermogen van meer dan 750 watt. In de meeste staten worden deze voertuigen
+            behandeld als bromfietsen of motorfietsen, waarvoor registratie, verzekering
+            en een rijbewijs vereist kunnen zijn.
+          emoto_motor: 750W+
+          emoto_speed: 28+ mph
+          emoto_summary: Een topsnelheid van meer dan 45 km/u, een maximale snelheid
+            van meer dan 32 km/u of een motorvermogen van meer dan 750 watt maken
+            het een e-moto.
+          not_an_ebike: Geen e-bike
+          watts_max: "≤%{watts}W"
+          watts_min: "%{watts}W+"
+          copy_id: Kopieer ID
+          id: ID
+        bike_summary:
+          classification: E-%{vehicle_type} classificatie
+          electric_certification: Elektrische certificering
+          not_provided: Niet verstrekt
+        check:
+          outside_checked_countries: De fietscontroles gelden voorlopig alleen in
+            Amerikaanse staten en Canadese provincies. De wetgeving voor e-bikes in
+            %{place} staat hieronder.
+      memberships:
+        new:
+          become_a_member: Word lid
+          bike_index_membership: Lidmaatschap van Bike Index
+          builds_next: Bouwt volgende
+          choose_your_membership: Kies uw lidmaatschap
+          cycling_cap: Fietsmuts
+          every_tier_keeps_it_free: Elk abonnementsniveau houdt de registratie gratis
+            en financiert nieuwe functies. Hogere abonnementsniveaus bieden meer bedankjes.
+          faq_cancel_answer: U kunt dit op elk gewenst moment doen via uw accountpagina.
+            Het wisselen tussen een maandelijks en een jaarlijks abonnement werkt
+            op dezelfde manier.
+          faq_cancel_question: Kan ik mijn abonnement wijzigen of annuleren?
+          faq_free_answer: Ja. Registreren, zoeken en diefstal melden is voor iedereen
+            gratis, voor altijd. Lidmaatschap is de manier waarop we ervoor zorgen
+            dat dit zo blijft.
+          faq_free_question: Is het registreren van een fiets nog steeds gratis als
+            ik geen lid word?
+          faq_gear_answer: Nadat je je hebt aangemeld, sturen we je een e-mail met
+            het verzoek om je postadres en verzenden we het product van daaruit.
+          faq_gear_question: Wanneer krijg ik mijn pet of shirt?
+          faq_marketplace_answer: Nee. Iedereen kan een geregistreerde fiets gratis
+            te koop aanbieden. Leden krijgen hun advertenties bovenaan de lijst.
+          faq_marketplace_question: Moet ik lid zijn om op de marktplaats te kunnen
+            verkopen?
+          faq_tax_answer: Bike Index is een 501(c)(3) non-profitorganisatie, EIN 81-4296194.
+            Lidmaatschappen en eenmalige donaties zijn fiscaal aftrekbaar in de VS.
+          faq_tax_question: Is het lidmaatschap fiscaal aftrekbaar?
+          free_alerts_body: Er worden meldingen van diefstal verstuurd naar winkels,
+            politiebureaus, campussen en fietsers in de buurt van de plek waar de
+            fiets is gestolen.
+          free_alerts_title: Meldingen van gestolen fietsen
+          free_partners_body: Het inwerken van nieuwe winkels, afdelingen en steden,
+            en het helpen van de politie bij het koppelen van teruggevonden fietsen
+            aan hun eigenaren.
+          free_partners_title: Partners en herstel
+          free_registration_body: Het registreren, zoeken en controleren van een tweedehands
+            fiets kost niets, voor fietsers, winkels en de politie. Wij verkopen geen
+            fietsgegevens.
+          free_registration_title: Registratie en zoeken
+          join_monthly: Word lid als %{level} — %{price}/maand
+          join_yearly: Word lid als %{level} — %{price}/jr
+          keep_bike_index_free: Houd Bike Index gratis voor elke fietser.
+          keeps_free: Houdt gratis
+          live: Leven
+          member_gear: Ledenuitrusting
+          member_gear_body: Plus-leden ontvangen de Bike Index-fietsmuts. Patrons
+            ontvangen het zonwerende shirt. Beide zijn ontworpen door Kelsey Graywill
+            en worden na je aanmelding naar je opgestuurd.
+          monthly: Maandelijks
+          new_tools_for_bike_owners: Nieuwe hulpmiddelen voor fietsbezitters
+          next: Volgende
+          next_ebike_database_body: Een wereldwijde UL-certificeringsdatabase
+          next_ebike_database_title: E-bike database
+          next_ios_app_body: Registreer en beheer fietsen via je telefoon.
+          next_ios_app_title: De iOS-app
+          next_marketplace_body: Alleen geregistreerde fietsen, gecontroleerd aan
+            de hand van diefstalrapporten.
+          next_marketplace_title: Een veiligere marktplaats
+          next_oem_parts_body: Fabrieksspecificaties en foto's voor elk model.
+          next_oem_parts_title: OEM-onderdelen en stockfoto's
+          next_versioning_body: Houd bij hoe je fiets verandert.
+          next_versioning_title: Fietsversie
+          official_registry: Het officiële register voor meer dan 1.000 politiekorpsen,
+            universiteiten, steden en winkels.
+          or_make_a_one_time_donation: Of doe een eenmalige donatie.
+          partner_organizations: partnerwinkels, politiekorpsen en steden
+          per_month: "/ maand"
+          per_year: "/ jaar"
+          perk_cycling_cap: Fiets Index leden fietspet
+          perk_everything_in_basic: Alles in Basic
+          perk_everything_in_basic_and_plus: Alles in Basic en Plus
+          perk_faster_support: Snellere reacties van de supportafdeling
+          perk_listings_promoted: Uw marktplaatsvermeldingen worden naar de top gepromoot.
+          perk_member_badge: Lidmaatschapsbadge op je Bike Index-profiel
+          perk_no_ads: Geen advertenties, mochten we die ooit laten zien.
+          perk_patron_badge: Patronbadge op je Bike Index-profiel
+          perk_promoted_alert: Een gratis, betaalde melding als uw fiets gestolen
+            wordt.
+          perk_sun_shirt: Fietsindex Patron zonneshirt
+          perk_top_listing_placement: Toppositie voor je advertentie op de marktplaats
+          plans_from: Plannen vanaf %{price} een maand
+          questions: Vragen
+          recommended: Aanbevolen
+          stolen_bikes_recovered: Gestolen fietsen teruggevonden
+          summary_monthly: "%{level} lidmaatschap, %{price} een maand"
+          summary_yearly: "%{level} lidmaatschap, %{price} een jaar"
+          sun_shirt: Zonoverhemd
+          tax_deductible_cancel_any_time: Lidmaatschappen en eenmalige donaties zijn
+            fiscaal aftrekbaar in de VS. U kunt uw lidmaatschap op elk gewenst moment
+            wijzigen of opzeggen via uw account.
+          tax_deductible_ein: Lidmaatschappen en eenmalige donaties zijn fiscaal aftrekbaar
+            in de VS. Bike Index is een 501(c)(3) non-profitorganisatie, EIN 81-4296194.
+          the_registry_open_to_everyone: Het register is voor iedereen toegankelijk.
+          two_months_free: Twee maanden gratis
+          value_returned_to_owners: waarde teruggegeven aan eigenaren
+          view_your_membership: Bekijk uw %{level} lidmaatschap
+          wear_the_shield: Draag het schild
+          what_members_make_possible: Wat leden mogelijk maken
+          yearly: Jaarlijks
+          bikes_registered: geregistreerde fietsen
+          bikes_registered_keep_it_free: "%{bikes} fietsen zijn geregistreerd. Leden
+            houden het gratis voor de volgende miljoen."
+          millions_registered_keep_it_free: "%{millions} miljoen fietsen zijn geregistreerd.
+            Leden houden het gratis voor de volgende miljoen."
+          monthly_donation_lede: Het lidmaatschap is een maandelijkse donatie aan
+            Bike Index. Hiermee betalen we het register en de meldingen van gestolen
+            fietsen, zodat fietsen weer thuisgebracht worden. Ook financieren we de
+            nieuwe tools die we in de toekomst gaan ontwikkelen. Het registreren van
+            een fiets en het melden van een diefstal is altijd gratis. Dankzij onze
+            leden kunnen we dat garanderen.
+      donate:
+        page:
+          already_member: Je bent al lid van Bike Index - bedankt! Je kunt je lidmaatschapsniveau
+            of betaalgegevens wijzigen via je lidmaatschapsinstellingen.
+          cadence: Hoe vaak moet je het geven?
+          cta_headline: Er staan een miljoen fietsen geregistreerd. Geen enkele eigenaar
+            heeft betaald om erbij te zijn.
+          cta_sub: Houd het gratis voor de volgende miljoen.
+          eyebrow: Hersteld en teruggebracht
+          fine_print: Bike Index is een 501(c)(3) non-profitorganisatie, EIN 81-4296194.
+            Uw donatie is fiscaal aftrekbaar in de VS. U kunt uw maandelijkse donatie
+            op elk gewenst moment stopzetten.
+          fine_print_short: 501(c)(3) non-profitorganisatie, EIN 81-4296194. Fiscaal
+            aftrekbaar in de VS.
+          form_title: Financier het volgende herstel
+          headline: Alle bovenstaande fietsen zijn mee naar huis genomen omdat de
+            registratie gratis was.
+          larger_gift_link: Neem contact met ons op voor een grotere gift.
+          lede: Bike Index is een non-profitorganisatie. Registratie is gratis, zoeken
+            is gratis en het melden van diefstal is gratis. Daarom staan er een miljoen
+            fietsen in het register en maken politiediensten en fietsenwinkels er
+            gebruik van. Donaties zorgen ervoor dat dit zo blijft.
+          lede_short: Bike Index is een non-profitorganisatie. Registratie, zoeken
+            en diefstalmeldingen zijn gratis. Donaties maken dit mogelijk.
+          major_benefactor: Weldoener
+          major_body: Donaties op dit niveau worden gebruikt voor het inwerken van
+            partners, grensoverschrijdende diefstalonderzoeken en de technische ontwikkeling
+            van gepromote waarschuwingen.
+          major_eyebrow: Grote donaties
+          major_partner: Partner
+          major_title: Grotere giften zorgen ervoor dat hele steden op de schenkingslijst
+            komen te staan.
+          manage_membership: Beheer uw lidmaatschap
+          membership_link: Wat het lidmaatschap inhoudt
+          membership_note: 'Met een maandelijkse bijdrage word je lid van Bike Index:
+            je krijgt toegang tot de marktplaats, een ledenbadge en extra voordelen
+            die we blijven ontwikkelen. De abonnementen kosten %{amounts} per maand.'
+          monthly: Maandelijks
+          monthly_submit: Word lid — %{amount}/maand
+          one_time: Eenmalig
+          one_time_submit: Doneer %{amount}
+          other_amount: Ander bedrag
+          other_ways_daf: Subsidies via donorfondsen — we kunnen ons EIN-nummer en
+            de subsidiegegevens doorgeven.
+          other_ways_match: Bijdragen van werkgevers — veel werkgevers verdubbelen
+            een donatie zonder extra kosten voor u.
+          other_ways_stock: Schenkingen van aandelen of cryptovaluta, waarmee vermogenswinstbelasting
+            op waardestijgingen wordt vermeden.
+          other_ways_title: Andere manieren om op dit niveau te doneren
+          stat_bikes: fietsen geregistreerd, gratis
+          stat_partners: partnerwinkels, politiekorpsen en steden
+          stat_recoveries: Gestolen fietsen teruggevonden
+          stat_value: waarde teruggegeven aan eigenaren
+          stories_title: In de woorden van hun eigenaren
+          tier_basic: Basislidmaatschap
+          tier_basic_benefit: Plaats je fietsen op de marktplaats, ontvang een ledenbadge
+            en profiteer van snellere ondersteuning.
+          tier_patron: Patronlidmaatschap
+          tier_patron_benefit: Alles in Plus, topnotering in de markt, Patron-shirt
+            en -badge
+          tier_plus: Plus-lidmaatschap
+          tier_plus_benefit: Alles in Basic, een gratis promotiemelding als je fiets
+            gestolen wordt, en een ledenlimiet.
+          uses_alerts_body: Het systeem voor het melden van gestolen fietsen en de
+            bijbehorende promotiemeldingen die een advertentie in de feeds rondom
+            de diefstal weergeven.
+          uses_alerts_title: Waarschuwingen die mensen bereiken
+          uses_free_body: Servers, ondersteuning en de zoektools die winkels en politie
+            gebruiken, zijn gratis beschikbaar. Geen betaalmuur, geen abonnementen,
+            geen verkoop van gebruikersgegevens.
+          uses_free_title: Registratie blijft gratis.
+          uses_owners_body: De marktplaats, waar een advertentie begint met een fiets
+            die al in het register staat, is ontworpen om de verkoop van een gestolen
+            fiets te bemoeilijken. Meer tools voor eigenaren zijn in ontwikkeling.
+          uses_owners_title: Kenmerken voor fietseigenaren
+          uses_partners_body: Het inwerken van nieuwe winkels, afdelingen en steden,
+            en de langlopende onderzoeken naar diefstalbendes die voortkomen uit de
+            registergegevens.
+          uses_partners_title: Partners en onderzoeken
+          uses_title: Waar gaat het geld naartoe?
+          wall_photo_alt: Een fiets teruggevonden via Bike Index
+      landing_pages:
+        demo_modal:
+          field_message: Is er verder nog iets dat we moeten weten?
+          field_name: Jouw naam
+          field_role: Jouw rol
+          phone_hint: Een telefoonnummer, met zijn cijfers.
+          request_name: verzoek
+          submit_text: Laten we praten
+          title: Neem contact met ons op voor een gratis proefperiode
+        for_cities:
+          answer_no: Nee
+          answer_yes: Ja
+          back_to_cities: Terug naar de fietsindex voor steden
+          call_body: Vertel ons iets over je stad, dan nemen we contact met je op
+            om een moment te vinden om te praten.
+          call_heading: Plan een kennismakingsgesprek.
+          cape_logo_alt: Fietsindex-schild met een cape
+          checker_choose_state: Kies een staat
+          checker_eyebrow: E-bike conformiteitscontroleur
+          checker_form_heading: Test een e-bike
+          checker_heading: Ken de regels voor e-bikes.
+          checker_intro: Een gratis openbare tool van Bike Index. Fietsers selecteren
+            hun staat en fiets en zien binnen 30 seconden of het legaal is om ermee
+            te rijden, welke certificeringen er zijn en welke regels gelden. Het antwoord
+            leidt direct naar de registratiepagina.
+          checker_point_bikebook: Klasse, motor, topsnelheid en UL-certificering uit
+            de e-bikecatalogus van BikeBook.
+          checker_point_program: Binnen uw programma kunnen medewerkers de classificatie
+            en de nalevingsstatus van elke geregistreerde e-bike inzien.
+          checker_point_states: Staatsregels betreffende motorklassen, maximumsnelheden,
+            gashendels en gashendels, met verwijzingen naar wetsartikelen.
+          checker_speed_20: 20 mijl per uur
+          checker_speed_28: 28 mph
+          checker_speed_over_28: Meer dan 45 km/u
+          checker_state: Staat
+          checker_submit: Bekijk de regels
+          checker_throttle: Elektrisch gaspedaal
+          checker_top_speed: Maximale ondersteunde snelheid
+          child_housing_name: Maple Court-appartementen
+          child_housing_note: Regels voor opladen en opslag
+          child_neighborhood_name: Buurtprogramma Riverside
+          child_neighborhood_note: "+2 lokale regels"
+          child_school_name: Westbrook Middelbare School
+          child_school_note: Strengere regels voor het gebruik van de fiets en campusbeleid.
+          community_watch_lead: Ook een buurtwacht is een optie.
+          community_watch_users_body: Gebruikers van Bike Index houden Craigslist,
+            Facebook Marketplace en OfferUp in de gaten voor gestolen fietsen. Spotters
+            kunnen contact opnemen met de eigenaren zonder dat contactgegevens van
+            beide partijen worden gedeeld.
+          contact_heading: Vertel ons over jouw stad.
+          contact_intro: Elke samenwerking begint met een kort kennismakingsgesprek.
+            Vertel ons waar jouw stad mee bezig is, en wij laten je zien hoe Bike
+            Index daarbij past.
+          contact_next_plan: Duidelijke vervolgstappen voor de inrichting van uw stad.
+          contact_next_priorities: Een gesprek over de prioriteiten van uw stad, of
+            dat nu e-bikes, het terugvinden van gestolen fietsen of de registratie
+            van fietsen is.
+          contact_next_walkthrough: Een stapsgewijze uitleg van hoe Bike Index zou
+            werken voor uw stad en haar programma's.
+          education_eyebrow: E-bike-educatie
+          education_heading: Ruiters leren de regels die voor hen gelden.
+          education_intro: 'Wanneer iemand een e-bike registreert, begeleidt Bike
+            Index die persoon door een kort educatief proces voordat de registratie
+            wordt bevestigd: accu''s en opladen, rijgedrag, eigen regels en een ondertekende
+            toestemmingsverklaring. Het doel is echt begrip, geen simpel vinkje. Kies
+            een organisatie om te zien hoe het proces verandert.'
+          faq_account_answer: De gemeente is de overkoepelende organisatie. Scholen,
+            appartementencomplexen en andere programma's kunnen als suborganisaties
+            fungeren met eigen personeel en lesmateriaal. Het personeel op elk niveau
+            beheert uitsluitend de eigen regels.
+          faq_account_question: Wie beheert het account?
+          faq_checker_answer: De fietsgegevens zijn afkomstig van BikeBook, een catalogus
+            van e-bike modellen met hun klasse, motor, snelheid en UL-certificering.
+            De staatsregelgeving wordt vermeld met de bijbehorende wetgeving.
+          faq_checker_question: Waar haalt de compliancechecker zijn gegevens vandaan?
+          faq_cost_answer: Er zijn geen kosten vooraf verbonden aan de registratie
+            en registratie is gratis voor inwoners. We bespreken de tarieven voor
+            uw stad tijdens een kennismakingsgesprek.
+          faq_cost_question: Wat zijn de kosten?
+          faq_heading: Vragen
+          faq_import_answer: Nee. Bestaande registraties kunnen vanuit een spreadsheet
+            worden geïmporteerd.
+          faq_import_question: We hebben de registratiegegevens al. Moeten we helemaal
+            opnieuw beginnen?
+          faq_police_answer: Agenten en stadsmedewerkers kunnen gedeelde toegang tot
+            hetzelfde beheerderspaneel hebben, elke fiets opzoeken op serienummer
+            en de lijst met gestolen fietsen voor hun gebied raadplegen.
+          faq_police_question: Hoe gebruikt de politie het?
+          faq_regular_answer: Ja. Elke fiets kan worden geregistreerd. De instructies
+            voor het gebruik van een e-bike verschijnen pas wanneer een gebruiker
+            een e-bike registreert.
+          faq_regular_question: Werkt het ook voor gewone fietsen?
+          faq_rules_answer: Ja, als partner van de stad. Begin met de standaardprocedure
+            van de Fietsindex of met een blanco pagina. Medewerkers van de stad passen
+            de tekst aan in het beheerderspaneel, zonder dat technische hulp nodig
+            is.
+          faq_rules_question: Kunnen we onze eigen regels voor e-bikes opstellen?
+          field_attestations_body: Elke verklaring wordt opgeslagen met de regels
+            die van kracht waren toen de ruiter zich registreerde, zodat u een blijvend,
+            controleerbaar dossier hebt.
+          field_attestations_title: Opgeslagen attestaties
+          field_battery_body: Zoek uit welke fietsen in jouw stad zijn uitgerust met
+            UL 2849- of UL 2271-gecertificeerde accu's en gebruik deze gegevens om
+            beleid en voorlichting vorm te geven.
+          field_battery_title: Audits voor batterijcertificering
+          field_eyebrow: E-bikebeheer in het veld
+          field_heading: Koppel elke fiets op straat aan zijn registratie.
+          field_intro: Voorlichting is alleen zinvol als medewerkers het kunnen controleren.
+            Parkeerwachters, buurtveiligheidsteams en beheerders kunnen elke fiets
+            opzoeken en zien waar de fietser mee akkoord is gegaan.
+          field_organization: Stad of organisatie
+          field_qr_body: Scan de sticker van een fiets met een willekeurige telefoon
+            om de registratie te bekijken, inclusief of en wanneer de fietser het
+            trainingsprogramma heeft voltooid.
+          field_qr_title: QR-code scannen
+          field_serial_body: Zoek op serienummer via de website of het beheerderspaneel
+            naar hetzelfde registratie- en attestatierecord.
+          field_serial_title: Serienummer opzoeken
+          heading_educate: Registreer elke fiets in je stad. Informeer e-bikegebruikers
+            over de regels van je stad.
+          hero_image_alt: Een fiets met een superheldencape.
+          hierarchy_city_body: Lokale verordeningen, leeftijdsgrenzen, helmplicht
+            en waar e-bikes wel en niet mogen rijden. Iedere fietser in de stad ziet
+            ze.
+          hierarchy_city_title: De stad stelt de basislijn vast.
+          hierarchy_dashboard_body: Gemeentelijke medewerkers zien de inschrijvingen
+            voor alle programma's. Medewerkers van elk programma beheren alleen hun
+            eigen regels en deelnemers.
+          hierarchy_dashboard_title: Eén dashboard voor iedereen
+          hierarchy_eyebrow: Nieuw · E-bike beheer
+          hierarchy_heading: Uw stad bepaalt de basis. Elk programma voegt daar zijn
+            eigen criteria aan toe.
+          hierarchy_intro: De regels voor e-bikes variëren per context. Een middelbare
+            school kan strengere regels hebben dan de gemeente, en een appartementencomplex
+            kan eigen regels voor opladen en stallen hanteren. Bike Index stelt uw
+            gemeente in als de overkoepelende organisatie, met elk programma als een
+            subaccount. De gemeentelijke regels gelden overal, en elk programma voegt
+            zijn eigen regels toe.
+          hierarchy_programs_body: Een school, appartementencomplex of buurtprogramma
+            kan elke stap herschrijven of er eigen stappen aan toevoegen, in eigen
+            bewoordingen.
+          hierarchy_programs_title: Programma's voegen hun eigen toe
+          hot_sheet_body: Een afdrukbare lijst van gestolen fietsen in uw omgeving
+            met telefoonnummers van de eigenaren, die in realtime wordt bijgewerkt
+            voor uw politieafdeling.
+          hot_sheet_title: Stolen Bike Hot Sheet
+          mock_batteries: Batterijen en opladen
+          mock_bike_info: Fietsinformatie
+          mock_continue: Doorgaan
+          mock_detected: Elektrisch (gemotoriseerd) gedetecteerd
+          mock_electric: Elektrisch (gemotoriseerd)
+          mock_electric_help: Vink 'elektrisch' aan, zodat we e-bikes kunnen markeren
+            en de certificering kunnen controleren.
+          mock_manufacturer: Fabrikant
+          mock_next: Volgende
+          mock_progress: Voortgang opgeslagen · Bevestiging e-voertuig · Stap 1 van
+            4
+          mock_rule_certified: Ik gebruik uitsluitend batterijen die gecertificeerd
+            zijn volgens UL 2849 / UL 2271 (of een gelijkwaardige norm).
+          mock_rule_charger: Ik laad mijn apparaat uitsluitend op met de oplader van
+            de fabrikant, nooit onbeheerd en nooit in een gang of vluchtroute.
+          mock_rule_report: Ik zal het gebruik staken en elke beschadigde, opgezwollen
+            of oververhitte batterij melden.
+          mock_sub: Westbrook heeft een aantal veiligheidsregels die je moet doornemen
+            voordat je je kunt inschrijven.
+          mock_title: Het lijkt erop dat je een elektrische auto hebt!
+          mock_traditional_bike: Traditionele fiets
+          mock_traditional_bike_note: "(2 wielen, 1 zitje, pedalen)"
+          mock_vehicle_type: 'Voertuigtype:'
+          nav_checker: Staatscontroleur
+          nav_education: Regels voor e-bikes
+          nav_faq: Veelgestelde vragen
+          nav_label: Bike Index voor steden
+          nav_recovery: Herstel
+          nav_registration: Registratie
+          new: Nieuw
+          open_the_checker: Open de volledige checker
+          parent_name: Stad Westbrook
+          parent_note: Batterij, rijregels en stadsregels
+          parent_organization: Moederorganisatie
+          partnership_data_body: De stad is eigenaar van haar gegevens en kan deze
+            op elk moment exporteren.
+          partnership_data_title: Uw gegevens blijven van u.
+          partnership_eyebrow: Partnerschap
+          partnership_fees_body: Inwoners kunnen zich gratis registreren.
+          partnership_fees_title: Geen inschrijfkosten per registratie
+          partnership_heading: Uw non-profitpartner
+          partnership_intro: Bike Index is sinds 2013 's werelds meest gebruikte fietsregister.
+            Samenwerkingen met steden hebben geen speciaal IT-personeel nodig en de
+            meeste systemen zijn binnen enkele dagen na de installatie operationeel.
+          partnership_support_body: Wij configureren uw organisatie en opleidingsproces
+            in uw eigen huisstijl, trainen uw personeel en onderhouden het platform.
+          partnership_support_title: Installatie, training en ondersteuning
+          program_education_body: E-bikegebruikers worden tijdens de registratie in
+            uw trainingsprogramma opgenomen. Medewerkers kunnen de klasse, het accucertificaat
+            en de ondertekende verklaring van elke fiets inzien.
+          program_education_link: Bekijk het onderwijstraject
+          program_education_title: E-bike-educatie
+          program_eyebrow: Wat uw programma dekt
+          program_heading: Het begint met de registratie.
+          program_intro: 'Registratie en het terugvinden van gestolen fietsen vormen
+            al sinds 2013 de kern van Bike Index. E-bike-educatie is de nieuwe laag
+            daarbovenop: wanneer een gebruiker een e-bike registreert, leert hij of
+            zij de regels kennen voordat de registratie is voltooid.'
+          program_recovery_body: Een geregistreerde fiets kan teruggevonden worden.
+            Rechtshandhavingsinstanties, maar ook winkels en vrijwilligers doorzoeken
+            het register.
+          program_recovery_link: Hoe herstel werkt
+          program_recovery_title: Terugvinding van gestolen fiets
+          program_registration_body: Elke fiets krijgt een registratie met serienummer,
+            foto's en eigenaar. Registraties van winkels, scholen, gemeentelijke diensten
+            en buurtprogramma's komen samen in één doorzoekbaar register.
+          program_registration_link: Hoe registratie werkt
+          program_registration_title: Registratie
+          recovery_eyebrow: Politie en terugvinding van gestolen fietsen
+          recovery_heading: Als een fiets gestolen wordt, weet het hele netwerk ervan.
+          recovery_intro: Het terugvinden van gestolen fietsen is de oorspronkelijke
+            missie van Bike Index. Meer dan 100 wetshandhavingsinstanties maken rechtstreeks
+            gebruik van Bike Index, en fietsenwinkels, pandhuizen en wederverkoopplatformen
+            kunnen een serienummer controleren voordat een verkoop wordt afgerond.
+          recovery_step_1_body: De status verandert onmiddellijk en wordt zichtbaar
+            voor iedereen die op dat serienummer zoekt.
+          recovery_step_1_title: Eigenaar meldt dat het gestolen is.
+          recovery_step_2_body: Bij een verkeerscontrole, een telefoontje van een
+            pandjeshuis of een controle, zoeken ze het merk, model, kleur, foto, contactgegevens
+            van de eigenaar en de statusgeschiedenis op.
+          recovery_step_2_title: Agenten controleren het veld.
+          recovery_step_3_body: Als een serienummer overeenkomt, nemen agenten rechtstreeks
+            contact op met de eigenaar, zonder de lange verwerkingstijd in het archief.
+          recovery_step_3_title: De fiets gaat naar huis.
+          registration_eyebrow: Registratie
+          registration_heading: Alle fietsen in jouw stad, in één doorzoekbaar register.
+          registration_import_body: Importeer ze vanuit een spreadsheet. Medewerkers
+            kunnen ook handmatig fietsen toevoegen en eigenaren berichten sturen op
+            basis van registratiedatum, fietstype of status van het elektrische voertuig.
+          registration_import_lead: Heeft u al aanmeldingen?
+          registration_intro: Aanmeldingen van fietsenwinkels, scholen, gemeentelijke
+            diensten en buurtprogramma's komen samen op één plek die door inwoners,
+            gemeentepersoneel en politie wordt gebruikt. Het werkt voor alle fietsen,
+            niet alleen voor e-bikes.
+          registration_step_1_body: Binnen twee minuten vanaf elke telefoon, via een
+            landingspagina met de huisstijl van de stad, een formulier op uw website
+            of een QR-code.
+          registration_step_1_title: Bewoners registreren zich
+          registration_step_2_body: BikeBook identificeert het model en de klasse
+            waartoe het behoort, waarna de fietser het leerproces doorloopt. Bij gewone
+            fietsen wordt deze stap overgeslagen.
+          registration_step_2_title: E-bikes worden geclassificeerd
+          registration_step_3_body: Status (geregistreerd, gestolen of teruggevonden),
+            merk, model, kleur en serienummer. Agenten en medewerkers kunnen het voertuig
+            opzoeken aan de hand van het serienummer.
+          registration_step_3_title: Elke fiets krijgt een eigen pagina.
+          registration_step_4_body: Registratievolume, e-bike-deelname en activiteiten
+            binnen de verschillende programma's, plus rapporten over teruggevonden
+            fietsen en accucontroles voor het stadsbestuur.
+          registration_step_4_title: Je ziet het op het dashboard.
+          role_city_staff: Stadspersoneel
+          role_elected: Gekozen functionaris
+          role_housing: Huisvesting of gemeenschapsprogramma
+          role_law_enforcement: Rechtshandhaving
+          role_other: Ander
+          role_school: School of district
+          schedule_a_demo: Plan een demo
+          sent_body: We nemen per e-mail contact met je op om een kennismakingsgesprek
+            in te plannen.
+          sent_heading: Dankjewel. We nemen binnenkort contact met je op.
+          stat_agencies: wetshandhavingsinstanties
+          stat_agencies_count: 100+
+          stat_bikes: geregistreerde fietsen
+          stat_organizations: partnerorganisaties
+          stat_recovered: gestolen fietsen teruggevonden
+          stolen_banner_body: Wie het serienummer opzoekt, ziet dat het gestolen is
+            en weet hoe de eigenaar te bereiken is.
+          stolen_banner_title: Gestolen
+          subheading: Bike Index is het non-profit register dat politie en fietsenwinkels
+            al gebruiken om gestolen fietsen terug te vinden. Fietsers beginnen met
+            het registreren van hun fiets. Als het een e-bike is, volgen ze direct
+            een korte instructievideo over de regels van hun stad.
+          submit_demo: Vraag een demo aan
+        for_cities_education:
+          all_set: Je bent er helemaal klaar voor.
+          back: Rug
+          battery_category: Batterijen en opladen
+          battery_rule_charger: Ik laad alleen op met een door de fabrikant goedgekeurde
+            oplader.
+          battery_rule_flammable: Ik zal mijn batterij uit de buurt van brandbare
+            materialen houden.
+          battery_rule_unattended: Ik laat mijn accu nooit onbeheerd opladen.
+          battery_title: Het lijkt erop dat je een e-bike hebt!
+          city_battery_sub: Westbrook heeft een paar regels voor e-bikes die je moet
+            doornemen voordat je je kunt inschrijven.
+          city_blurb: Iedere fietser in Westbrook ziet de stadsregels, de fietsregels
+            en de lokale voorschriften, ongeacht of ze zich zelf registreren of via
+            een programma.
+          city_name: Stad Westbrook
+          city_riding_rule_helmet: Ik draag altijd een helm als ik motorrijd en ik
+            ben jonger dan 18.
+          city_riding_rule_lanes: Ik zal gebruikmaken van fietspaden waar die er zijn
+            en op gedeelde paden niet harder rijden dan 24 km/u.
+          city_riding_rule_sidewalks: Ik zal niet op de stoep rijden in het zakelijke
+            centrum.
+          city_riding_sub: Regels van Westbrook met betrekking tot helmen, rijstroken,
+            snelheid en trottoirs.
+          city_rule_class_3: Ik zal alleen op een e-bike van categorie 3 rijden als
+            ik 16 jaar of ouder ben, en niet op de Riverside Trail.
+          city_rule_classes: Ik weet waar je de gratis e-bike veiligheidscursussen
+            van Westbrook kunt vinden.
+          city_rule_parking: Ik parkeer alleen bij openbare fietsenrekken en blokkeer
+            nooit trottoirs, hellingen of deuropeningen.
+          city_rules_category: Stadsregels
+          city_rules_sub: Regels gebaseerd op klassen en lokale middelen.
+          city_rules_title: Waar e-bikes mogen rijden in Westbrook
+          complete_registration: Voltooi de registratie
+          consent_category: Eindbeoordeling en toestemming
+          continue: Doorgaan
+          done_message:
+            one: Je hebt regel %{count} voor %{name} bevestigd. Je ondertekende verklaring
+              is opgeslagen in het kentekenbewijs van je fiets.
+            other: Je hebt alle %{count}-regels voor %{name} bevestigd. Je ondertekende
+              verklaring is opgeslagen in het kentekenbewijs van je fiets.
+          housing_building_blurb: Bewoners zien de regels van de stad en vervolgens
+            de eigen regels van het gebouwbeheer voor het opslaan en parkeren bij
+            de twee gebouwen.
+          housing_name: Maple Court-appartementen
+          housing_rule_sticker: Ik zal mijn kentekensticker zichtbaar houden, zodat
+            het personeel mijn fiets kan controleren.
+          housing_rule_storage: Ik zal mijn e-bike in de fietsenstalling bewaren,
+            nooit in gedeelde gangen of vluchtroutes.
+          housing_rules_category: Bouwvoorschriften
+          housing_rules_sub: Waar kun je je e-bike thuis stallen?
+          housing_rules_title: Opslag en parkeren
+          housing_tab: Esdoornhof
+          registered: Geregistreerd
+          riding_category: Rijoefeningen
+          riverside_blurb: De buurtbewoners zien eerst de regels van de stad en vervolgens
+            de eigen regels van het programma voor het buurtcentrum.
+          riverside_name: Buurtprogramma Riverside
+          riverside_rule_charging: Ik laad mijn e-bike niet op in het gemeenschapscentrum.
+          riverside_rule_parking: Ik parkeer alleen bij de daarvoor bestemde e-bikerekken
+            van het gemeenschapscentrum, nooit op het dijkpad of tegen bomen.
+          riverside_rules_category: Buurtregels
+          riverside_tab: Rivierzijde
+          rule_count:
+            one: "%{count} regel"
+            other: "%{count} regels"
+          school_campus_blurb: Leerlingen zien eerst de regels van de stad en vervolgens
+            het eigen beleid van de middelbare school met betrekking tot het vervoer
+            naar school.
+          school_name: Westbrook Middelbare School
+          school_rule_class_1: Ik ga alleen met een elektrische fiets van categorie
+            1 naar school.
+          school_rule_guardian: Ik heb deze regels met een ouder of voogd doorgenomen.
+          school_rule_traffic: Ik zal me aan de verkeersregels houden en voorrang
+            verlenen aan voetgangers en verkeersregelaars.
+          school_rule_walk: Ik loop met mijn fiets van de voordeur naar de fietsenrekken.
+          school_rules_category: Schoolregels
+          school_rules_sub: Jouw school heeft een paar extra regels voor het fietsen
+            naar de campus.
+          school_rules_title: Beleid van Westbrook Middle Campus
+          school_tab: Westbrook Middle
+          staff_edit: Uw medewerkers kunnen elke stap in het beheerderspaneel aanpassen,
+            zonder dat technische hulp nodig is. Elke ondertekende verklaring wordt
+            opgeslagen met de exacte regels die op die dag van kracht waren.
+          start_over: Begin opnieuw
+          tabs_label: Voorbeelden van organisaties
+          viewing_as: Beschouwen als
+      marketplace:
+        how_it_works:
+          across_town_heading: Aan de andere kant van de stad of aan de andere kant
+            van het land.
+          across_town_intro: Elke verkoop vindt plaats tussen particulieren. Bike
+            Index verzorgt geen betalingen of verzending, dus koper en verkoper spreken
+            onderling de prijs, betaling en levering af.
+          bike_index_members: Bike Index-leden
+          bike_index_members_body: Verkopers die Bike Index steunen met een lidmaatschap,
+            tonen een Bike Index-lidmaatschapsbadge bij hun advertenties.
+          browse_bikes: Bekijk fietsen
+          buying_a_bike: Een fiets kopen
+          checked_for_theft: Gecontroleerd op diefstal
+          checked_for_theft_body: Een fiets die als gestolen is opgegeven bij Bike
+            Index kan niet worden vermeld.
+          contact_the_seller: Neem contact op met de verkoper
+          contact_the_seller_member_badge_body: Stel vragen en maak een afspraak om
+            de fiets te bekijken. Let op het Bike Index-ledenlogo.
+          find_a_bike: Zoek een fiets
+          find_a_bike_body: Zoek in de beschrijvingen van de advertenties, kies een
+            primair activiteitstype en stel een prijsbereik in. Kies 'Te koop in zoekgebied'
+            om fietsen bij u in de buurt te zien, of 'Te koop overal' om alles te
+            zien.
+          hand_off_or_ship: Overhandigen of verzenden
+          hand_off_or_ship_body: Spreek met lokale kopers af op een openbare plek.
+            Voor kopers van buiten de stad kunt u gebruikmaken van een fietstransportdienst
+            zoals BikeFlights.
+          heading: Hoe de Bike Index Marketplace werkt
+          intro: Wij willen dat dit de gemakkelijkste en meest betrouwbare plek is
+            om een gebruikte fiets te kopen en te verkopen. Elke fiets die hier te
+            koop staat, is geregistreerd op Bike Index en de verkoop vindt rechtstreeks
+            plaats tussen jou en de andere fietser.
+          local_pickup: Ophalen op locatie
+          local_pickup_body: Ontmoet elkaar persoonlijk, maak een proefrit en controleer
+            het serienummer voordat u betaalt. De verkoper draagt het kentekenbewijs
+            direct aan u over.
+          mark_it_for_sale: Markeer het als te koop
+          mark_it_for_sale_body: Voeg vanaf de pagina van je fiets een prijs, foto's
+            en een beschrijving van de staat toe. De specificaties zijn afkomstig
+            van je kentekenbewijs.
+          ownership_transfers: Eigendomsoverdrachten
+          ownership_transfers_body: Na de verkoop draagt de verkoper het kentekenbewijs
+            over aan de koper. De nieuwe eigenaar staat vanaf dag één geregistreerd.
+          pay_and_take_ownership: Betaal en neem het in bezit
+          pay_and_take_ownership_body: Je betaalt rechtstreeks aan de verkoper. Die
+            draagt de Bike Index-registratie vervolgens aan jou over.
+          pro_tip: PRO TIP!
+          pro_tip_heading: Enkele gewoontes zorgen ervoor dat verkoop van persoon
+            tot persoon veilig blijft.
+          ready_heading: Klaar om je volgende fiets te vinden?
+          register_your_bike: Registreer uw fiets
+          register_your_bike_body: Al geregistreerd? Sla dit gedeelte over. Zo niet,
+            dan duurt het ongeveer twee minuten en is het voor altijd gratis.
+          registered_bikes_only: Alleen geregistreerde fietsen
+          registered_bikes_only_body: Je kunt alleen een fiets aanbieden die geregistreerd
+            staat op Bike Index, dus elke advertentie is gekoppeld aan een geldig
+            registratie- en serienummer.
+          see_it_or_ship_it: Bekijk het of laat het verzenden.
+          see_it_or_ship_it_body: Kom langs? Maak een proefrit en controleer of het
+            serienummer op het frame overeenkomt met de beschrijving. Woon je niet
+            in de buurt? Spreek dan met de verkoper af hoe je het verzendt en vraag
+            om een foto van het serienummer.
+          sell_your_bike: Verkoop je fiets
+          selling_a_bike: Een fiets verkopen
+          shipping: Verzending naar een koper buiten de stad
+          shipping_body: Verzenden is geen probleem. Verkopers kunnen gebruikmaken
+            van een fietsverzendservice zoals BikeFlights. Spreek van tevoren af wie
+            de verzendkosten en verpakking betaalt, deel de trackinginformatie en
+            draag het kentekenbewijs over zodra de koper de fiets heeft ontvangen.
+          tip_be_wary: Wees op je hoede voor iedereen die aandringt op snelheid of
+            ongebruikelijke betaalmethoden.
+          tip_check_serial: Controleer voordat u betaalt of het serienummer op het
+            frame overeenkomt met de beschrijving.
+          tip_public_place: Spreek je lokaal af? Kies dan een drukke openbare plek
+            overdag.
+          tip_registration_transferred: Zorg ervoor dat de registratie op uw naam
+            wordt overgedragen zodra de verkoop is afgerond.
+          tip_shipping: Verzending? Vraag om extra foto's, inclusief het serienummer,
+            en gebruik een betaalmethode met kopersbescherming.
+          transfer_ownership: Eigendomsoverdracht
+          transfer_ownership_body: Zodra je betaald hebt, stuur je de fiets door naar
+            het e-mailadres van de koper op Bike Index.
+          trust_not_guarantee: Een teken van vertrouwen, geen garantie.
+          trust_not_guarantee_body: Alle fietsen hier zijn geregistreerd en een fiets
+            die als gestolen is opgegeven, kan niet te koop worden aangeboden. Dat
+            zegt veel over de fiets zelf. Het garandeert echter niet de eerlijkheid
+            van de koper of verkoper. Stel vragen, bewaar je berichten en vertrouw
+            op je instinct.
+          what_we_check: Wat we controleren
+          why_a_marketplace: Waarom een marktplaats?
+          why_heading: Een tweedehands fiets kopen zou niet moeten betekenen dat je
+            het risico loopt een gestolen fiets te krijgen.
+          why_registry: Bike Index is een gratis, non-profit fietsenregister. Al jaren
+            helpen we fietsers hun fietsen te registreren en terug te krijgen als
+            ze gestolen zijn.
+          why_we_know: De meeste websites voor tweedehands fietsen weten niets over
+            de fietsen die ze aanbieden. Wij wel. Omdat elke fiets die hier te koop
+            staat geregistreerd is, kan een gestolen fiets niet worden aangeboden
+            en de registratie blijft geldig voor de nieuwe eigenaar.
     shared_blocks:
       footer:
         about: Over
@@ -7220,10 +8075,8 @@ nl:
           bike_index_store: Bike Index Winkel
           design_and_developer_resources: Ontwerp- en ontwikkelaarbronnen
           donate: Schenken
-          donate_today: Doneer vandaag nog
           help: Helpen
           how_to_get_your_stolen_bike_back: Hoe u uw gestolen fiets terugkrijgt
-          make_a_difference: Maak een verschil bij fietsdiefstal
           other_pages: Andere pagina's
           protect_your_bike: Bescherm je fiets
           related: Verwant
@@ -7270,7 +8123,6 @@ nl:
           menu: Menu
           organization_crest: "%{org_name} wapen"
         primary_menu:
-          blog: Blog
           donate: Schenken
           help: Helpen
           log_in: Log in
@@ -7278,6 +8130,8 @@ nl:
           search: Zoeken
           sign_up: Registreren
           stolen_bike: Fiets gestolen?
+          register: Registreer
+          register_a_new_bike: Registreer een nieuwe fiets
         user_settings_menu:
           settings_menu: Instellingen
         wrapper:
@@ -7350,6 +8204,12 @@ nl:
           rate_limited: Te veel zoekopdrachten te snel achter elkaar — je hebt een
             limiet bereikt. Wacht even en probeer het opnieuw.
           retry: Probeer het opnieuw
+      marketing:
+        recovery_stories:
+          no_recoveries: Er zijn geen herstelgevallen.
+          read_more_recovery_stories: Lees meer herstelverhalen
+          reported_by_owners: Elke terugvinding wordt gemeld door de persoon die zijn
+            of haar fiets heeft teruggekregen.
   user_emails:
     confirm:
       confirm_email: E-mail bevestigen

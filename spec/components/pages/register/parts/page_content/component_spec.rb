@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe Pages::Register::Parts::PageContent::Component, type: :component do
-  let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills") }
+  let(:organization) { FactoryBot.create(:organization, name: "Brakebills University", short_name: "Brakebills") }
   let(:registration_sequence) { FactoryBot.create(:registration_sequence, organization:, faq_url: "https://example.com/faq") }
   let(:page_record) do
     FactoryBot.build(:registration_sequence_page, registration_sequence:, title: "Battery safety",
@@ -18,6 +18,7 @@ RSpec.describe Pages::Register::Parts::PageContent::Component, type: :component 
     expect(page).to have_content("Battery safety") # the title labels the rules
     expect(page).to have_content("Use the right charger")
     expect(page).to have_link("E-Vehicle Acknowledgment FAQ", href: "https://example.com/faq")
+    expect(page).to have_content("Set by Brakebills University")
     # Nameless, so the preview's GET form doesn't serialize them
     expect(page).to have_css("input[type=checkbox]:not([name])", count: 2)
   end
@@ -33,7 +34,7 @@ RSpec.describe Pages::Register::Parts::PageContent::Component, type: :component 
     render_inline(described_class.new(page: page_record, first: true))
 
     expect(page).to have_content("Electric (motorized) detected")
-    expect(page).to have_no_content("Brakebills")
+    expect(page).to have_no_content(/Brakebills(?! University)/) # the short_name badge
   end
 
   context "organization_specific page" do
@@ -48,11 +49,12 @@ RSpec.describe Pages::Register::Parts::PageContent::Component, type: :component 
     context "on the template" do
       let(:registration_sequence) { FactoryBot.create(:registration_sequence_template) }
 
-      it "badges the template, matching what the editor promised" do
+      it "badges the template, matching what the editor promised, as set by Bike Index" do
         page_record.organization_specific = true
         render_inline(described_class.new(page: page_record))
 
         expect(page).to have_content("Template")
+        expect(page).to have_content("Set by Bike Index")
       end
     end
   end

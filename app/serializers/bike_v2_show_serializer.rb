@@ -12,6 +12,7 @@ class BikeV2ShowSerializer < BikeV2Serializer
     :front_tire_narrow,
     :type_of_cycle,
     :test_bike,
+    :hidden,
     :rear_wheel_size_iso_bsd,
     :front_wheel_size_iso_bsd,
     :handlebar_type_slug,
@@ -32,6 +33,10 @@ class BikeV2ShowSerializer < BikeV2Serializer
 
   def api_url
     "#{ENV["BASE_URL"]}/api/v1/bikes/#{object.id}"
+  end
+
+  def hidden
+    object.user_hidden
   end
 
   def test_bike

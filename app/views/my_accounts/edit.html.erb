@@ -1,4 +1,4 @@
-<% def template_url(template); template == "membership" ? edit_membership_path : edit_my_account_path(edit_template: template) end %>
+<% def template_url(template); template == "membership" ? my_account_membership_path : edit_my_account_path(edit_template: template) end %>
 
 <%= form_for @user, url: my_account_path, method: :patch, multipart: true, html: { class: 'primary-edit-user-form', "data-controller" => "strip-inputs", "data-action" => "submit->strip-inputs#submit" } do |f| %>
   <div class="form-well-container container">

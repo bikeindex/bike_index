@@ -20,6 +20,6 @@ class LandingPagesController < ApplicationController
   protected
 
   def instantiate_feedback
-    @feedback ||= Feedback.new
+    @feedback ||= Feedback.new(email: current_user&.email, contact_name: current_user&.name)
   end
 end

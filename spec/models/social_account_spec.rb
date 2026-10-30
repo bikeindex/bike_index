@@ -1,35 +1,43 @@
 require "rails_helper"
 
 RSpec.describe SocialAccount, type: :model do
-  it_behaves_like "geocodeable_legacy"
+  it_behaves_like "geocodeable"
 
   describe "geocoding" do
     it "geocodes default location correctly without hitting API" do
-      social_account = FactoryBot.build(:social_account, :in_nyc_legacy)
-      social_account.bike_index_geocode
-      expect(social_account.latitude).to eq(40.7143528)
-      expect(social_account.longitude).to eq(-74.0059731)
-      expect(social_account.city).to eq("New York")
-      expect(social_account.state&.abbreviation).to eq("NY")
+      state = FactoryBot.create(:state_new_york)
+      social_account = FactoryBot.build(:social_account, street: "278 Broadway", city: "New York", skip_geocoding: false)
+      social_account.valid?
+      expect(social_account).to have_attributes(latitude: 40.7143528, longitude: -74.0059731, city: "New York",
+        region_record_id: state.id, postal_code: "10007")
       expect(social_account.country&.name).to eq("United States")
     end
 
     it "should geocode and then reverse geocode on save" do
       social_account = FactoryBot.build(
         :social_account,
-        :in_chicago_legacy,
+        :in_chicago,
         skip_geocoding: false,
-        state: nil
+        region_record_id: nil
       )
       social_account.address_string = "1 New Address"
       expect(social_account).to be_should_be_geocoded
       expect(social_account).to be_should_be_reverse_geocoded
 
       expect(social_account).to receive(:fetch_account_info)
-      expect(social_account).to receive(:bike_index_geocode).once
+      expect(social_account).to receive(:address_record_geocode).once
       expect(social_account).to receive(:reverse_geocode).once
 
       social_account.save
+    end
+
+    it "assigns region_record when reverse geocoding" do
+      state = FactoryBot.create(:state_new_york)
+      social_account = FactoryBot.create(:social_account, :in_nyc, region_record_id: nil, account_info: {name: "name"})
+      expect(social_account.region_record_id).to be_nil
+
+      social_account.update(skip_geocoding: false)
+      expect(social_account.reload.region_record_id).to eq state.id
     end
   end
 
@@ -95,7 +103,7 @@ RSpec.describe SocialAccount, type: :model do
   describe :default_account_for_country do
     it "finds national account" do
       _default_national = FactoryBot.create(:social_account_1, :active, :national, :default)
-      national = FactoryBot.create(:social_account_2, :active, :national, :in_vancouver_legacy)
+      national = FactoryBot.create(:social_account_2, :active, :national, :in_vancouver)
 
       australia = FactoryBot.create(:country_australia)
       national.update_attribute(:country, australia)
@@ -105,7 +113,7 @@ RSpec.describe SocialAccount, type: :model do
 
     it "finds default account if no national exists for the country" do
       default = FactoryBot.create(:social_account_1, :national, :active, :default)
-      national = FactoryBot.create(:social_account_2, :national, :active, :in_vancouver_legacy)
+      national = FactoryBot.create(:social_account_2, :national, :active, :in_vancouver)
 
       australia = FactoryBot.create(:country_australia)
       national.update_attribute(:country, australia)

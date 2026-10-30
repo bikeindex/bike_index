@@ -13,8 +13,6 @@ module Geocodeable
         obj.internal_address_attrs.merge(skip_geocoding: obj.latitude.present?, skip_callback_job: true)
       elsif defined?(obj.address_record) && obj.address_record.present?
         attrs_to_duplicate(obj.address_record)
-      elsif defined?(obj.street)
-        attrs_from_legacy(obj)
       else
         {}
       end
@@ -26,22 +24,6 @@ module Geocodeable
 
       str.gsub(/\s+/, "").scan(/.{1,3}/).join(" ")
     end
-
-    private
-
-    def attrs_from_legacy(obj)
-      {
-        skip_geocoding: obj.latitude.present?, # Skip geocoding if already geocoded
-        skip_callback_job: true, # they're already in sync
-        street: obj.street,
-        city: obj.city,
-        region_record_id: obj.state_id,
-        postal_code: obj.zipcode,
-        country_id: obj.country_id,
-        latitude: obj.latitude,
-        longitude: obj.longitude
-      }
-    end
   end
 
   included do
@@ -49,6 +31,9 @@ module Geocodeable
 
     belongs_to :country
     belongs_to :region_record, class_name: "State"
+
+    scope :with_street, -> { where.not(street: ["", nil]) }
+    scope :without_street, -> { where(street: ["", nil]) }
   end
 
   def to_coordinates
@@ -59,8 +44,8 @@ module Geocodeable
     latitude.present?
   end
 
-  def without_location?
-    latitude.blank?
+  def without_street?
+    street.blank?
   end
 
   def address_present?
@@ -102,14 +87,6 @@ module Geocodeable
       postal_code: %i[street postal_code].include?(visible_attr) ? postal_code : nil,
       latitude:, longitude:
     }.merge(country_hash)
-  end
-
-  def address_hash_legacy(address_record_id: false)
-    l_hash = address_hash(visible_attribute: :street, render_country: true).dup
-    l_hash[:zipcode] = l_hash.delete(:postal_code)
-    l_hash[:state] = l_hash.delete(:region)
-    l_hash[:address_record_id] = id if address_record_id
-    l_hash.with_indifferent_access
   end
 
   def formatted_address_string(visible_attribute: nil, render_country: nil, current_country_id: nil, current_country_iso: nil)
@@ -206,15 +183,15 @@ module Geocodeable
       return
     end
 
-    GeocodeHelper.assignable_address_hash_for(
+    geocoded_attrs = GeocodeHelper.assignable_address_hash_for(
       formatted_address_string(render_country: :always), new_attrs: true
-    ).each do |key, value|
-      # Don't overwrite any values except latitude and longitude
-      if self[key].blank? || %i[latitude longitude].include?(key)
-        self[key] = value
-      end
-    end
+    )
+    self.attributes = geocoded_attrs.slice(:latitude, :longitude)
+    assign_blank_geocoded_attrs(geocoded_attrs)
+  end
 
+  def assign_blank_geocoded_attrs(geocoded_attrs)
+    self.attributes = geocoded_attrs.select { |key, _value| self[key].blank? }
     assign_region_record if region_string_changed?
   end
 end
