@@ -39,7 +39,7 @@ export async function loadCatalog (manifestUrl, ids = [], jurisdictions = {}) {
       options,
       comparable,
       // null, as for a comparison format it doesn't know, where the comparison doesn't load
-      similar: (model, settings, { market, market_scope: scope }) => call('similar', { model, settings, market, scope }).catch((error) => {
+      similar: (model, settings, filters) => call('similar', { model, settings, filters }).catch((error) => {
         console.error(error)
         return null
       }),
@@ -98,7 +98,7 @@ export class CatalogComboboxSource {
       placeholderUrl: kit.placeholder_url,
       currencies: vocabulary.currencies,
       market: this.params.market,
-      marketNames: vocabulary.names.markets
+      configurations: kit.model_configurations
     }))
     const pagination = html`<li id=${`${forId}__hw_combobox_pagination__wrapper`} class="hw_combobox__pagination__wrapper"
       data-hw-combobox-target="endOfOptionsStream" data-input-type=${inputType ?? nothing} aria-hidden="true"></li>`

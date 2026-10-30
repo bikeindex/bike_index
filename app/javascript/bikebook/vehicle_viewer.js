@@ -1,6 +1,5 @@
 import { html, nothing } from 'lit-html'
 import { basics } from 'bikebook/templates/vehicles/basics'
-import { copyButton } from 'bikebook/templates/ui/copy_button'
 import { chosenSizes, paramList, pickedSizes, sizesParam, vehicleKeys } from 'bikebook/sizes'
 import { comparisonTable } from 'bikebook/templates/vehicles/comparison_table'
 import { cycleDrawing } from 'bikebook/templates/vehicles/cycle_drawing'
@@ -11,6 +10,7 @@ import { jumpTo, VIEWS } from 'bikebook/templates/vehicles/jump_to'
 import { modelCard } from 'bikebook/templates/vehicles/model_card'
 import { modelGroup } from 'bikebook/templates/vehicles/model_group'
 import { removeLink } from 'bikebook/templates/vehicles/remove_link'
+import { vehicleTitle } from 'bikebook/templates/vehicles/vehicle_title'
 import { componentsOf, modelViewer, motorsOf, photoOf, runningGearOf, sizesOf } from 'bikebook/templates/vehicles/model_viewer'
 import { array, present } from 'bikebook/templates/values'
 import { searching, toQuery } from 'bikebook/query'
@@ -28,7 +28,7 @@ export class VehicleViewer {
     const barred = Object.values(vocabulary.e_vehicle_classifications)
       .some((record) => record.jurisdiction === `US-${jurisdiction}` && record.class_3_throttle === false)
     this.outOfClassId = barred ? `evc/out_of_class/us/${jurisdiction.toLowerCase()}` : null
-    this.card = { placeholderUrl: kit.placeholder_url, currencies: vocabulary.currencies, market, marketNames: vocabulary.names.markets }
+    this.card = { placeholderUrl: kit.placeholder_url, currencies: vocabulary.currencies, market, configurations: kit.model_configurations }
   }
 
   // The vehicles at `url` in the view it picks, each under its key, whose links keep its other params, compared in the
@@ -67,7 +67,7 @@ export class VehicleViewer {
     // a figure's letter lights it on each drawing, card and table row, until it's clicked again
     const highlight = url.searchParams.get('figure')
     const figurePath = (key) => pathWith(url, { figure: key === highlight ? '' : key })
-    const compared = { presenter, vehicles, sizes, frames: overlayFrames(vehicles, sizes) }
+    const compared = { presenter, vehicles, sizes, frames: overlayFrames(vehicles, sizes), market: this.card.market }
     const rowClasses = comparing
       ? 'tw:justify-center-safe tw:overflow-x-auto tw:max-md:snap-x tw:max-md:snap-mandatory tw:max-md:px-4 tw:max-md:*:w-[85vw] tw:max-md:*:shrink-0 tw:max-md:*:snap-center'
       : 'tw:flex-col tw:lg:flex-row tw:lg:justify-center'
@@ -85,10 +85,8 @@ export class VehicleViewer {
         label: `Remove ${name}`,
         href: removePath(index),
         corner: true
-      })}<header data-align-row="header" class="tw:flex tw:items-start tw:justify-between tw:gap-4"><div>${present(manufacturer)
-        ? html`<p class="tw:mb-1 tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">${manufacturer}</p>`
-        : nothing}<div class="tw:text-2xl tw:leading-tight"><h3 class="tw:inline tw:font-extrabold">${model}</h3> ${
-          copyButton({ value, label: 'Copy ID', tooltip: true })}</div></div><div
+      })}<header data-align-row="header" class="tw:flex tw:items-start tw:justify-between tw:gap-4"><div>${
+        vehicleTitle({ manufacturer, model, data, value, ...this.card, heading: 'h3' })}</div><div
         class="tw:shrink-0">${photoOf({ presenter, data }, 'tw:h-14 tw:w-21')}</div></header>${lead ? html`<div data-align-row="lead">${lead(data, key)}</div>` : nothing}${present(data[field])
         ? content(data, key, index)
         : html`<p class="twless-strong">${none}</p>`}</section>`
@@ -178,7 +176,7 @@ export class VehicleViewer {
       motors: () => cardRow('tw:mt-6', cards('motors', 'No motor', (data, key) => motorsOf({ presenter, data, others: others(key), outOfClassId }))),
       all: () => {
         const full = vehicles.map(({ data, value, key }, index) => modelViewer({
-          presenter, data, value, comparing, idSuffix: index + 1, others: others(key), removePath: removePath(index), selectedSize: selectedSizes.get(key), sizePath: sizePath(key), outOfClassId
+          presenter, data, value, market: this.card.market, comparing, idSuffix: index + 1, others: others(key), removePath: removePath(index), selectedSize: selectedSizes.get(key), sizePath: sizePath(key), outOfClassId
         }))
         return cardRow('tw:mt-6', full)
       }
@@ -210,8 +208,6 @@ export class VehicleViewer {
       vehicle: value,
       current,
       type: typeName(this.presenter, data).toLowerCase(),
-      vehicleType: data.type,
-      electric: present(data.motors),
       complete: (data.model_configuration ?? 'complete') === 'complete',
       settings: similar,
       groups: similar.results?.groups,
