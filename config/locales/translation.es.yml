@@ -5675,6 +5675,10 @@ es:
         included_columns: Columnas incluidas
         none: ninguno
         visible_columns: Columnas visibles
+        return_to_default_column_order: Volver al orden de columnas predeterminado
+      drag_handle:
+        move: Mover %{name}
+        moved: Posición %{position} de %{count}
     atoms:
       serial:
         hidden: oculto
@@ -5876,6 +5880,11 @@ es:
             status_at_cell_panel: Hora - Estado
             status_records: Registros %{status}
             unregistered_cell: No registrado
+            copy_column_order_from_impounded_vehicles_search: Copiar el orden de las
+              columnas de la búsqueda de vehículos incautados
+            copy_column_order_from_registrations_search: Copiar el orden de las columnas
+              de la búsqueda de registros
+            impound_search_columns: Columnas de búsqueda de depósitos
           column_settings_toggle:
             column_settings: Configuración de columnas
           settings_and_filters:
@@ -5964,6 +5973,9 @@ es:
           map_unavailable: No se pudo cargar el mapa; la ubicación aún estaba configurada
             desde su dispositivo.
           set_on_map: Colocar en el mapa
+        registration_sequence:
+          page_edit_bullet:
+            bullet: bala
       registrations:
         show:
           bike_details:
@@ -8020,7 +8032,6 @@ es:
           across_town_intro: Cada venta se realiza entre particulares. Bike Index
             no gestiona los pagos ni los envíos, por lo que comprador y vendedor acuerdan
             directamente el precio, el pago y la entrega.
-          back_to_marketplace: Volver al mercado
           bike_index_members: Miembros de Bike Index
           bike_index_members_body: Los vendedores que apoyan a Bike Index mediante
             una membresía muestran una insignia de miembro de Bike Index en sus anuncios.

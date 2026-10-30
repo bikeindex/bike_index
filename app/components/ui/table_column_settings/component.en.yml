@@ -7,4 +7,5 @@ en:
         default: default
         included_columns: Included columns
         none: none
+        return_to_default_column_order: Return to default column order
         visible_columns: Visible columns

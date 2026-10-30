@@ -13,6 +13,10 @@ en:
             all_statuses: All statuses
             avery_cell: Avery Exportable
             color_cell: Color
+            copy_column_order_from_impounded_vehicles_search: Copy column order from
+              impounded vehicles search
+            copy_column_order_from_registrations_search: Copy column order from registrations
+              search
             created_at_cell: Registered
             creation_description_cell: Source
             cycle_type_cell: Vehicle type
@@ -29,6 +33,7 @@ en:
             filter_with_stickers_html: only <strong>with</strong> stickers
             impound_id_cell: Impound ID
             impound_location_cell: Location
+            impound_search_columns: Impound search columns
             impound_status_cell: Impound status
             impound_updated_at_cell: Impound updated
             impound_updated_at_cell_panel: Time - Impound Record Updated

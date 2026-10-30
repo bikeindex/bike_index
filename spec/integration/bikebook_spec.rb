@@ -713,17 +713,20 @@ RSpec.describe "BikeBook", :js, type: :system do
     # its own models and those of makers it sells none of, but for e-vehicles
     expect(page).to have_css("#vehicle-models-count", exact_text: "(7 matching models)", wait: 10)
     type_into(vehicle_field, "haul")
-    expect(page).to have_css(vehicle_option, count: 1, text: "$3,599.99").and have_no_css(vehicle_option, text: "(Canada)")
+    expect(page).to have_css(vehicle_option, count: 1, text: "$3,599.99").and have_no_css(vehicle_option, text: "(CA)")
+    # beside its activity, whether it's electric
+    expect(find(vehicle_option)).to have_css("span", exact_text: "⚡")
     # nor a maker's sold elsewhere, where it sells its own
     type_into(vehicle_field, "kh24")
     expect(page).to have_css(vehicle_option, count: 1).and have_css("#{vehicle_option}[data-value='m/kris_holm/2023/kh24']")
+    expect(find(vehicle_option)).to have_no_text("⚡")
     # the URL says the search shows, but not what's typed or the visitor's own market
     expect(page).to have_current_path("/bikebook?search=1")
     # but a model's exact id finds it, though the market leaves it out, saying so rather than counting it
     type_into(vehicle_field, "m/specialized/2025/haul_st")
     expect(page).to have_css(".hw-combobox__group__label", exact_text: "(model doesn't match filters)")
     # named for the market it's sold in, which the visitor's isn't
-    expect(page).to have_css(vehicle_option, count: 1, text: "Specialized Haul ST (United States)").and have_no_css(vehicle_option, text: "$3,599.99")
+    expect(page).to have_css(vehicle_option, count: 1, text: "Specialized Haul ST (US)").and have_no_css(vehicle_option, text: "$3,599.99")
     type_into(vehicle_field, "m/specialized/2025/haul_st_ca")
     expect(page).to have_css(".hw-combobox__group__label", exact_text: "(1 matching model)")
 
@@ -742,7 +745,7 @@ RSpec.describe "BikeBook", :js, type: :system do
     choose "Any market", allow_label_click: true
     expect(page).to have_css("#vehicle-models-count", exact_text: "(33 matching models)")
     # a model sold outside the visitor's market names where it is
-    expect(find("[aria-label='Models to compare']")).to have_link(exact_text: "Kris Holm KH24 (United States)")
+    expect(find("[aria-label='Models to compare']")).to have_link(exact_text: "Kris Holm KH24 (US)")
       .and have_link(exact_text: "Kris Holm KH24")
     expect(page).to have_current_path(/[?&]market_scope=any\b/)
     # each re-runs the vehicle combobox's search, logged once it settles, though only the market's scope changed
@@ -867,6 +870,7 @@ RSpec.describe "BikeBook", :js, type: :system do
     # titled without a year, over the years it's been sold
     haul_st = featured.find("li", text: "Specialized Haul ST")
     expect(haul_st).to have_link(exact_text: "Specialized Haul ST").and have_css("strong", exact_text: "2025–current")
+    expect(featured.find("li", text: "Ramblas ADV")).to have_css("strong", exact_text: "2026–current")
     # each is picked as the search's option is
     haul_st.find("a").click
     expect(page).to have_css("[aria-label='Overview'] thead th", text: "Haul ST")
@@ -1417,12 +1421,20 @@ RSpec.describe "BikeBook", :js, type: :system do
     # 650b against 700c, whatever their tires
     expect(diameters.call).to eq(["Aventón Level 4 ADV's 650 B wheels with 56 mm tires are approximately 696 mm diameter",
       "Aventón Current EXP's 700 C wheels with 64 mm tires are approximately 750 mm diameter"])
+    # a chip's handle moves it a place by its arrow keys, and the comparison with it, keeping its focus
+    find("[aria-label='Move Aventón Level 4 ADV (current)']").send_keys(:right)
+    expect(page).to have_current_path(%r{[?&]vehicle_models=m/aventon/2026/current_exp,m/aventon/2026/level_4_adv(&|\z)})
+    expect(page).to have_css("#drag-handle-status", text: "Position 2 of 2", visible: :all)
+    expect(page).to have_css("[aria-label='Move Aventón Level 4 ADV (current)']:focus")
+    # and dragged back by it
+    find("[aria-label='Move Aventón Level 4 ADV (current)']").drag_to(find(".hw-combobox__chip", text: "Current EXP"))
+    expect(page).to have_current_path(%r{[?&]vehicle_models=m/aventon/2026/level_4_adv,m/aventon/2026/current_exp(&|\z)})
 
     # a model picked again compares in a size of its own, which goes on the URL in its place
     visit bikebook_path(vehicle_models: "m/aventon/2026/current_adv", view: "geometry", search: 1)
     expect(page).to have_css("[aria-label='Sizes & geometry comparison']", wait: 10)
     type_into(vehicle_field, "current adv")
-    retry_on_detach { find(vehicle_option, text: "Aventón Current ADV already selected").click }
+    retry_on_detach { find(vehicle_option, text: "Aventón Current ADV Selected").click }
     expect(page).to have_css(".hw-combobox__chip", text: "Aventón Current ADV", count: 2)
     all("select[aria-label='Size of Current ADV']", count: 2, wait: 10).last.select("Small")
     expect(page).to have_current_path(/[?&]vehicle_sizes=,Small(&|\z)/)
@@ -1508,9 +1520,6 @@ RSpec.describe "BikeBook", :js, type: :system do
 
       expect_template(UI::IconChevron::Component.new(size: :md), "bikebook/templates/ui/icon_chevron#iconChevron", "{ size: 'md' }")
       expect_template(UI::IconChevron::Component.new, "bikebook/templates/ui/icon_chevron#iconChevron", "undefined")
-
-      expect_template(UI::DragHandle::Component.new(controller: "bikebook--chip-reorder", html_class: "tw:mr-1"),
-        "bikebook/templates/ui/drag_handle#dragHandle", "{ controller: 'bikebook--chip-reorder', htmlClass: 'tw:mr-1' }")
 
       expect_template(UI::Tabs::Component.new(nav_label: "Views", turbo: true, margin_classes: "tw:mt-2", tabs: [
         ComponentStructs::Shapes.tab("Overview", "/bikebook", active: true), ComponentStructs::Shapes.tab("All", "/bikebook?view=all", count: 1200)
@@ -1764,11 +1773,31 @@ RSpec.describe "BikeBook", :js, type: :system do
     # whichever of them the market picked doesn't sell
     visit bikebook_path(vehicle_models: "m/specialized/2025/haul_st,m/specialized/2025/haul_st_ca", filters: 1)
     expect(page).to have_css("[aria-label='Overview comparison'] tbody tr:first-child", text: /\AMarkets\s*United States\s*Canada\z/, wait: 10)
-    expect(page).to have_css("[aria-label='Overview comparison'] thead th", text: /Haul ST\s+\(Canada\)/)
-      .and have_no_css("[aria-label='Overview comparison'] thead th", text: "(United States)")
+    expect(page).to have_css("[aria-label='Overview comparison'] thead th", text: /Haul ST\s+\(CA\)/)
+      .and have_no_css("[aria-label='Overview comparison'] thead th", text: "(US)")
     choose_option("Market", "Canada")
-    expect(page).to have_css("[aria-label='Overview comparison'] thead th", text: /Haul ST\s+\(United States\)/)
-      .and have_no_css("[aria-label='Overview comparison'] thead th", text: "(Canada)")
+    expect(page).to have_css("[aria-label='Overview comparison'] thead th", text: /Haul ST\s+\(US\)/)
+      .and have_no_css("[aria-label='Overview comparison'] thead th", text: "(CA)")
+    # as every view heads them, an e-vehicle's badge leading its model
+    click_link "Sizes & geometry"
+    expect(page).to have_css("[aria-label='Sizes & geometry comparison'] thead th", text: /\ASpecialized\s*⚡\s*Haul ST\s*\(US\)\z/i, wait: 10)
+    expect(all("section[aria-label='Specialized Haul ST sizes'] header").first).to have_css("h3", text: /\AHaul ST\s*\(US\)\z/)
+      .and have_text(/\ASpecialized\s*⚡\s*Haul ST/i)
+
+    # past three markets, the rest behind how many there are in all, which goes once it shows them
+    gt3_pro = JSON.parse(BikebookCatalogHelpers::FIXTURES.join("models/segway/2025.json").read)
+    gt3_pro["models"]["m/segway/2025/gt3_pro"]["markets"] = %w[AE CN GB JP KR]
+    page.driver.with_playwright_page do |playwright_page|
+      playwright_page.context.route("#{Integrations::Bikebook::Catalog::URL}models/segway/2025.json", ->(route, _request) {
+        route.fulfill(status: 200, headers: {"access-control-allow-origin" => "*", "content-type" => "application/json"}, body: gt3_pro.to_json)
+      })
+    end
+    visit bikebook_path(vehicle_models: "m/segway/2025/gt3_pro")
+    markets = find("[aria-label='Overview'] tbody tr", text: /\AMarkets/, wait: 10)
+    expect(markets).to have_text(/\AMarkets\s*United Arab Emirates, China, United Kingdom… 5 total\z/)
+    markets.find("[role='button']", exact_text: "5 total").click
+    expect(markets).to have_text(/\AMarkets\s*United Arab Emirates, China, United Kingdom, Japan, South Korea\z/)
+    expect(markets).to have_no_css("[role='button']")
 
     # its Canadian model, published resolved from it: its own market, price and motor, and no US class
     visit bikebook_path(vehicle_models: "m/specialized/2025/haul_st,m/specialized/2025/haul_st_ca", view: "all")
@@ -1784,6 +1813,23 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(page).to have_css(".hw-combobox__chip", text: "US Class 3").and have_css("[aria-label='Models to compare'] a", minimum: 1)
       .and have_text(/models to compare\. Search them/).and have_no_css("[aria-label='How to use BikeBook']").and have_no_text("Nothing selected yet")
     expect(page).to have_current_path("/bikebook?classifications=evc/us/class_3&search=1")
+
+    # a model that isn't complete says what it is in a badge after its name, in its option and its title
+    index = JSON.parse(BikebookCatalogHelpers::FIXTURES.join("index.json").read)
+    index["models"].find { it["id"] == "m/specialized/2027/crux_5_s_level_sram_red_xplr" }["model_configuration"] = "frame_fork"
+    crux = JSON.parse(BikebookCatalogHelpers::FIXTURES.join("models/specialized/2027.json").read)
+    crux["models"]["m/specialized/2027/crux_5_s_level_sram_red_xplr"]["model_configuration"] = "frame_fork"
+    page.driver.with_playwright_page do |playwright_page|
+      {"index.json" => index, "models/specialized/2027.json" => crux}.each do |path, body|
+        playwright_page.context.route("#{Integrations::Bikebook::Catalog::URL}#{path}", ->(route, _request) {
+          route.fulfill(status: 200, headers: {"access-control-allow-origin" => "*", "content-type" => "application/json"}, body: body.to_json)
+        })
+      end
+    end
+    visit bikebook_path(vehicle_models: "m/specialized/2027/crux_5_s_level_sram_red_xplr", search: 1)
+    expect(page).to have_css("[aria-label='Overview'] thead th", text: /Crux 5 S-Level - SRAM RED XPLR\s*frame & fork\z/, wait: 10)
+    type_into(vehicle_field, "crux")
+    expect(page).to have_css(vehicle_option, text: /Specialized Crux 5 S-Level - SRAM RED XPLR\s*frame & fork/)
   end
 
   it "puts the first model's most alike above its views, by a strategy or adjusted weights, each added to the comparison and taken out" do
@@ -1869,37 +1915,56 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(page).to have_current_path(/[?&]skip_manufacturer=1\b/).and have_text("No similar models are in the catalog.")
     uncheck "Skip bikes from the same manufacturer"
     expect(page).to have_no_current_path(/skip_manufacturer/).and have_css("#similar-m-aventon-2026-pace_5_rec_step_through")
-    # and the other propulsion's, an e-bike's human powered ones, and other vehicle types
-    expect(page).to have_css("legend", exact_text: "Other settings")
-    {"Show matching human powered bikes" => "other_propulsion", "Only complete bikes" => "same_configuration",
-     "Only match bikes with the same wheel size" => "same_wheels"}.each do |label, param|
+    expect(page).to have_css("legend", text: /\AOther settings/)
+    {"Only complete bikes" => "same_configuration", "Only match bikes with the same wheel size" => "same_wheels"}.each do |label, param|
       check label
       expect(page).to have_current_path(/[?&]#{param}=1\b/)
       uncheck label
       expect(page).to have_no_current_path(/#{param}/)
     end
-    check "Include different vehicle types"
-    expect(page).to have_current_path(/[?&]different_types=1\b/).and have_css("#similar-m-aventon-2025-abound_lr")
-    uncheck "Include different vehicle types"
-    expect(page).to have_no_current_path(/different_types/).and have_no_css("#similar-m-aventon-2025-abound_lr")
+    # its vehicle type, unless the filters pick others - Cargo Bike's option rather than Cargo Bike Rear's
+    type_into(find_field("Vehicle types"), "Cargo Bike")
+    find("#vehicle_type-hw-listbox [role='option']", text: /\ACargo Bike \(/).click
+    expect(page).to have_current_path(/[?&]vehicle_type=cargo_bike\b/).and have_css("#similar-m-aventon-2025-abound_lr")
+    within("#vehicle-filters") { click_link "Clear filters" }
+    expect(page).to have_no_current_path(/vehicle_type/).and have_no_css("#similar-m-aventon-2025-abound_lr")
     # the closest of each model group, its own, other propulsions and other vehicle types left out, other activities in
     expect(cards.call).to eq %w[similar-m-aventon-2026-pace_5_rec_step_through similar-m-aventon-2025-aventure_3_step_through
       similar-m-aventon-2024-soltera_2_5 similar-m-aventon-2026-ramblas_adv similar-m-aventon-2024-sinch_2_5]
+    # the propulsions the filters check in place of its own - an e-bike's human powered ones, of which none are near
+    check "Human powered (Acoustic)"
+    expect(page).to have_current_path(/[?&]electric=0\b/).and have_text("No similar models are in the catalog.")
+    check "e-Vehicle (motorized)"
+    expect(page).to have_current_path(/[?&]electric=0,1\b/).and have_css("#similar-m-aventon-2026-pace_5_rec_step_through")
+    uncheck "Human powered (Acoustic)"
+    uncheck "e-Vehicle (motorized)"
+    expect(page).to have_no_current_path(/electric/).and have_css("#similar-m-aventon-2026-pace_5_rec_step_through")
+    # and the rest of the filters', as the note beside the other settings says
+    expect(page).to have_css("legend", exact_text: "Other settings (you can also change the filters above to modify what is compared)")
+    choose_option("Suspension", "Rigid")
+    expect(page).to have_current_path(/[?&]suspension=rigid\b/).and have_no_css("#similar-m-aventon-2024-sinch_2_5")
+    expect(cards.call).to eq %w[similar-m-aventon-2026-pace_5_rec_step_through similar-m-aventon-2024-soltera_2_5]
+    choose_option("Frame material", "Carbon or Composite")
+    expect(page).to have_text("No similar models are in the catalog.")
+    within("#vehicle-filters") { click_link "Clear filters" }
+    expect(page).to have_css("#similar-m-aventon-2024-sinch_2_5")
     expect(page).to have_checked_field("Default weights", visible: :all).and have_field("Custom", disabled: true, visible: :all)
     # Custom says it's chosen by a slider, on hovering it though it's disabled
     find("button[aria-describedby]", exact_text: "Custom").hover
     expect(page).to have_css("[role='tooltip']", text: "If you change a weight, this will be selected")
+    # in the top layer, as the disabled option's opacity would fade it
+    expect(page).to have_css("[role='tooltip']:popover-open", text: "If you change a weight, this will be selected")
 
     # a card adds its model to the comparison, in place and focused again, and takes it out
     click_link "Soltera 2.5"
     expect(page).to have_css("[aria-label='Overview comparison'] thead th", count: 4, wait: 10)
     expect(page).to have_css("#similar-m-aventon-2024-soltera_2_5:focus")
     expect(compared.call).to eq %w[m/aventon/2026/level_4_rec m/aventon/2022/level_2 m/aventon/2024/soltera_2_5]
-    expect(find("#similar-m-aventon-2024-soltera_2_5").ancestor("li")).to have_text("Comparing")
+    expect(page).to have_css("#similar-m-aventon-2024-soltera_2_5", text: /Soltera 2\.5\s*, remove from the comparison/)
     expect(page).to have_text("Hide similar bikes").and have_unchecked_field("Skip bikes from the same manufacturer")
     click_link "Soltera 2.5"
     expect(page).to have_css("[aria-label='Overview comparison'] thead th", count: 3, wait: 10)
-    expect(find("#similar-m-aventon-2024-soltera_2_5").ancestor("li")).to have_no_text("Comparing")
+    expect(page).to have_css("#similar-m-aventon-2024-soltera_2_5", text: /Soltera 2\.5\s*, add to the comparison/)
 
     # a slider moved off the default weights chooses Custom, rescoring the cards
     find_field("E-vehicle motor and battery").send_keys(:home)
@@ -1934,18 +1999,17 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(page).to have_css("#similar-m-aventon-2026-pace_5_rec_step_through[href]", wait: 10)
     expect(page).to have_css(".hw-combobox__chip", count: 9).and have_no_css(".hw-combobox__chip", text: "Soltera 2.5")
 
-    # a human powered model's matching e-vehicles, and neither for a type that's always electric - opened alone, its
-    # adjustments showing the search they're in, which it hid
+    # opened alone, its adjustments showing the search they're in, which it hid
     visit bikebook_path(vehicle_models: "m/specialized/2027/crux_5_s_level_sram_red_xplr", similar: 1)
     click_on "Adjust comparison algorithm", wait: 10
-    expect(page).to have_field("Show matching e-bikes").and have_field("Select a bike, choose multiple to compare them")
+    expect(page).to have_field("Select a bike, choose multiple to compare them")
     expect(page).to have_current_path(/[?&]search=1&filters=1&adjust=1\b/)
-    # of the models the search's market leaves, as its e-bikes are Canada's, and current ones, as it's current, those no
-    # longer sold included by the first of the other settings - which leaves none, Canada's Haul ST no longer sold
-    visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_rec", market: "CA", similar: 1, skip_manufacturer: 1, different_types: 1,
+    # of the models the search's market and vehicle types leave, as its e-bikes are Canada's, and current ones, as it's
+    # current, those no longer sold included by the first of the other settings - which leaves none, Canada's Haul ST no longer sold
+    visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_rec", market: "CA", similar: 1, skip_manufacturer: 1, vehicle_type: "bike,cargo_bike",
       search: 1, filters: 1, adjust: 1)
     expect(page).to have_unchecked_field("Include bikes that are not current", wait: 10).and have_text("No similar models are in the catalog.")
-    expect(find("legend", exact_text: "Other settings").ancestor("fieldset").first("label")).to have_text("Include bikes that are not current")
+    expect(find("legend", text: /\AOther settings/).ancestor("fieldset").first("label")).to have_text("Include bikes that are not current")
     # any year's, then Canada's rather than the closer US one, until any market will do
     check "Include bikes that are not current"
     expect(page).to have_current_path(/[?&]include_not_current=1\b/)
@@ -1955,11 +2019,8 @@ RSpec.describe "BikeBook", :js, type: :system do
     # and one no longer sold matches any year's by default
     visit bikebook_path(vehicle_models: "m/specialized/2025/haul_st_ca", similar: 1, adjust: 1, search: 1, filters: 1)
     expect(page).to have_checked_field("Include cargo bikes that are not current", wait: 10)
-    visit bikebook_path(vehicle_models: "m/segway/2025/gt3_pro", similar: 1, adjust: 1, search: 1, filters: 1)
-    expect(page).to have_css("legend", exact_text: "Other settings", wait: 10)
-    expect(page).to have_no_text("Show matching")
-    # the other propulsion's instead with other_propulsion, without its e-bike fields counting against them, other vehicle
-    # types with different_types, a frame only without same_configuration, other wheel sizes only without same_wheels,
+    # the other propulsion's where they're included, without its e-bike fields counting against them, a frame only
+    # without same_configuration, other wheel sizes only without same_wheels,
     # more tire clearance nearer than as much less but not than less that's nearer, a frame's weight not held against it,
     # and a frame of the same material and bars of the same type closer, and only the same type with its slider at the top. None
     # nearly as far as one it knows nothing about, a groupset's tier however its series is written, and a slider's whole
@@ -1976,11 +2037,10 @@ RSpec.describe "BikeBook", :js, type: :system do
         const urban = [{ slug: 'commuting', family: 'urban' }]
         const scoring = (models, extra = {}, activities = urban) => scorer(models, { format: 2, fields: { ...fields, ...extra } }, activities)
         const score = scoring([model('e', true), model('other_e', true), model('acoustic', false)], { battery_size: [500, 500, null] })
-        const propulsions = ['', 'other_propulsion=1'].map((query) => score('e', settingsFrom(new URLSearchParams(query))).models.map(({ id }) => id))
+        const propulsions = [() => true, ({ electric }) => !electric].map((included) => score('e', settingsFrom(new URLSearchParams()), included).models.map(({ id }) => id))
         const materials = scoring([model('a', false), model('steel', false), model('aluminum', false)], { frame_material: ['aluminum', 'steel', 'aluminum'] })
         const bars = scoring([model('a', false, 'drop_bar'), model('flat', false, 'horizontal'), model('drop', false, 'drop_bar')])
         const ids = (score, query = '') => score('a', settingsFrom(new URLSearchParams(query))).models.map(({ id }) => id)
-        const types = scoring([model('a', false), { ...model('cargo', false), vehicle_type: 'cargo_bike' }, model('bike', false)])
         const far = scoring([model('a', false), model('near', false), model('far', false)],
           Object.fromEntries(Object.entries(alike).map(([name, value]) => [name, [value, value, value + 10]])))
         const groupsets = scoring([model('a', false), model('tiagra', false), model('s1000', false)], { groupset_series: ['S-1000', 'Tiagra', 'S1000'] })
@@ -1994,11 +2054,11 @@ RSpec.describe "BikeBook", :js, type: :system do
           { tire_clearance: [32, tight, roomy] }))
         const weighed = scoring([model('a', false), model('complete', false), { ...model('frame', false), model_configuration: 'frame_fork' }],
           { total_weight: [10, 3, 3] })
-        return [...propulsions, ids(types), ids(types, 'different_types=1'), ids(configurations), ids(configurations, 'same_configuration=1'),
+        return [...propulsions, ids(configurations), ids(configurations, 'same_configuration=1'),
           ids(wheels), ids(wheels, 'same_wheels=1'), ...clearances.map((each) => ids(each)), ids(weighed), ids(materials), ids(bars), ids(bars, 'weights=handlebar.4'), ids(far), ids(groupsets), ids(suspensions), ids(activities)]
       })()
     JS
-    expect(matched).to eq([["other_e"], ["acoustic"], ["bike"], ["cargo", "bike"], ["complete", "frame"], ["complete"], ["small", "road"], ["road"], ["36", "28"], ["28", "40"], ["frame", "complete"], ["aluminum", "steel"], ["drop"], ["drop", "flat"], ["near"], ["s1000", "tiagra"], ["steel", "full"], ["commuting", "touring"]])
+    expect(matched).to eq([["other_e", "acoustic"], ["acoustic"], ["complete", "frame"], ["complete"], ["small", "road"], ["road"], ["36", "28"], ["28", "40"], ["frame", "complete"], ["aluminum", "steel"], ["drop"], ["drop", "flat"], ["near"], ["s1000", "tiagra"], ["steel", "full"], ["commuting", "touring"]])
   end
 
   it "keeps the search and its filters while the catalog loads, and says so when it doesn't" do
