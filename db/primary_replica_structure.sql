@@ -3280,6 +3280,8 @@ CREATE TABLE public.pos_registration_matches (
     pos_bike_id bigint NOT NULL,
     user_id bigint NOT NULL,
     status integer DEFAULT 0 NOT NULL,
+    bucket integer DEFAULT 0 NOT NULL,
+    review_reasons text[] DEFAULT '{}'::text[] NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 );

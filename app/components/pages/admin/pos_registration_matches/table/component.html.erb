@@ -1,0 +1,42 @@
+<% sort_state = @sort_state %>
+
+<div
+  data-controller="update-cached-sortable-links"
+  data-update-cached-sortable-links-base-url-value="<%= url_for(sort_state.search_params) %>"
+>
+  <%= render(UI::Table::Component.new(records: @collection, render_sortable: @render_sortable, sort_state:)) do |table| %>
+    <% table.column(sortable: "created_at", label: "Created", lower_right: ->(match) { content_tag(:span, match.id, class: "only-dev-visible") }) do |match| %>
+      <%= render UI::Time::Component.new(time: match.created_at) %>
+    <% end %>
+
+    <% table.column(sortable: "bucket", label: "Bucket") do |match| %>
+      <%= render UI::Badge::Component.new(text: PosRegistrationMatch.bucket_display(match.bucket), color: BUCKET_COLORS[match.bucket], size: :sm) %>
+    <% end %>
+
+    <% table.column(label: "Review reasons") do |match| %>
+      <% match.review_reasons.each do |reason| %>
+        <span class="tw:block tw:text-xs"><%= PosRegistrationMatch::REVIEW_REASONS[reason] || reason %></span>
+      <% end %>
+    <% end %>
+
+    <% table.column(label: "New registration") do |match| %>
+      <%= render Atoms::Admin::TableCells::Bike::Component.new(bike: match.bike, bike_id: match.bike_id) %>
+    <% end %>
+
+    <% table.column(label: "POS registration") do |match| %>
+      <%= render Atoms::Admin::TableCells::Bike::Component.new(bike: match.pos_bike, bike_id: match.pos_bike_id) %>
+    <% end %>
+
+    <% table.column(sortable: "user_id", label: "Owner") do |match| %>
+      <%= render Atoms::Admin::TableCells::User::Component.new(user: match.user, user_id: match.user_id, sort_state:, render_search: true) %>
+    <% end %>
+
+    <% table.column(sortable: "status", label: "Status") do |match| %>
+      <%= match.status.humanize %>
+    <% end %>
+
+    <% table.column do |match| %>
+      <%= link_to "Compare", admin_duplicate_bike_path("compare", bike_ids: [match.pos_bike_id, match.bike_id].join(",")), class: "twlink tw:text-sm" %>
+    <% end %>
+  <% end %>
+</div>

@@ -19,13 +19,21 @@ RSpec.describe BikeJobs::PosRegistrationMatchFinderJob, type: :job do
     FactoryBot.create(pos_bike_factory, owner_email: pos_owner_email, manufacturer:, serial_number:, created_at: pos_created_at)
   end
 
-  it "records a pending match once" do
+  it "records a pending merge candidate once" do
     expect(pos_bike.current_ownership.user_id).to eq user.id
     expect {
       instance.perform(bike.id)
       instance.perform(bike.id)
     }.to change(PosRegistrationMatch, :count).by 1
-    expect(PosRegistrationMatch.last).to have_attributes(bike_id: bike.id, pos_bike_id: pos_bike.id, user_id: user.id, status: "pending")
+    expect(PosRegistrationMatch.last).to have_attributes(bike_id: bike.id, pos_bike_id: pos_bike.id, user_id: user.id,
+      status: "pending", bucket: "merge_candidate", review_reasons: [])
+  end
+
+  it "updates a pending match's reasons when it runs again" do
+    instance.perform(bike.id)
+    FactoryBot.create(:stolen_bike, serial_number:)
+    instance.perform(bike.id)
+    expect(PosRegistrationMatch.sole).to have_attributes(bucket: "review_candidate", review_reasons: ["stolen_history"])
   end
 
   context "ascend pos bike registered from the app" do
@@ -45,10 +53,17 @@ RSpec.describe BikeJobs::PosRegistrationMatchFinderJob, type: :job do
     end
   end
 
+  shared_examples "records a review candidate" do |review_reasons|
+    it "records a review candidate with #{review_reasons.to_sentence}" do
+      instance.perform(bike.id)
+      expect(PosRegistrationMatch.sole).to have_attributes(pos_bike_id: pos_bike.id, bucket: "review_candidate", review_reasons:)
+    end
+  end
+
   context "another manufacturer's bike with the serial is stolen" do
     before { FactoryBot.create(:stolen_bike, serial_number:) }
 
-    include_examples "records no match"
+    include_examples "records a review candidate", ["stolen_history"]
   end
 
   context "registered from a sticker" do
@@ -63,7 +78,7 @@ RSpec.describe BikeJobs::PosRegistrationMatchFinderJob, type: :job do
   context "a bike with the serial only has stolen status" do
     before { FactoryBot.create(:bike, serial_number:).update_column(:status, "status_stolen") }
 
-    include_examples "records no match"
+    include_examples "records a review candidate", ["stolen_history"]
   end
 
   context "a bike with the serial only has a current stolen record id" do
@@ -71,13 +86,13 @@ RSpec.describe BikeJobs::PosRegistrationMatchFinderJob, type: :job do
       FactoryBot.create(:bike, serial_number:).update_column(:current_stolen_record_id, FactoryBot.create(:stolen_record).id)
     end
 
-    include_examples "records no match"
+    include_examples "records a review candidate", ["stolen_history"]
   end
 
   context "another manufacturer's example bike with the serial is stolen" do
     before { FactoryBot.create(:stolen_bike, serial_number:, example: true) }
 
-    include_examples "records no match"
+    include_examples "records a review candidate", ["stolen_history"]
   end
 
   context "a deleted bike with the serial was stolen and recovered" do
@@ -88,7 +103,7 @@ RSpec.describe BikeJobs::PosRegistrationMatchFinderJob, type: :job do
       expect(deleted_bike.reload).to have_attributes(status: "status_with_owner", current_stolen_record_id: nil, deleted_at: be_present)
     end
 
-    include_examples "records no match"
+    include_examples "records a review candidate", ["stolen_history"]
   end
 
   context "pos bike owned by someone else" do
@@ -134,9 +149,26 @@ RSpec.describe BikeJobs::PosRegistrationMatchFinderJob, type: :job do
   end
 
   context "multiple earlier pos bikes" do
-    before { FactoryBot.create(:bike_lightspeed_pos, owner_email: user.email, manufacturer:, serial_number:, created_at: pos_created_at) }
+    let!(:pos_bike2) { FactoryBot.create(:bike_lightspeed_pos, owner_email: user.email, manufacturer:, serial_number:, created_at: pos_created_at) }
 
-    include_examples "records no match"
+    it "records a review candidate for each" do
+      instance.perform(bike.id)
+      expect(PosRegistrationMatch.pluck(:pos_bike_id, :bucket, :review_reasons))
+        .to match_array([pos_bike, pos_bike2].map { [it.id, "review_candidate", ["multiple_pos_bikes"]] })
+    end
+  end
+
+  context "serial is a part number" do
+    let(:serial_number) { "SM-BBR60" }
+
+    include_examples "records a review candidate", ["not_a_serial"]
+  end
+
+  context "stolen serial that's also a part number" do
+    let(:serial_number) { "SM-BBR60" }
+    before { FactoryBot.create(:stolen_bike, serial_number:) }
+
+    include_examples "records a review candidate", ["stolen_history", "not_a_serial"]
   end
 
   context "pos bike transferred to the owner" do
@@ -152,12 +184,12 @@ RSpec.describe BikeJobs::PosRegistrationMatchFinderJob, type: :job do
   context "pos bike impounded" do
     before { FactoryBot.create(:impound_record, bike: pos_bike) }
 
-    include_examples "records no match"
+    include_examples "records a review candidate", ["impounded"]
   end
 
   context "new bike with a marketplace listing" do
     before { FactoryBot.create(:marketplace_listing, item: bike) }
 
-    include_examples "records no match"
+    include_examples "records a review candidate", ["marketplace_listing"]
   end
 end

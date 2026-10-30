@@ -160,6 +160,7 @@ module Pages
             {title: "Exports", path: admin_exports_path},
             {title: "Bulk Imports", path: admin_bulk_imports_path},
             {title: "Duplicate Bikes", path: admin_duplicate_bikes_path},
+            {title: "POS Registration Matches", path: admin_pos_registration_matches_path},
             {title: "Model Audits", path: admin_model_audits_path},
             {title: "Marketplace Listings", path: admin_marketplace_listings_path},
             {title: "Marketplace Messages", path: admin_marketplace_messages_path},
