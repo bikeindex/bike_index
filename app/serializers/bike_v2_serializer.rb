@@ -30,8 +30,13 @@ class BikeV2Serializer < ApplicationSerializer
     :registry_name,
     :registry_url
 
+  # The serial depends on who's asking
+  def cache_key
+    [super, serial]
+  end
+
   def serial
-    object.serial_display
+    object.serial_display(scope)
   end
 
   def manufacturer_name

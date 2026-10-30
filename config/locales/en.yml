@@ -1771,12 +1771,8 @@ en:
       find_lock:
         not_your_lock: Whoops, that's not your lock!
     memberships:
-      edit:
-        free_membership: >-
-          Bike Index has given you a free membership. Please email support@bikeindex.org
-          if you have questions.
-        no_active_membership: You don't have an active membership, you'll have to
-          sign up for a new one.
+      create:
+        already_a_member: You already have a membership.
     my_accounts:
       edit:
         delete_account: Delete account
@@ -2435,6 +2431,8 @@ en:
   feedbacks:
     form:
       email_address: Email address
+      message_template: "Bike serial number (if applicable): \nBike Index registration
+        URL (if applicable): \nWhat I need help with: "
       name: Name
       send_it: Send it!
       subject: Subject
@@ -2444,6 +2442,10 @@ en:
       have_a_question_we_havent_answered: Have a question we haven't answered?
       help_with_bike_index: Help with Bike Index
       log_in_to_send_a_comment: Log in to send a comment!
+      the_more_detail_you_can_share: >-
+        The more detail you can share, the faster we can help. If your question is
+        about a specific bike, include the serial number or your Bike Index registration
+        URL.
       you_can_reach_us_at_contact_html: You can reach us at %{contact_link}, or send
         your message right here.
   gflash:
@@ -3658,42 +3660,6 @@ en:
       use_ascend: Use Ascend?
       use_lightspeed_retail: Use Lightspeed Retail?
       used_at_bike_shops_everywhere: Used at bike shops everywhere
-    for_cities:
-      actually_get_people_registered_and_do_it_: Actually get people registered. And
-        do it for cheap.
-      bike_index_for_cities: Bike Index for Cities
-      bike_index_is_the_community_registration_: >-
-        Bike Index is the community registration system of choice. We are the bike
-        registration system of %{organization_counts} organizations - communities
-        in every corner of the world. Join the most widely used bike registration
-        network in the world.
-      bike_index_new_dashboard: New Bike Index dashboard useful for fighting bike
-        crime
-      bike_index_organization_impounding: Impounding bikes with Bike Index
-      bike_index_unveils_partnership_with_the_c: Bike Index unveils partnership with
-        the City of Palo Alto
-      bring_together_bike_shops_schools_municip: >-
-        Bring together bike shops, schools, municipal departments, and law enforcement
-        to register bikes in one system. Gone are the days of waiting for people to
-        not come in to register their bikes, or wondering if that other department
-        took care of it. Bike Index consolidates everything in one manageable place.
-      check_out: Check out our
-      cities_deck: cities partner deck
-      embed_a_bike_index_registration_form: Embed a bike registration form on your
-        website
-      engage_your_residents_and_recover_their_b: Engage your residents and recover
-        their bikes, and they will love you forever.
-      mitigate_the_registration_mess: Mitigate the registration mess
-      no_more_index_cards_or_excel_sheets_give_: >-
-        No more index cards or excel sheets. Give your citizens the tools to register
-        from a smartphone, in less than two minutes, and use these registrations to
-        recover and return stolen bikes.
-      our_community_is_your_community: Our community is your community
-      plug_your_city_in_nationally: Plug your city in nationally.
-      related_articles: 'Related articles:'
-      schedule_a_demo: Schedule a demo
-      trusted_by_municipalities_everywhere: Trusted by municipalities everywhere
-      used_by_municipalities_everywhere: Used by municipalities everywhere
     for_community_groups:
       bike_index_for_community_groups: Bike Index for Community Groups
       bike_index_launches_new_ambassadors_progr: Bike Index launches new Ambassadors
@@ -3862,6 +3828,9 @@ en:
     manufacturers_index: >-
       Bicycle related manufacturers listed on Bike Index - all the brands you know
       and then some.
+    marketplace_how_it_works: >-
+      How buying and selling works on the Bike Index Marketplace, where every bike
+      is registered and one reported stolen can't be listed.
     my_accounts_show: Your bikes on Bike Index
     news_index: Read Bike Index news. Also, periodically, learn magic spells.
     registrations_embed: >-
@@ -3906,6 +3875,7 @@ en:
     landing_pages_for_schools: Bike Index for Schools
     landing_pages_show: "%{organization} Bike Registration"
     manufacturers_index: Bike Manufacturers
+    marketplace_how_it_works: How the Bike Index Marketplace works
     my_accounts_show: You on Bike Index
     news_index: Bike Index Blog
     payments_create: Thanks for your support!
@@ -5072,6 +5042,7 @@ en:
     register_flow:
       date_found_required: Please tell us when you found it
       date_stolen_required: Please tell us when it was stolen
+      description_stolen_required: Please tell us what happened
       email_required: Email is required to register
       location_found_required: Please tell us where you found it
       location_stolen_required: Please tell us where it was stolen

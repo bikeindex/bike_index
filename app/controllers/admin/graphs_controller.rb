@@ -30,6 +30,19 @@ module Admin
       end
     end
 
+    # Each chart's series stack to its total
+    def logged_searches
+      daily = Counts.logged_searches(@time_range.first.to_date..@time_range.last.to_date)
+        .transform_keys { it.strftime(helpers.group_by_format(@time_range, :group_by_day)) }
+      series = if params[:search_endpoint] == "not_web_bikebook"
+        {"Org" => "organized", "Org serial" => "organized_serial", "User" => "user", "User serial" => "user_serial",
+         "Marketplace" => "web_marketplace"}
+      else
+        {"BikeBook" => "web_bikebook", "E-bike rules" => "web_ebike_rules"}
+      end
+      render json: series.map { |name, kind| {name:, data: daily.transform_values { it[kind] }} }.chart_json
+    end
+
     def bikes_table
       render Pages::Admin::Graphs::BikesTable::Component.new(kind: params[:table_kind], bikes: matching_bikes,
         time_range: @time_range, sortable_params: graphs_sortable_params), layout: false

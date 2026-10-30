@@ -1,0 +1,4 @@
+<%# Here rather than in the action, because a lead that fails to save re-renders this from FeedbacksController %>
+<%= render(SharedBlocks::Marketing::Wrapper::Component.new(page: Pages::LandingPages::ForCities::Component.new(
+  feedback: @feedback,
+  checker_state: EbikeRuleServices::StateLaws.state_from_location(request_location_hash)&.dig(:abbr)))) %>

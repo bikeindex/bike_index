@@ -148,6 +148,7 @@ module Pages
             {title: "Maintenance", path: admin_maintenance_path, exact: true},
             {title: "Partial Bikes", path: admin_b_params_path},
             {title: "Component Types", path: admin_ctypes_path},
+            {title: "Cycle Types", path: admin_cycle_types_path},
             {title: "Graphs", path: admin_graphs_path},
             {title: "Paints", path: admin_paints_path},
             {title: "Feedback & Messages", path: admin_feedbacks_path},

@@ -1,7 +1,8 @@
 production:
-  # Install postgres (to enable db:structure:load) and ripgrep
+  # Install postgres (to enable db:structure:load) and ripgrep. libheif from its PPA: noble's
+  # 1.17.6 rejects some iPhone HEICs' depth maps (fixed in 1.18), and its HEVC decoder is a plugin
   first_thing:
-    - command: sudo apt-get -y install postgresql-client-common ripgrep libvips
+    - command: sudo add-apt-repository -y ppa:strukturag/libheif && sudo apt-get -y install postgresql-client-common ripgrep libvips libheif1 libheif-plugin-libde265
       target: rails
       sudo: true
       apply_during: build_only

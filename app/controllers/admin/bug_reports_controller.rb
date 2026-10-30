@@ -3,6 +3,8 @@ module Admin
     include Binxtils::SortableTable
     include Admin::TokenAccessible
 
+    token_accessible :index, :show, :update, :assign_tags
+
     # Keyed by the BugReport scope each filter applies
     MEMBERSHIP_FILTERS = {"member" => "Only members", "invoiced_organization" => "Only invoiced org",
                           "invoiced_organization_staff" => "Only invoiced org staff"}.freeze

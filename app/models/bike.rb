@@ -73,29 +73,30 @@
 #
 # Indexes
 #
-#  index_bikes_current_listing_order               (listing_order) WHERE ((example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL))
-#  index_bikes_current_manufacturer_listing_order  (manufacturer_id,listing_order DESC) WHERE ((example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL))
-#  index_bikes_on_creation_organization_id         (creation_organization_id) WHERE (creation_organization_id IS NOT NULL)
-#  index_bikes_on_current_ownership_id             (current_ownership_id)
-#  index_bikes_on_current_stolen_record_id         (current_stolen_record_id) WHERE (current_stolen_record_id IS NOT NULL)
-#  index_bikes_on_deleted_at                       (deleted_at) WHERE (deleted_at IS NOT NULL)
-#  index_bikes_on_example                          (example) WHERE (example IS NOT NULL)
-#  index_bikes_on_latitude_and_longitude           (latitude,longitude)
-#  index_bikes_on_listing_order                    (listing_order)
-#  index_bikes_on_lower_frame_model                ("left"(lower(frame_model), 255))
-#  index_bikes_on_lower_mnfg_name                  (lower((mnfg_name)::text))
-#  index_bikes_on_manufacturer_id                  (manufacturer_id)
-#  index_bikes_on_model_audit_id                   (model_audit_id) WHERE (model_audit_id IS NOT NULL)
-#  index_bikes_on_owner_email_trgm                 (owner_email) USING gin
-#  index_bikes_on_primary_activity_id              (primary_activity_id) WHERE (primary_activity_id IS NOT NULL)
-#  index_bikes_on_primary_frame_color_id           (primary_frame_color_id)
-#  index_bikes_on_search_vector                    (search_vector) USING gin
-#  index_bikes_on_secondary_frame_color_id         (secondary_frame_color_id) WHERE (secondary_frame_color_id IS NOT NULL)
-#  index_bikes_on_serial_normalized_no_space_trgm  (serial_normalized_no_space) WHERE ((example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL)) USING gin
-#  index_bikes_on_serial_normalized_tsvector       (to_tsvector('simple'::regconfig, (serial_normalized)::text)) WHERE ((example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL)) USING gin
-#  index_bikes_on_status                           (status)
-#  index_bikes_on_tertiary_frame_color_id          (tertiary_frame_color_id) WHERE (tertiary_frame_color_id IS NOT NULL)
-#  index_bikes_on_user_hidden                      (user_hidden) WHERE (user_hidden IS NOT NULL)
+#  index_bikes_current_listing_order                    (listing_order) WHERE ((example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL))
+#  index_bikes_current_manufacturer_listing_order       (manufacturer_id,listing_order DESC) WHERE ((example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL))
+#  index_bikes_current_stolen_or_impounded_on_location  (latitude,longitude) WHERE ((status = ANY (ARRAY[1, 3])) AND (example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL))
+#  index_bikes_on_creation_organization_id              (creation_organization_id) WHERE (creation_organization_id IS NOT NULL)
+#  index_bikes_on_current_ownership_id                  (current_ownership_id)
+#  index_bikes_on_current_stolen_record_id              (current_stolen_record_id) WHERE (current_stolen_record_id IS NOT NULL)
+#  index_bikes_on_deleted_at                            (deleted_at) WHERE (deleted_at IS NOT NULL)
+#  index_bikes_on_example                               (example) WHERE (example IS NOT NULL)
+#  index_bikes_on_latitude_and_longitude                (latitude,longitude)
+#  index_bikes_on_listing_order                         (listing_order)
+#  index_bikes_on_lower_frame_model                     ("left"(lower(frame_model), 255))
+#  index_bikes_on_lower_mnfg_name                       (lower((mnfg_name)::text))
+#  index_bikes_on_manufacturer_id                       (manufacturer_id)
+#  index_bikes_on_model_audit_id                        (model_audit_id) WHERE (model_audit_id IS NOT NULL)
+#  index_bikes_on_owner_email_trgm                      (owner_email) USING gin
+#  index_bikes_on_primary_activity_id                   (primary_activity_id) WHERE (primary_activity_id IS NOT NULL)
+#  index_bikes_on_primary_frame_color_id                (primary_frame_color_id)
+#  index_bikes_on_search_vector                         (search_vector) USING gin
+#  index_bikes_on_secondary_frame_color_id              (secondary_frame_color_id) WHERE (secondary_frame_color_id IS NOT NULL)
+#  index_bikes_on_serial_normalized_no_space_trgm       (serial_normalized_no_space) WHERE ((example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL)) USING gin
+#  index_bikes_on_serial_normalized_tsvector            (to_tsvector('simple'::regconfig, (serial_normalized)::text)) WHERE ((example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL)) USING gin
+#  index_bikes_on_status                                (status)
+#  index_bikes_on_tertiary_frame_color_id               (tertiary_frame_color_id) WHERE (tertiary_frame_color_id IS NOT NULL)
+#  index_bikes_on_user_hidden                           (user_hidden) WHERE (user_hidden IS NOT NULL)
 #
 class Bike < ApplicationRecord
   include ActiveModel::Dirty
@@ -196,6 +197,8 @@ class Bike < ApplicationRecord
 
   scope :motorized, -> { where(propulsion_type: PropulsionType::MOTORIZED) }
   scope :current, -> { where(example: false, user_hidden: false, deleted_at: nil, likely_spam: false) }
+  # Starts from unscoped, so it drops anything chained before it - call it on Bike, not an association
+  scope :current_with_user_hidden, -> { unscoped.non_example.not_spam.without_deleted }
   scope :claimed, -> { includes(:ownerships).where(ownerships: {claimed: true}) }
   scope :unclaimed, -> { includes(:ownerships).where(ownerships: {claimed: false}) }
   scope :not_stolen, -> { where.not(status: %w[status_stolen status_abandoned]) }
@@ -218,7 +221,6 @@ class Bike < ApplicationRecord
   scope :example, -> { unscoped.where(example: true) }
   scope :non_example, -> { where(example: false) }
   scope :ignored, -> { where(example: true).or(where.not(deleted_at: nil)).or(where(likely_spam: true)) }
-  scope :with_user_hidden, -> { unscoped.non_example.not_spam.without_deleted }
   # An organization sees its own impounded bikes even when they're hidden - only chain it off the org's bikes
   scope :status_impounded_with_user_hidden, -> { unscope(where: :user_hidden).status_impounded }
   scope :default_includes, -> { includes(:primary_frame_color, :secondary_frame_color, :tertiary_frame_color, :current_stolen_record, :current_ownership) }
@@ -736,29 +738,26 @@ class Bike < ApplicationRecord
   end
 
   def valid_mailing_address?
-    addy = registration_address
-    return false if addy.blank? || addy.values.all?(&:blank?)
-    return false if addy["street"].blank? || addy["city"].blank?
-    return true if creation_organization&.default_location.blank?
+    registration_record = registration_address_record
+    registration_record&.street.present? && registration_record.city.present? &&
+      !registration_address_organization_default?(creation_organization)
+  end
 
-    creation_organization.default_location.address_hash_legacy != addy
+  def registration_address_organization_default?(organization)
+    registration_address_record&.internal_address_attrs == organization&.default_address_record&.internal_address_attrs
   end
 
   def mailing_address_record
-    BikeServices::CalculateLocation.registration_address_record(self) if valid_mailing_address?
+    registration_address_record if valid_mailing_address?
+  end
+
+  def registration_address_record
+    BikeServices::CalculateLocation.registration_address_record(self)
   end
 
   def address_hash
     current_stolen_record&.address_hash || current_impound_record&.address_hash ||
       address_record&.address_hash
-  end
-
-  def registration_address(unmemoize = false, address_record_id: false)
-    # unmemoize is necessary during save, because things may have changed
-    return @registration_address if !unmemoize && defined?(@registration_address)
-
-    @registration_address =
-      BikeServices::CalculateLocation.registration_address_hash(self, address_record_id:)
   end
 
   def external_image_urls

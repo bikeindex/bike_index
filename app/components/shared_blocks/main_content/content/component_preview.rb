@@ -19,7 +19,7 @@ module SharedBlocks
 
         def component(controller_name:, action_name:)
           SharedBlocks::MainContent::Content::Component.new(blog: nil, related_blogs: nil,
-            source: nil, current_user: nil, controller_name:, action_name:)
+            current_user: nil, controller_name:, action_name:)
         end
 
         def placeholder

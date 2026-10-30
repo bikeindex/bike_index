@@ -56,6 +56,13 @@ RSpec.describe SessionsController, type: :request do
       end
     end
 
+    context "email with a null byte" do
+      it "strips it" do
+        identify("1\u0000%2527%2522")
+        expect(response).to redirect_to(new_user_path(email: "1%2527%2522"))
+      end
+    end
+
     context "blank email" do
       it "re-renders the email step" do
         identify("")
@@ -125,6 +132,12 @@ RSpec.describe SessionsController, type: :request do
           response
         end
         expect(throttled.headers["retry-after"]).to eq "20"
+      end
+
+      it "returns 400 for a multipart email with invalid bytes" do
+        body = "--b\r\nContent-Disposition: form-data; name=\"session[email]\"\r\n\r\n1\xFF\xFE\r\n--b--\r\n".b
+        post "/session/identify", params: body, headers: {"CONTENT_TYPE" => "multipart/form-data; boundary=b"}
+        expect(response.status).to eq 400
       end
     end
   end
