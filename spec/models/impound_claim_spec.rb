@@ -49,6 +49,22 @@ RSpec.describe ImpoundClaim, type: :model do
     end
   end
 
+  describe "stalled" do
+    let(:impound_record) { FactoryBot.create(:impound_record) }
+    let(:stalled_at) { Time.current - ImpoundClaim::STALLED_AFTER - 1.day }
+    let!(:impound_claim_submitted) { FactoryBot.create(:impound_claim, impound_record:, status: "submitting", submitted_at: stalled_at) }
+    let!(:impound_claim_approved) { FactoryBot.create(:impound_claim, impound_record:, status: "approved", created_at: stalled_at) }
+    let!(:impound_claim_recent) { FactoryBot.create(:impound_claim, impound_record:, status: "submitting", created_at: stalled_at) }
+    let!(:impound_claim_organized) { FactoryBot.create(:impound_claim, status: "submitting", submitted_at: stalled_at) }
+    let!(:impound_claims_other_statuses) do
+      %w[pending denied retrieved].map { |status| FactoryBot.create(:impound_claim, impound_record:, status:, created_at: stalled_at) }
+    end
+
+    it "includes old submitted and approved claims on public found reports" do
+      expect(ImpoundClaim.stalled.pluck(:id)).to match_array([impound_claim_submitted.id, impound_claim_approved.id])
+    end
+  end
+
   describe "bike_submitting_images" do
     let(:bike) { FactoryBot.create(:bike, cycle_type: "trailer") }
     let!(:impound_claim) { FactoryBot.create(:impound_claim_with_stolen_record, bike: bike) }
