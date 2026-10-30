@@ -61,6 +61,11 @@ module UI
 
       def hideable? = @classes.to_s.split.include?("hideableColumn")
 
+      def header_label
+        return @label unless @label.nil?
+        @sortable&.gsub(/_(id|at)\z/, "")&.titleize
+      end
+
       def td_classes(bordered:)
         classes = ["tw:px-1 tw:py-1"]
         classes << if bordered
@@ -77,11 +82,6 @@ module UI
       end
 
       private
-
-      def header_label
-        return @label unless @label.nil?
-        @sortable&.gsub(/_(id|at)\z/, "")&.titleize
-      end
 
       def render_sort_link(current_sort:, current_direction:, sortable_url:, sort_icon:)
         title = header_label

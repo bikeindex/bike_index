@@ -53,6 +53,11 @@
                        data: {controller: "bikebook--chip-reorder", repeatable: true},
                        input: {autofocus: true, data: {"bikebook--focus-shortcut-target": "field"}}}
       )) %>
+
+        <%# Each chip's grip, cloned by bikebook/catalog's renderChips, which names its chip for %{name} %>
+        <template data-chip-grip>
+          <%= render(UI::DragHandle::Component.new(controller: "bikebook--chip-reorder", label: "%{name}", html_class: "tw:mr-1")) %>
+        </template>
       <% end %>
     </div>
 

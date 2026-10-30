@@ -27,7 +27,7 @@
       </div>
     </div>
 
-    <%= render(UI::TableColumnSettings::Component.new(columns: COLUMNS, defaults: DEFAULT_COLUMNS, narrow_hidden: %i[photo_cell created_at_cell])) %>
+    <%= render(UI::TableColumnSettings::Component.new(columns: COLUMNS, defaults: DEFAULT_COLUMNS, narrow_hidden: %i[photo_cell created_at_cell], orderable: true)) %>
 
     <% duplicate_counts = self.duplicate_counts %>
     <% location = method(:location) %>

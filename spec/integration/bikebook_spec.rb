@@ -1417,6 +1417,14 @@ RSpec.describe "BikeBook", :js, type: :system do
     # 650b against 700c, whatever their tires
     expect(diameters.call).to eq(["Aventón Level 4 ADV's 650 B wheels with 56 mm tires are approximately 696 mm diameter",
       "Aventón Current EXP's 700 C wheels with 64 mm tires are approximately 750 mm diameter"])
+    # a chip's handle moves it a place by its arrow keys, and the comparison with it, keeping its focus
+    find("[aria-label='Move Aventón Level 4 ADV (current)']").send_keys(:right)
+    expect(page).to have_current_path(%r{[?&]vehicle_models=m/aventon/2026/current_exp,m/aventon/2026/level_4_adv(&|\z)})
+    expect(page).to have_css("#drag-handle-status", text: "Position 2 of 2", visible: :all)
+    expect(page).to have_css("[aria-label='Move Aventón Level 4 ADV (current)']:focus")
+    # and dragged back by it
+    find("[aria-label='Move Aventón Level 4 ADV (current)']").drag_to(find(".hw-combobox__chip", text: "Current EXP"))
+    expect(page).to have_current_path(%r{[?&]vehicle_models=m/aventon/2026/level_4_adv,m/aventon/2026/current_exp(&|\z)})
 
     # a model picked again compares in a size of its own, which goes on the URL in its place
     visit bikebook_path(vehicle_models: "m/aventon/2026/current_adv", view: "geometry", search: 1)
@@ -1508,9 +1516,6 @@ RSpec.describe "BikeBook", :js, type: :system do
 
       expect_template(UI::IconChevron::Component.new(size: :md), "bikebook/templates/ui/icon_chevron#iconChevron", "{ size: 'md' }")
       expect_template(UI::IconChevron::Component.new, "bikebook/templates/ui/icon_chevron#iconChevron", "undefined")
-
-      expect_template(UI::DragHandle::Component.new(controller: "bikebook--chip-reorder", html_class: "tw:mr-1"),
-        "bikebook/templates/ui/drag_handle#dragHandle", "{ controller: 'bikebook--chip-reorder', htmlClass: 'tw:mr-1' }")
 
       expect_template(UI::Tabs::Component.new(nav_label: "Views", turbo: true, margin_classes: "tw:mt-2", tabs: [
         ComponentStructs::Shapes.tab("Overview", "/bikebook", active: true), ComponentStructs::Shapes.tab("All", "/bikebook?view=all", count: 1200)
