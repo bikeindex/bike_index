@@ -43,11 +43,11 @@ export default class extends Controller {
     this.keydownEscape = this.keydownEscape.bind(this)
   }
 
-  // A popover's UA styles center it in the viewport and clip the arrow hanging off its edge
+  // A popover's UA overflow clips the arrow hanging off its edge
   tooltipTargetConnected (tooltip) {
     if (!POPOVER) return
     tooltip.popover = 'manual'
-    Object.assign(tooltip.style, { margin: '0', inset: 'auto', overflow: 'visible' })
+    tooltip.style.overflow = 'visible'
   }
 
   disconnect () {

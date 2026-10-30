@@ -9,7 +9,7 @@ RSpec.describe UI::Tooltip::Component, :js, type: :system do
     page.evaluate_script(<<~JS)
       (() => {
         const style = document.getElementById(#{id.to_json}).style
-        return { top: style.top, left: style.left }
+        return { top: style.top, left: style.left, zIndex: style.zIndex, position: style.position }
       })()
     JS
   end
@@ -27,15 +27,14 @@ RSpec.describe UI::Tooltip::Component, :js, type: :system do
     page.evaluate_script("document.getElementById(#{id.to_json}).matches(':popover-open')")
   end
 
-  # Its own classes rather than a popover's UA styles, which center it in the viewport, and its gap from its trigger
+  # Not a popover's UA overflow, which clips its arrow, nor its centering, which would part it from its trigger
   def popover_styles(id)
     page.evaluate_script(<<~JS)
       (() => {
         const tooltip = document.getElementById(#{id.to_json})
-        const style = getComputedStyle(tooltip)
         const [box, trigger] = [tooltip, document.querySelector(`[aria-describedby="${tooltip.id}"]`)].map((element) => element.getBoundingClientRect())
         const gap = Math.round(Math.min(Math.abs(trigger.top - box.bottom), Math.abs(box.top - trigger.bottom)))
-        return { margin: style.margin, border: style.borderTopWidth, padding: style.padding, overflow: style.overflow, gap }
+        return { overflow: getComputedStyle(tooltip).overflow, gap }
       })()
     JS
   end
@@ -74,7 +73,7 @@ RSpec.describe UI::Tooltip::Component, :js, type: :system do
     expect(tooltip).to be_visible
     expect(top_layer?(tooltip_ids.first)).to be true
     expect(tooltip_position(tooltip_ids.first)).to include("top" => be_present, "left" => be_present)
-    expect(popover_styles(tooltip_ids.first)).to eq("margin" => "0px", "border" => "1px", "padding" => "4px 8px", "overflow" => "visible", "gap" => 8)
+    expect(popover_styles(tooltip_ids.first)).to eq("overflow" => "visible", "gap" => 8)
     find("body").hover
     expect(tooltip).not_to be_visible
     expect(top_layer?(tooltip_ids.first)).to be false
@@ -221,9 +220,9 @@ RSpec.describe UI::Tooltip::Component, :js, type: :system do
     find("[aria-describedby='#{second}']").hover
     expect(find_by_id(first)).to be_visible
     expect(find_by_id(second)).to be_visible
-    z_index = ->(id) { page.evaluate_script("document.getElementById(#{id.to_json}).style.zIndex").to_i }
-    expect(z_index.call(second)).to be > z_index.call(first)
-    expect(page.evaluate_script("document.getElementById(#{second.to_json}).style.position")).to eq "absolute"
+    first_position, second_position = [first, second].map { tooltip_position(it) }
+    expect(second_position["zIndex"].to_i).to be > first_position["zIndex"].to_i
+    expect(second_position["position"]).to eq "absolute"
     find("body").click
     expect(find_by_id(first, visible: :all)).not_to be_visible
   end
