@@ -1,6 +1,5 @@
 import { html, nothing } from 'lit-html'
 import { numberDisplay, uuid } from 'bikebook/templates/helpers'
-import { dragHandle } from 'bikebook/templates/ui/drag_handle'
 import { classificationOption } from 'bikebook/templates/vehicles/class_cards'
 import { comboboxOption } from 'bikebook/templates/vehicles/combobox_option'
 import { fragmentOf, renderInto } from 'bikebook/render'
@@ -143,17 +142,25 @@ export class CatalogComboboxSource {
   }
 }
 
-// The gem's selection chip partial, ahead of the field, gripped where bikebook--chip-reorder drags them. Each grip's id
-// is its model's and its count among that model's repeats, so a render that recreates the chips keeps a grip's focus
+// The gem's selection chip partial, ahead of the field, gripped where bikebook--chip-reorder drags them by the
+// template[data-chip-grip] beside it. Each grip's id is its model's and its count among that model's repeats, so a
+// render that recreates the chips keeps a grip's focus
 export const renderChips = (combobox, chips) => {
-  const reorderable = combobox.matches('[data-controller~="bikebook--chip-reorder"]')
+  const grip = combobox.matches('[data-controller~="bikebook--chip-reorder"]') && combobox.closest('form').querySelector('template[data-chip-grip]')
   const chipped = [...combobox.querySelectorAll('[data-hw-combobox-value-param]')].map((remover) => remover.dataset.hwComboboxValueParam)
   const values = [...chipped, ...chips.map(({ value }) => value)]
   const handleId = (value, index) => `move-${value}-${values.slice(0, chipped.length + index).filter((each) => each === value).length}`
   combobox.querySelector('[data-hw-combobox-target~="combobox"]').before(fragmentOf(chips.map(({ value, display }, index) =>
-    html`<div data-hw-combobox-chip=""><div class="hw-combobox__chip">${reorderable ? dragHandle({ controller: 'bikebook--chip-reorder', label: display, htmlClass: 'tw:mr-1', id: handleId(value, index) }) : nothing}<span>${display}</span><span tabindex="0" class="hw-combobox__chip__remover"
+    html`<div data-hw-combobox-chip=""><div class="hw-combobox__chip">${grip ? gripFor(grip, display, handleId(value, index)) : nothing}<span>${display}</span><span tabindex="0" class="hw-combobox__chip__remover"
       aria-label=${`Remove ${display}`} data-action="click->hw-combobox#removeChip:stop keydown->hw-combobox#navigateChip"
       data-hw-combobox-target="chipDismisser" data-hw-combobox-value-param=${value}></span></div></div>`)))
+}
+
+const gripFor = (grip, label, id) => {
+  const handle = grip.content.firstElementChild.cloneNode(true)
+  handle.id = id
+  handle.setAttribute('aria-label', handle.getAttribute('aria-label').replace('%{name}', label))
+  return handle
 }
 
 const group = (label, options) => {

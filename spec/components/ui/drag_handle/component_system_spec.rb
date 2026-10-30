@@ -9,6 +9,9 @@ RSpec.describe UI::DragHandle::Component, :js, type: :system do
     visit "/rails/view_components/ui/drag_handle/component/default"
     expect(item_order).to eq ["First item", "Second item", "Third item"]
     expect_axe_clean
+    # The status a move is announced in, there once a handle has focus rather than added by the move
+    send_keys(:tab)
+    expect(page).to have_css("#drag-handle-status:empty", visible: :all)
 
     find("[aria-label='Move Third item']").drag_to(find("[data-sortable-target='item']", text: "First item"))
     expect(item_order).to eq ["Third item", "First item", "Second item"]

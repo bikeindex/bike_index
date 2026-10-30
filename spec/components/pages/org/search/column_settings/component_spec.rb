@@ -40,6 +40,29 @@ RSpec.describe Pages::Org::Search::ColumnSettings::Component, type: :component d
     expect(component.at_css("[data-ui--collapse-target='content']")[:class]).to include("tw:hidden!")
   end
 
+  it "lists every column together, with nothing to copy an order from" do
+    expect(component).to have_no_css("h3", text: "Impound search columns", visible: :all)
+    expect(component).to have_no_css("[data-ui--table-column-order-target='copy']", visible: :all)
+  end
+
+  context "with the impound records search" do
+    let(:enabled_feature_slugs) { %w[bike_search impound_bikes] }
+
+    it "copies the impound records search's column order" do
+      expect(component).to have_css("button[data-ui--table-column-order-target='copy'][data-storage-key='orgImpoundColumnsOrder']",
+        text: "Copy column order from impounded vehicles search", visible: :all)
+      expect(component).to have_no_css("h3", text: "Impound search columns", visible: :all)
+    end
+
+    context "unordered, as the multi-serial search is" do
+      let(:instance) { described_class.new(settings:, orderable: false) }
+
+      it "leaves out the order buttons" do
+        expect(component).to have_no_css("[data-ui--table-column-order-target]", visible: :all)
+      end
+    end
+  end
+
   it "keeps View checked, out of the controller's reach" do
     expect(component).to have_field("view_cell", checked: true, disabled: true, visible: :all)
     expect(component.at_css("input[name='view_cell']")["data-ui--table-column-settings-target"]).to be_nil
@@ -56,13 +79,17 @@ RSpec.describe Pages::Org::Search::ColumnSettings::Component, type: :component d
     let(:enabled_feature_slugs) { %w[bike_search impound_bikes] }
     let(:settings) { ComponentStructs::OrgSearchSettings.new(organization:, impound: true) }
 
-    it "lists the impound columns with the rest, on by default" do
+    it "lists the impound columns under their own heading, on by default, and copies the registrations search's order" do
       checkboxes = ComponentStructs::OrgSearchSettings::IMPOUND_COLUMNS.map { component.at_css("input[name='#{it}']") }
       expect(checkboxes.map { it["data-default"] }.uniq).to eq ["true"]
       expect(component).to have_text("Time - Impounded", normalize_ws: true)
       expect(component).to have_text("Time - Resolved")
       expect(component).to have_text("Impound status")
       expect(component.at_css("input[name='impound_id_cell']")["data-default"]).to eq "true"
+      after_heading = component.css("h3, input[type='checkbox']").map { it[:name] || it.text.strip }.drop_while { it != "Impound search columns" }.drop(1)
+      expect(after_heading).to match_array(settings.impound_panel_columns)
+      expect(component).to have_css("button[data-ui--table-column-order-target='copy'][data-storage-key='orgRegistrationColumnsOrder']",
+        text: "Copy column order from registrations search", visible: :all)
     end
   end
 

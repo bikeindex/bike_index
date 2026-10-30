@@ -13,7 +13,22 @@ RSpec.describe UI::TableColumnSettings::Component, type: :component do
     expect(component).to have_css("input[name='name_cell'][data-default='true'][data-narrow-hidden='false'][data-ui--table-column-settings-target='checkbox']")
     expect(component).to have_css("input[name='color_cell'][data-default='true'][data-narrow-hidden='true']")
     expect(component).to have_button("default")
-    expect(component).to have_css("[data-ui--table-column-order-target='reset'].tw\\:hidden\\! button", text: "Return to default column order", visible: :all)
+    expect(component).to have_no_css("[data-ui--table-column-order-target]", visible: :all)
+  end
+
+  context "orderable, with sections and copy_order_from" do
+    let(:component) do
+      render_inline(described_class.new(columns: {name_cell: "Name", color_cell: "Color", size_cell: "Size"}, defaults: %i[name_cell],
+        sections: {"Fit columns" => %i[size_cell]}, orderable: true, copy_order_from: {storage_key: "otherThings", label: "Copy other order"}))
+    end
+
+    it "lists a section's columns under its heading, after the rest, and returns to the default order or copies the other table's" do
+      expect(component.css("h3, input[type='checkbox']").map { it[:name] || it.text.strip }).to eq ["Visible columns", "name_cell", "color_cell", "Fit columns", "size_cell"]
+      expect(component).to have_css("[data-ui--table-column-order-target='actions'].tw\\:hidden\\! button[data-ui--table-column-order-target='reset']",
+        text: "Return to default column order", visible: :all)
+      expect(component).to have_css("button[data-ui--table-column-order-target='copy'][data-storage-key='otherThingsOrder']", text: "Copy other order", visible: :all)
+      expect(component).to have_css("[data-ui--table-column-order-target='separator']", visible: :all)
+    end
   end
 
   context "with always_visible and hints" do

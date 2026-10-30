@@ -13,6 +13,14 @@ RSpec.describe UI::DragHandle::Component, type: :component do
     expect(component).to have_css("button[data-moved-message='Position %{position} of %{count}']")
   end
 
+  context "with a markup label" do
+    let(:options) { {controller: "sortable", label: ActionController::Base.helpers.tag.span("Notes & <em>more</em>".html_safe, title: "Tip")} }
+
+    it "names it by its text" do
+      expect(component).to have_css("button[aria-label='Move Notes & more']")
+    end
+  end
+
   context "with a hyphenated controller and extra classes" do
     let(:options) { {controller: "bullet-editors", label: "bullet", html_class: "tw:pt-2"} }
 

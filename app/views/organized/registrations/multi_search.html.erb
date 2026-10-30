@@ -89,7 +89,7 @@
   </div>
 
   <div class="tw:mb-3">
-    <%= render(Pages::Org::Search::ColumnSettings::Component.new(settings:)) %>
+    <%= render(Pages::Org::Search::ColumnSettings::Component.new(settings:, orderable: false)) %>
   </div>
 
   <div id="multi_serial_results" data-org--multi-search-target="results"></div>

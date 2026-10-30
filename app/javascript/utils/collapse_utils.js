@@ -42,11 +42,14 @@ export class CollapseUtils {
 
   // The measured dimension, the styles to animate, and the collapse scale class
   // for the axis. Horizontal drives flex-basis too, since a flex-row item is
-  // sized by its basis rather than its width.
+  // sized by its basis rather than its width. The edges - padding, border and
+  // margin - go to 0 with it, or they'd stay until display:none and jump.
   static axis (direction) {
+    const [start, end] = direction === 'horizontal' ? ['Left', 'Right'] : ['Top', 'Bottom']
+    const edges = [`padding${start}`, `padding${end}`, `border${start}Width`, `border${end}Width`, `margin${start}`, `margin${end}`]
     return direction === 'horizontal'
-      ? { dimension: 'width', styles: ['width', 'flexBasis'], scale: 'tw:scale-x-0' }
-      : { dimension: 'height', styles: ['height'], scale: 'tw:scale-y-0' }
+      ? { dimension: 'width', styles: ['width', 'flexBasis'], edges, scale: 'tw:scale-x-0' }
+      : { dimension: 'height', styles: ['height'], edges, scale: 'tw:scale-y-0' }
   }
 
   // The element's natural rendered size along the axis (flex-aware, unlike
@@ -85,7 +88,7 @@ export class CollapseUtils {
    * @param {string} direction - 'vertical' (height) or 'horizontal' (width)
    */
   static show (element, duration, direction = 'vertical') {
-    const { dimension, styles, scale } = this.axis(direction)
+    const { dimension, styles, edges, scale } = this.axis(direction)
     // Bail if already fully shown — but isVisible alone isn't enough: a hide()
     // mid-transition still has display:block/visibility:visible until its finalizer
     // adds tw:hidden!, yet the scale class means the element is collapsed to 0.
@@ -99,16 +102,20 @@ export class CollapseUtils {
     // An animated hide leaves the size/scale/clip pinned, so reset before the
     // duration-0 return too - display alone doesn't uncollapse it
     element.classList.remove(scale, 'tw:overflow-clip')
-    this.setSize(element, styles, '')
+    this.setSize(element, [...styles, ...edges], '')
 
     // Skip animation if duration is 0
     if (!duration) return
 
     // Measure the natural size while visible, before collapsing to 0.
     const target = this.naturalSize(element, dimension)
-    // Collapse to 0 as the transition's starting point
+    // Collapse to 0 as the transition's starting point - committed with transitions off, as a
+    // hide() leaves them on, or the edges would start animating down from the size just measured
+    element.style.transition = 'none'
+    this.setSize(element, [...styles, ...edges], 0)
+    this.reflow(element)
+    element.style.transition = ''
     element.classList.add(scale)
-    this.setSize(element, styles, 0)
     // Always add transition classes (moving toward a more generalizable collapse method)
     // Clipped for the duration: content is laid out from the element's leading edge, so the
     // pinned size doesn't move it - unclipped it covers whatever is sliding past beneath,
@@ -118,8 +125,9 @@ export class CollapseUtils {
     element.classList.remove(scale)
     // Force a reflow so the browser commits the 0 size before transitioning.
     this.reflow(element)
-    // Set the element's size to its natural size to expand it
+    // Set the element's size to its natural size to expand it, its edges back to the stylesheet's
     this.setSize(element, styles, `${target}px`)
+    this.setSize(element, edges, '')
 
     // After transition is complete, remove explicit size (clean up afterward)
     element._collapseFinalizer = setTimeout(() => {
@@ -146,7 +154,7 @@ export class CollapseUtils {
       return
     }
 
-    const { dimension, styles, scale } = this.axis(direction)
+    const { dimension, styles, edges, scale } = this.axis(direction)
     // Pin the current natural size so the transition has a starting point.
     this.setSize(element, styles, this.naturalSize(element, dimension) + 'px')
     // Always add transition classes (moving toward a more generalizable collapse method)
@@ -158,11 +166,13 @@ export class CollapseUtils {
     // Force a reflow so the browser commits the natural size before transitioning.
     this.reflow(element)
     // Transition to size 0
-    this.setSize(element, styles, '0px')
+    this.setSize(element, [...styles, ...edges], '0px')
 
-    // After transition completes, add display: none to remove element from the flow
+    // After transition completes, add display: none to remove element from the flow. The edges go
+    // back to the stylesheet's, out of the flow, for show() to measure
     element._collapseFinalizer = setTimeout(() => {
       element.classList.add('tw:hidden!')
+      this.setSize(element, edges, '')
       element._collapseFinalizer = null
     }, duration)
   }

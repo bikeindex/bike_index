@@ -1,5 +1,5 @@
 import { Controller } from '@hotwired/stimulus'
-import { moveByKey } from 'utils/drag_handle'
+import { followPointer, moveByKey, startsDrag } from 'utils/drag_handle'
 
 // Drag a multiselect combobox's chips to reorder its value, and so the compared vehicles, or move
 // one a place at a time by its UI::DragHandle's arrow keys.
@@ -15,7 +15,7 @@ export default class extends Controller {
 
   disconnect () {
     this.element.removeEventListener('pointerdown', this.#onPointerDown)
-    this.#reset()
+    this.stopFollowing?.()
   }
 
   moveByKey (event) {
@@ -25,18 +25,16 @@ export default class extends Controller {
     })
   }
 
+  // Not prevented, and a drag only once it's gone 5px, so a press on the chip still clicks
   #onPointerDown = (event) => {
-    if (event.button !== 0) return
+    if (!startsDrag(event)) return
     if (event.target.closest('.hw-combobox__chip__remover')) return
     this.dragging = event.target.closest('[data-hw-combobox-chip]')
     if (!this.dragging) return
 
     this.startX = event.clientX
     this.moved = false
-    document.addEventListener('pointermove', this.#onPointerMove)
-    document.addEventListener('pointerup', this.#onPointerUp, { once: true })
-    // a touch gesture the browser takes over (scroll/zoom) fires pointercancel
-    document.addEventListener('pointercancel', this.#reset, { once: true })
+    this.stopFollowing = followPointer(event, { move: this.#onPointerMove, drop: this.#drop, done: this.#done })
   }
 
   #onPointerMove = (event) => {
@@ -55,21 +53,17 @@ export default class extends Controller {
     over.parentNode.insertBefore(this.indicator, after ? over.nextSibling : over)
   }
 
-  #onPointerUp = () => {
-    if (this.moved && this.indicator.parentNode) {
-      this.indicator.parentNode.insertBefore(this.dragging, this.indicator)
-      this.#syncOrder()
-    }
-    this.#reset()
+  #drop = () => {
+    if (!this.moved || !this.indicator.parentNode) return
+    this.indicator.parentNode.insertBefore(this.dragging, this.indicator)
+    this.#syncOrder()
   }
 
-  #reset = () => {
+  #done = () => {
     this.dragging?.classList.remove('tw:opacity-50')
     this.dragging = null
-    document.removeEventListener('pointermove', this.#onPointerMove)
-    document.removeEventListener('pointerup', this.#onPointerUp)
-    document.removeEventListener('pointercancel', this.#reset)
     this.indicator.remove()
+    this.stopFollowing = null
   }
 
   #syncOrder () {

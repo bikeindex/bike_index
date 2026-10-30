@@ -51,6 +51,9 @@ module ComponentStructs
     IMPOUND_COLUMNS = %w[impounded_at_cell impound_updated_at_cell resolved_at_cell impound_status_cell
       impound_user_cell impounded_from_cell unregistered_cell].freeze
 
+    # Those and its feature-gated ones, which its panel lists apart from the registration columns
+    IMPOUND_PANEL_COLUMNS = ["impound_id_cell", "impound_location_cell", *IMPOUND_COLUMNS].freeze
+
     # The panel groups the time columns under "Time - "; the table headers keep the short names
     PANEL_LABEL_KEYS = {
       created_at_cell: :registered_cell_panel,
@@ -218,6 +221,11 @@ module ComponentStructs
       translation(:location_search_disabled_no_address, org_name: @organization.short_name)
     end
 
+    def impound? = @impound
+
+    # Whether the organization has the impound records search, as its menu does
+    def impound_search? = @organization.enabled?("impound_bikes")
+
     def render_export? = !@impound && @organization.enabled?("csv_exports")
 
     def search_all? = @search_all
@@ -268,6 +276,8 @@ module ComponentStructs
     def panel_columns
       @panel_columns ||= (enabled_columns + ALWAYS_VISIBLE_COLUMNS).sort_by { |cell| panel_labels[cell.to_sym] }
     end
+
+    def impound_panel_columns = panel_columns & IMPOUND_PANEL_COLUMNS
 
     def additional_registration_fields
       @additional_registration_fields ||= @organization.additional_registration_fields - ["reg_bike_sticker"]
