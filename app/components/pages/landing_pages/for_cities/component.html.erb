@@ -634,7 +634,7 @@
 
 <%= render(SharedBlocks::Marketing::InvertedBlock::Component.new) do %>
   <div>
-    <%= render(SharedBlocks::Marketing::SectionHeading::Component.new(eyebrow: translation(".partnership_eyebrow"), eyebrow_color: :yellow, heading: translation(".partnership_heading"), intro: translation(".partnership_intro"), on_dark: true, html_class: "tw:mb-6")) %>
+    <%= render(SharedBlocks::Marketing::SectionHeading::Component.new(eyebrow: translation(".partnership_eyebrow"), eyebrow_color: :yellow, heading: translation(".partnership_heading"), intro: translation(".partnership_intro"), html_class: "tw:mb-6")) %>
 
     <%= image_tag "kelsey/illustrations/comic-assets_logo-cape.png", alt: translation(".cape_logo_alt"), loading: "lazy", width: 200, height: 120, class: "tw:h-30 tw:w-auto" %>
   </div>
@@ -651,7 +651,7 @@
           <%= title %>
         </div>
 
-        <div class="tw:mt-1 tw:text-[15px] tw:text-gray-600 tw:dark:text-white/80">
+        <div class="tw:mt-1 tw:text-[15px] tw:text-gray-500 tw:dark:text-gray-400">
           <%= body %>
         </div>
       </div>

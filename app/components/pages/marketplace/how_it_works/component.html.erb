@@ -11,8 +11,8 @@
 
     <p
       class="
-        tw:m-0 tw:max-w-[560px] tw:text-lg tw:leading-[1.6] tw:text-gray-600
-        tw:dark:text-[#dfe6ec]
+        tw:m-0 tw:max-w-[560px] tw:text-lg tw:leading-[1.6] tw:text-gray-500
+        tw:dark:text-gray-400
       "
     >
       <%= translation(".intro") %>
@@ -149,5 +149,5 @@
 </section>
 
 <%= render(SharedBlocks::Marketing::CallToActionBanner::Component.new(heading: translation(".ready_heading"))) do %>
-  <div class="dark"><%= call_to_action_buttons %></div>
+  <%= call_to_action_buttons %>
 <% end %>

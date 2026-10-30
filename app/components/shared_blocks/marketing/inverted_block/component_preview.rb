@@ -8,7 +8,7 @@ module SharedBlocks
           render(SharedBlocks::Marketing::InvertedBlock::Component.new) do
             safe_join([
               render(SharedBlocks::Marketing::SectionHeading::Component.new(eyebrow: "Partnership", eyebrow_color: :yellow,
-                heading: "Your nonprofit partner", intro: "We work alongside your team", on_dark: true)),
+                heading: "Your nonprofit partner", intro: "We work alongside your team")),
               render(UI::ButtonLink::Component.new(href: "#", text: "Get in touch", size: :callout))
             ])
           end
