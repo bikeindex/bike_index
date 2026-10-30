@@ -529,8 +529,11 @@
     <div class="twwiderow tw:gap-6">
       <% tools.each do |tool| %>
         <%= link_to(tool[:href],
-          class: "tw:flex tw:flex-col tw:gap-3 tw:rounded-lg tw:border tw:border-gray-200 tw:bg-white tw:p-7 tw:text-inherit tw:no-underline tw:shadow-sm tw:transition-all tw:duration-300 tw:hover:-translate-y-1.25 tw:hover:text-inherit tw:hover:no-underline tw:hover:shadow-[0_10px_30px_rgba(44,62,80,.16)]") do %>
-          <span class="tw:flex tw:size-12 tw:items-center tw:justify-center tw:rounded-full tw:text-white <%= tool[:circle] %>">
+          class: "tw:flex tw:flex-col tw:gap-3 tw:overflow-hidden tw:rounded-lg tw:border tw:border-gray-200 tw:bg-white tw:px-7 tw:pb-7 tw:text-inherit tw:no-underline tw:shadow-sm tw:transition-all tw:duration-300 tw:hover:-translate-y-1.25 tw:hover:text-inherit tw:hover:no-underline tw:hover:shadow-[0_10px_30px_rgba(44,62,80,.16)]") do %>
+          <%= image_tag(tool[:screenshot], alt: "", loading: "lazy",
+            class: "tw:-mx-7 tw:block tw:aspect-[1040/630] tw:w-[calc(100%+3.5rem)] tw:max-w-none tw:border-b tw:border-gray-200 tw:object-cover tw:object-top") %>
+
+          <span class="tw:-mt-9 tw:flex tw:size-12 tw:items-center tw:justify-center tw:rounded-full tw:text-white tw:ring-4 tw:ring-white <%= tool[:circle] %>">
             <%= helpers.inline_svg_tag(tool[:icon], class: "tw:size-5.5", aria_hidden: true) %>
           </span>
 

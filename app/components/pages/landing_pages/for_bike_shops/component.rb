@@ -72,10 +72,10 @@ module Pages
         end
 
         def tools
-          [{href: ebike_rules_path, icon: "icons/bolt.svg", circle: "tw:bg-blue-600",
+          [{href: ebike_rules_path, icon: "icons/bolt.svg", circle: "tw:bg-blue-600", screenshot: "landing_pages/ebike-checker.webp",
             title: translation(".ebike_legality_checker"), body: translation(".ebike_legality_checker_body"),
             action: translation(".check_your_state")},
-            {href: bikebook_path, icon: "icons/book-open.svg", circle: "tw:bg-purple-500",
+            {href: bikebook_path, icon: "icons/book-open.svg", circle: "tw:bg-purple-500", screenshot: "landing_pages/bikebook-compare.webp",
              title: translation(".bike_book"), body: translation(".bike_book_body"), action: translation(".browse_bike_book")}]
         end
 
