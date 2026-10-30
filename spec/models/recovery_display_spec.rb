@@ -118,9 +118,8 @@ RSpec.describe RecoveryDisplay, type: :model do
       bike = FactoryBot.create(:bike, :with_ownership, creator: FactoryBot.create(:user, name: "Shop Staff"))
       expect(bike.owner.name).to eq "Shop Staff"
       expect(RecoveryDisplay.calculated_owner_name(bike)).to be_nil
-      user = FactoryBot.create(:user, name: "Pat Smith")
-      bike.current_ownership.update(user:)
-      expect(RecoveryDisplay.calculated_owner_name(bike.reload)).to eq "Pat Smith"
+      ownership = FactoryBot.create(:ownership, creator: bike.creator, registration_info: {user_name: "Pat Smith"})
+      expect(RecoveryDisplay.calculated_owner_name(ownership.bike)).to eq "Pat Smith"
     end
   end
 

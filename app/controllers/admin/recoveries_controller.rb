@@ -4,8 +4,8 @@ module Admin
 
     # Each needs the ability its single-record action does
     BULK_ACTIONS = {
-      "display" => {done: "displayed", ability: {controller_name: "recovery_displays", action_name: "create"}},
-      "not_displayed" => {done: "marked not displayable", ability: {controller_name: "recoveries", action_name: "update"}}
+      "display" => {verb: "display", done: "displayed", ability: {controller_name: "recovery_displays", action_name: "create"}},
+      "not_displayed" => {verb: "mark not displayable", done: "marked not displayable", ability: {controller_name: "recoveries", action_name: "update"}}
     }.freeze
 
     helper_method :available_recoveries
@@ -21,7 +21,7 @@ module Admin
       if recoveries.none?
         flash[:error] = "No recoveries waiting on a decision selected!"
       elsif bulk_action
-        count = send(:"bulk_#{params[:bulk_action]}", recoveries)
+        count = recoveries.size - send(:"bulk_#{params[:bulk_action]}", recoveries, bulk_action[:verb]).size
         flash[:success] = "#{count} #{"recovery".pluralize(count)} #{bulk_action[:done]}" if count.positive?
       else
         flash[:error] = "Unknown action!"
@@ -65,40 +65,34 @@ module Admin
 
     private
 
-    # Each returns how many it changed
-    def bulk_display(recoveries)
-      errors = bulk_errors("display", recoveries) { display_error(it) }
+    # Each returns {id => error} for the ones it didn't change
+    def bulk_display(recoveries, verb)
+      bikes = Bike.unscoped.where(id: recoveries.map(&:bike_id)).includes(:current_ownership, :public_images).index_by(&:id)
+      errors = bulk_errors(verb, recoveries) { display_error(it, bikes[it.bike_id]) }
       @failed_edits = errors.keys.index_with { display_edits(it) } if errors.any?
-      recoveries.size - errors.size
+      errors
     end
 
-    def bulk_not_displayed(recoveries)
-      recoveries.size - bulk_errors("mark not displayable", recoveries) { not_displayed_error(it) }.size
+    def bulk_not_displayed(recoveries, verb)
+      bulk_errors(verb, recoveries) do
+        it.errors.full_messages.to_sentence unless it.update(recovery_display_status: "not_displayed")
+      end
     end
 
-    # The lock makes a concurrent submit wait, then see what it did. Returns {id => error}
+    # The lock makes a concurrent submit wait, then see what it did
     def bulk_errors(verb, recoveries)
-      errors = recoveries.to_h { |stolen_record| [stolen_record.id, stolen_record.with_lock { yield stolen_record }] }.compact
+      errors = recoveries.to_h { |stolen_record| [stolen_record.id, stolen_record.with_lock { decided_error(stolen_record) || yield(stolen_record) }] }.compact
       flash[:error] = "Unable to #{verb}: #{errors.map { |id, error| "##{id} #{error}" }.join("; ")}" if errors.any?
       errors
     end
 
     # Edits go to the display, not the recovery, which keeps what the owner wrote
-    def display_error(stolen_record)
-      bike = Bike.unscoped.find_by_id(stolen_record.bike_id)
+    def display_error(stolen_record, bike)
       return "bike is hidden" if bike.present? && !bike.current?
-
-      decided = decided_error(stolen_record)
-      return decided if decided
 
       attributes = RecoveryDisplay.attributes_from_stolen_record(stolen_record, bike:).merge(display_edits(stolen_record.id))
       recovery_display = RecoveryDisplay.new(attributes.merge(remote_photo_url: bike&.image_url))
       recovery_display.errors.full_messages.to_sentence unless recovery_display.save
-    end
-
-    def not_displayed_error(stolen_record)
-      decided_error(stolen_record) ||
-        (stolen_record.errors.full_messages.to_sentence unless stolen_record.update(recovery_display_status: "not_displayed"))
     end
 
     def decided_error(stolen_record)

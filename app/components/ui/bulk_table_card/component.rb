@@ -37,9 +37,9 @@ module UI
 
       def wrapper_data
         data = UI::TableColumnSettings::Component.data_attributes(storage_key: @storage_key, orderable: true,
-          controllers: [("table-multi-checkbox" if @form), @data[:controller]].compact.join(" ").presence)
+          controllers: token_list(("table-multi-checkbox" if @form), @data[:controller]).presence)
         selection = "input->table-multi-checkbox#selectRow submit->table-multi-checkbox#confirmDiscard" if @form
-        @data.merge(data, action: [data[:action], selection, @data[:action]].compact.join(" "))
+        @data.merge(data, action: token_list(data[:action], selection, @data[:action]))
       end
     end
   end

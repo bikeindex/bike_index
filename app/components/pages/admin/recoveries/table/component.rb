@@ -55,13 +55,13 @@ module Pages
             end
           end
 
-          # A bike's page has the bike already
           def card_options
-            options = {columns: COLUMNS, defaults: DEFAULT_COLUMNS, narrow_hidden: %i[photo_cell recovered_at_cell]}
+            options = {columns: COLUMNS, narrow_hidden: %i[photo_cell recovered_at_cell]}
+            # A bike's page has the bike already
             return options.merge(storage_key: "adminBikeRecoveriesColumns", defaults: DEFAULT_COLUMNS - %i[photo_cell bike_cell]) unless @editable
 
             # The filters ride along, so a failed display renders the same page
-            options.merge(storage_key: "adminRecoveriesColumns", form: {url: bulk_update_admin_recoveries_path(request.query_parameters), method: :post},
+            options.merge(storage_key: "adminRecoveriesColumns", defaults: DEFAULT_COLUMNS, form: {url: bulk_update_admin_recoveries_path(request.query_parameters), method: :post},
               data: {controller: "admin--personal-info", action: "submit->admin--personal-info#confirmDisplay",
                      "admin--personal-info-patterns-value": PERSONAL_INFO.transform_values { {label: it[:label], source: it[:pattern].source} }.to_json})
           end

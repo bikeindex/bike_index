@@ -1,10 +1,4 @@
-<% if actions? %>
-  <% bulk_actions = capture do %>
-    <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-      <%= actions %>
-    </div>
-  <% end %>
-<% end %>
+<% bulk_actions = tag.div(actions, class: "tw:flex tw:flex-wrap tw:items-center tw:gap-2") if actions? %>
 
 <%# twfullbleed reads the twwiderow container %>
 <div class="twwiderow tw:mb-4">
