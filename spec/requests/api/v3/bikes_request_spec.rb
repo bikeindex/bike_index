@@ -37,6 +37,7 @@ RSpec.describe "Bikes API V3", type: :request do
         "cycle_type_slug" => "bike",
         "propulsion_type_slug" => "foot-pedal",
         "test_bike" => false,
+        "hidden" => false,
         "is_stock_img" => false,
         "url" => "http://test.host/bikes/#{bike.id}",
         "api_url" => "http://test.host/api/v1/bikes/#{bike.id}",
@@ -131,7 +132,7 @@ RSpec.describe "Bikes API V3", type: :request do
 
         get "/api/v3/bikes/#{bike.id}", params: {format: :json, access_token: token.token}
         expect(response.code).to eq("200")
-        expect(json_result["bike"]["id"]).to eq bike.id
+        expect(json_result["bike"].slice("id", "hidden")).to eq("id" => bike.id, "hidden" => true)
       end
     end
 

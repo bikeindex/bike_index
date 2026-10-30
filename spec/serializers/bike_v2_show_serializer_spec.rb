@@ -61,6 +61,7 @@ RSpec.describe BikeV2ShowSerializer do
         front_tire_narrow: nil,
         type_of_cycle: "Cargo Bike (front storage)",
         test_bike: false,
+        hidden: false,
         frame_material_slug: nil,
         rear_wheel_size_iso_bsd: nil,
         front_wheel_size_iso_bsd: nil,
