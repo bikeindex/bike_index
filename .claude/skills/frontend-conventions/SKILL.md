@@ -89,6 +89,8 @@ Every legacy stylesheet wraps itself in `@layer legacy` (see `app/assets/stylesh
 
 The same instinct applies beyond buttons: **check `app/components/ui/` and `app/components/atoms/` before hand-rolling any UI primitive** (dropdowns → `UI::Dropdown`, tooltips → `UI::Tooltip`, form fields → `UI::Forms::*`, badges, modals, pagination, tables…). If a component exists for the pattern, use it; if it almost fits, extend it rather than forking its markup inline.
 
+**A marketing page — a `for_*` landing page, donate, membership, a how-it-works — renders inside `SharedBlocks::Marketing::Wrapper` and builds from its siblings** in `app/components/shared_blocks/marketing/` (`SectionHeading`, `NumberBlocks`, `IconFeature`, `RecoveryStories`, `CallToActionBanner`), with `Wrapper::Component::CONTAINER_CLASSES` as each section's width. A design handoff draws these blocks by hand, so its mock is no sign they're missing. `Pages::LandingPages::ForCities` and `Pages::LandingPages::ForCommunityGroups` are the pattern.
+
 Four of those carry a rule beyond "use the component":
 
 - **`UI::Tooltip` keeps its default `?` button trigger** unless the user explicitly says otherwise — never pass a label as the trigger content.
