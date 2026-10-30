@@ -14,7 +14,7 @@ RSpec.describe UI::Button::Component, type: :component do
     expect(component).to have_css("button[type='button']")
     expect(component).to have_text("Click me")
     html = component.to_html
-    expect(html).to include("tw:bg-white")
+    expect(html).to include("tw:bg-white/80")
     expect(html).to include("tw:border-gray-200")
   end
 
