@@ -47,6 +47,7 @@ Rails.application.routes.draw do
 
   get "for_advocacy", to: redirect("/for_community_groups")
   get "for_shops", to: redirect("/for_bike_shops")
+  get "ucmerced", to: redirect("/register/new?organization_id=uc-merced")
   get "ambassadors", to: redirect("/ambassadors_how_to") # Because convenience
   get "ambassadors/new", to: redirect("https://docs.google.com/forms/d/e/1FAIpQLSenRXqarY4KFNw1AQ3u5iHwIaaIpgy6cb1sD3YTSQiR0ICeCQ/viewform"), as: :new_ambassador
 
@@ -57,12 +58,18 @@ Rails.application.routes.draw do
   get "recovery_stories", to: "welcome#recovery_stories", as: :recovery_stories
   get "bikebook", to: "bikebook#show"
   get "bikebook/*vehicle_model", to: "bikebook#vehicle", format: false
+  # a catalog model's own id, its manufacturer, year and model
+  get "m/*vehicle_model", to: "bikebook#vehicle", format: false, constraints: {vehicle_model: %r{[a-z0-9_]+/\d{4}/[a-z0-9_]+}}
+  # an e-vehicle classification's id, whose card the page shows
+  get "evc/*classification", to: redirect(status: 302) { |params, _request| "/bikebook?classifications=evc/#{params[:classification]}" },
+    format: false, constraints: {classification: %r{[a-z0-9_]+(/[a-z0-9_]+)*}}
   if Integrations::Bikebook::Catalog::LOCAL_DIRECTORY
     mount Rack::Files.new(Integrations::Bikebook::Catalog::LOCAL_DIRECTORY) => Integrations::Bikebook::Catalog::LOCAL_PATH
   end
   get "ebike-rules", to: "ebike_rules#show", as: :ebike_rules
-  get "ebike-rules/:abbr", to: "ebike_rules#show", as: :ebike_rules_state, constraints: {abbr: /[a-z]{2}/i}
+  get "ebike-rules/:country(/:region)", to: "ebike_rules#show", as: :ebike_rules_place, constraints: {country: /[a-z]{2}/i, region: /[a-z0-9]{1,3}/i}
   get "e-bike-rules(/*rest)", to: redirect { |_, request| request.fullpath.sub("/e-bike-rules", "/ebike-rules") }
+  get "marketplace/how-it-works", to: "marketplace#how_it_works", as: :marketplace_how_it_works
 
   resource :session, only: %i[new create destroy] do
     collection do
@@ -149,6 +156,7 @@ Rails.application.routes.draw do
   resource :my_account, only: %i[show update destroy] do
     post :toggle_show_redesign
     resources :messages, only: %i[index show create], controller: "my_accounts/messages"
+    resource :membership, only: %i[show], controller: "my_accounts/memberships"
     resources :marketplace_listings, only: %i[update], controller: "my_accounts/marketplace_listings"
     resources :organization_roles, only: %i[update destroy], controller: "my_accounts/organization_roles"
   end
@@ -230,6 +238,7 @@ Rails.application.routes.draw do
     resources :marketplace, only: [] do
       collection { get :counts }
     end
+    get "/bikebook", to: "bikebook#index", as: :bikebook
   end
 
   # Short_id forms the resources :id segment can't match; before resources, as with registrations above
@@ -315,7 +324,7 @@ Rails.application.routes.draw do
       :primary_activities
 
     %i[
-      bike_sticker_updates email_bans exports graduated_notifications invoices logged_searches
+      bike_sticker_updates cycle_types email_bans exports graduated_notifications invoices logged_searches
       mailchimp_data model_attestations model_audits
       notifications organization_landing_pages organization_messages organization_statuses paper_trail_versions
       parking_notifications public_images
@@ -358,10 +367,11 @@ Rails.application.routes.draw do
 
     resources :stolen_bikes do
       member { post :approve }
+      collection { patch :bulk_update }
     end
     resources :customer_contacts, only: %i[create show]
     resources :recoveries do
-      collection { post :approve }
+      collection { patch :bulk_update }
     end
     resources :stolen_notifications do
       member { get :resend }
@@ -370,6 +380,7 @@ Rails.application.routes.draw do
       collection do
         get :tables
         get :variable
+        get :logged_searches
         get :bikes_table
       end
     end
@@ -461,8 +472,8 @@ Rails.application.routes.draw do
     how_not_to_buy_stolen lightspeed membership].freeze.each do |page|
     get page, controller: "info", action: page
   end
-  get "why-donate", to: "info#why_donate", as: "why_donate"
-  get "why_donate", to: redirect("/why-donate")
+  get "why-donate", to: redirect("/donate")
+  get "why_donate", to: redirect("/donate")
   get "lightspeed_integration", to: redirect("/lightspeed")
   get "/info/how-to-get-your-stolen-bike-back", controller: "info", action: "show", id: "how-to-get-your-stolen-bike-back", as: :get_your_stolen_bike_back
   resources :info, only: %i[show]

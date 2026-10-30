@@ -70,6 +70,19 @@ module UI
         render(UI::Button::Component.new(text: "Link Disabled", color: :link, disabled: true))
       end
 
+      # The lesser way out, beside a primary action
+      def link_gray
+        render(UI::Button::Component.new(text: "Link gray", color: :link_gray))
+      end
+
+      def link_gray_active
+        render(UI::Button::Component.new(text: "Link Gray Active", color: :link_gray, active: true))
+      end
+
+      def link_gray_disabled
+        render(UI::Button::Component.new(text: "Link Gray Disabled", color: :link_gray, disabled: true))
+      end
+
       # Filled purple primary
       def purple
         render(UI::Button::Component.new(text: "Purple", color: :purple))

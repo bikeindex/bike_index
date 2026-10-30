@@ -19,7 +19,7 @@ module ControllerHelpers
       :page_id, :default_bike_search_path, :every_bike_search_path, :bikehub_url, :show_general_alert,
       :display_dev_info?, :current_country_id, :current_currency, :turbo_request?,
       :render_donation_request?, :old_register_view?, :sort_state, :admin_index_state, :metric_units?,
-      :search_distance_unit
+      :search_distance_unit, :request_location_hash
     before_action :enable_rack_profiler
 
     before_action do
@@ -449,7 +449,7 @@ module ControllerHelpers
     redirect_to(my_account_url) && return
   end
 
-  def require_index_admin!
+  def require_index_admin!(controller_name: self.controller_name, action_name: self.action_name)
     if current_user.present?
       return true if current_user.superuser?(controller_name:, action_name:)
     end
@@ -478,7 +478,8 @@ module ControllerHelpers
   end
 
   def invalid_return_to?(target)
-    return true if target.blank?
+    # The session is a cookie, which overflows past 4KB
+    return true if target.blank? || target.length > 2000
 
     # return_to can't be a sign in/up page, or we'll loop
     ["/users/new", "/session/new", "/session/magic_link", "/integrations", "/users/please_confirm_email"].any? { |r| target.match?(r) }

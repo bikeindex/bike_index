@@ -1419,6 +1419,19 @@ RSpec.describe RegisterController, type: :request do
         end
       end
 
+      context "with a blank description" do
+        it "re-renders the step, and creates no bike" do
+          patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
+
+          expect {
+            patch "#{base_url}/report", params: {b_param_token: b_param.id_token,
+                                                 report: report_details.merge(theft_description: "   ")}
+          }.to_not change(Bike, :count)
+          expect(response).to have_http_status :unprocessable_entity
+          expect(response.body).to include "Please tell us what happened"
+        end
+      end
+
       context "registered with the owner" do
         let(:bike_details) { super().merge(status: "status_with_owner") }
 

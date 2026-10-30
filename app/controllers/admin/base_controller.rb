@@ -5,6 +5,8 @@ module Admin
     DEFAULT_SEARCH_STATUSES = %w[
       stolen with_owner abandoned impounded unregistered_parking_notification
     ].freeze
+    # {bulk_action => {ability: the single-record action's}}, for a controller with a bulk_update
+    BULK_ACTIONS = {}.freeze
 
     # Permit viewing deleted organizations
     def current_organization
@@ -16,6 +18,14 @@ module Admin
     end
 
     private
+
+    def require_index_admin!
+      ability = self.class::BULK_ACTIONS.dig(params[:bulk_action], :ability) if action_name == "bulk_update"
+      ability ? super(**ability) : super
+    end
+
+    # A checkbox list submits {id => id}, a multiple select [id]
+    def selected_ids(key) = params[key].respond_to?(:keys) ? params[key].keys : Array(params[key])
 
     def search_deleted_scope(scope)
       @render_deleted = %w[including only].include?(params[:search_deleted]) ? params[:search_deleted] : false

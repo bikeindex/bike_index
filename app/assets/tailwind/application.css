@@ -15,8 +15,8 @@
 @import "./lexxy_overrides.css";
 
 /* Class-based dark mode (the legacy config's darkMode: 'selector'); a `.dark`
- * ancestor activates tw:dark:* utilities. */
-@custom-variant dark (&:where(.dark, .dark *));
+ * ancestor activates tw:dark:* utilities. An `.inverted` ancestor flips it. */
+@custom-variant dark (&:where(:where(.dark, .dark *):not(:where(.inverted, .inverted *)), :where(.inverted, .inverted *):not(:where(.dark, .dark *))));
 
 /* Below anything holding the org registrations search's checked search_all: the owner email
  * field and the chart card fold away on it */
@@ -24,6 +24,9 @@
 
 /* /bikebook reads lengths, weights and speeds in imperial units below an `.imperial` ancestor */
 @custom-variant imperial (&:where(.imperial, .imperial *));
+
+/* /bikebook with its similar models open */
+@custom-variant similar-open (&:where(:has(#similar-toggle[aria-expanded=true]) *));
 
 /* The selected/pressed state of a button, link or menu item, however it's flagged —
  * including a <label> around a checked radio (UI::Forms::RadioButtonGroup).
@@ -155,8 +158,9 @@
     @apply tw:ui-table-bordered-th-last;
   }
   /* A 🔎 or tooltip "?" stays on the line of what it follows. Only the whole cell
-     works: Chromium still breaks after a preceding element that wraps */
-  .ui-table td:has(.keep-with-previous) {
+     works: Chromium still breaks after a preceding element that wraps. A .keep-together
+     already holds it with its last word, so the rest of the cell can wrap */
+  .ui-table td:has(.keep-with-previous:not(.keep-together *)) {
     @apply tw:whitespace-nowrap;
   }
 }
@@ -201,15 +205,19 @@ body {
     --nav-gap: 60px;
   }
 }
-/* The org sidebar is fixed, so the page it covers is pushed over instead. The
-   controller narrows --org-sidebar-width as it collapses; defaulting to the
-   expanded width keeps the content still until stimulus connects. There's no
+/* The controller narrows it as the sidebar collapses, in an inline style that
+   outranks this; the expanded width keeps the content still until stimulus connects */
+:root:has(> body.with-org-sidebar) {
+  --org-sidebar-width: 266px;
+}
+
+/* The org sidebar is fixed, so the page it covers is pushed over instead. There's no
    navbar here, so main's inset stands in for its gap -- named the same so a
    full-bleed page pulls up under it with the same -mt-(--nav-gap) */
 body.with-org-sidebar {
   --nav-gap: 28px;
 
-  margin-left: var(--org-sidebar-width, 266px);
+  margin-left: var(--org-sidebar-width);
   transition: margin-left 0.18s ease;
   /* The sidebar is fixed, so the general alert is the first in-flow child and its
      margin-top would otherwise collapse out through body, over the canvas -- which
@@ -241,7 +249,7 @@ body.with-org-sidebar main > :only-child {
 
 /* Fixed to the viewport, which body's margin doesn't reach */
 body.with-org-sidebar #flash-messages {
-  left: var(--org-sidebar-width, 266px);
+  left: var(--org-sidebar-width);
   transition: left 0.18s ease;
 }
 

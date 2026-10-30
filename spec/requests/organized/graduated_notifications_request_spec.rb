@@ -25,10 +25,7 @@ RSpec.describe Organized::GraduatedNotificationsController, type: :request do
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)
       expect(assigns(:render_results)).to be_falsey
-      # The chart card's lazy frame asks for its chart alone
-      expect(response.body).to include("chart_only=1")
-
-      get "#{base_url}?chart_only=1"
+      get base_url, headers: {"Turbo-Frame" => Pages::Org::Search::ChartCard::Component::FRAME_ID.to_s}
       expect(response.status).to eq(200)
       expect(response.body).to include(Pages::Org::Search::ChartCard::Component::FRAME_ID.to_s)
       expect(response.body).to include("Current search")

@@ -7,7 +7,6 @@ import { lazyLoadControllersFrom } from '@hotwired/stimulus-loading'
 
 import TimeLocalizer from '@bikeindex/time-localizer'
 
-// Fixes for hotwire_combobox 0.4.1's option lookup, Enter handling and typing over a selection
 import 'utils/hw_combobox_patch'
 
 /* global Turbo */
@@ -41,8 +40,12 @@ if (honeybadgerApiKey) {
     .then(({ default: Honeybadger }) => {
       Honeybadger.configure({
         apiKey: honeybadgerApiKey,
-        environment: document.querySelector('meta[name="honeybadger-environment"]')?.content
+        environment: document.querySelector('meta[name="honeybadger-environment"]')?.content,
+        // One looping tab sent 59k notices in a day
+        maxErrors: 20
       })
+      // Turbo keeps one JS context across visits, so the cap would otherwise span the session
+      document.addEventListener('turbo:load', () => Honeybadger.resetMaxErrors())
       Honeybadger.beforeNotify((notice) => {
         // Filter out browser extension errors
         if (notice.backtrace?.some((frame) => /^(chrome|moz|safari)-extension:\/\//.test(frame.file))) {
@@ -57,9 +60,10 @@ if (honeybadgerApiKey) {
         if (NETWORK_ERROR.test(notice.message) && (navigatingAway || !fromOurCode)) {
           return false
         }
-        // Google's iOS apps (GSA, CriOS) inject a script that recurses. WebKit files its frames
-        // under the page's URL, at the same line numbers whatever the page
-        if (notice.message?.includes('Maximum call stack size exceeded') && !fromOurCode) {
+        // Injected scripts whose frames dodge the extension filter: Google's iOS apps (GSA, CriOS)
+        // recurse, filed by WebKit under the page's URL; Firefox extensions touch a torn-down
+        // window, filed as unknown:0
+        if (/Maximum call stack size exceeded|can't access dead object/.test(notice.message) && !fromOurCode) {
           return false
         }
       })

@@ -68,4 +68,38 @@
       </p>
     </div>
   </div>
+
+  <hr>
+
+  <% week_searches = Counts.logged_searches(@time_range.first.to_date..Date.current).values.reduce { |sum, day| sum.merge(day) { |_kind, a, b| a + b } } %>
+
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="mt-4">
+        Index searches
+      </h2>
+
+      <p>
+        <%= number_display(week_searches.values_at("organized", "organized_serial", "user", "user_serial", "web_marketplace").sum) %>
+        past week
+        <em>(<%= number_display(week_searches["organized"] + week_searches["organized_serial"]) %> org, <%= number_display(week_searches["organized_serial"] + week_searches["user_serial"]) %> with serial, <%= number_display(week_searches["web_marketplace"]) %> marketplace)</em>
+      </p>
+
+      <%= render(UI::Chart::Component.new(series: logged_searches_admin_graphs_path(search_endpoint: "not_web_bikebook", period: "week"), stacked: true)) %>
+    </div>
+
+    <div class="col-md-6">
+      <h2 class="mt-4">
+        BikeBook searches
+      </h2>
+
+      <p>
+        <%= number_display(week_searches["web_bikebook"] + week_searches["web_ebike_rules"]) %>
+        past week
+        <em>(<%= number_display(week_searches["web_ebike_rules"]) %> from e-bike rules)</em>
+      </p>
+
+      <%= render(UI::Chart::Component.new(series: logged_searches_admin_graphs_path(search_endpoint: "web_bikebook", period: "week"), stacked: true)) %>
+    </div>
+  </div>
 <% end %>

@@ -5,6 +5,8 @@ module Counts
 
   COUNT_KEYS = %w[total_bikes stolen_bikes recoveries recoveries_value week_creation_chart organizations].freeze
 
+  LOGGED_SEARCH_KINDS = %w[web_bikebook web_ebike_rules organized organized_serial user user_serial web_marketplace].freeze
+
   RECOVERY_AVERAGE_VALUE = 2103 # updated with calculated_recovery_average_value on 2026-4-11
 
   def assign_for(count_key, value)
@@ -49,6 +51,14 @@ module Counts
     chart_data.present? ? JSON.parse(chart_data) : chart_data
   end
 
+  # {date => {kind => count}}, zeros for a day that hasn't been stored
+  def logged_searches(dates)
+    stored = RedisPool.conn { |r| r.hmget STORAGE_KEY, *dates.map { "logged_searches_#{it}" } }
+    dates.zip(stored).to_h do |date, counts|
+      [date, LOGGED_SEARCH_KINDS.to_h { [it, 0] }.merge(JSON.parse(counts || "{}"))]
+    end
+  end
+
   def assign_stolen_bikes
     assign_for("stolen_bikes", Bike.status_stolen.count)
   end
@@ -68,6 +78,17 @@ module Counts
 
   def assign_week_creation_chart
     assign_for("week_creation_chart", Bike.unscoped.where(created_at: beginning_of_week..Time.current).group_by_day(:created_at).count.to_json)
+  end
+
+  # Yesterday too, so the searches after the last run before midnight get counted
+  def assign_logged_searches(dates = [Date.yesterday, Date.current])
+    dates.each do |date|
+      counts = LoggedSearch.where(request_at: date.all_day)
+        .group(:endpoint, Arel.sql("serial_normalized IS NOT NULL")).count
+      kind_counts = counts.group_by { |(endpoint, serial), _| logged_search_kind(endpoint, serial) }
+        .except(nil).transform_values { it.sum(&:last) }
+      assign_for("logged_searches_#{date}", kind_counts.to_json)
+    end
   end
 
   def recoveries
@@ -102,5 +123,16 @@ module Counts
     calculated_recoveries.pluck(:estimated_value).reject(&:blank?)
   end
 
-  conceal :beginning_of_week, :calculated_recovery_average_value, :calculated_recoveries, :valued_recoveries
+  # The marketplace's counts lookup accompanies each of its searches, so it isn't one
+  def logged_search_kind(endpoint, serial)
+    case endpoint&.to_sym
+    when *LoggedSearch.bikebook_endpoints, :web_marketplace then endpoint
+    when :web_marketplace_count then nil
+    when *LoggedSearch.organized_endpoints then serial ? "organized_serial" : "organized"
+    else serial ? "user_serial" : "user"
+    end
+  end
+
+  conceal :beginning_of_week, :calculated_recovery_average_value, :calculated_recoveries, :valued_recoveries,
+    :logged_search_kind
 end

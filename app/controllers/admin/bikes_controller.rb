@@ -1,13 +1,16 @@
 module Admin
   class BikesController < Admin::BaseController
     include Binxtils::SortableTable
+    include Admin::TokenAccessible
+
+    token_accessible :missing_manufacturer
 
     # The Pages::Admin::Bikes::Tabs tabs show renders; the rest are other controllers' screens
     SHOW_TABS = %w[duplicates messages ownerships stickers recoveries impound].freeze
 
     before_action :find_bike, only: %i[edit update show]
     before_action :set_period, only: %i[index missing_manufacturer]
-    around_action :set_reading_role, only: %i[index show]
+    around_action :set_reading_role, only: %i[index show missing_manufacturer]
 
     def index
       @per_page = permitted_per_page(default: 100)
@@ -17,6 +20,14 @@ module Admin
     end
 
     def missing_manufacturer
+      if request.format.json?
+        created_at = Bike.arel_table[:created_at]
+        rows = missing_manufacturer_bikes.reorder(Arel.star.count.desc).group(:manufacturer_other)
+          .limit(permitted_per_page(default: 1_000, max: 10_000))
+          .pluck(:manufacturer_other, Arel.star.count, created_at.minimum, created_at.maximum)
+        return render(json: {missing_manufacturers: rows.map { %i[manufacturer_other count first_created_at last_created_at].zip(it).to_h }})
+      end
+
       @per_page = permitted_per_page(default: 100)
       @pagy, @bikes = pagy(:countish,
         missing_manufacturer_bikes.includes(:creation_organization, :current_ownership, :current_impound_record, :paint),
@@ -66,7 +77,7 @@ module Admin
 
     def get_destroy
       if params[:id] == "multi_delete"
-        bike_ids = params[:bikes_selected].respond_to?(:keys) ? params[:bikes_selected].keys : Array(params[:bikes_selected])
+        bike_ids = selected_ids(:bikes_selected)
         if bike_ids.any?
           bike_ids.each { |id| BikeJobs::BikeDeleterJob.perform_async(id.to_i, false, current_user.id) }
           flash[:success] = "#{bike_ids.count} #{"bike".pluralize(bike_ids.count)} deleted!"
@@ -187,7 +198,7 @@ module Admin
 
     def matching_bikes
       bikes = if params[:user_id].present?
-        user_subject&.bikes
+        Bike.unscoped.current_owner(user_subject.id)
       elsif params[:search_phone].present?
         Bike.search_phone(params[:search_phone])
       else

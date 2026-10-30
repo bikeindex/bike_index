@@ -1,0 +1,35 @@
+<div class="tw:flex tw:flex-col tw:gap-5">
+  <% if tiles? %>
+    <div class="tw:flex tw:flex-col tw:items-start tw:gap-3.5">
+      <h3 class="tw:text-[15px] tw:font-bold">
+        <%= translation(".classification", vehicle_type: @noun) %>
+      </h3>
+
+      <%= tiles %>
+    </div>
+  <% end %>
+
+  <div class="tw:border-y tw:border-gray-200 tw:py-4 tw:dark:border-gray-700">
+    <%= render(UI::DefinitionList::Container::Component.new(term: :below)) do %>
+      <% @specs.each do |label, value| %>
+        <%= render(UI::DefinitionList::Row::Component.new(label:, value:, render_with_no_value: true, no_value_text: translation(".not_provided"))) %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <div class="tw:flex tw:flex-col tw:items-start tw:gap-3.5">
+    <h3 class="tw:text-[15px] tw:font-bold">
+      <%= translation(".electric_certification") %>
+    </h3>
+
+    <span class="tw:flex tw:flex-wrap tw:gap-2">
+      <% ul_badges.each do |standard, status| %>
+        <%= render(Pages::EbikeRules::UlBadge::Component.new(standard:, status:)) %>
+      <% end %>
+    </span>
+
+    <% if @others.present? %>
+      <p class="tw:text-sm"><%= @others %></p>
+    <% end %>
+  </div>
+</div>

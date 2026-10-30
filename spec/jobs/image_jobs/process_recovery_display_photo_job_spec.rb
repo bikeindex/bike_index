@@ -26,6 +26,23 @@ RSpec.describe ImageJobs::ProcessRecoveryDisplayPhotoJob, type: :job do
         end.to_not change(described_class.jobs, :count)
         expect(recovery_display.reload.photo_processed.attached?).to be_truthy
       end
+
+      context "when another job attaches a processed photo while this one processes" do
+        let!(:other_blob) { ActiveStorage::Blob.create_and_upload!(io: StringIO.new("other"), filename: "other.jpg") }
+
+        it "keeps the other job's photo" do
+          allow(ImageProcessing::Vips).to receive(:source).and_wrap_original do |original, *args|
+            RecoveryDisplay.find(recovery_display.id).photo_processed.attach(other_blob)
+            original.call(*args)
+          end
+
+          expect do
+            described_class.new.perform(recovery_display.id)
+          end.to_not change(ActiveStorage::Blob, :count)
+          expect(ActiveStorage::Attachment.where(record: recovery_display, name: "photo_processed")
+            .pluck(:blob_id)).to eq([other_blob.id])
+        end
+      end
     end
 
     context "with remote_photo_url" do

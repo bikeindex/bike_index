@@ -10,11 +10,11 @@ Skip it when the diff has no code in it — a docs- or skill-only branch gives i
 
 **Read `git diff` as soon as the agents return, before running anything.** An agent that stops mid-verification leaves its edit in the tree — including a sweeping edit it reverted to test, which then reads as your regression.
 
-**Brief the agents with the constraint, not the shape you think satisfies it.** "A cell block is instance_exec'd, so a component method is unreachable inside one" is a fact they can work from; "the lambda is required, judge only how it's used" is a conclusion, and it hid that `method(:…)` is how four sibling org tables already bind exactly that. Declining a finding is yours to do on the way back, not theirs to be told up front — the exception is a *second* run, where naming what a previous pass already triaged is what keeps them off it.
+**Brief the agents with the constraint, not the shape you think satisfies it.** "A cell block is instance_exec'd, so a component method is unreachable inside one" is a fact they can work from; "the lambda is required, judge only how it's used" is a conclusion, and it hid that `method(:…)` is how four sibling org tables already bind exactly that. Likewise "the user asked for a shared component" is a constraint, while "the user requested this new component" is a conclusion — it kept `UI::BulkTableCard` from the reuse reviewer, when the shared component was `UI::CardTable` extended. Declining a finding is yours to do on the way back, not theirs to be told up front — the exception is a *second* run, where naming what a previous pass already triaged is what keeps them off it.
 
 **On a second run against the same branch, scope it to the commits since the last one** — `/simplify` defaults to the whole branch diff, so re-running it resurfaces every finding already triaged, including the ones deliberately declined. Pass the range (`git diff <last-simplify-commit>..HEAD`) as its argument.
 
-**The previous run's merge from the base names that commit** — `rtk proxy git log --merges -2 --format=%h origin/main..HEAD | tail -1`. It's the *second* one because **Prepare the branch** merges before it cleans, so this run's own merge is already the most recent by the time you get here, and `-1` scopes the range to that merge alone — an empty diff, which reads as a clean branch rather than a wrong range. A run that had nothing to merge left no commit, so the range can reach back further than the last run; that costs a re-triage, not a wrong scope.
+**The previous run's merge from the base names that commit** — `rtk proxy git log --merges -2 --format=%h origin/main..HEAD | tail -1`. It's the *second* one because **Prepare the branch** merges before it cleans, so this run's own merge is already the most recent by the time you get here, and `-1` scopes the range to that merge alone — an empty diff, which reads as a clean branch rather than a wrong range. A run that had nothing to merge left no commit, so the range can reach back further than the last run; that costs a re-triage, not a wrong scope. A merge made *between* runs — the user asking to merge main — errs the other way: it's newer than the last run, so the range silently drops the commits before it. Read the session for one before trusting the count.
 
 **That range breaks when earlier branch work was split into its own PRs and merged.** Those commits return through a merge from the base, so `<last-simplify-commit>..HEAD` includes all of them plus everything else the base gained — hundreds of files, none of it yours. Check `git log --oneline <last-simplify-commit>..HEAD`; if it lists the base's merges, scope to your own commits (`git show` each) instead. `--no-merges` doesn't rescue it — it hides the merge commits, not the commits they brought in.
 
@@ -121,6 +121,27 @@ rtk proxy git diff origin/main...HEAD --name-only --diff-filter=A -- app/assets/
 
 Check each against `frontend-conventions`' image and icon rules: an original elsewhere in the repo (a design handoff's comes resized and renamed), an existing icon, or a plain character that should be text. Replace a duplicate with what already exists and delete it.
 
+### The controller audit
+
+**Required when the branch adds a Stimulus controller or wires one to new markup.** List both:
+
+```bash
+rtk proxy git diff origin/main...HEAD --name-only --diff-filter=A -- app/javascript/controllers
+rtk proxy git diff origin/main...HEAD -G 'data-controller|controller:' --name-only
+```
+
+For each controller named, look for one that already does its job — a shared one in `app/javascript/controllers/ui/` or the top level, or a sibling in another namespace — and for two in the branch's namespace doing the same thing. Fold a duplicate into the shared one, an option on it rather than a second controller, and delete the copy. `bikebook--center-current` into `ui--tabs` and `bikebook--image-fallback` into `image-fallback` are the pattern. Name each one you kept and what it does that nothing shared covers.
+
+### The component audit
+
+**Required when the branch adds a directory under `app/components/`.** List them:
+
+```bash
+rtk proxy git diff origin/main...HEAD --name-only --diff-filter=A -- 'app/components/**/component.rb'
+```
+
+For each, name the existing component it renders or duplicates. One that wraps a single `UI::*` component in chrome is that component with an argument — ask the user whether to fold it in, since a new `UI::*` argument needs their permission. `UI::BulkTableCard` into `UI::CardTable`'s `column_settings:` is the pattern.
+
 ### The cycle-type translation check
 
 `AGENTS.md`'s Translations section has the rule; this is how to find the branch's violations:
@@ -133,6 +154,17 @@ rtk proxy git diff origin/main...HEAD -- '*.rb' | grep -in '^+[^+].*errors\.add.
 The second one is load-bearing: a model's `errors.add(:base, "…")` reaches a flash through `full_messages`, never passing a locale file, so the YAML grep can't see it. `Sale#seller_is_owner` interpolates the cycle type into one.
 
 Read each hit. Key names (`about_this_bike:`), the product name ("Bike Index"), and copy that really is bike-only are fine; a value saying "bike" about the registration is not. `Pages::Registrations::Show::CurrentAlerts::ClaimImpound` and `Pages::Registrations::Show::WrapperConsumer` are the pattern for fixing one, and `spec/components/pages/registrations/show/current_alerts/claim_impound/component_spec.rb` shows how to cover it.
+
+### The product-name check
+
+Copy spells the products "Bike Index" and "BikeBook" — never "BikeIndex", "Bike index", "Bike Book" or "Bikebook":
+
+```bash
+rtk proxy git diff origin/main...HEAD -- '*.yml' '*.erb' '*.haml' '*.rb' '*.js' '*.md' |
+  grep -nE '^\+[^+].*(BikeIndex|[Bb]ike index|Bike [Bb]ook|[Bb]ike book|Bikebook)'
+```
+
+Fix every hit in copy. Code identifiers (`BikeIndexFormBuilder`, `Bikebook::`, `bikebook_path`) and the `BikeIndex.org` domain are fine.
 
 ### Only if you have rtk: `rtk proxy` anything you grep or count
 
