@@ -10,8 +10,20 @@ module UI
         end
       end
 
-      def with_shadow
-        render(UI::Card::Component.new(shadow: true)) do
+      def with_small_shadow
+        render(UI::Card::Component.new(shadow: :small)) do
+          "Man braid sustainable solarpunk vexillologist grailed marxism schlitz big mood shabby chic cornhole yuccie PBR&B vegan."
+        end
+      end
+
+      def with_large_shadow
+        render(UI::Card::Component.new(shadow: :large)) do
+          "Man braid sustainable solarpunk vexillologist grailed marxism schlitz big mood shabby chic cornhole yuccie PBR&B vegan."
+        end
+      end
+
+      def with_black_shadow
+        render(UI::Card::Component.new(shadow: :black)) do
           "Man braid sustainable solarpunk vexillologist grailed marxism schlitz big mood shabby chic cornhole yuccie PBR&B vegan."
         end
       end

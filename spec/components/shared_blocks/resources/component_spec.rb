@@ -20,8 +20,8 @@ RSpec.describe SharedBlocks::Resources::Component, type: :component do
   end
 
   it "only opens external dev resource links in new tabs" do
-    expect(component).to have_css("a.dev-resource-link", count: 6)
-    expect(component).to have_css("a.dev-resource-link[target='_blank']", count: 2)
+    expect(component).to have_css("a.dev-resource-link", count: 5)
+    expect(component).to have_css("a.dev-resource-link[target='_blank']", count: 1)
     expect(component).to have_link("View API Docs", href: "/documentation")
     expect(component).to have_link("Manage Applications", href: "/oauth/applications")
   end

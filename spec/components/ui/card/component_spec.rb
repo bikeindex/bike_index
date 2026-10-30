@@ -45,11 +45,34 @@ RSpec.describe UI::Card::Component, type: :component do
     end
   end
 
-  context "shadow and additional_classes" do
-    it "appends both" do
-      render_inline(described_class.new(shadow: true, additional_classes: "tw:mt-8"))
+  context "shadow" do
+    it "adds a small shadow to the gray border, alongside additional_classes" do
+      render_inline(described_class.new(shadow: :small, additional_classes: "tw:mt-8"))
 
-      expect(page).to have_css("div[class~='tw:shadow-sm'][class~='tw:mt-8']")
+      expect(page).to have_css("div[class~='tw:shadow-sm'][class~='tw:border-gray-200'][class~='tw:mt-8']")
+    end
+
+    it "adds a large shadow to the gray border" do
+      render_inline(described_class.new(shadow: :large)) { "in the card" }
+
+      expect(page).to have_css("div[class~='tw:shadow-[0_10px_30px_rgba(44,62,80,.16)]'][class~='tw:border-gray-200']")
+    end
+
+    it "swaps the gray border for the sticker's with a black shadow" do
+      render_inline(described_class.new(shadow: :black)) { "in the card" }
+
+      expect(page).to have_css("div[class~='tw:border-3'][class~='tw:shadow-[4px_4px_0_#111]'][class~='tw:p-4']")
+      expect(page).to have_no_css("div[class~='tw:border-gray-200']")
+    end
+
+    it "has none by default" do
+      render_inline(described_class.new) { "in the card" }
+
+      expect(page).to have_no_css("div[class*='shadow']")
+    end
+
+    it "rejects anything else" do
+      expect { described_class.new(shadow: true) }.to raise_error(ArgumentError, /unknown shadow true/)
     end
   end
 end

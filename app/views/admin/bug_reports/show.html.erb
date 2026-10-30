@@ -120,7 +120,7 @@
   </div>
 </div>
 
-<%= render(UI::Card::Component.new(shadow: true, additional_classes: "tw:max-w-3xl")) do %>
+<%= render(UI::Card::Component.new(shadow: :small, additional_classes: "tw:max-w-3xl")) do %>
   <p><strong>Subject:</strong> <%= @bug_report.display_subject %></p>
   <%= render(UI::UserTextBlockDisplay::Component.new(text: @bug_report.body_stripped, max_height_class: "")) %>
 <% end %>

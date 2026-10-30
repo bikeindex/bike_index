@@ -67,7 +67,7 @@
 
 <% card_html = capture do %>
   <% if @framed %>
-    <%= render(UI::Card::Component.new(shadow: true, additional_classes: "tw:flex tw:flex-col tw:gap-4 tw:rounded-lg tw:p-6!")) { content } %>
+    <%= render(UI::Card::Component.new(additional_classes: "tw:flex tw:flex-col tw:gap-4 tw:rounded-lg tw:p-6!")) { content } %>
   <% else %>
     <div
       class="

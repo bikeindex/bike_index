@@ -250,7 +250,7 @@
     "
   >
     <% program_cards.each do |card| %>
-      <%= render(UI::Card::Component.new(shadow: true, additional_classes: "tw:flex tw:flex-col tw:gap-2.5 tw:rounded-lg! tw:p-6!")) do %>
+      <%= render(UI::Card::Component.new(additional_classes: "tw:flex tw:flex-col tw:gap-2.5 tw:rounded-lg! tw:p-6!")) do %>
         <div class="tw:flex tw:items-center tw:justify-between">
           <span class="<%= ICON_DISC_CLASSES %> <%= card[:color] %>">
             <%= helpers.inline_svg_tag(card[:icon], class: "tw:size-5.5", aria_hidden: true) %>
@@ -307,7 +307,7 @@
   >
     <% registration_steps.each_with_index do |(title, body), index| %>
       <li>
-        <%= render(UI::Card::Component.new(shadow: true, additional_classes: "tw:h-full tw:rounded-lg! tw:p-6!")) do %>
+        <%= render(UI::Card::Component.new(additional_classes: "tw:h-full tw:rounded-lg! tw:p-6!")) do %>
           <div
             class="
               tw:mb-3 tw:font-header tw:text-[15px] tw:font-black
@@ -388,8 +388,8 @@
     >
       <div
         class="
-          tw:rounded-lg tw:bg-[#cc0000] tw:px-5.5 tw:py-5 tw:text-white
-          tw:shadow-sm
+          tw:rounded-lg tw:border tw:border-[#b20000] tw:bg-[#cc0000]
+          tw:px-5.5 tw:py-5 tw:text-white
         "
       >
         <div
@@ -406,7 +406,7 @@
         </p>
       </div>
 
-      <%= render(UI::Card::Component.new(shadow: true, additional_classes: "tw:flex tw:items-start tw:gap-3.5 tw:rounded-lg! tw:px-5.5 tw:py-5")) do %>
+      <%= render(UI::Card::Component.new(additional_classes: "tw:flex tw:items-start tw:gap-3.5 tw:rounded-lg! tw:px-5.5 tw:py-5")) do %>
         <span class="tw:size-10! tw:bg-slate-900 <%= ICON_DISC_CLASSES %>">
           <%= helpers.inline_svg_tag("icons/list.svg", class: "tw:size-5", aria_hidden: true) %>
         </span>
@@ -422,14 +422,14 @@
         </div>
       <% end %>
 
-      <div class="<%= Pages::LandingPages::ForCitiesEducation::Component::STICKER_CLASSES %>">
+      <%= render(UI::Card::Component.new(shadow: :black, additional_classes: Pages::LandingPages::ForCitiesEducation::Component::STICKER_CLASSES)) do %>
         <%= image_tag "kelsey/illustrations/comic-assets_bike-hero.png", alt: "", loading: "lazy", width: 96, height: 72, class: "tw:h-18 tw:w-auto tw:flex-none" %>
 
         <p class="tw:text-[15px]">
           <strong><%= translation(".community_watch_lead") %></strong>
           <%= translation(".community_watch_users_body") %>
         </p>
-      </div>
+      <% end %>
     </div>
   </div>
 </section>
@@ -554,7 +554,7 @@
     </div>
 
     <%# The checker's own form for a bike entered by hand, so a check lands on its result %>
-    <%= render(UI::Card::Component.new(additional_classes: "tw:w-full tw:max-w-[520px] tw:justify-self-center tw:rounded-lg! tw:p-7! tw:shadow-[0_4px_12px_rgba(44,62,80,.12)]")) do %>
+    <%= render(UI::Card::Component.new(shadow: :large, additional_classes: "tw:w-full tw:max-w-[520px] tw:justify-self-center tw:rounded-lg! tw:p-7!")) do %>
       <%= form_with url: ebike_rules_path, method: :get, local: true, class: "tw:flex tw:flex-col tw:gap-4.5" do |f| %>
         <%= f.hidden_field :manual, value: 1, id: nil %>
 
@@ -609,7 +609,7 @@
       "
     >
       <% field_tools.each do |tool| %>
-        <%= render(UI::Card::Component.new(shadow: true, additional_classes: "tw:rounded-lg! tw:p-6!")) do %>
+        <%= render(UI::Card::Component.new(additional_classes: "tw:rounded-lg! tw:p-6!")) do %>
           <span class="tw:mb-3.5 <%= ICON_DISC_CLASSES %> <%= tool[:color] %>">
             <%= helpers.inline_svg_tag(tool[:icon], class: "tw:size-5.5", aria_hidden: true) %>
           </span>
@@ -693,7 +693,7 @@
       </ul>
     </div>
 
-    <%= render(UI::Card::Component.new(additional_classes: "tw:rounded-lg! tw:p-7! tw:shadow-[0_4px_12px_rgba(44,62,80,.12)]")) do %>
+    <%= render(UI::Card::Component.new(shadow: :large, additional_classes: "tw:rounded-lg! tw:p-7!")) do %>
       <%# A sent request returns here, which :target turns into a thank you in place of the call to action %>
       <div
         id="lead-sent"
