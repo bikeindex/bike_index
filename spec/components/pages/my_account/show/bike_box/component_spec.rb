@@ -22,6 +22,7 @@ RSpec.describe Pages::MyAccount::Show::BikeBox::Component, type: :component do
     expect(component).to have_text("SUR-77120934")
     expect(component).to have_link("List for sale")
     expect(component).to have_link("Mark stolen")
+    expect(component).to have_css("a[aria-label='Add a photo'][href='/bikes/#{bike.id}/edit/photos']")
     expect(component).not_to have_css("[role=alert]")
   end
 

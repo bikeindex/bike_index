@@ -36,7 +36,7 @@
     </div>
   </div>
 
-  <div class="tw:flex tw:items-end tw:gap-4">
+  <div class="tw:flex tw:items-end">
     <div class="tw:min-w-0 tw:flex-1">
       <%= render(UI::Tabs::Component.new(tabs:, nav_label: translation(".your_registrations"), margin_classes: "tw:mb-0")) %>
     </div>
@@ -88,7 +88,7 @@
               </div>
             </div>
 
-            <%= link_to translation(".edit"), edit_lock_path(lock), class: "twlink tw:px-2 tw:text-[15px] tw:font-semibold" %>
+            <%= link_to translation(".edit"), edit_lock_path(lock), class: "twlink tw:px-2 tw:py-1 tw:text-[15px] tw:font-semibold" %>
           </li>
         <% end %>
       </ul>
@@ -139,7 +139,7 @@
     <% bar.with_icon { helpers.inline_svg_tag("icons/user-circle.svg", class: "tw:size-[22px]", aria_hidden: true) } %>
     <% bar.with_title { translation(".tell_us_more_about_yourself") } %>
     <% bar.with_subtext { translation(".helps_shops_and_police") } %>
-    <% bar.with_action { link_to(translation(".update_profile"), edit_my_account_url, class: "twlink tw:text-[15px]") } %>
+    <% bar.with_action { link_to(translation(".update_profile"), edit_my_account_url, class: "twlink tw:py-1 tw:text-[15px]") } %>
   <% end %>
 
   <%= render(Pages::MyAccount::StravaIntegration::Component.new(user: @user, link_bikes_path:)) %>

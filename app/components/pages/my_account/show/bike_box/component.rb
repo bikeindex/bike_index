@@ -51,6 +51,9 @@ module Pages
             thumb_image_url ? bike_path(@bike) : edit_bike_path(@bike, edit_template: "photos")
           end
 
+          # An image's alt names the link; without one there is only an icon
+          def photo_label = (translation(".add_a_photo") unless thumb_image_url)
+
           # Only the exceptional statuses say when they began; being registered is the default
           def status_time = (@bike.occurred_at unless @bike.status_with_owner? && !@bike.is_for_sale?)
 

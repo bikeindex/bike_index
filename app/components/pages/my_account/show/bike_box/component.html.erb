@@ -14,14 +14,7 @@
           tw:dark:bg-gray-900
         "
       >
-        <a
-          href="<%= photo_path %>"
-          class="
-            tw:relative tw:flex tw:h-[170px] tw:items-center
-            tw:justify-center tw:bg-gray-100 tw:text-gray-300
-            tw:dark:bg-gray-800 tw:dark:text-gray-600
-          "
-        >
+        <%= link_to photo_path, class: "tw:relative tw:flex tw:h-[170px] tw:items-center tw:justify-center tw:bg-gray-100 tw:text-gray-300 tw:dark:bg-gray-800 tw:dark:text-gray-600", aria: {label: photo_label} do %>
           <% if thumb_image_url %>
             <%= image_tag(thumb_image_url, alt: @bike.title_string, skip_pipeline: true, class: "tw:size-full tw:object-cover") %>
           <% else %>
@@ -29,7 +22,7 @@
           <% end %>
 
           <span class="tw:absolute tw:top-3 tw:right-3"><%= render(Atoms::RegistrationStatusBadge::Component.new(bike: @bike, size: :lg, time: status_time)) %></span>
-        </a>
+        <% end %>
 
         <div class="tw:flex tw:flex-1 tw:flex-col tw:gap-2 tw:px-4 tw:py-3.5">
           <%= link_to title_html, bike_path(@bike), class: "tw:text-[17px] tw:text-pretty tw:text-slate-700 tw:no-underline tw:dark:text-gray-100" %>
@@ -60,31 +53,23 @@
             tw:dark:border-gray-800
           "
         >
-          <%= link_to translation(".edit"), edit_bike_path(@bike, edit_template: @bike.default_edit_template), class: "twlink" %>
+          <%= link_to translation(".edit"), edit_bike_path(@bike, edit_template: @bike.default_edit_template), class: "twlink tw:py-1" %>
 
           <% if @bike.status_with_owner? %>
-            <%= link_to sale_link_text, edit_bike_path(@bike, edit_template: "marketplace"), class: "tw:text-purple-600 tw:dark:text-purple-300" %>
-            <%= link_to translation(".report_stolen"), edit_bike_path(@bike, edit_template: "report_stolen"), class: "tw:ml-auto tw:text-red-600 tw:dark:text-red-400" %>
+            <%= link_to sale_link_text, edit_bike_path(@bike, edit_template: "marketplace"), class: "tw:py-1 tw:text-purple-600 tw:dark:text-purple-300" %>
+            <%= link_to translation(".report_stolen"), edit_bike_path(@bike, edit_template: "report_stolen"), class: "tw:ml-auto tw:py-1 tw:text-red-600 tw:dark:text-red-400" %>
           <% end %>
         </div>
       </div>
     <% else %>
       <div class="<%= class_names("tw:flex tw:flex-wrap tw:items-stretch tw:gap-[18px] tw:rounded-[10px] tw:border tw:border-l-[5px] tw:border-gray-200 tw:bg-white tw:p-3.5 tw:dark:border-gray-700 tw:dark:bg-gray-900", accent_classes) %>">
-        <a
-          href="<%= photo_path %>"
-          class="
-            tw:flex tw:h-[124px] tw:flex-none tw:basis-[180px]
-            tw:items-center tw:justify-center tw:overflow-hidden
-            tw:rounded-lg tw:bg-gray-100 tw:text-gray-300
-            tw:dark:bg-gray-800 tw:dark:text-gray-600
-          "
-        >
+        <%= link_to photo_path, class: "tw:flex tw:h-[124px] tw:flex-none tw:basis-[180px] tw:items-center tw:justify-center tw:overflow-hidden tw:rounded-lg tw:bg-gray-100 tw:text-gray-300 tw:dark:bg-gray-800 tw:dark:text-gray-600", aria: {label: photo_label} do %>
           <% if thumb_image_url %>
             <%= image_tag(thumb_image_url, alt: @bike.title_string, skip_pipeline: true, class: "tw:size-full tw:object-cover") %>
           <% else %>
             <%= helpers.inline_svg_tag("icons/lucide-bike.svg", class: "tw:size-16", aria_hidden: true) %>
           <% end %>
-        </a>
+        <% end %>
 
         <div
           class="
@@ -131,11 +116,11 @@
             tw:font-semibold
           "
         >
-          <%= link_to translation(".edit_registration", bike_type: @bike.type_titleize&.downcase), edit_bike_path(@bike, edit_template: @bike.default_edit_template), class: "twlink" %>
+          <%= link_to translation(".edit_registration", bike_type: @bike.type_titleize&.downcase), edit_bike_path(@bike, edit_template: @bike.default_edit_template), class: "twlink tw:py-1" %>
 
           <% if @bike.status_with_owner? %>
-            <%= link_to sale_link_text, edit_bike_path(@bike, edit_template: "marketplace"), class: "tw:text-purple-600 tw:dark:text-purple-300" %>
-            <%= link_to translation(".report_stolen"), edit_bike_path(@bike, edit_template: "report_stolen"), class: "tw:text-red-600 tw:dark:text-red-400" %>
+            <%= link_to sale_link_text, edit_bike_path(@bike, edit_template: "marketplace"), class: "tw:py-1 tw:text-purple-600 tw:dark:text-purple-300" %>
+            <%= link_to translation(".report_stolen"), edit_bike_path(@bike, edit_template: "report_stolen"), class: "tw:py-1 tw:text-red-600 tw:dark:text-red-400" %>
           <% end %>
         </div>
       </div>
@@ -150,7 +135,7 @@
           <%= render(UI::ButtonLink::Component.new(text: translation(".add_it_now"), href: user_alert_path(id: user_alert.id, add_bike_organization: true), method: :patch, color: :primary, size: :sm, form: {class: "tw:ml-1 tw:inline-block"})) %>
 
           <div class="tw:mt-2 tw:text-sm">
-            <%= link_to translation(".ignore_this_suggestion"), user_alert_path(id: user_alert.id, alert_action: "dismiss"), method: :patch, class: "twlink-underlined twless-strong" %>
+            <%= link_to translation(".ignore_this_suggestion"), user_alert_path(id: user_alert.id, alert_action: "dismiss"), method: :patch, class: "twlink-underlined twless-strong tw:inline-block tw:py-1" %>
           </div>
         <% end %>
       <% end %>

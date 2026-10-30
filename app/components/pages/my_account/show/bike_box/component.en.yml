@@ -5,6 +5,7 @@ en:
       my_account:
         show:
           bike_box:
+            add_a_photo: Add a photo
             add_it_now: Add it now!
             edit: Edit
             edit_registration: Edit %{bike_type}
