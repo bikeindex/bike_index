@@ -1,5 +1,5 @@
 import { Controller } from '@hotwired/stimulus'
-import { computePosition, flip, shift, offset, arrow, autoUpdate } from '@floating-ui/dom'
+import { computePosition, flip, shift, offset, arrow, hide, autoUpdate } from '@floating-ui/dom'
 import { claimFloatingZIndex, releaseFloatingZIndex } from 'utils/floating_z_index'
 
 // Connects to data-controller="ui--tooltip"
@@ -141,12 +141,14 @@ export default class extends Controller {
     const { x, y, placement, middlewareData } = await computePosition(this.triggerTarget, this.tooltipTarget, {
       placement: this.placementValue,
       strategy: STRATEGY,
-      middleware: [offset(8), flip(), shift({ padding: 4 }), arrow({ element: this.arrowTarget, padding: 4 })]
+      middleware: [offset(8), flip(), shift({ padding: 4 }), arrow({ element: this.arrowTarget, padding: 4 }), hide()]
     })
+    // in the top layer, no container clips it once its trigger scrolls out of view
     Object.assign(this.tooltipTarget.style, {
       left: `${x}px`,
       top: `${y}px`,
-      position: STRATEGY
+      position: STRATEGY,
+      visibility: middlewareData.hide.referenceHidden ? 'hidden' : ''
     })
 
     const { edge, borderWidth } = ARROW_SIDES[placement.split('-')[0]]

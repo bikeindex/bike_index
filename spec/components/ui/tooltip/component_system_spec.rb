@@ -27,6 +27,23 @@ RSpec.describe UI::Tooltip::Component, :js, type: :system do
     page.evaluate_script("document.getElementById(#{id.to_json}).matches(':popover-open')")
   end
 
+  # Its own classes rather than a popover's UA styles, which center it in the viewport, and its gap from its trigger
+  def popover_styles(id)
+    page.evaluate_script(<<~JS)
+      (() => {
+        const tooltip = document.getElementById(#{id.to_json})
+        const style = getComputedStyle(tooltip)
+        const [box, trigger] = [tooltip, document.querySelector(`[aria-describedby="${tooltip.id}"]`)].map((element) => element.getBoundingClientRect())
+        const gap = Math.round(Math.min(Math.abs(trigger.top - box.bottom), Math.abs(box.top - trigger.bottom)))
+        return { margin: style.margin, border: style.borderTopWidth, padding: style.padding, overflow: style.overflow, gap }
+      })()
+    JS
+  end
+
+  def scroll_container(delta)
+    page.driver.with_playwright_page { it.mouse.wheel(delta, 0) }
+  end
+
   # The top layer stacks popovers in the order they were shown
   def last_shown_tooltip
     page.evaluate_script("window.shownTooltips.at(-1)")
@@ -57,8 +74,10 @@ RSpec.describe UI::Tooltip::Component, :js, type: :system do
     expect(tooltip).to be_visible
     expect(top_layer?(tooltip_ids.first)).to be true
     expect(tooltip_position(tooltip_ids.first)).to include("top" => be_present, "left" => be_present)
+    expect(popover_styles(tooltip_ids.first)).to eq("margin" => "0px", "border" => "1px", "padding" => "4px 8px", "overflow" => "visible", "gap" => 8)
     find("body").hover
     expect(tooltip).not_to be_visible
+    expect(top_layer?(tooltip_ids.first)).to be false
 
     # Focus shows, body click hides
     page.execute_script("arguments[0].focus()", trigger)
@@ -177,6 +196,16 @@ RSpec.describe UI::Tooltip::Component, :js, type: :system do
     page.document.synchronize { raise Capybara::ExpectationNotMet unless last_shown_tooltip == third }
     find("[aria-describedby='#{second}']").hover
     page.document.synchronize { raise Capybara::ExpectationNotMet unless last_shown_tooltip == second }
+
+    # Held open in a scroll container, hidden while its trigger's scrolled out of view
+    scrolled_trigger = find("button", text: "scrolled trigger")
+    scrolled = find_by_id(scrolled_trigger["aria-describedby"], visible: :all)
+    scrolled_trigger.click
+    expect(scrolled).to be_visible
+    scroll_container(400)
+    expect(page).to have_css("##{scrolled[:id]}:popover-open", visible: :hidden)
+    scroll_container(-400)
+    expect(page).to have_css("##{scrolled[:id]}", visible: true)
   end
 
   it "raises by z-index in a browser without popovers" do
