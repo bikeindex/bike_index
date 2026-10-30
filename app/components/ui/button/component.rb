@@ -32,8 +32,13 @@ module UI
         error: "tw:text-[#c0392b] tw:bg-white tw:border-[#f3c9c9] tw:not-disabled:not-aria-disabled:hover:bg-red-50 tw:focus:ring-red-500/40 tw:dark:bg-transparent tw:dark:text-red-400 tw:dark:border-red-900 tw:dark:not-disabled:not-aria-disabled:hover:bg-red-950",
         purple: "tw:text-white tw:bg-purple-500 tw:border-purple-500 tw:not-disabled:not-aria-disabled:hover:bg-purple-600 tw:not-disabled:not-aria-disabled:hover:border-purple-600 tw:focus:ring-purple-500/40",
         yellow: "tw:text-blue-600 tw:bg-[#ffd660] tw:border-[#ffd660] tw:not-disabled:not-aria-disabled:hover:bg-[#ffcc33] tw:not-disabled:not-aria-disabled:hover:border-[#ffcc33] tw:focus:ring-[#ffd660]/60",
-        link: "twlink tw:rounded-lg tw:p-0 tw:focus:ring-blue-500/40"
+        link: "twlink tw:rounded-lg tw:p-0 tw:focus:ring-blue-500/40",
+        # The grays outrank twlink-underlined's color shift, so each state names its own
+        link_gray: "twlink-underlined tw:text-gray-500 tw:not-disabled:not-aria-disabled:hover:text-gray-700 tw:dark:text-gray-400 tw:dark:not-disabled:not-aria-disabled:hover:text-gray-200 tw:rounded-lg tw:p-0 tw:focus:ring-gray-500/40"
       }.freeze
+
+      # Text-only, so they take no size
+      LINK_COLORS = %i[link link_gray].freeze
 
       # The active look, as a delta over COLORS — always emitted alongside it and inert
       # until the element flags itself active (see the is-active variant in application.css,
@@ -47,7 +52,8 @@ module UI
         secondary: "tw:is-active:text-white tw:is-active:bg-purple-500 tw:is-active:border-purple-500 tw:is-active:ring-2 tw:is-active:ring-purple-500/40",
         error: "tw:is-active:bg-red-100 tw:is-active:border-[#c0392b] tw:is-active:ring-2 tw:is-active:ring-red-500/40 tw:is-active:dark:bg-red-950 tw:is-active:dark:border-red-700",
         purple: "tw:is-active:bg-purple-700 tw:is-active:border-purple-700 tw:is-active:ring-2 tw:is-active:ring-purple-500/40",
-        yellow: "tw:is-active:bg-[#f5bc1b] tw:is-active:border-[#f5bc1b] tw:is-active:ring-2 tw:is-active:ring-[#ffd660]/60"
+        yellow: "tw:is-active:bg-[#f5bc1b] tw:is-active:border-[#f5bc1b] tw:is-active:ring-2 tw:is-active:ring-[#ffd660]/60",
+        link_gray: "tw:is-active:text-gray-900 tw:is-active:dark:text-gray-100"
       }.freeze
 
       # No pointer-events-none: with pointer events off the browser takes the cursor from
@@ -59,17 +65,17 @@ module UI
       # unless focus is restated under the variant.
       FOCUS_CLASSES = "tw:focus:outline-none tw:focus:ring-3 tw:is-active:focus:ring-3"
 
-      # Focus and disabled reach link color too — only SIZES is button-shaped
+      # Focus and disabled reach the link colors too — only SIZES is button-shaped
       def self.build_classes(color:, size:, html_class: nil)
         extras = [FOCUS_CLASSES, DISABLED_CLASSES]
-        extras += [SIZES[size], "tw:no-underline"] unless color == :link
+        extras += [SIZES[size], "tw:no-underline"] unless LINK_COLORS.include?(color)
         [BASE_CLASSES, html_class, *extras, COLORS[color], ACTIVE_COLORS[color]].compact.join(" ")
       end
 
       # ButtonLink calls this too, so the pair answers a caller the same way
       def self.validate_options!(color:, size:, html_options:)
         raise ArgumentError, "unknown color #{color.inspect}, expected one of: #{COLORS.keys.join(", ")}" unless COLORS.key?(color)
-        raise ArgumentError, "size is not supported for link color" if color == :link && size != :md
+        raise ArgumentError, "size is not supported for link color" if LINK_COLORS.include?(color) && size != :md
         # The component builds its own class, so a passed one is dropped rather than merged
         raise ArgumentError, "class is not supported, you must use the keyword arg html_class" if html_options.key?(:class)
       end

@@ -71,8 +71,8 @@ const marketList = (names) => names.length <= MARKETS_SHOWN
   : html`<span class="tw:group/markets" data-controller="ui--collapse">${names.slice(0, MARKETS_SHOWN).join(', ')}<span
     class="tw:group-has-[[aria-expanded=true]]/markets:hidden">…</span><span class="tw:hidden"
     data-ui--collapse-target="content">, ${names.slice(MARKETS_SHOWN).join(', ')}</span> ${collapse({
-      color: 'link',
-      htmlClass: 'tw:text-sm tw:text-gray-500 tw:hover:text-gray-700 tw:dark:text-gray-400 tw:dark:hover:text-gray-200 tw:aria-expanded:hidden',
+      color: 'link_gray',
+      htmlClass: 'tw:text-sm tw:aria-expanded:hidden',
       content: `${names.length} total`
     })}</span>`
 

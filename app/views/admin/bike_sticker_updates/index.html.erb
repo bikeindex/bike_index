@@ -62,7 +62,7 @@
             <% if row[:organization].present? %>
               <%= link_to row[:organization].short_name, admin_bike_sticker_updates_path(sort_state.search_params.merge(organization_id: row[:organization_id])), class: row[:organization].deleted? ? "twlink tw:text-red-600" : "twlink" %>
             <% else %>
-              <%= link_to "no organization", admin_bike_sticker_updates_path(sort_state.search_params.merge(organization_id: "none")), class: "twlink tw:text-gray-400" %>
+              <%= render(UI::ButtonLink::Component.new(href: admin_bike_sticker_updates_path(sort_state.search_params.merge(organization_id: "none")), text: "no organization", color: :link_gray)) %>
             <% end %>
           <% end %>
 
