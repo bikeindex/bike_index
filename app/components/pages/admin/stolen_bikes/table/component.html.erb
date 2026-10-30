@@ -2,7 +2,7 @@
 <% location = method(:location) %>
 
 <%= render(UI::BulkTableCard::Component.new(storage_key: "adminStolenBikesColumns", columns: COLUMNS, defaults: DEFAULT_COLUMNS,
-  narrow_hidden: %i[photo_cell created_at_cell], form: {url: bulk_update_admin_stolen_bikes_path, method: :post})) do |card| %>
+  narrow_hidden: %i[photo_cell created_at_cell], form: {url: bulk_update_admin_stolen_bikes_path, method: :patch})) do |card| %>
   <% card.with_actions do %>
     <%= render(UI::Button::Component.new(text: "Approve selected", color: :primary, size: :sm, type: :submit, name: :bulk_action, value: :approve)) %>
     <%= render(UI::Button::Component.new(text: "Mark spam", size: :sm, type: :submit, name: :bulk_action, value: :spam)) %>

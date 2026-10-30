@@ -31,12 +31,10 @@ module Pages
 
           DEFAULT_COLUMNS = (COLUMNS.keys - %i[date_stolen_cell shareable_cell]).freeze
 
-          # edits: {recovery_id => {quote:, quote_by:, location_string:}}, the rows a display failed
-          # on, which stay checked. editable: false leaves out the form, for a bike's own recoveries
-          def initialize(recoveries:, sort_state:, edits: {}, editable: true)
+          # editable: false leaves out the form, for a bike's own recoveries
+          def initialize(recoveries:, sort_state:, editable: true)
             @recoveries = recoveries
             @sort_state = sort_state
-            @edits = edits
             @editable = editable
           end
 
@@ -50,8 +48,8 @@ module Pages
               .includes(current_ownership: {user: %i[membership_active email_bans_active]}).index_by(&:id)
             @recoveries.map do |recovery|
               bike = bikes[recovery.bike_id]
-              defaults = RecoveryDisplay.attributes_from_stolen_record(recovery, bike:).merge(@edits[recovery.id].to_h) if @editable && recovery.waiting_on_decision?
-              [recovery, bike, defaults, @edits.key?(recovery.id)]
+              defaults = RecoveryDisplay.attributes_from_stolen_record(recovery, bike:) if @editable && recovery.waiting_on_decision?
+              [recovery, bike, defaults]
             end
           end
 
@@ -60,8 +58,7 @@ module Pages
             # A bike's page has the bike already
             return options.merge(storage_key: "adminBikeRecoveriesColumns", defaults: DEFAULT_COLUMNS - %i[photo_cell bike_cell]) unless @editable
 
-            # The filters ride along, so a failed display renders the same page
-            options.merge(storage_key: "adminRecoveriesColumns", defaults: DEFAULT_COLUMNS, form: {url: bulk_update_admin_recoveries_path(request.query_parameters), method: :post},
+            options.merge(storage_key: "adminRecoveriesColumns", defaults: DEFAULT_COLUMNS, form: {url: bulk_update_admin_recoveries_path, method: :patch},
               data: {controller: "admin--personal-info", action: "submit->admin--personal-info#confirmDisplay",
                      "admin--personal-info-patterns-value": PERSONAL_INFO.transform_values { {label: it[:label], source: it[:pattern].source} }.to_json})
           end

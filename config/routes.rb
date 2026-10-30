@@ -367,12 +367,11 @@ Rails.application.routes.draw do
 
     resources :stolen_bikes do
       member { post :approve }
-      collection { post :bulk_update }
+      collection { patch :bulk_update }
     end
     resources :customer_contacts, only: %i[create show]
-    # On the index's path, so links a failed bulk_update re-renders lead back to the index
-    resources :recoveries, except: :create do
-      collection { post "", action: :bulk_update, as: :bulk_update }
+    resources :recoveries do
+      collection { patch :bulk_update }
     end
     resources :stolen_notifications do
       member { get :resend }

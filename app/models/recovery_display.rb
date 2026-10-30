@@ -15,7 +15,7 @@
 #
 # Indexes
 #
-#  index_recovery_displays_on_stolen_record_id  (stolen_record_id)
+#  index_recovery_displays_on_stolen_record_id_unique  (stolen_record_id) UNIQUE
 #
 class RecoveryDisplay < ActiveRecord::Base
   QUOTE_MAX_LENGTH = 400
@@ -28,6 +28,7 @@ class RecoveryDisplay < ActiveRecord::Base
 
   validates_presence_of :quote, :recovered_at
   validates :quote, length: {maximum: QUOTE_MAX_LENGTH}
+  validates :stolen_record_id, uniqueness: {message: "is already displayed"}, allow_nil: true
 
   attr_accessor :date_input, :remote_photo_url, :skip_callback_job
 

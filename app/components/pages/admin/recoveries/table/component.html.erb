@@ -14,9 +14,9 @@
 
   <%= render(UI::CardTable::Component.new(records: rows, render_sortable: @editable, sort_state: @sort_state)) do |table| %>
     <% if @editable %>
-      <% table.column(label: card.toggle_all_button) do |(recovery, _bike, _defaults, selected)| %>
+      <% table.column(label: card.toggle_all_button) do |(recovery)| %>
         <div class="tw:flex tw:items-center tw:gap-3">
-          <%= check_box_tag "sr_selected[#{recovery.id}]", recovery.id, selected, disabled: !recovery.waiting_on_decision?,
+          <%= check_box_tag "sr_selected[#{recovery.id}]", recovery.id, false, disabled: !recovery.waiting_on_decision?,
       aria: {label: "Select recovery #{recovery.id}"}, data: {"table-multi-checkbox-target" => "checkbox"} %>
 
           <%= render(UI::ButtonLink::Component.new(text: "View", href: edit_admin_recovery_path(recovery), size: :sm)) %>
