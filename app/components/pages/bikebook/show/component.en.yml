@@ -9,6 +9,8 @@ en:
           activity_examples: "(e.g. Mountain Biking, Cyclocross, etc)"
           any_activity: Any activity
           any_configuration: Any configuration
+          any_frame_material: Any frame material
+          any_handlebar_type: Any handlebar type
           any_manufacturer: Any manufacturer
           any_market: Any market
           any_suspension: Any suspension
@@ -21,9 +23,12 @@ en:
           e_bike_classification: e-bike classification
           e_vehicle_motorized: e-Vehicle (motorized)
           failed: The catalog didn't load. Reload the page to try again.
+          frame_material: Frame material
+          handlebar_type: Handlebar type
           human_powered: Human powered (Acoustic)
           jurisdiction: Jurisdiction
           loading: Loading the catalog…
+          loading_placeholder: Loading…
           manufacturers: Manufacturers
           market: Market
           max: Max

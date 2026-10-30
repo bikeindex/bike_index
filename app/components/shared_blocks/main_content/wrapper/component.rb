@@ -36,7 +36,7 @@ module SharedBlocks
           force_landing_page_render: false, current_user: nil, current_organization: nil,
           passive_organization: nil, show_general_alert: false, blog: nil, related_blogs: nil,
           bike: nil, bike_og: nil, og_email: nil, edit_template: nil, edit_templates: nil,
-          oauth_application: nil, source: nil)
+          oauth_application: nil)
           @controller_name = controller_name
           @action_name = action_name
           @current_user = current_user
@@ -51,7 +51,6 @@ module SharedBlocks
           @edit_template = edit_template
           @edit_templates = edit_templates
           @oauth_application = oauth_application
-          @source = source
           @kind = self.class.kind(controller_namespace:, controller_name:, action_name:,
             force_landing_page_render:)
         end
@@ -74,7 +73,6 @@ module SharedBlocks
           SharedBlocks::MainContent::Content::Component.new(
             blog: @blog,
             related_blogs: @related_blogs,
-            source: @source,
             current_user: @current_user,
             controller_name: @controller_name,
             action_name: @action_name

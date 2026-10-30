@@ -1,5 +1,6 @@
 import { html, nothing } from 'lit-html'
 import { numberDisplay, uuid } from 'bikebook/templates/helpers'
+import { dragHandle } from 'bikebook/templates/ui/drag_handle'
 import { classificationOption } from 'bikebook/templates/vehicles/class_cards'
 import { comboboxOption } from 'bikebook/templates/vehicles/combobox_option'
 import { fragmentOf, renderInto } from 'bikebook/render'
@@ -26,15 +27,26 @@ export async function loadCatalog (manifestUrl, ids = [], jurisdictions = {}) {
   })
 
   try {
-    const { vocabulary, kit, options } = await call('load', {
-      manifestUrl: new URL(manifestUrl, window.location.href).href, ids, jurisdictions, rulesUrl: import.meta.resolve('bikebook/featured_rules')
+    const { vocabulary, kit, options, comparable } = await call('load', {
+      manifestUrl: new URL(manifestUrl, window.location.href).href,
+      ids,
+      jurisdictions,
+      rulesUrl: import.meta.resolve('bikebook/featured_rules'),
+      similarityUrl: import.meta.resolve('bikebook/similarity')
     })
     return {
       vocabulary,
       kit,
       options,
+      comparable,
+      // null, as for a comparison format it doesn't know, where the comparison doesn't load
+      similar: (model, settings) => call('similar', { model, settings }).catch((error) => {
+        console.error(error)
+        return null
+      }),
       search: (params, page, perPage) => call('search', { params, page, perPage }),
       featured: (params, legalClasses) => call('featured', { params, legalClasses }),
+      group: (id) => call('group', { model: id }),
       vehicles: (ids, { market } = {}) => call('vehicles', { ids, market }),
       displays: (ids) => call('displays', { ids })
     }
@@ -45,7 +57,7 @@ export async function loadCatalog (manifestUrl, ids = [], jurisdictions = {}) {
 }
 
 // Answers a hotwire_combobox async filter with the markup the gem's own turbo-stream response would
-// carry, so its callbacks and paging run unchanged
+// carry, so its selection and paging run unchanged
 export class CatalogComboboxSource {
   #generation = 0
 
@@ -63,7 +75,8 @@ export class CatalogComboboxSource {
     const query = new URL(combobox.asyncSrcValue, window.location.origin).searchParams
     this.params = { ...Object.fromEntries(query), q: combobox._fullQuery }
     this.#generation++
-    await this.#render(combobox, 0, { inputType, primed, callbackId: primed ? undefined : combobox._enqueueCallback() })
+    // The gem settles a pending filter only on an input type, as its own request falls back to
+    await this.#render(combobox, 0, { inputType: primed ? undefined : inputType || 'hw:unspecifiedInput', primed })
   }
 
   // The gem fetches the first page through a lazy turbo-frame on first open; list it here instead
@@ -71,16 +84,19 @@ export class CatalogComboboxSource {
     return this.filter(combobox, undefined, { primed: true })
   }
 
-  async #render (combobox, page, { inputType, callbackId, primed }) {
+  async #render (combobox, page, { inputType, primed }) {
     const generation = this.#generation
     const { total, filteredCount, unfiltered, models, nextPage } = await this.catalog.search(this.params, page, this.catalog.kit.per_page)
     if ((page && generation !== this.#generation) || !combobox.element.isConnected) return
 
     const forId = combobox.element.dataset.asyncId
     const listbox = combobox._actingListbox
-    const options = models.map((model) => comboboxOption({ model, placeholderUrl: this.catalog.kit.placeholder_url, currencies: this.catalog.vocabulary.currencies }))
+    const picked = String(this.params.vehicle_models ?? '').split(',')
+    const options = models.map((model) => comboboxOption({
+      model, selected: picked.includes(model.id), placeholderUrl: this.catalog.kit.placeholder_url, currencies: this.catalog.vocabulary.currencies
+    }))
     const pagination = html`<li id=${`${forId}__hw_combobox_pagination__wrapper`} class="hw_combobox__pagination__wrapper"
-      data-hw-combobox-target="endOfOptionsStream" data-input-type=${inputType ?? nothing} data-callback-id=${callbackId ?? nothing} aria-hidden="true"></li>`
+      data-hw-combobox-target="endOfOptionsStream" data-input-type=${inputType ?? nothing} aria-hidden="true"></li>`
     document.getElementById(`${forId}__hw_combobox_pagination__wrapper`)?.remove()
     if (page === 0) {
       const offered = classificationOption(this.params.q, String(this.params.vehicle_models ?? '').split(','), this.catalog.vocabulary.e_vehicle_classifications)
@@ -106,10 +122,10 @@ export class CatalogComboboxSource {
     observer.observe(wrapper)
   }
 
-  // An id the catalog lacks gets no chip, and one the render already chipped no second
-  async chips (combobox, values) {
+  // No chip for an id the catalog lacks, nor for one already chipped unless `adding` it as a repeat pick
+  async chips (combobox, values, { adding = false } = {}) {
     const chipped = new Set([...combobox.element.querySelectorAll('[data-hw-combobox-value-param]')].map((remover) => remover.dataset.hwComboboxValueParam))
-    const ids = String(values).split(',').filter((id) => id && !chipped.has(id))
+    const ids = String(values).split(',').filter((id) => id && (adding || !chipped.has(id)))
     if (ids.length === 0) return
 
     const displays = await this.catalog.displays(ids)
@@ -121,11 +137,14 @@ export class CatalogComboboxSource {
   }
 }
 
-// The gem's selection chip partial, ahead of the field
-export const renderChips = (combobox, chips) => combobox.querySelector('[data-hw-combobox-target~="combobox"]').before(fragmentOf(chips.map(({ value, display }) =>
-  html`<div data-hw-combobox-chip=""><div class="hw-combobox__chip"><span>${display}</span><span tabindex="0" class="hw-combobox__chip__remover"
-    aria-label=${`Remove ${display}`} data-action="click->hw-combobox#removeChip:stop keydown->hw-combobox#navigateChip"
-    data-hw-combobox-target="chipDismisser" data-hw-combobox-value-param=${value}></span></div></div>`)))
+// The gem's selection chip partial, ahead of the field, gripped where bikebook--chip-reorder drags them
+export const renderChips = (combobox, chips) => {
+  const handle = combobox.matches('[data-controller~="bikebook--chip-reorder"]') ? dragHandle({ controller: 'bikebook--chip-reorder', htmlClass: 'tw:mr-1' }) : nothing
+  combobox.querySelector('[data-hw-combobox-target~="combobox"]').before(fragmentOf(chips.map(({ value, display }) =>
+    html`<div data-hw-combobox-chip=""><div class="hw-combobox__chip">${handle}<span>${display}</span><span tabindex="0" class="hw-combobox__chip__remover"
+      aria-label=${`Remove ${display}`} data-action="click->hw-combobox#removeChip:stop keydown->hw-combobox#navigateChip"
+      data-hw-combobox-target="chipDismisser" data-hw-combobox-value-param=${value}></span></div></div>`)))
+}
 
 const group = (label, options) => {
   const id = uuid()

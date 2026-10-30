@@ -5,7 +5,7 @@ module Pages
     module ClassCard
       # A class as "E-bike classes, explained" cards it: a US class from its number, any other `classification`, or
       # else the e-moto, each with the `place`'s own rules for it. Unframed, it's a tooltip's body; in a `frame_id`,
-      # the one Bike Book loads. A `catalog_id` closes it, a copy away
+      # the one BikeBook loads. A `catalog_id` closes it, a copy away
       class Component < ApplicationComponent
         FRAME_ID = "ebike-rules-class-card"
 
@@ -49,7 +49,7 @@ module Pages
 
         def emoto_card
           rules = @place && EbikeRuleServices::StateLaws.emoto_rules(@place[:abbr]).presence
-          {either: true, title: render(Pages::EbikeRules::UnbrokenHyphens::Component.new(text: translation(".not_an_ebike"))),
+          {either: true, title: unbroken_hyphen(translation(".not_an_ebike")),
            speed: translation(".emoto_speed"), motor: translation(".emoto_motor"), rules:,
            body: rules ? translation(".emoto_summary") : translation(".emoto_limits_body")}
         end

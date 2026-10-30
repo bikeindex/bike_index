@@ -1,7 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
 import { storedArray } from 'utils/stored_array'
-
-/* global localStorage */
+import { storage } from 'utils/storage'
 
 // Connects to data-controller='ui--column-settings'
 // Goes on an element holding both a UI::ColumnSettings panel and its table. Each checkbox is
@@ -34,7 +33,7 @@ export default class extends Controller {
   // Saved only from a change, so the defaults a load applies are worked out afresh each time
   update () {
     const checked = this.checkboxTargets.filter(checkbox => checkbox.checked).map(checkbox => checkbox.name)
-    localStorage.setItem(this.storageKeyValue, JSON.stringify(checked))
+    storage.setItem(this.storageKeyValue, JSON.stringify(checked))
     this.showColumns()
   }
 

@@ -1,4 +1,5 @@
 import { Controller } from '@hotwired/stimulus'
+import { ordered, RANGES } from 'bikebook/query'
 import { readable, replaceUrl } from 'bikebook/replace_url'
 
 /* global CSS */
@@ -40,6 +41,7 @@ export default class extends Controller {
 
   // the page follows the URL's filters
   apply () {
+    this.#orderRanges()
     this.#showClasses()
     this.#classifyPropulsion()
     this.#syncCombobox()
@@ -52,6 +54,13 @@ export default class extends Controller {
   // so defer a tick to read the picked value.
   applySelection () {
     setTimeout(() => this.apply(), 0)
+  }
+
+  // a range typed backwards turned the way round it was meant
+  #orderRanges () {
+    const fields = RANGES.map((name) => this.element.querySelector(`input[name="${name}"]`))
+    const values = ordered(Object.fromEntries(fields.map(({ name, value }) => [name, value])))
+    for (const field of fields) field.value = values[field.name]
   }
 
   // The classes are the US market's, by state - a state without its own uses the US ones - and a hidden
@@ -157,15 +166,18 @@ export default class extends Controller {
 
   #describe (field) {
     const inputs = [...field.querySelectorAll('input[name]')]
+    // what the catalog names, which leaves out a value while it loads
     if (field.matches('.hw-combobox')) {
       return inputs[0].value.split(',').filter(Boolean)
-        .map((value) => field.querySelector(`[role="option"][data-value="${CSS.escape(value)}"]`)?.dataset.autocompletableAs ?? value)
+        .flatMap((value) => field.querySelector(`[role="option"][data-value="${CSS.escape(value)}"]`)?.dataset.autocompletableAs ?? [])
         .join(', ')
     }
     // the classes alone, without the jurisdiction they're of
     const boxes = inputs.filter(({ type }) => type === 'checkbox')
     if (boxes.length) return boxes.filter(({ checked }) => checked).map(({ labels }) => labels[0].textContent.trim()).join(', ')
-    const [min, max] = inputs.map(({ value }) => value && `${field.dataset.filterPrefix}${value}`)
+    // a year ungrouped, unlike an amount
+    const prefix = field.dataset.filterPrefix
+    const [min, max] = inputs.map(({ value }) => value && (prefix ? `${prefix}${Number(value).toLocaleString('en-US')}` : value))
     if (min && max) return `${min}–${max}`
     return min ? `from ${min}` : max && `up to ${max}`
   }

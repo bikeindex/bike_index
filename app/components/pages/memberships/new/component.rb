@@ -17,7 +17,7 @@ module Pages
           @recoveries_count = recoveries_count
           @recoveries_value = recoveries_value
           @organizations_count = organizations_count
-          @recovery_displays = recovery_displays.first(4)
+          @recovery_displays = recovery_displays
           @referral_source = referral_source
           @membership = membership
           @level = Membership::LEVEL_ENUM.key?(level&.to_sym) ? level.to_sym : :plus
@@ -60,12 +60,10 @@ module Pages
         end
 
         def stats
-          [{value: bikes_display, label: translation(".bikes_registered")},
-            {value: number_display(@recoveries_count), label: translation(".stolen_bikes_recovered")},
-            {value: render(Atoms::CurrencyMillions::Component.new(dollars_usd: @recoveries_value)),
-             label: translation(".value_returned_to_owners")},
-            {value: safe_join([number_display(@organizations_count), "+"]),
-             label: translation(".partner_organizations")}]
+          [[bikes_display, translation(".bikes_registered")],
+            [number_display(@recoveries_count), translation(".stolen_bikes_recovered")],
+            [render(Atoms::CurrencyMillions::Component.new(dollars_usd: @recoveries_value)), translation(".value_returned_to_owners")],
+            [safe_join([number_display(@organizations_count), "+"]), translation(".partner_organizations")]]
         end
 
         def tiers
@@ -121,13 +119,7 @@ module Pages
             [translation(".faq_gear_question"), translation(".faq_gear_answer")]]
         end
 
-        def section_inner = "tw:mx-auto tw:max-w-6xl tw:px-5 tw:py-8 tw:lg:px-14 tw:lg:py-14"
-
-        def eyebrow_classes = "tw:text-[11.5px] tw:font-extrabold tw:tracking-widest tw:uppercase"
-
-        def h2_classes = "tw:m-0 tw:font-header tw:text-[26px] tw:font-extrabold tw:text-slate-900 tw:lg:text-[34px]"
-
-        def h3_classes = "tw:m-0 tw:font-header tw:text-[24px] tw:leading-tight tw:font-extrabold tw:text-slate-900 tw:lg:text-[30px]"
+        def section_inner = "#{SharedBlocks::Marketing::Wrapper::Component::CONTAINER_CLASSES} tw:py-8 tw:lg:py-14"
       end
     end
   end

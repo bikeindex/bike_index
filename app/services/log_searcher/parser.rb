@@ -17,7 +17,8 @@ module LogSearcher
       "Search::RegistrationsController#similar_serials" => :web_close_serials,
       "Search::MarketplaceController#index" => :web_marketplace,
       "Search::MarketplaceController#counts" => :web_marketplace_count,
-      "Search::BikebookController#index" => :web_bikebook
+      "Search::BikebookController#index" => :web_bikebook,
+      "EbikeRulesController#show" => :web_ebike_rules
     }.freeze
 
     ROUTE_ENDPOINTS = {
@@ -85,8 +86,9 @@ module LogSearcher
 
     def parse_endpoint(opts)
       if opts["message"].present?
-        controller_action = opts["message"].split("(").last.delete(")")
-        CONTROLLER_ENDPOINTS[controller_action]
+        endpoint = CONTROLLER_ENDPOINTS[opts["message"].split("(").last.delete(")")]
+        # its page views share the action, so it marks its checks
+        endpoint if endpoint != :web_ebike_rules || opts["logged_search"]
       elsif %w[/api/v2/bikes_search /api/v2/bikes_search/stolen
         /api/v2/bikes_search/non_stolen].include?(opts["path"])
         :api_v2_bikes

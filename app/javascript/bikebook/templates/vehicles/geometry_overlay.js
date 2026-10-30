@@ -1,37 +1,41 @@
 import { html, nothing, svg } from 'lit-html'
-import { builtWheel, outerRadius } from 'bikebook/frame_geometry'
+import { builtWheel, frameGeometry, outerRadius } from 'bikebook/frame_geometry'
 import { buttonClasses } from 'bikebook/templates/ui/button'
+import { extent, renderShape, sideView } from 'bikebook/templates/vehicles/cycle_drawing'
 import { tireWidth, wheelSize } from 'bikebook/templates/vehicles/model_viewer'
 import { sectionHeading } from 'bikebook/templates/vehicles/section'
 import { andSentence, equal, isNumber, join, present } from 'bikebook/templates/values'
 
 // UI::Chart::Component::COLORS, one per compared model; forced, or the table cells' dark border color wins
 export const SERIES = [
-  { color: '#3498db', bottom: 'tw:border-b-[#3498db]!', top: 'tw:border-t-[#3498db]!' },
-  { color: '#DC2626', bottom: 'tw:border-b-[#DC2626]!', top: 'tw:border-t-[#DC2626]!' },
-  { color: '#7C3AED', bottom: 'tw:border-b-[#7C3AED]!', top: 'tw:border-t-[#7C3AED]!' },
-  { color: '#D97706', bottom: 'tw:border-b-[#D97706]!', top: 'tw:border-t-[#D97706]!' },
-  { color: '#059669', bottom: 'tw:border-b-[#059669]!', top: 'tw:border-t-[#059669]!' }
+  { color: '#3498db', variable: 'tw:[--series:#3498db]', top: 'tw:border-t-[#3498db]!' },
+  { color: '#DC2626', variable: 'tw:[--series:#DC2626]', top: 'tw:border-t-[#DC2626]!' },
+  { color: '#7C3AED', variable: 'tw:[--series:#7C3AED]', top: 'tw:border-t-[#7C3AED]!' },
+  { color: '#D97706', variable: 'tw:[--series:#D97706]', top: 'tw:border-t-[#D97706]!' },
+  { color: '#059669', variable: 'tw:[--series:#059669]', top: 'tw:border-t-[#059669]!' },
+  { color: '#DB2777', variable: 'tw:[--series:#DB2777]', top: 'tw:border-t-[#DB2777]!' },
+  { color: '#475569', variable: 'tw:[--series:#475569]', top: 'tw:border-t-[#475569]!' },
+  { color: '#0891B2', variable: 'tw:[--series:#0891B2]', top: 'tw:border-t-[#0891B2]!' },
+  { color: '#65A30D', variable: 'tw:[--series:#65A30D]', top: 'tw:border-t-[#65A30D]!' },
+  { color: '#EA580C', variable: 'tw:[--series:#EA580C]', top: 'tw:border-t-[#EA580C]!' }
 ]
 const PADDING = 30
 const TIRE_GAP = 10
-// mm around the bottom bracket and up from the ground that nearly every catalog frame fits, so a larger size draws
-// larger rather than the drawing refitting
-const BOUNDS = { left: -850, right: 1250, top: 1010 }
-// a typical rear axle's mm behind the bottom bracket, for wheels with no frame to line up on
-const REAR_AXLE = -430
+// mm around the rear axle and up from the ground that nearly every catalog frame fits, so a larger size draws larger
+// rather than the drawing refitting
+const BOUNDS = { left: -460, right: 1685, top: 1140 }
 
-const point = ([x, y]) => `${Math.round(x * 10) / 10},${Math.round(-y * 10) / 10}`
+export const wheelName = (presenter, bsd) => presenter.vocabulary.wheel_sizes[bsd]?.name ?? `${bsd} mm BSD`
+
 const figures = (presenter, keys) => andSentence(keys.map((key) => presenter.kit.geometry.labels[key] ?? presenter.humanize(key)))
-const path = (...lines) => lines.map(([start, ...rest]) => `M${point(start)}${rest.map((each) => `L${point(each)}`).join('')}`).join('')
 
-const frame = ({ geometry: { rearAxle, frontAxle, rearRadius, frontRadius, headTop, headBottom, seatTop, seatBottom, bottomBracketHeight }, series, label, value }, index) =>
-  svg`<g id=${`geometry-frame-${index}`} data-bikebook--geometry-overlay-target="frame" data-vehicle=${value} transform=${`translate(0 ${-bottomBracketHeight})`} stroke=${series.color} fill="none" stroke-linecap="round" stroke-linejoin="round"><title>${label}</title><circle
-    cx=${rearAxle[0]} cy=${-rearAxle[1]} r=${rearRadius} stroke-width="2" vector-effect="non-scaling-stroke"></circle><circle
-    cx=${frontAxle[0]} cy=${-frontAxle[1]} r=${frontRadius} stroke-width="2" vector-effect="non-scaling-stroke"></circle>${headTop
-    ? svg`<path d=${path([frontAxle, headBottom, headTop, seatTop, rearAxle, [0, 0], headBottom], [seatTop, seatBottom])}
-      stroke-width="4" vector-effect="non-scaling-stroke"></path>`
-    : nothing}</g>`
+// A frame drawn whole as its type's side view, else its wheels alone, faded while another is chosen
+const frame = ({ side, geometry: { rearAxle, frontAxle, rearRadius, frontRadius }, series, label, key }, index, chosen) =>
+  svg`<g id=${`geometry-frame-${index}`} data-bikebook--geometry-overlay-target="frame" data-vehicle=${key} color=${series.color}
+    data-action="click->bikebook--geometry-overlay#pick" cursor="pointer"
+    opacity=${chosen >= 0 && chosen !== index ? 0.2 : nothing}><title>${label}</title>${side
+    ? side.shapes.map(renderShape)
+    : [[rearAxle, rearRadius], [frontAxle, frontRadius]].map(([center, radius]) => renderShape({ kind: 'circle', center, radius, weight: 'part' }))}</g>`
 
 // A [bsd, tire] wheel against the first's: the same size on a tire more than TIRE_GAP mm wider or narrower, or 700c
 // against 650b
@@ -51,7 +55,7 @@ const diameterNotes = (presenter, compared) => {
     const title = html`<em>${vehicle.title}</em>'s`
     const described = (position) => {
       const [bsd, tire] = wheel(vehicle, position)
-      return [presenter.vocabulary.wheel_sizes[bsd]?.name ?? `${bsd} mm BSD`, mm(tire), mm(2 * outerRadius(vehicle.builtWheels[position]))]
+      return [wheelName(presenter, bsd), mm(tire), mm(2 * outerRadius(vehicle.builtWheels[position]))]
     }
     if (positions.length === 2 && equal(wheel(vehicle, 'front'), wheel(vehicle, 'rear'))) {
       const [size, tire, diameter] = described('front')
@@ -67,62 +71,75 @@ const diameterNotes = (presenter, compared) => {
 const noteList = (heading, items) => html`<div class="tw:text-xs tw:text-gray-500 tw:dark:text-gray-400"><p>Note: ${heading}:</p><ul
   class="tw:mt-1 tw:list-disc tw:space-y-1 tw:pl-5">${items}</ul></div>`
 
-const drawable = (geometry) => geometry?.missing.length === 0 || geometry?.wheels
+const drawable = (geometry) => geometry?.side || geometry?.wheels
 
 // One frame has nothing to overlay
 const overlaid = (frames) => frames.filter(drawable).length > 1
 
-// The top and bottom borders that key a comparison table column to its frame, which the overlay draws in the same order
-export const seriesBorders = (frames, index) => overlaid(frames) && drawable(frames[index])
-  ? { top: `tw:border-t-4 ${SERIES[index].top}`, bottom: `tw:border-b-4 ${SERIES[index].bottom}` }
-  : { top: '', bottom: '' }
+// Each vehicle's frame in its `sizes` as frameGeometry works it out, with its type's `side` view where that's drawn
+// whole, and the figures it's `unlisted` without: frameGeometry's for a view on its frame, else those the view takes at
+// their typical
+export const overlayFrames = (vehicles, sizes) => vehicles.map(({ data }, index) => {
+  const frame = frameGeometry(data, sizes[index])
+  const side = sideView({ type: data.type, data, size: sizes[index] })
+  const unlisted = side.framed ? frame.missing : side.typical
+  return { ...frame, side: unlisted.length === 0 ? side : null, unlisted }
+})
 
-// The compared models' frames in their `sizes`, standing on the same ground with their bottom brackets lined up,
-// each over the ones the comparison table columns left of it. A frame it can't draw is its wheels alone where they're
-// listed, the rear axle on the first drawn frame's. Lone wheels aren't drawn, only said what they're missing
-export const geometryOverlay = ({ presenter, vehicles, sizes, frames, beside = false }) => {
+// The top border that keys a comparison table column to its frame, which the overlay draws in the same order, and its
+// color as --series
+export const seriesBorders = (frames, index) => overlaid(frames) && drawable(frames[index])
+  ? { top: `tw:border-t-4 ${SERIES[index].top}`, variable: SERIES[index].variable }
+  : { top: '', variable: '' }
+
+// The compared models' frames in their `sizes`, their rear wheels standing on the same spot, each over the ones the
+// comparison table columns left of it. A frame it can't draw is its wheels alone where they're listed. Lone wheels aren't drawn, only said what they're missing,
+// as a stem and bar it lists no stem length for aren't. The
+// `selected` vehicle's over the rest, the others faded, the first drawn's unless it's another or 'none'
+export const geometryOverlay = ({ presenter, vehicles, sizes, frames, selected, beside = false }) => {
   const named = vehicles.map(({ data }) => presenter.named(presenter.kit.schemas.vehicle, data))
   const labelled = named.map((vehicle, index) => {
     const title = [vehicle.manufacturer, vehicle.model].filter(present).join(' ')
     const size = sizes[index]?.name
     const builtWheels = Object.fromEntries(['front', 'rear'].map((position) => [position, builtWheel(vehicles[index].data, sizes[index], position)]))
-    return { geometry: frames[index], series: SERIES[index], title, size, builtWheels, label: present(size) ? `${title}, ${size}` : title, value: vehicles[index].value }
+    return { geometry: frames[index], side: frames[index].side, series: SERIES[index], title, size, builtWheels, label: present(size) ? `${title}, ${size}` : title, key: vehicles[index].key }
   })
-  const aligned = labelled.find(({ geometry }) => geometry.missing.length === 0)
-  const rearX = aligned?.geometry.rearAxle[0] ?? REAR_AXLE
   const drawn = labelled.filter(({ geometry }) => drawable(geometry)).map((each) => {
-    if (each.geometry.missing.length === 0) return each
+    if (each.side) return each
     const { rearRadius, frontRadius, wheelbase } = each.geometry.wheels
-    return { ...each, geometry: { rearAxle: [rearX, rearRadius], frontAxle: [rearX + wheelbase, frontRadius], rearRadius, frontRadius, bottomBracketHeight: 0 } }
+    return { ...each, geometry: { rearAxle: [0, rearRadius], frontAxle: [wheelbase, frontRadius], rearRadius, frontRadius } }
   })
-  const undrawn = labelled.filter(({ geometry }) => geometry.missing.length)
-  if (drawn.length === 0) return nothing
 
-  const overlay = drawn.length > 1 || Boolean(aligned)
-  const missingNote = undrawn.length
-    ? noteList('missing geometry information', undrawn.map(({ title, geometry: { missing, wheels } }) => {
-      const none = `${figures(presenter, missing)} or the measures to calculate them`
-      return html`<li><em>${title}</em> doesn't list its ${none}, so ${!wheels || !overlay
-        ? "it can't be drawn"
-        : `only its wheels are drawn${aligned ? `, the rear axle on ${aligned.title}'s` : ''}`}.</li>`
-    }))
-    : nothing
+  const overlay = drawn.length > 1 || drawn.some(({ side }) => side)
+  // a stem missing only beside one that's drawn
+  const stemDrawn = drawn.some(({ side }) => side?.shapes.some(({ cockpit }) => cockpit))
+  const missing = labelled.flatMap(({ title, side, geometry: { unlisted, wheels } }) => {
+    if (side) return side.stemless && stemDrawn ? [html`<li><em>${title}</em> doesn't list its ${figures(presenter, ['stem_length'])}, so its stem and handlebar aren't drawn.</li>`] : []
+    const none = `${figures(presenter, unlisted)} or the measures to calculate them`
+    return [html`<li><em>${title}</em> doesn't list its ${none}, so ${!wheels || !overlay
+      ? "it can't be drawn"
+      : 'only its wheels are drawn'}.</li>`]
+  })
+  const missingNote = missing.length ? noteList('missing geometry information', missing) : nothing
 
   // out to the screen's edges on a phone, as the cards below it are
   return html`<section aria-label="Geometry overlay" data-controller=${overlay ? 'bikebook--geometry-overlay' : nothing} class="tw:mx-auto tw:mt-6
     tw:w-full tw:max-w-4xl tw:space-y-3 tw:rounded-sm tw:border tw:border-gray-200 tw:bg-white tw:p-4 tw:dark:border-gray-700 tw:dark:bg-gray-800
     tw:max-[500px]:twpagebleed tw:max-[500px]:rounded-none tw:max-[500px]:border-x-0 ${beside
-      ? 'tw:min-[1500px]:mx-0 tw:min-[1500px]:basis-2/5 tw:min-[1500px]:shrink-0'
+      ? 'tw:min-[1500px]:order-first tw:min-[1500px]:mx-0 tw:min-[1500px]:basis-2/5 tw:min-[1500px]:shrink-0'
       : ''}">${sectionHeading('Geometry overlay')}${
-    overlay ? drawing(presenter, drawn, labelled) : nothing}${missingNote}</section>`
+    overlay ? drawing(presenter, drawn, labelled, selected) : nothing}${missingNote}</section>`
 }
 
-const drawing = (presenter, drawn, labelled) => {
-  const xs = drawn.flatMap(({ geometry: { rearAxle, frontAxle, rearRadius, frontRadius } }) => [rearAxle[0] - rearRadius, frontAxle[0] + frontRadius])
-  // the wheels stand on the ground, so only the frame's top reaches past it
-  const ys = drawn.filter(({ geometry }) => geometry.headTop).flatMap(({ geometry: { headTop, seatTop, bottomBracketHeight } }) => [headTop[1], seatTop[1]].map((y) => y + bottomBracketHeight))
-  const [left, top] = [Math.min(BOUNDS.left, ...xs) - PADDING, -Math.max(BOUNDS.top, ...ys) - PADDING]
-  const [width, height] = [Math.max(BOUNDS.right, ...xs) - left + PADDING, PADDING - top]
+// The points a frame reaches, its wheels' standing on the ground
+const reach = ({ side, geometry: { rearAxle, frontAxle, rearRadius, frontRadius } }) => side
+  ? side.points
+  : [[rearAxle[0] - rearRadius, 0], [frontAxle[0] + frontRadius, 2 * Math.max(rearRadius, frontRadius)]]
+
+const drawing = (presenter, drawn, labelled, selected) => {
+  const chosen = selected === 'none' ? -1 : Math.max(drawn.findIndex(({ key }) => key === selected), 0)
+  const bounds = extent([...drawn.flatMap(reach), [BOUNDS.left, 0], [BOUNDS.right, BOUNDS.top]])
+  const [left, right, top] = [bounds.left - PADDING, bounds.right + PADDING, bounds.top + PADDING]
   const notes = diameterNotes(presenter, labelled)
   const noted = drawn.filter(({ geometry }) => geometry.calculated?.length || geometry.assumed?.length || geometry.typicalWheel)
   const clause = (keys, how) => keys?.length ? `${figures(presenter, keys)} ${keys.length > 1 ? 'are' : 'is'} ${how}` : null
@@ -131,10 +148,12 @@ const drawing = (presenter, drawn, labelled) => {
     : html`wheels aren't listed, so it's drawn with ${wheelSize(presenter, bsd)} wheels and ${tireWidth(presenter, tire)} tires`
 
   return html`<svg
-    role="img" aria-label=${`Frames on the same ground, their bottom brackets lined up: ${drawn.map(({ label }) => label).join('; ')}`}
-    viewBox=${[left, top, width, height].map(Math.round).join(' ')} class="tw:h-auto tw:w-full">${drawn.map(frame)}<use
-    data-bikebook--geometry-overlay-target="top"></use></svg><ul class="tw:flex tw:flex-wrap tw:gap-2">${drawn.map(({ series, title, size }) =>
-      html`<li><button type="button" class=${buttonClasses({ size: 'sm' })} aria-pressed="false"
+    role="img" aria-label=${`Frames on the same ground, their rear wheels lined up: ${drawn.map(({ label }) => label).join('; ')}`}
+    viewBox=${[left, -top, right - left, top + PADDING].map(Math.round).join(' ')} class="tw:h-auto tw:w-full">${drawn.map((each, index) =>
+    frame(each, index, chosen))}<use data-bikebook--geometry-overlay-target="top" data-action="click->bikebook--geometry-overlay#pick" cursor="pointer"
+    href=${chosen < 0 ? nothing : `#geometry-frame-${chosen}`}></use></svg><ul
+    class="tw:flex tw:flex-wrap tw:gap-2">${drawn.map(({ series, title, size, key }, index) =>
+      html`<li><button type="button" class=${buttonClasses({ size: 'sm' })} aria-pressed=${String(index === chosen)} data-vehicle=${key}
         data-bikebook--geometry-overlay-target="button" data-action="bikebook--geometry-overlay#toggle"><svg aria-hidden="true" class="tw:shrink-0" width="24" height="8"><line stroke=${series.color}
         x1="2" y1="4" x2="22" y2="4" stroke-width="4" stroke-linecap="round"></line></svg><span>${title}${
         present(size) ? html` <span class="tw:opacity-65">${size}</span>` : nothing}</span></button></li>`)}</ul>${notes.length
@@ -142,7 +161,7 @@ const drawing = (presenter, drawn, labelled) => {
       : nothing}${noted.length
       ? html`<ul class="tw:list-disc tw:space-y-1 tw:pl-5 tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">${noted.map(({ title, geometry }) =>
         html`<li><em>${title}</em>'s ${join([clause(geometry.calculated, 'calculated from its other measures'),
-          clause(geometry.assumed, `estimated based on a typical ${geometry.typicalKind}`),
+          clause(geometry.assumed, `estimated from typical values on ${geometry.typicalKind}s`),
           geometry.typicalWheel && tires(geometry.typicalWheel)].filter(Boolean), '. Its ')}.</li>`)}</ul>`
       : nothing}`
 }

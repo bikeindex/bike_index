@@ -1518,7 +1518,7 @@ RSpec.describe Bike, type: :model do
           creation_registration_info: {street: "102 Washington Pl", city: "State College"})
       end
       # let(:ownership) { FactoryBot.create(:ownership, creator: user, user: nil, bike: bike) }
-      let(:target_address) { {city: "State College", country: "United States", latitude: 40.7933949, longitude: -77.8600012, state: "PA", street: "102 Washington Pl", zipcode: "16801", street_2: nil} }
+      let(:target_address) { {city: "State College", latitude: 40.7933949, longitude: -77.8600012, region: "PA", street: "102 Washington Pl"} }
       include_context :geocoder_real
       it "is exportable" do
         # Referencing the same address and the same cassette from a different spec, b/c I'm terrible ;)
@@ -1527,12 +1527,11 @@ RSpec.describe Bike, type: :model do
           expect(bike.reload.user&.id).to eq user.id
           # We test that the bike has a location saved
           expect(BikeServices::CalculateLocation.registration_address_source(bike)).to eq "initial_creation"
-          expect(bike.registration_address(true).except("latitude", "longitude", "zipcode")).to eq(target_address.as_json.except("latitude", "longitude", "zipcode"))
+          expect(bike.registration_address_record).to have_attributes(target_address.except(:latitude, :longitude))
           expect(bike.to_coordinates.map(&:round)).to eq([target_address[:latitude].round, target_address[:longitude].round])
           expect(bike.latitude).to be_present
           expect(bike.longitude).to be_present
           expect(bike.owner_name).to eq "some name"
-          expect(bike.registration_address["street"]).to eq "102 Washington Pl"
           expect(bike.avery_exportable?).to be_truthy
           FactoryBot.create(:impound_record_with_organization, bike: bike, organization: organization)
           bike.update(updated_at: Time.current) # Bump current_impound_record
@@ -1543,13 +1542,10 @@ RSpec.describe Bike, type: :model do
     end
   end
 
-  describe "registration_address" do
+  describe "registration_address_record" do
     let(:bike) { Bike.new }
-    let(:b_param) { BParam.new }
-    it "returns nil when no b_param and with a b_param without address" do
-      expect(bike.registration_address).to eq({})
-      allow(bike).to receive(:b_params) { [b_param] }
-      expect(bike.registration_address).to eq({})
+    it "returns nil without an address" do
+      expect(bike.registration_address_record).to be_nil
     end
     context "with user with address" do
       let(:country) { Country.united_states }
@@ -1559,17 +1555,15 @@ RSpec.describe Bike, type: :model do
       let(:bike) { ownership.bike }
       let(:ownership) { FactoryBot.create(:ownership_claimed, user: user) }
       it "returns the user's address" do
-        expect(user.address_hash_legacy).to eq default_location_registration_address.merge("latitude" => nil, "longitude" => nil, "country" => "United States", "street_2" => nil)
         expect(BikeServices::CalculateLocation.registration_address_source(bike)).to eq "user"
-        expect(bike.registration_address(true)).to eq default_location_registration_address.merge("latitude" => nil, "longitude" => nil, "country" => "United States", "street_2" => nil)
+        expect(bike.registration_address_record).to eq address_record
       end
       context "ownership creator" do
         let(:ownership) { FactoryBot.create(:ownership_claimed, creator: user, user: FactoryBot.create(:user_confirmed)) }
         it "returns nothing" do
-          expect(user.address_hash_legacy).to eq default_location_registration_address.merge("latitude" => nil, "longitude" => nil, "country" => "United States", "street_2" => nil)
           expect(bike.user).to_not eq user
           expect(BikeServices::CalculateLocation.registration_address_source(bike)).to be_blank
-          expect(bike.registration_address.values.compact).to eq([])
+          expect(bike.registration_address_record).to be_nil
         end
       end
     end
@@ -1580,7 +1574,7 @@ RSpec.describe Bike, type: :model do
     let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
 
     it "is falsey without registration address" do
-      expect(bike.registration_address).to eq({})
+      expect(bike.registration_address_record).to be_nil
       expect(bike.valid_mailing_address?).to be_falsey
     end
 
@@ -1590,13 +1584,12 @@ RSpec.describe Bike, type: :model do
       it "is falsey when address matches organization default" do
         expect(organization.default_location).to be_present
         expect(user.address_record).to be_present
-        # Use Bike.find to get a fresh instance (avoids memoization from factory)
         reloaded_bike = Bike.find(bike.id)
         expect(reloaded_bike.user).to eq user
         expect(reloaded_bike.user.address_set_manually).to be_truthy
         expect(BikeServices::CalculateLocation.registration_address_source(reloaded_bike)).to eq "user"
-        expect(reloaded_bike.registration_address).to be_present
-        expect(reloaded_bike.registration_address).to eq organization.default_location.address_hash_legacy
+        expect(reloaded_bike.registration_address_record.internal_address_attrs)
+          .to eq organization.default_location.address_record.internal_address_attrs
         expect(reloaded_bike.valid_mailing_address?).to be_falsey
       end
     end
@@ -1606,10 +1599,9 @@ RSpec.describe Bike, type: :model do
       let!(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: user, creation_organization: organization) }
       it "is truthy when address differs from organization default" do
         expect(organization.default_location).to be_present
-        # Use Bike.find to get a fresh instance (avoids memoization from factory)
         reloaded_bike = Bike.find(bike.id)
-        expect(reloaded_bike.registration_address).to be_present
-        expect(reloaded_bike.registration_address).to_not eq organization.default_location.address_hash_legacy
+        expect(reloaded_bike.registration_address_record.internal_address_attrs)
+          .to_not eq organization.default_location.address_record.internal_address_attrs
         expect(reloaded_bike.valid_mailing_address?).to be_truthy
       end
     end

@@ -18,7 +18,7 @@ RSpec.describe Pages::EbikeRules::Results::Component, type: :component do
   end
   let(:component) { render_inline(described_class.new(lookup:)) }
 
-  it "renders a legal bike, its Bike Book photo, specs and certifications, and its state's law" do
+  it "renders a legal bike, its BikeBook photo, specs and certifications, and its state's law" do
     expect(component).to have_css("[role='status']", text: "Legal to ride")
       .and have_css("[role='status']", text: "Your Trek Verve+ 2 is legal to ride in Indiana as a Class 1 e-bike.")
       .and have_css("img[src='https://bikebook.bikeindex.org/trek/2025/verve.jpg'][alt='Trek Verve+ 2']")
@@ -32,7 +32,7 @@ RSpec.describe Pages::EbikeRules::Results::Component, type: :component do
       .and have_css("li [role='img'][aria-label='Meets this rule']", count: 4)
       .and have_css("li", text: "Class 3 riders must be 15 or older")
       .and have_link(href: "https://in.gov/dnr/rules-and-regulations/e-bike-rules")
-      .and have_link("BikeBook", href: "/bikebook?vehicle_models=evc%2Fus%2Fin%2Felectric_bicycle")
+      .and have_link("BikeBook", href: "/bikebook?vehicle_models=evc/us/in/electric_bicycle")
       .and have_link("Register on Bike Index — free", href: "/register/new?frame_model=Verve%2B+2&manufacturer=Trek")
   end
 
@@ -62,9 +62,23 @@ RSpec.describe Pages::EbikeRules::Results::Component, type: :component do
     it "names what the state classes it as" do
       expect(component).to have_css("[role='status']", text: "Not permitted")
         .and have_css("[role='status'] li", text: "12,500W motor exceeds the 750W cap.")
-        .and have_css("[role='status'] li", text: "In Texas, it falls under Off-Highway Motorcycle, which can require registration and a license.")
+        .and have_css("[role='status'] li", text: "In Texas, it falls under Off-Highway Motorcycle.")
         .and have_css("button[aria-label='E-moto, not an e-bike'] + [role='tooltip'] h3", text: "Not an e-bike", visible: :all)
         .and have_css("[role='tooltip'] code", text: /\A\s*evc\/out_of_class\s*\z/, visible: :all)
+    end
+  end
+
+  context "in a state that recognizes Class 1 alone" do
+    let(:bike) { super().with(e_bike_class: 3, e_vehicle_classifications: ["evc/us/class_3"], top_assist_mph: 28, top_assist_kmh: 45) }
+    let(:abbreviation) { "NJ" }
+
+    it "names the state the class isn't recognized in, and the state's class it falls under with its rules, as an e-moto" do
+      expect(component).to have_css("li", text: "Class 3 isn't recognized in New Jersey")
+        .and have_css("[role='status'] li", text: "In New Jersey, it falls under Motorized Bicycle.")
+        .and have_css("[role='status'] [role='button']", text: "Motorized Bicycle rules")
+        .and have_css("[role='status'] li", text: /Registered with the Motor Vehicle Commission.*N\.J\.S\.A\. 39:4-14\.3i/m, visible: :all)
+        .and have_css("button[aria-label='E-moto, not an e-bike'] + [role='tooltip'] code", text: /\A\s*evc\/out_of_class\s*\z/, visible: :all)
+        .and have_no_css("[role='img'][aria-label='Class 3 e-bike']")
     end
   end
 

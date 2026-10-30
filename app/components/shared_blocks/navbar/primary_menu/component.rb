@@ -22,7 +22,7 @@ module SharedBlocks
             *account_items,
             {label: translation(".help"), path: help_path},
             {label: translation(".stolen_bike"), path: stolen_index_path},
-            {label: translation(".donate"), path: why_donate_path},
+            {label: translation(".donate"), path: donate_path},
             # Desktop items float right, so reversing them keeps the mobile order on screen
             *side_items(:desktop).reverse]
         end
@@ -31,7 +31,8 @@ module SharedBlocks
         # which naming no match_params gets: the stolenness this happens to link to isn't compared
         def side_items(side)
           [{label: translation(".search"), path: helpers.default_bike_search_path},
-            {label: translation(".marketplace"), path: search_marketplace_path},
+            {label: translation(".marketplace"), path: search_marketplace_path,
+             match_paths: [search_marketplace_path, marketplace_how_it_works_path]},
             register_item(side)]
             .map { it.merge(item_class: SIDE_CLASSES.fetch(side)) }
         end

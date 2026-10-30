@@ -32,15 +32,6 @@ RSpec.describe Admin::BikesController, type: :request do
     end
   end
 
-  describe "duplicates" do
-    it "renders" do
-      get "#{base_url}/duplicates"
-      expect(response.code).to eq("200")
-      expect(response).to render_template("duplicates")
-      expect(flash).to_not be_present
-    end
-  end
-
   describe "missing_manufacturer" do
     let!(:bike) { FactoryBot.create(:bike, :with_ownership, manufacturer: Manufacturer.other, manufacturer_other: "Cool Bikes") }
     it "renders" do

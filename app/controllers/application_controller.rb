@@ -15,6 +15,8 @@ class ApplicationController < ActionController::Base
   rescue_from Pagy::RangeError, with: :redirect_to_last_page
   # A "null" Origin raises from Rails' origin check rather than calling handle_unverified_request
   rescue_from ActionController::InvalidAuthenticityToken, with: :handle_unverified_request
+  # IpSpoofAttackFilter returns the same 403, but only after the request log records the raise as a 500
+  rescue_from ActionDispatch::RemoteIp::IpSpoofAttackError, with: :forbid_ip_spoof
 
   def allow_x_frame
     SecureHeaders.opt_out_of_header(request, :x_frame_options)
@@ -62,6 +64,10 @@ class ApplicationController < ActionController::Base
   def normalize_page_param
     page = params[:page]
     params.delete(:page) if page.present? && !page.is_a?(String) && !page.is_a?(Integer)
+  end
+
+  def forbid_ip_spoof
+    render plain: "Forbidden", status: :forbidden
   end
 
   def user_for_paper_trail
