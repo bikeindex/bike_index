@@ -90,9 +90,9 @@ RSpec.describe UI::Button::Component, type: :component do
   context "with link_gray color" do
     let(:color) { :link_gray }
 
-    it "renders gray link styles, without a size" do
+    it "renders gray link styles, underlined, without a size" do
       tokens = component.css("button").first["class"].split
-      expect(tokens).to include("tw:text-gray-500", "tw:not-disabled:not-aria-disabled:hover:underline")
+      expect(tokens).to include("twlink-underlined", "tw:text-gray-500")
       expect(tokens).to_not include("twlink", "tw:no-underline", "tw:px-3", "tw:py-1.5", "tw:text-sm")
     end
 
