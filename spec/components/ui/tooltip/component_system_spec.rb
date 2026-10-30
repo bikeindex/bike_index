@@ -179,6 +179,26 @@ RSpec.describe UI::Tooltip::Component, :js, type: :system do
     page.document.synchronize { raise Capybara::ExpectationNotMet unless last_shown_tooltip == second }
   end
 
+  it "raises by z-index in a browser without popovers" do
+    page.driver.with_playwright_page do |playwright_page|
+      playwright_page.add_init_script(script: <<~JS)
+        for (const name of ["popover", "showPopover", "hidePopover", "togglePopover"]) delete HTMLElement.prototype[name]
+      JS
+    end
+    visit preview_url
+
+    first, second = all("[role='tooltip']", visible: :all).first(2).map { it[:id] }
+    find("[aria-describedby='#{first}']").click
+    find("[aria-describedby='#{second}']").hover
+    expect(find_by_id(first)).to be_visible
+    expect(find_by_id(second)).to be_visible
+    z_index = ->(id) { page.evaluate_script("document.getElementById(#{id.to_json}).style.zIndex").to_i }
+    expect(z_index.call(second)).to be > z_index.call(first)
+    expect(page.evaluate_script("document.getElementById(#{second.to_json}).style.position")).to eq "absolute"
+    find("body").click
+    expect(find_by_id(first, visible: :all)).not_to be_visible
+  end
+
   it "is accessible in dark mode" do
     visit "#{preview_url}?_display=#{CGI.escape({theme: "dark"}.to_json)}"
 
