@@ -20,21 +20,19 @@
       <%= render(UI::Button::Component.new(text: "Delete selected", color: :error, size: :sm, type: :submit)) %>
     <% end %>
 
-    <% table.column(label: table.toggle_all_button) do |bike| %>
-      <%= check_box_tag "bikes_selected[#{bike.id}]", bike.id, false, aria: {label: "Select bike #{bike.id}"}, data: {"table-multi-checkbox-target" => "checkbox"} %>
-    <% end %>
+    <% table.selection_column(param: "bikes_selected") %>
   <% end %>
 
   <% table.column(sortable: "id", label: "Added", classes: "tw:whitespace-nowrap", lower_right: ->(bike) { content_tag(:span, bike.id, class: "only-dev-visible") }) do |bike| %>
     <%= link_to render(UI::Time::Component.new(time: bike.created_at)), edit_admin_bike_url(bike), class: "tw:text-xs" %>
   <% end %>
 
-  <% table.column(sortable: "updated_by_user_at", label: COLUMNS[:updated_cell], classes: "hideableColumn updated_cell tw:text-xs") do |bike| %>
+  <% table.column(sortable: "updated_by_user_at", hideable: :updated_cell, classes: "tw:text-xs") do |bike| %>
     <%= render UI::Time::Component.new(time: bike.updated_by_user_fallback) %>
   <% end %>
 
   <% unless @skip_user %>
-    <% table.column(sortable: "owner_email", label: COLUMNS[:user_cell], classes: "hideableColumn user_cell") do |bike| %>
+    <% table.column(sortable: "owner_email", hideable: :user_cell) do |bike| %>
       <div class="tw:relative">
         <%# Pass in search_url because caching breaks with url_for %>
         <% search_url = bike.user.present? ? admin_bikes_path(user_id: bike.user.id) : admin_bikes_path(search_email: bike.owner_email) %>
@@ -53,7 +51,7 @@
     <% end %>
   <% end %>
 
-  <% table.column(sortable: "manufacturer_id", label: COLUMNS[:manufacturer_cell], classes: "hideableColumn manufacturer_cell") do |bike| %>
+  <% table.column(sortable: "manufacturer_id", hideable: :manufacturer_cell) do |bike| %>
     <% if bike.manufacturer_other.present? %>
       <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>">
         <%= bike.manufacturer_other %>
@@ -67,7 +65,7 @@
     </small>
   <% end %>
 
-  <% table.column(label: COLUMNS[:info_cell], classes: "hideableColumn info_cell") do |bike| %>
+  <% table.column(hideable: :info_cell) do |bike| %>
     <div>
       <%= render Atoms::Admin::Badges::BikeHiddenExplanation::Component.new(bike:) %>
       <%= [bike.year, bike.frame_model_truncated].join(' ') %>
@@ -99,11 +97,11 @@
     </div>
   <% end %>
 
-  <% table.column(label: COLUMNS[:serial_cell], classes: "hideableColumn serial_cell") do |bike| %>
+  <% table.column(hideable: :serial_cell) do |bike| %>
     <small class="tw:text-gray-400"><%= bike.serial_number %></small>
   <% end %>
 
-  <% table.column(label: COLUMNS[:created_by_cell], classes: "hideableColumn created_by_cell") do |bike| %>
+  <% table.column(hideable: :created_by_cell) do |bike| %>
     <% if bike.creation_organization.present? %>
       <%= link_to bike.creation_organization.name, admin_organization_path(bike.creation_organization.to_param) %>
       <%= link_to search_emoji, admin_bikes_path(organization_id: bike.creation_organization.to_param), class: "small display-sortable-link" %>
@@ -120,7 +118,7 @@
     <% end %>
   <% end %>
 
-  <% table.column(label: COLUMNS[:cred_cell], classes: "hideableColumn cred_cell tw:text-right tw:text-xs") do |bike| %>
+  <% table.column(hideable: :cred_cell, classes: "tw:text-right tw:text-xs") do |bike| %>
     <% if bike.credibility_score.present? %>
       <small
         style="color: <%= helpers.credibility_scorer_color_table(bike.credibility_score) %>;"

@@ -2,26 +2,22 @@
   column_settings: {storage_key: "adminBugReportsColumns", columns: COLUMNS, defaults: COLUMNS.keys, narrow_hidden: %i[receiver_cell member_cell invoiced_cell pull_request_cell]},
   form: {url: assign_tags_admin_bug_reports_path, method: :post},
   data: {controller: "update-cached-sortable-links", "update-cached-sortable-links-base-url-value": url_for(@sort_state.search_params)})) do |table| %>
-  <% table.with_description do %>
-    <div class="tw:flex tw:flex-wrap tw:items-end tw:gap-2">
-      <%= render(UI::Forms::Group::Component.new(attribute: :tags, label_text: "Tag to assign", wrapper_class: "tw:mb-0 tw:min-w-64")) do %>
-        <%= render UI::Forms::Combobox::Component.new(name: :tags, options: @searchable_tags, free_text: true, html_options: {placeholder: "Select or create a tag"}) %>
-      <% end %>
+  <% table.with_actions do %>
+    <%= render(UI::Forms::Group::Component.new(attribute: :tags, label_text: "Tag to assign", wrapper_class: "tw:mb-0 tw:min-w-64")) do %>
+      <%= render UI::Forms::Combobox::Component.new(name: :tags, options: @searchable_tags, free_text: true, html_options: {placeholder: "Select or create a tag"}) %>
+    <% end %>
 
-      <%= render(UI::Button::Component.new(text: "Add tag to selected", color: :primary, size: :sm, type: :submit)) %>
-    </div>
+    <%= render(UI::Button::Component.new(text: "Add tag to selected", color: :primary, size: :sm, type: :submit)) %>
   <% end %>
 
-  <% table.column(label: table.toggle_all_button) do |bug_report| %>
-    <%= check_box_tag "bug_reports_selected[#{bug_report.id}]", bug_report.id, false, aria: {label: "Select bug report #{bug_report.id}"}, data: {"table-multi-checkbox-target" => "checkbox"} %>
-  <% end %>
+  <% table.selection_column(param: "bug_reports_selected") %>
 
   <% table.column(sortable: "received_at", label: "Received", lower_right: ->(bug_report) { content_tag(:span, bug_report.id, class: "only-dev-visible") }) do |bug_report| %>
     <%= link_to render(UI::Time::Component.new(time: bug_report.received_at || bug_report.created_at)),
       admin_bug_report_path(bug_report), class: "tw:text-xs" %>
   <% end %>
 
-  <% table.column(sortable: "email", label: COLUMNS[:sender_cell], classes: "hideableColumn sender_cell") do |bug_report| %>
+  <% table.column(sortable: "email", hideable: :sender_cell) do |bug_report| %>
     <% if bug_report.user_id.present? %>
       <%= render Atoms::Admin::TableCells::User::Component.new(user: bug_report.user, user_id: bug_report.user_id) %>
     <% else %>
@@ -33,14 +29,14 @@
     <%= link_to search_emoji, admin_bug_reports_path(search_email: bug_report.email), class: "display-sortable-link small" %>
   <% end %>
 
-  <% table.column(sortable: "receiver", label: COLUMNS[:receiver_cell], classes: "hideableColumn receiver_cell") do |bug_report| %>
+  <% table.column(sortable: "receiver", hideable: :receiver_cell) do |bug_report| %>
     <% if bug_report.receiver.present? %>
       <small><%= BugReport.display_receiver(bug_report.receiver) %></small>
       <%= link_to search_emoji, admin_bug_reports_path(search_receiver: bug_report.receiver), class: "display-sortable-link small" %>
     <% end %>
   <% end %>
 
-  <% table.column(label: COLUMNS[:subject_cell], classes: "hideableColumn subject_cell") do |bug_report| %>
+  <% table.column(hideable: :subject_cell) do |bug_report| %>
     <%= bug_report.display_subject %>
 
     <%= render(UI::Tooltip::Component.new) do |tooltip| %>
@@ -55,21 +51,21 @@
     <% end %>
   <% end %>
 
-  <% table.column(sortable: "status", label: COLUMNS[:status_cell], classes: "hideableColumn status_cell") do |bug_report| %>
+  <% table.column(sortable: "status", hideable: :status_cell) do |bug_report| %>
     <%= BugReport.status_display(bug_report.status) %>
   <% end %>
 
-  <% table.column(label: COLUMNS[:tags_cell], classes: "hideableColumn tags_cell") do |bug_report| %>
+  <% table.column(hideable: :tags_cell) do |bug_report| %>
     <% bug_report.tags.each do |tag| %>
       <code class="tw:text-xs tw:text-black"><%= tag %></code>
     <% end %>
   <% end %>
 
-  <% table.column(label: COLUMNS[:member_cell], classes: "hideableColumn member_cell tw:text-center") do |bug_report| %>
+  <% table.column(hideable: :member_cell, classes: "tw:text-center") do |bug_report| %>
     <%= check_mark if bug_report.is_member %>
   <% end %>
 
-  <% table.column(label: COLUMNS[:invoiced_cell], classes: "hideableColumn invoiced_cell") do |bug_report| %>
+  <% table.column(hideable: :invoiced_cell) do |bug_report| %>
     <%= check_mark if bug_report.is_invoiced_organization %>
 
     <% if bug_report.is_invoiced_organization_staff %>
@@ -77,7 +73,7 @@
     <% end %>
   <% end %>
 
-  <% table.column(sortable: "github_pull_request", label: COLUMNS[:pull_request_cell], classes: "hideableColumn pull_request_cell") do |bug_report| %>
+  <% table.column(sortable: "github_pull_request", hideable: :pull_request_cell) do |bug_report| %>
     <% if bug_report.github_pull_request.present? %>
       <%= link_to "##{bug_report.github_pull_request}", bug_report.github_pull_request_url %>
     <% end %>

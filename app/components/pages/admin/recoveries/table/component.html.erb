@@ -13,21 +13,16 @@
   <% end %>
 
   <% if @editable %>
-    <% table.column(label: table.toggle_all_button) do |(recovery)| %>
-      <div class="tw:flex tw:items-center tw:gap-3">
-        <%= check_box_tag "sr_selected[#{recovery.id}]", recovery.id, false, disabled: !recovery.waiting_on_decision?,
-      aria: {label: "Select recovery #{recovery.id}"}, data: {"table-multi-checkbox-target" => "checkbox"} %>
-
-        <%= render(UI::ButtonLink::Component.new(text: "View", href: edit_admin_recovery_path(recovery), size: :sm)) %>
-      </div>
+    <% table.selection_column(param: "sr_selected", disabled: ->(recovery) { !recovery.waiting_on_decision? }) do |(recovery)| %>
+      <%= render(UI::ButtonLink::Component.new(text: "View", href: edit_admin_recovery_path(recovery), size: :sm)) %>
     <% end %>
   <% end %>
 
-  <% table.column(label: COLUMNS[:photo_cell], classes: "hideableColumn photo_cell") do |(_recovery, bike)| %>
+  <% table.column(hideable: :photo_cell) do |(_recovery, bike)| %>
     <%= render(Atoms::BikeThumbnail::Component.new(bike:)) %>
   <% end %>
 
-  <% table.column(sortable: "recovered_at", label: COLUMNS[:recovered_at_cell], classes: "hideableColumn recovered_at_cell") do |(recovery)| %>
+  <% table.column(sortable: "recovered_at", hideable: :recovered_at_cell) do |(recovery)| %>
     <%= link_to edit_admin_recovery_path(recovery), class: "twlink tw:font-bold tw:whitespace-nowrap" do %>
       <% if recovery.recovered_at.blank? %>
         <span class="tw:text-red-600">no recovery date</span>
@@ -37,11 +32,11 @@
     <% end %>
   <% end %>
 
-  <% table.column(sortable: "date_stolen", label: COLUMNS[:date_stolen_cell], classes: "hideableColumn date_stolen_cell tw:whitespace-nowrap") do |(recovery)| %>
+  <% table.column(sortable: "date_stolen", hideable: :date_stolen_cell, classes: "tw:whitespace-nowrap") do |(recovery)| %>
     <%= render(UI::Time::Component.new(time: recovery.date_stolen)) %>
   <% end %>
 
-  <% table.column(sortable: "recovery_display_status", label: COLUMNS[:status_cell], classes: "hideableColumn status_cell tw:text-xs") do |(recovery)| %>
+  <% table.column(sortable: "recovery_display_status", hideable: :status_cell, classes: "tw:text-xs") do |(recovery)| %>
     <%= recovery.recovery_display_status.humanize %>
 
     <% if recovery.recovery_display.present? %>
@@ -49,7 +44,7 @@
     <% end %>
   <% end %>
 
-  <% table.column(label: COLUMNS[:bike_cell], classes: "hideableColumn bike_cell") do |(recovery, bike)| %>
+  <% table.column(hideable: :bike_cell) do |(recovery, bike)| %>
     <% if bike.present? %>
       <%= link_to edit_admin_bike_path(bike), class: "twlink" do %>
         <strong><%= bike.title_string %></strong>
@@ -63,7 +58,7 @@
     <% end %>
   <% end %>
 
-  <% table.column(label: COLUMNS[:owner_cell], classes: "hideableColumn owner_cell tw:leading-none") do |(recovery, bike)| %>
+  <% table.column(hideable: :owner_cell, classes: "tw:leading-none") do |(recovery, bike)| %>
     <% if bike.present? %>
       <%= bike.owner_email %>
       <%= render(Atoms::Admin::Badges::User::Component.new(user: bike.user)) %>
@@ -81,11 +76,11 @@
     <% end %>
   <% end %>
 
-  <% table.column(label: COLUMNS[:theft_description_cell], classes: "hideableColumn theft_description_cell tw:min-w-56 tw:text-xs tw:text-gray-500") do |(recovery)| %>
+  <% table.column(hideable: :theft_description_cell, classes: "tw:min-w-56 tw:text-xs tw:text-gray-500") do |(recovery)| %>
     <%= recovery.theft_description&.truncate(200) %>
   <% end %>
 
-  <% table.column(label: COLUMNS[:story_cell], classes: "hideableColumn story_cell tw:min-w-72") do |(recovery, _bike, defaults)| %>
+  <% table.column(hideable: :story_cell, classes: "tw:min-w-72") do |(recovery, _bike, defaults)| %>
     <% if defaults %>
       <div
         data-controller="admin--character-count"
@@ -125,7 +120,7 @@
   <% %i[quote_by location_string].each do |field| %>
     <% label = COLUMNS[:"#{field}_cell"] %>
 
-    <% table.column(label:, classes: "hideableColumn #{field}_cell tw:min-w-32") do |(recovery, _bike, defaults)| %>
+    <% table.column(hideable: :"#{field}_cell", classes: "tw:min-w-32") do |(recovery, _bike, defaults)| %>
       <% if defaults %>
         <%= text_field_tag "display[#{recovery.id}][#{field}]", defaults[field], class: "twinput", autocomplete: "off",
             aria: {label: "#{label} for recovery #{recovery.id}"} %>
@@ -135,15 +130,15 @@
     <% end %>
   <% end %>
 
-  <% table.column(label: COLUMNS[:location_cell], classes: "hideableColumn location_cell") do |(recovery)| %>
+  <% table.column(hideable: :location_cell) do |(recovery)| %>
     <%= render(Atoms::Admin::TableCells::AddressRecord::Component.new(address_record: recovery)) %>
   <% end %>
 
-  <% table.column(label: COLUMNS[:helped_cell], classes: "hideableColumn helped_cell tw:text-center") do |(recovery)| %>
+  <% table.column(hideable: :helped_cell, classes: "tw:text-center") do |(recovery)| %>
     <%= check_mark if recovery.index_helped_recovery %>
   <% end %>
 
-  <% table.column(label: COLUMNS[:shareable_cell], classes: "hideableColumn shareable_cell tw:text-center") do |(recovery)| %>
+  <% table.column(hideable: :shareable_cell, classes: "tw:text-center") do |(recovery)| %>
     <%= check_mark if recovery.can_share_recovery %>
   <% end %>
 <% end %>
