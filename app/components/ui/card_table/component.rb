@@ -6,6 +6,7 @@ module UI
     # horizontal scroll. Columns are declared as on UI::Table, and their blocks run there.
     # Given column_settings, it renders its own full-bleed card, under them
     class Component < ApplicationComponent
+      # Template Dependency: UI::Card::Component
       renders_one :description
       renders_one :actions
 
