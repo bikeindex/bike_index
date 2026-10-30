@@ -559,6 +559,26 @@ RSpec.describe BulkImportJob, type: :job do
         expect { described_class.new.perform(bulk_import2.id) }.to change(Bike, :count).by 0
         expect(bulk_import2.reload).to have_attributes(matched_count: 2, no_bikes?: false, import_errors: {})
         expect(BulkImport.no_bikes.pluck(:id)).to eq([])
+        # Run again from the start, it counts the rows again rather than adding to the count
+        bulk_import2.update(progress: "pending")
+        described_class.new.perform(bulk_import2.id)
+        expect(bulk_import2.reload.matched_count).to eq 2
+      end
+
+      it "keeps the count when an error stops the import, and resuming skips the rows before it" do
+        instance.perform(bulk_import.id)
+        register_count = 0
+        allow_any_instance_of(described_class).to receive(:register_bike).and_wrap_original do |method, *args|
+          raise "Unexpected error" if (register_count += 1) == 2
+          method.call(*args)
+        end
+        expect { described_class.new.perform(bulk_import2.id) }.to raise_error("Unexpected error")
+        expect(bulk_import2.reload).to have_attributes(matched_count: 1, file_import_error_lines: [3])
+
+        RSpec::Mocks.space.proxy_for(described_class).reset
+        bulk_import2.update(progress: "pending")
+        expect { described_class.new.perform(bulk_import2.id) }.to change(Bike, :count).by 0
+        expect(bulk_import2.reload).to have_attributes(matched_count: 1, no_bikes?: false)
       end
     end
     context "no_duplicate: false" do
