@@ -11,6 +11,7 @@
 // draws
 
 const inches = (width) => Math.round(width * 25.4)
+const BMX = { kind: 'BMX bike', fork_rake: 28, head_tube: 100, crown: 63, seat_tube: 240 }
 
 export const TYPICAL_GEOMETRY = {
   track_racing: { kind: 'track bike', rim: 622, tire: 23, fork_rake: 40 },
@@ -34,7 +35,8 @@ export const TYPICAL_GEOMETRY = {
   mtb_downhill: { kind: 'downhill mountain bike', rim: null, tire: inches(2.5), fork_rake: 52 },
   mtb_freeride: { kind: 'freeride mountain bike', rim: null, tire: inches(2.3) },
   dj: { kind: 'dirt jump bike', rim: 559, tire: inches(2.25) },
-  bmx: { kind: 'BMX bike', fork_rake: 28, head_tube: 119, crown: 63, seat_tube: 240 },
-  bmx_race: { kind: 'BMX bike', fork_rake: 28, head_tube: 119, crown: 63, seat_tube: 240 },
-  bmx_freestyle: { kind: 'BMX bike', fork_rake: 28, head_tube: 119, crown: 63, seat_tube: 240 }
+  bmx: BMX,
+  bmx_race: BMX,
+  bmx_freestyle: BMX,
+  bmx_flatland: BMX
 }

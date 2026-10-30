@@ -1091,7 +1091,7 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(frames).to eq([[[-414, 70], [606, 70], [446, 457], [-146, 478], [0, 0]], 281, [], [-414, 70], ["seat_tube_ct"], ["fork_rake"], ["fork_rake"],
       [["fork_rake"], "road bike"],
       [625, 70], [616, 70], [453, 438], ["head_tube"], [33, 34], [[405, 572], %w[reach stack]], ["wheel_size"], [360, 361, ["wheel_size"]], 9,
-      [[367, 567], %w[reach stack], %w[fork_rake fork_length_a2c head_tube]], [339, {"bsd" => 622, "tire" => 28, "rimListed" => true}], 341,
+      [[372, 549], %w[reach stack], %w[fork_rake fork_length_a2c head_tube]], [339, {"bsd" => 622, "tire" => 28, "rimListed" => true}], 341,
       {"missing" => %w[reach stack top_tube_effective front_center head_tube], "wheels" => {"rearRadius" => 351, "frontRadius" => 351, "wheelbase" => 1020}},
       [[], %w[fork_rake fork_length_a2c head_tube]]])
     # a BMX's unlisted seat tube runs its top tube over its standover above the bottom bracket, the same as over its
@@ -1104,7 +1104,7 @@ RSpec.describe "BikeBook", :js, type: :system do
         return [seatTube({ standover_above_bb: 235 }), seatTube({ standover: 516 }), seatTube({})]
       })
     JS
-    expect(seat_tubes).to eq([128, 128, 240])
+    expect(seat_tubes).to eq([134, 134, 240])
 
     size_select.call("Current EXP").select("Small")
     expect_size.call("Current EXP", "Small")
