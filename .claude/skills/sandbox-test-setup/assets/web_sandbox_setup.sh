@@ -128,7 +128,7 @@ setup_system() {
 
   # Playwright MCP's `chrome` channel: fixed path, and --no-sandbox because we're root
   local chrome_dir
-  chrome_dir="$(ls -d /opt/pw-browsers/chromium-*/chrome-linux 2>/dev/null | sort -V | tail -1)"
+  chrome_dir="$(ls -d /opt/pw-browsers/chromium-*/chrome-linux* 2>/dev/null | sort -V | tail -1)"
   mkdir -p /root/.cache/ms-playwright
   if [ -x "$chrome_dir/chrome" ]; then
     mkdir -p /opt/google/chrome

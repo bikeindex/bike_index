@@ -1,7 +1,4 @@
-<div
-  data-controller="admin--social-post-form"
-  data-admin--social-post-form-max-character-count-value="<%= Integrations::SocialPoster::TWEET_LENGTH %>"
->
+<div data-controller="admin--social-post-form">
   <%= render(UI::Alerts::ObjectError::Component.new(object: @social_post)) %>
 
   <%= form_for [:admin, @social_post] do |f| %>
@@ -36,20 +33,24 @@
           </div>
 
           <div class="col-md-6">
-            <div class="form-group">
+            <div
+              class="form-group"
+              data-controller="admin--character-count"
+              data-admin--character-count-max-value="<%= Integrations::SocialPoster::TWEET_LENGTH %>"
+            >
               <%= f.label :body do %>
                 Post
                 <small class="less-strong">Make sure the text is under the character count</small>
               <% end %>
 
               <%= f.text_area :body, rows: 4, class: "form-control",
-                    data: {"admin--social-post-form-target": "characterCounter", action: "input->admin--social-post-form#setCharacterCount"} %>
+                    data: {"admin--character-count-target": "field", action: "input->admin--character-count#update"} %>
 
               <p
                 class="text-info text-right"
                 style="margin-top: -0.4rem; font-size: 150%;"
               >
-                <span data-admin--social-post-form-target="characterTotal"></span>
+                <span data-admin--character-count-target="total"></span>
               </p>
             </div>
           </div>
