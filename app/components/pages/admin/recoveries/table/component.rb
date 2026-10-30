@@ -54,13 +54,14 @@ module Pages
           end
 
           def card_options
-            options = {columns: COLUMNS, narrow_hidden: %i[photo_cell recovered_at_cell]}
+            column_settings = {columns: COLUMNS, narrow_hidden: %i[photo_cell recovered_at_cell]}
             # A bike's page has the bike already
-            return options.merge(storage_key: "adminBikeRecoveriesColumns", defaults: DEFAULT_COLUMNS - %i[photo_cell bike_cell]) unless @editable
+            return {column_settings: column_settings.merge(storage_key: "adminBikeRecoveriesColumns", defaults: DEFAULT_COLUMNS - %i[photo_cell bike_cell])} unless @editable
 
-            options.merge(storage_key: "adminRecoveriesColumns", defaults: DEFAULT_COLUMNS, form: {url: bulk_update_admin_recoveries_path, method: :patch},
-              data: {controller: "admin--personal-info", action: "submit->admin--personal-info#confirmDisplay",
-                     "admin--personal-info-patterns-value": PERSONAL_INFO.transform_values { {label: it[:label], source: it[:pattern].source} }.to_json})
+            {column_settings: column_settings.merge(storage_key: "adminRecoveriesColumns", defaults: DEFAULT_COLUMNS),
+             form: {url: bulk_update_admin_recoveries_path, method: :patch},
+             data: {controller: "admin--personal-info", action: "submit->admin--personal-info#confirmDisplay",
+                    "admin--personal-info-patterns-value": PERSONAL_INFO.transform_values { {label: it[:label], source: it[:pattern].source} }.to_json}}
           end
         end
       end
