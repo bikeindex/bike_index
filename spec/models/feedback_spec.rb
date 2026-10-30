@@ -48,6 +48,19 @@ RSpec.describe Feedback, type: :model do
       expect(feedback.kind_humanized).to eq "School lead"
     end
 
+    context "with a lead name that fills the column" do
+      let(:name) { "S" * 255 }
+
+      it "truncates the generated title, and rejects a longer name or email rather than overflowing the column" do
+        feedback = Feedback.create(feedback_type: "lead_for_bike_shop", email: "shop@example.com", name:)
+        expect(feedback).to be_persisted
+        expect(feedback.title.length).to eq 255
+
+        expect(Feedback.new(feedback_type: "lead_for_bike_shop", email: "shop@example.com", name: "#{name}S")).to_not be_valid
+        expect(Feedback.new(feedback_type: "lead_for_bike_shop", email: "#{name}@example.com", name: "Shop")).to_not be_valid
+      end
+    end
+
     it "sets the body for a lead submitted with a blank message, and keeps its role" do
       feedback = Feedback.create(feedback_type: "lead_for_city", email: "staff@example.gov", name: "Portland",
         body: "", contact_role: "law_enforcement")

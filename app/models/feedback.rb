@@ -45,6 +45,7 @@ class Feedback < ApplicationRecord
 
   validates_presence_of :email, :title
   validates_presence_of :body, unless: :lead?
+  validates :name, :email, :title, length: {maximum: 255}
 
   attr_accessor :additional
 
@@ -192,7 +193,7 @@ class Feedback < ApplicationRecord
   def generate_title
     return true if title.present? || lead_type.blank?
 
-    self.title = "New #{lead_type} lead: #{name}"
+    self.title = "New #{lead_type} lead: #{name}".truncate(255)
   end
 
   def set_user_attrs
