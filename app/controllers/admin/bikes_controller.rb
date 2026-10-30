@@ -198,7 +198,7 @@ module Admin
 
     def matching_bikes
       bikes = if params[:user_id].present?
-        Bike.current_owner(user_subject.id)
+        Bike.unscoped.current_owner(user_subject.id)
       elsif params[:search_phone].present?
         Bike.search_phone(params[:search_phone])
       else

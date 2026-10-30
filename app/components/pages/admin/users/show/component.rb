@@ -19,7 +19,7 @@ module Pages
           end
 
           def deleted_bikes_count
-            @deleted_bikes_count ||= Bike.current_owner(@user.id).only_deleted.count
+            @deleted_bikes_count ||= Bike.unscoped.current_owner(@user.id).only_deleted.count
           end
 
           def marketplace_messages

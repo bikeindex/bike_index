@@ -30,7 +30,7 @@ module UserServices
       # Ordering by bikes.id walks bikes_pkey for users with thousands of bikes;
       # ownerships.id uses the (user_id, id) index
       def bikes_for_user(user)
-        Bike.current_owner(user.id).without_deleted.non_example
+        Bike.current_with_user_hidden.current_owner(user.id)
           .order("ownerships.id")
       end
     end
