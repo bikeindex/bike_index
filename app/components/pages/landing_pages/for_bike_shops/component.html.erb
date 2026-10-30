@@ -353,7 +353,8 @@
 
         <p class="tw:m-0 tw:mt-3.5 tw:text-[15px] tw:text-slate-900">
           <%= translation(".contact_us_for_bulk_orders_html",
-            contact_link: mail_to(support_email, translation(".contact_us"), class: "twlink-underlined tw:font-bold")) %>
+            contact_link: mail_to("gavin@bikeindex.org", translation(".contact_us"),
+              subject: translation(".bulk_order_email_subject"), class: "twlink-underlined tw:font-bold")) %>
         </p>
       </div>
 
