@@ -93,14 +93,18 @@ RSpec.describe "Bikes API V3", type: :request do
     end
 
     context "impounded as found" do
+      let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user:) }
       let!(:impound_record) { FactoryBot.create(:impound_record, bike: bike) }
 
-      it "returns status found" do
+      it "returns status found, with the serial only for the owner" do
         expect(impound_record.kind).to eq "found"
         bike.reload
         get "/api/v3/bikes/#{bike.id}", params: {format: :json}
         expect(response.code).to eq("200")
         expect(json_result["bike"].compact).to eq target.merge("status" => "found", "serial" => "Hidden")
+
+        get "/api/v3/bikes/#{bike.id}", params: {format: :json, access_token: token.token}
+        expect(json_result["bike"]["serial"]).to eq bike.serial_number.upcase
       end
     end
 

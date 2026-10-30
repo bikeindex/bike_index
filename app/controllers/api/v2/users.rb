@@ -64,7 +64,7 @@ module API
         get "/current/bikes", hidden: true do
           ActiveModel::ArraySerializer.new(current_user.bikes,
             each_serializer: BikeV2Serializer,
-            root: "bikes").as_json
+            root: "bikes", scope: current_user).as_json
         end
       end
     end
