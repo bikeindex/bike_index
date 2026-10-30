@@ -5585,6 +5585,10 @@ nl:
         included_columns: Inbegrepen kolommen
         none: geen
         visible_columns: Zichtbare kolommen
+        return_to_default_column_order: Terug naar de standaard kolomvolgorde
+      drag_handle:
+        move: Verplaats %{name}
+        moved: Positie %{position} van %{count}
     atoms:
       serial:
         hidden: verborgen
@@ -5790,6 +5794,11 @@ nl:
             status_at_cell_panel: Tijd - Status
             status_records: "%{status} records"
             unregistered_cell: Niet geregistreerd
+            copy_column_order_from_impounded_vehicles_search: Kopieer de kolomvolgorde
+              van de zoekopdracht naar in beslag genomen voertuigen.
+            copy_column_order_from_registrations_search: Kopieer de kolomvolgorde
+              uit de zoekopdracht naar registraties.
+            impound_search_columns: Inbeslagname zoekkolommen
           column_settings_toggle:
             column_settings: Kolominstellingen
           settings_and_filters:
@@ -5880,6 +5889,9 @@ nl:
           map_unavailable: De kaart kon niet worden geladen; de locatie was nog steeds
             ingesteld via uw apparaat.
           set_on_map: Op de kaart plaatsen
+        registration_sequence:
+          page_edit_bullet:
+            bullet: kogel
       registrations:
         show:
           bike_details:

@@ -5684,6 +5684,10 @@ it:
         included_columns: Colonne incluse
         none: nessuno
         visible_columns: Colonne visibili
+        return_to_default_column_order: Ripristina l'ordine predefinito delle colonne
+      drag_handle:
+        move: Sposta %{name}
+        moved: Posizione %{position} di %{count}
     atoms:
       serial:
         hidden: nascosto
@@ -5888,6 +5892,11 @@ it:
             status_at_cell_panel: Tempo - Stato
             status_records: "%{status} record"
             unregistered_cell: Non registrato
+            copy_column_order_from_impounded_vehicles_search: Copia l'ordine delle
+              colonne dalla ricerca dei veicoli sequestrati
+            copy_column_order_from_registrations_search: Copia l'ordine delle colonne
+              dalla ricerca delle registrazioni
+            impound_search_columns: Colonne di ricerca per i sequestri
           column_settings_toggle:
             column_settings: Impostazioni della colonna
           settings_and_filters:
@@ -5976,6 +5985,9 @@ it:
           map_unavailable: 'Impossibile caricare la mappa: la posizione è ancora impostata
             dal tuo dispositivo.'
           set_on_map: Imposta sulla mappa
+        registration_sequence:
+          page_edit_bullet:
+            bullet: proiettile
       registrations:
         show:
           bike_details:
