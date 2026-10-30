@@ -2,10 +2,9 @@
 
 module UI
   module BulkTableCard
-    # A full-bleed card around a UI::CardTable, rendered as its content, with its column settings
-    # and, given a form, bulk actions on the rows it checks. The table's first column is the rows'
-    # checkboxes, each a table-multi-checkbox target, under toggle_all_button. Editing a row's
-    # field checks it, and a submit button with data-discards-edits confirms before dropping edits
+    # A full-bleed card around a UI::CardTable, its content, and its column settings. Given a form,
+    # actions apply to the rows checked: a first column of table-multi-checkbox targets, under
+    # toggle_all_button
     class Component < ApplicationComponent
       renders_one :description
       renders_one :actions

@@ -64,7 +64,7 @@ class RecoveryDisplay < ActiveRecord::Base
     def first_name(name) = name.to_s.split.find { !HONORIFIC.match?(it) }
 
     # Not Ownership#owner, which falls back to the creator - a shop's staff, for an unclaimed bike.
-    # owner_name is set on save, so it misses a rename since
+    # owner_name is a snapshot, stale after the account is renamed
     def calculated_owner_name(bike) = bike&.user&.name.presence || bike&.owner_name
   end
 
