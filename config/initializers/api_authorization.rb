@@ -87,8 +87,8 @@ module APIAuthorization
       @endpoint_auth_declaration = env["api.endpoint"]&.options&.dig(:route_options, :authorizations)
       if endpoint_protected?
         doorkeeper_authorize!
-      elsif !doorkeeper_access_token&.accessible?
-        # A public endpoint ignores a bad token, but a valid one identifies the user
+      elsif !(doorkeeper_access_token&.accessible? && resource_owner&.confirmed?)
+        # A public endpoint ignores a token it won't honor rather than rejecting the request
         return
       end
       # Assign the access_token and the user to the request object, so it can be accessed
