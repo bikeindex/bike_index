@@ -69,10 +69,10 @@ en:
             other programs can be child accounts with their own staff and education
             content. Staff at each level manage only their own rules.
           faq_account_question: Who manages the account?
-          faq_checker_answer: >-
-            Bike details come from BikeBook, a catalog of e-bike models with their
-            class, motor, speed, and UL certification. State rules are listed with
-            the statutes behind them.
+          faq_checker_answer_html: >-
+            Bike details come from %{bikebook_link}, a catalog of e-bike models with
+            their class, motor, speed, and UL certification. State rules are listed
+            with the statutes behind them.
           faq_checker_question: Where does the compliance checker get its data?
           faq_cost_answer: >-
             There are no per-registration fees, and registering is free for residents.

@@ -21,7 +21,7 @@
       <% if outside_us %>
         <div class="tw:mt-7 tw:flex tw:flex-col tw:gap-8">
           <% outside_us[:laws].each do |law| %>
-            <%= render(UI::Card::Component.new(shadow: true, additional_classes: "tw:rounded-lg tw:p-6!")) do %>
+            <%= render(UI::Card::Component.new(additional_classes: "tw:rounded-lg tw:p-6!")) do %>
               <%= render(Pages::EbikeRules::LawSummary::Component.new(law:, titled: true)) %>
             <% end %>
           <% end %>

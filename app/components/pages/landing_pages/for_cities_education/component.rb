@@ -9,7 +9,7 @@ module Pages
         DEFAULT_ORGANIZATION = :school
         # Here rather than on the cities page, which would put that page in this cached fragment's digest
         PANEL_CLASSES = "tw:scroll-mt-24 tw:[grid-area:1/1] tw:focus:outline-none"
-        STICKER_CLASSES = "tw:flex tw:items-center tw:gap-4 tw:rounded-lg tw:border-3 tw:border-black tw:bg-white tw:px-5 tw:py-4.5 tw:shadow-[4px_4px_0_#111] tw:dark:bg-gray-800"
+        STICKER_CLASSES = "tw:flex tw:items-center tw:gap-4 tw:rounded-lg! tw:px-5 tw:py-4.5"
 
         private
 

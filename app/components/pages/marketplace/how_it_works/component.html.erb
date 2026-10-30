@@ -95,7 +95,7 @@
       "
     >
       <% delivery_options.each do |title, body| %>
-        <%= render(UI::Card::Component.new(additional_classes: "tw:flex tw:flex-col tw:gap-2.5 tw:rounded-lg! tw:p-7! tw:shadow-[0_4px_12px_rgba(44,62,80,.12)]")) do %>
+        <%= render(UI::Card::Component.new(additional_classes: "tw:flex tw:flex-col tw:gap-2.5 tw:rounded-lg! tw:p-7!")) do %>
           <h3 class="tw:text-xl tw:font-bold"><%= title %></h3>
 
           <p class="tw:m-0 tw:leading-[1.6] <%= BODY_CLASSES %>">
@@ -118,14 +118,7 @@
 </section>
 
 <section class="tw:py-16 <%= SECTION_CLASSES %>">
-  <div
-    class="
-      tw:grid tw:grid-cols-[repeat(auto-fit,minmax(min(100%,300px),1fr))]
-      tw:items-start tw:gap-6 tw:rounded-lg tw:border-3 tw:border-[#111]
-      tw:px-8 tw:py-7 tw:shadow-[4px_4px_0_#111] tw:dark:border-gray-300
-      tw:dark:shadow-[4px_4px_0_var(--color-gray-300)]
-    "
-  >
+  <%= render(UI::Card::Component.new(shadow: :black, additional_classes: "tw:grid tw:grid-cols-[repeat(auto-fit,minmax(min(100%,300px),1fr))] tw:items-start tw:gap-6 tw:rounded-lg! tw:px-8 tw:py-7")) do %>
     <div class="tw:flex tw:flex-col tw:gap-2">
       <%# Bangers in the design; Montserrat stands in rather than loading a font for one heading %>
       <h2
@@ -152,7 +145,7 @@
         <li><%= tip %></li>
       <% end %>
     </ul>
-  </div>
+  <% end %>
 </section>
 
 <%= render(SharedBlocks::Marketing::CallToActionBanner::Component.new(heading: translation(".ready_heading"))) do %>

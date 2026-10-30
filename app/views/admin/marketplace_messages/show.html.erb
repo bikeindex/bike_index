@@ -172,7 +172,7 @@
 </div>
 
 <div class="mt-4">
-  <%= render(UI::Card::Component.new(shadow: true)) do %>
+  <%= render(UI::Card::Component.new(shadow: :small)) do %>
     <p><strong>subject:</strong><%= @marketplace_message.subject %></p>
 
     <%= render(UI::UserTextBlockDisplay::Component.new(text: @marketplace_message.body, max_height_class: "")) %>

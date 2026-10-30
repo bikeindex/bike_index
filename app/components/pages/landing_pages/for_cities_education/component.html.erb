@@ -154,16 +154,16 @@
             <% end %>
           </ol>
 
-          <div class="<%= STICKER_CLASSES %>">
+          <%= render(UI::Card::Component.new(shadow: :black, additional_classes: STICKER_CLASSES)) do %>
             <%= image_tag "kelsey/illustrations/comic-assets_bike-bell.png", alt: "", loading: "lazy", width: 65, height: 64, class: "tw:h-16 tw:w-auto tw:flex-none" %>
 
             <p class="tw:text-[15px] tw:leading-normal">
               <%= translation(".staff_edit") %>
             </p>
-          </div>
+          <% end %>
         </div>
 
-        <%= render(UI::Card::Component.new(additional_classes: "tw:grid tw:w-full tw:max-w-[520px] tw:justify-self-center tw:rounded-lg! tw:px-7 tw:pt-7 tw:pb-6 tw:shadow-[0_4px_12px_rgba(44,62,80,.12)] tw:lg:col-start-2 tw:lg:row-span-2 tw:lg:row-start-1")) do %>
+        <%= render(UI::Card::Component.new(shadow: :large, additional_classes: "tw:grid tw:w-full tw:max-w-[520px] tw:justify-self-center tw:rounded-lg! tw:px-7 tw:pt-7 tw:pb-6 tw:lg:col-start-2 tw:lg:row-span-2 tw:lg:row-start-1")) do %>
           <%#
             Every step shares one grid cell, hidden by visibility rather than display, so the card
             keeps the tallest step's height instead of jumping as the rider moves through them
