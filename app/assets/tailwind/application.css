@@ -15,8 +15,7 @@
 @import "./lexxy_overrides.css";
 
 /* Class-based dark mode (the legacy config's darkMode: 'selector'); a `.dark`
- * ancestor activates tw:dark:* utilities. An `.inverted` block flips it, so its content
- * styles itself as on the page and comes out the other way round. */
+ * ancestor activates tw:dark:* utilities. An `.inverted` ancestor flips it. */
 @custom-variant dark {
   &:where(.dark, .dark *):not(:where(.inverted, .inverted *)) {
     @slot;
