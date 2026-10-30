@@ -18,7 +18,7 @@ export function moveByKey (event, items, move) {
   announce(handle.dataset.movedMessage.replace('%{position}', index + 1).replace('%{count}', before.length))
 }
 
-// Follows the pointer pressed in `down` until it's let go: move(event) as it moves, then drop(event)
+// Follows the pointer pressed in `down` until it's let go: move(event) as it moves, then drop()
 // and done(). A gesture the browser takes over (pointercancel) skips the drop. Returns the function
 // that stops following early, as a controller disconnecting mid-drag needs
 export function followPointer (down, { move, drop, done }) {
@@ -26,27 +26,20 @@ export function followPointer (down, { move, drop, done }) {
   const onMove = (event) => { if (ours(event)) move(event) }
   const onUp = (event) => {
     if (!ours(event)) return
-    stop()
-    drop(event)
-    done()
+    drop()
+    finish()
   }
-  const onCancel = (event) => {
-    if (!ours(event)) return
-    stop()
-    done()
-  }
-  const stop = () => {
+  const onCancel = (event) => { if (ours(event)) finish() }
+  const finish = () => {
     document.removeEventListener('pointermove', onMove)
     document.removeEventListener('pointerup', onUp)
     document.removeEventListener('pointercancel', onCancel)
+    done()
   }
   document.addEventListener('pointermove', onMove)
   document.addEventListener('pointerup', onUp)
   document.addEventListener('pointercancel', onCancel)
-  return () => {
-    stop()
-    done()
-  }
+  return finish
 }
 
 // A drag starts from the main button, and from the first finger alone

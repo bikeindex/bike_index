@@ -45,9 +45,10 @@ export class CollapseUtils {
   // sized by its basis rather than its width. The edges - padding, border and
   // margin - go to 0 with it, or they'd stay until display:none and jump.
   static axis (direction) {
-    const [start, end] = direction === 'horizontal' ? ['Left', 'Right'] : ['Top', 'Bottom']
+    const horizontal = direction === 'horizontal'
+    const [start, end] = horizontal ? ['Left', 'Right'] : ['Top', 'Bottom']
     const edges = [`padding${start}`, `padding${end}`, `border${start}Width`, `border${end}Width`, `margin${start}`, `margin${end}`]
-    return direction === 'horizontal'
+    return horizontal
       ? { dimension: 'width', styles: ['width', 'flexBasis'], edges, scale: 'tw:scale-x-0' }
       : { dimension: 'height', styles: ['height'], edges, scale: 'tw:scale-y-0' }
   }

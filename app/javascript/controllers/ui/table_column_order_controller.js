@@ -19,7 +19,7 @@ export default class extends Controller {
     this.defaultOrder = this.#order
     this.applyOrder(storedArray(this.storageKeyValue))
     this.#toggleActions(0)
-    window.addEventListener('storage', this.#onStorage)
+    if (this.hasCopyTarget) window.addEventListener('storage', this.#onStorage)
   }
 
   disconnect () {
@@ -28,7 +28,9 @@ export default class extends Controller {
   }
 
   // The order the copy target copies, saved from another tab
-  #onStorage = () => this.#toggleActions()
+  #onStorage = (event) => {
+    if (event.key === this.copyTarget.dataset.storageKey) this.#toggleActions()
+  }
 
   // Reconnects each time applyOrder moves its header, which the shared listener makes harmless
   handleTargetConnected (handle) {
@@ -46,6 +48,7 @@ export default class extends Controller {
     this.dragged = event.target.closest('th.hideableColumn')
     this.dragged.classList.add('tw:opacity-50')
     this.scroller = this.dragged.closest('table').parentElement
+    this.dragHeaders = this.headers
     this.stopFollowing = followPointer(event, { move: this.#onPointerMove, drop: this.#drop, done: this.#done })
   }
 
@@ -60,12 +63,12 @@ export default class extends Controller {
   #indicate () {
     const { left, right } = this.scroller.getBoundingClientRect()
     const x = Math.min(Math.max(this.pointerX, left), right - 1)
-    const th = this.headers.find(header => {
-      const box = header.getBoundingClientRect()
+    let box
+    const th = this.dragHeaders.find(header => {
+      box = header.getBoundingClientRect()
       return x >= box.left && x < box.right
     })
     if (!th) return
-    const box = th.getBoundingClientRect()
     this.dropAfter = x > box.left + box.width / 2
     if (th !== this.indicated) this.clearIndicator()
     this.indicated = th
@@ -95,7 +98,6 @@ export default class extends Controller {
     this.dragged?.classList.remove('tw:opacity-50')
     this.dragged = null
     this.clearIndicator()
-    this.stopFollowing = null
   }
 
   #move (th, target, after) {
@@ -111,7 +113,7 @@ export default class extends Controller {
 
   // The order it copies can have gone in the meantime, from another tab
   copy () {
-    const order = this.#copiedOrder
+    const order = this.#copiedOrder()
     order ? this.#reorder(order) : this.#toggleActions()
   }
 
@@ -122,25 +124,23 @@ export default class extends Controller {
       storage.setItem(this.storageKeyValue, JSON.stringify(order))
     }
     this.applyOrder(order)
-    this.#toggleActions()
+    this.#toggleActions(undefined, order)
   }
 
   // The copied table's order for the columns both have, each of this one's own keeping its place
-  get #copiedOrder () {
+  #copiedOrder (order = this.#order) {
     const source = this.hasCopyTarget && storedArray(this.copyTarget.dataset.storageKey)
     if (!source) return null
-    const order = this.#order
     const shared = source.filter(name => order.includes(name))
     let index = 0
     return order.map(name => shared.includes(name) ? shared[index++] : name)
   }
 
   // Left as they were while the row collapses, so it doesn't empty first
-  #toggleActions (duration) {
+  #toggleActions (duration, order = this.#order) {
     if (!this.hasActionsTarget) return
-    const order = this.#order
     const moved = !sameOrder(order, this.defaultOrder)
-    const copied = this.#copiedOrder
+    const copied = this.#copiedOrder(order)
     const copyable = Boolean(copied) && !sameOrder(copied, order)
     if (!moved && !copyable) return collapse('hide', this.actionsTarget, duration)
 

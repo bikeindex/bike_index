@@ -63,6 +63,8 @@ RSpec.describe "Organized impound records index", :js, type: :system do
 
   def visible_column_order = all("thead th.hideableColumn").map { it[:class][/\w+_cell/] }
 
+  def shared_with(order) = visible_column_order & order
+
   it "loads results via turbo, filters by unregisteredness, then applies multi-updates" do
     # The results-frame component opts the page out of Turbo's snapshot cache
     expect(page).to have_css('meta[name="turbo-cache-control"][content="no-cache"]', visible: :all)
@@ -99,14 +101,13 @@ RSpec.describe "Organized impound records index", :js, type: :system do
     expect(page).to have_css("turbo-frame#impound_records_results_frame table tbody tr", count: 4, wait: 10)
 
     # Its own columns apart, and the registrations search's order copied onto the columns both have
-    shared_order = -> { visible_column_order & registrations_order }
-    expect(shared_order.call).not_to eq registrations_order & shared_order.call
+    expect(shared_with(registrations_order)).not_to eq registrations_order & shared_with(registrations_order)
     click_button "Column settings"
     expect(page).to have_css("h3", text: "Impound search columns")
     expect(page).to have_no_button("Return to default column order")
     click_button "Copy column order from registrations search"
     expect(page).to have_no_button("Copy column order from registrations search")
-    expect(shared_order.call).to eq registrations_order & shared_order.call
+    expect(shared_with(registrations_order)).to eq registrations_order & shared_with(registrations_order)
     click_button "Return to default column order"
     expect(page).to have_button("Copy column order from registrations search")
     # Gone once the registrations search is back in its default order, in another window
@@ -130,12 +131,11 @@ RSpec.describe "Organized impound records index", :js, type: :system do
     impound_order = visible_column_order
     visit "/o/#{organization.to_param}/registrations"
     expect(page).to have_css("turbo-frame#organized_bikes_results_frame[complete] table", wait: 10)
-    shared_with_impound = -> { visible_column_order & impound_order }
-    expect(shared_with_impound.call).not_to eq impound_order & shared_with_impound.call
+    expect(shared_with(impound_order)).not_to eq impound_order & shared_with(impound_order)
     click_button "Column settings"
     click_button "Copy column order from impounded vehicles search"
     expect(page).to have_no_button("Copy column order from impounded vehicles search")
-    expect(shared_with_impound.call).to eq impound_order & shared_with_impound.call
+    expect(shared_with(impound_order)).to eq impound_order & shared_with(impound_order)
     visit base_url
     expect(page).to have_css("turbo-frame#impound_records_results_frame table tbody tr", count: 4, wait: 10)
 

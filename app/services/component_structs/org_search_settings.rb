@@ -267,7 +267,7 @@ module ComponentStructs
         *ALWAYS_ENABLED_COLUMNS,
         *additional_registration_fields.map { |field| "#{field}_cell" },
         ("notes_cell" if @organization.enabled?("registration_notes")),
-        ("impound_id_cell" if @organization.enabled?("impound_bikes")),
+        ("impound_id_cell" if impound_search?),
         ("avery_cell" if @organization.enabled?("avery_export")),
         ("acknowledgment_cell" if @organization.enabled?("registration_sequences"))
       ].compact.uniq

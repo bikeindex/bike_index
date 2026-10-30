@@ -20,7 +20,7 @@ export default class extends Controller {
 
   moveByKey (event) {
     moveByKey(event, () => [...this.element.querySelectorAll('[data-hw-combobox-chip]')], (chip, target, after) => {
-      target.parentNode.insertBefore(chip, after ? target.nextSibling : target)
+      after ? target.after(chip) : target.before(chip)
       this.#syncOrder()
     })
   }
@@ -63,7 +63,6 @@ export default class extends Controller {
     this.dragging?.classList.remove('tw:opacity-50')
     this.dragging = null
     this.indicator.remove()
-    this.stopFollowing = null
   }
 
   #syncOrder () {

@@ -57,7 +57,6 @@ export default class extends Controller {
     this.draggingItem?.classList.remove('tw:opacity-50')
     this.draggingItem = null
     this.dropTarget = null
-    this.stopFollowing = null
   }
 
   moveByKey (event) {
