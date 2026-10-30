@@ -1,7 +1,7 @@
 <li class="<%= class_names("tw:flex tw:flex-col", "tw:min-w-0": grid?) %>">
-  <% if @unfinished_b_param %>
+  <% if @unfinished_b_param && !grid? %>
     <div class="tw:mb-2">
-      <%= render(SharedBlocks::UserAlerts::UnfinishedRegistration::Component.new(b_param: @unfinished_b_param, current_user: @current_user, kind: :error, margin_classes: "tw:mb-0")) %>
+      <%= render(Pages::MyAccount::Show::BikeAlerts::Component.new(bike: @bike, current_user: @current_user, unfinished_b_param: @unfinished_b_param)) %>
     </div>
   <% end %>
 
@@ -48,8 +48,8 @@
 
         <div
           class="
-            tw:flex tw:flex-wrap tw:gap-4 tw:border-t tw:border-gray-100
-            tw:px-4 tw:py-3 tw:text-sm tw:font-semibold
+            tw:flex tw:flex-wrap tw:gap-x-3 tw:gap-y-1 tw:border-t
+            tw:border-gray-100 tw:px-4 tw:py-3 tw:text-sm tw:font-semibold
             tw:dark:border-gray-800
           "
         >
@@ -127,18 +127,9 @@
     <% end %>
   <% end %>
 
-  <% if @user_alerts.any? %>
-    <div class="tw:mt-2 tw:flex tw:flex-col tw:gap-4">
-      <% @user_alerts.each do |user_alert| %>
-        <%= render(UI::Alerts::Base::Component.new(margin_classes: "tw:mb-0")) do %>
-          <%= translation(".generally_connect_to_org", org_name: user_alert.organization&.short_name) %>
-          <%= render(UI::ButtonLink::Component.new(text: translation(".add_it_now"), href: user_alert_path(id: user_alert.id, add_bike_organization: true), method: :patch, color: :primary, size: :sm, form: {class: "tw:ml-1 tw:inline-block"})) %>
-
-          <div class="tw:mt-2 tw:text-sm">
-            <%= link_to translation(".ignore_this_suggestion"), user_alert_path(id: user_alert.id, alert_action: "dismiss"), method: :patch, class: "twlink-underlined twless-strong tw:inline-block tw:py-1" %>
-          </div>
-        <% end %>
-      <% end %>
+  <% if @user_alerts.any? && !grid? %>
+    <div class="tw:mt-2">
+      <%= render(Pages::MyAccount::Show::BikeAlerts::Component.new(bike: @bike, current_user: @current_user, user_alerts: @user_alerts)) %>
     </div>
   <% end %>
 </li>

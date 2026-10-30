@@ -43,6 +43,10 @@ module Pages
 
         def unfinished_b_params = @unfinished_b_params ||= Pages::MyAccount::Show::BikeBox::Component.unfinished_b_params(@bikes)
 
+        def bikes_with_alerts
+          @bikes.select { |bike| unfinished_b_params.key?(bike.id) || user_alerts.any? { it.bike_id == bike.id } }
+        end
+
         def link_bikes_path
           bike = @bikes.first
           edit_bike_path(bike, edit_template: "versions") if bike.present?

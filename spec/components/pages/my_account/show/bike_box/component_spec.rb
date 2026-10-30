@@ -29,6 +29,18 @@ RSpec.describe Pages::MyAccount::Show::BikeBox::Component, type: :component do
   context "in the grid" do
     let(:component) { render_inline(described_class.new(bike: bike.reload, current_user: user, view: :grid)) }
 
+    context "with alerts" do
+      let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills") }
+      let!(:user_alert) { FactoryBot.create(:user_alert, user:, bike:, organization:, kind: "unassigned_bike_org") }
+
+      before { UserAlert.refresh_alert_slugs(user) }
+
+      it "leaves them to the page, so the tile keeps its height" do
+        grid = render_inline(described_class.new(bike: bike.reload, current_user: user, view: :grid, user_alerts: described_class.user_alerts(user.reload)))
+        expect(grid).not_to have_css("[role=alert]")
+      end
+    end
+
     it "renders the tile, with the shorter action names" do
       expect(component).to have_css("strong", text: "Surly")
       expect(component).to have_text("SUR-77120934")

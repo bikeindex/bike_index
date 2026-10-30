@@ -55,6 +55,29 @@ RSpec.describe Pages::MyAccount::Show::Component, type: :component do
       end
     end
 
+    context "with an unassigned_bike_org alert" do
+      let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills") }
+      let!(:user_alert) { FactoryBot.create(:user_alert, user:, bike:, organization:, kind: "unassigned_bike_org") }
+
+      before { UserAlert.refresh_alert_slugs(user) }
+
+      it "renders it with its bike, saying 'this one'" do
+        expect(component).to have_css("li [role=alert]", text: "but this one is not")
+        expect(component).not_to have_css("[role=alert] a[href='/bikes/#{bike.id}']")
+      end
+
+      context "in the grid" do
+        let(:view) { :grid }
+
+        it "stacks it above the tiles, naming the bike, and leaves the tile alone" do
+          expect(component).to have_css("[role=alert]", count: 1, text: "but #{bike.title_string} is not")
+          expect(component).to have_css("[role=alert] a[href='/bikes/#{bike.id}']", text: bike.title_string)
+          expect(component).not_to have_css("li [role=alert]")
+          expect(component).to have_css("form[action='/user_alerts/#{user_alert.id}?add_bike_organization=true'] button", text: "Add it now!")
+        end
+      end
+    end
+
     context "on the locks tab" do
       let(:locks_tab) { true }
 

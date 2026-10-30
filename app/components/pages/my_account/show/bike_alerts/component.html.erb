@@ -1,0 +1,21 @@
+<div class="tw:flex tw:flex-col tw:gap-4">
+  <% if @unfinished_b_param %>
+    <%= render(SharedBlocks::UserAlerts::UnfinishedRegistration::Component.new(b_param: @unfinished_b_param, current_user: @current_user, kind: :error, margin_classes: "tw:mb-0")) %>
+  <% end %>
+
+  <% @user_alerts.each do |user_alert| %>
+    <%= render(UI::Alerts::Base::Component.new(margin_classes: "tw:mb-0")) do %>
+      <% if @named %>
+        <%= translation(".generally_connect_to_org_named_html", org_name: user_alert.organization&.short_name, bike: link_to(@bike.title_string, bike_path(@bike))) %>
+      <% else %>
+        <%= translation(".generally_connect_to_org", org_name: user_alert.organization&.short_name) %>
+      <% end %>
+
+      <%= render(UI::ButtonLink::Component.new(text: translation(".add_it_now"), href: user_alert_path(id: user_alert.id, add_bike_organization: true), method: :patch, color: :primary, size: :sm, form: {class: "tw:ml-1 tw:inline-block"})) %>
+
+      <div class="tw:mt-2 tw:text-sm">
+        <%= link_to translation(".ignore_this_suggestion"), user_alert_path(id: user_alert.id, alert_action: "dismiss"), method: :patch, class: "twlink-underlined twless-strong tw:inline-block tw:py-1" %>
+      </div>
+    <% end %>
+  <% end %>
+</div>

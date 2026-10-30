@@ -112,6 +112,15 @@
       </div>
     <% end %>
   <% elsif @bikes.any? %>
+    <% if @view == :grid && bikes_with_alerts.any? %>
+      <div class="tw:flex tw:flex-col tw:gap-4">
+        <% bikes_with_alerts.each do |bike| %>
+          <%= render(Pages::MyAccount::Show::BikeAlerts::Component.new(bike:, current_user: @user, named: true,
+                user_alerts: user_alerts.select { it.bike_id == bike.id }, unfinished_b_param: unfinished_b_params[bike.id])) %>
+        <% end %>
+      </div>
+    <% end %>
+
     <ul class="<%= class_names("tw:m-0 tw:grid tw:list-none tw:p-0", "tw:grid-cols-[repeat(auto-fill,minmax(230px,1fr))] tw:gap-[18px]": @view == :grid, "tw:gap-3.5": @view == :list) %>">
       <% @bikes.each do |bike| %>
         <%= render(Pages::MyAccount::Show::BikeBox::Component.new(bike:, current_user: @user, view: @view, user_alerts:, unfinished_b_params:)) %>
