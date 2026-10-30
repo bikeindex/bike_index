@@ -8,9 +8,22 @@
 <% paint_for = ->(bike) { unmatched_paint(bike) } %>
 <% searched_other_name = @searched_other_name %>
 
-<%= render(UI::Table::Component.new(records: @bikes)) do |table| %>
-  <% table.column(label: toggle_all_button) do |bike| %>
-    <%= check_box_tag "bikes_selected[#{bike.id}]", bike.id, false,
+<%= render(UI::CardTable::Component.new(records: @bikes,
+  column_settings: {storage_key: "adminMissingManufacturerColumns", columns: COLUMNS, defaults: COLUMNS.keys, narrow_hidden: %i[created_by_cell]},
+  form: {url: update_manufacturers_admin_bikes_path, method: :post})) do |table| %>
+  <%# Not in actions, which renders twice and would submit a second, blank manufacturer %>
+  <% table.with_description do %>
+    <div class="tw:flex tw:flex-wrap tw:items-end tw:gap-2">
+      <%= render(UI::Forms::Group::Component.new(attribute: :manufacturer_id, label_text: Manufacturer.model_name.human, wrapper_class: "tw:mb-0 tw:min-w-64")) do %>
+        <%= render UI::Forms::ComboboxManufacturer::Component.new(frame_maker: true, no_manufacturer_other: true) %>
+      <% end %>
+
+      <%= render(UI::Button::Component.new(text: "Update selected", color: :primary, size: :sm, type: :submit)) %>
+    </div>
+  <% end %>
+
+  <% table.column(label: table.toggle_all_button) do |bike| %>
+    <%= check_box_tag "bikes_selected[#{bike.id}]", bike.id, false, aria: {label: "Select bike #{bike.id}"},
           data: {"table-multi-checkbox-target": "checkbox"} %>
   <% end %>
 
@@ -40,7 +53,7 @@
     <% end %>
   <% end %>
 
-  <% table.column(label: "Info") do |bike| %>
+  <% table.column(label: COLUMNS[:info_cell], classes: "hideableColumn info_cell") do |bike| %>
     <%= describe.call(bike) %>
 
     <% if paint_for.call(bike).present? %>
@@ -55,7 +68,7 @@
     </span>
   <% end %>
 
-  <% table.column(label: "Created by") do |bike| %>
+  <% table.column(label: COLUMNS[:created_by_cell], classes: "hideableColumn created_by_cell") do |bike| %>
     <% if bike.creation_organization.present? %>
       <%= link_to bike.creation_organization.name, admin_organization_path(bike.creation_organization), class: "twlink" %>
     <% end %>
