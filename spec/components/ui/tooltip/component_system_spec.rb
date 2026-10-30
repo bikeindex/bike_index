@@ -23,8 +23,13 @@ RSpec.describe UI::Tooltip::Component, :js, type: :system do
     JS
   end
 
-  def tooltip_z_index(id)
-    page.evaluate_script("document.getElementById(#{id.to_json}).style.zIndex")
+  def top_layer?(id)
+    page.evaluate_script("document.getElementById(#{id.to_json}).matches(':popover-open')")
+  end
+
+  # The top layer stacks popovers in the order they were shown
+  def last_shown_tooltip
+    page.evaluate_script("window.shownTooltips.at(-1)")
   end
 
   it "renders accessibly and supports the full hover/focus/click state machine" do
@@ -47,9 +52,10 @@ RSpec.describe UI::Tooltip::Component, :js, type: :system do
     body_tooltip = find(".tooltip-body-imperial", visible: :all).find(:xpath, "ancestor::*[@role='tooltip']", visible: :all)
     expect(body_tooltip).to have_css(".tooltip-body-imperial", text: "5 mi", visible: :all)
 
-    # Hover shows, mouseleave hides
+    # Hover shows, mouseleave hides - in the top layer, which no ancestor's opacity or overflow reaches
     trigger.hover
     expect(tooltip).to be_visible
+    expect(top_layer?(tooltip_ids.first)).to be true
     expect(tooltip_position(tooltip_ids.first)).to include("top" => be_present, "left" => be_present)
     find("body").hover
     expect(tooltip).not_to be_visible
@@ -158,13 +164,19 @@ RSpec.describe UI::Tooltip::Component, :js, type: :system do
     find("body").click
     expect(commit_tooltip).not_to be_visible
 
-    # One hovered goes above one held open, though another was open when it opened and has closed since
+    # One hovered goes above one held open, and one held open goes back above it once hovered again
+    page.execute_script(<<~JS)
+      window.shownTooltips = []
+      document.addEventListener("toggle", (event) => event.newState === "open" && window.shownTooltips.push(event.target.id), true)
+    JS
     first, second, third = tooltip_ids.first(3)
     find("[aria-describedby='#{first}']").click
     find("[aria-describedby='#{second}']").click
     find("[aria-describedby='#{third}']").hover
     expect(find_by_id(second)).to be_visible
-    expect(tooltip_z_index(third).to_i).to be > tooltip_z_index(second).to_i
+    page.document.synchronize { raise Capybara::ExpectationNotMet unless last_shown_tooltip == third }
+    find("[aria-describedby='#{second}']").hover
+    page.document.synchronize { raise Capybara::ExpectationNotMet unless last_shown_tooltip == second }
   end
 
   it "is accessible in dark mode" do

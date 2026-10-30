@@ -103,7 +103,7 @@ export async function unpickedVehicles (catalog, page, url) {
 const pickedOf = (catalog, url, { market }) => catalog.vehicles(url.searchParams.get('vehicle_models')?.split(',') ?? [], { market })
 
 // The models most like the first of `vehicles` where the catalog publishes what it compares, scored once their section
-// is open, of those the `filters`' market leaves
+// is open, of those the `filters` leave
 const similarOf = async (catalog, url, vehicles, filters) => {
   if (!catalog.comparable || !vehicles.length) return null
   const settings = settingsFrom(url.searchParams)

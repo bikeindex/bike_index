@@ -1,8 +1,11 @@
 import { Controller } from '@hotwired/stimulus'
 import { computePosition, flip, shift, offset, arrow, autoUpdate } from '@floating-ui/dom'
-import { claimFloatingZIndex, releaseFloatingZIndex } from 'utils/floating_z_index'
 
 // Connects to data-controller="ui--tooltip"
+//
+// Shown as a manual popover, in the top layer: an ancestor's opacity - a disabled
+// control's - its overflow clipping and its stacking context don't reach it there.
+// The top layer stacks in the order shown, so raising one shows it again.
 //
 // State model: two independent flags, OR'd together.
 //   hoverActive       toggled by mouseenter/mouseleave
@@ -35,6 +38,12 @@ export default class extends Controller {
     this.keydownEscape = this.keydownEscape.bind(this)
   }
 
+  // A popover's UA styles center it in the viewport and clip the arrow hanging off its edge
+  tooltipTargetConnected (tooltip) {
+    tooltip.popover = 'manual'
+    Object.assign(tooltip.style, { margin: '0', inset: 'auto', overflow: 'visible' })
+  }
+
   disconnect () {
     this.close()
   }
@@ -42,7 +51,10 @@ export default class extends Controller {
   // The one under the pointer goes on top, though another was opened since
   showOnHover () {
     this.hoverActive = true
-    if (this.isOpen) claimFloatingZIndex(this.tooltipTarget)
+    if (this.isOpen) {
+      this.tooltipTarget.hidePopover()
+      this.tooltipTarget.showPopover()
+    }
     this.sync()
   }
 
@@ -96,8 +108,8 @@ export default class extends Controller {
   open () {
     if (this.isOpen) return
     this.isOpen = true
-    claimFloatingZIndex(this.tooltipTarget)
     this.tooltipTarget.classList.remove('tw:hidden')
+    this.tooltipTarget.showPopover()
     document.addEventListener('keydown', this.keydownEscape)
     this.cleanup = autoUpdate(this.triggerTarget, this.tooltipTarget, () => this.updatePosition())
   }
@@ -105,7 +117,7 @@ export default class extends Controller {
   close () {
     if (!this.isOpen) return
     this.isOpen = false
-    releaseFloatingZIndex(this.tooltipTarget)
+    if (this.tooltipTarget.matches(':popover-open')) this.tooltipTarget.hidePopover()
     this.tooltipTarget.classList.add('tw:hidden')
     document.removeEventListener('pointerdown', this.pointerdownOutside)
     document.removeEventListener('keydown', this.keydownEscape)
@@ -118,12 +130,13 @@ export default class extends Controller {
   async updatePosition () {
     const { x, y, placement, middlewareData } = await computePosition(this.triggerTarget, this.tooltipTarget, {
       placement: this.placementValue,
+      strategy: 'fixed',
       middleware: [offset(8), flip(), shift({ padding: 4 }), arrow({ element: this.arrowTarget, padding: 4 })]
     })
     Object.assign(this.tooltipTarget.style, {
       left: `${x}px`,
       top: `${y}px`,
-      position: 'absolute'
+      position: 'fixed'
     })
 
     const { edge, borderWidth } = ARROW_SIDES[placement.split('-')[0]]
