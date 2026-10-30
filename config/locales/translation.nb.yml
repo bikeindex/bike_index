@@ -5427,6 +5427,10 @@ nb:
         included_columns: Inkluderte kolonner
         none: ingen
         visible_columns: Synlige kolonner
+        return_to_default_column_order: Gå tilbake til standard kolonnerekkefølge
+      drag_handle:
+        move: Flytt %{name}
+        moved: Posisjon %{position} til %{count}
     atoms:
       serial:
         hidden: skjult
@@ -5623,6 +5627,11 @@ nb:
             status_at_cell_panel: Tid - Status
             status_records: "%{status} poster"
             unregistered_cell: Uregistrert
+            copy_column_order_from_impounded_vehicles_search: Kopier kolonnerekkefølge
+              fra søk etter beslaglagte kjøretøy
+            copy_column_order_from_registrations_search: Kopier kolonnerekkefølge
+              fra registreringssøk
+            impound_search_columns: Beslaglegg søkekolonner
           column_settings_toggle:
             column_settings: Kolonneinnstillinger
           settings_and_filters:
@@ -5709,6 +5718,9 @@ nb:
           map_unavailable: Kartet kunne ikke lastes inn – posisjonen var fortsatt
             angitt fra enheten din.
           set_on_map: Sett på kartet
+        registration_sequence:
+          page_edit_bullet:
+            bullet: kule
       registrations:
         show:
           bike_details:
