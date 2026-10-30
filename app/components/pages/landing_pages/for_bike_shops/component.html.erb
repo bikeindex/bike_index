@@ -259,13 +259,20 @@
             </div>
 
             <ul class="tw:m-0 tw:grid tw:list-none tw:gap-4 tw:p-0">
-              <% card[:rows].each do |icon, title, body| %>
+              <% card[:rows].each do |icon, title, body, tools_link| %>
                 <li class="tw:flex tw:items-start tw:gap-3">
                   <%= helpers.inline_svg_tag(icon, class: "tw:mt-px tw:size-5.5 tw:shrink-0 #{card[:color]}", aria_hidden: true) %>
 
                   <div>
                     <strong class="tw:text-slate-900"><%= title %></strong>
                     <%= body %>
+
+                    <% if tools_link %>
+                      <%= link_to("#free-tools", class: "twlink tw:font-semibold tw:whitespace-nowrap") do %>
+                        <%= translation(".see_the_tools") %>
+                        <span aria-hidden="true">↓</span>
+                      <% end %>
+                    <% end %>
                   </div>
                 </li>
               <% end %>
@@ -517,7 +524,10 @@
     </section>
   <% end %>
 
-  <section class="tw:pb-12 tw:md:pb-18 <%= section_inner %> <%= "tw:pt-12 tw:md:pt-18" if @recovery_displays.none? %>">
+  <section
+    id="free-tools"
+    class="tw:scroll-mt-8 tw:pb-12 tw:md:pb-18 <%= section_inner %> <%= "tw:pt-12 tw:md:pt-18" if @recovery_displays.none? %>"
+  >
     <p class="tw:text-purple-500 <%= eyebrow_classes %>">
       <%= translation(".more_from_bike_index") %>
     </p>

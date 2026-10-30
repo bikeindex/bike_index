@@ -64,6 +64,9 @@ en:
           free_registration: Free registration.
           free_registration_body: Their bike is on record before they ride away.
           free_tools: Free tools for you and your customers
+          free_tools_choose_body: to help customers choose.
+          free_tools_fun_body: to make bike ownership more fun.
+          free_tools_title: Free tools
           help_if_stolen: Help if it's stolen.
           help_if_stolen_body: One click sends an alert to shops, police, and riders.
           hero_lede: >-
@@ -101,6 +104,7 @@ en:
           safe: SAFE!
           safer_used_bike_sales: Safer used-bike sales.
           safer_used_bike_sales_body: Check serials against the registry.
+          see_the_tools: See the tools
           send_every_bike_home_with_a_sidekick: Send every bike home with a sidekick.
           set_it_and_forget_it: Set it and forget it
           shop_name: Shop name
