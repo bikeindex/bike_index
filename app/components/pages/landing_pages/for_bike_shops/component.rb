@@ -56,7 +56,7 @@ module Pages
             {title: translation(".for_your_shop"), burst: translation(".pow"), color: "tw:text-purple-500",
              rows: [["icons/timer.svg", translation(".nothing_to_manage"), translation(".nothing_to_manage_body")],
                ["icons/heart-handshake.svg", translation(".a_reason_to_trust_you"), translation(".a_reason_to_trust_you_body")],
-               ["icons/searcher.svg", translation(".safer_used_bike_sales"), translation(".safer_used_bike_sales_body")],
+               ["icons/lucide-search.svg", translation(".safer_used_bike_sales"), translation(".safer_used_bike_sales_body")],
                ["icons/wrench.svg", translation(".free_tools_title"), translation(".free_tools_choose_body"), true]]}]
         end
 
