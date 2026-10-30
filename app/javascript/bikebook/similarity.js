@@ -182,13 +182,13 @@ export const scorer = (models, { format, fields }, activities) => {
       }))
     })
     const groups = [...new Set(listed.map(({ group }) => group))]
+    const wheels = sameWheels ? ['front_bsd', 'rear_bsd'].filter((field) => columns[field][target] != null).map((field) => ({ field, kind: 'same' })) : []
     const [same, other] = [listed, listed.filter(({ group }) => group !== 'ebike')].map((fields) => {
       const weighted = fields.filter(({ weight }) => weight > 0)
       return {
         weighted,
         available: weighted.reduce((total, { weight }) => total + weight, 0),
-        required: [...weighted.filter(({ group, kind }) => weights[group] === MAX_WEIGHT && REQUIRABLE.includes(kind)),
-          ...(sameWheels ? ['front_bsd', 'rear_bsd'].filter((field) => columns[field][target] != null).map((field) => ({ field, kind: 'same' })) : [])]
+        required: [...weighted.filter(({ group, kind }) => weights[group] === MAX_WEIGHT && REQUIRABLE.includes(kind)), ...wheels]
       }
     })
     if (!same.available) return { groups, models: [] }

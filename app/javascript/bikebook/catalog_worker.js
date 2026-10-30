@@ -135,17 +135,13 @@ const scorer = () => {
 
 // the last scoring kept, as the page asks again on each render while the section is open. Of the models the search's
 // `filters` leave, of the model's own propulsion and vehicle type where they pick none
-async function similar ({ model, settings, filters }) {
+async function similar ({ model, settings, filters: { sort, year_dir: yearDir, price_dir: priceDir, ...filters } }) {
   const score = await scorer()
   const key = JSON.stringify({ model, settings, filters })
   if (lastSimilar?.key !== key) {
-    const matches = filter(filters)
     const own = byId.get(model)
-    lastSimilar = {
-      key,
-      result: score?.(model, settings, (candidate) => matches(candidate) && (filters.electric || candidate.electric === own?.electric) &&
-        (filters.vehicle_type || candidate.vehicle_type === own?.vehicle_type)) ?? null
-    }
+    const matches = filter({ ...filters, electric: filters.electric || (own?.electric ? '1' : '0'), vehicle_type: filters.vehicle_type || own?.vehicle_type })
+    lastSimilar = { key, result: score?.(model, settings, matches) ?? null }
   }
   return lastSimilar.result
 }

@@ -5,6 +5,8 @@ import { configurationNote } from 'bikebook/templates/vehicles/configuration_not
 import { marketNote } from 'bikebook/templates/vehicles/market_note'
 import { array, present } from 'bikebook/templates/values'
 
+const HEADING = 'tw:inline tw:font-extrabold'
+
 export const manufacturerLine = (manufacturer) => present(manufacturer)
   ? html`<p class="tw:mb-1 tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">${manufacturer}</p>`
   : nothing
@@ -18,9 +20,7 @@ export const modelLine = ({ model, data, value, market, configurations, heading 
     marketNote({ markets: array(data.markets), market })}`
   return html`<div class=${heading ? 'tw:text-2xl tw:leading-tight' : ''}>${present(data.motors)
     ? html`${inlineBadge({ text: '⚡', title: 'E-vehicle', color: 'purple', size })} `
-    : nothing}${heading === 'h1'
-    ? html`<h1 class="tw:inline tw:font-extrabold">${name}</h1>`
-    : heading === 'h3' ? html`<h3 class="tw:inline tw:font-extrabold">${name}</h3>` : name} <span
+    : nothing}${{ h1: html`<h1 class=${HEADING}>${name}</h1>`, h3: html`<h3 class=${HEADING}>${name}</h3>` }[heading] ?? name} <span
     class="tw:inline-block tw:align-middle">${copyButton({ value, label: 'Copy ID', tooltip: true })}</span></div>`
 }
 

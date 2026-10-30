@@ -5,8 +5,7 @@ import { configurationNote } from 'bikebook/templates/vehicles/configuration_not
 import { marketNote } from 'bikebook/templates/vehicles/market_note'
 
 const years = (text) => html`<span class="tw:text-sm tw:tabular-nums tw:text-gray-400 tw:dark:text-gray-500">${text}</span>`
-const CURRENT = html`<span class="tw:rounded-full tw:bg-[#f0f0f2] tw:px-1.5 tw:text-xs tw:font-medium tw:text-[#666666] tw:dark:bg-gray-800
-  tw:dark:text-gray-400">current</span>`
+const CURRENT = badge({ text: 'current', size: 'sm' })
 
 const yearBadge = ({ first_year: first, final_year: final }) => {
   if (final) return years(first && first !== final ? `${first}-${final}` : final)

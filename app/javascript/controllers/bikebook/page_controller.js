@@ -3,7 +3,7 @@ import { CatalogComboboxSource, loadCatalog, renderCounts } from 'bikebook/catal
 import { hydrate, loadingShell, pickedVehicles, rescoredSimilar, unpickedVehicles } from 'bikebook/hydrate'
 import { keepPermanent, renderInto } from 'bikebook/render'
 import { readable } from 'bikebook/replace_url'
-import { FILTERS, searching } from 'bikebook/query'
+import { NARROWING, searching } from 'bikebook/query'
 import { collapse } from 'utils/collapse_utils'
 import { SearchLog } from 'bikebook/search_log'
 import { realigned, storePreferredSize, withSize } from 'bikebook/sizes'
@@ -98,13 +98,14 @@ export default class extends Controller {
   }
 
   // A filter changes in place, which with nothing picked the featured models and their count follow, and the picked
-  // ones too, as a jurisdiction or market decides which are out of class and which are sold elsewhere, and every filter
-  // which similar ones show, unless the page renders or the filters change again first
+  // ones a jurisdiction or market, which decide which are out of class and which are sold elsewhere, or while the similar
+  // ones are open any that narrows them, unless the page renders or the filters change again first
   async refilter () {
     const viewers = this.pageTarget.querySelector('#vehicle-viewers')
     const url = new URL(window.location.href)
     const unpicked = viewers?.querySelector(':scope > [data-controller~="bikebook--tips"]')
-    const changed = FILTERS.some((name) => url.searchParams.get(name) !== this.#renderedUrl?.searchParams.get(name))
+    const names = url.searchParams.get('similar') === '1' ? NARROWING : ['jurisdiction', 'market', 'market_scope']
+    const changed = names.some((name) => url.searchParams.get(name) !== this.#renderedUrl?.searchParams.get(name))
     if (!this.catalog || !viewers || (!unpicked && !changed)) return
 
     const render = this.#renders
