@@ -107,7 +107,7 @@ RSpec.describe "BikesController#update", type: :request do
         bike.reload
         expect(bike.address_record).to have_attributes(target_address_record_attributes)
         expect(bike.address_set_manually).to be_truthy
-        expect(bike.registration_address).to match_hash_indifferently(target_address_record_attributes.slice(:latitude, :longitude))
+        expect(bike.registration_address_record).to have_attributes(target_address_record_attributes.slice(:latitude, :longitude))
         # NOTE: There is an issue with coordinate precision locally vs on CI. It isn't relevant, so bypassing
         expect(bike.latitude).to be_within(0.01).of(53.5183351)
         expect(bike.longitude).to be_within(0.01).of(-113.5015663)
@@ -372,21 +372,6 @@ RSpec.describe "BikesController#update", type: :request do
         receive_notifications: "1",
         id: stolen_record.id
       }
-    end
-
-    context "with legacy stolen attribute names" do
-      let(:legacy_stolen_params) do
-        stolen_params.except(:postal_code, :region_record_id).merge(zipcode: "10007", state_id: state.id)
-      end
-      it "updates with the renamed attributes" do
-        expect(bike.reload.current_stolen_record_id).to eq stolen_record.id
-        patch base_url, params: {bike: {stolen: "true", stolen_records_attributes: {"0" => legacy_stolen_params}}}
-        expect(flash[:success]).to be_present
-        stolen_record.reload
-        expect(stolen_record.street).to eq "278 Broadway"
-        expect(stolen_record.postal_code).to eq "10007"
-        expect(stolen_record.region_record_id).to eq state.id
-      end
     end
 
     it "clears the existing alert image" do

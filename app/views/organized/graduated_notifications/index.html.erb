@@ -42,7 +42,7 @@
 
     <div class="tw:min-w-0">
       <%= render("organized/search_chart_card", id: :graduated_notifications_chart,
-        src: organization_graduated_notifications_path(sortable_search_params.merge(organization_id: current_organization.to_param, chart_only: "1"))) %>
+        src: organization_graduated_notifications_path(sortable_search_params.merge(organization_id: current_organization.to_param))) %>
     </div>
   </div>
 <% end %>

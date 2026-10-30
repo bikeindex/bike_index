@@ -43,12 +43,15 @@ class Feedback < ApplicationRecord
   belongs_to :user
   belongs_to :mailchimp_datum
 
-  validates_presence_of :body, :email, :title
+  validates_presence_of :email, :title
+  validates_presence_of :body, unless: :lead?
   validates :name, length: {maximum: 255}
 
   attr_accessor :additional
 
   before_validation :set_calculated_attributes
+  # On save rather than validation, so a lead that fails doesn't come back to the form saying "lead"
+  before_save { self.body = "lead" if lead? && body.blank? }
 
   after_create :notify_admins
 
@@ -97,6 +100,10 @@ class Feedback < ApplicationRecord
     return "#{str.gsub("lead_for_", "").strip.humanize} lead" if str.match?("lead")
 
     str.gsub("_request", "").strip.humanize
+  end
+
+  def contact_role=(val)
+    self.feedback_hash = (feedback_hash || {}).merge(contact_role: val)
   end
 
   def package_size=(val)
@@ -154,6 +161,10 @@ class Feedback < ApplicationRecord
     (feedback_hash || {})["contact_name"]
   end
 
+  def contact_role
+    (feedback_hash || {})["contact_role"]
+  end
+
   def kind_humanized
     self.class.kind_humanized(kind)
   end
@@ -164,11 +175,11 @@ class Feedback < ApplicationRecord
   end
 
   def set_calculated_attributes
+    self.name = name.to_s.strip.presence
     generate_title
     set_user_attrs
     self.email = EmailNormalizer.normalize(email)
     self.kind ||= calculated_kind
-    self.body ||= "lead" if lead?
     self.feedback_type ||= kind
   end
 

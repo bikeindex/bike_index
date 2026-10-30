@@ -10,7 +10,7 @@
       data-sortable-target="item"
       class="tw:flex tw:items-center tw:gap-3 tw:p-3"
     >
-      <%= render UI::DragHandle::Component.new(controller: "sortable") %>
+      <%= render UI::DragHandle::Component.new(controller: "sortable", label:) %>
       <span><%= label %></span>
     </div>
   <% end %>

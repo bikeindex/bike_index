@@ -85,7 +85,7 @@ end
 
 def seed_organization_member(organization:, email:, name: nil, role: "member")
   user = User.find_by_email(email) ||
-    User.create!(name:, email:, password: "pleaseplease12", password_confirmation: "pleaseplease12", terms_of_service: true)
+    User.create!(name:, email:, password: SeedHelpers::PASSWORD, password_confirmation: SeedHelpers::PASSWORD, terms_of_service: true)
   user.confirm(user.confirmation_token) unless user.confirmed?
   OrganizationRole.find_or_create_by!(organization_id: organization.id, user_id: user.id, role:)
   user

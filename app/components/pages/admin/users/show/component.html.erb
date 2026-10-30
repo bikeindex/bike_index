@@ -421,6 +421,9 @@
 <h4 class="mt-4">
   Bikes
   <small><%= link_to number_display(@bikes_count), admin_bikes_path(user_id: @user.id) %></small>
+  <% if deleted_bikes_count > 0 %>
+    <small>(<%= render UI::ButtonLink::Component.new(text: safe_join([number_display(deleted_bikes_count), " deleted"]), href: admin_bikes_path(user_id: @user.id, search_status_deleted_only: true, search_status_example: true), color: :link_gray) %>)</small>
+  <% end %>
 </h4>
 
 <% if @bikes_count > 0 %>

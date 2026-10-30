@@ -50,6 +50,42 @@ RSpec.describe Counts do
     end
   end
 
+  context "logged_searches" do
+    let(:request_at) { Time.current.beginning_of_day }
+    let!(:bikebook_search) { FactoryBot.create(:logged_search, endpoint: :web_bikebook, serial_normalized: "XXX", request_at:) }
+    let!(:serial_search) { FactoryBot.create(:logged_search, endpoint: :web_bikes, serial_normalized: "XXX", request_at:) }
+    let!(:no_serial_search) { FactoryBot.create(:logged_search, endpoint: :api_v3_bikes, request_at:) }
+    let!(:ebike_rules_search) { FactoryBot.create(:logged_search, endpoint: :web_ebike_rules, request_at:) }
+    let!(:marketplace_search) { FactoryBot.create(:logged_search, endpoint: :web_marketplace, request_at:) }
+    let!(:marketplace_serial_search) { FactoryBot.create(:logged_search, endpoint: :web_marketplace, serial_normalized: "XXX", request_at:) }
+    let!(:marketplace_count_search) { FactoryBot.create(:logged_search, endpoint: :web_marketplace_count, request_at:) }
+    let!(:organized_search) { FactoryBot.create(:logged_search, endpoint: :org_bikes, request_at:) }
+    let!(:organized_serial_search) { FactoryBot.create(:logged_search, endpoint: :org_impounded, serial_normalized: "XXX", request_at:) }
+    let!(:yesterday_search) { FactoryBot.create(:logged_search, endpoint: :web_bikebook, request_at: request_at - 1.minute) }
+    let!(:earlier_search) { FactoryBot.create(:logged_search, endpoint: :web_marketplace, request_at: request_at - 1.day - 1.minute) }
+    let(:empty_counts) { Counts::LOGGED_SEARCH_KINDS.to_h { [it, 0] } }
+
+    it "stores yesterday's and today's counts" do
+      dates = [Date.current - 2.days, Date.yesterday, Date.current]
+      expect(Counts.logged_searches(dates)).to eq(dates.to_h { [it, empty_counts] })
+      Counts.assign_logged_searches
+      expect(Counts.logged_searches(dates)).to eq(
+        Date.current - 2.days => empty_counts,
+        Date.yesterday => empty_counts.merge("web_bikebook" => 1),
+        Date.current => {"web_bikebook" => 1, "web_ebike_rules" => 1, "organized" => 1, "organized_serial" => 1,
+                         "user" => 1, "user_serial" => 1, "web_marketplace" => 2}
+      )
+    end
+
+    it "stores the counts for the passed dates" do
+      Counts.assign_logged_searches([Date.current - 2.days])
+      expect(Counts.logged_searches([Date.current - 2.days, Date.yesterday])).to eq(
+        Date.current - 2.days => empty_counts.merge("web_marketplace" => 1),
+        Date.yesterday => empty_counts
+      )
+    end
+  end
+
   context "recoveries" do
     let!(:recovered_bike) { FactoryBot.create(:stolen_record_recovered, recovered_at: Time.current - 1.day) }
     it "returns constant" do

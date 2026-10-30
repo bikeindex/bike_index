@@ -2,12 +2,9 @@
   <tbody>
     <tr>
       <td class="image-holder <%= 'placeholder' if placeholder? %>">
-        <a
-          href="<%= @bike_url_path %>"
-          data-pm-no-track="<%= skip_link_tracking? %>"
-        >
+        <%= render(Emails::Partials::TokenLink::Component.new(href: @bike_url_path, html_class: nil)) do %>
           <%= image_tag thumb_url, alt: translation("bike_photo", bike_type: @bike.type_titleize) %>
-        </a>
+        <% end %>
       </td>
 
       <td class="info-holder">

@@ -8,6 +8,16 @@ RSpec.describe FeedbacksController, type: :request do
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)
     end
+
+    context "logged in" do
+      include_context :request_spec_logged_in_as_user
+
+      it "renders the detail prompt and the message template" do
+        get base_url
+        expect(response.body).to match(/The more detail you can share/)
+        expect(response.body).to match(/Bike serial number \(if applicable\):/)
+      end
+    end
   end
 
   describe "create" do
@@ -129,6 +139,25 @@ RSpec.describe FeedbacksController, type: :request do
           end
         end
       end
+
+      context "from a demo modal that names where to return" do
+        let(:lead_params) { {name: "Chicago", feedback_type: "lead_for_city", email: "example@example.com"} }
+
+        it "re-renders and returns there, not at the /feedbacks a failed submit left as the referer" do
+          post base_url, params: {feedback: lead_params.merge(email: " "), return_to: "/for_cities#lead-sent"},
+            headers: {"HTTP_REFERER" => "http://www.example.com/feedbacks", "HTTP_CF_IPCOUNTRY" => "US", "HTTP_CF_REGION" => "Indiana"}
+          expect(response).to render_template("landing_pages/for_cities")
+          expect(Capybara.string(response.body)).to have_field("state", type: :hidden, with: "US-IN")
+
+          post base_url, params: {feedback: lead_params, return_to: "/for_cities#lead-sent"},
+            headers: {"HTTP_REFERER" => "http://www.example.com/feedbacks"}
+          expect(response).to redirect_to "http://www.example.com/for_cities#lead-sent"
+
+          post base_url, params: {feedback: lead_params, return_to: "https://evil.example.org/for_cities"},
+            headers: {"HTTP_REFERER" => "http://www.example.com/for_cities"}
+          expect(response).to redirect_to "http://www.example.com/for_cities"
+        end
+      end
     end
 
     context "feedback with additional" do
@@ -159,7 +188,7 @@ RSpec.describe FeedbacksController, type: :request do
           log_in(user)
           expect {
             post base_url, params: {feedback: feedback_attrs.merge(body: "")},
-              headers: {"HTTP_REFERER" => for_schools_url}
+              headers: {"HTTP_REFERER" => "http://www.example.com/for_schools"}
           }.to change(EmailJobs::FeedbackNotificationJob.jobs, :count).by(0)
           expect(response).to render_template("landing_pages/for_schools")
           feedback = assigns(:feedback)

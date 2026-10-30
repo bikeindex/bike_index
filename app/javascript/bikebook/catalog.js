@@ -1,11 +1,13 @@
 import { html, nothing } from 'lit-html'
 import { numberDisplay, uuid } from 'bikebook/templates/helpers'
-import { classificationOption, comboboxOption } from 'bikebook/templates/vehicles/combobox_option'
-import { fragmentOf } from 'bikebook/render'
+import { classificationOption } from 'bikebook/templates/vehicles/class_cards'
+import { comboboxOption } from 'bikebook/templates/vehicles/combobox_option'
+import { fragmentOf, renderInto } from 'bikebook/render'
 
 /* global IntersectionObserver, Worker */
 
-export async function loadCatalog (manifestUrl, ids = []) {
+// `jurisdictions` names the codes classifications are in, which the catalog doesn't
+export async function loadCatalog (manifestUrl, ids = [], jurisdictions = {}) {
   const worker = new Worker(import.meta.resolve('bikebook/catalog_worker'), { type: 'module' })
   const pending = new Map()
   let nextId = 0
@@ -24,14 +26,27 @@ export async function loadCatalog (manifestUrl, ids = []) {
   })
 
   try {
-    const { vocabulary, kit, options, modelsCount } = await call('load', { manifestUrl: new URL(manifestUrl, window.location.href).href, ids })
+    const { vocabulary, kit, options, comparable } = await call('load', {
+      manifestUrl: new URL(manifestUrl, window.location.href).href,
+      ids,
+      jurisdictions,
+      rulesUrl: import.meta.resolve('bikebook/featured_rules'),
+      similarityUrl: import.meta.resolve('bikebook/similarity')
+    })
     return {
       vocabulary,
       kit,
       options,
-      modelsCount,
+      comparable,
+      // null, as for a comparison format it doesn't know, where the comparison doesn't load
+      similar: (model, settings, filters) => call('similar', { model, settings, filters }).catch((error) => {
+        console.error(error)
+        return null
+      }),
       search: (params, page, perPage) => call('search', { params, page, perPage }),
-      vehicles: (ids) => call('vehicles', { ids }),
+      featured: (params, legalClasses) => call('featured', { params, legalClasses }),
+      group: (id) => call('group', { model: id }),
+      vehicles: (ids, { market } = {}) => call('vehicles', { ids, market }),
       displays: (ids) => call('displays', { ids })
     }
   } catch (error) {
@@ -41,47 +56,58 @@ export async function loadCatalog (manifestUrl, ids = []) {
 }
 
 // Answers a hotwire_combobox async filter with the markup the gem's own turbo-stream response would
-// carry, so its callbacks and paging run unchanged
+// carry, so its selection and paging run unchanged
 export class CatalogComboboxSource {
   #generation = 0
 
-  // onCount takes each search's count of matching models
-  constructor (catalog, onCount = () => {}) {
+  // onSearch takes each search's params, its count of results and of the models its filters match, and whether it
+  // primed the listing rather than answered the reader
+  constructor (catalog, onSearch = () => {}) {
     this.catalog = catalog
-    this.onCount = onCount
+    this.onSearch = onSearch
   }
 
   // A pick re-renders the page, leaving the gem's debounced refilter behind on the combobox it replaced
-  async filter (combobox, inputType, { callback = true } = {}) {
+  async filter (combobox, inputType, { primed = false } = {}) {
     if (!combobox.element.isConnected) return
 
     const query = new URL(combobox.asyncSrcValue, window.location.origin).searchParams
     this.params = { ...Object.fromEntries(query), q: combobox._fullQuery }
     this.#generation++
-    await this.#render(combobox, 0, { inputType, callbackId: callback ? combobox._enqueueCallback() : undefined })
+    // The gem settles a pending filter only on an input type, as its own request falls back to
+    await this.#render(combobox, 0, { inputType: primed ? undefined : inputType || 'hw:unspecifiedInput', primed })
   }
 
   // The gem fetches the first page through a lazy turbo-frame on first open; list it here instead
   prime (combobox) {
-    return this.filter(combobox, undefined, { callback: false })
+    return this.filter(combobox, undefined, { primed: true })
   }
 
-  async #render (combobox, page, { inputType, callbackId }) {
+  async #render (combobox, page, { inputType, primed }) {
     const generation = this.#generation
-    const { total, filteredCount, models, nextPage } = await this.catalog.search(this.params, page, this.catalog.kit.per_page)
+    const { total, filteredCount, unfiltered, models, nextPage } = await this.catalog.search(this.params, page, this.catalog.kit.per_page)
     if ((page && generation !== this.#generation) || !combobox.element.isConnected) return
 
     const forId = combobox.element.dataset.asyncId
     const listbox = combobox._actingListbox
-    const options = models.map((model) => model.classification
-      ? classificationOption(model)
-      : comboboxOption({ model, placeholderUrl: this.catalog.kit.placeholder_url, currencies: this.catalog.vocabulary.currencies }))
+    const picked = String(this.params.vehicle_models ?? '').split(',')
+    const { kit, vocabulary } = this.catalog
+    const options = models.map((model) => comboboxOption({
+      model,
+      selected: picked.includes(model.id),
+      placeholderUrl: kit.placeholder_url,
+      currencies: vocabulary.currencies,
+      market: this.params.market,
+      configurations: kit.model_configurations
+    }))
     const pagination = html`<li id=${`${forId}__hw_combobox_pagination__wrapper`} class="hw_combobox__pagination__wrapper"
-      data-hw-combobox-target="endOfOptionsStream" data-input-type=${inputType ?? nothing} data-callback-id=${callbackId ?? nothing} aria-hidden="true"></li>`
+      data-hw-combobox-target="endOfOptionsStream" data-input-type=${inputType ?? nothing} aria-hidden="true"></li>`
     document.getElementById(`${forId}__hw_combobox_pagination__wrapper`)?.remove()
     if (page === 0) {
-      listbox.replaceChildren(fragmentOf(html`${group(matching(total), options)}${pagination}`))
-      this.onCount(filteredCount)
+      const offered = classificationOption(this.params.q, String(this.params.vehicle_models ?? '').split(','), this.catalog.vocabulary.e_vehicle_classifications)
+      listbox.replaceChildren(fragmentOf(html`${offered ? group('E-bike classification', [offered]) : nothing}${
+        group(unfiltered ? unmatched : matching(total), options)}${pagination}`))
+      this.onSearch({ params: this.params, total, filteredCount, primed })
     } else {
       listbox.append(fragmentOf(html`${options}${pagination}`))
     }
@@ -101,26 +127,52 @@ export class CatalogComboboxSource {
     observer.observe(wrapper)
   }
 
-  // An id the catalog lacks gets no chip
-  async chips (combobox, values) {
-    const ids = String(values).split(',').filter(Boolean)
+  // No chip for an id the catalog lacks, nor for one already chipped unless `adding` it as a repeat pick
+  async chips (combobox, values, { adding = false } = {}) {
+    const chipped = new Set([...combobox.element.querySelectorAll('[data-hw-combobox-value-param]')].map((remover) => remover.dataset.hwComboboxValueParam))
+    const ids = String(values).split(',').filter((id) => id && (adding || !chipped.has(id)))
+    if (ids.length === 0) return
+
     const displays = await this.catalog.displays(ids)
     if (!combobox.element.isConnected) return
 
-    renderChips(combobox.element, ids.map((value, index) => ({ value, display: displays[index] })).filter(({ display }) => display != null))
+    const classifications = this.catalog.vocabulary.e_vehicle_classifications
+    renderChips(combobox.element, ids.map((value, index) => ({ value, display: displays[index] ?? classifications[value]?.label }))
+      .filter(({ display }) => display != null))
   }
 }
 
-// The gem's selection chip partial, ahead of the field
-export const renderChips = (combobox, chips) => combobox.querySelector('[data-hw-combobox-target~="combobox"]').before(fragmentOf(chips.map(({ value, display }) =>
-  html`<div data-hw-combobox-chip=""><div class="hw-combobox__chip"><span>${display}</span><span tabindex="0" class="hw-combobox__chip__remover"
-    aria-label=${`Remove ${display}`} data-action="click->hw-combobox#removeChip:stop keydown->hw-combobox#navigateChip"
-    data-hw-combobox-target="chipDismisser" data-hw-combobox-value-param=${value}></span></div></div>`)))
+// The gem's selection chip partial, ahead of the field, gripped where bikebook--chip-reorder drags them by the
+// template[data-chip-grip] beside it. Each grip's id is its model's and its count among that model's repeats, so a
+// render that recreates the chips keeps a grip's focus
+export const renderChips = (combobox, chips) => {
+  const grip = combobox.matches('[data-controller~="bikebook--chip-reorder"]') && combobox.closest('form').querySelector('template[data-chip-grip]')
+  const chipped = [...combobox.querySelectorAll('[data-hw-combobox-value-param]')].map((remover) => remover.dataset.hwComboboxValueParam)
+  const values = [...chipped, ...chips.map(({ value }) => value)]
+  const handleId = (value, index) => `move-${value}-${values.slice(0, chipped.length + index).filter((each) => each === value).length}`
+  combobox.querySelector('[data-hw-combobox-target~="combobox"]').before(fragmentOf(chips.map(({ value, display }, index) =>
+    html`<div data-hw-combobox-chip=""><div class="hw-combobox__chip">${grip ? gripFor(grip, display, handleId(value, index)) : nothing}<span>${display}</span><span tabindex="0" class="hw-combobox__chip__remover"
+      aria-label=${`Remove ${display}`} data-action="click->hw-combobox#removeChip:stop keydown->hw-combobox#navigateChip"
+      data-hw-combobox-target="chipDismisser" data-hw-combobox-value-param=${value}></span></div></div>`)))
+}
+
+const gripFor = (grip, label, id) => {
+  const handle = grip.content.firstElementChild.cloneNode(true)
+  handle.id = id
+  handle.setAttribute('aria-label', handle.getAttribute('aria-label').replace('%{name}', label))
+  return handle
+}
 
 const group = (label, options) => {
   const id = uuid()
   return html`<ul class="hw-combobox__group" role="group" aria-labelledby=${id}><li id=${id} class="hw-combobox__group__label"
     role="presentation">${label}</li>${options}</ul>`
 }
+
+export const renderCounts = (root, count) => renderInto(root.getElementById('vehicle-models-count'), matching(count))
+
+// in UI::Alerts::Base's warning colors
+const unmatched = html`<span class="tw:rounded-sm tw:border tw:border-yellow-300 tw:bg-yellow-50 tw:px-1 tw:text-yellow-800
+  tw:dark:border-yellow-800 tw:dark:bg-yellow-950 tw:dark:text-yellow-400">(model doesn't match filters)</span>`
 
 export const matching = (count) => html`(${numberDisplay(count)} matching ${count === 1 ? 'model' : 'models'})`

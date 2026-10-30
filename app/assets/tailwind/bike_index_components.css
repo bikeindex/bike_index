@@ -24,6 +24,13 @@
   }
 }
 
+/* Out to the window's edges from a column centered in the page, short of the org sidebar,
+ * which is fixed rather than in the flow */
+@utility twpagebleed {
+  margin-inline: calc(50% - 50vw + var(--org-sidebar-width, 0px) / 2);
+  width: calc(100vw - var(--org-sidebar-width, 0px));
+}
+
 /* The dev-info marking, formerly admin_unvendored's unlayered copy. A hand-written block
  * rather than @utility, which would take the tw: prefix and so match none of the ~95
  * existing .only-dev-visible sites - nor the `<style>.only-dev-visible {display: none}`
