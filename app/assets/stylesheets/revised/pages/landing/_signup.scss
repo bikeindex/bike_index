@@ -3,10 +3,7 @@
 .landing-page-body,
 #welcome_index {
   padding-top: 0;
-
-  .primary-footer {
-    margin-top: 0;
-  }
+  --footer-gap: 0;
   // This is our minimal spam block thing
   .form-group.additional-field {
     display: none !important;

@@ -1,16 +1,9 @@
 <section class="tw:border-b tw:border-gray-200 tw:dark:border-gray-700">
   <div class="tw:grid tw:grid-cols-[repeat(auto-fit,minmax(min(100%,420px),1fr))] tw:items-center tw:gap-10 tw:pt-10 tw:pb-15 tw:sm:pt-16 <%= SECTION_CLASSES %>">
     <div>
-      <p
-        class="
-          tw:m-0 tw:mb-4.5 tw:inline-block tw:rounded-full tw:bg-[#e8f3fc]
-          tw:px-3.5 tw:py-1.5 tw:text-[13px] tw:font-bold
-          tw:tracking-[.08em] tw:text-blue-600 tw:uppercase
-          tw:dark:bg-blue-950 tw:dark:text-blue-300
-        "
-      >
-        <%= translation(".eyebrow") %>
-      </p>
+      <span class="tw:mb-4.5 tw:inline-block tw:tracking-wider tw:uppercase">
+        <%= render(UI::Badge::Component.new(text: translation(".eyebrow"), color: :notice, size: :lg)) %>
+      </span>
 
       <h1
         class="
@@ -22,7 +15,7 @@
         <%= translation(".help_your_riders") %>
       </h1>
 
-      <p class="tw:m-0 tw:mb-7 tw:max-w-120 tw:text-[19px] tw:leading-[1.55] tw:text-pretty <%= muted_classes %>">
+      <p class="tw:m-0 tw:mb-7 tw:max-w-120 tw:text-[19px] tw:leading-[1.55] tw:text-pretty <%= MUTED %>">
         <%= translation(".lede") %>
       </p>
 
@@ -34,24 +27,19 @@
           color: :secondary, size: :callout, html_class: OUTLINE)) %>
       </div>
 
-      <p class="tw:m-0 tw:mt-6 <%= callout_classes %>">
+      <p class="tw:m-0 tw:mt-6 <%= CALLOUT %>">
         <%= helpers.inline_svg_tag("icons/bolt.svg", class: "tw:size-5.5 tw:shrink-0 tw:text-purple-500", aria_hidden: true) %>
 
         <span class="tw:flex-1">
           <%= translation(".ask_about_ebike_education") %>
 
-          <a
-            href="#ebikes"
-            class="twlink tw:py-2.5 tw:font-semibold tw:whitespace-nowrap"
-          >
-            <%= translation(".new_for_ebike_riders") %>
-          </a>
+          <%= link_to(translation(".new_for_ebike_riders"), "#ebikes", class: "twlink tw:py-2.5 tw:font-semibold tw:whitespace-nowrap") %>
         </span>
       </p>
     </div>
 
     <div class="tw:flex tw:justify-center">
-      <%= image_tag("kelsey/illustrations/comic-assets_bike-hero.png", alt: "", class: "tw:w-full tw:max-w-105") %>
+      <%= image_tag("kelsey/illustrations/comic-assets_bike-hero.png", alt: "", width: 420, height: 314, class: "tw:h-auto tw:w-full tw:max-w-105") %>
     </div>
   </div>
 
@@ -92,19 +80,19 @@
       tw:@lg:grid-cols-2 tw:@4xl:grid-cols-4
     "
   >
-    <% steps.each_with_index do |step, index| %>
+    <% steps.each_with_index do |(color, title, body), index| %>
       <li class="tw:flex">
         <%= render(UI::Card::Component.new(shadow: true, additional_classes: "tw:w-full tw:rounded-lg! tw:p-6!")) do %>
-          <span class="tw:mb-2.5 tw:block tw:font-header tw:text-[34px] tw:leading-none tw:font-black <%= step[:color] %>">
+          <span class="tw:mb-2.5 tw:block tw:font-header tw:text-[34px] tw:leading-none tw:font-black <%= color %>">
             <%= index + 1 %>
           </span>
 
           <h3 class="tw:m-0 tw:mb-1.5 tw:font-header tw:text-lg tw:font-bold">
-            <%= step[:title] %>
+            <%= title %>
           </h3>
 
-          <p class="tw:m-0 tw:text-[15px] tw:leading-[1.6] <%= muted_classes %>">
-            <%= step[:body] %>
+          <p class="tw:m-0 tw:text-[15px] tw:leading-[1.6] <%= MUTED %>">
+            <%= body %>
           </p>
         <% end %>
       </li>
@@ -168,7 +156,7 @@
           <li class="tw:flex tw:items-start tw:gap-3">
             <%= helpers.inline_svg_tag(icon, class: "tw:size-5.5 tw:shrink-0 tw:text-blue-600", aria_hidden: true) %>
 
-            <span class="<%= muted_classes %>">
+            <span class="<%= MUTED %>">
               <strong class="tw:text-slate-900 tw:dark:text-gray-100"><%= title %></strong>
               <%= detail %>
             </span>
@@ -189,13 +177,13 @@
       tw:gap-5
     "
   >
-    <% tools.each do |tool| %>
-      <%= render(SharedBlocks::Marketing::IconFeature::Component.new(**tool, card: true)) %>
+    <% tools.each do |icon, circle, title, body| %>
+      <%= render(SharedBlocks::Marketing::IconFeature::Component.new(icon:, circle:, title:, body:, card: true)) %>
     <% end %>
   </div>
 
-  <p class="tw:m-0 tw:mt-7 <%= callout_classes %>">
-    <%= helpers.inline_svg_tag("icons/store.svg", class: "tw:size-5.5 tw:shrink-0 tw:text-blue-600", aria_hidden: true) %>
+  <p class="tw:m-0 tw:mt-7 <%= CALLOUT %>">
+    <%= helpers.inline_svg_tag("icons/lucide-store.svg", class: "tw:size-5.5 tw:shrink-0 tw:text-blue-600", aria_hidden: true) %>
 
     <span class="tw:flex-1">
       <%= translation(".we_also_work_with_bike_shops") %>
@@ -221,7 +209,7 @@
         <%= TESTIMONIAL %>
       </blockquote>
 
-      <figcaption class="tw:mt-4 tw:text-[15px] <%= muted_classes %>">
+      <figcaption class="tw:mt-4 tw:text-[15px] <%= MUTED %>">
         <%= translation(".testimonial_attribution_html",
           link: link_to("@GOBuffalo", "https://twitter.com/GOBuffalo", class: "tw:py-2.5 tw:font-semibold twlink")) %>
       </figcaption>
@@ -250,11 +238,8 @@
   </ul>
 </section>
 
-<%# landing-page-body zeroes the footer margin that SharedBlocks::Marketing::Wrapper's -mb-18 cancels; this margin collapses with it %>
-<div class="tw:mb-18">
-  <%= render(SharedBlocks::Marketing::CallToActionBanner::Component.new(heading: translation(".join_us"),
-    subheading: translation(".create_an_organization_account"))) do %>
-    <%= render(UI::ButtonLink::Component.new(href: @sign_up_path, text: translation(".sign_up_for_free"),
-      color: :yellow, size: :callout)) %>
-  <% end %>
-</div>
+<%= render(SharedBlocks::Marketing::CallToActionBanner::Component.new(heading: translation(".join_us"),
+  subheading: translation(".create_an_organization_account"))) do %>
+  <%= render(UI::ButtonLink::Component.new(href: @sign_up_path, text: translation(".sign_up_for_free"),
+    color: :yellow, size: :callout)) %>
+<% end %>
