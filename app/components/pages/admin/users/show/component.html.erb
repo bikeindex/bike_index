@@ -421,6 +421,9 @@
 <h4 class="mt-4">
   Bikes
   <small><%= link_to number_display(@bikes_count), admin_bikes_path(user_id: @user.id) %></small>
+  <% if deleted_bikes_count > 0 %>
+    <small>(<%= link_to safe_join([number_display(deleted_bikes_count), " deleted"]), admin_bikes_path(user_id: @user.id, search_status_deleted_only: true, search_status_example: true), class: "gray-link" %>)</small>
+  <% end %>
 </h4>
 
 <% if @bikes_count > 0 %>

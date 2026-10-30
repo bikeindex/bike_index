@@ -198,7 +198,8 @@ module Admin
 
     def matching_bikes
       bikes = if params[:user_id].present?
-        user_subject&.bikes
+        # Not user_subject.bikes, which drops deleted bikes before the status filter can find them
+        Bike.unscoped.includes(:current_ownership).where(ownerships: {user_id: user_subject.id})
       elsif params[:search_phone].present?
         Bike.search_phone(params[:search_phone])
       else

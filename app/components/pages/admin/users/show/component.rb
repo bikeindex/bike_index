@@ -18,6 +18,11 @@ module Pages
             10
           end
 
+          def deleted_bikes_count
+            @deleted_bikes_count ||= Bike.unscoped.where.not(deleted_at: nil)
+              .joins(:current_ownership).where(ownerships: {user_id: @user.id}).count
+          end
+
           def marketplace_messages
             MarketplaceMessage.where(sender_id: @user.id).order(id: :desc)
           end
