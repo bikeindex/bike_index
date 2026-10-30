@@ -7,7 +7,7 @@ module SharedBlocks
       # on_dark: the intro on a dark band. id: the h2's, for a control it labels
       class Component < ApplicationComponent
         EYEBROW_COLORS = {blue: "tw:text-blue-600 tw:dark:text-blue-400", purple: "tw:text-purple-500 tw:dark:text-purple-300",
-                          red: "tw:text-[#cc0000] tw:dark:text-red-400", yellow: "tw:text-[#ffd660]", gray: "tw:text-gray-400"}.freeze
+                          red: "tw:text-[#cc0000] tw:dark:text-red-400", yellow: "tw:text-amber-600 tw:dark:text-[#ffd660]", gray: "tw:text-gray-400"}.freeze
 
         def self.eyebrow_classes(color)
           "tw:text-[11.5px] tw:font-extrabold tw:tracking-widest tw:uppercase #{EYEBROW_COLORS.fetch(color)}"

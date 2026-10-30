@@ -8,13 +8,13 @@ module UI
     class Component < ApplicationComponent
       BASE_CLASSES = "tw:inline-flex tw:items-center tw:justify-center tw:gap-1.5 tw:cursor-pointer"
 
-      # Per size rather than in BASE_CLASSES, so :callout's radius, weight and transition
+      # Per size rather than in BASE_CLASSES, so :callout's radius, border, weight and transition
       # have nothing to tie with
-      STANDARD_SHAPE = "tw:rounded-lg tw:font-medium tw:transition-colors"
+      STANDARD_SHAPE = "tw:rounded-lg tw:border tw:font-medium tw:transition-colors"
 
       # A press sinks it 2px from where it sits - back down from the hover lift, or below
       # rest on a device that can't hover
-      CALLOUT_SHAPE = "tw:rounded-full tw:font-semibold tw:uppercase tw:tracking-[0.5px] tw:transition-all tw:duration-300 tw:not-disabled:not-aria-disabled:hover:-translate-y-0.5 tw:not-disabled:not-aria-disabled:active:translate-y-0.5 tw:hover:is-active:translate-y-0"
+      CALLOUT_SHAPE = "tw:rounded-full tw:border-2 tw:font-semibold tw:uppercase tw:tracking-[0.5px] tw:transition-all tw:duration-300 tw:not-disabled:not-aria-disabled:hover:-translate-y-0.5 tw:not-disabled:not-aria-disabled:active:translate-y-0.5 tw:hover:is-active:translate-y-0"
 
       SIZES = {
         sm: "#{STANDARD_SHAPE} tw:px-2.5 tw:py-1 tw:text-xs",
@@ -27,12 +27,11 @@ module UI
       # Hover is guarded against both ways an element says it's disabled — :disabled for a
       # button, aria-disabled for UI::ButtonLink's anchor. Nothing else stops it now.
       COLORS = {
-        primary: "tw:text-white tw:bg-blue-600 tw:border tw:border-blue-600 tw:not-disabled:not-aria-disabled:hover:bg-blue-700 tw:focus:ring-blue-500/40 tw:dark:bg-blue-500 tw:dark:border-blue-500 tw:dark:not-disabled:not-aria-disabled:hover:bg-blue-600",
-        secondary: "tw:text-gray-800 tw:bg-white tw:border tw:border-gray-200 tw:not-disabled:not-aria-disabled:hover:border-purple-500 tw:not-disabled:not-aria-disabled:hover:bg-purple-50 tw:focus:ring-purple-500/40 tw:dark:bg-gray-800 tw:dark:text-gray-100 tw:dark:border-gray-700 tw:dark:not-disabled:not-aria-disabled:hover:border-purple-500 tw:dark:not-disabled:not-aria-disabled:hover:bg-purple-950",
-        error: "tw:text-[#c0392b] tw:bg-white tw:border tw:border-[#f3c9c9] tw:not-disabled:not-aria-disabled:hover:bg-red-50 tw:focus:ring-red-500/40 tw:dark:bg-transparent tw:dark:text-red-400 tw:dark:border-red-900 tw:dark:not-disabled:not-aria-disabled:hover:bg-red-950",
-        purple: "tw:text-white tw:bg-purple-500 tw:border tw:border-purple-500 tw:not-disabled:not-aria-disabled:hover:bg-purple-600 tw:not-disabled:not-aria-disabled:hover:border-purple-600 tw:focus:ring-purple-500/40",
-        yellow: "tw:text-blue-600 tw:bg-[#ffd660] tw:border tw:border-[#ffd660] tw:not-disabled:not-aria-disabled:hover:bg-[#ffcc33] tw:not-disabled:not-aria-disabled:hover:border-[#ffcc33] tw:focus:ring-[#ffd660]/60",
-        outline_white: "tw:text-white tw:bg-transparent tw:border-2 tw:border-white tw:not-disabled:not-aria-disabled:hover:bg-white/10 tw:focus:ring-white/40",
+        primary: "tw:text-white tw:bg-blue-600 tw:border-blue-600 tw:not-disabled:not-aria-disabled:hover:bg-blue-700 tw:focus:ring-blue-500/40 tw:dark:bg-blue-500 tw:dark:border-blue-500 tw:dark:not-disabled:not-aria-disabled:hover:bg-blue-600",
+        secondary: "tw:text-gray-800 tw:bg-white/80 tw:border-gray-200 tw:not-disabled:not-aria-disabled:hover:border-purple-500 tw:not-disabled:not-aria-disabled:hover:bg-purple-50 tw:focus:ring-purple-500/40 tw:dark:bg-gray-900/80 tw:dark:text-gray-100 tw:dark:border-gray-700 tw:dark:not-disabled:not-aria-disabled:hover:border-purple-500 tw:dark:not-disabled:not-aria-disabled:hover:bg-purple-950",
+        error: "tw:text-[#c0392b] tw:bg-white tw:border-[#f3c9c9] tw:not-disabled:not-aria-disabled:hover:bg-red-50 tw:focus:ring-red-500/40 tw:dark:bg-transparent tw:dark:text-red-400 tw:dark:border-red-900 tw:dark:not-disabled:not-aria-disabled:hover:bg-red-950",
+        purple: "tw:text-white tw:bg-purple-500 tw:border-purple-500 tw:not-disabled:not-aria-disabled:hover:bg-purple-600 tw:not-disabled:not-aria-disabled:hover:border-purple-600 tw:focus:ring-purple-500/40",
+        yellow: "tw:text-blue-600 tw:bg-[#ffd660] tw:border-[#ffd660] tw:not-disabled:not-aria-disabled:hover:bg-[#ffcc33] tw:not-disabled:not-aria-disabled:hover:border-[#ffcc33] tw:focus:ring-[#ffd660]/60",
         link: "twlink tw:rounded-lg tw:p-0 tw:focus:ring-blue-500/40"
       }.freeze
 
@@ -48,8 +47,7 @@ module UI
         secondary: "tw:is-active:text-white tw:is-active:bg-purple-500 tw:is-active:border-purple-500 tw:is-active:ring-2 tw:is-active:ring-purple-500/40",
         error: "tw:is-active:bg-red-100 tw:is-active:border-[#c0392b] tw:is-active:ring-2 tw:is-active:ring-red-500/40 tw:is-active:dark:bg-red-950 tw:is-active:dark:border-red-700",
         purple: "tw:is-active:bg-purple-700 tw:is-active:border-purple-700 tw:is-active:ring-2 tw:is-active:ring-purple-500/40",
-        yellow: "tw:is-active:bg-[#f5bc1b] tw:is-active:border-[#f5bc1b] tw:is-active:ring-2 tw:is-active:ring-[#ffd660]/60",
-        outline_white: "tw:is-active:bg-white/20 tw:is-active:ring-2 tw:is-active:ring-white/40"
+        yellow: "tw:is-active:bg-[#f5bc1b] tw:is-active:border-[#f5bc1b] tw:is-active:ring-2 tw:is-active:ring-[#ffd660]/60"
       }.freeze
 
       # No pointer-events-none: with pointer events off the browser takes the cursor from

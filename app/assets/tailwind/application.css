@@ -15,8 +15,16 @@
 @import "./lexxy_overrides.css";
 
 /* Class-based dark mode (the legacy config's darkMode: 'selector'); a `.dark`
- * ancestor activates tw:dark:* utilities. */
-@custom-variant dark (&:where(.dark, .dark *));
+ * ancestor activates tw:dark:* utilities. An `.inverted` block flips it, so its content
+ * styles itself as on the page and comes out the other way round. */
+@custom-variant dark {
+  &:where(.dark, .dark *):not(:where(.inverted, .inverted *)) {
+    @slot;
+  }
+  &:where(.inverted, .inverted *):not(:where(.dark, .dark *)) {
+    @slot;
+  }
+}
 
 /* Below anything holding the org registrations search's checked search_all: the owner email
  * field and the chart card fold away on it */

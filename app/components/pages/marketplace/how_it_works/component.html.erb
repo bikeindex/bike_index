@@ -1,36 +1,29 @@
-<section class="tw:bg-linear-160 tw:from-slate-900 tw:to-[#233140] tw:text-white">
-  <div class="tw:grid tw:grid-cols-[repeat(auto-fit,minmax(min(100%,420px),1fr))] tw:items-center tw:gap-12 tw:py-16 <%= SECTION_CLASSES %>">
-    <div class="tw:flex tw:flex-col tw:items-start tw:gap-5">
-      <%= link_to search_marketplace_path, class: "tw:text-sm tw:text-[#c9d3dc] tw:no-underline tw:hover:text-white tw:hover:underline" do %>
-        <span aria-hidden="true">←</span>
-        <%= translation(".back_to_marketplace") %>
-      <% end %>
+<%= render(SharedBlocks::Marketing::InvertedBlock::Component.new(html_class: "tw:py-16")) do %>
+  <div class="tw:flex tw:flex-col tw:items-start tw:gap-5">
+    <h1
+      class="
+        tw:font-header tw:text-[clamp(34px,4.5vw,52px)] tw:leading-[1.08]
+        tw:font-extrabold tw:tracking-[-.01em]
+      "
+    >
+      <%= translation(".heading") %>
+    </h1>
 
-      <h1
-        class="
-          tw:font-header tw:text-[clamp(34px,4.5vw,52px)] tw:leading-[1.08]
-          tw:font-extrabold tw:tracking-[-.01em]
-        "
-      >
-        <%= translation(".heading") %>
-      </h1>
+    <p
+      class="
+        tw:m-0 tw:max-w-[560px] tw:text-lg tw:leading-[1.6] tw:text-gray-600
+        tw:dark:text-[#dfe6ec]
+      "
+    >
+      <%= translation(".intro") %>
+    </p>
 
-      <p
-        class="
-          tw:m-0 tw:max-w-[560px] tw:text-lg tw:leading-[1.6]
-          tw:text-[#dfe6ec]
-        "
-      >
-        <%= translation(".intro") %>
-      </p>
-
-      <%= call_to_action_buttons %>
-    </div>
-
-    <%= image_tag "kelsey/illustrations/comic-assets_bike-hero.png", alt: "", width: 1768, height: 1320,
-      class: "tw:h-auto tw:w-full tw:max-w-[420px] tw:justify-self-center" %>
+    <%= call_to_action_buttons %>
   </div>
-</section>
+
+  <%= image_tag "kelsey/illustrations/comic-assets_bike-hero.png", alt: "", width: 1768, height: 1320,
+      class: "tw:h-auto tw:w-full tw:max-w-[420px] tw:justify-self-center" %>
+<% end %>
 
 <section class="tw:grid tw:grid-cols-[repeat(auto-fit,minmax(min(100%,340px),1fr))] tw:gap-12 tw:py-16 <%= SECTION_CLASSES %>">
   <%= render(SharedBlocks::Marketing::SectionHeading::Component.new(eyebrow: translation(".why_a_marketplace"),
@@ -156,5 +149,5 @@
 </section>
 
 <%= render(SharedBlocks::Marketing::CallToActionBanner::Component.new(heading: translation(".ready_heading"))) do %>
-  <%= call_to_action_buttons %>
+  <div class="dark"><%= call_to_action_buttons %></div>
 <% end %>
