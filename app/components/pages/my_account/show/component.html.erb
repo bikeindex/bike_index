@@ -1,0 +1,156 @@
+<div
+  class="
+    tw:mx-auto tw:flex tw:max-w-[1200px] tw:flex-col tw:gap-7 tw:px-6
+    tw:pt-12 tw:pb-16
+  "
+>
+  <div
+    class="
+      tw:-mb-3.5 tw:flex tw:flex-wrap tw:items-center tw:justify-between
+      tw:gap-5
+    "
+  >
+    <div class="tw:flex tw:flex-col tw:gap-1.5">
+      <h1
+        class="
+          tw:m-0 tw:font-header tw:text-[40px] tw:leading-tight
+          tw:font-extrabold tw:tracking-tight tw:text-pretty
+        "
+      >
+        <%= translation(".header_title", current_user_name: @user.display_name) %>
+      </h1>
+
+      <div class="tw:text-[15px] tw:text-gray-500 tw:dark:text-gray-400">
+        <%= translation(".bike_count", count: bike_count) %> ·
+        <%= translation(".lock_count", count: @locks.size) %>
+        <% if membership.present? %>
+          ·
+          <%= translation(".membership_subtitle", level: membership.basic? ? "" : membership.level_humanized) %>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+      <%= render(UI::ButtonLink::Component.new(text: translation(".add_a_bike"), href: register_path, color: :yellow, size: :callout_sm)) %>
+      <%= render(UI::ButtonLink::Component.new(text: translation(".add_a_lock"), href: new_lock_url, color: :secondary, size: :callout_sm)) %>
+    </div>
+  </div>
+
+  <div class="tw:flex tw:items-end tw:gap-4">
+    <div class="tw:min-w-0 tw:flex-1">
+      <%= render(UI::Tabs::Component.new(tabs:, nav_label: translation(".your_registrations"), margin_classes: "tw:mb-0")) %>
+    </div>
+
+    <% unless @locks_tab %>
+      <div
+        class="
+          tw:flex tw:gap-1.5 tw:border-b tw:border-gray-300 tw:pb-2
+          tw:dark:border-gray-700
+        "
+      >
+        <% view_toggles.each do |view, icon, label| %>
+          <%= link_to my_account_path(view:), class: toggle_classes(view), title: label, aria: {label:, current: ("true" if view == @view)} do %>
+            <%= helpers.inline_svg_tag(icon, class: "tw:size-[18px]", aria_hidden: true) %>
+          <% end %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <% if @locks_tab %>
+    <% if @locks.any? %>
+      <ul class="tw:m-0 tw:flex tw:list-none tw:flex-col tw:gap-3.5 tw:p-0">
+        <% @locks.each do |lock| %>
+          <li
+            class="
+              tw:flex tw:flex-wrap tw:items-center tw:justify-between
+              tw:gap-4 tw:rounded-[10px] tw:border tw:border-gray-200
+              tw:p-3.5 tw:dark:border-gray-700
+            "
+          >
+            <div class="tw:flex tw:flex-col tw:gap-1.5">
+              <div class="tw:text-lg">
+                <strong><%= lock.mnfg_name %></strong> <%= lock.lock_type&.name %>
+              </div>
+
+              <div class="tw:text-[15px] tw:text-gray-500 tw:dark:text-gray-400">
+                <% if lock.key_serial.present? %>
+                  <%= translation(".key_serial") %>:
+                  <span class="tw:font-mono"><%= lock.key_serial %></span>
+                <% end %>
+
+                <% if lock.combination.present? %>
+                  <%= translation(".combination") %>:
+                  <span class="tw:font-mono"><%= lock.combination %></span>
+                <% end %>
+
+                <%= translation(".registered") %> <%= render(UI::Time::Component.new(time: lock.created_at)) %>
+              </div>
+            </div>
+
+            <%= link_to translation(".edit"), edit_lock_path(lock), class: "twlink tw:px-2 tw:text-[15px] tw:font-semibold" %>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <div
+        class="
+          tw:flex tw:flex-col tw:items-center tw:gap-3.5 tw:rounded-lg
+          tw:border tw:border-dashed tw:border-gray-300 tw:px-6 tw:py-12
+          tw:text-center tw:dark:border-gray-600
+        "
+      >
+        <div class="tw:font-header tw:text-xl tw:font-bold">
+          <%= translation(".no_locks_registered_yet") %>
+        </div>
+
+        <div class="tw:max-w-95 tw:text-[15px] tw:text-gray-500 tw:dark:text-gray-400">
+          <%= translation(".no_locks_description") %>
+        </div>
+
+        <%= render(UI::ButtonLink::Component.new(text: translation(".add_a_lock_empty"), href: new_lock_url, color: :primary, size: :sm)) %>
+      </div>
+    <% end %>
+  <% elsif @bikes.any? %>
+    <ul class="<%= class_names("tw:m-0 tw:grid tw:list-none tw:p-0", "tw:grid-cols-[repeat(auto-fill,minmax(230px,1fr))] tw:gap-[18px]": @view == :grid, "tw:gap-3.5": @view == :list) %>">
+      <% @bikes.each do |bike| %>
+        <%= render(Pages::MyAccount::Show::BikeBox::Component.new(bike:, current_user: @user, view: @view, user_alerts:, unfinished_b_params:)) %>
+      <% end %>
+    </ul>
+
+    <%= render(UI::Pagination::Component.new(pagy: @pagy, page_params: @page_params, size: :lg)) %>
+  <% else %>
+    <div
+      class="
+        tw:flex tw:flex-col tw:items-center tw:gap-3.5 tw:rounded-lg
+        tw:border tw:border-dashed tw:border-gray-300 tw:px-6 tw:py-12
+        tw:text-center tw:dark:border-gray-600
+      "
+    >
+      <div class="tw:font-header tw:text-xl tw:font-bold">
+        <%= translation(".no_bikes_registered_yet") %>
+      </div>
+
+      <%= render(UI::ButtonLink::Component.new(text: translation(".add_a_bike_empty"), href: register_path, color: :primary, size: :sm)) %>
+    </div>
+  <% end %>
+
+  <%= render(Pages::MyAccount::Show::PromptBar::Component.new(icon_classes: "tw:bg-blue-50 tw:text-blue-600 tw:dark:bg-blue-950 tw:dark:text-blue-300")) do |bar| %>
+    <% bar.with_icon { helpers.inline_svg_tag("icons/user-circle.svg", class: "tw:size-[22px]", aria_hidden: true) } %>
+    <% bar.with_title { translation(".tell_us_more_about_yourself") } %>
+    <% bar.with_subtext { translation(".helps_shops_and_police") } %>
+    <% bar.with_action { link_to(translation(".update_profile"), edit_my_account_url, class: "twlink tw:text-[15px]") } %>
+  <% end %>
+
+  <%= render(Pages::MyAccount::StravaIntegration::Component.new(user: @user, link_bikes_path:)) %>
+
+  <%= render(Pages::MyAccount::Show::PromptBar::Component.new(icon_classes: "tw:bg-purple-50 tw:text-purple-500 tw:dark:bg-purple-950 tw:dark:text-purple-300")) do |bar| %>
+    <% bar.with_icon { helpers.inline_svg_tag("icons/lucide-heart.svg", class: "tw:size-[22px]", aria_hidden: true) } %>
+    <% bar.with_title { translation(".bike_index_is_free") } %>
+    <% bar.with_subtext { translation(".donations_keep_the_registry_running") } %>
+
+    <% bar.with_action do %>
+      <%= render(UI::ButtonLink::Component.new(text: translation(".donate"), href: donate_url, color: :yellow, size: :callout_sm, target: "_blank", rel: "noopener")) %>
+    <% end %>
+  <% end %>
+</div>

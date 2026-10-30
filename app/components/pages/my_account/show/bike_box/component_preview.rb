@@ -22,6 +22,10 @@ module Pages
             render_box(bike(id: 43))
           end
 
+          def grid
+            render_box(bike(id: 46), view: :grid)
+          end
+
           def with_owner_with_photo
             render_box(bike(id: 44, thumb_path: SharedBlocks::SearchResults::BikeBox::ComponentPreview.vehicles.first.thumb_path))
           end
@@ -46,9 +50,9 @@ module Pages
 
           private
 
-          def render_box(bike, current_user: lookbook_user, user_alerts: [], unfinished_b_params: {})
+          def render_box(bike, current_user: lookbook_user, view: :list, user_alerts: [], unfinished_b_params: {})
             render_with_template(template: "pages/my_account/show/bike_box/component_preview/bike_box",
-              locals: {bike:, current_user:, user_alerts:, unfinished_b_params:})
+              locals: {bike:, current_user:, view:, user_alerts:, unfinished_b_params:})
           end
 
           def bike(**attrs)

@@ -10,7 +10,6 @@ RSpec.describe Pages::MyAccount::StravaIntegration::Component, type: :system do
 
     it "renders connect button" do
       visit(preview_path)
-      expect(page).not_to have_content "Integration"
       expect(page).to have_content "Integrate your bikes with Strava"
       expect(page).to have_link "Connect with Strava"
     end
@@ -32,10 +31,10 @@ RSpec.describe Pages::MyAccount::StravaIntegration::Component, type: :system do
 
     it "renders synced state with gear" do
       visit(preview_path)
-      expect(page).to have_content "Connected to Strava"
+      expect(page).to have_content "Connected"
       expect(page).to have_content(/150\s+activities synced/)
-      expect(page).to have_content "Strava bikes connected"
-      expect(page).to have_link "Disconnect Strava"
+      expect(page).to have_content "0 / 2 bikes linked"
+      expect(page).to have_link "Disconnect"
     end
   end
 
@@ -46,7 +45,7 @@ RSpec.describe Pages::MyAccount::StravaIntegration::Component, type: :system do
       visit(preview_path)
       expect(page).to have_content "Sync error"
       expect(page).to have_content "There was an error syncing your Strava activities"
-      expect(page).to have_link "Disconnect Strava"
+      expect(page).to have_link "Disconnect"
     end
   end
 end

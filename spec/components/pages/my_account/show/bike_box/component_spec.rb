@@ -21,8 +21,29 @@ RSpec.describe Pages::MyAccount::Show::BikeBox::Component, type: :component do
     expect(component).to have_css("strong", text: "Surly")
     expect(component).to have_text("SUR-77120934")
     expect(component).to have_link("List for sale")
-    expect(component).to have_link("Mark bike stolen")
+    expect(component).to have_link("Mark stolen")
     expect(component).not_to have_css("[role=alert]")
+  end
+
+  context "in the grid" do
+    let(:component) { render_inline(described_class.new(bike: bike.reload, current_user: user, view: :grid)) }
+
+    it "renders the tile, with the shorter action names" do
+      expect(component).to have_css("strong", text: "Surly")
+      expect(component).to have_text("SUR-77120934")
+      expect(component).to have_link("Edit", exact_text: true)
+      expect(component).to have_link("List for sale")
+      expect(component).to have_link("Mark stolen")
+    end
+  end
+
+  context "when the bike is for sale" do
+    before { bike.update(is_for_sale: true) }
+
+    it "offers to update the listing, and says it's for sale" do
+      expect(component).to have_text("For Sale")
+      expect(component).to have_link("Update listing")
+    end
   end
 
   context "with an unassigned_bike_org alert" do

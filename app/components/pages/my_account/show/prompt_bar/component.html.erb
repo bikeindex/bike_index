@@ -1,0 +1,30 @@
+<div
+  class="
+    tw:flex tw:flex-wrap tw:items-center tw:gap-4 tw:rounded-lg tw:border
+    tw:border-gray-200 tw:bg-gray-50 tw:px-5 tw:py-4 tw:dark:border-gray-700
+    tw:dark:bg-gray-800
+  "
+>
+  <div class="tw:flex tw:size-11 tw:flex-none tw:items-center tw:justify-center tw:rounded-full <%= @icon_classes %>">
+    <%= icon %>
+  </div>
+
+  <div class="tw:flex tw:min-w-0 tw:flex-[1_1_14rem] tw:flex-col tw:gap-0.5">
+    <div class="tw:flex tw:items-center tw:gap-2 tw:text-[15px] tw:font-bold">
+      <%= title %>
+    </div>
+
+    <div class="tw:text-sm tw:text-gray-500 tw:dark:text-gray-400">
+      <%= subtext %>
+    </div>
+  </div>
+
+  <div
+    class="
+      tw:flex tw:flex-none tw:flex-col tw:items-end tw:gap-0.5 tw:text-sm
+      tw:font-semibold
+    "
+  >
+    <%= action %>
+  </div>
+</div>
