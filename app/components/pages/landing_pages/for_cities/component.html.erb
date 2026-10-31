@@ -669,7 +669,6 @@
   </div>
 </section>
 
-<%# Its bottom padding also covers SharedBlocks::Marketing::Wrapper's -mb-18, so the space below matches the space above %>
 <section
   id="contact"
   class="
@@ -677,7 +676,7 @@
     tw:dark:border-gray-700 tw:dark:bg-gray-900
   "
 >
-  <div class="tw:grid tw:grid-cols-[repeat(auto-fit,minmax(min(100%,360px),1fr))] tw:items-center tw:gap-12 tw:pt-20 tw:pb-38 <%= SECTION_CLASSES %>">
+  <div class="tw:grid tw:grid-cols-[repeat(auto-fit,minmax(min(100%,360px),1fr))] tw:items-center tw:gap-12 tw:py-20 <%= SECTION_CLASSES %>">
     <div>
       <%= render(SharedBlocks::Marketing::SectionHeading::Component.new(heading: translation(".contact_heading"), intro: translation(".contact_intro"), html_class: "tw:mb-6")) %>
 
