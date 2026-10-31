@@ -46,6 +46,19 @@ RSpec.describe Color, type: :model do
     end
   end
 
+  describe "displays" do
+    it "is each color's display by its name, until a color changes" do
+      Rails.cache.clear
+      color = FactoryBot.create(:color, name: "Blue", display: "#386ed2")
+      expect(Color.displays).to eq("Blue" => "#386ed2")
+      expect(Rails.cache.read(Color::DISPLAYS_CACHE_KEY)).to eq("Blue" => "#386ed2")
+      color.update(display: "#0000ff")
+      expect(Color.displays).to eq("Blue" => "#0000ff")
+      color.destroy
+      expect(Color.displays).to eq({})
+    end
+  end
+
   describe "black" do
     context "not-existing" do
       it "creates it on first pass" do

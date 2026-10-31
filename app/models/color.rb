@@ -25,14 +25,21 @@ class Color < ApplicationRecord
   COVER_UP_SWATCH = "radial-gradient(circle at 50% 100%, transparent 0 20%, #a745c0 20% 30%, " \
     "#386ed2 30% 40%, #1ba100 40% 50%, #fff44b 50% 60%, #ff8d1d 60% 70%, #ec1313 70% 80%, transparent 80%), #fff"
 
+  DISPLAYS_CACHE_KEY = "color_displays"
+
   has_many :bikes
   has_many :paints
 
   validates_presence_of :name, :priority
   validates_uniqueness_of :name
 
+  after_commit { Rails.cache.delete(DISPLAYS_CACHE_KEY) }
+
   default_scope { order(:name) }
   scope :commonness, -> { order("priority ASC, name ASC") }
+
+  # Each color's display by its name
+  def self.displays = Rails.cache.fetch(DISPLAYS_CACHE_KEY) { pluck(:name, :display).to_h }
 
   def self.black
     where(name: "Black", priority: 1, display: "#000").first_or_create
