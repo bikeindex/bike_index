@@ -34,7 +34,7 @@
   <%= render(Pages::Admin::Bikes::Show::Messages::Component.new(bike: @bike)) %>
 <% when "recoveries" %>
   <div class="tw:mt-8">
-    <%= render partial: "/admin/recoveries/table", locals: {recoveries: @bike.recovered_records, skip_bike: true} %>
+    <%= render(Pages::Admin::Recoveries::Table::Component.new(recoveries: @bike.recovered_records, sort_state:, editable: false)) %>
   </div>
 
   <h3 class="tw:mt-6">Other stolen records</h3>

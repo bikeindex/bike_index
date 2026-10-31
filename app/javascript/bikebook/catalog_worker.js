@@ -54,7 +54,8 @@ async function load ({ manifestUrl, ids, jurisdictions, rulesUrl, similarityUrl:
     // by its maker, as makers share names, and its first word where it has no group
     group_key: `${model.manufacturer}/${model.model_group ?? model.model.split(' ')[0]}`,
     searchText: `${model.display}\n${model.id}`.toLowerCase(),
-    sortYear: model.final_year ?? currentYear
+    // a current model's first year where it's sold ahead of the calendar
+    sortYear: model.final_year ?? Math.max(model.first_year, currentYear)
   }))
   byId = new Map(models.map((model) => [model.id, model]))
   // the index labels the out of class markers, which the vocabulary has no record of: "Out of class in California"
@@ -225,8 +226,7 @@ function group ({ model: id }) {
 
   const years = new Map()
   for (const each of sorted({}).filter((each) => each.manufacturer === model.manufacturer && each.model_group === model.model_group && each.first_year)) {
-    const year = Math.max(each.first_year, each.sortYear)
-    years.set(year, [...(years.get(year) ?? []), each])
+    years.set(each.sortYear, [...(years.get(each.sortYear) ?? []), each])
   }
   return {
     name: model.model_group,

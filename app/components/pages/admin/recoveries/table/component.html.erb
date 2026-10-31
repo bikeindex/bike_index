@@ -1,0 +1,149 @@
+<%= render(UI::CardTable::Component.new(records: rows, render_sortable: @editable, sort_state: @sort_state, **card_options)) do |table| %>
+  <% if @editable %>
+    <% table.with_description do %>
+      Edit the story, name and location to match our guidelines, then display.
+      Display names are first name only. Edits are saved to the display, not the
+      recovery.
+    <% end %>
+
+    <% table.with_actions do %>
+      <%= render(UI::Button::Component.new(text: "Display selected", color: :primary, size: :sm, type: :submit, name: :bulk_action, value: :display)) %>
+      <%= render(UI::Button::Component.new(text: "Mark not displayable", size: :sm, type: :submit, name: :bulk_action, value: :not_displayed, data: {discards_edits: true})) %>
+    <% end %>
+  <% end %>
+
+  <% if @editable %>
+    <% table.column(label: table.toggle_all_button) do |(recovery)| %>
+      <div class="tw:flex tw:items-center tw:gap-3">
+        <%= check_box_tag "sr_selected[#{recovery.id}]", recovery.id, false, disabled: !recovery.waiting_on_decision?,
+      aria: {label: "Select recovery #{recovery.id}"}, data: {"table-multi-checkbox-target" => "checkbox"} %>
+
+        <%= render(UI::ButtonLink::Component.new(text: "View", href: edit_admin_recovery_path(recovery), size: :sm)) %>
+      </div>
+    <% end %>
+  <% end %>
+
+  <% table.column(label: COLUMNS[:photo_cell], classes: "hideableColumn photo_cell") do |(_recovery, bike)| %>
+    <%= render(Atoms::BikeThumbnail::Component.new(bike:)) %>
+  <% end %>
+
+  <% table.column(sortable: "recovered_at", label: COLUMNS[:recovered_at_cell], classes: "hideableColumn recovered_at_cell") do |(recovery)| %>
+    <%= link_to edit_admin_recovery_path(recovery), class: "twlink tw:font-bold tw:whitespace-nowrap" do %>
+      <% if recovery.recovered_at.blank? %>
+        <span class="tw:text-red-600">no recovery date</span>
+      <% end %>
+
+      <%= render(UI::Time::Component.new(time: recovery.recovered_at || recovery.created_at)) %>
+    <% end %>
+  <% end %>
+
+  <% table.column(sortable: "date_stolen", label: COLUMNS[:date_stolen_cell], classes: "hideableColumn date_stolen_cell tw:whitespace-nowrap") do |(recovery)| %>
+    <%= render(UI::Time::Component.new(time: recovery.date_stolen)) %>
+  <% end %>
+
+  <% table.column(sortable: "recovery_display_status", label: COLUMNS[:status_cell], classes: "hideableColumn status_cell tw:text-xs") do |(recovery)| %>
+    <%= recovery.recovery_display_status.humanize %>
+
+    <% if recovery.recovery_display.present? %>
+      <%= link_to check_mark, edit_admin_recovery_display_path(recovery.recovery_display), class: "twlink" %>
+    <% end %>
+  <% end %>
+
+  <% table.column(label: COLUMNS[:bike_cell], classes: "hideableColumn bike_cell") do |(recovery, bike)| %>
+    <% if bike.present? %>
+      <%= link_to edit_admin_bike_path(bike), class: "twlink" do %>
+        <strong><%= bike.title_string %></strong>
+      <% end %>
+      <% if recovery.estimated_value.present? %>
+        <small class="tw:text-gray-500">$<%= number_display(recovery.estimated_value) %></small>
+      <% end %>
+      <%= render(Atoms::Admin::Badges::BikeHiddenExplanation::Component.new(bike:)) %>
+    <% else %>
+      <span class="tw:text-amber-600">no bike</span>
+    <% end %>
+  <% end %>
+
+  <% table.column(label: COLUMNS[:owner_cell], classes: "hideableColumn owner_cell tw:leading-none") do |(recovery, bike)| %>
+    <% if bike.present? %>
+      <%= bike.owner_email %>
+      <%= render(Atoms::Admin::Badges::User::Component.new(user: bike.user)) %>
+    <% end %>
+
+    <% if recovery.recovering_user.present? %>
+      <br>
+      <small class="tw:text-gray-500">
+        Recovered by
+        <%= link_to recovery.recovering_user.display_name, admin_user_path(recovery.recovering_user.to_param), class: "twlink" %>
+        <% unless recovery.recovering_user == bike&.user %>
+          <span class="tw:text-amber-600">not owner!</span>
+        <% end %>
+      </small>
+    <% end %>
+  <% end %>
+
+  <% table.column(label: COLUMNS[:theft_description_cell], classes: "hideableColumn theft_description_cell tw:min-w-56 tw:text-xs tw:text-gray-500") do |(recovery)| %>
+    <%= recovery.theft_description&.truncate(200) %>
+  <% end %>
+
+  <% table.column(label: COLUMNS[:story_cell], classes: "hideableColumn story_cell tw:min-w-72") do |(recovery, _bike, defaults)| %>
+    <% if defaults %>
+      <div
+        data-controller="admin--character-count"
+        data-admin--character-count-max-value="<%= RecoveryDisplay::QUOTE_MAX_LENGTH %>"
+      >
+        <%= text_area_tag "display[#{recovery.id}][quote]", defaults[:quote], rows: 5,
+          class: "twinput", aria: {label: "Recovery story for recovery #{recovery.id}"},
+          data: {"admin--personal-info-target" => "field", "admin--character-count-target" => "field", action: "input->admin--character-count#update input->admin--personal-info#check"} %>
+
+        <div
+          class="
+            tw:mt-1 tw:flex tw:items-start tw:justify-between tw:gap-2
+            tw:text-xs
+          "
+        >
+          <p
+            class="tw:m-0 tw:text-amber-700 tw:empty:hidden"
+            data-admin--personal-info-target="warning"
+          ></p>
+
+          <span
+            class="tw:ml-auto tw:text-gray-500 tw:tabular-nums"
+            data-admin--character-count-target="total"
+          ></span>
+        </div>
+      </div>
+    <% else %>
+      <%= recovery.recovered_description %>
+
+      <% quote = recovery.recovery_display&.quote %>
+      <% if quote.present? && quote != recovery.recovered_description %>
+        <small class="tw:mt-1 tw:block tw:text-gray-500">Displayed as: <%= quote %></small>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <% %i[quote_by location_string].each do |field| %>
+    <% label = COLUMNS[:"#{field}_cell"] %>
+
+    <% table.column(label:, classes: "hideableColumn #{field}_cell tw:min-w-32") do |(recovery, _bike, defaults)| %>
+      <% if defaults %>
+        <%= text_field_tag "display[#{recovery.id}][#{field}]", defaults[field], class: "twinput", autocomplete: "off",
+            aria: {label: "#{label} for recovery #{recovery.id}"} %>
+      <% else %>
+        <%= recovery.recovery_display&.public_send(field) %>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <% table.column(label: COLUMNS[:location_cell], classes: "hideableColumn location_cell") do |(recovery)| %>
+    <%= render(Atoms::Admin::TableCells::AddressRecord::Component.new(address_record: recovery)) %>
+  <% end %>
+
+  <% table.column(label: COLUMNS[:helped_cell], classes: "hideableColumn helped_cell tw:text-center") do |(recovery)| %>
+    <%= check_mark if recovery.index_helped_recovery %>
+  <% end %>
+
+  <% table.column(label: COLUMNS[:shareable_cell], classes: "hideableColumn shareable_cell tw:text-center") do |(recovery)| %>
+    <%= check_mark if recovery.can_share_recovery %>
+  <% end %>
+<% end %>

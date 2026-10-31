@@ -59,7 +59,6 @@
   data: {
     controller: "admin--recovery-display-form",
     "admin--recovery-display-form-toggle-image-value" => toggle_image_initially,
-    "admin--recovery-display-form-max-character-count-value" => RecoveryDisplay::QUOTE_MAX_LENGTH,
     "admin--recovery-display-form-remote-photo-url-value" => @bike&.image_url || ""
   }} do |f| %>
   <%= render(UI::Alerts::ObjectError::Component.new(object: @recovery_display, dismissable: true)) %>
@@ -120,19 +119,23 @@
   </div>
 
   <div class="row">
-    <div class="col-lg-6">
+    <div
+      class="col-lg-6"
+      data-controller="admin--character-count"
+      data-admin--character-count-max-value="<%= RecoveryDisplay::QUOTE_MAX_LENGTH %>"
+    >
       <div class="form-group">
         <%= f.label :body %>
 
         <%= f.text_area :quote, placeholder: 'Quote about recovery', rows: 4, class: "form-control", data: {
-           "admin--recovery-display-form-target" => "characterCounter",
-            action: "keyup->admin--recovery-display-form#updateCharacterCount"
+           "admin--character-count-target" => "field",
+            action: "input->admin--character-count#update"
       } %>
       </div>
 
       <p
         class="text-info text-right tw:-mt-2 tw:text-lg"
-        data-admin--recovery-display-form-target="characterTotal"
+        data-admin--character-count-target="total"
       ></p>
     </div>
 

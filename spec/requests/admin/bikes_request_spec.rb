@@ -30,6 +30,19 @@ RSpec.describe Admin::BikesController, type: :request do
         expect(assigns(:user_subject)).to eq user
       end
     end
+
+    context "user_id with deleted_only" do
+      let!(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user:) }
+      let!(:bike_deleted) { FactoryBot.create(:bike, :with_ownership_claimed, user:, deleted_at: Time.current) }
+      let(:user) { FactoryBot.create(:user_confirmed) }
+      it "finds the user's deleted bikes" do
+        get base_url, params: {user_id: user.id}
+        expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
+
+        get base_url, params: {user_id: user.id, search_status_deleted_only: true}
+        expect(assigns(:bikes).pluck(:id)).to eq([bike_deleted.id])
+      end
+    end
   end
 
   describe "duplicates" do
@@ -141,6 +154,19 @@ RSpec.describe Admin::BikesController, type: :request do
       # A tab the show action doesn't render would otherwise raise from the tabs component
       get "#{base_url}/#{bike.id}?active_tab=party"
       expect(response).to redirect_to("#{base_url}/#{bike.id}/edit")
+    end
+
+    context "with a recovery waiting on a decision" do
+      let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, bike:, recovered_description: "Got it back from the shop") }
+      before { stolen_record.update_column(:recovery_display_status, "waiting_on_decision") }
+      it "renders it without the bulk display form" do
+        get "#{base_url}/#{bike.id}?active_tab=recoveries"
+        expect(response.code).to eq("200")
+        expect(response.body).to include("Got it back from the shop")
+        expect(response.body).to_not include("display[#{stolen_record.id}][quote]")
+        expect(response.body).to_not include("sr_selected")
+        expect(response.body).to_not include("bulk_update")
+      end
     end
 
     context "with an organization message" do

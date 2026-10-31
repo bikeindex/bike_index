@@ -4,13 +4,14 @@
 //     one listing none undrawn
 //   tire: the width in mm, where it lists none
 //   fork_rake: the fork's offset in mm
-//   head_tube, crown: a BMX's head tube in mm, and its fork crown's height above the front tire, as BMX spec sheets list
-//     no stack, reach or fork length
+//   head_tube, crown: a BMX's head tube in mm - a short one's rather than the median - and its fork crown's height above
+//     the front tire, as BMX spec sheets list no stack, reach or fork length
 //   seat_tube: a BMX's seat tube, center to top, in mm, which slopes its top tube down to it
-// Touring's are drawn on the road wheels they're built from, and `mtb` gets no wheel for its fat bikes, which no one tire
-// draws
+// Touring's are drawn on the road wheels they're built from, `mtb` gets no wheel for its fat bikes, which no one tire
+// draws, and `bmx_cruiser` none of a BMX's, its frames sized for 24" and 26" wheels
 
 const inches = (width) => Math.round(width * 25.4)
+const BMX = { kind: 'BMX bike', fork_rake: 28, head_tube: 100, crown: 63, seat_tube: 240 }
 
 export const TYPICAL_GEOMETRY = {
   track_racing: { kind: 'track bike', rim: 622, tire: 23, fork_rake: 40 },
@@ -34,7 +35,8 @@ export const TYPICAL_GEOMETRY = {
   mtb_downhill: { kind: 'downhill mountain bike', rim: null, tire: inches(2.5), fork_rake: 52 },
   mtb_freeride: { kind: 'freeride mountain bike', rim: null, tire: inches(2.3) },
   dj: { kind: 'dirt jump bike', rim: 559, tire: inches(2.25) },
-  bmx: { kind: 'BMX bike', fork_rake: 28, head_tube: 119, crown: 63, seat_tube: 240 },
-  bmx_race: { kind: 'BMX bike', fork_rake: 28, head_tube: 119, crown: 63, seat_tube: 240 },
-  bmx_freestyle: { kind: 'BMX bike', fork_rake: 28, head_tube: 119, crown: 63, seat_tube: 240 }
+  bmx: BMX,
+  bmx_race: BMX,
+  bmx_freestyle: BMX,
+  bmx_flatland: BMX
 }
