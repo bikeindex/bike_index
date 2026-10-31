@@ -26,6 +26,7 @@ class Color < ApplicationRecord
     "#386ed2 30% 40%, #1ba100 40% 50%, #fff44b 50% 60%, #ff8d1d 60% 70%, #ec1313 70% 80%, transparent 80%), #fff"
 
   DISPLAYS_CACHE_KEY = "color_displays"
+  private_constant :DISPLAYS_CACHE_KEY
 
   has_many :bikes
   has_many :paints
@@ -38,7 +39,6 @@ class Color < ApplicationRecord
   default_scope { order(:name) }
   scope :commonness, -> { order("priority ASC, name ASC") }
 
-  # Each color's display by its name
   def self.displays = Rails.cache.fetch(DISPLAYS_CACHE_KEY) { pluck(:name, :display).to_h }
 
   def self.black

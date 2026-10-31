@@ -51,7 +51,8 @@ RSpec.describe Color, type: :model do
       Rails.cache.clear
       color = FactoryBot.create(:color, name: "Blue", display: "#386ed2")
       expect(Color.displays).to eq("Blue" => "#386ed2")
-      expect(Rails.cache.read(Color::DISPLAYS_CACHE_KEY)).to eq("Blue" => "#386ed2")
+      Color.update_all(display: "#fff")
+      expect(Color.displays).to eq("Blue" => "#386ed2")
       color.update(display: "#0000ff")
       expect(Color.displays).to eq("Blue" => "#0000ff")
       color.destroy
