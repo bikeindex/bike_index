@@ -76,6 +76,14 @@ module Pages
             @user.deleted? || @user.banned? || last_email_errored.any? || @user.email_bans_active.any?
           end
 
+          def deleted_bikes_link
+            count = Bike.unscoped.current_owner(@user.id).only_deleted.count
+            return if count.zero?
+
+            render(UI::ButtonLink::Component.new(text: safe_join([number_display(count), " deleted #{"bike".pluralize(count)}"]),
+              size: :sm, href: admin_bikes_path(user_id: @user.id, search_status_deleted_only: true, search_status_example: true)))
+          end
+
           def non_admin_view_link
             return unless @user.show_bikes?
 

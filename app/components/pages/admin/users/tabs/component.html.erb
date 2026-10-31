@@ -1,4 +1,4 @@
-<%= render(Pages::Admin::Headers::Tabs::Component.new(title:, tabs:, links: [non_admin_view_link].compact,
+<%= render(Pages::Admin::Headers::Tabs::Component.new(title:, tabs:, links: [deleted_bikes_link, non_admin_view_link].compact,
       nav_label: "User sections")) do |header| %>
   <% if alerts? %>
     <% header.with_alert do %>

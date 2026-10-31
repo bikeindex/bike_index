@@ -121,7 +121,7 @@ RSpec.describe Admin::UsersController, type: :request do
       it "links to the deleted bikes" do
         get "#{base_url}/#{user_subject.id}/edit"
         link = Nokogiri::HTML(response.body).at_css("a[href='#{admin_bikes_path(user_id: user_subject.id, search_status_deleted_only: true, search_status_example: true)}']")
-        expect(link&.text).to eq "1 deleted"
+        expect(link&.text&.squish).to eq "1 deleted bike"
       end
     end
 

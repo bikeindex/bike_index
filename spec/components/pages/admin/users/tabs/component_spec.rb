@@ -19,6 +19,16 @@ RSpec.describe Pages::Admin::Users::Tabs::Component, type: :component do
     expect(component).to have_link("Payments 0", href: "/admin/payments?period=all&user_id=#{user.id}")
     expect(component).to have_link("Emails 2", href: "/admin/users/#{user.id}?active_tab=emails")
     expect(component.css("[role='alert']")).to be_empty
+    expect(component).to_not have_content("deleted")
+  end
+
+  context "with deleted bikes" do
+    before { FactoryBot.create_list(:bike, 2, :with_ownership_claimed, user:, deleted_at: Time.current) }
+
+    it "links to them" do
+      expect(component).to have_link("2 deleted bikes",
+        href: "/admin/bikes?search_status_deleted_only=true&search_status_example=true&user_id=#{user.id}")
+    end
   end
 
   context "with an invalid active tab" do
