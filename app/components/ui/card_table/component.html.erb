@@ -34,11 +34,13 @@
 
       <%= render(UI::TableColumnSettings::Component.new(**@column_settings.except(:storage_key), orderable: true)) %>
 
-      <%# Full bleed takes the table over the admin gutter, past the card, so it's clipped here %>
+      <%# Full bleed takes the table over the admin gutter, past the card, so it's clipped here. %>
+      <%# Wider, it's rounded to the card's rounded-xl inside its border, or the cells square the corners off %>
       <div
         class="
           tw:overflow-hidden
           tw:@max-[672px]/twwiderow:mx-[calc(var(--gutter)*-1)]
+          tw:@min-[672px]/twwiderow:rounded-b-[11px]
         "
       >
         <%= table_html %>
