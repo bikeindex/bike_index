@@ -39,7 +39,6 @@ export class VehicleViewer {
   render (picks, url, preferredSize, search, { group = null, similar } = {}) {
     const { presenter, outOfClassId } = this
     const values = picks.map(({ value }) => value)
-    const keys = vehicleKeys(values)
     // each showing its chosen colorway's photo everywhere it's pictured, its card among the group's and similar models' too
     const vehicles = withChosenPhotos(url, picks)
     const photos = pickedPhotos(vehicles)
@@ -65,7 +64,7 @@ export class VehicleViewer {
     // without the vehicle at `index`, the others' picked sizes and colorways following them
     const removePath = (index) => {
       const without = (list) => list.filter((_, each) => each !== index).join(',')
-      const remaining = (chosen) => without(keys.map((each) => chosen[each] ?? '')).replace(/,+$/, '')
+      const remaining = (chosen) => without(vehicles.map(({ key }) => chosen[key] ?? '')).replace(/,+$/, '')
       return pathWith(url, { vehicle_models: without(values), vehicle_sizes: remaining(picked), vehicle_colorways: remaining(colorways) })
     }
     const sizePath = (key) => (name) => pathWith(url, { vehicle_sizes: sizesParam(values, { ...picked, [key]: name }) })
