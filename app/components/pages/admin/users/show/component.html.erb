@@ -41,7 +41,7 @@
 <% when :ambassador_tasks %>
   <% if @user.ambassador? %>
     <p class="tw:mb-4">
-      <strong><%= records.completed.count %>/<%= records.count %> complete</strong>
+      <strong><%= Ambassador.find(@user.id).progress_count %> complete</strong>
     </p>
   <% else %>
     <p class="tw:mb-4">Not an ambassador</p>

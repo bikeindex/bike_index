@@ -1,4 +1,4 @@
-<%= render(Pages::Admin::Users::Header::Component.new(user: @user, active: :edit, current_country_id:)) %>
+<%= render(Pages::Admin::Users::Header::Component.new(user: @user, active: :edit)) %>
 
 <%= render(Pages::Admin::Users::Edit::Component.new(user: @user, display_dev_info: display_dev_info?)) %>
 
@@ -6,58 +6,57 @@
 
 <%= render(Pages::Admin::Users::MailchimpData::Component.new(user: @user)) %>
 
-<% if @user.present? %>
-  <hr style="margin-top: 60px;">
-  <div class="mt-4 mb-4 row">
-    <div class="col-sm-6 mb-4">
-      <%= render UI::ButtonLink::Component.new(text: "Delete #{@user.email}!", href: admin_user_path(@user.id), method: :delete, color: :error,
-        confirm: "Are you sure? Generally it's better to ban than delete") %>
+<hr style="margin-top: 60px;">
+
+<div class="mt-4 mb-4 row">
+  <div class="col-sm-6 mb-4">
+    <%= render UI::ButtonLink::Component.new(text: "Delete #{@user.email}!", href: admin_user_path(@user.id), method: :delete, color: :error,
+      confirm: "Are you sure? Generally it's better to ban than delete") %>
+  </div>
+
+  <div class="col-sm-6 mb-4" data-controller="ui--collapse">
+    <div class="text-right">
+      <%= render(UI::Collapse::Component.new(text: "Force merge with another email", color: :link_gray)) %>
     </div>
 
-    <div class="col-sm-6 mb-4" data-controller="ui--collapse">
-      <div class="text-right">
-        <%= render(UI::Collapse::Component.new(text: "Force merge with another email", color: :link_gray)) %>
-      </div>
+    <div class="mt-2 tw:hidden" data-ui--collapse-target="content">
+      <div class="card">
+        <div class="card-body">
+          <p>
+            Add another email to this user.
+          </p>
 
-      <div class="mt-2 tw:hidden" data-ui--collapse-target="content">
-        <div class="card">
-          <div class="card-body">
-            <p>
-              Add another email to this user.
-            </p>
+          <p>
+            <span class="text-danger">WARNING</span> this does not send a
+            confirmation email or check that they have access to the email you
+            merge with.
+          </p>
 
-            <p>
-              <span class="text-danger">WARNING</span> this does not send a
-              confirmation email or check that they have access to the email you
-              merge with.
-            </p>
+          <p>
+            <span class="text-warning">
+              We can <strong>not</strong> undo this.
+            </span>
+          </p>
 
-            <p>
-              <span class="text-warning">
-                We can <strong>not</strong> undo this.
-              </span>
-            </p>
+          <%= form_for @user, url: admin_user_path, method: :patch do |f| %>
+            <div class="row mt-2">
+              <div class="col-md-8">
+                <div class="form-group">
+                  <%= email_field_tag :force_merge_email, "", placeholder: "Email to merge", class: "form-control" %>
 
-            <%= form_for @user, url: admin_user_path, method: :patch do |f| %>
-              <div class="row mt-2">
-                <div class="col-md-8">
-                  <div class="form-group">
-                    <%= email_field_tag :force_merge_email, "", placeholder: "Email to merge", class: "form-control" %>
-
-                    <small class="less-strong">
-                      Email must be another user account on Bike Index
-                    </small>
-                  </div>
-                </div>
-
-                <div class="col-md-4">
-                  <%= f.submit "Merge", class: 'btn btn-outline-danger' %>
+                  <small class="less-strong">
+                    Email must be another user account on Bike Index
+                  </small>
                 </div>
               </div>
-            <% end %>
-          </div>
+
+              <div class="col-md-4">
+                <%= f.submit "Merge", class: 'btn btn-outline-danger' %>
+              </div>
+            </div>
+          <% end %>
         </div>
       </div>
     </div>
   </div>
-<% end %>
+</div>

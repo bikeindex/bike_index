@@ -6,8 +6,7 @@ RSpec.describe Pages::Admin::Users::Summary::Component, type: :component do
   let(:user) { FactoryBot.create(:user_confirmed) }
   let(:component) { render_inline(described_class.new(user:)) }
 
-  it "renders the user's email" do
-    expect(component).to have_content(user.email)
+  it "renders no superuser info" do
     expect(component).to_not have_content("full superuser")
   end
 

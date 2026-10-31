@@ -34,9 +34,7 @@
 
               <td>
                 <% if @mailchimp_datum.mailchimp_updated_at.present? %>
-                  <span class="localizeTime">
-                    <%= l(@mailchimp_datum.mailchimp_updated_at, format: :convert_time) %>
-                  </span>
+                  <%= render(UI::Time::Component.new(time: @mailchimp_datum.mailchimp_updated_at)) %>
                 <% end %>
               </td>
             </tr>

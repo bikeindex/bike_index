@@ -16,7 +16,7 @@ RSpec.describe Pages::Admin::Users::Tabs::Component, type: :component do
     expect(component.css("nav a[aria-current]").map { |tab| tab.text.squish }).to eq ["Edit"]
     expect(component).to have_link("Edit", href: "/admin/users/#{user.id}/edit")
     expect(component).to have_link("Bikes 0", href: "/admin/bikes?user_id=#{user.id}")
-    expect(component).to have_link("Payments 0", href: "/admin/payments?period=all&user_id=#{user.id}")
+    expect(component).to have_link("Payments 0", href: "/admin/payments?user_id=#{user.id}")
     expect(component).to have_link("Emails 2", href: "/admin/users/#{user.id}?active_tab=emails")
     expect(component.css("[role='alert']")).to be_empty
     expect(component).to_not have_content("deleted")

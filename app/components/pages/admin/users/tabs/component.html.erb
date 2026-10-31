@@ -1,4 +1,4 @@
-<%= render(Pages::Admin::Headers::Tabs::Component.new(title:, tabs:, links: [deleted_bikes_link, non_admin_view_link].compact,
+<%= render(Pages::Admin::Headers::Tabs::Component.new(title: @user.display_name, tabs:, links: [deleted_bikes_link, non_admin_view_link].compact,
       nav_label: "User sections")) do |header| %>
   <% if alerts? %>
     <% header.with_alert do %>
@@ -25,11 +25,7 @@
                 <td>By</td>
 
                 <td>
-                  <% if user_ban&.creator.present? %>
-                    <%= user_ban.creator.display_name %>
-                  <% elsif user_ban&.creator_id.present? %>
-                    User # <%= user_ban.creator_id %> (unknown user)
-                  <% end %>
+                  <%= render(Atoms::Admin::TableCells::User::Component.new(user: user_ban&.creator, user_id: user_ban&.creator_id)) %>
                 </td>
               </tr>
 

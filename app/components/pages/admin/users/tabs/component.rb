@@ -18,10 +18,9 @@ module Pages
                          payments: :admin_payments_path, notifications: :admin_notifications_path,
                          feedbacks: :admin_feedbacks_path}.freeze
 
-          # What a tab counts
           def self.records(user, tab)
             case tab
-            when :bikes then user.bikes
+            when :bikes then Bike.current_with_user_hidden.current_owner(user.id)
             when :marketplace_messages then MarketplaceMessage.for_user(user)
             when :memberships then user.memberships
             when :alerts then user.user_alerts
@@ -43,17 +42,12 @@ module Pages
 
           private
 
-          def title
-            safe_join([@user.display_name,
-              render(Atoms::Admin::Badges::User::Component.new(user: @user))].reject(&:blank?), " ")
-          end
-
           def tabs
             TABS.filter_map do |tab, label|
               next unless render_tab?(tab)
 
-              count = self.class.records(@user, tab).count unless tab == :edit
-              ComponentStructs::Shapes.tab(label, tab_path(tab), count:, active: @active == tab)
+              ComponentStructs::Shapes.tab(label, tab_path(tab), count: self.class.records(@user, tab)&.count,
+                active: @active == tab)
             end
           end
 
@@ -61,19 +55,18 @@ module Pages
             return edit_admin_user_path(@user.id) if tab == :edit
             return admin_user_path(@user.id, active_tab: tab) unless INDEX_PATHS.key?(tab)
 
-            # Payments' period otherwise defaults to the last year
-            period = "all" if tab == :payments
-            public_send(INDEX_PATHS[tab], user_id: @user.id, period:)
+            public_send(INDEX_PATHS[tab], user_id: @user.id)
           end
 
           # Only ambassadors have tasks - except on its own page, which still renders (saying
           # so) and shouldn't lose its place in the row
           def render_tab?(tab) = tab != :ambassador_tasks || @active == tab || @user.ambassador?
 
-          def last_email_errored = @last_email_errored ||= @user.user_emails.last_email_errored
+          def last_email_errored = @last_email_errored ||= @user.user_emails.last_email_errored.to_a
 
+          # present? loads the association, so the template and the badges reuse it
           def alerts?
-            @user.deleted? || @user.banned? || last_email_errored.any? || @user.email_bans_active.any?
+            @user.deleted? || @user.banned? || last_email_errored.present? || @user.email_bans_active.present?
           end
 
           def deleted_bikes_link

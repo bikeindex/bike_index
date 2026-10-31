@@ -20,7 +20,7 @@ module Pages
 
           def records = Pages::Admin::Users::Tabs::Component.records(@user, @active_tab)
 
-          def registration_organizations_count = @user.user_registration_organizations.count
+          def registration_organizations_count = @registration_organizations_count ||= @user.user_registration_organizations.count
         end
       end
     end

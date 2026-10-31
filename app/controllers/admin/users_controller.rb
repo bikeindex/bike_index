@@ -2,8 +2,6 @@ module Admin
   class UsersController < Admin::BaseController
     include Binxtils::SortableTable
 
-    SHOW_TABS = Pages::Admin::Users::Show::Component::TABS.map(&:to_s).freeze
-
     before_action :find_user, only: %i[show edit update destroy]
     before_action :ensure_can_change_user!, only: %i[update destroy]
     helper_method :invalid_user_options
@@ -16,10 +14,10 @@ module Admin
     end
 
     def show
-      @active_tab = params[:active_tab]
-      return redirect_to(edit_admin_user_url(params[:id])) unless SHOW_TABS.include?(@active_tab)
+      @active_tab = Pages::Admin::Users::Show::Component::TABS.find { it.to_s == params[:active_tab] }
+      return redirect_to(edit_admin_user_url(params[:id])) unless @active_tab
 
-      @page_title = "#{@active_tab.titleize}: #{@user.display_name}"
+      @page_title = "#{Pages::Admin::Users::Tabs::Component::TABS[@active_tab]}: #{@user.display_name}"
     end
 
     def edit
