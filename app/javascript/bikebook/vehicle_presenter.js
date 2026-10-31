@@ -50,8 +50,7 @@ export class VehiclePresenter {
 
   // A colorway's color by its name, a slug or the vocabulary's name for one, beside Bike Index's swatch of it
   paintColor (color) {
-    const swatch = this.paintSwatch(color)
-    return swatch ? join([this.#paintName(color), ' ', swatch]) : this.#paintName(color)
+    return join(compact([this.#paintName(color), this.paintSwatch(color)]), ' ')
   }
 
   // Bike Index's swatch of a colorway's color, null for one it has none of

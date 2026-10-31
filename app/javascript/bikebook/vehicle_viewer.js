@@ -1,7 +1,7 @@
 import { html, nothing } from 'lit-html'
 import { basics } from 'bikebook/templates/vehicles/basics'
 import { withColorwayPhoto } from 'bikebook/colorways'
-import { chosenSizes, paramList, pickedColorways, pickedSizes, sizesParam, vehicleKeys } from 'bikebook/sizes'
+import { chosenSizes, paramList, pickedColorways, pickedSizes, picksParam, vehicleKeys } from 'bikebook/sizes'
 import { comparisonTable } from 'bikebook/templates/vehicles/comparison_table'
 import { cycleDrawing } from 'bikebook/templates/vehicles/cycle_drawing'
 import { emptyState } from 'bikebook/templates/vehicles/empty_state'
@@ -39,7 +39,6 @@ export class VehicleViewer {
   render (picks, url, preferredSize, search, { group = null, similar } = {}) {
     const { presenter, outOfClassId } = this
     const values = picks.map(({ value }) => value)
-    // each showing its chosen colorway's photo everywhere it's pictured, its card among the group's and similar models' too
     const vehicles = withChosenPhotos(url, picks)
     const photos = pickedPhotos(vehicles)
     const colorways = pickedColorways(url)
@@ -67,7 +66,7 @@ export class VehicleViewer {
       const remaining = (chosen) => without(vehicles.map(({ key }) => chosen[key] ?? '')).replace(/,+$/, '')
       return pathWith(url, { vehicle_models: without(values), vehicle_sizes: remaining(picked), vehicle_colorways: remaining(colorways) })
     }
-    const sizePath = (key) => (name) => pathWith(url, { vehicle_sizes: sizesParam(values, { ...picked, [key]: name }) })
+    const sizePath = (key) => (name) => pathWith(url, { vehicle_sizes: picksParam(values, { ...picked, [key]: name }) })
     // a figure's letter lights it on each drawing, card and table row, until it's clicked again
     const highlight = url.searchParams.get('figure')
     const figurePath = (key) => pathWith(url, { figure: key === highlight ? '' : key })
@@ -261,7 +260,7 @@ const pathWith = (url, params) => {
 }
 const typeName = (presenter, data) => presenter.named(presenter.kit.schemas.vehicle, data).type || 'bike'
 const modelName = (presenter, data) => presenter.named(presenter.kit.schemas.vehicle, data).model
-// comparing `ids`, each picked size following its vehicle
+// comparing `ids`, each picked size and colorway following its vehicle
 const comparedPath = (url, ids) => pathWith(url, {
-  vehicle_models: ids.join(','), vehicle_sizes: sizesParam(ids, pickedSizes(url)), vehicle_colorways: sizesParam(ids, pickedColorways(url))
+  vehicle_models: ids.join(','), vehicle_sizes: picksParam(ids, pickedSizes(url)), vehicle_colorways: picksParam(ids, pickedColorways(url))
 })
