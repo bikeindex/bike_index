@@ -830,6 +830,14 @@ RSpec.describe "BikeBook", :js, type: :system do
     visit bikebook_path
     expect(page).to have_css("#vehicle-models-count", exact_text: "(26 matching models)", wait: 10)
 
+    # on a phone, a colorway toggle off the overview's edge scrolls with it rather than widening the page
+    window_size = page.current_window.size
+    page.current_window.resize_to(390, 844)
+    visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_rec_step_through,m/specialized/2025/haul_st")
+    expect(page).to have_css("[aria-label='Overview comparison'] tr input[type='radio']", visible: :all, wait: 10)
+    expect(page.evaluate_script("document.documentElement.scrollWidth")).to eq 390
+    page.current_window.resize_to(*window_size)
+
     # a model's group leaves out the models the market does, until any market will do
     FactoryBot.create(:color, name: "Silver, gray or bare metal", display: "#bbb")
     visit bikebook_path(search: 1, vehicle_models: "m/specialized/2025/haul_st")
