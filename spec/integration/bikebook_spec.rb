@@ -868,8 +868,8 @@ RSpec.describe "BikeBook", :js, type: :system do
     tip = colors.find("[role='tooltip']", visible: true)
     expect(tip.all("span.tw\\:block").map { it.text.squish }).to eq(["Code: #545056", "Colors: Silver, Gray or Bare Metal"])
     expect(tip).to have_css("code", exact_text: "#545056").and have_css("span[aria-hidden][style='background: #bbb']", visible: :all)
-    # one colorway its newest year listed alone, each earlier year's behind a link that hides itself once it shows them, but
-    # 2023's, the same paint as 2026's
+    # one colorway its newest year listed alone, and behind a link that hides itself once it shows them, each paint an
+    # earlier year had, the years that share one together, but 2023's, the same as 2026's
     page.evaluate_script(<<~JS)
       (async () => {
         const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
@@ -877,7 +877,8 @@ RSpec.describe "BikeBook", :js, type: :system do
           import('bikebook/templates/vehicles/basics'), catalog('kit.json'), catalog('vocabulary.json')])
         const colorway = (name) => ({ name, color_code: '#000000' })
         const years = [{ year: 2026, colorways: [colorway('Black')] }, { year: 2025, colorways: [colorway('Black'), colorway('Red'), { name: 'Bare', colors: ['silver'] }] },
-          { year: 2024, colorways: [] }, { year: 2023, colorways: [{ ...colorway('Black'), stock_photo: 'black_2023.png' }] }]
+          { year: 2024, colorways: [] }, { year: 2023, colorways: [{ ...colorway('Black'), stock_photo: 'black_2023.png' }] }, { year: 2022, colorways: [colorway('Red')] },
+          { year: 2021, colorways: [colorway('Red')] }]
         const container = Object.assign(document.createElement('div'), { id: 'colorway-check' })
         const presenter = new VehiclePresenter(kit, { ...vocabulary, paint_colors: { 'Silver, gray or bare metal': '#bbb' } })
         render(basics({ presenter, vehicles: [{ value: '0', key: '0', data: { model: 'One', years } }], removePath: () => '/bikebook' }), container)
@@ -889,7 +890,7 @@ RSpec.describe "BikeBook", :js, type: :system do
       click_on "View previous years colors"
       expect(page).to have_no_button("View previous years colors")
       # one without a code, Bike Index's swatches of its colors in its swatch's place, and no tooltip
-      expect(page).to have_text(/\ABlack\s*\?\s*2025\s*Black\s*\?\s*Red\s*\?\s*Bare\z/)
+      expect(page).to have_text(/\ABlack\s*\?\s*2025\s*Black\s*\?\s*Red\s*\?\s*Bare\s*2021, 2022\s*Red\s*\?\z/)
       expect(page).to have_css("span:has(> span[aria-hidden][style='background: #bbb'])", text: /\ABare\z/)
     end
     page.evaluate_script("document.getElementById('colorway-check').remove()")

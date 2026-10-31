@@ -1,6 +1,7 @@
 import { html, nothing } from 'lit-html'
 import { chosenColorway, colorwayValue, colorwayYears } from 'bikebook/colorways'
 import { amountDisplay, missing } from 'bikebook/templates/helpers'
+import { badge } from 'bikebook/templates/ui/badge'
 import { buttonClasses } from 'bikebook/templates/ui/button'
 import { collapse } from 'bikebook/templates/ui/collapse'
 import { radioButtonGroup } from 'bikebook/templates/ui/forms/radio_button_group'
@@ -46,11 +47,11 @@ const manufacturerPage = (vehicle) => {
   return url && html`<small class="tw:text-gray-500 tw:dark:text-gray-400"><a class="twlink-underlined" href=${url}>manufacturer's page</a></small>`
 }
 
-// the newest colorways, to choose between where there are several, the `picked` one chosen, and each earlier year's behind
-// a link that shows them
 // A year's colorways by their paint, not their photos
 const paint = (year) => JSON.stringify(array(year.colorways).map(({ name, colors, color_code: code }) => [name, colors, code]))
 
+// the newest colorways, to choose between where there are several, the `picked` one chosen, and behind a link that shows
+// them, each paint the earlier years had, but the newest's
 const colors = (presenter, vehicle, key, picked) => {
   const [newest, ...rest] = colorwayYears(vehicle)
   if (!newest) return null
@@ -66,12 +67,12 @@ const colors = (presenter, vehicle, key, picked) => {
       attributes: { 'data-action': 'change->bikebook--page#pickColorway', 'data-bikebook--page-vehicle-param': key }
     })}</div>`
     : colorways(presenter, latest)
-  const earlier = rest.filter((year) => paint(year) !== paint(newest))
-  if (earlier.length === 0) return shown
+  const earlier = Map.groupBy(rest.filter((year) => paint(year) !== paint(newest)), paint)
+  if (earlier.size === 0) return shown
 
   return html`<div class="tw:space-y-2" data-controller="ui--collapse">${shown}<div class="tw:hidden tw:space-y-1" data-ui--collapse-target="content">${
-    earlier.map(({ year, colorways: each }) => html`<div class="tw:flex tw:items-baseline tw:gap-2"><span class="tw:text-xs tw:font-bold tw:tabular-nums">${year}</span>${
-      colorways(presenter, array(each))}</div>`)}</div><div>${collapse({ color: 'link_gray', htmlClass: 'tw:text-sm tw:aria-expanded:hidden', content: 'View previous years colors' })}</div></div>`
+    [...earlier.values()].map((years) => html`<div class="tw:flex tw:flex-wrap tw:items-baseline tw:gap-x-2 tw:gap-y-1"><span class="tw:text-xs tw:font-bold tw:whitespace-nowrap tw:tabular-nums">${
+      years.map(({ year }) => year).toReversed().join(', ')}</span>${badge({ text: colorways(presenter, array(years[0].colorways)) })}</div>`)}</div><div>${collapse({ color: 'link_gray', htmlClass: 'tw:text-sm tw:aria-expanded:hidden', content: 'View previous years colors' })}</div></div>`
 }
 
 const EXCERPT_LENGTH = 200
