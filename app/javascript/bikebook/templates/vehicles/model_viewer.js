@@ -1,6 +1,7 @@
 import { html, nothing, render } from 'lit-html'
 import { frameGeometry, OVERALL_LENGTH_ESTIMATE } from 'bikebook/frame_geometry'
 import { missing, numberDisplay } from 'bikebook/templates/helpers'
+import { inlineBadge } from 'bikebook/templates/ui/badge'
 import { collapse } from 'bikebook/templates/ui/collapse'
 import { definitionListContainer } from 'bikebook/templates/ui/definition_list/container'
 import { definitionListRow } from 'bikebook/templates/ui/definition_list/row'
@@ -48,6 +49,8 @@ const WIDE_TIRE = 50
 const MAX_LOAD = 'Max load (rider + cargo)'
 const GROSS_WEIGHT = 'Gross weight rating (bike + rider + cargo)'
 const FRAME_LABELS = { max_weight_total: MAX_LOAD, gross_weight_rating: GROSS_WEIGHT }
+// In the box rather than on the bike, so listed apart and never compared part by part
+const INCLUDED = 'included_not_installed'
 
 export const US_CLASS = /^evc\/us\/class_(\d)$/
 // (tire_width / 25.4).round(1) is a Float, so a whole inch still reads 2.0
@@ -118,7 +121,7 @@ export const componentsOf = ({ presenter, vehicles, others }) => {
   const groups = viewers[0].componentRows(viewers.map((viewer) => viewer.vehicle))
   return new Map(vehicles.map(({ key }, index) => [key, html`<div class="tw:space-y-4">${viewers[index].components({
     groups, index, compared: others(key).map((other) => vehicles.findIndex(({ data }) => data === other))
-  })}</div>`]))
+  })}${viewers[index].inTheBox()}</div>`]))
 }
 
 class ModelViewer {
@@ -162,8 +165,8 @@ class ModelViewer {
       data-controller="ui--collapse ui--alert" data-ui--collapse-param-value="json"
       data-ui--collapse-direction-value="horizontal"><article class="twgutter tw:w-full tw:min-w-0 tw:space-y-6
       tw:rounded-sm tw:border tw:border-gray-200 tw:dark:border-gray-700 tw:bg-white tw:dark:bg-gray-800 tw:pt-4 tw:pb-6 tw:[--gutter:--spacing(6)]
-      ${comparing ? 'tw:md:max-w-[56rem] tw:lg:flex-1' : 'tw:lg:w-[56rem] tw:lg:shrink-0'}">${header}${specs}${this.description()}${this.sizesDisclosure()}${present(this.vehicle.components)
-      ? html`<section class="tw:space-y-4"><h2 class="tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">Components</h2>${this.components()}</section>`
+      ${comparing ? 'tw:md:max-w-[56rem] tw:lg:flex-1' : 'tw:lg:w-[56rem] tw:lg:shrink-0'}">${header}${specs}${this.description()}${this.sizesDisclosure()}${present(this.data.components)
+      ? html`<section class="tw:space-y-4"><h2 class="tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">Components</h2>${this.components()}${this.inTheBox()}</section>`
       : nothing}</article><aside
       id=${jsonPanelId} class="twjson-panel tw:hidden tw:w-full tw:min-w-0 tw:lg:relative tw:lg:w-[28rem] tw:lg:shrink-0" data-ui--collapse-target="content">${
         jsonDisplay({ data: this.data, small: true, noMaxHeight: true })}</aside></div>`
@@ -178,9 +181,13 @@ class ModelViewer {
       alt="" class="tw:aspect-square tw:h-16 tw:min-h-0 tw:w-auto" src=${this.kit.placeholder_url}><span class="tw:text-sm tw:leading-none">No photo</span></div></div>`
   }
 
-  // Values by their vocabulary names, then the frame's mount labels and each suspension's values
+  // Values by their vocabulary names, the parts in the box apart, then the frame's mount labels and each suspension's values
   #normalize (data) {
-    const vehicle = this.presenter.named(this.kit.schemas.vehicle, data)
+    const components = array(data.components)
+    const vehicle = {
+      ...this.presenter.named(this.kit.schemas.vehicle, { ...data, components: components.filter(({ type }) => type !== INCLUDED) }),
+      included: components.filter(({ type }) => type === INCLUDED)
+    }
     const frame = vehicle.frame && { ...vehicle.frame, ...this.#frameMounts(vehicle.frame, vehicle.sizes) }
     const suspension = Object.fromEntries(Object.keys(this.kit.viewer.suspensions)
       .map((position) => [position, this.#suspension(vehicle, position)]).filter(([, values]) => values != null))
@@ -484,7 +491,7 @@ class ModelViewer {
     const { first_year: first, final_year: final } = this.vehicle
     if (blank(first)) return null
     if (final === first) return String(first)
-    return join([first, ' – ', presence(final) ?? 'current'])
+    return join([first, ' – ', presence(final) ?? inlineBadge({ text: 'current', size: 'sm' })])
   }
 
   specRows (key, fields = key === 'frame' ? this.kit.viewer.frame_fields : this.kit.schemas.vehicle[key].fields, labels = {}) {
@@ -950,6 +957,14 @@ class ModelViewer {
         alignKey: layout && name
       })]
     })
+  }
+
+  inTheBox () {
+    if (blank(this.vehicle.included)) return nothing
+
+    return html`<div class="tw:space-y-2"><h3 class="tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">In the box</h3><ul
+      class="tw:list-disc tw:space-y-1 tw:pl-5 tw:text-sm">${this.vehicle.included.map(({ type_detail: detail, description }) =>
+      html`<li>${present(detail) ? html`<span class="tw:font-bold">${detail}</span> ` : nothing}${description}</li>`)}</ul></div>`
   }
 }
 

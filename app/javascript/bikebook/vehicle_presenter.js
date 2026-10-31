@@ -2,6 +2,7 @@ import { html, nothing } from 'lit-html'
 import { fragmentOf } from 'bikebook/render'
 import { numberDisplay } from 'bikebook/templates/helpers'
 import { copyableCode } from 'bikebook/templates/atoms/copyable_code'
+import { colorSwatch } from 'bikebook/templates/ui/color_swatch'
 import { definitionListRow } from 'bikebook/templates/ui/definition_list/row'
 import { tooltip } from 'bikebook/templates/ui/tooltip'
 import { array, blank, compact, equal, isHash, isTemplate, join, listed } from 'bikebook/templates/values'
@@ -45,6 +46,22 @@ export class VehiclePresenter {
       ...kit.imperial_lengths.map(({ pattern, parts }) => ({ pattern: new RegExp(pattern), parts }))]
     this.unitSuffix = new RegExp(kit.geometry.unit_suffix)
     this.componentGroups = new Map(Object.entries(kit.component_groups).flatMap(([group, types]) => types.map((type) => [type, group])))
+  }
+
+  // A colorway's color by its name, a slug or the vocabulary's name for one, beside Bike Index's swatch of it
+  paintColor (color) {
+    return join(compact([this.#paintName(color), this.paintSwatch(color)]), ' ')
+  }
+
+  // Bike Index's swatch of a colorway's color, null for one it has none of
+  paintSwatch (color) {
+    const name = this.#paintName(color)
+    const [paint, display] = Object.entries(this.vocabulary.paint_colors ?? {}).find(([each]) => each.toLowerCase() === name.toLowerCase()) ?? []
+    return paint ? colorSwatch({ name: paint, display, size: 'sm', align: 'baseline' }) : null
+  }
+
+  #paintName (color) {
+    return this.vocabulary.names['years.colorways.colors']?.[color] ?? color
   }
 
   // `hash` with each slug the vocabulary names as its name

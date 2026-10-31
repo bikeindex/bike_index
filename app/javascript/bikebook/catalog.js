@@ -6,8 +6,9 @@ import { fragmentOf, renderInto } from 'bikebook/render'
 
 /* global IntersectionObserver, Worker */
 
-// `jurisdictions` names the codes classifications are in, which the catalog doesn't
-export async function loadCatalog (manifestUrl, ids = [], jurisdictions = {}) {
+// `jurisdictions` names the codes classifications are in, which the catalog doesn't, and `paintColors` are Bike Index's
+// colors' displays by their names, which its colorways' colors are
+export async function loadCatalog (manifestUrl, ids = [], jurisdictions = {}, paintColors = {}) {
   const worker = new Worker(import.meta.resolve('bikebook/catalog_worker'), { type: 'module' })
   const pending = new Map()
   let nextId = 0
@@ -34,7 +35,7 @@ export async function loadCatalog (manifestUrl, ids = [], jurisdictions = {}) {
       similarityUrl: import.meta.resolve('bikebook/similarity')
     })
     return {
-      vocabulary,
+      vocabulary: { ...vocabulary, paint_colors: paintColors },
       kit,
       options,
       comparable,
@@ -45,7 +46,7 @@ export async function loadCatalog (manifestUrl, ids = [], jurisdictions = {}) {
       }),
       search: (params, page, perPage) => call('search', { params, page, perPage }),
       featured: (params, legalClasses) => call('featured', { params, legalClasses }),
-      group: (id) => call('group', { model: id }),
+      group: (id, { market, market_scope: scope }) => call('group', { model: id, market, scope }),
       vehicles: (ids, { market } = {}) => call('vehicles', { ids, market }),
       displays: (ids) => call('displays', { ids })
     }

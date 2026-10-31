@@ -9,7 +9,7 @@ import { FILTERS, LISTS, RANGES, SINGLES, ordered, searching, toQuery } from 'bi
 import { fragmentOf, renderInto } from 'bikebook/render'
 import { preferredSize } from 'bikebook/sizes'
 import { settingsFrom } from 'bikebook/similarity'
-import { MAX_COMPARE, VehicleViewer } from 'bikebook/vehicle_viewer'
+import { MAX_COMPARE, pickedPhotos, VehicleViewer, withChosenPhotos } from 'bikebook/vehicle_viewer'
 
 /* global CSS */
 
@@ -113,22 +113,23 @@ const similarOf = async (catalog, url, vehicles, filters) => {
 // The similar models' cards for `vehicle` by its `settings`, which change without rendering the page afresh
 export async function rescoredSimilar (catalog, page, url, vehicle, settings) {
   const filters = filtersAt(catalog, page, url)
-  return new VehicleViewer(catalog.kit, catalog.vocabulary, filters).similarResults(url, await catalog.similar(vehicle, settings, filters))
+  const [picks, results] = await Promise.all([pickedOf(catalog, url, filters), catalog.similar(vehicle, settings, filters)])
+  return new VehicleViewer(catalog.kit, catalog.vocabulary, filters).similarResults(url, results, pickedPhotos(withChosenPhotos(url, picks)))
 }
 
-// the model group `url`'s overview shows, of one of its vehicles
-const groupOf = (catalog, url) => {
+// the model group `url`'s overview shows, of one of its vehicles, in the `filters`' market
+const groupOf = (catalog, url, filters) => {
   const id = url.searchParams.get('group')
   const view = url.searchParams.get('view')
   const picked = url.searchParams.get('vehicle_models')?.split(',').slice(0, MAX_COMPARE) ?? []
-  return picked.includes(id) && (!view || view === 'basics') ? catalog.group(id) : null
+  return picked.includes(id) && (!view || view === 'basics') ? catalog.group(id, filters) : null
 }
 
 // The picked vehicles' place for `url`'s jurisdiction, which decides which are out of class there, and market, which
 // which are sold elsewhere, and the similar models' adjustments for the filters' card
 export async function pickedVehicles (catalog, page, url) {
   const filters = filtersAt(catalog, page, url)
-  const [found, group] = await Promise.all([pickedOf(catalog, url, filters), groupOf(catalog, url)])
+  const [found, group] = await Promise.all([pickedOf(catalog, url, filters), groupOf(catalog, url, filters)])
   const vehicles = found.slice(0, MAX_COMPARE)
   const viewer = new VehicleViewer(catalog.kit, catalog.vocabulary, filters)
   const similar = await similarOf(catalog, url, vehicles, filters)
@@ -175,7 +176,7 @@ export async function hydrate (catalog, source, shell, url) {
   const located = panel.getAttribute(MARKET_ATTRIBUTE)
   panel.setAttribute(MARKET_ATTRIBUTE, catalog.options.market.some(({ value }) => value === located) ? located : '')
   const filters = filtersAt(catalog, root, url)
-  const [found, { filteredCount }, group] = await Promise.all([pickedOf(catalog, url, filters), catalog.search(filters, 0, 0), groupOf(catalog, url)])
+  const [found, { filteredCount }, group] = await Promise.all([pickedOf(catalog, url, filters), catalog.search(filters, 0, 0), groupOf(catalog, url, filters)])
   const vehicles = found.slice(0, MAX_COMPARE)
   const classifications = catalog.vocabulary.e_vehicle_classifications
   const cards = pickedClassifications(url, classifications)
