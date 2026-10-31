@@ -640,8 +640,10 @@ class ModelViewer {
     ], ' ')
   }
 
+  // Wraps only between cups
   shisCode (code, size = 'tw:text-xs') {
-    return html`<code class="tw:rounded-sm tw:border tw:border-gray-200 tw:dark:border-gray-700 tw:px-1.5 tw:py-0.5 tw:font-mono tw:whitespace-nowrap ${size}">${code}</code>`
+    return html`<code class="tw:rounded-sm tw:border tw:border-gray-200 tw:dark:border-gray-700 tw:px-1.5 tw:py-0.5 tw:font-mono tw:whitespace-normal tw:box-decoration-clone ${
+      size}">${join(code.split(/\s*\|\s*/).map((cup) => html`<span class="tw:whitespace-nowrap">${cup}</span>`), ' | ')}</code>`
   }
 
   millimeters (value, suffix = null) {
