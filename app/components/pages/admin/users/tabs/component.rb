@@ -46,8 +46,15 @@ module Pages
             TABS.filter_map do |tab, label|
               next unless render_tab?(tab)
 
-              ComponentStructs::Shapes.tab(label, tab_path(tab), count: self.class.records(@user, tab)&.count,
-                active: @active == tab)
+              ComponentStructs::Shapes.tab(label, tab_path(tab), count: tab_counts[tab], active: @active == tab)
+            end
+          end
+
+          # Cached on the user, as Pages::Admin::Bikes::Tabs caches its counts on the bike
+          def tab_counts
+            @tab_counts ||= Rails.cache.fetch(["admin_user_tab_counts", @user]) do
+              (TABS.keys - %i[edit]).to_h { [it, self.class.records(@user, it).count] }
+                .merge(deleted_bikes: Bike.unscoped.current_owner(@user.id).only_deleted.count)
             end
           end
 
@@ -70,7 +77,7 @@ module Pages
           end
 
           def deleted_bikes_link
-            count = Bike.unscoped.current_owner(@user.id).only_deleted.count
+            count = tab_counts[:deleted_bikes]
             return if count.zero?
 
             render(UI::ButtonLink::Component.new(text: safe_join([number_display(count), " deleted #{"bike".pluralize(count)}"]),

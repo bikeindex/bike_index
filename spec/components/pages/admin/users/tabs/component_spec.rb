@@ -31,6 +31,18 @@ RSpec.describe Pages::Admin::Users::Tabs::Component, type: :component do
     end
   end
 
+  context "with caching", :caching do
+    include_context :caching_basic
+
+    it "keeps the counts until the user changes" do
+      expect(tab_labels).to include("Bikes 0")
+      FactoryBot.create(:bike, :with_ownership_claimed, user:)
+      expect(render_inline(described_class.new(user:, active:)).css("nav a").map { it.text.squish }).to include("Bikes 0")
+      user.update(name: "Renamed User")
+      expect(render_inline(described_class.new(user:, active:)).css("nav a").map { it.text.squish }).to include("Bikes 1")
+    end
+  end
+
   context "with an invalid active tab" do
     let(:active) { :party }
 
