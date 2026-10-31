@@ -3,7 +3,7 @@ import { attributes } from 'bikebook/templates/attributes'
 import { buttonClasses, LINK_COLORS } from 'bikebook/templates/ui/button'
 import { iconChevron } from 'bikebook/templates/ui/icon_chevron'
 
-const ACTIONS = 'mousedown->ui--collapse#press click->ui--collapse#toggle keydown.enter->ui--collapse#toggle:prevent ' +
+export const COLLAPSE_ACTIONS = 'mousedown->ui--collapse#press click->ui--collapse#toggle keydown.enter->ui--collapse#toggle:prevent ' +
   'keydown.space->ui--collapse#toggle:prevent'
 
 // UI::Collapse::Component in the secondary or a link color, the trigger for a ui--collapse controller on an ancestor, its
@@ -17,5 +17,5 @@ export const collapse = ({ content, chevron = false, color = 'secondary', size, 
   const classes = [buttonClasses({ size, htmlClass, color }),
     LINK_COLORS.includes(color) && !String(htmlClass ?? '').includes('tw:font-') && 'tw:not-data-[active=true]:[font-weight:inherit]'].filter(Boolean).join(' ')
   return html`<span ${attributes(htmlOptions)} role="button" tabindex="0" class=${classes} aria-expanded="false"
-    data-ui--collapse-target="trigger" data-action=${ACTIONS}>${chevron === 'trailing' ? html`${content}${chevronSpan}` : html`${chevronSpan}${content}`}</span>`
+    data-ui--collapse-target="trigger" data-action=${COLLAPSE_ACTIONS}>${chevron === 'trailing' ? html`${content}${chevronSpan}` : html`${chevronSpan}${content}`}</span>`
 }

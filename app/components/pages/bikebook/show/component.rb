@@ -9,8 +9,9 @@ module Pages
       class Component < ApplicationComponent
         # market is the visitor's CF-IPCountry, which Cloudflare sends as XX, or T1 over Tor, when it can't
         # tell; state is theirs in the US
-        def initialize(manifest_url:, market:, state:, query:)
+        def initialize(manifest_url:, market:, state:, query:, paint_colors:)
           @manifest_url = manifest_url
+          @paint_colors = paint_colors
           @market = %w[XX T1].include?(market) ? "US" : market.presence || "US"
           @jurisdiction = state&.dig(:abbr) || "US"
           @query = query

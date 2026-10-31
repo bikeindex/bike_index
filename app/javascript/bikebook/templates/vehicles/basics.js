@@ -1,11 +1,14 @@
 import { html, nothing } from 'lit-html'
+import { chosenColorway, colorwayValue, colorwayYears } from 'bikebook/colorways'
 import { amountDisplay, missing } from 'bikebook/templates/helpers'
 import { buttonClasses } from 'bikebook/templates/ui/button'
 import { collapse } from 'bikebook/templates/ui/collapse'
+import { radioButtonGroup } from 'bikebook/templates/ui/forms/radio_button_group'
 import { table } from 'bikebook/templates/ui/table'
 import { PINNED_ROW_HEADER } from 'bikebook/templates/vehicles/comparison_table'
 import { removeLink } from 'bikebook/templates/vehicles/remove_link'
 import { basicsOf, simpleFormat } from 'bikebook/templates/vehicles/model_viewer'
+import { colorway, colorways } from 'bikebook/templates/vehicles/model_years'
 import { vehicleTitle } from 'bikebook/templates/vehicles/vehicle_title'
 import { array, isNumber, join, present } from 'bikebook/templates/values'
 
@@ -15,6 +18,7 @@ const FIELDS = [
   { label: 'Markets', key: 'markets', only: 'outside_market' },
   { label: 'Model group', key: 'model_group' },
   { label: 'Years', key: 'years' },
+  { label: 'Colorway', key: 'colors' },
   { label: 'Vehicle type', key: 'vehicle_type', differing: 'type' },
   { label: 'Cargo', key: 'cargo', only: 'cargo_vehicle' },
   { label: 'Primary activity', key: 'primary_activity' },
@@ -40,6 +44,30 @@ const priced = (vehicle) => array(vehicle.years).find((year) => isNumber(year.or
 const manufacturerPage = (vehicle) => {
   const url = array(vehicle.years).find((year) => year.url_live && present(year.url))?.url
   return url && html`<small class="tw:text-gray-500 tw:dark:text-gray-400"><a class="twlink-underlined" href=${url}>manufacturer's page</a></small>`
+}
+
+// the newest colorways, to choose between where there are several, the `picked` one chosen, and each earlier year's behind
+// a link that shows them
+const colors = (presenter, vehicle, key, picked) => {
+  const [newest, ...earlier] = colorwayYears(vehicle)
+  if (!newest) return null
+
+  const latest = array(newest.colorways)
+  const chosen = chosenColorway(vehicle, picked)
+  // the toggle's track wrapping its segments, which it doesn't for its own few short ones
+  const shown = latest.length > 1
+    ? html`<div class="tw:*:flex-wrap">${radioButtonGroup({
+      name: `colorway-${key}`,
+      entries: latest.map((each, index) => ({ value: colorwayValue(each, index), label: colorway(presenter, each) })),
+      selected: colorwayValue(chosen, latest.indexOf(chosen)),
+      attributes: { 'data-action': 'change->bikebook--page#pickColorway', 'data-bikebook--page-vehicle-param': key }
+    })}</div>`
+    : colorways(presenter, latest)
+  if (earlier.length === 0) return shown
+
+  return html`<div class="tw:space-y-2" data-controller="ui--collapse">${shown}<div class="tw:hidden tw:space-y-1" data-ui--collapse-target="content">${
+    earlier.map(({ year, colorways: each }) => html`<div class="tw:flex tw:items-baseline tw:gap-2"><span class="tw:text-xs tw:font-bold tw:tabular-nums">${year}</span>${
+      colorways(presenter, array(each))}</div>`)}</div><div>${collapse({ color: 'link_gray', htmlClass: 'tw:text-sm tw:aria-expanded:hidden', content: 'View previous years colors' })}</div></div>`
 }
 
 const EXCERPT_LENGTH = 200
@@ -81,10 +109,10 @@ const viewGroup = (groupPath, value, shownGroup) => html`<a href=${groupPath(val
   class=${buttonClasses({ size: 'sm', htmlClass: 'tw:ml-2' })} aria-current=${value === shownGroup ? 'true' : nothing} data-in-place="#model-group">View group</a>`
 
 // The models' names, photos and headline fields side by side in a table, one model's as two's, each photo with an ×
-// to the page without it at `removePath`, each column's last cell with its `bottoms` classes and the table's section with
-// its `sectionClasses`
-export const basics = ({ presenter, vehicles, market, outOfClassId, removePath, groupPath, shownGroup, bottoms = [], sectionClasses = '' }) => {
-  const shown = vehicles.map(({ data, value, outsideMarket }, index) => {
+// to the page without it at `removePath`, each column's last cell with its `bottoms` classes, the table's section with
+// its `sectionClasses` and its corner with `corner`
+export const basics = ({ presenter, vehicles, market, outOfClassId, removePath, colorways: pickedColorways = {}, groupPath, shownGroup, bottoms = [], sectionClasses = '', corner = nothing }) => {
+  const shown = vehicles.map(({ data, value, key, outsideMarket }, index) => {
     const price = priced(data)
     const fields = basicsOf({ presenter, data, outOfClassId })
     return {
@@ -96,22 +124,23 @@ export const basics = ({ presenter, vehicles, market, outOfClassId, removePath, 
       outside_market: outsideMarket,
       title: vehicleTitle({ manufacturer: fields.manufacturer, model: fields.model, data, value, market, configurations: presenter.kit.model_configurations }),
       years: join([fields.years, manufacturerPage(data)].filter(present), ' '),
+      colors: colors(presenter, data, key, pickedColorways[key]),
       price: price && amountDisplay(price.original_msrp, price.original_msrp_currency, presenter.vocabulary.currencies),
       description: fields.description && readMore(data.description, fields.description)
     }
   })
   const fields = FIELDS.filter((field) => (field.only ? shown.some((each) => each[field.only]) : shown.some((each) => present(each[field.key]))) &&
     (!field.differing || new Set(shown.map((each) => each[field.differing])).size > 1))
-  return compared(shown, fields, bottoms, sectionClasses)
+  return compared(shown, fields, bottoms, sectionClasses, corner)
 }
 
-const compared = (vehicles, fields, bottoms, sectionClasses) => html`<section aria-label=${vehicles.length > 1 ? 'Overview comparison' : 'Overview'} class="tw:mt-6 ${vehicles.length > 3
+const compared = (vehicles, fields, bottoms, sectionClasses, corner) => html`<section aria-label=${vehicles.length > 1 ? 'Overview comparison' : 'Overview'} class="tw:mt-6 ${vehicles.length > 3
   ? 'tw:twpagebleed tw:px-4'
   : ''} ${sectionClasses}" style=${`--models: ${vehicles.length}`}>${table({
   classes: `${vehicles.length === 1 ? 'tw:w-full tw:md:w-[calc(50%+6.25rem)] tw:md:min-w-0!' : `tw:w-full ${MIN_WIDTH}`} tw:table-fixed ${vehicles.length > 3 ? `tw:mx-auto ${MAX_WIDTH}` : ''}`,
   records: fields,
   columns: [
-    { label: html`<span class="tw:sr-only">Field</span>`, rowHeader: true, classes: 'tw:w-32 tw:md:w-50 tw:px-2.5! tw:py-2! tw:align-top tw:font-bold', cellClass: () => PINNED_ROW_HEADER, cell: ({ label }) => label },
+    { label: html`<span class="tw:sr-only">Field</span>${corner}`, rowHeader: true, classes: 'tw:w-32 tw:md:w-50 tw:px-2.5! tw:py-2! tw:align-top tw:font-bold', cellClass: () => PINNED_ROW_HEADER, cell: ({ label }) => label },
     ...vehicles.map((vehicle, index) => ({
       label: html`${vehicle.photo('tw:mb-2 tw:aspect-[4/3]')}${removeLink({
         label: `Remove ${[vehicle.manufacturer, vehicle.model].filter(present).join(' ')}`,

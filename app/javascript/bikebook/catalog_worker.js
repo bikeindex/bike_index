@@ -219,13 +219,14 @@ function featured ({ params, legalClasses }) {
 }
 
 // The models of the `model` id's group by year, newest first, each under the newest it's sold in - so each once, and a
-// current one in this year
-function group ({ model: id }) {
+// current one in this year. Those `market` leaves out by its `scope`, as a search would, but the model itself
+function group ({ model: id, market, scope }) {
   const model = byId.get(id)
   if (!model?.model_group) return null
 
   const years = new Map()
-  for (const each of sorted({}).filter((each) => each.manufacturer === model.manufacturer && each.model_group === model.model_group && each.first_year)) {
+  for (const each of sorted({}).filter((each) => each.manufacturer === model.manufacturer && each.model_group === model.model_group && each.first_year &&
+    (each === model || !market || inMarket(each, market, scope)))) {
     years.set(each.sortYear, [...(years.get(each.sortYear) ?? []), each])
   }
   return {
