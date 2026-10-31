@@ -6,7 +6,7 @@ import { readable } from 'bikebook/replace_url'
 import { NARROWING, searching } from 'bikebook/query'
 import { collapse } from 'utils/collapse_utils'
 import { SearchLog } from 'bikebook/search_log'
-import { realigned, storePreferredSize, withSize } from 'bikebook/sizes'
+import { realigned, storePreferredSize, withColorway, withSize } from 'bikebook/sizes'
 import { renderClassCards, withClassifications } from 'bikebook/templates/vehicles/class_cards'
 import { uuid } from 'bikebook/templates/helpers'
 
@@ -19,7 +19,7 @@ const stamped = (state) => ({ ...state, bikebook: uuid() })
 // link to this page and each history step render the page afresh from the shell, without a request
 export default class extends Controller {
   static targets = ['shell', 'page', 'status']
-  static values = { manifestUrl: String, jurisdictions: Object, failedText: String, title: String, searchLogUrl: String }
+  static values = { manifestUrl: String, jurisdictions: Object, paintColors: Object, failedText: String, title: String, searchLogUrl: String }
 
   #scrolls = new Map()
   #searchLog
@@ -40,7 +40,7 @@ export default class extends Controller {
     const url = new URL(window.location.href)
     this.#render(url)
     try {
-      this.catalog = await loadCatalog(this.manifestUrlValue, url.searchParams.get('vehicle_models')?.split(',') ?? [], this.jurisdictionsValue)
+      this.catalog = await loadCatalog(this.manifestUrlValue, url.searchParams.get('vehicle_models')?.split(',') ?? [], this.jurisdictionsValue, this.paintColorsValue)
     } catch (error) {
       return this.#fail(error)
     }
@@ -95,6 +95,11 @@ export default class extends Controller {
     if (first) storePreferredSize(JSON.parse(target.selectedOptions[0].dataset.size))
     await this.#go(withSize(new URL(window.location.href), vehicle, target.value), [window.scrollX, window.scrollY])
     this.pageTarget.querySelector(`select[data-bikebook--page-vehicle-param="${CSS.escape(vehicle)}"]`)?.focus({ preventScroll: true })
+  }
+
+  // A vehicle's colorway, in place of the history entry it's picked on
+  pickColorway ({ target, params: { vehicle } }) {
+    this.#go(withColorway(new URL(window.location.href), vehicle, target.value), [window.scrollX, window.scrollY], { replace: true })
   }
 
   // A filter changes in place, which with nothing picked the featured models and their count follow, and the picked
@@ -216,7 +221,8 @@ export default class extends Controller {
       // once its panel's controller has opened it, a hidden field taking no focus
       requestAnimationFrame(() => kept.focus({ preventScroll: true }))
     } else if (focus) {
-      (this.pageTarget.querySelector(focus) ?? this.pageTarget.querySelector('[autofocus]'))?.focus({ preventScroll: Boolean(scroll) })
+      // once a list's controller has shown the page it's on
+      requestAnimationFrame(() => (this.pageTarget.querySelector(focus) ?? this.pageTarget.querySelector('[autofocus]'))?.focus({ preventScroll: Boolean(scroll) }))
     }
     if (scroll) {
       window.scrollTo(...scroll)
