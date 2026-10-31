@@ -34,12 +34,14 @@ RSpec.describe Pages::Admin::Users::Tabs::Component, type: :component do
   context "with caching", :caching do
     include_context :caching_basic
 
+    def rendered = render_inline(described_class.new(user:, active:))
+
     it "keeps the counts until the user changes" do
-      expect(tab_labels).to include("Bikes 0")
+      expect(rendered).to have_link("Bikes 0")
       FactoryBot.create(:bike, :with_ownership_claimed, user:)
-      expect(render_inline(described_class.new(user:, active:)).css("nav a").map { it.text.squish }).to include("Bikes 0")
-      user.update(name: "Renamed User")
-      expect(render_inline(described_class.new(user:, active:)).css("nav a").map { it.text.squish }).to include("Bikes 1")
+      expect(rendered).to have_link("Bikes 0")
+      user.touch
+      expect(rendered).to have_link("Bikes 1")
     end
   end
 

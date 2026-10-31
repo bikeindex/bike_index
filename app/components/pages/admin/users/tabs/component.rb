@@ -50,7 +50,7 @@ module Pages
             end
           end
 
-          # Cached on the user, as Pages::Admin::Bikes::Tabs caches its counts on the bike
+          # Keyed on the user, so a new bike or payment only shows once the user is next touched
           def tab_counts
             @tab_counts ||= Rails.cache.fetch(["admin_user_tab_counts", @user]) do
               (TABS.keys - %i[edit]).to_h { [it, self.class.records(@user, it).count] }
