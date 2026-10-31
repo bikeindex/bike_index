@@ -1,148 +1,131 @@
-<li class="bike-box-item tw:odd:bg-gray-100 tw:dark:odd:bg-gray-800">
-  <%# The row wraps, so the alerts fill the box's width %>
-  <% if @unfinished_b_param %>
-    <div class="tw:basis-full">
-      <%= render(SharedBlocks::UserAlerts::UnfinishedRegistration::Component.new(b_param: @unfinished_b_param, current_user: @current_user, kind: :error, margin_classes: "tw:mb-0")) %>
-    </div>
+<li class="<%= class_names("tw:flex tw:flex-col tw:gap-2", "tw:min-w-0": grid?) %>">
+  <% unless grid? %>
+    <%= render(Pages::MyAccount::Show::BikeAlerts::Component.new(bike: @bike, current_user: @current_user, unfinished_b_param: @unfinished_b_param)) %>
   <% end %>
 
   <% cache(cache_key) do %>
-    <% image_link = @bike.thumb_path ? bike_url(@bike) : edit_bike_url(@bike, edit_template: 'photos') %>
-
-    <a
-      class="<%= class_names("bike-list-image tw:[&>img:not(.no-image)]:size-full tw:[&>img:not(.no-image)]:object-cover", "hover-expand": @bike.thumb_path) %>"
-      href="<%= image_link %>"
-    >
-      <% unless @bike.thumb_path %>
-        <div class="thumb-overlay">
-          <%= image_tag 'revised/photo_icon.svg', alt: "" %>
-
-          <h4><%= translation(".add_a_photo") %></h4>
-        </div>
-      <% end %>
-
-      <%= helpers.bike_thumb_image(@bike) %>
-    </a>
-
-    <div class="bike-information multi-attr-lists">
-      <h5 class="title-link">
-        <%# Pulled left by the badge's padding and border, so its text lines up with the rows below %>
-        <span class="tw:has-[*]:-ml-[calc(0.5rem+1px)]"><%= render(Atoms::RegistrationStatusBadge::Component.new(bike: @bike, skip_with_owner: true, size: :inherit)) %></span>
-        <%= link_to helpers.bike_title_html(@bike), bike_path(@bike) %>
-      </h5>
-
-      <ul class="attr-list">
-        <li>
-          <strong class="attr-title"><%= translation(".serial") %>:</strong>
-          <%= render(Atoms::Serial::Component.new(bike: @bike, user: @current_user, explanation: :tooltip)) %>
-        </li>
-
-        <%= helpers.attr_list_item(@bike.frame_colors.to_sentence, translation(".primary_colors")) %>
-
-        <li class="less-strong">
-          <strong class="attr-title"><%= translation(".registered") %>:</strong>
-          <span class="localizeTime"><%= l @bike.created_at, format: :convert_time %></span>
-        </li>
-
-        <li class="less-strong">
-          <strong class="attr-title"><%= translation(".updated") %>:</strong>
-          <span class="localizeTime"><%= l @bike.updated_by_user_fallback, format: :convert_time %></span>
-        </li>
-      </ul>
-
-      <ul class="attr-list">
-        <% if @bike.bike_stickers.any? %>
-          <% sticker_count = @bike.bike_stickers.count %>
-          <li>
-            <strong><%= translation(".bike_sticker").pluralize(sticker_count) %></strong>
-
-            <% if sticker_count > 1 %>
-              <ul class="multi-sticker">
-                <% @bike.bike_stickers.includes(:bike_sticker_batch).each do |bike_sticker| %>
-                  <li>
-                    <code class="sticker-code"><%= bike_sticker.pretty_code %></code>
-                  </li>
-                <% end %>
-              </ul>
-            <% else %>
-              <% @bike.bike_stickers.includes(:bike_sticker_batch).each do |bike_sticker| %>
-                <code class="sticker-code"><%= bike_sticker.pretty_code %></code>
-              <% end %>
-            <% end %>
-          </li>
-        <% end %>
-
-        <% if @bike.occurred_at.present? %>
-          <li>
-            <%= render(Atoms::RegistrationStatusBadge::Component.new(bike: @bike, skip_with_owner: true, size: :xs)) %>
-            <span class="localizeTime"><%= l @bike.occurred_at, format: :convert_time %></span>
-          </li>
-        <% end %>
-
-        <%# marketplace_listing handles address differently. TODO: Reconcile that! %>
-        <% if @bike.current_event_record.present? && !@bike.is_for_sale %>
-          <% if @bike.current_event_record.is_a?(ImpoundRecord) %>
-            <%= helpers.attr_list_item(@bike.current_event_record.address_record&.formatted_address_string(visible_attribute: :street), translation(".location")) %>
+    <% if grid? %>
+      <div
+        class="
+          tw:flex tw:h-full tw:flex-col tw:overflow-hidden tw:rounded-[10px]
+          tw:border tw:border-gray-200 tw:bg-white tw:dark:border-gray-700
+          tw:dark:bg-gray-900
+        "
+      >
+        <%= link_to photo_path, class: "tw:relative tw:flex tw:h-[170px] tw:items-center tw:justify-center tw:bg-gray-100 tw:text-gray-300 tw:dark:bg-gray-800 tw:dark:text-gray-600", aria: {label: photo_label} do %>
+          <% if thumb_image_url %>
+            <%= image_tag(thumb_image_url, alt: @bike.title_string, skip_pipeline: true, class: "tw:size-full tw:object-cover") %>
           <% else %>
-            <%= helpers.attr_list_item(@bike.current_event_record.formatted_address_string, translation(".location")) %>
+            <%= helpers.inline_svg_tag("icons/lucide-bike.svg", class: "tw:size-[72px]", aria_hidden: true) %>
+          <% end %>
+
+          <span class="tw:absolute tw:top-3 tw:right-3"><%= render(Atoms::RegistrationStatusBadge::Component.new(bike: @bike, size: :lg, time: status_time)) %></span>
+        <% end %>
+
+        <div class="tw:flex tw:flex-1 tw:flex-col tw:gap-2 tw:px-4 tw:py-3.5">
+          <%= link_to title_html, bike_path(@bike), class: "tw:text-[17px] tw:text-pretty tw:text-slate-700 tw:no-underline tw:dark:text-gray-100" %>
+
+          <div
+            class="
+              tw:flex tw:items-center tw:gap-2 tw:text-[15px]
+              tw:text-gray-500 tw:dark:text-gray-400
+            "
+          >
+            <%= render(UI::ColorSwatch::Component.new(display: @bike.primary_frame_color&.display, name: @bike.primary_frame_color&.name, size: :sm)) %>
+            <%= @bike.frame_colors.to_sentence %>
+          </div>
+
+          <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-2.5">
+            <%= render(UI::Badge::Component.new(text: @bike.type_titleize, color: :gray)) %>
+
+            <span class="tw:font-mono tw:text-sm tw:text-gray-500 tw:dark:text-gray-400">
+              <%= render(Atoms::Serial::Component.new(bike: @bike, user: @current_user, explanation: :tooltip)) %>
+            </span>
+          </div>
+        </div>
+
+        <div
+          class="
+            tw:flex tw:flex-wrap tw:gap-x-3 tw:gap-y-1 tw:border-t
+            tw:border-gray-100 tw:px-4 tw:py-3 tw:text-sm tw:font-semibold
+            tw:dark:border-gray-800
+          "
+        >
+          <%= link_to translation(".edit"), edit_bike_path(@bike, edit_template: @bike.default_edit_template), class: "twlink tw:py-1" %>
+
+          <% if @bike.status_with_owner? %>
+            <%= link_to sale_link_text, edit_bike_path(@bike, edit_template: "marketplace"), class: "tw:py-1 tw:text-purple-600 tw:dark:text-purple-300" %>
+            <%= link_to translation(".report_stolen"), edit_bike_path(@bike, edit_template: "report_stolen"), class: "tw:ml-auto tw:py-1 tw:text-red-600 tw:dark:text-red-400" %>
+          <% end %>
+        </div>
+      </div>
+    <% else %>
+      <div class="<%= class_names("tw:flex tw:flex-wrap tw:items-stretch tw:gap-[18px] tw:rounded-[10px] tw:border tw:border-l-[5px] tw:border-gray-200 tw:bg-white tw:p-3.5 tw:dark:border-gray-700 tw:dark:bg-gray-900", accent_classes) %>">
+        <%= link_to photo_path, class: "tw:flex tw:h-[124px] tw:flex-none tw:basis-[180px] tw:items-center tw:justify-center tw:overflow-hidden tw:rounded-lg tw:bg-gray-100 tw:text-gray-300 tw:dark:bg-gray-800 tw:dark:text-gray-600", aria: {label: photo_label} do %>
+          <% if thumb_image_url %>
+            <%= image_tag(thumb_image_url, alt: @bike.title_string, skip_pipeline: true, class: "tw:size-full tw:object-cover") %>
+          <% else %>
+            <%= helpers.inline_svg_tag("icons/lucide-bike.svg", class: "tw:size-16", aria_hidden: true) %>
           <% end %>
         <% end %>
 
-        <li>
-          <%= link_to translation(".edit_registration", bike_type: @bike.type_titleize&.downcase), edit_bike_path(@bike, edit_template: @bike.default_edit_template) %>
-        </li>
+        <div
+          class="
+            tw:flex tw:min-w-0 tw:flex-1 tw:basis-70 tw:flex-col
+            tw:justify-center tw:gap-2.5
+          "
+        >
+          <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-2.5">
+            <%= render(Atoms::RegistrationStatusBadge::Component.new(bike: @bike, size: :lg, time: status_time)) %>
+            <%= link_to title_html, bike_path(@bike), class: "tw:text-lg tw:text-slate-700 tw:no-underline tw:dark:text-gray-100" %>
+          </div>
 
-        <% if @bike.status_stolen? %>
-          <%# Hide the printable PDF link (pdf_bike_path) because it isn't working right now :( %>
-          <% if @bike.impound_claims_submitting.active.any? %>
-            <% impound_claim = @bike.impound_claims_submitting.active.last %>
-            <li>
-              <span class="text-warning">
-                <em><%= impound_claim.status_humanized.titleize %></em> claim to
-              </span>
+          <div
+            class="
+              tw:flex tw:flex-wrap tw:items-center tw:gap-3 tw:text-[15px]
+              tw:text-gray-500 tw:dark:text-gray-400
+            "
+          >
+            <span class="tw:flex tw:items-center tw:gap-[7px]">
+              <%= render(UI::ColorSwatch::Component.new(display: @bike.primary_frame_color&.display, name: @bike.primary_frame_color&.name, size: :sm)) %>
+              <%= @bike.frame_colors.to_sentence %>
+            </span>
 
-              <%= link_to "this #{impound_claim.impound_record.kind} #{impound_claim.bike_claimed.type_titleize&.downcase}", bike_path(impound_claim.bike_claimed) %>
-            </li>
+            <%= render(UI::Badge::Component.new(text: @bike.type_titleize, color: :gray)) %>
+          </div>
+
+          <div class="tw:flex">
+            <span
+              class="
+                tw:rounded-[5px] tw:border tw:border-gray-200 tw:bg-gray-50
+                tw:px-2.5 tw:py-1 tw:font-mono tw:text-[15px]
+                tw:dark:border-gray-700 tw:dark:bg-gray-800
+              "
+            >
+              <%= render(Atoms::Serial::Component.new(bike: @bike, user: @current_user, explanation: :tooltip)) %>
+            </span>
+          </div>
+        </div>
+
+        <div
+          class="
+            tw:flex tw:flex-none tw:flex-col tw:items-start
+            tw:justify-center tw:gap-2 tw:px-2 tw:text-[15px]
+            tw:font-semibold
+          "
+        >
+          <%= link_to translation(".edit_registration", bike_type: @bike.type), edit_bike_path(@bike, edit_template: @bike.default_edit_template), class: "twlink tw:py-1" %>
+
+          <% if @bike.status_with_owner? %>
+            <%= link_to sale_link_text, edit_bike_path(@bike, edit_template: "marketplace"), class: "tw:py-1 tw:text-purple-600 tw:dark:text-purple-300" %>
+            <%= link_to translation(".report_stolen"), edit_bike_path(@bike, edit_template: "report_stolen"), class: "tw:py-1 tw:text-red-600 tw:dark:text-red-400" %>
           <% end %>
-        <% elsif @bike.status_with_owner? %>
-          <li>
-            <% marketplace_translation = @bike.is_for_sale ? translation(".update_marketplace_listing") : translation(".list_for_sale") %>
-            <%= link_to marketplace_translation, edit_bike_path(@bike, edit_template: "marketplace"), class: "less-strong" %>
-          </li>
-          <% if @bike.strava_gear.present? %>
-            <li>
-              <%= link_to strava_search_path(gear: @bike.strava_gear.strava_id), class: "less-strong" do %>
-                <%= helpers.inline_svg_tag("logos/strava.svg", style: "vertical-align: baseline; display: inline-block; height: 12px; width: auto;") %>
-                <span class="less-strong"><%= @bike.strava_gear.strava_gear_display_name %></span>
-              <% end %>
-            </li>
-          <% end %>
-          <li>
-            <%= link_to translation(".mark_stolen", bike_type: @bike.type_titleize&.downcase), edit_bike_path(@bike, edit_template: "report_stolen"), class: "text-danger less-strong" %>
-          </li>
-        <% end %>
-
-        <% if @bike.user_hidden %>
-          <li>
-            <em class="small text-warning"><%= translation(".user_hidden") %></em>
-          </li>
-        <% end %>
-      </ul>
-    </div>
+        </div>
+      </div>
+    <% end %>
   <% end %>
 
-  <% if @user_alerts.any? %>
-    <div class="tw:flex tw:basis-full tw:flex-col tw:gap-4">
-      <% @user_alerts.each do |user_alert| %>
-        <%= render(UI::Alerts::Base::Component.new(margin_classes: "tw:mb-0")) do %>
-          <%= translation(".generally_connect_to_org", org_name: user_alert.organization&.short_name) %>
-          <%= render(UI::ButtonLink::Component.new(text: translation(".add_it_now"), href: user_alert_path(id: user_alert.id, add_bike_organization: true), method: :patch, color: :primary, size: :sm, form: {class: "tw:ml-1 tw:inline-block"})) %>
-
-          <div class="tw:mt-2 tw:text-sm">
-            <%= link_to translation(".ignore_this_suggestion"), user_alert_path(id: user_alert.id, alert_action: "dismiss"), method: :patch, class: "twlink-underlined twless-strong" %>
-          </div>
-        <% end %>
-      <% end %>
-    </div>
+  <% unless grid? %>
+    <%= render(Pages::MyAccount::Show::BikeAlerts::Component.new(bike: @bike, current_user: @current_user, user_alerts: @user_alerts)) %>
   <% end %>
 </li>

@@ -16,13 +16,51 @@ RSpec.describe Pages::MyAccount::Show::BikeBox::Component, type: :component do
       unfinished_b_params: described_class.unfinished_b_params([bike]))
   end
 
+  it "has an accent for every colour a registration's status can badge as" do
+    expect(described_class::ACCENTS.keys).to include(*Atoms::RegistrationStatusBadge::Component::COLORS.values.uniq)
+  end
+
   it "renders the registration, with no alerts" do
     expect(component).to have_link(href: "/bikes/#{bike.id}")
     expect(component).to have_css("strong", text: "Surly")
     expect(component).to have_text("SUR-77120934")
     expect(component).to have_link("List for sale")
-    expect(component).to have_link("Mark bike stolen")
+    expect(component).to have_link("Mark stolen")
+    expect(component).to have_css("a[aria-label='Add a photo'][href='/bikes/#{bike.id}/edit/photos']")
     expect(component).not_to have_css("[role=alert]")
+  end
+
+  context "in the grid" do
+    let(:component) { render_inline(described_class.new(bike: bike.reload, current_user: user, view: :grid)) }
+
+    context "with alerts" do
+      let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills") }
+      let!(:user_alert) { FactoryBot.create(:user_alert, user:, bike:, organization:, kind: "unassigned_bike_org") }
+
+      before { UserAlert.refresh_alert_slugs(user) }
+
+      it "leaves them to the page, so the tile keeps its height" do
+        grid = render_inline(described_class.new(bike: bike.reload, current_user: user, view: :grid, user_alerts: described_class.user_alerts(user.reload)))
+        expect(grid).not_to have_css("[role=alert]")
+      end
+    end
+
+    it "renders the tile, with the shorter action names" do
+      expect(component).to have_css("strong", text: "Surly")
+      expect(component).to have_text("SUR-77120934")
+      expect(component).to have_link("Edit", exact_text: true)
+      expect(component).to have_link("List for sale")
+      expect(component).to have_link("Mark stolen")
+    end
+  end
+
+  context "when the bike is for sale" do
+    before { bike.update(is_for_sale: true) }
+
+    it "offers to update the listing, and says it's for sale" do
+      expect(component).to have_text("For Sale")
+      expect(component).to have_link("Update listing")
+    end
   end
 
   context "with an unassigned_bike_org alert" do

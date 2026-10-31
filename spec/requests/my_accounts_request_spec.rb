@@ -105,6 +105,22 @@ RSpec.describe MyAccountsController, type: :request do
             end
           end
         end
+        context "with a view" do
+          let!(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: current_user) }
+
+          it "defaults to the list, and remembers the view chosen" do
+            get base_url
+            expect(assigns(:view)).to eq :list
+
+            get base_url, params: {view: "grid"}
+            expect(assigns(:view)).to eq :grid
+            get base_url
+            expect(assigns(:view)).to eq :grid
+
+            get base_url, params: {view: "nonsense"}
+            expect(assigns(:view)).to eq :grid
+          end
+        end
         context "with lock with deleted manufacturer" do
           let(:lock) { FactoryBot.create(:lock, user: current_user) }
           it "renders and user things are assigned" do

@@ -4030,33 +4030,6 @@ en:
       your_username_is_the_url_for_your_sharing: >-
         Your username is the URL for your sharing page and the bike embed form. Update
         it if you care about those things.
-    show:
-      add_a_bike: Add a bike
-      add_a_lock: Add a lock
-      bikes: bikes
-      combination: Combination
-      edit: edit
-      header_title: "%{current_user_name} on Bike Index"
-      key_serial: Key Serial
-      lock_type: Lock Type
-      locks: locks
-      manufacturer: Manufacturer
-      membership_subtitle: Thank you for being a Bike Index %{level} member!
-      next: Next steps
-      register_new_items: Register new items
-      registered: Registered
-      sorry_your_bike_was_stolen: >-
-        We're sorry your %{bikes_last_type} was stolen, but hopefully, with everyone
-        able to search for it, you'll get it back!
-      tell_us_more_about_yourself: Tell us more about yourself.
-      thanks_for_adding_your_bike: Awesome! We're pumped you added a %{bikes_last_type}
-        to the Index.
-      to_bike_index_thanks_for_signing_up: to Bike Index. Thanks for signing up!
-      update_your_profile: Update your profile
-      updated: Updated
-      welcome: Welcome
-      you_have_no_registered_bikes: You have no registered bikes
-      you_have_no_registered_locks: You have no registered locks
   news:
     index:
       bike_index_blog: Bike Index Blog

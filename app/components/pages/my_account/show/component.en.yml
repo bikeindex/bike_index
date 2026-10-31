@@ -1,0 +1,39 @@
+---
+en:
+  components:
+    pages:
+      my_account:
+        show:
+          add_a_bike: "+ Add a bike"
+          add_a_bike_empty: Add a bike
+          add_a_lock: "+ Add a lock"
+          add_a_lock_empty: Add a lock
+          bike_count:
+            one: "%{count} bike"
+            other: "%{count} bikes"
+          bike_index_is_free: Bike Index is free because riders like you chip in.
+          bikes: Bikes
+          combination: Combination
+          donate: Donate
+          donations_keep_the_registry_running: >-
+            We're a nonprofit. Donations keep the registry running and stolen bikes
+            getting home.
+          edit: Edit
+          grid_view: Grid view
+          header_title: "%{current_user_name} on Bike Index"
+          helps_shops_and_police: Helps shops and police reach you if a bike is found.
+          key_serial: Key serial
+          list_view: List view
+          lock_count:
+            one: "%{count} lock"
+            other: "%{count} locks"
+          locks: Locks
+          membership_subtitle: Thank you for being a Bike Index %{level} member!
+          no_bikes_registered_yet: No bikes registered yet
+          no_locks_description: Record your lock's key and combination so you can
+            replace a lost key.
+          no_locks_registered_yet: No locks registered yet
+          registered: Registered
+          tell_us_more_about_yourself: Tell us more about yourself.
+          update_profile: Update profile
+          your_registrations: Your registrations
