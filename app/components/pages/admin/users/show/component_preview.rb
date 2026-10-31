@@ -5,15 +5,9 @@ module Pages
     module Users
       module Show
         class ComponentPreview < ApplicationComponentPreview
-          def default
-            render(Pages::Admin::Users::Show::Component.new(user: lookbook_user, bikes:, bikes_count: bikes.count))
-          end
-
-          private
-
-          # What Admin::UsersController#calculate_user_bikes hands the component
-          def bikes
-            @bikes ||= lookbook_user.bikes.reorder(created_at: :desc).limit(10)
+          # @param active_tab select { choices: [organization_roles, emails, ambassador_tasks] }
+          def default(active_tab: :emails)
+            render(Pages::Admin::Users::Show::Component.new(user: lookbook_user, active_tab: active_tab.to_sym))
           end
         end
       end

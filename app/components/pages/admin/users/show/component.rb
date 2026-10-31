@@ -4,43 +4,23 @@ module Pages
   module Admin
     module Users
       module Show
+        # The body of each Pages::Admin::Users::Tabs tab that has no index of its own
         class Component < ApplicationComponent
-          def initialize(user:, bikes:, bikes_count:, current_country_id: nil)
+          TABS = (Pages::Admin::Users::Tabs::Component::TABS.keys -
+            Pages::Admin::Users::Tabs::Component::INDEX_PATHS.keys - %i[edit]).freeze
+
+          def initialize(user:, active_tab:)
+            raise_if_invalid_value!(:active_tab, active_tab, TABS)
+
             @user = user
-            @bikes = bikes
-            @bikes_count = bikes_count
-            @current_country_id = current_country_id
+            @active_tab = active_tab
           end
 
           private
 
-          def object_limit
-            10
-          end
+          def records = Pages::Admin::Users::Tabs::Component.records(@user, @active_tab)
 
-          def deleted_bikes_count
-            @deleted_bikes_count ||= Bike.unscoped.current_owner(@user.id).only_deleted.count
-          end
-
-          def marketplace_messages
-            MarketplaceMessage.where(sender_id: @user.id).order(id: :desc)
-          end
-
-          def memberships
-            Membership.where(user_id: @user.id).order(id: :desc)
-          end
-
-          def user_alerts
-            @user.user_alerts.order(created_at: :desc)
-          end
-
-          def payments
-            @user.payments.reorder(created_at: :desc).paid
-          end
-
-          def mailchimp_datum
-            @user.mailchimp_datum
-          end
+          def registration_organizations_count = @registration_organizations_count ||= @user.user_registration_organizations.count
         end
       end
     end

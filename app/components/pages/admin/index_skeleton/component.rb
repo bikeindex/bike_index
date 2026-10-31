@@ -18,7 +18,8 @@ module Pages
           table_view: nil,
           chart_collection: nil,
           header_content: nil,
-          count_detail: nil
+          count_detail: nil,
+          user_tab: nil
         )
           @index = index
           @collection = collection
@@ -34,11 +35,17 @@ module Pages
           @chart_collection = chart_collection
           @header_content = header_content
           @count_detail = count_detail
+          @user_tab = user_tab
         end
 
         private
 
         def sortable_search_params = @index.sortable_search_params
+
+        # user_tab: is the Pages::Admin::Users::Tabs tab this index is, once filtered to a user
+        def user_header?
+          @user_tab.present? && @index.user_subject.present?
+        end
 
         # "Manage" is the first thing a narrow screen can spare
         def index_title

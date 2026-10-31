@@ -1,0 +1,277 @@
+<div class="row">
+  <div class="col-md-6">
+    <table class="table-list">
+      <tbody>
+        <tr class="only-dev-visible">
+          <td>ID</td>
+          <td><code><%= @user.id %></code></td>
+        </tr>
+
+        <tr>
+          <td>Icons</td>
+
+          <td>
+            <%= render(Atoms::Admin::Badges::User::Component.new(user: @user, full_text: true)) %>
+          </td>
+        </tr>
+
+        <tr>
+          <td>Created</td>
+
+          <td>
+            <%= render(UI::Time::Component.new(time: @user.created_at, format: :localize_time_precise)) %>
+          </td>
+        </tr>
+
+        <tr>
+          <td>Updated</td>
+
+          <td>
+            <%= render(UI::Time::Component.new(time: @user.updated_at, format: :localize_time_precise)) %>
+          </td>
+        </tr>
+
+        <tr>
+          <td>Last&nbsp;login</td>
+
+          <td>
+            <% if @user.last_login_at.present? %>
+              <%= render(UI::Time::Component.new(time: @user.last_login_at, format: :localize_time_precise)) %>
+            <% end %>
+
+            <% if @user.last_login_ip.present? %>
+              <small class="less-strong"><%= @user.last_login_ip %></small>
+            <% end %>
+          </td>
+        </tr>
+
+        <tr class="only-dev-visible">
+          <td>No Address</td>
+
+          <td>
+            <% if @user.no_address? %>
+              <strong class="text-success">TRUE</strong>
+            <% else %>
+              <small class="less-strong">address permitted</small>
+            <% end %>
+          </td>
+        </tr>
+
+        <tr>
+          <td>Superuser</td>
+
+          <td>
+            <% if @user.developer? %>
+              <span class="only-dev-visible">developer</span>
+            <% end %>
+
+            <% superuser_abilities = @user.superuser_abilities %>
+
+            <% if @user.superuser? %>
+              <strong>full superuser</strong>
+              <% superuser_ability = superuser_abilities.universal.first %>
+              <% if superuser_ability.present? %>
+                <small class="less-strong">
+                  since
+                  <%= render(UI::Time::Component.new(time: superuser_ability.created_at, format: :localize_time_precise)) %>
+                </small>
+              <% end %>
+            <% elsif superuser_abilities.any? %>
+              <%= link_to "limited", admin_superuser_abilities_path(user_id: @user.id), class: "text-info" %>
+              <ul class="small mb-0">
+                <% superuser_abilities.each do |superuser_ability| %>
+                  <li>
+                    <% if superuser_ability.universal? %>
+                      <strong>full superuser</strong>
+                    <% else %>
+                      Can access
+                      <% if superuser_ability.action_name.present? %>
+                        <em><%= superuser_ability.action_name %></em> in
+                      <% end %>
+                      <%= superuser_ability.controller_name %>
+                    <% end %>
+                  </li>
+                <% end %>
+              </ul>
+            <% end %>
+          </td>
+        </tr>
+
+        <tr>
+          <td>Emails</td>
+
+          <td>
+            <div class="row">
+              <div class="col-4">
+                <small
+                  class="d-block border-bottom"
+                  title="Receive Bike Index newsletters"
+                >
+                  Newsletters
+                </small>
+
+                <% if @user.notification_newsletters %>
+                  <%= check_mark %>
+                <% else %>
+                  <small class="less-strong">false</small>
+                <% end %>
+              </div>
+
+              <div class="col-4">
+                <small
+                  class="d-block border-bottom"
+                  title="Receive non-stolen theft emails"
+                >
+                  Unstolen
+                </small>
+
+                <% if @user.notification_unstolen %>
+                  <%= check_mark %>
+                <% else %>
+                  <small class="text-danger less-strong">false</small>
+                <% end %>
+              </div>
+
+              <div class="col-4">
+                <small
+                  class="d-block border-bottom"
+                  title="No non theft emails"
+                >
+                  NONE
+                </small>
+
+                <% if @user.no_non_theft_notification %>
+                  <span class="text-danger"><%= check_mark %></span>
+                <% else %>
+                  <small class="less-strong">false</small>
+                <% end %>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="col-md-6">
+    <table class="table-list">
+      <tr>
+        <td>Confirmed?</td>
+
+        <td>
+          <% if @user.confirmed? %>
+            <%= check_mark %>
+          <% else %>
+            <small class="less-strong">false</small>
+          <% end %>
+        </td>
+      </tr>
+
+      <tr>
+        <td>email</td>
+
+        <td>
+          <%= @user.email %>
+
+          <% if @user.secondary_emails.any? %>
+            <small><%= @user.secondary_emails.join(", ") %></small>
+          <% end %>
+        </td>
+      </tr>
+
+      <tr>
+        <td>Name</td>
+        <td><%= @user.name %></td>
+      </tr>
+
+      <tr>
+        <td>Photo</td>
+
+        <td>
+          <% if @user.avatar? %>
+            <%= image_tag @user.avatar_url(:medium), class: "tw:w-24", alt: "#{@user.display_name} avatar" %>
+          <% end %>
+        </td>
+      </tr>
+
+      <tr>
+        <td>Social</td>
+
+        <td>
+          <small>
+            <% if @user.twitter.present? %>
+              Twitter:
+              <%= link_to @user.twitter, "https://twitter.com/#{@user.twitter}" %>
+            <% end %>
+          </small>
+        </td>
+      </tr>
+
+      <tr>
+        <td>Phone</td>
+
+        <td>
+          <% display_phone = @user.phone.present? %>
+
+          <% if display_phone || @user.user_phones.any? %>
+            <ul class="mb-0">
+              <% @user.user_phones.each do |user_phone| %>
+                <li>
+                  <%= render Atoms::Phone::Component.new(phone: user_phone.phone, skip_link: true) %>
+
+                  <small class="less-strong <%= user_phone.confirmed? ? "text-success" : "text-warning" %>">
+                    <%= user_phone.confirmed? ? "confirmed" : "unconfirmed" %>
+                  </small>
+
+                  <small class="less-strong"><%= render(UI::Time::Component.new(time: user_phone.created_at, preposition: true)) %></small>
+
+                  <% if display_phone && Phonifyer.phonify(user_phone.phone) == Phonifyer.phonify(@user.phone) %>
+                    <% display_phone = false %>
+                  <% end %>
+                </li>
+              <% end %>
+
+              <% if display_phone %>
+                <li>
+                  <%= render Atoms::Phone::Component.new(phone: @user.phone, skip_link: true) %>
+                  <small class="less-strong text-warning">unconfirmed</small>
+                </li>
+              <% end %>
+            </ul>
+            <% unless Flipper.enabled?(:phone_verification) %>
+              <em class="small less-strong">
+                Phone verification is currently disabled, users don't see the
+                option to confirm their phones
+              </em>
+            <% end %>
+          <% end %>
+        </td>
+      </tr>
+
+      <tr>
+        <td>Website</td>
+        <td><%= @user.mb_link_target %></td>
+      </tr>
+
+      <tr>
+        <td>Address</td>
+
+        <td>
+          <small>
+            <%= @user.formatted_address_string(visible_attribute: :street, current_country_id: helpers.current_country_id) %>
+          </small>
+        </td>
+      </tr>
+
+      <tr>
+        <td>Vendor terms?</td>
+
+        <td>
+          <% if @user.when_vendor_terms_of_service.present? %>
+            <%= render(UI::Time::Component.new(time: @user.when_vendor_terms_of_service, format: :localize_time_precise)) %>
+          <% end %>
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>

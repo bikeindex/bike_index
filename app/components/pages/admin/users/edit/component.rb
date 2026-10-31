@@ -4,7 +4,7 @@ module Pages
   module Admin
     module Users
       module Edit
-        # The admin user edit form. The user's details above it are Pages::Admin::Users::Show.
+        # The admin user edit form. The user's details above it are Pages::Admin::Users::Header.
         class Component < ApplicationComponent
           def initialize(user:, display_dev_info: false)
             @user = user

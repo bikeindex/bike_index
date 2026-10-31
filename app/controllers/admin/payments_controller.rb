@@ -127,9 +127,8 @@ module Admin
       Time.at(1417588530)
     end
 
-    def default_period
-      "year"
-    end
+    # A user's payments are few enough to show them all
+    def default_period = params[:user_id].present? ? "all" : "year"
 
     def assign_to_membership_param?
       Binxtils::InputNormalizer.boolean(params[:assign_to_membership])

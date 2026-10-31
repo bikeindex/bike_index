@@ -31,6 +31,17 @@ RSpec.describe Admin::PaymentsController, type: :request do
       expect(response.body).to include(subject.amount_formatted)
     end
 
+    context "filtered to a user" do
+      let!(:payment_old) { FactoryBot.create(:payment, user: current_user, created_at: Time.current - 2.years) }
+
+      it "defaults to every period" do
+        get base_url, params: {user_id: current_user.id}
+        expect(response.body).to include(edit_admin_payment_path(payment_old))
+        get base_url
+        expect(response.body).to_not include(edit_admin_payment_path(payment_old))
+      end
+    end
+
     # The row key has to carry this partial, or the fragment is shared with every other
     # admin table caching the same payment - and the user, or an email change serves stale
     context "with caching", :caching do
