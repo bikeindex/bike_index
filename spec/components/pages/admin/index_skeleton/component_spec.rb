@@ -52,6 +52,24 @@ RSpec.describe Pages::Admin::IndexSkeleton::Component, type: :component do
     end
   end
 
+  describe "user_tab" do
+    let(:user) { FactoryBot.create(:user_confirmed, name: "Test User") }
+    let(:options) { super().merge(index: super()[:index].with(user_subject: user), user_tab: :bikes) }
+
+    it "renders the user's tabs, with this index active" do
+      expect(component.css("nav a[aria-current]").map { |tab| tab.text.squish }).to eq ["Bikes 0"]
+      expect(component).to have_content("Test User")
+    end
+
+    context "without a user" do
+      let(:user) { nil }
+
+      it "renders no tabs" do
+        expect(component.css("nav a[aria-current]")).to be_empty
+      end
+    end
+  end
+
   describe "nav_header_list_items" do
     let(:options) { super().merge(nav_header_list_items: '<li class="nav-item"><a class="nav-link" href="#">Custom</a></li>'.html_safe) }
 

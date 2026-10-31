@@ -2,6 +2,8 @@ module Admin
   class UsersController < Admin::BaseController
     include Binxtils::SortableTable
 
+    SHOW_TABS = Pages::Admin::Users::Show::Component::TABS.map(&:to_s).freeze
+
     before_action :find_user, only: %i[show edit update destroy]
     before_action :ensure_can_change_user!, only: %i[update destroy]
     helper_method :invalid_user_options
@@ -14,16 +16,15 @@ module Admin
     end
 
     def show
-      redirect_to edit_admin_user_url(params[:id])
+      @active_tab = params[:active_tab]
+      return redirect_to(edit_admin_user_url(params[:id])) unless SHOW_TABS.include?(@active_tab)
+
+      @page_title = "#{@active_tab.titleize}: #{@user.display_name}"
     end
 
     def edit
       # urls with user IDs rather than usernames are more helpful in superadmin
-      if params[:id] == @user.username
-        redirect_to edit_admin_user_path(@user.id)
-        return
-      end
-      calculate_user_bikes
+      redirect_to edit_admin_user_path(@user.id) if params[:id] == @user.username
     end
 
     def update
@@ -62,7 +63,6 @@ module Admin
           CallbackJobs::AfterUserChangeJob.perform_async(@user.id)
           redirect_to admin_users_url, notice: "User Updated"
         else
-          calculate_user_bikes
           render action: :edit, status: :unprocessable_entity
         end
       end
@@ -184,13 +184,6 @@ module Admin
       else
         :valid_only
       end
-    end
-
-    def calculate_user_bikes
-      # If the user has a bunch of bikes, it can cause timeouts. In those cases, use rough approximation
-      bikes = @user.bikes
-      @bikescount = @user.bikes.count
-      @bikes = bikes.reorder(created_at: :desc).limit(10)
     end
   end
 end

@@ -3,61 +3,28 @@
 require "rails_helper"
 
 RSpec.describe Pages::Admin::Users::Show::Component, type: :component do
-  let(:instance) { described_class.new(**options) }
-  let(:component) { render_inline(instance) }
-  let(:options) { {user:, bikes:, bikes_count:} }
-  let(:user) { FactoryBot.create(:user_confirmed, name: "Test User") }
-  let(:bikes) { [] }
-  let(:bikes_count) { 0 }
+  let(:user) { FactoryBot.create(:user_confirmed) }
+  let(:active_tab) { :emails }
+  let(:component) { render_inline(described_class.new(user:, active_tab:)) }
 
-  it "renders user display name" do
-    expect(component).to have_css("h1", text: /Test User/)
-  end
-
-  it "renders user email" do
+  it "renders the emails" do
     expect(component).to have_content(user.email)
   end
 
-  it "renders bikes count" do
-    expect(component).to have_css("h4", text: /Bikes/)
-    expect(component).to have_link(href: /user_id=#{user.id}/)
-  end
+  context "on the ambassador tasks tab, for a user who isn't one" do
+    let(:active_tab) { :ambassador_tasks }
 
-  context "with deleted user" do
-    let(:user) { FactoryBot.create(:user_confirmed, deleted_at: Time.current) }
-
-    it "renders deleted alert" do
-      expect(component).to have_css(".alert-danger", text: /User deleted/)
+    it "says so" do
+      expect(component).to have_content("Not an ambassador")
     end
   end
 
-  context "with banned user" do
-    let(:user) { FactoryBot.create(:user_confirmed, banned: true) }
-    let!(:user_ban) { UserBan.create(user:, reason: :extortion) }
+  # Those tabs are the filtered admin index, which renders the header itself
+  context "with a tab that has an index" do
+    let(:active_tab) { :bikes }
 
-    it "renders banned alert" do
-      expect(component).to have_css("h4.text-danger", text: /User banned/)
-      expect(component).to have_content("Extortion")
-    end
-  end
-
-  context "with an email_ban on an additional address" do
-    let(:user_email) { FactoryBot.create(:user_email, user:, email: "other@example.com") }
-    let!(:email_ban) { FactoryBot.create(:email_ban, user:, user_email:, reason: :email_duplicate) }
-
-    it "renders the ban and the address it names" do
-      expect(user.reload.email_banned?).to be_falsey
-      expect(component).to have_css("h4.text-danger", text: /email banned/)
-      expect(component).to have_content("other@example.com")
-    end
-  end
-
-  context "with superuser" do
-    let(:user) { FactoryBot.create(:superuser) }
-    let!(:superuser_ability) { SuperuserAbility.create(user:) }
-
-    it "renders superuser info" do
-      expect(component).to have_content("full superuser")
+    it "raises" do
+      expect { component }.to raise_error(ArgumentError, /bikes/)
     end
   end
 end

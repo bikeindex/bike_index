@@ -1,0 +1,5 @@
+<%= render(Pages::Admin::Users::Tabs::Component.new(user: @user, active: @active)) %>
+
+<div class="twgutter-bleed admin-summary">
+  <%= render(Pages::Admin::Users::Summary::Component.new(user: @user, current_country_id: @current_country_id)) %>
+</div>

@@ -1,0 +1,84 @@
+<%= render(Pages::Admin::Headers::Tabs::Component.new(title:, tabs:, links: [non_admin_view_link].compact,
+      nav_label: "User sections")) do |header| %>
+  <% if alerts? %>
+    <% header.with_alert do %>
+      <% if @user.deleted? %>
+        <%= render(UI::Alerts::Base::Component.new(kind: :error, header: "User deleted")) do %>
+          <%= render(UI::Time::Component.new(time: @user.deleted_at, format: :localize_time_precise, preposition: true)) %>
+        <% end %>
+      <% end %>
+
+      <% if @user.banned? %>
+        <% user_ban = @user.user_ban %>
+        <%= render(UI::Alerts::Base::Component.new(kind: :error, header: "User banned")) do %>
+          <table class="table-list tw:mb-0">
+            <tbody>
+              <tr>
+                <td>Banned at</td>
+
+                <td>
+                  <%= render(UI::Time::Component.new(time: user_ban&.created_at || @user.updated_at, format: :localize_time_precise)) %>
+                </td>
+              </tr>
+
+              <tr>
+                <td>By</td>
+
+                <td>
+                  <% if user_ban&.creator.present? %>
+                    <%= user_ban.creator.display_name %>
+                  <% elsif user_ban&.creator_id.present? %>
+                    User # <%= user_ban.creator_id %> (unknown user)
+                  <% end %>
+                </td>
+              </tr>
+
+              <tr>
+                <td>Reason</td>
+                <td><%= user_ban&.reason_humanized %></td>
+              </tr>
+
+              <tr>
+                <td>Notes</td>
+                <td><%= user_ban&.description %></td>
+              </tr>
+            </tbody>
+          </table>
+        <% end %>
+      <% end %>
+
+      <% if last_email_errored.any? %>
+        <%= render(UI::Alerts::Base::Component.new(kind: :error, header: "Last email to user errored!")) do %>
+          Check the
+          <%= link_to "notifications", admin_notifications_path(user_id: @user.id), class: "twlink" %>
+          for the delivery errors
+        <% end %>
+      <% end %>
+
+      <% if @user.email_bans_active.any? %>
+        <%= render(UI::Alerts::Base::Component.new(kind: :error, header: "User's email banned (not delivered)")) do %>
+          Reasons:
+          <% @user.email_bans_active.each do |email_ban| %>
+            <strong><%= email_ban.email %></strong>
+            <%= email_ban.reason_humanized %>
+
+            <small class="twless-strong">
+              <% if email_ban.reason == "email_domain" %>
+                - the
+                <%= link_to "email domain", admin_email_domain_path(email_ban.email_domain), class: "twlink" %>
+                was banned.
+              <% elsif email_ban.reason == "email_duplicate" %>
+                - the email looks like a duplicate of another email. In 2025, we
+                were getting a lot of user sign up spam with emails that just
+                had extra periods added in (which still deliver to gmail)
+              <% elsif email_ban.reason == "delivery_failure" %>
+                - a recent email to them failed to be delivered. Have them check
+                their spam folder!
+              <% end %>
+            </small>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

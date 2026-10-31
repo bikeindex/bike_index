@@ -57,6 +57,37 @@ RSpec.describe Admin::UsersController, type: :request do
     it "links to edit" do
       get "#{base_url}/#{user_subject.username}"
       expect(response).to redirect_to(edit_admin_user_path(user_subject.username))
+      # A tab the show action doesn't render would otherwise raise from the tabs component
+      get "#{base_url}/#{user_subject.id}?active_tab=party"
+      expect(response).to redirect_to(edit_admin_user_path(user_subject.id))
+    end
+
+    context "with a record behind every tab" do
+      let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user: user_subject) }
+      let!(:user_email) { FactoryBot.create(:user_email, user: user_subject) }
+
+      it "renders each tab" do
+        Pages::Admin::Users::Show::Component::TABS.each do |tab|
+          get "#{base_url}/#{user_subject.id}?active_tab=#{tab}"
+          expect(response.code).to eq("200"), "#{tab} rendered #{response.code}"
+        end
+        get "#{base_url}/#{user_subject.id}?active_tab=emails"
+        expect(response.body).to include(user_email.email)
+        get "#{base_url}/#{user_subject.id}?active_tab=organization_roles"
+        expect(response.body).to include(organization_role.organization.name)
+      end
+    end
+  end
+
+  # Those tabs are another controller's index, which renders the header when filtered to the user
+  describe "the indexes that are tabs" do
+    it "renders the user's tabs on each, with its own active" do
+      Pages::Admin::Users::Tabs::Component::INDEX_PATHS.each do |tab, path|
+        get public_send(path, user_id: user_subject.id)
+        expect(response.code).to eq("200"), "#{tab} rendered #{response.code}"
+        active = Nokogiri::HTML(response.body).css("nav a[aria-current]").map { |link| link.text.squish }
+        expect(active).to eq(["#{Pages::Admin::Users::Tabs::Component::TABS[tab]} 0"]), "#{tab} marked #{active}"
+      end
     end
   end
 
@@ -80,6 +111,7 @@ RSpec.describe Admin::UsersController, type: :request do
       get "#{base_url}/#{user_subject.id}/edit"
       expect(response).to render_template :edit
       expect(response.body).to include(user_email.email)
+      expect(response.body).to include("Memberships")
     end
 
     # It rendered a link with ?method=delete, so deleting quietly did nothing but show the user again

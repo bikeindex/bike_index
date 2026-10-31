@@ -1,8 +1,10 @@
-<%= render(Pages::Admin::Users::Show::Component.new(user: @user, bikes: @bikes, bikes_count: @bikescount, current_country_id:)) %>
+<%= render(Pages::Admin::Users::Header::Component.new(user: @user, active: :edit, current_country_id:)) %>
+
+<%= render(Pages::Admin::Users::Edit::Component.new(user: @user, display_dev_info: display_dev_info?)) %>
 
 <hr class="mt-4">
 
-<%= render(Pages::Admin::Users::Edit::Component.new(user: @user, display_dev_info: display_dev_info?)) %>
+<%= render(Pages::Admin::Users::MailchimpData::Component.new(user: @user)) %>
 
 <% if @user.present? %>
   <hr style="margin-top: 60px;">

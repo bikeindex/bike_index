@@ -1,3 +1,8 @@
+<% if user_header? %>
+  <%= render(Pages::Admin::Users::Header::Component.new(user: @index.user_subject, active: @user_tab,
+        current_country_id: helpers.current_country_id)) %>
+<% end %>
+
 <%= render(Pages::Admin::Headers::Nav::Component.new(title: index_title)) do %>
   <%= @nav_header_list_items %>
 
