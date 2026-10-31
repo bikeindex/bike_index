@@ -861,12 +861,15 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(find("[aria-label='Overview'] tr", text: /\AColorway/, wait: 10)).to have_css("label", text: "Gloss White Mountains")
     expect(chosen.call).to eq([false, true])
     colors = find("[aria-label='Overview'] tr", text: /\AColorway/)
+    # 2025's colorways 2026's, so no earlier year to show
+    expect(colors).to have_no_button("View previous years colors")
     # each one's code and Bike Index's colors a tooltip away
     colors.find("label", text: "Satin Obsidian").click_button("?")
     tip = colors.find("[role='tooltip']", visible: true)
     expect(tip.all("span.tw\\:block").map { it.text.squish }).to eq(["Code: #545056", "Colors: Silver, Gray or Bare Metal"])
     expect(tip).to have_css("code", exact_text: "#545056").and have_css("span[aria-hidden][style='background: #bbb']", visible: :all)
-    # one colorway its newest year listed alone, each earlier year's behind a link that hides itself once it shows them
+    # one colorway its newest year listed alone, each earlier year's behind a link that hides itself once it shows them, but
+    # 2023's, the same paint as 2026's
     page.evaluate_script(<<~JS)
       (async () => {
         const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
@@ -874,7 +877,7 @@ RSpec.describe "BikeBook", :js, type: :system do
           import('bikebook/templates/vehicles/basics'), catalog('kit.json'), catalog('vocabulary.json')])
         const colorway = (name) => ({ name, color_code: '#000000' })
         const years = [{ year: 2026, colorways: [colorway('Black')] }, { year: 2025, colorways: [colorway('Black'), colorway('Red'), { name: 'Bare', colors: ['silver'] }] },
-          { year: 2024, colorways: [] }]
+          { year: 2024, colorways: [] }, { year: 2023, colorways: [{ ...colorway('Black'), stock_photo: 'black_2023.png' }] }]
         const container = Object.assign(document.createElement('div'), { id: 'colorway-check' })
         const presenter = new VehiclePresenter(kit, { ...vocabulary, paint_colors: { 'Silver, gray or bare metal': '#bbb' } })
         render(basics({ presenter, vehicles: [{ value: '0', key: '0', data: { model: 'One', years } }], removePath: () => '/bikebook' }), container)

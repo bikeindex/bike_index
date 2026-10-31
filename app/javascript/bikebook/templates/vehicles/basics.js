@@ -48,8 +48,11 @@ const manufacturerPage = (vehicle) => {
 
 // the newest colorways, to choose between where there are several, the `picked` one chosen, and each earlier year's behind
 // a link that shows them
+// A year's colorways by their paint, not their photos
+const paint = (year) => JSON.stringify(array(year.colorways).map(({ name, colors, color_code: code }) => [name, colors, code]))
+
 const colors = (presenter, vehicle, key, picked) => {
-  const [newest, ...earlier] = colorwayYears(vehicle)
+  const [newest, ...rest] = colorwayYears(vehicle)
   if (!newest) return null
 
   const latest = array(newest.colorways)
@@ -63,6 +66,7 @@ const colors = (presenter, vehicle, key, picked) => {
       attributes: { 'data-action': 'change->bikebook--page#pickColorway', 'data-bikebook--page-vehicle-param': key }
     })}</div>`
     : colorways(presenter, latest)
+  const earlier = rest.filter((year) => paint(year) !== paint(newest))
   if (earlier.length === 0) return shown
 
   return html`<div class="tw:space-y-2" data-controller="ui--collapse">${shown}<div class="tw:hidden tw:space-y-1" data-ui--collapse-target="content">${
