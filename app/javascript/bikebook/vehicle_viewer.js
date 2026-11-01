@@ -71,12 +71,13 @@ export class VehicleViewer {
     const highlight = url.searchParams.get('figure')
     const figurePath = (key) => pathWith(url, { figure: key === highlight ? '' : key })
     const compared = { presenter, vehicles, sizes, frames: overlayFrames(vehicles, sizes), market: this.card.market }
+    // compared, scrolling out to the window's edges, the page's gutter inside it
     const rowClasses = comparing
-      ? 'tw:justify-center-safe tw:overflow-x-auto tw:max-md:snap-x tw:max-md:snap-mandatory tw:max-md:px-4 tw:max-md:*:w-[85vw] tw:max-md:*:shrink-0 tw:max-md:*:snap-center'
+      ? 'tw:justify-center-safe tw:overflow-x-auto tw:px-(--gutter) tw:max-md:snap-x tw:max-md:snap-mandatory tw:max-md:*:w-[85vw] tw:max-md:*:shrink-0 tw:max-md:*:snap-center'
       : 'tw:flex-col tw:lg:flex-row tw:lg:justify-center'
-    const cardRow = (margin, cards, aligned = false) => html`<div ?data-comparison=${comparing} data-controller=${comparing && aligned ? 'bikebook--align-rows' : nothing} class="${margin} tw:max-[500px]:twpagebleed ${comparing
-      ? 'tw:md:twpagebleed tw:md:px-4'
-      : 'tw:lg:twpagebleed tw:lg:px-4'}"><div class="tw:flex tw:gap-8 ${rowClasses}">${cards}</div></div>`
+    const cardRow = (margin, cards, aligned = false) => html`<div ?data-comparison=${comparing} data-controller=${comparing && aligned ? 'bikebook--align-rows' : nothing} class="${margin} ${comparing
+      ? 'tw:twpagebleed'
+      : 'tw:max-[500px]:twpagebleed tw:lg:twpagebleed tw:lg:px-4'}"><div class="tw:flex tw:gap-8 ${rowClasses}">${cards}</div></div>`
     // each vehicle's `field` on a card of its own, named as its full card is, after whatever `lead` shows, with the overview's ×
     // `keyed`, each topped in its frame's color in the overlay
     const cards = (field, none, content, { lead, keyed = false } = {}) => vehicles.map(({ data, value, key }, index) => {
@@ -148,7 +149,7 @@ export class VehicleViewer {
         const size = sizes[index]
         const drawn = drawings[index]
         const { legend } = drawn
-        return html`${framed(legend) ? drawing(data, size, drawn) : nothing}<div class="tw:-mx-(--gutter)">${sizesOf({
+        return html`${framed(legend) ? drawing(data, size, drawn) : nothing}${sizesOf({
           presenter,
           data,
           others: others(key),
@@ -160,7 +161,7 @@ export class VehicleViewer {
             figurePath,
             drawn: { id: key, name: size?.name, figures: legend.filter(({ letter, listed }) => letter && !listed) }
           }
-        })}</div>`
+        })}`
       }, { keyed: true }))}`
       },
       components: () => {
