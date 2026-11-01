@@ -48,10 +48,10 @@ module UI
         @columns = []
       end
 
-      # hideable: the column's cell_name, labeled by column_settings
+      # hideable: the column's cell_name, labeled by column_settings unless given a label
       def column(hideable: nil, **options, &block)
         if hideable
-          options = options.merge(label: @column_settings&.dig(:columns, hideable), classes: token_list("hideableColumn", hideable, options[:classes]))
+          options = {label: @column_settings&.dig(:columns, hideable), **options, classes: token_list("hideableColumn", hideable, options[:classes])}
         end
         @columns << [options, block]
         nil
