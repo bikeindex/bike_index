@@ -49,6 +49,7 @@ module Admin
         @user.username = params[:user][:username]
         @user.can_send_many_stolen_notifications = params[:user][:can_send_many_stolen_notifications]
         @user.can_send_many_marketplace_messages = params[:user][:can_send_many_marketplace_messages]
+        @user.dark_mode = Binxtils::InputNormalizer.boolean(params[:user][:dark_mode])
         @user.phone = params[:user][:phone]
         # skip_update so the save doesn't auto-enqueue AfterUserChangeJob - it's enqueued
         # once below, after UserBan.create! (which marks the user banned) has run

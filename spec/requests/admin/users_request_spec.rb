@@ -93,6 +93,17 @@ RSpec.describe Admin::UsersController, type: :request do
       end
     end
 
+    context "current_user with dark_mode" do
+      let(:current_user) { FactoryBot.create(:superuser, dark_mode: true) }
+      it "is dark only in admin" do
+        get "#{base_url}/#{user_subject.id}/edit"
+        expect(Nokogiri::HTML(response.body).at_css("body")[:class]).to eq "dark"
+
+        get "/"
+        expect(Nokogiri::HTML(response.body).at_css("body")[:class].to_s.split).to_not include("dark")
+      end
+    end
+
     # It rendered a link with ?method=delete, so deleting quietly did nothing but show the user again
     it "carries the delete on the element, never as a query param" do
       get "#{base_url}/#{user_subject.id}/edit"
@@ -155,6 +166,7 @@ RSpec.describe Admin::UsersController, type: :request do
             developer: "1",
             can_send_many_stolen_notifications: true,
             can_send_many_marketplace_messages: true,
+            dark_mode: true,
             banned: true,
             phone: "9876543210",
             user_ban_attributes: {
@@ -169,6 +181,7 @@ RSpec.describe Admin::UsersController, type: :request do
         expect(user_subject.developer).to be_falsey
         expect(user_subject.can_send_many_stolen_notifications).to be_truthy
         expect(user_subject.can_send_many_marketplace_messages).to be_truthy
+        expect(user_subject.dark_mode).to be_truthy
         expect(user_subject.banned?).to be_truthy
         expect(user_subject.phone).to eq "9876543210"
         user_ban = user_subject.user_ban
