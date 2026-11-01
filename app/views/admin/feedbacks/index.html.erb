@@ -63,35 +63,28 @@
           <div class="card-body">
             <h3>Kinds</h3>
 
-            <table class="table-list wide-definition">
-              <tbody>
-                <% Feedback.kinds.each_with_index do |kind, index| %>
-                  <% count = available_feedbacks.where(kind: kind).count %>
-                  <% next unless count > 0 %>
+            <% nil_count = available_feedbacks.where(kind: nil).count %>
 
-                  <tr>
-                    <td>
-                      <div
-                        style="width: 1em; height: 1em; background: <%= colors[index] %>; float: right; margin-left: 0.4rem;"
-                      ></div>
+            <%= render(UI::TableList::Component.new(wide_definition: true)) do |list| %>
+              <% Feedback.kinds.each_with_index do |kind, index| %>
+                <% count = available_feedbacks.where(kind: kind).count %>
+                <% next unless count > 0 %>
 
-                      <%= link_to Feedback.kind_humanized(kind), url_for(sortable_search_params.merge(search_kind: kind)) %>
-                    </td>
+                <% label = capture do %>
+                  <div
+                    style="width: 1em; height: 1em; background: <%= colors[index] %>; float: right; margin-left: 0.4rem;"
+                  ></div>
 
-                    <td><%= number_display(count) %></td>
-                  </tr>
+                  <%= link_to Feedback.kind_humanized(kind), url_for(sortable_search_params.merge(search_kind: kind)) %>
                 <% end %>
 
-                <% nil_count = available_feedbacks.where(kind: nil).count %>
+                <% list.with_row(label:, value: number_display(count)) %>
+              <% end %>
 
-                <% if nil_count > 0 %>
-                  <tr>
-                    <td>Nil</td>
-                    <td><%= number_display(nil_count) %></td>
-                  </tr>
-                <% end %>
-              </tbody>
-            </table>
+              <% if nil_count > 0 %>
+                <% list.with_row(label: "Nil", value: number_display(nil_count)) %>
+              <% end %>
+            <% end %>
           </div>
         </div>
       </div>

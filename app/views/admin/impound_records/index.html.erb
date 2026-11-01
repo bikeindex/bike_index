@@ -43,25 +43,21 @@
     <% unless params[:organization_id].present? %>
       <div class="row mt-4">
         <div class="col-md-6 offset-md-3">
-          <table class="table-list wide-definition">
-            <tbody>
-              <% matching_impound_records.distinct.pluck(:organization_id).map { |id| [id, matching_impound_records.where(organization_id: id).count] }.sort_by { |_id, number| number }.each do |id, number| %>
-                <% organization = Organization.unscoped.find_by_id(id) if id.present? %>
+          <%= render(UI::TableList::Component.new(wide_definition: true)) do |list| %>
+            <% matching_impound_records.distinct.pluck(:organization_id).map { |id| [id, matching_impound_records.where(organization_id: id).count] }.sort_by { |_id, number| number }.each do |id, number| %>
+              <% organization = Organization.unscoped.find_by_id(id) if id.present? %>
 
-                <tr>
-                  <td>
-                    <% if organization.present? %>
-                      <%= link_to organization.short_name, url_for(sortable_search_params.merge(organization_id: id)), class: (organization.deleted? ? "text-danger" : "") %>
-                    <% else %>
-                      <%= link_to "no organization", url_for(sortable_search_params.merge(organization_id: "none")), class: "gray-link" %>
-                    <% end %>
-                  </td>
-
-                  <td><%= number_with_delimiter(number) %></td>
-                </tr>
+              <% label = capture do %>
+                <% if organization.present? %>
+                  <%= link_to organization.short_name, url_for(sortable_search_params.merge(organization_id: id)), class: (organization.deleted? ? "text-danger" : "") %>
+                <% else %>
+                  <%= link_to "no organization", url_for(sortable_search_params.merge(organization_id: "none")), class: "gray-link" %>
+                <% end %>
               <% end %>
-            </tbody>
-          </table>
+
+              <% list.with_row(label:, value: number_with_delimiter(number)) %>
+            <% end %>
+          <% end %>
         </div>
       </div>
     <% end %>

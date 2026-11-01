@@ -6,98 +6,60 @@
 
 <div class="row mt-4">
   <div class="col-md-6">
-    <table class="table-list">
-      <tbody>
-        <% if display_dev_info? %>
-          <tr>
-            <td class="only-dev-visible">ID</td>
-            <td><code><%= @bug_report.id %></code></td>
-          </tr>
-          <tr>
-            <td class="only-dev-visible">Inbound email</td>
-            <td><code><%= @bug_report.inbound_email_id %></code></td>
-          </tr>
+    <%= render(UI::TableList::Component.new) do |list| %>
+      <% if display_dev_info? %>
+        <% list.with_row(label: "ID", dev_only: true) do %>
+          <code><%= @bug_report.id %></code>
         <% end %>
-
-        <tr>
-          <td>Sender</td>
-
-          <td>
-            <div><%= @bug_report.from_name %></div>
-
-            <div>
-              <%= content_tag(:code, @bug_report.email, class: "small") %>
-
-              <%= mail_to @bug_report.email, inline_svg_tag("icons/envelope.svg", class: "tw:inline-block tw:h-4 tw:w-4"), class: "twlink tw:ml-1", title: "Email #{@bug_report.email}" %>
-
-              <%= bug_report_search_link(@bug_report.user_id.present? ? {user_id: @bug_report.user_id} : {search_email: @bug_report.email}) %>
-            </div>
-          </td>
-        </tr>
-
-        <tr>
-          <td>Sender user</td>
-
-          <td>
-            <% if @bug_report.user_id.present? %>
-              <%= render Atoms::Admin::TableCells::User::Component.new(user: @bug_report.user, user_id: @bug_report.user_id) %>
-            <% else %>
-              <span class="less-strong">no user</span>
-            <% end %>
-          </td>
-        </tr>
-
-        <tr>
-          <td>Member</td>
-          <td><%= check_mark if @bug_report.is_member %></td>
-        </tr>
-
-        <tr>
-          <td>Invoiced organization</td>
-          <td><%= check_mark if @bug_report.is_invoiced_organization %></td>
-        </tr>
-
-        <tr>
-          <td>Invoiced organization staff</td>
-
-          <td>
-            <%= check_mark if @bug_report.is_invoiced_organization_staff %>
-          </td>
-        </tr>
-
-        <tr>
-          <td>Receiver</td>
-
-          <td>
-            <% if @bug_report.receiver.present? %>
-              <%= BugReport.display_receiver(@bug_report.receiver) %>
-              <%= bug_report_search_link(search_receiver: @bug_report.receiver) %>
-            <% end %>
-          </td>
-        </tr>
-
-        <tr>
-          <td>Received</td>
-
-          <td>
-            <%= render UI::Time::Component.new(time: @bug_report.received_at || @bug_report.created_at,
-              format: :localize_time_precise) %>
-          </td>
-        </tr>
-
-        <% if @bug_report.github_pull_request.present? %>
-          <tr>
-            <td>Pull request</td>
-
-            <td>
-              <%= link_to @bug_report.github_pull_request_url, class: "twlink" do %>
-                #<%= @bug_report.github_pull_request %>
-              <% end %>
-            </td>
-          </tr>
+        <% list.with_row(label: "Inbound email", dev_only: true) do %>
+          <code><%= @bug_report.inbound_email_id %></code>
         <% end %>
-      </tbody>
-    </table>
+      <% end %>
+
+      <% list.with_row(label: "Sender") do %>
+        <div><%= @bug_report.from_name %></div>
+
+        <div>
+          <%= content_tag(:code, @bug_report.email, class: "small") %>
+
+          <%= mail_to @bug_report.email, inline_svg_tag("icons/envelope.svg", class: "tw:inline-block tw:h-4 tw:w-4"), class: "twlink tw:ml-1", title: "Email #{@bug_report.email}" %>
+
+          <%= bug_report_search_link(@bug_report.user_id.present? ? {user_id: @bug_report.user_id} : {search_email: @bug_report.email}) %>
+        </div>
+      <% end %>
+
+      <% list.with_row(label: "Sender user") do %>
+        <% if @bug_report.user_id.present? %>
+          <%= render Atoms::Admin::TableCells::User::Component.new(user: @bug_report.user, user_id: @bug_report.user_id) %>
+        <% else %>
+          <span class="less-strong">no user</span>
+        <% end %>
+      <% end %>
+
+      <% list.with_row(label: "Member", value: (check_mark if @bug_report.is_member)) %>
+      <% list.with_row(label: "Invoiced organization", value: (check_mark if @bug_report.is_invoiced_organization)) %>
+      <% list.with_row(label: "Invoiced organization staff", value: (check_mark if @bug_report.is_invoiced_organization_staff)) %>
+
+      <% list.with_row(label: "Receiver") do %>
+        <% if @bug_report.receiver.present? %>
+          <%= BugReport.display_receiver(@bug_report.receiver) %>
+          <%= bug_report_search_link(search_receiver: @bug_report.receiver) %>
+        <% end %>
+      <% end %>
+
+      <% list.with_row(label: "Received") do %>
+        <%= render UI::Time::Component.new(time: @bug_report.received_at || @bug_report.created_at,
+          format: :localize_time_precise) %>
+      <% end %>
+
+      <% if @bug_report.github_pull_request.present? %>
+        <% list.with_row(label: "Pull request") do %>
+          <%= link_to @bug_report.github_pull_request_url, class: "twlink" do %>
+            #<%= @bug_report.github_pull_request %>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
   </div>
 
   <div class="col-md-6">

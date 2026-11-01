@@ -14,23 +14,24 @@ module UI
       # The top padding sets the smaller label on the value's first line
       LABEL_CLASSES = "#{CELL_CLASSES} tw:pt-[9px] tw:text-right tw:text-[75%] tw:leading-[1.25] tw:font-normal tw:italic"
 
-      # value: or a block. dev_only marks the label only-dev-visible
-      renders_many :rows, ->(label:, value: nil, dev_only: false, &block) {
-        tag.tr do
+      # value: or a block. dev_only marks the label only-dev-visible. row_attributes: the <tr>'s
+      renders_many :rows, ->(label:, value: nil, dev_only: false, **row_attributes, &block) {
+        tag.tr(**row_attributes) do
           tag.th(label, scope: "row", class: token_list(LABEL_CLASSES, "only-dev-visible": dev_only)) +
             tag.td(block ? capture(&block) : value, class: value_classes)
         end
       }
 
       # wide_definition: a wider label column, for longer labels
-      def initialize(wide_definition: false)
+      def initialize(wide_definition: false, classes: nil)
         @wide_definition = wide_definition
+        @classes = classes
       end
 
       def render? = rows?
 
       def call
-        tag.table(class: TABLE_CLASSES) { tag.tbody { safe_join(rows) } }
+        tag.table(class: token_list(TABLE_CLASSES, @classes)) { tag.tbody { safe_join(rows) } }
       end
 
       private
