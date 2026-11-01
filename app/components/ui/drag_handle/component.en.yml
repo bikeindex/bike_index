@@ -1,0 +1,7 @@
+---
+en:
+  components:
+    ui:
+      drag_handle:
+        move: Move %{name}
+        moved: Position %{position} of %{count}

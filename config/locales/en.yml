@@ -4438,6 +4438,7 @@ en:
         file_removed: file removed
         file_removed_explanation: after a few days, we delete the uploaded file to
           save space
+        matched_count: Rows matching existing registrations
         progress: Progress
     exports:
       index:

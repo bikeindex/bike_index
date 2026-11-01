@@ -8,9 +8,6 @@ import { range } from 'bikebook/templates/ui/forms/range'
 import { tooltip } from 'bikebook/templates/ui/tooltip'
 import { GROUPS, MAX_WEIGHT, PRESETS, presetOf } from 'bikebook/similarity'
 
-// CycleType::ALWAYS_MOTORIZED, by the catalog's slugs
-const ALWAYS_MOTORIZED = ['e_scooter', 'epamd', 'e_motorcycle']
-
 const note = (content) => html`<div class="tw:mt-4 tw:rounded-md tw:bg-blue-50 tw:px-4 tw:py-3 tw:text-sm tw:dark:bg-blue-950">${content}</div>`
 
 // The `cards` of the models a scorer found beside the one compared against, or why there are none: no `results` where
@@ -58,7 +55,7 @@ export const similarSection = ({ model, results, searchShown, ...similar }) => {
 
 const CUSTOM = tooltip({ body: 'If you change a weight, this will be selected', content: 'Custom' })
 
-const legend = (text) => html`<legend class="twlabel">${text}</legend>`
+const legend = (text, note) => html`<legend class="twlabel">${text}${note ? html` <small class="twless-strong">(${note})</small>` : nothing}</legend>`
 
 // Opens the filters at the similar models' adjustments, expanded - shown only while the similar models are open and the
 // filters, which have their own, closed
@@ -71,28 +68,27 @@ const adjustToggle = html`<button type="button" data-action="bikebook--page#adju
 
 // The controls that rescore the similar models once they're scored, collapsed at the foot of the filters' card, which
 // they extend, with their own bikebook--similar
-export const similarAdjustments = ({ vehicle, type, vehicleType, electric, complete, current, settings, groups, scored }) => {
+export const similarAdjustments = ({ vehicle, type, complete, current, settings, groups, scored }) => {
   if (!scored || !groups?.length) return nothing
 
-  const propulsion = electric ? !ALWAYS_MOTORIZED.includes(vehicleType) && `Show matching human powered ${type}s` : `Show matching e-${type}s`
   const configuration = complete ? `Only complete ${type}s` : 'Only frames & forks'
   return html`<section aria-label="Comparison algorithm" class="tw:hidden tw:similar-open:block" data-controller="bikebook--similar ui--collapse"
     data-ui--collapse-param-value="adjust" data-bikebook--similar-vehicle-value=${vehicle} data-action="input->bikebook--similar#change">${collapse({
       content: 'Adjust comparison algorithm', chevron: true, color: 'link', size: 'sm', htmlClass: 'tw:text-sm'
     })}<div data-ui--collapse-target="content" class="tw:hidden"><div class="tw:mt-4">${
-      controls(groups, settings, type, propulsion, configuration, current)}</div></div></section>`
+      controls(groups, settings, type, configuration, current)}</div></div></section>`
 }
 
 // Custom is chosen only by moving a slider off every preset, each of the `listed` groups', the rest's disabled, as the
 // model has nothing of theirs to compare
-const controls = (listed, { weights, includeNotCurrent, skipManufacturer, otherPropulsion, sameConfiguration, sameWheels, differentTypes }, type, propulsion, configuration, current) => {
+const controls = (listed, { weights, includeNotCurrent, skipManufacturer, sameConfiguration, sameWheels }, type, configuration, current) => {
   const preset = presetOf(weights, listed)
   return html`<div class="tw:space-y-4"><fieldset aria-label="Strategy">${radioButtonGroup({
     name: 'strategy',
     selected: preset,
     entries: [...Object.entries(PRESETS).map(([value, { label }]) => ({ value, label })), { value: 'custom', label: CUSTOM, disabled: preset !== 'custom' }],
     attributes: { 'data-bikebook--similar-target': 'strategy', 'data-action': 'bikebook--similar#strategy:stop' }
-  })}</fieldset><fieldset>${legend('Weightings')}<div class="tw:mt-1 tw:grid tw:gap-x-6 tw:gap-y-5 tw:sm:grid-cols-2
+  })}</fieldset><fieldset aria-label="Weightings"><div class="tw:grid tw:gap-x-6 tw:gap-y-5 tw:sm:grid-cols-2
   tw:lg:grid-cols-3">${Object.keys(GROUPS).map((group) => {
     const scored = listed.includes(group)
     // an unlisted group's slider a bare track in a slider's box, showing no weight, which stays the URL's or a strategy's
@@ -108,11 +104,10 @@ const controls = (listed, { weights, includeNotCurrent, skipManufacturer, otherP
       max: MAX_WEIGHT,
       attributes: { id: `similar-${group}`, disabled: !scored, 'data-bikebook--similar-target': scored && 'weight' }
     })}</div>`
-  })}</div></fieldset><fieldset>${legend('Other settings')}<div class="tw:mt-1 tw:space-y-1">${
+  })}</div></fieldset><fieldset>${legend('Other settings', 'you can also change the filters above to modify what is compared')}<div class="tw:mt-1 tw:space-y-1">${
     setting('include_not_current', `Include ${type}s that are not current`, includeNotCurrent ?? !current, !current)}${setting('skip_manufacturer', `Skip ${type}s from the same manufacturer`, skipManufacturer)}${
-    propulsion ? setting('other_propulsion', propulsion, otherPropulsion) : nothing}${setting('same_configuration', configuration, sameConfiguration)}${
-    setting('same_wheels', `Only match ${type}s with the same wheel size`, sameWheels)}${
-    setting('different_types', 'Include different vehicle types', differentTypes)}</div></fieldset></div>`
+    setting('same_configuration', configuration, sameConfiguration)}${
+    setting('same_wheels', `Only match ${type}s with the same wheel size`, sameWheels)}</div></fieldset></div>`
 }
 
 // each a URL param of its name, 1 while it's checked, or 0 unchecked where it's `checkedByDefault`

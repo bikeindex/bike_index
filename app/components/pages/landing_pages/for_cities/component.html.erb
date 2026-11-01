@@ -632,34 +632,32 @@
   </div>
 </section>
 
-<section class="tw:bg-linear-160 tw:from-slate-900 tw:to-[#233140] tw:text-white">
-  <div class="tw:grid tw:grid-cols-[repeat(auto-fit,minmax(min(100%,380px),1fr))] tw:items-center tw:gap-12 tw:py-20 <%= SECTION_CLASSES %>">
-    <div>
-      <%= render(SharedBlocks::Marketing::SectionHeading::Component.new(eyebrow: translation(".partnership_eyebrow"), eyebrow_color: :yellow, heading: translation(".partnership_heading"), intro: translation(".partnership_intro"), on_dark: true, html_class: "tw:mb-6")) %>
+<%= render(SharedBlocks::Marketing::InvertedBlock::Component.new) do %>
+  <div>
+    <%= render(SharedBlocks::Marketing::SectionHeading::Component.new(eyebrow: translation(".partnership_eyebrow"), eyebrow_color: :yellow, heading: translation(".partnership_heading"), intro: translation(".partnership_intro"), html_class: "tw:mb-6")) %>
 
-      <%= image_tag "kelsey/illustrations/comic-assets_logo-cape.png", alt: translation(".cape_logo_alt"), loading: "lazy", width: 200, height: 120, class: "tw:h-30 tw:w-auto" %>
-    </div>
-
-    <div
-      class="
-        tw:flex tw:flex-col tw:gap-px tw:overflow-hidden tw:rounded-lg
-        tw:bg-white/12
-      "
-    >
-      <% partnership_points.each do |title, body| %>
-        <div class="tw:bg-slate-900 tw:px-6 tw:py-5">
-          <div class="tw:font-header tw:text-lg tw:font-extrabold">
-            <%= title %>
-          </div>
-
-          <div class="tw:mt-1 tw:text-[15px] tw:text-white/80">
-            <%= body %>
-          </div>
-        </div>
-      <% end %>
-    </div>
+    <%= image_tag "kelsey/illustrations/comic-assets_logo-cape.png", alt: translation(".cape_logo_alt"), loading: "lazy", width: 200, height: 120, class: "tw:h-30 tw:w-auto" %>
   </div>
-</section>
+
+  <div
+    class="
+      tw:flex tw:flex-col tw:gap-px tw:overflow-hidden tw:rounded-lg
+      tw:bg-gray-200 tw:dark:bg-white/12
+    "
+  >
+    <% partnership_points.each do |title, body| %>
+      <div class="tw:bg-white tw:px-6 tw:py-5 tw:dark:bg-slate-900">
+        <div class="tw:font-header tw:text-lg tw:font-extrabold">
+          <%= title %>
+        </div>
+
+        <div class="tw:mt-1 tw:text-[15px] tw:text-gray-500 tw:dark:text-gray-400">
+          <%= body %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% end %>
 
 <section id="faq" class="tw:scroll-mt-16 tw:py-20 <%= SECTION_CLASSES %>">
   <div class="tw:flex tw:flex-col tw:gap-4 tw:lg:flex-row tw:lg:gap-14">

@@ -6,10 +6,10 @@
 
 <%= tag.div(class: "org-search-component", data: {controller: "org--search", "org--search-result-view-value": @result_view,
   "org--search-result-view-key-value": "orgImpoundResultView"}) do %>
-  <%# Frame requests only need the results frame; skip the form (Turbo discards it) %>
-  <% unless turbo_frame_request? %>
-    <%# twwiderow is what the cards' full_bleed reads to meet the gutter once it's one column %>
-    <div class="twwiderow tw:mt-4 tw:gap-y-4">
+  <%# twwiderow is the container the results card's padding and full_bleed read %>
+  <div class="twwiderow tw:mt-4 tw:gap-y-4">
+    <%# Frame requests only need the results frame; skip the form (Turbo discards it) %>
+    <% unless turbo_frame_request? %>
       <div class="tw:min-w-0">
         <%= render(Pages::Org::Search::Form::Component.new(
           target_search_path: organization_impound_records_path(organization_id: current_organization.to_param),
@@ -43,11 +43,13 @@
         <%= render("organized/search_chart_card", id: :impound_records_chart,
           src: organization_impound_records_path(sortable_search_params.merge(organization_id: current_organization.to_param))) %>
       </div>
-    </div>
-  <% end %>
+    <% end %>
 
-  <%= render SharedBlocks::SearchResults::Frame::Component.new(frame_id: :impound_records_results_frame,
-    render_results: @render_results, current_path: request.original_fullpath) do %>
-    <%= render partial: "results" %>
-  <% end %>
+    <div class="tw:col-span-full tw:min-w-0">
+      <%= render SharedBlocks::SearchResults::Frame::Component.new(frame_id: :impound_records_results_frame,
+        render_results: @render_results, current_path: request.original_fullpath) do %>
+        <%= render partial: "results" %>
+      <% end %>
+    </div>
+  </div>
 <% end %>

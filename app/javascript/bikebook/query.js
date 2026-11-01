@@ -14,7 +14,8 @@ export const ordered = (filters) => ['year', 'price'].reduce((each, name) => {
   return each[min] && each[max] && Number(each[min]) > Number(each[max]) ? { ...each, [min]: each[max], [max]: each[min] } : each
 }, filters)
 
-export const FILTERS = [...LISTS, ...SINGLES, ...RANGES, 'electric', 'market_scope', 'jurisdiction', 'sort', 'year_dir', 'price_dir']
+export const NARROWING = [...LISTS, ...SINGLES, ...RANGES, 'electric', 'market_scope', 'jurisdiction']
+export const FILTERS = [...NARROWING, 'sort', 'year_dir', 'price_dir']
 
 // to_query: keys sorted and CGI-escaped, blank values dropped, commas and slashes left readable
 export const toQuery = (params) => {

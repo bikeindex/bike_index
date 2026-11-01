@@ -7,7 +7,7 @@
     <%= render(UI::Collapse::Component.new(text: "Column settings", chevron: :trailing, size: :sm)) %>
   </div>
 
-  <%= render(UI::TableColumnSettings::Component.new(columns:, defaults: %i[color_cell size_cell], narrow_hidden: %i[size_cell])) %>
+  <%= render(UI::TableColumnSettings::Component.new(columns:, defaults: %i[color_cell size_cell], narrow_hidden: %i[size_cell], orderable: true)) %>
 
   <%= render(UI::CardTable::Component.new(records: rows)) do |table| %>
     <% table.column(label: "Name") { |row| row[0] } %>

@@ -77,7 +77,7 @@ module Admin
 
     def get_destroy
       if params[:id] == "multi_delete"
-        bike_ids = params[:bikes_selected].respond_to?(:keys) ? params[:bikes_selected].keys : Array(params[:bikes_selected])
+        bike_ids = selected_ids(:bikes_selected)
         if bike_ids.any?
           bike_ids.each { |id| BikeJobs::BikeDeleterJob.perform_async(id.to_i, false, current_user.id) }
           flash[:success] = "#{bike_ids.count} #{"bike".pluralize(bike_ids.count)} deleted!"
@@ -198,7 +198,7 @@ module Admin
 
     def matching_bikes
       bikes = if params[:user_id].present?
-        user_subject&.bikes
+        Bike.unscoped.current_owner(user_subject.id)
       elsif params[:search_phone].present?
         Bike.search_phone(params[:search_phone])
       else

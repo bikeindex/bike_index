@@ -13,10 +13,10 @@ RSpec.describe Pages::Admin::SocialPosts::Form::Component, type: :component do
   it "wires the kind select, the counter and the repost buttons" do
     expect(component.css("[data-controller='admin--social-post-form']").count).to eq 1
     expect(component.css("[data-admin--social-post-form-target='kind']").count).to eq 1
-    expect(component.css("[data-admin--social-post-form-target='characterCounter']").count).to eq 1
-    expect(component.css("[data-admin--social-post-form-target='characterTotal']").count).to eq 1
+    expect(component.css("[data-controller='admin--character-count'] [data-admin--character-count-target='field']").count).to eq 1
+    expect(component.css("[data-admin--character-count-target='total']").count).to eq 1
     expect(kind_fields.map { |el| el["data-kind"] }).to match_array(%w[app_post imported_post])
-    expect(component.css("[data-admin--social-post-form-max-character-count-value]").count).to eq 1
+    expect(component.css("[data-admin--character-count-max-value]").count).to eq 1
   end
 
   context "when sending a post" do

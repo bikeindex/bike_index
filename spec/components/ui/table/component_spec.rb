@@ -204,13 +204,14 @@ RSpec.describe UI::Table::Component, type: :component do
   end
 
   context "with a hideable column" do
-    it "gives its header a hidden drag handle for ui--table-column-order" do
+    it "gives its header a drag handle shown inside a ui--table-column-order" do
       result = render_inline(described_class.new(records:)) do |table|
         table.column(label: "Name") { |r| r.name }
         table.column(label: "Email", classes: "hideableColumn email_cell") { |r| r.email }
       end
 
-      expect(result).to have_css("th.email_cell [data-ui--table-column-order-target='handle'].tw\\:hidden", visible: :all)
+      expect(result).to have_css("th.email_cell [data-ui--table-column-order-target='handle']" \
+        "[class~='tw:in-data-[controller~=ui--table-column-order]:inline-block']", visible: :all)
       expect(result).to have_css("[data-ui--table-column-order-target='handle']", count: 1, visible: :all)
     end
   end

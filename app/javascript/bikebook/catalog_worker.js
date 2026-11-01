@@ -54,7 +54,8 @@ async function load ({ manifestUrl, ids, jurisdictions, rulesUrl, similarityUrl:
     // by its maker, as makers share names, and its first word where it has no group
     group_key: `${model.manufacturer}/${model.model_group ?? model.model.split(' ')[0]}`,
     searchText: `${model.display}\n${model.id}`.toLowerCase(),
-    sortYear: model.final_year ?? currentYear
+    // a current model's first year where it's sold ahead of the calendar
+    sortYear: model.final_year ?? Math.max(model.first_year, currentYear)
   }))
   byId = new Map(models.map((model) => [model.id, model]))
   // the index labels the out of class markers, which the vocabulary has no record of: "Out of class in California"
@@ -133,12 +134,16 @@ const scorer = () => {
   return similarity
 }
 
-// the last scoring kept, as the page asks again on each render while the section is open. Of the models `market` and
-// its `scope` leave, as the search's are
-async function similar ({ model, settings, market, scope }) {
+// the last scoring kept, as the page asks again on each render while the section is open. Of the models the search's
+// `filters` leave, of the model's own propulsion and vehicle type where they pick none
+async function similar ({ model, settings, filters: { sort, year_dir: yearDir, price_dir: priceDir, ...filters } }) {
   const score = await scorer()
-  const key = JSON.stringify({ model, settings, market, scope })
-  if (lastSimilar?.key !== key) lastSimilar = { key, result: score?.(model, settings, (candidate) => !market || inMarket(candidate, market, scope)) ?? null }
+  const key = JSON.stringify({ model, settings, filters })
+  if (lastSimilar?.key !== key) {
+    const own = byId.get(model)
+    const matches = filter({ ...filters, electric: filters.electric || (own?.electric ? '1' : '0'), vehicle_type: filters.vehicle_type || own?.vehicle_type })
+    lastSimilar = { key, result: score?.(model, settings, matches) ?? null }
+  }
   return lastSimilar.result
 }
 
@@ -214,15 +219,15 @@ function featured ({ params, legalClasses }) {
 }
 
 // The models of the `model` id's group by year, newest first, each under the newest it's sold in - so each once, and a
-// current one in this year
-function group ({ model: id }) {
+// current one in this year. Those `market` leaves out by its `scope`, as a search would, but the model itself
+function group ({ model: id, market, scope }) {
   const model = byId.get(id)
   if (!model?.model_group) return null
 
   const years = new Map()
-  for (const each of sorted({}).filter((each) => each.manufacturer === model.manufacturer && each.model_group === model.model_group && each.first_year)) {
-    const year = Math.max(each.first_year, each.sortYear)
-    years.set(year, [...(years.get(year) ?? []), each])
+  for (const each of sorted({}).filter((each) => each.manufacturer === model.manufacturer && each.model_group === model.model_group && each.first_year &&
+    (each === model || !market || inMarket(each, market, scope)))) {
+    years.set(each.sortYear, [...(years.get(each.sortYear) ?? []), each])
   }
   return {
     name: model.model_group,
