@@ -5,8 +5,9 @@ module Pages
     module Users
       module Tabs
         class Component < ApplicationComponent
-          TABS = {edit: "Edit", bikes: "Bikes", messages: "Messages", memberships: "Memberships", payments: "Payments",
-                  organization_roles: "Organizations", emails: "Emails", ambassador_tasks: "Ambassador tasks"}.freeze
+          TABS = {edit: "Edit", bikes: "Bikes", memberships: "Memberships", payments: "Payments",
+                  organization_roles: "Organizations", messages: "Messages", emails: "Emails",
+                  ambassador_tasks: "Ambassador tasks"}.freeze
 
           # The Messages tab's sections, which it counts together
           MESSAGE_KINDS = %i[marketplace_messages alerts notifications feedbacks].freeze

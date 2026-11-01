@@ -13,7 +13,7 @@ RSpec.describe Pages::Admin::Users::Tabs::Component, type: :component do
     FactoryBot.create(:feedback, user:)
     FactoryBot.create(:user_alert, user:)
     expect(component).to have_content("Test User")
-    expect(tab_labels).to eq ["Edit", "Bikes 0", "Messages 2", "Memberships 0", "Payments 0", "Organizations 0",
+    expect(tab_labels).to eq ["Edit", "Bikes 0", "Memberships 0", "Payments 0", "Organizations 0", "Messages 2",
       "Emails 2"]
     expect(component.css("nav a[aria-current]").map { |tab| tab.text.squish }).to eq ["Edit"]
     expect(component).to have_link("Edit", href: "/admin/users/#{user.id}/edit")
