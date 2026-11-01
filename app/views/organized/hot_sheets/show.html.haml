@@ -76,51 +76,24 @@
                 - if stolen_record.recovered?
                   %div{ class: "tw:mb-2" }
                     = render(UI::Badge::Component.new(text: "Bike was recovered!", color: :success, solid: true, size: :lg))
-                %table.table-list.mb-0
-                  %tr.bike-main-info
-                    %td{ colspan: 2 }
-                      = link_to organized_bike_text(bike, skip_creation: true), bike_link
-                  %tr
-                    %td Serial
-                    %td= render(Atoms::Serial::Component.new(bike:, user: current_user))
+                %div{class: "tw:mb-1"}
+                  = link_to organized_bike_text(bike, skip_creation: true), bike_link
+                = render(UI::TableList::Component.new(classes: "tw:mb-0!")) do |list|
+                  - list.with_row(label: "Serial", value: render(Atoms::Serial::Component.new(bike:, user: current_user)))
                   - if stolen_record.recovered?
-                    %tr
-                      %td
-                        %span.text-success Recovered
-                      %td
-                        %span.localizeTime.preciseTime
-                          = l stolen_record.recovered_at, format: :convert_time
-
+                    - list.with_row(label: tag.span("Recovered", class: "text-success"),
+                      value: render(UI::Time::Component.new(time: stolen_record.recovered_at, format: :localize_time_precise)))
                   - else
-                    %tr
-                      %td
-                        %span.stolen-color Stolen at
-                      %td
-                        %span.localizeTime.preciseTime
-                          = l stolen_record.date_stolen, format: :convert_time
-
-                    %tr
-                      %td
-                        %span.stolen-color From
-                      %td
-                        = stolen_record.formatted_address_string(render_country: false)
-
-                    %tr
-                      %td
-                        PD Report
-                      %td
-                        = stolen_record.police_report_number
-                        -# Only show the department if there is a number, some people put it in otherwise :/
-                        - if stolen_record.police_report_number.present?
-                          %small.less-strong
-                            = stolen_record.police_report_department
-
-                    - if bike.phoneable_by?(current_user)
-                      %tr
-                        %td
-                          Phone
-                        %td
-                          = render Atoms::Phone::Component.new(phone: stolen_record.phone)
+                    - list.with_row(label: tag.span("Stolen at", class: "stolen-color"),
+                      value: render(UI::Time::Component.new(time: stolen_record.date_stolen, format: :localize_time_precise)))
+                    - list.with_row(label: tag.span("From", class: "stolen-color"), value: stolen_record.formatted_address_string(render_country: false))
+                    - list.with_row(label: "PD Report") do
+                      = stolen_record.police_report_number
+                      -# Only show the department if there is a number, some people put it in otherwise :/
+                      - if stolen_record.police_report_number.present?
+                        %small.less-strong
+                          = stolen_record.police_report_department
+                    - list.with_row(label: "Phone", value: render(Atoms::Phone::Component.new(phone: stolen_record.phone)), if: bike.phoneable_by?(current_user))
               .bike-image{ class: thumbclass }
                 %a{ href:  bike_link }
                   %img{ src: thumb_url }
