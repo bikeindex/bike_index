@@ -1,26 +1,15 @@
 - location_count ||= false
-.admin-subnav
-  .col-md-4
-    - if location_count
-      %h1
-        Bike Index records tables
-    - else
-      %h1
-        #{@kind.titleize} graphs
-  .col-md-8
-    %ul
-      - if @kind == "bikes"
-        %li.nav-item
-          = link_to "Search these bikes", admin_bikes_path(sortable_params), class: "nav-link text-info"
+- title = location_count ? "Bike Index records tables" : "#{@kind.titleize} graphs"
+= render(Pages::Admin::Headers::Nav::Component.new(title:)) do
+  - if @kind == "bikes"
+    %li= render(UI::ButtonLink::Component.new(text: "Search these bikes", href: admin_bikes_path(sortable_params), color: :link))
 
-      %li.nav-item
-        = link_to "Location count tables", tables_admin_graphs_path(location_count: true), class: location_count ? "nav-link active" : "nav-link"
-      - @graph_kinds.each do |kind|
-        - kind_path = admin_organization_statuses_path(sortable_params.merge(Admin::OrganizationStatusesController::WITH_POS_GRAPH_PARAMS)) if kind == "pos_integrations"
-        - kind_path ||= admin_graphs_path(sortable_params.merge(search_kind: kind, period: "week"))
-        %li.nav-item
-          = link_to kind.humanize, kind_path, class: @kind == kind ? " nav-link active" : "nav-link"
+  %li= render(UI::ButtonLink::Component.new(text: "Location count tables", href: tables_admin_graphs_path(location_count: true), size: :sm, active: location_count))
+  - @graph_kinds.each do |kind|
+    - kind_path = admin_organization_statuses_path(sortable_params.merge(Admin::OrganizationStatusesController::WITH_POS_GRAPH_PARAMS)) if kind == "pos_integrations"
+    - kind_path ||= admin_graphs_path(sortable_params.merge(search_kind: kind, period: "week"))
+    %li= render(UI::ButtonLink::Component.new(text: kind.humanize, href: kind_path, size: :sm, active: @kind == kind))
 
-  - if !["general", ""].include?(@kind) # General and location tables don't have period select :/
-    .col-12.mt-4{class: "tw:flex tw:justify-end"}
-      = render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time, sortable_search_params:)
+- if !["general", ""].include?(@kind) # General and location tables don't have period select :/
+  %div{class: "tw:flex tw:justify-end"}
+    = render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time, sortable_search_params:)

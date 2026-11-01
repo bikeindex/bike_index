@@ -12,20 +12,9 @@
       = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :organization_id, label_text: OrganizationRole.human_attribute_name(:organization), required: true)) do
         = render UI::Forms::Combobox::Component.new(name: :organization_id, options: @organizations.pluck(:name, :id), include_blank: true, html_options: {form: f, placeholder: "Please select an organization", required: true})
 
-      .form-group
-        = f.label :invited_email
-        = f.text_field :invited_email, required: true, class: "form-control"
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :invited_email, required: true))
 
-      .form-group
-        %label
-          Role
-        .form-check
-          %label
-            = f.radio_button :role, "admin", class: "form-check-input"
-            Admin of organization
-        .form-check
-          %label
-            = f.radio_button :role, "member", class: "form-check-input"
-            Member of organization
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :role)) do
+        = render(UI::Forms::RadioButtonGroup::Component.new(name: f.field_name(:role), entries: [{value: "admin", label: "Admin of organization"}, {value: "member", label: "Member of organization"}], selected: @organization_role.role))
 
-      = f.submit 'Save', class: 'btn btn-success'
+      = render(UI::Button::Component.new(text: "Save", color: :primary, type: "submit"))

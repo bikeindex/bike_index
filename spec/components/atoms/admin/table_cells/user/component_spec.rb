@@ -12,7 +12,7 @@ RSpec.describe Atoms::Admin::TableCells::User::Component, type: :component do
     let(:user) { FactoryBot.create(:user, email: "test@example.com") }
 
     it "renders email as link" do
-      expect(component.css("a.text-link")).to be_present
+      expect(component.css("a.twlink-underlined")).to be_present
       expect(component.css("a[href*='/admin/users/']")).to be_present
       expect(component.text).to include("test@example.com")
       # user_icon helper will render something based on user attributes
@@ -51,7 +51,7 @@ RSpec.describe Atoms::Admin::TableCells::User::Component, type: :component do
       expect(component.text).to include("888")
       expect(component.css("code.small")).to be_present
       # There is no email to label it with, so a link would read as its own href
-      expect(component.css("a.text-link")).to be_blank
+      expect(component.css("a.twlink-underlined")).to be_blank
     end
   end
 
@@ -61,7 +61,7 @@ RSpec.describe Atoms::Admin::TableCells::User::Component, type: :component do
     it "renders email in span" do
       expect(component.css("span[title='orphaned@example.com']")).to be_present
       expect(component.text).to include("orphaned@example.com")
-      expect(component.css("a.text-link")).to be_blank
+      expect(component.css("a.twlink-underlined")).to be_blank
     end
   end
 
@@ -92,7 +92,7 @@ RSpec.describe Atoms::Admin::TableCells::User::Component, type: :component do
     let(:options) { {user:, user_link_path: false} }
 
     it "does not render email link" do
-      expect(component.css("a.text-link")).to be_blank
+      expect(component.css("a.twlink-underlined")).to be_blank
     end
   end
 
@@ -101,7 +101,7 @@ RSpec.describe Atoms::Admin::TableCells::User::Component, type: :component do
     let(:options) { {user:, user_link_path: "/admin/custom/path"} }
 
     it "renders email linked to custom path" do
-      link = component.css("a.text-link").first
+      link = component.css("a.twlink-underlined").first
       expect(link).to be_present
       expect(link["href"]).to eq("/admin/custom/path")
       expect(link.text).to include("test@example.com")
@@ -113,7 +113,7 @@ RSpec.describe Atoms::Admin::TableCells::User::Component, type: :component do
     let(:options) { {user:, render_search: false} }
 
     it "renders user email" do
-      expect(component.css("a.text-link")).to be_present
+      expect(component.css("a.twlink-underlined")).to be_present
       expect(component.css("a.display-sortable-link")).to be_blank
     end
   end

@@ -15,189 +15,129 @@
   </div>
 
   <div class="tw:w-3/4 tw:lg:w-5/12 tw:lg:pr-4">
-    <table class="table-list tw:mb-0">
-      <tbody>
-        <% if @display_dev_info %>
-          <tr class="tw:text-sm">
-            <td>ID</td>
+    <%= render(UI::TableList::Component.new(classes: "tw:mb-0!")) do |list| %>
+      <% list.with_row(label: "ID", class: "tw:text-sm", if: @display_dev_info) do %>
+        <code><%= @bike.id %></code>
 
-            <td>
-              <code><%= @bike.id %></code>
+        <span class="tw:ml-2">status: <code><%= status_humanized %></code></span>
 
-              <span class="tw:ml-2">status: <code><%= status_humanized %></code></span>
+        <% if @bike.user_hidden %>
+          <small class="tw:ml-2 <%= UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>">user hidden</small>
+        <% end %>
+      <% end %>
 
-              <% if @bike.user_hidden %>
-                <small class="tw:ml-2 <%= UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>">user hidden</small>
-              <% end %>
-            </td>
-          </tr>
+      <% list.with_row(label: "Serial number", value: render(Atoms::Serial::Component.new(bike: @bike, user: @user, explanation: :tooltip))) %>
+
+      <% list.with_row(label: "Colors") do %>
+        <%= @bike.frame_colors.to_sentence %>
+        <%= paint_link %>
+      <% end %>
+
+      <% list.with_row(label: "Created") do %>
+        <%= render(UI::Time::Component.new(time: @bike.created_at)) %>
+
+        <%# the localizer fills this with the viewer's timezone %>
+        <small class="localizeTimezone"></small>
+      <% end %>
+
+      <% list.with_row(label: "Creation") do %>
+        <% if @bike.creation_organization.present? %>
+          <%= link_to @bike.creation_organization.name, admin_organization_path(@bike.creation_organization), class: "twlink" %>
+        <% else %>
+          <%= creator_cell %>
         <% end %>
 
-        <tr>
-          <td>Serial number</td>
-
-          <td>
-            <%= render(Atoms::Serial::Component.new(bike: @bike, user: @user, explanation: :tooltip)) %>
-          </td>
-        </tr>
-
-        <tr>
-          <td>Colors</td>
-
-          <td>
-            <%= @bike.frame_colors.to_sentence %>
-            <%= paint_link %>
-          </td>
-        </tr>
-
-        <tr>
-          <td>Created</td>
-
-          <td>
-            <%= render(UI::Time::Component.new(time: @bike.created_at)) %>
-
-            <%# the localizer fills this with the viewer's timezone %>
-            <small class="localizeTimezone"></small>
-          </td>
-        </tr>
-
-        <tr>
-          <td>Creation</td>
-
-          <td>
-            <% if @bike.creation_organization.present? %>
-              <%= link_to @bike.creation_organization.name, admin_organization_path(@bike.creation_organization), class: "twlink" %>
-            <% else %>
-              <%= creator_cell %>
-            <% end %>
-
-            <% if @bike.creation_kind.present? %>
-              &ndash;
-              <em>Via <%= render(Atoms::Org::OriginDisplay::Component.new(ownership: current_ownership)) %></em>
+        <% if @bike.creation_kind.present? %>
+          &ndash;
+          <em>Via <%= render(Atoms::Org::OriginDisplay::Component.new(ownership: current_ownership)) %></em>
 
 
-              <% if current_ownership&.doorkeeper_app_id.present? %>
-                <small class="twless-strong">
-                  oauth app
-                  <em><%= doorkeeper_app&.name || current_ownership.doorkeeper_app_id %></em>
-                </small>
+          <% if current_ownership&.doorkeeper_app_id.present? %>
+            <small class="twless-strong">
+              oauth app
+              <em><%= doorkeeper_app&.name || current_ownership.doorkeeper_app_id %></em>
+            </small>
 
-                <%= link_to helpers.search_emoji, admin_bikes_path(search_doorkeeper_app_id: current_ownership.doorkeeper_app_id), class: "tw:mx-1" %>
-              <% end %>
+            <%= link_to helpers.search_emoji, admin_bikes_path(search_doorkeeper_app_id: current_ownership.doorkeeper_app_id), class: "tw:mx-1" %>
+          <% end %>
 
-              <% if current_ownership&.ios_version.present? %>
-                <small class="twless-strong">
-                  iOS <em><%= current_ownership.ios_version %></em>
-                </small>
+          <% if current_ownership&.ios_version.present? %>
+            <small class="twless-strong">
+              iOS <em><%= current_ownership.ios_version %></em>
+            </small>
+          <% end %>
+        <% end %>
+
+        <% if bulk_import.present? %>
+          <div>
+            Import
+            <%= link_to admin_bulk_import_path(bulk_import.to_param), class: "twlink" do %>
+              #<%= bulk_import.id %>
+              <% if bulk_import.ascend? %>
+                <small>Ascend</small>
               <% end %>
             <% end %>
+          </div>
+        <% end %>
+      <% end %>
 
-            <% if bulk_import.present? %>
-              <div>
-                Import
-                <%= link_to admin_bulk_import_path(bulk_import.to_param), class: "twlink" do %>
-                  #<%= bulk_import.id %>
-                  <% if bulk_import.ascend? %>
-                    <small>Ascend</small>
-                  <% end %>
-                <% end %>
-              </div>
-            <% end %>
-          </td>
-        </tr>
+      <% list.with_row(label: "Updated") do %>
+        <%= render(UI::Time::Component.new(time: @bike.updated_by_user_fallback)) %>
 
-        <tr>
-          <td>Updated</td>
+        <% if updator_cell.present? %>
+          <em class="tw:text-sm">by <%= updator_cell %></em>
+        <% end %>
 
-          <td>
-            <%= render(UI::Time::Component.new(time: @bike.updated_by_user_fallback)) %>
+        <% if @bike.not_updated_by_user? %>
+          <em class="twless-strong tw:text-sm">not updated after creation</em>
+        <% end %>
 
-            <% if updator_cell.present? %>
-              <em class="tw:text-sm">by <%= updator_cell %></em>
-            <% end %>
-
-            <% if @bike.not_updated_by_user? %>
-              <em class="twless-strong tw:text-sm">not updated after creation</em>
-            <% end %>
-
-            <% if @display_dev_info %>
-              <small><%= render(UI::Time::Component.new(time: @bike.updated_at)) %></small>
-            <% end %>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+        <% if @display_dev_info %>
+          <small><%= render(UI::Time::Component.new(time: @bike.updated_at)) %></small>
+        <% end %>
+      <% end %>
+    <% end %>
   </div>
 
   <div class="tw:w-full tw:lg:w-5/12">
-    <table class="table-list tw:mb-0">
-      <tbody>
-        <tr>
-          <td>Owner Email</td>
+    <%= render(UI::TableList::Component.new(classes: "tw:mb-0!")) do |list| %>
+      <% list.with_row(label: "Owner Email") do %>
+        <%= @bike.owner_email %>
+        <%= link_to helpers.search_emoji, owner_search_url, class: "tw:mx-1" %>
 
-          <td>
-            <%= @bike.owner_email %>
-            <%= link_to helpers.search_emoji, owner_search_url, class: "tw:mx-1" %>
-
-            <% if @bike.claimed? %>
-              <small class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:notice] %>">claimed</small>
-            <% end %>
-          </td>
-        </tr>
-
-        <tr>
-          <td>Owner</td>
-
-          <td>
-            <% if @bike.user.present? %>
-              <%= render(Atoms::Admin::TableCells::User::Component.new(user: @bike.user)) %>
-            <% else %>
-              Unclaimed
-            <% end %>
-          </td>
-        </tr>
-
-        <tr>
-          <td>Cached Data</td>
-
-          <td><em class="twless-strong"><%= @bike.cached_data %></em></td>
-        </tr>
-
-        <tr>
-          <td>Address</td>
-
-          <td>
-            <small><%= address_display(address_hash) if address_hash.present? %></small>
-          </td>
-        </tr>
-
-        <% if separate_registration_address? %>
-          <tr>
-            <td>Reg Address</td>
-
-            <td>
-              <small><%= address_display(registration_address.compact) %></small>
-
-              <% if @display_dev_info %>
-                <small class="tw:ml-2">
-                  <em>source:</em>
-                  <%= BikeServices::CalculateLocation.registration_address_source(@bike) %>
-                </small>
-              <% end %>
-            </td>
-          </tr>
+        <% if @bike.claimed? %>
+          <small class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:notice] %>">claimed</small>
         <% end %>
+      <% end %>
 
-        <% if render_phone? %>
-          <tr>
-            <td>Phone</td>
-
-            <td>
-              <%= render(Atoms::Phone::Component.new(phone: @bike.phone, skip_link: true)) %>
-            </td>
-          </tr>
+      <% list.with_row(label: "Owner") do %>
+        <% if @bike.user.present? %>
+          <%= render(Atoms::Admin::TableCells::User::Component.new(user: @bike.user)) %>
+        <% else %>
+          Unclaimed
         <% end %>
-      </tbody>
-    </table>
+      <% end %>
+
+      <% list.with_row(label: "Cached Data") do %>
+        <em class="twless-strong"><%= @bike.cached_data %></em>
+      <% end %>
+
+      <% list.with_row(label: "Address") do %>
+        <small><%= address_display(address_hash) if address_hash.present? %></small>
+      <% end %>
+
+      <% list.with_row(label: "Reg Address", if: separate_registration_address?) do %>
+        <small><%= address_display(registration_address.compact) %></small>
+
+        <% if @display_dev_info %>
+          <small class="tw:ml-2">
+            <em>source:</em>
+            <%= BikeServices::CalculateLocation.registration_address_source(@bike) %>
+          </small>
+        <% end %>
+      <% end %>
+
+      <% list.with_row(label: "Phone", value: render(Atoms::Phone::Component.new(phone: @bike.phone, skip_link: true)), if: render_phone?) %>
+    <% end %>
   </div>
 </div>

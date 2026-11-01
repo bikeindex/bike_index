@@ -16,7 +16,7 @@ RSpec.describe Atoms::Serial::Component, type: :component do
     let(:bike) { FactoryBot.create(:bike, serial_number: "unknown") }
 
     it "renders the word rather than the number" do
-      expect(component.to_html.strip).to eq '<span class="less-strong">unknown</span>'
+      expect(component.to_html.strip).to eq '<span class="twless-strong">unknown</span>'
     end
   end
 
@@ -24,7 +24,7 @@ RSpec.describe Atoms::Serial::Component, type: :component do
     let(:bike) { FactoryBot.create(:bike, made_without_serial: true) }
 
     it "renders made without serial" do
-      expect(component.to_html.strip).to eq '<span class="less-strong">made without serial</span>'
+      expect(component.to_html.strip).to eq '<span class="twless-strong">made without serial</span>'
     end
   end
 
@@ -34,14 +34,14 @@ RSpec.describe Atoms::Serial::Component, type: :component do
 
     it "hides the serial and explains why" do
       expect(component.to_html.strip)
-        .to eq '<span class="less-strong">hidden</span> <em class="small twless-strong">because tandem is impounded</em>'
+        .to eq '<span class="twless-strong">hidden</span> <em class="small twless-strong">because tandem is impounded</em>'
     end
 
     context "with explanation: :tooltip" do
       let(:options) { {explanation: :tooltip} }
 
       it "hides the serial with the explanation in a tooltip" do
-        expect(component.css("span.less-strong").text).to eq "hidden"
+        expect(component.css("span.twless-strong").text).to eq "hidden"
         expect(component.css("em")).to be_blank
         expect(component.css("button").text).to eq "?"
         expect(component.css("[role=tooltip]").text).to eq "because tandem is impounded"
@@ -61,7 +61,7 @@ RSpec.describe Atoms::Serial::Component, type: :component do
         let(:options) { {organization: FactoryBot.create(:organization)} }
 
         it "hides the serial" do
-          expect(component.css("span.less-strong").text).to eq "hidden"
+          expect(component.css("span.twless-strong").text).to eq "hidden"
         end
       end
     end

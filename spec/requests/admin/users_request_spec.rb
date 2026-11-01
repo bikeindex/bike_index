@@ -169,6 +169,12 @@ RSpec.describe Admin::UsersController, type: :request do
       end
     end
     context "non developer" do
+      it "leaves the user unconfirmed when the box is unchecked" do
+        patch "#{base_url}/#{user_subject.id}", params: {user: ban_user_params.merge(name: "New Name", banned: "0", confirmed: "0")}
+        expect(user_subject.reload.name).to eq "New Name"
+        expect(user_subject.confirmed?).to be_falsey
+      end
+
       it "updates all the things that can be edited (finding via user id)" do
         user_subject.reload
         og_auth_token = user_subject.auth_token

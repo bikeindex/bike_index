@@ -5,9 +5,10 @@ module Pages
     module Headers
       module Section
         # A section of an admin record's tab, titled with its count - which links to the full
-        # index, when there is one. Block content follows the parenthetical.
+        # index, when there is one. A section that isn't a list, like an edit form, has no count.
+        # Block content follows the parenthetical.
         class Component < ApplicationComponent
-          def initialize(title:, count:, href: nil, parenthetical: nil)
+          def initialize(title:, count: nil, href: nil, parenthetical: nil)
             @title = title
             @count = count
             @href = href

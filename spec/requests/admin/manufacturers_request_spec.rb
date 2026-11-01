@@ -114,6 +114,17 @@ RSpec.describe Admin::ManufacturersController, type: :request do
     end
   end
 
+  describe "import" do
+    it "creates the manufacturers in the CSV" do
+      file = Rack::Test::UploadedFile.new(Rails.root.join("spec/fixtures/manufacturer-test-import.csv"), "text/csv")
+
+      expect { post "#{base_url}/import", params: {file:} }.to change(Manufacturer, :count)
+
+      expect(flash[:success]).to eq "Manufacturers imported"
+      expect(Manufacturer.friendly_find("Riese & Müller")).to be_present
+    end
+  end
+
   describe "create" do
     it "creates with available attributes" do
       expect(Manufacturer.where(name: "new name and things").count).to eq 0

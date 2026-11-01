@@ -1,10 +1,6 @@
 <%= render Pages::Admin::Bikes::Header::Component.new(bike: @bike, active: :recoveries, stolen_record: @recovery, display_recovery: true, user: current_user, display_dev_info: display_dev_info?) %>
 
-<div class="admin-subnav midpage-subnav">
-  <div class="col-12">
-    <h2>Manage Recovery Display</h2>
-  </div>
-</div>
+<%= render(Pages::Admin::Headers::Section::Component.new(title: "Manage Recovery Display")) %>
 
 <div class="row text-center">
   <% if @recovery.waiting_on_decision? %>
@@ -15,7 +11,8 @@
       <%= link_to "Display recovery", new_admin_recovery_display_path(stolen_record_id: @recovery.id), class: "btn btn-lg btn-primary d-block" %>
     </div>
     <div class="col-6 col-md-4">
-      <%= button_to "Mark Not Displayable", admin_recovery_path(id: @recovery.id, stolen_record: { is_not_displayable: true }), method: :put, class: "btn btn-lg btn-warning d-block", style: "width: 100%;" %>
+      <%= render(UI::ButtonLink::Component.new(text: "Mark Not Displayable", href: admin_recovery_path(id: @recovery.id, stolen_record: {is_not_displayable: true}),
+        method: :put, color: :yellow, size: :lg, html_class: "tw:w-full")) %>
     </div>
   <% elsif @recovery.recovery_displayed? %>
     <div class="col-6">
@@ -27,7 +24,9 @@
   <% elsif @recovery.not_displayed? %>
     <div class="col-12">
       <p>This recovery is not displayed.</p>
-      <%= button_to "Mark Eligible for display", admin_recovery_path(id: @recovery.id, stolen_record: { mark_as_eligible: true }), method: :put, class: "btn btn-lg btn-success" %>
+
+      <%= render(UI::ButtonLink::Component.new(text: "Mark Eligible for display", href: admin_recovery_path(id: @recovery.id, stolen_record: {mark_as_eligible: true}),
+        method: :put, color: :primary, size: :lg)) %>
     </div>
   <% else %>
     <% if !@recovery.recovered? %>
@@ -70,10 +69,7 @@
 <details data-controller="ui--details">
   <summary
     data-action="click->ui--details#toggle"
-    class="
-      gray-link tw:cursor-pointer tw:list-none
-      tw:[&::-webkit-details-marker]:hidden
-    "
+    class="<%= UI::Button::Component.build_classes(color: :link_gray, size: :md, html_class: "tw:cursor-pointer tw:list-none tw:[&::-webkit-details-marker]:hidden") %>"
   >
     show edit form
   </summary>
@@ -81,31 +77,22 @@
   <div data-ui--details-target="content" class="tw:hidden!">
     <hr class="mt-5 mb-4">
 
-    <%= form_for([:admin, @recovery], url: { action: "update", controller: "recoveries" }, html: { class: "form form-horizontal" }) do |f| %>
+    <%= form_for([:admin, @recovery], url: { action: "update", controller: "recoveries" }) do |f| %>
       <%= render(UI::Alerts::ObjectError::Component.new(name: "Recovery", object: @recovery)) %>
 
       <div class="row mt-4">
         <div class="col-md-6">
-          <div class="form-group">
-            <%= f.label :recovered_description, "Recovery description" %>
-            <%= f.text_area :recovered_description, rows: 4, class: "form-control" %>
-          </div>
+          <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :recovered_description, kind: :text_area,
+            label_text: "Recovery description", html_options: {rows: 4})) %>
         </div>
 
         <div class="col-md-6">
-          <div class="form-group form-check">
-            <%= f.check_box :index_helped_recovery, class: "form-check-input" %>
-            <%= f.label :index_helped_recovery, class: "form-check-label" %>
+          <div class="tw:mb-4">
+            <%= render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :index_helped_recovery, label: "Index helped recovery")) %>
+            <%= render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :can_share_recovery, label: "Can share recovery")) %>
           </div>
 
-          <div class="form-group form-check">
-            <%= f.check_box :can_share_recovery, class: "form-check-input" %>
-            <%= f.label :can_share_recovery, class: "form-check-label" %>
-          </div>
-
-          <div class="form-group mt-4">
-            <%= submit_tag "Update the recovery", class: "btn btn-success" %>
-          </div>
+          <%= render(UI::Button::Component.new(text: "Update the recovery", color: :primary, type: "submit")) %>
         </div>
       </div>
     <% end %>

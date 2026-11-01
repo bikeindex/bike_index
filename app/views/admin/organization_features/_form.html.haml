@@ -3,40 +3,29 @@
 
   .row
     .col-md-6.col-xs-12
-      .form-group
-        = f.label :kind
-        = f.select :kind, OrganizationFeature.kinds.map { |k| [k.humanize, k] }, {}, class: "form-control"
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :kind)) do
+        = render(UI::Forms::Select::Component.new(form_builder: f, attribute: :kind, option_tags: OrganizationFeature.kinds.map { |k| [k.humanize, k] }))
     .col-md-6.col-xs-12
-      .form-group
-        = f.label :name
-        = f.text_field :name, class: "form-control"
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :name))
   - if display_dev_info?
     .row.only-dev-visible
       .col-md-6
-        .form-group
-          = f.label :feature_slugs_string do
-            Organization Feature Slugs <small>comma delineated</small>
-          = f.text_area :feature_slugs_string, class: "form-control"
+        = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :feature_slugs_string, kind: :text_area, label_text: "Organization Feature Slugs")) do |group|
+          - group.with_label_note { "comma delineated" }
       .col-md-6{ style: "background: #fff;" }
-        %small.less-strong.p-1
+        %small.twless-strong.p-1
           Permitted slugs:
           = safe_join(OrganizationFeature::EXPECTED_SLUGS.sort.map { |slug| content_tag(:code, slug) }, ", ")
   .row.mt-2
     .col-md-6.col-xs-12
-      .form-group
-        = f.label :amount
-        .input-group.mb-2
-          .input-group-prepend
-            = f.select :currency_enum, options_for_select(Currency.select_options), {}, class: "form-control small"
-          = f.number_field :amount, step: 1, min: 0, class: "form-control"
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :amount)) do
+        %div{class: "tw:flex tw:gap-2"}
+          = render(UI::Forms::Select::Component.new(form_builder: f, attribute: :currency_enum, option_tags: Currency.select_options, html_options: {class: "tw:w-auto"}))
+          = render(UI::Forms::Input::Component.new(form_builder: f, attribute: :amount, kind: :number_field, html_options: {step: 1, min: 0}))
     .col-xs-12.col-md-6
-      .form-group
-        = f.label :details_link
-        = f.text_field :details_link, class: "form-control"
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :details_link))
   .row
     .col-12
-      .form-group
-        = f.label :description
-        = f.text_area :description, style: "width: 100%;", class: "form-control"
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :description, kind: :text_area))
 
-  = f.submit (@organization_feature.id.present? ? "Update" : "Create"), class: 'btn btn-success'
+  = render(UI::Button::Component.new(text: @organization_feature.id.present? ? "Update" : "Create", color: :primary, type: "submit"))

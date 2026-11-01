@@ -1,66 +1,20 @@
-<div class="admin-subnav">
-  <div class="col-md-12">
-    <h1>Bike Organization Note</h1>
-  </div>
-</div>
+<%= render(Pages::Admin::Headers::Nav::Component.new(title: "Bike Organization Note")) %>
 
 <div class="row mt-4">
   <div class="col-md-6">
-    <table class="table-list">
-      <tbody>
-        <% if display_dev_info? %>
-          <tr>
-            <td class="only-dev-visible">ID</td>
+    <%= render(UI::TableList::Component.new) do |list| %>
+      <% list.with_row(label: "ID", dev_only: true, value: tag.code(@bike_organization_note.id), if: display_dev_info?) %>
 
-            <td><code><%= @bike_organization_note.id %></code></td>
-          </tr>
-        <% end %>
+      <% list.with_row(label: "User", value: render(Atoms::Admin::TableCells::User::Component.new(user: @bike_organization_note.user, user_id: @bike_organization_note.user_id))) %>
 
-        <tr>
-          <td>User</td>
+      <% list.with_row(label: "Bike", value: link_to(@bike_organization_note.bike_id, admin_bike_path(@bike_organization_note.bike_id))) %>
 
-          <td>
-            <%= render Atoms::Admin::TableCells::User::Component.new(user: @bike_organization_note.user, user_id: @bike_organization_note.user_id) %>
-          </td>
-        </tr>
+      <% list.with_row(label: "Organization", value: link_to(@bike_organization_note.organization.short_name, admin_organization_path(@bike_organization_note.organization))) %>
 
-        <tr>
-          <td>Bike</td>
+      <% list.with_row(label: "Created", value: render(UI::Time::Component.new(time: @bike_organization_note.created_at, format: :localize_time_precise))) %>
 
-          <td>
-            <%= link_to @bike_organization_note.bike_id, admin_bike_path(@bike_organization_note.bike_id) %>
-          </td>
-        </tr>
-
-        <tr>
-          <td>Organization</td>
-
-          <td>
-            <%= link_to @bike_organization_note.organization.short_name, admin_organization_path(@bike_organization_note.organization) %>
-          </td>
-        </tr>
-
-        <tr>
-          <td>Created</td>
-
-          <td>
-            <span class="localizeTime preciseTime">
-              <%= l @bike_organization_note.created_at, format: :convert_time %>
-            </span>
-          </td>
-        </tr>
-
-        <tr class="small">
-          <td>Updated</td>
-
-          <td>
-            <span class="localizeTime preciseTime">
-              <%= l @bike_organization_note.updated_at, format: :convert_time %>
-            </span>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+      <% list.with_row(label: "Updated", class: "small", value: render(UI::Time::Component.new(time: @bike_organization_note.updated_at, format: :localize_time_precise))) %>
+    <% end %>
   </div>
 
   <div class="col-md-6">

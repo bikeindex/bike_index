@@ -3,7 +3,7 @@
   %span.text-danger
     Failed
   - if show_extended
-    %em.small.less-strong
+    %em.small.twless-strong
       - if bulk_import.timeout_failure?
         Processing timed out
       - else
@@ -17,6 +17,6 @@
   %span{class: bulk_import_progress_class}
     = bulk_import.progress
   - if show_extended && bulk_import.line_errors.present?
-    %em.small.less-strong
+    %em.small.twless-strong
       error did NOT block import
 

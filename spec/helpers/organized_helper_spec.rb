@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe OrganizedHelper, type: :helper do
   describe "organized bike display" do
     let(:bike) { FactoryBot.create(:bike_organized) }
-    let(:target_prefix) { "<span>#{bike.frame_colors.first} <strong>#{bike.mnfg_name}</strong>, <small class=\"less-strong\">" }
+    let(:target_prefix) { "<span>#{bike.frame_colors.first} <strong>#{bike.mnfg_name}</strong>, <small class=\"twless-strong\">" }
     it "renders" do
       expect(organized_bike_text).to be_nil
       result = organized_bike_text(bike)
@@ -18,7 +18,7 @@ RSpec.describe OrganizedHelper, type: :helper do
         result = organized_bike_text(bike)
         expect(result).to start_with "<span>#{bike.frame_colors.first} <strong>#{bike.mnfg_name}</strong><small> cargo bike</small> "
         expect(result).to include("Unregistered")
-        expect(result).not_to include("less-strong")
+        expect(result).not_to include("twless-strong")
       end
     end
     context "deleted" do
@@ -76,8 +76,8 @@ RSpec.describe OrganizedHelper, type: :helper do
     end
     context "graduated_notification" do
       it "info for approved, red for denied" do
-        expect(status_display("remains registered")).to eq "<span class=\"less-strong\">remains registered</span>"
-        expect(status_display("REMAINS registered")).to eq "<span class=\"less-strong\">REMAINS registered</span>"
+        expect(status_display("remains registered")).to eq "<span class=\"twless-strong\">remains registered</span>"
+        expect(status_display("REMAINS registered")).to eq "<span class=\"twless-strong\">REMAINS registered</span>"
         expect(status_display("bike Graduated")).to eq "<span class=\"text-info\">bike Graduated</span>"
         expect(status_display_class("bike Graduated")).to eq "text-info"
       end

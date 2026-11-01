@@ -12,12 +12,7 @@
 <%= render(UI::Tabs::Component.new(tabs: @tabs, nav_label: @nav_label, margin_classes: tabs_classes)) %>
 
 <% if summary? %>
-  <div
-    class="
-      twgutter-bleed tw:mb-6 tw:bg-[#212529] tw:pt-6 tw:pb-1 tw:text-white
-      tw:[&_:is(h1,h2,h3,h4)]:text-white tw:[&_table]:bg-white
-    "
-  >
+  <div class="twgutter-bleed tw:mb-6 tw:pt-6 tw:pb-4 <%= SharedBlocks::Marketing::InvertedBlock::Component::BAND_CLASSES %>">
     <%= summary %>
   </div>
 <% end %>

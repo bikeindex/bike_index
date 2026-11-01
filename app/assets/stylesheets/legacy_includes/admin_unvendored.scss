@@ -113,7 +113,6 @@ hr {
 }
 
 .admin-public-image .image-filename,
-.admin-subnav .nav-item,
 .small,
 small {
   font-size: 80%;
@@ -268,7 +267,6 @@ pre code {
   margin-left: auto
 }
 
-.admin-subnav,
 .row {
   display: flex;
   flex-wrap: wrap;
@@ -287,7 +285,6 @@ pre code {
   padding-left: 0
 }
 
-.admin-subnav .subtitle,
 .col,
 .col-1,
 .col-2,
@@ -431,7 +428,6 @@ pre code {
   max-width: 91.6666666667%
 }
 
-.admin-subnav .subtitle,
 .col-12 {
   flex: 0 0 100%;
   max-width: 100%
@@ -1109,15 +1105,12 @@ pre code {
   }
 }
 
-.table,
-.table-list {
+.table {
   width: 100%;
   margin-bottom: 1rem;
   color: #212529
 }
 
-.table-list td,
-.table-list th,
 .table td,
 .table th {
   padding: .75rem;
@@ -1125,19 +1118,15 @@ pre code {
   border-top: 1px solid #dee2e6
 }
 
-.table-list thead th,
 .table thead th {
   vertical-align: bottom;
   border-bottom: 2px solid #dee2e6
 }
 
-.table-list tbody+tbody,
 .table tbody+tbody {
   border-top: 2px solid #dee2e6
 }
 
-.table-list td,
-.table-list th,
 .table-sm td,
 .table-sm th {
   padding: .3rem
@@ -1145,17 +1134,12 @@ pre code {
 
 .table-bordered,
 .table-bordered td,
-.table-bordered th,
-.table-list,
-.table-list td,
-.table-list th {
+.table-bordered th {
   border: 1px solid #dee2e6
 }
 
 .table-bordered thead td,
-.table-bordered thead th,
-.table-list thead td,
-.table-list thead th {
+.table-bordered thead th {
   border-bottom-width: 2px
 }
 
@@ -1166,7 +1150,6 @@ pre code {
   border: 0
 }
 
-.table-list tbody tr:nth-of-type(odd),
 .table-striped tbody tr:nth-of-type(odd) {
   background-color: rgba(0, 0, 0, .05)
 }
@@ -1337,14 +1320,12 @@ pre code {
   background-color: rgba(0, 0, 0, .075)
 }
 
-.table-list .thead-dark th,
 .table .thead-dark th {
   color: #fff;
   background-color: #343a40;
   border-color: #454d55
 }
 
-.table-list .thead-light th,
 .table .thead-light th {
   color: #495057;
   background-color: #e9ecef;
@@ -1362,12 +1343,10 @@ pre code {
   border-color: #454d55
 }
 
-.table-dark.table-bordered,
-.table-dark.table-list {
+.table-dark.table-bordered {
   border: 0
 }
 
-.table-dark.table-list tbody tr:nth-of-type(odd),
 .table-dark.table-striped tbody tr:nth-of-type(odd) {
   background-color: hsla(0, 0%, 100%, .05)
 }
@@ -1384,8 +1363,7 @@ pre code {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch
   }
-  .table-responsive-sm>.table-bordered,
-  .table-responsive-sm>.table-list {
+  .table-responsive-sm>.table-bordered {
     border: 0
   }
 }
@@ -1397,8 +1375,7 @@ pre code {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch
   }
-  .table-responsive-md>.table-bordered,
-  .table-responsive-md>.table-list {
+  .table-responsive-md>.table-bordered {
     border: 0
   }
 }
@@ -1410,8 +1387,7 @@ pre code {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch
   }
-  .table-responsive-lg>.table-bordered,
-  .table-responsive-lg>.table-list {
+  .table-responsive-lg>.table-bordered {
     border: 0
   }
 }
@@ -1423,8 +1399,7 @@ pre code {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch
   }
-  .table-responsive-xl>.table-bordered,
-  .table-responsive-xl>.table-list {
+  .table-responsive-xl>.table-bordered {
     border: 0
   }
 }
@@ -1436,8 +1411,7 @@ pre code {
   -webkit-overflow-scrolling: touch
 }
 
-.table-responsive>.table-bordered,
-.table-responsive>.table-list {
+.table-responsive>.table-bordered {
   border: 0
 }
 
@@ -3693,7 +3667,6 @@ input[type=submit].btn-block {
   }
 }
 
-.admin-subnav ul,
 .nav {
   display: flex;
   flex-wrap: wrap;
@@ -3756,13 +3729,10 @@ input[type=submit].btn-block {
   border-top-right-radius: 0
 }
 
-.admin-subnav ul .nav-link,
 .nav-pills .nav-link {
   border-radius: .25rem
 }
 
-.admin-subnav ul .nav-link.active,
-.admin-subnav ul .show>.nav-link,
 .nav-pills .nav-link.active,
 .nav-pills .show>.nav-link {
   color: #fff;
@@ -4763,20 +4733,17 @@ a.badge-dark:focus {
   color: #0b2e13
 }
 
-.alert-info,
-.alert-notice {
+.alert-info {
   color: #0c5460;
   background-color: #d1ecf1;
   border-color: #bee5eb
 }
 
-.alert-info hr,
-.alert-notice hr {
+.alert-info hr {
   border-top-color: #abdde5
 }
 
-.alert-info .alert-link,
-.alert-notice .alert-link {
+.alert-info .alert-link {
   color: #062c33
 }
 
@@ -4794,20 +4761,17 @@ a.badge-dark:focus {
   color: #533f03
 }
 
-.alert-danger,
-.alert-error {
+.alert-danger {
   color: #721c24;
   background-color: #f8d7da;
   border-color: #f5c6cb
 }
 
-.alert-danger hr,
-.alert-error hr {
+.alert-danger hr {
   border-top-color: #f1b0b7
 }
 
-.alert-danger .alert-link,
-.alert-error .alert-link {
+.alert-danger .alert-link {
   color: #491217
 }
 
@@ -6603,7 +6567,6 @@ button.bg-dark:hover {
   justify-content: flex-start !important
 }
 
-.admin-subnav ul,
 .justify-content-end {
   justify-content: flex-end !important
 }
@@ -7435,8 +7398,6 @@ button.bg-dark:hover {
   margin: 1.5rem !important
 }
 
-.admin-subnav,
-.admin-subnav .subtitle,
 .mt-4,
 .my-4 {
   margin-top: 1.5rem !important
@@ -7447,7 +7408,6 @@ button.bg-dark:hover {
   margin-right: 1.5rem !important
 }
 
-.admin-subnav,
 .mb-4,
 .my-4 {
   margin-bottom: 1.5rem !important
@@ -9441,20 +9401,15 @@ a.text-dark:hover {
   .badge {
     border: 1px solid #000
   }
-  .table,
-  .table-list {
+  .table {
     border-collapse: collapse !important
   }
-  .table-list td,
-  .table-list th,
   .table td,
   .table th {
     background-color: #fff !important
   }
   .table-bordered td,
-  .table-bordered th,
-  .table-list td,
-  .table-list th {
+  .table-bordered th {
     border: 1px solid #dee2e6 !important
   }
   .table-dark {
@@ -9466,7 +9421,6 @@ a.text-dark:hover {
   .table-dark thead th {
     border-color: #dee2e6
   }
-  .table-list .thead-dark th,
   .table .thead-dark th {
     color: inherit;
     border-color: #dee2e6
@@ -9475,18 +9429,6 @@ a.text-dark:hover {
 
 .stolen-color {
   color: #e74c3c
-}
-
-.found-color {
-  color: #2ecc71
-}
-
-.impounded-color {
-  color: #e74c3c
-}
-
-.unregistered-color {
-  color: #f0ad4e
 }
 
 .custom-file-label {
@@ -9498,10 +9440,9 @@ body {
   font-weight: 400
 }
 
+// @bikeindex/time-localizer wraps preciseTimeSeconds' seconds in .less-strong
 .admin-public-image .image-filename,
-.less-strong,
-.user-edit-link,
-table .less-strong-right {
+.less-strong {
   opacity: .65
 }
 
@@ -9514,63 +9455,8 @@ table .less-strong-right {
 .admin-public-image .image-filename .btn:hover,
 .admin-public-image .image-filename .form-control:focus,
 .admin-public-image .image-filename .form-control:hover,
-.admin-public-image .image-filename a:hover,
-.btn.user-edit-link:focus,
-.btn.user-edit-link:hover,
-.form-control.user-edit-link:focus,
-.form-control.user-edit-link:hover,
-.less-strong+a:hover,
-.less-strong.btn:focus,
-.less-strong .btn:focus,
-.less-strong.btn:hover,
-.less-strong .btn:hover,
-.less-strong.form-control:focus,
-.less-strong .form-control:focus,
-.less-strong.form-control:hover,
-.less-strong .form-control:hover,
-.less-strong a:hover,
-.user-edit-link+a:hover,
-.user-edit-link .btn:focus,
-.user-edit-link .btn:hover,
-.user-edit-link .form-control:focus,
-.user-edit-link .form-control:hover,
-.user-edit-link a:hover,
-table .btn.less-strong-right:focus,
-table .btn.less-strong-right:hover,
-table .form-control.less-strong-right:focus,
-table .form-control.less-strong-right:hover,
-table .less-strong-right+a:hover,
-table .less-strong-right .btn:focus,
-table .less-strong-right .btn:hover,
-table .less-strong-right .form-control:focus,
-table .less-strong-right .form-control:hover,
-table .less-strong-right a:hover {
+.admin-public-image .image-filename a:hover {
   opacity: 1
-}
-
-.gray-link,
-.gray-link a {
-  color: #6c757d !important;
-  opacity: .65;
-  text-decoration: underline
-}
-
-.gray-link.active,
-.gray-link:active,
-.gray-link:hover {
-  opacity: .9
-}
-
-.text-link,
-.text-link a {
-  color: #343a40 !important;
-  text-decoration: underline
-}
-
-.text-link.active,
-.text-link:active,
-.text-link:hover {
-  color: #007bff !important
 }
 
 .text-underline {
@@ -9585,147 +9471,12 @@ label {
   font-style: italic
 }
 
-@media(max-width:767.98px) {
-  .hidden-sm-down {
-    display: none
-  }
-}
-
-@media(max-width:575.98px) {
-  .hidden-xs-down {
-    display: none
-  }
-}
-
-.convertedTime {
-  white-space: nowrap
-}
-
 .uppercase {
   text-transform: uppercase !important
 }
 
-.table-list {
-  word-break: break-word
-}
-
-.table-list tr td {
-  line-height: 1.5
-}
-
-.table-list tr td:first-child {
-  font-size: 75%;
-  font-style: italic;
-  text-align: right;
-  padding: 9px 4px 4px;
-  line-height: 1.25
-}
-
-.table-list tr td:first-child.full-width-data {
-  font-size: 100%;
-  font-style: normal;
-  text-align: left
-}
-
-.table-list tr td:last-child {
-  width: 85%
-}
-
-.table-list tr.active-row {
-  background-color: #ebf5fb !important
-}
-
-.table-list tr.active-row a {
-  text-decoration: underline
-}
-
-.table-list pre {
-  margin: 0
-}
-
-.table-list.wide-definition tr td:last-child {
-  width: 70%
-}
-
-.table-list .inline-images img {
-  display: inline-block;
-  width: 31%;
-  max-width: 150px;
-  margin-right: 3%
-}
-
-table thead.sortable th {
-  font-weight: 400
-}
-
-table thead.sortable th a.sortable-link {
-  display: block;
-  position: relative
-}
-
-table thead.sortable th a.sortable-link.active {
-  padding-right: 1.5rem
-}
-
-table thead.sortable th a.sortable-link span.sortable-direction {
-  display: block;
-  position: absolute;
-  right: 0;
-  top: 0
-}
-
-table thead.sortable th a.sortable-link.active {
-  font-weight: strong;
-  text-decoration: underline
-}
-
 table code {
   word-break: break-all
-}
-
-table .less-strong-hold {
-  position: relative;
-  min-height: 1.25em
-}
-
-table .less-strong-right {
-  position: absolute;
-  right: -.3em;
-  line-height: 1;
-  bottom: -.2em;
-  font-size: .8em
-}
-
-table .photo-cell {
-  text-align: center
-}
-
-table .photo-cell img {
-  max-width: 150px
-}
-
-.primary-alert-block {
-  position: fixed;
-  z-index: 1030;
-  padding-right: .9375rem;
-  padding-left: .9375rem
-}
-
-@media(min-width:992px) {
-  .primary-alert-block {
-    max-width: 600px;
-    width: 66.66667%;
-    top: 75px;
-    right: 3%
-  }
-}
-
-@media(max-width:991.98px) {
-  .primary-alert-block {
-    width: 83.33333%;
-    top: 90px;
-    right: 0
-  }
 }
 
 .alert p:last-of-type {
@@ -9855,113 +9606,6 @@ table .photo-cell img {
   left: 0
 }
 
-.tsv_table {
-  max-height: 270px;
-  overflow-x: scroll
-}
-
-.admin-graphs-list a.active {
-  font-weight: 700
-}
-
-.variable-admin-graphs-form .control-group {
-  width: 220px;
-  float: left;
-  margin-right: 1rem
-}
-
-.admin-subnav {
-  border-bottom: 1px solid #ced4da;
-  padding-bottom: 20px
-}
-
-.admin-subnav h1 {
-  font-size: 2rem
-}
-
-@media(max-width:767.98px) {
-  .admin-subnav h1,
-  .admin-subnav h2,
-  .admin-subnav h3 {
-    font-size: 1.5rem
-  }
-}
-
-@media(max-width:767.98px) {
-  .admin-subnav ul {
-    justify-content: normal !important
-  }
-}
-
-.admin-subnav .nav-item {
-  margin-left: .25rem
-}
-
-.admin-subnav .nav-item .button_to .btn,
-.admin-subnav .nav-item a {
-  padding: .25rem .5rem
-}
-
-.admin-subnav.midpage-subnav {
-  border-bottom: none;
-  margin-top: 40px;
-  padding-top: 20px
-}
-
-.paginate-container {
-  display: flex;
-  flex: wrap 1;
-  justify-content: center
-}
-
-.paginate-container .pagination {
-  flex: 0 1 auto;
-  display: inline-block;
-  padding-left: 0;
-  margin-top: 10px;
-  margin-bottom: 10px
-}
-
-.paginate-container ul {
-  list-item-type: none
-}
-
-.paginate-container li {
-  display: inline
-}
-
-.user-icon {
-  display: inline-block;
-  color: #fff;
-  font-size: 75%;
-  font-weight: 800;
-  padding: .15em .25em;
-  border: 1px solid #ccc;
-  line-height: 1em;
-  border-radius: .5em;
-  cursor: default
-}
-
-.user-icon.donor-icon {
-  background: #2ecc71
-}
-
-.user-icon.org-member-icon {
-  background: #2980b9
-}
-
-.user-icon.superuser-icon {
-  background: #563d7c
-}
-
-.user-icon.recovery-icon {
-  background: #ffc107
-}
-
-.user-icon.theft-alert-icon {
-  background: #17a2b8
-}
-
 .admin-public-image {
   font-size: 12px
 }
@@ -9976,18 +9620,6 @@ table .photo-cell img {
   max-width: 100%;
   height: auto;
   margin: 0 auto
-}
-
-.user-edit-link {
-  font-size: 70%;
-  font-style: italic
-}
-
-.bike-serial {
-  color: #212529;
-  background: none;
-  padding: 0;
-  border-radius: none
 }
 
 .credibility-score {
@@ -10011,10 +9643,6 @@ table .photo-cell img {
 .credibility-score .main-crediblity-score-box .credibility-title {
   display: block;
   color: #fff
-}
-
-.credibility-score .main-crediblity-score-box .credibility-titlea {
-  text-decoration: underline
 }
 
 .credibility-score .main-crediblity-score-box .score-number {
@@ -10041,37 +9669,16 @@ table .photo-cell img {
   display: block
 }
 
-.credibility-score .score-details .table,
-.credibility-score .score-details .table-list {
+.credibility-score .score-details .table {
   margin-bottom: 0
 }
 
-.credibility-score .score-details .table-list tr td,
 .credibility-score .score-details .table tr td {
   line-height: 1.5;
   border: 1px solid #eceeef;
   padding: 4px
 }
 
-.credibility-score .score-details .table-list tr td:last-child,
 .credibility-score .score-details .table tr td:last-child {
   width: 15%
-}
-
-#recovery-bike-image-text .using-bike-image {
-  display: none
-}
-
-#recovery-bike-image-text.bike-image-added .using-bike-image {
-  display: inline-block
-}
-
-#recovery-bike-image-text.bike-image-added .not-using-bike-image {
-  display: none
-}
-
-/* The rest of .only-dev-visible is in bike_index_components.css. This one stays: the file is
-   unlayered, so .table-list's striping would otherwise beat it */
-.table-list tr.only-dev-visible {
-  background: color-mix(in oklab, var(--tw-color-dev) 10%, transparent) !important
 }
