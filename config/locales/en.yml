@@ -4387,9 +4387,9 @@ en:
         choose_file: Choose file...
         correct_actual_image_url_html: '<span class="text-success">Correct</span>:
           actual image url'
-        create_duplicates: >-
+        create_duplicates_html: >-
           Create duplicates - add registrations when a row matches an existing registration's
-          serial and owner email
+          serial and owner email <span class="twless-strong">(off by default)</span>
         csv_file_with_bikes: CSV File with bikes
         doing_an_import: >-
           Doing an import for the first time? Try importing a sample of your CSV with
@@ -4415,7 +4415,6 @@ en:
         must_have_required_headers_html: Your CSV <em>must</em> have our required
           headers.
         notes_on_successfully_importing: 'Notes on successfully importing:'
-        off_by_default: "(off by default)"
         optional_additions: 'Optional additions:'
         our_example_csv_here: our example CSV here
         register_bikes_from_a_csv: Register bikes from a CSV
