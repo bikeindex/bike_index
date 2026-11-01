@@ -149,8 +149,7 @@ class BulkImport < ApplicationRecord
   end
 
   def allow_duplicate=(val)
-    self.data ||= {}
-    data["allow_duplicate"] = Binxtils::InputNormalizer.boolean(val)
+    self.data = (data || {}).merge("allow_duplicate" => Binxtils::InputNormalizer.boolean(val))
   end
 
   def allow_duplicate

@@ -161,8 +161,8 @@ RSpec.describe Organized::BulkImportsController, type: :request do
             expect(assigns(:bulk_import)&.kind).to eq "organization_import"
             page = Capybara.string(response.body)
             expect(page).to have_unchecked_field("bulk_import_allow_duplicate")
-            expect(page).to have_checked_field("bulk_import_allow_duplicate_impounded")
-            expect(page).to have_checked_field("bulk_import_allow_duplicate_stolen")
+            expect(page).to have_checked_field("impounded_bulk_import_allow_duplicate")
+            expect(page).to have_checked_field("stolen_bulk_import_allow_duplicate")
             get "#{base_url}/new?kind=impounded"
             expect(assigns(:bulk_import)&.kind).to eq "impounded"
             get "#{base_url}/new?kind=stolen"
