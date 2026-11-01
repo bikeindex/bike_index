@@ -26,7 +26,7 @@
           - unless @theft_alert.stolen_record_approved?
             %li.text-danger Stolen record isn't approved
 
-= form_for @theft_alert, url: admin_theft_alerts_path, method: :post, html: {class: "tw:m-0"} do |f|
+= form_for @theft_alert, url: admin_theft_alerts_path, method: :post do |f|
   = f.hidden_field :stolen_record_id
   .twfieldrow
     - plan_options = @theft_alert_plans.map { |e| ["#{theft_alert_plan_title(e)} - #{e.amount_formatted}", e.id] }

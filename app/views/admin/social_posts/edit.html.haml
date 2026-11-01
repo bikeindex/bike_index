@@ -4,22 +4,21 @@
 = form_for [:admin, @social_post], url: { action: 'update', controller: 'social_posts' } do |f|
   = render(UI::Alerts::ObjectError::Component.new(object: @social_post))
 
-  .twwiderow{class: "tw:mt-6"}
-    %div
-      - if @social_post.stolen_post?
-        - if @social_post.posted_image.present?
-          = image_tag(@social_post.posted_image)
-      - else
-        = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :image, label_text: "Post photo")) do
-          = render(UI::Forms::Files::Upload::Component.new(form_builder: f, attribute: :image, accept: ImageUploader.permitted_extensions))
-          - if @social_post.image.present?
-            = render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :remove_image, label: "Remove image"))
+  %div{class: "tw:mt-6 tw:md:w-1/2"}
+    - if @social_post.stolen_post?
+      - if @social_post.posted_image.present?
+        = image_tag(@social_post.posted_image)
+    - else
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :image, label_text: "Post photo")) do
+        = render(UI::Forms::Files::Upload::Component.new(form_builder: f, attribute: :image, accept: ImageUploader.permitted_extensions))
+        - if @social_post.image.present?
+          = render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :remove_image, label: "Remove image"))
 
-  %div{class: "tw:grid tw:gap-x-8 tw:md:grid-cols-12"}
-    %div{class: "tw:md:col-span-4"}
+  %div{class: "tw:grid tw:gap-x-8 tw:md:grid-cols-3"}
+    %div
       = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :body_html, kind: :text_area, label_text: "Post display html", html_options: {rows: 4}))
 
-    %div{class: "tw:md:col-span-8 tw:my-auto"}
+    %div{class: "tw:md:col-span-2 tw:my-auto"}
       = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :alignment, label_text: "Post alignment in image")) do
         = render(UI::Forms::RadioButtonGroup::Component.new(name: f.field_name(:alignment), selected: @social_post.alignment, entries: SocialPost::VALID_ALIGNMENTS.map { {value: it, label: it.humanize} }))
 

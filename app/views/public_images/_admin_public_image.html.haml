@@ -3,8 +3,8 @@
 %li.admin-public-image{ class: "tw:mt-1", id: "image-#{public_image.id}", data: ({ controller: "admin--public-image", "admin--public-image-url-value": public_image_path(public_image) } if blog) }
   .card.bg-light
     .card-body
-      %div{ class: "tw:grid tw:grid-cols-12 tw:gap-x-8" }
-        %div{ class: "tw:col-span-3" }
+      %div{ class: "tw:grid tw:grid-cols-4 tw:gap-x-8" }
+        %div
           .img-box
             - if original_url.present?
               -# Versions are generated in a background job, so a just-uploaded image has none
@@ -12,7 +12,7 @@
               = image_tag(public_image.image_url(:small) || original_url, data: { controller: "image-fallback", action: "error->image-fallback#fallBack", "image-fallback-url-value": original_url })
           %p.image-filename
             = public_image.name.truncate(18)
-        %div{ class: "tw:col-span-9" }
+        %div{ class: "tw:col-span-3" }
           %textarea.form-control
             \&lt;img class="post-image" src="#{original_url}" alt="ENTER YOUR TEXT HERE"&gt;
       - if blog

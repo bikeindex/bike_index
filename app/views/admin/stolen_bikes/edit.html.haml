@@ -70,7 +70,7 @@
     .alert.alert-info
       %h4
         Approving will:
-      %ul{class: "tw:mt-0"}
+      %ul
         %li
           Send out a tweet
         %li
@@ -85,7 +85,7 @@
 - if social_posts&.any?
   = render partial: "/admin/social_posts/table", locals: { social_posts: social_posts, render_sortable: false, skip_stolen_record: true }
 
-%hr{class: "tw:my-6!"}
+%hr{class: "tw:my-6"}
 
 - if @customer_contact.present?
   = form_for [:admin, @customer_contact] do |f|

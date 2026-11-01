@@ -53,11 +53,11 @@
 = form_for [:admin, @bike_sticker_batch], url: {action: "create", controller: "bike_stickers"} do |f|
   = render(UI::Alerts::ObjectError::Component.new(name: "Sticker Batch", object: @bike_sticker_batch))
 
-  %div{class: "tw:mt-6 tw:grid tw:gap-x-8 tw:md:grid-cols-12"}
-    %div{class: "tw:md:col-span-6 tw:lg:col-span-3"}
+  %div{class: "tw:mt-6 tw:grid tw:gap-x-8 tw:md:grid-cols-2 tw:lg:grid-cols-4"}
+    %div
       = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :organization_id, label_text: BikeStickerBatch.human_attribute_name(:organization_id), required: true)) do
         = render UI::Forms::Combobox::Component.new(name: :organization_id, options: @organizations.pluck(:name, :id), include_blank: true, html_options: {form: f, placeholder: "Choose organization", required: true})
-    %div{class: "tw:md:col-span-6 tw:lg:col-span-9"}
+    %div{class: "tw:lg:col-span-3"}
       = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :notes))
   .twfieldrow{class: "tw:mt-2"}
     = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :prefix, label_text: "Code letter prefix", required: true))

@@ -21,7 +21,7 @@
   %h3{class: "tw:mt-6"} Reposts
   = render partial: "admin/social_posts/table", locals: { social_posts: @social_post.reposts, skip_reposts: true }
 
-%hr{class: "tw:mt-6!"}
+%hr{class: "tw:mt-6"}
 
 %h3 Platform Response Data
 = render UI::JsonDisplay::Component.new(data: @social_post.platform_response, no_max_height: true)

@@ -26,8 +26,6 @@
 
 <%= render(Pages::Admin::Graphs::YearCounts::Component.new) %>
 
-<div class="tw:mt-6"></div>
-
 <% if @bounding_box.present? %>
   <h4 class="tw:mt-6">
     Records <em>within <%= @location_radius %> miles of</em>

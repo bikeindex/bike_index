@@ -32,49 +32,48 @@
     %strong Tell Seth
 
 - if @theft_alert.pending?
-  %div{class: "tw:my-6"}
-    = render(UI::Container::Component.new) do
-      .card
-        .card-body
-          - if @theft_alert.activateable_except_approval?
-            %h4.text-center
-              - if @theft_alert.activateable?
-                Theft alert can be activated!
-              - else
-                %span.text-warning This stolen record is NOT approved
-                %em.small.d-block{class: "tw:mt-2"}
-                  You can still activate if you're sure you want to
+  = render(UI::Container::Component.new) do
+    .card{class: "tw:my-6"}
+      .card-body
+        - if @theft_alert.activateable_except_approval?
+          %h4.text-center
+            - if @theft_alert.activateable?
+              Theft alert can be activated!
+            - else
+              %span.text-warning This stolen record is NOT approved
+              %em.small.d-block{class: "tw:mt-2"}
+                You can still activate if you're sure you want to
 
-            - if @theft_alert.activating?
-              %h2.text-center{class: "tw:mt-4"}
-                %span.text-warning Activation in process
+          - if @theft_alert.activating?
+            %h2.text-center{class: "tw:mt-4"}
+              %span.text-warning Activation in process
 
-              %p
-                Activation started at:
-                %span.localizeTime= l( @theft_alert.activating_at, format: :convert_time)
+            %p
+              Activation started at:
+              %span.localizeTime= l( @theft_alert.activating_at, format: :convert_time)
 
-              %p
-                %strong Don't activate again
-                unless activation started a while ago
+            %p
+              %strong Don't activate again
+              unless activation started a while ago
 
-            .text-center{class: "tw:mt-6"}
-              = render(UI::ButtonLink::Component.new(text: "Activate!", href: admin_theft_alert_path(@theft_alert.id, activate_theft_alert: true), method: :patch, color: :primary, size: :lg))
-          - else
-            %h4.text-center
-              Theft alert
-              %span.text-danger can not
-              be activated
-            %ul{class: "tw:mt-6"}
-              - unless @theft_alert.stolen_record_approved?
-                %li Stolen Record is not approved
-              - unless @theft_alert.paid?
-                %li Alert is not paid
-              - if @theft_alert.missing_photo?
-                %li Alert is missing photo
-              - if @theft_alert.missing_location?
-                %li Alert is missing location
-              - if @theft_alert.bike_not_current?
-                %li Bike is hidden, deleted, or spam
+          .text-center{class: "tw:mt-6"}
+            = render(UI::ButtonLink::Component.new(text: "Activate!", href: admin_theft_alert_path(@theft_alert.id, activate_theft_alert: true), method: :patch, color: :primary, size: :lg))
+        - else
+          %h4.text-center
+            Theft alert
+            %span.text-danger can not
+            be activated
+          %ul{class: "tw:mt-6"}
+            - unless @theft_alert.stolen_record_approved?
+              %li Stolen Record is not approved
+            - unless @theft_alert.paid?
+              %li Alert is not paid
+            - if @theft_alert.missing_photo?
+              %li Alert is missing photo
+            - if @theft_alert.missing_location?
+              %li Alert is missing location
+            - if @theft_alert.bike_not_current?
+              %li Bike is hidden, deleted, or spam
 
 .twwiderow{class: "tw:mt-6 tw:items-start"}
   = render(UI::TableList::Component.new) do |list|
@@ -151,8 +150,7 @@
 
 = form_for @theft_alert,
   url: admin_theft_alert_path(@theft_alert),
-  method: :patch,
-  html: { class: "tw:m-0" } do |f|
+  method: :patch do |f|
 
   -# Can't edit many things here! They're set via the theft_alert_plan
   -# - unless @theft_alert.pending?

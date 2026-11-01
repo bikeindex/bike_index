@@ -2,17 +2,16 @@
   %li= render(UI::ButtonLink::Component.new(text: "Edit", href: edit_admin_social_account_url(@social_account), size: :sm))
   %li= render(UI::ButtonLink::Component.new(text: "Check Credentials", href: check_credentials_admin_social_account_url(@social_account), size: :sm))
 - if @social_account.errored?
-  %div{class: "tw:my-6"}
-    = render(UI::Container::Component.new) do
-      .card
-        .card-body
-          %h4.text-danger
-            %em
-              #{@social_account.screen_name} has an Error!
-          = render(UI::TableList::Component.new(classes: "tw:mt-6")) do |list|
-            - list.with_row(label: "Error at:", value: render(UI::Time::Component.new(time: @social_account.last_error_at)))
-            - list.with_row(label: "Error", value: @social_account.last_error)
-          = link_to "Log in to refresh credentials", "/auth/twitter", class: "btn btn-success"
+  = render(UI::Container::Component.new) do
+    .card{class: "tw:my-6"}
+      .card-body
+        %h4.text-danger
+          %em
+            #{@social_account.screen_name} has an Error!
+        = render(UI::TableList::Component.new(classes: "tw:mt-6")) do |list|
+          - list.with_row(label: "Error at:", value: render(UI::Time::Component.new(time: @social_account.last_error_at)))
+          - list.with_row(label: "Error", value: @social_account.last_error)
+        = link_to "Log in to refresh credentials", "/auth/twitter", class: "btn btn-success"
 .twwiderow
   %div
     %h1

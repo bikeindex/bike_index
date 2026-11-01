@@ -64,7 +64,7 @@
         <%= render(UI::Container::Component.new) do %>
           <div class="card bg-light">
             <div class="card-body">
-              <div class="tw:grid tw:gap-x-8 tw:sm:grid-cols-2">
+              <div class="twwiderow">
                 <h4>Ban information</h4>
 
                 <%= render(UI::Forms::Group::Component.new(form_builder: user_ban, attribute: :reason, required: true)) do %>
