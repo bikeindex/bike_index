@@ -57,7 +57,7 @@
 
   <% table.column(hideable: :tags_cell) do |bug_report| %>
     <% bug_report.tags.each do |tag| %>
-      <code class="tw:text-xs tw:text-black"><%= tag %></code>
+      <code class="tw:text-xs tw:text-black tw:dark:text-gray-200"><%= tag %></code>
     <% end %>
   <% end %>
 
