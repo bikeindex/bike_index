@@ -50,7 +50,7 @@
 
             %p
               Activation started at:
-              %span.localizeTime= l( @theft_alert.activating_at, format: :convert_time)
+              = render(UI::Time::Component.new(time: @theft_alert.activating_at))
 
             %p
               %strong Don't activate again

@@ -27,5 +27,5 @@
     - list.with_row(label: "Description", value: @manufacturer.description)
     - list.with_row(label: "Logo", value: link_to(image_tag(@manufacturer.logo.url(:thumb)), @manufacturer.logo_url))
   %div
-    = link_to "Edit", edit_admin_manufacturer_url(@manufacturer), class: "btn btn-success"
+    = render(UI::ButtonLink::Component.new(text: "Edit", href: edit_admin_manufacturer_url(@manufacturer), color: :primary))
     = render(UI::ButtonLink::Component.new(text: "Delete", href: admin_manufacturer_url(@manufacturer), method: :delete, color: :error, confirm: "Are you sure?"))

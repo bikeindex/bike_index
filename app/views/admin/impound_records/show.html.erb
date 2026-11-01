@@ -77,9 +77,7 @@
       <% @impound_record.impound_record_updates.each do |impound_record_update| %>
         <tr>
           <td>
-            <span class="localizeTime preciseTime">
-              <%= l(impound_record_update.created_at, format: :convert_time) %>
-            </span>
+            <%= render UI::Time::Component.new(time: impound_record_update.created_at, format: :localize_time_precise) %>
           </td>
 
           <td>
