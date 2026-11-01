@@ -41,5 +41,5 @@
     </div>
   <% end %>
 
-  <%= link_to "Exit Admin", root_path, class: "btn btn-outline-secondary ml-auto twless-strong d-none d-lg-inline-block" %>
+  <%= render(UI::ButtonLink::Component.new(text: "Exit Admin", href: root_path, html_class: "tw:ml-auto tw:max-lg:hidden")) %>
 </nav>
