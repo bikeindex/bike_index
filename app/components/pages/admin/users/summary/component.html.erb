@@ -180,11 +180,7 @@
 
       <% list.with_row(label: "Website", value: @user.mb_link_target) %>
 
-      <% list.with_row(label: "Address") do %>
-        <small>
-          <%= @user.formatted_address_string(visible_attribute: :street, current_country_id: helpers.current_country_id) %>
-        </small>
-      <% end %>
+      <% list.with_row(label: "Address", value: tag.small(@user.formatted_address_string(visible_attribute: :street, current_country_id: helpers.current_country_id))) %>
 
       <% list.with_row(label: "Vendor terms?", value: render(UI::Time::Component.new(time: @user.when_vendor_terms_of_service, format: :localize_time_precise))) %>
     <% end %>

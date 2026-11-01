@@ -9,9 +9,7 @@
 
       <% list.with_row(label: "Seller", value: render(Atoms::Admin::TableCells::User::Component.new(user: @marketplace_listing.seller, user_id: @marketplace_listing.seller_id))) %>
 
-      <% list.with_row(label: "Buyer", if: @marketplace_listing.buyer.present?) do %>
-        <%= render(Atoms::Admin::TableCells::User::Component.new(user: @marketplace_listing.buyer, user_id: @marketplace_listing.buyer_id)) %>
-      <% end %>
+      <% list.with_row(label: "Buyer", value: render(Atoms::Admin::TableCells::User::Component.new(user: @marketplace_listing.buyer, user_id: @marketplace_listing.buyer_id)), if: @marketplace_listing.buyer.present?) %>
 
       <% list.with_row(label: "Price") do %>
         <%= amount_display(@marketplace_listing, currency_name_suffix: true) %>

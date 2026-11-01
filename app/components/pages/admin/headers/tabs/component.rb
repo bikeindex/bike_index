@@ -9,6 +9,8 @@ module Pages
         # rather than in each view, so a screen can't disagree with its siblings about what the
         # tabs are; Pages::Admin::Organizations::Tabs is the pattern.
         class Component < ApplicationComponent
+          # Template Dependency: SharedBlocks::Marketing::InvertedBlock::Component
+
           # What's wrong with the record - that it's deleted, that it can't be edited
           renders_one :alert
 

@@ -12,14 +12,7 @@
 <%= render(UI::Tabs::Component.new(tabs: @tabs, nav_label: @nav_label, margin_classes: tabs_classes)) %>
 
 <% if summary? %>
-  <%# inverted flips tw:dark: inside it, so what it holds styles itself as for a dark page %>
-  <div
-    class="
-      inverted twgutter-bleed tw:mb-6 tw:bg-linear-160 tw:from-white
-      tw:to-gray-100 tw:pt-6 tw:pb-4 tw:text-slate-900
-      tw:dark:from-slate-900 tw:dark:to-[#233140] tw:dark:text-white
-    "
-  >
+  <div class="twgutter-bleed tw:mb-6 tw:pt-6 tw:pb-4 <%= SharedBlocks::Marketing::InvertedBlock::Component::BAND_CLASSES %>">
     <%= summary %>
   </div>
 <% end %>
