@@ -6,12 +6,12 @@
 <% when :messages %>
   <%= render(Pages::Admin::Users::Show::Messages::Component.new(user: @user)) %>
 <% when :organization_roles %>
-  <p class="tw:mb-4 tw:text-sm">
+  <h4>
     <%= link_to admin_user_registration_organizations_path(user_id: @user.id), class: "twlink" do %>
       <%= number_display(registration_organizations_count) %>
       <%= "registration organization".pluralize(registration_organizations_count) %>
     <% end %>
-  </p>
+  </h4>
 
   <%= render partial: "/admin/organization_roles/table", locals: {organization_roles: records.reorder(id: :desc)} %>
 <% when :emails %>
