@@ -61,7 +61,7 @@ RSpec.describe Atoms::Admin::TableCells::Organization::Component, type: :compone
 
     it "renders organization name with less emphasis" do
       expect(component.text).to include("Deleted Org")
-      expect(component).to have_css("span.less-strong")
+      expect(component).to have_css("span.twless-strong")
       expect(component.text).to include("deleted!")
       expect(component).to have_css("span.tw:text-red-800")
       expect(component).to have_css("small")

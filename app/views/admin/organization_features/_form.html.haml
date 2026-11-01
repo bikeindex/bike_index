@@ -18,7 +18,7 @@
             Organization Feature Slugs <small>comma delineated</small>
           = f.text_area :feature_slugs_string, class: "form-control"
       .col-md-6{ style: "background: #fff;" }
-        %small.less-strong.p-1
+        %small.twless-strong.p-1
           Permitted slugs:
           = safe_join(OrganizationFeature::EXPECTED_SLUGS.sort.map { |slug| content_tag(:code, slug) }, ", ")
   .row.mt-2

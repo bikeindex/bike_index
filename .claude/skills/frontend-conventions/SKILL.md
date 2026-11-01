@@ -68,7 +68,7 @@ Every legacy stylesheet wraps itself in `@layer legacy` (see `app/assets/stylesh
 
 **Admin is the exception, and it inverts the rule.** `app/assets/stylesheets/admin.scss` imports `legacy_includes/admin_unvendored` *outside* its `@layer legacy` block, so those rules are unlayered and beat every tailwind utility whatever the specificity. On an admin page a utility that collides with one needs `!` — and without it the class is inert, not merely outranked: `tw:-mb-px` on `.nav-tabs` looked like it was doing the work `.nav { margin-bottom: 0 }` was actually overriding. Check `getComputedStyle` rather than assuming the class landed.
 
-**`!important` reverses layer order**, so a legacy-layer `!important` beats a tailwind utility that isn't. A rule kept "just in case" in `revised.scss` is not inert — it is what paints. Delete the legacy rule rather than leaving it alongside; `revised.scss` is fully inside the layer, so the utility already wins without it. Only `admin_unvendored` genuinely needs an `!important` companion, because it is unlayered. `.only-dev-visible` (`app/assets/tailwind/bike_index_components.css`, plus the one surviving companion in `admin_unvendored.scss`) is the worked example.
+**`!important` reverses layer order**, so a legacy-layer `!important` beats a tailwind utility that isn't. A rule kept "just in case" in `revised.scss` is not inert — it is what paints. Delete the legacy rule rather than leaving it alongside; `revised.scss` is fully inside the layer, so the utility already wins without it. Only a collision with `admin_unvendored`, which is unlayered, needs a forced utility — `.table-list tr.only-dev-visible` in `app/assets/tailwind/bike_index_components.css` is the worked example.
 
 ## Two Tailwind v4 traps
 

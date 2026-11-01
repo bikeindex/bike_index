@@ -1,8 +1,4 @@
-<div class="admin-subnav">
-  <div class="col-md-12">
-    <h1>Sale</h1>
-  </div>
-</div>
+<%= render(Pages::Admin::Headers::Nav::Component.new(title: "Sale")) %>
 
 <div class="row mt-4">
   <div class="col-md-6">
@@ -30,7 +26,7 @@
             <% if @sale.buyer.present? %>
               <%= render Atoms::Admin::TableCells::User::Component.new(user: @sale.buyer, user_id: @sale.buyer&.id) %>
             <% else %>
-              <span class="less-strong"><%= @sale.new_owner_email %></span>
+              <span class="twless-strong"><%= @sale.new_owner_email %></span>
             <% end %>
           </td>
         </tr>
@@ -129,7 +125,7 @@
             <% if @sale.new_ownership.present? %>
               <%= link_to @sale.new_ownership.id, admin_ownership_path(@sale.new_ownership.id) %>
             <% else %>
-              <span class="less-strong">pending</span>
+              <span class="twless-strong">pending</span>
             <% end %>
           </td>
         </tr>

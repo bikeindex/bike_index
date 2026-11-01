@@ -1,7 +1,4 @@
-.admin-subnav
-  .col-12
-    %h1
-      IP Location
+= render(Pages::Admin::Headers::Nav::Component.new(title: "IP Location"))
 
 %p
   Compare cloudflare headers vs geocoder results

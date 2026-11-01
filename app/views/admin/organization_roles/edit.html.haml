@@ -18,7 +18,7 @@
             - if @organization_role.sender_id.present?
               = render Atoms::Admin::TableCells::User::Component.new(user: @organization_role.sender, user_id: @organization_role.user_id)
             - else
-              %small.less-strong
+              %small.twless-strong
                 self created
         %tr
           %td

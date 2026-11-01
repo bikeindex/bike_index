@@ -1,7 +1,4 @@
-.admin-subnav
-  .col-12
-    %h1
-      Autocomplete status
+= render(Pages::Admin::Headers::Nav::Component.new(title: "Autocomplete status"))
 
 .row
   .col-md-6
@@ -13,13 +10,13 @@
           %td Category Keys
           %td
             = number_display(@autocomplete_info[:category_keys])
-            %small.less-strong.ml-1
+            %small.twless-strong.ml-1
               should be > 100k
         %tr
           %td Cache Keys
           %td
             = number_display(@autocomplete_info[:cache_keys])
-            %small.less-strong.ml-1
+            %small.twless-strong.ml-1
               they should expire every 10 minutes...
 
         - @autocomplete_info.except(:category_keys, :cache_keys).each do |key, value|
