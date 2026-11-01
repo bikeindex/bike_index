@@ -24,7 +24,7 @@
       </li>
 
       <li>
-        <small class="less-strong">
+        <small class="twless-strong">
           <%= link_to "all organization invoices", admin_organization_invoices_path(@invoice.organization) %>
         </small>
       </li>
@@ -34,7 +34,7 @@
   <% list.with_row(label: "Paid in full:") do %>
     <strong><%= @invoice.paid_in_full? ? "Yes" : "No" %></strong>
 
-    <span class="less-strong">
+    <span class="twless-strong">
       <%= MoneyFormatter.money_format(@invoice.amount_paid_cents, @invoice.currency_name) %>
     </span>
 
@@ -49,12 +49,12 @@
     </ul>
 
     <% if @invoice.law_enforcement_functionality_invoice? %>
-      <strong class="less-strong"> Verified Law Enforcement functionality </strong>
+      <strong class="twless-strong"> Verified Law Enforcement functionality </strong>
       invoice
     <% end %>
 
     <% if @invoice.paid_money_but_no_cost? %>
-      <strong class="less-strong">Amount due is $0</strong> this invoice doesn't
+      <strong class="twless-strong">Amount due is $0</strong> this invoice doesn't
       make the organization "Paid"
       <% if @invoice.payments.any? %>
         <span class="d-block mt-1">

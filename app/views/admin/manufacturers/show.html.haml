@@ -1,11 +1,4 @@
-.admin-subnav
-  .col-md-12
-    %h1
-      = @manufacturer.name
-      %small.less-strong
-        %small simple:
-
-        = @manufacturer.short_name
+= render(Pages::Admin::Headers::Nav::Component.new(title: @manufacturer.name, subtitle: "simple: #{@manufacturer.short_name}"))
 
 .row
   .col-6
@@ -16,7 +9,7 @@
       - list.with_row(label: "Slug") do
         = @manufacturer.slug
         %small
-          %span.less-strong.ml-1 secondary:
+          %span.twless-strong.ml-1 secondary:
           = @manufacturer.secondary_slug
       - list.with_row(label: "Frame Maker?", value: (check_mark if @manufacturer.frame_maker))
       - list.with_row(label: "Motorized only?", value: (check_mark if @manufacturer.motorized_only))

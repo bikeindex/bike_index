@@ -1,7 +1,4 @@
-.admin-subnav
-  .col
-    %h1
-      Messages
+= render(Pages::Admin::Headers::Nav::Component.new(title: "Messages"))
 .row
   .col-sm-6
     = render(UI::TableList::Component.new) do |list|
@@ -11,13 +8,13 @@
       - list.with_row(label: "User") do
         - if @feedback.user
           = link_to @feedback.user.display_name, edit_admin_user_path(@feedback.user.to_param)
-          %small.less-strong
+          %small.twless-strong
             user present
             - if @feedback.user.display_name != @feedback.name
               (name entered: #{@feedback.name})
         - else
           = @feedback.name
-          %span.less-strong
+          %span.twless-strong
             = link_to @feedback.email, admin_users_path(user_query: @feedback.email)
       - list.with_row(label: "data", if: @feedback.feedback_hash.present?) do
         - if @feedback.organization.present?
@@ -28,7 +25,7 @@
         - if @bike.present?
           = render Atoms::Admin::TableCells::Bike::Component.new(bike: @bike, bike_id: @feedback.feedback_hash["bike_id"])
         - elsif @feedback.bike_id.blank?
-          %small.less-strong no bike
+          %small.twless-strong no bike
         - else
           Bike permanently deleted
   .col-sm-6

@@ -1,8 +1,4 @@
-<div class="admin-subnav">
-  <div class="col-md-12">
-    <h1>Marketplace Listing</h1>
-  </div>
-</div>
+<%= render(Pages::Admin::Headers::Nav::Component.new(title: "Marketplace Listing")) %>
 
 <div class="row mt-4">
   <div class="col-md-6">
@@ -21,7 +17,7 @@
         <%= amount_display(@marketplace_listing, currency_name_suffix: true) %>
 
         <% if @marketplace_listing.price_negotiable? %>
-          <small class="less-strong">(negotiable)</small>
+          <small class="twless-strong">(negotiable)</small>
         <% end %>
       <% end %>
 

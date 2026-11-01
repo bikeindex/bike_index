@@ -35,7 +35,7 @@
   <% if @unapproved_only %>
     <p class="mt-4 mb-0">
       Showing only unapproved records
-      <em><% if @only_without_location %><strong>without location</strong><small class="less-strong">        view        <%= link_to "records with location", url_for(sortable_search_params.merge(search_without_location: false)) %>      </small><% else %><small class="less-strong">        <%= number_display(@unapproved_without_location_count) %> unapproved        records        <%= link_to "without location", url_for(sortable_search_params.merge(search_without_location: true)) %>      </small><% end %></em>
+      <em><% if @only_without_location %><strong>without location</strong><small class="twless-strong">        view        <%= link_to "records with location", url_for(sortable_search_params.merge(search_without_location: false)) %>      </small><% else %><small class="twless-strong">        <%= number_display(@unapproved_without_location_count) %> unapproved        records        <%= link_to "without location", url_for(sortable_search_params.merge(search_without_location: true)) %>      </small><% end %></em>
     </p>
   <% end %>
 

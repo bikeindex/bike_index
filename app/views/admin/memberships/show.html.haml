@@ -1,6 +1,6 @@
 %h1
   Editing Membership
-  %small.less-strong
+  %small.twless-strong
     - if @membership.admin_managed?
       admin managed
     - else
@@ -41,7 +41,7 @@
             = link_to @membership.stripe_id.truncate(20), @membership.stripe_admin_url, title: @membership.stripe_id
           - else
             %span.text-danger MISSING STRIPE ID!
-            %small.less-strong This is a problem, tell Seth!
+            %small.twless-strong This is a problem, tell Seth!
 
 - if @membership.admin_managed? && @membership.active?
   .row.mt-5

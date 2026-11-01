@@ -36,7 +36,7 @@
   <% table.column(sortable: "bike_sticker_batch_id", label: "Batch") do |bike_sticker| %>
     <% if bike_sticker.bike_sticker_batch.present? %>
       <%= link_to bike_sticker.bike_sticker_batch_id, admin_bike_stickers_path(sort_state.search_params.merge(search_bike_sticker_batch_id: bike_sticker.bike_sticker_batch_id)) %>
-      <small class="less-strong">
+      <small class="twless-strong">
         <%= bike_code_batch_organizations[bike_sticker.bike_sticker_batch_id.to_s] %>
       </small>
     <% end %>

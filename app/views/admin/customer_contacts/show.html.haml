@@ -1,9 +1,6 @@
 -# TODO: make this better. Leaves much to be desired
 
-.admin-subnav
-  .col-12
-    %h1
-      Customer Contact
+= render(Pages::Admin::Headers::Nav::Component.new(title: "Customer Contact"))
 .row
   .col-sm-6
     = render(UI::TableList::Component.new) do |list|
@@ -19,7 +16,7 @@
         - if @customer_contact.bike.present?
           = link_to organized_bike_text(@customer_contact.bike), edit_admin_bike_path(@customer_contact.bike)
         - else
-          %small.less-strong Bike ID: #{@customer_contact.bike_id}
+          %small.twless-strong Bike ID: #{@customer_contact.bike_id}
   .col-sm-6
     = render(UI::TableList::Component.new) do |list|
       - list.with_row(label: "Title", value: @customer_contact.title)

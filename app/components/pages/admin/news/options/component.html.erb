@@ -14,7 +14,7 @@
                 class="<%= info_only_class %>"
                 data-admin--news-form-target="infoOnly"
               >
-                <small class="less-strong">info posts are published at the most recent edit time</small>
+                <small class="twless-strong">info posts are published at the most recent edit time</small>
               </div>
             </div>
           </div>
@@ -27,7 +27,7 @@
                     <%= @form_builder.check_box :info_kind, checked: @blog.info?, class: "form-check-input",
                           data: {"admin--news-form-target": "infoKind", action: "change->admin--news-form#kindChanged"} %>
                     Info post
-                    <small class="less-strong">static content that's updated</small>
+                    <small class="twless-strong">static content that's updated</small>
                   <% end %>
                 </div>
               </div>
@@ -39,7 +39,7 @@
             data-admin--news-form-target="blogOnly"
           >
             <div class="form-group">
-              <span class="less-strong">Publish Date:</span>
+              <span class="twless-strong">Publish Date:</span>
               <span class="localizeTime"><%= l @blog.published_at, format: :convert_time %></span>
             </div>
           </div>
@@ -70,7 +70,7 @@
       <div class="col-md-6">
         <div class="form-group">
           <%= @form_builder.label :content_tag_names, class: "control-label" do %>
-            Tags <small class="less-strong">at least one required</small>
+            Tags <small class="twless-strong">at least one required</small>
           <% end %>
 
           <%= render UI::Forms::Combobox::Component.new(name: :content_tag_names, options: content_tag_options,
@@ -102,7 +102,7 @@
         <div class="form-group">
           <%= @form_builder.label :canonical_url, class: "control-label" do %>
             Canonical URL
-            <small class="less-strong">(e.g. https://blogspot.com/post/1)</small>
+            <small class="twless-strong">(e.g. https://blogspot.com/post/1)</small>
           <% end %>
 
           <%= @form_builder.text_field :canonical_url, class: "form-control" %>
@@ -117,7 +117,7 @@
             <label>
               <%= @form_builder.radio_button :index_image_id, 0 %> No primary
               image
-              <small class="less-strong">Otherwise, select a primary image with the radio button next to the image</small>
+              <small class="twless-strong">Otherwise, select a primary image with the radio button next to the image</small>
             </label>
           </div>
         </div>
@@ -149,7 +149,7 @@
       <div class="col-md-6">
         <div class="form-group">
           <%= @form_builder.label :secondary_title, class: "control-label" do %>
-            Secondary title <small class="less-strong">optional</small>
+            Secondary title <small class="twless-strong">optional</small>
           <% end %>
 
           <%= @form_builder.text_field :secondary_title, placeholder: "", class: "form-control" %>
@@ -164,7 +164,7 @@
             placeholder: "Description/subtitle shown on the homepage - will be the text below unless you enter something." %>
 
       <div class="mt-0">
-        Default: <em class="less-strong"><%= @blog.body_abbr %></em>
+        Default: <em class="twless-strong"><%= @blog.body_abbr %></em>
       </div>
     </div>
 

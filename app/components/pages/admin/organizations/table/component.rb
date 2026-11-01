@@ -20,9 +20,10 @@ module Pages
             display = organization.pos_kind.to_s.gsub("pos", "")
 
             # A fixed path rather than the current search params, which the row cache would bake in
-            link_to display.humanize,
-              admin_organizations_path(search_pos: organization.pos_kind),
-              class: display.match?("broken") ? "text-warning" : "gray-link"
+            path = admin_organizations_path(search_pos: organization.pos_kind)
+            return link_to(display.humanize, path, class: "text-warning") if display.match?("broken")
+
+            render(UI::ButtonLink::Component.new(href: path, text: display.humanize, color: :link_gray))
           end
         end
       end

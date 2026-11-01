@@ -1,6 +1,4 @@
-.admin-subnav
-  .col-12
-    %h1 External Registry Bike
+= render(Pages::Admin::Headers::Nav::Component.new(title: "External Registry Bike"))
 
 %h4
   = @bike.title_string
@@ -9,7 +7,7 @@
     - if @bike.thumb_url.present?
       = image_tag @bike.thumb_url, alt: @bike.title_string, style: "display: block; max-width: 100%;"
     - else
-      %h3.less-strong
+      %h3.twless-strong
         No Image
   .col-lg-5.col-9.mb-2
     = render(UI::TableList::Component.new) do |list|

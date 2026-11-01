@@ -28,6 +28,10 @@ module Pages
 
           private
 
+          def view_all_link(text, key)
+            render(UI::ButtonLink::Component.new(href: url_for(@index.sortable_search_params.merge(key => nil)), text:, color: :link_gray, html_class: "tw:text-sm"))
+          end
+
           def show_user?
             @index.user_subject.present? || @index.params[:user_id].present?
           end

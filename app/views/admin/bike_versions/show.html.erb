@@ -1,13 +1,9 @@
-<div class="admin-subnav">
-  <div class="col-md-12">
-    <h1>Bike Version</h1>
-  </div>
-</div>
+<%= render(Pages::Admin::Headers::Nav::Component.new(title: "Bike Version")) %>
 
 <div class="row mt-4">
   <div class="col-md-6">
     <% visibility_class = "text-success" if @bike_version.all_visible? %>
-    <% visibility_class = "less-strong" if @bike_version.user_hidden? %>
+    <% visibility_class = "twless-strong" if @bike_version.user_hidden? %>
 
     <%= render(UI::TableList::Component.new) do |list| %>
       <% list.with_row(label: "ID", dev_only: true, value: tag.code(@bike_version.id), if: display_dev_info?) %>

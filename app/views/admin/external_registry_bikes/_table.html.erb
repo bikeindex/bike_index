@@ -11,7 +11,7 @@
 
   <% table.column(sortable: "mnfg_name", label: "Manufacturer") do |bike| %>
     <% if bike.mnfg_name == "unknown_brand" %>
-      <small class="less-strong">unknown</small>
+      <small class="twless-strong">unknown</small>
     <% else %>
       <%= bike.mnfg_name %>
     <% end %>
@@ -19,7 +19,7 @@
 
   <% table.column(label: "Info", classes: "tw:hidden tw:lg:table-cell") do |bike| %>
     <%= bike.frame_model %>
-    <span class="less-strong"><%= bike.frame_colors.to_sentence %></span>
+    <span class="twless-strong"><%= bike.frame_colors.to_sentence %></span>
   <% end %>
 
   <% table.column(label: "Location", header_classes: "tw:text-xs") do |bike| %>
@@ -28,7 +28,7 @@
 
   <% if show_serial %>
     <% table.column(label: "Serial") do |bike| %>
-      <small class="less-strong"><%= bike.serial_number %></small>
+      <small class="twless-strong"><%= bike.serial_number %></small>
     <% end %>
   <% end %>
 
