@@ -14,7 +14,7 @@ module Admin
     end
 
     def create
-      @external_registry_credential = ExternalRegistryCredential.new(external_registry_credential_params)
+      @external_registry_credential = ExternalRegistryCredential.new(external_registry_credential_params(:type))
 
       if @external_registry_credential.save
         flash[:notice] = "Saved!"
@@ -55,8 +55,8 @@ module Admin
       @external_registry_credential = ExternalRegistryCredential.find(params[:id])
     end
 
-    def external_registry_credential_params
-      params.require(:external_registry_credential).permit(:app_id, :access_token, :refresh_token, :type)
+    def external_registry_credential_params(*extra_attributes)
+      params.require(:external_registry_credential).permit(:app_id, :access_token, :refresh_token, *extra_attributes)
     end
   end
 end

@@ -29,12 +29,15 @@ RSpec.describe Admin::ExternalRegistryCredentialsController, type: :request do
   end
 
   describe "update" do
-    it "updates" do
+    it "updates, without changing the type" do
       credential = FactoryBot.create(:stop_heling_credential)
 
-      patch "#{base_url}/#{credential.id}", params: {external_registry_credential: {app_id: "new app"}}
+      patch "#{base_url}/#{credential.id}", params: {
+        external_registry_credential: {app_id: "new app", type: "ExternalRegistryCredential::Project529Credential"}
+      }
 
       expect(response).to redirect_to(admin_external_registry_credentials_url)
+      expect(ExternalRegistryCredential.find(credential.id)).to be_a(ExternalRegistryCredential::StopHelingCredential)
       expect(credential.reload.app_id).to eq "new app"
     end
   end

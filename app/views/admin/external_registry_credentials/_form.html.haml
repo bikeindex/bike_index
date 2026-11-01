@@ -3,9 +3,13 @@
   url: action,
   method: method,
   html: { class: "form" } do |f|
-  = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :type)) do
-    = render(UI::Forms::Select::Component.new(form_builder: f, attribute: :type,
-      option_tags: ExternalRegistryCredential.types.map { [it.split("::").last, it] }, options: {include_blank: true}))
+  - if external_registry_credential.persisted?
+    = render(UI::DefinitionList::Container::Component.new) do
+      = render(UI::DefinitionList::Row::Component.new(label: "Type", value: external_registry_credential.type.demodulize))
+  - else
+    = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :type, required: true)) do
+      = render(UI::Forms::Select::Component.new(form_builder: f, attribute: :type, required: true,
+        option_tags: ExternalRegistryCredential.types.map { [it.demodulize, it] }, options: {include_blank: true}))
 
   = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :app_id, label_text: "App ID"))
   = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :access_token))
