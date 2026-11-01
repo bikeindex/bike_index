@@ -1,6 +1,6 @@
 <% if @bike.present? %>
   <%= render Pages::Admin::Bikes::Header::Component.new(bike: @bike, active: :listings, user: current_user, display_dev_info: display_dev_info?) %>
-  <h1 class="mt-5 mb-4">Marketplace Listings</h1>
+  <%= render(Pages::Admin::Headers::Section::Component.new(title: "Marketplace listings", count: @pagy.count)) %>
   <%= render(partial: "table", locals: {collection: @collection, render_sortable: false, skip_item: true}) %>
 <% else %>
   <% nav_header_list_items = capture do %>
