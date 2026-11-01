@@ -13,6 +13,14 @@ RSpec.describe Pages::Admin::Users::Edit::Component, type: :component do
     expect(component.css("[data-admin--user-edit-form-target='banned']").count).to eq 1
   end
 
+  context "with dark_mode dark" do
+    let(:user) { FactoryBot.create(:user, dark_mode: :dark) }
+    it "renders a radio per dark mode, with the user's checked" do
+      expect(component.css("[role=radiogroup] input[name='user[dark_mode]']").map { it["value"] }).to eq %w[light dark system]
+      expect(component.css("input[name='user[dark_mode]'][checked]").map { it["value"] }).to eq %w[dark]
+    end
+  end
+
   context "when not banned" do
     it "renders the ban fields collapsed, with the reason not required" do
       expect(ban_fields.first["class"]).to match("tw:hidden!")
