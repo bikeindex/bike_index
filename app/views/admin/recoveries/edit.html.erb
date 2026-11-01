@@ -8,7 +8,7 @@
       <h4>Choose what to do with this recovery:</h4>
     </div>
     <div class="col-6 col-md-4">
-      <%= link_to "Display recovery", new_admin_recovery_display_path(stolen_record_id: @recovery.id), class: "btn btn-lg btn-primary d-block" %>
+      <%= render(UI::ButtonLink::Component.new(text: "Display recovery", href: new_admin_recovery_display_path(stolen_record_id: @recovery.id), color: :primary, size: :lg, html_class: "tw:w-full")) %>
     </div>
     <div class="col-6 col-md-4">
       <%= render(UI::ButtonLink::Component.new(text: "Mark Not Displayable", href: admin_recovery_path(id: @recovery.id, stolen_record: {is_not_displayable: true}),
@@ -19,7 +19,7 @@
       <p>This recovery is displayed.</p>
     </div>
     <div class="col-6">
-      <%= link_to "Edit Recovery Display", edit_admin_recovery_display_url(@recovery.recovery_display), class: "btn btn-lg btn-primary" %>
+      <%= render(UI::ButtonLink::Component.new(text: "Edit Recovery Display", href: edit_admin_recovery_display_url(@recovery.recovery_display), color: :primary, size: :lg)) %>
     </div>
   <% elsif @recovery.not_displayed? %>
     <div class="col-12">

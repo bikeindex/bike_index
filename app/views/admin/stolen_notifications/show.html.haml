@@ -3,7 +3,7 @@
     %h1
       Stolen Notification
   .col-lg-1.col-sm-12
-    = link_to "Resend", resend_admin_stolen_notification_url(@stolen_notification, pretty_please: true), class: 'btn btn-success mt-4 mb-4'
+    = render(UI::ButtonLink::Component.new(text: "Resend", href: resend_admin_stolen_notification_url(@stolen_notification, pretty_please: true), color: :primary, html_class: "tw:my-4"))
 %h4
   Created
   %a.localizeTime.preciseTime{ href: admin_stolen_notification_url(@stolen_notification) }
