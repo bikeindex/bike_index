@@ -59,6 +59,15 @@ RSpec.describe UI::Card::Component, type: :component do
       expect(page).to have_no_css("div[class~='tw:border-gray-200']")
     end
 
+    it "rounds the large and black cards more" do
+      %i[large black].each do |shadow|
+        render_inline(described_class.new(shadow:)) { "in the card" }
+
+        expect(page).to have_css("div[class~='tw:rounded-lg']")
+        expect(page).to have_no_css("div[class~='tw:rounded-sm']")
+      end
+    end
+
     it "has none by default" do
       render_inline(described_class.new) { "in the card" }
 

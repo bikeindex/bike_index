@@ -14,13 +14,15 @@ module UI
       }.freeze
       # A divided card's rows bring their own padding, so it has none of its own
       DIVIDED_CLASSES = "tw:rounded-xl tw:divide-y tw:divide-gray-200 tw:dark:divide-gray-700"
-      UNDIVIDED_CLASSES = "tw:p-4 tw:rounded-sm"
+      UNDIVIDED_CLASSES = "tw:p-4"
+      ROUNDED_LG_SHADOWS = %i[large black].freeze
 
       # divided: separate the direct children with row dividers, for a checklist
       # full_bleed: meet the page's gutter once the .twwiderow holding it is single-column,
       #   and nothing outside such a row
       def initialize(additional_classes: nil, shadow: nil, divided: false, full_bleed: false)
         @shadow_classes = SHADOWS.fetch(shadow) { raise ArgumentError, "unknown shadow #{shadow.inspect}, expected one of: #{SHADOWS.keys.inspect}" }
+        @rounded = ROUNDED_LG_SHADOWS.include?(shadow) ? "tw:rounded-lg" : "tw:rounded-sm"
         @additional_classes = additional_classes
         @divided = divided
         @full_bleed = full_bleed
@@ -33,7 +35,7 @@ module UI
       private
 
       def card_classes
-        [@shadow_classes, @divided ? DIVIDED_CLASSES : UNDIVIDED_CLASSES,
+        [@shadow_classes, @divided ? DIVIDED_CLASSES : "#{UNDIVIDED_CLASSES} #{@rounded}",
           ("tw:twfullbleed" if @full_bleed), @additional_classes].compact.join(" ")
       end
     end

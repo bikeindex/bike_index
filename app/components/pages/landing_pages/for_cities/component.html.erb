@@ -554,7 +554,7 @@
     </div>
 
     <%# The checker's own form for a bike entered by hand, so a check lands on its result %>
-    <%= render(UI::Card::Component.new(shadow: :large, additional_classes: "tw:w-full tw:max-w-[520px] tw:justify-self-center tw:rounded-lg! tw:p-7!")) do %>
+    <%= render(UI::Card::Component.new(shadow: :large, additional_classes: "tw:w-full tw:max-w-[520px] tw:justify-self-center tw:p-7!")) do %>
       <%= form_with url: ebike_rules_path, method: :get, local: true, class: "tw:flex tw:flex-col tw:gap-4.5" do |f| %>
         <%= f.hidden_field :manual, value: 1, id: nil %>
 
@@ -691,7 +691,7 @@
       </ul>
     </div>
 
-    <%= render(UI::Card::Component.new(shadow: :large, additional_classes: "tw:rounded-lg! tw:p-7!")) do %>
+    <%= render(UI::Card::Component.new(shadow: :large, additional_classes: "tw:p-7!")) do %>
       <%# A sent request returns here, which :target turns into a thank you in place of the call to action %>
       <div
         id="lead-sent"

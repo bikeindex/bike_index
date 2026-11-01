@@ -32,7 +32,7 @@
   id="check"
   class="tw:relative tw:-mt-20 tw:scroll-mt-4 <%= SECTION_CLASSES %>"
 >
-  <%= render(UI::Card::Component.new(shadow: :large, additional_classes: "tw:rounded-lg! tw:p-[clamp(18px,4vw,32px)]!")) do %>
+  <%= render(UI::Card::Component.new(shadow: :large, additional_classes: "tw:p-[clamp(18px,4vw,32px)]!")) do %>
     <%= form_with url: form_path, method: :get, html: {aria: {label: translation(".form_label")}},
         class: "tw:group/lookup tw:flex tw:flex-col tw:gap-3.5",
         data: {controller: "ebike-rules--lookup", action: "turbo:frame-load@document->ebike-rules--lookup#checkLoaded click@window->ebike-rules--lookup#checkInState", details: details_mode,
