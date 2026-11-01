@@ -2,7 +2,7 @@ module Admin
   class UsersController < Admin::BaseController
     include Binxtils::SortableTable
 
-    SHOW_TABS = (Pages::Admin::Users::Show::Component::TABS + Pages::Admin::Users::Bikes::Component::TABS).freeze
+    SHOW_TABS = (Pages::Admin::Users::Show::Component::TABS + %i[bikes]).freeze
 
     before_action :find_user, only: %i[show edit update destroy]
     before_action :ensure_can_change_user!, only: %i[update destroy]
@@ -20,9 +20,9 @@ module Admin
       return redirect_to(edit_admin_user_url(params[:id])) unless @active_tab
 
       @page_title = "#{Pages::Admin::Users::Tabs::Component::TABS[@active_tab]}: #{@user.display_name}"
-      return unless Pages::Admin::Users::Bikes::Component::TABS.include?(@active_tab)
+      return unless @active_tab == :bikes
 
-      @pagy, @bikes = pagy(:countish, Pages::Admin::Users::Tabs::Component.records(@user, @active_tab)
+      @pagy, @bikes = pagy(:countish, Pages::Admin::Users::Tabs::Component.records(@user, :bikes)
         .includes(:creation_organization, :current_ownership, :current_impound_record, :paint).reorder(id: :desc),
         limit: permitted_per_page(default: 50), page: permitted_page)
     end

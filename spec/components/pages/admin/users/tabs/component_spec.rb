@@ -22,15 +22,6 @@ RSpec.describe Pages::Admin::Users::Tabs::Component, type: :component do
     expect(component).to_not have_content("deleted")
   end
 
-  context "with deleted bikes" do
-    before { FactoryBot.create_list(:bike, 2, :with_ownership_claimed, user:, deleted_at: Time.current) }
-
-    it "renders their tab" do
-      expect(component).to have_link("Deleted bikes 2",
-        href: "/admin/users/#{user.id}?active_tab=deleted_bikes")
-    end
-  end
-
   context "with caching", :caching do
     include_context :caching_basic
 

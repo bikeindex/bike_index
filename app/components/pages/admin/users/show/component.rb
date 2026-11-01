@@ -6,8 +6,8 @@ module Pages
       module Show
         # The body of each Pages::Admin::Users::Tabs tab that has no index or component of its own
         class Component < ApplicationComponent
-          TABS = (Pages::Admin::Users::Tabs::Component::TABS.keys - Pages::Admin::Users::Tabs::Component::INDEX_PATHS.keys -
-            Pages::Admin::Users::Bikes::Component::TABS - %i[edit]).freeze
+          TABS = (Pages::Admin::Users::Tabs::Component::TABS.keys -
+            Pages::Admin::Users::Tabs::Component::INDEX_PATHS.keys - %i[edit bikes]).freeze
 
           def initialize(user:, active_tab:)
             raise_if_invalid_value!(:active_tab, active_tab, TABS)

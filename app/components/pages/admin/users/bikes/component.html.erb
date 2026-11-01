@@ -1,7 +1,15 @@
 <p class="tw:mb-4 tw:text-sm">
-  <%= link_to "Search them in the bikes index", index_path, class: "twlink" %>
+  <%= link_to "Search them in the bikes index", admin_bikes_path(user_id: @user.id), class: "twlink" %>
+
+  <% if deleted_bikes_count.positive? %>
+    &middot;
+    <%= link_to admin_bikes_path(user_id: @user.id, search_status_deleted_only: true, search_status_example: true), class: "twlink" do %>
+      <%= number_display(deleted_bikes_count) %> deleted
+      <%= "bike".pluralize(deleted_bikes_count) %>
+    <% end %>
+  <% end %>
 </p>
 
 <%= render(Pages::Admin::Bikes::Table::Component.new(bikes: @bikes, skip_user: true)) %>
 
-<%= render(UI::Pagination::Component.new(pagy: @pagy, page_params: {active_tab: @active_tab})) %>
+<%= render(UI::Pagination::Component.new(pagy: @pagy, page_params: {active_tab: :bikes})) %>

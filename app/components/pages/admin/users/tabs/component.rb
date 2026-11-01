@@ -5,8 +5,8 @@ module Pages
     module Users
       module Tabs
         class Component < ApplicationComponent
-          TABS = {edit: "Edit", bikes: "Bikes", deleted_bikes: "Deleted bikes", marketplace_messages: "Messages",
-                  memberships: "Memberships", alerts: "Alerts", payments: "Payments", organization_roles: "Organizations",
+          TABS = {edit: "Edit", bikes: "Bikes", marketplace_messages: "Messages", memberships: "Memberships",
+                  alerts: "Alerts", payments: "Payments", organization_roles: "Organizations",
                   notifications: "Notifications", feedbacks: "Feedbacks", emails: "Emails",
                   ambassador_tasks: "Ambassador tasks"}.freeze
 
@@ -20,7 +20,6 @@ module Pages
           def self.records(user, tab)
             case tab
             when :bikes then Bike.current_with_user_hidden.current_owner(user.id)
-            when :deleted_bikes then Bike.unscoped.current_owner(user.id).only_deleted
             when :marketplace_messages then MarketplaceMessage.for_user(user)
             when :memberships then user.memberships
             when :alerts then user.user_alerts
@@ -64,16 +63,9 @@ module Pages
             public_send(INDEX_PATHS[tab], user_id: @user.id)
           end
 
-          # Hidden with nothing behind them - except on their own page, which keeps its place
-          def render_tab?(tab)
-            return true if @active == tab
-
-            case tab
-            when :ambassador_tasks then @user.ambassador?
-            when :deleted_bikes then tab_counts[:deleted_bikes].positive?
-            else true
-            end
-          end
+          # Only ambassadors have tasks - except on its own page, which still renders (saying
+          # so) and shouldn't lose its place in the row
+          def render_tab?(tab) = tab != :ambassador_tasks || @active == tab || @user.ambassador?
 
           def last_email_errored = @last_email_errored ||= @user.user_emails.last_email_errored.to_a
 
