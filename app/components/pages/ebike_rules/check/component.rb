@@ -13,8 +13,15 @@ module Pages
         end
 
         def call
+          # min-height gives the spinner somewhere to land while the frame is empty
+          tag.div(class: "tw:relative tw:has-[>turbo-frame[busy]]:min-h-36") { safe_join([frame, loading]) }
+        end
+
+        private
+
+        def frame
           # its links (register, the BikeBook entry) leave the page; only the lookup loads a check into it
-          helpers.turbo_frame_tag(FRAME_ID, class: "tw:block", target: "_top") do
+          helpers.turbo_frame_tag(FRAME_ID, class: "tw:peer tw:block tw:transition-opacity tw:[&[busy]]:opacity-30", target: "_top") do
             # A frame response's layout has no title, and the state's is in this one
             # a picked model's details, which the browser copies into the details panel
             safe_join([tag.span(hidden: true, data: {page_title: @page_title, bike_details: @lookup.details.to_json}),
@@ -22,7 +29,10 @@ module Pages
           end
         end
 
-        private
+        def loading
+          tag.div(render(UI::LoadingSpinner::Component.new), class: "tw:pointer-events-none tw:absolute tw:inset-x-0 tw:top-0 " \
+            "tw:hidden tw:justify-center tw:pt-[clamp(28px,5vw,40px)] tw:peer-[[busy]]:flex")
+        end
 
         def outside_checked_countries_note
           place = @lookup.place
