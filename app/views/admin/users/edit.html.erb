@@ -1,55 +1,56 @@
-<%= render(Pages::Admin::Users::Show::Component.new(user: @user, bikes: @bikes, bikes_count: @bikescount, current_country_id:)) %>
-
-<hr class="mt-4">
+<%= render(Pages::Admin::Users::Header::Component.new(user: @user, active: :edit)) %>
 
 <%= render(Pages::Admin::Users::Edit::Component.new(user: @user, display_dev_info: display_dev_info?)) %>
 
-<% if @user.present? %>
-  <hr style="margin-top: 60px;">
-  <div class="mt-4 mb-4 row">
-    <div class="col-sm-6 mb-4">
-      <%= render UI::ButtonLink::Component.new(text: "Delete #{@user.email}!", href: admin_user_path(@user.id), method: :delete, color: :error,
-        confirm: "Are you sure? Generally it's better to ban than delete") %>
+<hr class="mt-4">
+
+<%= render(Pages::Admin::Users::MailchimpData::Component.new(user: @user)) %>
+
+<hr style="margin-top: 60px;">
+
+<div class="mt-4 mb-4 row">
+  <div class="col-sm-6 mb-4">
+    <%= render UI::ButtonLink::Component.new(text: "Delete #{@user.email}!", href: admin_user_path(@user.id), method: :delete, color: :error,
+      confirm: "Are you sure? Generally it's better to ban than delete") %>
+  </div>
+
+  <div class="col-sm-6 mb-4" data-controller="ui--collapse">
+    <div class="text-right">
+      <%= render(UI::Collapse::Component.new(text: "Force merge with another email", color: :link_gray)) %>
     </div>
 
-    <div class="col-sm-6 mb-4" data-controller="ui--collapse">
-      <div class="text-right">
-        <%= render(UI::Collapse::Component.new(text: "Force merge with another email", color: :link_gray)) %>
-      </div>
+    <div class="mt-2 tw:hidden" data-ui--collapse-target="content">
+      <div class="card">
+        <div class="card-body">
+          <p>
+            Add another email to this user.
+          </p>
 
-      <div class="mt-2 tw:hidden" data-ui--collapse-target="content">
-        <div class="card">
-          <div class="card-body">
-            <p>
-              Add another email to this user.
-            </p>
+          <p>
+            <span class="text-danger">WARNING</span> this does not send a
+            confirmation email or check that they have access to the email you
+            merge with.
+          </p>
 
-            <p>
-              <span class="text-danger">WARNING</span> this does not send a
-              confirmation email or check that they have access to the email you
-              merge with.
-            </p>
+          <p>
+            <span class="text-warning">
+              We can <strong>not</strong> undo this.
+            </span>
+          </p>
 
-            <p>
-              <span class="text-warning">
-                We can <strong>not</strong> undo this.
-              </span>
-            </p>
+          <%= form_with(url: admin_user_path(@user), method: :patch) do |form| %>
+            <%= render(UI::Forms::Group::Component.new(form_builder: form, attribute: :force_merge_email,
+              label_text: "Email to merge", required: true)) do |group| %>
+              <% group.with_helper_text { "Email must be another user account on Bike Index" } %>
 
-            <%= form_with(url: admin_user_path(@user), method: :patch) do |form| %>
-              <%= render(UI::Forms::Group::Component.new(form_builder: form, attribute: :force_merge_email,
-                label_text: "Email to merge", required: true)) do |group| %>
-                <% group.with_helper_text { "Email must be another user account on Bike Index" } %>
-
-                <%= render(UI::Forms::Email::Component.new(form_builder: form, attribute: :force_merge_email, required: true,
-                  html_options: {placeholder: "Email to merge", "aria-describedby" => group.helper_text_id})) %>
-              <% end %>
-
-              <%= render(UI::Button::Component.new(text: "Merge", color: :error, type: "submit")) %>
+              <%= render(UI::Forms::Email::Component.new(form_builder: form, attribute: :force_merge_email, required: true,
+                html_options: {placeholder: "Email to merge", "aria-describedby" => group.helper_text_id})) %>
             <% end %>
-          </div>
+
+            <%= render(UI::Button::Component.new(text: "Merge", color: :error, type: "submit")) %>
+          <% end %>
         </div>
       </div>
     </div>
   </div>
-<% end %>
+</div>
