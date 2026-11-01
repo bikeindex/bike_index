@@ -5,6 +5,7 @@ module UI
     class Component < ApplicationComponent
       BACKGROUND_CLASSES = "tw:bg-white tw:dark:bg-gray-800"
       BASE_CLASSES = "#{BACKGROUND_CLASSES} tw:border tw:border-gray-200 tw:dark:border-gray-700"
+      # In general don't use small, it looks like a hover state.
       # black is the sticker, which replaces the gray border
       SHADOWS = {
         nil => BASE_CLASSES,
