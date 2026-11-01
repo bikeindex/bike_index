@@ -59,9 +59,10 @@
             .form-group.row
               .form-well-input
                 .checkbox
-                  = f.label :allow_duplicate do
+                  = f.label :allow_duplicate, style: "line-height: 1.5;" do
                     = f.check_box :allow_duplicate
-                    = t(".allow_duplicate")
+                    = t(".create_duplicates")
+                    %span.twless-strong= t(".off_by_default")
 
             .form-group.row
               .form-well-input

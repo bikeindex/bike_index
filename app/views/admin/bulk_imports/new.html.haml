@@ -16,9 +16,10 @@
           = f.check_box :no_notify
           Don't send emails to registrations
       .form-group
-        = f.label :allow_duplicate do
+        = f.label :allow_duplicate, style: "line-height: 1.5;" do
           = f.check_box :allow_duplicate
-          Register duplicates - rows matching an existing registration's serial and owner email
+          Create duplicates - add registrations when a row matches an existing registration's serial and owner email
+          %span.twless-strong (off by default)
 
 
       = f.submit 'Create', class: "btn btn-success float-right"
