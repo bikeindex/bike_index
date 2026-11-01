@@ -39,8 +39,9 @@ module Pages
             return {} if @no_show_header
 
             columns = @skip_user ? COLUMNS.except(:user_cell) : COLUMNS
-            defaults = columns.keys - [:updated_cell, (:serial_cell unless @show_serial)]
-            column_settings = {storage_key: "adminBikesColumns", columns:, defaults:, narrow_hidden: %i[updated_cell user_cell info_cell cred_cell]}
+            defaults = columns.keys - [:updated_cell, :cred_cell, (:serial_cell unless @show_serial)]
+            column_settings = {storage_key: "adminBikesColumns", columns:, defaults:, hints: {cred_cell: "(credibility score)"},
+                               narrow_hidden: %i[updated_cell user_cell info_cell cred_cell]}
             form = {url: get_destroy_admin_bike_path(id: "multi_delete"), method: :get} if @render_multi_check
             {column_settings:, form:}
           end
