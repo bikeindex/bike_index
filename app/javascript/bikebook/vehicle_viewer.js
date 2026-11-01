@@ -130,18 +130,14 @@ export class VehicleViewer {
         above ? parts : parts.toReversed()}</div>`
     }
     const views = {
-      // comparing, the overlay, each column's bottom in its frame's color
+      // comparing, the overlay, each column topped and footed in its frame's color
       basics: () => {
         const overview = { presenter, vehicles, market: this.card.market, outOfClassId, removePath, colorways, groupPath: (value) => pathWith(url, { group: value }), shownGroup: group && url.searchParams.get('group') }
         const groupModels = group ? modelGroup({ group, card: (model) => this.#toggleCard(url, model, 'group', photos) }) : nothing
         if (!comparing) return html`${basics(overview)}${groupModels}`
-        const bottoms = vehicles.map((_, index) => {
-          const { variable } = seriesBorders(compared.frames, index)
-          return variable && `${variable} tw:border-b-4 tw:border-b-(--series)!`
-        })
         return html`${withOverlay((corner) => basics({
           ...overview,
-          bottoms,
+          borders: vehicles.map((_, index) => seriesBorders(compared.frames, index)),
           corner,
           sectionClasses: 'tw:min-[1500px]:mx-0 tw:min-[1500px]:w-auto tw:min-[1500px]:min-w-0 tw:min-[1500px]:flex-1 tw:min-[1500px]:px-0'
         }))}${groupModels}`

@@ -113,9 +113,9 @@ const viewGroup = (groupPath, value, shownGroup) => html`<a href=${groupPath(val
   class=${buttonClasses({ size: 'sm', htmlClass: 'tw:ml-2' })} aria-current=${value === shownGroup ? 'true' : nothing} data-in-place="#model-group">View group</a>`
 
 // The models' names, photos and headline fields side by side in a table, one model's as two's, each photo with an ×
-// to the page without it at `removePath`, each column's last cell with its `bottoms` classes, the table's section with
-// its `sectionClasses` and its corner with `corner`
-export const basics = ({ presenter, vehicles, market, outOfClassId, removePath, colorways: pickedColorways = {}, groupPath, shownGroup, bottoms = [], sectionClasses = '', corner = nothing }) => {
+// to the page without it at `removePath`, each column's header and last cell with its `borders`' top and bottom, the
+// table's section with its `sectionClasses` and its corner with `corner`
+export const basics = ({ presenter, vehicles, market, outOfClassId, removePath, colorways: pickedColorways = {}, groupPath, shownGroup, borders = [], sectionClasses = '', corner = nothing }) => {
   const shown = vehicles.map(({ data, value, key, outsideMarket }, index) => {
     const price = priced(data)
     const fields = basicsOf({ presenter, data, outOfClassId })
@@ -135,10 +135,10 @@ export const basics = ({ presenter, vehicles, market, outOfClassId, removePath, 
   })
   const fields = FIELDS.filter((field) => (field.only ? shown.some((each) => each[field.only]) : shown.some((each) => present(each[field.key]))) &&
     (!field.differing || new Set(shown.map((each) => each[field.differing])).size > 1))
-  return compared(shown, fields, bottoms, sectionClasses, corner)
+  return compared(shown, fields, borders, sectionClasses, corner)
 }
 
-const compared = (vehicles, fields, bottoms, sectionClasses, corner) => html`<section aria-label=${vehicles.length > 1 ? 'Overview comparison' : 'Overview'} class="tw:mt-6 ${vehicles.length > 3
+const compared = (vehicles, fields, borders, sectionClasses, corner) => html`<section aria-label=${vehicles.length > 1 ? 'Overview comparison' : 'Overview'} class="tw:mt-6 ${vehicles.length > 3
   ? 'tw:twpagebleed tw:px-4'
   : ''} ${sectionClasses}" style=${`--models: ${vehicles.length}`}>${table({
   classes: `${vehicles.length === 1 ? 'tw:w-full tw:md:w-[calc(50%+6.25rem)] tw:md:min-w-0!' : `tw:w-full ${MIN_WIDTH}`} tw:table-fixed ${vehicles.length > 3 ? `tw:mx-auto ${MAX_WIDTH}` : ''}`,
@@ -152,8 +152,8 @@ const compared = (vehicles, fields, bottoms, sectionClasses, corner) => html`<se
         corner: true
       })}${vehicle.title}`,
       classes: 'tw:px-2.5! tw:py-2! tw:align-top',
-      headerClasses: 'tw:relative',
-      cellClass: ({ key }) => [key === 'description' && 'tw:text-sm', key === fields.at(-1).key && bottoms[index]].filter(Boolean).join(' '),
+      headerClasses: `tw:relative ${borders[index]?.top ?? ''}`,
+      cellClass: ({ key }) => [key === 'description' && 'tw:text-sm', key === fields.at(-1).key && borders[index]?.bottom].filter(Boolean).join(' '),
       cell: ({ key, only }) => {
         if (present(vehicle[key])) return vehicle[key]
         if (only !== 'electric' || vehicle.electric) return missing

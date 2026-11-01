@@ -142,7 +142,7 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], marke
           classes: 'tw:min-w-48 tw:align-top',
           headerClasses: border.top,
           // a model's name can wrap in its header, but not a value
-          cellClass: (record) => `tw:whitespace-nowrap ${record.className ?? ''}`,
+          cellClass: (record) => `tw:whitespace-nowrap ${record.className ?? ''} ${record === rows.at(-1) ? border.bottom : ''}`,
           cell: (record) => record.cell(index)
         }
       })
