@@ -111,6 +111,13 @@
 
             .form-group.row
               .form-well-input
+                .checkbox
+                  = f.label :allow_duplicate, class: "less-line-height", for: "bulk_import_allow_duplicate_impounded" do
+                    = f.check_box :allow_duplicate, checked: true, id: "bulk_import_allow_duplicate_impounded"
+                    = t(".create_duplicates_enabled_html")
+
+            .form-group.row
+              .form-well-input
                 = f.submit t(".upload_and_begin_import"), class: "btn btn-secondary btn-lg"
   - if @permitted_kinds.include?("stolen")
     - tab_classes = "tab-pane fade"
@@ -155,6 +162,13 @@
                     = f.file_field :file, required: true, class: "avatar-upload-field"
                     %span.file-custom
                       %span.file-upload-text= t(".choose_file")
+
+              .form-group.row
+                .form-well-input
+                  .checkbox
+                    = f.label :allow_duplicate, class: "less-line-height", for: "bulk_import_allow_duplicate_stolen" do
+                      = f.check_box :allow_duplicate, checked: true, id: "bulk_import_allow_duplicate_stolen"
+                      = t(".create_duplicates_enabled_html")
 
               .form-group.row
                 .form-well-input

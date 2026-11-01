@@ -217,6 +217,10 @@ class BulkImport < ApplicationRecord
     }
   end
 
+  def stolen_record=(val)
+    self.data = (data || {}).merge("stolen_record" => val)
+  end
+
   def stolen_record_attrs
     return {} unless stolen? && data&.dig("stolen_record").present?
 
@@ -227,8 +231,6 @@ class BulkImport < ApplicationRecord
   def set_calculated_attributes
     self.kind ||= calculated_kind
     self.no_notify = true if kind == "stolen"
-    # Deduping would drop the row's stolen or impound record
-    self.allow_duplicate = true if data&.dig("allow_duplicate").nil? && (stolen? || impounded?)
     # we're managing ascend errors separately because we need to lookup organization
     return true if ascend_unprocessable?
 
