@@ -96,7 +96,7 @@
       <p>
         <%= number_display(week_searches.values_at("web_bikebook", "web_bikebook_comparison", "web_ebike_rules").sum) %>
         past week
-        <em>(<%= link_to safe_join([number_display(week_searches["web_bikebook_comparison"]), " comparisons"]), admin_logged_searches_path(search_endpoint: "web_bikebook_comparisons", period: "week") %>, <%= number_display(week_searches["web_ebike_rules"]) %> from e-bike rules)</em>
+        <em>(<%= link_to safe_join([number_display(week_searches["web_bikebook_comparison"]), " comparisons"]), admin_logged_searches_path(search_endpoint: "web_bikebook_comparison", period: "week") %>, <%= number_display(week_searches["web_ebike_rules"]) %> from e-bike rules)</em>
       </p>
 
       <%= render(UI::Chart::Component.new(series: logged_searches_admin_graphs_path(search_endpoint: "web_bikebook", period: "week"), stacked: true)) %>
