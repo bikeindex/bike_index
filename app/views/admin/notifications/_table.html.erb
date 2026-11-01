@@ -36,7 +36,7 @@
           <%= render Atoms::Admin::TableCells::User::Component.new(sort_state:, user: notification.user, email: notification.message_channel_target || notification.user&.email, render_search: render_sortable) %>
         <% else %>
           <%= notification.message_channel_target %>
-          <small class="less-strong">no user</small>
+          <small class="twless-strong">no user</small>
         <% end %>
       <% end %>
     <% end %>
@@ -54,7 +54,7 @@
     <% end %>
 
     <% table.column(label: "Method", classes: "tw:text-xs") do |notification| %>
-      <span class="less-strong"><%= notification.message_channel %></span>
+      <span class="twless-strong"><%= notification.message_channel %></span>
     <% end %>
 
     <% table.column(label: "Delivered?", classes: "tw:text-center") do |notification| %>
@@ -68,7 +68,7 @@
         <% if notification.sender.is_a?(User) %>
           <%= link_to sender_display_name, admin_user_path(notification.sender&.id), class: "twlink" %>
         <% else %>
-          <span class="<%= "less-strong" if sender_display_name == "auto" %>"><%= sender_display_name %></span>
+          <span class="<%= "twless-strong" if sender_display_name == "auto" %>"><%= sender_display_name %></span>
         <% end %>
       <% end %>
     <% end %>

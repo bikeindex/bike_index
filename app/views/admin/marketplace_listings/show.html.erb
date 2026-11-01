@@ -1,146 +1,56 @@
-<div class="admin-subnav">
-  <div class="col-md-12">
-    <h1>Marketplace Listing</h1>
-  </div>
-</div>
+<%= render(Pages::Admin::Headers::Nav::Component.new(title: "Marketplace Listing")) %>
 
 <div class="row mt-4">
   <div class="col-md-6">
-    <table class="table-list">
-      <tbody>
-        <% if display_dev_info? %>
-          <tr>
-            <td class="only-dev-visible">ID</td>
-            <td><code><%= @marketplace_listing.id %></code></td>
-          </tr>
+    <%= render(UI::TableList::Component.new) do |list| %>
+      <% list.with_row(label: "ID", dev_only: true, value: tag.code(@marketplace_listing.id), if: display_dev_info?) %>
+
+      <% list.with_row(label: "Status", value: render(Atoms::Admin::Badges::MarketplaceListing::Component.new(status: @marketplace_listing.status, status_humanized: @marketplace_listing.status_humanized, kind: :marketplace_listing))) %>
+
+      <% list.with_row(label: "Seller", value: render(Atoms::Admin::TableCells::User::Component.new(user: @marketplace_listing.seller, user_id: @marketplace_listing.seller_id))) %>
+
+      <% list.with_row(label: "Buyer", value: render(Atoms::Admin::TableCells::User::Component.new(user: @marketplace_listing.buyer, user_id: @marketplace_listing.buyer_id)), if: @marketplace_listing.buyer.present?) %>
+
+      <% list.with_row(label: "Price") do %>
+        <%= amount_display(@marketplace_listing, currency_name_suffix: true) %>
+
+        <% if @marketplace_listing.price_negotiable? %>
+          <small class="twless-strong">(negotiable)</small>
         <% end %>
+      <% end %>
 
-        <tr>
-          <td>Status</td>
+      <% list.with_row(label: "Condition", value: @marketplace_listing.condition_humanized) %>
 
-          <td>
-            <%= render Atoms::Admin::Badges::MarketplaceListing::Component.new(status: @marketplace_listing.status, status_humanized: @marketplace_listing.status_humanized, kind: :marketplace_listing) %>
-          </td>
-        </tr>
+      <% list.with_row(label: "Created", class: "small", value: render(UI::Time::Component.new(time: @marketplace_listing.created_at, format: :localize_time_precise))) %>
 
-        <tr>
-          <td>Seller</td>
+      <% list.with_row(label: "Published", class: "small", value: render(UI::Time::Component.new(time: @marketplace_listing.published_at, format: :localize_time_precise)), if: @marketplace_listing.published_at.present?) %>
 
-          <td>
-            <%= render Atoms::Admin::TableCells::User::Component.new(user: @marketplace_listing.seller, user_id: @marketplace_listing.seller_id) %>
-          </td>
-        </tr>
-
-        <% if @marketplace_listing.buyer.present? %>
-          <tr>
-            <td>Buyer</td>
-
-            <td>
-              <%= render Atoms::Admin::TableCells::User::Component.new(user: @marketplace_listing.buyer, user_id: @marketplace_listing.buyer_id) %>
-            </td>
-          </tr>
-        <% end %>
-
-        <tr>
-          <td>Price</td>
-
-          <td>
-            <%= amount_display(@marketplace_listing, currency_name_suffix: true) %>
-
-            <% if @marketplace_listing.price_negotiable? %>
-              <small class="less-strong">(negotiable)</small>
-            <% end %>
-          </td>
-        </tr>
-
-        <tr>
-          <td>Condition</td>
-          <td><%= @marketplace_listing.condition_humanized %></td>
-        </tr>
-
-        <tr class="small">
-          <td>Created</td>
-
-          <td>
-            <span class="localizeTime preciseTime">
-              <%= l @marketplace_listing.created_at, format: :convert_time %>
-            </span>
-          </td>
-        </tr>
-
-        <% if @marketplace_listing.published_at.present? %>
-          <tr class="small">
-            <td>Published</td>
-
-            <td>
-              <span class="localizeTime preciseTime">
-                <%= l @marketplace_listing.published_at, format: :convert_time %>
-              </span>
-            </td>
-          </tr>
-        <% end %>
-
-        <% if @marketplace_listing.end_at.present? %>
-          <tr class="small">
-            <td>Ended</td>
-
-            <td>
-              <span class="localizeTime preciseTime">
-                <%= l @marketplace_listing.end_at, format: :convert_time %>
-              </span>
-            </td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
+      <% list.with_row(label: "Ended", class: "small", value: render(UI::Time::Component.new(time: @marketplace_listing.end_at, format: :localize_time_precise)), if: @marketplace_listing.end_at.present?) %>
+    <% end %>
   </div>
 
   <div class="col-md-6">
-    <table class="table-list">
-      <tbody>
-        <tr>
-          <td>Item</td>
-
-          <td>
-            <% if @marketplace_listing.item.is_a?(Bike) %>
-              <%= render Atoms::Admin::TableCells::Bike::Component.new(bike: @marketplace_listing.item, bike_id: @marketplace_listing.item_id, bike_link_path: bike_path(@marketplace_listing.item_id, view_as: "marketplace_preview")) %>
-            <% elsif @marketplace_listing.item.is_a?(BikeVersion) %>
-              BikeVersion
-              <%= link_to @marketplace_listing.item_id, bike_version_path(@marketplace_listing.item_id) %>
+    <%= render(UI::TableList::Component.new) do |list| %>
+      <% list.with_row(label: "Item") do %>
+        <% if @marketplace_listing.item.is_a?(Bike) %>
+          <%= render Atoms::Admin::TableCells::Bike::Component.new(bike: @marketplace_listing.item, bike_id: @marketplace_listing.item_id, bike_link_path: bike_path(@marketplace_listing.item_id, view_as: "marketplace_preview")) %>
+        <% elsif @marketplace_listing.item.is_a?(BikeVersion) %>
+          BikeVersion
+          <%= link_to @marketplace_listing.item_id, bike_version_path(@marketplace_listing.item_id) %>
 
 
-              <small>(bike: <%= link_to @marketplace_listing.item.bike_id, admin_bike_path(@marketplace_listing.item.bike_id) %>)</small>
-            <% end %>
-          </td>
-        </tr>
-
-        <% if @marketplace_listing.sale.present? %>
-          <tr>
-            <td>Sale</td>
-
-            <td>
-              <%= link_to @marketplace_listing.sale_id, admin_sale_path(@marketplace_listing.sale_id) %>
-            </td>
-          </tr>
+          <small>(bike: <%= link_to @marketplace_listing.item.bike_id, admin_bike_path(@marketplace_listing.item.bike_id) %>)</small>
         <% end %>
+      <% end %>
 
-        <tr>
-          <td>Location</td>
+      <% list.with_row(label: "Sale", if: @marketplace_listing.sale.present?) do %>
+        <%= link_to(@marketplace_listing.sale_id, admin_sale_path(@marketplace_listing.sale_id)) %>
+      <% end %>
 
-          <td>
-            <%= render Atoms::Admin::TableCells::AddressRecord::Component.new(address_record: @marketplace_listing.address_record) %>
-          </td>
-        </tr>
+      <% list.with_row(label: "Location", value: render(Atoms::Admin::TableCells::AddressRecord::Component.new(address_record: @marketplace_listing.address_record))) %>
 
-        <tr>
-          <td>Description</td>
-
-          <td>
-            <%= render(UI::UserTextBlockDisplay::Component.new(text: @marketplace_listing.description, max_height_class: "")) %>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+      <% list.with_row(label: "Description", value: render(UI::UserTextBlockDisplay::Component.new(text: @marketplace_listing.description, max_height_class: ""))) %>
+    <% end %>
   </div>
 </div>
 

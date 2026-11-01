@@ -1,7 +1,4 @@
-.admin-subnav
-  .col-12
-    %h1
-      Credibility Badges
+= render(Pages::Admin::Headers::Nav::Component.new(title: "Credibility Badges"))
 
 %p
   Bikes start out with a score of
@@ -25,7 +22,7 @@
           - CredibilityScorer::BADGES[category].each do |key, value|
             %tr
               %td
-                %small.less-strong
+                %small.twless-strong
                   = category.to_s.humanize
               %td
                 = key.to_s.humanize

@@ -5,48 +5,20 @@
 
 <div class="tw:flex tw:flex-wrap">
   <div class="tw:w-full tw:lg:w-1/2 tw:lg:pr-4">
-    <table class="table-list">
-      <tbody>
-        <tr>
-          <td>Recovered at</td>
+    <%= render(UI::TableList::Component.new) do |list| %>
+      <% list.with_row(label: "Recovered at", value: render(UI::Time::Component.new(time: @stolen_record.recovered_at))) %>
 
-          <td>
-            <%= render(UI::Time::Component.new(time: @stolen_record.recovered_at)) %>
-          </td>
-        </tr>
+      <% list.with_row(label: "Recovered by", value: recovering_user_cell) %>
 
-        <tr>
-          <td>Recovered by</td>
+      <% list.with_row(label: "We Helped", value: (check_mark if @stolen_record.index_helped_recovery)) %>
 
-          <td><%= recovering_user_cell %></td>
-        </tr>
-
-        <tr>
-          <td>We Helped</td>
-
-          <td><%= check_mark if @stolen_record.index_helped_recovery %></td>
-        </tr>
-
-        <tr>
-          <td>Can Share</td>
-
-          <td><%= check_mark if @stolen_record.can_share_recovery %></td>
-        </tr>
-      </tbody>
-    </table>
+      <% list.with_row(label: "Can Share", value: (check_mark if @stolen_record.can_share_recovery)) %>
+    <% end %>
   </div>
 
   <div class="tw:w-full tw:lg:w-1/2">
-    <table class="table-list">
-      <tbody>
-        <tr>
-          <td class="tw:text-left" colspan="2">Description</td>
-        </tr>
-
-        <tr>
-          <td colspan="2"><%= @stolen_record.recovered_description %></td>
-        </tr>
-      </tbody>
-    </table>
+    <%= render(UI::TableList::Component.new) do |list| %>
+      <% list.with_row(label: "Description", value: @stolen_record.recovered_description) %>
+    <% end %>
   </div>
 </div>

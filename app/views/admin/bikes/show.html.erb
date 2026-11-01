@@ -3,9 +3,13 @@
 
 <% case @active_tab %>
 <% when "ownerships" %>
+  <%= render(Pages::Admin::Headers::Section::Component.new(title: "Ownerships", count: @bike.ownerships.count)) %>
+
   <%= render partial: "/admin/ownerships/table",
         locals: {ownerships: @bike.ownerships.reorder(created_at: :desc), skip_bike: true} %>
 <% when "stickers" %>
+  <%= render(Pages::Admin::Headers::Section::Component.new(title: "Stickers", count: @bike.bike_stickers.count)) %>
+
   <%= render partial: "/admin/bike_stickers/table", locals: {bike_stickers: @bike.bike_stickers} %>
 <% when "duplicates" %>
   <% duplicate_groups = @bike.duplicate_bike_groups %>
@@ -33,11 +37,11 @@
 <% when "messages" %>
   <%= render(Pages::Admin::Bikes::Show::Messages::Component.new(bike: @bike)) %>
 <% when "recoveries" %>
-  <div class="tw:mt-8">
-    <%= render(Pages::Admin::Recoveries::Table::Component.new(recoveries: @bike.recovered_records, sort_state:, editable: false)) %>
-  </div>
+  <%= render(Pages::Admin::Headers::Section::Component.new(title: "Recoveries", count: @bike.recovered_records.count)) %>
 
-  <h3 class="tw:mt-6">Other stolen records</h3>
+  <%= render(Pages::Admin::Recoveries::Table::Component.new(recoveries: @bike.recovered_records, sort_state:, editable: false)) %>
+
+  <%= render(Pages::Admin::Headers::Section::Component.new(title: "Other stolen records", count: @bike.stolen_records.count)) %>
 
   <% if @bike.stolen_records.none? %>
     No other stolen records
@@ -54,20 +58,16 @@
     </ul>
   <% end %>
 <% when "impound" %>
-  <h3 class="tw:mt-6">
-    Impound records for this <%= @bike.type %>
-    <small class="twless-strong tw:ml-2"><%= link_to number_display(@bike.impound_records.count), admin_impound_records_path(search_bike_id: @bike.id), class: "twlink" %></small>
-  </h3>
+  <%= render(Pages::Admin::Headers::Section::Component.new(title: "Impound records for this #{@bike.type}",
+        count: @bike.impound_records.count, href: admin_impound_records_path(search_bike_id: @bike.id))) %>
 
   <%= render partial: "/admin/impound_records/table",
         locals: {impound_records: @bike.impound_records.reorder(created_at: :desc), skip_claims: true} %>
 
   <% impound_claims = ImpoundClaim.involving_bike_id(@bike.id).reorder(created_at: :desc) %>
 
-  <h3 class="tw:mt-6">
-    Impound claims involving this <%= @bike.type %>
-    <small class="twless-strong tw:ml-2"><%= link_to number_display(impound_claims.count), admin_impound_claims_path(search_bike_id: @bike.id), class: "twlink" %></small>
-  </h3>
+  <%= render(Pages::Admin::Headers::Section::Component.new(title: "Impound claims involving this #{@bike.type}",
+        count: impound_claims.count, href: admin_impound_claims_path(search_bike_id: @bike.id))) %>
 
   <%= render partial: "/admin/impound_claims/table", locals: {impound_claims:} %>
 <% end %>

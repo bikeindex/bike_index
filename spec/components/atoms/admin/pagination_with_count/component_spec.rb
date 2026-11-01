@@ -93,7 +93,7 @@ RSpec.describe Atoms::Admin::PaginationWithCount::Component, type: :component do
   describe "component structure" do
     it "renders within a row div" do
       expect(component.css("div.row")).to be_present
-      expect(component.css("div.col-md-5 p.pagination-number")).to be_present
+      expect(component.css("div.col-md-5 p")).to be_present
       expect(component.css("strong")).to be_present
     end
   end

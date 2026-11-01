@@ -342,11 +342,6 @@ body {
   }
 }
 
-.less-less-strong {
-  @extend .less-strong;
-  opacity: 0.4;
-}
-
 .gray-link {
   a,
   & {

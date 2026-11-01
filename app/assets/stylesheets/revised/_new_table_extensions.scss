@@ -71,11 +71,6 @@
       width: 70%;
     }
   }
-  &.no-italic-definition tr td {
-    &:first-child {
-      font-style: normal;
-    }
-  }
   .inline-images img {
     display: inline-block;
     width: 31%;
@@ -110,12 +105,6 @@ table thead.sortable {
 
 // Random special formatting bits
 table {
-  .table-cell-check {
-    font-family: Courier;
-    text-align: center;
-    font-weight: bold;
-  }
-
   code {
     word-break: break-all;
   }

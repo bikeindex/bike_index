@@ -72,11 +72,11 @@ export class VehicleViewer {
     const figurePath = (key) => pathWith(url, { figure: key === highlight ? '' : key })
     const compared = { presenter, vehicles, sizes, frames: overlayFrames(vehicles, sizes), market: this.card.market }
     const rowClasses = comparing
-      ? 'tw:justify-center-safe tw:overflow-x-auto tw:max-md:snap-x tw:max-md:snap-mandatory tw:max-md:px-4 tw:max-md:*:w-[85vw] tw:max-md:*:shrink-0 tw:max-md:*:snap-center'
+      ? 'tw:justify-center-safe tw:overflow-x-auto tw:px-(--gutter) tw:max-md:snap-x tw:max-md:snap-mandatory tw:max-md:*:w-[85vw] tw:max-md:*:shrink-0 tw:max-md:*:snap-center'
       : 'tw:flex-col tw:lg:flex-row tw:lg:justify-center'
-    const cardRow = (margin, cards, aligned = false) => html`<div ?data-comparison=${comparing} data-controller=${comparing && aligned ? 'bikebook--align-rows' : nothing} class="${margin} tw:max-[500px]:twpagebleed ${comparing
-      ? 'tw:md:twpagebleed tw:md:px-4'
-      : 'tw:lg:twpagebleed tw:lg:px-4'}"><div class="tw:flex tw:gap-8 ${rowClasses}">${cards}</div></div>`
+    const cardRow = (margin, cards, aligned = false) => html`<div ?data-comparison=${comparing} data-controller=${comparing && aligned ? 'bikebook--align-rows' : nothing} class="${margin} ${comparing
+      ? 'tw:twpagebleed'
+      : 'tw:max-[500px]:twpagebleed tw:lg:twpagebleed tw:lg:px-4'}"><div class="tw:flex tw:gap-8 ${rowClasses}">${cards}</div></div>`
     // each vehicle's `field` on a card of its own, named as its full card is, after whatever `lead` shows, with the overview's ×
     // `keyed`, each topped in its frame's color in the overlay
     const cards = (field, none, content, { lead, keyed = false } = {}) => vehicles.map(({ data, value, key }, index) => {
@@ -130,18 +130,14 @@ export class VehicleViewer {
         above ? parts : parts.toReversed()}</div>`
     }
     const views = {
-      // comparing, the overlay, each column's bottom in its frame's color
+      // comparing, the overlay, each column topped and footed in its frame's color
       basics: () => {
         const overview = { presenter, vehicles, market: this.card.market, outOfClassId, removePath, colorways, groupPath: (value) => pathWith(url, { group: value }), shownGroup: group && url.searchParams.get('group') }
         const groupModels = group ? modelGroup({ group, card: (model) => this.#toggleCard(url, model, 'group', photos) }) : nothing
         if (!comparing) return html`${basics(overview)}${groupModels}`
-        const bottoms = vehicles.map((_, index) => {
-          const { variable } = seriesBorders(compared.frames, index)
-          return variable && `${variable} tw:border-b-4 tw:border-b-(--series)!`
-        })
         return html`${withOverlay((corner) => basics({
           ...overview,
-          bottoms,
+          frames: compared.frames,
           corner,
           sectionClasses: 'tw:min-[1500px]:mx-0 tw:min-[1500px]:w-auto tw:min-[1500px]:min-w-0 tw:min-[1500px]:flex-1 tw:min-[1500px]:px-0'
         }))}${groupModels}`
@@ -152,7 +148,7 @@ export class VehicleViewer {
         const size = sizes[index]
         const drawn = drawings[index]
         const { legend } = drawn
-        return html`${framed(legend) ? drawing(data, size, drawn) : nothing}<div class="tw:-mx-(--gutter)">${sizesOf({
+        return html`${framed(legend) ? drawing(data, size, drawn) : nothing}${sizesOf({
           presenter,
           data,
           others: others(key),
@@ -164,7 +160,7 @@ export class VehicleViewer {
             figurePath,
             drawn: { id: key, name: size?.name, figures: legend.filter(({ letter, listed }) => letter && !listed) }
           }
-        })}</div>`
+        })}`
       }, { keyed: true }))}`
       },
       components: () => {

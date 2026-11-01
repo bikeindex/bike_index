@@ -6,8 +6,7 @@
     = form_for [:admin, @mail_snippet] do |f|
       = render partial: 'form', locals: { f: f }
 
-      .form-group
-        = f.label :is_enabled, "Enabled?"
-        = f.check_box :is_enabled
+      = render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :is_enabled, label: "Enabled?", class_name: "tw:mb-4"))
 
-      = f.submit "Update", class: 'btn btn-success float-right'
+      %div{class: "tw:flex tw:justify-end"}
+        = render(UI::Button::Component.new(text: "Update", color: :primary, type: "submit"))

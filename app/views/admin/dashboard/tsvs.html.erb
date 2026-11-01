@@ -1,9 +1,4 @@
-<div class="admin-subnav">
-  <div class="col">
-    <h1>TSV Exports!</h1>
-    <p>TSVs are generated every night.</p>
-  </div>
-</div>
+<%= render(Pages::Admin::Headers::Nav::Component.new(title: "TSV Exports!", subtitle: "TSVs are generated every night.")) %>
 
 <h4>Tsv reports:</h4>
 
@@ -31,16 +26,17 @@
 
 <div class="row mt-4">
   <div class="col-md-6">
-    <%= form_tag admin_update_tsv_blocklist_path, method: :put, multipart: true do %>
-      <%= label_tag :tsv_blocklist do %>
-        Blocklist Bike Urls, <strong>1 per line</strong>. These can be the id
-        (the number in the url), the bike url, admin url or edit url
-        <div class="form-group">
-          <%= text_area_tag :blocklist, @blocklist.map { |i| "#{ENV["BASE_URL"]}/bikes/#{i}" }.join("\n"), rows: 10, class: "form-control" %>
-        </div>
+    <%= form_with(url: admin_update_tsv_blocklist_path, method: :put, multipart: true) do |f| %>
+      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :blocklist, kind: :text_area,
+        label_text: "Blocklist Bike Urls", optional_badge: false,
+        html_options: {value: @blocklist.map { |i| "#{ENV["BASE_URL"]}/bikes/#{i}" }.join("\n"), rows: 10})) do |group| %>
+        <% group.with_helper_text do %>
+          <strong>1 per line</strong>. These can be the id (the number in the
+          url), the bike url, admin url or edit url
+        <% end %>
       <% end %>
-    <% end %>
 
-    <%= submit_tag "Save changes", class: "btn btn-success submit-bike-update" %>
+      <%= render UI::Button::Component.new(text: "Save changes", color: :primary, type: "submit") %>
+    <% end %>
   </div>
 </div>

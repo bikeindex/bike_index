@@ -25,7 +25,7 @@ module OrganizedHelper
         concat(render(Atoms::RegistrationStatusBadge::Component.new(bike:, size: :xs)))
       elsif !skip_creation && bike.creation_kind.present?
         concat(", ")
-        concat(content_tag(:small, render(Atoms::Org::OriginDisplay::Component.new(ownership: bike.current_ownership)), class: "less-strong"))
+        concat(content_tag(:small, render(Atoms::Org::OriginDisplay::Component.new(ownership: bike.current_ownership)), class: "twless-strong"))
       end
     end
   end
@@ -68,7 +68,7 @@ module OrganizedHelper
     when /removed/, "impounded", "trashed", "failed_to_find", /denied/, "delivery failure"
       UI::Alerts::Base::Component::TEXT_CLASSES[:error]
     else
-      "less-strong"
+      "twless-strong"
     end
   end
 

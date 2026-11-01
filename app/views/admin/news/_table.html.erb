@@ -22,18 +22,18 @@
 
     <% if blog.content_tag_names.any? %>
       <small class="d-block">
-        <span class="less-strong">Topics:</span>
+        <span class="twless-strong">Topics:</span>
 
         <% if tags_no_link %>
           <%= blog.content_tag_names.join(", ") %>
         <% else %>
-          <%= safe_join(blog.content_tags.name_ordered.map { |c| link_to(c.name, sort_state.search_params.merge(search_tags: tags_param + [c.to_param]), class: "less-strong") }, ", ") %>
+          <%= safe_join(blog.content_tags.name_ordered.map { |c| link_to(c.name, sort_state.search_params.merge(search_tags: tags_param + [c.to_param]), class: "twless-strong") }, ", ") %>
         <% end %>
       </small>
     <% end %>
 
     <% if blog.canonical_url? %>
-      <small class="d-block">Canonical: <%= link_to blog.pretty_canonical, blog.canonical_url, class: "gray-link" %></small>
+      <small class="d-block">Canonical: <%= render(UI::ButtonLink::Component.new(href: blog.canonical_url, text: blog.pretty_canonical, color: :link_gray)) %></small>
     <% end %>
   <% end %>
 

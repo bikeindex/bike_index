@@ -1,6 +1,6 @@
-<nav class="navbar navbar-expand-md navbar-light bg-light admin-navbar">
+<nav class="navbar navbar-expand-md navbar-light bg-light">
   <span class="navbar-brand">
-    <%= link_to image_tag("logo.svg"), @user_root_url %>
+    <%= link_to image_tag("logo.svg", class: "tw:h-9"), @user_root_url %>
   </span>
 
   <% if @current_user.superuser? %>
@@ -41,5 +41,5 @@
     </div>
   <% end %>
 
-  <%= link_to "Exit Admin", root_path, class: "btn btn-outline-secondary ml-auto less-strong d-none d-lg-inline-block" %>
+  <%= link_to "Exit Admin", root_path, class: "btn btn-outline-secondary ml-auto twless-strong d-none d-lg-inline-block" %>
 </nav>

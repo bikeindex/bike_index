@@ -15,12 +15,12 @@
         </small>
         <% unless @organization.deleted? %>
           -
-          <small class="less-strong"><%= link_to admin_organization_path(@organization, deleted_organization_roles: false), class: "gray-link" do %>            <%= number_with_delimiter(@organization.organization_roles.count) %>            <strong>NOT</strong> deleted organization role<% end %></small>
+          <small class="twless-strong"><%= render(UI::ButtonLink::Component.new(href: admin_organization_path(@organization, deleted_organization_roles: false), color: :link_gray)) do %>            <%= number_with_delimiter(@organization.organization_roles.count) %>            <strong>NOT</strong> deleted organization role<% end %></small>
         <% end %>
       <% else %>
         <small><%= number_with_delimiter(@organization.organization_roles.claimed.count) %> claimed</small>
         -
-        <small class="less-strong"><%= link_to admin_organization_path(@organization, deleted_organization_roles: true), class: "gray-link" do %>          <%= number_with_delimiter(@organization.organization_roles.deleted.count) %>          deleted<% end %></small>
+        <small class="twless-strong"><%= render(UI::ButtonLink::Component.new(href: admin_organization_path(@organization, deleted_organization_roles: true), color: :link_gray)) do %>          <%= number_with_delimiter(@organization.organization_roles.deleted.count) %>          deleted<% end %></small>
 
 
         <small><%= link_to "new organization role", new_admin_organization_role_url(organization_id: @organization.to_param), class: "btn btn-outline-secondary btn-sm ml-3" %></small>

@@ -7,9 +7,8 @@
 
   .row
     .col-auto
-      .form-group
-        = f.text_field :title, placeholder: "Blog title", class: "form-control"
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :title, required: true, html_options: {placeholder: "Blog title"}))
 
   .row.mt-2
     .col-auto
-      = f.submit 'Create Blog!', class: 'btn btn-success'
+      = render(UI::Button::Component.new(text: "Create Blog!", color: :primary, type: "submit"))

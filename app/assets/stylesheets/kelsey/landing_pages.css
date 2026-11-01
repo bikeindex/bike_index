@@ -711,12 +711,6 @@
   background-color: var(--redesign-gray-100);
   display: flex;
   flex-direction: column;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.kelsey_styles .resource-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
 .kelsey_styles .resource-thumbnail {
@@ -784,12 +778,6 @@
   background-color: white;
   padding: 1.75rem;
   border-left: 4px solid var(--redesign-purple-500);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.kelsey_styles .dev-resource-item:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
 }
 
 .kelsey_styles .dev-resource-content h3 {

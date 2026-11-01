@@ -1,111 +1,33 @@
-.admin-subnav
-  .col-md-12
-    %h1
-      = @manufacturer.name
-      %small.less-strong
-        %small simple:
-
-        = @manufacturer.short_name
+= render(Pages::Admin::Headers::Nav::Component.new(title: @manufacturer.name, subtitle: "simple: #{@manufacturer.short_name}"))
 
 .row
   .col-6
-    %table.table-list
-      %tbody
-        %tr
-          %td
-            ID
-          %td
-            = @manufacturer.id
-        %tr
-          %td
-            Created
-          %td
-            %span.localizeTime.preciseTime
-              = l @manufacturer.created_at, format: :convert_time
-        - if display_dev_info?
-          %tr.only-dev-visible
-            %td
-              Updated
-            %td
-              %span.localizeTime.preciseTime
-                = l @manufacturer.updated_at, format: :convert_time
-        %tr
-          %td
-            Slug
-          %td
-            = @manufacturer.slug
-            %small
-              %span.less-strong.ml-1 secondary:
-              = @manufacturer.secondary_slug
-        %tr
-          %td
-            Frame Maker?
-          %td
-            = check_mark if @manufacturer.frame_maker
-        %tr
-          %td
-            Motorized only?
-          %td
-            = check_mark if @manufacturer.motorized_only
-        %tr
-          %td
-            Bikes
-          %td
-            = number_display(@manufacturer.bikes.count)
-            %a{ href: admin_bikes_path(search_manufacturer: @manufacturer.slug) }
-              view
-        %tr
-          %td
-            Components
-          %td
-            = @manufacturer.components.count
+    = render(UI::TableList::Component.new) do |list|
+      - list.with_row(label: "ID", value: @manufacturer.id)
+      - list.with_row(label: "Created", value: render(UI::Time::Component.new(time: @manufacturer.created_at, format: :localize_time_precise)))
+      - list.with_row(label: "Updated", class: "only-dev-visible", value: render(UI::Time::Component.new(time: @manufacturer.updated_at, format: :localize_time_precise)), if: display_dev_info?)
+      - list.with_row(label: "Slug") do
+        = @manufacturer.slug
+        %small
+          %span.twless-strong.ml-1 secondary:
+          = @manufacturer.secondary_slug
+      - list.with_row(label: "Frame Maker?", value: (check_mark if @manufacturer.frame_maker))
+      - list.with_row(label: "Motorized only?", value: (check_mark if @manufacturer.motorized_only))
+      - list.with_row(label: "Bikes") do
+        = number_display(@manufacturer.bikes.count)
+        %a{ href: admin_bikes_path(search_manufacturer: @manufacturer.slug) }
+          view
+      - list.with_row(label: "Components", value: @manufacturer.components.count)
   .col-6
-    %table.table-list
-      %tbody
-        - if display_dev_info?
-          %tr.only-dev-visible
-            %td
-              Autocomplete priority
-            %td
-              = @manufacturer.priority
-        %tr
-          %td
-            Official Org
-          %td
-            - if @manufacturer.official_organization.present?
-              = link_to @manufacturer.official_organization.name, admin_organization_path(@manufacturer.official_organization.to_param)
-        %tr
-          %td
-            Open Year
-          %td
-            = @manufacturer.open_year
-        %tr
-          %td
-            Close Year
-          %td
-            = @manufacturer.close_year
-        %tr
-          %td
-            Website
-          %td
-            - if @manufacturer.website.present?
-              = link_to @manufacturer.website, @manufacturer.website
-        %tr
-          %td
-            Twitter
-          %td
-            - if @manufacturer.twitter_name.present?
-              = link_to "#{@manufacturer.twitter_name}", "https://twitter.com/#{@manufacturer.twitter_name}"
-        %tr
-          %td
-            Description
-          %td
-            = @manufacturer.description
-        %tr
-          %td
-            Logo
-          %td
-            = link_to image_tag(@manufacturer.logo.url(:thumb)), @manufacturer.logo_url
+    = render(UI::TableList::Component.new) do |list|
+      - list.with_row(label: "Autocomplete priority", class: "only-dev-visible", value: @manufacturer.priority, if: display_dev_info?)
+      - list.with_row(label: "Official Org", value: (link_to(@manufacturer.official_organization.name, admin_organization_path(@manufacturer.official_organization.to_param)) if @manufacturer.official_organization.present?))
+      - list.with_row(label: "Open Year", value: @manufacturer.open_year)
+      - list.with_row(label: "Close Year", value: @manufacturer.close_year)
+      - list.with_row(label: "Website", value: (link_to(@manufacturer.website, @manufacturer.website) if @manufacturer.website.present?))
+      - list.with_row(label: "Twitter", value: (link_to("#{@manufacturer.twitter_name}", "https://twitter.com/#{@manufacturer.twitter_name}") if @manufacturer.twitter_name.present?))
+      - list.with_row(label: "Description", value: @manufacturer.description)
+      - list.with_row(label: "Logo", value: link_to(image_tag(@manufacturer.logo.url(:thumb)), @manufacturer.logo_url))
   .col-6
     = link_to "Edit", edit_admin_manufacturer_url(@manufacturer), class: "btn btn-success"
     = render(UI::ButtonLink::Component.new(text: "Delete", href: admin_manufacturer_url(@manufacturer), method: :delete, color: :error, confirm: "Are you sure?"))

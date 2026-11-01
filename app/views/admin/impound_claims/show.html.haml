@@ -5,68 +5,30 @@
 - @bike_submitting = @impound_claim.bike_submitting
 - organization_name = @impound_claim.organization.present? ? @impound_claim.organization.name : @impound_claim.organization_id
 
-.admin-subnav
-  .col-12
-    %h1
-      #{@impound_claim.claim_kind_humanized.titleize} for
-      = link_to "impound record ##{impound_record_id}", admin_impound_record_path("pkey-#{@impound_record.id}")
-
-    - if organization_name.present?
-      %h2.mt-4
-        %em= link_to "View claim in organization", organization_impound_claim_path(@impound_claim.id, organization_id: @impound_claim.organization_id)
+= render(Pages::Admin::Headers::Nav::Component.new(title: safe_join(["#{@impound_claim.claim_kind_humanized.titleize} for ", link_to("impound record ##{impound_record_id}", admin_impound_record_path("pkey-#{@impound_record.id}"))]))) do
+  - if organization_name.present?
+    %li= link_to "View claim in organization", organization_impound_claim_path(@impound_claim.id, organization_id: @impound_claim.organization_id)
 .row
   .col-sm-6
-    %table.table-list
-      %tbody
-        %tr
-          %td Created
-          %td
-            %span.localizeTime.preciseTime
-              = l(@impound_claim.created_at, format: :convert_time)
-        %tr
-          %td Updated
-          %td
-            %span.localizeTime.preciseTime
-              = l(@impound_claim.updated_at, format: :convert_time)
-        %tr
-          %td Status
-          %td
-            %em
-              = status_display(@impound_claim.status_humanized)
-        %tr
-          %td Organization
-          %td
-            - if organization_name.present?
-              = link_to organization_name, admin_organization_path(@impound_claim.organization_id)
-            - else
-              %small.less-strong NO organization
-        %tr
-          %td Bike claimed
-          %td
-            - if @bike_claimed.present?
-              = link_to organized_bike_text(@bike_claimed), edit_admin_bike_path(@bike_claimed)
+    = render(UI::TableList::Component.new) do |list|
+      - list.with_row(label: "Created", value: render(UI::Time::Component.new(time: @impound_claim.created_at, format: :localize_time_precise)))
+      - list.with_row(label: "Updated", value: render(UI::Time::Component.new(time: @impound_claim.updated_at, format: :localize_time_precise)))
+      - list.with_row(label: "Status") do
+        %em
+          = status_display(@impound_claim.status_humanized)
+      - list.with_row(label: "Organization") do
+        - if organization_name.present?
+          = link_to organization_name, admin_organization_path(@impound_claim.organization_id)
+        - else
+          %small.twless-strong NO organization
+      - list.with_row(label: "Bike claimed", value: (link_to(organized_bike_text(@bike_claimed), edit_admin_bike_path(@bike_claimed)) if @bike_claimed.present?))
   .col-sm-6
-    %table.table-list
-      %tbody
-        %tr
-          %td Bike Submitted
-          %td
-            - if @bike_submitting.present?
-              = link_to organized_bike_text(@bike_submitting), edit_admin_bike_path(@bike_submitting)
-        %tr
-          %td Impound record
-          %td
-            - if @impound_record.present?
-              = link_to impound_record_id, admin_impound_record_path("pkey-#{@impound_record.id}")
-              - if organization_name.present?
-                %small.less-strong= link_to "view in organization", organization_impound_record_path(impound_record_id, organization_id: @impound_claim.organization_id)
-        %tr
-          %td User
-          %td
-            = @impound_claim.user&.display_name&.truncate(20)
-        %tr
-          %td Resolved
-          %td
-            - if @impound_claim.resolved_at.present?
-              %span.localizeTime.preciseTime
-                = l(@impound_claim.resolved_at, format: :convert_time)
+    = render(UI::TableList::Component.new) do |list|
+      - list.with_row(label: "Bike Submitted", value: (link_to(organized_bike_text(@bike_submitting), edit_admin_bike_path(@bike_submitting)) if @bike_submitting.present?))
+      - list.with_row(label: "Impound record") do
+        - if @impound_record.present?
+          = link_to impound_record_id, admin_impound_record_path("pkey-#{@impound_record.id}")
+          - if organization_name.present?
+            %small.twless-strong= link_to "view in organization", organization_impound_record_path(impound_record_id, organization_id: @impound_claim.organization_id)
+      - list.with_row(label: "User", value: @impound_claim.user&.display_name&.truncate(20))
+      - list.with_row(label: "Resolved", value: render(UI::Time::Component.new(time: @impound_claim.resolved_at, format: :localize_time_precise)))

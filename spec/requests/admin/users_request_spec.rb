@@ -57,6 +57,47 @@ RSpec.describe Admin::UsersController, type: :request do
     it "links to edit" do
       get "#{base_url}/#{user_subject.username}"
       expect(response).to redirect_to(edit_admin_user_path(user_subject.username))
+      # A tab the show action doesn't render would otherwise raise from the tabs component
+      get "#{base_url}/#{user_subject.id}?active_tab=party"
+      expect(response).to redirect_to(edit_admin_user_path(user_subject.id))
+    end
+
+    context "with a record behind every tab" do
+      let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user: user_subject) }
+      let!(:user_email) { FactoryBot.create(:user_email, user: user_subject) }
+      let!(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: user_subject, serial_number: "LIVE-SERIAL") }
+      let!(:bike_deleted) { FactoryBot.create(:bike, :with_ownership_claimed, user: user_subject, serial_number: "GONE-SERIAL", deleted_at: Time.current) }
+      let!(:feedback) { FactoryBot.create(:feedback, user: user_subject, body: "FEEDBACK-BODY") }
+      let!(:user_alert) { FactoryBot.create(:user_alert, user: user_subject) }
+      let!(:membership) { FactoryBot.create(:membership, user: user_subject) }
+      let!(:payment) { FactoryBot.create(:payment, user: user_subject) }
+
+      it "renders each tab" do
+        Pages::Admin::Users::Show::Component::TABS.each do |tab|
+          get "#{base_url}/#{user_subject.id}?active_tab=#{tab}"
+          expect(response.code).to eq("200"), "#{tab} rendered #{response.code}"
+        end
+        get "#{base_url}/#{user_subject.id}?active_tab=emails"
+        expect(Nokogiri::HTML(response.body).at_css("h3").text.squish).to eq "Emails #{user_subject.user_emails.count}"
+        expect(response.body).to include(user_email.email)
+        get "#{base_url}/#{user_subject.id}?active_tab=messages"
+        sections = Nokogiri::HTML(response.body).css("h3").map { |heading| heading.text.squish }
+        expect(sections).to eq(["Marketplace messages 0", "Alerts 1", "Notifications 0", "Feedbacks 1"])
+        expect(response.body).to include(admin_feedback_path(feedback))
+        get "#{base_url}/#{user_subject.id}?active_tab=payments"
+        sections = Nokogiri::HTML(response.body).css("h3").map { |heading| heading.text.squish }
+        expect(sections).to eq(["Memberships 1", "Payments 1"])
+        expect(response.body).to include(edit_admin_payment_path(payment))
+        get "#{base_url}/#{user_subject.id}?active_tab=organization_roles"
+        expect(response.body).to include(organization_role.organization.name)
+        expect(Nokogiri::HTML(response.body).at_css("h3").text.squish).to eq "Organizations 1 (0 registration organizations)"
+        get "#{base_url}/#{user_subject.id}?active_tab=bikes"
+        expect(Nokogiri::HTML(response.body).at_css("h3").text.squish).to start_with("Bikes 1 (view in admin/bikes)")
+        expect(response.body).to include("LIVE-SERIAL")
+        expect(response.body).to_not include("GONE-SERIAL")
+        deleted_path = admin_bikes_path(user_id: user_subject.id, search_status_deleted_only: true, search_status_example: true)
+        expect(Nokogiri::HTML(response.body).at_css("a[href='#{deleted_path}']")&.text&.squish).to eq "1 deleted bike"
+      end
     end
   end
 
@@ -80,17 +121,8 @@ RSpec.describe Admin::UsersController, type: :request do
       get "#{base_url}/#{user_subject.id}/edit"
       expect(response).to render_template :edit
       expect(response.body).to include(user_email.email)
+      expect(response.body).to include("&amp; membership")
       expect(response.body).to_not include("deleted_only")
-    end
-
-    context "with deleted bikes" do
-      let!(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: user_subject) }
-      let!(:bike_deleted) { FactoryBot.create(:bike, :with_ownership_claimed, user: user_subject, deleted_at: Time.current) }
-      it "links to the deleted bikes" do
-        get "#{base_url}/#{user_subject.id}/edit"
-        link = Nokogiri::HTML(response.body).at_css("a[href='#{admin_bikes_path(user_id: user_subject.id, search_status_deleted_only: true, search_status_example: true)}']")
-        expect(link&.text).to eq "1 deleted"
-      end
     end
 
     context "current_user with dark_mode" do
@@ -148,6 +180,12 @@ RSpec.describe Admin::UsersController, type: :request do
       end
     end
     context "non developer" do
+      it "leaves the user unconfirmed when the box is unchecked" do
+        patch "#{base_url}/#{user_subject.id}", params: {user: ban_user_params.merge(name: "New Name", banned: "0", confirmed: "0")}
+        expect(user_subject.reload.name).to eq "New Name"
+        expect(user_subject.confirmed?).to be_falsey
+      end
+
       it "updates all the things that can be edited (finding via user id)" do
         user_subject.reload
         og_auth_token = user_subject.auth_token

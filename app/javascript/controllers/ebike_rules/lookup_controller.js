@@ -1,6 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
 import { Turbo } from '@hotwired/turbo-rails'
-import { CatalogComboboxSource, loadCatalog } from 'bikebook/catalog'
+import { CURRENT_MARK, CatalogComboboxSource, loadCatalog } from 'bikebook/catalog'
 import { localSources } from 'utils/hw_combobox_patch'
 import { readable, replaceUrl } from 'bikebook/replace_url'
 
@@ -90,7 +90,7 @@ export default class extends Controller {
   chooseBike ({ detail } = {}) {
     const input = this.comboboxSlotTarget.querySelector('input[role=combobox]')
     if (detail?.value && input) {
-      input.value = input.value.replace(/ \(current\)$/, '')
+      input.value = input.value.replace(CURRENT_MARK, '')
       input.setSelectionRange(input.value.length, input.value.length)
     }
     if (detail?.value && (detail.value !== this.model || this.picking)) {
