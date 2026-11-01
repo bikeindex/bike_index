@@ -83,7 +83,7 @@ class LoggedSearch < AnalyticsRecord
 
   scope :organized, -> { where(endpoint: organized_endpoints) }
   scope :not_bikebook, -> { where.not(endpoint: bikebook_endpoints) }
-  scope :bikebook_comparison, -> { web_bikebook.where("query_items->>'vehicle_models' LIKE '%,%'") }
+  scope :web_bikebook_comparison, -> { web_bikebook.where("query_items->>'vehicle_models' LIKE '%,%'") }
   scope :serial, -> { where.not(serial_normalized: nil) }
   scope :includes_query, -> { where(includes_query: true) }
   scope :processed, -> { where(processed: true) }
