@@ -25,8 +25,8 @@ RSpec.describe Pages::Admin::Users::Tabs::Component, type: :component do
   context "with deleted bikes" do
     before { FactoryBot.create_list(:bike, 2, :with_ownership_claimed, user:, deleted_at: Time.current) }
 
-    it "links to them" do
-      expect(component).to have_link("2 deleted bikes",
+    it "renders their tab" do
+      expect(component).to have_link("Deleted bikes 2",
         href: "/admin/bikes?search_status_deleted_only=true&search_status_example=true&user_id=#{user.id}")
     end
   end

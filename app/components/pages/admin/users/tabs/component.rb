@@ -5,22 +5,24 @@ module Pages
     module Users
       module Tabs
         class Component < ApplicationComponent
-          TABS = {edit: "Edit", bikes: "Bikes", marketplace_messages: "Messages", memberships: "Memberships",
-                  alerts: "Alerts", payments: "Payments", organization_roles: "Organizations",
+          TABS = {edit: "Edit", bikes: "Bikes", deleted_bikes: "Deleted bikes", marketplace_messages: "Messages",
+                  memberships: "Memberships", alerts: "Alerts", payments: "Payments", organization_roles: "Organizations",
                   notifications: "Notifications", feedbacks: "Feedbacks", emails: "Emails",
                   ambassador_tasks: "Ambassador tasks"}.freeze
 
           # These tabs are another controller's index, filtered to this user - which renders the
           # header through Pages::Admin::IndexSkeleton's user_tab:. The rest but edit are
           # Pages::Admin::Users::Show tabs.
-          INDEX_PATHS = {bikes: :admin_bikes_path, marketplace_messages: :admin_marketplace_messages_path,
-                         memberships: :admin_memberships_path, alerts: :admin_user_alerts_path,
-                         payments: :admin_payments_path, notifications: :admin_notifications_path,
-                         feedbacks: :admin_feedbacks_path}.freeze
+          INDEX_PATHS = {bikes: :admin_bikes_path, deleted_bikes: :admin_bikes_path,
+                         marketplace_messages: :admin_marketplace_messages_path, memberships: :admin_memberships_path,
+                         alerts: :admin_user_alerts_path, payments: :admin_payments_path,
+                         notifications: :admin_notifications_path, feedbacks: :admin_feedbacks_path}.freeze
+          INDEX_PARAMS = {deleted_bikes: {search_status_deleted_only: true, search_status_example: true}}.freeze
 
           def self.records(user, tab)
             case tab
             when :bikes then Bike.current_with_user_hidden.current_owner(user.id)
+            when :deleted_bikes then Bike.unscoped.current_owner(user.id).only_deleted
             when :marketplace_messages then MarketplaceMessage.for_user(user)
             when :memberships then user.memberships
             when :alerts then user.user_alerts
@@ -54,7 +56,6 @@ module Pages
           def tab_counts
             @tab_counts ||= Rails.cache.fetch(["admin_user_tab_counts", @user]) do
               (TABS.keys - %i[edit]).to_h { [it, self.class.records(@user, it).count] }
-                .merge(deleted_bikes: Bike.unscoped.current_owner(@user.id).only_deleted.count)
             end
           end
 
@@ -62,26 +63,25 @@ module Pages
             return edit_admin_user_path(@user.id) if tab == :edit
             return admin_user_path(@user.id, active_tab: tab) unless INDEX_PATHS.key?(tab)
 
-            public_send(INDEX_PATHS[tab], user_id: @user.id)
+            public_send(INDEX_PATHS[tab], user_id: @user.id, **INDEX_PARAMS.fetch(tab, {}))
           end
 
-          # Only ambassadors have tasks - except on its own page, which still renders (saying
-          # so) and shouldn't lose its place in the row
-          def render_tab?(tab) = tab != :ambassador_tasks || @active == tab || @user.ambassador?
+          # Hidden with nothing behind them - except on their own page, which keeps its place
+          def render_tab?(tab)
+            return true if @active == tab
+
+            case tab
+            when :ambassador_tasks then @user.ambassador?
+            when :deleted_bikes then tab_counts[:deleted_bikes].positive?
+            else true
+            end
+          end
 
           def last_email_errored = @last_email_errored ||= @user.user_emails.last_email_errored.to_a
 
           # present? loads the association, so the template and the badges reuse it
           def alerts?
             @user.deleted? || @user.banned? || last_email_errored.present? || @user.email_bans_active.present?
-          end
-
-          def deleted_bikes_link
-            count = tab_counts[:deleted_bikes]
-            return if count.zero?
-
-            render(UI::ButtonLink::Component.new(text: safe_join([number_display(count), " deleted #{"bike".pluralize(count)}"]),
-              size: :sm, href: admin_bikes_path(user_id: @user.id, search_status_deleted_only: true, search_status_example: true)))
           end
 
           def non_admin_view_link

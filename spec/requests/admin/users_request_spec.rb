@@ -83,7 +83,7 @@ RSpec.describe Admin::UsersController, type: :request do
   describe "the indexes that are tabs" do
     it "renders the user's tabs on each, with its own active" do
       Pages::Admin::Users::Tabs::Component::INDEX_PATHS.each do |tab, path|
-        get public_send(path, user_id: user_subject.id)
+        get public_send(path, user_id: user_subject.id, **Pages::Admin::Users::Tabs::Component::INDEX_PARAMS.fetch(tab, {}))
         expect(response.code).to eq("200"), "#{tab} rendered #{response.code}"
         active = Nokogiri::HTML(response.body).css("nav a[aria-current]").map { |link| link.text.squish }
         expect(active).to eq(["#{Pages::Admin::Users::Tabs::Component::TABS[tab]} 0"]), "#{tab} marked #{active}"
@@ -118,10 +118,10 @@ RSpec.describe Admin::UsersController, type: :request do
     context "with deleted bikes" do
       let!(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: user_subject) }
       let!(:bike_deleted) { FactoryBot.create(:bike, :with_ownership_claimed, user: user_subject, deleted_at: Time.current) }
-      it "links to the deleted bikes" do
+      it "renders the deleted bikes tab" do
         get "#{base_url}/#{user_subject.id}/edit"
         link = Nokogiri::HTML(response.body).at_css("a[href='#{admin_bikes_path(user_id: user_subject.id, search_status_deleted_only: true, search_status_example: true)}']")
-        expect(link&.text&.squish).to eq "1 deleted bike"
+        expect(link&.text&.squish).to eq "Deleted bikes 1"
       end
     end
 
