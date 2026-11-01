@@ -640,8 +640,10 @@ class ModelViewer {
     ], ' ')
   }
 
+  // Wraps only between cups
   shisCode (code, size = 'tw:text-xs') {
-    return html`<code class="tw:rounded-sm tw:border tw:border-gray-200 tw:dark:border-gray-700 tw:px-1.5 tw:py-0.5 tw:font-mono tw:whitespace-nowrap ${size}">${code}</code>`
+    return html`<code class="tw:rounded-sm tw:border tw:border-gray-200 tw:dark:border-gray-700 tw:px-1.5 tw:py-0.5 tw:font-mono tw:whitespace-normal tw:box-decoration-clone ${
+      size}">${join(code.split(/\s*\|\s*/).map((cup) => html`<span class="tw:whitespace-nowrap">${cup}</span>`), ' | ')}</code>`
   }
 
   millimeters (value, suffix = null) {
@@ -903,7 +905,7 @@ class ModelViewer {
       param: 'sizes',
       label: 'sizes',
       heading: html`Sizes & geometry <span class="tw:ml-1 tw:font-mono tw:text-sm tw:font-normal tw:tracking-normal tw:opacity-65 tw:normal-case">${numberDisplay(sizes.length)}</span>`,
-      content: html`<div data-ui--collapse-target="content" class="tw:-mx-(--gutter)">${this.sizes()}</div>`
+      content: html`<div data-ui--collapse-target="content">${this.sizes()}</div>`
     })
   }
 
@@ -912,9 +914,8 @@ class ModelViewer {
     if (blank(sizes)) return nothing
 
     const others = this.others.map((other) => other.sizes)
-    // padded inside the scroller, so its cards scroll out to the edges of the card it bleeds across, which scrolls to the
-    // selected one as ui--tabs does its active tab
-    return html`<div data-controller="ui--tabs" class="tw:overflow-x-auto tw:px-(--gutter) tw:pb-3.5"><div data-ui--tabs-target="row"
+    // its cards scrolling out to the edges of the card it's on, and to the selected one as ui--tabs does its active tab
+    return html`<div data-controller="ui--tabs" class="twgutter-bleed tw:overflow-x-auto tw:pb-3.5"><div data-ui--tabs-target="row"
       class="tw:flex tw:w-max tw:min-w-full tw:gap-4">${sizes.map((size) => geometryCard({
         presenter: this.presenter,
         size,

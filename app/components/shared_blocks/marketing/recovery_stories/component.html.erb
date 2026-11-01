@@ -9,10 +9,10 @@
 <% if @recovery_displays.any? %>
   <ul
     class="
-      tw:m-0 tw:-mx-5 tw:mt-4 tw:flex tw:snap-x tw:snap-mandatory
-      tw:scroll-px-5 tw:list-none tw:gap-4 tw:overflow-x-auto tw:p-0 tw:px-5
-      tw:sm:mx-0 tw:sm:grid tw:sm:grid-cols-2 tw:sm:overflow-visible
-      tw:sm:px-0 tw:lg:mt-6 tw:lg:grid-cols-4
+      twgutter-bleed tw:mt-4 tw:mb-0 tw:flex tw:snap-x tw:snap-mandatory
+      tw:scroll-px-(--gutter) tw:list-none tw:gap-4 tw:overflow-x-auto
+      tw:[--gutter:--spacing(5)] tw:sm:mx-0 tw:sm:grid tw:sm:grid-cols-2
+      tw:sm:overflow-visible tw:sm:px-0 tw:lg:mt-6 tw:lg:grid-cols-4
     "
   >
     <% @recovery_displays.each do |recovery_display| %>
