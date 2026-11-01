@@ -154,16 +154,12 @@ class BulkImport < ApplicationRecord
   end
 
   def allow_duplicate
-    return false if ascend?
-    # Deduping would drop the row's stolen or impound record
-    return data&.dig("allow_duplicate") != false if stolen? || impounded?
-
-    data&.dig("allow_duplicate") == true
+    Binxtils::InputNormalizer.boolean(data&.dig("allow_duplicate"))
   end
 
   # Short serials (e.g. "1") are often junk shared by distinct bikes with one owner email
   def no_duplicate_for?(serial)
-    !allow_duplicate && SerialNormalizer.no_space(SerialNormalizer.normalized_and_corrected(serial)).to_s.length >= 6
+    (ascend? || !allow_duplicate) && SerialNormalizer.no_space(SerialNormalizer.normalized_and_corrected(serial)).to_s.length >= 6
   end
 
   def creator
@@ -229,6 +225,8 @@ class BulkImport < ApplicationRecord
   def set_calculated_attributes
     self.kind ||= calculated_kind
     self.no_notify = true if kind == "stolen"
+    # Deduping would drop the row's stolen or impound record
+    self.allow_duplicate = true if data&.dig("allow_duplicate").nil? && (stolen? || impounded?)
     # we're managing ascend errors separately because we need to lookup organization
     return true if ascend_unprocessable?
 
