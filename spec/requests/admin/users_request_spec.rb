@@ -78,7 +78,7 @@ RSpec.describe Admin::UsersController, type: :request do
           expect(response.code).to eq("200"), "#{tab} rendered #{response.code}"
         end
         get "#{base_url}/#{user_subject.id}?active_tab=emails"
-        expect(Nokogiri::HTML(response.body).at_css("h4").text.squish).to eq "Emails"
+        expect(Nokogiri::HTML(response.body).at_css("h3").text.squish).to eq "Emails #{user_subject.user_emails.count}"
         expect(response.body).to include(user_email.email)
         get "#{base_url}/#{user_subject.id}?active_tab=messages"
         sections = Nokogiri::HTML(response.body).css("h3").map { |heading| heading.text.squish }
@@ -90,6 +90,7 @@ RSpec.describe Admin::UsersController, type: :request do
         expect(response.body).to include(edit_admin_payment_path(payment))
         get "#{base_url}/#{user_subject.id}?active_tab=organization_roles"
         expect(response.body).to include(organization_role.organization.name)
+        expect(Nokogiri::HTML(response.body).at_css("h3").text.squish).to eq "Organizations 1 (0 registration organizations)"
         get "#{base_url}/#{user_subject.id}?active_tab=bikes"
         expect(Nokogiri::HTML(response.body).at_css("h3").text.squish).to start_with("Bikes 1 (view in admin/bikes)")
         expect(response.body).to include("LIVE-SERIAL")

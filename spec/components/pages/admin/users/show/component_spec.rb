@@ -8,7 +8,7 @@ RSpec.describe Pages::Admin::Users::Show::Component, type: :component do
   let(:component) { render_inline(described_class.new(user:, active_tab:)) }
 
   it "says when the user isn't an ambassador" do
-    expect(component).to have_content("Not an ambassador")
+    expect(component.at_css("h3").text.squish).to eq "Ambassador tasks 0 (not an ambassador)"
   end
 
   # The edit action renders that tab

@@ -11,6 +11,15 @@ RSpec.describe Pages::Admin::Headers::Section::Component, type: :component do
     expect(component).to have_link("3", href: "/admin/bikes")
   end
 
+  context "without an href" do
+    let(:options) { super().except(:href) }
+
+    it "renders the count unlinked" do
+      expect(component.at_css("h3").text.squish).to eq "Bikes 3"
+      expect(component.css("a")).to be_empty
+    end
+  end
+
   context "with a parenthetical and block content" do
     let(:component) do
       render_inline(described_class.new(**options, parenthetical: "first 100 shown")) { "- more" }
