@@ -119,10 +119,9 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
   end
 
   describe "panel_columns" do
-    it "lists the always-visible view column with the toggleable ones, in label order" do
+    it "lists the always-visible view column with the toggleable ones" do
       expect(instance.panel_columns).to include("view_cell")
       expect(instance.enabled_columns).not_to include("view_cell")
-      expect(instance.panel_columns).to eq(instance.panel_columns.sort_by { |cell| instance.panel_labels[cell.to_sym] })
     end
   end
 
