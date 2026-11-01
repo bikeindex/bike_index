@@ -20,71 +20,45 @@
   </li>
 <% end %>
 
+<% skip_organization = current_organization.present? %>
+
 <% table_view = capture do %>
-  <table class="table table-striped table-bordered table-sm without-exterior-border">
-    <thead class="small-header hidden-md-down">
-      <th><%= sortable "created_at" %></th>
-      <th><small><%= sortable "updated_at" %></small></th>
+  <%= render(UI::Table::Component.new(records: @mail_snippets, render_sortable: true, sort_state:)) do |table| %>
+    <% table.column(sortable: "created_at") do |mail_snippet| %>
+      <%= link_to render(UI::Time::Component.new(time: mail_snippet.created_at)), helpers.edit_mail_snippet_path_for(mail_snippet) %>
+      <code class="small only-dev-visible"><%= mail_snippet.id %></code>
+    <% end %>
 
-      <% unless current_organization.present? %>
-        <th><%= sortable "organization_id" %></th>
+    <% table.column(sortable: "updated_at", header_classes: "tw:text-xs") do |mail_snippet| %>
+      <small><%= render(UI::Time::Component.new(time: mail_snippet.updated_at)) %></small>
+    <% end %>
+
+    <% unless skip_organization %>
+      <% table.column(sortable: "organization_id") do |mail_snippet| %>
+        <% if mail_snippet.organization.present? %>
+          <%= link_to mail_snippet.organization&.short_name, admin_mail_snippets_path(sort_state.search_params.merge(organization_id: mail_snippet.organization_id)) %>
+        <% end %>
       <% end %>
+    <% end %>
 
-      <th><%= sortable "kind" %></th>
-      <th>Subject, Body</th>
-      <th><small>Enabled</small></th>
-      <th><small>Versions</small></th>
-    </thead>
+    <% table.column(sortable: "kind") do |mail_snippet| %>
+      <%= mail_snippet.kind_humanized %>
+    <% end %>
 
-    <tbody>
-      <% @mail_snippets.each do |mail_snippet| %>
-        <tr>
-          <td>
-            <a
-              class="localizeTime"
-              href="<%= edit_mail_snippet_path_for(mail_snippet) %>"
-            >
-              <%= l mail_snippet.created_at, format: :convert_time %>
-            </a>
+    <% table.column(label: "Subject, Body") do |mail_snippet| %>
+      <div class="d-block"><%= mail_snippet.subject %></div>
+      <small><%= truncate(mail_snippet.body_stripped, length: 100) %></small>
+    <% end %>
 
-            <% if display_dev_info? %>
-              <code class="small only-dev-visible"><%= mail_snippet.id %></code>
-            <% end %>
-          </td>
+    <% table.column(label: "Enabled", header_classes: "tw:text-xs", classes: "tw:text-center") do |mail_snippet| %>
+      <span class="table-cell-check"><%= helpers.check_mark if mail_snippet.is_enabled %></span>
+    <% end %>
 
-          <td>
-            <small class="localizeTime">
-              <%= l mail_snippet.updated_at, format: :convert_time %>
-            </small>
-          </td>
-
-          <% unless current_organization.present? %>
-            <td>
-              <% if mail_snippet.organization.present? %>
-                <%= link_to mail_snippet.organization&.short_name, admin_mail_snippets_path(sortable_search_params.merge(organization_id: mail_snippet.organization_id)) %>
-              <% end %>
-            </td>
-          <% end %>
-
-          <td><%= mail_snippet.kind_humanized %></td>
-
-          <td>
-            <div class="d-block"><%= mail_snippet.subject %></div>
-            <small><%= truncate(mail_snippet.body_stripped, length: 100) %></small>
-          </td>
-
-          <td class="table-cell-check">
-            <%= check_mark if mail_snippet.is_enabled %>
-          </td>
-
-          <td>
-            <% version_count = PaperTrail::Version.where(item_type: "MailSnippet", item_id: mail_snippet.id).count %>
-            <%= link_to number_display(version_count), admin_paper_trail_versions_path(search_item_type: "MailSnippet", search_item_id: mail_snippet.id, period: "all") %>
-          </td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
+    <% table.column(label: "Versions", header_classes: "tw:text-xs") do |mail_snippet| %>
+      <% version_count = PaperTrail::Version.where(item_type: "MailSnippet", item_id: mail_snippet.id).count %>
+      <%= link_to helpers.number_display(version_count), admin_paper_trail_versions_path(search_item_type: "MailSnippet", search_item_id: mail_snippet.id, period: "all") %>
+    <% end %>
+  <% end %>
 <% end %>
 
 <%= render(Pages::Admin::IndexSkeleton::Component.new(

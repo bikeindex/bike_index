@@ -9658,31 +9658,6 @@ label {
   margin-right: 3%
 }
 
-table thead.sortable th {
-  font-weight: 400
-}
-
-table thead.sortable th a.sortable-link {
-  display: block;
-  position: relative
-}
-
-table thead.sortable th a.sortable-link.active {
-  padding-right: 1.5rem
-}
-
-table thead.sortable th a.sortable-link span.sortable-direction {
-  display: block;
-  position: absolute;
-  right: 0;
-  top: 0
-}
-
-table thead.sortable th a.sortable-link.active {
-  font-weight: strong;
-  text-decoration: underline
-}
-
 table .table-cell-check,
 table .table-checkbox-select {
   font-family: Courier;
