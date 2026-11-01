@@ -37,9 +37,9 @@ module UI
         "tw:data-scrolled-end:after:hidden tw:@max-[672px]/twwiderow:after:hidden"
 
       # column_settings: UI::TableColumnSettings' columns, defaults and narrow_hidden, plus its storage_key.
-      # form: form_with's options, making the card a form whose actions apply to the rows checked - a first
-      # column of table-multi-checkbox targets, under toggle_all_button. data: the outermost element's,
-      # its controllers and actions joining these. The rest go to UI::Table
+      # form: form_with's options, making the card a form whose actions apply to the rows checked in
+      # selection_column. data: the outermost element's, its controllers and actions joining these.
+      # The rest go to UI::Table
       def initialize(column_settings: nil, form: nil, data: {}, **table_options)
         @column_settings = column_settings
         @form = form
@@ -48,14 +48,26 @@ module UI
         @columns = []
       end
 
-      def column(**options, &block)
+      # hideable: the column's cell_name, labeled by column_settings
+      def column(hideable: nil, **options, &block)
+        if hideable
+          options = options.merge(label: @column_settings&.dig(:columns, hideable), classes: token_list("hideableColumn", hideable, options[:classes]))
+        end
         @columns << [options, block]
         nil
       end
 
-      def toggle_all_button
-        render(UI::Button::Component.new(text: check_mark, color: :link, title: "Toggle all checked",
-          aria: {label: "Toggle all checked"}, data: {action: "click->table-multi-checkbox#toggleAll"}))
+      # The form's checkboxes, named param[id] for the row's record - or the first of its array, which
+      # disabled is called with. The block renders beside each
+      def selection_column(param:, disabled: nil, &block)
+        column(label: toggle_all_button) do |row|
+          record = row.is_a?(Array) ? row.first : row
+          checkbox = check_box_tag("#{param}[#{record.id}]", record.id, false, disabled: disabled&.call(record),
+            aria: {label: "Select #{record.model_name.human.downcase} #{record.id}"}, data: {"table-multi-checkbox-target" => "checkbox"})
+          next checkbox unless block
+
+          tag.div(safe_join([checkbox, capture { instance_exec(row, &block) }]), class: "tw:flex tw:items-center tw:gap-3")
+        end
       end
 
       def before_render
@@ -63,6 +75,11 @@ module UI
       end
 
       private
+
+      def toggle_all_button
+        render(UI::Button::Component.new(text: check_mark, color: :link, title: "Toggle all checked",
+          aria: {label: "Toggle all checked"}, data: {action: "click->table-multi-checkbox#toggleAll"}))
+      end
 
       def wrapper_data
         data = @column_settings ? {} : @data
