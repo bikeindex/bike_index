@@ -1,12 +1,11 @@
 = form_for external_registry_credential,
+  as: :external_registry_credential,
   url: action,
   method: method,
   html: { class: "form" } do |f|
-  = render(UI::Forms::Group::Component.new(attribute: :type)) do
-    = select_tag :type,
-      external_registry_type_options(selected: external_registry_credential&.type),
-      include_blank: true,
-      class: "twinput"
+  = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :type)) do
+    = render(UI::Forms::Select::Component.new(form_builder: f, attribute: :type,
+      option_tags: ExternalRegistryCredential.types.map { [it.split("::").last, it] }, options: {include_blank: true}))
 
   = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :app_id, label_text: "App ID"))
   = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :access_token))

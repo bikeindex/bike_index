@@ -20,8 +20,7 @@ RSpec.describe Admin::ExternalRegistryCredentialsController, type: :request do
   describe "create" do
     it "creates the credential of the chosen type" do
       expect {
-        post base_url, params: {type: "ExternalRegistryCredential::StopHelingCredential",
-                                external_registry_credential: {app_id: "app", access_token: "token"}}
+        post base_url, params: {external_registry_credential: {type: "ExternalRegistryCredential::StopHelingCredential", app_id: "app", access_token: "token"}}
       }.to change(ExternalRegistryCredential, :count).by 1
 
       expect(ExternalRegistryCredential.last).to be_a(ExternalRegistryCredential::StopHelingCredential)
@@ -30,11 +29,10 @@ RSpec.describe Admin::ExternalRegistryCredentialsController, type: :request do
   end
 
   describe "update" do
-    it "updates through the subclass's params" do
+    it "updates" do
       credential = FactoryBot.create(:stop_heling_credential)
 
-      patch "#{base_url}/#{credential.id}", params: {type: "ExternalRegistryCredential::StopHelingCredential",
-                                                     external_registry_credential_stop_heling_credential: {app_id: "new app"}}
+      patch "#{base_url}/#{credential.id}", params: {external_registry_credential: {app_id: "new app"}}
 
       expect(response).to redirect_to(admin_external_registry_credentials_url)
       expect(credential.reload.app_id).to eq "new app"
