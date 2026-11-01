@@ -20,7 +20,7 @@
           <% if colors.key?(origin) %>
             <%# Chartkick fills its columns at half opacity and outlines them; the swatch matches %>
             <span
-              class="d-inline-block mr-1"
+              class="d-inline-block tw:mr-1"
               style="width: .75rem; height: .75rem; border: 1px solid <%= colors[origin] %>; background-color: <%= colors[origin] %>80;"
             ></span>
             <%= render(Atoms::Org::OriginDisplay::Component.new(creation_kind: origin)) %>

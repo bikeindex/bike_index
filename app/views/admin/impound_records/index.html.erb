@@ -41,8 +41,8 @@
     <%= render(UI::Chart::Component.new(series: [{name: "Impound Records", data:}], time_range: @time_range, stacked: true)) %>
 
     <% unless params[:organization_id].present? %>
-      <div class="row mt-4">
-        <div class="col-md-6 offset-md-3">
+      <div class="tw:mt-6">
+        <%= render(UI::Container::Component.new) do %>
           <%= render(UI::TableList::Component.new(wide_definition: true)) do |list| %>
             <% matching_impound_records.distinct.pluck(:organization_id).map { |id| [id, matching_impound_records.where(organization_id: id).count] }.sort_by { |_id, number| number }.each do |id, number| %>
               <% organization = Organization.unscoped.find_by_id(id) if id.present? %>
@@ -50,7 +50,7 @@
               <% list.with_row(label: (organization.present? ? link_to(organization.short_name, url_for(sortable_search_params.merge(organization_id: id)), class: (organization.deleted? ? "text-danger" : "")) : render(UI::ButtonLink::Component.new(href: url_for(sortable_search_params.merge(organization_id: "none")), text: "no organization", color: :link_gray))), value: number_with_delimiter(number)) %>
             <% end %>
           <% end %>
-        </div>
+        <% end %>
       </div>
     <% end %>
   <% end %>

@@ -2,8 +2,8 @@
   url: action,
   method: method,
   html: { class: "form" } do |f|
-  .row
-    .col-md-6.mb-4
+  .twwiderow{class: "tw:items-start tw:gap-y-6 tw:mb-6"}
+    %div
       = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :screen_name, label_text: "Handle"))
       = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :append_block, kind: :text_area))
       %fieldset{class: "tw:mb-4"}
@@ -12,36 +12,34 @@
         = render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :national, label: "national"))
         = render(UI::Forms::Checkbox::Component.new(name: :check_credentials, label: "Test connection on update"))
 
-    .col-md-6.mb-4
-      .card
-        .card-body
-          %small
-            Credentials can be found on the
-            = link_to "Twitter Apps Dashboard", "https://developer.twitter.com/apps", target: :_blank
-            by selecting the desired app, then navigating to
-            %strong Details
-            >
-            %strong Keys and Tokens
+    .card
+      .card-body
+        %small
+          Credentials can be found on the
+          = link_to "Twitter Apps Dashboard", "https://developer.twitter.com/apps", target: :_blank
+          by selecting the desired app, then navigating to
+          %strong Details
+          >
+          %strong Keys and Tokens
 
-          %fieldset.mt-2
-            - %i[user_secret user_token consumer_key consumer_secret].each do |attribute|
-              = render(UI::Forms::Group::Component.new(form_builder: f, attribute:))
+        %fieldset{class: "tw:mt-2"}
+          - %i[user_secret user_token consumer_key consumer_secret].each do |attribute|
+            = render(UI::Forms::Group::Component.new(form_builder: f, attribute:))
 
-    %fieldset.col-md-6.mb-4
+    %fieldset
       - %i[street city neighborhood].each do |attribute|
         = render(UI::Forms::Group::Component.new(form_builder: f, attribute:))
       = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :region_record_id, label_text: "State")) do
         = render UI::Forms::ComboboxState::Component.new(name: :region_record_id, ids: true, html_options: {form: f, placeholder: "State"})
       = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :country, html_options: {value: social_account.country&.iso}))
       = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :language))
-    .col-md-6
-      .card
-        .card-body
-          %p
-            %em.text-warning
-              Probably don't edit
-            Latitude and Longitude will be set automatically from the address
-          = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :latitude))
-          = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :longitude))
+    .card
+      .card-body
+        %p
+          %em.text-warning
+            Probably don't edit
+          Latitude and Longitude will be set automatically from the address
+        = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :latitude))
+        = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :longitude))
 
   = render(UI::Button::Component.new(text: submit_label, color: :primary, size: :lg, type: "submit"))

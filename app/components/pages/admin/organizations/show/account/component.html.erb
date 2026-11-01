@@ -50,14 +50,14 @@
     <% end %>
 
     <% if @display_dev_info && @organization.manual_pos_kind.present? %>
-      <small class="only-dev-visible d-inline-block ml-2">
+      <small class="only-dev-visible d-inline-block tw:ml-2">
         <em class="twless-strong">manual POS kind set:</em>
         <%= @organization.manual_pos_kind %>
       </small>
     <% end %>
 
     <% if !@organization.no_pos? || @organization.opted_into_theft_survey_2023 %>
-      <small class="ml-3">
+      <small class="tw:ml-4">
         <span class="twless-strong">theft survey?</span>
         <%= @organization.opted_into_theft_survey_2023 %>
       </small>

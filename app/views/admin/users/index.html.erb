@@ -69,17 +69,15 @@
   <% end %>
 
   <% if @deleted %>
-    <div class="row">
-      <div class="col-sm-10 offset-sm-1 col-md-6 offset-md-3">
-        <div class="alert alert-info mt-1 mb-1">
-          <p>
-            Account deletion was added because it's a requirement for the iOS
-            app store. Right now, admins can't delete users, they must delete
-            themselves.
-          </p>
-        </div>
+    <%= render(UI::Container::Component.new) do %>
+      <div class="alert alert-info tw:my-1!">
+        <p>
+          Account deletion was added because it's a requirement for the iOS app
+          store. Right now, admins can't delete users, they must delete
+          themselves.
+        </p>
       </div>
-    </div>
+    <% end %>
   <% end %>
 <% end %>
 
@@ -94,7 +92,7 @@
   <%= render Pages::Admin::Users::Table::Component.new(users: @collection, sort_state:, render_sortable: true, render_deleted: @deleted) %>
 
   <% unless @collection.present? %>
-    <h1 class="mt-4">No users found!</h1>
+    <h1 class="tw:mt-6">No users found!</h1>
   <% end %>
 <% end %>
 

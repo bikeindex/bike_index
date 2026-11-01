@@ -53,22 +53,17 @@
 = form_for [:admin, @bike_sticker_batch], url: {action: "create", controller: "bike_stickers"} do |f|
   = render(UI::Alerts::ObjectError::Component.new(name: "Sticker Batch", object: @bike_sticker_batch))
 
-  .row.mt-4
-    .col-md-6.col-lg-3
+  %div{class: "tw:mt-6 tw:grid tw:gap-x-8 tw:md:grid-cols-12"}
+    %div{class: "tw:md:col-span-6 tw:lg:col-span-3"}
       = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :organization_id, label_text: BikeStickerBatch.human_attribute_name(:organization_id), required: true)) do
         = render UI::Forms::Combobox::Component.new(name: :organization_id, options: @organizations.pluck(:name, :id), include_blank: true, html_options: {form: f, placeholder: "Choose organization", required: true})
-    .col-md-6.col-lg-9
+    %div{class: "tw:md:col-span-6 tw:lg:col-span-9"}
       = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :notes))
-  .row.mt-2
-    .col-md-4.col-6
-      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :prefix, label_text: "Code letter prefix", required: true))
-    .col-md-4.col-6
-      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :initial_code_integer, kind: :number_field, label_text: "Initial sticker number", required: true))
-    .col-md-4.col-6
-      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :code_number_length, kind: :number_field, label_text: "Code Number Length")) do |group|
-        - group.with_label_note { "Leave blank unless you want extra zeros" }
-    .col-md-4.col-6
-      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :stickers_to_create_count, kind: :number_field, label_text: "Number of stickers to create", required: true))
-  .row.mt-2
-    .col-auto
-      = render(UI::Button::Component.new(text: "Create", color: :primary, type: "submit"))
+  .twfieldrow{class: "tw:mt-2"}
+    = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :prefix, label_text: "Code letter prefix", required: true))
+    = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :initial_code_integer, kind: :number_field, label_text: "Initial sticker number", required: true))
+    = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :code_number_length, kind: :number_field, label_text: "Code Number Length")) do |group|
+      - group.with_label_note { "Leave blank unless you want extra zeros" }
+    = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :stickers_to_create_count, kind: :number_field, label_text: "Number of stickers to create", required: true))
+  %div{class: "tw:mt-2"}
+    = render(UI::Button::Component.new(text: "Create", color: :primary, type: "submit"))

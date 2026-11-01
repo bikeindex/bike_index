@@ -20,7 +20,7 @@
   [klass, klass.last_started && Time.parse(klass.last_started), klass.last_finished.presence && Time.parse(klass.last_finished)]
 end %>
 
-<div class="mt-4">
+<div class="tw:mt-6">
   <%= render(UI::Table::Component.new(records: jobs)) do |table| %>
     <% table.column(label: "", classes: "only-dev-visible") do |(klass)| %>
       <code class="small"><%= klass %></code>

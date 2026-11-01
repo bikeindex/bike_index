@@ -2,24 +2,24 @@
 
 <%= render(Pages::Admin::Users::Edit::Component.new(user: @user, display_dev_info: display_dev_info?)) %>
 
-<hr class="mt-4">
+<hr class="tw:mt-6!">
 
 <%= render(Pages::Admin::Users::MailchimpData::Component.new(user: @user)) %>
 
 <hr style="margin-top: 60px;">
 
-<div class="mt-4 mb-4 row">
-  <div class="col-sm-6 mb-4">
+<div class="twwiderow tw:my-6">
+  <div class="tw:mb-6">
     <%= render UI::ButtonLink::Component.new(text: "Delete #{@user.email}!", href: admin_user_path(@user.id), method: :delete, color: :error,
       confirm: "Are you sure? Generally it's better to ban than delete") %>
   </div>
 
-  <div class="col-sm-6 mb-4" data-controller="ui--collapse">
+  <div class="tw:mb-6" data-controller="ui--collapse">
     <div class="text-right">
       <%= render(UI::Collapse::Component.new(text: "Force merge with another email", color: :link_gray)) %>
     </div>
 
-    <div class="mt-2 tw:hidden" data-ui--collapse-target="content">
+    <div class="tw:mt-2 tw:hidden" data-ui--collapse-target="content">
       <div class="card">
         <div class="card-body">
           <p>

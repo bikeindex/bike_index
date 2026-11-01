@@ -1,9 +1,9 @@
 <div class="card" data-controller="admin--news-form">
   <div class="card-body">
-    <div class="row">
-      <div class="col-md-6" data-controller="ui--collapse">
-        <div class="row">
-          <div class="col-sm-6 tw:mb-4">
+    <div class="twwiderow">
+      <div data-controller="ui--collapse">
+        <div class="tw:grid tw:gap-x-8 tw:sm:grid-cols-2">
+          <div class="tw:mb-4">
             <%= render(UI::Forms::Checkbox::Component.new(form_builder: @form_builder, attribute: :published, label: "Published")) %>
 
             <div
@@ -15,7 +15,7 @@
           </div>
 
           <% unless @blog.listicle? %>
-            <div class="col-sm-6 tw:mb-4">
+            <div class="tw:mb-4">
               <%= render(UI::Forms::Checkbox::Component.new(form_builder: @form_builder, attribute: :info_kind, checked: @blog.info?,
                 html_options: {data: {"admin--news-form-target": "infoKind", action: "change->admin--news-form#kindChanged"}})) do %>
                 Info post
@@ -25,7 +25,7 @@
           <% end %>
 
           <div
-            class="col-sm-6 tw:mb-4 <%= blog_only_class %>"
+            class="tw:mb-4 <%= blog_only_class %>"
             data-admin--news-form-target="blogOnly"
           >
             <span class="twless-strong">Publish Date:</span>
@@ -33,7 +33,7 @@
           </div>
 
           <div
-            class="col-sm-6 <%= blog_only_class %>"
+            class="<%= blog_only_class %>"
             data-admin--news-form-target="blogOnly"
           >
             <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
@@ -52,7 +52,7 @@
         </div>
       </div>
 
-      <div class="col-md-6">
+      <div>
         <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :content_tag_names, label_text: "Tags",
           required: true)) do |group| %>
           <% group.with_label_note { "at least one required" } %>
@@ -64,7 +64,7 @@
       </div>
 
       <div
-        class="col-md-6 <%= blog_only_class %>"
+        class="<%= blog_only_class %>"
         data-admin--news-form-target="blogOnly"
       >
         <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :user_email, label_text: "Author email",
@@ -84,7 +84,7 @@
       </div>
 
       <div
-        class="col-md-6 <%= blog_only_class %>"
+        class="<%= blog_only_class %>"
         data-admin--news-form-target="blogOnly"
       >
         <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :canonical_url,
@@ -94,8 +94,8 @@
       </div>
     </div>
 
-    <div class="row mt-2">
-      <div class="col-md-6 tw:mb-4">
+    <div class="twwiderow tw:mt-2">
+      <div class="tw:mb-4">
         <label>
           <%= @form_builder.radio_button :index_image_id, 0 %> No primary image
           <small class="twless-strong">Otherwise, select a primary image with the radio button next to the image</small>
@@ -103,7 +103,7 @@
       </div>
 
       <div
-        class="col-md-6 tw:mb-4 <%= blog_only_class %>"
+        class="tw:mb-4 <%= blog_only_class %>"
         data-admin--news-form-target="blogOnly"
       >
         <%= render(UI::Forms::Checkbox::Component.new(form_builder: @form_builder, attribute: :update_title, label: "Update URL")) %>
@@ -112,15 +112,11 @@
       </div>
     </div>
 
-    <div class="row mt-2">
-      <div class="col-md-6">
-        <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :title, required: true,
-          html_options: {placeholder: "Blog title"})) %>
-      </div>
+    <div class="twwiderow tw:mt-2">
+      <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :title, required: true,
+        html_options: {placeholder: "Blog title"})) %>
 
-      <div class="col-md-6">
-        <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :secondary_title)) %>
-      </div>
+      <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :secondary_title)) %>
     </div>
 
     <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :description_abbr,
@@ -131,19 +127,19 @@
       <% end %>
     <% end %>
 
-    <div class="row mt-2">
-      <div class="col-sm-3">
+    <div class="tw:mt-2 tw:grid tw:grid-cols-2 tw:gap-x-8 tw:sm:grid-cols-4">
+      <div class="tw:col-span-2 tw:sm:col-span-1">
         <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :language)) do %>
           <%= render(UI::Forms::Select::Component.new(form_builder: @form_builder, attribute: :language,
             option_tags: helpers.language_choices)) %>
         <% end %>
       </div>
 
-      <div class="col-sm-3 col-6">
+      <div>
         <%= render(UI::ButtonLink::Component.new(text: "Preview", href: news_url(@blog.to_param), target: "_blank")) %>
       </div>
 
-      <div class="col-6 text-right">
+      <div class="text-right tw:sm:col-span-2">
         <%= render(UI::Button::Component.new(text: "Save", color: :primary, type: "submit")) %>
       </div>
     </div>

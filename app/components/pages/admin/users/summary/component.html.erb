@@ -1,188 +1,184 @@
-<div class="row">
-  <div class="col-md-6">
-    <%= render(UI::TableList::Component.new) do |list| %>
-      <% list.with_row(label: "ID", value: tag.code(@user.id), class: "only-dev-visible") %>
-      <% list.with_row(label: "Icons", value: render(Atoms::Admin::Badges::User::Component.new(user: @user, full_text: true))) %>
-      <% list.with_row(label: "Created", value: render(UI::Time::Component.new(time: @user.created_at, format: :localize_time_precise))) %>
-      <% list.with_row(label: "Updated", value: render(UI::Time::Component.new(time: @user.updated_at, format: :localize_time_precise))) %>
+<div class="twwiderow tw:items-start">
+  <%= render(UI::TableList::Component.new) do |list| %>
+    <% list.with_row(label: "ID", value: tag.code(@user.id), class: "only-dev-visible") %>
+    <% list.with_row(label: "Icons", value: render(Atoms::Admin::Badges::User::Component.new(user: @user, full_text: true))) %>
+    <% list.with_row(label: "Created", value: render(UI::Time::Component.new(time: @user.created_at, format: :localize_time_precise))) %>
+    <% list.with_row(label: "Updated", value: render(UI::Time::Component.new(time: @user.updated_at, format: :localize_time_precise))) %>
 
-      <% list.with_row(label: "Last\u00a0login") do %>
-        <%= render(UI::Time::Component.new(time: @user.last_login_at, format: :localize_time_precise)) %>
+    <% list.with_row(label: "Last\u00a0login") do %>
+      <%= render(UI::Time::Component.new(time: @user.last_login_at, format: :localize_time_precise)) %>
 
-        <% if @user.last_login_ip.present? %>
-          <small class="twless-strong"><%= @user.last_login_ip %></small>
-        <% end %>
+      <% if @user.last_login_ip.present? %>
+        <small class="twless-strong"><%= @user.last_login_ip %></small>
+      <% end %>
+    <% end %>
+
+    <% list.with_row(label: "No Address", class: "only-dev-visible") do %>
+      <% if @user.no_address? %>
+        <strong class="text-success">TRUE</strong>
+      <% else %>
+        <small class="twless-strong">address permitted</small>
+      <% end %>
+    <% end %>
+
+    <% list.with_row(label: "Superuser") do %>
+      <% if @user.developer? %>
+        <span class="only-dev-visible">developer</span>
       <% end %>
 
-      <% list.with_row(label: "No Address", class: "only-dev-visible") do %>
-        <% if @user.no_address? %>
-          <strong class="text-success">TRUE</strong>
-        <% else %>
-          <small class="twless-strong">address permitted</small>
+      <% superuser_abilities = @user.superuser_abilities %>
+
+      <% if @user.superuser? %>
+        <strong>full superuser</strong>
+        <% superuser_ability = superuser_abilities.universal.first %>
+        <% if superuser_ability.present? %>
+          <small class="twless-strong">
+            since
+            <%= render(UI::Time::Component.new(time: superuser_ability.created_at, format: :localize_time_precise)) %>
+          </small>
         <% end %>
-      <% end %>
-
-      <% list.with_row(label: "Superuser") do %>
-        <% if @user.developer? %>
-          <span class="only-dev-visible">developer</span>
-        <% end %>
-
-        <% superuser_abilities = @user.superuser_abilities %>
-
-        <% if @user.superuser? %>
-          <strong>full superuser</strong>
-          <% superuser_ability = superuser_abilities.universal.first %>
-          <% if superuser_ability.present? %>
-            <small class="twless-strong">
-              since
-              <%= render(UI::Time::Component.new(time: superuser_ability.created_at, format: :localize_time_precise)) %>
-            </small>
-          <% end %>
-        <% elsif superuser_abilities.any? %>
-          <%= link_to "limited", admin_superuser_abilities_path(user_id: @user.id), class: "text-info" %>
-          <ul class="small mb-0">
-            <% superuser_abilities.each do |superuser_ability| %>
-              <li>
-                <% if superuser_ability.universal? %>
-                  <strong>full superuser</strong>
-                <% else %>
-                  Can access
-                  <% if superuser_ability.action_name.present? %>
-                    <em><%= superuser_ability.action_name %></em> in
-                  <% end %>
-                  <%= superuser_ability.controller_name %>
+      <% elsif superuser_abilities.any? %>
+        <%= link_to "limited", admin_superuser_abilities_path(user_id: @user.id), class: "text-info" %>
+        <ul class="small tw:mb-0">
+          <% superuser_abilities.each do |superuser_ability| %>
+            <li>
+              <% if superuser_ability.universal? %>
+                <strong>full superuser</strong>
+              <% else %>
+                Can access
+                <% if superuser_ability.action_name.present? %>
+                  <em><%= superuser_ability.action_name %></em> in
                 <% end %>
-              </li>
-            <% end %>
-          </ul>
-        <% end %>
+                <%= superuser_ability.controller_name %>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
       <% end %>
+    <% end %>
 
-      <% list.with_row(label: "Emails") do %>
-        <div class="row">
-          <div class="col-4">
-            <small
-              class="d-block border-bottom"
-              title="Receive Bike Index newsletters"
-            >
-              Newsletters
-            </small>
+    <% list.with_row(label: "Emails") do %>
+      <div class="tw:grid tw:grid-cols-3 tw:gap-x-8">
+        <div>
+          <small
+            class="d-block border-bottom"
+            title="Receive Bike Index newsletters"
+          >
+            Newsletters
+          </small>
 
-            <% if @user.notification_newsletters %>
-              <%= check_mark %>
-            <% else %>
-              <small class="twless-strong">false</small>
-            <% end %>
-          </div>
-
-          <div class="col-4">
-            <small
-              class="d-block border-bottom"
-              title="Receive non-stolen theft emails"
-            >
-              Unstolen
-            </small>
-
-            <% if @user.notification_unstolen %>
-              <%= check_mark %>
-            <% else %>
-              <small class="text-danger twless-strong">false</small>
-            <% end %>
-          </div>
-
-          <div class="col-4">
-            <small class="d-block border-bottom" title="No non theft emails">
-              NONE
-            </small>
-
-            <% if @user.no_non_theft_notification %>
-              <span class="text-danger"><%= check_mark %></span>
-            <% else %>
-              <small class="twless-strong">false</small>
-            <% end %>
-          </div>
+          <% if @user.notification_newsletters %>
+            <%= check_mark %>
+          <% else %>
+            <small class="twless-strong">false</small>
+          <% end %>
         </div>
+
+        <div>
+          <small
+            class="d-block border-bottom"
+            title="Receive non-stolen theft emails"
+          >
+            Unstolen
+          </small>
+
+          <% if @user.notification_unstolen %>
+            <%= check_mark %>
+          <% else %>
+            <small class="text-danger twless-strong">false</small>
+          <% end %>
+        </div>
+
+        <div>
+          <small class="d-block border-bottom" title="No non theft emails">
+            NONE
+          </small>
+
+          <% if @user.no_non_theft_notification %>
+            <span class="text-danger"><%= check_mark %></span>
+          <% else %>
+            <small class="twless-strong">false</small>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+
+  <%= render(UI::TableList::Component.new) do |list| %>
+    <% list.with_row(label: "Confirmed?") do %>
+      <% if @user.confirmed? %>
+        <%= check_mark %>
+      <% else %>
+        <small class="twless-strong">false</small>
       <% end %>
     <% end %>
-  </div>
 
-  <div class="col-md-6">
-    <%= render(UI::TableList::Component.new) do |list| %>
-      <% list.with_row(label: "Confirmed?") do %>
-        <% if @user.confirmed? %>
-          <%= check_mark %>
-        <% else %>
-          <small class="twless-strong">false</small>
-        <% end %>
+    <% list.with_row(label: "email") do %>
+      <%= @user.email %>
+
+      <% if @user.secondary_emails.any? %>
+        <small><%= @user.secondary_emails.join(", ") %></small>
       <% end %>
-
-      <% list.with_row(label: "email") do %>
-        <%= @user.email %>
-
-        <% if @user.secondary_emails.any? %>
-          <small><%= @user.secondary_emails.join(", ") %></small>
-        <% end %>
-      <% end %>
-
-      <% list.with_row(label: "Name", value: @user.name) %>
-
-      <% list.with_row(label: "Photo") do %>
-        <% if @user.avatar? %>
-          <%= image_tag @user.avatar_url(:medium), class: "tw:w-24", alt: "#{@user.display_name} avatar" %>
-        <% end %>
-      <% end %>
-
-      <% list.with_row(label: "Social") do %>
-        <small>
-          <% if @user.twitter.present? %>
-            Twitter:
-            <%= link_to @user.twitter, "https://twitter.com/#{@user.twitter}" %>
-          <% end %>
-        </small>
-      <% end %>
-
-      <% list.with_row(label: "Phone") do %>
-        <% display_phone = @user.phone.present? %>
-
-        <% if display_phone || @user.user_phones.any? %>
-          <ul class="mb-0">
-            <% @user.user_phones.each do |user_phone| %>
-              <li>
-                <%= render Atoms::Phone::Component.new(phone: user_phone.phone, skip_link: true) %>
-
-                <small class="twless-strong <%= user_phone.confirmed? ? "text-success" : "text-warning" %>">
-                  <%= user_phone.confirmed? ? "confirmed" : "unconfirmed" %>
-                </small>
-
-                <small class="twless-strong"><%= render(UI::Time::Component.new(time: user_phone.created_at, preposition: true)) %></small>
-
-                <% if display_phone && Phonifyer.phonify(user_phone.phone) == Phonifyer.phonify(@user.phone) %>
-                  <% display_phone = false %>
-                <% end %>
-              </li>
-            <% end %>
-
-            <% if display_phone %>
-              <li>
-                <%= render Atoms::Phone::Component.new(phone: @user.phone, skip_link: true) %>
-                <small class="twless-strong text-warning">unconfirmed</small>
-              </li>
-            <% end %>
-          </ul>
-          <% unless Flipper.enabled?(:phone_verification) %>
-            <em class="small twless-strong">
-              Phone verification is currently disabled, users don't see the
-              option to confirm their phones
-            </em>
-          <% end %>
-        <% end %>
-      <% end %>
-
-      <% list.with_row(label: "Website", value: @user.mb_link_target) %>
-
-      <% list.with_row(label: "Address", value: tag.small(@user.formatted_address_string(visible_attribute: :street, current_country_id: helpers.current_country_id))) %>
-
-      <% list.with_row(label: "Vendor terms?", value: render(UI::Time::Component.new(time: @user.when_vendor_terms_of_service, format: :localize_time_precise))) %>
     <% end %>
-  </div>
+
+    <% list.with_row(label: "Name", value: @user.name) %>
+
+    <% list.with_row(label: "Photo") do %>
+      <% if @user.avatar? %>
+        <%= image_tag @user.avatar_url(:medium), class: "tw:w-24", alt: "#{@user.display_name} avatar" %>
+      <% end %>
+    <% end %>
+
+    <% list.with_row(label: "Social") do %>
+      <small>
+        <% if @user.twitter.present? %>
+          Twitter:
+          <%= link_to @user.twitter, "https://twitter.com/#{@user.twitter}" %>
+        <% end %>
+      </small>
+    <% end %>
+
+    <% list.with_row(label: "Phone") do %>
+      <% display_phone = @user.phone.present? %>
+
+      <% if display_phone || @user.user_phones.any? %>
+        <ul class="tw:mb-0">
+          <% @user.user_phones.each do |user_phone| %>
+            <li>
+              <%= render Atoms::Phone::Component.new(phone: user_phone.phone, skip_link: true) %>
+
+              <small class="twless-strong <%= user_phone.confirmed? ? "text-success" : "text-warning" %>">
+                <%= user_phone.confirmed? ? "confirmed" : "unconfirmed" %>
+              </small>
+
+              <small class="twless-strong"><%= render(UI::Time::Component.new(time: user_phone.created_at, preposition: true)) %></small>
+
+              <% if display_phone && Phonifyer.phonify(user_phone.phone) == Phonifyer.phonify(@user.phone) %>
+                <% display_phone = false %>
+              <% end %>
+            </li>
+          <% end %>
+
+          <% if display_phone %>
+            <li>
+              <%= render Atoms::Phone::Component.new(phone: @user.phone, skip_link: true) %>
+              <small class="twless-strong text-warning">unconfirmed</small>
+            </li>
+          <% end %>
+        </ul>
+        <% unless Flipper.enabled?(:phone_verification) %>
+          <em class="small twless-strong">
+            Phone verification is currently disabled, users don't see the option
+            to confirm their phones
+          </em>
+        <% end %>
+      <% end %>
+    <% end %>
+
+    <% list.with_row(label: "Website", value: @user.mb_link_target) %>
+
+    <% list.with_row(label: "Address", value: tag.small(@user.formatted_address_string(visible_attribute: :street, current_country_id: helpers.current_country_id))) %>
+
+    <% list.with_row(label: "Vendor terms?", value: render(UI::Time::Component.new(time: @user.when_vendor_terms_of_service, format: :localize_time_precise))) %>
+  <% end %>
 </div>

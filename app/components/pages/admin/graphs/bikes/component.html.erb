@@ -9,8 +9,8 @@
   <% end %>
 </ul>
 
-<div class="row mt-4 mb-4">
-  <div class="col-md-6 order-2 order-md-1">
+<div class="tw:my-6 tw:grid tw:gap-x-8 tw:md:grid-cols-2">
+  <div class="tw:order-2 tw:md:order-1">
     <% if @index.params[:search_manufacturer].present? %>
       Bikes
       <% if @manufacturer.present? %>
@@ -32,14 +32,14 @@
     <% end %>
 
     <% if @total_count.present? %>
-      <p class="mt-4">
+      <p class="tw:mt-6">
         <%= number_display(@total_count) %> matching bikes
         <em><%= render(UI::TimeRange::Component.new(time_range: @index.time_range, period: @index.period)) %></em>
       </p>
     <% end %>
   </div>
 
-  <div class="col-md-6 order-1 order-md-2">
+  <div class="tw:order-1 tw:md:order-2">
     <% if show_search_statuses %>
       <%= form_tag admin_graphs_path(search_kind: "bikes"), method: :get, data: {controller: "ui--collapse"} do %>
         <%= render partial: "/shared/hidden_search_fields" %>
@@ -56,15 +56,17 @@
   </div>
 
   <% if @ignored_only %>
-    <%= render(UI::Chart::Component.new(series: variable_admin_graphs_path(sortable_params.merge(bike_graph_kind: "ignored")), stacked: true)) %>
+    <div class="tw:md:col-span-2">
+      <%= render(UI::Chart::Component.new(series: variable_admin_graphs_path(sortable_params.merge(bike_graph_kind: "ignored")), stacked: true)) %>
+    </div>
   <% end %>
 </div>
 
-<div class="mt-4"></div>
+<div class="tw:mt-6"></div>
 
 <%= render(UI::Chart::Component.new(series: variable_admin_graphs_path(sortable_params))) %>
 
-<div class="text-center mb-4">
+<div class="text-center tw:mb-6">
   <small class="twless-strong">
     <strong>Note:</strong> Columns are separate because they are independent
     counts: total registrations &amp; stolen records created for those
@@ -77,11 +79,13 @@
 <% render_other_bike_graphs = helpers.time_range_length(@index.time_range) < 367.days.to_i %>
 
 <% if render_other_bike_graphs %>
-  <div class="col-sm-6 offset-sm-3 mt-4">
-    <%= render(Pages::Admin::Graphs::BikesTable::Component.new(kind: "origin", sortable_params:)) %>
-  </div>
+  <%= render(UI::Container::Component.new) do %>
+    <div class="tw:mt-6">
+      <%= render(Pages::Admin::Graphs::BikesTable::Component.new(kind: "origin", sortable_params:)) %>
+    </div>
+  <% end %>
 
-  <div class="mt-4"></div>
+  <div class="tw:mt-6"></div>
   <%= render(UI::Chart::Component.new(series: variable_admin_graphs_path(sortable_params.merge(bike_graph_kind: "origin")), stacked: true)) %>
 
   <div class="twwiderow twwiderow-3 tw:mt-4 tw:gap-y-6">
@@ -104,7 +108,9 @@
     </div>
   </div>
 
-  <div class="col-sm-8 offset-sm-2 mt-4">
-    <%= render(Pages::Admin::Graphs::BikesTable::Component.new(kind: "organization", sortable_params:)) %>
-  </div>
+  <%= render(UI::Container::Component.new) do %>
+    <div class="tw:mt-6">
+      <%= render(Pages::Admin::Graphs::BikesTable::Component.new(kind: "organization", sortable_params:)) %>
+    </div>
+  <% end %>
 <% end %>

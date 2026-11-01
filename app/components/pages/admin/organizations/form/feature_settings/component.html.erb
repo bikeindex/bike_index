@@ -1,6 +1,6 @@
 <div class="card">
   <div class="card-body">
-    <h4 class="mb-4">Settings for organization features</h4>
+    <h4 class="tw:mb-6">Settings for organization features</h4>
 
     <% if @organization.enabled?("graduated_notifications") %>
       <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :graduated_notification_interval_days, kind: :number_field, label_text: "Interval for send graduated notifications, in days")) do |group| %>
@@ -60,7 +60,7 @@
     <% end %>
 
     <% if @organization.enabled?("organization_stolen_message") %>
-      <div class="mt-4">
+      <div class="tw:mt-6">
         <%= render(UI::Forms::Group::Component.new(attribute: :organization_stolen_message_kind, label_text: "Stolen Message type")) do |group| %>
           <% group.with_helper_text do %>
             <span class="text-success">Organization Stolen Message setting</span>,

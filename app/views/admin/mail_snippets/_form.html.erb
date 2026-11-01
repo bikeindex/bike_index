@@ -10,15 +10,15 @@
 <% end %>
 
 <%= render(UI::Alerts::Base::Component.new(kind: :notice, header: "NOTE: Organization Message snippets are actually the entire email.")) do %>
-  <p class="mb-0">
+  <p class="tw:mb-0">
     Organization Messages are editable through the organization's page and
     should probably be edited there (rather than here). Those kinds:
-    <small class="d-block mt-2"><%= safe_join(MailSnippet.organization_message_kinds.map { |kind| content_tag(:code, MailSnippet.kind_humanized(kind)) }, ", ") %></small>
+    <small class="d-block tw:mt-2"><%= safe_join(MailSnippet.organization_message_kinds.map { |kind| content_tag(:code, MailSnippet.kind_humanized(kind)) }, ", ") %></small>
   </p>
 <% end %>
 
 <% if @mail_snippet.organization.present? %>
-  <ul class="mb-3 tw:list-inside tw:list-disc tw:px-2">
+  <ul class="tw:mb-4 tw:list-inside tw:list-disc tw:px-2">
     <li>
       View
       <%= link_to "#{@mail_snippet.organization.short_name}'s email interface", organization_emails_path(organization_id: @mail_snippet.organization_id) %>

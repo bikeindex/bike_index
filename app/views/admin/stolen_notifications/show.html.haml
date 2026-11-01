@@ -1,9 +1,8 @@
-.row
-  .col-lg-11.col-sm-12
-    %h1
-      Stolen Notification
-  .col-lg-1.col-sm-12
-    = link_to "Resend", resend_admin_stolen_notification_url(@stolen_notification, pretty_please: true), class: 'btn btn-success mt-4 mb-4'
+%div{class: "tw:grid tw:gap-x-8 tw:lg:grid-cols-12"}
+  %h1{class: "tw:lg:col-span-11"}
+    Stolen Notification
+  %div{class: "tw:lg:col-span-1"}
+    = link_to "Resend", resend_admin_stolen_notification_url(@stolen_notification, pretty_please: true), class: 'btn btn-success tw:my-6'
 %h4
   Created
   %a.localizeTime.preciseTime{ href: admin_stolen_notification_url(@stolen_notification) }
@@ -22,7 +21,7 @@
     times
   - list.with_row(label: "Times:") do
     - if @stolen_notification.send_dates_parsed.any?
-      %ul.pl-0
+      %ul{class: "tw:pl-0"}
         - @stolen_notification.send_dates_parsed.each do |stamp|
           %li.list-unstyled
             = link_to render(UI::Time::Component.new(time: Time.at(stamp), format: :localize_time_precise)), admin_stolen_notification_url(stamp)
@@ -36,7 +35,7 @@
   - list.with_row(label: "Sender sent count", value: @stolen_notification.sender.sent_stolen_notifications.count)
 
 
-.card.bg-light.mb-4.mt-4
+.card.bg-light{class: "tw:mt-6 tw:mb-6!"}
   .card-header
     Notification Message
   .card-body

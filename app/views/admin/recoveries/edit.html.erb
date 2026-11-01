@@ -2,27 +2,27 @@
 
 <%= render(Pages::Admin::Headers::Section::Component.new(title: "Manage Recovery Display")) %>
 
-<div class="row text-center">
+<div class="text-center tw:grid tw:grid-cols-12 tw:gap-x-8">
   <% if @recovery.waiting_on_decision? %>
-    <div class="col-md-4">
+    <div class="tw:col-span-12 tw:md:col-span-4">
       <h4>Choose what to do with this recovery:</h4>
     </div>
-    <div class="col-6 col-md-4">
+    <div class="tw:col-span-6 tw:md:col-span-4">
       <%= link_to "Display recovery", new_admin_recovery_display_path(stolen_record_id: @recovery.id), class: "btn btn-lg btn-primary d-block" %>
     </div>
-    <div class="col-6 col-md-4">
+    <div class="tw:col-span-6 tw:md:col-span-4">
       <%= render(UI::ButtonLink::Component.new(text: "Mark Not Displayable", href: admin_recovery_path(id: @recovery.id, stolen_record: {is_not_displayable: true}),
         method: :put, color: :yellow, size: :lg, html_class: "tw:w-full")) %>
     </div>
   <% elsif @recovery.recovery_displayed? %>
-    <div class="col-6">
+    <div class="tw:col-span-6">
       <p>This recovery is displayed.</p>
     </div>
-    <div class="col-6">
+    <div class="tw:col-span-6">
       <%= link_to "Edit Recovery Display", edit_admin_recovery_display_url(@recovery.recovery_display), class: "btn btn-lg btn-primary" %>
     </div>
   <% elsif @recovery.not_displayed? %>
-    <div class="col-12">
+    <div class="tw:col-span-12">
       <p>This recovery is not displayed.</p>
 
       <%= render(UI::ButtonLink::Component.new(text: "Mark Eligible for display", href: admin_recovery_path(id: @recovery.id, stolen_record: {mark_as_eligible: true}),
@@ -30,24 +30,24 @@
     </div>
   <% else %>
     <% if !@recovery.recovered? %>
-      <div class="col-12">
+      <div class="tw:col-span-12">
         <h1 class="text-danger d-block">
           This <%= @bike.type %> has not been marked recovered
         </h1>
       </div>
-      <div class="col-12 mb-4">
+      <div class="tw:col-span-12 tw:mb-6">
         <p class="text-warning">
           You're viewing this in error, you shouldn't be on this page
         </p>
       </div>
     <% end %>
-    <div class="col-12">
+    <div class="tw:col-span-12">
       <h4>
         Display Status:
         <em><%= @recovery.recovery_display_status.humanize %></em>
       </h4>
 
-      <p class="mt-4">
+      <p class="tw:mt-6">
         Really want to display this recovery?
         <%= link_to "Display recovery here", new_admin_recovery_display_path(stolen_record_id: @recovery.id) %>
       </p>
@@ -75,18 +75,16 @@
   </summary>
 
   <div data-ui--details-target="content" class="tw:hidden!">
-    <hr class="mt-5 mb-4">
+    <hr class="tw:mt-12! tw:mb-6!">
 
     <%= form_for([:admin, @recovery], url: { action: "update", controller: "recoveries" }) do |f| %>
       <%= render(UI::Alerts::ObjectError::Component.new(name: "Recovery", object: @recovery)) %>
 
-      <div class="row mt-4">
-        <div class="col-md-6">
-          <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :recovered_description, kind: :text_area,
-            label_text: "Recovery description", html_options: {rows: 4})) %>
-        </div>
+      <div class="twwiderow tw:mt-6">
+        <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :recovered_description, kind: :text_area,
+          label_text: "Recovery description", html_options: {rows: 4})) %>
 
-        <div class="col-md-6">
+        <div>
           <div class="tw:mb-4">
             <%= render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :index_helped_recovery, label: "Index helped recovery")) %>
             <%= render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :can_share_recovery, label: "Can share recovery")) %>

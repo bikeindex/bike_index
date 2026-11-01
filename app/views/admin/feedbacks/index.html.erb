@@ -51,36 +51,34 @@
 
 <% table_view = capture do %>
   <% if @render_kind_counts %>
-    <div class="row mt-4 mb-4">
-      <div class="col-md-6 offset-md-3">
-        <div class="card">
-          <div class="card-body">
-            <h3>Kinds</h3>
+    <%= render(UI::Container::Component.new) do %>
+      <div class="card tw:my-6">
+        <div class="card-body">
+          <h3>Kinds</h3>
 
-            <% nil_count = available_feedbacks.where(kind: nil).count %>
+          <% nil_count = available_feedbacks.where(kind: nil).count %>
 
-            <%= render(UI::TableList::Component.new(wide_definition: true)) do |list| %>
-              <% Feedback.kinds.each_with_index do |kind, index| %>
-                <% count = available_feedbacks.where(kind: kind).count %>
-                <% next unless count > 0 %>
+          <%= render(UI::TableList::Component.new(wide_definition: true)) do |list| %>
+            <% Feedback.kinds.each_with_index do |kind, index| %>
+              <% count = available_feedbacks.where(kind: kind).count %>
+              <% next unless count > 0 %>
 
-                <% label = capture do %>
-                  <div
-                    style="width: 1em; height: 1em; background: <%= colors[index] %>; float: right; margin-left: 0.4rem;"
-                  ></div>
+              <% label = capture do %>
+                <div
+                  style="width: 1em; height: 1em; background: <%= colors[index] %>; float: right; margin-left: 0.4rem;"
+                ></div>
 
-                  <%= link_to Feedback.kind_humanized(kind), url_for(sortable_search_params.merge(search_kind: kind)) %>
-                <% end %>
-
-                <% list.with_row(label:, value: number_display(count)) %>
+                <%= link_to Feedback.kind_humanized(kind), url_for(sortable_search_params.merge(search_kind: kind)) %>
               <% end %>
 
-              <% list.with_row(label: "Nil", value: number_display(nil_count), if: nil_count > 0) %>
+              <% list.with_row(label:, value: number_display(count)) %>
             <% end %>
-          </div>
+
+            <% list.with_row(label: "Nil", value: number_display(nil_count), if: nil_count > 0) %>
+          <% end %>
         </div>
       </div>
-    </div>
+    <% end %>
   <% end %>
 
   <%= render partial: "/admin/feedbacks/table", locals: {feedbacks: @feedbacks, render_sortable: true} %>

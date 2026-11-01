@@ -1,5 +1,5 @@
-<div class="row mt-4 mb-4">
-  <div class="col-md-10 col-lg-8 ml-auto mr-auto">
+<div class="tw:my-6">
+  <%= render(UI::Container::Component.new) do %>
     <h4>Recovery display approval process</h4>
 
     <ol class="tw:list-decimal">
@@ -31,11 +31,11 @@
         </ul>
       </li>
     </ol>
-  </div>
+  <% end %>
 </div>
 
 <% if @bike&.manufacturer.present? %>
-  <p class="mt-4">
+  <p class="tw:mt-6">
     <%= @bike.type_titleize %> manufacturer
     <%= link_to @bike.mnfg_name, admin_manufacturer_path(@bike.manufacturer), target: "_blank" %>
     - Twitter:
@@ -50,7 +50,7 @@
   </p>
 <% end %>
 
-<hr class="mb-4">
+<hr class="tw:mb-6!">
 
 <%# Toggle image initially if the recovery display hasn't been created, and there is an image to toggle %>
 <% toggle_image_initially = @recovery_display.id.blank? && (@bike&.public_images&.present? || @bike&.stock_photo_url&.present?) %>
@@ -67,41 +67,30 @@
     <%= f.hidden_field :stolen_record_id, value: @recovery_display.stolen_record_id %>
   <% end %>
 
-  <div class="row">
-    <div class="col-lg-4 col-md-6">
-      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :quote_by, label_text: "Quote By")) do |group| %>
-        <% group.with_label_note do %>
-          (full name: <em><%= @recovery_display.calculated_owner_name %></em>)
-        <% end %>
+  <div class="twfieldrow">
+    <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :quote_by, label_text: "Quote By")) do |group| %>
+      <% group.with_label_note do %>
+        (full name: <em><%= @recovery_display.calculated_owner_name %></em>)
       <% end %>
-    </div>
+    <% end %>
 
-    <div class="col-lg-4 col-md-6">
-      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :location_string, label_text: "Location")) %>
-    </div>
+    <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :location_string, label_text: "Location")) %>
 
-    <div class="col-lg-4 col-md-6">
-      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :link)) %>
-    </div>
+    <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :link)) %>
 
-    <div class="col-lg-4 col-md-6">
-      <% recovered_at = Binxtils::TimeParser.round(f.object.recovered_at || Time.current) %>
+    <% recovered_at = Binxtils::TimeParser.round(f.object.recovered_at || Time.current) %>
 
-      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :recovered_at, kind: :datetime_local_field, required: true,
-        html_options: {value: recovered_at, max: Binxtils::TimeParser.round(Time.current + 1.day), class: "dateInputUpdateZone", "data-initialtime" => l(recovered_at, format: :convert_time)})) %>
-    </div>
+    <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :recovered_at, kind: :datetime_local_field, required: true,
+      html_options: {value: recovered_at, max: Binxtils::TimeParser.round(Time.current + 1.day), class: "dateInputUpdateZone", "data-initialtime" => l(recovered_at, format: :convert_time)})) %>
 
     <% if @bike.present? %>
-      <div class="col-lg-4 col-md-6">
-        <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :bike_url,
-          html_options: {value: bike_url(@recovery_display.bike), autocomplete: "off", disabled: true, class: "twless-strong"})) %>
-      </div>
+      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :bike_url,
+        html_options: {value: bike_url(@recovery_display.bike), autocomplete: "off", disabled: true, class: "twless-strong"})) %>
     <% end %>
   </div>
 
-  <div class="row">
+  <div class="twwiderow">
     <div
-      class="col-lg-6"
       data-controller="admin--character-count"
       data-admin--character-count-max-value="<%= RecoveryDisplay::QUOTE_MAX_LENGTH %>"
     >
@@ -115,10 +104,10 @@
       ></p>
     </div>
 
-    <div class="col-lg-6">
+    <div>
       <div
         data-admin--recovery-display-form-target="notUsingBikeImage"
-        class="mt-4"
+        class="tw:mt-6"
       >
         <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :photo, label_text: "Recovery photo")) do %>
           <%= render(UI::Forms::Files::Upload::Component.new(form_builder: f, attribute: :photo, accept: ImageUploader.permitted_extensions)) %>
@@ -126,7 +115,7 @@
       </div>
 
       <% if @bike.present? && !@recovery_display.photo_processed? %>
-        <div class="mt-3">
+        <div class="tw:mt-4">
           <% if @bike.public_images.present? || @bike.stock_photo_url.present? %>
             <% if @recovery_display.image_processing? %>
               <span class="text-warning">
@@ -180,7 +169,7 @@
     </div>
   </div>
 
-  <div class="mt-4 mb-4 tw:flex tw:justify-end">
+  <div class="tw:my-6 tw:flex tw:justify-end">
     <%= render(UI::Button::Component.new(text: "Save", color: :primary, type: "submit")) %>
   </div>
 <% end %>

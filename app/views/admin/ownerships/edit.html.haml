@@ -7,42 +7,39 @@
 %p{class: "text-danger tw:font-bold"}
   BE CAREFUL. YOU CAN BREAK STUFF HERE
 
-.row
-  .col-md-6
-    = form_for [:admin, @ownership] do |f|
-      = render(UI::Alerts::ObjectError::Component.new(object: @ownership))
+.twwiderow{class: "tw:items-start"}
+  = form_for [:admin, @ownership] do |f|
+    = render(UI::Alerts::ObjectError::Component.new(object: @ownership))
 
-      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :creator_email, label_text: "Creator", required: true)) do
-        = render(UI::Forms::Email::Component.new(form_builder: f, attribute: :creator_email, required: true, html_options: {value: @ownership.creator&.email}))
+    = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :creator_email, label_text: "Creator", required: true)) do
+      = render(UI::Forms::Email::Component.new(form_builder: f, attribute: :creator_email, required: true, html_options: {value: @ownership.creator&.email}))
 
-      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :user_email, required: true)) do
-        = render(UI::Forms::Email::Component.new(form_builder: f, attribute: :user_email, required: true, html_options: {value: @ownership.user&.email}))
+    = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :user_email, required: true)) do
+      = render(UI::Forms::Email::Component.new(form_builder: f, attribute: :user_email, required: true, html_options: {value: @ownership.user&.email}))
 
-      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :owner_email, required: true))
+    = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :owner_email, required: true))
 
-      %div{class: "tw:mb-4 tw:flex tw:flex-wrap tw:gap-x-6"}
-        - %i[current user_hidden claimed].each do |attribute|
-          = render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute:, label: attribute.to_s.humanize))
+    %div{class: "tw:mb-4 tw:flex tw:flex-wrap tw:gap-x-6"}
+      - %i[current user_hidden claimed].each do |attribute|
+        = render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute:, label: attribute.to_s.humanize))
 
-      %div{class: "tw:mt-4"}
-        = render(UI::Button::Component.new(text: "Update the ownership", color: :primary, type: "submit"))
-  .col-md-6
-    = render(UI::TableList::Component.new) do |list|
-      - list.with_row(label: "Created At", value: render(UI::Time::Component.new(time: @bike.created_at)))
-      - list.with_row(label: "Owner Email", value: @bike.owner_email)
-      - list.with_row(label: "Current Owner", value: @bike.owner.email)
-      - list.with_row(label: "Send Email", value: (check_mark if @ownership.send_email))
-      - list.with_row(label: "Cached Data", value: @bike.cached_data)
-      - list.with_row(label: "Token") do
-        - if @ownership.token.present?
-          %code
-            = link_to @ownership.token, bike_path(@bike.to_param, t: @ownership.token)
-      - list.with_row(label: "Claim message", value: @ownership.claim_message&.humanize)
-      - list.with_row(label: "Pre-registration?", value: (check_mark if @ownership.organization_pre_registration))
-      - list.with_row(label: "Origin", value: render(Atoms::Org::OriginDisplay::Component.new(creation_kind: @ownership.origin)))
+    %div{class: "tw:mt-4"}
+      = render(UI::Button::Component.new(text: "Update the ownership", color: :primary, type: "submit"))
+  = render(UI::TableList::Component.new) do |list|
+    - list.with_row(label: "Created At", value: render(UI::Time::Component.new(time: @bike.created_at)))
+    - list.with_row(label: "Owner Email", value: @bike.owner_email)
+    - list.with_row(label: "Current Owner", value: @bike.owner.email)
+    - list.with_row(label: "Send Email", value: (check_mark if @ownership.send_email))
+    - list.with_row(label: "Cached Data", value: @bike.cached_data)
+    - list.with_row(label: "Token") do
+      - if @ownership.token.present?
+        %code
+          = link_to @ownership.token, bike_path(@bike.to_param, t: @ownership.token)
+    - list.with_row(label: "Claim message", value: @ownership.claim_message&.humanize)
+    - list.with_row(label: "Pre-registration?", value: (check_mark if @ownership.organization_pre_registration))
+    - list.with_row(label: "Origin", value: render(Atoms::Org::OriginDisplay::Component.new(creation_kind: @ownership.origin)))
 
 - if display_dev_info?
-  .row.mt-5
-    .col-md-6
-      %h5.only-dev-visible Registration info
-      = render UI::JsonDisplay::Component.new(data: @ownership.registration_info, skip_blank: true, no_max_height: true)
+  = render(UI::Container::Component.new(alignment: :left)) do
+    %h5.only-dev-visible{class: "tw:mt-12"} Registration info
+    = render UI::JsonDisplay::Component.new(data: @ownership.registration_info, skip_blank: true, no_max_height: true)

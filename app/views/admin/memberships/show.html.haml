@@ -8,48 +8,46 @@
   - if @membership.stripe_managed?
     = render(UI::ButtonLink::Component.new(text: "Update from Stripe", href: admin_membership_path(id: @membership.id, update_from_stripe: true), method: :patch, color: :primary, size: :sm, form: {class: "float-right"}))
 
-.row.mt-4
-  .col-md-6
-    = render(UI::TableList::Component.new) do |list|
-      - list.with_row(label: "User", value: render(Atoms::Admin::TableCells::User::Component.new(user: @membership.user, user_id: @membership.user_id)))
-      - list.with_row(label: "Created", class: "small", value: render(UI::Time::Component.new(time: @membership.created_at, format: :localize_time_precise)))
-      - list.with_row(label: "Updated", class: "small", value: render(UI::Time::Component.new(time: @membership.updated_at, format: :localize_time_precise)))
-      - list.with_row(label: "level", value: @membership.level_humanized)
-      - list.with_row(label: "Referral source") do
-        - if @membership.referral_source.present?
-          %code.small= @membership.referral_source
-          - if display_dev_info?
-            -# There shouldn't be multiple different sources! Show them if there are.
-            - referral_sources = (@membership.stripe_subscriptions.distinct.pluck(:referral_source) + @membership.payments.distinct.pluck(:referral_source)).compact.uniq
-            - if referral_sources.count > 1
-              %span.only-dev-visible multiple different sources!
-              %small= referral_sources.join(",")
+.twwiderow{class: "tw:mt-6 tw:items-start"}
+  = render(UI::TableList::Component.new) do |list|
+    - list.with_row(label: "User", value: render(Atoms::Admin::TableCells::User::Component.new(user: @membership.user, user_id: @membership.user_id)))
+    - list.with_row(label: "Created", class: "small", value: render(UI::Time::Component.new(time: @membership.created_at, format: :localize_time_precise)))
+    - list.with_row(label: "Updated", class: "small", value: render(UI::Time::Component.new(time: @membership.updated_at, format: :localize_time_precise)))
+    - list.with_row(label: "level", value: @membership.level_humanized)
+    - list.with_row(label: "Referral source") do
+      - if @membership.referral_source.present?
+        %code.small= @membership.referral_source
+        - if display_dev_info?
+          -# There shouldn't be multiple different sources! Show them if there are.
+          - referral_sources = (@membership.stripe_subscriptions.distinct.pluck(:referral_source) + @membership.payments.distinct.pluck(:referral_source)).compact.uniq
+          - if referral_sources.count > 1
+            %span.only-dev-visible multiple different sources!
+            %small= referral_sources.join(",")
 
-  .col-md-6
-    = render(UI::TableList::Component.new) do |list|
-      - list.with_row(label: "Status", value: @membership.status_humanized)
-      - list.with_row(label: "Start", value: render(UI::Time::Component.new(time: @membership.start_at, format: :localize_time_precise)))
-      - list.with_row(label: "End", value: render(UI::Time::Component.new(time: @membership.end_at, format: :localize_time_precise)))
-      - if @membership.admin_managed?
-        - list.with_row(label: "Creator") do
-          - if @membership.creator_id.present?
-            %em Admin:
-            = render Atoms::Admin::TableCells::User::Component.new(user: @membership.creator, user_id: @membership.creator_id)
-      - else
-        - list.with_row(label: "Stripe") do
-          - if @membership.stripe_id.present?
-            = link_to @membership.stripe_id.truncate(20), @membership.stripe_admin_url, title: @membership.stripe_id
-          - else
-            %span.text-danger MISSING STRIPE ID!
-            %small.twless-strong This is a problem, tell Seth!
+  = render(UI::TableList::Component.new) do |list|
+    - list.with_row(label: "Status", value: @membership.status_humanized)
+    - list.with_row(label: "Start", value: render(UI::Time::Component.new(time: @membership.start_at, format: :localize_time_precise)))
+    - list.with_row(label: "End", value: render(UI::Time::Component.new(time: @membership.end_at, format: :localize_time_precise)))
+    - if @membership.admin_managed?
+      - list.with_row(label: "Creator") do
+        - if @membership.creator_id.present?
+          %em Admin:
+          = render Atoms::Admin::TableCells::User::Component.new(user: @membership.creator, user_id: @membership.creator_id)
+    - else
+      - list.with_row(label: "Stripe") do
+        - if @membership.stripe_id.present?
+          = link_to @membership.stripe_id.truncate(20), @membership.stripe_admin_url, title: @membership.stripe_id
+        - else
+          %span.text-danger MISSING STRIPE ID!
+          %small.twless-strong This is a problem, tell Seth!
 
 - if @membership.admin_managed? && @membership.active?
-  .row.mt-5
-    .col-md-4
+  %div{class: "tw:mt-12"}
+    = render(UI::Container::Component.new(alignment: :left)) do
       = render partial: "form"
 
-.container
-  %h4.pt-4.pb-2
+= render(UI::Container::Component.new(width: :wide)) do
+  %h4{class: "tw:pt-6 tw:pb-2"}
     Payments
     %small
       = link_to number_display(@payments.count), admin_payments_path(user_id: @membership.user_id, period: "all")
@@ -60,7 +58,7 @@
 
 
 - if display_dev_info?
-  .container
-    %h4.pt-4.pb-2
+  = render(UI::Container::Component.new(width: :wide)) do
+    %h4{class: "tw:pt-6 tw:pb-2"}
       %span.only-dev-visible Stripe Subscriptions
   = render(partial: "/admin/stripe_subscriptions/table", locals: {collection: @stripe_subscriptions, render_sortable: false})

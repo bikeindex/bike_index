@@ -3,13 +3,13 @@
 %p
   Compare cloudflare headers vs geocoder results
 
-.row
-  .col-md-6
+.twwiderow
+  %div
     %h4 Cloudflare
     = render UI::JsonDisplay::Component.new(data: @cloudflare_hash)
-  .col-md-6
+  %div
     %h4 Geocoder
     = render UI::JsonDisplay::Component.new(data: @geocoder_hash)
-  .col-md-6
+  %div
     %h4 Raw Headers
     = render UI::JsonDisplay::Component.new(data: @headers)

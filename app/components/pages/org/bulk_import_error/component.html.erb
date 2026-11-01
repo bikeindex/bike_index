@@ -5,7 +5,7 @@
     <%# use non-standard height so that it doesn't clip at a line break %>
     <div class="tw:max-h-[402px] tw:overflow-y-auto">
       <% if @bulk_import.ascend_unprocessable? %>
-        <p class="mt-2">
+        <p class="tw:mt-2">
           <%= translation(".ascend_unprocessable_html", ascend_name: @bulk_import.ascend_name) %>
         </p>
         <% if @in_admin %>
@@ -72,7 +72,7 @@
       <%= render UI::JsonDisplay::Component.new(data: other_errors) %>
 
       <% if @display_dev_info %>
-        <code class="small d-block only-dev-visible p-1">
+        <code class="small d-block only-dev-visible tw:p-1">
           <%= @bulk_import.import_errors %>
         </code>
       <% end %>

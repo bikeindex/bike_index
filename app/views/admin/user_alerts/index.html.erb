@@ -44,8 +44,8 @@
 
 <% table_view = capture do %>
   <% if @render_kind_counts %>
-    <div class="row mt-4 mb-4">
-      <div class="col-md-6 offset-md-3">
+    <div class="tw:my-6">
+      <%= render(UI::Container::Component.new) do %>
         <div class="card">
           <div class="card-body">
             <h3>Kinds</h3>
@@ -72,7 +72,7 @@
             <% end %>
           </div>
         </div>
-      </div>
+      <% end %>
     </div>
   <% end %>
 

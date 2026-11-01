@@ -1,9 +1,8 @@
 %h1 New Snippet
 
-.row
-  .col-md-6
-    = form_for [:admin, @mail_snippet] do |f|
-      = render partial: 'form', locals: { f: f }
+= render(UI::Container::Component.new(alignment: :left)) do
+  = form_for [:admin, @mail_snippet] do |f|
+    = render partial: 'form', locals: { f: f }
 
-      %div{class: "tw:flex tw:justify-end"}
-        = render(UI::Button::Component.new(text: "Create", color: :primary, type: "submit"))
+    %div{class: "tw:flex tw:justify-end"}
+      = render(UI::Button::Component.new(text: "Create", color: :primary, type: "submit"))
