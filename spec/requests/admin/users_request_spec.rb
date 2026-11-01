@@ -78,6 +78,7 @@ RSpec.describe Admin::UsersController, type: :request do
           expect(response.code).to eq("200"), "#{tab} rendered #{response.code}"
         end
         get "#{base_url}/#{user_subject.id}?active_tab=emails"
+        expect(Nokogiri::HTML(response.body).at_css("h4").text.squish).to eq "Emails"
         expect(response.body).to include(user_email.email)
         get "#{base_url}/#{user_subject.id}?active_tab=messages"
         sections = Nokogiri::HTML(response.body).css("h3").map { |heading| heading.text.squish }
