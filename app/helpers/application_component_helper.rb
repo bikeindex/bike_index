@@ -45,7 +45,7 @@ module ApplicationComponentHelper
   end
 
   def link_emoji
-    image_tag("link.svg", class: "tw:inline-block tw:w-4 tw:h-auto")
+    image_tag("link.svg", class: "tw:inline-block tw:w-4")
   end
 
   private

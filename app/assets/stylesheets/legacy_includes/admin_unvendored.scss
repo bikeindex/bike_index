@@ -9679,12 +9679,6 @@ table thead.sortable th a.sortable-link.active {
   text-decoration: underline
 }
 
-table .table-checkbox-select {
-  font-family: Courier;
-  text-align: center;
-  font-weight: 700
-}
-
 table code {
   word-break: break-all
 }
@@ -10074,35 +10068,6 @@ table .photo-cell img {
 
 #recovery-bike-image-text.bike-image-added .not-using-bike-image {
   display: none
-}
-
-.pagination-flex {
-  display: flex;
-  flex-wrap: wrap;
-  opacity: .65
-}
-
-.pagination-flex.pagination-sm a.page-link {
-  padding: .25rem .5rem;
-  font-size: .875rem
-}
-
-.pagination-flex .per-page {
-  display: flex;
-  flex-basis: 0;
-  flex-grow: 1;
-  margin-top: .5rem
-}
-
-.pagination-flex .per-page {
-  min-width: 9rem;
-  max-width: 9rem
-}
-
-.pagination-flex #per-page-select-skiptotal,
-.pagination-flex .per-page-select {
-  width: 8rem;
-  display: inline-block
 }
 
 /* The rest of .only-dev-visible is in bike_index_components.css. This one stays: the file is
