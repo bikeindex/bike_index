@@ -112,6 +112,15 @@ RSpec.describe "BikeBook", :js, type: :system do
     # its basics first, beside its photo
     expect(page).to have_css("[aria-label='Overview'] thead th", text: "Level 4 REC Step-Through")
     expect(page).to have_css("nav[aria-label='Views'] a[aria-current='page']", exact_text: "Overview")
+    # the search's list opening over its ×
+    vehicle_field.click
+    expect(page).to have_css(vehicle_option, minimum: 1)
+    under_list = page.evaluate_script(<<~JS)
+      (({ left, top, width, height }) => document.elementFromPoint(left + width / 2, top + height / 2).closest("[role='listbox']") !== null)(
+        document.querySelector("#vehicle-viewers [aria-label^='Remove']").getBoundingClientRect())
+    JS
+    expect(under_list).to be true
+    vehicle_field.send_keys(:escape)
     # its ID a copy away, beside its name, which its tooltip shows
     copy_id = find("[aria-label='Overview'] thead button[aria-label='Copy ID (m/aventon/2026/level_4_rec_step_through)']")
     copy_id.hover
