@@ -79,7 +79,7 @@
             <% group.with_helper_text do %>
               <span class="text-success">Organization Stolen Message setting</span>
               - only available for area type
-              <span class="less-strong">max <%= stolen_message_radius[:max] %></span>
+              <span class="twless-strong">max <%= stolen_message_radius[:max] %></span>
             <% end %>
 
             <%= number_field_tag stolen_message_radius[:attribute], stolen_message_radius[:value], class: "twinput", "aria-describedby" => group.helper_text_id %>

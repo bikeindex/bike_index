@@ -20,10 +20,10 @@
           matching <%= "batch".pluralize(@bike_sticker_batches.count) %>
         <% elsif @all_batches %>
           batches
-          <small class="less-strong">- show <%= link_to "only most recent", url_for(sortable_search_params.merge(search_all_batches: false)) %></small>
+          <small class="twless-strong">- show <%= link_to "only most recent", url_for(sortable_search_params.merge(search_all_batches: false)) %></small>
         <% else %>
           most recent batches
-          <small class="less-strong">- <%= number_display(BikeStickerBatch.count) %> <%= link_to "total batches", url_for(sortable_search_params.merge(search_all_batches: true)), class: "less-strong" %></small>
+          <small class="twless-strong">- <%= number_display(BikeStickerBatch.count) %> <%= link_to "total batches", url_for(sortable_search_params.merge(search_all_batches: true)), class: "twless-strong" %></small>
         <% end %>
       </h5>
     <% end %>
@@ -36,7 +36,7 @@
       <div class="mt-4 mb-4">
         <h4>
           Showing Problem stickers
-          <small><%= link_to "hide", url_for(sortable_search_params.merge(search_show_problems: false)), class: "less-strong" %></small>
+          <small><%= link_to "hide", url_for(sortable_search_params.merge(search_show_problems: false)), class: "twless-strong" %></small>
         </h4>
 
         <% duplicated = @bike_sticker_batch.duplicated_integers %>
@@ -49,7 +49,7 @@
             <% end %>
           </ul>
         <% else %>
-          <em class="less-strong">None</em>
+          <em class="twless-strong">None</em>
         <% end %>
 
         <span class="d-block strong">Non-sequential stickers:</span>
@@ -61,7 +61,7 @@
             <% end %>
           </ul>
         <% else %>
-          <em class="less-strong">none</em>
+          <em class="twless-strong">none</em>
         <% end %>
       </div>
       <hr>
@@ -69,7 +69,7 @@
       <div class="text-center pt-4">
         <%= link_to "Show problem stickers for Batch ##{@bike_sticker_batch.id}", url_for(sortable_search_params.merge(search_show_problems: true)), class: "btn btn-outline-warning btn-sm" %>
 
-        <em class="ml-2 less-strong">
+        <em class="ml-2 twless-strong">
           (duplicates and non-sequential stickers)
         </em>
       </div>
@@ -82,7 +82,7 @@
         <%= number_display(matching_bike_stickers.size) %> matching
         <%= "sticker".pluralize(matching_bike_stickers.size) %>
         <% unless @search_claimed %>
-          <span class="less-strong">
+          <span class="twless-strong">
             <%= number_with_delimiter(matching_bike_stickers.claimed.count) %>
             claimed
           </span>

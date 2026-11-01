@@ -95,7 +95,7 @@
 
     <% table.column(sortable: "pos_kind", label: "POS kind") do |organization_status| %>
       <% status_class = organization_status.pos_kind.match?(/broken/) ? "text-danger" : "" %>
-      <% status_class = "less-strong" if organization_status.pos_kind == "no_pos" %>
+      <% status_class = "twless-strong" if organization_status.pos_kind == "no_pos" %>
 
       <span class="<%= status_class %>">
         <%= organization_status.pos_kind&.humanize %>

@@ -77,7 +77,7 @@
     <%= hidden_field_tag :search_displayed, params[:search_displayed] %>
     <%= render partial: "/shared/hidden_search_fields" %>
 
-    <em class="small less-strong d-md-inline d-none">within</em>
+    <em class="small twless-strong d-md-inline d-none">within</em>
 
     <%= render(UI::Forms::Input::Component.new(form_builder: form, attribute: :search_distance, kind: :number_field,
       html_options: {value: @distance, class: "tw:w-20"})) %>

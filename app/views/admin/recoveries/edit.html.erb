@@ -1,10 +1,6 @@
 <%= render Pages::Admin::Bikes::Header::Component.new(bike: @bike, active: :recoveries, stolen_record: @recovery, display_recovery: true, user: current_user, display_dev_info: display_dev_info?) %>
 
-<div class="admin-subnav midpage-subnav">
-  <div class="col-12">
-    <h2>Manage Recovery Display</h2>
-  </div>
-</div>
+<%= render(Pages::Admin::Headers::Section::Component.new(title: "Manage Recovery Display")) %>
 
 <div class="row text-center">
   <% if @recovery.waiting_on_decision? %>
@@ -73,10 +69,7 @@
 <details data-controller="ui--details">
   <summary
     data-action="click->ui--details#toggle"
-    class="
-      gray-link tw:cursor-pointer tw:list-none
-      tw:[&::-webkit-details-marker]:hidden
-    "
+    class="<%= UI::Button::Component.build_classes(color: :link_gray, size: :md, html_class: "tw:cursor-pointer tw:list-none tw:[&::-webkit-details-marker]:hidden") %>"
   >
     show edit form
   </summary>

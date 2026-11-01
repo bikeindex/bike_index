@@ -1,6 +1,9 @@
 <h3 class="tw:mt-6 tw:mb-3">
   <%= @title %>
-  <small class="twless-strong tw:ml-2"><%= count_display %></small>
+
+  <% unless @count.nil? %>
+    <small class="twless-strong tw:ml-2"><%= count_display %></small>
+  <% end %>
 
   <% if @parenthetical.present? %>
     <small class="twless-strong tw:ml-2"><%= wrapped_parenthetical %></small>

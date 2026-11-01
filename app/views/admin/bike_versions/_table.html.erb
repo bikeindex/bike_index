@@ -27,7 +27,7 @@
 
     <% table.column(sortable: "visibility") do |bike_version| %>
       <% if bike_version.user_hidden? %>
-        <span class="less-strong">hidden</span>
+        <span class="twless-strong">hidden</span>
       <% elsif bike_version.all_visible? %>
         <span class="text-success">visible</span>
       <% else %>

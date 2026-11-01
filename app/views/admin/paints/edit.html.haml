@@ -1,9 +1,7 @@
-.admin-subnav
-  .col-lg-6.col-sm-12
-    %h1
-      Edit paint
+= render(Pages::Admin::Headers::Nav::Component.new(title: "Edit paint"))
 
-  - if @paint.id.present?
+- if @paint.id.present?
+  .row
     .col-md-6.offset-md-3.mt-2
       %table.table-list
         %tbody

@@ -9,7 +9,7 @@
 
       <li>
         Make sure there is a picture!
-        <small class="less-strong"> By default, if the bike has an image, it will use that image. click "upload a different image" if you want to use a different. </small>
+        <small class="twless-strong"> By default, if the bike has an image, it will use that image. click "upload a different image" if you want to use a different. </small>
       </li>
 
       <li>
@@ -17,7 +17,7 @@
         <ul class="tw:ml-4 tw:list-disc">
           <li>
             Make sure the text is under the character count
-            <small class="less-strong"> there's a counter below that updates as you type </small>
+            <small class="twless-strong"> there's a counter below that updates as you type </small>
           </li>
 
           <li>
@@ -40,11 +40,11 @@
     <%= link_to @bike.mnfg_name, admin_manufacturer_path(@bike.manufacturer), target: "_blank" %>
     - Twitter:
     <% if @bike.manufacturer.blank? || @bike.manufacturer.other? %>
-      <em class="less-strong">"other" manufacturer, no twitter</em>
+      <em class="twless-strong">"other" manufacturer, no twitter</em>
     <% elsif @bike.manufacturer.twitter_name.present? %>
       <strong>@<%= @bike.manufacturer.twitter_name %></strong>
     <% else %>
-      <em class="small less-strong">Not stored</em>
+      <em class="small twless-strong">Not stored</em>
       <%= link_to "Add one", edit_admin_manufacturer_path(@bike.manufacturer), target: "_blank" %>
     <% end %>
   </p>
@@ -94,7 +94,7 @@
     <% if @bike.present? %>
       <div class="col-lg-4 col-md-6">
         <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :bike_url,
-          html_options: {value: bike_url(@recovery_display.bike), autocomplete: "off", disabled: true, class: "less-strong"})) %>
+          html_options: {value: bike_url(@recovery_display.bike), autocomplete: "off", disabled: true, class: "twless-strong"})) %>
       </div>
     <% end %>
   </div>

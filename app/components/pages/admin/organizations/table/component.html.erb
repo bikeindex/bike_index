@@ -16,7 +16,7 @@
     <% if parent_names.any? %>
       <div class="tw:mt-1 tw:text-sm">
         <em class="twless-strong"><%= "region parent".pluralize(parent_names.count) %>:</em>
-        <%= safe_join(parent_names.map { |name| link_to(name, admin_organization_url(name), class: "gray-link") }, ", ") %>
+        <%= safe_join(parent_names.map { |name| render(UI::ButtonLink::Component.new(href: admin_organization_url(name), text: name, color: :link_gray)) }, ", ") %>
       </div>
     <% end %>
 

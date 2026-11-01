@@ -13,7 +13,7 @@
         = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :feature_slugs_string, kind: :text_area, label_text: "Organization Feature Slugs")) do |group|
           - group.with_label_note { "comma delineated" }
       .col-md-6{ style: "background: #fff;" }
-        %small.less-strong.p-1
+        %small.twless-strong.p-1
           Permitted slugs:
           = safe_join(OrganizationFeature::EXPECTED_SLUGS.sort.map { |slug| content_tag(:code, slug) }, ", ")
   .row.mt-2
