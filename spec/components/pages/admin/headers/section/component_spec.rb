@@ -20,6 +20,15 @@ RSpec.describe Pages::Admin::Headers::Section::Component, type: :component do
     end
   end
 
+  context "without a count" do
+    let(:options) { {title: "Edit Promoted Alert"} }
+
+    it "renders the title alone" do
+      expect(component.at_css("h3").text.squish).to eq "Edit Promoted Alert"
+      expect(component.css("small")).to be_empty
+    end
+  end
+
   context "with a parenthetical and block content" do
     let(:component) do
       render_inline(described_class.new(**options, parenthetical: "first 100 shown")) { "- more" }

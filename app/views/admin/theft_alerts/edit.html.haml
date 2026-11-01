@@ -182,7 +182,7 @@
 - if @theft_alert.notifications.any?
   %h3 Notifications
   = render partial: "/admin/notifications/table", locals: {notifications: @theft_alert.notifications.reorder(created_at: :desc), skip_user: true}
-= render(UI::Header::Component.new(text: "Edit Promoted Alert", tag: :h2, html_class: "tw:mt-10"))
+= render(Pages::Admin::Headers::Section::Component.new(title: "Edit Promoted Alert"))
 
 = form_for @theft_alert,
   url: admin_theft_alert_path(@theft_alert),
