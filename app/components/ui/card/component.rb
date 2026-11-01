@@ -5,7 +5,7 @@ module UI
     class Component < ApplicationComponent
       BACKGROUND_CLASSES = "tw:bg-white tw:dark:bg-gray-800"
       BASE_CLASSES = "#{BACKGROUND_CLASSES} tw:border tw:border-gray-200 tw:dark:border-gray-700"
-      # black is a sticker - a thick dark border and a solid offset shadow, in place of the gray border
+      # black is the sticker, which replaces the gray border
       SHADOWS = {
         nil => BASE_CLASSES,
         :small => "#{BASE_CLASSES} tw:shadow-sm",
@@ -20,10 +20,8 @@ module UI
       # full_bleed: meet the page's gutter once the .twwiderow holding it is single-column,
       #   and nothing outside such a row
       def initialize(additional_classes: nil, shadow: nil, divided: false, full_bleed: false)
-        raise ArgumentError, "unknown shadow #{shadow.inspect}, expected one of: #{SHADOWS.keys.inspect}" unless SHADOWS.key?(shadow)
-
+        @shadow_classes = SHADOWS.fetch(shadow) { raise ArgumentError, "unknown shadow #{shadow.inspect}, expected one of: #{SHADOWS.keys.inspect}" }
         @additional_classes = additional_classes
-        @shadow = shadow
         @divided = divided
         @full_bleed = full_bleed
       end
@@ -35,7 +33,7 @@ module UI
       private
 
       def card_classes
-        [SHADOWS[@shadow], @divided ? DIVIDED_CLASSES : UNDIVIDED_CLASSES,
+        [@shadow_classes, @divided ? DIVIDED_CLASSES : UNDIVIDED_CLASSES,
           ("tw:twfullbleed" if @full_bleed), @additional_classes].compact.join(" ")
       end
     end

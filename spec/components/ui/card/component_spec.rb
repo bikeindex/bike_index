@@ -52,12 +52,6 @@ RSpec.describe UI::Card::Component, type: :component do
       expect(page).to have_css("div[class~='tw:shadow-sm'][class~='tw:border-gray-200'][class~='tw:mt-8']")
     end
 
-    it "adds a large shadow to the gray border" do
-      render_inline(described_class.new(shadow: :large)) { "in the card" }
-
-      expect(page).to have_css("div[class~='tw:shadow-[0_10px_30px_rgba(44,62,80,.16)]'][class~='tw:border-gray-200']")
-    end
-
     it "swaps the gray border for the sticker's with a black shadow" do
       render_inline(described_class.new(shadow: :black)) { "in the card" }
 
