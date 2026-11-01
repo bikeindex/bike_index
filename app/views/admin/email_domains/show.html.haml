@@ -38,7 +38,7 @@
             - if @matching_tld.present?
               = link_to @matching_tld.domain, admin_email_domain_path(@matching_tld.id)
             - elsif @email_domain.tld?
-              %small.less-strong this is record is a TLD
+              %small.twless-strong this is record is a TLD
             - else
               = @email_domain.tld
         %tr
@@ -55,7 +55,7 @@
             %span{class: status_class}
               = @email_domain.status_humanized
             - if @email_domain.ignored?
-              %small.less-strong will not match any new users
+              %small.twless-strong will not match any new users
             - if @email_domain&.no_auto_assign_status?
               %small{class: "tw:ml-1 tw:text-sky-400"} no auto status
 
@@ -97,7 +97,7 @@
           %td
             %strong{class: admin_email_domain_spam_color(@email_domain.spam_score)}
               #{@email_domain.spam_score} / 10
-            %small.less-strong above #{EmailDomain::SPAM_SCORE_AUTO_BAN} is auto-bannable (with no blockers)
+            %small.twless-strong above #{EmailDomain::SPAM_SCORE_AUTO_BAN} is auto-bannable (with no blockers)
             %small.d-block
               %span
                 %strong= number_display(- @email_domain.spam_score_our_records)

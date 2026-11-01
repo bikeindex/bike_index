@@ -6,7 +6,7 @@
       %tr
         %td Method
         %td
-          %span.less-strong= payment.payment_method
+          %span.twless-strong= payment.payment_method
       %tr
         %td Amount
         %td
@@ -14,7 +14,7 @@
       %tr
         %td Currency
         %td
-          %span{class: (payment.currency_enum == Currency.default.slug ? "less-strong" : "text-info")}
+          %span{class: (payment.currency_enum == Currency.default.slug ? "twless-strong" : "text-info")}
             = payment.currency_name
       - if payment.stripe_id.present?
         %tr
@@ -30,11 +30,11 @@
             = render partial: "payment_invoice_cell", locals: {payment:}
           - elsif payment.membership_id.present?
             = link_to "Membership", admin_membership_path(payment.membership_id)
-          %small.less-strong
+          %small.twless-strong
             (#{payment.kind_humanized})
 
           - if payment.stripe? && payment.membership_id.present?
-            = link_to "membership's payments", admin_payments_path(search_membership_id: payment.membership_id), class: "small less-strong ml-1"
+            = link_to "membership's payments", admin_payments_path(search_membership_id: payment.membership_id), class: "small twless-strong ml-1"
   .col-md-6
     %table.table-list
       %tr

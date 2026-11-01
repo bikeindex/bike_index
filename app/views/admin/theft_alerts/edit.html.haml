@@ -12,7 +12,7 @@
       Facebook Activation failed
     %small
       this alert has be marked inactive, but it never ran.
-      %span.less-strong This happened either because something is broken with this alert, or because it was one of the original ~90 that Seth updated when he enabled automated fixing of failed activations on 2025-2-23.
+      %span.twless-strong This happened either because something is broken with this alert, or because it was one of the original ~90 that Seth updated when he enabled automated fixing of failed activations on 2025-2-23.
 %h4
   - if @theft_alert.facebook_updateable?
     = render(UI::ButtonLink::Component.new(text: "Update Facebook data", href: admin_theft_alert_path(@theft_alert.id, update_theft_alert: true), method: :patch, size: :sm))
@@ -20,9 +20,9 @@
     %em
       %span.text-warning Can't update Facebook:
     - if @theft_alert.before_automation?
-      %span.less-strong This alert was created before automation
+      %span.twless-strong This alert was created before automation
     - elsif !@theft_alert.activateable?
-      %span.less-strong This alert is missing required stuff
+      %span.twless-strong This alert is missing required stuff
     - else
       %span.text-danger NOT SURE WHY!
       %strong Tell Seth
@@ -93,7 +93,7 @@
               %span.localizeTime
                 = l @theft_alert.activating_at, format: :convert_time
               - if @theft_alert.paid_at.present?
-                %small.ml-2.less-strong
+                %small.ml-2.twless-strong
                   = distance_of_time_in_words(@theft_alert.paid_at, @theft_alert.activating_at)
                   after payment
         %tr
@@ -102,7 +102,7 @@
             - if @theft_alert.facebook_updated_at.present?
               %span.localizeTime
                 = l @theft_alert.facebook_updated_at, format: :convert_time
-              %small.ml-2.less-strong
+              %small.ml-2.twless-strong
                 = @theft_alert.live? ? "alert ends" : "alert ended"
                 - if @theft_alert.end_at.present?
                   %span.localizeTime
@@ -114,7 +114,7 @@
             - if @theft_alert.admin
               %small.text-info (admin)
             - elsif @theft_alert.facebook_data&.dig("no_notify").present?
-              %em.less-strong manually disabled
+              %em.twless-strong manually disabled
             - elsif @theft_alert.stolen_record.present?
               Stolen record
               - if @theft_alert.stolen_record.receive_notifications?

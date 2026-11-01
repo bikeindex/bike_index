@@ -35,7 +35,7 @@
       <% end %>
 
       <% if @organization.show_on_map %>
-        <span class="less-strong">Shown on map</span>
+        <span class="twless-strong">Shown on map</span>
       <% else %>
         <strong>Not Shown</strong>
       <% end %>
@@ -55,10 +55,10 @@
         <br>
         <% if @organization.manufacturer_id.present? %>
           <strong><%= @organization.manufacturer.name %></strong>
-          <em class="less-strong">Manufacturer official account of</em>
+          <em class="twless-strong">Manufacturer official account of</em>
         <% else %>
           <strong class="text-danger">No Manufacturer assigned</strong>
-          <span class="less-strong">
+          <span class="twless-strong">
             <%= link_to "edit organization", edit_admin_organization_path(@organization) %>
             to add
           </span>

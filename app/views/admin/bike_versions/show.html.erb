@@ -33,7 +33,7 @@
 
           <td>
             <% visibility_class = "text-success" if @bike_version.all_visible? %>
-            <% visibility_class = "less-strong" if @bike_version.user_hidden? %>
+            <% visibility_class = "twless-strong" if @bike_version.user_hidden? %>
 
             <span class="<%= visibility_class %>">
               <%= @bike_version.visibility&.humanize %>

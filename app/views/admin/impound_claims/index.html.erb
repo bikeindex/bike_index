@@ -49,7 +49,7 @@
                     <% if organization.present? %>
                       <%= link_to organization.short_name, admin_impound_claims_path(sortable_search_params.merge(organization_id: id)), class: (organization.deleted? ? "text-danger" : "") %>
                     <% else %>
-                      <%= link_to "no organization", admin_impound_claims_path(sortable_search_params.merge(organization_id: "none")), class: "gray-link" %>
+                      <%= render(UI::ButtonLink::Component.new(href: admin_impound_claims_path(sortable_search_params.merge(organization_id: "none")), text: "no organization", color: :link_gray)) %>
                     <% end %>
                   </td>
 

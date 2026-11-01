@@ -39,7 +39,7 @@
             - if organization_name.present?
               = link_to organization_name, admin_organization_path(@impound_claim.organization_id)
             - else
-              %small.less-strong NO organization
+              %small.twless-strong NO organization
         %tr
           %td Bike claimed
           %td
@@ -59,7 +59,7 @@
             - if @impound_record.present?
               = link_to impound_record_id, admin_impound_record_path("pkey-#{@impound_record.id}")
               - if organization_name.present?
-                %small.less-strong= link_to "view in organization", organization_impound_record_path(impound_record_id, organization_id: @impound_claim.organization_id)
+                %small.twless-strong= link_to "view in organization", organization_impound_record_path(impound_record_id, organization_id: @impound_claim.organization_id)
         %tr
           %td User
           %td

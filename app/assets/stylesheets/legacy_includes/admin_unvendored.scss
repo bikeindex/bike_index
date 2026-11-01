@@ -9500,7 +9500,6 @@ body {
 
 .admin-public-image .image-filename,
 .less-less-strong,
-.less-strong,
 .user-edit-link,
 table .less-strong-right {
   opacity: .65
@@ -9530,16 +9529,6 @@ table .less-strong-right {
 .less-less-strong .form-control:focus,
 .less-less-strong .form-control:hover,
 .less-less-strong a:hover,
-.less-strong+a:hover,
-.less-strong.btn:focus,
-.less-strong .btn:focus,
-.less-strong.btn:hover,
-.less-strong .btn:hover,
-.less-strong.form-control:focus,
-.less-strong .form-control:focus,
-.less-strong.form-control:hover,
-.less-strong .form-control:hover,
-.less-strong a:hover,
 .user-edit-link+a:hover,
 .user-edit-link .btn:focus,
 .user-edit-link .btn:hover,
@@ -9561,19 +9550,6 @@ table .less-strong-right a:hover {
 
 .less-less-strong {
   opacity: .3
-}
-
-.gray-link,
-.gray-link a {
-  color: #6c757d !important;
-  opacity: .65;
-  text-decoration: underline
-}
-
-.gray-link.active,
-.gray-link:active,
-.gray-link:hover {
-  opacity: .9
 }
 
 .text-link,
@@ -10169,12 +10145,6 @@ table .photo-cell img {
 .pagination-flex .per-page-select {
   width: 8rem;
   display: inline-block
-}
-
-/* The rest of .only-dev-visible is in bike_index_components.css. This one stays: the file is
-   unlayered, so .table-list's striping would otherwise beat it */
-.table-list tr.only-dev-visible {
-  background: color-mix(in oklab, var(--tw-color-dev) 10%, transparent) !important
 }
 
 .link-emoji {

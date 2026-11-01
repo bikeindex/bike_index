@@ -56,7 +56,7 @@
       <% else %>
         <code><%= params[:search_endpoint] %></code>
       <% end %>
-      <%= link_to "view for all endpoints", url_for(sortable_search_params.merge(search_endpoint: nil)), class: "gray-link small" %>
+      <%= render(UI::ButtonLink::Component.new(href: url_for(sortable_search_params.merge(search_endpoint: nil)), text: "view for all endpoints", color: :link_gray, html_class: "tw:text-sm")) %>
     </p>
   <% end %>
 
@@ -64,7 +64,7 @@
     <p>
       Viewing only Searches <strong>from</strong>
       <code><%= params[:search_ip_address] %></code>
-      <%= link_to "view from any ip address", url_for(sortable_search_params.merge(search_ip_address: nil)), class: "gray-link small" %>
+      <%= render(UI::ButtonLink::Component.new(href: url_for(sortable_search_params.merge(search_ip_address: nil)), text: "view from any ip address", color: :link_gray, html_class: "tw:text-sm")) %>
     </p>
   <% end %>
 

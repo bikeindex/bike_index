@@ -70,10 +70,7 @@
 <details data-controller="ui--details">
   <summary
     data-action="click->ui--details#toggle"
-    class="
-      gray-link tw:cursor-pointer tw:list-none
-      tw:[&::-webkit-details-marker]:hidden
-    "
+    class="<%= UI::Button::Component.build_classes(color: :link_gray, size: :md, html_class: "tw:cursor-pointer tw:list-none tw:[&::-webkit-details-marker]:hidden") %>"
   >
     show edit form
   </summary>

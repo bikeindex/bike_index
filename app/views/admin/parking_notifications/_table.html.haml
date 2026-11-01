@@ -39,7 +39,7 @@
             = link_to organized_bike_text(parking_notification.bike), admin_bike_path(parking_notification.bike)
         %td
           - if parking_notification.repeat_record?
-            %small.less-strong
+            %small.twless-strong
               = parking_notification.notification_number
         %td
           - if parking_notification.status == "impounded"

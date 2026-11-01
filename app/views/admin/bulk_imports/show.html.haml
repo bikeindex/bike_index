@@ -32,19 +32,19 @@
           %small
             - if @bulk_import.file_cleaned?
               %span.text-warning file removed
-              %em.small.less-strong after a few days, we delete the uploaded file to save space
+              %em.small.twless-strong after a few days, we delete the uploaded file to save space
             - else
               = link_to @bulk_import.file_url, @bulk_import.file_url
       %tr
         %td Send email?
         %td
           = @bulk_import.send_email ? check_mark : cross_mark
-          %small.less-strong Email is sent by default
+          %small.twless-strong Email is sent by default
       %tr
         %td Allow duplicates?
         %td
           = @bulk_import.allow_duplicate ? check_mark : cross_mark
-          %small.less-strong Only true by default for stolen and impounded
+          %small.twless-strong Only true by default for stolen and impounded
 
   .col-sm-6
     %table.table-list
@@ -61,7 +61,7 @@
           Organization
         %td
           - if @bulk_import.organization.present?
-            = link_to @bulk_import.organization.name, admin_organization_path(@bulk_import.organization), class: "less-strong"
+            = link_to @bulk_import.organization.name, admin_organization_path(@bulk_import.organization), class: "twless-strong"
             \|
             %strong
               = link_to "Organization view of import", organization_bulk_import_path(@bulk_import, organization_id: @bulk_import.organization.to_param)
@@ -95,7 +95,7 @@
 .mt-4.mb-4
   %h3 Errors
   - if @bulk_import.import_errors == {}
-    %span.less-strong No errors
+    %span.twless-strong No errors
   - else
     = render(Pages::Org::BulkImportError::Component.new(bulk_import: @bulk_import, in_admin: true, display_dev_info: display_dev_info?))
 

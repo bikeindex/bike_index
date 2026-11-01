@@ -7,12 +7,12 @@
     <% end %>
   <% end %>
 
-  <% table.column(sortable: "created_at", classes: "tw:text-xs", header_classes: "less-strong") do |recovery_display| %>
+  <% table.column(sortable: "created_at", classes: "tw:text-xs", header_classes: "twless-strong") do |recovery_display| %>
     <%= render UI::Time::Component.new(time: recovery_display.created_at) %>
   <% end %>
 
   <% table.column(sortable: "updated_at", classes: "tw:text-xs") do |recovery_display| %>
-    <span class="less-strong"><%= render UI::Time::Component.new(time: recovery_display.updated_at) %></span>
+    <span class="twless-strong"><%= render UI::Time::Component.new(time: recovery_display.updated_at) %></span>
   <% end %>
 
   <% table.column(label: "Quote") do |recovery_display| %>

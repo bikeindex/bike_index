@@ -44,7 +44,7 @@ module Atoms
       def serial_block
         return content_tag(:span, serial, class: ["serial-span", @html_class]) unless placeholder?
 
-        content_tag(:span, placeholder_text, class: ["less-strong", @html_class])
+        content_tag(:span, placeholder_text, class: ["twless-strong", @html_class])
       end
 
       def placeholder_text
