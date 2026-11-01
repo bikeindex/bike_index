@@ -56,12 +56,10 @@ module Admin
     end
 
     def external_registry_credential_params
-      model_type = params[:type]&.underscore&.tr("/", "_")
-      params[model_type][:type] = params[:type]
+      # A new credential's form is for the base class; an existing one's is for its subclass
+      param_key = [params[:type]&.underscore&.tr("/", "_"), "external_registry_credential"].find { params.key?(it) }
 
-      params
-        .require(model_type)
-        .permit(:app_id, :access_token, :refresh_token, :type)
+      params.require(param_key).permit(:app_id, :access_token, :refresh_token).merge(type: params[:type])
     end
   end
 end

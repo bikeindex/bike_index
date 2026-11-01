@@ -57,7 +57,7 @@ module Admin
           elsif ban_params[:reason].present?
             @user.user_ban&.update(ban_params.slice(:reason, :description))
           end
-          @user.confirm(@user.confirmation_token) if params[:user][:confirmed]
+          @user.confirm(@user.confirmation_token) if Binxtils::InputNormalizer.boolean(params[:user][:confirmed])
           CallbackJobs::AfterUserChangeJob.perform_async(@user.id)
           redirect_to admin_users_url, notice: "User Updated"
         else

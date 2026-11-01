@@ -63,7 +63,7 @@ module Admin
 
     def import
       if params[:file]
-        Manufacturer.import(params[:file])
+        Spreadsheets::Manufacturers.import(params[:file].path)
         flash[:success] = "Manufacturers imported"
       else
         flash[:notice] = "You gotta choose a file to import!"
