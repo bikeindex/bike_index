@@ -46,8 +46,7 @@ RSpec.describe Admin::ManufacturersController, type: :request do
         it "renders the manufacturers with their priority" do
           get url, params: token_param.merge(search_with_websites: true)
           expect(response.status).to eq 200
-          expect(json_result["manufacturers"]).to eq([with_website.as_json(only: Admin::ManufacturersController::JSON_ATTRIBUTES)])
-          expect(json_result["manufacturers"].first).to include("priority" => 0, "website" => "http://stuff.com")
+          expect(json_result["manufacturers"]).to eq([with_website.as_json(only: %w[id name slug secondary_slug website frame_maker motorized_only priority])])
         end
       end
     end

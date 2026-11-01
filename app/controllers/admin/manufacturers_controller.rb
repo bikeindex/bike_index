@@ -11,10 +11,7 @@ module Admin
 
     def index
       @manufacturers = searched_manufacturers.reorder(sortable_order(Manufacturer))
-      respond_to do |format|
-        format.html
-        format.json { render json: {manufacturers: @manufacturers.as_json(only: JSON_ATTRIBUTES)} }
-      end
+      render json: {manufacturers: @manufacturers.as_json(only: JSON_ATTRIBUTES)} if request.format.json?
     end
 
     def show
