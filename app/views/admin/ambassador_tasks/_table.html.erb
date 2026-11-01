@@ -1,6 +1,6 @@
 <%# locals: (collection:, render_sortable: false) %>
 
-<%= render(UI::Table::Component.new(records: collection, classes: "ambassador-tasks-table")) do |table| %>
+<%= render(UI::Table::Component.new(records: collection, classes: "tw:[&_td_p]:inline")) do |table| %>
   <% table.column(label: "Title") do |task| %>
     <%= task.title %>
   <% end %>
