@@ -72,6 +72,9 @@ class LoggedSearch < AnalyticsRecord
 
   STOLENNESS_ENUM = {all: 0, non: 1, stolen: 2, impounded: 3, for_sale: 4}.freeze
 
+  # vehicle_models is comma-joined, so a comma means two or more
+  COMPARISON_SQL = "query_items->>'vehicle_models' LIKE '%,%'".freeze
+
   enum :endpoint, ENDPOINT_ENUM
   enum :stolenness, STOLENNESS_ENUM, prefix: :stolenness
 
@@ -83,7 +86,7 @@ class LoggedSearch < AnalyticsRecord
 
   scope :organized, -> { where(endpoint: organized_endpoints) }
   scope :not_bikebook, -> { where.not(endpoint: bikebook_endpoints) }
-  scope :web_bikebook_comparison, -> { web_bikebook.where("query_items->>'vehicle_models' LIKE '%,%'") }
+  scope :web_bikebook_comparison, -> { web_bikebook.where(COMPARISON_SQL) }
   scope :serial, -> { where.not(serial_normalized: nil) }
   scope :includes_query, -> { where(includes_query: true) }
   scope :processed, -> { where(processed: true) }
