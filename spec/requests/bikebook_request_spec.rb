@@ -147,10 +147,11 @@ RSpec.describe BikebookController, type: :request do
         expect(response).to redirect_to("/bikebook?filters=1&vehicle_models=m/segway/2025/gt3_pro,m/aventon/2022/level_2")
       end
 
-      context "with sizes picked" do
-        it "moves each size with its vehicle" do
-          get "/bikebook/m/segway/2025/gt3_pro", params: {vehicle_models: "m/aventon/2022/level_2,m/segway/2025/gt3_pro,m/aventon/2026/current_adv", vehicle_sizes: "Large,,Small"}
-          expect(response).to redirect_to("/bikebook?vehicle_models=m/segway/2025/gt3_pro,m/aventon/2022/level_2,m/aventon/2026/current_adv&vehicle_sizes=,Large,Small")
+      context "with sizes and colorways picked" do
+        it "moves each with its vehicle" do
+          get "/bikebook/m/segway/2025/gt3_pro", params: {vehicle_models: "m/aventon/2022/level_2,m/segway/2025/gt3_pro,m/aventon/2026/current_adv",
+                                                          vehicle_sizes: "Large,,Small", vehicle_colorways: ",,Sage"}
+          expect(response).to redirect_to("/bikebook?vehicle_colorways=,,Sage&vehicle_models=m/segway/2025/gt3_pro,m/aventon/2022/level_2,m/aventon/2026/current_adv&vehicle_sizes=,Large,Small")
         end
       end
     end

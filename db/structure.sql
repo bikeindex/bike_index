@@ -7494,10 +7494,10 @@ CREATE INDEX index_public_images_on_imageable_id_and_imageable_type ON public.pu
 
 
 --
--- Name: index_recovery_displays_on_stolen_record_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_recovery_displays_on_stolen_record_id_unique; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_recovery_displays_on_stolen_record_id ON public.recovery_displays USING btree (stolen_record_id);
+CREATE UNIQUE INDEX index_recovery_displays_on_stolen_record_id_unique ON public.recovery_displays USING btree (stolen_record_id);
 
 
 --
@@ -7965,6 +7965,7 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261030102135'),
 ('20261017210000'),
 ('20261017200000'),
 ('20261017174533'),

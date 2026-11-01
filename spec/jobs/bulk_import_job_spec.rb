@@ -56,6 +56,74 @@ RSpec.describe BulkImportJob, type: :job do
         expect(UnknownOrganizationForAscendImportJob.jobs.map { |j| j["args"] }.flatten).to eq([bulk_import.id])
       end
     end
+    context "ascend import with lock held" do
+      let(:organization) { FactoryBot.create(:organization_with_auto_user, ascend_name: "BIKELaneChiC", kind: "bike_shop", pos_kind: "ascend_pos") }
+      let!(:bulk_import) { FactoryBot.create(:bulk_import_ascend, organization:) }
+      let(:locked_organization_id) { organization.id }
+      before do
+        allow_any_instance_of(BulkImport).to receive(:open_file) { StringIO.new(csv_string) }
+        @lock_manager = described_class.new_lock_manager
+        @redlock = @lock_manager.lock(described_class.redlock_key(locked_organization_id), 5000)
+      end
+      after { @lock_manager.unlock(@redlock) }
+
+      it "defers processing" do
+        expect {
+          instance.perform(bulk_import.id)
+        }.to change(described_class.jobs, :count).by(1)
+        expect(Bike.count).to eq 0
+        expect(described_class.jobs.last["args"]).to eq([bulk_import.id, true])
+        expect(described_class.jobs.last["at"]).to be > 50.seconds.from_now.to_f
+        expect(bulk_import.reload.pending?).to be_truthy
+      end
+
+      context "with an invalid extension" do
+        before { allow_any_instance_of(BulkImport).to receive(:invalid_extension?) { true } }
+        it "only notifies about the extension on the first attempt" do
+          expect {
+            instance.perform(bulk_import.id)
+            instance.perform(bulk_import.id, true)
+          }.to change(InvalidExtensionForAscendImportJob.jobs, :count).by(1)
+          expect(described_class.jobs.last(2).map { it["args"] }).to eq([[bulk_import.id, true]] * 2)
+        end
+      end
+
+      context "when Redis errors prevent locking" do
+        before { allow_any_instance_of(Redlock::Client).to receive(:lock).and_raise(Redlock::LockAcquisitionError.new("down", [])) }
+        it "defers processing rather than dropping the import" do
+          expect {
+            instance.perform(bulk_import.id)
+          }.to change(described_class.jobs, :count).by(1)
+          expect(described_class.jobs.last["args"]).to eq([bulk_import.id, true])
+          expect(bulk_import.reload.pending?).to be_truthy
+        end
+      end
+
+      context "for a different organization" do
+        let(:locked_organization_id) { organization.id + 1 }
+        it "processes, and releases its lock" do
+          expect {
+            instance.perform(bulk_import.id)
+          }.to_not change(described_class.jobs, :count)
+          expect(Bike.count).to eq 2
+          expect(bulk_import.reload.finished?).to be_truthy
+          expect(described_class.new_lock_manager.locked?(described_class.redlock_key(organization.id))).to be_falsey
+        end
+
+        it "renews its lock while it works through a long file" do
+          allow_any_instance_of(BulkImport).to receive(:open_file) { StringIO.new(([csv_lines.first.join(",")] + [","] * 60).join("\n")) }
+          lock_options = []
+          allow_any_instance_of(Redlock::Client).to receive(:lock).and_wrap_original do |method, *args, **options|
+            lock_options << options
+            method.call(*args, **options)
+          end
+          instance.perform(bulk_import.id)
+          expect(bulk_import.reload.finished?).to be_truthy
+          expect(lock_options.map { it[:extend_only_if_locked] }).to eq([false, true])
+          expect(described_class.new_lock_manager.locked?(described_class.redlock_key(organization.id))).to be_falsey
+        end
+      end
+    end
     context "erroring" do
       let!(:color) { FactoryBot.create(:color, name: "White") }
       before do

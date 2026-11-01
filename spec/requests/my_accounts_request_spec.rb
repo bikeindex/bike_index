@@ -8,6 +8,13 @@ RSpec.describe MyAccountsController, type: :request do
       it "redirects" do
         get base_url
         expect(response).to redirect_to(/session\/new/) # weird subdomain issue matching url directly otherwise
+        expect(session[:return_to]).to eq base_url
+      end
+
+      it "doesn't store a return_to too long for the session cookie" do
+        get base_url, params: {q: "x" * 4_000}
+        expect(response).to redirect_to(/session\/new/)
+        expect(session[:return_to]).to be_blank
       end
     end
 

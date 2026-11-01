@@ -37,6 +37,7 @@ RSpec.describe "Bikes API V3", type: :request do
         "cycle_type_slug" => "bike",
         "propulsion_type_slug" => "foot-pedal",
         "test_bike" => false,
+        "hidden" => false,
         "is_stock_img" => false,
         "url" => "http://test.host/bikes/#{bike.id}",
         "api_url" => "http://test.host/api/v1/bikes/#{bike.id}",
@@ -92,14 +93,18 @@ RSpec.describe "Bikes API V3", type: :request do
     end
 
     context "impounded as found" do
+      let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user:) }
       let!(:impound_record) { FactoryBot.create(:impound_record, bike: bike) }
 
-      it "returns status found" do
+      it "returns status found, with the serial only for the owner" do
         expect(impound_record.kind).to eq "found"
         bike.reload
         get "/api/v3/bikes/#{bike.id}", params: {format: :json}
         expect(response.code).to eq("200")
         expect(json_result["bike"].compact).to eq target.merge("status" => "found", "serial" => "Hidden")
+
+        get "/api/v3/bikes/#{bike.id}", params: {format: :json, access_token: token.token}
+        expect(json_result["bike"]["serial"]).to eq bike.serial_number.upcase
       end
     end
 
@@ -110,6 +115,39 @@ RSpec.describe "Bikes API V3", type: :request do
       expect(response.headers["Content-Type"].match("json")).to be_present
       expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
       expect(response.headers["Access-Control-Request-Method"]).to eq("*")
+    end
+
+    context "hidden bike" do
+      let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user:, user_hidden: true) }
+      let(:other_user_token) do
+        Doorkeeper::AccessToken.create!(application_id: doorkeeper_app.id, resource_owner_id: FactoryBot.create(:user_confirmed).id)
+      end
+
+      it "returns it only with the owner's token" do
+        expect(bike.reload.user_hidden).to be_truthy
+        get "/api/v3/bikes/#{bike.id}", params: {format: :json}
+        expect(response.code).to eq("404")
+
+        get "/api/v3/bikes/#{bike.id}", params: {format: :json, access_token: "invalid"}
+        expect(response.code).to eq("404")
+
+        get "/api/v3/bikes/#{bike.id}", params: {format: :json, access_token: other_user_token.token}
+        expect(response.code).to eq("404")
+
+        get "/api/v3/bikes/#{bike.id}", params: {format: :json, access_token: token.token}
+        expect(response.code).to eq("200")
+        expect(json_result["bike"].slice("id", "hidden")).to eq("id" => bike.id, "hidden" => true)
+      end
+    end
+
+    context "unconfirmed user's token" do
+      let(:user) { FactoryBot.create(:user) }
+
+      it "returns a visible bike" do
+        expect(user.unconfirmed?).to be_truthy
+        get "/api/v3/bikes/#{bike.id}", params: {format: :json, access_token: token.token}
+        expect(response.code).to eq("200")
+      end
     end
 
     describe "short_id" do

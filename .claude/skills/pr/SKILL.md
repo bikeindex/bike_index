@@ -57,7 +57,7 @@ This has to happen before the cleanup below, which diffs against `origin/main`.
 
 ### Simplify, lint, and conform to AGENTS.md
 
-`references/pre-push-cleanup.md` has this in full: `/simplify`, `bin/lint` scoped to the branch's files, branch-scoped specs, a pass over the changed files against `AGENTS.md`, its audits — spec, documentation, churn, comment, backfill and, when the branch adds them, asset and controller — and the cycle-type translation and product-name checks. The audits are required every run, not just when the diff looks messy. Commit everything it produces before re-dating migrations.
+`references/pre-push-cleanup.md` has this in full: `/simplify`, `bin/lint` scoped to the branch's files, branch-scoped specs, a pass over the changed files against `AGENTS.md`, its audits — spec, documentation, churn, comment, backfill and, when the branch adds them, asset, controller and component — and the cycle-type translation and product-name checks. The audits are required every run, not just when the diff looks messy. Commit everything it produces before re-dating migrations.
 
 ### Freshen stale migration timestamps
 
@@ -175,7 +175,7 @@ Then return the PR URL.
 
 ## Appendix: the sandbox with no `gh`
 
-Only the Claude Code web sandbox (`/home/user/bike_index`, where `$CLAUDE_CODE_REMOTE` is `true`) lacks the GitHub CLI; everywhere else the sections above run as written, and you shouldn't check. If a `gh` command comes back "command not found", swap in the GitHub MCP equivalents — the rest of the workflow is unchanged, including `git push`.
+Only the Claude Code web sandbox (`/home/user/bike_index`, where `$CLAUDE_CODE_REMOTE` is `true`) lacks the GitHub CLI; everywhere else the sections above run as written, and you shouldn't check. If a `gh` command comes back "command not found" — or, since a `gh` binary can be present there, `HTTP 403: GitHub GraphQL is not available from Claude Code sessions` — swap in the GitHub MCP equivalents — the rest of the workflow is unchanged, including `git push`.
 
 | Where | `gh` | MCP |
 | --- | --- | --- |

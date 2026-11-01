@@ -2,11 +2,11 @@ import { html, nothing } from 'lit-html'
 import { listedFigure } from 'bikebook/cycle_drawings'
 import { OVERALL_LENGTH_ESTIMATE } from 'bikebook/frame_geometry'
 import { missing } from 'bikebook/templates/helpers'
-import { copyButton } from 'bikebook/templates/ui/copy_button'
 import { table } from 'bikebook/templates/ui/table'
 import { tooltip } from 'bikebook/templates/ui/tooltip'
 import { seriesBorders, wheelName } from 'bikebook/templates/vehicles/geometry_overlay'
 import { cargoAt, isCargo, tireWidth, typeLabel, wheelsAt } from 'bikebook/templates/vehicles/model_viewer'
+import { vehicleTitle } from 'bikebook/templates/vehicles/vehicle_title'
 import { array, isNumber, join, present, slice, sum } from 'bikebook/templates/values'
 
 // A row header's cell classes that keep it in view as a phone scrolls the table across, at its scroller's edge rather than
@@ -21,10 +21,11 @@ const WEIGHT = { label: 'Weight', read: (vehicle, size) => size?.geometry?.total
 
 // The compared models' sizes, wheels and frames side by side in their `sizes`, each column's numbers against the
 // first's, keyed to the overlay by `frames`. `beside` the overlay, it shares a row with it once the window is wide enough.
+// `corner` fills its top left cell.
 // A row's `better` is the sign of a difference that's an improvement, a longer wheelbase, 0 for one that's neither, and
 // none for a value that isn't compared. `parts` splits a value whose parts are each compared, and `amount` shows a
 // difference, given the number it's of
-export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], highlight, beside = false }) => {
+export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], market, highlight, beside = false, corner = nothing }) => {
   const named = vehicles.map(({ data }) => presenter.named(presenter.kit.schemas.vehicle, data))
   const [first] = named
   const show = (row, value, vehicle) => row.format?.(value, vehicle, presenter) ?? (row.unit ? presenter.measurement(value, row.unit, row.key) : value)
@@ -135,12 +136,13 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], highl
     classes: 'tw:mx-auto tw:min-w-[min(100%,78rem)]!',
     records: rows,
     columns: [
-      { label: html`<span class="tw:sr-only">Spec</span>`, rowHeader: true, classes: 'tw:font-bold tw:max-md:min-w-28 tw:md:whitespace-nowrap tw:align-top', cellClass: (record) => `${PINNED_ROW_HEADER} ${record.className ?? ''}`, cell: (record) => record.label },
+      { label: html`<span class="tw:sr-only">Spec</span>${corner}`, rowHeader: true, classes: 'tw:font-bold tw:max-md:min-w-28 tw:md:whitespace-nowrap tw:align-top', cellClass: (record) => `${PINNED_ROW_HEADER} ${record.className ?? ''}`, cell: (record) => record.label },
       ...named.map((vehicle, index) => {
         const border = seriesBorders(frames, index)
         return {
-          label: html`<span class="tw:block tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">${vehicle.manufacturer}</span><span
-            class="tw:inline-flex tw:items-baseline tw:gap-1">${vehicle.model}${copyButton({ value: vehicles[index].value, label: 'Copy ID', tooltip: true })}</span>`,
+          label: vehicleTitle({
+            manufacturer: vehicle.manufacturer, model: vehicle.model, data: vehicles[index].data, value: vehicles[index].value, market, configurations: presenter.kit.model_configurations
+          }),
           classes: 'tw:min-w-48 tw:align-top',
           headerClasses: border.top,
           // a model's name can wrap in its header, but not a value

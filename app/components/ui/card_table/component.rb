@@ -3,8 +3,13 @@
 module UI
   module CardTable
     # A UI::Table that fills a card edge to edge, its first column frozen against the
-    # horizontal scroll. Columns are declared as on UI::Table, and their blocks run there
+    # horizontal scroll. Columns are declared as on UI::Table, and their blocks run there.
+    # Given column_settings, it renders its own full-bleed card, under them
     class Component < ApplicationComponent
+      # Template Dependency: UI::Card::Component
+      renders_one :description
+      renders_one :actions
+
       # Descendant selectors, so they outrank the cell classes UI::Table gives every column
       TABLE_CLASSES = [
         "tw:[&_th]:whitespace-nowrap tw:[&_th]:border-b tw:[&_th]:border-gray-100 tw:[&_th]:bg-gray-50",
@@ -31,8 +36,13 @@ module UI
         "tw:data-overflowing:after:shadow-[-2px_0_6px_rgba(26,26,31,0.04)] tw:dark:data-overflowing:after:border-gray-700 " \
         "tw:data-scrolled-end:after:hidden tw:@max-[672px]/twwiderow:after:hidden"
 
-      # data: the wrapper's, whose controllers join ui--table-overflow. The rest go to UI::Table
-      def initialize(data: {}, **table_options)
+      # column_settings: UI::TableColumnSettings' columns, defaults and narrow_hidden, plus its storage_key.
+      # form: form_with's options, making the card a form whose actions apply to the rows checked - a first
+      # column of table-multi-checkbox targets, under toggle_all_button. data: the outermost element's,
+      # its controllers and actions joining these. The rest go to UI::Table
+      def initialize(column_settings: nil, form: nil, data: {}, **table_options)
+        @column_settings = column_settings
+        @form = form
         @data = data
         @table_options = table_options
         @columns = []
@@ -43,6 +53,11 @@ module UI
         nil
       end
 
+      def toggle_all_button
+        render(UI::Button::Component.new(text: check_mark, color: :link, title: "Toggle all checked",
+          aria: {label: "Toggle all checked"}, data: {action: "click->table-multi-checkbox#toggleAll"}))
+      end
+
       def before_render
         content
       end
@@ -50,7 +65,22 @@ module UI
       private
 
       def wrapper_data
-        @data.merge(controller: ["ui--table-overflow", @data[:controller]].compact.join(" "))
+        data = @column_settings ? {} : @data
+        data.merge(controller: token_list("ui--table-overflow", data[:controller]))
+      end
+
+      def card(&)
+        classes = "tw:col-span-full tw:min-w-0 tw:rounded-xl tw:twfullbleed #{UI::Card::Component::BASE_CLASSES}"
+        return form_with(**@form, class: classes, data: card_data, &) if @form
+
+        tag.div(class: classes, data: card_data, &)
+      end
+
+      def card_data
+        data = UI::TableColumnSettings::Component.data_attributes(storage_key: @column_settings[:storage_key], orderable: true,
+          controllers: token_list(("table-multi-checkbox" if @form), @data[:controller]).presence)
+        selection = "input->table-multi-checkbox#selectRow submit->table-multi-checkbox#confirmDiscard" if @form
+        @data.merge(data, action: token_list(data[:action], selection, @data[:action]))
       end
 
       def column_options(options, index)

@@ -104,8 +104,8 @@ class ApplicationController < ActionController::Base
   end
 
   def default_url_options(options = {})
-    return options if locale_from_request_params.blank? ||
-      locale_from_request_params == implicit_locale.to_s
+    return options if locale_from_request_params == implicit_locale.to_s ||
+      I18n.available_locales.exclude?(locale_from_request_params.to_sym)
 
     {locale: locale_from_request_params}.merge(options)
   end
