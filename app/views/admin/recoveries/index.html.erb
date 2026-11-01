@@ -41,14 +41,14 @@
         <% valued_recoveries = available_recoveries.pluck(:estimated_value).reject(&:blank?) %>
         <% recovery_amount = valued_recoveries.sum + (available_recoveries.count - valued_recoveries.count) * Counts.recovery_average_value %>
 
-        <%= render(UI::TableList::Component.new(wide_definition: true)) do |list| %>
+        <%= render(UI::TableList::Component.new(wide_definition: true, classes: "tw:[&_th]:not-italic")) do |list| %>
           <% list.with_row(label: "With user entered value", class: "small", value: number_display(valued_recoveries.count)) %>
 
-          <% list.with_row(label: "Total user entered value", class: "small", value: "$#{number_display(valued_recoveries.sum)}") %>
+          <% list.with_row(label: "Total user entered value", class: "small", value: safe_join(["$", number_display(valued_recoveries.sum)])) %>
 
-          <% list.with_row(label: "Average stolen value", class: "small", value: "$#{number_display(Counts.recovery_average_value)}") %>
+          <% list.with_row(label: "Average stolen value", class: "small", value: safe_join(["$", number_display(Counts.recovery_average_value)])) %>
 
-          <% list.with_row(label: "Total estimated value", value: "$#{number_display(recovery_amount)}") %>
+          <% list.with_row(label: "Total estimated value", value: safe_join(["$", number_display(recovery_amount)])) %>
         <% end %>
       </div>
     </div>
