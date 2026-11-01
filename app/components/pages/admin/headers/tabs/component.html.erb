@@ -12,10 +12,12 @@
 <%= render(UI::Tabs::Component.new(tabs: @tabs, nav_label: @nav_label, margin_classes: tabs_classes)) %>
 
 <% if summary? %>
+  <%# inverted flips tw:dark: inside it, so what it holds styles itself as for a dark page %>
   <div
     class="
-      twgutter-bleed tw:mb-6 tw:bg-[#212529] tw:pt-6 tw:pb-1 tw:text-white
-      tw:[&_:is(h1,h2,h3,h4)]:text-white tw:[&_table]:bg-white
+      inverted twgutter-bleed tw:mb-6 tw:bg-linear-160 tw:from-white
+      tw:to-gray-100 tw:pt-6 tw:pb-1 tw:text-slate-900
+      tw:dark:from-slate-900 tw:dark:to-[#233140] tw:dark:text-white
     "
   >
     <%= summary %>
