@@ -8,19 +8,9 @@
         %h4.text-danger
           %em
             #{@social_account.screen_name} has an Error!
-        %table.table-list.mt-4
-          %tbody
-            %tr
-              %td
-                Error at:
-              %td
-                %span.localizeTime
-                  = l @social_account.last_error_at, format: :convert_time
-            %tr
-              %td
-                Error
-              %td
-                = @social_account.last_error
+        = render(UI::TableList::Component.new(classes: "mt-4")) do |list|
+          - list.with_row(label: "Error at:", value: render(UI::Time::Component.new(time: @social_account.last_error_at)))
+          - list.with_row(label: "Error", value: @social_account.last_error)
         = link_to "Log in to refresh credentials", "/auth/twitter", class: "btn btn-success"
 .row
   .col-md-6
@@ -30,19 +20,11 @@
     %small
       = link_to "view on twitter", "https://twitter.com/#{@social_account.screen_name}", target: :_blank
 
-    %table.table-list.mt-2
-      %tbody
-        - %w[created_at updated_at last_error_at].each do |attr|
-          %tr
-            %td= attr.humanize
-            %td
-              - if @social_account.send(attr).present?
-                %span.localizeTime
-                  = l @social_account.send(attr), format: :convert_time
-        - @social_account.attributes.except("account_info", "last_error_at", "created_at", "updated_at", "last_error").each_pair do |attr, value|
-          %tr
-            %td= attr
-            %td= value
+    = render(UI::TableList::Component.new(classes: "mt-2")) do |list|
+      - %w[created_at updated_at last_error_at].each do |attr|
+        - list.with_row(label: attr.humanize, value: render(UI::Time::Component.new(time: @social_account.send(attr))))
+      - @social_account.attributes.except("account_info", "last_error_at", "created_at", "updated_at", "last_error").each_pair do |attr, value|
+        - list.with_row(label: attr, value:)
   .col-md-6
     %h3 Platform Response Data
     %pre{ style: "max-height: 600px; overflow: scroll; background: #eeeeee; padding: 10px 2px;" }

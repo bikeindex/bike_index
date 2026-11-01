@@ -2,110 +2,40 @@
 
 <div class="row mt-4">
   <div class="col-md-6">
-    <table class="table-list">
-      <tbody>
-        <% if display_dev_info? %>
-          <tr>
-            <td class="only-dev-visible">ID</td>
-            <td><code><%= @bike_version.id %></code></td>
-          </tr>
-        <% end %>
+    <% visibility_class = "text-success" if @bike_version.all_visible? %>
+    <% visibility_class = "twless-strong" if @bike_version.user_hidden? %>
 
-        <tr>
-          <td>Name</td>
-          <td><%= @bike_version.name %></td>
-        </tr>
+    <%= render(UI::TableList::Component.new) do |list| %>
+      <% list.with_row(label: "ID", dev_only: true, value: tag.code(@bike_version.id), if: display_dev_info?) %>
 
-        <tr>
-          <td>Owner</td>
+      <% list.with_row(label: "Name", value: @bike_version.name) %>
 
-          <td>
-            <%= render Atoms::Admin::TableCells::User::Component.new(user: @bike_version.owner, user_id: @bike_version.owner_id) %>
-          </td>
-        </tr>
+      <% list.with_row(label: "Owner", value: render(Atoms::Admin::TableCells::User::Component.new(user: @bike_version.owner, user_id: @bike_version.owner_id))) %>
 
-        <tr>
-          <td>Visibility</td>
+      <% list.with_row(label: "Visibility") do %>
+        <span class="<%= visibility_class %>">
+          <%= @bike_version.visibility&.humanize %>
+        </span>
+      <% end %>
 
-          <td>
-            <% visibility_class = "text-success" if @bike_version.all_visible? %>
-            <% visibility_class = "twless-strong" if @bike_version.user_hidden? %>
+      <% list.with_row(label: "Bike", value: render(Atoms::Admin::TableCells::Bike::Component.new(bike: @bike, bike_id: @bike_version.bike_id))) %>
 
-            <span class="<%= visibility_class %>">
-              <%= @bike_version.visibility&.humanize %>
-            </span>
-          </td>
-        </tr>
+      <% list.with_row(label: "Created", class: "small", value: render(UI::Time::Component.new(time: @bike_version.created_at, format: :localize_time_precise))) %>
 
-        <tr>
-          <td>Bike</td>
-
-          <td>
-            <%= render Atoms::Admin::TableCells::Bike::Component.new(bike: @bike, bike_id: @bike_version.bike_id) %>
-          </td>
-        </tr>
-
-        <tr class="small">
-          <td>Created</td>
-
-          <td>
-            <span class="localizeTime preciseTime">
-              <%= l @bike_version.created_at, format: :convert_time %>
-            </span>
-          </td>
-        </tr>
-
-        <% if @bike_version.deleted_at.present? %>
-          <tr class="small">
-            <td><span class="text-danger">Deleted</span></td>
-
-            <td>
-              <span class="localizeTime preciseTime">
-                <%= l @bike_version.deleted_at, format: :convert_time %>
-              </span>
-            </td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
+      <% list.with_row(label: tag.span("Deleted", class: "text-danger"), class: "small", value: render(UI::Time::Component.new(time: @bike_version.deleted_at, format: :localize_time_precise)), if: @bike_version.deleted_at.present?) %>
+    <% end %>
   </div>
 
   <div class="col-md-6">
-    <table class="table-list">
-      <tbody>
-        <tr>
-          <td>Manufacturer</td>
-          <td><%= @bike_version.mnfg_name %></td>
-        </tr>
+    <%= render(UI::TableList::Component.new) do |list| %>
+      <% list.with_row(label: "Manufacturer", value: @bike_version.mnfg_name) %>
+      <% list.with_row(label: "Frame model", value: @bike_version.frame_model) %>
+      <% list.with_row(label: "Year", value: @bike_version.year) %>
+      <% list.with_row(label: "Colors", value: @bike_version.frame_colors.join(", ")) %>
+      <% list.with_row(label: "Cycle type", value: @bike_version.cycle_type_name) %>
 
-        <tr>
-          <td>Frame model</td>
-          <td><%= @bike_version.frame_model %></td>
-        </tr>
-
-        <tr>
-          <td>Year</td>
-          <td><%= @bike_version.year %></td>
-        </tr>
-
-        <tr>
-          <td>Colors</td>
-          <td><%= @bike_version.frame_colors.join(", ") %></td>
-        </tr>
-
-        <tr>
-          <td>Cycle type</td>
-          <td><%= @bike_version.cycle_type_name %></td>
-        </tr>
-
-        <% if @bike_version.description.present? %>
-          <tr>
-            <td>Description</td>
-            <td><%= truncate(@bike_version.description, length: 200) %></td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
+      <% list.with_row(label: "Description", value: truncate(@bike_version.description, length: 200), if: @bike_version.description.present?) %>
+    <% end %>
   </div>
 </div>
 

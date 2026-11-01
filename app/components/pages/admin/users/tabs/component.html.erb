@@ -11,35 +11,12 @@
       <% if @user.banned? %>
         <% user_ban = @user.user_ban %>
         <%= render(UI::Alerts::Base::Component.new(kind: :error, header: "User banned")) do %>
-          <table class="table-list tw:mb-0">
-            <tbody>
-              <tr>
-                <td>Banned at</td>
-
-                <td>
-                  <%= render(UI::Time::Component.new(time: user_ban&.created_at || @user.updated_at, format: :localize_time_precise)) %>
-                </td>
-              </tr>
-
-              <tr>
-                <td>By</td>
-
-                <td>
-                  <%= render(Atoms::Admin::TableCells::User::Component.new(user: user_ban&.creator, user_id: user_ban&.creator_id)) %>
-                </td>
-              </tr>
-
-              <tr>
-                <td>Reason</td>
-                <td><%= user_ban&.reason_humanized %></td>
-              </tr>
-
-              <tr>
-                <td>Notes</td>
-                <td><%= user_ban&.description %></td>
-              </tr>
-            </tbody>
-          </table>
+          <%= render(UI::TableList::Component.new(classes: "tw:mb-0!")) do |list| %>
+            <% list.with_row(label: "Banned at", value: render(UI::Time::Component.new(time: user_ban&.created_at || @user.updated_at, format: :localize_time_precise))) %>
+            <% list.with_row(label: "By", value: render(Atoms::Admin::TableCells::User::Component.new(user: user_ban&.creator, user_id: user_ban&.creator_id))) %>
+            <% list.with_row(label: "Reason", value: user_ban&.reason_humanized) %>
+            <% list.with_row(label: "Notes", value: user_ban&.description) %>
+          <% end %>
         <% end %>
       <% end %>
 

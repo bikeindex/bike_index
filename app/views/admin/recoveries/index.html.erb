@@ -37,33 +37,19 @@
 
     <div class="row mt-4 mb-4">
       <div class="col-sm-6 offset-sm-3">
-        <table class="table-list wide-definition tw:[&_td:first-child]:not-italic!">
-          <%# duplicates some stuff from counts.rb %>
-          <% valued_recoveries = available_recoveries.pluck(:estimated_value).reject(&:blank?) %>
-          <% recovery_amount = valued_recoveries.sum + (available_recoveries.count - valued_recoveries.count) * Counts.recovery_average_value %>
+        <%# duplicates some stuff from counts.rb %>
+        <% valued_recoveries = available_recoveries.pluck(:estimated_value).reject(&:blank?) %>
+        <% recovery_amount = valued_recoveries.sum + (available_recoveries.count - valued_recoveries.count) * Counts.recovery_average_value %>
 
-          <tbody>
-            <tr class="small">
-              <td>With user entered value</td>
-              <td><%= number_display(valued_recoveries.count) %></td>
-            </tr>
+        <%= render(UI::TableList::Component.new(wide_definition: true, classes: "tw:[&_th]:not-italic")) do |list| %>
+          <% list.with_row(label: "With user entered value", class: "small", value: number_display(valued_recoveries.count)) %>
 
-            <tr class="small">
-              <td>Total user entered value</td>
-              <td>$<%= number_display(valued_recoveries.sum) %></td>
-            </tr>
+          <% list.with_row(label: "Total user entered value", class: "small", value: safe_join(["$", number_display(valued_recoveries.sum)])) %>
 
-            <tr class="small">
-              <td>Average stolen value</td>
-              <td>$<%= number_display(Counts.recovery_average_value) %></td>
-            </tr>
+          <% list.with_row(label: "Average stolen value", class: "small", value: safe_join(["$", number_display(Counts.recovery_average_value)])) %>
 
-            <tr>
-              <td>Total estimated value</td>
-              <td>$<%= number_display(recovery_amount) %></td>
-            </tr>
-          </tbody>
-        </table>
+          <% list.with_row(label: "Total estimated value", value: safe_join(["$", number_display(recovery_amount)])) %>
+        <% end %>
       </div>
     </div>
   <% end %>

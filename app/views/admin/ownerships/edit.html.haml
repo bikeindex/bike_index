@@ -36,41 +36,19 @@
       .form-group.mt-4
         = submit_tag "Update the ownership", class: "btn btn-success"
   .col-md-6
-    %table.table-list
-      %tr
-        %td Created At
-        %td.localizeTime
-          = l @bike.created_at, format: :convert_time
-      %tr
-        %td Owner Email
-        %td= @bike.owner_email
-      %tr
-        %td Current Owner
-        %td= @bike.owner.email
-      %tr
-        %td Send Email
-        %td
-          = check_mark if @ownership.send_email
-      %tr
-        %td Cached Data
-        %td= @bike.cached_data
-      %tr
-        %td Token
-        %td
-          - if @ownership.token.present?
-            %code
-              = link_to @ownership.token, bike_path(@bike.to_param, t: @ownership.token)
-      %tr
-        %td Claim message
-        %td= @ownership.claim_message&.humanize
-      %tr
-        %td Pre-registration?
-        %td= check_mark if @ownership.organization_pre_registration
-      %tr
-        %td Origin
-        %td
-          = render(Atoms::Org::OriginDisplay::Component.new(creation_kind: @ownership.origin))
-
+    = render(UI::TableList::Component.new) do |list|
+      - list.with_row(label: "Created At", value: render(UI::Time::Component.new(time: @bike.created_at)))
+      - list.with_row(label: "Owner Email", value: @bike.owner_email)
+      - list.with_row(label: "Current Owner", value: @bike.owner.email)
+      - list.with_row(label: "Send Email", value: (check_mark if @ownership.send_email))
+      - list.with_row(label: "Cached Data", value: @bike.cached_data)
+      - list.with_row(label: "Token") do
+        - if @ownership.token.present?
+          %code
+            = link_to @ownership.token, bike_path(@bike.to_param, t: @ownership.token)
+      - list.with_row(label: "Claim message", value: @ownership.claim_message&.humanize)
+      - list.with_row(label: "Pre-registration?", value: (check_mark if @ownership.organization_pre_registration))
+      - list.with_row(label: "Origin", value: render(Atoms::Org::OriginDisplay::Component.new(creation_kind: @ownership.origin)))
 
 - if display_dev_info?
   .row.mt-5

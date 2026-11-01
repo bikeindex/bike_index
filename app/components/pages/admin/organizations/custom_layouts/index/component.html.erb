@@ -3,12 +3,11 @@
     <%= link_to "Custom layouts version history", version_history_url %>
   </p>
 
-  <table class="table-list">
-    <tr>
-      <td>Invoiced</td>
-      <td><strong><%= @organization.is_invoiced? %></strong></td>
-    </tr>
-  </table>
+  <%= render(UI::TableList::Component.new) do |list| %>
+    <% list.with_row(label: "Invoiced") do %>
+      <strong><%= @organization.is_invoiced? %></strong>
+    <% end %>
+  <% end %>
 </div>
 
 <%= render(Pages::Admin::Organizations::CustomLayouts::Table::Component.new(organization: @organization)) %>

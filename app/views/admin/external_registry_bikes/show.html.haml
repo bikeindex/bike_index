@@ -10,48 +10,23 @@
       %h3.twless-strong
         No Image
   .col-lg-5.col-9.mb-2
-    %table.table-list
-      %tr
-        %td Registry
-        %td= @bike.registry_name
-      %tr
-        %td Registry ID
-        %td= @bike.external_id
-      %tr
-        %td Status
-        %td
-          = render(Atoms::RegistrationStatusBadge::Component.new(bike: @bike, size: :sm))
-      %tr
-        %td Date Stolen
-        %td= render UI::Time::Component.new(time: @bike.date_stolen)
-      %tr
-        %td Location
-        %td= @bike.location_found
-      %tr
-        %td Registry Link
-        %td= link_to @bike.url, @bike.url, target: :_blank
+    = render(UI::TableList::Component.new) do |list|
+      - list.with_row(label: "Registry", value: @bike.registry_name)
+      - list.with_row(label: "Registry ID", value: @bike.external_id)
+      - list.with_row(label: "Status", value: render(Atoms::RegistrationStatusBadge::Component.new(bike: @bike, size: :sm)))
+      - list.with_row(label: "Date Stolen", value: render(UI::Time::Component.new(time: @bike.date_stolen)))
+      - list.with_row(label: "Location", value: @bike.location_found)
+      - list.with_row(label: "Registry Link", value: link_to(@bike.url, @bike.url, target: :_blank))
 
   .col-lg-5.col-md-9.mt-auto.mb-2
-    %table.table-list.mb-0
-      %tbody
-        %tr
-          %td Serial number
-          %td= @bike.serial_number
-        %tr
-          %td Description
-          %td= @bike.description
-        %tr
-          %td Colors
-          %td= @bike.frame_colors.to_sentence
-        %tr
-          %td Created
-          %td
-            %span.localizeTime.preciseTime= l @bike.created_at, format: :convert_time
-            %small.localizeTimezone
-        %tr
-          %td Updated
-          %td
-            %span.localizeTime.preciseTime= l @bike.updated_at, format: :convert_time
+    = render(UI::TableList::Component.new(classes: "mb-0")) do |list|
+      - list.with_row(label: "Serial number", value: @bike.serial_number)
+      - list.with_row(label: "Description", value: @bike.description)
+      - list.with_row(label: "Colors", value: @bike.frame_colors.to_sentence)
+      - list.with_row(label: "Created") do
+        = render UI::Time::Component.new(time: @bike.created_at, format: :localize_time_precise)
+        %small.localizeTimezone
+      - list.with_row(label: "Updated", value: render(UI::Time::Component.new(time: @bike.updated_at, format: :localize_time_precise)))
     .mt-2
       %p.mb-0 Info Hash
       = render UI::JsonDisplay::Component.new(data: @bike.info_hash, no_max_height: true)

@@ -18,97 +18,49 @@
 
 <div class="row">
   <div class="col-sm-6">
-    <table class="table-list">
-      <tbody>
-        <tr>
-          <td>Created</td>
+    <%= render(UI::TableList::Component.new) do |list| %>
+      <% list.with_row(label: "Created", value: render(UI::Time::Component.new(time: @impound_record.created_at, format: :localize_time_precise))) %>
 
-          <td>
-            <span class="localizeTime preciseTime">
-              <%= l(@impound_record.created_at, format: :convert_time) %>
-            </span>
-          </td>
-        </tr>
+      <% list.with_row(label: "Updated", value: render(UI::Time::Component.new(time: @impound_record.updated_at, format: :localize_time_precise))) %>
 
-        <tr>
-          <td>Updated</td>
+      <% list.with_row(label: "Status") do %>
+        <em><%= status_display(@impound_record.status_humanized) %></em>
+      <% end %>
 
-          <td>
-            <span class="localizeTime preciseTime">
-              <%= l(@impound_record.updated_at, format: :convert_time) %>
-            </span>
-          </td>
-        </tr>
+      <% list.with_row(label: "Organization") do %>
+        <% if organization_name.present? %>
+          <%= link_to organization_name, admin_organization_path(@impound_record.organization_id) %>
+        <% else %>
+          <small class="twless-strong">NO organization</small>
+        <% end %>
+      <% end %>
 
-        <tr>
-          <td>Status</td>
+      <% list.with_row(label: "Bike", value: render(Atoms::Admin::TableCells::Bike::Component.new(bike: @impound_record.bike))) %>
 
-          <td>
-            <em><%= status_display(@impound_record.status_humanized) %></em>
-          </td>
-        </tr>
-
-        <tr>
-          <td>Organization</td>
-
-          <td>
-            <% if organization_name.present? %>
-              <%= link_to organization_name, admin_organization_path(@impound_record.organization_id) %>
-            <% else %>
-              <small class="twless-strong">NO organization</small>
-            <% end %>
-          </td>
-        </tr>
-
-        <tr>
-          <td>Bike</td>
-
-          <td>
-            <%= render Atoms::Admin::TableCells::Bike::Component.new(bike: @impound_record.bike) %>
-          </td>
-        </tr>
-
-        <tr>
-          <td>User</td>
-
-          <td>
-            <%= render Atoms::Admin::TableCells::User::Component.new(user: @impound_record.user) %>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+      <% list.with_row(label: "User", value: render(Atoms::Admin::TableCells::User::Component.new(user: @impound_record.user))) %>
+    <% end %>
   </div>
 
   <div class="col-sm-6">
-    <table class="table-list">
-      <tbody>
-        <tr>
-          <td>Impounded from</td>
+    <%= render(UI::TableList::Component.new) do |list| %>
+      <% list.with_row(label: "Impounded from") do %>
+        <% if @impound_record.impounded_from_address_record.blank? %>
+          <em class="twless-strong">No impounded from address</em>
+        <% else %>
+          <%= render(UI::AddressDisplay::Component.new(address_record: @impound_record.impounded_from_address_record, visible_attribute: :street)) %>
+        <% end %>
+      <% end %>
 
-          <td>
-            <% if @impound_record.impounded_from_address_record.blank? %>
-              <em class="twless-strong">No impounded from address</em>
-            <% else %>
-              <%= render(UI::AddressDisplay::Component.new(address_record: @impound_record.impounded_from_address_record, visible_attribute: :street)) %>
-            <% end %>
-          </td>
-        </tr>
-
-        <tr>
-          <td>Current address</td>
-
-          <td>
-            <% if @impound_record.address_record_id.blank? %>
-              <em class="twless-strong">No current address</em>
-            <% elsif @impound_record.address_record_id == @impound_record.impounded_from_address_record_id %>
-              <em class="twless-strong">same as impounded from</em>
-            <% else %>
-              <%= render(UI::AddressDisplay::Component.new(address_record: @impound_record.address_record, visible_attribute: :street)) %>
-            <% end %>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+      <% list.with_row(label: "Current address") do %>
+        <% if @impound_record.address_record_id.blank? %>
+          <em class="twless-strong">No current address</em>
+        <% elsif @impound_record.address_record_id == @impound_record.impounded_from_address_record_id %>
+          <em class="twless-strong">same as impounded from</em>
+        <% else %>
+          <%= render(UI::AddressDisplay::Component.new(address_record: @impound_record.address_record, visible_attribute: :street)) %>
+        <% end %>
+      <% end %>
+    <% end %>
   </div>
 </div>
 

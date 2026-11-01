@@ -4,26 +4,14 @@
   .col-md-6
     %h4.mb-3
       Autocomplete info
-    %table.table-list
-      %tbody
-        %tr
-          %td Category Keys
-          %td
-            = number_display(@autocomplete_info[:category_keys])
-            %small.twless-strong.ml-1
-              should be > 100k
-        %tr
-          %td Cache Keys
-          %td
-            = number_display(@autocomplete_info[:cache_keys])
-            %small.twless-strong.ml-1
-              they should expire every 10 minutes...
-
-        - @autocomplete_info.except(:category_keys, :cache_keys).each do |key, value|
-          %tr
-            %td= key.to_s.humanize
-            %td
-              - if value.is_a?(Integer)
-                = number_display(value)
-              - else
-                = value
+    = render(UI::TableList::Component.new) do |list|
+      - list.with_row(label: "Category Keys") do
+        = number_display(@autocomplete_info[:category_keys])
+        %small.twless-strong.ml-1
+          should be > 100k
+      - list.with_row(label: "Cache Keys") do
+        = number_display(@autocomplete_info[:cache_keys])
+        %small.twless-strong.ml-1
+          they should expire every 10 minutes...
+      - @autocomplete_info.except(:category_keys, :cache_keys).each do |key, value|
+        - list.with_row(label: key.to_s.humanize, value: value.is_a?(Integer) ? number_display(value) : value)
