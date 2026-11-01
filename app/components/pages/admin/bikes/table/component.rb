@@ -11,19 +11,19 @@ module Pages
         class Component < ApplicationComponent
           # The panel groups the time columns under "Time - "; the table headers keep the short names
           COLUMNS = {
-            created_at_cell: "Time - Registered",
-            updated_cell: "Time - Registration Updated",
-            occurred_at_cell: "Time - Status",
+            claimed_cell: "Claimed",
+            created_by_cell: "Created by",
+            cred_cell: "Cred",
+            propulsion_type_cell: "E-vehicle (propulsion)",
+            info_cell: "Info",
+            manufacturer_cell: "Manufacturer",
             photo_cell: "Photo",
             user_cell: "Sent to",
-            claimed_cell: "Claimed",
-            manufacturer_cell: "Manufacturer",
-            info_cell: "Info",
-            propulsion_type_cell: "E-vehicle (propulsion)",
             serial_cell: "Serial",
-            created_by_cell: "Created by",
             source_cell: "Source",
-            cred_cell: "Cred"
+            created_at_cell: "Time - Registered",
+            updated_cell: "Time - Registration Updated",
+            occurred_at_cell: "Time - Status"
           }.freeze
 
           DEFAULT_COLUMNS = %i[created_at_cell user_cell manufacturer_cell info_cell created_by_cell].freeze
