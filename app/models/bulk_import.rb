@@ -154,12 +154,14 @@ class BulkImport < ApplicationRecord
   end
 
   def allow_duplicate
+    return false if ascend?
+
     Binxtils::InputNormalizer.boolean(data&.dig("allow_duplicate"))
   end
 
   # Short serials (e.g. "1") are often junk shared by distinct bikes with one owner email
   def no_duplicate_for?(serial)
-    (ascend? || !allow_duplicate) && SerialNormalizer.no_space(SerialNormalizer.normalized_and_corrected(serial)).to_s.length >= 6
+    !allow_duplicate && SerialNormalizer.no_space(SerialNormalizer.normalized_and_corrected(serial)).to_s.length >= 6
   end
 
   def creator
