@@ -54,8 +54,8 @@
     <% end %>
 
     <% if @invoice.paid_money_but_no_cost? %>
-      <strong class="twless-strong">Amount due is $0</strong> this invoice doesn't
-      make the organization "Paid"
+      <strong class="twless-strong">Amount due is $0</strong> this invoice
+      doesn't make the organization "Paid"
       <% if @invoice.payments.any? %>
         <span class="d-block mt-1">
           <strong class="text-danger">This invoice has a payment,</strong> but
