@@ -213,37 +213,6 @@
     @apply tw:border-t tw:border-gray-200 tw:dark:border-gray-700;
   }
 
-  /* The band an admin bike or user screen opens with: what the record is, set apart from
-   * whichever tab's body follows it. Its .table-list tables sit on white against it. */
-  .admin-summary {
-    @apply tw:bg-[#212529] tw:pt-6 tw:pb-1 tw:text-white;
-  }
-
-  /* The UI::Tabs row the band sits flush under, with a heavier line the active tab still
-   * breaks. Forced, since the utilities they override outrank this layer */
-  nav:has(+ .admin-summary) {
-    @apply tw:mb-0!;
-  }
-
-  nav:has(+ .admin-summary) [data-ui--tabs-target="row"] {
-    @apply tw:border-b-2!;
-  }
-
-  nav:has(+ .admin-summary) [aria-current="page"] {
-    @apply tw:-mb-0.5! tw:border-b-2!;
-  }
-
-  .admin-summary h1,
-  .admin-summary h2,
-  .admin-summary h3,
-  .admin-summary h4 {
-    @apply tw:text-white;
-  }
-
-  .admin-summary table {
-    @apply tw:bg-white;
-  }
-
   .twhr {
     @apply tw:border-0 tw:h-px tw:bg-gray-200 tw:dark:bg-gray-700 tw:my-8;
   }
