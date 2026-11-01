@@ -71,7 +71,7 @@ RSpec.describe Admin::UsersController, type: :request do
       let!(:user_alert) { FactoryBot.create(:user_alert, user: user_subject) }
 
       it "renders each tab" do
-        Admin::UsersController::SHOW_TABS.each do |tab|
+        Pages::Admin::Users::Show::Component::TABS.each do |tab|
           get "#{base_url}/#{user_subject.id}?active_tab=#{tab}"
           expect(response.code).to eq("200"), "#{tab} rendered #{response.code}"
         end
@@ -84,6 +84,7 @@ RSpec.describe Admin::UsersController, type: :request do
         get "#{base_url}/#{user_subject.id}?active_tab=organization_roles"
         expect(response.body).to include(organization_role.organization.name)
         get "#{base_url}/#{user_subject.id}?active_tab=bikes"
+        expect(Nokogiri::HTML(response.body).at_css("h4").text.squish).to start_with("1 bike (view in admin/bikes)")
         expect(response.body).to include("LIVE-SERIAL")
         expect(response.body).to_not include("GONE-SERIAL")
         deleted_path = admin_bikes_path(user_id: user_subject.id, search_status_deleted_only: true, search_status_example: true)

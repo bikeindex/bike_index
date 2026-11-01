@@ -1,0 +1,18 @@
+<h4>
+  <%= number_display(bikes_count) %> <%= "bike".pluralize(bikes_count) %>
+  <small class="twless-strong"><%= index_note %></small>
+
+  <% if deleted_bikes_count.positive? %>
+    <small class="tw:text-sm!">
+      -
+      <%= link_to admin_bikes_path(user_id: @user.id, search_status_deleted_only: true, search_status_example: true), class: "twlink" do %>
+        <%= number_display(deleted_bikes_count) %> deleted
+        <%= "bike".pluralize(deleted_bikes_count) %>
+      <% end %>
+    </small>
+  <% end %>
+</h4>
+
+<% if bikes_count.positive? %>
+  <%= render(Pages::Admin::Bikes::Table::Component.new(bikes:, skip_user: true)) %>
+<% end %>
