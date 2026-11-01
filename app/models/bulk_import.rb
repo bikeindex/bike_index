@@ -155,7 +155,7 @@ class BulkImport < ApplicationRecord
 
   def allow_duplicate
     return false if ascend?
-    # Stolen and impound imports allow by default: a duplicate skips the row's stolen or impound record
+    # Deduping would drop the row's stolen or impound record
     return data&.dig("allow_duplicate") != false if stolen? || impounded?
 
     data&.dig("allow_duplicate") == true
