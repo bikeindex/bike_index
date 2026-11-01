@@ -58,9 +58,9 @@ const colors = (presenter, vehicle, key, picked) => {
 
   const latest = array(newest.colorways)
   const chosen = chosenColorway(vehicle, picked)
-  // the toggle's track wrapping its segments, which it doesn't for its own few short ones
+  // the toggle's track wrapping its segments, and scrolling in its column where one's name is wider than it
   const shown = latest.length > 1
-    ? html`<div class="tw:*:flex-wrap">${radioButtonGroup({
+    ? html`<div class="tw:overflow-x-auto tw:*:flex-wrap">${radioButtonGroup({
       name: `colorway-${key}`,
       entries: latest.map((each, index) => ({ value: colorwayValue(each, index), label: colorway(presenter, each) })),
       selected: colorwayValue(chosen, latest.indexOf(chosen)),
