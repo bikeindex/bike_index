@@ -19,6 +19,7 @@ RSpec.describe Pages::Admin::Bikes::Table::Component, type: :component do
     expect(component).to have_css("th.occurred_at_cell", text: "Status at")
     expect(component).to have_field("Time - Status when stolen, impounded, etc")
     expect(component).to have_css("input[value='source_cell'][data-default='false']")
+    expect(component).to have_css("input[value='claimed_cell'][data-default='false']")
     expect(component).to have_css("input[value='created_by_cell'][data-default='true']")
   end
 

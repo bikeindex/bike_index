@@ -16,6 +16,7 @@ module Pages
             occurred_at_cell: "Time - Status",
             photo_cell: "Photo",
             user_cell: "Sent to",
+            claimed_cell: "Claimed",
             manufacturer_cell: "Manufacturer",
             info_cell: "Info",
             propulsion_type_cell: "E-vehicle (propulsion)",

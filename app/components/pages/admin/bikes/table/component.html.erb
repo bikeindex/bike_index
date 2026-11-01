@@ -42,22 +42,14 @@
 
   <% unless @skip_user %>
     <% table.column(sortable: "owner_email", hideable: :user_cell) do |bike| %>
-      <div class="tw:relative">
-        <%# Pass in search_url because caching breaks with url_for %>
-        <% search_url = bike.user.present? ? admin_bikes_path(user_id: bike.user.id) : admin_bikes_path(search_email: bike.owner_email) %>
-        <%= render Atoms::Admin::TableCells::User::Component.new(email: bike.owner_email, user: bike.user, search_url:, render_search: true) %>
-
-        <% if bike.claimed? %>
-          <span
-            class="tw:absolute tw:top-0 tw:right-0 <%= UI::Alerts::Base::Component::TEXT_CLASSES[:notice] %>"
-            title="<%= bike.type %> is claimed"
-            style="cursor: default"
-          >
-            <%= check_mark %>
-          </span>
-        <% end %>
-      </div>
+      <%# Pass in search_url because caching breaks with url_for %>
+      <% search_url = bike.user.present? ? admin_bikes_path(user_id: bike.user.id) : admin_bikes_path(search_email: bike.owner_email) %>
+      <%= render Atoms::Admin::TableCells::User::Component.new(email: bike.owner_email, user: bike.user, search_url:, render_search: true) %>
     <% end %>
+  <% end %>
+
+  <% table.column(hideable: :claimed_cell, classes: UI::Alerts::Base::Component::TEXT_CLASSES[:notice]) do |bike| %>
+    <%= tag.span(check_mark, title: "#{bike.type} is claimed") if bike.claimed? %>
   <% end %>
 
   <% table.column(sortable: "manufacturer_id", hideable: :manufacturer_cell) do |bike| %>
