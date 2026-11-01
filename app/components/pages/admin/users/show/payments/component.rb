@@ -15,12 +15,12 @@ module Pages
 
             def memberships
               @memberships ||= Pages::Admin::Users::Tabs::Component.records(@user, :memberships)
-                .includes(:creator, :stripe_subscriptions).reorder(id: :desc).to_a
+                .includes(:creator, :stripe_subscriptions).reorder(id: :desc).load
             end
 
             def payments
               @payments ||= Pages::Admin::Users::Tabs::Component.records(@user, :payments)
-                .includes(:organization, :invoice).reorder(created_at: :desc).to_a
+                .includes(:organization, :invoice).reorder(created_at: :desc).load
             end
           end
         end
