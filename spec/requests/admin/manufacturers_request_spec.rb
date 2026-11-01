@@ -33,6 +33,24 @@ RSpec.describe Admin::ManufacturersController, type: :request do
       expect(response.status).to eq(200)
       expect(assigns(:manufacturers).pluck(:id)).to eq([with_website.id])
     end
+
+    context "authenticated with an API token" do
+      let(:current_user) { false }
+      include_context :admin_doorkeeper_token
+      let(:url) { "/admin/manufacturers.json" }
+      include_examples "rejects_unauthorized_token"
+
+      context "token for a manufacturers superuser" do
+        before { FactoryBot.create(:superuser_ability, user: token_user, controller_name: "manufacturers") }
+
+        it "renders the manufacturers with their priority" do
+          get url, params: token_param.merge(search_with_websites: true)
+          expect(response.status).to eq 200
+          expect(json_result["manufacturers"]).to eq([with_website.as_json(only: Admin::ManufacturersController::JSON_ATTRIBUTES)])
+          expect(json_result["manufacturers"].first).to include("priority" => 0, "website" => "http://stuff.com")
+        end
+      end
+    end
   end
 
   describe "show" do
@@ -81,7 +99,7 @@ RSpec.describe Admin::ManufacturersController, type: :request do
         it "updates" do
           patch url, params: token_param.merge(manufacturer: {name: "Cool Bikes (Rad Bikes)"})
           expect(response.status).to eq 200
-          expect(json_result["manufacturer"]).to include("name" => "Cool Bikes (Rad Bikes)", "slug" => "cool", "secondary_slug" => "rad")
+          expect(json_result["manufacturer"]).to include("name" => "Cool Bikes (Rad Bikes)", "slug" => "cool", "secondary_slug" => "rad", "priority" => 0)
         end
 
         context "with a name that is taken" do

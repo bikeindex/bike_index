@@ -3,12 +3,18 @@ module Admin
     include Binxtils::SortableTable
     include Admin::TokenAccessible
 
-    token_accessible :create, :update
+    token_accessible :index, :create, :update
+
+    JSON_ATTRIBUTES = %w[id name slug secondary_slug website frame_maker motorized_only priority].freeze
 
     before_action :find_manufacturer, only: [:edit, :update, :destroy, :show]
 
     def index
       @manufacturers = searched_manufacturers.reorder(sortable_order(Manufacturer))
+      respond_to do |format|
+        format.html
+        format.json { render json: {manufacturers: @manufacturers.as_json(only: JSON_ATTRIBUTES)} }
+      end
     end
 
     def show
@@ -94,7 +100,7 @@ module Admin
     end
 
     def render_manufacturer_json
-      render json: {manufacturer: @manufacturer.as_json(only: %w[id name slug secondary_slug website frame_maker motorized_only])}
+      render json: {manufacturer: @manufacturer.as_json(only: JSON_ATTRIBUTES)}
     end
 
     def render_errors_json
