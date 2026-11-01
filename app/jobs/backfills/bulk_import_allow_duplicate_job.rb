@@ -7,8 +7,9 @@ module Backfills
 
     def perform
       BulkImport.where("data IS NULL OR NOT data ? 'allow_duplicate'").find_each do |bulk_import|
-        no_duplicate = Binxtils::InputNormalizer.boolean(bulk_import.data&.dig("no_duplicate"))
-        bulk_import.update_column(:data, (bulk_import.data || {}).except("no_duplicate").merge("allow_duplicate" => !no_duplicate))
+        data = bulk_import.data.to_h
+        allow_duplicate = !Binxtils::InputNormalizer.boolean(data["no_duplicate"])
+        bulk_import.update_column(:data, data.except("no_duplicate").merge("allow_duplicate" => allow_duplicate))
       end
     end
   end
