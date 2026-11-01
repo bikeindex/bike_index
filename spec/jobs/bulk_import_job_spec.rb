@@ -599,8 +599,8 @@ RSpec.describe BulkImportJob, type: :job do
         expect { instance.perform(bulk_import.id) }.to change(Bike, :count).by 2
       end
     end
-    context "stolen import" do
-      let(:bulk_import_attrs) { {kind: "stolen", data: {stolen_record: {date_stolen: "2022-04-12T16:00", timezone: "America/Los_Angeles"}}} }
+    context "stolen import, with allow_duplicate" do
+      let(:bulk_import_attrs) { {kind: "stolen", data: {stolen_record: {date_stolen: "2022-04-12T16:00", timezone: "America/Los_Angeles"}}, allow_duplicate: true} }
       it "creates two bikes, so each keeps its stolen record" do
         expect { instance.perform(bulk_import.id) }.to change(Bike, :count).by 2
         expect(Bike.status_stolen.count).to eq 2
@@ -717,7 +717,7 @@ RSpec.describe BulkImportJob, type: :job do
             send_email: true,
             creation_organization_id: nil,
             bike_sticker: nil,
-            no_duplicate: false
+            no_duplicate: true
           }
         end
         let(:target_impound) do
