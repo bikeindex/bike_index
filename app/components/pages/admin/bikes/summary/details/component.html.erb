@@ -16,15 +16,13 @@
 
   <div class="tw:w-3/4 tw:lg:w-5/12 tw:lg:pr-4">
     <%= render(UI::TableList::Component.new(classes: "tw:mb-0!")) do |list| %>
-      <% if @display_dev_info %>
-        <% list.with_row(label: "ID", class: "tw:text-sm") do %>
-          <code><%= @bike.id %></code>
+      <% list.with_row(label: "ID", class: "tw:text-sm", if: @display_dev_info) do %>
+        <code><%= @bike.id %></code>
 
-          <span class="tw:ml-2">status: <code><%= status_humanized %></code></span>
+        <span class="tw:ml-2">status: <code><%= status_humanized %></code></span>
 
-          <% if @bike.user_hidden %>
-            <small class="tw:ml-2 <%= UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>">user hidden</small>
-          <% end %>
+        <% if @bike.user_hidden %>
+          <small class="tw:ml-2 <%= UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>">user hidden</small>
         <% end %>
       <% end %>
 
@@ -128,22 +126,18 @@
         <small><%= address_display(address_hash) if address_hash.present? %></small>
       <% end %>
 
-      <% if separate_registration_address? %>
-        <% list.with_row(label: "Reg Address") do %>
-          <small><%= address_display(registration_address.compact) %></small>
+      <% list.with_row(label: "Reg Address", if: separate_registration_address?) do %>
+        <small><%= address_display(registration_address.compact) %></small>
 
-          <% if @display_dev_info %>
-            <small class="tw:ml-2">
-              <em>source:</em>
-              <%= BikeServices::CalculateLocation.registration_address_source(@bike) %>
-            </small>
-          <% end %>
+        <% if @display_dev_info %>
+          <small class="tw:ml-2">
+            <em>source:</em>
+            <%= BikeServices::CalculateLocation.registration_address_source(@bike) %>
+          </small>
         <% end %>
       <% end %>
 
-      <% if render_phone? %>
-        <% list.with_row(label: "Phone", value: render(Atoms::Phone::Component.new(phone: @bike.phone, skip_link: true))) %>
-      <% end %>
+      <% list.with_row(label: "Phone", value: render(Atoms::Phone::Component.new(phone: @bike.phone, skip_link: true)), if: render_phone?) %>
     <% end %>
   </div>
 </div>

@@ -9,9 +9,7 @@
 <div class="row mt-4">
   <div class="col-md-6">
     <%= render(UI::TableList::Component.new) do |list| %>
-      <% if display_dev_info? %>
-        <% list.with_row(label: "ID", dev_only: true, value: tag.code(@marketplace_message.id)) %>
-      <% end %>
+      <% list.with_row(label: "ID", dev_only: true, value: tag.code(@marketplace_message.id), if: display_dev_info?) %>
 
       <% list.with_row(label: "Sender") do %>
         <%= render Atoms::Admin::TableCells::User::Component.new(user: @marketplace_message.sender, user_id: @marketplace_message.sender_id) %>

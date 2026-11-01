@@ -15,8 +15,8 @@
       %em total messages sent to bike:
       = number_display(@bike.messages_count)
   - list.with_row(label: "Receiver Name", value: @stolen_notification.receiver_email)
-  -if @bike.current_stolen_record.present?
-    - list.with_row(label: "Bike phone", value: @bike.current_stolen_record.phone)
+  - list.with_row(label: "Bike phone", if: @bike.current_stolen_record.present?) do
+    = @bike.current_stolen_record.phone
   - list.with_row(label: "Sent to owner") do
     = @stolen_notification.send_dates_parsed.count
     times

@@ -10,9 +10,7 @@
     <% visibility_class = "less-strong" if @bike_version.user_hidden? %>
 
     <%= render(UI::TableList::Component.new) do |list| %>
-      <% if display_dev_info? %>
-        <% list.with_row(label: "ID", dev_only: true, value: tag.code(@bike_version.id)) %>
-      <% end %>
+      <% list.with_row(label: "ID", dev_only: true, value: tag.code(@bike_version.id), if: display_dev_info?) %>
 
       <% list.with_row(label: "Name", value: @bike_version.name) %>
 
@@ -28,9 +26,7 @@
 
       <% list.with_row(label: "Created", class: "small", value: render(UI::Time::Component.new(time: @bike_version.created_at, format: :localize_time_precise))) %>
 
-      <% if @bike_version.deleted_at.present? %>
-        <% list.with_row(label: tag.span("Deleted", class: "text-danger"), class: "small", value: render(UI::Time::Component.new(time: @bike_version.deleted_at, format: :localize_time_precise))) %>
-      <% end %>
+      <% list.with_row(label: tag.span("Deleted", class: "text-danger"), class: "small", value: render(UI::Time::Component.new(time: @bike_version.deleted_at, format: :localize_time_precise)), if: @bike_version.deleted_at.present?) %>
     <% end %>
   </div>
 
@@ -42,9 +38,7 @@
       <% list.with_row(label: "Colors", value: @bike_version.frame_colors.join(", ")) %>
       <% list.with_row(label: "Cycle type", value: @bike_version.cycle_type_name) %>
 
-      <% if @bike_version.description.present? %>
-        <% list.with_row(label: "Description", value: truncate(@bike_version.description, length: 200)) %>
-      <% end %>
+      <% list.with_row(label: "Description", value: truncate(@bike_version.description, length: 200), if: @bike_version.description.present?) %>
     <% end %>
   </div>
 </div>

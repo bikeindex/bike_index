@@ -5,9 +5,7 @@
 <div class="tw:flex tw:flex-wrap">
   <div class="tw:w-full tw:md:w-1/2 tw:md:pr-4">
     <%= render(UI::TableList::Component.new) do |list| %>
-      <% if @display_dev_info %>
-        <% list.with_row(label: "ID", value: tag.code(@stolen_record.id), class: "tw:text-sm") %>
-      <% end %>
+      <% list.with_row(label: "ID", value: tag.code(@stolen_record.id), class: "tw:text-sm", if: @display_dev_info) %>
 
       <% list.with_row(label: "Theft description", value: @stolen_record.theft_description) %>
 
@@ -17,16 +15,14 @@
 
       <% list.with_row(label: "Callable by", value: callable_by) %>
 
-      <% unless @stolen_record.recovered? %>
-        <% list.with_row(label: "Link to recover") do %>
-          <input
-            type="text"
-            class="twinput"
-            readonly
-            autocomplete="off"
-            value="<%= recovery_link %>"
-          >
-        <% end %>
+      <% list.with_row(label: "Link to recover", if: !@stolen_record.recovered?) do %>
+        <input
+          type="text"
+          class="twinput"
+          readonly
+          autocomplete="off"
+          value="<%= recovery_link %>"
+        >
       <% end %>
     <% end %>
   </div>

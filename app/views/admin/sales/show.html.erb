@@ -7,9 +7,7 @@
 <div class="row mt-4">
   <div class="col-md-6">
     <%= render(UI::TableList::Component.new) do |list| %>
-      <% if display_dev_info? %>
-        <% list.with_row(label: "ID", dev_only: true, value: tag.code(@sale.id)) %>
-      <% end %>
+      <% list.with_row(label: "ID", dev_only: true, value: tag.code(@sale.id), if: display_dev_info?) %>
 
       <% list.with_row(label: "Seller", value: render(Atoms::Admin::TableCells::User::Component.new(user: @sale.seller, user_id: @sale.seller_id))) %>
 
@@ -53,16 +51,14 @@
         <% end %>
       <% end %>
 
-      <% if @marketplace_listing.present? %>
-        <% list.with_row(label: "Marketplace Listing") do %>
-          <%= link_to @marketplace_listing.id, admin_marketplace_messages_path(search_marketplace_listing_id: @marketplace_listing.id) %>
+      <% list.with_row(label: "Marketplace Listing", if: @marketplace_listing.present?) do %>
+        <%= link_to @marketplace_listing.id, admin_marketplace_messages_path(search_marketplace_listing_id: @marketplace_listing.id) %>
 
-          <%= render Atoms::Admin::Badges::MarketplaceListing::Component.new(status: @marketplace_listing.status, status_humanized: @marketplace_listing.status_humanized, kind: :marketplace_listing) %>
-        <% end %>
+        <%= render Atoms::Admin::Badges::MarketplaceListing::Component.new(status: @marketplace_listing.status, status_humanized: @marketplace_listing.status_humanized, kind: :marketplace_listing) %>
       <% end %>
 
-      <% if @sale.marketplace_message.present? %>
-        <% list.with_row(label: "Marketplace Message", value: link_to(@sale.marketplace_message_id, admin_marketplace_message_path(@sale.marketplace_message_id))) %>
+      <% list.with_row(label: "Marketplace Message", if: @sale.marketplace_message.present?) do %>
+        <%= link_to(@sale.marketplace_message_id, admin_marketplace_message_path(@sale.marketplace_message_id)) %>
       <% end %>
 
       <% list.with_row(label: "New Ownership") do %>

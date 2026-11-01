@@ -31,6 +31,31 @@ RSpec.describe UI::TableList::Component, type: :component do
     end
   end
 
+  context "with if:" do
+    let(:component) do
+      render_inline(described_class.new) do |list|
+        list.with_row(label: "Name", value: "Mothman", if: true)
+        list.with_row(label: "Region", if: nil) { raise "the block of a skipped row runs" }
+      end
+    end
+
+    it "skips the falsy rows" do
+      expect(component).to have_css("tr", count: 1)
+      expect(component).to have_css("tr", text: "Mothman")
+      expect(component).not_to have_css("tr[if]")
+    end
+
+    context "with every row skipped" do
+      let(:component) do
+        render_inline(described_class.new) { |list| list.with_row(label: "Name", value: "Mothman", if: false) }
+      end
+
+      it "renders nothing" do
+        expect(component.to_html).to eq ""
+      end
+    end
+  end
+
   context "with no rows" do
     it "renders nothing" do
       expect(render_inline(described_class.new).to_html).to eq ""

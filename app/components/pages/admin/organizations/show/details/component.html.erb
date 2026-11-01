@@ -1,7 +1,5 @@
 <%= render(UI::TableList::Component.new) do |list| %>
-  <% if @display_dev_info %>
-    <% list.with_row(label: "ID", value: @organization.id, class: "small only-dev-visible") %>
-  <% end %>
+  <% list.with_row(label: "ID", value: @organization.id, class: "small only-dev-visible", if: @display_dev_info) %>
 
   <% list.with_row(label: "Short Name") do %>
     <%= @organization.short_name %>

@@ -81,9 +81,7 @@
                 <% list.with_row(label:, value: number_display(count)) %>
               <% end %>
 
-              <% if nil_count > 0 %>
-                <% list.with_row(label: "Nil", value: number_display(nil_count)) %>
-              <% end %>
+              <% list.with_row(label: "Nil", value: number_display(nil_count), if: nil_count > 0) %>
             <% end %>
           </div>
         </div>

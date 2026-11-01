@@ -7,14 +7,12 @@
 <div class="row mt-4">
   <div class="col-md-6">
     <%= render(UI::TableList::Component.new) do |list| %>
-      <% if display_dev_info? %>
-        <% list.with_row(label: "ID", dev_only: true) do %>
-          <code><%= @strava_integration.id %></code>
+      <% list.with_row(label: "ID", dev_only: true, if: display_dev_info?) do %>
+        <code><%= @strava_integration.id %></code>
 
-          <small class="less-strong tw:ml-2">
-            Strava ID: <code><%= @strava_integration.strava_id %></code>
-          </small>
-        <% end %>
+        <small class="less-strong tw:ml-2">
+          Strava ID: <code><%= @strava_integration.strava_id %></code>
+        </small>
       <% end %>
 
       <% list.with_row(label: "User", value: render(Atoms::Admin::TableCells::User::Component.new(user: @strava_integration.user, user_id: @strava_integration.user_id))) %>
@@ -27,12 +25,10 @@
 
       <% list.with_row(label: "Last Page 1 request", value: render(UI::Time::Component.new(time: @strava_integration.last_updated_activities_at, format: :localize_time_precise))) %>
 
-      <% if @strava_integration.deleted_at.present? %>
-        <% list.with_row(label: "Deleted", class: "small") do %>
-          <span class="text-danger">
-            <%= render(UI::Time::Component.new(time: @strava_integration.deleted_at, format: :localize_time_precise)) %>
-          </span>
-        <% end %>
+      <% list.with_row(label: "Deleted", class: "small", if: @strava_integration.deleted_at.present?) do %>
+        <span class="text-danger">
+          <%= render(UI::Time::Component.new(time: @strava_integration.deleted_at, format: :localize_time_precise)) %>
+        </span>
       <% end %>
     <% end %>
   </div>

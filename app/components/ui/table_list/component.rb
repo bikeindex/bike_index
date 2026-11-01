@@ -13,9 +13,13 @@ module UI
       # The top padding sets the smaller label on the value's first line
       LABEL_CLASSES = "#{CELL_CLASSES} tw:pt-[9px] tw:text-right tw:text-[75%] tw:leading-[1.25] tw:font-normal tw:italic"
 
-      # value: or a block. row_attributes go on the <tr>
+      # value: or a block. A falsy if: skips the row without running its block - value: is
+      # evaluated regardless, so a value that needs the condition goes in the block.
+      # row_attributes go on the <tr>
       renders_many :rows, ->(label:, value: nil, dev_only: false, **row_attributes, &block) {
-        tag.tr(**row_attributes) do
+        next "" if row_attributes.key?(:if) && !row_attributes[:if]
+
+        tag.tr(**row_attributes.except(:if)) do
           tag.th(label, scope: "row", class: token_list(LABEL_CLASSES, "only-dev-visible": dev_only)) +
             tag.td(block ? capture(&block) : value, class: value_classes)
         end
@@ -27,7 +31,7 @@ module UI
         @classes = classes
       end
 
-      def render? = rows?
+      def render? = rows.any? { it.to_s.present? }
 
       def call
         tag.table(class: token_list(TABLE_CLASSES, @classes)) { tag.tbody { safe_join(rows) } }

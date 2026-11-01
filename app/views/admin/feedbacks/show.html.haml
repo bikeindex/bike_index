@@ -19,12 +19,11 @@
           = @feedback.name
           %span.less-strong
             = link_to @feedback.email, admin_users_path(user_query: @feedback.email)
-      - if @feedback.feedback_hash.present?
-        - list.with_row(label: "data") do
-          - if @feedback.organization.present?
-            = link_to @feedback.organization.name, admin_organization_path(@feedback.organization.to_param)
-          .mt-2
-            = render UI::JsonDisplay::Component.new(data: @feedback.feedback_hash, small: true)
+      - list.with_row(label: "data", if: @feedback.feedback_hash.present?) do
+        - if @feedback.organization.present?
+          = link_to @feedback.organization.name, admin_organization_path(@feedback.organization.to_param)
+        .mt-2
+          = render UI::JsonDisplay::Component.new(data: @feedback.feedback_hash, small: true)
       - list.with_row(label: "Bike") do
         - if @bike.present?
           = render Atoms::Admin::TableCells::Bike::Component.new(bike: @bike, bike_id: @feedback.feedback_hash["bike_id"])
