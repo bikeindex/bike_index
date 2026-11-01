@@ -11,13 +11,11 @@ module Pages
                   ambassador_tasks: "Ambassador tasks"}.freeze
 
           # These tabs are another controller's index, filtered to this user - which renders the
-          # header through Pages::Admin::IndexSkeleton's user_tab:. The rest but edit are
-          # Pages::Admin::Users::Show tabs.
-          INDEX_PATHS = {bikes: :admin_bikes_path, deleted_bikes: :admin_bikes_path,
-                         marketplace_messages: :admin_marketplace_messages_path, memberships: :admin_memberships_path,
+          # header through Pages::Admin::IndexSkeleton's user_tab:. The rest but edit are the
+          # users show action's.
+          INDEX_PATHS = {marketplace_messages: :admin_marketplace_messages_path, memberships: :admin_memberships_path,
                          alerts: :admin_user_alerts_path, payments: :admin_payments_path,
                          notifications: :admin_notifications_path, feedbacks: :admin_feedbacks_path}.freeze
-          INDEX_PARAMS = {deleted_bikes: {search_status_deleted_only: true, search_status_example: true}}.freeze
 
           def self.records(user, tab)
             case tab
@@ -63,7 +61,7 @@ module Pages
             return edit_admin_user_path(@user.id) if tab == :edit
             return admin_user_path(@user.id, active_tab: tab) unless INDEX_PATHS.key?(tab)
 
-            public_send(INDEX_PATHS[tab], user_id: @user.id, **INDEX_PARAMS.fetch(tab, {}))
+            public_send(INDEX_PATHS[tab], user_id: @user.id)
           end
 
           # Hidden with nothing behind them - except on their own page, which keeps its place

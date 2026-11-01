@@ -1,0 +1,7 @@
+<p class="tw:mb-4 tw:text-sm">
+  <%= link_to "Search them in the bikes index", index_path, class: "twlink" %>
+</p>
+
+<%= render(Pages::Admin::Bikes::Table::Component.new(bikes: @bikes, skip_user: true)) %>
+
+<%= render(UI::Pagination::Component.new(pagy: @pagy, page_params: {active_tab: @active_tab})) %>

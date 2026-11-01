@@ -13,10 +13,10 @@ RSpec.describe Pages::Admin::Users::Show::Component, type: :component do
 
   # Those tabs are the filtered admin index, which renders the header itself
   context "with a tab that has an index" do
-    let(:active_tab) { :bikes }
+    let(:active_tab) { :payments }
 
     it "raises" do
-      expect { component }.to raise_error(ArgumentError, /bikes/)
+      expect { component }.to raise_error(ArgumentError, /payments/)
     end
   end
 end

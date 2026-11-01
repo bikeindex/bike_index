@@ -65,9 +65,11 @@ RSpec.describe Admin::UsersController, type: :request do
     context "with a record behind every tab" do
       let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user: user_subject) }
       let!(:user_email) { FactoryBot.create(:user_email, user: user_subject) }
+      let!(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: user_subject, serial_number: "LIVE-SERIAL") }
+      let!(:bike_deleted) { FactoryBot.create(:bike, :with_ownership_claimed, user: user_subject, serial_number: "GONE-SERIAL", deleted_at: Time.current) }
 
       it "renders each tab" do
-        Pages::Admin::Users::Show::Component::TABS.each do |tab|
+        Admin::UsersController::SHOW_TABS.each do |tab|
           get "#{base_url}/#{user_subject.id}?active_tab=#{tab}"
           expect(response.code).to eq("200"), "#{tab} rendered #{response.code}"
         end
@@ -75,6 +77,12 @@ RSpec.describe Admin::UsersController, type: :request do
         expect(response.body).to include(user_email.email)
         get "#{base_url}/#{user_subject.id}?active_tab=organization_roles"
         expect(response.body).to include(organization_role.organization.name)
+        get "#{base_url}/#{user_subject.id}?active_tab=bikes"
+        expect(response.body).to include("LIVE-SERIAL")
+        expect(response.body).to_not include("GONE-SERIAL")
+        get "#{base_url}/#{user_subject.id}?active_tab=deleted_bikes"
+        expect(response.body).to include("GONE-SERIAL")
+        expect(response.body).to_not include("LIVE-SERIAL")
       end
     end
   end
@@ -83,11 +91,15 @@ RSpec.describe Admin::UsersController, type: :request do
   describe "the indexes that are tabs" do
     it "renders the user's tabs on each, with its own active" do
       Pages::Admin::Users::Tabs::Component::INDEX_PATHS.each do |tab, path|
-        get public_send(path, user_id: user_subject.id, **Pages::Admin::Users::Tabs::Component::INDEX_PARAMS.fetch(tab, {}))
+        get public_send(path, user_id: user_subject.id)
         expect(response.code).to eq("200"), "#{tab} rendered #{response.code}"
         active = Nokogiri::HTML(response.body).css("nav a[aria-current]").map { |link| link.text.squish }
         expect(active).to eq(["#{Pages::Admin::Users::Tabs::Component::TABS[tab]} 0"]), "#{tab} marked #{active}"
       end
+      # The user's bikes are their own tab, not the bikes index
+      get admin_bikes_path(user_id: user_subject.id)
+      expect(response.code).to eq("200")
+      expect(response.body).to_not include("User sections")
     end
   end
 
@@ -120,7 +132,7 @@ RSpec.describe Admin::UsersController, type: :request do
       let!(:bike_deleted) { FactoryBot.create(:bike, :with_ownership_claimed, user: user_subject, deleted_at: Time.current) }
       it "renders the deleted bikes tab" do
         get "#{base_url}/#{user_subject.id}/edit"
-        link = Nokogiri::HTML(response.body).at_css("a[href='#{admin_bikes_path(user_id: user_subject.id, search_status_deleted_only: true, search_status_example: true)}']")
+        link = Nokogiri::HTML(response.body).at_css("a[href='#{admin_user_path(user_subject.id, active_tab: :deleted_bikes)}']")
         expect(link&.text&.squish).to eq "Deleted bikes 1"
       end
     end

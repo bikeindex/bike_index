@@ -15,7 +15,7 @@ RSpec.describe Pages::Admin::Users::Tabs::Component, type: :component do
       "Organizations 0", "Notifications 0", "Feedbacks 0", "Emails 2"]
     expect(component.css("nav a[aria-current]").map { |tab| tab.text.squish }).to eq ["Edit"]
     expect(component).to have_link("Edit", href: "/admin/users/#{user.id}/edit")
-    expect(component).to have_link("Bikes 0", href: "/admin/bikes?user_id=#{user.id}")
+    expect(component).to have_link("Bikes 0", href: "/admin/users/#{user.id}?active_tab=bikes")
     expect(component).to have_link("Payments 0", href: "/admin/payments?user_id=#{user.id}")
     expect(component).to have_link("Emails 2", href: "/admin/users/#{user.id}?active_tab=emails")
     expect(component.css("[role='alert']")).to be_empty
@@ -27,7 +27,7 @@ RSpec.describe Pages::Admin::Users::Tabs::Component, type: :component do
 
     it "renders their tab" do
       expect(component).to have_link("Deleted bikes 2",
-        href: "/admin/bikes?search_status_deleted_only=true&search_status_example=true&user_id=#{user.id}")
+        href: "/admin/users/#{user.id}?active_tab=deleted_bikes")
     end
   end
 

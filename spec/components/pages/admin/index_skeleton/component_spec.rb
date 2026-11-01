@@ -54,10 +54,10 @@ RSpec.describe Pages::Admin::IndexSkeleton::Component, type: :component do
 
   describe "user_tab" do
     let(:user) { FactoryBot.create(:user_confirmed, name: "Test User") }
-    let(:options) { super().merge(index: super()[:index].with(user_subject: user), user_tab: :bikes) }
+    let(:options) { super().merge(index: super()[:index].with(user_subject: user), user_tab: :payments) }
 
     it "renders the user's tabs, with this index active" do
-      expect(component.css("nav a[aria-current]").map { |tab| tab.text.squish }).to eq ["Bikes 0"]
+      expect(component.css("nav a[aria-current]").map { |tab| tab.text.squish }).to eq ["Payments 0"]
       expect(component).to have_content("Test User")
     end
 
