@@ -13,7 +13,7 @@
 
 <%# A column only some callers render is in the cached rows, so it keys them %>
 <%= render(UI::CardTable::Component.new(records: @bikes, cache_key: [self.class.cache_digest, (:multi_check if @render_multi_check), (:skip_user if @skip_user)].compact,
-  render_sortable: @render_sortable, sort_state: @sort_state, frozen_column: @render_multi_check, **card_options,
+  render_sortable: @render_sortable, sort_state: @sort_state, **card_options,
   data: {controller: "update-cached-sortable-links", "update-cached-sortable-links-base-url-value": url_for(@sort_state.search_params)})) do |table| %>
   <% if @render_multi_check %>
     <% table.with_actions do %>

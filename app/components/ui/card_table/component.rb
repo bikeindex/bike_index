@@ -39,12 +39,11 @@ module UI
       # column_settings: UI::TableColumnSettings' columns, defaults and narrow_hidden, plus its storage_key.
       # form: form_with's options, making the card a form whose actions apply to the rows checked in
       # selection_column. data: the outermost element's, its controllers and actions joining these.
-      # frozen_column: false lets the first column scroll with the rest. The rest go to UI::Table
-      def initialize(column_settings: nil, form: nil, data: {}, frozen_column: true, **table_options)
+      # The rest go to UI::Table
+      def initialize(column_settings: nil, form: nil, data: {}, **table_options)
         @column_settings = column_settings
         @form = form
         @data = data
-        @frozen_column = frozen_column
         @table_options = table_options
         @columns = []
       end
@@ -102,7 +101,7 @@ module UI
       end
 
       def column_options(options, index)
-        options.merge(classes: [(FROZEN_COLUMN_CLASSES if @frozen_column && index.zero?), options[:classes]].compact.join(" "))
+        options.merge(classes: [(FROZEN_COLUMN_CLASSES if index.zero?), options[:classes]].compact.join(" "))
       end
     end
   end
