@@ -191,15 +191,8 @@
                     <% end %>
                   <% end %>
                 <% else %>
-                  <% list.with_row(label: (bike_attr || reg_field)&.humanize(keep_id_suffix: true)) do %>
-                    <% if bike_attr == "organization_affiliation" %>
-                      <%= @bike.organization_affiliation(@organization)&.humanize %>
-                    <% elsif bike_attr == "student_id" %>
-                      <%= @bike.student_id(@organization) %>
-                    <% else %>
-                      <%= @bike.send(bike_attr) %>
-                    <% end %>
-                  <% end %>
+                  <% list.with_row(label: (bike_attr || reg_field)&.humanize(keep_id_suffix: true),
+                       value: OrgServices::RegistrationFields.value(bike: @bike, organization: @organization, reg_field:)) %>
                 <% end %>
               <% end %>
 

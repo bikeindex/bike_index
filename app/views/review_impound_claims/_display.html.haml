@@ -1,7 +1,6 @@
 -# Need to pass update_url if you want the url to be for organization
 - update_url ||= review_impound_claim_path(@impound_claim.id)
 - block_superuser_update ||= false
-- inline_image_classes = "tw:inline-block tw:w-[31%] tw:max-w-[150px] tw:mr-[3%]"
 
 - @bike_claimed = @impound_claim.bike_claimed
 - @bike_submitting = @impound_claim.bike_submitting
@@ -21,16 +20,15 @@
             submitted:
             = render(UI::Time::Component.new(time: @impound_claim.submitted_at, format: :localize_time_precise))
       - list.with_row(label: "Claimant", value: @impound_claim.user&.display_name)
-      - list.with_row(label: "Verified phone?", value: (check_mark if @impound_claim.user&.phone_confirmed?), if: Flipper.enabled?(:phone_verification))
+      - list.with_row(label: "Verified phone?", if: Flipper.enabled?(:phone_verification)) do
+        = check_mark if @impound_claim.user&.phone_confirmed?
       - list.with_row(label: "Bike", if: @bike_submitting.present?) do
         = link_to organized_bike_text(@bike_submitting), bike_path(@bike_submitting, organization_id: current_organization.to_param)
       - list.with_row(label: "Bike registered", value: render(UI::Time::Component.new(time: @bike_submitting&.created_at, format: :localize_time_precise)))
-      - list.with_row(label: "Photos with bike") do
-        - @impound_claim.bike_submitting_images.photo_of_user_with_bike.each do |image|
-          = link_to image_tag(image.image_url(:small), class: inline_image_classes), image.image_url
-      - list.with_row(label: "Proof of purchase") do
-        - @impound_claim.bike_submitting_images.photo_of_receipt.each do |image|
-          = link_to image_tag(image.image_url(:small), class: inline_image_classes), image.image_url
+      - {"Photos with bike" => :photo_of_user_with_bike, "Proof of purchase" => :photo_of_receipt}.each do |label, kind|
+        - list.with_row(label:) do
+          - @impound_claim.bike_submitting_images.public_send(kind).each do |image|
+            = link_to image_tag(image.image_url(:small), class: "tw:inline-block tw:w-[31%] tw:max-w-[150px] tw:mr-[3%]"), image.image_url
 
   .col-md-6
     - if @bike_submitting.present?
@@ -99,9 +97,7 @@
                 = @impound_record.id
         - list.with_row(label: "#{@impound_claim.kind.titleize} by", value: @impound_record.creator&.display_name)
       - list.with_row(label: "Created", value: render(UI::Time::Component.new(time: @impound_record.created_at, format: :localize_time_precise)), if: @parking_notification.blank?)
-      - list.with_row(label: "Status", if: !@impound_record.current?) do
-        %strong
-          = status_display(@impound_record.status_humanized)
+      - list.with_row(label: "Status", value: tag.strong(status_display(@impound_record.status_humanized)), if: !@impound_record.current?)
       -# Can't write notes unless organized
       - list.with_row(label: "Notification Notes", if: @impound_claim.organized?) do
         - if @impound_record.notification_notes_and_messages.present?

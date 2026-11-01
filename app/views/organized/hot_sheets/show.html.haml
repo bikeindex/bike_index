@@ -93,7 +93,8 @@
                       - if stolen_record.police_report_number.present?
                         %small.less-strong
                           = stolen_record.police_report_department
-                    - list.with_row(label: "Phone", value: render(Atoms::Phone::Component.new(phone: stolen_record.phone)), if: bike.phoneable_by?(current_user))
+                    - list.with_row(label: "Phone", if: bike.phoneable_by?(current_user)) do
+                      = render(Atoms::Phone::Component.new(phone: stolen_record.phone))
               .bike-image{ class: thumbclass }
                 %a{ href:  bike_link }
                   %img{ src: thumb_url }

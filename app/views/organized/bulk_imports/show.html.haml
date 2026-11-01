@@ -16,7 +16,7 @@
       %em.small.less-strong= t(".file_removed_explanation")
     - else
       = link_to @bulk_import.file_url.truncate(100), @bulk_import.file_url
-  - list.with_row(label: t(".matched_count"), value: number_with_delimiter(@bulk_import.matched_count), if: @bulk_import.matched_count.positive?)
+  - list.with_row(label: t(".matched_count"), value: number_display(@bulk_import.matched_count), if: @bulk_import.matched_count.positive?)
   - list.with_row(label: t(".creator"), value: @bulk_import.user&.display_name || "-")
   - list.with_row(label: "Kind", value: @bulk_import.kind_humanized, if: permitted_kinds.count > 1)
   - list.with_row(label: "notes", if: @bulk_import.no_notify) do
