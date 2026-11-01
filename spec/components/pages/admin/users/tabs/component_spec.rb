@@ -13,16 +13,26 @@ RSpec.describe Pages::Admin::Users::Tabs::Component, type: :component do
     FactoryBot.create(:feedback, user:)
     FactoryBot.create(:user_alert, user:)
     expect(component).to have_content("Test User")
-    expect(tab_labels).to eq ["Edit", "Bikes 0", "Memberships 0", "Payments 0", "Organizations 0", "Messages 2",
-      "Emails 2"]
+    expect(tab_labels).to eq ["Edit", "Bikes 0", "Payments 0", "Organizations 0", "Messages 2", "Emails 2"]
     expect(component.css("nav a[aria-current]").map { |tab| tab.text.squish }).to eq ["Edit"]
     expect(component).to have_link("Edit", href: "/admin/users/#{user.id}/edit")
     expect(component).to have_link("Bikes 0", href: "/admin/users/#{user.id}?active_tab=bikes")
     expect(component).to have_link("Messages 2", href: "/admin/users/#{user.id}?active_tab=messages")
-    expect(component).to have_link("Payments 0", href: "/admin/payments?user_id=#{user.id}")
+    expect(component).to have_link("Payments 0", href: "/admin/users/#{user.id}?active_tab=payments")
     expect(component).to have_link("Emails 2", href: "/admin/users/#{user.id}?active_tab=emails")
     expect(component.css("[role='alert']")).to be_empty
     expect(component).to_not have_content("deleted")
+  end
+
+  context "with memberships" do
+    before do
+      FactoryBot.create(:membership, user:, start_at: Time.current - 2.years, end_at: Time.current - 1.year)
+      FactoryBot.create(:membership, user:)
+    end
+
+    it "names them on the payments tab, after the payments' count" do
+      expect(tab_labels).to include("Payments 0 & memberships")
+    end
   end
 
   context "with caching", :caching do

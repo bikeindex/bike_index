@@ -69,6 +69,8 @@ RSpec.describe Admin::UsersController, type: :request do
       let!(:bike_deleted) { FactoryBot.create(:bike, :with_ownership_claimed, user: user_subject, serial_number: "GONE-SERIAL", deleted_at: Time.current) }
       let!(:feedback) { FactoryBot.create(:feedback, user: user_subject, body: "FEEDBACK-BODY") }
       let!(:user_alert) { FactoryBot.create(:user_alert, user: user_subject) }
+      let!(:membership) { FactoryBot.create(:membership, user: user_subject) }
+      let!(:payment) { FactoryBot.create(:payment, user: user_subject) }
 
       it "renders each tab" do
         Pages::Admin::Users::Show::Component::TABS.each do |tab|
@@ -81,6 +83,10 @@ RSpec.describe Admin::UsersController, type: :request do
         sections = Nokogiri::HTML(response.body).css("h3").map { |heading| heading.text.squish }
         expect(sections).to eq(["Marketplace messages 0", "Alerts 1", "Notifications 0", "Feedbacks 1"])
         expect(response.body).to include(admin_feedback_path(feedback))
+        get "#{base_url}/#{user_subject.id}?active_tab=payments"
+        sections = Nokogiri::HTML(response.body).css("h3").map { |heading| heading.text.squish }
+        expect(sections).to eq(["Memberships 1", "Payments 1"])
+        expect(response.body).to include(edit_admin_payment_path(payment))
         get "#{base_url}/#{user_subject.id}?active_tab=organization_roles"
         expect(response.body).to include(organization_role.organization.name)
         get "#{base_url}/#{user_subject.id}?active_tab=bikes"
@@ -90,22 +96,6 @@ RSpec.describe Admin::UsersController, type: :request do
         deleted_path = admin_bikes_path(user_id: user_subject.id, search_status_deleted_only: true, search_status_example: true)
         expect(Nokogiri::HTML(response.body).at_css("a[href='#{deleted_path}']")&.text&.squish).to eq "1 deleted bike"
       end
-    end
-  end
-
-  # Those tabs are another controller's index, which renders the header when filtered to the user
-  describe "the indexes that are tabs" do
-    it "renders the user's tabs on each, with its own active" do
-      Pages::Admin::Users::Tabs::Component::INDEX_PATHS.each do |tab, path|
-        get public_send(path, user_id: user_subject.id)
-        expect(response.code).to eq("200"), "#{tab} rendered #{response.code}"
-        active = Nokogiri::HTML(response.body).css("nav a[aria-current]").map { |link| link.text.squish }
-        expect(active).to eq(["#{Pages::Admin::Users::Tabs::Component::TABS[tab]} 0"]), "#{tab} marked #{active}"
-      end
-      # The user's bikes are their own tab, not the bikes index
-      get admin_bikes_path(user_id: user_subject.id)
-      expect(response.code).to eq("200")
-      expect(response.body).to_not include("User sections")
     end
   end
 
@@ -129,7 +119,7 @@ RSpec.describe Admin::UsersController, type: :request do
       get "#{base_url}/#{user_subject.id}/edit"
       expect(response).to render_template :edit
       expect(response.body).to include(user_email.email)
-      expect(response.body).to include("Memberships")
+      expect(response.body).to include("&amp; membership")
       expect(response.body).to_not include("deleted_only")
     end
 

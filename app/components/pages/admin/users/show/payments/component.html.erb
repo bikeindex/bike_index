@@ -1,0 +1,13 @@
+<% if memberships.any? %>
+  <%= render(Atoms::Admin::SectionHeading::Component.new(title: "Memberships", count: memberships.size,
+        href: admin_memberships_path(user_id: @user.id))) %>
+
+  <%= render partial: "/admin/memberships/table", locals: {memberships:, skip_user: true} %>
+<% end %>
+
+<%= render(Atoms::Admin::SectionHeading::Component.new(title: "Payments", count: payments.size,
+      href: admin_payments_path(user_id: @user.id))) %>
+
+<% if payments.any? %>
+  <%= render partial: "/admin/payments/table", locals: {payments:, skip_user: true} %>
+<% end %>

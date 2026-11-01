@@ -1,47 +1,38 @@
-<h3 class="tw:mt-6">
-  <%= section_heading("Notifications", notifications.size, admin_notifications_path(search_bike_id: @bike.id)) %>
-</h3>
+<%= render(Atoms::Admin::SectionHeading::Component.new(title: "Notifications", count: notifications.size,
+      href: admin_notifications_path(search_bike_id: @bike.id))) %>
 
 <% if notifications.any? %>
   <%= render partial: "/admin/notifications/table",
         locals: {notifications:, skip_bike: true, show_message_preview: true} %>
 <% end %>
 
-<h3 class="tw:mt-6">
-  <%= section_heading("Organization messages", organization_messages.size,
-        admin_organization_messages_path(search_bike_id: @bike.id)) %>
-</h3>
+<%= render(Atoms::Admin::SectionHeading::Component.new(title: "Organization messages", count: organization_messages.size,
+      href: admin_organization_messages_path(search_bike_id: @bike.id))) %>
 
 <% if organization_messages.any? %>
   <%= render partial: "/admin/organization_messages/table", locals: {collection: organization_messages, skip_bike: true} %>
 <% end %>
 
-<h3 class="tw:mt-6">
-  <%= section_heading("Feedbacks", feedbacks.size, admin_feedbacks_path(search_bike_id: @bike.id)) %>
-</h3>
+<%= render(Atoms::Admin::SectionHeading::Component.new(title: "Feedbacks", count: feedbacks.size,
+      href: admin_feedbacks_path(search_bike_id: @bike.id))) %>
 
 <% if feedbacks.any? %>
   <%= render partial: "/admin/feedbacks/table", locals: {feedbacks:, skip_bike: true} %>
 <% end %>
 
-<h3 class="tw:mt-6">
-  <%= section_heading("User alerts", user_alerts.size, admin_user_alerts_path(search_bike_id: @bike.id)) %>
-</h3>
+<%= render(Atoms::Admin::SectionHeading::Component.new(title: "User alerts", count: user_alerts.size,
+      href: admin_user_alerts_path(search_bike_id: @bike.id))) %>
 
 <% if user_alerts.any? %>
   <%= render partial: "/admin/user_alerts/table", locals: {user_alerts:} %>
 <% end %>
 
-<h3 class="tw:mt-6">
-  <%= section_heading("Parking notifications", parking_notifications.size,
-        admin_parking_notifications_path(search_bike_id: @bike.id)) %>
-</h3>
+<%= render(Atoms::Admin::SectionHeading::Component.new(title: "Parking notifications", count: parking_notifications.size,
+      href: admin_parking_notifications_path(search_bike_id: @bike.id))) %>
 
 <% if parking_notifications.any? %>
   <%= render partial: "/admin/parking_notifications/table", locals: {parking_notifications:} %>
 <% end %>
 
-<h3 class="tw:mt-6">
-  <%= section_heading("Graduated notifications", graduated_notifications_count,
-        admin_graduated_notifications_path(search_bike_id: @bike.id)) %>
-</h3>
+<%= render(Atoms::Admin::SectionHeading::Component.new(title: "Graduated notifications", count: graduated_notifications_count,
+      href: admin_graduated_notifications_path(search_bike_id: @bike.id))) %>

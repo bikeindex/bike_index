@@ -21,11 +21,6 @@ module Pages
             def recent(kind) = records(kind).reorder(created_at: :desc).limit(LIMIT)
 
             def counts = @counts ||= Pages::Admin::Users::Tabs::Component::MESSAGE_KINDS.to_h { [it, records(it).count] }
-
-            def section_heading(title, kind, path)
-              safe_join([title, tag.small(link_to(number_display(counts[kind]), path, class: "twlink"),
-                class: "twless-strong tw:ml-2")], " ")
-            end
           end
         end
       end

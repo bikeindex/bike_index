@@ -1,6 +1,8 @@
 <% case @active_tab %>
 <% when :bikes %>
   <%= render(Pages::Admin::Users::Show::Bikes::Component.new(user: @user)) %>
+<% when :payments %>
+  <%= render(Pages::Admin::Users::Show::Payments::Component.new(user: @user)) %>
 <% when :messages %>
   <%= render(Pages::Admin::Users::Show::Messages::Component.new(user: @user)) %>
 <% when :organization_roles %>

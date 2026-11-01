@@ -11,12 +11,12 @@ RSpec.describe Pages::Admin::Users::Show::Component, type: :component do
     expect(component).to have_content("Not an ambassador")
   end
 
-  # Those tabs are the filtered admin index, which renders the header itself
-  context "with a tab that has an index" do
-    let(:active_tab) { :payments }
+  # The edit action renders that tab
+  context "with the edit tab" do
+    let(:active_tab) { :edit }
 
     it "raises" do
-      expect { component }.to raise_error(ArgumentError, /payments/)
+      expect { component }.to raise_error(ArgumentError, /edit/)
     end
   end
 end
