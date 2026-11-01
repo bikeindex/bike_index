@@ -41,10 +41,10 @@
           = @bulk_import.send_email ? check_mark : cross_mark
           %small.less-strong Email is sent by default
       %tr
-        %td No dupe
+        %td Allow duplicates?
         %td
-          = @bulk_import.send_email ? check_mark : cross_mark
-          %small.less-strong Only true by default for Ascend
+          = @bulk_import.allow_duplicate ? check_mark : cross_mark
+          %small.less-strong Only true by default for stolen and impounded
 
   .col-sm-6
     %table.table-list
@@ -105,6 +105,9 @@
 
 %h2.mt-4
   Bikes - #{number_display(@bulk_import.bikes.count)}
+  - if @bulk_import.matched_count.positive?
+    %small
+      and #{number_display(@bulk_import.matched_count)} #{"row".pluralize(@bulk_import.matched_count)} matching existing registrations
   - if @bulk_import.bikes.count > 25
     %small
       Last 25 shown

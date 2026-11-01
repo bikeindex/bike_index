@@ -4666,6 +4666,13 @@ es:
         your_headers_must_match_html: Sus encabezados deben coincidir <em>exactamente</em>
           con los nuestros; por ejemplo, si incluye "número de serie" como encabezado,
           la importación no funcionará.
+        create_duplicates_html: 'Crear duplicados: añade registros cuando una fila
+          coincide con el número de serie y el correo electrónico del propietario
+          de un registro existente <span class="twless-strong">(desactivado por defecto).</span>'
+        create_duplicates_enabled_html: 'Crear duplicados: agregue registros cuando
+          una fila coincida con el número de serie y el correo electrónico del propietario
+          de un registro existente <span class="twless-strong">(habilitado de forma
+          predeterminada para evitar la pérdida de datos robados o confiscados).</span>'
       show:
         ascend_import: Importación de Ascend
         bulk_import: Importación a granel
@@ -4678,6 +4685,7 @@ es:
         file_removed_explanation: Después de unos días, eliminamos el archivo subido
           para ahorrar espacio.
         progress: Progreso
+        matched_count: Filas que coinciden con registros existentes
     exports:
       index:
         bikes_in_export: Registros en exportación

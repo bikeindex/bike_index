@@ -3963,6 +3963,15 @@ nl:
         importing_stickers_html: Als je stickers samen met fietsen importeert, worden
           stickers alleen toegewezen als de stickercode is gevonden en kan worden
           toegewezen.
+        create_duplicates_html: Dubbele registraties aanmaken - voeg registraties
+          toe wanneer een rij overeenkomt met het serienummer en het e-mailadres van
+          de eigenaar van een bestaande registratie <span class="twless-strong">(standaard
+          uitgeschakeld).</span>
+        create_duplicates_enabled_html: Dubbele registraties aanmaken - voeg registraties
+          toe wanneer een rij overeenkomt met het serienummer en het e-mailadres van
+          de eigenaar van een bestaande registratie <span class="twless-strong">(standaard
+          ingeschakeld om te voorkomen dat gestolen/in beslag genomen gegevens verloren
+          gaan).</span>
       show:
         ascend_import: Ascending importeren
         bulk_import: Bulk import
@@ -3975,6 +3984,7 @@ nl:
         file_removed_explanation: na een paar dagen verwijderen we het geüploade bestand
           om ruimte te besparen
         bulk_import_impounded: In beslag genomen bulkimport
+        matched_count: Rijen die overeenkomen met bestaande registraties
     exports:
       index:
         bikes_in_export: Fietsen in export
