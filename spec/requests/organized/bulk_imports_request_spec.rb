@@ -145,6 +145,7 @@ RSpec.describe Organized::BulkImportsController, type: :request do
           expect(response).to render_template :new
           expect(assigns(:current_organization)).to eq current_organization
           expect(assigns(:bulk_import)&.kind).to eq "organization_import"
+          expect(response.body).to include("bulk_import[allow_duplicate]")
           get "#{base_url}/new?kind=stolen"
           expect(assigns(:bulk_import)&.kind).to eq "organization_import"
         end
@@ -175,6 +176,13 @@ RSpec.describe Organized::BulkImportsController, type: :request do
           expect(response.status).to eq(200)
           expect(response).to render_template :show
         end
+        context "with matching rows" do
+          before { bulk_import.update(data: (bulk_import.data || {}).merge("matched_count" => 3)) }
+          it "renders the count" do
+            get "#{base_url}/#{bulk_import.id}"
+            expect(response.body).to include("Rows matching existing registrations")
+          end
+        end
         context "not organizations bulk_import" do
           let(:bulk_import) { FactoryBot.create(:bulk_import) }
           it "redirects" do
@@ -200,7 +208,17 @@ RSpec.describe Organized::BulkImportsController, type: :request do
             expect(bulk_import.organization_id).to eq current_organization.id
             expect(bulk_import.kind).to eq "organization_import" # Because this isn't a permitted kind
             expect(bulk_import.send_email).to be_truthy # Because no_notify isn't permitted here, only in admin
+            expect(bulk_import.allow_duplicate).to be_falsey
             expect(BulkImportJob).to have_enqueued_sidekiq_job(bulk_import.id)
+          end
+          context "allow_duplicate checked" do
+            let(:bulk_import_params) { {file:, kind: "organization_import", allow_duplicate: "1"} }
+            it "creates" do
+              expect {
+                post base_url, params: {bulk_import: bulk_import_params}
+              }.to change(BulkImport, :count).by 1
+              expect(BulkImport.last.allow_duplicate).to be_truthy
+            end
           end
           context "impound" do
             let!(:current_organization) { impound_organization }

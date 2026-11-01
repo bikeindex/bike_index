@@ -343,7 +343,7 @@ RSpec.describe BulkImportJob, type: :job do
           expect(bike_sticker.bike_sticker_updates.count).to eq 1
         end
       end
-      context "no_duplicate" do
+      context "allow_duplicate" do
         it "creates the bikes, doesn't have any errors", :flaky do
           expect(bike_sticker.reload.claimed?).to be_falsey
           expect(bike_sticker.bike_sticker_updates.count).to eq 0
@@ -354,12 +354,12 @@ RSpec.describe BulkImportJob, type: :job do
             expect {
               instance.perform(bulk_import.id)
               # This test is being flaky! Add debug printout #2101 (actually after, but still...)
-              pp "Error no_duplicate", bulk_import.import_errors if bulk_import.reload.blocking_error?
+              pp "Error allow_duplicate", bulk_import.import_errors if bulk_import.reload.blocking_error?
             }.to change(Bike, :count).by 2
           end
-          # It doesn't duplicate if no duplicate is true
-          bulk_import.update(no_duplicate: true, progress: "pending")
-          expect(bulk_import.reload.no_duplicate).to be_truthy
+          # It doesn't duplicate by default
+          bulk_import.update(progress: "pending")
+          expect(bulk_import.reload.allow_duplicate).to be_falsey
           VCR.use_cassette("bulk_import-perform-success") do
             expect {
               instance.perform(bulk_import.id)
@@ -369,9 +369,9 @@ RSpec.describe BulkImportJob, type: :job do
           expect(bike_sticker.reload.claimed?).to be_truthy
           expect(bike_sticker.bike_sticker_updates.count).to eq 1
 
-          # But with no_duplicate false, it does duplicate
-          bulk_import.update(no_duplicate: false, progress: "pending")
-          expect(bulk_import.reload.no_duplicate).to be_falsey
+          # But with allow_duplicate, it does duplicate
+          bulk_import.update(allow_duplicate: true, progress: "pending")
+          expect(bulk_import.reload.allow_duplicate).to be_truthy
           VCR.use_cassette("bulk_import-perform-success") do
             expect {
               instance.perform(bulk_import.id)
@@ -536,6 +536,78 @@ RSpec.describe BulkImportJob, type: :job do
     end
   end
 
+  context "repeated row" do
+    let!(:trek) { FactoryBot.create(:manufacturer, name: "Trek") }
+    let!(:color_green) { FactoryBot.create(:color, name: "Green") }
+    let(:serial) { "xyz_test" }
+    let(:row) { ["Trek", "Roscoe 8", "2019", "Green", "test@bikeindex.org", serial].join(",") }
+    let(:csv_lines) { [sample_csv_lines[0].join(","), row, row] }
+    let(:bulk_import_attrs) { {} }
+    let(:bulk_import) { FactoryBot.create(:bulk_import, progress: "pending", **bulk_import_attrs) }
+    before { allow_any_instance_of(BulkImport).to receive(:open_file) { File.open(tempfile.path, "r") } }
+
+    it "creates one bike" do
+      expect { instance.perform(bulk_import.id) }.to change(Bike, :count).by 1
+      expect(bulk_import.reload.import_errors).to be_blank
+      # The repeated row matched a bike this import registered
+      expect(bulk_import.matched_count).to eq 0
+    end
+    context "file uploaded again" do
+      let(:bulk_import2) { FactoryBot.create(:bulk_import, progress: "pending", **bulk_import_attrs) }
+      it "counts the matching rows, and isn't empty" do
+        instance.perform(bulk_import.id)
+        expect { described_class.new.perform(bulk_import2.id) }.to change(Bike, :count).by 0
+        expect(bulk_import2.reload).to have_attributes(matched_count: 2, no_bikes?: false, import_errors: {})
+        expect(BulkImport.no_bikes.pluck(:id)).to eq([])
+        # Run again from the start, it counts the rows again rather than adding to the count
+        bulk_import2.update(progress: "pending")
+        described_class.new.perform(bulk_import2.id)
+        expect(bulk_import2.reload.matched_count).to eq 2
+      end
+
+      it "keeps the count when an error stops the import, and resuming skips the rows before it" do
+        instance.perform(bulk_import.id)
+        register_count = 0
+        allow_any_instance_of(described_class).to receive(:register_bike).and_wrap_original do |method, *args|
+          raise "Unexpected error" if (register_count += 1) == 2
+          method.call(*args)
+        end
+        expect { described_class.new.perform(bulk_import2.id) }.to raise_error("Unexpected error")
+        expect(bulk_import2.reload).to have_attributes(matched_count: 1, file_import_error_lines: [3])
+
+        RSpec::Mocks.space.proxy_for(described_class).reset
+        bulk_import2.update(progress: "pending")
+        expect { described_class.new.perform(bulk_import2.id) }.to change(Bike, :count).by 0
+        expect(bulk_import2.reload).to have_attributes(matched_count: 1, no_bikes?: false)
+      end
+    end
+    context "allow_duplicate: true" do
+      let(:bulk_import_attrs) { {allow_duplicate: true} }
+      it "creates two bikes" do
+        expect { instance.perform(bulk_import.id) }.to change(Bike, :count).by 2
+      end
+    end
+    context "different serials" do
+      let(:csv_lines) { [sample_csv_lines[0].join(","), row, row.sub(serial, "other_serial")] }
+      it "creates two bikes" do
+        expect { instance.perform(bulk_import.id) }.to change(Bike, :count).by 2
+      end
+    end
+    context "short serial" do
+      let(:serial) { "12345" }
+      it "creates two bikes" do
+        expect { instance.perform(bulk_import.id) }.to change(Bike, :count).by 2
+      end
+    end
+    context "stolen import" do
+      let(:bulk_import_attrs) { {kind: "stolen", data: {stolen_record: {date_stolen: "2022-04-12T16:00", timezone: "America/Los_Angeles"}}} }
+      it "creates two bikes, so each keeps its stolen record" do
+        expect { instance.perform(bulk_import.id) }.to change(Bike, :count).by 2
+        expect(Bike.status_stolen.count).to eq 2
+      end
+    end
+  end
+
   context "with assigned bulk import" do
     before { instance.bulk_import = bulk_import }
     describe "process_csv" do
@@ -605,7 +677,7 @@ RSpec.describe BulkImportJob, type: :job do
           send_email: true,
           creation_organization_id: nil,
           bike_sticker: nil,
-          no_duplicate: false
+          no_duplicate: true
         }
       end
       describe "row_to_b_param_hash" do
