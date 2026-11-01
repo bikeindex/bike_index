@@ -62,7 +62,7 @@
       tw:items-start tw:gap-6
     "
   >
-    <%= render(UI::Card::Component.new(additional_classes: "tw:rounded-lg tw:p-0!")) do %>
+    <%= render(UI::Card::Component.new(additional_classes: "tw:p-0!")) do %>
       <% if @bike.photo_url %>
         <div
           class="
@@ -119,7 +119,7 @@
       </div>
     <% end %>
 
-    <%= render(UI::Card::Component.new(additional_classes: "tw:flex tw:flex-col tw:gap-4 tw:rounded-lg tw:p-[clamp(18px,3vw,28px)]!")) do %>
+    <%= render(UI::Card::Component.new(additional_classes: "tw:flex tw:flex-col tw:gap-4 tw:p-[clamp(18px,3vw,28px)]!")) do %>
       <div>
         <span class="<%= EYEBROW_CLASSES %>"><%= copy[:your_state] %></span>
         <h2 class="<%= NAME_CLASSES %>"><%= @state[:name] %></h2>
