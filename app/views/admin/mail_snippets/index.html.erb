@@ -20,8 +20,6 @@
   </li>
 <% end %>
 
-<% skip_organization = current_organization.present? %>
-
 <% table_view = capture do %>
   <%= render(UI::Table::Component.new(records: @mail_snippets, render_sortable: true, sort_state:)) do |table| %>
     <% table.column(sortable: "created_at") do |mail_snippet| %>
@@ -33,7 +31,7 @@
       <small><%= render(UI::Time::Component.new(time: mail_snippet.updated_at)) %></small>
     <% end %>
 
-    <% unless skip_organization %>
+    <% unless current_organization.present? %>
       <% table.column(sortable: "organization_id") do |mail_snippet| %>
         <% if mail_snippet.organization.present? %>
           <%= link_to mail_snippet.organization&.short_name, admin_mail_snippets_path(sort_state.search_params.merge(organization_id: mail_snippet.organization_id)) %>
@@ -50,13 +48,13 @@
       <small><%= truncate(mail_snippet.body_stripped, length: 100) %></small>
     <% end %>
 
-    <% table.column(label: "Enabled", header_classes: "tw:text-xs", classes: "tw:text-center") do |mail_snippet| %>
-      <span class="table-cell-check"><%= helpers.check_mark if mail_snippet.is_enabled %></span>
+    <% table.column(label: "Enabled", header_classes: "tw:text-xs", classes: "table-cell-check") do |mail_snippet| %>
+      <%= check_mark if mail_snippet.is_enabled %>
     <% end %>
 
     <% table.column(label: "Versions", header_classes: "tw:text-xs") do |mail_snippet| %>
       <% version_count = PaperTrail::Version.where(item_type: "MailSnippet", item_id: mail_snippet.id).count %>
-      <%= link_to helpers.number_display(version_count), admin_paper_trail_versions_path(search_item_type: "MailSnippet", search_item_id: mail_snippet.id, period: "all") %>
+      <%= link_to number_display(version_count), admin_paper_trail_versions_path(search_item_type: "MailSnippet", search_item_id: mail_snippet.id, period: "all") %>
     <% end %>
   <% end %>
 <% end %>

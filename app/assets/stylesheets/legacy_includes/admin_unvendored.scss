@@ -9468,8 +9468,10 @@ body {
   font-weight: 400
 }
 
+// @bikeindex/time-localizer wraps preciseTimeSeconds' seconds in .less-strong
 .admin-public-image .image-filename,
-.less-less-strong {
+.less-less-strong,
+.less-strong {
   opacity: .65
 }
 

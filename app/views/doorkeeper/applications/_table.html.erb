@@ -37,11 +37,11 @@
     <% end %>
 
     <% table.column(sortable: "tokens_count", label: "Tokens #", header_classes: "tw:text-xs") do |application| %>
-      <small><%= helpers.number_display(application.access_tokens.count) %></small>
+      <small><%= number_display(application.access_tokens.count) %></small>
     <% end %>
 
     <% table.column(sortable: "ownerships_count", label: "Ownerships #", header_tooltip: "NOTE: only tracked since #{Time.at(START_TRACKING_REGISTRATION_APP_ID_AT).to_date}") do |application| %>
-      <%= helpers.number_display(application.ownerships_count) %>
+      <%= number_display(application.ownerships_count) %>
     <% end %>
   <% end %>
 </div>

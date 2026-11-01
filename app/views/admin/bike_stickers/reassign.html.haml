@@ -7,7 +7,7 @@
   - else
     batches
 
-= render partial: "batches_table", locals: {bike_sticker_batches: @bike_sticker_batches, render_sortable: false}
+= render partial: "batches_table", locals: {bike_sticker_batches: @bike_sticker_batches}
 
 = render(Pages::Admin::Headers::IndexInfo::Component.new(index: admin_index_state, viewing: "Stickers"))
 .row
