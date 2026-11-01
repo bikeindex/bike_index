@@ -7628,9 +7628,6 @@ nl:
             fungeren met eigen personeel en lesmateriaal. Het personeel op elk niveau
             beheert uitsluitend de eigen regels.
           faq_account_question: Wie beheert het account?
-          faq_checker_answer: De fietsgegevens zijn afkomstig van BikeBook, een catalogus
-            van e-bike modellen met hun klasse, motor, snelheid en UL-certificering.
-            De staatsregelgeving wordt vermeld met de bijbehorende wetgeving.
           faq_checker_question: Waar haalt de compliancechecker zijn gegevens vandaan?
           faq_cost_answer: Er zijn geen kosten vooraf verbonden aan de registratie
             en registratie is gratis voor inwoners. We bespreken de tarieven voor
@@ -7836,6 +7833,9 @@ nl:
             het registreren van hun fiets. Als het een e-bike is, volgen ze direct
             een korte instructievideo over de regels van hun stad.
           submit_demo: Vraag een demo aan
+          faq_checker_answer_html: De fietsdetails zijn afkomstig van %{bikebook_link},
+            een catalogus van e-bike modellen met hun klasse, motor, snelheid en UL-certificering.
+            De staatsregels worden vermeld met de bijbehorende wetgeving.
         for_cities_education:
           all_set: Je bent er helemaal klaar voor.
           back: Rug
