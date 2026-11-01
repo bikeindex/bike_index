@@ -112,9 +112,14 @@ RSpec.describe "BikeBook", :js, type: :system do
     # its basics first, beside its photo
     expect(page).to have_css("[aria-label='Overview'] thead th", text: "Level 4 REC Step-Through")
     expect(page).to have_css("nav[aria-label='Views'] a[aria-current='page']", exact_text: "Overview")
-    # the search's list opening over its ×
-    vehicle_field.click
+    # lined up with the search, its views' tabs at its left and, where a second model's column would be, a slot at its right
+    edge = ->(selector, side) { page.evaluate_script("Math.round(document.querySelector(#{selector.to_json}).getBoundingClientRect().#{side})") }
+    expect(edge.call("nav[aria-label='Views'] a", "left")).to eq edge.call("[aria-label='Overview'] table", "left")
+    expect(edge.call("[aria-label='Overview'] > :last-child", "right")).to eq edge.call(".hw-combobox", "right")
+    # which opens the search's list, over its ×
+    click_on "+ Add a model to compare"
     expect(page).to have_css(vehicle_option, minimum: 1)
+    expect(page).to have_css("#vehicle_models:focus")
     under_list = page.evaluate_script(<<~JS)
       (({ left, top, width, height }) => document.elementFromPoint(left + width / 2, top + height / 2).closest("[role='listbox']") !== null)(
         document.querySelector("#vehicle-viewers [aria-label^='Remove']").getBoundingClientRect())
@@ -1082,6 +1087,16 @@ RSpec.describe "BikeBook", :js, type: :system do
     within("#vehicle-filters") { click_on "Price" }
     expect(page).to have_current_path(/[?&]price_dir=asc\b/)
     expect(page).to have_css("[aria-label='Models to compare']") { (listed = prices.call(it)) == listed.sort && listed.uniq.size > 1 }
+
+    # Opened alone, the overview's slot for a second model shows the search it hid, scrolled to with its list open
+    visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_rec_step_through")
+    add = find_button("+ Add a model to compare", wait: 10)
+    page.scroll_to(:bottom)
+    add.click
+    expect(page).to have_css(vehicle_option, minimum: 1)
+    expect(page).to have_css("#vehicle_models:focus")
+    expect(page).to have_current_path("/bikebook?vehicle_models=m/aventon/2026/level_4_rec_step_through&search=1")
+    page.document.synchronize { raise Capybara::ExpectationNotMet unless vehicle_field.evaluate_script("this.getBoundingClientRect().top") >= 0 }
   end
 
   it "keeps each compared vehicle's size in the URL, the others the first's by name, else nearest it for its riders or by top tube, unless picked" do

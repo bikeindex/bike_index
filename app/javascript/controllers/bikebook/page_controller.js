@@ -143,6 +143,17 @@ export default class extends Controller {
     adjust.querySelector('[data-ui--collapse-target~="trigger"]').focus()
   }
 
+  // The search's list opened by bikebook--focus-shortcut, once the search shows where a lone model hid it, as a step back
+  // can undo. Not revealed: its easing open would carry the field back out of the view scrolled to it
+  async addVehicle () {
+    const url = new URL(window.location.href)
+    if (!searching(url)) {
+      url.searchParams.set('search', '1')
+      await this.#go(url, [window.scrollX, window.scrollY])
+    }
+    this.dispatch('add')
+  }
+
   // The similar models' section opened from a toggle outside it, its own toggle taking focus
   compareSimilar () {
     const toggle = this.pageTarget.querySelector('#similar-toggle')

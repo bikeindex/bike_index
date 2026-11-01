@@ -35,10 +35,12 @@
       <small id="vehicle-models-count" class="twless-strong"></small>
     </label>
 
+    <%# Its label's height above the field it scrolls to %>
     <div
+      class="tw:scroll-mt-10"
       data-bikebook--catalog-filters-target="vehicleCombobox"
       data-controller="bikebook--focus-shortcut"
-      data-action="bikebook--tips:browse@window->bikebook--focus-shortcut#open"
+      data-action="bikebook--tips:browse@window->bikebook--focus-shortcut#open bikebook--page:add@window->bikebook--focus-shortcut#open"
     >
       <%= form_with url: bikebook_path, method: :get,
           data: {controller: "bikebook--auto-submit",
