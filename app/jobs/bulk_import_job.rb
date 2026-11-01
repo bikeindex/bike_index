@@ -2,9 +2,21 @@ require "csv"
 
 class BulkImportJob < ApplicationJob
   MAX_LINES = 25_100
+  REDLOCK_PREFIX = "BulkImportAscendLock-#{Rails.env.slice(0, 3)}"
+  # Expires the lock if a worker dies mid-import, so deferred imports can't wait forever
+  LOCK_DURATION_MS = 30.minutes.in_milliseconds.to_i
+  LOCKED_RETRY_DELAY = 1.minute
   sidekiq_options retry: false
 
   class << self
+    def redlock_key(organization_id)
+      "#{REDLOCK_PREFIX}-#{organization_id}"
+    end
+
+    def new_lock_manager
+      Redlock::Client.new([Bikeindex::Application.config.redis_default_url])
+    end
+
     # This is a little gross. It was added in PR #2911 when adding address records to bikes
     def address_record_attributes(address_string, country_id: nil)
       return {} if address_string.blank?
@@ -62,11 +74,36 @@ class BulkImportJob < ApplicationJob
 
   attr_accessor :bulk_import, :line_errors # Only necessary for testing
 
-  def perform(bulk_import_id)
+  # deferred: the ascend check already ran, and assigned the organization
+  def perform(bulk_import_id, deferred = false)
     @bulk_import = BulkImport.find(bulk_import_id)
-    return true if @bulk_import.ascend? && !@bulk_import.check_ascend_import_processable!
+    return true if @bulk_import.ascend? && !deferred && !@bulk_import.check_ascend_import_processable!
     return true if @bulk_import.finished? # Exit early if already finished
+    return process_import unless @bulk_import.ascend?
 
+    # Ascend sends a shop's files seconds apart, and concurrent imports can't dedupe against each other
+    @lock_manager = self.class.new_lock_manager
+    @redlock = ascend_lock
+    return self.class.perform_in(LOCKED_RETRY_DELAY, bulk_import_id, true) unless @redlock
+
+    begin
+      process_import
+    ensure
+      @lock_manager.unlock(@redlock)
+    end
+  end
+
+  private
+
+  # A Redis error counts as not getting the lock - with retry: false, raising would drop the import
+  def ascend_lock(extend: nil)
+    @lock_manager.lock(self.class.redlock_key(@bulk_import.organization_id), LOCK_DURATION_MS,
+      extend:, extend_only_if_locked: extend.present?)
+  rescue Redlock::LockAcquisitionError
+    false
+  end
+
+  def process_import
     # Check file size before processing
     open_file = @bulk_import.open_file
 
@@ -87,8 +124,6 @@ class BulkImportJob < ApplicationJob
     @bulk_import.update_attribute :import_errors, (@bulk_import.import_errors || {}).merge("line" => @line_errors.compact)
   end
 
-  private
-
   def process_csv(open_file)
     @line_errors = @bulk_import.line_errors || [] # We always need line_errors
     return false if @bulk_import.finished? # If url fails to load, this will catch
@@ -105,7 +140,10 @@ class BulkImportJob < ApplicationJob
     csv = CSV.new(open_file, headers: headers)
     while (row = csv.shift)
       row_index += 1 # row_index is current line number
-      @bulk_import.reload if (row_index % 50).zero? # reload import every so often to check if import is finished (external trip switch)
+      if (row_index % 50).zero?
+        @bulk_import.reload # check every so often whether the import is finished (external trip switch)
+        @redlock = ascend_lock(extend: @redlock) || @redlock if @redlock # so a long import keeps its lock
+      end
       break false if @bulk_import.finished? # Means there was an error or we marked finished separately, so noop
 
       bike = register_bike(row_to_b_param_hash(row.to_h))

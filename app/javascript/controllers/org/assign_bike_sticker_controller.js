@@ -1,13 +1,20 @@
 import { Controller } from '@hotwired/stimulus'
 
 // Connects to data-controller='org--assign-bike-sticker'
-// When a bike_sticker param is present, wires up assign link hrefs
+// When a bike_sticker param is present, shows the assign column and wires up its link hrefs
 export default class extends Controller {
   static values = { stickerPath: String }
 
   connect () {
     if (!this.stickerPathValue) return
+    this.showColumn()
     this.updateLinks()
+  }
+
+  // Not in the column panel, so ui--table-column-settings leaves it hidden
+  showColumn () {
+    this.element.querySelectorAll('.assign_bike_sticker_cell').forEach(cell => cell.classList.remove('tw:hidden'))
+    window.dispatchEvent(new Event('ui-table:refresh'))
   }
 
   updateLinks () {

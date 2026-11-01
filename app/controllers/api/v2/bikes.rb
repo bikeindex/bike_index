@@ -149,7 +149,7 @@ module API
         end
 
         def created_bike_serialized(bike, include_claim_token)
-          serialized = BikeV2ShowSerializer.new(bike, root: false)
+          serialized = BikeV2ShowSerializer.new(bike, root: false, scope: current_user)
           claim_url = serialized.url + (include_claim_token ? "?t=#{bike.current_ownership.token}" : "")
           {bike: serialized, claim_url: claim_url}
         end
@@ -171,7 +171,7 @@ module API
           requires :id, type: String, desc: "Bike id, or a short_id (bike: 'r/21J-HW', sticker: 's/A1029')"
         end
         get ":id" do
-          BikeV2ShowSerializer.new(find_bike, root: "bike").as_json
+          BikeV2ShowSerializer.new(find_bike, root: "bike", scope: current_user).as_json
         end
 
         desc "View bike by a short_id with a '/' separator (bike 'r/35', sticker 's/a044')"
@@ -180,7 +180,7 @@ module API
           requires :id, type: String, desc: "Short_id body"
         end
         get ":prefix/:id", requirements: {prefix: /[rs]/i} do
-          BikeV2ShowSerializer.new(find_bike, root: "bike").as_json
+          BikeV2ShowSerializer.new(find_bike, root: "bike", scope: current_user).as_json
         end
 
         desc "Check if a bike is already registered <span class='accstr'>*</span>", {
@@ -360,7 +360,7 @@ module API
           rescue => e
             error!("Unable to update bike: #{e}", 401)
           end
-          BikeV2ShowSerializer.new(@bike.reload, root: "bike").as_json
+          BikeV2ShowSerializer.new(@bike.reload, root: "bike", scope: current_user).as_json
         end
 
         desc "Mark a bike recovered that is owned by the access token<span class='accstr'>*</span>", {
@@ -386,7 +386,7 @@ module API
           declared_p = declared(params, include_missing: false)
           @bike.current_stolen_record.add_recovery_information(declared_p)
 
-          BikeV2ShowSerializer.new(@bike.reload, root: "bike").as_json
+          BikeV2ShowSerializer.new(@bike.reload, root: "bike", scope: current_user).as_json
         end
 
         desc "Add an image to a bike <span class='accstr'>*</span>", {
@@ -439,7 +439,7 @@ module API
           public_image = @bike.public_images.find_by_id(params[:image_id])
           error!("Unable to find that image", 404) unless public_image.present?
           public_image.destroy
-          BikeV2ShowSerializer.new(@bike.reload, root: "bike").as_json
+          BikeV2ShowSerializer.new(@bike.reload, root: "bike", scope: current_user).as_json
         end
 
         desc "Send a stolen notification <span class='accstr'>*</span>", {

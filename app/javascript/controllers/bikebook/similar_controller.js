@@ -41,7 +41,10 @@ export default class extends Controller {
       }
     }
     const url = new URL(window.location.href)
-    const params = { weights: weightsParam(weights), ...Object.fromEntries(this.settingTargets.map(({ name, checked }) => [name, checked && '1'])) }
+    const params = {
+      weights: weightsParam(weights),
+      ...Object.fromEntries(this.settingTargets.map(({ name, checked, dataset }) => [name, checked !== ('checkedByDefault' in dataset) && (checked ? '1' : '0')]))
+    }
     for (const [name, value] of Object.entries(params)) value ? url.searchParams.set(name, value) : url.searchParams.delete(name)
     replaceUrl(url)
     this.dispatch('change', { detail: { vehicle: this.vehicleValue, settings: settingsFrom(url.searchParams) } })

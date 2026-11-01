@@ -19,6 +19,7 @@ en:
             ordered_by_tooltip: Switch to the table view to change ordering
             over_count_matching_html: Over %{number} matches
             per_page: Results per page
+            per_page_option: "%{number} per page"
             showing_html: showing %{from}–%{to} of %{count}
             view_as: View as
             view_cards: Cards

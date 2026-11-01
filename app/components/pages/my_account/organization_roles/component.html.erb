@@ -23,7 +23,7 @@
         >
           <% unless single_role? %>
             <%= render UI::DragHandle::Component.new(controller: "my-account--organization-roles",
-                  html_class: "tw:self-center") %>
+                  label: organization.short_name, html_class: "tw:self-center") %>
           <% end %>
 
           <%#
