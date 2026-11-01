@@ -149,16 +149,13 @@ class BulkImport < ApplicationRecord
   end
 
   def allow_duplicate=(val)
-    self.data ||= {}
-    data["allow_duplicate"] = Binxtils::InputNormalizer.boolean(val)
+    self.data = (data || {}).merge("allow_duplicate" => Binxtils::InputNormalizer.boolean(val))
   end
 
   def allow_duplicate
     return false if ascend?
-    # Deduping would drop the row's stolen or impound record
-    return data&.dig("allow_duplicate") != false if stolen? || impounded?
 
-    data&.dig("allow_duplicate") == true
+    Binxtils::InputNormalizer.boolean(data&.dig("allow_duplicate"))
   end
 
   # Short serials (e.g. "1") are often junk shared by distinct bikes with one owner email
@@ -217,6 +214,10 @@ class BulkImport < ApplicationRecord
     Organization.ascend_pos.find { |org|
       org.ascend_name.present? && org.ascend_name.gsub(/-|_|\s/, "").match(/#{regex_matcher}/i)
     }
+  end
+
+  def stolen_record=(val)
+    self.data = (data || {}).merge("stolen_record" => val)
   end
 
   def stolen_record_attrs

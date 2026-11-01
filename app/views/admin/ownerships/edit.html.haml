@@ -1,7 +1,6 @@
 = render Pages::Admin::Bikes::Header::Component.new(bike: @bike, active: :ownerships, user: current_user, display_dev_info: display_dev_info?)
 
-%h1.mt-5.mb-4
-  Ownerships
+= render(Pages::Admin::Headers::Section::Component.new(title: "Ownerships", count: @bike.ownerships.count))
 = render partial: "/admin/ownerships/table", locals: {ownerships: @bike.ownerships.reorder(created_at: :desc), skip_bike: true}
 
 %div{class: "admin-subnav midpage-subnav"}
