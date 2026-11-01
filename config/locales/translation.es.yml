@@ -4678,6 +4678,7 @@ es:
         file_removed_explanation: Después de unos días, eliminamos el archivo subido
           para ahorrar espacio.
         progress: Progreso
+        matched_count: Filas que coinciden con registros existentes
     exports:
       index:
         bikes_in_export: Registros en exportación

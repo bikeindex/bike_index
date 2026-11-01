@@ -4470,6 +4470,7 @@ nb:
         file_removed_explanation: etter noen dager sletter vi den opplastede filen
           for å spare plass
         progress: Framgang
+        matched_count: Rader som samsvarer med eksisterende registreringer
     exports:
       index:
         bikes_in_export: Sykler på eksport

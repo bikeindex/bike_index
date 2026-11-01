@@ -3975,6 +3975,7 @@ nl:
         file_removed_explanation: na een paar dagen verwijderen we het geüploade bestand
           om ruimte te besparen
         bulk_import_impounded: In beslag genomen bulkimport
+        matched_count: Rijen die overeenkomen met bestaande registraties
     exports:
       index:
         bikes_in_export: Fietsen in export
