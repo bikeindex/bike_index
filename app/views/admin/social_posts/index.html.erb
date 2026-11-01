@@ -40,15 +40,14 @@
     </div>
 
     <div class="col-md-7">
-      <%= form_tag admin_social_posts_path, method: :get, class: "form-inline" do %>
+      <%= form_with(url: admin_social_posts_path, method: :get, html: {class: "twsearchrow"}) do |form| %>
         <%= render partial: "/shared/hidden_search_fields" %>
         <%= hidden_field_tag :search_social_account_id, params[:search_social_account_id] %>
 
-        <div class="form-group ml-auto mr-2 mb-2">
-          <%= text_field_tag :query, params[:query], placeholder: "Search posts", class: "form-control" %>
-        </div>
+        <%= render(UI::Forms::Input::Component.new(form_builder: form, attribute: :query,
+          html_options: {value: params[:query], placeholder: "Search posts"})) %>
 
-        <%= submit_tag "Search", name: "search", class: "btn btn-primary mb-2" %>
+        <%= render(UI::Button::Component.new(text: "Search", color: :primary, type: "submit", name: "search")) %>
       <% end %>
     </div>
   </div>

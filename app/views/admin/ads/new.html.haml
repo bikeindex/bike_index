@@ -3,4 +3,5 @@
 
 = form_for [:admin, @ad] do |f|
   = render partial: 'form', locals: { f: f }
-  = f.submit "Create ad", class: 'btn btn-success float-right position-static'
+  %div{class: "tw:flex tw:justify-end"}
+    = render(UI::Button::Component.new(text: "Create ad", color: :primary, type: "submit"))

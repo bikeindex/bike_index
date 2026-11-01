@@ -10,27 +10,21 @@
         -# payment_method is an integer-backed enum: pass enum *labels* as option values and an explicit value: to override hotwire_combobox's enum branch (which would emit payment_method_before_type_cast)
         = render UI::Forms::Combobox::Component.new(name: :payment_method, options: Payment.admin_creatable_payment_methods.map { |m| [m.humanize, m] }, html_options: {form: f, value: @payment.payment_method})
     .col-md-6
-      .form-group
-        - f.object.created_at = Binxtils::TimeParser.round(f.object.created_at || Time.current)
-        = f.label :created_at, "Time of payment"
-        = f.datetime_local_field :created_at, max: Binxtils::TimeParser.round(Time.current + 1.week), step: 60, required: true, class: 'form-control'
+      - f.object.created_at = Binxtils::TimeParser.round(f.object.created_at || Time.current)
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :created_at, kind: :datetime_local_field, label_text: "Time of payment", required: true, html_options: {max: Binxtils::TimeParser.round(Time.current + 1.week), step: 60}))
     .col-md-6
-      = f.label :amount
-      .input-group
-        .input-group-prepend
-          %span.input-group-text
-            = f.select :currency_enum, options_for_select(Currency.select_options)
-        = f.number_field :amount, step: 1, min: 0, class: "form-control"
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :amount)) do
+        %div{class: "tw:flex tw:gap-2"}
+          = render(UI::Forms::Select::Component.new(form_builder: f, attribute: :currency_enum, option_tags: Currency.select_options, html_options: {class: "tw:w-auto"}))
+          = render(UI::Forms::Input::Component.new(form_builder: f, attribute: :amount, kind: :number_field, html_options: {step: 1, min: 0}))
     .col-md-6
-      .form-group
-        = f.label :email, "Email of user who created payment"
-        = f.email_field :email, class: "form-control"
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :email, label_text: "Email of user who created payment")) do
+        = render(UI::Forms::Email::Component.new(form_builder: f))
     .col-md-6
       = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :organization_id, label_text: Payment.human_attribute_name(:organization_id))) do
         = render UI::Forms::Combobox::Component.new(name: :organization_id, options: Organization.all.pluck(:name, :id), include_blank: true, html_options: {form: f, placeholder: "Choose organization"})
     .col-md-6
-      .form-group
-        = f.label :referral_source, class: "control-label"
-        = f.text_field :referral_source, class: "form-control"
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :referral_source))
     .col-md-6.mt-4
-      = f.submit "Submit", class: 'btn btn-success float-right'
+      %div{class: "tw:flex tw:justify-end"}
+        = render(UI::Button::Component.new(text: "Submit", color: :primary, type: "submit"))

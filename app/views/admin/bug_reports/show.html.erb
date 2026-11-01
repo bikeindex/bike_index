@@ -64,12 +64,12 @@
 
       <%= render(UI::Forms::Group::Component.new(attribute: :github_pull_request, form_builder: f, kind: :number_field)) %>
 
-      <%= f.submit "Update", class: "btn btn-outline-primary" %>
+      <%= render UI::Button::Component.new(text: "Update", color: :primary, type: "submit") %>
     <% end %>
   </div>
 </div>
 
-<%= render(UI::Card::Component.new(shadow: true, additional_classes: "tw:max-w-3xl")) do %>
+<%= render(UI::Card::Component.new(additional_classes: "tw:max-w-3xl")) do %>
   <p><strong>Subject:</strong> <%= @bug_report.display_subject %></p>
   <%= render(UI::UserTextBlockDisplay::Component.new(text: @bug_report.body_stripped, max_height_class: "")) %>
 <% end %>
