@@ -192,6 +192,13 @@ class CredibilityScorer
     end.flatten.reject(&:blank?).uniq
   end
 
+  def self.color(score)
+    return "#dc3545" if score < 31
+    return "#ffc107" if score < 70
+
+    "#28a745"
+  end
+
   def self.humanize_badge(badge)
     if badge == :example_bike
       "Test bike"

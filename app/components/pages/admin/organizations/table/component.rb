@@ -6,6 +6,7 @@ module Pages
       module Table
         # The admin organizations index table, also rendered on the admin dashboard.
         class Component < ApplicationComponent
+          # Template Dependency: UI::Alerts::Base::Component
           def initialize(organizations:, sort_state: ComponentStructs::SortState.new,
             render_sortable: false, render_deleted: false)
             @organizations = organizations

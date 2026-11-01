@@ -6,7 +6,7 @@
   </h2>
 
   <div class="tw:ml-auto">
-    <%= render partial: "/bikes/credibility_score", locals: {bike: @bike} %>
+    <%= render(Atoms::CredibilityScore::Component.new(bike: @bike)) %>
   </div>
 </div>
 
