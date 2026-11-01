@@ -3967,6 +3967,11 @@ nl:
           toe wanneer een rij overeenkomt met het serienummer en het e-mailadres van
           de eigenaar van een bestaande registratie <span class="twless-strong">(standaard
           uitgeschakeld).</span>
+        create_duplicates_enabled_html: Dubbele registraties aanmaken - voeg registraties
+          toe wanneer een rij overeenkomt met het serienummer en het e-mailadres van
+          de eigenaar van een bestaande registratie <span class="twless-strong">(standaard
+          ingeschakeld om te voorkomen dat gestolen/in beslag genomen gegevens verloren
+          gaan).</span>
       show:
         ascend_import: Ascending importeren
         bulk_import: Bulk import

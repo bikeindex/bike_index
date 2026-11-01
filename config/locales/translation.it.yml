@@ -4689,6 +4689,10 @@ it:
           riga corrisponde al numero di serie e all''indirizzo email del proprietario
           di una registrazione esistente <span class="twless-strong">(disattivato
           per impostazione predefinita).</span>'
+        create_duplicates_enabled_html: 'Crea duplicati: aggiungi registrazioni quando
+          una riga corrisponde al numero di serie e all''indirizzo email del proprietario
+          di una registrazione esistente <span class="twless-strong">(abilitato per
+          impostazione predefinita per evitare la perdita di dati rubati/sequestrati).</span>'
       show:
         ascend_import: Importazione Ascend
         bulk_import: Importazione massiva
