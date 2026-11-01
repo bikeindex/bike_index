@@ -16,7 +16,7 @@
 
   <%= form_with(url: import_admin_manufacturers_path, multipart: true) do |form| %>
     <%= render(UI::Forms::Group::Component.new(form_builder: form, attribute: :file, label_text: "Upload CSV of Manufacturers list")) do %>
-      <%= render(UI::Forms::Files::Picker::Component.new(form_builder: form, attribute: :file)) %>
+      <%= render(UI::Forms::Files::Upload::Component.new(form_builder: form, attribute: :file)) %>
     <% end %>
 
     <div class="tw:mb-4 tw:flex tw:justify-end">

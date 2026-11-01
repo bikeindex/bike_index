@@ -7,7 +7,7 @@
 <div class="mb-4">
   <%= form_with(url: tables_admin_graphs_path, method: :get, html: {class: "twsearchrow"}) do |f| %>
     <%= render UI::Forms::Input::Component.new(form_builder: f, attribute: :location,
-      html_options: {value: params[:location], placeholder: "Location", class: "tw:w-full tw:sm:w-64"}) %>
+      html_options: {value: params[:location], placeholder: "Location"}) %>
 
     <%= render UI::Forms::Input::Component.new(form_builder: f, attribute: :location_radius,
       html_options: {value: params[:location_radius], placeholder: "Proximity in miles", class: "tw:w-full tw:sm:w-48"}) %>

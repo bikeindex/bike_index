@@ -60,20 +60,16 @@
 <% end %>
 
 <% admin_search_form = capture do %>
-  <div class="row mt-4">
-    <div class="col">
-      <%= form_with(url: admin_notifications_path, method: :get, html: {class: "twsearchrow"}) do |f| %>
-        <%= render partial: "/shared/hidden_search_fields" %>
-        <%= hidden_field_tag :search_with_bike, params[:search_with_bike] %>
-        <%= hidden_field_tag :search_undelivered, params[:search_undelivered] %>
+  <%= form_with(url: admin_notifications_path, method: :get, html: {class: "twsearchrow"}) do |f| %>
+    <%= render partial: "/shared/hidden_search_fields" %>
+    <%= hidden_field_tag :search_with_bike, params[:search_with_bike] %>
+    <%= hidden_field_tag :search_undelivered, params[:search_undelivered] %>
 
-        <%= render UI::Forms::Input::Component.new(form_builder: f, attribute: :query,
-          html_options: {value: params[:query], placeholder: "Search email/phone", class: "tw:w-full tw:sm:w-64"}) %>
+    <%= render UI::Forms::Input::Component.new(form_builder: f, attribute: :query,
+      html_options: {value: params[:query], placeholder: "Search email/phone"}) %>
 
-        <%= render UI::Button::Component.new(text: "Search", color: :primary, type: "submit", name: "search") %>
-      <% end %>
-    </div>
-  </div>
+    <%= render UI::Button::Component.new(text: "Search", color: :primary, type: "submit", name: "search") %>
+  <% end %>
 <% end %>
 
 <% table_view = capture do %>

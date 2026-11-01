@@ -15,6 +15,6 @@
       = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :invited_email, required: true))
 
       = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :role)) do
-        = render(UI::Forms::RadioButtonGroup::Component.new(name: "organization_role[role]", entries: [{value: "admin", label: "Admin of organization"}, {value: "member", label: "Member of organization"}], selected: @organization_role.role))
+        = render(UI::Forms::RadioButtonGroup::Component.new(name: f.field_name(:role), entries: [{value: "admin", label: "Admin of organization"}, {value: "member", label: "Member of organization"}], selected: @organization_role.role))
 
       = render(UI::Button::Component.new(text: "Save", color: :primary, type: "submit"))

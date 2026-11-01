@@ -20,8 +20,7 @@
         <%= render partial: "/shared/hidden_search_fields" %>
 
         <%= render(UI::Forms::Select::Component.new(form_builder: form, attribute: :search_to,
-          option_tags: ExchangeRate.pluck(:to).uniq, options: {prompt: "Filter by target currency"},
-          html_options: {class: "tw:w-full tw:sm:w-64"})) %>
+          option_tags: ExchangeRate.pluck(:to).uniq, options: {prompt: "Filter by target currency"})) %>
 
         <%= render(UI::Button::Component.new(text: "Filter", color: :primary, type: "submit", name: "search")) %>
       <% end %>

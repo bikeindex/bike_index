@@ -43,7 +43,7 @@
     <%= hidden_field_tag :search_users, params[:search_users] %>
 
     <%= render UI::Forms::Input::Component.new(form_builder: f, attribute: :query,
-      html_options: {value: params[:query], placeholder: "Search email", class: "tw:w-full tw:sm:w-64"}) %>
+      html_options: {value: params[:query], placeholder: "Search email"}) %>
 
     <%= render UI::Button::Component.new(text: "Search", color: :primary, type: "submit", name: "search") %>
   <% end %>

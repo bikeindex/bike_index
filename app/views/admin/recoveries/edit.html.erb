@@ -84,7 +84,7 @@
   <div data-ui--details-target="content" class="tw:hidden!">
     <hr class="mt-5 mb-4">
 
-    <%= form_for([:admin, @recovery], url: { action: "update", controller: "recoveries" }, html: { class: "form" }) do |f| %>
+    <%= form_for([:admin, @recovery], url: { action: "update", controller: "recoveries" }) do |f| %>
       <%= render(UI::Alerts::ObjectError::Component.new(name: "Recovery", object: @recovery)) %>
 
       <div class="row mt-4">

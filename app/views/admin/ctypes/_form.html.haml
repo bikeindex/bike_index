@@ -6,7 +6,7 @@
   = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :cgroup_id, label_text: "Component Group", required: true)) do
     = render(UI::Forms::Select::Component.new(form_builder: f, attribute: :cgroup_id, option_tags: Cgroup.pluck(:name, :id), options: {prompt: "Select the component group"}, required: true))
   = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :image, label_text: "Component type avatar")) do
-    = render(UI::Forms::Files::Upload::Component.new(form_builder: f, attribute: :image, accept: ImageUploader.permitted_extensions.join(",")))
+    = render(UI::Forms::Files::Upload::Component.new(form_builder: f, attribute: :image, accept: ImageUploader.permitted_extensions))
     = f.hidden_field :image_cache
 
   .mt-4

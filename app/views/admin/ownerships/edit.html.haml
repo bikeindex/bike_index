@@ -19,10 +19,10 @@
       = render(UI::Alerts::ObjectError::Component.new(object: @ownership))
 
       = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :creator_email, label_text: "Creator", required: true)) do
-        = render(UI::Forms::Email::Component.new(form_builder: f, attribute: :creator_email, required: true, html_options: {value: @ownership.creator&.email, prompt: "Creator's email"}))
+        = render(UI::Forms::Email::Component.new(form_builder: f, attribute: :creator_email, required: true, html_options: {value: @ownership.creator&.email}))
 
       = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :user_email, required: true)) do
-        = render(UI::Forms::Email::Component.new(form_builder: f, attribute: :user_email, required: true, html_options: {value: @ownership.user&.email || "", prompt: "Owner's email"}))
+        = render(UI::Forms::Email::Component.new(form_builder: f, attribute: :user_email, required: true, html_options: {value: @ownership.user&.email}))
 
       = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :owner_email, required: true))
 

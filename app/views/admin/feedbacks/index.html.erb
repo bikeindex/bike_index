@@ -43,7 +43,7 @@
       options: {selected: params[:search_kind], include_blank: "Search Kind"}, html_options: {class: "tw:w-full tw:sm:w-auto"}) %>
 
     <%= render UI::Forms::Input::Component.new(form_builder: f, attribute: :search_email,
-      html_options: {value: params[:search_email], placeholder: "Search email", class: "tw:w-full tw:sm:w-64"}) %>
+      html_options: {value: params[:search_email], placeholder: "Search email"}) %>
 
     <%= render UI::Button::Component.new(text: "Search", color: :primary, type: "submit", name: "search") %>
   <% end %>

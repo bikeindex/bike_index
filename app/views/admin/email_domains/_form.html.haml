@@ -18,7 +18,7 @@
   -# The status is ignored on create, processing has to happen first
   - if email_domain.id.present?
     = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :status)) do |group|
-      = render(UI::Forms::RadioButtonGroup::Component.new(name: "email_domain[status]", entries: EmailDomain.statuses.keys.map { |status| {value: status, label: EmailDomain.status_humanized(status)} }, selected: email_domain.status))
+      = render(UI::Forms::RadioButtonGroup::Component.new(name: f.field_name(:status), entries: EmailDomain.statuses.keys.map { |status| {value: status, label: EmailDomain.status_humanized(status)} }, selected: email_domain.status, html_options: {"aria-describedby" => group.helper_text_id}))
       - group.with_helper_text do
         %strong= EmailDomain.status_humanized("ignored")
         is used to make sure super short top-level domains don't match everything

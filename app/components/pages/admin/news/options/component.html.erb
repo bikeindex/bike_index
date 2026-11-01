@@ -135,7 +135,7 @@
       <div class="col-sm-3">
         <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :language)) do %>
           <%= render(UI::Forms::Select::Component.new(form_builder: @form_builder, attribute: :language,
-            option_tags: options_for_select(helpers.language_choices, selected: @blog.language))) %>
+            option_tags: helpers.language_choices)) %>
         <% end %>
       </div>
 

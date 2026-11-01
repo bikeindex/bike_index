@@ -22,7 +22,7 @@
 
     .col-md-8.my-auto
       = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :alignment, label_text: "Post alignment in image")) do
-        = render(UI::Forms::RadioButtonGroup::Component.new(name: "social_post[alignment]", selected: @social_post.alignment, entries: SocialPost::VALID_ALIGNMENTS.map { {value: it, label: it.humanize} }))
+        = render(UI::Forms::RadioButtonGroup::Component.new(name: f.field_name(:alignment), selected: @social_post.alignment, entries: SocialPost::VALID_ALIGNMENTS.map { {value: it, label: it.humanize} }))
 
   .row.justify-content-end
     .col-auto

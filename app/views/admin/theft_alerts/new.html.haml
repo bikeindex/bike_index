@@ -32,14 +32,13 @@
     .col-md-6
       - plan_options = @theft_alert_plans.map { |e| ["#{theft_alert_plan_title(e)} - #{e.amount_formatted}", e.id] }
       = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :theft_alert_plan_id)) do
-        = render(UI::Forms::Select::Component.new(form_builder: f, attribute: :theft_alert_plan_id, option_tags: options_for_select(plan_options, @theft_alert.theft_alert_plan.id)))
+        = render(UI::Forms::Select::Component.new(form_builder: f, attribute: :theft_alert_plan_id, option_tags: plan_options))
 
     - @theft_alert.ad_radius_miles ||= @theft_alert.theft_alert_plan.ad_radius_miles
     .col-md-6
       = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :ad_radius_miles, kind: :number_field, html_options: {step: 1, min: 1}))
 
-  = render(UI::Forms::Group::Component.new(attribute: :location)) do
-    = text_field_tag :location, @theft_alert.address_string, disabled: true, class: "twinput"
+  = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :location, html_options: {value: @theft_alert.address_string, disabled: true}))
 
   = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :notes, kind: :text_area, html_options: {rows: 3}))
 

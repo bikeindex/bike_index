@@ -16,7 +16,7 @@
           %em leave blank if you want to give a membership for forever. In general, set an end at
 
       = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :level, label_text: "Membership Level")) do
-        = render(UI::Forms::RadioButtonGroup::Component.new(name: "membership[level]", entries: Membership.levels.keys.map { |level| {value: level, label: Membership.level_humanized(level)} }, selected: @membership.level))
+        = render(UI::Forms::RadioButtonGroup::Component.new(name: f.field_name(:level), entries: Membership.levels.keys.map { |level| {value: level, label: Membership.level_humanized(level)} }, selected: @membership.level))
 
       %div{class: "tw:mt-4"}
         = render(UI::Button::Component.new(text: "Save", color: :primary, type: "submit"))

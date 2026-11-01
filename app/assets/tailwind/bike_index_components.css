@@ -141,6 +141,10 @@
     @apply tw:my-4 tw:flex tw:flex-wrap tw:items-baseline tw:justify-end tw:gap-2;
   }
 
+  .twsearchrow > .twinput {
+    @apply tw:sm:w-64;
+  }
+
   /* Two columns of cards or sections (three with .twwiderow-3), breaking on the row's own
    * width like .twfieldrow rather than at a viewport breakpoint. The max() caps the column
    * count, which repeat() alone would not do - a wide row fits four 320px tracks. auto-fill

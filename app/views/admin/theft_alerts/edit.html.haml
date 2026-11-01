@@ -196,11 +196,11 @@
   .row
     .col-sm-4
       = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :status)) do
-        = render(UI::Forms::Select::Component.new(form_builder: f, attribute: :status, option_tags: options_for_select(TheftAlert.statuses, @theft_alert.status), html_options: {disabled: true}))
+        = render(UI::Forms::Select::Component.new(form_builder: f, attribute: :status, option_tags: TheftAlert.statuses, html_options: {disabled: true}))
     .col-sm-4
       - plan_options = TheftAlertPlan.active.map { |e| [theft_alert_plan_title(e), e.id] }
       = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :theft_alert_plan_id)) do
-        = render(UI::Forms::Select::Component.new(form_builder: f, attribute: :theft_alert_plan_id, option_tags: options_for_select(plan_options, @theft_alert.theft_alert_plan.id), html_options: {disabled: true}))
+        = render(UI::Forms::Select::Component.new(form_builder: f, attribute: :theft_alert_plan_id, option_tags: plan_options, html_options: {disabled: true}))
     .col-sm-4
       = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :ad_radius_miles, kind: :number_field, html_options: {disabled: true}))
   .row

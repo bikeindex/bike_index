@@ -56,14 +56,14 @@
     <% if display_dev_info? %>
       <%= render(UI::Forms::Input::Component.new(form_builder: form, attribute: :search_domain,
         html_options: {value: params[:search_domain], placeholder: "search email domain",
-                       class: "only-dev-visible tw:w-full tw:sm:w-64"})) %>
+                       class: "only-dev-visible"})) %>
     <% end %>
 
     <%= render(UI::Forms::Input::Component.new(form_builder: form, attribute: :search_phone,
-      html_options: {value: params[:search_phone], placeholder: "Find by phone", class: "tw:w-full tw:sm:w-64"})) %>
+      html_options: {value: params[:search_phone], placeholder: "Find by phone"})) %>
 
     <%= render(UI::Forms::Input::Component.new(form_builder: form, attribute: :query,
-      html_options: {value: params[:query], placeholder: "Find by name or email", class: "tw:w-full tw:sm:w-64"})) %>
+      html_options: {value: params[:query], placeholder: "Find by name or email"})) %>
 
     <%= render(UI::Button::Component.new(text: "Search", color: :primary, type: "submit", name: "search")) %>
   <% end %>

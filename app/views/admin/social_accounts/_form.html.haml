@@ -24,15 +24,12 @@
             %strong Keys and Tokens
 
           %fieldset.mt-2
-            = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :user_secret))
-            = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :user_token))
-            = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :consumer_key))
-            = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :consumer_secret))
+            - %i[user_secret user_token consumer_key consumer_secret].each do |attribute|
+              = render(UI::Forms::Group::Component.new(form_builder: f, attribute:))
 
     %fieldset.col-md-6.mb-4
-      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :street))
-      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :city))
-      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :neighborhood))
+      - %i[street city neighborhood].each do |attribute|
+        = render(UI::Forms::Group::Component.new(form_builder: f, attribute:))
       = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :region_record_id, label_text: "State")) do
         = render UI::Forms::ComboboxState::Component.new(name: :region_record_id, ids: true, html_options: {form: f, placeholder: "State"})
       = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :country, html_options: {value: social_account.country&.iso}))

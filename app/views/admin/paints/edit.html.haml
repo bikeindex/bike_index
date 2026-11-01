@@ -37,10 +37,11 @@
   .row
     .col-lg-3.col-md-6.col-sm-12
       = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :name, html_options: {disabled: true}))
+    - color_options = Color.pluck(:name, :id)
     - %i[color_id secondary_color_id tertiary_color_id].each do |attribute|
       .col-lg-3.col-md-6.col-sm-12
         = render(UI::Forms::Group::Component.new(form_builder: f, attribute:)) do
-          = render(UI::Forms::Select::Component.new(form_builder: f, attribute:, option_tags: Color.pluck(:name, :id), options: {prompt: "Choose color"}))
+          = render(UI::Forms::Select::Component.new(form_builder: f, attribute:, option_tags: color_options, options: {prompt: "Choose color"}))
 
   = render(UI::Button::Component.new(text: "Update the paint", color: :primary, type: "submit"))
   .alert.alert-info.mt-2

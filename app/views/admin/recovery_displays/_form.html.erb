@@ -93,16 +93,8 @@
 
     <% if @bike.present? %>
       <div class="col-lg-4 col-md-6">
-        <%= render(UI::Forms::Group::Component.new(attribute: :bike_url)) do %>
-          <input
-            id="bike_url"
-            class="twinput less-strong"
-            type="text"
-            value="<%= bike_url(@recovery_display.bike) %>"
-            autocomplete="off"
-            disabled
-          >
-        <% end %>
+        <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :bike_url,
+          html_options: {value: bike_url(@recovery_display.bike), autocomplete: "off", disabled: true, class: "less-strong"})) %>
       </div>
     <% end %>
   </div>

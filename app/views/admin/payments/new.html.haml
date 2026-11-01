@@ -15,7 +15,7 @@
     .col-md-6
       = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :amount)) do
         %div{class: "tw:flex tw:gap-2"}
-          = render(UI::Forms::Select::Component.new(form_builder: f, attribute: :currency_enum, option_tags: options_for_select(Currency.select_options), html_options: {class: "tw:w-auto"}))
+          = render(UI::Forms::Select::Component.new(form_builder: f, attribute: :currency_enum, option_tags: Currency.select_options, html_options: {class: "tw:w-auto"}))
           = render(UI::Forms::Input::Component.new(form_builder: f, attribute: :amount, kind: :number_field, html_options: {step: 1, min: 0}))
     .col-md-6
       = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :email, label_text: "Email of user who created payment")) do
