@@ -1,10 +1,6 @@
 <% message_thread_path = admin_marketplace_messages_path(search_marketplace_listing_id: @marketplace_listing.id, user_id: @marketplace_listing.buyer_id || @marketplace_message.receiver_id) %>
 
-<div class="admin-subnav">
-  <div class="col-md-12">
-    <h1>Marketplace Message</h1>
-  </div>
-</div>
+<%= render(Pages::Admin::Headers::Nav::Component.new(title: "Marketplace Message")) %>
 
 <div class="row mt-4">
   <div class="col-md-6">

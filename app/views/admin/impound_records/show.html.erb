@@ -1,24 +1,20 @@
 <% impound_record_id = @impound_record.display_id || @impound_record.id %>
 <% organization_name = @impound_record.organization.present? ? @impound_record.organization.name : @impound_record.organization_id %>
 
-<div class="admin-subnav">
-  <div class="col-12">
-    <h1>
-      Impound Record
-      <% if @bike.present? && @bike.creator_unregistered_parking_notification? %>
-        <%= render(Atoms::RegistrationStatusBadge::Component.new(bike: @bike, override_status: "unregistered")) %>
-      <% end %>
-    </h1>
+<% title = capture do %>
+  Impound Record
+  <% if @bike.present? && @bike.creator_unregistered_parking_notification? %>
+    <%= render(Atoms::RegistrationStatusBadge::Component.new(bike: @bike, override_status: "unregistered")) %>
+  <% end %>
+<% end %>
 
-    <% if organization_name.present? %>
-      <h2 class="mt-4">
-        <em>
-          <%= link_to "View record in organization", organization_impound_record_path(@impound_record.display_id, organization_id: @impound_record.organization_id) %>
-        </em>
-      </h2>
-    <% end %>
-  </div>
-</div>
+<%= render(Pages::Admin::Headers::Nav::Component.new(title:)) do %>
+  <% if organization_name.present? %>
+    <li>
+      <%= link_to "View record in organization", organization_impound_record_path(@impound_record.display_id, organization_id: @impound_record.organization_id) %>
+    </li>
+  <% end %>
+<% end %>
 
 <div class="row">
   <div class="col-sm-6">

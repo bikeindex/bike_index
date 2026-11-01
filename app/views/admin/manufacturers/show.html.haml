@@ -1,11 +1,4 @@
-.admin-subnav
-  .col-md-12
-    %h1
-      = @manufacturer.name
-      %small.twless-strong
-        %small simple:
-
-        = @manufacturer.short_name
+= render(Pages::Admin::Headers::Nav::Component.new(title: @manufacturer.name, subtitle: "simple: #{@manufacturer.short_name}"))
 
 .row
   .col-6

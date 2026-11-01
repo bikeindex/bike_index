@@ -1,8 +1,4 @@
-.admin-subnav
-  .col-md-12
-    %h1
-      Email Domain
-      %strong #{@email_domain.domain}
+= render(Pages::Admin::Headers::Nav::Component.new(title: safe_join(["Email Domain ", tag.strong(@email_domain.domain)])))
 
 .row.mt-4
   .col-md-6

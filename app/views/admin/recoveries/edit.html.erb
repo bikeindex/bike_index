@@ -1,10 +1,6 @@
 <%= render Pages::Admin::Bikes::Header::Component.new(bike: @bike, active: :recoveries, stolen_record: @recovery, display_recovery: true, user: current_user, display_dev_info: display_dev_info?) %>
 
-<div class="admin-subnav midpage-subnav">
-  <div class="col-12">
-    <h2>Manage Recovery Display</h2>
-  </div>
-</div>
+<%= render(UI::Header::Component.new(text: "Manage Recovery Display", tag: :h2, html_class: "tw:mt-10")) %>
 
 <div class="row text-center">
   <% if @recovery.waiting_on_decision? %>

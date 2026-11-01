@@ -113,7 +113,6 @@ hr {
 }
 
 .admin-public-image .image-filename,
-.admin-subnav .nav-item,
 .small,
 small {
   font-size: 80%;
@@ -268,7 +267,6 @@ pre code {
   margin-left: auto
 }
 
-.admin-subnav,
 .row {
   display: flex;
   flex-wrap: wrap;
@@ -287,7 +285,6 @@ pre code {
   padding-left: 0
 }
 
-.admin-subnav .subtitle,
 .col,
 .col-1,
 .col-2,
@@ -431,7 +428,6 @@ pre code {
   max-width: 91.6666666667%
 }
 
-.admin-subnav .subtitle,
 .col-12 {
   flex: 0 0 100%;
   max-width: 100%
@@ -3693,7 +3689,6 @@ input[type=submit].btn-block {
   }
 }
 
-.admin-subnav ul,
 .nav {
   display: flex;
   flex-wrap: wrap;
@@ -3756,13 +3751,10 @@ input[type=submit].btn-block {
   border-top-right-radius: 0
 }
 
-.admin-subnav ul .nav-link,
 .nav-pills .nav-link {
   border-radius: .25rem
 }
 
-.admin-subnav ul .nav-link.active,
-.admin-subnav ul .show>.nav-link,
 .nav-pills .nav-link.active,
 .nav-pills .show>.nav-link {
   color: #fff;
@@ -6603,7 +6595,6 @@ button.bg-dark:hover {
   justify-content: flex-start !important
 }
 
-.admin-subnav ul,
 .justify-content-end {
   justify-content: flex-end !important
 }
@@ -7435,8 +7426,6 @@ button.bg-dark:hover {
   margin: 1.5rem !important
 }
 
-.admin-subnav,
-.admin-subnav .subtitle,
 .mt-4,
 .my-4 {
   margin-top: 1.5rem !important
@@ -7447,7 +7436,6 @@ button.bg-dark:hover {
   margin-right: 1.5rem !important
 }
 
-.admin-subnav,
 .mb-4,
 .my-4 {
   margin-bottom: 1.5rem !important
@@ -9858,44 +9846,6 @@ table .photo-cell img {
   width: 220px;
   float: left;
   margin-right: 1rem
-}
-
-.admin-subnav {
-  border-bottom: 1px solid #ced4da;
-  padding-bottom: 20px
-}
-
-.admin-subnav h1 {
-  font-size: 2rem
-}
-
-@media(max-width:767.98px) {
-  .admin-subnav h1,
-  .admin-subnav h2,
-  .admin-subnav h3 {
-    font-size: 1.5rem
-  }
-}
-
-@media(max-width:767.98px) {
-  .admin-subnav ul {
-    justify-content: normal !important
-  }
-}
-
-.admin-subnav .nav-item {
-  margin-left: .25rem
-}
-
-.admin-subnav .nav-item .button_to .btn,
-.admin-subnav .nav-item a {
-  padding: .25rem .5rem
-}
-
-.admin-subnav.midpage-subnav {
-  border-bottom: none;
-  margin-top: 40px;
-  padding-top: 20px
 }
 
 .paginate-container {

@@ -1,9 +1,6 @@
 -# TODO: make this better. Leaves much to be desired
 
-.admin-subnav
-  .col-12
-    %h1
-      Customer Contact
+= render(Pages::Admin::Headers::Nav::Component.new(title: "Customer Contact"))
 .row
   .col-sm-6
     %table.table-list

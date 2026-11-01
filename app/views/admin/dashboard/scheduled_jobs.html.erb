@@ -1,8 +1,4 @@
-<div class="admin-subnav">
-  <div class="col-12">
-    <h1>Scheduled jobs</h1>
-  </div>
-</div>
+<%= render(Pages::Admin::Headers::Nav::Component.new(title: "Scheduled jobs")) %>
 
 <% env_skipped_jobs = ENV.keys.grep(/\ASIDEKIQ_SKIP_/).select { |k| Binxtils::InputNormalizer.boolean(ENV.fetch(k, nil)) } %>
 

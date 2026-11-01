@@ -4,14 +4,9 @@
   Ownerships
 = render partial: "/admin/ownerships/table", locals: {ownerships: @bike.ownerships.reorder(created_at: :desc), skip_bike: true}
 
-%div{class: "admin-subnav midpage-subnav"}
-  .col-12
-    %h1
-      Edit ownership
-      %code= @ownership.id
-    %h2
-      %span.text-danger
-        BE CAREFUL. YOU CAN BREAK STUFF HERE
+= render(UI::Header::Component.new(text: safe_join(["Edit ownership ", tag.code(@ownership.id)]), tag: :h2, html_class: "tw:mt-10"))
+%p{class: "text-danger tw:font-bold"}
+  BE CAREFUL. YOU CAN BREAK STUFF HERE
 
 .row
   .col-md-6

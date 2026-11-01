@@ -1,8 +1,6 @@
 = render Pages::Admin::Bikes::Header::Component.new(bike: @bike, active: :recovery_displays, stolen_record: @stolen_record, display_recovery: true, user: current_user, display_dev_info: display_dev_info?)
 
-.admin-subnav.midpage-subnav
-  .col-12
-    %h1 Edit Recovery Display
+= render(UI::Header::Component.new(text: "Edit Recovery Display", tag: :h2, html_class: "tw:mt-10"))
 
 = render partial: "form"
 

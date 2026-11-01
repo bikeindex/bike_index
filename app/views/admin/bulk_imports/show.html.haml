@@ -1,16 +1,7 @@
-.admin-subnav
-  .col-sm-4
-    %h1
-      Bulk Import
-      %em
-        \##{@bulk_import.id}
-  .col-sm-8
-    %ul
-      %li.nav-item
-        = link_to "All bulk imports", admin_bulk_imports_path, class: "nav-link"
-      - if @bulk_import.organization_id.present?
-        %li.nav-item
-          = link_to "All #{@bulk_import.organization.name} imports", admin_bulk_imports_path(organization_id: @bulk_import.organization.to_param), class: "nav-link"
+= render(Pages::Admin::Headers::Nav::Component.new(title: safe_join(["Bulk Import ", tag.em("##{@bulk_import.id}")]))) do
+  %li= render(UI::ButtonLink::Component.new(text: "All bulk imports", href: admin_bulk_imports_path, size: :sm))
+  - if @bulk_import.organization_id.present?
+    %li= render(UI::ButtonLink::Component.new(text: "All #{@bulk_import.organization.name} imports", href: admin_bulk_imports_path(organization_id: @bulk_import.organization.to_param), size: :sm))
 .row
   .col-sm-6
     %table.table-list

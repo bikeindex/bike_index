@@ -1,6 +1,4 @@
-.admin-subnav
-  .col-12
-    %h1 External Registry Bike
+= render(Pages::Admin::Headers::Nav::Component.new(title: "External Registry Bike"))
 
 %h4
   = @bike.title_string
