@@ -48,11 +48,6 @@
   :is(.table-list, .ui-table-list) td .only-dev-visible {
     @apply tw:px-1 tw:py-0.5;
   }
-
-  /* Forced: admin's .table-list striping is unlayered */
-  .table-list tr.only-dev-visible {
-    @apply tw:bg-dev/10!;
-  }
 }
 
 @layer components {
