@@ -1540,6 +1540,8 @@ RSpec.describe "BikeBook", :js, type: :system do
     # 650b against 700c, whatever their tires
     expect(diameters.call).to eq(["Aventón Level 4 ADV's 650 B wheels with 56 mm tires are approximately 696 mm diameter",
       "Aventón Current EXP's 700 C wheels with 64 mm tires are approximately 750 mm diameter"])
+    # a current model's chip its name and the current badge
+    expect(page).to have_css(".hw-combobox__chip", text: /\bAventón Level 4 ADV current\z/)
     # a chip's handle moves it a place by its arrow keys, and the comparison with it, keeping its focus
     find("[aria-label='Move Aventón Level 4 ADV (current)']").send_keys(:right)
     expect(page).to have_current_path(%r{[?&]vehicle_models=m/aventon/2026/current_exp,m/aventon/2026/level_4_adv(&|\z)})
