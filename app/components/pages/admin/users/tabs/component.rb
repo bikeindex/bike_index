@@ -5,17 +5,16 @@ module Pages
     module Users
       module Tabs
         class Component < ApplicationComponent
-          TABS = {edit: "Edit", bikes: "Bikes", marketplace_messages: "Messages", memberships: "Memberships",
-                  alerts: "Alerts", payments: "Payments", organization_roles: "Organizations",
-                  notifications: "Notifications", feedbacks: "Feedbacks", emails: "Emails",
-                  ambassador_tasks: "Ambassador tasks"}.freeze
+          TABS = {edit: "Edit", bikes: "Bikes", messages: "Messages", memberships: "Memberships", payments: "Payments",
+                  organization_roles: "Organizations", emails: "Emails", ambassador_tasks: "Ambassador tasks"}.freeze
+
+          # The Messages tab's sections, which it counts together
+          MESSAGE_KINDS = %i[marketplace_messages alerts notifications feedbacks].freeze
 
           # These tabs are another controller's index, filtered to this user - which renders the
           # header through Pages::Admin::IndexSkeleton's user_tab:. The rest but edit are the
           # users show action's.
-          INDEX_PATHS = {marketplace_messages: :admin_marketplace_messages_path, memberships: :admin_memberships_path,
-                         alerts: :admin_user_alerts_path, payments: :admin_payments_path,
-                         notifications: :admin_notifications_path, feedbacks: :admin_feedbacks_path}.freeze
+          INDEX_PATHS = {memberships: :admin_memberships_path, payments: :admin_payments_path}.freeze
 
           def self.records(user, tab)
             case tab
@@ -52,7 +51,8 @@ module Pages
           # Keyed on the user, so a new bike or payment only shows once the user is next touched
           def tab_counts
             @tab_counts ||= Rails.cache.fetch(["admin_user_tab_counts", @user]) do
-              (TABS.keys - %i[edit]).to_h { [it, self.class.records(@user, it).count] }
+              counts = (TABS.keys - %i[edit messages] + MESSAGE_KINDS).to_h { [it, self.class.records(@user, it).count] }
+              counts.merge(messages: counts.values_at(*MESSAGE_KINDS).sum)
             end
           end
 

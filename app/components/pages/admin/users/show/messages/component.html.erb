@@ -1,0 +1,31 @@
+<h3 class="tw:mt-6">
+  <%= section_heading("Marketplace messages", :marketplace_messages, admin_marketplace_messages_path(user_id: @user.id)) %>
+</h3>
+
+<% if counts[:marketplace_messages].positive? %>
+  <%= render partial: "/admin/marketplace_messages/table", locals: {collection: recent(:marketplace_messages)} %>
+<% end %>
+
+<h3 class="tw:mt-6">
+  <%= section_heading("Alerts", :alerts, admin_user_alerts_path(user_id: @user.id)) %>
+</h3>
+
+<% if counts[:alerts].positive? %>
+  <%= render partial: "/admin/user_alerts/table", locals: {user_alerts: recent(:alerts), skip_user: true} %>
+<% end %>
+
+<h3 class="tw:mt-6">
+  <%= section_heading("Notifications", :notifications, admin_notifications_path(user_id: @user.id)) %>
+</h3>
+
+<% if counts[:notifications].positive? %>
+  <%= render partial: "/admin/notifications/table", locals: {notifications: recent(:notifications).includes(:bike, :notifiable, :user)} %>
+<% end %>
+
+<h3 class="tw:mt-6">
+  <%= section_heading("Feedbacks", :feedbacks, admin_feedbacks_path(user_id: @user.id)) %>
+</h3>
+
+<% if counts[:feedbacks].positive? %>
+  <%= render partial: "/admin/feedbacks/table", locals: {feedbacks: recent(:feedbacks).includes(:user), skip_user: true} %>
+<% end %>

@@ -10,12 +10,15 @@ RSpec.describe Pages::Admin::Users::Tabs::Component, type: :component do
 
   it "renders the user and every tab, with the active one marked" do
     FactoryBot.create(:user_email, user:)
+    FactoryBot.create(:feedback, user:)
+    FactoryBot.create(:user_alert, user:)
     expect(component).to have_content("Test User")
-    expect(tab_labels).to eq ["Edit", "Bikes 0", "Messages 0", "Memberships 0", "Alerts 0", "Payments 0",
-      "Organizations 0", "Notifications 0", "Feedbacks 0", "Emails 2"]
+    expect(tab_labels).to eq ["Edit", "Bikes 0", "Messages 2", "Memberships 0", "Payments 0", "Organizations 0",
+      "Emails 2"]
     expect(component.css("nav a[aria-current]").map { |tab| tab.text.squish }).to eq ["Edit"]
     expect(component).to have_link("Edit", href: "/admin/users/#{user.id}/edit")
     expect(component).to have_link("Bikes 0", href: "/admin/users/#{user.id}?active_tab=bikes")
+    expect(component).to have_link("Messages 2", href: "/admin/users/#{user.id}?active_tab=messages")
     expect(component).to have_link("Payments 0", href: "/admin/payments?user_id=#{user.id}")
     expect(component).to have_link("Emails 2", href: "/admin/users/#{user.id}?active_tab=emails")
     expect(component.css("[role='alert']")).to be_empty

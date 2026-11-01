@@ -1,4 +1,6 @@
 <% case @active_tab %>
+<% when :messages %>
+  <%= render(Pages::Admin::Users::Show::Messages::Component.new(user: @user)) %>
 <% when :organization_roles %>
   <p class="tw:mb-4 tw:text-sm">
     <%= link_to admin_user_registration_organizations_path(user_id: @user.id), class: "twlink" do %>

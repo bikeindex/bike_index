@@ -67,6 +67,8 @@ RSpec.describe Admin::UsersController, type: :request do
       let!(:user_email) { FactoryBot.create(:user_email, user: user_subject) }
       let!(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: user_subject, serial_number: "LIVE-SERIAL") }
       let!(:bike_deleted) { FactoryBot.create(:bike, :with_ownership_claimed, user: user_subject, serial_number: "GONE-SERIAL", deleted_at: Time.current) }
+      let!(:feedback) { FactoryBot.create(:feedback, user: user_subject, body: "FEEDBACK-BODY") }
+      let!(:user_alert) { FactoryBot.create(:user_alert, user: user_subject) }
 
       it "renders each tab" do
         Admin::UsersController::SHOW_TABS.each do |tab|
@@ -75,6 +77,10 @@ RSpec.describe Admin::UsersController, type: :request do
         end
         get "#{base_url}/#{user_subject.id}?active_tab=emails"
         expect(response.body).to include(user_email.email)
+        get "#{base_url}/#{user_subject.id}?active_tab=messages"
+        sections = Nokogiri::HTML(response.body).css("h3").map { |heading| heading.text.squish }
+        expect(sections).to eq(["Marketplace messages 0", "Alerts 1", "Notifications 0", "Feedbacks 1"])
+        expect(response.body).to include(admin_feedback_path(feedback))
         get "#{base_url}/#{user_subject.id}?active_tab=organization_roles"
         expect(response.body).to include(organization_role.organization.name)
         get "#{base_url}/#{user_subject.id}?active_tab=bikes"
