@@ -163,6 +163,9 @@
   .ui-table td:has(.keep-with-previous:not(.keep-together *)) {
     @apply tw:whitespace-nowrap;
   }
+  .table_cell_check {
+    @apply tw:font-[Courier] tw:text-center tw:font-bold;
+  }
 }
 
 /* Create utility classes for the sides of the table so that it can be applied in JS when columns are hidden */
