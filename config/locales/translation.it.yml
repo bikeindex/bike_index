@@ -4685,6 +4685,10 @@ it:
         your_headers_must_match_html: Le tue intestazioni devono corrispondere <em>esattamente</em>
           alle nostre; ad esempio, se hai "numero di serie" come intestazione, l'importazione
           non funzionerà.
+        create_duplicates_html: 'Crea duplicati: aggiungi registrazioni quando una
+          riga corrisponde al numero di serie e all''indirizzo email del proprietario
+          di una registrazione esistente <span class="twless-strong">(disattivato
+          per impostazione predefinita).</span>'
       show:
         ascend_import: Importazione Ascend
         bulk_import: Importazione massiva
