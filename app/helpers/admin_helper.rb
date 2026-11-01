@@ -74,7 +74,7 @@ module AdminHelper
     elsif theft_alert.pending?
       "text-warning"
     elsif theft_alert.inactive?
-      "less-strong small"
+      "twless-strong small"
     end
     theft_alert.recovered? ? text_class + " small" : text_class
   end

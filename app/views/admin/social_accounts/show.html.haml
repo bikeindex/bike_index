@@ -1,7 +1,6 @@
-.admin-subnav
-  .col-12.text-center
-    = link_to "Edit", edit_admin_social_account_url(@social_account), class: "btn btn-outline-success ml-2"
-    = link_to "Check Credentials", check_credentials_admin_social_account_url(@social_account), class: "btn btn-outline-success ml-2"
+= render(Pages::Admin::Headers::Nav::Component.new(title: "Social Account")) do
+  %li= render(UI::ButtonLink::Component.new(text: "Edit", href: edit_admin_social_account_url(@social_account), size: :sm))
+  %li= render(UI::ButtonLink::Component.new(text: "Check Credentials", href: check_credentials_admin_social_account_url(@social_account), size: :sm))
 - if @social_account.errored?
   .row.mt-4.mb-4
     .card.ml-auto.mr-auto.col-8

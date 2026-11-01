@@ -24,8 +24,8 @@
 
     <div>
       <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :serial_number, required: true,
-            html_options: {class: ("fake-disabled" if @bike.no_serial?),
-                           data: {"admin--bike-edit-form-target": "serial"}})) %>
+            html_options: {class: "tw:data-no-serial:bg-gray-100 tw:dark:data-no-serial:bg-gray-800 tw:data-no-serial:cursor-not-allowed",
+                           data: {"admin--bike-edit-form-target": "serial", no_serial: @bike.no_serial?.presence}})) %>
     </div>
 
     <div class="tw:self-center">

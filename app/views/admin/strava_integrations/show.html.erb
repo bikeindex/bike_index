@@ -1,8 +1,4 @@
-<div class="admin-subnav">
-  <div class="col-md-12">
-    <h1>Strava Integration</h1>
-  </div>
-</div>
+<%= render(Pages::Admin::Headers::Nav::Component.new(title: "Strava Integration")) %>
 
 <div class="row mt-4">
   <div class="col-md-6">
@@ -15,7 +11,7 @@
             <td>
               <code><%= @strava_integration.id %></code>
 
-              <small class="less-strong tw:ml-2">
+              <small class="twless-strong tw:ml-2">
                 Strava ID: <code><%= @strava_integration.strava_id %></code>
               </small>
             </td>
@@ -122,7 +118,7 @@
 
           <td>
             <%= @strava_integration.sync_progress_percent %>%
-            <span class="less-strong tw:ml-2"><%= number_display(@strava_integration.strava_activities.enriched.count) %> / <%= number_display(@strava_integration.activities_downloaded_count) %> enriched</span>
+            <span class="twless-strong tw:ml-2"><%= number_display(@strava_integration.strava_activities.enriched.count) %> / <%= number_display(@strava_integration.activities_downloaded_count) %> enriched</span>
           </td>
         </tr>
 
@@ -137,7 +133,7 @@
                 <%= l most_recent_proxy_at, format: :convert_time %>
               </span>
             <% else %>
-              <small class="less-strong">no proxy requests</small>
+              <small class="twless-strong">no proxy requests</small>
             <% end %>
 
             <small class="tw:ml-1">

@@ -14,6 +14,16 @@ RSpec.describe Admin::BikesController, type: :request do
       expect(assigns(:page_id)).to eq "admin_bikes_index"
     end
 
+    context "sorted by occurred_at" do
+      let!(:bike) { FactoryBot.create(:bike, :with_ownership) }
+      let!(:stolen_bike) { FactoryBot.create(:stolen_bike) }
+      it "puts the bikes without one last" do
+        get base_url, params: {sort: "occurred_at", direction: "asc"}
+        expect(response.code).to eq("200")
+        expect(assigns(:bikes).pluck(:id)).to eq([stolen_bike.id, bike.id])
+      end
+    end
+
     context "with render_chart and search_email" do
       let!(:bike) { FactoryBot.create(:bike, :with_ownership, :with_ownership_claimed, user:) }
       let(:user) { FactoryBot.create(:user_confirmed, email: "somethingcool@bikeindex.org") }

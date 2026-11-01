@@ -12,9 +12,8 @@ RSpec.describe BulkImport, type: :model do
   describe "no_duplicate_for?" do
     it "dedupes serials of 6 or more characters by default, including ascend" do
       expect(BulkImport.new.no_duplicate_for?("WTU123456")).to be_truthy
-      expect(BulkImport.new(no_duplicate: false).no_duplicate_for?("WTU123456")).to be_falsey
-      expect(BulkImport.new(kind: "stolen").no_duplicate_for?("WTU123456")).to be_falsey
-      expect(BulkImport.new(kind: "ascend", no_duplicate: false).no_duplicate_for?("WTU123456")).to be_truthy
+      expect(BulkImport.new(allow_duplicate: true).no_duplicate_for?("WTU123456")).to be_falsey
+      expect(BulkImport.new(kind: "ascend", allow_duplicate: true).no_duplicate_for?("WTU123456")).to be_truthy
       expect(BulkImport.new(kind: "ascend").no_duplicate_for?("12345")).to be_falsey
       expect(BulkImport.new.no_duplicate_for?("unknown")).to be_falsey
     end

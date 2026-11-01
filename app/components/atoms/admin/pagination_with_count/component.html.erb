@@ -1,7 +1,7 @@
 <div class="row tw:mt-8 tw:mb-4">
   <% unless @skip_total %>
     <div class="col-md-5">
-      <p class="pagination-number mb-2 mb-md-0">
+      <p class="mb-2 mb-md-0">
         <strong><%= number_with_delimiter(count) %></strong> Matching
         <%= viewing.pluralize(count) %>
 
@@ -15,13 +15,13 @@
             <%= render(UI::TimeRange::Component.new(time_range: @index.time_range, period: @index.period)) %>
           </em>
         <% elsif show_today_count? %>
-          <em class="less-strong">
+          <em class="twless-strong">
             (<%= number_with_delimiter(today_count) %> today)
           </em>
         <% end %>
 
         <% if @count_detail.present? %>
-          <span class="less-strong"><%= @count_detail %></span>
+          <span class="twless-strong"><%= @count_detail %></span>
         <% end %>
       </p>
     </div>

@@ -5,15 +5,9 @@
 - @bike_submitting = @impound_claim.bike_submitting
 - organization_name = @impound_claim.organization.present? ? @impound_claim.organization.name : @impound_claim.organization_id
 
-.admin-subnav
-  .col-12
-    %h1
-      #{@impound_claim.claim_kind_humanized.titleize} for
-      = link_to "impound record ##{impound_record_id}", admin_impound_record_path("pkey-#{@impound_record.id}")
-
-    - if organization_name.present?
-      %h2.mt-4
-        %em= link_to "View claim in organization", organization_impound_claim_path(@impound_claim.id, organization_id: @impound_claim.organization_id)
+= render(Pages::Admin::Headers::Nav::Component.new(title: safe_join(["#{@impound_claim.claim_kind_humanized.titleize} for ", link_to("impound record ##{impound_record_id}", admin_impound_record_path("pkey-#{@impound_record.id}"))]))) do
+  - if organization_name.present?
+    %li= link_to "View claim in organization", organization_impound_claim_path(@impound_claim.id, organization_id: @impound_claim.organization_id)
 .row
   .col-sm-6
     %table.table-list
@@ -39,7 +33,7 @@
             - if organization_name.present?
               = link_to organization_name, admin_organization_path(@impound_claim.organization_id)
             - else
-              %small.less-strong NO organization
+              %small.twless-strong NO organization
         %tr
           %td Bike claimed
           %td
@@ -59,7 +53,7 @@
             - if @impound_record.present?
               = link_to impound_record_id, admin_impound_record_path("pkey-#{@impound_record.id}")
               - if organization_name.present?
-                %small.less-strong= link_to "view in organization", organization_impound_record_path(impound_record_id, organization_id: @impound_claim.organization_id)
+                %small.twless-strong= link_to "view in organization", organization_impound_record_path(impound_record_id, organization_id: @impound_claim.organization_id)
         %tr
           %td User
           %td

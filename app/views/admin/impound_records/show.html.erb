@@ -1,24 +1,20 @@
 <% impound_record_id = @impound_record.display_id || @impound_record.id %>
 <% organization_name = @impound_record.organization.present? ? @impound_record.organization.name : @impound_record.organization_id %>
 
-<div class="admin-subnav">
-  <div class="col-12">
-    <h1>
-      Impound Record
-      <% if @bike.present? && @bike.creator_unregistered_parking_notification? %>
-        <%= render(Atoms::RegistrationStatusBadge::Component.new(bike: @bike, override_status: "unregistered")) %>
-      <% end %>
-    </h1>
+<% title = capture do %>
+  Impound Record
+  <% if @bike.present? && @bike.creator_unregistered_parking_notification? %>
+    <%= render(Atoms::RegistrationStatusBadge::Component.new(bike: @bike, override_status: "unregistered")) %>
+  <% end %>
+<% end %>
 
-    <% if organization_name.present? %>
-      <h2 class="mt-4">
-        <em>
-          <%= link_to "View record in organization", organization_impound_record_path(@impound_record.display_id, organization_id: @impound_record.organization_id) %>
-        </em>
-      </h2>
-    <% end %>
-  </div>
-</div>
+<%= render(Pages::Admin::Headers::Nav::Component.new(title:)) do %>
+  <% if organization_name.present? %>
+    <li>
+      <%= link_to "View record in organization", organization_impound_record_path(@impound_record.display_id, organization_id: @impound_record.organization_id) %>
+    </li>
+  <% end %>
+<% end %>
 
 <div class="row">
   <div class="col-sm-6">
@@ -59,7 +55,7 @@
             <% if organization_name.present? %>
               <%= link_to organization_name, admin_organization_path(@impound_record.organization_id) %>
             <% else %>
-              <small class="less-strong">NO organization</small>
+              <small class="twless-strong">NO organization</small>
             <% end %>
           </td>
         </tr>
@@ -91,7 +87,7 @@
 
           <td>
             <% if @impound_record.impounded_from_address_record.blank? %>
-              <em class="less-strong">No impounded from address</em>
+              <em class="twless-strong">No impounded from address</em>
             <% else %>
               <%= render(UI::AddressDisplay::Component.new(address_record: @impound_record.impounded_from_address_record, visible_attribute: :street)) %>
             <% end %>
@@ -103,9 +99,9 @@
 
           <td>
             <% if @impound_record.address_record_id.blank? %>
-              <em class="less-strong">No current address</em>
+              <em class="twless-strong">No current address</em>
             <% elsif @impound_record.address_record_id == @impound_record.impounded_from_address_record_id %>
-              <em class="less-strong">same as impounded from</em>
+              <em class="twless-strong">same as impounded from</em>
             <% else %>
               <%= render(UI::AddressDisplay::Component.new(address_record: @impound_record.address_record, visible_attribute: :street)) %>
             <% end %>
@@ -119,7 +115,7 @@
 <h2 class="mt-5">Impound record updates</h2>
 
 <% if @impound_record.impound_record_updates.none? %>
-  <p class="less-strong">no updates</p>
+  <p class="twless-strong">no updates</p>
 <% else %>
   <table class="table table-striped table-bordered table-sm without-exterior-border">
     <thead class="small-header hidden-md-down">
@@ -167,7 +163,7 @@
 <h2 class="mt-5">Impound claims</h2>
 
 <% if @impound_record.impound_claims.none? %>
-  <p class="less-strong">no claims</p>
+  <p class="twless-strong">no claims</p>
 <% else %>
   <%= render partial: "admin/impound_claims/table", locals: {impound_claims: @impound_record.impound_claims} %>
 <% end %>

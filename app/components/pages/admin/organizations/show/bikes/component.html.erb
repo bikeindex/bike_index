@@ -9,7 +9,7 @@
   </h2>
 
   <%# ml-auto rather than justify-between, which drops the link to the left once it wraps %>
-  <%= link_to "org bikes view", organization_registrations_path(organization_id: @organization.to_param), class: "gray-link tw:ml-auto" %>
+  <%= render(UI::ButtonLink::Component.new(href: organization_registrations_path(organization_id: @organization.to_param), text: "org bikes view", color: :link_gray, html_class: "tw:ml-auto")) %>
 </div>
 
 <%= render Pages::Admin::Bikes::Table::Component.new(bikes: @bikes, sort_state: @sort_state) %>

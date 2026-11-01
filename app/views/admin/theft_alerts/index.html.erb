@@ -1,9 +1,8 @@
 <% if @bike.present? %>
   <%= render Pages::Admin::Bikes::Header::Component.new(bike: @bike, active: :theft_alerts, display_recovery: true, user: current_user, display_dev_info: display_dev_info?) %>
-  <h1 class="mt-5 mb-4">
-    Promoted Alerts
+  <%= render(Pages::Admin::Headers::Section::Component.new(title: "Promoted alerts", count: @pagy.count)) do %>
     <%= render(UI::ButtonLink::Component.new(text: "New Promoted alert", href: new_admin_theft_alert_path(bike_id: @bike.id), color: :primary, size: :sm, html_class: "tw:ml-2")) %>
-  </h1>
+  <% end %>
   <%= render partial: "table", locals: {render_sortable: true, theft_alerts: @theft_alerts, skip_bike: true} %>
 <% else %>
   <% nav_header_list_items = capture do %>
@@ -103,10 +102,10 @@
           <%= render partial: "/shared/hidden_search_fields" %>
 
           <div class="form-group ml-auto mr-1 mb-2">
-            <em class="small less-strong mr-1 d-md-inline d-none">within</em>
+            <em class="small twless-strong mr-1 d-md-inline d-none">within</em>
             <%= number_field_tag :search_distance, @distance, class: "form-control", style: "width: 5rem;" %>
 
-            <em class="small less-strong ml-1 mr-1 d-md-inline d-none">
+            <em class="small twless-strong ml-1 mr-1 d-md-inline d-none">
               miles of
             </em>
           </div>

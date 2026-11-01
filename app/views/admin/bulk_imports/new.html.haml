@@ -1,6 +1,4 @@
-.admin-subnav
-  %h1
-    New Bulk Import
+= render(Pages::Admin::Headers::Nav::Component.new(title: "New Bulk Import"))
 
 .row
   .col-sm-6
@@ -16,9 +14,10 @@
           = f.check_box :no_notify
           Don't send emails to registrations
       .form-group
-        = f.label :no_duplicate do
-          = f.check_box :no_duplicate
-          Skip registering bikes with the same serial number as other bikes owned by the same email
+        = f.label :allow_duplicate, style: "line-height: 1.5;" do
+          = f.check_box :allow_duplicate
+          Create duplicates - add registrations when a row matches an existing registration's serial and owner email
+          %span.twless-strong (off by default)
 
 
       = f.submit 'Create', class: "btn btn-success float-right"

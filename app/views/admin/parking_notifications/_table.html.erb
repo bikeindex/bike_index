@@ -1,0 +1,57 @@
+<%# locals: (parking_notifications:, render_sortable: false) %>
+
+<%= render(UI::Table::Component.new(records: parking_notifications, render_sortable:, sort_state:)) do |table| %>
+  <% table.column(sortable: "created_at") do |parking_notification| %>
+    <%= link_to render(UI::Time::Component.new(time: parking_notification.created_at, format: :localize_time_precise)), organization_parking_notification_path(parking_notification.id, organization_id: parking_notification.organization_id) %>
+  <% end %>
+
+  <% table.column(sortable: "updated_at", header_classes: "tw:text-xs") do |parking_notification| %>
+    <%= render(UI::Time::Component.new(time: parking_notification.updated_at, format: :localize_time_precise)) %>
+  <% end %>
+
+  <% unless current_organization.present? %>
+    <% table.column(sortable: "organization_id") do |parking_notification| %>
+      <%= link_to parking_notification.organization&.short_name, admin_parking_notifications_path(organization_id: parking_notification.organization_id) %>
+    <% end %>
+  <% end %>
+
+  <% table.column(sortable: "kind") do |parking_notification| %>
+    <small><%= parking_notification.kind_humanized %></small>
+  <% end %>
+
+  <% table.column(label: "Bike") do |parking_notification| %>
+    <% if parking_notification.bike.present? %>
+      <%= link_to helpers.organized_bike_text(parking_notification.bike), admin_bike_path(parking_notification.bike) %>
+    <% end %>
+  <% end %>
+
+  <% table.column(label: "#") do |parking_notification| %>
+    <% if parking_notification.repeat_record? %>
+      <small class="twless-strong"><%= parking_notification.notification_number %></small>
+    <% end %>
+  <% end %>
+
+  <% table.column(label: "Status") do |parking_notification| %>
+    <% if parking_notification.status == "impounded" %>
+      <% if parking_notification.impound_record_id.present? %>
+        <small class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">
+          <%= link_to "Impounded", admin_impound_record_path(parking_notification.impound_record_id), class: "twlink-underlined" %>
+        </small>
+      <% else %>
+        <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">no impound record!</span>
+      <% end %>
+    <% else %>
+      <em class="small"><%= helpers.status_display(parking_notification.status) %></em>
+    <% end %>
+  <% end %>
+
+  <% table.column(sortable: "user_id", label: "last updator", header_classes: "tw:text-xs") do |parking_notification| %>
+    <small><%= parking_notification.user&.display_name&.truncate(20) %></small>
+  <% end %>
+
+  <% table.column(sortable: "resolved_at", header_classes: "tw:text-xs") do |parking_notification| %>
+    <% if parking_notification.resolved_at.present? %>
+      <small><%= render(UI::Time::Component.new(time: parking_notification.resolved_at, format: :localize_time_precise)) %></small>
+    <% end %>
+  <% end %>
+<% end %>

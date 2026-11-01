@@ -37,7 +37,8 @@ PATHS = {
   "sidekiq" => "/api/admin_data/sidekiq",
   "pghero" => "/api/admin_data/pghero",
   "bug_reports" => "#{BUG_REPORTS}.json",
-  "missing_manufacturers" => "/admin/bikes/missing_manufacturer.json"
+  "missing_manufacturers" => "/admin/bikes/missing_manufacturer.json",
+  "manufacturers" => "/admin/manufacturers.json"
 }.freeze
 
 def env_get(key)

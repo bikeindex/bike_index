@@ -6,7 +6,7 @@
       %tr
         %td Method
         %td
-          %span.less-strong= payment.payment_method
+          %span.twless-strong= payment.payment_method
       %tr
         %td Amount
         %td= payment.amount_formatted
@@ -45,5 +45,5 @@
             = link_to payment.email, edit_admin_user_url(payment.user.id)
           - else
             = payment.email
-            %em.small.less-strong
+            %em.small.twless-strong
               no matching user
