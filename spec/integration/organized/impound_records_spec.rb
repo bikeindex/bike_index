@@ -3,12 +3,12 @@
 require "rails_helper"
 
 # Verifies the impound records index browser behavior: results load into a
-# turbo-frame, the dropdown/location filters drive it, and the multi-update
+# turbo-frame, the settings panel/location filters drive it, and the multi-update
 # flow (`org--impound-update-multi` + `org--impound-update`) reacts to the
 # rendered DOM. Lives at the integration layer because the controllers react
 # to the rendered DOM.
 RSpec.describe "Organized impound records index", :js, type: :system do
-  let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[parking_notifications impound_bikes]) }
+  let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[parking_notifications impound_bikes bike_search]) }
   let(:user) { FactoryBot.create(:organization_admin, organization:) }
   let(:base_url) { "/o/#{organization.to_param}/impound_records" }
 
@@ -61,6 +61,10 @@ RSpec.describe "Organized impound records index", :js, type: :system do
     expect(page).to have_current_path(/\A#{Regexp.escape(base_url)}(\?|\z)/, wait: 10)
   end
 
+  def visible_column_order = all("thead th.hideableColumn").map { it[:class][/\w+_cell/] }
+
+  def shared_with(order) = visible_column_order & order
+
   it "loads results via turbo, filters by unregisteredness, then applies multi-updates" do
     # The results-frame component opts the page out of Turbo's snapshot cache
     expect(page).to have_css('meta[name="turbo-cache-control"][content="no-cache"]', visible: :all)
@@ -69,15 +73,81 @@ RSpec.describe "Organized impound records index", :js, type: :system do
     # search_no_js should NOT be in the URL (removed by the JS controller)
     expect(page).not_to have_current_path(/search_no_js/)
 
-    # Unregisteredness dropdown link advances the URL (data-turbo-action="advance")
-    # and updates the frame in place
-    within("turbo-frame#impound_records_results_frame") do
-      all("[data-ui--dropdown-target='button']").last.click
+    # The impound columns are in the column settings, on by default
+    click_button "Column settings"
+    expect(page).to have_css("th.impound_user_cell", text: /last updator/i)
+    uncheck "Last updator"
+    expect(page).to have_no_css("th.impound_user_cell")
+    click_button "default"
+    expect(page).to have_css("th.impound_user_cell")
+    click_button "Column settings"
+
+    # The view switcher swaps the table for cards, and back
+    click_link "Cards"
+    expect(page).to have_current_path(/search_result_view=cards/, wait: 10)
+    expect(page).to have_no_css("turbo-frame#impound_records_results_frame table")
+    expect(page).to have_no_button("Update multiple records")
+    # Stored apart from the registrations search's view
+    visit "/o/#{organization.to_param}/registrations"
+    expect(page).to have_css("turbo-frame#organized_bikes_results_frame[complete] table", wait: 10)
+    expect(page).not_to have_current_path(/search_result_view/)
+    # A registrations column order, for the impound search to copy
+    find("[aria-label='Move Photo']").send_keys(:right)
+    expect(page).to have_css("#drag-handle-status", text: "Position 2 of", visible: :all)
+    registrations_order = visible_column_order
+    visit base_url
+    expect(page).to have_current_path(/search_result_view=cards/, wait: 10)
+    click_link "Table"
+    expect(page).to have_css("turbo-frame#impound_records_results_frame table tbody tr", count: 4, wait: 10)
+
+    # Its own columns apart, and the registrations search's order copied onto the columns both have
+    expect(shared_with(registrations_order)).not_to eq registrations_order & shared_with(registrations_order)
+    click_button "Column settings"
+    expect(page).to have_css("h3", text: "Impound search columns")
+    expect(page).to have_no_button("Return to default column order")
+    click_button "Copy column order from registrations search"
+    expect(page).to have_no_button("Copy column order from registrations search")
+    expect(shared_with(registrations_order)).to eq registrations_order & shared_with(registrations_order)
+    click_button "Return to default column order"
+    expect(page).to have_button("Copy column order from registrations search")
+    # Gone once the registrations search is back in its default order, in another window
+    registrations_window = open_new_window
+    within_window(registrations_window) do
+      visit "/o/#{organization.to_param}/registrations"
+      expect(page).to have_css("turbo-frame#organized_bikes_results_frame[complete] table", wait: 10)
+      click_button "Column settings"
+      click_button "Return to default column order"
+      expect(page).to have_no_button("Return to default column order")
+      click_button "Column settings"
     end
-    click_link "Only unregistered"
+    registrations_window.close
+    expect(page).to have_no_button("Copy column order from registrations search")
+    click_button "Column settings"
+
+    # and the registrations search copies this one's, once it's moved
+    last_column = visible_column_order.last
+    find("[aria-label='Move Photo']").drag_to(find("thead th.#{last_column}"))
+    expect(page).to have_css("thead th.photo_cell + th.#{last_column}")
+    impound_order = visible_column_order
+    visit "/o/#{organization.to_param}/registrations"
+    expect(page).to have_css("turbo-frame#organized_bikes_results_frame[complete] table", wait: 10)
+    expect(shared_with(impound_order)).not_to eq impound_order & shared_with(impound_order)
+    click_button "Column settings"
+    click_button "Copy column order from impounded vehicles search"
+    expect(page).to have_no_button("Copy column order from impounded vehicles search")
+    expect(shared_with(impound_order)).to eq impound_order & shared_with(impound_order)
+    visit base_url
+    expect(page).to have_css("turbo-frame#impound_records_results_frame table tbody tr", count: 4, wait: 10)
+
+    # The settings panel's radios submit the search, which advances the URL and
+    # updates the frame in place
+    expect(page).to have_text("Current records")
+    click_button "Search settings and filters"
+    choose("search_unregisteredness_only_unregistered", allow_label_click: true, visible: :all)
 
     expect(page).to have_current_path(/search_unregisteredness=only_unregistered/, wait: 10)
     expect(page).to have_css("turbo-frame#impound_records_results_frame table tbody tr", count: 1)
+    expect(page).to have_text("Current records · Only unregistered")
 
     # Back navigation restores the unfiltered listing. The page opts out of
     # Turbo's snapshot cache (no-cache meta), so back/forward re-fetch it and the
@@ -85,6 +155,9 @@ RSpec.describe "Organized impound records index", :js, type: :system do
     page.go_back
     expect(page).not_to have_current_path(/search_unregisteredness/, wait: 10)
     expect(page).to have_css("turbo-frame#impound_records_results_frame table tbody tr", count: 4, wait: 10)
+    # search--form puts the panel's radios back in step with the address bar
+    expect(find("#search_unregisteredness_all", visible: :all)).to be_checked
+    expect(page).not_to have_text("Current records · Only unregistered")
 
     # Search form submit + direct back-nav: regression guard for the stale
     # turbo-frame state the no-cache meta prevents. The form submit updates the
@@ -136,7 +209,7 @@ RSpec.describe "Organized impound records index", :js, type: :system do
     # Cells are hidden until the user opts into multi-update.
     expect(page).not_to have_css("input[type=checkbox][name='ids[#{registered.id}]']", visible: true)
 
-    click_button "update multiple records"
+    click_button "Update multiple records"
 
     # Wait for the makeMultiUpdate panel to be expanded — the kind <select> is
     # inside it, so its visibility is the signal the Stimulus controller has run.
@@ -165,15 +238,15 @@ RSpec.describe "Organized impound records index", :js, type: :system do
     expect(unregistered.impound_record_updates).to be_empty
 
     # redirect_back keeps multi_update=true, so the index reloads with the
-    # panel server-rendered open — the toggle now reads "hide update".
+    # panel server-rendered open — the toggle now reads "Hide update".
     expect(page).to have_current_path(/multi_update=true/)
     expect(page).to have_select("impound_record_update_kind", visible: true, wait: 5)
 
     # "hide update" collapses the panel; clicking the toggle again reopens it
-    click_button "hide update"
+    click_button "Hide update"
     expect(page).to have_select("impound_record_update_kind", visible: :hidden, wait: 5)
     expect(page).not_to have_current_path(/multi_update=true/)
-    click_button "update multiple records"
+    click_button "Update multiple records"
     expect(page).to have_select("impound_record_update_kind", visible: true, wait: 5)
     # registered is resolved now, so the three remaining active rows stay
     expect(page).to have_css("table tbody tr", count: 3)

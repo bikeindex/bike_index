@@ -1,8 +1,13 @@
 import { Controller } from '@hotwired/stimulus'
-import { computePosition, flip, shift, offset, arrow, autoUpdate } from '@floating-ui/dom'
+import { computePosition, flip, shift, offset, arrow, hide, autoUpdate } from '@floating-ui/dom'
 import { claimFloatingZIndex, releaseFloatingZIndex } from 'utils/floating_z_index'
 
 // Connects to data-controller="ui--tooltip"
+//
+// Shown as a manual popover, in the top layer: an ancestor's opacity - a disabled
+// control's - its overflow clipping and its stacking context don't reach it there.
+// The top layer stacks in the order shown, so raising one shows it again. A
+// browser without popovers (Safari before 17) raises it by z-index instead.
 //
 // State model: two independent flags, OR'd together.
 //   hoverActive       toggled by mouseenter/mouseleave
@@ -18,6 +23,9 @@ const ARROW_SIDES = {
   bottom: { edge: 'top', borderWidth: '1px 0 0 1px' },
   left: { edge: 'right', borderWidth: '1px 1px 0 0' }
 }
+
+const POPOVER = 'popover' in window.HTMLElement.prototype
+const STRATEGY = POPOVER ? 'fixed' : 'absolute'
 
 export default class extends Controller {
   static targets = ['trigger', 'tooltip', 'arrow']
@@ -35,6 +43,13 @@ export default class extends Controller {
     this.keydownEscape = this.keydownEscape.bind(this)
   }
 
+  // A popover's UA overflow clips the arrow hanging off its edge
+  tooltipTargetConnected (tooltip) {
+    if (!POPOVER) return
+    tooltip.popover = 'manual'
+    tooltip.style.overflow = 'visible'
+  }
+
   disconnect () {
     this.close()
   }
@@ -42,7 +57,7 @@ export default class extends Controller {
   // The one under the pointer goes on top, though another was opened since
   showOnHover () {
     this.hoverActive = true
-    if (this.isOpen) claimFloatingZIndex(this.tooltipTarget)
+    if (this.isOpen) this.#raise()
     this.sync()
   }
 
@@ -96,8 +111,8 @@ export default class extends Controller {
   open () {
     if (this.isOpen) return
     this.isOpen = true
-    claimFloatingZIndex(this.tooltipTarget)
     this.tooltipTarget.classList.remove('tw:hidden')
+    this.#raise()
     document.addEventListener('keydown', this.keydownEscape)
     this.cleanup = autoUpdate(this.triggerTarget, this.tooltipTarget, () => this.updatePosition())
   }
@@ -105,7 +120,8 @@ export default class extends Controller {
   close () {
     if (!this.isOpen) return
     this.isOpen = false
-    releaseFloatingZIndex(this.tooltipTarget)
+    if (!POPOVER) releaseFloatingZIndex(this.tooltipTarget)
+    else if (this.tooltipTarget.matches(':popover-open')) this.tooltipTarget.hidePopover()
     this.tooltipTarget.classList.add('tw:hidden')
     document.removeEventListener('pointerdown', this.pointerdownOutside)
     document.removeEventListener('keydown', this.keydownEscape)
@@ -115,15 +131,24 @@ export default class extends Controller {
     }
   }
 
+  #raise () {
+    if (!POPOVER) return claimFloatingZIndex(this.tooltipTarget)
+    this.tooltipTarget.hidePopover()
+    this.tooltipTarget.showPopover()
+  }
+
   async updatePosition () {
     const { x, y, placement, middlewareData } = await computePosition(this.triggerTarget, this.tooltipTarget, {
       placement: this.placementValue,
-      middleware: [offset(8), flip(), shift({ padding: 4 }), arrow({ element: this.arrowTarget, padding: 4 })]
+      strategy: STRATEGY,
+      middleware: [offset(8), flip(), shift({ padding: 4 }), arrow({ element: this.arrowTarget, padding: 4 }), hide()]
     })
+    // in the top layer, no container clips it once its trigger scrolls out of view
     Object.assign(this.tooltipTarget.style, {
       left: `${x}px`,
       top: `${y}px`,
-      position: 'absolute'
+      position: STRATEGY,
+      visibility: middlewareData.hide.referenceHidden ? 'hidden' : ''
     })
 
     const { edge, borderWidth } = ARROW_SIDES[placement.split('-')[0]]

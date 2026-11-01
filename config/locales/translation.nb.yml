@@ -5421,11 +5421,16 @@ nb:
         in_the_past_year: i løpet av det siste året
         now: nå
         to: til
-      column_settings:
+      table_column_settings:
         all: Alle
         default: misligholde
+        included_columns: Inkluderte kolonner
         none: ingen
         visible_columns: Synlige kolonner
+        return_to_default_column_order: Gå tilbake til standard kolonnerekkefølge
+      drag_handle:
+        move: Flytt %{name}
+        moved: Posisjon %{position} til %{count}
     atoms:
       serial:
         hidden: skjult
@@ -5534,6 +5539,7 @@ nb:
             view_list: Liste
             view_table: Bord
             loading_results: Laster inn resultater...
+            per_page_option: "%{number} per side"
           chart_card:
             caption_search: Nåværende søk
             caption_year: Oversikt over fjoråret
@@ -5557,7 +5563,6 @@ nb:
             created_at_cell: Registrert
             creation_description_cell: Kilde
             cycle_type_cell: Bil type
-            default: misligholde
             filter_impounded_html: bare <strong>beslaglagt</strong>
             filter_no_address_html: bare <strong>ingen</strong> adresse
             filter_no_sticker_html: bare <strong>uten</strong> klistremerke
@@ -5571,7 +5576,6 @@ nb:
             impound_id_cell: Beslags-ID
             manufacturer_cell: Produsent
             model_cell: Modell
-            none: ingen
             owner_email_cell: Sendt til
             owner_name_cell: Eiers navn
             propulsion_type_cell: Elbil (fremdrift)
@@ -5587,7 +5591,6 @@ nb:
             unregistered: 'Uregistrert:'
             updated_at_cell: Oppdatert
             url_cell: URL-adresse
-            visible_columns: Synlige kolonner
             notes_cell_html: Registreringsnotater <em>av %{org_name}</em>
             reg_organization_affiliation_cell_html: Tilknytning <em>i %{org_name}</em>
             reg_student_id_cell_html: Studentbevis <em>for %{org_name}</em>
@@ -5595,9 +5598,6 @@ nb:
             photo_cell: Foto
             view_cell: Utsikt
             acknowledgment_cell_panel: Tid - Registreringssekvens bekreftet
-            created_at_cell_panel: Tid - registrert
-            occurred_at_cell_panel: Tid - status
-            updated_at_cell_panel: Tid - oppdatert
             filter_stolen_or_impounded_html: bare <strong>stjålet</strong> eller <strong>beslaglagt</strong>
             location_search_disabled_no_address: "%{org_name} samler ikke inn registreringsadresser,
               så bare stjålne og beslaglagte registreringer har en plassering. Filtrer
@@ -5606,13 +5606,40 @@ nb:
               søker etter alle registreringer, med mindre du bare søker etter beslaglagte
               og/eller stjålne registreringer.
             show_location_search: vis stedssøk
-            included_columns: Inkluderte kolonner
+            all_bikes: Alle sykler
+            all_statuses: Alle statuser
+            impound_location_cell: plassering
+            impound_status_cell: Status for beslag
+            impound_updated_at_cell: Beslaglegging oppdatert
+            impound_updated_at_cell_panel: Tid - Beslagsregister oppdatert
+            impound_user_cell: Siste oppdatering
+            impounded_at_cell: Beslaglagt
+            impounded_at_cell_panel: Tid - Beslaglagt
+            impounded_from_cell: Beslaglagt fra
+            only_unregistered: Kun uregistrerte
+            only_user_registered: Kun bruker registrert
+            registered_cell_panel: Tid - Registrert
+            registration: 'Registrering:'
+            registration_updated_cell_panel: Tid - Registrering oppdatert
+            resolved_at_cell: Løst
+            resolved_at_cell_panel: Tid - Løst
+            status_at_cell_hint: når det blir stjålet, beslaglagt osv.
+            status_at_cell_panel: Tid - Status
+            status_records: "%{status} poster"
+            unregistered_cell: Uregistrert
+            copy_column_order_from_impounded_vehicles_search: Kopier kolonnerekkefølge
+              fra søk etter beslaglagte kjøretøy
+            copy_column_order_from_registrations_search: Kopier kolonnerekkefølge
+              fra registreringssøk
+            impound_search_columns: Beslaglegg søkekolonner
           column_settings_toggle:
             column_settings: Kolonneinnstillinger
           settings_and_filters:
             date_range: 'Datoperiode:'
             search_settings_and_filters: Søkeinnstillinger og filtre
             filters: Filtre
+            impound_search: søket etter beslaglagte kjøretøy
+            view_in_impound_search_html: Vis i %{impound_search}
           search_all:
             search_all_html: Søk i alle registreringer <span class="twless-strong">(ikke
               bare %{org_name})</span>
@@ -5624,9 +5651,8 @@ nb:
             hidden: skjult
             not_registered_with: Skjult fordi den ikke er registrert hos %{org_name}
             acknowledgment_title: Bekreftelse på registreringssekvens kl.
-            occurred_at_tooltip: Når den ble stjålet, beslaglagt, funnet eller lagt
-              ut for salg
             view: Utsikt
+            toggle_all_checked: Slå av/på alle avkryssede
           multi_result_chip:
             no_results: ingen treff
           multi_results:
@@ -5639,16 +5665,8 @@ nb:
             view_all: se alle
         impound_records:
           index:
-            all_bikes: Alle sykler
-            all_statuses: Alle statuser
             cannot_update_with_kind: Denne oppføringen kan ikke oppdateres med «{kind}»
             hide_update: Skjul oppdatering
-            matching_impound_record:
-              one: samsvarende beslagsregister
-              other: samsvarende beslaglagte poster
-            only_unregistered: Kun uregistrerte
-            only_user_registered: Kun bruker registrert
-            status_records: "%{status} poster"
             update_multiple_records: Oppdater flere poster
         parking_notifications:
           index:
@@ -5700,6 +5718,9 @@ nb:
           map_unavailable: Kartet kunne ikke lastes inn – posisjonen var fortsatt
             angitt fra enheten din.
           set_on_map: Sett på kartet
+        registration_sequence:
+          page_edit_bullet:
+            bullet: kule
       registrations:
         show:
           bike_details:
@@ -6668,6 +6689,13 @@ nb:
           any_handlebar_type: Alle typer styrer
           frame_material: Rammemateriale
           handlebar_type: Styre type
+          market_scope: Modeller fra andre markeder
+          only_market_html: Kun %{market}
+          prefer_market_sold_in_html: Foretrekker kjøretøy solgt i %{market}
+          select_a_vehicle_type: Velg en %{bike_type}, velg flere for å sammenligne
+            dem
+          select_an_vehicle_type: Velg en %{bike_type}, velg flere for å sammenligne
+            dem
         donate_strip:
           donate: Donere
           pitch: Dette kule produktet er levert av den ideelle organisasjonen Bike
@@ -7628,7 +7656,6 @@ nb:
           across_town_intro: Hvert salg skjer mellom personer. Bike Index håndterer
             ikke betaling eller frakt, så kjøper og selger blir enige om pris, betaling
             og levering seg imellom.
-          back_to_marketplace: Tilbake til markedsplassen
           bike_index_members: Bike Index-medlemmer
           bike_index_members_body: Selgere som støtter Bike Index med et medlemskap
             viser et Bike Index-medlemsmerke på annonsene sine.

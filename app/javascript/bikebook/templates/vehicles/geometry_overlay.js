@@ -1,6 +1,9 @@
 import { html, nothing, svg } from 'lit-html'
 import { builtWheel, frameGeometry, outerRadius } from 'bikebook/frame_geometry'
 import { buttonClasses } from 'bikebook/templates/ui/button'
+import { collapse, COLLAPSE_ACTIONS } from 'bikebook/templates/ui/collapse'
+import { x } from 'bikebook/templates/icons'
+import { X_LINK_CLASSES } from 'bikebook/templates/vehicles/remove_link'
 import { extent, renderShape, sideView } from 'bikebook/templates/vehicles/cycle_drawing'
 import { tireWidth, wheelSize } from 'bikebook/templates/vehicles/model_viewer'
 import { sectionHeading } from 'bikebook/templates/vehicles/section'
@@ -95,8 +98,9 @@ export const seriesBorders = (frames, index) => overlaid(frames) && drawable(fra
 // The compared models' frames in their `sizes`, their rear wheels standing on the same spot, each over the ones the
 // comparison table columns left of it. A frame it can't draw is its wheels alone where they're listed. Lone wheels aren't drawn, only said what they're missing,
 // as a stem and bar it lists no stem length for aren't. The
-// `selected` vehicle's over the rest, the others faded, the first drawn's unless it's another or 'none'
-export const geometryOverlay = ({ presenter, vehicles, sizes, frames, selected, beside = false }) => {
+// `selected` vehicle's over the rest, the others faded, the first drawn's unless it's another or 'none'. The content of a
+// ui--collapse, rendered closed unless `open`, which its × closes and overlayOpener opens again
+export const geometryOverlay = ({ presenter, vehicles, sizes, frames, selected, open = true, beside = false }) => {
   const named = vehicles.map(({ data }) => presenter.named(presenter.kit.schemas.vehicle, data))
   const labelled = named.map((vehicle, index) => {
     const title = [vehicle.manufacturer, vehicle.model].filter(present).join(' ')
@@ -123,13 +127,23 @@ export const geometryOverlay = ({ presenter, vehicles, sizes, frames, selected, 
   const missingNote = missing.length ? noteList('missing geometry information', missing) : nothing
 
   // out to the screen's edges on a phone, as the cards below it are
-  return html`<section aria-label="Geometry overlay" data-controller=${overlay ? 'bikebook--geometry-overlay' : nothing} class="tw:mx-auto tw:mt-6
+  return html`<section id="geometry-overlay" aria-label="Geometry overlay" data-controller=${overlay ? 'bikebook--geometry-overlay' : nothing}
+    data-ui--collapse-target="content" class="${open ? '' : 'tw:hidden'} tw:relative tw:mx-auto tw:mt-6
     tw:w-full tw:max-w-4xl tw:space-y-3 tw:rounded-sm tw:border tw:border-gray-200 tw:bg-white tw:p-4 tw:dark:border-gray-700 tw:dark:bg-gray-800
     tw:max-[500px]:twpagebleed tw:max-[500px]:rounded-none tw:max-[500px]:border-x-0 ${beside
       ? 'tw:min-[1500px]:order-first tw:min-[1500px]:mx-0 tw:min-[1500px]:basis-2/5 tw:min-[1500px]:shrink-0'
-      : ''}">${sectionHeading('Geometry overlay')}${
+      : ''}">${sectionHeading('Geometry overlay')}<span role="button" tabindex="0" aria-label="Close geometry overlay"
+    data-ui--collapse-target="trigger" data-action=${COLLAPSE_ACTIONS} class="tw:absolute tw:top-2 tw:right-2 tw:cursor-pointer ${X_LINK_CLASSES}">${x('tw:h-3 tw:w-3')}</span>${
     overlay ? drawing(presenter, drawn, labelled, selected) : nothing}${missingNote}</section>`
 }
+
+// What opens the overlay again once it's closed, in a table's corner
+export const overlayOpener = (open) => collapse({
+  content: 'Geo',
+  size: 'sm',
+  htmlClass: 'tw:aria-expanded:hidden',
+  attributes: { 'aria-label': 'Show geometry overlay', 'aria-controls': 'geometry-overlay', 'aria-expanded': String(open) }
+})
 
 // The points a frame reaches, its wheels' standing on the ground
 const reach = ({ side, geometry: { rearAxle, frontAxle, rearRadius, frontRadius } }) => side

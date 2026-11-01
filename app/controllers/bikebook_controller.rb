@@ -18,10 +18,11 @@ class BikebookController < ApplicationController
     picked = params[:vehicle_models].to_s.split(",")
     vehicle_models = [id, *picked].uniq
     query = request.query_parameters.merge("vehicle_models" => vehicle_models.join(","))
-    # vehicle_sizes is in vehicle_models' order, so each size moves with its vehicle
-    if params[:vehicle_sizes].present?
-      sizes = picked.zip(params[:vehicle_sizes].split(",")).to_h
-      query["vehicle_sizes"] = vehicle_models.map { sizes[it] }.join(",").sub(/,+\z/, "")
+    # vehicle_sizes and vehicle_colorways are in vehicle_models' order, so each pick moves with its vehicle
+    %w[vehicle_sizes vehicle_colorways].each do |param|
+      next if params[param].blank?
+      picks = picked.zip(params[param].split(",")).to_h
+      query[param] = vehicle_models.map { picks[it] }.join(",").sub(/,+\z/, "")
     end
     redirect_to ReadableQuery.path(bikebook_path, query)
   end
@@ -47,6 +48,6 @@ class BikebookController < ApplicationController
     @page_image ||= helpers.image_url("logos/bikebook_icon.png")
     render Pages::Bikebook::Show::Component.new(manifest_url: Integrations::Bikebook::Catalog::MANIFEST_URL,
       market: request.env["HTTP_CF_IPCOUNTRY"], state: EbikeRuleServices::StateLaws.state_from_location(request_location_hash),
-      query: request.query_parameters), status:
+      query: request.query_parameters, paint_colors: Color.pluck(:name, :display).to_h), status:
   end
 end

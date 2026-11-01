@@ -1,4 +1,4 @@
-// Where a floating element (a dropdown menu, a tooltip) sits: above
+// Where a floating element (a dropdown menu, a tooltip where popovers aren't) sits: above
 // SharedBlocks::Navbar::OrgSidebar's tw:z-[1050], which a menu opened at the left edge of
 // the content column extends over, and below bootstrap's $zindex-modal (1061).
 const FLOOR = 1051

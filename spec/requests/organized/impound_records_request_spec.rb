@@ -24,10 +24,10 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
       expect(assigns(:impound_records).count).to eq 0
       expect(assigns(:available_statuses)).to eq available_statuses
 
-      # The card holds the chart, so its frame asks with chart_only alone
-      expect(response.body).to include("chart_only=1")
+      expect(response.body).to include("Search settings and filters")
+      expect(response.body).to include("Current records")
 
-      get "#{base_url}?chart_only=1"
+      get base_url, headers: {"Turbo-Frame" => Pages::Org::Search::ChartCard::Component::FRAME_ID.to_s}
       expect(response.status).to eq(200)
       expect(assigns(:impound_records)).to be_nil
       expect(assigns(:pagy)).to be_nil

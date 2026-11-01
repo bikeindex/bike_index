@@ -5,14 +5,6 @@ en:
       org:
         impound_records:
           index:
-            all_bikes: All bikes
-            all_statuses: All statuses
             cannot_update_with_kind: This record can't be updated with '{kind}'
             hide_update: Hide update
-            matching_impound_record:
-              one: matching impound record
-              other: matching impound records
-            only_unregistered: Only unregistered
-            only_user_registered: Only user registered
-            status_records: "%{status} records"
             update_multiple_records: Update multiple records
