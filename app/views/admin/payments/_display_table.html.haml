@@ -7,8 +7,7 @@
         %span.less-strong= payment.payment_method
       - list.with_row(label: "Amount", value: payment.amount_formatted)
       - if payment.stripe_id.present?
-        - list.with_row(label: "Stripe ID") do
-          = link_to payment.stripe_id, payment.stripe_admin_url
+        - list.with_row(label: "Stripe ID", value: link_to(payment.stripe_id, payment.stripe_admin_url))
 
       - list.with_row(label: "For") do
         - if payment.theft_alert.present?

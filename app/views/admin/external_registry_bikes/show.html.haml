@@ -16,8 +16,7 @@
     = render(UI::TableList::Component.new) do |list|
       - list.with_row(label: "Registry", value: @bike.registry_name)
       - list.with_row(label: "Registry ID", value: @bike.external_id)
-      - list.with_row(label: "Status") do
-        = render(Atoms::RegistrationStatusBadge::Component.new(bike: @bike, size: :sm))
+      - list.with_row(label: "Status", value: render(Atoms::RegistrationStatusBadge::Component.new(bike: @bike, size: :sm)))
       - list.with_row(label: "Date Stolen", value: render(UI::Time::Component.new(time: @bike.date_stolen)))
       - list.with_row(label: "Location", value: @bike.location_found)
       - list.with_row(label: "Registry Link", value: link_to(@bike.url, @bike.url, target: :_blank))

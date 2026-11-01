@@ -46,8 +46,7 @@
       - list.with_row(label: "Created At", value: render(UI::Time::Component.new(time: @bike.created_at)))
       - list.with_row(label: "Owner Email", value: @bike.owner_email)
       - list.with_row(label: "Current Owner", value: @bike.owner.email)
-      - list.with_row(label: "Send Email") do
-        = check_mark if @ownership.send_email
+      - list.with_row(label: "Send Email", value: (check_mark if @ownership.send_email))
       - list.with_row(label: "Cached Data", value: @bike.cached_data)
       - list.with_row(label: "Token") do
         - if @ownership.token.present?
@@ -55,8 +54,7 @@
             = link_to @ownership.token, bike_path(@bike.to_param, t: @ownership.token)
       - list.with_row(label: "Claim message", value: @ownership.claim_message&.humanize)
       - list.with_row(label: "Pre-registration?", value: (check_mark if @ownership.organization_pre_registration))
-      - list.with_row(label: "Origin") do
-        = render(Atoms::Org::OriginDisplay::Component.new(creation_kind: @ownership.origin))
+      - list.with_row(label: "Origin", value: render(Atoms::Org::OriginDisplay::Component.new(creation_kind: @ownership.origin)))
 
 - if display_dev_info?
   .row.mt-5

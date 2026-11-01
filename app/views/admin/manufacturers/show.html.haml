@@ -30,17 +30,11 @@
     = render(UI::TableList::Component.new) do |list|
       - if display_dev_info?
         - list.with_row(label: "Autocomplete priority", class: "only-dev-visible", value: @manufacturer.priority)
-      - list.with_row(label: "Official Org") do
-        - if @manufacturer.official_organization.present?
-          = link_to @manufacturer.official_organization.name, admin_organization_path(@manufacturer.official_organization.to_param)
+      - list.with_row(label: "Official Org", value: (link_to(@manufacturer.official_organization.name, admin_organization_path(@manufacturer.official_organization.to_param)) if @manufacturer.official_organization.present?))
       - list.with_row(label: "Open Year", value: @manufacturer.open_year)
       - list.with_row(label: "Close Year", value: @manufacturer.close_year)
-      - list.with_row(label: "Website") do
-        - if @manufacturer.website.present?
-          = link_to @manufacturer.website, @manufacturer.website
-      - list.with_row(label: "Twitter") do
-        - if @manufacturer.twitter_name.present?
-          = link_to "#{@manufacturer.twitter_name}", "https://twitter.com/#{@manufacturer.twitter_name}"
+      - list.with_row(label: "Website", value: (link_to(@manufacturer.website, @manufacturer.website) if @manufacturer.website.present?))
+      - list.with_row(label: "Twitter", value: (link_to("#{@manufacturer.twitter_name}", "https://twitter.com/#{@manufacturer.twitter_name}") if @manufacturer.twitter_name.present?))
       - list.with_row(label: "Description", value: @manufacturer.description)
       - list.with_row(label: "Logo", value: link_to(image_tag(@manufacturer.logo.url(:thumb)), @manufacturer.logo_url))
   .col-6

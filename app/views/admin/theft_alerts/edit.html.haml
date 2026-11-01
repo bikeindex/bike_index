@@ -115,10 +115,8 @@
         - if @theft_alert.admin
           %small.text-info admin:
         = link_to @theft_alert.user.display_name, edit_admin_user_path(@theft_alert.user.to_param)
-      - list.with_row(label: safe_join(["Campaign", tag.small("Objective")], " ")) do
-        %code= @theft_alert.objective_campaign
-      - list.with_row(label: safe_join(["Adset", tag.small("Objective")], " ")) do
-        %code= @theft_alert.objective_adset
+      - list.with_row(label: safe_join(["Campaign", tag.small("Objective")], " "), value: tag.code(@theft_alert.objective_campaign))
+      - list.with_row(label: safe_join(["Adset", tag.small("Objective")], " "), value: tag.code(@theft_alert.objective_adset))
 
   .col-sm-6
     = render(UI::TableList::Component.new) do |list|

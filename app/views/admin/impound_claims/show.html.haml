@@ -27,14 +27,10 @@
           = link_to organization_name, admin_organization_path(@impound_claim.organization_id)
         - else
           %small.less-strong NO organization
-      - list.with_row(label: "Bike claimed") do
-        - if @bike_claimed.present?
-          = link_to organized_bike_text(@bike_claimed), edit_admin_bike_path(@bike_claimed)
+      - list.with_row(label: "Bike claimed", value: (link_to(organized_bike_text(@bike_claimed), edit_admin_bike_path(@bike_claimed)) if @bike_claimed.present?))
   .col-sm-6
     = render(UI::TableList::Component.new) do |list|
-      - list.with_row(label: "Bike Submitted") do
-        - if @bike_submitting.present?
-          = link_to organized_bike_text(@bike_submitting), edit_admin_bike_path(@bike_submitting)
+      - list.with_row(label: "Bike Submitted", value: (link_to(organized_bike_text(@bike_submitting), edit_admin_bike_path(@bike_submitting)) if @bike_submitting.present?))
       - list.with_row(label: "Impound record") do
         - if @impound_record.present?
           = link_to impound_record_id, admin_impound_record_path("pkey-#{@impound_record.id}")

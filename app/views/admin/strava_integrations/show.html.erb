@@ -17,9 +17,7 @@
         <% end %>
       <% end %>
 
-      <% list.with_row(label: "User") do %>
-        <%= render Atoms::Admin::TableCells::User::Component.new(user: @strava_integration.user, user_id: @strava_integration.user_id) %>
-      <% end %>
+      <% list.with_row(label: "User", value: render(Atoms::Admin::TableCells::User::Component.new(user: @strava_integration.user, user_id: @strava_integration.user_id))) %>
 
       <% list.with_row(label: "Strava ID", value: number_display(@strava_integration.strava_id)) %>
 

@@ -20,15 +20,13 @@
   - list.with_row(label: "Sent to owner") do
     = @stolen_notification.send_dates_parsed.count
     times
-  - if @stolen_notification.send_dates_parsed.any?
-    - list.with_row(label: "Times:") do
+  - list.with_row(label: "Times:") do
+    - if @stolen_notification.send_dates_parsed.any?
       %ul.pl-0
         - @stolen_notification.send_dates_parsed.each do |stamp|
           %li.list-unstyled
-            %a.localizeTime.preciseTime{ href: admin_stolen_notification_url(stamp) }
-              = l Time.at(stamp).to_datetime, format: :convert_time
-  - else
-    - list.with_row(label: "Times:") do
+            = link_to render(UI::Time::Component.new(time: Time.at(stamp), format: :localize_time_precise)), admin_stolen_notification_url(stamp)
+    - else
       %strong
         Has not been sent!
   - if @stolen_notification.sender.name.present?

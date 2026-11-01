@@ -6,20 +6,14 @@
   <div class="tw:w-full tw:md:w-1/2 tw:md:pr-4">
     <%= render(UI::TableList::Component.new) do |list| %>
       <% if @display_dev_info %>
-        <% list.with_row(label: "ID", class: "tw:text-sm") do %>
-          <code><%= @stolen_record.id %></code>
-        <% end %>
+        <% list.with_row(label: "ID", value: tag.code(@stolen_record.id), class: "tw:text-sm") %>
       <% end %>
 
       <% list.with_row(label: "Theft description", value: @stolen_record.theft_description) %>
 
-      <% list.with_row(label: "Stolen record created") do %>
-        <%= render(UI::Time::Component.new(time: @stolen_record.created_at)) %>
-      <% end %>
+      <% list.with_row(label: "Stolen record created", value: render(UI::Time::Component.new(time: @stolen_record.created_at))) %>
 
-      <% list.with_row(label: "Stolen at") do %>
-        <%= render(UI::Time::Component.new(time: @stolen_record.date_stolen)) %>
-      <% end %>
+      <% list.with_row(label: "Stolen at", value: render(UI::Time::Component.new(time: @stolen_record.date_stolen))) %>
 
       <% list.with_row(label: "Callable by", value: callable_by) %>
 

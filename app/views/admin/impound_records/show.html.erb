@@ -23,13 +23,9 @@
 <div class="row">
   <div class="col-sm-6">
     <%= render(UI::TableList::Component.new) do |list| %>
-      <% list.with_row(label: "Created") do %>
-        <%= render(UI::Time::Component.new(time: @impound_record.created_at, format: :localize_time_precise)) %>
-      <% end %>
+      <% list.with_row(label: "Created", value: render(UI::Time::Component.new(time: @impound_record.created_at, format: :localize_time_precise))) %>
 
-      <% list.with_row(label: "Updated") do %>
-        <%= render(UI::Time::Component.new(time: @impound_record.updated_at, format: :localize_time_precise)) %>
-      <% end %>
+      <% list.with_row(label: "Updated", value: render(UI::Time::Component.new(time: @impound_record.updated_at, format: :localize_time_precise))) %>
 
       <% list.with_row(label: "Status") do %>
         <em><%= status_display(@impound_record.status_humanized) %></em>
@@ -43,13 +39,9 @@
         <% end %>
       <% end %>
 
-      <% list.with_row(label: "Bike") do %>
-        <%= render Atoms::Admin::TableCells::Bike::Component.new(bike: @impound_record.bike) %>
-      <% end %>
+      <% list.with_row(label: "Bike", value: render(Atoms::Admin::TableCells::Bike::Component.new(bike: @impound_record.bike))) %>
 
-      <% list.with_row(label: "User") do %>
-        <%= render Atoms::Admin::TableCells::User::Component.new(user: @impound_record.user) %>
-      <% end %>
+      <% list.with_row(label: "User", value: render(Atoms::Admin::TableCells::User::Component.new(user: @impound_record.user))) %>
     <% end %>
   </div>
 

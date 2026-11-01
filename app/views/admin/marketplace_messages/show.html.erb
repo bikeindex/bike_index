@@ -65,9 +65,7 @@
         </span>
       <% end %>
 
-      <% list.with_row(label: "Listing status") do %>
-        <%= render Atoms::Admin::Badges::MarketplaceListing::Component.new(status: @marketplace_listing.status, status_humanized: @marketplace_listing.status_humanized, kind: :marketplace_listing) %>
-      <% end %>
+      <% list.with_row(label: "Listing status", value: render(Atoms::Admin::Badges::MarketplaceListing::Component.new(status: @marketplace_listing.status, status_humanized: @marketplace_listing.status_humanized, kind: :marketplace_listing))) %>
 
       <% list.with_row(label: "Listing published") do %>
         <%= render(UI::Time::Component.new(time: @marketplace_listing.published_at)) %>
@@ -85,9 +83,7 @@
 
       <% list.with_row(label: "Condition", value: @marketplace_listing.condition) %>
 
-      <% list.with_row(label: "Item") do %>
-        <%= render Atoms::Admin::TableCells::Bike::Component.new(bike: @marketplace_listing.item, bike_id: @marketplace_listing.item_id, bike_link_path: bike_path(@marketplace_listing.item_id, view_as: "marketplace_preview")) %>
-      <% end %>
+      <% list.with_row(label: "Item", value: render(Atoms::Admin::TableCells::Bike::Component.new(bike: @marketplace_listing.item, bike_id: @marketplace_listing.item_id, bike_link_path: bike_path(@marketplace_listing.item_id, view_as: "marketplace_preview")))) %>
     <% end %>
   </div>
 </div>

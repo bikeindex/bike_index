@@ -6,9 +6,7 @@
 <div class="tw:flex tw:flex-wrap">
   <div class="tw:w-full tw:lg:w-1/2 tw:lg:pr-4">
     <%= render(UI::TableList::Component.new) do |list| %>
-      <% list.with_row(label: "Recovered at") do %>
-        <%= render(UI::Time::Component.new(time: @stolen_record.recovered_at)) %>
-      <% end %>
+      <% list.with_row(label: "Recovered at", value: render(UI::Time::Component.new(time: @stolen_record.recovered_at))) %>
 
       <% list.with_row(label: "Recovered by", value: recovering_user_cell) %>
 

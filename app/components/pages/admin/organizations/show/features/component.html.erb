@@ -123,11 +123,7 @@
         <% end %>
       <% end %>
     <% end %>
-    <% list.with_row(label: "Enabled features") do %>
-      <span class="small">
-        <%= safe_join(@organization.enabled_feature_slugs.map { |slug| content_tag(:code, slug) }, ", ") %>
-      </span>
-    <% end %>
+    <% list.with_row(label: "Enabled features", value: tag.span(safe_join(@organization.enabled_feature_slugs.map { |slug| tag.code(slug) }, ", "), class: "small")) %>
   <% end %>
 
   <% if @organization.parent_organization.present? %>
@@ -166,9 +162,7 @@
         <% end %>
       </ul>
     <% end %>
-    <% list.with_row(label: "Regional address") do %>
-      <%= render UI::AddressDisplay::Component.new(address_record: @organization.default_address_record, visible_attribute: :street, kind: :single_line) %>
-    <% end %>
+    <% list.with_row(label: "Regional address", value: render(UI::AddressDisplay::Component.new(address_record: @organization.default_address_record, visible_attribute: :street, kind: :single_line))) %>
     <% list.with_row(label: "Search radius") do %>
       <%= @organization.search_radius_display %>
 

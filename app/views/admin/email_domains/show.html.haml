@@ -7,13 +7,10 @@
 .row.mt-4
   .col-md-6
     = render(UI::TableList::Component.new) do |list|
-      - list.with_row(label: "Creator") do
-        = render Atoms::Admin::TableCells::User::Component.new(user: @email_domain.creator, user_id: @email_domain.creator_id)
+      - list.with_row(label: "Creator", value: render(Atoms::Admin::TableCells::User::Component.new(user: @email_domain.creator, user_id: @email_domain.creator_id)))
       - list.with_row(label: "Created", class: "small", value: render(UI::Time::Component.new(time: @email_domain.created_at, format: :localize_time_precise)))
       - list.with_row(label: "Updated", class: "small", value: render(UI::Time::Component.new(time: @email_domain.updated_at, format: :localize_time_precise)))
-      - list.with_row(label: "Changed status at", class: "small") do
-        - if @email_domain.status_changed_after_create?
-          = render(UI::Time::Component.new(time: @email_domain.status_changed_at, format: :localize_time_precise))
+      - list.with_row(label: "Changed status at", class: "small", value: (render(UI::Time::Component.new(time: @email_domain.status_changed_at, format: :localize_time_precise)) if @email_domain.status_changed_after_create?))
       - list.with_row(label: "TLD") do
         - if @matching_tld.present?
           = link_to @matching_tld.domain, admin_email_domain_path(@matching_tld.id)
@@ -21,8 +18,7 @@
           %small.less-strong this is record is a TLD
         - else
           = @email_domain.tld
-      - list.with_row(label: "Extra") do
-        = render partial: "data_details", locals: {email_domain: @email_domain}
+      - list.with_row(label: "Extra", value: render(partial: "data_details", locals: {email_domain: @email_domain}))
       - list.with_row(label: "Status") do
         - status_class = "text-danger" if @email_domain.status.match?("ban")
         - status_class = "text-warning font-weight-bold" if @email_domain.ignored?

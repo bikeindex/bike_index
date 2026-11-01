@@ -5,8 +5,7 @@
   .col-md-6
     = render(UI::TableList::Component.new) do |list|
       - list.with_row(label: "Created", value: render(UI::Time::Component.new(time: @superuser_ability.created_at)))
-      - list.with_row(label: "Updated") do
-        %span.small= render(UI::Time::Component.new(time: @superuser_ability.updated_at))
+      - list.with_row(label: "Updated", value: tag.span(render(UI::Time::Component.new(time: @superuser_ability.updated_at)), class: "small"))
       - list.with_row(label: "Deleted") do
         - if @superuser_ability.deleted_at.present?
           %strong.text-danger

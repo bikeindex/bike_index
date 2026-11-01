@@ -28,9 +28,7 @@
         <% end %>
       <% end %>
 
-      <% list.with_row(label: "Serial number") do %>
-        <%= render(Atoms::Serial::Component.new(bike: @bike, user: @user, explanation: :tooltip)) %>
-      <% end %>
+      <% list.with_row(label: "Serial number", value: render(Atoms::Serial::Component.new(bike: @bike, user: @user, explanation: :tooltip))) %>
 
       <% list.with_row(label: "Colors") do %>
         <%= @bike.frame_colors.to_sentence %>
@@ -144,9 +142,7 @@
       <% end %>
 
       <% if render_phone? %>
-        <% list.with_row(label: "Phone") do %>
-          <%= render(Atoms::Phone::Component.new(phone: @bike.phone, skip_link: true)) %>
-        <% end %>
+        <% list.with_row(label: "Phone", value: render(Atoms::Phone::Component.new(phone: @bike.phone, skip_link: true))) %>
       <% end %>
     <% end %>
   </div>

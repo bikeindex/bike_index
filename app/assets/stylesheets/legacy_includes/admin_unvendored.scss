@@ -1109,15 +1109,12 @@ pre code {
   }
 }
 
-.table,
-.table-list {
+.table {
   width: 100%;
   margin-bottom: 1rem;
   color: #212529
 }
 
-.table-list td,
-.table-list th,
 .table td,
 .table th {
   padding: .75rem;
@@ -1125,19 +1122,15 @@ pre code {
   border-top: 1px solid #dee2e6
 }
 
-.table-list thead th,
 .table thead th {
   vertical-align: bottom;
   border-bottom: 2px solid #dee2e6
 }
 
-.table-list tbody+tbody,
 .table tbody+tbody {
   border-top: 2px solid #dee2e6
 }
 
-.table-list td,
-.table-list th,
 .table-sm td,
 .table-sm th {
   padding: .3rem
@@ -1145,17 +1138,12 @@ pre code {
 
 .table-bordered,
 .table-bordered td,
-.table-bordered th,
-.table-list,
-.table-list td,
-.table-list th {
+.table-bordered th {
   border: 1px solid #dee2e6
 }
 
 .table-bordered thead td,
-.table-bordered thead th,
-.table-list thead td,
-.table-list thead th {
+.table-bordered thead th {
   border-bottom-width: 2px
 }
 
@@ -1166,7 +1154,6 @@ pre code {
   border: 0
 }
 
-.table-list tbody tr:nth-of-type(odd),
 .table-striped tbody tr:nth-of-type(odd) {
   background-color: rgba(0, 0, 0, .05)
 }
@@ -1337,14 +1324,12 @@ pre code {
   background-color: rgba(0, 0, 0, .075)
 }
 
-.table-list .thead-dark th,
 .table .thead-dark th {
   color: #fff;
   background-color: #343a40;
   border-color: #454d55
 }
 
-.table-list .thead-light th,
 .table .thead-light th {
   color: #495057;
   background-color: #e9ecef;
@@ -1362,12 +1347,10 @@ pre code {
   border-color: #454d55
 }
 
-.table-dark.table-bordered,
-.table-dark.table-list {
+.table-dark.table-bordered {
   border: 0
 }
 
-.table-dark.table-list tbody tr:nth-of-type(odd),
 .table-dark.table-striped tbody tr:nth-of-type(odd) {
   background-color: hsla(0, 0%, 100%, .05)
 }
@@ -1384,8 +1367,7 @@ pre code {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch
   }
-  .table-responsive-sm>.table-bordered,
-  .table-responsive-sm>.table-list {
+  .table-responsive-sm>.table-bordered {
     border: 0
   }
 }
@@ -1397,8 +1379,7 @@ pre code {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch
   }
-  .table-responsive-md>.table-bordered,
-  .table-responsive-md>.table-list {
+  .table-responsive-md>.table-bordered {
     border: 0
   }
 }
@@ -1410,8 +1391,7 @@ pre code {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch
   }
-  .table-responsive-lg>.table-bordered,
-  .table-responsive-lg>.table-list {
+  .table-responsive-lg>.table-bordered {
     border: 0
   }
 }
@@ -1423,8 +1403,7 @@ pre code {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch
   }
-  .table-responsive-xl>.table-bordered,
-  .table-responsive-xl>.table-list {
+  .table-responsive-xl>.table-bordered {
     border: 0
   }
 }
@@ -1436,8 +1415,7 @@ pre code {
   -webkit-overflow-scrolling: touch
 }
 
-.table-responsive>.table-bordered,
-.table-responsive>.table-list {
+.table-responsive>.table-bordered {
   border: 0
 }
 
@@ -9441,20 +9419,15 @@ a.text-dark:hover {
   .badge {
     border: 1px solid #000
   }
-  .table,
-  .table-list {
+  .table {
     border-collapse: collapse !important
   }
-  .table-list td,
-  .table-list th,
   .table td,
   .table th {
     background-color: #fff !important
   }
   .table-bordered td,
-  .table-bordered th,
-  .table-list td,
-  .table-list th {
+  .table-bordered th {
     border: 1px solid #dee2e6 !important
   }
   .table-dark {
@@ -9466,7 +9439,6 @@ a.text-dark:hover {
   .table-dark thead th {
     border-color: #dee2e6
   }
-  .table-list .thead-dark th,
   .table .thead-dark th {
     color: inherit;
     border-color: #dee2e6
@@ -9627,59 +9599,6 @@ label {
 
 .uppercase {
   text-transform: uppercase !important
-}
-
-.table-list {
-  word-break: break-word
-}
-
-.table-list tr td {
-  line-height: 1.5
-}
-
-.table-list tr td:first-child {
-  font-size: 75%;
-  font-style: italic;
-  text-align: right;
-  padding: 9px 4px 4px;
-  line-height: 1.25
-}
-
-.table-list tr td:first-child.full-width-data {
-  font-size: 100%;
-  font-style: normal;
-  text-align: left
-}
-
-.table-list tr td:last-child {
-  width: 85%
-}
-
-.table-list tr.active-row {
-  background-color: #ebf5fb !important
-}
-
-.table-list tr.active-row a {
-  text-decoration: underline
-}
-
-.table-list pre {
-  margin: 0
-}
-
-.table-list.wide-definition tr td:last-child {
-  width: 70%
-}
-
-.table-list.no-italic-definition tr td:first-child {
-  font-style: normal
-}
-
-.table-list .inline-images img {
-  display: inline-block;
-  width: 31%;
-  max-width: 150px;
-  margin-right: 3%
 }
 
 table thead.sortable th {
@@ -10104,19 +10023,16 @@ table .photo-cell img {
   display: block
 }
 
-.credibility-score .score-details .table,
-.credibility-score .score-details .table-list {
+.credibility-score .score-details .table {
   margin-bottom: 0
 }
 
-.credibility-score .score-details .table-list tr td,
 .credibility-score .score-details .table tr td {
   line-height: 1.5;
   border: 1px solid #eceeef;
   padding: 4px
 }
 
-.credibility-score .score-details .table-list tr td:last-child,
 .credibility-score .score-details .table tr td:last-child {
   width: 15%
 }
@@ -10169,12 +10085,6 @@ table .photo-cell img {
 .pagination-flex .per-page-select {
   width: 8rem;
   display: inline-block
-}
-
-/* The rest of .only-dev-visible is in bike_index_components.css. This one stays: the file is
-   unlayered, so .table-list's striping would otherwise beat it */
-.table-list tr.only-dev-visible {
-  background: color-mix(in oklab, var(--tw-color-dev) 10%, transparent) !important
 }
 
 .link-emoji {

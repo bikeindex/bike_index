@@ -11,9 +11,7 @@
         <% list.with_row(label: "ID", dev_only: true, value: tag.code(@sale.id)) %>
       <% end %>
 
-      <% list.with_row(label: "Seller") do %>
-        <%= render Atoms::Admin::TableCells::User::Component.new(user: @sale.seller, user_id: @sale.seller_id) %>
-      <% end %>
+      <% list.with_row(label: "Seller", value: render(Atoms::Admin::TableCells::User::Component.new(user: @sale.seller, user_id: @sale.seller_id))) %>
 
       <% list.with_row(label: "Buyer") do %>
         <% if @sale.buyer.present? %>
@@ -64,9 +62,7 @@
       <% end %>
 
       <% if @sale.marketplace_message.present? %>
-        <% list.with_row(label: "Marketplace Message") do %>
-          <%= link_to @sale.marketplace_message_id, admin_marketplace_message_path(@sale.marketplace_message_id) %>
-        <% end %>
+        <% list.with_row(label: "Marketplace Message", value: link_to(@sale.marketplace_message_id, admin_marketplace_message_path(@sale.marketplace_message_id))) %>
       <% end %>
 
       <% list.with_row(label: "New Ownership") do %>

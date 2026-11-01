@@ -8,12 +8,8 @@
   <div class="col-md-6">
     <%= render(UI::TableList::Component.new) do |list| %>
       <% if display_dev_info? %>
-        <% list.with_row(label: "ID", dev_only: true) do %>
-          <code><%= @bug_report.id %></code>
-        <% end %>
-        <% list.with_row(label: "Inbound email", dev_only: true) do %>
-          <code><%= @bug_report.inbound_email_id %></code>
-        <% end %>
+        <% list.with_row(label: "ID", dev_only: true, value: tag.code(@bug_report.id)) %>
+        <% list.with_row(label: "Inbound email", dev_only: true, value: tag.code(@bug_report.inbound_email_id)) %>
       <% end %>
 
       <% list.with_row(label: "Sender") do %>
@@ -47,10 +43,7 @@
         <% end %>
       <% end %>
 
-      <% list.with_row(label: "Received") do %>
-        <%= render UI::Time::Component.new(time: @bug_report.received_at || @bug_report.created_at,
-          format: :localize_time_precise) %>
-      <% end %>
+      <% list.with_row(label: "Received", value: render(UI::Time::Component.new(time: @bug_report.received_at || @bug_report.created_at, format: :localize_time_precise))) %>
 
       <% if @bug_report.github_pull_request.present? %>
         <% list.with_row(label: "Pull request") do %>
