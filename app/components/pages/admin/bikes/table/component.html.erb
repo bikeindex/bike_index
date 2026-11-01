@@ -23,12 +23,21 @@
     <% table.selection_column(param: "bikes_selected") %>
   <% end %>
 
-  <% table.column(sortable: "id", label: "Added", classes: "tw:whitespace-nowrap", lower_right: ->(bike) { content_tag(:span, bike.id, class: "only-dev-visible") }) do |bike| %>
+  <%# Listed always_visible in the panel: the frozen first column can't be one ui--table-column-order moves %>
+  <% table.column(sortable: "id", label: "Registered", classes: "tw:whitespace-nowrap", lower_right: ->(bike) { content_tag(:span, bike.id, class: "only-dev-visible") }) do |bike| %>
     <%= link_to render(UI::Time::Component.new(time: bike.created_at)), edit_admin_bike_url(bike), class: "tw:text-xs" %>
   <% end %>
 
-  <% table.column(sortable: "updated_by_user_at", hideable: :updated_cell, classes: "tw:text-xs") do |bike| %>
+  <% table.column(sortable: "updated_by_user_at", hideable: :updated_cell, label: "Updated", classes: "tw:text-xs") do |bike| %>
     <%= render UI::Time::Component.new(time: bike.updated_by_user_fallback) %>
+  <% end %>
+
+  <% table.column(sortable: "occurred_at", hideable: :occurred_at_cell, label: "Status at", classes: "tw:text-xs") do |bike| %>
+    <%= render UI::Time::Component.new(time: bike.occurred_at) %>
+  <% end %>
+
+  <% table.column(hideable: :photo_cell) do |bike| %>
+    <%= render(Atoms::BikeThumbnail::Component.new(bike:)) %>
   <% end %>
 
   <% unless @skip_user %>
@@ -97,6 +106,10 @@
     </div>
   <% end %>
 
+  <% table.column(sortable: "propulsion_type", hideable: :propulsion_type_cell) do |bike| %>
+    <%= bike.propulsion_titleize unless bike.propulsion_type == "foot-pedal" %>
+  <% end %>
+
   <% table.column(hideable: :serial_cell) do |bike| %>
     <small class="tw:text-gray-400"><%= bike.serial_number %></small>
   <% end %>
@@ -106,15 +119,15 @@
       <%= link_to bike.creation_organization.name, admin_organization_path(bike.creation_organization.to_param) %>
       <%= link_to search_emoji, admin_bikes_path(organization_id: bike.creation_organization.to_param), class: "small display-sortable-link" %>
     <% end %>
+  <% end %>
 
+  <% table.column(hideable: :source_cell, classes: "tw:text-xs tw:text-gray-400") do |bike| %>
     <% if bike.creation_kind %>
-      <span class="tw:block tw:text-xs tw:text-gray-400">
-        <%= render(Atoms::Org::OriginDisplay::Component.new(ownership: bike.current_ownership)) %>
+      <%= render(Atoms::Org::OriginDisplay::Component.new(ownership: bike.current_ownership)) %>
 
-        <% if bike.bulk_import.present? %>
-          <%= render(UI::ButtonLink::Component.new(href: admin_bulk_import_path(bike.bulk_import), text: "import", color: :link_gray)) %>
-        <% end %>
-      </span>
+      <% if bike.bulk_import.present? %>
+        <%= render(UI::ButtonLink::Component.new(href: admin_bulk_import_path(bike.bulk_import), text: "import", color: :link_gray)) %>
+      <% end %>
     <% end %>
   <% end %>
 

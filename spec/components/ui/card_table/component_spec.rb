@@ -47,6 +47,7 @@ RSpec.describe UI::CardTable::Component, type: :component do
           table.with_actions { "Approve selected" }
           table.selection_column(param: "people", disabled: ->(record) { record.id == 8 }) { "View" }
           table.column(hideable: :email_cell) { |r| r.email }
+          table.column(hideable: :name_cell, label: "Short") { |r| r.email }
         end
       end
 
@@ -65,6 +66,7 @@ RSpec.describe UI::CardTable::Component, type: :component do
         expect(component).to have_css("td div:has(input[aria-label='Select person 7'])", text: "View")
         expect(component).to have_css("th.hideableColumn.email_cell", text: "Email")
         expect(component).to have_css("td.hideableColumn.email_cell", text: "alice@example.com")
+        expect(component).to have_css("th.hideableColumn.name_cell", text: "Short")
       end
 
       context "with a disabled record" do
