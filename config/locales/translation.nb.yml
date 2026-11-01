@@ -4461,6 +4461,10 @@ nb:
         create_duplicates_html: Opprett duplikater – legg til registreringer når en
           rad samsvarer med en eksisterende registrerings serienummer og eierens e-postadresse
           <span class="twless-strong">(av som standard)</span>
+        create_duplicates_enabled_html: Opprett duplikater – legg til registreringer
+          når en rad samsvarer med en eksisterende registrerings serienummer og eierens
+          e-postadresse <span class="twless-strong">(aktivert som standard for å forhindre
+          tap av stjålne/beslaglagte data)</span>
       show:
         ascend_import: Ascend import
         bulk_import: Masseimport

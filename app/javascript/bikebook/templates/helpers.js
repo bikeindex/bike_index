@@ -13,7 +13,7 @@ export const uuid = () => [4, 2, 2, 2, 6].map(randomHex).join('-')
 // number_with_delimiter, which leaves the fraction as Ruby prints it
 export const numberDisplay = (number) => {
   const [whole, fraction] = String(number).split('.')
-  return html`<span class=${number === 0 ? 'less-less-strong' : ''}>${whole.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}${fraction ? `.${fraction}` : ''}</span>`
+  return html`<span class=${number === 0 ? 'twless-strong' : ''}>${whole.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}${fraction ? `.${fraction}` : ''}</span>`
 }
 
 // amount_display(Money.new(cents, code))

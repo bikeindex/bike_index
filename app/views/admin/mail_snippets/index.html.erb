@@ -48,7 +48,7 @@
       <small><%= truncate(mail_snippet.body_stripped, length: 100) %></small>
     <% end %>
 
-    <% table.column(label: "Enabled", header_classes: "tw:text-xs", classes: "table-cell-check") do |mail_snippet| %>
+    <% table.column(label: "Enabled", header_classes: "tw:text-xs", classes: "table_cell_check") do |mail_snippet| %>
       <%= check_mark if mail_snippet.is_enabled %>
     <% end %>
 

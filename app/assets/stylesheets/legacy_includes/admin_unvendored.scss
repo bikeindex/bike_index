@@ -9470,7 +9470,6 @@ body {
 
 // @bikeindex/time-localizer wraps preciseTimeSeconds' seconds in .less-strong
 .admin-public-image .image-filename,
-.less-less-strong,
 .less-strong {
   opacity: .65
 }
@@ -9484,22 +9483,8 @@ body {
 .admin-public-image .image-filename .btn:hover,
 .admin-public-image .image-filename .form-control:focus,
 .admin-public-image .image-filename .form-control:hover,
-.admin-public-image .image-filename a:hover,
-.btn.less-less-strong:focus,
-.btn.less-less-strong:hover,
-.form-control.less-less-strong:focus,
-.form-control.less-less-strong:hover,
-.less-less-strong+a:hover,
-.less-less-strong .btn:focus,
-.less-less-strong .btn:hover,
-.less-less-strong .form-control:focus,
-.less-less-strong .form-control:hover,
-.less-less-strong a:hover {
+.admin-public-image .image-filename a:hover {
   opacity: 1
-}
-
-.less-less-strong {
-  opacity: .3
 }
 
 .text-link,
@@ -9524,15 +9509,6 @@ label {
 
 .em {
   font-style: italic
-}
-
-.fake-disabled,
-.fake-disabled.active,
-.fake-disabled:active,
-.fake-disabled:focus {
-  background-color: #e9ecef;
-  opacity: 1;
-  cursor: not-allowed
 }
 
 .uppercase {
@@ -9565,16 +9541,6 @@ label {
 
 .table-list.wide-definition tr td:last-child {
   width: 70%
-}
-
-.table-list.no-italic-definition tr td:first-child {
-  font-style: normal
-}
-
-table .table-cell-check {
-  font-family: Courier;
-  text-align: center;
-  font-weight: 700
 }
 
 table code {
@@ -9708,18 +9674,6 @@ table code {
   left: 0
 }
 
-.admin-navbar .navbar-brand img {
-  height: 35px
-}
-
-.ambassador-tasks-table td p {
-  display: inline
-}
-
-.admin-filter-menu {
-  float: right
-}
-
 .admin-public-image {
   font-size: 12px
 }
@@ -9734,22 +9688,6 @@ table code {
   max-width: 100%;
   height: auto;
   margin: 0 auto
-}
-
-@media(min-width:768px) {
-  .admin-bike-summary .admin-image-thumb {
-    max-width: 220px
-  }
-}
-
-.admin-bike-summary .admin-image-thumb img {
-  max-width: 100%;
-  width: 180px;
-  height: auto
-}
-
-.admin-bike-summary .admin-image-thumb h3 {
-  text-align: center
 }
 
 .credibility-score {
@@ -9814,18 +9752,4 @@ table code {
 .credibility-score .score-details .table-list tr td:last-child,
 .credibility-score .score-details .table tr td:last-child {
   width: 15%
-}
-
-.admin-bike-table-serial-cell {
-  display: none
-}
-
-.show-admin-bike-table-serial-cell .admin-bike-table-serial-cell {
-  display: table-cell
-}
-
-.link-emoji {
-  display: inline-block;
-  width: 1rem;
-  height: auto
 }

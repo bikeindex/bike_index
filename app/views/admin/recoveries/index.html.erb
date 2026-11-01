@@ -37,7 +37,7 @@
 
     <div class="row mt-4 mb-4">
       <div class="col-sm-6 offset-sm-3">
-        <table class="table-list wide-definition no-italic-definition">
+        <table class="table-list wide-definition tw:[&_td:first-child]:not-italic!">
           <%# duplicates some stuff from counts.rb %>
           <% valued_recoveries = available_recoveries.pluck(:estimated_value).reject(&:blank?) %>
           <% recovery_amount = valued_recoveries.sum + (available_recoveries.count - valued_recoveries.count) * Counts.recovery_average_value %>

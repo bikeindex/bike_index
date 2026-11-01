@@ -1,6 +1,6 @@
 <% admin_search_form = capture do %>
   <% if params[:search_item_type].present? || params[:search_item_id].present? %>
-    <p class="pagination-number">
+    <p>
       Versions for
       <% if params[:search_item_type].present? && params[:search_item_id].present? %>
         <%= link_to "#{params[:search_item_type]} ##{params[:search_item_id]}", admin_path_for_object(item_type: params[:search_item_type], item_id: params[:search_item_id]), class: "twlink" %>
