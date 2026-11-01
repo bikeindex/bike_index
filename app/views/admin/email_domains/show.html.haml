@@ -4,9 +4,9 @@
   .col-md-6
     = render(UI::TableList::Component.new) do |list|
       - list.with_row(label: "Creator", value: render(Atoms::Admin::TableCells::User::Component.new(user: @email_domain.creator, user_id: @email_domain.creator_id)))
-      - list.with_row(label: "Created", class: "small", value: render(UI::Time::Component.new(time: @email_domain.created_at, format: :localize_time_precise)))
-      - list.with_row(label: "Updated", class: "small", value: render(UI::Time::Component.new(time: @email_domain.updated_at, format: :localize_time_precise)))
-      - list.with_row(label: "Changed status at", class: "small", value: (render(UI::Time::Component.new(time: @email_domain.status_changed_at, format: :localize_time_precise)) if @email_domain.status_changed_after_create?))
+      - list.with_row(label: "Created", class: "tw:text-sm", value: render(UI::Time::Component.new(time: @email_domain.created_at, format: :localize_time_precise)))
+      - list.with_row(label: "Updated", class: "tw:text-sm", value: render(UI::Time::Component.new(time: @email_domain.updated_at, format: :localize_time_precise)))
+      - list.with_row(label: "Changed status at", class: "tw:text-sm", value: (render(UI::Time::Component.new(time: @email_domain.status_changed_at, format: :localize_time_precise)) if @email_domain.status_changed_after_create?))
       - list.with_row(label: "TLD") do
         - if @matching_tld.present?
           = link_to @matching_tld.domain, admin_email_domain_path(@matching_tld.id)
@@ -16,8 +16,8 @@
           = @email_domain.tld
       - list.with_row(label: "Extra", value: render(partial: "data_details", locals: {email_domain: @email_domain}))
       - list.with_row(label: "Status") do
-        - status_class = "text-danger" if @email_domain.status.match?("ban")
-        - status_class = "text-warning font-weight-bold" if @email_domain.ignored?
+        - status_class = UI::Alerts::Base::Component::TEXT_CLASSES[:error] if @email_domain.status.match?("ban")
+        - status_class = "font-weight-bold #{UI::Alerts::Base::Component::TEXT_CLASSES[:warning]}" if @email_domain.ignored?
         %span{class: status_class}
           = @email_domain.status_humanized
         - if @email_domain.ignored?
@@ -27,12 +27,12 @@
 
   .col-md-6
     = render(UI::TableList::Component.new) do |list|
-      - list.with_row(label: "Ban Blockers", class: "small") do
+      - list.with_row(label: "Ban Blockers", class: "tw:text-sm") do
         - ban_blockers = @email_domain.ban_blockers.any?
         = ban_blockers ? check_mark : cross_mark
         %small.ml-2
           - if @email_domain.auto_bannable?
-            %span.text-warning auto bannable
+            %span{class: UI::Alerts::Base::Component::TEXT_CLASSES[:warning]} auto bannable
           - else
             not auto banable
             - if ban_blockers
@@ -55,7 +55,7 @@
         %strong{class: admin_email_domain_spam_color(@email_domain.spam_score)}
           #{@email_domain.spam_score} / 10
         %small.twless-strong above #{EmailDomain::SPAM_SCORE_AUTO_BAN} is auto-bannable (with no blockers)
-        %small.d-block
+        %small{class: "tw:block"}
           %span
             %strong= number_display(- @email_domain.spam_score_our_records)
             our records,
@@ -70,7 +70,7 @@
         %small.ml-2
           POS:
           %strong= number_display(@email_domain.data["bike_count_pos"])
-      - list.with_row(label: "BParam", class: "small", value: number_display(@email_domain.b_param_count))
+      - list.with_row(label: "BParam", class: "tw:text-sm", value: number_display(@email_domain.b_param_count))
       - list.with_row(label: "Notifications", value: link_to(number_display(@email_domain.notification_count), admin_notifications_path(query: @email_domain.domain, render_chart: true)))
       - list.with_row(label: "Users") do
         = link_to number_display(@email_domain.user_count), admin_users_path(search_domain: @email_domain.domain, render_chart: true)

@@ -22,15 +22,15 @@
     <% end %>
 
     <% table.column(sortable: "endpoint") do |logged_search| %>
-      <code class="small" style="word-break: keep-all;">
+      <code style="word-break: keep-all;">
         <%= logged_search.endpoint %>
-        <%= link_to search_emoji, url_for(sort_state.search_params.merge(search_endpoint: logged_search.endpoint)), class: "display-sortable-link small" %>
+        <%= link_to search_emoji, url_for(sort_state.search_params.merge(search_endpoint: logged_search.endpoint)), class: "display-sortable-link tw:text-sm" %>
       </code>
     <% end %>
 
     <% table.column(sortable: "ip_address") do |logged_search| %>
-      <code class="small"><%= logged_search.ip_address %></code>
-      <%= link_to search_emoji, url_for(sort_state.search_params.merge(search_ip_address: logged_search.ip_address)), class: "display-sortable-link small" %>
+      <code><%= logged_search.ip_address %></code>
+      <%= link_to search_emoji, url_for(sort_state.search_params.merge(search_ip_address: logged_search.ip_address)), class: "display-sortable-link tw:text-sm" %>
     <% end %>
 
     <% table.column(sortable: "city", label: "IP Location", classes: "tw:text-xs") do |logged_search| %>

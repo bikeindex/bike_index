@@ -27,7 +27,7 @@
       <%= link_to search_emoji, admin_invoices_path(organization_id: organization.to_param) %>
 
       <% if organization.deleted? %>
-        <small class="text-danger">organization is deleted!</small>
+        <small class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">organization is deleted!</small>
       <% end %>
     <% end %>
   <% end %>
@@ -70,7 +70,7 @@
 
     <% if invoice.current? && invoice.paid_money_but_no_cost? %>
       <em class="tw:block tw:text-sm/4">
-        <strong class="text-danger">doesn't make organization "paid"</strong>
+        <strong class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">doesn't make organization "paid"</strong>
         even though it is paid - because amount due is $0
       </em>
     <% end %>
@@ -78,7 +78,7 @@
 
   <% unless @skip_discount_due %>
     <% table.column(label: "Discount") do |invoice| %>
-      <span class="<%= "text-danger" if invoice.discount_cents > 0 %>">
+      <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] if invoice.discount_cents > 0 %>">
         <%= invoice.discount_formatted %>
       </span>
     <% end %>

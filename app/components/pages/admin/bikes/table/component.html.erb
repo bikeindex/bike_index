@@ -109,7 +109,7 @@
   <% table.column(hideable: :created_by_cell) do |bike| %>
     <% if bike.creation_organization.present? %>
       <%= link_to bike.creation_organization.name, admin_organization_path(bike.creation_organization.to_param) %>
-      <%= link_to search_emoji, admin_bikes_path(organization_id: bike.creation_organization.to_param), class: "small display-sortable-link" %>
+      <%= link_to search_emoji, admin_bikes_path(organization_id: bike.creation_organization.to_param), class: "display-sortable-link tw:text-sm" %>
     <% end %>
   <% end %>
 

@@ -16,7 +16,7 @@
 
 - if @social_post.imported_post?
   %h3 Landing page rendering
-  .landing-why-col.clearfix
+  %div{class: "tw:mt-6 tw:lg:max-w-7/12"}
     = render partial: 'landing_pages/social_post', locals: { post_id: @social_post.id }
 
 - if @social_post.reposts.any?

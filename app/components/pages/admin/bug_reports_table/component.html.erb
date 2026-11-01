@@ -22,17 +22,17 @@
       <%= render Atoms::Admin::TableCells::User::Component.new(user: bug_report.user, user_id: bug_report.user_id) %>
     <% else %>
       <span class="tw:block tw:xl:inline"><%= bug_report.from_name %></span>
-      <%= content_tag(:code, bug_report.email, class: "small") %>
+      <%= content_tag(:code, bug_report.email) %>
     <% end %>
 
     <%# a fixed path rather than sortable_search_params, which caching would bake in %>
-    <%= link_to search_emoji, admin_bug_reports_path(search_email: bug_report.email), class: "display-sortable-link small" %>
+    <%= link_to search_emoji, admin_bug_reports_path(search_email: bug_report.email), class: "display-sortable-link tw:text-sm" %>
   <% end %>
 
   <% table.column(sortable: "receiver", hideable: :receiver_cell) do |bug_report| %>
     <% if bug_report.receiver.present? %>
       <small><%= BugReport.display_receiver(bug_report.receiver) %></small>
-      <%= link_to search_emoji, admin_bug_reports_path(search_receiver: bug_report.receiver), class: "display-sortable-link small" %>
+      <%= link_to search_emoji, admin_bug_reports_path(search_receiver: bug_report.receiver), class: "display-sortable-link tw:text-sm" %>
     <% end %>
   <% end %>
 

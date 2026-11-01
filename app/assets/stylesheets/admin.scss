@@ -357,4 +357,9 @@
   h6 {
     font-size: 1rem
   }
+
+  // @bikeindex/time-localizer wraps preciseTimeSeconds' seconds in .less-strong
+  .less-strong {
+    opacity: .65
+  }
 }

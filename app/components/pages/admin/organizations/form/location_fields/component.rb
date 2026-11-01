@@ -23,7 +23,7 @@ module Pages
               return Location.human_attribute_name(:publicly_visible) if @organization.allowed_show?
 
               safe_join([Location.human_attribute_name(:publicly_visible),
-                tag.small("org not shown on map, checking this won't change that", class: "text-warning ml-1")], " ")
+                tag.small("org not shown on map, checking this won't change that", class: "ml-1 #{UI::Alerts::Base::Component::TEXT_CLASSES[:warning]}")], " ")
             end
           end
         end

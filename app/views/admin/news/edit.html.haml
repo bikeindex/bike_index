@@ -20,7 +20,7 @@
   = render(UI::Alerts::ObjectError::Component.new(object: @blog))
 
   - if @blog.is_listicle
-    %h2.text-danger
+    %h2{class: UI::Alerts::Base::Component::TEXT_CLASSES[:error]}
       Listicles are no longer actively maintained. Many things on this page are no longer working.
     = render partial: "listicle_form", locals: { f: f }
   - else
@@ -30,7 +30,7 @@
 
 .row.mt-2.mb-2
   .col-md-6
-.alert.alert-info
+= render(UI::Alerts::Base::Component.new(kind: :notice)) do
   %p
     The content blocks accept HTML or Markdown for styling and linking things. Check out this #{link_to "Markdown cheat sheet", "https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet", target: "_blank"} if you're curious.
 

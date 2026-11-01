@@ -62,7 +62,7 @@
       <small><%= number_display(payment_count) %></small>
 
       <% stripe_subscription.payments.order(id: :desc).limit(1).pluck(:id, :stripe_status).each do |id, stripe_status| %>
-        <%= link_to admin_payment_path(id), class: "twlink small" do %>
+        <%= link_to admin_payment_path(id), class: "twlink tw:text-sm" do %>
           <% if stripe_status.blank? || payment_count > 1 %>
             last
           <% end %>

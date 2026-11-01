@@ -35,7 +35,7 @@ module Pages
           end
 
           def end_at_class(invoice)
-            "text-danger" if invoice.subscription_end_at < Time.current
+            UI::Alerts::Base::Component::TEXT_CLASSES[:error] if invoice.subscription_end_at < Time.current
           end
         end
       end

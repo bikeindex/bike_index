@@ -12,7 +12,7 @@
         <div><%= @bug_report.from_name %></div>
 
         <div>
-          <%= content_tag(:code, @bug_report.email, class: "small") %>
+          <%= content_tag(:code, @bug_report.email) %>
 
           <%= mail_to @bug_report.email, inline_svg_tag("icons/envelope.svg", class: "tw:inline-block tw:h-4 tw:w-4"), class: "twlink tw:ml-1", title: "Email #{@bug_report.email}" %>
 
@@ -97,7 +97,7 @@
           <%= image_tag BlobUrl.for(image.blob), alt: image.filename, class: "img-thumbnail tw:max-h-72" %>
         <% end %>
 
-        <div class="small twless-strong">
+        <div class="twless-strong tw:text-sm">
           <%= image.filename %>
           <%= number_to_human_size(image.byte_size) %>
         </div>

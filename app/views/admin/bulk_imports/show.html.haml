@@ -10,8 +10,8 @@
       - list.with_row(label: "File") do
         %small
           - if @bulk_import.file_cleaned?
-            %span.text-warning file removed
-            %em.small.twless-strong after a few days, we delete the uploaded file to save space
+            %span{class: UI::Alerts::Base::Component::TEXT_CLASSES[:warning]} file removed
+            %em.twless-strong{class: "tw:text-sm"} after a few days, we delete the uploaded file to save space
           - else
             = link_to @bulk_import.file_url, @bulk_import.file_url
       - list.with_row(label: "Send email?") do
@@ -37,7 +37,7 @@
         - else
           None
           - if @bulk_import.ascend?
-            .small
+            %div{class: "tw:text-sm"}
               Ascend name:
               %code= @bulk_import.ascend_name
       - list.with_row(label: "Kind", value: @bulk_import.kind_humanized)

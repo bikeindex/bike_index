@@ -23,10 +23,9 @@
           = render(UI::Forms::Select::Component.new(form_builder: f, attribute:, option_tags: color_options, options: {prompt: "Choose color"}))
 
   = render(UI::Button::Component.new(text: "Update the paint", color: :primary, type: "submit"))
-  .alert.alert-info.mt-2
-    %p
-      %strong You can't edit the name.
-      Otherwise future bikes posted with this paint won't be able to find this paint, and will recreate it.
+  = render(UI::Alerts::Base::Component.new(kind: :notice, margin_classes: "tw:mt-2")) do
+    %strong You can't edit the name.
+    Otherwise future bikes posted with this paint won't be able to find this paint, and will recreate it.
 
 %hr.mt-2
 

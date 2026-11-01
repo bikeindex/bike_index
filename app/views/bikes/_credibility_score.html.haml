@@ -1,21 +1,20 @@
 - scorer = bike.credibility_scorer
-.credibility-score{ style: "background: #{credibility_scorer_color(scorer.score)};" }
-  .main-crediblity-score-box
-    -# %a.credibility-title{ href: ".score-details", data: { toggle: "collapse" } }
-    %span.credibility-title
+.credibility-score{class: "tw:ml-auto tw:flex tw:max-w-[546px] tw:flex-wrap tw:rounded-xs tw:border-2 tw:border-black/15", style: "background: #{credibility_scorer_color(scorer.score)};"}
+  %div{class: "tw:relative tw:w-2/5 tw:py-4 tw:text-center tw:text-white"}
+    %span{class: "tw:block"}
       Credibility Score
-    %span.score-number
+    %span{class: "tw:mt-2 tw:block tw:text-[125%] tw:font-bold"}
       = scorer.score
-  .score-details.text-left
-    %em.small.details-title
+  %div{class: "tw:relative tw:w-3/5 tw:rounded-r-xs tw:bg-white tw:text-left"}
+    %em{class: "tw:block tw:px-[.1rem] tw:pt-1 tw:pb-[.1rem] tw:text-sm"}
       Factors in score:
-    %table.table.table-sm.table-striped.table-bordered
+    %table{class: "tw:w-full tw:leading-normal"}
       %tbody
         - CredibilityScorer.permitted_badges_hash(scorer.badges).each do |badge, value|
-          %tr
-            %td
+          %tr{class: "tw:odd:bg-black/5"}
+            %td{class: "tw:border tw:border-[#eceeef] tw:p-1"}
               %small
                 = CredibilityScorer.humanize_badge(badge)
-            %td.text-right
-              %span{ class: (value < 0 ? "text-danger" : "") }
+            %td{class: "tw:w-[15%] tw:border tw:border-[#eceeef] tw:p-1 tw:text-right"}
+              %span{class: (UI::Alerts::Base::Component::TEXT_CLASSES[:error] if value < 0)}
                 = value

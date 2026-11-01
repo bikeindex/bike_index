@@ -63,7 +63,7 @@
 
       <%= view_all_link("view for all organizations", :organization_id) %>
       <% if organization_subject&.deleted? %>
-        <em class="d-block mt-1 twless-strong">
+        <em class="mt-1 twless-strong tw:block">
           (<%= organization_subject.short_name %> is
           <em class="<%= error_text_class %>">deleted</em>) - at
           <span class="localizeTime preciseTime"><%= l organization_subject.deleted_at, format: :convert_time %></span>

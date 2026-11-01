@@ -31,7 +31,7 @@ RSpec.describe Atoms::Admin::TableCells::Organization::Component, type: :compone
       expect(component.text).to include("Missing organization")
       expect(component).to have_css("small.tw:text-red-800")
       expect(component.text).to include("99999999")
-      expect(component).to have_css("code.small")
+      expect(component).to have_css("code", text: "99999999")
       expect(component).to have_css("a[href='/admin/organizations/99999999']")
     end
   end
