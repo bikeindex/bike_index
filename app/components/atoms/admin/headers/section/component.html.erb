@@ -1,4 +1,10 @@
 <h3 class="tw:mt-6">
   <%= @title %>
   <small class="twless-strong tw:ml-2"><%= link_to number_display(@count), @href, class: "twlink" %></small>
+
+  <% if @parenthetical.present? %>
+    <small class="twless-strong"><%= wrapped_parenthetical %></small>
+  <% end %>
+
+  <%= content %>
 </h3>

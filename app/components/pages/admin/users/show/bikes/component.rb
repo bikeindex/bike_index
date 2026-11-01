@@ -26,9 +26,11 @@ module Pages
 
             def deleted_bikes_count = @deleted_bikes_count ||= Bike.unscoped.current_owner(@user.id).only_deleted.count
 
-            def index_note
+            def index_path = admin_bikes_path(user_id: @user.id)
+
+            def parenthetical
               note = (bikes_count > LIMIT) ? "first #{LIMIT} shown, view all in " : "view in "
-              safe_join(["(", note, link_to("admin/bikes", admin_bikes_path(user_id: @user.id), class: "twlink"), ")"])
+              safe_join([note, link_to("admin/bikes", index_path, class: "twlink")])
             end
           end
         end

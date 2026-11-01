@@ -1,25 +1,25 @@
-<%= render(Atoms::Admin::SectionHeading::Component.new(title: "Marketplace messages", count: counts[:marketplace_messages],
+<%= render(Atoms::Admin::Headers::Section::Component.new(title: "Marketplace messages", count: counts[:marketplace_messages],
       href: admin_marketplace_messages_path(user_id: @user.id))) %>
 
 <% if counts[:marketplace_messages].positive? %>
   <%= render partial: "/admin/marketplace_messages/table", locals: {collection: recent(:marketplace_messages)} %>
 <% end %>
 
-<%= render(Atoms::Admin::SectionHeading::Component.new(title: "Alerts", count: counts[:alerts],
+<%= render(Atoms::Admin::Headers::Section::Component.new(title: "Alerts", count: counts[:alerts],
       href: admin_user_alerts_path(user_id: @user.id))) %>
 
 <% if counts[:alerts].positive? %>
   <%= render partial: "/admin/user_alerts/table", locals: {user_alerts: recent(:alerts), skip_user: true} %>
 <% end %>
 
-<%= render(Atoms::Admin::SectionHeading::Component.new(title: "Notifications", count: counts[:notifications],
+<%= render(Atoms::Admin::Headers::Section::Component.new(title: "Notifications", count: counts[:notifications],
       href: admin_notifications_path(user_id: @user.id))) %>
 
 <% if counts[:notifications].positive? %>
   <%= render partial: "/admin/notifications/table", locals: {notifications: recent(:notifications).includes(:bike, :notifiable, :user)} %>
 <% end %>
 
-<%= render(Atoms::Admin::SectionHeading::Component.new(title: "Feedbacks", count: counts[:feedbacks],
+<%= render(Atoms::Admin::Headers::Section::Component.new(title: "Feedbacks", count: counts[:feedbacks],
       href: admin_feedbacks_path(user_id: @user.id))) %>
 
 <% if counts[:feedbacks].positive? %>

@@ -1,7 +1,5 @@
-<h4>
-  <%= number_display(bikes_count) %> <%= "bike".pluralize(bikes_count) %>
-  <small class="twless-strong"><%= index_note %></small>
-
+<%= render(Atoms::Admin::Headers::Section::Component.new(title: "Bikes", count: bikes_count, href: index_path,
+      parenthetical:)) do %>
   <% if deleted_bikes_count.positive? %>
     <small class="tw:text-sm!">
       -
@@ -11,7 +9,7 @@
       <% end %>
     </small>
   <% end %>
-</h4>
+<% end %>
 
 <% if bikes_count.positive? %>
   <%= render(Pages::Admin::Bikes::Table::Component.new(bikes:, skip_user: true)) %>

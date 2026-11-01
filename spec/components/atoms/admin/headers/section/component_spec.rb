@@ -1,0 +1,23 @@
+# frozen_string_literal: true
+
+require "rails_helper"
+
+RSpec.describe Atoms::Admin::Headers::Section::Component, type: :component do
+  let(:options) { {title: "Bikes", count: 3, href: "/admin/bikes"} }
+  let(:component) { render_inline(described_class.new(**options)) }
+
+  it "links the count to the index" do
+    expect(component.at_css("h3").text.squish).to eq "Bikes 3"
+    expect(component).to have_link("3", href: "/admin/bikes")
+  end
+
+  context "with a parenthetical and block content" do
+    let(:component) do
+      render_inline(described_class.new(**options, parenthetical: "first 100 shown")) { "- more" }
+    end
+
+    it "wraps the parenthetical, and follows it with the content" do
+      expect(component.at_css("h3").text.squish).to eq "Bikes 3 (first 100 shown) - more"
+    end
+  end
+end
