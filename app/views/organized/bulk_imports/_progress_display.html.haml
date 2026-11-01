@@ -1,9 +1,9 @@
 - show_extended ||= false
 - if bulk_import.blocking_error?
-  %span.text-danger
+  %span{class: UI::Alerts::Base::Component::TEXT_CLASSES[:error]}
     Failed
   - if show_extended
-    %em.small.twless-strong
+    %em.twless-strong{class: "tw:text-sm"}
       - if bulk_import.timeout_failure?
         Processing timed out
       - else
@@ -17,6 +17,6 @@
   %span{class: bulk_import_progress_class}
     = bulk_import.progress
   - if show_extended && bulk_import.line_errors.present?
-    %em.small.twless-strong
+    %em.twless-strong{class: "tw:text-sm"}
       error did NOT block import
 
