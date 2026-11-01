@@ -4384,6 +4384,9 @@ en:
         search_filter_without_empty: Only NOT empty imports
         search_filter_without_errors: Only imports without errors
       new:
+        allow_duplicate: >-
+          Register duplicates - rows matching an existing registration's serial and
+          owner email
         choose_file: Choose file...
         correct_actual_image_url_html: '<span class="text-success">Correct</span>:
           actual image url'

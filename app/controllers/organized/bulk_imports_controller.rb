@@ -130,7 +130,7 @@ module Organized
       pparams = if params[:file].present?
         {file: params[:file]}
       else
-        permitted_p = params.require(:bulk_import).permit(:file, :kind)
+        permitted_p = params.require(:bulk_import).permit(:file, :kind, :allow_duplicate)
         if permitted_kinds.include?(permitted_p[:kind])
           permitted_p
         else

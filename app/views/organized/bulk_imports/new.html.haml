@@ -58,6 +58,13 @@
 
             .form-group.row
               .form-well-input
+                .checkbox
+                  = f.label :allow_duplicate do
+                    = f.check_box :allow_duplicate
+                    = t(".allow_duplicate")
+
+            .form-group.row
+              .form-well-input
                 = f.submit t(".upload_and_begin_import"), class: "btn btn-secondary btn-lg"
 
   - if @permitted_kinds.include?("impounded")

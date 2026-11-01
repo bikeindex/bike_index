@@ -343,7 +343,7 @@ RSpec.describe BulkImportJob, type: :job do
           expect(bike_sticker.bike_sticker_updates.count).to eq 1
         end
       end
-      context "no_duplicate" do
+      context "allow_duplicate" do
         it "creates the bikes, doesn't have any errors", :flaky do
           expect(bike_sticker.reload.claimed?).to be_falsey
           expect(bike_sticker.bike_sticker_updates.count).to eq 0
@@ -354,12 +354,12 @@ RSpec.describe BulkImportJob, type: :job do
             expect {
               instance.perform(bulk_import.id)
               # This test is being flaky! Add debug printout #2101 (actually after, but still...)
-              pp "Error no_duplicate", bulk_import.import_errors if bulk_import.reload.blocking_error?
+              pp "Error allow_duplicate", bulk_import.import_errors if bulk_import.reload.blocking_error?
             }.to change(Bike, :count).by 2
           end
-          # It doesn't duplicate if no duplicate is true
-          bulk_import.update(no_duplicate: true, progress: "pending")
-          expect(bulk_import.reload.no_duplicate).to be_truthy
+          # It doesn't duplicate by default
+          bulk_import.update(progress: "pending")
+          expect(bulk_import.reload.allow_duplicate).to be_falsey
           VCR.use_cassette("bulk_import-perform-success") do
             expect {
               instance.perform(bulk_import.id)
@@ -369,9 +369,9 @@ RSpec.describe BulkImportJob, type: :job do
           expect(bike_sticker.reload.claimed?).to be_truthy
           expect(bike_sticker.bike_sticker_updates.count).to eq 1
 
-          # But with no_duplicate false, it does duplicate
-          bulk_import.update(no_duplicate: false, progress: "pending")
-          expect(bulk_import.reload.no_duplicate).to be_falsey
+          # But with allow_duplicate, it does duplicate
+          bulk_import.update(allow_duplicate: true, progress: "pending")
+          expect(bulk_import.reload.allow_duplicate).to be_truthy
           VCR.use_cassette("bulk_import-perform-success") do
             expect {
               instance.perform(bulk_import.id)
@@ -581,8 +581,8 @@ RSpec.describe BulkImportJob, type: :job do
         expect(bulk_import2.reload).to have_attributes(matched_count: 1, no_bikes?: false)
       end
     end
-    context "no_duplicate: false" do
-      let(:bulk_import_attrs) { {no_duplicate: false} }
+    context "allow_duplicate: true" do
+      let(:bulk_import_attrs) { {allow_duplicate: true} }
       it "creates two bikes" do
         expect { instance.perform(bulk_import.id) }.to change(Bike, :count).by 2
       end

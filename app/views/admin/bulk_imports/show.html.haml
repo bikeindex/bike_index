@@ -41,10 +41,10 @@
           = @bulk_import.send_email ? check_mark : cross_mark
           %small.less-strong Email is sent by default
       %tr
-        %td No dupe
+        %td Allow duplicates?
         %td
-          = @bulk_import.send_email ? check_mark : cross_mark
-          %small.less-strong Only true by default for Ascend
+          = @bulk_import.allow_duplicate ? check_mark : cross_mark
+          %small.less-strong Only true by default for stolen and impounded
 
   .col-sm-6
     %table.table-list

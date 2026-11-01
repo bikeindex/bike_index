@@ -16,9 +16,9 @@
           = f.check_box :no_notify
           Don't send emails to registrations
       .form-group
-        = f.label :no_duplicate do
-          = f.check_box :no_duplicate
-          Skip registering bikes with the same serial number as other bikes owned by the same email
+        = f.label :allow_duplicate do
+          = f.check_box :allow_duplicate
+          Register duplicates - rows matching an existing registration's serial and owner email
 
 
       = f.submit 'Create', class: "btn btn-success float-right"
