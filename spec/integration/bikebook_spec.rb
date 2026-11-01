@@ -190,7 +190,7 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(page).to have_current_path("/bikebook?search=1&vehicle_models=m/aventon/2026/level_4_rec_step_through,m/aventon/2022/level_2_step_through")
     # each model's column topped and footed in its frame's color in the geometry overlay
     expect(all("[aria-label='Overview comparison'] thead th").map { it[:class].include?("tw:border-t-4") }).to eq([false, true, true])
-    expect(all("[aria-label='Overview comparison'] tbody tr:last-child td").map { it[:class].include?("tw:border-b-4") }).to eq([true, true])
+    expect(page).to have_css("[aria-label='Overview comparison'] tbody tr:last-child td.tw\\:border-b-4", count: 2)
     # the render re-runs the pick's search in its combobox, which settles unlogged
     page.evaluate_script("new Promise((resolve) => setTimeout(resolve, 1100))")
     expect(logged).to eq ["count=2&q=level+4+rec", "vehicle_models=m/aventon/2026/level_4_rec_step_through",
@@ -274,7 +274,7 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(labels.first(4)).to eq(["Front wheel", "Rear wheel", "Size", "Reach"])
     sizes_card = find("section[aria-label='Aventón Level 2 Step-Through sizes']")
     # each model's card topped in its frame's color, as its table column is, which is footed in it too
-    expect(all("[aria-label='Sizes & geometry comparison'] tbody tr:last-child td").map { it[:class].include?("tw:border-b-4") }).to eq([true, true])
+    expect(page).to have_css("[aria-label='Sizes & geometry comparison'] tbody tr:last-child td.tw\\:border-b-4", count: 2)
     expect(all("section[aria-label$=' sizes']").map { it[:class][/tw:border-t-\[#\w+\]!/] }).to eq(["tw:border-t-[#3498db]!", "tw:border-t-[#DC2626]!"])
     expect(sizes_card).to have_no_css("h2", text: /\Awheels\z/i)
     # its sizes scroll out to the card's edges, as a components table does

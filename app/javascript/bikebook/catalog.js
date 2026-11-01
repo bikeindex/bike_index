@@ -145,7 +145,7 @@ export class CatalogComboboxSource {
 }
 
 // the catalog's mark on a current model's display, which a chip shows as a badge
-const CURRENT = / \(current\)$/
+export const CURRENT_MARK = / \(current\)$/
 
 // The gem's selection chip partial, ahead of the field, gripped where bikebook--chip-reorder drags them by the
 // template[data-chip-grip] beside it. Each grip's id is its model's and its count among that model's repeats, so a
@@ -156,7 +156,7 @@ export const renderChips = (combobox, chips) => {
   const values = [...chipped, ...chips.map(({ value }) => value)]
   const handleId = (value, index) => `move-${value}-${values.slice(0, chipped.length + index).filter((each) => each === value).length}`
   combobox.querySelector('[data-hw-combobox-target~="combobox"]').before(fragmentOf(chips.map(({ value, display }, index) => {
-    const name = display.replace(CURRENT, '')
+    const name = display.replace(CURRENT_MARK, '')
     return html`<div data-hw-combobox-chip=""><div class="hw-combobox__chip">${grip ? gripFor(grip, display, handleId(value, index)) : nothing}<span>${name}${
       name === display ? nothing : html` ${inlineBadge({ text: 'current', size: 'sm' })}`}</span><span tabindex="0" class="hw-combobox__chip__remover"
       aria-label=${`Remove ${display}`} data-action="click->hw-combobox#removeChip:stop keydown->hw-combobox#navigateChip"

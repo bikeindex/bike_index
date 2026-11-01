@@ -89,11 +89,10 @@ export const overlayFrames = (vehicles, sizes) => vehicles.map(({ data }, index)
   return { ...frame, side: unlisted.length === 0 ? side : null, unlisted }
 })
 
-// The top and bottom borders that key a comparison table column to its frame, which the overlay draws in the same order,
-// and its color as --series
+// The top and bottom borders that key a comparison table column to its frame, which the overlay draws in the same order
 export const seriesBorders = (frames, index) => overlaid(frames) && drawable(frames[index])
-  ? { top: `tw:border-t-4 ${SERIES[index].top}`, bottom: `${SERIES[index].variable} tw:border-b-4 tw:border-b-(--series)!`, variable: SERIES[index].variable }
-  : { top: '', bottom: '', variable: '' }
+  ? { top: `tw:border-t-4 ${SERIES[index].top}`, bottom: `${SERIES[index].variable} tw:border-b-4 tw:border-b-(--series)!` }
+  : { top: '', bottom: '' }
 
 // The compared models' frames in their `sizes`, their rear wheels standing on the same spot, each over the ones the
 // comparison table columns left of it. A frame it can't draw is its wheels alone where they're listed. Lone wheels aren't drawn, only said what they're missing,

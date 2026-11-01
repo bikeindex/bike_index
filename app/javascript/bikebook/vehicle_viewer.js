@@ -71,7 +71,6 @@ export class VehicleViewer {
     const highlight = url.searchParams.get('figure')
     const figurePath = (key) => pathWith(url, { figure: key === highlight ? '' : key })
     const compared = { presenter, vehicles, sizes, frames: overlayFrames(vehicles, sizes), market: this.card.market }
-    // compared, scrolling out to the window's edges, the page's gutter inside it
     const rowClasses = comparing
       ? 'tw:justify-center-safe tw:overflow-x-auto tw:px-(--gutter) tw:max-md:snap-x tw:max-md:snap-mandatory tw:max-md:*:w-[85vw] tw:max-md:*:shrink-0 tw:max-md:*:snap-center'
       : 'tw:flex-col tw:lg:flex-row tw:lg:justify-center'
@@ -138,7 +137,7 @@ export class VehicleViewer {
         if (!comparing) return html`${basics(overview)}${groupModels}`
         return html`${withOverlay((corner) => basics({
           ...overview,
-          borders: vehicles.map((_, index) => seriesBorders(compared.frames, index)),
+          frames: compared.frames,
           corner,
           sectionClasses: 'tw:min-[1500px]:mx-0 tw:min-[1500px]:w-auto tw:min-[1500px]:min-w-0 tw:min-[1500px]:flex-1 tw:min-[1500px]:px-0'
         }))}${groupModels}`
