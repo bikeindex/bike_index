@@ -105,6 +105,9 @@
 
 %h2.mt-4
   Bikes - #{number_display(@bulk_import.bikes.count)}
+  - if @bulk_import.matched_count.positive?
+    %small
+      and #{number_display(@bulk_import.matched_count)} #{"row".pluralize(@bulk_import.matched_count)} matching existing registrations
   - if @bulk_import.bikes.count > 25
     %small
       Last 25 shown

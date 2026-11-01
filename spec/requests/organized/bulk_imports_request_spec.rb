@@ -175,6 +175,13 @@ RSpec.describe Organized::BulkImportsController, type: :request do
           expect(response.status).to eq(200)
           expect(response).to render_template :show
         end
+        context "with matching rows" do
+          before { bulk_import.update(data: (bulk_import.data || {}).merge("matched_count" => 3)) }
+          it "renders the count" do
+            get "#{base_url}/#{bulk_import.id}"
+            expect(response.body).to include("Rows matching existing registrations")
+          end
+        end
         context "not organizations bulk_import" do
           let(:bulk_import) { FactoryBot.create(:bulk_import) }
           it "redirects" do
