@@ -21,6 +21,15 @@ RSpec.describe UI::CardTable::Component, type: :component do
     expect(component).not_to have_css("td.email_cell.tw\\:sticky")
   end
 
+  context "with frozen_column: false" do
+    let(:options) { {records:, frozen_column: false} }
+
+    it "freezes no column" do
+      expect(component).to have_css("td", text: "Alice")
+      expect(component).to have_no_css(".tw\\:sticky")
+    end
+  end
+
   context "with data" do
     let(:options) { {records:, data: {controller: "org--assign-bike-sticker", foo: "bar"}} }
 
