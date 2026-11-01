@@ -68,7 +68,7 @@ export default class extends Controller {
 
   // A plain click on a link to this page, such as a card's remove link, or on a drawing's figure's data-href, which an
   // in-place link renders without scrolling, focusing what the data-in-place on it or an ancestor selects rather than the search, and one inside a
-  // data-replace in place of the history entry it's on. Any other renders at the top, or at what its data-scroll-to selects. One among the
+  // data-replace in place of the history entry it's on. Any other renders at the top, or at what the data-scroll-to on it or an ancestor selects. One among the
   // vehicles was written when the page rendered, so only what it changes from that goes onto the URL, which filters and panels have moved on since
   follow (event) {
     const link = event.target.closest('a[href], [data-href]')
@@ -79,7 +79,7 @@ export default class extends Controller {
 
     event.preventDefault()
     const inPlace = link.closest('[data-in-place]')
-    if (!inPlace) return this.#go(url, link.dataset.scrollTo)
+    if (!inPlace) return this.#go(url, link.closest('[data-scroll-to]')?.dataset.scrollTo)
 
     const next = link.closest('#vehicle-viewers') ? this.#changedBy(url) : url
     // one that shows the search a lone model hid, as its tab does, is a step back can undo, and opens and focuses it
@@ -149,7 +149,7 @@ export default class extends Controller {
     const url = new URL(window.location.href)
     if (!searching(url)) {
       url.searchParams.set('search', '1')
-      await this.#go(url, [window.scrollX, window.scrollY])
+      await this.#go(url, null)
     }
     this.dispatch('add')
   }

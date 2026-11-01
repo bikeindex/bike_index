@@ -1012,8 +1012,7 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(page).to have_css("[aria-label='Overview'] thead th", text: "Haul ST")
     expect(page).to have_current_path("/bikebook?price_max=3000&search=1&vehicle_models=m/specialized/2025/haul_st")
     # scrolled to its views, rather than left under the search
-    views_top = -> { page.evaluate_script("document.getElementById('vehicle-views').getBoundingClientRect().top").round }
-    page.document.synchronize { raise Capybara::ExpectationNotMet unless views_top.call == 16 }
+    page.document.synchronize { raise Capybara::ExpectationNotMet unless page.evaluate_script("document.getElementById('vehicle-views').getBoundingClientRect().top").round == 16 }
     # its classes' tiles as /ebike-rules has them, in order, the optional throttle's captioned
     overview = find("[aria-label='Overview']")
     expect(overview.all("td button[aria-label$=' e-bike']").map { it[:"aria-label"] }).to eq ["Class 2 e-bike", "Class 3 e-bike"]

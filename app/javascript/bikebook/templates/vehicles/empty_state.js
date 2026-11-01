@@ -33,7 +33,7 @@ const searchNote = ({ count, filtered }) => html`<p class="tw:mt-3 tw:rounded-md
 
 // each scrolling to the views it opens, which an open filter panel would leave below the window
 const featuredCards = ({ featured, vehiclePath, ...card }) => html`<ul aria-label="Models to compare" class="tw:mt-3 ${MODEL_CARDS_CLASSES}"
-  >${featured.map((model) => modelCard({ model, href: vehiclePath(model.id), attributes: { 'data-scroll-to': '#vehicle-views' }, ...card }))}</ul>`
+  data-scroll-to="#vehicle-views">${featured.map((model) => modelCard({ model, href: vehiclePath(model.id), ...card }))}</ul>`
 
 // With nothing picked, how the page works and comparisons to start from, or once they're dismissed, a prompt, and under
 // either what the search leaves and some of it. A classification's card, shown alone, leaves out the first two
