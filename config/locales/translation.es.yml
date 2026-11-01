@@ -7723,10 +7723,6 @@ es:
             subsidiarias con su propio personal y contenido educativo. El personal
             de cada nivel gestiona únicamente sus propias normas.
           faq_account_question: "¿Quién gestiona la cuenta?"
-          faq_checker_answer: Los detalles de las bicicletas provienen de BikeBook,
-            un catálogo de modelos de bicicletas eléctricas que incluye su clase,
-            motor, velocidad y certificación UL. Las normas estatales se enumeran
-            junto con las leyes que las respaldan.
           faq_checker_question: "¿De dónde obtiene sus datos el verificador de cumplimiento?"
           faq_cost_answer: No hay cuotas de inscripción y el registro es gratuito
             para los residentes. Analizaremos los precios para su ciudad en una llamada
@@ -7944,6 +7940,10 @@ es:
             eléctrica, acceden directamente a una breve sesión informativa sobre las
             normas de su ciudad.
           submit_demo: Solicita una demostración
+          faq_checker_answer_html: Los detalles de las bicicletas provienen de %{bikebook_link},
+            un catálogo de modelos de bicicletas eléctricas con su clase, motor, velocidad
+            y certificación UL. Las normas estatales se enumeran junto con las leyes
+            que las respaldan.
         for_cities_education:
           all_set: Ya está todo listo.
           back: Atrás
