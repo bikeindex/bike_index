@@ -64,7 +64,7 @@
 
       <%= render(UI::Forms::Group::Component.new(attribute: :github_pull_request, form_builder: f, kind: :number_field)) %>
 
-      <%= f.submit "Update", class: "btn btn-outline-primary" %>
+      <%= render UI::Button::Component.new(text: "Update", color: :primary, type: "submit") %>
     <% end %>
   </div>
 </div>

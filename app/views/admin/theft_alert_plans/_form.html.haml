@@ -3,57 +3,34 @@
 = form_for record, url: action, method: method, html: { class: "form" } do |f|
   .row
     .col-sm-6
-      .form-group
-        = f.label :name, "Name", class: "form-label"
-        = f.text_field :name, class: "form-control"
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :name))
     .col-sm-6
-      .form-group
-        = f.label :language
-        = f.select :language,
-          options_for_select(language_choices, selected: record.language),
-          {},
-          class: "form-control"
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :language)) do
+        = render(UI::Forms::Select::Component.new(form_builder: f, attribute: :language, option_tags: language_choices))
     .col-sm-4.col-6
-      .form-group
-        = f.label :currency_enum, "Currency"
-        = f.select :currency_enum, options_for_select(Currency.select_options), {},  class: "form-control"
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :currency_enum, label_text: "Currency")) do
+        = render(UI::Forms::Select::Component.new(form_builder: f, attribute: :currency_enum, option_tags: Currency.select_options))
     .col-sm-4.col-6
-      .form-group
-        = f.label :amount_cents, "Price (cents)", class: "form-label"
-        = f.number_field :amount_cents, class: "form-control"
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :amount_cents, kind: :number_field, label_text: "Price (cents)"))
     .col-sm-4.col-6
-      .form-group
-        = f.label :amount_cents_facebook, "Facebook ad buy (cents)", class: "form-label"
-        = f.number_field :amount_cents_facebook, class: "form-control"
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :amount_cents_facebook, kind: :number_field, label_text: "Facebook ad buy (cents)"))
     .col-sm-4.col-6
-      .form-group
-        = f.label :views, "Views Provided", class: "form-label"
-        = f.number_field :views, class: "form-control"
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :views, kind: :number_field, label_text: "Views Provided"))
     .col-sm-4.col-6
-      .form-group
-        = f.label :duration_days, "Duration (days)", class: "form-label"
-        = f.number_field :duration_days, class: "form-control"
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :duration_days, kind: :number_field, label_text: "Duration (days)"))
     .col-sm-4.col-6
-      .form-group
-        = f.label :ad_radius_miles, class: "form-label"
-        = f.number_field :ad_radius_miles, class: "form-control"
-  .form-group.mb-0
-    = f.label :description, "Description", class: "form-label"
-    = f.text_area :description, class: "form-control", rows: "5"
-
-  .float-right.mt-0
-    [
-    = link_to "Markdown",
-      "https://www.markdownguide.org/getting-started",
-      target: "_blank",
-      tabindex: -1
-    permitted
-    ]
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :ad_radius_miles, kind: :number_field))
+  = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :description, kind: :text_area, html_options: {rows: 5})) do |group|
+    - group.with_helper_text do
+      [
+      = link_to "Markdown",
+        "https://www.markdownguide.org/getting-started",
+        target: "_blank",
+        tabindex: -1
+      permitted
+      ]
   .row.mt-4
     .col-6
-      .form-group
-        = submit_tag submit_label, class: "btn btn-success btn-lg"
-    .col-sm-6
-      .form-group.mt-4
-        = f.check_box :active, class: ""
-        = f.label :active, "Active?", class: "form-check-label"
+      = render(UI::Button::Component.new(text: submit_label, color: :primary, size: :lg, type: "submit"))
+    .col-sm-6.mt-4
+      = render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :active, label: "Active?"))

@@ -9,32 +9,23 @@
 
 .row
   .col-md-6
-    = form_for [:admin, @ownership], html: { class: "form form-horizontal" } do |f|
+    = form_for [:admin, @ownership] do |f|
       = render(UI::Alerts::ObjectError::Component.new(object: @ownership))
 
-      .form-group
-        = f.label :creator_id
-        = f.email_field :creator_email, value: @ownership.creator&.email, required: true, prompt: "Creator's email", class: "form-control"
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :creator_email, label_text: "Creator", required: true)) do
+        = render(UI::Forms::Email::Component.new(form_builder: f, attribute: :creator_email, required: true, html_options: {value: @ownership.creator&.email}))
 
-      .form-group
-        = f.label :user_email
-        - user_email = @ownership.user.present? ? @ownership.user.email : ''
-        = f.email_field :user_email, value: user_email, required: true, prompt: "Owner's email", class: "form-control"
-      .form-group
-        = f.label :owner_email
-        = f.text_field :owner_email, required: true, class: "form-control"
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :user_email, required: true)) do
+        = render(UI::Forms::Email::Component.new(form_builder: f, attribute: :user_email, required: true, html_options: {value: @ownership.user&.email}))
 
-      .form-check.form-check-inline
-        = f.check_box :current, class: "form-check-input"
-        = f.label :current, class: "form-check-label"
-      .form-check.form-check-inline
-        = f.check_box :user_hidden, class: "form-check-input"
-        = f.label :user_hidden, class: "form-check-label"
-      .form-check.form-check-inline
-        = f.check_box :claimed, class: "form-check-input"
-        = f.label :claimed, class: "form-check-label"
-      .form-group.mt-4
-        = submit_tag "Update the ownership", class: "btn btn-success"
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :owner_email, required: true))
+
+      %div{class: "tw:mb-4 tw:flex tw:flex-wrap tw:gap-x-6"}
+        - %i[current user_hidden claimed].each do |attribute|
+          = render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute:, label: attribute.to_s.humanize))
+
+      %div{class: "tw:mt-4"}
+        = render(UI::Button::Component.new(text: "Update the ownership", color: :primary, type: "submit"))
   .col-md-6
     = render(UI::TableList::Component.new) do |list|
       - list.with_row(label: "Created At", value: render(UI::Time::Component.new(time: @bike.created_at)))

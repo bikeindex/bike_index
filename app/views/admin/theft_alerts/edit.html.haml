@@ -160,40 +160,23 @@
   -# - unless @theft_alert.pending?
   .row
     .col-sm-4
-      .form-group
-        = f.label :status
-        = f.select :status,
-          options_for_select(TheftAlert.statuses, @theft_alert.status),
-          {},
-          {disabled: true, class: "form-control"}
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :status)) do
+        = render(UI::Forms::Select::Component.new(form_builder: f, attribute: :status, option_tags: TheftAlert.statuses, html_options: {disabled: true}))
     .col-sm-4
-      .form-group
-        - plan_options = TheftAlertPlan.active.map { |e| [theft_alert_plan_title(e), e.id] }
-        = f.label :theft_alert_plan_id
-        = f.select :theft_alert_plan_id,
-          options_for_select(plan_options, @theft_alert.theft_alert_plan.id),
-          {},
-          {disabled: true, class: "form-control"}
+      - plan_options = TheftAlertPlan.active.map { |e| [theft_alert_plan_title(e), e.id] }
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :theft_alert_plan_id)) do
+        = render(UI::Forms::Select::Component.new(form_builder: f, attribute: :theft_alert_plan_id, option_tags: plan_options, html_options: {disabled: true}))
     .col-sm-4
-      .form-group
-        = f.label :ad_radius_miles
-        = f.number_field :ad_radius_miles, disabled: true, class: "form-control"
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :ad_radius_miles, kind: :number_field, html_options: {disabled: true}))
   .row
     .col-sm-6
-      .form-group
-        = f.label :start_at
-        = f.datetime_local_field :start_at, step: 60, disabled: true, class: "form-control"
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :start_at, kind: :datetime_local_field, html_options: {step: 60, disabled: true}))
     .col-sm-6
-      .form-group
-        = f.label :end_at
-        = f.datetime_local_field :end_at, step: 60, disabled: true, class: "form-control"
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :end_at, kind: :datetime_local_field, html_options: {step: 60, disabled: true}))
 
-  .form-group
-    = f.label :notes
-    = f.text_area :notes, rows: 3, class: "form-control"
+  = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :notes, kind: :text_area, html_options: {rows: 3}))
 
-  .form-group
-    = submit_tag "Save", class: "btn btn-info"
+  = render(UI::Button::Component.new(text: "Save", color: :primary, type: "submit"))
 
 - if display_dev_info?
   .mt-5.mb-1.only-dev-visible

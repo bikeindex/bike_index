@@ -16,4 +16,15 @@ RSpec.describe Admin::AdsController, type: :request do
       expect(response.body).to include(ad.title)
     end
   end
+
+  describe "update" do
+    let(:ad) { Ad.create(title: "Ad title", body: "Ad body", organization: FactoryBot.create(:organization)) }
+
+    it "makes it live" do
+      patch "#{base_url}/#{ad.id}", params: {ad: {live: "1"}}
+
+      expect(response).to redirect_to(admin_ad_url(ad))
+      expect(ad.reload.live).to be_truthy
+    end
+  end
 end
