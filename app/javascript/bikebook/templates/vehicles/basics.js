@@ -6,7 +6,6 @@ import { buttonClasses } from 'bikebook/templates/ui/button'
 import { collapse } from 'bikebook/templates/ui/collapse'
 import { radioButtonGroup } from 'bikebook/templates/ui/forms/radio_button_group'
 import { table } from 'bikebook/templates/ui/table'
-import { PINNED_ROW_HEADER } from 'bikebook/templates/vehicles/comparison_table'
 import { removeLink } from 'bikebook/templates/vehicles/remove_link'
 import { basicsOf, simpleFormat } from 'bikebook/templates/vehicles/model_viewer'
 import { colorway, colorways } from 'bikebook/templates/vehicles/model_years'
@@ -145,7 +144,7 @@ const compared = (vehicles, fields, bottoms, sectionClasses, corner) => html`<se
   classes: `${vehicles.length === 1 ? 'tw:w-full tw:md:w-[calc(50%+6.25rem)] tw:md:min-w-0!' : `tw:w-full ${MIN_WIDTH}`} tw:table-fixed ${vehicles.length > 3 ? `tw:mx-auto ${MAX_WIDTH}` : ''}`,
   records: fields,
   columns: [
-    { label: html`<span class="tw:sr-only">Field</span>${corner}`, rowHeader: true, classes: 'tw:w-32 tw:md:w-50 tw:px-2.5! tw:py-2! tw:align-top tw:font-bold', cellClass: () => PINNED_ROW_HEADER, cell: ({ label }) => label },
+    { label: html`<span class="tw:sr-only">Field</span>${corner}`, rowHeader: true, classes: 'tw:w-32 tw:md:w-50 tw:px-2.5! tw:py-2! tw:align-top tw:font-bold', cell: ({ label }) => label },
     ...vehicles.map((vehicle, index) => ({
       label: html`${vehicle.photo('tw:mb-2 tw:aspect-[4/3]')}${removeLink({
         label: `Remove ${[vehicle.manufacturer, vehicle.model].filter(present).join(' ')}`,

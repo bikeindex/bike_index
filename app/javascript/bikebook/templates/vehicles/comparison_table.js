@@ -9,10 +9,6 @@ import { cargoAt, isCargo, tireWidth, typeLabel, wheelsAt } from 'bikebook/templ
 import { vehicleTitle } from 'bikebook/templates/vehicles/vehicle_title'
 import { array, isNumber, join, present, slice, sum } from 'bikebook/templates/values'
 
-// A row header's cell classes that keep it in view as a phone scrolls the table across, at its scroller's edge rather than
-// inside its gutter. Its inherited background outranks a row's own, which takes `!`
-export const PINNED_ROW_HEADER = 'tw:max-md:sticky tw:max-md:-left-(--gutter) tw:max-md:z-10 tw:max-md:border-r tw:max-md:bg-inherit'
-
 const GEOMETRY = ['reach', 'stack', 'top_tube_effective', 'head_angle', 'seat_angle', 'chainstay', 'standover', 'wheelbase']
 const BETTER = 'tw:text-green-700 tw:dark:text-green-400'
 const WORSE = 'tw:text-red-700 tw:dark:text-red-400'
@@ -113,7 +109,7 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], marke
       return {
         label: row.label,
         // lit as the drawings' `highlight` figure is
-        className: row.key && row.key === highlight ? 'tw:bg-[#3397dc]/10!' : undefined,
+        className: row.key && row.key === highlight ? 'tw:bg-[#3397dc]/10' : undefined,
         cell: (index) => {
           if (!present(values[index])) return missing
           return row.parts
@@ -122,7 +118,7 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], marke
         }
       }
     })
-  const size = { label: 'Size', cell: sizeCell, className: 'tw:bg-blue-50! tw:dark:bg-blue-950!' }
+  const size = { label: 'Size', cell: sizeCell, className: 'tw:bg-blue-50 tw:dark:bg-blue-950' }
   const sizeRows = sizes.some(Boolean) ? [size] : []
   const cargos = new Map(named.map((vehicle, index) => [vehicle, cargoAt(presenter, vehicles[index].data, sizes[index])]))
   const cargoRows = vehicles.some(({ data }) => isCargo(data)) ? records([{ label: 'Cargo', read: (vehicle) => cargos.get(vehicle) }]) : []
@@ -136,7 +132,7 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], marke
     classes: 'tw:mx-auto tw:min-w-[min(100%,78rem)]!',
     records: rows,
     columns: [
-      { label: html`<span class="tw:sr-only">Spec</span>${corner}`, rowHeader: true, classes: 'tw:font-bold tw:max-md:min-w-28 tw:md:whitespace-nowrap tw:align-top', cellClass: (record) => `${PINNED_ROW_HEADER} ${record.className ?? ''}`, cell: (record) => record.label },
+      { label: html`<span class="tw:sr-only">Spec</span>${corner}`, rowHeader: true, classes: 'tw:font-bold tw:max-md:min-w-28 tw:md:whitespace-nowrap tw:align-top', cellClass: (record) => record.className, cell: (record) => record.label },
       ...named.map((vehicle, index) => {
         const border = seriesBorders(frames, index)
         return {
