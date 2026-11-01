@@ -4503,7 +4503,7 @@ CREATE TABLE public.users (
     feature_registration_show_legacy boolean DEFAULT false NOT NULL,
     passwordless_user boolean DEFAULT false NOT NULL,
     preferred_unit_system integer,
-    dark_mode boolean DEFAULT false NOT NULL
+    dark_mode integer DEFAULT 0 NOT NULL
 );
 
 

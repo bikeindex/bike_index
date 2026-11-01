@@ -29,6 +29,11 @@
   <div class="row">
     <div class="col-md-6">
       <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :phone)) %>
+
+      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :dark_mode, optional_badge: false)) do %>
+        <%= render(UI::Forms::Select::Component.new(form_builder: f, attribute: :dark_mode,
+          option_tags: User.dark_modes.keys.map { [it.humanize, it] })) %>
+      <% end %>
     </div>
 
     <div class="col-lg-3 col-6 tw:mb-4">
@@ -40,8 +45,6 @@
 
       <%= render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :can_send_many_marketplace_messages,
         label: "Can send many marketplace messages")) %>
-
-      <%= render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :dark_mode, label: "Dark mode")) %>
     </div>
 
     <div class="col-lg-3 col-6 tw:mb-4">

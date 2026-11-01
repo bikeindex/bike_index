@@ -125,14 +125,33 @@ RSpec.describe Admin::UsersController, type: :request do
       expect(response.body).to_not include("deleted_only")
     end
 
-    context "current_user with dark_mode" do
-      let(:current_user) { FactoryBot.create(:superuser, dark_mode: true) }
-      it "is dark only in admin" do
+    describe "dark_mode" do
+      let(:current_user) { FactoryBot.create(:superuser, dark_mode:) }
+      let(:body) { Nokogiri::HTML(response.body).at_css("body") }
+      let(:dark_mode) { :system }
+      it "follows the system preference" do
         get "#{base_url}/#{user_subject.id}/edit"
-        expect(Nokogiri::HTML(response.body).at_css("body")[:class]).to eq "dark"
+        expect(body[:class]).to be_blank
+        expect(body.to_html).to include("prefers-color-scheme: dark")
+      end
+      context "dark" do
+        let(:dark_mode) { :dark }
+        it "is dark only in admin" do
+          get "#{base_url}/#{user_subject.id}/edit"
+          expect(body[:class]).to eq "dark"
+          expect(body.to_html).to_not include("prefers-color-scheme: dark")
 
-        get "/"
-        expect(Nokogiri::HTML(response.body).at_css("body")[:class].to_s.split).to_not include("dark")
+          get "/"
+          expect(Nokogiri::HTML(response.body).at_css("body")[:class].to_s.split).to_not include("dark")
+        end
+      end
+      context "light" do
+        let(:dark_mode) { :light }
+        it "is light" do
+          get "#{base_url}/#{user_subject.id}/edit"
+          expect(body[:class]).to be_blank
+          expect(body.to_html).to_not include("prefers-color-scheme: dark")
+        end
       end
     end
 
@@ -204,7 +223,7 @@ RSpec.describe Admin::UsersController, type: :request do
             developer: "1",
             can_send_many_stolen_notifications: true,
             can_send_many_marketplace_messages: true,
-            dark_mode: true,
+            dark_mode: "dark",
             banned: true,
             phone: "9876543210",
             user_ban_attributes: {
@@ -219,7 +238,7 @@ RSpec.describe Admin::UsersController, type: :request do
         expect(user_subject.developer).to be_falsey
         expect(user_subject.can_send_many_stolen_notifications).to be_truthy
         expect(user_subject.can_send_many_marketplace_messages).to be_truthy
-        expect(user_subject.dark_mode).to be_truthy
+        expect(user_subject.dark_mode).to eq "dark"
         expect(user_subject.banned?).to be_truthy
         expect(user_subject.phone).to eq "9876543210"
         user_ban = user_subject.user_ban
