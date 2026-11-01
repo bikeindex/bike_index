@@ -9499,7 +9499,6 @@ body {
 }
 
 .admin-public-image .image-filename,
-.less-less-strong,
 .less-strong,
 .user-edit-link,
 table .less-strong-right {
@@ -9516,20 +9515,10 @@ table .less-strong-right {
 .admin-public-image .image-filename .form-control:focus,
 .admin-public-image .image-filename .form-control:hover,
 .admin-public-image .image-filename a:hover,
-.btn.less-less-strong:focus,
-.btn.less-less-strong:hover,
 .btn.user-edit-link:focus,
 .btn.user-edit-link:hover,
-.form-control.less-less-strong:focus,
-.form-control.less-less-strong:hover,
 .form-control.user-edit-link:focus,
 .form-control.user-edit-link:hover,
-.less-less-strong+a:hover,
-.less-less-strong .btn:focus,
-.less-less-strong .btn:hover,
-.less-less-strong .form-control:focus,
-.less-less-strong .form-control:hover,
-.less-less-strong a:hover,
 .less-strong+a:hover,
 .less-strong.btn:focus,
 .less-strong .btn:focus,
@@ -9557,10 +9546,6 @@ table .less-strong-right .form-control:focus,
 table .less-strong-right .form-control:hover,
 table .less-strong-right a:hover {
   opacity: 1
-}
-
-.less-less-strong {
-  opacity: .3
 }
 
 .gray-link,
@@ -9616,15 +9601,6 @@ label {
   white-space: nowrap
 }
 
-.fake-disabled,
-.fake-disabled.active,
-.fake-disabled:active,
-.fake-disabled:focus {
-  background-color: #e9ecef;
-  opacity: 1;
-  cursor: not-allowed
-}
-
 .uppercase {
   text-transform: uppercase !important
 }
@@ -9671,10 +9647,6 @@ label {
   width: 70%
 }
 
-.table-list.no-italic-definition tr td:first-child {
-  font-style: normal
-}
-
 .table-list .inline-images img {
   display: inline-block;
   width: 31%;
@@ -9705,13 +9677,6 @@ table thead.sortable th a.sortable-link span.sortable-direction {
 table thead.sortable th a.sortable-link.active {
   font-weight: strong;
   text-decoration: underline
-}
-
-table .table-cell-check,
-table .table-checkbox-select {
-  font-family: Courier;
-  text-align: center;
-  font-weight: 700
 }
 
 table code {
@@ -9895,10 +9860,6 @@ table .photo-cell img {
   overflow-x: scroll
 }
 
-.admin-navbar .navbar-brand img {
-  height: 35px
-}
-
 .admin-graphs-list a.active {
   font-weight: 700
 }
@@ -10001,14 +9962,6 @@ table .photo-cell img {
   background: #17a2b8
 }
 
-.ambassador-tasks-table td p {
-  display: inline
-}
-
-.admin-filter-menu {
-  float: right
-}
-
 .admin-public-image {
   font-size: 12px
 }
@@ -10035,22 +9988,6 @@ table .photo-cell img {
   background: none;
   padding: 0;
   border-radius: none
-}
-
-@media(min-width:768px) {
-  .admin-bike-summary .admin-image-thumb {
-    max-width: 220px
-  }
-}
-
-.admin-bike-summary .admin-image-thumb img {
-  max-width: 100%;
-  width: 180px;
-  height: auto
-}
-
-.admin-bike-summary .admin-image-thumb h3 {
-  text-align: center
 }
 
 .credibility-score {
@@ -10121,14 +10058,6 @@ table .photo-cell img {
   width: 15%
 }
 
-.admin-bike-table-serial-cell {
-  display: none
-}
-
-.show-admin-bike-table-serial-cell .admin-bike-table-serial-cell {
-  display: table-cell
-}
-
 #recovery-bike-image-text .using-bike-image {
   display: none
 }
@@ -10141,44 +10070,8 @@ table .photo-cell img {
   display: none
 }
 
-.pagination-flex {
-  display: flex;
-  flex-wrap: wrap;
-  opacity: .65
-}
-
-.pagination-flex.pagination-sm a.page-link {
-  padding: .25rem .5rem;
-  font-size: .875rem
-}
-
-.pagination-flex .pagination-number,
-.pagination-flex .per-page {
-  display: flex;
-  flex-basis: 0;
-  flex-grow: 1;
-  margin-top: .5rem
-}
-
-.pagination-flex .per-page {
-  min-width: 9rem;
-  max-width: 9rem
-}
-
-.pagination-flex #per-page-select-skiptotal,
-.pagination-flex .per-page-select {
-  width: 8rem;
-  display: inline-block
-}
-
 /* The rest of .only-dev-visible is in bike_index_components.css. This one stays: the file is
    unlayered, so .table-list's striping would otherwise beat it */
 .table-list tr.only-dev-visible {
   background: color-mix(in oklab, var(--tw-color-dev) 10%, transparent) !important
-}
-
-.link-emoji {
-  display: inline-block;
-  width: 1rem;
-  height: auto
 }
