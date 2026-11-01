@@ -4755,20 +4755,17 @@ a.badge-dark:focus {
   color: #0b2e13
 }
 
-.alert-info,
-.alert-notice {
+.alert-info {
   color: #0c5460;
   background-color: #d1ecf1;
   border-color: #bee5eb
 }
 
-.alert-info hr,
-.alert-notice hr {
+.alert-info hr {
   border-top-color: #abdde5
 }
 
-.alert-info .alert-link,
-.alert-notice .alert-link {
+.alert-info .alert-link {
   color: #062c33
 }
 
@@ -4786,20 +4783,17 @@ a.badge-dark:focus {
   color: #533f03
 }
 
-.alert-danger,
-.alert-error {
+.alert-danger {
   color: #721c24;
   background-color: #f8d7da;
   border-color: #f5c6cb
 }
 
-.alert-danger hr,
-.alert-error hr {
+.alert-danger hr {
   border-top-color: #f1b0b7
 }
 
-.alert-danger .alert-link,
-.alert-error .alert-link {
+.alert-danger .alert-link {
   color: #491217
 }
 
@@ -9465,18 +9459,6 @@ a.text-dark:hover {
   color: #e74c3c
 }
 
-.found-color {
-  color: #2ecc71
-}
-
-.impounded-color {
-  color: #e74c3c
-}
-
-.unregistered-color {
-  color: #f0ad4e
-}
-
 .custom-file-label {
   overflow: hidden
 }
@@ -9487,9 +9469,7 @@ body {
 }
 
 .admin-public-image .image-filename,
-.less-less-strong,
-.user-edit-link,
-table .less-strong-right {
+.less-less-strong {
   opacity: .65
 }
 
@@ -9505,34 +9485,14 @@ table .less-strong-right {
 .admin-public-image .image-filename a:hover,
 .btn.less-less-strong:focus,
 .btn.less-less-strong:hover,
-.btn.user-edit-link:focus,
-.btn.user-edit-link:hover,
 .form-control.less-less-strong:focus,
 .form-control.less-less-strong:hover,
-.form-control.user-edit-link:focus,
-.form-control.user-edit-link:hover,
 .less-less-strong+a:hover,
 .less-less-strong .btn:focus,
 .less-less-strong .btn:hover,
 .less-less-strong .form-control:focus,
 .less-less-strong .form-control:hover,
-.less-less-strong a:hover,
-.user-edit-link+a:hover,
-.user-edit-link .btn:focus,
-.user-edit-link .btn:hover,
-.user-edit-link .form-control:focus,
-.user-edit-link .form-control:hover,
-.user-edit-link a:hover,
-table .btn.less-strong-right:focus,
-table .btn.less-strong-right:hover,
-table .form-control.less-strong-right:focus,
-table .form-control.less-strong-right:hover,
-table .less-strong-right+a:hover,
-table .less-strong-right .btn:focus,
-table .less-strong-right .btn:hover,
-table .less-strong-right .form-control:focus,
-table .less-strong-right .form-control:hover,
-table .less-strong-right a:hover {
+.less-less-strong a:hover {
   opacity: 1
 }
 
@@ -9564,22 +9524,6 @@ label {
   font-style: italic
 }
 
-@media(max-width:767.98px) {
-  .hidden-sm-down {
-    display: none
-  }
-}
-
-@media(max-width:575.98px) {
-  .hidden-xs-down {
-    display: none
-  }
-}
-
-.convertedTime {
-  white-space: nowrap
-}
-
 .fake-disabled,
 .fake-disabled.active,
 .fake-disabled:active,
@@ -9609,22 +9553,8 @@ label {
   line-height: 1.25
 }
 
-.table-list tr td:first-child.full-width-data {
-  font-size: 100%;
-  font-style: normal;
-  text-align: left
-}
-
 .table-list tr td:last-child {
   width: 85%
-}
-
-.table-list tr.active-row {
-  background-color: #ebf5fb !important
-}
-
-.table-list tr.active-row a {
-  text-decoration: underline
 }
 
 .table-list pre {
@@ -9639,15 +9569,7 @@ label {
   font-style: normal
 }
 
-.table-list .inline-images img {
-  display: inline-block;
-  width: 31%;
-  max-width: 150px;
-  margin-right: 3%
-}
-
-table .table-cell-check,
-table .table-checkbox-select {
+table .table-cell-check {
   font-family: Courier;
   text-align: center;
   font-weight: 700
@@ -9655,51 +9577,6 @@ table .table-checkbox-select {
 
 table code {
   word-break: break-all
-}
-
-table .less-strong-hold {
-  position: relative;
-  min-height: 1.25em
-}
-
-table .less-strong-right {
-  position: absolute;
-  right: -.3em;
-  line-height: 1;
-  bottom: -.2em;
-  font-size: .8em
-}
-
-table .photo-cell {
-  text-align: center
-}
-
-table .photo-cell img {
-  max-width: 150px
-}
-
-.primary-alert-block {
-  position: fixed;
-  z-index: 1030;
-  padding-right: .9375rem;
-  padding-left: .9375rem
-}
-
-@media(min-width:992px) {
-  .primary-alert-block {
-    max-width: 600px;
-    width: 66.66667%;
-    top: 75px;
-    right: 3%
-  }
-}
-
-@media(max-width:991.98px) {
-  .primary-alert-block {
-    width: 83.33333%;
-    top: 90px;
-    right: 0
-  }
 }
 
 .alert p:last-of-type {
@@ -9829,77 +9706,8 @@ table .photo-cell img {
   left: 0
 }
 
-.tsv_table {
-  max-height: 270px;
-  overflow-x: scroll
-}
-
 .admin-navbar .navbar-brand img {
   height: 35px
-}
-
-.admin-graphs-list a.active {
-  font-weight: 700
-}
-
-.variable-admin-graphs-form .control-group {
-  width: 220px;
-  float: left;
-  margin-right: 1rem
-}
-
-.paginate-container {
-  display: flex;
-  flex: wrap 1;
-  justify-content: center
-}
-
-.paginate-container .pagination {
-  flex: 0 1 auto;
-  display: inline-block;
-  padding-left: 0;
-  margin-top: 10px;
-  margin-bottom: 10px
-}
-
-.paginate-container ul {
-  list-item-type: none
-}
-
-.paginate-container li {
-  display: inline
-}
-
-.user-icon {
-  display: inline-block;
-  color: #fff;
-  font-size: 75%;
-  font-weight: 800;
-  padding: .15em .25em;
-  border: 1px solid #ccc;
-  line-height: 1em;
-  border-radius: .5em;
-  cursor: default
-}
-
-.user-icon.donor-icon {
-  background: #2ecc71
-}
-
-.user-icon.org-member-icon {
-  background: #2980b9
-}
-
-.user-icon.superuser-icon {
-  background: #563d7c
-}
-
-.user-icon.recovery-icon {
-  background: #ffc107
-}
-
-.user-icon.theft-alert-icon {
-  background: #17a2b8
 }
 
 .ambassador-tasks-table td p {
@@ -9924,18 +9732,6 @@ table .photo-cell img {
   max-width: 100%;
   height: auto;
   margin: 0 auto
-}
-
-.user-edit-link {
-  font-size: 70%;
-  font-style: italic
-}
-
-.bike-serial {
-  color: #212529;
-  background: none;
-  padding: 0;
-  border-radius: none
 }
 
 @media(min-width:768px) {
@@ -9975,10 +9771,6 @@ table .photo-cell img {
 .credibility-score .main-crediblity-score-box .credibility-title {
   display: block;
   color: #fff
-}
-
-.credibility-score .main-crediblity-score-box .credibility-titlea {
-  text-decoration: underline
 }
 
 .credibility-score .main-crediblity-score-box .score-number {
@@ -10028,48 +9820,6 @@ table .photo-cell img {
 
 .show-admin-bike-table-serial-cell .admin-bike-table-serial-cell {
   display: table-cell
-}
-
-#recovery-bike-image-text .using-bike-image {
-  display: none
-}
-
-#recovery-bike-image-text.bike-image-added .using-bike-image {
-  display: inline-block
-}
-
-#recovery-bike-image-text.bike-image-added .not-using-bike-image {
-  display: none
-}
-
-.pagination-flex {
-  display: flex;
-  flex-wrap: wrap;
-  opacity: .65
-}
-
-.pagination-flex.pagination-sm a.page-link {
-  padding: .25rem .5rem;
-  font-size: .875rem
-}
-
-.pagination-flex .pagination-number,
-.pagination-flex .per-page {
-  display: flex;
-  flex-basis: 0;
-  flex-grow: 1;
-  margin-top: .5rem
-}
-
-.pagination-flex .per-page {
-  min-width: 9rem;
-  max-width: 9rem
-}
-
-.pagination-flex #per-page-select-skiptotal,
-.pagination-flex .per-page-select {
-  width: 8rem;
-  display: inline-block
 }
 
 .link-emoji {
