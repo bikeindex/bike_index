@@ -2,6 +2,13 @@
 
 module BikeServices
   class Creator
+    REDLOCK_PREFIX = "BikeCreatorDuplicateLock-#{Rails.env.slice(0, 3)}"
+    # Expires the lock if a process dies mid-registration
+    LOCK_DURATION_MS = 30.seconds.in_milliseconds.to_i
+    # Waits up to about 10 seconds for a concurrent registration of the same bike
+    LOCK_RETRY_COUNT = 50
+    LOCK_RETRY_DELAY_MS = 200
+
     PERMITTED_ATTRS = %i[
       abandoned
       approved_stolen
@@ -88,23 +95,31 @@ module BikeServices
       ]).freeze
     end
 
+    class << self
+      # Hashed, so the owner's email and serial aren't stored in Redis
+      def duplicate_lock_key(b_param)
+        return unless b_param&.no_duplicate?
+
+        serial = SerialNormalizer.no_space(SerialNormalizer.normalized_and_corrected(b_param.bike["serial_number"]))
+        email = EmailNormalizer.normalize(b_param.owner_email)
+        return if serial.blank? || email.blank?
+
+        "#{REDLOCK_PREFIX}-#{Digest::SHA256.hexdigest("#{email} #{serial}")}"
+      end
+
+      def new_lock_manager
+        Redlock::Client.new([Bikeindex::Application.config.redis_default_url],
+          retry_count: LOCK_RETRY_COUNT, retry_delay: LOCK_RETRY_DELAY_MS)
+      end
+    end
+
     def initialize(ip_address: nil)
       @ip_address = ip_address
     end
 
     def create_bike(b_param)
       add_bike_book_data(b_param)
-      bike = BikeServices::Builder.find_or_build(b_param)
-
-      # Skip processing if this bike is already created
-      return bike if bike.id.present? && bike.id == b_param.created_bike_id
-
-      # There could be errors during the build - or during the save
-      bike = save_bike(b_param, bike) if bike.errors.none?
-      if bike.errors.any?
-        b_param&.update(bike_errors: bike.cleaned_error_messages)
-      end
-      bike
+      with_duplicate_lock(b_param) { find_or_create_bike(b_param) }
     end
 
     # Called from ImageAssociatorJob, so can't be private
@@ -125,6 +140,39 @@ module BikeServices
 
     # Previously all of this stuff was public.
     # In an effort to refactor and simplify, anything not accessed outside of this class was explicitly made private (PR#1478)
+
+    # Two registrations of one bike, seconds apart, can't see each other's unsaved bike, so no_duplicate misses.
+    # The second waits for the first. If the lock isn't acquired, it registers anyway rather than failing
+    def with_duplicate_lock(b_param)
+      key = self.class.duplicate_lock_key(b_param)
+      return yield if key.blank?
+
+      lock_manager = self.class.new_lock_manager
+      redlock = begin
+        lock_manager.lock(key, LOCK_DURATION_MS)
+      rescue Redlock::LockAcquisitionError
+        false
+      end
+      begin
+        yield
+      ensure
+        lock_manager.unlock(redlock) if redlock
+      end
+    end
+
+    def find_or_create_bike(b_param)
+      bike = BikeServices::Builder.find_or_build(b_param)
+
+      # Skip processing if this bike is already created
+      return bike if bike.id.present? && bike.id == b_param.created_bike_id
+
+      # There could be errors during the build - or during the save
+      bike = save_bike(b_param, bike) if bike.errors.none?
+      if bike.errors.any?
+        b_param&.update(bike_errors: bike.cleaned_error_messages)
+      end
+      bike
+    end
 
     def add_bike_book_data(b_param = nil)
       return nil unless b_param&.bike.present? && b_param.manufacturer_id.present?

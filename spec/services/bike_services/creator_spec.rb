@@ -575,6 +575,60 @@ RSpec.describe BikeServices::Creator do
           expect(b_param.created_bike).to have_attributes(serial_number: "unknown", serial_normalized: nil)
         end
       end
+      describe "duplicate lock" do
+        let(:existing_bike) { nil }
+        let(:user) { FactoryBot.create(:user) }
+        let(:lock_key) { described_class.duplicate_lock_key(b_param) }
+        let(:lock_manager) { described_class.new_lock_manager }
+
+        it "keys on the normalized serial and email, without storing them" do
+          expect(lock_key).to start_with(described_class::REDLOCK_PREFIX)
+          other_b_param = BParam.new(params: {bike: default_params.merge(serial_number: "Some-Serial Number", owner_email: email)})
+          expect(described_class.duplicate_lock_key(other_b_param)).to eq lock_key
+          expect(lock_key).not_to match(/something|serial/i)
+        end
+
+        context "no_duplicate false" do
+          let(:bike_params) { default_params.merge(no_duplicate: false) }
+          it "has no key" do
+            expect(lock_key).to be_nil
+          end
+        end
+
+        context "unknown serial" do
+          let(:bike_params) { default_params.merge(serial_number: "unknown") }
+          it "has no key" do
+            expect(lock_key).to be_nil
+          end
+        end
+
+        it "holds the lock while registering, and releases it" do
+          expect(BikeServices::Builder).to receive(:find_or_build).and_wrap_original do |method, *args|
+            expect(lock_manager.locked?(lock_key)).to be_truthy
+            method.call(*args)
+          end
+          bike = instance.create_bike(b_param)
+          expect(bike.id).to be_present
+          expect(lock_manager.locked?(lock_key)).to be_falsey
+        end
+
+        it "waits for a concurrent registration, then finds its bike" do
+          redlock = lock_manager.lock(lock_key, 5_000)
+          waiting = Thread.new { instance.create_bike(b_param) }
+          sleep 0.5
+          expect(waiting).to be_alive
+          # The concurrent registration saves its bike, then releases the lock
+          first_bike = FactoryBot.create(:bike, :with_ownership, serial_number: serial, owner_email: email, manufacturer:)
+          lock_manager.unlock(redlock)
+          expect(waiting.value&.id).to eq first_bike.id
+          expect(Bike.unscoped.pluck(:id)).to eq([first_bike.id])
+        end
+
+        it "registers anyway when Redis errors" do
+          allow_any_instance_of(Redlock::Client).to receive(:lock).and_raise(Redlock::LockAcquisitionError.new("error", []))
+          expect(instance.create_bike(b_param).id).to be_present
+        end
+      end
       context "user_hidden" do
         it "finds duplicate" do
           existing_bike.update(marked_user_hidden: true)
