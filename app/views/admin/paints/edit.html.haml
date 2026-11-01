@@ -36,23 +36,13 @@
 
   .row
     .col-lg-3.col-md-6.col-sm-12
-      .form-group
-        = f.label :name
-        = f.text_field :name, disabled: true, class: "form-control"
-    .col-lg-3.col-md-6.col-sm-12
-      .form-group
-        = f.label :color_id
-        = collection_select(:paint, :color_id, Color.all, :id, :name, {prompt: "Choose color"}, class: "form-control")
-    .col-lg-3.col-md-6.col-sm-12
-      .form-group
-        = f.label :secondary_color_id
-        = collection_select(:paint, :secondary_color_id, Color.all, :id, :name, {prompt: "Choose color"}, class: "form-control")
-    .col-lg-3.col-md-6.col-sm-12
-      .form-group
-        = f.label :tertiary_color_id, class: "control-label"
-        = collection_select(:paint, :tertiary_color_id, Color.all, :id, :name, {prompt: "Choose color"}, class: "form-control")
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :name, html_options: {disabled: true}))
+    - %i[color_id secondary_color_id tertiary_color_id].each do |attribute|
+      .col-lg-3.col-md-6.col-sm-12
+        = render(UI::Forms::Group::Component.new(form_builder: f, attribute:)) do
+          = render(UI::Forms::Select::Component.new(form_builder: f, attribute:, option_tags: Color.pluck(:name, :id), options: {prompt: "Choose color"}))
 
-  = submit_tag "Update the paint", class: "btn btn-success"
+  = render(UI::Button::Component.new(text: "Update the paint", color: :primary, type: "submit"))
   .alert.alert-info.mt-2
     %p
       %strong You can't edit the name.

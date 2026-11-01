@@ -58,29 +58,17 @@
       = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :organization_id, label_text: BikeStickerBatch.human_attribute_name(:organization_id), required: true)) do
         = render UI::Forms::Combobox::Component.new(name: :organization_id, options: @organizations.pluck(:name, :id), include_blank: true, html_options: {form: f, placeholder: "Choose organization", required: true})
     .col-md-6.col-lg-9
-      .form-group
-        = f.label :notes, "Notes"
-        = f.text_field :notes, class: "form-control"
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :notes))
   .row.mt-2
     .col-md-4.col-6
-      .form-group
-        = f.label :prefix, "Code letter prefix"
-        = f.text_field :prefix, required: true, class: "form-control"
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :prefix, label_text: "Code letter prefix", required: true))
     .col-md-4.col-6
-      .form-group
-        = f.label :initial_code_integer, "Initial sticker number"
-        = f.number_field :initial_code_integer, required: true, class: "form-control"
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :initial_code_integer, kind: :number_field, label_text: "Initial sticker number", required: true))
     .col-md-4.col-6
-      .form-group
-        = f.label :code_number_length do
-          Code Number Length
-          %small.less-strong
-            Leave blank unless you want extra zeros
-        = f.number_field :code_number_length, class: "form-control"
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :code_number_length, kind: :number_field, label_text: "Code Number Length")) do |group|
+        - group.with_label_note { "Leave blank unless you want extra zeros" }
     .col-md-4.col-6
-      .form-group
-        = f.label :stickers_to_create_count, "Number of stickers to create"
-        = f.number_field :stickers_to_create_count, required: true, class: "form-control"
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :stickers_to_create_count, kind: :number_field, label_text: "Number of stickers to create", required: true))
   .row.mt-2
     .col-auto
-      = f.submit "Create", class: "btn btn-success"
+      = render(UI::Button::Component.new(text: "Create", color: :primary, type: "submit"))

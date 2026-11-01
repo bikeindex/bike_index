@@ -12,11 +12,10 @@
   - else
     %p
       No picture!
-    .form-group
-      = f.label :image
-      = f.file_field :image, class: "btn btn-light", accept: ImageUploader.permitted_extensions.join(",")
+    = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :image)) do
+      = render(UI::Forms::Files::Upload::Component.new(form_builder: f, attribute: :image, accept: ImageUploader.permitted_extensions.join(",")))
       = f.hidden_field :image_cache
-    .form-group
-      = f.label :live, class: "mr-2"
-      = f.check_box :live
-  = f.submit "Update", class: 'btn btn-success float-right'
+    %div{class: "tw:mb-4"}
+      = render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :live, label: "Live"))
+  %div{class: "tw:flex tw:justify-end"}
+    = render(UI::Button::Component.new(text: "Update", color: :primary, type: "submit"))

@@ -70,25 +70,24 @@
 <% end %>
 
 <% admin_search_form = capture do %>
-  <%= form_tag admin_recoveries_path, method: :get, class: "form-inline mb-4 mt-4" do %>
+  <%= form_with(url: admin_recoveries_path, method: :get, html: {class: "twsearchrow"}) do |form| %>
     <%= hidden_field_tag :search_recovery_display_status, @recovery_display_status %>
     <%= hidden_field_tag :search_index_helped_recovery, params[:search_index_helped_recovery] %>
     <%= hidden_field_tag :search_shareable, params[:search_shareable] %>
     <%= hidden_field_tag :search_displayed, params[:search_displayed] %>
     <%= render partial: "/shared/hidden_search_fields" %>
 
-    <div class="form-group ml-auto mr-1 mb-2">
-      <em class="small less-strong mr-1 d-md-inline d-none">within</em>
-      <%= number_field_tag :search_distance, @distance, class: "form-control", style: "width: 5rem;" %>
+    <em class="small less-strong d-md-inline d-none">within</em>
 
-      <em class="small less-strong ml-1 mr-1 d-md-inline d-none"> miles of </em>
-    </div>
+    <%= render(UI::Forms::Input::Component.new(form_builder: form, attribute: :search_distance, kind: :number_field,
+      html_options: {value: @distance, class: "tw:w-20"})) %>
 
-    <div class="form-group mr-2 mb-2">
-      <%= text_field_tag :search_location, params[:search_location], placeholder: "anywhere", class: "form-control" %>
-    </div>
+    <em class="small less-strong d-md-inline d-none">miles of</em>
 
-    <%= submit_tag "Search", name: "search", class: "btn btn-primary mb-2" %>
+    <%= render(UI::Forms::Input::Component.new(form_builder: form, attribute: :search_location,
+      html_options: {value: params[:search_location], placeholder: "anywhere", class: "tw:w-full tw:sm:w-64"})) %>
+
+    <%= render(UI::Button::Component.new(text: "Search", color: :primary, type: "submit", name: "search")) %>
   <% end %>
 <% end %>
 

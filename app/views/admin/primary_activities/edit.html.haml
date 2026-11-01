@@ -59,10 +59,7 @@
 
 .row
   .col-sm-6
-    = form_for [:admin, @primary_activity],
-      html: { class: "form" } do |f|
-      .form-group
-        = f.label :priority, class: "form-label"
-        = f.number_field :priority, class: "form-control"
-      .mt-4
-        = submit_tag "Save", class: "btn btn-success btn-lg"
+    = form_for [:admin, @primary_activity] do |f|
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :priority, kind: :number_field))
+      %div{class: "tw:mt-4"}
+        = render(UI::Button::Component.new(text: "Save", color: :primary, size: :lg, type: "submit"))

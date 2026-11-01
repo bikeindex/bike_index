@@ -98,24 +98,21 @@
     .row
       .col-lg-4
         .row
-          .form-group.col-sm-6
-            = f.label :creator_email
-            = f.email_field :creator_email, value: current_user.email, class: "form-control"
-          .form-group.col-md-6
-            = f.label :user_email
-            = f.email_field :user_email, value: @bike.owner_email, class: "form-control"
-          .form-group.col-12
-            = f.label :bike, "Your stolen bike"
-            = f.text_field :title, value: "Your stolen #{@bike.title_string}", class: "form-control"
+          .col-sm-6
+            = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :creator_email)) do
+              = render(UI::Forms::Email::Component.new(form_builder: f, attribute: :creator_email, html_options: {value: current_user.email}))
+          .col-md-6
+            = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :user_email)) do
+              = render(UI::Forms::Email::Component.new(form_builder: f, attribute: :user_email, html_options: {value: @bike.owner_email}))
+          .col-12
+            = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :title, label_text: "Your stolen bike", html_options: {value: "Your stolen #{@bike.title_string}"}))
             = f.hidden_field :kind, value: 'stolen_contact'
             = f.hidden_field :creator_id, value: current_user.id
             = f.hidden_field :bike_id, value: @bike.id
       .col-lg-8
-        .form-group
-          = f.label :notification_body
-          = f.text_area :body, placeholder: "You can write HTML in here. There will be a link to the #{@bike.type} included automatically.", rows: 7, class: "form-control"
+        = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :body, kind: :text_area, label_text: "Notification body", html_options: {placeholder: "You can write HTML in here. There will be a link to the #{@bike.type} included automatically.", rows: 7}))
       .col-auto.mt-auto
-        = f.submit 'Send it!', class: 'btn btn-success mb-4'
+        = render(UI::Button::Component.new(text: "Send it!", color: :primary, type: "submit", html_class: "tw:mb-4"))
 
   = render(UI::ButtonLink::Component.new(text: "Delete", href: admin_bike_url(@bike), method: :delete, color: :error, confirm: "Are you sure?", html_class: "mb-4"))
 

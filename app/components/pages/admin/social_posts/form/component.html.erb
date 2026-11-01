@@ -4,12 +4,11 @@
   <%= form_for [:admin, @social_post] do |f| %>
     <div class="row">
       <div class="col-md-6 offset-md-3">
-        <div class="form-group mb-4">
-          <%= f.label :kind, "Kind" %>
-
-          <%= f.select :kind, kind_options, {prompt: "Choose kind", required: true},
-                class: "form-control", data: {"admin--social-post-form-target": "kind", action: "change->admin--social-post-form#kindChanged"} %>
-        </div>
+        <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :kind, required: true)) do %>
+          <%= render(UI::Forms::Select::Component.new(form_builder: f, attribute: :kind, option_tags: kind_options,
+            options: {prompt: "Choose kind"}, required: true,
+            html_options: {data: {"admin--social-post-form-target": "kind", action: "change->admin--social-post-form#kindChanged"}})) %>
+        <% end %>
       </div>
     </div>
 
@@ -21,30 +20,26 @@
       <div class="card-body">
         <div class="row">
           <div class="col-md-6">
-            <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :social_account_id, label_text: "Account", wrapper_class: "form-group")) do |group| %>
+            <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :social_account_id, label_text: "Account")) do |group| %>
               <% group.with_label_note { "will send the original post" } %>
 
               <%= render UI::Forms::Combobox::Component.new(name: :social_account_id, options: account_options, include_blank: true, html_options: {form: f, placeholder: "Choose  "}) %>
             <% end %>
 
-            <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :image, label_text: "Post photo", wrapper_class: "form-group")) do %>
+            <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :image, label_text: "Post photo")) do %>
               <%= render(UI::Forms::Files::Upload::Component.new(form_builder: f, attribute: :image, accept: ImageUploader.permitted_extensions)) %>
             <% end %>
           </div>
 
           <div class="col-md-6">
             <div
-              class="form-group"
               data-controller="admin--character-count"
               data-admin--character-count-max-value="<%= Integrations::SocialPoster::TWEET_LENGTH %>"
             >
-              <%= f.label :body do %>
-                Post
-                <small class="less-strong">Make sure the text is under the character count</small>
+              <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :body, kind: :text_area, label_text: "Post",
+                html_options: {rows: 4, data: {"admin--character-count-target": "field", action: "input->admin--character-count#update"}})) do |group| %>
+                <% group.with_label_note { "Make sure the text is under the character count" } %>
               <% end %>
-
-              <%= f.text_area :body, rows: 4, class: "form-control",
-                    data: {"admin--character-count-target": "field", action: "input->admin--character-count#update"} %>
 
               <p
                 class="text-info text-right"
@@ -56,9 +51,7 @@
           </div>
         </div>
 
-        <div class="form-group">
-          <%= f.submit "Send post!", class: "btn btn-success" %>
-        </div>
+        <%= render(UI::Button::Component.new(text: "Send post!", color: :primary, type: "submit")) %>
 
         <div class="mt-4">
           <strong>Repost:</strong>
@@ -70,17 +63,11 @@
                 data: {action: "admin--social-post-form#uncheckAll"})) %>
         </div>
 
-        <div class="row mt-2">
+        <div class="tw:mt-2 tw:mb-4 tw:flex tw:flex-wrap tw:gap-x-4">
           <% SocialAccount.active.each do |social_account| %>
-            <div class="form-check">
-              <label>
-                <%= check_box_tag "social_account_ids[]", social_account.id, true, multiple: true,
-                      id: "social_account_ids_#{social_account.id}",
-                      data: {"admin--social-post-form-target": "accountCheckbox"} %>
-
-                <%= social_account.screen_name %>
-              </label>
-            </div>
+            <%= render(UI::Forms::Checkbox::Component.new(name: "social_account_ids[]", value: social_account.id, checked: true,
+              label: social_account.screen_name,
+              html_options: {id: "social_account_ids_#{social_account.id}", data: {"admin--social-post-form-target": "accountCheckbox"}})) %>
           <% end %>
         </div>
 
@@ -112,13 +99,10 @@
           - 874644243737751553
         </p>
 
-        <div class="form-group">
-          <%= f.label :platform_id, "Platform id" %>
-          <%= f.text_field :platform_id, class: "form-control" %>
-        </div>
+        <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :platform_id, label_text: "Platform id")) %>
 
         <div class="mt-4">
-          <%= f.submit "Create post!", class: "btn btn-success" %>
+          <%= render(UI::Button::Component.new(text: "Create post!", color: :primary, type: "submit")) %>
         </div>
       </div>
     </div>

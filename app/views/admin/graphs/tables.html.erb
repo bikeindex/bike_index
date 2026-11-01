@@ -5,13 +5,15 @@
 <% end %>
 
 <div class="mb-4">
-  <%= form_tag tables_admin_graphs_path, method: :get do %>
-    <div class="form-inline">
-      <%= text_field_tag :location, params[:location], placeholder: "Location", class: "form-control mr-2" %>
-      <%= text_field_tag :location_radius, params[:location_radius], placeholder: "Proximity in miles", class: "form-control mr-2" %>
-      <%= hidden_field_tag :tables, true %>
-      <%= submit_tag "Load", name: "search", class: "btn btn-primary" %>
-    </div>
+  <%= form_with(url: tables_admin_graphs_path, method: :get, html: {class: "twsearchrow"}) do |f| %>
+    <%= render UI::Forms::Input::Component.new(form_builder: f, attribute: :location,
+      html_options: {value: params[:location], placeholder: "Location", class: "tw:w-full tw:sm:w-64"}) %>
+
+    <%= render UI::Forms::Input::Component.new(form_builder: f, attribute: :location_radius,
+      html_options: {value: params[:location_radius], placeholder: "Proximity in miles", class: "tw:w-full tw:sm:w-48"}) %>
+
+    <%= hidden_field_tag :tables, true %>
+    <%= render UI::Button::Component.new(text: "Load", color: :primary, type: "submit", name: "search") %>
   <% end %>
 </div>
 
