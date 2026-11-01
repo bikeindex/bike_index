@@ -1,4 +1,4 @@
-<%= render(Atoms::Admin::Headers::Section::Component.new(title: "Bikes", count: bikes_count, href: index_path,
+<%= render(Pages::Admin::Headers::Section::Component.new(title: "Bikes", count: bikes_count, href: index_path,
       parenthetical:)) do %>
   <% if deleted_bikes_count.positive? %>
     <small class="tw:text-sm!">

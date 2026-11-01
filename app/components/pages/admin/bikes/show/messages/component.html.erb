@@ -1,4 +1,4 @@
-<%= render(Atoms::Admin::Headers::Section::Component.new(title: "Notifications", count: notifications.size,
+<%= render(Pages::Admin::Headers::Section::Component.new(title: "Notifications", count: notifications.size,
       href: admin_notifications_path(search_bike_id: @bike.id))) %>
 
 <% if notifications.any? %>
@@ -6,33 +6,33 @@
         locals: {notifications:, skip_bike: true, show_message_preview: true} %>
 <% end %>
 
-<%= render(Atoms::Admin::Headers::Section::Component.new(title: "Organization messages", count: organization_messages.size,
+<%= render(Pages::Admin::Headers::Section::Component.new(title: "Organization messages", count: organization_messages.size,
       href: admin_organization_messages_path(search_bike_id: @bike.id))) %>
 
 <% if organization_messages.any? %>
   <%= render partial: "/admin/organization_messages/table", locals: {collection: organization_messages, skip_bike: true} %>
 <% end %>
 
-<%= render(Atoms::Admin::Headers::Section::Component.new(title: "Feedbacks", count: feedbacks.size,
+<%= render(Pages::Admin::Headers::Section::Component.new(title: "Feedbacks", count: feedbacks.size,
       href: admin_feedbacks_path(search_bike_id: @bike.id))) %>
 
 <% if feedbacks.any? %>
   <%= render partial: "/admin/feedbacks/table", locals: {feedbacks:, skip_bike: true} %>
 <% end %>
 
-<%= render(Atoms::Admin::Headers::Section::Component.new(title: "User alerts", count: user_alerts.size,
+<%= render(Pages::Admin::Headers::Section::Component.new(title: "User alerts", count: user_alerts.size,
       href: admin_user_alerts_path(search_bike_id: @bike.id))) %>
 
 <% if user_alerts.any? %>
   <%= render partial: "/admin/user_alerts/table", locals: {user_alerts:} %>
 <% end %>
 
-<%= render(Atoms::Admin::Headers::Section::Component.new(title: "Parking notifications", count: parking_notifications.size,
+<%= render(Pages::Admin::Headers::Section::Component.new(title: "Parking notifications", count: parking_notifications.size,
       href: admin_parking_notifications_path(search_bike_id: @bike.id))) %>
 
 <% if parking_notifications.any? %>
   <%= render partial: "/admin/parking_notifications/table", locals: {parking_notifications:} %>
 <% end %>
 
-<%= render(Atoms::Admin::Headers::Section::Component.new(title: "Graduated notifications", count: graduated_notifications_count,
+<%= render(Pages::Admin::Headers::Section::Component.new(title: "Graduated notifications", count: graduated_notifications_count,
       href: admin_graduated_notifications_path(search_bike_id: @bike.id))) %>

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Atoms
+module Pages
   module Admin
     module Headers
       module Section

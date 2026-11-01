@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Atoms::Admin::Headers::Section::Component, type: :component do
+RSpec.describe Pages::Admin::Headers::Section::Component, type: :component do
   let(:options) { {title: "Bikes", count: 3, href: "/admin/bikes"} }
   let(:component) { render_inline(described_class.new(**options)) }
 
