@@ -102,9 +102,9 @@
             <%= payment_count[:name].pluralize %>
 
             <% if params[:search_kind].present? %>
-              <%= link_to "view all kinds", admin_payments_path(sortable_search_params.merge(search_kind: "")), class: "small em" %>
+              <%= link_to "view all kinds", admin_payments_path(sortable_search_params.merge(search_kind: "")), class: "tw:text-sm tw:italic" %>
             <% else %>
-              <%= link_to "view", admin_payments_path(sortable_search_params.merge(search_kind: payment_count[:kind])), class: "small em" %>
+              <%= link_to "view", admin_payments_path(sortable_search_params.merge(search_kind: payment_count[:kind])), class: "tw:text-sm tw:italic" %>
             <% end %>
           <% end %>
 
@@ -117,7 +117,7 @@
 
             <% if payment_count[:name] == "payment" && payment_count[:count] > 0 %>
               <br>
-              <small class="text-warning">
+              <small class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>">
                 There shouldn't be payments without invoices
               </small>
             <% end %>

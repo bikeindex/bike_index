@@ -2,12 +2,11 @@
   Edit #{@organization_feature.name}
 
 - if @organization_feature.locked?
-  .card.bg-danger{ style: "margin: 40px 0;" }
-    .card-body
-      %p
-        This Feature is used to enable and disable functionality for organizations in Bike Index
-      %p
-        If you need to update it, talk to Seth
+  = render(UI::Alerts::Base::Component.new(kind: :error, margin_classes: "tw:my-10")) do
+    %p
+      This Feature is used to enable and disable functionality for organizations in Bike Index
+    %p
+      If you need to update it, talk to Seth
 = render partial: "form"
 
 %h3

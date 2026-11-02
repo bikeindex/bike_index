@@ -20,11 +20,11 @@
 
     <% list.with_row(label: "Condition", value: @marketplace_listing.condition_humanized) %>
 
-    <% list.with_row(label: "Created", class: "small", value: render(UI::Time::Component.new(time: @marketplace_listing.created_at, format: :localize_time_precise))) %>
+    <% list.with_row(label: "Created", class: "tw:text-sm", value: render(UI::Time::Component.new(time: @marketplace_listing.created_at, format: :localize_time_precise))) %>
 
-    <% list.with_row(label: "Published", class: "small", value: render(UI::Time::Component.new(time: @marketplace_listing.published_at, format: :localize_time_precise)), if: @marketplace_listing.published_at.present?) %>
+    <% list.with_row(label: "Published", class: "tw:text-sm", value: render(UI::Time::Component.new(time: @marketplace_listing.published_at, format: :localize_time_precise)), if: @marketplace_listing.published_at.present?) %>
 
-    <% list.with_row(label: "Ended", class: "small", value: render(UI::Time::Component.new(time: @marketplace_listing.end_at, format: :localize_time_precise)), if: @marketplace_listing.end_at.present?) %>
+    <% list.with_row(label: "Ended", class: "tw:text-sm", value: render(UI::Time::Component.new(time: @marketplace_listing.end_at, format: :localize_time_precise)), if: @marketplace_listing.end_at.present?) %>
   <% end %>
 
   <%= render(UI::TableList::Component.new) do |list| %>

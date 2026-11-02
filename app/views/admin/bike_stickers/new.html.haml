@@ -2,53 +2,25 @@
   New Bike Sticker Batch
 
 .twwiderow
-  = render(UI::Card::Component.new(full_bleed: true, additional_classes: "tw:col-span-full tw:min-w-0 tw:overflow-x-auto")) do
+  = render(UI::Card::Component.new(full_bleed: true, additional_classes: "tw:col-span-full tw:min-w-0")) do
     %h4 Examples
     %p Here are the values for a few example sticker batches.
-    %table.table.table-sm.table-bordered.table-striped
-      %thead
-        %th Batch
-        %th First & Last Sticker
-        %th
-          %em Code Prefix
-        %th
-          %em Initial Sticker number
-        %th
-          %em Number of stickers to create
-        %th
-          %em Code Number Length
-
-      %tbody
-        %tr
-          %td
-            = link_to "#9 (EPS 2)", admin_bike_stickers_path(search_bike_sticker_batch_id: 9)
-          %td
-            %strong.small.d-block ED 010 133
-            %strong.small.d-block ED 061 132
-          %td
-            %code ED
-          %td
-            %code 10133
-          %td
-            %code 51000
-          %td
-            %code 6
-        %tr
-          %td
-            = link_to "#21 (3rd internal)", admin_bike_stickers_path(search_bike_sticker_batch_id: 21)
-          %td
-            %strong.small.d-block A 250 0
-            %strong.small.d-block A 309 8
-
-          %td
-            %code A
-          %td
-            %code 2500
-          %td
-            %code 599
-          %td
-            %code 4
-
+    - examples = [{id: 9, name: "#9 (EPS 2)", stickers: ["ED 010 133", "ED 061 132"], prefix: "ED", initial: 10133, count: 51000, length: 6},
+      {id: 21, name: "#21 (3rd internal)", stickers: ["A 250 0", "A 309 8"], prefix: "A", initial: 2500, count: 599, length: 4}]
+    = render(UI::Table::Component.new(records: examples)) do |table|
+      - table.column(label: "Batch") do |batch|
+        = link_to batch[:name], admin_bike_stickers_path(search_bike_sticker_batch_id: batch[:id])
+      - table.column(label: "First & Last Sticker") do |batch|
+        - batch[:stickers].each do |sticker|
+          %strong{class: "tw:block tw:text-sm"}= sticker
+      - table.column(label: tag.em("Code Prefix")) do |batch|
+        %code= batch[:prefix]
+      - table.column(label: tag.em("Initial Sticker number")) do |batch|
+        %code= batch[:initial]
+      - table.column(label: tag.em("Number of stickers to create")) do |batch|
+        %code= batch[:count]
+      - table.column(label: tag.em("Code Number Length")) do |batch|
+        %code= batch[:length]
 
 = form_for [:admin, @bike_sticker_batch], url: {action: "create", controller: "bike_stickers"} do |f|
   = render(UI::Alerts::ObjectError::Component.new(name: "Sticker Batch", object: @bike_sticker_batch))

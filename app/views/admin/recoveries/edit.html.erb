@@ -2,7 +2,7 @@
 
 <%= render(Pages::Admin::Headers::Section::Component.new(title: "Manage Recovery Display")) %>
 
-<div class="text-center tw:grid tw:grid-cols-12 tw:gap-x-8">
+<div class="tw:grid tw:grid-cols-12 tw:gap-x-8 tw:text-center">
   <% if @recovery.waiting_on_decision? %>
     <div class="tw:col-span-12 tw:md:col-span-4">
       <h4>Choose what to do with this recovery:</h4>
@@ -31,12 +31,12 @@
   <% else %>
     <% if !@recovery.recovered? %>
       <div class="tw:col-span-12">
-        <h1 class="text-danger d-block">
+        <h1 class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">
           This <%= @bike.type %> has not been marked recovered
         </h1>
       </div>
       <div class="tw:col-span-12 tw:mb-6">
-        <p class="text-warning">
+        <p class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>">
           You're viewing this in error, you shouldn't be on this page
         </p>
       </div>
@@ -61,7 +61,7 @@
 
 <p>
   You will have a chance to edit the text, when displaying the recovery.
-  <em class="text-warning">Don't edit to make it displayable.</em>
+  <em class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>">Don't edit to make it displayable.</em>
 </p>
 
 <p>Only edit if you want to change what is stored about this recovery.</p>

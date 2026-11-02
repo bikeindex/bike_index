@@ -31,13 +31,13 @@
 
       <% if @bulk_import.line_errors.present? %>
         <strong>
-          <span class="text-danger"><%= translation(".line_errors") %></span>
+          <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>"><%= translation(".line_errors") %></span>
         </strong>
         <ul class="tw:ml-4 tw:list-disc">
           <% @bulk_import.line_errors.each do |line_error| %>
             <li>
               <% if line_error.is_a?(Array) && line_error.first.is_a?(Integer) %>
-                <span class="d-block">
+                <span class="tw:block">
                   <%= translation(".line_label") %>
                   <strong><%= line_error.first %></strong>
                 </span>
@@ -52,7 +52,7 @@
 
       <% if @bulk_import.file_errors.present? %>
         <strong>
-          <span class="text-danger"><%= translation(".file_errors") %></span>
+          <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>"><%= translation(".file_errors") %></span>
         </strong>
         <ul class="tw:ml-4 tw:list-disc">
           <% @bulk_import.file_errors.each_with_index do |file_error, ind| %>
@@ -72,7 +72,7 @@
       <%= render UI::JsonDisplay::Component.new(data: other_errors) %>
 
       <% if @display_dev_info %>
-        <code class="small d-block only-dev-visible tw:p-1">
+        <code class="only-dev-visible tw:block tw:p-1 tw:text-xs!">
           <%= @bulk_import.import_errors %>
         </code>
       <% end %>

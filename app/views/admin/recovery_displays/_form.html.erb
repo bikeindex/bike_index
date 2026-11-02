@@ -44,7 +44,7 @@
     <% elsif @bike.manufacturer.twitter_name.present? %>
       <strong>@<%= @bike.manufacturer.twitter_name %></strong>
     <% else %>
-      <em class="small twless-strong">Not stored</em>
+      <em class="twless-strong tw:text-sm">Not stored</em>
       <%= link_to "Add one", edit_admin_manufacturer_path(@bike.manufacturer), target: "_blank" %>
     <% end %>
   </p>
@@ -99,7 +99,7 @@
                        data: {"admin--character-count-target" => "field", action: "input->admin--character-count#update"}})) %>
 
       <p
-        class="text-info text-right tw:-mt-2 tw:text-lg"
+        class="text-info tw:-mt-2 tw:text-right tw:text-lg"
         data-admin--character-count-target="total"
       ></p>
     </div>
@@ -118,7 +118,7 @@
         <div class="tw:mt-4">
           <% if @bike.public_images.present? || @bike.stock_photo_url.present? %>
             <% if @recovery_display.image_processing? %>
-              <span class="text-warning">
+              <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>">
                 Image is still processing - please check back in a few minutes
                 before re-uploading an image
               </span>

@@ -35,7 +35,7 @@
 
   <% table.column(label: "Linked Bike") do |strava_gear| %>
     <% if strava_gear.item.present? %>
-      <%= link_to strava_gear.item.title_string.truncate(30), bike_path(strava_gear.item), class: "small" %>
+      <%= link_to strava_gear.item.title_string.truncate(30), bike_path(strava_gear.item), class: "tw:text-sm" %>
     <% end %>
   <% end %>
 

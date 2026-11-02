@@ -1,12 +1,12 @@
 <%= render(Pages::Admin::Organizations::Tabs::Component.new(organization: @organization, active: :show, display_dev_info: display_dev_info?)) %>
 
 <% if OrgServices::Displayer.law_enforcement_missing_verified_features?(@organization) %>
-  <div class="alert alert-info">
+  <%= render(UI::Alerts::Base::Component.new(kind: :notice)) do %>
     This is a law enforcement organization without unstolen notifications. To
     enable unstolen notifications,
     <%= link_to "add an invoice for this organization", new_admin_organization_invoice_path(organization_id: @organization.to_param, end_at: (Time.current + 10.years).to_i) %>
     and enable "Law Enforcement functionality" in it
-  </div>
+  <% end %>
 <% end %>
 
 <%#
@@ -33,7 +33,7 @@
 
 <hr class="tw:mt-8 tw:mb-4">
 
-<div class="text-right">
+<div class="tw:text-right">
   <% if @organization.deleted? %>
     <%= render(UI::ButtonLink::Component.new(text: "Un-Delete organization", href: admin_recover_organization_path(id: @organization.id), confirm: "Are you sure?")) %>
   <% else %>

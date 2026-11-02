@@ -1,8 +1,8 @@
 - if SocialAccount.active.errored.any?
   = render(UI::Container::Component.new) do
-    .alert.alert-danger{class: "tw:my-6!"}
+    = render(UI::Alerts::Base::Component.new(kind: :error, margin_classes: "tw:my-6")) do
       %h4
-        %strong.text-danger
+        %strong
           = pluralize(SocialAccount.active.errored.count, "Social account")
         with errors
         %em.text-success

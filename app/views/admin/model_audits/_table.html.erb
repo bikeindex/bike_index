@@ -17,7 +17,7 @@
   <% table.column(sortable: "mnfg_name", label: "Manufacturer") do |model_audit| %>
     <%= model_audit.mnfg_name %>
 
-    <%= link_to search_emoji, url_for(sort_state.search_params.merge(search_mnfg_name: model_audit.mnfg_name)), class: "display-sortable-link small" %>
+    <%= link_to search_emoji, url_for(sort_state.search_params.merge(search_mnfg_name: model_audit.mnfg_name)), class: "display-sortable-link tw:text-sm" %>
   <% end %>
 
   <% table.column(label: "Mnfg other", header_classes: "tw:text-xs", classes: "tw:text-center") do |model_audit| %>

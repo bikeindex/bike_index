@@ -125,6 +125,8 @@ RSpec.describe Admin::GraphsController, type: :request do
   end
 
   describe "logged_searches" do
+    before { RedisPool.conn { |r| r.del(Counts::STORAGE_KEY) } }
+
     let(:request_at) { Time.current.beginning_of_day }
     let!(:bikebook_search) { FactoryBot.create(:logged_search, endpoint: :web_bikebook, serial_normalized: "XXX", request_at:) }
     let!(:comparison_searches) { FactoryBot.create_list(:logged_search, 2, endpoint: :web_bikebook, query_items: {vehicle_models: "m/a/2025/b,m/c/2025/d"}, request_at:) }

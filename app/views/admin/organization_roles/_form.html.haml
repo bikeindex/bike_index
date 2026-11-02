@@ -1,20 +1,19 @@
-.card
-  .card-body
-    - if @organization_role.id.present?
-      %h4.text-danger{class: "tw:mb-6"}
-        DANGER! Don't edit
-        %em
-          %br
-          It would be better to delete and re-add
-    = form_for [:admin, @organization_role] do |f|
-      = render(UI::Alerts::ObjectError::Component.new(object: @organization_role))
+= render(UI::Card::Component.new) do
+  - if @organization_role.id.present?
+    %h4{class: "tw:mb-6 #{UI::Alerts::Base::Component::TEXT_CLASSES[:error]}"}
+      DANGER! Don't edit
+      %em
+        %br
+        It would be better to delete and re-add
+  = form_for [:admin, @organization_role] do |f|
+    = render(UI::Alerts::ObjectError::Component.new(object: @organization_role))
 
-      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :organization_id, label_text: OrganizationRole.human_attribute_name(:organization), required: true)) do
-        = render UI::Forms::Combobox::Component.new(name: :organization_id, options: @organizations.pluck(:name, :id), include_blank: true, html_options: {form: f, placeholder: "Please select an organization", required: true})
+    = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :organization_id, label_text: OrganizationRole.human_attribute_name(:organization), required: true)) do
+      = render UI::Forms::Combobox::Component.new(name: :organization_id, options: @organizations.pluck(:name, :id), include_blank: true, html_options: {form: f, placeholder: "Please select an organization", required: true})
 
-      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :invited_email, required: true))
+    = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :invited_email, required: true))
 
-      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :role)) do
-        = render(UI::Forms::RadioButtonGroup::Component.new(name: f.field_name(:role), entries: [{value: "admin", label: "Admin of organization"}, {value: "member", label: "Member of organization"}], selected: @organization_role.role))
+    = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :role)) do
+      = render(UI::Forms::RadioButtonGroup::Component.new(name: f.field_name(:role), entries: [{value: "admin", label: "Admin of organization"}, {value: "member", label: "Member of organization"}], selected: @organization_role.role))
 
-      = render(UI::Button::Component.new(text: "Save", color: :primary, type: "submit"))
+    = render(UI::Button::Component.new(text: "Save", color: :primary, type: "submit"))

@@ -1,13 +1,12 @@
 = render(UI::Container::Component.new) do
-  .card{class: "tw:my-6"}
-    .card-body
-      %h4
-        Be careful what you make banned!
-      %p{class: "tw:mt-6"}
-        There are some protections built in - you can't add a banned domain if there multiple bikes registered to that domain
-      %p
-        %strong BUT STILL
-        if you add a banned domain that is valid, it will prevent people from signing up with that domain.
+  = render(UI::Card::Component.new(additional_classes: "tw:my-6")) do
+    %h4
+      Be careful what you make banned!
+    %p{class: "tw:mt-6"}
+      There are some protections built in - you can't add a banned domain if there multiple bikes registered to that domain
+    %p
+      %strong BUT STILL
+      if you add a banned domain that is valid, it will prevent people from signing up with that domain.
 
 = form_for email_domain,
   url: action,

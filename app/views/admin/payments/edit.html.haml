@@ -7,13 +7,12 @@
 
 - if @payment.can_assign_to_membership?
   = render(UI::Container::Component.new) do
-    .card{class: "tw:mt-6 tw:mb-12"}
-      .card-body
-        %p
-          You can give this user a Bike Index membership by clicking
-          %em assign to membership
-          \- which will give this user a membership if they don't have one, or extend their current membership if they do.
-        = render(UI::ButtonLink::Component.new(text: "assign to membership", href: admin_payment_path(id: @payment.id, assign_to_membership: true), method: :patch, color: :primary))
+    = render(UI::Card::Component.new(additional_classes: "tw:mt-6 tw:mb-12")) do
+      %p
+        You can give this user a Bike Index membership by clicking
+        %em assign to membership
+        \- which will give this user a membership if they don't have one, or extend their current membership if they do.
+      = render(UI::ButtonLink::Component.new(text: "assign to membership", href: admin_payment_path(id: @payment.id, assign_to_membership: true), method: :patch, color: :primary))
 
 - if @payment.can_assign_to_invoice?
   = render(UI::Container::Component.new) do

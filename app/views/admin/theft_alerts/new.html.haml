@@ -10,21 +10,16 @@
 %div{class: "tw:mt-12 tw:mb-6"}
   = render(UI::Container::Component.new) do
     - if @theft_alert.activateable?
-      .alert.alert-success
-        %h4
-          This alert will activate as soon as you create it.
+      = render(UI::Alerts::Base::Component.new(kind: :success, header: "This alert will activate as soon as you create it."))
     - else
-      .alert.alert-warning
-        %h4
-          This alert won't activate,
-          %small it's missing required stuff:
+      = render(UI::Alerts::Base::Component.new(kind: :warning, header: safe_join(["This alert won't activate, ", tag.small("it's missing required stuff:")]))) do
         %ul
           - if @theft_alert.missing_photo?
-            %li.text-danger It doesn't have a photo
+            %li{class: UI::Alerts::Base::Component::TEXT_CLASSES[:error]} It doesn't have a photo
           - if @theft_alert.missing_location?
-            %li.text-danger It doesn't have a location - "#{@theft_alert.latitude}"
+            %li{class: UI::Alerts::Base::Component::TEXT_CLASSES[:error]} It doesn't have a location - "#{@theft_alert.latitude}"
           - unless @theft_alert.stolen_record_approved?
-            %li.text-danger Stolen record isn't approved
+            %li{class: UI::Alerts::Base::Component::TEXT_CLASSES[:error]} Stolen record isn't approved
 
 = form_for @theft_alert, url: admin_theft_alerts_path, method: :post do |f|
   = f.hidden_field :stolen_record_id

@@ -62,40 +62,38 @@
         data-admin--user-edit-form-target="banFields"
       >
         <%= render(UI::Container::Component.new) do %>
-          <div class="card bg-light">
-            <div class="card-body">
-              <div class="twwiderow">
-                <h4>Ban information</h4>
+          <%= render(UI::Card::Component.new) do %>
+            <div class="twwiderow">
+              <h4>Ban information</h4>
 
-                <%= render(UI::Forms::Group::Component.new(form_builder: user_ban, attribute: :reason, required: true)) do %>
-                  <%= render(UI::Forms::Select::Component.new(form_builder: user_ban, attribute: :reason,
-                    option_tags: user_ban_reason_options, options: {prompt: "Reason for ban"}, required: @user.banned?,
-                    html_options: {data: {"admin--user-edit-form-target": "banReason"}})) %>
-                <% end %>
-              </div>
-
-              <%= render(UI::Forms::Group::Component.new(form_builder: user_ban, attribute: :description, kind: :text_area,
-                label_text: "Description/notes")) %>
-
-              <p><em class="small"> Banning a user will: </em></p>
-
-              <ul class="tw:mt-0 tw:ml-4 tw:list-disc">
-                <li>
-                  Log them out and prevent them from logging back in
-                </li>
-
-                <li>
-                  (soft) delete all their bikes - which will remove all their
-                  marketplace listings
-                </li>
-
-                <li>
-                  Show any user they were messaging with a message telling them
-                  that they're banned
-                </li>
-              </ul>
+              <%= render(UI::Forms::Group::Component.new(form_builder: user_ban, attribute: :reason, required: true)) do %>
+                <%= render(UI::Forms::Select::Component.new(form_builder: user_ban, attribute: :reason,
+                  option_tags: user_ban_reason_options, options: {prompt: "Reason for ban"}, required: @user.banned?,
+                  html_options: {data: {"admin--user-edit-form-target": "banReason"}})) %>
+              <% end %>
             </div>
-          </div>
+
+            <%= render(UI::Forms::Group::Component.new(form_builder: user_ban, attribute: :description, kind: :text_area,
+              label_text: "Description/notes")) %>
+
+            <p><em class="tw:text-sm"> Banning a user will: </em></p>
+
+            <ul class="tw:mt-0 tw:ml-4 tw:list-disc">
+              <li>
+                Log them out and prevent them from logging back in
+              </li>
+
+              <li>
+                (soft) delete all their bikes - which will remove all their
+                marketplace listings
+              </li>
+
+              <li>
+                Show any user they were messaging with a message telling them
+                that they're banned
+              </li>
+            </ul>
+          <% end %>
         <% end %>
       </div>
     <% end %>

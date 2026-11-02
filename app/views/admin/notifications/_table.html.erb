@@ -18,12 +18,12 @@
       <% if notification.notifiable.present? %>
         <%= link_to helpers.admin_path_for_object(notification.notifiable), class: "twlink" do %>
           <%= notification.notifiable.class.to_s.titleize %>
-          <code class="small">#<%= notification.notifiable_id %></code>
+          <code>#<%= notification.notifiable_id %></code>
         <% end %>
         <%# TODO: include more previews %>
         <% if show_message_preview && notification.notifiable.is_a?(MarketplaceMessage) %>
           <% notification_text = notification.notifiable.body %>
-          <small class="d-block" title="<%= notification_text %>">
+          <small class="tw:block" title="<%= notification_text %>">
             <%= notification_text.truncate(100) %>
           </small>
         <% end %>

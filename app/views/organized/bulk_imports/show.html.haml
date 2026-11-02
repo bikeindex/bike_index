@@ -7,55 +7,20 @@
     - else
       = t(".bulk_import")
     = link_to "superadmin", admin_bulk_import_path(@bulk_import.to_param), class: "btn btn-outline-info less-strong float-right"
-%table.table-list.mb-4
-  %tbody
-    %tr
-      %td
-        = t(".created")
-      %td
-        %span.localizeTime
-          = l @bulk_import.created_at, format: :convert_time
-
-    %tr
-      %td
-        = t(".progress")
-      %td
-        = render partial: "/organized/bulk_imports/progress_display", locals: {bulk_import: @bulk_import, show_extended: true}
-    %tr
-      %td
-        = t(".file")
-      %td
-        - if @bulk_import.file_cleaned?
-          %span.text-warning= t(".file_removed")
-          %em.small.less-strong= t(".file_removed_explanation")
-        - else
-          = link_to @bulk_import.file_url.truncate(100), @bulk_import.file_url
-    - if @bulk_import.matched_count.positive?
-      %tr
-        %td
-          = t(".matched_count")
-        %td
-          = number_with_delimiter(@bulk_import.matched_count)
-    %tr
-      %td
-        = t(".creator")
-      %td
-        - if @bulk_import.user.present?
-          = @bulk_import.user.display_name
-        - else
-          \-
-    - if permitted_kinds.count > 1
-      %tr
-        %td Kind
-        %td= @bulk_import.kind_humanized
-    - if @bulk_import.no_notify
-      %tr
-        %td notes
-        %td
-          This import did <strong>not</strong> send emails
-
-
-
+= render(UI::TableList::Component.new) do |list|
+  - list.with_row(label: t(".created"), value: render(UI::Time::Component.new(time: @bulk_import.created_at)))
+  - list.with_row(label: t(".progress"), value: render(partial: "/organized/bulk_imports/progress_display", locals: {bulk_import: @bulk_import, show_extended: true}))
+  - list.with_row(label: t(".file")) do
+    - if @bulk_import.file_cleaned?
+      %span.text-warning= t(".file_removed")
+      %em.small.less-strong= t(".file_removed_explanation")
+    - else
+      = link_to @bulk_import.file_url.truncate(100), @bulk_import.file_url
+  - list.with_row(label: t(".matched_count"), value: number_display(@bulk_import.matched_count), if: @bulk_import.matched_count.positive?)
+  - list.with_row(label: t(".creator"), value: @bulk_import.user&.display_name || "-")
+  - list.with_row(label: "Kind", value: @bulk_import.kind_humanized, if: permitted_kinds.count > 1)
+  - list.with_row(label: "notes", if: @bulk_import.no_notify) do
+    This import did <strong>not</strong> send emails
 
 - if @bulk_import.import_errors?
   = render(UI::Header::Component.new(text: t(".errors"), tag: :h2, html_class: "mt-2 tw:mb-2!"))

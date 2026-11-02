@@ -31,11 +31,9 @@
   - list.with_row(label: "Sender sent count", value: @stolen_notification.sender.sent_stolen_notifications.count)
 
 
-.card.bg-light{class: "tw:my-6"}
-  .card-header
-    Notification Message
-  .card-body
-    = @stolen_notification.message
+= render(UI::Card::Component.new(additional_classes: "tw:my-6")) do
+  %h4 Notification Message
+  = @stolen_notification.message
 
 %h3
   Notifications

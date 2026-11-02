@@ -4,17 +4,17 @@
       <strong>True</strong>
     <% else %>
       <% if LandingPageOrganizations::SLUGS.include?(@organization.slug) %>
-        <p class="text-danger">
+        <p class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">
           IS NOT MARKED INVOICED BUT HAS A LANDING PAGE
         </p>
       <% elsif @organization.paid_previously? %>
-        <strong class="text-warning">Previously paid!</strong>
+        <strong class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>">Previously paid!</strong>
       <% else %>
         False
       <% end %>
     <% end %>
 
-    <em class="small twless-strong">
+    <em class="twless-strong tw:text-sm">
       Set this via
       <%= link_to "invoices", admin_organization_invoices_path(organization_id: @organization.to_param) %>
     </em>
@@ -56,10 +56,10 @@
         <small><%= additional_fields.join(", ") %></small>
         <br>
         <% if @organization.registration_field_labels.values.none? %>
-          <em class="small twless-strong">No custom labels</em>
+          <em class="twless-strong tw:text-sm">No custom labels</em>
         <% else %>
-          <em class="small twless-strong">Custom Labels:</em>
-          <ul class="small tw:mb-0">
+          <em class="twless-strong tw:text-sm">Custom Labels:</em>
+          <ul class="tw:mb-0 tw:text-sm">
             <% @organization.registration_field_labels.each do |field, label| %>
               <li>
                 <strong>
@@ -115,30 +115,30 @@
         Delivering notifications
         <small><%= @organization.graduated_notification_interval_days %> day interval</small>
       <% else %>
-        <em class="text-warning">Not delivering</em>
+        <em class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>">Not delivering</em>
         <small>notification interval is not set</small>
       <% end %>
     <% end %>
-    <% list.with_row(label: "Enabled features", value: tag.span(safe_join(@organization.enabled_feature_slugs.map { |slug| tag.code(slug) }, ", "), class: "small")) %>
+    <% list.with_row(label: "Enabled features", value: tag.span(safe_join(@organization.enabled_feature_slugs.map { |slug| tag.code(slug) }, ", "), class: "tw:text-sm")) %>
   <% end %>
 
   <% list.with_row(label: "Child of", if: @organization.parent_organization.present?) do %>
     <%= link_to @organization.parent_organization.name, admin_organization_path(@organization.parent_organization) %>
 
-    <small class="twless-strong d-block">
+    <small class="twless-strong tw:block">
       Parent organization should be part of the same organization. Use
       "regional" feature otherwise
     </small>
   <% end %>
 
   <% list.with_row(label: "Child organizations", if: @organization.parent?) do %>
-    <ul class="small tw:mb-2">
+    <ul class="tw:mb-2 tw:text-sm">
       <% @organization.child_organizations.each do |org| %>
         <li><%= link_to org.name, admin_organization_url(org) %></li>
       <% end %>
     </ul>
 
-    <small class="twless-strong d-block">
+    <small class="twless-strong tw:block">
       Parent organization should be part of the same organization. Use
       "regional" feature otherwise
     </small>
@@ -146,7 +146,7 @@
 
   <% if @organization.regional? %>
     <% list.with_row(label: "Regional Sub-Organizations") do %>
-      <ul class="small tw:mb-2">
+      <ul class="tw:mb-2 tw:text-sm">
         <% @organization.nearby_organizations.each do |suborg| %>
           <li>
             <%= link_to suborg.name, admin_organization_path(suborg) %>
@@ -169,7 +169,7 @@
       <% regional_parent = regional_parents.first %>
       <%= link_to regional_parent.name, admin_organization_path(regional_parent) %>
     <% else %>
-      <ul class="small tw:mb-2">
+      <ul class="tw:mb-2 tw:text-sm">
         <% regional_parents.each do |regional_parent| %>
           <li>
             <%= link_to regional_parent.name, admin_organization_path(regional_parent) %>
@@ -178,12 +178,12 @@
       </ul>
     <% end %>
 
-    <small class="twless-strong d-block">
+    <small class="twless-strong tw:block">
       Search radius includes this organization
     </small>
   <% end %>
 
   <% list.with_row(label: "Associated orgs", if: !associated_organizations?) do %>
-    <em class="small twless-strong">No associated organizations</em>
+    <em class="twless-strong tw:text-sm">No associated organizations</em>
   <% end %>
 <% end %>

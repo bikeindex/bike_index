@@ -12,19 +12,18 @@
         = render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :national, label: "national"))
         = render(UI::Forms::Checkbox::Component.new(name: :check_credentials, label: "Test connection on update"))
 
-    .card
-      .card-body
-        %small
-          Credentials can be found on the
-          = link_to "Twitter Apps Dashboard", "https://developer.twitter.com/apps", target: :_blank
-          by selecting the desired app, then navigating to
-          %strong Details
-          >
-          %strong Keys and Tokens
+    = render(UI::Card::Component.new) do
+      %small
+        Credentials can be found on the
+        = link_to "Twitter Apps Dashboard", "https://developer.twitter.com/apps", target: :_blank
+        by selecting the desired app, then navigating to
+        %strong Details
+        >
+        %strong Keys and Tokens
 
-        %fieldset{class: "tw:mt-2"}
-          - %i[user_secret user_token consumer_key consumer_secret].each do |attribute|
-            = render(UI::Forms::Group::Component.new(form_builder: f, attribute:))
+      %fieldset{class: "tw:mt-2"}
+        - %i[user_secret user_token consumer_key consumer_secret].each do |attribute|
+          = render(UI::Forms::Group::Component.new(form_builder: f, attribute:))
 
     %fieldset
       - %i[street city neighborhood].each do |attribute|
@@ -33,13 +32,12 @@
         = render UI::Forms::ComboboxState::Component.new(name: :region_record_id, ids: true, html_options: {form: f, placeholder: "State"})
       = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :country, html_options: {value: social_account.country&.iso}))
       = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :language))
-    .card
-      .card-body
-        %p
-          %em.text-warning
-            Probably don't edit
-          Latitude and Longitude will be set automatically from the address
-        = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :latitude))
-        = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :longitude))
+    = render(UI::Card::Component.new) do
+      %p
+        %em{class: UI::Alerts::Base::Component::TEXT_CLASSES[:warning]}
+          Probably don't edit
+        Latitude and Longitude will be set automatically from the address
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :latitude))
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :longitude))
 
   = render(UI::Button::Component.new(text: submit_label, color: :primary, size: :lg, type: "submit"))

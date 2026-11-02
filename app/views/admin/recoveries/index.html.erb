@@ -42,11 +42,11 @@
         <% recovery_amount = valued_recoveries.sum + (available_recoveries.count - valued_recoveries.count) * Counts.recovery_average_value %>
 
         <%= render(UI::TableList::Component.new(wide_definition: true, classes: "tw:[&_th]:not-italic")) do |list| %>
-          <% list.with_row(label: "With user entered value", class: "small", value: number_display(valued_recoveries.count)) %>
+          <% list.with_row(label: "With user entered value", class: "tw:text-sm", value: number_display(valued_recoveries.count)) %>
 
-          <% list.with_row(label: "Total user entered value", class: "small", value: safe_join(["$", number_display(valued_recoveries.sum)])) %>
+          <% list.with_row(label: "Total user entered value", class: "tw:text-sm", value: safe_join(["$", number_display(valued_recoveries.sum)])) %>
 
-          <% list.with_row(label: "Average stolen value", class: "small", value: safe_join(["$", number_display(Counts.recovery_average_value)])) %>
+          <% list.with_row(label: "Average stolen value", class: "tw:text-sm", value: safe_join(["$", number_display(Counts.recovery_average_value)])) %>
 
           <% list.with_row(label: "Total estimated value", value: safe_join(["$", number_display(recovery_amount)])) %>
         <% end %>
@@ -63,12 +63,12 @@
     <%= hidden_field_tag :search_displayed, params[:search_displayed] %>
     <%= render partial: "/shared/hidden_search_fields" %>
 
-    <em class="small twless-strong d-md-inline d-none">within</em>
+    <em class="twless-strong tw:hidden tw:text-sm tw:md:inline">within</em>
 
     <%= render(UI::Forms::Input::Component.new(form_builder: form, attribute: :search_distance, kind: :number_field,
       html_options: {value: @distance, class: "tw:w-20"})) %>
 
-    <em class="small twless-strong d-md-inline d-none">miles of</em>
+    <em class="twless-strong tw:hidden tw:text-sm tw:md:inline">miles of</em>
 
     <%= render(UI::Forms::Input::Component.new(form_builder: form, attribute: :search_location,
       html_options: {value: params[:search_location], placeholder: "anywhere"})) %>

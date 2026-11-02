@@ -24,7 +24,7 @@
   <%= render(UI::Table::Component.new(records: @mail_snippets, render_sortable: true, sort_state:)) do |table| %>
     <% table.column(sortable: "created_at") do |mail_snippet| %>
       <%= link_to render(UI::Time::Component.new(time: mail_snippet.created_at)), helpers.edit_mail_snippet_path_for(mail_snippet) %>
-      <code class="small only-dev-visible"><%= mail_snippet.id %></code>
+      <code class="only-dev-visible"><%= mail_snippet.id %></code>
     <% end %>
 
     <% table.column(sortable: "updated_at", header_classes: "tw:text-xs") do |mail_snippet| %>
@@ -44,7 +44,7 @@
     <% end %>
 
     <% table.column(label: "Subject, Body") do |mail_snippet| %>
-      <div class="d-block"><%= mail_snippet.subject %></div>
+      <div><%= mail_snippet.subject %></div>
       <small><%= truncate(mail_snippet.body_stripped, length: 100) %></small>
     <% end %>
 

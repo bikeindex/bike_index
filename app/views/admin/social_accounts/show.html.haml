@@ -3,15 +3,14 @@
   %li= render(UI::ButtonLink::Component.new(text: "Check Credentials", href: check_credentials_admin_social_account_url(@social_account), size: :sm))
 - if @social_account.errored?
   = render(UI::Container::Component.new) do
-    .card{class: "tw:my-6"}
-      .card-body
-        %h4.text-danger
-          %em
-            #{@social_account.screen_name} has an Error!
-        = render(UI::TableList::Component.new(classes: "tw:mt-6")) do |list|
-          - list.with_row(label: "Error at:", value: render(UI::Time::Component.new(time: @social_account.last_error_at)))
-          - list.with_row(label: "Error", value: @social_account.last_error)
-        = render(UI::ButtonLink::Component.new(text: "Log in to refresh credentials", href: "/auth/twitter", color: :primary))
+    = render(UI::Card::Component.new(additional_classes: "tw:my-6")) do
+      %h4{class: UI::Alerts::Base::Component::TEXT_CLASSES[:error]}
+        %em
+          #{@social_account.screen_name} has an Error!
+      = render(UI::TableList::Component.new(classes: "tw:mt-6")) do |list|
+        - list.with_row(label: "Error at:", value: render(UI::Time::Component.new(time: @social_account.last_error_at)))
+        - list.with_row(label: "Error", value: @social_account.last_error)
+      = render(UI::ButtonLink::Component.new(text: "Log in to refresh credentials", href: "/auth/twitter", color: :primary))
 .twwiderow
   %div
     %h1
@@ -33,6 +32,6 @@
 %h3{class: "tw:mt-6"}
   = number_with_delimiter(@social_account.social_posts.count)
   Posts
-  %em.small
+  %em{class: "tw:text-sm"}
     = link_to "view all", admin_social_posts_path(search_social_account_id: @social_account.id)
 = render partial: "/admin/social_posts/table", locals: { social_posts: @social_account.social_posts.reorder(created_at: :desc).limit(25), skip_social_account: true }

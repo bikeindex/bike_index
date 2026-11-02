@@ -1014,94 +1014,6 @@
       "note": "image_url is a CarrierWave-generated path, not user-controlled HTML"
     },
     {
-      "warning_type": "Cross-Site Scripting",
-      "warning_code": 4,
-      "fingerprint": "c92595b02fb88252584c7f1f976b37a682ec73bbc86d64047008133e79f132f7",
-      "check_name": "LinkToHref",
-      "message": "Potentially unsafe model attribute in `link_to` href",
-      "file": "app/views/review_impound_claims/_display.html.haml",
-      "line": 56,
-      "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
-      "code": "link_to(image_tag((Unresolved Model).new.image_url(:small), :class => \"d-inline-block\"), (Unresolved Model).new.image_url)",
-      "render_path": [
-        {
-          "type": "controller",
-          "class": "ReviewImpoundClaimsController",
-          "method": "show",
-          "line": 6,
-          "file": "app/controllers/review_impound_claims_controller.rb",
-          "rendered": {
-            "name": "review_impound_claims/show",
-            "file": "app/views/review_impound_claims/show.html.haml"
-          }
-        },
-        {
-          "type": "template",
-          "name": "review_impound_claims/show",
-          "line": 10,
-          "file": "app/views/review_impound_claims/show.html.haml",
-          "rendered": {
-            "name": "review_impound_claims/_display",
-            "file": "app/views/review_impound_claims/_display.html.haml"
-          }
-        }
-      ],
-      "location": {
-        "type": "template",
-        "template": "review_impound_claims/_display"
-      },
-      "user_input": "(Unresolved Model).new.image_url",
-      "confidence": "Weak",
-      "cwe_id": [
-        79
-      ],
-      "note": "image_url is a CarrierWave-generated path, not user-controlled HTML"
-    },
-    {
-      "warning_type": "Cross-Site Scripting",
-      "warning_code": 4,
-      "fingerprint": "c92595b02fb88252584c7f1f976b37a682ec73bbc86d64047008133e79f132f7",
-      "check_name": "LinkToHref",
-      "message": "Potentially unsafe model attribute in `link_to` href",
-      "file": "app/views/review_impound_claims/_display.html.haml",
-      "line": 61,
-      "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
-      "code": "link_to(image_tag((Unresolved Model).new.image_url(:small), :class => \"d-inline-block\"), (Unresolved Model).new.image_url)",
-      "render_path": [
-        {
-          "type": "controller",
-          "class": "ReviewImpoundClaimsController",
-          "method": "show",
-          "line": 6,
-          "file": "app/controllers/review_impound_claims_controller.rb",
-          "rendered": {
-            "name": "review_impound_claims/show",
-            "file": "app/views/review_impound_claims/show.html.haml"
-          }
-        },
-        {
-          "type": "template",
-          "name": "review_impound_claims/show",
-          "line": 10,
-          "file": "app/views/review_impound_claims/show.html.haml",
-          "rendered": {
-            "name": "review_impound_claims/_display",
-            "file": "app/views/review_impound_claims/_display.html.haml"
-          }
-        }
-      ],
-      "location": {
-        "type": "template",
-        "template": "review_impound_claims/_display"
-      },
-      "user_input": "(Unresolved Model).new.image_url",
-      "confidence": "Weak",
-      "cwe_id": [
-        79
-      ],
-      "note": "image_url is a CarrierWave-generated path, not user-controlled HTML"
-    },
-    {
       "warning_type": "Dangerous Send",
       "warning_code": 23,
       "fingerprint": "118b36de15d95b326e918220562b9e6210d26ee7ee0c7350a6cb1a9a62117bfc",
@@ -1489,6 +1401,50 @@
         79
       ],
       "note": "github_pull_request is an integer column interpolated into a constant GitHub URL"
+    },
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 4,
+      "fingerprint": "bc59ec8f4ff54517ef1491f45a16ae17fdaaaea3a9a71b22c18cee8dec99ef71",
+      "check_name": "LinkToHref",
+      "message": "Potentially unsafe model attribute in `link_to` href",
+      "file": "app/views/review_impound_claims/_display.html.haml",
+      "line": 32,
+      "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
+      "code": "link_to(image_tag((Unresolved Model).new.image_url(:small), :class => \"tw:inline-block tw:w-[31%] tw:max-w-[150px] tw:mr-[3%]\"), (Unresolved Model).new.image_url)",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "ReviewImpoundClaimsController",
+          "method": "show",
+          "line": 6,
+          "file": "app/controllers/review_impound_claims_controller.rb",
+          "rendered": {
+            "name": "review_impound_claims/show",
+            "file": "app/views/review_impound_claims/show.html.haml"
+          }
+        },
+        {
+          "type": "template",
+          "name": "review_impound_claims/show",
+          "line": 10,
+          "file": "app/views/review_impound_claims/show.html.haml",
+          "rendered": {
+            "name": "review_impound_claims/_display",
+            "file": "app/views/review_impound_claims/_display.html.haml"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "review_impound_claims/_display"
+      },
+      "user_input": "(Unresolved Model).new.image_url",
+      "confidence": "Weak",
+      "cwe_id": [
+        79
+      ],
+      "note": "image_url is a CarrierWave-generated path, not user-controlled HTML"
     }
   ],
   "brakeman_version": "8.1.0"

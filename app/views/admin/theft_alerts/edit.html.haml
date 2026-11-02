@@ -8,7 +8,7 @@
       = @theft_alert.status
 - if @theft_alert.manual_override_inactive?
   %p{class: "tw:py-2"}
-    %span.text-danger
+    %span{class: UI::Alerts::Base::Component::TEXT_CLASSES[:error]}
       Facebook Activation failed
     %small
       this alert has be marked inactive, but it never ran.
@@ -18,62 +18,61 @@
     = render(UI::ButtonLink::Component.new(text: "Update Facebook data", href: admin_theft_alert_path(@theft_alert.id, update_theft_alert: true), method: :patch, size: :sm))
   - else
     %em
-      %span.text-warning Can't update Facebook:
+      %span{class: UI::Alerts::Base::Component::TEXT_CLASSES[:warning]} Can't update Facebook:
     - if @theft_alert.before_automation?
       %span.twless-strong This alert was created before automation
     - elsif !@theft_alert.activateable?
       %span.twless-strong This alert is missing required stuff
     - else
-      %span.text-danger NOT SURE WHY!
+      %span{class: UI::Alerts::Base::Component::TEXT_CLASSES[:error]} NOT SURE WHY!
       %strong Tell Seth
 
   - if @theft_alert.failed_to_activate?
-    %span.text-danger Something Broke!
+    %span{class: UI::Alerts::Base::Component::TEXT_CLASSES[:error]} Something Broke!
     %strong Tell Seth
 
 - if @theft_alert.pending?
   = render(UI::Container::Component.new) do
-    .card{class: "tw:my-6"}
-      .card-body
-        - if @theft_alert.activateable_except_approval?
-          %h4.text-center
-            - if @theft_alert.activateable?
-              Theft alert can be activated!
-            - else
-              %span.text-warning This stolen record is NOT approved
-              %em.small.d-block{class: "tw:mt-2"}
-                You can still activate if you're sure you want to
+    = render(UI::Card::Component.new(additional_classes: "tw:my-6")) do
+      - if @theft_alert.activateable_except_approval?
+        %h4{class: "tw:text-center"}
+          - if @theft_alert.activateable?
+            Theft alert can be activated!
+          - else
+            %span{class: UI::Alerts::Base::Component::TEXT_CLASSES[:warning]} This stolen record is NOT approved
+            %em{class: "tw:mt-2 tw:block tw:text-sm"}
+              You can still activate if you're sure you want to
 
-          - if @theft_alert.activating?
-            %h2.text-center{class: "tw:mt-4"}
-              %span.text-warning Activation in process
+        - if @theft_alert.activating?
+          %h2{class: "tw:mt-4 tw:text-center"}
+            %span{class: UI::Alerts::Base::Component::TEXT_CLASSES[:warning]} Activation in process
 
-            %p
-              Activation started at:
-              = render(UI::Time::Component.new(time: @theft_alert.activating_at))
+          %p
+            Activation started at:
+            = render(UI::Time::Component.new(time: @theft_alert.activating_at))
 
-            %p
-              %strong Don't activate again
-              unless activation started a while ago
+          %p
+            %strong Don't activate again
+            unless activation started a while ago
 
-          .text-center{class: "tw:mt-6"}
-            = render(UI::ButtonLink::Component.new(text: "Activate!", href: admin_theft_alert_path(@theft_alert.id, activate_theft_alert: true), method: :patch, color: :primary, size: :lg))
-        - else
-          %h4.text-center
-            Theft alert
-            %span.text-danger can not
-            be activated
-          %ul{class: "tw:mt-6"}
-            - unless @theft_alert.stolen_record_approved?
-              %li Stolen Record is not approved
-            - unless @theft_alert.paid?
-              %li Alert is not paid
-            - if @theft_alert.missing_photo?
-              %li Alert is missing photo
-            - if @theft_alert.missing_location?
-              %li Alert is missing location
-            - if @theft_alert.bike_not_current?
-              %li Bike is hidden, deleted, or spam
+        %div{class: "tw:mt-6 tw:text-center"}
+          = render(UI::ButtonLink::Component.new(text: "Activate!", href: admin_theft_alert_path(@theft_alert.id, activate_theft_alert: true), method: :patch, color: :primary, size: :lg))
+      - else
+        %h4{class: "tw:text-center"}
+          Theft alert
+          %span{class: UI::Alerts::Base::Component::TEXT_CLASSES[:error]} can not
+          be activated
+        %ul{class: "tw:mt-6"}
+          - unless @theft_alert.stolen_record_approved?
+            %li Stolen Record is not approved
+          - unless @theft_alert.paid?
+            %li Alert is not paid
+          - if @theft_alert.missing_photo?
+            %li Alert is missing photo
+          - if @theft_alert.missing_location?
+            %li Alert is missing location
+          - if @theft_alert.bike_not_current?
+            %li Bike is hidden, deleted, or spam
 
 .twwiderow{class: "tw:mt-6 tw:items-start"}
   = render(UI::TableList::Component.new) do |list|
@@ -106,9 +105,9 @@
         - if @theft_alert.stolen_record.receive_notifications?
           %span.text-info receives notifications
         - else
-          %span.text-warning DOESN'T receive notifications
+          %span{class: UI::Alerts::Base::Component::TEXT_CLASSES[:warning]} DOESN'T receive notifications
       - else
-        %span.text-danger Something is missing!
+        %span{class: UI::Alerts::Base::Component::TEXT_CLASSES[:error]} Something is missing!
     - list.with_row(label: "Creator") do
       - if @theft_alert.admin
         %small.text-info admin:
@@ -120,7 +119,7 @@
     - list.with_row(label: "Target Spend", value: @theft_alert.amount_facebook)
     - list.with_row(label: "Actual Fbook Spend") do
       = @theft_alert.amount_facebook_spent
-      %span.text-warning
+      %span{class: UI::Alerts::Base::Component::TEXT_CLASSES[:warning]}
         = @theft_alert.live? ? "so far" : "total"
     - list.with_row(label: "Reach", value: @theft_alert.reach)
     - @theft_alert.engagement.each do |k, v|

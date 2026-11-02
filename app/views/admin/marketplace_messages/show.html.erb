@@ -32,9 +32,9 @@
       </small>
     <% end %>
 
-    <% list.with_row(label: "Created", class: "small", value: render(UI::Time::Component.new(time: @marketplace_message.created_at, format: :localize_time_precise))) %>
+    <% list.with_row(label: "Created", class: "tw:text-sm", value: render(UI::Time::Component.new(time: @marketplace_message.created_at, format: :localize_time_precise))) %>
 
-    <% list.with_row(label: "Updated", class: "small", value: render(UI::Time::Component.new(time: @marketplace_message.updated_at, format: :localize_time_precise))) %>
+    <% list.with_row(label: "Updated", class: "tw:text-sm", value: render(UI::Time::Component.new(time: @marketplace_message.updated_at, format: :localize_time_precise))) %>
 
     <% list.with_row(label: "From", value: @marketplace_message.kind_humanized) %>
 
@@ -46,7 +46,7 @@
 
   <%= render(UI::TableList::Component.new) do |list| %>
     <% list.with_row(label: "Marketplace Listing") do %>
-      <span class="small">
+      <span class="tw:text-sm">
         <%= render(UI::Time::Component.new(time: @marketplace_listing.created_at)) %>
 
         <% if display_dev_info? %>

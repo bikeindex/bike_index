@@ -4,7 +4,7 @@
 .twwiderow{class: "tw:items-start"}
   = render(UI::TableList::Component.new) do |list|
     - list.with_row(label: "Created", value: render(UI::Time::Component.new(time: @customer_contact.created_at, format: :localize_time_precise)))
-    - list.with_row(label: "Updated", value: tag.span(render(UI::Time::Component.new(time: @customer_contact.updated_at, format: :localize_time_precise)), class: "small"))
+    - list.with_row(label: "Updated", value: tag.span(render(UI::Time::Component.new(time: @customer_contact.updated_at, format: :localize_time_precise)), class: "tw:text-sm"))
     - list.with_row(label: "Sender") do
       %em
         = @customer_contact.creator&.display_name

@@ -27,10 +27,9 @@
         %small.twless-strong no bike
       - else
         Bike permanently deleted
-  .card
-    .card-body
-      %h5.card-title
-        Message text
-      %p.card-text
-        = @feedback.body
+  = render(UI::Card::Component.new) do
+    %h5
+      Message text
+    %p
+      = @feedback.body
 

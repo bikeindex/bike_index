@@ -1,13 +1,11 @@
 <% show_search_statuses = !@ignored_only %>
 <% sortable_params = @sortable_params %>
 
-<ul class="nav justify-content-end small">
-  <% unless @ignored_only %>
-    <li class="nav-item">
-      <%= link_to "Ignored bikes only (deleted, test, spam)", admin_graphs_path(sortable_params.merge(search_ignored: true)), class: "nav-link" %>
-    </li>
-  <% end %>
-</ul>
+<% unless @ignored_only %>
+  <div class="tw:text-right tw:text-sm">
+    <%= link_to "Ignored bikes only (deleted, test, spam)", admin_graphs_path(sortable_params.merge(search_ignored: true)), class: "tw:inline-block tw:px-4 tw:py-2" %>
+  </div>
+<% end %>
 
 <div class="tw:my-6 tw:grid tw:gap-x-8 tw:md:grid-cols-2">
   <div class="tw:order-2 tw:md:order-1">
@@ -66,12 +64,12 @@
 
 <%= render(UI::Chart::Component.new(series: variable_admin_graphs_path(sortable_params))) %>
 
-<div class="text-center tw:mb-6">
+<div class="tw:mb-6 tw:text-center">
   <small class="twless-strong">
     <strong>Note:</strong> Columns are separate because they are independent
     counts: total registrations &amp; stolen records created for those
     registrations
-    <em class="d-block">This is different from other graphs showing counts of nonstolen &amp; stolen (which add up to the total registrations). This is done here so that this graph includes recovered bikes.</em>
+    <em class="tw:block">This is different from other graphs showing counts of nonstolen &amp; stolen (which add up to the total registrations). This is done here so that this graph includes recovered bikes.</em>
   </small>
 </div>
 
