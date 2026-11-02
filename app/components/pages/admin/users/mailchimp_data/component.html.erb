@@ -4,7 +4,7 @@
   <div data-controller="ui--collapse">
     <%= render(UI::Header::Component.new(tag: :h2, html_class: "twsection")) do %>
       Mailchimp data
-      <span class="tw:font-normal"><em><%= render(UI::Collapse::Component.new(text: "show raw data", color: :link, html_class: "tw:text-sm")) %></em></span>
+      <em><%= render(UI::Collapse::Component.new(text: "show raw data", color: :link, html_class: "tw:text-sm")) %></em>
     <% end %>
 
     <div class="twwiderow tw:items-start">

@@ -2,11 +2,10 @@
 
 = render(UI::Header::Component.new(tag: :h2, html_class: "twsection")) do
   Facebook data
-  %span{class: "tw:font-normal"}
-    %small{class: "tw:ml-1"}
-      alert status:
-      %span{class: theft_alert_status_class(@theft_alert)}
-        = @theft_alert.status
+  %small{class: "tw:ml-1"}
+    alert status:
+    %span{class: theft_alert_status_class(@theft_alert)}
+      = @theft_alert.status
 - if @theft_alert.manual_override_inactive?
   %p{class: "tw:mb-4 tw:py-2"}
     %span{class: UI::Alerts::Base::Component::TEXT_CLASSES[:error]}
@@ -133,10 +132,9 @@
 
 = render(UI::Header::Component.new(tag: :h2, html_class: "twsection")) do
   Payment
-  %span{class: "tw:font-normal"}
-    %small
-      - if @theft_alert.payment.present?
-        = link_to "view payment", edit_admin_payment_path(@theft_alert.payment_id), class: "twlink"
+  %small
+    - if @theft_alert.payment.present?
+      = link_to "view payment", edit_admin_payment_path(@theft_alert.payment_id), class: "twlink"
 
 - if @theft_alert.payment.present?
   = render partial: "/admin/payments/display", locals: { payment: @theft_alert.payment }

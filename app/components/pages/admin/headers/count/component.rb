@@ -5,7 +5,7 @@ module Pages
     module Headers
       module Count
         # Goes after an admin UI::Header's title: its count - which links to the full index, when
-        # there is one - and a parenthetical. The weight undoes the heading's.
+        # there is one - and a parenthetical.
         class Component < ApplicationComponent
           def initialize(count: nil, href: nil, parenthetical: nil)
             @count = count

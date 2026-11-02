@@ -56,13 +56,11 @@
   <%= render(UI::Header::Component.new(tag: :h2, html_class: "twsection")) do %>
     <%= link_to(safe_join([number_display(messages_count), " ", "message".pluralize(messages_count)]), admin_marketplace_messages_path(search_marketplace_listing_id: @marketplace_listing.id), class: "twlink") %>
 
-    <span class="tw:font-normal">
-      <% if messages_count > @marketplace_messages.count %>
-        <small>
-          most recent <%= number_display(@marketplace_messages.count) %> shown
-        </small>
-      <% end %>
-    </span>
+    <% if messages_count > @marketplace_messages.count %>
+      <small>
+        most recent <%= number_display(@marketplace_messages.count) %> shown
+      </small>
+    <% end %>
   <% end %>
 
   <%= render partial: "/admin/marketplace_messages/table", locals: { collection: @marketplace_messages, render_sortable: false, skip_marketplace_listing: true } %>

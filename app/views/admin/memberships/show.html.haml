@@ -43,10 +43,9 @@
 = render(UI::Header::Component.new(tag: :h2, html_class: "twsection")) do
   Payments
   = render(Pages::Admin::Headers::Count::Component.new(count: @payments.count, href: admin_payments_path(user_id: @membership.user_id, period: "all")))
-  %span{class: "tw:font-normal"}
-    - if @payments.count > 25
-      %small
-        %em (only first 25 shown)
+  - if @payments.count > 25
+    %small
+      %em (only first 25 shown)
 - if @payments.any?
   = render partial: "/admin/payments/table", locals: {payments: @payments.limit(25), skip_user: true, render_method: true}
 

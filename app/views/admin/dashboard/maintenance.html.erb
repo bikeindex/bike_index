@@ -22,7 +22,7 @@
 
 <%= render(UI::Header::Component.new(tag: :h2, html_class: "twsection")) do %>
   Recent example bikes
-  <span class="tw:font-normal"><%= link_to "Delete example bikes", admin_destroy_example_bikes_url, class: "twlink" %></span>
+  <%= link_to "Delete example bikes", admin_destroy_example_bikes_url, class: "twlink" %>
 <% end %>
 
 <% if @bikes.any? %>

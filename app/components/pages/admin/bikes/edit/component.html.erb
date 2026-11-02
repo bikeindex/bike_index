@@ -1,8 +1,8 @@
 <div class="tw:mt-6 tw:mb-1 tw:flex tw:flex-wrap tw:items-baseline tw:gap-2">
   <%= render(UI::Header::Component.new(tag: :h2, html_class: "twsection")) do %>
     Edit
-    <span class="tw:font-normal"><%= link_to "user edit", edit_bike_path(@bike, return_to: edit_admin_bike_path(@bike)),
-            class: "twlink tw:ml-2 tw:text-sm" %></span>
+    <%= link_to "user edit", edit_bike_path(@bike, return_to: edit_admin_bike_path(@bike)),
+            class: "twlink tw:ml-2 tw:text-sm" %>
   <% end %>
 
   <div class="tw:ml-auto">

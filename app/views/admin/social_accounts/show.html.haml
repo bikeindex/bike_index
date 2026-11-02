@@ -27,7 +27,6 @@
 
 = render(UI::Header::Component.new(tag: :h3, html_class: "twsection")) do
   = "#{number_with_delimiter(@social_account.social_posts.count)} Posts"
-  %span{class: "tw:font-normal"}
-    %em{class: "tw:text-sm"}
-      = link_to "view all", admin_social_posts_path(search_social_account_id: @social_account.id), class: "twlink"
+  %em{class: "tw:text-sm"}
+    = link_to "view all", admin_social_posts_path(search_social_account_id: @social_account.id), class: "twlink"
 = render partial: "/admin/social_posts/table", locals: { social_posts: @social_account.social_posts.reorder(created_at: :desc).limit(25), skip_social_account: true }
