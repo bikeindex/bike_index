@@ -14,7 +14,7 @@
 #  can_send_many_stolen_notifications :boolean          default(FALSE), not null
 #  confirmation_token                 :string(255)
 #  confirmed                          :boolean          default(FALSE), not null
-#  dark_mode                          :integer          default(0), not null
+#  dark_mode                          :integer          default("system"), not null
 #  deleted_at                         :datetime
 #  description                        :text
 #  developer                          :boolean          default(FALSE), not null
