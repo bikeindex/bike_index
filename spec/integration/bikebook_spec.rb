@@ -2228,6 +2228,25 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(matched).to eq([["other_e", "acoustic"], ["acoustic"], ["complete", "frame"], ["complete"], ["small", "road"], ["road"], ["36", "28"], ["28", "40"], ["frame", "complete"], ["aluminum", "steel"], ["drop"], ["drop", "flat"], ["near"], ["s1000", "tiagra"], ["steel", "full"], ["commuting", "touring"]])
   end
 
+  it "shows the picks it last named on a reload, before the catalog loads" do
+    serve_bikebook_catalog
+    visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_rec_step_through,m/specialized/2025/haul_st")
+    expect(page).to have_css(".hw-combobox__chip", count: 2, wait: 10)
+    held = Queue.new
+    page.driver.with_playwright_page do |playwright_page|
+      playwright_page.context.route("#{Integrations::Bikebook::Catalog::URL}manifest.json", ->(route, _request) { held << route })
+    end
+
+    page.refresh
+    expect(page).to have_css("[inert] .hw-combobox__chip", text: "Aventón Level 4 REC Step-Through", wait: 10)
+    expect(page).to have_css("[inert] .hw-combobox__chip", text: "Specialized Haul ST")
+    expect(page).to have_css("#vehicle_models[disabled][placeholder='']")
+    held.pop.fallback
+    expect(page).to have_no_css("[inert]", wait: 10)
+    expect(page).to have_css(".hw-combobox__chip", count: 2)
+    expect(page).to have_css("[aria-label='Overview comparison'] thead th", text: "Haul ST")
+  end
+
   it "keeps the search and its filters while the catalog loads, and says so when it doesn't" do
     serve_bikebook_catalog(manifest_status: 404)
     held = Queue.new

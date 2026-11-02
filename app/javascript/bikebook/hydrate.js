@@ -9,6 +9,7 @@ import { FILTERS, LISTS, RANGES, SINGLES, ordered, searching, toQuery } from 'bi
 import { fragmentOf, renderInto } from 'bikebook/render'
 import { preferredSize } from 'bikebook/sizes'
 import { settingsFrom } from 'bikebook/similarity'
+import { storage } from 'utils/storage'
 import { MAX_COMPARE, pickedPhotos, VehicleViewer, withChosenPhotos } from 'bikebook/vehicle_viewer'
 
 /* global CSS */
@@ -19,6 +20,16 @@ const MARKET_ATTRIBUTE = 'data-bikebook--catalog-filters-default-market-value'
 // CycleType::NOT_CYCLE_TYPE, by the catalog's slugs
 const NOT_CYCLE_TYPE = ['e_scooter', 'skateboard', 'epamd', 'stroller', 'wheelchair', 'e_motorcycle']
 const JURISDICTION_ATTRIBUTE = 'data-bikebook--catalog-filters-default-jurisdiction-value'
+const CHIPS_KEY = 'bikebook:chips'
+
+// What the last render's vehicle chips said, by value, for a reload to show before the catalog names them
+const storedChips = () => {
+  try {
+    return JSON.parse(storage.getItem(CHIPS_KEY)) ?? {}
+  } catch {
+    return {}
+  }
+}
 
 // "Select an e-scooter, choose multiple to compare them" once the first of `vehicles` is one that isn't a bike, both
 // where the search is labelled and its dialog on a phone. The catalog names types in English, which picks the article
@@ -137,19 +148,24 @@ export async function pickedVehicles (catalog, page, url) {
 }
 
 // The page at `url` while the catalog loads: its filters live and filled in from the URL, their values as it has them, and
-// its comboboxes, whose options are the catalog's, disabled. `status` stands in for the vehicles
+// its comboboxes, whose options are the catalog's, disabled, and the picks it last named chipped. `status` stands in for
+// the vehicles
 export function loadingShell (shell, url, status) {
   const root = shell.content.cloneNode(true)
   const panel = panelOf(root)
   panel.hidden = !searching(url)
   const filters = urlFilters(root, url)
   fillFields(root, filters)
+  const stored = storedChips()
+  const picks = ['vehicle_models', 'classifications'].flatMap((name) => url.searchParams.get(name)?.split(',').filter(Boolean) ?? [])
+  const chips = picks.filter((value) => stored[value]).map((value) => ({ value, display: stored[value] }))
+  renderChips(combobox(root, 'vehicle_models'), chips)
   // one holding what only the catalog names, rather than the Any it isn't
   for (const name of ['vehicle_models', ...LISTS, ...SINGLES].filter((each) => filters[each] ?? url.searchParams.get(each))) {
     const field = combobox(root, name)
     const input = field.querySelector('.hw-combobox__input')
     field.dataset.hwComboboxPrefilledDisplayValue = ''
-    input.placeholder = panel.dataset.loadingPlaceholder
+    input.placeholder = name === 'vehicle_models' && chips.length === picks.length ? '' : panel.dataset.loadingPlaceholder
     input.dataset.awaitingCatalog = ''
   }
   for (const field of root.querySelectorAll('.hw-combobox')) {
@@ -193,8 +209,9 @@ export async function hydrate (catalog, source, shell, url) {
   combobox(root, 'vehicle_models').dataset.hwComboboxAsyncSrcValue = `${url.pathname}?${query ? `${query}&` : ''}for_id=vehicle_models`
   root.getElementById('vehicle_models-hw-hidden-field').setAttribute('value', values)
   // chipped before it's shown, rather than once the combobox asks the worker, which would leave the field bare a frame
-  renderChips(combobox(root, 'vehicle_models'), [...vehicles.filter(({ display }) => display != null),
-    ...cards.map((value) => ({ value, display: classifications[value].label }))])
+  const chips = [...vehicles.filter(({ display }) => display != null), ...cards.map((value) => ({ value, display: classifications[value].label }))]
+  renderChips(combobox(root, 'vehicle_models'), chips)
+  storage.setItem(CHIPS_KEY, JSON.stringify(Object.fromEntries(chips.map(({ value, display }) => [value, display]))))
   fillFields(root, filters)
   renderClassCards(root, cards, classifications)
   for (const name of SINGLES) {
