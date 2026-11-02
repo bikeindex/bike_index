@@ -1,15 +1,13 @@
-.row.mb-4
-  .col-md-4
-    %h1
-      Edit Payment
+%h1{class: "tw:mb-6"}
+  Edit Payment
 
 = render partial: "/admin/payments/display", locals: {payment: @payment}
 
-.pb-4
+%div{class: "tw:pb-6"}
 
 - if @payment.can_assign_to_membership?
-  .col-6.ml-auto.mr-auto.mb-5.mt-4
-    = render(UI::Card::Component.new) do
+  = render(UI::Container::Component.new) do
+    = render(UI::Card::Component.new(additional_classes: "tw:mt-6 tw:mb-12")) do
       %p
         You can give this user a Bike Index membership by clicking
         %em assign to membership
@@ -17,18 +15,15 @@
       = render(UI::ButtonLink::Component.new(text: "assign to membership", href: admin_payment_path(id: @payment.id, assign_to_membership: true), method: :patch, color: :primary))
 
 - if @payment.can_assign_to_invoice?
-  .row
-    .col-md-8.offset-md-2
-      = form_for [:admin, @payment] do |f|
-        = render(UI::Alerts::ObjectError::Component.new(object: @payment))
+  = render(UI::Container::Component.new) do
+    = form_for [:admin, @payment] do |f|
+      = render(UI::Alerts::ObjectError::Component.new(object: @payment))
 
-        .row
-          .col-lg-6
-            = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :organization_id, label_text: Payment.human_attribute_name(:organization_id))) do
-              = render UI::Forms::Combobox::Component.new(name: :organization_id, options: Organization.approved.pluck(:name, :id), include_blank: true, html_options: {form: f, placeholder: "Choose organization"})
-          .col-lg-6
-            = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :invoice_id, label_text: "Invoice #"))
+      .twwiderow
+        = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :organization_id, label_text: Payment.human_attribute_name(:organization_id))) do
+          = render UI::Forms::Combobox::Component.new(name: :organization_id, options: Organization.approved.pluck(:name, :id), include_blank: true, html_options: {form: f, placeholder: "Choose organization"})
+        = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :invoice_id, label_text: "Invoice #"))
 
-        %div{class: "tw:flex tw:justify-end"}
-          = render(UI::Button::Component.new(text: "Submit", color: :primary, type: "submit"))
+      %div{class: "tw:flex tw:justify-end"}
+        = render(UI::Button::Component.new(text: "Submit", color: :primary, type: "submit"))
 

@@ -64,10 +64,10 @@
 
 <% if @render_chart %>
   <% rendered_chart = capture do %>
-    <h4 class="mt-2">Counts</h4>
+    <h4 class="tw:mt-2">Counts</h4>
     <%= render(UI::Chart::Component.new(series: payments_counts_nozero.map { |c| {name: c[:name], data: c[:data]} }, time_range: @time_range, stacked: true)) %>
 
-    <h4 class="mt-2">Amounts</h4>
+    <h4 class="tw:mt-2">Amounts</h4>
     <%= render(UI::Chart::Component.new(series: payments_counts_nozero.map { |c| {name: c[:name], data: c[:data_money]} }, time_range: @time_range, stacked: true, prefix: "$", round: 2)) %>
   <% end %>
 <% end %>
@@ -89,45 +89,41 @@
 <% end %>
 
 <% table_view = capture do %>
-  <div class="row mb-4">
-    <div class="col-sm">
-      <p class="mt-2">
-        A total of
-        <%= MoneyFormatter.money_format(matching_payments.sum(:amount_cents)) %>
-      </p>
-    </div>
+  <div class="twwiderow tw:mb-6 tw:items-start">
+    <p class="tw:mt-2">
+      A total of
+      <%= MoneyFormatter.money_format(matching_payments.sum(:amount_cents)) %>
+    </p>
 
     <% if payments_counts.present? %>
-      <div class="col-sm">
-        <%= render(UI::Table::Component.new(records: [payments_counts])) do |table| %>
-          <% payments_counts.each do |payment_count| %>
-            <% header = capture do %>
-              <%= payment_count[:name].pluralize %>
+      <%= render(UI::Table::Component.new(records: [payments_counts])) do |table| %>
+        <% payments_counts.each do |payment_count| %>
+          <% header = capture do %>
+            <%= payment_count[:name].pluralize %>
 
-              <% if params[:search_kind].present? %>
-                <%= link_to "view all kinds", admin_payments_path(sortable_search_params.merge(search_kind: "")), class: "tw:text-sm tw:italic" %>
-              <% else %>
-                <%= link_to "view", admin_payments_path(sortable_search_params.merge(search_kind: payment_count[:kind])), class: "tw:text-sm tw:italic" %>
-              <% end %>
+            <% if params[:search_kind].present? %>
+              <%= link_to "view all kinds", admin_payments_path(sortable_search_params.merge(search_kind: "")), class: "tw:text-sm tw:italic" %>
+            <% else %>
+              <%= link_to "view", admin_payments_path(sortable_search_params.merge(search_kind: payment_count[:kind])), class: "tw:text-sm tw:italic" %>
             <% end %>
+          <% end %>
 
-            <% table.column(label: header, classes: "tw:text-center") do %>
-              <em class="twless-strong">
-                <%= number_display(payment_count[:count]) %> -
-              </em>
+          <% table.column(label: header, classes: "tw:text-center") do %>
+            <em class="twless-strong">
+              <%= number_display(payment_count[:count]) %> -
+            </em>
 
-              <%= payment_count[:money] %>
+            <%= payment_count[:money] %>
 
-              <% if payment_count[:name] == "payment" && payment_count[:count] > 0 %>
-                <br>
-                <small class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>">
-                  There shouldn't be payments without invoices
-                </small>
-              <% end %>
+            <% if payment_count[:name] == "payment" && payment_count[:count] > 0 %>
+              <br>
+              <small class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>">
+                There shouldn't be payments without invoices
+              </small>
             <% end %>
           <% end %>
         <% end %>
-      </div>
+      <% end %>
     <% end %>
   </div>
 

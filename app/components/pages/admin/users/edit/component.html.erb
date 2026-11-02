@@ -3,35 +3,25 @@
 <%= form_for @user, url: admin_user_path(@user), method: :patch, html: {data: {controller: "admin--user-edit-form"}} do |f| %>
   <%= render(UI::Alerts::ObjectError::Component.new(object: @user)) %>
 
-  <div class="row mt-4">
-    <div class="col-md-6">
-      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :name)) %>
-    </div>
+  <div class="twwiderow tw:mt-6">
+    <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :name)) %>
 
-    <div class="col-md-6">
-      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :email, required: true)) do %>
-        <%= render(UI::Forms::Email::Component.new(form_builder: f, required: true)) %>
-      <% end %>
-    </div>
+    <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :email, required: true)) do %>
+      <%= render(UI::Forms::Email::Component.new(form_builder: f, required: true)) %>
+    <% end %>
+
+    <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :username)) %>
+
+    <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :secondary_emails, kind: :text_area,
+      optional_badge: false, html_options: {value: @user.secondary_emails.join(", "), disabled: true, rows: 1})) %>
   </div>
 
-  <div class="row">
-    <div class="col-md-6">
-      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :username)) %>
-    </div>
-
-    <div class="col-md-6">
-      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :secondary_emails, kind: :text_area,
-        optional_badge: false, html_options: {value: @user.secondary_emails.join(", "), disabled: true, rows: 1})) %>
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="col-md-6">
+  <div class="tw:grid tw:grid-cols-2 tw:gap-x-8 tw:lg:grid-cols-4">
+    <div class="tw:col-span-2 tw:md:col-span-1 tw:lg:col-span-2">
       <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :phone)) %>
     </div>
 
-    <div class="col-lg-3 col-6 tw:mb-4">
+    <div class="tw:mb-4">
       <%= render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :confirmed, label: "Confirmed",
         html_options: {disabled: @user.confirmed})) %>
 
@@ -42,7 +32,7 @@
         label: "Can send many marketplace messages")) %>
     </div>
 
-    <div class="col-lg-3 col-6 tw:mb-4">
+    <div class="tw:mb-4">
       <%= render(UI::Forms::Checkbox::Component.new(name: "user[superuser]", label: "superuser", checked: @user.superuser?)) %>
 
       <% if @display_dev_info %>
@@ -52,12 +42,12 @@
     </div>
   </div>
 
-  <div class="row mt-3">
-    <div class="col-6">
+  <div class="tw:mt-4 tw:grid tw:grid-cols-2 tw:gap-x-8">
+    <div>
       <%= render(UI::Button::Component.new(text: "Save", color: :primary, type: "submit")) %>
     </div>
 
-    <div class="col-6 pt-2">
+    <div class="tw:pt-2">
       <%= render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :banned, label: "Banned",
         html_options: {data: {"admin--user-edit-form-target": "banned", action: "change->admin--user-edit-form#bannedChanged"}})) %>
     </div>
@@ -66,24 +56,19 @@
   <% if ban_fields? %>
     <%= f.fields_for :user_ban do |user_ban| %>
       <div
-        <%# hidden! because .row sets display in unlayered admin.css, which tw:hidden loses to %>
-        class="row <%= "tw:hidden!" unless @user.banned? %>"
+        class="tw:mt-4 <%= "tw:hidden!" unless @user.banned? %>"
         data-admin--user-edit-form-target="banFields"
       >
-        <div class="col-md-8 offset-md-2 mt-3">
+        <%= render(UI::Container::Component.new) do %>
           <%= render(UI::Card::Component.new) do %>
-            <div class="row">
-              <div class="col-sm-6">
-                <h4>Ban information</h4>
-              </div>
+            <div class="twwiderow">
+              <h4>Ban information</h4>
 
-              <div class="col-sm-6">
-                <%= render(UI::Forms::Group::Component.new(form_builder: user_ban, attribute: :reason, required: true)) do %>
-                  <%= render(UI::Forms::Select::Component.new(form_builder: user_ban, attribute: :reason,
-                    option_tags: user_ban_reason_options, options: {prompt: "Reason for ban"}, required: @user.banned?,
-                    html_options: {data: {"admin--user-edit-form-target": "banReason"}})) %>
-                <% end %>
-              </div>
+              <%= render(UI::Forms::Group::Component.new(form_builder: user_ban, attribute: :reason, required: true)) do %>
+                <%= render(UI::Forms::Select::Component.new(form_builder: user_ban, attribute: :reason,
+                  option_tags: user_ban_reason_options, options: {prompt: "Reason for ban"}, required: @user.banned?,
+                  html_options: {data: {"admin--user-edit-form-target": "banReason"}})) %>
+              <% end %>
             </div>
 
             <%= render(UI::Forms::Group::Component.new(form_builder: user_ban, attribute: :description, kind: :text_area,
@@ -107,7 +92,7 @@
               </li>
             </ul>
           <% end %>
-        </div>
+        <% end %>
       </div>
     <% end %>
   <% end %>

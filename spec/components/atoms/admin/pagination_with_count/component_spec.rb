@@ -84,17 +84,15 @@ RSpec.describe Atoms::Admin::PaginationWithCount::Component, type: :component do
       let(:options) { super().merge(skip_total: true) }
 
       it "renders minimal output" do
-        expect(component.css(".row")).to be_present
+        expect(component.css("p")).to be_blank
         expect(component.text.strip).to be_blank
       end
     end
   end
 
   describe "component structure" do
-    it "renders within a row div" do
-      expect(component.css("div.row")).to be_present
-      expect(component.css("div.col-md-5 p")).to be_present
-      expect(component.css("strong")).to be_present
+    it "renders the count in a paragraph" do
+      expect(component.css("p strong")).to be_present
     end
   end
 

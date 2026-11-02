@@ -28,14 +28,12 @@
 
   = render(Pages::Admin::News::Options::Component.new(form_builder: f, blog: @blog))
 
-.row.mt-2.mb-2
-  .col-md-6
-= render(UI::Alerts::Base::Component.new(kind: :notice)) do
+= render(UI::Alerts::Base::Component.new(kind: :notice, margin_classes: "tw:mt-2 tw:mb-4")) do
   %p
     The content blocks accept HTML or Markdown for styling and linking things. Check out this #{link_to "Markdown cheat sheet", "https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet", target: "_blank"} if you're curious.
 
 - unless @blog.is_listicle
-  .mt-4
+  %div{class: "tw:mt-6"}
     = render(UI::Forms::Files::UploadMultiple::Component.new(url: public_images_path, file_param: "public_image[image]",
-      params: { blog_id: @blog.id }, accept: ImageUploader.permitted_extensions, list_html_options: { class: "row list-unstyled" })) do
+      params: { blog_id: @blog.id }, accept: ImageUploader.permitted_extensions, list_html_options: { class: "list-unstyled twwiderow twwiderow-3" })) do
       = render partial: "public_images/admin_public_image", collection: @blog.public_images.with_attached_file, as: :public_image

@@ -17,7 +17,7 @@
     times
   - list.with_row(label: "Times:") do
     - if @stolen_notification.send_dates_parsed.any?
-      %ul.pl-0
+      %ul
         - @stolen_notification.send_dates_parsed.each do |stamp|
           %li.list-unstyled
             = link_to render(UI::Time::Component.new(time: Time.at(stamp), format: :localize_time_precise)), admin_stolen_notification_url(stamp)

@@ -1,17 +1,16 @@
 - if SocialAccount.active.errored.any?
-  .row.mt-4.mb-4
-    .col-md-6.ml-auto.mr-auto
-      = render(UI::Alerts::Base::Component.new(kind: :error)) do
-        %h4
-          %strong
-            = pluralize(SocialAccount.active.errored.count, "Social account")
-          with errors
-          %em.text-success
-            = link_to "review errors", admin_social_accounts_path(sort: "last_error_at")
-        %p
-          This will prevent posting for areas served by:
-          %br
-          %em
-            = SocialAccount.active.errored.pluck(:screen_name).sort.join(", ")
+  = render(UI::Container::Component.new) do
+    = render(UI::Alerts::Base::Component.new(kind: :error, margin_classes: "tw:my-6")) do
+      %h4
+        %strong
+          = pluralize(SocialAccount.active.errored.count, "Social account")
+        with errors
+        %em.text-success
+          = link_to "review errors", admin_social_accounts_path(sort: "last_error_at")
+      %p
+        This will prevent posting for areas served by:
+        %br
+        %em
+          = SocialAccount.active.errored.pluck(:screen_name).sort.join(", ")
 
-        = render(UI::ButtonLink::Component.new(text: "Log in with any of these accounts to refresh their credentials", href: "/auth/twitter", color: :primary))
+      = render(UI::ButtonLink::Component.new(text: "Log in with any of these accounts to refresh their credentials", href: "/auth/twitter", color: :primary))

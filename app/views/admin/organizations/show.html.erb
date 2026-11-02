@@ -31,8 +31,7 @@
 
 <%= render(Pages::Admin::Organizations::Show::Roles::Component.new(organization: @organization, deleted: @deleted_organization_roles)) %>
 
-<%# forced: admin_unvendored's `hr` rule is unlayered, so plain utilities are inert here %>
-<hr class="tw:mt-8! tw:mb-4!">
+<hr class="tw:mt-8 tw:mb-4">
 
 <div class="tw:text-right">
   <% if @organization.deleted? %>

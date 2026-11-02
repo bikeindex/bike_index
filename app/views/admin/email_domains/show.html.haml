@@ -1,88 +1,86 @@
 = render(Pages::Admin::Headers::Nav::Component.new(title: safe_join(["Email Domain ", tag.strong(@email_domain.domain)])))
 
-.row.mt-4
-  .col-md-6
-    = render(UI::TableList::Component.new) do |list|
-      - list.with_row(label: "Creator", value: render(Atoms::Admin::TableCells::User::Component.new(user: @email_domain.creator, user_id: @email_domain.creator_id)))
-      - list.with_row(label: "Created", class: "tw:text-sm", value: render(UI::Time::Component.new(time: @email_domain.created_at, format: :localize_time_precise)))
-      - list.with_row(label: "Updated", class: "tw:text-sm", value: render(UI::Time::Component.new(time: @email_domain.updated_at, format: :localize_time_precise)))
-      - list.with_row(label: "Changed status at", class: "tw:text-sm", value: (render(UI::Time::Component.new(time: @email_domain.status_changed_at, format: :localize_time_precise)) if @email_domain.status_changed_after_create?))
-      - list.with_row(label: "TLD") do
-        - if @matching_tld.present?
-          = link_to @matching_tld.domain, admin_email_domain_path(@matching_tld.id)
-        - elsif @email_domain.tld?
-          %small.twless-strong this is record is a TLD
+.twwiderow{class: "tw:items-start tw:mt-6"}
+  = render(UI::TableList::Component.new) do |list|
+    - list.with_row(label: "Creator", value: render(Atoms::Admin::TableCells::User::Component.new(user: @email_domain.creator, user_id: @email_domain.creator_id)))
+    - list.with_row(label: "Created", class: "tw:text-sm", value: render(UI::Time::Component.new(time: @email_domain.created_at, format: :localize_time_precise)))
+    - list.with_row(label: "Updated", class: "tw:text-sm", value: render(UI::Time::Component.new(time: @email_domain.updated_at, format: :localize_time_precise)))
+    - list.with_row(label: "Changed status at", class: "tw:text-sm", value: (render(UI::Time::Component.new(time: @email_domain.status_changed_at, format: :localize_time_precise)) if @email_domain.status_changed_after_create?))
+    - list.with_row(label: "TLD") do
+      - if @matching_tld.present?
+        = link_to @matching_tld.domain, admin_email_domain_path(@matching_tld.id)
+      - elsif @email_domain.tld?
+        %small.twless-strong this is record is a TLD
+      - else
+        = @email_domain.tld
+    - list.with_row(label: "Extra", value: render(partial: "data_details", locals: {email_domain: @email_domain}))
+    - list.with_row(label: "Status") do
+      - status_class = UI::Alerts::Base::Component::TEXT_CLASSES[:error] if @email_domain.status.match?("ban")
+      - status_class = "font-weight-bold #{UI::Alerts::Base::Component::TEXT_CLASSES[:warning]}" if @email_domain.ignored?
+      %span{class: status_class}
+        = @email_domain.status_humanized
+      - if @email_domain.ignored?
+        %small.twless-strong will not match any new users
+      - if @email_domain&.no_auto_assign_status?
+        %small{class: "tw:ml-1 tw:text-sky-400"} no auto status
+
+  = render(UI::TableList::Component.new) do |list|
+    - list.with_row(label: "Ban Blockers", class: "tw:text-sm") do
+      - ban_blockers = @email_domain.ban_blockers.any?
+      = ban_blockers ? check_mark : cross_mark
+      %small{class: "tw:ml-2"}
+        - if @email_domain.auto_bannable?
+          %span{class: UI::Alerts::Base::Component::TEXT_CLASSES[:warning]} auto bannable
         - else
-          = @email_domain.tld
-      - list.with_row(label: "Extra", value: render(partial: "data_details", locals: {email_domain: @email_domain}))
-      - list.with_row(label: "Status") do
-        - status_class = UI::Alerts::Base::Component::TEXT_CLASSES[:error] if @email_domain.status.match?("ban")
-        - status_class = "font-weight-bold #{UI::Alerts::Base::Component::TEXT_CLASSES[:warning]}" if @email_domain.ignored?
-        %span{class: status_class}
-          = @email_domain.status_humanized
-        - if @email_domain.ignored?
-          %small.twless-strong will not match any new users
-        - if @email_domain&.no_auto_assign_status?
-          %small{class: "tw:ml-1 tw:text-sky-400"} no auto status
-
-  .col-md-6
-    = render(UI::TableList::Component.new) do |list|
-      - list.with_row(label: "Ban Blockers", class: "tw:text-sm") do
-        - ban_blockers = @email_domain.ban_blockers.any?
-        = ban_blockers ? check_mark : cross_mark
-        %small.ml-2
-          - if @email_domain.auto_bannable?
-            %span{class: UI::Alerts::Base::Component::TEXT_CLASSES[:warning]} auto bannable
-          - else
-            not auto banable
-            - if ban_blockers
-              %ul.mb-0
-                -# duplicates the logic from ban_blockers to make it more readable
-                - if @email_domain.below_email_count_blocker?
-                  %li
-                    %em.ml-2{title: "NOTE: this also checks against notifications / 10"}
-                      Below email min count (#{EmailDomain::EMAIL_MIN_COUNT})
-                - if @email_domain.bike_count_blocker?
-                  %li
-                    %em.ml-2 Bike count
-                - if @email_domain.organization_role_blocker?
-                  %li
-                    %em.ml-2 Org Roles
-                - if @email_domain.calculated_subdomains.permitted.count > 0
-                  %li
-                    %em.ml-2 Permitted subdomains
-      - list.with_row(label: "Spam score") do
-        %strong{class: admin_email_domain_spam_color(@email_domain.spam_score)}
-          #{@email_domain.spam_score} / 10
-        %small.twless-strong above #{EmailDomain::SPAM_SCORE_AUTO_BAN} is auto-bannable (with no blockers)
-        %small{class: "tw:block"}
-          %span
-            %strong= number_display(- @email_domain.spam_score_our_records)
-            our records,
-          %span.ml-2
-            %strong= number_display(- @email_domain.spam_score_domain_resolution)
-            domain resolution,
-          %span.ml-2
-            %strong= number_display(- @email_domain.spam_score_sendgrid_validations)
-            sendgrid
-      - list.with_row(label: "Bikes") do
-        = link_to number_display(@email_domain.bike_count), admin_bikes_path(search_domain: @email_domain.domain, render_chart: true)
-        %small.ml-2
-          POS:
-          %strong= number_display(@email_domain.data["bike_count_pos"])
-      - list.with_row(label: "BParam", class: "tw:text-sm", value: number_display(@email_domain.b_param_count))
-      - list.with_row(label: "Notifications", value: link_to(number_display(@email_domain.notification_count), admin_notifications_path(query: @email_domain.domain, render_chart: true)))
-      - list.with_row(label: "Users") do
-        = link_to number_display(@email_domain.user_count), admin_users_path(search_domain: @email_domain.domain, render_chart: true)
-        %small.ml-2
-          Donors:
-          = number_display(@email_domain.data["user_count_donated"] || 0)
+          not auto banable
+          - if ban_blockers
+            %ul{class: "tw:mb-0"}
+              -# duplicates the logic from ban_blockers to make it more readable
+              - if @email_domain.below_email_count_blocker?
+                %li
+                  %em{class: "tw:ml-2", title: "NOTE: this also checks against notifications / 10"}
+                    Below email min count (#{EmailDomain::EMAIL_MIN_COUNT})
+              - if @email_domain.bike_count_blocker?
+                %li
+                  %em{class: "tw:ml-2"} Bike count
+              - if @email_domain.organization_role_blocker?
+                %li
+                  %em{class: "tw:ml-2"} Org Roles
+              - if @email_domain.calculated_subdomains.permitted.count > 0
+                %li
+                  %em{class: "tw:ml-2"} Permitted subdomains
+    - list.with_row(label: "Spam score") do
+      %strong{class: admin_email_domain_spam_color(@email_domain.spam_score)}
+        #{@email_domain.spam_score} / 10
+      %small.twless-strong above #{EmailDomain::SPAM_SCORE_AUTO_BAN} is auto-bannable (with no blockers)
+      %small{class: "tw:block"}
+        %span
+          %strong= number_display(- @email_domain.spam_score_our_records)
+          our records,
+        %span{class: "tw:ml-2"}
+          %strong= number_display(- @email_domain.spam_score_domain_resolution)
+          domain resolution,
+        %span{class: "tw:ml-2"}
+          %strong= number_display(- @email_domain.spam_score_sendgrid_validations)
+          sendgrid
+    - list.with_row(label: "Bikes") do
+      = link_to number_display(@email_domain.bike_count), admin_bikes_path(search_domain: @email_domain.domain, render_chart: true)
+      %small{class: "tw:ml-2"}
+        POS:
+        %strong= number_display(@email_domain.data["bike_count_pos"])
+    - list.with_row(label: "BParam", class: "tw:text-sm", value: number_display(@email_domain.b_param_count))
+    - list.with_row(label: "Notifications", value: link_to(number_display(@email_domain.notification_count), admin_notifications_path(query: @email_domain.domain, render_chart: true)))
+    - list.with_row(label: "Users") do
+      = link_to number_display(@email_domain.user_count), admin_users_path(search_domain: @email_domain.domain, render_chart: true)
+      %small{class: "tw:ml-2"}
+        Donors:
+        = number_display(@email_domain.data["user_count_donated"] || 0)
 
 
-.row.mt-4.mb-4.pb-4
-  .col-md-4.pt-3
+%div{class: "tw:grid tw:gap-x-8 tw:md:grid-cols-3 tw:my-6 tw:pb-6"}
+  %div{class: "tw:pt-4"}
     .only-dev-visible= render UI::JsonDisplay::Component.new(data: @email_domain.data, small: true)
-  .col-md-68.pt-3
+  %div{class: "tw:md:col-span-2 tw:pt-4"}
     = render "form",
       email_domain: @email_domain,
       action: admin_email_domain_path(@email_domain),

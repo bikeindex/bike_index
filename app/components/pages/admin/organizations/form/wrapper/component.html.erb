@@ -103,7 +103,7 @@
 
   <div>
     <% if @display_dev_info %>
-      <div class="only-dev-visible mt-4 tw:mb-2 tw:p-2">
+      <div class="only-dev-visible tw:mt-6 tw:mb-2 tw:p-2">
         <%= render(UI::Forms::Group::Component.new(attribute: :manual_pos_kind, label_text: "Manually set POS kind")) do |group| %>
           <% group.with_helper_text do %>
             <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">Warning - you can break things here!</span>

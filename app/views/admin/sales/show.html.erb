@@ -1,69 +1,65 @@
 <%= render(Pages::Admin::Headers::Nav::Component.new(title: "Sale")) %>
 
-<div class="row mt-4">
-  <div class="col-md-6">
-    <%= render(UI::TableList::Component.new) do |list| %>
-      <% list.with_row(label: "ID", dev_only: true, value: tag.code(@sale.id), if: display_dev_info?) %>
+<div class="twwiderow tw:mt-6 tw:items-start">
+  <%= render(UI::TableList::Component.new) do |list| %>
+    <% list.with_row(label: "ID", dev_only: true, value: tag.code(@sale.id), if: display_dev_info?) %>
 
-      <% list.with_row(label: "Seller", value: render(Atoms::Admin::TableCells::User::Component.new(user: @sale.seller, user_id: @sale.seller_id))) %>
+    <% list.with_row(label: "Seller", value: render(Atoms::Admin::TableCells::User::Component.new(user: @sale.seller, user_id: @sale.seller_id))) %>
 
-      <% list.with_row(label: "Buyer") do %>
-        <% if @sale.buyer.present? %>
-          <%= render Atoms::Admin::TableCells::User::Component.new(user: @sale.buyer, user_id: @sale.buyer&.id) %>
-        <% else %>
-          <span class="twless-strong"><%= @sale.new_owner_email %></span>
-        <% end %>
-      <% end %>
-
-      <% list.with_row(label: "Amount", value: amount_display(@sale, currency_name_suffix: true)) %>
-
-      <% list.with_row(label: "Sold via", value: @sale.sold_via&.humanize) %>
-
-      <% list.with_row(label: "Sold at", class: "tw:text-sm", value: render(UI::Time::Component.new(time: @sale.sold_at, format: :localize_time_precise))) %>
-
-      <% list.with_row(label: "Created", class: "tw:text-sm", value: render(UI::Time::Component.new(time: @sale.created_at, format: :localize_time_precise))) %>
-    <% end %>
-  </div>
-
-  <div class="col-md-6">
-    <%= render(UI::TableList::Component.new) do |list| %>
-      <% list.with_row(label: "Item") do %>
-        <% if @sale.item.is_a?(Bike) %>
-          <%= render Atoms::Admin::TableCells::Bike::Component.new(bike: @sale.item, bike_id: @sale.item_id) %>
-        <% elsif @sale.item.is_a?(BikeVersion) %>
-          BikeVersion
-          <%= link_to @sale.item_id, bike_version_path(@sale.item_id) %>
-          <small>(bike: <%= link_to @sale.item.bike_id, admin_bike_path(@sale.item.bike_id) %>)</small>
-        <% end %>
-      <% end %>
-
-      <% list.with_row(label: "Ownership") do %>
-        <% if @sale.ownership.present? %>
-          <%= link_to @sale.ownership_id, admin_ownership_path(@sale.ownership_id) %>
-          <small>
-            (bike:
-            <%= link_to @sale.ownership.bike_id, admin_bike_path(@sale.ownership.bike_id) %>)
-          </small>
-        <% end %>
-      <% end %>
-
-      <% list.with_row(label: "Marketplace Listing", if: @marketplace_listing.present?) do %>
-        <%= link_to @marketplace_listing.id, admin_marketplace_messages_path(search_marketplace_listing_id: @marketplace_listing.id) %>
-
-        <%= render Atoms::Admin::Badges::MarketplaceListing::Component.new(status: @marketplace_listing.status, status_humanized: @marketplace_listing.status_humanized, kind: :marketplace_listing) %>
-      <% end %>
-
-      <% list.with_row(label: "Marketplace Message", if: @sale.marketplace_message.present?) do %>
-        <%= link_to(@sale.marketplace_message_id, admin_marketplace_message_path(@sale.marketplace_message_id)) %>
-      <% end %>
-
-      <% list.with_row(label: "New Ownership") do %>
-        <% if @sale.new_ownership.present? %>
-          <%= link_to @sale.new_ownership.id, admin_ownership_path(@sale.new_ownership.id) %>
-        <% else %>
-          <span class="twless-strong">pending</span>
-        <% end %>
+    <% list.with_row(label: "Buyer") do %>
+      <% if @sale.buyer.present? %>
+        <%= render Atoms::Admin::TableCells::User::Component.new(user: @sale.buyer, user_id: @sale.buyer&.id) %>
+      <% else %>
+        <span class="twless-strong"><%= @sale.new_owner_email %></span>
       <% end %>
     <% end %>
-  </div>
+
+    <% list.with_row(label: "Amount", value: amount_display(@sale, currency_name_suffix: true)) %>
+
+    <% list.with_row(label: "Sold via", value: @sale.sold_via&.humanize) %>
+
+    <% list.with_row(label: "Sold at", class: "tw:text-sm", value: render(UI::Time::Component.new(time: @sale.sold_at, format: :localize_time_precise))) %>
+
+    <% list.with_row(label: "Created", class: "tw:text-sm", value: render(UI::Time::Component.new(time: @sale.created_at, format: :localize_time_precise))) %>
+  <% end %>
+
+  <%= render(UI::TableList::Component.new) do |list| %>
+    <% list.with_row(label: "Item") do %>
+      <% if @sale.item.is_a?(Bike) %>
+        <%= render Atoms::Admin::TableCells::Bike::Component.new(bike: @sale.item, bike_id: @sale.item_id) %>
+      <% elsif @sale.item.is_a?(BikeVersion) %>
+        BikeVersion
+        <%= link_to @sale.item_id, bike_version_path(@sale.item_id) %>
+        <small>(bike: <%= link_to @sale.item.bike_id, admin_bike_path(@sale.item.bike_id) %>)</small>
+      <% end %>
+    <% end %>
+
+    <% list.with_row(label: "Ownership") do %>
+      <% if @sale.ownership.present? %>
+        <%= link_to @sale.ownership_id, admin_ownership_path(@sale.ownership_id) %>
+        <small>
+          (bike:
+          <%= link_to @sale.ownership.bike_id, admin_bike_path(@sale.ownership.bike_id) %>)
+        </small>
+      <% end %>
+    <% end %>
+
+    <% list.with_row(label: "Marketplace Listing", if: @marketplace_listing.present?) do %>
+      <%= link_to @marketplace_listing.id, admin_marketplace_messages_path(search_marketplace_listing_id: @marketplace_listing.id) %>
+
+      <%= render Atoms::Admin::Badges::MarketplaceListing::Component.new(status: @marketplace_listing.status, status_humanized: @marketplace_listing.status_humanized, kind: :marketplace_listing) %>
+    <% end %>
+
+    <% list.with_row(label: "Marketplace Message", if: @sale.marketplace_message.present?) do %>
+      <%= link_to(@sale.marketplace_message_id, admin_marketplace_message_path(@sale.marketplace_message_id)) %>
+    <% end %>
+
+    <% list.with_row(label: "New Ownership") do %>
+      <% if @sale.new_ownership.present? %>
+        <%= link_to @sale.new_ownership.id, admin_ownership_path(@sale.new_ownership.id) %>
+      <% else %>
+        <span class="twless-strong">pending</span>
+      <% end %>
+    <% end %>
+  <% end %>
 </div>

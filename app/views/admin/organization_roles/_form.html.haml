@@ -1,6 +1,6 @@
 = render(UI::Card::Component.new) do
   - if @organization_role.id.present?
-    %h4.mb-4{class: UI::Alerts::Base::Component::TEXT_CLASSES[:error]}
+    %h4{class: "tw:mb-6 #{UI::Alerts::Base::Component::TEXT_CLASSES[:error]}"}
       DANGER! Don't edit
       %em
         %br

@@ -35,8 +35,8 @@
   <% rendered_chart = capture do %>
     <%= render(UI::Chart::Component.new(series: time_range_counts(collection: available_recoveries, column: @time_range_column), time_range: @time_range, stacked: true)) %>
 
-    <div class="row mt-4 mb-4">
-      <div class="col-sm-6 offset-sm-3">
+    <div class="tw:my-6">
+      <%= render(UI::Container::Component.new) do %>
         <%# duplicates some stuff from counts.rb %>
         <% valued_recoveries = available_recoveries.pluck(:estimated_value).reject(&:blank?) %>
         <% recovery_amount = valued_recoveries.sum + (available_recoveries.count - valued_recoveries.count) * Counts.recovery_average_value %>
@@ -50,7 +50,7 @@
 
           <% list.with_row(label: "Total estimated value", value: safe_join(["$", number_display(recovery_amount)])) %>
         <% end %>
-      </div>
+      <% end %>
     </div>
   <% end %>
 <% end %>

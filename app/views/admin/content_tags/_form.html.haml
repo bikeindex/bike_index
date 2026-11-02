@@ -1,12 +1,9 @@
 = form_for [:admin, @content_tag] do |f|
   = render(UI::Alerts::ObjectError::Component.new(object: @content_tag))
 
-  .row
-    .col-md-6
-      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :name))
-    .col-md-6
-      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :description, kind: :text_area))
-    .col-md-6
-      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :priority, kind: :number_field))
+  .twfieldrow
+    = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :name))
+    = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :description, kind: :text_area))
+    = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :priority, kind: :number_field))
 
   = render(UI::Button::Component.new(text: @content_tag.id.present? ? "Update" : "Create", color: :primary, type: "submit"))

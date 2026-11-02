@@ -1,6 +1,6 @@
 <% component = self %>
 
-<div class="mt-4" data-controller="admin--invoice-form">
+<div class="tw:mt-6" data-controller="admin--invoice-form">
   <%= form_for [:admin, @organization, @invoice] do |f| %>
     <%= render(UI::Container::Component.new(width: :wide)) do %>
       <%= f.hidden_field :organization_feature_ids, data: {"admin--invoice-form-target": "featureIds"} %>

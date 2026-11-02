@@ -1,25 +1,18 @@
 = render(UI::Alerts::ObjectError::Component.new(object: record))
 
 = form_for record, url: action, method: method, html: { class: "form" } do |f|
-  .row
-    .col-sm-6
-      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :name))
-    .col-sm-6
-      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :language)) do
-        = render(UI::Forms::Select::Component.new(form_builder: f, attribute: :language, option_tags: language_choices))
-    .col-sm-4.col-6
-      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :currency_enum, label_text: "Currency")) do
-        = render(UI::Forms::Select::Component.new(form_builder: f, attribute: :currency_enum, option_tags: Currency.select_options))
-    .col-sm-4.col-6
-      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :amount_cents, kind: :number_field, label_text: "Price (cents)"))
-    .col-sm-4.col-6
-      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :amount_cents_facebook, kind: :number_field, label_text: "Facebook ad buy (cents)"))
-    .col-sm-4.col-6
-      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :views, kind: :number_field, label_text: "Views Provided"))
-    .col-sm-4.col-6
-      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :duration_days, kind: :number_field, label_text: "Duration (days)"))
-    .col-sm-4.col-6
-      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :ad_radius_miles, kind: :number_field))
+  .twfieldrow
+    = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :name))
+    = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :language)) do
+      = render(UI::Forms::Select::Component.new(form_builder: f, attribute: :language, option_tags: language_choices))
+  %div{class: "tw:grid tw:grid-cols-2 tw:items-end tw:gap-x-2 tw:sm:grid-cols-3"}
+    = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :currency_enum, label_text: "Currency")) do
+      = render(UI::Forms::Select::Component.new(form_builder: f, attribute: :currency_enum, option_tags: Currency.select_options))
+    = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :amount_cents, kind: :number_field, label_text: "Price (cents)"))
+    = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :amount_cents_facebook, kind: :number_field, label_text: "Facebook ad buy (cents)"))
+    = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :views, kind: :number_field, label_text: "Views Provided"))
+    = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :duration_days, kind: :number_field, label_text: "Duration (days)"))
+    = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :ad_radius_miles, kind: :number_field))
   = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :description, kind: :text_area, html_options: {rows: 5})) do |group|
     - group.with_helper_text do
       [
@@ -29,8 +22,8 @@
         tabindex: -1
       permitted
       ]
-  .row.mt-4
-    .col-6
+  .twwiderow{class: "tw:mt-6"}
+    %div
       = render(UI::Button::Component.new(text: submit_label, color: :primary, size: :lg, type: "submit"))
-    .col-sm-6.mt-4
+    %div{class: "tw:mt-6"}
       = render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :active, label: "Active?"))

@@ -1,27 +1,26 @@
 %h1
   Editing Organization Role
 - if @organization_role.deleted?
-  %h2.mb-4{class: UI::Alerts::Base::Component::TEXT_CLASSES[:error]}
+  %h2{class: "tw:mb-6 #{UI::Alerts::Base::Component::TEXT_CLASSES[:error]}"}
     Organization Role deleted
     = render(UI::Time::Component.new(time: @organization_role.deleted_at, format: :localize_time_precise))
 
 
-.row
-  .col-md-6
-    = render(UI::TableList::Component.new) do |list|
-      - list.with_row(label: "Sender") do
-        - if @organization_role.sender_id.present?
-          = render Atoms::Admin::TableCells::User::Component.new(user: @organization_role.sender, user_id: @organization_role.user_id)
-        - else
-          %small.twless-strong
-            self created
-      - list.with_row(label: "Receiver", value: render(Atoms::Admin::TableCells::User::Component.new(user: @organization_role.user, user_id: @organization_role.user_id)))
-      - list.with_row(label: "Created", value: render(UI::Time::Component.new(time: @organization_role.created_at, format: :localize_time_precise)))
-      - list.with_row(label: "Updated", value: render(UI::Time::Component.new(time: @organization_role.updated_at, format: :localize_time_precise)))
-      - list.with_row(label: "Claimed", value: render(UI::Time::Component.new(time: @organization_role.claimed_at, format: :localize_time_precise)))
-      - list.with_row(label: "Emailed", value: render(UI::Time::Component.new(time: @organization_role.email_invitation_sent_at, format: :localize_time_precise)))
+.twwiderow{class: "tw:items-start"}
+  = render(UI::TableList::Component.new) do |list|
+    - list.with_row(label: "Sender") do
+      - if @organization_role.sender_id.present?
+        = render Atoms::Admin::TableCells::User::Component.new(user: @organization_role.sender, user_id: @organization_role.user_id)
+      - else
+        %small.twless-strong
+          self created
+    - list.with_row(label: "Receiver", value: render(Atoms::Admin::TableCells::User::Component.new(user: @organization_role.user, user_id: @organization_role.user_id)))
+    - list.with_row(label: "Created", value: render(UI::Time::Component.new(time: @organization_role.created_at, format: :localize_time_precise)))
+    - list.with_row(label: "Updated", value: render(UI::Time::Component.new(time: @organization_role.updated_at, format: :localize_time_precise)))
+    - list.with_row(label: "Claimed", value: render(UI::Time::Component.new(time: @organization_role.claimed_at, format: :localize_time_precise)))
+    - list.with_row(label: "Emailed", value: render(UI::Time::Component.new(time: @organization_role.email_invitation_sent_at, format: :localize_time_precise)))
 
-  .col-md-4
+  %div
     = render partial: "form"
-    .mt-4{class: "tw:text-right"}
+    %div{class: "tw:mt-6 tw:text-right"}
       = render(UI::ButtonLink::Component.new(text: "Delete organization_role", href: admin_organization_role_path(@organization_role), method: :delete, color: :error, confirm: "Are you sure you want to delete this organization_role?"))
