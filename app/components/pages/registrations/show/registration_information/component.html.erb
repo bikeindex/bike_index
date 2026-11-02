@@ -14,7 +14,7 @@
                   tw:inline-block tw:rounded tw:px-2 tw:py-0.5 tw:font-bold
                   tw:text-white
                 "
-                style="background-color: <%= credibility_color %>"
+                style="background-color: <%= CredibilityScorer.color(credibility_score) %>"
               >
                 <%= credibility_score %>
               </span>

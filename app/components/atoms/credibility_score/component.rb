@@ -5,12 +5,10 @@ module Atoms
     # A bike's credibility score, beside the badges that make it up
     class Component < ApplicationComponent
       def initialize(bike:)
-        @scorer = bike.credibility_scorer
+        scorer = bike.credibility_scorer
+        @score = scorer.score
+        @badges = CredibilityScorer.permitted_badges_hash(scorer.badges)
       end
-
-      private
-
-      def badges = CredibilityScorer.permitted_badges_hash(@scorer.badges)
     end
   end
 end

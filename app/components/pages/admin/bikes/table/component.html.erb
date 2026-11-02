@@ -125,9 +125,7 @@
 
   <% table.column(hideable: :cred_cell, classes: "tw:text-right tw:text-xs") do |bike| %>
     <% if bike.credibility_score.present? %>
-      <small
-        style="color: <%= CredibilityScorer.color(bike.credibility_score) if bike.credibility_score < 31 %>;"
-      >
+      <small class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] if CredibilityScorer.low?(bike.credibility_score) %>">
         <%= bike.credibility_score %>
       </small>
     <% end %>

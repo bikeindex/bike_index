@@ -4,19 +4,19 @@
     credibility-score tw:ml-auto tw:flex tw:max-w-[546px] tw:flex-wrap
     tw:rounded-xs tw:border-2 tw:border-black/15
   "
-  style="background: <%= CredibilityScorer.color(@scorer.score) %>;"
+  style="background: <%= CredibilityScorer.color(@score) %>;"
 >
-  <div class="tw:relative tw:w-2/5 tw:py-4 tw:text-center tw:text-white">
+  <div class="tw:w-2/5 tw:py-4 tw:text-center tw:text-white">
     <span class="tw:block">Credibility Score</span>
-    <span class="tw:mt-2 tw:block tw:text-[125%] tw:font-bold"><%= @scorer.score %></span>
+    <span class="tw:mt-2 tw:block tw:text-[125%] tw:font-bold"><%= @score %></span>
   </div>
 
-  <div class="tw:relative tw:w-3/5 tw:rounded-r-xs tw:bg-white tw:text-left">
+  <div class="tw:w-3/5 tw:rounded-r-xs tw:bg-white tw:text-left">
     <em class="tw:block tw:px-[.1rem] tw:pt-1 tw:pb-[.1rem] tw:text-sm">Factors in score:</em>
 
     <table class="tw:w-full tw:leading-normal">
       <tbody>
-        <% badges.each do |badge, value| %>
+        <% @badges.each do |badge, value| %>
           <tr class="tw:odd:bg-black/5">
             <td class="tw:border tw:border-[#eceeef] tw:p-1">
               <small><%= CredibilityScorer.humanize_badge(badge) %></small>

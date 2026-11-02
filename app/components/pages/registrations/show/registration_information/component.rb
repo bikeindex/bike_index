@@ -49,8 +49,6 @@ module Pages
             @credibility_score ||= credibility_scorer.score
           end
 
-          def credibility_color = CredibilityScorer.color(credibility_score)
-
           def credibility_badges
             @credibility_badges ||= CredibilityScorer.permitted_badges_hash(credibility_scorer.badges)
           end
