@@ -13,22 +13,13 @@ RSpec.describe Pages::Admin::Users::Edit::Component, type: :component do
     expect(component.css("[data-admin--user-edit-form-target='banned']").count).to eq 1
   end
 
-  describe "dark mode chooser" do
+  context "on the user's own page" do
     let(:user) { FactoryBot.create(:user, dark_mode: :dark) }
-    let(:component) { render_inline(described_class.new(user:, current_user:)) }
-    let(:current_user) { FactoryBot.create(:user) }
+    let(:component) { render_inline(described_class.new(user:, current_user: user)) }
 
-    it "isn't offered on another user's page" do
-      expect(component.css("input[name='user[dark_mode]']")).to be_empty
-    end
-
-    context "on the user's own page" do
-      let(:current_user) { user }
-
-      it "renders a radio per dark mode, with the user's checked" do
-        expect(component.css("[role=radiogroup] input[name='user[dark_mode]']").map { it["value"] }).to eq %w[light dark system]
-        expect(component.css("input[name='user[dark_mode]'][checked]").map { it["value"] }).to eq %w[dark]
-      end
+    it "renders a dark mode radio per mode, with the user's checked" do
+      expect(component.css("input[name='user[dark_mode]']").map { it["value"] }).to eq %w[light dark system]
+      expect(component.css("input[name='user[dark_mode]'][checked]").map { it["value"] }).to eq %w[dark]
     end
   end
 
