@@ -10,14 +10,14 @@
       <% bike_sticker_url = "/bikes/scanned/#{bike_sticker.code}" %>
     <% end %>
 
-    <%= link_to bike_sticker_url do %>
+    <%= link_to bike_sticker_url, class: "twlink" do %>
       <%= render UI::Time::Component.new(time: bike_sticker.created_at) %>
     <% end %>
   <% end %>
 
   <% table.column(sortable: "updated_at", classes: "tw:text-xs") do |bike_sticker| %>
     <small>
-      <%= link_to admin_bike_sticker_updates_path(search_bike_sticker_id: bike_sticker.id) do %>
+      <%= link_to admin_bike_sticker_updates_path(search_bike_sticker_id: bike_sticker.id), class: "twlink" do %>
         <%= render UI::Time::Component.new(time: bike_sticker.updated_at) %>
       <% end %>
     </small>
@@ -25,7 +25,7 @@
 
   <% unless skip_updates %>
     <% table.column(label: "Updates") do |bike_sticker| %>
-      <%= link_to number_display(bike_sticker.bike_sticker_updates.count), admin_bike_sticker_updates_path(search_bike_sticker_id: bike_sticker.id) %>
+      <%= link_to number_display(bike_sticker.bike_sticker_updates.count), admin_bike_sticker_updates_path(search_bike_sticker_id: bike_sticker.id), class: "twlink" %>
     <% end %>
   <% end %>
 
@@ -35,7 +35,7 @@
 
   <% table.column(sortable: "bike_sticker_batch_id", label: "Batch") do |bike_sticker| %>
     <% if bike_sticker.bike_sticker_batch.present? %>
-      <%= link_to bike_sticker.bike_sticker_batch_id, admin_bike_stickers_path(sort_state.search_params.merge(search_bike_sticker_batch_id: bike_sticker.bike_sticker_batch_id)) %>
+      <%= link_to bike_sticker.bike_sticker_batch_id, admin_bike_stickers_path(sort_state.search_params.merge(search_bike_sticker_batch_id: bike_sticker.bike_sticker_batch_id)), class: "twlink" %>
       <small class="twless-strong">
         <%= bike_code_batch_organizations[bike_sticker.bike_sticker_batch_id.to_s] %>
       </small>
@@ -52,14 +52,14 @@
     <% if bike_sticker.claimed? %>
       <%= helpers.organized_bike_text(bike_sticker.bike) %>
     <% elsif bike_sticker.bike_id.present? %>
-      <%= link_to bike_sticker.bike_id, admin_bike_path(bike_sticker.bike_id), class: "tw:text-sm" %>
+      <%= link_to bike_sticker.bike_id, admin_bike_path(bike_sticker.bike_id), class: "twlink tw:text-sm" %>
       <small class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">Deleted?</small>
     <% end %>
   <% end %>
 
   <% table.column(sortable: "code_integer", label: "Code #") do |bike_sticker| %>
     <strong>
-      <%= link_to bike_sticker.pretty_code, "/bikes/scanned/#{bike_sticker.code}?organization_id=#{bike_sticker.organization.to_param}" %>
+      <%= link_to bike_sticker.pretty_code, "/bikes/scanned/#{bike_sticker.code}?organization_id=#{bike_sticker.organization.to_param}", class: "twlink" %>
     </strong>
 
     <% unless bike_sticker.sticker? %>

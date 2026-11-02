@@ -27,7 +27,7 @@
         <% if tags_no_link %>
           <%= blog.content_tag_names.join(", ") %>
         <% else %>
-          <%= safe_join(blog.content_tags.name_ordered.map { |c| link_to(c.name, sort_state.search_params.merge(search_tags: tags_param + [c.to_param]), class: "twless-strong") }, ", ") %>
+          <%= safe_join(blog.content_tags.name_ordered.map { |c| link_to(c.name, sort_state.search_params.merge(search_tags: tags_param + [c.to_param]), class: "twlink twless-strong") }, ", ") %>
         <% end %>
       </small>
     <% end %>
@@ -40,7 +40,7 @@
   <% unless skip_kind %>
     <% table.column(label: "Kind") do |blog| %>
       <% if !blog.blog? %>
-        <span class="text-info"><%= blog.kind.humanize %></span>
+        <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:notice] %>"><%= blog.kind.humanize %></span>
       <% end %>
     <% end %>
   <% end %>

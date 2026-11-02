@@ -1,17 +1,15 @@
 = render(UI::Container::Component.new) do
   = render(UI::Card::Component.new(additional_classes: "tw:my-6")) do
-    %h4
-      Be careful what you make banned!
-    %p{class: "tw:mt-6"}
+    = render(Pages::Admin::Headers::Section::Component.new(title: "Be careful what you make banned!"))
+    %p{class: "tw:mt-6 tw:mb-4"}
       There are some protections built in - you can't add a banned domain if there multiple bikes registered to that domain
-    %p
+    %p{class: "tw:mb-4"}
       %strong BUT STILL
       if you add a banned domain that is valid, it will prevent people from signing up with that domain.
 
 = form_for email_domain,
   url: action,
-  method: method,
-  html: { class: "form" } do |f|
+  method: method do |f|
 
   = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :domain, html_options: {placeholder: "@something.com", disabled: email_domain.id.present?}))
   -# The status is ignored on create, processing has to happen first

@@ -1,12 +1,9 @@
 <div class="tw:mt-6 tw:flex tw:flex-wrap tw:items-baseline tw:gap-2">
-  <h2>
-    <%= number_with_delimiter(@bikes_count) %>
-    <%= "Bike".pluralize(@bikes_count) %>
-
+  <%= render(Pages::Admin::Headers::Section::Component.new(title: "#{number_with_delimiter(@bikes_count)} #{"Bike".pluralize(@bikes_count)}")) do %>
     <em class="tw:text-sm">
-      <%= link_to "view all bikes", admin_bikes_path(organization_id: @organization.to_param) %>
+      <%= link_to "view all bikes", admin_bikes_path(organization_id: @organization.to_param), class: "twlink" %>
     </em>
-  </h2>
+  <% end %>
 
   <%# ml-auto rather than justify-between, which drops the link to the left once it wraps %>
   <%= render(UI::ButtonLink::Component.new(href: organization_registrations_path(organization_id: @organization.to_param), text: "org bikes view", color: :link_gray, html_class: "tw:ml-auto")) %>

@@ -49,21 +49,21 @@
 
 <% table_view = capture do %>
   <% if params[:search_endpoint].present? %>
-    <p>
+    <p class="tw:mb-4">
       Viewing only Searches <strong>to</strong>
       <% if special_endpoints.include?(params[:search_endpoint]) %>
         <em><%= params[:search_endpoint].humanize %></em>
       <% else %>
-        <code><%= params[:search_endpoint] %></code>
+        <code class="twcode"><%= params[:search_endpoint] %></code>
       <% end %>
       <%= render(UI::ButtonLink::Component.new(href: url_for(sortable_search_params.merge(search_endpoint: nil)), text: "view for all endpoints", color: :link_gray, html_class: "tw:text-sm")) %>
     </p>
   <% end %>
 
   <% if params[:search_ip_address].present? %>
-    <p>
+    <p class="tw:mb-4">
       Viewing only Searches <strong>from</strong>
-      <code><%= params[:search_ip_address] %></code>
+      <code class="twcode"><%= params[:search_ip_address] %></code>
       <%= render(UI::ButtonLink::Component.new(href: url_for(sortable_search_params.merge(search_ip_address: nil)), text: "view from any ip address", color: :link_gray, html_class: "tw:text-sm")) %>
     </p>
   <% end %>

@@ -48,7 +48,7 @@
           <small class="tw:text-gray-400">|</small>
         <% end %>
 
-        <%= link_to organization_role.organization.name.gsub(" ", "\u00a0"), admin_users_path(organization_id: organization_role.organization_id), class: "tw:text-sm" %>
+        <%= link_to organization_role.organization.name.gsub(" ", "\u00a0"), admin_users_path(organization_id: organization_role.organization_id), class: "twlink tw:text-sm" %>
       <% end %>
     <% end %>
   <% end %>

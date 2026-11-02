@@ -2,7 +2,7 @@
 
 <%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
   <% table.column(sortable: "created_at") do |graduated_notification| %>
-    <%= link_to render(UI::Time::Component.new(time: graduated_notification.created_at, format: :localize_time_precise)), organization_graduated_notification_path(graduated_notification.id, organization_id: graduated_notification.organization_id) %>
+    <%= link_to render(UI::Time::Component.new(time: graduated_notification.created_at, format: :localize_time_precise)), organization_graduated_notification_path(graduated_notification.id, organization_id: graduated_notification.organization_id), class: "twlink" %>
   <% end %>
 
   <% table.column(sortable: "processed_at", label: "Sent") do |graduated_notification| %>
@@ -22,13 +22,13 @@
 
   <% unless current_organization.present? %>
     <% table.column(label: "Organization") do |graduated_notification| %>
-      <%= link_to graduated_notification.organization&.short_name, admin_graduated_notifications_path(sort_state.search_params.merge(organization_id: graduated_notification.organization_id)) %>
+      <%= link_to graduated_notification.organization&.short_name, admin_graduated_notifications_path(sort_state.search_params.merge(organization_id: graduated_notification.organization_id)), class: "twlink" %>
     <% end %>
   <% end %>
 
   <% table.column(label: "Bike") do |graduated_notification| %>
     <% if graduated_notification.bike.present? %>
-      <%= link_to helpers.organized_bike_text(graduated_notification.bike), bike_path(graduated_notification.bike, organization_id: graduated_notification.organization_id) %>
+      <%= link_to helpers.organized_bike_text(graduated_notification.bike), bike_path(graduated_notification.bike, organization_id: graduated_notification.organization_id), class: "twlink" %>
     <% end %>
   <% end %>
 
@@ -38,7 +38,7 @@
 
   <% table.column(sortable: "email") do |graduated_notification| %>
     <% if graduated_notification.user_id.present? %>
-      <%= link_to graduated_notification.email, admin_user_path(graduated_notification.user_id) %>
+      <%= link_to graduated_notification.email, admin_user_path(graduated_notification.user_id), class: "twlink" %>
     <% else %>
       <%= graduated_notification.email %>
     <% end %>

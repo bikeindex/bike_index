@@ -2,14 +2,12 @@
 
 <%= render(Pages::Admin::Invoices::Table::Component.new(invoices: @invoices)) %>
 
-<h2 class="tw:mt-12">
-  <%= @organization.name %> has
-  <%= pluralize(@organization.payments.count, "payment") %>
-</h2>
+<%= render(Pages::Admin::Headers::Section::Component.new(title: "#{@organization.name} has #{pluralize(@organization.payments.count, "payment")}", margin_classes: "tw:mt-12 tw:mb-3")) %>
 
-<p class="twless-strong">
+<p class="twless-strong tw:mb-4">
   You can add invoices to payments by editing them. If you don't see a payment
-  in this list, <%= link_to "search the payments", admin_payments_path %> and
+  in this list,
+  <%= link_to "search the payments", admin_payments_path, class: "twlink" %> and
   add it by editing it.
 </p>
 

@@ -4,7 +4,7 @@
   <%= render(UI::Alerts::Base::Component.new(kind: :notice)) do %>
     This is a law enforcement organization without unstolen notifications. To
     enable unstolen notifications,
-    <%= link_to "add an invoice for this organization", new_admin_organization_invoice_path(organization_id: @organization.to_param, end_at: (Time.current + 10.years).to_i) %>
+    <%= link_to "add an invoice for this organization", new_admin_organization_invoice_path(organization_id: @organization.to_param, end_at: (Time.current + 10.years).to_i), class: "twlink" %>
     and enable "Law Enforcement functionality" in it
   <% end %>
 <% end %>
@@ -31,7 +31,7 @@
 
 <%= render(Pages::Admin::Organizations::Show::Roles::Component.new(organization: @organization, deleted: @deleted_organization_roles)) %>
 
-<hr class="tw:mt-8 tw:mb-4">
+<hr class="twhr tw:mt-8">
 
 <div class="tw:text-right">
   <% if @organization.deleted? %>

@@ -1,9 +1,9 @@
 <%= render(Pages::Admin::Headers::Nav::Component.new(title: "TSV Exports!", subtitle: "TSVs are generated every night.")) %>
 
-<h4>Tsv reports:</h4>
+<%= render(Pages::Admin::Headers::Section::Component.new(title: "Tsv reports:")) %>
 
 <% if @tsvs.none? %>
-  <p class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>">
+  <p class="tw:mb-4 <%= UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>">
     No TSVs
   </p>
 <% else %>

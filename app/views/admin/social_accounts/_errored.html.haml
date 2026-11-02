@@ -1,12 +1,13 @@
 - if SocialAccount.active.errored.any?
   = render(UI::Container::Component.new) do
     = render(UI::Alerts::Base::Component.new(kind: :error, margin_classes: "tw:my-6")) do
-      %h4
+      - errors_title = capture do
         %strong
           = pluralize(SocialAccount.active.errored.count, "Social account")
         with errors
-        %em.text-success
-          = link_to "review errors", admin_social_accounts_path(sort: "last_error_at")
+        %em{class: UI::Alerts::Base::Component::TEXT_CLASSES[:success]}
+          = link_to "review errors", admin_social_accounts_path(sort: "last_error_at"), class: "twlink"
+      = render(Pages::Admin::Headers::Section::Component.new(title: errors_title))
       %p
         This will prevent posting for areas served by:
         %br

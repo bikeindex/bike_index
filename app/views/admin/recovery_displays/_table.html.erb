@@ -1,7 +1,7 @@
 <%# locals: (collection:, render_sortable: true) %>
 
 <%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
-  <% table.column(sortable: "recovered_at", lower_right: ->(recovery_display) { content_tag(:code, recovery_display.id) }) do |recovery_display| %>
+  <% table.column(sortable: "recovered_at", lower_right: ->(recovery_display) { content_tag(:code, recovery_display.id, class: "twcode") }) do |recovery_display| %>
     <%= link_to edit_admin_recovery_display_url(recovery_display), class: "twlink" do %>
       <%= render UI::Time::Component.new(time: recovery_display.recovered_at) %>
     <% end %>

@@ -1,15 +1,15 @@
 = render(Pages::Admin::Headers::Nav::Component.new(title: "IP Location"))
 
-%p
+%p{class: "tw:mb-4"}
   Compare cloudflare headers vs geocoder results
 
 .twwiderow
   %div
-    %h4 Cloudflare
+    = render(Pages::Admin::Headers::Section::Component.new(title: "Cloudflare"))
     = render UI::JsonDisplay::Component.new(data: @cloudflare_hash)
   %div
-    %h4 Geocoder
+    = render(Pages::Admin::Headers::Section::Component.new(title: "Geocoder"))
     = render UI::JsonDisplay::Component.new(data: @geocoder_hash)
   %div
-    %h4 Raw Headers
+    = render(Pages::Admin::Headers::Section::Component.new(title: "Raw Headers"))
     = render UI::JsonDisplay::Component.new(data: @headers)

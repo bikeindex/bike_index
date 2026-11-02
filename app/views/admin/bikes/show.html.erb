@@ -32,7 +32,7 @@
   <% end %>
 
   <% if duplicate_groups.none? %>
-    <h3 class="tw:mt-6">No duplicates</h3>
+    <%= render(Pages::Admin::Headers::Section::Component.new(title: "No duplicates")) %>
   <% end %>
 <% when "messages" %>
   <%= render(Pages::Admin::Bikes::Show::Messages::Component.new(bike: @bike)) %>
@@ -46,7 +46,7 @@
   <% if @bike.stolen_records.none? %>
     No other stolen records
   <% else %>
-    <ul>
+    <ul class="tw:mb-4">
       <% @bike.stolen_records.each do |stolen_record| %>
         <li>
           Stolen on

@@ -2,7 +2,7 @@
 
 <%= render(UI::Table::Component.new(records: impound_records, render_sortable:, sort_state:)) do |table| %>
   <% table.column(sortable: "created_at") do |impound_record| %>
-    <%= link_to render(UI::Time::Component.new(time: impound_record.created_at, format: :localize_time_precise)), admin_impound_record_path("pkey-#{impound_record.id}") %>
+    <%= link_to render(UI::Time::Component.new(time: impound_record.created_at, format: :localize_time_precise)), admin_impound_record_path("pkey-#{impound_record.id}"), class: "twlink" %>
   <% end %>
 
   <% table.column(sortable: "updated_at", header_classes: "tw:text-xs") do |impound_record| %>
@@ -18,7 +18,7 @@
   <% unless skip_organization %>
     <% table.column(sortable: "organization_id") do |impound_record| %>
       <% if impound_record.organization_id.present? %>
-        <%= link_to impound_record.organization&.short_name || impound_record.organization_id, admin_impound_records_path(sort_state.search_params.merge(organization_id: impound_record.organization_id)) %>
+        <%= link_to impound_record.organization&.short_name || impound_record.organization_id, admin_impound_records_path(sort_state.search_params.merge(organization_id: impound_record.organization_id)), class: "twlink" %>
       <% end %>
     <% end %>
   <% end %>
@@ -48,7 +48,7 @@
   <% unless skip_claims %>
     <% table.column(label: "Claims", header_classes: "tw:text-xs") do |impound_record| %>
       <% if impound_record.bike_id.present? %>
-        <%= link_to number_display(impound_record.impound_claims.count), admin_impound_claims_path(search_bike_id: impound_record.bike_id) %>
+        <%= link_to number_display(impound_record.impound_claims.count), admin_impound_claims_path(search_bike_id: impound_record.bike_id), class: "twlink" %>
       <% end %>
     <% end %>
   <% end %>

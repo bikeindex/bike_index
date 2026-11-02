@@ -39,7 +39,7 @@
   <% if display_dev_info? %>
     <small class="twless-strong only-dev-visible" style="font-size: 50%;">
       current_user id:
-      <%= link_to current_user.id, admin_user_path(current_user) %>
+      <%= link_to current_user.id, admin_user_path(current_user), class: "twlink" %>
     </small>
   <% end %>
 <% end %>
@@ -92,7 +92,7 @@
   <%= render Pages::Admin::Users::Table::Component.new(users: @collection, sort_state:, render_sortable: true, render_deleted: @deleted) %>
 
   <% unless @collection.present? %>
-    <h1 class="tw:mt-6">No users found!</h1>
+    <%= render(Pages::Admin::Headers::Section::Component.new(title: "No users found!")) %>
   <% end %>
 <% end %>
 

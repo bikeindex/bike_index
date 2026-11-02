@@ -31,7 +31,7 @@ module Pages
           def invoice_link(invoice)
             link_to invoice.display_name.gsub(/invoice\s?/i, ""),
               edit_admin_organization_invoice_path(organization_id: organization_for(invoice).to_param,
-                id: invoice.to_param)
+                id: invoice.to_param), class: "twlink"
           end
 
           def end_at_class(invoice)

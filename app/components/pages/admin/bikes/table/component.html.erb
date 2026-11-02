@@ -25,7 +25,7 @@
 
   <%# Listed always_visible in the panel: the frozen first column can't be one ui--table-column-order moves %>
   <% table.column(sortable: "id", label: "Registered", classes: "tw:whitespace-nowrap", lower_right: ->(bike) { content_tag(:span, bike.id, class: "only-dev-visible") }) do |bike| %>
-    <%= link_to render(UI::Time::Component.new(time: bike.created_at)), edit_admin_bike_url(bike), class: "tw:text-xs" %>
+    <%= link_to render(UI::Time::Component.new(time: bike.created_at)), edit_admin_bike_url(bike), class: "twlink tw:text-xs" %>
   <% end %>
 
   <% table.column(sortable: "updated_by_user_at", hideable: :updated_cell, label: "Updated", classes: "tw:text-xs") do |bike| %>
@@ -88,7 +88,7 @@
 
       <% if BikeServices::Displayer.paint_description?(bike) %>
         <small class="tw:hidden tw:text-gray-400 tw:lg:inline">
-          <%= link_to bike.paint_description, edit_admin_paint_url(bike.paint) %>
+          <%= link_to bike.paint_description, edit_admin_paint_url(bike.paint), class: "twlink" %>
         </small>
       <% end %>
 
@@ -108,7 +108,7 @@
 
   <% table.column(hideable: :created_by_cell) do |bike| %>
     <% if bike.creation_organization.present? %>
-      <%= link_to bike.creation_organization.name, admin_organization_path(bike.creation_organization.to_param) %>
+      <%= link_to bike.creation_organization.name, admin_organization_path(bike.creation_organization.to_param), class: "twlink" %>
       <%= link_to search_emoji, admin_bikes_path(organization_id: bike.creation_organization.to_param), class: "display-sortable-link tw:text-sm" %>
     <% end %>
   <% end %>

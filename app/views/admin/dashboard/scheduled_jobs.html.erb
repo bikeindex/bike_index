@@ -4,10 +4,10 @@
 
 <% if env_skipped_jobs.any? %>
   <%= render UI::Alerts::Base::Component.new(kind: :warning, header: "Skipped via ENV SIDEKIQ_SKIP_*") do %>
-    <ul class="tw:mb-0">
+    <ul>
       <% env_skipped_jobs.each do |env_key| %>
         <li>
-          <code>
+          <code class="twcode">
             <%= env_key.sub(/\ASIDEKIQ_SKIP_/, "").downcase.camelize %>
           </code>
         </li>
@@ -23,7 +23,7 @@ end %>
 <div class="tw:mt-6">
   <%= render(UI::Table::Component.new(records: jobs)) do |table| %>
     <% table.column(label: "", classes: "only-dev-visible") do |(klass)| %>
-      <code><%= klass %></code>
+      <code class="twcode"><%= klass %></code>
     <% end %>
 
     <% table.column(label: "Job") do |(klass)| %>

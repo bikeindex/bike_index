@@ -11,7 +11,7 @@
 <%= render(Pages::Admin::Headers::Nav::Component.new(title:)) do %>
   <% if organization_name.present? %>
     <li>
-      <%= link_to "View record in organization", organization_impound_record_path(@impound_record.display_id, organization_id: @impound_record.organization_id) %>
+      <%= link_to "View record in organization", organization_impound_record_path(@impound_record.display_id, organization_id: @impound_record.organization_id), class: "twlink" %>
     </li>
   <% end %>
 <% end %>
@@ -28,7 +28,7 @@
 
     <% list.with_row(label: "Organization") do %>
       <% if organization_name.present? %>
-        <%= link_to organization_name, admin_organization_path(@impound_record.organization_id) %>
+        <%= link_to organization_name, admin_organization_path(@impound_record.organization_id), class: "twlink" %>
       <% else %>
         <small class="twless-strong">NO organization</small>
       <% end %>
@@ -60,10 +60,10 @@
   <% end %>
 </div>
 
-<h2 class="tw:mt-12">Impound record updates</h2>
+<%= render(Pages::Admin::Headers::Section::Component.new(title: "Impound record updates", margin_classes: "tw:mt-12 tw:mb-3")) %>
 
 <% if @impound_record.impound_record_updates.none? %>
-  <p class="twless-strong">no updates</p>
+  <p class="twless-strong tw:mb-4">no updates</p>
 <% else %>
   <%= render(UI::Table::Component.new(records: @impound_record.impound_record_updates)) do |table| %>
     <% table.column(label: "Updated") do |impound_record_update| %>
@@ -94,10 +94,10 @@
   <% end %>
 <% end %>
 
-<h2 class="tw:mt-12">Impound claims</h2>
+<%= render(Pages::Admin::Headers::Section::Component.new(title: "Impound claims", margin_classes: "tw:mt-12 tw:mb-3")) %>
 
 <% if @impound_record.impound_claims.none? %>
-  <p class="twless-strong">no claims</p>
+  <p class="twless-strong tw:mb-4">no claims</p>
 <% else %>
   <%= render partial: "admin/impound_claims/table", locals: {impound_claims: @impound_record.impound_claims} %>
 <% end %>

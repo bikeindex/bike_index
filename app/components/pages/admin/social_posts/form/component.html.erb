@@ -39,7 +39,7 @@
             <% end %>
 
             <p
-              class="text-info tw:text-right"
+              class="tw:mb-4 tw:text-right <%= UI::Alerts::Base::Component::TEXT_CLASSES[:notice] %>"
               style="margin-top: -0.4rem; font-size: 150%;"
             >
               <span data-admin--character-count-target="total"></span>
@@ -80,18 +80,20 @@
       data-kind="imported_post"
     >
       <%= render(UI::Card::Component.new) do %>
-        <p><strong>Import a post</strong></p>
+        <p class="tw:mb-4"><strong>Import a post</strong></p>
 
-        <p><em>This is primarily for adding a post to a landing page.</em></p>
+        <p class="tw:mb-4">
+          <em>This is primarily for adding a post to a landing page.</em>
+        </p>
 
-        <p>
+        <p class="tw:mb-4">
           Get the post ID from the URL of the post. It's the final number at the
           end of the url
         </p>
 
-        <p>
+        <p class="tw:mb-4">
           e.g. for
-          <code>https://twitter.com/stolenbikereg/status/874644243737751553</code>
+          <code class="twcode">https://twitter.com/stolenbikereg/status/874644243737751553</code>
           - 874644243737751553
         </p>
 

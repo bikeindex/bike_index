@@ -1,16 +1,15 @@
-%h1
-  Edit Ad
+= render(Pages::Admin::Headers::Nav::Component.new(title: "Edit Ad"))
 
 = render 'ad'
 
 
 = form_for [:admin, @ad] do |f|
   = render partial: 'form', locals: { f: f }
-  %label.w-100 Ad image
+  %label.twlabel{class: "tw:w-full"} Ad image
   - if @ad.image?
     = image_tag(@ad.image_url(:small))
   - else
-    %p
+    %p{class: "tw:mb-4"}
       No picture!
     = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :image)) do
       = render(UI::Forms::Files::Upload::Component.new(form_builder: f, attribute: :image, accept: ImageUploader.permitted_extensions))

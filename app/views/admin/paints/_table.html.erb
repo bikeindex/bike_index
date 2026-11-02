@@ -27,7 +27,7 @@
     <% end %>
 
     <% table.column(label: "Color") do |paint| %>
-      <ul class="tw:text-sm">
+      <ul class="tw:mb-4 tw:text-sm">
         <% if paint.color_id.present? %>
           <li><%= paint.color.name %></li>
         <% end %>
@@ -43,5 +43,5 @@
     <% end %>
   <% end %>
 <% else %>
-  <h1 class="tw:mb-6">No paints found!</h1>
+  <%= render(Pages::Admin::Headers::Section::Component.new(title: "No paints found!", margin_classes: "tw:mb-6")) %>
 <% end %>

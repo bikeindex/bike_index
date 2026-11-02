@@ -45,7 +45,7 @@
       <% else %>
         <strong class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">No Manufacturer assigned</strong>
         <span class="twless-strong">
-          <%= link_to "edit organization", edit_admin_organization_path(@organization) %>
+          <%= link_to "edit organization", edit_admin_organization_path(@organization), class: "twlink" %>
           to add
         </span>
       <% end %>
@@ -54,7 +54,7 @@
 
   <% list.with_row(label: "Slug") do %>
     <%= @organization.slug %> |
-    <%= link_to "embed", embed_registrations_url(organization_id: @organization.to_param) %>
+    <%= link_to "embed", embed_registrations_url(organization_id: @organization.to_param), class: "twlink" %>
   <% end %>
 
   <% list.with_row(label: "Created") do %>

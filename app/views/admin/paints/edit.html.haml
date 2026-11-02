@@ -24,10 +24,10 @@
     %strong You can't edit the name.
     Otherwise future bikes posted with this paint won't be able to find this paint, and will recreate it.
 
-%hr{class: "tw:mt-2"}
+%hr.twhr{class: "tw:mt-2"}
 
 - if @bikes.present?
-  %p
+  %p{class: "tw:mb-4"}
     = number_with_delimiter(@bikes_count)
     Bikes with this paint
 

@@ -17,9 +17,9 @@
   <% end %>
 </div>
 
-<h2>Records everywhere</h2>
+<%= render(Pages::Admin::Headers::Section::Component.new(title: "Records everywhere")) %>
 
-<p>
+<p class="tw:mb-4">
   The <span class="twless-strong">data in this color</span> is (simplified, not
   accounting for seasonalness) projections for the end of the current year
 </p>
@@ -27,20 +27,20 @@
 <%= render(Pages::Admin::Graphs::YearCounts::Component.new) %>
 
 <% if @bounding_box.present? %>
-  <h4 class="tw:mt-6">
+  <% location_title = capture do %>
     Records <em>within <%= @location_radius %> miles of</em>
     <strong><%= params[:location] %></strong>
-  </h4>
+  <% end %>
+
+  <%= render(Pages::Admin::Headers::Section::Component.new(title: location_title)) %>
 
   <div class="tw:mt-4">
     <%= render(Pages::Admin::Graphs::YearCounts::Component.new(bounding_box: @bounding_box)) %>
   </div>
 <% else %>
-  <h2>
-    <em>Add a location to the search section at the top of the page to see stats about that location</em>
-  </h2>
+  <%= render(Pages::Admin::Headers::Section::Component.new(title: tag.em("Add a location to the search section at the top of the page to see stats about that location"))) %>
 
   <% if params[:location].present? %>
-    <h4>The location and proximity you entered weren't useable. Try again.</h4>
+    <%= render(Pages::Admin::Headers::Section::Component.new(title: "The location and proximity you entered weren't useable. Try again.")) %>
   <% end %>
 <% end %>

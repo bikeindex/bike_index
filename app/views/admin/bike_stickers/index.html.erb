@@ -13,19 +13,21 @@
 <% admin_search_form = capture do %>
   <div class="tw:mt-6">
     <% unless @bike_sticker_batch.present? %>
-      <h5>
+      <% batches_title = capture do %>
         <%= number_display(@bike_sticker_batches.count) %>
 
         <% if @matching_batches %>
           matching <%= "batch".pluralize(@bike_sticker_batches.count) %>
         <% elsif @all_batches %>
           batches
-          <small class="twless-strong">- show <%= link_to "only most recent", url_for(sortable_search_params.merge(search_all_batches: false)) %></small>
+          <small class="twless-strong">- show <%= link_to "only most recent", url_for(sortable_search_params.merge(search_all_batches: false)), class: "twlink" %></small>
         <% else %>
           most recent batches
-          <small class="twless-strong">- <%= number_display(BikeStickerBatch.count) %> <%= link_to "total batches", url_for(sortable_search_params.merge(search_all_batches: true)), class: "twless-strong" %></small>
+          <small class="twless-strong">- <%= number_display(BikeStickerBatch.count) %> <%= link_to "total batches", url_for(sortable_search_params.merge(search_all_batches: true)), class: "twlink twless-strong" %></small>
         <% end %>
-      </h5>
+      <% end %>
+
+      <%= render(Pages::Admin::Headers::Section::Component.new(title: batches_title)) %>
     <% end %>
 
     <%= render partial: "batches_table", locals: {bike_sticker_batches: @bike_sticker_batches, render_sortable: false, matching_count: @matching_batches} %>
@@ -34,18 +36,17 @@
   <% if @bike_sticker_batch.present? %>
     <% if Binxtils::InputNormalizer.boolean(params[:search_show_problems]) %>
       <div class="tw:my-6">
-        <h4>
-          Showing Problem stickers
-          <small><%= link_to "hide", url_for(sortable_search_params.merge(search_show_problems: false)), class: "twless-strong" %></small>
-        </h4>
+        <%= render(Pages::Admin::Headers::Section::Component.new(title: "Showing Problem stickers")) do %>
+          <small><%= link_to "hide", url_for(sortable_search_params.merge(search_show_problems: false)), class: "twlink twless-strong" %></small>
+        <% end %>
 
         <% duplicated = @bike_sticker_batch.duplicated_integers %>
         <span class="strong tw:block">Duplicates:</span>
 
         <% if duplicated.any? %>
-          <ul>
+          <ul class="tw:mb-4">
             <% duplicated.each do |int| %>
-              <li class="tw:text-sm"><code><%= int %></code></li>
+              <li class="tw:text-sm"><code class="twcode"><%= int %></code></li>
             <% end %>
           </ul>
         <% else %>
@@ -55,7 +56,7 @@
         <span class="strong tw:block">Non-sequential stickers:</span>
 
         <% if @bike_sticker_batch.non_sequential_integers.any? %>
-          <ul>
+          <ul class="tw:mb-4">
             <% @bike_sticker_batch.non_sequential_integers.each do |arr| %>
               <li class="tw:text-sm"><%= arr[0] %> &gt; <%= arr[1] %></li>
             <% end %>
@@ -64,7 +65,7 @@
           <em class="twless-strong">none</em>
         <% end %>
       </div>
-      <hr>
+      <hr class="twhr">
     <% else %>
       <div class="tw:pt-6 tw:text-center">
         <%= render(UI::ButtonLink::Component.new(text: "Show problem stickers for Batch ##{@bike_sticker_batch.id}", href: url_for(sortable_search_params.merge(search_show_problems: true)), color: :yellow, size: :sm)) %>
@@ -78,7 +79,7 @@
 
   <div class="twwiderow tw:mt-6">
     <div>
-      <p>
+      <p class="tw:mb-4">
         <%= number_display(matching_bike_stickers.size) %> matching
         <%= "sticker".pluralize(matching_bike_stickers.size) %>
         <% unless @search_claimed %>
@@ -92,16 +93,17 @@
           <em><%= UI::PeriodSelect::Component.column_label(@time_range_column) %> <%= render(UI::TimeRange::Component.new(time_range: @time_range, period: @period)) %></em>
         <% end %>
         <% if sortable_search_params? %>
-          - <em><%= link_to "view all stickers", url_for %></em>
+          -
+          <em><%= link_to "view all stickers", url_for, class: "twlink" %></em>
         <% end %>
       </p>
 
       <% if @bike_sticker_batch.present? %>
-        <p>
+        <p class="tw:mb-4">
           <strong>Viewing Just Batch #<%= @bike_sticker_batch.id %></strong>
 
           <small>
-            <%= link_to "view all batches", url_for(sortable_search_params.except(:search_bike_sticker_batch_id)) %>
+            <%= link_to "view all batches", url_for(sortable_search_params.except(:search_bike_sticker_batch_id)), class: "twlink" %>
           </small>
         </p>
       <% end %>

@@ -1,5 +1,4 @@
-%h1
-  Edit #{@organization_feature.name}
+= render(Pages::Admin::Headers::Nav::Component.new(title: "Edit #{@organization_feature.name}"))
 
 - if @organization_feature.locked?
   = render(UI::Alerts::Base::Component.new(kind: :error, margin_classes: "tw:my-10")) do
@@ -9,8 +8,7 @@
       If you need to update it, talk to Seth
 = render partial: "form"
 
-%h3
-  Invoices with this feature
+= render(Pages::Admin::Headers::Section::Component.new(title: "Invoices with this feature"))
 %p{class: "tw:my-6"}
   = number_display(@invoices.count)
   total,
