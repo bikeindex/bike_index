@@ -19,20 +19,6 @@
   <div class="tw:grid tw:grid-cols-2 tw:gap-x-8 tw:lg:grid-cols-4">
     <div class="tw:col-span-2 tw:md:col-span-1 tw:lg:col-span-2">
       <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :phone)) %>
-
-      <% if own_page? %>
-        <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :dark_mode_preview, optional_badge: false)) do %>
-          <div class="tw:flex tw:gap-4">
-            <label class="tw:flex tw:cursor-pointer tw:items-center tw:gap-1">
-              <%= f.radio_button :dark_mode_preview, false %> Off
-            </label>
-
-            <label class="tw:flex tw:cursor-pointer tw:items-center tw:gap-1">
-              <%= f.radio_button :dark_mode_preview, true %> On
-            </label>
-          </div>
-        <% end %>
-      <% end %>
     </div>
 
     <div class="tw:mb-4">
@@ -52,6 +38,20 @@
       <% if @display_dev_info %>
         <%= render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :developer, label: "Developer",
           class_name: "only-dev-visible")) %>
+      <% end %>
+
+      <% if own_page? %>
+        <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :dark_mode_preview, optional_badge: false, wrapper_class: "tw:mt-4")) do %>
+          <div class="tw:flex tw:gap-4">
+            <label class="tw:flex tw:cursor-pointer tw:items-center tw:gap-1">
+              <%= f.radio_button :dark_mode_preview, false %> Off
+            </label>
+
+            <label class="tw:flex tw:cursor-pointer tw:items-center tw:gap-1">
+              <%= f.radio_button :dark_mode_preview, true %> On
+            </label>
+          </div>
+        <% end %>
       <% end %>
     </div>
   </div>
