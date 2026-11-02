@@ -4,7 +4,7 @@
       Missing user
     </small>
     <% if show_email_for_missing_user? %>
-      <code><%= @user_id %></code>
+      <code class="tw:text-xs!"><%= @user_id %></code>
     <% end %>
   <% end %>
 
@@ -21,6 +21,6 @@
   <%= render(Atoms::Admin::Badges::User::Component.new(user: @user)) %>
 
   <% if show_search? %>
-    <%= link_to search_emoji, computed_search_url, class: "display-sortable-link tw:text-sm" %>
+    <%= link_to search_emoji, computed_search_url, class: "display-sortable-link tw:text-xs" %>
   <% end %>
 </span>

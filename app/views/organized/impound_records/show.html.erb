@@ -16,145 +16,65 @@
 
 <div class="row">
   <div class="col-md-6">
-    <table class="table-list">
-      <tbody>
-        <tr>
-          <td>ID</td>
+    <%= render(UI::TableList::Component.new) do |list| %>
+      <% list.with_row(label: "ID") do %>
+        <strong><%= @impound_record.display_id %></strong>
 
-          <td>
-            <strong><%= @impound_record.display_id %></strong>
+        <% if display_dev_info? %>
+          <small class="only-dev-visible ml-2">
+            <em class="less-strong">real id:</em>
+            <code><%= @impound_record.id %></code>
+          </small>
+        <% end %>
+      <% end %>
 
-            <% if display_dev_info? %>
-              <small class="only-dev-visible ml-2">
-                <em class="less-strong">real id:</em>
-                <code><%= @impound_record.id %></code>
-              </small>
-            <% end %>
-          </td>
-        </tr>
+      <% list.with_row(label: "Created", value: render(UI::Time::Component.new(time: @impound_record.created_at, format: :localize_time_precise))) %>
+      <% list.with_row(label: "Impounded by", value: @impound_record.creator&.display_name) %>
 
-        <tr>
-          <td>Created</td>
+      <% if @impound_record.resolved? %>
+        <% list.with_row(label: "Resolved", value: render(UI::Time::Component.new(time: @impound_record.resolved_at, format: :localize_time_precise))) %>
+        <% list.with_row(label: "By", value: @impound_record.user&.display_name) %>
+      <% end %>
 
-          <td>
-            <span class="localizeTime preciseTime">
-              <%= l(@impound_record.created_at, format: :convert_time) %>
-            </span>
-          </td>
-        </tr>
-
-        <tr>
-          <td>Impounded by</td>
-          <td><%= @impound_record.creator&.display_name %></td>
-        </tr>
-
-        <% if @impound_record.resolved? %>
-          <tr>
-            <td>Resolved</td>
-
-            <td>
-              <span class="localizeTime preciseTime">
-                <%= l(@impound_record.resolved_at, format: :convert_time) %>
-              </span>
-            </td>
-          </tr>
-          <tr>
-            <td>By</td>
-            <td><%= @impound_record.user&.display_name %></td>
-          </tr>
+      <% list.with_row(label: "Bike") do %>
+        <% if @bike.present? %>
+          <%= link_to organized_bike_text(@bike), bike_path(@bike, organization_id: current_organization.to_param) %>
+        <% else %>
+          <span class="text-danger">No bike</span>
         <% end %>
 
-        <tr>
-          <td>Bike</td>
+        <% if display_dev_info? && @impound_record.impound_claim_retrieved? %>
+          <% og_bike = Bike.unscoped.find_by_id(@impound_record.bike_id) %>
+          <div class="only-dev-visible">
+            <em class="small less-strong">
+              Retrieved by impound claim, original bike:
+            </em>
 
-          <td>
-            <% if @bike.present? %>
-              <%= link_to organized_bike_text(@bike), bike_path(@bike, organization_id: current_organization.to_param) %>
-            <% else %>
-              <span class="text-danger">No bike</span>
-            <% end %>
-
-            <% if display_dev_info? && @impound_record.impound_claim_retrieved? %>
-              <% og_bike = Bike.unscoped.find_by_id(@impound_record.bike_id) %>
-              <div class="only-dev-visible">
-                <em class="small less-strong">
-                  Retrieved by impound claim, original bike:
-                </em>
-
-                <br>
-                <%= link_to organized_bike_text(og_bike), bike_path(og_bike, organization_id: current_organization.to_param) %>
-              </div>
-            <% end %>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+            <br>
+            <%= link_to organized_bike_text(og_bike), bike_path(og_bike, organization_id: current_organization.to_param) %>
+          </div>
+        <% end %>
+      <% end %>
+    <% end %>
   </div>
 
   <div class="col-md-6">
-    <table class="table-list">
-      <tbody>
-        <tr>
-          <td>Status</td>
+    <%= render(UI::TableList::Component.new) do |list| %>
+      <% list.with_row(label: "Status", value: tag.strong(status_display(@impound_record.status_humanized))) %>
 
-          <td>
-            <strong>
-              <%= status_display(@impound_record.status_humanized) %>
-            </strong>
-          </td>
-        </tr>
+      <% list.with_row(label: "Location", value: @impound_record.location&.name, if: locations_enabled) %>
+      <% list.with_row(label: "Updated", value: render(UI::Time::Component.new(time: @impound_record.updated_at, format: :localize_time_precise)), if: impound_record_updates.any?) %>
+      <% list.with_row(label: "last update by", value: @impound_record.user&.display_name) %>
+      <% list.with_row(label: "Resolved", value: render(UI::Time::Component.new(time: @impound_record.resolved_at, format: :localize_time_precise)), if: @impound_record.resolving_update.present?) %>
 
-        <% if locations_enabled %>
-          <tr>
-            <td>Location</td>
-            <td><%= @impound_record.location&.name %></td>
-          </tr>
+      <% list.with_row(label: "Impounded from") do %>
+        <% if @impound_record.impounded_from_address_record.blank? %>
+          <em class="less-strong">No impounded from address</em>
+        <% else %>
+          <%= render(UI::AddressDisplay::Component.new(address_record: @impound_record.impounded_from_address_record, visible_attribute: :street)) %>
         <% end %>
-
-        <% if impound_record_updates.any? %>
-          <tr>
-            <td>Updated</td>
-
-            <td>
-              <span class="localizeTime preciseTime">
-                <%= l(@impound_record.updated_at, format: :convert_time) %>
-              </span>
-            </td>
-          </tr>
-        <% end %>
-
-        <tr>
-          <td>last update by</td>
-          <td><%= @impound_record.user&.display_name %></td>
-        </tr>
-
-        <% if @impound_record.resolving_update.present? %>
-          <tr>
-            <td>Resolved</td>
-
-            <td>
-              <% if @impound_record.resolved_at.present? %>
-                <span class="localizeTime preciseTime">
-                  <%= l(@impound_record.resolved_at, format: :convert_time) %>
-                </span>
-              <% end %>
-            </td>
-          </tr>
-        <% end %>
-
-        <tr>
-          <td>Impounded from</td>
-
-          <td>
-            <% if @impound_record.impounded_from_address_record.blank? %>
-              <em class="less-strong">No impounded from address</em>
-            <% else %>
-              <%= render(UI::AddressDisplay::Component.new(address_record: @impound_record.impounded_from_address_record, visible_attribute: :street)) %>
-            <% end %>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+      <% end %>
+    <% end %>
   </div>
 </div>
 
