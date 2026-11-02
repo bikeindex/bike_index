@@ -218,7 +218,7 @@
   }
 
   .twcode {
-    @apply tw:text-sm tw:wrap-anywhere tw:text-pink-600 tw:dark:text-pink-400;
+    @apply tw:text-sm tw:wrap-break-word tw:text-pink-600 tw:dark:text-pink-400;
   }
 
   .twhr {
