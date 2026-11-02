@@ -12,10 +12,10 @@
   <% end %>
 
   <% table.column(label: "Text", classes: "tw:w-1/4") do |ad| %>
-    <%= render(Pages::Admin::Headers::Section::Component.new(title: link_to(ad.title, edit_admin_ad_url(ad), class: "tw:text-gray-900 tw:dark:text-gray-200"))) %>
+    <%= render(Pages::Admin::Headers::Section::Component.new(title: link_to(ad.title, edit_admin_ad_url(ad), class: "tw:twtext-color"))) %>
 
     <p class="tw:mb-4">
-      <%= link_to ad.body, edit_admin_ad_url(ad), class: "tw:text-gray-900 tw:dark:text-gray-200" %>
+      <%= link_to ad.body, edit_admin_ad_url(ad), class: "tw:twtext-color" %>
     </p>
   <% end %>
 
