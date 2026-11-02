@@ -1,6 +1,6 @@
 = render Pages::Admin::Bikes::Header::Component.new(bike: @bike, active: :recovery_displays, stolen_record: @stolen_record, display_recovery: true, user: current_user, display_dev_info: display_dev_info?)
 
-= render(Pages::Admin::Headers::Section::Component.new(title: "Edit Recovery Display"))
+= render(UI::Header::Component.new(text: "Edit Recovery Display", tag: :h2))
 
 = render partial: "form"
 

@@ -1,26 +1,34 @@
-<%= render(Pages::Admin::Headers::Section::Component.new(title: "Marketplace messages", count: counts[:marketplace_messages],
-      href: admin_marketplace_messages_path(user_id: @user.id))) %>
+<%= render(UI::Header::Component.new(tag: :h2)) do %>
+  Marketplace messages
+  <%= render(Pages::Admin::Headers::Count::Component.new(count: counts[:marketplace_messages], href: admin_marketplace_messages_path(user_id: @user.id))) %>
+<% end %>
 
 <% if counts[:marketplace_messages].positive? %>
   <%= render partial: "/admin/marketplace_messages/table", locals: {collection: recent(:marketplace_messages)} %>
 <% end %>
 
-<%= render(Pages::Admin::Headers::Section::Component.new(title: "Alerts", count: counts[:alerts],
-      href: admin_user_alerts_path(user_id: @user.id))) %>
+<%= render(UI::Header::Component.new(tag: :h2)) do %>
+  Alerts
+  <%= render(Pages::Admin::Headers::Count::Component.new(count: counts[:alerts], href: admin_user_alerts_path(user_id: @user.id))) %>
+<% end %>
 
 <% if counts[:alerts].positive? %>
   <%= render partial: "/admin/user_alerts/table", locals: {user_alerts: recent(:alerts), skip_user: true} %>
 <% end %>
 
-<%= render(Pages::Admin::Headers::Section::Component.new(title: "Notifications", count: counts[:notifications],
-      href: admin_notifications_path(user_id: @user.id))) %>
+<%= render(UI::Header::Component.new(tag: :h2)) do %>
+  Notifications
+  <%= render(Pages::Admin::Headers::Count::Component.new(count: counts[:notifications], href: admin_notifications_path(user_id: @user.id))) %>
+<% end %>
 
 <% if counts[:notifications].positive? %>
   <%= render partial: "/admin/notifications/table", locals: {notifications: recent(:notifications).includes(:bike, :notifiable, :user)} %>
 <% end %>
 
-<%= render(Pages::Admin::Headers::Section::Component.new(title: "Feedbacks", count: counts[:feedbacks],
-      href: admin_feedbacks_path(user_id: @user.id))) %>
+<%= render(UI::Header::Component.new(tag: :h2)) do %>
+  Feedbacks
+  <%= render(Pages::Admin::Headers::Count::Component.new(count: counts[:feedbacks], href: admin_feedbacks_path(user_id: @user.id))) %>
+<% end %>
 
 <% if counts[:feedbacks].positive? %>
   <%= render partial: "/admin/feedbacks/table", locals: {feedbacks: recent(:feedbacks).includes(:user), skip_user: true} %>

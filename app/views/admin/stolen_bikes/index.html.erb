@@ -18,7 +18,7 @@
       <% sorted_by_created = sort_column == "created_at" %>
       <% time_range_column = sorted_by_created ? "stolen_records.created_at" : "stolen_records.date_stolen" %>
 
-      <%= render(Pages::Admin::Headers::Section::Component.new(title: sorted_by_created ? "Stolen records created" : "Date stolen")) %>
+      <%= render(UI::Header::Component.new(text: sorted_by_created ? "Stolen records created" : "Date stolen", tag: :h2)) %>
 
       <%= render(UI::Chart::Component.new(series: time_range_counts(collection: available_stolen_records, column: time_range_column), time_range: @time_range, stacked: true)) %>
     </div>
