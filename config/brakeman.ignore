@@ -539,19 +539,19 @@
     {
       "warning_type": "Cross-Site Scripting",
       "warning_code": 4,
-      "fingerprint": "651809dafcd743c22afeb1dd2c7cca62a326b3211f77053f8b4994a2e341f1e9",
+      "fingerprint": "db1d41ed77c458d0e94a691a8a35fcd5abd6971ae02e7a38c4ccd49043951b52",
       "check_name": "LinkToHref",
       "message": "Potentially unsafe model attribute in `link_to` href",
       "file": "app/views/admin/payments/_display.html.haml",
-      "line": 23,
+      "line": 13,
       "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
-      "code": "link_to(Payment.find(params[:id]).stripe_id.truncate(20), Payment.find(params[:id]).stripe_admin_url, :title => Payment.find(params[:id]).stripe_id)",
+      "code": "link_to(Payment.find(params[:id]).stripe_id.truncate(20), Payment.find(params[:id]).stripe_admin_url, :title => Payment.find(params[:id]).stripe_id, :class => \"twlink\")",
       "render_path": [
         {
           "type": "controller",
           "class": "Admin::PaymentsController",
           "method": "edit",
-          "line": 21,
+          "line": 22,
           "file": "app/controllers/admin/payments_controller.rb",
           "rendered": {
             "name": "admin/payments/edit",
@@ -561,7 +561,7 @@
         {
           "type": "template",
           "name": "admin/payments/edit",
-          "line": 6,
+          "line": 3,
           "file": "app/views/admin/payments/edit.html.haml",
           "rendered": {
             "name": "admin/payments/_display",
@@ -583,19 +583,19 @@
     {
       "warning_type": "Cross-Site Scripting",
       "warning_code": 4,
-      "fingerprint": "706a89d842fc179ed2e9293fcca79e3adf05da033d47d3c7adf7a11cb6f831ba",
+      "fingerprint": "aa2bf0e8be7147341ee5560a9cb6a2dcd608b4a270ac5bddaeef0fab64011902",
       "check_name": "LinkToHref",
       "message": "Potentially unsafe model attribute in `link_to` href",
       "file": "app/views/admin/external_registry_bikes/show.html.haml",
-      "line": 35,
+      "line": 17,
       "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
-      "code": "link_to(ExternalRegistryBike.find(params[:id]).url, ExternalRegistryBike.find(params[:id]).url, :target => :_blank)",
+      "code": "link_to(ExternalRegistryBike.find(params[:id]).url, ExternalRegistryBike.find(params[:id]).url, :target => :_blank, :class => \"twlink\")",
       "render_path": [
         {
           "type": "controller",
           "class": "Admin::ExternalRegistryBikesController",
           "method": "show",
-          "line": 14,
+          "line": 15,
           "file": "app/controllers/admin/external_registry_bikes_controller.rb",
           "rendered": {
             "name": "admin/external_registry_bikes/show",
@@ -868,19 +868,19 @@
     {
       "warning_type": "Cross-Site Scripting",
       "warning_code": 4,
-      "fingerprint": "bd60c52737d1d650780cb1b3d1837759750056482c0040582ea2ae2d7a0fb43a",
+      "fingerprint": "cf67c4d450644db6dfa8503bda560a24ce891ca5c55cd10c1cb60ec2e463ba24",
       "check_name": "LinkToHref",
       "message": "Potentially unsafe model attribute in `link_to` href",
       "file": "app/views/admin/bulk_imports/show.html.haml",
-      "line": 37,
+      "line": 16,
       "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
-      "code": "link_to(BulkImport.find(params[:id]).file_url, BulkImport.find(params[:id]).file_url)",
+      "code": "link_to(BulkImport.find(params[:id]).file_url, BulkImport.find(params[:id]).file_url, :class => \"twlink\")",
       "render_path": [
         {
           "type": "controller",
           "class": "Admin::BulkImportsController",
           "method": "show",
-          "line": 15,
+          "line": 17,
           "file": "app/controllers/admin/bulk_imports_controller.rb",
           "rendered": {
             "name": "admin/bulk_imports/show",
@@ -902,19 +902,19 @@
     {
       "warning_type": "Cross-Site Scripting",
       "warning_code": 4,
-      "fingerprint": "be2ce00918c2c3877cf571e2ab007fca6ad86fc744198b859c0c646bdcffb2c7",
+      "fingerprint": "102fceef19c1ba15d5c86270df3ff98722f19fbbf11dc2935d737ee8f4aece30",
       "check_name": "LinkToHref",
       "message": "Potentially unsafe model attribute in `link_to` href",
       "file": "app/views/admin/theft_alerts/edit.html.haml",
-      "line": 88,
+      "line": 87,
       "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
-      "code": "link_to(\"Facebook post\", TheftAlert.find(params[:id]).facebook_post_url, :target => \"_blank\")",
+      "code": "link_to(\"Facebook post\", TheftAlert.find(params[:id]).facebook_post_url, :target => \"_blank\", :class => \"twlink\")",
       "render_path": [
         {
           "type": "controller",
           "class": "Admin::TheftAlertsController",
           "method": "edit",
-          "line": 20,
+          "line": 21,
           "file": "app/controllers/admin/theft_alerts_controller.rb",
           "rendered": {
             "name": "admin/theft_alerts/edit",
@@ -1039,19 +1039,19 @@
     {
       "warning_type": "Cross-Site Scripting",
       "warning_code": 4,
-      "fingerprint": "cfcf6efef605caaaf1b33b383c0629079cb7029fbd478c1a45ccd80308d5075f",
+      "fingerprint": "7e6d6edab1f4a23516b85228840fb41b00ec70bb71b78b65db91dcf3c7c3897e",
       "check_name": "LinkToHref",
       "message": "Potentially unsafe model attribute in `link_to` href",
       "file": "app/views/admin/memberships/show.html.haml",
-      "line": 82,
+      "line": 34,
       "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
-      "code": "link_to(Membership.find(params[:id]).stripe_id.truncate(20), Membership.find(params[:id]).stripe_admin_url, :title => Membership.find(params[:id]).stripe_id)",
+      "code": "link_to(Membership.find(params[:id]).stripe_id.truncate(20), Membership.find(params[:id]).stripe_admin_url, :title => Membership.find(params[:id]).stripe_id, :class => \"twlink\")",
       "render_path": [
         {
           "type": "controller",
           "class": "Admin::MembershipsController",
           "method": "show",
-          "line": 39,
+          "line": 40,
           "file": "app/controllers/admin/memberships_controller.rb",
           "rendered": {
             "name": "admin/memberships/show",

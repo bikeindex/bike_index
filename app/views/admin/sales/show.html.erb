@@ -31,6 +31,7 @@
         BikeVersion
         <%= link_to @sale.item_id, bike_version_path(@sale.item_id), class: "twlink" %>
 
+
         <small>(bike: <%= link_to @sale.item.bike_id, admin_bike_path(@sale.item.bike_id), class: "twlink" %>)</small>
       <% end %>
     <% end %>
