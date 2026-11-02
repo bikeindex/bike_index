@@ -87,8 +87,6 @@
 </div>
 
 <% if @marketplace_messages_thread.count > 1 %>
-  <div class="tw:mt-12">
-    <%= render(Pages::Admin::Headers::Section::Component.new(title: "Message Thread", parenthetical: link_to(number_display(@marketplace_messages_thread.count), message_thread_path, class: "twlink"))) %>
-  </div>
+  <%= render(Pages::Admin::Headers::Section::Component.new(title: "Message Thread", parenthetical: link_to(number_display(@marketplace_messages_thread.count), message_thread_path, class: "twlink"), margin_classes: "tw:mt-12 tw:mb-3")) %>
   <%= render partial: "table", locals: {collection: @marketplace_messages_thread.order(id: :desc), render_sortable: false, skip_marketplace_listing: true, truncate_length: 200} %>
 <% end %>

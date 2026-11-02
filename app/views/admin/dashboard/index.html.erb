@@ -5,9 +5,7 @@
     <%= render(UI::Alerts::Base::Component.new(kind: :error, header: "Example organization is broken!", text: "This breaks things. Tell Seth.")) %>
   <% end %>
 
-  <div class="tw:my-6">
-    <%= render(Pages::Admin::Headers::Section::Component.new(title: safe_join(["Recent ", link_to("Bikes", admin_bikes_url, class: "twlink")]))) %>
-  </div>
+  <%= render(Pages::Admin::Headers::Section::Component.new(title: safe_join(["Recent ", link_to("Bikes", admin_bikes_url, class: "twlink")]), margin_classes: "tw:my-6")) %>
 
   <%= render Pages::Admin::Bikes::Table::Component.new(bikes: @bikes, sort_state:) %>
 
@@ -22,7 +20,7 @@
 
   <%= render(UI::Chart::Component.new(series: bikes, time_range: @time_range, stacked: true)) %>
 
-  <hr class="twhr tw:my-4">
+  <hr class="twhr">
 
   <% cache(User.maximum(:created_at)) do %>
     <%= render(Pages::Admin::Headers::Section::Component.new(title: safe_join(["Recent ", link_to("Users", admin_users_url, class: "twlink")]))) %>
@@ -35,7 +33,7 @@
     </p>
   <% end %>
 
-  <hr class="twhr tw:my-4">
+  <hr class="twhr">
 
   <%= render(Pages::Admin::Headers::Section::Component.new(title: safe_join(["Recent ", link_to("Organizations", admin_organizations_url, class: "twlink")]))) %>
 
@@ -50,7 +48,7 @@
     <em>(<%= number_with_delimiter(yesterday) %> yesterday, <%= number_with_delimiter(today) %> today)</em>
   </p>
 
-  <hr class="twhr tw:my-4">
+  <hr class="twhr">
 
   <% week_searches = Counts.logged_searches(@time_range.first.to_date..Date.current).values.reduce { |sum, day| sum.merge(day) { |_kind, a, b| a + b } } %>
 

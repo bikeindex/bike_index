@@ -43,7 +43,5 @@
     <% end %>
   <% end %>
 <% else %>
-  <div class="tw:mb-6">
-    <%= render(Pages::Admin::Headers::Section::Component.new(title: "No paints found!")) %>
-  </div>
+  <%= render(Pages::Admin::Headers::Section::Component.new(title: "No paints found!", margin_classes: "tw:mb-6")) %>
 <% end %>

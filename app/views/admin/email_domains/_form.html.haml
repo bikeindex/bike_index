@@ -9,8 +9,7 @@
 
 = form_for email_domain,
   url: action,
-  method: method,
-  html: { class: "form" } do |f|
+  method: method do |f|
 
   = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :domain, html_options: {placeholder: "@something.com", disabled: email_domain.id.present?}))
   -# The status is ignored on create, processing has to happen first

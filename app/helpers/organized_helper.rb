@@ -36,9 +36,9 @@ module OrganizedHelper
   end
 
   def export_progress_class(export)
-    return UI::Alerts::Base::Component::TEXT_CLASSES[:error] if export.calculated_progress == "errored"
+    return "text-danger" if export.calculated_progress == "errored"
 
-    (export.calculated_progress == "finished") ? UI::Alerts::Base::Component::TEXT_CLASSES[:success] : UI::Alerts::Base::Component::TEXT_CLASSES[:warning]
+    (export.calculated_progress == "finished") ? "text-success" : "text-warning"
   end
 
   # Whether the export's sticker assignment is still in effect
@@ -58,15 +58,17 @@ module OrganizedHelper
   def status_display_class(status)
     return "" if status.blank?
 
+    text_classes = UI::Alerts::Base::Component::TEXT_CLASSES
+
     case status.downcase
     when "current", "paging", "being_helped"
-      UI::Alerts::Base::Component::TEXT_CLASSES[:success]
+      text_classes[:success]
     when "stolen", /uncertified/
-      UI::Alerts::Base::Component::TEXT_CLASSES[:warning]
+      text_classes[:warning]
     when "resolved_otherwise", "on_deck", /approved/, /retrieved/, "bike graduated", /certified_by/
-      UI::Alerts::Base::Component::TEXT_CLASSES[:notice]
+      text_classes[:notice]
     when /removed/, "impounded", "trashed", "failed_to_find", /denied/, "delivery failure"
-      UI::Alerts::Base::Component::TEXT_CLASSES[:error]
+      text_classes[:error]
     else
       "twless-strong"
     end

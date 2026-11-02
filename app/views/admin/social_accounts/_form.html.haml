@@ -1,7 +1,6 @@
 = form_for social_account,
   url: action,
-  method: method,
-  html: { class: "form" } do |f|
+  method: method do |f|
   .twwiderow{class: "tw:items-start tw:gap-y-6 tw:mb-6"}
     %div
       = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :screen_name, label_text: "Handle"))

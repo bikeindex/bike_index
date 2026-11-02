@@ -1,6 +1,5 @@
 <% index_title = capture do %>
-  <em class="strong"><%= @query.present? ? @query.titleize : "All" %></em>
-  Invoices
+  <em><%= @query.present? ? @query.titleize : "All" %></em> Invoices
 <% end %>
 
 <% nav_header_list_items = capture do %>

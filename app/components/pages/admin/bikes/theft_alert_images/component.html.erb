@@ -9,7 +9,7 @@
 <% end %>
 
 <%# A row that scrolls sideways rather than wrapping - the widths the legacy JS summed %>
-<ul class="twgutter-bleed tw:mb-4 tw:flex tw:list-none tw:gap-4 tw:overflow-x-auto">
+<ul class="twgutter-bleed tw:mb-4 tw:flex tw:gap-4 tw:overflow-x-auto">
   <% public_images.each do |image| %>
     <li class="tw:w-44 tw:shrink-0 tw:text-center">
       <%= render(UI::ButtonLink::Component.new(text: "Delete image", href: delete_path(image.id), method: :put, color: :error, size: :sm,
@@ -31,7 +31,7 @@
 <% if !alert_images? %>
   <div class="tw:mb-4">None</div>
 <% else %>
-  <ul class="twgutter-bleed tw:mb-4 tw:flex tw:list-none tw:gap-4 tw:overflow-x-auto">
+  <ul class="twgutter-bleed tw:mb-4 tw:flex tw:gap-4 tw:overflow-x-auto">
     <% alert_image_versions.each do |name, image_url| %>
       <li class="tw:w-72 tw:shrink-0 tw:text-center">
         <%= link_to image_tag(image_url, class: "tw:mx-auto"), image_url, target: "_blank", rel: "noopener" %>

@@ -4,7 +4,7 @@
 
 = render Pages::Admin::Bikes::TheftAlertImages::Component.new(bike: @bike, stolen_record: @stolen_record, return_to: request.fullpath)
 
-%hr.twhr{class: "tw:my-4"}
+%hr.twhr
 
 - if @stolen_record.blank?
   = render(Pages::Admin::Headers::Section::Component.new(title: "Stolen record not created yet."))
@@ -64,7 +64,7 @@
             If you believe the bike is <em>Special</em>, and don't know what to do, ping Bryan with it
 
     = render(UI::Alerts::Base::Component.new(kind: :notice, header: "Approving will:")) do
-      %ul{class: "tw:mt-0"}
+      %ul
         %li
           Send out a tweet
         %li

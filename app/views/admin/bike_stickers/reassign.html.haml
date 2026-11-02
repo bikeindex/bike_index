@@ -1,12 +1,6 @@
 = render(Pages::Admin::Headers::Nav::Component.new(title: "Reassign Stickers"))
 
-- batches_title = capture do
-  = number_display(@bike_sticker_batches.count)
-  - if @bike_sticker_batch.present?
-    Selected batch
-  - else
-    batches
-= render(Pages::Admin::Headers::Section::Component.new(title: batches_title))
+= render(Pages::Admin::Headers::Section::Component.new(title: safe_join([number_display(@bike_sticker_batches.count), " ", @bike_sticker_batch.present? ? "Selected batch" : "batches"])))
 
 = render partial: "batches_table", locals: {bike_sticker_batches: @bike_sticker_batches}
 

@@ -10,7 +10,7 @@
 <% end %>
 
 <%= render(UI::Alerts::Base::Component.new(kind: :notice, header: "NOTE: Organization Message snippets are actually the entire email.")) do %>
-  <p class="tw:mb-0">
+  <p>
     Organization Messages are editable through the organization's page and
     should probably be edited there (rather than here). Those kinds:
     <small class="tw:mt-2 tw:block"><%= safe_join(MailSnippet.organization_message_kinds.map { |kind| content_tag(:code, MailSnippet.kind_humanized(kind), class: "twcode") }, ", ") %></small>

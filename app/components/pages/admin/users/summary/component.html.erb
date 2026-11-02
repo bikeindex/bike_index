@@ -39,7 +39,7 @@
         <% end %>
       <% elsif superuser_abilities.any? %>
         <%= link_to "limited", admin_superuser_abilities_path(user_id: @user.id), class: UI::Alerts::Base::Component::TEXT_CLASSES[:notice] %>
-        <ul class="tw:mb-0 tw:text-sm">
+        <ul class="tw:text-sm">
           <% superuser_abilities.each do |superuser_ability| %>
             <li>
               <% if superuser_ability.universal? %>
@@ -145,7 +145,7 @@
       <% display_phone = @user.phone.present? %>
 
       <% if display_phone || @user.user_phones.any? %>
-        <ul class="tw:mb-0">
+        <ul>
           <% @user.user_phones.each do |user_phone| %>
             <li>
               <%= render Atoms::Phone::Component.new(phone: user_phone.phone, skip_link: true) %>

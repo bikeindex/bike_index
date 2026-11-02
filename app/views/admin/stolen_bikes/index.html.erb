@@ -29,7 +29,7 @@
   <%= render partial: "/admin/social_accounts/errored" %>
 
   <% if @unapproved_only %>
-    <p class="tw:mt-6 tw:mb-0">
+    <p class="tw:mt-6">
       Showing only unapproved records
       <em><% if @only_without_location %><strong>without location</strong><small class="twless-strong">        view        <%= link_to "records with location", url_for(sortable_search_params.merge(search_without_location: false)), class: "twlink" %>      </small><% else %><small class="twless-strong">        <%= number_display(@unapproved_without_location_count) %> unapproved        records        <%= link_to "without location", url_for(sortable_search_params.merge(search_without_location: true)), class: "twlink" %>      </small><% end %></em>
     </p>

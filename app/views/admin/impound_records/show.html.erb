@@ -60,9 +60,7 @@
   <% end %>
 </div>
 
-<div class="tw:mt-12">
-  <%= render(Pages::Admin::Headers::Section::Component.new(title: "Impound record updates")) %>
-</div>
+<%= render(Pages::Admin::Headers::Section::Component.new(title: "Impound record updates", margin_classes: "tw:mt-12 tw:mb-3")) %>
 
 <% if @impound_record.impound_record_updates.none? %>
   <p class="twless-strong tw:mb-4">no updates</p>
@@ -96,9 +94,7 @@
   <% end %>
 <% end %>
 
-<div class="tw:mt-12">
-  <%= render(Pages::Admin::Headers::Section::Component.new(title: "Impound claims")) %>
-</div>
+<%= render(Pages::Admin::Headers::Section::Component.new(title: "Impound claims", margin_classes: "tw:mt-12 tw:mb-3")) %>
 
 <% if @impound_record.impound_claims.none? %>
   <p class="twless-strong tw:mb-4">no claims</p>

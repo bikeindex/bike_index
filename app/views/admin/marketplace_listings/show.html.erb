@@ -53,14 +53,7 @@
 <div class="tw:mt-10">
   <% messages_count = @marketplace_listing.marketplace_messages.count %>
 
-  <% messages_title = capture do %>
-    <%= link_to admin_marketplace_messages_path(search_marketplace_listing_id: @marketplace_listing.id), class: "twlink" do %>
-      <%= number_display(messages_count) %>
-      <%= "message".pluralize(messages_count) %>
-    <% end %>
-  <% end %>
-
-  <%= render(Pages::Admin::Headers::Section::Component.new(title: messages_title)) do %>
+  <%= render(Pages::Admin::Headers::Section::Component.new(title: link_to(safe_join([number_display(messages_count), " ", "message".pluralize(messages_count)]), admin_marketplace_messages_path(search_marketplace_listing_id: @marketplace_listing.id), class: "twlink"))) do %>
     <% if messages_count > @marketplace_messages.count %>
       <small>
         most recent <%= number_display(@marketplace_messages.count) %> shown

@@ -21,7 +21,7 @@
   = render(Pages::Admin::Headers::Section::Component.new(title: "Reposts"))
   = render partial: "admin/social_posts/table", locals: { social_posts: @social_post.reposts, skip_reposts: true }
 
-%hr.twhr{class: "tw:mt-6 tw:mb-4"}
+%hr.twhr{class: "tw:mt-6"}
 
 = render(Pages::Admin::Headers::Section::Component.new(title: "Platform Response Data"))
 = render UI::JsonDisplay::Component.new(data: @social_post.platform_response, no_max_height: true)

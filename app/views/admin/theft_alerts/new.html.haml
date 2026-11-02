@@ -1,7 +1,6 @@
 = render Pages::Admin::Bikes::Header::Component.new(bike: @bike, active: :theft_alerts, display_recovery: true, user: current_user, display_dev_info: display_dev_info?)
 
-%div{class: "tw:mt-12 tw:mb-6"}
-  = render(Pages::Admin::Headers::Section::Component.new(title: "New Promoted Alert"))
+= render(Pages::Admin::Headers::Section::Component.new(title: "New Promoted Alert", margin_classes: "tw:mt-12 tw:mb-6"))
 
 - if @theft_alerts.any?
   = render(Pages::Admin::Headers::Section::Component.new(title: "Existing alerts"))

@@ -1,7 +1,5 @@
 <%= render(UI::Card::Component.new) do %>
-  <div class="tw:mb-6">
-    <%= render(Pages::Admin::Headers::Section::Component.new(title: "Settings for organization features")) %>
-  </div>
+  <%= render(Pages::Admin::Headers::Section::Component.new(title: "Settings for organization features", margin_classes: "tw:mb-6")) %>
 
   <% if @organization.enabled?("graduated_notifications") %>
     <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :graduated_notification_interval_days, kind: :number_field, label_text: "Interval for send graduated notifications, in days")) do |group| %>

@@ -34,7 +34,7 @@
         - else
           not auto banable
           - if ban_blockers
-            %ul{class: "tw:mb-0"}
+            %ul
               -# duplicates the logic from ban_blockers to make it more readable
               - if @email_domain.below_email_count_blocker?
                 %li

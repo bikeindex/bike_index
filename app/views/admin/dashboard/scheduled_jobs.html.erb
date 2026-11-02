@@ -4,7 +4,7 @@
 
 <% if env_skipped_jobs.any? %>
   <%= render UI::Alerts::Base::Component.new(kind: :warning, header: "Skipped via ENV SIDEKIQ_SKIP_*") do %>
-    <ul class="tw:mb-0">
+    <ul>
       <% env_skipped_jobs.each do |env_key| %>
         <li>
           <code class="twcode">

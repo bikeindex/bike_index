@@ -1,7 +1,5 @@
 <%= render(UI::Card::Component.new) do %>
-  <div class="tw:mb-6">
-    <%= render(Pages::Admin::Headers::Section::Component.new(title: "SAML SSO")) %>
-  </div>
+  <%= render(Pages::Admin::Headers::Section::Component.new(title: "SAML SSO", margin_classes: "tw:mb-6")) %>
 
   <p class="tw:mb-4 <%= UI::Alerts::Base::Component::TEXT_CLASSES[:success] %>">
     Service Provider details for the organization's IdP admin — or just share
