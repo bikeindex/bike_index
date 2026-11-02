@@ -160,7 +160,7 @@
     = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :theft_alert_plan_id)) do
       = render(UI::Forms::Select::Component.new(form_builder: f, attribute: :theft_alert_plan_id, option_tags: plan_options, html_options: {disabled: true}))
     = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :ad_radius_miles, kind: :number_field, html_options: {disabled: true}))
-  .twfieldrow
+  .twwiderow
     = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :start_at, kind: :datetime_local_field, html_options: {step: 60, disabled: true}))
     = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :end_at, kind: :datetime_local_field, html_options: {step: 60, disabled: true}))
 

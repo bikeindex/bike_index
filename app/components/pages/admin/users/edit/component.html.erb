@@ -9,9 +9,7 @@
     <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :email, required: true)) do %>
       <%= render(UI::Forms::Email::Component.new(form_builder: f, required: true)) %>
     <% end %>
-  </div>
 
-  <div class="twwiderow">
     <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :username)) %>
 
     <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :secondary_emails, kind: :text_area,
