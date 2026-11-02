@@ -134,6 +134,13 @@ RSpec.describe Admin::UsersController, type: :request do
         expect(body[:class]).to be_blank
         expect(body.to_html).to include("prefers-color-scheme: dark")
       end
+      it "only offers the chooser on the user's own page" do
+        get "#{base_url}/#{user_subject.id}/edit"
+        expect(body.at_css("input[name='user[dark_mode]']")).to be_nil
+
+        get "#{base_url}/#{current_user.id}/edit"
+        expect(Nokogiri::HTML(response.body).css("input[name='user[dark_mode]']").count).to eq 3
+      end
       context "dark" do
         let(:dark_mode) { :dark }
         it "is dark only in admin" do
@@ -238,7 +245,7 @@ RSpec.describe Admin::UsersController, type: :request do
         expect(user_subject.developer).to be_falsey
         expect(user_subject.can_send_many_stolen_notifications).to be_truthy
         expect(user_subject.can_send_many_marketplace_messages).to be_truthy
-        expect(user_subject.dark_mode).to eq "dark"
+        expect(user_subject.dark_mode).to eq "system"
         expect(user_subject.banned?).to be_truthy
         expect(user_subject.phone).to eq "9876543210"
         user_ban = user_subject.user_ban
@@ -255,6 +262,16 @@ RSpec.describe Admin::UsersController, type: :request do
         expect(user_subject.superuser_abilities.count).to eq 1
         expect(User.admins.pluck(:id)).to include(user_subject.id)
         expect(marketplace_listing.reload.status).to eq "removed"
+      end
+    end
+    context "dark_mode on the user's own page" do
+      let(:own_params) { ban_user_params.merge(email: current_user.email, banned: false, superuser: true) }
+      it "updates it, ignoring an unknown value" do
+        patch "#{base_url}/#{current_user.id}", params: {user: own_params.merge(dark_mode: "dark")}
+        expect(current_user.reload.dark_mode).to eq "dark"
+
+        patch "#{base_url}/#{current_user.id}", params: {user: own_params.merge(dark_mode: "purple")}
+        expect(current_user.reload.dark_mode).to eq "dark"
       end
     end
     context "banning, draining jobs" do

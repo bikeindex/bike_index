@@ -30,14 +30,16 @@
     <div class="col-md-6">
       <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :phone)) %>
 
-      <div class="tw:mb-4">
-        <span id="user-dark-mode-label" class="twlabel">Dark mode</span>
+      <% if own_page? %>
+        <div class="tw:mb-4">
+          <span id="user-dark-mode-label" class="twlabel">Dark mode</span>
 
-        <div role="radiogroup" aria-labelledby="user-dark-mode-label">
-          <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "user[dark_mode]", entries: dark_mode_entries,
-            selected: @user.dark_mode, full_width: true)) %>
+          <div role="radiogroup" aria-labelledby="user-dark-mode-label">
+            <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "user[dark_mode]", entries: dark_mode_entries,
+              selected: @user.dark_mode, full_width: true)) %>
+          </div>
         </div>
-      </div>
+      <% end %>
     </div>
 
     <div class="col-lg-3 col-6 tw:mb-4">

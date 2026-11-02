@@ -12,8 +12,9 @@ module Pages
             "system" => ["icons/computer.svg", nil]
           }.freeze
 
-          def initialize(user:, display_dev_info: false)
+          def initialize(user:, current_user: nil, display_dev_info: false)
             @user = user
+            @current_user = current_user
             @display_dev_info = display_dev_info
           end
 
@@ -27,6 +28,8 @@ module Pages
             @user.build_user_ban if @user.user_ban.blank?
             true
           end
+
+          def own_page? = @user == @current_user
 
           def dark_mode_entries
             DARK_MODE_ICONS.map do |value, (icon, color)|
