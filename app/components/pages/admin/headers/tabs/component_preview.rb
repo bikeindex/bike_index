@@ -5,24 +5,22 @@ module Pages
     module Headers
       module Tabs
         class ComponentPreview < ApplicationComponentPreview
+          # @!group Variants
+
+          # A template, so the links and the alert can render UI:: components
           def default
-            render(component)
+            {template: "pages/admin/headers/tabs/component_preview/default", locals: {tabs:}}
           end
 
           def with_summary
-            render(component) do |header|
+            render(Pages::Admin::Headers::Tabs::Component.new(title: "Brakebills", tabs:, nav_label: "Organization sections")) do |header|
               header.with_summary { "A school in upstate New York" }
             end
           end
 
-          # A template, so the links and the alert can render UI:: components
-          def with_links_and_alert
-            {template: "pages/admin/headers/tabs/component_preview/with_links_and_alert", locals: {tabs:}}
-          end
+          # @!endgroup
 
           private
-
-          def component = Pages::Admin::Headers::Tabs::Component.new(title: "Brakebills", tabs:, nav_label: "Organization sections")
 
           def tabs
             [ComponentStructs::Shapes.tab("Show", "#", active: true),
