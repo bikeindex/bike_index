@@ -205,7 +205,7 @@
 }
 
 body {
-  @apply tw:base-font tw:dark:bg-gray-900;
+  @apply tw:base-font tw:dark:bg-gray-900 tw:dark:scheme-dark;
 
   /* .primary-header-nav's margin-bottom, which the full-bleed pages pull up by to sit
      flush under the navbar. Defined here rather than beside the nav in revised.scss,
