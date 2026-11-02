@@ -6,13 +6,16 @@ module Pages
       module Section
         # A section of an admin record's tab, titled with its count - which links to the full
         # index, when there is one. A section that isn't a list, like an edit form, has no count.
-        # Block content follows the parenthetical.
+        # Block content follows the parenthetical. tag: :h3 is a section within another.
         class Component < ApplicationComponent
-          def initialize(title:, count: nil, href: nil, parenthetical: nil, margin_classes: "tw:mt-6 tw:mb-3 tw:first:mt-0")
+          TAG_CLASSES = {h2: "tw:text-2xl", h3: "tw:text-xl"}.freeze
+
+          def initialize(title:, count: nil, href: nil, parenthetical: nil, tag: :h2, margin_classes: "tw:mt-6 tw:mb-3 tw:first:mt-0")
             @title = title
             @count = count
             @href = href
             @parenthetical = parenthetical
+            @tag = tag
             @margin_classes = margin_classes
           end
 

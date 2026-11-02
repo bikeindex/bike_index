@@ -13,6 +13,10 @@ module Pages
             render(Pages::Admin::Headers::Section::Component.new(title: "Edit Promoted Alert"))
           end
 
+          def within_a_section
+            render(Pages::Admin::Headers::Section::Component.new(title: "Ban information", tag: :h3))
+          end
+
           def with_parenthetical
             render(Pages::Admin::Headers::Section::Component.new(title: "Bikes", count: 250, href: "#",
               parenthetical: "first 100 shown"))

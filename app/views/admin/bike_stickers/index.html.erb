@@ -27,7 +27,7 @@
         <% end %>
       <% end %>
 
-      <%= render(Pages::Admin::Headers::Section::Component.new(title: batches_title)) %>
+      <%= render(Pages::Admin::Headers::Section::Component.new(title: batches_title, tag: :h3)) %>
     <% end %>
 
     <%= render partial: "batches_table", locals: {bike_sticker_batches: @bike_sticker_batches, render_sortable: false, matching_count: @matching_batches} %>

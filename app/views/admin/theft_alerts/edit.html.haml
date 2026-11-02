@@ -29,7 +29,7 @@
   - if @theft_alert.failed_to_activate?
     %span{class: UI::Alerts::Base::Component::TEXT_CLASSES[:error]} Something Broke!
     %strong Tell Seth
-= render(Pages::Admin::Headers::Section::Component.new(title: facebook_update_title))
+= render(Pages::Admin::Headers::Section::Component.new(title: facebook_update_title, tag: :h3))
 
 - if @theft_alert.pending?
   = render(UI::Container::Component.new) do
@@ -43,7 +43,7 @@
             %em{class: "tw:mt-2 tw:block tw:text-sm"}
               You can still activate if you're sure you want to
         %div{class: "tw:text-center"}
-          = render(Pages::Admin::Headers::Section::Component.new(title: activateable_title))
+          = render(Pages::Admin::Headers::Section::Component.new(title: activateable_title, tag: :h3))
 
         - if @theft_alert.activating?
           %div{class: "tw:mt-4 tw:text-center"}
@@ -65,7 +65,7 @@
           %span{class: UI::Alerts::Base::Component::TEXT_CLASSES[:error]} can not
           be activated
         %div{class: "tw:text-center"}
-          = render(Pages::Admin::Headers::Section::Component.new(title: not_activateable_title))
+          = render(Pages::Admin::Headers::Section::Component.new(title: not_activateable_title, tag: :h3))
         %ul{class: "tw:mt-6 tw:mb-4"}
           - unless @theft_alert.stolen_record_approved?
             %li Stolen Record is not approved
@@ -137,7 +137,7 @@
 - if @theft_alert.payment.present?
   = render partial: "/admin/payments/display", locals: { payment: @theft_alert.payment }
 - elsif @theft_alert.admin
-  = render(Pages::Admin::Headers::Section::Component.new(title: "Admin"))
+  = render(Pages::Admin::Headers::Section::Component.new(title: "Admin", tag: :h3))
 - else
   No payment present!
 
@@ -146,7 +146,7 @@
 
 
 - if @theft_alert.notifications.any?
-  = render(Pages::Admin::Headers::Section::Component.new(title: "Notifications"))
+  = render(Pages::Admin::Headers::Section::Component.new(title: "Notifications", tag: :h3))
   = render partial: "/admin/notifications/table", locals: {notifications: @theft_alert.notifications.reorder(created_at: :desc), skip_user: true}
 = render(Pages::Admin::Headers::Section::Component.new(title: "Edit Promoted Alert"))
 

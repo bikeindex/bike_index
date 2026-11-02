@@ -110,7 +110,7 @@
 
   <% if @bike.current_stolen_record.present? %>
     <div class="tw:mt-8" id="edit-stolen-record">
-      <%= render(Pages::Admin::Headers::Section::Component.new(title: "Edit stolen record")) %>
+      <%= render(Pages::Admin::Headers::Section::Component.new(title: "Edit stolen record", tag: :h3)) %>
     </div>
 
     <%= f.fields_for :stolen_records do |s| %>

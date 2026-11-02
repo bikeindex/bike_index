@@ -3,7 +3,7 @@
 = render(Pages::Admin::Headers::Section::Component.new(title: "New Promoted Alert", margin_classes: "tw:mt-12 tw:mb-6"))
 
 - if @theft_alerts.any?
-  = render(Pages::Admin::Headers::Section::Component.new(title: "Existing alerts"))
+  = render(Pages::Admin::Headers::Section::Component.new(title: "Existing alerts", tag: :h3))
   = render partial: "/admin/theft_alerts/table", locals: {render_sortable: true, theft_alerts: @theft_alerts, skip_bike: true}
 
 %div{class: "tw:mt-12 tw:mb-6"}

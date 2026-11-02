@@ -5,7 +5,7 @@
 <div class="tw:grid tw:grid-cols-12 tw:gap-x-8 tw:text-center">
   <% if @recovery.waiting_on_decision? %>
     <div class="tw:col-span-12 tw:md:col-span-4">
-      <%= render(Pages::Admin::Headers::Section::Component.new(title: "Choose what to do with this recovery:")) %>
+      <%= render(Pages::Admin::Headers::Section::Component.new(title: "Choose what to do with this recovery:", tag: :h3)) %>
     </div>
     <div class="tw:col-span-6 tw:md:col-span-4">
       <%= render(UI::ButtonLink::Component.new(text: "Display recovery", href: new_admin_recovery_display_path(stolen_record_id: @recovery.id), color: :primary, size: :lg, html_class: "tw:w-full")) %>
@@ -40,7 +40,7 @@
       </div>
     <% end %>
     <div class="tw:col-span-12">
-      <%= render(Pages::Admin::Headers::Section::Component.new(title: safe_join(["Display Status: ", tag.em(@recovery.recovery_display_status.humanize)]))) %>
+      <%= render(Pages::Admin::Headers::Section::Component.new(title: safe_join(["Display Status: ", tag.em(@recovery.recovery_display_status.humanize)]), tag: :h3)) %>
 
       <p class="tw:mt-6 tw:mb-4">
         Really want to display this recovery?

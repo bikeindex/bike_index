@@ -1,6 +1,6 @@
 = render(Pages::Admin::Headers::Nav::Component.new(title: "Reassign Stickers"))
 
-= render(Pages::Admin::Headers::Section::Component.new(title: safe_join([number_display(@bike_sticker_batches.count), " ", @bike_sticker_batch.present? ? "Selected batch" : "batches"])))
+= render(Pages::Admin::Headers::Section::Component.new(title: safe_join([number_display(@bike_sticker_batches.count), " ", @bike_sticker_batch.present? ? "Selected batch" : "batches"]), tag: :h3))
 
 = render partial: "batches_table", locals: {bike_sticker_batches: @bike_sticker_batches}
 

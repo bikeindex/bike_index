@@ -1,4 +1,4 @@
-<h3 class="tw:text-2xl tw:leading-tight tw:font-medium <%= @margin_classes %>">
+<%= content_tag(@tag, class: "#{TAG_CLASSES.fetch(@tag)} tw:leading-tight tw:font-medium #{@margin_classes}") do %>
   <%= @title %>
 
   <% unless @count.nil? %>
@@ -10,4 +10,4 @@
   <% end %>
 
   <%= content %>
-</h3>
+<% end %>

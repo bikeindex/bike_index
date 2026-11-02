@@ -62,7 +62,7 @@
         <%= render(UI::Container::Component.new) do %>
           <%= render(UI::Card::Component.new) do %>
             <div class="twwiderow">
-              <%= render(Pages::Admin::Headers::Section::Component.new(title: "Ban information")) %>
+              <%= render(Pages::Admin::Headers::Section::Component.new(title: "Ban information", tag: :h3)) %>
 
               <%= render(UI::Forms::Group::Component.new(form_builder: user_ban, attribute: :reason, required: true)) do %>
                 <%= render(UI::Forms::Select::Component.new(form_builder: user_ban, attribute: :reason,

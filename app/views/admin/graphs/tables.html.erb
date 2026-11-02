@@ -32,7 +32,7 @@
     <strong><%= params[:location] %></strong>
   <% end %>
 
-  <%= render(Pages::Admin::Headers::Section::Component.new(title: location_title)) %>
+  <%= render(Pages::Admin::Headers::Section::Component.new(title: location_title, tag: :h3)) %>
 
   <div class="tw:mt-4">
     <%= render(Pages::Admin::Graphs::YearCounts::Component.new(bounding_box: @bounding_box)) %>
@@ -41,6 +41,6 @@
   <%= render(Pages::Admin::Headers::Section::Component.new(title: tag.em("Add a location to the search section at the top of the page to see stats about that location"))) %>
 
   <% if params[:location].present? %>
-    <%= render(Pages::Admin::Headers::Section::Component.new(title: "The location and proximity you entered weren't useable. Try again.")) %>
+    <%= render(Pages::Admin::Headers::Section::Component.new(title: "The location and proximity you entered weren't useable. Try again.", tag: :h3)) %>
   <% end %>
 <% end %>

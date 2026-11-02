@@ -112,7 +112,7 @@
       <%= render(Pages::Admin::Headers::Section::Component.new(title: matching_title, count: @searched_bike_stickers.count)) %>
 
       <% if @searched_bike_stickers.count > 100 %>
-        <%= render(Pages::Admin::Headers::Section::Component.new(title: "More than 100 matching stickers, just showing the first 100")) %>
+        <%= render(Pages::Admin::Headers::Section::Component.new(title: "More than 100 matching stickers, just showing the first 100", tag: :h3)) %>
       <% end %>
 
       <%= render partial: "/admin/bike_stickers/table", locals: {bike_stickers: @searched_bike_stickers.limit(100)} %>

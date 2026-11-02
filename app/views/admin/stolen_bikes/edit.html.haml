@@ -15,14 +15,14 @@
   = render(Pages::Admin::Headers::Section::Component.new(title: tag.span("This Stolen record is not the current stolen record for the Bike!", class: UI::Alerts::Base::Component::TEXT_CLASSES[:warning])))
   %p{class: "tw:mb-4"}
     Either you're viewing a recovered bike or there is a new stolen record.
-  = render(Pages::Admin::Headers::Section::Component.new(title: link_to("View the current stolen record", edit_admin_stolen_bike_url(@bike.id), class: "twlink")))
+  = render(Pages::Admin::Headers::Section::Component.new(title: link_to("View the current stolen record", edit_admin_stolen_bike_url(@bike.id), class: "twlink"), tag: :h3))
   %p{class: "tw:mt-6 tw:mb-4 #{UI::Alerts::Base::Component::TEXT_CLASSES[:error]}"}
     You Probably don't want to do anything on this page
 
 - elsif @stolen_record.present? && !@stolen_record.approved
   .twwiderow{class: "tw:my-6 tw:items-start"}
     %div
-      = render(Pages::Admin::Headers::Section::Component.new(title: "Stolen Record approval process"))
+      = render(Pages::Admin::Headers::Section::Component.new(title: "Stolen Record approval process", tag: :h3))
       %ol{class: "tw:mb-4 tw:list-decimal tw:ml-4"}
         %li
           Delete anything that's egregiously wrong (like Motorcycles), or spam
@@ -75,7 +75,7 @@
         = render(UI::ButtonLink::Component.new(text: "Approve listing", href: approve_admin_stolen_bike_url(@bike), method: :post, color: :primary, size: :lg))
 
 - social_posts = @stolen_record&.social_posts
-= render(Pages::Admin::Headers::Section::Component.new(title: "Posts"))
+= render(Pages::Admin::Headers::Section::Component.new(title: "Posts", tag: :h3))
 - if social_posts&.any?
   = render partial: "/admin/social_posts/table", locals: { social_posts: social_posts, render_sortable: false, skip_stolen_record: true }
 
@@ -84,7 +84,7 @@
 - if @customer_contact.present?
   = form_for [:admin, @customer_contact] do |f|
     #contact-owner
-      = render(Pages::Admin::Headers::Section::Component.new(title: "Send bike owner an email"))
+      = render(Pages::Admin::Headers::Section::Component.new(title: "Send bike owner an email", tag: :h3))
 
     - if @customer_contact.errors.any?
       = render(UI::Alerts::ObjectError::Component.new(object: @customer_contact))
@@ -108,6 +108,6 @@
 
 - else
   = render(Pages::Admin::Headers::Section::Component.new(title: "Something is broken on this page"))
-  = render(Pages::Admin::Headers::Section::Component.new(title: "This bike doesn't have an owner"))
+  = render(Pages::Admin::Headers::Section::Component.new(title: "This bike doesn't have an owner", tag: :h3))
   %p{class: "tw:mb-4"}
     Talk to a developer

@@ -122,7 +122,7 @@
       <% gears = @strava_integration.strava_gears.select { |g| g.gear_type == gear_type.to_s }.sort_by { |g| g.strava_gear_display_name.downcase } %>
       <% next if gears.empty? %>
 
-      <%= render(Pages::Admin::Headers::Section::Component.new(title: gear_type_label)) %>
+      <%= render(Pages::Admin::Headers::Section::Component.new(title: gear_type_label, tag: :h3)) %>
 
       <%= render partial: "admin/strava_gears/table", locals: {collection: gears, skip_strava_integration: true} %>
     <% end %>

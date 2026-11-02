@@ -54,7 +54,7 @@
           = render UI::JsonDisplay::Component.new(data: data.except("headers"), small: true)
 
 %div{class: "tw:my-6"}
-  = render(Pages::Admin::Headers::Section::Component.new(title: "Errors"))
+  = render(Pages::Admin::Headers::Section::Component.new(title: "Errors", tag: :h3))
   - if @bulk_import.import_errors == {}
     %span.twless-strong No errors
   - else
