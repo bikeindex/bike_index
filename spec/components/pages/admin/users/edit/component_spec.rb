@@ -14,12 +14,12 @@ RSpec.describe Pages::Admin::Users::Edit::Component, type: :component do
   end
 
   context "on the user's own page" do
-    let(:user) { FactoryBot.create(:user, dark_mode: :dark) }
+    let(:user) { FactoryBot.create(:user, dark_mode_preview: true) }
     let(:component) { render_inline(described_class.new(user:, current_user: user)) }
 
-    it "renders a dark mode radio per mode, with the user's checked" do
-      expect(component.css("input[name='user[dark_mode]']").map { it["value"] }).to eq %w[light dark system]
-      expect(component.css("input[name='user[dark_mode]'][checked]").map { it["value"] }).to eq %w[dark]
+    it "renders on and off radios, with the user's checked" do
+      expect(component.css("input[type=radio][name='user[dark_mode_preview]']").map { it["value"] }).to eq %w[false true]
+      expect(component.css("input[name='user[dark_mode_preview]'][checked]").map { it["value"] }).to eq %w[true]
     end
   end
 

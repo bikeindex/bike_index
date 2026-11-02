@@ -125,39 +125,26 @@ RSpec.describe Admin::UsersController, type: :request do
       expect(response.body).to_not include("deleted_only")
     end
 
-    describe "dark_mode" do
-      let(:current_user) { FactoryBot.create(:superuser, dark_mode:) }
+    describe "dark_mode_preview" do
+      let(:current_user) { FactoryBot.create(:superuser, dark_mode_preview:) }
       let(:body) { Nokogiri::HTML(response.body).at_css("body") }
-      let(:dark_mode) { :system }
-      it "follows the system preference" do
+      let(:dark_mode_preview) { false }
+      it "isn't dark, and only offers the radios on the user's own page" do
         get "#{base_url}/#{user_subject.id}/edit"
         expect(body[:class]).to be_blank
-        expect(body.to_html).to include("prefers-color-scheme: dark")
-      end
-      it "only offers the chooser on the user's own page" do
-        get "#{base_url}/#{user_subject.id}/edit"
-        expect(body.at_css("input[name='user[dark_mode]']")).to be_nil
+        expect(body.at_css("input[name='user[dark_mode_preview]']")).to be_nil
 
         get "#{base_url}/#{current_user.id}/edit"
-        expect(Nokogiri::HTML(response.body).css("input[name='user[dark_mode]']").count).to eq 3
+        expect(Nokogiri::HTML(response.body).css("input[type=radio][name='user[dark_mode_preview]']").count).to eq 2
       end
-      context "dark" do
-        let(:dark_mode) { :dark }
+      context "true" do
+        let(:dark_mode_preview) { true }
         it "is dark only in admin" do
           get "#{base_url}/#{user_subject.id}/edit"
           expect(body[:class]).to eq "dark"
-          expect(body.to_html).to_not include("prefers-color-scheme: dark")
 
           get "/"
           expect(Nokogiri::HTML(response.body).at_css("body")[:class].to_s.split).to_not include("dark")
-        end
-      end
-      context "light" do
-        let(:dark_mode) { :light }
-        it "is light" do
-          get "#{base_url}/#{user_subject.id}/edit"
-          expect(body[:class]).to be_blank
-          expect(body.to_html).to_not include("prefers-color-scheme: dark")
         end
       end
     end
@@ -230,7 +217,7 @@ RSpec.describe Admin::UsersController, type: :request do
             developer: "1",
             can_send_many_stolen_notifications: true,
             can_send_many_marketplace_messages: true,
-            dark_mode: "dark",
+            dark_mode_preview: true,
             banned: true,
             phone: "9876543210",
             user_ban_attributes: {
@@ -245,7 +232,7 @@ RSpec.describe Admin::UsersController, type: :request do
         expect(user_subject.developer).to be_falsey
         expect(user_subject.can_send_many_stolen_notifications).to be_truthy
         expect(user_subject.can_send_many_marketplace_messages).to be_truthy
-        expect(user_subject.dark_mode).to eq "system"
+        expect(user_subject.dark_mode_preview).to be_falsey
         expect(user_subject.banned?).to be_truthy
         expect(user_subject.phone).to eq "9876543210"
         user_ban = user_subject.user_ban
@@ -264,14 +251,14 @@ RSpec.describe Admin::UsersController, type: :request do
         expect(marketplace_listing.reload.status).to eq "removed"
       end
     end
-    context "dark_mode on the user's own page" do
+    context "dark_mode_preview on the user's own page" do
       let(:own_params) { ban_user_params.merge(email: current_user.email, banned: false, superuser: true) }
-      it "updates it, ignoring an unknown value" do
-        patch "#{base_url}/#{current_user.id}", params: {user: own_params.merge(dark_mode: "dark")}
-        expect(current_user.reload.dark_mode).to eq "dark"
+      it "updates it" do
+        patch "#{base_url}/#{current_user.id}", params: {user: own_params.merge(dark_mode_preview: "true")}
+        expect(current_user.reload.dark_mode_preview).to be_truthy
 
-        patch "#{base_url}/#{current_user.id}", params: {user: own_params.merge(dark_mode: "purple")}
-        expect(current_user.reload.dark_mode).to eq "dark"
+        patch "#{base_url}/#{current_user.id}", params: {user: own_params.merge(dark_mode_preview: "false")}
+        expect(current_user.reload.dark_mode_preview).to be_falsey
       end
     end
     context "banning, draining jobs" do

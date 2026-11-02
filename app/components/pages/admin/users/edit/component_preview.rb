@@ -19,7 +19,7 @@ module Pages
             render(Pages::Admin::Users::Edit::Component.new(user:))
           end
 
-          # Editing yourself is what offers the dark mode chooser
+          # Editing yourself is what offers the dark mode preview radios
           def own_page
             user = lookbook_user
 

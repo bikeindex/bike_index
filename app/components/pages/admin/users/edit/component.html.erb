@@ -21,9 +21,16 @@
       <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :phone)) %>
 
       <% if own_page? %>
-        <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :dark_mode, optional_badge: false)) do %>
-          <%= render(UI::Forms::RadioButtonGroup::Component.new(name: f.field_name(:dark_mode), entries: dark_mode_entries,
-            selected: @user.dark_mode, full_width: true)) %>
+        <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :dark_mode_preview, optional_badge: false)) do %>
+          <div class="tw:flex tw:gap-4">
+            <label class="tw:flex tw:cursor-pointer tw:items-center tw:gap-1">
+              <%= f.radio_button :dark_mode_preview, false %> Off
+            </label>
+
+            <label class="tw:flex tw:cursor-pointer tw:items-center tw:gap-1">
+              <%= f.radio_button :dark_mode_preview, true %> On
+            </label>
+          </div>
         <% end %>
       <% end %>
     </div>

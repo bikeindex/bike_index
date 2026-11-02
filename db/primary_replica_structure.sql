@@ -4503,7 +4503,7 @@ CREATE TABLE public.users (
     feature_registration_show_legacy boolean DEFAULT false NOT NULL,
     passwordless_user boolean DEFAULT false NOT NULL,
     preferred_unit_system integer,
-    dark_mode integer DEFAULT 0 NOT NULL
+    dark_mode_preview boolean DEFAULT false NOT NULL
 );
 
 
@@ -7966,7 +7966,7 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
-('20261101185304'),
+('20261102171029'),
 ('20261030102135'),
 ('20261017210000'),
 ('20261017200000'),

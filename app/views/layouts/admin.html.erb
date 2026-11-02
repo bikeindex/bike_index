@@ -24,19 +24,7 @@
     <%# = hotwire_livereload_tags if Rails.env.development? %>
   </head>
 
-  <%= body_tag(html_class: class_names(dark: current_user&.dark_mode_dark?), data: {turbo: true}) do %>
-    <% if current_user&.dark_mode_system? %>
-      <%# Before anything paints, so the page doesn't flash light. A block, because Turbo re-runs it on each visit %>
-      <script>
-        {
-          const darkQuery = matchMedia("(prefers-color-scheme: dark)")
-          const setDark = () => document.body.classList.toggle("dark", darkQuery.matches)
-          setDark()
-          darkQuery.addEventListener("change", setDark)
-        }
-      </script>
-    <% end %>
-
+  <%= body_tag(html_class: class_names(dark: current_user&.dark_mode_preview?), data: {turbo: true}) do %>
     <%= render(SharedBlocks::ReviewAppBanner::Component.from_env(current_user:, return_to: request.fullpath)) %>
 
     <%= render(Pages::Admin::Navbar::Component.new(current_user:, user_root_url:, search_filtered: admin_search_filtered?)) %>
