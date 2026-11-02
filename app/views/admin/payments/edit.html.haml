@@ -1,5 +1,4 @@
-%h1{class: "tw:mb-6"}
-  Edit Payment
+= render(Pages::Admin::Headers::Nav::Component.new(title: "Edit Payment"))
 
 = render partial: "/admin/payments/display", locals: {payment: @payment}
 
@@ -8,7 +7,7 @@
 - if @payment.can_assign_to_membership?
   = render(UI::Container::Component.new) do
     = render(UI::Card::Component.new(additional_classes: "tw:mt-6 tw:mb-12")) do
-      %p
+      %p{class: "tw:mb-4"}
         You can give this user a Bike Index membership by clicking
         %em assign to membership
         \- which will give this user a membership if they don't have one, or extend their current membership if they do.

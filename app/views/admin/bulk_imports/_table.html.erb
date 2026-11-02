@@ -9,7 +9,7 @@
 
       <% if bulk_import.organization_id.present? %>
         <small class="twless-strong">
-          <%= link_to "org view", organization_bulk_import_path(bulk_import, organization_id: bulk_import.organization.to_param), class: "twless-strong tw:italic" %>
+          <%= link_to "org view", organization_bulk_import_path(bulk_import, organization_id: bulk_import.organization.to_param), class: "twlink twless-strong tw:italic" %>
         </small>
       <% end %>
     <% end %>

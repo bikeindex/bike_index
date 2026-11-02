@@ -15,7 +15,7 @@
     = render(UI::Card::Component.new) do
       %small
         Credentials can be found on the
-        = link_to "Twitter Apps Dashboard", "https://developer.twitter.com/apps", target: :_blank
+        = link_to "Twitter Apps Dashboard", "https://developer.twitter.com/apps", target: :_blank, class: "twlink"
         by selecting the desired app, then navigating to
         %strong Details
         >
@@ -33,7 +33,7 @@
       = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :country, html_options: {value: social_account.country&.iso}))
       = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :language))
     = render(UI::Card::Component.new) do
-      %p
+      %p{class: "tw:mb-4"}
         %em{class: UI::Alerts::Base::Component::TEXT_CLASSES[:warning]}
           Probably don't edit
         Latitude and Longitude will be set automatically from the address

@@ -1,8 +1,8 @@
-%h1
-  Edit #{@content_tag.name}
+= render(Pages::Admin::Headers::Nav::Component.new(title: "Edit #{@content_tag.name}"))
 
 = render partial: "form"
 
-%h3{class: "tw:mt-12"} Blogs with this tag:
+%div{class: "tw:mt-12"}
+  = render(Pages::Admin::Headers::Section::Component.new(title: "Blogs with this tag:"))
 
 = render partial: "/admin/news/table", locals: {blogs: @blogs, tags_no_link: true}

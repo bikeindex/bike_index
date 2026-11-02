@@ -1,8 +1,8 @@
 = render(Pages::Admin::Headers::Nav::Component.new(title: "Autocomplete status"))
 
 = render(UI::Container::Component.new(alignment: :left)) do
-  %h4{class: "tw:mb-4"}
-    Autocomplete info
+  %div{class: "tw:mb-4"}
+    = render(Pages::Admin::Headers::Section::Component.new(title: "Autocomplete info"))
   = render(UI::TableList::Component.new) do |list|
     - list.with_row(label: "Category Keys") do
       = number_display(@autocomplete_info[:category_keys])

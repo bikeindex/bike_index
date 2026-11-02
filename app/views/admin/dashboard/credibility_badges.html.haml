@@ -1,10 +1,10 @@
 = render(Pages::Admin::Headers::Nav::Component.new(title: "Credibility Badges"))
 
-%p
+%p{class: "tw:mb-4"}
   Bikes start out with a score of
   %strong
     = CredibilityScorer::BASE_SCORE
-%p
+%p{class: "tw:mb-4"}
   Badges add or subtract value from that score (max of #{CredibilityScorer::MAX_SCORE}, min of 0)
 
 = render(UI::Container::Component.new) do

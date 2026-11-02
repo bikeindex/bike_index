@@ -1,6 +1,6 @@
 <div class="tw:mt-6">
   <% if show_user? %>
-    <p>
+    <p class="tw:mb-4">
       <% if @index.user_subject.present? %>
         <%= @viewing.pluralize %> for
         <%= link_to @index.user_subject.display_name, admin_user_path(@index.user_subject), class: "twlink" %>
@@ -15,7 +15,7 @@
   <% end %>
 
   <% if show_bike? %>
-    <p>
+    <p class="tw:mb-4">
       <% if bike_subject.present? %>
         <%= @viewing.pluralize %> for
         <%= link_to bike_subject.title_string, admin_bike_path(bike_subject), class: "twlink" %>
@@ -32,7 +32,7 @@
   <% end %>
 
   <% if show_marketplace_listing? %>
-    <p>
+    <p class="tw:mb-4">
       <% if marketplace_listing_subject.present? %>
         <%= @viewing.pluralize %> for
         <em>Marketplace Listing <%= render(Atoms::Admin::Badges::MarketplaceListing::Component.new(status: marketplace_listing_subject.status, status_humanized: marketplace_listing_subject.status_humanized, kind: :marketplace_listing)) %> #<%= marketplace_listing_subject.id %>,</em>
@@ -51,7 +51,7 @@
   <% end %>
 
   <% if show_organization? %>
-    <p>
+    <p class="tw:mb-4">
       <%= @viewing.pluralize %> for
       <% if organization_subject.present? %>
         <em>
@@ -73,7 +73,7 @@
   <% end %>
 
   <% if show_membership? %>
-    <p>
+    <p class="tw:mb-4">
       <%= @viewing.pluralize %> for
       <%= link_to "Membership #{membership_id}", admin_membership_path(membership_id), class: "twlink" %>
       <%= view_all_link("view for all memberships", :search_membership_id) %>
@@ -81,7 +81,7 @@
   <% end %>
 
   <% if show_strava_integration? %>
-    <p>
+    <p class="tw:mb-4">
       <%= @viewing.pluralize %> for
       <%= link_to "Strava Integration #{strava_integration_id}", admin_strava_integration_path(strava_integration_id), class: "twlink" %>
       <% if strava_integration.present? %>
@@ -96,14 +96,14 @@
   <% end %>
 
   <% if show_kind? %>
-    <p>
+    <p class="tw:mb-4">
       <%= @viewing.pluralize %> for <strong><%= kind_humanized %></strong>
       <%= view_all_link("view for all kinds", :search_kind) %>
     </p>
   <% end %>
 
   <% if show_primary_activity? %>
-    <p>
+    <p class="tw:mb-4">
       <%= @viewing.pluralize %> for
       <% if primary_activity_subject.present? %>
         <%= link_to primary_activity_subject.name, admin_primary_activity_path(primary_activity_subject), class: "twlink" %>

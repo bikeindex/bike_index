@@ -75,9 +75,9 @@
       </div>
 
       <% if @search_facebook_data %>
-        <h3 class="tw:mt-12">
-          <em>Sum of Facebook reach for ads started in the period</em>
-        </h3>
+        <div class="tw:mt-12">
+          <%= render(Pages::Admin::Headers::Section::Component.new(title: tag.em("Sum of Facebook reach for ads started in the period"))) %>
+        </div>
         <%= render(UI::Chart::Component.new(series: facebook_reach_graph, time_range: @time_range, stacked: true)) %>
         <div class="tw:mt-12"></div>
       <% end %>

@@ -1,4 +1,4 @@
-<h4>Edit</h4>
+<%= render(Pages::Admin::Headers::Section::Component.new(title: "Edit")) %>
 
 <%= form_for @user, url: admin_user_path(@user), method: :patch, html: {data: {controller: "admin--user-edit-form"}} do |f| %>
   <%= render(UI::Alerts::ObjectError::Component.new(object: @user)) %>
@@ -62,7 +62,7 @@
         <%= render(UI::Container::Component.new) do %>
           <%= render(UI::Card::Component.new) do %>
             <div class="twwiderow">
-              <h4>Ban information</h4>
+              <%= render(Pages::Admin::Headers::Section::Component.new(title: "Ban information")) %>
 
               <%= render(UI::Forms::Group::Component.new(form_builder: user_ban, attribute: :reason, required: true)) do %>
                 <%= render(UI::Forms::Select::Component.new(form_builder: user_ban, attribute: :reason,
@@ -74,9 +74,11 @@
             <%= render(UI::Forms::Group::Component.new(form_builder: user_ban, attribute: :description, kind: :text_area,
               label_text: "Description/notes")) %>
 
-            <p><em class="tw:text-sm"> Banning a user will: </em></p>
+            <p class="tw:mb-4">
+              <em class="tw:text-sm"> Banning a user will: </em>
+            </p>
 
-            <ul class="tw:mt-0 tw:ml-4 tw:list-disc">
+            <ul class="tw:mt-0 tw:mb-4 tw:ml-4 tw:list-disc">
               <li>
                 Log them out and prevent them from logging back in
               </li>

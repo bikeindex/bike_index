@@ -1,13 +1,13 @@
 <% cache("admin/dashboard/index", expires_in: 1.minute) do %>
-  <h1 class="tw:text-center">Go Hard</h1>
+  <h1 class="tw:mb-2 tw:text-center tw:text-2xl tw:font-medium">Go Hard</h1>
 
   <% if Organization.example.blank? %>
     <%= render(UI::Alerts::Base::Component.new(kind: :error, header: "Example organization is broken!", text: "This breaks things. Tell Seth.")) %>
   <% end %>
 
-  <h2 class="tw:my-6">
-    Recent <%= link_to "Bikes", admin_bikes_url %>
-  </h2>
+  <div class="tw:my-6">
+    <%= render(Pages::Admin::Headers::Section::Component.new(title: safe_join(["Recent ", link_to("Bikes", admin_bikes_url, class: "twlink")]))) %>
+  </div>
 
   <%= render Pages::Admin::Bikes::Table::Component.new(bikes: @bikes, sort_state:) %>
 
@@ -15,37 +15,33 @@
   <% yesterday = (Bike.where("created_at >= ?", Time.current.beginning_of_day - 1.day).count) - today %>
   <% bikes = [{name: "Registrations", data: UI::Chart::Component.time_range_counts(collection: Bike.unscoped.current.not_stolen.where(created_at: @time_range), time_range: @time_range, column: "bikes.created_at")}, {name: "Stolen", data: UI::Chart::Component.time_range_counts(collection: Bike.unscoped.current.status_stolen.where(created_at: @time_range), time_range: @time_range, column: "bikes.created_at")}] %>
 
-  <p class="tw:text-right">
+  <p class="tw:mb-4 tw:text-right">
     <%= number_with_delimiter(Bike.count) %> bikes total
     <em>(<%= number_with_delimiter(yesterday) %> yesterday, <%= number_with_delimiter(today) %> today)</em>
   </p>
 
   <%= render(UI::Chart::Component.new(series: bikes, time_range: @time_range, stacked: true)) %>
 
-  <hr>
+  <hr class="twhr tw:my-4">
 
   <% cache(User.maximum(:created_at)) do %>
-    <h2 class="tw:mt-6">
-      Recent <%= link_to "Users", admin_users_url %>
-    </h2>
+    <%= render(Pages::Admin::Headers::Section::Component.new(title: safe_join(["Recent ", link_to("Users", admin_users_url, class: "twlink")]))) %>
 
     <%= render Pages::Admin::Users::Table::Component.new(users: @users) %>
 
-    <p class="tw:text-right">
+    <p class="tw:mb-4 tw:text-right">
       <%= number_with_delimiter(@users_count) %> users total
       <em>(<%= number_with_delimiter(@users_yesterday) %> yesterday, <%= number_with_delimiter(@users_today) %> today)</em>
     </p>
   <% end %>
 
-  <hr>
+  <hr class="twhr tw:my-4">
 
-  <h2 class="tw:mt-6">
-    Recent <%= link_to "Organizations", admin_organizations_url %>
-  </h2>
+  <%= render(Pages::Admin::Headers::Section::Component.new(title: safe_join(["Recent ", link_to("Organizations", admin_organizations_url, class: "twlink")]))) %>
 
   <%= render(Pages::Admin::Organizations::Table::Component.new(organizations: @organizations, sort_state:)) %>
 
-  <p class="tw:text-right">
+  <p class="tw:mb-4 tw:text-right">
     <%= number_with_delimiter(Organization.count) %> Organizations total
     <% today = Organization.where("created_at >= ?", Time.current.beginning_of_day).count %>
 
@@ -54,17 +50,15 @@
     <em>(<%= number_with_delimiter(yesterday) %> yesterday, <%= number_with_delimiter(today) %> today)</em>
   </p>
 
-  <hr>
+  <hr class="twhr tw:my-4">
 
   <% week_searches = Counts.logged_searches(@time_range.first.to_date..Date.current).values.reduce { |sum, day| sum.merge(day) { |_kind, a, b| a + b } } %>
 
   <div class="twwiderow">
-    <div>
-      <h2 class="tw:mt-6">
-        Index searches
-      </h2>
+    <div class="tw:mt-6">
+      <%= render(Pages::Admin::Headers::Section::Component.new(title: "Index searches")) %>
 
-      <p>
+      <p class="tw:mb-4">
         <%= number_display(week_searches.values_at("organized", "organized_serial", "user", "user_serial", "web_marketplace").sum) %>
         past week
         <em>(<%= number_display(week_searches["organized"] + week_searches["organized_serial"]) %> org, <%= number_display(week_searches["organized_serial"] + week_searches["user_serial"]) %> with serial, <%= number_display(week_searches["web_marketplace"]) %> marketplace)</em>
@@ -73,15 +67,13 @@
       <%= render(UI::Chart::Component.new(series: logged_searches_admin_graphs_path(search_endpoint: "not_web_bikebook", period: "week"), stacked: true)) %>
     </div>
 
-    <div>
-      <h2 class="tw:mt-6">
-        BikeBook searches
-      </h2>
+    <div class="tw:mt-6">
+      <%= render(Pages::Admin::Headers::Section::Component.new(title: "BikeBook searches")) %>
 
-      <p>
+      <p class="tw:mb-4">
         <%= number_display(week_searches.values_at("web_bikebook", "web_bikebook_comparison", "web_ebike_rules").sum) %>
         past week
-        <em>(<%= link_to safe_join([number_display(week_searches["web_bikebook_comparison"]), " comparisons"]), admin_logged_searches_path(search_endpoint: "web_bikebook_comparison", period: "week") %>, <%= number_display(week_searches["web_ebike_rules"]) %> from e-bike rules)</em>
+        <em>(<%= link_to safe_join([number_display(week_searches["web_bikebook_comparison"]), " comparisons"]), admin_logged_searches_path(search_endpoint: "web_bikebook_comparison", period: "week"), class: "twlink" %>, <%= number_display(week_searches["web_ebike_rules"]) %> from e-bike rules)</em>
       </p>
 
       <%= render(UI::Chart::Component.new(series: logged_searches_admin_graphs_path(search_endpoint: "web_bikebook", period: "week"), stacked: true)) %>

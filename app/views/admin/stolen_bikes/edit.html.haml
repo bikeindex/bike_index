@@ -4,43 +4,39 @@
 
 = render Pages::Admin::Bikes::TheftAlertImages::Component.new(bike: @bike, stolen_record: @stolen_record, return_to: request.fullpath)
 
-%hr
+%hr.twhr{class: "tw:my-4"}
 
 - if @stolen_record.blank?
-  %h1{class: "tw:mt-6"}
-    Stolen record not created yet.
-  %p
+  = render(Pages::Admin::Headers::Section::Component.new(title: "Stolen record not created yet."))
+  %p{class: "tw:mb-4"}
     If this bike has just been marked stolen, wait a minute or two and it will be here!
 
 - elsif @bike.present? && !@current_stolen_record
-  %h2{class: UI::Alerts::Base::Component::TEXT_CLASSES[:warning]}
-    This Stolen record is not the current stolen record for the Bike!
-  %p
+  = render(Pages::Admin::Headers::Section::Component.new(title: tag.span("This Stolen record is not the current stolen record for the Bike!", class: UI::Alerts::Base::Component::TEXT_CLASSES[:warning])))
+  %p{class: "tw:mb-4"}
     Either you're viewing a recovered bike or there is a new stolen record.
-  %h4
-    = link_to "View the current stolen record", edit_admin_stolen_bike_url(@bike.id)
-  %p{class: "tw:mt-6 #{UI::Alerts::Base::Component::TEXT_CLASSES[:error]}"}
+  = render(Pages::Admin::Headers::Section::Component.new(title: link_to("View the current stolen record", edit_admin_stolen_bike_url(@bike.id), class: "twlink")))
+  %p{class: "tw:mt-6 tw:mb-4 #{UI::Alerts::Base::Component::TEXT_CLASSES[:error]}"}
     You Probably don't want to do anything on this page
 
 - elsif @stolen_record.present? && !@stolen_record.approved
   .twwiderow{class: "tw:my-6 tw:items-start"}
     %div
-      %h4
-        Stolen Record approval process
-      %ol{class: "tw:list-decimal tw:ml-4"}
+      = render(Pages::Admin::Headers::Section::Component.new(title: "Stolen Record approval process"))
+      %ol{class: "tw:mb-4 tw:list-decimal tw:ml-4"}
         %li
           Delete anything that's egregiously wrong (like Motorcycles), or spam
         %li
-          #{link_to "Edit Bike", admin_bike_path(@bike)} if there is a 40 word descriptions in the "Bike Model" field and move it to the description field
+          #{link_to "Edit Bike", admin_bike_path(@bike), class: "twlink"} if there is a 40 word descriptions in the "Bike Model" field and move it to the description field
         %li
-          #{link_to "Edit Bike", admin_bike_path(@bike)} & check "Unknown Serial" if:
+          #{link_to "Edit Bike", admin_bike_path(@bike), class: "twlink"} & check "Unknown Serial" if:
           %ul{class: "tw:list-disc tw:ml-4"}
             %li
               The serial is "idk" or other similar stupid shit (rather than <span class="twless-strong">absent</span>)
             %li
-              The serial is <em>only</em> a frame numbers like <code>EN14761</code> or <code>EN14****</code>
+              The serial is <em>only</em> a frame numbers like <code class="twcode">EN14761</code> or <code class="twcode">EN14****</code>
         %li
-          #{link_to "Edit Bike", admin_bike_path(@bike, anchor: "edit-stolen-record")} and fix the stolen city name if:
+          #{link_to "Edit Bike", admin_bike_path(@bike, anchor: "edit-stolen-record"), class: "twlink"} and fix the stolen city name if:
           %ul{class: "tw:list-disc tw:ml-4"}
             %li
               City is abbreviated: e.g. "SLC" and not "Salt Lake City"
@@ -79,16 +75,16 @@
         = render(UI::ButtonLink::Component.new(text: "Approve listing", href: approve_admin_stolen_bike_url(@bike), method: :post, color: :primary, size: :lg))
 
 - social_posts = @stolen_record&.social_posts
-%h3{class: "tw:mt-6"} Posts
+= render(Pages::Admin::Headers::Section::Component.new(title: "Posts"))
 - if social_posts&.any?
   = render partial: "/admin/social_posts/table", locals: { social_posts: social_posts, render_sortable: false, skip_stolen_record: true }
 
-%hr{class: "tw:my-6"}
+%hr.twhr{class: "tw:my-6"}
 
 - if @customer_contact.present?
   = form_for [:admin, @customer_contact] do |f|
-    %h4#contact-owner
-      Send bike owner an email
+    #contact-owner
+      = render(Pages::Admin::Headers::Section::Component.new(title: "Send bike owner an email"))
 
     - if @customer_contact.errors.any?
       = render(UI::Alerts::ObjectError::Component.new(object: @customer_contact))
@@ -111,9 +107,7 @@
   = render(UI::ButtonLink::Component.new(text: "Delete", href: admin_bike_url(@bike), method: :delete, color: :error, confirm: "Are you sure?", html_class: "tw:mb-4"))
 
 - else
-  %h1
-    Something is broken on this page
-  %h2
-    This bike doesn't have an owner
-  %p
+  = render(Pages::Admin::Headers::Section::Component.new(title: "Something is broken on this page"))
+  = render(Pages::Admin::Headers::Section::Component.new(title: "This bike doesn't have an owner"))
+  %p{class: "tw:mb-4"}
     Talk to a developer

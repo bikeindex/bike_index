@@ -1,6 +1,6 @@
 <% table_view = capture do %>
   <% if params[:search_model_audit_id].present? %>
-    <p>
+    <p class="tw:mb-4">
       Viewing only Searches <strong>for</strong>
       <em><%= model_audit_frame_model_display(@model_audit, truncate: false) %></em>
 

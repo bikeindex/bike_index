@@ -1,10 +1,13 @@
 = render(UI::Card::Component.new) do
   - if @organization_role.id.present?
-    %h4{class: "tw:mb-6 #{UI::Alerts::Base::Component::TEXT_CLASSES[:error]}"}
-      DANGER! Don't edit
-      %em
-        %br
-        It would be better to delete and re-add
+    - title = capture do
+      %span{class: UI::Alerts::Base::Component::TEXT_CLASSES[:error]}
+        DANGER! Don't edit
+        %em
+          %br
+          It would be better to delete and re-add
+    %div{class: "tw:mb-6"}
+      = render(Pages::Admin::Headers::Section::Component.new(title:))
   = form_for [:admin, @organization_role] do |f|
     = render(UI::Alerts::ObjectError::Component.new(object: @organization_role))
 

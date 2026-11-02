@@ -4,7 +4,7 @@
   <% table.column(sortable: "created_at", lower_right: ->(r) { content_tag(:span, r.id, class: "only-dev-visible") }) do |update| %>
     <% bike_sticker = update.bike_sticker %>
 
-    <%= link_to "/bikes/scanned/#{bike_sticker.code}?organization_id=#{bike_sticker.organization.to_param}" do %>
+    <%= link_to "/bikes/scanned/#{bike_sticker.code}?organization_id=#{bike_sticker.organization.to_param}", class: "twlink" do %>
       <%= render UI::Time::Component.new(time: update.created_at) %>
     <% end %>
   <% end %>
@@ -19,7 +19,7 @@
     <% bike_sticker = update.bike_sticker %>
 
     <strong>
-      <%= link_to bike_sticker.pretty_code, admin_bike_sticker_updates_path(sort_state.search_params.merge(search_query: bike_sticker.code)) %>
+      <%= link_to bike_sticker.pretty_code, admin_bike_sticker_updates_path(sort_state.search_params.merge(search_query: bike_sticker.code)), class: "twlink" %>
     </strong>
 
     <% unless bike_sticker.sticker? %>
@@ -42,10 +42,10 @@
   <% table.column(sortable: "bike_id") do |update| %>
     <% if update.bike.present? %>
       <small>
-        <%= link_to helpers.organized_bike_text(update.bike), edit_admin_bike_path(update.bike_id) %>
+        <%= link_to helpers.organized_bike_text(update.bike), edit_admin_bike_path(update.bike_id), class: "twlink" %>
       </small>
     <% elsif update.bike_id.present? %>
-      <%= link_to update.bike_sticker.bike_id, admin_bike_path(update.bike_sticker.bike_id), class: "tw:text-sm" %>
+      <%= link_to update.bike_sticker.bike_id, admin_bike_path(update.bike_sticker.bike_id), class: "twlink tw:text-sm" %>
       <small class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">Deleted?</small>
     <% end %>
   <% end %>
@@ -74,10 +74,10 @@
         <%= update.creator_kind_humanized %>
       </small>
       <% if update.export_id.present? %>
-        <%= link_to "##{update.export_id}", organization_export_path(update.export_id, organization_id: update.organization_id), class: "tw:text-sm" %>
+        <%= link_to "##{update.export_id}", organization_export_path(update.export_id, organization_id: update.organization_id), class: "twlink tw:text-sm" %>
       <% end %>
       <% if update.bulk_import_id.present? %>
-        <%= link_to "##{update.bulk_import_id}", organization_bulk_import_path(update.bulk_import_id, organization_id: update.organization_id), class: "tw:text-sm" %>
+        <%= link_to "##{update.bulk_import_id}", organization_bulk_import_path(update.bulk_import_id, organization_id: update.organization_id), class: "twlink tw:text-sm" %>
       <% end %>
     <% end %>
   <% end %>

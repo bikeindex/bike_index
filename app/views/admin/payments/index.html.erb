@@ -64,10 +64,10 @@
 
 <% if @render_chart %>
   <% rendered_chart = capture do %>
-    <h4 class="tw:mt-2">Counts</h4>
+    <%= render(Pages::Admin::Headers::Section::Component.new(title: "Counts")) %>
     <%= render(UI::Chart::Component.new(series: payments_counts_nozero.map { |c| {name: c[:name], data: c[:data]} }, time_range: @time_range, stacked: true)) %>
 
-    <h4 class="tw:mt-2">Amounts</h4>
+    <%= render(Pages::Admin::Headers::Section::Component.new(title: "Amounts")) %>
     <%= render(UI::Chart::Component.new(series: payments_counts_nozero.map { |c| {name: c[:name], data: c[:data_money]} }, time_range: @time_range, stacked: true, prefix: "$", round: 2)) %>
   <% end %>
 <% end %>
@@ -90,7 +90,7 @@
 
 <% table_view = capture do %>
   <div class="twwiderow tw:mb-6 tw:items-start">
-    <p class="tw:mt-2">
+    <p class="tw:mt-2 tw:mb-4">
       A total of
       <%= MoneyFormatter.money_format(matching_payments.sum(:amount_cents)) %>
     </p>
@@ -102,9 +102,9 @@
             <%= payment_count[:name].pluralize %>
 
             <% if params[:search_kind].present? %>
-              <%= link_to "view all kinds", admin_payments_path(sortable_search_params.merge(search_kind: "")), class: "tw:text-sm tw:italic" %>
+              <%= link_to "view all kinds", admin_payments_path(sortable_search_params.merge(search_kind: "")), class: "twlink tw:text-sm tw:italic" %>
             <% else %>
-              <%= link_to "view", admin_payments_path(sortable_search_params.merge(search_kind: payment_count[:kind])), class: "tw:text-sm tw:italic" %>
+              <%= link_to "view", admin_payments_path(sortable_search_params.merge(search_kind: payment_count[:kind])), class: "twlink tw:text-sm tw:italic" %>
             <% end %>
           <% end %>
 

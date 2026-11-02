@@ -14,7 +14,7 @@
 
   <% table.column(sortable: "received_at", label: "Received", lower_right: ->(bug_report) { content_tag(:span, bug_report.id, class: "only-dev-visible") }) do |bug_report| %>
     <%= link_to render(UI::Time::Component.new(time: bug_report.received_at || bug_report.created_at)),
-      admin_bug_report_path(bug_report), class: "tw:text-xs" %>
+      admin_bug_report_path(bug_report), class: "twlink tw:text-xs" %>
   <% end %>
 
   <% table.column(sortable: "email", hideable: :sender_cell) do |bug_report| %>
@@ -22,7 +22,7 @@
       <%= render Atoms::Admin::TableCells::User::Component.new(user: bug_report.user, user_id: bug_report.user_id) %>
     <% else %>
       <span class="tw:block tw:xl:inline"><%= bug_report.from_name %></span>
-      <%= content_tag(:code, bug_report.email) %>
+      <%= content_tag(:code, bug_report.email, class: "twcode") %>
     <% end %>
 
     <%# a fixed path rather than sortable_search_params, which caching would bake in %>
@@ -57,7 +57,7 @@
 
   <% table.column(hideable: :tags_cell) do |bug_report| %>
     <% bug_report.tags.each do |tag| %>
-      <code class="tw:text-xs tw:text-black"><%= tag %></code>
+      <code class="twcode tw:text-xs tw:text-black"><%= tag %></code>
     <% end %>
   <% end %>
 
@@ -75,7 +75,7 @@
 
   <% table.column(sortable: "github_pull_request", hideable: :pull_request_cell) do |bug_report| %>
     <% if bug_report.github_pull_request.present? %>
-      <%= link_to "##{bug_report.github_pull_request}", bug_report.github_pull_request_url %>
+      <%= link_to "##{bug_report.github_pull_request}", bug_report.github_pull_request_url, class: "twlink" %>
     <% end %>
   <% end %>
 <% end %>

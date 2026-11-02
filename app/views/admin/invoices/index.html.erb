@@ -70,12 +70,12 @@
 <% end %>
 
 <% table_view = capture do %>
-  <p>
+  <p class="tw:mb-4">
     Total paid:
     <strong><%= MoneyFormatter.money_format(matching_invoices.sum(:amount_paid_cents)) %></strong>
   </p>
 
-  <p class="twless-strong">
+  <p class="twless-strong tw:mb-4">
     Go to individual organizations to create new invoices
   </p>
 

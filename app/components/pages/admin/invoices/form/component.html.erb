@@ -15,7 +15,7 @@
           <%= link_to organization_feature.name, edit_admin_organization_feature_url(organization_feature), class: "twlink" %>
 
           <% if organization_feature.feature_slugs.any? %>
-            <code class="only-dev-visible tw:text-xs"><%= organization_feature.feature_slugs.join(" ") %></code>
+            <code class="twcode only-dev-visible tw:text-xs"><%= organization_feature.feature_slugs.join(" ") %></code>
           <% end %>
         <% end %>
 
@@ -53,7 +53,7 @@
             <span data-admin--invoice-form-target="totalCost"></span>
           <% end %>
 
-          <%= render(UI::DefinitionList::Row::Component.new(label: f.label(:amount_due, "Amount due $"), render_with_no_value: true)) do %>
+          <%= render(UI::DefinitionList::Row::Component.new(label: f.label(:amount_due, "Amount due $", class: "twlabel"), render_with_no_value: true)) do %>
             <%= render(UI::Forms::Input::Component.new(form_builder: f, attribute: :amount_due, kind: :number_field,
               html_options: {data: {"admin--invoice-form-target": "amountDue", action: "input->admin--invoice-form#recalculate"}})) %>
           <% end %>
@@ -95,7 +95,7 @@
         </div>
       </div>
 
-      <hr>
+      <hr class="twhr tw:my-4">
 
       <div class="tw:mt-6 tw:md:w-1/2">
         <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :child_enabled_feature_slugs_string,
@@ -107,7 +107,7 @@
 
           <% group.with_helper_text do %>
             <em>available features in current invoice:</em>
-            <%= safe_join(@invoice.feature_slugs.map { |slug| content_tag(:code, slug) }, ", ") %>
+            <%= safe_join(@invoice.feature_slugs.map { |slug| content_tag(:code, slug, class: "twcode") }, ", ") %>
           <% end %>
         <% end %>
       </div>

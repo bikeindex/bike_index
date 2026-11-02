@@ -1,33 +1,36 @@
 <%= render(UI::Card::Component.new) do %>
-  <h4 class="tw:mb-6">SAML SSO</h4>
+  <div class="tw:mb-6">
+    <%= render(Pages::Admin::Headers::Section::Component.new(title: "SAML SSO")) %>
+  </div>
 
-  <p class="text-success">
+  <p class="tw:mb-4 <%= UI::Alerts::Base::Component::TEXT_CLASSES[:success] %>">
     Service Provider details for the organization's IdP admin — or just share
     the metadata URL, which contains all of them.
   </p>
 
-  <ul>
+  <ul class="tw:mb-4">
     <li>
-      Metadata URL: <%= link_to metadata_url, metadata_url %>
+      Metadata URL: <%= link_to metadata_url, metadata_url, class: "twlink" %>
     </li>
 
     <li>
-      SP certificate: <%= link_to certificate_url, certificate_url %>
+      SP certificate:
+      <%= link_to certificate_url, certificate_url, class: "twlink" %>
       <small>only for an IdP that wants the certificate on its own</small>
     </li>
 
     <li>
       SP entityID:
-      <code><%= Saml::SettingsBuilder.sp_entity_id(saml_configuration) %></code>
+      <code class="twcode"><%= Saml::SettingsBuilder.sp_entity_id(saml_configuration) %></code>
     </li>
 
     <li>
       ACS (callback) URL:
-      <code><%= Saml::SettingsBuilder.assertion_consumer_service_url(saml_configuration) %></code>
+      <code class="twcode"><%= Saml::SettingsBuilder.assertion_consumer_service_url(saml_configuration) %></code>
     </li>
 
     <li>
-      Test page: <%= link_to test_url, test_url %>
+      Test page: <%= link_to test_url, test_url, class: "twlink" %>
       <small>a real SSO login that reports what the IdP sent, rather than signing in silently</small>
     </li>
   </ul>

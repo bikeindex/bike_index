@@ -2,7 +2,7 @@
 
 <div class="twwiderow tw:mt-6 tw:items-start">
   <%= render(UI::TableList::Component.new) do |list| %>
-    <% list.with_row(label: "ID", dev_only: true, value: tag.code(@marketplace_listing.id), if: display_dev_info?) %>
+    <% list.with_row(label: "ID", dev_only: true, value: tag.code(@marketplace_listing.id, class: "twcode"), if: display_dev_info?) %>
 
     <% list.with_row(label: "Status", value: render(Atoms::Admin::Badges::MarketplaceListing::Component.new(status: @marketplace_listing.status, status_humanized: @marketplace_listing.status_humanized, kind: :marketplace_listing))) %>
 
@@ -33,15 +33,15 @@
         <%= render Atoms::Admin::TableCells::Bike::Component.new(bike: @marketplace_listing.item, bike_id: @marketplace_listing.item_id, bike_link_path: bike_path(@marketplace_listing.item_id, view_as: "marketplace_preview")) %>
       <% elsif @marketplace_listing.item.is_a?(BikeVersion) %>
         BikeVersion
-        <%= link_to @marketplace_listing.item_id, bike_version_path(@marketplace_listing.item_id) %>
+        <%= link_to @marketplace_listing.item_id, bike_version_path(@marketplace_listing.item_id), class: "twlink" %>
 
 
-        <small>(bike: <%= link_to @marketplace_listing.item.bike_id, admin_bike_path(@marketplace_listing.item.bike_id) %>)</small>
+        <small>(bike: <%= link_to @marketplace_listing.item.bike_id, admin_bike_path(@marketplace_listing.item.bike_id), class: "twlink" %>)</small>
       <% end %>
     <% end %>
 
     <% list.with_row(label: "Sale", if: @marketplace_listing.sale.present?) do %>
-      <%= link_to(@marketplace_listing.sale_id, admin_sale_path(@marketplace_listing.sale_id)) %>
+      <%= link_to(@marketplace_listing.sale_id, admin_sale_path(@marketplace_listing.sale_id), class: "twlink") %>
     <% end %>
 
     <% list.with_row(label: "Location", value: render(Atoms::Admin::TableCells::AddressRecord::Component.new(address_record: @marketplace_listing.address_record))) %>
@@ -51,20 +51,22 @@
 </div>
 
 <div class="tw:mt-10">
-  <h2>
-    <% messages_count = @marketplace_listing.marketplace_messages.count %>
+  <% messages_count = @marketplace_listing.marketplace_messages.count %>
 
-    <%= link_to admin_marketplace_messages_path(search_marketplace_listing_id: @marketplace_listing.id) do %>
+  <% messages_title = capture do %>
+    <%= link_to admin_marketplace_messages_path(search_marketplace_listing_id: @marketplace_listing.id), class: "twlink" do %>
       <%= number_display(messages_count) %>
       <%= "message".pluralize(messages_count) %>
     <% end %>
+  <% end %>
 
+  <%= render(Pages::Admin::Headers::Section::Component.new(title: messages_title)) do %>
     <% if messages_count > @marketplace_messages.count %>
       <small>
         most recent <%= number_display(@marketplace_messages.count) %> shown
       </small>
     <% end %>
-  </h2>
+  <% end %>
 
   <%= render partial: "/admin/marketplace_messages/table", locals: { collection: @marketplace_messages, render_sortable: false, skip_marketplace_listing: true } %>
 </div>

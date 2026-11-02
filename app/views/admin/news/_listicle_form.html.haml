@@ -15,4 +15,4 @@
 = f.fields_for :listicles do |builder|
   = render 'listicle_fields', f: builder
 %div{class: "tw:mt-6 tw:flex tw:justify-center"}
-  = link_to_add_fields "Add a Vignette", f, :listicles
+  = link_to_add_fields "Add a Vignette", f, :listicles, class_name: "twlink"

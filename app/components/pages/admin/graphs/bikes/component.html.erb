@@ -3,7 +3,7 @@
 
 <% unless @ignored_only %>
   <div class="tw:text-right tw:text-sm">
-    <%= link_to "Ignored bikes only (deleted, test, spam)", admin_graphs_path(sortable_params.merge(search_ignored: true)), class: "tw:inline-block tw:px-4 tw:py-2" %>
+    <%= link_to "Ignored bikes only (deleted, test, spam)", admin_graphs_path(sortable_params.merge(search_ignored: true)), class: "twlink tw:inline-block tw:px-4 tw:py-2" %>
   </div>
 <% end %>
 
@@ -13,16 +13,16 @@
       Bikes
       <% if @manufacturer.present? %>
         made by
-        <%= link_to @manufacturer.name, admin_manufacturer_path(@manufacturer) %>
+        <%= link_to @manufacturer.name, admin_manufacturer_path(@manufacturer), class: "twlink" %>
       <% else %>
         No manufacturer found for
-        <code><%= @index.params[:search_manufacturer] %></code>
+        <code class="twcode"><%= @index.params[:search_manufacturer] %></code>
       <% end %>
       <%= render(UI::ButtonLink::Component.new(href: url_for(sortable_params.merge(search_manufacturer: nil)), text: "view all manufacturer bikes", color: :link_gray, html_class: "tw:text-sm")) %>
     <% end %>
 
     <% if @ignored_only %>
-      <p>
+      <p class="tw:mb-4">
         Viewing only <strong>ignored</strong> bikes
         <em>(deleted, test, spam)</em>
         <%= render(UI::ButtonLink::Component.new(href: url_for(sortable_params.merge(search_ignored: false)), text: "view not ignored bikes", color: :link_gray, html_class: "tw:text-sm")) %>
@@ -30,7 +30,7 @@
     <% end %>
 
     <% if @total_count.present? %>
-      <p class="tw:mt-6">
+      <p class="tw:mt-6 tw:mb-4">
         <%= number_display(@total_count) %> matching bikes
         <em><%= render(UI::TimeRange::Component.new(time_range: @index.time_range, period: @index.period)) %></em>
       </p>

@@ -1,11 +1,10 @@
 <% if @mailchimp_datum.blank? %>
-  <h4>No Mailchimp data</h4>
+  <%= render(Pages::Admin::Headers::Section::Component.new(title: "No Mailchimp data")) %>
 <% else %>
   <div data-controller="ui--collapse">
-    <h4>
-      Mailchimp data
+    <%= render(Pages::Admin::Headers::Section::Component.new(title: "Mailchimp data")) do %>
       <em><%= render(UI::Collapse::Component.new(text: "show raw data", color: :link, html_class: "tw:text-sm")) %></em>
-    </h4>
+    <% end %>
 
     <div class="twwiderow tw:items-start">
       <%= render(UI::TableList::Component.new) do |list| %>
@@ -13,7 +12,7 @@
         <% list.with_row(label: "Status", value: @mailchimp_datum.status) %>
         <% list.with_row(label: "Lists", value: @mailchimp_datum.lists.join(", ")) %>
         <% list.with_row(label: "Mailchimp updated", value: render(UI::Time::Component.new(time: @mailchimp_datum.mailchimp_updated_at))) %>
-        <% list.with_row(label: "Feedbacks", value: safe_join(@mailchimp_datum.feedbacks.map { |f| link_to(f.kind_humanized, admin_feedback_path(f)) }, ", "), class: "tw:text-sm tw:hidden", data: {"ui--collapse-target": "content"}) %>
+        <% list.with_row(label: "Feedbacks", value: safe_join(@mailchimp_datum.feedbacks.map { |f| link_to(f.kind_humanized, admin_feedback_path(f), class: "twlink") }, ", "), class: "tw:text-sm tw:hidden", data: {"ui--collapse-target": "content"}) %>
       <% end %>
 
       <div class="tw:hidden" data-ui--collapse-target="content">

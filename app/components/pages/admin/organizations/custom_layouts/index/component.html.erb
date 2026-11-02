@@ -1,6 +1,6 @@
 <div class="twwiderow tw:items-start">
-  <p>
-    <%= link_to "Custom layouts version history", version_history_url %>
+  <p class="tw:mb-4">
+    <%= link_to "Custom layouts version history", version_history_url, class: "twlink" %>
   </p>
 
   <%= render(UI::TableList::Component.new) do |list| %>
@@ -14,6 +14,6 @@
 
 <div class="tw:mt-6">
   <strong>Note:</strong> Custom Layouts (other than landing pages), are
-  <%= link_to "Mail Snippets", admin_mail_snippets_path %>. You can view and
-  edit all the active ones there.
+  <%= link_to "Mail Snippets", admin_mail_snippets_path, class: "twlink" %>. You
+  can view and edit all the active ones there.
 </div>

@@ -12,7 +12,7 @@
           %span{class: UI::Alerts::Base::Component::TEXT_CLASSES[:warning]} file removed
           %em.twless-strong{class: "tw:text-sm"} after a few days, we delete the uploaded file to save space
         - else
-          = link_to @bulk_import.file_url, @bulk_import.file_url
+          = link_to @bulk_import.file_url, @bulk_import.file_url, class: "twlink"
     - list.with_row(label: "Send email?") do
       = @bulk_import.send_email ? check_mark : cross_mark
       %small.twless-strong Email is sent by default
@@ -23,38 +23,38 @@
   = render(UI::TableList::Component.new) do |list|
     - list.with_row(label: "User") do
       - if @bulk_import.user.present?
-        = link_to @bulk_import.user.display_name, admin_user_path(@bulk_import.user)
+        = link_to @bulk_import.user.display_name, admin_user_path(@bulk_import.user), class: "twlink"
       - else
         None
     - list.with_row(label: "Organization") do
       - if @bulk_import.organization.present?
-        = link_to @bulk_import.organization.name, admin_organization_path(@bulk_import.organization), class: "twless-strong"
+        = link_to @bulk_import.organization.name, admin_organization_path(@bulk_import.organization), class: "twlink twless-strong"
         \|
         %strong
-          = link_to "Organization view of import", organization_bulk_import_path(@bulk_import, organization_id: @bulk_import.organization.to_param)
+          = link_to "Organization view of import", organization_bulk_import_path(@bulk_import, organization_id: @bulk_import.organization.to_param), class: "twlink"
       - else
         None
         - if @bulk_import.ascend?
           %div{class: "tw:text-sm"}
             Ascend name:
-            %code= @bulk_import.ascend_name
+            %code.twcode= @bulk_import.ascend_name
     - list.with_row(label: "Kind", value: @bulk_import.kind_humanized)
     - list.with_row(label: "Headers") do
       - if @bulk_import.headers.present?
         %small
-          = safe_join(@bulk_import.headers.map { |a| content_tag(:code, a) }, ", ")
+          = safe_join(@bulk_import.headers.map { |a| content_tag(:code, a, class: "twcode") }, ", ")
     - if display_dev_info?
       - data = @bulk_import.data || {}
       - list.with_row(label: "Data", dev_only: true) do
         - if data.blank?
           No data
         - elsif data.except("headers").blank?
-          No data (except <code>headers</code>)
+          No data (except <code class="twcode">headers</code>)
         - else
           = render UI::JsonDisplay::Component.new(data: data.except("headers"), small: true)
 
 %div{class: "tw:my-6"}
-  %h3 Errors
+  = render(Pages::Admin::Headers::Section::Component.new(title: "Errors"))
   - if @bulk_import.import_errors == {}
     %span.twless-strong No errors
   - else
@@ -62,10 +62,9 @@
 
 
 - if @bulk_import.ownerships.count < 1 || params[:show_reprocess]
-  = render UI::ButtonLink::Component.new(text: "Reprocess Import", href: admin_bulk_import_path(@bulk_import, reprocess: true), method: :put, form: {class: "float-right"})
+  = render UI::ButtonLink::Component.new(text: "Reprocess Import", href: admin_bulk_import_path(@bulk_import, reprocess: true), method: :put, form: {class: "tw:float-right"})
 
-%h2{class: "tw:mt-6"}
-  Bikes - #{number_display(@bulk_import.bikes.count)}
+= render(Pages::Admin::Headers::Section::Component.new(title: safe_join(["Bikes - ", number_display(@bulk_import.bikes.count)]))) do
   - if @bulk_import.matched_count.positive?
     %small
       and #{number_display(@bulk_import.matched_count)} #{"row".pluralize(@bulk_import.matched_count)} matching existing registrations
@@ -75,7 +74,7 @@
       - if @bulk_import.organization.present?
         %em
           use
-          = link_to "organization view", organization_bulk_import_path(@bulk_import, organization_id: @bulk_import.organization.to_param)
+          = link_to "organization view", organization_bulk_import_path(@bulk_import, organization_id: @bulk_import.organization.to_param), class: "twlink"
           for paginated list
 
 = render Pages::Admin::Bikes::Table::Component.new(bikes: @bulk_import.bikes.reorder(id: :desc).limit(25), sort_state:)

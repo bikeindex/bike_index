@@ -1,10 +1,10 @@
 = render Pages::Admin::Bikes::Header::Component.new(bike: @bike, active: :theft_alerts, display_recovery: true, user: current_user, display_dev_info: display_dev_info?)
 
-%h1{class: "tw:mt-12 tw:mb-6"}
-  New Promoted Alert
+%div{class: "tw:mt-12 tw:mb-6"}
+  = render(Pages::Admin::Headers::Section::Component.new(title: "New Promoted Alert"))
 
 - if @theft_alerts.any?
-  %h4 Existing alerts
+  = render(Pages::Admin::Headers::Section::Component.new(title: "Existing alerts"))
   = render partial: "/admin/theft_alerts/table", locals: {render_sortable: true, theft_alerts: @theft_alerts, skip_bike: true}
 
 %div{class: "tw:mt-12 tw:mb-6"}
