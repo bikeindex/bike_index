@@ -5,7 +5,7 @@
         = image_tag @ad.image_url(:large)
   %div{class: "tw:px-5 tw:py-3"}
     %a.twlink{href: @ad.target_url}
-      = render(Pages::Admin::Headers::Section::Component.new(title: @ad.title))
+      = render(UI::Header::Component.new(text: @ad.title, tag: :h2, html_class: "twsection"))
   %div{class: "tw:px-5 tw:py-3"}
     %p{class: "tw:mb-4"}
       = @ad.body

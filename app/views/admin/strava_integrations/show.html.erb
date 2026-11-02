@@ -109,20 +109,24 @@
       <% end %>
     <% end %>
 
-    <%= render(Pages::Admin::Headers::Section::Component.new(title: gear_title)) do %>
-      <% if unknown_gear.present? %>
-        <small class="tw:mt-2 tw:mb-4 tw:block">
-          <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>">Unknown gear IDs:</span>
-          <%= unknown_gear.join(", ") %>
-        </small>
-      <% end %>
+    <%= render(UI::Header::Component.new(tag: :h2, html_class: "twsection")) do %>
+      <%= gear_title %>
+
+      <span class="tw:font-normal">
+        <% if unknown_gear.present? %>
+          <small class="tw:mt-2 tw:mb-4 tw:block">
+            <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>">Unknown gear IDs:</span>
+            <%= unknown_gear.join(", ") %>
+          </small>
+        <% end %>
+      </span>
     <% end %>
 
     <% {bike: "Bikes", shoe: "Shoes"}.each do |gear_type, gear_type_label| %>
       <% gears = @strava_integration.strava_gears.select { |g| g.gear_type == gear_type.to_s }.sort_by { |g| g.strava_gear_display_name.downcase } %>
       <% next if gears.empty? %>
 
-      <%= render(Pages::Admin::Headers::Section::Component.new(title: gear_type_label, tag: :h3)) %>
+      <%= render(UI::Header::Component.new(text: gear_type_label, tag: :h3, html_class: "twsection")) %>
 
       <%= render partial: "admin/strava_gears/table", locals: {collection: gears, skip_strava_integration: true} %>
     <% end %>

@@ -2,7 +2,7 @@
 
 .twwiderow
   = render(UI::Card::Component.new(full_bleed: true, additional_classes: "tw:col-span-full")) do
-    = render(Pages::Admin::Headers::Section::Component.new(title: "Examples"))
+    = render(UI::Header::Component.new(text: "Examples", tag: :h2, html_class: "twsection"))
     %p{class: "tw:mb-4"} Here are the values for a few example sticker batches.
     - examples = [{id: 9, name: "#9 (EPS 2)", stickers: ["ED 010 133", "ED 061 132"], prefix: "ED", initial: 10133, count: 51000, length: 6},
       {id: 21, name: "#21 (3rd internal)", stickers: ["A 250 0", "A 309 8"], prefix: "A", initial: 2500, count: 599, length: 4}]

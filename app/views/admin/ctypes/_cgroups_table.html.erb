@@ -1,6 +1,6 @@
 <%# locals: (cgroups:, ctype_counts:) %>
 
-<%= render(Pages::Admin::Headers::Section::Component.new(title: "Component groups")) %>
+<%= render(UI::Header::Component.new(text: "Component groups", tag: :h2, html_class: "twsection")) %>
 
 <%= render(UI::Table::Component.new(records: cgroups)) do |table| %>
   <% table.column(label: "Name") do |cgroup| %>

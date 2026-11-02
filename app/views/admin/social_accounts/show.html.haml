@@ -4,14 +4,14 @@
 - if @social_account.errored?
   = render(UI::Container::Component.new) do
     = render(UI::Card::Component.new(additional_classes: "tw:my-6")) do
-      = render(Pages::Admin::Headers::Section::Component.new(title: tag.em("#{@social_account.screen_name} has an Error!", class: UI::Alerts::Base::Component::TEXT_CLASSES[:error]), tag: :h3))
+      = render(UI::Header::Component.new(text: tag.em("#{@social_account.screen_name} has an Error!", class: UI::Alerts::Base::Component::TEXT_CLASSES[:error]), tag: :h3, html_class: "twsection"))
       = render(UI::TableList::Component.new(classes: "tw:mt-6")) do |list|
         - list.with_row(label: "Error at:", value: render(UI::Time::Component.new(time: @social_account.last_error_at)))
         - list.with_row(label: "Error", value: @social_account.last_error)
       = render(UI::ButtonLink::Component.new(text: "Log in to refresh credentials", href: "/auth/twitter", color: :primary))
 .twwiderow
   %div
-    = render(Pages::Admin::Headers::Section::Component.new(title: safe_join([tag.small("account:"), " ", @social_account.screen_name])))
+    = render(UI::Header::Component.new(text: safe_join([tag.small("account:"), " ", @social_account.screen_name]), tag: :h2, html_class: "twsection"))
     %small
       = link_to "view on twitter", "https://twitter.com/#{@social_account.screen_name}", target: :_blank, class: "twlink"
 
@@ -21,11 +21,13 @@
       - @social_account.attributes.except("account_info", "last_error_at", "created_at", "updated_at", "last_error").each_pair do |attr, value|
         - list.with_row(label: attr, value:)
   %div
-    = render(Pages::Admin::Headers::Section::Component.new(title: "Platform Response Data", tag: :h3))
+    = render(UI::Header::Component.new(text: "Platform Response Data", tag: :h3, html_class: "twsection"))
     %pre{ class: "tw:mb-4", style: "max-height: 600px; overflow: scroll; background: #eeeeee; padding: 10px 2px;" }
       = @social_account.account_info.to_yaml
 
-= render(Pages::Admin::Headers::Section::Component.new(title: "#{number_with_delimiter(@social_account.social_posts.count)} Posts", tag: :h3)) do
-  %em{class: "tw:text-sm"}
-    = link_to "view all", admin_social_posts_path(search_social_account_id: @social_account.id), class: "twlink"
+= render(UI::Header::Component.new(tag: :h3, html_class: "twsection")) do
+  = "#{number_with_delimiter(@social_account.social_posts.count)} Posts"
+  %span{class: "tw:font-normal"}
+    %em{class: "tw:text-sm"}
+      = link_to "view all", admin_social_posts_path(search_social_account_id: @social_account.id), class: "twlink"
 = render partial: "/admin/social_posts/table", locals: { social_posts: @social_account.social_posts.reorder(created_at: :desc).limit(25), skip_social_account: true }

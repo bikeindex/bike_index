@@ -1,8 +1,12 @@
 <div class="tw:mt-6 tw:flex tw:flex-wrap tw:items-baseline tw:gap-2">
-  <%= render(Pages::Admin::Headers::Section::Component.new(title: "#{number_with_delimiter(@bikes_count)} #{"Bike".pluralize(@bikes_count)}")) do %>
-    <em class="tw:text-sm">
-      <%= link_to "view all bikes", admin_bikes_path(organization_id: @organization.to_param), class: "twlink" %>
-    </em>
+  <%= render(UI::Header::Component.new(tag: :h2, html_class: "twsection")) do %>
+    <%= number_with_delimiter(@bikes_count) %> <%= "Bike".pluralize(@bikes_count) %>
+
+    <span class="tw:font-normal">
+      <em class="tw:text-sm">
+        <%= link_to "view all bikes", admin_bikes_path(organization_id: @organization.to_param), class: "twlink" %>
+      </em>
+    </span>
   <% end %>
 
   <%# ml-auto rather than justify-between, which drops the link to the left once it wraps %>

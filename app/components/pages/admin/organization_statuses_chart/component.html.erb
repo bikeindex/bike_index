@@ -9,12 +9,12 @@
 <% end %>
 
 <% unless @ended %>
-  <%= render(Pages::Admin::Headers::Section::Component.new(title: safe_join(["POS kinds ", tag.code("start_at", class: "twcode")]), tag: :h3)) %>
+  <%= render(UI::Header::Component.new(text: safe_join(["POS kinds ", tag.code("start_at", class: "twcode")]), tag: :h3, html_class: "twsection")) %>
   <%= render(UI::Chart::Component.new(series: pos_kinds_start_counts, time_range: @time_range, stacked: true, colors: start_colors)) %>
 <% end %>
 
 <% unless @current %>
-  <%= render(Pages::Admin::Headers::Section::Component.new(title: safe_join(["POS kinds ", tag.code("end_at", class: "twcode")]), tag: :h3)) %>
+  <%= render(UI::Header::Component.new(text: safe_join(["POS kinds ", tag.code("end_at", class: "twcode")]), tag: :h3, html_class: "twsection")) %>
   <%= render(UI::Chart::Component.new(series: pos_kinds_end_counts, time_range: @time_range, stacked: true, colors: end_colors)) %>
 <% end %>
 

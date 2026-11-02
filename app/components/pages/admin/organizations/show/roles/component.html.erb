@@ -9,25 +9,30 @@
     <%= "OrganizationRole".pluralize(organization_roles_count) %>
   <% end %>
 
-  <%= render(Pages::Admin::Headers::Section::Component.new(title:)) do %>
-    <small>
-      <% if @deleted %>
-        <small>
-          <%= number_with_delimiter(organization_roles.claimed.count) %> claimed
-        </small>
-        <% unless @organization.deleted? %>
+  <%= render(UI::Header::Component.new(tag: :h2, html_class: "twsection")) do %>
+    <%= title %>
+
+    <span class="tw:font-normal">
+      <small>
+        <% if @deleted %>
+          <small>
+            <%= number_with_delimiter(organization_roles.claimed.count) %>
+            claimed
+          </small>
+          <% unless @organization.deleted? %>
+            -
+            <small class="twless-strong"><%= render(UI::ButtonLink::Component.new(href: admin_organization_path(@organization, deleted_organization_roles: false), color: :link_gray)) do %>              <%= number_with_delimiter(@organization.organization_roles.count) %>              <strong>NOT</strong> deleted organization role<% end %></small>
+          <% end %>
+        <% else %>
+          <small><%= number_with_delimiter(@organization.organization_roles.claimed.count) %> claimed</small>
           -
-          <small class="twless-strong"><%= render(UI::ButtonLink::Component.new(href: admin_organization_path(@organization, deleted_organization_roles: false), color: :link_gray)) do %>            <%= number_with_delimiter(@organization.organization_roles.count) %>            <strong>NOT</strong> deleted organization role<% end %></small>
+          <small class="twless-strong"><%= render(UI::ButtonLink::Component.new(href: admin_organization_path(@organization, deleted_organization_roles: true), color: :link_gray)) do %>            <%= number_with_delimiter(@organization.organization_roles.deleted.count) %>            deleted<% end %></small>
+
+
+          <%= render(UI::ButtonLink::Component.new(text: "new organization role", href: new_admin_organization_role_url(organization_id: @organization.to_param), size: :sm, html_class: "tw:ml-3")) %>
         <% end %>
-      <% else %>
-        <small><%= number_with_delimiter(@organization.organization_roles.claimed.count) %> claimed</small>
-        -
-        <small class="twless-strong"><%= render(UI::ButtonLink::Component.new(href: admin_organization_path(@organization, deleted_organization_roles: true), color: :link_gray)) do %>          <%= number_with_delimiter(@organization.organization_roles.deleted.count) %>          deleted<% end %></small>
-
-
-        <%= render(UI::ButtonLink::Component.new(text: "new organization role", href: new_admin_organization_role_url(organization_id: @organization.to_param), size: :sm, html_class: "tw:ml-3")) %>
-      <% end %>
-    </small>
+      </small>
+    </span>
   <% end %>
 
   <%# ml-auto rather than justify-between, which drops the link to the left once it wraps %>

@@ -1,14 +1,14 @@
 <%= render(Pages::Admin::Headers::Nav::Component.new(title: "Maintaining things")) %>
 
-<%= render(Pages::Admin::Headers::Section::Component.new(title: "Component manufacturer other")) %>
+<%= render(UI::Header::Component.new(text: "Component manufacturer other", tag: :h2, html_class: "twsection")) %>
 
 <%= render partial: "/admin/components/table", locals: {collection: @component_mnfgs} %>
 
-<%= render(Pages::Admin::Headers::Section::Component.new(title: "Component type other")) %>
+<%= render(UI::Header::Component.new(text: "Component type other", tag: :h2, html_class: "twsection")) %>
 
 <%= render partial: "/admin/components/table", locals: {collection: @component_types} %>
 
-<%= render(Pages::Admin::Headers::Section::Component.new(title: "Handlebar Types other")) %>
+<%= render(UI::Header::Component.new(text: "Handlebar Types other", tag: :h2, html_class: "twsection")) %>
 
 <%= render(UI::Table::Component.new(records: @bikes_other_handlebar_type)) do |table| %>
   <% table.column(label: "Date") do |bike| %>
@@ -20,8 +20,9 @@
   <% end %>
 <% end %>
 
-<%= render(Pages::Admin::Headers::Section::Component.new(title: "Recent example bikes")) do %>
-  <%= link_to "Delete example bikes", admin_destroy_example_bikes_url, class: "twlink" %>
+<%= render(UI::Header::Component.new(tag: :h2, html_class: "twsection")) do %>
+  Recent example bikes
+  <span class="tw:font-normal"><%= link_to "Delete example bikes", admin_destroy_example_bikes_url, class: "twlink" %></span>
 <% end %>
 
 <% if @bikes.any? %>

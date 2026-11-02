@@ -1,6 +1,9 @@
 <% if @bike.present? %>
   <%= render Pages::Admin::Bikes::Header::Component.new(bike: @bike, active: :listings, user: current_user, display_dev_info: display_dev_info?) %>
-  <%= render(Pages::Admin::Headers::Section::Component.new(title: "Marketplace listings", count: @pagy.count)) %>
+  <%= render(UI::Header::Component.new(tag: :h2, html_class: "twsection")) do %>
+    Marketplace listings
+    <%= render(Pages::Admin::Headers::Count::Component.new(count: @pagy.count)) %>
+  <% end %>
   <%= render(partial: "table", locals: {collection: @collection, render_sortable: false, skip_item: true}) %>
 <% else %>
   <% nav_header_list_items = capture do %>

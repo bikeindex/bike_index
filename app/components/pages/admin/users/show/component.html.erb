@@ -6,12 +6,17 @@
 <% when :messages %>
   <%= render(Pages::Admin::Users::Show::Messages::Component.new(user: @user)) %>
 <% when :organization_roles %>
-  <%= render(Pages::Admin::Headers::Section::Component.new(title: "Organizations", count: records.count,
-        parenthetical: registration_organizations_link)) %>
+  <%= render(UI::Header::Component.new(tag: :h2, html_class: "twsection")) do %>
+    Organizations
+    <%= render(Pages::Admin::Headers::Count::Component.new(count: records.count, parenthetical: registration_organizations_link)) %>
+  <% end %>
 
   <%= render partial: "/admin/organization_roles/table", locals: {organization_roles: records.reorder(id: :desc)} %>
 <% when :emails %>
-  <%= render(Pages::Admin::Headers::Section::Component.new(title: "Emails", count: records.count)) %>
+  <%= render(UI::Header::Component.new(tag: :h2, html_class: "twsection")) do %>
+    Emails
+    <%= render(Pages::Admin::Headers::Count::Component.new(count: records.count)) %>
+  <% end %>
 
   <%= render(UI::Table::Component.new(records: records.reorder(id: :desc))) do |table| %>
     <% table.column(label: "Created", lower_right: ->(user_email) { user_email.id }) do |user_email| %>
@@ -43,8 +48,10 @@
     <% end %>
   <% end %>
 <% when :ambassador_tasks %>
-  <%= render(Pages::Admin::Headers::Section::Component.new(title: "Ambassador tasks", count: records.count,
-        parenthetical: ambassador_progress)) %>
+  <%= render(UI::Header::Component.new(tag: :h2, html_class: "twsection")) do %>
+    Ambassador tasks
+    <%= render(Pages::Admin::Headers::Count::Component.new(count: records.count, parenthetical: ambassador_progress)) %>
+  <% end %>
 
   <%= render(UI::Table::Component.new(records: records.task_ordered)) do |table| %>
     <% table.column(label: "Task") do |assignment| %>

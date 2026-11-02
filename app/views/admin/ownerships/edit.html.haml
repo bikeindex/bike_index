@@ -1,9 +1,11 @@
 = render Pages::Admin::Bikes::Header::Component.new(bike: @bike, active: :ownerships, user: current_user, display_dev_info: display_dev_info?)
 
-= render(Pages::Admin::Headers::Section::Component.new(title: "Ownerships", count: @bike.ownerships.count))
+= render(UI::Header::Component.new(tag: :h2, html_class: "twsection")) do
+  Ownerships
+  = render(Pages::Admin::Headers::Count::Component.new(count: @bike.ownerships.count))
 = render partial: "/admin/ownerships/table", locals: {ownerships: @bike.ownerships.reorder(created_at: :desc), skip_bike: true}
 
-= render(Pages::Admin::Headers::Section::Component.new(title: safe_join(["Edit ownership ", tag.code(@ownership.id, class: "twcode")])))
+= render(UI::Header::Component.new(text: safe_join(["Edit ownership ", tag.code(@ownership.id, class: "twcode")]), tag: :h2, html_class: "twsection"))
 %p{class: "tw:mb-4 tw:font-bold #{UI::Alerts::Base::Component::TEXT_CLASSES[:error]}"}
   BE CAREFUL. YOU CAN BREAK STUFF HERE
 
@@ -42,5 +44,5 @@
 - if display_dev_info?
   = render(UI::Container::Component.new(alignment: :left)) do
     .only-dev-visible{class: "tw:mt-12"}
-      = render(Pages::Admin::Headers::Section::Component.new(title: "Registration info"))
+      = render(UI::Header::Component.new(text: "Registration info", tag: :h2, html_class: "twsection"))
     = render UI::JsonDisplay::Component.new(data: @ownership.registration_info, skip_blank: true, no_max_height: true)

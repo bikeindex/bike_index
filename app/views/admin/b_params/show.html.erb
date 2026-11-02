@@ -28,12 +28,12 @@
   <% end %>
 <% end %>
 
-<%= render(Pages::Admin::Headers::Section::Component.new(title: "Bike")) %>
+<%= render(UI::Header::Component.new(text: "Bike", tag: :h2, html_class: "twsection")) %>
 
 <%= render UI::JsonDisplay::Component.new(data: @b_param.params) %>
 
 <% if @b_param.bike_errors.present? %>
-  <%= render(Pages::Admin::Headers::Section::Component.new(title: "Bike Errors")) %>
+  <%= render(UI::Header::Component.new(text: "Bike Errors", tag: :h2, html_class: "twsection")) %>
 
   <%= render UI::JsonDisplay::Component.new(data: @b_param.bike_errors) %>
 <% end %>

@@ -54,7 +54,7 @@
           = render UI::JsonDisplay::Component.new(data: data.except("headers"), small: true)
 
 %div{class: "tw:my-6"}
-  = render(Pages::Admin::Headers::Section::Component.new(title: "Errors", tag: :h3))
+  = render(UI::Header::Component.new(text: "Errors", tag: :h3, html_class: "twsection"))
   - if @bulk_import.import_errors == {}
     %span.twless-strong No errors
   - else
@@ -64,17 +64,19 @@
 - if @bulk_import.ownerships.count < 1 || params[:show_reprocess]
   = render UI::ButtonLink::Component.new(text: "Reprocess Import", href: admin_bulk_import_path(@bulk_import, reprocess: true), method: :put, form: {class: "tw:float-right"})
 
-= render(Pages::Admin::Headers::Section::Component.new(title: safe_join(["Bikes - ", number_display(@bulk_import.bikes.count)]))) do
-  - if @bulk_import.matched_count.positive?
-    %small
-      and #{number_display(@bulk_import.matched_count)} #{"row".pluralize(@bulk_import.matched_count)} matching existing registrations
-  - if @bulk_import.bikes.count > 25
-    %small
-      Last 25 shown
-      - if @bulk_import.organization.present?
-        %em
-          use
-          = link_to "organization view", organization_bulk_import_path(@bulk_import, organization_id: @bulk_import.organization.to_param), class: "twlink"
-          for paginated list
+= render(UI::Header::Component.new(tag: :h2, html_class: "twsection")) do
+  = safe_join(["Bikes - ", number_display(@bulk_import.bikes.count)])
+  %span{class: "tw:font-normal"}
+    - if @bulk_import.matched_count.positive?
+      %small
+        and #{number_display(@bulk_import.matched_count)} #{"row".pluralize(@bulk_import.matched_count)} matching existing registrations
+    - if @bulk_import.bikes.count > 25
+      %small
+        Last 25 shown
+        - if @bulk_import.organization.present?
+          %em
+            use
+            = link_to "organization view", organization_bulk_import_path(@bulk_import, organization_id: @bulk_import.organization.to_param), class: "twlink"
+            for paginated list
 
 = render Pages::Admin::Bikes::Table::Component.new(bikes: @bulk_import.bikes.reorder(id: :desc).limit(25), sort_state:)

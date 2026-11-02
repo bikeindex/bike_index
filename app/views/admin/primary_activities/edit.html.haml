@@ -16,7 +16,7 @@
 
 - if @primary_activity.family?
   %div{class: "tw:my-12"}
-    = render(Pages::Admin::Headers::Section::Component.new(title: "Flavors"))
+    = render(UI::Header::Component.new(text: "Flavors", tag: :h2, html_class: "twsection"))
     = render(partial: "table", locals: {collection: @primary_activity_flavors, render_sortable: false})
 
 = render(UI::Container::Component.new(alignment: :left)) do

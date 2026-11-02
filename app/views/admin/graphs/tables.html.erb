@@ -17,7 +17,7 @@
   <% end %>
 </div>
 
-<%= render(Pages::Admin::Headers::Section::Component.new(title: "Records everywhere")) %>
+<%= render(UI::Header::Component.new(text: "Records everywhere", tag: :h2, html_class: "twsection")) %>
 
 <p class="tw:mb-4">
   The <span class="twless-strong">data in this color</span> is (simplified, not
@@ -32,15 +32,15 @@
     <strong><%= params[:location] %></strong>
   <% end %>
 
-  <%= render(Pages::Admin::Headers::Section::Component.new(title: location_title, tag: :h3)) %>
+  <%= render(UI::Header::Component.new(text: location_title, tag: :h3, html_class: "twsection")) %>
 
   <div class="tw:mt-4">
     <%= render(Pages::Admin::Graphs::YearCounts::Component.new(bounding_box: @bounding_box)) %>
   </div>
 <% else %>
-  <%= render(Pages::Admin::Headers::Section::Component.new(title: tag.em("Add a location to the search section at the top of the page to see stats about that location"))) %>
+  <%= render(UI::Header::Component.new(text: tag.em("Add a location to the search section at the top of the page to see stats about that location"), tag: :h2, html_class: "twsection")) %>
 
   <% if params[:location].present? %>
-    <%= render(Pages::Admin::Headers::Section::Component.new(title: "The location and proximity you entered weren't useable. Try again.", tag: :h3)) %>
+    <%= render(UI::Header::Component.new(text: "The location and proximity you entered weren't useable. Try again.", tag: :h3, html_class: "twsection")) %>
   <% end %>
 <% end %>

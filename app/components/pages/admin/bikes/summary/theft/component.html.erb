@@ -1,4 +1,4 @@
-<%= render(Pages::Admin::Headers::Section::Component.new(title: tag.span("Theft information", class: UI::Alerts::Base::Component::TEXT_CLASSES[:error]))) %>
+<%= render(UI::Header::Component.new(text: tag.span("Theft information", class: UI::Alerts::Base::Component::TEXT_CLASSES[:error]), tag: :h2, html_class: "twsection")) %>
 
 <div class="tw:flex tw:flex-wrap">
   <div class="tw:w-full tw:md:w-1/2 tw:md:pr-4">

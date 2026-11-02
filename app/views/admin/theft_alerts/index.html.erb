@@ -1,7 +1,10 @@
 <% if @bike.present? %>
   <%= render Pages::Admin::Bikes::Header::Component.new(bike: @bike, active: :theft_alerts, display_recovery: true, user: current_user, display_dev_info: display_dev_info?) %>
-  <%= render(Pages::Admin::Headers::Section::Component.new(title: "Promoted alerts", count: @pagy.count)) do %>
-    <%= render(UI::ButtonLink::Component.new(text: "New Promoted alert", href: new_admin_theft_alert_path(bike_id: @bike.id), color: :primary, size: :sm, html_class: "tw:ml-2")) %>
+  <%= render(UI::Header::Component.new(tag: :h2, html_class: "twsection")) do %>
+    Promoted alerts
+    <%= render(Pages::Admin::Headers::Count::Component.new(count: @pagy.count)) %>
+
+    <span class="tw:font-normal"><%= render(UI::ButtonLink::Component.new(text: "New Promoted alert", href: new_admin_theft_alert_path(bike_id: @bike.id), color: :primary, size: :sm, html_class: "tw:ml-2")) %></span>
   <% end %>
   <%= render partial: "table", locals: {render_sortable: true, theft_alerts: @theft_alerts, skip_bike: true} %>
 <% else %>
@@ -75,7 +78,7 @@
       </div>
 
       <% if @search_facebook_data %>
-        <%= render(Pages::Admin::Headers::Section::Component.new(title: tag.em("Sum of Facebook reach for ads started in the period"), margin_classes: "tw:mt-12 tw:mb-3")) %>
+        <%= render(UI::Header::Component.new(text: tag.em("Sum of Facebook reach for ads started in the period"), tag: :h2, html_class: "tw:mt-12")) %>
         <%= render(UI::Chart::Component.new(series: facebook_reach_graph, time_range: @time_range, stacked: true)) %>
         <div class="tw:mt-12"></div>
       <% end %>

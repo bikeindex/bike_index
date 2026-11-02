@@ -221,6 +221,10 @@
     @apply tw:text-sm tw:wrap-break-word tw:text-pink-600 tw:dark:text-pink-400;
   }
 
+  .twsection {
+    @apply tw:mt-6 tw:first:mt-0;
+  }
+
   .twhr {
     @apply tw:border-0 tw:h-px tw:bg-gray-200 tw:dark:bg-gray-700 tw:my-4;
   }

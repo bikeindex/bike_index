@@ -46,7 +46,7 @@
   <% if @render_kind_counts %>
     <%= render(UI::Container::Component.new) do %>
       <%= render(UI::Card::Component.new(additional_classes: "tw:my-6")) do %>
-        <%= render(Pages::Admin::Headers::Section::Component.new(title: "Kinds")) %>
+        <%= render(UI::Header::Component.new(text: "Kinds", tag: :h2, html_class: "twsection")) %>
 
         <%= render(UI::TableList::Component.new(wide_definition: true)) do |list| %>
           <% UserAlert.kinds.each_with_index do |kind, index| %>

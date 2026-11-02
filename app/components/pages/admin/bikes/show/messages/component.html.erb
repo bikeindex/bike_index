@@ -1,38 +1,50 @@
-<%= render(Pages::Admin::Headers::Section::Component.new(title: "Notifications", count: notifications.size,
-      href: admin_notifications_path(search_bike_id: @bike.id))) %>
+<%= render(UI::Header::Component.new(tag: :h2, html_class: "twsection")) do %>
+  Notifications
+  <%= render(Pages::Admin::Headers::Count::Component.new(count: notifications.size, href: admin_notifications_path(search_bike_id: @bike.id))) %>
+<% end %>
 
 <% if notifications.any? %>
   <%= render partial: "/admin/notifications/table",
         locals: {notifications:, skip_bike: true, show_message_preview: true} %>
 <% end %>
 
-<%= render(Pages::Admin::Headers::Section::Component.new(title: "Organization messages", count: organization_messages.size,
-      href: admin_organization_messages_path(search_bike_id: @bike.id))) %>
+<%= render(UI::Header::Component.new(tag: :h2, html_class: "twsection")) do %>
+  Organization messages
+  <%= render(Pages::Admin::Headers::Count::Component.new(count: organization_messages.size, href: admin_organization_messages_path(search_bike_id: @bike.id))) %>
+<% end %>
 
 <% if organization_messages.any? %>
   <%= render partial: "/admin/organization_messages/table", locals: {collection: organization_messages, skip_bike: true} %>
 <% end %>
 
-<%= render(Pages::Admin::Headers::Section::Component.new(title: "Feedbacks", count: feedbacks.size,
-      href: admin_feedbacks_path(search_bike_id: @bike.id))) %>
+<%= render(UI::Header::Component.new(tag: :h2, html_class: "twsection")) do %>
+  Feedbacks
+  <%= render(Pages::Admin::Headers::Count::Component.new(count: feedbacks.size, href: admin_feedbacks_path(search_bike_id: @bike.id))) %>
+<% end %>
 
 <% if feedbacks.any? %>
   <%= render partial: "/admin/feedbacks/table", locals: {feedbacks:, skip_bike: true} %>
 <% end %>
 
-<%= render(Pages::Admin::Headers::Section::Component.new(title: "User alerts", count: user_alerts.size,
-      href: admin_user_alerts_path(search_bike_id: @bike.id))) %>
+<%= render(UI::Header::Component.new(tag: :h2, html_class: "twsection")) do %>
+  User alerts
+  <%= render(Pages::Admin::Headers::Count::Component.new(count: user_alerts.size, href: admin_user_alerts_path(search_bike_id: @bike.id))) %>
+<% end %>
 
 <% if user_alerts.any? %>
   <%= render partial: "/admin/user_alerts/table", locals: {user_alerts:} %>
 <% end %>
 
-<%= render(Pages::Admin::Headers::Section::Component.new(title: "Parking notifications", count: parking_notifications.size,
-      href: admin_parking_notifications_path(search_bike_id: @bike.id))) %>
+<%= render(UI::Header::Component.new(tag: :h2, html_class: "twsection")) do %>
+  Parking notifications
+  <%= render(Pages::Admin::Headers::Count::Component.new(count: parking_notifications.size, href: admin_parking_notifications_path(search_bike_id: @bike.id))) %>
+<% end %>
 
 <% if parking_notifications.any? %>
   <%= render partial: "/admin/parking_notifications/table", locals: {parking_notifications:} %>
 <% end %>
 
-<%= render(Pages::Admin::Headers::Section::Component.new(title: "Graduated notifications", count: graduated_notifications_count,
-      href: admin_graduated_notifications_path(search_bike_id: @bike.id))) %>
+<%= render(UI::Header::Component.new(tag: :h2, html_class: "twsection")) do %>
+  Graduated notifications
+  <%= render(Pages::Admin::Headers::Count::Component.new(count: graduated_notifications_count, href: admin_graduated_notifications_path(search_bike_id: @bike.id))) %>
+<% end %>
