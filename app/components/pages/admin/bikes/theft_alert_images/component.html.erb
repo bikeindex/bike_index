@@ -1,4 +1,4 @@
-<%= render(UI::Header::Component.new(tag: :h2, html_class: "twsection")) do %>
+<%= render(UI::Header::Component.new(tag: :h2)) do %>
   <%= @bike.type_titleize %> images
   <% if public_images.any? %>
     <%= link_to "user edit", edit_bike_path(@bike, edit_template: "photos", return_to: @return_to),
@@ -27,7 +27,7 @@
   <% end %>
 </ul>
 
-<%= render(UI::Header::Component.new(text: "Promoted alert images", tag: :h2, html_class: "twsection")) %>
+<%= render(UI::Header::Component.new(text: "Promoted alert images", tag: :h2)) %>
 
 <% if !alert_images? %>
   <div class="tw:mb-4">None</div>

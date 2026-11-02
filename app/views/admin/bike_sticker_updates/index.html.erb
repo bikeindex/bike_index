@@ -109,13 +109,13 @@
         <% end %>
       <% end %>
 
-      <%= render(UI::Header::Component.new(tag: :h2, html_class: "twsection")) do %>
+      <%= render(UI::Header::Component.new(tag: :h2)) do %>
         <%= matching_title %>
         <%= render(Pages::Admin::Headers::Count::Component.new(count: @searched_bike_stickers.count)) %>
       <% end %>
 
       <% if @searched_bike_stickers.count > 100 %>
-        <%= render(UI::Header::Component.new(text: "More than 100 matching stickers, just showing the first 100", tag: :h3, html_class: "twsection")) %>
+        <%= render(UI::Header::Component.new(text: "More than 100 matching stickers, just showing the first 100", tag: :h3)) %>
       <% end %>
 
       <%= render partial: "/admin/bike_stickers/table", locals: {bike_stickers: @searched_bike_stickers.limit(100)} %>

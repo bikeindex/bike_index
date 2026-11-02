@@ -3,7 +3,7 @@
 = render(UI::Header::Component.new(text: "New Promoted Alert", tag: :h2, html_class: "tw:mt-12"))
 
 - if @theft_alerts.any?
-  = render(UI::Header::Component.new(text: "Existing alerts", tag: :h3, html_class: "twsection"))
+  = render(UI::Header::Component.new(text: "Existing alerts", tag: :h3))
   = render partial: "/admin/theft_alerts/table", locals: {render_sortable: true, theft_alerts: @theft_alerts, skip_bike: true}
 
 %div{class: "tw:mt-12 tw:mb-6"}

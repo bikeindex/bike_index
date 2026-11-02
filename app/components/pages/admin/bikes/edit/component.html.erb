@@ -1,5 +1,5 @@
 <div class="tw:mt-6 tw:mb-1 tw:flex tw:flex-wrap tw:items-baseline tw:gap-2">
-  <%= render(UI::Header::Component.new(tag: :h2, html_class: "twsection")) do %>
+  <%= render(UI::Header::Component.new(tag: :h2)) do %>
     Edit
     <%= link_to "user edit", edit_bike_path(@bike, return_to: edit_admin_bike_path(@bike)),
             class: "twlink tw:ml-2 tw:text-sm" %>
@@ -111,7 +111,7 @@
 
   <% if @bike.current_stolen_record.present? %>
     <div class="tw:mt-8" id="edit-stolen-record">
-      <%= render(UI::Header::Component.new(text: "Edit stolen record", tag: :h3, html_class: "twsection")) %>
+      <%= render(UI::Header::Component.new(text: "Edit stolen record", tag: :h3)) %>
     </div>
 
     <%= f.fields_for :stolen_records do |s| %>

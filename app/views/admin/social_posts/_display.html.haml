@@ -13,15 +13,15 @@
     - list.with_row(label: "Kind", value: (@social_post.kind.gsub(/_?post/, "").humanize if @social_post.kind.present?))
 
 - if @social_post.imported_post?
-  = render(UI::Header::Component.new(text: "Landing page rendering", tag: :h2, html_class: "twsection"))
+  = render(UI::Header::Component.new(text: "Landing page rendering", tag: :h2))
   %div{class: "tw:mt-6 tw:lg:max-w-7/12"}
     = render partial: 'landing_pages/social_post', locals: { post_id: @social_post.id }
 
 - if @social_post.reposts.any?
-  = render(UI::Header::Component.new(text: "Reposts", tag: :h2, html_class: "twsection"))
+  = render(UI::Header::Component.new(text: "Reposts", tag: :h2))
   = render partial: "admin/social_posts/table", locals: { social_posts: @social_post.reposts, skip_reposts: true }
 
 %hr.twhr{class: "tw:mt-6"}
 
-= render(UI::Header::Component.new(text: "Platform Response Data", tag: :h2, html_class: "twsection"))
+= render(UI::Header::Component.new(text: "Platform Response Data", tag: :h2))
 = render UI::JsonDisplay::Component.new(data: @social_post.platform_response, no_max_height: true)

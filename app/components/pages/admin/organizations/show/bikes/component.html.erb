@@ -1,5 +1,5 @@
 <div class="tw:mt-6 tw:flex tw:flex-wrap tw:items-baseline tw:gap-2">
-  <%= render(UI::Header::Component.new(tag: :h2, html_class: "twsection")) do %>
+  <%= render(UI::Header::Component.new(tag: :h2)) do %>
     <%= number_with_delimiter(@bikes_count) %> <%= "Bike".pluralize(@bikes_count) %>
 
     <em class="tw:text-sm">

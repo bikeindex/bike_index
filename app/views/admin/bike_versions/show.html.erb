@@ -37,7 +37,7 @@
 
 <% if @bike_version.public_images.any? %>
   <div class="tw:mt-6">
-    <%= render(UI::Header::Component.new(text: "Images", tag: :h2, html_class: "twsection")) %>
+    <%= render(UI::Header::Component.new(text: "Images", tag: :h2)) %>
 
     <div class="tw:grid tw:gap-x-8 tw:md:grid-cols-4">
       <% @bike_version.public_images.each do |image| %>

@@ -3,14 +3,14 @@
 
 - if @kind == "general"
 
-  = render(UI::Header::Component.new(text: "Users past week", tag: :h2, html_class: "twsection"))
+  = render(UI::Header::Component.new(text: "Users past week", tag: :h2))
   = render(UI::Chart::Component.new(series: variable_admin_graphs_path(search_kind: "users", period: "week"), stacked: true))
 
-  = render(UI::Header::Component.new(text: "Users past year", tag: :h2, html_class: "twsection"))
+  = render(UI::Header::Component.new(text: "Users past year", tag: :h2, html_class: "tw:mt-6"))
   = render(UI::Chart::Component.new(series: variable_admin_graphs_path(search_kind: "users", period: "year"), stacked: true))
 
 
-  = render(UI::Header::Component.new(text: "Bikes past year", tag: :h2, html_class: "twsection"))
+  = render(UI::Header::Component.new(text: "Bikes past year", tag: :h2, html_class: "tw:mt-6"))
   = render(UI::Chart::Component.new(series: variable_admin_graphs_path(search_kind: "bikes", period: "year"), stacked: true))
 
 - elsif @kind == "bikes"

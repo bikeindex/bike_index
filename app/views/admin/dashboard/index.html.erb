@@ -23,7 +23,7 @@
   <hr class="twhr">
 
   <% cache(User.maximum(:created_at)) do %>
-    <%= render(UI::Header::Component.new(text: safe_join(["Recent ", link_to("Users", admin_users_url, class: "twlink")]), tag: :h2, html_class: "twsection")) %>
+    <%= render(UI::Header::Component.new(text: safe_join(["Recent ", link_to("Users", admin_users_url, class: "twlink")]), tag: :h2)) %>
 
     <%= render Pages::Admin::Users::Table::Component.new(users: @users) %>
 
@@ -35,7 +35,7 @@
 
   <hr class="twhr">
 
-  <%= render(UI::Header::Component.new(text: safe_join(["Recent ", link_to("Organizations", admin_organizations_url, class: "twlink")]), tag: :h2, html_class: "twsection")) %>
+  <%= render(UI::Header::Component.new(text: safe_join(["Recent ", link_to("Organizations", admin_organizations_url, class: "twlink")]), tag: :h2)) %>
 
   <%= render(Pages::Admin::Organizations::Table::Component.new(organizations: @organizations, sort_state:)) %>
 
@@ -54,7 +54,7 @@
 
   <div class="twwiderow">
     <div class="tw:mt-6">
-      <%= render(UI::Header::Component.new(text: "Index searches", tag: :h2, html_class: "twsection")) %>
+      <%= render(UI::Header::Component.new(text: "Index searches", tag: :h2)) %>
 
       <p class="tw:mb-4">
         <%= number_display(week_searches.values_at("organized", "organized_serial", "user", "user_serial", "web_marketplace").sum) %>
@@ -66,7 +66,7 @@
     </div>
 
     <div class="tw:mt-6">
-      <%= render(UI::Header::Component.new(text: "BikeBook searches", tag: :h2, html_class: "twsection")) %>
+      <%= render(UI::Header::Component.new(text: "BikeBook searches", tag: :h2)) %>
 
       <p class="tw:mb-4">
         <%= number_display(week_searches.values_at("web_bikebook", "web_bikebook_comparison", "web_ebike_rules").sum) %>

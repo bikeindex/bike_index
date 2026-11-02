@@ -5,11 +5,11 @@
 
 .twwiderow
   %div
-    = render(UI::Header::Component.new(text: "Cloudflare", tag: :h2, html_class: "twsection"))
+    = render(UI::Header::Component.new(text: "Cloudflare", tag: :h2))
     = render UI::JsonDisplay::Component.new(data: @cloudflare_hash)
   %div
-    = render(UI::Header::Component.new(text: "Geocoder", tag: :h2, html_class: "twsection"))
+    = render(UI::Header::Component.new(text: "Geocoder", tag: :h2))
     = render UI::JsonDisplay::Component.new(data: @geocoder_hash)
   %div
-    = render(UI::Header::Component.new(text: "Raw Headers", tag: :h2, html_class: "twsection"))
+    = render(UI::Header::Component.new(text: "Raw Headers", tag: :h2))
     = render UI::JsonDisplay::Component.new(data: @headers)

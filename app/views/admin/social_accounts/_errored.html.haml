@@ -7,7 +7,7 @@
         with errors
         %em{class: UI::Alerts::Base::Component::TEXT_CLASSES[:success]}
           = link_to "review errors", admin_social_accounts_path(sort: "last_error_at"), class: "twlink"
-      = render(UI::Header::Component.new(text: errors_title, tag: :h2, html_class: "twsection"))
+      = render(UI::Header::Component.new(text: errors_title, tag: :h2))
       %p
         This will prevent posting for areas served by:
         %br

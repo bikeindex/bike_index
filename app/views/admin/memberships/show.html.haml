@@ -40,7 +40,7 @@
     = render(UI::Container::Component.new(alignment: :left)) do
       = render partial: "form"
 
-= render(UI::Header::Component.new(tag: :h2, html_class: "twsection")) do
+= render(UI::Header::Component.new(tag: :h2, html_class: "tw:mt-6")) do
   Payments
   = render(Pages::Admin::Headers::Count::Component.new(count: @payments.count, href: admin_payments_path(user_id: @membership.user_id, period: "all")))
   - if @payments.count > 25
@@ -51,5 +51,5 @@
 
 
 - if display_dev_info?
-  = render(UI::Header::Component.new(text: tag.span("Stripe Subscriptions", class: "only-dev-visible"), tag: :h2, html_class: "twsection"))
+  = render(UI::Header::Component.new(text: tag.span("Stripe Subscriptions", class: "only-dev-visible"), tag: :h2))
   = render(partial: "/admin/stripe_subscriptions/table", locals: {collection: @stripe_subscriptions, render_sortable: false})

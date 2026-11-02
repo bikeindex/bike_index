@@ -1,8 +1,8 @@
 <% if @mailchimp_datum.blank? %>
-  <%= render(UI::Header::Component.new(text: "No Mailchimp data", tag: :h2, html_class: "twsection")) %>
+  <%= render(UI::Header::Component.new(text: "No Mailchimp data", tag: :h2)) %>
 <% else %>
   <div data-controller="ui--collapse">
-    <%= render(UI::Header::Component.new(tag: :h2, html_class: "twsection")) do %>
+    <%= render(UI::Header::Component.new(tag: :h2)) do %>
       Mailchimp data
       <em><%= render(UI::Collapse::Component.new(text: "show raw data", color: :link, html_class: "tw:text-sm")) %></em>
     <% end %>

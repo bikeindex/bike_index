@@ -1,6 +1,6 @@
 <% if @bike.present? %>
   <%= render Pages::Admin::Bikes::Header::Component.new(bike: @bike, active: :listings, user: current_user, display_dev_info: display_dev_info?) %>
-  <%= render(UI::Header::Component.new(tag: :h2, html_class: "twsection")) do %>
+  <%= render(UI::Header::Component.new(tag: :h2)) do %>
     Marketplace listings
     <%= render(Pages::Admin::Headers::Count::Component.new(count: @pagy.count)) %>
   <% end %>

@@ -6,14 +6,14 @@
 <% when :messages %>
   <%= render(Pages::Admin::Users::Show::Messages::Component.new(user: @user)) %>
 <% when :organization_roles %>
-  <%= render(UI::Header::Component.new(tag: :h2, html_class: "twsection")) do %>
+  <%= render(UI::Header::Component.new(tag: :h2)) do %>
     Organizations
     <%= render(Pages::Admin::Headers::Count::Component.new(count: records.count, parenthetical: registration_organizations_link)) %>
   <% end %>
 
   <%= render partial: "/admin/organization_roles/table", locals: {organization_roles: records.reorder(id: :desc)} %>
 <% when :emails %>
-  <%= render(UI::Header::Component.new(tag: :h2, html_class: "twsection")) do %>
+  <%= render(UI::Header::Component.new(tag: :h2)) do %>
     Emails
     <%= render(Pages::Admin::Headers::Count::Component.new(count: records.count)) %>
   <% end %>
@@ -48,7 +48,7 @@
     <% end %>
   <% end %>
 <% when :ambassador_tasks %>
-  <%= render(UI::Header::Component.new(tag: :h2, html_class: "twsection")) do %>
+  <%= render(UI::Header::Component.new(tag: :h2)) do %>
     Ambassador tasks
     <%= render(Pages::Admin::Headers::Count::Component.new(count: records.count, parenthetical: ambassador_progress)) %>
   <% end %>

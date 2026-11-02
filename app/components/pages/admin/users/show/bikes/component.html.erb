@@ -1,4 +1,4 @@
-<%= render(UI::Header::Component.new(tag: :h2, html_class: "twsection")) do %>
+<%= render(UI::Header::Component.new(tag: :h2)) do %>
   Bikes
   <%= render(Pages::Admin::Headers::Count::Component.new(count: bikes_count, href: index_path, parenthetical:)) %>
 

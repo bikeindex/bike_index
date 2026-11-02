@@ -53,7 +53,7 @@
 <div class="tw:mt-10">
   <% messages_count = @marketplace_listing.marketplace_messages.count %>
 
-  <%= render(UI::Header::Component.new(tag: :h2, html_class: "twsection")) do %>
+  <%= render(UI::Header::Component.new(tag: :h2)) do %>
     <%= link_to(safe_join([number_display(messages_count), " ", "message".pluralize(messages_count)]), admin_marketplace_messages_path(search_marketplace_listing_id: @marketplace_listing.id), class: "twlink") %>
 
     <% if messages_count > @marketplace_messages.count %>

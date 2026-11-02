@@ -1,4 +1,4 @@
-<%= render(UI::Header::Component.new(tag: :h2, html_class: "twsection")) do %>
+<%= render(UI::Header::Component.new(tag: :h2)) do %>
   Marketplace messages
   <%= render(Pages::Admin::Headers::Count::Component.new(count: counts[:marketplace_messages], href: admin_marketplace_messages_path(user_id: @user.id))) %>
 <% end %>
@@ -7,7 +7,7 @@
   <%= render partial: "/admin/marketplace_messages/table", locals: {collection: recent(:marketplace_messages)} %>
 <% end %>
 
-<%= render(UI::Header::Component.new(tag: :h2, html_class: "twsection")) do %>
+<%= render(UI::Header::Component.new(tag: :h2)) do %>
   Alerts
   <%= render(Pages::Admin::Headers::Count::Component.new(count: counts[:alerts], href: admin_user_alerts_path(user_id: @user.id))) %>
 <% end %>
@@ -16,7 +16,7 @@
   <%= render partial: "/admin/user_alerts/table", locals: {user_alerts: recent(:alerts), skip_user: true} %>
 <% end %>
 
-<%= render(UI::Header::Component.new(tag: :h2, html_class: "twsection")) do %>
+<%= render(UI::Header::Component.new(tag: :h2)) do %>
   Notifications
   <%= render(Pages::Admin::Headers::Count::Component.new(count: counts[:notifications], href: admin_notifications_path(user_id: @user.id))) %>
 <% end %>
@@ -25,7 +25,7 @@
   <%= render partial: "/admin/notifications/table", locals: {notifications: recent(:notifications).includes(:bike, :notifiable, :user)} %>
 <% end %>
 
-<%= render(UI::Header::Component.new(tag: :h2, html_class: "twsection")) do %>
+<%= render(UI::Header::Component.new(tag: :h2)) do %>
   Feedbacks
   <%= render(Pages::Admin::Headers::Count::Component.new(count: counts[:feedbacks], href: admin_feedbacks_path(user_id: @user.id))) %>
 <% end %>
