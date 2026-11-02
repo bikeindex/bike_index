@@ -16,6 +16,7 @@ import { array, isNumber, join, present } from 'bikebook/templates/values'
 // `only` ones once a shown model is electric, suspended, a cargo vehicle or sold outside the visitor's market, the rest once one lists it, and `differing`
 // ones where the models' values of it differ
 const FIELDS = [
+  { label: 'Price', key: 'price' },
   { label: 'Markets', key: 'markets', only: 'outside_market' },
   { label: 'Model group', key: 'model_group' },
   { label: 'Years', key: 'years' },
@@ -27,7 +28,6 @@ const FIELDS = [
   { label: 'Wheel & tire size', key: 'wheel_size' },
   { label: 'Suspension front/rear', key: 'suspension', only: 'suspended' },
   { label: 'Groupset', key: 'groupset' },
-  { label: 'Price', key: 'price' },
   { label: 'E-vehicle class', key: 'e_vehicle_class', only: 'electric' },
   { label: 'Electric Certification', key: 'certification', only: 'electric' },
   { label: 'Description', key: 'description' }

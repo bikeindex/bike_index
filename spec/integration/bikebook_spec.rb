@@ -139,7 +139,7 @@ RSpec.describe "BikeBook", :js, type: :system do
     badge.click
     expect(page).to have_css("[role='tooltip'] h3", exact_text: "Class #{badge[:"aria-label"][/\d/]}", visible: true)
     expect(find("[aria-label='Overview']").all("tbody tr > th").map(&:text))
-      .to eq(["Model group", "Years", "Primary activity", "Frame material", "Wheel & tire size", "Suspension front/rear", "Groupset", "Price", "E-vehicle class", "Electric Certification", "Description"])
+      .to eq(["Price", "Model group", "Years", "Primary activity", "Frame material", "Wheel & tire size", "Suspension front/rear", "Groupset", "E-vehicle class", "Electric Certification", "Description"])
     # a tire over 50 mm in inches, its mm in a tooltip
     expect(find("[aria-label='Overview'] tr", text: /\AWheel & tire size/).find("td").text(:all).squish).to eq "650 B × 2.2 in ? 56 mm"
     # no groupset listed, so its gear count alone, with the rest of its drivetrain in the tooltip
@@ -1917,10 +1917,10 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(years).to have_text("Satin Obsidian").and have_text("Gloss White Mountains")
     expect(find("h2", text: /\Aframe\z/i).ancestor("section")).to have_text(/Max load \(rider \+ cargo\)\W*190\W*kg/)
 
-    # beside its Canadian model, sold outside the visitor's market, the Overview leads with each one's, and names it after
+    # beside its Canadian model, sold outside the visitor's market, the Overview has each one's under its price, and names it after
     # whichever of them the market picked doesn't sell
     visit bikebook_path(vehicle_models: "m/specialized/2025/haul_st,m/specialized/2025/haul_st_ca", filters: 1)
-    expect(page).to have_css("[aria-label='Overview comparison'] tbody tr:first-child", text: /\AMarkets\s*United States\s*Canada\z/, wait: 10)
+    expect(page).to have_css("[aria-label='Overview comparison'] tbody tr:nth-child(2)", text: /\AMarkets\s*United States\s*Canada\z/, wait: 10)
     expect(page).to have_css("[aria-label='Overview comparison'] thead th", text: /Haul ST\s+\(CA\)/)
       .and have_no_css("[aria-label='Overview comparison'] thead th", text: "(US)")
     choose_option("Market", "Canada")
