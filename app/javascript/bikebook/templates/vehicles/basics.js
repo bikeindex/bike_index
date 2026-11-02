@@ -138,15 +138,10 @@ export const basics = ({ presenter, vehicles, market, outOfClassId, removePath, 
   return compared(shown, fields, frames, sectionClasses, corner)
 }
 
-// Where a second model's column would be, opening the search's list
-const addSlot = html`<div class="tw:mb-7 tw:hidden tw:items-start tw:justify-center tw:rounded-sm tw:border-2 tw:border-dashed tw:border-gray-300 tw:md:flex
-  tw:dark:border-gray-600"><button type="button" data-action="bikebook--page#addVehicle" class=${buttonClasses({ htmlClass: 'tw:sticky tw:top-4 tw:mt-40' })}
-  >+ Add a model to compare</button></div>`
-
 const compared = (vehicles, fields, frames, sectionClasses, corner) => html`<section aria-label=${vehicles.length > 1 ? 'Overview comparison' : 'Overview'} class="tw:mt-6 ${vehicles.length > 3
   ? 'tw:twpagebleed tw:px-4'
-  : ''} ${vehicles.length === 1 ? 'tw:md:grid tw:md:grid-cols-[calc(50%+6.25rem)_1fr] tw:md:gap-4' : ''} ${sectionClasses}" style=${`--models: ${vehicles.length}`}>${table({
-  classes: `tw:w-full ${vehicles.length === 1 ? '' : MIN_WIDTH} tw:table-fixed ${vehicles.length > 3 ? `tw:mx-auto ${MAX_WIDTH}` : ''}`,
+  : ''} ${sectionClasses}" style=${`--models: ${vehicles.length}`}>${table({
+  classes: `${vehicles.length === 1 ? 'tw:w-full tw:md:w-[calc(50%+6.25rem)] tw:md:min-w-0!' : `tw:w-full ${MIN_WIDTH}`} tw:table-fixed ${vehicles.length > 3 ? `tw:mx-auto ${MAX_WIDTH}` : ''}`,
   records: fields,
   columns: [
     { label: html`<span class="tw:sr-only">Field</span>${corner}`, rowHeader: true, classes: 'tw:w-32 tw:md:w-50 tw:px-2.5! tw:py-2! tw:align-top tw:font-bold', cell: ({ label }) => label },
@@ -169,4 +164,4 @@ const compared = (vehicles, fields, frames, sectionClasses, corner) => html`<sec
       }
     })
   ]
-})}${vehicles.length === 1 ? addSlot : nothing}</section>`
+})}</section>`

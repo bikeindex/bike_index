@@ -13,12 +13,10 @@ export default class extends Controller {
     document.removeEventListener('keydown', this.focusField)
   }
 
-  // Opens the field's list, after the click that asked, which it would otherwise close as one outside it, scrolled to
-  // where it's out of view. A field already focused wouldn't scroll to itself
+  // Opens the field's list, after the click that asked, which it would otherwise close as one outside it
   open () {
     setTimeout(() => {
-      this.element.scrollIntoView({ block: 'nearest' })
-      this.fieldTarget.focus({ preventScroll: true })
+      this.fieldTarget.focus()
       this.fieldTarget.click()
     })
   }
