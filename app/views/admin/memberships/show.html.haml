@@ -1,12 +1,6 @@
-%h1
-  Editing Membership
-  %small.twless-strong
-    - if @membership.admin_managed?
-      admin managed
-    - else
-      stripe managed
+= render(Pages::Admin::Headers::Nav::Component.new(title: "Editing Membership", subtitle: @membership.admin_managed? ? "admin managed" : "stripe managed")) do
   - if @membership.stripe_managed?
-    = render(UI::ButtonLink::Component.new(text: "Update from Stripe", href: admin_membership_path(id: @membership.id, update_from_stripe: true), method: :patch, color: :primary, size: :sm, form: {class: "float-right"}))
+    %li= render(UI::ButtonLink::Component.new(text: "Update from Stripe", href: admin_membership_path(id: @membership.id, update_from_stripe: true), method: :patch, color: :primary, size: :sm))
 
 .twwiderow{class: "tw:mt-6 tw:items-start"}
   = render(UI::TableList::Component.new) do |list|
@@ -16,7 +10,7 @@
     - list.with_row(label: "level", value: @membership.level_humanized)
     - list.with_row(label: "Referral source") do
       - if @membership.referral_source.present?
-        %code= @membership.referral_source
+        %code.twcode= @membership.referral_source
         - if display_dev_info?
           -# There shouldn't be multiple different sources! Show them if there are.
           - referral_sources = (@membership.stripe_subscriptions.distinct.pluck(:referral_source) + @membership.payments.distinct.pluck(:referral_source)).compact.uniq
@@ -36,7 +30,7 @@
     - else
       - list.with_row(label: "Stripe") do
         - if @membership.stripe_id.present?
-          = link_to @membership.stripe_id.truncate(20), @membership.stripe_admin_url, title: @membership.stripe_id
+          = link_to @membership.stripe_id.truncate(20), @membership.stripe_admin_url, title: @membership.stripe_id, class: "twlink"
         - else
           %span{class: UI::Alerts::Base::Component::TEXT_CLASSES[:error]} MISSING STRIPE ID!
           %small.twless-strong This is a problem, tell Seth!
@@ -46,17 +40,14 @@
     = render(UI::Container::Component.new(alignment: :left)) do
       = render partial: "form"
 
-%h4{class: "tw:pt-6 tw:pb-2"}
-  Payments
-  %small
-    = link_to number_display(@payments.count), admin_payments_path(user_id: @membership.user_id, period: "all")
-    - if @payments.count > 25
+= render(Pages::Admin::Headers::Section::Component.new(title: "Payments", count: @payments.count, href: admin_payments_path(user_id: @membership.user_id, period: "all"))) do
+  - if @payments.count > 25
+    %small
       %em (only first 25 shown)
 - if @payments.any?
   = render partial: "/admin/payments/table", locals: {payments: @payments.limit(25), skip_user: true, render_method: true}
 
 
 - if display_dev_info?
-  %h4{class: "tw:pt-6 tw:pb-2"}
-    %span.only-dev-visible Stripe Subscriptions
+  = render(Pages::Admin::Headers::Section::Component.new(title: tag.span("Stripe Subscriptions", class: "only-dev-visible")))
   = render(partial: "/admin/stripe_subscriptions/table", locals: {collection: @stripe_subscriptions, render_sortable: false})

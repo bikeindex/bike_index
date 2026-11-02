@@ -8,9 +8,9 @@
   <div class="twwiderow">
     <div>
       <% if filter_params.any? %>
-        <p>
+        <p class="tw:mb-4">
           <%= pluralize number_with_delimiter(@exchange_rates.count), "matching exchange rate" %>
-          <em><%= link_to "view all", admin_exchange_rates_path %></em>
+          <em><%= link_to "view all", admin_exchange_rates_path, class: "twlink" %></em>
         </p>
       <% end %>
     </div>

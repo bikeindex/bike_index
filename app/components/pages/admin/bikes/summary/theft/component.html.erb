@@ -1,11 +1,9 @@
-<h4 class="tw:mt-4">
-  <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">Theft information</span>
-</h4>
+<%= render(Pages::Admin::Headers::Section::Component.new(title: tag.span("Theft information", class: UI::Alerts::Base::Component::TEXT_CLASSES[:error]))) %>
 
 <div class="tw:flex tw:flex-wrap">
   <div class="tw:w-full tw:md:w-1/2 tw:md:pr-4">
     <%= render(UI::TableList::Component.new) do |list| %>
-      <% list.with_row(label: "ID", value: tag.code(@stolen_record.id), class: "tw:text-sm", if: @display_dev_info) %>
+      <% list.with_row(label: "ID", value: tag.code(@stolen_record.id, class: "twcode"), class: "tw:text-sm", if: @display_dev_info) %>
 
       <% list.with_row(label: "Theft description", value: @stolen_record.theft_description) %>
 

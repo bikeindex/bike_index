@@ -3,16 +3,14 @@
 
 - if @kind == "general"
 
-  %h2{class: "tw:mt-6"} Users past week
+  = render(Pages::Admin::Headers::Section::Component.new(title: "Users past week"))
   = render(UI::Chart::Component.new(series: variable_admin_graphs_path(search_kind: "users", period: "week"), stacked: true))
 
-  %h2{class: "tw:mt-6"}
-    Users past year
+  = render(Pages::Admin::Headers::Section::Component.new(title: "Users past year"))
   = render(UI::Chart::Component.new(series: variable_admin_graphs_path(search_kind: "users", period: "year"), stacked: true))
 
 
-  %h2{class: "tw:mt-6"}
-    Bikes past year
+  = render(Pages::Admin::Headers::Section::Component.new(title: "Bikes past year"))
   = render(UI::Chart::Component.new(series: variable_admin_graphs_path(search_kind: "bikes", period: "year"), stacked: true))
 
 - elsif @kind == "bikes"
@@ -22,7 +20,7 @@
 
 - else
   - if @total_count.present?
-    %p{class: "tw:mt-6"}
+    %p{class: "tw:mt-6 tw:mb-4"}
       #{number_display(@total_count)} matching #{@kind}
       %em
         = render(UI::TimeRange::Component.new(time_range: @time_range, period: @period))

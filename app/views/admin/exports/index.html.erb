@@ -2,9 +2,9 @@
   <% if current_organization.present? %>
     <li>
       <span class="tw:px-2.5 tw:py-1 tw:text-xs">
-        <%= link_to current_organization.name, admin_organization_path(current_organization) %>
+        <%= link_to current_organization.name, admin_organization_path(current_organization), class: "twlink" %>
         Exports
-        <small><%= link_to "view orgs view", organization_exports_path(organization_id: current_organization.to_param), class: "twless-strong" %></small>
+        <small><%= link_to "view orgs view", organization_exports_path(organization_id: current_organization.to_param), class: "twlink twless-strong" %></small>
       </span>
     </li>
   <% end %>
@@ -55,7 +55,7 @@
 <% table_view = capture do %>
   <%= render(UI::Table::Component.new(records: @collection, render_sortable: true, sort_state:)) do |table| %>
     <% table.column(sortable: "created_at", label: "Date") do |export| %>
-      <%= link_to organization_export_path(export, organization_id: export.organization.to_param) do %>
+      <%= link_to organization_export_path(export, organization_id: export.organization.to_param), class: "twlink" do %>
         <%= render UI::Time::Component.new(time: export.created_at) %>
       <% end %>
     <% end %>
@@ -98,7 +98,7 @@
 
     <% table.column(label: "Kind") do |export| %>
       <% display_kind = export.avery_export? ? "avery" : export.kind %>
-      <%= link_to display_kind, url_for(sort_state.search_params.merge(search_kind: display_kind)) %>
+      <%= link_to display_kind, url_for(sort_state.search_params.merge(search_kind: display_kind)), class: "twlink" %>
 
       <% if export.assign_bike_codes? %>
         <%= link_to url_for(sort_state.search_params.merge(search_stickers: true)) do %>

@@ -1,14 +1,14 @@
 <%= render(Pages::Admin::Headers::Nav::Component.new(title: "Maintaining things")) %>
 
-<h2>Component manufacturer other</h2>
+<%= render(Pages::Admin::Headers::Section::Component.new(title: "Component manufacturer other")) %>
 
 <%= render partial: "/admin/components/table", locals: {collection: @component_mnfgs} %>
 
-<h2>Component type other</h2>
+<%= render(Pages::Admin::Headers::Section::Component.new(title: "Component type other")) %>
 
 <%= render partial: "/admin/components/table", locals: {collection: @component_types} %>
 
-<h2>Handlebar Types other</h2>
+<%= render(Pages::Admin::Headers::Section::Component.new(title: "Handlebar Types other")) %>
 
 <%= render(UI::Table::Component.new(records: @bikes_other_handlebar_type)) do |table| %>
   <% table.column(label: "Date") do |bike| %>
@@ -20,15 +20,14 @@
   <% end %>
 <% end %>
 
-<h2>
-  Recent example bikes
-  <%= link_to "Delete example bikes", admin_destroy_example_bikes_url %>
-</h2>
+<%= render(Pages::Admin::Headers::Section::Component.new(title: "Recent example bikes")) do %>
+  <%= link_to "Delete example bikes", admin_destroy_example_bikes_url, class: "twlink" %>
+<% end %>
 
 <% if @bikes.any? %>
   <%= render Pages::Admin::Bikes::Table::Component.new(bikes: @bikes, sort_state:) %>
 
-  <p class="tw:text-right">
+  <p class="tw:mb-4 tw:text-right">
     <%= Bike.unscoped.where(example: true).count %> example bikes total
   </p>
 <% else %>

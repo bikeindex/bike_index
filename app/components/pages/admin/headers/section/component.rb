@@ -8,11 +8,12 @@ module Pages
         # index, when there is one. A section that isn't a list, like an edit form, has no count.
         # Block content follows the parenthetical.
         class Component < ApplicationComponent
-          def initialize(title:, count: nil, href: nil, parenthetical: nil)
+          def initialize(title:, count: nil, href: nil, parenthetical: nil, margin_classes: "tw:mt-6 tw:mb-3 tw:first:mt-0")
             @title = title
             @count = count
             @href = href
             @parenthetical = parenthetical
+            @margin_classes = margin_classes
           end
 
           private

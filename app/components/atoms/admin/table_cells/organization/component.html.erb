@@ -1,10 +1,10 @@
 <% if organization_present? %>
-  <%= link_to admin_organization_path(@organization_id) do %>
+  <%= link_to admin_organization_path(@organization_id), class: "twlink" do %>
     <% if organization_subject.blank? %>
       <small class="<%= error_text_class %>" title="<%= @organization_id %>">
         Missing organization
       </small>
-      <code class="tw:text-xs!"><%= @organization_id %></code>
+      <code class="twcode tw:text-xs"><%= @organization_id %></code>
     <% elsif organization_subject.deleted? %>
       <small>
         <span class="twless-strong"><%= display_name %></span>

@@ -3,10 +3,11 @@
 <div class="twwiderow tw:mt-6 tw:items-start">
   <%= render(UI::TableList::Component.new) do |list| %>
     <% list.with_row(label: "ID", dev_only: true, if: display_dev_info?) do %>
-      <code><%= @strava_integration.id %></code>
+      <code class="twcode"><%= @strava_integration.id %></code>
 
       <small class="twless-strong tw:ml-2">
-        Strava ID: <code><%= @strava_integration.strava_id %></code>
+        Strava ID:
+        <code class="twcode"><%= @strava_integration.strava_id %></code>
       </small>
     <% end %>
 
@@ -31,7 +32,7 @@
     <% list.with_row(label: "Status") do %>
       <%# duplicated in strava_integrations/table %>
       <% if @strava_integration.synced? %>
-        <span class="text-success"><%= @strava_integration.status %></span>
+        <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:success] %>"><%= @strava_integration.status %></span>
       <% elsif @strava_integration.error? %>
         <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>"><%= @strava_integration.status %></span>
       <% else %>
@@ -40,7 +41,7 @@
     <% end %>
 
     <% list.with_row(label: "Activities") do %>
-      <%= link_to admin_strava_activities_path(search_strava_integration_id: @strava_integration.id) do %>
+      <%= link_to admin_strava_activities_path(search_strava_integration_id: @strava_integration.id), class: "twlink" do %>
         <%= number_display(@strava_integration.activities_downloaded_count) %>
       <% end %>
 
@@ -66,12 +67,12 @@
 
       <small class="tw:ml-1">
         priority multiplier:
-        <code><%= StravaJobs::ScheduledRequestPriorityUpdator.priority_multiplier(@strava_integration.id) %></code>
+        <code class="twcode"><%= StravaJobs::ScheduledRequestPriorityUpdator.priority_multiplier(@strava_integration.id) %></code>
       </small>
     <% end %>
 
     <% list.with_row(label: "Permissions") do %>
-      <code><%= @strava_integration.strava_permissions %></code>
+      <code class="twcode"><%= @strava_integration.strava_permissions %></code>
 
       <% if @strava_integration.permissions_less? %>
         <%= render UI::Badge::Component.new(text: "less than default", color: :error, size: :sm) %>
@@ -83,7 +84,7 @@
     <% end %>
 
     <% list.with_row(label: "Requests") do %>
-      <%= link_to admin_strava_requests_path(search_strava_integration_id: @strava_integration.id) do %>
+      <%= link_to admin_strava_requests_path(search_strava_integration_id: @strava_integration.id), class: "twlink" do %>
         <% strava_requests_count = @strava_integration.strava_requests.count %>
         <%= number_display(strava_requests_count) %>
         <%= "Strava Requests".pluralize(strava_requests_count) %>
@@ -101,25 +102,27 @@
 
 <% if @strava_integration.strava_gears.any? || unknown_gear %>
   <div class="tw:mt-6">
-    <h4>
-      <%= link_to admin_strava_gears_path(search_strava_integration_id: @strava_integration.id) do %>
+    <% gear_title = capture do %>
+      <%= link_to admin_strava_gears_path(search_strava_integration_id: @strava_integration.id), class: "twlink" do %>
         Strava Gear
         (<%= number_display(@strava_integration.strava_gears.count) %>)
       <% end %>
+    <% end %>
 
+    <%= render(Pages::Admin::Headers::Section::Component.new(title: gear_title)) do %>
       <% if unknown_gear.present? %>
         <small class="tw:mt-2 tw:mb-4 tw:block">
           <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>">Unknown gear IDs:</span>
           <%= unknown_gear.join(", ") %>
         </small>
       <% end %>
-    </h4>
+    <% end %>
 
     <% {bike: "Bikes", shoe: "Shoes"}.each do |gear_type, gear_type_label| %>
       <% gears = @strava_integration.strava_gears.select { |g| g.gear_type == gear_type.to_s }.sort_by { |g| g.strava_gear_display_name.downcase } %>
       <% next if gears.empty? %>
 
-      <h5 class="tw:mt-4"><%= gear_type_label %></h5>
+      <%= render(Pages::Admin::Headers::Section::Component.new(title: gear_type_label)) %>
 
       <%= render partial: "admin/strava_gears/table", locals: {collection: gears, skip_strava_integration: true} %>
     <% end %>

@@ -23,7 +23,7 @@
 
   <% table.column(sortable: "status") do |email_domain| %>
     <% status_class = UI::Alerts::Base::Component::TEXT_CLASSES[:error] if email_domain.status.match?("ban") %>
-    <% status_class = "#{UI::Alerts::Base::Component::TEXT_CLASSES[:warning]} font-weight-bold" if email_domain.ignored? %>
+    <% status_class = "#{UI::Alerts::Base::Component::TEXT_CLASSES[:warning]} tw:font-bold" if email_domain.ignored? %>
 
     <span class="<%= status_class %>">
       <%= email_domain.status_humanized %>

@@ -8,7 +8,7 @@
       = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :image)) do |group|
         - group.with_helper_text { "min-width 726px" }
         = render(UI::Forms::Files::Upload::Component.new(form_builder: f, attribute: :image, accept: ListicleImageUploader.permitted_extensions, html_options: {"aria-describedby" => group.helper_text_id}))
-      %label.index-image-select
+      %label.index-image-select{class: "tw:cursor-pointer"}
         <input type="radio" name="index_image_id" value="#{f.object.id}" class="index_image_#{f.object.id}">
         Primary image
     %div

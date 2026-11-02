@@ -1,5 +1,5 @@
 - if payment.invoice.present? && payment.organization_id.present?
-  #{link_to payment.invoice.display_name, edit_admin_organization_invoice_path(organization_id: payment.organization_id, id: payment.invoice.id)}
+  #{link_to payment.invoice.display_name, edit_admin_organization_invoice_path(organization_id: payment.organization_id, id: payment.invoice.id), class: "twlink"}
   - if payment.invoice.subscription_start_at
     %small
       %em start:

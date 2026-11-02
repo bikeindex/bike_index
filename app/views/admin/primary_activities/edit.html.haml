@@ -12,11 +12,11 @@
     - list.with_row(label: "Top level?", value: (check_mark if @primary_activity.top_level?))
     - list.with_row(label: "Family", value: (check_mark if @primary_activity.family))
     - list.with_row(label: "Family", value: @primary_activity.family_name)
-    - list.with_row(label: "Bike count", value: link_to(number_display(Bike.where(primary_activity_id: @primary_activity.id).count), admin_bikes_path(primary_activity: @primary_activity.id)))
+    - list.with_row(label: "Bike count", value: link_to(number_display(Bike.where(primary_activity_id: @primary_activity.id).count), admin_bikes_path(primary_activity: @primary_activity.id), class: "twlink"))
 
 - if @primary_activity.family?
   %div{class: "tw:my-12"}
-    %h4 Flavors
+    = render(Pages::Admin::Headers::Section::Component.new(title: "Flavors"))
     = render(partial: "table", locals: {collection: @primary_activity_flavors, render_sortable: false})
 
 = render(UI::Container::Component.new(alignment: :left)) do

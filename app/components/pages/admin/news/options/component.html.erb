@@ -72,7 +72,7 @@
           <% if author_needs_personal_page? %>
             <% group.with_helper_text do %>
               Please
-              <%= link_to "turn on your personal page", edit_my_account_url, target: "_blank" %>,
+              <%= link_to "turn on your personal page", edit_my_account_url, target: "_blank", class: "twlink" %>,
               or link your twitter!
             <% end %>
           <% end %>
@@ -96,7 +96,7 @@
 
     <div class="twwiderow tw:mt-2">
       <div class="tw:mb-4">
-        <label>
+        <label class="tw:cursor-pointer">
           <%= @form_builder.radio_button :index_image_id, 0 %> No primary image
           <small class="twless-strong">Otherwise, select a primary image with the radio button next to the image</small>
         </label>

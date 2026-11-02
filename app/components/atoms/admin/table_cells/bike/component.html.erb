@@ -2,7 +2,7 @@
   <small class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">
     Missing bike
     <% if @bike_id.present? %>
-      <code><%= @bike_id %></code>
+      <code class="twcode"><%= @bike_id %></code>
     <% end %>
   </small>
 <% elsif @bike.present? %>

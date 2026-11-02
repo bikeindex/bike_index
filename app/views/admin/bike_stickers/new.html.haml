@@ -1,26 +1,25 @@
-%h1
-  New Bike Sticker Batch
+= render(Pages::Admin::Headers::Nav::Component.new(title: "New Bike Sticker Batch"))
 
 .twwiderow
   = render(UI::Card::Component.new(full_bleed: true, additional_classes: "tw:col-span-full")) do
-    %h4 Examples
-    %p Here are the values for a few example sticker batches.
+    = render(Pages::Admin::Headers::Section::Component.new(title: "Examples"))
+    %p{class: "tw:mb-4"} Here are the values for a few example sticker batches.
     - examples = [{id: 9, name: "#9 (EPS 2)", stickers: ["ED 010 133", "ED 061 132"], prefix: "ED", initial: 10133, count: 51000, length: 6},
       {id: 21, name: "#21 (3rd internal)", stickers: ["A 250 0", "A 309 8"], prefix: "A", initial: 2500, count: 599, length: 4}]
     = render(UI::Table::Component.new(records: examples)) do |table|
       - table.column(label: "Batch") do |batch|
-        = link_to batch[:name], admin_bike_stickers_path(search_bike_sticker_batch_id: batch[:id])
+        = link_to batch[:name], admin_bike_stickers_path(search_bike_sticker_batch_id: batch[:id]), class: "twlink"
       - table.column(label: "First & Last Sticker") do |batch|
         - batch[:stickers].each do |sticker|
           %strong{class: "tw:block tw:text-sm"}= sticker
       - table.column(label: tag.em("Code Prefix")) do |batch|
-        %code= batch[:prefix]
+        %code.twcode= batch[:prefix]
       - table.column(label: tag.em("Initial Sticker number")) do |batch|
-        %code= batch[:initial]
+        %code.twcode= batch[:initial]
       - table.column(label: tag.em("Number of stickers to create")) do |batch|
-        %code= batch[:count]
+        %code.twcode= batch[:count]
       - table.column(label: tag.em("Code Number Length")) do |batch|
-        %code= batch[:length]
+        %code.twcode= batch[:length]
 
 = form_for [:admin, @bike_sticker_batch], url: {action: "create", controller: "bike_stickers"} do |f|
   = render(UI::Alerts::ObjectError::Component.new(name: "Sticker Batch", object: @bike_sticker_batch))

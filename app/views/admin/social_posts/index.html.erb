@@ -34,7 +34,7 @@
       <% if @social_account.present? %>
         <strong>
           from
-          <%= link_to @social_account.screen_name, admin_social_account_path(@social_account) %>
+          <%= link_to @social_account.screen_name, admin_social_account_path(@social_account), class: "twlink" %>
         </strong>
       <% end %>
     </div>

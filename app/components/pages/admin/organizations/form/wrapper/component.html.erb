@@ -138,7 +138,7 @@
     <% if @organization.official_manufacturer? %>
       <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :manufacturer_id, label_text: Organization.human_attribute_name(:manufacturer), required: true)) do |group| %>
         <% group.with_helper_text do %>
-          <strong>This organization has <code>Official manufacturer organization</code> enabled.</strong>
+          <strong>This organization has <code class="twcode">Official manufacturer organization</code> enabled.</strong>
           Select a manufacturer to give them manufacturer access.
         <% end %>
 

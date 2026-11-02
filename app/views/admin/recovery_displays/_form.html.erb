@@ -1,8 +1,8 @@
 <div class="tw:my-6">
   <%= render(UI::Container::Component.new) do %>
-    <h4>Recovery display approval process</h4>
+    <%= render(Pages::Admin::Headers::Section::Component.new(title: "Recovery display approval process")) %>
 
-    <ol class="tw:list-decimal">
+    <ol class="tw:mb-4 tw:list-decimal">
       <li>
         Remove last name from "Quote by" field
       </li>
@@ -35,9 +35,9 @@
 </div>
 
 <% if @bike&.manufacturer.present? %>
-  <p class="tw:mt-6">
+  <p class="tw:mt-6 tw:mb-4">
     <%= @bike.type_titleize %> manufacturer
-    <%= link_to @bike.mnfg_name, admin_manufacturer_path(@bike.manufacturer), target: "_blank" %>
+    <%= link_to @bike.mnfg_name, admin_manufacturer_path(@bike.manufacturer), target: "_blank", class: "twlink" %>
     - Twitter:
     <% if @bike.manufacturer.blank? || @bike.manufacturer.other? %>
       <em class="twless-strong">"other" manufacturer, no twitter</em>
@@ -45,12 +45,12 @@
       <strong>@<%= @bike.manufacturer.twitter_name %></strong>
     <% else %>
       <em class="twless-strong tw:text-sm">Not stored</em>
-      <%= link_to "Add one", edit_admin_manufacturer_path(@bike.manufacturer), target: "_blank" %>
+      <%= link_to "Add one", edit_admin_manufacturer_path(@bike.manufacturer), target: "_blank", class: "twlink" %>
     <% end %>
   </p>
 <% end %>
 
-<hr class="tw:mb-6">
+<hr class="twhr tw:mb-6">
 
 <%# Toggle image initially if the recovery display hasn't been created, and there is an image to toggle %>
 <% toggle_image_initially = @recovery_display.id.blank? && (@bike&.public_images&.present? || @bike&.stock_photo_url&.present?) %>
@@ -99,7 +99,7 @@
                        data: {"admin--character-count-target" => "field", action: "input->admin--character-count#update"}})) %>
 
       <p
-        class="text-info tw:-mt-2 tw:text-right tw:text-lg"
+        class="tw:-mt-2 tw:mb-4 tw:text-right tw:text-lg <%= UI::Alerts::Base::Component::TEXT_CLASSES[:notice] %>"
         data-admin--character-count-target="total"
       ></p>
     </div>
@@ -125,7 +125,10 @@
             <% end %>
             <%= f.hidden_field :remote_photo_url,
                 data: { "admin--recovery-display-form-target" => "remotePhotoUrl" } %>
-            <p data-admin--recovery-display-form-target="bikeImageText">
+            <p
+              class="tw:mb-4"
+              data-admin--recovery-display-form-target="bikeImageText"
+            >
               <span data-admin--recovery-display-form-target="usingBikeImage">
                 Using <%= @bike.type %> image
               </span>

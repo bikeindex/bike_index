@@ -1,17 +1,17 @@
 <%= render(UI::TableList::Component.new) do |list| %>
   <% list.with_row(label: "Associated invoices:") do %>
-    <ul>
+    <ul class="tw:mb-4">
       <li>
         Previous:
         <% if @invoice.previous_invoice.present? %>
-          <%= link_to @invoice.previous_invoice.display_name, edit_admin_organization_invoice_path(organization_id: @invoice.organization.to_param, id: @invoice.previous_invoice.id) %>
+          <%= link_to @invoice.previous_invoice.display_name, edit_admin_organization_invoice_path(organization_id: @invoice.organization.to_param, id: @invoice.previous_invoice.id), class: "twlink" %>
         <% end %>
       </li>
 
       <li>
         Next:
         <% if @invoice.following_invoice.present? %>
-          <%= link_to @invoice.following_invoice.display_name, edit_admin_organization_invoice_path(organization_id: @invoice.organization.to_param, id: @invoice.following_invoice.id) %>
+          <%= link_to @invoice.following_invoice.display_name, edit_admin_organization_invoice_path(organization_id: @invoice.organization.to_param, id: @invoice.following_invoice.id), class: "twlink" %>
         <% else %>
           <% if @invoice.paid_in_full? %>
             <%= render(UI::ButtonLink::Component.new(text: "create following invoice", color: :link, html_class: "tw:font-bold",
@@ -25,7 +25,7 @@
 
       <li>
         <small class="twless-strong">
-          <%= link_to "all organization invoices", admin_organization_invoices_path(@invoice.organization) %>
+          <%= link_to "all organization invoices", admin_organization_invoices_path(@invoice.organization), class: "twlink" %>
         </small>
       </li>
     </ul>
@@ -41,7 +41,7 @@
     <ul class="tw:mb-2">
       <% @invoice.payments.each do |payment| %>
         <li>
-          <%= link_to "#{payment.amount_formatted}", admin_payment_path(payment) %>
+          <%= link_to "#{payment.amount_formatted}", admin_payment_path(payment), class: "twlink" %>
 
           <%= render(UI::Time::Component.new(time: payment.created_at, preposition: true)) %>
         </li>

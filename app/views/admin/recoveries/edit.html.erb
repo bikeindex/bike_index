@@ -5,7 +5,7 @@
 <div class="tw:grid tw:grid-cols-12 tw:gap-x-8 tw:text-center">
   <% if @recovery.waiting_on_decision? %>
     <div class="tw:col-span-12 tw:md:col-span-4">
-      <h4>Choose what to do with this recovery:</h4>
+      <%= render(Pages::Admin::Headers::Section::Component.new(title: "Choose what to do with this recovery:")) %>
     </div>
     <div class="tw:col-span-6 tw:md:col-span-4">
       <%= render(UI::ButtonLink::Component.new(text: "Display recovery", href: new_admin_recovery_display_path(stolen_record_id: @recovery.id), color: :primary, size: :lg, html_class: "tw:w-full")) %>
@@ -16,14 +16,14 @@
     </div>
   <% elsif @recovery.recovery_displayed? %>
     <div class="tw:col-span-6">
-      <p>This recovery is displayed.</p>
+      <p class="tw:mb-4">This recovery is displayed.</p>
     </div>
     <div class="tw:col-span-6">
       <%= render(UI::ButtonLink::Component.new(text: "Edit Recovery Display", href: edit_admin_recovery_display_url(@recovery.recovery_display), color: :primary, size: :lg)) %>
     </div>
   <% elsif @recovery.not_displayed? %>
     <div class="tw:col-span-12">
-      <p>This recovery is not displayed.</p>
+      <p class="tw:mb-4">This recovery is not displayed.</p>
 
       <%= render(UI::ButtonLink::Component.new(text: "Mark Eligible for display", href: admin_recovery_path(id: @recovery.id, stolen_record: {mark_as_eligible: true}),
         method: :put, color: :primary, size: :lg)) %>
@@ -31,40 +31,37 @@
   <% else %>
     <% if !@recovery.recovered? %>
       <div class="tw:col-span-12">
-        <h1 class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">
-          This <%= @bike.type %> has not been marked recovered
-        </h1>
+        <%= render(Pages::Admin::Headers::Section::Component.new(title: tag.span("This #{@bike.type} has not been marked recovered", class: UI::Alerts::Base::Component::TEXT_CLASSES[:error]))) %>
       </div>
       <div class="tw:col-span-12 tw:mb-6">
-        <p class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>">
+        <p class="tw:mb-4 <%= UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>">
           You're viewing this in error, you shouldn't be on this page
         </p>
       </div>
     <% end %>
     <div class="tw:col-span-12">
-      <h4>
-        Display Status:
-        <em><%= @recovery.recovery_display_status.humanize %></em>
-      </h4>
+      <%= render(Pages::Admin::Headers::Section::Component.new(title: safe_join(["Display Status: ", tag.em(@recovery.recovery_display_status.humanize)]))) %>
 
-      <p class="tw:mt-6">
+      <p class="tw:mt-6 tw:mb-4">
         Really want to display this recovery?
-        <%= link_to "Display recovery here", new_admin_recovery_display_path(stolen_record_id: @recovery.id) %>
+        <%= link_to "Display recovery here", new_admin_recovery_display_path(stolen_record_id: @recovery.id), class: "twlink" %>
       </p>
     </div>
   <% end %>
 </div>
 
-<hr style="margin: 60px 0 30px;">
+<hr class="twhr tw:mt-15 tw:mb-7.5">
 
-<h2>Edit recovery information</h2>
+<%= render(Pages::Admin::Headers::Section::Component.new(title: "Edit recovery information")) %>
 
-<p>
+<p class="tw:mb-4">
   You will have a chance to edit the text, when displaying the recovery.
   <em class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>">Don't edit to make it displayable.</em>
 </p>
 
-<p>Only edit if you want to change what is stored about this recovery.</p>
+<p class="tw:mb-4">
+  Only edit if you want to change what is stored about this recovery.
+</p>
 
 <details data-controller="ui--details">
   <summary
@@ -75,7 +72,7 @@
   </summary>
 
   <div data-ui--details-target="content" class="tw:hidden!">
-    <hr class="tw:mt-12 tw:mb-6">
+    <hr class="twhr tw:mt-12 tw:mb-6">
 
     <%= form_for([:admin, @recovery], url: { action: "update", controller: "recoveries" }) do |f| %>
       <%= render(UI::Alerts::ObjectError::Component.new(name: "Recovery", object: @recovery)) %>

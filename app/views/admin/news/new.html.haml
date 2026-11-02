@@ -1,5 +1,4 @@
-%h1
-  New #{@dignified_name}
+= render(Pages::Admin::Headers::Nav::Component.new(title: "New #{@dignified_name}"))
 
 - url = {action: "create", controller: "news"}
 = form_for [:admin, @blog], :url => url do |f|

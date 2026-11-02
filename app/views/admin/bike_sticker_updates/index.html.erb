@@ -100,18 +100,19 @@
       class="matching-bike-stickers tw:my-6 tw:px-4 tw:pt-6 tw:pb-2"
       style="background: rgba(0, 0, 0, 0.05); border: 1px solid #ccc;"
     >
-      <h2>
+      <% matching_title = capture do %>
         Matching
         <% if params[:search_query].present? %>
-          <%= link_to "bike stickers", admin_bike_stickers_path(search_query: params[:search_query]) %>
+          <%= link_to "bike stickers", admin_bike_stickers_path(search_query: params[:search_query]), class: "twlink" %>
         <% else %>
           bike stickers
         <% end %>
-        <small><%= number_display(@searched_bike_stickers.count) %></small>
-      </h2>
+      <% end %>
+
+      <%= render(Pages::Admin::Headers::Section::Component.new(title: matching_title, count: @searched_bike_stickers.count)) %>
 
       <% if @searched_bike_stickers.count > 100 %>
-        <h3>More than 100 matching stickers, just showing the first 100</h3>
+        <%= render(Pages::Admin::Headers::Section::Component.new(title: "More than 100 matching stickers, just showing the first 100")) %>
       <% end %>
 
       <%= render partial: "/admin/bike_stickers/table", locals: {bike_stickers: @searched_bike_stickers.limit(100)} %>
