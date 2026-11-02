@@ -2,11 +2,11 @@
 
 <%= render(Pages::Admin::Users::Edit::Component.new(user: @user, current_user:, display_dev_info: display_dev_info?)) %>
 
-<hr class="tw:mt-6">
+<hr class="twhr tw:mt-6">
 
 <%= render(Pages::Admin::Users::MailchimpData::Component.new(user: @user)) %>
 
-<hr style="margin-top: 60px;">
+<hr class="twhr tw:mt-15">
 
 <div class="twwiderow tw:my-6">
   <div class="tw:mb-6">
@@ -21,17 +21,17 @@
 
     <div class="tw:mt-2 tw:hidden" data-ui--collapse-target="content">
       <%= render(UI::Card::Component.new) do %>
-        <p>
+        <p class="tw:mb-4">
           Add another email to this user.
         </p>
 
-        <p>
+        <p class="tw:mb-4">
           <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">WARNING</span>
           this does not send a confirmation email or check that they have access
           to the email you merge with.
         </p>
 
-        <p>
+        <p class="tw:mb-4">
           <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>">
             We can <strong>not</strong> undo this.
           </span>

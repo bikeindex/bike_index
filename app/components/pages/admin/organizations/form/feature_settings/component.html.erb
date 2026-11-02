@@ -1,10 +1,10 @@
 <%= render(UI::Card::Component.new) do %>
-  <h4 class="tw:mb-6">Settings for organization features</h4>
+  <%= render(Pages::Admin::Headers::Section::Component.new(title: "Settings for organization features", margin_classes: "tw:mb-6")) %>
 
   <% if @organization.enabled?("graduated_notifications") %>
     <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :graduated_notification_interval_days, kind: :number_field, label_text: "Interval for send graduated notifications, in days")) do |group| %>
       <% group.with_label_note do %>
-        <span class="text-success">graduated_notifications setting</span>
+        <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:success] %>">graduated_notifications setting</span>
       <% end %>
 
       <% group.with_helper_text do %>
@@ -19,14 +19,14 @@
   <% if @organization.enabled?("regional_bike_counts") %>
     <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: search_radius[:attribute], kind: :number_field, label_text: "Search radius (#{search_radius[:unit]})")) do |group| %>
       <% group.with_label_note do %>
-        <span class="text-success">regional bike counts setting</span>, controls
-        how large the region is to associate regional sub-organizations
+        <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:success] %>">regional bike counts setting</span>,
+        controls how large the region is to associate regional sub-organizations
       <% end %>
 
       <% group.with_helper_text do %>
         <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>">
-          <code class="d-inline">nearby_organizations</code> will search within
-          this radius for other organizations in the same area
+          <code class="twcode tw:inline">nearby_organizations</code> will search
+          within this radius for other organizations in the same area
         </span>
       <% end %>
     <% end %>
@@ -35,7 +35,7 @@
   <% if domain_uses.any? %>
     <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :user_email_domain, label_text: "permitted domain for #{domain_uses.to_sentence}")) do |group| %>
       <% group.with_label_note do %>
-        <%= safe_join(domain_uses.map { |domain_use| tag.span("#{domain_use} feature", class: "text-success") }, " ") %>
+        <%= safe_join(domain_uses.map { |domain_use| tag.span("#{domain_use} feature", class: UI::Alerts::Base::Component::TEXT_CLASSES[:success]) }, " ") %>
       <% end %>
 
       <% unless developer? %>
@@ -61,9 +61,9 @@
     <div class="tw:mt-6">
       <%= render(UI::Forms::Group::Component.new(attribute: :organization_stolen_message_kind, label_text: "Stolen Message type")) do |group| %>
         <% group.with_helper_text do %>
-          <span class="text-success">Organization Stolen Message setting</span>,
+          <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:success] %>">Organization Stolen Message setting</span>,
           edit message in the
-          <%= link_to "orgs own edit page", edit_organization_email_path("organization_stolen_message", organization_id: @organization.to_param) %>
+          <%= link_to "orgs own edit page", edit_organization_email_path("organization_stolen_message", organization_id: @organization.to_param), class: "twlink" %>
         <% end %>
 
         <%= select_tag :organization_stolen_message_kind, options_for_select(stolen_message_kind_options, selected: organization_stolen_message.kind), class: "twinput", "aria-describedby" => group.helper_text_id, data: {"admin--organization-form-target": "stolenMessageKind", action: "change->admin--organization-form#toggleStolenMessageArea"} %>
@@ -75,7 +75,7 @@
       >
         <%= render(UI::Forms::Group::Component.new(attribute: stolen_message_radius[:attribute], label_text: "Stolen Message radius (#{stolen_message_radius[:unit]})")) do |group| %>
           <% group.with_helper_text do %>
-            <span class="text-success">Organization Stolen Message setting</span>
+            <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:success] %>">Organization Stolen Message setting</span>
             - only available for area type
             <span class="twless-strong">max <%= stolen_message_radius[:max] %></span>
           <% end %>

@@ -1,7 +1,6 @@
-<h4 class="tw:mt-4 <%= UI::Alerts::Base::Component::TEXT_CLASSES[:success] %>">
-  Recovery Information
+<%= render(Pages::Admin::Headers::Section::Component.new(title: tag.span("Recovery Information", class: UI::Alerts::Base::Component::TEXT_CLASSES[:success]))) do %>
   <%= link_to "view", admin_recovery_path(@stolen_record.to_param), class: "twlink tw:ml-2 tw:text-sm" %>
-</h4>
+<% end %>
 
 <div class="tw:flex tw:flex-wrap">
   <div class="tw:w-full tw:lg:w-1/2 tw:lg:pr-4">

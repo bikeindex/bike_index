@@ -3,8 +3,8 @@
 = render(Pages::Admin::Headers::Section::Component.new(title: "Ownerships", count: @bike.ownerships.count))
 = render partial: "/admin/ownerships/table", locals: {ownerships: @bike.ownerships.reorder(created_at: :desc), skip_bike: true}
 
-= render(Pages::Admin::Headers::Section::Component.new(title: safe_join(["Edit ownership ", tag.code(@ownership.id)])))
-%p{class: "tw:font-bold #{UI::Alerts::Base::Component::TEXT_CLASSES[:error]}"}
+= render(Pages::Admin::Headers::Section::Component.new(title: safe_join(["Edit ownership ", tag.code(@ownership.id, class: "twcode")])))
+%p{class: "tw:mb-4 tw:font-bold #{UI::Alerts::Base::Component::TEXT_CLASSES[:error]}"}
   BE CAREFUL. YOU CAN BREAK STUFF HERE
 
 .twwiderow{class: "tw:items-start"}
@@ -33,13 +33,14 @@
     - list.with_row(label: "Cached Data", value: @bike.cached_data)
     - list.with_row(label: "Token") do
       - if @ownership.token.present?
-        %code
-          = link_to @ownership.token, bike_path(@bike.to_param, t: @ownership.token)
+        %code.twcode
+          = link_to @ownership.token, bike_path(@bike.to_param, t: @ownership.token), class: "twlink"
     - list.with_row(label: "Claim message", value: @ownership.claim_message&.humanize)
     - list.with_row(label: "Pre-registration?", value: (check_mark if @ownership.organization_pre_registration))
     - list.with_row(label: "Origin", value: render(Atoms::Org::OriginDisplay::Component.new(creation_kind: @ownership.origin)))
 
 - if display_dev_info?
   = render(UI::Container::Component.new(alignment: :left)) do
-    %h5.only-dev-visible{class: "tw:mt-12"} Registration info
+    .only-dev-visible{class: "tw:mt-12"}
+      = render(Pages::Admin::Headers::Section::Component.new(title: "Registration info"))
     = render UI::JsonDisplay::Component.new(data: @ownership.registration_info, skip_blank: true, no_max_height: true)

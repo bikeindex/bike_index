@@ -1,11 +1,11 @@
 <%= render(Pages::Admin::Headers::Nav::Component.new(title: "Bike Version")) %>
 
 <div class="twwiderow tw:mt-6 tw:items-start">
-  <% visibility_class = "text-success" if @bike_version.all_visible? %>
+  <% visibility_class = UI::Alerts::Base::Component::TEXT_CLASSES[:success] if @bike_version.all_visible? %>
   <% visibility_class = "twless-strong" if @bike_version.user_hidden? %>
 
   <%= render(UI::TableList::Component.new) do |list| %>
-    <% list.with_row(label: "ID", dev_only: true, value: tag.code(@bike_version.id), if: display_dev_info?) %>
+    <% list.with_row(label: "ID", dev_only: true, value: tag.code(@bike_version.id, class: "twcode"), if: display_dev_info?) %>
 
     <% list.with_row(label: "Name", value: @bike_version.name) %>
 
@@ -37,11 +37,11 @@
 
 <% if @bike_version.public_images.any? %>
   <div class="tw:mt-6">
-    <h3>Images</h3>
+    <%= render(Pages::Admin::Headers::Section::Component.new(title: "Images")) %>
 
     <div class="tw:grid tw:gap-x-8 tw:md:grid-cols-4">
       <% @bike_version.public_images.each do |image| %>
-        <%= image_tag image.image_url(:medium), class: "img-fluid", alt: image.image_alt %>
+        <%= image_tag image.image_url(:medium), alt: image.image_alt %>
       <% end %>
     </div>
   </div>

@@ -13,7 +13,7 @@
         = @customer_contact.kind.humanize
     - list.with_row(label: "Bike") do
       - if @customer_contact.bike.present?
-        = link_to organized_bike_text(@customer_contact.bike), edit_admin_bike_path(@customer_contact.bike)
+        = link_to organized_bike_text(@customer_contact.bike), edit_admin_bike_path(@customer_contact.bike), class: "twlink"
       - else
         %small.twless-strong Bike ID: #{@customer_contact.bike_id}
   = render(UI::TableList::Component.new) do |list|

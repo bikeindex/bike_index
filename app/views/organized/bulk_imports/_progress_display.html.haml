@@ -13,7 +13,7 @@
         currently
         %code= bulk_import.progress
 - else
-  - bulk_import_progress_class = bulk_import.progress == "finished" ? "text-success" : ""
+  - bulk_import_progress_class = bulk_import.progress == "finished" ? UI::Alerts::Base::Component::TEXT_CLASSES[:success] : ""
   %span{class: bulk_import_progress_class}
     = bulk_import.progress
   - if show_extended && bulk_import.line_errors.present?

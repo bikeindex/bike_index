@@ -3,15 +3,15 @@
 <div class="twwiderow tw:mt-6 tw:items-start">
   <%= render(UI::TableList::Component.new) do |list| %>
     <% if display_dev_info? %>
-      <% list.with_row(label: "ID", dev_only: true, value: tag.code(@bug_report.id)) %>
-      <% list.with_row(label: "Inbound email", dev_only: true, value: tag.code(@bug_report.inbound_email_id)) %>
+      <% list.with_row(label: "ID", dev_only: true, value: tag.code(@bug_report.id, class: "twcode")) %>
+      <% list.with_row(label: "Inbound email", dev_only: true, value: tag.code(@bug_report.inbound_email_id, class: "twcode")) %>
     <% end %>
 
     <% list.with_row(label: "Sender") do %>
       <div><%= @bug_report.from_name %></div>
 
       <div>
-        <%= content_tag(:code, @bug_report.email) %>
+        <%= content_tag(:code, @bug_report.email, class: "twcode") %>
 
         <%= mail_to @bug_report.email, inline_svg_tag("icons/envelope.svg", class: "tw:inline-block tw:h-4 tw:w-4"), class: "twlink tw:ml-1", title: "Email #{@bug_report.email}" %>
 
@@ -66,7 +66,10 @@
 </div>
 
 <%= render(UI::Card::Component.new(additional_classes: "tw:max-w-3xl")) do %>
-  <p><strong>Subject:</strong> <%= @bug_report.display_subject %></p>
+  <p class="tw:mb-4">
+    <strong>Subject:</strong> <%= @bug_report.display_subject %>
+  </p>
+
   <%= render(UI::UserTextBlockDisplay::Component.new(text: @bug_report.body_stripped, max_height_class: "")) %>
 <% end %>
 
@@ -78,19 +81,19 @@
 
     <div data-ui--collapse-target="content" class="tw:hidden">
       <%= render(UI::Card::Component.new) do %>
-        <pre class="tw:overflow-x-auto"><code><%= @bug_report.body %></code></pre>
+        <pre class="tw:mb-4 tw:overflow-x-auto"><code class="tw:text-sm"><%= @bug_report.body %></code></pre>
       <% end %>
     </div>
   </div>
 <% end %>
 
 <% if @bug_report.images.attached? %>
-  <h2 class="tw:mt-12">Images</h2>
+  <%= render(Pages::Admin::Headers::Section::Component.new(title: "Images", margin_classes: "tw:mt-12 tw:mb-3")) %>
   <div class="tw:flex tw:flex-wrap tw:gap-4">
     <% @bug_report.images.each do |image| %>
       <div>
         <%= link_to BlobUrl.for(image.blob), target: "_blank", rel: "noopener" do %>
-          <%= image_tag BlobUrl.for(image.blob), alt: image.filename, class: "img-thumbnail tw:max-h-72" %>
+          <%= image_tag BlobUrl.for(image.blob), alt: image.filename, class: "tw:max-h-72 tw:rounded tw:border tw:border-gray-200 tw:p-1" %>
         <% end %>
 
         <div class="twless-strong tw:text-sm">

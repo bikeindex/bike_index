@@ -1,5 +1,5 @@
 = render(UI::Container::Component.new(width: :wide)) do
-  %h1 New Promoted Alert Plan
+  = render(Pages::Admin::Headers::Nav::Component.new(title: "New Promoted Alert Plan"))
 
   = render "form",
     record: @theft_alert_plan,

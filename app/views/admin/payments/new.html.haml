@@ -1,5 +1,4 @@
-%h1
-  New Payment
+= render(Pages::Admin::Headers::Nav::Component.new(title: "New Payment"))
 
 = form_for [:admin, @payment] do |f|
   = render(UI::Alerts::ObjectError::Component.new(object: @payment))

@@ -17,19 +17,14 @@
       type="text/css"
     >
 
-    <%= stylesheet_link_tag "tailwind", "admin", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
     <%= hw_combobox_style_tag %>
     <%= javascript_importmap_tags %>
 
     <%# = hotwire_livereload_tags if Rails.env.development? %>
   </head>
 
-  <%# manually override body_class in a few situations :/ %>
-  <% admin_body_class = "welcome-page" if current_page?(root_path) and controller_name == "welcome" %>
-  <% admin_body_class = "vendor-signup-page" if current_page?(:vendor_signup) %>
-  <% admin_body_class = "news-page" if controller_name == "news" %>
-
-  <%= body_tag(html_class: class_names(admin_body_class, dark: current_user&.dark_mode_dark?), data: {turbo: true}) do %>
+  <%= body_tag(html_class: class_names(dark: current_user&.dark_mode_dark?), data: {turbo: true}) do %>
     <% if current_user&.dark_mode_system? %>
       <%# Before anything paints, so the page doesn't flash light. A block, because Turbo re-runs it on each visit %>
       <script>

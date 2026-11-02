@@ -29,7 +29,7 @@
       <% if bike_version.user_hidden? %>
         <span class="twless-strong">hidden</span>
       <% elsif bike_version.all_visible? %>
-        <span class="text-success">visible</span>
+        <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:success] %>">visible</span>
       <% else %>
         <small><%= bike_version.visibility&.humanize %></small>
       <% end %>

@@ -1,5 +1,5 @@
-%h1{class: "tw:mt-6"}
-  Edit Superuser Ability
+%div{class: "tw:mt-6"}
+  = render(Pages::Admin::Headers::Nav::Component.new(title: "Edit Superuser Ability"))
 
 .twwiderow{class: "tw:items-start tw:mb-6"}
   = render(UI::TableList::Component.new) do |list|

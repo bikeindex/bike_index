@@ -13,13 +13,13 @@
 
     <% table.column(sortable: "status") do |theft_alert| %>
       <% if theft_alert.recovered? %>
-        <%= link_to "recovered!", admin_recovery_path(theft_alert.stolen_record), class: "text-success" %>
+        <%= link_to "recovered!", admin_recovery_path(theft_alert.stolen_record), class: UI::Alerts::Base::Component::TEXT_CLASSES[:success] %>
       <% end %>
 
       <% if theft_alert.failed_to_activate? %>
         <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">Failed activation!</span>
       <% elsif theft_alert.activating? %>
-        <span class="text-success">activating!</span>
+        <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:success] %>">activating!</span>
       <% else %>
         <% unless theft_alert.recovered? && theft_alert.inactive? %>
           <span class="<%= helpers.theft_alert_status_class(theft_alert) %>">
@@ -28,7 +28,7 @@
         <% end %>
         <% if theft_alert.pending? %>
           <% if theft_alert.activateable? %>
-            <em class="text-success tw:text-sm">activateable</em>
+            <em class="tw:text-sm <%= UI::Alerts::Base::Component::TEXT_CLASSES[:success] %>">activateable</em>
           <% else %>
             <em class="tw:block tw:text-sm">
               <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">missing:</span>

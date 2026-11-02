@@ -58,15 +58,17 @@ module OrganizedHelper
   def status_display_class(status)
     return "" if status.blank?
 
+    text_classes = UI::Alerts::Base::Component::TEXT_CLASSES
+
     case status.downcase
     when "current", "paging", "being_helped"
-      "text-success"
+      text_classes[:success]
     when "stolen", /uncertified/
-      "text-warning"
+      text_classes[:warning]
     when "resolved_otherwise", "on_deck", /approved/, /retrieved/, "bike graduated", /certified_by/
-      "text-info"
+      text_classes[:notice]
     when /removed/, "impounded", "trashed", "failed_to_find", /denied/, "delivery failure"
-      UI::Alerts::Base::Component::TEXT_CLASSES[:error]
+      text_classes[:error]
     else
       "twless-strong"
     end

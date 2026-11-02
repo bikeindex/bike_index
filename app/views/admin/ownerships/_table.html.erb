@@ -2,7 +2,7 @@
 
 <div class="tw:mt-4">
   <%= render(UI::Table::Component.new(records: ownerships, render_sortable:, sort_state:)) do |table| %>
-    <% table.column(sortable: "created_at", lower_right: ->(ownership) { content_tag(:code, ownership.id, class: "tw:hidden tw:md:inline") }) do |ownership| %>
+    <% table.column(sortable: "created_at", lower_right: ->(ownership) { content_tag(:code, ownership.id, class: "twcode tw:hidden tw:md:inline") }) do |ownership| %>
       <%= link_to edit_admin_ownership_url(ownership.id), class: "twlink" do %>
         <%= render UI::Time::Component.new(time: ownership.created_at) %>
       <% end %>

@@ -1,6 +1,6 @@
 <nav
   class="
-    tw:flex! tw:flex-wrap tw:items-center tw:justify-between tw:bg-gray-50
+    tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:bg-gray-50
     tw:px-4 tw:py-2 tw:md:flex-nowrap tw:md:justify-start
     tw:dark:bg-gray-800
   "
@@ -10,7 +10,7 @@
   </span>
 
   <% if @current_user.superuser? %>
-    <ul class="tw:m-0 tw:hidden tw:list-none tw:p-0 tw:lg:flex">
+    <ul class="tw:hidden tw:lg:flex">
       <% shortcut_links.each do |link| %>
         <li>
           <%= render UI::ActiveLink::Component.from_item(link, html_class: NAV_LINK_CLASS,

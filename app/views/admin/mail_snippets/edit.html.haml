@@ -1,5 +1,5 @@
-%h1{class: "tw:mt-6"}
-  Edit Snippet
+%div{class: "tw:mt-6"}
+  = render(Pages::Admin::Headers::Nav::Component.new(title: "Edit Snippet"))
 
 = render(UI::Container::Component.new(alignment: :left)) do
   = form_for [:admin, @mail_snippet] do |f|

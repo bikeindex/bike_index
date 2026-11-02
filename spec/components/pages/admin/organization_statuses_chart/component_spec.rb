@@ -46,16 +46,16 @@ RSpec.describe Pages::Admin::OrganizationStatusesChart::Component, type: :compon
 
   describe "chart visibility" do
     it "renders both charts by default" do
-      expect(component).to have_css("h4", text: /POS kinds.*start_at/)
-      expect(component).to have_css("h4", text: /POS kinds.*end_at/)
+      expect(component).to have_css("h3", text: /POS kinds.*start_at/)
+      expect(component).to have_css("h3", text: /POS kinds.*end_at/)
     end
 
     context "when ended" do
       let(:options) { super().merge(ended: true) }
 
       it "hides the start_at chart" do
-        expect(component).not_to have_css("h4", text: /POS kinds.*start_at/)
-        expect(component).to have_css("h4", text: /POS kinds.*end_at/)
+        expect(component).not_to have_css("h3", text: /POS kinds.*start_at/)
+        expect(component).to have_css("h3", text: /POS kinds.*end_at/)
       end
     end
 
@@ -63,8 +63,8 @@ RSpec.describe Pages::Admin::OrganizationStatusesChart::Component, type: :compon
       let(:options) { super().merge(current: true) }
 
       it "hides the end_at chart" do
-        expect(component).to have_css("h4", text: /POS kinds.*start_at/)
-        expect(component).not_to have_css("h4", text: /POS kinds.*end_at/)
+        expect(component).to have_css("h3", text: /POS kinds.*start_at/)
+        expect(component).not_to have_css("h3", text: /POS kinds.*end_at/)
       end
     end
   end
