@@ -851,6 +851,12 @@ RSpec.describe "BikeBook", :js, type: :system do
     visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_rec_step_through,m/specialized/2025/haul_st")
     expect(page).to have_css("[aria-label='Overview comparison'] tr input[type='radio']", visible: :all, wait: 10)
     expect(page.evaluate_script("document.documentElement.scrollWidth")).to eq 390
+    # nor does the filters' toggle, whose segments stack
+    click_on "More filters", match: :first
+    expect(page).to have_css("#vehicle-filters", visible: true)
+    tops = -> { all("label:has(input[name='market_scope'])").map { it.evaluate_script("this.getBoundingClientRect().top") }.uniq.count }
+    page.document.synchronize { raise Capybara::ExpectationNotMet unless tops.call == 3 }
+    expect(page.evaluate_script("document.documentElement.scrollWidth")).to eq 390
     page.current_window.resize_to(*window_size)
 
     # a model's group leaves out the models the market does, until any market will do

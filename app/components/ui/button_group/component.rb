@@ -6,7 +6,7 @@ module UI
     # UI::Forms::RadioButtonGroup, which builds on CHIP_CLASSES and SEGMENT_CLASSES.
     #
     # kind: :toggle renders them as a segmented control instead — one track, with the
-    # active entry raised out of it.
+    # active entry raised out of it. Where they don't fit on a line, ui--toggle stacks them all.
     class Component < ApplicationComponent
       # Template Dependency: UI::Button::Component
       KINDS = %i[button toggle].freeze
@@ -21,7 +21,7 @@ module UI
       FULL_WIDTH_ROW_CLASSES = "tw:grid tw:grid-cols-[repeat(auto-fit,minmax(4rem,1fr))] tw:gap-2"
 
       # Track and segment sizes come from kelsey_redesign/new-org-search/, not the type scale
-      TRACK_CLASSES = "tw:inline-flex tw:gap-[3px] tw:rounded-[10px] tw:border tw:border-gray-200 " \
+      TRACK_CLASSES = "tw:inline-flex tw:flex-wrap tw:gap-[3px] tw:rounded-[10px] tw:border tw:border-gray-200 " \
         "tw:bg-gray-100 tw:p-[3px] tw:dark:border-gray-700 tw:dark:bg-gray-800"
 
       # Only what the segment doesn't share with a button — the rest is UI::Button's
@@ -55,15 +55,18 @@ module UI
         end
       end
 
+      def self.group_data(kind:) = (kind == :toggle) ? {controller: "ui--toggle"} : nil
+
       # entries: ComponentStructs::Shapes' entries
       def initialize(entries:, full_width: false, kind: :button)
         @group_classes = self.class.group_classes(kind:, full_width:)
+        @group_data = self.class.group_data(kind:)
         @chip_classes = (kind == :toggle) ? SEGMENT_CLASSES : CHIP_CLASSES
         @entries = entries
       end
 
       def call
-        tag.div(class: @group_classes) do
+        tag.div(class: @group_classes, data: @group_data) do
           safe_join(@entries.map { |entry| chip(entry) })
         end
       end
