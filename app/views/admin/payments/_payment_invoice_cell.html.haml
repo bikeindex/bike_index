@@ -3,5 +3,4 @@
   - if payment.invoice.subscription_start_at
     %small
       %em start:
-      %span.localizeTime
-        = l payment.invoice.subscription_start_at, format: :convert_time
+      = render(UI::Time::Component.new(time: payment.invoice.subscription_start_at))

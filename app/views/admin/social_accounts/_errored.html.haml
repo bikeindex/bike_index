@@ -14,4 +14,4 @@
           %em
             = SocialAccount.active.errored.pluck(:screen_name).sort.join(", ")
 
-        = render(UI::ButtonLink::Component.new(href: "/auth/twitter", text: "Log in with any of these accounts to refresh their credentials", color: :primary))
+        = render(UI::ButtonLink::Component.new(text: "Log in with any of these accounts to refresh their credentials", href: "/auth/twitter", color: :primary))
