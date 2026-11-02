@@ -13,8 +13,7 @@
       <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :controller_name,
           html_options: {autocomplete: "off"})) do |group| %>
         <% group.with_helper_text do %>
-          <em>leave blank</em> for a universal ability - access to all of
-          admin
+          <em>leave blank</em> for a universal ability - access to all of admin
         <% end %>
       <% end %>
 
