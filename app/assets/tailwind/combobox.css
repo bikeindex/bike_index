@@ -23,6 +23,8 @@
   --hw-border-radius: 0.25rem; /* matches .twinput's rounded-sm */
   --hw-combobox-width: 100%;
   --hw-combobox-width--multiple: 100%;
+  /* over the page's own z-10 and z-20, which the gem's 10 lets through */
+  --hw-listbox-z-index: 30;
 
   color: var(--hw-text-color);
   width: 100%;
