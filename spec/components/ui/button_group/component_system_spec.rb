@@ -43,6 +43,8 @@ RSpec.describe UI::ButtonGroup::Component, :js, type: :system do
     # room for two on a line, where they'd otherwise stay
     resize_window(width: 230, height: 600)
     settled_on.call(3)
+    # their labels at one left edge, though they're different widths
+    expect(all("button span").map { it.evaluate_script("this.getBoundingClientRect().left") }.uniq.count).to eq 1
     resize_window(width: 1024, height: 600)
     settled_on.call(1)
   end

@@ -32,6 +32,7 @@ module UI
         # The line height is part of the size: an arbitrary font size pairs none of its own,
         # so the page's inherited 30px made a 24px segment 40px tall
         "tw:rounded-lg tw:px-3 tw:py-[5px] tw:text-[11.5px]/[1.2] tw:font-extrabold tw:whitespace-nowrap tw:transition-colors",
+        "tw:justify-start!", # over BASE_CLASSES' centering, once stacked segments are as wide as their track
         "tw:no-underline tw:hover:no-underline tw:text-gray-400",
         "tw:not-disabled:not-aria-disabled:hover:text-gray-900",
         "tw:focus:ring-purple-500/40",
