@@ -33,7 +33,7 @@ RSpec.describe Pages::Admin::Headers::Section::Component, type: :component do
     let(:options) { {title: "Ban information", tag: :h3} }
 
     it "renders a smaller heading" do
-      expect(component).to have_css("h3.tw:text-xl", text: "Ban information")
+      expect(component).to have_css("h3.tw\\:text-xl", text: "Ban information")
     end
   end
 
