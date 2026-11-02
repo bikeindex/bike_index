@@ -1,8 +1,8 @@
 %h1
   New Bike Sticker Batch
 
-.card.bg-light
-  .card-body
+.twwiderow
+  = render(UI::Card::Component.new(full_bleed: true, additional_classes: "tw:col-span-full tw:min-w-0 tw:overflow-x-auto")) do
     %h4 Examples
     %p Here are the values for a few example sticker batches.
     %table.table.table-sm.table-bordered.table-striped
@@ -59,7 +59,7 @@
         = render UI::Forms::Combobox::Component.new(name: :organization_id, options: @organizations.pluck(:name, :id), include_blank: true, html_options: {form: f, placeholder: "Choose organization", required: true})
     %div{class: "tw:lg:col-span-3"}
       = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :notes))
-  .twfieldrow{class: "tw:mt-2"}
+  .twfieldrow{class: "tw:mt-2 tw:items-end"}
     = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :prefix, label_text: "Code letter prefix", required: true))
     = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :initial_code_integer, kind: :number_field, label_text: "Initial sticker number", required: true))
     = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :code_number_length, kind: :number_field, label_text: "Code Number Length")) do |group|

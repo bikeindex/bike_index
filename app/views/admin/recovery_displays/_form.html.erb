@@ -67,7 +67,7 @@
     <%= f.hidden_field :stolen_record_id, value: @recovery_display.stolen_record_id %>
   <% end %>
 
-  <div class="twfieldrow">
+  <div class="twwiderow twwiderow-3 tw:items-end">
     <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :quote_by, label_text: "Quote By")) do |group| %>
       <% group.with_label_note do %>
         (full name: <em><%= @recovery_display.calculated_owner_name %></em>)

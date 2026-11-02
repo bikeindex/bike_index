@@ -5,7 +5,7 @@
     = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :name))
     = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :language)) do
       = render(UI::Forms::Select::Component.new(form_builder: f, attribute: :language, option_tags: language_choices))
-  %div{class: "tw:grid tw:grid-cols-2 tw:gap-x-2 tw:sm:grid-cols-3"}
+  %div{class: "tw:grid tw:grid-cols-2 tw:items-end tw:gap-x-2 tw:sm:grid-cols-3"}
     = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :currency_enum, label_text: "Currency")) do
       = render(UI::Forms::Select::Component.new(form_builder: f, attribute: :currency_enum, option_tags: Currency.select_options))
     = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :amount_cents, kind: :number_field, label_text: "Price (cents)"))

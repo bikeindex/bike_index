@@ -3,7 +3,7 @@
 <%= form_for @user, url: admin_user_path(@user), method: :patch, html: {data: {controller: "admin--user-edit-form"}} do |f| %>
   <%= render(UI::Alerts::ObjectError::Component.new(object: @user)) %>
 
-  <div class="twfieldrow tw:mt-6">
+  <div class="twwiderow tw:mt-6">
     <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :name)) %>
 
     <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :email, required: true)) do %>
@@ -11,7 +11,7 @@
     <% end %>
   </div>
 
-  <div class="twfieldrow">
+  <div class="twwiderow">
     <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :username)) %>
 
     <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :secondary_emails, kind: :text_area,
