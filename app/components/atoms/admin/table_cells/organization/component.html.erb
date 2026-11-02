@@ -4,7 +4,7 @@
       <small class="<%= error_text_class %>" title="<%= @organization_id %>">
         Missing organization
       </small>
-      <code class="tw:text-xs!"><%= @organization_id %></code>
+      <code class="tw:text-xs"><%= @organization_id %></code>
     <% elsif organization_subject.deleted? %>
       <small>
         <span class="twless-strong"><%= display_name %></span>

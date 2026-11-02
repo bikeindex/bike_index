@@ -6,7 +6,9 @@
   <% end %>
 
   <% table.column(label: "Description") do |task| %>
-    <%= task.description_html.html_safe %>
+    <div class="tw:prose tw:max-w-none tw:text-sm">
+      <%= task.description_html.html_safe %>
+    </div>
   <% end %>
 
   <% table.column(label: "") do |task| %>

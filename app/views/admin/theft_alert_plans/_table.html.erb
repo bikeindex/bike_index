@@ -18,7 +18,9 @@
   <% end %>
 
   <% table.column(label: "Description") do |plan| %>
-    <%= plan.description_html.html_safe %>
+    <div class="tw:prose tw:max-w-none tw:text-sm">
+      <%= plan.description_html.html_safe %>
+    </div>
   <% end %>
 
   <% table.column(label: "Language") do |plan| %>

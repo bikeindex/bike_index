@@ -50,7 +50,7 @@
   </p>
 <% end %>
 
-<hr class="twhr tw:mb-6">
+<hr class="twhr tw:mt-4 tw:mb-6">
 
 <%# Toggle image initially if the recovery display hasn't been created, and there is an image to toggle %>
 <% toggle_image_initially = @recovery_display.id.blank? && (@bike&.public_images&.present? || @bike&.stock_photo_url&.present?) %>

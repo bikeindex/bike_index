@@ -49,7 +49,7 @@ RSpec.describe Atoms::Admin::TableCells::User::Component, type: :component do
     it "renders missing user warning" do
       expect(component.text).to include("Missing user")
       expect(component.text).to include("888")
-      expect(component.css("code.tw\\:text-xs\\!")).to be_present
+      expect(component.css("code.tw:text-xs")).to be_present
       # There is no email to label it with, so a link would read as its own href
       expect(component.css("a.twlink-underlined")).to be_blank
     end
