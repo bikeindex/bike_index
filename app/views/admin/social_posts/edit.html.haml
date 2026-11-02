@@ -4,30 +4,28 @@
 = form_for [:admin, @social_post], url: { action: 'update', controller: 'social_posts' } do |f|
   = render(UI::Alerts::ObjectError::Component.new(object: @social_post))
 
-  .row.mt-4
-    .col-md-6
-      - if @social_post.stolen_post?
-        - if @social_post.posted_image.present?
-          = image_tag(@social_post.posted_image)
-      - else
-        = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :image, label_text: "Post photo")) do
-          = render(UI::Forms::Files::Upload::Component.new(form_builder: f, attribute: :image, accept: ImageUploader.permitted_extensions))
-          - if @social_post.image.present?
-            = render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :remove_image, label: "Remove image"))
+  %div{class: "tw:mt-6 tw:md:w-1/2"}
+    - if @social_post.stolen_post?
+      - if @social_post.posted_image.present?
+        = image_tag(@social_post.posted_image)
+    - else
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :image, label_text: "Post photo")) do
+        = render(UI::Forms::Files::Upload::Component.new(form_builder: f, attribute: :image, accept: ImageUploader.permitted_extensions))
+        - if @social_post.image.present?
+          = render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :remove_image, label: "Remove image"))
 
-  .row
-    .col-md-4
+  %div{class: "tw:grid tw:gap-x-8 tw:md:grid-cols-3"}
+    %div
       = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :body_html, kind: :text_area, label_text: "Post display html", html_options: {rows: 4}))
 
-    .col-md-8.my-auto
+    %div{class: "tw:md:col-span-2 tw:my-auto"}
       = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :alignment, label_text: "Post alignment in image")) do
         = render(UI::Forms::RadioButtonGroup::Component.new(name: f.field_name(:alignment), selected: @social_post.alignment, entries: SocialPost::VALID_ALIGNMENTS.map { {value: it, label: it.humanize} }))
 
-  .row.justify-content-end
-    .col-auto
-      = render(UI::Button::Component.new(text: "Save", color: :primary, type: "submit"))
+  %div{class: "tw:flex tw:justify-end"}
+    = render(UI::Button::Component.new(text: "Save", color: :primary, type: "submit"))
 
-.text-right.mt-2
+%div{class: "tw:mt-2 tw:text-right"}
   = render(UI::ButtonLink::Component.new(text: "Delete", href: {controller: "admin/social_posts", id: @social_post.id, action: :destroy}, method: :delete, color: :error, confirm: "Are you sure you want to delete this post?"))
 
 %hr

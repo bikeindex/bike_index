@@ -3,7 +3,7 @@
     <%= number_with_delimiter(@bikes_count) %>
     <%= "Bike".pluralize(@bikes_count) %>
 
-    <em class="small">
+    <em class="tw:text-sm">
       <%= link_to "view all bikes", admin_bikes_path(organization_id: @organization.to_param) %>
     </em>
   </h2>

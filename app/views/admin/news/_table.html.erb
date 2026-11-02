@@ -21,7 +21,7 @@
     <%= blog.body_abbr.html_safe if blog.body_abbr %>
 
     <% if blog.content_tag_names.any? %>
-      <small class="d-block">
+      <small class="tw:block">
         <span class="twless-strong">Topics:</span>
 
         <% if tags_no_link %>
@@ -33,7 +33,7 @@
     <% end %>
 
     <% if blog.canonical_url? %>
-      <small class="d-block">Canonical: <%= render(UI::ButtonLink::Component.new(href: blog.canonical_url, text: blog.pretty_canonical, color: :link_gray)) %></small>
+      <small class="tw:block">Canonical: <%= render(UI::ButtonLink::Component.new(href: blog.canonical_url, text: blog.pretty_canonical, color: :link_gray)) %></small>
     <% end %>
   <% end %>
 

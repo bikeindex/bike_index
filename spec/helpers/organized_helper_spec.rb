@@ -24,7 +24,7 @@ RSpec.describe OrganizedHelper, type: :helper do
     context "deleted" do
       let!(:bike) { FactoryBot.create(:bike, deleted_at: Time.current) }
       let(:target_text) do
-        "<span>#{bike.frame_colors.first} <strong>#{bike.mnfg_name}</strong><em class=\"small text-danger\"> removed from Bike Index</em></span>"
+        "<span>#{bike.frame_colors.first} <strong>#{bike.mnfg_name}</strong><em class=\"tw:text-sm #{UI::Alerts::Base::Component::TEXT_CLASSES[:error]}\"> removed from Bike Index</em></span>"
       end
       it "renders with deleted" do
         expect(bike.deleted?).to be_truthy

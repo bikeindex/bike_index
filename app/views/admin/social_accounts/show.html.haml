@@ -2,37 +2,36 @@
   %li= render(UI::ButtonLink::Component.new(text: "Edit", href: edit_admin_social_account_url(@social_account), size: :sm))
   %li= render(UI::ButtonLink::Component.new(text: "Check Credentials", href: check_credentials_admin_social_account_url(@social_account), size: :sm))
 - if @social_account.errored?
-  .row.mt-4.mb-4
-    .card.ml-auto.mr-auto.col-8
-      .card-body
-        %h4.text-danger
-          %em
-            #{@social_account.screen_name} has an Error!
-        = render(UI::TableList::Component.new(classes: "mt-4")) do |list|
-          - list.with_row(label: "Error at:", value: render(UI::Time::Component.new(time: @social_account.last_error_at)))
-          - list.with_row(label: "Error", value: @social_account.last_error)
-        = link_to "Log in to refresh credentials", "/auth/twitter", class: "btn btn-success"
-.row
-  .col-md-6
+  = render(UI::Container::Component.new) do
+    = render(UI::Card::Component.new(additional_classes: "tw:my-6")) do
+      %h4{class: UI::Alerts::Base::Component::TEXT_CLASSES[:error]}
+        %em
+          #{@social_account.screen_name} has an Error!
+      = render(UI::TableList::Component.new(classes: "tw:mt-6")) do |list|
+        - list.with_row(label: "Error at:", value: render(UI::Time::Component.new(time: @social_account.last_error_at)))
+        - list.with_row(label: "Error", value: @social_account.last_error)
+      = render(UI::ButtonLink::Component.new(text: "Log in to refresh credentials", href: "/auth/twitter", color: :primary))
+.twwiderow
+  %div
     %h1
       %small account:
       = @social_account.screen_name
     %small
       = link_to "view on twitter", "https://twitter.com/#{@social_account.screen_name}", target: :_blank
 
-    = render(UI::TableList::Component.new(classes: "mt-2")) do |list|
+    = render(UI::TableList::Component.new(classes: "tw:mt-2")) do |list|
       - %w[created_at updated_at last_error_at].each do |attr|
         - list.with_row(label: attr.humanize, value: render(UI::Time::Component.new(time: @social_account.send(attr))))
       - @social_account.attributes.except("account_info", "last_error_at", "created_at", "updated_at", "last_error").each_pair do |attr, value|
         - list.with_row(label: attr, value:)
-  .col-md-6
+  %div
     %h3 Platform Response Data
     %pre{ class: "tw:bg-gray-100 tw:dark:bg-gray-800", style: "max-height: 600px; overflow: scroll; padding: 10px 2px;" }
       = @social_account.account_info.to_yaml
 
-%h3.mt-4
+%h3{class: "tw:mt-6"}
   = number_with_delimiter(@social_account.social_posts.count)
   Posts
-  %em.small
+  %em{class: "tw:text-sm"}
     = link_to "view all", admin_social_posts_path(search_social_account_id: @social_account.id)
 = render partial: "/admin/social_posts/table", locals: { social_posts: @social_account.social_posts.reorder(created_at: :desc).limit(25), skip_social_account: true }

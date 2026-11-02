@@ -56,7 +56,7 @@
       <% organization_rows = kind_counts.map { |id, counts| {organization_id: id, organization: organizations[id], counts:} }
         .sort_by { |row| row[:counts].values.sum } %>
 
-      <div class="mt-2">
+      <div class="tw:mt-2">
         <%= render(UI::Table::Component.new(records: organization_rows, sort_state:)) do |table| %>
           <% table.column(label: "Organization", footer: "Total") do |row| %>
             <% if row[:organization].present? %>
@@ -98,27 +98,25 @@
   <% if @searched_bike_stickers.present? %>
     <div
       class="
-        row matching-bike-stickers mt-4 mb-4 tw:border tw:border-gray-300
-        tw:bg-black/5 tw:dark:border-gray-700 tw:dark:bg-white/5
+        matching-bike-stickers tw:my-6 tw:border tw:border-gray-300 tw:bg-black/5
+        tw:px-4 tw:pt-6 tw:pb-2 tw:dark:border-gray-700 tw:dark:bg-white/5
       "
     >
-      <div class="col-12 pt-4 pb-2">
-        <h2>
-          Matching
-          <% if params[:search_query].present? %>
-            <%= link_to "bike stickers", admin_bike_stickers_path(search_query: params[:search_query]) %>
-          <% else %>
-            bike stickers
-          <% end %>
-          <small><%= number_display(@searched_bike_stickers.count) %></small>
-        </h2>
-
-        <% if @searched_bike_stickers.count > 100 %>
-          <h3>More than 100 matching stickers, just showing the first 100</h3>
+      <h2>
+        Matching
+        <% if params[:search_query].present? %>
+          <%= link_to "bike stickers", admin_bike_stickers_path(search_query: params[:search_query]) %>
+        <% else %>
+          bike stickers
         <% end %>
+        <small><%= number_display(@searched_bike_stickers.count) %></small>
+      </h2>
 
-        <%= render partial: "/admin/bike_stickers/table", locals: {bike_stickers: @searched_bike_stickers.limit(100)} %>
-      </div>
+      <% if @searched_bike_stickers.count > 100 %>
+        <h3>More than 100 matching stickers, just showing the first 100</h3>
+      <% end %>
+
+      <%= render partial: "/admin/bike_stickers/table", locals: {bike_stickers: @searched_bike_stickers.limit(100)} %>
     </div>
   <% end %>
 

@@ -34,7 +34,7 @@ RSpec.describe Atoms::Serial::Component, type: :component do
 
     it "hides the serial and explains why" do
       expect(component.to_html.strip)
-        .to eq '<span class="twless-strong">hidden</span> <em class="small twless-strong">because tandem is impounded</em>'
+        .to eq '<span class="twless-strong">hidden</span> <em class="twless-strong tw:text-xs">because tandem is impounded</em>'
     end
 
     context "with explanation: :tooltip" do

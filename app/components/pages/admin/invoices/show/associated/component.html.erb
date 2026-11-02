@@ -38,7 +38,7 @@
       <%= MoneyFormatter.money_format(@invoice.amount_paid_cents, @invoice.currency_name) %>
     </span>
 
-    <ul class="mb-2">
+    <ul class="tw:mb-2">
       <% @invoice.payments.each do |payment| %>
         <li>
           <%= link_to "#{payment.amount_formatted}", admin_payment_path(payment) %>
@@ -57,9 +57,9 @@
       <strong class="twless-strong">Amount due is $0</strong> this invoice
       doesn't make the organization "Paid"
       <% if @invoice.payments.any? %>
-        <span class="d-block mt-1">
-          <strong class="text-danger">This invoice has a payment,</strong> but
-          because amount due is $0, this doesn't make the organization isn't
+        <span class="tw:mt-1 tw:block">
+          <strong class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">This invoice has a payment,</strong>
+          but because amount due is $0, this doesn't make the organization isn't
           marked "paid"
         </span>
       <% end %>

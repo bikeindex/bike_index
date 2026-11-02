@@ -2,12 +2,12 @@
   <% list.with_row(label: "Auto user email", value: (@organization.auto_user.email if @organization.auto_user.present?)) %>
 
   <% if @display_dev_info %>
-    <% list.with_row(label: "API V1 token", class: "small", dev_only: true) do %>
+    <% list.with_row(label: "API V1 token", class: "tw:text-sm", dev_only: true) do %>
       <div id="stupidLegacyToken" style="overflow-x: scroll;">
-        <code class="small"><%= @organization.access_token %></code>
+        <code><%= @organization.access_token %></code>
       </div>
     <% end %>
-    <% list.with_row(label: "User Reg all bikes?", value: @organization.user_registration_all_bikes?, class: "small", dev_only: true) %>
+    <% list.with_row(label: "User Reg all bikes?", value: @organization.user_registration_all_bikes?, class: "tw:text-sm", dev_only: true) %>
   <% end %>
 
   <% list.with_row(label: "Users", value: link_to(@organization.users.count, admin_users_path(organization_id: @organization.to_param))) %>
@@ -34,12 +34,12 @@
 
   <% list.with_row(label: "POS integration:") do %>
     <% if @organization.no_pos? %>
-      <em class="small twless-strong">no integration</em>
+      <em class="twless-strong tw:text-sm">no integration</em>
     <% elsif @organization.ascend_or_broken_ascend? %>
       <%= link_to "Ascend POS", organization_bulk_imports_path(organization_id: @organization.to_param) %>
       <small>Ascend name: <em><%= @organization.ascend_name %></em></small>
     <% elsif @organization.broken_pos? %>
-      <span class="text-danger">POS Integration broken!</span>
+      <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">POS Integration broken!</span>
       <%= @organization.pos_kind.humanize %>
     <% elsif @organization.does_not_need_pos? %>
       <small class="twless-strong">Does not need POS integration</small>
@@ -50,14 +50,14 @@
     <% end %>
 
     <% if @display_dev_info && @organization.manual_pos_kind.present? %>
-      <small class="only-dev-visible d-inline-block ml-2">
+      <small class="only-dev-visible d-inline-block tw:ml-2">
         <em class="twless-strong">manual POS kind set:</em>
         <%= @organization.manual_pos_kind %>
       </small>
     <% end %>
 
     <% if !@organization.no_pos? || @organization.opted_into_theft_survey_2023 %>
-      <small class="ml-3">
+      <small class="tw:ml-4">
         <span class="twless-strong">theft survey?</span>
         <%= @organization.opted_into_theft_survey_2023 %>
       </small>

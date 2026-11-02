@@ -2,7 +2,7 @@
 
 <%= render(Pages::Admin::Invoices::Table::Component.new(invoices: @invoices)) %>
 
-<h2 class="mt-5">
+<h2 class="tw:mt-12">
   <%= @organization.name %> has
   <%= pluralize(@organization.payments.count, "payment") %>
 </h2>

@@ -2,14 +2,14 @@
 
 %h4
   = @bike.title_string
-.row
-  .col-lg-2.col-md-3.mb-2
+%div{class: "tw:grid tw:grid-cols-12 tw:gap-x-8"}
+  %div{class: "tw:col-span-12 tw:md:col-span-3 tw:lg:col-span-2 tw:mb-2"}
     - if @bike.thumb_url.present?
       = image_tag @bike.thumb_url, alt: @bike.title_string, style: "display: block; max-width: 100%;"
     - else
       %h3.twless-strong
         No Image
-  .col-lg-5.col-9.mb-2
+  %div{class: "tw:col-span-9 tw:lg:col-span-5 tw:mb-2"}
     = render(UI::TableList::Component.new) do |list|
       - list.with_row(label: "Registry", value: @bike.registry_name)
       - list.with_row(label: "Registry ID", value: @bike.external_id)
@@ -18,8 +18,8 @@
       - list.with_row(label: "Location", value: @bike.location_found)
       - list.with_row(label: "Registry Link", value: link_to(@bike.url, @bike.url, target: :_blank))
 
-  .col-lg-5.col-md-9.mt-auto.mb-2
-    = render(UI::TableList::Component.new(classes: "mb-0")) do |list|
+  %div{class: "tw:col-span-12 tw:md:col-span-9 tw:lg:col-span-5 tw:mt-auto tw:mb-2"}
+    = render(UI::TableList::Component.new(classes: "tw:mb-0!")) do |list|
       - list.with_row(label: "Serial number", value: @bike.serial_number)
       - list.with_row(label: "Description", value: @bike.description)
       - list.with_row(label: "Colors", value: @bike.frame_colors.to_sentence)
@@ -27,8 +27,8 @@
         = render UI::Time::Component.new(time: @bike.created_at, format: :localize_time_precise)
         %small.localizeTimezone
       - list.with_row(label: "Updated", value: render(UI::Time::Component.new(time: @bike.updated_at, format: :localize_time_precise)))
-    .mt-2
-      %p.mb-0 Info Hash
+    %div{class: "tw:mt-2"}
+      %p{class: "tw:mb-0"} Info Hash
       = render UI::JsonDisplay::Component.new(data: @bike.info_hash, no_max_height: true)
 
 

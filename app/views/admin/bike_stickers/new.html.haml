@@ -1,74 +1,41 @@
 %h1
   New Bike Sticker Batch
 
-.card.bg-light
-  .card-body
+.twwiderow
+  = render(UI::Card::Component.new(full_bleed: true, additional_classes: "tw:col-span-full")) do
     %h4 Examples
     %p Here are the values for a few example sticker batches.
-    %table.table.table-sm.table-bordered.table-striped
-      %thead
-        %th Batch
-        %th First & Last Sticker
-        %th
-          %em Code Prefix
-        %th
-          %em Initial Sticker number
-        %th
-          %em Number of stickers to create
-        %th
-          %em Code Number Length
-
-      %tbody
-        %tr
-          %td
-            = link_to "#9 (EPS 2)", admin_bike_stickers_path(search_bike_sticker_batch_id: 9)
-          %td
-            %strong.small.d-block ED 010 133
-            %strong.small.d-block ED 061 132
-          %td
-            %code ED
-          %td
-            %code 10133
-          %td
-            %code 51000
-          %td
-            %code 6
-        %tr
-          %td
-            = link_to "#21 (3rd internal)", admin_bike_stickers_path(search_bike_sticker_batch_id: 21)
-          %td
-            %strong.small.d-block A 250 0
-            %strong.small.d-block A 309 8
-
-          %td
-            %code A
-          %td
-            %code 2500
-          %td
-            %code 599
-          %td
-            %code 4
-
+    - examples = [{id: 9, name: "#9 (EPS 2)", stickers: ["ED 010 133", "ED 061 132"], prefix: "ED", initial: 10133, count: 51000, length: 6},
+      {id: 21, name: "#21 (3rd internal)", stickers: ["A 250 0", "A 309 8"], prefix: "A", initial: 2500, count: 599, length: 4}]
+    = render(UI::Table::Component.new(records: examples)) do |table|
+      - table.column(label: "Batch") do |batch|
+        = link_to batch[:name], admin_bike_stickers_path(search_bike_sticker_batch_id: batch[:id])
+      - table.column(label: "First & Last Sticker") do |batch|
+        - batch[:stickers].each do |sticker|
+          %strong{class: "tw:block tw:text-sm"}= sticker
+      - table.column(label: tag.em("Code Prefix")) do |batch|
+        %code= batch[:prefix]
+      - table.column(label: tag.em("Initial Sticker number")) do |batch|
+        %code= batch[:initial]
+      - table.column(label: tag.em("Number of stickers to create")) do |batch|
+        %code= batch[:count]
+      - table.column(label: tag.em("Code Number Length")) do |batch|
+        %code= batch[:length]
 
 = form_for [:admin, @bike_sticker_batch], url: {action: "create", controller: "bike_stickers"} do |f|
   = render(UI::Alerts::ObjectError::Component.new(name: "Sticker Batch", object: @bike_sticker_batch))
 
-  .row.mt-4
-    .col-md-6.col-lg-3
+  %div{class: "tw:mt-6 tw:grid tw:gap-x-8 tw:md:grid-cols-2 tw:lg:grid-cols-4"}
+    %div
       = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :organization_id, label_text: BikeStickerBatch.human_attribute_name(:organization_id), required: true)) do
         = render UI::Forms::Combobox::Component.new(name: :organization_id, options: @organizations.pluck(:name, :id), include_blank: true, html_options: {form: f, placeholder: "Choose organization", required: true})
-    .col-md-6.col-lg-9
+    %div{class: "tw:lg:col-span-3"}
       = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :notes))
-  .row.mt-2
-    .col-md-4.col-6
-      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :prefix, label_text: "Code letter prefix", required: true))
-    .col-md-4.col-6
-      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :initial_code_integer, kind: :number_field, label_text: "Initial sticker number", required: true))
-    .col-md-4.col-6
-      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :code_number_length, kind: :number_field, label_text: "Code Number Length")) do |group|
-        - group.with_label_note { "Leave blank unless you want extra zeros" }
-    .col-md-4.col-6
-      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :stickers_to_create_count, kind: :number_field, label_text: "Number of stickers to create", required: true))
-  .row.mt-2
-    .col-auto
-      = render(UI::Button::Component.new(text: "Create", color: :primary, type: "submit"))
+  .twfieldrow{class: "tw:mt-2 tw:items-end"}
+    = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :prefix, label_text: "Code letter prefix", required: true))
+    = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :initial_code_integer, kind: :number_field, label_text: "Initial sticker number", required: true))
+    = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :code_number_length, kind: :number_field, label_text: "Code Number Length")) do |group|
+      - group.with_label_note { "Leave blank unless you want extra zeros" }
+    = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :stickers_to_create_count, kind: :number_field, label_text: "Number of stickers to create", required: true))
+  %div{class: "tw:mt-2"}
+    = render(UI::Button::Component.new(text: "Create", color: :primary, type: "submit"))

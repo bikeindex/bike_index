@@ -2,87 +2,81 @@
 
 <%= render(Pages::Admin::Headers::Nav::Component.new(title: "Marketplace Message")) %>
 
-<div class="row mt-4">
-  <div class="col-md-6">
-    <%= render(UI::TableList::Component.new) do |list| %>
-      <% list.with_row(label: "ID", dev_only: true, value: tag.code(@marketplace_message.id), if: display_dev_info?) %>
+<div class="twwiderow tw:mt-6 tw:items-start">
+  <%= render(UI::TableList::Component.new) do |list| %>
+    <% list.with_row(label: "ID", dev_only: true, value: tag.code(@marketplace_message.id), if: display_dev_info?) %>
 
-      <% list.with_row(label: "Sender") do %>
-        <%= render Atoms::Admin::TableCells::User::Component.new(user: @marketplace_message.sender, user_id: @marketplace_message.sender_id) %>
+    <% list.with_row(label: "Sender") do %>
+      <%= render Atoms::Admin::TableCells::User::Component.new(user: @marketplace_message.sender, user_id: @marketplace_message.sender_id) %>
 
-        <small class="tw:ml-2">
-          <% sender_count = MarketplaceMessage.where(sender_id: @marketplace_message.sender_id).count %>
+      <small class="tw:ml-2">
+        <% sender_count = MarketplaceMessage.where(sender_id: @marketplace_message.sender_id).count %>
 
-          <%= link_to admin_marketplace_messages_path(user_id: @marketplace_message.sender_id) do %>
-            <%= number_display(sender_count) %> total
-            <%= "message".pluralize(sender_count) %> sent
-          <% end %>
-        </small>
-      <% end %>
-
-      <% list.with_row(label: "Receiver") do %>
-        <%= render Atoms::Admin::TableCells::User::Component.new(user: @marketplace_message.receiver, user_id: @marketplace_message.receiver_id) %>
-
-        <small class="tw:ml-2">
-          <% receiver_count = MarketplaceMessage.where(sender_id: @marketplace_message.receiver_id).count %>
-
-          <%= link_to admin_marketplace_messages_path(user_id: @marketplace_message.receiver_id) do %>
-            <%= number_display(receiver_count) %> total
-            <%= "message".pluralize(receiver_count) %> sent
-          <% end %>
-        </small>
-      <% end %>
-
-      <% list.with_row(label: "Created", class: "small", value: render(UI::Time::Component.new(time: @marketplace_message.created_at, format: :localize_time_precise))) %>
-
-      <% list.with_row(label: "Updated", class: "small", value: render(UI::Time::Component.new(time: @marketplace_message.updated_at, format: :localize_time_precise))) %>
-
-      <% list.with_row(label: "From", value: @marketplace_message.kind_humanized) %>
-
-      <% list.with_row(label: "Count") do %>
-        <%= number_display(@marketplace_message.messages_prior_count) %> prior
-        /
-        <small><%= number_display(@marketplace_messages_thread.count) %> total <%= link_to "in thread", message_thread_path %></small>
-      <% end %>
+        <%= link_to admin_marketplace_messages_path(user_id: @marketplace_message.sender_id) do %>
+          <%= number_display(sender_count) %> total
+          <%= "message".pluralize(sender_count) %> sent
+        <% end %>
+      </small>
     <% end %>
-  </div>
 
-  <div class="col-md-6">
-    <%= render(UI::TableList::Component.new) do |list| %>
-      <% list.with_row(label: "Marketplace Listing") do %>
-        <span class="small">
-          <%= render(UI::Time::Component.new(time: @marketplace_listing.created_at)) %>
+    <% list.with_row(label: "Receiver") do %>
+      <%= render Atoms::Admin::TableCells::User::Component.new(user: @marketplace_message.receiver, user_id: @marketplace_message.receiver_id) %>
 
-          <% if display_dev_info? %>
-            <code class="only-dev-visible"><%= @marketplace_listing.id %></code>
-          <% end %>
-        </span>
-      <% end %>
+      <small class="tw:ml-2">
+        <% receiver_count = MarketplaceMessage.where(sender_id: @marketplace_message.receiver_id).count %>
 
-      <% list.with_row(label: "Listing status", value: render(Atoms::Admin::Badges::MarketplaceListing::Component.new(status: @marketplace_listing.status, status_humanized: @marketplace_listing.status_humanized, kind: :marketplace_listing))) %>
-
-      <% list.with_row(label: "Listing published") do %>
-        <%= render(UI::Time::Component.new(time: @marketplace_listing.published_at)) %>
-
-        <small class="twless-strong">
-          (<%= number_display(@marketplace_listing.marketplace_messages.count) %>
-
-          <%= link_to("messages about this listing", admin_marketplace_messages_path(marketplace_listing_id: @marketplace_message.marketplace_listing_id)) %>)
-        </small>
-      <% end %>
-
-      <% list.with_row(label: "Listing end", value: render(UI::Time::Component.new(time: @marketplace_listing.end_at))) %>
-
-      <% list.with_row(label: "price", value: amount_display(@marketplace_listing, currency_name_suffix: :if_not_default)) %>
-
-      <% list.with_row(label: "Condition", value: @marketplace_listing.condition) %>
-
-      <% list.with_row(label: "Item", value: render(Atoms::Admin::TableCells::Bike::Component.new(bike: @marketplace_listing.item, bike_id: @marketplace_listing.item_id, bike_link_path: bike_path(@marketplace_listing.item_id, view_as: "marketplace_preview")))) %>
+        <%= link_to admin_marketplace_messages_path(user_id: @marketplace_message.receiver_id) do %>
+          <%= number_display(receiver_count) %> total
+          <%= "message".pluralize(receiver_count) %> sent
+        <% end %>
+      </small>
     <% end %>
-  </div>
+
+    <% list.with_row(label: "Created", class: "tw:text-sm", value: render(UI::Time::Component.new(time: @marketplace_message.created_at, format: :localize_time_precise))) %>
+
+    <% list.with_row(label: "Updated", class: "tw:text-sm", value: render(UI::Time::Component.new(time: @marketplace_message.updated_at, format: :localize_time_precise))) %>
+
+    <% list.with_row(label: "From", value: @marketplace_message.kind_humanized) %>
+
+    <% list.with_row(label: "Count") do %>
+      <%= number_display(@marketplace_message.messages_prior_count) %> prior /
+      <small><%= number_display(@marketplace_messages_thread.count) %> total <%= link_to "in thread", message_thread_path %></small>
+    <% end %>
+  <% end %>
+
+  <%= render(UI::TableList::Component.new) do |list| %>
+    <% list.with_row(label: "Marketplace Listing") do %>
+      <span class="tw:text-sm">
+        <%= render(UI::Time::Component.new(time: @marketplace_listing.created_at)) %>
+
+        <% if display_dev_info? %>
+          <code class="only-dev-visible"><%= @marketplace_listing.id %></code>
+        <% end %>
+      </span>
+    <% end %>
+
+    <% list.with_row(label: "Listing status", value: render(Atoms::Admin::Badges::MarketplaceListing::Component.new(status: @marketplace_listing.status, status_humanized: @marketplace_listing.status_humanized, kind: :marketplace_listing))) %>
+
+    <% list.with_row(label: "Listing published") do %>
+      <%= render(UI::Time::Component.new(time: @marketplace_listing.published_at)) %>
+
+      <small class="twless-strong">
+        (<%= number_display(@marketplace_listing.marketplace_messages.count) %>
+        <%= link_to("messages about this listing", admin_marketplace_messages_path(marketplace_listing_id: @marketplace_message.marketplace_listing_id)) %>)
+      </small>
+    <% end %>
+
+    <% list.with_row(label: "Listing end", value: render(UI::Time::Component.new(time: @marketplace_listing.end_at))) %>
+
+    <% list.with_row(label: "price", value: amount_display(@marketplace_listing, currency_name_suffix: :if_not_default)) %>
+
+    <% list.with_row(label: "Condition", value: @marketplace_listing.condition) %>
+
+    <% list.with_row(label: "Item", value: render(Atoms::Admin::TableCells::Bike::Component.new(bike: @marketplace_listing.item, bike_id: @marketplace_listing.item_id, bike_link_path: bike_path(@marketplace_listing.item_id, view_as: "marketplace_preview")))) %>
+  <% end %>
 </div>
 
-<div class="mt-4">
+<div class="tw:mt-6">
   <%= render(UI::Card::Component.new(shadow: :large)) do %>
     <p><strong>subject:</strong><%= @marketplace_message.subject %></p>
 
@@ -91,7 +85,7 @@
 </div>
 
 <% if @marketplace_messages_thread.count > 1 %>
-  <h2 class="mt-5">
+  <h2 class="tw:mt-12">
     Message Thread
     <small>(<%= link_to(number_display(@marketplace_messages_thread.count), message_thread_path) %>)</small>
   </h2>

@@ -50,26 +50,28 @@
 
 <% table_view = capture do %>
   <% if @org_count %>
-    <div class="col-sm-6 offset-sm-3 mt-4">
-      <% import_counts = matching_bulk_imports.group(:organization_id).count %>
-      <% organizations = Organization.where(id: import_counts.keys).index_by(&:id) %>
+    <%= render(UI::Container::Component.new) do %>
+      <div class="tw:mt-6">
+        <% import_counts = matching_bulk_imports.group(:organization_id).count %>
+        <% organizations = Organization.where(id: import_counts.keys).index_by(&:id) %>
 
-      <%= render(UI::Table::Component.new(records: import_counts.to_a, sort_state:)) do |table| %>
-        <% table.column(label: "Organization") do |(id)| %>
-          <% if id.present? %>
-            <%= link_to organizations[id]&.name || id, url_for(sort_state.search_params.merge(organization_id: id)), class: "twlink" %>
-            <%= link_to link_emoji, admin_organization_path(id) %>
-          <% else %>
-            <%= link_to "No organization", url_for(sort_state.search_params.merge(organization_id: "none")), class: "twlink" %>
-            <span class="tw:text-red-600">missing org!</span>
+        <%= render(UI::Table::Component.new(records: import_counts.to_a, sort_state:)) do |table| %>
+          <% table.column(label: "Organization") do |(id)| %>
+            <% if id.present? %>
+              <%= link_to organizations[id]&.name || id, url_for(sort_state.search_params.merge(organization_id: id)), class: "twlink" %>
+              <%= link_to link_emoji, admin_organization_path(id) %>
+            <% else %>
+              <%= link_to "No organization", url_for(sort_state.search_params.merge(organization_id: "none")), class: "twlink" %>
+              <span class="tw:text-red-600">missing org!</span>
+            <% end %>
+          <% end %>
+
+          <% table.column(label: "Imports", classes: "tw:text-right") do |(_id, count)| %>
+            <%= number_display(count) %>
           <% end %>
         <% end %>
-
-        <% table.column(label: "Imports", classes: "tw:text-right") do |(_id, count)| %>
-          <%= number_display(count) %>
-        <% end %>
-      <% end %>
-    </div>
+      </div>
+    <% end %>
   <% end %>
 
   <%= render partial: "/admin/bulk_imports/table", locals: {collection: @bulk_imports, render_sortable: true} %>

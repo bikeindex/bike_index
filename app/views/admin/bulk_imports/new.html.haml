@@ -1,19 +1,18 @@
 = render(Pages::Admin::Headers::Nav::Component.new(title: "New Bulk Import"))
 
-.row
-  .col-sm-6
-    = form_for [:admin, @bulk_import] do |f|
-      = render(UI::Alerts::ObjectError::Component.new(object: @bulk_import))
+= render(UI::Container::Component.new(alignment: :left)) do
+  = form_for [:admin, @bulk_import] do |f|
+    = render(UI::Alerts::ObjectError::Component.new(object: @bulk_import))
 
-      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :organization_id, label_text: BulkImport.human_attribute_name(:organization_id), required: true)) do
-        = render UI::Forms::Combobox::Component.new(name: :organization_id, options: Organization.all.pluck(:name, :id), include_blank: true, html_options: {form: f, placeholder: "Choose organization", required: true})
-      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :file, label_text: "CSV", required: true)) do
-        = render(UI::Forms::Files::Upload::Component.new(form_builder: f, attribute: :file))
-      %div{class: "tw:mb-4"}
-        = render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :no_notify, label: "Don't send emails to registrations"))
-        = render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :allow_duplicate)) do
-          Create duplicates - add registrations when a row matches an existing registration's serial and owner email
-          %span.twless-strong (off by default)
+    = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :organization_id, label_text: BulkImport.human_attribute_name(:organization_id), required: true)) do
+      = render UI::Forms::Combobox::Component.new(name: :organization_id, options: Organization.all.pluck(:name, :id), include_blank: true, html_options: {form: f, placeholder: "Choose organization", required: true})
+    = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :file, label_text: "CSV", required: true)) do
+      = render(UI::Forms::Files::Upload::Component.new(form_builder: f, attribute: :file))
+    %div{class: "tw:mb-4"}
+      = render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :no_notify, label: "Don't send emails to registrations"))
+      = render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :allow_duplicate)) do
+        Create duplicates - add registrations when a row matches an existing registration's serial and owner email
+        %span.twless-strong (off by default)
 
-      %div{class: "tw:flex tw:justify-end"}
-        = render(UI::Button::Component.new(text: "Create", color: :primary, type: "submit"))
+    %div{class: "tw:flex tw:justify-end"}
+      = render(UI::Button::Component.new(text: "Create", color: :primary, type: "submit"))

@@ -1,5 +1,5 @@
 <%= render(UI::TableList::Component.new) do |list| %>
-  <% list.with_row(label: "ID", value: @organization.id, class: "small only-dev-visible", if: @display_dev_info) %>
+  <% list.with_row(label: "ID", value: @organization.id, class: "tw:text-sm only-dev-visible", if: @display_dev_info) %>
 
   <% list.with_row(label: "Short Name") do %>
     <%= @organization.short_name %>
@@ -11,7 +11,7 @@
     <% end %>
 
     <% if @organization.spam_registrations %>
-      <small class="ml-1 text-danger">high spam registrations</small>
+      <small class="tw:ml-1 <%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">high spam registrations</small>
     <% end %>
   <% end %>
 
@@ -34,14 +34,16 @@
 
     <% if @organization.enabled?("official_manufacturer") %>
       <% unless @organization.kind == "bike_manufacturer" %>
-        <span class="text-warning"> Kind should be "Bike Manufacturer" </span>
+        <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>">
+          Kind should be "Bike Manufacturer"
+        </span>
       <% end %>
       <br>
       <% if @organization.manufacturer_id.present? %>
         <strong><%= @organization.manufacturer.name %></strong>
         <em class="twless-strong">Manufacturer official account of</em>
       <% else %>
-        <strong class="text-danger">No Manufacturer assigned</strong>
+        <strong class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">No Manufacturer assigned</strong>
         <span class="twless-strong">
           <%= link_to "edit organization", edit_admin_organization_path(@organization) %>
           to add

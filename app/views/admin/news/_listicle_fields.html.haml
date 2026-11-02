@@ -1,26 +1,21 @@
-.card.bg-light.mt-2
-  .card-body
-    .row
-      .col-md-6
-        = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :title, html_options: {placeholder: "Title"}))
-      .col-md-6
-        = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :image_credits, label_text: "Credits", html_options: {placeholder: "Image credits - should be a link in HTML or Markdown"}))
-    .row
-      .col-md-12
-        = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :body, kind: :text_area, html_options: {placeholder: "Body content - HTML or Markdown"}))
-    .row
-      .col-md-6
-        = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :image)) do |group|
-          - group.with_helper_text { "min-width 726px" }
-          = render(UI::Forms::Files::Upload::Component.new(form_builder: f, attribute: :image, accept: ListicleImageUploader.permitted_extensions, html_options: {"aria-describedby" => group.helper_text_id}))
-        %label.index-image-select
-          <input type="radio" name="index_image_id" value="#{f.object.id}" class="index_image_#{f.object.id}">
-          Primary image
-      .col-md-6
-        = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :list_order, kind: :number_field, label_text: "Order", html_options: {placeholder: "1", min: 0}))
-        = f.hidden_field :_destroy
+= render(UI::Card::Component.new(additional_classes: "tw:mt-2")) do
+  .twwiderow
+    = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :title, html_options: {placeholder: "Title"}))
+    = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :image_credits, label_text: "Credits", html_options: {placeholder: "Image credits - should be a link in HTML or Markdown"}))
+  = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :body, kind: :text_area, html_options: {placeholder: "Body content - HTML or Markdown"}))
+  .twwiderow
+    %div
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :image)) do |group|
+        - group.with_helper_text { "min-width 726px" }
+        = render(UI::Forms::Files::Upload::Component.new(form_builder: f, attribute: :image, accept: ListicleImageUploader.permitted_extensions, html_options: {"aria-describedby" => group.helper_text_id}))
+      %label.index-image-select
+        <input type="radio" name="index_image_id" value="#{f.object.id}" class="index_image_#{f.object.id}">
+        Primary image
+    %div
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :list_order, kind: :number_field, label_text: "Order", html_options: {placeholder: "1", min: 0}))
+      = f.hidden_field :_destroy
 
 
 
-    %a.remove_fields
-      Remove
+  %a.remove_fields
+    Remove

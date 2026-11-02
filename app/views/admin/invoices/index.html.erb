@@ -44,8 +44,8 @@
     <%= render(UI::Chart::Component.new(series: [{name: "Invoices", data:}], time_range: @time_range, stacked: true)) %>
 
     <% unless params[:query].present? %>
-      <div class="row mb-4 mt-4">
-        <div class="col-sm-8 offset-sm-2">
+      <div class="tw:my-6">
+        <%= render(UI::Container::Component.new) do %>
           <% *invoice_rows, all_row = {
               "First invoice" => matching_invoices.first_invoice,
               "Renewals" => matching_invoices.renewal_invoice,
@@ -63,7 +63,7 @@
             <% table.column(label: "amount due", footer: all_row[:amount_due]) { |row| row[:amount_due] } %>
             <% table.column(label: "amount paid", footer: all_row[:amount_paid]) { |row| row[:amount_paid] } %>
           <% end %>
-        </div>
+        <% end %>
       </div>
     <% end %>
   <% end %>

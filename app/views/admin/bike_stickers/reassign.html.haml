@@ -10,60 +10,51 @@
 = render partial: "batches_table", locals: {bike_sticker_batches: @bike_sticker_batches}
 
 = render(Pages::Admin::Headers::IndexInfo::Component.new(index: admin_index_state, viewing: "Stickers"))
-.row
-  .col-md-8.offset-md-2.mt-2
-    = form_with(url: reassign_admin_bike_stickers_path, method: :get) do |form|
+= render(UI::Container::Component.new) do
+  = form_with(url: reassign_admin_bike_stickers_path, method: :get, html: {class: "tw:mt-2"}) do |form|
 
-      .card.bg-light
-        .card-body
-          %h4 Select stickers to reassign
+    = render(UI::Card::Component.new) do
+      %h4 Select stickers to reassign
 
-          = render partial: "/shared/hidden_search_fields", locals: {skip_organization: true}
+      = render partial: "/shared/hidden_search_fields", locals: {skip_organization: true}
 
-          .row.mt-4
-            - if @bike_sticker1.present?
-              .col-12
-                - opt_vals = BikeStickerBatch.includes(:organization).order(id: :desc).map { |b| ["##{b.id} - #{b.organization&.short_name} - #{b.notes}", b.id] }
-                = render(UI::Forms::Group::Component.new(attribute: :search_bike_sticker_batch_id, label_text: "Sticker Batch")) do
-                  = render UI::Forms::Combobox::Component.new(name: :search_bike_sticker_batch_id, options: opt_vals, dialog_label: "Sticker Batch", include_blank: true, html_options: {placeholder: "Select batch", value: @bike_sticker_batch&.id})
-            .col-sm-6
-              = render(UI::Forms::Group::Component.new(form_builder: form, attribute: :search_sticker1, label_text: "Starting Sticker code", html_options: {value: params[:search_sticker1]}))
-            .col-sm-6
-              = render(UI::Forms::Group::Component.new(form_builder: form, attribute: :search_sticker2, label_text: "Ending Sticker code", html_options: {value: params[:search_sticker2]}))
-            .col-12
-              - org_opt_vals = Organization.approved.name_ordered.pluck(:name, :id)
-              = render(UI::Forms::Group::Component.new(attribute: :organization_id, label_text: "Organization to assign stickers to")) do
-                = render UI::Forms::Combobox::Component.new(name: :organization_id, options: org_opt_vals, include_blank: true, html_options: {placeholder: "Select organization", value: current_organization&.id})
-          .mt-2
-            = render(UI::Button::Component.new(text: "Select", color: :primary, type: "submit", name: "select"))
+      %div{class: "tw:mt-6"}
+        - if @bike_sticker1.present?
+          - opt_vals = BikeStickerBatch.includes(:organization).order(id: :desc).map { |b| ["##{b.id} - #{b.organization&.short_name} - #{b.notes}", b.id] }
+          = render(UI::Forms::Group::Component.new(attribute: :search_bike_sticker_batch_id, label_text: "Sticker Batch")) do
+            = render UI::Forms::Combobox::Component.new(name: :search_bike_sticker_batch_id, options: opt_vals, dialog_label: "Sticker Batch", include_blank: true, html_options: {placeholder: "Select batch", value: @bike_sticker_batch&.id})
+        .twfieldrow
+          = render(UI::Forms::Group::Component.new(form_builder: form, attribute: :search_sticker1, label_text: "Starting Sticker code", html_options: {value: params[:search_sticker1]}))
+          = render(UI::Forms::Group::Component.new(form_builder: form, attribute: :search_sticker2, label_text: "Ending Sticker code", html_options: {value: params[:search_sticker2]}))
+        - org_opt_vals = Organization.approved.name_ordered.pluck(:name, :id)
+        = render(UI::Forms::Group::Component.new(attribute: :organization_id, label_text: "Organization to assign stickers to")) do
+          = render UI::Forms::Combobox::Component.new(name: :organization_id, options: org_opt_vals, include_blank: true, html_options: {placeholder: "Select organization", value: current_organization&.id})
+      %div{class: "tw:mt-2"}
+        = render(UI::Button::Component.new(text: "Select", color: :primary, type: "submit", name: "select"))
 
-          - if @valid_selection
-            .alert.alert-success.mt-4
-              %h4 Selected codes can be reassigned
-              .text-center
-                = render UI::Button::Component.new(text: "Reassign Now", color: :primary, size: :lg, type: "submit", name: :reassign_now, value: true)
-          .alert.alert-info.mt-4
-            %h4 To reassign codes:
-            %ul
-              %li
-                Enter a starting sticker code and a final sticker code. Only #{max_reassign_size} codes can be reassigned at a time (choose an appropriate start and end code).
-              %li Select the organization that you want to assign the stickers to
-              %li Click "Select" to find the group of stickers
-              %li Make sure that the "batch" that is chosen is the one that you want to use.
-              %li Review the selected stickers.
-              %li You will see a button to "Reassign now" if the reassignment can be done. Press it to reassign the stickers.
+      - if @valid_selection
+        = render(UI::Alerts::Base::Component.new(kind: :success, header: "Selected codes can be reassigned", margin_classes: "tw:mt-6")) do
+          %div{class: "tw:text-center"}
+            = render UI::Button::Component.new(text: "Reassign Now", color: :primary, size: :lg, type: "submit", name: :reassign_now, value: true)
+      = render(UI::Alerts::Base::Component.new(kind: :notice, header: "To reassign codes:", margin_classes: "tw:mt-6")) do
+        %ul
+          %li
+            Enter a starting sticker code and a final sticker code. Only #{max_reassign_size} codes can be reassigned at a time (choose an appropriate start and end code).
+          %li Select the organization that you want to assign the stickers to
+          %li Click "Select" to find the group of stickers
+          %li Make sure that the "batch" that is chosen is the one that you want to use.
+          %li Review the selected stickers.
+          %li You will see a button to "Reassign now" if the reassignment can be done. Press it to reassign the stickers.
 
 
 
-.row.mt-4
-  .col-md-6
-    %p
-      = number_display(selected_bike_stickers.size)
-      matching
-      = "sticker".pluralize(selected_bike_stickers.size)
-      %span.twless-strong
-        = number_with_delimiter(matching_bike_stickers.claimed.count)
-        claimed
+%p{class: "tw:mt-6"}
+  = number_display(selected_bike_stickers.size)
+  matching
+  = "sticker".pluralize(selected_bike_stickers.size)
+  %span.twless-strong
+    = number_with_delimiter(matching_bike_stickers.claimed.count)
+    claimed
 
 = render(Atoms::Admin::PaginationWithCount::Component.new(collection: @bike_stickers, index: admin_index_state, viewing: "Sticker"))
 

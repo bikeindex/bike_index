@@ -1,38 +1,35 @@
 = render(Pages::Admin::Headers::Nav::Component.new(title: "Messages"))
-.row
-  .col-sm-6
-    = render(UI::TableList::Component.new) do |list|
-      - list.with_row(label: "Created", value: render(UI::Time::Component.new(time: @feedback.created_at, format: :localize_time_precise)))
-      - list.with_row(label: "Kind", value: link_to(@feedback.humanized_type, admin_feedbacks_path(search_kind: @feedback.kind)))
-      - list.with_row(label: "Title", value: @feedback.title)
-      - list.with_row(label: "User") do
-        - if @feedback.user
-          = link_to @feedback.user.display_name, edit_admin_user_path(@feedback.user.to_param)
-          %small.twless-strong
-            user present
-            - if @feedback.user.display_name != @feedback.name
-              (name entered: #{@feedback.name})
-        - else
-          = @feedback.name
-          %span.twless-strong
-            = link_to @feedback.email, admin_users_path(user_query: @feedback.email)
-      - list.with_row(label: "data", if: @feedback.feedback_hash.present?) do
-        - if @feedback.organization.present?
-          = link_to @feedback.organization.name, admin_organization_path(@feedback.organization.to_param)
-        .mt-2
-          = render UI::JsonDisplay::Component.new(data: @feedback.feedback_hash, small: true)
-      - list.with_row(label: "Bike") do
-        - if @bike.present?
-          = render Atoms::Admin::TableCells::Bike::Component.new(bike: @bike, bike_id: @feedback.feedback_hash["bike_id"])
-        - elsif @feedback.bike_id.blank?
-          %small.twless-strong no bike
-        - else
-          Bike permanently deleted
-  .col-sm-6
-    .card
-      .card-body
-        %h5.card-title
-          Message text
-        %p.card-text
-          = @feedback.body
+.twwiderow{class: "tw:items-start"}
+  = render(UI::TableList::Component.new) do |list|
+    - list.with_row(label: "Created", value: render(UI::Time::Component.new(time: @feedback.created_at, format: :localize_time_precise)))
+    - list.with_row(label: "Kind", value: link_to(@feedback.humanized_type, admin_feedbacks_path(search_kind: @feedback.kind)))
+    - list.with_row(label: "Title", value: @feedback.title)
+    - list.with_row(label: "User") do
+      - if @feedback.user
+        = link_to @feedback.user.display_name, edit_admin_user_path(@feedback.user.to_param)
+        %small.twless-strong
+          user present
+          - if @feedback.user.display_name != @feedback.name
+            (name entered: #{@feedback.name})
+      - else
+        = @feedback.name
+        %span.twless-strong
+          = link_to @feedback.email, admin_users_path(user_query: @feedback.email)
+    - list.with_row(label: "data", if: @feedback.feedback_hash.present?) do
+      - if @feedback.organization.present?
+        = link_to @feedback.organization.name, admin_organization_path(@feedback.organization.to_param)
+      %div{class: "tw:mt-2"}
+        = render UI::JsonDisplay::Component.new(data: @feedback.feedback_hash, small: true)
+    - list.with_row(label: "Bike") do
+      - if @bike.present?
+        = render Atoms::Admin::TableCells::Bike::Component.new(bike: @bike, bike_id: @feedback.feedback_hash["bike_id"])
+      - elsif @feedback.bike_id.blank?
+        %small.twless-strong no bike
+      - else
+        Bike permanently deleted
+  = render(UI::Card::Component.new) do
+    %h5
+      Message text
+    %p
+      = @feedback.body
 

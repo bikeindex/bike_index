@@ -1,29 +1,27 @@
-.row
-  .col-md-6
-    = render(UI::TableList::Component.new) do |list|
-      - list.with_row(label: "Account", value: @social_post.poster)
-      - list.with_row(label: "Post ID", value: tag.code(@social_post.platform_id))
-      - list.with_row(label: "Created", value: render(UI::Time::Component.new(time: @social_post.created_at)))
-      - list.with_row(label: "Bike", if: @social_post.stolen_record_id.present?) do
-        - link_text = @social_post.bike.title_string if @social_post.bike.present?
-        - link_text ||= @social_post.stolen_record.id
-        = link_to link_text, admin_stolen_bike_path(@social_post.stolen_record_id, stolen_record_id: true) if @social_post.stolen_record.present?
-  .col-md-6
-    = render(UI::TableList::Component.new) do |list|
-      - list.with_row(label: "Text", value: @social_post.posted_text)
-      - list.with_row(label: "Image", value: (image_tag(@social_post.posted_image, style: "display: block; max-height: 200px; width: auto;") if @social_post.posted_image.present?))
-      - list.with_row(label: "Kind", value: (@social_post.kind.gsub(/_?post/, "").humanize if @social_post.kind.present?))
+.twwiderow{class: "tw:items-start"}
+  = render(UI::TableList::Component.new) do |list|
+    - list.with_row(label: "Account", value: @social_post.poster)
+    - list.with_row(label: "Post ID", value: tag.code(@social_post.platform_id))
+    - list.with_row(label: "Created", value: render(UI::Time::Component.new(time: @social_post.created_at)))
+    - list.with_row(label: "Bike", if: @social_post.stolen_record_id.present?) do
+      - link_text = @social_post.bike.title_string if @social_post.bike.present?
+      - link_text ||= @social_post.stolen_record.id
+      = link_to link_text, admin_stolen_bike_path(@social_post.stolen_record_id, stolen_record_id: true) if @social_post.stolen_record.present?
+  = render(UI::TableList::Component.new) do |list|
+    - list.with_row(label: "Text", value: @social_post.posted_text)
+    - list.with_row(label: "Image", value: (image_tag(@social_post.posted_image, style: "display: block; max-height: 200px; width: auto;") if @social_post.posted_image.present?))
+    - list.with_row(label: "Kind", value: (@social_post.kind.gsub(/_?post/, "").humanize if @social_post.kind.present?))
 
 - if @social_post.imported_post?
   %h3 Landing page rendering
-  .landing-why-col.clearfix
+  %div{class: "tw:mt-6 tw:lg:max-w-7/12"}
     = render partial: 'landing_pages/social_post', locals: { post_id: @social_post.id }
 
 - if @social_post.reposts.any?
-  %h3.mt-4 Reposts
+  %h3{class: "tw:mt-6"} Reposts
   = render partial: "admin/social_posts/table", locals: { social_posts: @social_post.reposts, skip_reposts: true }
 
-%hr.mt-4
+%hr{class: "tw:mt-6"}
 
 %h3 Platform Response Data
 = render UI::JsonDisplay::Component.new(data: @social_post.platform_response, no_max_height: true)

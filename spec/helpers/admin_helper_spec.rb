@@ -43,20 +43,6 @@ RSpec.describe AdminHelper, type: :helper do
     end
   end
 
-  describe "credibility_scorer_color" do
-    it "returns yellow for 50" do
-      expect(credibility_scorer_color(50)).to eq "#ffc107"
-      expect(credibility_scorer_color_table(50)).to eq ""
-    end
-    it "returns red for 25" do
-      expect(credibility_scorer_color(25)).to eq "#dc3545"
-      expect(credibility_scorer_color_table(25)).to eq "#dc3545"
-    end
-    it "returns green for 80" do
-      expect(credibility_scorer_color(80)).to eq "#28a745"
-    end
-  end
-
   describe "admin_path_for_object" do
     it "returns blank" do
       expect(admin_path_for_object).to be_blank

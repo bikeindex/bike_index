@@ -52,8 +52,8 @@
     <% if bike_sticker.claimed? %>
       <%= helpers.organized_bike_text(bike_sticker.bike) %>
     <% elsif bike_sticker.bike_id.present? %>
-      <%= link_to bike_sticker.bike_id, admin_bike_path(bike_sticker.bike_id), class: "small" %>
-      <small class="text-danger">Deleted?</small>
+      <%= link_to bike_sticker.bike_id, admin_bike_path(bike_sticker.bike_id), class: "tw:text-sm" %>
+      <small class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">Deleted?</small>
     <% end %>
   <% end %>
 
@@ -63,7 +63,7 @@
     </strong>
 
     <% unless bike_sticker.sticker? %>
-      <em class="small text-warning"><%= bike_sticker.kind %></em>
+      <em class="tw:text-sm <%= UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>"><%= bike_sticker.kind %></em>
     <% end %>
   <% end %>
 <% end %>

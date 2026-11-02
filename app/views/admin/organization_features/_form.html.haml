@@ -1,31 +1,24 @@
 = form_for [:admin, @organization_feature] do |f|
   = render(UI::Alerts::ObjectError::Component.new(object: @organization_feature))
 
-  .row
-    .col-md-6.col-xs-12
-      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :kind)) do
-        = render(UI::Forms::Select::Component.new(form_builder: f, attribute: :kind, option_tags: OrganizationFeature.kinds.map { |k| [k.humanize, k] }))
-    .col-md-6.col-xs-12
-      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :name))
+  .twfieldrow
+    = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :kind)) do
+      = render(UI::Forms::Select::Component.new(form_builder: f, attribute: :kind, option_tags: OrganizationFeature.kinds.map { |k| [k.humanize, k] }))
+    = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :name))
   - if display_dev_info?
-    .row.only-dev-visible
-      .col-md-6
-        = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :feature_slugs_string, kind: :text_area, label_text: "Organization Feature Slugs")) do |group|
-          - group.with_label_note { "comma delineated" }
-      .col-md-6{ class: "tw:bg-white tw:dark:bg-gray-800" }
-        %small.twless-strong.p-1
+    .twwiderow.only-dev-visible
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :feature_slugs_string, kind: :text_area, label_text: "Organization Feature Slugs")) do |group|
+        - group.with_label_note { "comma delineated" }
+      %div{ class: "tw:bg-white tw:dark:bg-gray-800" }
+        %small.twless-strong{class: "tw:p-1"}
           Permitted slugs:
           = safe_join(OrganizationFeature::EXPECTED_SLUGS.sort.map { |slug| content_tag(:code, slug) }, ", ")
-  .row.mt-2
-    .col-md-6.col-xs-12
-      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :amount)) do
-        %div{class: "tw:flex tw:gap-2"}
-          = render(UI::Forms::Select::Component.new(form_builder: f, attribute: :currency_enum, option_tags: Currency.select_options, html_options: {class: "tw:w-auto"}))
-          = render(UI::Forms::Input::Component.new(form_builder: f, attribute: :amount, kind: :number_field, html_options: {step: 1, min: 0}))
-    .col-xs-12.col-md-6
-      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :details_link))
-  .row
-    .col-12
-      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :description, kind: :text_area))
+  .twfieldrow{class: "tw:mt-2"}
+    = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :amount)) do
+      %div{class: "tw:flex tw:gap-2"}
+        = render(UI::Forms::Select::Component.new(form_builder: f, attribute: :currency_enum, option_tags: Currency.select_options, html_options: {class: "tw:w-auto"}))
+        = render(UI::Forms::Input::Component.new(form_builder: f, attribute: :amount, kind: :number_field, html_options: {step: 1, min: 0}))
+    = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :details_link))
+  = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :description, kind: :text_area))
 
   = render(UI::Button::Component.new(text: @organization_feature.id.present? ? "Update" : "Create", color: :primary, type: "submit"))

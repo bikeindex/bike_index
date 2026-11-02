@@ -5,8 +5,8 @@
 <% end %>
 
 <% admin_search_form = capture do %>
-  <div class="row">
-    <div class="col-md-6">
+  <div class="twwiderow">
+    <div>
       <% if filter_params.any? %>
         <p>
           <%= pluralize number_with_delimiter(@exchange_rates.count), "matching exchange rate" %>
@@ -15,16 +15,14 @@
       <% end %>
     </div>
 
-    <div class="col-md-6">
-      <%= form_with(url: admin_exchange_rates_path, method: :get, html: {class: "twsearchrow"}) do |form| %>
-        <%= render partial: "/shared/hidden_search_fields" %>
+    <%= form_with(url: admin_exchange_rates_path, method: :get, html: {class: "twsearchrow"}) do |form| %>
+      <%= render partial: "/shared/hidden_search_fields" %>
 
-        <%= render(UI::Forms::Select::Component.new(form_builder: form, attribute: :search_to,
-          option_tags: ExchangeRate.pluck(:to).uniq, options: {prompt: "Filter by target currency", selected: params[:search_to]})) %>
+      <%= render(UI::Forms::Select::Component.new(form_builder: form, attribute: :search_to,
+        option_tags: ExchangeRate.pluck(:to).uniq, options: {prompt: "Filter by target currency", selected: params[:search_to]})) %>
 
-        <%= render(UI::Button::Component.new(text: "Filter", color: :primary, type: "submit", name: "search")) %>
-      <% end %>
-    </div>
+      <%= render(UI::Button::Component.new(text: "Filter", color: :primary, type: "submit", name: "search")) %>
+    <% end %>
   </div>
 <% end %>
 

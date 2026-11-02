@@ -7381,9 +7381,6 @@ nb:
             og andre programmer kan være underkontoer med eget personale og utdanningsinnhold.
             Ansatte på hvert nivå administrerer kun sine egne regler.
           faq_account_question: Hvem administrerer kontoen?
-          faq_checker_answer: Sykkeldetaljer kommer fra BikeBook, en katalog over
-            elsykkelmodeller med klasse, motor, hastighet og UL-sertifisering. Statlige
-            regler er oppført med forskriftene bak dem.
           faq_checker_question: Hvor får samsvarskontrolløren dataene sine fra?
           faq_cost_answer: Det er ingen gebyrer per registrering, og registreringen
             er gratis for innbyggere. Vi vil gå gjennom prisene for byen din under
@@ -7576,6 +7573,9 @@ nb:
             registrere sykkelen sin. Hvis det er en elsykkel, går de rett inn i en
             kort opplæringsprosess med byens regler.
           submit_demo: Be om en demonstrasjon
+          faq_checker_answer_html: Sykkeldetaljer kommer fra %{bikebook_link}, en
+            katalog over elsykkelmodeller med klasse, motor, hastighet og UL-sertifisering.
+            Statlige regler er listet opp med forskriftene bak dem.
         for_cities_education:
           all_set: Du er klar.
           back: Tilbake

@@ -1,6 +1,6 @@
 <%# locals: (collection:, render_sortable: false) %>
 
-<div class="pt-2">
+<div class="tw:pt-2">
   <%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:,
         cache_key: cache_fragment_name("admin_bulk_import"),
         cache_records: ->(bulk_import) { [bulk_import.organization, bulk_import.user, bulk_import.ownerships.size] })) do |table| %>
@@ -9,7 +9,7 @@
 
       <% if bulk_import.organization_id.present? %>
         <small class="twless-strong">
-          <%= link_to "org view", organization_bulk_import_path(bulk_import, organization_id: bulk_import.organization.to_param), class: "em twless-strong" %>
+          <%= link_to "org view", organization_bulk_import_path(bulk_import, organization_id: bulk_import.organization.to_param), class: "twless-strong tw:italic" %>
         </small>
       <% end %>
     <% end %>
@@ -18,7 +18,7 @@
       <%= render partial: "/organized/bulk_imports/progress_display", locals: {bulk_import:} %>
 
       <% if bulk_import.timeout_failure? %>
-        <em class="small">import failed to process</em>
+        <em class="tw:text-sm">import failed to process</em>
         <small class="only-dev-visible">still pending</small>
       <% end %>
     <% end %>
@@ -35,7 +35,9 @@
       <% if bulk_import.ascend? %>
         <small class="twless-strong">ascend</small>
         <% if bulk_import.ascend_unprocessable? %>
-          <small class="text-warning"> missing Ascend Organization! </small>
+          <small class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>">
+            missing Ascend Organization!
+          </small>
         <% end %>
       <% end %>
     <% end %>
@@ -49,7 +51,7 @@
 
       <small>
         <% if bulk_import.file_cleaned? %>
-          <em class="text-warning">file removed</em>
+          <em class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>">file removed</em>
         <% else %>
           <%= bulk_import.file_filename %>
         <% end %>

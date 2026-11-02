@@ -65,6 +65,13 @@ RSpec.describe ImpoundClaim, type: :model do
       expect(impound_claim.organized?).to be_truthy
       expect(impound_claim.claim_kind_humanized).to eq "impounded bike trailer claim"
     end
+
+    # The review page and the claim checklist call image scopes on it
+    context "without a bike submitting" do
+      it "returns an empty relation" do
+        expect(ImpoundClaim.new.bike_submitting_images.photo_of_receipt).to eq([])
+      end
+    end
   end
 
   describe "impound_record_email" do

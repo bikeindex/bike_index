@@ -14,6 +14,5 @@
         /   Crop image
 = f.fields_for :listicles do |builder|
   = render 'listicle_fields', f: builder
-.row.mt-4.justify-content-center
-  .col.auto
-    = link_to_add_fields "Add a Vignette", f, :listicles
+%div{class: "tw:mt-6 tw:flex tw:justify-center"}
+  = link_to_add_fields "Add a Vignette", f, :listicles

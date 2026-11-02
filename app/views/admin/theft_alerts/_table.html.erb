@@ -17,7 +17,7 @@
       <% end %>
 
       <% if theft_alert.failed_to_activate? %>
-        <span class="text-danger">Failed activation!</span>
+        <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">Failed activation!</span>
       <% elsif theft_alert.activating? %>
         <span class="text-success">activating!</span>
       <% else %>
@@ -28,10 +28,10 @@
         <% end %>
         <% if theft_alert.pending? %>
           <% if theft_alert.activateable? %>
-            <em class="small text-success">activateable</em>
+            <em class="text-success tw:text-sm">activateable</em>
           <% else %>
-            <em class="small d-block">
-              <span class="text-danger">missing:</span>
+            <em class="tw:block tw:text-sm">
+              <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">missing:</span>
 
               <%= [
                 ("photo" if theft_alert.missing_photo?),
@@ -112,7 +112,7 @@
       <%= theft_alert.notes %>
 
       <% if theft_alert.facebook_post_url.present? %>
-        <small class="d-block">
+        <small class="tw:block">
           <%= link_to "facebook", theft_alert.facebook_post_url, class: "twlink" %>
         </small>
       <% end %>
