@@ -12,10 +12,9 @@ module Pages
             {template: "pages/admin/headers/tabs/component_preview/default", locals: {tabs:}}
           end
 
-          def with_summary
-            render(Pages::Admin::Headers::Tabs::Component.new(title: "Brakebills", tabs:, nav_label: "Organization sections")) do |header|
-              header.with_summary { "A school in upstate New York" }
-            end
+          # A template, so the alert can render UI::Alerts::Base
+          def with_alert_and_summary
+            {template: "pages/admin/headers/tabs/component_preview/with_alert_and_summary", locals: {tabs:}}
           end
 
           # @!endgroup
