@@ -17,7 +17,7 @@ module OrganizedHelper
         concat(content_tag(:small, " #{bike.type}"))
       end
       if bike.deleted?
-        concat(content_tag(:em, " removed from Bike Index", class: "small text-danger"))
+        concat(content_tag(:em, " removed from Bike Index", class: "tw:text-sm #{UI::Alerts::Base::Component::TEXT_CLASSES[:error]}"))
       elsif bike.unregistered_parking_notification? # Only care if currently unregistered parking notification
         # If it's an unregistered bike, don't display where it was created
         # ... since it only could've been created in one place

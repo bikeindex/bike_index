@@ -3,7 +3,9 @@
 <h4>Tsv reports:</h4>
 
 <% if @tsvs.none? %>
-  <p class="text-warning">No TSVs</p>
+  <p class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>">
+    No TSVs
+  </p>
 <% else %>
   <%= render(UI::Table::Component.new(records: @tsvs.sort_by { |a| a[:updated_at] })) do |table| %>
     <% table.column(label: "Updated") do |tsv_info| %>

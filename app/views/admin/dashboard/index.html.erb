@@ -1,11 +1,8 @@
 <% cache("admin/dashboard/index", expires_in: 1.minute) do %>
-  <h1 class="text-center">Go Hard</h1>
+  <h1 class="tw:text-center">Go Hard</h1>
 
   <% if Organization.example.blank? %>
-    <div class="alert alert-danger">
-      <h4>Example organization is broken!</h4>
-      <p>This breaks things. Tell Seth.</p>
-    </div>
+    <%= render(UI::Alerts::Base::Component.new(kind: :error, header: "Example organization is broken!", text: "This breaks things. Tell Seth.")) %>
   <% end %>
 
   <h2 class="mb-4 mt-4">

@@ -40,24 +40,24 @@
         </h4>
 
         <% duplicated = @bike_sticker_batch.duplicated_integers %>
-        <span class="d-block strong">Duplicates:</span>
+        <span class="strong tw:block">Duplicates:</span>
 
         <% if duplicated.any? %>
           <ul>
             <% duplicated.each do |int| %>
-              <li class="small"><code><%= int %></code></li>
+              <li class="tw:text-sm"><code><%= int %></code></li>
             <% end %>
           </ul>
         <% else %>
           <em class="twless-strong">None</em>
         <% end %>
 
-        <span class="d-block strong">Non-sequential stickers:</span>
+        <span class="strong tw:block">Non-sequential stickers:</span>
 
         <% if @bike_sticker_batch.non_sequential_integers.any? %>
           <ul>
             <% @bike_sticker_batch.non_sequential_integers.each do |arr| %>
-              <li class="small"><%= arr[0] %> &gt; <%= arr[1] %></li>
+              <li class="tw:text-sm"><%= arr[0] %> &gt; <%= arr[1] %></li>
             <% end %>
           </ul>
         <% else %>
@@ -66,7 +66,7 @@
       </div>
       <hr>
     <% else %>
-      <div class="text-center pt-4">
+      <div class="pt-4 tw:text-center">
         <%= render(UI::ButtonLink::Component.new(text: "Show problem stickers for Batch ##{@bike_sticker_batch.id}", href: url_for(sortable_search_params.merge(search_show_problems: true)), color: :yellow, size: :sm)) %>
 
         <em class="ml-2 twless-strong">

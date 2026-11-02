@@ -13,13 +13,13 @@
     If this bike has just been marked stolen, wait a minute or two and it will be here!
 
 - elsif @bike.present? && !@current_stolen_record
-  %h2.text-warning
+  %h2{class: UI::Alerts::Base::Component::TEXT_CLASSES[:warning]}
     This Stolen record is not the current stolen record for the Bike!
   %p
     Either you're viewing a recovered bike or there is a new stolen record.
   %h4
     = link_to "View the current stolen record", edit_admin_stolen_bike_url(@bike.id)
-  %p.text-danger.mt-4
+  %p.mt-4{class: UI::Alerts::Base::Component::TEXT_CLASSES[:error]}
     You Probably don't want to do anything on this page
 
 - elsif @stolen_record.present? && !@stolen_record.approved
@@ -68,17 +68,15 @@
             If you believe the bike is <em>Special</em>, and don't know what to do, ping Bryan with it
 
     .col-md-6
-      .alert.alert-info
-        %h4
-          Approving will:
+      = render(UI::Alerts::Base::Component.new(kind: :notice, header: "Approving will:")) do
         %ul.mt-0
           %li
             Send out a tweet
           %li
             The #{@bike.type} will be posted to any pertinent blogs.
           %li
-            It <strong class="em">can NOT</strong> be effectively reversed
-        .mt-4.text-center
+            It <strong class="tw:italic">can NOT</strong> be effectively reversed
+        .mt-4{class: "tw:text-center"}
           = render(UI::ButtonLink::Component.new(text: "Approve listing", href: approve_admin_stolen_bike_url(@bike), method: :post, color: :primary, size: :lg))
 
 - social_posts = @stolen_record&.social_posts

@@ -1,26 +1,24 @@
 - blog = public_image.imageable if public_image.imageable_type == 'Blog'
 - original_url = public_image.image_url
-%li.admin-public-image.mt-1.col-xl-4.col-sm-6{ id: "image-#{public_image.id}", data: ({ controller: "admin--public-image", "admin--public-image-url-value": public_image_path(public_image) } if blog) }
-  .card.bg-light
-    .card-body
+%li.mt-1.col-xl-4.col-sm-6{ class: "tw:text-xs", id: "image-#{public_image.id}", data: ({ controller: "admin--public-image", "admin--public-image-url-value": public_image_path(public_image) } if blog) }
+  = render(UI::Card::Component.new) do
+    .row
+      .col-3
+        - if original_url.present?
+          -# Versions are generated in a background job, so a just-uploaded image has none
+          -# yet, and the versioned src can 404 until the worker catches up
+          = image_tag(public_image.image_url(:small) || original_url, class: "tw:mx-auto tw:block tw:h-auto tw:max-w-full", data: { controller: "image-fallback", action: "error->image-fallback#fallBack", "image-fallback-url-value": original_url })
+        %p{class: "twless-strong tw:text-center tw:text-[80%]"}
+          = public_image.name.truncate(18)
+      .col-9
+        %textarea.form-control
+          \&lt;img class="post-image" src="#{original_url}" alt="ENTER YOUR TEXT HERE"&gt;
+    - if blog
       .row
-        .col-3
-          .img-box
-            - if original_url.present?
-              -# Versions are generated in a background job, so a just-uploaded image has none
-              -# yet, and the versioned src can 404 until the worker catches up
-              = image_tag(public_image.image_url(:small) || original_url, data: { controller: "image-fallback", action: "error->image-fallback#fallBack", "image-fallback-url-value": original_url })
-          %p.image-filename
-            = public_image.name.truncate(18)
-        .col-9
-          %textarea.form-control
-            \&lt;img class="post-image" src="#{original_url}" alt="ENTER YOUR TEXT HERE"&gt;
-      - if blog
-        .row
-          .col-6
-            = render(UI::Button::Component.new(text: "delete", color: :error, size: :sm, data: { action: "admin--public-image#destroy" }))
-          .col-6.text-right
-            %label.form-check-inline
-              -# The list sits outside the blog's form, so `form` is what joins it to "No primary image"
-              %input{ type: "radio", name: "blog[index_image_id]", value: public_image.id, form: dom_id(blog, :edit), checked: blog.index_image_id == public_image.id }
-              %em.ml-1 primary image
+        .col-6
+          = render(UI::Button::Component.new(text: "delete", color: :error, size: :sm, data: { action: "admin--public-image#destroy" }))
+        .col-6{class: "tw:text-right"}
+          %label.form-check-inline
+            -# The list sits outside the blog's form, so `form` is what joins it to "No primary image"
+            %input{ type: "radio", name: "blog[index_image_id]", value: public_image.id, form: dom_id(blog, :edit), checked: blog.index_image_id == public_image.id }
+            %em.ml-1 primary image

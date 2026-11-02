@@ -23,7 +23,7 @@
     </strong>
 
     <% unless bike_sticker.sticker? %>
-      <em class="small text-warning"><%= bike_sticker.kind %></em>
+      <em class="tw:text-sm <%= UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>"><%= bike_sticker.kind %></em>
     <% end %>
   <% end %>
 
@@ -45,8 +45,8 @@
         <%= link_to helpers.organized_bike_text(update.bike), edit_admin_bike_path(update.bike_id) %>
       </small>
     <% elsif update.bike_id.present? %>
-      <%= link_to update.bike_sticker.bike_id, admin_bike_path(update.bike_sticker.bike_id), class: "small" %>
-      <small class="text-danger">Deleted?</small>
+      <%= link_to update.bike_sticker.bike_id, admin_bike_path(update.bike_sticker.bike_id), class: "tw:text-sm" %>
+      <small class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">Deleted?</small>
     <% end %>
   <% end %>
 
@@ -74,10 +74,10 @@
         <%= update.creator_kind_humanized %>
       </small>
       <% if update.export_id.present? %>
-        <%= link_to "##{update.export_id}", organization_export_path(update.export_id, organization_id: update.organization_id), class: "small" %>
+        <%= link_to "##{update.export_id}", organization_export_path(update.export_id, organization_id: update.organization_id), class: "tw:text-sm" %>
       <% end %>
       <% if update.bulk_import_id.present? %>
-        <%= link_to "##{update.bulk_import_id}", organization_bulk_import_path(update.bulk_import_id, organization_id: update.organization_id), class: "small" %>
+        <%= link_to "##{update.bulk_import_id}", organization_bulk_import_path(update.bulk_import_id, organization_id: update.organization_id), class: "tw:text-sm" %>
       <% end %>
     <% end %>
   <% end %>

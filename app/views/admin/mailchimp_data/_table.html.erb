@@ -9,7 +9,7 @@
   <% end %>
 
   <% table.column(label: "Feedbacks", header_classes: "tw:text-xs") do |mailchimp_datum| %>
-    <%= safe_join(mailchimp_datum.feedbacks.map { |f| link_to(f.kind_humanized, admin_feedback_path(f), class: "small") }, ", ") %>
+    <%= safe_join(mailchimp_datum.feedbacks.map { |f| link_to(f.kind_humanized, admin_feedback_path(f), class: "tw:text-sm") }, ", ") %>
   <% end %>
 
   <% table.column(sortable: "created_at") do |mailchimp_datum| %>
@@ -24,7 +24,7 @@
     <%= mailchimp_datum.lists.join(", ") %>
   <% end %>
 
-  <% table.column(label: safe_join(["Groups ", tag.small("AKA interests", class: "only-dev-visible d-none d-xl-inline-block")])) do |mailchimp_datum| %>
+  <% table.column(label: safe_join(["Groups ", tag.small("AKA interests", class: "only-dev-visible tw:hidden tw:xl:inline-block")])) do |mailchimp_datum| %>
     <%= mailchimp_datum.interests.map(&:humanize).join(", ") %>
   <% end %>
 

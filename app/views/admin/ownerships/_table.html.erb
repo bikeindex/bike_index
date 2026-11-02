@@ -17,7 +17,7 @@
         <% if ownership.bike.present? %>
           <%= link_to helpers.bike_title_html(ownership.bike), admin_bike_path(ownership.bike), class: "twlink" %>
         <% else %>
-          <span class="text-danger">Missing Bike #<%= ownership.bike_id %></span>
+          <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">Missing Bike #<%= ownership.bike_id %></span>
         <% end %>
       <% end %>
     <% end %>
@@ -26,7 +26,7 @@
       <% creator = ownership.creator %>
 
       <% if creator.blank? %>
-        <em class="text-warning">user deleted</em>
+        <em class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>">user deleted</em>
         <span class="only-dev-visible">#<%= ownership.creator_id %></span>
       <% else %>
         <%= creator.display_name %>

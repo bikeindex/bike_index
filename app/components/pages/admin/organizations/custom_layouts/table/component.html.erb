@@ -8,7 +8,7 @@
       <%= row[:preview_prefix] %>
       <%= link_to row[:preview_label], row[:preview_path], class: "tw:text-sm" %>
     <% else %>
-      <span class="text-warning">Unknown email kind: "<%= row[:emails] %>"</span>
+      <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>">Unknown email kind: "<%= row[:emails] %>"</span>
     <% end %>
   <% end %>
 

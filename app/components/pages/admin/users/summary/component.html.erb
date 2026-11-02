@@ -40,7 +40,7 @@
           <% end %>
         <% elsif superuser_abilities.any? %>
           <%= link_to "limited", admin_superuser_abilities_path(user_id: @user.id), class: "text-info" %>
-          <ul class="small mb-0">
+          <ul class="mb-0 tw:text-sm">
             <% superuser_abilities.each do |superuser_ability| %>
               <li>
                 <% if superuser_ability.universal? %>
@@ -62,7 +62,7 @@
         <div class="row">
           <div class="col-4">
             <small
-              class="d-block border-bottom"
+              class="border-bottom tw:block"
               title="Receive Bike Index newsletters"
             >
               Newsletters
@@ -77,7 +77,7 @@
 
           <div class="col-4">
             <small
-              class="d-block border-bottom"
+              class="border-bottom tw:block"
               title="Receive non-stolen theft emails"
             >
               Unstolen
@@ -86,17 +86,17 @@
             <% if @user.notification_unstolen %>
               <%= check_mark %>
             <% else %>
-              <small class="text-danger twless-strong">false</small>
+              <small class="twless-strong <%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">false</small>
             <% end %>
           </div>
 
           <div class="col-4">
-            <small class="d-block border-bottom" title="No non theft emails">
+            <small class="border-bottom tw:block" title="No non theft emails">
               NONE
             </small>
 
             <% if @user.no_non_theft_notification %>
-              <span class="text-danger"><%= check_mark %></span>
+              <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>"><%= check_mark %></span>
             <% else %>
               <small class="twless-strong">false</small>
             <% end %>
@@ -150,7 +150,7 @@
               <li>
                 <%= render Atoms::Phone::Component.new(phone: user_phone.phone, skip_link: true) %>
 
-                <small class="twless-strong <%= user_phone.confirmed? ? "text-success" : "text-warning" %>">
+                <small class="twless-strong <%= user_phone.confirmed? ? "text-success" : UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>">
                   <%= user_phone.confirmed? ? "confirmed" : "unconfirmed" %>
                 </small>
 
@@ -165,12 +165,12 @@
             <% if display_phone %>
               <li>
                 <%= render Atoms::Phone::Component.new(phone: @user.phone, skip_link: true) %>
-                <small class="twless-strong text-warning">unconfirmed</small>
+                <small class="twless-strong <%= UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>">unconfirmed</small>
               </li>
             <% end %>
           </ul>
           <% unless Flipper.enabled?(:phone_verification) %>
-            <em class="small twless-strong">
+            <em class="twless-strong tw:text-sm">
               Phone verification is currently disabled, users don't see the
               option to confirm their phones
             </em>

@@ -22,17 +22,6 @@ module AdminHelper
     end
   end
 
-  def credibility_scorer_color(score)
-    return "#dc3545" if score < 31
-    return "#ffc107" if score < 70
-
-    "#28a745"
-  end
-
-  def credibility_scorer_color_table(score)
-    (score < 31) ? credibility_scorer_color(score) : ""
-  end
-
   def admin_email_domain_spam_color(spam_score)
     if spam_score > 9
       UI::Alerts::Base::Component::TEXT_CLASSES[:error]

@@ -3,7 +3,7 @@
     <%= number_with_delimiter(organization_roles_count) %>
 
     <% if @deleted %>
-      <span class="text-danger">Deleted</span>
+      <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">Deleted</span>
     <% end %>
 
     <%= "OrganizationRole".pluralize(organization_roles_count) %>

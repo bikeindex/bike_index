@@ -13,11 +13,11 @@
     </div>
 
     <div
-      class="card bg-light <%= kind_hidden_class("app_post") %>"
+      class="<%= kind_hidden_class("app_post") %>"
       data-admin--social-post-form-target="kindFields"
       data-kind="app_post"
     >
-      <div class="card-body">
+      <%= render(UI::Card::Component.new) do %>
         <div class="row">
           <div class="col-md-6">
             <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :social_account_id, label_text: "Account")) do |group| %>
@@ -42,7 +42,7 @@
               <% end %>
 
               <p
-                class="text-info text-right"
+                class="text-info tw:text-right"
                 style="margin-top: -0.4rem; font-size: 150%;"
               >
                 <span data-admin--character-count-target="total"></span>
@@ -71,19 +71,19 @@
           <% end %>
         </div>
 
-        <em class="small twless-strong">
+        <em class="twless-strong tw:text-sm">
           Even if checked, original account won't repost itself (so feel free to
           leave it checked)
         </em>
-      </div>
+      <% end %>
     </div>
 
     <div
-      class="card bg-light <%= kind_hidden_class("imported_post") %>"
+      class="<%= kind_hidden_class("imported_post") %>"
       data-admin--social-post-form-target="kindFields"
       data-kind="imported_post"
     >
-      <div class="card-body">
+      <%= render(UI::Card::Component.new) do %>
         <p><strong>Import a post</strong></p>
 
         <p><em>This is primarily for adding a post to a landing page.</em></p>
@@ -104,7 +104,7 @@
         <div class="mt-4">
           <%= render(UI::Button::Component.new(text: "Create post!", color: :primary, type: "submit")) %>
         </div>
-      </div>
+      <% end %>
     </div>
   <% end %>
 </div>
