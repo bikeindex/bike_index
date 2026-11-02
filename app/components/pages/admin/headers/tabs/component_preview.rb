@@ -7,7 +7,7 @@ module Pages
         class ComponentPreview < ApplicationComponentPreview
           # @!group Variants
 
-          # A template, so the links and the alert can render UI:: components
+          # A template, so the link can render UI::ButtonLink
           def default
             {template: "pages/admin/headers/tabs/component_preview/default", locals: {tabs:}}
           end
