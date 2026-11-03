@@ -1,6 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
 import { CatalogComboboxSource, loadCatalog, renderCounts } from 'bikebook/catalog'
-import { hydrate, loadingShell, pickedVehicles, rescoredSimilar, unpickedVehicles } from 'bikebook/hydrate'
+import { addComparison, hydrate, loadingShell, pickedVehicles, picksShell, rescoredSimilar, unpickedVehicles } from 'bikebook/hydrate'
 import { keepPermanent, renderInto } from 'bikebook/render'
 import { readable } from 'bikebook/replace_url'
 import { NARROWING, searching } from 'bikebook/query'
@@ -27,6 +27,8 @@ export default class extends Controller {
   #refilters = 0
   #rescores = 0
   #renderedUrl
+  #picks
+  #renderedCatalog
 
   // The loading shell holds the status until the catalog's first render replaces it, and a failure puts it back
   initialize () {
@@ -40,7 +42,12 @@ export default class extends Controller {
     const url = new URL(window.location.href)
     this.#render(url)
     try {
-      this.catalog = await loadCatalog(this.manifestUrlValue, url.searchParams.get('vehicle_models')?.split(',') ?? [], this.jurisdictionsValue, this.paintColorsValue)
+      this.catalog = await loadCatalog(this.manifestUrlValue, url.searchParams.get('vehicle_models')?.split(',') ?? [], this.jurisdictionsValue, this.paintColorsValue, (picks) => {
+        if (this.catalog) return
+
+        this.#picks = picks
+        this.#render(new URL(window.location.href), [window.scrollX, window.scrollY], { focus: false })
+      })
     } catch (error) {
       return this.#fail(error)
     }
@@ -51,10 +58,17 @@ export default class extends Controller {
       renderClassCards(document, picked.split(','), this.catalog.vocabulary.e_vehicle_classifications)
       if (!primed) this.#searchLog.typed({ ...Object.fromEntries(new URL(window.location.href).searchParams), q, count: total })
     })
+    const compared = this.catalog.comparison().then(({ comparable, frameMaterials }) => {
+      this.catalog = { ...this.catalog, comparable, options: { ...this.catalog.options, frame_material: frameMaterials } }
+    })
     // filters set while it loaded are in the URL, and the reader stays where they've scrolled to
     const current = new URL(window.location.href)
-    this.#render(current, [window.scrollX, window.scrollY])
+    // the comparison doesn't hold up the page, unless the page is of what it adds
+    if (current.searchParams.get('similar') === '1' || current.searchParams.get('frame_material')) await compared
     this.#searchLog.visited(current)
+    await this.#render(current, [window.scrollX, window.scrollY])
+    await compared
+    if (this.#renderedCatalog !== this.catalog) addComparison(this.catalog, this.pageTarget, new URL(window.location.href))
   }
 
   // The form's fields over the URL's other params, such as an open panel's, its sizes following their vehicles,
@@ -194,14 +208,18 @@ export default class extends Controller {
 
   // `scroll` is where the window goes, [x, y] or a selector of what to bring to its top. `focus` selects what to focus,
   // the search where it selects nothing, unless a field of the page's has focus, which keeps it and any value it hasn't
-  // yet changed to. Until the catalog loads, the page is its loading shell
+  // yet changed to. Until the catalog loads, the page is its loading shell, with the picked vehicles once they're in
   async #render (url, scroll, { focus = '[autofocus]', reveal = false } = {}) {
-    if (!this.catalog) return this.pageTarget.replaceChildren(loadingShell(this.shellTarget, url, this.status))
+    if (!this.catalog && !this.#picks) return this.pageTarget.replaceChildren(loadingShell(this.shellTarget, url, this.status))
 
     const render = ++this.#renders
-    // A share menu shares the canonical, which names the page the server sent. Kept through the first render, which crawlers see
-    if (render > 1) document.querySelector('link[rel="canonical"]')?.remove()
-    const rendered = await hydrate(this.catalog, this.source, this.shellTarget, url).catch((error) => error)
+    // A share menu shares the canonical, which names the page the server sent. Kept through the first render of the
+    // catalog, which crawlers see
+    if (render > (this.#picks ? 2 : 1)) document.querySelector('link[rel="canonical"]')?.remove()
+    const { catalog } = this
+    const rendered = await (catalog
+      ? hydrate(catalog, this.source, this.shellTarget, url)
+      : picksShell(this.#picks, this.shellTarget, url, this.status)).catch((error) => error)
     if (render !== this.#renders) return
     if (rendered instanceof Error) return this.#fail(rendered)
 
@@ -215,6 +233,7 @@ export default class extends Controller {
       collapse('show', search)
     }
     this.#renderedUrl = url
+    this.#renderedCatalog = catalog
     document.title = rendered.title ?? this.titleValue
     const kept = active && this.pageTarget.querySelector(`#${CSS.escape(active.id)}`)
     if (kept) {

@@ -12,7 +12,7 @@
   </a>
 <% end %>
 
-<% search = capture do %>
+<% search = lambda do |placeholder| %>
   <div
     class="tw:group"
     data-controller="bikebook--catalog-filters ui--collapse"
@@ -49,7 +49,7 @@
         multiselect_chip_src: bikebook_path,
         dialog_label: translation(".select_a_bike"),
         html_options: {value: "",
-                       placeholder: translation(".search_placeholder"),
+                       placeholder:,
                        data: {controller: "bikebook--chip-reorder", repeatable: true},
                        input: {autofocus: true, data: {"bikebook--focus-shortcut-target": "field"}}}
       )) %>
@@ -414,7 +414,7 @@
 
   <div class="bikebook twgutter tw:mx-auto tw:max-w-screen-xl tw:pt-7 tw:pb-6">
     <template data-bikebook--page-target="shell">
-      <%= search %>
+      <%= capture(translation(".search_placeholder"), &search) %>
 
       <div
         id="classification-cards"
@@ -427,7 +427,9 @@
 
     <div data-bikebook--page-target="page">
       <%# Placeholder until the catalog loads %>
-      <div inert class="<%= placeholder_class %>"><%= search %></div>
+      <div inert class="<%= placeholder_class %>">
+        <%= capture(placeholder_text, &search) %>
+      </div>
 
       <div
         class="

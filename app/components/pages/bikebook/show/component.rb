@@ -19,13 +19,14 @@ module Pages
 
         private
 
-        # The search until bikebook--page fills it in from the URL: hidden as searching() hides a lone model's, and blank
-        # where the URL sets anything
+        # The search until bikebook--page fills it in from the URL: hidden as searching() hides a lone model's
         def placeholder_class
           models, classifications = %w[vehicle_models classifications].map { @query[it].to_s.split(",").compact_blank }
-          return "tw:hidden" if models.one? && classifications.none? && !@query.key?("search")
-          "tw:invisible" if @query.except("search").any?
+          "tw:hidden" if models.one? && classifications.none? && !@query.key?("search")
         end
+
+        # Saying so where the URL sets anything, as what it sets waits on the catalog, like loadingShell's
+        def placeholder_text = @query.except("search").any? ? translation(".loading_placeholder") : translation(".search_placeholder")
 
         # The closed filters' and the open card's, so it's beside whichever shows
         def more_filters = render(UI::Collapse::Component.new(text: translation(".more_filters"), chevron: true,

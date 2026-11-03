@@ -2228,6 +2228,54 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(matched).to eq([["other_e", "acoustic"], ["acoustic"], ["complete", "frame"], ["complete"], ["small", "road"], ["road"], ["36", "28"], ["28", "40"], ["frame", "complete"], ["aluminum", "steel"], ["drop"], ["drop", "flat"], ["near"], ["s1000", "tiagra"], ["steel", "full"], ["commuting", "touring"]])
   end
 
+  it "shows and switches between the picked vehicles ahead of the index" do
+    serve_bikebook_catalog
+    held = Queue.new
+    page.driver.with_playwright_page do |playwright_page|
+      playwright_page.context.route("#{Integrations::Bikebook::Catalog::URL}index.*", ->(route, _request) { held << route })
+    end
+    visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_adv,m/specialized/2025/haul_st")
+
+    expect(page).to have_css("[data-hw-combobox-chip]", text: "Aventón Level 4 ADV", wait: 10)
+    expect(page).to have_css("[data-hw-combobox-chip]", text: /Specialized Haul ST\z/)
+    expect(page).to have_css("#vehicle_models[disabled]")
+    expect(page).to have_css("#vehicle-viewers tr")
+    click_link "Components"
+    expect(page).to have_current_path(/[?&]view=components\b/)
+    expect(page).to have_css("[data-hw-combobox-chip]", text: "Aventón Level 4 ADV")
+    expect(page).to have_css("[data-hw-combobox-chip]", text: /Specialized Haul ST\z/)
+
+    held.pop.fallback
+    # what the index adds: whether each is current, and the search
+    expect(page).to have_css("[data-hw-combobox-chip]", text: "Specialized Haul ST current", wait: 10)
+    expect(page).to have_no_css("#vehicle_models[disabled]")
+    expect(page).to have_current_path(/[?&]view=components\b/)
+  end
+
+  it "searches ahead of the comparison, leaving what's typed as it adds the similar models" do
+    serve_bikebook_catalog
+    held = Queue.new
+    page.driver.with_playwright_page do |playwright_page|
+      playwright_page.context.route("#{Integrations::Bikebook::Catalog::URL}comparison.*", ->(route, _request) { held << route })
+    end
+    visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_adv,m/specialized/2025/haul_st")
+
+    expect(page).to have_css("#vehicle-models-count", text: "matching", wait: 10)
+    expect(page).to have_no_css("#vehicle_models[disabled]")
+    expect(page).to have_no_button("Compare similar bikes to Level 4 ADV")
+    type_into(find_field("vehicle_models"), "Soltera")
+    expect(page).to have_field("vehicle_models", with: /\ASoltera/)
+
+    held.pop.fallback
+    expect(page).to have_button("Compare similar bikes to Level 4 ADV", wait: 10)
+    expect(page).to have_field("vehicle_models", with: /\ASoltera/, focused: true)
+    find_field("vehicle_models").send_keys(:escape)
+    expect(page).to have_button("Compare similar bikes to Level 4 ADV")
+    click_on "More filters"
+    choose_option("Frame material", "Carbon or Composite")
+    expect(page).to have_current_path(/[?&]frame_material=/)
+  end
+
   it "keeps the search and its filters while the catalog loads, and says so when it doesn't" do
     serve_bikebook_catalog(manifest_status: 404)
     held = Queue.new

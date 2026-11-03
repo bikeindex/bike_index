@@ -8,8 +8,9 @@ import { fragmentOf, renderInto } from 'bikebook/render'
 /* global IntersectionObserver, Worker */
 
 // `jurisdictions` names the codes classifications are in, which the catalog doesn't, and `paintColors` are Bike Index's
-// colors' displays by their names, which its colorways' colors are
-export async function loadCatalog (manifestUrl, ids = [], jurisdictions = {}, paintColors = {}) {
+// colors' displays by their names, which its colorways' colors are. `onPicks` takes what `ids` render from, as soon as
+// it's in, where there are any
+export async function loadCatalog (manifestUrl, ids = [], jurisdictions = {}, paintColors = {}, onPicks = null) {
   const worker = new Worker(import.meta.resolve('bikebook/catalog_worker'), { type: 'module' })
   const pending = new Map()
   let nextId = 0
@@ -27,10 +28,13 @@ export async function loadCatalog (manifestUrl, ids = [], jurisdictions = {}, pa
     worker.postMessage({ id: nextId++, type, ...args })
   })
 
+  const vehicles = (ids, { market } = {}) => call('vehicles', { ids, market })
+
   try {
-    const { vocabulary, kit, options, comparable } = await call('load', {
-      manifestUrl: new URL(manifestUrl, window.location.href).href,
-      ids,
+    // a failure is load's to report, as it waits on the same files
+    const started = call('start', { manifestUrl: new URL(manifestUrl, window.location.href).href, ids, jurisdictions }).catch(() => null)
+    if (onPicks && ids.length) started.then((picks) => picks && onPicks({ ...picks, vocabulary: { ...picks.vocabulary, paint_colors: paintColors }, vehicles }))
+    const { vocabulary, kit, options } = await call('load', {
       jurisdictions,
       rulesUrl: import.meta.resolve('bikebook/featured_rules'),
       similarityUrl: import.meta.resolve('bikebook/similarity')
@@ -39,7 +43,10 @@ export async function loadCatalog (manifestUrl, ids = [], jurisdictions = {}, pa
       vocabulary: { ...vocabulary, paint_colors: paintColors },
       kit,
       options,
-      comparable,
+      comparable: false,
+      vehicles,
+      // what the comparison adds, once it's in
+      comparison: () => call('comparison'),
       // null, as for a comparison format it doesn't know, where the comparison doesn't load
       similar: (model, settings, filters) => call('similar', { model, settings, filters }).catch((error) => {
         console.error(error)
@@ -48,7 +55,6 @@ export async function loadCatalog (manifestUrl, ids = [], jurisdictions = {}, pa
       search: (params, page, perPage) => call('search', { params, page, perPage }),
       featured: (params, legalClasses) => call('featured', { params, legalClasses }),
       group: (id, { market, market_scope: scope }) => call('group', { model: id, market, scope }),
-      vehicles: (ids, { market } = {}) => call('vehicles', { ids, market }),
       displays: (ids) => call('displays', { ids })
     }
   } catch (error) {

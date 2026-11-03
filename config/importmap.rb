@@ -11,7 +11,7 @@ pin "@hotwired/stimulus-loading", to: "stimulus-loading.js"
 # preload: application.js imports this at the top level, so fetching it gates every
 # Stimulus controller connecting.
 pin "@bikeindex/time-localizer", to: "@bikeindex--time-localizer.js", preload: true
-pin "@floating-ui/dom", to: "@floating-ui--dom.js"
+pin "@floating-ui/dom", to: "@floating-ui--dom.js", preload: false
 # preload: false so a component rendered on a handful of admin pages doesn't fetch 10KB
 # on every page -- the controller import()s them for the same reason.
 pin "highlight.js/lib/core", to: "highlight.js--core.js", preload: false
@@ -25,20 +25,17 @@ pin "@honeybadger-io/js", to: "@honeybadger-io--js.js", preload: false
 pin "chartkick", to: "chartkick.js", preload: false
 pin "Chart.bundle", to: "Chart.bundle.js", preload: false
 
-# Our javascript!
-pin_all_from "app/javascript/controllers", under: "controllers"
-pin_all_from "app/components", under: "components"
+# Our javascript! Preloading the controllers cost ~0.5s of a cold first paint and ~0.2s of a warm
+# one for nothing: stimulus-loading import()s the ones a page connects, no later without it.
+pin_all_from "app/javascript/controllers", under: "controllers", preload: false
+pin_all_from "app/components", under: "components", preload: false
 pin_all_from "app/javascript/utils", under: "utils", to: "utils"
 
 # Lexxy rich text editor (Action Text). Assets served by the lexxy/activestorage gems.
-pin "lexxy", to: "lexxy.js"
-pin "@rails/activestorage", to: "activestorage.esm.js"
+pin "lexxy", to: "lexxy.js", preload: false
+pin "@rails/activestorage", to: "activestorage.esm.js", preload: false
 
-# /bikebook's modules, preloaded nowhere. Its controllers' pin_all_from overrides the preload
-# "app/javascript/controllers" gives them, which would fetch the graph they import on every page
+# /bikebook's modules, which /ebike-rules searches the catalog with too
 pin_all_from "app/javascript/bikebook", under: "bikebook", preload: false
-pin_all_from "app/javascript/controllers/bikebook", under: "controllers/bikebook", preload: false
-# /ebike-rules searches the catalog with /bikebook's modules
-pin_all_from "app/javascript/controllers/ebike_rules", under: "controllers/ebike_rules", preload: false
 pin "lit-html", to: "lit-html.js", preload: false
 pin "lit-html/directive.js", to: "lit-html--directive.js", preload: false
