@@ -55,8 +55,8 @@ class EmailDomain < ApplicationRecord
 
   validates_presence_of :domain
   validates_uniqueness_of :domain, on: :create
-  validate :domain_is_expected_format
-  validate :domain_does_not_match_existing, on: :create
+  validate :domain_is_expected_format, if: :domain?
+  validate :domain_does_not_match_existing, on: :create, if: :domain?
 
   attr_accessor :skip_processing
 
@@ -300,13 +300,13 @@ class EmailDomain < ApplicationRecord
   end
 
   def domain_is_expected_format
-    self.domain = domain&.strip
+    self.domain = domain.strip
 
-    errors.add(:domain, "Must include a .") unless domain&.match?(/\./)
+    errors.add(:domain, "Must include a .") unless domain.match?(/\./)
   end
 
   def domain_does_not_match_existing
-    return if domain.blank? || invalid_domain?
+    return if invalid_domain?
 
     existing_domain = self.class.find_matching_domain(domain)
     return if existing_domain.blank?
@@ -331,7 +331,7 @@ class EmailDomain < ApplicationRecord
     data["tld"] = self.class.tld_for(domain)
     return if data["tld"].blank?
 
-    data["is_tld"] = data["tld"].length >= domain&.tr("@", "")&.length
+    data["is_tld"] = data["tld"].length >= domain.tr("@", "").length
 
     if !no_auto_assign_status? && !ban_or_provisional?
       broader_status = broader_domain_bannable_status

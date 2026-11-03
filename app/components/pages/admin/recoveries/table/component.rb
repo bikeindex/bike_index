@@ -29,7 +29,7 @@ module Pages
             address: {label: "street address", pattern: /\b\d{1,6}\s+([\w.'-]+\s+){0,3}(street|st|avenue|ave|road|rd|boulevard|blvd|drive|dr|lane|ln|court|ct|highway|hwy)\b|\b[a-z]\d[a-z] ?\d[a-z]\d\b/i}
           }.freeze
 
-          DEFAULT_COLUMNS = (COLUMNS.keys - %i[date_stolen_cell location_cell shareable_cell]).freeze
+          DEFAULT_COLUMNS = (COLUMNS.keys - %i[date_stolen_cell shareable_cell]).freeze
 
           # editable: false leaves out the form, for a bike's own recoveries
           def initialize(recoveries:, sort_state:, editable: true)
@@ -58,7 +58,7 @@ module Pages
             # A bike's page has the bike already
             return {column_settings: column_settings.merge(storage_key: "adminBikeRecoveriesColumns", defaults: DEFAULT_COLUMNS - %i[photo_cell bike_cell])} unless @editable
 
-            {column_settings: column_settings.merge(storage_key: "adminRecoveriesColumns", defaults: DEFAULT_COLUMNS),
+            {column_settings: column_settings.merge(storage_key: "adminRecoveriesColumns", defaults: DEFAULT_COLUMNS - %i[location_cell]),
              form: {url: bulk_update_admin_recoveries_path, method: :patch},
              data: {controller: "admin--personal-info", action: "submit->admin--personal-info#confirmDisplay",
                     "admin--personal-info-patterns-value": PERSONAL_INFO.transform_values { {label: it[:label], source: it[:pattern].source} }.to_json}}

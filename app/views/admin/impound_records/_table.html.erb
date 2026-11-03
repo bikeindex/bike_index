@@ -27,7 +27,7 @@
     <small><%= impound_record.location&.name %></small>
   <% end %>
 
-  <% table.column(label: "Bike", classes: "tw:whitespace-normal") do |impound_record| %>
+  <% table.column(label: "Bike") do |impound_record| %>
     <%= render Atoms::Admin::TableCells::Bike::Component.new(bike: impound_record.bike, bike_id: impound_record.bike_id) %>
   <% end %>
 
