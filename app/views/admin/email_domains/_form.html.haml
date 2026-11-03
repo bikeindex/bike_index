@@ -1,6 +1,6 @@
 = render(UI::Container::Component.new) do
   = render(UI::Card::Component.new(additional_classes: "tw:my-6")) do
-    = render(Pages::Admin::Headers::Section::Component.new(title: "Be careful what you make banned!"))
+    = render(UI::Header::Component.new(text: "Be careful what you make banned!", tag: :h2))
     %p{class: "tw:mt-6 tw:mb-4"}
       There are some protections built in - you can't add a banned domain if there multiple bikes registered to that domain
     %p{class: "tw:mb-4"}

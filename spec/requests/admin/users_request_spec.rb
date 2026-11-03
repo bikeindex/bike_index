@@ -78,21 +78,21 @@ RSpec.describe Admin::UsersController, type: :request do
           expect(response.code).to eq("200"), "#{tab} rendered #{response.code}"
         end
         get "#{base_url}/#{user_subject.id}?active_tab=emails"
-        expect(Nokogiri::HTML(response.body).at_css("h3").text.squish).to eq "Emails #{user_subject.user_emails.count}"
+        expect(Nokogiri::HTML(response.body).at_css("h2").text.squish).to eq "Emails #{user_subject.user_emails.count}"
         expect(response.body).to include(user_email.email)
         get "#{base_url}/#{user_subject.id}?active_tab=messages"
-        sections = Nokogiri::HTML(response.body).css("h3").map { |heading| heading.text.squish }
+        sections = Nokogiri::HTML(response.body).css("h2").map { |heading| heading.text.squish }
         expect(sections).to eq(["Marketplace messages 0", "Alerts 1", "Notifications 0", "Feedbacks 1"])
         expect(response.body).to include(admin_feedback_path(feedback))
         get "#{base_url}/#{user_subject.id}?active_tab=payments"
-        sections = Nokogiri::HTML(response.body).css("h3").map { |heading| heading.text.squish }
+        sections = Nokogiri::HTML(response.body).css("h2").map { |heading| heading.text.squish }
         expect(sections).to eq(["Memberships 1", "Payments 1"])
         expect(response.body).to include(edit_admin_payment_path(payment))
         get "#{base_url}/#{user_subject.id}?active_tab=organization_roles"
         expect(response.body).to include(organization_role.organization.name)
-        expect(Nokogiri::HTML(response.body).at_css("h3").text.squish).to eq "Organizations 1 (0 registration organizations)"
+        expect(Nokogiri::HTML(response.body).at_css("h2").text.squish).to eq "Organizations 1 (0 registration organizations)"
         get "#{base_url}/#{user_subject.id}?active_tab=bikes"
-        expect(Nokogiri::HTML(response.body).at_css("h3").text.squish).to start_with("Bikes 1 (view in admin/bikes)")
+        expect(Nokogiri::HTML(response.body).at_css("h2").text.squish).to start_with("Bikes 1 (view in admin/bikes)")
         expect(response.body).to include("LIVE-SERIAL")
         expect(response.body).to_not include("GONE-SERIAL")
         deleted_path = admin_bikes_path(user_id: user_subject.id, search_status_deleted_only: true, search_status_example: true)

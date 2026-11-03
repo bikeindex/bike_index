@@ -88,7 +88,7 @@
 <% end %>
 
 <% if @bug_report.images.attached? %>
-  <%= render(Pages::Admin::Headers::Section::Component.new(title: "Images", margin_classes: "tw:mt-12 tw:mb-3")) %>
+  <%= render(UI::Header::Component.new(text: "Images", tag: :h2, html_class: "tw:mt-12")) %>
   <div class="tw:flex tw:flex-wrap tw:gap-4">
     <% @bug_report.images.each do |image| %>
       <div>

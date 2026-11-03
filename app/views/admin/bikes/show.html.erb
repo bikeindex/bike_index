@@ -3,12 +3,18 @@
 
 <% case @active_tab %>
 <% when "ownerships" %>
-  <%= render(Pages::Admin::Headers::Section::Component.new(title: "Ownerships", count: @bike.ownerships.count)) %>
+  <%= render(UI::Header::Component.new(tag: :h2)) do %>
+    Ownerships
+    <%= render(Pages::Admin::Headers::Count::Component.new(count: @bike.ownerships.count)) %>
+  <% end %>
 
   <%= render partial: "/admin/ownerships/table",
         locals: {ownerships: @bike.ownerships.reorder(created_at: :desc), skip_bike: true} %>
 <% when "stickers" %>
-  <%= render(Pages::Admin::Headers::Section::Component.new(title: "Stickers", count: @bike.bike_stickers.count)) %>
+  <%= render(UI::Header::Component.new(tag: :h2)) do %>
+    Stickers
+    <%= render(Pages::Admin::Headers::Count::Component.new(count: @bike.bike_stickers.count)) %>
+  <% end %>
 
   <%= render partial: "/admin/bike_stickers/table", locals: {bike_stickers: @bike.bike_stickers} %>
 <% when "duplicates" %>
@@ -32,16 +38,22 @@
   <% end %>
 
   <% if duplicate_groups.none? %>
-    <%= render(Pages::Admin::Headers::Section::Component.new(title: "No duplicates")) %>
+    <%= render(UI::Header::Component.new(text: "No duplicates", tag: :h2)) %>
   <% end %>
 <% when "messages" %>
   <%= render(Pages::Admin::Bikes::Show::Messages::Component.new(bike: @bike)) %>
 <% when "recoveries" %>
-  <%= render(Pages::Admin::Headers::Section::Component.new(title: "Recoveries", count: @bike.recovered_records.count)) %>
+  <%= render(UI::Header::Component.new(tag: :h2)) do %>
+    Recoveries
+    <%= render(Pages::Admin::Headers::Count::Component.new(count: @bike.recovered_records.count)) %>
+  <% end %>
 
   <%= render(Pages::Admin::Recoveries::Table::Component.new(recoveries: @bike.recovered_records, sort_state:, editable: false)) %>
 
-  <%= render(Pages::Admin::Headers::Section::Component.new(title: "Other stolen records", count: @bike.stolen_records.count)) %>
+  <%= render(UI::Header::Component.new(tag: :h2)) do %>
+    Other stolen records
+    <%= render(Pages::Admin::Headers::Count::Component.new(count: @bike.stolen_records.count)) %>
+  <% end %>
 
   <% if @bike.stolen_records.none? %>
     No other stolen records
@@ -58,16 +70,20 @@
     </ul>
   <% end %>
 <% when "impound" %>
-  <%= render(Pages::Admin::Headers::Section::Component.new(title: "Impound records for this #{@bike.type}",
-        count: @bike.impound_records.count, href: admin_impound_records_path(search_bike_id: @bike.id))) %>
+  <%= render(UI::Header::Component.new(tag: :h2)) do %>
+    Impound records for this <%= @bike.type %>
+    <%= render(Pages::Admin::Headers::Count::Component.new(count: @bike.impound_records.count, href: admin_impound_records_path(search_bike_id: @bike.id))) %>
+  <% end %>
 
   <%= render partial: "/admin/impound_records/table",
         locals: {impound_records: @bike.impound_records.reorder(created_at: :desc), skip_claims: true} %>
 
   <% impound_claims = ImpoundClaim.involving_bike_id(@bike.id).reorder(created_at: :desc) %>
 
-  <%= render(Pages::Admin::Headers::Section::Component.new(title: "Impound claims involving this #{@bike.type}",
-        count: impound_claims.count, href: admin_impound_claims_path(search_bike_id: @bike.id))) %>
+  <%= render(UI::Header::Component.new(tag: :h2)) do %>
+    Impound claims involving this <%= @bike.type %>
+    <%= render(Pages::Admin::Headers::Count::Component.new(count: impound_claims.count, href: admin_impound_claims_path(search_bike_id: @bike.id))) %>
+  <% end %>
 
   <%= render partial: "/admin/impound_claims/table", locals: {impound_claims:} %>
 <% end %>

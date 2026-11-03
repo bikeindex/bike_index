@@ -12,7 +12,7 @@
   <% end %>
 
   <% table.column(label: "Text", classes: "tw:w-1/4") do |ad| %>
-    <%= render(Pages::Admin::Headers::Section::Component.new(title: link_to(ad.title, edit_admin_ad_url(ad), class: "tw:twtext-color"))) %>
+    <%= render(UI::Header::Component.new(text: link_to(ad.title, edit_admin_ad_url(ad), class: "tw:twtext-color"), tag: :h2)) %>
 
     <p class="tw:mb-4">
       <%= link_to ad.body, edit_admin_ad_url(ad), class: "tw:twtext-color" %>

@@ -2,6 +2,6 @@
 
 = render partial: "form"
 
-= render(Pages::Admin::Headers::Section::Component.new(title: "Blogs with this tag:", margin_classes: "tw:mt-12 tw:mb-3"))
+= render(UI::Header::Component.new(text: "Blogs with this tag:", tag: :h2, html_class: "tw:mt-12"))
 
 = render partial: "/admin/news/table", locals: {blogs: @blogs, tags_no_link: true}
