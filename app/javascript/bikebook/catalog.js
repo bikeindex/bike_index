@@ -10,7 +10,7 @@ import { fragmentOf, renderInto } from 'bikebook/render'
 // `jurisdictions` names the codes classifications are in, which the catalog doesn't, and `paintColors` are Bike Index's
 // colors' displays by their names, which its colorways' colors are. `onPicks` takes what `ids` render from, as soon as
 // it's in, where there are any
-export async function loadCatalog (manifestUrl, ids = [], jurisdictions = {}, paintColors = {}, onPicks = null) {
+export async function loadCatalog (manifestUrl, ids = [], jurisdictions = {}, paintColors = {}, onPicks = () => {}) {
   const worker = new Worker(import.meta.resolve('bikebook/catalog_worker'), { type: 'module' })
   const pending = new Map()
   let nextId = 0
@@ -28,23 +28,17 @@ export async function loadCatalog (manifestUrl, ids = [], jurisdictions = {}, pa
     worker.postMessage({ id: nextId++, type, ...args })
   })
 
-  const vehicles = (ids, { market } = {}) => call('vehicles', { ids, market })
+  const painted = ({ vocabulary, ...rest }) => ({ ...rest, vocabulary: { ...vocabulary, paint_colors: paintColors }, vehicles: (ids, { market } = {}) => call('vehicles', { ids, market }) })
 
   try {
     // a failure is load's to report, as it waits on the same files
-    const started = call('start', { manifestUrl: new URL(manifestUrl, window.location.href).href, ids, jurisdictions }).catch(() => null)
-    if (onPicks && ids.length) started.then((picks) => picks && onPicks({ ...picks, vocabulary: { ...picks.vocabulary, paint_colors: paintColors }, vehicles }))
-    const { vocabulary, kit, options } = await call('load', {
-      jurisdictions,
+    call('start', { manifestUrl: new URL(manifestUrl, window.location.href).href, ids, jurisdictions }).then((picks) => ids.length && onPicks(painted(picks)), () => {})
+    const loaded = await call('load', {
       rulesUrl: import.meta.resolve('bikebook/featured_rules'),
       similarityUrl: import.meta.resolve('bikebook/similarity')
     })
     return {
-      vocabulary: { ...vocabulary, paint_colors: paintColors },
-      kit,
-      options,
-      comparable: false,
-      vehicles,
+      ...painted(loaded),
       // what the comparison adds, once it's in
       comparison: () => call('comparison'),
       // null, as for a comparison format it doesn't know, where the comparison doesn't load

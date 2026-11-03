@@ -28,6 +28,7 @@ export default class extends Controller {
   #rescores = 0
   #renderedUrl
   #picks
+  #compared
   #renderedCatalog
 
   // The loading shell holds the status until the catalog's first render replaces it, and a failure puts it back
@@ -43,11 +44,10 @@ export default class extends Controller {
     this.#render(url)
     try {
       this.catalog = await loadCatalog(this.manifestUrlValue, url.searchParams.get('vehicle_models')?.split(',') ?? [], this.jurisdictionsValue, this.paintColorsValue, (picks) => {
-        if (this.catalog) return
-
         this.#picks = picks
-        this.#render(new URL(window.location.href), [window.scrollX, window.scrollY], { focus: false })
+        this.refresh()
       })
+      this.#picks = null
     } catch (error) {
       return this.#fail(error)
     }
@@ -58,17 +58,14 @@ export default class extends Controller {
       renderClassCards(document, picked.split(','), this.catalog.vocabulary.e_vehicle_classifications)
       if (!primed) this.#searchLog.typed({ ...Object.fromEntries(new URL(window.location.href).searchParams), q, count: total })
     })
-    const compared = this.catalog.comparison().then(({ comparable, frameMaterials }) => {
+    this.#compared = this.catalog.comparison().then(({ comparable, frameMaterials }) => {
       this.catalog = { ...this.catalog, comparable, options: { ...this.catalog.options, frame_material: frameMaterials } }
+      this.#addComparison()
     })
     // filters set while it loaded are in the URL, and the reader stays where they've scrolled to
     const current = new URL(window.location.href)
-    // the comparison doesn't hold up the page, unless the page is of what it adds
-    if (current.searchParams.get('similar') === '1' || current.searchParams.get('frame_material')) await compared
+    this.#render(current, [window.scrollX, window.scrollY])
     this.#searchLog.visited(current)
-    await this.#render(current, [window.scrollX, window.scrollY])
-    await compared
-    if (this.#renderedCatalog !== this.catalog) addComparison(this.catalog, this.pageTarget, new URL(window.location.href))
   }
 
   // The form's fields over the URL's other params, such as an open panel's, its sizes following their vehicles,
@@ -215,7 +212,9 @@ export default class extends Controller {
     const render = ++this.#renders
     // A share menu shares the canonical, which names the page the server sent. Kept through the first render of the
     // catalog, which crawlers see
-    if (render > (this.#picks ? 2 : 1)) document.querySelector('link[rel="canonical"]')?.remove()
+    if (this.#renderedCatalog) document.querySelector('link[rel="canonical"]')?.remove()
+    // the comparison doesn't hold up the page, unless the page is of what it adds
+    if (url.searchParams.get('similar') === '1' || url.searchParams.get('frame_material')) await this.#compared
     const { catalog } = this
     const rendered = await (catalog
       ? hydrate(catalog, this.source, this.shellTarget, url)
@@ -250,6 +249,16 @@ export default class extends Controller {
       // and again once the panels' controllers have opened them, which the browser's scroll anchoring follows down
       requestAnimationFrame(place)
     }
+    this.#addComparison()
+  }
+
+  // Into a page a catalog without the comparison rendered, whichever of the two lands last
+  #addComparison () {
+    if (!this.#renderedCatalog || this.#renderedCatalog === this.catalog) return
+
+    this.#renderedCatalog = this.catalog
+    const render = this.#renders
+    addComparison(this.catalog, this.pageTarget, new URL(window.location.href), () => render === this.#renders)
   }
 
   // in place of the spinner, below the loading shell's search, where it's still showing

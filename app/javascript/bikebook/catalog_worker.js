@@ -17,7 +17,6 @@ let comparison = null
 let lastSimilar = null
 let opened = null
 let started = null
-let compared = null
 const blocks = new Map()
 const orders = new Map()
 const sold = new Map()
@@ -52,20 +51,21 @@ function start ({ manifestUrl, ids, jurisdictions }) {
     ids.map(blockKey).filter((key) => manifest.blocks[key]).forEach((key) => block(key).catch(() => {}))
   })
   started = opened.then(() => Promise.all([manifest.vocabulary, manifest.kit].map((file) => fetchJson(new URL(file, base)))))
-  return started.then(([vocabulary, { kit }]) => ({ vocabulary: { ...vocabulary, e_vehicle_classifications: classified(vocabulary, jurisdictions) }, kit }))
+    .then(([vocabulary, { kit }]) => ({ vocabulary: { ...vocabulary, e_vehicle_classifications: classified(vocabulary, jurisdictions) }, kit }))
+  return started
 }
 
-async function load ({ jurisdictions, rulesUrl, similarityUrl: similarityModule }) {
+async function load ({ rulesUrl, similarityUrl: similarityModule }) {
   similarityUrl = similarityModule
-  ;[, rules] = await Promise.all([opened, import(rulesUrl)])
-  const [index, [vocabulary, { kit }]] = await Promise.all([fetchJson(new URL(manifest.index, base)), started])
+  const [index, { vocabulary, kit }, featuredRules] = await Promise.all([opened.then(() => fetchJson(new URL(manifest.index, base))), started, import(rulesUrl)])
+  rules = featuredRules
   const currentYear = new Date().getFullYear()
   const activityNames = vocabulary.names.primary_activity ?? {}
   const typeNames = Object.fromEntries(index.vehicle_types.map(({ slug, name }) => [slug, name]))
   activities = index.primary_activities
   models = index.models.map((model, position) => ({
     ...model,
-    frame_material: null,
+    position,
     stock_photo: model.photo && `${index.stock_photos}/${path(model.id)}.${model.photo}`,
     activity_name: activityNames[model.primary_activity],
     type_name: typeNames[model.vehicle_type],
@@ -78,22 +78,18 @@ async function load ({ jurisdictions, rulesUrl, similarityUrl: similarityModule 
   byId = new Map(models.map((model) => [model.id, model]))
   // the index labels the out of class markers, which the vocabulary has no record of: "Out of class in California"
   const labels = Object.entries(index.filter_options.e_vehicle_classification).map(([id, label]) => [id, { label, title: label, marker: true }])
-  classifications = { ...Object.fromEntries(labels), ...classified(vocabulary, jurisdictions) }
-  compared = compare(vocabulary.names)
+  classifications = { ...Object.fromEntries(labels), ...vocabulary.e_vehicle_classifications }
   return { vocabulary: { ...vocabulary, e_vehicle_classifications: classifications }, kit, options: options(index, vocabulary.names) }
 }
 
-// The comparison, once the index it's in the order of has had the connection, for its frame materials as well as how alike
-// models are; without it neither is offered
-async function compare (names) {
+// The comparison, asked for once the index, whose order it's in, has had the connection, for its frame materials as well
+// as how alike models are; without it neither is offered
+async function compare () {
   comparison = manifest.comparison && await fetchJson(new URL(manifest.comparison, base)).catch(() => null)
   if (!comparison) return { comparable: false, frameMaterials: [] }
 
-  models = models.map((model, position) => ({ ...model, frame_material: comparison.fields.frame_material?.[position] ?? null }))
-  byId = new Map(models.map((model) => [model.id, model]))
-  orders.clear()
   last = null
-  return { comparable: true, frameMaterials: named('frame_material', 'frame.material', names) }
+  return { comparable: true, frameMaterials: named('frame_material', 'frame.material', (await started).vocabulary.names) }
 }
 
 const counted = (name, choices) => choices.map(([value, display]) => ({ value, display, count: models.filter(filter({ [name]: value })).length }))
@@ -315,7 +311,7 @@ function filter (params) {
     (types.length === 0 || types.includes(model.vehicle_type)) &&
     (!params.model_configuration || model.model_configuration === params.model_configuration) &&
     (!params.handlebar_type || model.handlebar_type === params.handlebar_type) &&
-    (!params.frame_material || model.frame_material === params.frame_material) &&
+    (!params.frame_material || comparison?.fields.frame_material?.[model.position] === params.frame_material) &&
     (!params.market || inMarket(model, params.market, params.market_scope)) &&
     (yearMin == null || model.sortYear >= yearMin) &&
     (yearMax == null || (model.first_year ?? 0) <= yearMax) &&
@@ -335,7 +331,7 @@ function propelled ({ electric, e_vehicle_classifications: carried = [] }, propu
 
 self.onmessage = async ({ data: { id, type, ...args } }) => {
   try {
-    self.postMessage({ id, result: await { start, load, comparison: () => compared, search, featured, group, vehicles, displays, similar }[type](args) })
+    self.postMessage({ id, result: await { start, load, comparison: compare, search, featured, group, vehicles, displays, similar }[type](args) })
   } catch (error) {
     self.postMessage({ id, error: error.message })
   }

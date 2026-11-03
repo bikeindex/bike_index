@@ -182,15 +182,19 @@ export class VehicleViewer {
       label: `Search other ${typeName(presenter, lone).toLowerCase()}s`,
       href: pathWith(url, { search: '1', vehicle_type: lone.type || 'bike' })
     }
-    const similarModels = similar
+    return html`${this.similarModels(baseline, similar, url, photos)}${jumpTo(view, (each) => pathWith(url, { view: each === 'basics' ? '' : each }), shown, searchTab)}${views[view]()}`
+  }
+
+  // The section of the models most like `baseline`, where `similar` offers them, showing `photos` of those `url` compares
+  similarModels (baseline, similar, url, photos) {
+    return similar
       ? similarSection({
         ...this.#similarOf(baseline, similar),
-        model: modelName(presenter, baseline.data),
+        model: modelName(this.presenter, baseline.data),
         results: similar.results === undefined ? undefined : this.similarResults(url, similar.results, photos),
         searchShown: searching(url)
       })
       : nothing
-    return html`${similarModels}${jumpTo(view, (each) => pathWith(url, { view: each === 'basics' ? '' : each }), shown, searchTab)}${views[view]()}`
   }
 
   // The controls that rescore the models most like the first of `vehicles`, for the filters' card

@@ -2230,10 +2230,7 @@ RSpec.describe "BikeBook", :js, type: :system do
 
   it "shows and switches between the picked vehicles ahead of the index" do
     serve_bikebook_catalog
-    held = Queue.new
-    page.driver.with_playwright_page do |playwright_page|
-      playwright_page.context.route("#{Integrations::Bikebook::Catalog::URL}index.*", ->(route, _request) { held << route })
-    end
+    held = hold_bikebook_catalog_file("index.*")
     visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_adv,m/specialized/2025/haul_st")
 
     expect(page).to have_css("[data-hw-combobox-chip]", text: "Aventón Level 4 ADV", wait: 10)
@@ -2252,12 +2249,20 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(page).to have_current_path(/[?&]view=components\b/)
   end
 
+  it "keeps the picked vehicles when the index doesn't load" do
+    serve_bikebook_catalog
+    held = hold_bikebook_catalog_file("index.*")
+    visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_adv,m/specialized/2025/haul_st")
+
+    expect(page).to have_css("#vehicle-viewers tr", wait: 10)
+    held.pop.fulfill(status: 404, headers: {"access-control-allow-origin" => "*"}, body: "")
+    expect(page).to have_text("The catalog didn't load. Reload the page to try again.", wait: 10)
+    expect(page).to have_css("#vehicle-viewers tr")
+  end
+
   it "searches ahead of the comparison, leaving what's typed as it adds the similar models" do
     serve_bikebook_catalog
-    held = Queue.new
-    page.driver.with_playwright_page do |playwright_page|
-      playwright_page.context.route("#{Integrations::Bikebook::Catalog::URL}comparison.*", ->(route, _request) { held << route })
-    end
+    held = hold_bikebook_catalog_file("comparison.*")
     visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_adv,m/specialized/2025/haul_st")
 
     expect(page).to have_css("#vehicle-models-count", text: "matching", wait: 10)
@@ -2278,10 +2283,7 @@ RSpec.describe "BikeBook", :js, type: :system do
 
   it "keeps the search and its filters while the catalog loads, and says so when it doesn't" do
     serve_bikebook_catalog(manifest_status: 404)
-    held = Queue.new
-    page.driver.with_playwright_page do |playwright_page|
-      playwright_page.context.route("#{Integrations::Bikebook::Catalog::URL}manifest.json", ->(route, _request) { held << route })
-    end
+    held = hold_bikebook_catalog_file("manifest.json")
     # searching, which a model alone would hide
     visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_rec_step_through", electric: "1", search: 1, vehicle_type: "e_scooter")
 
