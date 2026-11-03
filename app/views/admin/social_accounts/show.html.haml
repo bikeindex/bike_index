@@ -1,6 +1,6 @@
-= render(Pages::Admin::Headers::Nav::Component.new(title: "Social Account")) do
-  %li= render(UI::ButtonLink::Component.new(text: "Edit", href: edit_admin_social_account_url(@social_account), size: :sm))
-  %li= render(UI::ButtonLink::Component.new(text: "Check Credentials", href: check_credentials_admin_social_account_url(@social_account), size: :sm))
+= render(Pages::Admin::Headers::Nav::Component.new(title: "Social Account")) do |nav|
+  - nav.with_item { render(UI::ButtonLink::Component.new(text: "Edit", href: edit_admin_social_account_url(@social_account), size: :sm)) }
+  - nav.with_item { render(UI::ButtonLink::Component.new(text: "Check Credentials", href: check_credentials_admin_social_account_url(@social_account), size: :sm)) }
 - if @social_account.errored?
   = render(UI::Container::Component.new) do
     = render(UI::Card::Component.new(additional_classes: "tw:my-6")) do
@@ -22,8 +22,7 @@
         - list.with_row(label: attr, value:)
   %div
     = render(UI::Header::Component.new(text: "Platform Response Data", tag: :h3))
-    %pre{ class: "tw:mb-4", style: "max-height: 600px; overflow: scroll; background: #eeeeee; padding: 10px 2px;" }
-      = @social_account.account_info.to_yaml
+    = render(UI::Code::Json::Component.new(data: @social_account.account_info, no_max_height: true))
 
 = render(UI::Header::Component.new(tag: :h3)) do
   = "#{number_with_delimiter(@social_account.social_posts.count)} Posts"

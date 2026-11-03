@@ -3,7 +3,7 @@
 <div class="tw:flex tw:flex-wrap">
   <div class="tw:w-full tw:md:w-1/2 tw:md:pr-4">
     <%= render(UI::TableList::Component.new) do |list| %>
-      <% list.with_row(label: "ID", value: tag.code(@stolen_record.id, class: "twcode"), class: "tw:text-sm", if: @display_dev_info) %>
+      <% list.with_row(label: "ID", value: render(UI::Code::Inline::Component.new(text: @stolen_record.id)), class: "tw:text-sm", if: @display_dev_info) %>
 
       <% list.with_row(label: "Theft description", value: @stolen_record.theft_description) %>
 

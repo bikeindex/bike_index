@@ -10,9 +10,10 @@
       "
     >
       <p class="tw:mb-0">
-        Persisted panel body — open state lives in the <code>?details=1</code>
-        URL param. Lookbook frames this page, so the param lands on the frame's
-        own URL: open the preview in its own window to watch the address bar.
+        Persisted panel body — open state lives in the
+        <%= render(UI::Code::Inline::Component.new(text: "?details=1")) %> URL
+        param. Lookbook frames this page, so the param lands on the frame's own
+        URL: open the preview in its own window to watch the address bar.
       </p>
 
       <label class="tw:mb-0 tw:flex tw:items-center tw:gap-2">

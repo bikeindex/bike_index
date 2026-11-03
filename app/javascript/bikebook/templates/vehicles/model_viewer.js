@@ -5,7 +5,7 @@ import { inlineBadge } from 'bikebook/templates/ui/badge'
 import { collapse } from 'bikebook/templates/ui/collapse'
 import { definitionListContainer } from 'bikebook/templates/ui/definition_list/container'
 import { definitionListRow } from 'bikebook/templates/ui/definition_list/row'
-import { jsonDisplay } from 'bikebook/templates/ui/json_display'
+import { codeJson } from 'bikebook/templates/ui/code/json'
 import { tooltip } from 'bikebook/templates/ui/tooltip'
 import { componentGroup, matchingRow, pairedComponents } from 'bikebook/templates/vehicles/component_group'
 import { geometryCard } from 'bikebook/templates/vehicles/geometry_card'
@@ -169,7 +169,7 @@ class ModelViewer {
       ? html`<section class="tw:space-y-4"><h2 class="tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">Components</h2>${this.components()}${this.inTheBox()}</section>`
       : nothing}</article><aside
       id=${jsonPanelId} class="twjson-panel tw:hidden tw:w-full tw:min-w-0 tw:lg:relative tw:lg:w-[28rem] tw:lg:shrink-0" data-ui--collapse-target="content">${
-        jsonDisplay({ data: this.data, small: true, noMaxHeight: true })}</aside></div>`
+        codeJson({ data: this.data, small: true, noMaxHeight: true })}</aside></div>`
   }
 
   photo (photo, titleText, frame = 'tw:mb-6 tw:aspect-[3/2]') {

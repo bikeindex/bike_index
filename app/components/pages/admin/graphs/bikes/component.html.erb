@@ -16,7 +16,7 @@
         <%= link_to @manufacturer.name, admin_manufacturer_path(@manufacturer), class: "twlink" %>
       <% else %>
         No manufacturer found for
-        <code class="twcode"><%= @index.params[:search_manufacturer] %></code>
+        <%= render(UI::Code::Inline::Component.new(text: @index.params[:search_manufacturer])) %>
       <% end %>
       <%= render(UI::ButtonLink::Component.new(href: url_for(sortable_params.merge(search_manufacturer: nil)), text: "view all manufacturer bikes", color: :link_gray, html_class: "tw:text-sm")) %>
     <% end %>

@@ -1,15 +1,3 @@
-<% nav_header_list_items = capture do %>
-  <li>
-    <%= render(UI::ButtonLink::Component.new(text: "promoted alerts", href: admin_stolen_bikes_url(sortable_search_params.merge(search_with_promoted_alert: !@with_promoted_alert)), size: :sm, active: @with_promoted_alert)) %>
-  </li>
-
-  <li>
-    <%= render(UI::ButtonLink::Component.new(size: :sm,
-          text: @unapproved_only ? "All stolen (not just unverified)" : "Only unverified bikes",
-          href: admin_stolen_bikes_url(sortable_search_params.merge(search_unapproved: @unapproved_only)))) %>
-  </li>
-<% end %>
-
 <% rendered_chart = nil %>
 
 <% if @render_chart %>
@@ -42,7 +30,14 @@
   index: admin_index_state,
   collection: @stolen_records,
   viewing: "Stolen Bikes",
-  nav_header_list_items:,
   rendered_chart:,
   table_view:,
-)) %>
+)) do |skeleton| %>
+  <% skeleton.with_nav_item { render(UI::ButtonLink::Component.new(text: "promoted alerts", href: admin_stolen_bikes_url(sortable_search_params.merge(search_with_promoted_alert: !@with_promoted_alert)), size: :sm, active: @with_promoted_alert)) } %>
+
+  <% skeleton.with_nav_item do %>
+    <%= render(UI::ButtonLink::Component.new(size: :sm,
+          text: @unapproved_only ? "All stolen (not just unverified)" : "Only unverified bikes",
+          href: admin_stolen_bikes_url(sortable_search_params.merge(search_unapproved: @unapproved_only)))) %>
+  <% end %>
+<% end %>

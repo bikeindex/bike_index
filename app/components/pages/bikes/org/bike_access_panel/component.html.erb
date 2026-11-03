@@ -421,7 +421,7 @@
               <%= translation(".additional_registrations_potential_duplicates") %>
 
               <% @bike.normalized_serial_segments.considered_for_duplicate.each do |normalized_segment| %>
-                <code><%= normalized_segment.segment %></code>
+                <%= render(UI::Code::Inline::Component.new(text: normalized_segment.segment)) %>
               <% end %>
             </p>
             <table

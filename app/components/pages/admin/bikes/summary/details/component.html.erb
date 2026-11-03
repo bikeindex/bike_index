@@ -17,9 +17,9 @@
   <div class="tw:w-3/4 tw:lg:w-5/12 tw:lg:pr-4">
     <%= render(UI::TableList::Component.new(classes: "tw:mb-0!")) do |list| %>
       <% list.with_row(label: "ID", class: "tw:text-sm", if: @display_dev_info) do %>
-        <code class="twcode"><%= @bike.id %></code>
+        <%= render(UI::Code::Inline::Component.new(text: @bike.id)) %>
 
-        <span class="tw:ml-2">status: <code class="twcode"><%= status_humanized %></code></span>
+        <span class="tw:ml-2">status: <%= render(UI::Code::Inline::Component.new(text: status_humanized)) %></span>
 
         <% if @bike.user_hidden %>
           <small class="tw:ml-2 <%= UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>">user hidden</small>

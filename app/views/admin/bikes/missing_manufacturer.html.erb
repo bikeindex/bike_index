@@ -1,42 +1,40 @@
-<%= render(Pages::Admin::Headers::Nav::Component.new(title: "Multi manufacturer update")) do %>
+<%= render(Pages::Admin::Headers::Nav::Component.new(title: "Multi manufacturer update")) do |nav| %>
   <%#
     The view-ordering pair reads session[:missing_manufacturer_time_order], which survives
     with no param in the URL - so active: has to come from the controller, not a
     UI::ActiveLink query:
   %>
 
-  <li>
-    <%= render(UI::ButtonLink::Component.new(text: "all bikes", href: admin_bikes_path, size: :sm)) %>
-  </li>
+  <% nav.with_item { render(UI::ButtonLink::Component.new(text: "all bikes", href: admin_bikes_path, size: :sm)) } %>
 
-  <li>
+  <% nav.with_item do %>
     <%= render(UI::ButtonLink::Component.new(text: "motorized", size: :sm, active: @motorized,
           href: url_for(sortable_search_params.merge(search_motorized: !@motorized)))) %>
-  </li>
+  <% end %>
 
-  <li>
+  <% nav.with_item do %>
     <% include_spam = Binxtils::InputNormalizer.boolean(params[:search_spam]) %>
 
     <%= render(UI::ButtonLink::Component.new(text: "spam & deleted", size: :sm, active: include_spam,
           href: url_for(sortable_search_params.merge(search_spam: !include_spam, search_deleted: !include_spam)))) %>
-  </li>
+  <% end %>
 
-  <li>
+  <% nav.with_item do %>
     <%= render(UI::ButtonLink::Component.new(text: "Include blank", size: :sm, active: @include_blank,
           href: url_for(sortable_search_params.merge(search_include_blank: !@include_blank)))) %>
-  </li>
+  <% end %>
 
-  <li>
+  <% nav.with_item do %>
     <%= render(UI::ButtonLink::Component.new(text: "Alphabetical view", size: :sm,
           active: !session[:missing_manufacturer_time_order],
           href: url_for(sortable_search_params.merge(reset_view: true)))) %>
-  </li>
+  <% end %>
 
-  <li>
+  <% nav.with_item do %>
     <%= render(UI::ButtonLink::Component.new(text: "Time ordered view", size: :sm,
           active: session[:missing_manufacturer_time_order].present?,
           href: url_for(sortable_search_params.merge(search_time_ordered: true)))) %>
-  </li>
+  <% end %>
 <% end %>
 
 <div class="tw:flex tw:justify-end">

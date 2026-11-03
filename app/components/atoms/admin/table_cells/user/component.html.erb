@@ -4,7 +4,7 @@
       Missing user
     </small>
     <% if show_email_for_missing_user? %>
-      <code class="twcode tw:text-xs"><%= @user_id %></code>
+      <%= render(UI::Code::Inline::Component.new(text: @user_id, small: true)) %>
     <% end %>
   <% end %>
 

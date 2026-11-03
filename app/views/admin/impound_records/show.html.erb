@@ -8,11 +8,9 @@
   <% end %>
 <% end %>
 
-<%= render(Pages::Admin::Headers::Nav::Component.new(title:)) do %>
+<%= render(Pages::Admin::Headers::Nav::Component.new(title:)) do |nav| %>
   <% if organization_name.present? %>
-    <li>
-      <%= link_to "View record in organization", organization_impound_record_path(@impound_record.display_id, organization_id: @impound_record.organization_id), class: "twlink" %>
-    </li>
+    <% nav.with_item { link_to "View record in organization", organization_impound_record_path(@impound_record.display_id, organization_id: @impound_record.organization_id), class: "twlink" } %>
   <% end %>
 <% end %>
 
