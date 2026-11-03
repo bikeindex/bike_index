@@ -77,7 +77,7 @@
 
 <% searched_terms = {"receiver" => @searched_receiver, "tag" => @searched_tag, "sender email" => params[:search_email],
   "user" => params[:user_id], "text" => params[:query]}
-  .filter_map { |label, value| safe_join(["#{label}: ", content_tag(:code, value, class: "twcode")]) if value.present? } %>
+  .filter_map { |label, value| safe_join(["#{label}: ", render(UI::Code::Inline::Component.new(text: value))]) if value.present? } %>
 
 <% count_detail = capture do %>
   &mdash; with <%= safe_join(searched_terms, ", ") %>

@@ -37,21 +37,21 @@
         - if @bulk_import.ascend?
           %div{class: "tw:text-sm"}
             Ascend name:
-            %code.twcode= @bulk_import.ascend_name
+            = render(UI::Code::Inline::Component.new(text: @bulk_import.ascend_name))
     - list.with_row(label: "Kind", value: @bulk_import.kind_humanized)
     - list.with_row(label: "Headers") do
       - if @bulk_import.headers.present?
         %small
-          = safe_join(@bulk_import.headers.map { |a| content_tag(:code, a, class: "twcode") }, ", ")
+          = safe_join(@bulk_import.headers.map { |a| render(UI::Code::Inline::Component.new(text: a, small: true)) }, ", ")
     - if display_dev_info?
       - data = @bulk_import.data || {}
       - list.with_row(label: "Data", dev_only: true) do
         - if data.blank?
           No data
         - elsif data.except("headers").blank?
-          No data (except <code class="twcode">headers</code>)
+          No data (except #{render(UI::Code::Inline::Component.new(text: "headers"))})
         - else
-          = render UI::JsonDisplay::Component.new(data: data.except("headers"), small: true)
+          = render UI::Code::Json::Component.new(data: data.except("headers"), small: true)
 
 %div{class: "tw:my-6"}
   = render(UI::Header::Component.new(text: "Errors", tag: :h3))

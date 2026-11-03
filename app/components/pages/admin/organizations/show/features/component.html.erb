@@ -119,7 +119,7 @@
         <small>notification interval is not set</small>
       <% end %>
     <% end %>
-    <% list.with_row(label: "Enabled features", value: tag.span(safe_join(@organization.enabled_feature_slugs.map { |slug| tag.code(slug, class: "twcode") }, ", "), class: "tw:text-sm")) %>
+    <% list.with_row(label: "Enabled features", value: tag.span(safe_join(@organization.enabled_feature_slugs.map { |slug| render(UI::Code::Inline::Component.new(text: slug)) }, ", "), class: "tw:text-sm")) %>
   <% end %>
 
   <% list.with_row(label: "Child of", if: @organization.parent_organization.present?) do %>

@@ -1,7 +1,7 @@
 <% wide_definition ||= false %>
 
 <%= render(UI::TableList::Component.new(wide_definition:)) do |list| %>
-  <% list.with_row(label: "ID", value: tag.code("4815162342"), dev_only: true) %>
+  <% list.with_row(label: "ID", value: render(UI::Code::Inline::Component.new(text: "4815162342")), dev_only: true) %>
   <% list.with_row(label: "Cryptid", value: "Mothman") %>
 
   <% list.with_row(label: "Region") do %>

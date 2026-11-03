@@ -25,8 +25,9 @@
 
       <% group.with_helper_text do %>
         <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>">
-          <code class="twcode tw:inline">nearby_organizations</code> will search
-          within this radius for other organizations in the same area
+          <%= render(UI::Code::Inline::Component.new(text: "nearby_organizations")) %>
+          will search within this radius for other organizations in the same
+          area
         </span>
       <% end %>
     <% end %>

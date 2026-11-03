@@ -68,7 +68,7 @@
           <% end %>
 
           <% if stripe_status.present? %>
-            <code class="tw:text-sm"><%= stripe_status %></code>
+            <%= render(UI::Code::Inline::Component.new(text: stripe_status)) %>
           <% end %>
         <% end %>
       <% end %>

@@ -2,13 +2,13 @@
 
 require "rails_helper"
 
-RSpec.describe UI::JsonDisplay::Component, type: :component do
+RSpec.describe UI::Code::Json::Component, type: :component do
   let(:component) { render_inline(described_class.new(data:, **options)) }
   let(:data) { {owner_email: "mothman@bikeindex.org", stolen: false, bike_sticker: nil} }
   let(:options) { {} }
 
   it "renders every value, full width and full size" do
-    expect(component).to have_css("div.highlightjs-json[data-controller='ui--json-display'] pre code.language-json")
+    expect(component).to have_css("div.highlightjs-json[data-controller='ui--code--json'] pre code.language-json")
     expect(component.text).to include "bike_sticker"
     expect(component).to_not have_css("div.highlightjs-json[style]")
     expect(component).to have_css("div.highlightjs-json pre.tw\\:max-h-72")

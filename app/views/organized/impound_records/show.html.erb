@@ -23,7 +23,7 @@
         <% if display_dev_info? %>
           <small class="only-dev-visible ml-2">
             <em class="less-strong">real id:</em>
-            <code><%= @impound_record.id %></code>
+            <%= render(UI::Code::Inline::Component.new(text: @impound_record.id, small: true)) %>
           </small>
         <% end %>
       <% end %>

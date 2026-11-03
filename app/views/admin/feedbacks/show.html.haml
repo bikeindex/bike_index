@@ -19,7 +19,7 @@
       - if @feedback.organization.present?
         = link_to @feedback.organization.name, admin_organization_path(@feedback.organization.to_param), class: "twlink"
       %div{class: "tw:mt-2"}
-        = render UI::JsonDisplay::Component.new(data: @feedback.feedback_hash, small: true)
+        = render UI::Code::Json::Component.new(data: @feedback.feedback_hash, small: true)
     - list.with_row(label: "Bike") do
       - if @bike.present?
         = render Atoms::Admin::TableCells::Bike::Component.new(bike: @bike, bike_id: @feedback.feedback_hash["bike_id"])

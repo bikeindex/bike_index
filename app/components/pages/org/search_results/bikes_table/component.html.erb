@@ -82,9 +82,7 @@
   <% end %>
 
   <% column.(label: settings.column_renames[:url_cell], classes: "hideableColumn url_cell") do |bike| %>
-    <code class="tw:p-0 tw:text-xs!" style="word-break: normal">
-      <%= bike.html_url %>
-    </code>
+    <%= render(UI::Code::Inline::Component.new(text: bike.html_url, small: true, word_break: false)) %>
   <% end %>
 
   <% column.(sortable: "id", label: settings.column_renames[:created_at_cell], classes: "hideableColumn created_at_cell") do |bike| %>

@@ -24,7 +24,7 @@
   <%= render(UI::Table::Component.new(records: @mail_snippets, render_sortable: true, sort_state:)) do |table| %>
     <% table.column(sortable: "created_at") do |mail_snippet| %>
       <%= link_to render(UI::Time::Component.new(time: mail_snippet.created_at)), helpers.edit_mail_snippet_path_for(mail_snippet), class: "twlink" %>
-      <code class="only-dev-visible twcode"><%= mail_snippet.id %></code>
+      <span class="only-dev-visible"><%= render(UI::Code::Inline::Component.new(text: mail_snippet.id)) %></span>
     <% end %>
 
     <% table.column(sortable: "updated_at", header_classes: "tw:text-xs") do |mail_snippet| %>

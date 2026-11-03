@@ -41,6 +41,6 @@
   <% end %>
 
   <% table.column(label: tag.span("Data", class: "tw:hidden", data: {"ui--collapse-target": "content"}), classes: data_column_classes) do |mailchimp_datum| %>
-    <%= render UI::JsonDisplay::Component.new(data: mailchimp_datum.data, small: true, max_width: :table_cell) %>
+    <%= render UI::Code::Json::Component.new(data: mailchimp_datum.data, small: true, max_width: :table_cell) %>
   <% end %>
 <% end %>
