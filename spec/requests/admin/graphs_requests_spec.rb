@@ -49,7 +49,7 @@ RSpec.describe Admin::GraphsController, type: :request do
         # [origin, swatch color, bike count] per row of the origin table, as rendered
         let(:origin_rows) do
           Nokogiri::HTML(response.body).css("td span[style*='background-color']").map do |swatch|
-            [swatch.next_sibling.text.strip, swatch["style"][/#\h{6}/], swatch.parent.next_element.text.strip]
+            [swatch.next_element.children.first.text.strip, swatch["style"][/#\h{6}/], swatch.parent.next_element.text.strip]
           end
         end
 

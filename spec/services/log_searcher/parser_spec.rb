@@ -184,6 +184,7 @@ RSpec.describe LogSearcher::Parser do
       end
       it "parses" do
         expect(described_class.parse_log_line(log_line)).to match_hash_indifferently target
+        expect(described_class.parse_log_line(log_line.gsub("sort_direction", "direction"))[:includes_query]).to be false
       end
       context "/v3/bikes/check_if_registered" do
         let(:log_line) { 'I, [2023-10-23T00:20:31.0000 #149741]  INFO -- : [7e0645ff-032e-4095-9a75-81afb12b8892] {"status":201,"method":"POST","path":"/api/v3/bikes/check_if_registered","params":{"access_token":"[FILTERED]","serial":"999xxxx","owner_email":"example@bikeindex.org","organization_slug":"brakebills","manufacturer":"salsa"},"host":"bikeindex.org","remote_ip":"11.222.33.4","format":"json","db":1076.85,"view":15.86000000000013,"duration":1092.71}' }

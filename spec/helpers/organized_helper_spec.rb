@@ -7,7 +7,7 @@ RSpec.describe OrganizedHelper, type: :helper do
     it "renders" do
       expect(organized_bike_text).to be_nil
       result = organized_bike_text(bike)
-      expect(result).to start_with("#{target_prefix}web ") # origin_display label
+      expect(result).to start_with("#{target_prefix}<span class=\"keep-together tw:whitespace-nowrap\">web ") # origin_display label
       expect(result).to include("registered with self registration process") # origin_display tooltip
       expect(organized_bike_text(bike, skip_creation: true)).to eq "<span>#{bike.frame_colors.first} <strong>#{bike.mnfg_name}</strong></span>"
     end

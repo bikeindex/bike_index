@@ -34,7 +34,7 @@ end %>
 
     <% table.column(label: "Next run") do |klass, last_started| %>
       <% if klass.new.skip_scheduling? %>
-        <%= render UI::Alerts::Base::Component.new(text: "Skipped", kind: :warning, margin_classes: "") %>
+        <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>">Skipped</span>
       <% elsif last_started.blank? || (last_started + klass.frequency) < Time.current %>
         <span class="twless-strong">now</span>
       <% else %>
