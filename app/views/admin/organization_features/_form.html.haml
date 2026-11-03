@@ -4,7 +4,7 @@
   .twfieldrow
     = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :kind)) do
       = render(UI::Forms::Select::Component.new(form_builder: f, attribute: :kind, option_tags: OrganizationFeature.kinds.map { |k| [k.humanize, k] }))
-    = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :name))
+    = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :name, required: true))
   - if display_dev_info?
     .twwiderow.only-dev-visible
       = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :feature_slugs_string, kind: :text_area, label_text: "Organization Feature Slugs")) do |group|

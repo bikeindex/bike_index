@@ -4,14 +4,15 @@ module UI
   module TableList
     # The legacy .table-list's label-beside-value rows, striped and bordered by UI::Table's CSS
     class Component < ApplicationComponent
-      # .ui-table-list is .only-dev-visible's hook
+      # .ui-table-list is .only-dev-visible's hook, and application.css's for these lists' wrapping
       TABLE_CLASSES = "ui-table ui-table-bordered ui-table-list tw:mb-4 tw:w-full tw:border-separate tw:border-spacing-0 " \
         "tw:leading-normal tw:wrap-anywhere"
 
       CELL_CLASSES = "#{UI::TableColumn::Component::BORDERED_TD_CLASSES} tw:align-top"
 
-      # The top padding sets the smaller label on the value's first line
-      LABEL_CLASSES = "#{CELL_CLASSES} tw:pt-[9px] tw:text-right tw:text-[75%] tw:leading-[1.25] tw:font-normal tw:italic"
+      # The top padding sets the smaller label on the value's first line. wrap-normal because
+      # the table's wrap-anywhere lets a narrow list squeeze a label to one letter per line
+      LABEL_CLASSES = "#{CELL_CLASSES} tw:pt-[9px] tw:text-right tw:text-[75%] tw:leading-[1.25] tw:font-normal tw:italic tw:wrap-normal"
 
       # value: or a block. A falsy if: skips the row, but value: is evaluated anyway,
       # so a value that needs the condition goes in the block

@@ -2,7 +2,7 @@
 
 <%= render(Pages::Admin::Headers::Section::Component.new(title: "Manage Recovery Display")) %>
 
-<div class="tw:grid tw:grid-cols-12 tw:gap-x-8 tw:text-center">
+<div class="tw:grid tw:grid-cols-12 tw:gap-x-4 tw:text-center tw:md:gap-x-8">
   <% if @recovery.waiting_on_decision? %>
     <div class="tw:col-span-12 tw:md:col-span-4">
       <%= render(Pages::Admin::Headers::Section::Component.new(title: "Choose what to do with this recovery:")) %>

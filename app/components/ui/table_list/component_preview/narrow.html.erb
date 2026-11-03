@@ -1,0 +1,9 @@
+<div class="tw:w-64">
+  <%= render(UI::TableList::Component.new) do |list| %>
+    <% list.with_row(label: "Serial number", value: tag.code("4815162342-4815162342-4815162342-4815162342", class: "twcode")) %>
+
+    <% list.with_row(label: "Owner email") do %>
+      mothman-sightings@point-pleasant.example.com <%= search_emoji %>
+    <% end %>
+  <% end %>
+</div>

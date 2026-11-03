@@ -169,9 +169,13 @@
   }
   /* A 🔎 or tooltip "?" stays on the line of what it follows. Only the whole cell
      works: Chromium still breaks after a preceding element that wraps. A .keep-together
-     already holds it with its last word, so the rest of the cell can wrap */
-  .ui-table td:has(.keep-with-previous:not(.keep-together *)) {
+     already holds it with its last word, so the rest of the cell can wrap. UI::TableList
+     has no scroller to spill into, so its cells always wrap */
+  .ui-table:not(.ui-table-list) td:has(.keep-with-previous:not(.keep-together *)) {
     @apply tw:whitespace-nowrap;
+  }
+  .ui-table-list .twcode {
+    @apply tw:wrap-anywhere;
   }
   .table_cell_check {
     @apply tw:font-mono tw:text-center tw:font-bold;

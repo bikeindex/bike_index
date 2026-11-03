@@ -62,6 +62,14 @@ RSpec.describe AdminHelper, type: :helper do
         expect(admin_path_for_object(StolenRecord.new(id: 22))).to eq admin_stolen_bike_path(22, stolen_record_id: 22)
       end
     end
+    context "a record without a show page" do
+      it "returns the page that lists it" do
+        expect(admin_path_for_object(ParkingNotification.new(id: 1, bike_id: 42))).to eq admin_parking_notifications_path(search_bike_id: 42)
+        expect(admin_path_for_object(GraduatedNotification.new(id: 1, bike_id: 42))).to eq admin_graduated_notifications_path(search_bike_id: 42)
+        expect(admin_path_for_object(OrganizationStatus.new(id: 1, organization_id: 42))).to eq admin_organization_statuses_path(organization_id: 42)
+        expect(admin_path_for_object(UserEmail.new(id: 1, user_id: 42))).to eq admin_user_path(42)
+      end
+    end
     context "payment" do
       it "returns" do
         expect(admin_path_for_object(Payment.new(id: 412))).to eq admin_payment_path(412)

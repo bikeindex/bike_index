@@ -29,7 +29,7 @@ module Pages
             address: {label: "street address", pattern: /\b\d{1,6}\s+([\w.'-]+\s+){0,3}(street|st|avenue|ave|road|rd|boulevard|blvd|drive|dr|lane|ln|court|ct|highway|hwy)\b|\b[a-z]\d[a-z] ?\d[a-z]\d\b/i}
           }.freeze
 
-          DEFAULT_COLUMNS = (COLUMNS.keys - %i[date_stolen_cell shareable_cell]).freeze
+          DEFAULT_COLUMNS = (COLUMNS.keys - %i[date_stolen_cell location_cell shareable_cell]).freeze
 
           # editable: false leaves out the form, for a bike's own recoveries
           def initialize(recoveries:, sort_state:, editable: true)
