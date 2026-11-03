@@ -42,7 +42,7 @@
     - list.with_row(label: "Headers") do
       - if @bulk_import.headers.present?
         %small
-          = safe_join(@bulk_import.headers.map { |a| render(UI::Code::Inline::Component.new(text: a)) }, ", ")
+          = safe_join(@bulk_import.headers.map { |a| render(UI::Code::Inline::Component.new(text: a, small: true)) }, ", ")
     - if display_dev_info?
       - data = @bulk_import.data || {}
       - list.with_row(label: "Data", dev_only: true) do

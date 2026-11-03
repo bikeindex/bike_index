@@ -13,7 +13,7 @@
   <p>
     Organization Messages are editable through the organization's page and
     should probably be edited there (rather than here). Those kinds:
-    <small class="tw:mt-2 tw:block"><%= safe_join(MailSnippet.organization_message_kinds.map { |kind| render(UI::Code::Inline::Component.new(text: MailSnippet.kind_humanized(kind))) }, ", ") %></small>
+    <small class="tw:mt-2 tw:block"><%= safe_join(MailSnippet.organization_message_kinds.map { |kind| render(UI::Code::Inline::Component.new(text: MailSnippet.kind_humanized(kind), small: true)) }, ", ") %></small>
   </p>
 <% end %>
 

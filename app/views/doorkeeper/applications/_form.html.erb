@@ -24,7 +24,7 @@
 
         <span class="tw:block">
           Include
-          <span class="<%= scrolling_code_class %>"><%= render(UI::Code::Inline::Component.new(text: "bikeindex://")) %></span>
+          <%= render(UI::Code::Inline::Component.new(text: "bikeindex://")) %>
           for
           <%= link_to "iOS app deeplinks", "https://github.com/bikeindex/bike_index_ios?tab=readme-ov-file#quick-start", class: "twlink", tabindex: -1 %>.
         </span>
@@ -58,7 +58,7 @@
 
   <%= render(UI::Alerts::Base::Component.new(kind: :warning)) do %>
     Turning this on will make any request FAIL that doesn't include a
-    <span class="tw:leading-none <%= scrolling_code_class %>"><%= render(UI::Code::Inline::Component.new(text: "client_secret")) %></span>
+    <%= render(UI::Code::Inline::Component.new(text: "client_secret")) %>
     parameter
   <% end %>
 <% end %>

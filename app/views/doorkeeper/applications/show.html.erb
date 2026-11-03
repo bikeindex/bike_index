@@ -45,10 +45,7 @@
       <div class="tw:text-base">
         <%= render(UI::Alerts::Base::Component.new(kind: :warning, margin_classes: "tw:mb-6")) do %>
           All requests fail that don't include a
-          <span class="
-            tw:inline-block tw:max-w-full tw:overflow-x-auto tw:align-bottom
-            tw:leading-none tw:whitespace-nowrap
-          "><%= render(UI::Code::Inline::Component.new(text: "client_secret")) %></span>
+          <%= render(UI::Code::Inline::Component.new(text: "client_secret")) %>
           parameter
         <% end %>
       </div>

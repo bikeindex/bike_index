@@ -72,7 +72,7 @@
     <% if render_serial %>
       <% table.column(sortable: "serial_normalized", label: "Serial") do |logged_search| %>
         <% if logged_search.serial_normalized.present? %>
-          <small><%= render(UI::Code::Inline::Component.new(text: logged_search.serial_normalized)) %></small>
+          <%= render(UI::Code::Inline::Component.new(text: logged_search.serial_normalized, small: true)) %>
         <% end %>
       <% end %>
     <% end %>

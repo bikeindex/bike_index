@@ -7,7 +7,7 @@
 
       <small class="twless-strong tw:ml-2">
         Strava ID:
-        <%= render(UI::Code::Inline::Component.new(text: @strava_integration.strava_id)) %>
+        <%= render(UI::Code::Inline::Component.new(text: @strava_integration.strava_id, small: true)) %>
       </small>
     <% end %>
 
@@ -67,7 +67,7 @@
 
       <small class="tw:ml-1">
         priority multiplier:
-        <%= render(UI::Code::Inline::Component.new(text: StravaJobs::ScheduledRequestPriorityUpdator.priority_multiplier(@strava_integration.id))) %>
+        <%= render(UI::Code::Inline::Component.new(text: StravaJobs::ScheduledRequestPriorityUpdator.priority_multiplier(@strava_integration.id), small: true)) %>
       </small>
     <% end %>
 
