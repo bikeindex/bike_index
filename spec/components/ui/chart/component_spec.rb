@@ -10,14 +10,29 @@ RSpec.describe UI::Chart::Component, type: :component do
     rendered = render_inline(instance)
     script_content = rendered.css("script").text
     described_class::COLORS.each { |color| expect(script_content).to include(color) }
-    expect(script_content).to include('"legend":false')
+    expect(script_content).to include('"htmlLegend":false')
+    expect(rendered.css("[data-chart-legend]")).to be_blank
 
     rerendered = render_inline(described_class.new(series: [{name: "Test", data: {}}], time_range:))
     expect(rerendered.at_css("[id^='chart-']")["id"]).not_to eq rendered.at_css("[id^='chart-']")["id"]
 
     # Several series keep the legend that tells them apart
-    several = render_inline(described_class.new(series: [{name: "A", data: {}}, {name: "B", data: {}}])).css("script").text
-    expect(several).not_to include('"legend"')
+    several = render_inline(described_class.new(series: [{name: "A", data: {}}, {name: "B", data: {}}]))
+    expect(several.css("[data-chart-legend]")).to be_present
+    expect(several.css("script").text).to include('"htmlLegend":{}')
+  end
+
+  describe "library" do
+    let(:series) { {"A" => 1, "B" => 2} }
+
+    it "keeps a pie's legend unless its library turns it off" do
+      bottom = render_inline(described_class.new(series:, kind: :pie, library: {plugins: {legend: {position: "bottom"}}}))
+      expect(bottom.css("[data-chart-legend]").first["class"]).to include("tw:order-1")
+
+      off = render_inline(described_class.new(series:, kind: :pie, library: {plugins: {legend: false}}))
+      expect(off.css("[data-chart-legend]")).to be_blank
+      expect(off.css("script").text).to include('"htmlLegend":false')
+    end
   end
 
   context "with custom colors" do

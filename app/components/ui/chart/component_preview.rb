@@ -13,6 +13,18 @@ module UI
         series = [{name: "No bikes", data: {}}] if series.empty?
         render(UI::Chart::Component.new(series:, time_range:, stacked: true))
       end
+
+      def several_series
+        series = [{name: "Registered", data: {"Mon" => 1200, "Tue" => 34}},
+          {name: "Stolen", data: {"Mon" => 3, "Tue" => 2}},
+          {name: "Recovered", data: {"Mon" => 0, "Tue" => 0}}]
+        render(UI::Chart::Component.new(series:, stacked: true))
+      end
+
+      def pie_with_prefix
+        render(UI::Chart::Component.new(series: {"Donations" => 1234.5, "Stickers" => 20}, kind: :pie, prefix: "$", round: 2,
+          library: {plugins: {legend: {position: "bottom"}}}))
+      end
     end
   end
 end
