@@ -39,6 +39,7 @@ PATHS = {
   "pghero" => "/api/admin_data/pghero",
   "bug_reports" => "#{BUG_REPORTS}.json",
   "missing_manufacturers" => "/admin/bikes/missing_manufacturer.json",
+  "manufacturers" => "/admin/manufacturers.json",
   "duplicates" => "#{DUPLICATE_BIKES}.json",
   "duplicate_comparison" => "#{DUPLICATE_BIKES}/serial.json"
 }.freeze

@@ -58,6 +58,13 @@
 
             .form-group.row
               .form-well-input
+                .checkbox
+                  = f.label :allow_duplicate, class: "less-line-height" do
+                    = f.check_box :allow_duplicate
+                    = t(".create_duplicates_html")
+
+            .form-group.row
+              .form-well-input
                 = f.submit t(".upload_and_begin_import"), class: "btn btn-secondary btn-lg"
 
   - if @permitted_kinds.include?("impounded")
@@ -90,7 +97,7 @@
           = link_to "example impounded CSV with all optional columns", "https://raw.githubusercontent.com/bikeindex/bike_index/main/public/import_impounded_all_optional_fields.csv"
 
 
-      = form_for @bulk_import, {url: organization_bulk_imports_path(organization_id: current_organization.to_param), action: "create", html: {class: "organized-form"}} do |f|
+      = form_for @bulk_import, {url: organization_bulk_imports_path(organization_id: current_organization.to_param), action: "create", html: {class: "organized-form"}, namespace: "impounded"} do |f|
         = f.hidden_field :kind, value: "impounded"
         .card.col-sm-6
           .card-block
@@ -101,6 +108,13 @@
                   = f.file_field :file, class: "avatar-upload-field"
                   %span.file-custom
                     %span.file-upload-text= t(".choose_file")
+
+            .form-group.row
+              .form-well-input
+                .checkbox
+                  = f.label :allow_duplicate, class: "less-line-height" do
+                    = f.check_box :allow_duplicate, checked: true
+                    = t(".create_duplicates_enabled_html")
 
             .form-group.row
               .form-well-input
@@ -126,7 +140,7 @@
         %p
           New registrations will be created for all of the bikes. No emails will be sent on registration.
 
-      = form_for @bulk_import, {url: organization_bulk_imports_path(organization_id: current_organization.to_param), action: "create", html: {class: "organized-form"}} do |f|
+      = form_for @bulk_import, {url: organization_bulk_imports_path(organization_id: current_organization.to_param), action: "create", html: {class: "organized-form"}, namespace: "stolen"} do |f|
         = f.hidden_field :kind, value: "stolen"
         - @bike = Bike.new
         - @stolen_record = @bike.stolen_records.new(phone: current_user.current_user_phone)
@@ -148,6 +162,13 @@
                     = f.file_field :file, required: true, class: "avatar-upload-field"
                     %span.file-custom
                       %span.file-upload-text= t(".choose_file")
+
+              .form-group.row
+                .form-well-input
+                  .checkbox
+                    = f.label :allow_duplicate, class: "less-line-height" do
+                      = f.check_box :allow_duplicate, checked: true
+                      = t(".create_duplicates_enabled_html")
 
               .form-group.row
                 .form-well-input

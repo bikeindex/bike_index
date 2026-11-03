@@ -34,14 +34,13 @@
 <% end if request.query_parameters.blank? %>
 
 <% admin_search_form = capture do %>
-  <%= form_tag admin_b_params_path, method: :get, class: "form-inline mt-4 mb-4 justify-content-md-end" do %>
+  <%= form_with(url: admin_b_params_path, method: :get, html: {class: "twsearchrow"}) do |f| %>
     <%= hidden_field_tag :search_completeness, params[:search_completeness] %>
 
-    <div class="form-group mr-2 mb-2">
-      <%= text_field_tag :query, params[:query], placeholder: "Find by email", class: "form-control" %>
-    </div>
+    <%= render UI::Forms::Input::Component.new(form_builder: f, attribute: :query,
+      html_options: {value: params[:query], placeholder: "Find by email"}) %>
 
-    <%= submit_tag "Search", name: "search", class: "btn btn-primary mb-2" %>
+    <%= render UI::Button::Component.new(text: "Search", color: :primary, type: "submit", name: "search") %>
   <% end %>
 <% end %>
 

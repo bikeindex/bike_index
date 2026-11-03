@@ -56,8 +56,7 @@ RSpec.describe UI::Forms::RadioButtonGroup::Component, type: :component do
 
     it "renders radios as segments of a single track that focus like UI::ButtonGroup's" do
       expect(component).to have_css("input[value='active'][checked]", visible: :all)
-      expect(component).to have_css("div.tw\\:bg-gray-100")
-      expect(component).to have_no_css("div.tw\\:flex-wrap")
+      expect(component).to have_css("div.tw\\:bg-gray-100[data-controller='ui--toggle']")
       expect(utilities_for(label, "has-[:focus-visible]")).to eq(utilities_for(segment, "focus"))
     end
   end

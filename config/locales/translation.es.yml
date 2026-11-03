@@ -4666,6 +4666,13 @@ es:
         your_headers_must_match_html: Sus encabezados deben coincidir <em>exactamente</em>
           con los nuestros; por ejemplo, si incluye "número de serie" como encabezado,
           la importación no funcionará.
+        create_duplicates_html: 'Crear duplicados: añade registros cuando una fila
+          coincide con el número de serie y el correo electrónico del propietario
+          de un registro existente <span class="twless-strong">(desactivado por defecto).</span>'
+        create_duplicates_enabled_html: 'Crear duplicados: agregue registros cuando
+          una fila coincida con el número de serie y el correo electrónico del propietario
+          de un registro existente <span class="twless-strong">(habilitado de forma
+          predeterminada para evitar la pérdida de datos robados o confiscados).</span>'
       show:
         ascend_import: Importación de Ascend
         bulk_import: Importación a granel
@@ -4678,6 +4685,7 @@ es:
         file_removed_explanation: Después de unos días, eliminamos el archivo subido
           para ahorrar espacio.
         progress: Progreso
+        matched_count: Filas que coinciden con registros existentes
     exports:
       index:
         bikes_in_export: Registros en exportación
@@ -7715,10 +7723,6 @@ es:
             subsidiarias con su propio personal y contenido educativo. El personal
             de cada nivel gestiona únicamente sus propias normas.
           faq_account_question: "¿Quién gestiona la cuenta?"
-          faq_checker_answer: Los detalles de las bicicletas provienen de BikeBook,
-            un catálogo de modelos de bicicletas eléctricas que incluye su clase,
-            motor, velocidad y certificación UL. Las normas estatales se enumeran
-            junto con las leyes que las respaldan.
           faq_checker_question: "¿De dónde obtiene sus datos el verificador de cumplimiento?"
           faq_cost_answer: No hay cuotas de inscripción y el registro es gratuito
             para los residentes. Analizaremos los precios para su ciudad en una llamada
@@ -7936,6 +7940,10 @@ es:
             eléctrica, acceden directamente a una breve sesión informativa sobre las
             normas de su ciudad.
           submit_demo: Solicita una demostración
+          faq_checker_answer_html: Los detalles de las bicicletas provienen de %{bikebook_link},
+            un catálogo de modelos de bicicletas eléctricas con su clase, motor, velocidad
+            y certificación UL. Las normas estatales se enumeran junto con las leyes
+            que las respaldan.
         for_cities_education:
           all_set: Ya está todo listo.
           back: Atrás

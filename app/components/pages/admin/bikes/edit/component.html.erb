@@ -1,12 +1,12 @@
-<div class="tw:mt-6 tw:mb-4 tw:flex tw:flex-wrap tw:items-baseline tw:gap-2">
-  <h2 class="tw:mb-0">
+<div class="tw:mt-6 tw:mb-1 tw:flex tw:flex-wrap tw:items-baseline tw:gap-2">
+  <%= render(UI::Header::Component.new(tag: :h2)) do %>
     Edit
     <%= link_to "user edit", edit_bike_path(@bike, return_to: edit_admin_bike_path(@bike)),
-          class: "twlink tw:ml-2 tw:text-sm" %>
-  </h2>
+            class: "twlink tw:ml-2 tw:text-sm" %>
+  <% end %>
 
   <div class="tw:ml-auto">
-    <%= render partial: "/bikes/credibility_score", locals: {bike: @bike} %>
+    <%= render(Atoms::CredibilityScore::Component.new(bike: @bike)) %>
   </div>
 </div>
 
@@ -24,8 +24,8 @@
 
     <div>
       <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :serial_number, required: true,
-            html_options: {class: ("fake-disabled" if @bike.no_serial?),
-                           data: {"admin--bike-edit-form-target": "serial"}})) %>
+            html_options: {class: "tw:data-no-serial:bg-gray-100 tw:dark:data-no-serial:bg-gray-800 tw:data-no-serial:cursor-not-allowed",
+                           data: {"admin--bike-edit-form-target": "serial", no_serial: @bike.no_serial?.presence}})) %>
     </div>
 
     <div class="tw:self-center">
@@ -47,7 +47,7 @@
       data-action="hw-combobox:preselection->admin--bike-manufacturer#toggleWarning"
     >
       <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :manufacturer_id, label_text: "Manufacturer", required: true)) do |group| %>
-        <% group.with_label_note { tag.em(link_to("mfg bikes", admin_bikes_path(search_manufacturer: @bike.mnfg_name))) } %>
+        <% group.with_label_note { tag.em(link_to("mfg bikes", admin_bikes_path(search_manufacturer: @bike.mnfg_name), class: "twlink")) } %>
 
         <%= render UI::Forms::ComboboxManufacturer::Component.new(frame_maker: true, html_options: {form: f, required: true}) %>
 
@@ -110,7 +110,9 @@
   </div>
 
   <% if @bike.current_stolen_record.present? %>
-    <h3 class="tw:mt-8" id="edit-stolen-record">Edit stolen record</h3>
+    <div class="tw:mt-8" id="edit-stolen-record">
+      <%= render(UI::Header::Component.new(text: "Edit stolen record", tag: :h3)) %>
+    </div>
 
     <%= f.fields_for :stolen_records do |s| %>
       <% next unless current_stolen_record_fields?(s) %>
@@ -176,7 +178,7 @@
       </div>
 
       <div class="tw:hidden" data-admin--bike-edit-form-target="recoveryFields">
-        <hr class="tw:my-4">
+        <hr class="twhr">
 
         <div class="twwiderow">
           <div>
@@ -224,7 +226,7 @@
         <%= render(UI::Time::Component.new(time: bike_organization.created_at)) %>
 
         <% if display_dev_info %>
-          <code class="tw:ml-2 tw:text-xs">ID: <%= bike_organization.id %></code>
+          <code class="twcode tw:ml-2 tw:text-xs">ID: <%= bike_organization.id %></code>
         <% end %>
       <% end %>
 

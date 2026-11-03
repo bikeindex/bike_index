@@ -1,15 +1,6 @@
-<div class="admin-subnav">
-  <div class="col">
-    <h1>Cycle types</h1>
-
-    <p>
-      BikeBook's drawing of each type, and of each type detail it draws its own
-      way. Change a figure to redraw it. Light purple figures aren't listed but
-      are worked out from those that are, and gray ones are drawn at the type's
-      typical figure.
-    </p>
-  </div>
-</div>
+<%= render(Pages::Admin::Headers::Nav::Component.new(title: "Cycle types",
+      subtitle: "BikeBook's drawing of each type, and of each type detail it draws its own way. Change a figure to redraw it. " \
+        "Light purple figures aren't listed but are worked out from those that are, and gray ones are drawn at the type's typical figure.")) %>
 
 <%# a collapsed row is its own ui--collapse, so the trigger in its header opens both drawings %>
 <% drawing = lambda do |row, model = nil|
@@ -24,7 +15,7 @@ end %>
   <%= render(UI::Table::Component.new(records: @rows, row_attributes: ->(row) { {data: {"admin--cycle-type-details-target": "row", type: row.type, **({controller: "ui--collapse", "ui--collapse-param-value": row.type} if row.collapsed)}} })) do |table| %>
     <% table.column(label: "Type", row_header: true) do |row| %>
       <strong><%= row.name %></strong>
-      <code class="tw:text-xs"><%= row.type %></code>
+      <code class="twcode tw:text-xs"><%= row.type %></code>
 
       <% if row.collapsed %>
         <br>

@@ -22,6 +22,14 @@ RSpec.describe Admin::RecoveriesController, type: :request do
       expect(response).to render_template(:index)
       expect(flash).to_not be_present
     end
+
+    it "renders the chart's value totals" do
+      get "#{base_url}?search_recovery_display_status=all&render_chart=true"
+      expect(response).to be_ok
+      expect(response.body).to include("Total estimated value")
+      # A dollar amount interpolated into a string escaped number_display's span
+      expect(response.body).not_to include("&lt;span")
+    end
   end
   describe "index with a recovery waiting on a decision" do
     let(:bike) { FactoryBot.create(:bike, :with_ownership) }

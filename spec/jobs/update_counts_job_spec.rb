@@ -14,6 +14,7 @@ RSpec.describe UpdateCountsJob, type: :lib do
     let!(:stolen_bike) { FactoryBot.create(:stolen_bike) }
     let!(:recovered_bike) { FactoryBot.create(:stolen_record_recovered) }
     let!(:stolen_notification) { FactoryBot.create(:stolen_notification) }
+    let!(:logged_search) { FactoryBot.create(:logged_search, endpoint: :web_marketplace, request_at: Time.current) }
 
     it "updates counts in the cache" do
       expect(StolenRecord.count).to eq 2
@@ -23,6 +24,7 @@ RSpec.describe UpdateCountsJob, type: :lib do
       expect(Counts.stolen_bikes).to eq 2
       expect(Counts.recoveries).to eq 2041
       expect(Counts.week_creation_chart.is_a?(Hash)).to be_truthy
+      expect(Counts.logged_searches([Date.current])[Date.current]["web_marketplace"]).to eq 1
     end
   end
 end

@@ -40,7 +40,8 @@ module UI
       def toggle
         render(UI::ButtonGroup::Component.new(kind: :toggle, entries: [
           ComponentStructs::Shapes.entry("Spreadsheet", active: true, data: {action: "click->something#show"}),
-          ComponentStructs::Shapes.entry("Thumbnail", data: {action: "click->something#show"})
+          ComponentStructs::Shapes.entry("Thumbnail", data: {action: "click->something#show"}),
+          ComponentStructs::Shapes.entry("Map", data: {action: "click->something#show"})
         ]))
       end
 

@@ -107,7 +107,7 @@ module BikeDuplicatesServices
 
     def group_cues(group)
       cues(serials: [group["serial"]], record_count: group["record_count"], contact_count: group["email_count"],
-        test_count: group["test_count"], review_contact_count: group["review_contact_count"].to_i,
+        test_count: group["test_count"], review_contact_count: group["review_contact_count"],
         manufacturer_names: group_manufacturer_names(group),
         single_contact: single_contact?(group))
     end

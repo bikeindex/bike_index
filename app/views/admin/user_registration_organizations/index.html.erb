@@ -10,35 +10,21 @@
 
 <% table_view = capture do %>
   <% if @render_org_counts %>
-    <div class="row mt-4 mb-4">
-      <div class="col-md-6 offset-md-3">
-        <div class="card">
-          <div class="card-body">
-            <h3>Organizations</h3>
+    <%= render(UI::Container::Component.new) do %>
+      <%= render(UI::Card::Component.new(additional_classes: "tw:my-6")) do %>
+        <%= render(UI::Header::Component.new(text: "Organizations", tag: :h2)) %>
 
-            <table class="table-list wide-definition">
-              <tbody>
-                <% org_ids = matching_user_registration_organizations.distinct.pluck(:organization_id) %>
-                <% org_data = Organization.where(id: org_ids).pluck(:name, :id) %>
-                <% org_data = org_data.map { |org_name, org_id| [org_name, org_id, matching_user_registration_organizations.where(organization_id: org_id).count] }.sort { |a, b| b[2] <=> a[2] } %>
+        <% org_ids = matching_user_registration_organizations.distinct.pluck(:organization_id) %>
+        <% org_data = Organization.where(id: org_ids).pluck(:name, :id) %>
+        <% org_data = org_data.map { |org_name, org_id| [org_name, org_id, matching_user_registration_organizations.where(organization_id: org_id).count] }.sort { |a, b| b[2] <=> a[2] } %>
 
-                <% org_data.each do |org_name, org_id, org_reg_count| %>
-                  <tr>
-                    <td>
-                      <%= link_to org_name, url_for(sortable_search_params.merge(organization_id: org_id)) %>
-                    </td>
-
-                    <td>
-                      <%= number_display(org_reg_count) %>
-                    </td>
-                  </tr>
-                <% end %>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
+        <%= render(UI::TableList::Component.new(wide_definition: true)) do |list| %>
+          <% org_data.each do |org_name, org_id, org_reg_count| %>
+            <% list.with_row(label: link_to(org_name, url_for(sortable_search_params.merge(organization_id: org_id)), class: "twlink"), value: number_display(org_reg_count)) %>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
   <% end %>
 
   <%= render partial: "table", locals: {collection: @user_registration_organizations, render_sortable: true} %>

@@ -20,7 +20,7 @@
 
       <% if stripe_price.present? %>
         <%= stripe_price.membership_level %>
-        <span class="less-strong"><%= stripe_price.interval %></span>
+        <span class="twless-strong"><%= stripe_price.interval %></span>
         <% unless stripe_price.currency_enum == "usd" %>
           <small><%= stripe_price.currency_name %></small>
         <% end %>
@@ -62,13 +62,13 @@
       <small><%= number_display(payment_count) %></small>
 
       <% stripe_subscription.payments.order(id: :desc).limit(1).pluck(:id, :stripe_status).each do |id, stripe_status| %>
-        <%= link_to admin_payment_path(id), class: "twlink small" do %>
+        <%= link_to admin_payment_path(id), class: "twlink tw:text-sm" do %>
           <% if stripe_status.blank? || payment_count > 1 %>
             last
           <% end %>
 
           <% if stripe_status.present? %>
-            <code><%= stripe_status %></code>
+            <code class="tw:text-sm"><%= stripe_status %></code>
           <% end %>
         <% end %>
       <% end %>

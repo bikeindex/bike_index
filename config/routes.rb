@@ -283,6 +283,7 @@ Rails.application.routes.draw do
       end
     end
 
+    get "bikes/duplicates", to: redirect("/admin/duplicate_bikes?search_view=segments")
     resources :bikes do
       collection do
         put :ignore_duplicate_toggle

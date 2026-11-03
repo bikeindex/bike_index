@@ -1,9 +1,19 @@
 <h1>Duplicate registration review</h1>
 
-<p class="tw:mt-4">
-  The review queues are being prepared. This can take a minute. Refresh this
-  page shortly to see registration groups and counts.
-</p>
+<% if @group_snapshot_failed_at %>
+  <%= render UI::Alerts::Base::Component.new(kind: :error, margin_classes: "tw:mt-4", header: "Preparing the review queues failed") do %>
+    The last attempt failed
+    <%= render UI::Time::Component.new(time: @group_snapshot_failed_at) %>.
+    Another attempt starts on a visit within
+    <%= BikeDuplicatesServices::Finder::PREPARING_TTL.in_minutes.to_i %>
+    minutes.
+  <% end %>
+<% else %>
+  <p class="tw:mt-4">
+    The review queues are being prepared. This can take a minute. Refresh this
+    page shortly to see registration groups and counts.
+  </p>
+<% end %>
 
 <p class="tw:mt-4">
   This review does not merge records, remove data or send customer emails.

@@ -17,7 +17,7 @@ module OrganizedHelper
         concat(content_tag(:small, " #{bike.type}"))
       end
       if bike.deleted?
-        concat(content_tag(:em, " removed from Bike Index", class: "small text-danger"))
+        concat(content_tag(:em, " removed from Bike Index", class: "tw:text-sm #{UI::Alerts::Base::Component::TEXT_CLASSES[:error]}"))
       elsif bike.unregistered_parking_notification? # Only care if currently unregistered parking notification
         # If it's an unregistered bike, don't display where it was created
         # ... since it only could've been created in one place
@@ -25,7 +25,7 @@ module OrganizedHelper
         concat(render(Atoms::RegistrationStatusBadge::Component.new(bike:, size: :xs)))
       elsif !skip_creation && bike.creation_kind.present?
         concat(", ")
-        concat(content_tag(:small, render(Atoms::Org::OriginDisplay::Component.new(ownership: bike.current_ownership)), class: "less-strong"))
+        concat(content_tag(:small, render(Atoms::Org::OriginDisplay::Component.new(ownership: bike.current_ownership)), class: "twless-strong"))
       end
     end
   end
@@ -58,17 +58,19 @@ module OrganizedHelper
   def status_display_class(status)
     return "" if status.blank?
 
+    text_classes = UI::Alerts::Base::Component::TEXT_CLASSES
+
     case status.downcase
     when "current", "paging", "being_helped"
-      "text-success"
+      text_classes[:success]
     when "stolen", /uncertified/
-      "text-warning"
+      text_classes[:warning]
     when "resolved_otherwise", "on_deck", /approved/, /retrieved/, "bike graduated", /certified_by/
-      "text-info"
+      text_classes[:notice]
     when /removed/, "impounded", "trashed", "failed_to_find", /denied/, "delivery failure"
-      UI::Alerts::Base::Component::TEXT_CLASSES[:error]
+      text_classes[:error]
     else
-      "less-strong"
+      "twless-strong"
     end
   end
 

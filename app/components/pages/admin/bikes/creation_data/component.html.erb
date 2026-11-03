@@ -24,7 +24,7 @@
               <%= render(UI::Time::Component.new(time: ownership.created_at)) %>
 
               <% if @display_dev_info %>
-                <code class="tw:ml-2 tw:text-xs">ID: <%= ownership.id %></code>
+                <code class="twcode tw:ml-2 tw:text-xs">ID: <%= ownership.id %></code>
               <% end %>
             <% end %>
 
@@ -48,7 +48,7 @@
     </div>
 
     <% if b_params.none? %>
-      <p class="tw:mt-4">No <code>BParams</code> exist</p>
+      <p class="tw:my-4">No <code class="twcode">BParams</code> exist</p>
     <% else %>
       <div class="twwiderow tw:mt-4">
         <% b_params.each do |b_param| %>
@@ -60,7 +60,7 @@
                 <%= render(UI::Time::Component.new(time: b_param.created_at)) %>
 
                 <% if @display_dev_info %>
-                  <code class="tw:ml-2 tw:text-xs">ID: <%= b_param.id %></code>
+                  <code class="twcode tw:ml-2 tw:text-xs">ID: <%= b_param.id %></code>
                 <% end %>
               <% end %>
 

@@ -1,18 +1,15 @@
-.admin-subnav
-  .col-12
-    %h1
-      IP Location
+= render(Pages::Admin::Headers::Nav::Component.new(title: "IP Location"))
 
-%p
+%p{class: "tw:mb-4"}
   Compare cloudflare headers vs geocoder results
 
-.row
-  .col-md-6
-    %h4 Cloudflare
+.twwiderow
+  %div
+    = render(UI::Header::Component.new(text: "Cloudflare", tag: :h2))
     = render UI::JsonDisplay::Component.new(data: @cloudflare_hash)
-  .col-md-6
-    %h4 Geocoder
+  %div
+    = render(UI::Header::Component.new(text: "Geocoder", tag: :h2))
     = render UI::JsonDisplay::Component.new(data: @geocoder_hash)
-  .col-md-6
-    %h4 Raw Headers
+  %div
+    = render(UI::Header::Component.new(text: "Raw Headers", tag: :h2))
     = render UI::JsonDisplay::Component.new(data: @headers)

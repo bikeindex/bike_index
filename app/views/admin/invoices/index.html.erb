@@ -1,6 +1,5 @@
 <% index_title = capture do %>
-  <em class="strong"><%= @query.present? ? @query.titleize : "All" %></em>
-  Invoices
+  <em><%= @query.present? ? @query.titleize : "All" %></em> Invoices
 <% end %>
 
 <% nav_header_list_items = capture do %>
@@ -44,8 +43,8 @@
     <%= render(UI::Chart::Component.new(series: [{name: "Invoices", data:}], time_range: @time_range, stacked: true)) %>
 
     <% unless params[:query].present? %>
-      <div class="row mb-4 mt-4">
-        <div class="col-sm-8 offset-sm-2">
+      <div class="tw:my-6">
+        <%= render(UI::Container::Component.new) do %>
           <% *invoice_rows, all_row = {
               "First invoice" => matching_invoices.first_invoice,
               "Renewals" => matching_invoices.renewal_invoice,
@@ -63,19 +62,19 @@
             <% table.column(label: "amount due", footer: all_row[:amount_due]) { |row| row[:amount_due] } %>
             <% table.column(label: "amount paid", footer: all_row[:amount_paid]) { |row| row[:amount_paid] } %>
           <% end %>
-        </div>
+        <% end %>
       </div>
     <% end %>
   <% end %>
 <% end %>
 
 <% table_view = capture do %>
-  <p>
+  <p class="tw:mb-4">
     Total paid:
     <strong><%= MoneyFormatter.money_format(matching_invoices.sum(:amount_paid_cents)) %></strong>
   </p>
 
-  <p class="less-strong">
+  <p class="twless-strong tw:mb-4">
     Go to individual organizations to create new invoices
   </p>
 

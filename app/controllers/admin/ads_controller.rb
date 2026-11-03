@@ -43,7 +43,7 @@ module Admin
     protected
 
     def permitted_parameters
-      params.require(:ad).permit(:title, :body, :target_url, :organization_id, :image)
+      params.require(:ad).permit(:title, :body, :target_url, :organization_id, :image, :live)
     end
 
     def find_ad
