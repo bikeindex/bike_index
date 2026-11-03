@@ -31,7 +31,6 @@ export default class extends Controller {
   #compared
   #renderedCatalog
   #loadFailed = false
-  #landedOn
 
   // The loading shell holds the status until the catalog's first render replaces it, and a failure puts it back
   initialize () {
@@ -43,7 +42,6 @@ export default class extends Controller {
     window.history.scrollRestoration = 'manual'
     this.#stamp()
     const url = new URL(window.location.href)
-    this.#landedOn = readable(url)
     this.#render(url)
     try {
       this.catalog = await loadCatalog(this.manifestUrlValue, url.searchParams.get('vehicle_models')?.split(',') ?? [], this.jurisdictionsValue, this.paintColorsValue, {
@@ -214,7 +212,13 @@ export default class extends Controller {
   #go (url, scroll = [0, 0], { replace = false, ...options } = {}) {
     window.history[replace ? 'replaceState' : 'pushState'](stamped(), '', readable(url))
     this.#searchLog.visited(url)
+    this.#dropCanonical()
     return this.#render(url, scroll, options)
+  }
+
+  // A share menu shares the canonical, which names the page the server sent
+  #dropCanonical () {
+    document.querySelector('link[rel="canonical"]')?.remove()
   }
 
   // `scroll` is where the window goes, [x, y] or a selector of what to bring to its top. `focus` selects what to focus,
@@ -227,8 +231,8 @@ export default class extends Controller {
     }
 
     const render = ++this.#renders
-    // A share menu shares the canonical, which names the page the server sent
-    if (readable(url) !== this.#landedOn) document.querySelector('link[rel="canonical"]')?.remove()
+    // Kept through the first render of the catalog, which crawlers see
+    if (this.#renderedCatalog) this.#dropCanonical()
     // the comparison doesn't hold up the page, unless the page is of what it adds
     if (comparing(url)) await this.#compared
     const { catalog } = this

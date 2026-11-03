@@ -2234,7 +2234,11 @@ RSpec.describe "BikeBook", :js, type: :system do
     visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_adv,m/specialized/2025/haul_st")
 
     expect(page).to have_css("[data-hw-combobox-chip]", text: "Aventón Level 4 ADV", wait: 10)
+    expect(page).to have_css("link[rel='canonical']", visible: :all)
     expect(page).to have_css("[data-hw-combobox-chip]", text: /Specialized Haul ST\z/)
+    # nothing offered that a click on would ignore, until the search is live
+    expect(page).to have_no_css(".hw-combobox__chip__remover")
+    expect(page).to have_no_button("Move Aventón Level 4 ADV")
     expect(page).to have_css("#vehicle_models[disabled]")
     expect(page).to have_css("#vehicle-viewers tr")
     click_link "Components"
@@ -2248,6 +2252,7 @@ RSpec.describe "BikeBook", :js, type: :system do
     # what the index adds: whether each is current, and the search
     expect(page).to have_css("[data-hw-combobox-chip]", text: "Specialized Haul ST current", wait: 10)
     expect(page).to have_no_css("#vehicle_models[disabled]")
+    expect(page).to have_css(".hw-combobox__chip__remover", count: 2)
     expect(page).to have_current_path(/[?&]view=components\b/)
     # a keyboard's place among the vehicles, rather than the search that wasn't there to focus
     expect(page).to have_css("a:focus", text: "Components")
@@ -2268,6 +2273,15 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(page).to have_current_path(/[?&]view=components\b/)
     expect(page).to have_css(failed, text: "The catalog didn't load.")
     expect(page).to have_field("vehicle_models", placeholder: "", disabled: true)
+  end
+
+  it "keeps the canonical through the first render of compared vehicles, which adds to the URL" do
+    serve_bikebook_catalog
+    visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_adv,m/specialized/2025/haul_st")
+
+    expect(page).to have_css("[data-hw-combobox-chip]", text: "Specialized Haul ST current", wait: 10)
+    expect(page).to have_current_path(/[?&]search=1\b/)
+    expect(page).to have_css("link[rel='canonical']", visible: :all)
   end
 
   it "says the index didn't load above picked vehicles that arrive after it" do

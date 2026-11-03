@@ -159,7 +159,7 @@ export const renderChips = (combobox, chips) => {
   combobox.querySelector('[data-hw-combobox-target~="combobox"]').before(fragmentOf(chips.map(({ value, display }, index) => {
     const name = display.replace(CURRENT_MARK, '')
     return html`<div data-hw-combobox-chip=""><div class="hw-combobox__chip">${grip ? gripFor(grip, display, handleId(value, index)) : nothing}<span>${name}${
-      name === display ? nothing : html` ${inlineBadge({ text: 'current', size: 'sm' })}`}</span><span tabindex="0" class="hw-combobox__chip__remover"
+      name === display ? nothing : html` ${inlineBadge({ text: 'current', size: 'sm' })}`}</span><span tabindex="0" class="hw-combobox__chip__remover tw:inert:invisible"
       aria-label=${`Remove ${display}`} data-action="click->hw-combobox#removeChip:stop keydown->hw-combobox#navigateChip"
       data-hw-combobox-target="chipDismisser" data-hw-combobox-value-param=${value}></span></div></div>`
   })))
