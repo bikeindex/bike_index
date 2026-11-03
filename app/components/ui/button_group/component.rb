@@ -34,7 +34,7 @@ module UI
         "tw:rounded-lg tw:px-3 tw:py-[5px] tw:text-[11.5px]/[1.2] tw:font-extrabold tw:whitespace-nowrap tw:transition-colors",
         "tw:justify-start!", # over BASE_CLASSES' centering, once stacked segments are as wide as their track
         "tw:no-underline tw:hover:no-underline tw:text-gray-400",
-        "tw:not-disabled:not-aria-disabled:hover:text-gray-900",
+        "tw:not-disabled:not-aria-disabled:hover:text-gray-900 tw:dark:not-disabled:not-aria-disabled:hover:text-gray-100",
         "tw:focus:ring-purple-500/40",
         "tw:is-active:bg-white tw:is-active:text-gray-900 tw:is-active:shadow-sm",
         "tw:is-active:dark:bg-gray-900 tw:is-active:dark:text-gray-100"
