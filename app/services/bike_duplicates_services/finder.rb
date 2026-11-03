@@ -34,6 +34,9 @@ module BikeDuplicatesServices
     QUERY_TIMEOUT = 10.minutes
     # Deletes the claim only if it's still the one passed in, not a newer job's
     RELEASE_CLAIM_SCRIPT = 'if redis.call("get", KEYS[1]) == ARGV[1] then return redis.call("del", KEYS[1]) end'
+    # Restarts the claim's TTL, or takes it back if it expired while the job was queued - not if a newer job has it
+    HOLD_CLAIM_SCRIPT = 'local held = redis.call("get", KEYS[1]) ' \
+      'if not held or held == ARGV[1] then return redis.call("set", KEYS[1], ARGV[1], "EX", ARGV[2]) end'
 
     # The dashboard's groups, or nil until the first ones are prepared. The query takes most of a minute in
     # production, so a missing or hour-old snapshot enqueues the job - once across every server - rather
@@ -64,10 +67,9 @@ module BikeDuplicatesServices
         it.del(FAILED_KEY)
       end
       release_claim(claim) if claim
-    rescue
-      # The claim is kept, so visits don't start another long query until it expires
-      RedisPool.conn { it.set(FAILED_KEY, Time.current.to_i, ex: SNAPSHOT_TTL.to_i) }
-      raise
+    rescue => e
+      record_failure(claim)
+      raise e
     end
 
     def groups
@@ -229,8 +231,19 @@ module BikeDuplicatesServices
 
     def release_claim(claim) = RedisPool.conn { it.eval(RELEASE_CLAIM_SCRIPT, keys: [PREPARING_KEY], argv: [claim]) }
 
+    # Holds the claim for PREPARING_TTL from now, so visits don't start another long query straight away.
+    # Best effort: an error here would hide the query's own
+    def record_failure(claim)
+      RedisPool.conn do
+        it.set(FAILED_KEY, Time.current.to_i, ex: SNAPSHOT_TTL.to_i)
+        it.eval(HOLD_CLAIM_SCRIPT, keys: [PREPARING_KEY], argv: [claim, PREPARING_TTL.to_i]) if claim
+      end
+    rescue => e
+      Rails.logger.error("Duplicate review snapshot failure not recorded: #{e.class}")
+    end
+
     def enum_sql(enum, *keys) = enum.values_at(*keys.map(&:to_sym)).join(", ")
 
-    conceal :customer_origins, :enqueue_group_snapshot, :enum_sql, :release_claim, :stolen_serial_bikes, :query, :test_bikes_sql
+    conceal :customer_origins, :enqueue_group_snapshot, :enum_sql, :record_failure, :release_claim, :stolen_serial_bikes, :query, :test_bikes_sql
   end
 end

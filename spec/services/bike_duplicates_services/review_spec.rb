@@ -239,8 +239,8 @@ RSpec.describe BikeDuplicatesServices::Review do
       end
     end
 
-    context "with a stolen record on one record, recovered ones included" do
-      let(:second_bike_id) { FactoryBot.create(:stolen_record_recovered).bike_id }
+    context "with a stolen record on one record, recovered ones on deleted bikes included" do
+      let(:second_bike_id) { FactoryBot.create(:stolen_record_recovered).bike.tap { it.update_column(:deleted_at, Time.current) }.id }
 
       it "vetoes it whatever the whole-serial lookup found" do
         expect(review.stolen_count(pair.last)).to eq 1

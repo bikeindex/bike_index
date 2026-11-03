@@ -36,12 +36,30 @@ RSpec.describe BikeJobs::PrepareDuplicateReviewJob, type: :job do
     expect { described_class.new.perform("claim") }.to raise_error(ActiveRecord::QueryCanceled)
     expect(finder.group_snapshot_failed_at).to be_within(2.seconds).of(Time.current)
     expect(RedisPool.conn { it.get(finder::PREPARING_KEY) }).to eq "claim"
+    expect(RedisPool.conn { it.ttl(finder::PREPARING_KEY) }).to be_within(5).of(finder::PREPARING_TTL.to_i)
     expect(finder.fetch_group_snapshot).to be_nil
     expect(described_class.jobs).to be_empty
 
     allow(BikeDuplicatesServices::Cues).to receive(:fetch_manufacturer_name_serials).and_call_original
     described_class.new.perform("claim")
     expect(finder.group_snapshot_failed_at).to be_nil
+  end
+
+  it "takes its claim back on failure if it expired while queued, but not from a newer job" do
+    allow(BikeDuplicatesServices::Cues).to receive(:fetch_manufacturer_name_serials).and_raise(ActiveRecord::QueryCanceled)
+    expect { described_class.new.perform("claim") }.to raise_error(ActiveRecord::QueryCanceled)
+    expect(RedisPool.conn { it.get(finder::PREPARING_KEY) }).to eq "claim"
+
+    RedisPool.conn { it.set(finder::PREPARING_KEY, "newer") }
+    expect { described_class.new.perform("claim") }.to raise_error(ActiveRecord::QueryCanceled)
+    expect(RedisPool.conn { it.get(finder::PREPARING_KEY) }).to eq "newer"
+  end
+
+  it "raises the query's error even when the failure can't be recorded" do
+    allow(BikeDuplicatesServices::Cues).to receive(:fetch_manufacturer_name_serials).and_raise(ActiveRecord::QueryCanceled)
+    allow(RedisPool).to receive(:conn).and_raise(RedisClient::CannotConnectError)
+    expect { described_class.new.perform("claim") }.to raise_error(ActiveRecord::QueryCanceled)
+    allow(RedisPool).to receive(:conn).and_call_original
   end
 
   it "leaves a newer job's claim in place" do
