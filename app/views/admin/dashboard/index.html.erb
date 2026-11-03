@@ -50,15 +50,17 @@
 
   <hr class="twhr">
 
+  <% week_searches = Counts.logged_searches(@time_range.first.to_date..Date.current).values.reduce { |sum, day| sum.merge(day) { |_kind, a, b| a + b } } %>
+
   <div class="twwiderow">
     <div class="tw:mt-6">
-      <%= render(UI::Header::Component.new(text: "Index searches", tag: :h2)) %>
+      <%= render(UI::Header::Component.new(text: "Index searches", tag: :h2, subtitle: safe_join([number_display(week_searches.values_at("organized", "organized_serial", "user", "user_serial", "web_marketplace").sum), " past week"]))) %>
 
       <%= render(UI::Chart::Component.new(series: logged_searches_admin_graphs_path(search_endpoint: "not_web_bikebook", period: "week"), stacked: true)) %>
     </div>
 
     <div class="tw:mt-6">
-      <%= render(UI::Header::Component.new(text: "BikeBook searches", tag: :h2)) %>
+      <%= render(UI::Header::Component.new(text: "BikeBook searches", tag: :h2, subtitle: safe_join([number_display(week_searches.values_at("web_bikebook", "web_bikebook_comparison", "web_ebike_rules").sum), " past week"]))) %>
 
       <%= render(UI::Chart::Component.new(series: logged_searches_admin_graphs_path(search_endpoint: "web_bikebook", period: "week"), stacked: true)) %>
     </div>
