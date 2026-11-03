@@ -2241,6 +2241,8 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(page).to have_no_button("Move Aventón Level 4 ADV")
     expect(page).to have_css("#vehicle_models[disabled]")
     expect(page).to have_css("#vehicle-viewers tr")
+    # its block leaves out its markets, which the index has
+    expect(find("#vehicle-viewers")).to have_no_text("()")
     click_link "Components"
     expect(page).to have_current_path(/[?&]view=components\b/)
     expect(page).to have_css("[data-hw-combobox-chip]", text: "Aventón Level 4 ADV")
