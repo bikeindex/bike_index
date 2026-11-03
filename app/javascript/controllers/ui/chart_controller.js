@@ -46,6 +46,10 @@ export default class extends Controller {
   async connect () {
     await import('Chart.bundle')
     window.Chart.register(htmlLegend)
+    if (this.element.closest('.dark')) {
+      window.Chart.defaults.color = '#9ca3af' // gray-400
+      window.Chart.defaults.borderColor = 'rgb(255 255 255 / 10%)'
+    }
     await import('chartkick')
   }
 }

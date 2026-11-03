@@ -93,7 +93,7 @@
     <% @bug_report.images.each do |image| %>
       <div>
         <%= link_to BlobUrl.for(image.blob), target: "_blank", rel: "noopener" do %>
-          <%= image_tag BlobUrl.for(image.blob), alt: image.filename, class: "tw:max-h-72 tw:rounded tw:border tw:border-gray-200 tw:p-1" %>
+          <%= image_tag BlobUrl.for(image.blob), alt: image.filename, class: "tw:max-h-72 tw:rounded tw:border tw:border-gray-200 tw:p-1 tw:dark:border-gray-700" %>
         <% end %>
 
         <div class="twless-strong tw:text-sm">

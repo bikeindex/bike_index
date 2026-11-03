@@ -19,6 +19,13 @@ module Pages
             render(Pages::Admin::Users::Edit::Component.new(user:))
           end
 
+          # Editing yourself is what offers the dark mode preview radios
+          def own_page
+            user = lookbook_user
+
+            render(Pages::Admin::Users::Edit::Component.new(user:, current_user: user))
+          end
+
           def with_dev_info
             render(Pages::Admin::Users::Edit::Component.new(user: lookbook_user, display_dev_info: true))
           end
