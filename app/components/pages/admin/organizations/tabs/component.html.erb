@@ -1,5 +1,8 @@
 <%= render(Pages::Admin::Headers::Tabs::Component.new(title: @organization.name, subtitle: @subtitle,
-      tabs:, links: top_right_links, nav_label: "Organization sections")) do |header| %>
+      tabs:, nav_label: "Organization sections")) do |header| %>
+  <% header.with_nav_item { @additional_link } %>
+  <% header.with_nav_item { (@active == :invoices) ? new_invoice_link : organization_view_link } %>
+
   <% if @organization.deleted? %>
     <% header.with_alert do %>
       <%= render(UI::Alerts::Base::Component.new(kind: :error, header: "Organization deleted")) do %>

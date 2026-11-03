@@ -46,7 +46,7 @@
       <% if bulk_import.organization.present? %>
         <%= link_to bulk_import.organization.name, admin_bulk_imports_url(sort_state.search_params.merge(organization_id: bulk_import.organization.to_param)), class: "twlink" %>
       <% else %>
-        <%= link_to "no org", admin_bulk_imports_url(organization_id: "none"), style: "color: #ccc" %>
+        <%= link_to "no org", admin_bulk_imports_url(organization_id: "none"), class: "tw:text-gray-300 tw:dark:text-gray-600" %>
       <% end %>
 
       <small>

@@ -79,7 +79,7 @@
 
 %div{class: "tw:grid tw:gap-x-8 tw:md:grid-cols-3 tw:my-6 tw:pb-6"}
   %div{class: "tw:pt-4"}
-    .only-dev-visible= render UI::JsonDisplay::Component.new(data: @email_domain.data, small: true)
+    .only-dev-visible= render UI::Code::Json::Component.new(data: @email_domain.data, small: true)
   %div{class: "tw:md:col-span-2 tw:pt-4"}
     = render "form",
       email_domain: @email_domain,

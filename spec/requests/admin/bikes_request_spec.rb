@@ -424,6 +424,19 @@ RSpec.describe Admin::BikesController, type: :request do
     end
   end
 
+  describe "undelete" do
+    let!(:bike) { FactoryBot.create(:bike, :with_ownership, deleted_at: Time.current) }
+
+    it "restores the bike" do
+      expect(Bike.pluck(:id)).to eq([])
+      put "#{base_url}/#{bike.id}/undelete"
+      expect(response).to redirect_to(edit_admin_bike_url(bike))
+      expect(flash[:success]).to match(/un-deleted/i)
+      expect(Bike.pluck(:id)).to eq([bike.id])
+      expect(CallbackJobs::AfterBikeSaveJob).to have_enqueued_sidekiq_job(bike.id)
+    end
+  end
+
   describe "destroy" do
     it "destroys the bike" do
       bike.current_ownership

@@ -1,4 +1,4 @@
-/* UI::JsonDisplay. The token colors are classes rather than the inline styles a
+/* UI::Code::Json. The token colors are classes rather than the inline styles a
  * server-side highlighter bakes in, which is what lets them take dark variants. */
 
 @layer components {

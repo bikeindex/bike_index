@@ -1,11 +1,5 @@
 <% show_search_statuses = !@ignored_only %>
 
-<% nav_header_list_items = capture do %>
-  <%= render(Pages::Admin::Bikes::Index::Filters::Component.new(index: admin_index_state, motorized: @motorized,
-        multi_delete: @multi_delete, origin_search_type: @origin_search_type,
-        pos_search_type: @pos_search_type, period: @period)) %>
-<% end %>
-
 <% rendered_chart = nil %>
 
 <% if @render_chart %>
@@ -45,7 +39,7 @@
       <% if @search_email.present? %>
         <p class="tw:mb-4">
           Viewing only bikes <strong>sent to</strong>
-          <code class="twcode"><%= @search_email %></code>
+          <%= render(UI::Code::Inline::Component.new(text: @search_email)) %>
           <%= link_to "view sent to any emails", url_for(sortable_search_params.merge(search_email: nil)), class: "twlink tw:text-sm" %>
         </p>
       <% end %>
@@ -53,7 +47,7 @@
       <% if @search_domain.present? %>
         <p class="tw:mb-4">
           Viewing only bikes <strong>from the domain</strong>
-          <code class="twcode"><%= @search_domain %></code>
+          <%= render(UI::Code::Inline::Component.new(text: @search_domain)) %>
           <%= link_to "view sent to any domain", url_for(sortable_search_params.merge(search_domain: nil)), class: "twlink tw:text-sm" %>
         </p>
       <% end %>
@@ -64,7 +58,7 @@
           <% if @model_audit.present? %>
             <%= model_audit_display(@model_audit, truncate: true) %>
           <% else %>
-            <code class="twcode">ID: <%= params[:search_model_audit_id] %></code>
+            <%= render(UI::Code::Inline::Component.new(text: "ID: #{params[:search_model_audit_id]}")) %>
           <% end %>
           <%= link_to "view for any model audit", url_for(sortable_search_params.merge(search_model_audit_id: nil)), class: "twlink tw:text-sm" %>
         </p>
@@ -76,7 +70,7 @@
           <% if @doorkeeper_app.present? %>
             <%= link_to @doorkeeper_app.name, oauth_application_path(@doorkeeper_app), class: "twlink" %>
           <% else %>
-            <code class="twcode">ID: <%= params[:search_doorkeeper_app_id] %></code>
+            <%= render(UI::Code::Inline::Component.new(text: "ID: #{params[:search_doorkeeper_app_id]}")) %>
             <span class="twless-strong">(no app with that ID)</span>
           <% end %>
           <%= link_to "view for any API Application", url_for(sortable_search_params.merge(search_doorkeeper_app_id: nil)), class: "twlink tw:text-sm" %>
@@ -90,7 +84,8 @@
       <% if params[:serial].present? %>
         <p class="tw:mb-4">
           Viewing only bikes <strong>with normalized serials matching</strong>
-          <code class="twcode"><%= @serial_normalized %></code>
+          <%= render(UI::Code::Inline::Component.new(text: @serial_normalized)) %>
+
           <%= link_to "view with any serial", url_for(sortable_search_params.merge(serial: nil)), class: "twlink tw:text-sm" %>
         </p>
       <% end %>
@@ -108,7 +103,7 @@
             <% end %>
           <% else %>
             No manufacturer found for
-            <code class="twcode"><%= params[:search_manufacturer] %></code>
+            <%= render(UI::Code::Inline::Component.new(text: params[:search_manufacturer])) %>
           <% end %>
 
           <%= link_to "view all manufacturer bikes", url_for(sortable_search_params.merge(search_manufacturer: nil)), class: "twlink tw:text-sm" %>
@@ -168,9 +163,14 @@
   index: admin_index_state,
   collection: @bikes,
   viewing: "Bikes",
-  nav_header_list_items:,
   rendered_chart:,
   admin_search_form:,
   table_view:,
   count_detail:,
-)) %>
+)) do |skeleton| %>
+  <% skeleton.with_nav_item do %>
+    <%= render(Pages::Admin::Bikes::Index::Filters::Component.new(index: admin_index_state, motorized: @motorized,
+        multi_delete: @multi_delete, origin_search_type: @origin_search_type,
+        pos_search_type: @pos_search_type, period: @period)) %>
+  <% end %>
+<% end %>

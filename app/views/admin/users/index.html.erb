@@ -1,39 +1,3 @@
-<% nav_header_list_items = capture do %>
-  <li>
-    <%= render(UI::Dropdown::Component.new(name: @invalid.titleize, button_size: :sm,
-          active: @invalid != invalid_user_options.first)) do |dropdown| %>
-      <% invalid_user_options.each do |kind| %>
-        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: kind.titleize, path: url_for(sortable_search_params.merge(search_invalid: kind)), match_params: {search_invalid: kind}) } %>
-      <% end %>
-    <% end %>
-  </li>
-
-  <li>
-    <% access_active = @search_ambassadors || @search_superusers || @search_developers || @search_with_organization %>
-    <% clear_access_params = {search_ambassadors: nil, search_superusers: nil, search_developers: nil, search_with_organization: nil} %>
-
-    <% access_filter_name = [[@search_ambassadors, "Ambassadors"], [@search_superusers, "Superusers"],
-         [@search_developers, "Developers"], [@search_with_organization, "With Organization Role"]]
-       .detect(&:first)&.last || "Any Access" %>
-
-    <%= render(UI::Dropdown::Component.new(name: access_filter_name, button_size: :sm,
-          active: access_active)) do |dropdown| %>
-      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Any Access", path: url_for(sortable_search_params.merge(clear_access_params)), match_params: clear_access_params) } %>
-      <% dropdown.with_entry_divider %>
-      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "With Organization Role", path: url_for(sortable_search_params.merge(clear_access_params.merge(search_with_organization: true))), match_params: {search_with_organization: true}) } %>
-      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Ambassadors", path: url_for(sortable_search_params.merge(clear_access_params.merge(search_ambassadors: true))), match_params: {search_ambassadors: true}) } %>
-      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Superusers", path: url_for(sortable_search_params.merge(clear_access_params.merge(search_superusers: true))), match_params: {search_superusers: true}) } %>
-      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Developers", path: url_for(sortable_search_params.merge(clear_access_params.merge(search_developers: true))), match_params: {search_developers: true}) } %>
-    <% end %>
-  </li>
-
-  <li>
-    <%= render(UI::ButtonLink::Component.new(text: "Un", href: url_for(sortable_search_params.merge(search_unconfirmed: !@search_unconfirmed, search_confirmed: false)), size: :sm)) %>
-    /
-    <%= render(UI::ButtonLink::Component.new(text: "confirmed", href: url_for(sortable_search_params.merge(search_confirmed: !@search_confirmed, search_unconfirmed: false)), size: :sm)) %>
-  </li>
-<% end %>
-
 <% index_title = capture do %>
   <span class="tw:hidden tw:lg:inline">Manage</span> Users
   <% if display_dev_info? %>
@@ -102,7 +66,40 @@
   index_title: index_title,
   viewing: "Users",
   chart_collection: @render_chart && matching_users,
-  nav_header_list_items:,
   admin_search_form:,
   table_view:,
-)) %>
+)) do |skeleton| %>
+  <% skeleton.with_nav_item do %>
+    <%= render(UI::Dropdown::Component.new(name: @invalid.titleize, button_size: :sm,
+          active: @invalid != invalid_user_options.first)) do |dropdown| %>
+      <% invalid_user_options.each do |kind| %>
+        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: kind.titleize, path: url_for(sortable_search_params.merge(search_invalid: kind)), match_params: {search_invalid: kind}) } %>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <% skeleton.with_nav_item do %>
+    <% access_active = @search_ambassadors || @search_superusers || @search_developers || @search_with_organization %>
+    <% clear_access_params = {search_ambassadors: nil, search_superusers: nil, search_developers: nil, search_with_organization: nil} %>
+
+    <% access_filter_name = [[@search_ambassadors, "Ambassadors"], [@search_superusers, "Superusers"],
+         [@search_developers, "Developers"], [@search_with_organization, "With Organization Role"]]
+       .detect(&:first)&.last || "Any Access" %>
+
+    <%= render(UI::Dropdown::Component.new(name: access_filter_name, button_size: :sm,
+          active: access_active)) do |dropdown| %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Any Access", path: url_for(sortable_search_params.merge(clear_access_params)), match_params: clear_access_params) } %>
+      <% dropdown.with_entry_divider %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "With Organization Role", path: url_for(sortable_search_params.merge(clear_access_params.merge(search_with_organization: true))), match_params: {search_with_organization: true}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Ambassadors", path: url_for(sortable_search_params.merge(clear_access_params.merge(search_ambassadors: true))), match_params: {search_ambassadors: true}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Superusers", path: url_for(sortable_search_params.merge(clear_access_params.merge(search_superusers: true))), match_params: {search_superusers: true}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Developers", path: url_for(sortable_search_params.merge(clear_access_params.merge(search_developers: true))), match_params: {search_developers: true}) } %>
+    <% end %>
+  <% end %>
+
+  <% skeleton.with_nav_item do %>
+    <%= render(UI::ButtonLink::Component.new(text: "Un", href: url_for(sortable_search_params.merge(search_unconfirmed: !@search_unconfirmed, search_confirmed: false)), size: :sm)) %>
+    /
+    <%= render(UI::ButtonLink::Component.new(text: "confirmed", href: url_for(sortable_search_params.merge(search_confirmed: !@search_confirmed, search_unconfirmed: false)), size: :sm)) %>
+  <% end %>
+<% end %>
