@@ -55,6 +55,18 @@ module UI
         render(UI::ButtonLink::Component.new(text: "Link Disabled", href: "#", color: :link, disabled: true))
       end
 
+      def link_gray
+        render(UI::ButtonLink::Component.new(text: "Link gray", href: "#", color: :link_gray))
+      end
+
+      def link_gray_active
+        render(UI::ButtonLink::Component.new(text: "Link Gray Active", href: "#", color: :link_gray, active: true))
+      end
+
+      def link_gray_disabled
+        render(UI::ButtonLink::Component.new(text: "Link Gray Disabled", href: "#", color: :link_gray, disabled: true))
+      end
+
       # Filled purple primary
       def purple
         render(UI::ButtonLink::Component.new(text: "Purple Link", href: "#", color: :purple))

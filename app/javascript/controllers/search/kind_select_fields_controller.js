@@ -1,7 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
 import { collapse } from 'utils/collapse_utils'
-
-/* global localStorage  */
+import { storage } from 'utils/storage'
 
 // Connects to data-controller='search--kind-select-fields'
 export default class extends Controller {
@@ -97,15 +96,15 @@ export default class extends Controller {
     if (location && location.length > 0) {
       // Don't save location if location is an ignored string
       if (!this.ignoredLocation(location)) {
-        localStorage.setItem(`${this.storageKeyPrefix}searchLocation`, location)
+        storage.setItem(`${this.storageKeyPrefix}searchLocation`, location)
         // save distance if location is being saved
         const distance = this.distanceTarget.value
         if (distance && distance.length > 0) {
-          localStorage.setItem(`${this.storageKeyPrefix}searchDistance`, distance)
+          storage.setItem(`${this.storageKeyPrefix}searchDistance`, distance)
         }
       }
     } else {
-      location = localStorage.getItem(`${this.storageKeyPrefix}searchLocation`)
+      location = storage.getItem(`${this.storageKeyPrefix}searchLocation`)
       // Make location 'you' if location is anywhere or blank, so user isn't stuck and unable to use location
       if (this.ignoredLocation(location)) {
         location = 'you'
@@ -114,7 +113,7 @@ export default class extends Controller {
       this.locationTarget.value = location
       // Restore the distance saved with it, unless the field holds something
       // other than the placeholder default - that came from the URL
-      const distance = localStorage.getItem(`${this.storageKeyPrefix}searchDistance`)
+      const distance = storage.getItem(`${this.storageKeyPrefix}searchDistance`)
       if (distance && this.distanceTarget.value === this.distanceTarget.placeholder) {
         this.distanceTarget.value = distance
       }

@@ -10,16 +10,16 @@ class EbikeRulesController < ApplicationController
       code, query = query[key], query.except(key)
       chosen = place_for(code)
       path = if chosen
-        place_path(chosen, query)
+        place_path(chosen)
       elsif code == "US"
-        ebike_rules_place_path("US", query)
+        ebike_rules_place_path("US")
       # no place picked waits for one on the page's country, as the form does with JavaScript
       elsif code.blank? && (country = page_country)
-        ebike_rules_place_path(country, query)
+        ebike_rules_place_path(country)
       else
-        ebike_rules_path(query)
+        ebike_rules_path
       end
-      return redirect_to(path, status: :moved_permanently)
+      return redirect_to(ReadableQuery.path(path, query), status: :moved_permanently)
     end
 
     code = params[:country] && [params[:country], params[:region]].compact.join("-")
@@ -49,17 +49,25 @@ class EbikeRulesController < ApplicationController
     assign_meta(place)
     @page_url = ebike_rules_url if us_chosen
     lookup = EbikeRuleServices::Lookup.from_params(params.permit(*LOOKUP_PARAMS), place:, detected_place:)
+    @logged_search = lookup.submitted
     return render(Pages::EbikeRules::Check::Component.new(lookup:, page_title: @page_title)) if turbo_frame_request?
 
     registered_count, recoveries_count = Counts.retrieve_many("total_bikes", "recoveries")
-    render Pages::EbikeRules::Show::Component.new(lookup:, manifest_url: Integrations::Bikebook::Catalog::MANIFEST_URL,
-      registered_count:, recoveries_count:, page_title: @page_title, default_title: country_title(lookup.country))
+    render SharedBlocks::Marketing::Wrapper::Component.new(page: Pages::EbikeRules::Show::Component.new(lookup:,
+      manifest_url: Integrations::Bikebook::Catalog::MANIFEST_URL, registered_count:, recoveries_count:,
+      page_title: @page_title, default_title: country_title(lookup.country)))
   end
 
   private
 
+  # LogSearcher stores a check's log line as a search
+  def append_info_to_payload(payload)
+    super
+    payload[:logged_search] = true if @logged_search
+  end
+
   # US-CA's is /ebike-rules/US/CA
-  def place_path(place, query = {}) = ebike_rules_place_path(*place[:code].split("-"), query)
+  def place_path(place, query = {}) = ReadableQuery.path(ebike_rules_place_path(*place[:code].split("-")), query)
 
   # Two lowercase letters were a US state's before places outside the US had pages, as two uppercase ones still are
   # where no place has them. The rest are a place's code in any case

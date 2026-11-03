@@ -5,6 +5,8 @@ en:
       register:
         parts:
           page_content:
+            bike_index: Bike Index
             electric_detected: "⚡️ Electric (motorized) detected"
             have_questions: Have questions about these policies?
             read_the_faq: E-Vehicle Acknowledgment FAQ
+            set_by: Set by %{name}

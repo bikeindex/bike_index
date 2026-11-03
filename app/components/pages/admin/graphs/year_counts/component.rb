@@ -32,7 +32,7 @@ module Pages
           end
 
           def bikes
-            Bike.with_user_hidden
+            Bike.current_with_user_hidden
           end
 
           def stolen_records

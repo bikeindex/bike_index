@@ -32,6 +32,31 @@
     container: bikebook-components / inline-size;
   }
 
+  /* A blank row, standing in for a component only a compared vehicle has, unstriped and ruled only by the table's
+   * edges - transparent rather than gone, so it keeps the height the other cards' rows match. Stacked, a row's top
+   * border closes the one above; wide, the row after a blank draws its own */
+  .bikebook-components tbody tr:not(:has(td:not(:empty))) {
+    @apply tw:bg-white tw:dark:bg-gray-900;
+
+    & + & {
+      @apply tw:border-transparent!;
+    }
+
+    & td:not(:first-child) {
+      @apply tw:border-l-transparent!;
+    }
+
+    &:not(:last-child) td {
+      @apply tw:border-b-transparent!;
+    }
+
+    @container bikebook-components (width >= 40rem) {
+      & + tr:has(td:not(:empty)) td {
+        @apply tw:shadow-[inset_0_1px_0_var(--tw-color-gray-200)] tw:dark:shadow-[inset_0_1px_0_var(--tw-color-gray-700)];
+      }
+    }
+  }
+
   @container bikebook-components (width < 40rem) {
     .bikebook-components :is(table, thead, tbody) {
       display: block;

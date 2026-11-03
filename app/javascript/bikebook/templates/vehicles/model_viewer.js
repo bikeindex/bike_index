@@ -1,19 +1,20 @@
 import { html, nothing, render } from 'lit-html'
 import { frameGeometry, OVERALL_LENGTH_ESTIMATE } from 'bikebook/frame_geometry'
-import { copyButton } from 'bikebook/templates/ui/copy_button'
 import { missing, numberDisplay } from 'bikebook/templates/helpers'
+import { inlineBadge } from 'bikebook/templates/ui/badge'
 import { collapse } from 'bikebook/templates/ui/collapse'
 import { definitionListContainer } from 'bikebook/templates/ui/definition_list/container'
 import { definitionListRow } from 'bikebook/templates/ui/definition_list/row'
-import { jsonDisplay } from 'bikebook/templates/ui/json_display'
+import { codeJson } from 'bikebook/templates/ui/code/json'
 import { tooltip } from 'bikebook/templates/ui/tooltip'
-import { componentGroup, pairedComponents } from 'bikebook/templates/vehicles/component_group'
+import { componentGroup, matchingRow, pairedComponents } from 'bikebook/templates/vehicles/component_group'
 import { geometryCard } from 'bikebook/templates/vehicles/geometry_card'
 import { modelYears } from 'bikebook/templates/vehicles/model_years'
 import { motorSection } from 'bikebook/templates/vehicles/motor_section'
 import { bikeSummary } from 'bikebook/templates/vehicles/bike_summary'
 import { certificationBadges, certificationsOf, classBadges } from 'bikebook/templates/vehicles/page_badges'
 import { removeLink } from 'bikebook/templates/vehicles/remove_link'
+import { manufacturerLine, modelLine } from 'bikebook/templates/vehicles/vehicle_title'
 import { disclosure, section } from 'bikebook/templates/vehicles/section'
 import { andSentence, array, blank, compact, equal, except, isNumber, join, partsOf, presence, present, slice, sum, truthy, upcaseFirst } from 'bikebook/templates/values'
 
@@ -33,7 +34,10 @@ const groupsetSummary = ({ groupset }) => {
   const name = compact([named ? null : manufacturer, description]).join(' ')
   return electronic ? join([name, 'electronic'], ' · ') : name
 }
-const typeLabel = (each) => [each.type, each.type_detail].filter(present).join(' · ')
+// "Cargo Bike Rear · Kids & Women's · Long tail": its type, target riders unless `riders` is false, and detail, and a
+// step-through frame's after, its top tube named or not
+export const typeLabel = (each, { riders = true } = {}) => [each.type, riders && array(each.target_riders).join(' & '), each.type_detail,
+  /^step[_-]through$/i.test(each.frame?.top_tube ?? '') && 'Step-through'].filter(present).join(' · ')
 
 // One vehicle's card, marked where it differs from `others`
 export const modelViewer = (args) => new ModelViewer(args).render()
@@ -45,6 +49,8 @@ const WIDE_TIRE = 50
 const MAX_LOAD = 'Max load (rider + cargo)'
 const GROSS_WEIGHT = 'Gross weight rating (bike + rider + cargo)'
 const FRAME_LABELS = { max_weight_total: MAX_LOAD, gross_weight_rating: GROSS_WEIGHT }
+// In the box rather than on the bike, so listed apart and never compared part by part
+const INCLUDED = 'included_not_installed'
 
 export const US_CLASS = /^evc\/us\/class_(\d)$/
 // (tire_width / 25.4).round(1) is a Float, so a whole inch still reads 2.0
@@ -60,7 +66,7 @@ export const wheelsAt = (presenter, data, size) => {
     const built = at(viewer.builtWheels(), position, size)[0]
     const widths = at(viewer.vehicle.wheels, position, size).map((wheel) => wheel.max_tire_width).filter((width) => typeof width === 'number')
     return [position, {
-      parts: built && viewer.wheelParts({ ...built, sizes: null }, { fitting: false }).map(([key, content]) => [key, key === 'tire' ? built.tire_width : null, content]),
+      parts: built && viewer.wheelParts({ ...built, sizes: null }, { fitting: false }).map(([key, content]) => [key, { size: built.bsd, tire: built.tire_width }[key] ?? null, content]),
       maxTire: widths.length ? Math.max(...widths) : null
     }]
   }))
@@ -87,8 +93,10 @@ export const basicsOf = ({ presenter, data, outOfClassId }) => new ModelViewer({
 export const photoOf = ({ presenter, data }, frame) => new ModelViewer({ presenter, data, others: [] }).stockPhoto(frame)
 
 // A vehicle's sizes, each with its geometry, `selectedSize` ringed and marked where they differ from `others`', the rest
-// linked to `sizePath(name)`
-export const sizesOf = ({ presenter, data, others, selectedSize, sizePath }) => new ModelViewer({ presenter, data, others, selectedSize, sizePath }).sizes()
+// linked to `sizePath(name)`, and each figure lettered as its drawing has it by `lettering`, geometryCard's letters,
+// highlight and figurePath
+export const sizesOf = ({ presenter, data, others, selectedSize, sizePath, lettering }) =>
+  new ModelViewer({ presenter, data, others, selectedSize, sizePath, lettering }).sizes()
 
 // A vehicle's electric summary beside its motors, each with its battery, marked where they differ from `others`'
 export const motorsOf = ({ presenter, data, others, outOfClassId }) => {
@@ -106,26 +114,26 @@ export const runningGearOf = ({ presenter, data, others }) => {
 const sideBySide = (columns) => html`<div class="tw:@container"><div class="tw:flex tw:flex-col tw:@min-[600px]:flex-row tw:@min-[600px]:gap-6">${columns.map((column) =>
   html`<div class="tw:contents tw:@min-[600px]:block tw:@min-[600px]:min-w-0 tw:@min-[600px]:flex-1">${column}</div>`)}</div></div>`
 
-// Each of `vehicles`' components by group, by its `value`, marked where they differ from its `others`', each group
+// Each of `vehicles`' components by group, by its `key`, marked where they differ from its `others`', each group
 // listing a row for every component any of them has, so each card's rows line up with the rest's
 export const componentsOf = ({ presenter, vehicles, others }) => {
   const viewers = vehicles.map(({ data }) => new ModelViewer({ presenter, data, others: [] }))
   const groups = viewers[0].componentRows(viewers.map((viewer) => viewer.vehicle))
-  return new Map(vehicles.map(({ value }, index) => [value, html`<div class="tw:space-y-4">${viewers[index].components({
-    groups, index, compared: others(value).map((other) => vehicles.findIndex(({ data }) => data === other))
-  })}</div>`]))
+  return new Map(vehicles.map(({ key }, index) => [key, html`<div class="tw:space-y-4">${viewers[index].components({
+    groups, index, compared: others(key).map((other) => vehicles.findIndex(({ data }) => data === other))
+  })}${viewers[index].inTheBox()}</div>`]))
 }
 
 class ModelViewer {
   // `outOfClassId` the viewing state's out of class marker, evc/out_of_class/us/ca, where its law bars a Class 3's throttle
-  constructor ({ presenter, data, value, comparing, idSuffix, others, removePath, selectedSize, sizePath, outOfClassId }) {
+  constructor ({ presenter, data, value, market, comparing, idSuffix, others, removePath, selectedSize, sizePath, outOfClassId, lettering }) {
     this.presenter = presenter
     this.kit = presenter.kit
     this.data = data
     this.vehicle = this.#normalize(data)
     this.outOfClass = outOfClassId ? this.#throttledClass3() : null
     this.others = others.map((other) => this.#normalize(other))
-    Object.assign(this, { value, comparing, idSuffix, removePath, selectedSize, sizePath, outOfClassId })
+    Object.assign(this, { value, market, comparing, idSuffix, removePath, selectedSize, sizePath, outOfClassId, lettering })
   }
 
   render () {
@@ -133,10 +141,9 @@ class ModelViewer {
     const jsonPanelId = `vehicle-model-json-${this.idSuffix}`
     const base = 'tw:flex tw:flex-col tw:gap-6 tw:transition tw:duration-300 tw:lg:flex-row tw:lg:items-stretch'
     const titleText = [vehicle.manufacturer, vehicle.model].filter(present).join(' ')
-    const header = html`<header><div class="tw:flex tw:items-start tw:gap-4">${present(vehicle.manufacturer)
-      ? html`<p class="tw:mb-1 tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">${vehicle.manufacturer}</p>`
-      : nothing}${removeLink({ label: `Remove ${titleText}`, href: this.removePath })}</div><div class="tw:flex tw:items-baseline tw:justify-between tw:gap-4"><div class="tw:flex tw:items-baseline tw:gap-1"><h1
-      class="tw:text-2xl tw:leading-tight tw:font-extrabold">${vehicle.model}</h1>${copyButton({ value: this.value, label: 'Copy ID', tooltip: true })}</div>${collapse({
+    const header = html`<header><div class="tw:flex tw:items-start tw:gap-4">${manufacturerLine(vehicle.manufacturer)}${
+      removeLink({ label: `Remove ${titleText}`, href: this.removePath })}</div><div class="tw:flex tw:items-baseline tw:justify-between tw:gap-4">${
+      modelLine({ model: vehicle.model, data: this.data, value: this.value, market: this.market, configurations: this.kit.model_configurations, heading: 'h1' })}${collapse({
         size: 'sm',
         htmlClass: 'tw:shrink-0 tw:whitespace-nowrap',
         attributes: { 'aria-controls': jsonPanelId, 'aria-label': 'Toggle JSON' },
@@ -158,25 +165,29 @@ class ModelViewer {
       data-controller="ui--collapse ui--alert" data-ui--collapse-param-value="json"
       data-ui--collapse-direction-value="horizontal"><article class="twgutter tw:w-full tw:min-w-0 tw:space-y-6
       tw:rounded-sm tw:border tw:border-gray-200 tw:dark:border-gray-700 tw:bg-white tw:dark:bg-gray-800 tw:pt-4 tw:pb-6 tw:[--gutter:--spacing(6)]
-      ${comparing ? 'tw:md:max-w-[56rem] tw:lg:flex-1' : 'tw:lg:w-[56rem] tw:lg:shrink-0'}">${header}${specs}${this.description()}${this.sizesDisclosure()}${present(this.vehicle.components)
-      ? html`<section class="tw:space-y-4"><h2 class="tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">Components</h2>${this.components()}</section>`
+      ${comparing ? 'tw:md:max-w-[56rem] tw:lg:flex-1' : 'tw:lg:w-[56rem] tw:lg:shrink-0'}">${header}${specs}${this.description()}${this.sizesDisclosure()}${present(this.data.components)
+      ? html`<section class="tw:space-y-4"><h2 class="tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">Components</h2>${this.components()}${this.inTheBox()}</section>`
       : nothing}</article><aside
       id=${jsonPanelId} class="twjson-panel tw:hidden tw:w-full tw:min-w-0 tw:lg:relative tw:lg:w-[28rem] tw:lg:shrink-0" data-ui--collapse-target="content">${
-        jsonDisplay({ data: this.data, small: true, noMaxHeight: true })}</aside></div>`
+        codeJson({ data: this.data, small: true, noMaxHeight: true })}</aside></div>`
   }
 
   photo (photo, titleText, frame = 'tw:mb-6 tw:aspect-[3/2]') {
     return html`<div class="tw:group tw:order-first" data-controller=${present(photo) ? 'image-fallback' : nothing} data-broken=${present(photo) ? nothing : ''}>${present(photo)
       ? html`<a target="_blank" rel="noopener" class="${frame} tw:block tw:group-data-broken:hidden"
         href=${photo}><img alt=${titleText} loading="lazy" class="tw:size-full tw:rounded-sm tw:object-contain" data-action="error->image-fallback#fallBack" src=${photo}></a>`
-      : nothing}<div class="${frame} tw:hidden tw:flex-col tw:items-center tw:justify-center tw:gap-2 tw:rounded-md
+      : nothing}<div class="${frame} tw:hidden tw:flex-col tw:items-center tw:justify-center tw:gap-2 tw:rounded-md tw:p-1
       tw:border tw:border-dashed tw:border-gray-200 tw:dark:border-gray-700 tw:text-gray-400 tw:group-data-broken:flex tw:dark:text-gray-500"><img
-      alt="" class="tw:h-16 tw:w-16" src=${this.kit.placeholder_url}><span class="tw:text-sm">No photo</span></div></div>`
+      alt="" class="tw:aspect-square tw:h-16 tw:min-h-0 tw:w-auto" src=${this.kit.placeholder_url}><span class="tw:text-sm tw:leading-none">No photo</span></div></div>`
   }
 
-  // Values by their vocabulary names, then the frame's mount labels and each suspension's values
+  // Values by their vocabulary names, the parts in the box apart, then the frame's mount labels and each suspension's values
   #normalize (data) {
-    const vehicle = this.presenter.named(this.kit.schemas.vehicle, data)
+    const components = array(data.components)
+    const vehicle = {
+      ...this.presenter.named(this.kit.schemas.vehicle, { ...data, components: components.filter(({ type }) => type !== INCLUDED) }),
+      included: components.filter(({ type }) => type === INCLUDED)
+    }
     const frame = vehicle.frame && { ...vehicle.frame, ...this.#frameMounts(vehicle.frame, vehicle.sizes) }
     const suspension = Object.fromEntries(Object.keys(this.kit.viewer.suspensions)
       .map((position) => [position, this.#suspension(vehicle, position)]).filter(([, values]) => values != null))
@@ -337,14 +348,17 @@ class ModelViewer {
       electric: present(vehicle.motors),
       model_group: vehicle.vehicle_model_group,
       years: this.yearRange(),
-      vehicle_type: presence(typeLabel(vehicle)),
+      vehicle_type: presence(typeLabel(vehicle, { riders: false })),
       type: vehicle.type,
       e_vehicle_class: this.eVehicleClass(),
       cargo_vehicle: isCargo(this.data),
       cargo: this.cargo(),
-      primary_activity: this.withoutParenthetical(vehicle.primary_activity),
-      frame_material: vehicle.frame?.material,
-      ...this.wheelSizes(),
+      // "Kids & Women's MTB: Trail", its riders ahead of the activity rather than in its type
+      primary_activity: presence(join([array(vehicle.target_riders).join(' & '), this.withoutParenthetical(vehicle.primary_activity)].filter(present), ' ')),
+      frame_material: present(vehicle.frame?.material) && present(vehicle.frame.material_detail)
+        ? html`${vehicle.frame.material} <span class="tw:text-xs twless-strong">${vehicle.frame.material_detail}</span>`
+        : vehicle.frame?.material,
+      wheel_size: this.wheelSizes(),
       suspended: present(vehicle.suspension),
       suspension: this.suspensionTravels(),
       groupset: this.groupsetWithDrivetrain(),
@@ -477,7 +491,7 @@ class ModelViewer {
     const { first_year: first, final_year: final } = this.vehicle
     if (blank(first)) return null
     if (final === first) return String(first)
-    return join([first, ' – ', presence(final) ?? 'current'])
+    return join([first, ' – ', presence(final) ?? inlineBadge({ text: 'current', size: 'sm' })])
   }
 
   specRows (key, fields = key === 'frame' ? this.kit.viewer.frame_fields : this.kit.schemas.vehicle[key].fields, labels = {}) {
@@ -626,8 +640,10 @@ class ModelViewer {
     ], ' ')
   }
 
+  // Wraps only between cups
   shisCode (code, size = 'tw:text-xs') {
-    return html`<code class="tw:rounded-sm tw:border tw:border-gray-200 tw:dark:border-gray-700 tw:px-1.5 tw:py-0.5 tw:font-mono tw:whitespace-nowrap ${size}">${code}</code>`
+    return html`<code class="tw:rounded-sm tw:border tw:border-gray-200 tw:dark:border-gray-700 tw:px-1.5 tw:py-0.5 tw:font-mono tw:whitespace-normal tw:box-decoration-clone ${
+      size}">${join(code.split(/\s*\|\s*/).map((cup) => html`<span class="tw:whitespace-nowrap">${cup}</span>`), ' | ')}</code>`
   }
 
   millimeters (value, suffix = null) {
@@ -686,6 +702,21 @@ class ModelViewer {
 
   builtWheels (vehicle = this.vehicle) {
     return array(vehicle.wheels).filter((wheel) => wheel.configured !== false)
+  }
+
+  // `size`'s wheels as [label, content], each its size, labelled as Wheels labels it, over its tire: front and rear as one
+  // where they're the same size and tire
+  sizeWheels (size) {
+    const [front, rear] = ['front', 'rear'].map((position) => at(this.builtWheels(), position, size)[0])
+    const rows = (wheelLabel, tireLabel, wheel) => {
+      const tire = compact([wheel.tire_width != null ? this.tireWidthSummary(wheel.tire_width, '') : null, wheel.tire_system?.replaceAll('_', ' ')])
+      return [[wheelLabel, wheel.bsd != null ? this.wheelSizeName(wheel.bsd) : null], [tireLabel, tire.length ? join(tire, ', ') : null]]
+        .filter(([, content]) => content != null)
+    }
+    const fitted = (wheel) => slice(wheel, ['bsd', 'tire_width', 'tire_system'])
+    const label = this.presenter.positionLabel.bind(this.presenter)
+    if (front && rear && equal(fitted(front), fitted(rear))) return rows(label(['front', 'rear']), 'Tires', front)
+    return [['front', front], ['rear', rear]].filter(([, wheel]) => wheel).flatMap(([position, wheel]) => rows(label(position), `${label(position)} tire`, wheel))
   }
 
   // the wheels the frame takes but the build doesn't come with, as [bsd, max_tire_width, positions]
@@ -761,16 +792,27 @@ class ModelViewer {
     return this.keepTogether(join([tireInches(presenter, tireWidth), suffix]), tooltip({ text: `${tireWidth} mm` }))
   }
 
-  // "700 C", or "700 C front, 650 B rear", and their BSDs to compare them by, as a name can carry a tooltip
+  // "700 C × 40 mm", or "700 C × 40 mm front, 650 B × 47 mm rear", over the widest tire they take
   wheelSizes () {
-    const bsds = ['front', 'rear'].map((position) =>
-      [...new Set(this.builtWheels().filter((wheel) => wheel.bsd && array(wheel.position).includes(position)).map((wheel) => wheel.bsd))])
-    const names = (each) => join(each.map((bsd) => this.wheelSizeName(bsd)), ' / ')
-    const [front, rear] = bsds
-    const wheelSize = equal(front, rear)
-      ? (front.length ? names(front) : null)
-      : join(compact([front.length ? join([names(front), ' front']) : null, rear.length ? join([names(rear), ' rear']) : null]), ', ')
-    return { wheel_size: wheelSize, wheel_bsds: JSON.stringify(bsds) }
+    const [front, rear] = ['front', 'rear'].map((position) => new Map(this.builtWheels()
+      .filter((wheel) => wheel.bsd && array(wheel.position).includes(position)).map((wheel) => [`${wheel.bsd}/${wheel.tire_width}`, wheel])))
+    const names = (wheels) => join([...wheels.values()].map((wheel) =>
+      join(compact([this.wheelSizeName(wheel.bsd), wheel.tire_width != null ? this.tireWidthSummary(wheel.tire_width, '') : null]), ' × ')), ' / ')
+    const sizes = equal([...front.keys()], [...rear.keys()])
+      ? (front.size ? names(front) : null)
+      : join(compact([front.size ? join([names(front), ' front']) : null, rear.size ? join([names(rear), ' rear']) : null]), ', ')
+    const tireMax = this.tireMax()
+    return tireMax ? join(compact([sizes, tireMax]), html`<br>`) : sizes
+  }
+
+  // "2.4 in tire max", or "2.4 in front, 2.6 in rear tire max"
+  tireMax () {
+    const [front, rear] = ['front', 'rear'].map((position) =>
+      highest(this.builtWheels().filter((wheel) => array(wheel.position).includes(position)).map((wheel) => wheel.max_tire_width)))
+    if (front === rear) return front == null ? null : this.tireWidthSummary(front, 'tire max')
+
+    const widths = compact([front != null ? join([this.tireWidthSummary(front, ''), ' front']) : null, rear != null ? join([this.tireWidthSummary(rear, ''), ' rear']) : null])
+    return join([join(widths, ', '), ' tire max'])
   }
 
   wheelSizeName (bsd) {
@@ -802,11 +844,14 @@ class ModelViewer {
       : nothing}${present(content) ? definitionListContainer({ content }) : nothing}</section>`
   }
 
-  // "MicroShift, 1x9", the rest of its drivetrain in a tooltip, on a dash where neither is listed
+  // "SRAM · GX · 1x12", the whole groupset and the rest of its drivetrain in a tooltip, on a dash where none is listed
   groupsetWithDrivetrain () {
-    const groupset = presence(join([groupsetSummary(this.vehicle), this.#gearCount()].filter(present), ', '))
-    const drivetrain = this.drivetrainTooltip()
-    return drivetrain ? this.withTooltip(groupset ?? missing, drivetrain) : groupset
+    const { manufacturer, series, description, electronic } = this.vehicle.groupset ?? {}
+    const shown = presence(join([manufacturer, series, this.#gearCount()].filter(present), ' · '))
+    const groupset = [['Groupset manufacturer', manufacturer], ['Groupset series', series], ['Groupset description', description],
+      ['Electronic', electronic == null ? null : electronic ? 'Yes' : 'No']].filter(([, value]) => present(value))
+    const rows = [...groupset, ...this.drivetrainRows()]
+    return rows.length ? this.withTooltip(shown ?? missing, this.tooltipRows(rows)) : shown
   }
 
   // Its chainrings by its cogs, "1x9", or "singlespeed" for one of each
@@ -824,11 +869,10 @@ class ModelViewer {
     return [...this.specRows('gearing', this.kit.schemas.vehicle.gearing.fields, counted), ...this.specRows('frame', fields)]
   }
 
-  // the Drivetrain section's rows but the groupset, as a tooltip lists them
-  drivetrainTooltip () {
+  // the Drivetrain section's rows but the groupset
+  drivetrainRows () {
     const labels = drivetrainLabels(this.vehicle.drivetrain)
-    const rows = [...(labels.length ? [['Drivetrain', labels.join(', ')]] : []), ...this.gearingRows()]
-    return rows.length ? this.tooltipRows(rows) : null
+    return [...(labels.length ? [['Drivetrain', labels.join(', ')]] : []), ...this.gearingRows()]
   }
 
   // a list, so against a model that isn't electronic, that alone is marked
@@ -861,7 +905,7 @@ class ModelViewer {
       param: 'sizes',
       label: 'sizes',
       heading: html`Sizes & geometry <span class="tw:ml-1 tw:font-mono tw:text-sm tw:font-normal tw:tracking-normal tw:opacity-65 tw:normal-case">${numberDisplay(sizes.length)}</span>`,
-      content: html`<div data-ui--collapse-target="content" class="tw:-mx-(--gutter)">${this.sizes()}</div>`
+      content: html`<div data-ui--collapse-target="content">${this.sizes()}</div>`
     })
   }
 
@@ -870,21 +914,30 @@ class ModelViewer {
     if (blank(sizes)) return nothing
 
     const others = this.others.map((other) => other.sizes)
-    // padded inside the scroller, so its cards scroll out to the edges of the card it bleeds across, which scrolls to the
-    // selected one as ui--tabs does its active tab
-    return html`<div data-controller="ui--tabs" class="tw:overflow-x-auto tw:px-(--gutter) tw:pb-3.5"><div data-ui--tabs-target="row"
+    // its cards scrolling out to the edges of the card it's on, and to the selected one as ui--tabs does its active tab
+    return html`<div data-controller="ui--tabs" class="twgutter-bleed tw:overflow-x-auto tw:pb-3.5"><div data-ui--tabs-target="row"
       class="tw:flex tw:w-max tw:min-w-full tw:gap-4">${sizes.map((size) => geometryCard({
-        presenter: this.presenter, size, others, selected: present(this.selectedSize) && size.name === this.selectedSize, href: this.sizePath?.(size.name)
+        presenter: this.presenter,
+        size,
+        others,
+        selected: present(this.selectedSize) && size.name === this.selectedSize,
+        href: this.sizePath?.(size.name),
+        ...this.lettering,
+        wheels: this.sizeWheels(size),
+        cargo: this.vehicle.cargo,
+        otherCargos: this.others.map((other) => other.cargo)
       }))}</div></div>`
   }
 
-  // Each component group's rows across `vehicles`, a cell per vehicle, in order of the first cell's type
+  // Each component group's rows across `vehicles`, a cell per vehicle, those matching across them first, then those
+  // more of them have, then in order of the first cell's type
   componentRows (vehicles) {
     const groups = Object.keys(this.kit.component_groups)
     const group = (type) => this.presenter.componentGroups.get(type) ?? groups.at(-1)
     const label = (row) => typeLabel(row.find(Boolean)).toLowerCase()
+    const had = (row) => row.filter(Boolean).length
     return groups.map((name) => [name, pairedComponents(vehicles.map((vehicle) => array(vehicle.components).filter((component) => group(component.type) === name)))
-      .sort((a, b) => label(a) < label(b) ? -1 : label(a) > label(b) ? 1 : 0)])
+      .sort((a, b) => matchingRow(b) - matchingRow(a) || had(b) - had(a) || (label(a) < label(b) ? -1 : label(a) > label(b) ? 1 : 0))])
   }
 
   // Its cells of the `groups`' rows, at `index`, marked against the `compared` cells. Given a `layout`, every row,
@@ -905,6 +958,14 @@ class ModelViewer {
         alignKey: layout && name
       })]
     })
+  }
+
+  inTheBox () {
+    if (blank(this.vehicle.included)) return nothing
+
+    return html`<div class="tw:space-y-2"><h3 class="tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">In the box</h3><ul
+      class="tw:list-disc tw:space-y-1 tw:pl-5 tw:text-sm">${this.vehicle.included.map(({ type_detail: detail, description }) =>
+      html`<li>${present(detail) ? html`<span class="tw:font-bold">${detail}</span> ` : nothing}${description}</li>`)}</ul></div>`
   }
 }
 

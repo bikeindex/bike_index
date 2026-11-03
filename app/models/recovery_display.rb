@@ -15,10 +15,11 @@
 #
 # Indexes
 #
-#  index_recovery_displays_on_stolen_record_id  (stolen_record_id)
+#  index_recovery_displays_on_stolen_record_id_unique  (stolen_record_id) UNIQUE
 #
 class RecoveryDisplay < ActiveRecord::Base
   QUOTE_MAX_LENGTH = 400
+  HONORIFIC = /\A(mr|mrs|ms|mx|miss|dr|prof|professor|rev|sir|madam)\.?\z/i
 
   belongs_to :stolen_record
 
@@ -27,6 +28,7 @@ class RecoveryDisplay < ActiveRecord::Base
 
   validates_presence_of :quote, :recovered_at
   validates :quote, length: {maximum: QUOTE_MAX_LENGTH}
+  validates :stolen_record_id, uniqueness: {message: "is already displayed"}, allow_nil: true
 
   attr_accessor :date_input, :remote_photo_url, :skip_callback_job
 
@@ -48,23 +50,23 @@ class RecoveryDisplay < ActiveRecord::Base
       new_record
     end
 
-    def attributes_from_stolen_record(stolen_record)
-      bike = Bike.unscoped.find_by_id(stolen_record.bike_id) if stolen_record.bike_id.present?
+    def attributes_from_stolen_record(stolen_record, bike: nil)
+      bike ||= Bike.unscoped.find_by_id(stolen_record.bike_id) if stolen_record.bike_id.present?
 
       {
         stolen_record:,
         recovered_at: stolen_record.recovered_at,
         location_string: stolen_record.city,
         quote: stolen_record.recovered_description,
-        quote_by: calculated_owner_name(bike)&.split(/\s/)&.first
+        quote_by: first_name(calculated_owner_name(bike))
       }
     end
 
-    def calculated_owner_name(bike)
-      return unless bike&.current_ownership&.present? && bike&.owner.present?
+    def first_name(name) = name.to_s.split.find { !HONORIFIC.match?(it) }
 
-      bike.owner.name
-    end
+    # Not Ownership#owner, which falls back to the creator - a shop's staff, for an unclaimed bike.
+    # owner_name is a snapshot, stale after the account is renamed
+    def calculated_owner_name(bike) = bike&.user&.name.presence || bike&.owner_name
   end
 
   def set_calculated_attributes

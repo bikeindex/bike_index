@@ -2,6 +2,6 @@
 <% recoveries_count, recoveries_value, organizations_count =
   Counts.retrieve_many("recoveries", "recoveries_value", "organizations") %>
 
-<%= render(Pages::Stolen::Index::Component.new(recoveries_count:, recoveries_value:, organizations_count:,
-  recovery_displays: RecoveryDisplay.with_photo,
-  feedback: @feedback, current_user:)) %>
+<%= render(SharedBlocks::Marketing::Wrapper::Component.new(page: Pages::Stolen::Index::Component.new(
+  recoveries_count:, recoveries_value:, organizations_count:, recovery_displays: RecoveryDisplay.with_photo,
+  feedback: @feedback, current_user:))) %>

@@ -1,22 +1,3 @@
-<% nav_header_list_items = capture do %>
-  <li>
-    <%= render(UI::Dropdown::Component.new(name: "#{@list.titleize} #{@list == "all" ? "lists" : "list"}", button_size: :sm,
-          active: @list != "all")) do |dropdown| %>
-      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All lists", path: url_for(sortable_search_params.merge(search_list: nil)), match_params: {search_list: nil}) } %>
-      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Organization list", path: url_for(sortable_search_params.merge(search_list: "organization")), match_params: {search_list: "organization"}) } %>
-      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Individual list", path: url_for(sortable_search_params.merge(search_list: "individual")), match_params: {search_list: "individual"}) } %>
-    <% end %>
-  </li>
-
-  <li>
-    <%= render(UI::ButtonLink::Component.new(text: "update values", href: admin_mailchimp_values_path, size: :sm, method: :post)) %>
-  </li>
-
-  <li>
-    <%= render(UI::Collapse::Component.new(text: "Toggle data", size: :sm)) %>
-  </li>
-<% end %>
-
 <%# The trigger and the data column are separate skeleton fragments, so the controller wraps the render %>
 <div data-controller="ui--collapse">
   <%= render(Pages::Admin::IndexSkeleton::Component.new(
@@ -24,6 +5,18 @@
     collection: @mailchimp_values,
     viewing: "Mailchimp Values",
     skip_charting: true,
-    nav_header_list_items:,
-  )) %>
+  )) do |skeleton| %>
+    <% skeleton.with_nav_item do %>
+      <%= render(UI::Dropdown::Component.new(name: "#{@list.titleize} #{@list == "all" ? "lists" : "list"}", button_size: :sm,
+            active: @list != "all")) do |dropdown| %>
+        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All lists", path: url_for(sortable_search_params.merge(search_list: nil)), match_params: {search_list: nil}) } %>
+        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Organization list", path: url_for(sortable_search_params.merge(search_list: "organization")), match_params: {search_list: "organization"}) } %>
+        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Individual list", path: url_for(sortable_search_params.merge(search_list: "individual")), match_params: {search_list: "individual"}) } %>
+      <% end %>
+    <% end %>
+
+    <% skeleton.with_nav_item { render(UI::ButtonLink::Component.new(text: "update values", href: admin_mailchimp_values_path, size: :sm, method: :post)) } %>
+
+    <% skeleton.with_nav_item { render(UI::Collapse::Component.new(text: "Toggle data", size: :sm)) } %>
+  <% end %>
 </div>

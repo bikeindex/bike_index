@@ -1,9 +1,7 @@
-.admin-subnav
-  .col-md-4
-    %h1 New Email Domain
+= render(Pages::Admin::Headers::Nav::Component.new(title: "New Email Domain"))
 
-.row.mt-4.mb-4
-  .col-md-6.offset-md-3
+%div{class: "tw:my-6"}
+  = render(UI::Container::Component.new) do
     = render "form",
       email_domain: @email_domain,
       action: admin_email_domains_path,

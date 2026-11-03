@@ -1,25 +1,16 @@
-<div
-  class="tw:group/membership tw:bg-white tw:text-gray-500"
-  data-controller="memberships--new"
->
+<div class="tw:group/membership" data-controller="memberships--new">
   <section class="tw:border-b tw:border-gray-200">
-    <div
-      class="
-        tw:mx-auto tw:flex tw:max-w-6xl tw:flex-col tw:gap-10 tw:px-5
-        tw:pt-8 tw:pb-8 tw:lg:flex-row tw:lg:items-center tw:lg:gap-16
-        tw:lg:px-14 tw:lg:pt-16 tw:lg:pb-14
-      "
-    >
+    <div class="tw:flex tw:flex-col tw:gap-10 tw:pt-8 tw:pb-8 tw:lg:flex-row tw:lg:items-center tw:lg:gap-16 tw:lg:pt-16 tw:lg:pb-14 <%= SharedBlocks::Marketing::Wrapper::Component::CONTAINER_CLASSES %>">
       <div class="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:gap-5">
-        <p class="tw:m-0 tw:text-purple-500 <%= eyebrow_classes %>">
+        <p class="tw:m-0 <%= SharedBlocks::Marketing::SectionHeading::Component.eyebrow_classes(:purple) %>">
           <%= translation(".bike_index_membership") %>
         </p>
 
         <h1
           class="
             tw:m-0 tw:font-header tw:text-[36px] tw:leading-[1.04]
-            tw:font-extrabold tw:tracking-tight tw:text-slate-900
-            tw:sm:text-[44px] tw:lg:text-[54px]
+            tw:font-extrabold tw:tracking-tight tw:sm:text-[44px]
+            tw:lg:text-[54px]
           "
         >
           <%= translation(".keep_bike_index_free") %>
@@ -28,7 +19,7 @@
         <p
           class="
             tw:m-0 tw:max-w-150 tw:text-base tw:leading-[1.55]
-            tw:lg:text-[19px]
+            tw:text-gray-500 tw:lg:text-[19px]
           "
         >
           <%= translation(".monthly_donation_lede") %>
@@ -43,7 +34,7 @@
           <%= render(UI::ButtonLink::Component.new(href: "#membership-plans", text: translation(".become_a_member"),
             color: :primary, size: :callout, data: {action: "memberships--new#scrollToPlans"})) %>
 
-          <span class="tw:text-[15px]">
+          <span class="tw:text-[15px] tw:text-gray-500">
             <%= translation(".plans_from", price: price(:basic, :monthly)) %>
           </span>
         </div>
@@ -51,7 +42,7 @@
         <p
           class="
             tw:m-0 tw:flex tw:max-w-150 tw:items-start tw:gap-2
-            tw:text-[14.5px]
+            tw:text-[14.5px] tw:text-gray-500
           "
         >
           <%= helpers.inline_svg_tag("icons/badge-check.svg", class: "tw:mt-0.5 tw:size-4.5 tw:shrink-0 tw:text-green-700", aria_hidden: true) %>
@@ -59,29 +50,7 @@
         </p>
       </div>
 
-      <dl
-        class="
-          tw:m-0 tw:grid tw:grid-cols-2 tw:gap-x-8 tw:gap-y-7 tw:lg:w-95
-          tw:lg:shrink-0
-        "
-      >
-        <% stats.each do |stat| %>
-          <div class="tw:flex tw:flex-col tw:border-t-3 tw:border-blue-600 tw:pt-3.5">
-            <dt class="tw:text-[14.5px] tw:font-normal">
-              <%= stat[:label] %>
-            </dt>
-
-            <dd
-              class="
-                tw:order-first tw:m-0 tw:font-header tw:text-[26px]
-                tw:font-extrabold tw:text-slate-900 tw:lg:text-[32px]
-              "
-            >
-              <%= stat[:value] %>
-            </dd>
-          </div>
-        <% end %>
-      </dl>
+      <%= render(SharedBlocks::Marketing::NumberBlocks::Component.new(items: stats, html_class: "tw:lg:w-95 tw:lg:shrink-0")) %>
     </div>
   </section>
 
@@ -102,15 +71,8 @@
           tw:md:justify-between
         "
       >
-        <div>
-          <h2 id="membership-plans-heading" class="<%= h2_classes %>">
-            <%= translation(".choose_your_membership") %>
-          </h2>
-
-          <p class="tw:m-0 tw:mt-2 tw:text-[17px]">
-            <%= translation(".every_tier_keeps_it_free") %>
-          </p>
-        </div>
+        <%= render(SharedBlocks::Marketing::SectionHeading::Component.new(heading: translation(".choose_your_membership"),
+          intro: translation(".every_tier_keeps_it_free"), id: "membership-plans-heading")) %>
 
         <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "membership[set_interval]",
           entries: interval_entries, selected: @interval, kind: :toggle)) %>
@@ -142,12 +104,7 @@
               data: {labels: interval_labels(level)} %>
 
             <span class="tw:flex tw:items-center tw:gap-2.5">
-              <span
-                class="
-                  tw:font-header tw:text-[22px] tw:font-extrabold
-                  tw:text-slate-900
-                "
-              >
+              <span class="tw:font-header tw:text-[22px] tw:font-extrabold">
                 <%= level_name(level) %>
               </span>
 
@@ -175,7 +132,7 @@
               <span
                 class="
                   tw:font-header tw:text-[40px] tw:leading-none
-                  tw:font-extrabold tw:tracking-tight tw:text-slate-900
+                  tw:font-extrabold tw:tracking-tight
                   tw:group-has-checked/tier:text-blue-600
                 "
               >
@@ -183,7 +140,7 @@
                 <span class="<%= YEARLY_ONLY %>"><%= price(level, :yearly) %></span>
               </span>
 
-              <span class="tw:text-[15px]">
+              <span class="tw:text-[15px] tw:text-gray-500">
                 <span class="<%= MONTHLY_ONLY %>"><%= translation(".per_month") %></span>
                 <span class="<%= YEARLY_ONLY %>"><%= translation(".per_year") %></span>
               </span>
@@ -229,13 +186,13 @@
       >
         <div class="tw:flex-1">
           <p
-            class="tw:m-0 tw:text-[17px] tw:font-extrabold tw:text-slate-900"
+            class="tw:m-0 tw:text-[17px] tw:font-extrabold"
             data-memberships--new-target="summary"
           >
             <%= labels(@level, @interval)[:summary] %>
           </p>
 
-          <p class="tw:m-0 tw:mt-1 tw:text-sm">
+          <p class="tw:m-0 tw:mt-1 tw:text-sm tw:text-gray-500">
             <%= translation(".tax_deductible_cancel_any_time") %>
           </p>
         </div>
@@ -260,46 +217,17 @@
   <section class="tw:border-b tw:border-gray-200">
     <div class="tw:grid tw:gap-12 tw:lg:grid-cols-2 <%= section_inner %>">
       <div class="tw:flex tw:flex-col tw:gap-4.5">
-        <p class="tw:m-0 tw:text-blue-600 <%= eyebrow_classes %>">
-          <%= translation(".keeps_free") %>
-        </p>
-
-        <h2 class="<%= h3_classes %>">
-          <%= translation(".the_registry_open_to_everyone") %>
-        </h2>
+        <%= render(SharedBlocks::Marketing::SectionHeading::Component.new(eyebrow: translation(".keeps_free"),
+          heading: translation(".the_registry_open_to_everyone"))) %>
 
         <% keeps_free.each do |row| %>
-          <div class="tw:flex tw:gap-4">
-            <span
-              class="
-                tw:flex tw:size-10 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:text-white
-                <%= row[:circle] %>
-              "
-            >
-              <%= helpers.inline_svg_tag(row[:icon], class: "tw:size-5", aria_hidden: true) %>
-            </span>
-
-            <div>
-              <h3 class="tw:m-0 tw:text-[17px] tw:font-extrabold tw:text-slate-900">
-                <%= row[:title] %>
-              </h3>
-
-              <p class="tw:m-0 tw:mt-1 tw:text-[15px] tw:leading-[1.55]">
-                <%= row[:body] %>
-              </p>
-            </div>
-          </div>
+          <%= render(SharedBlocks::Marketing::IconFeature::Component.new(**row)) %>
         <% end %>
       </div>
 
       <div class="tw:flex tw:flex-col tw:gap-4.5">
-        <p class="tw:m-0 tw:text-purple-500 <%= eyebrow_classes %>">
-          <%= translation(".builds_next") %>
-        </p>
-
-        <h2 class="<%= h3_classes %>">
-          <%= translation(".new_tools_for_bike_owners") %>
-        </h2>
+        <%= render(SharedBlocks::Marketing::SectionHeading::Component.new(eyebrow: translation(".builds_next"), eyebrow_color: :purple,
+          heading: translation(".new_tools_for_bike_owners"))) %>
 
         <ul class="tw:m-0 tw:list-none tw:border-t tw:border-gray-200 tw:p-0">
           <% builds_next.each do |row| %>
@@ -310,11 +238,13 @@
               "
             >
               <div class="tw:flex-1">
-                <h3 class="tw:m-0 tw:text-base tw:font-extrabold tw:text-slate-900">
+                <h3 class="tw:m-0 tw:text-base tw:font-extrabold">
                   <%= row[:title] %>
                 </h3>
 
-                <p class="tw:m-0 tw:text-sm"><%= row[:body] %></p>
+                <p class="tw:m-0 tw:text-sm tw:text-gray-500">
+                  <%= row[:body] %>
+                </p>
               </div>
 
               <span class="tw:tracking-wider tw:uppercase">
@@ -328,46 +258,16 @@
     </div>
   </section>
 
-  <% if @recovery_displays.any? %>
-    <section class="tw:border-b tw:border-gray-200 tw:bg-gray-50">
-      <div class="<%= section_inner %>">
-        <div
-          class="
-            tw:flex tw:flex-wrap tw:items-end tw:justify-between tw:gap-x-6
-            tw:gap-y-1
-          "
-        >
-          <div>
-            <h2 class="<%= h2_classes %>">
-              <%= translation(".what_members_make_possible") %>
-            </h2>
-
-            <p class="tw:m-0 tw:mt-1 tw:text-[17px]">
-              <%= translation(".recoveries_reported_by_owners") %>
-            </p>
-          </div>
-
-          <%= link_to(translation(".read_more_recovery_stories"), recovery_stories_path,
-            class: "twlink tw:text-[15.5px] tw:font-bold") %>
-        </div>
-
-        <ul
-          class="
-            tw:m-0 tw:mt-6 tw:grid tw:list-none tw:gap-4 tw:p-0
-            tw:sm:grid-cols-2 tw:lg:grid-cols-4
-          "
-        >
-          <% @recovery_displays.each do |recovery_display| %>
-            <%= render(Atoms::RecoveryDisplayCard::Component.new(recovery_display:)) %>
-          <% end %>
-        </ul>
-      </div>
-    </section>
-  <% end %>
+  <section class="tw:border-b tw:border-gray-200 tw:bg-gray-50">
+    <div class="<%= section_inner %>">
+      <%= render(SharedBlocks::Marketing::RecoveryStories::Component.new(heading: translation(".what_members_make_possible"),
+        recovery_displays: @recovery_displays)) %>
+    </div>
+  </section>
 
   <section class="tw:border-b tw:border-gray-200">
-    <div class="tw:mx-auto tw:max-w-6xl tw:px-5 tw:py-8 tw:lg:px-14 tw:lg:py-11">
-      <h2 class="tw:m-0 tw:text-center tw:text-[15px] tw:font-bold tw:text-slate-900">
+    <div class="tw:py-8 tw:lg:py-11 <%= SharedBlocks::Marketing::Wrapper::Component::CONTAINER_CLASSES %>">
+      <h2 class="tw:m-0 tw:text-center tw:text-[15px] tw:font-bold">
         <%= translation(".official_registry") %>
       </h2>
 
@@ -390,17 +290,8 @@
   <section class="tw:border-b tw:border-gray-200 tw:bg-gray-50">
     <div class="tw:flex tw:flex-col tw:gap-8 tw:lg:flex-row tw:lg:gap-12 <%= section_inner %>">
       <div class="tw:lg:w-85 tw:lg:shrink-0">
-        <p class="tw:m-0 tw:text-purple-500 <%= eyebrow_classes %>">
-          <%= translation(".member_gear") %>
-        </p>
-
-        <h2 class="tw:mt-2 <%= h2_classes %>">
-          <%= translation(".wear_the_shield") %>
-        </h2>
-
-        <p class="tw:m-0 tw:mt-3 tw:text-base tw:leading-relaxed">
-          <%= translation(".member_gear_body") %>
-        </p>
+        <%= render(SharedBlocks::Marketing::SectionHeading::Component.new(eyebrow: translation(".member_gear"), eyebrow_color: :purple,
+          heading: translation(".wear_the_shield"), intro: translation(".member_gear_body"))) %>
       </div>
 
       <ul
@@ -425,7 +316,7 @@
                 tw:py-3.5
               "
             >
-              <span class="tw:text-[15px] tw:font-extrabold tw:text-slate-900">
+              <span class="tw:text-[15px] tw:font-extrabold">
                 <%= item[:name] %>
               </span>
 
@@ -441,66 +332,20 @@
 
   <section class="tw:border-b tw:border-gray-200">
     <div class="tw:flex tw:flex-col tw:gap-4 tw:lg:flex-row tw:lg:gap-14 <%= section_inner %>">
-      <h2 class="tw:lg:w-85 tw:lg:shrink-0 <%= h2_classes %>">
-        <%= translation(".questions") %>
-      </h2>
+      <%= render(SharedBlocks::Marketing::SectionHeading::Component.new(heading: translation(".questions"), html_class: "tw:lg:w-85 tw:lg:shrink-0")) %>
 
-      <div class="tw:flex-1 tw:border-t tw:border-gray-200">
-        <% faqs.each_with_index do |(question, answer), index| %>
-          <%= tag.details(open: index.zero?, class: "tw:group tw:border-b tw:border-gray-200") do %>
-            <summary
-              class="
-                tw:flex tw:cursor-pointer tw:list-none tw:items-center
-                tw:justify-between tw:gap-4 tw:px-2 tw:py-4.5 tw:text-[17px]
-                tw:font-bold tw:text-slate-900 tw:hover:bg-gray-50
-                tw:[&::-webkit-details-marker]:hidden
-              "
-            >
-              <%= question %>
-
-              <%= render(UI::IconChevron::Component.new(direction: :down, size: :md,
-                html_class: "tw:shrink-0 tw:text-blue-600 tw:transition-transform tw:group-open:-rotate-90")) %>
-            </summary>
-
-            <p
-              class="
-                tw:m-0 tw:max-w-160 tw:px-2 tw:pb-5 tw:text-[15.5px]
-                tw:leading-relaxed
-              "
-            >
-              <%= answer %>
-            </p>
-          <% end %>
-        <% end %>
+      <div class="tw:flex-1 tw:text-gray-500">
+        <%= render(UI::Accordion::Component.new(items: faqs)) %>
       </div>
     </div>
   </section>
 
-  <section class="tw:bg-blue-600 tw:text-white">
-    <div
-      class="
-        tw:mx-auto tw:flex tw:max-w-6xl tw:flex-col tw:gap-6 tw:px-5 tw:py-8
-        tw:md:flex-row tw:md:items-center tw:md:gap-9 tw:lg:px-14
-        tw:lg:py-11
-      "
-    >
-      <%= image_tag("membership/bike-love.png", alt: "", class: "tw:hidden tw:w-30 tw:shrink-0 tw:md:block") %>
-
-      <h2
-        class="
-          tw:m-0 tw:flex-1 tw:font-header tw:text-[22px] tw:font-extrabold
-          tw:text-white tw:lg:text-[32px]
-        "
-      >
-        <%= members_keep_it_free %>
-      </h2>
-
-      <%= render(UI::ButtonLink::Component.new(href: "#membership-plans", color: :yellow, size: :callout,
-        html_class: "tw:shrink-0", data: {action: "memberships--new#scrollToPlans"})) do %>
-        <span data-memberships--new-target="join">
-          <%= labels(@level, @interval)[:join] %>
-        </span>
-      <% end %>
-    </div>
-  </section>
+  <%= render(SharedBlocks::Marketing::CallToActionBanner::Component.new(heading: members_keep_it_free)) do %>
+    <%= render(UI::ButtonLink::Component.new(href: "#membership-plans", color: :yellow, size: :callout,
+      data: {action: "memberships--new#scrollToPlans"})) do %>
+      <span data-memberships--new-target="join">
+        <%= labels(@level, @interval)[:join] %>
+      </span>
+    <% end %>
+  <% end %>
 </div>

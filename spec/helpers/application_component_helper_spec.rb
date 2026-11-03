@@ -17,8 +17,8 @@ RSpec.describe ApplicationComponentHelper, type: :helper do
     context "with zero value" do
       let(:number) { 0 }
 
-      it "applies less-less-strong class" do
-        expect(result).to eq '<span class="less-less-strong">0</span>'
+      it "applies twless-strong class" do
+        expect(result).to eq '<span class="twless-strong">0</span>'
       end
     end
 
@@ -36,6 +36,13 @@ RSpec.describe ApplicationComponentHelper, type: :helper do
       it "handles negative numbers" do
         expect(result).to eq '<span class="">-100</span>'
       end
+    end
+  end
+
+  describe "unbroken_hyphen" do
+    it "keeps each hyphenated word on one line, escaping the text around it" do
+      expect(helper.unbroken_hyphen("Know your e-bike & e-scooter rules"))
+        .to eq 'Know your <span class="tw:whitespace-nowrap">e-bike</span> &amp; <span class="tw:whitespace-nowrap">e-scooter</span> rules'
     end
   end
 
@@ -97,15 +104,15 @@ RSpec.describe ApplicationComponentHelper, type: :helper do
     context "with zero amount" do
       let(:payment) { Payment.new(amount_cents: 0) }
 
-      it "applies less-less-strong class to zero" do
-        expect(result).to eq '<span><span title="USD">$</span><span class="less-less-strong">0</span></span>'
+      it "applies twless-strong class to zero" do
+        expect(result).to eq '<span><span title="USD">$</span><span class="twless-strong">0</span></span>'
       end
     end
 
     context "with nil amount" do
       let(:payment) { Payment.new(amount_cents: nil) }
 
-      it "applies less-less-strong class to zero" do
+      it "applies twless-strong class to zero" do
         expect(result).to be_nil
       end
     end

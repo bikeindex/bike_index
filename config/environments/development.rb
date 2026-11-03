@@ -91,7 +91,8 @@ Rails.application.configure do
       {
         remote_ip: event.payload[:ip],
         u_id: event.payload[:u_id],
-        params: event.payload[:params]&.except("controller", "action", "format", "id")
+        params: event.payload[:params]&.except("controller", "action", "format", "id"),
+        **event.payload.slice(:logged_search)
       }
     end
   end

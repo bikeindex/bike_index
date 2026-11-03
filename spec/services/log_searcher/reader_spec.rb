@@ -36,8 +36,8 @@ RSpec.describe LogSearcher::Reader do
       # When new lines are added to the example log file, this will fail.
       # Added as a failsafe because Seth didn't update the Reader when he updated the Parser in 2025-4
       # ... and didn't store web searches for ~ 2 months because of that
-      expect(total_lines).to eq 32
-      expect(LogSearcher::Reader.rgrep_log_lines_count(log_path:)).to eq 22
+      expect(total_lines).to eq 34
+      expect(LogSearcher::Reader.rgrep_log_lines_count(log_path:)).to eq 23
     end
   end
 

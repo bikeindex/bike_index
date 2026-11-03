@@ -2,26 +2,12 @@
 <% cache_if(on_file.positive?, cache_key) do %>
   <section
     id="state-laws"
-    class="
-      tw:mx-auto tw:max-w-[1120px] tw:px-[clamp(16px,4vw,32px)]
-      tw:py-[clamp(44px,8vw,72px)]
-    "
+    class="tw:py-[clamp(44px,8vw,72px)] <%= SharedBlocks::Marketing::Wrapper::Component::CONTAINER_CLASSES %>"
     data-controller="ebike-rules--state-filter"
   >
     <div class="tw:mb-5 tw:flex tw:flex-wrap tw:items-end tw:gap-x-8 tw:gap-y-4">
       <div class="tw:flex-[1_1_360px]">
-        <h2
-          class="
-            tw:font-header tw:text-[clamp(26px,4vw,34px)] tw:leading-tight
-            tw:font-extrabold
-          "
-        >
-          <%= copy[:heading] %>
-        </h2>
-
-        <p class="tw:mt-2 tw:text-[17px] tw:text-gray-700 tw:dark:text-gray-300">
-          <%= copy[:limits_subheading] %>
-        </p>
+        <%= render(SharedBlocks::Marketing::SectionHeading::Component.new(heading: unbroken_hyphen(copy[:heading]), intro: copy[:limits_subheading])) %>
       </div>
 
       <div class="tw:min-w-60 tw:flex-[0_1_300px]">

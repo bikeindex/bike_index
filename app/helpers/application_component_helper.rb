@@ -10,7 +10,12 @@ module ApplicationComponentHelper
   end
 
   def number_display(number)
-    content_tag(:span, number_with_delimiter(number), class: ((number == 0) ? "less-less-strong" : ""))
+    content_tag(:span, number_with_delimiter(number), class: ((number == 0) ? "twless-strong" : ""))
+  end
+
+  # Hyphenated words never wrap at the hyphen, which splits "e-bike" across lines
+  def unbroken_hyphen(text)
+    safe_join(text.split(/(\S+-\S+)/).map { it.include?("-") ? tag.span(it, class: "tw:whitespace-nowrap") : it })
   end
 
   # currency_name_suffix options: [false, true, :if_not_default]
@@ -40,7 +45,7 @@ module ApplicationComponentHelper
   end
 
   def link_emoji
-    image_tag("link.svg", class: "link-emoji")
+    image_tag("link.svg", class: "tw:inline-block tw:w-4")
   end
 
   private

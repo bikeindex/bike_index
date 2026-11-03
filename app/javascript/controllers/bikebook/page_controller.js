@@ -1,12 +1,12 @@
 import { Controller } from '@hotwired/stimulus'
 import { CatalogComboboxSource, loadCatalog, renderCounts } from 'bikebook/catalog'
-import { hydrate, loadingShell, pickedVehicles, unpickedVehicles } from 'bikebook/hydrate'
+import { hydrate, loadingShell, pickedVehicles, rescoredSimilar, unpickedVehicles } from 'bikebook/hydrate'
 import { keepPermanent, renderInto } from 'bikebook/render'
 import { readable } from 'bikebook/replace_url'
-import { searching } from 'bikebook/query'
+import { NARROWING, searching } from 'bikebook/query'
 import { collapse } from 'utils/collapse_utils'
 import { SearchLog } from 'bikebook/search_log'
-import { realigned, storePreferredSize, withSize } from 'bikebook/sizes'
+import { realigned, storePreferredSize, withColorway, withSize } from 'bikebook/sizes'
 import { renderClassCards, withClassifications } from 'bikebook/templates/vehicles/class_cards'
 import { uuid } from 'bikebook/templates/helpers'
 
@@ -19,12 +19,13 @@ const stamped = (state) => ({ ...state, bikebook: uuid() })
 // link to this page and each history step render the page afresh from the shell, without a request
 export default class extends Controller {
   static targets = ['shell', 'page', 'status']
-  static values = { manifestUrl: String, jurisdictions: Object, failedText: String, title: String, searchLogUrl: String }
+  static values = { manifestUrl: String, jurisdictions: Object, paintColors: Object, failedText: String, title: String, searchLogUrl: String }
 
   #scrolls = new Map()
   #searchLog
   #renders = 0
   #refilters = 0
+  #rescores = 0
   #renderedUrl
 
   // The loading shell holds the status until the catalog's first render replaces it, and a failure puts it back
@@ -39,7 +40,7 @@ export default class extends Controller {
     const url = new URL(window.location.href)
     this.#render(url)
     try {
-      this.catalog = await loadCatalog(this.manifestUrlValue, url.searchParams.get('vehicle_models')?.split(',') ?? [], this.jurisdictionsValue)
+      this.catalog = await loadCatalog(this.manifestUrlValue, url.searchParams.get('vehicle_models')?.split(',') ?? [], this.jurisdictionsValue, this.paintColorsValue)
     } catch (error) {
       return this.#fail(error)
     }
@@ -65,20 +66,20 @@ export default class extends Controller {
     this.#go(realigned(withClassifications(url, this.catalog.vocabulary.e_vehicle_classifications)), [window.scrollX, window.scrollY])
   }
 
-  // A plain click on a link to this page, such as a card's remove link, which an in-place link renders without
-  // scrolling, focusing what the data-in-place on it or an ancestor selects rather than the search, and one inside a
-  // data-replace in place of the history entry it's on. One among the vehicles was written when the page rendered, so
-  // only what it changes from that goes onto the URL, which filters and panels have moved on since
+  // A plain click on a link to this page, such as a card's remove link, or on a drawing's figure's data-href, which an
+  // in-place link renders without scrolling, focusing what the data-in-place on it or an ancestor selects rather than the search, and one inside a
+  // data-replace in place of the history entry it's on. Any other renders at the top, or at what the data-scroll-to on it or an ancestor selects. One among the
+  // vehicles was written when the page rendered, so only what it changes from that goes onto the URL, which filters and panels have moved on since
   follow (event) {
-    const link = event.target.closest('a[href]')
+    const link = event.target.closest('a[href], [data-href]')
     if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || link.target) return
 
-    const url = new URL(link.href)
+    const url = new URL(link.getAttribute('href') ?? link.dataset.href, window.location.href)
     if (url.origin !== window.location.origin || url.pathname !== window.location.pathname) return
 
     event.preventDefault()
     const inPlace = link.closest('[data-in-place]')
-    if (!inPlace) return this.#go(url)
+    if (!inPlace) return this.#go(url, link.closest('[data-scroll-to]')?.dataset.scrollTo)
 
     const next = link.closest('#vehicle-viewers') ? this.#changedBy(url) : url
     // one that shows the search a lone model hid, as its tab does, is a step back can undo, and opens and focuses it
@@ -96,23 +97,65 @@ export default class extends Controller {
     this.pageTarget.querySelector(`select[data-bikebook--page-vehicle-param="${CSS.escape(vehicle)}"]`)?.focus({ preventScroll: true })
   }
 
+  // A vehicle's colorway, in place of the history entry it's picked on
+  pickColorway ({ target, params: { vehicle } }) {
+    this.#go(withColorway(new URL(window.location.href), vehicle, target.value), [window.scrollX, window.scrollY], { replace: true })
+  }
+
   // A filter changes in place, which with nothing picked the featured models and their count follow, and the picked
-  // ones a jurisdiction or market, which decide which are out of class and which are sold elsewhere, unless the page
-  // renders or the filters change again first
+  // ones a jurisdiction or market, which decide which are out of class and which are sold elsewhere, or while the similar
+  // ones are open any that narrows them, unless the page renders or the filters change again first
   async refilter () {
     const viewers = this.pageTarget.querySelector('#vehicle-viewers')
     const url = new URL(window.location.href)
     const unpicked = viewers?.querySelector(':scope > [data-controller~="bikebook--tips"]')
-    const placeChanged = ['jurisdiction', 'market'].some((name) => url.searchParams.get(name) !== this.#renderedUrl?.searchParams.get(name))
-    if (!this.catalog || !viewers || (!unpicked && !placeChanged)) return
+    const names = url.searchParams.get('similar') === '1' ? NARROWING : ['jurisdiction', 'market', 'market_scope']
+    const changed = names.some((name) => url.searchParams.get(name) !== this.#renderedUrl?.searchParams.get(name))
+    if (!this.catalog || !viewers || (!unpicked && !changed)) return
 
     const render = this.#renders
     const refilter = ++this.#refilters
-    const vehicles = await (unpicked ? unpickedVehicles : pickedVehicles)(this.catalog, this.pageTarget, url)
+    const { vehicles, adjustments } = await (unpicked ? unpickedVehicles : pickedVehicles)(this.catalog, this.pageTarget, url)
     if (render === this.#renders && refilter === this.#refilters) {
       renderInto(viewers, vehicles)
+      renderInto(this.pageTarget.querySelector('#similar-adjustments'), adjustments)
       this.#renderedUrl = url
     }
+  }
+
+  // The page as it is, rendered where the reader is, such as once a section that's scored when open first opens
+  refresh () {
+    this.#render(new URL(window.location.href), [window.scrollX, window.scrollY], { focus: false })
+  }
+
+  // The filters opened at the similar models' adjustments, expanded, from beside the similar models' toggle - and the
+  // search they're in, where a lone model hid it, as a step back can undo
+  adjustSimilar () {
+    const url = new URL(window.location.href)
+    if (!searching(url)) {
+      for (const name of ['search', 'filters', 'adjust']) url.searchParams.set(name, '1')
+      return this.#go(url, [window.scrollX, window.scrollY], { focus: '#similar-adjustments [data-ui--collapse-target~="trigger"]', reveal: true })
+    }
+    const adjust = this.pageTarget.querySelector('#similar-adjustments [data-controller~="ui--collapse"]')
+    for (const element of [this.pageTarget.querySelector('[data-controller~="bikebook--catalog-filters"]'), adjust]) {
+      this.application.getControllerForElementAndIdentifier(element, 'ui--collapse').show()
+    }
+    adjust.querySelector('[data-ui--collapse-target~="trigger"]').focus()
+  }
+
+  // The similar models' section opened from a toggle outside it, its own toggle taking focus
+  compareSimilar () {
+    const toggle = this.pageTarget.querySelector('#similar-toggle')
+    toggle.click()
+    toggle.focus()
+  }
+
+  // The similar models by the settings their controls set, unless the page renders or they change again first
+  async rescore ({ detail: { vehicle, settings } }) {
+    const render = this.#renders
+    const rescore = ++this.#rescores
+    const results = await rescoredSimilar(this.catalog, this.pageTarget, new URL(window.location.href), vehicle, settings)
+    if (render === this.#renders && rescore === this.#rescores) renderInto(this.pageTarget.querySelector('#similar-results'), results)
   }
 
   restore () {
@@ -149,8 +192,9 @@ export default class extends Controller {
     return this.#render(url, scroll, options)
   }
 
-  // `focus` selects what to focus, the search where it selects nothing, unless a field of the page's has focus, which
-  // keeps it and any value it hasn't yet changed to. Until the catalog loads, the page is its loading shell
+  // `scroll` is where the window goes, [x, y] or a selector of what to bring to its top. `focus` selects what to focus,
+  // the search where it selects nothing, unless a field of the page's has focus, which keeps it and any value it hasn't
+  // yet changed to. Until the catalog loads, the page is its loading shell
   async #render (url, scroll, { focus = '[autofocus]', reveal = false } = {}) {
     if (!this.catalog) return this.pageTarget.replaceChildren(loadingShell(this.shellTarget, url, this.status))
 
@@ -178,12 +222,14 @@ export default class extends Controller {
       // once its panel's controller has opened it, a hidden field taking no focus
       requestAnimationFrame(() => kept.focus({ preventScroll: true }))
     } else if (focus) {
-      (this.pageTarget.querySelector(focus) ?? this.pageTarget.querySelector('[autofocus]'))?.focus({ preventScroll: Boolean(scroll) })
+      // once a list's controller has shown the page it's on
+      requestAnimationFrame(() => (this.pageTarget.querySelector(focus) ?? this.pageTarget.querySelector('[autofocus]'))?.focus({ preventScroll: Boolean(scroll) }))
     }
     if (scroll) {
-      window.scrollTo(...scroll)
+      const place = () => typeof scroll === 'string' ? this.pageTarget.querySelector(scroll)?.scrollIntoView() : window.scrollTo(...scroll)
+      place()
       // and again once the panels' controllers have opened them, which the browser's scroll anchoring follows down
-      requestAnimationFrame(() => window.scrollTo(...scroll))
+      requestAnimationFrame(place)
     }
   }
 

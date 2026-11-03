@@ -147,16 +147,18 @@ RSpec.describe EbikeRuleServices::StateLaws do
     end
   end
 
-  describe "classification_name" do
+  describe "other_classification" do
     let(:ids) { ["evc/us/ca/off_highway_electric_motorcycle"] }
 
-    it "names the state's own classification, or the one sharing its group" do
-      expect(described_class.classification_name("CA", ids)).to eq "Off-Highway Electric Motorcycle"
-      expect(described_class.classification_name("TX", ids)).to eq "Off-Highway Motorcycle"
-      expect(described_class.classification_name("NY", ids)).to be_nil
-      expect(described_class.classification_name("TX", [])).to be_nil
+    it "is the state's own classification, or the one sharing its group, with its restrictions" do
+      expect(described_class.other_classification("CA", ids)).to include(name: "Off-Highway Electric Motorcycle")
+      expect(described_class.other_classification("TX", ids)).to include(name: "Off-Highway Motorcycle")
+      expect(described_class.other_classification("NY", ids)).to be_nil
+      expect(described_class.other_classification("TX", [])).to be_nil
       # not the state's e-bike law, which a Class 3 shares a group with
-      expect(described_class.classification_name("TX", ["evc/us/class_3"])).to be_nil
+      expect(described_class.other_classification("TX", ["evc/us/class_3"])).to be_nil
+      expect(described_class.other_classification("NJ", ["evc/us/class_3"]))
+        .to match(name: "Motorized Bicycle", restrictions: include(a_hash_including(rule: /moped \(class F\) license/, citation: "N.J.S.A. 39:4-14.3")))
     end
   end
 end

@@ -6,9 +6,7 @@ module Pages
       # The form is a plain GET, so a result is a link. A Canadian page picks a province rather than a state, and says
       # nothing of the US
       class Component < ApplicationComponent
-        EYEBROW_CLASSES = "tw:text-xs tw:font-bold tw:tracking-[.08em] tw:uppercase tw:text-blue-600 tw:dark:text-blue-400"
-        HEADING_CLASSES = "tw:font-header tw:text-[clamp(26px,4vw,34px)] tw:leading-tight tw:font-extrabold"
-        SECTION_CLASSES = "tw:mx-auto tw:max-w-[1120px] tw:px-[clamp(16px,4vw,32px)]"
+        SECTION_CLASSES = SharedBlocks::Marketing::Wrapper::Component::CONTAINER_CLASSES
         COUNTRY_MODAL_ID = "ebike-rules-switch-country"
 
         def initialize(lookup:, manifest_url:, registered_count:, recoveries_count:, page_title:, default_title:)
@@ -47,8 +45,7 @@ module Pages
             combobox_options(places.reject { EbikeRuleServices::Places.country(it) == @lookup.country })
         end
 
-        # Each submits its code, and reads "California (CA)", or "New South Wales (AU-NSW)" outside the page's country
-        def combobox_options(places) = places.map { {name: it[:name], abbr: it[:code].delete_prefix("#{@lookup.country}-"), value: it[:code]} }
+        def combobox_options(places) = EbikeRuleServices::Places.combobox_options(places, country: @lookup.country)
 
         def field_error(field, text)
           return unless error?(field)

@@ -7,7 +7,7 @@ module Atoms
         class ComponentPreview < ApplicationComponentPreview
           # @!group Hidden Variants
           def user_hidden
-            render(Atoms::Admin::Badges::BikeHiddenExplanation::Component.new(bike: Bike.with_user_hidden.where(user_hidden: true).last))
+            render(Atoms::Admin::Badges::BikeHiddenExplanation::Component.new(bike: Bike.current_with_user_hidden.where(user_hidden: true).last))
           end
 
           def example

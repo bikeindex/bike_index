@@ -17,15 +17,16 @@ class FeedbacksController < ApplicationController
       else
         translation(:thanks_for_your_message)
       end
-      redirect_back(fallback_location: help_path)
+      redirect_to(form_page || help_path)
     else
-      @page_errors = @feedback.errors
-      render(:index) && return if request.referer.blank?
+      @page_errors = @feedback.errors unless params[:return_to] # a demo modal shows its own
+      render(:index) && return if form_page.blank?
 
-      re_path = Rails.application.routes.recognize_path(request.referer)
+      re_path = Rails.application.routes.recognize_path(URI(form_page).path)
       template = "#{re_path[:controller]}/#{re_path[:action]}"
       @force_landing_page_render = re_path[:controller] == "landing_pages"
       @page_id = [re_path[:controller], re_path[:action]].join("_")
+      @page_title = I18n.t("meta_titles.#{@page_id}", default: nil)
       @recovery_displays = RecoveryDisplay.with_photo.limit(5) if template == "welcome/index"
       render template: template
     end
@@ -46,9 +47,14 @@ class FeedbacksController < ApplicationController
     redirect_back(fallback_location: root_url) && (return true)
   end
 
+  # A form can name its page, since one that failed and re-rendered leaves the referer at /feedbacks
+  def form_page
+    url_from(params[:return_to]) || url_from(request.referer)
+  end
+
   def permitted_parameters
     params.require(:feedback).permit(:body, :email, :name, :title, :feedback_type, :feedback_hash,
-      :package_size, :phone_number, :contact_name, :additional)
+      :package_size, :phone_number, :contact_name, :contact_role, :additional)
   end
 
   def set_permitted_format

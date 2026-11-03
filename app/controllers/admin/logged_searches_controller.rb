@@ -24,7 +24,7 @@ module Admin
     end
 
     def special_endpoints
-      %w[not_web_bikes not_web_bikebook organized]
+      %w[not_web_bikes not_web_bikebook web_bikebook_comparison organized]
     end
 
     def matching_logged_searches
@@ -34,7 +34,8 @@ module Admin
         @endpoint = params[:search_endpoint]
         logged_searches = case @endpoint
         when "not_web_bikes" then logged_searches.where.not(endpoint: :web_bikes)
-        when "not_web_bikebook" then logged_searches.not_web_bikebook
+        when "not_web_bikebook" then logged_searches.not_bikebook
+        when "web_bikebook_comparison" then logged_searches.web_bikebook_comparison
         when "organized" then logged_searches.organized
         end
       elsif LoggedSearch.endpoints.key?(params[:search_endpoint])

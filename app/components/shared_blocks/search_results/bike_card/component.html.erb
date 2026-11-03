@@ -1,6 +1,7 @@
 <%#
   No overflow-hidden, which would clip the tooltips - so the photo rounds its own
-  corners, and the hovered card rises over the next row for a tooltip to show
+  corners, and the hovered card rises over the next row for a tooltip to show.
+  Its tooltips sit above the card's link, which covers the rest of it
 %>
 
 <% cache(cache_key) do %>
@@ -11,6 +12,8 @@
       tw:hover:z-10 tw:hover:-translate-y-0.5 tw:hover:shadow-lg
       tw:active:translate-y-0.5 tw:hover:active:translate-y-0
       tw:dark:border-gray-700 tw:dark:bg-gray-800
+      tw:[&_[data-controller~=ui--tooltip]]:relative
+      tw:[&_[data-controller~=ui--tooltip]]:z-20
     "
     data-test-id="search-result-card-<%= @bike.id %>"
   >
@@ -37,8 +40,7 @@
         </span>
       <% end %>
 
-      <%# Above the card's link, so its tooltip opens rather than the bike %>
-      <span class="tw:absolute tw:top-2 tw:right-2 tw:z-20">
+      <span class="tw:absolute tw:top-2 tw:right-2">
         <%= render(status_badge(size: :md)) %>
       </span>
     </div>
@@ -69,8 +71,7 @@
         </div>
       <% end %>
 
-      <%# Above the card's link too, for the e-vehicle tooltip %>
-      <div class="tw:relative tw:z-20 tw:flex tw:flex-wrap tw:items-center tw:gap-1.5">
+      <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-1.5">
         <% if @bike.motorized? %>
           <%= render(UI::Badge::Component.new(text: "⚡", title: translation(".e_vehicle"), color: :purple)) %>
         <% end %>

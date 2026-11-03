@@ -10,7 +10,7 @@ module UI
     class Component < ApplicationComponent
       # leading-[0] collapses the empty box's line-height strut so align-baseline
       # sits its bottom on the text baseline instead of floating above it
-      BASE_CLASSES = "tw:inline-block tw:leading-[0] tw:rounded-xs tw:border tw:border-black/20"
+      BASE_CLASSES = "tw:inline-block tw:leading-[0] tw:rounded-xs tw:border tw:border-black/20 tw:dark:border-white/20"
 
       SIZES = {sm: "tw:h-3 tw:w-3", md: "tw:h-6 tw:w-6"}.freeze
 

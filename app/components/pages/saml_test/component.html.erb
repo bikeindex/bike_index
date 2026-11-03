@@ -1,6 +1,6 @@
 <div class="tw:mx-auto tw:max-w-3xl tw:p-4">
   <%= render(UI::Header::Component.new(text: "SAML configuration test",
-        subtitle: safe_join([@organization.short_name, " — ", tag.code(@organization.user_email_domain)]))) %>
+        subtitle: safe_join([@organization.short_name, " — ", render(UI::Code::Inline::Component.new(text: @organization.user_email_domain))]))) %>
 
   <%= render(UI::Alerts::Base::Component.new(kind: summary_kind, header: summary_header)) do %>
     <% if @result.blank? %>
@@ -9,8 +9,9 @@
       isn't one already. What comes back is reported here rather than dropping
       you on your account page.
     <% elsif @result.success? %>
-      <code><%= @result.user.email %></code> is signed in on this browser now —
-      the same session an ordinary SSO login creates.
+      <%= render(UI::Code::Inline::Component.new(text: @result.user.email)) %>
+      is signed in on this browser now — the same session an ordinary SSO login
+      creates.
     <% else %>
       <%= @result.error %>
     <% end %>
@@ -36,21 +37,27 @@
     >
       <% if @expected_email.present? %>
         <dt class="tw:font-semibold">Address entered</dt>
-        <dd><code><%= @expected_email %></code></dd>
+        <dd>
+          <%= render(UI::Code::Inline::Component.new(text: @expected_email)) %>
+        </dd>
       <% end %>
 
       <% if asserted? %>
         <dt class="tw:font-semibold">NameID</dt>
-        <dd><code><%= @result.name_id.presence || "(missing)" %></code></dd>
+        <dd>
+          <%= render(UI::Code::Inline::Component.new(text: @result.name_id.presence || "(missing)")) %>
+        </dd>
         <dt class="tw:font-semibold">NameID format</dt>
         <dd>
-          <code><%= @result.name_id_format.presence || "(missing)" %></code>
+          <%= render(UI::Code::Inline::Component.new(text: @result.name_id_format.presence || "(missing)")) %>
         </dd>
         <dt class="tw:font-semibold">Configured email attribute</dt>
-        <dd><code><%= @result.email_attribute %></code></dd>
+        <dd>
+          <%= render(UI::Code::Inline::Component.new(text: @result.email_attribute)) %>
+        </dd>
         <dt class="tw:font-semibold">Asserted email</dt>
         <dd>
-          <code><%= @result.email.presence || "(missing)" %></code>
+          <%= render(UI::Code::Inline::Component.new(text: @result.email.presence || "(missing)")) %>
 
           <% if @expected_email.present? %>
             <%= asserted_expected_email? ? "— matches the address entered" : "— the IdP released a different address" %>
@@ -58,20 +65,22 @@
         </dd>
         <dt class="tw:font-semibold">Asserted email domain</dt>
         <dd>
-          <code><%= @result.email_domain.presence || "(missing)" %></code>
+          <%= render(UI::Code::Inline::Component.new(text: @result.email_domain.presence || "(missing)")) %>
         </dd>
         <dt class="tw:font-semibold">Asserted name</dt>
         <dd>
           <%= @result.name.presence || "(missing)" %>
         </dd>
         <dt class="tw:font-semibold">Organization domain</dt>
-        <dd><code><%= @organization.user_email_domain %></code></dd>
+        <dd>
+          <%= render(UI::Code::Inline::Component.new(text: @organization.user_email_domain)) %>
+        </dd>
       <% end %>
 
       <% if @result.user.present? %>
         <dt class="tw:font-semibold">Account</dt>
         <dd>
-          <code><%= @result.user.email %></code>
+          <%= render(UI::Code::Inline::Component.new(text: @result.user.email)) %>
           <%= @result.signed_up ? "— created by this login" : "— already existed" %>
         </dd>
         <% unless @result.signed_up %>
@@ -90,8 +99,13 @@
           "
         >
           <% @result.attributes.each do |name, values| %>
-            <dt class="tw:font-semibold"><code><%= name %></code></dt>
-            <dd><code><%= Array(values).join(", ") %></code></dd>
+            <dt class="tw:font-semibold">
+              <%= render(UI::Code::Inline::Component.new(text: name)) %>
+            </dt>
+
+            <dd>
+              <%= render(UI::Code::Inline::Component.new(text: Array(values).join(", "))) %>
+            </dd>
           <% end %>
         </dl>
       <% else %>

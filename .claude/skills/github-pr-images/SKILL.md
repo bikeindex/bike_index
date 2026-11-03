@@ -61,6 +61,8 @@ A caller's body is posted verbatim — don't recompose it. Composing it yourself
 <img src="tmp/screenshot.png" width="500">
 ```
 
+When a `## Screenshots` comment already exists (step 3 finds it), compose from its current body: a recapture **replaces** the image it supersedes in place — never a new "Updated"/"After merging main" section appended below the old shots. A state the comment doesn't show yet gets its own block, in the shape of the ones there.
+
 Images in table cells want `<img … width=…>`; elsewhere `![alt](path)` is fine. Don't give an `<img>`'s file a `#alt` on `--attach` — step 3's script finds its upload by the basename gh uses as the default alt.
 
 ## Step 3: Post it

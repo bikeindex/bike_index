@@ -14,6 +14,7 @@
 #  can_send_many_stolen_notifications :boolean          default(FALSE), not null
 #  confirmation_token                 :string(255)
 #  confirmed                          :boolean          default(FALSE), not null
+#  dark_mode_preview                  :boolean          default(FALSE), not null
 #  deleted_at                         :datetime
 #  description                        :text
 #  developer                          :boolean          default(FALSE), not null

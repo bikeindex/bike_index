@@ -1,16 +1,15 @@
 require "rails_helper"
 
 RSpec.describe BikeServices::CalculateLocation do
-  describe "registration_address_hash and registration_address_record" do
-    it "returns empty" do
-      expect(described_class.registration_address_hash(Bike.new)).to eq({})
+  describe "registration_address_record" do
+    it "returns nil" do
+      expect(described_class.registration_address_record(Bike.new)).to be_nil
     end
     context "with user" do
       let(:user) { FactoryBot.create(:user, :with_address_record, address_in: :vancouver, address_set_manually: true) }
       let(:bike) { FactoryBot.create(:bike, :with_address_record, :with_ownership_claimed, address_in: :chicago, user:) }
 
       it "returns user" do
-        expect(described_class.registration_address_hash(bike)).to eq user.address_hash_legacy
         expect(bike.address_record.city).to eq "Chicago"
         expect(described_class.registration_address_record(bike)).to eq user.address_record
       end
@@ -32,7 +31,7 @@ RSpec.describe BikeServices::CalculateLocation do
         expect(address_record.reload.to_coordinates.map(&:round)).to eq([42, -88])
         expect(described_class.registration_address_source(bike.reload)).to eq "initial_creation"
         bike.update(address_record:, address_set_manually: true)
-        expect(bike.reload.registration_address(true)["latitude"]).to eq address_record["latitude"]
+        expect(bike.reload.registration_address_record).to eq address_record
         expect(bike.reload.address_record.city).to eq "Chicago"
         expect(bike.address_record.street).to eq "1313 N Milwaukee Ave"
         expect(bike.address_record.city).to eq "Chicago"
@@ -55,9 +54,9 @@ RSpec.describe BikeServices::CalculateLocation do
         it "returns user address" do
           bike.reload
           expect(described_class.registration_address_source(bike)).to eq "user"
-          expect(bike.registration_address(true)).to eq user.address_hash_legacy
+          expect(bike.registration_address_record).to eq user.address_record
           expect(bike.address_record.city).to eq "Chicago"
-          expect(bike.registration_address["city"]).to eq "Vancouver"
+          expect(bike.registration_address_record.city).to eq "Vancouver"
         end
       end
       context "with stolen record" do

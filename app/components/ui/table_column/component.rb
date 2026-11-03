@@ -4,6 +4,8 @@ module UI
   module TableColumn
     class Component < ApplicationComponent
       NBSP = "\u00A0"
+      TD_CLASSES = "tw:px-1 tw:py-1 tw:border-b tw:border-gray-100 tw:dark:border-gray-700"
+      BORDERED_TD_CLASSES = "tw:px-1 tw:py-1 tw:border-b tw:border-l tw:border-gray-200 tw:dark:border-gray-700"
 
       attr_reader :sortable, :cell_block, :footer, :header_tooltip, :row_header
 
@@ -59,27 +61,20 @@ module UI
         classes.join(" ")
       end
 
-      def td_classes(bordered:)
-        classes = ["tw:px-1 tw:py-1"]
-        classes << if bordered
-          "tw:border-b tw:border-l tw:border-gray-200 tw:dark:border-gray-700"
-        else
-          "tw:border-b tw:border-gray-100 tw:dark:border-gray-700"
-        end
-        classes << @classes if @classes
-        classes.join(" ")
+      def hideable? = @classes.to_s.split.include?("hideableColumn")
+
+      def header_label
+        return @label unless @label.nil?
+        @sortable&.gsub(/_(id|at)\z/, "")&.titleize
       end
+
+      def td_classes(bordered:) = [bordered ? BORDERED_TD_CLASSES : TD_CLASSES, @classes].compact.join(" ")
 
       def tfoot_classes(bordered:)
         [td_classes(bordered:), "tw:border-t-2 tw:border-t-gray-200 tw:font-bold tw:dark:border-t-gray-600"].join(" ")
       end
 
       private
-
-      def header_label
-        return @label unless @label.nil?
-        @sortable&.gsub(/_(id|at)\z/, "")&.titleize
-      end
 
       def render_sort_link(current_sort:, current_direction:, sortable_url:, sort_icon:)
         title = header_label

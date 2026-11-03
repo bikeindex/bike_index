@@ -1,127 +1,47 @@
-<div class="admin-subnav">
-  <div class="col-md-12">
-    <h1>Bike Version</h1>
-  </div>
-</div>
+<%= render(Pages::Admin::Headers::Nav::Component.new(title: "Bike Version")) %>
 
-<div class="row mt-4">
-  <div class="col-md-6">
-    <table class="table-list">
-      <tbody>
-        <% if display_dev_info? %>
-          <tr>
-            <td class="only-dev-visible">ID</td>
-            <td><code><%= @bike_version.id %></code></td>
-          </tr>
-        <% end %>
+<div class="twwiderow tw:mt-6 tw:items-start">
+  <% visibility_class = UI::Alerts::Base::Component::TEXT_CLASSES[:success] if @bike_version.all_visible? %>
+  <% visibility_class = "twless-strong" if @bike_version.user_hidden? %>
 
-        <tr>
-          <td>Name</td>
-          <td><%= @bike_version.name %></td>
-        </tr>
+  <%= render(UI::TableList::Component.new) do |list| %>
+    <% list.with_row(label: "ID", dev_only: true, value: render(UI::Code::Inline::Component.new(text: @bike_version.id)), if: display_dev_info?) %>
 
-        <tr>
-          <td>Owner</td>
+    <% list.with_row(label: "Name", value: @bike_version.name) %>
 
-          <td>
-            <%= render Atoms::Admin::TableCells::User::Component.new(user: @bike_version.owner, user_id: @bike_version.owner_id) %>
-          </td>
-        </tr>
+    <% list.with_row(label: "Owner", value: render(Atoms::Admin::TableCells::User::Component.new(user: @bike_version.owner, user_id: @bike_version.owner_id))) %>
 
-        <tr>
-          <td>Visibility</td>
+    <% list.with_row(label: "Visibility") do %>
+      <span class="<%= visibility_class %>">
+        <%= @bike_version.visibility&.humanize %>
+      </span>
+    <% end %>
 
-          <td>
-            <% visibility_class = "text-success" if @bike_version.all_visible? %>
-            <% visibility_class = "less-strong" if @bike_version.user_hidden? %>
+    <% list.with_row(label: "Bike", value: render(Atoms::Admin::TableCells::Bike::Component.new(bike: @bike, bike_id: @bike_version.bike_id))) %>
 
-            <span class="<%= visibility_class %>">
-              <%= @bike_version.visibility&.humanize %>
-            </span>
-          </td>
-        </tr>
+    <% list.with_row(label: "Created", class: "tw:text-sm", value: render(UI::Time::Component.new(time: @bike_version.created_at, format: :localize_time_precise))) %>
 
-        <tr>
-          <td>Bike</td>
+    <% list.with_row(label: tag.span("Deleted", class: UI::Alerts::Base::Component::TEXT_CLASSES[:error]), class: "tw:text-sm", value: render(UI::Time::Component.new(time: @bike_version.deleted_at, format: :localize_time_precise)), if: @bike_version.deleted_at.present?) %>
+  <% end %>
 
-          <td>
-            <%= render Atoms::Admin::TableCells::Bike::Component.new(bike: @bike, bike_id: @bike_version.bike_id) %>
-          </td>
-        </tr>
+  <%= render(UI::TableList::Component.new) do |list| %>
+    <% list.with_row(label: "Manufacturer", value: @bike_version.mnfg_name) %>
+    <% list.with_row(label: "Frame model", value: @bike_version.frame_model) %>
+    <% list.with_row(label: "Year", value: @bike_version.year) %>
+    <% list.with_row(label: "Colors", value: @bike_version.frame_colors.join(", ")) %>
+    <% list.with_row(label: "Cycle type", value: @bike_version.cycle_type_name) %>
 
-        <tr class="small">
-          <td>Created</td>
-
-          <td>
-            <span class="localizeTime preciseTime">
-              <%= l @bike_version.created_at, format: :convert_time %>
-            </span>
-          </td>
-        </tr>
-
-        <% if @bike_version.deleted_at.present? %>
-          <tr class="small">
-            <td><span class="text-danger">Deleted</span></td>
-
-            <td>
-              <span class="localizeTime preciseTime">
-                <%= l @bike_version.deleted_at, format: :convert_time %>
-              </span>
-            </td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="col-md-6">
-    <table class="table-list">
-      <tbody>
-        <tr>
-          <td>Manufacturer</td>
-          <td><%= @bike_version.mnfg_name %></td>
-        </tr>
-
-        <tr>
-          <td>Frame model</td>
-          <td><%= @bike_version.frame_model %></td>
-        </tr>
-
-        <tr>
-          <td>Year</td>
-          <td><%= @bike_version.year %></td>
-        </tr>
-
-        <tr>
-          <td>Colors</td>
-          <td><%= @bike_version.frame_colors.join(", ") %></td>
-        </tr>
-
-        <tr>
-          <td>Cycle type</td>
-          <td><%= @bike_version.cycle_type_name %></td>
-        </tr>
-
-        <% if @bike_version.description.present? %>
-          <tr>
-            <td>Description</td>
-            <td><%= truncate(@bike_version.description, length: 200) %></td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
-  </div>
+    <% list.with_row(label: "Description", value: truncate(@bike_version.description, length: 200), if: @bike_version.description.present?) %>
+  <% end %>
 </div>
 
 <% if @bike_version.public_images.any? %>
-  <div class="mt-4">
-    <h3>Images</h3>
+  <div class="tw:mt-6">
+    <%= render(UI::Header::Component.new(text: "Images", tag: :h2)) %>
 
-    <div class="row">
+    <div class="tw:grid tw:gap-x-8 tw:md:grid-cols-4">
       <% @bike_version.public_images.each do |image| %>
-        <div class="col-md-3">
-          <%= image_tag image.image_url(:medium), class: "img-fluid", alt: image.image_alt %>
-        </div>
+        <%= image_tag image.image_url(:medium), alt: image.image_alt %>
       <% end %>
     </div>
   </div>

@@ -7,11 +7,11 @@ import HwComboboxController from 'controllers/hw_combobox_controller'
 // gem's lazy turbo-frame (`source.prime(controller)`), in the browser rather than asking the server
 export const localSources = new WeakMap()
 
-// Pressing an option would blur the input onto the page, which a multiselect then reopens its list over -
-// open, with nothing focused to hear Escape or to blur from. The click back in still selects the display,
-// as it did after that blur
+// Pressing the list - an option, a label, "No matches" - or the field beside its chips would blur the input
+// onto the page, leaving it open with nothing focused to hear Escape or to blur from. The click back in still
+// selects the display, as it did after that blur
 const keepFocusOnPick = (event) => {
-  if (!event.target.closest('[role=option]')) return
+  if (!event.target.closest('[role=listbox]') && !event.target.matches('.hw-combobox__main__wrapper')) return
 
   event.preventDefault()
   event.currentTarget.querySelectorAll('[role=combobox]').forEach((input) => clickedSinceFocus.delete(input))
@@ -33,7 +33,7 @@ HwComboboxController.prototype._requestChips = function (values) {
   if (!values) return
 
   const source = localSources.get(this.element)
-  return source ? source.chips(this, values) : requestChips.call(this, values)
+  return source ? source.chips(this, values, { adding: this.addingChip }) : requestChips.call(this, values)
 }
 
 // A paste fills the input without opening it, and closing is what commits a pick, from the options it shows -
@@ -67,17 +67,23 @@ HwComboboxController.prototype._filterAsync = async function (inputType) {
   }
 }
 
-// hotwire_combobox 0.4.1 finds an option by interpolating the raw value into
-// `[data-value='<value>']`; a value containing a quote (e.g. a search term like
-// `2011'`) builds an invalid selector and throws a SyntaxError, which aborts the
-// multiselect reset. Match on the attribute instead so any value is safe.
-HwComboboxController.prototype._optionElementWithValue = function (value) {
-  return Array.from(
-    this._actingListbox.querySelectorAll(`[${this.filterableAttributeValue}]`)
-  ).find(option => option.getAttribute('data-value') === value) || null
+// Closing on Enter clears a query that matches nothing, so it stays open to say so - unless it's free text to
+// keep. And a multiselect's Escape makes no chip of the option the gem locks in, but the gem still announces it
+const close = HwComboboxController.prototype.close
+HwComboboxController.prototype.close = function (inputType) {
+  if (inputType === 'hw:keyHandler:enter' && this._isQueried && !this._allowNew && !this._visibleOptionElements.length) return
+
+  this.dismissing = this._isMultiselect && inputType === 'hw:keyHandler:escape'
+  close.call(this, inputType)
+  this.dismissing = false
 }
 
-// It also swallows Enter whether or not the listbox is open, so a combobox with
+const dispatchSelectionEvent = HwComboboxController.prototype._dispatchSelectionEvent
+HwComboboxController.prototype._dispatchSelectionEvent = function (previousValue) {
+  if (!this.dismissing) dispatchSelectionEvent.call(this, previousValue)
+}
+
+// The gem swallows Enter whether or not the listbox is open, so a combobox with
 // nothing to pick breaks the form's implicit submission -- unlike every other
 // input. Only handle the key while there's an option to choose.
 const navigate = HwComboboxController.prototype.navigate
@@ -209,6 +215,70 @@ HwComboboxController.prototype._openInDialog = function () {
 
   this.dialogTarget.addEventListener('close', dismiss, { signal: listeners.signal })
   RENDER_EVENTS.forEach(name => document.addEventListener(name, dismiss, { signal: listeners.signal }))
+}
+
+// A repeatable multiselect (data-repeatable) takes a value picked again, as a chip of its own, where the gem keeps its
+// values as a set - and removing a chip takes off its own pick, the field and its chips being in the same order
+const repeats = (controller) => controller._isMultiselect && controller.element.hasAttribute('data-repeatable')
+const picks = (controller) => controller.hiddenFieldTarget.value.split(',').filter(Boolean)
+const setPicks = (controller, values) => {
+  controller.hiddenFieldTarget.value = values.join(',')
+  controller._syncRequired()
+}
+
+Object.defineProperty(HwComboboxController.prototype, '_fieldValueArray', {
+  configurable: true,
+  get () {
+    return repeats(this) ? picks(this) : Reflect.get(Object.getPrototypeOf(HwComboboxController.prototype), '_fieldValueArray', this)
+  }
+})
+
+// its picks' options stay to pick again, rather than hidden
+const resetMultiselectionMarks = HwComboboxController.prototype._resetMultiselectionMarks
+HwComboboxController.prototype._resetMultiselectionMarks = function () {
+  if (!repeats(this)) resetMultiselectionMarks.call(this)
+}
+
+const beforeClearing = HwComboboxController.prototype._beforeClearingMultiselectQuery
+HwComboboxController.prototype._beforeClearingMultiselectQuery = function (callback) {
+  if (!repeats(this)) return beforeClearing.call(this, callback)
+
+  const { dataset } = this.hiddenFieldTarget
+  if (dataset.valueForMultiselect) callback(dataset.displayForMultiselect, dataset.valueForMultiselect)
+  dataset.displayForMultiselect = ''
+  dataset.valueForMultiselect = ''
+}
+
+const addToFieldValue = HwComboboxController.prototype._addToFieldValue
+HwComboboxController.prototype._addToFieldValue = function (value) {
+  repeats(this) ? setPicks(this, [...picks(this), String(value)]) : addToFieldValue.call(this, value)
+}
+
+// its chip's place, which the field's value is at
+const removeChip = HwComboboxController.prototype.removeChip
+HwComboboxController.prototype.removeChip = function (event) {
+  this.removingAt = [...this.element.querySelectorAll('[data-hw-combobox-value-param]')].indexOf(event.currentTarget)
+  removeChip.call(this, event)
+}
+
+const removeFromFieldValue = HwComboboxController.prototype._removeFromFieldValue
+HwComboboxController.prototype._removeFromFieldValue = function (value) {
+  if (!repeats(this)) return removeFromFieldValue.call(this, value)
+
+  const values = picks(this)
+  const at = values[this.removingAt] === String(value) ? this.removingAt : values.indexOf(String(value))
+  setPicks(this, values.filter((_, index) => index !== at))
+}
+
+// a pick's chip, which a local source draws though the value's already chipped
+const createChip = HwComboboxController.prototype._createChip
+HwComboboxController.prototype._createChip = function () {
+  this.addingChip = true
+  try {
+    createChip.call(this)
+  } finally {
+    this.addingChip = false
+  }
 }
 
 // A combobox set or cleared from code goes through the gem, so its hidden field, its input and a

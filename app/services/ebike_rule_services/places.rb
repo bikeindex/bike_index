@@ -58,6 +58,10 @@ module EbikeRuleServices
 
     def us_states = StateLaws::STATES.map { us_state(it) }
 
+    # For UI::Forms::ComboboxState: each submits its code, and reads "California (CA)", or
+    # "New South Wales (AU-NSW)" outside the given country
+    def combobox_options(places, country:) = places.map { {name: it[:name], abbr: it[:code].delete_prefix("#{country}-"), value: it[:code]} }
+
     def outside_us = StateLaws.places.keys.map { {code: it, name: REGION_NAMES[it] || COUNTRY_NAMES[it] || it} }.sort_by { it[:name] }
 
     #

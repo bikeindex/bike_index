@@ -1,0 +1,16 @@
+<%# The layout loads only 400 and 700 %>
+<% helpers.content_for(:header) do %>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&family=Open+Sans:wght@600;800&display=swap"
+    rel="stylesheet"
+  >
+<% end %>
+
+<div
+  class="
+    tw:-mt-(--nav-gap) tw:-mb-18 tw:bg-white tw:text-base tw:leading-normal
+    tw:text-slate-900 tw:dark:bg-gray-900 tw:dark:text-gray-100
+  "
+>
+  <%= render(@page) %>
+</div>

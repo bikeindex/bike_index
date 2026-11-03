@@ -85,7 +85,7 @@
     <div class="donate-message">
       <h5>
         <%= translation("please_consider_prefix") %>
-        <%= link_to translation("donating"), why_donate_url %>
+        <%= link_to translation("donating"), donate_url %>
         <%= translation("please_consider_suffix") %>
       </h5>
 
@@ -123,14 +123,8 @@
         <tr>
           <td class="locking-copy">
             <h3 class="uncap" style="font-weight: 400">
-              <%= translation("use_a_ulock") %> <%= translation("cable_locks_should_never_be_used", bike_type: bike.type) %>
+              <%= translation("use_a_ulock_or_foldable_lock") %> <%= translation("cable_locks_should_never_be_used", bike_type: bike.type) %>
             </h3>
-          </td>
-
-          <td class="locking-art">
-            <%= image_tag template_asset_url("assets-howtolock-fighter.png"),
-                      alt: translation("ulock_illustration"),
-                      class: "locking-inline-art" %>
           </td>
         </tr>
       </tbody>
@@ -145,9 +139,9 @@
     >
       <tbody>
         <tr>
-          <td class="locking-copy locking-copy-wide">
+          <td class="locking-copy">
             <p>
-              <%= translation("secure_both_wheels_either_with_two_ulocks") %> <%= translation("before_locking_check") %>
+              <%= translation("secure_both_wheels_with_locking_skewers") %> <%= translation("before_locking_check") %>
             </p>
           </td>
         </tr>

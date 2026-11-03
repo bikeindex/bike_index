@@ -4,43 +4,39 @@
 
 = render Pages::Admin::Bikes::TheftAlertImages::Component.new(bike: @bike, stolen_record: @stolen_record, return_to: request.fullpath)
 
-%hr
+%hr.twhr
 
 - if @stolen_record.blank?
-  %h1.mt-4
-    Stolen record not created yet.
-  %p
+  = render(UI::Header::Component.new(text: "Stolen record not created yet.", tag: :h2))
+  %p{class: "tw:mb-4"}
     If this bike has just been marked stolen, wait a minute or two and it will be here!
 
 - elsif @bike.present? && !@current_stolen_record
-  %h2.text-warning
-    This Stolen record is not the current stolen record for the Bike!
-  %p
+  = render(UI::Header::Component.new(text: tag.span("This Stolen record is not the current stolen record for the Bike!", class: UI::Alerts::Base::Component::TEXT_CLASSES[:warning]), tag: :h2))
+  %p{class: "tw:mb-4"}
     Either you're viewing a recovered bike or there is a new stolen record.
-  %h4
-    = link_to "View the current stolen record", edit_admin_stolen_bike_url(@bike.id)
-  %p.text-danger.mt-4
+  = render(UI::Header::Component.new(text: link_to("View the current stolen record", edit_admin_stolen_bike_url(@bike.id), class: "twlink"), tag: :h3))
+  %p{class: "tw:mt-6 tw:mb-4 #{UI::Alerts::Base::Component::TEXT_CLASSES[:error]}"}
     You Probably don't want to do anything on this page
 
 - elsif @stolen_record.present? && !@stolen_record.approved
-  .row.mt-4.mb-4
-    .col-md-6
-      %h4
-        Stolen Record approval process
-      %ol{class: "tw:list-decimal tw:ml-4"}
+  .twwiderow{class: "tw:my-6 tw:items-start"}
+    %div
+      = render(UI::Header::Component.new(text: "Stolen Record approval process", tag: :h3))
+      %ol{class: "tw:mb-4 tw:list-decimal tw:ml-4"}
         %li
           Delete anything that's egregiously wrong (like Motorcycles), or spam
         %li
-          #{link_to "Edit Bike", admin_bike_path(@bike)} if there is a 40 word descriptions in the "Bike Model" field and move it to the description field
+          #{link_to "Edit Bike", admin_bike_path(@bike), class: "twlink"} if there is a 40 word descriptions in the "Bike Model" field and move it to the description field
         %li
-          #{link_to "Edit Bike", admin_bike_path(@bike)} & check "Unknown Serial" if:
+          #{link_to "Edit Bike", admin_bike_path(@bike), class: "twlink"} & check "Unknown Serial" if:
           %ul{class: "tw:list-disc tw:ml-4"}
             %li
-              The serial is "idk" or other similar stupid shit (rather than <span class="less-strong">absent</span>)
+              The serial is "idk" or other similar stupid shit (rather than <span class="twless-strong">absent</span>)
             %li
-              The serial is <em>only</em> a frame numbers like <code>EN14761</code> or <code>EN14****</code>
+              The serial is <em>only</em> a frame numbers like #{render(UI::Code::Inline::Component.new(text: "EN14761"))} or #{render(UI::Code::Inline::Component.new(text: "EN14****"))}
         %li
-          #{link_to "Edit Bike", admin_bike_path(@bike, anchor: "edit-stolen-record")} and fix the stolen city name if:
+          #{link_to "Edit Bike", admin_bike_path(@bike, anchor: "edit-stolen-record"), class: "twlink"} and fix the stolen city name if:
           %ul{class: "tw:list-disc tw:ml-4"}
             %li
               City is abbreviated: e.g. "SLC" and not "Salt Lake City"
@@ -64,65 +60,54 @@
               Did the person say "I have security video" but didn't include it? Email them for it.
             %li
               Did the person say "I have photos of the thief"  - same
-          %em.less-strong
+          %em.twless-strong
             If you believe the bike is <em>Special</em>, and don't know what to do, ping Bryan with it
 
-    .col-md-6
-      .alert.alert-info
-        %h4
-          Approving will:
-        %ul.mt-0
-          %li
-            Send out a tweet
-          %li
-            The #{@bike.type} will be posted to any pertinent blogs.
-          %li
-            It <strong class="em">can NOT</strong> be effectively reversed
-        .mt-4.text-center
-          = render(UI::ButtonLink::Component.new(text: "Approve listing", href: approve_admin_stolen_bike_url(@bike), method: :post, color: :primary, size: :lg))
+    = render(UI::Alerts::Base::Component.new(kind: :notice, header: "Approving will:")) do
+      %ul
+        %li
+          Send out a tweet
+        %li
+          The #{@bike.type} will be posted to any pertinent blogs.
+        %li
+          It <strong class="tw:italic">can NOT</strong> be effectively reversed
+      %div{class: "tw:mt-6 tw:text-center"}
+        = render(UI::ButtonLink::Component.new(text: "Approve listing", href: approve_admin_stolen_bike_url(@bike), method: :post, color: :primary, size: :lg))
 
 - social_posts = @stolen_record&.social_posts
-%h3.mt-4 Posts
+= render(UI::Header::Component.new(text: "Posts", tag: :h3))
 - if social_posts&.any?
   = render partial: "/admin/social_posts/table", locals: { social_posts: social_posts, render_sortable: false, skip_stolen_record: true }
 
-%hr.mt-4.mb-4
+%hr.twhr{class: "tw:my-6"}
 
 - if @customer_contact.present?
   = form_for [:admin, @customer_contact] do |f|
-    %h4#contact-owner
-      Send bike owner an email
+    #contact-owner
+      = render(UI::Header::Component.new(text: "Send bike owner an email", tag: :h3))
 
     - if @customer_contact.errors.any?
       = render(UI::Alerts::ObjectError::Component.new(object: @customer_contact))
-    .row
-      .col-lg-4
-        .row
-          .form-group.col-sm-6
-            = f.label :creator_email
-            = f.email_field :creator_email, value: current_user.email, class: "form-control"
-          .form-group.col-md-6
-            = f.label :user_email
-            = f.email_field :user_email, value: @bike.owner_email, class: "form-control"
-          .form-group.col-12
-            = f.label :bike, "Your stolen bike"
-            = f.text_field :title, value: "Your stolen #{@bike.title_string}", class: "form-control"
-            = f.hidden_field :kind, value: 'stolen_contact'
-            = f.hidden_field :creator_id, value: current_user.id
-            = f.hidden_field :bike_id, value: @bike.id
-      .col-lg-8
-        .form-group
-          = f.label :notification_body
-          = f.text_area :body, placeholder: "You can write HTML in here. There will be a link to the #{@bike.type} included automatically.", rows: 7, class: "form-control"
-      .col-auto.mt-auto
-        = f.submit 'Send it!', class: 'btn btn-success mb-4'
+    %div{class: "tw:grid tw:gap-x-8 tw:lg:grid-cols-12"}
+      %div{class: "tw:lg:col-span-4"}
+        .twfieldrow
+          = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :creator_email)) do
+            = render(UI::Forms::Email::Component.new(form_builder: f, attribute: :creator_email, html_options: {value: current_user.email}))
+          = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :user_email)) do
+            = render(UI::Forms::Email::Component.new(form_builder: f, attribute: :user_email, html_options: {value: @bike.owner_email}))
+        = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :title, label_text: "Your stolen bike", html_options: {value: "Your stolen #{@bike.title_string}"}))
+        = f.hidden_field :kind, value: 'stolen_contact'
+        = f.hidden_field :creator_id, value: current_user.id
+        = f.hidden_field :bike_id, value: @bike.id
+      %div{class: "tw:lg:col-span-8"}
+        = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :body, kind: :text_area, label_text: "Notification body", html_options: {placeholder: "You can write HTML in here. There will be a link to the #{@bike.type} included automatically.", rows: 7}))
+      %div{class: "tw:mt-auto"}
+        = render(UI::Button::Component.new(text: "Send it!", color: :primary, type: "submit", html_class: "tw:mb-4"))
 
-  = render(UI::ButtonLink::Component.new(text: "Delete", href: admin_bike_url(@bike), method: :delete, color: :error, confirm: "Are you sure?", html_class: "mb-4"))
+  = render(UI::ButtonLink::Component.new(text: "Delete", href: admin_bike_url(@bike), method: :delete, color: :error, confirm: "Are you sure?", html_class: "tw:mb-4"))
 
 - else
-  %h1
-    Something is broken on this page
-  %h2
-    This bike doesn't have an owner
-  %p
+  = render(UI::Header::Component.new(text: "Something is broken on this page", tag: :h2))
+  = render(UI::Header::Component.new(text: "This bike doesn't have an owner", tag: :h3))
+  %p{class: "tw:mb-4"}
     Talk to a developer

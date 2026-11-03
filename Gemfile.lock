@@ -19,6 +19,16 @@ GIT
       money (~> 6.13)
 
 GIT
+  remote: https://github.com/josefarias/hotwire_combobox.git
+  revision: a7b0c78b39000a3cd07175ad8d40ce8e7b8b4c66
+  specs:
+    hotwire_combobox (0.4.1)
+      platform_agent (>= 1.0.1)
+      rails (>= 7.0.7.2)
+      stimulus-rails (>= 1.2)
+      turbo-rails (>= 1.2)
+
+GIT
   remote: https://github.com/mailchimp/mailchimp-marketing-ruby.git
   revision: 2cd67937bff16b42d38e0b0a918b4f2014c1a98c
   specs:
@@ -379,11 +389,6 @@ GEM
       actioncable (>= 6.0.0)
       listen (>= 3.0.0)
       railties (>= 6.0.0)
-    hotwire_combobox (0.4.1)
-      platform_agent (>= 1.0.1)
-      rails (>= 7.0.7.2)
-      stimulus-rails (>= 1.2)
-      turbo-rails (>= 1.2)
     htmlbeautifier (1.4.3)
     htmlentities (4.3.4)
     http (4.4.1)
@@ -949,7 +954,7 @@ DEPENDENCIES
   herb
   honeybadger
   hotwire-livereload (~> 1.4.1)
-  hotwire_combobox
+  hotwire_combobox!
   i18n-country-translations
   i18n-js
   i18n-tasks

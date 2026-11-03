@@ -1,6 +1,6 @@
 <li
   class="
-    tw:flex-col tw:overflow-hidden tw:rounded-lg tw:border tw:border-gray-200 tw:bg-white tw:transition-all tw:duration-300 tw:hover:-translate-y-1.25 tw:hover:shadow-[0_10px_30px_rgba(44,62,80,.16)]
+    tw:flex-col tw:overflow-hidden tw:rounded-lg tw:border tw:border-gray-200 tw:bg-white
     <%= @html_class %>
   "
 >
@@ -17,7 +17,7 @@
       <%= @recovery_display.quote %>
     </blockquote>
 
-    <p class="tw:m-0 tw:text-[11.5px]">
+    <p class="tw:m-0 tw:text-[11.5px] tw:text-gray-500">
       <% if @recovery_display.quote_by.present? %>
         <strong class="tw:mr-1 tw:text-[13.5px] tw:font-extrabold tw:text-slate-900">
           <%= @recovery_display.quote_by %>

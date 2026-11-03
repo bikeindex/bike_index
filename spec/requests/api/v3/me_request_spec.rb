@@ -183,6 +183,18 @@ RSpec.describe "Me API V3", type: :request do
       end
     end
 
+    context "with impounded bike" do
+      let!(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user:) }
+      before { FactoryBot.create(:impound_record, bike:) }
+
+      it "shows the owner the serial" do
+        token.update_attribute :scopes, "read_bikes"
+        get "/api/v3/me/bikes", params: {access_token: token.token}, headers: {format: :json}
+        result = json_result["bikes"].find { |b| b["id"] == bike.id }
+        expect(result).to include("status" => "found", "serial" => bike.serial_number.upcase)
+      end
+    end
+
     it "403s if read_bikes_spec isn't in token" do
       get "/api/v3/me/bikes", params: {access_token: token.token}, headers: {format: :json}
       expect(response.response_code).to eq(403)

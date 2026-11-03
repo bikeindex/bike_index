@@ -3,7 +3,8 @@ import { Controller } from '@hotwired/stimulus'
 const SUPPORTS_INVOKERS = 'commandForElement' in window.HTMLButtonElement.prototype
 
 // Connects to data-controller="ui--modal"
-// The open state persists to the URL query (?modal_<id>=1) so the modal survives a reload.
+// The open state persists to the URL query (?modal_<id>=1) so the modal survives a reload, in a
+// history entry of its own so Back closes the modal rather than leaving the page.
 // Triggers carry command/commandfor too, so a browser with invoker commands opens the dialog
 // itself rather than waiting for this lazy loaded controller, which may not have arrived when
 // the click lands. Without them the controller stands in for the browser.
@@ -72,10 +73,30 @@ export default class extends Controller {
     this.persist(false)
   }
 
-  backdropClick (event) {
-    if (event.target === this.element) {
+  // A submit's referer is often where its response redirects, which mustn't reopen the modal
+  submitted () {
+    this.persist(false)
+  }
+
+  // Back and Forward stepping across the entry that opening pushed. Turbo restamps an entry
+  // stepped onto without its state, so a reopened one is marked as this modal's again
+  popped () {
+    if (this.element.open && !this.paramInUrl) {
       this.close()
+    } else if (!this.element.open && this.paramInUrl) {
+      window.history.replaceState({ modal: this.element.id }, '', window.location.href)
+      this.showDialog()
     }
+  }
+
+  // Only a press that started on the backdrop closes - a text selection dragged out of the
+  // dialog ends in a click on the dialog itself too
+  pressed (event) {
+    this.pressedBackdrop = event.target === this.element
+  }
+
+  backdropClick (event) {
+    if (event.target === this.element && this.pressedBackdrop) this.close()
   }
 
   // data-active, not an `active` class: that's what the is-active variant matches
@@ -96,15 +117,27 @@ export default class extends Controller {
     return new URLSearchParams(window.location.search).has(this.param)
   }
 
+  // Opening pushes an entry of its own, so Back closes the modal. The entry under it loses Turbo's
+  // state, which Turbo would take a step back onto for a visit, re-rendering the page. Any other
+  // close only drops the param - stepping back itself would race whatever the close led to, and
+  // abort it - and reopening reuses the entry
   persist (open) {
-    const url = new URL(window.location)
-    if (open) {
-      url.searchParams.set(this.param, '1')
-    } else {
-      url.searchParams.delete(this.param)
+    if (window.history.state?.modal === this.element.id) {
+      window.history.replaceState(window.history.state, '', this.urlWithParam(open))
+    } else if (open) {
+      const { turbo, ...state } = window.history.state || {}
+      window.history.replaceState(state, '', this.urlWithParam(false))
+      window.history.pushState({ modal: this.element.id }, '', this.urlWithParam(true))
+    } else if (this.paramInUrl) {
+      window.history.replaceState(window.history.state, '', this.urlWithParam(false))
     }
-    // replaceState (not pushState) so opening doesn't stack history entries.
-    window.history.replaceState(window.history.state, '', url)
+  }
+
+  urlWithParam (present) {
+    const url = new URL(window.location)
+    if (present) url.searchParams.set(this.param, '1')
+    else url.searchParams.delete(this.param)
+    return url
   }
 
   // Every button aimed at this dialog, open and close alike

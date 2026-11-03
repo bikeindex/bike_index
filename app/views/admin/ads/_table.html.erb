@@ -12,12 +12,10 @@
   <% end %>
 
   <% table.column(label: "Text", classes: "tw:w-1/4") do |ad| %>
-    <h3>
-      <%= link_to ad.title, edit_admin_ad_url(ad), class: "text-dark" %>
-    </h3>
+    <%= render(UI::Header::Component.new(text: link_to(ad.title, edit_admin_ad_url(ad), class: "tw:twtext-color"), tag: :h2)) %>
 
-    <p>
-      <%= link_to ad.body, edit_admin_ad_url(ad), class: "text-dark" %>
+    <p class="tw:mb-4">
+      <%= link_to ad.body, edit_admin_ad_url(ad), class: "tw:twtext-color" %>
     </p>
   <% end %>
 

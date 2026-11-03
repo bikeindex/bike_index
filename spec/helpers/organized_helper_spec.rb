@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe OrganizedHelper, type: :helper do
   describe "organized bike display" do
     let(:bike) { FactoryBot.create(:bike_organized) }
-    let(:target_prefix) { "<span>#{bike.frame_colors.first} <strong>#{bike.mnfg_name}</strong>, <small class=\"less-strong\">" }
+    let(:target_prefix) { "<span>#{bike.frame_colors.first} <strong>#{bike.mnfg_name}</strong>, <small class=\"twless-strong\">" }
     it "renders" do
       expect(organized_bike_text).to be_nil
       result = organized_bike_text(bike)
@@ -18,13 +18,13 @@ RSpec.describe OrganizedHelper, type: :helper do
         result = organized_bike_text(bike)
         expect(result).to start_with "<span>#{bike.frame_colors.first} <strong>#{bike.mnfg_name}</strong><small> cargo bike</small> "
         expect(result).to include("Unregistered")
-        expect(result).not_to include("less-strong")
+        expect(result).not_to include("twless-strong")
       end
     end
     context "deleted" do
       let!(:bike) { FactoryBot.create(:bike, deleted_at: Time.current) }
       let(:target_text) do
-        "<span>#{bike.frame_colors.first} <strong>#{bike.mnfg_name}</strong><em class=\"small text-danger\"> removed from Bike Index</em></span>"
+        "<span>#{bike.frame_colors.first} <strong>#{bike.mnfg_name}</strong><em class=\"tw:text-sm #{UI::Alerts::Base::Component::TEXT_CLASSES[:error]}\"> removed from Bike Index</em></span>"
       end
       it "renders with deleted" do
         expect(bike.deleted?).to be_truthy
@@ -34,21 +34,23 @@ RSpec.describe OrganizedHelper, type: :helper do
   end
 
   describe "status_display" do
-    it "renders text-success" do
-      expect(status_display("current")).to eq "<span class=\"text-success\">current</span>"
-      expect(status_display("Current")).to eq "<span class=\"text-success\">Current</span>"
-      expect(status_display_class("Current")).to eq "text-success"
+    let(:text_classes) { UI::Alerts::Base::Component::TEXT_CLASSES }
+
+    it "renders success" do
+      expect(status_display("current")).to eq "<span class=\"#{text_classes[:success]}\">current</span>"
+      expect(status_display("Current")).to eq "<span class=\"#{text_classes[:success]}\">Current</span>"
+      expect(status_display_class("Current")).to eq text_classes[:success]
     end
-    it "renders text-warning" do
-      expect(status_display("stolen")).to eq "<span class=\"text-warning\">stolen</span>"
-      expect(status_display("uncertified_by_trusted_org")).to eq "<span class=\"text-warning\">uncertified by trusted org</span>"
+    it "renders warning" do
+      expect(status_display("stolen")).to eq "<span class=\"#{text_classes[:warning]}\">stolen</span>"
+      expect(status_display("uncertified_by_trusted_org")).to eq "<span class=\"#{text_classes[:warning]}\">uncertified by trusted org</span>"
     end
-    context "text-info" do
+    context "notice" do
       it "is expected" do
-        expect(status_display("retrieved_by_owner")).to eq "<span class=\"text-info\">retrieved by owner</span>"
-        expect(status_display("Retrieved")).to eq "<span class=\"text-info\">Retrieved</span>"
-        expect(status_display("resolved_otherwise")).to eq "<span class=\"text-info\">resolved</span>"
-        expect(status_display("certified_by_trusted_org")).to eq "<span class=\"text-info\">certified by trusted org</span>"
+        expect(status_display("retrieved_by_owner")).to eq "<span class=\"#{text_classes[:notice]}\">retrieved by owner</span>"
+        expect(status_display("Retrieved")).to eq "<span class=\"#{text_classes[:notice]}\">Retrieved</span>"
+        expect(status_display("resolved_otherwise")).to eq "<span class=\"#{text_classes[:notice]}\">resolved</span>"
+        expect(status_display("certified_by_trusted_org")).to eq "<span class=\"#{text_classes[:notice]}\">certified by trusted org</span>"
       end
     end
     context "removed_from_bike_index, trashed or Removed from Bike Index" do
@@ -68,18 +70,18 @@ RSpec.describe OrganizedHelper, type: :helper do
     context "impound_claim" do
       let(:error_class) { UI::Alerts::Base::Component::TEXT_CLASSES[:error] }
       it "info for approved, red for denied" do
-        expect(status_display("approved")).to eq "<span class=\"text-info\">approved</span>"
-        expect(status_display("claim_approved")).to eq "<span class=\"text-info\">claim approved</span>"
+        expect(status_display("approved")).to eq "<span class=\"#{text_classes[:notice]}\">approved</span>"
+        expect(status_display("claim_approved")).to eq "<span class=\"#{text_classes[:notice]}\">claim approved</span>"
         expect(status_display("denied")).to eq "<span class=\"#{error_class}\">denied</span>"
         expect(status_display("claim_denied")).to eq "<span class=\"#{error_class}\">claim denied</span>"
       end
     end
     context "graduated_notification" do
       it "info for approved, red for denied" do
-        expect(status_display("remains registered")).to eq "<span class=\"less-strong\">remains registered</span>"
-        expect(status_display("REMAINS registered")).to eq "<span class=\"less-strong\">REMAINS registered</span>"
-        expect(status_display("bike Graduated")).to eq "<span class=\"text-info\">bike Graduated</span>"
-        expect(status_display_class("bike Graduated")).to eq "text-info"
+        expect(status_display("remains registered")).to eq "<span class=\"twless-strong\">remains registered</span>"
+        expect(status_display("REMAINS registered")).to eq "<span class=\"twless-strong\">REMAINS registered</span>"
+        expect(status_display("bike Graduated")).to eq "<span class=\"#{text_classes[:notice]}\">bike Graduated</span>"
+        expect(status_display_class("bike Graduated")).to eq text_classes[:notice]
       end
     end
   end

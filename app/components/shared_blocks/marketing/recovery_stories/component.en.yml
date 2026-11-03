@@ -1,0 +1,10 @@
+---
+en:
+  components:
+    shared_blocks:
+      marketing:
+        recovery_stories:
+          no_recoveries: There are no recoveries
+          read_more_recovery_stories: Read more recovery stories
+          reported_by_owners: Every recovery is reported by the person who got their
+            bike back.

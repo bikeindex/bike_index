@@ -32,6 +32,18 @@ RSpec.describe IpSpoofAttackFilter, type: :request do
       expect(response.media_type).to eq("application/json")
     end
 
+    it "instruments the request as 403, so the request log doesn't report a 500" do
+      statuses = []
+      callback = ->(*, payload) { statuses << payload[:status] }
+      ActiveSupport::Notifications.subscribed(callback, "process_action.action_controller") do
+        get "/", headers: spoofed_headers
+        get "/404", headers: spoofed_headers
+      end
+
+      expect(response.status).to eq(403)
+      expect(statuses).to eq([403, 403])
+    end
+
     context "with a matching HTTP_FORWARDED header" do
       let(:spoofed_headers) do
         super().merge("HTTP_FORWARDED" => "for=211.112.215.202, for=109.123.246.221, for=172.71.131.189")

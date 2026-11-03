@@ -11,12 +11,12 @@
 @source "../../javascript";
 @source "../../../public/*.html";
 @import "./combobox.css";
-@import "./json_display.css";
+@import "./code_json.css";
 @import "./lexxy_overrides.css";
 
 /* Class-based dark mode (the legacy config's darkMode: 'selector'); a `.dark`
- * ancestor activates tw:dark:* utilities. */
-@custom-variant dark (&:where(.dark, .dark *));
+ * ancestor activates tw:dark:* utilities. An `.inverted` ancestor flips it. */
+@custom-variant dark (&:where(:where(.dark, .dark *):not(:where(.inverted, .inverted *)), :where(.inverted, .inverted *):not(:where(.dark, .dark *))));
 
 /* Below anything holding the org registrations search's checked search_all: the owner email
  * field and the chart card fold away on it */
@@ -24,6 +24,9 @@
 
 /* /bikebook reads lengths, weights and speeds in imperial units below an `.imperial` ancestor */
 @custom-variant imperial (&:where(.imperial, .imperial *));
+
+/* /bikebook with its similar models open */
+@custom-variant similar-open (&:where(:has(#similar-toggle[aria-expanded=true]) *));
 
 /* The selected/pressed state of a button, link or menu item, however it's flagged —
  * including a <label> around a checked radio (UI::Forms::RadioButtonGroup).
@@ -154,11 +157,24 @@
   .ui-table-bordered thead tr th:last-child {
     @apply tw:ui-table-bordered-th-last;
   }
+  /* A table with no thead, as UI::TableList is, draws its top edge on its first row */
+  .ui-table-bordered tbody:first-child tr:first-child :is(td, th) {
+    @apply tw:border-t;
+  }
+  .ui-table tbody:first-child tr:first-child :is(td, th):first-child {
+    @apply tw:rounded-tl-sm;
+  }
+  .ui-table tbody:first-child tr:first-child :is(td, th):last-child {
+    @apply tw:rounded-tr-sm;
+  }
   /* A 🔎 or tooltip "?" stays on the line of what it follows. Only the whole cell
      works: Chromium still breaks after a preceding element that wraps. A .keep-together
      already holds it with its last word, so the rest of the cell can wrap */
   .ui-table td:has(.keep-with-previous:not(.keep-together *)) {
     @apply tw:whitespace-nowrap;
+  }
+  .table_cell_check {
+    @apply tw:font-mono tw:text-center tw:font-bold;
   }
 }
 
@@ -189,7 +205,7 @@
 }
 
 body {
-  @apply tw:base-font tw:dark:bg-gray-900;
+  @apply tw:base-font tw:dark:bg-gray-900 tw:dark:scheme-dark;
 
   /* .primary-header-nav's margin-bottom, which the full-bleed pages pull up by to sit
      flush under the navbar. Defined here rather than beside the nav in revised.scss,

@@ -39,7 +39,7 @@ RSpec.describe UserRegistrationOrganization, type: :model do
         phone: "1112224444",
         student_id: "XXZZUUU",
         organization_affiliation: "community_member"
-      ).merge(default_location_registration_address).as_json
+      ).merge(default_location_registration_info).as_json
     end
     let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: user, creation_registration_info: ownership_registration_info) }
     let(:target_universal_info) do
