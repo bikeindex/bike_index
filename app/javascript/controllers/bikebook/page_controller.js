@@ -205,10 +205,14 @@ export default class extends Controller {
     if (render !== this.#renders) return
     if (rendered instanceof Error) return this.#fail(rendered)
 
+    const rows = () => [...this.pageTarget.querySelectorAll('[data-keep-scroll]')]
+    const rowScrolls = new Map(rows().filter((row) => row.scrollLeft).map((row) => [row.dataset.keepScroll, row.scrollLeft]))
     // what turbo:before-render is to a Turbo page, which an open combobox dialog closes on
     this.dispatch('before-render')
     const active = this.pageTarget.contains(document.activeElement) && document.activeElement.id ? document.activeElement : null
     this.pageTarget.replaceChildren(keepPermanent(rendered.content, this.pageTarget))
+    // once their controllers have opened them, as a hidden row can't scroll
+    if (rowScrolls.size) requestAnimationFrame(() => rows().forEach((row) => { row.scrollLeft = rowScrolls.get(row.dataset.keepScroll) ?? 0 }))
     if (reveal) {
       const search = this.pageTarget.querySelector('[data-controller~="bikebook--catalog-filters"]')
       search.classList.add('tw:hidden')
