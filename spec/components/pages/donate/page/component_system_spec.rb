@@ -40,5 +40,37 @@ RSpec.describe Pages::Donate::Page::Component, :js, type: :system do
     expect(page).to have_button("Donate $1,000", count: 2)
     expect(page).to have_field("Other amount", with: "1000")
     expect(page).to have_css("a[data-amount='1000'][data-active='true']")
+    expect(page).to have_current_path("/rails/view_components/pages/donate/page/component/default")
+  end
+
+  context "before donate--form's module has loaded" do
+    def wait_for_donate_page_controller
+      wait_for do
+        page.evaluate_script(<<~JS)
+          (() => {
+            const element = document.querySelector('[data-controller~="donate--page"]')
+            return !!(element && window.Stimulus?.getControllerForElementAndIdentifier(element, "donate--page"))
+          })()
+        JS
+      end
+    end
+
+    it "lets a major gift card follow its link, and the closing CTA go to the form" do
+      hold = hold_requests("**/controllers/donate/form_controller*")
+      visit "/rails/view_components/pages/donate/page/component/default"
+      wait_for_donate_page_controller
+
+      find("a[data-amount='1000']").click
+      expect(page).to have_current_path("/donate?initial_amount=1000")
+      expect(page).to have_css("a[data-amount='1000'][data-active='true']")
+      wait_for_donate_page_controller
+
+      page.execute_script("window.scrollTo(0, document.body.scrollHeight)")
+      page.all(:button, "Donate $1,000").last.click
+      wait_for { page.evaluate_script("Math.abs(document.getElementById('donate-form').getBoundingClientRect().top) < 100") }
+      expect(page).to have_current_path("/donate?initial_amount=1000")
+
+      hold.release
+    end
   end
 end
