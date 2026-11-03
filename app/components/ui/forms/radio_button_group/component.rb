@@ -22,6 +22,7 @@ module UI
         # html_options go on each radio
         def initialize(name:, entries:, selected: nil, full_width: false, kind: :button, html_options: {})
           @group_classes = UI::ButtonGroup::Component.group_classes(kind:, full_width:)
+          @group_data = UI::ButtonGroup::Component.group_data(kind:)
           @label_classes = (kind == :toggle) ? SEGMENT_CLASSES : CHIP_CLASSES
           @name = name
           @entries = entries
@@ -30,7 +31,7 @@ module UI
         end
 
         def call
-          tag.div(class: @group_classes) do
+          tag.div(class: @group_classes, data: @group_data) do
             safe_join(@entries.map { |option| chip(option) })
           end
         end

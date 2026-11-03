@@ -1,6 +1,8 @@
 - if @bike.present?
   = render Pages::Admin::Bikes::Header::Component.new(bike: @bike, active: :recovery_displays, display_recovery: true, user: current_user, display_dev_info: display_dev_info?)
-  = render(Pages::Admin::Headers::Section::Component.new(title: "Recovery displays", count: @pagy.count))
+  = render(UI::Header::Component.new(tag: :h2)) do
+    Recovery displays
+    = render(Pages::Admin::Headers::Count::Component.new(count: @pagy.count))
   = render partial: "table", locals: {collection: @recovery_displays}
 
 - else

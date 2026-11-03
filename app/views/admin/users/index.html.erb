@@ -92,7 +92,7 @@
   <%= render Pages::Admin::Users::Table::Component.new(users: @collection, sort_state:, render_sortable: true, render_deleted: @deleted) %>
 
   <% unless @collection.present? %>
-    <%= render(Pages::Admin::Headers::Section::Component.new(title: "No users found!")) %>
+    <%= render(UI::Header::Component.new(text: "No users found!", tag: :h2)) %>
   <% end %>
 <% end %>
 
