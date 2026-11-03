@@ -2260,15 +2260,27 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(page).to have_css("a:focus", text: "Components")
   end
 
-  it "keeps the picked vehicles when the index doesn't load" do
+  it "keeps the picked vehicles when the index doesn't load, whichever lands first" do
     serve_bikebook_catalog
-    held = hold_bikebook_catalog_file("index.*")
+    index = hold_bikebook_catalog_file("index.*")
+    kit = hold_bikebook_catalog_file("kit.*")
+    failed = "#vehicle-viewers > [role='status']:first-child"
+    not_found = {status: 404, headers: {"access-control-allow-origin" => "*"}, body: ""}
     visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_adv,m/specialized/2025/haul_st")
 
+    index.pop(timeout: 10).fulfill(**not_found)
+    expect(page).to have_text("The catalog didn't load. Reload the page to try again.", wait: 10)
+    kit.pop(timeout: 10).fallback
     expect(page).to have_css("#vehicle-viewers tr", wait: 10)
-    held.pop.fulfill(status: 404, headers: {"access-control-allow-origin" => "*"}, body: "")
-    failed = "#vehicle-viewers > [role='status']:first-child"
-    expect(page).to have_css(failed, text: "The catalog didn't load. Reload the page to try again.", wait: 10)
+    expect(page).to have_css(failed, text: "The catalog didn't load.")
+    expect(page).to have_field("vehicle_models", placeholder: "", disabled: true)
+
+    # reloaded as it says to, the vehicles in ahead of the failure this time
+    visit page.current_url
+    kit.pop(timeout: 10).fallback
+    expect(page).to have_css("#vehicle-viewers tr", wait: 10)
+    index.pop(timeout: 10).fulfill(**not_found)
+    expect(page).to have_css(failed, text: "The catalog didn't load.", wait: 10)
     expect(page).to have_css("#vehicle-viewers tr")
     expect(page).to have_field("vehicle_models", placeholder: "", disabled: true)
     click_link "Components"
@@ -2277,56 +2289,31 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(page).to have_field("vehicle_models", placeholder: "", disabled: true)
   end
 
-  it "keeps the canonical through the first render of compared vehicles, which adds to the URL" do
-    serve_bikebook_catalog
-    visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_adv,m/specialized/2025/haul_st")
-
-    expect(page).to have_css("[data-hw-combobox-chip]", text: "Specialized Haul ST current", wait: 10)
-    expect(page).to have_current_path(/[?&]search=1\b/)
-    expect(page).to have_css("link[rel='canonical']", visible: :all)
-  end
-
-  it "says the index didn't load above picked vehicles that arrive after it" do
-    serve_bikebook_catalog
-    index = hold_bikebook_catalog_file("index.*")
-    kit = hold_bikebook_catalog_file("kit.*")
-    visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_adv,m/specialized/2025/haul_st")
-
-    index.pop(timeout: 10).fulfill(status: 404, headers: {"access-control-allow-origin" => "*"}, body: "")
-    expect(page).to have_text("The catalog didn't load. Reload the page to try again.", wait: 10)
-    kit.pop(timeout: 10).fallback
-    expect(page).to have_css("#vehicle-viewers tr", wait: 10)
-    expect(page).to have_css("#vehicle-viewers > [role='status']:first-child", text: "The catalog didn't load.")
-    expect(page).to have_field("vehicle_models", placeholder: "", disabled: true)
-  end
-
-  it "fetches the comparison alongside the index for a page of what it adds, in its place from the start" do
+  it "holds the similar models' line until the comparison lands, which a page open on them fetches alongside the index" do
     serve_bikebook_catalog
     index = hold_bikebook_catalog_file("index.*")
     comparison = hold_bikebook_catalog_file("comparison.*")
-    visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_adv", similar: 1)
-
-    expect(page).to have_css("nav[aria-label='Views']", wait: 10)
-    held_comparison = comparison.pop(timeout: 10)
-    expect(held_comparison).to be_present
-    index.pop(timeout: 10).fallback
-    held_comparison.fallback
-    expect(page).to have_css("#similar-results", wait: 10)
-  end
-
-  it "holds the line of the similar models' toggle, so the vehicles don't jump as it lands" do
-    serve_bikebook_catalog
-    held = hold_bikebook_catalog_file("comparison.*")
     visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_adv")
 
+    expect(page).to have_css("nav[aria-label='Views']", wait: 10)
+    expect(comparison).to be_empty
+    index.pop(timeout: 10).fallback
     expect(page).to have_css("#vehicle-models-count", text: "matching", visible: :all, wait: 10)
     expect(page).to have_no_button("Compare similar bikes to Level 4 ADV")
-    tabs_top = -> { page.evaluate_script("document.querySelector(\"nav[aria-label='Views']\").getBoundingClientRect().top") }
+    tabs_top = -> { find("nav[aria-label='Views']").evaluate_script("this.getBoundingClientRect().top") }
     before = tabs_top.call
-    held.pop(timeout: 10).fallback
+    comparison.pop(timeout: 10).fallback
     expect(page).to have_css("#similar-toggle", text: "Compare similar bikes to Level 4 ADV", wait: 10)
     expect(page).to have_no_css("[data-similar-waiting]", visible: :all)
     expect(tabs_top.call).to be_within(1).of(before)
+
+    find("#similar-toggle").click
+    expect(page).to have_current_path(/[?&]similar=1\b/)
+    # reloaded open on them, the comparison asked for with the index still out
+    visit page.current_url
+    comparison.pop(timeout: 10).fallback
+    index.pop(timeout: 10).fallback
+    expect(page).to have_css("#similar-results", wait: 10)
   end
 
   it "searches ahead of the comparison, leaving what's typed as it adds the similar models" do
@@ -2337,6 +2324,9 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(page).to have_css("#vehicle-models-count", text: "matching", wait: 10)
     expect(page).to have_no_css("#vehicle_models[disabled]")
     expect(page).to have_no_button("Compare similar bikes to Level 4 ADV")
+    # the first render adds to the URL, and crawlers see it
+    expect(page).to have_current_path(/[?&]search=1\b/)
+    expect(page).to have_css("link[rel='canonical']", visible: :all)
     type_into(find_field("vehicle_models"), "Soltera")
     expect(page).to have_field("vehicle_models", with: /\ASoltera/)
 
