@@ -162,13 +162,13 @@
   <%= render(SharedBlocks::Marketing::CallToActionBanner::Component.new(heading: translation(".cta_headline"),
     subheading: translation(".cta_sub"))) do %>
     <%= render UI::Button::Component.new(
-      text: submit_label,
+      text: @form.submit_label,
       color: :yellow,
       size: :callout,
       html_class: "tw:w-full tw:md:w-auto tw:max-md:px-4! tw:max-xs:text-xs!",
       data: {
         donate__page_target: "submit",
-        action: "donate--page#submitActive"
+        action: "donate--page#submit"
       }
     ) %>
   <% end %>

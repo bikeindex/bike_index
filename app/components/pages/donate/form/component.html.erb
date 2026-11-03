@@ -1,4 +1,4 @@
-<% ink = "tw:text-[#2c3e50] tw:dark:text-gray-100" %>
+<% ink = "tw:text-slate-900 tw:dark:text-gray-100" %>
 <% muted = "tw:text-[#666] tw:dark:text-gray-400" %>
 <% card = "tw:rounded-lg tw:border tw:border-[#e0e0e0] tw:bg-white tw:dark:border-gray-700 tw:dark:bg-gray-800" %>
 <% selectable = "tw:transition-colors tw:hover:border-[#a9d2f0] tw:is-active:border-blue-600 tw:is-active:ring-1 tw:is-active:ring-blue-600" %>
@@ -197,7 +197,7 @@
     <%= submit_button.(one_time_submit) %>
   <% end %>
 
-  <p class="tw:mb-0 tw:text-[13.5px] <%= muted %>">
+  <p class="tw:mb-0 tw:text-xs <%= muted %>">
     <span class="tw:lg:hidden"><%= translation(".fine_print_short") %></span>
     <span class="tw:hidden tw:lg:inline"><%= translation(".fine_print") %></span>
   </p>
