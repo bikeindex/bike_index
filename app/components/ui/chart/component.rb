@@ -39,12 +39,12 @@ module UI
 
       # Filled in by ui--chart, since a series from a path has no totals until it's fetched
       def legend
-        item = safe_join([tag.span(class: "tw:size-3 tw:border"), tag.span, " ", tag.span(class: "twless-strong tw:-ml-0.5 tw:text-xs")])
-        safe_join([
+        item = safe_join([render(UI::ColorSwatch::Component.new(size: :sm)), tag.span, " ", tag.span(class: "twless-strong tw:-ml-0.5 tw:text-xs")])
+        [
           tag.div(class: class_names("tw:flex tw:shrink-0 tw:flex-wrap tw:justify-center tw:gap-x-5 tw:gap-y-1 tw:py-1",
-            "tw:order-1": library_legend&.dig(:position) == "bottom"), data: {chart_legend: true}),
+            "tw:order-1": library_legend&.dig(:position) == "bottom"), data: {chart_legend: true, prefix: @prefix, round: @round}),
           tag.template(render(UI::Button::Component.new(text: item, color: :link_gray, html_class: "tw:text-sm tw:font-normal tw:no-underline")))
-        ])
+        ]
       end
 
       # A pie's legend names its slices, so it keeps one
@@ -76,12 +76,7 @@ module UI
       # fresh one - so two on a page would both be chart-1, and draw into the first
       def chart_options
         {id: "chart-#{SecureRandom.hex(4)}", thousands: ",", colors: chart_colors, stacked: @stacked,
-         prefix: @prefix, round: @round, height: @height, legend: false, library: chart_library}.compact
-      end
-
-      # false is how Chart.js turns a plugin off
-      def chart_library
-        {plugins: {htmlLegend: legend? && {prefix: @prefix, round: @round}.compact}}.deep_merge(@library.to_h)
+         prefix: @prefix, round: @round, height: @height, legend: false, library: @library}.compact
       end
 
       # Chartkick paints single-series column bars per-color from a flat array;

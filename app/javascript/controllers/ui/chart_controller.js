@@ -3,22 +3,25 @@ import { Controller } from '@hotwired/stimulus'
 // Chart.js draws its own legend in one font, which can't make a total smaller than its name
 const htmlLegend = {
   id: 'htmlLegend',
-  afterUpdate (chart, _args, { prefix = '', round }) {
+  afterUpdate (chart, { mode }) {
     const wrapper = chart.canvas.closest('[data-controller~="ui--chart"]')
     const legend = wrapper.querySelector('[data-chart-legend]')
-    const { labels, onClick } = chart.options.plugins.legend
+    if (!legend || mode === 'resize') return
 
-    legend.replaceChildren(...labels.generateLabels(chart).map((item, position) => {
-      const button = wrapper.querySelector('template').content.firstElementChild.cloneNode(true)
+    const { legendItems, options: { onClick } } = chart.legend
+    const { prefix = '', round } = legend.dataset
+    const template = wrapper.querySelector('template').content.firstElementChild
+    const number = new Intl.NumberFormat('en-US', { minimumFractionDigits: round, maximumFractionDigits: round })
+
+    legend.replaceChildren(...legendItems.map((item, position) => {
+      const button = template.cloneNode(true)
       const [swatch, name, count] = button.children
-      const total = legendItemTotal(chart, item)
-      const digits = { minimumFractionDigits: round, maximumFractionDigits: round }
 
       swatch.style.backgroundColor = item.fillStyle
       swatch.style.borderColor = item.strokeStyle
       name.textContent = item.text
       name.classList.toggle('tw:line-through', item.hidden)
-      count.textContent = `(${prefix}${total.toLocaleString('en-US', digits)})`
+      count.textContent = `(${prefix}${number.format(legendItemTotal(chart, item))})`
       button.setAttribute('aria-pressed', !item.hidden)
       button.addEventListener('click', (event) => {
         onClick.call(chart.legend, event, item, chart.legend)

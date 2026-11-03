@@ -10,7 +10,6 @@ RSpec.describe UI::Chart::Component, type: :component do
     rendered = render_inline(instance)
     script_content = rendered.css("script").text
     described_class::COLORS.each { |color| expect(script_content).to include(color) }
-    expect(script_content).to include('"htmlLegend":false')
     expect(rendered.css("[data-chart-legend]")).to be_blank
 
     rerendered = render_inline(described_class.new(series: [{name: "Test", data: {}}], time_range:))
@@ -19,7 +18,6 @@ RSpec.describe UI::Chart::Component, type: :component do
     # Several series keep the legend that tells them apart
     several = render_inline(described_class.new(series: [{name: "A", data: {}}, {name: "B", data: {}}]))
     expect(several.css("[data-chart-legend]")).to be_present
-    expect(several.css("script").text).to include('"htmlLegend":{}')
   end
 
   describe "library" do
@@ -31,7 +29,6 @@ RSpec.describe UI::Chart::Component, type: :component do
 
       off = render_inline(described_class.new(series:, kind: :pie, library: {plugins: {legend: false}}))
       expect(off.css("[data-chart-legend]")).to be_blank
-      expect(off.css("script").text).to include('"htmlLegend":false')
     end
   end
 
