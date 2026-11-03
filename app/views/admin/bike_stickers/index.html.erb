@@ -47,7 +47,9 @@
         <% if duplicated.any? %>
           <ul class="tw:mb-4">
             <% duplicated.each do |int| %>
-              <li class="tw:text-sm"><code class="twcode"><%= int %></code></li>
+              <li>
+                <%= render(UI::Code::Inline::Component.new(text: int)) %>
+              </li>
             <% end %>
           </ul>
         <% else %>

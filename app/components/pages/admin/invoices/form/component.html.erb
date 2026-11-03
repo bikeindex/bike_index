@@ -15,7 +15,7 @@
           <%= link_to organization_feature.name, edit_admin_organization_feature_url(organization_feature), class: "twlink" %>
 
           <% if organization_feature.feature_slugs.any? %>
-            <code class="twcode only-dev-visible tw:text-xs"><%= organization_feature.feature_slugs.join(" ") %></code>
+            <span class="only-dev-visible"><%= render(UI::Code::Inline::Component.new(text: organization_feature.feature_slugs.join(" "), small: true)) %></span>
           <% end %>
         <% end %>
 
@@ -107,7 +107,7 @@
 
           <% group.with_helper_text do %>
             <em>available features in current invoice:</em>
-            <%= safe_join(@invoice.feature_slugs.map { |slug| content_tag(:code, slug, class: "twcode") }, ", ") %>
+            <%= safe_join(@invoice.feature_slugs.map { |slug| render(UI::Code::Inline::Component.new(text: slug)) }, ", ") %>
           <% end %>
         <% end %>
       </div>

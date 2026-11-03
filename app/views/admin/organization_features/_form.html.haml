@@ -12,7 +12,7 @@
       %div{ class: "tw:bg-white tw:dark:bg-gray-800" }
         %small.twless-strong{class: "tw:p-1"}
           Permitted slugs:
-          = safe_join(OrganizationFeature::EXPECTED_SLUGS.sort.map { |slug| content_tag(:code, slug, class: "twcode") }, ", ")
+          = safe_join(OrganizationFeature::EXPECTED_SLUGS.sort.map { |slug| render(UI::Code::Inline::Component.new(text: slug, small: true)) }, ", ")
   .twfieldrow{class: "tw:mt-2"}
     = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :amount)) do
       %div{class: "tw:flex tw:gap-2"}

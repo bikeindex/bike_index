@@ -17,8 +17,8 @@
       <% if @suggested_button_hover.present? %>
         <%= render(UI::Alerts::Base::Component.new(kind: :notice, margin_classes: "tw:mt-2")) do %>
           The register frame names a button color but no hover color. Add
-          <code class="twcode"><%= hover_param %></code> to its src to set the
-          shade it currently derives.
+          <%= render(UI::Code::Inline::Component.new(text: hover_param)) %> to
+          its src to set the shade it currently derives.
         <% end %>
       <% end %>
     </div>
