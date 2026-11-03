@@ -1,6 +1,6 @@
 <div class="twwiderow tw:items-start">
   <%= render(UI::TableList::Component.new) do |list| %>
-    <% list.with_row(label: "ID", value: tag.code(@user.id, class: "twcode"), class: "only-dev-visible") %>
+    <% list.with_row(label: "ID", value: render(UI::Code::Inline::Component.new(text: @user.id)), class: "only-dev-visible") %>
     <% list.with_row(label: "Icons", value: render(Atoms::Admin::Badges::User::Component.new(user: @user, full_text: true))) %>
     <% list.with_row(label: "Created", value: render(UI::Time::Component.new(time: @user.created_at, format: :localize_time_precise))) %>
     <% list.with_row(label: "Updated", value: render(UI::Time::Component.new(time: @user.updated_at, format: :localize_time_precise))) %>
@@ -61,7 +61,10 @@
       <div class="tw:grid tw:grid-cols-3 tw:gap-x-8">
         <div>
           <small
-            class="tw:block tw:border-b tw:border-gray-200"
+            class="
+              tw:block tw:border-b tw:border-gray-200
+              tw:dark:border-gray-700
+            "
             title="Receive Bike Index newsletters"
           >
             Newsletters
@@ -76,7 +79,10 @@
 
         <div>
           <small
-            class="tw:block tw:border-b tw:border-gray-200"
+            class="
+              tw:block tw:border-b tw:border-gray-200
+              tw:dark:border-gray-700
+            "
             title="Receive non-stolen theft emails"
           >
             Unstolen
@@ -91,7 +97,10 @@
 
         <div>
           <small
-            class="tw:block tw:border-b tw:border-gray-200"
+            class="
+              tw:block tw:border-b tw:border-gray-200
+              tw:dark:border-gray-700
+            "
             title="No non theft emails"
           >
             NONE

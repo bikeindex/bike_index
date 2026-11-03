@@ -1,15 +1,3 @@
-<% nav_header_list_items = capture do %>
-  <li>
-    <%= render(UI::ButtonLink::Component.new(text: "New batch", href: new_admin_bike_sticker_path, color: :primary, size: :sm)) %>
-  </li>
-
-  <li>
-    <small>
-      <%= render(UI::ButtonLink::Component.new(text: "reassign", href: reassign_admin_bike_stickers_path, color: :link, html_class: "twless-strong")) %>
-    </small>
-  </li>
-<% end %>
-
 <% admin_search_form = capture do %>
   <div class="tw:mt-6">
     <% unless @bike_sticker_batch.present? %>
@@ -47,7 +35,9 @@
         <% if duplicated.any? %>
           <ul class="tw:mb-4">
             <% duplicated.each do |int| %>
-              <li class="tw:text-sm"><code class="twcode"><%= int %></code></li>
+              <li>
+                <%= render(UI::Code::Inline::Component.new(text: int)) %>
+              </li>
             <% end %>
           </ul>
         <% else %>
@@ -135,7 +125,14 @@
   collection: @bike_stickers,
   viewing: "Stickers",
   chart_collection: @render_chart && matching_bike_stickers,
-  nav_header_list_items:,
   admin_search_form:,
   table_view:,
-)) %>
+)) do |skeleton| %>
+  <% skeleton.with_nav_item { render(UI::ButtonLink::Component.new(text: "New batch", href: new_admin_bike_sticker_path, color: :primary, size: :sm)) } %>
+
+  <% skeleton.with_nav_item do %>
+    <small>
+      <%= render(UI::ButtonLink::Component.new(text: "reassign", href: reassign_admin_bike_stickers_path, color: :link, html_class: "twless-strong")) %>
+    </small>
+  <% end %>
+<% end %>

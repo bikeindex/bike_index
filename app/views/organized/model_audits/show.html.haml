@@ -25,10 +25,9 @@
       - list.with_row(label: "Certification", value: tag.span(@organization_model_audit&.certification_status_humanized, class: status_display_class(@model_audit.certification_status)))
       - list.with_row(label: "IDs", dev_only: true, if: display_dev_info?) do
         Org Model Audit ID
-        %code.mr-2= @organization_model_audit&.id
+        %span.mr-2= render(UI::Code::Inline::Component.new(text: @organization_model_audit&.id))
         Model Audit ID
-        %code
-          = link_to @model_audit&.id, admin_bikes_path(search_model_audit_id: @model_audit&.id)
+        = render(UI::Code::Inline::Component.new(text: link_to(@model_audit&.id, admin_bikes_path(search_model_audit_id: @model_audit&.id))))
 
 = render(UI::Header::Component.new(tag: :h2, html_class: "uncap mt-4")) do
   Attestations
@@ -60,7 +59,7 @@
             %span.localizeTime.preciseTime
               = l(model_attestation.created_at, format: :convert_time)
             - if display_dev_info?
-              %code.only-dev-visible= model_attestation.id
+              %span.only-dev-visible= render(UI::Code::Inline::Component.new(text: model_attestation.id))
           %td
             %span{class: status_display_class(model_attestation.kind)}
               = model_attestation.kind_humanized

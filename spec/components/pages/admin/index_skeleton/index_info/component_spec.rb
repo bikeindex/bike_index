@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Pages::Admin::Headers::IndexInfo::Component, type: :component do
+RSpec.describe Pages::Admin::IndexSkeleton::IndexInfo::Component, type: :component do
   let(:instance) { described_class.new(**options) }
   let(:component) { with_request_url("/admin") { render_inline(instance) } }
   let(:options) { {index: index_state, viewing: "Notifications"} }

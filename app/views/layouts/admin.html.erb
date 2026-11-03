@@ -24,7 +24,7 @@
     <%# = hotwire_livereload_tags if Rails.env.development? %>
   </head>
 
-  <%= body_tag(data: {turbo: true}) do %>
+  <%= body_tag(html_class: class_names(dark: current_user&.dark_mode_preview?), data: {turbo: true}) do %>
     <%= render(SharedBlocks::ReviewAppBanner::Component.from_env(current_user:, return_to: request.fullpath)) %>
 
     <%= render(Pages::Admin::Navbar::Component.new(current_user:, user_root_url:, search_filtered: admin_search_filtered?)) %>

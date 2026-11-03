@@ -6,6 +6,7 @@ import { checkbox } from 'bikebook/templates/ui/forms/checkbox'
 import { radioButtonGroup } from 'bikebook/templates/ui/forms/radio_button_group'
 import { range } from 'bikebook/templates/ui/forms/range'
 import { tooltip } from 'bikebook/templates/ui/tooltip'
+import { MODEL_CARDS_ROW_CLASSES } from 'bikebook/templates/vehicles/model_card'
 import { GROUPS, MAX_WEIGHT, PRESETS, presetOf } from 'bikebook/similarity'
 
 const note = (content) => html`<div class="tw:mt-4 tw:rounded-md tw:bg-blue-50 tw:px-4 tw:py-3 tw:text-sm tw:dark:bg-blue-950">${content}</div>`
@@ -18,8 +19,8 @@ export const similarResults = ({ results, cards, full }) => {
   if (!results.models.length) {
     return note(results.groups.length ? 'No similar models are in the catalog.' : 'Too little is listed about this model to find similar ones.')
   }
-  return html`${full ? note(`Compare up to ${full} at once. Remove one to add another.`) : nothing}<ul aria-label="Similar models to compare"
-    class="tw:mt-4 tw:grid tw:grid-cols-[repeat(auto-fill,minmax(17rem,1fr))] tw:gap-4">${cards}</ul>`
+  return html`${full ? note(`Compare up to ${full} at once. Remove one to add another.`) : nothing}<ul aria-label="Similar models to compare" data-keep-scroll="similar"
+    class="tw:mt-4 tw:grid tw:grid-cols-[repeat(auto-fill,minmax(17rem,1fr))] tw:gap-4 ${MODEL_CARDS_ROW_CLASSES}">${cards}</ul>`
 }
 
 const compareLabel = (type, model) => `Compare similar ${type}s to ${model}`
@@ -29,7 +30,7 @@ const compareLabel = (type, model) => `Compare similar ${type}s to ${model}`
 // on the comparison
 export const compareToggle = ({ type, model, waiting }) => html`<button type="button" data-action="bikebook--page#compareSimilar" class=${buttonClasses({
   color: 'link',
-  htmlClass: `tw:text-left tw:not-data-[active=true]:[font-weight:inherit] tw:similar-open:hidden ${waiting ? 'tw:invisible' : ''}`
+  htmlClass: `tw:text-left tw:not-data-[active=true]:[font-weight:inherit] tw:similar-open:hidden tw:max-sm:order-last tw:max-sm:basis-full tw:max-sm:justify-start ${waiting ? 'tw:invisible' : ''}`
 })}><span class="tw:inline-block"><span class="tw:flex">${iconChevron()}</span></span>${compareLabel(type, model)}</button>`
 
 // Collapsed until it's wanted, the models most like the first compared, `model`, whose `results` bikebook--similar scores
@@ -46,7 +47,7 @@ export const similarSection = ({ model, results, searchShown, ...similar }) => {
       content: label,
       chevron: true,
       color: 'link',
-      htmlClass: `tw:group/similar tw:aria-expanded:mt-3 ${searchShown ? 'tw:not-aria-expanded:hidden' : ''}`,
+      htmlClass: `tw:group/similar tw:aria-expanded:mt-3 tw:max-sm:basis-full tw:max-sm:justify-start ${searchShown ? 'tw:not-aria-expanded:hidden' : ''}`,
       attributes: { id: 'similar-toggle' }
     })}${scored && groups?.length ? adjustToggle : nothing}<div data-ui--collapse-target="content"
     class="tw:hidden tw:w-full">${scored
@@ -63,7 +64,7 @@ const legend = (text, note) => html`<legend class="twlabel">${text}${note ? html
 const adjustToggle = html`<button type="button" data-action="bikebook--page#adjustSimilar" class=${buttonClasses({
   color: 'link',
   size: 'sm',
-  htmlClass: 'tw:ml-auto tw:text-sm ' +
+  htmlClass: 'tw:ml-auto tw:text-sm tw:max-sm:order-first tw:max-sm:mt-1 ' +
     'tw:[:is(body:not(:has(#similar-toggle[aria-expanded=true])),body:has([aria-controls=vehicle-filters][aria-expanded=true]))_&]:hidden'
 })}><span class="tw:inline-block"><span class="tw:flex">${iconChevron()}</span></span>Adjust comparison algorithm</button>`
 

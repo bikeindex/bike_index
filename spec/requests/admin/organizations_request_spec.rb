@@ -19,6 +19,23 @@ RSpec.describe Admin::OrganizationsController, type: :request do
         expect(response).to render_template("admin/organizations/index")
         expect(assigns(:organizations)).to eq([organization])
       end
+      context "with a feature that has no slugs" do
+        let(:organization_feature) { FactoryBot.create(:organization_feature, feature_slugs: []) }
+        let(:invoice) { FactoryBot.create(:invoice_paid, organization:) }
+        let(:ended_invoice) { FactoryBot.create(:invoice_paid, start_at: 2.years.ago) }
+
+        before do
+          invoice.update(organization_feature_ids: [organization_feature.id])
+          ended_invoice.update(organization_feature_ids: [organization_feature.id])
+        end
+
+        it "finds the organizations with an active invoice for it" do
+          get base_url, params: {search_features_and_settings: organization_feature.id.to_s}
+
+          expect(assigns(:organizations)).to eq([organization])
+        end
+      end
+
       it "renders the chart" do
         get base_url, params: {search_query: "cool", render_chart: true}
         expect(response.status).to eq 200

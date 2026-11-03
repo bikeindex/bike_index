@@ -5,11 +5,12 @@ module Pages
     module Headers
       module Count
         # Goes after an admin UI::Header's title: its count - which links to the full index, when
-        # there is one - and a parenthetical.
+        # there is one - what it counts, and a parenthetical.
         class Component < ApplicationComponent
-          def initialize(count: nil, href: nil, parenthetical: nil)
+          def initialize(count: nil, href: nil, suffix: nil, parenthetical: nil)
             @count = count
             @href = href
+            @suffix = suffix
             @parenthetical = parenthetical
           end
 

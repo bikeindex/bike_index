@@ -71,8 +71,9 @@ export class VehicleViewer {
     const highlight = url.searchParams.get('figure')
     const figurePath = (key) => pathWith(url, { figure: key === highlight ? '' : key })
     const compared = { presenter, vehicles, sizes, frames: overlayFrames(vehicles, sizes), market: this.card.market }
+    // the width leaves each side of a centered card its gap and 12px of its neighbor
     const rowClasses = comparing
-      ? 'tw:justify-center-safe tw:overflow-x-auto tw:px-(--gutter) tw:max-md:snap-x tw:max-md:snap-mandatory tw:max-md:*:w-[85vw] tw:max-md:*:shrink-0 tw:max-md:*:snap-center'
+      ? 'tw:justify-center-safe tw:overflow-x-auto tw:px-(--gutter) tw:pb-3 tw:max-md:snap-x tw:max-md:snap-mandatory tw:max-md:gap-2 tw:max-md:*:w-[calc(100vw-2.5rem)] tw:max-md:*:shrink-0 tw:max-md:*:snap-center'
       : 'tw:flex-col tw:lg:flex-row tw:lg:justify-center'
     const cardRow = (margin, cards, aligned = false) => html`<div ?data-comparison=${comparing} data-controller=${comparing && aligned ? 'bikebook--align-rows' : nothing} class="${margin} ${comparing
       ? 'tw:twpagebleed'

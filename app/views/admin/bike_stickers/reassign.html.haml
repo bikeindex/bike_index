@@ -4,7 +4,7 @@
 
 = render partial: "batches_table", locals: {bike_sticker_batches: @bike_sticker_batches}
 
-= render(Pages::Admin::Headers::IndexInfo::Component.new(index: admin_index_state, viewing: "Stickers"))
+= render(Pages::Admin::IndexSkeleton::IndexInfo::Component.new(index: admin_index_state, viewing: "Stickers"))
 = render(UI::Container::Component.new) do
   = form_with(url: reassign_admin_bike_stickers_path, method: :get, html: {class: "tw:mt-2"}) do |form|
 

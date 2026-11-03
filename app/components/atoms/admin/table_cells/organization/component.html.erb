@@ -4,7 +4,7 @@
       <small class="<%= error_text_class %>" title="<%= @organization_id %>">
         Missing organization
       </small>
-      <code class="twcode tw:text-xs"><%= @organization_id %></code>
+      <%= render(UI::Code::Inline::Component.new(text: @organization_id, small: true)) %>
     <% elsif organization_subject.deleted? %>
       <small>
         <span class="twless-strong"><%= display_name %></span>

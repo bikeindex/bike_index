@@ -6,8 +6,9 @@ module Pages
       module Edit
         # The admin user edit form. The user's details above it are Pages::Admin::Users::Header.
         class Component < ApplicationComponent
-          def initialize(user:, display_dev_info: false)
+          def initialize(user:, current_user: nil, display_dev_info: false)
             @user = user
+            @current_user = current_user
             @display_dev_info = display_dev_info
           end
 
@@ -21,6 +22,8 @@ module Pages
             @user.build_user_ban if @user.user_ban.blank?
             true
           end
+
+          def own_page? = @user == @current_user
 
           def user_ban_reason_options
             options_for_select(UserBan.reasons.map { |reason| [UserBan.reason_humanized(reason), reason] })

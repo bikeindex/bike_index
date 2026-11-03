@@ -6,7 +6,7 @@ module UI
     class Component < ApplicationComponent
       # .ui-table-list is .only-dev-visible's hook
       TABLE_CLASSES = "ui-table ui-table-bordered ui-table-list tw:mb-4 tw:w-full tw:border-separate tw:border-spacing-0 " \
-        "tw:leading-normal tw:wrap-anywhere"
+        "tw:leading-normal"
 
       CELL_CLASSES = "#{UI::TableColumn::Component::BORDERED_TD_CLASSES} tw:align-top"
 
@@ -38,7 +38,8 @@ module UI
 
       private
 
-      def value_classes = "#{CELL_CLASSES} #{@wide_definition ? "tw:w-[70%]" : "tw:w-[85%]"}"
+      # UI::Code's own wrap-break-word leaves a long value its full width, overflowing a narrow list
+      def value_classes = "#{CELL_CLASSES} tw:wrap-anywhere tw:[&_code]:wrap-anywhere #{@wide_definition ? "tw:w-[70%]" : "tw:w-[85%]"}"
     end
   end
 end

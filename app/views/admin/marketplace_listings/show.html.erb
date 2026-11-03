@@ -2,7 +2,7 @@
 
 <div class="twwiderow tw:mt-6 tw:items-start">
   <%= render(UI::TableList::Component.new) do |list| %>
-    <% list.with_row(label: "ID", dev_only: true, value: tag.code(@marketplace_listing.id, class: "twcode"), if: display_dev_info?) %>
+    <% list.with_row(label: "ID", dev_only: true, value: render(UI::Code::Inline::Component.new(text: @marketplace_listing.id)), if: display_dev_info?) %>
 
     <% list.with_row(label: "Status", value: render(Atoms::Admin::Badges::MarketplaceListing::Component.new(status: @marketplace_listing.status, status_humanized: @marketplace_listing.status_humanized, kind: :marketplace_listing))) %>
 

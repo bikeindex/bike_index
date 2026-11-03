@@ -33,7 +33,7 @@ Scope it: every file a bare run rewrites that you've already read is re-injected
 
 - Tailwind classes have the prefix `tw:` (e.g. `tw:text-blue`, `tw:flex`, `tw:gap-4`).
   - The `tw:` prefix comes **before** variant modifiers, not after. Use `tw:dark:bg-gray-800`, `tw:hover:bg-blue-600`, `tw:sm:flex`, `tw:focus-visible:ring-2`. Never `dark:tw:bg-gray-800` — variant prefixes layer on top of `tw:`.
-  - **`dark` is a custom variant keyed to a `.dark` ancestor** (`app/assets/tailwind/application.css`), and nothing in the app sets that class — so `prefers-color-scheme: dark` renders the light page, and a dark-mode check means adding `.dark` to `<html>` by hand. Keep writing the variants; just don't read a light screenshot as a missing one.
+  - **`dark` is a custom variant keyed to a `.dark` ancestor** (`app/assets/tailwind/application.css`), and only the admin layout sets that class on a whole page, from `User#dark_mode_preview` — so outside `/admin`, `prefers-color-scheme: dark` renders the light page, and a dark-mode check means adding `.dark` to `<html>` by hand. Keep writing the variants; just don't read a light screenshot as a missing one.
 - Form fields should use the `twinput` class.
 - Labels should use the `twlabel` class.
 - Basic links should use the `twlink` class.
@@ -86,7 +86,7 @@ Every legacy stylesheet wraps itself in `@layer legacy` (see `app/assets/stylesh
 
 - **An action that needs confirming passes `confirm:` alongside `method:`**, and the component renders a Turbo link rather than a `button_to` — an `<a>` carrying the method plus an `onclick` that Turbo's click handler honours. So a confirming action nests anywhere a link does, and no call site spells the mechanism out. `Pages::MyAccount::OrganizationRoles` is the worked example.
 
-The same instinct applies beyond buttons: **check `app/components/ui/` and `app/components/atoms/` before hand-rolling any UI primitive** (dropdowns → `UI::Dropdown`, tooltips → `UI::Tooltip`, form fields → `UI::Forms::*`, label-beside-value tables → `UI::TableList` — only email CSS still styles `.table-list`, so the legacy class renders bare on a page — badges, modals, pagination, tables…). If a component exists for the pattern, use it. **Never add an argument to a `UI::*` component without the user's explicit permission** — its arguments are the design system's surface, and one added for a single caller stays for every caller. If it almost fits, ask, and don't fork its markup inline meanwhile.
+The same instinct applies beyond buttons: **check `app/components/ui/` and `app/components/atoms/` before hand-rolling any UI primitive** (dropdowns → `UI::Dropdown`, tooltips → `UI::Tooltip`, form fields → `UI::Forms::*`, label-beside-value tables → `UI::TableList` — only email CSS still styles `.table-list`, so the legacy class renders bare on a page — inline code → `UI::Code::Inline`, a block of JSON → `UI::Code::Json`, badges, modals, pagination, tables…). If a component exists for the pattern, use it. **Never add an argument to a `UI::*` component without the user's explicit permission** — its arguments are the design system's surface, and one added for a single caller stays for every caller. If it almost fits, ask, and don't fork its markup inline meanwhile.
 
 Four of those carry a rule beyond "use the component":
 
