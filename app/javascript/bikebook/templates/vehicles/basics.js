@@ -1,11 +1,12 @@
 import { html, nothing } from 'lit-html'
 import { chosenColorway, colorwayValue, colorwayYears } from 'bikebook/colorways'
 import { amountDisplay, missing } from 'bikebook/templates/helpers'
+import { badge } from 'bikebook/templates/ui/badge'
 import { buttonClasses } from 'bikebook/templates/ui/button'
 import { collapse } from 'bikebook/templates/ui/collapse'
 import { radioButtonGroup } from 'bikebook/templates/ui/forms/radio_button_group'
 import { table } from 'bikebook/templates/ui/table'
-import { PINNED_ROW_HEADER } from 'bikebook/templates/vehicles/comparison_table'
+import { seriesBorders } from 'bikebook/templates/vehicles/geometry_overlay'
 import { removeLink } from 'bikebook/templates/vehicles/remove_link'
 import { basicsOf, simpleFormat } from 'bikebook/templates/vehicles/model_viewer'
 import { colorway, colorways } from 'bikebook/templates/vehicles/model_years'
@@ -15,6 +16,7 @@ import { array, isNumber, join, present } from 'bikebook/templates/values'
 // `only` ones once a shown model is electric, suspended, a cargo vehicle or sold outside the visitor's market, the rest once one lists it, and `differing`
 // ones where the models' values of it differ
 const FIELDS = [
+  { label: 'Price', key: 'price' },
   { label: 'Markets', key: 'markets', only: 'outside_market' },
   { label: 'Model group', key: 'model_group' },
   { label: 'Years', key: 'years' },
@@ -26,7 +28,6 @@ const FIELDS = [
   { label: 'Wheel & tire size', key: 'wheel_size' },
   { label: 'Suspension front/rear', key: 'suspension', only: 'suspended' },
   { label: 'Groupset', key: 'groupset' },
-  { label: 'Price', key: 'price' },
   { label: 'E-vehicle class', key: 'e_vehicle_class', only: 'electric' },
   { label: 'Electric Certification', key: 'certification', only: 'electric' },
   { label: 'Description', key: 'description' }
@@ -46,17 +47,20 @@ const manufacturerPage = (vehicle) => {
   return url && html`<small class="tw:text-gray-500 tw:dark:text-gray-400"><a class="twlink-underlined" href=${url}>manufacturer's page</a></small>`
 }
 
-// the newest colorways, to choose between where there are several, the `picked` one chosen, and each earlier year's behind
-// a link that shows them
+// A year's colorways by their paint, not their photos
+const paint = (year) => JSON.stringify(array(year.colorways).map(({ name, colors, color_code: code }) => [name, colors, code]))
+
+// the newest colorways, to choose between where there are several, the `picked` one chosen, and behind a link that shows
+// them, each paint the earlier years had, but the newest's
 const colors = (presenter, vehicle, key, picked) => {
-  const [newest, ...earlier] = colorwayYears(vehicle)
+  const [[newest] = [], ...earlier] = Map.groupBy(colorwayYears(vehicle), paint).values()
   if (!newest) return null
 
   const latest = array(newest.colorways)
   const chosen = chosenColorway(vehicle, picked)
-  // the toggle's track wrapping its segments, which it doesn't for its own few short ones
+  // the toggle scrolling out to its cell's edges where one's name is wider than it
   const shown = latest.length > 1
-    ? html`<div class="tw:*:flex-wrap">${radioButtonGroup({
+    ? html`<div class="twgutter-bleed tw:overflow-x-auto tw:[--gutter:--spacing(2.5)]">${radioButtonGroup({
       name: `colorway-${key}`,
       entries: latest.map((each, index) => ({ value: colorwayValue(each, index), label: colorway(presenter, each) })),
       selected: colorwayValue(chosen, latest.indexOf(chosen)),
@@ -66,8 +70,8 @@ const colors = (presenter, vehicle, key, picked) => {
   if (earlier.length === 0) return shown
 
   return html`<div class="tw:space-y-2" data-controller="ui--collapse">${shown}<div class="tw:hidden tw:space-y-1" data-ui--collapse-target="content">${
-    earlier.map(({ year, colorways: each }) => html`<div class="tw:flex tw:items-baseline tw:gap-2"><span class="tw:text-xs tw:font-bold tw:tabular-nums">${year}</span>${
-      colorways(presenter, array(each))}</div>`)}</div><div>${collapse({ color: 'link_gray', htmlClass: 'tw:text-sm tw:aria-expanded:hidden', content: 'View previous years colors' })}</div></div>`
+    earlier.map((years) => html`<div class="tw:flex tw:flex-wrap tw:items-baseline tw:gap-x-2 tw:gap-y-1"><span class="tw:text-xs tw:font-bold tw:whitespace-nowrap tw:tabular-nums">${
+      years.map(({ year }) => year).toReversed().join(', ')}</span>${badge({ text: colorways(presenter, array(years[0].colorways)) })}</div>`)}</div><div>${collapse({ color: 'link_gray', htmlClass: 'tw:text-sm tw:aria-expanded:hidden', content: 'View previous years colors' })}</div></div>`
 }
 
 const EXCERPT_LENGTH = 200
@@ -109,9 +113,9 @@ const viewGroup = (groupPath, value, shownGroup) => html`<a href=${groupPath(val
   class=${buttonClasses({ size: 'sm', htmlClass: 'tw:ml-2' })} aria-current=${value === shownGroup ? 'true' : nothing} data-in-place="#model-group">View group</a>`
 
 // The models' names, photos and headline fields side by side in a table, one model's as two's, each photo with an ×
-// to the page without it at `removePath`, each column's last cell with its `bottoms` classes, the table's section with
-// its `sectionClasses` and its corner with `corner`
-export const basics = ({ presenter, vehicles, market, outOfClassId, removePath, colorways: pickedColorways = {}, groupPath, shownGroup, bottoms = [], sectionClasses = '', corner = nothing }) => {
+// to the page without it at `removePath`, each column topped and footed in its color among the overlay's `frames`, the
+// table's section with its `sectionClasses` and its corner with `corner`
+export const basics = ({ presenter, vehicles, market, outOfClassId, removePath, colorways: pickedColorways = {}, groupPath, shownGroup, frames = [], sectionClasses = '', corner = nothing }) => {
   const shown = vehicles.map(({ data, value, key, outsideMarket }, index) => {
     const price = priced(data)
     const fields = basicsOf({ presenter, data, outOfClassId })
@@ -131,30 +135,33 @@ export const basics = ({ presenter, vehicles, market, outOfClassId, removePath, 
   })
   const fields = FIELDS.filter((field) => (field.only ? shown.some((each) => each[field.only]) : shown.some((each) => present(each[field.key]))) &&
     (!field.differing || new Set(shown.map((each) => each[field.differing])).size > 1))
-  return compared(shown, fields, bottoms, sectionClasses, corner)
+  return compared(shown, fields, frames, sectionClasses, corner)
 }
 
-const compared = (vehicles, fields, bottoms, sectionClasses, corner) => html`<section aria-label=${vehicles.length > 1 ? 'Overview comparison' : 'Overview'} class="tw:mt-6 ${vehicles.length > 3
+const compared = (vehicles, fields, frames, sectionClasses, corner) => html`<section aria-label=${vehicles.length > 1 ? 'Overview comparison' : 'Overview'} class="tw:mt-6 ${vehicles.length > 3
   ? 'tw:twpagebleed tw:px-4'
   : ''} ${sectionClasses}" style=${`--models: ${vehicles.length}`}>${table({
   classes: `${vehicles.length === 1 ? 'tw:w-full tw:md:w-[calc(50%+6.25rem)] tw:md:min-w-0!' : `tw:w-full ${MIN_WIDTH}`} tw:table-fixed ${vehicles.length > 3 ? `tw:mx-auto ${MAX_WIDTH}` : ''}`,
   records: fields,
   columns: [
-    { label: html`<span class="tw:sr-only">Field</span>${corner}`, rowHeader: true, classes: 'tw:w-32 tw:md:w-50 tw:px-2.5! tw:py-2! tw:align-top tw:font-bold', cellClass: () => PINNED_ROW_HEADER, cell: ({ label }) => label },
-    ...vehicles.map((vehicle, index) => ({
-      label: html`${vehicle.photo('tw:mb-2 tw:aspect-[4/3]')}${removeLink({
-        label: `Remove ${[vehicle.manufacturer, vehicle.model].filter(present).join(' ')}`,
-        href: vehicle.removeHref,
-        corner: true
-      })}${vehicle.title}`,
-      classes: 'tw:px-2.5! tw:py-2! tw:align-top',
-      headerClasses: 'tw:relative',
-      cellClass: ({ key }) => [key === 'description' && 'tw:text-sm', key === fields.at(-1).key && bottoms[index]].filter(Boolean).join(' '),
-      cell: ({ key, only }) => {
-        if (present(vehicle[key])) return vehicle[key]
-        if (only !== 'electric' || vehicle.electric) return missing
-        return key === 'e_vehicle_class' ? html`<span class="twless-strong">not e-vehicle</span>` : nothing
+    { label: html`<span class="tw:sr-only">Field</span>${corner}`, rowHeader: true, classes: 'tw:w-32 tw:md:w-50 tw:px-2.5! tw:py-2! tw:align-top tw:font-bold', cell: ({ label }) => label },
+    ...vehicles.map((vehicle, index) => {
+      const border = seriesBorders(frames, index)
+      return {
+        label: html`${vehicle.photo('tw:mb-2 tw:aspect-[4/3]')}${removeLink({
+          label: `Remove ${[vehicle.manufacturer, vehicle.model].filter(present).join(' ')}`,
+          href: vehicle.removeHref,
+          corner: true
+        })}${vehicle.title}`,
+        classes: 'tw:px-2.5! tw:py-2! tw:align-top',
+        headerClasses: `tw:relative ${border.top}`,
+        cellClass: ({ key }) => [key === 'description' && 'tw:text-sm', key === fields.at(-1).key && border.bottom].filter(Boolean).join(' '),
+        cell: ({ key, only }) => {
+          if (present(vehicle[key])) return vehicle[key]
+          if (only !== 'electric' || vehicle.electric) return missing
+          return key === 'e_vehicle_class' ? html`<span class="twless-strong">not e-vehicle</span>` : nothing
+        }
       }
-    }))
+    })
   ]
 })}</section>`

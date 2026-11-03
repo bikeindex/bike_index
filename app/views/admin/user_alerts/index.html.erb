@@ -44,45 +44,32 @@
 
 <% table_view = capture do %>
   <% if @render_kind_counts %>
-    <div class="row mt-4 mb-4">
-      <div class="col-md-6 offset-md-3">
-        <div class="card">
-          <div class="card-body">
-            <h3>Kinds</h3>
+    <%= render(UI::Container::Component.new) do %>
+      <%= render(UI::Card::Component.new(additional_classes: "tw:my-6")) do %>
+        <%= render(UI::Header::Component.new(text: "Kinds", tag: :h2)) %>
 
-            <table class="table-list wide-definition">
-              <tbody>
-                <% UserAlert.kinds.each_with_index do |kind, index| %>
-                  <% count = matching_user_alerts.where(kind: kind).count %>
-                  <% next unless count > 0 %>
+        <%= render(UI::TableList::Component.new(wide_definition: true)) do |list| %>
+          <% UserAlert.kinds.each_with_index do |kind, index| %>
+            <% count = matching_user_alerts.where(kind: kind).count %>
+            <% next unless count > 0 %>
 
-                  <tr>
-                    <td>
-                      <div
-                        style="width: 1em; height: 1em; background: <%= UI::Chart::Component::COLORS[index % UI::Chart::Component::COLORS.length] %>; float: right; margin-left: 0.4rem;"
-                      ></div>
+            <% label = capture do %>
+              <div
+                style="width: 1em; height: 1em; background: <%= UI::Chart::Component::COLORS[index % UI::Chart::Component::COLORS.length] %>; float: right; margin-left: 0.4rem;"
+              ></div>
 
-                      <%= link_to UserAlert.kind_humanized(kind), url_for(sortable_search_params.merge(search_kind: kind)) %>
-                    </td>
+              <%= link_to UserAlert.kind_humanized(kind), url_for(sortable_search_params.merge(search_kind: kind)), class: "twlink" %>
+            <% end %>
 
-                    <td><%= number_display(count) %></td>
-                  </tr>
-                <% end %>
+            <% list.with_row(label:, value: number_display(count)) %>
+          <% end %>
 
-                <% nil_count = matching_user_alerts.where(kind: nil).count %>
+          <% nil_count = matching_user_alerts.where(kind: nil).count %>
 
-                <% if nil_count > 0 %>
-                  <tr>
-                    <td>Nil</td>
-                    <td><%= number_display(nil_count) %></td>
-                  </tr>
-                <% end %>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
+          <% list.with_row(label: "Nil", value: number_display(nil_count), if: nil_count > 0) %>
+        <% end %>
+      <% end %>
+    <% end %>
   <% end %>
 
   <%= render partial: "/admin/user_alerts/table", locals: {render_sortable: true, user_alerts: @collection, skip_user: @user_subject.present?} %>

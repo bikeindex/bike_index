@@ -3,7 +3,7 @@ import { Controller } from '@hotwired/stimulus'
 // Connects to data-controller='admin--character-count'
 // Counts a field's characters against max, turning red once over. Not maxlength: the browser
 // would block submitting the whole form over one edited field still past it.
-// The red is important, so it beats the total's own color, a utility or legacy .text-info alike
+// The red is important, so it beats the total's own color utility
 export default class extends Controller {
   static targets = ['field', 'total']
   static values = { max: Number }

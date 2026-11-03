@@ -10,7 +10,7 @@ RSpec.describe VehicleHelper, type: :helper do
     end
     context "unknown_model" do
       let(:frame_model) { nil }
-      let(:target) { "<span class=\"less-strong\">Missing model</span>" }
+      let(:target) { "<span class=\"twless-strong\">Missing model</span>" }
       it "responds with name" do
         expect(model_audit_frame_model_display(model_audit)).to eq target
       end

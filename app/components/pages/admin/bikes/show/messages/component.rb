@@ -34,11 +34,6 @@ module Pages
             def graduated_notifications_count
               @graduated_notifications_count ||= GraduatedNotification.where(bike_id: @bike.id).count
             end
-
-            def section_heading(title, count, path)
-              safe_join([title, tag.small(link_to(helpers.number_display(count), path, class: "twlink"),
-                class: "twless-strong tw:ml-2")], " ")
-            end
           end
         end
       end

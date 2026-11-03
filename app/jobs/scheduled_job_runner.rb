@@ -62,7 +62,6 @@ class ScheduledJobRunner < ScheduledJob
       UpdateEmailDomainJob,
       UpdateExchangeRatesJob,
       UpdateInvoiceJob,
-      UpdateLoggedSearchCountsJob,
       UpdateManufacturerLogoAndPriorityJob,
       UpdateOrganizationPosKindJob,
       UserJobs::RemoveUnconfirmedJob,

@@ -11,15 +11,15 @@ import { GROUPS, MAX_WEIGHT, PRESETS, presetOf } from 'bikebook/similarity'
 const note = (content) => html`<div class="tw:mt-4 tw:rounded-md tw:bg-blue-50 tw:px-4 tw:py-3 tw:text-sm tw:dark:bg-blue-950">${content}</div>`
 
 // The `cards` of the models a scorer found beside the one compared against, or why there are none: no `results` where
-// the catalog's comparison is a format it doesn't know, out to the window's edges with as many as fit at the search's
-// cards' width. Once the comparison is `full`, only its own cards link
+// the catalog's comparison is a format it doesn't know, as many to a row as fit at the search's cards' width. Once the
+// comparison is `full`, only its own cards link
 export const similarResults = ({ results, cards, full }) => {
   if (!results) return note("Similar models can't be found right now.")
   if (!results.models.length) {
     return note(results.groups.length ? 'No similar models are in the catalog.' : 'Too little is listed about this model to find similar ones.')
   }
   return html`${full ? note(`Compare up to ${full} at once. Remove one to add another.`) : nothing}<ul aria-label="Similar models to compare"
-    class="tw:mt-4 tw:grid tw:grid-cols-[repeat(auto-fill,minmax(17rem,1fr))] tw:gap-4 tw:twpagebleed tw:px-4">${cards}</ul>`
+    class="tw:mt-4 tw:grid tw:grid-cols-[repeat(auto-fill,minmax(17rem,1fr))] tw:gap-4">${cards}</ul>`
 }
 
 const compareLabel = (type, model) => `Compare similar ${type}s to ${model}`
@@ -28,7 +28,7 @@ const compareLabel = (type, model) => `Compare similar ${type}s to ${model}`
 // once it's open. Not a ui--collapse trigger, which the search's own would claim
 export const compareToggle = ({ type, model }) => html`<button type="button" data-action="bikebook--page#compareSimilar" class=${buttonClasses({
   color: 'link',
-  htmlClass: 'tw:not-data-[active=true]:[font-weight:inherit] tw:similar-open:hidden'
+  htmlClass: 'tw:text-left tw:not-data-[active=true]:[font-weight:inherit] tw:similar-open:hidden'
 })}><span class="tw:inline-block"><span class="tw:flex">${iconChevron()}</span></span>${compareLabel(type, model)}</button>`
 
 // Collapsed until it's wanted, the models most like the first compared, `model`, whose `results` bikebook--similar scores

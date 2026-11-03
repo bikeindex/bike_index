@@ -1,6 +1,9 @@
 - if @bike.present?
   = render Pages::Admin::Bikes::Header::Component.new(bike: @bike, active: :recovery_displays, display_recovery: true, user: current_user, display_dev_info: display_dev_info?)
-  %h1.mt-5.mb-4 Recovery displays
+  = render(UI::Header::Component.new(tag: :h2)) do
+    Recovery displays
+    = render(Pages::Admin::Headers::Count::Component.new(count: @pagy.count))
+  = render partial: "table", locals: {collection: @recovery_displays}
 
 - else
   - nav_header_list_items = capture_haml do

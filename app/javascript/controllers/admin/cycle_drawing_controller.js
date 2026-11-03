@@ -95,12 +95,12 @@ export default class extends Controller {
       : listed || calculated ? '' : 'tw:text-gray-500'}">${letter
       ? html`<button type="button" aria-label=${`Highlight ${label}`} aria-pressed=${String(highlighted)}
       @click=${() => this.select(key)} class="tw:inline-flex tw:size-5 tw:shrink-0 tw:cursor-pointer tw:items-center tw:justify-center tw:rounded-full
-      tw:border-0! tw:p-0! tw:text-xs tw:font-bold tw:text-white tw:focus:outline-none! tw:focus-visible:ring-2 tw:focus-visible:ring-blue-500/40 ${letterBackground({ listed, calculated, highlighted })}">${letter}</button>`
+      tw:text-xs tw:font-bold tw:text-white tw:focus:outline-none tw:focus-visible:ring-2 tw:focus-visible:ring-blue-500/40 ${letterBackground({ listed, calculated, highlighted })}">${letter}</button>`
       : html`<span class="tw:w-5 tw:shrink-0"></span>`}<label for=${`${idPrefix}-${key}`}
       class="tw:grow">${label}</label>${!editable
       ? html`<span class="tw:font-mono">${value} ${unit}</span>`
       : html`<input type="number" step="any" name=${key} id=${`${idPrefix}-${key}`} autocomplete="off"
-        class="twinput tw:w-20! tw:py-0.5! tw:text-right tw:text-xs!" ${inputValue(this.figures[key] ?? String(value))} placeholder=${String(value)} @input=${(event) => this.edit(event)}><span
+        class="twinput tw:w-20 tw:py-0.5 tw:text-right tw:text-xs" ${inputValue(this.figures[key] ?? String(value))} placeholder=${String(value)} @input=${(event) => this.edit(event)}><span
         class="tw:w-6">${unit}</span>`}</li>`
   })}</ol>`
   }

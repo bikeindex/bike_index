@@ -154,7 +154,7 @@ module Admin
     end
 
     def sortable_columns
-      %w[id owner_email manufacturer_id updated_by_user_at]
+      %w[id owner_email manufacturer_id updated_by_user_at occurred_at propulsion_type]
     end
 
     def permitted_parameters

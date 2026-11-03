@@ -1,79 +1,39 @@
-.row
-  .col-lg-11.col-sm-12
-    %h1
-      Stolen Notification
-  .col-lg-1.col-sm-12
-    = link_to "Resend", resend_admin_stolen_notification_url(@stolen_notification, pretty_please: true), class: 'btn btn-success mt-4 mb-4'
-%h4
+= render(Pages::Admin::Headers::Nav::Component.new(title: "Stolen Notification")) do
+  %li= render(UI::ButtonLink::Component.new(text: "Resend", href: resend_admin_stolen_notification_url(@stolen_notification, pretty_please: true), color: :primary, size: :sm))
+= render(UI::Header::Component.new(tag: :h3)) do
   Created
-  %a.localizeTime.preciseTime{ href: admin_stolen_notification_url(@stolen_notification) }
-    = l @stolen_notification.created_at, format: :convert_time
-%table.table-list
-  %tbody
-    %tr
-      %td
-        Bike
-      %td
-        = link_to @bike.title_string, edit_admin_stolen_bike_url(@bike)
-        %small
-          %em total messages sent to bike:
-          = number_display(@bike.messages_count)
-    %tr
-      %td
-        Receiver Name
-      %td
-        = @stolen_notification.receiver_email
-    -if @bike.current_stolen_record.present?
-      %tr
-        %td
-          Bike phone
-        %td
-          = @bike.current_stolen_record.phone
-    %tr
-      %td
-        Sent to owner
-      %td
-        = @stolen_notification.send_dates_parsed.count
-        times
+  = link_to render(UI::Time::Component.new(time: @stolen_notification.created_at, format: :localize_time_precise)), admin_stolen_notification_url(@stolen_notification), class: "twlink"
+= render(UI::TableList::Component.new) do |list|
+  - list.with_row(label: "Bike") do
+    = link_to @bike.title_string, edit_admin_stolen_bike_url(@bike), class: "twlink"
+    %small
+      %em total messages sent to bike:
+      = number_display(@bike.messages_count)
+  - list.with_row(label: "Receiver Name", value: @stolen_notification.receiver_email)
+  - list.with_row(label: "Bike phone", if: @bike.current_stolen_record.present?) do
+    = @bike.current_stolen_record.phone
+  - list.with_row(label: "Sent to owner") do
+    = @stolen_notification.send_dates_parsed.count
+    times
+  - list.with_row(label: "Times:") do
     - if @stolen_notification.send_dates_parsed.any?
-      %tr
-        %td
-          Times:
-        %td
-          %ul.pl-0
-            - @stolen_notification.send_dates_parsed.each do |stamp|
-              %li.list-unstyled
-                %a.localizeTime.preciseTime{ href: admin_stolen_notification_url(stamp) }
-                  = l Time.at(stamp).to_datetime, format: :convert_time
+      %ul{class: "tw:mb-4"}
+        - @stolen_notification.send_dates_parsed.each do |stamp|
+          %li
+            = link_to render(UI::Time::Component.new(time: Time.at(stamp), format: :localize_time_precise)), admin_stolen_notification_url(stamp), class: "twlink"
     - else
       %strong
         Has not been sent!
-    - if @stolen_notification.sender.name.present?
-      %tr
-        %td
-          Sender
-        %td
-          = link_to @stolen_notification.sender.name, edit_admin_user_url(@stolen_notification.sender_id)
-    - else
-      %tr
-        %td
-          Sender
-        %td
-          = link_to @stolen_notification.sender.email, edit_admin_user_url(@stolen_notification.sender_id)
-    %tr
-      %td
-        Sender sent count
-      %td
-        = @stolen_notification.sender.sent_stolen_notifications.count
+  - if @stolen_notification.sender.name.present?
+    - list.with_row(label: "Sender", value: link_to(@stolen_notification.sender.name, edit_admin_user_url(@stolen_notification.sender_id), class: "twlink"))
+  - else
+    - list.with_row(label: "Sender", value: link_to(@stolen_notification.sender.email, edit_admin_user_url(@stolen_notification.sender_id), class: "twlink"))
+  - list.with_row(label: "Sender sent count", value: @stolen_notification.sender.sent_stolen_notifications.count)
 
 
+= render(UI::Card::Component.new(additional_classes: "tw:my-6")) do
+  = render(UI::Header::Component.new(text: "Notification Message", tag: :h3))
+  = @stolen_notification.message
 
-.card.bg-light.mb-4.mt-4
-  .card-header
-    Notification Message
-  .card-body
-    = @stolen_notification.message
-
-%h3
-  Notifications
+= render(UI::Header::Component.new(text: "Notifications", tag: :h2))
 = render partial: "/admin/notifications/table", locals: {notifications: @stolen_notification.notifications.order(created_at: :desc), skip_bike: true}

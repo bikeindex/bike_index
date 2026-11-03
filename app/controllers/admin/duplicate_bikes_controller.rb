@@ -15,7 +15,6 @@ module Admin
 
       @per_page = permitted_per_page(default: 25)
       groups = matching_groups.order(added_bike_at: :desc, id: :desc)
-      @duplicate_groups_count = groups.count
       @pagy, @duplicate_groups = pagy(:countish, groups, limit: @per_page, page: permitted_page)
       group_ids = @duplicate_groups.map(&:id)
       @segments = NormalizedSerialSegment.where(duplicate_bike_group_id: group_ids).group(:duplicate_bike_group_id).minimum(:segment)
@@ -75,14 +74,15 @@ module Admin
     def dashboard
       @per_page = permitted_per_page(default: 25)
       @group_snapshot = BikeDuplicatesServices::Finder.fetch_group_snapshot
+      @group_snapshot_failed_at = BikeDuplicatesServices::Finder.group_snapshot_failed_at
       return render :preparing unless @group_snapshot
 
       @summary = @group_snapshot[:groups].group_by { it["kind"] }
       @kind = params[:search_kind].presence_in(BikeDuplicatesServices::Finder::KINDS.keys) || "handoff_priority"
       groups = @summary.fetch(@kind, [])
       if params[:search_organization_id].present?
-        @organization = Organization.unscoped.find(params[:search_organization_id])
-        groups = groups.select { it["organization_ids"]&.include?(@organization.id) }
+        @organization = Organization.unscoped.find_by(id: Integer(params[:search_organization_id], exception: false))
+        groups = groups.select { it["organization_ids"].include?(@organization&.id) }
       end
       if params[:search_bike_id].present?
         bike_id = Integer(params[:search_bike_id], exception: false)
@@ -108,7 +108,7 @@ module Admin
       end
       @representatives = Bike.unscoped.where(id: @groups.map { it["reference_id"] })
         .includes(:manufacturer, :ownerships).index_by(&:id)
-      @organizations = Organization.unscoped.where(id: @groups.flat_map { it["organization_ids"] || [] }).index_by(&:id)
+      @organizations = Organization.unscoped.where(id: @groups.flat_map { it["organization_ids"] }).index_by(&:id)
       render :dashboard
     end
 

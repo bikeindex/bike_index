@@ -20,7 +20,7 @@ RSpec.describe Admin::DuplicateBikesController, type: :request do
   let(:finder) { BikeDuplicatesServices::Finder }
 
   before { finder.store_group_snapshot }
-  after { RedisPool.conn { it.del(finder::SNAPSHOT_KEY, finder::PREPARING_KEY) } }
+  after { RedisPool.conn { it.del(finder::SNAPSHOT_KEY, finder::PREPARING_KEY, finder::FAILED_KEY) } }
 
   describe "dashboard" do
     it "prepares the groups in the background, once" do
@@ -51,6 +51,32 @@ RSpec.describe Admin::DuplicateBikesController, type: :request do
       allow(BikeJobs::PrepareDuplicateReviewJob).to receive(:perform_async).and_raise(RedisClient::CannotConnectError)
       expect { finder.fetch_group_snapshot }.to raise_error(RedisClient::CannotConnectError)
       expect(RedisPool.conn { it.get(finder::PREPARING_KEY) }).to be_nil
+    end
+
+    it "says preparing failed, and waits out the failed job's claim" do
+      RedisPool.conn do
+        it.del(finder::SNAPSHOT_KEY)
+        it.set(finder::PREPARING_KEY, "failed job")
+        it.set(finder::FAILED_KEY, 2.minutes.ago.to_i)
+      end
+      expect { get base_url }.not_to change(BikeJobs::PrepareDuplicateReviewJob.jobs, :count)
+      expect(response).to render_template(:preparing)
+      expect(response.body).to include("Preparing the review queues failed")
+    end
+
+    it "filters by organization, matching none for an unknown one" do
+      get base_url, params: {search_kind: "large_group", search_organization_id: organization.id}
+      expect(assigns(:groups).map { it["record_count"] }).to eq [11]
+      expect(response.body).to include(organization.name)
+
+      get base_url, params: {search_kind: "large_group", search_organization_id: "0"}
+      expect(response.code).to eq "200"
+      expect(assigns(:groups)).to be_empty
+    end
+
+    it "redirects the old serial-segment list" do
+      get "/admin/bikes/duplicates"
+      expect(response).to redirect_to("/admin/duplicate_bikes?search_view=segments")
     end
 
     it "shows tentative cues and narrows by them reversibly" do
@@ -103,6 +129,17 @@ RSpec.describe Admin::DuplicateBikesController, type: :request do
       shop_bike = FactoryBot.create(:bike_lightspeed_pos, manufacturer:, serial_number: "HAND0FF123", owner_email: user.email, created_at: 2.days.ago)
       FactoryBot.create(:bike, :with_ownership_claimed, user:, manufacturer:, serial_number: "HAND0FF123")
       expect(finder.groups.find { it["bike_ids"].include?(shop_bike.id) }["kind"]).to eq "handoff_priority"
+    end
+  end
+
+  describe "segments" do
+    it "lists serial-segment groups with their count" do
+      duplicate_group = DuplicateBikeGroup.create
+      pair.each { NormalizedSerialSegment.create(bike: it, duplicate_bike_group: duplicate_group, segment: "WTU123456") }
+      get base_url, params: {search_view: "segments"}
+      expect(response.code).to eq "200"
+      expect(assigns(:duplicate_groups)).to eq [duplicate_group]
+      expect(Capybara.string(response.body)).to have_text("1 Matching")
     end
   end
 

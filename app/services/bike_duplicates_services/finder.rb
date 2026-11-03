@@ -24,13 +24,19 @@ module BikeDuplicatesServices
 
     SNAPSHOT_KEY = "duplicate_review_group_snapshot"
     PREPARING_KEY = "duplicate_review_group_snapshot_preparing"
+    FAILED_KEY = "duplicate_review_group_snapshot_failed"
     # Older snapshots are still served while a fresh one is prepared, so only the first visit waits
     REFRESH_AFTER = 1.hour
     SNAPSHOT_TTL = 1.day
-    # Longer than the query takes; if the job dies, the next visit after this enqueues another
+    # Longer than the query takes. If the job fails or dies, visits wait this out before enqueuing another
     PREPARING_TTL = 30.minutes
+    # The replica's statement_timeout is 60 seconds, which the query nears in production
+    QUERY_TIMEOUT = 10.minutes
     # Deletes the claim only if it's still the one passed in, not a newer job's
     RELEASE_CLAIM_SCRIPT = 'if redis.call("get", KEYS[1]) == ARGV[1] then return redis.call("del", KEYS[1]) end'
+    # Restarts the claim's TTL, or takes it back if it expired while the job was queued - not if a newer job has it
+    HOLD_CLAIM_SCRIPT = 'local held = redis.call("get", KEYS[1]) ' \
+      'if not held or held == ARGV[1] then return redis.call("set", KEYS[1], ARGV[1], "EX", ARGV[2]) end'
 
     # The dashboard's groups, or nil until the first ones are prepared. The query takes most of a minute in
     # production, so a missing or hour-old snapshot enqueues the job - once across every server - rather
@@ -42,12 +48,28 @@ module BikeDuplicatesServices
       snapshot && {generated_at: Time.zone.at(snapshot["generated_at"]), groups: snapshot["groups"]}
     end
 
-    # claim: the job's PREPARING_KEY value, released when it's done
+    # When the last attempt failed, if it hasn't succeeded since
+    def group_snapshot_failed_at
+      failed_at = RedisPool.conn { it.get(FAILED_KEY) }
+      failed_at && Time.zone.at(failed_at.to_i)
+    end
+
+    # claim: the job's PREPARING_KEY value, released when it succeeds
     def store_group_snapshot(claim: nil)
-      snapshot = ActiveRecord::Base.connected_to(role: :reading, prevent_writes: true) { {generated_at: Time.current.to_i, groups:} }
-      RedisPool.conn { it.set(SNAPSHOT_KEY, snapshot.to_json, ex: SNAPSHOT_TTL.to_i) }
-    ensure
+      snapshot = ActiveRecord::Base.connected_to(role: :reading, prevent_writes: true) do
+        ActiveRecord::Base.transaction do
+          ActiveRecord::Base.connection.execute("SET LOCAL statement_timeout = #{QUERY_TIMEOUT.in_milliseconds.to_i}")
+          {generated_at: Time.current.to_i, groups:}
+        end
+      end
+      RedisPool.conn do
+        it.set(SNAPSHOT_KEY, snapshot.to_json, ex: SNAPSHOT_TTL.to_i)
+        it.del(FAILED_KEY)
+      end
       release_claim(claim) if claim
+    rescue => e
+      record_failure(claim)
+      raise e
     end
 
     def groups
@@ -209,8 +231,19 @@ module BikeDuplicatesServices
 
     def release_claim(claim) = RedisPool.conn { it.eval(RELEASE_CLAIM_SCRIPT, keys: [PREPARING_KEY], argv: [claim]) }
 
+    # Holds the claim for PREPARING_TTL from now, so visits don't start another long query straight away.
+    # Best effort: an error here would hide the query's own
+    def record_failure(claim)
+      RedisPool.conn do
+        it.set(FAILED_KEY, Time.current.to_i, ex: SNAPSHOT_TTL.to_i)
+        it.eval(HOLD_CLAIM_SCRIPT, keys: [PREPARING_KEY], argv: [claim, PREPARING_TTL.to_i]) if claim
+      end
+    rescue => e
+      Rails.logger.error("Duplicate review snapshot failure not recorded: #{e.class}")
+    end
+
     def enum_sql(enum, *keys) = enum.values_at(*keys.map(&:to_sym)).join(", ")
 
-    conceal :customer_origins, :enqueue_group_snapshot, :enum_sql, :release_claim, :stolen_serial_bikes, :query, :test_bikes_sql
+    conceal :customer_origins, :enqueue_group_snapshot, :enum_sql, :record_failure, :release_claim, :stolen_serial_bikes, :query, :test_bikes_sql
   end
 end

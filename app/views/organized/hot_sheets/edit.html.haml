@@ -12,30 +12,20 @@
         = link_to "Add a location", locations_organization_manage_path(organization_id: current_organization.to_param), class: "twlink-underlined"
         to be able to enable Hot Sheet
 
-    %table.table-list
-      %tbody
-        %tr
-          %td Enabled?
-          %td
-            - if @hot_sheet_configuration.on?
-              = check_mark
-            - else
-              %small.less-strong false
+    = render(UI::TableList::Component.new) do |list|
+      - list.with_row(label: "Enabled?") do
         - if @hot_sheet_configuration.on?
-          %tr
-            %td
-              Generates at
-            %td
-              %span.localizeTime.preciseTime
-                = l(@hot_sheet_configuration.send_today_at, format: :convert_time)
-              %span.localizeTimezone
-          %tr
-            %td
-              Recipients
-            %td.hot-sheet-recipient-emails
-              %ul.small
-                - @hot_sheet_configuration.current_recipients.pluck(:email).each do |email|
-                  %li= email
+          = check_mark
+        - else
+          %small.less-strong false
+      - if @hot_sheet_configuration.on?
+        - list.with_row(label: "Generates at") do
+          = render(UI::Time::Component.new(time: @hot_sheet_configuration.send_today_at, format: :localize_time_precise))
+          %span.localizeTimezone
+        - list.with_row(label: "Recipients") do
+          %ul{class: "small tw:mb-0 tw:max-h-[250px] tw:overflow-y-auto"}
+            - @hot_sheet_configuration.current_recipients.pluck(:email).each do |email|
+              %li= email
 
 .row
   .col-md-6

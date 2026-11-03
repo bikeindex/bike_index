@@ -27,9 +27,9 @@
 
     <% table.column(sortable: "referral_source") do |payment| %>
       <% if payment.referral_source.present? %>
-        <code class="small"><%= payment.referral_source %></code>
+        <code class="twcode"><%= payment.referral_source %></code>
         <% if render_sortable %>
-          <%= link_to search_emoji, url_for(sort_state.search_params.merge(query: payment.referral_source)), class: "display-sortable-link small" %>
+          <%= link_to search_emoji, url_for(sort_state.search_params.merge(query: payment.referral_source)), class: "display-sortable-link tw:text-sm" %>
         <% end %>
       <% end %>
     <% end %>
@@ -43,7 +43,7 @@
         <% end %>
 
         <% if render_sortable %>
-          <%= link_to search_emoji, url_for(sort_state.search_params.merge(search_kind: payment.kind)), class: "display-sortable-link small" %>
+          <%= link_to search_emoji, url_for(sort_state.search_params.merge(search_kind: payment.kind)), class: "display-sortable-link tw:text-sm" %>
         <% end %>
       <% end %>
     <% end %>
@@ -64,7 +64,7 @@
           <%= payment.payment_method.humanize.downcase %>
         <% end %>
 
-        <%= link_to search_emoji, url_for(sort_state.search_params.merge(search_payment_method: payment.payment_method)), class: "display-sortable-link small" %>
+        <%= link_to search_emoji, url_for(sort_state.search_params.merge(search_payment_method: payment.payment_method)), class: "display-sortable-link tw:text-sm" %>
       <% end %>
     <% end %>
 

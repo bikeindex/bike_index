@@ -44,7 +44,7 @@ module Atoms
       def serial_block
         return content_tag(:span, serial, class: ["serial-span", @html_class]) unless placeholder?
 
-        content_tag(:span, placeholder_text, class: ["less-strong", @html_class])
+        content_tag(:span, placeholder_text, class: ["twless-strong", @html_class])
       end
 
       def placeholder_text
@@ -62,7 +62,7 @@ module Atoms
       def explanation_block
         return tooltip(explanation_text) if @explanation == :tooltip
 
-        em = content_tag(:em, explanation_text, class: "small less-less-strong")
+        em = content_tag(:em, explanation_text, class: "twless-strong tw:text-xs")
         return em unless serial_visible?
 
         safe_join([em, " ", tooltip(status_text)])

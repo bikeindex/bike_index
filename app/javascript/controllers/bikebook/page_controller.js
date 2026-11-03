@@ -68,8 +68,8 @@ export default class extends Controller {
 
   // A plain click on a link to this page, such as a card's remove link, or on a drawing's figure's data-href, which an
   // in-place link renders without scrolling, focusing what the data-in-place on it or an ancestor selects rather than the search, and one inside a
-  // data-replace in place of the history entry it's on. One among the vehicles was written when the page rendered, so
-  // only what it changes from that goes onto the URL, which filters and panels have moved on since
+  // data-replace in place of the history entry it's on. Any other renders at the top, or at what the data-scroll-to on it or an ancestor selects. One among the
+  // vehicles was written when the page rendered, so only what it changes from that goes onto the URL, which filters and panels have moved on since
   follow (event) {
     const link = event.target.closest('a[href], [data-href]')
     if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || link.target) return
@@ -79,7 +79,7 @@ export default class extends Controller {
 
     event.preventDefault()
     const inPlace = link.closest('[data-in-place]')
-    if (!inPlace) return this.#go(url)
+    if (!inPlace) return this.#go(url, link.closest('[data-scroll-to]')?.dataset.scrollTo)
 
     const next = link.closest('#vehicle-viewers') ? this.#changedBy(url) : url
     // one that shows the search a lone model hid, as its tab does, is a step back can undo, and opens and focuses it
@@ -192,8 +192,9 @@ export default class extends Controller {
     return this.#render(url, scroll, options)
   }
 
-  // `focus` selects what to focus, the search where it selects nothing, unless a field of the page's has focus, which
-  // keeps it and any value it hasn't yet changed to. Until the catalog loads, the page is its loading shell
+  // `scroll` is where the window goes, [x, y] or a selector of what to bring to its top. `focus` selects what to focus,
+  // the search where it selects nothing, unless a field of the page's has focus, which keeps it and any value it hasn't
+  // yet changed to. Until the catalog loads, the page is its loading shell
   async #render (url, scroll, { focus = '[autofocus]', reveal = false } = {}) {
     if (!this.catalog) return this.pageTarget.replaceChildren(loadingShell(this.shellTarget, url, this.status))
 
@@ -225,9 +226,10 @@ export default class extends Controller {
       requestAnimationFrame(() => (this.pageTarget.querySelector(focus) ?? this.pageTarget.querySelector('[autofocus]'))?.focus({ preventScroll: Boolean(scroll) }))
     }
     if (scroll) {
-      window.scrollTo(...scroll)
+      const place = () => typeof scroll === 'string' ? this.pageTarget.querySelector(scroll)?.scrollIntoView() : window.scrollTo(...scroll)
+      place()
       // and again once the panels' controllers have opened them, which the browser's scroll anchoring follows down
-      requestAnimationFrame(() => window.scrollTo(...scroll))
+      requestAnimationFrame(place)
     }
   }
 

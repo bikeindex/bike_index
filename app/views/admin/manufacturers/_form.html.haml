@@ -2,51 +2,28 @@
 = form_for [:admin, @manufacturer] do |f|
   = render(UI::Alerts::ObjectError::Component.new(object: @manufacturer))
 
-  .form-group
-    = f.label :name
-    = f.text_field :name, class: "form-control"
+  = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :name)) do |group|
     - if @manufacturer.id.present?
-      %small.below-input-help
-        %span.less-strong Secondary name (name in parentheses):
-        = @manufacturer.secondary_name.present? ? @manufacturer.secondary_name : nil
+      - group.with_helper_text do
+        %span.twless-strong Secondary name (name in parentheses):
+        = @manufacturer.secondary_name.presence
 
-  .form-group
-    = f.label :website
-    = f.text_field :website, class: "form-control"
+  = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :website))
 
-  .form-group
-    = f.label :twitter_name, "Twitter handle"
-    = f.text_field :twitter_name, class: "form-control"
+  = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :twitter_name, label_text: "Twitter handle"))
 
-  .form-group
-    = f.label :open_year
-    = f.text_field :open_year, class: "form-control"
+  = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :open_year))
 
-  .form-group
-    = f.label :close_year
-    = f.text_field :close_year, class: "form-control"
+  = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :close_year))
 
-  .form-group
-    = f.label :frame_maker
-    = f.check_box :frame_maker
+  %div{class: "tw:mb-4"}
+    = render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :frame_maker, label: "Frame maker"))
+    = render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :motorized_only, label: "Motorized only"))
 
-  .form-group
-    = f.label :motorized_only
-    = f.check_box :motorized_only
-
-  .form-group
-    = f.label :logo
-    - if @manufacturer.logo?
-      = image_tag(@manufacturer.logo_url(:thumb))
-    - else
-      %p
-        No logo!
-    = f.file_field :logo, accept: ImageUploader.permitted_extensions.join(",")
+  = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :logo)) do
+    = render(UI::Forms::Files::Upload::Component.new(form_builder: f, attribute: :logo, accept: ImageUploader.permitted_extensions))
     = f.hidden_field :logo_cache
 
-  .form-group
-    = f.label :description
-    = f.text_area :description, rows: 7, class: "form-control"
+  = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :description, kind: :text_area, html_options: {rows: 7}))
 
-  = f.submit "Submit", class: 'btn btn-success mb-4'
-
+  = render(UI::Button::Component.new(text: "Submit", color: :primary, type: "submit", html_class: "tw:mb-4"))

@@ -10,6 +10,14 @@ module Pages
             @bike = bike
             @review = review
           end
+
+          private
+
+          def initial = @initial ||= @review.initial_ownership(@bike)
+
+          def current = @bike.current_ownership
+
+          def muted = "tw:text-gray-600 tw:dark:text-gray-400"
         end
       end
     end

@@ -1,5 +1,5 @@
-.container
-  %h1 New Ambassador Activity
+= render(UI::Container::Component.new(width: :wide)) do
+  = render(Pages::Admin::Headers::Nav::Component.new(title: "New Ambassador Activity"))
 
   = render "form",
     ambassador_task: @ambassador_task,

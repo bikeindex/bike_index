@@ -1,9 +1,11 @@
 <% if @bike.present? %>
   <%= render Pages::Admin::Bikes::Header::Component.new(bike: @bike, active: :theft_alerts, display_recovery: true, user: current_user, display_dev_info: display_dev_info?) %>
-  <h1 class="mt-5 mb-4">
-    Promoted Alerts
+  <%= render(UI::Header::Component.new(tag: :h2)) do %>
+    Promoted alerts
+    <%= render(Pages::Admin::Headers::Count::Component.new(count: @pagy.count)) %>
+
     <%= render(UI::ButtonLink::Component.new(text: "New Promoted alert", href: new_admin_theft_alert_path(bike_id: @bike.id), color: :primary, size: :sm, html_class: "tw:ml-2")) %>
-  </h1>
+  <% end %>
   <%= render partial: "table", locals: {render_sortable: true, theft_alerts: @theft_alerts, skip_bike: true} %>
 <% else %>
   <% nav_header_list_items = capture do %>
@@ -71,29 +73,27 @@
           end
         end %>
 
-      <div class="col-12 mt-2">
+      <div class="tw:mt-2">
         <%= render(UI::Chart::Component.new(series: theft_alerts_graph, time_range: @time_range, stacked: true)) %>
       </div>
 
       <% if @search_facebook_data %>
-        <h3 class="mt-5">
-          <em>Sum of Facebook reach for ads started in the period</em>
-        </h3>
+        <%= render(UI::Header::Component.new(text: tag.em("Sum of Facebook reach for ads started in the period"), tag: :h2, html_class: "tw:mt-12")) %>
         <%= render(UI::Chart::Component.new(series: facebook_reach_graph, time_range: @time_range, stacked: true)) %>
-        <div class="mt-5"></div>
+        <div class="tw:mt-12"></div>
       <% end %>
 
       <% unless @search_recovered %>
-        <div class="col-12 mt-2">
+        <div class="tw:mt-2">
           <%= render(UI::Chart::Component.new(series: alerts_recoveries_graph, time_range: @time_range, stacked: true)) %>
         </div>
       <% end %>
     <% end %>
   <% end %>
   <% admin_search_form = capture do %>
-    <div class="row mb-4 mt-4">
-      <div class="col">
-        <%= form_tag admin_theft_alerts_path, method: :get, class: "form-inline" do %>
+    <div class="tw:my-6 tw:flex tw:gap-x-8">
+      <div class="tw:flex-1">
+        <%= form_with(url: admin_theft_alerts_path, method: :get, html: {class: "twsearchrow"}) do |form| %>
           <%= hidden_field_tag :search_recovery_display_status, @search_recovered %>
           <%= hidden_field_tag :search_status, @status %>
           <%= hidden_field_tag :search_paid_admin, @search_paid %>
@@ -102,25 +102,22 @@
           <%= hidden_field_tag :search_location_counts, @location_counts %>
           <%= render partial: "/shared/hidden_search_fields" %>
 
-          <div class="form-group ml-auto mr-1 mb-2">
-            <em class="small less-strong mr-1 d-md-inline d-none">within</em>
-            <%= number_field_tag :search_distance, @distance, class: "form-control", style: "width: 5rem;" %>
+          <em class="twless-strong tw:hidden tw:text-sm tw:md:inline">within</em>
 
-            <em class="small less-strong ml-1 mr-1 d-md-inline d-none">
-              miles of
-            </em>
-          </div>
+          <%= render(UI::Forms::Input::Component.new(form_builder: form, attribute: :search_distance, kind: :number_field,
+            html_options: {value: @distance, class: "tw:w-20"})) %>
 
-          <div class="form-group mr-2 mb-2">
-            <%= text_field_tag :search_location, params[:search_location], placeholder: "anywhere", class: "form-control" %>
-          </div>
+          <em class="twless-strong tw:hidden tw:text-sm tw:md:inline">miles of</em>
 
-          <%= submit_tag "Search", name: "search", class: "btn btn-primary mb-2" %>
+          <%= render(UI::Forms::Input::Component.new(form_builder: form, attribute: :search_location,
+            html_options: {value: params[:search_location], placeholder: "anywhere"})) %>
+
+          <%= render(UI::Button::Component.new(text: "Search", color: :primary, type: "submit", name: "search")) %>
         <% end %>
       </div>
 
       <% if theft_alert_plans.present? %>
-        <div class="col">
+        <div class="tw:flex-1">
           <%= render(Pages::Admin::TheftAlerts::PlanCounts::Component.new(theft_alert_plans:, theft_alerts: searched_theft_alerts, recovered_stolen_records: stolen_records)) %>
         </div>
       <% end %>
@@ -128,28 +125,27 @@
   <% end %>
   <% table_view = capture do %>
     <% if @location_counts %>
-      <div
-        class="col-md-8 offset-md-2 mb-3"
-        style="max-height: 500px; overflow-y: scroll;"
-      >
-        <%= render(UI::Table::Component.new(records: searched_theft_alerts.cities_count, sort_state:)) do |table| %>
-          <% table.column(label: "Country", classes: "tw:text-xs") do |(country)| %>
-            <%= country %>
-          <% end %>
+      <%= render(UI::Container::Component.new) do %>
+        <div class="tw:mb-4" style="max-height: 500px; overflow-y: scroll;">
+          <%= render(UI::Table::Component.new(records: searched_theft_alerts.cities_count, sort_state:)) do |table| %>
+            <% table.column(label: "Country", classes: "tw:text-xs") do |(country)| %>
+              <%= country %>
+            <% end %>
 
-          <% table.column(label: "City") do |(country, city, state)| %>
-            <%= link_to city.presence || "Blank location", admin_theft_alerts_path(sort_state.search_params.merge(search_location: "#{city}, #{state} #{country}")), class: "twlink" %>
-          <% end %>
+            <% table.column(label: "City") do |(country, city, state)| %>
+              <%= link_to city.presence || "Blank location", admin_theft_alerts_path(sort_state.search_params.merge(search_location: "#{city}, #{state} #{country}")), class: "twlink" %>
+            <% end %>
 
-          <% table.column(label: "State", classes: "tw:text-xs") do |(_country, _city, state)| %>
-            <%= state %>
-          <% end %>
+            <% table.column(label: "State", classes: "tw:text-xs") do |(_country, _city, state)| %>
+              <%= state %>
+            <% end %>
 
-          <% table.column(label: "Count") do |(_country, _city, _state, count)| %>
-            <%= number_display(count) %>
+            <% table.column(label: "Count") do |(_country, _city, _state, count)| %>
+              <%= number_display(count) %>
+            <% end %>
           <% end %>
-        <% end %>
-      </div>
+        </div>
+      <% end %>
     <% end %>
 
     <%= render partial: "table", locals: {render_sortable: true, theft_alerts: @theft_alerts, skip_bike: false} %>

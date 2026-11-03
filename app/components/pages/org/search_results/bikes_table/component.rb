@@ -53,7 +53,7 @@ module Pages
           end
 
           def multiselect_cell_classes
-            ["multi-update-cell table-cell-check", ("tw:hidden" unless @multiselect_visible)].compact.join(" ")
+            ["multi-update-cell table_cell_check", ("tw:hidden" unless @multiselect_visible)].compact.join(" ")
           end
 
           # The organization's fields placed after column, or with :rest the ones placed nowhere

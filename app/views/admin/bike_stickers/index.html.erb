@@ -11,21 +11,23 @@
 <% end %>
 
 <% admin_search_form = capture do %>
-  <div class="mt-4">
+  <div class="tw:mt-6">
     <% unless @bike_sticker_batch.present? %>
-      <h5>
+      <% batches_title = capture do %>
         <%= number_display(@bike_sticker_batches.count) %>
 
         <% if @matching_batches %>
           matching <%= "batch".pluralize(@bike_sticker_batches.count) %>
         <% elsif @all_batches %>
           batches
-          <small class="less-strong">- show <%= link_to "only most recent", url_for(sortable_search_params.merge(search_all_batches: false)) %></small>
+          <small class="twless-strong">- show <%= link_to "only most recent", url_for(sortable_search_params.merge(search_all_batches: false)), class: "twlink" %></small>
         <% else %>
           most recent batches
-          <small class="less-strong">- <%= number_display(BikeStickerBatch.count) %> <%= link_to "total batches", url_for(sortable_search_params.merge(search_all_batches: true)), class: "less-strong" %></small>
+          <small class="twless-strong">- <%= number_display(BikeStickerBatch.count) %> <%= link_to "total batches", url_for(sortable_search_params.merge(search_all_batches: true)), class: "twlink twless-strong" %></small>
         <% end %>
-      </h5>
+      <% end %>
+
+      <%= render(UI::Header::Component.new(text: batches_title, tag: :h3)) %>
     <% end %>
 
     <%= render partial: "batches_table", locals: {bike_sticker_batches: @bike_sticker_batches, render_sortable: false, matching_count: @matching_batches} %>
@@ -33,56 +35,56 @@
 
   <% if @bike_sticker_batch.present? %>
     <% if Binxtils::InputNormalizer.boolean(params[:search_show_problems]) %>
-      <div class="mt-4 mb-4">
-        <h4>
+      <div class="tw:my-6">
+        <%= render(UI::Header::Component.new(tag: :h2)) do %>
           Showing Problem stickers
-          <small><%= link_to "hide", url_for(sortable_search_params.merge(search_show_problems: false)), class: "less-strong" %></small>
-        </h4>
+          <small><%= link_to "hide", url_for(sortable_search_params.merge(search_show_problems: false)), class: "twlink twless-strong" %></small>
+        <% end %>
 
         <% duplicated = @bike_sticker_batch.duplicated_integers %>
-        <span class="d-block strong">Duplicates:</span>
+        <span class="strong tw:block">Duplicates:</span>
 
         <% if duplicated.any? %>
-          <ul>
+          <ul class="tw:mb-4">
             <% duplicated.each do |int| %>
-              <li class="small"><code><%= int %></code></li>
+              <li class="tw:text-sm"><code class="twcode"><%= int %></code></li>
             <% end %>
           </ul>
         <% else %>
-          <em class="less-strong">None</em>
+          <em class="twless-strong">None</em>
         <% end %>
 
-        <span class="d-block strong">Non-sequential stickers:</span>
+        <span class="strong tw:block">Non-sequential stickers:</span>
 
         <% if @bike_sticker_batch.non_sequential_integers.any? %>
-          <ul>
+          <ul class="tw:mb-4">
             <% @bike_sticker_batch.non_sequential_integers.each do |arr| %>
-              <li class="small"><%= arr[0] %> &gt; <%= arr[1] %></li>
+              <li class="tw:text-sm"><%= arr[0] %> &gt; <%= arr[1] %></li>
             <% end %>
           </ul>
         <% else %>
-          <em class="less-strong">none</em>
+          <em class="twless-strong">none</em>
         <% end %>
       </div>
-      <hr>
+      <hr class="twhr">
     <% else %>
-      <div class="text-center pt-4">
-        <%= link_to "Show problem stickers for Batch ##{@bike_sticker_batch.id}", url_for(sortable_search_params.merge(search_show_problems: true)), class: "btn btn-outline-warning btn-sm" %>
+      <div class="tw:pt-6 tw:text-center">
+        <%= render(UI::ButtonLink::Component.new(text: "Show problem stickers for Batch ##{@bike_sticker_batch.id}", href: url_for(sortable_search_params.merge(search_show_problems: true)), color: :yellow, size: :sm)) %>
 
-        <em class="ml-2 less-strong">
+        <em class="twless-strong tw:ml-2">
           (duplicates and non-sequential stickers)
         </em>
       </div>
     <% end %>
   <% end %>
 
-  <div class="row mt-4">
-    <div class="col-md-6">
-      <p>
+  <div class="twwiderow tw:mt-6">
+    <div>
+      <p class="tw:mb-4">
         <%= number_display(matching_bike_stickers.size) %> matching
         <%= "sticker".pluralize(matching_bike_stickers.size) %>
         <% unless @search_claimed %>
-          <span class="less-strong">
+          <span class="twless-strong">
             <%= number_with_delimiter(matching_bike_stickers.claimed.count) %>
             claimed
           </span>
@@ -92,36 +94,33 @@
           <em><%= UI::PeriodSelect::Component.column_label(@time_range_column) %> <%= render(UI::TimeRange::Component.new(time_range: @time_range, period: @period)) %></em>
         <% end %>
         <% if sortable_search_params? %>
-          - <em><%= link_to "view all stickers", url_for %></em>
+          -
+          <em><%= link_to "view all stickers", url_for, class: "twlink" %></em>
         <% end %>
       </p>
 
       <% if @bike_sticker_batch.present? %>
-        <p>
+        <p class="tw:mb-4">
           <strong>Viewing Just Batch #<%= @bike_sticker_batch.id %></strong>
 
           <small>
-            <%= link_to "view all batches", url_for(sortable_search_params.except(:search_bike_sticker_batch_id)) %>
+            <%= link_to "view all batches", url_for(sortable_search_params.except(:search_bike_sticker_batch_id)), class: "twlink" %>
           </small>
         </p>
       <% end %>
     </div>
 
-    <div class="col-md-6 mt-2">
-      <%= form_tag admin_bike_stickers_path, method: :get, class: "form-inline" do %>
+    <div class="tw:mt-2">
+      <%= form_with(url: admin_bike_stickers_path, method: :get, html: {class: "twsearchrow"}) do |form| %>
         <%= render partial: "/shared/hidden_search_fields" %>
         <%= hidden_field_tag :search_bike_sticker_batch_id, params[:search_bike_sticker_batch_id] %>
 
-        <div class="form-check ml-auto ml-2">
-          <%= check_box_tag :search_claimed, true, @search_claimed, class: "form-check-input" %>
-          <%= label_tag :search_claimed, "Claimed only" %>
-        </div>
+        <%= render(UI::Forms::Checkbox::Component.new(name: :search_claimed, value: true, checked: @search_claimed, label: "Claimed only")) %>
 
-        <div class="form-group ml-2">
-          <%= text_field_tag :search_query, params[:search_query], placeholder: "search sticker", class: "form-control" %>
-        </div>
+        <%= render(UI::Forms::Input::Component.new(form_builder: form, attribute: :search_query,
+          html_options: {value: params[:search_query], placeholder: "search sticker"})) %>
 
-        <%= submit_tag "Search", name: "search", class: "btn btn-primary ml-2" %>
+        <%= render(UI::Button::Component.new(text: "Search", color: :primary, type: "submit", name: "search")) %>
       <% end %>
     </div>
   </div>
