@@ -75,9 +75,9 @@ export default class extends Controller {
 
   // The search, unless the reader's moved through the picked vehicles while it was disabled: a link of theirs is there again
   #focusOnLoad () {
-    if (!this.pageTarget.contains(document.activeElement)) return '[autofocus]'
+    if (!this.pageTarget.contains(document.activeElement)) return
     const href = document.activeElement.getAttribute('href')
-    return Boolean(href) && `[href="${CSS.escape(href)}"]`
+    return href && `[href="${CSS.escape(href)}"]`
   }
 
   // The form's fields over the URL's other params, such as an open panel's, its sizes following their vehicles,

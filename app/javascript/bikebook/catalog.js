@@ -10,7 +10,7 @@ import { fragmentOf, renderInto } from 'bikebook/render'
 // `jurisdictions` names the codes classifications are in, which the catalog doesn't, and `paintColors` are Bike Index's
 // colors' displays by their names, which its colorways' colors are. `onPicks` takes what `ids` render from, as soon as
 // it's in, where there are any, and `comparing` fetches the comparison alongside the index rather than after it
-export async function loadCatalog (manifestUrl, ids = [], jurisdictions = {}, paintColors = {}, { onPicks = () => {}, comparing = false } = {}) {
+export async function loadCatalog (manifestUrl, ids = [], jurisdictions = {}, paintColors = {}, { onPicks = () => {}, comparing } = {}) {
   const worker = new Worker(import.meta.resolve('bikebook/catalog_worker'), { type: 'module' })
   const pending = new Map()
   let nextId = 0

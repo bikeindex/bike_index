@@ -111,6 +111,13 @@ const similarOf = async (catalog, url, vehicles, filters) => {
   return { ...settings, results: url.searchParams.get('similar') === '1' ? await catalog.similar(vehicles[0].value, settings, filters) : undefined }
 }
 
+// What opens and adjusts the similar models, from beside their section
+const renderSimilarControls = (root, viewer, vehicles, similar) => {
+  const toggle = viewer.compareToggle(vehicles, similar)
+  for (const slot of root.querySelectorAll('[data-similar-slot]')) renderInto(slot, toggle)
+  renderInto(root.querySelector('#similar-adjustments'), viewer.similarAdjustments(vehicles, similar))
+}
+
 // The similar models' cards for `vehicle` by its `settings`, which change without rendering the page afresh
 export async function rescoredSimilar (catalog, page, url, vehicle, settings) {
   const filters = filtersAt(catalog, page, url)
@@ -144,13 +151,12 @@ export async function addComparison (catalog, page, url, current) {
   const filters = filtersAt(catalog, page, url)
   const vehicles = (await pickedOf(catalog, url, filters)).slice(0, MAX_COMPARE)
   const similar = await similarOf(catalog, url, vehicles, filters)
-  if (!current()) return
+  if (!vehicles.length || !current()) return
 
   const viewer = new VehicleViewer(catalog.kit, catalog.vocabulary, filters)
   page.querySelector('[data-similar-waiting]')?.remove()
   page.querySelector('#vehicle-viewers').prepend(fragmentOf(viewer.similarModels(vehicles[0], similar, url)))
-  renderInto(page.querySelector('#similar-adjustments'), viewer.similarAdjustments(vehicles, similar))
-  for (const slot of page.querySelectorAll('[data-similar-slot]')) renderInto(slot, viewer.compareToggle(vehicles, similar))
+  renderSimilarControls(page, viewer, vehicles, similar)
 }
 
 // The page at `url` while the catalog loads: its filters live and filled in from the URL, their values as it has them, and
@@ -190,10 +196,9 @@ export async function picksShell (picks, shell, url, status) {
   renderChips(combobox(root, 'vehicle_models'), vehicles)
   const viewers = root.getElementById('vehicle-viewers')
   const viewer = new VehicleViewer(picks.kit, picks.vocabulary, urlFilters(root, url))
-  const similar = await similarOf(picks, url, vehicles, {})
+  const similar = { waiting: true }
   renderInto(viewers, viewer.render(vehicles, url, preferredSize(), {}, { similar }))
-  for (const slot of root.querySelectorAll('[data-similar-slot]')) renderInto(slot, viewer.compareToggle(vehicles, similar))
-  // beneath them, so a failure to load the rest says so without taking them away
+  renderSimilarControls(root, viewer, vehicles, similar)
   viewers.append(status)
   return { content: root, title: vehicles[0].display }
 }
@@ -249,8 +254,7 @@ export async function hydrate (catalog, source, shell, url) {
   const similar = await similarOf(catalog, url, vehicles, filters)
   renderInto(root.getElementById('vehicle-viewers'), viewer.render(vehicles, url, preferredSize(),
     vehicles.length ? {} : await unpicked(catalog, root, filters), { group, similar }))
-  for (const slot of root.querySelectorAll('[data-similar-slot]')) renderInto(slot, viewer.compareToggle(vehicles, similar))
-  renderInto(root.getElementById('similar-adjustments'), viewer.similarAdjustments(vehicles, similar))
+  renderSimilarControls(root, viewer, vehicles, similar)
 
   localSources.set(combobox(root, 'vehicle_models'), source)
   for (const name of LISTS) {

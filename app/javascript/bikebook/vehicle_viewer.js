@@ -202,7 +202,7 @@ export class VehicleViewer {
 
   // The controls that rescore the models most like the first of `vehicles`, for the filters' card
   similarAdjustments (vehicles, similar) {
-    return similar && !similar.waiting && vehicles.length ? similarAdjustments(this.#similarOf(vehicles[0], similar)) : nothing
+    return similar && vehicles.length ? similarAdjustments(this.#similarOf(vehicles[0], similar)) : nothing
   }
 
   #similarOf ({ value, data, current }, similar) {

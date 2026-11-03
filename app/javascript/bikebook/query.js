@@ -26,4 +26,4 @@ export const toQuery = (params) => {
 }
 
 // Whether the page at `url` is of what the comparison adds, the similar models or a frame material
-export const comparing = (url) => url.searchParams.get('similar') === '1' || Boolean(url.searchParams.get('frame_material'))
+export const comparing = (url) => url.searchParams.get('similar') === '1' || url.searchParams.get('frame_material')
