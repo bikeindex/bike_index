@@ -1,6 +1,8 @@
-= render(Pages::Admin::Headers::Nav::Component.new(title: "Social Account")) do
-  %li= render(UI::ButtonLink::Component.new(text: "Edit", href: edit_admin_social_account_url(@social_account), size: :sm))
-  %li= render(UI::ButtonLink::Component.new(text: "Check Credentials", href: check_credentials_admin_social_account_url(@social_account), size: :sm))
+= render(Pages::Admin::Headers::Nav::Component.new(title: "Social Account")) do |nav|
+  - nav.with_item do
+    = render(UI::ButtonLink::Component.new(text: "Edit", href: edit_admin_social_account_url(@social_account), size: :sm))
+  - nav.with_item do
+    = render(UI::ButtonLink::Component.new(text: "Check Credentials", href: check_credentials_admin_social_account_url(@social_account), size: :sm))
 - if @social_account.errored?
   = render(UI::Container::Component.new) do
     = render(UI::Card::Component.new(additional_classes: "tw:my-6")) do

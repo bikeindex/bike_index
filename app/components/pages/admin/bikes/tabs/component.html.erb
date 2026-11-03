@@ -1,5 +1,7 @@
-<%= render(Pages::Admin::Headers::Tabs::Component.new(title:, tabs:, links: [non_admin_view_link],
+<%= render(Pages::Admin::Headers::Tabs::Component.new(title:, tabs:,
       nav_label: "Registration sections")) do |header| %>
+  <% header.with_nav_item { non_admin_view_link } %>
+
   <% if alerts? %>
     <% header.with_alert do %>
       <% if @bike.deleted? %>

@@ -1,24 +1,3 @@
-<% nav_header_list_items = capture do %>
-  <li>
-    <%= render(UI::Dropdown::Component.new(name: @search_kind == "all" ? "All kinds" : Feedback.kind_humanized(@search_kind), button_size: :sm,
-          active: @search_kind != "all")) do |dropdown| %>
-      <% permitted_kinds.each do |kind| %>
-        <% kind_active = @search_kind == kind %>
-        <% kind_display = kind == "all" ? "All kinds" : Feedback.kind_humanized(kind) %>
-        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: kind_display, path: url_for(sortable_search_params.merge(search_kind: (kind_active ? nil : kind))), match_params: {search_kind: kind}) } %>
-
-        <% if kind == "stolen_tip" %>
-          <% dropdown.with_entry_divider %>
-        <% end %>
-      <% end %>
-    <% end %>
-  </li>
-
-  <li>
-    <%= render(UI::ButtonLink::Component.new(text: "Render kind counts", href: url_for(sortable_search_params.merge(search_kind_counts: !@render_kind_counts)), size: :sm, active: @render_kind_counts)) %>
-  </li>
-<% end %>
-
 <% colors = %w[#B60205 #D93F0B #FBCA04 #0E8A16 #006B75 #1D76DB #0052CC #5319E7 #D4C5F9 #2C3E50 #F9D0C4 #C2E0C6 #C5DEF5 #7DCABB] %>
 
 <% rendered_chart = capture do %>
@@ -87,7 +66,25 @@
   collection: @feedbacks,
   viewing: "Feedback & Messages",
   rendered_chart:,
-  nav_header_list_items:,
   admin_search_form:,
   table_view:,
-)) %>
+)) do |skeleton| %>
+  <% skeleton.with_nav_item do %>
+    <%= render(UI::Dropdown::Component.new(name: @search_kind == "all" ? "All kinds" : Feedback.kind_humanized(@search_kind), button_size: :sm,
+          active: @search_kind != "all")) do |dropdown| %>
+      <% permitted_kinds.each do |kind| %>
+        <% kind_active = @search_kind == kind %>
+        <% kind_display = kind == "all" ? "All kinds" : Feedback.kind_humanized(kind) %>
+        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: kind_display, path: url_for(sortable_search_params.merge(search_kind: (kind_active ? nil : kind))), match_params: {search_kind: kind}) } %>
+
+        <% if kind == "stolen_tip" %>
+          <% dropdown.with_entry_divider %>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <% skeleton.with_nav_item do %>
+    <%= render(UI::ButtonLink::Component.new(text: "Render kind counts", href: url_for(sortable_search_params.merge(search_kind_counts: !@render_kind_counts)), size: :sm, active: @render_kind_counts)) %>
+  <% end %>
+<% end %>

@@ -1,6 +1,7 @@
-= render(Pages::Admin::Headers::Nav::Component.new(title: "Editing Membership", subtitle: @membership.admin_managed? ? "admin managed" : "stripe managed")) do
+= render(Pages::Admin::Headers::Nav::Component.new(title: "Editing Membership", subtitle: @membership.admin_managed? ? "admin managed" : "stripe managed")) do |nav|
   - if @membership.stripe_managed?
-    %li= render(UI::ButtonLink::Component.new(text: "Update from Stripe", href: admin_membership_path(id: @membership.id, update_from_stripe: true), method: :patch, color: :primary, size: :sm))
+    - nav.with_item do
+      = render(UI::ButtonLink::Component.new(text: "Update from Stripe", href: admin_membership_path(id: @membership.id, update_from_stripe: true), method: :patch, color: :primary, size: :sm))
 
 .twwiderow{class: "tw:mt-6 tw:items-start"}
   = render(UI::TableList::Component.new) do |list|

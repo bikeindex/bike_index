@@ -1,33 +1,3 @@
-<% nav_header_list_items = capture do %>
-  <li>
-    <% reposts_hidden = Binxtils::InputNormalizer.boolean(params[:search_repost]) %>
-
-    <%# the component escapes the label, so writing &amp; here would double-escape %>
-    <%= render(UI::ButtonLink::Component.new(size: :sm, active: reposts_hidden,
-          text: reposts_hidden ? "OG & Reposts" : "OG posts only",
-          href: reposts_hidden ? admin_social_posts_path(sortable_search_params.except(:search_repost)) : admin_social_posts_path(sortable_search_params.merge(search_repost: true)))) %>
-  </li>
-
-  <li>
-    <%= render(UI::Dropdown::Component.new(name: @search_kind == "all" ? "All kinds" : "#{@search_kind.gsub(/_?post/, "").humanize} posts", button_size: :sm,
-          active: @search_kind != "all")) do |dropdown| %>
-      <% permitted_search_kinds.each do |kind| %>
-        <% kind_active = @search_kind == kind %>
-        <% kind_display = kind == "all" ? "All kinds" : "#{kind.gsub(/_?post/, "").humanize} posts" %>
-        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: kind_display, path: admin_social_posts_path(sortable_search_params.merge(search_kind: (kind_active ? nil : kind))), match_params: {search_kind: kind}) } %>
-
-        <% if kind == "not_stolen" %>
-          <% dropdown.with_entry_divider %>
-        <% end %>
-      <% end %>
-    <% end %>
-  </li>
-
-  <li>
-    <%= render(UI::ButtonLink::Component.new(text: "New Post", href: new_admin_social_post_path, color: :primary, size: :sm)) %>
-  </li>
-<% end %>
-
 <% admin_search_form = capture do %>
   <div class="tw:my-6 tw:grid tw:gap-x-8 tw:sm:grid-cols-12">
     <div class="tw:sm:col-span-5">
@@ -59,8 +29,35 @@
   index: admin_index_state,
   collection: @social_posts,
   viewing: "Posts",
-  nav_header_list_items:,
   chart_collection: @render_chart && matching_social_posts,
   admin_search_form:,
   table_view:,
-)) %>
+)) do |skeleton| %>
+  <% skeleton.with_nav_item do %>
+    <% reposts_hidden = Binxtils::InputNormalizer.boolean(params[:search_repost]) %>
+
+    <%# the component escapes the label, so writing &amp; here would double-escape %>
+    <%= render(UI::ButtonLink::Component.new(size: :sm, active: reposts_hidden,
+          text: reposts_hidden ? "OG & Reposts" : "OG posts only",
+          href: reposts_hidden ? admin_social_posts_path(sortable_search_params.except(:search_repost)) : admin_social_posts_path(sortable_search_params.merge(search_repost: true)))) %>
+  <% end %>
+
+  <% skeleton.with_nav_item do %>
+    <%= render(UI::Dropdown::Component.new(name: @search_kind == "all" ? "All kinds" : "#{@search_kind.gsub(/_?post/, "").humanize} posts", button_size: :sm,
+          active: @search_kind != "all")) do |dropdown| %>
+      <% permitted_search_kinds.each do |kind| %>
+        <% kind_active = @search_kind == kind %>
+        <% kind_display = kind == "all" ? "All kinds" : "#{kind.gsub(/_?post/, "").humanize} posts" %>
+        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: kind_display, path: admin_social_posts_path(sortable_search_params.merge(search_kind: (kind_active ? nil : kind))), match_params: {search_kind: kind}) } %>
+
+        <% if kind == "not_stolen" %>
+          <% dropdown.with_entry_divider %>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <% skeleton.with_nav_item do %>
+    <%= render(UI::ButtonLink::Component.new(text: "New Post", href: new_admin_social_post_path, color: :primary, size: :sm)) %>
+  <% end %>
+<% end %>

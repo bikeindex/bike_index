@@ -1,9 +1,3 @@
-<% nav_header_list_items = capture do %>
-  <li>
-    <%= render(UI::ButtonLink::Component.new(text: "New Manufacturer", href: new_admin_manufacturer_url, color: :primary, size: :sm)) %>
-  </li>
-<% end %>
-
 <% count_detail = capture do %>
   &mdash; <%= number_display(Manufacturer.with_websites.count) %> with
   <%= link_to "websites", url_for(sortable_search_params.merge(search_with_websites: !@with_websites)), class: @with_websites ? "twlink active" : "twlink" %>,
@@ -29,8 +23,11 @@
   index: admin_index_state,
   collection: @manufacturers,
   viewing: "Manufacturers",
-  nav_header_list_items:,
   table_view:,
   count_detail:,
   skip_charting: true,
-)) %>
+)) do |skeleton| %>
+  <% skeleton.with_nav_item do %>
+    <%= render(UI::ButtonLink::Component.new(text: "New Manufacturer", href: new_admin_manufacturer_url, color: :primary, size: :sm)) %>
+  <% end %>
+<% end %>

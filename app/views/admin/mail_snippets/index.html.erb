@@ -1,25 +1,3 @@
-<% nav_header_list_items = capture do %>
-  <li>
-    <%= render(UI::ButtonLink::Component.new(text: "new snippet", href: new_admin_mail_snippet_path, color: :primary, size: :sm)) %>
-  </li>
-
-  <li>
-    <%= render(UI::Dropdown::Component.new(name: @search_kind == "all" ? "All kinds" : MailSnippet.kind_humanized(@search_kind), button_size: :sm,
-          active: @search_kind != "all")) do |dropdown| %>
-      <% (["all"] + MailSnippet.kinds).each do |kind| %>
-        <% kind_active = @search_kind == kind %>
-        <% kind_link_params = sortable_search_params.merge(search_kind: (kind_active ? nil : kind)) %>
-        <% kind_humanized = kind == "all" ? "All kinds" : MailSnippet.kind_humanized(kind) %>
-        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: kind_humanized, path: admin_mail_snippets_path(kind_link_params), match_params: {search_kind: kind}) } %>
-
-        <% if kind == "all" %>
-          <% dropdown.with_entry_divider %>
-        <% end %>
-      <% end %>
-    <% end %>
-  </li>
-<% end %>
-
 <% table_view = capture do %>
   <%= render(UI::Table::Component.new(records: @mail_snippets, render_sortable: true, sort_state:)) do |table| %>
     <% table.column(sortable: "created_at") do |mail_snippet| %>
@@ -62,5 +40,25 @@
 <%= render(Pages::Admin::IndexSkeleton::Component.new(
   index: admin_index_state,
   viewing: controller_name.humanize,
-  collection: @mail_snippets, nav_header_list_items:, table_view:, chart_collection: @render_chart && matching_mail_snippets,
-)) %>
+  collection: @mail_snippets, table_view:, chart_collection: @render_chart && matching_mail_snippets,
+)) do |skeleton| %>
+  <% skeleton.with_nav_item do %>
+    <%= render(UI::ButtonLink::Component.new(text: "new snippet", href: new_admin_mail_snippet_path, color: :primary, size: :sm)) %>
+  <% end %>
+
+  <% skeleton.with_nav_item do %>
+    <%= render(UI::Dropdown::Component.new(name: @search_kind == "all" ? "All kinds" : MailSnippet.kind_humanized(@search_kind), button_size: :sm,
+          active: @search_kind != "all")) do |dropdown| %>
+      <% (["all"] + MailSnippet.kinds).each do |kind| %>
+        <% kind_active = @search_kind == kind %>
+        <% kind_link_params = sortable_search_params.merge(search_kind: (kind_active ? nil : kind)) %>
+        <% kind_humanized = kind == "all" ? "All kinds" : MailSnippet.kind_humanized(kind) %>
+        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: kind_humanized, path: admin_mail_snippets_path(kind_link_params), match_params: {search_kind: kind}) } %>
+
+        <% if kind == "all" %>
+          <% dropdown.with_entry_divider %>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

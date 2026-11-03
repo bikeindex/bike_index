@@ -1,11 +1,5 @@
 <% show_search_statuses = !@ignored_only %>
 
-<% nav_header_list_items = capture do %>
-  <%= render(Pages::Admin::Bikes::Index::Filters::Component.new(index: admin_index_state, motorized: @motorized,
-        multi_delete: @multi_delete, origin_search_type: @origin_search_type,
-        pos_search_type: @pos_search_type, period: @period)) %>
-<% end %>
-
 <% rendered_chart = nil %>
 
 <% if @render_chart %>
@@ -168,9 +162,14 @@
   index: admin_index_state,
   collection: @bikes,
   viewing: "Bikes",
-  nav_header_list_items:,
   rendered_chart:,
   admin_search_form:,
   table_view:,
   count_detail:,
-)) %>
+)) do |skeleton| %>
+  <% skeleton.with_nav_item do %>
+    <%= render(Pages::Admin::Bikes::Index::Filters::Component.new(index: admin_index_state, motorized: @motorized,
+        multi_delete: @multi_delete, origin_search_type: @origin_search_type,
+        pos_search_type: @pos_search_type, period: @period)) %>
+  <% end %>
+<% end %>

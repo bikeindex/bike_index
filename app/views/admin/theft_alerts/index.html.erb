@@ -8,44 +8,6 @@
   <% end %>
   <%= render partial: "table", locals: {render_sortable: true, theft_alerts: @theft_alerts, skip_bike: true} %>
 <% else %>
-  <% nav_header_list_items = capture do %>
-    <li>
-      <%= render(UI::Dropdown::Component.new(name: "#{@status.titleize} #{@status == "all" ? "statuses" : "alerts"}", button_size: :sm,
-            active: @status != "all")) do |dropdown| %>
-        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All statuses", path: url_for(sortable_search_params.merge(search_status: nil)), match_params: {search_status: nil}) } %>
-        <% dropdown.with_entry_divider %>
-
-        <% available_statuses.each do |status| %>
-          <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "#{status.humanize} alerts", path: url_for(sortable_search_params.merge(search_status: status)), match_params: {search_status: status}) } %>
-        <% end %>
-      <% end %>
-    </li>
-
-    <li>
-      <%= render(UI::Dropdown::Component.new(name: @search_paid_admin.humanize, button_size: :sm,
-            active: @search_paid_admin.present?)) do |dropdown| %>
-        <% available_paid_admin.each do |paid_admin| %>
-          <% if paid_admin == "paid_and_unpaid" %>
-            <% dropdown.with_entry_divider %>
-          <% end %>
-
-          <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: paid_admin.humanize, path: url_for(sortable_search_params.merge(search_paid_admin: paid_admin)), match_params: {search_paid_admin: paid_admin}) } %>
-        <% end %>
-      <% end %>
-    </li>
-
-    <li>
-      <%= render(UI::ButtonLink::Component.new(text: "fbook data", href: url_for(sortable_search_params.merge(search_facebook_data: !@search_facebook_data)), size: :sm, active: @search_facebook_data)) %>
-    </li>
-
-    <li>
-      <%= render(UI::ButtonLink::Component.new(text: "recovered", href: url_for(sortable_search_params.merge(search_recovered: !@search_recovered)), size: :sm, active: @search_recovered)) %>
-    </li>
-
-    <li>
-      <%= render(UI::ButtonLink::Component.new(text: "location counts", href: admin_theft_alerts_path(sortable_search_params.merge(search_location_counts: !@location_counts)), size: :sm, active: @location_counts)) %>
-    </li>
-  <% end %>
   <% theft_alert_plans = TheftAlertPlan.price_ordered_desc.select { |plan| searched_theft_alerts.where(theft_alert_plan: plan).any? } %>
   <% stolen_records = StolenRecord.recovered.with_theft_alerts.where(theft_alerts: {id: searched_theft_alerts.pluck(:id)}) %>
   <% rendered_chart = nil %>
@@ -154,9 +116,45 @@
   index: admin_index_state,
     collection: @theft_alerts,
     viewing: "Promoted Alerts",
-    nav_header_list_items:,
     rendered_chart:,
     admin_search_form:,
     table_view:,
-  )) %>
+  )) do |skeleton| %>
+    <% skeleton.with_nav_item do %>
+      <%= render(UI::Dropdown::Component.new(name: "#{@status.titleize} #{@status == "all" ? "statuses" : "alerts"}", button_size: :sm,
+            active: @status != "all")) do |dropdown| %>
+        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All statuses", path: url_for(sortable_search_params.merge(search_status: nil)), match_params: {search_status: nil}) } %>
+        <% dropdown.with_entry_divider %>
+
+        <% available_statuses.each do |status| %>
+          <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "#{status.humanize} alerts", path: url_for(sortable_search_params.merge(search_status: status)), match_params: {search_status: status}) } %>
+        <% end %>
+      <% end %>
+    <% end %>
+
+    <% skeleton.with_nav_item do %>
+      <%= render(UI::Dropdown::Component.new(name: @search_paid_admin.humanize, button_size: :sm,
+            active: @search_paid_admin.present?)) do |dropdown| %>
+        <% available_paid_admin.each do |paid_admin| %>
+          <% if paid_admin == "paid_and_unpaid" %>
+            <% dropdown.with_entry_divider %>
+          <% end %>
+
+          <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: paid_admin.humanize, path: url_for(sortable_search_params.merge(search_paid_admin: paid_admin)), match_params: {search_paid_admin: paid_admin}) } %>
+        <% end %>
+      <% end %>
+    <% end %>
+
+    <% skeleton.with_nav_item do %>
+      <%= render(UI::ButtonLink::Component.new(text: "fbook data", href: url_for(sortable_search_params.merge(search_facebook_data: !@search_facebook_data)), size: :sm, active: @search_facebook_data)) %>
+    <% end %>
+
+    <% skeleton.with_nav_item do %>
+      <%= render(UI::ButtonLink::Component.new(text: "recovered", href: url_for(sortable_search_params.merge(search_recovered: !@search_recovered)), size: :sm, active: @search_recovered)) %>
+    <% end %>
+
+    <% skeleton.with_nav_item do %>
+      <%= render(UI::ButtonLink::Component.new(text: "location counts", href: admin_theft_alerts_path(sortable_search_params.merge(search_location_counts: !@location_counts)), size: :sm, active: @location_counts)) %>
+    <% end %>
+  <% end %>
 <% end %>

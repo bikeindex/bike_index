@@ -1,5 +1,6 @@
-= render(Pages::Admin::Headers::Nav::Component.new(title: "Editing #{@blog.blog? ? "Blog" : "Info piece"}")) do
-  %li= render(UI::ButtonLink::Component.new(text: "Delete", href: admin_news_url(@blog), method: :delete, color: :error, size: :sm, confirm: "Are you sure?"))
+= render(Pages::Admin::Headers::Nav::Component.new(title: "Editing #{@blog.blog? ? "Blog" : "Info piece"}")) do |nav|
+  - nav.with_item do
+    = render(UI::ButtonLink::Component.new(text: "Delete", href: admin_news_url(@blog), method: :delete, color: :error, size: :sm, confirm: "Are you sure?"))
 
 - if params[:show_photos]
   %p{class: "tw:mb-4"}

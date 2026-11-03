@@ -1,9 +1,3 @@
-<% nav_header_list_items = capture do %>
-  <li>
-    <%= render(UI::ButtonLink::Component.new(text: "Mnfg Other", href: url_for(sortable_search_params.merge(search_mnfg_other: !@mnfg_other)), size: :sm, active: @mnfg_other)) %>
-  </li>
-<% end %>
-
 <% admin_search_form = capture do %>
   <%= form_with(url: admin_model_audits_path, method: :get, html: {class: "twsearchrow"}) do |f| %>
     <%= render partial: "/shared/hidden_search_fields" %>
@@ -23,6 +17,9 @@
   collection: @model_audits,
   viewing: "Model Audits",
   chart_collection: @render_chart && matching_model_audits,
-  nav_header_list_items:,
   admin_search_form:,
-)) %>
+)) do |skeleton| %>
+  <% skeleton.with_nav_item do %>
+    <%= render(UI::ButtonLink::Component.new(text: "Mnfg Other", href: url_for(sortable_search_params.merge(search_mnfg_other: !@mnfg_other)), size: :sm, active: @mnfg_other)) %>
+  <% end %>
+<% end %>

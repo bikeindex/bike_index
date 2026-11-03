@@ -17,14 +17,15 @@ module Pages
           # What the record is - a dark band flush under the tab row, which every tab shares
           renders_one :summary
 
-          # tabs: what UI::Tabs takes; links: what this screen offers besides them, already
-          # rendered - e.g. "New Invoice"
-          def initialize(title:, tabs:, nav_label:, subtitle: nil, links: [])
+          # What this screen offers besides the tabs - e.g. "New Invoice"
+          renders_many :nav_items
+
+          # tabs: what UI::Tabs takes
+          def initialize(title:, tabs:, nav_label:, subtitle: nil)
             @title = title
             @tabs = tabs
             @nav_label = nav_label
             @subtitle = subtitle
-            @links = links
           end
 
           private
