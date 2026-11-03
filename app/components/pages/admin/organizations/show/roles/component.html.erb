@@ -9,7 +9,9 @@
     <%= "OrganizationRole".pluralize(organization_roles_count) %>
   <% end %>
 
-  <%= render(Pages::Admin::Headers::Section::Component.new(title:)) do %>
+  <%= render(UI::Header::Component.new(tag: :h2)) do %>
+    <%= title %>
+
     <small>
       <% if @deleted %>
         <small>

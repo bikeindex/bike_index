@@ -1,4 +1,6 @@
-<%= render(Pages::Admin::Headers::Section::Component.new(title: tag.span("Recovery Information", class: UI::Alerts::Base::Component::TEXT_CLASSES[:success]))) do %>
+<%= render(UI::Header::Component.new(tag: :h2, html_class: "tw:mt-6")) do %>
+  <%= tag.span("Recovery Information", class: UI::Alerts::Base::Component::TEXT_CLASSES[:success]) %>
+
   <%= link_to "view", admin_recovery_path(@stolen_record.to_param), class: "twlink tw:ml-2 tw:text-sm" %>
 <% end %>
 

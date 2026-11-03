@@ -1,6 +1,6 @@
 = render(Pages::Admin::Headers::Nav::Component.new(title: "Reassign Stickers"))
 
-= render(Pages::Admin::Headers::Section::Component.new(title: safe_join([number_display(@bike_sticker_batches.count), " ", @bike_sticker_batch.present? ? "Selected batch" : "batches"])))
+= render(UI::Header::Component.new(text: safe_join([number_display(@bike_sticker_batches.count), " ", @bike_sticker_batch.present? ? "Selected batch" : "batches"]), tag: :h3))
 
 = render partial: "batches_table", locals: {bike_sticker_batches: @bike_sticker_batches}
 
@@ -9,7 +9,7 @@
   = form_with(url: reassign_admin_bike_stickers_path, method: :get, html: {class: "tw:mt-2"}) do |form|
 
     = render(UI::Card::Component.new) do
-      = render(Pages::Admin::Headers::Section::Component.new(title: "Select stickers to reassign"))
+      = render(UI::Header::Component.new(text: "Select stickers to reassign", tag: :h2))
 
       = render partial: "/shared/hidden_search_fields", locals: {skip_organization: true}
 
