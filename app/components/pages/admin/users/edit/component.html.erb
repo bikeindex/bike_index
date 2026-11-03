@@ -1,4 +1,4 @@
-<%= render(Pages::Admin::Headers::Section::Component.new(title: "Edit")) %>
+<%= render(UI::Header::Component.new(text: "Edit", tag: :h2)) %>
 
 <%= form_for @user, url: admin_user_path(@user), method: :patch, html: {data: {controller: "admin--user-edit-form"}} do |f| %>
   <%= render(UI::Alerts::ObjectError::Component.new(object: @user)) %>
@@ -62,7 +62,7 @@
         <%= render(UI::Container::Component.new) do %>
           <%= render(UI::Card::Component.new) do %>
             <div class="twwiderow">
-              <%= render(Pages::Admin::Headers::Section::Component.new(title: "Ban information")) %>
+              <%= render(UI::Header::Component.new(text: "Ban information", tag: :h3)) %>
 
               <%= render(UI::Forms::Group::Component.new(form_builder: user_ban, attribute: :reason, required: true)) do %>
                 <%= render(UI::Forms::Select::Component.new(form_builder: user_ban, attribute: :reason,
