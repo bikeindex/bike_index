@@ -28,7 +28,7 @@
       - else
         Bike permanently deleted
   = render(UI::Card::Component.new) do
-    = render(Pages::Admin::Headers::Section::Component.new(title: "Message text"))
+    = render(UI::Header::Component.new(text: "Message text", tag: :h2))
     %p{class: "tw:mb-4"}
       = @feedback.body
 

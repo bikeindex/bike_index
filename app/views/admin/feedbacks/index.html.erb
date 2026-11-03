@@ -53,7 +53,7 @@
   <% if @render_kind_counts %>
     <%= render(UI::Container::Component.new) do %>
       <%= render(UI::Card::Component.new(additional_classes: "tw:my-6")) do %>
-        <%= render(Pages::Admin::Headers::Section::Component.new(title: "Kinds")) %>
+        <%= render(UI::Header::Component.new(text: "Kinds", tag: :h2)) %>
 
         <% nil_count = available_feedbacks.where(kind: nil).count %>
 

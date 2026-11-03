@@ -43,5 +43,5 @@
     <% end %>
   <% end %>
 <% else %>
-  <%= render(Pages::Admin::Headers::Section::Component.new(title: "No paints found!", margin_classes: "tw:mb-6")) %>
+  <%= render(UI::Header::Component.new(text: "No paints found!", tag: :h2)) %>
 <% end %>

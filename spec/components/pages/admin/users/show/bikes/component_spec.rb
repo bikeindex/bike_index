@@ -5,7 +5,7 @@ require "rails_helper"
 RSpec.describe Pages::Admin::Users::Show::Bikes::Component, type: :component do
   let(:user) { FactoryBot.create(:user_confirmed) }
   let(:component) { with_request_url("/admin/users/#{user.id}?active_tab=bikes") { render_inline(described_class.new(user:)) } }
-  let(:heading) { component.at_css("h3").text.squish }
+  let(:heading) { component.at_css("h2").text.squish }
 
   it "says there are none" do
     expect(heading).to eq "Bikes 0 (view in admin/bikes)"

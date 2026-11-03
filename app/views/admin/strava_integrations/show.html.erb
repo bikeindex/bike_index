@@ -109,7 +109,9 @@
       <% end %>
     <% end %>
 
-    <%= render(Pages::Admin::Headers::Section::Component.new(title: gear_title)) do %>
+    <%= render(UI::Header::Component.new(tag: :h2)) do %>
+      <%= gear_title %>
+
       <% if unknown_gear.present? %>
         <small class="tw:mt-2 tw:mb-4 tw:block">
           <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>">Unknown gear IDs:</span>
@@ -122,7 +124,7 @@
       <% gears = @strava_integration.strava_gears.select { |g| g.gear_type == gear_type.to_s }.sort_by { |g| g.strava_gear_display_name.downcase } %>
       <% next if gears.empty? %>
 
-      <%= render(Pages::Admin::Headers::Section::Component.new(title: gear_type_label)) %>
+      <%= render(UI::Header::Component.new(text: gear_type_label, tag: :h3)) %>
 
       <%= render partial: "admin/strava_gears/table", locals: {collection: gears, skip_strava_integration: true} %>
     <% end %>

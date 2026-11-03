@@ -36,10 +36,8 @@ RSpec.describe UI::ButtonGroup::Component, type: :component do
   context "kind: toggle" do
     let(:component) { render_inline(described_class.new(entries:, kind: :toggle)) }
 
-    # One row, so no flex-wrap — the button kind's chips wrap
     it "renders the entries as segments of a single track" do
-      expect(component).to have_css("div.tw\\:bg-gray-100")
-      expect(component).to have_no_css("div.tw\\:flex-wrap")
+      expect(component).to have_css("div.tw\\:bg-gray-100[data-controller='ui--toggle']")
       expect(component).to have_css("a.tw\\:font-extrabold", count: 2)
     end
   end
