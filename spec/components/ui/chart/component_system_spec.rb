@@ -36,6 +36,12 @@ RSpec.describe UI::Chart::Component, :js, type: :system do
     expect(find_button("Stolen (5)")["aria-pressed"]).to eq "false"
     expect(page).to have_css("button[aria-pressed='false']:focus")
 
+    visit("/rails/view_components/ui/chart/component/skip_legend_counts")
+    expect(page).to have_button("Stolen", exact: true, wait: 5)
+    click_button("Stolen", exact: true)
+    expect(find_button("Stolen", exact: true)["aria-pressed"]).to eq "false"
+    expect_axe_clean
+
     visit("/rails/view_components/ui/chart/component/pie_with_prefix")
     expect(page).to have_button("Donations ($1,234.50)", wait: 5)
     expect(page).to have_button("Stickers ($20.00)")

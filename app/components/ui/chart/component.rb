@@ -14,7 +14,7 @@ module UI
       # series: a grouped hash, an array of {name:, data:} series, or a path the chart
       # fetches its JSON from
       def initialize(series:, time_range: nil, kind: :column, colors: nil, stacked: false,
-        prefix: nil, round: nil, height: "300px", library: nil)
+        prefix: nil, round: nil, height: "300px", library: nil, skip_legend_counts: false)
         raise ArgumentError, "kind must be one of #{KINDS.join(", ")}" unless KINDS.include?(kind)
 
         @series = series
@@ -26,6 +26,7 @@ module UI
         @round = round
         @height = height
         @library = library
+        @skip_legend_counts = skip_legend_counts
       end
 
       # The height is fixed so a legend comes out of the chart's, as Chart.js's own did
@@ -39,7 +40,8 @@ module UI
 
       # Filled in by ui--chart, since a series from a path has no totals until it's fetched
       def legend
-        item = safe_join([render(UI::ColorSwatch::Component.new(size: :sm)), tag.span, " ", tag.span(class: "twless-strong tw:-ml-0.5 tw:text-xs")])
+        count = tag.span(class: "twless-strong tw:-ml-0.5 tw:text-xs") unless @skip_legend_counts
+        item = safe_join([render(UI::ColorSwatch::Component.new(size: :sm)), tag.span, " ", count])
         [
           tag.div(class: class_names("tw:flex tw:shrink-0 tw:flex-wrap tw:justify-center tw:gap-x-5 tw:gap-y-1 tw:py-1",
             "tw:order-1": library_legend&.dig(:position) == "bottom"), data: {chart_legend: true, prefix: @prefix, round: @round}),

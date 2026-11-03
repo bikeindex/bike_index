@@ -21,7 +21,7 @@ const htmlLegend = {
       swatch.style.borderColor = item.strokeStyle
       name.textContent = item.text
       name.classList.toggle('tw:line-through', item.hidden)
-      count.textContent = `(${prefix}${number.format(legendItemTotal(chart, item))})`
+      if (count) count.textContent = `(${prefix}${number.format(legendItemTotal(chart, item))})`
       button.setAttribute('aria-pressed', !item.hidden)
       button.addEventListener('click', (event) => {
         onClick.call(chart.legend, event, item, chart.legend)
