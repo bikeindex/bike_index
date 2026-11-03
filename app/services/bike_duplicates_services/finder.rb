@@ -24,11 +24,14 @@ module BikeDuplicatesServices
 
     SNAPSHOT_KEY = "duplicate_review_group_snapshot"
     PREPARING_KEY = "duplicate_review_group_snapshot_preparing"
+    FAILED_KEY = "duplicate_review_group_snapshot_failed"
     # Older snapshots are still served while a fresh one is prepared, so only the first visit waits
     REFRESH_AFTER = 1.hour
     SNAPSHOT_TTL = 1.day
-    # Longer than the query takes; if the job dies, the next visit after this enqueues another
+    # Longer than the query takes. If the job fails or dies, visits wait this out before enqueuing another
     PREPARING_TTL = 30.minutes
+    # The replica's statement_timeout is 60 seconds, which the query nears in production
+    QUERY_TIMEOUT = 10.minutes
     # Deletes the claim only if it's still the one passed in, not a newer job's
     RELEASE_CLAIM_SCRIPT = 'if redis.call("get", KEYS[1]) == ARGV[1] then return redis.call("del", KEYS[1]) end'
 
@@ -42,12 +45,29 @@ module BikeDuplicatesServices
       snapshot && {generated_at: Time.zone.at(snapshot["generated_at"]), groups: snapshot["groups"]}
     end
 
-    # claim: the job's PREPARING_KEY value, released when it's done
+    # When the last attempt failed, if it hasn't succeeded since
+    def group_snapshot_failed_at
+      failed_at = RedisPool.conn { it.get(FAILED_KEY) }
+      failed_at && Time.zone.at(failed_at.to_i)
+    end
+
+    # claim: the job's PREPARING_KEY value, released when it succeeds
     def store_group_snapshot(claim: nil)
-      snapshot = ActiveRecord::Base.connected_to(role: :reading, prevent_writes: true) { {generated_at: Time.current.to_i, groups:} }
-      RedisPool.conn { it.set(SNAPSHOT_KEY, snapshot.to_json, ex: SNAPSHOT_TTL.to_i) }
-    ensure
+      snapshot = ActiveRecord::Base.connected_to(role: :reading, prevent_writes: true) do
+        ActiveRecord::Base.transaction do
+          ActiveRecord::Base.connection.execute("SET LOCAL statement_timeout = #{QUERY_TIMEOUT.in_milliseconds.to_i}")
+          {generated_at: Time.current.to_i, groups:}
+        end
+      end
+      RedisPool.conn do
+        it.set(SNAPSHOT_KEY, snapshot.to_json, ex: SNAPSHOT_TTL.to_i)
+        it.del(FAILED_KEY)
+      end
       release_claim(claim) if claim
+    rescue
+      # The claim is kept, so visits don't start another long query until it expires
+      RedisPool.conn { it.set(FAILED_KEY, Time.current.to_i, ex: SNAPSHOT_TTL.to_i) }
+      raise
     end
 
     def groups

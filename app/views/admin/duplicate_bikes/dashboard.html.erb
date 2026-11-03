@@ -10,6 +10,12 @@
   Computed
   <%= render UI::Time::Component.new(time: @group_snapshot[:generated_at]) %>,
   and recomputed in the background once it's an hour old.
+  <% if @group_snapshot_failed_at %>
+    <strong class="tw:text-red-700 tw:dark:text-red-400">
+      The last recompute failed
+      <%= render UI::Time::Component.new(time: @group_snapshot_failed_at) %>.
+    </strong>
+  <% end %>
 </p>
 
 <%= render UI::Alerts::Base::Component.new(kind: :warning, margin_classes: "tw:mt-4", header: "Review only — no merging, deletion or customer emails") do %>
@@ -30,7 +36,9 @@
     <p>
       Serials shorter than six characters and partial matches remain in the
       <%= link_to "serial-segment view", admin_duplicate_bikes_path(search_view: "segments"), class: "twlink" %>.
-      Each group is in exactly one queue, assigned in the order listed below.
+      Each group is in exactly one queue. Stolen history takes precedence, then
+      placeholder serials, test markers and large groups, so only the remaining
+      groups reach the other queues.
     </p>
 
     <p>

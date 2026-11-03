@@ -197,10 +197,12 @@ RSpec.describe BikeDuplicatesServices::Review do
 
   context "assessing a pair for a future invitation" do
     let(:second_user_id) { 10 }
+    # Test markers and stolen records are looked up by bike ID
+    let(:second_bike_id) { 2 }
     let(:pair) do
       [[10, true], [second_user_id, false]].each_with_index.map do |(user_id, claimed), index|
         ownership = ownership_class.new(id: index + 1, created_at: Time.at(index), user_id:, owner_email: "rider@bikeindex.org", claimed:)
-        record_class.new(id: index + 1, created_at: Time.at(index), serial_normalized_no_space: "WTU123456", manufacturer_id: 1,
+        record_class.new(id: index.zero? ? 1 : second_bike_id, created_at: Time.at(index), serial_normalized_no_space: "WTU123456", manufacturer_id: 1,
           frame_model: "Roadster", ownerships: [ownership], current_ownership: ownership, marketplace_listings: [])
       end
     end
@@ -228,15 +230,20 @@ RSpec.describe BikeDuplicatesServices::Review do
       expect(review.readiness).to eq :blocked
     end
 
-    it "keeps test records out" do
-      allow(review).to receive(:test_count).and_return(1)
-      expect(review.readiness).to eq :blocked
+    context "with a test record" do
+      let(:second_bike_id) { FactoryBot.create(:bike, owner_email: "testing@example.com").id }
+
+      it "keeps it out" do
+        expect(review.test_count).to eq 1
+        expect(review.readiness).to eq :blocked
+      end
     end
 
-    context "with a stolen record on one record, deleted ones included" do
-      before { allow(review).to receive(:stolen_count) { |bike| (bike.id == 2) ? 1 : 0 } }
+    context "with a stolen record on one record, recovered ones included" do
+      let(:second_bike_id) { FactoryBot.create(:stolen_record_recovered).bike_id }
 
       it "vetoes it whatever the whole-serial lookup found" do
+        expect(review.stolen_count(pair.last)).to eq 1
         expect(blocked_labels).to eq ["A record has its own stolen history, a hard merge veto whatever its serial"]
       end
     end

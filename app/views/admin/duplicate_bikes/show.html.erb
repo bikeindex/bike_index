@@ -47,12 +47,12 @@
 </p>
 
 <% if @duplicate_group %>
-  <p class="tw:text-sm">
+  <div class="tw:flex tw:items-baseline tw:gap-1 tw:text-sm">
     Serial-segment group #<%= @duplicate_group.id %>:
     <strong><%= @duplicate_group.ignore? ? "Ignored" : "Active" %></strong> ·
     <%= render(UI::ButtonLink::Component.new(text: @duplicate_group.ignore? ? "Un-ignore group" : "Ignore group", method: :put,
           href: ignore_duplicate_toggle_admin_bikes_path(id: @duplicate_group.id), color: :link, html_class: "tw:text-sm")) %>
-  </p>
+  </div>
 <% end %>
 
 <% checks = review.readiness_checks %>

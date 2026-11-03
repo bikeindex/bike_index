@@ -12,6 +12,10 @@ module Pages
             @review = review
             @link_params = link_params
           end
+
+          private
+
+          def muted = "tw:text-gray-600 tw:dark:text-gray-400"
         end
       end
     end
