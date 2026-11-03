@@ -8,7 +8,7 @@
       If you need to update it, talk to Seth
 = render partial: "form"
 
-= render(Pages::Admin::Headers::Section::Component.new(title: "Invoices with this feature"))
+= render(UI::Header::Component.new(text: "Invoices with this feature", tag: :h2, html_class: "tw:mt-6"))
 %p{class: "tw:my-6"}
   = number_display(@invoices.count)
   total,

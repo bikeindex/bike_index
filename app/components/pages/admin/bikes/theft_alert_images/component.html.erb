@@ -1,10 +1,11 @@
-<%= render(Pages::Admin::Headers::Section::Component.new(title: "#{@bike.type_titleize} images")) do %>
+<%= render(UI::Header::Component.new(tag: :h2)) do %>
+  <%= @bike.type_titleize %> images
   <% if public_images.any? %>
     <%= link_to "user edit", edit_bike_path(@bike, edit_template: "photos", return_to: @return_to),
-          class: "twlink tw:ml-2 tw:text-sm" %>
+            class: "twlink tw:ml-2 tw:text-sm" %>
   <% else %>
     <%= render(UI::ButtonLink::Component.new(text: "remove alert", href: regenerate_path(nil),
-          method: :put, size: :sm, html_class: "tw:ml-2")) %>
+            method: :put, size: :sm, html_class: "tw:ml-2")) %>
   <% end %>
 <% end %>
 
@@ -26,7 +27,7 @@
   <% end %>
 </ul>
 
-<%= render(Pages::Admin::Headers::Section::Component.new(title: "Promoted alert images")) %>
+<%= render(UI::Header::Component.new(text: "Promoted alert images", tag: :h2)) %>
 
 <% if !alert_images? %>
   <div class="tw:mb-4">None</div>

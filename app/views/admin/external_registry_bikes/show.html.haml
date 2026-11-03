@@ -1,12 +1,12 @@
 = render(Pages::Admin::Headers::Nav::Component.new(title: "External Registry Bike"))
 
-= render(Pages::Admin::Headers::Section::Component.new(title: @bike.title_string))
+= render(UI::Header::Component.new(text: @bike.title_string, tag: :h2)) if @bike.title_string.present?
 %div{class: "tw:grid tw:grid-cols-12 tw:gap-x-8"}
   %div{class: "tw:col-span-12 tw:md:col-span-3 tw:lg:col-span-2 tw:mb-2"}
     - if @bike.thumb_url.present?
       = image_tag @bike.thumb_url, alt: @bike.title_string, style: "display: block; max-width: 100%;"
     - else
-      = render(Pages::Admin::Headers::Section::Component.new(title: tag.span("No Image", class: "twless-strong")))
+      = render(UI::Header::Component.new(text: tag.span("No Image", class: "twless-strong"), tag: :h3))
   %div{class: "tw:col-span-9 tw:lg:col-span-5 tw:mb-2"}
     = render(UI::TableList::Component.new) do |list|
       - list.with_row(label: "Registry", value: @bike.registry_name)
