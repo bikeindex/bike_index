@@ -1,11 +1,11 @@
 <%= render Pages::Admin::Bikes::Header::Component.new(bike: @bike, active: :recoveries, stolen_record: @recovery, display_recovery: true, user: current_user, display_dev_info: display_dev_info?) %>
 
-<%= render(Pages::Admin::Headers::Section::Component.new(title: "Manage Recovery Display")) %>
+<%= render(UI::Header::Component.new(text: "Manage Recovery Display", tag: :h2)) %>
 
 <div class="tw:grid tw:grid-cols-12 tw:gap-x-8 tw:text-center">
   <% if @recovery.waiting_on_decision? %>
     <div class="tw:col-span-12 tw:md:col-span-4">
-      <%= render(Pages::Admin::Headers::Section::Component.new(title: "Choose what to do with this recovery:")) %>
+      <%= render(UI::Header::Component.new(text: "Choose what to do with this recovery:", tag: :h3)) %>
     </div>
     <div class="tw:col-span-6 tw:md:col-span-4">
       <%= render(UI::ButtonLink::Component.new(text: "Display recovery", href: new_admin_recovery_display_path(stolen_record_id: @recovery.id), color: :primary, size: :lg, html_class: "tw:w-full")) %>
@@ -31,7 +31,7 @@
   <% else %>
     <% if !@recovery.recovered? %>
       <div class="tw:col-span-12">
-        <%= render(Pages::Admin::Headers::Section::Component.new(title: tag.span("This #{@bike.type} has not been marked recovered", class: UI::Alerts::Base::Component::TEXT_CLASSES[:error]))) %>
+        <%= render(UI::Header::Component.new(text: tag.span("This #{@bike.type} has not been marked recovered", class: UI::Alerts::Base::Component::TEXT_CLASSES[:error]), tag: :h2)) %>
       </div>
       <div class="tw:col-span-12 tw:mb-6">
         <p class="tw:mb-4 <%= UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>">
@@ -40,7 +40,7 @@
       </div>
     <% end %>
     <div class="tw:col-span-12">
-      <%= render(Pages::Admin::Headers::Section::Component.new(title: safe_join(["Display Status: ", tag.em(@recovery.recovery_display_status.humanize)]))) %>
+      <%= render(UI::Header::Component.new(text: safe_join(["Display Status: ", tag.em(@recovery.recovery_display_status.humanize)]), tag: :h3)) %>
 
       <p class="tw:mt-6 tw:mb-4">
         Really want to display this recovery?
@@ -52,7 +52,7 @@
 
 <hr class="twhr tw:mt-15 tw:mb-7.5">
 
-<%= render(Pages::Admin::Headers::Section::Component.new(title: "Edit recovery information")) %>
+<%= render(UI::Header::Component.new(text: "Edit recovery information", tag: :h2)) %>
 
 <p class="tw:mb-4">
   You will have a chance to edit the text, when displaying the recovery.

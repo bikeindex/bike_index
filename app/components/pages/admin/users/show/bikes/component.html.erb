@@ -1,5 +1,8 @@
-<%= render(Pages::Admin::Headers::Section::Component.new(title: "Bikes", count: bikes_count, href: index_path,
-      parenthetical:)) do %>
+<%= render(UI::Header::Component.new(tag: :h2)) do %>
+  Bikes
+  <%= render(Pages::Admin::Headers::Count::Component.new(count: bikes_count, href: index_path, parenthetical:)) %>
+
+
   <% if deleted_bikes_count.positive? %>
     <small class="tw:text-sm">
       -

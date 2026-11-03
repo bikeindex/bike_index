@@ -2,7 +2,7 @@
 
 <%= render(Pages::Admin::Invoices::Table::Component.new(invoices: @invoices)) %>
 
-<%= render(Pages::Admin::Headers::Section::Component.new(title: "#{@organization.name} has #{pluralize(@organization.payments.count, "payment")}", margin_classes: "tw:mt-12 tw:mb-3")) %>
+<%= render(UI::Header::Component.new(text: "#{@organization.name} has #{pluralize(@organization.payments.count, "payment")}", tag: :h2, html_class: "tw:mt-12")) %>
 
 <p class="twless-strong tw:mb-4">
   You can add invoices to payments by editing them. If you don't see a payment

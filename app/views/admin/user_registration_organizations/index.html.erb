@@ -12,7 +12,7 @@
   <% if @render_org_counts %>
     <%= render(UI::Container::Component.new) do %>
       <%= render(UI::Card::Component.new(additional_classes: "tw:my-6")) do %>
-        <%= render(Pages::Admin::Headers::Section::Component.new(title: "Organizations")) %>
+        <%= render(UI::Header::Component.new(text: "Organizations", tag: :h2)) %>
 
         <% org_ids = matching_user_registration_organizations.distinct.pluck(:organization_id) %>
         <% org_data = Organization.where(id: org_ids).pluck(:name, :id) %>
