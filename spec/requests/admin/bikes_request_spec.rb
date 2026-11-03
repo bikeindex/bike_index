@@ -425,7 +425,7 @@ RSpec.describe Admin::BikesController, type: :request do
   end
 
   describe "undelete" do
-    let(:bike) { FactoryBot.create(:bike, :with_ownership, deleted_at: Time.current) }
+    let!(:bike) { FactoryBot.create(:bike, :with_ownership, deleted_at: Time.current) }
 
     it "restores the bike" do
       expect(Bike.pluck(:id)).to eq([])

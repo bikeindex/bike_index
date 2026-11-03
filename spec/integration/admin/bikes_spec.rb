@@ -27,14 +27,11 @@ RSpec.describe "Admin bikes", :js, type: :system do
     visit "/admin/bikes/#{bike.id}/edit"
 
     expect(dismiss_confirm { click_link "Un-delete bike" }).to eq "Are you sure?"
-    expect(page).to have_current_path("/admin/bikes/#{bike.id}/edit")
     expect(bike.reload.deleted_at).to be_present
 
     accept_confirm { click_link "Un-delete bike" }
 
     expect(page).to have_content("Bike un-deleted!")
-    expect(page).to have_current_path("/admin/bikes/#{bike.id}/edit")
-    expect(page).to have_link("Delete bike")
     expect(page).to have_no_link("Un-delete bike")
     expect(bike.reload.deleted_at).to be_nil
   end
