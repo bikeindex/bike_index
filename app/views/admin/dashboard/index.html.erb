@@ -56,7 +56,7 @@
     <div class="tw:mt-6">
       <%= render(UI::Header::Component.new(tag: :h2)) do %>
         Index searches
-        <%= render(Pages::Admin::Headers::Count::Component.new(count: week_searches.values_at("organized", "organized_serial", "user", "user_serial", "web_marketplace").sum)) %>
+        <%= render(Pages::Admin::Headers::Count::Component.new(count: week_searches.values_at("organized", "organized_serial", "user", "user_serial", "web_marketplace").sum, suffix: "in the past week")) %>
       <% end %>
 
       <%= render(UI::Chart::Component.new(series: logged_searches_admin_graphs_path(search_endpoint: "not_web_bikebook", period: "week"), stacked: true)) %>
@@ -64,8 +64,8 @@
 
     <div class="tw:mt-6">
       <%= render(UI::Header::Component.new(tag: :h2)) do %>
-        BikeBook use
-        <%= render(Pages::Admin::Headers::Count::Component.new(count: week_searches.values_at("web_bikebook", "web_bikebook_comparison", "web_ebike_rules").sum)) %>
+        BikeBook searches
+        <%= render(Pages::Admin::Headers::Count::Component.new(count: week_searches.values_at("web_bikebook", "web_bikebook_comparison", "web_ebike_rules").sum, suffix: "in the past week")) %>
       <% end %>
 
       <%= render(UI::Chart::Component.new(series: logged_searches_admin_graphs_path(search_endpoint: "web_bikebook", period: "week"), stacked: true)) %>
