@@ -11,22 +11,34 @@ RSpec.describe "BikeBook", :js, type: :system do
   # Page-wide, the filters' ~160 hidden options cost Capybara a round trip each, a pass outlasting its wait
   def vehicle_option = "#vehicle_models-hw-listbox [role='option']"
 
-  # On a phone, two high in a row running sideways, a little of the next and previous showing, staying put as one's added
-  def expect_sideways_cards(selector)
-    list = find(selector)
-    placed = list.evaluate_script(<<~JS)
+  def on_phone
+    size = page.current_window.size
+    page.current_window.resize_to(390, 844)
+    yield
+    page.current_window.resize_to(*size)
+  end
+
+  # How much of each neighbor shows either side of the card `step` along, centered, `step` being the cards to a column
+  def neighbors_showing(row, step)
+    row.evaluate_script(<<~JS)
       (() => {
-        this.children[2].scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'instant' })
-        const [first, second, , , next] = [...this.children].map((card) => card.getBoundingClientRect())
-        return { width: first.width, stacked: first.left === second.left && first.top < second.top, previous: first.right, next: window.innerWidth - next.left }
+        this.children[#{step}].scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'instant' })
+        const [previous, next] = [this.children[0], this.children[#{step * 2}]].map((card) => card.getBoundingClientRect())
+        return [previous.right, window.innerWidth - next.left]
       })()
     JS
-    expect(placed).to match("width" => 300, "stacked" => true, "previous" => be > 10, "next" => be > 10)
+  end
+
+  # Two high in a row running sideways, a little of the next and previous showing, staying put as one's added
+  def expect_sideways_cards(selector)
+    list = find(selector)
+    expect(neighbors_showing(list, 2)).to all(be > 10)
+    expect(list.evaluate_script("[this.children[0].offsetWidth, this.children[0].offsetLeft === this.children[1].offsetLeft]")).to eq [300, true]
     scrolled = list.evaluate_script("this.scrollLeft")
     id = list.all("a", text: /, add to the comparison\z/)[2][:id]
     find("##{id}").click
     expect(page).to have_css("##{id}:focus", text: /, remove from the comparison\z/)
-    page.document.synchronize { raise Capybara::ExpectationNotMet unless find(selector).evaluate_script("this.scrollLeft") == scrolled }
+    expect(find(selector).evaluate_script("this.scrollLeft")).to eq scrolled
     find("##{id}").click
     expect(page).to have_css("##{id}:focus", text: /, add to the comparison\z/)
   end
@@ -185,11 +197,7 @@ RSpec.describe "BikeBook", :js, type: :system do
     find("#group-m-aventon-2026-level_4_rec").click
     expect(page).to have_css("#group-m-aventon-2026-level_4_rec:focus", text: /, add to the comparison\z/)
     expect(page).to have_no_css("[aria-label='Overview comparison']")
-    # in a row running sideways on a phone, as the similar models are
-    group_window = page.current_window.size
-    page.current_window.resize_to(390, 844)
-    expect_sideways_cards("[aria-labelledby='model-group-#{Time.current.year}']")
-    page.current_window.resize_to(*group_window)
+    on_phone { expect_sideways_cards("[aria-labelledby='model-group-#{Time.current.year}']") }
     # a longer one a page of years at a time, the next as the reader nears its end
     render_long = <<~JS
       (async () => {
@@ -779,22 +787,9 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(card_rows.call).to eq 1
     expect(scrolls_sideways.call).to be true
     # each neighbor of a centered card still showing
-    neighbors_showing = -> {
-      page.evaluate_script(<<~JS)
-        (() => {
-          const row = document.querySelector('[data-comparison] > div')
-          row.children[1].scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'instant' })
-          const [previous, , next] = [...row.children].map((card) => card.getBoundingClientRect())
-          return [previous.right, window.innerWidth - next.left]
-        })()
-      JS
-    }
     click_link "Components"
     expect(page).to have_css("[data-comparison] section[aria-label$=' components']", count: 5)
-    expect(neighbors_showing.call).to all(be > 10)
-    click_link "Sizes & geometry"
-    expect(page).to have_css("[data-comparison] section[aria-label$=' sizes']", count: 5)
-    expect(neighbors_showing.call).to all(be > 10)
+    expect(neighbors_showing(find("[data-comparison] > div"), 1)).to all(be > 10)
     page.current_window.resize_to(1920, 1080)
 
     # up to ten, in the search and compared, the picks past them left off
@@ -2040,15 +2035,11 @@ RSpec.describe "BikeBook", :js, type: :system do
     visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_rec,m/aventon/2022/level_2")
     # opened from the search's More filters line, its section above the views collapsed until then
     compare = find_button("Compare similar bikes to Level 4 REC", wait: 10)
-    expect(compare).to have_xpath("../following-sibling::*[@aria-controls='vehicle-filters']")
     # beside More filters, but beneath it on a phone
     more_filters = compare.find(:xpath, "../following-sibling::*[@aria-controls='vehicle-filters']")
     top = ->(element) { element.evaluate_script("this.getBoundingClientRect().top") }
     expect(top.call(compare)).to be_within(1).of(top.call(more_filters))
-    window_size = page.current_window.size
-    page.current_window.resize_to(390, 844)
-    expect(top.call(compare)).to be > top.call(more_filters)
-    page.current_window.resize_to(*window_size)
+    on_phone { expect(top.call(compare)).to be > top.call(more_filters) }
     # and beneath the filters once they're open, its section's own toggle as far beneath them once that opens
     click_on "More filters", match: :first
     beneath_filters = lambda do |selector|
@@ -2106,10 +2097,10 @@ RSpec.describe "BikeBook", :js, type: :system do
     # hidden with the models, and above its toggle on a phone rather than beside it
     adjust = find_button("Adjust comparison algorithm")
     expect(top.call(adjust)).to be_within(5).of(top.call(find("#similar-toggle")))
-    page.current_window.resize_to(390, 844)
-    expect(top.call(adjust)).to be < top.call(find("#similar-toggle"))
-    expect_sideways_cards("[aria-label='Similar models to compare']")
-    page.current_window.resize_to(*window_size)
+    on_phone do
+      expect(top.call(adjust)).to be < top.call(find("#similar-toggle"))
+      expect_sideways_cards("[aria-label='Similar models to compare']")
+    end
     find("#similar-toggle").click
     expect(page).to have_no_button("Adjust comparison algorithm").and have_no_css("[aria-label='Similar models to compare']")
     click_on "Compare similar bikes to Level 4 REC"

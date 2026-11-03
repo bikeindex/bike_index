@@ -29,7 +29,7 @@ const compareLabel = (type, model) => `Compare similar ${type}s to ${model}`
 // once it's open. Not a ui--collapse trigger, which the search's own would claim
 export const compareToggle = ({ type, model }) => html`<button type="button" data-action="bikebook--page#compareSimilar" class=${buttonClasses({
   color: 'link',
-  htmlClass: 'tw:text-left tw:not-data-[active=true]:[font-weight:inherit] tw:similar-open:hidden'
+  htmlClass: 'tw:text-left tw:not-data-[active=true]:[font-weight:inherit] tw:similar-open:hidden tw:max-sm:order-last tw:max-sm:basis-full tw:max-sm:justify-start'
 })}><span class="tw:inline-block"><span class="tw:flex">${iconChevron()}</span></span>${compareLabel(type, model)}</button>`
 
 // Collapsed until it's wanted, the models most like the first compared, `model`, whose `results` bikebook--similar scores

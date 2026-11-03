@@ -10,7 +10,7 @@ export const modelGroup = ({ group: { name, manufacturer, years }, card }) => ht
   tabindex="-1" aria-labelledby="model-group-name" class="tw:mt-8 tw:focus:outline-none" data-controller="bikebook--infinite-scroll" data-bikebook--infinite-scroll-key-value=${`${manufacturer}/${name}`}>${manufacturerLine(manufacturer)}<h2 id="model-group-name"
   class="tw:text-2xl tw:leading-tight tw:font-extrabold">${name}</h2>${pages(years).map((page, index) => html`<div
   ?hidden=${index > 0} data-bikebook--infinite-scroll-target="page">${page.map(({ year, models }) => html`<h3
-  id="model-group-${year}" class="tw:mt-6 tw:mb-3 tw:text-lg tw:font-bold">${year}</h3><ul aria-labelledby="model-group-${year}" data-keep-scroll=${year}
+  id="model-group-${year}" class="tw:mt-6 tw:mb-3 tw:text-lg tw:font-bold">${year}</h3><ul aria-labelledby="model-group-${year}" data-keep-scroll=${`${manufacturer}/${name}/${year}`}
   class="${MODEL_CARDS_CLASSES} ${MODEL_CARDS_ROW_CLASSES}">${models.map(card)}</ul>`)}</div>`)}<div
   data-bikebook--infinite-scroll-target="sentinel"></div></section>`
 
