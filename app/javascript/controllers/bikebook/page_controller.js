@@ -208,7 +208,10 @@ export default class extends Controller {
     // what turbo:before-render is to a Turbo page, which an open combobox dialog closes on
     this.dispatch('before-render')
     const active = this.pageTarget.contains(document.activeElement) && document.activeElement.id ? document.activeElement : null
+    const rowScrolls = new Map(this.#scrollingRows().map((row) => [row.dataset.keepScroll, row.scrollLeft]))
     this.pageTarget.replaceChildren(keepPermanent(rendered.content, this.pageTarget))
+    // once their controllers have opened them, as a hidden row can't scroll
+    requestAnimationFrame(() => this.#scrollingRows().forEach((row) => { row.scrollLeft = rowScrolls.get(row.dataset.keepScroll) ?? 0 }))
     if (reveal) {
       const search = this.pageTarget.querySelector('[data-controller~="bikebook--catalog-filters"]')
       search.classList.add('tw:hidden')
@@ -231,6 +234,10 @@ export default class extends Controller {
       // and again once the panels' controllers have opened them, which the browser's scroll anchoring follows down
       requestAnimationFrame(place)
     }
+  }
+
+  #scrollingRows () {
+    return [...this.pageTarget.querySelectorAll('[data-keep-scroll]')]
   }
 
   // in place of the spinner, below the loading shell's search, where it's still showing
