@@ -22,8 +22,7 @@
         - list.with_row(label: attr, value:)
   %div
     = render(Pages::Admin::Headers::Section::Component.new(title: "Platform Response Data"))
-    %pre{ class: "tw:mb-4", style: "max-height: 600px; overflow: scroll; background: #eeeeee; padding: 10px 2px;" }
-      = @social_account.account_info.to_yaml
+    = render(UI::Code::Json::Component.new(data: @social_account.account_info, no_max_height: true))
 
 = render(Pages::Admin::Headers::Section::Component.new(title: "#{number_with_delimiter(@social_account.social_posts.count)} Posts")) do
   %em{class: "tw:text-sm"}

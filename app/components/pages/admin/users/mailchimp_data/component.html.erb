@@ -16,7 +16,7 @@
       <% end %>
 
       <div class="tw:hidden" data-ui--collapse-target="content">
-        <%= render UI::JsonDisplay::Component.new(data: @mailchimp_datum.data, small: true) %>
+        <%= render UI::Code::Json::Component.new(data: @mailchimp_datum.data, small: true) %>
       </div>
     </div>
   </div>

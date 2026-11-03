@@ -4,7 +4,7 @@
 
 <div class="twwiderow tw:mt-6 tw:items-start">
   <%= render(UI::TableList::Component.new) do |list| %>
-    <% list.with_row(label: "ID", dev_only: true, value: tag.code(@marketplace_message.id, class: "twcode"), if: display_dev_info?) %>
+    <% list.with_row(label: "ID", dev_only: true, value: render(UI::Code::Inline::Component.new(text: @marketplace_message.id)), if: display_dev_info?) %>
 
     <% list.with_row(label: "Sender") do %>
       <%= render Atoms::Admin::TableCells::User::Component.new(user: @marketplace_message.sender, user_id: @marketplace_message.sender_id) %>
@@ -50,7 +50,7 @@
         <%= render(UI::Time::Component.new(time: @marketplace_listing.created_at)) %>
 
         <% if display_dev_info? %>
-          <code class="only-dev-visible twcode"><%= @marketplace_listing.id %></code>
+          <span class="only-dev-visible"><%= render(UI::Code::Inline::Component.new(text: @marketplace_listing.id)) %></span>
         <% end %>
       </span>
     <% end %>

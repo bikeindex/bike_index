@@ -41,7 +41,7 @@
                   <%= translation(".line_label") %>
                   <strong><%= line_error.first %></strong>
                 </span>
-                <code><%= line_error[1..].join(", ") %></code>
+                <%= render(UI::Code::Inline::Component.new(text: line_error[1..].join(", "))) %>
               <% else %>
                 <%= line_error %>
               <% end %>
@@ -69,12 +69,12 @@
         </ul>
       <% end %>
 
-      <%= render UI::JsonDisplay::Component.new(data: other_errors) %>
+      <%= render UI::Code::Json::Component.new(data: other_errors) %>
 
       <% if @display_dev_info %>
-        <code class="only-dev-visible tw:block tw:p-1 tw:text-xs!">
-          <%= @bulk_import.import_errors %>
-        </code>
+        <div class="only-dev-visible">
+          <%= render(UI::Code::Json::Component.new(data: @bulk_import.import_errors, small: true)) %>
+        </div>
       <% end %>
     </div>
   <% end %>

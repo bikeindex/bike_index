@@ -7,9 +7,7 @@
     <ul>
       <% env_skipped_jobs.each do |env_key| %>
         <li>
-          <code class="twcode">
-            <%= env_key.sub(/\ASIDEKIQ_SKIP_/, "").downcase.camelize %>
-          </code>
+          <%= render(UI::Code::Inline::Component.new(text: env_key.sub(/\ASIDEKIQ_SKIP_/, "").downcase.camelize)) %>
         </li>
       <% end %>
     </ul>
@@ -23,7 +21,7 @@ end %>
 <div class="tw:mt-6">
   <%= render(UI::Table::Component.new(records: jobs)) do |table| %>
     <% table.column(label: "", classes: "only-dev-visible") do |(klass)| %>
-      <code class="twcode"><%= klass %></code>
+      <%= render(UI::Code::Inline::Component.new(text: klass)) %>
     <% end %>
 
     <% table.column(label: "Job") do |(klass)| %>

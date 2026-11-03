@@ -94,7 +94,7 @@
     </ul>
 
     <small>
-      <%= safe_join(invoice.feature_slugs.map { |slug| content_tag(:code, slug, class: "twcode") }, ", ") %>
+      <%= safe_join(invoice.feature_slugs.map { |slug| render(UI::Code::Inline::Component.new(text: slug)) }, ", ") %>
     </small>
   <% end %>
 <% end %>

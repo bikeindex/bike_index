@@ -1,7 +1,7 @@
 .twwiderow{class: "tw:items-start"}
   = render(UI::TableList::Component.new) do |list|
     - list.with_row(label: "Account", value: @social_post.poster)
-    - list.with_row(label: "Post ID", value: tag.code(@social_post.platform_id, class: "twcode"))
+    - list.with_row(label: "Post ID", value: render(UI::Code::Inline::Component.new(text: @social_post.platform_id)))
     - list.with_row(label: "Created", value: render(UI::Time::Component.new(time: @social_post.created_at)))
     - list.with_row(label: "Bike", if: @social_post.stolen_record_id.present?) do
       - link_text = @social_post.bike.title_string if @social_post.bike.present?
@@ -24,4 +24,4 @@
 %hr.twhr{class: "tw:mt-6"}
 
 = render(Pages::Admin::Headers::Section::Component.new(title: "Platform Response Data"))
-= render UI::JsonDisplay::Component.new(data: @social_post.platform_response, no_max_height: true)
+= render UI::Code::Json::Component.new(data: @social_post.platform_response, no_max_height: true)

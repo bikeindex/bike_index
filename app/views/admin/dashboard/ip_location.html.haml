@@ -6,10 +6,10 @@
 .twwiderow
   %div
     = render(Pages::Admin::Headers::Section::Component.new(title: "Cloudflare"))
-    = render UI::JsonDisplay::Component.new(data: @cloudflare_hash)
+    = render UI::Code::Json::Component.new(data: @cloudflare_hash)
   %div
     = render(Pages::Admin::Headers::Section::Component.new(title: "Geocoder"))
-    = render UI::JsonDisplay::Component.new(data: @geocoder_hash)
+    = render UI::Code::Json::Component.new(data: @geocoder_hash)
   %div
     = render(Pages::Admin::Headers::Section::Component.new(title: "Raw Headers"))
-    = render UI::JsonDisplay::Component.new(data: @headers)
+    = render UI::Code::Json::Component.new(data: @headers)

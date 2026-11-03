@@ -11,7 +11,7 @@
     - if bulk_import.timeout_failure? && display_dev_info?
       %small.only-dev-visible
         currently
-        %code= bulk_import.progress
+        = render(UI::Code::Inline::Component.new(text: bulk_import.progress))
 - else
   - bulk_import_progress_class = bulk_import.progress == "finished" ? UI::Alerts::Base::Component::TEXT_CLASSES[:success] : ""
   %span{class: bulk_import_progress_class}

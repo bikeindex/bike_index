@@ -30,10 +30,10 @@
 
 <%= render(Pages::Admin::Headers::Section::Component.new(title: "Bike")) %>
 
-<%= render UI::JsonDisplay::Component.new(data: @b_param.params) %>
+<%= render UI::Code::Json::Component.new(data: @b_param.params) %>
 
 <% if @b_param.bike_errors.present? %>
   <%= render(Pages::Admin::Headers::Section::Component.new(title: "Bike Errors")) %>
 
-  <%= render UI::JsonDisplay::Component.new(data: @b_param.bike_errors) %>
+  <%= render UI::Code::Json::Component.new(data: @b_param.bike_errors) %>
 <% end %>

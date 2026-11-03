@@ -10,7 +10,7 @@
     - list.with_row(label: "level", value: @membership.level_humanized)
     - list.with_row(label: "Referral source") do
       - if @membership.referral_source.present?
-        %code.twcode= @membership.referral_source
+        = render(UI::Code::Inline::Component.new(text: @membership.referral_source))
         - if display_dev_info?
           -# There shouldn't be multiple different sources! Show them if there are.
           - referral_sources = (@membership.stripe_subscriptions.distinct.pluck(:referral_source) + @membership.payments.distinct.pluck(:referral_source)).compact.uniq

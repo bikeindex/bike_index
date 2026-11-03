@@ -22,14 +22,12 @@
     <% end %>
 
     <% table.column(sortable: "endpoint") do |logged_search| %>
-      <code class="twcode" style="word-break: keep-all;">
-        <%= logged_search.endpoint %>
-        <%= link_to search_emoji, url_for(sort_state.search_params.merge(search_endpoint: logged_search.endpoint)), class: "display-sortable-link tw:text-sm" %>
-      </code>
+      <%= render(UI::Code::Inline::Component.new(text: logged_search.endpoint, word_break: false)) %>
+      <%= link_to search_emoji, url_for(sort_state.search_params.merge(search_endpoint: logged_search.endpoint)), class: "display-sortable-link tw:text-sm" %>
     <% end %>
 
     <% table.column(sortable: "ip_address") do |logged_search| %>
-      <code class="twcode"><%= logged_search.ip_address %></code>
+      <%= render(UI::Code::Inline::Component.new(text: logged_search.ip_address)) %>
       <%= link_to search_emoji, url_for(sort_state.search_params.merge(search_ip_address: logged_search.ip_address)), class: "display-sortable-link tw:text-sm" %>
     <% end %>
 
@@ -38,15 +36,15 @@
     <% end %>
 
     <% table.column(label: "Query") do |logged_search| %>
-      <%= render UI::JsonDisplay::Component.new(data: logged_search.query_items, small: true, max_width: :table_cell) %>
+      <%= render UI::Code::Json::Component.new(data: logged_search.query_items, small: true, max_width: :table_cell) %>
 
       <% if logged_search.log_line.present? %>
         <div data-controller="ui--collapse">
           <%= render(UI::Collapse::Component.new(text: "↔️", color: :link, aria: {label: "Toggle the full log line"})) %>
 
-          <code class="twcode tw:hidden" data-ui--collapse-target="content">
-            <%= logged_search.log_line %>
-          </code>
+          <span class="tw:hidden" data-ui--collapse-target="content">
+            <%= render(UI::Code::Inline::Component.new(text: logged_search.log_line)) %>
+          </span>
         </div>
       <% end %>
     <% end %>
@@ -74,7 +72,7 @@
     <% if render_serial %>
       <% table.column(sortable: "serial_normalized", label: "Serial") do |logged_search| %>
         <% if logged_search.serial_normalized.present? %>
-          <small><code class="twcode"><%= logged_search.serial_normalized %></code></small>
+          <small><%= render(UI::Code::Inline::Component.new(text: logged_search.serial_normalized)) %></small>
         <% end %>
       <% end %>
     <% end %>

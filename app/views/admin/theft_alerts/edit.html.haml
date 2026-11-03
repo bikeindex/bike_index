@@ -116,8 +116,8 @@
       - if @theft_alert.admin
         %small{class: UI::Alerts::Base::Component::TEXT_CLASSES[:notice]} admin:
       = link_to @theft_alert.user.display_name, edit_admin_user_path(@theft_alert.user.to_param), class: "twlink"
-    - list.with_row(label: safe_join(["Campaign", tag.small("Objective")], " "), value: tag.code(@theft_alert.objective_campaign, class: "twcode"))
-    - list.with_row(label: safe_join(["Adset", tag.small("Objective")], " "), value: tag.code(@theft_alert.objective_adset, class: "twcode"))
+    - list.with_row(label: safe_join(["Campaign", tag.small("Objective")], " "), value: render(UI::Code::Inline::Component.new(text: @theft_alert.objective_campaign)))
+    - list.with_row(label: safe_join(["Adset", tag.small("Objective")], " "), value: render(UI::Code::Inline::Component.new(text: @theft_alert.objective_adset)))
 
   = render(UI::TableList::Component.new) do |list|
     - list.with_row(label: "Target Spend", value: @theft_alert.amount_facebook)
@@ -174,4 +174,4 @@
 - if display_dev_info?
   .only-dev-visible{class: "tw:mt-12 tw:mb-1"}
     = render(Pages::Admin::Headers::Section::Component.new(title: "Raw facebook data"))
-  = render UI::JsonDisplay::Component.new(data: @theft_alert.facebook_data, no_max_height: true)
+  = render UI::Code::Json::Component.new(data: @theft_alert.facebook_data, no_max_height: true)

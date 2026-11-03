@@ -17,20 +17,21 @@
         <% if Doorkeeper.configuration.native_redirect_uri %>
           <span class="tw:block">
             Include
-            <code class="<%= scrolling_code_class %>"><%= Doorkeeper.configuration.native_redirect_uri %></code>
+            <span class="<%= scrolling_code_class %>"><%= render(UI::Code::Inline::Component.new(text: Doorkeeper.configuration.native_redirect_uri)) %></span>
             for local tests.
           </span>
         <% end %>
 
         <span class="tw:block">
-          Include <code class="<%= scrolling_code_class %>">bikeindex://</code>
+          Include
+          <span class="<%= scrolling_code_class %>"><%= render(UI::Code::Inline::Component.new(text: "bikeindex://")) %></span>
           for
           <%= link_to "iOS app deeplinks", "https://github.com/bikeindex/bike_index_ios?tab=readme-ov-file#quick-start", class: "twlink", tabindex: -1 %>.
         </span>
 
         <span class="tw:block">
           Include
-          <code class="<%= scrolling_code_class %>"><%= authorize_documentation_index_url %></code>
+          <span class="<%= scrolling_code_class %>"><%= render(UI::Code::Inline::Component.new(text: authorize_documentation_index_url)) %></span>
           to be able to add new tokens
           <%= link_to "from the documentation", api_v3_documentation_index_url, class: "twlink", tabindex: -1 %>.
         </span>
@@ -57,7 +58,7 @@
 
   <%= render(UI::Alerts::Base::Component.new(kind: :warning)) do %>
     Turning this on will make any request FAIL that doesn't include a
-    <code class="tw:leading-none <%= scrolling_code_class %>">client_secret</code>
+    <span class="tw:leading-none <%= scrolling_code_class %>"><%= render(UI::Code::Inline::Component.new(text: "client_secret")) %></span>
     parameter
   <% end %>
 <% end %>

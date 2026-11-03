@@ -225,7 +225,7 @@
         <%= render(UI::Time::Component.new(time: bike_organization.created_at)) %>
 
         <% if display_dev_info %>
-          <code class="twcode tw:ml-2 tw:text-xs">ID: <%= bike_organization.id %></code>
+          <span class="tw:ml-2"><%= render(UI::Code::Inline::Component.new(text: "ID: #{bike_organization.id}", small: true)) %></span>
         <% end %>
       <% end %>
 

@@ -75,7 +75,7 @@
               <br>
               <small class="only-dev-visible">
                 <span class="less-strong">developer info:</span>
-                <code><%= retrieved_notification.retrieved_kind %></code>
+                <%= render(UI::Code::Inline::Component.new(text: retrieved_notification.retrieved_kind)) %>
 
                 <em class="less-strong">
                   notification:
@@ -124,7 +124,7 @@
             <%= @parking_notification.to_coordinates %>
 
             <% if @parking_notification.accuracy.present? %>
-              <code><%= @parking_notification.accuracy %> accuracy</code>
+              <%= render(UI::Code::Inline::Component.new(text: "#{@parking_notification.accuracy} accuracy")) %>
             <% end %>
           </small>
         <% end %>
