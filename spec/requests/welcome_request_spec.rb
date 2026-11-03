@@ -101,6 +101,10 @@ RSpec.describe WelcomeController, type: :request do
         expect(response.body).to include("Load more stories")
         expect(flash).to_not be_present
 
+        get "/recovery_stories", params: {per_page: 2, page: 2}
+        expect(response.body).to include("Newer stories")
+        expect(response.body).to include("Fund the next recovery")
+
         get "/recovery_stories", params: {per_page: 2, page: 3}
         expect(response).to redirect_to(recovery_stories_path(page: 2))
       end
@@ -111,6 +115,7 @@ RSpec.describe WelcomeController, type: :request do
         expect(response.body).to include('<turbo-frame class="tw:contents" id="recovery_stories_page_2">')
         expect(response.body).to include(ERB::Util.html_escape(quote))
         expect(response.body).to_not include("Load more stories")
+        expect(response.body).to_not include("Newer stories")
         expect(response.body).to_not include("Fund the next recovery")
       end
 

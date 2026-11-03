@@ -1,0 +1,10 @@
+---
+en:
+  components:
+    pages:
+      recovery_stories:
+        stories:
+          load_more_stories: Load more stories
+          newer_stories: Newer stories
+          recovered: Recovered
+          translated_from_english: translated from English

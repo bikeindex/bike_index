@@ -25,22 +25,6 @@ module Pages
 
         private
 
-        def stats
-          [
-            [abbreviated(Counts.total_bikes), translation(".stat_bikes")],
-            [number_display(Counts.recoveries), translation(".stat_recoveries")],
-            [render(Atoms::CurrencyMillions::Component.new(dollars_usd: Counts.recoveries_value)),
-              translation(".stat_value")],
-            [safe_join([number_display(Counts.organizations.floor(-2)), "+"]), translation(".stat_partners")]
-          ]
-        end
-
-        def abbreviated(count)
-          return number_display(count) if count < 1_000_000
-
-          "#{number_with_precision(count / 1_000_000.0, precision: 1, round_mode: :floor, strip_insignificant_zeros: true)}M+"
-        end
-
         def major_gifts
           MAJOR_AMOUNTS.zip([translation(".major_partner"), translation(".major_benefactor")])
         end

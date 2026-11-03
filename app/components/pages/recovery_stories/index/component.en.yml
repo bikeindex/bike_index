@@ -4,7 +4,6 @@ en:
     pages:
       recovery_stories:
         index:
-          bikes_registered_free: bikes registered, free
           donors_keep_it_free: >-
             Bike Index doesn't charge riders, sell data, or run ads. Every recovery
             on this page was powered by donors who keep registration, search, and
@@ -19,16 +18,10 @@ en:
             who cared enough to check. A shop mechanic. A police officer. A stranger
             who remembered an alert. This is what a free, open registry makes possible,
             and it's kept free by people like you.
-          load_more_stories: Load more stories
-          partner_organizations: partner shops, police departments, and cities
-          recovered: Recovered
           recovery_stories: Recovery stories
           register_your_bike: Register your bike
           share_your_story: Share your story
           shared_by_the_person: Every story here is shared by the person who got their
             bike back.
           started_with_a_registration: Every story here started with a registration.
-          stolen_bikes_recovered: stolen bikes recovered
           takes_two_minutes: Takes about two minutes. It's free, forever.
-          translated_from_english: translated from English
-          value_returned_to_owners: value returned to owners

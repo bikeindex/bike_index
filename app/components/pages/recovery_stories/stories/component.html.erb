@@ -1,0 +1,68 @@
+<%= helpers.turbo_frame_tag("recovery_stories_page_#{@pagy.page}", class: "tw:contents") do %>
+  <% if @pagy.previous && !helpers.turbo_frame_request? %>
+    <div class="tw:col-span-full tw:flex tw:justify-center">
+      <%= render(UI::ButtonLink::Component.new(href: page_path(@pagy.previous), text: translation(".newer_stories"),
+        color: :secondary, size: :callout, data: {turbo: false},
+        html_class: PURPLE_OUTLINE)) %>
+    </div>
+  <% end %>
+
+  <% @recovery_displays.each do |recovery_display| %>
+    <% link = recovery_display.link.presence %>
+
+    <%# Turbo would load a same-origin link into this frame, which has no matching frame to show %>
+    <%= content_tag(link ? :a : :article, href: link, data: ({turbo: false} if link), class: class_names(CARD_CLASSES, LINKED_CARD_CLASSES => link)) do %>
+      <% if recovery_display.photo_url.present? %>
+        <%= image_tag(recovery_display.photo_url, alt: recovery_display.image_alt, loading: "lazy",
+          class: "tw:block tw:h-50 tw:w-full tw:bg-gray-100 tw:object-cover tw:dark:bg-gray-700") %>
+      <% else %>
+        <div class="tw:h-50 tw:bg-gray-100 tw:dark:bg-gray-700"></div>
+      <% end %>
+
+      <%= tag.div(class: "tw:flex tw:flex-col tw:gap-3 tw:p-5", data: {controller: "recovery-stories--translate-quote", recovery_stories__translate_quote_locale_value: I18n.locale}) do %>
+        <blockquote
+          class="tw:m-0 tw:border-0 tw:p-0 tw:text-base tw:leading-[1.55]"
+          data-recovery-stories--translate-quote-target="quote"
+        >
+          <%= recovery_display.quote %>
+        </blockquote>
+
+        <p class="tw:m-0 tw:flex tw:flex-wrap tw:items-baseline tw:gap-2">
+          <% if recovery_display.quote_by.present? %>
+            <strong
+              class="
+                tw:text-sm tw:font-extrabold tw:text-slate-900
+                tw:dark:text-gray-100
+              "
+            >
+              <%= recovery_display.quote_by %>
+            </strong>
+          <% end %>
+
+          <span class="tw:text-[12.5px] tw:text-gray-600 tw:dark:text-gray-400">
+            <%= translation(".recovered") %>
+            <%= render(UI::Time::Component.new(time: recovery_display.recovered_at)) %>
+          </span>
+
+          <span
+            class="tw:text-[12.5px] tw:text-gray-500 tw:dark:text-gray-400"
+            data-recovery-stories--translate-quote-target="credit"
+            hidden
+          >
+            <%= translation(".translated_from_english") %>
+          </span>
+        </p>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <% if @pagy.next %>
+    <%= helpers.turbo_frame_tag("recovery_stories_page_#{@pagy.next}", class: "tw:contents") do %>
+      <div class="tw:col-span-full tw:mt-4 tw:flex tw:justify-center">
+        <%= render(UI::ButtonLink::Component.new(href: page_path(@pagy.next), text: translation(".load_more_stories"),
+          color: :secondary, size: :callout, data: {turbo: true, turbo_action: "advance"},
+          html_class: PURPLE_OUTLINE)) %>
+      </div>
+    <% end %>
+  <% end %>
+<% end %>
