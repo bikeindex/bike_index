@@ -1,7 +1,7 @@
 <%# UI::Tabs draws the line under itself, so the nav's own border would double it %>
-<%= render(Pages::Admin::Headers::Nav::Component.new(title: @title, subtitle: @subtitle, border: false)) do %>
-  <% @links.each do |link| %>
-    <li><%= link %></li>
+<%= render(Pages::Admin::Headers::Nav::Component.new(title: @title, subtitle: @subtitle, border: false)) do |nav| %>
+  <% nav_items.each do |nav_item| %>
+    <% nav.with_item { nav_item.to_s } %>
   <% end %>
 <% end %>
 

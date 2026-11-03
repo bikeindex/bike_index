@@ -5,6 +5,8 @@ module Pages
     module Headers
       module Nav
         class ComponentPreview < ApplicationComponentPreview
+          # @!group Variants
+
           def default
             render(Pages::Admin::Headers::Nav::Component.new(title: "Manage Organizations"))
           end
@@ -21,6 +23,8 @@ module Pages
           def without_border
             render(Pages::Admin::Headers::Nav::Component.new(title: "Brakebills", border: false))
           end
+
+          # @!endgroup
         end
       end
     end
