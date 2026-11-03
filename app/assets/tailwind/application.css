@@ -174,9 +174,6 @@
   .ui-table:not(.ui-table-list) td:has(.keep-with-previous:not(.keep-together *)) {
     @apply tw:whitespace-nowrap;
   }
-  .ui-table-list .twcode {
-    @apply tw:wrap-anywhere;
-  }
   .table_cell_check {
     @apply tw:font-mono tw:text-center tw:font-bold;
   }

@@ -38,7 +38,8 @@ module UI
 
       private
 
-      def value_classes = "#{CELL_CLASSES} tw:wrap-anywhere #{@wide_definition ? "tw:w-[70%]" : "tw:w-[85%]"}"
+      # UI::Code's own wrap-break-word leaves a long value its full width, overflowing a narrow list
+      def value_classes = "#{CELL_CLASSES} tw:wrap-anywhere tw:[&_code]:wrap-anywhere! #{@wide_definition ? "tw:w-[70%]" : "tw:w-[85%]"}"
     end
   end
 end
