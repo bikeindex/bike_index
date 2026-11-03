@@ -68,7 +68,8 @@ async function load ({ rulesUrl, similarityUrl: similarityModule }) {
   models = index.models.map((model, position) => ({
     ...model,
     position,
-    stock_photo: model.photo && `${index.stock_photos}/${path(model.id)}.${model.photo}`,
+    // an extension at its own path, or the whole URL of a photo it shares with another model
+    stock_photo: model.photo && (model.photo.includes('://') ? model.photo : `${index.stock_photos}/${path(model.id)}.${model.photo}`),
     activity_name: activityNames[model.primary_activity],
     type_name: typeNames[model.vehicle_type],
     // by its maker, as makers share names, and its first word where it has no group
