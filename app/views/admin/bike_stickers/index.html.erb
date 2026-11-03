@@ -126,9 +126,7 @@
   admin_search_form:,
   table_view:,
 )) do |skeleton| %>
-  <% skeleton.with_nav_item do %>
-    <%= render(UI::ButtonLink::Component.new(text: "New batch", href: new_admin_bike_sticker_path, color: :primary, size: :sm)) %>
-  <% end %>
+  <% skeleton.with_nav_item { render(UI::ButtonLink::Component.new(text: "New batch", href: new_admin_bike_sticker_path, color: :primary, size: :sm)) } %>
 
   <% skeleton.with_nav_item do %>
     <small>

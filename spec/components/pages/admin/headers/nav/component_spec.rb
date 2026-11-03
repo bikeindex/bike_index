@@ -11,6 +11,19 @@ RSpec.describe Pages::Admin::Headers::Nav::Component, type: :component do
     expect(component).not_to have_css("ul")
   end
 
+  context "with items rendering nothing" do
+    let(:component) do
+      render_inline(described_class.new(title: "Manage Bikes")) do |nav|
+        nav.with_item { nil }
+        nav.with_item { "\n  \n".html_safe }
+      end
+    end
+
+    it "renders no list" do
+      expect(component).not_to have_css("ul")
+    end
+  end
+
   context "with a subtitle and items" do
     let(:component) do
       render_inline(described_class.new(title: "Manage Bikes", subtitle: "Editing", border: false)) do |nav|

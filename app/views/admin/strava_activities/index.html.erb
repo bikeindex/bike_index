@@ -6,9 +6,7 @@
   viewing: controller_name.humanize,
   table_view:, chart_collection: @render_chart && matching_strava_activities,
 )) do |skeleton| %>
-  <% skeleton.with_nav_item do %>
-    <%= render(UI::ButtonLink::Component.new(text: "with gear", href: url_for(sortable_search_params.merge(search_with_gear: !@with_gear)), size: :sm, active: @with_gear)) %>
-  <% end %>
+  <% skeleton.with_nav_item { render(UI::ButtonLink::Component.new(text: "with gear", href: url_for(sortable_search_params.merge(search_with_gear: !@with_gear)), size: :sm, active: @with_gear)) } %>
 
   <% skeleton.with_nav_item do %>
     <% enriched_filter_name = {"true" => "Only enriched", "false" => "Only not enriched"}[@searched_enriched] || "Enriched?" %>

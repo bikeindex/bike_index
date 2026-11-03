@@ -2,16 +2,13 @@
 - title = location_count ? "Bike Index records tables" : "#{@kind.titleize} graphs"
 = render(Pages::Admin::Headers::Nav::Component.new(title:)) do |nav|
   - if @kind == "bikes"
-    - nav.with_item do
-      = render(UI::ButtonLink::Component.new(text: "Search these bikes", href: admin_bikes_path(sortable_params), color: :link))
+    - nav.with_item { render(UI::ButtonLink::Component.new(text: "Search these bikes", href: admin_bikes_path(sortable_params), color: :link)) }
 
-  - nav.with_item do
-    = render(UI::ButtonLink::Component.new(text: "Location count tables", href: tables_admin_graphs_path(location_count: true), size: :sm, active: location_count))
+  - nav.with_item { render(UI::ButtonLink::Component.new(text: "Location count tables", href: tables_admin_graphs_path(location_count: true), size: :sm, active: location_count)) }
   - @graph_kinds.each do |kind|
     - kind_path = admin_organization_statuses_path(sortable_params.merge(Admin::OrganizationStatusesController::WITH_POS_GRAPH_PARAMS)) if kind == "pos_integrations"
     - kind_path ||= admin_graphs_path(sortable_params.merge(search_kind: kind, period: "week"))
-    - nav.with_item do
-      = render(UI::ButtonLink::Component.new(text: kind.humanize, href: kind_path, size: :sm, active: @kind == kind))
+    - nav.with_item { render(UI::ButtonLink::Component.new(text: kind.humanize, href: kind_path, size: :sm, active: @kind == kind)) }
 
 - if !["general", ""].include?(@kind) # General and location tables don't have period select :/
   %div{class: "tw:flex tw:justify-end"}

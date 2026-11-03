@@ -59,7 +59,5 @@
     <% end %>
   <% end %>
 
-  <% skeleton.with_nav_item do %>
-    <%= render(UI::ButtonLink::Component.new(text: "with claims", href: url_for(sortable_search_params.merge(search_with_claims: !@with_claims)), size: :sm, active: @with_claims)) %>
-  <% end %>
+  <% skeleton.with_nav_item { render(UI::ButtonLink::Component.new(text: "with claims", href: url_for(sortable_search_params.merge(search_with_claims: !@with_claims)), size: :sm, active: @with_claims)) } %>
 <% end %>

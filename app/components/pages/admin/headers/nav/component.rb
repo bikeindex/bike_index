@@ -19,6 +19,8 @@ module Pages
 
           private
 
+          def rendered_items = @rendered_items ||= items.map(&:to_s).compact_blank
+
           def wrapper_classes
             ["tw:flex tw:flex-row tw:flex-wrap tw:items-baseline tw:gap-x-4 tw:gap-y-2",
               (BORDER_CLASSES if @border)].compact.join(" ")

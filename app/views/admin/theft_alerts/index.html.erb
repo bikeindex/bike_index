@@ -145,16 +145,10 @@
       <% end %>
     <% end %>
 
-    <% skeleton.with_nav_item do %>
-      <%= render(UI::ButtonLink::Component.new(text: "fbook data", href: url_for(sortable_search_params.merge(search_facebook_data: !@search_facebook_data)), size: :sm, active: @search_facebook_data)) %>
-    <% end %>
+    <% skeleton.with_nav_item { render(UI::ButtonLink::Component.new(text: "fbook data", href: url_for(sortable_search_params.merge(search_facebook_data: !@search_facebook_data)), size: :sm, active: @search_facebook_data)) } %>
 
-    <% skeleton.with_nav_item do %>
-      <%= render(UI::ButtonLink::Component.new(text: "recovered", href: url_for(sortable_search_params.merge(search_recovered: !@search_recovered)), size: :sm, active: @search_recovered)) %>
-    <% end %>
+    <% skeleton.with_nav_item { render(UI::ButtonLink::Component.new(text: "recovered", href: url_for(sortable_search_params.merge(search_recovered: !@search_recovered)), size: :sm, active: @search_recovered)) } %>
 
-    <% skeleton.with_nav_item do %>
-      <%= render(UI::ButtonLink::Component.new(text: "location counts", href: admin_theft_alerts_path(sortable_search_params.merge(search_location_counts: !@location_counts)), size: :sm, active: @location_counts)) %>
-    <% end %>
+    <% skeleton.with_nav_item { render(UI::ButtonLink::Component.new(text: "location counts", href: admin_theft_alerts_path(sortable_search_params.merge(search_location_counts: !@location_counts)), size: :sm, active: @location_counts)) } %>
   <% end %>
 <% end %>

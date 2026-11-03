@@ -27,7 +27,5 @@
   skip_charting: true,
   admin_search_form:,
 )) do |skeleton| %>
-  <% skeleton.with_nav_item do %>
-    <%= render(UI::ButtonLink::Component.new(text: "New Exchange Rate", href: new_admin_exchange_rate_path, color: :primary, size: :sm)) %>
-  <% end %>
+  <% skeleton.with_nav_item { render(UI::ButtonLink::Component.new(text: "New Exchange Rate", href: new_admin_exchange_rate_path, color: :primary, size: :sm)) } %>
 <% end %>

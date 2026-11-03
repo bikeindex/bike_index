@@ -1,9 +1,7 @@
 = render(Pages::Admin::Headers::Nav::Component.new(title: safe_join(["Bulk Import ", tag.em("##{@bulk_import.id}")]))) do |nav|
-  - nav.with_item do
-    = render(UI::ButtonLink::Component.new(text: "All bulk imports", href: admin_bulk_imports_path, size: :sm))
+  - nav.with_item { render(UI::ButtonLink::Component.new(text: "All bulk imports", href: admin_bulk_imports_path, size: :sm)) }
   - if @bulk_import.organization_id.present?
-    - nav.with_item do
-      = render(UI::ButtonLink::Component.new(text: "All #{@bulk_import.organization.name} imports", href: admin_bulk_imports_path(organization_id: @bulk_import.organization.to_param), size: :sm))
+    - nav.with_item { render(UI::ButtonLink::Component.new(text: "All #{@bulk_import.organization.name} imports", href: admin_bulk_imports_path(organization_id: @bulk_import.organization.to_param), size: :sm)) }
 .twwiderow{class: "tw:items-start"}
   = render(UI::TableList::Component.new) do |list|
     - list.with_row(label: "Created", value: render(UI::Time::Component.new(time: @bulk_import.created_at, format: :localize_time_precise)))

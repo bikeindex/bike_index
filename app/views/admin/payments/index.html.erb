@@ -90,9 +90,7 @@
   admin_search_form:,
   table_view:,
 )) do |skeleton| %>
-  <% skeleton.with_nav_item do %>
-    <%= render(UI::ButtonLink::Component.new(text: "New payment", href: new_admin_payment_url, color: :primary, size: :sm)) %>
-  <% end %>
+  <% skeleton.with_nav_item { render(UI::ButtonLink::Component.new(text: "New payment", href: new_admin_payment_url, color: :primary, size: :sm)) } %>
 
   <% skeleton.with_nav_item do %>
     <%= render(UI::Dropdown::Component.new(name: @kind.blank? ? "All kinds" : "#{@kind.titleize} only", button_size: :sm,

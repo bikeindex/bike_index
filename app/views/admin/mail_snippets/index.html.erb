@@ -42,9 +42,7 @@
   viewing: controller_name.humanize,
   collection: @mail_snippets, table_view:, chart_collection: @render_chart && matching_mail_snippets,
 )) do |skeleton| %>
-  <% skeleton.with_nav_item do %>
-    <%= render(UI::ButtonLink::Component.new(text: "new snippet", href: new_admin_mail_snippet_path, color: :primary, size: :sm)) %>
-  <% end %>
+  <% skeleton.with_nav_item { render(UI::ButtonLink::Component.new(text: "new snippet", href: new_admin_mail_snippet_path, color: :primary, size: :sm)) } %>
 
   <% skeleton.with_nav_item do %>
     <%= render(UI::Dropdown::Component.new(name: @search_kind == "all" ? "All kinds" : MailSnippet.kind_humanized(@search_kind), button_size: :sm,

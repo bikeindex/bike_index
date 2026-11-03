@@ -28,7 +28,5 @@
     <% end %>
   <% end %>
 
-  <% skeleton.with_nav_item do %>
-    <%= render(UI::ButtonLink::Component.new(text: "New Post", href: new_admin_news_url, color: :primary, size: :sm)) %>
-  <% end %>
+  <% skeleton.with_nav_item { render(UI::ButtonLink::Component.new(text: "New Post", href: new_admin_news_url, color: :primary, size: :sm)) } %>
 <% end %>

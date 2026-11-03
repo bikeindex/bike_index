@@ -14,7 +14,5 @@
   header_content:,
   table_view:,
 )) do |skeleton| %>
-  <% skeleton.with_nav_item do %>
-    <%= render(UI::ButtonLink::Component.new(text: "New Component type", href: new_admin_ctype_url, color: :primary, size: :sm)) %>
-  <% end %>
+  <% skeleton.with_nav_item { render(UI::ButtonLink::Component.new(text: "New Component type", href: new_admin_ctype_url, color: :primary, size: :sm)) } %>
 <% end %>

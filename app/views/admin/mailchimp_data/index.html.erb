@@ -52,8 +52,6 @@
       <% end %>
     <% end %>
 
-    <% skeleton.with_nav_item do %>
-      <%= render(UI::Collapse::Component.new(text: "Toggle data", size: :sm)) %>
-    <% end %>
+    <% skeleton.with_nav_item { render(UI::Collapse::Component.new(text: "Toggle data", size: :sm)) } %>
   <% end %>
 </div>

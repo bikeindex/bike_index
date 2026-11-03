@@ -114,11 +114,7 @@
     <% end %>
   <% end %>
 
-  <% skeleton.with_nav_item do %>
-    <%= render(UI::ButtonLink::Component.new(text: "current", href: url_for(sortable_search_params.merge(search_current: !@current)), size: :sm, active: @current)) %>
-  <% end %>
+  <% skeleton.with_nav_item { render(UI::ButtonLink::Component.new(text: "current", href: url_for(sortable_search_params.merge(search_current: !@current)), size: :sm, active: @current)) } %>
 
-  <% skeleton.with_nav_item do %>
-    <%= render(UI::ButtonLink::Component.new(text: "ended", href: url_for(sortable_search_params.merge(search_ended: !@ended)), size: :sm, active: @ended)) %>
-  <% end %>
+  <% skeleton.with_nav_item { render(UI::ButtonLink::Component.new(text: "ended", href: url_for(sortable_search_params.merge(search_ended: !@ended)), size: :sm, active: @ended)) } %>
 <% end %>

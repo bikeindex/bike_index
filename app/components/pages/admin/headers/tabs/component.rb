@@ -20,7 +20,6 @@ module Pages
           # What this screen offers besides the tabs - e.g. "New Invoice"
           renders_many :nav_items
 
-          # tabs: what UI::Tabs takes
           def initialize(title:, tabs:, nav_label:, subtitle: nil)
             @title = title
             @tabs = tabs

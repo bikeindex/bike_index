@@ -1,6 +1,6 @@
 <%= render(Pages::Admin::Headers::Tabs::Component.new(title: @user.display_name, tabs:,
       nav_label: "User sections")) do |header| %>
-  <% header.with_nav_item { non_admin_view_link } if non_admin_view_link %>
+  <% header.with_nav_item { non_admin_view_link } %>
 
   <% if alerts? %>
     <% header.with_alert do %>

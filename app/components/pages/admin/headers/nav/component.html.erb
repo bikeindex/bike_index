@@ -4,14 +4,14 @@
     <%= render(UI::Header::Component.new(text: @title, subtitle: @subtitle)) %>
   </div>
 
-  <% if items? %>
+  <% if rendered_items.any? %>
     <ul
       class="
         tw:mb-6 tw:flex tw:flex-row tw:flex-wrap tw:items-baseline tw:gap-1
         tw:text-sm
       "
     >
-      <% items.each do |item| %>
+      <% rendered_items.each do |item| %>
         <li><%= item %></li>
       <% end %>
     </ul>

@@ -19,7 +19,6 @@
       - dropdown.with_entry_divider
       - searchable_managers.each do |kind|
         - dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "#{kind.titleize} only", path: url_for(sortable_search_params.merge(search_manager: kind)), match_params: {search_manager: kind}) }
-  - skeleton.with_nav_item do
-    = render(UI::ButtonLink::Component.new(text: "New Membership", href: new_admin_membership_url, color: :primary, size: :sm))
+  - skeleton.with_nav_item { render(UI::ButtonLink::Component.new(text: "New Membership", href: new_admin_membership_url, color: :primary, size: :sm)) }
 
 

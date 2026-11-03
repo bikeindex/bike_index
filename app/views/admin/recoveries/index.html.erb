@@ -79,11 +79,7 @@
     <% end %>
   <% end %>
 
-  <% skeleton.with_nav_item do %>
-    <%= render(UI::ButtonLink::Component.new(text: "Shareable", href: url_for(sortable_search_params.merge(search_shareable: !@shareable)), size: :sm, active: @shareable)) %>
-  <% end %>
+  <% skeleton.with_nav_item { render(UI::ButtonLink::Component.new(text: "Shareable", href: url_for(sortable_search_params.merge(search_shareable: !@shareable)), size: :sm, active: @shareable)) } %>
 
-  <% skeleton.with_nav_item do %>
-    <%= render(UI::ButtonLink::Component.new(text: "Index Helped", href: url_for(sortable_search_params.merge(search_index_helped_recovery: !@index_helped_recovery)), size: :sm, active: @index_helped_recovery)) %>
-  <% end %>
+  <% skeleton.with_nav_item { render(UI::ButtonLink::Component.new(text: "Index Helped", href: url_for(sortable_search_params.merge(search_index_helped_recovery: !@index_helped_recovery)), size: :sm, active: @index_helped_recovery)) } %>
 <% end %>

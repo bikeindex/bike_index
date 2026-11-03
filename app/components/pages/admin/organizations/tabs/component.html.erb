@@ -1,8 +1,7 @@
 <%= render(Pages::Admin::Headers::Tabs::Component.new(title: @organization.name, subtitle: @subtitle,
       tabs:, nav_label: "Organization sections")) do |header| %>
-  <% top_right_links.each do |link| %>
-    <% header.with_nav_item { link } %>
-  <% end %>
+  <% header.with_nav_item { @additional_link } %>
+  <% header.with_nav_item { (@active == :invoices) ? new_invoice_link : organization_view_link } %>
 
   <% if @organization.deleted? %>
     <% header.with_alert do %>

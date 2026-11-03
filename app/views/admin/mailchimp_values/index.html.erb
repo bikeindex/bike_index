@@ -15,12 +15,8 @@
       <% end %>
     <% end %>
 
-    <% skeleton.with_nav_item do %>
-      <%= render(UI::ButtonLink::Component.new(text: "update values", href: admin_mailchimp_values_path, size: :sm, method: :post)) %>
-    <% end %>
+    <% skeleton.with_nav_item { render(UI::ButtonLink::Component.new(text: "update values", href: admin_mailchimp_values_path, size: :sm, method: :post)) } %>
 
-    <% skeleton.with_nav_item do %>
-      <%= render(UI::Collapse::Component.new(text: "Toggle data", size: :sm)) %>
-    <% end %>
+    <% skeleton.with_nav_item { render(UI::Collapse::Component.new(text: "Toggle data", size: :sm)) } %>
   <% end %>
 </div>

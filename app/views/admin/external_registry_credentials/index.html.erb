@@ -5,7 +5,5 @@
   index_title: "External Registry Credentials",
   skip_charting: true,
 )) do |skeleton| %>
-  <% skeleton.with_nav_item do %>
-    <%= render(UI::ButtonLink::Component.new(text: "New Credential", href: new_admin_external_registry_credential_path, color: :primary, size: :sm)) %>
-  <% end %>
+  <% skeleton.with_nav_item { render(UI::ButtonLink::Component.new(text: "New Credential", href: new_admin_external_registry_credential_path, color: :primary, size: :sm)) } %>
 <% end %>

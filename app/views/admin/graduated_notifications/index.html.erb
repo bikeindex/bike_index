@@ -14,9 +14,7 @@
   rendered_chart:,
 )) do |skeleton| %>
   <% if current_organization.present? %>
-    <% skeleton.with_nav_item do %>
-      <%= render(UI::ButtonLink::Component.new(text: "#{current_organization.short_name} view", href: organization_graduated_notifications_path({organization_id: current_organization.to_param}.merge(sortable_search_params)), size: :sm)) %>
-    <% end %>
+    <% skeleton.with_nav_item { render(UI::ButtonLink::Component.new(text: "#{current_organization.short_name} view", href: organization_graduated_notifications_path({organization_id: current_organization.to_param}.merge(sortable_search_params)), size: :sm)) } %>
   <% end %>
 
   <% skeleton.with_nav_item do %>

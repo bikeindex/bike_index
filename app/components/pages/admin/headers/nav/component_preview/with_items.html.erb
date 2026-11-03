@@ -1,11 +1,7 @@
 <%= render(Pages::Admin::Headers::Nav::Component.new(title: "Manage Invoices")) do |nav| %>
-  <% nav.with_item do %>
-    <%= render(UI::ButtonLink::Component.new(text: "Paid", href: admin_invoices_path(search_paid: true), size: :sm, active: true)) %>
-  <% end %>
+  <% nav.with_item { render(UI::ButtonLink::Component.new(text: "Paid", href: admin_invoices_path(search_paid: true), size: :sm, active: true)) } %>
 
-  <% nav.with_item do %>
-    <%= render(UI::ButtonLink::Component.new(text: "Unpaid", href: admin_invoices_path, size: :sm)) %>
-  <% end %>
+  <% nav.with_item { render(UI::ButtonLink::Component.new(text: "Unpaid", href: admin_invoices_path, size: :sm)) } %>
 
   <% nav.with_item do %>
     <%= render(UI::Dropdown::Component.new(name: "All statuses", button_size: :sm)) do |dropdown| %>
@@ -14,7 +10,5 @@
     <% end %>
   <% end %>
 
-  <% nav.with_item do %>
-    <%= render(UI::ButtonLink::Component.new(text: "New Invoice", href: new_admin_organization_invoice_path(organization_id: "brakebills"), color: :primary, size: :sm)) %>
-  <% end %>
+  <% nav.with_item { render(UI::ButtonLink::Component.new(text: "New Invoice", href: new_admin_organization_invoice_path(organization_id: "brakebills"), color: :primary, size: :sm)) } %>
 <% end %>

@@ -4,7 +4,5 @@
   collection: @ads,
   skip_charting: true,
 )) do |skeleton| %>
-  <% skeleton.with_nav_item do %>
-    <%= render(UI::ButtonLink::Component.new(text: "New ad", href: new_admin_ad_url, color: :primary, size: :sm)) %>
-  <% end %>
+  <% skeleton.with_nav_item { render(UI::ButtonLink::Component.new(text: "New ad", href: new_admin_ad_url, color: :primary, size: :sm)) } %>
 <% end %>

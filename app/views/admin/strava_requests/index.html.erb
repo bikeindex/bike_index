@@ -14,9 +14,7 @@
   viewing: controller_name.humanize,
   index_title:, rendered_chart:,
 )) do |skeleton| %>
-  <% skeleton.with_nav_item do %>
-    <%= render(UI::ButtonLink::Component.new(text: "Proxy requests", href: url_for(sortable_search_params.merge(search_proxy_requests: !@proxy_request)), size: :sm, active: @proxy_request)) %>
-  <% end %>
+  <% skeleton.with_nav_item { render(UI::ButtonLink::Component.new(text: "Proxy requests", href: url_for(sortable_search_params.merge(search_proxy_requests: !@proxy_request)), size: :sm, active: @proxy_request)) } %>
 
   <% skeleton.with_nav_item do %>
     <%= render(UI::Dropdown::Component.new(name: params[:search_request_type].blank? ? "All types" : params[:search_request_type].humanize, button_size: :sm,

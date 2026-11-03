@@ -5,7 +5,7 @@ module Pages
     module IndexSkeleton
       module IndexInfo
         class ComponentPreview < ApplicationComponentPreview
-          # @!group Header Variants
+          # @!group Variants
 
           def default
             render(Pages::Admin::IndexSkeleton::IndexInfo::Component.new(index: index_state, viewing: "Notifications"))

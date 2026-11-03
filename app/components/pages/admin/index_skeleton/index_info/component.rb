@@ -22,8 +22,8 @@ module Pages
 
           def viewing_for(*subject) = safe_join([@viewing.pluralize, " for ", *subject])
 
-          def missing(*subject)
-            tag.span(safe_join([*subject, " ", tag.em("missing")]), class: error_text_class)
+          def missing(subject)
+            tag.span(safe_join([subject, " ", tag.em("missing")]), class: error_text_class)
           end
 
           def error_text_class = UI::Alerts::Base::Component::TEXT_CLASSES[:error]
@@ -37,19 +37,20 @@ module Pages
           end
 
           def bike_row
-            bike = @index.bike || Bike.unscoped.find_by_id(@index.params[:search_bike_id])
-            return unless bike.present? || @index.params[:search_bike_id].present?
+            id = @index.params[:search_bike_id]
+            return if id.blank? && @index.bike.blank?
 
+            bike = @index.bike || Bike.unscoped.find_by_id(id)
             {view_all_text: "view for all bikes", key: :search_bike_id,
-             subject: bike.present? ? viewing_for(link_to(bike.title_string, admin_bike_path(bike), class: "twlink")) : missing("Bike ##{@index.params[:search_bike_id]}"),
+             subject: bike.present? ? viewing_for(link_to(bike.title_string, admin_bike_path(bike), class: "twlink")) : missing("Bike ##{id}"),
              detail: render(Pages::Admin::Bikes::DeletedAlert::Component.new(bike:))}
           end
 
           def marketplace_listing_row
             id = @index.params[:search_marketplace_listing_id]
-            listing = @index.marketplace_listing || MarketplaceListing.find_by_id(id)
-            return unless id.present? || listing.present?
+            return if id.blank? && @index.marketplace_listing.blank?
 
+            listing = @index.marketplace_listing || MarketplaceListing.find_by_id(id)
             {view_all_text: "view for all marketplace listings", key: :search_marketplace_listing_id,
              subject: listing.present? ? viewing_for(marketplace_listing_subject(listing)) : missing("Marketplace ##{id}")}
           end
@@ -107,9 +108,9 @@ module Pages
 
           def primary_activity_row
             param = @index.params[:primary_activity]
-            activity = @index.primary_activity || PrimaryActivity.find_by_id(param)
-            return unless param.present? || activity.present?
+            return if param.blank? && @index.primary_activity.blank?
 
+            activity = @index.primary_activity || PrimaryActivity.find_by_id(param)
             {view_all_text: "view for all primary activities", key: :primary_activity,
              subject: activity.present? ? viewing_for(link_to(activity.name, admin_primary_activity_path(activity), class: "twlink")) : tag.span(%(unknown primary activity "#{param}"), class: error_text_class)}
           end

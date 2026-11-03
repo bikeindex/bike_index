@@ -4,7 +4,5 @@
   viewing: "Ambassador Activities",
   skip_charting: true,
 )) do |skeleton| %>
-  <% skeleton.with_nav_item do %>
-    <%= render(UI::ButtonLink::Component.new(text: "New Activity", href: new_admin_ambassador_task_path, color: :primary, size: :sm)) %>
-  <% end %>
+  <% skeleton.with_nav_item { render(UI::ButtonLink::Component.new(text: "New Activity", href: new_admin_ambassador_task_path, color: :primary, size: :sm)) } %>
 <% end %>

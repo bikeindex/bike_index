@@ -5,9 +5,7 @@
     UI::ActiveLink query:
   %>
 
-  <% nav.with_item do %>
-    <%= render(UI::ButtonLink::Component.new(text: "all bikes", href: admin_bikes_path, size: :sm)) %>
-  <% end %>
+  <% nav.with_item { render(UI::ButtonLink::Component.new(text: "all bikes", href: admin_bikes_path, size: :sm)) } %>
 
   <% nav.with_item do %>
     <%= render(UI::ButtonLink::Component.new(text: "motorized", size: :sm, active: @motorized,

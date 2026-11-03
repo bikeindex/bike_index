@@ -5,7 +5,5 @@
   index_title: "Promoted Alert Plans",
   skip_charting: true,
 )) do |skeleton| %>
-  <% skeleton.with_nav_item do %>
-    <%= render(UI::ButtonLink::Component.new(text: "New Promoted Alert Plan", href: new_admin_theft_alert_plan_path, color: :primary, size: :sm)) %>
-  <% end %>
+  <% skeleton.with_nav_item { render(UI::ButtonLink::Component.new(text: "New Promoted Alert Plan", href: new_admin_theft_alert_plan_path, color: :primary, size: :sm)) } %>
 <% end %>

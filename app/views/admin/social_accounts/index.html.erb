@@ -5,7 +5,5 @@
   index_title: "Social Accounts",
   skip_charting: true,
 )) do |skeleton| %>
-  <% skeleton.with_nav_item do %>
-    <%= render(UI::ButtonLink::Component.new(text: "New Account", href: "/auth/twitter", color: :primary, size: :sm)) %>
-  <% end %>
+  <% skeleton.with_nav_item { render(UI::ButtonLink::Component.new(text: "New Account", href: "/auth/twitter", color: :primary, size: :sm)) } %>
 <% end %>

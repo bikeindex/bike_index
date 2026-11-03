@@ -4,7 +4,5 @@
   viewing: "Organization Features",
   skip_charting: true,
 )) do |skeleton| %>
-  <% skeleton.with_nav_item do %>
-    <%= render(UI::ButtonLink::Component.new(text: "New Feature", href: new_admin_organization_feature_url, color: :primary, size: :sm)) %>
-  <% end %>
+  <% skeleton.with_nav_item { render(UI::ButtonLink::Component.new(text: "New Feature", href: new_admin_organization_feature_url, color: :primary, size: :sm)) } %>
 <% end %>
