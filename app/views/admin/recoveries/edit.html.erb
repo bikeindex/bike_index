@@ -1,111 +1,93 @@
 <%= render Pages::Admin::Bikes::Header::Component.new(bike: @bike, active: :recoveries, stolen_record: @recovery, display_recovery: true, user: current_user, display_dev_info: display_dev_info?) %>
 
-<div class="admin-subnav midpage-subnav">
-  <div class="col-12">
-    <h2>Manage Recovery Display</h2>
-  </div>
-</div>
+<%= render(UI::Header::Component.new(text: "Manage Recovery Display", tag: :h2)) %>
 
-<div class="row text-center">
+<div class="tw:grid tw:grid-cols-12 tw:gap-x-8 tw:text-center">
   <% if @recovery.waiting_on_decision? %>
-    <div class="col-md-4">
-      <h4>Choose what to do with this recovery:</h4>
+    <div class="tw:col-span-12 tw:md:col-span-4">
+      <%= render(UI::Header::Component.new(text: "Choose what to do with this recovery:", tag: :h3)) %>
     </div>
-    <div class="col-6 col-md-4">
-      <%= link_to "Display recovery", new_admin_recovery_display_path(stolen_record_id: @recovery.id), class: "btn btn-lg btn-primary d-block" %>
+    <div class="tw:col-span-6 tw:md:col-span-4">
+      <%= render(UI::ButtonLink::Component.new(text: "Display recovery", href: new_admin_recovery_display_path(stolen_record_id: @recovery.id), color: :primary, size: :lg, html_class: "tw:w-full")) %>
     </div>
-    <div class="col-6 col-md-4">
-      <%= button_to "Mark Not Displayable", admin_recovery_path(id: @recovery.id, stolen_record: { is_not_displayable: true }), method: :put, class: "btn btn-lg btn-warning d-block", style: "width: 100%;" %>
+    <div class="tw:col-span-6 tw:md:col-span-4">
+      <%= render(UI::ButtonLink::Component.new(text: "Mark Not Displayable", href: admin_recovery_path(id: @recovery.id, stolen_record: {is_not_displayable: true}),
+        method: :put, color: :yellow, size: :lg, html_class: "tw:w-full")) %>
     </div>
   <% elsif @recovery.recovery_displayed? %>
-    <div class="col-6">
-      <p>This recovery is displayed.</p>
+    <div class="tw:col-span-6">
+      <p class="tw:mb-4">This recovery is displayed.</p>
     </div>
-    <div class="col-6">
-      <%= link_to "Edit Recovery Display", edit_admin_recovery_display_url(@recovery.recovery_display), class: "btn btn-lg btn-primary" %>
+    <div class="tw:col-span-6">
+      <%= render(UI::ButtonLink::Component.new(text: "Edit Recovery Display", href: edit_admin_recovery_display_url(@recovery.recovery_display), color: :primary, size: :lg)) %>
     </div>
   <% elsif @recovery.not_displayed? %>
-    <div class="col-12">
-      <p>This recovery is not displayed.</p>
-      <%= button_to "Mark Eligible for display", admin_recovery_path(id: @recovery.id, stolen_record: { mark_as_eligible: true }), method: :put, class: "btn btn-lg btn-success" %>
+    <div class="tw:col-span-12">
+      <p class="tw:mb-4">This recovery is not displayed.</p>
+
+      <%= render(UI::ButtonLink::Component.new(text: "Mark Eligible for display", href: admin_recovery_path(id: @recovery.id, stolen_record: {mark_as_eligible: true}),
+        method: :put, color: :primary, size: :lg)) %>
     </div>
   <% else %>
     <% if !@recovery.recovered? %>
-      <div class="col-12">
-        <h1 class="text-danger d-block">
-          This <%= @bike.type %> has not been marked recovered
-        </h1>
+      <div class="tw:col-span-12">
+        <%= render(UI::Header::Component.new(text: tag.span("This #{@bike.type} has not been marked recovered", class: UI::Alerts::Base::Component::TEXT_CLASSES[:error]), tag: :h2)) %>
       </div>
-      <div class="col-12 mb-4">
-        <p class="text-warning">
+      <div class="tw:col-span-12 tw:mb-6">
+        <p class="tw:mb-4 <%= UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>">
           You're viewing this in error, you shouldn't be on this page
         </p>
       </div>
     <% end %>
-    <div class="col-12">
-      <h4>
-        Display Status:
-        <em><%= @recovery.recovery_display_status.humanize %></em>
-      </h4>
+    <div class="tw:col-span-12">
+      <%= render(UI::Header::Component.new(text: safe_join(["Display Status: ", tag.em(@recovery.recovery_display_status.humanize)]), tag: :h3)) %>
 
-      <p class="mt-4">
+      <p class="tw:mt-6 tw:mb-4">
         Really want to display this recovery?
-        <%= link_to "Display recovery here", new_admin_recovery_display_path(stolen_record_id: @recovery.id) %>
+        <%= link_to "Display recovery here", new_admin_recovery_display_path(stolen_record_id: @recovery.id), class: "twlink" %>
       </p>
     </div>
   <% end %>
 </div>
 
-<hr style="margin: 60px 0 30px;">
+<hr class="twhr tw:mt-15 tw:mb-7.5">
 
-<h2>Edit recovery information</h2>
+<%= render(UI::Header::Component.new(text: "Edit recovery information", tag: :h2)) %>
 
-<p>
+<p class="tw:mb-4">
   You will have a chance to edit the text, when displaying the recovery.
-  <em class="text-warning">Don't edit to make it displayable.</em>
+  <em class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>">Don't edit to make it displayable.</em>
 </p>
 
-<p>Only edit if you want to change what is stored about this recovery.</p>
+<p class="tw:mb-4">
+  Only edit if you want to change what is stored about this recovery.
+</p>
 
 <details data-controller="ui--details">
   <summary
     data-action="click->ui--details#toggle"
-    class="
-      gray-link tw:cursor-pointer tw:list-none
-      tw:[&::-webkit-details-marker]:hidden
-    "
+    class="<%= UI::Button::Component.build_classes(color: :link_gray, size: :md, html_class: "tw:cursor-pointer tw:list-none tw:[&::-webkit-details-marker]:hidden") %>"
   >
     show edit form
   </summary>
 
   <div data-ui--details-target="content" class="tw:hidden!">
-    <hr class="mt-5 mb-4">
+    <hr class="twhr tw:mt-12 tw:mb-6">
 
-    <%= form_for([:admin, @recovery], url: { action: "update", controller: "recoveries" }, html: { class: "form form-horizontal" }) do |f| %>
+    <%= form_for([:admin, @recovery], url: { action: "update", controller: "recoveries" }) do |f| %>
       <%= render(UI::Alerts::ObjectError::Component.new(name: "Recovery", object: @recovery)) %>
 
-      <div class="row mt-4">
-        <div class="col-md-6">
-          <div class="form-group">
-            <%= f.label :recovered_description, "Recovery description" %>
-            <%= f.text_area :recovered_description, rows: 4, class: "form-control" %>
-          </div>
-        </div>
+      <div class="twwiderow tw:mt-6">
+        <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :recovered_description, kind: :text_area,
+          label_text: "Recovery description", html_options: {rows: 4})) %>
 
-        <div class="col-md-6">
-          <div class="form-group form-check">
-            <%= f.check_box :index_helped_recovery, class: "form-check-input" %>
-            <%= f.label :index_helped_recovery, class: "form-check-label" %>
+        <div>
+          <div class="tw:mb-4">
+            <%= render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :index_helped_recovery, label: "Index helped recovery")) %>
+            <%= render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :can_share_recovery, label: "Can share recovery")) %>
           </div>
 
-          <div class="form-group form-check">
-            <%= f.check_box :can_share_recovery, class: "form-check-input" %>
-            <%= f.label :can_share_recovery, class: "form-check-label" %>
-          </div>
-
-          <div class="form-group mt-4">
-            <%= submit_tag "Update the recovery", class: "btn btn-success" %>
-          </div>
+          <%= render(UI::Button::Component.new(text: "Update the recovery", color: :primary, type: "submit")) %>
         </div>
       </div>
     <% end %>

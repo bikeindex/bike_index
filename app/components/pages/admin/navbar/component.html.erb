@@ -1,10 +1,15 @@
-<nav class="navbar navbar-expand-md navbar-light bg-light admin-navbar">
-  <span class="navbar-brand">
-    <%= link_to image_tag("logo.svg"), @user_root_url %>
+<nav
+  class="
+    tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:bg-gray-50
+    tw:px-4 tw:py-2 tw:md:flex-nowrap tw:md:justify-start
+  "
+>
+  <span class="tw:mr-4 tw:py-1.25">
+    <%= link_to image_tag("logo.svg", class: "tw:h-9"), @user_root_url %>
   </span>
 
   <% if @current_user.superuser? %>
-    <ul class="navbar-nav d-none d-lg-flex">
+    <ul class="tw:hidden tw:lg:flex">
       <% shortcut_links.each do |link| %>
         <li>
           <%= render UI::ActiveLink::Component.from_item(link, html_class: NAV_LINK_CLASS,
@@ -24,10 +29,9 @@
       <% end %>
     </ul>
     <% if display_view_all? %>
-      <%# The same .nav-link outside the list, so it keeps the padding .navbar-nav overrode %>
-      <%= link_to current_nav_link[:path], class: "tw:block tw:py-2 tw:px-4 tw:no-underline text-muted em" do %>
+      <%= link_to current_nav_link[:path], class: "tw:block tw:py-2 tw:px-4 tw:no-underline tw:text-gray-500 tw:italic" do %>
         All
-        <div class="d-none d-sm-inline-block d-lg-none d-xl-inline-block">
+        <div class="tw:hidden tw:sm:inline-block tw:lg:hidden tw:xl:inline-block">
           <%= view_all_title %>
         </div>
       <% end %>
@@ -41,5 +45,5 @@
     </div>
   <% end %>
 
-  <%= link_to "Exit Admin", root_path, class: "btn btn-outline-secondary ml-auto less-strong d-none d-lg-inline-block" %>
+  <%= render(UI::ButtonLink::Component.new(text: "Exit Admin", href: root_path, html_class: "tw:ml-auto tw:max-lg:hidden")) %>
 </nav>

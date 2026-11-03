@@ -11,7 +11,7 @@ module AdminHelper
   # search_status: "all" because the index otherwise only shows the investigate statuses
   def bug_report_search_link(search_params)
     link_to search_emoji, admin_bug_reports_path(search_params.merge(search_status: "all")),
-      class: "display-sortable-link small tw:ml-1"
+      class: "display-sortable-link tw:ml-1 tw:text-xs"
   end
 
   def edit_mail_snippet_path_for(mail_snippet)
@@ -22,22 +22,11 @@ module AdminHelper
     end
   end
 
-  def credibility_scorer_color(score)
-    return "#dc3545" if score < 31
-    return "#ffc107" if score < 70
-
-    "#28a745"
-  end
-
-  def credibility_scorer_color_table(score)
-    (score < 31) ? credibility_scorer_color(score) : ""
-  end
-
   def admin_email_domain_spam_color(spam_score)
     if spam_score > 9
-      "text-danger"
+      UI::Alerts::Base::Component::TEXT_CLASSES[:error]
     elsif spam_score < EmailDomain::SPAM_SCORE_AUTO_BAN
-      "text-info"
+      UI::Alerts::Base::Component::TEXT_CLASSES[:notice]
     else
       ""
     end
@@ -70,12 +59,12 @@ module AdminHelper
 
   def theft_alert_status_class(theft_alert)
     text_class = if theft_alert.active?
-      "text-info"
+      UI::Alerts::Base::Component::TEXT_CLASSES[:notice]
     elsif theft_alert.pending?
-      "text-warning"
+      UI::Alerts::Base::Component::TEXT_CLASSES[:warning]
     elsif theft_alert.inactive?
-      "less-strong small"
+      "twless-strong tw:text-xs"
     end
-    theft_alert.recovered? ? text_class + " small" : text_class
+    theft_alert.recovered? ? text_class + " tw:text-xs" : text_class
   end
 end

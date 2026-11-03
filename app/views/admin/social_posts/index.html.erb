@@ -29,28 +29,25 @@
 <% end %>
 
 <% admin_search_form = capture do %>
-  <div class="row mt-4 mb-4">
-    <div class="col-sm-5">
+  <div class="tw:my-6 tw:grid tw:gap-x-8 tw:sm:grid-cols-12">
+    <div class="tw:sm:col-span-5">
       <% if @social_account.present? %>
         <strong>
           from
-          <%= link_to @social_account.screen_name, admin_social_account_path(@social_account) %>
+          <%= link_to @social_account.screen_name, admin_social_account_path(@social_account), class: "twlink" %>
         </strong>
       <% end %>
     </div>
 
-    <div class="col-md-7">
-      <%= form_tag admin_social_posts_path, method: :get, class: "form-inline" do %>
-        <%= render partial: "/shared/hidden_search_fields" %>
-        <%= hidden_field_tag :search_social_account_id, params[:search_social_account_id] %>
+    <%= form_with(url: admin_social_posts_path, method: :get, html: {class: "twsearchrow tw:sm:col-span-12 tw:md:col-span-7"}) do |form| %>
+      <%= render partial: "/shared/hidden_search_fields" %>
+      <%= hidden_field_tag :search_social_account_id, params[:search_social_account_id] %>
 
-        <div class="form-group ml-auto mr-2 mb-2">
-          <%= text_field_tag :query, params[:query], placeholder: "Search posts", class: "form-control" %>
-        </div>
+      <%= render(UI::Forms::Input::Component.new(form_builder: form, attribute: :query,
+        html_options: {value: params[:query], placeholder: "Search posts"})) %>
 
-        <%= submit_tag "Search", name: "search", class: "btn btn-primary mb-2" %>
-      <% end %>
-    </div>
+      <%= render(UI::Button::Component.new(text: "Search", color: :primary, type: "submit", name: "search")) %>
+    <% end %>
   </div>
 <% end %>
 

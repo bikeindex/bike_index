@@ -1,96 +1,67 @@
-<table class="table-list">
-  <% if @display_dev_info %>
-    <tr class="small only-dev-visible">
-      <td>ID</td>
-      <td><%= @organization.id %></td>
-    </tr>
+<%= render(UI::TableList::Component.new) do |list| %>
+  <% list.with_row(label: "ID", value: @organization.id, class: "tw:text-sm only-dev-visible", if: @display_dev_info) %>
+
+  <% list.with_row(label: "Short Name") do %>
+    <%= @organization.short_name %>
+
+    <% if CredibilityScorer.organization_trusted?(@organization) %>
+      <%= render(UI::Badge::Component.new(text: "Trusted credibility", color: :success, size: :sm)) %>
+    <% elsif CredibilityScorer.organization_suspicious?(@organization) %>
+      <%= render(UI::Badge::Component.new(text: "Suspicious credibility", color: :warning, size: :sm)) %>
+    <% end %>
+
+    <% if @organization.spam_registrations %>
+      <small class="tw:ml-1 <%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">high spam registrations</small>
+    <% end %>
   <% end %>
 
-  <tr>
-    <td>Short Name</td>
+  <% list.with_row(label: "Map") do %>
+    <% unless @organization.approved %>
+      <strong>Not approved</strong>
+      <small>therefor hidden</small>
+      <em>Would be</em>
+    <% end %>
 
-    <td>
-      <%= @organization.short_name %>
+    <% if @organization.show_on_map %>
+      <span class="twless-strong">Shown on map</span>
+    <% else %>
+      <strong>Not Shown</strong>
+    <% end %>
+  <% end %>
 
-      <% if CredibilityScorer.organization_trusted?(@organization) %>
-        <%= render(UI::Badge::Component.new(text: "Trusted credibility", color: :success, size: :sm)) %>
-      <% elsif CredibilityScorer.organization_suspicious?(@organization) %>
-        <%= render(UI::Badge::Component.new(text: "Suspicious credibility", color: :warning, size: :sm)) %>
+  <% list.with_row(label: "Kind") do %>
+    <%= @organization.kind_humanized %>
+
+    <% if @organization.enabled?("official_manufacturer") %>
+      <% unless @organization.kind == "bike_manufacturer" %>
+        <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>">
+          Kind should be "Bike Manufacturer"
+        </span>
       <% end %>
-
-      <% if @organization.spam_registrations %>
-        <small class="ml-1 text-danger">high spam registrations</small>
-      <% end %>
-    </td>
-  </tr>
-
-  <tr>
-    <td>Map</td>
-
-    <td>
-      <% unless @organization.approved %>
-        <strong>Not approved</strong>
-        <small>therefor hidden</small>
-        <em>Would be</em>
-      <% end %>
-
-      <% if @organization.show_on_map %>
-        <span class="less-strong">Shown on map</span>
+      <br>
+      <% if @organization.manufacturer_id.present? %>
+        <strong><%= @organization.manufacturer.name %></strong>
+        <em class="twless-strong">Manufacturer official account of</em>
       <% else %>
-        <strong>Not Shown</strong>
+        <strong class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">No Manufacturer assigned</strong>
+        <span class="twless-strong">
+          <%= link_to "edit organization", edit_admin_organization_path(@organization), class: "twlink" %>
+          to add
+        </span>
       <% end %>
-    </td>
-  </tr>
+    <% end %>
+  <% end %>
 
-  <tr>
-    <td>Kind</td>
+  <% list.with_row(label: "Slug") do %>
+    <%= @organization.slug %> |
+    <%= link_to "embed", embed_registrations_url(organization_id: @organization.to_param), class: "twlink" %>
+  <% end %>
 
-    <td>
-      <%= @organization.kind_humanized %>
+  <% list.with_row(label: "Created") do %>
+    <%= render(UI::Time::Component.new(time: @organization.created_at, format: :localize_time_precise)) %>
 
-      <% if @organization.enabled?("official_manufacturer") %>
-        <% unless @organization.kind == "bike_manufacturer" %>
-          <span class="text-warning"> Kind should be "Bike Manufacturer" </span>
-        <% end %>
-        <br>
-        <% if @organization.manufacturer_id.present? %>
-          <strong><%= @organization.manufacturer.name %></strong>
-          <em class="less-strong">Manufacturer official account of</em>
-        <% else %>
-          <strong class="text-danger">No Manufacturer assigned</strong>
-          <span class="less-strong">
-            <%= link_to "edit organization", edit_admin_organization_path(@organization) %>
-            to add
-          </span>
-        <% end %>
-      <% end %>
-    </td>
-  </tr>
+    <small class="localizeTimezone"></small>
+  <% end %>
 
-  <tr>
-    <td>Slug</td>
-
-    <td>
-      <%= @organization.slug %> |
-      <%= link_to "embed", embed_registrations_url(organization_id: @organization.to_param) %>
-    </td>
-  </tr>
-
-  <tr>
-    <td>Created</td>
-
-    <td>
-      <%= render(UI::Time::Component.new(time: @organization.created_at, format: :localize_time_precise)) %>
-
-      <small class="localizeTimezone"></small>
-    </td>
-  </tr>
-
-  <tr>
-    <td>Updated</td>
-
-    <td>
-      <%= render(UI::Time::Component.new(time: @organization.updated_at, format: :localize_time_precise)) %>
-    </td>
-  </tr>
-</table>
+  <% list.with_row(label: "Updated", value: render(UI::Time::Component.new(time: @organization.updated_at, format: :localize_time_precise))) %>
+<% end %>

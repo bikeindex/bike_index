@@ -28,12 +28,12 @@
   <% end %>
 <% end %>
 
-<h3 class="tw:mt-6">Bike</h3>
+<%= render(UI::Header::Component.new(text: "Bike", tag: :h2, html_class: "tw:mt-6")) %>
 
 <%= render UI::JsonDisplay::Component.new(data: @b_param.params) %>
 
 <% if @b_param.bike_errors.present? %>
-  <h3 class="tw:mt-6">Bike Errors</h3>
+  <%= render(UI::Header::Component.new(text: "Bike Errors", tag: :h2)) %>
 
   <%= render UI::JsonDisplay::Component.new(data: @b_param.bike_errors) %>
 <% end %>

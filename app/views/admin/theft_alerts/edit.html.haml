@@ -1,236 +1,179 @@
 = render Pages::Admin::Bikes::Header::Component.new(bike: @bike, active: :theft_alerts, stolen_record: @stolen_record, user: current_user, display_dev_info: display_dev_info?)
 
-%h2.mt-4
+= render(UI::Header::Component.new(tag: :h2)) do
   Facebook data
-  %small.ml-1
+  %small{class: "tw:ml-1"}
     alert status:
     %span{class: theft_alert_status_class(@theft_alert)}
       = @theft_alert.status
 - if @theft_alert.manual_override_inactive?
-  %p.pt-2.pb-2
-    %span.text-danger
+  %p{class: "tw:mb-4 tw:py-2"}
+    %span{class: UI::Alerts::Base::Component::TEXT_CLASSES[:error]}
       Facebook Activation failed
     %small
       this alert has be marked inactive, but it never ran.
-      %span.less-strong This happened either because something is broken with this alert, or because it was one of the original ~90 that Seth updated when he enabled automated fixing of failed activations on 2025-2-23.
-%h4
+      %span.twless-strong This happened either because something is broken with this alert, or because it was one of the original ~90 that Seth updated when he enabled automated fixing of failed activations on 2025-2-23.
+- facebook_update_title = capture do
   - if @theft_alert.facebook_updateable?
     = render(UI::ButtonLink::Component.new(text: "Update Facebook data", href: admin_theft_alert_path(@theft_alert.id, update_theft_alert: true), method: :patch, size: :sm))
   - else
     %em
-      %span.text-warning Can't update Facebook:
+      %span{class: UI::Alerts::Base::Component::TEXT_CLASSES[:warning]} Can't update Facebook:
     - if @theft_alert.before_automation?
-      %span.less-strong This alert was created before automation
+      %span.twless-strong This alert was created before automation
     - elsif !@theft_alert.activateable?
-      %span.less-strong This alert is missing required stuff
+      %span.twless-strong This alert is missing required stuff
     - else
-      %span.text-danger NOT SURE WHY!
+      %span{class: UI::Alerts::Base::Component::TEXT_CLASSES[:error]} NOT SURE WHY!
       %strong Tell Seth
 
   - if @theft_alert.failed_to_activate?
-    %span.text-danger Something Broke!
+    %span{class: UI::Alerts::Base::Component::TEXT_CLASSES[:error]} Something Broke!
     %strong Tell Seth
+= render(UI::Header::Component.new(text: facebook_update_title, tag: :h3))
 
 - if @theft_alert.pending?
-  .row.mt-4.mb-4
-    .col-xl-4.offset-xl-4.col-md-6.offset-md-3
-      .card
-        .card-body
-          - if @theft_alert.activateable_except_approval?
-            %h4.text-center
-              - if @theft_alert.activateable?
-                Theft alert can be activated!
-              - else
-                %span.text-warning This stolen record is NOT approved
-                %em.small.d-block.mt-2
-                  You can still activate if you're sure you want to
-
-            - if @theft_alert.activating?
-              %h2.mt-3.text-center
-                %span.text-warning Activation in process
-
-              %p
-                Activation started at:
-                %span.localizeTime= l( @theft_alert.activating_at, format: :convert_time)
-
-              %p
-                %strong Don't activate again
-                unless activation started a while ago
-
-            .text-center.mt-4
-              = render(UI::ButtonLink::Component.new(text: "Activate!", href: admin_theft_alert_path(@theft_alert.id, activate_theft_alert: true), method: :patch, color: :primary, size: :lg))
+  = render(UI::Container::Component.new) do
+    = render(UI::Card::Component.new(additional_classes: "tw:my-6")) do
+      - if @theft_alert.activateable_except_approval?
+        - activateable_title = capture do
+          - if @theft_alert.activateable?
+            Theft alert can be activated!
           - else
-            %h4.text-center
-              Theft alert
-              %span.text-danger can not
-              be activated
-            %ul.mt-4
-              - unless @theft_alert.stolen_record_approved?
-                %li Stolen Record is not approved
-              - unless @theft_alert.paid?
-                %li Alert is not paid
-              - if @theft_alert.missing_photo?
-                %li Alert is missing photo
-              - if @theft_alert.missing_location?
-                %li Alert is missing location
-              - if @theft_alert.bike_not_current?
-                %li Bike is hidden, deleted, or spam
+            %span{class: UI::Alerts::Base::Component::TEXT_CLASSES[:warning]} This stolen record is NOT approved
+            %em{class: "tw:mt-2 tw:block tw:text-sm"}
+              You can still activate if you're sure you want to
+        %div{class: "tw:text-center"}
+          = render(UI::Header::Component.new(text: activateable_title, tag: :h3))
 
-.row.mt-4
-  .col-sm-6
-    %table.table-list
-      %tbody
-        %tr
-          %td Link
-          %td
-            - if @theft_alert.facebook_post_url.present?
-              %strong
-                = link_to "Facebook post", @theft_alert.facebook_post_url, target: "_blank"
-        %tr
-          %td Activation began
-          %td
-            - if @theft_alert.activating_at.present?
-              %span.localizeTime
-                = l @theft_alert.activating_at, format: :convert_time
-              - if @theft_alert.paid_at.present?
-                %small.ml-2.less-strong
-                  = distance_of_time_in_words(@theft_alert.paid_at, @theft_alert.activating_at)
-                  after payment
-        %tr
-          %td last FB update
-          %td
-            - if @theft_alert.facebook_updated_at.present?
-              %span.localizeTime
-                = l @theft_alert.facebook_updated_at, format: :convert_time
-              %small.ml-2.less-strong
-                = @theft_alert.live? ? "alert ends" : "alert ended"
-                - if @theft_alert.end_at.present?
-                  %span.localizeTime
-                    = l @theft_alert.end_at, format: :convert_time
-        %tr
-          %td Notify?
-          %td
-            = @theft_alert.notify? ? "✅" : "❌"
-            - if @theft_alert.admin
-              %small.text-info (admin)
-            - elsif @theft_alert.facebook_data&.dig("no_notify").present?
-              %em.less-strong manually disabled
-            - elsif @theft_alert.stolen_record.present?
-              Stolen record
-              - if @theft_alert.stolen_record.receive_notifications?
-                %span.text-info receives notifications
-              - else
-                %span.text-warning DOESN'T receive notifications
-            - else
-              %span.text-danger Something is missing!
-        %tr
-          %td Creator
-          %td
-            - if @theft_alert.admin
-              %small.text-info admin:
-            = link_to @theft_alert.user.display_name, edit_admin_user_path(@theft_alert.user.to_param)
-        %tr
-          %td
-            Campaign
-            %small Objective
-          %td
-            %code= @theft_alert.objective_campaign
-        %tr
-          %td
-            Adset
-            %small Objective
-          %td
-            %code= @theft_alert.objective_adset
+        - if @theft_alert.activating?
+          %div{class: "tw:mt-4 tw:text-center"}
+            = render(UI::Header::Component.new(text: tag.span("Activation in process", class: UI::Alerts::Base::Component::TEXT_CLASSES[:warning]), tag: :h2))
 
-  .col-sm-6
-    %table.table-list
-      %tbody
-        %tr
-          %td Target Spend
-          %td= @theft_alert.amount_facebook
-        %tr
-          %td Actual Fbook Spend
-          %td
-            = @theft_alert.amount_facebook_spent
-            %span.text-warning
-              = @theft_alert.live? ? "so far" : "total"
-        %tr
-          %td Reach
-          %td= @theft_alert.reach
-        - @theft_alert.engagement.each do |k, v|
-          %tr
-            %td= k.titleize
-            %td= v
+          %p{class: "tw:mb-4"}
+            Activation started at:
+            = render(UI::Time::Component.new(time: @theft_alert.activating_at))
 
-%h2.mt-4
+          %p{class: "tw:mb-4"}
+            %strong Don't activate again
+            unless activation started a while ago
+
+        %div{class: "tw:mt-6 tw:text-center"}
+          = render(UI::ButtonLink::Component.new(text: "Activate!", href: admin_theft_alert_path(@theft_alert.id, activate_theft_alert: true), method: :patch, color: :primary, size: :lg))
+      - else
+        - not_activateable_title = capture do
+          Theft alert
+          %span{class: UI::Alerts::Base::Component::TEXT_CLASSES[:error]} can not
+          be activated
+        %div{class: "tw:text-center"}
+          = render(UI::Header::Component.new(text: not_activateable_title, tag: :h3))
+        %ul{class: "tw:mt-6 tw:mb-4"}
+          - unless @theft_alert.stolen_record_approved?
+            %li Stolen Record is not approved
+          - unless @theft_alert.paid?
+            %li Alert is not paid
+          - if @theft_alert.missing_photo?
+            %li Alert is missing photo
+          - if @theft_alert.missing_location?
+            %li Alert is missing location
+          - if @theft_alert.bike_not_current?
+            %li Bike is hidden, deleted, or spam
+
+.twwiderow{class: "tw:mt-6 tw:items-start"}
+  = render(UI::TableList::Component.new) do |list|
+    - list.with_row(label: "Link") do
+      - if @theft_alert.facebook_post_url.present?
+        %strong
+          = link_to "Facebook post", @theft_alert.facebook_post_url, target: "_blank", class: "twlink"
+    - list.with_row(label: "Activation began") do
+      - if @theft_alert.activating_at.present?
+        = render(UI::Time::Component.new(time: @theft_alert.activating_at))
+        - if @theft_alert.paid_at.present?
+          %small.twless-strong{class: "tw:ml-2"}
+            = distance_of_time_in_words(@theft_alert.paid_at, @theft_alert.activating_at)
+            after payment
+    - list.with_row(label: "last FB update") do
+      - if @theft_alert.facebook_updated_at.present?
+        = render(UI::Time::Component.new(time: @theft_alert.facebook_updated_at))
+        %small.twless-strong{class: "tw:ml-2"}
+          = @theft_alert.live? ? "alert ends" : "alert ended"
+          - if @theft_alert.end_at.present?
+            = render(UI::Time::Component.new(time: @theft_alert.end_at))
+    - list.with_row(label: "Notify?") do
+      = @theft_alert.notify? ? "✅" : "❌"
+      - if @theft_alert.admin
+        %small{class: UI::Alerts::Base::Component::TEXT_CLASSES[:notice]} (admin)
+      - elsif @theft_alert.facebook_data&.dig("no_notify").present?
+        %em.twless-strong manually disabled
+      - elsif @theft_alert.stolen_record.present?
+        Stolen record
+        - if @theft_alert.stolen_record.receive_notifications?
+          %span{class: UI::Alerts::Base::Component::TEXT_CLASSES[:notice]} receives notifications
+        - else
+          %span{class: UI::Alerts::Base::Component::TEXT_CLASSES[:warning]} DOESN'T receive notifications
+      - else
+        %span{class: UI::Alerts::Base::Component::TEXT_CLASSES[:error]} Something is missing!
+    - list.with_row(label: "Creator") do
+      - if @theft_alert.admin
+        %small{class: UI::Alerts::Base::Component::TEXT_CLASSES[:notice]} admin:
+      = link_to @theft_alert.user.display_name, edit_admin_user_path(@theft_alert.user.to_param), class: "twlink"
+    - list.with_row(label: safe_join(["Campaign", tag.small("Objective")], " "), value: tag.code(@theft_alert.objective_campaign, class: "twcode"))
+    - list.with_row(label: safe_join(["Adset", tag.small("Objective")], " "), value: tag.code(@theft_alert.objective_adset, class: "twcode"))
+
+  = render(UI::TableList::Component.new) do |list|
+    - list.with_row(label: "Target Spend", value: @theft_alert.amount_facebook)
+    - list.with_row(label: "Actual Fbook Spend") do
+      = @theft_alert.amount_facebook_spent
+      %span{class: UI::Alerts::Base::Component::TEXT_CLASSES[:warning]}
+        = @theft_alert.live? ? "so far" : "total"
+    - list.with_row(label: "Reach", value: @theft_alert.reach)
+    - @theft_alert.engagement.each do |k, v|
+      - list.with_row(label: k.titleize, value: v)
+
+= render(UI::Header::Component.new(tag: :h2)) do
   Payment
   %small
     - if @theft_alert.payment.present?
-      = link_to "view payment", edit_admin_payment_path(@theft_alert.payment_id)
+      = link_to "view payment", edit_admin_payment_path(@theft_alert.payment_id), class: "twlink"
 
 - if @theft_alert.payment.present?
   = render partial: "/admin/payments/display", locals: { payment: @theft_alert.payment }
 - elsif @theft_alert.admin
-  %h4 Admin
+  = render(UI::Header::Component.new(text: "Admin", tag: :h3))
 - else
   No payment present!
 
-.mt-3
+%div{class: "tw:mt-4"}
 = render Pages::Admin::Bikes::TheftAlertImages::Component.new(bike: @bike, stolen_record: @stolen_record, return_to: url_for)
 
 
 - if @theft_alert.notifications.any?
-  %h3 Notifications
+  = render(UI::Header::Component.new(text: "Notifications", tag: :h3))
   = render partial: "/admin/notifications/table", locals: {notifications: @theft_alert.notifications.reorder(created_at: :desc), skip_user: true}
-.admin-subnav.midpage-subnav
-  .col-12
-    %h1 Edit Promoted Alert
+= render(UI::Header::Component.new(text: "Edit Promoted Alert", tag: :h2))
 
 = form_for @theft_alert,
   url: admin_theft_alert_path(@theft_alert),
-  method: :patch,
-  html: { class: "m-0" } do |f|
+  method: :patch do |f|
 
   -# Can't edit many things here! They're set via the theft_alert_plan
   -# - unless @theft_alert.pending?
-  .row
-    .col-sm-4
-      .form-group
-        = f.label :status
-        = f.select :status,
-          options_for_select(TheftAlert.statuses, @theft_alert.status),
-          {},
-          {disabled: true, class: "form-control"}
-    .col-sm-4
-      .form-group
-        - plan_options = TheftAlertPlan.active.map { |e| [theft_alert_plan_title(e), e.id] }
-        = f.label :theft_alert_plan_id
-        = f.select :theft_alert_plan_id,
-          options_for_select(plan_options, @theft_alert.theft_alert_plan.id),
-          {},
-          {disabled: true, class: "form-control"}
-    .col-sm-4
-      .form-group
-        = f.label :ad_radius_miles
-        = f.number_field :ad_radius_miles, disabled: true, class: "form-control"
-  .row
-    .col-sm-6
-      .form-group
-        = f.label :start_at
-        = f.datetime_local_field :start_at, step: 60, disabled: true, class: "form-control"
-    .col-sm-6
-      .form-group
-        = f.label :end_at
-        = f.datetime_local_field :end_at, step: 60, disabled: true, class: "form-control"
+  .twfieldrow
+    = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :status)) do
+      = render(UI::Forms::Select::Component.new(form_builder: f, attribute: :status, option_tags: TheftAlert.statuses, html_options: {disabled: true}))
+    - plan_options = TheftAlertPlan.active.map { |e| [theft_alert_plan_title(e), e.id] }
+    = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :theft_alert_plan_id)) do
+      = render(UI::Forms::Select::Component.new(form_builder: f, attribute: :theft_alert_plan_id, option_tags: plan_options, html_options: {disabled: true}))
+    = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :ad_radius_miles, kind: :number_field, html_options: {disabled: true}))
+  .twwiderow
+    = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :start_at, kind: :datetime_local_field, html_options: {step: 60, disabled: true}))
+    = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :end_at, kind: :datetime_local_field, html_options: {step: 60, disabled: true}))
 
-  .form-group
-    = f.label :notes
-    = f.text_area :notes, rows: 3, class: "form-control"
+  = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :notes, kind: :text_area, html_options: {rows: 3}))
 
-  .form-group
-    = submit_tag "Save", class: "btn btn-info"
+  = render(UI::Button::Component.new(text: "Save", color: :primary, type: "submit"))
 
 - if display_dev_info?
-  .mt-5.mb-1.only-dev-visible
-    %h2 Raw facebook data
+  .only-dev-visible{class: "tw:mt-12 tw:mb-1"}
+    = render(UI::Header::Component.new(text: "Raw facebook data", tag: :h2))
   = render UI::JsonDisplay::Component.new(data: @theft_alert.facebook_data, no_max_height: true)

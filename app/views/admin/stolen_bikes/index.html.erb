@@ -14,15 +14,11 @@
 
 <% if @render_chart %>
   <% rendered_chart = capture do %>
-    <div class="col-12 mt-2 mb-4">
-      <h4>
-        <% if sort_column == "created_at" %>
-          <% time_range_column = "stolen_records.created_at" %> Stolen records
-          created
-        <% else %>
-          <% time_range_column = "stolen_records.date_stolen" %> Date stolen
-        <% end %>
-      </h4>
+    <div class="tw:mt-2 tw:mb-4">
+      <% sorted_by_created = sort_column == "created_at" %>
+      <% time_range_column = sorted_by_created ? "stolen_records.created_at" : "stolen_records.date_stolen" %>
+
+      <%= render(UI::Header::Component.new(text: sorted_by_created ? "Stolen records created" : "Date stolen", tag: :h2)) %>
 
       <%= render(UI::Chart::Component.new(series: time_range_counts(collection: available_stolen_records, column: time_range_column), time_range: @time_range, stacked: true)) %>
     </div>
@@ -33,9 +29,9 @@
   <%= render partial: "/admin/social_accounts/errored" %>
 
   <% if @unapproved_only %>
-    <p class="mt-4 mb-0">
+    <p class="tw:mt-6">
       Showing only unapproved records
-      <em><% if @only_without_location %><strong>without location</strong><small class="less-strong">        view        <%= link_to "records with location", url_for(sortable_search_params.merge(search_without_location: false)) %>      </small><% else %><small class="less-strong">        <%= number_display(@unapproved_without_location_count) %> unapproved        records        <%= link_to "without location", url_for(sortable_search_params.merge(search_without_location: true)) %>      </small><% end %></em>
+      <em><% if @only_without_location %><strong>without location</strong><small class="twless-strong">        view        <%= link_to "records with location", url_for(sortable_search_params.merge(search_without_location: false)), class: "twlink" %>      </small><% else %><small class="twless-strong">        <%= number_display(@unapproved_without_location_count) %> unapproved        records        <%= link_to "without location", url_for(sortable_search_params.merge(search_without_location: true)), class: "twlink" %>      </small><% end %></em>
     </p>
   <% end %>
 

@@ -94,7 +94,7 @@ RSpec.describe Admin::BugReportsController, type: :request do
       it "names the search in the count detail" do
         get base_url, params: {search_receiver: "support@bikeindex.org", search_status: "all"}
         expect(response.body).to match(/1<\/strong>\s*Matching/)
-        expect(response.body).to include("receiver: <code>support@bikeindex.org</code>")
+        expect(response.body).to include(%(receiver: <code class="twcode">support@bikeindex.org</code>))
       end
     end
 

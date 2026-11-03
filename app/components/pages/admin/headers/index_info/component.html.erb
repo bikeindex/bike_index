@@ -1,4 +1,4 @@
-<div class="mt-4">
+<div class="tw:mt-6 tw:*:mb-4">
   <% if show_user? %>
     <p>
       <% if @index.user_subject.present? %>
@@ -10,7 +10,7 @@
         </span>
       <% end %>
 
-      <%= link_to "view for all users", url_for(@index.sortable_search_params.merge(user_id: nil)), class: "gray-link tw:text-sm" %>
+      <%= view_all_link("view for all users", :user_id) %>
     </p>
   <% end %>
 
@@ -25,7 +25,7 @@
         </span>
       <% end %>
 
-      <%= link_to "view for all bikes", url_for(@index.sortable_search_params.merge(search_bike_id: nil)), class: "gray-link tw:text-sm" %>
+      <%= view_all_link("view for all bikes", :search_bike_id) %>
 
       <%= render(Pages::Admin::Bikes::DeletedAlert::Component.new(bike: bike_subject)) %>
     </p>
@@ -46,7 +46,7 @@
         </span>
       <% end %>
 
-      <%= link_to "view for all marketplace listings", url_for(@index.sortable_search_params.merge(search_marketplace_listing_id: nil)), class: "gray-link tw:text-sm" %>
+      <%= view_all_link("view for all marketplace listings", :search_marketplace_listing_id) %>
     </p>
   <% end %>
 
@@ -61,12 +61,12 @@
         <strong>no organization</strong>
       <% end %>
 
-      <%= link_to "view for all organizations", url_for(@index.sortable_search_params.merge(organization_id: nil)), class: "gray-link tw:text-sm" %>
+      <%= view_all_link("view for all organizations", :organization_id) %>
       <% if organization_subject&.deleted? %>
-        <em class="d-block mt-1 less-strong">
+        <em class="twless-strong tw:mt-1 tw:block">
           (<%= organization_subject.short_name %> is
           <em class="<%= error_text_class %>">deleted</em>) - at
-          <span class="localizeTime preciseTime"><%= l organization_subject.deleted_at, format: :convert_time %></span>
+          <%= render UI::Time::Component.new(time: organization_subject.deleted_at, format: :localize_time_precise) %>
         </em>
       <% end %>
     </p>
@@ -76,8 +76,7 @@
     <p>
       <%= @viewing.pluralize %> for
       <%= link_to "Membership #{membership_id}", admin_membership_path(membership_id), class: "twlink" %>
-
-      <%= link_to "view for all memberships", url_for(@index.sortable_search_params.merge(search_membership_id: nil)), class: "gray-link tw:text-sm" %>
+      <%= view_all_link("view for all memberships", :search_membership_id) %>
     </p>
   <% end %>
 
@@ -92,14 +91,14 @@
             user_link_path: admin_strava_integration_path(strava_integration_id))) %>
         </small>
       <% end %>
-      <%= link_to "view for all Strava integrations", url_for(@index.sortable_search_params.merge(search_strava_integration_id: nil)), class: "gray-link tw:text-sm" %>
+      <%= view_all_link("view for all Strava integrations", :search_strava_integration_id) %>
     </p>
   <% end %>
 
   <% if show_kind? %>
     <p>
       <%= @viewing.pluralize %> for <strong><%= kind_humanized %></strong>
-      <%= link_to "view for all kinds", url_for(@index.sortable_search_params.merge(search_kind: nil)), class: "gray-link tw:text-sm" %>
+      <%= view_all_link("view for all kinds", :search_kind) %>
     </p>
   <% end %>
 
@@ -114,7 +113,7 @@
         </span>
       <% end %>
 
-      <%= link_to "view for all primary activities", url_for(@index.sortable_search_params.merge(primary_activity: nil)), class: "gray-link tw:text-sm" %>
+      <%= view_all_link("view for all primary activities", :primary_activity) %>
     </p>
   <% end %>
 </div>

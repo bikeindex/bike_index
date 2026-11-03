@@ -2,7 +2,7 @@
   <small class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">
     Missing bike
     <% if @bike_id.present? %>
-      <code><%= @bike_id %></code>
+      <code class="twcode"><%= @bike_id %></code>
     <% end %>
   </small>
 <% elsif @bike.present? %>
@@ -18,5 +18,5 @@
 <% end %>
 
 <% if @render_search && computed_search_url.present? %>
-  <%= link_to search_emoji, computed_search_url, class: "display-sortable-link small ml-1" %>
+  <%= link_to search_emoji, computed_search_url, class: "display-sortable-link tw:ml-1 tw:text-xs" %>
 <% end %>

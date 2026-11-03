@@ -274,7 +274,7 @@ module ComponentStructs
     end
 
     def panel_columns
-      @panel_columns ||= (enabled_columns + ALWAYS_VISIBLE_COLUMNS).sort_by { |cell| panel_labels[cell.to_sym] }
+      @panel_columns ||= enabled_columns + ALWAYS_VISIBLE_COLUMNS
     end
 
     def impound_panel_columns = panel_columns & IMPOUND_PANEL_COLUMNS
