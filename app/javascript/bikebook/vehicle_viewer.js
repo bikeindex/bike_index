@@ -185,8 +185,10 @@ export class VehicleViewer {
     return html`${this.similarModels(baseline, similar, url, photos)}${jumpTo(view, (each) => pathWith(url, { view: each === 'basics' ? '' : each }), shown, searchTab)}${views[view]()}`
   }
 
-  // The section of the models most like `baseline`, where `similar` offers them, showing `photos` of those `url` compares
+  // The section of the models most like `baseline`, where `similar` offers them, showing `photos` of those `url` compares,
+  // its toggle's line kept for it while they're `waiting` on the comparison
   similarModels (baseline, similar, url, photos) {
+    if (similar?.waiting) return searching(url) ? nothing : html`<div data-similar-waiting>${this.compareToggle([baseline], similar)}</div>`
     return similar
       ? similarSection({
         ...this.#similarOf(baseline, similar),
@@ -199,7 +201,7 @@ export class VehicleViewer {
 
   // The controls that rescore the models most like the first of `vehicles`, for the filters' card
   similarAdjustments (vehicles, similar) {
-    return similar && vehicles.length ? similarAdjustments(this.#similarOf(vehicles[0], similar)) : nothing
+    return similar && !similar.waiting && vehicles.length ? similarAdjustments(this.#similarOf(vehicles[0], similar)) : nothing
   }
 
   #similarOf ({ value, data, current }, similar) {
@@ -217,7 +219,7 @@ export class VehicleViewer {
   // What opens the models most like the first of `vehicles` from the search's More filters lines, where `similar` offers them
   compareToggle (vehicles, similar) {
     if (!similar) return nothing
-    return compareToggle({ type: typeName(this.presenter, vehicles[0].data).toLowerCase(), model: modelName(this.presenter, vehicles[0].data) })
+    return compareToggle({ type: typeName(this.presenter, vehicles[0].data).toLowerCase(), model: modelName(this.presenter, vehicles[0].data), waiting: similar.waiting })
   }
 
   // The cards of the models most like the first at `url`, those it compares showing `photos`' photo of them

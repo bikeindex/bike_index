@@ -25,10 +25,11 @@ export const similarResults = ({ results, cards, full }) => {
 const compareLabel = (type, model) => `Compare similar ${type}s to ${model}`
 
 // On the search's More filters lines, what opens the similar models' section beneath them, whose own toggle takes over
-// once it's open. Not a ui--collapse trigger, which the search's own would claim
-export const compareToggle = ({ type, model }) => html`<button type="button" data-action="bikebook--page#compareSimilar" class=${buttonClasses({
+// once it's open. Not a ui--collapse trigger, which the search's own would claim. Unseen, holding its line, while `waiting`
+// on the comparison
+export const compareToggle = ({ type, model, waiting }) => html`<button type="button" data-action="bikebook--page#compareSimilar" class=${buttonClasses({
   color: 'link',
-  htmlClass: 'tw:text-left tw:not-data-[active=true]:[font-weight:inherit] tw:similar-open:hidden'
+  htmlClass: `tw:text-left tw:not-data-[active=true]:[font-weight:inherit] tw:similar-open:hidden ${waiting ? 'tw:invisible' : ''}`
 })}><span class="tw:inline-block"><span class="tw:flex">${iconChevron()}</span></span>${compareLabel(type, model)}</button>`
 
 // Collapsed until it's wanted, the models most like the first compared, `model`, whose `results` bikebook--similar scores

@@ -9,8 +9,8 @@ import { fragmentOf, renderInto } from 'bikebook/render'
 
 // `jurisdictions` names the codes classifications are in, which the catalog doesn't, and `paintColors` are Bike Index's
 // colors' displays by their names, which its colorways' colors are. `onPicks` takes what `ids` render from, as soon as
-// it's in, where there are any
-export async function loadCatalog (manifestUrl, ids = [], jurisdictions = {}, paintColors = {}, onPicks = () => {}) {
+// it's in, where there are any, and `comparing` fetches the comparison alongside the index rather than after it
+export async function loadCatalog (manifestUrl, ids = [], jurisdictions = {}, paintColors = {}, { onPicks = () => {}, comparing = false } = {}) {
   const worker = new Worker(import.meta.resolve('bikebook/catalog_worker'), { type: 'module' })
   const pending = new Map()
   let nextId = 0
@@ -32,7 +32,7 @@ export async function loadCatalog (manifestUrl, ids = [], jurisdictions = {}, pa
 
   try {
     // a failure is load's to report, as it waits on the same files
-    call('start', { manifestUrl: new URL(manifestUrl, window.location.href).href, ids, jurisdictions }).then((picks) => ids.length && onPicks(painted(picks)), () => {})
+    call('start', { manifestUrl: new URL(manifestUrl, window.location.href).href, ids, jurisdictions, comparing }).then((picks) => ids.length && onPicks(painted(picks)), () => {})
     const loaded = await call('load', {
       rulesUrl: import.meta.resolve('bikebook/featured_rules'),
       similarityUrl: import.meta.resolve('bikebook/similarity')
@@ -52,7 +52,8 @@ export async function loadCatalog (manifestUrl, ids = [], jurisdictions = {}, pa
       displays: (ids) => call('displays', { ids })
     }
   } catch (error) {
-    worker.terminate()
+    // picked vehicles render from it without the index
+    if (!ids.length) worker.terminate()
     throw error
   }
 }

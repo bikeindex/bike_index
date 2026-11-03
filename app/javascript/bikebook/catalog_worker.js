@@ -17,6 +17,7 @@ let comparison = null
 let lastSimilar = null
 let opened = null
 let started = null
+let comparisonFetch = null
 const blocks = new Map()
 const orders = new Map()
 const sold = new Map()
@@ -42,7 +43,7 @@ const classified = ({ e_vehicle_classifications: records }, jurisdictions) => Ob
 }))
 
 // What picked vehicles render from, which needs nothing of the index: the blocks `ids` are in, the kit and the vocabulary
-function start ({ manifestUrl, ids, jurisdictions }) {
+function start ({ manifestUrl, ids, jurisdictions, comparing }) {
   opened = fetchJson(manifestUrl).then((published) => {
     if (published.format !== FORMAT) throw new Error(`catalog format ${published.format} isn't ${FORMAT}`)
 
@@ -52,6 +53,7 @@ function start ({ manifestUrl, ids, jurisdictions }) {
   })
   started = opened.then(() => Promise.all([manifest.vocabulary, manifest.kit].map((file) => fetchJson(new URL(file, base)))))
     .then(([vocabulary, { kit }]) => ({ vocabulary: { ...vocabulary, e_vehicle_classifications: classified(vocabulary, jurisdictions) }, kit }))
+  if (comparing) fetchComparison()
   return started
 }
 
@@ -82,10 +84,13 @@ async function load ({ rulesUrl, similarityUrl: similarityModule }) {
   return { vocabulary: { ...vocabulary, e_vehicle_classifications: classifications }, kit, options: options(index, vocabulary.names) }
 }
 
-// The comparison, asked for once the index, whose order it's in, has had the connection, for its frame materials as well
-// as how alike models are; without it neither is offered
+const fetchComparison = () => (comparisonFetch ??= opened.then(() => manifest.comparison && fetchJson(new URL(manifest.comparison, base))).catch(() => null))
+
+// The comparison, once the index, whose order it's in, has loaded, for its frame materials as well as how alike models are;
+// without it neither is offered. Fetched when it's asked for, leaving the index the connection, unless `start` is told the
+// page is of what it adds
 async function compare () {
-  comparison = manifest.comparison && await fetchJson(new URL(manifest.comparison, base)).catch(() => null)
+  comparison = await fetchComparison()
   if (!comparison) return { comparable: false, frameMaterials: [] }
 
   last = null

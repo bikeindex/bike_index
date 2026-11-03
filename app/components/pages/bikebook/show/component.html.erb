@@ -425,7 +425,8 @@
       <div id="vehicle-viewers"></div>
     </template>
 
-    <div data-bikebook--page-target="page">
+    <%# A screen's height from the start, so what renders into it doesn't shove the footer out of view %>
+    <div class="tw:min-h-screen" data-bikebook--page-target="page">
       <%# Placeholder until the catalog loads %>
       <div inert class="<%= placeholder_class %>">
         <%= placeholder_search(search) %>
