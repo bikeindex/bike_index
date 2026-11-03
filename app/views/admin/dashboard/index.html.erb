@@ -60,9 +60,9 @@
     </div>
 
     <div class="tw:mt-6">
-      <%= render(UI::Header::Component.new(text: "BikeBook searches", tag: :h2, subtitle: safe_join([number_display(week_searches.values_at("web_bikebook", "web_bikebook_comparison", "web_ebike_rules").sum), " past week"]))) %>
+      <%= render(UI::Header::Component.new(text: "BikeBook use", tag: :h2, subtitle: safe_join([number_display(week_searches.values_at("web_bikebook", "web_bikebook_comparison", "web_ebike_rules").sum), " past week"]))) %>
 
-      <%= render(UI::Chart::Component.new(series: logged_searches_admin_graphs_path(search_endpoint: "web_bikebook", period: "week"), stacked: true)) %>
+      <%= render(UI::Chart::Component.new(series: logged_searches_admin_graphs_path(search_endpoint: "web_bikebook", period: "week"))) %>
     </div>
   </div>
 <% end %>
