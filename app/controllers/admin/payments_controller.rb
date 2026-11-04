@@ -11,7 +11,7 @@ module Admin
     end
 
     def new
-      @payment = Payment.new
+      @payment = Payment.new(payment_method: Payment.admin_creatable_payment_methods.first)
     end
 
     def show

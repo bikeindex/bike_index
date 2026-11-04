@@ -169,8 +169,9 @@
   }
   /* A 🔎 or tooltip "?" stays on the line of what it follows. Only the whole cell
      works: Chromium still breaks after a preceding element that wraps. A .keep-together
-     already holds it with its last word, so the rest of the cell can wrap */
-  .ui-table td:has(.keep-with-previous:not(.keep-together *)) {
+     already holds it with its last word, so the rest of the cell can wrap. UI::TableList
+     has no scroller to spill into, so its cells always wrap */
+  .ui-table:not(.ui-table-list) td:has(.keep-with-previous:not(.keep-together *)) {
     @apply tw:whitespace-nowrap;
   }
   .table_cell_check {
@@ -205,7 +206,7 @@
 }
 
 body {
-  @apply tw:base-font tw:dark:bg-gray-900;
+  @apply tw:base-font tw:dark:bg-gray-900 tw:dark:scheme-dark;
 
   /* .primary-header-nav's margin-bottom, which the full-bleed pages pull up by to sit
      flush under the navbar. Defined here rather than beside the nav in revised.scss,
