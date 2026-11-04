@@ -1,4 +1,4 @@
-<%= tag.div(class: [("tw:hidden!" unless @field_name), "tw:border-b tw:border-gray-100 tw:bg-gray-50 tw:px-5 tw:py-5 tw:dark:border-gray-700 tw:dark:bg-gray-900"],
+<%= tag.div(class: [("tw:hidden!" unless @field_name), "tw:border-b tw:border-gray-100 tw:bg-gray-50 tw:px-5 tw:py-5 tw:dark:border-gray-700 tw:dark:bg-gray-800"],
   data: panel_data) do %>
   <div class="tw:mb-5 tw:flex tw:flex-wrap tw:items-baseline tw:gap-x-3 tw:gap-y-2">
     <%= render(UI::Header::Component.new(text: @field_name ? translation(".included_columns") : translation(".visible_columns"),

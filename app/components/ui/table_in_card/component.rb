@@ -88,7 +88,8 @@ module UI
       end
 
       def card(&)
-        classes = "tw:col-span-full tw:min-w-0 tw:rounded-xl tw:twfullbleed tw:in-data-[table-bleed=true]:rounded-none! " \
+        # The page's background rather than a card's in dark too, as in light: only the headers and settings stand out
+        classes = "tw:col-span-full tw:min-w-0 tw:rounded-xl tw:twfullbleed tw:dark:bg-gray-900! tw:in-data-[table-bleed=true]:rounded-none! " \
           "tw:in-data-[table-bleed=true]:border-x-0! tw:in-data-[table-bleed=true]:border-t-0! #{UI::Card::Component::BASE_CLASSES}"
         return form_with(**@form, class: classes, data: card_data, &) if @form
 
