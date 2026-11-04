@@ -32,7 +32,9 @@
   </table>
 
   <% if show_organization_stolen_message? %>
-    <%= render partial: "/bikes/organization_stolen_message", locals: {stolen_record: bike.current_stolen_record} %>
+    <div class="organization-stolen-message-alert">
+      <%= render partial: "/bikes/organization_stolen_message", locals: {stolen_record: bike.current_stolen_record} %>
+    </div>
   <% end %>
 
   <% if claim_message? %>
