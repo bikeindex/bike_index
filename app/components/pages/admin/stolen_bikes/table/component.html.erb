@@ -1,7 +1,7 @@
 <% duplicate_counts = self.duplicate_counts %>
 <% location = method(:location) %>
 
-<%= render(UI::CardTable::Component.new(records: rows, render_sortable: true, sort_state: @sort_state,
+<%= render(UI::TableInCard::Component.new(records: rows, render_sortable: true, sort_state: @sort_state,
   column_settings: {storage_key: "adminStolenBikesColumns", columns: COLUMNS, defaults: DEFAULT_COLUMNS, narrow_hidden: %i[photo_cell created_at_cell]},
   form: {url: bulk_update_admin_stolen_bikes_path, method: :patch})) do |table| %>
   <% table.with_actions do %>

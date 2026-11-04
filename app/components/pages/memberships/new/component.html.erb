@@ -56,7 +56,10 @@
 
   <section
     id="membership-plans"
-    class="tw:scroll-mt-10 tw:border-b tw:border-gray-200 tw:bg-gray-50"
+    class="
+      tw:scroll-mt-10 tw:border-b tw:border-gray-200 tw:bg-gray-50
+      tw:dark:border-gray-700 tw:dark:bg-gray-800
+    "
     data-memberships--new-target="plans"
   >
     <%= form_for Membership.new(level: @level), url: membership_path, method: :post,
@@ -98,6 +101,7 @@
               tw:has-checked:shadow-[0_4px_12px_rgba(44,62,80,.12)]
               tw:has-[:focus-visible]:ring-3
               tw:has-[:focus-visible]:ring-blue-500/40
+              tw:dark:border-gray-700 tw:dark:bg-gray-900
             "
           >
             <%= f.radio_button :level, level, class: "tw:sr-only",
@@ -165,7 +169,7 @@
                 <li
                   class="
                     tw:flex tw:gap-2.5 tw:text-[15px] tw:leading-normal
-                    tw:text-gray-700
+                    tw:text-gray-700 tw:dark:text-gray-300
                   "
                 >
                   <%= helpers.inline_svg_tag("icons/check.svg", class: "tw:mt-0.5 tw:size-4.5 tw:shrink-0 tw:text-blue-600", aria_hidden: true) %>
@@ -181,7 +185,8 @@
         class="
           tw:flex tw:flex-col tw:gap-4 tw:rounded-lg tw:border
           tw:border-gray-200 tw:bg-white tw:px-6.5 tw:py-5.5 tw:md:flex-row
-          tw:md:items-center tw:md:gap-7
+          tw:md:items-center tw:md:gap-7 tw:dark:border-gray-700
+          tw:dark:bg-gray-900
         "
       >
         <div class="tw:flex-1">
@@ -258,7 +263,12 @@
     </div>
   </section>
 
-  <section class="tw:border-b tw:border-gray-200 tw:bg-gray-50">
+  <section
+    class="
+      tw:border-b tw:border-gray-200 tw:bg-gray-50 tw:dark:border-gray-700
+      tw:dark:bg-gray-800
+    "
+  >
     <div class="<%= section_inner %>">
       <%= render(SharedBlocks::Marketing::RecoveryStories::Component.new(heading: translation(".what_members_make_possible"),
         recovery_displays: @recovery_displays)) %>
@@ -287,7 +297,12 @@
     </div>
   </section>
 
-  <section class="tw:border-b tw:border-gray-200 tw:bg-gray-50">
+  <section
+    class="
+      tw:border-b tw:border-gray-200 tw:bg-gray-50 tw:dark:border-gray-700
+      tw:dark:bg-gray-800
+    "
+  >
     <div class="tw:flex tw:flex-col tw:gap-8 tw:lg:flex-row tw:lg:gap-12 <%= section_inner %>">
       <div class="tw:lg:w-85 tw:lg:shrink-0">
         <%= render(SharedBlocks::Marketing::SectionHeading::Component.new(eyebrow: translation(".member_gear"), eyebrow_color: :purple,
@@ -304,7 +319,7 @@
           <li
             class="
               tw:overflow-hidden tw:rounded-lg tw:border tw:border-gray-200
-              tw:bg-white
+              tw:bg-white tw:dark:border-gray-700 tw:dark:bg-gray-900
             "
           >
             <%= image_tag(item[:src], alt: item[:name],
