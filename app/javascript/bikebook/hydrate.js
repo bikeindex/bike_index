@@ -9,7 +9,7 @@ import { FILTERS, LISTS, RANGES, SINGLES, ordered, searching, toQuery } from 'bi
 import { fragmentOf, renderInto } from 'bikebook/render'
 import { preferredSize } from 'bikebook/sizes'
 import { settingsFrom } from 'bikebook/similarity'
-import { MAX_COMPARE, pickedPhotos, VehicleViewer, withChosenPhotos } from 'bikebook/vehicle_viewer'
+import { chosenPhotos, MAX_COMPARE, VehicleViewer } from 'bikebook/vehicle_viewer'
 
 /* global CSS */
 
@@ -103,18 +103,26 @@ export async function unpickedVehicles (catalog, page, url) {
 const pickedOf = (catalog, url, { market }) => catalog.vehicles(url.searchParams.get('vehicle_models')?.split(',') ?? [], { market })
 
 // The models most like the first of `vehicles` where the catalog publishes what it compares, scored once their section
-// is open, of those the `filters` leave
+// is open, of those the `filters` leave. `waiting`, until the comparison says whether it does
 const similarOf = async (catalog, url, vehicles, filters) => {
-  if (!catalog.comparable || !vehicles.length) return null
+  if (catalog.comparable === false || !vehicles.length) return null
+  if (catalog.comparable === undefined) return { waiting: true }
   const settings = settingsFrom(url.searchParams)
   return { ...settings, results: url.searchParams.get('similar') === '1' ? await catalog.similar(vehicles[0].value, settings, filters) : undefined }
+}
+
+// What opens and adjusts the similar models, from beside their section
+const renderSimilarControls = (root, viewer, vehicles, similar) => {
+  const toggle = viewer.compareToggle(vehicles, similar)
+  for (const slot of root.querySelectorAll('[data-similar-slot]')) renderInto(slot, toggle)
+  renderInto(root.querySelector('#similar-adjustments'), viewer.similarAdjustments(vehicles, similar))
 }
 
 // The similar models' cards for `vehicle` by its `settings`, which change without rendering the page afresh
 export async function rescoredSimilar (catalog, page, url, vehicle, settings) {
   const filters = filtersAt(catalog, page, url)
   const [picks, results] = await Promise.all([pickedOf(catalog, url, filters), catalog.similar(vehicle, settings, filters)])
-  return new VehicleViewer(catalog.kit, catalog.vocabulary, filters).similarResults(url, results, pickedPhotos(withChosenPhotos(url, picks)))
+  return new VehicleViewer(catalog.kit, catalog.vocabulary, filters).similarResults(url, results, chosenPhotos(url, picks))
 }
 
 // the model group `url`'s overview shows, of one of its vehicles, in the `filters`' market
@@ -134,6 +142,21 @@ export async function pickedVehicles (catalog, page, url) {
   const viewer = new VehicleViewer(catalog.kit, catalog.vocabulary, filters)
   const similar = await similarOf(catalog, url, vehicles, filters)
   return { vehicles: viewer.render(vehicles, url, preferredSize(), {}, { group, similar }), adjustments: viewer.similarAdjustments(vehicles, similar) }
+}
+
+// What the comparison adds to `page`, rendered at `url` without it: the frame materials and, unless `current` says it's
+// since rendered with them, picked vehicles' similar ones. In place, as the reader may be typing in the search
+export async function addComparison (catalog, page, url, current) {
+  page.querySelector('#frame_material-hw-listbox').append(fragmentOf(catalog.options.frame_material.map(filterOption)))
+  const filters = filtersAt(catalog, page, url)
+  const vehicles = (await pickedOf(catalog, url, filters)).slice(0, MAX_COMPARE)
+  const similar = await similarOf(catalog, url, vehicles, filters)
+  if (!vehicles.length || !current()) return
+
+  const viewer = new VehicleViewer(catalog.kit, catalog.vocabulary, filters)
+  page.querySelector('[data-similar-waiting]')?.remove()
+  page.querySelector('#vehicle-viewers').prepend(fragmentOf(viewer.similarModels(vehicles[0], similar, url, chosenPhotos(url, vehicles))))
+  renderSimilarControls(page, viewer, vehicles, similar)
 }
 
 // The page at `url` while the catalog loads: its filters live and filled in from the URL, their values as it has them, and
@@ -160,6 +183,24 @@ export function loadingShell (shell, url, status) {
   }
   root.getElementById('vehicle-viewers').append(status)
   return root
+}
+
+// The loading shell with `url`'s picked vehicles, which `picks` has before the index that names them for a chip and says
+// where they're sold, where it has any of them
+export async function picksShell (picks, shell, url, status) {
+  const root = loadingShell(shell, url, status)
+  const found = await pickedOf(picks, url, {})
+  const vehicles = found.slice(0, MAX_COMPARE).map((vehicle) => ({ ...vehicle, display: `${vehicle.data.manufacturer} ${vehicle.data.model}` }))
+  if (!vehicles.length) return { content: root }
+
+  renderChips(combobox(root, 'vehicle_models'), vehicles)
+  const viewers = root.getElementById('vehicle-viewers')
+  const viewer = new VehicleViewer(picks.kit, picks.vocabulary, urlFilters(root, url))
+  const similar = await similarOf(picks, url, vehicles)
+  renderInto(viewers, viewer.render(vehicles, url, preferredSize(), {}, { similar }))
+  renderSimilarControls(root, viewer, vehicles, similar)
+  viewers.append(status)
+  return { content: root, title: vehicles[0].display }
 }
 
 // The page at `url`: the shell, with the catalog's filter options, filled in from the URL. Its
@@ -213,8 +254,7 @@ export async function hydrate (catalog, source, shell, url) {
   const similar = await similarOf(catalog, url, vehicles, filters)
   renderInto(root.getElementById('vehicle-viewers'), viewer.render(vehicles, url, preferredSize(),
     vehicles.length ? {} : await unpicked(catalog, root, filters), { group, similar }))
-  for (const slot of root.querySelectorAll('[data-similar-slot]')) renderInto(slot, viewer.compareToggle(vehicles, similar))
-  renderInto(root.getElementById('similar-adjustments'), viewer.similarAdjustments(vehicles, similar))
+  renderSimilarControls(root, viewer, vehicles, similar)
 
   localSources.set(combobox(root, 'vehicle_models'), source)
   for (const name of LISTS) {

@@ -183,15 +183,21 @@ export class VehicleViewer {
       label: `Search other ${typeName(presenter, lone).toLowerCase()}s`,
       href: pathWith(url, { search: '1', vehicle_type: lone.type || 'bike' })
     }
-    const similarModels = similar
+    return html`${this.similarModels(baseline, similar, url, photos)}${jumpTo(view, (each) => pathWith(url, { view: each === 'basics' ? '' : each }), shown, searchTab)}${views[view]()}`
+  }
+
+  // The section of the models most like `baseline`, where `similar` offers them, showing `photos` of those `url` compares,
+  // its toggle's line kept for it while they're `waiting` on the comparison
+  similarModels (baseline, similar, url, photos) {
+    if (similar?.waiting) return searching(url) ? nothing : html`<div data-similar-waiting>${this.compareToggle([baseline], similar)}</div>`
+    return similar
       ? similarSection({
         ...this.#similarOf(baseline, similar),
-        model: modelName(presenter, baseline.data),
+        model: modelName(this.presenter, baseline.data),
         results: similar.results === undefined ? undefined : this.similarResults(url, similar.results, photos),
         searchShown: searching(url)
       })
       : nothing
-    return html`${similarModels}${jumpTo(view, (each) => pathWith(url, { view: each === 'basics' ? '' : each }), shown, searchTab)}${views[view]()}`
   }
 
   // The controls that rescore the models most like the first of `vehicles`, for the filters' card
@@ -214,7 +220,7 @@ export class VehicleViewer {
   // What opens the models most like the first of `vehicles` from the search's More filters lines, where `similar` offers them
   compareToggle (vehicles, similar) {
     if (!similar) return nothing
-    return compareToggle({ type: typeName(this.presenter, vehicles[0].data).toLowerCase(), model: modelName(this.presenter, vehicles[0].data) })
+    return compareToggle({ type: typeName(this.presenter, vehicles[0].data).toLowerCase(), model: modelName(this.presenter, vehicles[0].data), waiting: similar.waiting })
   }
 
   // The cards of the models most like the first at `url`, those it compares showing `photos`' photo of them
@@ -241,14 +247,16 @@ export class VehicleViewer {
 }
 
 // Each of the `picks` at `url` keyed, its photo its chosen colorway's where it has one
-export const withChosenPhotos = (url, picks) => {
+const withChosenPhotos = (url, picks) => {
   const colorways = pickedColorways(url)
   const keys = vehicleKeys(picks.map(({ value }) => value))
   return picks.map((pick, index) => ({ ...pick, key: keys[index], data: pick.data && withColorwayPhoto(pick.data, colorways[keys[index]]) }))
 }
 
 // Each of the `vehicles` compared's photo, by its id
-export const pickedPhotos = (vehicles) => new Map(vehicles.filter(({ data }) => present(data?.stock_photo)).map(({ value, data }) => [value, data.stock_photo]))
+const pickedPhotos = (vehicles) => new Map(vehicles.filter(({ data }) => present(data?.stock_photo)).map(({ value, data }) => [value, data.stock_photo]))
+
+export const chosenPhotos = (url, picks) => pickedPhotos(withChosenPhotos(url, picks))
 
 // This page's URL with `params` laid over its own
 const pathWith = (url, params) => {
