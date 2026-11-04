@@ -3,13 +3,22 @@
 module UI
   module Table
     class ComponentPreview < ApplicationComponentPreview
-      Cryptid = Data.define(:name, :region, :credibility, :enthusiasm, :sightings, :first_seen)
+      # id and model_name are for UI::TableInCard's selection_column
+      Cryptid = Data.define(:id, :name, :region, :credibility, :enthusiasm, :sightings, :first_seen) { extend ActiveModel::Naming }
+      SAMPLE_RECORDS = [
+        Cryptid.new(id: 1, name: "Mothman", region: "West Virginia", credibility: "Medium", enthusiasm: "Extreme", sightings: 142, first_seen: ::Time.zone.parse("1966-11-15")),
+        Cryptid.new(id: 2, name: "Bigfoot", region: "Pacific Northwest", credibility: "Low", enthusiasm: "Extreme", sightings: 10000, first_seen: ::Time.zone.parse("1958-08-27")),
+        Cryptid.new(id: 3, name: "Loch Ness Monster", region: "Scottish Highlands", credibility: "Low", enthusiasm: "High", sightings: 1036, first_seen: ::Time.zone.parse("1933-05-02")),
+        Cryptid.new(id: 4, name: "Chupacabra", region: "Puerto Rico", credibility: "Low", enthusiasm: "Medium", sightings: 87, first_seen: ::Time.zone.parse("1995-03-01")),
+        Cryptid.new(id: 5, name: "Jersey Devil", region: "Pine Barrens, NJ", credibility: "Low", enthusiasm: "Low", sightings: 53, first_seen: ::Time.zone.parse("1909-01-16")),
+        Cryptid.new(id: 6, name: "Okapi", region: "Congo", credibility: "Confirmed", enthusiasm: "None", sightings: 1, first_seen: ::Time.zone.parse("1901-06-01"))
+      ].freeze
 
       # @!group Variants
 
       def default
         colors = enthusiasm_colors
-        render(UI::Table::Component.new(records: sample_records, sort_state: preview_sort_state("first_seen"))) do |table|
+        render(UI::Table::Component.new(records: SAMPLE_RECORDS, sort_state: preview_sort_state("first_seen"))) do |table|
           table.column(label: "Cryptid", lower_right: ->(r) { r.region }) { |r| r.name }
           table.column(label: "Credibility") { |r| render(UI::Badge::Component.new(text: r.credibility, color: (r.credibility == "Confirmed") ? :success : :gray, size: :sm)) }
           table.column(label: "Enthusiasm") { |r| render(UI::Badge::Component.new(text: r.enthusiasm, color: colors[r.enthusiasm], size: :sm)) }
@@ -20,7 +29,7 @@ module UI
 
       def sortable_with_cache
         colors = enthusiasm_colors
-        render(UI::Table::Component.new(records: sample_records, cache_key: "preview-cryptids", sort_state: preview_sort_state("name"), render_sortable: true)) do |table|
+        render(UI::Table::Component.new(records: SAMPLE_RECORDS, cache_key: "preview-cryptids", sort_state: preview_sort_state("name"), render_sortable: true)) do |table|
           table.column(sortable: "name") { |r| r.name }
           table.column(label: "Region") { |r| r.region }
           table.column(label: "Credibility") { |r| render(UI::Badge::Component.new(text: r.credibility, color: (r.credibility == "Confirmed") ? :success : :gray, size: :sm)) }
@@ -32,7 +41,7 @@ module UI
 
       def sticky
         colors = enthusiasm_colors
-        many = sample_records * 8
+        many = SAMPLE_RECORDS * 8
         render(UI::Table::Component.new(records: many, sticky: true, sort_state: preview_sort_state("first_seen"))) do |table|
           table.column(label: "Cryptid", lower_right: ->(r) { r.region }) { |r| r.name }
           table.column(label: "Credibility") { |r| render(UI::Badge::Component.new(text: r.credibility, color: (r.credibility == "Confirmed") ? :success : :gray, size: :sm)) }
@@ -44,7 +53,7 @@ module UI
 
       def unbordered
         colors = enthusiasm_colors
-        render(UI::Table::Component.new(records: sample_records, unbordered: true, sort_state: preview_sort_state("first_seen"))) do |table|
+        render(UI::Table::Component.new(records: SAMPLE_RECORDS, unbordered: true, sort_state: preview_sort_state("first_seen"))) do |table|
           table.column(label: "Cryptid") { |r| r.name }
           table.column(label: "Region") { |r| r.region }
           table.column(label: "Credibility") { |r| render(UI::Badge::Component.new(text: r.credibility, color: (r.credibility == "Confirmed") ? :success : :gray, size: :sm)) }
@@ -55,17 +64,16 @@ module UI
       end
 
       def with_footer
-        records = sample_records
-        render(UI::Table::Component.new(records:)) do |table|
+        render(UI::Table::Component.new(records: SAMPLE_RECORDS)) do |table|
           table.column(label: "Cryptid", footer: "Total") { |r| r.name }
           table.column(label: "Region") { |r| r.region }
-          table.column(label: "Sightings", footer: records.sum(&:sightings).to_fs(:delimited)) { |r| number_with_delimiter(r.sightings) }
+          table.column(label: "Sightings", footer: SAMPLE_RECORDS.sum(&:sightings).to_fs(:delimited)) { |r| number_with_delimiter(r.sightings) }
         end
       end
 
       # A transposed table: each row a measure named by its row header
       def row_headers
-        cryptids = sample_records.first(3)
+        cryptids = SAMPLE_RECORDS.first(3)
         render(UI::Table::Component.new(records: %i[region credibility sightings])) do |table|
           table.column(label: tag.span("Measure", class: "tw:sr-only"), row_header: true) { |measure| measure.to_s.humanize }
           cryptids.each do |cryptid|
@@ -77,17 +85,6 @@ module UI
       # @!endgroup
 
       private
-
-      def sample_records
-        [
-          Cryptid.new(name: "Mothman", region: "West Virginia", credibility: "Medium", enthusiasm: "Extreme", sightings: 142, first_seen: ::Time.zone.parse("1966-11-15")),
-          Cryptid.new(name: "Bigfoot", region: "Pacific Northwest", credibility: "Low", enthusiasm: "Extreme", sightings: 10000, first_seen: ::Time.zone.parse("1958-08-27")),
-          Cryptid.new(name: "Loch Ness Monster", region: "Scottish Highlands", credibility: "Low", enthusiasm: "High", sightings: 1036, first_seen: ::Time.zone.parse("1933-05-02")),
-          Cryptid.new(name: "Chupacabra", region: "Puerto Rico", credibility: "Low", enthusiasm: "Medium", sightings: 87, first_seen: ::Time.zone.parse("1995-03-01")),
-          Cryptid.new(name: "Jersey Devil", region: "Pine Barrens, NJ", credibility: "Low", enthusiasm: "Low", sightings: 53, first_seen: ::Time.zone.parse("1909-01-16")),
-          Cryptid.new(name: "Okapi", region: "Congo", credibility: "Confirmed", enthusiasm: "None", sightings: 1, first_seen: ::Time.zone.parse("1901-06-01"))
-        ]
-      end
 
       def preview_sort_state(sort)
         ComponentStructs::SortState.new(search_params: {period: "all"}, sort:, direction: "desc")
