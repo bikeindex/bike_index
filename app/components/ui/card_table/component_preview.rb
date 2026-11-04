@@ -13,6 +13,14 @@ module UI
           OpenStruct.new(name: "Okapi", region: "Congo", credibility: "Confirmed", sightings: 1)
         ]})
       end
+
+      # Shift-click a checkbox to give every one since the last clicked its state
+      def selection
+        cryptid = OpenStruct.new(human: "Cryptid")
+        render_with_template(template: "ui/card_table/component_preview/selection", locals: {records: %w[Mothman Bigfoot Okapi Nessie Chupacabra].each_with_index.map do |name, index|
+          OpenStruct.new(id: index + 1, name:, model_name: cryptid)
+        end})
+      end
     end
   end
 end

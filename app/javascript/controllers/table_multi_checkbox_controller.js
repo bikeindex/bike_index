@@ -6,10 +6,26 @@ export default class extends Controller {
 
   connect () {
     this.element.addEventListener('keydown', this.ignoreFieldEnter)
+    this.element.addEventListener('click', this.selectRange)
   }
 
   disconnect () {
     this.element.removeEventListener('keydown', this.ignoreFieldEnter)
+    this.element.removeEventListener('click', this.selectRange)
+  }
+
+  // Shift-clicking a checkbox gives every one from the last clicked to it the state it took
+  selectRange = (event) => {
+    const checkboxes = this.checkboxTargets
+    const clicked = checkboxes.indexOf(event.target)
+    if (clicked === -1) return
+
+    const last = checkboxes.indexOf(this.lastClicked)
+    if (event.shiftKey && last !== -1) {
+      checkboxes.slice(Math.min(last, clicked), Math.max(last, clicked) + 1)
+        .forEach(cb => { if (!cb.disabled) cb.checked = event.target.checked })
+    }
+    this.lastClicked = event.target
   }
 
   toggleAll (event) {
