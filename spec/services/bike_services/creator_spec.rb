@@ -534,20 +534,32 @@ RSpec.describe BikeServices::Creator do
         let(:parent_organization) { FactoryBot.create(:organization) }
         let(:posting_organization) { FactoryBot.create(:organization_child, parent_organization:) }
         let(:bike_params) { default_params.merge(creation_organization_id: posting_organization.id) }
-        before { BikeOrganization.create!(bike: existing_bike, organization: parent_organization, can_edit_claimed: false) }
         def bike_organization_ids = existing_bike.reload.bike_organizations.pluck(:organization_id)
 
-        it "adds a child of the organization holding the bike" do
-          expect_duplicate_found
-          expect(bike_organization_ids).to match_array([parent_organization.id, posting_organization.id])
-          expect(BikeOrganization.find_by(bike: existing_bike, organization: posting_organization).can_edit_claimed).to be_falsey
-        end
-        context "child of an unrelated organization" do
-          let(:posting_organization) { FactoryBot.create(:organization_child) }
+        context "held by the parent" do
+          before { BikeOrganization.create!(bike: existing_bike, organization: parent_organization, can_edit_claimed: false) }
 
-          it "doesn't add it" do
+          it "adds a child of the organization holding the bike" do
             expect_duplicate_found
-            expect(bike_organization_ids).to eq([parent_organization.id])
+            expect(bike_organization_ids).to match_array([parent_organization.id, posting_organization.id])
+            expect(BikeOrganization.find_by(bike: existing_bike, organization: posting_organization).can_edit_claimed).to be_falsey
+          end
+          context "child of an unrelated organization" do
+            let(:posting_organization) { FactoryBot.create(:organization_child) }
+
+            it "doesn't add it" do
+              expect_duplicate_found
+              expect(bike_organization_ids).to eq([parent_organization.id])
+            end
+          end
+        end
+        context "created by the parent, which hasn't added itself to the bike yet" do
+          before { existing_bike.update_column(:creation_organization_id, parent_organization.id) }
+
+          it "adds the child" do
+            expect_duplicate_found
+            expect(bike_organization_ids).to eq([posting_organization.id])
+            expect(BikeOrganization.find_by(bike: existing_bike, organization: posting_organization).can_edit_claimed).to be_truthy
           end
         end
       end

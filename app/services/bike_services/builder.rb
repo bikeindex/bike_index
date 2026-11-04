@@ -78,10 +78,11 @@ module BikeServices
       return if organization&.parent_organization_id.blank?
 
       parent = bike.bike_organizations.find_by(organization_id: organization.parent_organization_id)
-      return if parent.blank?
+      # A concurrent registration commits the bike before adding its organization
+      return if parent.blank? && bike.creation_organization_id != organization.parent_organization_id
 
       bike.bike_organizations.find_or_create_by(organization_id: organization.id) do |bike_organization|
-        bike_organization.can_not_edit_claimed = parent.can_not_edit_claimed
+        bike_organization.can_not_edit_claimed = parent.can_not_edit_claimed if parent.present?
       end
     end
 
