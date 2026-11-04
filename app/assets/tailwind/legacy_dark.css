@@ -33,7 +33,7 @@
 
   hr:not(.twhr),
   .edit-menu-accessories {
-    @apply tw:dark:border-gray-400/80;
+    @apply tw:dark:border-gray-500;
   }
 
   .form-control,
