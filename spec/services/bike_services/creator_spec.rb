@@ -530,6 +530,27 @@ RSpec.describe BikeServices::Creator do
       it "finds a duplicate" do
         expect_duplicate_found
       end
+      context "registered by another organization" do
+        let(:parent_organization) { FactoryBot.create(:organization) }
+        let(:posting_organization) { FactoryBot.create(:organization_child, parent_organization:) }
+        let(:bike_params) { default_params.merge(creation_organization_id: posting_organization.id) }
+        before { BikeOrganization.create!(bike: existing_bike, organization: parent_organization, can_edit_claimed: false) }
+        def bike_organization_ids = existing_bike.reload.bike_organizations.pluck(:organization_id)
+
+        it "adds a child of the organization holding the bike" do
+          expect_duplicate_found
+          expect(bike_organization_ids).to match_array([parent_organization.id, posting_organization.id])
+          expect(BikeOrganization.find_by(bike: existing_bike, organization: posting_organization).can_edit_claimed).to be_falsey
+        end
+        context "child of an unrelated organization" do
+          let(:posting_organization) { FactoryBot.create(:organization_child) }
+
+          it "doesn't add it" do
+            expect_duplicate_found
+            expect(bike_organization_ids).to eq([parent_organization.id])
+          end
+        end
+      end
       context "no_duplicate false" do
         let(:bike_params) { default_params.merge(no_duplicate: false) }
         it "finds a duplicate" do
@@ -837,6 +858,57 @@ RSpec.describe BikeServices::Creator do
           expect(b_param.bike["primary_frame_color_id"]).to eq(color.id)
         end
       end
+    end
+  end
+
+  describe "concurrent no_duplicate registrations", strategy: :truncation do
+    self.use_transactional_tests = false
+
+    let(:parent_organization) { FactoryBot.create(:organization) }
+    let(:child_organization) { FactoryBot.create(:organization_child, parent_organization:) }
+    let(:bike_params) do
+      {
+        serial_number: "some serial",
+        manufacturer_id: manufacturer.id,
+        primary_frame_color_id: color.id,
+        owner_email: "something@gmail.com",
+        no_duplicate: true
+      }
+    end
+    let!(:b_params) do
+      [parent_organization, child_organization].map do |organization|
+        BParam.create(creator: user, params: {bike: bike_params.merge(creation_organization_id: organization.id)})
+      end
+    end
+
+    def waiting_on_postgres
+      Bike.lease_connection.select_value(<<~SQL)
+        SELECT COUNT(*) FROM pg_locks
+        WHERE NOT granted AND database = (SELECT oid FROM pg_database WHERE datname = current_database())
+      SQL
+    end
+
+    it "registers one bike, for both organizations" do
+      Organization.example # Creates it if missing, which the threads would race to do
+
+      # SHARE lets reads through and holds writes. One registration reaches its insert while the other is started
+      threads = Bike.transaction do
+        Bike.lease_connection.execute("LOCK TABLE bikes IN SHARE MODE")
+        started = b_params.map do |b_param|
+          Thread.new { Bike.connection_pool.with_connection { described_class.new.create_bike(b_param) } }
+        end
+        Timeout.timeout(10) { sleep(0.01) until waiting_on_postgres >= 1 }
+        sleep 0.5
+        started
+      end
+
+      bike_ids = threads.map { it.value.id }.uniq
+      expect(bike_ids.size).to eq 1
+      expect(Bike.unscoped.pluck(:id)).to eq(bike_ids)
+      expect(Ownership.pluck(:bike_id)).to eq(bike_ids)
+      expect(b_params.map { it.reload.created_bike_id }.uniq).to eq(bike_ids)
+      expect(BikeOrganization.where(bike_id: bike_ids).pluck(:organization_id))
+        .to match_array([parent_organization.id, child_organization.id])
     end
   end
 end
