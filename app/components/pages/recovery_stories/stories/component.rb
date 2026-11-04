@@ -16,8 +16,6 @@ module Pages
 
         private
 
-        def link_label(link) = link.sub(%r{\Ahttps?://(www\.)?}, "").truncate(41)
-
         def page_path(page) = recovery_stories_path(page:, per_page: (@pagy.limit unless @pagy.limit == PER_PAGE))
       end
     end

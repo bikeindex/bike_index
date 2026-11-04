@@ -1,6 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
 
-// Connects to data-controller='recovery-stories--translate-quote'
+// Connects to data-controller='atoms--recovery-display-card'
 // Machine-translates an English quote through the endpoint Google's browser extension
 // uses - unauthenticated, so it rate limits after a few pages. A failure leaves the English
 export default class extends Controller {

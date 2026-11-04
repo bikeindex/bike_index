@@ -4,3 +4,4 @@ en:
     atoms:
       recovery_display_card:
         recovered: Recovered
+        translated_from_english: translated from English

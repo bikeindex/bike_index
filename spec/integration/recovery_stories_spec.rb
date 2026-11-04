@@ -28,6 +28,7 @@ RSpec.describe "recovery stories", :js, type: :system do
     expect(page).to have_current_path("/recovery_stories?page=3&per_page=1")
     expect(stories).to eq(["Newest story", "Middle story", "Oldest story"])
     expect(page).to have_no_link("Load more stories")
+    expect_axe_clean
 
     # Reloading lands on the page the URL recorded, with a way back to the newer ones
     visit page.current_url
