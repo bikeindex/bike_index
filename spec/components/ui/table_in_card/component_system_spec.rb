@@ -18,6 +18,18 @@ RSpec.describe UI::TableInCard::Component, :js, type: :system do
     JS
   end
 
+  # Where the card's settings and the line under its table start and end
+  let(:edges) do
+    <<~JS
+      (() => {
+        const row = document.querySelector("[data-table-bleed]")
+        const span = (element) => [element.getBoundingClientRect().left, element.getBoundingClientRect().right]
+        const line = [...row.querySelectorAll("*")].find((element) => element.querySelector(":scope > * > * > table") && getComputedStyle(element).borderBottomWidth === "1px")
+        return {settings: span(row.querySelector("[data-ui--collapse-target='content']")), line: line && span(line)}
+      })()
+    JS
+  end
+
   it "selects a shift-clicked range, toggles all, and bleeds once the table is wider than the card, without flipping back" do
     visit("/lookbook/preview/ui/table_in_card/variants")
     wait_for_stimulus("table-multi-checkbox")
@@ -43,6 +55,10 @@ RSpec.describe UI::TableInCard::Component, :js, type: :system do
     page.current_window.resize_to(table_width + 20, 800)
     expect(page).to have_css("[data-table-bleed='true']", count: 2)
     expect(page.evaluate_script(bleed_samples)).to eq("samples" => ["true"], "left" => 0)
+
+    click_button("Column settings", match: :first)
+    settle_animations(find("[data-ui--collapse-target='content']", match: :first))
+    expect(page.evaluate_script(edges)).to eq("settings" => [0, table_width + 20], "line" => [0, table_width + 20])
 
     page.current_window.resize_to(table_width + 60, 800)
     expect(page).to have_css("[data-table-bleed='false']", minimum: 1)
