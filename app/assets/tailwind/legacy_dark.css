@@ -1,0 +1,71 @@
+/* Legacy sorts below this layer and utilities above it; kelsey_styles.css is unlayered, so its pages stay light */
+@layer components {
+  :is(.container, .container-fluid, .bootstrapstyle) {
+    @apply tw:dark:text-gray-300;
+
+    :is(h1, h2, h3, h4, h5, h6):not(.root-landing-who *) {
+      @apply tw:dark:text-inherit;
+    }
+  }
+
+  .form-wrap,
+  .card,
+  .inner,
+  .next-steps-wrap,
+  .recovery-quote,
+  .select-amount,
+  .modal-content {
+    @apply tw:dark:bg-gray-800 tw:dark:border-gray-700 tw:dark:text-gray-300;
+  }
+
+  .form-well-container {
+    @apply tw:max-md:dark:bg-gray-800;
+  }
+
+  .form-well {
+    @apply tw:md:max-navbar:dark:bg-gray-800 tw:dark:border-gray-700;
+  }
+
+  .primary-edit-form-well-menu {
+    @apply tw:max-md:dark:bg-gray-800;
+  }
+
+  .form-well-edit-page-select select {
+    @apply tw:dark:text-gray-200;
+  }
+
+  hr:not(.twhr),
+  .edit-menu-accessories {
+    @apply tw:dark:border-gray-500;
+  }
+
+  .form-control,
+  .btn-secondary,
+  .selectize-input,
+  .selectize-dropdown {
+    @apply tw:dark:bg-gray-700 tw:dark:border-gray-600 tw:dark:text-gray-200;
+  }
+
+  .add_fields,
+  .optional-form-block,
+  .inline-input-help,
+  .right-input-help a,
+  .selectize-input input,
+  .close {
+    @apply tw:dark:text-gray-300;
+  }
+
+  /* These pages stay light, so a margin between their sections mustn't show a dark body */
+  body:has(.kelsey_styles) {
+    @apply tw:dark:bg-white!;
+  }
+
+  /* !important to beat kelsey_styles.css, away from the homepage's section it leaves light */
+  .kelsey_styles_buttons-grid:not(.for-section *) .category-button:not(:hover) span {
+    @apply tw:dark:text-gray-200!;
+  }
+
+  .nav-tabs .nav-link:not(.active) {
+    @apply tw:dark:bg-gray-800 tw:dark:text-gray-300;
+  }
+}

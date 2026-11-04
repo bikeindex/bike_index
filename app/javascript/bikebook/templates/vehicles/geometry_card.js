@@ -30,7 +30,7 @@ export const geometryCard = ({ presenter, size, others, selected, href, letters 
   const cargoRows = Object.keys(cargoFields).some((key) => present(cargo?.[key]))
     ? presenter.rowsFor(cargoFields, cargo, { others: otherCargos }).map(([label, value, unit, differs, key, ...rest]) => [label, value, unit, differs, `cargo.${key}`, ...rest])
     : []
-  const heading = (text) => html`<h4 class="tw:pt-2 tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">${text}</h4>`
+  const heading = (text) => html`<h4 class="tw:tweyebrow tw:pt-2">${text}</h4>`
   const group = (text, rows) => rows.length
     ? html`${heading(text)}${definitionListContainer({ term: 'right_align', content: presenter.measurementRows(lettered(rows)) })}`
     : nothing

@@ -52,7 +52,7 @@
   <% navbar = SharedBlocks::Navbar::Wrapper::Component.new(current_user:, current_user_or_unconfirmed_user:,
     passive_organization:, old_register_view: old_register_view?) %>
 
-  <%= body_tag(html_class: class_names(body_class, "with-org-sidebar" => navbar.org_sidebar?)) do %>
+  <%= body_tag(html_class: class_names(body_class, "with-org-sidebar" => navbar.org_sidebar?, dark: current_user&.dark_mode_preview?)) do %>
     <a
       href="#main-content"
       class="
