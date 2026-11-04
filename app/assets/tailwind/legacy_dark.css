@@ -34,6 +34,11 @@
     @apply tw:dark:text-gray-300;
   }
 
+  /* These pages stay light, so a margin between their sections mustn't show a dark body */
+  body:has(.kelsey_styles) {
+    @apply tw:dark:bg-white!;
+  }
+
   /* !important to beat kelsey_styles.css, away from the homepage's section it leaves light */
   .kelsey_styles_buttons-grid:not(.for-section *) .category-button:not(:hover) span {
     @apply tw:dark:text-gray-200!;
