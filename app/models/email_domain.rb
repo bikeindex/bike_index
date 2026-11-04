@@ -55,8 +55,8 @@ class EmailDomain < ApplicationRecord
 
   validates_presence_of :domain
   validates_uniqueness_of :domain, on: :create
-  validate :domain_is_expected_format
-  validate :domain_does_not_match_existing, on: :create
+  validate :domain_is_expected_format, if: :domain?
+  validate :domain_does_not_match_existing, on: :create, if: :domain?
 
   attr_accessor :skip_processing
 
@@ -111,6 +111,7 @@ class EmailDomain < ApplicationRecord
 
     def tld_for(email_or_domain)
       domain = email_or_domain&.split("@")&.last&.strip
+      return if domain.blank?
       return INVALID_DOMAIN if invalid_domain?(domain)
       return domain if domain.split(".").count == 1
 
@@ -328,7 +329,9 @@ class EmailDomain < ApplicationRecord
   def set_calculated_attributes
     self.data ||= {}
     data["tld"] = self.class.tld_for(domain)
-    data["is_tld"] = data["tld"].length >= domain&.tr("@", "")&.length
+    return if data["tld"].blank?
+
+    data["is_tld"] = data["tld"].length >= domain.tr("@", "").length
 
     if !no_auto_assign_status? && !ban_or_provisional?
       broader_status = broader_domain_bannable_status

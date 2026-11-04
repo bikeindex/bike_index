@@ -54,25 +54,19 @@
 
   <div class="twwiderow">
     <div class="tw:mt-6">
-      <%= render(UI::Header::Component.new(text: "Index searches", tag: :h2)) %>
-
-      <p class="tw:mb-4">
-        <%= number_display(week_searches.values_at("organized", "organized_serial", "user", "user_serial", "web_marketplace").sum) %>
-        past week
-        <em>(<%= number_display(week_searches["organized"] + week_searches["organized_serial"]) %> org, <%= number_display(week_searches["organized_serial"] + week_searches["user_serial"]) %> with serial, <%= number_display(week_searches["web_marketplace"]) %> marketplace)</em>
-      </p>
+      <%= render(UI::Header::Component.new(tag: :h2)) do %>
+        Index searches
+        <%= render(Pages::Admin::Headers::Count::Component.new(count: week_searches.values_at("organized", "organized_serial", "user", "user_serial", "web_marketplace").sum, suffix: "in the past week")) %>
+      <% end %>
 
       <%= render(UI::Chart::Component.new(series: logged_searches_admin_graphs_path(search_endpoint: "not_web_bikebook", period: "week"), stacked: true)) %>
     </div>
 
     <div class="tw:mt-6">
-      <%= render(UI::Header::Component.new(text: "BikeBook searches", tag: :h2)) %>
-
-      <p class="tw:mb-4">
-        <%= number_display(week_searches.values_at("web_bikebook", "web_bikebook_comparison", "web_ebike_rules").sum) %>
-        past week
-        <em>(<%= link_to safe_join([number_display(week_searches["web_bikebook_comparison"]), " comparisons"]), admin_logged_searches_path(search_endpoint: "web_bikebook_comparison", period: "week"), class: "twlink" %>, <%= number_display(week_searches["web_ebike_rules"]) %> from e-bike rules)</em>
-      </p>
+      <%= render(UI::Header::Component.new(tag: :h2)) do %>
+        BikeBook searches
+        <%= render(Pages::Admin::Headers::Count::Component.new(count: week_searches.values_at("web_bikebook", "web_bikebook_comparison", "web_ebike_rules").sum, suffix: "in the past week")) %>
+      <% end %>
 
       <%= render(UI::Chart::Component.new(series: logged_searches_admin_graphs_path(search_endpoint: "web_bikebook", period: "week"), stacked: true)) %>
     </div>

@@ -14,6 +14,11 @@ module UI
       end
 
       # @!endgroup
+
+      # Long unbroken values in a panel narrower than they are
+      def narrow
+        {template: "ui/table_list/component_preview/narrow"}
+      end
     end
   end
 end

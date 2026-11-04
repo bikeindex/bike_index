@@ -241,7 +241,7 @@ RSpec.describe Admin::RecoveriesController, type: :request do
         }.to change(RecoveryDisplay, :count).by 0
         stolen_record.reload
         expect(stolen_record.recovery_display_status).to eq "waiting_on_decision"
-        expect(response).to redirect_to(new_admin_recovery_display_path(stolen_record))
+        expect(response).to redirect_to(new_admin_recovery_display_path(stolen_record_id: stolen_record.id))
         expect(flash).to be_present
       end
     end

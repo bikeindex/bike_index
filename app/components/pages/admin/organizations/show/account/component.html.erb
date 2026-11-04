@@ -3,9 +3,7 @@
 
   <% if @display_dev_info %>
     <% list.with_row(label: "API V1 token", class: "tw:text-sm", dev_only: true) do %>
-      <div id="stupidLegacyToken" style="overflow-x: scroll;">
-        <%= render(UI::Code::Inline::Component.new(text: @organization.access_token)) %>
-      </div>
+      <%= render(UI::Code::Inline::Component.new(text: @organization.access_token)) %>
     <% end %>
     <% list.with_row(label: "User Reg all bikes?", value: @organization.user_registration_all_bikes?, class: "tw:text-sm", dev_only: true) %>
   <% end %>

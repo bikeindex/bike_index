@@ -11,6 +11,12 @@ RSpec.describe Admin::UsersController, type: :request do
     let!(:developer) { FactoryBot.create(:developer) }
     let!(:superuser_ability) { SuperuserAbility.create(user: user_subject) }
 
+    it "searches in the sort direction it's showing" do
+      get base_url, params: {sort: "created_at", direction: "asc"}
+
+      expect(Capybara.string(response.body)).to have_field("direction", type: "hidden", with: "asc")
+    end
+
     it "renders with all search options" do
       get "#{base_url}?query=something"
       expect(response).to render_template :index
