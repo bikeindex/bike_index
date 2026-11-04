@@ -699,6 +699,11 @@ RSpec.describe "BikesController#create", type: :request do
           expect(b_param.reload.status).to eq "status_stolen"
           testable_bike_params.except(:manufacturer_id)
             .each { |key, value| expect(assigns(:bike).send(key).to_s).to eq(value.to_s) }
+
+          follow_redirect!
+          page = Capybara.string(response.body)
+          expect(page.find("#flash-messages [role=alert]")).to have_text("Manufacturer can't be blank")
+          expect(page).to have_css("[role=alert]", count: 1)
         end
       end
     end

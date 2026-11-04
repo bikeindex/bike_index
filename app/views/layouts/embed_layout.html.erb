@@ -12,12 +12,6 @@
   <body id="bi_embed">
     <%= render(UI::Alerts::FlashMessage::Component.new(flash:)) %>
 
-    <% if @b_param && @b_param.bike_errors.present? %>
-      <div id="alert-block">
-        <%= render(UI::Alerts::ObjectError::Component.new(object: @b_param, name: @bike.type, error_messages: @b_param.bike_errors, dismissable: true)) %>
-      </div>
-    <% end %>
-
     <%= yield %>
 
     <%= render "/shared/analytics" %>

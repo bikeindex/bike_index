@@ -351,19 +351,6 @@ a {
   display: none;
 }
 
-#alert-block {
-  z-index: 100;
-  position: fixed;
-  top: 100px;
-
-  left: 10%;
-  width: 80%;
-  max-width: 700px;
-
-  // @include clearfix;
-  margin: 0 auto;
-}
-
 //
 // Parking Notification fields
 //

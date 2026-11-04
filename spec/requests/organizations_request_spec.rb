@@ -147,17 +147,6 @@ RSpec.describe OrganizationsController, type: :request do
         expect(assigns(:current_organization)&.id).to be_blank
       end
     end
-    context "b_param with errors" do
-      let(:b_param) { FactoryBot.create(:b_param, creator: nil, bike_errors: ["Manufacturer can't be blank"]) }
-
-      it "renders the errors in an alert" do
-        get "#{base_url}/#{current_organization.slug}/embed?b_param_id_token=#{b_param.id_token}"
-        alert = Nokogiri::HTML(response.body).at_css("#alert-block [role=alert]")
-        expect(alert.at_css("h4").text.strip).to eq "1 error prevented this bike from being saved:"
-        expect(alert.at_css("li").text).to eq "Manufacturer can't be blank"
-      end
-    end
-
     context "stolen" do
       it "renders embed without xframe block" do
         get "#{base_url}/#{current_organization.slug}/embed?stolen=1&non_stolen=true"
