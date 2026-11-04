@@ -108,8 +108,12 @@
     @apply tw:m-0;
   }
 
-  .twless-strong {
+  .less-strong {
     @apply tw:opacity-65 tw:decoration-gray-900/65 tw:dark:decoration-gray-400/65;
+
+    &:is(.btn, .form-control):is(:hover, :focus) {
+      opacity: 1;
+    }
   }
 
   .twinput {

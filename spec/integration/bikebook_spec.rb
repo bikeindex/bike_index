@@ -266,10 +266,10 @@ RSpec.describe "BikeBook", :js, type: :system do
         const rows = rowsOf([{ model: 'Electric', type: 'cargo_bike', motors: [{ rated_power: 250 }], wheels: wheels(622, 584, undefined, [50, 60]), suspension: { front: { travel: 120 } } },
           { model: 'Acoustic', type: 'bike', wheels: wheels(622, 622, 40, [45, 45]) }])
         const cells = (label) => [...rows.find((each) => each.querySelector('th').textContent.trim() === label).querySelectorAll('td')]
-        return [cells('E-vehicle class').map((cell) => [cell.textContent.trim(), cell.querySelector('.twless-strong') != null]),
+        return [cells('E-vehicle class').map((cell) => [cell.textContent.trim(), cell.querySelector('.less-strong') != null]),
           cells('Electric Certification').map((cell) => [...cell.querySelectorAll('button')].map((badge) => badge.textContent.replace(/\\s+/g, ' ').trim())),
           cells('Wheel & tire size').map(lines), cells('Vehicle type').map((cell) => cell.textContent.trim()),
-          cells('Suspension front/rear').map((cell) => [cell.textContent.replace(/\\s+/g, ' ').trim(), [...cell.querySelectorAll('.twless-strong')].map((each) => each.textContent)]),
+          cells('Suspension front/rear').map((cell) => [cell.textContent.replace(/\\s+/g, ' ').trim(), [...cell.querySelectorAll('.less-strong')].map((each) => each.textContent)]),
           rowsOf([{ model: 'One', type: 'bike', wheels: wheels(622, 622) }, { model: 'Two', type: 'bike', wheels: wheels(622, 622) }])
             .map((row) => row.querySelector('th').textContent.trim()).filter((label) => /Wheel|Vehicle type|Suspension/.test(label))]
       })()

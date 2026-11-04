@@ -1,7 +1,7 @@
 import { html } from 'lit-html'
 import { join } from 'bikebook/templates/values'
 
-// A missing value, as light as a unit, which twless-strong isn't
+// A missing value, as light as a unit, which less-strong isn't
 export const missing = html`<span class="tw:text-gray-400 tw:dark:text-gray-500">—</span>`
 
 // ApplicationComponentHelper
@@ -13,7 +13,7 @@ export const uuid = () => [4, 2, 2, 2, 6].map(randomHex).join('-')
 // number_with_delimiter, which leaves the fraction as Ruby prints it
 export const numberDisplay = (number) => {
   const [whole, fraction] = String(number).split('.')
-  return html`<span class=${number === 0 ? 'twless-strong' : ''}>${whole.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}${fraction ? `.${fraction}` : ''}</span>`
+  return html`<span class=${number === 0 ? 'less-strong' : ''}>${whole.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}${fraction ? `.${fraction}` : ''}</span>`
 }
 
 // amount_display(Money.new(cents, code))

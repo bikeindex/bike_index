@@ -87,7 +87,7 @@
       <span class="tw:px-2.5 tw:py-1 tw:text-xs">
         <%= link_to current_organization.name, admin_organization_path(current_organization), class: "twlink" %>
         Exports
-        <small><%= link_to "view orgs view", organization_exports_path(organization_id: current_organization.to_param), class: "twlink twless-strong" %></small>
+        <small><%= link_to "view orgs view", organization_exports_path(organization_id: current_organization.to_param), class: "twlink less-strong" %></small>
       </span>
     <% end %>
   <% end %>

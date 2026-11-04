@@ -33,7 +33,7 @@
       <% if membership.stripe_managed? %>
         <%= link_to "Stripe", membership.stripe_admin_url, class: "twlink" %>
       <% else %>
-        <div class="twless-strong">
+        <div class="less-strong">
           <%= render Atoms::Admin::TableCells::User::Component.new(user: membership.creator, user_id: membership.creator_id) %>
         </div>
       <% end %>

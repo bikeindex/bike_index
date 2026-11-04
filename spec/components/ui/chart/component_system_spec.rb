@@ -19,7 +19,7 @@ RSpec.describe UI::Chart::Component, :js, type: :system do
     expect(page).to have_button("Registered (1,234)", wait: 5)
     expect(page).to have_button("Stolen (5)")
     expect(page).to have_button("Recovered (0)")
-    expect(find_button("Stolen (5)")).to have_css(".twless-strong", text: "(5)")
+    expect(find_button("Stolen (5)")).to have_css(".less-strong", text: "(5)")
     expect_axe_clean
 
     # The legend came out of the chart's height rather than adding to it

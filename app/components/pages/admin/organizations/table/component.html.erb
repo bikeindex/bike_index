@@ -9,21 +9,21 @@
   <% table.column(sortable: "name") do |organization| %>
     <%= link_to organization.name, admin_organization_url(organization), class: "twlink" %>
 
-    <small class="twless-strong"><%= "invoiced" if organization.is_invoiced? %></small>
+    <small class="less-strong"><%= "invoiced" if organization.is_invoiced? %></small>
 
     <% parent_names = organization.regional_parents.pluck(:short_name) %>
 
     <% if parent_names.any? %>
       <div class="tw:mt-1 tw:text-sm">
-        <em class="twless-strong"><%= "region parent".pluralize(parent_names.count) %>:</em>
+        <em class="less-strong"><%= "region parent".pluralize(parent_names.count) %>:</em>
         <%= safe_join(parent_names.map { |name| render(UI::ButtonLink::Component.new(href: admin_organization_url(name), text: name, color: :link_gray)) }, ", ") %>
       </div>
     <% end %>
 
     <% if organization.parent_organization.present? %>
       <div class="tw:mt-1 tw:text-sm">
-        <em class="twless-strong <%= UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>">parent:</em>
-        <%= link_to organization.parent_organization.short_name, admin_organization_url(organization.parent_organization), class: "twlink twless-strong" %>
+        <em class="less-strong <%= UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>">parent:</em>
+        <%= link_to organization.parent_organization.short_name, admin_organization_url(organization.parent_organization), class: "twlink less-strong" %>
       </div>
     <% end %>
   <% end %>

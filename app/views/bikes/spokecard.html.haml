@@ -8,7 +8,7 @@
     %meta{name: "description", content: "Spoke card a bike." }
     %title= content_for?(:title) ? yield(:title) : "Bike Index"
     <link rel="shortcut icon" href="/favicon.ico" />
-    = stylesheet_link_tag "spokecard", media: "all"
+    = stylesheet_link_tag "tailwind", "spokecard", media: "all"
     = csrf_meta_tags
 
 %body

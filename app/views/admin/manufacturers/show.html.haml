@@ -8,7 +8,7 @@
     - list.with_row(label: "Slug") do
       = @manufacturer.slug
       %small
-        %span.twless-strong{class: "tw:ml-1"} secondary:
+        %span.less-strong{class: "tw:ml-1"} secondary:
         = @manufacturer.secondary_slug
     - list.with_row(label: "Frame Maker?", value: (check_mark if @manufacturer.frame_maker))
     - list.with_row(label: "Motorized only?", value: (check_mark if @manufacturer.motorized_only))

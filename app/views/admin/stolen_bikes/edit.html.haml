@@ -32,7 +32,7 @@
           #{link_to "Edit Bike", admin_bike_path(@bike), class: "twlink"} & check "Unknown Serial" if:
           %ul{class: "tw:list-disc tw:ml-4"}
             %li
-              The serial is "idk" or other similar stupid shit (rather than <span class="twless-strong">absent</span>)
+              The serial is "idk" or other similar stupid shit (rather than <span class="less-strong">absent</span>)
             %li
               The serial is <em>only</em> a frame numbers like #{render(UI::Code::Inline::Component.new(text: "EN14761"))} or #{render(UI::Code::Inline::Component.new(text: "EN14****"))}
         %li
@@ -60,7 +60,7 @@
               Did the person say "I have security video" but didn't include it? Email them for it.
             %li
               Did the person say "I have photos of the thief"  - same
-          %em.twless-strong
+          %em.less-strong
             If you believe the bike is <em>Special</em>, and don't know what to do, ping Bryan with it
 
     = render(UI::Alerts::Base::Component.new(kind: :notice, header: "Approving will:")) do

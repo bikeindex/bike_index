@@ -89,7 +89,7 @@
       <%# its own checkbox rather than part of the group's label, so the required * stays with "Owner email" %>
       <%= render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :skip_email,
             label: safe_join(["Don't send email",
-              tag.em("only applies if email changes", class: "twless-strong tw:ml-1 tw:text-xs")], " "))) %>
+              tag.em("only applies if email changes", class: "less-strong tw:ml-1 tw:text-xs")], " "))) %>
     </div>
 
     <% if organization_options.any? %>
@@ -211,7 +211,7 @@
 
 <div class="tw:mt-8">
   <% if bike_organizations.none? %>
-    <em class="twless-strong">No organizations</em>
+    <em class="less-strong">No organizations</em>
   <% else %>
     <%# instance_exec'd cell blocks can't see the ivar, so it comes across as a local %>
     <% display_dev_info = @display_dev_info %>

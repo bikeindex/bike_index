@@ -2,7 +2,7 @@
 
 <div class="twwiderow tw:mt-6 tw:items-start">
   <% visibility_class = UI::Alerts::Base::Component::TEXT_CLASSES[:success] if @bike_version.all_visible? %>
-  <% visibility_class = "twless-strong" if @bike_version.user_hidden? %>
+  <% visibility_class = "less-strong" if @bike_version.user_hidden? %>
 
   <%= render(UI::TableList::Component.new) do |list| %>
     <% list.with_row(label: "ID", dev_only: true, value: render(UI::Code::Inline::Component.new(text: @bike_version.id)), if: display_dev_info?) %>

@@ -3,7 +3,7 @@
     <strong><%= @organization.invoices.active.count %> active</strong> and
   <% end %>
 
-  <em class="twless-strong">
+  <em class="less-strong">
     <%= link_to "#{pluralize(@organization.invoices.count, 'invoice')} total", admin_organization_invoices_path(organization_id: @organization), class: "twlink" %>
   </em>
 
@@ -25,7 +25,7 @@
     <%= link_to admin_organization_invoices_path(organization_id: @organization.parent_organization.to_param), class: "twlink" do %>
       <%= pluralize(@organization.parent_organization.invoices.count, "invoice") %>
     <% end %>
-    <small class="twless-strong">
+    <small class="less-strong">
       which may add features to this organization
     </small>
   </p>

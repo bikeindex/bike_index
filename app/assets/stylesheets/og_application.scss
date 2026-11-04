@@ -6242,17 +6242,6 @@ label {
     cursor: default
 }
 
-.less-strong {
-    color: #b1b1b1
-}
-
-input.less-strong {
-    border: none;
-    background: transparent;
-    font-size: .8em;
-    box-shadow: none
-}
-
 .overflow-text {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -10072,10 +10061,6 @@ body .selectize-dropdown .active {
 
 .full-screen-table .not-large-screens {
     display: none
-}
-
-.full-screen-table .less-strong {
-    color: #b1b1b1
 }
 
 .full-screen-table .less-strong-hold {

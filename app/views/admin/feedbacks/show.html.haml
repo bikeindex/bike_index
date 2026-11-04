@@ -7,13 +7,13 @@
     - list.with_row(label: "User") do
       - if @feedback.user
         = link_to @feedback.user.display_name, edit_admin_user_path(@feedback.user.to_param), class: "twlink"
-        %small.twless-strong
+        %small.less-strong
           user present
           - if @feedback.user.display_name != @feedback.name
             (name entered: #{@feedback.name})
       - else
         = @feedback.name
-        %span.twless-strong
+        %span.less-strong
           = link_to @feedback.email, admin_users_path(user_query: @feedback.email), class: "twlink"
     - list.with_row(label: "data", if: @feedback.feedback_hash.present?) do
       - if @feedback.organization.present?
@@ -24,7 +24,7 @@
       - if @bike.present?
         = render Atoms::Admin::TableCells::Bike::Component.new(bike: @bike, bike_id: @feedback.feedback_hash["bike_id"])
       - elsif @feedback.bike_id.blank?
-        %small.twless-strong no bike
+        %small.less-strong no bike
       - else
         Bike permanently deleted
   = render(UI::Card::Component.new) do

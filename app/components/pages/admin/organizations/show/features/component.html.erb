@@ -14,7 +14,7 @@
       <% end %>
     <% end %>
 
-    <em class="twless-strong tw:text-sm">
+    <em class="less-strong tw:text-sm">
       Set this via
       <%= link_to "invoices", admin_organization_invoices_path(organization_id: @organization.to_param), class: "twlink" %>
     </em>
@@ -25,14 +25,14 @@
       <% if @organization.enabled?("bike_search") %>
         Yes
       <% else %>
-        <small class="twless-strong">no</small>
+        <small class="less-strong">no</small>
       <% end %>
     <% end %>
     <% list.with_row(label: "Templates") do %>
       <% if @organization.mail_snippets.any? %>
         <%= @organization.mail_snippets.pluck(:kind).to_sentence %>
       <% else %>
-        <small class="twless-strong">none</small>
+        <small class="less-strong">none</small>
       <% end %>
     <% end %>
     <% list.with_row(label: "Landing Page") do %>
@@ -44,21 +44,21 @@
           <%= link_to 'landing page', organization_landing_path(organization_id: @organization.to_param), class: "twlink" %>
         <% end %>
       <% else %>
-        <small class="twless-strong">no</small>
+        <small class="less-strong">no</small>
       <% end %>
     <% end %>
     <% list.with_row(label: "Additional Fields") do %>
       <% additional_fields = @organization.additional_registration_fields.map { |i| OrganizationFeature.reg_field_to_bike_attrs(i)&.titleize(keep_id_suffix: true) } %>
 
       <% if additional_fields.none? %>
-        <small class="twless-strong">none</small>
+        <small class="less-strong">none</small>
       <% else %>
         <small><%= additional_fields.join(", ") %></small>
         <br>
         <% if @organization.registration_field_labels.values.none? %>
-          <em class="twless-strong tw:text-sm">No custom labels</em>
+          <em class="less-strong tw:text-sm">No custom labels</em>
         <% else %>
-          <em class="twless-strong tw:text-sm">Custom Labels:</em>
+          <em class="less-strong tw:text-sm">Custom Labels:</em>
           <ul class="tw:text-sm">
             <% @organization.registration_field_labels.each do |field, label| %>
               <li>
@@ -76,9 +76,9 @@
     <% list.with_row(label: "Hot Sheet", if: @organization.enabled?("hot_sheet")) do %>
       <% if @organization.hot_sheet_on? %>
         Enabled
-        <em class="twless-strong"><%= "recipient".pluralize(@organization.hot_sheet_configuration.current_recipients.count) %></em>
+        <em class="less-strong"><%= "recipient".pluralize(@organization.hot_sheet_configuration.current_recipients.count) %></em>
       <% else %>
-        <small class="twless-strong">not enabled</small>
+        <small class="less-strong">not enabled</small>
       <% end %>
 
       <small>
@@ -93,7 +93,7 @@
         <% elsif organization_stolen_message.body.present? %>
           has content, not enabled
         <% else %>
-          <small class="twless-strong">no</small>
+          <small class="less-strong">no</small>
         <% end %>
 
         <% if organization_stolen_message.report_url.present? %>
@@ -107,7 +107,7 @@
           <%= number_display(@organization.bike_stickers.count) %> stickers
         <% end %>
       <% else %>
-        <small class="twless-strong">no</small>
+        <small class="less-strong">no</small>
       <% end %>
     <% end %>
     <% list.with_row(label: "Graduated bikes", if: @organization.enabled?("graduated_notifications")) do %>
@@ -125,7 +125,7 @@
   <% list.with_row(label: "Child of", if: @organization.parent_organization.present?) do %>
     <%= link_to @organization.parent_organization.name, admin_organization_path(@organization.parent_organization), class: "twlink" %>
 
-    <small class="twless-strong tw:block">
+    <small class="less-strong tw:block">
       Parent organization should be part of the same organization. Use
       "regional" feature otherwise
     </small>
@@ -140,7 +140,7 @@
       <% end %>
     </ul>
 
-    <small class="twless-strong tw:block">
+    <small class="less-strong tw:block">
       Parent organization should be part of the same organization. Use
       "regional" feature otherwise
     </small>
@@ -160,7 +160,7 @@
     <% list.with_row(label: "Search radius") do %>
       <%= @organization.search_radius_display %>
 
-      <small class="twless-strong">
+      <small class="less-strong">
         This controls which organizations are regional sub organizations
       </small>
     <% end %>
@@ -180,12 +180,12 @@
       </ul>
     <% end %>
 
-    <small class="twless-strong tw:block">
+    <small class="less-strong tw:block">
       Search radius includes this organization
     </small>
   <% end %>
 
   <% list.with_row(label: "Associated orgs", if: !associated_organizations?) do %>
-    <em class="twless-strong tw:text-sm">No associated organizations</em>
+    <em class="less-strong tw:text-sm">No associated organizations</em>
   <% end %>
 <% end %>

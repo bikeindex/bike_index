@@ -93,7 +93,7 @@ export class VehicleViewer {
         vehicleTitle({ manufacturer, model, data, value, ...this.card, heading: 'h3' })}</div><div
         class="tw:shrink-0">${photoOf({ presenter, data }, 'tw:h-14 tw:w-21')}</div></header>${lead ? html`<div data-align-row="lead">${lead(data, key)}</div>` : nothing}${present(data[field])
         ? content(data, key, index)
-        : html`<p class="twless-strong">${none}</p>`}</section>`
+        : html`<p class="less-strong">${none}</p>`}</section>`
     })
     // its type's drawing of `size`, said where it works figures out or takes a typical one's: its `typicalKind`'s where
     // they're all that kind of bike's

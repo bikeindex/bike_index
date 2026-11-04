@@ -33,7 +33,7 @@
           = link_to @membership.stripe_id.truncate(20), @membership.stripe_admin_url, title: @membership.stripe_id, class: "twlink"
         - else
           %span{class: UI::Alerts::Base::Component::TEXT_CLASSES[:error]} MISSING STRIPE ID!
-          %small.twless-strong This is a problem, tell Seth!
+          %small.less-strong This is a problem, tell Seth!
 
 - if @membership.admin_managed? && @membership.active?
   %div{class: "tw:mt-12"}

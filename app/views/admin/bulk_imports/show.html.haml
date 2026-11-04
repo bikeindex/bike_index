@@ -10,15 +10,15 @@
       %small
         - if @bulk_import.file_cleaned?
           %span{class: UI::Alerts::Base::Component::TEXT_CLASSES[:warning]} file removed
-          %em.twless-strong{class: "tw:text-sm"} after a few days, we delete the uploaded file to save space
+          %em.less-strong{class: "tw:text-sm"} after a few days, we delete the uploaded file to save space
         - else
           = link_to @bulk_import.file_url, @bulk_import.file_url, class: "twlink"
     - list.with_row(label: "Send email?") do
       = @bulk_import.send_email ? check_mark : cross_mark
-      %small.twless-strong Email is sent by default
+      %small.less-strong Email is sent by default
     - list.with_row(label: "Allow duplicates?") do
       = @bulk_import.allow_duplicate ? check_mark : cross_mark
-      %small.twless-strong Only true by default for stolen and impounded
+      %small.less-strong Only true by default for stolen and impounded
 
   = render(UI::TableList::Component.new) do |list|
     - list.with_row(label: "User") do
@@ -28,7 +28,7 @@
         None
     - list.with_row(label: "Organization") do
       - if @bulk_import.organization.present?
-        = link_to @bulk_import.organization.name, admin_organization_path(@bulk_import.organization), class: "twlink twless-strong"
+        = link_to @bulk_import.organization.name, admin_organization_path(@bulk_import.organization), class: "twlink less-strong"
         \|
         %strong
           = link_to "Organization view of import", organization_bulk_import_path(@bulk_import, organization_id: @bulk_import.organization.to_param), class: "twlink"
@@ -56,7 +56,7 @@
 %div{class: "tw:my-6"}
   = render(UI::Header::Component.new(text: "Errors", tag: :h3))
   - if @bulk_import.import_errors == {}
-    %span.twless-strong No errors
+    %span.less-strong No errors
   - else
     = render(Pages::Org::BulkImportError::Component.new(bulk_import: @bulk_import, in_admin: true, display_dev_info: display_dev_info?))
 

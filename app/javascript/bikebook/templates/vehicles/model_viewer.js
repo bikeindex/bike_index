@@ -312,7 +312,7 @@ class ModelViewer {
       definitionListRow({ label, value: presenter.highlighted(shown(vehicle[key]), this.differs(key), this.others.map((other) => shown(other[key]))) })
     const configuration = vehicle.model_configuration
     const configurationName = (each) => each === 'complete'
-      ? html`<span class="twless-strong">${this.kit.model_configurations[each]}</span>`
+      ? html`<span class="less-strong">${this.kit.model_configurations[each]}</span>`
       : this.kit.model_configurations[each]
     const yearRangeDiffers = this.others.some((other) => !equal([other.first_year, other.final_year], [vehicle.first_year, vehicle.final_year]))
     const list = (value) => join(array(value), ', ')
@@ -356,7 +356,7 @@ class ModelViewer {
       // "Kids & Women's MTB: Trail", its riders ahead of the activity rather than in its type
       primary_activity: presence(join([array(vehicle.target_riders).join(' & '), this.withoutParenthetical(vehicle.primary_activity)].filter(present), ' ')),
       frame_material: present(vehicle.frame?.material) && present(vehicle.frame.material_detail)
-        ? html`${vehicle.frame.material} <span class="tw:text-xs twless-strong">${vehicle.frame.material_detail}</span>`
+        ? html`${vehicle.frame.material} <span class="tw:text-xs less-strong">${vehicle.frame.material_detail}</span>`
         : vehicle.frame?.material,
       wheel_size: this.wheelSizes(),
       suspended: present(vehicle.suspension),
@@ -555,7 +555,7 @@ class ModelViewer {
   }
 
   bottomBracket (bottomBracket) {
-    const shell = bottomBracket.shell ?? html`<span class="twless-strong">Unknown shell</span>`
+    const shell = bottomBracket.shell ?? html`<span class="less-strong">Unknown shell</span>`
     const rows = this.presenter.rowsFor(this.kit.schemas.vehicle.frame.fields.bottom_bracket.fields, bottomBracket)
     return this.withTooltip(join([shell, ...array(bottomBracket.spindle)], ', '), this.tooltipRows(rows))
   }
@@ -583,7 +583,7 @@ class ModelViewer {
     const parts = compact([lead, presence(join(compact([size, name ?? (size ? 'shock' : null)]), ' ')), truthy(length) ? null : this.millimeters(stroke, ' stroke'),
       spring === 'coil' ? 'coil' : null, lockout ? 'lockout' : null])
     // an end with nothing stated is still suspended
-    const summary = parts.length ? join(parts, ', ') : present(mount) ? `${upcaseFirst(mount)} shock mount` : html`<span class="twless-strong">Unknown travel</span>`
+    const summary = parts.length ? join(parts, ', ') : present(mount) ? `${upcaseFirst(mount)} shock mount` : html`<span class="less-strong">Unknown travel</span>`
     const rows = this.suspensionRows(suspension)
     const shown = compact([lead ? 'travel' : null, 'shock_length', 'shock_stroke', parts.length ? null : 'shock_mount', spring === 'coil' ? 'spring' : null, lockout ? 'lockout' : null])
     const unshown = rows.some((row) => !shown.includes(row[4]) && !equal(row[1], name))
@@ -605,7 +605,7 @@ class ModelViewer {
   // "160 mm / 150 mm", or "60 mm front (no rear suspension)" for one end, with both ends' tooltips in one
   suspensionTravels () {
     const ends = this.vehicle.suspension
-    if (blank(ends)) return html`<span class="twless-strong">Rigid</span>`
+    if (blank(ends)) return html`<span class="less-strong">Rigid</span>`
 
     const [front, rear] = ['front', 'rear'].map((position) => ends[position] && (this.travelLead(ends[position]) ?? 'unknown'))
     const travels = front && rear

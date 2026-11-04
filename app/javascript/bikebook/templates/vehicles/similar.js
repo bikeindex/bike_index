@@ -56,7 +56,7 @@ export const similarSection = ({ model, results, searchShown, ...similar }) => {
 
 const CUSTOM = tooltip({ body: 'If you change a weight, this will be selected', content: 'Custom' })
 
-const legend = (text, note) => html`<legend class="twlabel">${text}${note ? html` <small class="twless-strong">(${note})</small>` : nothing}</legend>`
+const legend = (text, note) => html`<legend class="twlabel">${text}${note ? html` <small class="less-strong">(${note})</small>` : nothing}</legend>`
 
 // Opens the filters at the similar models' adjustments, expanded - shown only while the similar models are open and the
 // filters, which have their own, closed
