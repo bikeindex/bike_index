@@ -23,5 +23,13 @@ RSpec.describe SharedBlocks::Marketing::RegistryStats::Component, type: :compone
     it "floors the count to a tenth of a million" do
       expect(component).to have_text("1.1M+")
     end
+
+    context "that round to a whole number of millions" do
+      let(:total_bikes) { 2_000_999 }
+
+      it "drops the decimal" do
+        expect(component).to have_text("2M+")
+      end
+    end
   end
 end
