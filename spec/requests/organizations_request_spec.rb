@@ -153,7 +153,7 @@ RSpec.describe OrganizationsController, type: :request do
       it "renders the errors in an alert" do
         get "#{base_url}/#{current_organization.slug}/embed?b_param_id_token=#{b_param.id_token}"
         alert = Nokogiri::HTML(response.body).at_css("#alert-block [role=alert]")
-        expect(alert.at_css("h4").text.strip).to eq "Please fix the following 1 error"
+        expect(alert.at_css("h4").text.strip).to eq "1 error prevented this bike from being saved:"
         expect(alert.at_css("li").text).to eq "Manufacturer can't be blank"
       end
     end

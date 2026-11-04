@@ -3744,9 +3744,6 @@ en:
       help_prevent_theft: Help prevent bike theft,
       make_a_donation: make a donation.
       the_bike_index_team: The Bike Index Team
-    embed_layout:
-      error: error
-      please_fix_the_following: Please fix the following
     payments_layout:
       be_a_bike_saver: Be a bike saver.
       support_bike_index_today: Support Bike Index today.

@@ -28,6 +28,8 @@ module SharedBlocks
 
         private
 
+        def email_link = link_to("gavin@bikeindex.org", "mailto:gavin@bikeindex.org", class: "twlink-underlined")
+
         def page = [@controller_name, @action_name]
 
         def container

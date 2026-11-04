@@ -14,13 +14,7 @@
 
     <% if @b_param && @b_param.bike_errors.present? %>
       <div id="alert-block">
-        <%= render(UI::Alerts::Base::Component.new(kind: :error, dismissable: true, header: "#{t(".please_fix_the_following")} #{pluralize(@b_param.bike_errors.count, t(".error"))}")) do %>
-          <ul class="tw:list-inside tw:list-disc">
-            <% @b_param.bike_errors.each do |msg| %>
-              <li><%= msg %></li>
-            <% end %>
-          </ul>
-        <% end %>
+        <%= render(UI::Alerts::ObjectError::Component.new(object: @b_param, name: @bike.type, error_messages: @b_param.bike_errors, dismissable: true)) %>
       </div>
     <% end %>
 
