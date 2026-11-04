@@ -112,13 +112,23 @@ module BikeServices
       return if b_param.image_signed_id.blank? && b_param.image.blank?
 
       if b_param.image_signed_id.present?
-        blob = b_param.image_blob # nil once reaped - drop the photo, not the registration
-        PublicImage.create(imageable: bike, file: blob) if blob
+        begin
+          attach_blob(b_param, bike)
+        rescue Seahorse::Client::NetworkingError, Aws::Errors::ServiceError
+          # Attaching reads the blob back from R2 to identify it. Raising here strands the bike
+          # without a created_bike_id, so resubmitting the form would register a second one
+          ImageJobs::AttachBlobJob.perform_in(1.minute, b_param.id, bike.id)
+        end
       else
         PublicImage.create(imageable: bike, image: b_param.image)
         b_param.update(image_processed: true)
       end
       bike.reload
+    end
+
+    def attach_blob(b_param, bike)
+      blob = b_param.image_blob # nil once reaped - drop the photo, not the registration
+      PublicImage.create(imageable: bike, file: blob) if blob
     end
 
     private

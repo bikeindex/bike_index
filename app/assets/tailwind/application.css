@@ -122,6 +122,7 @@
 
 @import "./bike_index_components.css";
 @import "./bikebook.css";
+@import "./legacy_dark.css";
 
 @layer components {
   /* Style tables with CSS selectors to prevent caching issues */

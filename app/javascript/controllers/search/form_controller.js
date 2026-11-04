@@ -1,5 +1,4 @@
 import { Controller } from '@hotwired/stimulus'
-import TimeLocalizer from '@bikeindex/time-localizer'
 
 /* global window */
 
@@ -28,8 +27,6 @@ export default class extends Controller {
     // submit here - just reconcile a restored snapshot with the address bar.
     this.refreshResults()
 
-    // Add timeLocalizer and watch for turbo-frame renders
-    if (!window.timeLocalizer) window.timeLocalizer = new TimeLocalizer()
     document.addEventListener('turbo:frame-render', this.handleFrameRender)
     document.addEventListener('turbo:load', this.handleTurboLoad)
     // Surface throttling: the eager results frame and the kind-count fetch can
@@ -149,10 +146,6 @@ export default class extends Controller {
   handleFrameRender = () => {
     // A frame render means results came back, so clear any failure notice
     this.hideNotices()
-    // Run the time localization command on frame render
-    if (window.timeLocalizer && typeof window.timeLocalizer.localize === 'function') {
-      window.timeLocalizer.localize()
-    }
     this.syncHiddenFieldsFromUrl()
   }
 

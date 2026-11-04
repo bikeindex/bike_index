@@ -37,7 +37,7 @@
             <strong><%= email_ban.email %></strong>
             <%= email_ban.reason_humanized %>
 
-            <small class="twless-strong">
+            <small class="less-strong">
               <% if email_ban.reason == "email_domain" %>
                 - the
                 <%= link_to "email domain", admin_email_domain_path(email_ban.email_domain), class: "twlink" %>

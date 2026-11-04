@@ -163,7 +163,7 @@ class Blog < ApplicationRecord
   def pretty_canonical
     return nil unless canonical_url?
 
-    canonical_url.gsub(/https?:\/\//i, "").truncate(90)
+    Urlifyer.display(canonical_url, length: 90)
   end
 
   def set_calculated_attributes

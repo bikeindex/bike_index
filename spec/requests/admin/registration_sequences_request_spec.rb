@@ -45,7 +45,7 @@ RSpec.describe Admin::RegistrationSequencesController, type: :request do
           get base_url
           expect(assigns(:template)).to eq template_draft
           expect(response.body).to include("Template Draft sequence")
-          expect(Capybara.string(response.body)).to have_css("td span.twless-strong", text: "Template", count: 2)
+          expect(Capybara.string(response.body)).to have_css("td span.less-strong", text: "Template", count: 2)
         end
       end
 

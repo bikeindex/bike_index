@@ -1,9 +1,9 @@
 import { Controller } from '@hotwired/stimulus'
 import { CatalogComboboxSource, loadCatalog, renderCounts } from 'bikebook/catalog'
-import { hydrate, loadingShell, pickedVehicles, rescoredSimilar, unpickedVehicles } from 'bikebook/hydrate'
+import { addComparison, hydrate, loadingShell, pickedVehicles, picksShell, rescoredSimilar, unpickedVehicles } from 'bikebook/hydrate'
 import { keepPermanent, renderInto } from 'bikebook/render'
 import { readable } from 'bikebook/replace_url'
-import { NARROWING, searching } from 'bikebook/query'
+import { NARROWING, comparing, searching } from 'bikebook/query'
 import { collapse } from 'utils/collapse_utils'
 import { SearchLog } from 'bikebook/search_log'
 import { realigned, storePreferredSize, withColorway, withSize } from 'bikebook/sizes'
@@ -27,6 +27,10 @@ export default class extends Controller {
   #refilters = 0
   #rescores = 0
   #renderedUrl
+  #picks
+  #compared
+  #renderedCatalog
+  #loadFailed = false
 
   // The loading shell holds the status until the catalog's first render replaces it, and a failure puts it back
   initialize () {
@@ -40,8 +44,16 @@ export default class extends Controller {
     const url = new URL(window.location.href)
     this.#render(url)
     try {
-      this.catalog = await loadCatalog(this.manifestUrlValue, url.searchParams.get('vehicle_models')?.split(',') ?? [], this.jurisdictionsValue, this.paintColorsValue)
+      this.catalog = await loadCatalog(this.manifestUrlValue, url.searchParams.get('vehicle_models')?.split(',') ?? [], this.jurisdictionsValue, this.paintColorsValue, {
+        comparing: comparing(url),
+        onPicks: (picks) => {
+          this.#picks = picks
+          this.refresh()
+        }
+      })
+      this.#picks = null
     } catch (error) {
+      this.#loadFailed = true
       return this.#fail(error)
     }
     // the URL's filters are the reader's, where the combobox's add the visitor's market
@@ -51,10 +63,21 @@ export default class extends Controller {
       renderClassCards(document, picked.split(','), this.catalog.vocabulary.e_vehicle_classifications)
       if (!primed) this.#searchLog.typed({ ...Object.fromEntries(new URL(window.location.href).searchParams), q, count: total })
     })
+    this.#compared = this.catalog.comparison().then(({ comparable, frameMaterials }) => {
+      this.catalog = { ...this.catalog, comparable, options: { ...this.catalog.options, frame_material: frameMaterials } }
+      this.#addComparison()
+    })
     // filters set while it loaded are in the URL, and the reader stays where they've scrolled to
     const current = new URL(window.location.href)
-    this.#render(current, [window.scrollX, window.scrollY])
+    this.#render(current, [window.scrollX, window.scrollY], { focus: this.#focusOnLoad() })
     this.#searchLog.visited(current)
+  }
+
+  // The search, unless the reader's moved through the picked vehicles while it was disabled: a link of theirs is there again
+  #focusOnLoad () {
+    if (!this.pageTarget.contains(document.activeElement)) return
+    const href = document.activeElement.getAttribute('href')
+    return href && `[href="${CSS.escape(href)}"]`
   }
 
   // The form's fields over the URL's other params, such as an open panel's, its sizes following their vehicles,
@@ -189,19 +212,33 @@ export default class extends Controller {
   #go (url, scroll = [0, 0], { replace = false, ...options } = {}) {
     window.history[replace ? 'replaceState' : 'pushState'](stamped(), '', readable(url))
     this.#searchLog.visited(url)
+    this.#dropCanonical()
     return this.#render(url, scroll, options)
+  }
+
+  // A share menu shares the canonical, which names the page the server sent
+  #dropCanonical () {
+    document.querySelector('link[rel="canonical"]')?.remove()
   }
 
   // `scroll` is where the window goes, [x, y] or a selector of what to bring to its top. `focus` selects what to focus,
   // the search where it selects nothing, unless a field of the page's has focus, which keeps it and any value it hasn't
-  // yet changed to. Until the catalog loads, the page is its loading shell
+  // yet changed to. Until the catalog loads, the page is its loading shell, with the picked vehicles once they're in
   async #render (url, scroll, { focus = '[autofocus]', reveal = false } = {}) {
-    if (!this.catalog) return this.pageTarget.replaceChildren(loadingShell(this.shellTarget, url, this.status))
+    if (!this.catalog && !this.#picks) {
+      this.pageTarget.replaceChildren(loadingShell(this.shellTarget, url, this.status))
+      return this.#loadFailed && this.#fail()
+    }
 
     const render = ++this.#renders
-    // A share menu shares the canonical, which names the page the server sent. Kept through the first render, which crawlers see
-    if (render > 1) document.querySelector('link[rel="canonical"]')?.remove()
-    const rendered = await hydrate(this.catalog, this.source, this.shellTarget, url).catch((error) => error)
+    // Kept through the first render of the catalog, which crawlers see
+    if (this.#renderedCatalog) this.#dropCanonical()
+    // the comparison doesn't hold up the page, unless the page is of what it adds
+    if (comparing(url)) await this.#compared
+    const { catalog } = this
+    const rendered = await (catalog
+      ? hydrate(catalog, this.source, this.shellTarget, url)
+      : picksShell(this.#picks, this.shellTarget, url, this.status)).catch((error) => error)
     if (render !== this.#renders) return
     if (rendered instanceof Error) return this.#fail(rendered)
 
@@ -219,6 +256,7 @@ export default class extends Controller {
       collapse('show', search)
     }
     this.#renderedUrl = url
+    this.#renderedCatalog = catalog
     document.title = rendered.title ?? this.titleValue
     const kept = active && this.pageTarget.querySelector(`#${CSS.escape(active.id)}`)
     if (kept) {
@@ -235,13 +273,25 @@ export default class extends Controller {
       // and again once the panels' controllers have opened them, which the browser's scroll anchoring follows down
       requestAnimationFrame(place)
     }
+    this.#addComparison()
+    if (this.#loadFailed) this.#fail()
   }
 
-  // in place of the spinner, below the loading shell's search, where it's still showing
+  // Into a page a catalog without the comparison rendered, whichever of the two lands last
+  #addComparison () {
+    if (!this.#renderedCatalog || this.#renderedCatalog === this.catalog) return
+
+    this.#renderedCatalog = this.catalog
+    const render = this.#renders
+    addComparison(this.catalog, this.pageTarget, new URL(window.location.href), () => render === this.#renders)
+  }
+
+  // in place of the spinner: below the loading shell's search, where it's still showing, or above any picked vehicles
   #fail (error) {
-    console.error(error)
+    if (error) console.error(error)
     this.status.textContent = this.failedTextValue
     for (const input of this.pageTarget.querySelectorAll('[data-awaiting-catalog]')) input.placeholder = ''
-    if (!this.pageTarget.contains(this.status)) this.pageTarget.replaceChildren(this.status)
+    if (this.pageTarget.contains(this.status)) this.status.parentElement.prepend(this.status)
+    else this.pageTarget.replaceChildren(this.status)
   }
 }

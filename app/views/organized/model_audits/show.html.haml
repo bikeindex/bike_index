@@ -35,7 +35,7 @@
     %a.btn.btn-sm.btn-secondary.updateModelCert{data: {toggle: "modal", target: "#update-model-cert-modal", modelauditid: @model_audit.id, mnfgname: @model_audit.mnfg_name, framemodel: @model_audit.frame_model}}
       submit new
 - if @model_attestations.none?
-  %p.twless-strong.mt-4 No Attestations
+  %p.less-strong.mt-4 No Attestations
 - else
   %table.table.table-striped.table-bordered.table-sm.without-exterior-border
     %thead.small-header.hidden-md-down
@@ -73,7 +73,7 @@
             - if model_attestation.file.present?
               %strong= link_to "File", model_attestation.file.url, target: "_blank"
             - if model_attestation.url.present?
-              %small= link_to truncate(model_attestation.url), model_attestation.url
+              %small= link_to Urlifyer.display(model_attestation.url, length: 30), model_attestation.url
           %td
             = model_attestation.info
 

@@ -17,8 +17,8 @@ RSpec.describe ApplicationComponentHelper, type: :helper do
     context "with zero value" do
       let(:number) { 0 }
 
-      it "applies twless-strong class" do
-        expect(result).to eq '<span class="twless-strong">0</span>'
+      it "applies less-strong class" do
+        expect(result).to eq '<span class="less-strong">0</span>'
       end
     end
 
@@ -104,15 +104,15 @@ RSpec.describe ApplicationComponentHelper, type: :helper do
     context "with zero amount" do
       let(:payment) { Payment.new(amount_cents: 0) }
 
-      it "applies twless-strong class to zero" do
-        expect(result).to eq '<span><span title="USD">$</span><span class="twless-strong">0</span></span>'
+      it "applies less-strong class to zero" do
+        expect(result).to eq '<span><span title="USD">$</span><span class="less-strong">0</span></span>'
       end
     end
 
     context "with nil amount" do
       let(:payment) { Payment.new(amount_cents: nil) }
 
-      it "applies twless-strong class to zero" do
+      it "applies less-strong class to zero" do
         expect(result).to be_nil
       end
     end

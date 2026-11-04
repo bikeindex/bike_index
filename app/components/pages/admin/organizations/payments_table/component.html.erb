@@ -12,7 +12,7 @@
       <%= link_to payment.user.display_name, edit_admin_user_path(payment.user), class: "twlink" %>
     <% elsif payment.email.present? %>
       <%= payment.email %>
-      <small class="twless-strong">no user</small>
+      <small class="less-strong">no user</small>
     <% end %>
   <% end %>
 

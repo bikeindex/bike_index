@@ -5411,8 +5411,6 @@ it:
       total_bikes_registered: Total Bikes Registrato
       total_recovery_value: Valore totale del recupero
       used_by: Utilizzato da
-    recovery_stories:
-      recovery_stories: Storie di recupero
     update_browser:
       go_here_to_learn_more: Clicca qui per saperne di più
       oh_no: Oh No!
@@ -5721,6 +5719,7 @@ it:
         copy_sticker: Copia adesivo
       recovery_display_card:
         recovered: Riparato
+        translated_from_english: tradotto dall'inglese
     pages:
       messages:
         thread_show:
@@ -7545,7 +7544,6 @@ it:
           official_registry: Il registro ufficiale di oltre 1.000 dipartimenti di
             polizia, università, città e negozi.
           or_make_a_one_time_donation: Oppure fai una donazione una tantum
-          partner_organizations: negozi partner, dipartimenti di polizia e città
           per_month: "/ mese"
           per_year: "/ anno"
           perk_cycling_cap: Cappellino da ciclista per i membri di Bike Index
@@ -7563,7 +7561,6 @@ it:
           plans_from: Piani a partire da %{price} un mese
           questions: Domande
           recommended: Raccomandato
-          stolen_bikes_recovered: biciclette rubate recuperate
           summary_monthly: "%{level} abbonamento, %{price} al mese"
           summary_yearly: "%{level} iscrizione, %{price} un anno"
           sun_shirt: camicia da sole
@@ -7575,12 +7572,10 @@ it:
             no-profit 501(c)(3), EIN 81-4296194.
           the_registry_open_to_everyone: Il registro, aperto a tutti
           two_months_free: Due mesi gratis
-          value_returned_to_owners: valore restituito ai proprietari
           view_your_membership: Visualizza la tua iscrizione a %{level}
           wear_the_shield: Indossa lo scudo
           what_members_make_possible: Ciò che i membri rendono possibile
           yearly: Annuale
-          bikes_registered: biciclette registrate
           bikes_registered_keep_it_free: "%{bikes} Le biciclette sono registrate.
             I membri mantengono il servizio gratuito per il prossimo milione."
           millions_registered_keep_it_free: "%{millions} milioni di biciclette sono
@@ -7592,19 +7587,10 @@ it:
             sempre gratuito. È grazie ai nostri soci che possiamo garantirlo.
       donate:
         page:
-          already_member: 'Sei già un membro di Bike Index: grazie! Puoi modificare
-            il tuo livello di abbonamento o i dettagli di pagamento dalle impostazioni
-            del tuo account.'
-          cadence: Con quale frequenza somministrare
           cta_headline: Un milione di biciclette sono registrate. Nessun proprietario
             ha pagato per essere presente.
           cta_sub: Lasciatelo gratuito per il prossimo milione.
           eyebrow: Recuperato e restituito
-          fine_print: Bike Index è un'organizzazione no-profit 501(c)(3), EIN 81-4296194.
-            La tua donazione è deducibile dalle tasse negli Stati Uniti. Puoi annullare
-            la donazione mensile in qualsiasi momento.
-          fine_print_short: Organizzazione no-profit 501(c)(3), EIN 81-4296194. Detraibile
-            dalle tasse negli Stati Uniti.
           form_title: Finanziare la prossima ripresa
           headline: Tutte le biciclette sopra elencate sono tornate a casa perché
             la registrazione era gratuita
@@ -7625,17 +7611,6 @@ it:
           major_partner: Partner
           major_title: Le donazioni più consistenti permettono di inserire intere
             città nel registro.
-          manage_membership: Gestisci il tuo abbonamento
-          membership_link: Cosa include l'abbonamento
-          membership_note: 'Il supporto mensile ti rende un membro di Bike Index:
-            avrai accesso agli annunci sul marketplace, al badge di membro e a vantaggi
-            che aumentano man mano che li sviluppiamo. I livelli sono %{amounts} al
-            mese.'
-          monthly: Mensile
-          monthly_submit: Diventa socio — %{amount}/mese
-          one_time: Una volta
-          one_time_submit: Dona %{amount}
-          other_amount: Altro importo
           other_ways_daf: Sovvenzioni da fondi gestiti da donatori — possiamo inviarvi
             il nostro codice EIN e i dettagli della sovvenzione.
           other_ways_match: 'Contributo equivalente da parte del datore di lavoro:
@@ -7645,20 +7620,7 @@ it:
             evitare le imposte sulle plusvalenze derivanti dall'apprezzamento del
             valore degli asset.
           other_ways_title: Altri modi per donare a questo livello
-          stat_bikes: biciclette registrate, gratis
-          stat_partners: negozi partner, dipartimenti di polizia e città
-          stat_recoveries: biciclette rubate recuperate
-          stat_value: valore restituito ai proprietari
           stories_title: Nelle parole dei loro proprietari
-          tier_basic: Abbonamento base
-          tier_basic_benefit: Pubblicazione di biciclette sul marketplace, badge di
-            membro e supporto più rapido
-          tier_patron: Adesione come sostenitore
-          tier_patron_benefit: Tutto incluso nel pacchetto Plus, posizionamento di
-            rilievo sul mercato, maglietta e badge da sostenitore.
-          tier_plus: Abbonamento Plus
-          tier_plus_benefit: Tutto incluso nel pacchetto Base, un avviso gratuito
-            in caso di furto della bicicletta e un limite di abbonamento.
           uses_alerts_body: Il sistema di allerta per biciclette rubate e le notifiche
             sponsorizzate che promuovono un annuncio nei feed relativi al furto.
           uses_alerts_title: Avvisi che raggiungono le persone
@@ -7675,6 +7637,36 @@ it:
           uses_partners_title: Partner e indagini
           uses_title: Dove vanno i soldi
           wall_photo_alt: Una bicicletta recuperata grazie a Bike Index
+        form:
+          already_member: 'Sei già un membro di Bike Index: grazie! Puoi modificare
+            il tuo livello di abbonamento o i dettagli di pagamento dalle impostazioni
+            del tuo account.'
+          cadence: Con quale frequenza somministrare
+          fine_print: Bike Index è un'organizzazione no-profit 501(c)(3), EIN 81-4296194.
+            La tua donazione è deducibile dalle tasse negli Stati Uniti. Puoi annullare
+            la donazione mensile in qualsiasi momento.
+          fine_print_short: Organizzazione no-profit 501(c)(3), EIN 81-4296194. Detraibile
+            dalle tasse negli Stati Uniti.
+          manage_membership: Gestisci il tuo abbonamento
+          membership_link: Cosa include l'abbonamento
+          membership_note: 'Il supporto mensile ti rende un membro di Bike Index:
+            avrai accesso agli annunci sul marketplace, al badge di membro e a vantaggi
+            che aumentano man mano che li sviluppiamo. I livelli sono %{amounts} al
+            mese.'
+          monthly: Mensile
+          monthly_submit: Diventa socio — %{amount}/mese
+          one_time: Una volta
+          one_time_submit: Dona %{amount}
+          other_amount: Altro importo
+          tier_basic: Abbonamento base
+          tier_basic_benefit: Pubblicazione di biciclette sul marketplace, badge di
+            membro e supporto più rapido
+          tier_patron: Adesione come sostenitore
+          tier_patron_benefit: Tutto incluso nel pacchetto Plus, posizionamento di
+            rilievo sul mercato, maglietta e badge da sostenitore.
+          tier_plus: Abbonamento Plus
+          tier_plus_benefit: Tutto incluso nel pacchetto Base, un avviso gratuito
+            in caso di furto della bicicletta e un limite di abbonamento.
       landing_pages:
         demo_modal:
           field_message: C'è qualcos'altro che dovremmo sapere?
@@ -8159,6 +8151,32 @@ it:
             qui si riferisce a una bicicletta regolarmente registrata, una bicicletta
             denunciata come rubata non può essere pubblicata e la registrazione segue
             la bicicletta al suo nuovo proprietario.
+      recovery_stories:
+        index:
+          donors_keep_it_free: Bike Index non addebita alcun costo ai ciclisti, non
+            vende dati e non pubblica annunci pubblicitari. Ogni recupero presente
+            in questa pagina è stato reso possibile grazie alle donazioni che mantengono
+            gratuiti per tutti la registrazione, la ricerca e gli avvisi di furto.
+          every_one_found_its_way_home: Ognuna di queste biciclette è tornata a casa.
+          fund_the_next_recovery: Finanziare la prossima ripresa
+          help_it_come_home: Da qualche parte stanotte, una bicicletta verrà rubata.
+            Aiutatela a tornare a casa.
+          in_their_own_words: Con le loro stesse parole
+          lede: Dietro ogni foto c'è un motociclista che pensava di averlo perso per
+            sempre, e qualcuno che si è preoccupato abbastanza da controllare. Un
+            meccanico. Un agente di polizia. Uno sconosciuto che si è ricordato di
+            un avviso. Questo è ciò che rende possibile un registro libero e aperto,
+            e rimane tale grazie a persone come te.
+          recovery_stories: Storie di guarigione
+          register_your_bike: Registra la tua bicicletta
+          share_your_story: Condividi la tua storia
+          shared_by_the_person: Ogni storia qui raccontata è stata condivisa da chi
+            ha ritrovato la propria bicicletta.
+          started_with_a_registration: Ogni storia qui è iniziata con una registrazione.
+          takes_two_minutes: Ci vogliono circa due minuti. È gratis, per sempre.
+        stories:
+          load_more_stories: Carica altre storie
+          newer_stories: Storie più recenti
     shared_blocks:
       footer:
         about: Di
@@ -8356,6 +8374,11 @@ it:
           read_more_recovery_stories: Leggi altre storie di guarigione
           reported_by_owners: Ogni ritrovamento viene segnalato dalla persona che
             ha recuperato la propria bicicletta.
+        registry_stats:
+          stat_bikes: biciclette registrate, gratis
+          stat_partners: negozi partner, dipartimenti di polizia e città
+          stat_recoveries: biciclette rubate recuperate
+          stat_value: valore restituito ai proprietari
   user_emails:
     confirm:
       confirm_email: Conferma email

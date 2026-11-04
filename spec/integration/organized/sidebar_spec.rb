@@ -108,6 +108,15 @@ RSpec.describe "Organization sidebar", :js, type: :system do
     wait_for { current_row_in_view? }
     # Guards this against going vacuous on a menu that turns out to fit
     expect(scroller_top).to be > 0
+
+    # ui--collapse's module landing well behind this controller's, as on a slow connection
+    collapse_module = hold_requests("**/ui/collapse_controller*.js")
+    visit "/o/#{slug}/impound_records"
+
+    expect(page).to have_css "#org_sidebar_nav a[aria-current]", text: "Search Impounded Vehicles", visible: :all
+    sleep 1
+    collapse_module.release
+    expect_open("Impounded Vehicles")
   end
 
   it "lays a flash beside the sidebar, and tells add-a-registration from the notification row by the param" do

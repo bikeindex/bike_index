@@ -3,35 +3,33 @@
   UI::ActiveLink query: instead, since their state is just a param
 %>
 
-<div class="tw:flex tw:flex-wrap tw:items-baseline tw:gap-1">
-  <%= render(UI::ButtonLink::Component.new(text: "motorized", size: :sm, active: @motorized,
+<%= render(UI::ButtonLink::Component.new(text: "motorized", size: :sm, active: @motorized,
       href: url_for(search_params.merge(search_motorized: !@motorized)))) %>
 
-  <%= render(UI::ButtonLink::Component.new(text: "multi-delete", size: :sm, active: @multi_delete,
+<%= render(UI::ButtonLink::Component.new(text: "multi-delete", size: :sm, active: @multi_delete,
       href: url_for(search_params.merge(search_multi_delete: !@multi_delete)))) %>
 
-  <%= render(UI::ButtonLink::Component.new(text: "Unknown Mnfgs", size: :sm,
+<%= render(UI::ButtonLink::Component.new(text: "Unknown Mnfgs", size: :sm,
       href: missing_manufacturer_admin_bikes_path)) %>
 
-  <%= render(UI::Dropdown::Component.new(name: origin_name, button_size: :sm,
+<%= render(UI::Dropdown::Component.new(name: origin_name, button_size: :sm,
       active: !any_origin_active?)) do |dropdown| %>
-    <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Any Origin", match_params: {search_origin: nil}, path: url_for(search_params.merge(search_origin: nil))) } %>
-    <% dropdown.with_entry_divider %>
+  <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Any Origin", match_params: {search_origin: nil}, path: url_for(search_params.merge(search_origin: nil))) } %>
+  <% dropdown.with_entry_divider %>
 
-    <% Ownership.origins.each do |origin| %>
-      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: Ownership.creation_kind_humanized(origin), match_params: {search_origin: origin}, path: origin_path(origin)) } %>
-    <% end %>
+  <% Ownership.origins.each do |origin| %>
+    <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: Ownership.creation_kind_humanized(origin), match_params: {search_origin: origin}, path: origin_path(origin)) } %>
   <% end %>
+<% end %>
 
-  <%= render(UI::Dropdown::Component.new(name: pos_name, button_size: :sm,
+<%= render(UI::Dropdown::Component.new(name: pos_name, button_size: :sm,
       active: @pos_search_type.present?)) do |dropdown| %>
-    <% Pages::Admin::Bikes::Index::Filters::Component::POS_TYPES.each do |value, label| %>
-      <% dropdown.with_entry_divider if value == "any_pos" %>
-      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: label, match_params: {search_pos: value}, path: pos_path(value)) } %>
-    <% end %>
-
-    <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "any (POS or not)", match_params: {search_pos: nil}, path: url_for(search_params.merge(search_pos: nil))) } %>
+  <% Pages::Admin::Bikes::Index::Filters::Component::POS_TYPES.each do |value, label| %>
+    <% dropdown.with_entry_divider if value == "any_pos" %>
+    <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: label, match_params: {search_pos: value}, path: pos_path(value)) } %>
   <% end %>
 
-  <%= render(UI::ButtonLink::Component.new(text: "Detailed graphs", size: :sm, href: graphs_path)) %>
-</div>
+  <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "any (POS or not)", match_params: {search_pos: nil}, path: url_for(search_params.merge(search_pos: nil))) } %>
+<% end %>
+
+<%= render(UI::ButtonLink::Component.new(text: "Detailed graphs", size: :sm, href: graphs_path)) %>
