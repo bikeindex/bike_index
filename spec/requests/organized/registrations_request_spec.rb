@@ -429,7 +429,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         expect(current_organization.reload.is_invoiced?).to be_falsey
         get base_url
         expect(response.status).to eq(200)
-        expect(response).to render_template :search
+        expect(response).to render_template :index
         expect(assigns(:current_organization)).to eq current_organization
 
         get base_url, params: {search_no_js: true}
@@ -536,7 +536,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       it "renders the sticker columns" do
         get base_url, params: {search_no_js: true, bike_sticker: unclaimed_sticker.code}
         expect(response.status).to eq(200)
-        expect(response).to render_template :search
+        expect(response).to render_template :index
         expect(assigns(:bike_sticker)).to eq unclaimed_sticker
         expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
         expect(response.body).to include(claimed_sticker.pretty_code)
@@ -1066,7 +1066,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       it "renders, assigning the organization" do
         get base_url
         expect(response.status).to eq(200)
-        expect(response).to render_template :search
+        expect(response).to render_template :index
         expect(assigns(:current_organization)).to eq current_organization
         expect(assigns(:passive_organization)).to eq current_organization
         expect(assigns(:page_id)).to eq "organized_registrations_index"

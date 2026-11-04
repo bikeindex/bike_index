@@ -4548,7 +4548,7 @@ en:
           and forward to the final user, because those users haven't opted in to Bike
           Index notifications.
     registrations:
-      search:
+      index:
         find_a_registration: Find a registration
         search_all_email_disabled: You can only search your organization's registrations
           with owner email or name

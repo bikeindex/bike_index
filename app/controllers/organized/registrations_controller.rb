@@ -41,13 +41,8 @@ module Organized
         render chart_card_component, layout: false
       elsif @render_results
         search_organization_bikes
-        respond_to do |format|
-          format.html { render :search }
-          format.turbo_stream
-        end
       else
         set_search_filter_params
-        render :search
       end
     end
 
