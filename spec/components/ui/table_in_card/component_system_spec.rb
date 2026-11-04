@@ -68,12 +68,16 @@ RSpec.describe UI::TableInCard::Component, :js, type: :system do
     page.current_window.resize_to(*original_size)
   end
 
-  it "shadows the frozen column in dark mode, and a shadow with its own color keeps it" do
+  it "shadows the frozen column in dark mode, keeps region and header text quieter than cells, and a shadow with its own color keeps it" do
     size = page.current_window.size
     page.current_window.resize_to(500, 800)
     visit("/rails/view_components/ui/table_in_card/component/default?lookbook%5Bdisplay%5D%5Btheme%5D=dark")
     expect(page).to have_css("[data-controller~='ui--table-overflow'][data-overflowing]")
     expect(page.evaluate_script(%(getComputedStyle(document.querySelector("tbody td")).boxShadow))).to include("rgba(0, 0, 0, 0.5) 2px 0px 6px")
+    colors = page.evaluate_script(%(["tbody td", "tbody small", "thead th"].map((selector) => getComputedStyle(document.querySelector(selector)).color)))
+    expect(colors.uniq.count).to eq 2
+    expect(colors.second).to eq colors.third
+    expect(colors.first).not_to eq colors.second
 
     visit("/rails/view_components/ui/card/component/with_black_shadow?lookbook%5Bdisplay%5D%5Btheme%5D=dark")
     card_shadow = page.evaluate_script(%([...document.querySelectorAll("div")].map((div) => getComputedStyle(div).boxShadow).find((shadow) => shadow.includes("4px 4px"))))
