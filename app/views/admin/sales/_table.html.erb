@@ -39,7 +39,7 @@
       <% if sale.buyer.present? %>
         <%= render Atoms::Admin::TableCells::User::Component.new(sort_state:, user: sale.buyer, render_search: true) %>
       <% else %>
-        <small class="twless-strong">
+        <small class="less-strong">
           <%= sale.new_owner_email&.truncate(20) %>
         </small>
       <% end %>

@@ -91,6 +91,8 @@ RSpec.describe "Organized registrations search", :js, type: :system do
 
     # Search by serial number
     expect(page).to have_css("turbo-frame#chart_card_frame [id^='chart-'] canvas", wait: 10)
+    # The card's stat rows carry the counts
+    within("turbo-frame#chart_card_frame") { expect(page).to have_button("Registrations", exact: true) }
     chart_src = chart_frame[:src]
 
     fill_in "serial", with: bike1.serial_number

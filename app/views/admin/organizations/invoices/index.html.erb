@@ -4,7 +4,7 @@
 
 <%= render(UI::Header::Component.new(text: "#{@organization.name} has #{pluralize(@organization.payments.count, "payment")}", tag: :h2, html_class: "tw:mt-12")) %>
 
-<p class="twless-strong tw:mb-4">
+<p class="less-strong tw:mb-4">
   You can add invoices to payments by editing them. If you don't see a payment
   in this list,
   <%= link_to "search the payments", admin_payments_path, class: "twlink" %> and

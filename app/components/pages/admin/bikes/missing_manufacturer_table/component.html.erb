@@ -26,7 +26,7 @@
       <%= render(UI::Time::Component.new(time: bike.created_at)) %>
     <% end %>
 
-    <span class="twless-strong tw:ml-2">
+    <span class="less-strong tw:ml-2">
       <% if bike.example %>
         <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>"><%= bike.id %></span>
       <% else %>
@@ -43,7 +43,7 @@
         <%= link_to "search", other_name_search.call(bike), class: "twlink tw:text-sm" %>
       <% end %>
     <% else %>
-      <em class="twless-strong"><%= bike.mnfg_name %></em>
+      <em class="less-strong"><%= bike.mnfg_name %></em>
     <% end %>
   <% end %>
 
@@ -51,7 +51,7 @@
     <%= describe.call(bike) %>
 
     <% if paint_for.call(bike).present? %>
-      <div class="twless-strong">
+      <div class="less-strong">
         <%= link_to bike.paint_description, edit_admin_paint_url(bike.paint), class: "twlink" %>
         <%= bike.frame_colors.to_sentence %>
       </div>
@@ -68,7 +68,7 @@
     <% end %>
 
     <% if bike.pos? %>
-      <span class="twless-strong tw:ml-2">pos</span>
+      <span class="less-strong tw:ml-2">pos</span>
     <% end %>
   <% end %>
 <% end %>

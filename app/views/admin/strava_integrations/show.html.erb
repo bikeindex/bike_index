@@ -3,11 +3,11 @@
 <div class="twwiderow tw:mt-6 tw:items-start">
   <%= render(UI::TableList::Component.new) do |list| %>
     <% list.with_row(label: "ID", dev_only: true, if: display_dev_info?) do %>
-      <code class="twcode"><%= @strava_integration.id %></code>
+      <%= render(UI::Code::Inline::Component.new(text: @strava_integration.id)) %>
 
-      <small class="twless-strong tw:ml-2">
+      <small class="less-strong tw:ml-2">
         Strava ID:
-        <code class="twcode"><%= @strava_integration.strava_id %></code>
+        <%= render(UI::Code::Inline::Component.new(text: @strava_integration.strava_id, small: true)) %>
       </small>
     <% end %>
 
@@ -53,7 +53,7 @@
 
     <% list.with_row(label: "Sync Progress") do %>
       <%= @strava_integration.sync_progress_percent %>%
-      <span class="twless-strong tw:ml-2"><%= number_display(@strava_integration.strava_activities.enriched.count) %> / <%= number_display(@strava_integration.activities_downloaded_count) %> enriched</span>
+      <span class="less-strong tw:ml-2"><%= number_display(@strava_integration.strava_activities.enriched.count) %> / <%= number_display(@strava_integration.activities_downloaded_count) %> enriched</span>
     <% end %>
 
     <% list.with_row(label: "Most recent proxy") do %>
@@ -62,17 +62,17 @@
       <% if most_recent_proxy_at.present? %>
         <%= render(UI::Time::Component.new(time: most_recent_proxy_at, format: :localize_time_precise)) %>
       <% else %>
-        <small class="twless-strong">no proxy requests</small>
+        <small class="less-strong">no proxy requests</small>
       <% end %>
 
       <small class="tw:ml-1">
         priority multiplier:
-        <code class="twcode"><%= StravaJobs::ScheduledRequestPriorityUpdator.priority_multiplier(@strava_integration.id) %></code>
+        <%= render(UI::Code::Inline::Component.new(text: StravaJobs::ScheduledRequestPriorityUpdator.priority_multiplier(@strava_integration.id), small: true)) %>
       </small>
     <% end %>
 
     <% list.with_row(label: "Permissions") do %>
-      <code class="twcode"><%= @strava_integration.strava_permissions %></code>
+      <%= render(UI::Code::Inline::Component.new(text: @strava_integration.strava_permissions)) %>
 
       <% if @strava_integration.permissions_less? %>
         <%= render UI::Badge::Component.new(text: "less than default", color: :error, size: :sm) %>

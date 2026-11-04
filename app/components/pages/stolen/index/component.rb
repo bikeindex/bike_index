@@ -52,7 +52,7 @@ module Pages
         end
 
         def step_classes(priority)
-          priority ? "tw:bg-blue-100 tw:border-blue-200" : "tw:bg-white tw:border-gray-200 tw:hover:border-blue-200"
+          priority ? "tw:bg-blue-100 tw:border-blue-200 tw:dark:bg-blue-950 tw:dark:border-blue-800" : "tw:bg-white tw:border-gray-200 tw:hover:border-blue-200 tw:dark:bg-gray-800 tw:dark:border-gray-700"
         end
 
         def step_action(step, priority)

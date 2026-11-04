@@ -2,7 +2,7 @@
 
 <div class="twwiderow tw:mt-6 tw:items-start">
   <%= render(UI::TableList::Component.new) do |list| %>
-    <% list.with_row(label: "ID", dev_only: true, value: tag.code(@sale.id, class: "twcode"), if: display_dev_info?) %>
+    <% list.with_row(label: "ID", dev_only: true, value: render(UI::Code::Inline::Component.new(text: @sale.id)), if: display_dev_info?) %>
 
     <% list.with_row(label: "Seller", value: render(Atoms::Admin::TableCells::User::Component.new(user: @sale.seller, user_id: @sale.seller_id))) %>
 
@@ -10,7 +10,7 @@
       <% if @sale.buyer.present? %>
         <%= render Atoms::Admin::TableCells::User::Component.new(user: @sale.buyer, user_id: @sale.buyer&.id) %>
       <% else %>
-        <span class="twless-strong"><%= @sale.new_owner_email %></span>
+        <span class="less-strong"><%= @sale.new_owner_email %></span>
       <% end %>
     <% end %>
 
@@ -60,7 +60,7 @@
       <% if @sale.new_ownership.present? %>
         <%= link_to @sale.new_ownership.id, admin_ownership_path(@sale.new_ownership.id), class: "twlink" %>
       <% else %>
-        <span class="twless-strong">pending</span>
+        <span class="less-strong">pending</span>
       <% end %>
     <% end %>
   <% end %>

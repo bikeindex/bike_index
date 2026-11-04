@@ -12,7 +12,7 @@
 </h2>
 
 <h6 class="tw:mt-2 tw:mb-1 tw:text-sm tw:opacity-65">
-  format <code>:localize_time</code>
+  format <%= render(UI::Code::Inline::Component.new(text: ":localize_time")) %>
 </h6>
 
 <p id="current-time">
@@ -41,7 +41,8 @@
 </p>
 
 <h6 class="tw:mt-5 tw:mb-1 tw:text-sm tw:opacity-65">
-  format <code>:localize_time_precise</code>
+  format
+  <%= render(UI::Code::Inline::Component.new(text: ":localize_time_precise")) %>
 </h6>
 
 <p>

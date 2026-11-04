@@ -20,6 +20,15 @@ RSpec.describe Pages::Admin::Headers::Count::Component, type: :component do
     end
   end
 
+  context "with a suffix" do
+    let(:options) { {count: 3, href: "/admin/bikes", suffix: "in the past week"} }
+
+    it "follows the count, outside its link" do
+      expect(component.text.squish).to eq "3 in the past week"
+      expect(component).to have_link("3", href: "/admin/bikes", exact: true)
+    end
+  end
+
   context "with a parenthetical" do
     let(:options) { {count: 3, parenthetical: "first 100 shown"} }
 

@@ -58,7 +58,7 @@
     <% table.column(sortable: "theft_alert_plan_id", label: "Plan") do |theft_alert| %>
       <small>
         <%= theft_alert.amount_facebook %>
-        <span class="twless-strong"><%= theft_alert.theft_alert_plan.name %></span>
+        <span class="less-strong"><%= theft_alert.theft_alert_plan.name %></span>
       </small>
     <% end %>
 
@@ -102,9 +102,9 @@
       <%= theft_alert.city %>
 
       <% if theft_alert.region.present? %>
-        <small class="twless-strong"><%= theft_alert.region %></small>
+        <small class="less-strong"><%= theft_alert.region %></small>
       <% elsif theft_alert.country.present? && !theft_alert.country.united_states? %>
-        <small class="twless-strong"><%= theft_alert.country.name %></small>
+        <small class="less-strong"><%= theft_alert.country.name %></small>
       <% end %>
     <% end %>
 

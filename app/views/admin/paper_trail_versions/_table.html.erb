@@ -28,6 +28,6 @@
   <% end %>
 
   <% table.column(label: "Changes") do |version| %>
-    <%= render UI::JsonDisplay::Component.new(data: version.object_changes, small: true, max_width: :table_cell) %>
+    <%= render UI::Code::Json::Component.new(data: version.object_changes, small: true, max_width: :table_cell) %>
   <% end %>
 <% end %>

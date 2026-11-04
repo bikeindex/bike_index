@@ -19,12 +19,12 @@
 
     <li>
       SP entityID:
-      <code class="twcode"><%= Saml::SettingsBuilder.sp_entity_id(saml_configuration) %></code>
+      <%= render(UI::Code::Inline::Component.new(text: Saml::SettingsBuilder.sp_entity_id(saml_configuration))) %>
     </li>
 
     <li>
       ACS (callback) URL:
-      <code class="twcode"><%= Saml::SettingsBuilder.assertion_consumer_service_url(saml_configuration) %></code>
+      <%= render(UI::Code::Inline::Component.new(text: Saml::SettingsBuilder.assertion_consumer_service_url(saml_configuration))) %>
     </li>
 
     <li>

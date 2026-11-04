@@ -1,9 +1,3 @@
-<% nav_header_list_items = capture do %>
-  <li>
-    <%= render(UI::ButtonLink::Component.new(text: "unlinked", href: admin_paints_path(sortable_search_params.merge(search_unlinked: !@search_unlinked)), size: :sm, active: @search_unlinked)) %>
-  </li>
-<% end %>
-
 <% count_detail = capture do %>
   &mdash;
   <%= number_display(matching_paints.where("created_at >= ?", Time.current.beginning_of_day).count) %>
@@ -26,7 +20,8 @@
   collection: @paints,
   viewing: "Paints",
   chart_collection: @render_chart && matching_paints,
-  nav_header_list_items:,
   admin_search_form:,
   count_detail:,
-)) %>
+)) do |skeleton| %>
+  <% skeleton.with_nav_item { render(UI::ButtonLink::Component.new(text: "unlinked", href: admin_paints_path(sortable_search_params.merge(search_unlinked: !@search_unlinked)), size: :sm, active: @search_unlinked)) } %>
+<% end %>
