@@ -130,6 +130,16 @@ RSpec.describe Admin::DuplicateBikesController, type: :request do
       FactoryBot.create(:bike, :with_ownership_claimed, user:, manufacturer:, serial_number: "HAND0FF123")
       expect(finder.groups.find { it["bike_ids"].include?(shop_bike.id) }["kind"]).to eq "handoff_priority"
     end
+
+    it "keeps a pair the comparison page doesn't pass out of the priority queue" do
+      user = FactoryBot.create(:user_confirmed)
+      shop_bike = FactoryBot.create(:bike_lightspeed_pos, manufacturer: Manufacturer.other, serial_number: "HAND0FF123", owner_email: user.email, created_at: 2.days.ago)
+      customer_bike = FactoryBot.create(:bike, :with_ownership_claimed, user:, manufacturer: Manufacturer.other, serial_number: "HAND0FF123")
+      expect(finder.groups.find { it["bike_ids"].include?(shop_bike.id) }["kind"]).to eq "shop_customer"
+
+      get "#{base_url}/compare", params: {bike_ids: [shop_bike.id, customer_bike.id].join(",")}
+      expect(response.body).to include("Uncertain — admin judgment", "Manufacturer is Other")
+    end
   end
 
   describe "segments" do

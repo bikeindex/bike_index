@@ -125,6 +125,13 @@ module BikeDuplicatesServices
       ActiveRecord::Base.connection.select_values(ActiveRecord::Base.sanitize_sql_array([sql, bike_ids]))
     end
 
+    # Whether these records, whatever they are, meet each same_owner_criteria: {criterion => met}
+    def same_owner_evidence(bike_ids)
+      condition = ActiveRecord::Base.sanitize_sql_array(["id IN (?)", bike_ids])
+      columns = same_owner_criteria.map { |criterion, sql| "#{sql} AS #{criterion}" }.join(", ")
+      ActiveRecord::Base.connection.select_one("WITH live AS (#{live_sql(condition)}), #{registrations_sql("live")} SELECT #{columns} FROM registrations")
+    end
+
     #
     # private below here
     #
@@ -148,20 +155,37 @@ module BikeDuplicatesServices
       SQL
     end
 
-    def query
+    # Aggregates over registrations_sql. The handoff queue requires all of them and the comparison page
+    # reports each, so the two can't disagree
+    def same_owner_criteria
+      {
+        "two_records" => "count(*) = 2",
+        "one_account" => "(count(DISTINCT user_id) = 1 AND count(user_id) = count(*))",
+        "one_email" => "(count(DISTINCT email) = 1 AND count(email) = count(*))",
+        "current_owner" => "count(*) FILTER (WHERE NOT current_identity_matches) = 0",
+        "claimed" => "count(*) FILTER (WHERE claimed) > 0",
+        "shop_unclaimed" => "count(*) FILTER (WHERE pos AND ever_claimed) = 0",
+        "simple_history" => "count(*) FILTER (WHERE transferred OR marketplace OR current_impound_record_id IS NOT NULL OR status IS DISTINCT FROM #{Bike::STATUS_ENUM[:status_with_owner]}) = 0",
+        "one_model" => "count(DISTINCT nullif(lower(btrim(frame_model)), '')) <= 1",
+        "one_year" => "count(DISTINCT year) <= 1",
+        "one_manufacturer_other" => "count(DISTINCT nullif(lower(btrim(manufacturer_other)), '')) <= 1",
+        "one_stored_serial" => "count(DISTINCT simple_serial) = 1",
+        "named_manufacturer" => "count(*) FILTER (WHERE NOT named_manufacturer) = 0"
+      }
+    end
+
+    def live_sql(condition)
       <<~SQL
-        WITH #{test_bikes_sql}, live AS MATERIALIZED (
-          SELECT id, manufacturer_id, serial_normalized_no_space serial, created_at, creation_organization_id,
-            current_ownership_id, status, current_impound_record_id, frame_model, year, manufacturer_other,
-            regexp_replace(upper(coalesce(serial_number, '')), '[^A-Z0-9]', '', 'g') simple_serial
-          FROM bikes WHERE deleted_at IS NULL AND example IS NOT TRUE AND likely_spam IS NOT TRUE
-            AND manufacturer_id IS NOT NULL AND length(serial_normalized_no_space) >= 6
-        ), duplicate_keys AS MATERIALIZED (
-          SELECT manufacturer_id, serial FROM live GROUP BY manufacturer_id, serial HAVING count(*) > 1
-        ), stolen_serials AS MATERIALIZED (
-          SELECT DISTINCT b.serial_normalized_no_space serial FROM bikes b
-          WHERE #{stolen_history_sql("b")}
-        ), registrations AS (
+        SELECT id, manufacturer_id, serial_normalized_no_space serial, created_at, creation_organization_id,
+          current_ownership_id, status, current_impound_record_id, frame_model, year, manufacturer_other,
+          regexp_replace(upper(coalesce(serial_number, '')), '[^A-Z0-9]', '', 'g') simple_serial
+        FROM bikes WHERE #{condition}
+      SQL
+    end
+
+    def registrations_sql(source)
+      <<~SQL
+        registrations AS (
           SELECT b.*, o.user_id, coalesce(o.organization_id, b.creation_organization_id) organization_id,
             CASE WHEN o.is_phone IS NOT TRUE AND btrim(o.owner_email) ~ '^[^@[:space:]]+@[^@[:space:]]+$' THEN lower(btrim(o.owner_email)) END email,
             coalesce(o.pos_kind IN (#{enum_sql(Organization::POS_KIND_ENUM, *POS_KINDS)}), false) pos,
@@ -175,8 +199,8 @@ module BikeDuplicatesServices
             EXISTS (SELECT 1 FROM marketplace_listings m WHERE m.item_type = 'Bike' AND m.item_id = b.id)
               OR EXISTS (SELECT 1 FROM marketplace_listings m JOIN bike_versions v ON m.item_type = 'BikeVersion' AND m.item_id = v.id WHERE v.bike_id = b.id) marketplace,
             coalesce(c.user_id IS NOT DISTINCT FROM o.user_id AND c.is_phone IS NOT TRUE AND lower(btrim(c.owner_email)) = lower(btrim(o.owner_email)), false) current_identity_matches,
-            t.bike_id IS NOT NULL test, s.serial IS NOT NULL serial_stolen
-          FROM live b JOIN duplicate_keys k ON k.manufacturer_id = b.manufacturer_id AND k.serial = b.serial
+            EXISTS (SELECT 1 FROM manufacturers m WHERE m.id = b.manufacturer_id AND nullif(btrim(m.name), '') IS NOT NULL AND m.name <> 'Other') named_manufacturer
+          FROM #{source} b
           LEFT JOIN LATERAL (
             SELECT user_id, creator_id, organization_id, owner_email, is_phone, origin, pos_kind, claimed, claimed_at
             FROM ownerships WHERE bike_id = b.id
@@ -184,9 +208,25 @@ module BikeDuplicatesServices
           ) o ON true
           LEFT JOIN organizations g ON g.id = coalesce(o.organization_id, b.creation_organization_id)
           LEFT JOIN ownerships c ON c.id = b.current_ownership_id AND c.bike_id = b.id
-          LEFT JOIN test_bikes t ON t.bike_id = b.id
-          LEFT JOIN stolen_serials s ON s.serial = b.serial
         )
+      SQL
+    end
+
+    def query
+      <<~SQL
+        WITH #{test_bikes_sql}, live AS MATERIALIZED (
+          #{live_sql("deleted_at IS NULL AND example IS NOT TRUE AND likely_spam IS NOT TRUE AND manufacturer_id IS NOT NULL AND length(serial_normalized_no_space) >= 6")}
+        ), duplicate_keys AS MATERIALIZED (
+          SELECT manufacturer_id, serial FROM live GROUP BY manufacturer_id, serial HAVING count(*) > 1
+        ), stolen_serials AS MATERIALIZED (
+          SELECT DISTINCT b.serial_normalized_no_space serial FROM bikes b
+          WHERE #{stolen_history_sql("b")}
+        ), duplicates AS (
+          SELECT live.*, t.bike_id IS NOT NULL test, s.serial IS NOT NULL serial_stolen
+          FROM live JOIN duplicate_keys k ON k.manufacturer_id = live.manufacturer_id AND k.serial = live.serial
+          LEFT JOIN test_bikes t ON t.bike_id = live.id
+          LEFT JOIN stolen_serials s ON s.serial = live.serial
+        ), #{registrations_sql("duplicates")}
         SELECT manufacturer_id, serial, min(id) reference_id, jsonb_agg(id ORDER BY created_at, id) bike_ids,
           count(*)::integer record_count, count(*) FILTER (WHERE test)::integer test_count,
           count(*) FILTER (WHERE pos)::integer pos_count, count(*) FILTER (WHERE customer)::integer customer_count,
@@ -201,15 +241,9 @@ module BikeDuplicatesServices
           min(created_at) first_at, max(created_at) last_at,
           coalesce(min(created_at) FILTER (WHERE pos) < min(created_at) FILTER (WHERE customer), false) pos_first,
           bool_or(serial_stolen) serial_stolen,
-          count(*) = 2 AND count(*) FILTER (WHERE pos) = 1 AND count(*) FILTER (WHERE customer AND self_registered) = 1
+          count(*) FILTER (WHERE pos) = 1 AND count(*) FILTER (WHERE customer AND self_registered) = 1
             AND min(created_at) FILTER (WHERE pos) < min(created_at) FILTER (WHERE customer)
-            AND count(*) FILTER (WHERE pos AND ever_claimed) = 0
-            AND count(*) FILTER (WHERE transferred OR marketplace OR NOT current_identity_matches OR current_impound_record_id IS NOT NULL OR status IS DISTINCT FROM #{Bike::STATUS_ENUM[:status_with_owner]}) = 0
-            AND count(DISTINCT email) = 1 AND count(email) = 2 AND count(DISTINCT user_id) = 1 AND count(user_id) = 2
-            AND count(DISTINCT nullif(lower(btrim(frame_model)), '')) <= 1 AND count(DISTINCT year) <= 1
-            AND count(DISTINCT nullif(lower(btrim(manufacturer_other)), '')) <= 1
-            AND count(DISTINCT simple_serial) = 1
-            AND EXISTS (SELECT 1 FROM manufacturers m WHERE m.id = manufacturer_id AND nullif(btrim(m.name), '') IS NOT NULL AND m.name <> 'Other') handoff_priority
+            AND #{same_owner_criteria.values.join(" AND ")} handoff_priority
         FROM registrations GROUP BY manufacturer_id, serial
         ORDER BY count(*) DESC, min(id)
       SQL
@@ -244,6 +278,6 @@ module BikeDuplicatesServices
 
     def enum_sql(enum, *keys) = enum.values_at(*keys.map(&:to_sym)).join(", ")
 
-    conceal :customer_origins, :enqueue_group_snapshot, :enum_sql, :record_failure, :release_claim, :stolen_serial_bikes, :query, :test_bikes_sql
+    conceal :customer_origins, :enqueue_group_snapshot, :enum_sql, :live_sql, :record_failure, :registrations_sql, :release_claim, :same_owner_criteria, :stolen_serial_bikes, :query, :test_bikes_sql
   end
 end
