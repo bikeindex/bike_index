@@ -1,7 +1,7 @@
 <%# TODO: Add translations %>
 <% if @bike.impounded? && @bike.current_impound_record.organized? %>
   <% impound_record = @bike.current_impound_record %>
-  <% organization = impound_record.organization&.name %>
+  <% organization = impound_record.organization.name %>
   <% address = impound_record.parking_notification&.formatted_address_string %>
   <% time = capture do %>
     <em><%= render(UI::Time::Component.new(time: impound_record.impounded_at)) %></em>
