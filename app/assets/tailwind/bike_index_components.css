@@ -16,6 +16,10 @@
  * once the .twwiderow holding it has dropped to one column. Keyed to the row rather than the
  * viewport so it can't disagree with the column count - 672px is where .twwiderow's second
  * 320px column stops fitting, and a container query can't read that from a var(). */
+@utility tweyebrow {
+  @apply tw:text-xs tw:font-bold tw:tracking-wider tw:text-purple-500 tw:uppercase tw:dark:text-purple-300;
+}
+
 @utility twfullbleed {
   @container twwiderow (width < 672px) {
     /* All forced. Tailwind sorts a custom utility by the properties it sets, so each one added

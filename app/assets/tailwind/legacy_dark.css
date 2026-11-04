@@ -1,18 +1,10 @@
-/* The legacy stylesheets have no dark mode, and shouldn't grow one. They sort below this
- * layer, so these win on the properties they set, and any tw: utility still beats them.
- * kelsey_styles.css is unlayered and beats them all, so its pages stay light. */
+/* Legacy sorts below this layer and utilities above it; kelsey_styles.css is unlayered, so its pages stay light */
 @layer components {
   :is(.container, .container-fluid, .bootstrapstyle) {
-    @variant dark {
-      @apply tw:text-gray-300;
-    }
-  }
+    @apply tw:dark:text-gray-300;
 
-  :is(.container, .container-fluid, .bootstrapstyle) :is(h1, h2, h3, h4, h5, h6):not(.alert *, .root-landing-who *),
-  .global-title,
-  .pub-date {
-    @variant dark {
-      @apply tw:text-gray-200;
+    :is(h1, h2, h3, h4, h5, h6):not(.root-landing-who *) {
+      @apply tw:dark:text-inherit;
     }
   }
 
@@ -22,22 +14,15 @@
   .next-steps-wrap,
   .recovery-quote,
   .select-amount,
-  .modal-content,
-  .modal-header,
-  .modal-body,
-  .modal-footer {
-    @variant dark {
-      @apply tw:bg-gray-800 tw:border-gray-700 tw:text-gray-300;
-    }
+  .modal-content {
+    @apply tw:dark:bg-gray-800 tw:dark:border-gray-700 tw:dark:text-gray-300;
   }
 
   .form-control,
   .btn-secondary,
   .selectize-input,
   .selectize-dropdown {
-    @variant dark {
-      @apply tw:bg-gray-700 tw:border-gray-600 tw:text-gray-200;
-    }
+    @apply tw:dark:bg-gray-700 tw:dark:border-gray-600 tw:dark:text-gray-200;
   }
 
   .add_fields,
@@ -46,21 +31,15 @@
   .right-input-help a,
   .selectize-input input,
   .close {
-    @variant dark {
-      @apply tw:text-gray-300;
-    }
+    @apply tw:dark:text-gray-300;
   }
 
   /* !important to beat kelsey_styles.css, away from the homepage's section it leaves light */
-  .kelsey_styles_buttons-grid:not(.for-section *) .category-button span {
-    @variant dark {
-      @apply tw:text-gray-200!;
-    }
+  .kelsey_styles_buttons-grid:not(.for-section *) .category-button:not(:hover) span {
+    @apply tw:dark:text-gray-200!;
   }
 
   .nav-tabs .nav-link:not(.active) {
-    @variant dark {
-      @apply tw:bg-gray-800 tw:text-gray-300;
-    }
+    @apply tw:dark:bg-gray-800 tw:dark:text-gray-300;
   }
 }

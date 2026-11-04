@@ -32,7 +32,7 @@
     <%= render "/shared/analytics" %>
   </head>
 
-  <%= tag.body(class: class_names("payments-layout-body", dark: current_user&.dark_mode_preview?), id: page_id) do %>
+  <%= body_tag(html_class: class_names("payments-layout-body", dark: current_user&.dark_mode_preview?)) do %>
     <%= render(UI::Alerts::FlashMessage::Component.new(flash:)) %>
     <%= render 'layouts/revised_messages' %>
 

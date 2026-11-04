@@ -144,7 +144,7 @@ RSpec.describe Admin::UsersController, type: :request do
         expect(Nokogiri::HTML(response.body).css("input[type=radio][name='user[dark_mode_preview]']").count).to eq 2
 
         get "/"
-        expect(Nokogiri::HTML(response.body).at_css("body")[:class].to_s.split).to_not include("dark")
+        expect(Nokogiri::HTML(response.body).at_css("body.dark")).to be_nil
       end
       context "true" do
         let(:dark_mode_preview) { true }
@@ -155,7 +155,7 @@ RSpec.describe Admin::UsersController, type: :request do
           ["/", "/oauth/applications", "/payments/new"].each do |path|
             get path
             expect(response.status).to eq 200
-            expect(Nokogiri::HTML(response.body).at_css("body")[:class].to_s.split).to include("dark")
+            expect(Nokogiri::HTML(response.body).at_css("body.dark")).to be_present
           end
 
           get "/for_bike_shops"

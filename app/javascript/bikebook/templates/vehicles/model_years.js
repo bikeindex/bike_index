@@ -33,6 +33,6 @@ export const modelYears = ({ presenter, years, others }) => {
     return html`<tr class="tw:even:bg-gray-100 tw:dark:even:bg-gray-800"><td class="${CELL} ${highlight(['url'], true)}">${label}</td><td
       class="${CELL} ${highlight(['original_msrp', 'original_msrp_currency'])}">${money}</td><td class="${CELL} ${highlight(['colorways'])}">${colorways(presenter, array(year.colorways))}</td></tr>`
   })
-  return html`<section class="tw:mb-6 tw:break-inside-avoid tw:space-y-2"><h2 class="tw:border-b tw:border-gray-200 tw:dark:border-gray-700 tw:pb-1.5 tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:dark:text-purple-300 tw:uppercase">Model years</h2><table
+  return html`<section class="tw:mb-6 tw:break-inside-avoid tw:space-y-2"><h2 class="tw:tweyebrow tw:border-b tw:border-gray-200 tw:dark:border-gray-700 tw:pb-1.5">Model years</h2><table
     class="tw:w-full tw:border-collapse tw:text-left"><tbody>${rows}</tbody></table></section>`
 }
