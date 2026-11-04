@@ -8,10 +8,11 @@ module Pages
         # the cache, since resolving or dismissing one doesn't touch the bike. Each is loaded
         # once for the page, and each box picks out its own
         class Component < ApplicationComponent
-          # Literal strings so Tailwind's scanner generates them
+          # Literal strings so Tailwind's scanner generates them. Forced, because the card's
+          # tw:dark:border-gray-700 sorts after them and sets every side
           ACCENTS = {
-            success: "tw:border-l-green-600", purple: "tw:border-l-purple-500", error: "tw:border-l-red-600",
-            warning: "tw:border-l-amber-500", pink: "tw:border-l-pink-400"
+            success: "tw:border-l-green-600!", purple: "tw:border-l-purple-500!", error: "tw:border-l-red-600!",
+            warning: "tw:border-l-amber-500!", pink: "tw:border-l-pink-400!"
           }.freeze
 
           def self.user_alerts(user)
@@ -20,8 +21,9 @@ module Pages
             user.user_alerts.active.account.includes(:organization)
           end
 
-          def self.unfinished_b_params(bikes)
-            BParam.acknowledgment_pending.where(created_bike_id: bikes.map(&:id)).order(:id).index_by(&:created_bike_id)
+          def self.unfinished_b_params(bikes, user)
+            BParam.acknowledgment_pending.where(created_bike_id: bikes.map(&:id)).order(:id)
+              .select { it.unfinished_registration?(user) }.index_by(&:created_bike_id)
           end
 
           def initialize(bike:, current_user:, view: :list, user_alerts: [], unfinished_b_params: {})
@@ -35,7 +37,7 @@ module Pages
           private
 
           def cache_key
-            [self.class.cache_digest, @view, @bike]
+            [self.class.cache_digest, @view, @bike, impound_claim]
           end
 
           def grid? = @view == :grid
@@ -44,15 +46,41 @@ module Pages
 
           def thumb_image_url = @thumb_image_url ||= BikeServices::Displayer.thumb_image_url(@bike)
 
+          # A stock photo fills the frame, but the owner still hasn't added one of their own
           def photo_path
-            thumb_image_url ? bike_path(@bike) : edit_bike_path(@bike, edit_template: "photos")
+            @bike.thumb_path.present? ? bike_path(@bike) : edit_bike_path(@bike, edit_template: "photos")
           end
 
-          # An image's alt names the link; without one there is only an icon
-          def photo_label = (translation(".add_a_photo") unless thumb_image_url)
+          def add_photo_prompt
+            return if @bike.thumb_path.present?
 
-          # Only the exceptional statuses say when they began; being registered is the default
-          def status_time = (@bike.occurred_at unless @bike.status_with_owner? && !@bike.is_for_sale?)
+            tag.span(translation(".add_a_photo"), class: "tw:absolute tw:bottom-2 tw:left-2 tw:rounded-full tw:bg-white/90 tw:px-2.5 tw:py-0.5 tw:text-xs tw:font-semibold tw:text-gray-700 tw:dark:bg-gray-900/90 tw:dark:text-gray-200")
+          end
+
+          def strava_gear_link
+            strava_gear = @bike.strava_gear
+            return unless @bike.status_with_owner? && strava_gear.present?
+
+            link_to(strava_search_path(gear: strava_gear.strava_id), class: "tw:inline-flex tw:items-center tw:gap-1 tw:text-sm tw:text-gray-500 tw:dark:text-gray-400") do
+              safe_join([helpers.inline_svg_tag("logos/strava-symbol.svg", class: "tw:size-3.5", aria_hidden: true), strava_gear.strava_gear_display_name])
+            end
+          end
+
+          def impound_claim
+            return @impound_claim if defined?(@impound_claim)
+
+            @impound_claim = (@bike.impound_claims_submitting.active.last if @bike.status_stolen?)
+          end
+
+          def impound_claim_note
+            claimed_bike = impound_claim&.bike_claimed
+            return if claimed_bike.blank?
+
+            claimed_bike_link = link_to(translation(".this_claimed_bike_type", kind: impound_claim.kind, bike_type: claimed_bike.type),
+              bike_path(claimed_bike), class: "twlink-underlined")
+            tag.div(translation(".impound_claim_html", status: impound_claim.status_humanized.titleize, claimed_bike: claimed_bike_link),
+              class: "tw:text-sm tw:text-amber-700 tw:dark:text-amber-300")
+          end
 
           def sale_link_text
             @bike.is_for_sale ? translation(".update_listing") : translation(".list_for_sale")

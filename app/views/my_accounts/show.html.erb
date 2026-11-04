@@ -1,5 +1,5 @@
 <%= render(Pages::MyAccount::Show::Component.new(user: current_user, bikes: @bikes, pagy: @pagy, locks: @locks,
-      view: @view, locks_tab: @locks_active_tab, page_params: params)) %>
+      view: @view, locks_tab: @locks_active_tab, page_params: params.permit(:page, :per_page).to_h)) %>
 
 <% if OrganizedMailer.render_donation?(user: current_user, emails: [current_user.email]) %>
   <%# Cache this render callout to avoid allocations %>

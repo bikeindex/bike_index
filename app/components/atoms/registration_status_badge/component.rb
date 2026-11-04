@@ -40,7 +40,7 @@ module Atoms
 
       def call
         render(UI::Badge::Component.new(text: label, title: translation(".#{status_key}"), color: COLORS[status_key], size: @size)) do
-          tag.span(safe_join([tag.span(label, class: "tw:uppercase"), *time_suffix]), class: "tw:whitespace-nowrap")
+          tag.span(safe_join([tag.span(label, class: "tw:whitespace-nowrap tw:uppercase"), *time_suffix]))
         end
       end
 
@@ -48,10 +48,11 @@ module Atoms
 
       def label = @label ||= Bike.status_humanized_translated(status_humanized).titleize
 
-      # Plain spaces, so they collapse into the space the localizer puts before a time of day
+      # Plain spaces, so they collapse into the space the localizer puts before a time of day.
+      # The badge can break here rather than overflow a narrow card
       def time_suffix
         return [] if @time.blank?
-        [" · ", render(UI::Time::Component.new(time: @time))]
+        [" · ", tag.span(render(UI::Time::Component.new(time: @time)), class: "tw:whitespace-nowrap")]
       end
 
       def status_humanized

@@ -33,7 +33,7 @@ module Pages
 
         def view_toggles
           [[:grid, "icons/lucide-layout-grid.svg", translation(".grid_view")],
-            [:list, "icons/lucide-list.svg", translation(".list_view")]]
+            [:list, "icons/list.svg", translation(".list_view")]]
         end
 
         def toggle_classes(view)
@@ -45,7 +45,7 @@ module Pages
 
         def user_alerts = @user_alerts ||= Pages::MyAccount::Show::BikeBox::Component.user_alerts(@user)
 
-        def unfinished_b_params = @unfinished_b_params ||= Pages::MyAccount::Show::BikeBox::Component.unfinished_b_params(@bikes)
+        def unfinished_b_params = @unfinished_b_params ||= Pages::MyAccount::Show::BikeBox::Component.unfinished_b_params(@bikes, @user)
 
         def bikes_with_alerts
           @bikes_with_alerts ||= @bikes.select { |bike| unfinished_b_params.key?(bike.id) || user_alerts.any? { it.bike_id == bike.id } }

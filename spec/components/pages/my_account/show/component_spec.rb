@@ -7,8 +7,9 @@ RSpec.describe Pages::MyAccount::Show::Component, type: :component do
   let(:view) { :list }
   let(:locks_tab) { false }
   let(:pagy) { Pagy::Offset.new(count: user.bikes.count, page: 1, limit: 10) }
+  let(:page_params) { {} }
   let(:component) do
-    render_inline(described_class.new(user: user.reload, bikes: user.bikes.reorder(:id), pagy:, locks: user.locks, view:, locks_tab:))
+    render_inline(described_class.new(user: user.reload, bikes: user.bikes.reorder(:id), pagy:, locks: user.locks, view:, locks_tab:, page_params:))
   end
 
   context "without bikes or locks" do
@@ -44,6 +45,14 @@ RSpec.describe Pages::MyAccount::Show::Component, type: :component do
       expect(component).to have_text("LISTED-123")
       expect(component).to have_link("Grid view", href: "/my_account?view=grid")
       expect(component).to have_css("a[aria-current=true][aria-label='List view']")
+    end
+
+    context "paged" do
+      let(:page_params) { {page: "3", per_page: "50"}.with_indifferent_access }
+
+      it "keeps the page when switching view" do
+        expect(component).to have_link("Grid view", href: "/my_account?page=3&per_page=50&view=grid")
+      end
     end
 
     context "in the grid" do

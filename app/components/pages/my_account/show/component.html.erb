@@ -49,7 +49,7 @@
         "
       >
         <% view_toggles.each do |view, icon, label| %>
-          <%= link_to my_account_path(view:), class: toggle_classes(view), title: label, aria: {label:, current: ("true" if view == @view)} do %>
+          <%= link_to my_account_path(@page_params.merge(view:)), class: toggle_classes(view), title: label, aria: {label:, current: ("true" if view == @view)} do %>
             <%= helpers.inline_svg_tag(icon, class: "tw:size-[18px]", aria_hidden: true) %>
           <% end %>
         <% end %>

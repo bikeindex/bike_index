@@ -26,6 +26,19 @@ module Pages
             render_box(bike(id: 46), view: :grid)
           end
 
+          def grid_stolen
+            render_box(bike(id: 47, status: :status_stolen, occurred_at: 3.days.ago,
+              current_stolen_record: ::StolenRecord.new(city: "Chicago")), view: :grid)
+          end
+
+          def stock_photo
+            render_box(bike(id: 48, stock_photo_url: SharedBlocks::SearchResults::BikeBox::ComponentPreview.vehicles.first.thumb_path.sub("small_", "")))
+          end
+
+          def hidden_with_strava_gear
+            render_box(bike(id: 49, user_hidden: true, strava_gear: ::StravaGear.new(strava_id: "b1", name: "My Road Bike", gear_type: "bike")))
+          end
+
           def with_owner_with_photo
             render_box(bike(id: 44, thumb_path: SharedBlocks::SearchResults::BikeBox::ComponentPreview.vehicles.first.thumb_path))
           end

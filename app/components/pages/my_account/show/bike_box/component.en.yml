@@ -8,6 +8,9 @@ en:
             add_a_photo: Add a photo
             edit: Edit
             edit_registration: Edit %{bike_type}
+            impound_claim_html: "%{status} claim to %{claimed_bike}"
             list_for_sale: List for sale
             report_stolen: Mark stolen
+            this_claimed_bike_type: this %{kind} %{bike_type}
             update_listing: Update listing
+            user_hidden: Hidden from other users

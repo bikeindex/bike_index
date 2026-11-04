@@ -13,7 +13,7 @@ RSpec.describe Pages::MyAccount::Show::BikeBox::Component, type: :component do
 
   def box
     described_class.new(bike: bike.reload, current_user: user, user_alerts: described_class.user_alerts(user.reload),
-      unfinished_b_params: described_class.unfinished_b_params([bike]))
+      unfinished_b_params: described_class.unfinished_b_params([bike], user))
   end
 
   it "has an accent for every colour a registration's status can badge as" do
@@ -26,8 +26,77 @@ RSpec.describe Pages::MyAccount::Show::BikeBox::Component, type: :component do
     expect(component).to have_text("SUR-77120934")
     expect(component).to have_link("List for sale")
     expect(component).to have_link("Mark stolen")
-    expect(component).to have_css("a[aria-label='Add a photo'][href='/bikes/#{bike.id}/edit/photos']")
+    expect(component).to have_link("Add a photo", href: "/bikes/#{bike.id}/edit/photos")
     expect(component).not_to have_css("[role=alert]")
+    expect(component).not_to have_text("Hidden from other users")
+    expect(component).not_to have_link(href: /strava_search/)
+  end
+
+  context "with only a stock photo" do
+    before { bike.update(stock_photo_url: "https://bikebook.s3.amazonaws.com/uploads/Fr/10251/12_codacomp_bl.jpg") }
+
+    it "shows it, and still asks for a photo of their own" do
+      expect(component).to have_css("img[src*='small_12_codacomp_bl.jpg']")
+      expect(component).to have_link("Add a photo", href: "/bikes/#{bike.id}/edit/photos")
+    end
+  end
+
+  context "with a photo of their own" do
+    before { bike.update_column(:thumb_path, "https://files.bikeindex.org/uploads/Pu/1/small_bike.jpg") }
+
+    it "links the photo to the bike, without asking for one" do
+      expect(component).to have_css("a[href='/bikes/#{bike.id}'] img")
+      expect(component).not_to have_text("Add a photo")
+    end
+  end
+
+  context "hidden from other users" do
+    before { bike.update(marked_user_hidden: true) }
+
+    it "says so" do
+      expect(component).to have_text("Hidden from other users")
+    end
+  end
+
+  context "linked to Strava gear" do
+    let!(:strava_gear) { FactoryBot.create(:strava_gear, item: bike, name: "My Road Bike", strava_id: "b1234") }
+
+    it "links to Strava search for the gear" do
+      expect(component).to have_link("My Road Bike", href: "/strava_search?gear=b1234")
+    end
+  end
+
+  context "stolen, with an active impound claim" do
+    let(:stolen_record) { FactoryBot.create(:stolen_record, bike:) }
+    let(:bike_claimed) { FactoryBot.create(:bike) }
+    let(:impound_record) { FactoryBot.create(:impound_record, bike: bike_claimed) }
+    let!(:impound_claim) { FactoryBot.create(:impound_claim, stolen_record:, impound_record:, user:, status: :submitting) }
+
+    it "links to the bike it claims" do
+      expect(component).to have_text("Submitted claim to")
+      expect(component).to have_link("this found bike", href: "/bikes/#{bike_claimed.id}")
+    end
+  end
+
+  describe "unfinished_b_params" do
+    let!(:b_param) do
+      FactoryBot.create(:b_param_unfinished_registration, creator: user, created_bike_id: bike.id,
+        params: {bike: {manufacturer_id: bike.manufacturer_id, owner_email: owner_email}})
+    end
+    let!(:registration_sequence) { FactoryBot.create(:registration_sequence_acknowledgment_pending, b_param:, bike:) }
+    let(:owner_email) { user.email }
+
+    it "finds the one the user still has to finish" do
+      expect(described_class.unfinished_b_params([bike], user)).to eq(bike.id => b_param)
+    end
+
+    context "made for someone else, so its alert renders nothing" do
+      let(:owner_email) { "someone-else@example.com" }
+
+      it "leaves it out" do
+        expect(described_class.unfinished_b_params([bike], user)).to eq({})
+      end
+    end
   end
 
   context "in the grid" do
@@ -60,6 +129,7 @@ RSpec.describe Pages::MyAccount::Show::BikeBox::Component, type: :component do
     it "offers to update the listing, and says it's for sale" do
       expect(component).to have_text("For Sale")
       expect(component).to have_link("Update listing")
+      expect(component).not_to have_css(".localizeTime")
     end
   end
 
