@@ -2281,10 +2281,12 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(matched).to eq([["other_e", "acoustic"], ["acoustic"], ["complete", "frame"], ["complete"], ["small", "road"], ["road"], ["36", "28"], ["28", "40"], ["frame", "complete"], ["aluminum", "steel"], ["drop"], ["drop", "flat"], ["near"], ["s1000", "tiagra"], ["steel", "full"], ["commuting", "touring"]])
   end
 
-  it "shows and switches between the picked vehicles ahead of the index" do
+  it "shows what each of the catalog's files allows as it lands, keeping the picked vehicles if the index fails" do
     serve_bikebook_catalog
-    held = hold_bikebook_catalog_file("index.*")
-    visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_adv,m/specialized/2025/haul_st")
+    index = hold_bikebook_catalog_file("index.*")
+    comparison = hold_bikebook_catalog_file("comparison.*")
+    compared = bikebook_path(vehicle_models: "m/aventon/2026/level_4_adv,m/specialized/2025/haul_st")
+    visit compared
 
     expect(page).to have_css("[data-hw-combobox-chip]", text: "Aventón Level 4 ADV", wait: 10)
     expect(page).to have_css("link[rel='canonical']", visible: :all)
@@ -2303,7 +2305,7 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(page).to have_no_css("link[rel='canonical']", visible: :all)
     find_link("Components").send_keys(:shift)
 
-    held.pop.fallback
+    index.pop(timeout: 10).fallback
     # what the index adds: whether each is current, and the search
     expect(page).to have_css("[data-hw-combobox-chip]", text: "Specialized Haul ST current", wait: 10)
     expect(page).to have_no_css("#vehicle_models[disabled]")
@@ -2311,16 +2313,51 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(page).to have_current_path(/[?&]view=components\b/)
     # a keyboard's place among the vehicles, rather than the search that wasn't there to focus
     expect(page).to have_css("a:focus", text: "Components")
-  end
 
-  it "keeps the picked vehicles when the index doesn't load, whichever lands first" do
-    serve_bikebook_catalog
-    index = hold_bikebook_catalog_file("index.*")
+    # searching ahead of the comparison, which leaves what's typed as it adds the similar models
+    expect(page).to have_css("#vehicle-models-count", text: "matching", wait: 10)
+    expect(page).to have_no_button("Compare similar bikes to Level 4 ADV")
+    expect(page).to have_current_path(/[?&]search=1\b/)
+    type_into(find_field("vehicle_models"), "Soltera")
+    expect(page).to have_field("vehicle_models", with: /\ASoltera/)
+    comparison.pop(timeout: 10).fallback
+    expect(page).to have_button("Compare similar bikes to Level 4 ADV", wait: 10)
+    expect(page).to have_field("vehicle_models", with: /\ASoltera/, focused: true)
+    find_field("vehicle_models").send_keys(:escape)
+    expect(page).to have_button("Compare similar bikes to Level 4 ADV")
+    click_on "More filters"
+    choose_option("Frame material", "Carbon or Composite")
+    expect(page).to have_current_path(/[?&]frame_material=/)
+
+    # a model alone holds the similar models' line until the comparison lands
+    visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_adv")
+    expect(page).to have_css("nav[aria-label='Views']", wait: 10)
+    expect(comparison).to be_empty
+    index.pop(timeout: 10).fallback
+    expect(page).to have_css("#vehicle-models-count", text: "matching", visible: :all, wait: 10)
+    # the first render of the catalog, which crawlers see
+    expect(page).to have_css("link[rel='canonical']", visible: :all)
+    expect(page).to have_no_button("Compare similar bikes to Level 4 ADV")
+    tabs_top = -> { find("nav[aria-label='Views']").evaluate_script("this.getBoundingClientRect().top") }
+    before = tabs_top.call
+    comparison.pop(timeout: 10).fallback
+    expect(page).to have_css("#similar-toggle", text: "Compare similar bikes to Level 4 ADV", wait: 10)
+    expect(page).to have_no_css("[data-similar-waiting]", visible: :all)
+    expect(tabs_top.call).to be_within(1).of(before)
+
+    find("#similar-toggle").click
+    expect(page).to have_current_path(/[?&]similar=1\b/)
+    # reloaded open on them, the comparison asked for with the index still out
+    visit page.current_url
+    comparison.pop(timeout: 10).fallback
+    index.pop(timeout: 10).fallback
+    expect(page).to have_css("#similar-results", wait: 10)
+
+    # the index failing, whichever lands first
     kit = hold_bikebook_catalog_file("kit.*")
     failed = "#vehicle-viewers > [role='status']:first-child"
     not_found = {status: 404, headers: {"access-control-allow-origin" => "*"}, body: ""}
-    visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_adv,m/specialized/2025/haul_st")
-
+    visit compared
     index.pop(timeout: 10).fulfill(**not_found)
     expect(page).to have_text("The catalog didn't load. Reload the page to try again.", wait: 10)
     kit.pop(timeout: 10).fallback
@@ -2340,57 +2377,6 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(page).to have_current_path(/[?&]view=components\b/)
     expect(page).to have_css(failed, text: "The catalog didn't load.")
     expect(page).to have_field("vehicle_models", placeholder: "", disabled: true)
-  end
-
-  it "holds the similar models' line until the comparison lands, which a page open on them fetches alongside the index" do
-    serve_bikebook_catalog
-    index = hold_bikebook_catalog_file("index.*")
-    comparison = hold_bikebook_catalog_file("comparison.*")
-    visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_adv")
-
-    expect(page).to have_css("nav[aria-label='Views']", wait: 10)
-    expect(comparison).to be_empty
-    index.pop(timeout: 10).fallback
-    expect(page).to have_css("#vehicle-models-count", text: "matching", visible: :all, wait: 10)
-    expect(page).to have_no_button("Compare similar bikes to Level 4 ADV")
-    tabs_top = -> { find("nav[aria-label='Views']").evaluate_script("this.getBoundingClientRect().top") }
-    before = tabs_top.call
-    comparison.pop(timeout: 10).fallback
-    expect(page).to have_css("#similar-toggle", text: "Compare similar bikes to Level 4 ADV", wait: 10)
-    expect(page).to have_no_css("[data-similar-waiting]", visible: :all)
-    expect(tabs_top.call).to be_within(1).of(before)
-
-    find("#similar-toggle").click
-    expect(page).to have_current_path(/[?&]similar=1\b/)
-    # reloaded open on them, the comparison asked for with the index still out
-    visit page.current_url
-    comparison.pop(timeout: 10).fallback
-    index.pop(timeout: 10).fallback
-    expect(page).to have_css("#similar-results", wait: 10)
-  end
-
-  it "searches ahead of the comparison, leaving what's typed as it adds the similar models" do
-    serve_bikebook_catalog
-    held = hold_bikebook_catalog_file("comparison.*")
-    visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_adv,m/specialized/2025/haul_st")
-
-    expect(page).to have_css("#vehicle-models-count", text: "matching", wait: 10)
-    expect(page).to have_no_css("#vehicle_models[disabled]")
-    expect(page).to have_no_button("Compare similar bikes to Level 4 ADV")
-    # the first render adds to the URL, and crawlers see it
-    expect(page).to have_current_path(/[?&]search=1\b/)
-    expect(page).to have_css("link[rel='canonical']", visible: :all)
-    type_into(find_field("vehicle_models"), "Soltera")
-    expect(page).to have_field("vehicle_models", with: /\ASoltera/)
-
-    held.pop.fallback
-    expect(page).to have_button("Compare similar bikes to Level 4 ADV", wait: 10)
-    expect(page).to have_field("vehicle_models", with: /\ASoltera/, focused: true)
-    find_field("vehicle_models").send_keys(:escape)
-    expect(page).to have_button("Compare similar bikes to Level 4 ADV")
-    click_on "More filters"
-    choose_option("Frame material", "Carbon or Composite")
-    expect(page).to have_current_path(/[?&]frame_material=/)
   end
 
   it "keeps the search and its filters while the catalog loads, and says so when it doesn't" do
