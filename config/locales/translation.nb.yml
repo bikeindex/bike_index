@@ -1769,13 +1769,11 @@ nb:
       you_have_claimed_the_maximum_permitted: Du har gjort krav på det maksimalt tillatte
         antallet sykkelkoder.
     show:
-      change_the_bike_sticker_linked_to: Endre sykkelen den kobler til
       contact_the_owner: Kontakt eieren
       created_to_record_parking_notification: opprettet av %{organization} for å registrere
         et parkeringsvarsel
       from: fra
       in: i
-      is_this_linked_to_incorrect_bike: Er dette klistremerket knyttet til feil sykkel?
       know_something_about_this_bike_type: Vet du noe om dette %{bike_type}?
       link_url: Link url
       looking_for_correct_owner: Ser etter riktig eier av denne %{bike_type}!
@@ -1785,15 +1783,11 @@ nb:
       send_message: Sende melding
       share_it: Del det!
       spread_the_word: Spre ordet!
-      switch_to_new_bike_id: Bytt til en ny sykkel-ID
       test_registration: prøveregistrering
-      update: Oppdater
       view_users_other_registrations: Se brukerens andre registreringer
       where_did_you_see_this_bike: Hvor så du dette %{bike_type}? Hvis du kontakter
         om en annonse du fant på nettet, inkluderer du en lenke i feltet nedenfor
       write_them_a_message: Skriv en melding til dem
-      you_scanned_this_sticker_html: Du skannet klistremerket <strong>%{pretty_code}</strong>
-        , som er tilordnet denne %{bike_type}.
       view_public_non_listing: Se offentlig registrering
       viewing_listing_preview: Dette er en forhåndsvisning av annonsen din som er
         «til salgs». Den er ikke offentlig synlig.
@@ -1837,6 +1831,25 @@ nb:
     stolen_map:
       unavailable: Kartet kunne ikke lastes inn – nettleseren eller enheten din støtter
         det kanskje ikke.
+    owner_bike_status_alerts:
+      address: Adresse
+      by: Av
+      created: Opprettet
+      current_notifications:
+        one: "%{count} gjeldende varsel for denne %{bike_type}!"
+        other: "%{count} nåværende varsler for denne %{bike_type}!"
+      currently_impounded: Din %{bike_type} er for øyeblikket beslaglagt!
+      have_you_retrieved: Har du hentet denne %{bike_type}?
+      impounded_by_from_html: Beslaglagt %{time} av <strong>%{organization}</strong>
+        fra %{address}
+      impounded_by_html: Beslaglagt %{time} av <strong>%{organization}</strong>
+      kind: Snill
+      kind_by_organization_html: "- <em>%{kind}</em> - av <strong>%{organization}</strong>"
+      let_organization_know: Gi beskjed til %{organization}
+      mark_retrieved: marker hentet
+      notification: Melding#
+      notification_number: 'Varsel #%{number}'
+      was_this_retrieved: Ble denne %{bike_type} hentet?
   bikes_edit:
     accessories:
       add_a_component: Legg til en komponent
@@ -2153,12 +2166,12 @@ nb:
           bike_recovered: Sykkel merket gjenvunnet! Takk skal du ha!
       resolve_token:
         marked_remaining: "%{bike_type} merket gjenværende!"
-        marked_retrieved: "%{@bike_type} merket hentet!"
         notification_already_retrieved: At %{bike_type} allerede er merket som hentet!
         notification_impounded: At %{bike_type} har blitt beslaglagt! Kontakt %{org_name}
           for å hente den.
         unable_to_find_graduated_notification: Finner ikke det uteksaminerte varselet!
         unable_to_find_parking_notification: Finner ikke parkeringsvarselet!
+        bike_type_marked_retrieved: "%{bike_type} markert som hentet!"
       scanned:
         unable_to_find_sticker: 'Kan ikke finne klistremerke: %{scanned_id}'
       update:
@@ -3848,9 +3861,6 @@ nb:
       help_prevent_theft: Bidra til å forhindre sykkeltyveri,
       make_a_donation: gi en donasjon.
       the_bike_index_team: Sykkelindeksteamet
-    embed_layout:
-      error: feil
-      please_fix_the_following: Rett opp følgende
     payments_layout:
       be_a_bike_saver: Vær en sykkelsparer.
       support_bike_index_today: Støtt Bike Index i dag.
@@ -4203,7 +4213,6 @@ nb:
         gratis, i tre enkle trinn:'
       bike_index_account: Bike Index konto
       confirm_your_email: Bekreft e-posten din
-      error: feil
       fill_out_the_form_that_will_appear: Fyll ut skjemaet som vises på denne siden
         når du er logget på.
       filling_out_this_form_will_create_a_new_org: Ved å fylle ut dette skjemaet opprettes
@@ -4215,7 +4224,6 @@ nb:
       new_organization: Ny organisasjon
       organization_kind: Organisasjonsslag
       organization_name: Organisasjonsnavn
-      please_fix_the_following_errors: Vennligst fiks følgende %{errors}
       sign_up_for_a_new_account_html: Registrer deg for en %{new_account_link}
       you_are_already_a_member_of_org_html: Du er allerede medlem av %{org_link}.
       your_current_account_will_be_a_member_html: Din nåværende konto ( <strong>%{user_email}</strong>
@@ -4740,9 +4748,6 @@ nb:
     form:
       cancel_update: Avbryt oppdatering
       do_not_display: Ikke vis
-      error: Feil
-      errors_prevented_photo_from_saving: "%{errors_count} forhindret at bildet ble
-        lagret"
       image_name: Bildenavn
       no_one_will_be_able_to_see_this_image_exc: "(ingen vil kunne se dette bildet
         bortsett fra deg)"
