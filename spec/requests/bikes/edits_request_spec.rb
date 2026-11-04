@@ -422,5 +422,15 @@ RSpec.describe Bikes::EditsController, type: :request do
       expect(response.code).to eq("200")
       expect(response).to render_template(:versions)
     end
+
+    context "still syncing" do
+      let!(:strava_integration) { FactoryBot.create(:strava_integration, :syncing, user: current_user) }
+
+      it "renders the sync notice in an alert" do
+        get "#{base_url}/strava_gear"
+        expect(response).to render_template(:versions)
+        expect(Capybara.string(response.body)).to have_css("[role=alert]", text: "Strava sync hasn't finished yet")
+      end
+    end
   end
 end
