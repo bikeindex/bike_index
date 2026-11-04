@@ -98,30 +98,10 @@
         @apply tw:dark:bg-transparent tw:dark:text-inherit;
       }
     }
-
-    .alert-info {
-      @apply tw:dark:bg-blue-950 tw:dark:border-blue-800 tw:dark:text-blue-400;
-    }
-
-    .alert-success {
-      @apply tw:dark:bg-green-950 tw:dark:border-green-800 tw:dark:text-green-400;
-    }
-
-    .alert-warning {
-      @apply tw:dark:bg-yellow-950 tw:dark:border-yellow-800 tw:dark:text-yellow-400;
-    }
-
-    .alert-danger {
-      @apply tw:dark:bg-red-950 tw:dark:border-red-800 tw:dark:text-red-400;
-    }
-
-    .alert a {
-      @apply tw:dark:text-inherit tw:dark:underline;
-    }
   }
 
   .swagger-section {
-    @apply tw:dark:text-gray-300;
+    @apply tw:dark:text-gray-100;
 
     pre .string {
       @apply tw:dark:text-red-300;
@@ -137,7 +117,7 @@
 
     .docs-section-list a:not(.scrltrgt, :hover),
     .global-footer a {
-      @apply tw:dark:text-gray-300;
+      @apply tw:dark:text-gray-100;
     }
 
     .applications-list li {
@@ -151,7 +131,7 @@
 
   .swagger-ui-wrap {
     :is(p, li) {
-      @apply tw:dark:text-gray-300;
+      @apply tw:dark:text-gray-100;
     }
 
     th {
