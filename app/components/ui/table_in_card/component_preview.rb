@@ -5,6 +5,8 @@ require "ostruct"
 module UI
   module TableInCard
     class ComponentPreview < ApplicationComponentPreview
+      # @!group Variants
+
       # Narrower than its columns, so the first stays put while the rest scroll under it
       def default
         render_with_template(template: "ui/table_in_card/component_preview/default", locals: {records: [
@@ -21,6 +23,8 @@ module UI
           OpenStruct.new(id: index + 1, name:, model_name: cryptid)
         end})
       end
+
+      # @!endgroup
     end
   end
 end
