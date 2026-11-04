@@ -34,6 +34,16 @@ RSpec.describe Admin::ManufacturersController, type: :request do
       expect(assigns(:manufacturers).pluck(:id)).to eq([with_website.id])
     end
 
+    it "shows close_year undelimited, sortable" do
+      closed_later = FactoryBot.create(:manufacturer, close_year: 2015)
+      closed_earlier = FactoryBot.create(:manufacturer, close_year: 1992)
+
+      get base_url, params: {sort: "close_year"}
+      expect(response.status).to eq(200)
+      expect(assigns(:manufacturers).pluck(:id).first(2)).to eq([closed_earlier.id, closed_later.id])
+      expect(Capybara.string(response.body)).to have_css("td", text: /\A\s*2015\s*\z/)
+    end
+
     context "authenticated with an API token" do
       let(:current_user) { false }
       include_context :admin_doorkeeper_token

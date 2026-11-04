@@ -204,6 +204,8 @@ GEM
       bigdecimal
       rexml
     crass (1.0.8)
+    cruise (0.3.0-arm64-darwin)
+    cruise (0.3.0-x86_64-linux-gnu)
     css_parser (3.0.0)
       addressable
       ssrf_filter (~> 1.5)
@@ -378,8 +380,8 @@ GEM
       thor
       tilt
     hashdiff (1.2.1)
-    herb (0.10.3-arm64-darwin)
-    herb (0.10.3-x86_64-linux-gnu)
+    herb (0.11.1-arm64-darwin)
+    herb (0.11.1-x86_64-linux-gnu)
     highline (3.1.2)
       reline
     honeybadger (6.9.1)
@@ -686,9 +688,11 @@ GEM
       prism (>= 1.6.0)
       rbs (>= 4.0.0)
       tsort
-    reactionview (0.3.0)
+    reactionview (0.6.0)
       actionview (>= 7.0)
-      herb (>= 0.9.0, < 1.0.0)
+      cruise (>= 0.3.0)
+      herb (>= 0.11.0)
+      websocket (~> 1.2)
     redcarpet (3.6.1)
     redis (5.4.1)
       redis-client (>= 0.22.0)
@@ -891,6 +895,7 @@ GEM
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
       hashdiff (>= 0.4.0, < 2.0.0)
+    websocket (1.2.11)
     websocket-driver (0.8.2)
       base64
       websocket-extensions (>= 0.1.0)
