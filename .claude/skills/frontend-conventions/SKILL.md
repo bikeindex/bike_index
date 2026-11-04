@@ -8,7 +8,8 @@ description: >-
   (every button is `UI::Button`/`UI::ButtonLink`, every
   typeahead/autocomplete is `UI::Forms::Combobox`, every FAQ is
   `UI::Accordion`, never hand-rolled
-  markup), that **helpers are deprecated — render a view component
+  markup; existing components before new ones — never a wrapper around one to
+  dodge asking for a new `UI::*` argument, which needs the user's permission), that **helpers are deprecated — render a view component
   taking full keyword arguments instead of adding or extending one**,
   ViewComponent rules (when to write a partial instead, keyword arguments, instance variables,
   `helpers.` prefix in templates), and `UI::Time::Component` for every
@@ -16,8 +17,7 @@ description: >-
   when adding or modifying views (`.html.erb`), view components, Stimulus
   controllers, Tailwind classes, image or icon files under `app/assets/images`
   (which usually already exist), or any frontend code that touches styling
-  or interactivity — including admin screens, whose unlayered legacy CSS
-  inverts several of these rules. Stimulus.js is the
+  or interactivity. Stimulus.js is the
   JavaScript framework; SCSS and CoffeeScript files exist but are deprecated.
 ---
 
@@ -33,13 +33,14 @@ Scope it: every file a bare run rewrites that you've already read is re-injected
 
 - Tailwind classes have the prefix `tw:` (e.g. `tw:text-blue`, `tw:flex`, `tw:gap-4`).
   - The `tw:` prefix comes **before** variant modifiers, not after. Use `tw:dark:bg-gray-800`, `tw:hover:bg-blue-600`, `tw:sm:flex`, `tw:focus-visible:ring-2`. Never `dark:tw:bg-gray-800` — variant prefixes layer on top of `tw:`.
-  - **`dark` is a custom variant keyed to a `.dark` ancestor** (`app/assets/tailwind/application.css`), and nothing in the app sets that class — so `prefers-color-scheme: dark` renders the light page, and a dark-mode check means adding `.dark` to `<html>` by hand. Keep writing the variants; just don't read a light screenshot as a missing one.
+  - **`dark` is a custom variant keyed to a `.dark` ancestor** (`app/assets/tailwind/application.css`), and only the admin layout sets that class on a whole page, from `User#dark_mode_preview` — so outside `/admin`, `prefers-color-scheme: dark` renders the light page, and a dark-mode check means adding `.dark` to `<html>` by hand. Keep writing the variants; just don't read a light screenshot as a missing one.
 - Form fields should use the `twinput` class.
 - Labels should use the `twlabel` class.
 - Basic links should use the `twlink` class.
 - A link that should take the color of the text around it — inside an alert, a colored `<small>`, the review-app banner — uses `twlink-underlined` instead. Never hand-roll `tw:text-inherit tw:underline`. Its color must come from an ancestor, not a `tw:text-*` on the link itself, which would outrank the class at every state.
 - **A row of two or three things side by side uses `twfieldrow` or `twwiderow`**, not `tw:md:grid-cols-2`. `twfieldrow` is for fields that read as one control (a city and its state); `twwiderow` is for cards and sections, and `twwiderow twwiderow-3` for three of them. Both break on the row's own width rather than a viewport breakpoint, so a row nested in a narrow card breaks where it should. `UI::Card`'s `full_bleed:` is keyed to `twwiderow` by a container query, so it only bleeds inside one, and only once that row is single-column. All three are in `app/assets/tailwind/bike_index_components.css`.
 - The default text color is `tw:twtext-color` (`tw:twtext-color!` to force it). It's an `@utility`, hence the `tw:` prefix — **any Bike Index class that something `@apply`s has to be an `@utility`**; v4's `@apply` rejects a `@layer components` class with "Cannot apply unknown utility class".
+- **A horizontal scroller runs out to its container's edges, the container's padding inside it** — `twgutter-bleed tw:overflow-x-auto`, with `--gutter` set to that padding wherever it isn't the page's (`tw:[--gutter:--spacing(2.5)]` in a `px-2.5` table cell). One out to the window's edges is `twpagebleed`, padded `tw:px-(--gutter)`. `UI::Table`, `UI::Tabs` and `SharedBlocks::Marketing::RecoveryStories` are the pattern; a `tw:m-0` or `tw:p-0` beside `twgutter-bleed` undoes it. A scroller that is its own bordered box — a code block, `Atoms::CopyableCode` — scrolls inside its border instead.
 - **A custom `@utility` has no fixed rank against a core one it collides with** — Tailwind sorts custom and core utilities together, so `tw:twfullbleed` emits after `tw:border` while another pairing may go the other way. A hand-written `@layer utilities { }` block in `bike_index_components.css` *does* have a fixed rank: it emits after everything Tailwind generates, so it takes ties and needs no `@variant` or `!`. That's also how to define an unprefixed class name — `@utility` would force the `tw:` prefix. `.only-dev-visible` is the pattern for both. Grep `app/assets/builds/tailwind.css` for the two selectors when a collision matters.
 - **A `@layer components` rule loses to a utility class on the same element**, whatever the specificity — so a hand-written rule that sets `display` is inert against an element carrying `tw:grid` or `tw:flex`, silently. A variant utility has no such problem, and reaches further than it looks: `SharedBlocks::SearchResults::Frame` drives its whole loading swap off `tw:group`, `tw:peer` and an arbitrary `tw:peer-[[busy]:not(:has(>.search-results-card))]:block`, with no rule at all. `@custom-variant` when the state is worth naming for templates to use inline (`search-all-checked` is the pattern), and a long selector written out per utility in a component constant, since tailwind scans for whole class names.
 - **A Tailwind class a Stimulus controller toggles is a literal in that controller**, not a `static classes` value the template has to carry — `ui/table_controller.js` toggling `tw:overflow-x-scroll` is the pattern, and there are ~40 of those against one `static classes`. Tailwind scans `app/javascript`, so the utility is generated either way; reach for `static classes` only when call sites need different classes.
@@ -64,14 +65,12 @@ Scope it: every file a bare run rewrites that you've already read is re-injected
 
 Every legacy stylesheet wraps itself in `@layer legacy` (see `app/assets/stylesheets/legacy_includes/_css_layers.scss`), which sorts below tailwind's `components` and `utilities`. So a `UI::*` component rendered inside legacy-styled markup **wins over the surrounding stylesheet's rules for every property its own classes set** — `UI::Button`'s `tw:inline-flex`, `tw:p-0` and `twlink` beat `.primary-header-nav`'s `display`, `padding` and `color` no matter how specific those selectors are.
 
-**Admin is the exception, and it inverts the rule.** `app/assets/stylesheets/admin.scss` imports `legacy_includes/admin_unvendored` *outside* its `@layer legacy` block, so those rules are unlayered and beat every tailwind utility whatever the specificity. On an admin page a utility that collides with one needs `!` — and without it the class is inert, not merely outranked: `tw:-mb-px` on `.nav-tabs` looked like it was doing the work `.nav { margin-bottom: 0 }` was actually overriding. Check `getComputedStyle` rather than assuming the class landed.
-
-**`!important` reverses layer order**, so a legacy-layer `!important` beats a tailwind utility that isn't. A rule kept "just in case" in `revised.scss` is not inert — it is what paints. Delete the legacy rule rather than leaving it alongside; `revised.scss` is fully inside the layer, so the utility already wins without it. Only `admin_unvendored` genuinely needs an `!important` companion, because it is unlayered. `.only-dev-visible` (`app/assets/tailwind/bike_index_components.css`, plus the one surviving companion in `admin_unvendored.scss`) is the worked example.
+**`!important` reverses layer order**, so a legacy-layer `!important` beats a tailwind utility that isn't. A rule kept "just in case" in `revised.scss` is not inert — it is what paints. Delete the legacy rule rather than leaving it alongside; `revised.scss` is fully inside the layer, so the utility already wins without it.
 
 ## Two Tailwind v4 traps
 
 - **A build that was right can go wrong under you.** Each workspace runs its own `tailwindcss:watch`, and one can overwrite `app/assets/builds/tailwind.css` with a scan from before your edit — so a rule you just wrote is served, then isn't. Before believing a CSS change doesn't work, count it in the build (`grep -o '<class>' app/assets/builds/tailwind.css | wc -l`, since the file is minified onto few lines) and check the built file's mtime against the source's. `bin/rails tailwindcss:build` restores it.
-- **A grid item stretches to its row.** For a `<div>` that's invisible, but a bare `<table>` grid item spreads the extra height across its own rows, so two `table-list` panels side by side pull each other's rows tall. `tw:items-start` on the grid, or wrap the table in a `<div>`.
+- **A grid item stretches to its row.** For a `<div>` that's invisible, but a bare `<table>` grid item spreads the extra height across its own rows, so two `UI::TableList` panels side by side pull each other's rows tall. `tw:items-start` on the grid, or wrap the table in a `<div>`.
 
 ## Buttons: always `UI::Button` (and the UI component library generally)
 
@@ -87,7 +86,7 @@ Every legacy stylesheet wraps itself in `@layer legacy` (see `app/assets/stylesh
 
 - **An action that needs confirming passes `confirm:` alongside `method:`**, and the component renders a Turbo link rather than a `button_to` — an `<a>` carrying the method plus an `onclick` that Turbo's click handler honours. So a confirming action nests anywhere a link does, and no call site spells the mechanism out. `Pages::MyAccount::OrganizationRoles` is the worked example.
 
-The same instinct applies beyond buttons: **check `app/components/ui/` and `app/components/atoms/` before hand-rolling any UI primitive** (dropdowns → `UI::Dropdown`, tooltips → `UI::Tooltip`, form fields → `UI::Forms::*`, badges, modals, pagination, tables…). If a component exists for the pattern, use it; if it almost fits, extend it rather than forking its markup inline.
+The same instinct applies beyond buttons: **check `app/components/ui/` and `app/components/atoms/` before hand-rolling any UI primitive** (dropdowns → `UI::Dropdown`, tooltips → `UI::Tooltip`, form fields → `UI::Forms::*`, label-beside-value tables → `UI::TableList` — only email CSS still styles `.table-list`, so the legacy class renders bare on a page — inline code → `UI::Code::Inline`, a block of JSON → `UI::Code::Json`, badges, modals, pagination, tables…). If a component exists for the pattern, use it. **Never add an argument to a `UI::*` component without the user's explicit permission** — its arguments are the design system's surface, and one added for a single caller stays for every caller. If it almost fits, ask, and don't fork its markup inline meanwhile.
 
 **A marketing page — a `for_*` landing page, donate, membership, a how-it-works — renders inside `SharedBlocks::Marketing::Wrapper` and builds from its siblings** in `app/components/shared_blocks/marketing/` (`SectionHeading`, `NumberBlocks`, `IconFeature`, `RecoveryStories`, `CallToActionBanner`), with `Wrapper::Component::CONTAINER_CLASSES` as each section's width. A design handoff draws these blocks by hand, so its mock is no sign they're missing. `Pages::LandingPages::ForCities` and `Pages::LandingPages::ForCommunityGroups` are the pattern.
 
@@ -126,7 +125,7 @@ Any time you show, hide, or toggle an element in response to interaction, go thr
   collapse('show', this.formTarget)   // 'show' | 'hide' | 'toggle'; optional duration (default 200)
   ```
 
-The collapsible element starts hidden with the **`tw:hidden` class** (not the `hidden` attribute) — `collapse` toggles `tw:hidden`/`tw:hidden!` and runs the height/scale transition for you. Use **`tw:hidden!`** when the element also carries a display utility that sorts after `hidden` — any `inline-*`, which every `UI::Button` has — and on an admin page whenever the element carries a legacy class that sets `display` (`.row` and `.card` are the ones that come up), for the unlayered reason above. A plain `tw:hidden` renders that panel open, and no component spec can see it: the class is in the attribute, it just loses the cascade. Because the initial hidden state is a class, component specs assert it by class (`have_css("[…].tw\\:hidden")`), not Capybara visibility — the rack_test driver doesn't evaluate CSS, so it can't tell a class-hidden element is hidden.
+The collapsible element starts hidden with the **`tw:hidden` class** (not the `hidden` attribute) — `collapse` toggles `tw:hidden`/`tw:hidden!` and runs the height/scale transition for you. Use **`tw:hidden!`** when the element also carries a display utility that sorts after `hidden` — any `inline-*`, which every `UI::Button` has. A plain `tw:hidden` renders that panel open, and no component spec can see it: the class is in the attribute, it just loses the cascade. Because the initial hidden state is a class, component specs assert it by class (`have_css("[…].tw\\:hidden")`), not Capybara visibility — the rack_test driver doesn't evaluate CSS, so it can't tell a class-hidden element is hidden.
 
 ## No dead hooks in markup
 
@@ -164,6 +163,7 @@ Bundle only what's cohesive — one subject, assembled in one place. `IndexState
 
 This project uses the ViewComponent gem to render components.
 
+- **Prefer an existing component to a new one, extended if needed.** Before creating one, look for a component that already renders the pattern or its core — in `ui/`, `atoms/` and the sibling `pages/` namespaces. A new component whose template is mostly one existing `UI::*` component plus chrome is that component with an argument: ask to extend it (the no-new-argument rule above) rather than wrapping it to avoid asking. `UI::BulkTableCard`, folded into `UI::CardTable`'s `column_settings:`, is the pattern.
 - **Before creating a component, check it earns its class.** If its `component.rb` would hold nothing but `initialize` assigning arguments to ivars, and fewer than 3 callers render it, write a partial instead, with `<%# locals: (…) %>` at the top. An admin index table on `UI::Table` is the usual case: `admin/strava_gears/_table.html.erb` is the pattern, and `Pages::Admin::IndexSkeleton` renders the `_table` partial without a `table_view:`. A component earns its class with logic to name, a cache key to build, or a third caller; past that bar, prefer components to partials.
 - **If a view file only renders a single component, consider rendering it from the controller instead** (`render Foo::Component.new(...)`) and deleting the view file — the layout still wraps it.
 - Generate a new view component with `rails generate component ComponentName argument1 argument2`.

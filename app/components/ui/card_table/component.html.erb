@@ -1,7 +1,52 @@
-<%= tag.div(class: WRAPPER_CLASSES, data: wrapper_data) do %>
+<% table_html = tag.div(class: WRAPPER_CLASSES, data: wrapper_data) do %>
   <%= render(UI::Table::Component.new(**@table_options, classes: TABLE_CLASSES, unbordered: true)) do |table| %>
     <% @columns.each_with_index do |(options, block), index| %>
       <% table.column(**column_options(options, index), &block) %>
     <% end %>
   <% end %>
+<% end %>
+
+<% if @column_settings %>
+  <%# twfullbleed reads the twwiderow container %>
+  <div class="twwiderow tw:mb-4">
+    <%= card do %>
+      <%# Full bleed drops the card's gutter, so the header meets the page's %>
+      <div
+        class="
+          tw:flex tw:flex-wrap tw:items-center tw:justify-end tw:gap-x-4
+          tw:gap-y-2 tw:py-3 tw:@min-[672px]/twwiderow:px-4
+        "
+      >
+        <% if description? %>
+          <p class="tw:m-0 tw:text-xs tw:text-gray-500"><%= description %></p>
+        <% end %>
+
+        <div class="tw:ml-auto tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+          <% if actions? %>
+            <div class="tw:flex tw:flex-wrap tw:items-end tw:gap-2">
+              <%= actions %>
+            </div>
+          <% end %>
+
+          <%= render(UI::Collapse::Component.new(text: "Column settings", chevron: :trailing, size: :sm)) %>
+        </div>
+      </div>
+
+      <%= render(UI::TableColumnSettings::Component.new(**@column_settings.except(:storage_key), orderable: true)) %>
+
+      <%# Full bleed takes the table over the admin gutter, past the card, so it's clipped here. %>
+      <%# Wider, it's rounded to the card's rounded-xl inside its border, or the cells square the corners off %>
+      <div
+        class="
+          tw:overflow-hidden
+          tw:@max-[672px]/twwiderow:mx-[calc(var(--gutter)*-1)]
+          tw:@min-[672px]/twwiderow:rounded-b-[11px]
+        "
+      >
+        <%= table_html %>
+      </div>
+    <% end %>
+  </div>
+<% else %>
+  <%= table_html %>
 <% end %>

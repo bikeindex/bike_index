@@ -10,7 +10,7 @@ Skip it when the diff has no code in it — a docs- or skill-only branch gives i
 
 **Read `git diff` as soon as the agents return, before running anything.** An agent that stops mid-verification leaves its edit in the tree — including a sweeping edit it reverted to test, which then reads as your regression.
 
-**Brief the agents with the constraint, not the shape you think satisfies it.** "A cell block is instance_exec'd, so a component method is unreachable inside one" is a fact they can work from; "the lambda is required, judge only how it's used" is a conclusion, and it hid that `method(:…)` is how four sibling org tables already bind exactly that. Declining a finding is yours to do on the way back, not theirs to be told up front — the exception is a *second* run, where naming what a previous pass already triaged is what keeps them off it.
+**Brief the agents with the constraint, not the shape you think satisfies it.** "A cell block is instance_exec'd, so a component method is unreachable inside one" is a fact they can work from; "the lambda is required, judge only how it's used" is a conclusion, and it hid that `method(:…)` is how four sibling org tables already bind exactly that. Likewise "the user asked for a shared component" is a constraint, while "the user requested this new component" is a conclusion — it kept `UI::BulkTableCard` from the reuse reviewer, when the shared component was `UI::CardTable` extended. Declining a finding is yours to do on the way back, not theirs to be told up front — the exception is a *second* run, where naming what a previous pass already triaged is what keeps them off it.
 
 **On a second run against the same branch, scope it to the commits since the last one** — `/simplify` defaults to the whole branch diff, so re-running it resurfaces every finding already triaged, including the ones deliberately declined. Pass the range (`git diff <last-simplify-commit>..HEAD`) as its argument.
 
@@ -131,6 +131,16 @@ rtk proxy git diff origin/main...HEAD -G 'data-controller|controller:' --name-on
 ```
 
 For each controller named, look for one that already does its job — a shared one in `app/javascript/controllers/ui/` or the top level, or a sibling in another namespace — and for two in the branch's namespace doing the same thing. Fold a duplicate into the shared one, an option on it rather than a second controller, and delete the copy. `bikebook--center-current` into `ui--tabs` and `bikebook--image-fallback` into `image-fallback` are the pattern. Name each one you kept and what it does that nothing shared covers.
+
+### The component audit
+
+**Required when the branch adds a directory under `app/components/`.** List them:
+
+```bash
+rtk proxy git diff origin/main...HEAD --name-only --diff-filter=A -- 'app/components/**/component.rb'
+```
+
+For each, name the existing component it renders or duplicates. One that wraps a single `UI::*` component in chrome is that component with an argument — ask the user whether to fold it in, since a new `UI::*` argument needs their permission. `UI::BulkTableCard` into `UI::CardTable`'s `column_settings:` is the pattern.
 
 ### The cycle-type translation check
 

@@ -7,6 +7,8 @@ module Pages
         # The bikes whose manufacturer is Other, with a checkbox each so a batch of them can
         # be reassigned to one manufacturer.
         class Component < ApplicationComponent
+          COLUMNS = {info_cell: "Info", created_by_cell: "Created by"}.freeze
+
           def initialize(bikes:, index:, searched_other_name: nil)
             @bikes = bikes
             @index = index
@@ -14,15 +16,6 @@ module Pages
           end
 
           private
-
-          # The header cell checks and unchecks every row, through table-multi-checkbox on
-          # the form this table sits in
-          def toggle_all_button
-            tag.button(check_mark, type: "button", title: "Toggle all checked",
-              class: "twlink tw:cursor-pointer tw:border-0 tw:bg-transparent tw:p-0",
-              aria: {label: "Toggle all checked"},
-              data: {action: "click->table-multi-checkbox#toggleAll"})
-          end
 
           def description(bike)
             [bike.year, bike.frame_model, ("(#{bike.type})" unless bike.type == "bike")]

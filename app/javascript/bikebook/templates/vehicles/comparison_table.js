@@ -9,10 +9,6 @@ import { cargoAt, isCargo, tireWidth, typeLabel, wheelsAt } from 'bikebook/templ
 import { vehicleTitle } from 'bikebook/templates/vehicles/vehicle_title'
 import { array, isNumber, join, present, slice, sum } from 'bikebook/templates/values'
 
-// A row header's cell classes that keep it in view as a phone scrolls the table across, at its scroller's edge rather than
-// inside its gutter. Its inherited background outranks a row's own, which takes `!`
-export const PINNED_ROW_HEADER = 'tw:max-md:sticky tw:max-md:-left-(--gutter) tw:max-md:z-10 tw:max-md:border-r tw:max-md:bg-inherit'
-
 const GEOMETRY = ['reach', 'stack', 'top_tube_effective', 'head_angle', 'seat_angle', 'chainstay', 'standover', 'wheelbase']
 const BETTER = 'tw:text-green-700 tw:dark:text-green-400'
 const WORSE = 'tw:text-red-700 tw:dark:text-red-400'
@@ -21,10 +17,11 @@ const WEIGHT = { label: 'Weight', read: (vehicle, size) => size?.geometry?.total
 
 // The compared models' sizes, wheels and frames side by side in their `sizes`, each column's numbers against the
 // first's, keyed to the overlay by `frames`. `beside` the overlay, it shares a row with it once the window is wide enough.
+// `corner` fills its top left cell.
 // A row's `better` is the sign of a difference that's an improvement, a longer wheelbase, 0 for one that's neither, and
 // none for a value that isn't compared. `parts` splits a value whose parts are each compared, and `amount` shows a
 // difference, given the number it's of
-export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], market, highlight, beside = false }) => {
+export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], market, highlight, beside = false, corner = nothing }) => {
   const named = vehicles.map(({ data }) => presenter.named(presenter.kit.schemas.vehicle, data))
   const [first] = named
   const show = (row, value, vehicle) => row.format?.(value, vehicle, presenter) ?? (row.unit ? presenter.measurement(value, row.unit, row.key) : value)
@@ -112,7 +109,7 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], marke
       return {
         label: row.label,
         // lit as the drawings' `highlight` figure is
-        className: row.key && row.key === highlight ? 'tw:bg-[#3397dc]/10!' : undefined,
+        className: row.key && row.key === highlight ? 'tw:bg-[#3397dc]/10' : undefined,
         cell: (index) => {
           if (!present(values[index])) return missing
           return row.parts
@@ -121,7 +118,7 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], marke
         }
       }
     })
-  const size = { label: 'Size', cell: sizeCell, className: 'tw:bg-blue-50! tw:dark:bg-blue-950!' }
+  const size = { label: 'Size', cell: sizeCell, className: 'tw:bg-blue-50 tw:dark:bg-blue-950' }
   const sizeRows = sizes.some(Boolean) ? [size] : []
   const cargos = new Map(named.map((vehicle, index) => [vehicle, cargoAt(presenter, vehicles[index].data, sizes[index])]))
   const cargoRows = vehicles.some(({ data }) => isCargo(data)) ? records([{ label: 'Cargo', read: (vehicle) => cargos.get(vehicle) }]) : []
@@ -135,7 +132,7 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], marke
     classes: 'tw:mx-auto tw:min-w-[min(100%,78rem)]!',
     records: rows,
     columns: [
-      { label: html`<span class="tw:sr-only">Spec</span>`, rowHeader: true, classes: 'tw:font-bold tw:max-md:min-w-28 tw:md:whitespace-nowrap tw:align-top', cellClass: (record) => `${PINNED_ROW_HEADER} ${record.className ?? ''}`, cell: (record) => record.label },
+      { label: html`<span class="tw:sr-only">Spec</span>${corner}`, rowHeader: true, classes: 'tw:font-bold tw:max-md:min-w-28 tw:md:whitespace-nowrap tw:align-top', cellClass: (record) => record.className, cell: (record) => record.label },
       ...named.map((vehicle, index) => {
         const border = seriesBorders(frames, index)
         return {
@@ -145,7 +142,7 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], marke
           classes: 'tw:min-w-48 tw:align-top',
           headerClasses: border.top,
           // a model's name can wrap in its header, but not a value
-          cellClass: (record) => `tw:whitespace-nowrap ${record.className ?? ''}`,
+          cellClass: (record) => `tw:whitespace-nowrap ${record.className ?? ''} ${record === rows.at(-1) ? border.bottom : ''}`,
           cell: (record) => record.cell(index)
         }
       })

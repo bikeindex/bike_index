@@ -2,15 +2,15 @@
 
 module UI
   module ColorSwatch
-    # A small square showing a bike color. The display-less "cover-up" color
+    # A small square showing a color. The display-less "cover-up" color
     # renders Color::COVER_UP_SWATCH's multicolor blend instead of a solid fill.
     #
-    # Decorative: every caller prints the color name beside the swatch, so giving the
+    # Decorative: every caller prints a name beside the swatch, so giving the
     # swatch an accessible name of its own would announce "Red Red".
     class Component < ApplicationComponent
       # leading-[0] collapses the empty box's line-height strut so align-baseline
       # sits its bottom on the text baseline instead of floating above it
-      BASE_CLASSES = "tw:inline-block tw:leading-[0] tw:rounded-xs tw:border tw:border-black/20"
+      BASE_CLASSES = "tw:inline-block tw:leading-[0] tw:rounded-xs tw:border tw:border-black/20 tw:dark:border-white/20"
 
       SIZES = {sm: "tw:h-3 tw:w-3", md: "tw:h-6 tw:w-6"}.freeze
 

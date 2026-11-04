@@ -26,11 +26,11 @@
     <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :short_name, label_text: "Short name (30 letters or less)")) do |group| %>
       <% if @organization.saml_active? %>
         <% group.with_helper_text do %>
-          <span class="em text-danger">locked while SAML SSO is active - deactivate it first</span>
+          <em class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">locked while SAML SSO is active - deactivate it first</em>
         <% end %>
       <% elsif @organization.block_short_name_edit? %>
         <% group.with_helper_text do %>
-          <span class="em text-danger">warning - will change org URLs (landing pages, embeds)</span>
+          <em class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">warning - will change org URLs (landing pages, embeds)</em>
         <% end %>
       <% end %>
     <% end %>
@@ -52,7 +52,7 @@
   </div>
 
   <div>
-    <% previous_slug_note = tag.em("Rarely unnecessary", class: "text-warning") %>
+    <% previous_slug_note = tag.em("Rarely unnecessary", class: UI::Alerts::Base::Component::TEXT_CLASSES[:warning]) %>
 
     <% if @display_dev_info %>
       <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :previous_slug, label_text: "Previous Slug", html_options: {class: "only-dev-visible"})) do |group| %>
@@ -88,7 +88,7 @@
 
     <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :parent_organization_id, label_text: "Parent organization")) do |group| %>
       <% group.with_label_note do %>
-        <strong class="text-danger">(probably) do not add parents!</strong>
+        <strong class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">(probably) do not add parents!</strong>
         Parents must be part of the same organization
       <% end %>
 
@@ -103,10 +103,10 @@
 
   <div>
     <% if @display_dev_info %>
-      <div class="only-dev-visible mt-4 tw:mb-2 tw:p-2">
+      <div class="only-dev-visible tw:mt-6 tw:mb-2 tw:p-2">
         <%= render(UI::Forms::Group::Component.new(attribute: :manual_pos_kind, label_text: "Manually set POS kind")) do |group| %>
           <% group.with_helper_text do %>
-            <span class="text-danger">Warning - you can break things here!</span>
+            <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">Warning - you can break things here!</span>
           <% end %>
 
           <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "organization[manual_pos_kind]", entries: manual_pos_kind_entries, selected: selected_manual_pos_kind)) %>
@@ -138,7 +138,7 @@
     <% if @organization.official_manufacturer? %>
       <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :manufacturer_id, label_text: Organization.human_attribute_name(:manufacturer), required: true)) do |group| %>
         <% group.with_helper_text do %>
-          <strong>This organization has <code>Official manufacturer organization</code> enabled.</strong>
+          <strong>This organization has <%= render(UI::Code::Inline::Component.new(text: "Official manufacturer organization")) %> enabled.</strong>
           Select a manufacturer to give them manufacturer access.
         <% end %>
 

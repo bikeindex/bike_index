@@ -1,10 +1,11 @@
 import { html, nothing, render } from 'lit-html'
 import { frameGeometry, OVERALL_LENGTH_ESTIMATE } from 'bikebook/frame_geometry'
 import { missing, numberDisplay } from 'bikebook/templates/helpers'
+import { inlineBadge } from 'bikebook/templates/ui/badge'
 import { collapse } from 'bikebook/templates/ui/collapse'
 import { definitionListContainer } from 'bikebook/templates/ui/definition_list/container'
 import { definitionListRow } from 'bikebook/templates/ui/definition_list/row'
-import { jsonDisplay } from 'bikebook/templates/ui/json_display'
+import { codeJson } from 'bikebook/templates/ui/code/json'
 import { tooltip } from 'bikebook/templates/ui/tooltip'
 import { componentGroup, matchingRow, pairedComponents } from 'bikebook/templates/vehicles/component_group'
 import { geometryCard } from 'bikebook/templates/vehicles/geometry_card'
@@ -48,6 +49,8 @@ const WIDE_TIRE = 50
 const MAX_LOAD = 'Max load (rider + cargo)'
 const GROSS_WEIGHT = 'Gross weight rating (bike + rider + cargo)'
 const FRAME_LABELS = { max_weight_total: MAX_LOAD, gross_weight_rating: GROSS_WEIGHT }
+// In the box rather than on the bike, so listed apart and never compared part by part
+const INCLUDED = 'included_not_installed'
 
 export const US_CLASS = /^evc\/us\/class_(\d)$/
 // (tire_width / 25.4).round(1) is a Float, so a whole inch still reads 2.0
@@ -118,7 +121,7 @@ export const componentsOf = ({ presenter, vehicles, others }) => {
   const groups = viewers[0].componentRows(viewers.map((viewer) => viewer.vehicle))
   return new Map(vehicles.map(({ key }, index) => [key, html`<div class="tw:space-y-4">${viewers[index].components({
     groups, index, compared: others(key).map((other) => vehicles.findIndex(({ data }) => data === other))
-  })}</div>`]))
+  })}${viewers[index].inTheBox()}</div>`]))
 }
 
 class ModelViewer {
@@ -162,11 +165,11 @@ class ModelViewer {
       data-controller="ui--collapse ui--alert" data-ui--collapse-param-value="json"
       data-ui--collapse-direction-value="horizontal"><article class="twgutter tw:w-full tw:min-w-0 tw:space-y-6
       tw:rounded-sm tw:border tw:border-gray-200 tw:dark:border-gray-700 tw:bg-white tw:dark:bg-gray-800 tw:pt-4 tw:pb-6 tw:[--gutter:--spacing(6)]
-      ${comparing ? 'tw:md:max-w-[56rem] tw:lg:flex-1' : 'tw:lg:w-[56rem] tw:lg:shrink-0'}">${header}${specs}${this.description()}${this.sizesDisclosure()}${present(this.vehicle.components)
-      ? html`<section class="tw:space-y-4"><h2 class="tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">Components</h2>${this.components()}</section>`
+      ${comparing ? 'tw:md:max-w-[56rem] tw:lg:flex-1' : 'tw:lg:w-[56rem] tw:lg:shrink-0'}">${header}${specs}${this.description()}${this.sizesDisclosure()}${present(this.data.components)
+      ? html`<section class="tw:space-y-4"><h2 class="tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">Components</h2>${this.components()}${this.inTheBox()}</section>`
       : nothing}</article><aside
       id=${jsonPanelId} class="twjson-panel tw:hidden tw:w-full tw:min-w-0 tw:lg:relative tw:lg:w-[28rem] tw:lg:shrink-0" data-ui--collapse-target="content">${
-        jsonDisplay({ data: this.data, small: true, noMaxHeight: true })}</aside></div>`
+        codeJson({ data: this.data, small: true, noMaxHeight: true })}</aside></div>`
   }
 
   photo (photo, titleText, frame = 'tw:mb-6 tw:aspect-[3/2]') {
@@ -178,9 +181,13 @@ class ModelViewer {
       alt="" class="tw:aspect-square tw:h-16 tw:min-h-0 tw:w-auto" src=${this.kit.placeholder_url}><span class="tw:text-sm tw:leading-none">No photo</span></div></div>`
   }
 
-  // Values by their vocabulary names, then the frame's mount labels and each suspension's values
+  // Values by their vocabulary names, the parts in the box apart, then the frame's mount labels and each suspension's values
   #normalize (data) {
-    const vehicle = this.presenter.named(this.kit.schemas.vehicle, data)
+    const components = array(data.components)
+    const vehicle = {
+      ...this.presenter.named(this.kit.schemas.vehicle, { ...data, components: components.filter(({ type }) => type !== INCLUDED) }),
+      included: components.filter(({ type }) => type === INCLUDED)
+    }
     const frame = vehicle.frame && { ...vehicle.frame, ...this.#frameMounts(vehicle.frame, vehicle.sizes) }
     const suspension = Object.fromEntries(Object.keys(this.kit.viewer.suspensions)
       .map((position) => [position, this.#suspension(vehicle, position)]).filter(([, values]) => values != null))
@@ -484,7 +491,7 @@ class ModelViewer {
     const { first_year: first, final_year: final } = this.vehicle
     if (blank(first)) return null
     if (final === first) return String(first)
-    return join([first, ' – ', presence(final) ?? 'current'])
+    return join([first, ' – ', presence(final) ?? inlineBadge({ text: 'current', size: 'sm' })])
   }
 
   specRows (key, fields = key === 'frame' ? this.kit.viewer.frame_fields : this.kit.schemas.vehicle[key].fields, labels = {}) {
@@ -633,8 +640,10 @@ class ModelViewer {
     ], ' ')
   }
 
+  // Wraps only between cups
   shisCode (code, size = 'tw:text-xs') {
-    return html`<code class="tw:rounded-sm tw:border tw:border-gray-200 tw:dark:border-gray-700 tw:px-1.5 tw:py-0.5 tw:font-mono tw:whitespace-nowrap ${size}">${code}</code>`
+    return html`<code class="tw:rounded-sm tw:border tw:border-gray-200 tw:dark:border-gray-700 tw:px-1.5 tw:py-0.5 tw:font-mono tw:whitespace-normal tw:box-decoration-clone ${
+      size}">${join(code.split(/\s*\|\s*/).map((cup) => html`<span class="tw:whitespace-nowrap">${cup}</span>`), ' | ')}</code>`
   }
 
   millimeters (value, suffix = null) {
@@ -896,7 +905,7 @@ class ModelViewer {
       param: 'sizes',
       label: 'sizes',
       heading: html`Sizes & geometry <span class="tw:ml-1 tw:font-mono tw:text-sm tw:font-normal tw:tracking-normal tw:opacity-65 tw:normal-case">${numberDisplay(sizes.length)}</span>`,
-      content: html`<div data-ui--collapse-target="content" class="tw:-mx-(--gutter)">${this.sizes()}</div>`
+      content: html`<div data-ui--collapse-target="content">${this.sizes()}</div>`
     })
   }
 
@@ -905,9 +914,8 @@ class ModelViewer {
     if (blank(sizes)) return nothing
 
     const others = this.others.map((other) => other.sizes)
-    // padded inside the scroller, so its cards scroll out to the edges of the card it bleeds across, which scrolls to the
-    // selected one as ui--tabs does its active tab
-    return html`<div data-controller="ui--tabs" class="tw:overflow-x-auto tw:px-(--gutter) tw:pb-3.5"><div data-ui--tabs-target="row"
+    // its cards scrolling out to the edges of the card it's on, and to the selected one as ui--tabs does its active tab
+    return html`<div data-controller="ui--tabs" class="twgutter-bleed tw:overflow-x-auto tw:pb-3.5"><div data-ui--tabs-target="row"
       class="tw:flex tw:w-max tw:min-w-full tw:gap-4">${sizes.map((size) => geometryCard({
         presenter: this.presenter,
         size,
@@ -950,6 +958,14 @@ class ModelViewer {
         alignKey: layout && name
       })]
     })
+  }
+
+  inTheBox () {
+    if (blank(this.vehicle.included)) return nothing
+
+    return html`<div class="tw:space-y-2"><h3 class="tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">In the box</h3><ul
+      class="tw:list-disc tw:space-y-1 tw:pl-5 tw:text-sm">${this.vehicle.included.map(({ type_detail: detail, description }) =>
+      html`<li>${present(detail) ? html`<span class="tw:font-bold">${detail}</span> ` : nothing}${description}</li>`)}</ul></div>`
   }
 }
 

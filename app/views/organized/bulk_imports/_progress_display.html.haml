@@ -1,9 +1,9 @@
 - show_extended ||= false
 - if bulk_import.blocking_error?
-  %span.text-danger
+  %span{class: UI::Alerts::Base::Component::TEXT_CLASSES[:error]}
     Failed
   - if show_extended
-    %em.small.less-strong
+    %em.twless-strong{class: "tw:text-sm"}
       - if bulk_import.timeout_failure?
         Processing timed out
       - else
@@ -11,12 +11,12 @@
     - if bulk_import.timeout_failure? && display_dev_info?
       %small.only-dev-visible
         currently
-        %code= bulk_import.progress
+        = render(UI::Code::Inline::Component.new(text: bulk_import.progress, small: true))
 - else
-  - bulk_import_progress_class = bulk_import.progress == "finished" ? "text-success" : ""
+  - bulk_import_progress_class = bulk_import.progress == "finished" ? UI::Alerts::Base::Component::TEXT_CLASSES[:success] : ""
   %span{class: bulk_import_progress_class}
     = bulk_import.progress
   - if show_extended && bulk_import.line_errors.present?
-    %em.small.less-strong
+    %em.twless-strong{class: "tw:text-sm"}
       error did NOT block import
 

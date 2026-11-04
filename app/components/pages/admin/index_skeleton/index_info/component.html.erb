@@ -1,0 +1,9 @@
+<div class="tw:mt-6 tw:*:mb-4">
+  <% rows.each do |row| %>
+    <p>
+      <%= row[:subject] %>
+      <%= render(UI::ButtonLink::Component.new(href: url_for(@index.sortable_search_params.merge(row[:key] => nil)), text: row[:view_all_text], color: :link_gray, html_class: "tw:text-sm")) %>
+      <%= row[:detail] %>
+    </p>
+  <% end %>
+</div>

@@ -89,6 +89,7 @@ class OrganizationFeature < ApplicationRecord
   has_many :invoice_organization_features
   has_many :invoices, through: :invoice_organization_features
 
+  validates_presence_of :name
   validates_uniqueness_of :name
 
   after_commit :update_invoices

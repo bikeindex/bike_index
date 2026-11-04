@@ -44,7 +44,7 @@
       <%= public_image.kind&.titleize %>
 
       <% if render_sortable %>
-        <%= link_to search_emoji, url_for(sort_state.search_params.merge(search_kind: public_image.kind)), class: "display-sortable-link small" %>
+        <%= link_to search_emoji, url_for(sort_state.search_params.merge(search_kind: public_image.kind)), class: "display-sortable-link tw:text-sm" %>
       <% end %>
     <% end %>
 
@@ -52,7 +52,7 @@
       <%= public_image.imageable_type %>
 
       <% if render_sortable %>
-        <%= link_to search_emoji, url_for(sort_state.search_params.merge(search_imageable_type: public_image.imageable_type)), class: "display-sortable-link small" %>
+        <%= link_to search_emoji, url_for(sort_state.search_params.merge(search_imageable_type: public_image.imageable_type)), class: "display-sortable-link tw:text-sm" %>
       <% end %>
     <% end %>
 

@@ -1,5 +1,64 @@
-<% nav_header_list_items = capture do %>
-  <li>
+<% rendered_chart = nil %>
+
+<% if @render_chart %>
+  <% rendered_chart = capture do %>
+    <%= render(UI::Chart::Component.new(series: time_range_counts(collection: available_recoveries, column: @time_range_column), time_range: @time_range, stacked: true)) %>
+
+    <div class="tw:my-6">
+      <%= render(UI::Container::Component.new) do %>
+        <%# duplicates some stuff from counts.rb %>
+        <% valued_recoveries = available_recoveries.pluck(:estimated_value).reject(&:blank?) %>
+        <% recovery_amount = valued_recoveries.sum + (available_recoveries.count - valued_recoveries.count) * Counts.recovery_average_value %>
+
+        <%= render(UI::TableList::Component.new(wide_definition: true, classes: "tw:[&_th]:not-italic")) do |list| %>
+          <% list.with_row(label: "With user entered value", class: "tw:text-sm", value: number_display(valued_recoveries.count)) %>
+
+          <% list.with_row(label: "Total user entered value", class: "tw:text-sm", value: safe_join(["$", number_display(valued_recoveries.sum)])) %>
+
+          <% list.with_row(label: "Average stolen value", class: "tw:text-sm", value: safe_join(["$", number_display(Counts.recovery_average_value)])) %>
+
+          <% list.with_row(label: "Total estimated value", value: safe_join(["$", number_display(recovery_amount)])) %>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+<% end %>
+
+<% admin_search_form = capture do %>
+  <%= form_with(url: admin_recoveries_path, method: :get, html: {class: "twsearchrow"}) do |form| %>
+    <%= hidden_field_tag :search_recovery_display_status, @recovery_display_status %>
+    <%= hidden_field_tag :search_index_helped_recovery, params[:search_index_helped_recovery] %>
+    <%= hidden_field_tag :search_shareable, params[:search_shareable] %>
+    <%= hidden_field_tag :search_displayed, params[:search_displayed] %>
+    <%= render partial: "/shared/hidden_search_fields" %>
+
+    <em class="twless-strong tw:hidden tw:text-sm tw:md:inline">within</em>
+
+    <%= render(UI::Forms::Input::Component.new(form_builder: form, attribute: :search_distance, kind: :number_field,
+      html_options: {value: @distance, class: "tw:w-20"})) %>
+
+    <em class="twless-strong tw:hidden tw:text-sm tw:md:inline">miles of</em>
+
+    <%= render(UI::Forms::Input::Component.new(form_builder: form, attribute: :search_location,
+      html_options: {value: params[:search_location], placeholder: "anywhere"})) %>
+
+    <%= render(UI::Button::Component.new(text: "Search", color: :primary, type: "submit", name: "search")) %>
+  <% end %>
+<% end %>
+
+<% table_view = capture do %>
+  <%= render(Pages::Admin::Recoveries::Table::Component.new(recoveries: @recoveries, sort_state:)) %>
+<% end %>
+
+<%= render(Pages::Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
+  collection: @recoveries,
+  viewing: "Recoveries",
+  rendered_chart:,
+  admin_search_form:,
+  table_view:,
+)) do |skeleton| %>
+  <% skeleton.with_nav_item do %>
     <%= render(UI::Dropdown::Component.new(name: "#{@recovery_display_status.titleize} #{"statuses" if @recovery_display_status == "all"}", button_size: :sm,
           active: @recovery_display_status != "waiting_on_decision")) do |dropdown| %>
       <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All statuses", path: url_for(sortable_search_params.merge(search_recovery_display_status: "all")), match_params: {search_recovery_display_status: "all"}) } %>
@@ -9,99 +68,18 @@
         <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: recovery_display_status.to_s.humanize, path: url_for(sortable_search_params.merge(search_recovery_display_status: recovery_display_status)), match_params: {search_recovery_display_status: recovery_display_status}) } %>
       <% end %>
     <% end %>
-  </li>
+  <% end %>
 
-  <li>
+  <% skeleton.with_nav_item do %>
     <%= render(UI::Dropdown::Component.new(name: params[:search_displayed].present? ? "Only #{params[:search_displayed].titleize}" : "Displayed and not", button_size: :sm,
           active: params[:search_displayed].present?)) do |dropdown| %>
       <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Displayed and not", path: url_for(sortable_search_params.merge(search_displayed: nil)), match_params: {search_displayed: nil}) } %>
       <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Only Displayed", path: url_for(sortable_search_params.merge(search_displayed: "displayed")), match_params: {search_displayed: "displayed"}) } %>
       <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Only not displayed", path: url_for(sortable_search_params.merge(search_displayed: "not_displayed")), match_params: {search_displayed: "not_displayed"}) } %>
     <% end %>
-  </li>
-
-  <li>
-    <%= render(UI::ButtonLink::Component.new(text: "Shareable", href: url_for(sortable_search_params.merge(search_shareable: !@shareable)), size: :sm, active: @shareable)) %>
-  </li>
-
-  <li>
-    <%= render(UI::ButtonLink::Component.new(text: "Index Helped", href: url_for(sortable_search_params.merge(search_index_helped_recovery: !@index_helped_recovery)), size: :sm, active: @index_helped_recovery)) %>
-  </li>
-<% end %>
-
-<% rendered_chart = nil %>
-
-<% if @render_chart %>
-  <% rendered_chart = capture do %>
-    <%= render(UI::Chart::Component.new(series: time_range_counts(collection: available_recoveries, column: @time_range_column), time_range: @time_range, stacked: true)) %>
-
-    <div class="row mt-4 mb-4">
-      <div class="col-sm-6 offset-sm-3">
-        <table class="table-list wide-definition no-italic-definition">
-          <%# duplicates some stuff from counts.rb %>
-          <% valued_recoveries = available_recoveries.pluck(:estimated_value).reject(&:blank?) %>
-          <% recovery_amount = valued_recoveries.sum + (available_recoveries.count - valued_recoveries.count) * Counts.recovery_average_value %>
-
-          <tbody>
-            <tr class="small">
-              <td>With user entered value</td>
-              <td><%= number_display(valued_recoveries.count) %></td>
-            </tr>
-
-            <tr class="small">
-              <td>Total user entered value</td>
-              <td>$<%= number_display(valued_recoveries.sum) %></td>
-            </tr>
-
-            <tr class="small">
-              <td>Average stolen value</td>
-              <td>$<%= number_display(Counts.recovery_average_value) %></td>
-            </tr>
-
-            <tr>
-              <td>Total estimated value</td>
-              <td>$<%= number_display(recovery_amount) %></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
   <% end %>
+
+  <% skeleton.with_nav_item { render(UI::ButtonLink::Component.new(text: "Shareable", href: url_for(sortable_search_params.merge(search_shareable: !@shareable)), size: :sm, active: @shareable)) } %>
+
+  <% skeleton.with_nav_item { render(UI::ButtonLink::Component.new(text: "Index Helped", href: url_for(sortable_search_params.merge(search_index_helped_recovery: !@index_helped_recovery)), size: :sm, active: @index_helped_recovery)) } %>
 <% end %>
-
-<% admin_search_form = capture do %>
-  <%= form_tag admin_recoveries_path, method: :get, class: "form-inline mb-4 mt-4" do %>
-    <%= hidden_field_tag :search_recovery_display_status, @recovery_display_status %>
-    <%= hidden_field_tag :search_index_helped_recovery, params[:search_index_helped_recovery] %>
-    <%= hidden_field_tag :search_shareable, params[:search_shareable] %>
-    <%= hidden_field_tag :search_displayed, params[:search_displayed] %>
-    <%= render partial: "/shared/hidden_search_fields" %>
-
-    <div class="form-group ml-auto mr-1 mb-2">
-      <em class="small less-strong mr-1 d-md-inline d-none">within</em>
-      <%= number_field_tag :search_distance, @distance, class: "form-control", style: "width: 5rem;" %>
-
-      <em class="small less-strong ml-1 mr-1 d-md-inline d-none"> miles of </em>
-    </div>
-
-    <div class="form-group mr-2 mb-2">
-      <%= text_field_tag :search_location, params[:search_location], placeholder: "anywhere", class: "form-control" %>
-    </div>
-
-    <%= submit_tag "Search", name: "search", class: "btn btn-primary mb-2" %>
-  <% end %>
-<% end %>
-
-<% table_view = capture do %>
-  <%= render partial: "table", locals: {recoveries: @recoveries, render_sortable: true} %>
-<% end %>
-
-<%= render(Pages::Admin::IndexSkeleton::Component.new(
-  index: admin_index_state,
-  collection: @recoveries,
-  viewing: "Recoveries",
-  rendered_chart:,
-  nav_header_list_items:,
-  admin_search_form:,
-  table_view:,
-)) %>

@@ -32,58 +32,6 @@
   }
 }
 
-.table-list {
-  @extend .table;
-  @extend .table-striped;
-  @extend .table-bordered;
-  @extend .table-sm;
-  word-break: break-word;
-  tr td {
-    line-height: 1.5;
-    &:first-child {
-      font-size: 75%;
-      font-style: italic;
-      text-align: right;
-      padding: 9px 4px 4px;
-      line-height: 1.25;
-    }
-    &:first-child.full-width-data {
-      font-size: 100%;
-      font-style: normal;
-      text-align: left;
-    }
-    // use last, rather than first, to enable full width single rows
-    &:last-child {
-      width: 85%; // This is effectively min-width for tables
-    }
-  }
-  tr.active-row {
-    background-color: #ebf5fb !important;
-    a {
-      text-decoration: underline;
-    }
-  }
-  pre {
-    margin: 0;
-  }
-  &.wide-definition tr td {
-    &:last-child {
-      width: 70%;
-    }
-  }
-  &.no-italic-definition tr td {
-    &:first-child {
-      font-style: normal;
-    }
-  }
-  .inline-images img {
-    display: inline-block;
-    width: 31%;
-    max-width: 150px;
-    margin-right: 3%;
-  }
-}
-
 table thead.sortable {
   th {
     font-weight: normal;
@@ -110,12 +58,6 @@ table thead.sortable {
 
 // Random special formatting bits
 table {
-  .table-cell-check {
-    font-family: Courier;
-    text-align: center;
-    font-weight: bold;
-  }
-
   code {
     word-break: break-all;
   }
