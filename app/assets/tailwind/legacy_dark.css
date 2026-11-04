@@ -14,7 +14,8 @@
   .next-steps-wrap,
   .recovery-quote,
   .select-amount,
-  .modal-content {
+  .modal-content,
+  .swagger-section :is(.content-header, .docs-section-list, .applications-panel, .global-footer) {
     @apply tw:dark:bg-gray-800 tw:dark:border-gray-700 tw:dark:text-gray-300;
   }
 
@@ -42,7 +43,8 @@
   .form-control,
   .btn-secondary,
   .selectize-input,
-  .selectize-dropdown {
+  .selectize-dropdown,
+  .swagger-ui-wrap :is(input.parameter, select, .body-textarea) {
     @apply tw:dark:bg-gray-700 tw:dark:border-gray-600 tw:dark:text-gray-200;
   }
 
@@ -69,9 +71,9 @@
     @apply tw:dark:bg-gray-800 tw:dark:text-gray-300;
   }
 
-  /* <html> paints its own light background here, and sits outside the dark variant's reach */
+  /* Clears <html>'s light background, which the dark variant can't reach, so <body>'s fills the canvas */
   :root:has(> body.dark:is(.swagger-section, .documentation-authorize)) {
-    @apply tw:bg-gray-900;
+    @apply tw:bg-transparent;
   }
 
   :is(.swagger-section, .documentation-authorize) {
@@ -89,34 +91,22 @@
       code {
         @apply tw:dark:bg-transparent tw:dark:text-inherit;
       }
-
-      .string {
-        @apply tw:dark:text-green-300;
-      }
-
-      :is(.number, .literal) {
-        @apply tw:dark:text-blue-300;
-      }
     }
 
     .alert-info {
-      @apply tw:dark:bg-blue-950 tw:dark:border-blue-900 tw:dark:text-blue-200;
+      @apply tw:dark:bg-blue-950 tw:dark:border-blue-800 tw:dark:text-blue-400;
     }
 
     .alert-success {
-      @apply tw:dark:bg-green-950 tw:dark:border-green-900 tw:dark:text-green-200;
+      @apply tw:dark:bg-green-950 tw:dark:border-green-800 tw:dark:text-green-400;
     }
 
     .alert-warning {
-      @apply tw:dark:bg-yellow-950 tw:dark:border-yellow-900 tw:dark:text-yellow-200;
+      @apply tw:dark:bg-yellow-950 tw:dark:border-yellow-800 tw:dark:text-yellow-400;
     }
 
     .alert-danger {
-      @apply tw:dark:bg-red-950 tw:dark:border-red-900 tw:dark:text-red-200;
-    }
-
-    .alert p {
-      @apply tw:dark:text-inherit;
+      @apply tw:dark:bg-red-950 tw:dark:border-red-800 tw:dark:text-red-400;
     }
 
     .alert a {
@@ -127,8 +117,16 @@
   .swagger-section {
     @apply tw:dark:text-gray-300;
 
-    :is(#header, .content-header, .docs-section-list, .applications-panel, .global-footer) {
-      @apply tw:dark:bg-gray-800 tw:dark:border-gray-700;
+    pre .string {
+      @apply tw:dark:text-red-300;
+    }
+
+    pre .number {
+      @apply tw:dark:text-blue-300;
+    }
+
+    pre .literal {
+      @apply tw:dark:text-teal-300;
     }
 
     .docs-section-list a:not(.scrltrgt, :hover),
@@ -143,124 +141,79 @@
     .accstr {
       @apply tw:dark:text-red-300;
     }
+  }
 
-    .swagger-ui-wrap {
-      :is(p, li, .markdown li) {
-        @apply tw:dark:text-gray-300;
-      }
+  .swagger-ui-wrap {
+    :is(p, li) {
+      @apply tw:dark:text-gray-300;
+    }
 
-      :is(h1, h2, h3, h2 a, .markdown h3) {
+    th {
+      @apply tw:dark:text-gray-400;
+    }
+
+    :is(th, td, li.resource, .heading .options li) {
+      @apply tw:dark:border-gray-700;
+    }
+
+    a {
+      @apply tw:dark:text-green-400;
+    }
+
+    li.resource > .heading :is(h2, h2 a, .options a) {
+      @apply tw:dark:text-gray-400 tw:dark:hover:text-white;
+    }
+
+    li.resource.active > .heading :is(h2 a, .options a) {
+      @apply tw:dark:text-gray-100;
+    }
+
+    .operation {
+      :is(.heading h3, .heading .path a) {
         @apply tw:dark:text-gray-100;
       }
 
-      :is(th, .markdown h4, span.weak) {
-        @apply tw:dark:text-gray-400;
+      .heading .http_method a {
+        @apply tw:dark:text-white;
       }
 
-      :is(th, td, li.resource, .heading .options li) {
-        @apply tw:dark:border-gray-700;
-      }
-
-      tr.offset {
-        @apply tw:dark:bg-gray-800;
-      }
-
-      a {
-        @apply tw:dark:text-green-400;
-      }
-
-      :is(input.parameter, select, .body-textarea) {
-        @apply tw:dark:bg-gray-700 tw:dark:border-gray-600 tw:dark:text-gray-200;
-      }
-
-      .content-type label {
-        @apply tw:dark:text-blue-300;
-      }
-
-      li.resource > .heading {
-        :is(h2, h2 a) {
-          @apply tw:dark:text-gray-400 tw:dark:hover:text-white;
+      &.get {
+        :is(.heading, .content) {
+          @apply tw:dark:bg-blue-950 tw:dark:border-blue-900;
         }
 
-        .options a {
-          @apply tw:dark:text-gray-400 tw:dark:hover:text-white;
-        }
-      }
-
-      li.resource.active > .heading :is(h2 a, .options a) {
-        @apply tw:dark:text-gray-100;
-      }
-
-      .operation {
-        .heading h3,
-        .heading .path a {
-          @apply tw:dark:text-gray-100;
-        }
-
-        .heading .http_method a {
-          @apply tw:dark:text-white;
-        }
-
-        &:is(.get, .head) {
-          :is(.heading, .content) {
-            @apply tw:dark:bg-blue-950 tw:dark:border-blue-900;
-          }
-
-          :is(.options a, .content h4, .sandbox_header a) {
-            @apply tw:dark:text-blue-300;
-          }
-        }
-
-        &.post {
-          :is(.heading, .content) {
-            @apply tw:dark:bg-green-950 tw:dark:border-green-900;
-          }
-
-          :is(.options a, .content h4, .sandbox_header a) {
-            @apply tw:dark:text-green-300;
-          }
-        }
-
-        &:is(.put, .patch) {
-          :is(.heading, .content) {
-            @apply tw:dark:bg-yellow-950 tw:dark:border-yellow-900;
-          }
-
-          :is(.options a, .content h4, .sandbox_header a) {
-            @apply tw:dark:text-yellow-300;
-          }
-        }
-
-        &.delete {
-          :is(.heading, .content) {
-            @apply tw:dark:bg-red-950 tw:dark:border-red-900;
-          }
-
-          :is(.options a, .content h4, .sandbox_header a) {
-            @apply tw:dark:text-red-300;
-          }
-        }
-      }
-
-      .model-signature {
-        :is(.signature-nav .selected, .signature-nav a:hover, .description .strong, .description .stronger) {
-          @apply tw:dark:text-gray-100;
-        }
-
-        .signature-nav li {
-          @apply tw:dark:border-gray-700;
-        }
-
-        .propType {
+        :is(.options a, .content h4, .sandbox_header a) {
           @apply tw:dark:text-blue-300;
         }
+      }
 
-        .propOpt {
-          @apply tw:dark:text-gray-400;
+      &.post {
+        :is(.heading, .content) {
+          @apply tw:dark:bg-green-950 tw:dark:border-green-900;
         }
 
-        pre:hover {
-          @apply tw:dark:bg-gray-700;
+        :is(.options a, .content h4, .sandbox_header a) {
+          @apply tw:dark:text-green-300;
+        }
+      }
+
+      &.put {
+        :is(.heading, .content) {
+          @apply tw:dark:bg-yellow-950 tw:dark:border-yellow-900;
+        }
+
+        :is(.options a, .content h4, .sandbox_header a) {
+          @apply tw:dark:text-yellow-300;
+        }
+      }
+
+      &.delete {
+        :is(.heading, .content) {
+          @apply tw:dark:bg-red-950 tw:dark:border-red-900;
+        }
+
+        :is(.options a, .content h4, .sandbox_header a) {
+          @apply tw:dark:text-red-300;
         }
       }
     }

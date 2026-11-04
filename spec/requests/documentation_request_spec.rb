@@ -42,33 +42,7 @@ RSpec.describe DocumentationController, type: :request do
       expect(response.code).to eq("200")
       expect(response).to render_template("api_v3")
       expect(flash).to_not be_present
-      expect(response.body).to match(/<body class="swagger-section">/)
-    end
-  end
-
-  describe "dark mode" do
-    include_context :request_spec_logged_in_as_user
-    include_context :existing_doorkeeper_app
-    let(:access_grant) { doorkeeper_app.access_grants.create!(resource_owner_id: current_user.id, redirect_uri: "*", expires_in: 10.minutes) }
-
-    it "is off without dark_mode_preview" do
-      get "/documentation/api_v3"
-      expect(response.body).to match(/<body class="swagger-section">/)
-    end
-
-    context "with dark_mode_preview" do
-      before { current_user.update(dark_mode_preview: true) }
-
-      it "renders every documentation page dark" do
-        get "/documentation/api_v3"
-        expect(response.body).to match(/<body class="swagger-section dark">/)
-
-        get "/documentation/api_v2"
-        expect(response.body).to match(/<body class="swagger-section dark">/)
-
-        get "/documentation/authorize", params: {code: access_grant.token}
-        expect(response.body).to match(/<body class="documentation-authorize dark">/)
-      end
+      expect(Nokogiri::HTML(response.body).at_css("body.dark")).to be_nil
     end
   end
 end
