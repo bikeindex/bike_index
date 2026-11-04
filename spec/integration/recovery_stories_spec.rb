@@ -37,8 +37,10 @@ RSpec.describe "recovery stories", :js, type: :system do
     expect(page).to have_current_path("/recovery_stories?page=2&per_page=1")
     expect(stories).to eq(["Middle story"])
 
-    find("a", text: "Middle story").click
-    expect(page).to have_current_path("/about")
+    within_window(window_opened_by { click_link "/about" }) do
+      expect(page).to have_current_path("/about")
+    end
+    expect(stories).to eq(["Middle story"])
     expect(page).to have_no_text("Content missing")
   end
 end

@@ -13,14 +13,16 @@ RSpec.describe Pages::RecoveryStories::Stories::Component, type: :component do
     expect(component).to have_css("article strong", text: "Matt")
     expect(component).to have_no_link("Load more stories")
     expect(component).to have_no_link("Newer stories")
+    expect(component).to have_no_css("article a")
   end
 
   context "with a link and more pages" do
-    let(:link) { "https://bikeindex.org/news/matt" }
+    let(:link) { "https://twitter.com/stolenbikessfo/status/537025628319805443" }
     let(:pagy) { Pagy::Offset.new(count: 20, page: 1, limit: 9) }
 
-    it "links the card out of the frame and nests the next page's frame in this one" do
-      expect(component).to have_css("a[href='#{link}'][data-turbo='false'] blockquote", text: "Police called me")
+    it "links from inside the card and nests the next page's frame in this one" do
+      expect(component).to have_css("article a.tw\\:truncate[href='#{link}'][target='_blank'][title='#{link}']", exact_text: "twitter.com/stolenbikessfo/status/5370...")
+      expect(component).to have_no_css("a blockquote")
       expect(component).to have_css("turbo-frame#recovery_stories_page_1 > turbo-frame#recovery_stories_page_2 a[data-turbo='true'][data-turbo-action='advance'][href='/recovery_stories?page=2']",
         text: "Load more stories")
     end
