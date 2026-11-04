@@ -3,6 +3,7 @@ module Admin
     include Binxtils::SortableTable
 
     before_action :find_snippet, except: [:index, :new, :create]
+    before_action :find_organizations, only: [:new, :edit, :create, :update]
 
     def index
       @per_page = permitted_per_page
@@ -15,7 +16,6 @@ module Admin
     end
 
     def edit
-      @organizations = Organization.all
     end
 
     def update
@@ -29,12 +29,11 @@ module Admin
 
     def new
       @mail_snippet = MailSnippet.new
-      @organizations = Organization.all
     end
 
     def create
-      @mail_snippet = MailSnippet.create(permitted_parameters)
-      if @mail_snippet.save
+      @mail_snippet = MailSnippet.new(permitted_parameters)
+      if @mail_snippet.save(context: :admin_create)
         flash[:success] = "Snippet Created!"
         redirect_to edit_admin_mail_snippet_url(@mail_snippet)
       else
@@ -77,6 +76,10 @@ module Admin
 
     def find_snippet
       @mail_snippet = MailSnippet.find(params[:id])
+    end
+
+    def find_organizations
+      @organizations = Organization.all
     end
   end
 end

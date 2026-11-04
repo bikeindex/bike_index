@@ -7,7 +7,17 @@ class SerialNormalizer
     "B" => "8"
   }.freeze
 
-  UNKNOWN_STRINGS = ["na", "idk", "no", "unkown", "no serial", "none", "tbd"].freeze
+  # Exact matches, compared with case, spaces and punctuation removed. Placeholders
+  # shops and bulk imports enter would otherwise group unrelated bikes as duplicates
+  UNKNOWN_STRINGS = [
+    "na", "idk", "no", "unkown", "no serial", "none", "tbd",
+    "no serial number", "no number", "not assigned", "not recorded", "not available",
+    "unavailable", "unsure", "not sure", "pending", "presale", "on order", "placeholder",
+    "to be specified", "to be added", "tbd special order", "tbd building", "add serial",
+    "add later", "will add", "will add later", "will update", "fill in later", "add at build",
+    "add on build", "add sn on build", "add upon arrival", "dont have", "dont have it",
+    "i dont have it", "cant find", "cannot find", "cant read", "unreadable", "illegible", "hidden"
+  ].map { |string| string.gsub(/[^a-z0-9]/, "") }.to_set.freeze
 
   def self.unknown_and_absent_corrected(str = nil)
     str = str.to_s.strip
@@ -25,7 +35,7 @@ class SerialNormalizer
   end
 
   def self.looks_like_unknown?(str_downcase)
-    return true if UNKNOWN_STRINGS.include?(str_downcase) # specific things
+    return true if UNKNOWN_STRINGS.include?(str_downcase.gsub(/[^a-z0-9]/, ""))
 
     if str_downcase[/(no)|(remember)/].present?
       return true if str_downcase[/unkno/].present?

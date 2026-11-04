@@ -26,7 +26,7 @@
 
     <% if strava_activity.description.present? %>
       <span
-        class="small less-strong tw:block"
+        class="twless-strong tw:block tw:text-sm"
         title="<%= strava_activity.description %>"
       >
         <%= strava_activity.description&.truncate(120) %>
@@ -44,7 +44,7 @@
     <% end %>
 
     <% unless searched_activity_type.present? %>
-      <%= link_to search_emoji, url_for(sort_state.search_params.merge(search_activity_type: strava_activity.activity_type)), class: "display-sortable-link small" %>
+      <%= link_to search_emoji, url_for(sort_state.search_params.merge(search_activity_type: strava_activity.activity_type)), class: "display-sortable-link tw:text-sm" %>
     <% end %>
   <% end %>
 
@@ -57,7 +57,7 @@
       <small><%= strava_activity.calculated_gear_name %></small>
       <% gear_assoc = strava_activity.strava_integration.strava_gears.find { |ga| ga.strava_id == strava_activity.gear_id } %>
       <% if gear_assoc&.item.present? %>
-        <%= link_to "BI", bike_path(gear_assoc.item), class: "small #{UI::Alerts::Base::Component::TEXT_CLASSES[:success]}", title: gear_assoc.item.title_string %>
+        <%= link_to "BI", bike_path(gear_assoc.item), class: "tw:text-sm #{UI::Alerts::Base::Component::TEXT_CLASSES[:success]}", title: gear_assoc.item.title_string %>
       <% end %>
     <% end %>
   <% end %>

@@ -9,37 +9,21 @@
         method: :put,
         class: "btn btn-danger"
 
-%table.table-list
-  %tbody
-    %tr
-      %td= t(".sticker")
-      %td= @bike_sticker.pretty_code
-    %tr
-      %td= t(".claimed")
-      %td
-        - if @bike_sticker.claimed_at.present?
-          %span.localizeTime
-            = l(@bike_sticker.created_at, format: :convert_time)
-    %tr
-      %td= t(".bike")
-      %td
-        - if @bike_sticker.claimed?
-          = link_to(organized_bike_text(@bike_sticker.bike), bike_path(@bike_sticker.bike, organization_id: current_organization.to_param))
-        - elsif @bike_sticker.bike_id.present?
-          %span.text-danger= t(".bike_is_unavailable")
-        - else
-          %strong= t(".unclaimed")
-    %tr
-      %td= t(".claimed_by")
-      %td= @bike_sticker.user&.display_name
-
-    - if @bike_sticker.previous_bike_id
-      %tr
-        %td= t(".previous_bike")
-        %td
-          - previous_bike = Bike.find_by_id(@bike_sticker.previous_bike_id)
-          - label = previous_bike&.title_string || @bike_sticker.previous_bike_id
-          = link_to(label, bike_path(@bike_sticker.previous_bike_id, organization_id: current_organization.to_param))
+= render(UI::TableList::Component.new) do |list|
+  - list.with_row(label: t(".sticker"), value: @bike_sticker.pretty_code)
+  - list.with_row(label: t(".claimed"), value: (render(UI::Time::Component.new(time: @bike_sticker.created_at)) if @bike_sticker.claimed_at.present?))
+  - list.with_row(label: t(".bike")) do
+    - if @bike_sticker.claimed?
+      = link_to(organized_bike_text(@bike_sticker.bike), bike_path(@bike_sticker.bike, organization_id: current_organization.to_param))
+    - elsif @bike_sticker.bike_id.present?
+      %span.text-danger= t(".bike_is_unavailable")
+    - else
+      %strong= t(".unclaimed")
+  - list.with_row(label: t(".claimed_by"), value: @bike_sticker.user&.display_name)
+  - list.with_row(label: t(".previous_bike"), if: @bike_sticker.previous_bike_id) do
+    - previous_bike = Bike.find_by_id(@bike_sticker.previous_bike_id)
+    - label = previous_bike&.title_string || @bike_sticker.previous_bike_id
+    = link_to(label, bike_path(@bike_sticker.previous_bike_id, organization_id: current_organization.to_param))
 
 %hr.mt-4.mb-4
 
@@ -83,7 +67,7 @@
               %span.localizeTime.preciseTime
                 = l(bike_sticker_update.created_at, format: :convert_time)
               - if display_dev_info?
-                %small.code.only-dev-visible= bike_sticker_update.id
+                %span.only-dev-visible= render(UI::Code::Inline::Component.new(text: bike_sticker_update.id, small: true))
             %td
               = bike_sticker_update.creator_kind_humanized
             %td

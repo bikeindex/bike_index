@@ -1,14 +1,48 @@
-<% nav_header_list_items = capture do %>
-  <li>
+<% admin_search_form = capture do %>
+  <div class="tw:my-6 tw:grid tw:gap-x-8 tw:sm:grid-cols-12">
+    <div class="tw:sm:col-span-5">
+      <% if @social_account.present? %>
+        <strong>
+          from
+          <%= link_to @social_account.screen_name, admin_social_account_path(@social_account), class: "twlink" %>
+        </strong>
+      <% end %>
+    </div>
+
+    <%= form_with(url: admin_social_posts_path, method: :get, html: {class: "twsearchrow tw:sm:col-span-12 tw:md:col-span-7"}) do |form| %>
+      <%= render partial: "/shared/hidden_search_fields" %>
+      <%= hidden_field_tag :search_social_account_id, params[:search_social_account_id] %>
+
+      <%= render(UI::Forms::Input::Component.new(form_builder: form, attribute: :query,
+        html_options: {value: params[:query], placeholder: "Search posts"})) %>
+
+      <%= render(UI::Button::Component.new(text: "Search", color: :primary, type: "submit", name: "search")) %>
+    <% end %>
+  </div>
+<% end %>
+
+<% table_view = capture do %>
+  <%= render partial: "/admin/social_posts/table", locals: {social_posts: @social_posts, render_sortable: true} %>
+<% end %>
+
+<%= render(Pages::Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
+  collection: @social_posts,
+  viewing: "Posts",
+  chart_collection: @render_chart && matching_social_posts,
+  admin_search_form:,
+  table_view:,
+)) do |skeleton| %>
+  <% skeleton.with_nav_item do %>
     <% reposts_hidden = Binxtils::InputNormalizer.boolean(params[:search_repost]) %>
 
     <%# the component escapes the label, so writing &amp; here would double-escape %>
     <%= render(UI::ButtonLink::Component.new(size: :sm, active: reposts_hidden,
           text: reposts_hidden ? "OG & Reposts" : "OG posts only",
           href: reposts_hidden ? admin_social_posts_path(sortable_search_params.except(:search_repost)) : admin_social_posts_path(sortable_search_params.merge(search_repost: true)))) %>
-  </li>
+  <% end %>
 
-  <li>
+  <% skeleton.with_nav_item do %>
     <%= render(UI::Dropdown::Component.new(name: @search_kind == "all" ? "All kinds" : "#{@search_kind.gsub(/_?post/, "").humanize} posts", button_size: :sm,
           active: @search_kind != "all")) do |dropdown| %>
       <% permitted_search_kinds.each do |kind| %>
@@ -21,49 +55,7 @@
         <% end %>
       <% end %>
     <% end %>
-  </li>
+  <% end %>
 
-  <li>
-    <%= render(UI::ButtonLink::Component.new(text: "New Post", href: new_admin_social_post_path, color: :primary, size: :sm)) %>
-  </li>
+  <% skeleton.with_nav_item { render(UI::ButtonLink::Component.new(text: "New Post", href: new_admin_social_post_path, color: :primary, size: :sm)) } %>
 <% end %>
-
-<% admin_search_form = capture do %>
-  <div class="row mt-4 mb-4">
-    <div class="col-sm-5">
-      <% if @social_account.present? %>
-        <strong>
-          from
-          <%= link_to @social_account.screen_name, admin_social_account_path(@social_account) %>
-        </strong>
-      <% end %>
-    </div>
-
-    <div class="col-md-7">
-      <%= form_tag admin_social_posts_path, method: :get, class: "form-inline" do %>
-        <%= render partial: "/shared/hidden_search_fields" %>
-        <%= hidden_field_tag :search_social_account_id, params[:search_social_account_id] %>
-
-        <div class="form-group ml-auto mr-2 mb-2">
-          <%= text_field_tag :query, params[:query], placeholder: "Search posts", class: "form-control" %>
-        </div>
-
-        <%= submit_tag "Search", name: "search", class: "btn btn-primary mb-2" %>
-      <% end %>
-    </div>
-  </div>
-<% end %>
-
-<% table_view = capture do %>
-  <%= render partial: "/admin/social_posts/table", locals: {social_posts: @social_posts, render_sortable: true} %>
-<% end %>
-
-<%= render(Pages::Admin::IndexSkeleton::Component.new(
-  index: admin_index_state,
-  collection: @social_posts,
-  viewing: "Posts",
-  nav_header_list_items:,
-  chart_collection: @render_chart && matching_social_posts,
-  admin_search_form:,
-  table_view:,
-)) %>

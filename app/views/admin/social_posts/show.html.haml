@@ -1,5 +1,4 @@
-.admin-subnav
-  .col-12.text-right
-    = link_to @social_post.post_link.gsub(/https?..\//, ''), @social_post.post_link, target: '_blank'
+= render(Pages::Admin::Headers::Nav::Component.new(title: "Social Post")) do |nav|
+  - nav.with_item { link_to @social_post.post_link.gsub(/https?..\//, ''), @social_post.post_link, class: "twlink", target: '_blank' }
 
 = render partial: "display"

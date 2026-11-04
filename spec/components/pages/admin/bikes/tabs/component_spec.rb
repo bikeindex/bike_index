@@ -113,6 +113,7 @@ RSpec.describe Pages::Admin::Bikes::Tabs::Component, type: :component do
 
       it "renders the deleted alert" do
         expect(component).to have_content("#{bike.type_titleize} deleted")
+        expect(component).to have_link("Un-delete #{bike.type}", href: "/admin/bikes/#{bike.id}/undelete")
       end
     end
 

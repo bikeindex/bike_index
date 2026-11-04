@@ -293,7 +293,10 @@ Rails.application.routes.draw do
         # Selection chips for the organizations combobox on the edit form
         post :organization_chips
       end
-      member { get :get_destroy }
+      member do
+        get :get_destroy
+        put :undelete
+      end
     end
     get "credibility_badges", to: "dashboard#credibility_badges"
     get "maintenance", to: "dashboard#maintenance"
@@ -367,11 +370,11 @@ Rails.application.routes.draw do
 
     resources :stolen_bikes do
       member { post :approve }
-      collection { post :bulk_update }
+      collection { patch :bulk_update }
     end
     resources :customer_contacts, only: %i[create show]
     resources :recoveries do
-      collection { post :approve }
+      collection { patch :bulk_update }
     end
     resources :stolen_notifications do
       member { get :resend }

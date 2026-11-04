@@ -6,7 +6,7 @@ import { readable } from 'bikebook/replace_url'
 import { NARROWING, searching } from 'bikebook/query'
 import { collapse } from 'utils/collapse_utils'
 import { SearchLog } from 'bikebook/search_log'
-import { realigned, storePreferredSize, withSize } from 'bikebook/sizes'
+import { realigned, storePreferredSize, withColorway, withSize } from 'bikebook/sizes'
 import { renderClassCards, withClassifications } from 'bikebook/templates/vehicles/class_cards'
 import { uuid } from 'bikebook/templates/helpers'
 
@@ -19,7 +19,7 @@ const stamped = (state) => ({ ...state, bikebook: uuid() })
 // link to this page and each history step render the page afresh from the shell, without a request
 export default class extends Controller {
   static targets = ['shell', 'page', 'status']
-  static values = { manifestUrl: String, jurisdictions: Object, failedText: String, title: String, searchLogUrl: String }
+  static values = { manifestUrl: String, jurisdictions: Object, paintColors: Object, failedText: String, title: String, searchLogUrl: String }
 
   #scrolls = new Map()
   #searchLog
@@ -40,7 +40,7 @@ export default class extends Controller {
     const url = new URL(window.location.href)
     this.#render(url)
     try {
-      this.catalog = await loadCatalog(this.manifestUrlValue, url.searchParams.get('vehicle_models')?.split(',') ?? [], this.jurisdictionsValue)
+      this.catalog = await loadCatalog(this.manifestUrlValue, url.searchParams.get('vehicle_models')?.split(',') ?? [], this.jurisdictionsValue, this.paintColorsValue)
     } catch (error) {
       return this.#fail(error)
     }
@@ -68,8 +68,8 @@ export default class extends Controller {
 
   // A plain click on a link to this page, such as a card's remove link, or on a drawing's figure's data-href, which an
   // in-place link renders without scrolling, focusing what the data-in-place on it or an ancestor selects rather than the search, and one inside a
-  // data-replace in place of the history entry it's on. One among the vehicles was written when the page rendered, so
-  // only what it changes from that goes onto the URL, which filters and panels have moved on since
+  // data-replace in place of the history entry it's on. Any other renders at the top, or at what the data-scroll-to on it or an ancestor selects. One among the
+  // vehicles was written when the page rendered, so only what it changes from that goes onto the URL, which filters and panels have moved on since
   follow (event) {
     const link = event.target.closest('a[href], [data-href]')
     if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || link.target) return
@@ -79,7 +79,7 @@ export default class extends Controller {
 
     event.preventDefault()
     const inPlace = link.closest('[data-in-place]')
-    if (!inPlace) return this.#go(url)
+    if (!inPlace) return this.#go(url, link.closest('[data-scroll-to]')?.dataset.scrollTo)
 
     const next = link.closest('#vehicle-viewers') ? this.#changedBy(url) : url
     // one that shows the search a lone model hid, as its tab does, is a step back can undo, and opens and focuses it
@@ -95,6 +95,11 @@ export default class extends Controller {
     if (first) storePreferredSize(JSON.parse(target.selectedOptions[0].dataset.size))
     await this.#go(withSize(new URL(window.location.href), vehicle, target.value), [window.scrollX, window.scrollY])
     this.pageTarget.querySelector(`select[data-bikebook--page-vehicle-param="${CSS.escape(vehicle)}"]`)?.focus({ preventScroll: true })
+  }
+
+  // A vehicle's colorway, in place of the history entry it's picked on
+  pickColorway ({ target, params: { vehicle } }) {
+    this.#go(withColorway(new URL(window.location.href), vehicle, target.value), [window.scrollX, window.scrollY], { replace: true })
   }
 
   // A filter changes in place, which with nothing picked the featured models and their count follow, and the picked
@@ -187,8 +192,9 @@ export default class extends Controller {
     return this.#render(url, scroll, options)
   }
 
-  // `focus` selects what to focus, the search where it selects nothing, unless a field of the page's has focus, which
-  // keeps it and any value it hasn't yet changed to. Until the catalog loads, the page is its loading shell
+  // `scroll` is where the window goes, [x, y] or a selector of what to bring to its top. `focus` selects what to focus,
+  // the search where it selects nothing, unless a field of the page's has focus, which keeps it and any value it hasn't
+  // yet changed to. Until the catalog loads, the page is its loading shell
   async #render (url, scroll, { focus = '[autofocus]', reveal = false } = {}) {
     if (!this.catalog) return this.pageTarget.replaceChildren(loadingShell(this.shellTarget, url, this.status))
 
@@ -199,10 +205,14 @@ export default class extends Controller {
     if (render !== this.#renders) return
     if (rendered instanceof Error) return this.#fail(rendered)
 
+    const rows = () => [...this.pageTarget.querySelectorAll('[data-keep-scroll]')]
+    const rowScrolls = new Map(rows().filter((row) => row.scrollLeft).map((row) => [row.dataset.keepScroll, row.scrollLeft]))
     // what turbo:before-render is to a Turbo page, which an open combobox dialog closes on
     this.dispatch('before-render')
     const active = this.pageTarget.contains(document.activeElement) && document.activeElement.id ? document.activeElement : null
     this.pageTarget.replaceChildren(keepPermanent(rendered.content, this.pageTarget))
+    // once their controllers have opened them, as a hidden row can't scroll
+    if (rowScrolls.size) requestAnimationFrame(() => rows().forEach((row) => { row.scrollLeft = rowScrolls.get(row.dataset.keepScroll) ?? 0 }))
     if (reveal) {
       const search = this.pageTarget.querySelector('[data-controller~="bikebook--catalog-filters"]')
       search.classList.add('tw:hidden')
@@ -216,12 +226,14 @@ export default class extends Controller {
       // once its panel's controller has opened it, a hidden field taking no focus
       requestAnimationFrame(() => kept.focus({ preventScroll: true }))
     } else if (focus) {
-      (this.pageTarget.querySelector(focus) ?? this.pageTarget.querySelector('[autofocus]'))?.focus({ preventScroll: Boolean(scroll) })
+      // once a list's controller has shown the page it's on
+      requestAnimationFrame(() => (this.pageTarget.querySelector(focus) ?? this.pageTarget.querySelector('[autofocus]'))?.focus({ preventScroll: Boolean(scroll) }))
     }
     if (scroll) {
-      window.scrollTo(...scroll)
+      const place = () => typeof scroll === 'string' ? this.pageTarget.querySelector(scroll)?.scrollIntoView() : window.scrollTo(...scroll)
+      place()
       // and again once the panels' controllers have opened them, which the browser's scroll anchoring follows down
-      requestAnimationFrame(() => window.scrollTo(...scroll))
+      requestAnimationFrame(place)
     }
   }
 

@@ -13,6 +13,14 @@ RSpec.describe Admin::ParkingNotificationsController, type: :request do
       expect(assigns(:parking_notifications)).to eq([parking_notification])
     end
 
+    it "filters to a bike, as a notification's link does" do
+      get base_url, params: {search_bike_id: parking_notification.bike_id}
+      expect(assigns(:parking_notifications)).to eq([parking_notification])
+
+      get base_url, params: {search_bike_id: parking_notification.bike_id + 1}
+      expect(assigns(:parking_notifications)).to eq([])
+    end
+
     context "impounded" do
       let!(:parking_notification) { FactoryBot.create(:parking_notification_organized, kind: "impound_notification") }
 

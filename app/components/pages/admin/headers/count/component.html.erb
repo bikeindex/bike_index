@@ -1,0 +1,7 @@
+<% unless @count.nil? %>
+  <small class="twless-strong tw:ml-2"><%= count_display %><%= " #{@suffix}" if @suffix %></small>
+<% end %>
+
+<% if @parenthetical.present? %>
+  <small class="twless-strong tw:ml-2"><%= wrapped_parenthetical %></small>
+<% end %>

@@ -9,7 +9,7 @@ module VehicleHelper
 
   def model_audit_frame_model_display(model_audit, truncate: false)
     if model_audit.unknown_model?
-      content_tag(:span, "Missing model", class: "less-strong")
+      content_tag(:span, "Missing model", class: "twless-strong")
     elsif truncate
       content_tag(:span, model_audit.frame_model.truncate(70), title: model_audit.frame_model)
     else

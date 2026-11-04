@@ -1,13 +1,11 @@
-.card.mb-2
-  %ul.list-group.list-group-flush
-    - if @ad.image.present?
-      %li.list-group-item
-        %a{ href: @ad.target_url }
-          = image_tag @ad.image_url(:large) if @ad.image.present?
-    %li.list-group-item
-      %a{href: @ad.target_url}
-        %h3
-          = @ad.title
-    %li.list-group-item
-      %p
-        = @ad.body
+= render(UI::Card::Component.new(divided: true, additional_classes: "tw:mb-2")) do
+  - if @ad.image.present?
+    %div{class: "tw:px-5 tw:py-3"}
+      %a{ href: @ad.target_url }
+        = image_tag @ad.image_url(:large)
+  %div{class: "tw:px-5 tw:py-3"}
+    %a.twlink{href: @ad.target_url}
+      = render(UI::Header::Component.new(text: @ad.title, tag: :h2)) if @ad.title.present?
+  %div{class: "tw:px-5 tw:py-3"}
+    %p{class: "tw:mb-4"}
+      = @ad.body
