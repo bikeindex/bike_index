@@ -47,7 +47,7 @@
       </p>
 
       <% if @recovery_display.link.present? %>
-        <%= link_to link_label, @recovery_display.link, target: "_blank", rel: "noopener", title: @recovery_display.link, class: "twlink tw:block tw:truncate tw:text-sm" %>
+        <%= link_to Urlifyer.display(@recovery_display.link, length: 41), @recovery_display.link, target: "_blank", rel: "noopener", title: @recovery_display.link, class: "twlink tw:block tw:truncate tw:text-sm" %>
       <% end %>
     </div>
   <% end %>

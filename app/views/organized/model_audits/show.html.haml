@@ -73,7 +73,7 @@
             - if model_attestation.file.present?
               %strong= link_to "File", model_attestation.file.url, target: "_blank"
             - if model_attestation.url.present?
-              %small= link_to truncate(model_attestation.url), model_attestation.url
+              %small= link_to Urlifyer.display(model_attestation.url, length: 30), model_attestation.url
           %td
             = model_attestation.info
 

@@ -12,6 +12,14 @@ module Urlifyer
     "http://#{string.strip}"
   end
 
+  # The address without its scheme or www, for the text of a link
+  def display(string, length: nil)
+    return nil if string.blank?
+
+    address = string.strip.sub(%r{\Ahttps?://(www\.)?}i, "")
+    length ? address.truncate(length) : address
+  end
+
   def uri?(string)
     uri = URI.parse(string)
     %w[http https].include?(uri.scheme)

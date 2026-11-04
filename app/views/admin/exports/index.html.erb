@@ -37,7 +37,7 @@
     <% table.column(label: "File") do |export| %>
       <% if export.file.url.present? %>
         <small title="<%= export.file.url %>">
-          <%= truncate(export.file.url, length: 50) %>
+          <%= Urlifyer.display(export.file.url, length: 50) %>
         </small>
       <% end %>
     <% end %>
