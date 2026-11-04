@@ -224,7 +224,8 @@
    * A shadow that's a chosen color rather than a shadow sets its own: tw:dark:shadow-gray-300 */
   * {
     @variant dark {
-      --tw-drop-shadow-color: rgb(0 0 0 / 0.5);
+      /* A drop shadow's filter reads this rather than a color */
+      --tw-drop-shadow-md: 0 3px 3px rgb(0 0 0 / 0.5);
 
       &,
       &::before,

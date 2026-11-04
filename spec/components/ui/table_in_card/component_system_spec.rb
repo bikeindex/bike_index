@@ -66,11 +66,20 @@ RSpec.describe UI::TableInCard::Component, :js, type: :system do
     expect(result["left"]).to be > 0
   end
 
-  it "shadows the frozen column in dark mode, keeps region and header text quieter than cells, and a shadow with its own color keeps it" do
+  it "shadows the frozen column and drop shadows in dark mode, keeps region and header text quieter than cells, and a shadow with its own color keeps it" do
     resize_window(width: 500, height: 800)
     visit("/rails/view_components/ui/table_in_card/component/default?lookbook%5Bdisplay%5D%5Btheme%5D=dark")
     expect(page).to have_css("[data-controller~='ui--table-overflow'][data-overflowing]")
     expect(computed_ring(first("tbody td"))).to include("rgba(0, 0, 0, 0.5) 2px 0px 6px")
+    drop_shadow = page.evaluate_script(<<~JS)
+      (() => {
+        const element = document.createElement("div")
+        element.className = "tw:drop-shadow-md"
+        document.body.append(element)
+        return getComputedStyle(element).filter
+      })()
+    JS
+    expect(drop_shadow).to include("rgba(0, 0, 0, 0.5)")
     colors = page.evaluate_script(%(["tbody td", "tbody small", "thead th"].map((selector) => getComputedStyle(document.querySelector(selector)).color)))
     expect(colors.second).to eq colors.third
     expect(colors.first).not_to eq colors.second
