@@ -157,7 +157,7 @@ module Organized
     end
 
     def chart_bikes
-      @chart_bikes ||= chart_scope_year? ? organization_bikes : @searched_bikes
+      @chart_bikes ||= chart_scope_year? ? current_organization.bikes : @searched_bikes
     end
 
     # Whole months, so the bars are comparable rather than the first and last being part ones
@@ -211,10 +211,6 @@ module Organized
 
     def chart_counts(bikes)
       UI::Chart::Component.time_range_counts(collection: bikes, time_range: chart_time_range, column: "bikes.created_at")
-    end
-
-    def organization_bikes
-      current_organization.bikes.reorder("bikes.created_at desc")
     end
 
     def current_root_path
