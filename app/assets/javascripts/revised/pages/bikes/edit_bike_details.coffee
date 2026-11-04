@@ -115,7 +115,7 @@ class BikeIndex.BikesEditBikeDetails extends BikeIndex
       response_callback = @requestSerialUpdateRequestCallback
       new BikeIndex.SubmitUserRequest(data, response_callback)
     else
-      $('#serial-correction .alert').slideDown('fast')
+      $('#serial-correction .modal-validation-alert').slideDown('fast')
 
   requestManufacturerUpdate: ->
     manufacturer = $('#manufacturer_update_manufacturer').val()
@@ -134,7 +134,7 @@ class BikeIndex.BikesEditBikeDetails extends BikeIndex
       response_callback = @requestManufacturerUpdateRequestCallback
       new BikeIndex.SubmitUserRequest(data, response_callback)
     else
-      $('#manufacturer-correction .alert').slideDown('fast')
+      $('#manufacturer-correction .modal-validation-alert').slideDown('fast')
 
   updateVersionDates: (e) ->
     # Delay to let the fields populate

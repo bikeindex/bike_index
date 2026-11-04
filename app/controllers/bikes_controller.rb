@@ -194,7 +194,7 @@ class BikesController < Bikes::BaseController
       matching_notification = @bike.parking_notifications.where(retrieval_link_token: params[:token]).first
       if matching_notification.present?
         if matching_notification.active?
-          flash[:success] = translation(:marked_retrieved, bike_type: @bike.type)
+          flash[:success] = translation(:bike_type_marked_retrieved, bike_type: @bike.type_titleize)
           # Quick hack to skip making another endpoint
           retrieved_kind = params[:user_recovery].present? ? "user_recovery" : "link_token_recovery"
           matching_notification.mark_retrieved!(retrieved_by_id: current_user&.id, retrieved_kind: retrieved_kind)

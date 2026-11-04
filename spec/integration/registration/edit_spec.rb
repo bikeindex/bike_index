@@ -123,6 +123,7 @@ RSpec.describe "Editing a registration", :js, type: :system do
     find('[data-target="#serial-correction"]').click
     expect(page).to have_css("#serial-correction.in", wait: 5)
     within("#serial-correction") do
+      expect(page).to have_no_content("Please fill in both fields")
       fill_in "serial_update_serial", with: "SERIAL-UPDATED-9"
       fill_in "serial_update_reason", with: "Read the frame more carefully"
       click_button "Submit update"
@@ -134,6 +135,7 @@ RSpec.describe "Editing a registration", :js, type: :system do
     find('[data-target="#manufacturer-correction"]').click
     expect(page).to have_css("#manufacturer-correction.in", wait: 5)
     within("#manufacturer-correction") do
+      expect(page).to have_no_content("Please fill in both fields")
       pick_remote_selectize("#manufacturer_update_manufacturer", "Trek")
       fill_in "manufacturer_update_reason", with: "It is actually a Trek"
       click_button "Submit update"

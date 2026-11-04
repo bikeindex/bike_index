@@ -71,8 +71,7 @@
           %h3
             Return to the #{link_to "documentation page", documentation_index_url, class: 'documentation_url'} to use the token.
           %article
-            .alert.alert-success
-              Since the token has already been used, the response below is an error.
+            = render(UI::Alerts::Base::Component.new(kind: :success, text: "Since the token has already been used, the response below is an error."))
 
         - else
           %h3
@@ -111,8 +110,7 @@
         %h1
           Uh-oh
         %article
-          .alert.alert-danger
-            We couldn't find the application for that access token
+          = render(UI::Alerts::Base::Component.new(kind: :error, text: "We couldn't find the application for that access token"))
         %h3
           You submitted the access code:
           %code
