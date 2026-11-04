@@ -47,12 +47,11 @@ RSpec.describe UI::TableInCard::Component, :js, type: :system do
     expect(boxes.map(&:checked?)).to all(be true)
     expect_axe_clean
 
-    original_size = page.current_window.size
-    page.current_window.resize_to(500, 800)
+    resize_window(width: 500, height: 800)
     table_width = page.evaluate_script(%(document.querySelector("[data-table-bleed] table").getBoundingClientRect().width)).ceil
 
     # Wider than the table once it bleeds, and narrower while it's inset: what would flip back and forth
-    page.current_window.resize_to(table_width + 20, 800)
+    resize_window(width: table_width + 20, height: 800)
     expect(page).to have_css("[data-table-bleed='true']", count: 2)
     expect(page.evaluate_script(bleed_samples)).to eq("samples" => ["true"], "left" => 0)
 
@@ -60,22 +59,19 @@ RSpec.describe UI::TableInCard::Component, :js, type: :system do
     settle_animations(find("[data-ui--collapse-target='content']", match: :first))
     expect(page.evaluate_script(edges)).to eq("settings" => [0, table_width + 20], "line" => [0, table_width + 20])
 
-    page.current_window.resize_to(table_width + 60, 800)
+    resize_window(width: table_width + 60, height: 800)
     expect(page).to have_css("[data-table-bleed='false']", minimum: 1)
     result = page.evaluate_script(bleed_samples)
     expect(result["samples"]).to eq ["false"]
     expect(result["left"]).to be > 0
-    page.current_window.resize_to(*original_size)
   end
 
   it "shadows the frozen column in dark mode, keeps region and header text quieter than cells, and a shadow with its own color keeps it" do
-    size = page.current_window.size
-    page.current_window.resize_to(500, 800)
+    resize_window(width: 500, height: 800)
     visit("/rails/view_components/ui/table_in_card/component/default?lookbook%5Bdisplay%5D%5Btheme%5D=dark")
     expect(page).to have_css("[data-controller~='ui--table-overflow'][data-overflowing]")
-    expect(page.evaluate_script(%(getComputedStyle(document.querySelector("tbody td")).boxShadow))).to include("rgba(0, 0, 0, 0.5) 2px 0px 6px")
+    expect(computed_ring(first("tbody td"))).to include("rgba(0, 0, 0, 0.5) 2px 0px 6px")
     colors = page.evaluate_script(%(["tbody td", "tbody small", "thead th"].map((selector) => getComputedStyle(document.querySelector(selector)).color)))
-    expect(colors.uniq.count).to eq 2
     expect(colors.second).to eq colors.third
     expect(colors.first).not_to eq colors.second
 
@@ -84,6 +80,5 @@ RSpec.describe UI::TableInCard::Component, :js, type: :system do
     expect(card_shadow).to be_present
     expect(card_shadow).not_to include("rgba(0, 0, 0, 0.5)")
     expect_axe_clean
-    page.current_window.resize_to(*size)
   end
 end

@@ -4,7 +4,14 @@ module UI
   module Table
     class ComponentPreview < ApplicationComponentPreview
       # id and model_name are for UI::TableInCard's selection_column
-      Cryptid = Data.define(:id, :name, :region, :credibility, :enthusiasm, :sightings, :first_seen) { extend ActiveModel::Naming }
+      Cryptid = Data.define(:id, :name, :region, :credibility, :enthusiasm, :sightings, :first_seen) do
+        extend ActiveModel::Naming
+
+        def credibility_color = (credibility == "Confirmed") ? :success : :gray
+
+        def enthusiasm_color = {"Extreme" => :error, "High" => :warning, "Medium" => :orange, "Low" => :gray, "None" => :gray}[enthusiasm]
+      end
+
       SAMPLE_RECORDS = [
         Cryptid.new(id: 1, name: "Mothman", region: "West Virginia", credibility: "Medium", enthusiasm: "Extreme", sightings: 142, first_seen: ::Time.zone.parse("1966-11-15")),
         Cryptid.new(id: 2, name: "Bigfoot", region: "Pacific Northwest", credibility: "Low", enthusiasm: "Extreme", sightings: 10000, first_seen: ::Time.zone.parse("1958-08-27")),
@@ -13,15 +20,14 @@ module UI
         Cryptid.new(id: 5, name: "Jersey Devil", region: "Pine Barrens, NJ", credibility: "Low", enthusiasm: "Low", sightings: 53, first_seen: ::Time.zone.parse("1909-01-16")),
         Cryptid.new(id: 6, name: "Okapi", region: "Congo", credibility: "Confirmed", enthusiasm: "None", sightings: 1, first_seen: ::Time.zone.parse("1901-06-01"))
       ].freeze
-      ENTHUSIASM_COLORS = {"Extreme" => :error, "High" => :warning, "Medium" => :orange, "Low" => :gray, "None" => :gray}.freeze
 
       # @!group Variants
 
       def default
         render(UI::Table::Component.new(records: SAMPLE_RECORDS, sort_state: preview_sort_state("first_seen"))) do |table|
           table.column(label: "Cryptid", lower_right: ->(r) { r.region }) { |r| r.name }
-          table.column(label: "Credibility") { |r| render(UI::Badge::Component.new(text: r.credibility, color: (r.credibility == "Confirmed") ? :success : :gray, size: :sm)) }
-          table.column(label: "Enthusiasm") { |r| render(UI::Badge::Component.new(text: r.enthusiasm, color: ENTHUSIASM_COLORS[r.enthusiasm], size: :sm)) }
+          table.column(label: "Credibility") { |r| render(UI::Badge::Component.new(text: r.credibility, color: r.credibility_color, size: :sm)) }
+          table.column(label: "Enthusiasm") { |r| render(UI::Badge::Component.new(text: r.enthusiasm, color: r.enthusiasm_color, size: :sm)) }
           table.column(label: "Sightings") { |r| number_with_delimiter(r.sightings) }
           table.column(label: safe_join(["First Seen ", tag.span(class: "localizeTimezone")]), sort_indicator: "first_seen") { |r| render(UI::Time::Component.new(time: r.first_seen)) }
         end
@@ -31,19 +37,18 @@ module UI
         render(UI::Table::Component.new(records: SAMPLE_RECORDS, cache_key: "preview-cryptids", sort_state: preview_sort_state("name"), render_sortable: true)) do |table|
           table.column(sortable: "name") { |r| r.name }
           table.column(label: "Region") { |r| r.region }
-          table.column(label: "Credibility") { |r| render(UI::Badge::Component.new(text: r.credibility, color: (r.credibility == "Confirmed") ? :success : :gray, size: :sm)) }
-          table.column(label: "Enthusiasm") { |r| render(UI::Badge::Component.new(text: r.enthusiasm, color: ENTHUSIASM_COLORS[r.enthusiasm], size: :sm)) }
+          table.column(label: "Credibility") { |r| render(UI::Badge::Component.new(text: r.credibility, color: r.credibility_color, size: :sm)) }
+          table.column(label: "Enthusiasm") { |r| render(UI::Badge::Component.new(text: r.enthusiasm, color: r.enthusiasm_color, size: :sm)) }
           table.column(sortable: "sightings") { |r| number_with_delimiter(r.sightings) }
           table.column(label: "Rendered at") { |_r| tag.small(l(::Time.current, format: :convert_time), class: "localizeTime preciseTimeSeconds") }
         end
       end
 
       def sticky
-        many = SAMPLE_RECORDS * 8
-        render(UI::Table::Component.new(records: many, sticky: true, sort_state: preview_sort_state("first_seen"))) do |table|
+        render(UI::Table::Component.new(records: SAMPLE_RECORDS * 8, sticky: true, sort_state: preview_sort_state("first_seen"))) do |table|
           table.column(label: "Cryptid", lower_right: ->(r) { r.region }) { |r| r.name }
-          table.column(label: "Credibility") { |r| render(UI::Badge::Component.new(text: r.credibility, color: (r.credibility == "Confirmed") ? :success : :gray, size: :sm)) }
-          table.column(label: "Enthusiasm") { |r| render(UI::Badge::Component.new(text: r.enthusiasm, color: ENTHUSIASM_COLORS[r.enthusiasm], size: :sm)) }
+          table.column(label: "Credibility") { |r| render(UI::Badge::Component.new(text: r.credibility, color: r.credibility_color, size: :sm)) }
+          table.column(label: "Enthusiasm") { |r| render(UI::Badge::Component.new(text: r.enthusiasm, color: r.enthusiasm_color, size: :sm)) }
           table.column(label: "Sightings") { |r| number_with_delimiter(r.sightings) }
           table.column(label: "First Seen", sort_indicator: "first_seen") { |r| render(UI::Time::Component.new(time: r.first_seen)) }
         end
@@ -53,8 +58,8 @@ module UI
         render(UI::Table::Component.new(records: SAMPLE_RECORDS, unbordered: true, sort_state: preview_sort_state("first_seen"))) do |table|
           table.column(label: "Cryptid") { |r| r.name }
           table.column(label: "Region") { |r| r.region }
-          table.column(label: "Credibility") { |r| render(UI::Badge::Component.new(text: r.credibility, color: (r.credibility == "Confirmed") ? :success : :gray, size: :sm)) }
-          table.column(label: "Enthusiasm") { |r| render(UI::Badge::Component.new(text: r.enthusiasm, color: ENTHUSIASM_COLORS[r.enthusiasm], size: :sm)) }
+          table.column(label: "Credibility") { |r| render(UI::Badge::Component.new(text: r.credibility, color: r.credibility_color, size: :sm)) }
+          table.column(label: "Enthusiasm") { |r| render(UI::Badge::Component.new(text: r.enthusiasm, color: r.enthusiasm_color, size: :sm)) }
           table.column(label: "Sightings") { |r| number_with_delimiter(r.sightings) }
           table.column(label: "First Seen", sort_indicator: "first_seen") { |r| render(UI::Time::Component.new(time: r.first_seen)) }
         end

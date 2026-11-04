@@ -8,8 +8,8 @@
 
   <%# lower_right takes no room of its own, and the frozen column shrinks to its content %>
   <% table.column(label: "Cryptid", lower_right: ->(record) { record.region }) { |record| tag.div(record.name, class: "tw:min-w-60") } %>
-  <% table.column(hideable: :credibility_cell) { |record| render(UI::Badge::Component.new(text: record.credibility, color: (record.credibility == "Confirmed") ? :success : :gray, size: :sm)) } %>
-  <% table.column(hideable: :enthusiasm_cell) { |record| render(UI::Badge::Component.new(text: record.enthusiasm, color: UI::Table::ComponentPreview::ENTHUSIASM_COLORS[record.enthusiasm], size: :sm)) } %>
-  <% table.column(hideable: :sightings_cell) { |record| number_with_delimiter(record.sightings) } %>
+  <% table.column(hideable: :credibility_cell) { |record| render(UI::Badge::Component.new(text: record.credibility, color: record.credibility_color, size: :sm)) } %>
+  <% table.column(hideable: :enthusiasm_cell) { |record| render(UI::Badge::Component.new(text: record.enthusiasm, color: record.enthusiasm_color, size: :sm)) } %>
+  <% table.column(hideable: :sightings_cell) { |record| number_display(record.sightings) } %>
   <% table.column(hideable: :first_seen_cell, sort_indicator: "first_seen", classes: "tw:whitespace-nowrap") { |record| render(UI::Time::Component.new(time: record.first_seen)) } %>
 <% end %>

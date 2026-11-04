@@ -6,7 +6,6 @@ module UI
     # horizontal scroll. Columns are declared as on UI::Table, and their blocks run there.
     # Given column_settings, it renders its own full-bleed card, under them
     class Component < ApplicationComponent
-      # Template Dependency: UI::Card::Component
       renders_one :description
       renders_one :actions
 
@@ -24,19 +23,21 @@ module UI
         "tw:dark:[&_tr:hover_td]:bg-[color-mix(in_oklab,var(--tw-color-amber-950)_40%,var(--tw-color-gray-900))]"
       ].join(" ").freeze
 
+      # The page's background in dark as well as light, so only the headers and settings stand out
+      CARD_CLASSES = "tw:rounded-xl tw:border tw:border-gray-200 tw:bg-white tw:dark:border-gray-700 tw:dark:bg-gray-900"
+
       # Shadowed once the ui--table-overflow controller flags there's any to scroll
       FROZEN_COLUMN_CLASSES = "tw:w-px tw:sticky tw:left-0 tw:z-1 tw:border-r tw:border-r-gray-100 " \
         "tw:group-data-overflowing/table-in-card:shadow-[2px_0_6px_rgba(26,26,31,0.04)] tw:dark:border-r-gray-700"
 
       # [&>div] is UI::Table's scroller, whose bottom spacing would part the table from what
       # follows it. The after: box mirrors the frozen column's divider and shadow on the right
-      # edge while there's more to scroll, except in a full-bleed row that runs off the page,
-      # whether that's a narrow row or one whose table is wider than the card
+      # edge while there's more to scroll, except in a full-bleed row that runs off the page
       WRAPPER_CLASSES = "tw:group/table-in-card tw:relative tw:[&>div]:mb-0 tw:[&>div]:pb-0 tw:data-overflowing:after:absolute " \
         "tw:data-overflowing:after:inset-y-0 tw:data-overflowing:after:left-[calc(100%-1px)] tw:data-overflowing:after:z-2 " \
         "tw:data-overflowing:after:w-4 tw:data-overflowing:after:border-l tw:data-overflowing:after:border-gray-100 " \
         "tw:data-overflowing:after:shadow-[-2px_0_6px_rgba(26,26,31,0.04)] tw:dark:data-overflowing:after:border-gray-700 " \
-        "tw:data-scrolled-end:after:hidden tw:@max-[672px]/twwiderow:after:hidden tw:in-data-[table-bleed=true]:after:hidden"
+        "tw:data-scrolled-end:after:hidden tw:table-bleed:after:hidden"
 
       # column_settings: UI::TableColumnSettings' columns, defaults and narrow_hidden, plus its storage_key.
       # form: form_with's options, making the card a form whose actions apply to the rows checked in
@@ -89,10 +90,7 @@ module UI
       end
 
       def card(&)
-        # The page's background rather than a card's in dark too, as in light: only the headers and settings stand out
-        classes = "tw:col-span-full tw:min-w-0 tw:rounded-xl tw:twfullbleed tw:dark:bg-gray-900! tw:in-data-[table-bleed=true]:rounded-none! " \
-          "tw:in-data-[table-bleed=true]:border-x-0! tw:in-data-[table-bleed=true]:border-t-0! tw:in-data-[table-bleed=true]:border-b-0! " \
-          "tw:@max-[672px]/twwiderow:border-b-0! #{UI::Card::Component::BASE_CLASSES}"
+        classes = "tw:col-span-full tw:min-w-0 #{CARD_CLASSES} tw:table-bleed:rounded-none tw:table-bleed:border-0"
         return form_with(**@form, class: classes, data: card_data, &) if @form
 
         tag.div(class: classes, data: card_data, &)

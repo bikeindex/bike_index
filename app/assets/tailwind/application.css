@@ -28,6 +28,18 @@
 /* /bikebook with its similar models open */
 @custom-variant similar-open (&:where(:has(#similar-toggle[aria-expanded=true]) *));
 
+/* A UI::TableInCard running past its card to the page's edges: once its .twwiderow has dropped
+ * to one column, the same 672px as .twfullbleed, or its table is wider than the card */
+@custom-variant table-bleed {
+  @container twwiderow (width < 672px) {
+    @slot;
+  }
+
+  &:where([data-table-bleed=true] *) {
+    @slot;
+  }
+}
+
 /* The selected/pressed state of a button, link or menu item, however it's flagged —
  * including a <label> around a checked radio (UI::Forms::RadioButtonGroup).
  * Keep it the last @custom-variant: tailwind sorts custom variants in declaration
@@ -212,9 +224,9 @@
    * A shadow that's a chosen color rather than a shadow sets its own: tw:dark:shadow-gray-300 */
   * {
     @variant dark {
-      --tw-shadow-color: rgb(0 0 0 / 0.5);
       --tw-drop-shadow-color: rgb(0 0 0 / 0.5);
 
+      &,
       &::before,
       &::after {
         --tw-shadow-color: rgb(0 0 0 / 0.5);

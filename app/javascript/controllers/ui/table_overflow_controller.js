@@ -17,8 +17,8 @@ export default class extends Controller {
     this.boundSyncScroll = () => this.#syncScroll()
     this.scroller.addEventListener('scroll', this.boundSyncScroll, { passive: true })
     this.resizeObserver = new ResizeObserver(() => this.#sync())
-    const headers = this.row ? this.table.querySelectorAll('th') : []
-    ;[this.scroller, this.table, this.row, ...headers].filter(Boolean).forEach(element => this.resizeObserver.observe(element))
+    const observed = [this.scroller, this.table, ...this.table.querySelectorAll('th')]
+    observed.forEach(element => this.resizeObserver.observe(element))
   }
 
   disconnect () {
