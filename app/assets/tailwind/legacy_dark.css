@@ -68,4 +68,201 @@
   .nav-tabs .nav-link:not(.active) {
     @apply tw:dark:bg-gray-800 tw:dark:text-gray-300;
   }
+
+  /* <html> paints its own light background here, and sits outside the dark variant's reach */
+  :root:has(> body.dark:is(.swagger-section, .documentation-authorize)) {
+    @apply tw:bg-gray-900;
+  }
+
+  :is(.swagger-section, .documentation-authorize) {
+    :is(.modal, .modal-header) {
+      @apply tw:dark:bg-gray-800 tw:dark:border-gray-700;
+    }
+
+    code {
+      @apply tw:dark:bg-gray-800 tw:dark:border-gray-700 tw:dark:text-red-300;
+    }
+
+    pre {
+      @apply tw:dark:bg-gray-800 tw:dark:border-gray-700 tw:dark:text-gray-200;
+
+      code {
+        @apply tw:dark:bg-transparent tw:dark:text-inherit;
+      }
+
+      .string {
+        @apply tw:dark:text-green-300;
+      }
+
+      :is(.number, .literal) {
+        @apply tw:dark:text-blue-300;
+      }
+    }
+
+    .alert-info {
+      @apply tw:dark:bg-blue-950 tw:dark:border-blue-900 tw:dark:text-blue-200;
+    }
+
+    .alert-success {
+      @apply tw:dark:bg-green-950 tw:dark:border-green-900 tw:dark:text-green-200;
+    }
+
+    .alert-warning {
+      @apply tw:dark:bg-yellow-950 tw:dark:border-yellow-900 tw:dark:text-yellow-200;
+    }
+
+    .alert-danger {
+      @apply tw:dark:bg-red-950 tw:dark:border-red-900 tw:dark:text-red-200;
+    }
+
+    .alert p {
+      @apply tw:dark:text-inherit;
+    }
+
+    .alert a {
+      @apply tw:dark:text-inherit tw:dark:underline;
+    }
+  }
+
+  .swagger-section {
+    @apply tw:dark:text-gray-300;
+
+    :is(#header, .content-header, .docs-section-list, .applications-panel, .global-footer) {
+      @apply tw:dark:bg-gray-800 tw:dark:border-gray-700;
+    }
+
+    .docs-section-list a:not(.scrltrgt, :hover),
+    .global-footer a {
+      @apply tw:dark:text-gray-300;
+    }
+
+    .applications-list li {
+      @apply tw:dark:bg-gray-900;
+    }
+
+    .accstr {
+      @apply tw:dark:text-red-300;
+    }
+
+    .swagger-ui-wrap {
+      :is(p, li, .markdown li) {
+        @apply tw:dark:text-gray-300;
+      }
+
+      :is(h1, h2, h3, h2 a, .markdown h3) {
+        @apply tw:dark:text-gray-100;
+      }
+
+      :is(th, .markdown h4, span.weak) {
+        @apply tw:dark:text-gray-400;
+      }
+
+      :is(th, td, li.resource, .heading .options li) {
+        @apply tw:dark:border-gray-700;
+      }
+
+      tr.offset {
+        @apply tw:dark:bg-gray-800;
+      }
+
+      a {
+        @apply tw:dark:text-green-400;
+      }
+
+      :is(input.parameter, select, .body-textarea) {
+        @apply tw:dark:bg-gray-700 tw:dark:border-gray-600 tw:dark:text-gray-200;
+      }
+
+      .content-type label {
+        @apply tw:dark:text-blue-300;
+      }
+
+      li.resource > .heading {
+        :is(h2, h2 a) {
+          @apply tw:dark:text-gray-400 tw:dark:hover:text-white;
+        }
+
+        .options a {
+          @apply tw:dark:text-gray-400 tw:dark:hover:text-white;
+        }
+      }
+
+      li.resource.active > .heading :is(h2 a, .options a) {
+        @apply tw:dark:text-gray-100;
+      }
+
+      .operation {
+        .heading h3,
+        .heading .path a {
+          @apply tw:dark:text-gray-100;
+        }
+
+        .heading .http_method a {
+          @apply tw:dark:text-white;
+        }
+
+        &:is(.get, .head) {
+          :is(.heading, .content) {
+            @apply tw:dark:bg-blue-950 tw:dark:border-blue-900;
+          }
+
+          :is(.options a, .content h4, .sandbox_header a) {
+            @apply tw:dark:text-blue-300;
+          }
+        }
+
+        &.post {
+          :is(.heading, .content) {
+            @apply tw:dark:bg-green-950 tw:dark:border-green-900;
+          }
+
+          :is(.options a, .content h4, .sandbox_header a) {
+            @apply tw:dark:text-green-300;
+          }
+        }
+
+        &:is(.put, .patch) {
+          :is(.heading, .content) {
+            @apply tw:dark:bg-yellow-950 tw:dark:border-yellow-900;
+          }
+
+          :is(.options a, .content h4, .sandbox_header a) {
+            @apply tw:dark:text-yellow-300;
+          }
+        }
+
+        &.delete {
+          :is(.heading, .content) {
+            @apply tw:dark:bg-red-950 tw:dark:border-red-900;
+          }
+
+          :is(.options a, .content h4, .sandbox_header a) {
+            @apply tw:dark:text-red-300;
+          }
+        }
+      }
+
+      .model-signature {
+        :is(.signature-nav .selected, .signature-nav a:hover, .description .strong, .description .stronger) {
+          @apply tw:dark:text-gray-100;
+        }
+
+        .signature-nav li {
+          @apply tw:dark:border-gray-700;
+        }
+
+        .propType {
+          @apply tw:dark:text-blue-300;
+        }
+
+        .propOpt {
+          @apply tw:dark:text-gray-400;
+        }
+
+        pre:hover {
+          @apply tw:dark:bg-gray-700;
+        }
+      }
+    }
+  }
 }
