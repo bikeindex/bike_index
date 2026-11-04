@@ -68,9 +68,10 @@ Every legacy stylesheet wraps itself in `@layer legacy` (see `app/assets/stylesh
 
 **`!important` reverses layer order**, so a legacy-layer `!important` beats a tailwind utility that isn't. A rule kept "just in case" in `revised.scss` is not inert — it is what paints. Delete the legacy rule rather than leaving it alongside; `revised.scss` is fully inside the layer, so the utility already wins without it.
 
-## Two Tailwind v4 traps
+## Tailwind v4 traps
 
 - **A build that was right can go wrong under you.** Each workspace runs its own `tailwindcss:watch`, and one can overwrite `app/assets/builds/tailwind.css` with a scan from before your edit — so a rule you just wrote is served, then isn't. Before believing a CSS change doesn't work, count it in the build (`grep -o '<class>' app/assets/builds/tailwind.css | wc -l`, since the file is minified onto few lines) and check the built file's mtime against the source's. `bin/rails tailwindcss:build` restores it.
+- **An `_` inside an arbitrary value compiles to a space.** `tw:group-has-[#donate_cadence:checked]:flex` builds `#donate cadence:checked`, a descendant selector that never matches, so the class is emitted and inert. Give an id an arbitrary variant keys on dashes (`Pages::Donate::Form`'s `donate-cadence-one-time`), or escape it as `\_`.
 - **A grid item stretches to its row.** For a `<div>` that's invisible, but a bare `<table>` grid item spreads the extra height across its own rows, so two `UI::TableList` panels side by side pull each other's rows tall. `tw:items-start` on the grid, or wrap the table in a `<div>`.
 
 ## Buttons: always `UI::Button` (and the UI component library generally)
