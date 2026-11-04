@@ -89,11 +89,6 @@ linter:
       exclude:
         - 'db/seeds/**/*'
 
-    # Its cards are components, and render(array) only takes partials
-    actionview-prefer-collection-render:
-      exclude:
-        - 'app/components/pages/ebike_rules/classes/component.html.erb'
-
     # The legacy views are full of these; components are clean, so hold the line there
     html-anchor-require-href:
       only:

@@ -52,8 +52,7 @@
 <div class="mobile-nonfloating-menu pl-1 pr-1 text-center">
   <strong class="d-inline-block"><%= t(".edit_pages") %></strong>
 
-  <% @edit_templates.each do |t_d| %>
-    <% template, description = t_d[0], t_d[1] %>
+  <% @edit_templates.each do |template, description| %>
     <% is_active = 'active' if @edit_template.match(/#{template}/) %>
 
     <a

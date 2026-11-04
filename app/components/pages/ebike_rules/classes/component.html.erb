@@ -41,9 +41,7 @@
           tw:gap-4
         "
       >
-        <% cards.each do |card| %>
-          <%= render(card) %>
-        <% end %>
+        <%= safe_join(cards.map { render(it) }) %>
       </div>
     </div>
   </section>

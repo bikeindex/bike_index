@@ -211,12 +211,11 @@ RSpec.describe Organized::ExportsController, type: :request do
       it "expands the time field that has a value, not the other one" do
         get "#{base_url}/new?end_at=2016-03-08T02:00"
         expect(response.code).to eq("200")
-        styles = Nokogiri::HTML(response.body).css(".collapsed-fields").to_h do |fields|
-          [fields.at_css("input[type=datetime-local]")&.attr("name"), fields.attr("style")]
-        end
-        expect(styles["export[end_at]"]).to eq("display: block;")
-        expect(styles["export[start_at]"]).to eq("")
+        page = Nokogiri::HTML(response.body)
+        expect(page.at_css("[name='export[end_at]']").parent["style"]).to eq("display: block;")
+        expect(page.at_css("[name='export[start_at]']").parent["style"]).to eq("")
       end
+
       context "organization has all feature slugs" do
         let(:enabled_feature_slugs) { ["csv_exports"] + OrganizationFeature::REG_FIELDS }
         it "renders still" do

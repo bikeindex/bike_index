@@ -5,7 +5,6 @@
   <%# search--form only needs to hold the form; the card is the outer element %>
   <div data-controller="<%= turbo? ? "search--form" : "" %>">
     <%= form_with(url: @target_search_path,
-      builder: BikeIndexFormBuilder,
       method: :get,
       id: "Search_Form",
       data: form_data) do %>
