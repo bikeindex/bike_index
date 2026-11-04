@@ -197,14 +197,13 @@ module BikeServices
     # under a lock. It ends with this transaction because the rest of save_bike can be slow
     def duplicate_or_save(b_param, bike)
       Bike.transaction do
-        lock_duplicate_check(bike) if b_param.no_duplicate?
-        BikeServices::Builder.find_duplicate(b_param, bike).tap { bike.save if it.blank? }
+        if b_param.no_duplicate?
+          BikeServices::OwnerDuplicateFinder.lock_matching(serial: bike.serial_number, owner_email: bike.owner_email)
+        end
+        duplicate = BikeServices::Builder.find_duplicate(b_param, bike)
+        bike.save if duplicate.blank?
+        duplicate
       end
-    end
-
-    def lock_duplicate_check(bike)
-      key = "#{SerialNormalizer.normalized_and_corrected(bike.serial_number)}:#{bike.owner_email}"
-      Bike.lease_connection.execute(Bike.sanitize_sql(["SELECT pg_advisory_xact_lock(hashtextextended(?, 0))", key]))
     end
 
     def save_bike(b_param, bike)

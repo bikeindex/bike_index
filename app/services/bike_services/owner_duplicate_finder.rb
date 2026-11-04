@@ -37,6 +37,15 @@ module BikeServices
         )
     end
 
+    # Holds concurrent registrations of the same bike until the open transaction ends
+    def self.lock_matching(serial:, owner_email:)
+      serial_normalized = SerialNormalizer.normalized_and_corrected(serial)
+      return if serial_normalized.blank?
+
+      key = "#{serial_normalized}:#{EmailNormalizer.normalize(owner_email)}"
+      Bike.lease_connection.execute(Bike.sanitize_sql(["SELECT pg_advisory_xact_lock(hashtextextended(?, 0))", key]))
+    end
+
     def self.find_matching_user_ids(email = nil, phone = nil)
       (matching_user_ids(:email, email, UserEmail) + matching_user_ids(:phone, phone, UserPhone)).uniq
     end

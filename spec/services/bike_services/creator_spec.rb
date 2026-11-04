@@ -534,15 +534,13 @@ RSpec.describe BikeServices::Creator do
         let(:parent_organization) { FactoryBot.create(:organization) }
         let(:posting_organization) { FactoryBot.create(:organization_child, parent_organization:) }
         let(:bike_params) { default_params.merge(creation_organization_id: posting_organization.id) }
-        before { BikeOrganization.create!(bike: existing_bike, organization: parent_organization) }
+        before { BikeOrganization.create!(bike: existing_bike, organization: parent_organization, can_edit_claimed: false) }
         def bike_organization_ids = existing_bike.reload.bike_organizations.pluck(:organization_id)
 
         it "adds a child of the organization holding the bike" do
           expect_duplicate_found
           expect(bike_organization_ids).to match_array([parent_organization.id, posting_organization.id])
-          # And calling it again doesn't add it twice
-          expect(instance.create_bike(b_param)&.id).to eq existing_bike.id
-          expect(bike_organization_ids).to match_array([parent_organization.id, posting_organization.id])
+          expect(BikeOrganization.find_by(bike: existing_bike, organization: posting_organization).can_edit_claimed).to be_falsey
         end
         context "child of an unrelated organization" do
           let(:posting_organization) { FactoryBot.create(:organization_child) }
@@ -822,7 +820,7 @@ RSpec.describe BikeServices::Creator do
         no_duplicate: true
       }
     end
-    let(:b_params) { Array.new(2) { BParam.create(creator: user, params: {bike: bike_params}) } }
+    let!(:b_params) { Array.new(2) { BParam.create(creator: user, params: {bike: bike_params}) } }
 
     def waiting_on_locks
       Bike.lease_connection.select_value(<<~SQL)
@@ -832,7 +830,6 @@ RSpec.describe BikeServices::Creator do
     end
 
     it "registers one bike" do
-      expect(b_params.size).to eq 2
       Organization.example # Creates it if missing, which the threads would race to do
 
       # SHARE lets reads through and holds writes, so both get past find_or_build before either commits

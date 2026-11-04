@@ -56,7 +56,6 @@ module BikeServices
       find_duplicate(b_param, bike) || bike
     end
 
-    # Called from Creator too, so can't be private
     def find_duplicate(b_param, bike)
       return unless b_param.no_duplicate?
 
@@ -76,11 +75,14 @@ module BikeServices
     # A bike reaches an organization's parent when it's created, never its children - so
     # a child posting a sale its parent already holds would otherwise lose sight of it
     def add_to_child_organization(bike, organization)
-      parent_organization_id = organization&.parent_organization_id
-      return if parent_organization_id.blank?
-      return unless BikeOrganization.exists?(bike_id: bike.id, organization_id: parent_organization_id)
+      return if organization&.parent_organization_id.blank?
 
-      BikeOrganization.find_or_create_by(bike_id: bike.id, organization_id: organization.id)
+      parent = bike.bike_organizations.find_by(organization_id: organization.parent_organization_id)
+      return if parent.blank?
+
+      bike.bike_organizations.find_or_create_by(organization_id: organization.id) do |bike_organization|
+        bike_organization.can_not_edit_claimed = parent.can_not_edit_claimed
+      end
     end
 
     # previously BikeServices::CreatorOrganizer
