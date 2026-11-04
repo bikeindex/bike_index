@@ -108,6 +108,23 @@ RSpec.describe "Organization sidebar", :js, type: :system do
     wait_for { current_row_in_view? }
     # Guards this against going vacuous on a menu that turns out to fit
     expect(scroller_top).to be > 0
+
+    # ui--collapse's module landing well behind this controller's, as on a slow connection
+    held = []
+    page.driver.with_playwright_page do |playwright_page|
+      playwright_page.route("**/ui/collapse_controller*.js", ->(route, request) {
+        held << request.url
+        sleep 1
+        route.continue
+      })
+    end
+    visit "/o/#{slug}/impound_records"
+
+    using_wait_time(10) { expect_open("Impounded Vehicles") }
+    expect(page).to have_no_css "#org_sidebar_nav button[aria-expanded='true']",
+      text: "#{organization.short_name} Registrations"
+    # A route that never fired would pass vacuously
+    expect(held).to be_present
   end
 
   it "lays a flash beside the sidebar, and tells add-a-registration from the notification row by the param" do
