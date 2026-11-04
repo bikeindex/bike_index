@@ -359,10 +359,13 @@ arrived; and prefer asserting the user-visible consequence alongside the interna
 verdict.
 
 **Programmatic back/forward.** Playwright drives these specs and there is no
-BFCache, so `go_back`/`go_forward` onto a `turbo-action: advance` entry is
-genuinely unreliable. Prefer not to chain a real navigation onto the tail of a
-back/forward sequence. If a spec must, expect to need the settle-then-click
-pattern above.
+BFCache, so a traversal onto a `turbo-action: advance` entry depends on Turbo's
+restoration visit finishing. Check for an app race before blaming the harness:
+`search_marketplace_spec`'s `:flaky` tag blamed `go_forward` no-op'ing, when `go_forward`
+never did and a frame's follow-up visit was cancelling the restoration, which a rider
+can hit too. Logging `popstate`, `turbo:before-visit` and `turbo:load` tells them apart.
+Prefer not to chain a real navigation onto the tail of a back/forward sequence. If a
+spec must, expect to need the settle-then-click pattern above.
 
 ## What a finished fix looks like
 
