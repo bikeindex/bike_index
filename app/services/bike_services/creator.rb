@@ -244,7 +244,8 @@ module BikeServices
     end
 
     def create_ownership(b_param, bike)
-      ownership = bike.ownerships.new(creator: b_param.creator, skip_email: b_param.skip_email?)
+      # bike: because an unsaved bike isn't set by the association, which reads its owner_email as blank
+      ownership = bike.ownerships.new(bike:, creator: b_param.creator, skip_email: b_param.skip_email?)
       ownership.attributes = ownership_creation_attributes(b_param, bike)
       unless ownership.save
         ownership.errors.messages.each { |msg| bike.errors.add(msg[0], msg[1][0]) }
