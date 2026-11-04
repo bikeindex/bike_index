@@ -134,9 +134,9 @@ module BikeDuplicatesServices
 
     # Whether these records, whatever they are, meet each same_owner_criteria: {criterion => met}
     def same_owner_evidence(bike_ids)
-      condition = ActiveRecord::Base.sanitize_sql_array(["id IN (?)", bike_ids])
       columns = same_owner_criteria.map { |criterion, sql| "#{sql} AS #{criterion}" }.join(", ")
-      ActiveRecord::Base.connection.select_one("WITH live AS (#{live_sql(condition)}), #{registrations_sql("live")} SELECT #{columns} FROM registrations")
+      sql = "WITH live AS (#{live_sql("id IN (?)")}), #{registrations_sql("live")} SELECT #{columns} FROM registrations"
+      ActiveRecord::Base.connection.select_one(ActiveRecord::Base.sanitize_sql_array([sql, bike_ids]))
     end
 
     #
