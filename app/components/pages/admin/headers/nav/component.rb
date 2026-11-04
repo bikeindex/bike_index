@@ -5,7 +5,8 @@ module Pages
     module Headers
       module Nav
         # The row an admin screen opens with: its heading, and the links and filters acting on
-        # the whole screen right-aligned beside it, one with_item each.
+        # the whole screen right-aligned beside it, one with_item each. An item's top-level
+        # elements each wrap on their own, so wrap any that have to stay together.
         class Component < ApplicationComponent
           BORDER_CLASSES = "tw:mb-6 tw:border-b tw:border-gray-300 tw:dark:border-gray-700"
 
