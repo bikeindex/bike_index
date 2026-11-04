@@ -9,7 +9,7 @@ import { FILTERS, LISTS, RANGES, SINGLES, ordered, searching, toQuery } from 'bi
 import { fragmentOf, renderInto } from 'bikebook/render'
 import { preferredSize } from 'bikebook/sizes'
 import { settingsFrom } from 'bikebook/similarity'
-import { MAX_COMPARE, pickedPhotos, VehicleViewer, withChosenPhotos } from 'bikebook/vehicle_viewer'
+import { chosenPhotos, MAX_COMPARE, VehicleViewer } from 'bikebook/vehicle_viewer'
 
 /* global CSS */
 
@@ -122,7 +122,7 @@ const renderSimilarControls = (root, viewer, vehicles, similar) => {
 export async function rescoredSimilar (catalog, page, url, vehicle, settings) {
   const filters = filtersAt(catalog, page, url)
   const [picks, results] = await Promise.all([pickedOf(catalog, url, filters), catalog.similar(vehicle, settings, filters)])
-  return new VehicleViewer(catalog.kit, catalog.vocabulary, filters).similarResults(url, results, pickedPhotos(withChosenPhotos(url, picks)))
+  return new VehicleViewer(catalog.kit, catalog.vocabulary, filters).similarResults(url, results, chosenPhotos(url, picks))
 }
 
 // the model group `url`'s overview shows, of one of its vehicles, in the `filters`' market
@@ -155,7 +155,7 @@ export async function addComparison (catalog, page, url, current) {
 
   const viewer = new VehicleViewer(catalog.kit, catalog.vocabulary, filters)
   page.querySelector('[data-similar-waiting]')?.remove()
-  page.querySelector('#vehicle-viewers').prepend(fragmentOf(viewer.similarModels(vehicles[0], similar, url, pickedPhotos(withChosenPhotos(url, vehicles)))))
+  page.querySelector('#vehicle-viewers').prepend(fragmentOf(viewer.similarModels(vehicles[0], similar, url, chosenPhotos(url, vehicles))))
   renderSimilarControls(page, viewer, vehicles, similar)
 }
 

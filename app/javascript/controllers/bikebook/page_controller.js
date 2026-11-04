@@ -51,6 +51,7 @@ export default class extends Controller {
           this.refresh()
         }
       })
+      this.#picks = null
     } catch (error) {
       this.#loadFailed = true
       return this.#fail(error)

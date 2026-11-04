@@ -37,24 +37,22 @@ RSpec.describe BikebookController, type: :request do
       end
     end
 
-    context "with filters" do
-      it "keeps the search it would show without them blank" do
+    context "the search the server can't fill in" do
+      let(:shell_class) { Capybara.string(response.body).find("[inert]")[:class] }
+
+      it "is blank with filters" do
         get "/bikebook", params: {search: "1", manufacturer: "aventon"}
-        expect(Capybara.string(response.body).find("[inert]", visible: :all)[:class]).to eq "tw:invisible"
+        expect(shell_class).to eq "tw:invisible"
       end
 
-      context "and picks" do
-        it "keeps the search blank" do
-          get "/bikebook", params: {vehicle_models: "m/segway/2025/gt3_pro,m/aventon/2022/level_2", electric: "1"}
-          expect(Capybara.string(response.body).find("[inert]", visible: :all)[:class]).to eq "tw:invisible"
-        end
+      it "is blank with filters and picks" do
+        get "/bikebook", params: {vehicle_models: "m/segway/2025/gt3_pro,m/aventon/2022/level_2", electric: "1"}
+        expect(shell_class).to eq "tw:invisible"
       end
-    end
 
-    context "asked for the search alone" do
-      it "shows it" do
+      it "shows when asked for alone" do
         get "/bikebook", params: {search: "1"}
-        expect(Capybara.string(response.body).find("[inert]")[:class]).to be_blank
+        expect(shell_class).to be_blank
       end
     end
 

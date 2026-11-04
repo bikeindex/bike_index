@@ -247,14 +247,16 @@ export class VehicleViewer {
 }
 
 // Each of the `picks` at `url` keyed, its photo its chosen colorway's where it has one
-export const withChosenPhotos = (url, picks) => {
+const withChosenPhotos = (url, picks) => {
   const colorways = pickedColorways(url)
   const keys = vehicleKeys(picks.map(({ value }) => value))
   return picks.map((pick, index) => ({ ...pick, key: keys[index], data: pick.data && withColorwayPhoto(pick.data, colorways[keys[index]]) }))
 }
 
 // Each of the `vehicles` compared's photo, by its id
-export const pickedPhotos = (vehicles) => new Map(vehicles.filter(({ data }) => present(data?.stock_photo)).map(({ value, data }) => [value, data.stock_photo]))
+const pickedPhotos = (vehicles) => new Map(vehicles.filter(({ data }) => present(data?.stock_photo)).map(({ value, data }) => [value, data.stock_photo]))
+
+export const chosenPhotos = (url, picks) => pickedPhotos(withChosenPhotos(url, picks))
 
 // This page's URL with `params` laid over its own
 const pathWith = (url, params) => {

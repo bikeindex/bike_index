@@ -12,7 +12,7 @@ const READER_SCROLL_EVENTS = ['wheel', 'touchmove', 'keydown']
 // short of the fold
 const REVEAL_MARGIN = 8
 const GROUP = '[data-controller~="ui--collapse"]'
-// In time rather than frames, which a slow connection outlasts and a fast display halves
+// So a ui--collapse that never loads can't leave a frame loop running
 const COLLAPSE_WAIT_MS = 10000
 
 // Connects to data-controller="shared-blocks--org-sidebar"
