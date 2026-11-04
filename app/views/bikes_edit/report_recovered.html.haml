@@ -27,7 +27,7 @@
 
 - modal_body = capture_haml do
   .modal-body
-    .modal-validation-alert.currently-hidden
+    .modal-validation-alert{class: "tw:hidden"}
       = render(UI::Alerts::Base::Component.new(kind: :error, header: t(".not_enough_info"))) do
         %p= t(".please_tell_us_how_you_got_your_bike", bike_type: @bike.type)
         %p= t(".its_how_we_get_better_at_recovering_bikes")

@@ -1707,8 +1707,8 @@ en:
         update:
           bike_recovered: Bike marked recovered! Thank you!
       resolve_token:
+        bike_type_marked_retrieved: "%{bike_type} marked retrieved!"
         marked_remaining: "%{bike_type} marked remaining!"
-        marked_retrieved: "%{@bike_type} marked retrieved!"
         notification_already_retrieved: That %{bike_type} has already been marked
           retrieved!
         notification_impounded: That %{bike_type} has been impounded! Contact %{org_name}

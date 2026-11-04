@@ -519,7 +519,7 @@ RSpec.describe "BikesController#show", type: :request do
         Sidekiq::Job.clear_all
         Sidekiq::Testing.inline! do
           put "#{base_url}/#{bike.id}/resolve_token?token=#{parking_notification.retrieval_link_token}&token_type=appears_abandoned_notification"
-          expect(flash[:success]).to be_present
+          expect(flash[:success]).to eq "Bike marked retrieved!"
         end
         # parking_notification_abandoned was marked retrieved - even though the token was for parking_notification
         expect(parking_notification_abandoned.reload.status).to eq "retrieved"
