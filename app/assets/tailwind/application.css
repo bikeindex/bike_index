@@ -28,6 +28,18 @@
 /* /bikebook with its similar models open */
 @custom-variant similar-open (&:where(:has(#similar-toggle[aria-expanded=true]) *));
 
+/* A table's card running to the page's edges: once its .twwiderow has dropped to one column,
+ * the same 672px as .twfullbleed, or its table is wider than the card, which ui--table-overflow flags */
+@custom-variant table-bleed {
+  @container twwiderow (width < 672px) {
+    @slot;
+  }
+
+  &:where([data-table-bleed=true], [data-table-bleed=true] *) {
+    @slot;
+  }
+}
+
 /* The selected/pressed state of a button, link or menu item, however it's flagged —
  * including a <label> around a checked radio (UI::Forms::RadioButtonGroup).
  * Keep it the last @custom-variant: tailwind sorts custom variants in declaration
@@ -122,6 +134,7 @@
 
 @import "./bike_index_components.css";
 @import "./bikebook.css";
+@import "./legacy_dark.css";
 
 @layer components {
   /* Style tables with CSS selectors to prevent caching issues */
@@ -202,6 +215,24 @@
   [role="button"]:not(:disabled),
   input:where([type="button"], [type="reset"], [type="submit"]):not(:disabled) {
     cursor: pointer;
+  }
+}
+
+@layer base {
+  /* Tailwind's shadows take this color over the one they're written with, which is pitched for
+   * a light page and doesn't show on a dark one. It doesn't inherit, so every element sets it.
+   * A shadow that's a chosen color rather than a shadow sets its own: tw:dark:shadow-gray-300 */
+  * {
+    @variant dark {
+      /* A drop shadow's filter reads this rather than a color */
+      --tw-drop-shadow-md: 0 3px 3px rgb(0 0 0 / 0.5);
+
+      &,
+      &::before,
+      &::after {
+        --tw-shadow-color: rgb(0 0 0 / 0.5);
+      }
+    }
   }
 }
 

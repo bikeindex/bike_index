@@ -49,9 +49,10 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
     expect(component).to have_css("select#per_page_select option[selected]", text: "10 per page")
     # bike data in cells
     expect(component).to have_text(bike.mnfg_name)
-    # the table bleeds to the page's edges once the card is full bleed
+    # the table's overflow flags the card, and the table bleeds to the page's edges with it
+    expect(component).to have_css(".search-results-card[data-table-bleed='false']", visible: :all)
     expect(component.at_css("div:has(> [data-controller~='ui--table-overflow'])")[:class].split)
-      .to include(*described_class::TABLE_BLEED_CLASSES.split)
+      .to include("tw:table-bleed:-mx-(--gutter)")
     # the card marks itself for the frame's loading swap, and the rows swap off the
     # frame's tw:group for the spinner that replaces them
     expect(component).to have_css(".search-results-card", visible: :all)
@@ -127,8 +128,7 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
       expect(component).to have_button("Column settings", visible: :all)
       # the header's button is the only one - the panel doesn't carry the legacy one
       expect(component).to have_css("[data-ui--collapse-target='trigger']", count: 1, visible: :all)
-      expect(component.at_css("div:has(> [data-controller~='ui--table-overflow'])")[:class].split)
-        .not_to include(*described_class::TABLE_BLEED_CLASSES.split)
+      expect(component).to have_css("[data-controller~='org--search'][data-table-bleed='false']")
     end
 
     context "with csv_exports enabled" do

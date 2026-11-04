@@ -159,7 +159,7 @@ const compared = (vehicles, fields, frames, sectionClasses, corner) => html`<sec
         cell: ({ key, only }) => {
           if (present(vehicle[key])) return vehicle[key]
           if (only !== 'electric' || vehicle.electric) return missing
-          return key === 'e_vehicle_class' ? html`<span class="twless-strong">not e-vehicle</span>` : nothing
+          return key === 'e_vehicle_class' ? html`<span class="less-strong">not e-vehicle</span>` : nothing
         }
       }
     })

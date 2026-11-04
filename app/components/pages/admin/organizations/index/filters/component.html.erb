@@ -1,5 +1,4 @@
-<div class="tw:flex tw:flex-wrap tw:items-baseline tw:gap-1">
-  <%= render(UI::Dropdown::Component.new(name: kind_name, button_size: :sm, active: kind.present?)) do |dropdown|
+<%= render(UI::Dropdown::Component.new(name: kind_name, button_size: :sm, active: kind.present?)) do |dropdown|
   dropdown.with_entry_item { filter_link("All Kinds", :search_kind, nil) }
   dropdown.with_entry_divider
   Organization.kinds.each do |organization_kind|
@@ -7,7 +6,7 @@
   end
 end %>
 
-  <%= render(UI::Dropdown::Component.new(name: pos_name, button_size: :sm, active: pos_kind.present?)) do |dropdown|
+<%= render(UI::Dropdown::Component.new(name: pos_name, button_size: :sm, active: pos_kind.present?)) do |dropdown|
   dropdown.with_entry_item { filter_link("All POS", :search_pos, nil) }
   dropdown.with_entry_divider
   pos_entries.each do |entry|
@@ -16,7 +15,6 @@ end %>
   end
 end %>
 
-  <%= render(UI::ButtonLink::Component.new(text: "Invoiced", href: invoiced_path, size: :sm, active: @search_invoiced)) %>
+<%= render(UI::ButtonLink::Component.new(text: "Invoiced", href: invoiced_path, size: :sm, active: @search_invoiced)) %>
 
-  <%= render(UI::ButtonLink::Component.new(text: "New Organization", href: new_admin_organization_url, color: :primary, size: :sm)) %>
-</div>
+<%= render(UI::ButtonLink::Component.new(text: "New Organization", href: new_admin_organization_url, color: :primary, size: :sm)) %>

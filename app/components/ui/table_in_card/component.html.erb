@@ -7,14 +7,14 @@
 <% end %>
 
 <% if @column_settings %>
-  <%# twfullbleed reads the twwiderow container %>
+  <%# The container table-bleed reads %>
   <div class="twwiderow tw:mb-4">
     <%= card do %>
       <%# Full bleed drops the card's gutter, so the header meets the page's %>
       <div
         class="
           tw:flex tw:flex-wrap tw:items-center tw:justify-end tw:gap-x-4
-          tw:gap-y-2 tw:py-3 tw:@min-[672px]/twwiderow:px-4
+          tw:gap-y-2 tw:px-4 tw:py-3 tw:table-bleed:px-0
         "
       >
         <% if description? %>
@@ -32,18 +32,20 @@
         </div>
       </div>
 
-      <%= render(UI::TableColumnSettings::Component.new(**@column_settings.except(:storage_key), orderable: true)) %>
+      <%# Full bleed runs past the card and its border, so the table draws the line under itself %>
+      <div class="tw:table-bleed:-mx-(--gutter)">
+        <%= render(UI::TableColumnSettings::Component.new(**@column_settings.except(:storage_key), orderable: true)) %>
 
-      <%# Full bleed takes the table over the admin gutter, past the card, so it's clipped here. %>
-      <%# Wider, it's rounded to the card's rounded-xl inside its border, or the cells square the corners off %>
-      <div
-        class="
-          tw:overflow-hidden
-          tw:@max-[672px]/twwiderow:mx-[calc(var(--gutter)*-1)]
-          tw:@min-[672px]/twwiderow:rounded-b-[11px]
-        "
-      >
-        <%= table_html %>
+        <%# Otherwise it's rounded to the card's rounded-xl inside its border, or the cells square the corners off %>
+        <div
+          class="
+            tw:overflow-hidden tw:rounded-b-[11px] tw:border-gray-200
+            tw:dark:border-gray-700 tw:table-bleed:rounded-b-none
+            tw:table-bleed:border-b
+          "
+        >
+          <%= table_html %>
+        </div>
       </div>
     <% end %>
   </div>

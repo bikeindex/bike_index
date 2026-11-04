@@ -4,8 +4,10 @@ module UI
   module TableColumn
     class Component < ApplicationComponent
       NBSP = "\u00A0"
-      TD_CLASSES = "tw:px-1 tw:py-1 tw:border-b tw:border-gray-100 tw:dark:border-gray-700"
-      BORDERED_TD_CLASSES = "tw:px-1 tw:py-1 tw:border-b tw:border-l tw:border-gray-200 tw:dark:border-gray-700"
+      TD_CLASSES = "tw:px-1 tw:py-1 tw:border-b tw:border-gray-100 tw:dark:border-gray-800"
+      # The last row's line is the table's bottom edge, so it stays with the sides
+      BORDERED_TD_CLASSES = "tw:px-1 tw:py-1 tw:border-b tw:border-l tw:border-gray-200 tw:dark:border-gray-700 " \
+        "tw:dark:[tr:not(:last-child)>&]:border-b-gray-800"
 
       attr_reader :sortable, :cell_block, :footer, :header_tooltip, :row_header
 

@@ -24,7 +24,7 @@
       </li>
 
       <li>
-        <small class="twless-strong">
+        <small class="less-strong">
           <%= link_to "all organization invoices", admin_organization_invoices_path(@invoice.organization), class: "twlink" %>
         </small>
       </li>
@@ -34,7 +34,7 @@
   <% list.with_row(label: "Paid in full:") do %>
     <strong><%= @invoice.paid_in_full? ? "Yes" : "No" %></strong>
 
-    <span class="twless-strong">
+    <span class="less-strong">
       <%= MoneyFormatter.money_format(@invoice.amount_paid_cents, @invoice.currency_name) %>
     </span>
 
@@ -49,13 +49,13 @@
     </ul>
 
     <% if @invoice.law_enforcement_functionality_invoice? %>
-      <strong class="twless-strong"> Verified Law Enforcement functionality </strong>
+      <strong class="less-strong"> Verified Law Enforcement functionality </strong>
       invoice
     <% end %>
 
     <% if @invoice.paid_money_but_no_cost? %>
-      <strong class="twless-strong">Amount due is $0</strong> this invoice
-      doesn't make the organization "Paid"
+      <strong class="less-strong">Amount due is $0</strong> this invoice doesn't
+      make the organization "Paid"
       <% if @invoice.payments.any? %>
         <span class="tw:mt-1 tw:block">
           <strong class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">This invoice has a payment,</strong>
