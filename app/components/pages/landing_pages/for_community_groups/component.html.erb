@@ -82,7 +82,7 @@
   >
     <% steps.each_with_index do |(color, title, body), index| %>
       <li class="tw:flex">
-        <%= render(UI::Card::Component.new(shadow: true, additional_classes: "tw:w-full tw:rounded-lg! tw:p-6!")) do %>
+        <%= render(UI::Card::Component.new(additional_classes: "tw:w-full tw:rounded-lg! tw:p-6!")) do %>
           <span class="tw:mb-2.5 tw:block tw:font-header tw:text-[34px] tw:leading-none tw:font-black <%= color %>">
             <%= index + 1 %>
           </span>
@@ -134,7 +134,7 @@
       <% end %>
     </div>
 
-    <div class="tw:p-7 <%= COMIC_CARD %>">
+    <%= render(UI::Card::Component.new(shadow: :black, additional_classes: "tw:p-7!")) do %>
       <div class="tw:mb-4 tw:flex tw:items-baseline tw:justify-between tw:gap-4">
         <h3 class="tw:m-0 tw:font-header tw:text-xl tw:font-extrabold">
           <%= translation(".ebike_education") %>
@@ -163,7 +163,7 @@
           </li>
         <% end %>
       </ul>
-    </div>
+    <% end %>
   </div>
 </section>
 
@@ -193,28 +193,35 @@
 </section>
 
 <section class="tw:pb-16 <%= SECTION_CLASSES %>">
-  <figure class="tw:m-0 tw:grid tw:grid-cols-[repeat(auto-fit,minmax(min(100%,320px),1fr))] tw:overflow-hidden <%= COMIC_CARD %>">
-    <%= image_tag("https://files.bikeindex.org/uploads/Tw/5/DCX27h8XkAQ9zOo.jpg", alt: "", loading: "lazy",
+  <%= render(UI::Card::Component.new(shadow: :black, additional_classes: "tw:overflow-hidden tw:p-0!")) do %>
+    <figure
+      class="
+        tw:m-0 tw:grid
+        tw:grid-cols-[repeat(auto-fit,minmax(min(100%,320px),1fr))]
+      "
+    >
+      <%= image_tag("https://files.bikeindex.org/uploads/Tw/5/DCX27h8XkAQ9zOo.jpg", alt: "", loading: "lazy",
       class: "tw:block tw:size-full tw:min-h-65 tw:object-cover") %>
 
-    <div class="tw:p-9">
-      <%= helpers.inline_svg_tag("icons/quote.svg", class: "tw:mb-3 tw:size-8 tw:text-purple-500", aria_hidden: true) %>
+      <div class="tw:p-9">
+        <%= helpers.inline_svg_tag("icons/quote.svg", class: "tw:mb-3 tw:size-8 tw:text-purple-500", aria_hidden: true) %>
 
-      <blockquote
-        class="
-          tw:m-0 tw:border-0 tw:p-0 tw:font-header tw:text-[22px]
-          tw:leading-[1.4] tw:font-bold
-        "
-      >
-        <%= TESTIMONIAL %>
-      </blockquote>
+        <blockquote
+          class="
+            tw:m-0 tw:border-0 tw:p-0 tw:font-header tw:text-[22px]
+            tw:leading-[1.4] tw:font-bold
+          "
+        >
+          <%= TESTIMONIAL %>
+        </blockquote>
 
-      <figcaption class="tw:mt-4 tw:text-[15px] <%= MUTED %>">
-        <%= translation(".testimonial_attribution_html",
+        <figcaption class="tw:mt-4 tw:text-[15px] <%= MUTED %>">
+          <%= translation(".testimonial_attribution_html",
           link: link_to("@GOBuffalo", "https://twitter.com/GOBuffalo", class: "tw:py-2.5 tw:font-semibold twlink")) %>
-      </figcaption>
-    </div>
-  </figure>
+        </figcaption>
+      </div>
+    </figure>
+  <% end %>
 </section>
 
 <section class="tw:pb-18 <%= SECTION_CLASSES %>">

@@ -5,7 +5,6 @@ module Pages
     module ForCommunityGroups
       class Component < ApplicationComponent
         SECTION_CLASSES = SharedBlocks::Marketing::Wrapper::Component::CONTAINER_CLASSES
-        COMIC_CARD = "tw:rounded-lg tw:border-3 tw:border-[#111] tw:bg-white tw:shadow-[4px_4px_0_#111] tw:dark:bg-gray-800"
         MUTED = "tw:text-gray-600 tw:dark:text-gray-300"
         CALLOUT = "tw:flex tw:items-center tw:gap-x-3.5 tw:text-base #{MUTED}"
         OUTLINE = "tw:border-2! tw:border-blue-600! tw:normal-case! tw:text-blue-600! tw:hover:bg-blue-600! tw:hover:text-white! " \
