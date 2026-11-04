@@ -31,6 +31,10 @@
     @apply tw:dark:text-gray-200;
   }
 
+  hr:not(.twhr) {
+    @apply tw:dark:border-gray-400/80;
+  }
+
   .form-control,
   .btn-secondary,
   .selectize-input,
