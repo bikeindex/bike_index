@@ -101,8 +101,6 @@
   }
 
   .swagger-section {
-    @apply tw:dark:text-gray-100;
-
     pre .string {
       @apply tw:dark:text-red-300;
     }
@@ -131,7 +129,7 @@
 
   .swagger-ui-wrap {
     :is(p, li) {
-      @apply tw:dark:text-gray-100;
+      @apply tw:dark:text-inherit;
     }
 
     th {

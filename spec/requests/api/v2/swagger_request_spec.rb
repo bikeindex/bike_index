@@ -22,9 +22,7 @@ RSpec.describe "Swagger API V2 docs", type: :request do
       expect(json_result["apis"].map { |i| i[:description] }.sort)
         .to eq target_apis.map { |i| i[:description] }.sort
 
-      json_result["apis"].each do |endpoint|
-        path = endpoint["path"]
-
+      json_result["apis"].pluck("path").each do |path|
         get "/api/v2/swagger_doc#{path}"
 
         expect(response.status).to eq(200)
