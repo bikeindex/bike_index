@@ -31,7 +31,8 @@
     @apply tw:dark:text-gray-200;
   }
 
-  hr:not(.twhr) {
+  hr:not(.twhr),
+  .edit-menu-accessories {
     @apply tw:dark:border-gray-400/80;
   }
 
