@@ -23,7 +23,7 @@
   }
 
   .form-well {
-    @apply tw:dark:bg-transparent tw:dark:border-gray-700;
+    @apply tw:md:max-navbar:dark:bg-gray-800 tw:dark:border-gray-700;
   }
 
   .primary-edit-form-well-menu {
