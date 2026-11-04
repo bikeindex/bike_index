@@ -889,6 +889,9 @@ RSpec.describe "BikesController#show", type: :request do
       expect(flash).to_not be_present
       expect(assigns(:bike_sticker)).to eq bike_sticker
       expect(current_user.authorized?(assigns(:bike_sticker))).to be_truthy
+      alert = Capybara.string(response.body).find("[role=alert]", text: "You scanned")
+      expect(alert).to have_text("assigned to this bike")
+      expect(alert).to have_css("form[action^='/bike_stickers/#{bike_sticker.code}'] input[name='bike_id']", visible: :all)
     end
 
     context "viewer isn't the bike owner" do
@@ -901,6 +904,8 @@ RSpec.describe "BikesController#show", type: :request do
         expect(flash).to_not be_present
         expect(assigns(:bike_sticker)).to eq bike_sticker
         expect(current_user.authorized?(assigns(:bike_sticker))).to be_falsey
+        alert = Capybara.string(response.body).find("[role=alert]", text: "You scanned")
+        expect(alert).to have_no_css("form", visible: :all)
       end
     end
   end

@@ -7,22 +7,8 @@
     = render partial: "/bikes/header_row"
 
   - if @bike_sticker.present?
-    .alert.alert-success
-      %p= t(".you_scanned_this_sticker_html", pretty_code: @bike_sticker.pretty_code, bike_type: @bike.type)
-      - if current_user&.authorized?(@bike_sticker)
-        %p.mt-2
-          %em.less-strong
-            = t(".is_this_linked_to_incorrect_bike")
-            %a.gray-link{ href: "#updateBikeCodeLink", data: { toggle: "collapse" } }
-              = t(".change_the_bike_sticker_linked_to")
-        .collapse#updateBikeCodeLink
-          = form_tag bike_sticker_path(id: @bike_sticker.code, organization_id: @bike_sticker.organization_id), method: :put, class: "row mt-4" do
-            .col-sm-8.col-lg-10
-              .form-group
-                = label_tag :bike_id, t(".switch_to_new_bike_id")
-                = text_field_tag :bike_id, nil, placeholder: "https://bikeindex.org/bikes/1234", class: "form-control"
-            .col-sm-4.col-lg-2.mt-4
-              = submit_tag t(".update"), class: "btn btn-success"
+    %div{class: "tw:mb-4"}
+      = render(Pages::Registrations::Show::CurrentAlerts::ScannedSticker::Component.new(bike: @bike, bike_sticker: @bike_sticker, current_user:))
 
   = render(Pages::Bikes::Org::BikeAccessPanel::Component.new(bike: @bike, organization: passive_organization, current_user:, display_dev_info: display_dev_info?, parking_notification_open: params[:parking_notification].present?))
 

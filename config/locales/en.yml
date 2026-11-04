@@ -1308,13 +1308,11 @@ en:
       you_have_claimed_the_maximum_permitted: You have claimed the maximum permitted
         number of Bike Codes.
     show:
-      change_the_bike_sticker_linked_to: Change the bike it links to
       contact_the_owner: Contact the owner
       created_to_record_parking_notification: created by %{organization} to record
         a Parking Notification
       from: from
       in: in
-      is_this_linked_to_incorrect_bike: Is this sticker linked to the incorrect bike?
       know_something_about_this_bike_type: Know something about this %{bike_type}?
       link_url: Link url
       looking_for_correct_owner: Looking for the correct owner of this %{bike_type}!
@@ -1324,9 +1322,7 @@ en:
       send_message: Send message
       share_it: Share it!
       spread_the_word: Spread the word!
-      switch_to_new_bike_id: Switch to a new bike ID
       test_registration: test registration
-      update: Update
       view_public_non_listing: View public registration
       view_users_other_registrations: View user's other registrations
       viewing_listing_preview: This is a preview of your "for sale" listing. It is
@@ -1335,9 +1331,6 @@ en:
         Where did you see this %{bike_type}? If you're contacting about an ad you
         found online, include a link in the field below
       write_them_a_message: Write them a message
-      you_scanned_this_sticker_html: >-
-        You scanned the sticker <strong>%{pretty_code}</strong>, which is assigned
-        to this %{bike_type}.
     stolen_map:
       unavailable: The map couldn't be loaded — your browser or device may not support
         it.

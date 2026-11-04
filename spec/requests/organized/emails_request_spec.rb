@@ -307,7 +307,7 @@ RSpec.describe Organized::EmailsController, type: :request do
             expect(response.status).to eq(200)
             expect(components).to include("Emails::FinishedRegistration::Component")
             # When claim_message is present, it renders the claim_message partial
-            expect(response.body).to include("something here") # organization_stolen_message body
+            expect(Nokogiri::HTML(response.body).at_css(".organization-stolen-message-alert").text).to include("something here")
             expect(response.body).to include("registered your bike on Bike Index")
             # Stolen-specific text rendered by the FinishedRegistration component
             expect(response.body).to include("Mark your bike recovered")
