@@ -193,6 +193,8 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(all("#model-group > div > h3").map(&:text)).to eq([Time.current.year.to_s])
     expect(group_cards.call).to match_array(["Aventón Level 2", "Aventón Level 2 Step-Through", "Aventón Level 3", "Aventón Level 3 Step-Through",
       "Aventón Level 4 ADV", "Aventón Level 4 ADV Step-Through", "Aventón Level 4 REC", "Aventón Level 4 REC Step-Through"])
+    # a photo shared with another model is its whole URL in the index, rather than an extension
+    expect(find("#group-m-aventon-2025-level_3_step_through").ancestor("li")).to have_css("img[src='https://bikebook.bikeindex.org/aventon/2025/level_3.jpg']", visible: :all)
     # each card adding its model to the comparison or taking it out, as a similar model's does, the group staying open
     expect(page).to have_css("#group-m-aventon-2026-level_4_rec_step_through", text: /, remove from the comparison\z/)
     find("#group-m-aventon-2026-level_4_rec", text: /, add to the comparison\z/).click
@@ -2279,12 +2281,107 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(matched).to eq([["other_e", "acoustic"], ["acoustic"], ["complete", "frame"], ["complete"], ["small", "road"], ["road"], ["36", "28"], ["28", "40"], ["frame", "complete"], ["aluminum", "steel"], ["drop"], ["drop", "flat"], ["near"], ["s1000", "tiagra"], ["steel", "full"], ["commuting", "touring"]])
   end
 
+  it "shows what each of the catalog's files allows as it lands, keeping the picked vehicles if the index fails" do
+    serve_bikebook_catalog
+    index = hold_bikebook_catalog_file("index.*")
+    comparison = hold_bikebook_catalog_file("comparison.*")
+    compared = bikebook_path(vehicle_models: "m/aventon/2026/level_4_adv,m/specialized/2025/haul_st")
+    visit compared
+
+    expect(page).to have_css("[data-hw-combobox-chip]", text: "Aventón Level 4 ADV", wait: 10)
+    expect(page).to have_css("link[rel='canonical']", visible: :all)
+    expect(page).to have_css("[data-hw-combobox-chip]", text: /Specialized Haul ST\z/)
+    # nothing offered that a click on would ignore, until the search is live
+    expect(page).to have_no_css(".hw-combobox__chip__remover")
+    expect(page).to have_no_button("Move Aventón Level 4 ADV")
+    expect(page).to have_css("#vehicle_models[disabled]")
+    expect(page).to have_css("#vehicle-viewers tr")
+    # its block leaves out its markets, which the index has
+    expect(find("#vehicle-viewers")).to have_no_text("()")
+    click_link "Components"
+    expect(page).to have_current_path(/[?&]view=components\b/)
+    expect(page).to have_css("[data-hw-combobox-chip]", text: "Aventón Level 4 ADV")
+    expect(page).to have_css("[data-hw-combobox-chip]", text: /Specialized Haul ST\z/)
+    expect(page).to have_no_css("link[rel='canonical']", visible: :all)
+    find_link("Components").send_keys(:shift)
+
+    index.pop(timeout: 10).fallback
+    # what the index adds: whether each is current, and the search
+    expect(page).to have_css("[data-hw-combobox-chip]", text: "Specialized Haul ST current", wait: 10)
+    expect(page).to have_no_css("#vehicle_models[disabled]")
+    expect(page).to have_css(".hw-combobox__chip__remover", count: 2)
+    expect(page).to have_current_path(/[?&]view=components\b/)
+    # a keyboard's place among the vehicles, rather than the search that wasn't there to focus
+    expect(page).to have_css("a:focus", text: "Components")
+
+    # searching ahead of the comparison, which leaves what's typed as it adds the similar models
+    expect(page).to have_css("#vehicle-models-count", text: "matching", wait: 10)
+    expect(page).to have_no_button("Compare similar bikes to Level 4 ADV")
+    expect(page).to have_current_path(/[?&]search=1\b/)
+    type_into(find_field("vehicle_models"), "Soltera")
+    expect(page).to have_field("vehicle_models", with: /\ASoltera/)
+    comparison.pop(timeout: 10).fallback
+    expect(page).to have_button("Compare similar bikes to Level 4 ADV", wait: 10)
+    expect(page).to have_field("vehicle_models", with: /\ASoltera/, focused: true)
+    find_field("vehicle_models").send_keys(:escape)
+    expect(page).to have_button("Compare similar bikes to Level 4 ADV")
+    click_on "More filters"
+    choose_option("Frame material", "Carbon or Composite")
+    expect(page).to have_current_path(/[?&]frame_material=/)
+
+    # a model alone holds the similar models' line until the comparison lands
+    visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_adv")
+    expect(page).to have_css("nav[aria-label='Views']", wait: 10)
+    expect(comparison).to be_empty
+    index.pop(timeout: 10).fallback
+    expect(page).to have_css("#vehicle-models-count", text: "matching", visible: :all, wait: 10)
+    # the first render of the catalog, which crawlers see
+    expect(page).to have_css("link[rel='canonical']", visible: :all)
+    expect(page).to have_no_button("Compare similar bikes to Level 4 ADV")
+    tabs_top = -> { find("nav[aria-label='Views']").evaluate_script("this.getBoundingClientRect().top") }
+    before = tabs_top.call
+    comparison.pop(timeout: 10).fallback
+    expect(page).to have_css("#similar-toggle", text: "Compare similar bikes to Level 4 ADV", wait: 10)
+    expect(page).to have_no_css("[data-similar-waiting]", visible: :all)
+    expect(tabs_top.call).to be_within(1).of(before)
+
+    find("#similar-toggle").click
+    expect(page).to have_current_path(/[?&]similar=1\b/)
+    # reloaded open on them, the comparison asked for with the index still out
+    visit page.current_url
+    comparison.pop(timeout: 10).fallback
+    index.pop(timeout: 10).fallback
+    expect(page).to have_css("#similar-results", wait: 10)
+
+    # the index failing, whichever lands first
+    kit = hold_bikebook_catalog_file("kit.*")
+    failed = "#vehicle-viewers > [role='status']:first-child"
+    not_found = {status: 404, headers: {"access-control-allow-origin" => "*"}, body: ""}
+    visit compared
+    index.pop(timeout: 10).fulfill(**not_found)
+    expect(page).to have_text("The catalog didn't load. Reload the page to try again.", wait: 10)
+    kit.pop(timeout: 10).fallback
+    expect(page).to have_css("#vehicle-viewers tr", wait: 10)
+    expect(page).to have_css(failed, text: "The catalog didn't load.")
+    expect(page).to have_field("vehicle_models", placeholder: "", disabled: true)
+
+    # reloaded as it says to, the vehicles in ahead of the failure this time
+    visit page.current_url
+    kit.pop(timeout: 10).fallback
+    expect(page).to have_css("#vehicle-viewers tr", wait: 10)
+    index.pop(timeout: 10).fulfill(**not_found)
+    expect(page).to have_css(failed, text: "The catalog didn't load.", wait: 10)
+    expect(page).to have_css("#vehicle-viewers tr")
+    expect(page).to have_field("vehicle_models", placeholder: "", disabled: true)
+    click_link "Components"
+    expect(page).to have_current_path(/[?&]view=components\b/)
+    expect(page).to have_css(failed, text: "The catalog didn't load.")
+    expect(page).to have_field("vehicle_models", placeholder: "", disabled: true)
+  end
+
   it "keeps the search and its filters while the catalog loads, and says so when it doesn't" do
     serve_bikebook_catalog(manifest_status: 404)
-    held = Queue.new
-    page.driver.with_playwright_page do |playwright_page|
-      playwright_page.context.route("#{Integrations::Bikebook::Catalog::URL}manifest.json", ->(route, _request) { held << route })
-    end
+    held = hold_bikebook_catalog_file("manifest.json")
     # searching, which a model alone would hide
     visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_rec_step_through", electric: "1", search: 1, vehicle_type: "e_scooter")
 
