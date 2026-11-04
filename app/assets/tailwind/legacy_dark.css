@@ -1,6 +1,6 @@
 /* Legacy sorts below this layer and utilities above it; kelsey_styles.css is unlayered, so its pages stay light */
 @layer components {
-  :is(.container, .container-fluid, .bootstrapstyle) {
+  :is(.container, .container-fluid, .bootstrapstyle, .doorkeeper-container) {
     @apply tw:dark:text-gray-100;
 
     :is(h1, h2, h3, h4, h5, h6):not(.root-landing-who *) {
@@ -77,6 +77,10 @@
     @apply tw:dark:bg-gray-800 tw:dark:text-gray-300;
   }
 
+  :is(pre, pre code) {
+    @apply tw:dark:text-inherit;
+  }
+
   /* Clears <html>'s light background, which the dark variant can't reach, so <body>'s fills the canvas */
   :root:has(> body.dark:is(.swagger-section, .documentation-authorize)) {
     @apply tw:bg-transparent;
@@ -92,10 +96,10 @@
     }
 
     pre {
-      @apply tw:dark:bg-gray-800 tw:dark:border-gray-700 tw:dark:text-gray-200;
+      @apply tw:dark:bg-gray-800 tw:dark:border-gray-700;
 
       code {
-        @apply tw:dark:bg-transparent tw:dark:text-inherit;
+        @apply tw:dark:bg-transparent;
       }
     }
   }
