@@ -31,9 +31,8 @@ fetching again.
 
 It reads `HONEYBADGER_PERSONAL_AUTH_TOKEN` from `.env.development`. Without it
 the command exits saying so — get a new token at honeybadger.io/users/edit and
-ask the user to set it. Don't fall back to the `honeybadger` MCP server — it can't redirect a notice to
-a file, so a 130 KB backtrace lands whole in context. Aggregates are covered too
-— `binx_hb faults`, `trend` and `counts`.
+ask the user to set it. Aggregates are covered too — `binx_hb faults`, `trend`
+and `counts`.
 
 ## Read the notice in this order
 
