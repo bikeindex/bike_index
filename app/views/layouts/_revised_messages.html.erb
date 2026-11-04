@@ -1,22 +1,27 @@
-<%# Flash messages render via UI::Alerts::FlashMessage; this block holds page errors %>
-<%# and the alerts BikeIndexAlerts adds client side (revised/components/alerts.coffee) %>
+<%# Flash messages render via UI::Alerts::FlashMessage %>
 
-<div class="bootstrapstyle primary-alert-block">
-  <% if @page_errors.present? %>
-    <%# Primarily used for form object errors %>
-    <% title = t(".please_fix_the_following", errors: pluralize(@page_errors.count, t(".error"))) %>
-    <% error_body = capture do %>
-      <ul>
-        <% @page_errors = @page_errors.full_messages if @page_errors.is_a?(ActiveModel::Errors) %>
+<% if @page_errors.present? %>
+  <%# Primarily used for form object errors %>
+  <% page_errors = @page_errors.is_a?(ActiveModel::Errors) ? @page_errors.full_messages : @page_errors %>
 
-        <% @page_errors.each do |msg| %>
+  <div
+    class="
+      tw:fixed tw:inset-x-0 tw:top-24 tw:z-1040 tw:mx-auto tw:w-5/6
+      tw:max-w-150 tw:md:top-36
+    "
+  >
+    <%= render(UI::Alerts::Base::Component.new(kind: :error, dismissable: true, header: t(".please_fix_the_following", errors: pluralize(page_errors.count, t(".error"))))) do %>
+      <ul class="tw:list-inside tw:list-disc">
+        <% page_errors.each do |msg| %>
           <li><%= msg %></li>
         <% end %>
       </ul>
     <% end %>
-    <%= render partial: '/shared/alert', locals: { body: error_body, title: title } %>
-  <% end %>
-</div>
+  </div>
+<% end %>
+
+<%# Only for the alerts BikeIndexAlerts adds client side, which hides it whenever it holds no .alert %>
+<div class="bootstrapstyle primary-alert-block"></div>
 
 <script id="alert-template" type="x-tmpl-mustache"> <%# herb:disable html-allowed-script-type %>
   <div class="alert alert-{{alert_type}} in" data-seconds="{{seconds}}">

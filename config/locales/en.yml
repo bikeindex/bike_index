@@ -1234,10 +1234,24 @@ en:
         <span class="text-warning">Report the theft</span> to %{organization} <strong>%{report_link}</strong>
         to get a police report number
     owner_bike_status_alerts:
+      address: Address
+      by: By
+      created: Created
+      current_notifications:
+        one: "%{count} current notification for this %{bike_type}!"
+        other: "%{count} current notifications for this %{bike_type}!"
       currently_impounded: Your %{bike_type} is currently impounded!
+      have_you_retrieved: Have you retrieved this %{bike_type}?
       impounded_by_from_html: Impounded %{time} by <strong>%{organization}</strong>
         from %{address}
       impounded_by_html: Impounded %{time} by <strong>%{organization}</strong>
+      kind: Kind
+      kind_by_organization_html: "- <em>%{kind}</em> - by <strong>%{organization}</strong>"
+      let_organization_know: Let %{organization} know
+      mark_retrieved: mark retrieved
+      notification: Notification#
+      notification_number: 'Notification #%{number}'
+      was_this_retrieved: Was this %{bike_type} retrieved?
     pdf:
       bike_description: 'Bike description:'
       bike_serial: Bike Serial
@@ -4206,7 +4220,6 @@ en:
         free, in three easy steps:'
       bike_index_account: Bike Index account
       confirm_your_email: Confirm your email
-      error: error
       fill_out_the_form_that_will_appear: Fill out the form that will appear on this
         page once you're signed in.
       filling_out_this_form_will_create_a_new_org: Filling out this form will create
@@ -4218,7 +4231,6 @@ en:
       new_organization: New organization
       organization_kind: Organization kind
       organization_name: Organization name
-      please_fix_the_following_errors: Please fix the following %{errors}
       sign_up_for_a_new_account_html: Sign up for a %{new_account_link}
       you_are_already_a_member_of_org_html: You are already a member of %{org_link}.
       your_current_account_will_be_a_member_html: >-
@@ -4714,8 +4726,6 @@ en:
     form:
       cancel_update: Cancel Update
       do_not_display: Do not display
-      error: Error
-      errors_prevented_photo_from_saving: "%{errors_count} prevented photo from saving"
       image_name: Image name
       no_one_will_be_able_to_see_this_image_exc: "(no one will be able to see this
         image except for you)"

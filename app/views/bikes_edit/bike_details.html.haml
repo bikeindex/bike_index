@@ -206,7 +206,8 @@
 - serial_correction_body = capture_haml do
   = form_tag do |t|
     .modal-body
-      = render partial: "shared/alert", locals: {body: t(".please_fill_in_both_fields"), class_names: "currently-hidden"}
+      .modal-validation-alert.currently-hidden
+        = render(UI::Alerts::Base::Component.new(kind: :error, text: t(".please_fill_in_both_fields")))
       = hidden_field_tag :serial_update_bike_id, @bike.id
       .form-group
         %label{for: :serial_update_serial}
@@ -229,7 +230,8 @@
 - manufacturer_correction_body = capture_haml do
   = form_tag do |t|
     .modal-body
-      = render partial: 'shared/alert', locals: {body: t(".please_fill_in_both_fields"), class_names: "currently-hidden"}
+      .modal-validation-alert.currently-hidden
+        = render(UI::Alerts::Base::Component.new(kind: :error, text: t(".please_fill_in_both_fields")))
       = hidden_field_tag :manufacturer_update_bike_id, @bike.id
       .related-fields
         .form-group

@@ -304,6 +304,10 @@ RSpec.describe MyAccountsController, type: :request do
         patch base_url, params: {id: current_user.username, user: {username: "confirm"}, edit_template: "sharing"}
         expect(response).to render_template(:edit)
         expect(assigns(:page_errors)).to include("Username is reserved")
+        page = Nokogiri::HTML(response.body)
+        expect(page.at_css("[role=alert] li").text).to eq "Username is reserved"
+        # BikeIndexAlerts hides .primary-alert-block whenever it holds no .alert
+        expect(page.at_css(".primary-alert-block [role=alert]")).to be_blank
         current_user.reload
         expect(current_user.username).to eq("something")
       end

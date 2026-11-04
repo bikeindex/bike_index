@@ -1,4 +1,3 @@
-<%# TODO: Add translations %>
 <% if @bike.impounded? && @bike.current_impound_record.organized? %>
   <% impound_record = @bike.current_impound_record %>
   <% organization = impound_record.organization.name %>
@@ -19,12 +18,7 @@
 
 <% if @bike.parking_notifications.active.any? %>
   <% parking_notifications = @bike.parking_notifications.active.reorder(created_at: :desc) %>
-  <div class="alert alert-warning mt-4 mb-4">
-    <h3 class="uncap">
-      <%= pluralize parking_notifications.count, "current notification" %> for
-      this <%= @bike.type %>!
-    </h3>
-
+  <%= render(UI::Alerts::Base::Component.new(kind: :warning, header: t(".current_notifications", count: parking_notifications.count, bike_type: @bike.type), margin_classes: "tw:my-4")) do %>
     <table
       class="
         table table-striped table-bordered table-sm without-exterior-border
@@ -35,14 +29,14 @@
       <thead class="small-header hidden-md-down">
         <tr>
           <th>
-            Created
+            <%= t(".created") %>
             <small class="localizeTimezone"></small>
           </th>
 
-          <th>Address</th>
-          <th>Kind</th>
-          <th>By</th>
-          <th><small>Notification#</small></th>
+          <th><%= t(".address") %></th>
+          <th><%= t(".kind") %></th>
+          <th><%= t(".by") %></th>
+          <th><small><%= t(".notification") %></small></th>
         </tr>
       </thead>
 
@@ -59,15 +53,14 @@
               <% end %>
 
               <span class="extended-col-info small">
-                - <em><%= parking_notification.kind_humanized %></em> - by
-                <strong><%= parking_notification.organization.short_name %></strong>
+                <%= t(".kind_by_organization_html", kind: parking_notification.kind_humanized, organization: parking_notification.organization.short_name) %>
 
                 <small class="less-strong">(<%= parking_notification.user&.display_name %>)</small>
               </span>
 
               <% if parking_notification.repeat_number > 0 %>
                 <strong class="extended-col-info">
-                  Notification #<%= parking_notification.repeat_number %>
+                  <%= t(".notification_number", number: parking_notification.repeat_number) %>
                 </strong>
               <% end %>
             </td>
@@ -108,22 +101,19 @@
       <h3 class="uncap text-center mt-4 mb-2">
         <strong>
           <% if @bike.unregistered_parking_notification? %>
-            Was this bike retrieved?
+            <%= t(".was_this_retrieved", bike_type: @bike.type) %>
           <% else %>
-            Have you retrieved this <%= @bike.type %> ?
+            <%= t(".have_you_retrieved", bike_type: @bike.type) %>
           <% end %>
         </strong>
       </h3>
       <p class="text-center">
         <% unless @bike.unregistered_parking_notification? %>
-          <em>
-            Let <%= current_parking_notification.organization&.short_name %>
-            know
-          </em>
+          <em><%= t(".let_organization_know", organization: current_parking_notification.organization&.short_name) %></em>
         <% end %>
 
-        <%= link_to "mark retrieved", bike_path(@bike.to_param, user_recovery: true, parking_notification_retrieved: current_parking_notification.retrieval_link_token), class: "btn btn-sm btn-success", style: "color: white;" %>
+        <%= render(UI::ButtonLink::Component.new(text: t(".mark_retrieved"), href: bike_path(@bike.to_param, user_recovery: true, parking_notification_retrieved: current_parking_notification.retrieval_link_token), color: :primary, size: :sm)) %>
       </p>
     <% end %>
-  </div>
+  <% end %>
 <% end %>

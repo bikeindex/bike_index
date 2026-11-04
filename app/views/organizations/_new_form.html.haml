@@ -9,27 +9,15 @@
 
   = form_for @organization, html: { class: 'organized-form mt-4' } do |f|
 
-    - if @organization.errors.any?
-      #alert-block
-        .alert.alert-error
-          %a.close{"data-dismiss" => "alert"} ×
-          %h4
-            = t(".please_fix_the_following_errors", errors: pluralize(@organization.errors.count, t(".error")))
-          %ul
-            - @organization.errors.full_messages.each do |msg|
-              %li= msg
+    = render(UI::Alerts::ObjectError::Component.new(object: @organization, dismissable: true))
     .card
       .card-block
         %h3.card-title
           = t(".new_organization")
         - if current_user.organization_roles.count > 0
-          .alert.alert-info.mt-4.mb-4
-            - org = current_user.organizations.first
-            %h3.padded.header-font-alt.text-center
-              - org_link = link_to org.name, organization_root_path(org.slug)
-              = t(".you_are_already_a_member_of_org_html", org_link: org_link)
-            %p.text-center
-              = t(".filling_out_this_form_will_create_a_new_org")
+          - org = current_user.organizations.first
+          - org_link = link_to org.name, organization_root_path(org.slug), class: "twlink-underlined"
+          = render(UI::Alerts::Base::Component.new(kind: :notice, header: t(".you_are_already_a_member_of_org_html", org_link:), text: t(".filling_out_this_form_will_create_a_new_org"), margin_classes: "tw:my-4"))
         .form-group.row.mt-4
           = f.label :name, t(".organization_name"), class: 'org-form-label'
           .col-sm-4

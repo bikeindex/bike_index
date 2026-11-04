@@ -38,4 +38,4 @@ class BikeIndex.BikesEditRemove extends BikeIndex
       response_callback = @requestDeleteRequestCallback
       new BikeIndex.SubmitUserRequest(data, response_callback)
     else
-      $("#request-delete .alert").slideDown("fast").removeClass("currently-hidden")
+      $("#request-delete .modal-validation-alert").slideDown("fast").removeClass("currently-hidden")

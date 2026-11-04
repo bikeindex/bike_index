@@ -571,6 +571,20 @@ RSpec.describe "BikesController#show", type: :request do
     end
   end
 
+  context "with active parking_notification, viewed by the owner" do
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
+    let(:current_user) { bike.user }
+    let!(:parking_notification) { FactoryBot.create(:parking_notification_organized, bike:) }
+
+    it "renders the notifications alert, with a link to mark it retrieved" do
+      get "#{base_url}/#{bike.id}"
+      alert = Nokogiri::HTML(response.body).at_css("[role=alert]:has(h4)")
+      expect(alert.at_css("h4").text.strip).to eq "1 current notification for this bike!"
+      expect(alert.text.squish).to match "Have you retrieved this bike?"
+      expect(alert.at_css("a[href*='parking_notification_retrieved=#{parking_notification.reload.retrieval_link_token}']").text.strip).to eq "mark retrieved"
+    end
+  end
+
   context "with impound_record" do
     let(:impound_record) { FactoryBot.create(:impound_record, bike: bike) }
     let(:current_user) { FactoryBot.create(:user_confirmed) }

@@ -10,34 +10,19 @@
   </head>
 
   <body id="bi_embed">
-    <div id="alert-block">
-      <% flash.each do |name, msg| %>
-        <% alert_class = "alert-#{name}" %>
+    <%= render(UI::Alerts::FlashMessage::Component.new(flash:)) %>
 
-        <div class="alert <%= alert_class %>">
-          <a class="close" data-dismiss="alert">×</a>
-          <%= content_tag :div, msg, id: "flash_#{name}" if msg.is_a?(String) %>
-        </div>
-      <% end %>
-
-      <% if @b_param && @b_param.bike_errors.present? %>
-        <div class="alert alert-error">
-          <a class="close" data-dismiss="alert">×</a>
-
-          <%# preflight drops heading sizing and list markers; embed_styles never restated them %>
-          <h4 class="tw:font-bold">
-            <%= t(".please_fix_the_following") %>
-            <%= pluralize(@b_param.bike_errors.count, t(".error")) %>
-          </h4>
-
-          <ul class="tw:list-disc tw:pl-10">
+    <% if @b_param && @b_param.bike_errors.present? %>
+      <div id="alert-block">
+        <%= render(UI::Alerts::Base::Component.new(kind: :error, dismissable: true, header: "#{t(".please_fix_the_following")} #{pluralize(@b_param.bike_errors.count, t(".error"))}")) do %>
+          <ul class="tw:list-inside tw:list-disc">
             <% @b_param.bike_errors.each do |msg| %>
               <li><%= msg %></li>
             <% end %>
           </ul>
-        </div>
-      <% end %>
-    </div>
+        <% end %>
+      </div>
+    <% end %>
 
     <%= yield %>
 

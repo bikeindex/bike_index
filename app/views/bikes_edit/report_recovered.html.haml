@@ -25,13 +25,12 @@
 
 - modal_title = t(".were_so_glad", bike_type: @bike.type)
 
-- alert_body = capture_haml do
-  %p= t(".please_tell_us_how_you_got_your_bike", bike_type: @bike.type)
-  %p= t(".its_how_we_get_better_at_recovering_bikes")
-
 - modal_body = capture_haml do
   .modal-body
-    = render partial: 'shared/alert', locals: { body: alert_body, title: t(".not_enough_info"), class_names: 'currently-hidden' }
+    .modal-validation-alert.currently-hidden
+      = render(UI::Alerts::Base::Component.new(kind: :error, header: t(".not_enough_info"))) do
+        %p= t(".please_tell_us_how_you_got_your_bike", bike_type: @bike.type)
+        %p= t(".its_how_we_get_better_at_recovering_bikes")
     = form_tag do |t|
       = hidden_field_tag :mark_recovered_bike_id, @bike.id
       = hidden_field_tag :mark_recovered_stolen_record_id, (@bike.current_stolen_record_id if @bike.current_stolen_record_id.present?)
