@@ -6,7 +6,7 @@
     - if @bike.thumb_url.present?
       = image_tag @bike.thumb_url, alt: @bike.title_string, style: "display: block; max-width: 100%;"
     - else
-      = render(UI::Header::Component.new(text: tag.span("No Image", class: "twless-strong"), tag: :h3))
+      = render(UI::Header::Component.new(text: tag.span("No Image", class: "less-strong"), tag: :h3))
   %div{class: "tw:col-span-9 tw:lg:col-span-5 tw:mb-2"}
     = render(UI::TableList::Component.new) do |list|
       - list.with_row(label: "Registry", value: @bike.registry_name)

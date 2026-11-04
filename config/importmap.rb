@@ -1,8 +1,7 @@
 # Pin npm packages by running ./bin/importmap
 
-# Nothing here is CDN-pinned. The vendor/javascript files are self-contained bundles,
-# each carrying its own re-generation command in its header. REMEMBER TO ADD the host to
-# content_security_policy.rb if a pin ever goes back to a CDN.
+# The vendor/javascript files are self-contained bundles, each carrying its own re-generation
+# command in its header. REMEMBER TO ADD the host to content_security_policy.rb for a CDN pin.
 
 pin "application"
 pin "@hotwired/turbo-rails", to: "turbo.min.js", preload: true
@@ -10,7 +9,7 @@ pin "@hotwired/stimulus", to: "stimulus.min.js"
 pin "@hotwired/stimulus-loading", to: "stimulus-loading.js"
 # preload: application.js imports this at the top level, so fetching it gates every
 # Stimulus controller connecting.
-pin "@bikeindex/time-localizer", to: "@bikeindex--time-localizer.js", preload: true
+pin "@bikeindex/time-localizer", to: "https://cdn.jsdelivr.net/npm/@bikeindex/time-localizer@0.4.0/dist/index.bundle.js", preload: true
 pin "@floating-ui/dom", to: "@floating-ui--dom.js", preload: false
 # preload: false so a component rendered on a handful of admin pages doesn't fetch 10KB
 # on every page -- the controller import()s them for the same reason.

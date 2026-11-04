@@ -15,7 +15,7 @@
     <% previous_invoice = invoice.previous_invoice %>
 
     <% if previous_invoice.present? %>
-      <small class="twless-strong tw:mt-1 tw:block">Follows #<%= previous_invoice.id %></small>
+      <small class="less-strong tw:mt-1 tw:block">Follows #<%= previous_invoice.id %></small>
     <% end %>
   <% end %>
 
@@ -38,7 +38,7 @@
 
   <% table.column(sortable: "subscription_end_at", label: "End") do |invoice| %>
     <% if invoice.endless? %>
-      <small class="twless-strong">endless</small>
+      <small class="less-strong">endless</small>
     <% elsif invoice.subscription_end_at.present? %>
       <span class="<%= end_at_class.call(invoice) %>">
         <%= render(UI::Time::Component.new(time: invoice.subscription_end_at)) %>

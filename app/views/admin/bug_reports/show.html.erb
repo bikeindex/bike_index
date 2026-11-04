@@ -23,7 +23,7 @@
       <% if @bug_report.user_id.present? %>
         <%= render Atoms::Admin::TableCells::User::Component.new(user: @bug_report.user, user_id: @bug_report.user_id) %>
       <% else %>
-        <span class="twless-strong">no user</span>
+        <span class="less-strong">no user</span>
       <% end %>
     <% end %>
 
@@ -96,7 +96,7 @@
           <%= image_tag BlobUrl.for(image.blob), alt: image.filename, class: "tw:max-h-72 tw:rounded tw:border tw:border-gray-200 tw:p-1 tw:dark:border-gray-700" %>
         <% end %>
 
-        <div class="twless-strong tw:text-sm">
+        <div class="less-strong tw:text-sm">
           <%= image.filename %>
           <%= number_to_human_size(image.byte_size) %>
         </div>

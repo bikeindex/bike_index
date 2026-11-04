@@ -12,7 +12,7 @@
       Facebook Activation failed
     %small
       this alert has be marked inactive, but it never ran.
-      %span.twless-strong This happened either because something is broken with this alert, or because it was one of the original ~90 that Seth updated when he enabled automated fixing of failed activations on 2025-2-23.
+      %span.less-strong This happened either because something is broken with this alert, or because it was one of the original ~90 that Seth updated when he enabled automated fixing of failed activations on 2025-2-23.
 - facebook_update_title = capture do
   - if @theft_alert.facebook_updateable?
     = render(UI::ButtonLink::Component.new(text: "Update Facebook data", href: admin_theft_alert_path(@theft_alert.id, update_theft_alert: true), method: :patch, size: :sm))
@@ -20,9 +20,9 @@
     %em
       %span{class: UI::Alerts::Base::Component::TEXT_CLASSES[:warning]} Can't update Facebook:
     - if @theft_alert.before_automation?
-      %span.twless-strong This alert was created before automation
+      %span.less-strong This alert was created before automation
     - elsif !@theft_alert.activateable?
-      %span.twless-strong This alert is missing required stuff
+      %span.less-strong This alert is missing required stuff
     - else
       %span{class: UI::Alerts::Base::Component::TEXT_CLASSES[:error]} NOT SURE WHY!
       %strong Tell Seth
@@ -89,13 +89,13 @@
       - if @theft_alert.activating_at.present?
         = render(UI::Time::Component.new(time: @theft_alert.activating_at))
         - if @theft_alert.paid_at.present?
-          %small.twless-strong{class: "tw:ml-2"}
+          %small.less-strong{class: "tw:ml-2"}
             = distance_of_time_in_words(@theft_alert.paid_at, @theft_alert.activating_at)
             after payment
     - list.with_row(label: "last FB update") do
       - if @theft_alert.facebook_updated_at.present?
         = render(UI::Time::Component.new(time: @theft_alert.facebook_updated_at))
-        %small.twless-strong{class: "tw:ml-2"}
+        %small.less-strong{class: "tw:ml-2"}
           = @theft_alert.live? ? "alert ends" : "alert ended"
           - if @theft_alert.end_at.present?
             = render(UI::Time::Component.new(time: @theft_alert.end_at))
@@ -104,7 +104,7 @@
       - if @theft_alert.admin
         %small{class: UI::Alerts::Base::Component::TEXT_CLASSES[:notice]} (admin)
       - elsif @theft_alert.facebook_data&.dig("no_notify").present?
-        %em.twless-strong manually disabled
+        %em.less-strong manually disabled
       - elsif @theft_alert.stolen_record.present?
         Stolen record
         - if @theft_alert.stolen_record.receive_notifications?

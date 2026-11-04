@@ -37,7 +37,7 @@
     <% end %>
 
     <% table.column(sortable: "kind", label: "From") do |marketplace_message| %>
-      <span class="<%= 'twless-strong' if marketplace_message.sender_buyer? %>">
+      <span class="<%= 'less-strong' if marketplace_message.sender_buyer? %>">
         <%= marketplace_message.kind_humanized %>
       </span>
     <% end %>

@@ -32,23 +32,23 @@
   <% end %>
 
   <% table.column(label: "Address") do |social_account| %>
-    <small class="twless-strong"><%= social_account.formatted_address_string %></small>
+    <small class="less-strong"><%= social_account.formatted_address_string %></small>
   <% end %>
 
   <% table.column(label: "Neighborhood") do |social_account| %>
-    <small class="twless-strong"><%= social_account.neighborhood %></small>
+    <small class="less-strong"><%= social_account.neighborhood %></small>
   <% end %>
 
   <% table.column(sortable: "city") do |social_account| %>
-    <small class="twless-strong"><%= social_account.city %></small>
+    <small class="less-strong"><%= social_account.city %></small>
   <% end %>
 
   <% table.column(label: "State") do |social_account| %>
-    <small class="twless-strong"><%= social_account.region %></small>
+    <small class="less-strong"><%= social_account.region %></small>
   <% end %>
 
   <% table.column(sortable: "country") do |social_account| %>
-    <small class="twless-strong"><%= social_account.country&.name %></small>
+    <small class="less-strong"><%= social_account.country&.name %></small>
   <% end %>
 
   <% table.column(label: "Posts") do |social_account| %>

@@ -5,7 +5,7 @@
   = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :name)) do |group|
     - if @manufacturer.id.present?
       - group.with_helper_text do
-        %span.twless-strong Secondary name (name in parentheses):
+        %span.less-strong Secondary name (name in parentheses):
         = @manufacturer.secondary_name.presence
 
   = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :website))
