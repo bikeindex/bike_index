@@ -17,7 +17,7 @@
   <% uro_organizations.each do |organization| %>
     <% user_registration_organization = @user.user_registration_organizations.find_by(organization_id: organization.id) %>
 
-    <%= fields_for user_registration_organization do |uro| %>
+    <%= fields_for user_registration_organization do %>
       <hr class="d-none d-sm-block">
 
       <div class="related-fields userRegistrationOrganization">
