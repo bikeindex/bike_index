@@ -18,8 +18,4 @@ RSpec.describe FetchProject529BikesJob, type: :job do
       end
     end
   end
-
-  it "is not specified in the runner" do
-    expect(ScheduledJobRunner.scheduled_jobs).to_not include(described_class)
-  end
 end

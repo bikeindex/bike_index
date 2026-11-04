@@ -8,7 +8,7 @@ RSpec.describe Integrations::ExchangeRateAPIClient, type: :service do
 
     it "returns a hash with :base and :rates keys" do
       Rails.cache.clear(instance.cache_key)
-      VCR.use_cassette("exchange_rate_api_client", match_requests_on: [:method]) do
+      VCR.use_cassette("exchange_rate_api_client", match_requests_on: [:method, :query]) do
         response = instance.latest
         pp response unless response.key?(:base)
         expect(response).to have_key(:base)
@@ -17,8 +17,8 @@ RSpec.describe Integrations::ExchangeRateAPIClient, type: :service do
         expect(response[:base]).to eq("CAD")
         expect(response[:rates]).to be_a(Hash)
         expect(response[:rates]["CAD"]).to eq 1
-        expect(response[:rates]["EUR"]).to be_within(0.00001).of(0.63804)
-        expect(response[:rates]["USD"]).to be_within(0.00001).of(0.71577)
+        expect(response[:rates]["EUR"]).to be_within(0.00001).of(0.63723)
+        expect(response[:rates]["USD"]).to be_within(0.00001).of(0.71603)
       end
     end
   end

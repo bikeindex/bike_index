@@ -4,8 +4,6 @@ module Integrations
   class ExchangeRateAPIClient
     BASE_URL = ENV.fetch("EXCHANGE_RATE_API_BASE_URL", "https://api.exchangeratesapi.io")
     API_KEY = ENV["EXCHANGE_RATE_API_KEY"]
-    # Our plan rejects any other base with base_currency_access_restricted
-    API_BASE_ISO = "EUR"
 
     attr_accessor :base_iso, :base_url, :cache_key
 
@@ -18,7 +16,8 @@ module Integrations
     def latest
       payload = Rails.cache.fetch(cache_key, expires_in: 24.hours) do
         resp = conn.get("latest") { |req|
-          req.params = {"base" => API_BASE_ISO, :access_key => API_KEY}
+          # Our plan rejects any other base with base_currency_access_restricted
+          req.params = {"base" => "EUR", :access_key => API_KEY}
         }
 
         raise(StandardError, resp.body) unless resp.status == 200 && resp.body.is_a?(Hash)
