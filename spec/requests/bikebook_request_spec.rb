@@ -27,11 +27,32 @@ RSpec.describe BikebookController, type: :request do
     end
 
     context "comparing" do
-      it "isn't indexed, and keeps the search it can't fill in blank" do
+      it "isn't indexed, and shows the search it can't fill in as loading" do
         get "/bikebook", params: {vehicle_models: "m/segway/2025/gt3_pro,m/aventon/2022/level_2"}
         expect(response).to have_http_status(:ok)
         expect(response.headers["X-Robots-Tag"]).to eq "noindex, follow"
-        expect(Capybara.string(response.body).find("[inert]")[:class]).to eq "tw:invisible"
+        shell = Capybara.string(response.body).find("[inert]")
+        expect(shell[:class]).to be_blank
+        expect(shell).to have_field("vehicle_models", placeholder: "Loading…")
+      end
+    end
+
+    context "the search the server can't fill in" do
+      let(:shell_class) { Capybara.string(response.body).find("[inert]")[:class] }
+
+      it "is blank with filters" do
+        get "/bikebook", params: {search: "1", manufacturer: "aventon"}
+        expect(shell_class).to eq "tw:invisible"
+      end
+
+      it "is blank with filters and picks" do
+        get "/bikebook", params: {vehicle_models: "m/segway/2025/gt3_pro,m/aventon/2022/level_2", electric: "1"}
+        expect(shell_class).to eq "tw:invisible"
+      end
+
+      it "shows when asked for alone" do
+        get "/bikebook", params: {search: "1"}
+        expect(shell_class).to be_blank
       end
     end
 

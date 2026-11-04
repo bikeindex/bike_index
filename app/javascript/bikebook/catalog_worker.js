@@ -15,6 +15,9 @@ let similarityUrl = null
 let similarity = null
 let comparison = null
 let lastSimilar = null
+let opened = null
+let started = null
+let comparisonFetch = null
 const blocks = new Map()
 const orders = new Map()
 const sold = new Map()
@@ -29,26 +32,45 @@ const list = (value) => (value ?? '').split(',').filter(Boolean)
 const path = (id) => id.replace(/^m\//, '')
 const blockKey = (id) => path(id).split('/').slice(0, 2).join('/')
 
-// The blocks `ids` are in load alongside the index rather than after it
-async function load ({ manifestUrl, ids, jurisdictions, rulesUrl, similarityUrl: similarityModule }) {
-  similarityUrl = similarityModule
-  ;[manifest, rules] = await Promise.all([fetchJson(manifestUrl), import(rulesUrl)])
-  if (manifest.format !== FORMAT) throw new Error(`catalog format ${manifest.format} isn't ${FORMAT}`)
+// "California Moped", which its name leaves off the state of, and a group has none; "US Class 3 e-bike"
+const classified = ({ e_vehicle_classifications: records }, jurisdictions) => Object.fromEntries(Object.entries(records).map(([id, record]) => {
+  const code = record.jurisdiction
+  const state = code?.startsWith('US-') && (jurisdictions[code] ?? code)
+  const label = [state || code, record.name].filter(Boolean).join(' ')
+  // "Alabama (AL)", "United States"
+  const jurisdictionName = state ? `${state} (${code.slice(3)})` : code && (jurisdictions[code] ?? code)
+  return [id, { ...record, label, jurisdiction_name: jurisdictionName, title: /^Class \d+$/.test(record.name) ? `${label} e-bike` : label }]
+}))
 
-  base = new URL(manifestUrl, self.location)
-  ids.map(blockKey).filter((key) => manifest.blocks[key]).forEach((key) => block(key).catch(() => {}))
-  // the comparison for its frame materials as well as how alike models are; without it neither is offered
-  const [index, vocabulary, { kit }, loaded] = await Promise.all([...[manifest.index, manifest.vocabulary, manifest.kit].map((file) => fetchJson(new URL(file, base))),
-    manifest.comparison && fetchJson(new URL(manifest.comparison, base)).catch(() => null)])
-  comparison = loaded
+// What picked vehicles render from, which needs nothing of the index: the blocks `ids` are in, the kit and the vocabulary
+function start ({ manifestUrl, ids, jurisdictions, comparing }) {
+  opened = fetchJson(manifestUrl).then((published) => {
+    if (published.format !== FORMAT) throw new Error(`catalog format ${published.format} isn't ${FORMAT}`)
+
+    manifest = published
+    base = new URL(manifestUrl, self.location)
+    ids.map(blockKey).filter((key) => manifest.blocks[key]).forEach((key) => block(key).catch(() => {}))
+  })
+  started = opened.then(() => Promise.all([manifest.vocabulary, manifest.kit].map((file) => fetchJson(new URL(file, base)))))
+    .then(([vocabulary, { kit }]) => ({ vocabulary: { ...vocabulary, e_vehicle_classifications: classified(vocabulary, jurisdictions) }, kit }))
+  if (comparing) fetchComparison()
+  return started
+}
+
+// After `start`, whose manifest and files it waits on
+async function load ({ rulesUrl, similarityUrl: similarityModule }) {
+  similarityUrl = similarityModule
+  const [index, { vocabulary, kit }, featuredRules] = await Promise.all([opened.then(() => fetchJson(new URL(manifest.index, base))), started, import(rulesUrl)])
+  rules = featuredRules
   const currentYear = new Date().getFullYear()
   const activityNames = vocabulary.names.primary_activity ?? {}
   const typeNames = Object.fromEntries(index.vehicle_types.map(({ slug, name }) => [slug, name]))
   activities = index.primary_activities
   models = index.models.map((model, position) => ({
     ...model,
-    frame_material: comparison?.fields.frame_material?.[position] ?? null,
-    stock_photo: model.photo && `${index.stock_photos}/${path(model.id)}.${model.photo}`,
+    position,
+    // an extension at its own path, or the whole URL of a photo it shares with another model
+    stock_photo: model.photo && (model.photo.includes('://') ? model.photo : `${index.stock_photos}/${path(model.id)}.${model.photo}`),
     activity_name: activityNames[model.primary_activity],
     type_name: typeNames[model.vehicle_type],
     // by its maker, as makers share names, and its first word where it has no group
@@ -60,21 +82,30 @@ async function load ({ manifestUrl, ids, jurisdictions, rulesUrl, similarityUrl:
   byId = new Map(models.map((model) => [model.id, model]))
   // the index labels the out of class markers, which the vocabulary has no record of: "Out of class in California"
   const labels = Object.entries(index.filter_options.e_vehicle_classification).map(([id, label]) => [id, { label, title: label, marker: true }])
-  // "California Moped", which its name leaves off the state of, and a group has none; "US Class 3 e-bike"
-  classifications = Object.fromEntries([...labels, ...Object.entries(vocabulary.e_vehicle_classifications).map(([id, record]) => {
-    const code = record.jurisdiction
-    const state = code?.startsWith('US-') && (jurisdictions[code] ?? code)
-    const label = [state || code, record.name].filter(Boolean).join(' ')
-    // "Alabama (AL)", "United States"
-    const jurisdictionName = state ? `${state} (${code.slice(3)})` : code && (jurisdictions[code] ?? code)
-    return [id, { ...record, label, jurisdiction_name: jurisdictionName, title: /^Class \d+$/.test(record.name) ? `${label} e-bike` : label }]
-  })])
-  return { vocabulary: { ...vocabulary, e_vehicle_classifications: classifications }, kit, options: options(index, vocabulary.names), comparable: Boolean(comparison) }
+  classifications = { ...Object.fromEntries(labels), ...vocabulary.e_vehicle_classifications }
+  return { vocabulary: { ...vocabulary, e_vehicle_classifications: classifications }, kit, options: options(index, vocabulary.names) }
 }
+
+const fetchComparison = () => (comparisonFetch ??= opened.then(() => manifest.comparison && fetchJson(new URL(manifest.comparison, base))).catch(() => null))
+
+// The comparison, once the index, whose order it's in, has loaded, for its frame materials as well as how alike models are;
+// without it neither is offered. Fetched when it's asked for, leaving the index the connection, unless `start` is told the
+// page is of what it adds
+async function compare () {
+  comparison = await fetchComparison()
+  if (!comparison) return { comparable: false, frameMaterials: [] }
+
+  last = null
+  return { comparable: true, frameMaterials: named('frame_material', 'frame.material', (await started).vocabulary.names) }
+}
+
+const counted = (name, choices) => choices.map(([value, display]) => ({ value, display, count: models.filter(filter({ [name]: value })).length }))
+
+// by the vocabulary, as the index offers no choices of these
+const named = (name, vocabulary, names) => counted(name, Object.entries(names[vocabulary] ?? {})).filter(({ count }) => count)
 
 // Each filter's choices, with how many models choosing it alone matches. Propulsion's checkboxes show no counts
 function options ({ manufacturers, vehicle_types: vehicleTypes, filter_options: { electric, e_vehicle_classification: classification, market, ...filterOptions } }, names) {
-  const counted = (name, choices) => choices.map(([value, display]) => ({ value, display, count: models.filter(filter({ [name]: value })).length }))
   const sellers = new Set(models.flatMap(({ markets }) => markets))
   const perManufacturer = models.reduce((counts, { manufacturer }) => counts.set(manufacturer, (counts.get(manufacturer) ?? 0) + 1), new Map())
   return {
@@ -86,9 +117,8 @@ function options ({ manufacturers, vehicle_types: vehicleTypes, filter_options: 
     market: Object.entries(market).sort(([, a], [, b]) => a.localeCompare(b)).filter(([value]) => sellers.has(value))
       .map(([value, display]) => ({ value, name: display, display: `${display} (${value})` })),
     ...Object.fromEntries(Object.entries(filterOptions).map(([name, labels]) => [name, counted(name, Object.entries(labels))])),
-    // by the vocabulary, as the index offers no choices of these
-    ...Object.fromEntries([['handlebar_type', 'handlebar_type'], ['frame_material', 'frame.material']]
-      .map(([name, vocabulary]) => [name, counted(name, Object.entries(names[vocabulary] ?? {})).filter(({ count }) => count)]))
+    handlebar_type: named('handlebar_type', 'handlebar_type', names),
+    frame_material: []
   }
 }
 
@@ -288,7 +318,7 @@ function filter (params) {
     (types.length === 0 || types.includes(model.vehicle_type)) &&
     (!params.model_configuration || model.model_configuration === params.model_configuration) &&
     (!params.handlebar_type || model.handlebar_type === params.handlebar_type) &&
-    (!params.frame_material || model.frame_material === params.frame_material) &&
+    (!params.frame_material || comparison?.fields.frame_material?.[model.position] === params.frame_material) &&
     (!params.market || inMarket(model, params.market, params.market_scope)) &&
     (yearMin == null || model.sortYear >= yearMin) &&
     (yearMax == null || (model.first_year ?? 0) <= yearMax) &&
@@ -308,7 +338,7 @@ function propelled ({ electric, e_vehicle_classifications: carried = [] }, propu
 
 self.onmessage = async ({ data: { id, type, ...args } }) => {
   try {
-    self.postMessage({ id, result: await { load, search, featured, group, vehicles, displays, similar }[type](args) })
+    self.postMessage({ id, result: await { start, load, comparison: compare, search, featured, group, vehicles, displays, similar }[type](args) })
   } catch (error) {
     self.postMessage({ id, error: error.message })
   }

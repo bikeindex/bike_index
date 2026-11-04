@@ -56,7 +56,7 @@
 
         <%# Each chip's grip, cloned by bikebook/catalog's renderChips, which names its chip for %{name} %>
         <template data-chip-grip>
-          <%= render(UI::DragHandle::Component.new(controller: "bikebook--chip-reorder", label: "%{name}", html_class: "tw:mr-1")) %>
+          <%= render(UI::DragHandle::Component.new(controller: "bikebook--chip-reorder", label: "%{name}", html_class: "tw:mr-1 tw:inert:invisible")) %>
         </template>
       <% end %>
     </div>
@@ -425,9 +425,12 @@
       <div id="vehicle-viewers"></div>
     </template>
 
-    <div data-bikebook--page-target="page">
+    <%# A screen's height from the start, so what renders into it doesn't shove the footer out of view %>
+    <div class="tw:min-h-screen" data-bikebook--page-target="page">
       <%# Placeholder until the catalog loads %>
-      <div inert class="<%= placeholder_class %>"><%= search %></div>
+      <div inert class="<%= placeholder_class %>">
+        <%= placeholder_search(search) %>
+      </div>
 
       <div
         class="
