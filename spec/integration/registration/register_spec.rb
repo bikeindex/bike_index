@@ -25,6 +25,22 @@ RSpec.describe "Register flow", :js, type: :system do
     end
   end
 
+  it "searches what was typed before the combobox's module landed" do
+    hold = hold_requests(%r{hotwire_combobox.*\.js})
+    # A plain visit waits for the load the held module is holding up
+    page.driver.with_playwright_page { it.goto("#{Capybara.app_host || page.server_url}/register/new", waitUntil: "commit") }
+
+    find("#b_param_manufacturer_id").send_keys("Surly")
+    wait_for { hold.held? }
+    hold.release
+
+    click_combobox_option("Surly")
+    expect(page).to have_field("b_param_manufacturer_id", with: "Surly")
+    fill_in "b_param[owner_email]", with: owner_email
+    click_button "Next"
+    expect(page).to have_field("bike[serial_number]", wait: 10)
+  end
+
   it "keeps a step 1 draft across a reload, and comes back to what it submitted" do
     visit "/register/new"
     type_into("#b_param_manufacturer_id", "Surly")

@@ -1,7 +1,7 @@
 <% columns = {color_cell: "Color", size_cell: "Size", notes_cell: "Notes"} %>
 <% rows = [["Cargo bike", "Green", "L", "Front basket"], ["Stroller", "Gray", "—", "Folds flat"]] %>
 
-<%= render(UI::CardTable::Component.new(records: rows,
+<%= render(UI::TableInCard::Component.new(records: rows,
   column_settings: {storage_key: "tableColumnSettingsPreview", columns:, defaults: %i[color_cell size_cell], narrow_hidden: %i[size_cell]})) do |table| %>
   <% table.column(label: "Name") { |row| row[0] } %>
 

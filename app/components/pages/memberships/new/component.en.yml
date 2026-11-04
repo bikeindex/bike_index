@@ -6,7 +6,6 @@ en:
         new:
           become_a_member: Become a member
           bike_index_membership: Bike Index membership
-          bikes_registered: bikes registered
           bikes_registered_keep_it_free: "%{bikes} bikes are registered. Members keep
             it free for the next million."
           builds_next: Builds next
@@ -81,7 +80,6 @@ en:
             The official registry for more than 1,000 police departments, universities,
             cities, and shops
           or_make_a_one_time_donation: Or make a one-time donation
-          partner_organizations: partner shops, police departments, and cities
           per_month: "/ month"
           per_year: "/ year"
           perk_cycling_cap: Bike Index member cycling cap
@@ -98,7 +96,6 @@ en:
           plans_from: Plans from %{price} a month
           questions: Questions
           recommended: Recommended
-          stolen_bikes_recovered: stolen bikes recovered
           summary_monthly: "%{level} membership, %{price} a month"
           summary_yearly: "%{level} membership, %{price} a year"
           sun_shirt: Sun shirt
@@ -110,7 +107,6 @@ en:
             Index is a 501(c)(3) nonprofit, EIN 81-4296194.
           the_registry_open_to_everyone: The registry, open to everyone
           two_months_free: Two months free
-          value_returned_to_owners: value returned to owners
           view_your_membership: View your %{level} membership
           wear_the_shield: Wear the shield
           what_members_make_possible: What members make possible

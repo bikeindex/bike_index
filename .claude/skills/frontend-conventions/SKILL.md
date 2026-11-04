@@ -33,7 +33,7 @@ Scope it: every file a bare run rewrites that you've already read is re-injected
 
 - Tailwind classes have the prefix `tw:` (e.g. `tw:text-blue`, `tw:flex`, `tw:gap-4`).
   - The `tw:` prefix comes **before** variant modifiers, not after. Use `tw:dark:bg-gray-800`, `tw:hover:bg-blue-600`, `tw:sm:flex`, `tw:focus-visible:ring-2`. Never `dark:tw:bg-gray-800` — variant prefixes layer on top of `tw:`.
-  - **`dark` is a custom variant keyed to a `.dark` ancestor** (`app/assets/tailwind/application.css`), and the page layouts set that class on `<body>` from `User#dark_mode_preview` — `prefers-color-scheme: dark` still renders the light page, so a dark-mode check means turning that on or adding `.dark` to `<html>` by hand. Keep writing the variants; just don't read a light screenshot as a missing one. Legacy markup's dark colors are in `app/assets/tailwind/legacy_dark.css`, not the SCSS; `kelsey_styles.css` is unlayered, so its sections stay light.
+  - **`dark` is a custom variant keyed to a `.dark` ancestor** (`app/assets/tailwind/application.css`), and the page layouts set that class on `<body>` from `User#dark_mode_preview` — `prefers-color-scheme: dark` still renders the light page, so a dark-mode check means turning that on or adding `.dark` to `<html>` by hand. A preview takes it as `?lookbook%5Bdisplay%5D%5Btheme%5D=dark` on the bare `/rails/view_components/` route, which `/lookbook/preview/` ignores. Keep writing the variants; just don't read a light screenshot as a missing one. Legacy markup's dark colors are in `app/assets/tailwind/legacy_dark.css`, not the SCSS; `kelsey_styles.css` is unlayered, so its sections stay light.
 - Form fields should use the `twinput` class.
 - Labels should use the `twlabel` class.
 - Basic links should use the `twlink` class.
@@ -68,9 +68,10 @@ Every legacy stylesheet wraps itself in `@layer legacy` (see `app/assets/stylesh
 
 **`!important` reverses layer order**, so a legacy-layer `!important` beats a tailwind utility that isn't. A rule kept "just in case" in `revised.scss` is not inert — it is what paints. Delete the legacy rule rather than leaving it alongside; `revised.scss` is fully inside the layer, so the utility already wins without it.
 
-## Two Tailwind v4 traps
+## Tailwind v4 traps
 
 - **A build that was right can go wrong under you.** Each workspace runs its own `tailwindcss:watch`, and one can overwrite `app/assets/builds/tailwind.css` with a scan from before your edit — so a rule you just wrote is served, then isn't. Before believing a CSS change doesn't work, count it in the build (`grep -o '<class>' app/assets/builds/tailwind.css | wc -l`, since the file is minified onto few lines) and check the built file's mtime against the source's. `bin/rails tailwindcss:build` restores it.
+- **An `_` inside an arbitrary value compiles to a space.** `tw:group-has-[#donate_cadence:checked]:flex` builds `#donate cadence:checked`, a descendant selector that never matches, so the class is emitted and inert. Give an id an arbitrary variant keys on dashes (`Pages::Donate::Form`'s `donate-cadence-one-time`), or escape it as `\_`.
 - **A grid item stretches to its row.** For a `<div>` that's invisible, but a bare `<table>` grid item spreads the extra height across its own rows, so two `UI::TableList` panels side by side pull each other's rows tall. `tw:items-start` on the grid, or wrap the table in a `<div>`.
 
 ## Buttons: always `UI::Button` (and the UI component library generally)
@@ -162,7 +163,7 @@ Bundle only what's cohesive — one subject, assembled in one place. `IndexState
 
 This project uses the ViewComponent gem to render components.
 
-- **Prefer an existing component to a new one, extended if needed.** Before creating one, look for a component that already renders the pattern or its core — in `ui/`, `atoms/` and the sibling `pages/` namespaces. A new component whose template is mostly one existing `UI::*` component plus chrome is that component with an argument: ask to extend it (the no-new-argument rule above) rather than wrapping it to avoid asking. `UI::BulkTableCard`, folded into `UI::CardTable`'s `column_settings:`, is the pattern.
+- **Prefer an existing component to a new one, extended if needed.** Before creating one, look for a component that already renders the pattern or its core — in `ui/`, `atoms/` and the sibling `pages/` namespaces. A new component whose template is mostly one existing `UI::*` component plus chrome is that component with an argument: ask to extend it (the no-new-argument rule above) rather than wrapping it to avoid asking. `UI::BulkTableCard`, folded into `UI::TableInCard`'s `column_settings:`, is the pattern.
 - **Before creating a component, check it earns its class.** If its `component.rb` would hold nothing but `initialize` assigning arguments to ivars, and fewer than 3 callers render it, write a partial instead, with `<%# locals: (…) %>` at the top. An admin index table on `UI::Table` is the usual case: `admin/strava_gears/_table.html.erb` is the pattern, and `Pages::Admin::IndexSkeleton` renders the `_table` partial without a `table_view:`. A component earns its class with logic to name, a cache key to build, or a third caller; past that bar, prefer components to partials.
 - **If a view file only renders a single component, consider rendering it from the controller instead** (`render Foo::Component.new(...)`) and deleting the view file — the layout still wraps it.
 - Generate a new view component with `rails generate component ComponentName argument1 argument2`.
