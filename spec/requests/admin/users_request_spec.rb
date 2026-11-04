@@ -152,7 +152,7 @@ RSpec.describe Admin::UsersController, type: :request do
           get "#{base_url}/#{user_subject.id}/edit"
           expect(body[:class]).to eq "dark"
 
-          ["/", "/oauth/applications", "/payments/new"].each do |path|
+          ["/", "/oauth/applications", "/payments/new", "/documentation/api_v3", "/documentation/api_v2", "/documentation/authorize"].each do |path|
             get path
             expect(response.status).to eq 200
             expect(Nokogiri::HTML(response.body).at_css("body.dark")).to be_present

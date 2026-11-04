@@ -29,7 +29,7 @@
 
 = render(UI::Alerts::Base::Component.new(kind: :notice, margin_classes: "tw:mt-2 tw:mb-4")) do
   %p
-    The content blocks accept HTML or Markdown for styling and linking things. Check out this #{link_to "Markdown cheat sheet", "https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet", target: "_blank", class: "twlink"} if you're curious.
+    The content blocks accept HTML or Markdown for styling and linking things. Check out this #{link_to "Markdown cheat sheet", "https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet", target: "_blank", class: "twlink-underlined"} if you're curious.
 
 - unless @blog.is_listicle
   %div{class: "tw:mt-6"}

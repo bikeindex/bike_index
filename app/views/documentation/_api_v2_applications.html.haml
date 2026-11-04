@@ -108,7 +108,7 @@
                     = url
           - else
             = render(UI::Alerts::Base::Component.new(kind: :error, margin_classes: "tw:mt-5 tw:mb-4")) do
-              This application doesn't have the documentation URL as a redirect, so  you can't create tokens for it here. #{link_to "Add the documentation URL", edit_oauth_application_url(application)} as a redirect url if you would like to be able to.
+              This application doesn't have the documentation URL as a redirect, so  you can't create tokens for it here. #{link_to "Add the documentation URL", edit_oauth_application_url(application), class: "twlink-underlined"} as a redirect url if you would like to be able to.
           - if application.is_internal
             = render(UI::Alerts::Base::Component.new(kind: :warning, margin_classes: "tw:mt-5 tw:mb-4")) do
               This application is <em>internal</em> which means it doesn't require authorization by users. They will be passed directly back to the application redirect.
