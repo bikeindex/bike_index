@@ -52,7 +52,7 @@
 
     @container bikebook-components (width >= 40rem) {
       & + tr:has(td:not(:empty)) td {
-        @apply tw:shadow-[inset_0_1px_0_var(--tw-color-gray-200)] tw:dark:shadow-[inset_0_1px_0_var(--tw-color-gray-700)];
+        @apply tw:shadow-[inset_0_1px_0_var(--tw-color-gray-200)] tw:dark:shadow-gray-700;
       }
     }
   }

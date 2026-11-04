@@ -205,6 +205,23 @@
   }
 }
 
+@layer base {
+  /* Tailwind's shadows take this color over the one they're written with, which is pitched for
+   * a light page and doesn't show on a dark one. It doesn't inherit, so every element sets it.
+   * A shadow that's a chosen color rather than a shadow sets its own: tw:dark:shadow-gray-300 */
+  * {
+    @variant dark {
+      --tw-shadow-color: rgb(0 0 0 / 0.5);
+      --tw-drop-shadow-color: rgb(0 0 0 / 0.5);
+
+      &::before,
+      &::after {
+        --tw-shadow-color: rgb(0 0 0 / 0.5);
+      }
+    }
+  }
+}
+
 body {
   @apply tw:base-font tw:dark:bg-gray-900 tw:dark:scheme-dark;
 
