@@ -263,7 +263,7 @@ img {
 
   h2 {
     font-size: 30px;
-    font-weight: bold;
+    font-weight: $strong-font-weight;
     margin: $vertical-height 0 (1.5 * $vertical-height);
   }
 
@@ -284,6 +284,7 @@ img {
       margin: 0;
       text-align: center;
       font-size: 21px;
+      font-weight: $strong-font-weight;
     }
   }
 
