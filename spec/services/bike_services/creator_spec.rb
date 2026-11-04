@@ -679,6 +679,19 @@ RSpec.describe BikeServices::Creator do
         end
       end
 
+      context "R2 unavailable" do
+        before do
+          blob.update!(identified: false)
+          allow_any_instance_of(blob.service.class).to receive(:download_chunk)
+            .and_raise(Seahorse::Client::NetworkingError.new(Net::ReadTimeout.new))
+        end
+
+        it "leaves the photo to the job rather than failing the registration" do
+          instance.attach_photo(b_param, bike)
+          expect(ImageJobs::AttachBlobJob.jobs.map { it["args"] }).to eq [[b_param.id, bike.id]]
+        end
+      end
+
       # CleanUnattachedBlobsJob can beat a long-delayed confirmation to the blob
       context "blob already reaped" do
         before { blob.purge }

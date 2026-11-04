@@ -14,15 +14,20 @@ module Integrations
     end
 
     def latest
-      Rails.cache.fetch(cache_key, expires_in: 24.hours) do
+      payload = Rails.cache.fetch(cache_key, expires_in: 24.hours) do
         resp = conn.get("latest") { |req|
-          req.params = {"base" => base_iso, :access_key => API_KEY}
+          # Our plan rejects any other base with base_currency_access_restricted
+          req.params = {"base" => "EUR", :access_key => API_KEY}
         }
 
         raise(StandardError, resp.body) unless resp.status == 200 && resp.body.is_a?(Hash)
 
         resp.body.with_indifferent_access
       end
+
+      rates = payload.fetch(:rates)
+      base_rate = rates.fetch(base_iso).to_f
+      payload.merge(base: base_iso, rates: rates.transform_values { it / base_rate })
     end
 
     private
