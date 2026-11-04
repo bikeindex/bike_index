@@ -53,6 +53,5 @@ const tips = (url) => html`<div data-bikebook--tips-target="tips"><section aria-
   tw:dark:text-gray-400">Or try an example:</span>${EXAMPLES.map((example) => exampleLink(url, example))}</div><button type="button" aria-label="Dismiss tips"
   data-action="bikebook--tips#dismiss" class="tw:absolute tw:top-2.5 tw:right-3 tw:p-1 tw:text-gray-400 tw:hover:text-gray-600
   tw:dark:hover:text-gray-200">${x('tw:h-3 tw:w-3')}</button></section></div><div hidden data-bikebook--tips-target="prompt"><div class="tw:rounded-md
-  tw:border tw:border-dashed tw:border-gray-300 tw:px-4 tw:py-6 tw:text-center tw:dark:border-gray-600"><p class="tw:text-xs tw:font-bold tw:tracking-wider
-  tw:text-[#715eb2] tw:uppercase tw:dark:text-[#a99bd6]">Nothing selected yet</p><p class="tw:mt-1 tw:text-sm tw:text-gray-500">Pick a bike above to start
+  tw:border tw:border-dashed tw:border-gray-300 tw:px-4 tw:py-6 tw:text-center tw:dark:border-gray-600"><p class="tw:tweyebrow">Nothing selected yet</p><p class="tw:mt-1 tw:text-sm tw:text-gray-500">Pick a bike above to start
   comparing. <button type="button" class="twlink" data-bikebook--tips-target="restore" data-action="bikebook--tips#restore">Show tips</button></p></div></div>`

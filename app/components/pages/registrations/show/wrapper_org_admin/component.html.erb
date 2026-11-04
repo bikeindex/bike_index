@@ -34,12 +34,7 @@
 
       <% if archive_images.any? %>
         <%= render(UI::Card::Component.new) do %>
-          <h2
-            class="
-              tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2]
-              tw:uppercase
-            "
-          >
+          <h2 class="tw:tweyebrow">
             <%= translation(".photo_archive") %>
           </h2>
 
@@ -77,12 +72,7 @@
 
       <% if @bike.description.present? %>
         <%= render(UI::Card::Component.new(additional_classes: "tw:order-6 tw:lg:order-none")) do %>
-          <h2
-            class="
-              tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2]
-              tw:uppercase
-            "
-          >
+          <h2 class="tw:tweyebrow">
             <%= translation(".about_this_bike", bike_type: @bike.type) %>
           </h2>
 
@@ -107,12 +97,7 @@
 
     <div class="tw:contents tw:lg:flex tw:lg:flex-col tw:lg:gap-6">
       <%= render(UI::Card::Component.new(additional_classes: "tw:order-1 tw:lg:order-none")) do %>
-        <h2
-          class="
-            tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2]
-            tw:uppercase
-          "
-        >
+        <h2 class="tw:tweyebrow">
           <%= translation(".owner_access") %>
         </h2>
 
@@ -190,12 +175,7 @@
     <%= render(UI::Card::Component.new) do %>
       <%= tag.div(class: "org-search-component", data: (Pages::Org::Search::ColumnSettings::Component.column_settings_data_attributes(controllers: "org--search") if other_registrations?)) do %>
         <div class="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2">
-          <h2
-            class="
-              tw:mb-0 tw:text-xs tw:font-bold tw:tracking-wider
-              tw:text-[#715eb2] tw:uppercase
-            "
-          >
+          <h2 class="tw:mb-0 tw:tweyebrow">
             <%= translation(".other_registrations") %>
           </h2>
 
