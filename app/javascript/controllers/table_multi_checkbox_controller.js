@@ -23,7 +23,7 @@ export default class extends Controller {
     const last = checkboxes.indexOf(this.lastClicked)
     if (event.shiftKey && last !== -1) {
       checkboxes.slice(Math.min(last, clicked), Math.max(last, clicked) + 1)
-        .forEach(cb => { if (!cb.disabled) cb.checked = event.target.checked })
+        .forEach(checkbox => { if (!checkbox.disabled) checkbox.checked = event.target.checked })
     }
     this.lastClicked = event.target
   }

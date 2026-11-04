@@ -5,6 +5,7 @@ require "rails_helper"
 RSpec.describe UI::TableInCard::Component, :js, type: :system do
   it "checks the rows between a click and a shift-click, to the shift-clicked one's state, and toggles all" do
     visit("/lookbook/preview/ui/table_in_card/variants")
+    wait_for_stimulus("table-multi-checkbox")
     boxes = (1..5).map { find_field("cryptids[#{it}]") }
 
     boxes[1].click
