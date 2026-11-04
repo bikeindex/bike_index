@@ -1807,14 +1807,11 @@ es:
       you_have_claimed_the_maximum_permitted: Has solicitado el número máximo permitido
         de códigos de bicicleta.
     show:
-      change_the_bike_sticker_linked_to: Cambia la bicicleta a la que enlaza.
       contact_the_owner: Contacta con el propietario
       created_to_record_parking_notification: Creado por %{organization} para registrar
         una notificación de estacionamiento.
       from: de
       in: en
-      is_this_linked_to_incorrect_bike: "¿Esta pegatina está vinculada a la bicicleta
-        incorrecta?"
       know_something_about_this_bike_type: "¿Sabes algo sobre esto %{bike_type}?"
       link_url: URL del enlace
       looking_for_correct_owner: "¡Buscando al propietario correcto de este %{bike_type}!"
@@ -1824,15 +1821,11 @@ es:
       send_message: Enviar mensaje
       share_it: "¡Compártelo!"
       spread_the_word: "¡Corre la voz!"
-      switch_to_new_bike_id: Cambiar a una nueva identificación de bicicleta
       test_registration: registro de pruebas
-      update: Actualizar
       view_users_other_registrations: Ver otros registros del usuario
       where_did_you_see_this_bike: "¿Dónde viste esto %{bike_type}? Si nos contactas
         por un anuncio que encontraste en línea, incluye un enlace en el campo a continuación."
       write_them_a_message: Escríbeles un mensaje
-      you_scanned_this_sticker_html: Escaneaste la pegatina <strong>%{pretty_code}</strong>
-        , que está asignada a este %{bike_type}.
       view_public_non_listing: Ver registro público
       viewing_listing_preview: Esta es una vista previa de su anuncio de "se vende".
         No es visible públicamente.
@@ -1877,6 +1870,25 @@ es:
     stolen_map:
       unavailable: No se pudo cargar el mapa; es posible que su navegador o dispositivo
         no lo admita.
+    owner_bike_status_alerts:
+      address: DIRECCIÓN
+      by: Por
+      created: Creado
+      current_notifications:
+        one: "%{count} ¡Notificación actual para este %{bike_type}!"
+        other: "%{count} ¡Notificaciones actuales para este %{bike_type}!"
+      currently_impounded: "¡Su %{bike_type} está actualmente retenido!"
+      have_you_retrieved: "¿Has recuperado esto %{bike_type}?"
+      impounded_by_from_html: "%{time} confiscado por <strong>%{organization}</strong>
+        de %{address}"
+      impounded_by_html: Incautado %{time} por <strong>%{organization}</strong>
+      kind: Amable
+      kind_by_organization_html: "- <em>%{kind}</em> - por <strong>%{organization}</strong>"
+      let_organization_know: Hazle saber a %{organization}
+      mark_retrieved: marca recuperada
+      notification: Notificación#
+      notification_number: 'Notificación #%{number}'
+      was_this_retrieved: "¿Se recuperó este %{bike_type}?"
   bikes_edit:
     accessories:
       add_a_component: Agregar un componente
@@ -2200,7 +2212,6 @@ es:
           bike_recovered: "¡Bicicleta recuperada! ¡Gracias!"
       resolve_token:
         marked_remaining: "%{bike_type} ¡Marcado restante!"
-        marked_retrieved: "%{@bike_type} marcado como recuperado!"
         notification_already_retrieved: "¡Ese %{bike_type} ya ha sido marcado como
           recuperado!"
         notification_impounded: "¡Ese %{bike_type} ha sido confiscado! Comuníquese
@@ -2208,6 +2219,7 @@ es:
         unable_to_find_graduated_notification: "¡No encuentro la notificación de graduación!"
         unable_to_find_parking_notification: "¡No se pudo encontrar la notificación
           de estacionamiento!"
+        bike_type_marked_retrieved: "%{bike_type} ¡marcado como recuperado!"
       scanned:
         unable_to_find_sticker: 'No se pudo encontrar la pegatina: %{scanned_id}'
       update:
@@ -4032,9 +4044,6 @@ es:
       help_prevent_theft: Ayuda a prevenir el robo de bicicletas,
       make_a_donation: Haz una donación.
       the_bike_index_team: El equipo de Bike Index
-    embed_layout:
-      error: error
-      please_fix_the_following: Por favor, corrija lo siguiente
     payments_layout:
       be_a_bike_saver: Sé un salvador de bicicletas.
       support_bike_index_today: Apoya a Bike Index hoy mismo.
@@ -4402,7 +4411,6 @@ es:
         forma gratuita, en tres sencillos pasos:'
       bike_index_account: Cuenta de Bike Index
       confirm_your_email: Confirma tu correo electrónico
-      error: error
       fill_out_the_form_that_will_appear: Rellena el formulario que aparecerá en esta
         página una vez que hayas iniciado sesión.
       filling_out_this_form_will_create_a_new_org: Al completar este formulario se
@@ -4413,7 +4421,6 @@ es:
       new_organization: Nueva organización
       organization_kind: Tipo de organización
       organization_name: Nombre de la organización
-      please_fix_the_following_errors: Por favor, corrija lo siguiente %{errors}
       sign_up_for_a_new_account_html: Regístrate para un %{new_account_link}
       you_are_already_a_member_of_org_html: Ya eres miembro de %{org_link}.
       your_current_account_will_be_a_member_html: Tu cuenta actual ( <strong>%{user_email}</strong>
@@ -4955,9 +4962,6 @@ es:
     form:
       cancel_update: Cancelar actualización
       do_not_display: No mostrar
-      error: Error
-      errors_prevented_photo_from_saving: "%{errors_count} impidió que se guardara
-        la foto."
       image_name: Nombre de la imagen
       no_one_will_be_able_to_see_this_image_exc: "(Nadie podrá ver esta imagen excepto
         tú)"

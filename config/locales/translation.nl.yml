@@ -1751,13 +1751,6 @@ nl:
         opneemt over een advertentie die u online hebt gevonden, neemt u een link
         op in het onderstaande veld
       write_them_a_message: Schrijf ze een bericht
-      change_the_bike_sticker_linked_to: Verander de fiets waarnaar het linkt
-      is_this_linked_to_incorrect_bike: Is deze sticker gekoppeld aan de verkeerde
-        fiets?
-      switch_to_new_bike_id: Schakel over naar een nieuwe fiets-ID
-      update: Bijwerken
-      you_scanned_this_sticker_html: U hebt de sticker <strong>%{pretty_code}</strong>
-        gescand die aan deze %{bike_type} is toegewezen.
       created_to_record_parking_notification: "%{bike_type} gemaakt door %{organization}
         om een parkeermelding op te nemen"
       from: uit
@@ -1861,6 +1854,25 @@ nl:
     stolen_map:
       unavailable: De kaart kon niet worden geladen. Uw browser of apparaat ondersteunt
         deze mogelijk niet.
+    owner_bike_status_alerts:
+      address: Adres
+      by: Door
+      created: Gemaakt
+      current_notifications:
+        one: "%{count} huidige melding voor deze %{bike_type}!"
+        other: "%{count} huidige meldingen voor dit %{bike_type}!"
+      currently_impounded: Uw %{bike_type} is momenteel in beslag genomen!
+      have_you_retrieved: Heeft u dit %{bike_type} opgehaald?
+      impounded_by_from_html: In beslag genomen %{time} door <strong>%{organization}</strong>
+        van %{address}
+      impounded_by_html: In beslag genomen %{time} door <strong>%{organization}</strong>
+      kind: Soort
+      kind_by_organization_html: "- <em>%{kind}</em> - door <strong>%{organization}</strong>"
+      let_organization_know: Laat %{organization} het weten
+      mark_retrieved: markering teruggevonden
+      notification: Kennisgeving#
+      notification_number: 'Melding #%{number}'
+      was_this_retrieved: Is dit %{bike_type} opgehaald?
   controllers:
     bikes:
       edit:
@@ -1914,13 +1926,13 @@ nl:
         unable_to_find_sticker: Kan geen overeenkomende sticker vinden %{bike_sticker}
       resolve_token:
         marked_remaining: "%{bike_type} gemarkeerd als resterend!"
-        marked_retrieved: "% {@ bike_type} gemarkeerd als opgehaald!"
         notification_already_retrieved: Dat %{bike_type} al is gemarkeerd als opgehaald!
         notification_impounded: Dat %{bike_type} in beslag is genomen! Neem contact
           op met %{org_name} om het op te halen.
         unable_to_find_graduated_notification: Kan die afgestudeerde melding niet
           vinden!
         unable_to_find_parking_notification: Kan die parkeermelding niet vinden!
+        bike_type_marked_retrieved: "%{bike_type} is als opgehaald gemarkeerd!"
     feedbacks:
       block_the_spam:
         please_sign_in: Meld je aan om dat bericht te verzenden
@@ -3624,9 +3636,6 @@ nl:
       help_prevent_theft: Helpt fietsdiefstal voorkomen,
       make_a_donation: doe een gift.
       the_bike_index_team: Het Bike Index Team
-    embed_layout:
-      error: Fout
-      please_fix_the_following: Los het volgende op
     payments_layout:
       be_a_bike_saver: Red het leven van een fiets.
       support_bike_index_today: Ondersteun Bike Index vandaag.
@@ -4713,7 +4722,6 @@ nl:
         Index in drie eenvoudige stappen:'
       bike_index_account: Bike Index-account
       confirm_your_email: bevestig je email
-      error: Fout
       fill_out_the_form_that_will_appear: Vul het formulier in dat op deze pagina
         verschijnt zodra u bent ingelogd.
       filling_out_this_form_will_create_a_new_org: Als u dit formulier invult, wordt
@@ -4725,7 +4733,6 @@ nl:
       new_organization: Nieuwe organisatie
       organization_kind: Soort organisatie
       organization_name: Organisatie naam
-      please_fix_the_following_errors: Corrigeer het volgende %{errors}
       sign_up_for_a_new_account_html: Meld u aan voor een %{new_account_link}
       you_are_already_a_member_of_org_html: Je bent al lid van %{org_link}.
       your_current_account_will_be_a_member_html: Uw huidige account ( <strong>%{user_email}</strong>
@@ -4831,9 +4838,6 @@ nl:
     form:
       cancel_update: Update annuleren
       do_not_display: Geef niet weer
-      error: Fout
-      errors_prevented_photo_from_saving: "%{errors_count} heeft voorkomen dat de
-        foto werd opgeslagen"
       image_name: Naam Afbeelding
       no_one_will_be_able_to_see_this_image_exc: "(niemand kan deze afbeelding zien
         behalve jij)"

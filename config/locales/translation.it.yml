@@ -1797,13 +1797,11 @@ it:
       you_have_claimed_the_maximum_permitted: Hai richiesto il numero massimo di codici
         bici consentiti.
     show:
-      change_the_bike_sticker_linked_to: Cambiare la bici a cui si collega
       contact_the_owner: Contatta il proprietario
       created_to_record_parking_notification: creato da %{organization} per registrare
         una notifica di parcheggio
       from: da
       in: in
-      is_this_linked_to_incorrect_bike: Questo adesivo è collegato alla bici sbagliata?
       know_something_about_this_bike_type: Sapete qualcosa di questa %{bike_type}?
       link_url: Collegamento
       looking_for_correct_owner: Cerco il proprietario corretto di questa %{bike_type}!
@@ -1813,16 +1811,12 @@ it:
       send_message: Invia il messaggio
       share_it: Condividilo!
       spread_the_word: Diffondi la notizia!
-      switch_to_new_bike_id: Passa a un nuovo codice identificativo della bicicletta
       test_registration: registrazione di test
-      update: Aggiorna
       view_users_other_registrations: Visualizza le altre registrazioni dell'utente
       where_did_you_see_this_bike: Dove hai visto questo %{bike_type}? Se ci contatti
         in merito a un annuncio che hai trovato online, includi il link nel campo
         sottostante.
       write_them_a_message: Scrivigli un messaggio
-      you_scanned_this_sticker_html: È stata eseguita la scansione dell'adesivo <strong>%{pretty_code}</strong>,
-        assegnato a questa %{bike_type}.
       view_public_non_listing: Visualizza la registrazione pubblica
       viewing_listing_preview: Questa è un'anteprima del tuo annuncio di vendita.
         Non è visibile pubblicamente.
@@ -1867,6 +1861,25 @@ it:
     stolen_map:
       unavailable: 'Impossibile caricare la mappa: il browser o il dispositivo in
         uso potrebbero non supportarla.'
+    owner_bike_status_alerts:
+      address: Indirizzo
+      by: Di
+      created: Creato
+      current_notifications:
+        one: "%{count} notifica corrente per questo %{bike_type}!"
+        other: "%{count} notifiche correnti per questo %{bike_type}!"
+      currently_impounded: Il tuo %{bike_type} è attualmente sotto sequestro!
+      have_you_retrieved: Hai recuperato questo %{bike_type}?
+      impounded_by_from_html: Sequestrato %{time} da <strong>%{organization}</strong>
+        a %{address}
+      impounded_by_html: Sequestrato %{time} da <strong>%{organization}</strong>
+      kind: Tipo
+      kind_by_organization_html: "- <em>%{kind}</em> - di <strong>%{organization}</strong>"
+      let_organization_know: Fai sapere %{organization}
+      mark_retrieved: segno recuperato
+      notification: Notifica#
+      notification_number: Notifica n. %{number}
+      was_this_retrieved: È stato recuperato %{bike_type}?
   bikes_edit:
     accessories:
       add_a_component: Aggiungi un componente
@@ -2196,7 +2209,6 @@ it:
           bike_recovered: Bicicletta ritrovata! Grazie!
       resolve_token:
         marked_remaining: "%{bike_type} contrassegnato come rimanente!"
-        marked_retrieved: "%{@bike_type} contrassegnato come recuperato!"
         notification_already_retrieved: Quel %{bike_type} è già stato contrassegnato
           come recuperato!
         notification_impounded: L'oggetto %{bike_type} è stato sequestrato! Contatta
@@ -2204,6 +2216,7 @@ it:
         unable_to_find_graduated_notification: Impossibile trovare la notifica di
           conseguimento del diploma!
         unable_to_find_parking_notification: Impossibile trovare l'avviso di parcheggio!
+        bike_type_marked_retrieved: "%{bike_type} contrassegnato come recuperato!"
       scanned:
         unable_to_find_sticker: 'Impossibile trovare l''etichetta: %{scanned_id}'
       update:
@@ -4048,9 +4061,6 @@ it:
       help_prevent_theft: Aiuta a prevenire il furto di biciclette,
       make_a_donation: fai una donazione.
       the_bike_index_team: Il team di Bike Index
-    embed_layout:
-      error: errore
-      please_fix_the_following: Si prega di correggere quanto segue
     payments_layout:
       be_a_bike_saver: Contribuisci a salvare le biciclette.
       support_bike_index_today: Sostieni Bike Index oggi stesso.
@@ -4417,7 +4427,6 @@ it:
         Index, gratuitamente, in tre semplici passaggi:'
       bike_index_account: Account Bike Index
       confirm_your_email: Conferma il tuo indirizzo email
-      error: errore
       fill_out_the_form_that_will_appear: Compila il modulo che apparirà su questa
         pagina una volta effettuato l'accesso.
       filling_out_this_form_will_create_a_new_org: Compilando questo modulo si creerà
@@ -4428,7 +4437,6 @@ it:
       new_organization: Nuova organizzazione
       organization_kind: Tipo di organizzazione
       organization_name: Nome dell'organizzazione
-      please_fix_the_following_errors: Correggi i seguenti %{errors}
       sign_up_for_a_new_account_html: Iscriviti a un %{new_account_link}
       you_are_already_a_member_of_org_html: Sei già membro di %{org_link}.
       your_current_account_will_be_a_member_html: Il tuo conto corrente ( <strong>%{user_email}</strong>
@@ -4974,9 +4982,6 @@ it:
     form:
       cancel_update: Annulla aggiornamento
       do_not_display: Non visualizzare
-      error: Errore
-      errors_prevented_photo_from_saving: "%{errors_count} ha impedito il salvataggio
-        della foto"
       image_name: Nome dell'immagine
       no_one_will_be_able_to_see_this_image_exc: "(Nessuno potrà vedere questa immagine
         tranne te)"
