@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require "ostruct"
-
 module UI
   module Table
     class ComponentPreview < ApplicationComponentPreview
+      Cryptid = Data.define(:name, :region, :credibility, :enthusiasm, :sightings, :first_seen)
+
       # @!group Variants
 
       def default
@@ -80,12 +80,12 @@ module UI
 
       def sample_records
         [
-          OpenStruct.new(name: "Mothman", region: "West Virginia", credibility: "Medium", enthusiasm: "Extreme", sightings: 142, first_seen: ::Time.zone.parse("1966-11-15")),
-          OpenStruct.new(name: "Bigfoot", region: "Pacific Northwest", credibility: "Low", enthusiasm: "Extreme", sightings: 10000, first_seen: ::Time.zone.parse("1958-08-27")),
-          OpenStruct.new(name: "Loch Ness Monster", region: "Scottish Highlands", credibility: "Low", enthusiasm: "High", sightings: 1036, first_seen: ::Time.zone.parse("1933-05-02")),
-          OpenStruct.new(name: "Chupacabra", region: "Puerto Rico", credibility: "Low", enthusiasm: "Medium", sightings: 87, first_seen: ::Time.zone.parse("1995-03-01")),
-          OpenStruct.new(name: "Jersey Devil", region: "Pine Barrens, NJ", credibility: "Low", enthusiasm: "Low", sightings: 53, first_seen: ::Time.zone.parse("1909-01-16")),
-          OpenStruct.new(name: "Okapi", region: "Congo", credibility: "Confirmed", enthusiasm: "None", sightings: 1, first_seen: ::Time.zone.parse("1901-06-01"))
+          Cryptid.new(name: "Mothman", region: "West Virginia", credibility: "Medium", enthusiasm: "Extreme", sightings: 142, first_seen: ::Time.zone.parse("1966-11-15")),
+          Cryptid.new(name: "Bigfoot", region: "Pacific Northwest", credibility: "Low", enthusiasm: "Extreme", sightings: 10000, first_seen: ::Time.zone.parse("1958-08-27")),
+          Cryptid.new(name: "Loch Ness Monster", region: "Scottish Highlands", credibility: "Low", enthusiasm: "High", sightings: 1036, first_seen: ::Time.zone.parse("1933-05-02")),
+          Cryptid.new(name: "Chupacabra", region: "Puerto Rico", credibility: "Low", enthusiasm: "Medium", sightings: 87, first_seen: ::Time.zone.parse("1995-03-01")),
+          Cryptid.new(name: "Jersey Devil", region: "Pine Barrens, NJ", credibility: "Low", enthusiasm: "Low", sightings: 53, first_seen: ::Time.zone.parse("1909-01-16")),
+          Cryptid.new(name: "Okapi", region: "Congo", credibility: "Confirmed", enthusiasm: "None", sightings: 1, first_seen: ::Time.zone.parse("1901-06-01"))
         ]
       end
 
