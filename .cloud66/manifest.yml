@@ -2,7 +2,7 @@ production:
   rails:
     configuration:
       ruby_version: "4.0.9"
-      node_version: "24.15.0"
+      node_version: "24.22.2"
   # usr1 is a Puma phased restart: workers recycle under a master that never dies, so
   # nginx's socket never disappears. Env var changes still need a hard restart.
   procfile_metadata:

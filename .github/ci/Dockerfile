@@ -43,7 +43,7 @@ RUN apt-get update -qq && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 # Node, matching .tool-versions (see .cloud66/manifest.yml for the other pin)
-ARG NODE_VERSION=24.15.0
+ARG NODE_VERSION=24.22.2
 RUN curl -fsSLo /tmp/node.tar.xz "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz" && \
     tar -xJf /tmp/node.tar.xz -C /usr/local --strip-components=1 && \
     rm /tmp/node.tar.xz
