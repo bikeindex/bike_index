@@ -5160,8 +5160,6 @@ nb:
       total_bikes_registered: Totalt registrerte sykler
       total_recovery_value: Total gjenopprettingsverdi
       used_by: Brukt av
-    recovery_stories:
-      recovery_stories: Gjenopprettingshistorier
     update_browser:
       go_here_to_learn_more: Gå hit for å lære mer
       oh_no: Å nei!
@@ -5461,6 +5459,7 @@ nb:
         copy_sticker: Kopier klistremerke
       recovery_display_card:
         recovered: Gjenopprettet
+        translated_from_english: oversatt fra engelsk
     pages:
       messages:
         thread_show:
@@ -7192,7 +7191,6 @@ nb:
           official_registry: Det offisielle registeret for mer enn 1000 politiavdelinger,
             universiteter, byer og butikker
           or_make_a_one_time_donation: Eller gi en engangsdonasjon
-          partner_organizations: partnerbutikker, politiavdelinger og byer
           per_month: "/ måned"
           per_year: "/ år"
           perk_cycling_cap: Sykkelkappe for medlemmer av Bike Index
@@ -7210,7 +7208,6 @@ nb:
           plans_from: Planer fra %{price} i måneden
           questions: Spørsmål
           recommended: Anbefalt
-          stolen_bikes_recovered: stjålne sykler funnet
           summary_monthly: "%{level} medlemskap, %{price} i måneden"
           summary_yearly: "%{level} medlemskap, %{price} per år"
           sun_shirt: Solskjorte
@@ -7221,12 +7218,10 @@ nb:
             i USA. Bike Index er en ideell organisasjon under 501(c)(3), EIN 81-4296194.
           the_registry_open_to_everyone: Registeret, åpent for alle
           two_months_free: To måneder gratis
-          value_returned_to_owners: verdi tilbakeført til eierne
           view_your_membership: Se ditt %{level}-medlemskap
           wear_the_shield: Bruk skjoldet
           what_members_make_possible: Hva medlemmer gjør mulig
           yearly: Årlig
-          bikes_registered: registrerte sykler
           bikes_registered_keep_it_free: "%{bikes} sykler er registrert. Medlemmer
             beholder det gratis den neste millionen."
           millions_registered_keep_it_free: "%{millions} millioner sykler er registrert.
@@ -7238,18 +7233,10 @@ nb:
             er grunnen til at vi kan love det.
       donate:
         page:
-          already_member: Du er allerede medlem av Bike Index – takk! Du kan endre
-            nivået eller betalingsinformasjonen din fra medlemsinnstillingene dine.
-          cadence: Hvor ofte å gi
           cta_headline: En million sykler er registrert. Ikke én eier betalte for
             å være der.
           cta_sub: Hold det gratis for den neste millionen.
           eyebrow: Gjenopprettet og returnert
-          fine_print: Bike Index er en ideell organisasjon under 501(c)(3), EIN 81-4296194.
-            Donasjonen din er fradragsberettiget i USA. Du kan når som helst avbryte
-            en månedlig gave.
-          fine_print_short: 501(c)(3) ideell organisasjon, EIN 81-4296194. Fradragsberettiget
-            i USA.
           form_title: Finansier den neste gjenopprettingen
           headline: Alle syklene ovenfor kom hjem fordi registeret var gratis
           larger_gift_link: Snakk med oss om en større gave
@@ -7267,16 +7254,6 @@ nb:
           major_eyebrow: Stor gaver
           major_partner: Partner
           major_title: Større gaver flytter hele byer inn i registeret
-          manage_membership: Administrer medlemskapet ditt
-          membership_link: Hva medlemskapet inkluderer
-          membership_note: 'Månedlig støtte gjør deg til et Bike Index-medlem: markedsplassoppføringer,
-            et medlemsmerke og fordeler som vokser etter hvert som vi bygger dem.
-            Nivåene er %{amounts} per måned.'
-          monthly: Månedlig
-          monthly_submit: Bli medlem — %{amount}/måned
-          one_time: Engangsbruk
-          one_time_submit: Doner %{amount}
-          other_amount: Annet beløp
           other_ways_daf: Giverstyrte fondstilskudd – vi kan sende deg EIN-nummeret
             ditt og stipendinformasjonen din.
           other_ways_match: Arbeidsgivermatching – mange arbeidsgivere vil matche
@@ -7284,20 +7261,7 @@ nb:
           other_ways_stock: Gaver i form av aksjer eller kryptovaluta, som unngår
             kapitalgevinster på verdiøkende eiendeler.
           other_ways_title: Andre måter å gi på dette nivået
-          stat_bikes: sykler registrert, gratis
-          stat_partners: partnerbutikker, politiavdelinger og byer
-          stat_recoveries: stjålne sykler funnet
-          stat_value: verdi tilbakeført til eierne
           stories_title: Med eiernes ord
-          tier_basic: Grunnleggende medlemskap
-          tier_basic_benefit: List opp sykler på markedsplassen, et medlemsmerke og
-            raskere støtte
-          tier_patron: Patronmedlemskap
-          tier_patron_benefit: Alt i Plus, topp plassering på markedsplassen, Patron-skjorte
-            og -merke
-          tier_plus: Pluss-medlemskap
-          tier_plus_benefit: Alt i Basic, et gratis promoteringsvarsel hvis sykkelen
-            din blir stjålet og et medlemskapstak
           uses_alerts_body: Varslingssystemet for stjålne sykler og de promoterte
             varslene som legger ut en oppføring i feeder om tyveriet.
           uses_alerts_title: Varsler som når ut til folk
@@ -7313,6 +7277,34 @@ nb:
           uses_partners_title: Partnere og etterforskninger
           uses_title: Hvor pengene går
           wall_photo_alt: En sykkel funnet gjennom Bike Index
+        form:
+          already_member: Du er allerede medlem av Bike Index – takk! Du kan endre
+            nivået eller betalingsinformasjonen din fra medlemsinnstillingene dine.
+          cadence: Hvor ofte å gi
+          fine_print: Bike Index er en ideell organisasjon under 501(c)(3), EIN 81-4296194.
+            Donasjonen din er fradragsberettiget i USA. Du kan når som helst avbryte
+            en månedlig gave.
+          fine_print_short: 501(c)(3) ideell organisasjon, EIN 81-4296194. Fradragsberettiget
+            i USA.
+          manage_membership: Administrer medlemskapet ditt
+          membership_link: Hva medlemskapet inkluderer
+          membership_note: 'Månedlig støtte gjør deg til et Bike Index-medlem: markedsplassoppføringer,
+            et medlemsmerke og fordeler som vokser etter hvert som vi bygger dem.
+            Nivåene er %{amounts} per måned.'
+          monthly: Månedlig
+          monthly_submit: Bli medlem — %{amount}/måned
+          one_time: Engangsbruk
+          one_time_submit: Doner %{amount}
+          other_amount: Annet beløp
+          tier_basic: Grunnleggende medlemskap
+          tier_basic_benefit: List opp sykler på markedsplassen, et medlemsmerke og
+            raskere støtte
+          tier_patron: Patronmedlemskap
+          tier_patron_benefit: Alt i Plus, topp plassering på markedsplassen, Patron-skjorte
+            og -merke
+          tier_plus: Pluss-medlemskap
+          tier_plus_benefit: Alt i Basic, et gratis promoteringsvarsel hvis sykkelen
+            din blir stjålet og et medlemskapstak
       landing_pages:
         demo_modal:
           field_message: Noe annet vi burde vite?
@@ -7746,6 +7738,30 @@ nb:
             på dem. Det gjør vi. Fordi alle oppføringer her er en registrert sykkel,
             kan ikke en meldt stjålet føres opp, og registreringen følger sykkelen
             til den nye eieren.
+      recovery_stories:
+        index:
+          donors_keep_it_free: Bike Index verken belaster syklister, selger data eller
+            kjører annonser. Alle gjenopprettinger på denne siden ble drevet av givere
+            som holder registrering, søk og stjålet varsler gratis for alle.
+          every_one_found_its_way_home: Hver og en av disse syklene fant veien hjem.
+          fund_the_next_recovery: Finansier den neste gjenopprettingen
+          help_it_come_home: Et sted i kveld blir en sykkel stjålet. Hjelp den med
+            å komme hjem.
+          in_their_own_words: Med deres egne ord
+          lede: Bak hvert bilde står en sjåfør som trodde det var borte for godt,
+            og noen som brydde seg nok til å sjekke. En verkstedmekaniker. En politibetjent.
+            En fremmed som husket et varsel. Dette er hva et gratis, åpent register
+            muliggjør, og det holdes gratis av folk som deg.
+          recovery_stories: Historier om gjenoppretting
+          register_your_bike: Registrer sykkelen din
+          share_your_story: Del historien din
+          shared_by_the_person: Hver historie her deles av personen som fikk sykkelen
+            sin tilbake.
+          started_with_a_registration: Hver historie her startet med en registrering.
+          takes_two_minutes: Tar omtrent to minutter. Det er gratis, for alltid.
+        stories:
+          load_more_stories: Last inn flere historier
+          newer_stories: Nyere historier
     shared_blocks:
       footer:
         about: Om
@@ -7942,6 +7958,11 @@ nb:
           read_more_recovery_stories: Les flere historier om gjenoppretting
           reported_by_owners: Hver gjenoppretting rapporteres av personen som fikk
             sykkelen sin tilbake.
+        registry_stats:
+          stat_bikes: sykler registrert, gratis
+          stat_partners: partnerbutikker, politiavdelinger og byer
+          stat_recoveries: stjålne sykler funnet
+          stat_value: verdi tilbakeført til eierne
   user_emails:
     confirm:
       confirm_email: Bekreft e-post

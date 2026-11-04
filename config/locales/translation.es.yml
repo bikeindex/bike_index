@@ -5403,8 +5403,6 @@ es:
       total_bikes_registered: Total de bicicletas registradas
       total_recovery_value: Valor total de recuperación
       used_by: Usado por
-    recovery_stories:
-      recovery_stories: Historias de recuperación
     update_browser:
       go_here_to_learn_more: Haz clic aquí para obtener más información.
       oh_no: "¡Oh, no!"
@@ -5710,6 +5708,7 @@ es:
         copy_sticker: Copiar pegatina
       recovery_display_card:
         recovered: Recuperado
+        translated_from_english: traducido del inglés
     pages:
       messages:
         thread_show:
@@ -7523,7 +7522,6 @@ es:
           official_registry: El registro oficial de más de 1.000 departamentos de
             policía, universidades, ciudades y tiendas.
           or_make_a_one_time_donation: O bien, haga una donación única.
-          partner_organizations: tiendas asociadas, departamentos de policía y ciudades
           per_month: "/ mes"
           per_year: "/ año"
           perk_cycling_cap: Gorra de ciclismo para miembros de Bike Index
@@ -7542,7 +7540,6 @@ es:
           plans_from: Planes de %{price} al mes
           questions: Preguntas
           recommended: Recomendado
-          stolen_bikes_recovered: Recuperan bicicletas robadas
           summary_monthly: "%{level} membresía, %{price} un mes"
           summary_yearly: "%{level} membresía, %{price} un año"
           sun_shirt: Camisa de sol
@@ -7554,12 +7551,10 @@ es:
             fines de lucro 501(c)(3), EIN 81-4296194.
           the_registry_open_to_everyone: El registro, abierto a todos
           two_months_free: Dos meses gratis
-          value_returned_to_owners: valor devuelto a los propietarios
           view_your_membership: Consulta tu membresía %{level}
           wear_the_shield: Lleva el escudo
           what_members_make_possible: Lo que los miembros hacen posible
           yearly: Anual
-          bikes_registered: bicicletas matriculadas
           bikes_registered_keep_it_free: "%{bikes} Las bicicletas están registradas.
             Los miembros lo mantienen gratis para el próximo millón."
           millions_registered_keep_it_free: "%{millions} millones de bicicletas están
@@ -7571,18 +7566,10 @@ es:
             será gratuito. Gracias a nuestros miembros podemos garantizarlo.
       donate:
         page:
-          already_member: Ya eres miembro de Bike Index. ¡Gracias! Puedes cambiar
-            tu nivel o los detalles de pago desde la configuración de tu membresía.
-          cadence: "¿Con qué frecuencia se debe dar?"
           cta_headline: Un millón de bicicletas están registradas. Ni un solo propietario
             pagó para estar allí.
           cta_sub: Que siga siendo gratuito para el próximo millón.
           eyebrow: Recuperado y regresado
-          fine_print: Bike Index es una organización sin fines de lucro 501(c)(3),
-            EIN 81-4296194. Su donación es deducible de impuestos en los EE. UU. Puede
-            cancelar su donación mensual en cualquier momento.
-          fine_print_short: Organización sin fines de lucro 501(c)(3), EIN 81-4296194.
-            Deducible de impuestos en los EE. UU.
           form_title: Financiar la próxima recuperación
           headline: Todas las bicicletas mencionadas anteriormente regresaron a casa
             porque el registro era gratuito.
@@ -7602,16 +7589,6 @@ es:
           major_partner: Pareja
           major_title: Las donaciones más grandes hacen que ciudades enteras se incluyan
             en la lista de regalos.
-          manage_membership: Gestiona tu membresía
-          membership_link: Qué incluye la membresía
-          membership_note: 'El apoyo mensual te convierte en miembro de Bike Index:
-            listados en el mercado, una insignia de miembro y ventajas que se amplían
-            a medida que las desarrollamos. Los niveles cuestan %{amounts} al mes.'
-          monthly: Mensual
-          monthly_submit: Hazte miembro — %{amount}/mes
-          one_time: Una sola vez
-          one_time_submit: Donar %{amount}
-          other_amount: Otra cantidad
           other_ways_daf: 'Subvenciones de fondos de donaciones asesoradas: podemos
             enviar nuestro número de identificación fiscal (EIN) y los detalles de
             la subvención.'
@@ -7621,20 +7598,7 @@ es:
             impuesto sobre las ganancias de capital derivadas de la apreciación de
             los activos.
           other_ways_title: Otras formas de donar a este nivel
-          stat_bikes: bicicletas registradas, gratis
-          stat_partners: tiendas asociadas, departamentos de policía y ciudades
-          stat_recoveries: Recuperan bicicletas robadas
-          stat_value: valor devuelto a los propietarios
           stories_title: En palabras de sus dueños
-          tier_basic: membresía básica
-          tier_basic_benefit: Publica tus bicicletas en el mercado, obtén una insignia
-            de miembro y asistencia más rápida.
-          tier_patron: Membresía de patrocinador
-          tier_patron_benefit: Todo incluido en Plus, mejor posicionamiento en el
-            mercado, camiseta y distintivo de Patrocinador.
-          tier_plus: Membresía Plus
-          tier_plus_benefit: Todo lo incluido en el paquete Básico, una alerta promocional
-            gratuita si te roban la bicicleta y un límite de miembros.
           uses_alerts_body: El sistema de alerta de bicicletas robadas y las alertas
             promocionadas que muestran un anuncio en los feeds relacionados con el
             robo.
@@ -7653,6 +7617,34 @@ es:
           uses_partners_title: Socios e investigaciones
           uses_title: "¿Adónde va el dinero?"
           wall_photo_alt: Una bicicleta recuperada a través de Bike Index.
+        form:
+          already_member: Ya eres miembro de Bike Index. ¡Gracias! Puedes cambiar
+            tu nivel o los detalles de pago desde la configuración de tu membresía.
+          cadence: "¿Con qué frecuencia se debe dar?"
+          fine_print: Bike Index es una organización sin fines de lucro 501(c)(3),
+            EIN 81-4296194. Su donación es deducible de impuestos en los EE. UU. Puede
+            cancelar su donación mensual en cualquier momento.
+          fine_print_short: Organización sin fines de lucro 501(c)(3), EIN 81-4296194.
+            Deducible de impuestos en los EE. UU.
+          manage_membership: Gestiona tu membresía
+          membership_link: Qué incluye la membresía
+          membership_note: 'El apoyo mensual te convierte en miembro de Bike Index:
+            listados en el mercado, una insignia de miembro y ventajas que se amplían
+            a medida que las desarrollamos. Los niveles cuestan %{amounts} al mes.'
+          monthly: Mensual
+          monthly_submit: Hazte miembro — %{amount}/mes
+          one_time: Una sola vez
+          one_time_submit: Donar %{amount}
+          other_amount: Otra cantidad
+          tier_basic: membresía básica
+          tier_basic_benefit: Publica tus bicicletas en el mercado, obtén una insignia
+            de miembro y asistencia más rápida.
+          tier_patron: Membresía de patrocinador
+          tier_patron_benefit: Todo incluido en Plus, mejor posicionamiento en el
+            mercado, camiseta y distintivo de Patrocinador.
+          tier_plus: Membresía Plus
+          tier_plus_benefit: Todo lo incluido en el paquete Básico, una alerta promocional
+            gratuita si te roban la bicicleta y un límite de miembros.
       landing_pages:
         demo_modal:
           field_message: "¿Hay algo más que debamos saber?"
@@ -8132,6 +8124,33 @@ es:
             que todas las bicicletas que aparecen en nuestro sitio están registradas,
             no podemos publicar aquellas que han sido reportadas como robadas, y el
             registro acompaña a la bicicleta hasta su nuevo propietario.
+      recovery_stories:
+        index:
+          donors_keep_it_free: Bike Index no cobra a los ciclistas, no vende datos
+            ni publicita. Cada recuperación que aparece en esta página fue posible
+            gracias a donantes que mantienen el registro, la búsqueda y las alertas
+            de robo gratuitas para todos.
+          every_one_found_its_way_home: Todas y cada una de estas bicicletas encontraron
+            el camino de regreso a casa.
+          fund_the_next_recovery: Financiar la próxima recuperación
+          help_it_come_home: Esta noche, en algún lugar, están robando una bicicleta.
+            Ayúdanos a recuperarla.
+          in_their_own_words: En sus propias palabras
+          lede: Detrás de cada foto hay un motociclista que pensó que la había perdido
+            para siempre, y alguien que se preocupó lo suficiente como para comprobarlo.
+            Un mecánico. Un policía. Un desconocido que recordó una alerta. Esto es
+            lo que hace posible un registro público y gratuito, y se mantiene así
+            gracias a personas como tú.
+          recovery_stories: Historias de recuperación
+          register_your_bike: Registra tu bicicleta
+          share_your_story: Comparte tu historia
+          shared_by_the_person: Cada historia que se cuenta aquí la comparte la persona
+            que recuperó su bicicleta.
+          started_with_a_registration: Cada historia aquí comenzó con un registro.
+          takes_two_minutes: Tarda unos dos minutos. Es gratis, para siempre.
+        stories:
+          load_more_stories: Cargar más historias
+          newer_stories: Historias más recientes
     shared_blocks:
       footer:
         about: Acerca
@@ -8331,6 +8350,11 @@ es:
           read_more_recovery_stories: Lee más historias de recuperación
           reported_by_owners: Cada recuperación es reportada por la persona que recuperó
             su bicicleta.
+        registry_stats:
+          stat_bikes: bicicletas registradas, gratis
+          stat_partners: tiendas asociadas, departamentos de policía y ciudades
+          stat_recoveries: Recuperan bicicletas robadas
+          stat_value: valor devuelto a los propietarios
   user_emails:
     confirm:
       confirm_email: Confirmar correo electrónico
