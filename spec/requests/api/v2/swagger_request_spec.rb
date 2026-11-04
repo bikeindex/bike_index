@@ -7,7 +7,6 @@ RSpec.describe "Swagger API V2 docs", type: :request do
         {path: "/bikes_search", description: "Searching for bikes"},
         {path: "/bikes", description: "Operations about bikes"},
         {path: "/me", description: "Operations about the current user"},
-        {path: "/users", description: "Deprecated"},
         {path: "/manufacturers", description: "Accepted manufacturers"},
         {path: "/selections", description: "Selections (static options)"}
       ]
@@ -24,13 +23,11 @@ RSpec.describe "Swagger API V2 docs", type: :request do
         .to eq target_apis.map { |i| i[:description] }.sort
 
       json_result["apis"].each do |endpoint|
-        path, desc = endpoint["path"], endpoint["description"]
+        path = endpoint["path"]
 
         get "/api/v2/swagger_doc#{path}"
 
-        code = /deprecated/i.match?(desc) ? 404 : 200
-        expect(response.status).to eq(code)
-        next if code == 404
+        expect(response.status).to eq(200)
 
         endpoint_response = JSON.parse(response.body)
 
