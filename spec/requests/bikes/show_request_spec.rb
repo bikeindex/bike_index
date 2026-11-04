@@ -546,6 +546,34 @@ RSpec.describe "BikesController#show", type: :request do
       end
     end
   end
+  context "with organized impound_record, viewed by the owner" do
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
+    let(:current_user) { bike.user }
+    let(:organization) { FactoryBot.create(:organization, name: "Brakebills") }
+    let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, bike:, organization:) }
+
+    it "renders the impounded alert" do
+      expect(bike.reload.current_impound_record).to be_present
+      get "#{base_url}/#{bike.id}"
+      expect(response).to render_template(:show)
+      alert = Nokogiri::HTML(response.body).at_css("[role=alert]:has(h4)")
+      expect(alert.at_css("h4").text.strip).to eq "Your bike is currently impounded!"
+      expect(alert.text.squish).to match(/Impounded .+ by Brakebills\z/)
+      expect(alert.at_css(".localizeTime")).to be_present
+    end
+
+    context "impounded from a parking notification" do
+      let!(:parking_notification) { FactoryBot.create(:parking_notification_organized, bike:, organization:, impound_record:) }
+
+      it "includes the notification's address" do
+        expect(impound_record.reload.parking_notification.formatted_address_string).to be_present
+        get "#{base_url}/#{bike.id}"
+        alert = Nokogiri::HTML(response.body).at_css("[role=alert]:has(h4)")
+        expect(alert.text.squish).to match(/by Brakebills from #{Regexp.escape(parking_notification.formatted_address_string)}\z/)
+      end
+    end
+  end
+
   context "with impound_record" do
     let(:impound_record) { FactoryBot.create(:impound_record, bike: bike) }
     let(:current_user) { FactoryBot.create(:user_confirmed) }

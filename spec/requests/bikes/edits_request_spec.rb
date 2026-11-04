@@ -300,6 +300,17 @@ RSpec.describe Bikes::EditsController, type: :request do
         expect(flash[:error]).to match(/impounded/i)
         expect(response).to redirect_to(bike_path(bike.id))
       end
+      context "superuser" do
+        let(:current_user) { FactoryBot.create(:superuser) }
+
+        it "renders the impounded alert above the edit page" do
+          get base_url
+          expect(response).to render_template(:bike_details)
+          alert = Nokogiri::HTML(response.body).at_css("#edit-bike-skeleton [role=alert]:has(h4)")
+          expect(alert.at_css("h4").text.strip).to eq "Your bike is currently impounded!"
+          expect(alert.text.squish).to match(/by #{Regexp.escape(impound_record.organization.name)}\z/)
+        end
+      end
       context "unclaimed" do
         let!(:bike) { FactoryBot.create(:bike, :with_ownership, user: nil, owner_email: "something@stuff.com") }
         let(:current_user) { FactoryBot.create(:user_confirmed, email: "something@stuff.com") }

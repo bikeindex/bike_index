@@ -1,18 +1,20 @@
 <%# TODO: Add translations %>
 <% if @bike.impounded? && @bike.current_impound_record.organized? %>
-  <div class="alert alert-danger mt-4 mb-4">
-    <h3 class="uncap">Your <%= @bike.type %> is currently impounded!</h3>
-    Impounded
-    <em class="localizeTime"><%= l @bike.current_impound_record.impounded_at, format: :convert_time %></em>
-
-
+  <% impound_record = @bike.current_impound_record %>
+  <% organization = impound_record.organization&.name %>
+  <% address = impound_record.parking_notification&.formatted_address_string %>
+  <% time = capture do %>
+    <em><%= render(UI::Time::Component.new(time: impound_record.impounded_at)) %></em>
     <em class="small localizeTimezone"></em>
-    by <strong><%= @bike.current_impound_record.organization&.name %></strong>
-    <% if @bike.current_impound_record.parking_notification.present? %>
-      from
-      <%= @bike.current_impound_record.parking_notification.formatted_address_string %>
+  <% end %>
+
+  <%= render(UI::Alerts::Base::Component.new(kind: :error, header: t(".currently_impounded", bike_type: @bike.type), margin_classes: "tw:my-4")) do %>
+    <% if address.present? %>
+      <%= t(".impounded_by_from_html", time:, organization:, address:) %>
+    <% else %>
+      <%= t(".impounded_by_html", time:, organization:) %>
     <% end %>
-  </div>
+  <% end %>
 <% end %>
 
 <% if @bike.parking_notifications.active.any? %>

@@ -1233,6 +1233,11 @@ en:
       report_the_theft_to_the_organization_html: >-
         <span class="text-warning">Report the theft</span> to %{organization} <strong>%{report_link}</strong>
         to get a police report number
+    owner_bike_status_alerts:
+      currently_impounded: Your %{bike_type} is currently impounded!
+      impounded_by_from_html: Impounded %{time} by <strong>%{organization}</strong>
+        from %{address}
+      impounded_by_html: Impounded %{time} by <strong>%{organization}</strong>
     pdf:
       bike_description: 'Bike description:'
       bike_serial: Bike Serial
