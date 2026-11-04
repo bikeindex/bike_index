@@ -267,6 +267,38 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
     end
   end
 
+  context "when a bike has been transferred" do
+    let(:bike) do
+      FactoryBot.create(:bike_organized, creation_organization: organization, owner_email: "first@example.com",
+        creation_registration_info: {user_name: "First Owner"})
+    end
+
+    before do
+      BikeServices::OwnershipTransferer.find_or_create(bike, updator: bike.creator,
+        new_owner_email: "new@example.com", registration_info: {user_name: "New Owner"})
+      bike.reload
+    end
+
+    it "shows an invoiced organization the current owner" do
+      expect(organization.reload.is_invoiced?).to be_truthy
+      expect(component).to have_css(".owner_email_cell", text: "new@example.com")
+      expect(component).to have_css(".owner_name_cell", text: "New Owner")
+      expect(component).not_to have_text("first@example.com")
+      expect(component).not_to have_text("sent to a new owner")
+    end
+
+    context "with an organization with no invoice" do
+      let(:organization) { FactoryBot.create(:organization) }
+
+      it "shows the first owner, and that it's been sent on" do
+        expect(component).to have_css(".owner_email_cell", text: "first@example.com")
+        expect(component).to have_css(".owner_email_cell", text: "sent to a new owner")
+        expect(component).to have_css(".owner_name_cell", text: "First Owner")
+        expect(component.to_html).not_to match(/new@example\.com|new%40example|New Owner/)
+      end
+    end
+  end
+
   let(:cached_record) { bike }
   it_behaves_like "cached_table_rows"
 

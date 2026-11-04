@@ -18,6 +18,22 @@ RSpec.describe BikeServices::OrganizedSearch, type: :service do
       expect(described_class.email_and_name(Bike.all, "  sally").pluck(:id)).to match_array([bike3.id])
       expect(Bike.claimed.pluck(:id)).to eq([bike2.id])
     end
+
+    context "with first_owner_only and a transferred bike" do
+      before do
+        BikeServices::OwnershipTransferer.find_or_create(bike3, updator: bike3.creator,
+          new_owner_email: "newer@example.com", registration_info: {user_name: "Pat Newer"})
+      end
+
+      def first_owner_search(query) = described_class.email_and_name(Bike.all, query, first_owner_only: true).pluck(:id)
+
+      it "matches the first owner, not the current one" do
+        expect(described_class.email_and_name(Bike.all, "newer").pluck(:id)).to eq([bike3.id])
+        expect(first_owner_search("newer")).to eq([])
+        expect(first_owner_search("something@stuff.com")).to eq([bike3.id])
+        expect(first_owner_search("  sally")).to eq([bike3.id])
+      end
+    end
   end
 
   describe ".location" do

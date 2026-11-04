@@ -593,6 +593,14 @@ class Bike < ApplicationRecord
     first_ownership&.owner_email
   end
 
+  def owner_email_for(organization)
+    organization.current_owner_visible? ? owner_email : first_owner_email
+  end
+
+  def owner_name_for(organization)
+    organization.current_owner_visible? ? owner_name : first_ownership&.owner_name
+  end
+
   def claimable_by?(u)
     return false if u.blank? || current_ownership.blank? || current_ownership.claimed?
 

@@ -8,10 +8,15 @@ module BikeServices
     # pagination, and what the results card says it found - stop here
     SEARCH_ALL_COUNT_LIMIT = 1_000
 
-    def email_and_name(bikes, query)
+    def email_and_name(bikes, query, first_owner_only: false)
       return bikes unless query.present?
 
       query_string = "%#{query.strip}%"
+      if first_owner_only
+        return bikes.where(id: Ownership.initial
+            .where("owner_email ilike ? OR owner_name ilike ?", query_string, query_string).select(:bike_id))
+      end
+
       bikes.includes(:current_ownership)
         .where("bikes.owner_email ilike ? OR ownerships.owner_name ilike ?", query_string, query_string)
         .references(:current_ownership)

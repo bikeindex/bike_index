@@ -355,6 +355,12 @@ class Organization < ApplicationRecord
     !law_enforcement? && !ambassador?
   end
 
+  # Without an invoice, an organization sees who a bike was first registered to rather than
+  # who it's been transferred to
+  def current_owner_visible?
+    is_invoiced?
+  end
+
   # WARNING! This is not efficient
   def law_enforcement_features_enabled?
     law_enforcement? && current_invoices.any? { |i| i.law_enforcement_functionality_invoice? }

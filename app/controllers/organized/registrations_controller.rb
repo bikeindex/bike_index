@@ -222,7 +222,8 @@ module Organized
       org = current_organization || passive_organization
       set_search_filter_params
       bikes = (@search_all || org.blank?) ? Bike.search(@interpreted_params) : org.bikes.search(@interpreted_params)
-      bikes = BikeServices::OrganizedSearch.email_and_name(bikes, params[:search_email])
+      bikes = BikeServices::OrganizedSearch.email_and_name(bikes, params[:search_email],
+        first_owner_only: org.present? && !org.current_owner_visible?)
       bikes = BikeServices::OrganizedSearch.notes(bikes, params[:search_notes], org) if params[:search_notes].present? && org.present?
       if org.present?
         bikes = BikeServices::OrganizedSearch.location(bikes, @interpreted_params[:location], @interpreted_params[:distance],

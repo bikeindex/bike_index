@@ -436,6 +436,27 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         expect(response.status).to eq(200)
         expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, impounded_bike.id])
       end
+
+      context "with a transferred bike" do
+        let(:first_email) { bike.owner_email }
+
+        before do
+          first_email
+          BikeServices::OwnershipTransferer.find_or_create(bike, updator: current_user,
+            new_owner_email: "new@example.com")
+        end
+
+        it "only searches and shows the first owner" do
+          get base_url, params: {search_no_js: true, search_email: "new@example.com"}
+          expect(response.status).to eq(200)
+          expect(assigns(:bikes).pluck(:id)).to eq([])
+
+          get base_url, params: {search_no_js: true, search_email: first_email}
+          expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
+          expect(response.body).to include(first_email)
+          expect(response.body).not_to include("new@example.com")
+        end
+      end
     end
 
     context "sorted by registration sequence acknowledgment" do

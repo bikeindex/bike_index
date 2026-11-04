@@ -14,6 +14,7 @@
   <% hidden_html = method(:hidden_not_registered_tag) %>
   <% email_hidden = translation(".email_hidden") %>
   <% view_label = translation(".view") %>
+  <% sent_to_new_owner = translation(".sent_to_new_owner") %>
 
   <% column.(label: settings.column_renames[:view_cell]) do |bike| %>
     <%= render(UI::ButtonLink::Component.new(text: view_label, href: bike_path(bike, organization_id: organization.to_param), size: :sm, data: {turbo_frame: "_top"})) %>
@@ -185,9 +186,14 @@
     <% if !bike.organized?(organization) %>
       <%= hidden_html.call %>
     <% elsif bike.email_visible_for?(organization) %>
-      <%= bike.owner_email %>
+      <% owner_email = bike.owner_email_for(organization) %>
+      <%= owner_email %>
       <small>
-        <%= link_to search_emoji, organization_registrations_path(organization_id: organization.to_param, search_email: bike.owner_email), class: "display-sortable-link", data: {turbo_frame: "_top"} %>
+        <%= link_to search_emoji, organization_registrations_path(organization_id: organization.to_param, search_email: owner_email), class: "display-sortable-link", data: {turbo_frame: "_top"} %>
+
+        <% unless owner_email == bike.owner_email %>
+          <em class="tw:text-gray-400">(<%= sent_to_new_owner %>)</em>
+        <% end %>
       </small>
     <% else %>
       <em class="tw:text-gray-400"><%= email_hidden %></em>
@@ -196,8 +202,9 @@
 
   <% column.(label: settings.column_renames[:owner_name_cell], classes: "hideableColumn owner_name_cell tw:leading-none") do |bike| %>
     <% if bike.organized?(organization) %>
-      <% if bike.owner_name.present? %>
-        <em><%= bike.owner_name %></em>
+      <% owner_name = bike.owner_name_for(organization) %>
+      <% if owner_name.present? %>
+        <em><%= owner_name %></em>
       <% end %>
     <% else %>
       <%= hidden_html.call %>
