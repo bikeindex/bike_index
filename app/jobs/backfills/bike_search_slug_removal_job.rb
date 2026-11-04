@@ -6,15 +6,21 @@ module Backfills
   class BikeSearchSlugRemovalJob < ApplicationJob
     sidekiq_options queue: "low_priority", retry: false
 
-    # Organizations last, since saving one recalculates its slugs from the other two.
-    # update_all rather than update, to skip the associations job every save would enqueue
+    SLUG = "bike_search"
+
+    # Organizations last, since saving one recalculates its slugs from the other two
     def perform
-      OrganizationFeature.where("'bike_search' = ANY(feature_slugs)")
-        .update_all("feature_slugs = array_remove(feature_slugs, 'bike_search')")
-      Invoice.where("child_enabled_feature_slugs @> '[\"bike_search\"]'")
-        .update_all("child_enabled_feature_slugs = child_enabled_feature_slugs - 'bike_search'")
-      Organization.unscoped.where("enabled_feature_slugs @> '[\"bike_search\"]'")
-        .update_all("enabled_feature_slugs = enabled_feature_slugs - 'bike_search'")
+      OrganizationFeature.where("? = ANY(feature_slugs)", SLUG).find_each do |organization_feature|
+        organization_feature.update!(feature_slugs: organization_feature.feature_slugs - [SLUG])
+      end
+      Invoice.where("child_enabled_feature_slugs @> ?", [SLUG].to_json).find_each do |invoice|
+        invoice.child_enabled_feature_slugs -= [SLUG]
+        # A deleted organization's invoice fails validating that it has an organization
+        invoice.save(validate: false)
+      end
+      Organization.unscoped.where("enabled_feature_slugs @> ?", [SLUG].to_json).find_each do |organization|
+        organization.update(skip_update: true, updated_at: Time.current)
+      end
     end
   end
 end

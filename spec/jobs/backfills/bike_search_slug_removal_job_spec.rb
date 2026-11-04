@@ -14,12 +14,21 @@ RSpec.describe Backfills::BikeSearchSlugRemovalJob, type: :job do
     end
     let(:invoice) { organization.invoices.first }
 
-    before { invoice.update_column(:child_enabled_feature_slugs, %w[bike_search csv_exports]) }
+    let(:deleted_invoice) { Invoice.find_by(organization_id: deleted_organization.id) }
+
+    before do
+      invoice.update_column(:child_enabled_feature_slugs, %w[bike_search csv_exports])
+      deleted_invoice.update_column(:child_enabled_feature_slugs, %w[bike_search])
+    end
 
     it "removes the slug from features, invoices and organizations, leaving the others" do
       expect(organization.enabled_feature_slugs).to eq %w[bike_search csv_exports]
+      organization.update_column(:updated_at, 1.day.ago)
 
       Sidekiq::Testing.inline! { described_class.perform_async }
+
+      expect(organization.reload.updated_at).to be_within(1.minute).of(Time.current)
+      expect(deleted_invoice.reload.child_enabled_feature_slugs).to eq []
 
       expect(invoice.organization_features.first.feature_slugs).to eq %w[csv_exports]
       expect(invoice.reload.child_enabled_feature_slugs).to eq %w[csv_exports]
