@@ -43,10 +43,8 @@ RSpec.describe SharedBlocks::Navbar::PrimaryMenu::Component, type: :component do
       .map { |link| link["data-ui--active-link-match-paths-value"] }).to eq(["/register/**"] * 2)
   end
 
-  context "with a passive_organization that searches its own registrations" do
-    let(:organization) do
-      FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["bike_search"])
-    end
+  context "with a passive_organization" do
+    let(:organization) { FactoryBot.create(:organization) }
     let(:current_user) { FactoryBot.create(:organization_user, organization:) }
     before { vc_test_controller.session[:passive_organization_id] = organization.id }
 
@@ -56,10 +54,16 @@ RSpec.describe SharedBlocks::Navbar::PrimaryMenu::Component, type: :component do
     end
 
     context "law enforcement" do
-      let(:organization) do
-        FactoryBot.create(:organization_with_organization_features, kind: "law_enforcement",
-          enabled_feature_slugs: ["bike_search"])
+      let(:organization) { FactoryBot.create(:organization, kind: "law_enforcement") }
+
+      it "points search at every registration" do
+        expect(links_named("Search").map { |link| link["href"] })
+          .to eq(["/search/registrations?stolenness=all"] * 2)
       end
+    end
+
+    context "ambassador" do
+      let(:organization) { FactoryBot.create(:organization_ambassador) }
 
       it "points search at every registration" do
         expect(links_named("Search").map { |link| link["href"] })
