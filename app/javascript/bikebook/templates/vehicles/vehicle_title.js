@@ -8,7 +8,7 @@ import { array, present } from 'bikebook/templates/values'
 const HEADING = 'tw:inline tw:font-extrabold'
 
 export const manufacturerLine = (manufacturer) => present(manufacturer)
-  ? html`<p class="tw:mb-1 tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">${manufacturer}</p>`
+  ? html`<p class="tw:mb-1 tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:dark:text-purple-300 tw:uppercase">${manufacturer}</p>`
   : nothing
 
 // A compared vehicle's model, after an e-vehicle's badge, its configuration where it isn't complete by the kit's

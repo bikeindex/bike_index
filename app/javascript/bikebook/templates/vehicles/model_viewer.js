@@ -166,7 +166,7 @@ class ModelViewer {
       data-ui--collapse-direction-value="horizontal"><article class="twgutter tw:w-full tw:min-w-0 tw:space-y-6
       tw:rounded-sm tw:border tw:border-gray-200 tw:dark:border-gray-700 tw:bg-white tw:dark:bg-gray-800 tw:pt-4 tw:pb-6 tw:[--gutter:--spacing(6)]
       ${comparing ? 'tw:md:max-w-[56rem] tw:lg:flex-1' : 'tw:lg:w-[56rem] tw:lg:shrink-0'}">${header}${specs}${this.description()}${this.sizesDisclosure()}${present(this.data.components)
-      ? html`<section class="tw:space-y-4"><h2 class="tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">Components</h2>${this.components()}${this.inTheBox()}</section>`
+      ? html`<section class="tw:space-y-4"><h2 class="tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:dark:text-purple-300 tw:uppercase">Components</h2>${this.components()}${this.inTheBox()}</section>`
       : nothing}</article><aside
       id=${jsonPanelId} class="twjson-panel tw:hidden tw:w-full tw:min-w-0 tw:lg:relative tw:lg:w-[28rem] tw:lg:shrink-0" data-ui--collapse-target="content">${
         codeJson({ data: this.data, small: true, noMaxHeight: true })}</aside></div>`
@@ -836,7 +836,7 @@ class ModelViewer {
 
     const othersLabels = this.others.map((other) => drivetrainLabels(other.drivetrain))
     const differs = (label) => othersLabels.some((labels) => !labels.includes(label))
-    return html`<section class="tw:mb-6 tw:break-inside-avoid tw:space-y-2"><h2 class="tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">Drivetrain</h2>${present(vehicle.drivetrain)
+    return html`<section class="tw:mb-6 tw:break-inside-avoid tw:space-y-2"><h2 class="tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:dark:text-purple-300 tw:uppercase">Drivetrain</h2>${present(vehicle.drivetrain)
       ? html`<div class="tw:flex tw:flex-wrap tw:gap-2">${drivetrainLabels(vehicle.drivetrain).map((label) => html`<span class="tw:rounded-sm tw:border tw:border-gray-200 tw:dark:border-gray-700 ${differs(label)
         ? 'tw:spec-diff'
         : 'tw:bg-white tw:dark:bg-gray-800'} tw:px-2 tw:py-0.5 tw:font-mono
@@ -963,7 +963,7 @@ class ModelViewer {
   inTheBox () {
     if (blank(this.vehicle.included)) return nothing
 
-    return html`<div class="tw:space-y-2"><h3 class="tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">In the box</h3><ul
+    return html`<div class="tw:space-y-2"><h3 class="tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:dark:text-purple-300 tw:uppercase">In the box</h3><ul
       class="tw:list-disc tw:space-y-1 tw:pl-5 tw:text-sm">${this.vehicle.included.map(({ type_detail: detail, description }) =>
       html`<li>${present(detail) ? html`<span class="tw:font-bold">${detail}</span> ` : nothing}${description}</li>`)}</ul></div>`
   }

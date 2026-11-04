@@ -80,7 +80,7 @@ export default class extends Controller {
       const key = target.closest('[data-figure]')?.dataset.figure
       if (key) this.select(key)
     }}>${figure}</div>${this.figureList(legend.filter(({ extra }) => !extra))}${extras.length
-    ? html`<h4 class="tw:mt-3 tw:mb-1 tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">Extra measurements</h4>${this.figureList(extras)}`
+    ? html`<h4 class="tw:mt-3 tw:mb-1 tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:dark:text-purple-300 tw:uppercase">Extra measurements</h4>${this.figureList(extras)}`
     : nothing}<div class="tw:mt-2 tw:flex tw:justify-center"><button type="button" class=${buttonClasses({ size: 'sm' })}
     ?disabled=${Object.keys(this.figures).length === 0} @click=${() => this.reset()}>Reset</button></div>`, this.element)
   }

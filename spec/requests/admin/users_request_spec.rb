@@ -142,15 +142,24 @@ RSpec.describe Admin::UsersController, type: :request do
 
         get "#{base_url}/#{current_user.id}/edit"
         expect(Nokogiri::HTML(response.body).css("input[type=radio][name='user[dark_mode_preview]']").count).to eq 2
+
+        get "/"
+        expect(Nokogiri::HTML(response.body).at_css("body")[:class].to_s.split).to_not include("dark")
       end
       context "true" do
         let(:dark_mode_preview) { true }
-        it "is dark only in admin" do
+        it "is dark on every layout, beside the page's own body class" do
           get "#{base_url}/#{user_subject.id}/edit"
           expect(body[:class]).to eq "dark"
 
-          get "/"
-          expect(Nokogiri::HTML(response.body).at_css("body")[:class].to_s.split).to_not include("dark")
+          ["/", "/oauth/applications", "/payments/new"].each do |path|
+            get path
+            expect(response.status).to eq 200
+            expect(Nokogiri::HTML(response.body).at_css("body")[:class].to_s.split).to include("dark")
+          end
+
+          get "/for_bike_shops"
+          expect(Nokogiri::HTML(response.body).at_css("body")[:class].to_s.split).to match_array(%w[landing-page-body dark])
         end
       end
     end

@@ -4,7 +4,7 @@ import { array, equal } from 'bikebook/templates/values'
 
 const sameKey = (a, b) => equal([a.type, a.position], [b.type, b.position])
 const sameDetail = (a, b) => sameKey(a, b) && equal(a.type_detail, b.type_detail)
-const HEADER_CLASSES = 'tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase'
+const HEADER_CLASSES = 'tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:dark:text-purple-300 tw:uppercase'
 // Stacked in a narrow .bikebook-components, the type and description each take a line, and the detail and position are muted
 const COLUMNS = [
   ['type', null, 'tw:w-[18%] tw:break-words tw:@max-[40rem]/bikebook-components:basis-full tw:@max-[40rem]/bikebook-components:font-bold'],

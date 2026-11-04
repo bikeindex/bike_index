@@ -33,7 +33,7 @@ Scope it: every file a bare run rewrites that you've already read is re-injected
 
 - Tailwind classes have the prefix `tw:` (e.g. `tw:text-blue`, `tw:flex`, `tw:gap-4`).
   - The `tw:` prefix comes **before** variant modifiers, not after. Use `tw:dark:bg-gray-800`, `tw:hover:bg-blue-600`, `tw:sm:flex`, `tw:focus-visible:ring-2`. Never `dark:tw:bg-gray-800` — variant prefixes layer on top of `tw:`.
-  - **`dark` is a custom variant keyed to a `.dark` ancestor** (`app/assets/tailwind/application.css`), and only the admin layout sets that class on a whole page, from `User#dark_mode_preview` — so outside `/admin`, `prefers-color-scheme: dark` renders the light page, and a dark-mode check means adding `.dark` to `<html>` by hand. Keep writing the variants; just don't read a light screenshot as a missing one.
+  - **`dark` is a custom variant keyed to a `.dark` ancestor** (`app/assets/tailwind/application.css`), and the page layouts set that class on `<body>` from `User#dark_mode_preview` — `prefers-color-scheme: dark` still renders the light page, so a dark-mode check means turning that on or adding `.dark` to `<html>` by hand. Keep writing the variants; just don't read a light screenshot as a missing one. Legacy markup's dark colors are in `app/assets/tailwind/legacy_dark.css`, not the SCSS; `kelsey_styles.css` is unlayered, so its sections stay light.
 - Form fields should use the `twinput` class.
 - Labels should use the `twlabel` class.
 - Basic links should use the `twlink` class.
