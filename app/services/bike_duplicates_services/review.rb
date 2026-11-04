@@ -133,6 +133,12 @@ module BikeDuplicatesServices
       @serial_stolen = BikeDuplicatesServices::Finder.stolen_serials?(bikes.map(&:serial_normalized_no_space).uniq)
     end
 
+    # Listings on the bike and on its versions, as the queues count them
+    def marketplace_count(bike) = marketplace_counts.fetch(bike.id, 0)
+
+    # Private images too, which public_images leaves out
+    def photo_count(bike) = photo_counts.fetch(bike.id, 0)
+
     # The same test-marker rule the dashboard queues use
     def test?(bike) = test_bike_ids.include?(bike.id)
 
@@ -247,6 +253,16 @@ module BikeDuplicatesServices
 
     def stolen_record_counts
       @stolen_record_counts ||= StolenRecord.unscoped.where(bike_id: bikes.map(&:id)).group(:bike_id).count
+    end
+
+    def marketplace_counts
+      @marketplace_counts ||= MarketplaceListing.where(item_type: "Bike", item_id: bikes.map(&:id)).group(:item_id).count
+        .merge(MarketplaceListing.where(item_type: "BikeVersion").joins("INNER JOIN bike_versions ON bike_versions.id = marketplace_listings.item_id")
+          .where(bike_versions: {bike_id: bikes.map(&:id)}).group("bike_versions.bike_id").count) { |_bike_id, direct, versions| direct + versions }
+    end
+
+    def photo_counts
+      @photo_counts ||= PublicImage.unscoped.where(imageable_type: "Bike", imageable_id: bikes.map(&:id)).group(:imageable_id).count
     end
 
     def test_bike_ids = @test_bike_ids ||= BikeDuplicatesServices::Finder.test_bike_ids(bikes.map(&:id)).to_set

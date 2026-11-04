@@ -42,8 +42,8 @@ module Pages
               ["Stolen/history records", bikes.map { @review.stolen_count(it) }],
               ["Organization links", bikes.map { it.bike_organizations.size }],
               ["Stickers", bikes.map { it.bike_stickers.size }],
-              ["Photos", bikes.map { it.public_images.size }],
-              ["Marketplace listings", bikes.map { it.marketplace_listings.size }]
+              ["Photos", bikes.map { @review.photo_count(it) }],
+              ["Marketplace listings", bikes.map { @review.marketplace_count(it) }]
             ]
           end
 

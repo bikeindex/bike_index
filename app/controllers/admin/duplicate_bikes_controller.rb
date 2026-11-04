@@ -22,18 +22,20 @@ module Admin
     end
 
     def show
-      bike_ids = nil
       if params[:id] == "serial"
         reference = Bike.unscoped.find(params[:reference_bike_id])
         return head :bad_request if reference.manufacturer_id.nil? || reference.serial_normalized_no_space.to_s.length < 6
 
         bikes = BikeDuplicatesServices::Finder.serial_bikes(reference)
       elsif params[:id] == "compare"
-        bike_ids = Array(params[:bike_ids]).flat_map { |value| value.to_s.split(",") }
-          .filter_map { |value| Integer(value.strip, exception: false) }.select(&:positive?).uniq
-        return head :bad_request unless bike_ids.size.between?(2, 50)
+        values = Array(params[:bike_ids]).flat_map { it.to_s.split(",") }.map(&:strip).compact_blank.uniq
+        invalid = values.grep_v(/\A\d+\z/)
+        return compare_error("Not bike record IDs: #{invalid.join(", ")}", values) if invalid.any?
+        return compare_error("Enter between 2 and 50 bike record IDs to compare", values) unless values.size.between?(2, 50)
 
-        bikes = Bike.unscoped.where(id: bike_ids)
+        bikes = Bike.unscoped.where(id: values.map(&:to_i))
+        missing = values.map(&:to_i) - bikes.pluck(:id)
+        return compare_error("No bike records with IDs: #{missing.join(", ")}", values) if missing.any?
       else
         @duplicate_group = DuplicateBikeGroup.find(params[:id])
         # Admins review every record in the group, including hidden and deleted ones
@@ -47,9 +49,9 @@ module Admin
       end
 
       # Summaries cover every record, so the whole group loads
-      all_bikes = bikes.default_includes.includes(:manufacturer, :creation_organization, :marketplace_listings,
-        :bike_organizations, :bike_stickers, :public_images, ownerships: :organization).reorder(:created_at, :id).to_a
-      raise ActiveRecord::RecordNotFound if all_bikes.empty? || bike_ids && all_bikes.size != bike_ids.size
+      all_bikes = bikes.default_includes.includes(:manufacturer, :creation_organization,
+        :bike_organizations, :bike_stickers, ownerships: :organization).reorder(:created_at, :id).to_a
+      raise ActiveRecord::RecordNotFound if all_bikes.empty?
       @bikes_count = all_bikes.size
       @reference_bike = if params[:reference_bike_id].present?
         all_bikes.find { it.id == params[:reference_bike_id].to_i } || raise(ActiveRecord::RecordNotFound)
@@ -66,6 +68,11 @@ module Admin
 
     private
 
+    def compare_error(message, values)
+      flash[:error] = message
+      redirect_to admin_duplicate_bikes_path(search_view: "segments", bike_ids: values.join(","))
+    end
+
     # url_for reads host, protocol and the like from its hash, so links only carry the page's own params
     def link_params
       request.query_parameters.select { |key, _| key.start_with?("search_") || LINK_PARAM_KEYS.include?(key) }
@@ -73,13 +80,12 @@ module Admin
 
     def dashboard
       @per_page = permitted_per_page(default: 25)
-      @group_snapshot = BikeDuplicatesServices::Finder.fetch_group_snapshot
+      @kind = params[:search_kind].presence_in(BikeDuplicatesServices::Finder::KINDS.keys) || "handoff_priority"
+      @group_snapshot = BikeDuplicatesServices::Finder.fetch_group_snapshot(@kind)
       @group_snapshot_failed_at = BikeDuplicatesServices::Finder.group_snapshot_failed_at
       return render :preparing unless @group_snapshot
 
-      @summary = @group_snapshot[:groups].group_by { it["kind"] }
-      @kind = params[:search_kind].presence_in(BikeDuplicatesServices::Finder::KINDS.keys) || "handoff_priority"
-      groups = @summary.fetch(@kind, [])
+      groups = @group_snapshot[:groups]
       if params[:search_organization_id].present?
         @organization = Organization.unscoped.find_by(id: Integer(params[:search_organization_id], exception: false))
         groups = groups.select { it["organization_ids"].include?(@organization&.id) }

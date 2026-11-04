@@ -22,7 +22,7 @@ module BikeDuplicatesServices
     # The integrations whose registrations are a shop's sale
     POS_KINDS = %w[lightspeed_pos ascend_pos].freeze
 
-    SNAPSHOT_KEY = "duplicate_review_group_snapshot"
+    SNAPSHOT_KEY = "duplicate_review_group_summary"
     PREPARING_KEY = "duplicate_review_group_snapshot_preparing"
     FAILED_KEY = "duplicate_review_group_snapshot_failed"
     # Older snapshots are still served while a fresh one is prepared, so only the first visit waits
@@ -38,14 +38,15 @@ module BikeDuplicatesServices
     HOLD_CLAIM_SCRIPT = 'local held = redis.call("get", KEYS[1]) ' \
       'if not held or held == ARGV[1] then return redis.call("set", KEYS[1], ARGV[1], "EX", ARGV[2]) end'
 
-    # The dashboard's groups, or nil until the first ones are prepared. The query takes most of a minute in
-    # production, so a missing or hour-old snapshot enqueues the job - once across every server - rather
-    # than running it here. Group times are epoch seconds and cues are keys, for Cues.group_cues to build
-    def fetch_group_snapshot
-      json = RedisPool.conn { it.get(SNAPSHOT_KEY) }
-      snapshot = JSON.parse(json) if json
-      enqueue_group_snapshot if snapshot.nil? || snapshot["generated_at"] < REFRESH_AFTER.ago.to_i
-      snapshot && {generated_at: Time.zone.at(snapshot["generated_at"]), groups: snapshot["groups"]}
+    # Every queue's counts and one queue's groups, or nil until the first ones are prepared. The query takes
+    # most of a minute in production, so a missing or hour-old snapshot enqueues the job - once across every
+    # server - rather than running it here. Group times are epoch seconds and cues are keys, for
+    # Cues.group_cues to build
+    def fetch_group_snapshot(kind)
+      summary_json, groups_json = RedisPool.conn { it.mget(SNAPSHOT_KEY, kind_key(kind)) }
+      summary = JSON.parse(summary_json) if summary_json
+      enqueue_group_snapshot if summary.nil? || summary["generated_at"] < REFRESH_AFTER.ago.to_i
+      summary && {generated_at: Time.zone.at(summary["generated_at"]), counts: summary["counts"], groups: JSON.parse(groups_json || "[]")}
     end
 
     # When the last attempt failed, if it hasn't succeeded since
@@ -56,15 +57,21 @@ module BikeDuplicatesServices
 
     # claim: the job's PREPARING_KEY value, released when it succeeds
     def store_group_snapshot(claim: nil)
-      snapshot = ActiveRecord::Base.connected_to(role: :reading, prevent_writes: true) do
+      generated_at = Time.current.to_i
+      kind_groups = ActiveRecord::Base.connected_to(role: :reading, prevent_writes: true) do
         ActiveRecord::Base.transaction do
           ActiveRecord::Base.connection.execute("SET LOCAL statement_timeout = #{QUERY_TIMEOUT.in_milliseconds.to_i}")
-          {generated_at: Time.current.to_i, groups:}
+          groups.group_by { it["kind"] }
         end
       end
-      RedisPool.conn do
-        it.set(SNAPSHOT_KEY, snapshot.to_json, ex: SNAPSHOT_TTL.to_i)
-        it.del(FAILED_KEY)
+      counts = KINDS.keys.to_h do |kind|
+        [kind, {groups: kind_groups.fetch(kind, []).size, records: kind_groups.fetch(kind, []).sum { it["record_count"] }}]
+      end
+      # One write per queue, not a transaction, so no single command holds Redis for the whole snapshot
+      RedisPool.conn do |redis|
+        KINDS.each_key { |kind| redis.set(kind_key(kind), kind_groups.fetch(kind, []).to_json, ex: SNAPSHOT_TTL.to_i) }
+        redis.set(SNAPSHOT_KEY, {generated_at:, counts:}.to_json, ex: SNAPSHOT_TTL.to_i)
+        redis.del(FAILED_KEY)
       end
       release_claim(claim) if claim
     rescue => e
@@ -76,9 +83,9 @@ module BikeDuplicatesServices
       manufacturer_names = Cues.fetch_manufacturer_name_serials
       ActiveRecord::Base.connection.select_all(query).to_a.map do |group|
         group["manufacturer_name_serial"] = manufacturer_names[group["serial"]]
-        group = group.merge("kind" => kind(group),
+        group = group.except("linked_organization_ids").merge("kind" => kind(group),
           "bike_ids" => JSON.parse(group["bike_ids"]),
-          "organization_ids" => JSON.parse(group["organization_ids"] || "[]"),
+          "organization_ids" => (JSON.parse(group["organization_ids"] || "[]") + JSON.parse(group["linked_organization_ids"] || "[]").flatten).uniq,
           "first_at" => group["first_at"].in_time_zone.to_i,
           "last_at" => group["last_at"].in_time_zone.to_i)
         group.merge("cue_keys" => Cues.group_cues(group).map(&:key))
@@ -222,7 +229,8 @@ module BikeDuplicatesServices
           SELECT DISTINCT b.serial_normalized_no_space serial FROM bikes b
           WHERE #{stolen_history_sql("b")}
         ), duplicates AS (
-          SELECT live.*, t.bike_id IS NOT NULL test, s.serial IS NOT NULL serial_stolen
+          SELECT live.*, t.bike_id IS NOT NULL test, s.serial IS NOT NULL serial_stolen,
+            ARRAY(SELECT organization_id FROM bike_organizations WHERE bike_id = live.id AND deleted_at IS NULL) linked_organization_ids
           FROM live JOIN duplicate_keys k ON k.manufacturer_id = live.manufacturer_id AND k.serial = live.serial
           LEFT JOIN test_bikes t ON t.bike_id = live.id
           LEFT JOIN stolen_serials s ON s.serial = live.serial
@@ -238,6 +246,7 @@ module BikeDuplicatesServices
           count(DISTINCT user_id)::integer account_count, count(*) FILTER (WHERE user_id IS NULL)::integer missing_account_count,
           count(DISTINCT organization_id)::integer organization_count, count(*) FILTER (WHERE organization_id IS NULL)::integer missing_organization_count,
           jsonb_agg(DISTINCT organization_id) FILTER (WHERE organization_id IS NOT NULL) organization_ids,
+          jsonb_agg(linked_organization_ids) FILTER (WHERE cardinality(linked_organization_ids) > 0) linked_organization_ids,
           min(created_at) first_at, max(created_at) last_at,
           coalesce(min(created_at) FILTER (WHERE pos) < min(created_at) FILTER (WHERE customer), false) pos_first,
           bool_or(serial_stolen) serial_stolen,
@@ -263,6 +272,8 @@ module BikeDuplicatesServices
       raise
     end
 
+    def kind_key(kind) = "duplicate_review_groups_#{kind}"
+
     def release_claim(claim) = RedisPool.conn { it.eval(RELEASE_CLAIM_SCRIPT, keys: [PREPARING_KEY], argv: [claim]) }
 
     # Holds the claim for PREPARING_TTL from now, so visits don't start another long query straight away.
@@ -278,6 +289,6 @@ module BikeDuplicatesServices
 
     def enum_sql(enum, *keys) = enum.values_at(*keys.map(&:to_sym)).join(", ")
 
-    conceal :customer_origins, :enqueue_group_snapshot, :enum_sql, :live_sql, :record_failure, :registrations_sql, :release_claim, :same_owner_criteria, :stolen_serial_bikes, :query, :test_bikes_sql
+    conceal :customer_origins, :enqueue_group_snapshot, :enum_sql, :kind_key, :live_sql, :record_failure, :registrations_sql, :release_claim, :same_owner_criteria, :stolen_serial_bikes, :query, :test_bikes_sql
   end
 end

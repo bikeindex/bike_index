@@ -103,8 +103,8 @@
       <%= number_display(@review.stolen_count(@bike)) %> stolen/history records
       · <%= number_display(@bike.bike_organizations.size) %> organization links
       · <%= number_display(@bike.bike_stickers.size) %> stickers ·
-      <%= number_display(@bike.public_images.size) %> photos ·
-      <%= number_display(@bike.marketplace_listings.size) %> marketplace
+      <%= number_display(@review.photo_count(@bike)) %> photos ·
+      <%= number_display(@review.marketplace_count(@bike)) %> marketplace
       listings
     </div>
   </div>
