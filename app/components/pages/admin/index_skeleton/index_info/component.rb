@@ -72,7 +72,7 @@ module Pages
           end
 
           def organization_deleted(organization)
-            tag.em(class: "twless-strong tw:mt-1 tw:block") do
+            tag.em(class: "less-strong tw:mt-1 tw:block") do
               safe_join(["(#{organization.short_name} is ", tag.em("deleted", class: error_text_class), ") - at ",
                 render(UI::Time::Component.new(time: organization.deleted_at, format: :localize_time_precise))])
             end

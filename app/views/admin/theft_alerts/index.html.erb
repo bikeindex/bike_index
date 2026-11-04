@@ -64,12 +64,12 @@
           <%= hidden_field_tag :search_location_counts, @location_counts %>
           <%= render partial: "/shared/hidden_search_fields" %>
 
-          <em class="twless-strong tw:hidden tw:text-sm tw:md:inline">within</em>
+          <em class="less-strong tw:hidden tw:text-sm tw:md:inline">within</em>
 
           <%= render(UI::Forms::Input::Component.new(form_builder: form, attribute: :search_distance, kind: :number_field,
             html_options: {value: @distance, class: "tw:w-20"})) %>
 
-          <em class="twless-strong tw:hidden tw:text-sm tw:md:inline">miles of</em>
+          <em class="less-strong tw:hidden tw:text-sm tw:md:inline">miles of</em>
 
           <%= render(UI::Forms::Input::Component.new(form_builder: form, attribute: :search_location,
             html_options: {value: params[:search_location], placeholder: "anywhere"})) %>

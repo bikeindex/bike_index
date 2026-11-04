@@ -36,7 +36,7 @@ end %>
       <% if klass.new.skip_scheduling? %>
         <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>">Skipped</span>
       <% elsif last_started.blank? || (last_started + klass.frequency) < Time.current %>
-        <span class="twless-strong">now</span>
+        <span class="less-strong">now</span>
       <% else %>
         <%= helpers.period_in_words((last_started + klass.frequency) - Time.current) %>
       <% end %>

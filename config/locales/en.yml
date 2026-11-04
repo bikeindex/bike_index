@@ -4389,11 +4389,11 @@ en:
           actual image url'
         create_duplicates_enabled_html: >-
           Create duplicates - add registrations when a row matches an existing registration's
-          serial and owner email <span class="twless-strong">(enabled by default to
+          serial and owner email <span class="less-strong">(enabled by default to
           prevent losing stolen/impounded data)</span>
         create_duplicates_html: >-
           Create duplicates - add registrations when a row matches an existing registration's
-          serial and owner email <span class="twless-strong">(off by default)</span>
+          serial and owner email <span class="less-strong">(off by default)</span>
         csv_file_with_bikes: CSV File with bikes
         doing_an_import: >-
           Doing an import for the first time? Try importing a sample of your CSV with

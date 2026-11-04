@@ -23,7 +23,7 @@
     <% end %>
 
     <% if @organization.show_on_map %>
-      <span class="twless-strong">Shown on map</span>
+      <span class="less-strong">Shown on map</span>
     <% else %>
       <strong>Not Shown</strong>
     <% end %>
@@ -41,10 +41,10 @@
       <br>
       <% if @organization.manufacturer_id.present? %>
         <strong><%= @organization.manufacturer.name %></strong>
-        <em class="twless-strong">Manufacturer official account of</em>
+        <em class="less-strong">Manufacturer official account of</em>
       <% else %>
         <strong class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">No Manufacturer assigned</strong>
-        <span class="twless-strong">
+        <span class="less-strong">
           <%= link_to "edit organization", edit_admin_organization_path(@organization), class: "twlink" %>
           to add
         </span>

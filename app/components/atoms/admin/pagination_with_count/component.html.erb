@@ -15,13 +15,13 @@
             <%= render(UI::TimeRange::Component.new(time_range: @index.time_range, period: @index.period)) %>
           </em>
         <% elsif show_today_count? %>
-          <em class="twless-strong">
+          <em class="less-strong">
             (<%= number_with_delimiter(today_count) %> today)
           </em>
         <% end %>
 
         <% if @count_detail.present? %>
-          <span class="twless-strong"><%= @count_detail %></span>
+          <span class="less-strong"><%= @count_detail %></span>
         <% end %>
       </p>
     </div>

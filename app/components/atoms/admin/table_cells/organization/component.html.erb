@@ -7,7 +7,7 @@
       <%= render(UI::Code::Inline::Component.new(text: @organization_id, small: true)) %>
     <% elsif organization_subject.deleted? %>
       <small>
-        <span class="twless-strong"><%= display_name %></span>
+        <span class="less-strong"><%= display_name %></span>
 
         <% if organization_subject.deleted? %>
           <span class="<%= error_text_class %>">deleted!</span>

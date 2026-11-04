@@ -45,7 +45,7 @@ module Pages
             def default_on?(status) = @default_statuses.include?(status)
 
             def with_owner_label
-              safe_join(["With owner", tag.small("(not stolen)", class: "twless-strong")], " ")
+              safe_join(["With owner", tag.small("(not stolen)", class: "less-strong")], " ")
             end
           end
         end

@@ -31,7 +31,7 @@
         <% if @stolen_record.approved %>
           <%= check_mark %>
         <% else %>
-          <small class="twless-strong">nope</small>
+          <small class="less-strong">nope</small>
         <% end %>
       <% end %>
 
@@ -52,7 +52,7 @@
 
         <% if @stolen_record.secondary_phone.present? %>
           <small class="tw:block">
-            <span class="twless-strong">secondary:</span>
+            <span class="less-strong">secondary:</span>
             <%= render(Atoms::Phone::Component.new(phone: @stolen_record.secondary_phone, skip_link: true)) %>
           </small>
         <% end %>

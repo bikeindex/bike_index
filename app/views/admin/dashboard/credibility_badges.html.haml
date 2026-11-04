@@ -10,7 +10,7 @@
 = render(UI::Container::Component.new) do
   = render(UI::Table::Component.new(records: CredibilityScorer::BADGES.flat_map { |category, badges| badges.map { |key, value| [category, key, value] } })) do |table|
     - table.column(label: "Category") do |(category, _key, _value)|
-      %small.twless-strong= category.to_s.humanize
+      %small.less-strong= category.to_s.humanize
     - table.column(label: "Name") do |(_category, key, _value)|
       = key.to_s.humanize
     - table.column(label: "Value") do |(_category, _key, value)|

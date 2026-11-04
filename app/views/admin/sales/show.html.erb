@@ -10,7 +10,7 @@
       <% if @sale.buyer.present? %>
         <%= render Atoms::Admin::TableCells::User::Component.new(user: @sale.buyer, user_id: @sale.buyer&.id) %>
       <% else %>
-        <span class="twless-strong"><%= @sale.new_owner_email %></span>
+        <span class="less-strong"><%= @sale.new_owner_email %></span>
       <% end %>
     <% end %>
 
@@ -60,7 +60,7 @@
       <% if @sale.new_ownership.present? %>
         <%= link_to @sale.new_ownership.id, admin_ownership_path(@sale.new_ownership.id), class: "twlink" %>
       <% else %>
-        <span class="twless-strong">pending</span>
+        <span class="less-strong">pending</span>
       <% end %>
     <% end %>
   <% end %>

@@ -248,6 +248,10 @@ img {
 // REGISTRATION FORM SPECIFIC STYLES
 //
 #binx_registration_widget {
+  // tailwind's unlayered body rule would otherwise reach the widget by inheritance
+  font-family: $font-family-base;
+  color: $body-color;
+
   margin: 0 auto;
   position: relative;
   border-radius: $border-radius;
@@ -259,6 +263,7 @@ img {
 
   h2 {
     font-size: 30px;
+    font-weight: bold;
     margin: $vertical-height 0 (1.5 * $vertical-height);
   }
 

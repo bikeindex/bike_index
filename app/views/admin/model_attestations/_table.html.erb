@@ -19,7 +19,7 @@
     <%= link_to search_emoji, url_for(sort_state.search_params.merge(search_model_audit_id: model_audit.id)), class: "display-sortable-link tw:text-sm" %>
 
     <% if model_attestation.organization_id.present? %>
-      <%= link_to "view in org", organization_model_audit_path(model_attestation.model_audit_id, organization_id: model_attestation.organization&.to_param), class: "twlink tw:text-xs tw:inline-block twless-strong" %>
+      <%= link_to "view in org", organization_model_audit_path(model_attestation.model_audit_id, organization_id: model_attestation.organization&.to_param), class: "twlink tw:text-xs tw:inline-block less-strong" %>
     <% end %>
   <% end %>
 

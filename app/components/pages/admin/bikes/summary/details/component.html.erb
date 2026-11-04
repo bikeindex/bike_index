@@ -53,7 +53,7 @@
 
 
           <% if current_ownership&.doorkeeper_app_id.present? %>
-            <small class="twless-strong">
+            <small class="less-strong">
               oauth app
               <em><%= doorkeeper_app&.name || current_ownership.doorkeeper_app_id %></em>
             </small>
@@ -62,7 +62,7 @@
           <% end %>
 
           <% if current_ownership&.ios_version.present? %>
-            <small class="twless-strong">
+            <small class="less-strong">
               iOS <em><%= current_ownership.ios_version %></em>
             </small>
           <% end %>
@@ -89,7 +89,7 @@
         <% end %>
 
         <% if @bike.not_updated_by_user? %>
-          <em class="twless-strong tw:text-sm">not updated after creation</em>
+          <em class="less-strong tw:text-sm">not updated after creation</em>
         <% end %>
 
         <% if @display_dev_info %>
@@ -119,7 +119,7 @@
       <% end %>
 
       <% list.with_row(label: "Cached Data") do %>
-        <em class="twless-strong"><%= @bike.cached_data %></em>
+        <em class="less-strong"><%= @bike.cached_data %></em>
       <% end %>
 
       <% list.with_row(label: "Address") do %>
