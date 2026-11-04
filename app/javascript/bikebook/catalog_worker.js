@@ -57,6 +57,7 @@ function start ({ manifestUrl, ids, jurisdictions, comparing }) {
   return started
 }
 
+// After `start`, whose manifest and files it waits on
 async function load ({ rulesUrl, similarityUrl: similarityModule }) {
   similarityUrl = similarityModule
   const [index, { vocabulary, kit }, featuredRules] = await Promise.all([opened.then(() => fetchJson(new URL(manifest.index, base))), started, import(rulesUrl)])

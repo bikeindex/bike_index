@@ -106,7 +106,7 @@ const pickedOf = (catalog, url, { market }) => catalog.vehicles(url.searchParams
 // is open, of those the `filters` leave. `waiting`, until the comparison says whether it does
 const similarOf = async (catalog, url, vehicles, filters) => {
   if (catalog.comparable === false || !vehicles.length) return null
-  if (!catalog.comparable) return { waiting: true }
+  if (catalog.comparable === undefined) return { waiting: true }
   const settings = settingsFrom(url.searchParams)
   return { ...settings, results: url.searchParams.get('similar') === '1' ? await catalog.similar(vehicles[0].value, settings, filters) : undefined }
 }
@@ -155,7 +155,7 @@ export async function addComparison (catalog, page, url, current) {
 
   const viewer = new VehicleViewer(catalog.kit, catalog.vocabulary, filters)
   page.querySelector('[data-similar-waiting]')?.remove()
-  page.querySelector('#vehicle-viewers').prepend(fragmentOf(viewer.similarModels(vehicles[0], similar, url)))
+  page.querySelector('#vehicle-viewers').prepend(fragmentOf(viewer.similarModels(vehicles[0], similar, url, pickedPhotos(withChosenPhotos(url, vehicles)))))
   renderSimilarControls(page, viewer, vehicles, similar)
 }
 
@@ -196,7 +196,7 @@ export async function picksShell (picks, shell, url, status) {
   renderChips(combobox(root, 'vehicle_models'), vehicles)
   const viewers = root.getElementById('vehicle-viewers')
   const viewer = new VehicleViewer(picks.kit, picks.vocabulary, urlFilters(root, url))
-  const similar = { waiting: true }
+  const similar = await similarOf(picks, url, vehicles)
   renderInto(viewers, viewer.render(vehicles, url, preferredSize(), {}, { similar }))
   renderSimilarControls(root, viewer, vehicles, similar)
   viewers.append(status)
