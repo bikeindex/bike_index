@@ -125,7 +125,7 @@ module Pages
         def details
           @details ||= case @verdict
           when :yellow then without_throttle? ? [] : notes(:check)
-          when :red then [*notes(:fail), falls_under]
+          when :red then [safe_join([*notes(:fail), falls_under], " ")]
           when :gray then @us ? [gray_detail] : []
           else []
           end
@@ -142,13 +142,19 @@ module Pages
         def falls_under
           return copy[:may_be_moped] unless other_classification
 
-          translation(".falls_under_name", state: @state[:name], name: other_classification[:name])
+          state, name = @state[:name], other_classification[:name]
+          other_classification[:by_limits] ? translation(".may_fall_under_name", state:, name:) : translation(".falls_under_name", state:, name:)
         end
+
+        def rules_shown? = @verdict == :red && other_classification.present?
 
         def other_classification
           return @other_classification if defined?(@other_classification)
 
-          @other_classification = (EbikeRuleServices::StateLaws.other_classification(@state[:abbr], @bike.e_vehicle_classifications) if @us)
+          @other_classification = if @us
+            EbikeRuleServices::StateLaws.other_classification(@state[:abbr], @bike.e_vehicle_classifications) ||
+              EbikeRuleServices::StateLaws.classification_by_limits(@state[:abbr], mph: @bike.top_mph, watts: @bike.watts)
+          end
         end
 
         # The copy that names a state, and Canada's in its place

@@ -10,6 +10,11 @@ module EbikeRuleServices
     STATE_ID = %r{\Aevc/us/([a-z]{2})/}
     OFF_HIGHWAY = "evc/off_highway_motorcycle"
     MOTORCYCLE = "evc/motorcycle"
+    ROAD_GROUPS = ["evc/moped", "evc/motor_driven_cycle", MOTORCYCLE].freeze
+    # The catalog doesn't rank a class's rules, so these read their wording: where it can go and what riding it takes
+    TOP_RULE = /\A(?:Ridden only|Never (?:ridden|allowed)|Not allowed|Barred from|Restricted to|Kept (?:off|to|out)|Can't be registered|Not registered|Riders need|Its operator needs|Needs an? (?:[\w-]+ )*(?:license|endorsement)|Registered|Titled)\b/
+    RIDER_RULE = /\b(?:riders?|ride|ridden|operator|licen[sc]e|helmet|insurance|permit|sticker|decal|towed|allowed|barred|kept)\b/i
+    SELLER_RULE = /\AIts (?:maker|importer|seller)s?\b/
     # Corrections the catalog doesn't carry yet: `either` limits are alternatives, and NOT_AN_EBIKE folds a
     # class into the one e-moto entry, listed last. New Jersey's law counts an electric motorized bicycle as
     # a motorcycle, and a dirt bike is one too
@@ -84,12 +89,18 @@ module EbikeRuleServices
     end
 
     # The state's classification for a vehicle with these classifications, other than its e-bike law: its own, or one
-    # sharing their group, with its restrictions in force
+    # sharing their group, with its restrictions not yet ended: the top_rules in force today, then a rider's, then the rest
     def other_classification(abbreviation, ids, today: Time.zone.today)
       parsed => {groups:, tiers:}
       shared = ids.flat_map { [it, *groups[it]] }
-      tiers[abbreviation]&.find { it[:ids].intersect?(shared) }
-        &.then { {name: it[:name], restrictions: current(it[:restrictions], today).select { it[:starts_on].nil? }} }
+      tiers[abbreviation]&.find { it[:ids].intersect?(shared) }&.then { ranked_rules(in_force(it, today)) }
+    end
+
+    # The lightest of the state's road classifications a vehicle whose record names none fits. Only a known speed is
+    # within a speed cap; an unknown power is within any
+    def classification_by_limits(abbreviation, mph:, watts:, today: Time.zone.today)
+      parsed[:tiers][abbreviation].to_a.select { road_rank(it) && within_limits?(it, mph, watts) }.min_by { road_rank(it) }
+        &.then { ranked_rules(in_force(it, today)).merge(by_limits: true) }
     end
 
     # From a request's Cloudflare location headers
@@ -104,7 +115,7 @@ module EbikeRuleServices
     # private below here
     #
 
-    def parsed = vocabulary("state_laws_with_tier_restrictions") { parse(it) } || {laws: {}, tiers: {}, groups: {}, classes: {}, motorcycles: {}, e_bike_laws: []}
+    def parsed = vocabulary("state_laws_with_tier_laws") { parse(it) } || {laws: {}, tiers: {}, groups: {}, classes: {}, motorcycles: {}, e_bike_laws: []}
 
     # apart from parsed, which every state's lookup reads
     def classifications
@@ -128,7 +139,7 @@ module EbikeRuleServices
         .to_h { |abbreviation, id, record| [abbreviation, law(id, record)] }
       {
         laws:,
-        tiers: tiers.group_by(&:first).transform_values { it.map { |_, id, record| {name: record["name"], ids: [id, *record["groups"]], restrictions: record["restrictions"].to_a.map { restriction(it) }} } },
+        tiers: tiers.group_by(&:first).transform_values { it.map { |_, id, record| law(id, record).merge(ids: [id, *record["groups"]], min_watts: record["min_power"]) } },
         groups: records.filter_map { |id, record| [id, record["groups"]] if record["groups"] }.to_h,
         e_bike_laws: records.filter_map { |id, record| id if record["e_bike_law"] },
         classes: states.group_by(&:first).filter_map { |abbreviation, entries|
@@ -223,6 +234,18 @@ module EbikeRuleServices
 
     def upcoming(date, today) = (date if date&.>(today))
 
-    conceal :parsed, :classifications, :vocabulary, :parse, :parse_places, :motor_vehicle_law, :state_classes, :by_speed, :state_class, :metric?, :mph, :law, :restriction, :web_pages, :date, :in_force, :current, :upcoming
+    def ranked_rules(classification)
+      top, rest = classification[:restrictions].partition { it[:starts_on].nil? && it[:ends_on].nil? && it[:rule].match?(TOP_RULE) }
+      rider, other = rest.partition { it[:rule].match?(RIDER_RULE) && !it[:rule].match?(SELLER_RULE) }
+      classification.merge(top_rules: top, restrictions: top + rider + other)
+    end
+
+    def road_rank(tier) = ROAD_GROUPS.index { tier[:ids].include?(it) }
+
+    def within_limits?(tier, mph, watts)
+      (tier[:mph].nil? || mph&.<=(tier[:mph])) && (watts.nil? || (tier[:min_watts]..tier[:watt_cap]).cover?(watts))
+    end
+
+    conceal :parsed, :classifications, :vocabulary, :parse, :parse_places, :motor_vehicle_law, :state_classes, :by_speed, :state_class, :metric?, :mph, :law, :restriction, :web_pages, :date, :in_force, :current, :upcoming, :ranked_rules, :road_rank, :within_limits?
   end
 end

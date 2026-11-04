@@ -158,7 +158,51 @@ RSpec.describe EbikeRuleServices::StateLaws do
       # not the state's e-bike law, which a Class 3 shares a group with
       expect(described_class.other_classification("TX", ["evc/us/class_3"])).to be_nil
       expect(described_class.other_classification("NJ", ["evc/us/class_3"]))
-        .to match(name: "Motorized Bicycle", restrictions: include(a_hash_including(rule: /moped \(class F\) license/, citation: "N.J.S.A. 39:4-14.3")))
+        .to include(name: "Motorized Bicycle", restrictions: include(a_hash_including(rule: /moped \(class F\) license/, citation: "N.J.S.A. 39:4-14.3")))
+    end
+
+    it "leads with the rules on where it can go and what riding it takes, then a rider's, ahead of what defines it" do
+      classification = described_class.other_classification("CA", ["evc/moped"], today: Date.new(2026, 11, 4))
+
+      expect(classification[:top_rules].pluck(:rule)).to match [a_string_starting_with("Riders need a driver's license"), a_string_starting_with("Registered with the DMV"),
+        a_string_starting_with("Barred from any freeway"), a_string_starting_with("Kept off bike paths")]
+      rules = classification[:restrictions].pluck(:rule)
+      expect(rules.first(4)).to eq classification[:top_rules].pluck(:rule)
+      expect(rules.fifth).to start_with("Riders must wear a motorcycle helmet")
+      expect(rules.index { it.start_with?("A peace officer") }).to be < rules.index { it.start_with?("Can't propel") }
+      expect(rules.last).to start_with("Built for highway use").or start_with("Its maker")
+    end
+
+    it "keeps a rule's start date until it starts, and drops one once it's ended" do
+      rules = ->(today) { described_class.other_classification("CA", ["evc/moped"], today:)[:restrictions] }
+
+      expect(rules.call(Date.new(2026, 11, 4))).to include(a_hash_including(citation: /§28191/, starts_on: Date.new(2027, 1, 1)))
+        .and include(a_hash_including(citation: /§22651\.08/, starts_on: nil))
+        .and include(a_hash_including(rule: /automatic transmission/))
+      expect(rules.call(Date.new(2027, 1, 1))).to include(a_hash_including(citation: /§28191/, starts_on: nil))
+      expect(rules.call(Date.new(2027, 1, 1)).pluck(:rule)).to_not include(a_string_matching(/automatic transmission/))
+    end
+  end
+
+  describe "classification_by_limits" do
+    def name_for(abbreviation = "CA", **) = described_class.classification_by_limits(abbreviation, **)&.dig(:name)
+
+    it "is the lightest road class the speed and power fit, and says it's by limits" do
+      expect(name_for(mph: 28, watts: 750)).to eq "Moped"
+      expect(described_class.classification_by_limits("CA", mph: 28, watts: 750)).to include(by_limits: true)
+      # past the moped's 30 mph and its 3,000W
+      expect(name_for(mph: 35, watts: 2_000)).to eq "Motor-Driven Cycle"
+      expect(name_for(mph: 28, watts: 3_500)).to eq "Motor-Driven Cycle"
+      expect(name_for(mph: 60, watts: 12_500)).to eq "Motorcycle"
+    end
+
+    it "fits any power that's unknown, and no speed cap with a speed that is" do
+      expect(name_for(mph: 28, watts: nil)).to eq "Moped"
+      expect(name_for(mph: nil, watts: nil)).to eq "Motor-Driven Cycle"
+    end
+
+    it "is nil for a state with no road class on file" do
+      expect(name_for("WY", mph: 28, watts: 750)).to be_nil
     end
   end
 end

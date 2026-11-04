@@ -214,8 +214,9 @@ RSpec.describe EbikeRulesController, type: :request do
       get "/ebike-rules/US/CA", params: {vehicle_models: "m/aventon/2026/level_4_adv"}
 
       expect(page).to have_css("[role='status']", text: "Your Aventón Level 4 ADV is not permitted as an e-bike under current California rules.")
-      expect(page.all("[role='status'] li").map(&:text)).to eq ["It is a Class 2 and Class 3 e-bike, which is not permitted.",
-        "It may be regulated as a moped or motor vehicle instead, which can require registration and a license."]
+      top_line = page.all("[role='status'] > div > ul > li").map { it.text.strip }
+      expect(top_line.first).to eq "It is a Class 2 and Class 3 e-bike, which is not permitted. In California, it may fall under Moped."
+      expect(top_line.second).to start_with "Riders need a driver's license"
       # its speed and throttle fail too, which the classes' note already gives as the reason
       speed = page.find("li", text: /Top assisted speed\s*28\W*mph\s*Assists to 28\W*mph, not allowed with a throttle/)
       throttle = page.find("li", text: /Throttle\s*Allowed\s*Not allowed with Class 3 assist/)

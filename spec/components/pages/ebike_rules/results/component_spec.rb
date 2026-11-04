@@ -3,6 +3,8 @@
 require "rails_helper"
 
 RSpec.describe Pages::EbikeRules::Results::Component, type: :component do
+  include ActiveSupport::Testing::TimeHelpers
+
   before { stub_bikebook_catalog }
 
   let(:bike) do
@@ -76,9 +78,51 @@ RSpec.describe Pages::EbikeRules::Results::Component, type: :component do
       expect(component).to have_css("li", text: "Class 3 isn't recognized in New Jersey")
         .and have_css("[role='status'] li", text: "In New Jersey, it falls under Motorized Bicycle.")
         .and have_css("[role='status'] [role='button']", text: "Motorized Bicycle rules")
-        .and have_css("[role='status'] li", text: /Registered with the Motor Vehicle Commission.*N\.J\.S\.A\. 39:4-14\.3i/m, visible: :all)
+        .and have_css("[role='status'] > div > ul > li", text: /\A\s*Registered with the Motor Vehicle Commission[^.]*\s*\z/)
+        .and have_css("[data-ui--collapse-target='content'] li", text: /Registered with the Motor Vehicle Commission.*N\.J\.S\.A\. 39:4-14\.3i/m)
         .and have_css("button[aria-label='E-moto, not an e-bike'] + [role='tooltip'] code", text: /\A\s*evc\/out_of_class\s*\z/, visible: :all)
         .and have_no_css("[role='img'][aria-label='Class 3 e-bike']")
+    end
+  end
+
+  context "with an off-highway e-moto in California" do
+    let(:bike) do
+      super().with(e_bike_class: nil, e_vehicle_classifications: ["evc/off_highway_motorcycle"], watts: nil, top_assist_mph: nil, top_assist_kmh: nil,
+        throttle: true, stock_throttle: true)
+    end
+    let(:abbreviation) { "CA" }
+
+    it "bullets where it can go, with no citation, above its rules, which lead with them and a rider's, cited" do
+      status = component.css("[role='status'] > div").first
+      expect(status.css("> ul").first.css("li").map { it.text.strip }).to eq ["It isn't a Class 1, 2 or 3 e-bike. In California, it falls under Off-Highway Electric Motorcycle."]
+      top_rules = status.css("> ul.tw\\:list-disc > li")
+      expect(top_rules.map { it.text.strip }).to eq ["Ridden only in designated OHV areas or on private property; never on highways, streets, sidewalks, bike lanes or bike paths",
+        "Can't be registered or converted for street use"]
+      expect(top_rules.css("a")).to be_empty
+
+      rules = status.css("[data-ui--collapse-target='content'] ul").first.css("li")
+      expect(rules.map(&:text).first(4)).to match [a_string_including("Ridden only"), a_string_including("Can't be registered"),
+        a_string_including("Identified with a California OHV Green Sticker"), a_string_including("No driver's license needed")]
+      expect(rules.first.css("a").map(&:text)).to eq ["source"]
+    end
+  end
+
+  context "with a Class 3 and a stock throttle in California, whose record names no state class" do
+    let(:bike) do
+      super().with(e_bike_class: 3, e_vehicle_classifications: ["evc/us/class_2", "evc/us/class_3"], watts: 750, top_assist_mph: 28, top_assist_kmh: 45,
+        throttle: true, stock_throttle: true, throttle_mph: 20, throttle_kmh: 32)
+    end
+    let(:abbreviation) { "CA" }
+
+    around { |example| travel_to(Time.zone.local(2026, 11, 4)) { example.run } }
+
+    it "lists the rules of the class its speed and power fit, with the ones still to come dated" do
+      expect(component).to have_css("[role='status'] li", text: "In California, it may fall under Moped.")
+        .and have_css("[role='status'] [role='button']", text: "Moped rules")
+        .and have_css("[role='status'] > div > ul > li", text: /\A\s*Riders need a driver's license with an M1 or M2[^§]*\z/)
+        .and have_css("[data-ui--collapse-target='content'] li", text: /Riders need a driver's license with an M1 or M2.*§§12500, 12804\.9/m)
+        .and have_css("[data-ui--collapse-target='content'] li", text: /A peace officer may remove it.*§22651\.08, added by AB 875/m)
+        .and have_css("li", text: /From January 1, 2027:\s*Its maker, importer or seller must warn buyers.*§28191/m)
     end
   end
 
