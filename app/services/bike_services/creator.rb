@@ -287,13 +287,15 @@ module BikeServices
         creator_id: b_param.creator_id,
         can_edit_claimed: bike.creation_organization_id.present?,
         organization_id: bike.creation_organization_id,
-        address_record_id: bike.address_record_id
+        address_record_id: bike.address_record_id,
+        # Ownership can't read these off an unsaved bike, which fails a filled in email as blank
+        owner_email: bike.owner_email,
+        is_phone: bike.phone_registration?
       }.merge(registration_info: b_param.registration_info_attrs.merge(ip_address: @ip_address))
     end
 
     def create_ownership(b_param, bike)
-      # Ownership can't read owner_email off an unsaved bike, which reports one that's filled in as blank
-      ownership = bike.ownerships.new(owner_email: bike.owner_email, creator: b_param.creator, skip_email: b_param.skip_email?)
+      ownership = bike.ownerships.new(creator: b_param.creator, skip_email: b_param.skip_email?)
       ownership.attributes = ownership_creation_attributes(b_param, bike)
       unless ownership.save
         ownership.errors.messages.each { |msg| bike.errors.add(msg[0], msg[1][0]) }

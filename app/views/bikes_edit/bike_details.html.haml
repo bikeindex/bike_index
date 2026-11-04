@@ -220,7 +220,7 @@
     .modal-btn-footer
       .row
         .col-xs-6.col-xs-push-6
-          = submit_tag t(".submit_update"), class: "btn btn-primary"
+          = submit_tag t(".submit_update"), class: "btn btn-primary", "data-disable-with": false
         .col-xs-6.col-xs-pull-6
           %button.btn.btn-secondary{"data-dismiss" => "modal", type: "button"}
             = t(".nevermind")
@@ -250,7 +250,7 @@
     .modal-btn-footer
       .row
         .col-xs-6.col-xs-push-6
-          = submit_tag t(".submit_update"), class: "btn btn-primary"
+          = submit_tag t(".submit_update"), class: "btn btn-primary", "data-disable-with": false
         .col-xs-6.col-xs-pull-6
           %button.btn.btn-secondary{"data-dismiss" => "modal", type: "button"}
             = t(".nevermind")

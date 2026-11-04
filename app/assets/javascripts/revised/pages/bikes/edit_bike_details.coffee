@@ -16,22 +16,15 @@ class BikeIndex.BikesEditBikeDetails extends BikeIndex
     $('#serial-correction form').submit (e) =>
       e.preventDefault()
       @requestSerialUpdate()
-      @enableSubmitAgain(e.target)
     $('#manufacturer-correction form').submit (e) =>
       e.preventDefault()
       @requestManufacturerUpdate()
-      @enableSubmitAgain(e.target)
     $('.frame-sizes .btn').click (e) =>
       @updateFrameSize(e)
     $('.toggle-version-date').click (e) =>
       @updateVersionDates(e)
     united_states_id = $('#us_id_data').data('usid')
     new BikeIndex.ToggleHiddenOther('.country-select-input', united_states_id)
-
-  # rails-ujs disables the submit for a page load these requests never make, so an invalid or
-  # failed one couldn't be resubmitted. Later than its handler, which runs after this one
-  enableSubmitAgain: (form) ->
-    setTimeout (-> $(form).find("input[type=submit]").attr("disabled", false)), 500
 
   updateYear: ->
     return unless $('#bike_year').length

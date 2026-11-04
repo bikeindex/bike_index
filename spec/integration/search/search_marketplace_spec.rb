@@ -94,8 +94,7 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     expect(page).to have_field("primary_activity-hw-hidden-field", with: record.id.to_s, type: "hidden", wait: 10)
   end
 
-  # Turbo pushes a frame navigation's history entry, renders, then starts a visit to the entry.
-  # This holds the render until a back/forward lands in that gap; the marker is that visit's turn.
+  # Holds the render until a back/forward lands before the frame's follow-up visit; the marker is that visit's turn
   def pause_next_results_render_for_traversal
     page.execute_script(<<~JS)
       document.addEventListener("turbo:before-frame-render", (event) => {

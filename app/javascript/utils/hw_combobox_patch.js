@@ -32,8 +32,7 @@ HwComboboxController.prototype.connect = function () {
 const searchEarlyTyping = (controller) => {
   if (document.activeElement !== controller._actingCombobox || !controller._fullQuery || controller._fieldValueString) return
 
-  controller.open()
-  controller._expand()
+  controller.prepareToFilter({ key: 'ArrowDown' })
   controller.filterAndSelect({})
 }
 
