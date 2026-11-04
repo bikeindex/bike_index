@@ -18,6 +18,19 @@
     @apply tw:dark:bg-gray-800 tw:dark:border-gray-700 tw:dark:text-gray-300;
   }
 
+  .form-well-container,
+  .form-well {
+    @apply tw:dark:bg-transparent tw:dark:border-gray-700;
+  }
+
+  .primary-edit-form-well-menu {
+    @apply tw:max-md:dark:bg-gray-800;
+  }
+
+  .form-well-edit-page-select select {
+    @apply tw:dark:text-gray-200;
+  }
+
   .form-control,
   .btn-secondary,
   .selectize-input,
