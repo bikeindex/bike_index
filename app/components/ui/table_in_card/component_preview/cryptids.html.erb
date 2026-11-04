@@ -9,6 +9,6 @@
     <% table.column(label: "Credibility") { |record| render(UI::Badge::Component.new(text: record.credibility, color: (record.credibility == "Confirmed") ? :success : :gray, size: :sm)) } %>
     <% table.column(label: "Enthusiasm") { |record| render(UI::Badge::Component.new(text: record.enthusiasm, color: UI::Table::ComponentPreview::ENTHUSIASM_COLORS[record.enthusiasm], size: :sm)) } %>
     <% table.column(label: "Sightings") { |record| number_with_delimiter(record.sightings) } %>
-    <% table.column(label: "First Seen", sort_indicator: "first_seen") { |record| render(UI::Time::Component.new(time: record.first_seen)) } %>
+    <% table.column(label: "First Seen", sort_indicator: "first_seen", classes: "tw:whitespace-nowrap") { |record| render(UI::Time::Component.new(time: record.first_seen)) } %>
   <% end %>
 </div>
