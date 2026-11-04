@@ -36,7 +36,8 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(list.evaluate_script("[this.children[0].offsetWidth, this.children[0].offsetLeft === this.children[1].offsetLeft]")).to eq [300, true]
     scrolled = list.evaluate_script("this.scrollLeft")
     id = list.all("a", text: /, add to the comparison\z/)[2][:id]
-    find("##{id}").click
+    # Forced: a hover lift still settling fails the stable check, and the retry scrolls the link to the row's end
+    find("##{id}").with_playwright_element_handle { it.click(force: true) }
     expect(page).to have_css("##{id}:focus", text: /, remove from the comparison\z/)
     expect(find(selector).evaluate_script("this.scrollLeft")).to eq scrolled
     find("##{id}").click
