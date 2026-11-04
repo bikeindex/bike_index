@@ -16,10 +16,6 @@ module Pages
           renders_one :actions
           renders_one :below_header
 
-          # With the card, once twfullbleed takes it to one column: out past the org layout's 15px
-          # .container-fluid padding to the page's edges
-          TABLE_BLEED_CLASSES = "tw:@max-[672px]/twwiderow:-mx-[15px]"
-
           # Display order, and the first is what search_result_view falls back to
           RESULT_VIEWS = %i[table list cards].freeze
 
@@ -104,23 +100,20 @@ module Pages
             )
           end
 
-          # On the search page the .twwiderow holding the card supplies the gap above it and is
-          # the container twfullbleed reads, and search-results-card is what the results frame
-          # reads to leave this card standing while it loads; elsewhere the card stands alone
+          # On the search page the .twwiderow holding the card supplies the gap above it, and
+          # search-results-card is what the results frame reads to leave this card standing while
+          # it loads; elsewhere the card stands alone
           def card_classes
             ["org-search-component", UI::TableInCard::Component::CARD_CLASSES,
-              @search_page ? "search-results-card tw:twfullbleed" : "tw:mt-4"].join(" ")
+              @search_page ? "search-results-card" : "tw:mt-4"].join(" ")
           end
 
           def table_clip_classes
-            ["tw:overflow-hidden", results_swap_class, (TABLE_BLEED_CLASSES if @search_page)].compact.join(" ")
+            ["tw:overflow-hidden tw:table-bleed:-mx-(--gutter)", results_swap_class].compact.join(" ")
           end
 
           # The rows hide for the spinner above them while the frame they render in is busy
           def results_swap_class = ("tw:group-[[busy]]:hidden" if @search_page)
-
-          # Full bleed drops the card's gutter, so the header and cards meet the chart's edge
-          def padding_x_class = @search_page ? "tw:@min-[672px]/twwiderow:px-4" : "tw:px-4"
 
           # Built here rather than on the settings struct, which route helpers never reach
           def export_path
@@ -167,7 +160,7 @@ module Pages
           # chart as well as this card
           def card_data_attributes
             Pages::Org::Search::ColumnSettings::Component.column_settings_data_attributes(controllers: ("org--search" unless @search_page),
-              impound: !@impound_records.nil?)
+              impound: !@impound_records.nil?).merge(table_bleed: false)
           end
         end
       end

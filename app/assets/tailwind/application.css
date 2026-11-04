@@ -28,14 +28,14 @@
 /* /bikebook with its similar models open */
 @custom-variant similar-open (&:where(:has(#similar-toggle[aria-expanded=true]) *));
 
-/* A UI::TableInCard running past its card to the page's edges: once its .twwiderow has dropped
- * to one column, the same 672px as .twfullbleed, or its table is wider than the card */
+/* A table's card running to the page's edges: once its .twwiderow has dropped to one column,
+ * the same 672px as .twfullbleed, or its table is wider than the card, which ui--table-overflow flags */
 @custom-variant table-bleed {
   @container twwiderow (width < 672px) {
     @slot;
   }
 
-  &:where([data-table-bleed=true] *) {
+  &:where([data-table-bleed=true], [data-table-bleed=true] *) {
     @slot;
   }
 }

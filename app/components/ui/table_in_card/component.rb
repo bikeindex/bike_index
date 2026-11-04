@@ -23,8 +23,10 @@ module UI
         "tw:dark:[&_tr:hover_td]:bg-[color-mix(in_oklab,var(--tw-color-amber-950)_40%,var(--tw-color-gray-900))]"
       ].join(" ").freeze
 
-      # The page's background in dark as well as light, so only the headers and settings stand out
-      CARD_CLASSES = "tw:rounded-xl tw:border tw:border-gray-200 tw:bg-white tw:dark:border-gray-700 tw:dark:bg-gray-900"
+      # The page's background in dark as well as light, so only the headers and settings stand out.
+      # On an element marked data-table-bleed, which is what ui--table-overflow flags
+      CARD_CLASSES = "tw:rounded-xl tw:border tw:border-gray-200 tw:bg-white tw:dark:border-gray-700 tw:dark:bg-gray-900 " \
+        "tw:table-bleed:rounded-none tw:table-bleed:border-0"
 
       # Shadowed once the ui--table-overflow controller flags there's any to scroll
       FROZEN_COLUMN_CLASSES = "tw:w-px tw:sticky tw:left-0 tw:z-1 tw:border-r tw:border-r-gray-100 " \
@@ -90,7 +92,7 @@ module UI
       end
 
       def card(&)
-        classes = "tw:col-span-full tw:min-w-0 #{CARD_CLASSES} tw:table-bleed:rounded-none tw:table-bleed:border-0"
+        classes = "tw:col-span-full tw:min-w-0 #{CARD_CLASSES}"
         return form_with(**@form, class: classes, data: card_data, &) if @form
 
         tag.div(class: classes, data: card_data, &)
@@ -100,7 +102,7 @@ module UI
         data = UI::TableColumnSettings::Component.data_attributes(storage_key: @column_settings[:storage_key], orderable: true,
           controllers: token_list(("table-multi-checkbox" if @form), @data[:controller]).presence)
         selection = "input->table-multi-checkbox#selectRow submit->table-multi-checkbox#confirmDiscard" if @form
-        @data.merge(data, action: token_list(data[:action], selection, @data[:action]))
+        @data.merge(data, table_bleed: false, action: token_list(data[:action], selection, @data[:action]))
       end
 
       def column_options(options, index)

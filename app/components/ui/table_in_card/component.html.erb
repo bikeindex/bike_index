@@ -7,8 +7,8 @@
 <% end %>
 
 <% if @column_settings %>
-  <%# table-bleed reads the twwiderow container and data-table-bleed %>
-  <div class="twwiderow tw:mb-4" data-table-bleed="false">
+  <%# The container table-bleed reads %>
+  <div class="twwiderow tw:mb-4">
     <%= card do %>
       <%# Full bleed drops the card's gutter, so the header meets the page's %>
       <div
@@ -33,7 +33,7 @@
       </div>
 
       <%# Full bleed runs past the card and its border, so the table draws the line under itself %>
-      <div class="tw:table-bleed:mx-[calc(var(--gutter)*-1)]">
+      <div class="tw:table-bleed:-mx-(--gutter)">
         <%= render(UI::TableColumnSettings::Component.new(**@column_settings.except(:storage_key), orderable: true)) %>
 
         <%# Otherwise it's rounded to the card's rounded-xl inside its border, or the cells square the corners off %>

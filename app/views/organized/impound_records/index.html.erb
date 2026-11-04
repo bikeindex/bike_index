@@ -6,7 +6,7 @@
 
 <%= tag.div(class: "org-search-component", data: {controller: "org--search", "org--search-result-view-value": @result_view,
   "org--search-result-view-key-value": "orgImpoundResultView"}) do %>
-  <%# twwiderow is the container the results card's padding and full_bleed read %>
+  <%# twwiderow is the container the results card's table-bleed and the form's full_bleed read %>
   <div class="twwiderow tw:mt-4 tw:gap-y-4">
     <%# Frame requests only need the results frame; skip the form (Turbo discards it) %>
     <% unless turbo_frame_request? %>

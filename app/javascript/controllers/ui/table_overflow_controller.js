@@ -6,14 +6,14 @@ import { Controller } from '@hotwired/stimulus'
 // Flags data-overflowing while the table is wider than its scroll container, which is what
 // UI::TableInCard's frozen column shadow keys off, and data-scrolled-end once it's scrolled all the way,
 // which drops the right edge's. Toggling columns resizes the table or its headers, so they're observed too.
-// A card's row, marked data-table-bleed, is set true while the table is wider than the card.
+// A card marked data-table-bleed is set true while the table is wider than it.
 export default class extends Controller {
   connect () {
     this.table = this.element.querySelector('table')
     if (!this.table) return
 
     this.scroller = this.table.parentElement
-    this.row = this.element.closest('[data-table-bleed]')
+    this.card = this.element.closest('[data-table-bleed]')
     this.boundSyncScroll = () => this.#syncScroll()
     this.scroller.addEventListener('scroll', this.boundSyncScroll, { passive: true })
     this.resizeObserver = new ResizeObserver(() => this.#sync())
@@ -27,9 +27,10 @@ export default class extends Controller {
   }
 
   // Bleeding gives the table room, so overflow can't decide it: a table that only just overflowed would
-  // then fit, and flip back. The row's width and the table's minimum don't move with it
+  // then fit, and flip back. The card's outer width and the table's minimum don't move with it.
+  // Hidden for a results frame's spinner, the table measures 0 and says nothing
   #sync () {
-    if (this.row) this.row.dataset.tableBleed = this.#minimumTableWidth() > this.row.clientWidth - CARD_BORDERS_WIDTH
+    if (this.card && this.table.offsetWidth) this.card.dataset.tableBleed = this.#minimumTableWidth() > this.card.offsetWidth - CARD_BORDERS_WIDTH
     this.#syncScroll()
   }
 
