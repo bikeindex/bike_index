@@ -37,6 +37,27 @@ RSpec.describe BikebookController, type: :request do
       end
     end
 
+    context "with filters" do
+      it "keeps the search it would show without them blank" do
+        get "/bikebook", params: {search: "1", manufacturer: "aventon"}
+        expect(Capybara.string(response.body).find("[inert]", visible: :all)[:class]).to eq "tw:invisible"
+      end
+
+      context "and picks" do
+        it "keeps the search blank" do
+          get "/bikebook", params: {vehicle_models: "m/segway/2025/gt3_pro,m/aventon/2022/level_2", electric: "1"}
+          expect(Capybara.string(response.body).find("[inert]", visible: :all)[:class]).to eq "tw:invisible"
+        end
+      end
+    end
+
+    context "asked for the search alone" do
+      it "shows it" do
+        get "/bikebook", params: {search: "1"}
+        expect(Capybara.string(response.body).find("[inert]")[:class]).to be_blank
+      end
+    end
+
     context "a model alone" do
       include BikebookCatalogHelpers
 
