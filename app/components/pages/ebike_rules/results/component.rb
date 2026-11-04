@@ -146,8 +146,6 @@ module Pages
           other_classification[:by_limits] ? translation(".may_fall_under_name", state:, name:) : translation(".falls_under_name", state:, name:)
         end
 
-        def rules_shown? = @verdict == :red && other_classification.present?
-
         def other_classification
           return @other_classification if defined?(@other_classification)
 

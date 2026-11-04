@@ -62,7 +62,7 @@ module EbikeRuleServices
     # A law outside the US caps the motor's speed however it's reached
     def top_kmh = [top_assist_kmh, throttle_kmh].compact.max
 
-    # nil for a hand entry past any class, whose speed is unknown. A Class 3's 28 mph, though its record gives a slower one
+    # nil for a hand entry past any class, whose speed is unknown. A Class 3's 28 mph, whatever its record gives
     def top_mph = [top_assist_mph, throttle_mph, (28 if e_bike_classes.include?(3))].compact.max
 
     def make_and_model = [manufacturer_name, model].compact.join(" ")

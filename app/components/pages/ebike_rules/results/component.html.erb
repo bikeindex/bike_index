@@ -33,7 +33,7 @@
         </ul>
       <% end %>
 
-      <% if rules_shown? %>
+      <% if @verdict == :red && other_classification %>
         <% if other_classification[:top_rules].any? %>
           <ul
             class="

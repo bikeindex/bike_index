@@ -170,7 +170,8 @@ RSpec.describe EbikeRuleServices::StateLaws do
       expect(rules.first(4)).to eq classification[:top_rules].pluck(:rule)
       expect(rules.fifth).to start_with("Riders must wear a motorcycle helmet")
       expect(rules.index { it.start_with?("A peace officer") }).to be < rules.index { it.start_with?("Can't propel") }
-      expect(rules.last).to start_with("Built for highway use").or start_with("Its maker")
+      # a seller's warning names the license and helmet laws, which isn't a rule for the rider
+      expect(rules.index { it.start_with?("Its maker") }).to be > rules.index { it.start_with?("Can't propel") }
     end
 
     it "keeps a rule's start date until it starts, and drops one once it's ended" do
