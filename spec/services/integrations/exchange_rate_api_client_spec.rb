@@ -16,7 +16,9 @@ RSpec.describe Integrations::ExchangeRateAPIClient, type: :service do
         expect(response).to have_key(:date)
         expect(response[:base]).to eq("CAD")
         expect(response[:rates]).to be_a(Hash)
-        expect(response[:rates]).to have_key("EUR")
+        expect(response[:rates]["CAD"]).to eq 1
+        expect(response[:rates]["EUR"]).to be_within(0.00001).of(0.63804)
+        expect(response[:rates]["USD"]).to be_within(0.00001).of(0.71577)
       end
     end
   end
