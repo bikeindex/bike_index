@@ -193,8 +193,23 @@ module BikeServices
       bike
     end
 
+    # find_or_build can't see a bike a concurrent request hasn't committed, so check again
+    # under a lock. It ends with this transaction because the rest of save_bike can be slow
+    def duplicate_or_save(b_param, bike)
+      Bike.transaction do
+        lock_duplicate_check(bike) if b_param.no_duplicate?
+        BikeServices::Builder.find_duplicate(b_param, bike).tap { bike.save if it.blank? }
+      end
+    end
+
+    def lock_duplicate_check(bike)
+      key = "#{SerialNormalizer.normalized_and_corrected(bike.serial_number)}:#{bike.owner_email}"
+      Bike.lease_connection.execute(Bike.sanitize_sql(["SELECT pg_advisory_xact_lock(hashtextextended(?, 0))", key]))
+    end
+
     def save_bike(b_param, bike)
-      bike.save
+      duplicate = duplicate_or_save(b_param, bike)
+      return duplicate if duplicate.present?
 
       ownership = create_ownership(b_param, bike)
       bike = associate(b_param, bike, ownership) unless bike.errors.any?

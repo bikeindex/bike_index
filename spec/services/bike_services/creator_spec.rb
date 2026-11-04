@@ -530,6 +530,29 @@ RSpec.describe BikeServices::Creator do
       it "finds a duplicate" do
         expect_duplicate_found
       end
+      context "registered by another organization" do
+        let(:parent_organization) { FactoryBot.create(:organization) }
+        let(:posting_organization) { FactoryBot.create(:organization_child, parent_organization:) }
+        let(:bike_params) { default_params.merge(creation_organization_id: posting_organization.id) }
+        before { BikeOrganization.create!(bike: existing_bike, organization: parent_organization) }
+        def bike_organization_ids = existing_bike.reload.bike_organizations.pluck(:organization_id)
+
+        it "adds a child of the organization holding the bike" do
+          expect_duplicate_found
+          expect(bike_organization_ids).to match_array([parent_organization.id, posting_organization.id])
+          # And calling it again doesn't add it twice
+          expect(instance.create_bike(b_param)&.id).to eq existing_bike.id
+          expect(bike_organization_ids).to match_array([parent_organization.id, posting_organization.id])
+        end
+        context "child of an unrelated organization" do
+          let(:posting_organization) { FactoryBot.create(:organization_child) }
+
+          it "doesn't add it" do
+            expect_duplicate_found
+            expect(bike_organization_ids).to eq([parent_organization.id])
+          end
+        end
+      end
       context "no_duplicate false" do
         let(:bike_params) { default_params.merge(no_duplicate: false) }
         it "finds a duplicate" do
@@ -783,6 +806,50 @@ RSpec.describe BikeServices::Creator do
           expect(b_param.bike["primary_frame_color_id"]).to eq(color.id)
         end
       end
+    end
+  end
+
+  # Advisory locks don't block within a connection, so this needs each thread's own - and committed rows
+  describe "concurrent no_duplicate registrations", strategy: :truncation do
+    self.use_transactional_tests = false
+
+    let(:bike_params) do
+      {
+        serial_number: "some serial",
+        manufacturer_id: manufacturer.id,
+        primary_frame_color_id: color.id,
+        owner_email: "something@gmail.com",
+        no_duplicate: true
+      }
+    end
+    let(:b_params) { Array.new(2) { BParam.create(creator: user, params: {bike: bike_params}) } }
+
+    def waiting_on_locks
+      Bike.lease_connection.select_value(<<~SQL)
+        SELECT COUNT(*) FROM pg_locks
+        WHERE NOT granted AND database = (SELECT oid FROM pg_database WHERE datname = current_database())
+      SQL
+    end
+
+    it "registers one bike" do
+      expect(b_params.size).to eq 2
+      Organization.example # Creates it if missing, which the threads would race to do
+
+      # SHARE lets reads through and holds writes, so both get past find_or_build before either commits
+      threads = Bike.transaction do
+        Bike.lease_connection.execute("LOCK TABLE bikes IN SHARE MODE")
+        started = b_params.map do |b_param|
+          Thread.new { Bike.connection_pool.with_connection { described_class.new.create_bike(b_param) } }
+        end
+        Timeout.timeout(10) { sleep(0.01) until waiting_on_locks == 2 }
+        started
+      end
+
+      bike_ids = threads.map { it.value.id }.uniq
+      expect(bike_ids.size).to eq 1
+      expect(Bike.unscoped.pluck(:id)).to eq(bike_ids)
+      expect(Ownership.pluck(:bike_id)).to eq(bike_ids)
+      expect(b_params.map { it.reload.created_bike_id }.uniq).to eq(bike_ids)
     end
   end
 end

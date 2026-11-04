@@ -53,22 +53,35 @@ module BikeServices
       bike = build(b_param)
       bike.set_calculated_unassociated_attributes
 
-      if b_param.no_duplicate?
-        # If a dupe is found, return that rather than the just built bike
-        dupe = BikeServices::OwnerDuplicateFinder.matching(serial: bike.serial_number,
-          owner_email: bike.owner_email, manufacturer_id: bike.manufacturer_id).first
+      find_duplicate(b_param, bike) || bike
+    end
 
-        if dupe.present?
-          b_param.update(created_bike_id: dupe.id)
-          return dupe
-        end
-      end
-      bike
+    # Called from Creator too, so can't be private
+    def find_duplicate(b_param, bike)
+      return unless b_param.no_duplicate?
+
+      dupe = BikeServices::OwnerDuplicateFinder.matching(serial: bike.serial_number,
+        owner_email: bike.owner_email, manufacturer_id: bike.manufacturer_id).first
+      return if dupe.blank?
+
+      b_param.update(created_bike_id: dupe.id)
+      add_to_child_organization(dupe, bike.creation_organization)
+      dupe
     end
 
     #
     # private below here
     #
+
+    # A bike reaches an organization's parent when it's created, never its children - so
+    # a child posting a sale its parent already holds would otherwise lose sight of it
+    def add_to_child_organization(bike, organization)
+      parent_organization_id = organization&.parent_organization_id
+      return if parent_organization_id.blank?
+      return unless BikeOrganization.exists?(bike_id: bike.id, organization_id: parent_organization_id)
+
+      BikeOrganization.find_or_create_by(bike_id: bike.id, organization_id: organization.id)
+    end
 
     # previously BikeServices::CreatorOrganizer
     def check_organization(b_param, bike)
@@ -135,7 +148,7 @@ module BikeServices
       impound_record
     end
 
-    conceal :check_organization, :check_example, :default_parking_notification_attrs,
-      :org_address_record, :build_new_impound_record
+    conceal :add_to_child_organization, :check_organization, :check_example,
+      :default_parking_notification_attrs, :org_address_record, :build_new_impound_record
   end
 end
