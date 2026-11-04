@@ -2,9 +2,9 @@
 
 require "rails_helper"
 
-RSpec.describe UI::CardTable::Component, :js, type: :system do
+RSpec.describe UI::TableInCard::Component, :js, type: :system do
   it "checks the rows between a click and a shift-click, to the shift-clicked one's state, and toggles all" do
-    visit("/rails/view_components/ui/card_table/component/selection")
+    visit("/rails/view_components/ui/table_in_card/component/selection")
     boxes = (1..5).map { find_field("cryptids[#{it}]") }
 
     boxes[1].click

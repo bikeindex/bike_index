@@ -1,4 +1,4 @@
-<%= render(UI::CardTable::Component.new(records: @collection, cache_key: self.class.cache_digest, render_sortable: @render_sortable, sort_state: @sort_state,
+<%= render(UI::TableInCard::Component.new(records: @collection, cache_key: self.class.cache_digest, render_sortable: @render_sortable, sort_state: @sort_state,
   column_settings: {storage_key: "adminBugReportsColumns", columns: COLUMNS, defaults: COLUMNS.keys, narrow_hidden: %i[receiver_cell member_cell invoiced_cell pull_request_cell]},
   form: {url: assign_tags_admin_bug_reports_path, method: :post},
   data: {controller: "update-cached-sortable-links", "update-cached-sortable-links-base-url-value": url_for(@sort_state.search_params)})) do |table| %>

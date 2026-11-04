@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UI
-  module CardTable
+  module TableInCard
     # A UI::Table that fills a card edge to edge, its first column frozen against the
     # horizontal scroll. Columns are declared as on UI::Table, and their blocks run there.
     # Given column_settings, it renders its own full-bleed card, under them
@@ -25,12 +25,12 @@ module UI
 
       # Shadowed once the ui--table-overflow controller flags there's any to scroll
       FROZEN_COLUMN_CLASSES = "tw:w-px tw:sticky tw:left-0 tw:z-1 tw:border-r tw:border-r-gray-100 " \
-        "tw:group-data-overflowing/card-table:shadow-[2px_0_6px_rgba(26,26,31,0.04)] tw:dark:border-r-gray-700"
+        "tw:group-data-overflowing/table-in-card:shadow-[2px_0_6px_rgba(26,26,31,0.04)] tw:dark:border-r-gray-700"
 
       # [&>div] is UI::Table's scroller, whose bottom spacing would part the table from what
       # follows it. The after: box mirrors the frozen column's divider and shadow on the right
       # edge while there's more to scroll, except in a full-bleed row that runs off the page
-      WRAPPER_CLASSES = "tw:group/card-table tw:relative tw:[&>div]:mb-0 tw:[&>div]:pb-0 tw:data-overflowing:after:absolute " \
+      WRAPPER_CLASSES = "tw:group/table-in-card tw:relative tw:[&>div]:mb-0 tw:[&>div]:pb-0 tw:data-overflowing:after:absolute " \
         "tw:data-overflowing:after:inset-y-0 tw:data-overflowing:after:left-[calc(100%-1px)] tw:data-overflowing:after:z-2 " \
         "tw:data-overflowing:after:w-4 tw:data-overflowing:after:border-l tw:data-overflowing:after:border-gray-100 " \
         "tw:data-overflowing:after:shadow-[-2px_0_6px_rgba(26,26,31,0.04)] tw:dark:data-overflowing:after:border-gray-700 " \
