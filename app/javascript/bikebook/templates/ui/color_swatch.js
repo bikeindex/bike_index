@@ -8,5 +8,5 @@ const SIZES = { sm: 'tw:h-3 tw:w-3', md: 'tw:h-6 tw:w-6' }
 const ALIGNS = { middle: 'tw:align-middle', baseline: 'tw:align-baseline' }
 
 // UI::ColorSwatch::Component
-export const colorSwatch = ({ display, name, size = 'md', align = 'middle' }) => html`<span class="tw:inline-block tw:leading-[0] tw:rounded-xs tw:border tw:border-black/20 ${
+export const colorSwatch = ({ display, name, size = 'md', align = 'middle' }) => html`<span class="tw:inline-block tw:leading-[0] tw:rounded-xs tw:border tw:border-black/20 tw:dark:border-white/20 ${
   SIZES[size] ?? SIZES.md} ${ALIGNS[align] ?? ALIGNS.middle}" style="background: ${name === COVER_UP_NAME ? COVER_UP_SWATCH : display ?? ''}" aria-hidden="true"></span>`

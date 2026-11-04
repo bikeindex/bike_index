@@ -4458,6 +4458,13 @@ nb:
         your_headers_must_match_html: Overskriftene dine må samsvare <em>nøyaktig</em>
           med overskriftene våre - hvis du for eksempel har 'serienummer' som overskrift,
           vil ikke importen fungere.
+        create_duplicates_html: Opprett duplikater – legg til registreringer når en
+          rad samsvarer med en eksisterende registrerings serienummer og eierens e-postadresse
+          <span class="twless-strong">(av som standard)</span>
+        create_duplicates_enabled_html: Opprett duplikater – legg til registreringer
+          når en rad samsvarer med en eksisterende registrerings serienummer og eierens
+          e-postadresse <span class="twless-strong">(aktivert som standard for å forhindre
+          tap av stjålne/beslaglagte data)</span>
       show:
         ascend_import: Ascend import
         bulk_import: Masseimport
@@ -4470,6 +4477,7 @@ nb:
         file_removed_explanation: etter noen dager sletter vi den opplastede filen
           for å spare plass
         progress: Framgang
+        matched_count: Rader som samsvarer med eksisterende registreringer
     exports:
       index:
         bikes_in_export: Sykler på eksport
@@ -7373,9 +7381,6 @@ nb:
             og andre programmer kan være underkontoer med eget personale og utdanningsinnhold.
             Ansatte på hvert nivå administrerer kun sine egne regler.
           faq_account_question: Hvem administrerer kontoen?
-          faq_checker_answer: Sykkeldetaljer kommer fra BikeBook, en katalog over
-            elsykkelmodeller med klasse, motor, hastighet og UL-sertifisering. Statlige
-            regler er oppført med forskriftene bak dem.
           faq_checker_question: Hvor får samsvarskontrolløren dataene sine fra?
           faq_cost_answer: Det er ingen gebyrer per registrering, og registreringen
             er gratis for innbyggere. Vi vil gå gjennom prisene for byen din under
@@ -7568,6 +7573,9 @@ nb:
             registrere sykkelen sin. Hvis det er en elsykkel, går de rett inn i en
             kort opplæringsprosess med byens regler.
           submit_demo: Be om en demonstrasjon
+          faq_checker_answer_html: Sykkeldetaljer kommer fra %{bikebook_link}, en
+            katalog over elsykkelmodeller med klasse, motor, hastighet og UL-sertifisering.
+            Statlige regler er listet opp med forskriftene bak dem.
         for_cities_education:
           all_set: Du er klar.
           back: Tilbake

@@ -128,7 +128,7 @@ module Pages
 
         def faqs
           [
-            [translation(".faq_checker_question"), translation(".faq_checker_answer")],
+            [translation(".faq_checker_question"), translation(".faq_checker_answer_html", bikebook_link: link_to("BikeBook", bikebook_path, class: "twlink"))],
             [translation(".faq_account_question"), translation(".faq_account_answer")],
             [translation(".faq_rules_question"), translation(".faq_rules_answer")],
             [translation(".faq_cost_question"), translation(".faq_cost_answer")],

@@ -45,7 +45,7 @@ module Admin
       @stolen_record.bike = Bike.unscoped.find_by_id(@stolen_record.bike_id)
       if params[:stolen_record][:mark_as_eligible].present?
         @stolen_record.recovery_display_status = "waiting_on_decision"
-        redirect = new_admin_recovery_display_path(@stolen_record)
+        redirect = new_admin_recovery_display_path(stolen_record_id: @stolen_record.id)
       elsif params[:stolen_record][:is_not_displayable].present?
         @stolen_record.recovery_display_status = "not_displayed"
       end

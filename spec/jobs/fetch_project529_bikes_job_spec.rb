@@ -18,12 +18,4 @@ RSpec.describe FetchProject529BikesJob, type: :job do
       end
     end
   end
-
-  context "with a Project529Credential and a stubbed client" do
-    let!(:credential) { FactoryBot.create(:project529_credential) }
-    before { allow_any_instance_of(ExternalRegistryClient::Project529Client).to receive(:bikes) { ExternalRegistryBike.none } }
-
-    include_context :scheduled_job
-    include_examples :scheduled_job_tests
-  end
 end

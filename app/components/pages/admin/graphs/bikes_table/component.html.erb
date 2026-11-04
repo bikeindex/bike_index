@@ -20,7 +20,7 @@
           <% if colors.key?(origin) %>
             <%# Chartkick fills its columns at half opacity and outlines them; the swatch matches %>
             <span
-              class="d-inline-block mr-1"
+              class="tw:mr-1 tw:inline-block"
               style="width: .75rem; height: .75rem; border: 1px solid <%= colors[origin] %>; background-color: <%= colors[origin] %>80;"
             ></span>
             <%= render(Atoms::Org::OriginDisplay::Component.new(creation_kind: origin)) %>
@@ -80,13 +80,7 @@
             <%= link_to organization.name, admin_bikes_path(sortable_params.merge(organization_id: org_id, render_chart: true)), class: "twlink" %>
             <%= link_to search_emoji, admin_bikes_path(sortable_params.merge(organization_id: org_id)) %>
           <% else %>
-            <a
-              class="gray-link"
-              href="<%= admin_bikes_path(sortable_params.merge(organization_id: "false", render_chart: true)) %>"
-              title="(id: <%= org_id %>)"
-            >
-              no organization
-            </a>
+            <%= render(UI::ButtonLink::Component.new(href: admin_bikes_path(sortable_params.merge(organization_id: "false", render_chart: true)), text: "no organization", color: :link_gray, title: "(id: #{org_id})")) %>
           <% end %>
         <% end %>
 

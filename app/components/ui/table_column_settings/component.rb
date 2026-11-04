@@ -15,7 +15,7 @@ module UI
 
       def self.order_storage_key(storage_key) = "#{storage_key}Order"
 
-      # columns: {cell_name => label}, each cell_name a class every cell in that column carries.
+      # columns: {cell_name => label}, listed alphabetically, each cell_name a class every cell in that column carries.
       # defaults: the cell_names shown until the viewer picks. narrow_hidden: defaults that start
       # hidden below Tailwind's sm breakpoint. always_visible: checked, and can't be unchecked.
       # hints: {cell_name => text} after its label. sections: {heading => cell_names} listed under
@@ -45,6 +45,7 @@ module UI
         sectioned = @sections.values.flatten
         [[nil, @columns.except(*sectioned)], *@sections.map { |heading, keys| [heading, @columns.slice(*keys)] }]
           .reject { |_heading, columns| columns.empty? }
+          .map { |heading, columns| [heading, columns.sort_by { |_key, label| label.to_s.downcase }] }
       end
 
       def column_rows(columns) = (columns.size / 3.0).ceil

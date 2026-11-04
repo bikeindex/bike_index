@@ -293,7 +293,10 @@ Rails.application.routes.draw do
         # Selection chips for the organizations combobox on the edit form
         post :organization_chips
       end
-      member { get :get_destroy }
+      member do
+        get :get_destroy
+        put :undelete
+      end
     end
     get "credibility_badges", to: "dashboard#credibility_badges"
     get "maintenance", to: "dashboard#maintenance"

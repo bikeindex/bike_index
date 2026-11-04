@@ -3963,6 +3963,15 @@ nl:
         importing_stickers_html: Als je stickers samen met fietsen importeert, worden
           stickers alleen toegewezen als de stickercode is gevonden en kan worden
           toegewezen.
+        create_duplicates_html: Dubbele registraties aanmaken - voeg registraties
+          toe wanneer een rij overeenkomt met het serienummer en het e-mailadres van
+          de eigenaar van een bestaande registratie <span class="twless-strong">(standaard
+          uitgeschakeld).</span>
+        create_duplicates_enabled_html: Dubbele registraties aanmaken - voeg registraties
+          toe wanneer een rij overeenkomt met het serienummer en het e-mailadres van
+          de eigenaar van een bestaande registratie <span class="twless-strong">(standaard
+          ingeschakeld om te voorkomen dat gestolen/in beslag genomen gegevens verloren
+          gaan).</span>
       show:
         ascend_import: Ascending importeren
         bulk_import: Bulk import
@@ -3975,6 +3984,7 @@ nl:
         file_removed_explanation: na een paar dagen verwijderen we het geüploade bestand
           om ruimte te besparen
         bulk_import_impounded: In beslag genomen bulkimport
+        matched_count: Rijen die overeenkomen met bestaande registraties
     exports:
       index:
         bikes_in_export: Fietsen in export
@@ -7618,9 +7628,6 @@ nl:
             fungeren met eigen personeel en lesmateriaal. Het personeel op elk niveau
             beheert uitsluitend de eigen regels.
           faq_account_question: Wie beheert het account?
-          faq_checker_answer: De fietsgegevens zijn afkomstig van BikeBook, een catalogus
-            van e-bike modellen met hun klasse, motor, snelheid en UL-certificering.
-            De staatsregelgeving wordt vermeld met de bijbehorende wetgeving.
           faq_checker_question: Waar haalt de compliancechecker zijn gegevens vandaan?
           faq_cost_answer: Er zijn geen kosten vooraf verbonden aan de registratie
             en registratie is gratis voor inwoners. We bespreken de tarieven voor
@@ -7826,6 +7833,9 @@ nl:
             het registreren van hun fiets. Als het een e-bike is, volgen ze direct
             een korte instructievideo over de regels van hun stad.
           submit_demo: Vraag een demo aan
+          faq_checker_answer_html: De fietsdetails zijn afkomstig van %{bikebook_link},
+            een catalogus van e-bike modellen met hun klasse, motor, snelheid en UL-certificering.
+            De staatsregels worden vermeld met de bijbehorende wetgeving.
         for_cities_education:
           all_set: Je bent er helemaal klaar voor.
           back: Rug

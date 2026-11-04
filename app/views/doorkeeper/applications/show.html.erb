@@ -23,7 +23,7 @@
     </h4>
 
     <p class="tw:overflow-x-auto tw:whitespace-nowrap">
-      <code id="application_id"><%= @application.uid %></code>
+      <%= render(UI::Code::Inline::Component.new(text: @application.uid)) %>
     </p>
 
     <h4 class="mb-1 uncap" style="font-size: 18px;">
@@ -31,7 +31,7 @@
     </h4>
 
     <p class="tw:overflow-x-auto tw:whitespace-nowrap">
-      <code id="secret"><%= @application.secret %></code>
+      <%= render(UI::Code::Inline::Component.new(text: @application.secret)) %>
     </p>
 
     <h4 class="mb-1 uncap" style="font-size: 18px;">
@@ -39,20 +39,19 @@
     </h4>
 
     <% if @application.confidential? %>
-      <p class="tw:mb-2"><code>true</code></p>
+      <p class="tw:mb-2">
+        <%= render(UI::Code::Inline::Component.new(text: "true")) %>
+      </p>
       <div class="tw:text-base">
         <%= render(UI::Alerts::Base::Component.new(kind: :warning, margin_classes: "tw:mb-6")) do %>
           All requests fail that don't include a
-          <code class="
-            tw:inline-block tw:max-w-full tw:overflow-x-auto tw:align-bottom
-            tw:leading-none tw:whitespace-nowrap
-          ">client_secret</code>
+          <%= render(UI::Code::Inline::Component.new(text: "client_secret")) %>
           parameter
         <% end %>
       </div>
     <% else %>
       <p class="tw:flex tw:items-center tw:gap-2">
-        <code>false</code>
+        <%= render(UI::Code::Inline::Component.new(text: "false")) %>
 
         <%= render(UI::Tooltip::Component.new) do |tooltip| %>
           <% tooltip.with_body do %>
@@ -87,7 +86,7 @@
       <tbody>
         <% @application.redirect_uri.split.each do |uri| %>
           <tr>
-            <td><code><%= uri %></code></td>
+            <td><%= render(UI::Code::Inline::Component.new(text: uri)) %></td>
 
             <td>
               <%= link_to 'Authorize', oauth_authorization_path(client_id: @application.uid, redirect_uri: uri, response_type: 'code', scope: 'public'), class: 'btn btn-secondary', target: '_blank' %>

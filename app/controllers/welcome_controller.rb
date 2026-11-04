@@ -25,12 +25,19 @@ class WelcomeController < ApplicationController
   end
 
   def recovery_stories
-    @per_page = permitted_per_page(default: 50)
+    @pagy, @recovery_displays = pagy(:countish, RecoveryDisplay.with_attached_photo_processed.reorder(recovered_at: :desc, id: :desc),
+      limit: permitted_per_page(default: Pages::RecoveryStories::Stories::Component::PER_PAGE), page: permitted_page)
 
-    @pagy, @recovery_displays = pagy(:countish, RecoveryDisplay, limit: @per_page, page: permitted_page)
-    @slice1, @slice2 = list_halves(@recovery_displays)
+    if turbo_frame_request?
+      return render Pages::RecoveryStories::Stories::Component.new(recovery_displays: @recovery_displays, pagy: @pagy)
+    end
 
-    flash[:notice] = translation(:no_stories_to_display) if @recovery_displays.empty?
+    flash.now[:notice] = translation(:no_stories_to_display) if @recovery_displays.load.empty?
+
+    render SharedBlocks::Marketing::Wrapper::Component.new(page: Pages::RecoveryStories::Index::Component.new(
+      recovery_displays: @recovery_displays, pagy: @pagy,
+      stripe_prices: StripePrice.active_for(current_currency), current_user:
+    ))
   end
 
   # Adding for testing purposes - so we can test where the root url for a user goes - sethherr, 2019-7-9
@@ -42,15 +49,5 @@ class WelcomeController < ApplicationController
 
   def authenticate_user_for_welcome_controller
     authenticate_user(translation_key: :create_account, flash_type: :notice, sign_up_not_in: true)
-  end
-
-  # Split the given array `list` into two halves
-  # Return a tuple with each half as an array.
-  def list_halves(list)
-    return [[], []] if list.empty?
-
-    slice_size = (list.length / 2.0).ceil
-    slice1, slice2 = list.each_slice(slice_size).entries
-    [slice1, slice2 || []]
   end
 end

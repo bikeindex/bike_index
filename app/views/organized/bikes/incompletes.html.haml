@@ -75,7 +75,7 @@
                 = notification_delivery_display(resend[1])
             -# Hacky restriction on the number of resends you can do
             - unless resend_notifications.count > 3
-              %span.less-strong-right
+              %span.less-strong-right.less-strong
                 = render(UI::ButtonLink::Component.new(text: t(".re_send"),
                   href: resend_incomplete_email_organization_bike_path(id: b_param.to_param, organization_id: current_organization.to_param),
                   color: :link_gray,

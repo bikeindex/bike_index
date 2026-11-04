@@ -31,8 +31,9 @@ const searchNote = ({ count, filtered }) => html`<p class="tw:mt-3 tw:rounded-md
     data-action="bikebook--tips#browse">Search them</button>`
   : html`No models match your filters. ${filtersButton('Change filters')}`}</p>`
 
+// each scrolling to the views it opens, which an open filter panel would leave below the window
 const featuredCards = ({ featured, vehiclePath, ...card }) => html`<ul aria-label="Models to compare" class="tw:mt-3 ${MODEL_CARDS_CLASSES}"
-  >${featured.map((model) => modelCard({ model, href: vehiclePath(model.id), ...card }))}</ul>`
+  data-scroll-to="#vehicle-views">${featured.map((model) => modelCard({ model, href: vehiclePath(model.id), ...card }))}</ul>`
 
 // With nothing picked, how the page works and comparisons to start from, or once they're dismissed, a prompt, and under
 // either what the search leaves and some of it. A classification's card, shown alone, leaves out the first two
@@ -52,6 +53,5 @@ const tips = (url) => html`<div data-bikebook--tips-target="tips"><section aria-
   tw:dark:text-gray-400">Or try an example:</span>${EXAMPLES.map((example) => exampleLink(url, example))}</div><button type="button" aria-label="Dismiss tips"
   data-action="bikebook--tips#dismiss" class="tw:absolute tw:top-2.5 tw:right-3 tw:p-1 tw:text-gray-400 tw:hover:text-gray-600
   tw:dark:hover:text-gray-200">${x('tw:h-3 tw:w-3')}</button></section></div><div hidden data-bikebook--tips-target="prompt"><div class="tw:rounded-md
-  tw:border tw:border-dashed tw:border-gray-300 tw:px-4 tw:py-6 tw:text-center tw:dark:border-gray-600"><p class="tw:text-xs tw:font-bold tw:tracking-wider
-  tw:text-[#715eb2] tw:uppercase tw:dark:text-[#a99bd6]">Nothing selected yet</p><p class="tw:mt-1 tw:text-sm tw:text-gray-500">Pick a bike above to start
+  tw:border tw:border-dashed tw:border-gray-300 tw:px-4 tw:py-6 tw:text-center tw:dark:border-gray-600"><p class="tw:tweyebrow">Nothing selected yet</p><p class="tw:mt-1 tw:text-sm tw:text-gray-500">Pick a bike above to start
   comparing. <button type="button" class="twlink" data-bikebook--tips-target="restore" data-action="bikebook--tips#restore">Show tips</button></p></div></div>`

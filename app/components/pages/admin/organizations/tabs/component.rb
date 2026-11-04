@@ -79,10 +79,6 @@ module Pages
             render(UI::ButtonLink::Component.new(text: "organization's view", size: :sm,
               href: public_send(ORGANIZED_VIEWS[@active], organization_id: @organization)))
           end
-
-          def top_right_links
-            [@additional_link, (@active == :invoices) ? new_invoice_link : organization_view_link].compact
-          end
         end
       end
     end

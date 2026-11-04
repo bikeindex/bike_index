@@ -53,6 +53,7 @@ RSpec.describe Counts do
   context "logged_searches" do
     let(:request_at) { Time.current.beginning_of_day }
     let!(:bikebook_search) { FactoryBot.create(:logged_search, endpoint: :web_bikebook, serial_normalized: "XXX", request_at:) }
+    let!(:comparison_search) { FactoryBot.create(:logged_search, endpoint: :web_bikebook, query_items: {vehicle_models: "m/a/2025/b,m/c/2025/d"}, request_at:) }
     let!(:serial_search) { FactoryBot.create(:logged_search, endpoint: :web_bikes, serial_normalized: "XXX", request_at:) }
     let!(:no_serial_search) { FactoryBot.create(:logged_search, endpoint: :api_v3_bikes, request_at:) }
     let!(:ebike_rules_search) { FactoryBot.create(:logged_search, endpoint: :web_ebike_rules, request_at:) }
@@ -72,7 +73,7 @@ RSpec.describe Counts do
       expect(Counts.logged_searches(dates)).to eq(
         Date.current - 2.days => empty_counts,
         Date.yesterday => empty_counts.merge("web_bikebook" => 1),
-        Date.current => {"web_bikebook" => 1, "web_ebike_rules" => 1, "organized" => 1, "organized_serial" => 1,
+        Date.current => {"web_bikebook" => 1, "web_bikebook_comparison" => 1, "web_ebike_rules" => 1, "organized" => 1, "organized_serial" => 1,
                          "user" => 1, "user_serial" => 1, "web_marketplace" => 2}
       )
     end

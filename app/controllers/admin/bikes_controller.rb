@@ -8,7 +8,7 @@ module Admin
     # The Pages::Admin::Bikes::Tabs tabs show renders; the rest are other controllers' screens
     SHOW_TABS = %w[duplicates messages ownerships stickers recoveries impound].freeze
 
-    before_action :find_bike, only: %i[edit update show]
+    before_action :find_bike, only: %i[edit update show undelete]
     before_action :set_period, only: %i[index missing_manufacturer]
     around_action :set_reading_role, only: %i[index show missing_manufacturer]
 
@@ -90,6 +90,14 @@ module Admin
       end
     end
 
+    def undelete
+      # restore writes with update_columns, skipping the save callbacks
+      @bike.restore
+      CallbackJobs::AfterBikeSaveJob.perform_async(@bike.id)
+      flash[:success] = "#{@bike.type_titleize} un-deleted!"
+      redirect_to edit_admin_bike_url(@bike)
+    end
+
     def show
       @active_tab = params[:active_tab]
       return redirect_to(edit_admin_bike_path) unless SHOW_TABS.include?(@active_tab)
@@ -165,7 +173,7 @@ module Admin
     end
 
     def sortable_columns
-      %w[id owner_email manufacturer_id updated_by_user_at]
+      %w[id owner_email manufacturer_id updated_by_user_at occurred_at propulsion_type]
     end
 
     def permitted_parameters

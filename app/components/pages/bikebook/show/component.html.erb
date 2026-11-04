@@ -32,7 +32,7 @@
         <%= translation(".select_a_bike") %>
       </span>
 
-      <small id="vehicle-models-count" class="twless-strong"></small>
+      <small id="vehicle-models-count" class="less-strong"></small>
     </label>
 
     <div
@@ -56,7 +56,7 @@
 
         <%# Each chip's grip, cloned by bikebook/catalog's renderChips, which names its chip for %{name} %>
         <template data-chip-grip>
-          <%= render(UI::DragHandle::Component.new(controller: "bikebook--chip-reorder", label: "%{name}", html_class: "tw:mr-1")) %>
+          <%= render(UI::DragHandle::Component.new(controller: "bikebook--chip-reorder", label: "%{name}", html_class: "tw:mr-1 tw:inert:invisible")) %>
         </template>
       <% end %>
     </div>
@@ -64,8 +64,8 @@
     <%# Carded only around applied filters, the similar models' toggle then beneath it %>
     <div
       class="
-        tw:group/bar tw:peer/bar tw:mt-3 tw:flex tw:items-baseline
-        tw:gap-x-4
+        tw:group/bar tw:peer/bar tw:mt-3 tw:flex tw:flex-wrap
+        tw:items-baseline tw:gap-x-4 tw:gap-y-1
         tw:group-has-[[aria-controls=vehicle-filters][aria-expanded=true]]:hidden
         tw:has-[li]:rounded-lg tw:has-[li]:border
         tw:has-[li]:border-gray-200 tw:has-[li]:px-4 tw:has-[li]:py-2
@@ -425,9 +425,12 @@
       <div id="vehicle-viewers"></div>
     </template>
 
-    <div data-bikebook--page-target="page">
+    <%# A screen's height from the start, so what renders into it doesn't shove the footer out of view %>
+    <div class="tw:min-h-screen" data-bikebook--page-target="page">
       <%# Placeholder until the catalog loads %>
-      <div inert class="<%= placeholder_class %>"><%= search %></div>
+      <div inert class="<%= placeholder_class %>">
+        <%= placeholder_search(search) %>
+      </div>
 
       <div
         class="

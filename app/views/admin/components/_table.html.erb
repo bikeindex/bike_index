@@ -18,7 +18,7 @@
     <% end %>
 
     <% if component.serial_number.present? %>
-      <small class="d-block">serial: <%= component.serial_number %></small>
+      <small class="tw:block">serial: <%= component.serial_number %></small>
     <% end %>
   <% end %>
 
@@ -28,7 +28,7 @@
 
   <% table.column(label: "Type") do |component| %>
     <% if component.ctype_id == ctype_other_id %>
-      <span class="stolen-color"><%= component.ctype_other.presence || "-" %></span>
+      <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>"><%= component.ctype_other.presence || "-" %></span>
     <% else %>
       <%= component.ctype&.name %>
     <% end %>
@@ -40,7 +40,7 @@
   <% end %>
 
   <% table.column(sortable: "manufacturer_id") do |component| %>
-    <span class="<%= (component.manufacturer_id == manufacturer_other_id ? "stolen-color" : "") %>">
+    <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] if component.manufacturer_id == manufacturer_other_id %>">
       <%= component.mnfg_name %>
     </span>
   <% end %>

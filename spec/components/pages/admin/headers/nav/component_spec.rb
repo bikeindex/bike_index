@@ -11,9 +11,13 @@ RSpec.describe Pages::Admin::Headers::Nav::Component, type: :component do
     expect(component).not_to have_css("ul")
   end
 
-  # A caller whose items all render conditionally would otherwise get a bordered empty list
-  context "with a block rendering nothing" do
-    let(:component) { render_inline(described_class.new(title: "Manage Bikes")) { "\n  \n".html_safe } }
+  context "with items rendering nothing" do
+    let(:component) do
+      render_inline(described_class.new(title: "Manage Bikes")) do |nav|
+        nav.with_item { nil }
+        nav.with_item { "\n  \n".html_safe }
+      end
+    end
 
     it "renders no list" do
       expect(component).not_to have_css("ul")
@@ -22,8 +26,8 @@ RSpec.describe Pages::Admin::Headers::Nav::Component, type: :component do
 
   context "with a subtitle and items" do
     let(:component) do
-      render_inline(described_class.new(title: "Manage Bikes", subtitle: "Editing", border: false)) do
-        "<li><a href='/one'>One</a></li>".html_safe
+      render_inline(described_class.new(title: "Manage Bikes", subtitle: "Editing", border: false)) do |nav|
+        nav.with_item { "<a href='/one'>One</a>".html_safe }
       end
     end
 
