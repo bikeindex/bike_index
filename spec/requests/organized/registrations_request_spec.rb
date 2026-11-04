@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe Organized::RegistrationsController, type: :request do
   let(:base_url) { "/o/#{current_organization.to_param}/registrations" }
   include_context :request_spec_logged_in_as_organization_user
-  let(:enabled_feature_slugs) { %w[bike_search show_recoveries show_partial_registrations bike_stickers impound_bikes] }
+  let(:enabled_feature_slugs) { %w[show_recoveries show_partial_registrations bike_stickers impound_bikes] }
   let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
 
   describe "index" do
@@ -69,7 +69,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
     end
     describe "location search" do
       include_context :geocoder_stubbed_bounding_box
-      let(:enabled_feature_slugs) { %w[bike_search reg_address] }
+      let(:enabled_feature_slugs) { %w[reg_address] }
       let!(:bike) { FactoryBot.create(:bike_organized, :with_address_record, creation_organization: current_organization) }
       let!(:bike_chicago) do
         FactoryBot.create(:bike_organized, :with_address_record, address_in: :chicago, creation_organization: current_organization)
@@ -113,7 +113,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       end
     end
     describe "create_export" do
-      let(:enabled_feature_slugs) { %w[bike_search show_recoveries show_partial_registrations bike_stickers impound_bikes csv_exports] }
+      let(:enabled_feature_slugs) { %w[show_recoveries show_partial_registrations bike_stickers impound_bikes csv_exports] }
       let(:target_params) do
         {
           organization_id: current_organization.id,
@@ -243,7 +243,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       end
 
       context "with csv_exports" do
-        let(:enabled_feature_slugs) { %w[bike_search csv_exports] }
+        let(:enabled_feature_slugs) { %w[csv_exports] }
 
         it "doesn't create an export" do
           expect {
@@ -359,7 +359,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
     end
 
     context "with search_stickers, no impounded feature" do
-      let(:enabled_feature_slugs) { %w[bike_search show_recoveries show_partial_registrations bike_stickers] }
+      let(:enabled_feature_slugs) { %w[show_recoveries show_partial_registrations bike_stickers] }
       let!(:bike_with_sticker) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }
       let!(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, organization: current_organization, bike: bike_with_sticker) }
       let!(:bike_sticker_2) { FactoryBot.create(:bike_sticker_claimed, organization: current_organization, bike: non_organization_bike) }
@@ -424,20 +424,22 @@ RSpec.describe Organized::RegistrationsController, type: :request do
     context "organization without an invoice" do
       let(:current_organization) { FactoryBot.create(:organization) }
 
-      it "renders without search" do
+      it "renders the search" do
         expect(impounded_bike.reload.status).to eq "status_impounded"
         expect(current_organization.reload.is_invoiced?).to be_falsey
-        expect(Bike).to_not receive(:search)
         get base_url
         expect(response.status).to eq(200)
-        expect(response).to render_template :index
+        expect(response).to render_template :search
         expect(assigns(:current_organization)).to eq current_organization
+
+        get base_url, params: {search_no_js: true}
+        expect(response.status).to eq(200)
         expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, impounded_bike.id])
       end
     end
 
     context "sorted by registration sequence acknowledgment" do
-      let(:enabled_feature_slugs) { %w[bike_search registration_sequences show_partial_registrations] }
+      let(:enabled_feature_slugs) { %w[registration_sequences show_partial_registrations] }
       let(:registration_sequence) { FactoryBot.create(:registration_sequence_active, :with_pages, organization: current_organization) }
       let!(:bike_acknowledged_earlier) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }
       let!(:bike_acknowledged_later) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }
@@ -508,7 +510,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
     end
 
     context "with search_notes" do
-      let(:enabled_feature_slugs) { %w[bike_search registration_notes] }
+      let(:enabled_feature_slugs) { %w[registration_notes] }
       let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }
 
       before { FactoryBot.create(:bike_organization_note, bike:, body: "important note") }
@@ -526,35 +528,19 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         expect(assigns(:bikes).pluck(:id)).to eq([])
       end
     end
-    context "claimed_ownerships without bike_search" do
-      let(:enabled_feature_slugs) { %w[claimed_ownerships] }
-
-      it "renders the claimedness dropdown defaulting to all, and filters by it" do
-        get base_url
-        expect(response.status).to eq(200)
-        expect(response).to render_template :index
-        expect(assigns(:search_claimedness)).to eq "all"
-        expect(assigns(:bikes).pluck(:id)).to match_array([bike.id])
-
-        get base_url, params: {search_claimedness: "initial"}
-        expect(response.status).to eq(200)
-        expect(assigns(:search_claimedness)).to eq "initial"
-        expect(assigns(:bikes).pluck(:id)).to match_array([bike.id])
-      end
-    end
-    context "bike_stickers without bike_search" do
+    context "bike_stickers" do
       let(:enabled_feature_slugs) { %w[bike_stickers] }
       let!(:claimed_sticker) { FactoryBot.create(:bike_sticker_claimed, organization: current_organization, bike:) }
       let(:unclaimed_sticker) { FactoryBot.create(:bike_sticker, organization: current_organization) }
 
       it "renders the sticker columns" do
-        get base_url, params: {bike_sticker: unclaimed_sticker.code}
+        get base_url, params: {search_no_js: true, bike_sticker: unclaimed_sticker.code}
         expect(response.status).to eq(200)
-        expect(response).to render_template :index
+        expect(response).to render_template :search
         expect(assigns(:bike_sticker)).to eq unclaimed_sticker
         expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
         expect(response.body).to include(claimed_sticker.pretty_code)
-        expect(response.body).to include(CGI.escapeHTML(bike_sticker_path(id: unclaimed_sticker.code, organization_id: current_organization.id, bike_id: bike.id)))
+        expect(response.body).to include(CGI.escapeHTML(bike_sticker_path(id: unclaimed_sticker.code, organization_id: current_organization.id)))
       end
     end
     context "unsupported format" do
@@ -1080,7 +1066,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       it "renders, assigning the organization" do
         get base_url
         expect(response.status).to eq(200)
-        expect(response).to render_template :index
+        expect(response).to render_template :search
         expect(assigns(:current_organization)).to eq current_organization
         expect(assigns(:passive_organization)).to eq current_organization
         expect(assigns(:page_id)).to eq "organized_registrations_index"

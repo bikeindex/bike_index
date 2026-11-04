@@ -10,7 +10,7 @@ RSpec.describe Pages::Org::Search::ColumnSettings::Component, type: :component d
     end
   end
   let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs:) }
-  let(:enabled_feature_slugs) { %w[bike_search csv_exports] }
+  let(:enabled_feature_slugs) { %w[csv_exports] }
   let(:settings) { ComponentStructs::OrgSearchSettings.new(organization:) }
 
   describe ".column_settings_data_attributes" do
@@ -46,7 +46,7 @@ RSpec.describe Pages::Org::Search::ColumnSettings::Component, type: :component d
   end
 
   context "with the impound records search" do
-    let(:enabled_feature_slugs) { %w[bike_search impound_bikes] }
+    let(:enabled_feature_slugs) { %w[impound_bikes] }
 
     it "copies the impound records search's column order" do
       expect(component).to have_css("button[data-ui--table-column-order-target='copy'][data-storage-key='orgImpoundColumnsOrder']",
@@ -76,7 +76,7 @@ RSpec.describe Pages::Org::Search::ColumnSettings::Component, type: :component d
   end
 
   context "with impound settings" do
-    let(:enabled_feature_slugs) { %w[bike_search impound_bikes] }
+    let(:enabled_feature_slugs) { %w[impound_bikes] }
     let(:settings) { ComponentStructs::OrgSearchSettings.new(organization:, impound: true) }
 
     it "lists the impound columns under their own heading, on by default, and copies the registrations search's order" do

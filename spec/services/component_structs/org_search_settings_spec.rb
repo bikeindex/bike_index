@@ -5,7 +5,7 @@ require "rails_helper"
 RSpec.describe ComponentStructs::OrgSearchSettings do
   let(:instance) { described_class.new(**options) }
   let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs:) }
-  let(:enabled_feature_slugs) { %w[bike_search] }
+  let(:enabled_feature_slugs) { [] }
   let(:search_stickers) { nil }
   let(:search_address) { nil }
   let(:search_status) { "all" }
@@ -167,7 +167,7 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
     end
 
     context "with bike_stickers enabled" do
-      let(:enabled_feature_slugs) { %w[bike_search bike_stickers] }
+      let(:enabled_feature_slugs) { %w[bike_stickers] }
 
       it "includes sticker_cell" do
         expect(instance.initially_checked_columns).to include("sticker_cell")
@@ -176,7 +176,7 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
   end
 
   describe "column_renames" do
-    let(:enabled_feature_slugs) { %w[bike_search reg_student_id] }
+    let(:enabled_feature_slugs) { %w[reg_student_id] }
 
     it "names the organization in its own columns" do
       expect(instance.column_renames[:color_cell]).to eq "Color"
@@ -194,14 +194,14 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
   end
 
   describe "enabled_columns" do
-    let(:enabled_feature_slugs) { %w[bike_search impound_bikes] }
+    let(:enabled_feature_slugs) { %w[impound_bikes] }
 
     it "adds the feature's columns" do
       expect(instance.enabled_columns).to include("impound_id_cell", "url_cell")
     end
 
     context "without impound_bikes" do
-      let(:enabled_feature_slugs) { %w[bike_search] }
+      let(:enabled_feature_slugs) { [] }
 
       it "doesn't include the impound columns" do
         expect(instance.enabled_columns).to_not include("impound_id_cell")
@@ -210,7 +210,7 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
   end
 
   describe "filter_groups" do
-    let(:enabled_feature_slugs) { %w[bike_search bike_stickers reg_address impound_bikes] }
+    let(:enabled_feature_slugs) { %w[bike_stickers reg_address impound_bikes] }
     let(:search_status) { "impounded" }
 
     it "returns a group per enabled filter, carrying the searched value" do
@@ -225,7 +225,7 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
     end
 
     context "with no optional features" do
-      let(:enabled_feature_slugs) { %w[bike_search] }
+      let(:enabled_feature_slugs) { [] }
       let(:search_status) { "all" }
 
       it "returns only the ungated ones, without the impound statuses" do
@@ -239,7 +239,7 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
   end
 
   describe "export_disabled?" do
-    let(:enabled_feature_slugs) { %w[bike_search csv_exports] }
+    let(:enabled_feature_slugs) { %w[csv_exports] }
 
     it "is true once the search reaches past the organization, which still renders the export" do
       expect(instance.export_disabled?).to be false

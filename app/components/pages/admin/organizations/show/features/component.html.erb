@@ -21,13 +21,6 @@
   <% end %>
 
   <% if @organization.is_invoiced? %>
-    <% list.with_row(label: "Bike Search") do %>
-      <% if @organization.enabled?("bike_search") %>
-        Yes
-      <% else %>
-        <small class="twless-strong">no</small>
-      <% end %>
-    <% end %>
     <% list.with_row(label: "Templates") do %>
       <% if @organization.mail_snippets.any? %>
         <%= @organization.mail_snippets.pluck(:kind).to_sentence %>

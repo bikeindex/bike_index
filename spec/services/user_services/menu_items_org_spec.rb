@@ -51,8 +51,8 @@ RSpec.describe UserServices::MenuItemsOrg do
       let(:target) do
         [
           group_item(:registrations, "#{organization.short_name} Registrations", "bike", [
-            link_item("Organization Registrations", "/o/#{organization.to_param}/registrations"),
-            link_item("Search all registrations", "/search/registrations?stolenness=all")
+            link_item("Search Registrations", "/o/#{organization.to_param}/registrations"),
+            link_item("Multi search", "/o/#{organization.to_param}/registrations/multi_search")
           ]),
           link_item("Add a registration", "/o/#{organization.to_param}/registrations/new",
             icon: "plus-circle", match_params: {parking_notification: nil})

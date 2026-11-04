@@ -232,7 +232,7 @@ RSpec.describe Invoice, type: :model do
   end
 
   describe "two invoices" do
-    let(:organization_feature1) { FactoryBot.create(:organization_feature, feature_slugs: ["bike_search"]) }
+    let(:organization_feature1) { FactoryBot.create(:organization_feature, feature_slugs: ["csv_exports"]) }
     let(:organization_feature2) { FactoryBot.create(:organization_feature, feature_slugs: ["extra_registration_number"]) }
     let(:invoice1) { FactoryBot.create(:invoice, amount_due_cents: 0, subscription_start_at: Time.current - 1.week) }
     let(:organization) { invoice1.organization }
@@ -244,7 +244,7 @@ RSpec.describe Invoice, type: :model do
 
       organization.update(updated_at: Time.current)
       organization.reload
-      expect(organization.enabled_feature_slugs).to eq(["bike_search"])
+      expect(organization.enabled_feature_slugs).to eq(["csv_exports"])
       expect(organization.is_invoiced?).to be_truthy
       expect(organization.paid_money?).to be_falsey
 
@@ -259,7 +259,7 @@ RSpec.describe Invoice, type: :model do
 
       organization.update(updated_at: Time.current)
       organization.reload
-      expect(organization.enabled_feature_slugs).to match_array %w[bike_search extra_registration_number]
+      expect(organization.enabled_feature_slugs).to match_array %w[csv_exports extra_registration_number]
       expect(organization.is_invoiced?).to be_truthy
       expect(organization.paid_money?).to be_truthy
     end

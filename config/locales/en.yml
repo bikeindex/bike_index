@@ -4332,18 +4332,6 @@ en:
         sent: Sent
         through_org: through %{org_name}
         vehicle_type: Type
-      list:
-        added: Added
-        bike: bike
-        color: Color
-        link: Link
-        manufacturer: Manufacturer
-        model: Model
-        num_bikes_registered_html: "<strong>%{num_bikes}</strong> registered"
-        sent_to: Sent to
-        sent_to_a_new_owner: sent to a new owner
-        sticker: Sticker
-        stickers: Stickers
       new:
         registration_form_settings: Registration form settings
       recoveries:

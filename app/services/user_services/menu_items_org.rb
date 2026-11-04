@@ -86,7 +86,7 @@ module UserServices
         *registrations_links(organization),
         enabled_link(organization, "show_partial_registrations", translation(:incomplete_registrations),
           routes.incompletes_organization_bikes_path(organization.to_param)),
-        enabled_link(organization, "bike_search", translation(:multi_search),
+        ComponentStructs::Shapes.link(translation(:multi_search),
           routes.multi_search_organization_registrations_path(organization.to_param)),
         enabled_link(organization, "show_recoveries", translation(:recoveries),
           routes.recoveries_organization_bikes_path(organization.to_param)),

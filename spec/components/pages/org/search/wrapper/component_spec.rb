@@ -10,7 +10,7 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
     end
   end
   let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs:) }
-  let(:enabled_feature_slugs) { %w[bike_search] }
+  let(:enabled_feature_slugs) { [] }
   let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
   let(:pagy) { Pagy::Offset.new(count: 25, page: 1, limit: 10) }
   let(:search_stickers) { nil }
@@ -77,7 +77,7 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
     end
 
     context "with csv_exports enabled" do
-      let(:enabled_feature_slugs) { %w[bike_search csv_exports] }
+      let(:enabled_feature_slugs) { %w[csv_exports] }
 
       it "renders no export" do
         expect(component).to have_css("ul li", text: bike.mnfg_name)
@@ -132,7 +132,7 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
     end
 
     context "with csv_exports enabled" do
-      let(:enabled_feature_slugs) { %w[bike_search csv_exports] }
+      let(:enabled_feature_slugs) { %w[csv_exports] }
 
       it "renders no export, since this page's params aren't a search of what's shown" do
         expect(component).not_to have_text("Export CSV")
@@ -141,7 +141,7 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
   end
 
   context "with impound_bikes enabled" do
-    let(:enabled_feature_slugs) { %w[bike_search impound_bikes] }
+    let(:enabled_feature_slugs) { %w[impound_bikes] }
 
     it "renders impound columns" do
       expect(component).to have_css("th.impound_id_cell", visible: :all, text: "Impound ID")
@@ -149,7 +149,7 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
   end
 
   context "with search_all" do
-    let(:enabled_feature_slugs) { %w[bike_search csv_exports] }
+    let(:enabled_feature_slugs) { %w[csv_exports] }
     let(:options) { super().merge(search_all: true) }
 
     it "disables the export, which would reach past the organization, and says why" do
@@ -199,7 +199,7 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
   end
 
   context "with csv_exports enabled" do
-    let(:enabled_feature_slugs) { %w[bike_search csv_exports] }
+    let(:enabled_feature_slugs) { %w[csv_exports] }
 
     it "renders the export in the header, beside the column settings button" do
       expect(component).to have_link("Export CSV", visible: :all)
@@ -208,7 +208,7 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
   end
 
   context "when bike does not belong to the organization" do
-    let(:enabled_feature_slugs) { %w[bike_search reg_phone reg_extra_registration_number bike_stickers] }
+    let(:enabled_feature_slugs) { %w[reg_phone reg_extra_registration_number bike_stickers] }
     let(:other_org) { FactoryBot.create(:organization) }
     let(:bike) do
       FactoryBot.create(:bike_organized,
