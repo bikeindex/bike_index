@@ -3,19 +3,9 @@
 <% rule = "tw:border-gray-200 tw:dark:border-gray-700" %>
 
 <section class="tw:border-b <%= rule %>">
-  <div
-    class="
-      tw:grid tw:grid-cols-[repeat(auto-fit,minmax(min(100%,340px),1fr))] tw:items-start tw:gap-x-10 tw:gap-y-6 tw:pt-8 tw:pb-7
-      <%= container %>
-    "
-  >
+  <div class="twwiderow tw:items-start tw:gap-y-6 tw:pt-8 tw:pb-7 <%= container %>">
     <div class="tw:flex tw:flex-col tw:gap-3">
-      <p
-        class="
-          tw:m-0 tw:text-xs tw:font-extrabold tw:tracking-widest
-          tw:text-[#cc0000] tw:uppercase
-        "
-      >
+      <p class="tw:m-0 <%= SharedBlocks::Marketing::SectionHeading::Component.eyebrow_classes(:red) %>">
         <%= translation(".recovery_stories") %>
       </p>
 
@@ -51,20 +41,8 @@
 </section>
 
 <section class="tw:pt-9 tw:pb-18 <%= container %>">
-  <div
-    class="
-      tw:mb-5.5 tw:flex tw:flex-wrap tw:items-baseline tw:justify-between
-      tw:gap-x-6 tw:gap-y-1.5
-    "
-  >
-    <h2 class="tw:text-[28px] <%= h2_classes %>">
-      <%= translation(".in_their_own_words") %>
-    </h2>
-
-    <p class="tw:m-0 tw:text-[15px] <%= muted %>">
-      <%= translation(".shared_by_the_person") %>
-    </p>
-  </div>
+  <%= render(SharedBlocks::Marketing::SectionHeading::Component.new(heading: translation(".in_their_own_words"),
+    intro: translation(".shared_by_the_person"), html_class: "tw:mb-5.5")) %>
 
   <div
     class="
@@ -77,12 +55,7 @@
 </section>
 
 <section id="fund-the-next-recovery" class="tw:bg-blue-600 tw:text-white">
-  <div
-    class="
-      tw:grid tw:grid-cols-[repeat(auto-fit,minmax(min(100%,440px),1fr))] tw:items-center tw:gap-x-16 tw:gap-y-12 tw:py-18
-      <%= container %>
-    "
-  >
+  <div class="twwiderow tw:items-center tw:gap-x-16 tw:gap-y-12 tw:py-18 <%= container %>">
     <div class="tw:flex tw:flex-col tw:items-start tw:gap-4.5">
       <%= image_tag("kelsey/illustrations/comic-assets_bike-love-1.png", alt: "",
         class: "tw:block tw:h-auto tw:w-30") %>
@@ -101,19 +74,14 @@
       </p>
     </div>
 
-    <div
-      class="
-        tw:flex tw:flex-col tw:gap-4 tw:rounded-lg tw:bg-white tw:p-7
-        tw:text-slate-900 tw:shadow-lg tw:dark:bg-gray-800
-        tw:dark:text-gray-100
-      "
-    >
+    <%= render(UI::Card::Component.new(shadow: :large,
+      additional_classes: "tw:flex tw:flex-col tw:gap-4 tw:p-7! tw:text-slate-900 tw:dark:text-gray-100")) do %>
       <h3 class="tw:text-2xl <%= h2_classes %>">
         <%= translation(".fund_the_next_recovery") %>
       </h3>
 
       <%= render(@form) %>
-    </div>
+    <% end %>
   </div>
 </section>
 
