@@ -154,6 +154,11 @@ scratch file when you're done. Two things this buys that reasoning doesn't: it
 distinguishes "the event never arrived" from "the event arrived and the assertion
 misread it", and it tells you *when* things happened, which is usually the answer.
 
+A click that succeeds on a retry reports nothing, and `DEBUG=pw:api` doesn't reach Ruby's stderr. Its
+action log is in a trace: `context.tracing.start(snapshots: false, screenshots: false)` before the click,
+`tracing.stop(path:)` after, then the `log` events in the zip's `trace.trace`. Keep only the traces from
+failing runs, as the failure can be rare.
+
 ### 4. Try to reproduce, and treat failure-to-reproduce as information
 
 ```bash
@@ -320,6 +325,12 @@ retry_on_detach { first(".bike-box-item .title-link a").click }
 `Playwright::Error` for a detached node, which Capybara's own retry does not.
 This is *not* a coverage reduction: the assertions are untouched, the click just
 happens on a DOM that has stopped moving.
+
+**A retried click moves the scroller it's in.** Each retry scrolls the target first — `inline: "end"`,
+then center, then start — so a click that finds its link `not stable` shifts the row before any mouse
+event, and `snap-mandatory` can carry it further. It reads as the app losing a scroll position. A hover
+transition left by a parked pointer is one source: `settle_animations` on the element that transitions,
+then click. `expect_sideways_cards` in `spec/integration/bikebook_spec.rb` is the pattern.
 
 **A probe that measures itself instead of the app.** When a spec observes
 behaviour by listening for an event, check whether what it reads is a property of
