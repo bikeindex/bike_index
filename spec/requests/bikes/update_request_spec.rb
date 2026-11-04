@@ -107,7 +107,7 @@ RSpec.describe "BikesController#update", type: :request do
         bike.reload
         expect(bike.address_record).to have_attributes(target_address_record_attributes)
         expect(bike.address_set_manually).to be_truthy
-        expect(bike.registration_address).to match_hash_indifferently(target_address_record_attributes.slice(:latitude, :longitude))
+        expect(bike.registration_address_record).to have_attributes(target_address_record_attributes.slice(:latitude, :longitude))
         # NOTE: There is an issue with coordinate precision locally vs on CI. It isn't relevant, so bypassing
         expect(bike.latitude).to be_within(0.01).of(53.5183351)
         expect(bike.longitude).to be_within(0.01).of(-113.5015663)

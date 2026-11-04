@@ -46,7 +46,7 @@ module Admin
     protected
 
     def permitted_parameters
-      params.require(:bulk_import).permit(:organization_id, :file, :no_notify, :no_duplicate)
+      params.require(:bulk_import).permit(:organization_id, :file, :no_notify, :allow_duplicate)
     end
 
     def default_period

@@ -6,8 +6,7 @@ RSpec.describe Pages::Memberships::New::Component, type: :component do
   let(:instance) { described_class.new(**options) }
   let(:component) { render_inline(instance) }
   let(:options) do
-    {stripe_prices:, level:, bikes_count: 1_234_567, recoveries_count: 18_263, recoveries_value: 38_412_345,
-     organizations_count: 1_000, recovery_displays:, referral_source: "donate"}
+    {stripe_prices:, level:, bikes_count: 1_234_567, recovery_displays:, referral_source: "donate"}
   end
   let(:currency_enum) { "usd" }
   let(:stripe_prices) do
@@ -21,10 +20,8 @@ RSpec.describe Pages::Memberships::New::Component, type: :component do
 
   it "renders the plans with plus selected" do
     expect(component).to have_css("h1", text: "Keep Bike Index free for every rider")
-    expect(component).to have_text("1.2M+")
     expect(component).to have_css("h2", text: "1.2 million bikes are registered. Members keep it free for the next million.")
-    expect(component).to have_text("18,263")
-    expect(component).to have_text("$38M+")
+    expect(component).to have_css("dl dd", count: 4)
     expect(component).to have_text("Plans from $5 a month")
     expect(component).to have_checked_field("membership_level_plus", visible: :all)
     expect(component).to have_checked_field("membership_set_interval_monthly", visible: :all)
@@ -35,7 +32,7 @@ RSpec.describe Pages::Memberships::New::Component, type: :component do
     expect(component).to have_css("[data-ui--collapse-target='content']", count: 5, visible: :all)
     expect(component).to have_css("[data-ui--collapse-target='content']:not(.tw\\:hidden)", count: 1, visible: :all)
     expect(component).to have_link("Or make a one-time donation", href: "/donate")
-    expect(component).to_not have_link("Read more recovery stories")
+    expect(component).to have_link("Read more recovery stories", href: "/recovery_stories")
 
     labels = JSON.parse(component.css("#membership_level_patron").first["data-labels"])
     expect(labels).to eq({"monthly" => {"summary" => "Patron membership, $50 a month", "join" => "Join as Patron — $50/mo"},
@@ -63,7 +60,6 @@ RSpec.describe Pages::Memberships::New::Component, type: :component do
     let(:options) { super().merge(bikes_count: 2_000_999) }
 
     it "drops the decimal" do
-      expect(component).to have_text("2M+")
       expect(component).to have_css("h2", text: "2 million bikes are registered.")
     end
   end
@@ -72,7 +68,6 @@ RSpec.describe Pages::Memberships::New::Component, type: :component do
     let(:options) { super().merge(bikes_count: 456_789) }
 
     it "shows the whole count" do
-      expect(component).to have_text("456,789+")
       expect(component).to have_css("h2", text: "456,789 bikes are registered.")
     end
   end

@@ -27,9 +27,10 @@ RSpec.describe "Admin cycle types", :js, type: :system do
     bike = headers.index { it.start_with?("Bike bike") }
     expect(headers[bike + 1, 2]).to eq ["Bike bike type detail: step_through", "Bike bike type detail: bench_seat"]
     expect(headers[headers.index { it.start_with?("Tricycle tricycle") } + 1]).to eq "Tricycle tricycle type detail: tadpole"
+    expect(headers[headers.index { it.start_with?("Tandem tandem") } + 1]).to start_with "Tandem tandem type detail: step_through"
 
     # typical, and its example model from the catalog, in the size BikeBook first shows it in
-    within(row("type detail: step_through")) do
+    within(row(/\bbike\s+type detail: step_through/)) do
       expect(page).to have_css("svg[role='img']", count: 2, wait: 10)
       expect(page).to have_link(href: %r{vehicle_models=m/aventon/2026/level_4_rec_step_through&(vehicle_sizes=[^&]+&)?view=geometry})
     end
@@ -40,7 +41,7 @@ RSpec.describe "Admin cycle types", :js, type: :system do
     end
     expect(page).to have_text("m/sun/2022/miami_sun_traditional_24_step_thru isn't in the published catalog yet")
 
-    within(row("type detail: step_through")) do
+    within(row(/\bbike\s+type detail: step_through/)) do
       typical = first("[data-controller='admin--cycle-drawing']")
       within(typical) do
         expect(page).to have_button("Reset", disabled: true)

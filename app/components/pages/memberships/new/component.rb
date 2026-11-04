@@ -9,15 +9,11 @@ module Pages
         MONTHLY_ONLY = "tw:group-has-[[value=yearly]:checked]/membership:hidden"
         YEARLY_ONLY = "tw:hidden tw:group-has-[[value=yearly]:checked]/membership:inline"
 
-        def initialize(stripe_prices:, bikes_count:, recoveries_count:, recoveries_value:, organizations_count:,
-          recovery_displays:, level: nil, referral_source: nil, membership: nil)
+        def initialize(stripe_prices:, bikes_count:, recovery_displays:, level: nil, referral_source: nil, membership: nil)
           @currency = stripe_prices.first&.currency_obj || Currency.default
           @amounts = stripe_prices.to_h { [[it.membership_level.to_sym, it.interval.to_sym], it.amount_cents] }
           @bikes_count = bikes_count
-          @recoveries_count = recoveries_count
-          @recoveries_value = recoveries_value
-          @organizations_count = organizations_count
-          @recovery_displays = recovery_displays.first(4)
+          @recovery_displays = recovery_displays
           @referral_source = referral_source
           @membership = membership
           @level = Membership::LEVEL_ENUM.key?(level&.to_sym) ? level.to_sym : :plus
@@ -45,27 +41,12 @@ module Pages
           number_with_precision(@bikes_count / 1_000_000.0, precision: 1, round_mode: :floor, strip_insignificant_zeros: true)
         end
 
-        def bikes_display
-          return safe_join([number_display(@bikes_count), "+"]) if @bikes_count < 1_000_000
-
-          "#{bikes_millions}M+"
-        end
-
         def members_keep_it_free
           if @bikes_count < 1_000_000
             return translation(".bikes_registered_keep_it_free", bikes: number_with_delimiter(@bikes_count))
           end
 
           translation(".millions_registered_keep_it_free", millions: bikes_millions)
-        end
-
-        def stats
-          [{value: bikes_display, label: translation(".bikes_registered")},
-            {value: number_display(@recoveries_count), label: translation(".stolen_bikes_recovered")},
-            {value: render(Atoms::CurrencyMillions::Component.new(dollars_usd: @recoveries_value)),
-             label: translation(".value_returned_to_owners")},
-            {value: safe_join([number_display(@organizations_count), "+"]),
-             label: translation(".partner_organizations")}]
         end
 
         def tiers
@@ -121,13 +102,7 @@ module Pages
             [translation(".faq_gear_question"), translation(".faq_gear_answer")]]
         end
 
-        def section_inner = "tw:mx-auto tw:max-w-6xl tw:px-5 tw:py-8 tw:lg:px-14 tw:lg:py-14"
-
-        def eyebrow_classes = "tw:text-[11.5px] tw:font-extrabold tw:tracking-widest tw:uppercase"
-
-        def h2_classes = "tw:m-0 tw:font-header tw:text-[26px] tw:font-extrabold tw:text-slate-900 tw:lg:text-[34px]"
-
-        def h3_classes = "tw:m-0 tw:font-header tw:text-[24px] tw:leading-tight tw:font-extrabold tw:text-slate-900 tw:lg:text-[30px]"
+        def section_inner = "#{SharedBlocks::Marketing::Wrapper::Component::CONTAINER_CLASSES} tw:py-8 tw:lg:py-14"
       end
     end
   end

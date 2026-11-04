@@ -10,7 +10,7 @@
       <%= link_to assignment.organization_name,
         admin_ambassador_task_assignments_path(sort_state.search_params.merge(search_organization_id: assignment.organization.id)), class: "twlink" %>
     <% else %>
-      <small class="text-danger">missing org</small>
+      <small class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">missing org</small>
     <% end %>
   <% end %>
 
@@ -24,7 +24,7 @@
       <%= link_to assignment.ambassador_name,
         admin_ambassador_task_assignments_path(sort_state.search_params.merge(search_ambassador_id: assignment.user_id)), class: "twlink" %>
     <% else %>
-      <small class="text-danger">missing ambassador</small>
+      <small class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">missing ambassador</small>
     <% end %>
   <% end %>
 <% end %>

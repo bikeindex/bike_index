@@ -1,36 +1,20 @@
-<table
-  class="
-    table table-striped table-bordered table-sm without-exterior-border
-    tw:mb-8
-  "
->
-  <thead class="small-header">
-    <tr>
-      <% if show_with_pos_counts? %>
-        <th>Active POS at start</th>
-        <th>Active POS at end</th>
-      <% else %>
-        <th>Matching statuses at start</th>
-        <th>Matching statuses at end</th>
-      <% end %>
-    </tr>
-  </thead>
+<%= render(UI::Table::Component.new(records: [[start_count, end_count]], classes: "tw:mb-8")) do |table| %>
+  <% table.column(label: show_with_pos_counts? ? "Active POS at start" : "Matching statuses at start") do |(start, _end)| %>
+    <%= number_display(start) %>
+  <% end %>
 
-  <tbody>
-    <tr>
-      <td><%= number_display(start_count) %></td>
-      <td><%= number_display(end_count) %></td>
-    </tr>
-  </tbody>
-</table>
+  <% table.column(label: show_with_pos_counts? ? "Active POS at end" : "Matching statuses at end") do |(_start, finish)| %>
+    <%= number_display(finish) %>
+  <% end %>
+<% end %>
 
 <% unless @ended %>
-  <h4 class="mt-4">POS kinds <code>start_at</code></h4>
+  <%= render(UI::Header::Component.new(text: safe_join(["POS kinds ", render(UI::Code::Inline::Component.new(text: "start_at"))]), tag: :h3)) %>
   <%= render(UI::Chart::Component.new(series: pos_kinds_start_counts, time_range: @time_range, stacked: true, colors: start_colors)) %>
 <% end %>
 
 <% unless @current %>
-  <h4 class="mt-4">POS kinds <code>end_at</code></h4>
+  <%= render(UI::Header::Component.new(text: safe_join(["POS kinds ", render(UI::Code::Inline::Component.new(text: "end_at"))]), tag: :h3, html_class: "tw:mt-6")) %>
   <%= render(UI::Chart::Component.new(series: pos_kinds_end_counts, time_range: @time_range, stacked: true, colors: end_colors)) %>
 <% end %>
 

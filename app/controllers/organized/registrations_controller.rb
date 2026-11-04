@@ -152,12 +152,6 @@ module Organized
       SORTABLE_COLUMNS
     end
 
-    # The frame asking, with no render_chart gate: the card always loads, and the scope links
-    # put this URL in the address bar, where a reload has to be the whole page
-    def chart_only?
-      turbo_frame_request_id == Pages::Org::Search::ChartCard::Component::FRAME_ID.to_s
-    end
-
     def chart_card_component
       Pages::Org::Search::ChartCard::Component.new(scope: @chart_scope, scope_paths: chart_scope_paths,
         chart: registrations_chart, stats: registrations_stats)
@@ -205,7 +199,8 @@ module Organized
         time_range: chart_time_range,
         colors: Pages::Org::Search::ChartCard::Component::BANDS.values.map { it[:hex] },
         height: Pages::Org::Search::ChartCard::Component::CHART_HEIGHT,
-        stacked: true
+        stacked: true,
+        skip_legend_counts: true
       )
     end
 

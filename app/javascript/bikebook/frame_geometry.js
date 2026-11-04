@@ -16,7 +16,7 @@ export const leg = (hypotenuse, side) => Math.sqrt(Math.max(hypotenuse ** 2 - si
 export const builtWheel = (data, size, position) => array(data.wheels).find((each) => each.configured !== false &&
   array(each.position).includes(position) && (!each.sizes || array(each.sizes).includes(size?.name)))
 
-export const OVERALL_LENGTH_ESTIMATE = 'the wheelbase plus each wheel’s radius, estimating its tire based on its width'
+export const OVERALL_LENGTH_ESTIMATE = 'the wheelbase plus each wheel’s radius, calculating the tire height from its width'
 
 // A wheel's outside radius where it lists its bead seat and tire, estimating the tire as tall as it's wide
 export const outerRadius = (wheel) => isNumber(wheel?.bsd) && isNumber(wheel?.tire_width) ? wheel.bsd / 2 + wheel.tire_width : null

@@ -18,7 +18,7 @@ export default class extends Controller {
     this.noSerialTargets.filter((checkbox) => checkbox !== target).forEach((checkbox) => { checkbox.checked = false })
 
     this.serialTarget.value = target.checked ? target.dataset.serial : this.originalSerialValue
-    this.serialTarget.classList.toggle('fake-disabled', target.checked)
+    this.serialTarget.toggleAttribute('data-no-serial', target.checked)
   }
 
   // collapseField rather than collapse: hiding alone leaves a reason someone typed and

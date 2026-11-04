@@ -31,7 +31,8 @@ module SharedBlocks
         # which naming no match_params gets: the stolenness this happens to link to isn't compared
         def side_items(side)
           [{label: translation(".search"), path: helpers.default_bike_search_path},
-            {label: translation(".marketplace"), path: search_marketplace_path},
+            {label: translation(".marketplace"), path: search_marketplace_path,
+             match_paths: [search_marketplace_path, marketplace_how_it_works_path]},
             register_item(side)]
             .map { it.merge(item_class: SIDE_CLASSES.fetch(side)) }
         end

@@ -1,4 +1,4 @@
-<h1>Possible duplicate bikes</h1>
+<%= render(Pages::Admin::Headers::Nav::Component.new(title: "Possible duplicate bikes")) %>
 
 <%= render(Atoms::Admin::PaginationWithCount::Component.new(collection: @duplicate_groups, index: admin_index_state, count: @duplicate_groups_count)) %>
 

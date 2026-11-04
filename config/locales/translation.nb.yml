@@ -1769,13 +1769,11 @@ nb:
       you_have_claimed_the_maximum_permitted: Du har gjort krav på det maksimalt tillatte
         antallet sykkelkoder.
     show:
-      change_the_bike_sticker_linked_to: Endre sykkelen den kobler til
       contact_the_owner: Kontakt eieren
       created_to_record_parking_notification: opprettet av %{organization} for å registrere
         et parkeringsvarsel
       from: fra
       in: i
-      is_this_linked_to_incorrect_bike: Er dette klistremerket knyttet til feil sykkel?
       know_something_about_this_bike_type: Vet du noe om dette %{bike_type}?
       link_url: Link url
       looking_for_correct_owner: Ser etter riktig eier av denne %{bike_type}!
@@ -1785,15 +1783,11 @@ nb:
       send_message: Sende melding
       share_it: Del det!
       spread_the_word: Spre ordet!
-      switch_to_new_bike_id: Bytt til en ny sykkel-ID
       test_registration: prøveregistrering
-      update: Oppdater
       view_users_other_registrations: Se brukerens andre registreringer
       where_did_you_see_this_bike: Hvor så du dette %{bike_type}? Hvis du kontakter
         om en annonse du fant på nettet, inkluderer du en lenke i feltet nedenfor
       write_them_a_message: Skriv en melding til dem
-      you_scanned_this_sticker_html: Du skannet klistremerket <strong>%{pretty_code}</strong>
-        , som er tilordnet denne %{bike_type}.
       view_public_non_listing: Se offentlig registrering
       viewing_listing_preview: Dette er en forhåndsvisning av annonsen din som er
         «til salgs». Den er ikke offentlig synlig.
@@ -1837,6 +1831,25 @@ nb:
     stolen_map:
       unavailable: Kartet kunne ikke lastes inn – nettleseren eller enheten din støtter
         det kanskje ikke.
+    owner_bike_status_alerts:
+      address: Adresse
+      by: Av
+      created: Opprettet
+      current_notifications:
+        one: "%{count} gjeldende varsel for denne %{bike_type}!"
+        other: "%{count} nåværende varsler for denne %{bike_type}!"
+      currently_impounded: Din %{bike_type} er for øyeblikket beslaglagt!
+      have_you_retrieved: Har du hentet denne %{bike_type}?
+      impounded_by_from_html: Beslaglagt %{time} av <strong>%{organization}</strong>
+        fra %{address}
+      impounded_by_html: Beslaglagt %{time} av <strong>%{organization}</strong>
+      kind: Snill
+      kind_by_organization_html: "- <em>%{kind}</em> - av <strong>%{organization}</strong>"
+      let_organization_know: Gi beskjed til %{organization}
+      mark_retrieved: marker hentet
+      notification: Melding#
+      notification_number: 'Varsel #%{number}'
+      was_this_retrieved: Ble denne %{bike_type} hentet?
   bikes_edit:
     accessories:
       add_a_component: Legg til en komponent
@@ -2153,12 +2166,12 @@ nb:
           bike_recovered: Sykkel merket gjenvunnet! Takk skal du ha!
       resolve_token:
         marked_remaining: "%{bike_type} merket gjenværende!"
-        marked_retrieved: "%{@bike_type} merket hentet!"
         notification_already_retrieved: At %{bike_type} allerede er merket som hentet!
         notification_impounded: At %{bike_type} har blitt beslaglagt! Kontakt %{org_name}
           for å hente den.
         unable_to_find_graduated_notification: Finner ikke det uteksaminerte varselet!
         unable_to_find_parking_notification: Finner ikke parkeringsvarselet!
+        bike_type_marked_retrieved: "%{bike_type} markert som hentet!"
       scanned:
         unable_to_find_sticker: 'Kan ikke finne klistremerke: %{scanned_id}'
       update:
@@ -3848,9 +3861,6 @@ nb:
       help_prevent_theft: Bidra til å forhindre sykkeltyveri,
       make_a_donation: gi en donasjon.
       the_bike_index_team: Sykkelindeksteamet
-    embed_layout:
-      error: feil
-      please_fix_the_following: Rett opp følgende
     payments_layout:
       be_a_bike_saver: Vær en sykkelsparer.
       support_bike_index_today: Støtt Bike Index i dag.
@@ -3954,6 +3964,8 @@ nb:
     strava_search_index: Knytt Strava-utstyret ditt til Bike Index-registreringene
       dine. Søk, filtrer og masseoppdater aktivitetene dine for å tilordne utstyr
       til turer som mangler det.
+    marketplace_how_it_works: Slik fungerer kjøp og salg på Bike Index Marketplace,
+      der hver sykkel er registrert og én meldt stjålet ikke kan listes opp.
   meta_titles:
     bikes_index: Søkeresultater
     bikes_new: Registrer en sykkel!
@@ -4006,6 +4018,7 @@ nb:
     search_marketplace_index: Sykkelindeksmarkedsplass
     strava_search_index: Sykkelindeks Strava-søk
     registration_form_settings: Innstillinger for registreringsskjema
+    marketplace_how_it_works: Slik fungerer Bike Index Marketplace
   money:
     currencies:
       en: USD
@@ -4200,7 +4213,6 @@ nb:
         gratis, i tre enkle trinn:'
       bike_index_account: Bike Index konto
       confirm_your_email: Bekreft e-posten din
-      error: feil
       fill_out_the_form_that_will_appear: Fyll ut skjemaet som vises på denne siden
         når du er logget på.
       filling_out_this_form_will_create_a_new_org: Ved å fylle ut dette skjemaet opprettes
@@ -4212,7 +4224,6 @@ nb:
       new_organization: Ny organisasjon
       organization_kind: Organisasjonsslag
       organization_name: Organisasjonsnavn
-      please_fix_the_following_errors: Vennligst fiks følgende %{errors}
       sign_up_for_a_new_account_html: Registrer deg for en %{new_account_link}
       you_are_already_a_member_of_org_html: Du er allerede medlem av %{org_link}.
       your_current_account_will_be_a_member_html: Din nåværende konto ( <strong>%{user_email}</strong>
@@ -4455,6 +4466,13 @@ nb:
         your_headers_must_match_html: Overskriftene dine må samsvare <em>nøyaktig</em>
           med overskriftene våre - hvis du for eksempel har 'serienummer' som overskrift,
           vil ikke importen fungere.
+        create_duplicates_html: Opprett duplikater – legg til registreringer når en
+          rad samsvarer med en eksisterende registrerings serienummer og eierens e-postadresse
+          <span class="twless-strong">(av som standard)</span>
+        create_duplicates_enabled_html: Opprett duplikater – legg til registreringer
+          når en rad samsvarer med en eksisterende registrerings serienummer og eierens
+          e-postadresse <span class="twless-strong">(aktivert som standard for å forhindre
+          tap av stjålne/beslaglagte data)</span>
       show:
         ascend_import: Ascend import
         bulk_import: Masseimport
@@ -4467,6 +4485,7 @@ nb:
         file_removed_explanation: etter noen dager sletter vi den opplastede filen
           for å spare plass
         progress: Framgang
+        matched_count: Rader som samsvarer med eksisterende registreringer
     exports:
       index:
         bikes_in_export: Sykler på eksport
@@ -4729,9 +4748,6 @@ nb:
     form:
       cancel_update: Avbryt oppdatering
       do_not_display: Ikke vis
-      error: Feil
-      errors_prevented_photo_from_saving: "%{errors_count} forhindret at bildet ble
-        lagret"
       image_name: Bildenavn
       no_one_will_be_able_to_see_this_image_exc: "(ingen vil kunne se dette bildet
         bortsett fra deg)"
@@ -5149,8 +5165,6 @@ nb:
       total_bikes_registered: Totalt registrerte sykler
       total_recovery_value: Total gjenopprettingsverdi
       used_by: Brukt av
-    recovery_stories:
-      recovery_stories: Gjenopprettingshistorier
     update_browser:
       go_here_to_learn_more: Gå hit for å lære mer
       oh_no: Å nei!
@@ -5232,15 +5246,12 @@ nb:
         protecting_your_bike_here: beskytte sykkelen din her
         read_more_about_prefix: Les mer om
         recovered_bike_type: gjenopprettet/funnet %{bike_type}
-        secure_both_wheels_either_with_two_ulocks: Sikre begge hjulene - enten med
-          to U-låser, eller en U-lås og en kraftig kabel.
         sign_up_on_bikeindexorg_to_claim_your_bik: Registrer deg på BikeIndex.org
           for å kreve din %{bike_type} og redigere den, last opp bilder og sørg for
           at du aldri mister oversikten over din pålitelige hest!
         stolen_bike_type: stjålet %{bike_type}
         thanks_for_adding_this_bike_type_you_found: Takk for at du la til denne %{bike_type}
           du fant til Bike Index
-        use_a_ulock: Bruk en U-lås.
         were_sorry_your_bike_type_was_stolen: Vi beklager at %{bike_type} ble stjålet.
         when_you_do: når du gjør det!
         you_added_a_bike_type_on_bike_index: Du la til en %{bike_type} på Bike Index
@@ -5267,13 +5278,16 @@ nb:
         stolen_guidance: Hvis sykkelen din noen gang blir stjålet, logg inn på Bike
           Index umiddelbart og merk den som stjålet for å aktivere vårt gjenopprettingsnettverk.
         theft_victims_illustration: Illustrasjon av tyveriofre
-        ulock_illustration: U-lås-illustrasjon
         updated_registration_guidance: Hvis du flytter, selger eller gjør endringer
           på sykkelen din, må du oppdatere registreringen slik at den forblir nøyaktig
           og nyttig.
         view_your_bike: Se sykkelen din
         what_if_my_bike_gets_stolen: Hva om sykkelen min blir stjålet?
         whats_next: Hva skjer nå?
+        secure_both_wheels_with_locking_skewers: Sikre begge hjulene – med låsespyder,
+          en kraftig vaier og en eller to U-låser.
+        use_a_ulock_or_foldable_lock: Bruk en U-lås eller en kraftig sammenleggbar
+          lås.
       organization_invitation:
         hello: Hei %{name},
         join_org: Bli med %{org_name}
@@ -5387,6 +5401,8 @@ nb:
           required: nødvendig
         combobox_state:
           state: Stat
+        combobox:
+          no_matches: Ingen treff
       alerts:
         base:
           error: Feil
@@ -5416,11 +5432,16 @@ nb:
         in_the_past_year: i løpet av det siste året
         now: nå
         to: til
-      column_settings:
+      table_column_settings:
         all: Alle
         default: misligholde
+        included_columns: Inkluderte kolonner
         none: ingen
         visible_columns: Synlige kolonner
+        return_to_default_column_order: Gå tilbake til standard kolonnerekkefølge
+      drag_handle:
+        move: Flytt %{name}
+        moved: Posisjon %{position} til %{count}
     atoms:
       serial:
         hidden: skjult
@@ -5443,6 +5464,7 @@ nb:
         copy_sticker: Kopier klistremerke
       recovery_display_card:
         recovered: Gjenopprettet
+        translated_from_english: oversatt fra engelsk
     pages:
       messages:
         thread_show:
@@ -5529,6 +5551,7 @@ nb:
             view_list: Liste
             view_table: Bord
             loading_results: Laster inn resultater...
+            per_page_option: "%{number} per side"
           chart_card:
             caption_search: Nåværende søk
             caption_year: Oversikt over fjoråret
@@ -5552,7 +5575,6 @@ nb:
             created_at_cell: Registrert
             creation_description_cell: Kilde
             cycle_type_cell: Bil type
-            default: misligholde
             filter_impounded_html: bare <strong>beslaglagt</strong>
             filter_no_address_html: bare <strong>ingen</strong> adresse
             filter_no_sticker_html: bare <strong>uten</strong> klistremerke
@@ -5566,7 +5588,6 @@ nb:
             impound_id_cell: Beslags-ID
             manufacturer_cell: Produsent
             model_cell: Modell
-            none: ingen
             owner_email_cell: Sendt til
             owner_name_cell: Eiers navn
             propulsion_type_cell: Elbil (fremdrift)
@@ -5582,7 +5603,6 @@ nb:
             unregistered: 'Uregistrert:'
             updated_at_cell: Oppdatert
             url_cell: URL-adresse
-            visible_columns: Synlige kolonner
             notes_cell_html: Registreringsnotater <em>av %{org_name}</em>
             reg_organization_affiliation_cell_html: Tilknytning <em>i %{org_name}</em>
             reg_student_id_cell_html: Studentbevis <em>for %{org_name}</em>
@@ -5590,9 +5610,6 @@ nb:
             photo_cell: Foto
             view_cell: Utsikt
             acknowledgment_cell_panel: Tid - Registreringssekvens bekreftet
-            created_at_cell_panel: Tid - registrert
-            occurred_at_cell_panel: Tid - status
-            updated_at_cell_panel: Tid - oppdatert
             filter_stolen_or_impounded_html: bare <strong>stjålet</strong> eller <strong>beslaglagt</strong>
             location_search_disabled_no_address: "%{org_name} samler ikke inn registreringsadresser,
               så bare stjålne og beslaglagte registreringer har en plassering. Filtrer
@@ -5601,13 +5618,40 @@ nb:
               søker etter alle registreringer, med mindre du bare søker etter beslaglagte
               og/eller stjålne registreringer.
             show_location_search: vis stedssøk
-            included_columns: Inkluderte kolonner
+            all_bikes: Alle sykler
+            all_statuses: Alle statuser
+            impound_location_cell: plassering
+            impound_status_cell: Status for beslag
+            impound_updated_at_cell: Beslaglegging oppdatert
+            impound_updated_at_cell_panel: Tid - Beslagsregister oppdatert
+            impound_user_cell: Siste oppdatering
+            impounded_at_cell: Beslaglagt
+            impounded_at_cell_panel: Tid - Beslaglagt
+            impounded_from_cell: Beslaglagt fra
+            only_unregistered: Kun uregistrerte
+            only_user_registered: Kun bruker registrert
+            registered_cell_panel: Tid - Registrert
+            registration: 'Registrering:'
+            registration_updated_cell_panel: Tid - Registrering oppdatert
+            resolved_at_cell: Løst
+            resolved_at_cell_panel: Tid - Løst
+            status_at_cell_hint: når det blir stjålet, beslaglagt osv.
+            status_at_cell_panel: Tid - Status
+            status_records: "%{status} poster"
+            unregistered_cell: Uregistrert
+            copy_column_order_from_impounded_vehicles_search: Kopier kolonnerekkefølge
+              fra søk etter beslaglagte kjøretøy
+            copy_column_order_from_registrations_search: Kopier kolonnerekkefølge
+              fra registreringssøk
+            impound_search_columns: Beslaglegg søkekolonner
           column_settings_toggle:
             column_settings: Kolonneinnstillinger
           settings_and_filters:
             date_range: 'Datoperiode:'
             search_settings_and_filters: Søkeinnstillinger og filtre
             filters: Filtre
+            impound_search: søket etter beslaglagte kjøretøy
+            view_in_impound_search_html: Vis i %{impound_search}
           search_all:
             search_all_html: Søk i alle registreringer <span class="twless-strong">(ikke
               bare %{org_name})</span>
@@ -5619,9 +5663,8 @@ nb:
             hidden: skjult
             not_registered_with: Skjult fordi den ikke er registrert hos %{org_name}
             acknowledgment_title: Bekreftelse på registreringssekvens kl.
-            occurred_at_tooltip: Når den ble stjålet, beslaglagt, funnet eller lagt
-              ut for salg
             view: Utsikt
+            toggle_all_checked: Slå av/på alle avkryssede
           multi_result_chip:
             no_results: ingen treff
           multi_results:
@@ -5634,16 +5677,8 @@ nb:
             view_all: se alle
         impound_records:
           index:
-            all_bikes: Alle sykler
-            all_statuses: Alle statuser
             cannot_update_with_kind: Denne oppføringen kan ikke oppdateres med «{kind}»
             hide_update: Skjul oppdatering
-            matching_impound_record:
-              one: samsvarende beslagsregister
-              other: samsvarende beslaglagte poster
-            only_unregistered: Kun uregistrerte
-            only_user_registered: Kun bruker registrert
-            status_records: "%{status} poster"
             update_multiple_records: Oppdater flere poster
         parking_notifications:
           index:
@@ -5695,6 +5730,9 @@ nb:
           map_unavailable: Kartet kunne ikke lastes inn – posisjonen var fortsatt
             angitt fra enheten din.
           set_on_map: Sett på kartet
+        registration_sequence:
+          page_edit_bullet:
+            bullet: kule
       registrations:
         show:
           bike_details:
@@ -6031,6 +6069,20 @@ nb:
         result_view_select:
           cards_view: Vis som kort
           list_view: Vis som liste
+        marketplace_intro:
+          bike_index_members: Bike Index-medlemmer
+          checked_for_theft: Sjekket for tyveri
+          description: Bike Index er en ideell organisasjon som hjelper med å få stjålne
+            sykler hjem. Markedsplassen vår viser kun registrerte sykler, slik at
+            du kan kjøpe brukt og være sikker på at sykkelen ikke er meldt stjålet.
+          heading: Bruktsykkelmarkedet fra sykkelregisteret.
+          hide_intro: Skjul introduksjonen
+          how_buying_works: Hvordan kjøp fungerer
+          how_selling_works: Hvordan salg fungerer
+          marketplace_title: Sykkelindeksmarkedsplass
+          ownership_transfers: Eierskapsoverføringer
+          registered_bikes_only: Kun registrerte sykler
+          what_makes_this_different: Hva gjør dette annerledes?
       sessions:
         sign_in_interstitial:
           click_button_to_continue: Klikk på knappen nedenfor for å fortsette
@@ -6294,8 +6346,6 @@ nb:
             vil gjenkjenne den låst til feil veranda.
           promoted_alerts_title: Sett sykkelen foran nabolaget den ble tatt fra
           questions_people_ask_at_2am: Spørsmål folk stiller klokken 02:00
-          read_more_recovery_stories: Les flere historier om gjenoppretting
-          recoveries_reported_by_owners: Nylige gjenopprettinger, rapportert av eierne.
           recovery_record: Gjenopprettingslogg
           register_it: Registrer det
           register_your_stolen_bike: Registrer den stjålne sykkelen din
@@ -6647,6 +6697,17 @@ nb:
           market: Marked
           clear_filters: Fjern filtre
           loading_placeholder: Laster inn…
+          any_frame_material: Ethvert rammemateriale
+          any_handlebar_type: Alle typer styrer
+          frame_material: Rammemateriale
+          handlebar_type: Styre type
+          market_scope: Modeller fra andre markeder
+          only_market_html: Kun %{market}
+          prefer_market_sold_in_html: Foretrekker kjøretøy solgt i %{market}
+          select_a_vehicle_type: Velg en %{bike_type}, velg flere for å sammenligne
+            dem
+          select_an_vehicle_type: Velg en %{bike_type}, velg flere for å sammenligne
+            dem
         donate_strip:
           donate: Donere
           pitch: Dette kule produktet er levert av den ideelle organisasjonen Bike
@@ -6678,8 +6739,6 @@ nb:
           classes_start_on: Kursene trer i kraft %{date}. Inntil da, sjekk statens
             gjeldende regler
           fails_rule: Oppfyller ikke denne regelen
-          falls_under: I %{state} faller den inn under %{name}, som kan kreve registrering
-            og lisens.
           for_your_information: Til din informasjon
           gray_detail: Din %{name} er oppført som en elsykkel i klasse %{n}. Sjekk
             %{state} DMV for lokale regler.
@@ -6758,14 +6817,10 @@ nb:
           speed_past_cap_html: Assisterer forbi %{past} mph, over %{cap} mph-grensen
           speed_past_html: Assisterer forbi %{past} mph; sjekk at den stopper ved
             %{cap} mph
-          classes_not_recognized:
-            one: Klassen %{n} gjenkjennes ikke her
-            other: Klasser %{n} gjenkjennes ikke her
           classes_recognized:
             one: Klasse %{n} er gjenkjent
             other: Klasser %{n} er gjenkjent
           read_more: Les mer
-          stock_photo: Arkivfoto
           answer_optional: Valgfri
           as_class_with_optional_throttle: som klasse %{n} med valgfri gasspedal
           as_class_with_optional_upgrade: som klasse %{n} med en valgfri oppgradering
@@ -6778,11 +6833,6 @@ nb:
             elsykkel i klasse %{n} og %{optional}.
           manually_entered: Angitt manuelt
           model_year: "%{year}-modell"
-          optional_classes_not_recognized:
-            one: Klasse %{n} gjenkjennes ikke her, så den er bare lovlig slik den
-              selges
-            other: Klasser %{n} er ikke anerkjent her, så det er bare lovlig slik
-              det selges.
           optional_throttle_not_allowed: Det er bare lovlig uten den valgfrie gasspedalen
           optional_to_html: Valgfritt, til %{mph}
           throttle_with_class_3_assist: Ikke tillatt med klasse 3-assistanse
@@ -6834,6 +6884,16 @@ nb:
               og det må sjekkes %{count}-reglene.
           yes_to_kmh_html: Ja, til %{kmh} km/t
           your_province: Din provins eller ditt territorium
+          classes_not_recognized_in:
+            one: Klassen %{n} gjenkjennes ikke i %{state}
+            other: Klassene %{n} gjenkjennes ikke i %{state}
+          falls_under_name: I %{state} faller den inn under %{name}.
+          optional_classes_not_recognized_in:
+            one: Klasse %{n} gjenkjennes ikke i %{state}, så den er bare lovlig slik
+              den selges.
+            other: Klassene %{n} gjenkjennes ikke i %{state}, så de er bare lovlige
+              slik de selges.
+          other_classification_rules: "%{name} regler"
         rule_label:
           classes: Klasser anerkjent
           power: Motoreffektbegrensning
@@ -7136,7 +7196,6 @@ nb:
           official_registry: Det offisielle registeret for mer enn 1000 politiavdelinger,
             universiteter, byer og butikker
           or_make_a_one_time_donation: Eller gi en engangsdonasjon
-          partner_organizations: partnerbutikker, politiavdelinger og byer
           per_month: "/ måned"
           per_year: "/ år"
           perk_cycling_cap: Sykkelkappe for medlemmer av Bike Index
@@ -7153,11 +7212,7 @@ nb:
           perk_top_listing_placement: Toppplassering på markedsplassen
           plans_from: Planer fra %{price} i måneden
           questions: Spørsmål
-          read_more_recovery_stories: Les flere historier om gjenoppretting
           recommended: Anbefalt
-          recoveries_reported_by_owners: Hver gjenoppretting rapporteres av personen
-            som fikk sykkelen sin tilbake.
-          stolen_bikes_recovered: stjålne sykler funnet
           summary_monthly: "%{level} medlemskap, %{price} i måneden"
           summary_yearly: "%{level} medlemskap, %{price} per år"
           sun_shirt: Solskjorte
@@ -7168,12 +7223,10 @@ nb:
             i USA. Bike Index er en ideell organisasjon under 501(c)(3), EIN 81-4296194.
           the_registry_open_to_everyone: Registeret, åpent for alle
           two_months_free: To måneder gratis
-          value_returned_to_owners: verdi tilbakeført til eierne
           view_your_membership: Se ditt %{level}-medlemskap
           wear_the_shield: Bruk skjoldet
           what_members_make_possible: Hva medlemmer gjør mulig
           yearly: Årlig
-          bikes_registered: registrerte sykler
           bikes_registered_keep_it_free: "%{bikes} sykler er registrert. Medlemmer
             beholder det gratis den neste millionen."
           millions_registered_keep_it_free: "%{millions} millioner sykler er registrert.
@@ -7185,18 +7238,10 @@ nb:
             er grunnen til at vi kan love det.
       donate:
         page:
-          already_member: Du er allerede medlem av Bike Index – takk! Du kan endre
-            nivået eller betalingsinformasjonen din fra medlemsinnstillingene dine.
-          cadence: Hvor ofte å gi
           cta_headline: En million sykler er registrert. Ikke én eier betalte for
             å være der.
           cta_sub: Hold det gratis for den neste millionen.
           eyebrow: Gjenopprettet og returnert
-          fine_print: Bike Index er en ideell organisasjon under 501(c)(3), EIN 81-4296194.
-            Donasjonen din er fradragsberettiget i USA. Du kan når som helst avbryte
-            en månedlig gave.
-          fine_print_short: 501(c)(3) ideell organisasjon, EIN 81-4296194. Fradragsberettiget
-            i USA.
           form_title: Finansier den neste gjenopprettingen
           headline: Alle syklene ovenfor kom hjem fordi registeret var gratis
           larger_gift_link: Snakk med oss om en større gave
@@ -7214,16 +7259,6 @@ nb:
           major_eyebrow: Stor gaver
           major_partner: Partner
           major_title: Større gaver flytter hele byer inn i registeret
-          manage_membership: Administrer medlemskapet ditt
-          membership_link: Hva medlemskapet inkluderer
-          membership_note: 'Månedlig støtte gjør deg til et Bike Index-medlem: markedsplassoppføringer,
-            et medlemsmerke og fordeler som vokser etter hvert som vi bygger dem.
-            Nivåene er %{amounts} per måned.'
-          monthly: Månedlig
-          monthly_submit: Bli medlem — %{amount}/måned
-          one_time: Engangsbruk
-          one_time_submit: Doner %{amount}
-          other_amount: Annet beløp
           other_ways_daf: Giverstyrte fondstilskudd – vi kan sende deg EIN-nummeret
             ditt og stipendinformasjonen din.
           other_ways_match: Arbeidsgivermatching – mange arbeidsgivere vil matche
@@ -7231,24 +7266,7 @@ nb:
           other_ways_stock: Gaver i form av aksjer eller kryptovaluta, som unngår
             kapitalgevinster på verdiøkende eiendeler.
           other_ways_title: Andre måter å gi på dette nivået
-          recovered: Gjenopprettet
-          stat_bikes: sykler registrert, gratis
-          stat_partners: partnerbutikker, politiavdelinger og byer
-          stat_recoveries: stjålne sykler funnet
-          stat_value: verdi tilbakeført til eierne
-          stories_link: Les flere historier om gjenoppretting
-          stories_subhead: Hver gjenoppretting rapporteres av personen som fikk sykkelen
-            sin tilbake.
           stories_title: Med eiernes ord
-          tier_basic: Grunnleggende medlemskap
-          tier_basic_benefit: List opp sykler på markedsplassen, et medlemsmerke og
-            raskere støtte
-          tier_patron: Patronmedlemskap
-          tier_patron_benefit: Alt i Plus, topp plassering på markedsplassen, Patron-skjorte
-            og -merke
-          tier_plus: Pluss-medlemskap
-          tier_plus_benefit: Alt i Basic, et gratis promoteringsvarsel hvis sykkelen
-            din blir stjålet og et medlemskapstak
           uses_alerts_body: Varslingssystemet for stjålne sykler og de promoterte
             varslene som legger ut en oppføring i feeder om tyveriet.
           uses_alerts_title: Varsler som når ut til folk
@@ -7264,6 +7282,34 @@ nb:
           uses_partners_title: Partnere og etterforskninger
           uses_title: Hvor pengene går
           wall_photo_alt: En sykkel funnet gjennom Bike Index
+        form:
+          already_member: Du er allerede medlem av Bike Index – takk! Du kan endre
+            nivået eller betalingsinformasjonen din fra medlemsinnstillingene dine.
+          cadence: Hvor ofte å gi
+          fine_print: Bike Index er en ideell organisasjon under 501(c)(3), EIN 81-4296194.
+            Donasjonen din er fradragsberettiget i USA. Du kan når som helst avbryte
+            en månedlig gave.
+          fine_print_short: 501(c)(3) ideell organisasjon, EIN 81-4296194. Fradragsberettiget
+            i USA.
+          manage_membership: Administrer medlemskapet ditt
+          membership_link: Hva medlemskapet inkluderer
+          membership_note: 'Månedlig støtte gjør deg til et Bike Index-medlem: markedsplassoppføringer,
+            et medlemsmerke og fordeler som vokser etter hvert som vi bygger dem.
+            Nivåene er %{amounts} per måned.'
+          monthly: Månedlig
+          monthly_submit: Bli medlem — %{amount}/måned
+          one_time: Engangsbruk
+          one_time_submit: Doner %{amount}
+          other_amount: Annet beløp
+          tier_basic: Grunnleggende medlemskap
+          tier_basic_benefit: List opp sykler på markedsplassen, et medlemsmerke og
+            raskere støtte
+          tier_patron: Patronmedlemskap
+          tier_patron_benefit: Alt i Plus, topp plassering på markedsplassen, Patron-skjorte
+            og -merke
+          tier_plus: Pluss-medlemskap
+          tier_plus_benefit: Alt i Basic, et gratis promoteringsvarsel hvis sykkelen
+            din blir stjålet og et medlemskapstak
       landing_pages:
         demo_modal:
           field_message: Noe annet vi burde vite?
@@ -7332,9 +7378,6 @@ nb:
             og andre programmer kan være underkontoer med eget personale og utdanningsinnhold.
             Ansatte på hvert nivå administrerer kun sine egne regler.
           faq_account_question: Hvem administrerer kontoen?
-          faq_checker_answer: Sykkeldetaljer kommer fra BikeBook, en katalog over
-            elsykkelmodeller med klasse, motor, hastighet og UL-sertifisering. Statlige
-            regler er oppført med forskriftene bak dem.
           faq_checker_question: Hvor får samsvarskontrolløren dataene sine fra?
           faq_cost_answer: Det er ingen gebyrer per registrering, og registreringen
             er gratis for innbyggere. Vi vil gå gjennom prisene for byen din under
@@ -7527,6 +7570,9 @@ nb:
             registrere sykkelen sin. Hvis det er en elsykkel, går de rett inn i en
             kort opplæringsprosess med byens regler.
           submit_demo: Be om en demonstrasjon
+          faq_checker_answer_html: Sykkeldetaljer kommer fra %{bikebook_link}, en
+            katalog over elsykkelmodeller med klasse, motor, hastighet og UL-sertifisering.
+            Statlige regler er listet opp med forskriftene bak dem.
         for_cities_education:
           all_set: Du er klar.
           back: Tilbake
@@ -7609,6 +7655,118 @@ nb:
           start_over: Start på nytt
           tabs_label: Eksempelorganisasjoner
           viewing_as: Viser som
+      marketplace:
+        how_it_works:
+          across_town_heading: På tvers av byen eller på tvers av landet
+          across_town_intro: Hvert salg skjer mellom personer. Bike Index håndterer
+            ikke betaling eller frakt, så kjøper og selger blir enige om pris, betaling
+            og levering seg imellom.
+          bike_index_members: Bike Index-medlemmer
+          bike_index_members_body: Selgere som støtter Bike Index med et medlemskap
+            viser et Bike Index-medlemsmerke på annonsene sine.
+          browse_bikes: Bla gjennom sykler
+          buying_a_bike: Å kjøpe en sykkel
+          checked_for_theft: Sjekket for tyveri
+          checked_for_theft_body: En sykkel som er meldt stjålet på Bike Index kan
+            ikke oppføres.
+          contact_the_seller: Kontakt selgeren
+          contact_the_seller_member_badge_body: Still spørsmål og avtal et tidspunkt
+            for å se sykkelen. Se etter medlemsmerket til Bike Index.
+          find_a_bike: Finn en sykkel
+          find_a_bike_body: Søk i beskrivelser av oppføringer, velg en primær aktivitetstype
+            og angi et prisintervall. Velg «Til salgs i søkeområdet» for å se sykler
+            i nærheten av deg, eller «Til salgs hvor som helst» for å se alt.
+          hand_off_or_ship: Overlevering eller sending
+          hand_off_or_ship_body: Møt lokale kjøpere et offentlig sted. For kjøpere
+            utenbys, send med en sykkelfrakttjeneste som BikeFlights.
+          heading: Slik fungerer Bike Index Marketplace
+          intro: Vi ønsker at dette skal være det enkleste og mest pålitelige stedet
+            å kjøpe og selge en brukt sykkel. Hver sykkel som er oppført er registrert
+            på Bike Index, og salget skjer direkte mellom deg og den andre syklisten.
+          local_pickup: Lokal henting
+          local_pickup_body: Møt opp personlig, prøvekjør sykkelen og sjekk serienummeret
+            før du betaler. Selgeren overfører registreringen til deg på stedet.
+          mark_it_for_sale: Merk den til salgs
+          mark_it_for_sale_body: Fra sykkelsiden din legger du til pris, bilder og
+            tilstand. Spesifikasjonene kommer fra registreringen din.
+          ownership_transfers: Eierskapsoverføringer
+          ownership_transfers_body: Når salget er gjennomført, overfører selgeren
+            registreringen til kjøperen. Den nye eieren er registrert fra dag én.
+          pay_and_take_ownership: Betal og ta eierskap
+          pay_and_take_ownership_body: Du betaler selgeren direkte. De overfører Bike
+            Index-registreringen til deg.
+          pro_tip: PROFF-TIPS!
+          pro_tip_heading: Noen få vaner holder salg mellom personer trygt.
+          ready_heading: Klar til å finne din neste sykkel?
+          register_your_bike: Registrer sykkelen din
+          register_your_bike_body: Allerede registrert? Hopp videre. Hvis ikke, tar
+            det omtrent to minutter, og det er gratis, for alltid.
+          registered_bikes_only: Kun registrerte sykler
+          registered_bikes_only_body: Du kan bare føre opp en sykkel som er registrert
+            på Bike Index, så hver oppføring er knyttet til et ekte registrerings-
+            og serienummer.
+          see_it_or_ship_it: Se den eller send den
+          see_it_or_ship_it_body: Lokalt? Kjør den og bekreft at serienummeret på
+            rammen samsvarer med oppføringen. Ute av byen? Avtal frakt med selgeren
+            og be om et bilde av serienummeret.
+          sell_your_bike: Selg sykkelen din
+          selling_a_bike: Selger en sykkel
+          shipping: Frakt til en kjøper utenfor byen
+          shipping_body: Det går greit å sende sykkelen. Selgere kan bruke en sykkelfrakttjeneste
+            som BikeFlights. Avtal på forhånd hvem som betaler for frakt og pakking,
+            del sporing og overfør registreringen når kjøperen har fått sykkelen.
+          tip_be_wary: Vær forsiktig med alle som presser på for å få ting til å gå
+            fort eller betale på uvanlige måter.
+          tip_check_serial: Sjekk at serienummeret på rammen samsvarer med oppføringen
+            før du betaler.
+          tip_public_place: Møtes du lokalt? Velg et travelt offentlig sted på dagtid.
+          tip_registration_transferred: Sørg for at registreringen overføres til deg
+            når salget er fullført.
+          tip_shipping: Frakt? Be om ekstra bilder, inkludert serienummeret, og bruk
+            en betalingsmåte med kjøperbeskyttelse.
+          transfer_ownership: Overfør eierskap
+          transfer_ownership_body: Når du har betalt, overfør sykkelen til kjøperens
+            e-postadresse på Bike Index.
+          trust_not_guarantee: Et tegn på tillit, ikke en garanti
+          trust_not_guarantee_body: Hver sykkel her er registrert, og en sykkel som
+            er meldt stjålet kan ikke bli oppført, noe som sier mye om sykkelen. Det
+            garanterer ikke ærligheten til personen som kjøper eller selger den. Still
+            spørsmål, ta vare på meldingene dine og stol på magefølelsen din.
+          what_we_check: Hva vi sjekker
+          why_a_marketplace: Hvorfor en markedsplass?
+          why_heading: Å kjøpe brukt burde ikke bety å ta en sjanse på en stjålet
+            sykkel.
+          why_registry: Bike Index er et gratis, ideell sykkelregister. I årevis har
+            vi hjulpet syklister med å registrere syklene sine og få dem tilbake når
+            de blir stjålet.
+          why_we_know: De fleste nettsteder for brukte sykler vet ingenting om syklene
+            på dem. Det gjør vi. Fordi alle oppføringer her er en registrert sykkel,
+            kan ikke en meldt stjålet føres opp, og registreringen følger sykkelen
+            til den nye eieren.
+      recovery_stories:
+        index:
+          donors_keep_it_free: Bike Index verken belaster syklister, selger data eller
+            kjører annonser. Alle gjenopprettinger på denne siden ble drevet av givere
+            som holder registrering, søk og stjålet varsler gratis for alle.
+          every_one_found_its_way_home: Hver og en av disse syklene fant veien hjem.
+          fund_the_next_recovery: Finansier den neste gjenopprettingen
+          help_it_come_home: Et sted i kveld blir en sykkel stjålet. Hjelp den med
+            å komme hjem.
+          in_their_own_words: Med deres egne ord
+          lede: Bak hvert bilde står en sjåfør som trodde det var borte for godt,
+            og noen som brydde seg nok til å sjekke. En verkstedmekaniker. En politibetjent.
+            En fremmed som husket et varsel. Dette er hva et gratis, åpent register
+            muliggjør, og det holdes gratis av folk som deg.
+          recovery_stories: Historier om gjenoppretting
+          register_your_bike: Registrer sykkelen din
+          share_your_story: Del historien din
+          shared_by_the_person: Hver historie her deles av personen som fikk sykkelen
+            sin tilbake.
+          started_with_a_registration: Hver historie her startet med en registrering.
+          takes_two_minutes: Tar omtrent to minutter. Det er gratis, for alltid.
+        stories:
+          load_more_stories: Last inn flere historier
+          newer_stories: Nyere historier
     shared_blocks:
       footer:
         about: Om
@@ -7799,6 +7957,17 @@ nb:
           rate_limited: For mange søk for raskt – du er frekvensbegrenset. Vent et
             øyeblikk, og prøv på nytt.
           retry: Prøv igjen
+      marketing:
+        recovery_stories:
+          no_recoveries: Det er ingen inndrivelser
+          read_more_recovery_stories: Les flere historier om gjenoppretting
+          reported_by_owners: Hver gjenoppretting rapporteres av personen som fikk
+            sykkelen sin tilbake.
+        registry_stats:
+          stat_bikes: sykler registrert, gratis
+          stat_partners: partnerbutikker, politiavdelinger og byer
+          stat_recoveries: stjålne sykler funnet
+          stat_value: verdi tilbakeført til eierne
   user_emails:
     confirm:
       confirm_email: Bekreft e-post

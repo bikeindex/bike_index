@@ -940,7 +940,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       get "#{base_url}/multi_search"
       page = Nokogiri::HTML(response.body)
       wrapper = page.at_css("[data-org--multi-search-url-value]")
-      expect(wrapper["data-controller"].split).to match_array(%w[org--multi-search ui--collapse org--search org--search-column-settings])
+      expect(wrapper["data-controller"].split).to match_array(%w[org--multi-search org--search ui--collapse ui--table-column-settings])
       expect(page.at_css("input[name='created_at_cell']")["data-default"]).to eq "true"
     end
   end

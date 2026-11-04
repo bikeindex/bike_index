@@ -91,6 +91,8 @@ RSpec.describe "Organized registrations search", :js, type: :system do
 
     # Search by serial number
     expect(page).to have_css("turbo-frame#chart_card_frame [id^='chart-'] canvas", wait: 10)
+    # The card's stat rows carry the counts
+    within("turbo-frame#chart_card_frame") { expect(page).to have_button("Registrations", exact: true) }
     chart_src = chart_frame[:src]
 
     fill_in "serial", with: bike1.serial_number
@@ -415,6 +417,13 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     Timeout.timeout(10) { sleep 0.05 until held.any? }
     expect(chart_busy?).to be true
     expect(asked).to eq(["organized_bikes_results_frame"])
+    # The table hides for the spinner, which isn't the card's table getting narrower
+    expect(page).to have_no_css("turbo-frame#organized_bikes_results_frame table", wait: 10)
+    table_bleed = page.evaluate_script(<<~JS)
+      new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(() =>
+        resolve(document.querySelector(".search-results-card").dataset.tableBleed))))
+    JS
+    expect(table_bleed).to eq "true"
 
     # Turned away, the chart stops spinning and stays on the search it's answering
     held.shift.fulfill(status: 429, contentType: "text/plain", body: "Slow down")
@@ -441,11 +450,14 @@ RSpec.describe "Organized registrations search", :js, type: :system do
   it "moves the result view through the address bar, and back from localStorage" do
     visit bikes_path
     expect(page).to have_css("turbo-frame#organized_bikes_results_frame table", wait: 10)
+    # Only a table wider than the card takes it to the page's edges
+    expect(page).to have_css(".search-results-card[data-table-bleed='true']")
 
     click_link "Cards"
     expect(page).to have_current_path(/search_result_view=cards/, wait: 10)
     expect(page).to have_css("a[data-active='true']", text: "Cards", wait: 10)
     expect(page).to have_no_css("turbo-frame#organized_bikes_results_frame table")
+    expect(page).to have_css(".search-results-card[data-table-bleed='false']")
 
     fill_in "search_email", with: "alice@example.com"
     click_button "Search registrations"
@@ -529,6 +541,11 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       expect(page).to have_current_path(/search_status=impounded/, wait: 10)
       expect(page).to have_css("table", wait: 10)
       expect(page).to have_css("tbody tr", count: 1)
+      # ...which the impound records search has its own statuses for
+      expect(page).to have_text("View in the impounded vehicles search")
+      impound_search_href = find_link("the impounded vehicles search")[:href]
+      expect(impound_search_href).to include("/o/#{organization.to_param}/impound_records?")
+      expect(impound_search_href).not_to include("search_status")
 
       # Doesn't have export, because no csv_export feature
       expect_filters_open
@@ -540,6 +557,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       expect(page).to have_css("table", wait: 10)
       expect(page).to have_css("tbody tr", count: 2)
       expect(page).to have_text("not stolen or impounded")
+      expect(page).to have_no_text("View in the impounded vehicles search")
 
       # Choose "All" to show everything
       choose("search_status_all", allow_label_click: true, visible: :all)

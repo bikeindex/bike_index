@@ -66,10 +66,14 @@ class LoggedSearch < AnalyticsRecord
     web_close_serials: 20,
     web_marketplace: 21,
     web_marketplace_count: 22,
-    web_bikebook: 23
+    web_bikebook: 23,
+    web_ebike_rules: 24
   }.freeze
 
   STOLENNESS_ENUM = {all: 0, non: 1, stolen: 2, impounded: 3, for_sale: 4}.freeze
+
+  # vehicle_models is comma-joined, so a comma means two or more
+  COMPARISON_SQL = "query_items->>'vehicle_models' LIKE '%,%'".freeze
 
   enum :endpoint, ENDPOINT_ENUM
   enum :stolenness, STOLENNESS_ENUM, prefix: :stolenness
@@ -81,6 +85,8 @@ class LoggedSearch < AnalyticsRecord
   validates_uniqueness_of :request_id, allow_nil: false
 
   scope :organized, -> { where(endpoint: organized_endpoints) }
+  scope :not_bikebook, -> { where.not(endpoint: bikebook_endpoints) }
+  scope :web_bikebook_comparison, -> { web_bikebook.where(COMPARISON_SQL) }
   scope :serial, -> { where.not(serial_normalized: nil) }
   scope :includes_query, -> { where(includes_query: true) }
   scope :processed, -> { where(processed: true) }
@@ -88,6 +94,10 @@ class LoggedSearch < AnalyticsRecord
 
   def self.organized_endpoints
     %i[org_bikes org_parking_notifications org_impounded].freeze
+  end
+
+  def self.bikebook_endpoints
+    %i[web_bikebook web_ebike_rules].freeze
   end
 
   def self.endpoints_sym

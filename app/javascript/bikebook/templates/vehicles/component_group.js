@@ -4,7 +4,7 @@ import { array, equal } from 'bikebook/templates/values'
 
 const sameKey = (a, b) => equal([a.type, a.position], [b.type, b.position])
 const sameDetail = (a, b) => sameKey(a, b) && equal(a.type_detail, b.type_detail)
-const HEADER_CLASSES = 'tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase'
+const HEADER_CLASSES = 'tw:tweyebrow'
 // Stacked in a narrow .bikebook-components, the type and description each take a line, and the detail and position are muted
 const COLUMNS = [
   ['type', null, 'tw:w-[18%] tw:break-words tw:@max-[40rem]/bikebook-components:basis-full tw:@max-[40rem]/bikebook-components:font-bold'],
@@ -13,6 +13,9 @@ const COLUMNS = [
   ['manufacturer', 'Manufacturer', 'tw:w-[17%]'],
   ['description', 'Description', 'tw:w-[38%] tw:@max-[40rem]/bikebook-components:basis-full']
 ]
+
+// Whether every vehicle has the row's component, and the same in every column
+export const matchingRow = (row) => row.every((component) => component && COLUMNS.every(([field]) => equal(component[field], row[0][field])))
 
 // Each vehicle's `components` (a list per vehicle) as rows of a cell per vehicle, pairing those of the same type and
 // position, the same detail first, so a vehicle's repeated component fills a row each

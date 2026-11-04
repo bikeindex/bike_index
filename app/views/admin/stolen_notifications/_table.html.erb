@@ -23,7 +23,7 @@
     <% sent_count = stolen_notification.send_dates_parsed.count %>
 
     <% if sent_count == 0 %>
-      <span class="text-danger">no</span>
+      <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">no</span>
     <% elsif sent_count == 1 %>
       <%= check_mark %>
     <% else %>

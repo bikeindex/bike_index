@@ -13,13 +13,11 @@ const LANE = 2.6
 
 // labels for the figures the kit's geometry labels don't name
 const LABELS = {
-  captain_top_tube: 'Captain top tube',
-  captain_seat_tube: 'Captain seat tube',
   stoker_top_tube_effective: 'Stoker top tube',
-  stoker_seat_tube: 'Stoker seat tube',
+  stoker_seat_tube_ct: 'Stoker seat tube',
+  stoker_standover: 'Stoker standover',
   boom_tube: 'Boom tube',
   seat_height: 'Seat height',
-  standover_above_bb: 'Standover above BB',
   seat_height_min: 'Seat height, lowest',
   seat_height_max: 'Seat height, highest',
   handlebar_height: 'Handlebar height',
@@ -124,14 +122,12 @@ const arrowhead = (tip, from, size) => {
   return [tip, plus(plus(tip, along), across), minus(plus(tip, along), across)]
 }
 
-// a rim hidden but for `rims`
-export const renderShape = (shape, rims = true) => {
+export const renderShape = (shape) => {
   const dashed = shape.weight === 'ghost'
   const common = { width: WEIGHTS[shape.weight], dash: dashed ? '6 5' : nothing, opacity: dashed ? 0.55 : nothing }
   return shape.kind === 'circle'
     ? svg`<circle cx=${shape.center[0]} cy=${-shape.center[1]} r=${shape.radius} fill=${shape.fill ? 'currentColor' : 'none'} stroke="currentColor"
-      stroke-width=${common.width} stroke-dasharray=${common.dash} opacity=${common.opacity} vector-effect="non-scaling-stroke"
-      ?data-rim=${shape.rim} display=${shape.rim && !rims ? 'none' : nothing}></circle>`
+      stroke-width=${common.width} stroke-dasharray=${common.dash} opacity=${common.opacity} vector-effect="non-scaling-stroke"></circle>`
     : svg`<path d=${pathData(shape.points, shape.closed)} fill=${shape.fill ? 'currentColor' : 'none'} fill-opacity="0.07" stroke="currentColor"
       stroke-width=${common.width} stroke-dasharray=${common.dash} opacity=${common.opacity} stroke-linecap="round" stroke-linejoin="round"
       vector-effect="non-scaling-stroke"></path>`
@@ -160,12 +156,14 @@ const renderDimension = ({ placement, letter, listed, calculated, key }, font, h
 // `unlettered`: `listed` where the size lists one, `calculated` where it's worked out from ones the size lists, and otherwise
 // its type's typical, `editable` where it can be set as a figure, and `extra`, lettered last, where the `kit`'s geometry
 // schema doesn't have it, as figures the wheels give don't count. Each figure's marks carry data-figure, and the
-// `highlight` one's are drawn on top
-export const cycleDrawing = ({ type, data = {}, typeDetail = data.type_detail, size, kit, highlight, figurePath }) => {
-  const { views, listed } = drawingViews({ type, typeDetail, data, size })
+// `highlight` one's are drawn on top. Lettered for its own `span` unless given another's, and framed by its own `bounds`,
+// or `within` a box, a width centred on it and a top and bottom, to draw it at the scale and on the ground of others.
+// Its `typicalKind` the kind of bike whose typical figures every unlisted one it letters is
+export const cycleDrawing = ({ type, data = {}, typeDetail = data.type_detail, size, kit, highlight, figurePath, span: sharedSpan }) => {
+  const { views, listed, kinds, detail } = drawingViews({ type, typeDetail, data, size })
   // lettering sized to the views side by side
   const extents = views.map(({ shapes }) => extent(shapes.flatMap(shapePoints)))
-  const span = Math.max(extents.reduce((width, { left, right }) => width + right - left, 0) * 1.15, ...extents.map(({ top, bottom }) => top - bottom))
+  const span = sharedSpan ?? Math.max(extents.reduce((width, { left, right }) => width + right - left, 0) * 1.15, ...extents.map(({ top, bottom }) => top - bottom))
   const font = span / 36
 
   const dims = views.flatMap((view) => view.dims)
@@ -212,36 +210,49 @@ export const cycleDrawing = ({ type, data = {}, typeDetail = data.type_detail, s
   const top = Math.max(...positioned.map(({ bounds, dy }) => bounds.top + dy)) + font
   const bottom = Math.min(...positioned.map(({ bounds, dy }) => bounds.bottom + dy)) - (positioned.length > 1 ? font * 2.5 : font)
 
-  const figure = svg`<svg role="img" aria-label=${`${[type, typeDetail].filter(Boolean).join(' ')} drawing, ${legend.map(({ letter, label }) => letter ? `${letter}: ${label}` : label).join(', ')}`}
-    viewBox=${[left, -top, right - left, top - bottom].map(Math.round).join(' ')} class="tw:h-auto tw:max-h-96 tw:w-full"
-    font-family="ui-sans-serif, system-ui, sans-serif">${positioned.map((view) => svg`<g transform=${`translate(${view.dx} ${-view.dy})`}>${view.plan
+  const content = positioned.map((view) => svg`<g transform=${`translate(${view.dx} ${-view.dy})`}>${view.plan
       ? nothing
       : svg`<path d=${pathData([[view.bounds.left, 0], [view.bounds.right, 0]])} stroke="currentColor" opacity="0.25" stroke-width="1"
         vector-effect="non-scaling-stroke"></path>`}${view.shapes.map((shape) => renderShape(shape))}${[...view.dims.filter(({ key }) => key !== highlight), ...view.dims.filter(({ key }) => key === highlight)]
         .map((dim) => renderDimension(dim, font, highlight, figurePath))}${positioned.length > 1
       ? svg`<text x=${(view.bounds.left + view.bounds.right) / 2} y=${-(bottom - view.dy + font)} fill="currentColor" opacity="0.6" font-size=${font}
         text-anchor="middle">${view.name}</text>`
-      : nothing}</g>`)}</svg>`
-  return { figure, legend }
+      : nothing}</g>`)
+  const framed = (frame) => svg`<svg role="img" aria-label=${`${[type, detail].filter(Boolean).join(' ')} drawing, ${legend.map(({ letter, label }) => letter ? `${letter}: ${label}` : label).join(', ')}`}
+    viewBox=${[frame.left, -frame.top, frame.width, frame.top - frame.bottom].map(Math.round).join(' ')} class="tw:h-auto tw:max-h-96 tw:w-full"
+    font-family="ui-sans-serif, system-ui, sans-serif">${content}</svg>`
+  const typicalKinds = [...new Set(legend.filter(({ listed, calculated }) => !listed && !calculated).map(({ key }) => kinds.get(key)))]
+  return {
+    figure: framed({ left, width: right - left, top, bottom }),
+    within: (box) => framed({ ...box, left: (left + right - box.width) / 2 }),
+    legend,
+    span,
+    bounds: { left, right, top, bottom },
+    typicalKind: typicalKinds.length === 1 ? typicalKinds[0] : null
+  }
 }
 
 // `type`'s side view, or its `typeDetail`'s, of `data` in `size`, its rear wheel standing on the origin, to lay over
-// others' unlettered: its shapes, their rims shown but for `rims` false, the points they reach, and the figures it draws
-// at their typical, but those only another view measures, and whether it's `framed`
+// others' unlettered: its shapes, the points they reach, and the figures it draws at their typical, but those only
+// another view measures, whether it's `framed`, and whether it's `stemless`, its stem and bar left out
 export const sideView = ({ type, data = {}, typeDetail = data.type_detail, size }) => {
-  const { views, typical, framed } = drawingViews({ type, typeDetail, data, size })
+  const { views, typical, framed, listed } = drawingViews({ type, typeDetail, data, size })
   const measures = (view, key) => view.dims.some((dim) => dim.key === key)
   // the hindmost tire on the ground, as a towing bike's ghost isn't
   const grounded = views[0].shapes.filter(({ kind, weight, center, radius }) => kind === 'circle' && weight !== 'ghost' && Math.abs(center[1] - radius) < 1)
   const back = grounded.length ? Math.min(...grounded.map(({ center }) => center[0])) : 0
-  const shapes = views[0].shapes.map((shape) => shape.kind === 'circle'
+  // without its seatposts, saddles and rims, which only clutter frames laid over each other, or a stem and bar it
+  // doesn't list the length of, which would only be a guess at where its rider steers from
+  const stemless = !listed('stem_length') && views[0].shapes.some(({ cockpit }) => cockpit)
+  const shapes = views[0].shapes.filter(({ seat, rim, cockpit }) => !seat && !rim && !(stemless && cockpit)).map((shape) => shape.kind === 'circle'
     ? { ...shape, center: plus(shape.center, [-back, 0]) }
     : { ...shape, points: shape.points.map((point) => plus(point, [-back, 0])) })
   return {
-    shapes: (rims) => shapes.map((shape) => renderShape(shape, rims)),
+    shapes,
     points: shapes.flatMap(shapePoints),
     typical: typical.filter((key) => measures(views[0], key) || !views.some((view) => measures(view, key))),
-    framed
+    framed,
+    stemless
   }
 }
 

@@ -13,36 +13,24 @@
   - created_at = @kind == "organization_stolen_message" ? @object.content_added_at : @object.created_at
   .row
     .col-md-6
-      %table.table-list
-        %tbody
-          %tr
-            %td Created
-            %td
-              - if created_at.present?
-                %span.localizeTime.preciseTime
-                  = l(created_at, format: :convert_time)
-              - else
-                %span.less-strong not created
-          %tr
-            %td Last updated
-            %td
-              - if created_at.present?
-                %span.localizeTime.preciseTime
-                  = l(@object.updated_at, format: :convert_time)
+      = render(UI::TableList::Component.new) do |list|
+        - list.with_row(label: "Created") do
+          - if created_at.present?
+            = render(UI::Time::Component.new(time: created_at, format: :localize_time_precise))
+          - else
+            %span.less-strong not created
+        - list.with_row(label: "Last updated", value: (render(UI::Time::Component.new(time: @object.updated_at, format: :localize_time_precise)) if created_at.present?))
     .col-md-6
-      %table.table-list
-        %tbody
-          %tr
-            %td Enabled?
-            %td
-              - if @object.is_enabled
-                = check_mark
-              - else
-                %small.less-strong false
-              - if @impound_claim_kind && !current_organization.impound_claims?
-                %br
-                Impound claims are not currently enabled
-                %small To turn on impound claims, you must enable the #{link_to "publicly accessible impound page", edit_organization_manage_impounding_path(organization_id: current_organization.to_param)}
+      = render(UI::TableList::Component.new) do |list|
+        - list.with_row(label: "Enabled?") do
+          - if @object.is_enabled
+            = check_mark
+          - else
+            %small.less-strong false
+          - if @impound_claim_kind && !current_organization.impound_claims?
+            %br
+            Impound claims are not currently enabled
+            %small To turn on impound claims, you must enable the #{link_to "publicly accessible impound page", edit_organization_manage_impounding_path(organization_id: current_organization.to_param)}
 
   = form_for @object, url: organization_email_path(@kind, organization_id: current_organization), action: "update", method: :patch do |f|
     - if @kind == "organization_stolen_message"

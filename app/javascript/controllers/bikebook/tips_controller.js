@@ -1,6 +1,5 @@
 import { Controller } from '@hotwired/stimulus'
-
-/* global localStorage */
+import { storage } from 'utils/storage'
 
 const KEY = 'bikebook_tips_dismissed'
 
@@ -16,13 +15,13 @@ export default class extends Controller {
   }
 
   dismiss () {
-    this.#store(() => localStorage.setItem(KEY, '1'))
+    storage.setItem(KEY, '1')
     this.#show(false)
     this.restoreTarget.focus()
   }
 
   restore () {
-    this.#store(() => localStorage.removeItem(KEY))
+    storage.removeItem(KEY)
     this.#show(true)
     this.tipsTarget.firstElementChild.focus()
   }
@@ -42,16 +41,6 @@ export default class extends Controller {
   }
 
   get #dismissed () {
-    try {
-      return localStorage.getItem(KEY) === '1'
-    } catch {
-      return false
-    }
-  }
-
-  #store (write) {
-    try {
-      write()
-    } catch {}
+    return storage.getItem(KEY) === '1'
   }
 }

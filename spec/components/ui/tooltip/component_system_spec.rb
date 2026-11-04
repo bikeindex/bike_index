@@ -9,7 +9,7 @@ RSpec.describe UI::Tooltip::Component, :js, type: :system do
     page.evaluate_script(<<~JS)
       (() => {
         const style = document.getElementById(#{id.to_json}).style
-        return { top: style.top, left: style.left }
+        return { top: style.top, left: style.left, zIndex: style.zIndex, position: style.position }
       })()
     JS
   end
@@ -23,8 +23,29 @@ RSpec.describe UI::Tooltip::Component, :js, type: :system do
     JS
   end
 
-  def tooltip_z_index(id)
-    page.evaluate_script("document.getElementById(#{id.to_json}).style.zIndex")
+  def top_layer?(id)
+    page.evaluate_script("document.getElementById(#{id.to_json}).matches(':popover-open')")
+  end
+
+  # Not a popover's UA overflow, which clips its arrow, nor its centering, which would part it from its trigger
+  def popover_styles(id)
+    page.evaluate_script(<<~JS)
+      (() => {
+        const tooltip = document.getElementById(#{id.to_json})
+        const [box, trigger] = [tooltip, document.querySelector(`[aria-describedby="${tooltip.id}"]`)].map((element) => element.getBoundingClientRect())
+        const gap = Math.round(Math.min(Math.abs(trigger.top - box.bottom), Math.abs(box.top - trigger.bottom)))
+        return { overflow: getComputedStyle(tooltip).overflow, gap }
+      })()
+    JS
+  end
+
+  def scroll_container(delta)
+    page.driver.with_playwright_page { it.mouse.wheel(delta, 0) }
+  end
+
+  # The top layer stacks popovers in the order they were shown
+  def last_shown_tooltip
+    page.evaluate_script("window.shownTooltips.at(-1)")
   end
 
   it "renders accessibly and supports the full hover/focus/click state machine" do
@@ -47,12 +68,15 @@ RSpec.describe UI::Tooltip::Component, :js, type: :system do
     body_tooltip = find(".tooltip-body-imperial", visible: :all).find(:xpath, "ancestor::*[@role='tooltip']", visible: :all)
     expect(body_tooltip).to have_css(".tooltip-body-imperial", text: "5 mi", visible: :all)
 
-    # Hover shows, mouseleave hides
+    # Hover shows, mouseleave hides - in the top layer, which no ancestor's opacity or overflow reaches
     trigger.hover
     expect(tooltip).to be_visible
+    expect(top_layer?(tooltip_ids.first)).to be true
     expect(tooltip_position(tooltip_ids.first)).to include("top" => be_present, "left" => be_present)
+    expect(popover_styles(tooltip_ids.first)).to eq("overflow" => "visible", "gap" => 8)
     find("body").hover
     expect(tooltip).not_to be_visible
+    expect(top_layer?(tooltip_ids.first)).to be false
 
     # Focus shows, body click hides
     page.execute_script("arguments[0].focus()", trigger)
@@ -158,13 +182,49 @@ RSpec.describe UI::Tooltip::Component, :js, type: :system do
     find("body").click
     expect(commit_tooltip).not_to be_visible
 
-    # One hovered goes above one held open, though another was open when it opened and has closed since
+    # One hovered goes above one held open, and one held open goes back above it once hovered again
+    page.execute_script(<<~JS)
+      window.shownTooltips = []
+      document.addEventListener("toggle", (event) => event.newState === "open" && window.shownTooltips.push(event.target.id), true)
+    JS
     first, second, third = tooltip_ids.first(3)
     find("[aria-describedby='#{first}']").click
     find("[aria-describedby='#{second}']").click
     find("[aria-describedby='#{third}']").hover
     expect(find_by_id(second)).to be_visible
-    expect(tooltip_z_index(third).to_i).to be > tooltip_z_index(second).to_i
+    page.document.synchronize { raise Capybara::ExpectationNotMet unless last_shown_tooltip == third }
+    find("[aria-describedby='#{second}']").hover
+    page.document.synchronize { raise Capybara::ExpectationNotMet unless last_shown_tooltip == second }
+
+    # Held open in a scroll container, hidden while its trigger's scrolled out of view
+    scrolled_trigger = find("button", text: "scrolled trigger")
+    scrolled = find_by_id(scrolled_trigger["aria-describedby"], visible: :all)
+    scrolled_trigger.click
+    expect(scrolled).to be_visible
+    scroll_container(400)
+    expect(page).to have_css("##{scrolled[:id]}:popover-open", visible: :hidden)
+    scroll_container(-400)
+    expect(page).to have_css("##{scrolled[:id]}", visible: true)
+  end
+
+  it "raises by z-index in a browser without popovers" do
+    page.driver.with_playwright_page do |playwright_page|
+      playwright_page.add_init_script(script: <<~JS)
+        for (const name of ["popover", "showPopover", "hidePopover", "togglePopover"]) delete HTMLElement.prototype[name]
+      JS
+    end
+    visit preview_url
+
+    first, second = all("[role='tooltip']", visible: :all).first(2).map { it[:id] }
+    find("[aria-describedby='#{first}']").click
+    find("[aria-describedby='#{second}']").hover
+    expect(find_by_id(first)).to be_visible
+    expect(find_by_id(second)).to be_visible
+    first_position, second_position = [first, second].map { tooltip_position(it) }
+    expect(second_position["zIndex"].to_i).to be > first_position["zIndex"].to_i
+    expect(second_position["position"]).to eq "absolute"
+    find("body").click
+    expect(find_by_id(first, visible: :all)).not_to be_visible
   end
 
   it "is accessible in dark mode" do
