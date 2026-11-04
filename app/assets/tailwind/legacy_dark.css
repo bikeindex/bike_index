@@ -18,7 +18,10 @@
     @apply tw:dark:bg-gray-800 tw:dark:border-gray-700 tw:dark:text-gray-300;
   }
 
-  .form-well-container,
+  .form-well-container {
+    @apply tw:max-md:dark:bg-gray-800;
+  }
+
   .form-well {
     @apply tw:dark:bg-transparent tw:dark:border-gray-700;
   }
