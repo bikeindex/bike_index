@@ -29,6 +29,7 @@ export default class extends Controller {
 
     document.addEventListener('turbo:frame-render', this.handleFrameRender)
     document.addEventListener('turbo:load', this.handleTurboLoad)
+    document.addEventListener('turbo:before-visit', this.handleBeforeVisit)
     // Surface throttling: the eager results frame and the kind-count fetch can
     // both come back 429 during active searching. Catch the frame's response
     // here; the count fetch signals via the search:rate-limited window event.
@@ -45,6 +46,7 @@ export default class extends Controller {
   disconnect () {
     document.removeEventListener('turbo:frame-render', this.handleFrameRender)
     document.removeEventListener('turbo:load', this.handleTurboLoad)
+    document.removeEventListener('turbo:before-visit', this.handleBeforeVisit)
     document.removeEventListener('turbo:before-fetch-request', this.handleFetchRequest)
     document.removeEventListener('turbo:before-fetch-response', this.handleFetchResponse)
     document.removeEventListener('turbo:fetch-request-error', this.handleFetchError)
@@ -55,6 +57,14 @@ export default class extends Controller {
 
   handleTurboLoad = () => {
     this.refreshResults()
+  }
+
+  // A frame navigation pushes its history entry, renders, then starts a visit to the entry, which
+  // cancels any running visit - so a back/forward landing before that loses its restoration, the
+  // one thing that re-renders the form. That visit renders nothing, so nothing's lost without it.
+  handleBeforeVisit = (event) => {
+    const { url } = event.detail
+    if (url === this.frameElement?.src && this.differentSearchOnSamePage(url, window.location.href)) event.preventDefault()
   }
 
   submit () {

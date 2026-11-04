@@ -94,6 +94,20 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     expect(page).to have_field("primary_activity-hw-hidden-field", with: record.id.to_s, type: "hidden", wait: 10)
   end
 
+  # Turbo pushes a frame navigation's history entry, renders, then starts a visit to the entry.
+  # This holds the render until a back/forward lands in that gap; the marker is that visit's turn.
+  def pause_next_results_render_for_traversal
+    page.execute_script(<<~JS)
+      document.addEventListener("turbo:before-frame-render", (event) => {
+        event.preventDefault()
+        window.addEventListener("popstate", event.detail.resume, {once: true})
+      }, {once: true})
+      document.addEventListener("turbo:before-visit", () => {
+        document.body.dataset.testResultsVisitProposed = "true"
+      }, {once: true})
+    JS
+  end
+
   # Hold back the unfiltered results the frame eager-loads on arrival, so the example
   # decides when they land rather than racing a timer
   def hold_initial_results_load
@@ -278,11 +292,7 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     expect(page).to have_no_link(exact_text: "2")
   end
 
-  # :flaky retry: a programmatic go_forward to a form-submitted (turbo advance)
-  # history entry can intermittently no-op in WebDriver (the URL stays on the back
-  # entry). It's a harness artifact - a real browser does back/forward reliably -
-  # so retry on CI. The form's values aren't part of that artifact.
-  it "keeps results and the primary_activity form in sync across back/forward", :flaky do
+  it "keeps results and the primary_activity form in sync across back/forward" do
     visit_marketplace_via_nav
     # First 12 on the unfiltered page (the 2 members sort first)
     expect(page).to have_css("[data-test-id^='search-result-card-']", wait: 10, count: 12)
@@ -305,6 +315,19 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     # Forward to the Road cycling search - everything reconciles back to it
     page.go_forward
     expect(page).to have_current_path(/primary_activity=#{other_primary_activity.id}/, wait: 10)
+    expect(page).to have_css("[data-test-id^='search-result-card-']", wait: 10, count: 9)
+    expect_primary_activity(other_primary_activity, "Road cycling")
+
+    # Back from a search still landing: the restoration, held open here, has to survive the
+    # visit that search starts once it renders - or the form stays on the search left behind
+    pause_next_results_render_for_traversal
+    restoration = hold_requests("**/search/marketplace*") { |request| request.headers["turbo-frame"].nil? }
+    search_primary_activity("Mountain biking")
+    expect(page).to have_current_path(/primary_activity=#{primary_activity.id}/, wait: 10)
+    page.go_back
+    expect(page).to have_css("body[data-test-results-visit-proposed]", wait: 10)
+    expect(page).to have_current_path(/primary_activity=#{other_primary_activity.id}/)
+    restoration.release
     expect(page).to have_css("[data-test-id^='search-result-card-']", wait: 10, count: 9)
     expect_primary_activity(other_primary_activity, "Road cycling")
   end
