@@ -111,16 +111,7 @@
   .less-strong {
     @apply tw:opacity-65 tw:decoration-gray-900/65 tw:dark:decoration-gray-400/65;
 
-    a:hover,
-    & + a:hover,
-    .btn:hover,
-    &.btn:hover,
-    .btn:focus,
-    &.btn:focus,
-    .form-control:hover,
-    &.form-control:hover,
-    .form-control:focus,
-    &.form-control:focus {
+    &:is(.btn, .form-control):is(:hover, :focus) {
       opacity: 1;
     }
   }
