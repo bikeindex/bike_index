@@ -834,13 +834,13 @@
     {
       "warning_type": "Cross-Site Scripting",
       "warning_code": 4,
-      "fingerprint": "b1febf55f2f395b7732c651773270d28fd1ea68339acca5c4ee76732e2aaed0e",
+      "fingerprint": "eb47976003f5808844b209be0faf195be1132ba24f476e12572f01c4477232ad",
       "check_name": "LinkToHref",
       "message": "Potentially unsafe model attribute in `link_to` href",
       "file": "app/views/organized/model_audits/show.html.haml",
-      "line": 105,
+      "line": 76,
       "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
-      "code": "link_to(truncate((Unresolved Model).new.url), (Unresolved Model).new.url)",
+      "code": "link_to(Urlifyer.display((Unresolved Model).new.url, :length => 30), (Unresolved Model).new.url)",
       "render_path": [
         {
           "type": "controller",
