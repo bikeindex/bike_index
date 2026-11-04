@@ -36,6 +36,9 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(list.evaluate_script("[this.children[0].offsetWidth, this.children[0].offsetLeft === this.children[1].offsetLeft]")).to eq [300, true]
     scrolled = list.evaluate_script("this.scrollLeft")
     id = list.all("a", text: /, add to the comparison\z/)[2][:id]
+    # The card the last click left the pointer on settles from the resize's frame. Clicked before it has, Playwright finds
+    # the link unstable and retries with it at the row's end, which snaps the row back to its start
+    list.evaluate_script("new Promise((resolve) => requestAnimationFrame(resolve)).then(() => Promise.allSettled(this.getAnimations({ subtree: true }).map((animation) => animation.finished))).then(() => true)")
     find("##{id}").click
     expect(page).to have_css("##{id}:focus", text: /, remove from the comparison\z/)
     expect(find(selector).evaluate_script("this.scrollLeft")).to eq scrolled
