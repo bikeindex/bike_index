@@ -1,14 +1,15 @@
-<div class="tw:overflow-hidden tw:rounded-xl <%= UI::Card::Component::BASE_CLASSES %>">
-  <%= render(UI::TableInCard::Component.new(records: UI::Table::ComponentPreview::SAMPLE_RECORDS,
-    sort_state: ComponentStructs::SortState.new(search_params: {period: "all"}, sort: "first_seen", direction: "desc"),
-    data: selection ? {controller: "table-multi-checkbox"} : {})) do |table| %>
-    <% table.selection_column(param: "cryptids") if selection %>
+<% columns = {credibility_cell: "Credibility", enthusiasm_cell: "Enthusiasm", sightings_cell: "Sightings", first_seen_cell: "First Seen"} %>
 
-    <%# lower_right takes no room of its own, and the frozen column shrinks to its content %>
-    <% table.column(label: "Cryptid", lower_right: ->(record) { record.region }) { |record| tag.div(record.name, class: "tw:min-w-60") } %>
-    <% table.column(label: "Credibility") { |record| render(UI::Badge::Component.new(text: record.credibility, color: (record.credibility == "Confirmed") ? :success : :gray, size: :sm)) } %>
-    <% table.column(label: "Enthusiasm") { |record| render(UI::Badge::Component.new(text: record.enthusiasm, color: UI::Table::ComponentPreview::ENTHUSIASM_COLORS[record.enthusiasm], size: :sm)) } %>
-    <% table.column(label: "Sightings") { |record| number_with_delimiter(record.sightings) } %>
-    <% table.column(label: "First Seen", sort_indicator: "first_seen", classes: "tw:whitespace-nowrap") { |record| render(UI::Time::Component.new(time: record.first_seen)) } %>
-  <% end %>
-</div>
+<%= render(UI::TableInCard::Component.new(records: UI::Table::ComponentPreview::SAMPLE_RECORDS,
+  sort_state: ComponentStructs::SortState.new(search_params: {period: "all"}, sort: "first_seen", direction: "desc"),
+  column_settings: {storage_key: selection ? "tableInCardSelectionPreview" : "tableInCardPreview", columns:, defaults: columns.keys},
+  form: ({url: "#"} if selection))) do |table| %>
+  <% table.selection_column(param: "cryptids") if selection %>
+
+  <%# lower_right takes no room of its own, and the frozen column shrinks to its content %>
+  <% table.column(label: "Cryptid", lower_right: ->(record) { record.region }) { |record| tag.div(record.name, class: "tw:min-w-60") } %>
+  <% table.column(hideable: :credibility_cell) { |record| render(UI::Badge::Component.new(text: record.credibility, color: (record.credibility == "Confirmed") ? :success : :gray, size: :sm)) } %>
+  <% table.column(hideable: :enthusiasm_cell) { |record| render(UI::Badge::Component.new(text: record.enthusiasm, color: UI::Table::ComponentPreview::ENTHUSIASM_COLORS[record.enthusiasm], size: :sm)) } %>
+  <% table.column(hideable: :sightings_cell) { |record| number_with_delimiter(record.sightings) } %>
+  <% table.column(hideable: :first_seen_cell, sort_indicator: "first_seen", classes: "tw:whitespace-nowrap") { |record| render(UI::Time::Component.new(time: record.first_seen)) } %>
+<% end %>
