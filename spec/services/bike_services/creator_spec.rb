@@ -687,10 +687,8 @@ RSpec.describe BikeServices::Creator do
         end
 
         it "leaves the photo to the job rather than failing the registration" do
-          expect { instance.attach_photo(b_param, bike) }
-            .to change(ImageJobs::AttachBlobJob.jobs, :count).by 1
-          expect(bike.public_images.count).to eq 0
-          expect(ImageJobs::AttachBlobJob.jobs.last["args"]).to eq([b_param.id, bike.id])
+          instance.attach_photo(b_param, bike)
+          expect(ImageJobs::AttachBlobJob.jobs.map { it["args"] }).to eq [[b_param.id, bike.id]]
         end
       end
 

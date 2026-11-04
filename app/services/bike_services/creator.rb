@@ -107,7 +107,7 @@ module BikeServices
       bike
     end
 
-    # Called from ImageJobs::AssociatorJob, so can't be private
+    # Called from ImageAssociatorJob, so can't be private
     def attach_photo(b_param, bike)
       return if b_param.image_signed_id.blank? && b_param.image.blank?
 
@@ -117,7 +117,7 @@ module BikeServices
         rescue Seahorse::Client::NetworkingError, Aws::Errors::ServiceError
           # Attaching reads the blob back from R2 to identify it. Raising here strands the bike
           # without a created_bike_id, so resubmitting the form would register a second one
-          ImageJobs::AttachBlobJob.perform_async(b_param.id, bike.id)
+          ImageJobs::AttachBlobJob.perform_in(1.minute, b_param.id, bike.id)
         end
       else
         PublicImage.create(imageable: bike, image: b_param.image)
@@ -126,7 +126,6 @@ module BikeServices
       bike.reload
     end
 
-    # Called from ImageJobs::AttachBlobJob, so can't be private
     def attach_blob(b_param, bike)
       blob = b_param.image_blob # nil once reaped - drop the photo, not the registration
       PublicImage.create(imageable: bike, file: blob) if blob

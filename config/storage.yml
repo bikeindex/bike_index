@@ -27,8 +27,8 @@ cloudflare_dev:
   bucket: bikeindex-dev
   region: auto
   public: true
-  http_open_timeout: 5
-  http_read_timeout: 10
+  http_open_timeout: 3
+  http_read_timeout: 8
   retry_limit: 1
   # When upgrading S3, this will need to be uncommented
   # request_checksum_calculation: "when_required"
@@ -43,9 +43,9 @@ cloudflare_production:
   region: auto
   public: true
   # The SDK defaults to a 60s read and 3 retries, so a hung R2 outlasts rack-timeout's 30s.
-  # Worst case here is 2 reads = 20s
-  http_open_timeout: 5
-  http_read_timeout: 10
+  # Worst case here is 2 x (connect + read) = 22s
+  http_open_timeout: 3
+  http_read_timeout: 8
   retry_limit: 1
   # When upgrading S3, this will need to be uncommented
   # request_checksum_calculation: "when_required"

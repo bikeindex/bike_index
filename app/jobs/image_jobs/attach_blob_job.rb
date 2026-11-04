@@ -1,6 +1,6 @@
 module ImageJobs
   class AttachBlobJob < ApplicationJob
-    sidekiq_options queue: "high_priority"
+    sidekiq_options queue: "med_priority"
 
     def perform(b_param_id, bike_id)
       b_param = BParam.find_by(id: b_param_id)
