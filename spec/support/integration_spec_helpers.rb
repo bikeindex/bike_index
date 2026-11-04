@@ -113,9 +113,11 @@ module IntegrationSpecHelpers
   # Playwright's fill, which dispatches only an `input` event; JS that opens on
   # keydown (e.g. hotwire_combobox's async dropdown) needs real key events. A combobox
   # typed into before its controller connects never searches, so that waits first.
+  # has_ancestor? because matches_css? can't ask this: it resolves against the field's parent,
+  # and Playwright scopes a selector to its root, so an ancestor above that never matches.
   def type_into(locator, text)
     field = locator.is_a?(Capybara::Node::Element) ? locator : find(locator)
-    wait_for_stimulus("hw-combobox") if field.matches_css?("[data-controller~='hw-combobox'] *", wait: 0)
+    wait_for_stimulus("hw-combobox") if field.has_ancestor?("[data-controller~='hw-combobox']", wait: 0)
     field.set("")
     field.send_keys(text)
     field
@@ -351,6 +353,8 @@ module IntegrationSpecHelpers
       # Pushing the token back leaves the gate open for the next one
       @gate.push(@gate.pop)
     end
+
+    def held? = @held
 
     # A pattern that stops matching holds nothing, leaving the example green against no race
     def release

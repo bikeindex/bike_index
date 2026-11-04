@@ -199,7 +199,8 @@ module Organized
         time_range: chart_time_range,
         colors: Pages::Org::Search::ChartCard::Component::BANDS.values.map { it[:hex] },
         height: Pages::Org::Search::ChartCard::Component::CHART_HEIGHT,
-        stacked: true
+        stacked: true,
+        skip_legend_counts: true
       )
     end
 

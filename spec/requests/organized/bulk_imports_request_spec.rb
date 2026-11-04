@@ -145,6 +145,7 @@ RSpec.describe Organized::BulkImportsController, type: :request do
           expect(response).to render_template :new
           expect(assigns(:current_organization)).to eq current_organization
           expect(assigns(:bulk_import)&.kind).to eq "organization_import"
+          expect(response.body).to include("bulk_import[allow_duplicate]")
           get "#{base_url}/new?kind=stolen"
           expect(assigns(:bulk_import)&.kind).to eq "organization_import"
         end
@@ -158,6 +159,10 @@ RSpec.describe Organized::BulkImportsController, type: :request do
             expect(assigns(:current_organization)).to eq current_organization
             expect(assigns(:permitted_kinds)).to eq(%w[organization_import impounded stolen])
             expect(assigns(:bulk_import)&.kind).to eq "organization_import"
+            page = Capybara.string(response.body)
+            expect(page).to have_unchecked_field("bulk_import_allow_duplicate")
+            expect(page).to have_checked_field("impounded_bulk_import_allow_duplicate")
+            expect(page).to have_checked_field("stolen_bulk_import_allow_duplicate")
             get "#{base_url}/new?kind=impounded"
             expect(assigns(:bulk_import)&.kind).to eq "impounded"
             get "#{base_url}/new?kind=stolen"
@@ -174,6 +179,13 @@ RSpec.describe Organized::BulkImportsController, type: :request do
           get "#{base_url}/#{bulk_import.id}"
           expect(response.status).to eq(200)
           expect(response).to render_template :show
+        end
+        context "with matching rows" do
+          before { bulk_import.update(data: (bulk_import.data || {}).merge("matched_count" => 3)) }
+          it "renders the count" do
+            get "#{base_url}/#{bulk_import.id}"
+            expect(response.body).to include("Rows matching existing registrations")
+          end
         end
         context "not organizations bulk_import" do
           let(:bulk_import) { FactoryBot.create(:bulk_import) }
@@ -200,7 +212,17 @@ RSpec.describe Organized::BulkImportsController, type: :request do
             expect(bulk_import.organization_id).to eq current_organization.id
             expect(bulk_import.kind).to eq "organization_import" # Because this isn't a permitted kind
             expect(bulk_import.send_email).to be_truthy # Because no_notify isn't permitted here, only in admin
+            expect(bulk_import.allow_duplicate).to be_falsey
             expect(BulkImportJob).to have_enqueued_sidekiq_job(bulk_import.id)
+          end
+          context "allow_duplicate checked" do
+            let(:bulk_import_params) { {file:, kind: "organization_import", allow_duplicate: "1"} }
+            it "creates" do
+              expect {
+                post base_url, params: {bulk_import: bulk_import_params}
+              }.to change(BulkImport, :count).by 1
+              expect(BulkImport.last.allow_duplicate).to be_truthy
+            end
           end
           context "impound" do
             let!(:current_organization) { impound_organization }
@@ -210,7 +232,7 @@ RSpec.describe Organized::BulkImportsController, type: :request do
             it "imports impounded bikes", :flaky do
               Sidekiq::Job.clear_all
               expect {
-                post base_url, params: {bulk_import: {file: file, kind: "impounded"}}
+                post base_url, params: {bulk_import: {file: file, kind: "impounded", allow_duplicate: "1"}}
               }.to change(BulkImport, :count).by 1
 
               bulk_import = BulkImport.last
@@ -219,6 +241,7 @@ RSpec.describe Organized::BulkImportsController, type: :request do
               expect(bulk_import.progress).to eq "pending"
               expect(bulk_import.organization).to eq current_organization
               expect(bulk_import.kind).to eq "impounded"
+              expect(bulk_import.allow_duplicate).to be_truthy
               expect(BulkImportJob).to have_enqueued_sidekiq_job(bulk_import.id)
 
               expect { BulkImportJob.drain }.to change(Bike, :count).by 2
@@ -271,7 +294,7 @@ RSpec.describe Organized::BulkImportsController, type: :request do
               Sidekiq::Job.clear_all
               expect {
                 post base_url, params: {
-                  bulk_import: {file: file, kind: "stolen"},
+                  bulk_import: {file: file, kind: "stolen", allow_duplicate: "1"},
                   stolen_record: stolen_record_params
                 }
               }.to change(BulkImport, :count).by 1
@@ -282,6 +305,7 @@ RSpec.describe Organized::BulkImportsController, type: :request do
               expect(bulk_import.organization_id).to eq current_organization.id
               expect(bulk_import.kind).to eq "stolen"
               expect(bulk_import.no_notify).to be_truthy
+              expect(bulk_import.allow_duplicate).to be_truthy
               expect(bulk_import.data["stolen_record"]).to match_hash_indifferently stolen_record_params.except(:bad_attribute)
               expect(BulkImportJob).to have_enqueued_sidekiq_job(bulk_import.id)
 

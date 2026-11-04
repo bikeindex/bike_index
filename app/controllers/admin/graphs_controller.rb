@@ -38,7 +38,7 @@ module Admin
         {"Org" => "organized", "Org serial" => "organized_serial", "User" => "user", "User serial" => "user_serial",
          "Marketplace" => "web_marketplace"}
       else
-        {"BikeBook" => "web_bikebook", "E-bike rules" => "web_ebike_rules"}
+        {"BikeBook" => "web_bikebook", "Comparisons" => "web_bikebook_comparison", "E-bike rules" => "web_ebike_rules"}
       end
       render json: series.map { |name, kind| {name:, data: daily.transform_values { it[kind] }} }.chart_json
     end

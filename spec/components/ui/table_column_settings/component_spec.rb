@@ -22,8 +22,8 @@ RSpec.describe UI::TableColumnSettings::Component, type: :component do
         sections: {"Fit columns" => %i[size_cell]}, orderable: true, copy_order_from: {storage_key: "otherThings", label: "Copy other order"}))
     end
 
-    it "lists a section's columns under its heading, after the rest, and returns to the default order or copies the other table's" do
-      expect(component.css("h3, input[type='checkbox']").map { it[:name] || it.text.strip }).to eq ["Visible columns", "name_cell", "color_cell", "Fit columns", "size_cell"]
+    it "lists the columns alphabetically, a section's under its heading after the rest, and returns to the default order or copies the other table's" do
+      expect(component.css("h3, input[type='checkbox']").map { it[:name] || it.text.strip }).to eq ["Visible columns", "color_cell", "name_cell", "Fit columns", "size_cell"]
       expect(component).to have_css("[data-ui--table-column-order-target='actions'].tw\\:hidden\\! button[data-ui--table-column-order-target='reset']",
         text: "Return to default column order", visible: :all)
       expect(component).to have_css("button[data-ui--table-column-order-target='copy'][data-storage-key='otherThingsOrder']", text: "Copy other order", visible: :all)

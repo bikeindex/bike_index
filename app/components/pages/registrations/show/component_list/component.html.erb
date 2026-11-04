@@ -19,7 +19,7 @@
     <span
       class="
         tw:flex tw:flex-none tw:items-center tw:gap-1.5 tw:text-[13px]
-        tw:font-bold tw:text-[#715eb2]
+        tw:font-bold tw:text-[#715eb2] tw:dark:text-purple-300
       "
     >
       <span class="tw:[details[open]_&]:hidden">
@@ -40,12 +40,7 @@
   >
     <% grouped_rows.each do |cgroup, rows| %>
       <%= render(UI::Card::Component.new) do %>
-        <h2
-          class="
-            tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2]
-            tw:uppercase
-          "
-        >
+        <h2 class="tw:tweyebrow">
           <%= cgroup.name %>
         </h2>
 

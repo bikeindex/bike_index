@@ -3,16 +3,14 @@
 
 - if @kind == "general"
 
-  %h2.mt-4 Users past week
+  = render(UI::Header::Component.new(text: "Users past week", tag: :h2))
   = render(UI::Chart::Component.new(series: variable_admin_graphs_path(search_kind: "users", period: "week"), stacked: true))
 
-  %h2.mt-4
-    Users past year
+  = render(UI::Header::Component.new(text: "Users past year", tag: :h2, html_class: "tw:mt-6"))
   = render(UI::Chart::Component.new(series: variable_admin_graphs_path(search_kind: "users", period: "year"), stacked: true))
 
 
-  %h2.mt-4
-    Bikes past year
+  = render(UI::Header::Component.new(text: "Bikes past year", tag: :h2, html_class: "tw:mt-6"))
   = render(UI::Chart::Component.new(series: variable_admin_graphs_path(search_kind: "bikes", period: "year"), stacked: true))
 
 - elsif @kind == "bikes"
@@ -22,9 +20,9 @@
 
 - else
   - if @total_count.present?
-    %p.mt-4
+    %p{class: "tw:mt-6 tw:mb-4"}
       #{number_display(@total_count)} matching #{@kind}
       %em
         = render(UI::TimeRange::Component.new(time_range: @time_range, period: @period))
-  .mt-4
+  %div{class: "tw:mt-6"}
   = render(UI::Chart::Component.new(series: variable_admin_graphs_path(sortable_params)))

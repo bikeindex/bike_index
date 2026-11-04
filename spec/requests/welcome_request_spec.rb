@@ -97,12 +97,41 @@ RSpec.describe WelcomeController, type: :request do
       it "paginates, and redirects to the last valid page when the requested one is past the end" do
         get "/recovery_stories", params: {per_page: 2}
         expect(response.status).to eq(200)
-        expect(response).to render_template("recovery_stories")
         expect(assigns(:recovery_displays).count).to eq 2
+        expect(response.body).to include("Load more stories")
         expect(flash).to_not be_present
+
+        get "/recovery_stories", params: {per_page: 2, page: 2}
+        expect(response.body).to include("Newer stories")
+        expect(response.body).to include("Fund the next recovery")
 
         get "/recovery_stories", params: {per_page: 2, page: 3}
         expect(response).to redirect_to(recovery_stories_path(page: 2))
+      end
+
+      it "renders only the requested page's frame for a load more" do
+        get "/recovery_stories", params: {per_page: 2, page: 2}, headers: {"Turbo-Frame" => "recovery_stories_page_2"}
+        expect(response.status).to eq(200)
+        expect(response.body).to include('<turbo-frame class="tw:contents" id="recovery_stories_page_2">')
+        expect(response.body).to include(ERB::Util.html_escape(quote))
+        expect(response.body).to_not include("Load more stories")
+        expect(response.body).to_not include("Newer stories")
+        expect(response.body).to_not include("Fund the next recovery")
+      end
+
+      context "when stories share a recovered_at" do
+        let(:recovered_at) { Time.current.beginning_of_day + 6.hours }
+        let!(:recovery_displays) { FactoryBot.create_list(:recovery_display, 4, recovered_at:) }
+
+        # Postgres returns ties in whatever order a plan reads them, so a page
+        # boundary through them can repeat one story and skip another
+        it "breaks ties by id" do
+          shown = [1, 2, 3].flat_map do |page|
+            get "/recovery_stories", params: {per_page: 2, page:}
+            assigns(:recovery_displays).map(&:id)
+          end
+          expect(shown).to eq(RecoveryDisplay.reorder(recovered_at: :desc, id: :desc).pluck(:id))
+        end
       end
     end
 
@@ -116,7 +145,6 @@ RSpec.describe WelcomeController, type: :request do
 
         get "/recovery_stories"
         expect(response.status).to eq(200)
-        expect(response).to render_template("recovery_stories")
         expect(assigns(:recovery_displays).count).to eq 1
         # passive_organization isn't re-authorized once it's in the session
         expect(session[:passive_organization_id]).to eq current_organization.id

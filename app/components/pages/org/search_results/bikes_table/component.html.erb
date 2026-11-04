@@ -3,7 +3,7 @@
 <% organization = @organization %>
 <% impound = impound? %>
 
-<%= render(UI::CardTable::Component.new(data: table_wrapper_data_attributes, records: @impound_records || @bikes, cache_key:, cache_records:, render_sortable: @render_sortable, sort_state: @sort_state)) do |table| %>
+<%= render(UI::TableInCard::Component.new(data: table_wrapper_data_attributes, records: @impound_records || @bikes, cache_key:, cache_records:, render_sortable: @render_sortable, sort_state: @sort_state)) do |table| %>
   <%#
     An impound search's rows are its impound records, so a registration column takes the
     record's bike - and doesn't sort, since the search orders by the record
@@ -82,9 +82,7 @@
   <% end %>
 
   <% column.(label: settings.column_renames[:url_cell], classes: "hideableColumn url_cell") do |bike| %>
-    <code class="tw:p-0 tw:text-xs!" style="word-break: normal">
-      <%= bike.html_url %>
-    </code>
+    <%= render(UI::Code::Inline::Component.new(text: bike.html_url, small: true, word_break: false)) %>
   <% end %>
 
   <% column.(sortable: "id", label: settings.column_renames[:created_at_cell], classes: "hideableColumn created_at_cell") do |bike| %>

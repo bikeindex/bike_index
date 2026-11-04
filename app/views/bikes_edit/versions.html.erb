@@ -88,9 +88,7 @@
               </p>
 
               <% if strava_integration.syncing? %>
-                <div class="alert alert-info mb-3">
-                  <%= t("bikes_edit.strava_gear.sync_not_finished") %>
-                </div>
+                <%= render(UI::Alerts::Base::Component.new(kind: :notice, text: t("bikes_edit.strava_gear.sync_not_finished"), margin_classes: "tw:mb-3")) %>
               <% end %>
             </div>
 

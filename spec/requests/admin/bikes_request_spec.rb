@@ -14,6 +14,16 @@ RSpec.describe Admin::BikesController, type: :request do
       expect(assigns(:page_id)).to eq "admin_bikes_index"
     end
 
+    context "sorted by occurred_at" do
+      let!(:bike) { FactoryBot.create(:bike, :with_ownership) }
+      let!(:stolen_bike) { FactoryBot.create(:stolen_bike) }
+      it "puts the bikes without one last" do
+        get base_url, params: {sort: "occurred_at", direction: "asc"}
+        expect(response.code).to eq("200")
+        expect(assigns(:bikes).pluck(:id)).to eq([stolen_bike.id, bike.id])
+      end
+    end
+
     context "with render_chart and search_email" do
       let!(:bike) { FactoryBot.create(:bike, :with_ownership, :with_ownership_claimed, user:) }
       let(:user) { FactoryBot.create(:user_confirmed, email: "somethingcool@bikeindex.org") }
@@ -154,6 +164,19 @@ RSpec.describe Admin::BikesController, type: :request do
       # A tab the show action doesn't render would otherwise raise from the tabs component
       get "#{base_url}/#{bike.id}?active_tab=party"
       expect(response).to redirect_to("#{base_url}/#{bike.id}/edit")
+    end
+
+    context "with a recovery waiting on a decision" do
+      let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, bike:, recovered_description: "Got it back from the shop") }
+      before { stolen_record.update_column(:recovery_display_status, "waiting_on_decision") }
+      it "renders it without the bulk display form" do
+        get "#{base_url}/#{bike.id}?active_tab=recoveries"
+        expect(response.code).to eq("200")
+        expect(response.body).to include("Got it back from the shop")
+        expect(response.body).to_not include("display[#{stolen_record.id}][quote]")
+        expect(response.body).to_not include("sr_selected")
+        expect(response.body).to_not include("bulk_update")
+      end
     end
 
     context "with an organization message" do
@@ -398,6 +421,19 @@ RSpec.describe Admin::BikesController, type: :request do
       bike3.reload
       expect(bike3.manufacturer_other).to eq "69" # Sanity check
       expect(UpdateModelAuditJob.jobs.map { |j| j["args"] }.flatten).to match_array([11, 12])
+    end
+  end
+
+  describe "undelete" do
+    let!(:bike) { FactoryBot.create(:bike, :with_ownership, deleted_at: Time.current) }
+
+    it "restores the bike" do
+      expect(Bike.pluck(:id)).to eq([])
+      put "#{base_url}/#{bike.id}/undelete"
+      expect(response).to redirect_to(edit_admin_bike_url(bike))
+      expect(flash[:success]).to match(/un-deleted/i)
+      expect(Bike.pluck(:id)).to eq([bike.id])
+      expect(CallbackJobs::AfterBikeSaveJob).to have_enqueued_sidekiq_job(bike.id)
     end
   end
 

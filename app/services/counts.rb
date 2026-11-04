@@ -5,7 +5,7 @@ module Counts
 
   COUNT_KEYS = %w[total_bikes stolen_bikes recoveries recoveries_value week_creation_chart organizations].freeze
 
-  LOGGED_SEARCH_KINDS = %w[web_bikebook web_ebike_rules organized organized_serial user user_serial web_marketplace].freeze
+  LOGGED_SEARCH_KINDS = %w[web_bikebook web_bikebook_comparison web_ebike_rules organized organized_serial user user_serial web_marketplace].freeze
 
   RECOVERY_AVERAGE_VALUE = 2103 # updated with calculated_recovery_average_value on 2026-4-11
 
@@ -84,8 +84,8 @@ module Counts
   def assign_logged_searches(dates = [Date.yesterday, Date.current])
     dates.each do |date|
       counts = LoggedSearch.where(request_at: date.all_day)
-        .group(:endpoint, Arel.sql("serial_normalized IS NOT NULL")).count
-      kind_counts = counts.group_by { |(endpoint, serial), _| logged_search_kind(endpoint, serial) }
+        .group(:endpoint, Arel.sql("serial_normalized IS NOT NULL"), Arel.sql(LoggedSearch::COMPARISON_SQL)).count
+      kind_counts = counts.group_by { |(endpoint, serial, comparison), _| logged_search_kind(endpoint, serial, comparison) }
         .except(nil).transform_values { it.sum(&:last) }
       assign_for("logged_searches_#{date}", kind_counts.to_json)
     end
@@ -124,8 +124,9 @@ module Counts
   end
 
   # The marketplace's counts lookup accompanies each of its searches, so it isn't one
-  def logged_search_kind(endpoint, serial)
+  def logged_search_kind(endpoint, serial, comparison)
     case endpoint&.to_sym
+    when :web_bikebook then comparison ? "web_bikebook_comparison" : endpoint
     when *LoggedSearch.bikebook_endpoints, :web_marketplace then endpoint
     when :web_marketplace_count then nil
     when *LoggedSearch.organized_endpoints then serial ? "organized_serial" : "organized"

@@ -9,8 +9,9 @@ module Pages
       class Component < ApplicationComponent
         # market is the visitor's CF-IPCountry, which Cloudflare sends as XX, or T1 over Tor, when it can't
         # tell; state is theirs in the US
-        def initialize(manifest_url:, market:, state:, query:)
+        def initialize(manifest_url:, market:, state:, query:, paint_colors:)
           @manifest_url = manifest_url
+          @paint_colors = paint_colors
           @market = %w[XX T1].include?(market) ? "US" : market.presence || "US"
           @jurisdiction = state&.dig(:abbr) || "US"
           @query = query
@@ -19,11 +20,19 @@ module Pages
         private
 
         # The search until bikebook--page fills it in from the URL: hidden as searching() hides a lone model's, and blank
-        # where the URL sets anything
+        # where the URL sets anything but picks, which it says are loading
         def placeholder_class
           models, classifications = %w[vehicle_models classifications].map { @query[it].to_s.split(",").compact_blank }
           return "tw:hidden" if models.one? && classifications.none? && !@query.key?("search")
-          "tw:invisible" if @query.except("search").any?
+          "tw:invisible" if @query.except("search", "vehicle_models").any?
+        end
+
+        # Saying so where the URL has picks, which wait on the catalog, like loadingShell's. Swapped rather than rendered
+        # again for the one attribute, as the search is a third of the page's render
+        def placeholder_search(search)
+          return search if @query["vehicle_models"].blank?
+
+          search.sub(%(placeholder="#{h(translation(".search_placeholder"))}"), %(placeholder="#{h(translation(".loading_placeholder"))}")).html_safe
         end
 
         # The closed filters' and the open card's, so it's beside whichever shows

@@ -1,13 +1,16 @@
 import { html, nothing } from 'lit-html'
 import { numberDisplay, uuid } from 'bikebook/templates/helpers'
+import { inlineBadge } from 'bikebook/templates/ui/badge'
 import { classificationOption } from 'bikebook/templates/vehicles/class_cards'
 import { comboboxOption } from 'bikebook/templates/vehicles/combobox_option'
 import { fragmentOf, renderInto } from 'bikebook/render'
 
 /* global IntersectionObserver, Worker */
 
-// `jurisdictions` names the codes classifications are in, which the catalog doesn't
-export async function loadCatalog (manifestUrl, ids = [], jurisdictions = {}) {
+// `jurisdictions` names the codes classifications are in, which the catalog doesn't, and `paintColors` are Bike Index's
+// colors' displays by their names, which its colorways' colors are. `onPicks` takes what `ids` render from, as soon as
+// it's in, where there are any, and `comparing` fetches the comparison alongside the index rather than after it
+export async function loadCatalog (manifestUrl, ids = [], jurisdictions = {}, paintColors = {}, { onPicks = () => {}, comparing } = {}) {
   const worker = new Worker(import.meta.resolve('bikebook/catalog_worker'), { type: 'module' })
   const pending = new Map()
   let nextId = 0
@@ -25,19 +28,19 @@ export async function loadCatalog (manifestUrl, ids = [], jurisdictions = {}) {
     worker.postMessage({ id: nextId++, type, ...args })
   })
 
+  const painted = ({ vocabulary, ...rest }) => ({ ...rest, vocabulary: { ...vocabulary, paint_colors: paintColors }, vehicles: (ids, { market } = {}) => call('vehicles', { ids, market }) })
+
   try {
-    const { vocabulary, kit, options, comparable } = await call('load', {
-      manifestUrl: new URL(manifestUrl, window.location.href).href,
-      ids,
-      jurisdictions,
+    // a failure is load's to report, as it waits on the same files
+    call('start', { manifestUrl: new URL(manifestUrl, window.location.href).href, ids, jurisdictions, comparing }).then((picks) => ids.length && onPicks(painted(picks)), () => {})
+    const loaded = await call('load', {
       rulesUrl: import.meta.resolve('bikebook/featured_rules'),
       similarityUrl: import.meta.resolve('bikebook/similarity')
     })
     return {
-      vocabulary,
-      kit,
-      options,
-      comparable,
+      ...painted(loaded),
+      // what the comparison adds, once it's in
+      comparison: () => call('comparison'),
       // null, as for a comparison format it doesn't know, where the comparison doesn't load
       similar: (model, settings, filters) => call('similar', { model, settings, filters }).catch((error) => {
         console.error(error)
@@ -45,12 +48,12 @@ export async function loadCatalog (manifestUrl, ids = [], jurisdictions = {}) {
       }),
       search: (params, page, perPage) => call('search', { params, page, perPage }),
       featured: (params, legalClasses) => call('featured', { params, legalClasses }),
-      group: (id) => call('group', { model: id }),
-      vehicles: (ids, { market } = {}) => call('vehicles', { ids, market }),
+      group: (id, { market, market_scope: scope }) => call('group', { model: id, market, scope }),
       displays: (ids) => call('displays', { ids })
     }
   } catch (error) {
-    worker.terminate()
+    // picked vehicles render from it without the index
+    if (!ids.length) worker.terminate()
     throw error
   }
 }
@@ -142,6 +145,9 @@ export class CatalogComboboxSource {
   }
 }
 
+// the catalog's mark on a current model's display, which a chip shows as a badge
+export const CURRENT_MARK = / \(current\)$/
+
 // The gem's selection chip partial, ahead of the field, gripped where bikebook--chip-reorder drags them by the
 // template[data-chip-grip] beside it. Each grip's id is its model's and its count among that model's repeats, so a
 // render that recreates the chips keeps a grip's focus
@@ -150,10 +156,13 @@ export const renderChips = (combobox, chips) => {
   const chipped = [...combobox.querySelectorAll('[data-hw-combobox-value-param]')].map((remover) => remover.dataset.hwComboboxValueParam)
   const values = [...chipped, ...chips.map(({ value }) => value)]
   const handleId = (value, index) => `move-${value}-${values.slice(0, chipped.length + index).filter((each) => each === value).length}`
-  combobox.querySelector('[data-hw-combobox-target~="combobox"]').before(fragmentOf(chips.map(({ value, display }, index) =>
-    html`<div data-hw-combobox-chip=""><div class="hw-combobox__chip">${grip ? gripFor(grip, display, handleId(value, index)) : nothing}<span>${display}</span><span tabindex="0" class="hw-combobox__chip__remover"
+  combobox.querySelector('[data-hw-combobox-target~="combobox"]').before(fragmentOf(chips.map(({ value, display }, index) => {
+    const name = display.replace(CURRENT_MARK, '')
+    return html`<div data-hw-combobox-chip=""><div class="hw-combobox__chip">${grip ? gripFor(grip, display, handleId(value, index)) : nothing}<span>${name}${
+      name === display ? nothing : html` ${inlineBadge({ text: 'current', size: 'sm' })}`}</span><span tabindex="0" class="hw-combobox__chip__remover tw:inert:invisible"
       aria-label=${`Remove ${display}`} data-action="click->hw-combobox#removeChip:stop keydown->hw-combobox#navigateChip"
-      data-hw-combobox-target="chipDismisser" data-hw-combobox-value-param=${value}></span></div></div>`)))
+      data-hw-combobox-target="chipDismisser" data-hw-combobox-value-param=${value}></span></div></div>`
+  })))
 }
 
 const gripFor = (grip, label, id) => {
