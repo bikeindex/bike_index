@@ -36,16 +36,17 @@ class RegistrationsController < ApplicationController
   # mailchimp/address recalculation
   def toggle_legacy_view
     bike = Bike.unscoped.find_id(params[:id])
-    show_legacy = !registration_show_legacy?
+    show_legacy = Binxtils::InputNormalizer.boolean(params[:show_legacy])
+    query = request.query_parameters.except(:show_legacy)
     if current_user.present? && !current_user.update(feature_registration_show_legacy: show_legacy, skip_update: true)
       # Unrelated validations (e.g. a preferred_language no longer available) can block
       # the update, so return to the view they came from rather than bouncing them
       flash[:error] = "Sorry, unable to update. Email contact@bikeindex.org for help fixing this!"
-      return redirect_to(bike_view_path(bike, show_legacy: !show_legacy))
+      return redirect_to(bike_view_path(bike, show_legacy: !show_legacy, **query))
     end
     # Signed in, the account holds it - a session copy would outlast a change on another device
     session[:registration_show_legacy] = current_user.blank? && show_legacy
-    redirect_to(bike_view_path(bike, show_legacy:))
+    redirect_to(bike_view_path(bike, show_legacy:, **query))
   end
 
   # The redesign has no edit view of its own; edit still lives on the bike

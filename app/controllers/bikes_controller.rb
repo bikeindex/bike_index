@@ -1,12 +1,13 @@
 class BikesController < Bikes::BaseController
-  # Ahead of find_bike and the rest, which registrations#show repeats
-  prepend_before_action :hand_off_to_redesign, only: %i[show]
   skip_before_action :verify_authenticity_token, only: %i[create]
+  skip_before_action :redirect_scanned_id, except: %i[show update pdf resolve_token]
+  before_action :hand_off_to_redesign, only: %i[show]
+  # Redeclared to run behind the hand-off, since registrations#show repeats them
+  before_action :find_bike, only: %i[show update pdf resolve_token]
+  before_action :assign_current_organization, only: %i[show]
+  before_action :ensure_user_allowed_to_edit, only: %i[update pdf]
   before_action :sign_in_if_not!, only: %i[show]
   before_action :render_ad, only: %i[show]
-  skip_before_action :find_bike, except: %i[show update pdf resolve_token]
-  skip_before_action :assign_current_organization, except: %i[show]
-  skip_before_action :ensure_user_allowed_to_edit, except: %i[update pdf]
   around_action :set_reading_role, only: %i[show]
 
   def show
@@ -90,7 +91,7 @@ class BikesController < Bikes::BaseController
       redirect_to(new_user_path) && return
     end
     find_or_new_b_param
-    redirect_to(bike_path(@b_param.created_bike_id)) && return if @b_param.created_bike.present?
+    redirect_to(bike_view_path(@b_param.created_bike_id)) && return if @b_param.created_bike.present?
 
     # Let them know if they sent an invalid b_param token - notice rather than error because we're aggressive about removing b_params
     flash[:notice] = translation(:we_couldnt_find_that_registration) if @b_param.id.blank? && params[:b_param_token].present?
@@ -210,7 +211,7 @@ class BikesController < Bikes::BaseController
       end
     end
 
-    redirect_to bike_path(@bike.id)
+    redirect_to bike_view_path(@bike.id)
   end
 
   private
@@ -221,12 +222,12 @@ class BikesController < Bikes::BaseController
     Binxtils::InputNormalizer.boolean(params[:contact_owner])
   end
 
-  # A scanned sticker id is find_bike's to redirect
+  # An id that decodes to nothing has no registration path, so find_bike 404s it
   def hand_off_to_redesign
-    return unless request.format.html? && registration_redesign_shown? &&
-      !params[:id].match?(Bikes::BaseController::SCANNED_ID_MATCHER)
+    return unless request.format.html? && registration_redesign_shown?
 
-    redirect_to(registration_path(params[:id], request.query_parameters))
+    id = ShortId.decode("Bike", params[:id])
+    redirect_to(registration_path(id, request.query_parameters)) if id.present?
   end
 
   def show_for_sale?(bike)

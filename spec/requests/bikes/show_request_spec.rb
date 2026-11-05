@@ -778,6 +778,24 @@ RSpec.describe "BikesController#show", type: :request do
       expect(response).to redirect_to(registration_path(bike, scanned_id: "XD8888", organization_id: "cool-org"))
     end
 
+    it "normalizes the id, rather than passing it along" do
+      get "#{base_url}/r/#{bike.id}"
+      expect(response).to redirect_to(registration_path(bike))
+
+      get "#{base_url}/embed"
+      expect(response).to redirect_to(registration_path("embed".to_i(36)))
+      follow_redirect!
+      expect(response.status).to eq 404
+
+      get "#{base_url}/r"
+      expect(response.status).to eq 404
+    end
+
+    it "lets a scanned sticker id through to its redirect" do
+      get "#{base_url}/scannedUC123?organization_id=cool-org"
+      expect(response).to redirect_to(scanned_bike_path("UC123", organization_id: "cool-org"))
+    end
+
     context "signed out" do
       let(:current_user) { nil }
 
@@ -788,7 +806,7 @@ RSpec.describe "BikesController#show", type: :request do
 
       context "session opted into the legacy view" do
         it "renders the legacy page" do
-          post toggle_legacy_view_registration_path(bike)
+          post toggle_legacy_view_registration_path(bike, show_legacy: true)
           get "#{base_url}/#{bike.id}"
           expect(response).to render_template(:show)
         end

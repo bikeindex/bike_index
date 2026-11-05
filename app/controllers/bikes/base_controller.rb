@@ -8,22 +8,23 @@ end
 
 module Bikes
   class BaseController < ApplicationController
-    SCANNED_ID_MATCHER = /scanned(uc|ui)\d+/i
-
+    before_action :redirect_scanned_id
     before_action :find_bike
     before_action :assign_current_organization
     before_action :ensure_user_allowed_to_edit
 
     protected
 
+    # Fix issue with sticker batches #35 & #38
+    def redirect_scanned_id
+      return unless params[:id].present? && params[:id].match?(/scanned(uc|ui)\d+/i)
+
+      permitted_params = params.except(:action, :controller, :id).as_json
+        .merge(id: params[:id].gsub("scanned", ""))
+      redirect_to(scanned_bike_path(permitted_params))
+    end
+
     def find_bike
-      # Fix issue with sticker batches #35 & #38
-      if params[:id].present? && params[:id].match?(SCANNED_ID_MATCHER)
-        permitted_params = params.except(:action, :controller, :id).as_json
-          .merge(id: params[:id].gsub("scanned", ""))
-        redirect_to(scanned_bike_path(permitted_params))
-        return
-      end
       @bike = Bike.unscoped.find_id(params[:bike_id] || params[:id])
       return @bike if @bike.visible_by?(current_user)
 
@@ -68,7 +69,7 @@ module Bikes
       return true unless error.present? # Can't assign directly to flash here, sometimes kick out of edit because other flash error
 
       flash[:error] = error
-      redirect_to(bike_path(@bike)) && return
+      redirect_to(bike_view_path(@bike)) && return
     end
 
     def update_organizations_can_edit_claimed(bike, organization_ids)

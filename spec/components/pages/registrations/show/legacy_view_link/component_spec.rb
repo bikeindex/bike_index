@@ -4,13 +4,18 @@ RSpec.describe Pages::Registrations::Show::LegacyViewLink::Component, type: :com
   let(:bike) { FactoryBot.create(:bike) }
   let(:show_legacy) { false }
   let(:component) { described_class.new(bike:, show_legacy:) }
-  let(:toggle_action) { "/registrations/#{bike.id}/toggle_legacy_view" }
+  let(:toggle_action) { "/registrations/#{bike.id}/toggle_legacy_view?show_legacy=true" }
 
   it "renders the opt-out alert with a button that posts to the toggle route" do
     render_inline(component)
     expect(page).to have_text("You're using the new bike viewer.")
     form = page.find("form[action='#{toggle_action}'][method='post']")
     expect(form).to have_button("Switch back to the legacy viewer")
+  end
+
+  it "carries the page's query through the toggle" do
+    with_request_url("/registrations/#{bike.id}?t=token") { render_inline(component) }
+    expect(page).to have_css("form[action='#{toggle_action}&t=token']")
   end
 
   context "viewer opted into the legacy view" do
@@ -20,6 +25,11 @@ RSpec.describe Pages::Registrations::Show::LegacyViewLink::Component, type: :com
       render_inline(component)
       expect(page).to have_link("view bike in legacy viewer", href: "/bikes/#{bike.id}")
       expect(page).to have_no_css("form[action='#{toggle_action}']")
+    end
+
+    it "carries the page's query through the link" do
+      with_request_url("/registrations/#{bike.id}?t=token") { render_inline(component) }
+      expect(page).to have_link("view bike in legacy viewer", href: "/bikes/#{bike.id}?t=token")
     end
   end
 end

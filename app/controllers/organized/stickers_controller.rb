@@ -28,7 +28,7 @@ module Organized
       else
         flash[:success] = "#{@bike_sticker.kind.titleize} #{@bike_sticker.code} - #{@bike_sticker.claimed? ? "claimed" : "unclaimed"}"
         if @bike_sticker.bike.present?
-          redirect_to(bike_path(@bike_sticker.bike_id)) && return
+          redirect_to(bike_view_path(@bike_sticker.bike_id)) && return
         end
       end
       redirect_back(

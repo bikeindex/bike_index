@@ -10,7 +10,7 @@ RSpec.describe Bikes::RecoveryController, type: :request do
     context "nonmatching recovery token" do
       it "redirects" do
         get "#{base_url}/edit?token=XXXXXXXX"
-        expect(response).to redirect_to bike_url(bike)
+        expect(response).to redirect_to registration_url(bike)
         expect(flash[:error]).to be_present
         expect(session[:recovery_link_token]).to be_blank
       end
@@ -21,11 +21,10 @@ RSpec.describe Bikes::RecoveryController, type: :request do
 
       it "renders, and the registration page spends the token on a mark-recovered modal" do
         get "#{base_url}/edit?token=#{recovery_link_token}"
-        expect(response).to redirect_to bike_path(bike)
+        expect(response).to redirect_to registration_path(bike)
         expect(session[:recovery_link_token]).to eq recovery_link_token
 
         follow_redirect!
-        follow_redirect! # bike show hands off to the redesigned registration page
         expect(response.body).to match(recovery_link_token)
         expect(session[:recovery_link_token]).to be_nil
       end
@@ -36,7 +35,7 @@ RSpec.describe Bikes::RecoveryController, type: :request do
         bike.reload
         expect(bike.status_stolen?).to be_falsey
         get "#{base_url}/edit?token=#{recovery_link_token}"
-        expect(response).to redirect_to bike_url(bike)
+        expect(response).to redirect_to registration_url(bike)
         expect(flash[:notice]).to match(/already/)
         expect(session[:recovery_link_token]).to be_blank
       end
@@ -106,7 +105,7 @@ RSpec.describe Bikes::RecoveryController, type: :request do
         stolen_record.reload
         bike.reload
 
-        expect(response).to redirect_to bike_url(bike)
+        expect(response).to redirect_to registration_url(bike)
         expect(flash[:error]).to be_present
         expect(bike.status_stolen?).to be_truthy
         expect(stolen_record.recovered?).to be_falsey

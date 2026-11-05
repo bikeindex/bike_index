@@ -8,7 +8,6 @@ RSpec.describe Pages::Registrations::Show::ViewSwitcher::Component, type: :compo
     described_class.new(bike:, current_view: [:public, nil], available_views:, label: "Public", color: :gray, current_user:)
   end
 
-  # LegacyViewLink owns the way back to the classic page, so this offers no second one
   it "renders a plain badge when there's nowhere to switch to" do
     render_inline(component)
     expect(page).to have_text("Public")
