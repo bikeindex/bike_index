@@ -232,6 +232,18 @@ module Pages
           end
         end
 
+        # What the law sets for a rule, with the rule named in the same line
+        def rule_heading(id)
+          value = render(Pages::EbikeRules::RuleValue::Component.new(law: @law, id:))
+          case id
+          when :classes then @law[:classes].any? ? translation(".heading_classes_html", classes: value) : value
+          when :power then @law[:watt_cap] ? translation(".heading_power_html", watts: value) : translation(".heading_no_power_cap")
+          when :speed then @law[:mph] ? translation(".heading_speed_html", speed: value) : translation(".heading_no_speed_cap")
+          when :vehicle then translation(".heading_vehicle_html", name: value)
+          else @law[:throttle] ? translation(".heading_throttle_allowed") : translation(".heading_throttle_not_allowed")
+          end
+        end
+
         def status_label(status)
           case status
           when :pass then translation(".meets_rule")

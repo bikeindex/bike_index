@@ -30,7 +30,7 @@ RSpec.describe Pages::EbikeRules::Results::Component, type: :component do
       # the certification it carries alone, without the one it's not known to
       .and have_text("UL 2849 Certified")
       .and have_no_text("UL 2271")
-      .and have_css("li", text: /Classes recognized\s*Classes 1, 2, and 3\s*Class 1 is recognized/)
+      .and have_css("li", text: /Classes 1, 2, and 3 recognized\s*Class 1 is recognized/)
       .and have_css("li [role='img'][aria-label='Meets this rule']", count: 4)
       .and have_css("li", text: "Class 3 riders must be 15 or older")
       .and have_link(href: "https://in.gov/dnr/rules-and-regulations/e-bike-rules")
@@ -137,13 +137,13 @@ RSpec.describe Pages::EbikeRules::Results::Component, type: :component do
 
     it "checks its law's limits in km/h, with nothing of the US's classes" do
       expect(component).to have_css("[role='status']", text: "Your Trek Verve+ 2 is legal to ride in Ontario under the Power-Assisted Bicycle rules.")
-        .and have_css("li", text: /Top assisted speed\s*32 km\/h\s*Assists to 32 km\/h, within the limit/)
+        .and have_css("li", text: /32 km\/h top assisted speed\s*Assists to 32 km\/h, within the limit/)
         .and have_css("dd", text: "32 km/h")
         .and have_text("Your province or territory")
         .and have_text("Riders must be 16 or older")
         .and have_text("catalog of e-bike law")
         .and have_no_css("[role='img'][aria-label='Class 1 e-bike']")
-        .and have_no_text("Classes recognized")
+        .and have_no_text("recognized")
         .and have_no_text("mph")
     end
 
@@ -164,7 +164,7 @@ RSpec.describe Pages::EbikeRules::Results::Component, type: :component do
       it "may be legal under that vehicle's rules, with its licence and registration to check" do
         expect(component).to have_css("[role='status']", text: "Your Trek Verve+ 2 may be legal to ride in New Brunswick under the Motor Driven Cycle rules, " \
           "with 1 rule to check.")
-          .and have_css("li", text: /Regulated as\s*Motor Driven Cycle\s*There's no e-bike category here/)
+          .and have_css("li", text: /Regulated as Motor Driven Cycle\s*There's no e-bike category here/)
           .and have_css("li", text: "Registered with one plate")
       end
     end

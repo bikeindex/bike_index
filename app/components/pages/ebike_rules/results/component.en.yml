@@ -52,6 +52,14 @@ en:
             Your %{name} is legal to ride in %{state} as a Class %{n} e-bike, and
             %{optional}.
           has_throttle: Has a throttle
+          heading_classes_html: "%{classes} recognized"
+          heading_no_power_cap: No motor power cap
+          heading_no_speed_cap: No top assisted speed cap
+          heading_power_html: "%{watts} motor power cap"
+          heading_speed_html: "%{speed} top assisted speed"
+          heading_throttle_allowed: Throttle allowed
+          heading_throttle_not_allowed: Throttle not allowed
+          heading_vehicle_html: Regulated as %{name}
           is_registered: Is this bike registered?
           kmh_html: "%{kmh} km/h"
           law_source_html: >-

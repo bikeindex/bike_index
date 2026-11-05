@@ -218,8 +218,8 @@ RSpec.describe EbikeRulesController, type: :request do
       expect(top_line.first).to eq "It is a Class 2 and Class 3 e-bike, which is not permitted. In California, it may fall under Moped."
       expect(top_line.second).to start_with "Riders need a driver's license"
       # its speed and throttle fail too, which the classes' note already gives as the reason
-      speed = page.find("li", text: /Top assisted speed\s*28\W*mph\s*Assists to 28\W*mph, not allowed with a throttle/)
-      throttle = page.find("li", text: /Throttle\s*Allowed\s*Not allowed with Class 3 assist/)
+      speed = page.find("li", text: /28\W*mph top assisted speed\s*Assists to 28\W*mph, not allowed with a throttle/)
+      throttle = page.find("li", text: /Throttle allowed\s*Not allowed with Class 3 assist/)
       [speed, throttle].each { expect(it).to have_css("[role='img'][aria-label='Does not meet this rule']") }
 
       get "/ebike-rules/US/CO", params: {vehicle_models: "m/aventon/2026/level_4_adv"}
@@ -237,7 +237,7 @@ RSpec.describe EbikeRulesController, type: :request do
       get "/ebike-rules/US/CA", params: {vehicle_models: "m/specialized/2025/haul_st"}
       expect(page).to have_css("[role='status']", text: "Your Specialized Haul ST is legal to ride in California as a Class 3 e-bike, without its optional throttle.")
         .and have_no_css("[role='status'] li")
-        .and have_css("li", text: /Throttle\s*Allowed\s*It's legal only without its optional throttle/)
+        .and have_css("li", text: /Throttle allowed\s*It's legal only without its optional throttle/)
       expect(page.all("section[aria-live] [data-controller~='ui--tooltip'] > button[aria-label$='e-bike']").map { it[:"aria-label"] })
         .to eq ["Class 3 e-bike", "E-moto, not an e-bike"]
       expect(page).to have_css("section[aria-live] div:has(> [data-controller~='ui--tooltip'] [aria-label='E-moto, not an e-bike']) > span", text: "w/ optional throttle")
@@ -327,7 +327,7 @@ RSpec.describe EbikeRulesController, type: :request do
       expect(page).to have_title("Ontario e-bike laws", exact: true)
         .and have_css("[data-hw-combobox-prefilled-display-value='Ontario (ON)']")
         .and have_css("[role='status']", text: "Your Specialized Haul ST is legal to ride in Ontario under the Power-Assisted Bicycle rules.")
-        .and have_css("li", text: /Top assisted speed\s*32 km\/h\s*Assists to 32 km\/h, within the limit/)
+        .and have_css("li", text: /32 km\/h top assisted speed\s*Assists to 32 km\/h, within the limit/)
         .and have_css("dd", text: "Optional, to 32 km/h")
         .and have_checked_field("top_speed", with: "32")
         .and have_field("watts", with: "500")
