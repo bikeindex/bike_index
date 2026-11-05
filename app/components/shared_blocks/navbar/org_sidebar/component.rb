@@ -23,7 +23,7 @@ module SharedBlocks
         GROUP_CURRENT = "tw:group-has-[[aria-current]]/nav-group:bg-blue-50! " \
           "tw:group-has-[[aria-current]]/nav-group:text-blue-600 tw:group-has-[[aria-current]]/nav-group:dark:bg-blue-600/5! tw:group-has-[[aria-current]]/nav-group:dark:text-blue-400 " \
           "tw:active:bg-blue-50 tw:active:text-blue-600 tw:active:dark:bg-blue-600/5 tw:active:dark:text-blue-400"
-        ROW_RESTING = "tw:text-gray-900 tw:dark:text-gray-100"
+        ROW_RESTING = "tw:twtext-color"
 
         # A row inside a group, indented past its parent's icon
         CHILD = "tw:mx-2 tw:block tw:rounded-[10px] tw:py-2 tw:pr-3 tw:pl-11 tw:text-[13.5px] " \
@@ -82,7 +82,7 @@ module SharedBlocks
           "tw:flex tw:w-full tw:items-center tw:gap-2.5 tw:rounded-[11px] tw:px-2.5 tw:py-2 " \
             "tw:group-data-[collapsed=true]/sidebar:justify-center " \
             "tw:group-data-[collapsed=true]/sidebar:[&_.twdropdown-chevron]:hidden " \
-            "tw:hover:bg-gray-100 tw:aria-expanded:bg-gray-100 tw:dark:hover:bg-white/2 tw:dark:aria-expanded:bg-white/2"
+            "#{ROW_HOVER} tw:aria-expanded:bg-gray-100 tw:dark:aria-expanded:bg-white/2"
         end
 
         def avatar_url
