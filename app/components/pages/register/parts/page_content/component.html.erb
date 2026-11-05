@@ -7,7 +7,7 @@
 </div>
 
 <%# uncap: the org preview renders in a layout that upper-cases headings; the flow's doesn't %>
-<%= render UI::Header::Component.new(text: @page.heading_text, subtitle: @page.subtitle, html_class: "uncap") %>
+<%= render UI::Header::Component.new(text: @page.heading_text, subtitle: @page.subtitle, tag: @heading_tag, html_class: "uncap") %>
 
 <% if @page.image_url.present? %>
   <%= image_tag @page.image_url, alt: "", class: "tw:mb-5 tw:w-full tw:rounded-lg tw:object-cover" %>
@@ -22,6 +22,15 @@
       <% end %>
     <% end %>
   <% end %>
+
+  <span
+    class="
+      tw:ml-auto tw:text-right tw:text-xs tw:font-semibold
+      tw:text-purple-500 tw:dark:text-purple-300
+    "
+  >
+    <%= translation(".set_by", name: set_by_name) %>
+  </span>
 <% end %>
 
 <%= render UI::Card::Component.new(divided: true) do %>

@@ -48,6 +48,20 @@ case "$tool" in
   *) exit 0 ;;
 esac
 
+# The attribution footer, which a brief can ask for even with the setting off. The
+# skill passes the body as a file, so that is read too, from the call's cwd.
+footer="Generated with [Claude Code]"
+cwd=""
+cwd_pattern='"cwd"[[:space:]]*:[[:space:]]*"([^"]+)"'
+[[ $input =~ $cwd_pattern ]] && cwd="${BASH_REMATCH[1]}"
+body_file=""
+body_file_pattern='(--body-file|-F)[=[:space:]]+([^[:space:]"\\]+)'
+[[ $input =~ $body_file_pattern ]] && body_file="${BASH_REMATCH[2]}"
+[[ -n $body_file && $body_file != /* && -n $cwd ]] && body_file="$cwd/$body_file"
+if [[ $input == *"$footer"* ]] || { [ -n "$body_file" ] && grep -qsF "$footer" "$body_file"; }; then
+  block "The PR body carries the Claude Code attribution footer, which the \`pr\` skill forbids. Remove it and run the command again."
+fi
+
 # Two markers: the Skill tool_use's own input, and the tag a typed slash command
 # leaves. Both are assembled from pieces, and described rather than spelt out, so
 # that reading *this* file into the transcript can't satisfy the check below.
@@ -57,6 +71,7 @@ transcript_pattern='"transcript_path"[[:space:]]*:[[:space:]]*"([^"]+)"'
 [ -r "$transcript" ] || exit 0
 invoked='"input":\{"skill":"pr"'
 typed="<command-name>/pr<""/command-name>"
-grep -qE "$invoked|$typed" "$transcript" && exit 0
+# a subagent's tool calls carry its parent's transcript_path, and its own lives beside it
+grep -qsE "$invoked|$typed" "$transcript" "${transcript%.jsonl}"/subagents/*.jsonl && exit 0
 
 block 'AGENTS.md routes PR authoring through the `pr` skill. Invoke it (Skill tool, skill: "pr") and follow it from the top; this command is allowed once it is loaded.'

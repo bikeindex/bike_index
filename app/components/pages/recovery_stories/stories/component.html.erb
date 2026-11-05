@@ -1,0 +1,25 @@
+<%= helpers.turbo_frame_tag("recovery_stories_page_#{@pagy.page}", class: "tw:contents") do %>
+  <% if @pagy.previous && !helpers.turbo_frame_request? %>
+    <div class="tw:col-span-full tw:flex tw:justify-center">
+      <%= render(UI::ButtonLink::Component.new(href: page_path(@pagy.previous), text: translation(".newer_stories"),
+        color: :secondary, size: :callout, data: {turbo: false},
+        html_class: PURPLE_OUTLINE)) %>
+    </div>
+  <% end %>
+
+  <ul class="tw:contents tw:list-none">
+    <% @recovery_displays.each do |recovery_display| %>
+      <%= render(Atoms::RecoveryDisplayCard::Component.new(recovery_display:)) %>
+    <% end %>
+  </ul>
+
+  <% if @pagy.next %>
+    <%= helpers.turbo_frame_tag("recovery_stories_page_#{@pagy.next}", class: "tw:contents") do %>
+      <div class="tw:col-span-full tw:mt-4 tw:flex tw:justify-center">
+        <%= render(UI::ButtonLink::Component.new(href: page_path(@pagy.next), text: translation(".load_more_stories"),
+          color: :secondary, size: :callout, data: {turbo: true, turbo_action: "advance"},
+          html_class: PURPLE_OUTLINE)) %>
+      </div>
+    <% end %>
+  <% end %>
+<% end %>

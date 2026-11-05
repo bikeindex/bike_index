@@ -1,0 +1,18 @@
+<% wide_definition ||= false %>
+
+<%= render(UI::TableList::Component.new(wide_definition:)) do |list| %>
+  <% list.with_row(label: "ID", value: render(UI::Code::Inline::Component.new(text: "4815162342")), dev_only: true) %>
+  <% list.with_row(label: "Cryptid", value: "Mothman") %>
+
+  <% list.with_row(label: "Region") do %>
+    <div>Point Pleasant</div>
+    <div class="tw:text-gray-500">West Virginia</div>
+  <% end %>
+
+  <% list.with_row(label: "First seen") do %>
+    <%= render(UI::Time::Component.new(time: Time.zone.parse("1966-11-15"))) %>
+  <% end %>
+
+  <% list.with_row(label: "Sightings", value: number_display(142)) %>
+  <% list.with_row(label: "Description", value: "A winged humanoid with glowing red eyes, reported by gravediggers and couples parked near the TNT area") %>
+<% end %>

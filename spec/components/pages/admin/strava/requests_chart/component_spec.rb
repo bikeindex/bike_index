@@ -16,7 +16,7 @@ RSpec.describe Pages::Admin::Strava::RequestsChart::Component, type: :component 
     component = render_inline(instance)
     expect(component.text).to include("By response status")
     expect(component.text).to include("By request type")
-    expect(component.css(".twwiderow-3 h4").map(&:text)).to eq(["Response status", "Request type", "By integration"])
+    expect(component.css(".twwiderow-3 h3").map { it.text.strip }).to eq(["Response status", "Request type", "By integration"])
   end
 
   context "without the integration chart" do
@@ -24,7 +24,7 @@ RSpec.describe Pages::Admin::Strava::RequestsChart::Component, type: :component 
 
     it "lays the pies out in two columns" do
       component = render_inline(instance)
-      expect(component.css(".twwiderow:not(.twwiderow-3)").last.css("h4").map(&:text)).to eq(["Response status", "Request type"])
+      expect(component.css(".twwiderow:not(.twwiderow-3)").last.css("h3").map { it.text.strip }).to eq(["Response status", "Request type"])
     end
   end
 

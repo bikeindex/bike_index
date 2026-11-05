@@ -5,6 +5,8 @@ RSpec.describe MembershipsController, type: :request do
   let(:re_record_interval) { 60.days }
 
   describe "new" do
+    include_context :active_stripe_prices
+
     context "user not logged in" do
       it "renders" do
         get "#{base_url}/new"
@@ -12,6 +14,8 @@ RSpec.describe MembershipsController, type: :request do
         expect(response).to render_template("new")
         expect(flash).to_not be_present
         expect(assigns(:referral_source)).to be_blank
+        expect(response).to render_template(layout: "application")
+        expect(response.body).to match("Choose your membership")
       end
       context "with UTM" do
         it "assigns referral_source" do
@@ -23,12 +27,30 @@ RSpec.describe MembershipsController, type: :request do
         end
       end
       context "with currency=cad" do
+        let!(:cad_stripe_prices) do
+          Membership::LEVEL_ENUM.keys.flat_map do |membership_level|
+            %w[monthly yearly].map do |interval|
+              FactoryBot.create(:stripe_price, currency_enum: "cad", membership_level:, interval:, amount_cents: 1500)
+            end
+          end
+        end
+
         it "renders with CAD" do
           get "#{base_url}/new?currency=cad"
           expect(response.code).to eq("200")
           expect(response).to render_template("new")
           expect(flash).to_not be_present
           expect(response.body).to match(/name="currency"[^>]*value="cad"/)
+        end
+
+        context "with a CAD price missing" do
+          before { cad_stripe_prices.last.update(active: false) }
+
+          it "renders with the default currency" do
+            get "#{base_url}/new?currency=cad"
+            expect(response.code).to eq("200")
+            expect(response.body).to match(/name="currency"[^>]*value="usd"/)
+          end
         end
       end
     end
@@ -39,14 +61,18 @@ RSpec.describe MembershipsController, type: :request do
         expect(response.code).to eq("200")
         expect(response).to render_template("new")
         expect(flash).to_not be_present
+        expect(Nokogiri::HTML(response.body).css("form[action='/membership'] [type=submit]")).to be_present
       end
       context "user has an active membership" do
         let!(:membership) { FactoryBot.create(:membership, user: current_user) }
-        it "redirects to edit" do
+        it "renders, linking to their membership" do
           expect(current_user.reload.membership_active).to be_present
 
           get "#{base_url}/new"
-          expect(response).to redirect_to "/membership/edit"
+          expect(response.code).to eq("200")
+          expect(response).to render_template("new")
+          expect(response.body).to match("View your Basic membership")
+          expect(Nokogiri::HTML(response.body).css("form[action='/membership'] [type=submit]")).to be_empty
         end
       end
       context "user has an inactive membership" do
@@ -146,6 +172,18 @@ RSpec.describe MembershipsController, type: :request do
         end
       end
 
+      context "user has an active membership" do
+        let!(:membership) { FactoryBot.create(:membership, user: current_user) }
+
+        it "redirects to their membership" do
+          expect {
+            post base_url, params: create_params
+          }.to_not change(StripeSubscription, :count)
+          expect(response).to redirect_to("/my_account/membership")
+          expect(flash[:notice]).to eq "You already have a membership."
+        end
+      end
+
       context "with invalid currency" do
         let(:modified_params) { create_params.merge(currency: "xxx") }
 
@@ -185,20 +223,18 @@ RSpec.describe MembershipsController, type: :request do
     context "logged in" do
       include_context :request_spec_logged_in_as_user
 
-      it "redirects to new membership" do
+      it "redirects to their membership" do
         get "#{base_url}/edit"
-        expect(response).to redirect_to new_membership_path
-        expect(flash[:notice]).to match(/active/)
+        expect(response).to redirect_to my_account_membership_path
       end
 
       context "with admin managed active membership" do
         let!(:membership) { FactoryBot.create(:membership, user: current_user) }
-        it "redirects to my_account" do
+        it "redirects to their membership" do
           expect(current_user.reload.membership_active.admin_managed?).to be_truthy
 
           get "#{base_url}/edit"
-          expect(response).to redirect_to my_account_path
-          expect(flash[:notice]).to match(/free membership/i)
+          expect(response).to redirect_to my_account_membership_path
         end
       end
 

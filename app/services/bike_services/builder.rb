@@ -60,6 +60,7 @@ module BikeServices
 
         if dupe.present?
           b_param.update(created_bike_id: dupe.id)
+          add_to_child_organization(dupe, bike.creation_organization)
           return dupe
         end
       end
@@ -69,6 +70,19 @@ module BikeServices
     #
     # private below here
     #
+
+    # A bike reaches an organization's parent when it's created, never its children - so
+    # a child posting a sale its parent already holds would otherwise lose sight of it
+    def add_to_child_organization(bike, organization)
+      return if organization&.parent_organization_id.blank?
+
+      parent = bike.bike_organizations.find_by(organization_id: organization.parent_organization_id)
+      return if parent.blank?
+
+      bike.bike_organizations.find_or_create_by(organization_id: organization.id) do |bike_organization|
+        bike_organization.can_not_edit_claimed = parent.can_not_edit_claimed
+      end
+    end
 
     # previously BikeServices::CreatorOrganizer
     def check_organization(b_param, bike)
@@ -135,7 +149,7 @@ module BikeServices
       impound_record
     end
 
-    conceal :check_organization, :check_example, :default_parking_notification_attrs,
-      :org_address_record, :build_new_impound_record
+    conceal :add_to_child_organization, :check_organization, :check_example,
+      :default_parking_notification_attrs, :org_address_record, :build_new_impound_record
   end
 end

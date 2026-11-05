@@ -9,13 +9,17 @@
 
 /* A utility rather than a class in the layer below: `@apply` only takes utilities */
 @utility twtext-color {
-  @apply tw:text-gray-900 tw:dark:text-gray-400;
+  @apply tw:text-gray-900 tw:dark:text-gray-100;
 }
 
 /* A card that meets the page's own gutter rather than sitting inset inside it twice over,
  * once the .twwiderow holding it has dropped to one column. Keyed to the row rather than the
  * viewport so it can't disagree with the column count - 672px is where .twwiderow's second
  * 320px column stops fitting, and a container query can't read that from a var(). */
+@utility tweyebrow {
+  @apply tw:text-xs tw:font-bold tw:tracking-wider tw:text-purple-500 tw:uppercase tw:dark:text-purple-300;
+}
+
 @utility twfullbleed {
   @container twwiderow (width < 672px) {
     /* All forced. Tailwind sorts a custom utility by the properties it sets, so each one added
@@ -24,7 +28,14 @@
   }
 }
 
-/* The dev-info marking, formerly admin_unvendored's unlayered copy. A hand-written block
+/* Out to the window's edges from a column centered in the page, short of the org sidebar,
+ * which is fixed rather than in the flow */
+@utility twpagebleed {
+  margin-inline: calc(50% - 50vw + var(--org-sidebar-width, 0px) / 2);
+  width: calc(100vw - var(--org-sidebar-width, 0px));
+}
+
+/* The dev-info marking. A hand-written block
  * rather than @utility, which would take the tw: prefix and so match none of the ~95
  * existing .only-dev-visible sites - nor the `<style>.only-dev-visible {display: none}`
  * that SharedBlocks::HeaderTags emits for non-dev viewers. This block lands after
@@ -38,7 +49,7 @@
   }
 
   /* Frequently marks one value inside a display-table cell, which has no padding of its own */
-  .table-list td .only-dev-visible {
+  .ui-table-list td .only-dev-visible {
     @apply tw:px-1 tw:py-0.5;
   }
 }
@@ -101,8 +112,12 @@
     @apply tw:m-0;
   }
 
-  .twless-strong {
+  .less-strong {
     @apply tw:opacity-65 tw:decoration-gray-900/65 tw:dark:decoration-gray-400/65;
+
+    &:is(.btn, .form-control):is(:hover, :focus) {
+      opacity: 1;
+    }
   }
 
   .twinput {
@@ -132,6 +147,10 @@
    * with shorter inputs and buttons, so they line up on their text or on nothing. */
   .twsearchrow {
     @apply tw:my-4 tw:flex tw:flex-wrap tw:items-baseline tw:justify-end tw:gap-2;
+  }
+
+  .twsearchrow > .twinput {
+    @apply tw:sm:w-64;
   }
 
   /* Two columns of cards or sections (three with .twwiderow-3), breaking on the row's own
@@ -206,27 +225,8 @@
     @apply tw:border-t tw:border-gray-200 tw:dark:border-gray-700;
   }
 
-  /* The band the admin bike screens open with: what the registration is, set apart from
-   * whichever tab's body follows it. Full bleed and borderless, the way the legacy
-   * .admin-bike-tabs read - its .table-list tables sit on white against it. The negative top
-   * margin cancels the tab row's mb-3, so the band meets the row it sits under. */
-  .admin-bike-summary {
-    @apply tw:-mt-3 tw:bg-[#212529] tw:pt-6 tw:pb-1 tw:text-white;
-  }
-
-  .admin-bike-summary h1,
-  .admin-bike-summary h2,
-  .admin-bike-summary h3,
-  .admin-bike-summary h4 {
-    @apply tw:text-white;
-  }
-
-  .admin-bike-summary table {
-    @apply tw:bg-white;
-  }
-
   .twhr {
-    @apply tw:border-0 tw:h-px tw:bg-gray-200 tw:dark:bg-gray-700 tw:my-8;
+    @apply tw:border-0 tw:h-px tw:bg-gray-200 tw:dark:bg-gray-700 tw:my-4;
   }
 
   .twgutter {

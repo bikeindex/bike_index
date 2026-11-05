@@ -13,7 +13,6 @@ module API
               {path: "/bikes_search", description: "Searching for bikes"},
               {path: "/bikes", description: "Operations about bikes"},
               {path: "/me", description: "Operations about the current user"},
-              {path: "/users", description: "Deprecated"},
               {path: "/manufacturers", description: "Accepted manufacturers"},
               {path: "/selections", description: "Selections (static options)"}
             ],

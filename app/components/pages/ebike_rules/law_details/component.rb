@@ -3,16 +3,13 @@
 module Pages
   module EbikeRules
     module LawDetails
-      # A state law's restrictions and sources, as Bike Book records them
+      # A state law's restrictions and sources, as BikeBook records them
       class Component < ApplicationComponent
         def initialize(law:)
           @law = law
         end
 
         private
-
-        # The address without its scheme or www, which the link truncates; its title holds the whole
-        def source_label(url) = url.sub(%r{\Ahttps?://(www\.)?}, "")
 
         # calendar days, which UI::Time would shift into the viewer's time zone
         def day(date) = l(date, format: :long)

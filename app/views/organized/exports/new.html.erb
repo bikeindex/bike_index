@@ -81,14 +81,14 @@
         <a
           class="field-expander"
           href="#"
-          style="<%= show_start ? 'display: none;' : '' %>"
+          style="<%= show_end ? 'display: none;' : '' %>"
         >
           Set before time
         </a>
 
         <div
           class="collapsed-fields"
-          style="<%= show_start ? 'display: block;' : '' %>"
+          style="<%= show_end ? 'display: block;' : '' %>"
         >
           <%= f.datetime_local_field :end_at, step: 60, class: "form-control" %>
           <a class="field-collapser" href="#"> remove </a>
@@ -148,9 +148,9 @@
 
           <span class="below-input-help mt-2">
             For example:
-            <code>https://bikeindex.org/bikes/123, https://bikeindex.org/bikes/4567</code>
+            <%= render(UI::Code::Inline::Component.new(text: "https://bikeindex.org/bikes/123, https://bikeindex.org/bikes/4567")) %>
             <br>
-            <span class="less-strong">(can also be just the IDs - e.g. for the above: <code>123, 4567</code>)</span>
+            <span class="less-strong">(can also be just the IDs - e.g. for the above: <%= render(UI::Code::Inline::Component.new(text: "123, 4567")) %>)</span>
           </span>
 
           <label class="checkbox mt-0">

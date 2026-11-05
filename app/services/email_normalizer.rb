@@ -2,9 +2,7 @@ module EmailNormalizer
   extend Functionable
 
   def normalize(email = nil)
-    return nil unless email.present?
-
-    (email || "").strip.downcase
+    Binxtils::InputNormalizer.string(email)&.downcase
   end
 
   def obfuscate(email = nil)

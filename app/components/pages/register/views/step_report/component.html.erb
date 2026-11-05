@@ -13,9 +13,9 @@
   %>
 
   <%= form_with(url: report_register_path, method: :patch, scope: :report,
-      data: {turbo: true, controller: "autofocus form-persist register--retry",
+      data: {turbo: true, controller: "autofocus form-persist register--retry strip-inputs",
              form_persist_key_value: "register-report-#{@b_param.id_token}",
-             action: "input->form-persist#save change->form-persist#save submit->form-persist#clear"}) do |f| %>
+             action: "input->form-persist#save change->form-persist#save hw-combobox:selection->form-persist#save submit->form-persist#clear"}) do |f| %>
     <%= hidden_field_tag :b_param_token, @b_param.id_token %>
 
     <%#
@@ -29,7 +29,7 @@
     <%= render UI::Forms::Group::Component.new(form_builder: f, attribute: :date, kind: :datetime_local_field,
         label_text: date_label, required: true,
         html_options: {value: date_value, max: Binxtils::TimeParser.round(Time.current + 1.day),
-          class: "dateInputUpdateZone", "data-initialtime": report_date&.iso8601 || ""}) %>
+          class: "dateInputUpdateZone", "data-controller": "max-now", "data-initialtime": report_date&.iso8601 || ""}) %>
 
     <%# _attributes explicitly: form_with has no model to infer nested attributes from %>
     <%= f.fields_for :address_record_attributes, address_record do |address_form| %>
@@ -39,7 +39,7 @@
     <% if stolen? %>
       <%= render Pages::Register::Parts::SectionLabel::Component.new(text: translation(".theft_details"), divider: true) %>
       <%= render UI::Forms::Group::Component.new(form_builder: f, attribute: :theft_description, kind: :text_area,
-          label_text: translation(".what_happened"),
+          label_text: translation(".what_happened"), required: true,
           html_options: {value: report_attrs[:theft_description], rows: 3,
             placeholder: translation(".what_happened_placeholder")}) %>
       <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :locking_description,

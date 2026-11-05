@@ -133,6 +133,17 @@ RSpec.describe Organized::ManagesController, type: :request do
     end
 
     describe "update" do
+      context "invalid" do
+        it "shows the error on the page it renders, and not the next one" do
+          put base_url, params: {organization_id: current_organization.to_param, id: current_organization.to_param, organization: {name: "Help"}}
+          expect(response).to render_template(:show)
+          expect(flash[:error]).to match(/trouble updating/)
+          get base_url
+          expect(response.status).to eq 200
+          expect(flash[:error]).to be_blank
+        end
+      end
+
       context "dissallowed attributes" do
         let(:org_attributes) do
           {

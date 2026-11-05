@@ -196,15 +196,6 @@ RSpec.describe "BikesController#create", type: :request do
         expect_created_stolen_bike(bike_params: bike_params, stolen_params: chicago_stolen_params.merge(show_address: true))
         expect(organization_stolen_message.reload.stolen_records.count).to eq 1
       end
-      context "with legacy stolen attribute names" do
-        let(:legacy_chicago_stolen_params) do
-          chicago_stolen_params.except(:postal_code, :region_record_id).merge(zipcode: "60622", state_id: state.id)
-        end
-        it "creates a bike with the renamed attributes" do
-          expect_created_stolen_bike(bike_params: bike_params, stolen_params: legacy_chicago_stolen_params.merge(show_address: true))
-          expect(Bike.last.current_stolen_record.region_record_id).to eq state.id
-        end
-      end
       context "outside of area" do
         let!(:organization_default_location) { FactoryBot.create(:location, :with_address_record, address_in: :new_york, organization: organization) }
         it "doesn't assign organization_stolen_message" do
@@ -717,8 +708,14 @@ RSpec.describe "BikesController#create", type: :request do
 
           expect(response).to redirect_to embed_organization_path(id: organization.slug, b_param_id_token: b_param.id_token)
           expect(b_param.reload.status).to eq "status_stolen"
+          expect(b_param.bike_errors).to eq(["Manufacturer can't be blank"])
           testable_bike_params.except(:manufacturer_id)
             .each { |key, value| expect(assigns(:bike).send(key).to_s).to eq(value.to_s) }
+
+          follow_redirect!
+          page = Capybara.string(response.body)
+          expect(page.find("#flash-messages [role=alert]")).to have_text("Manufacturer can't be blank")
+          expect(page).to have_css("[role=alert]", count: 1)
         end
       end
     end

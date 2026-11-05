@@ -15,6 +15,16 @@ RSpec.describe BikeServices::Creator do
 
   describe "create_bike" do
     context "errors" do
+      context "invalid bike, with a phone number for the owner_email" do
+        let(:bike_params) { {serial_number: "Serial 1", primary_frame_color_id: color.id, owner_email: "5551234567", is_phone: true} }
+
+        it "only reports what's wrong with the bike" do
+          bike = instance.create_bike(b_param)
+          expect(bike.id).to be_blank
+          expect(bike.cleaned_error_messages).to eq(["Manufacturer can't be blank"])
+        end
+      end
+
       context "owner_email format error" do
         let(:bike_params) do
           {
@@ -237,7 +247,7 @@ RSpec.describe BikeServices::Creator do
           expect(bike.creation_organization_id).to eq organization.id
           expect(bike.bike_organizations.count).to eq 1
           expect(bike.bike_organizations.first.can_edit_claimed).to be_truthy
-          expect(bike.registration_address.compact).to eq({"street" => "Somewhere Ville"})
+          expect(bike.registration_address_record.internal_address_attrs.compact).to eq({"street" => "Somewhere Ville"})
           expect(BikeServices::CalculateLocation.registration_address_source(bike)).to eq "initial_creation"
           expect(bike.address_record.attributes.compact.symbolize_keys.except(:id, :updated_at, :created_at)).to eq target_address_record.merge(bike_id: bike.id)
 
@@ -257,12 +267,37 @@ RSpec.describe BikeServices::Creator do
           expect(ownership.organization_id).to eq organization.id
           expect(ownership.owner_email).to eq "stuff@stuff.com"
           expect(ownership.owner_name).to eq "Sally"
-          expect(ownership.address_hash_legacy.reject { |_k, v| v.blank? }).to eq({"street" => "Somewhere Ville"})
+          expect(ownership.address_record.internal_address_attrs.compact).to eq({"street" => "Somewhere Ville"})
         end
 
         it "creates", :flaky do
           expect_bike_created_with_extra_attrs
         end
+      end
+    end
+
+    describe "creating abandoned bike" do
+      let(:organization) { FactoryBot.create(:organization_with_auto_user) }
+      let!(:creator) { FactoryBot.create(:organization_user, organization:) }
+      let(:state) { FactoryBot.create(:state_new_york) }
+      let(:address_record_attributes) do
+        {street: "1 Main St", city: "Brooklyn", postal_code: "11222", region_record_id: state.id, country_id: Country.united_states_id}
+      end
+      let(:b_param) do
+        BParam.create(origin: "organization_form", creator_id: creator.id, params: {
+          bike: {creation_organization_id: organization.id, serial_number: "abandoned-serial", owner_email: "abandoned@bikeindex.org",
+                 primary_frame_color_id: color.id, manufacturer_id: manufacturer.id, status: "status_abandoned",
+                 parking_notification_kind: "appears_abandoned_notification", address_record_attributes:}
+        })
+      end
+      it "creates a parking notification at the bike's address" do
+        allow(instance).to receive(:add_bike_book_data).and_return(nil)
+        bike = instance.create_bike(b_param)
+        expect(bike.errors).to_not be_present
+        expect(bike.reload.status).to eq "status_abandoned"
+        expect(bike.parking_notifications.count).to eq 1
+        expect(bike.parking_notifications.first).to have_attributes(address_record_attributes
+          .merge(kind: "appears_abandoned_notification", organization_id: organization.id, user_id: creator.id))
       end
     end
 
@@ -505,6 +540,27 @@ RSpec.describe BikeServices::Creator do
       it "finds a duplicate" do
         expect_duplicate_found
       end
+      context "registered by another organization" do
+        let(:parent_organization) { FactoryBot.create(:organization) }
+        let(:posting_organization) { FactoryBot.create(:organization_child, parent_organization:) }
+        let(:bike_params) { default_params.merge(creation_organization_id: posting_organization.id) }
+        before { BikeOrganization.create!(bike: existing_bike, organization: parent_organization, can_edit_claimed: false) }
+        def bike_organization_ids = existing_bike.reload.bike_organizations.pluck(:organization_id)
+
+        it "adds a child of the organization holding the bike" do
+          expect_duplicate_found
+          expect(bike_organization_ids).to match_array([parent_organization.id, posting_organization.id])
+          expect(BikeOrganization.find_by(bike: existing_bike, organization: posting_organization).can_edit_claimed).to be_falsey
+        end
+        context "child of an unrelated organization" do
+          let(:posting_organization) { FactoryBot.create(:organization_child) }
+
+          it "doesn't add it" do
+            expect_duplicate_found
+            expect(bike_organization_ids).to eq([parent_organization.id])
+          end
+        end
+      end
       context "no_duplicate false" do
         let(:bike_params) { default_params.merge(no_duplicate: false) }
         it "finds a duplicate" do
@@ -542,6 +598,68 @@ RSpec.describe BikeServices::Creator do
           end
         end
       end
+      context "placeholder serial" do
+        let(:serial) { "Not Assigned" }
+        it "stores unknown and finds no duplicate" do
+          expect(existing_bike.serial_number).to eq "unknown"
+          expect_no_duplicate
+          expect(b_param.created_bike).to have_attributes(serial_number: "unknown", serial_normalized: nil)
+        end
+      end
+      describe "duplicate lock" do
+        let(:existing_bike) { nil }
+        let(:user) { FactoryBot.create(:user) }
+        let(:lock_key) { described_class.duplicate_lock_key(b_param) }
+        let(:lock_manager) { described_class.new_lock_manager }
+
+        it "keys on the normalized serial and email, without storing them" do
+          expect(lock_key).to start_with(described_class::REDLOCK_PREFIX)
+          other_b_param = BParam.new(params: {bike: default_params.merge(serial_number: "Some-Serial Number", owner_email: email)})
+          expect(described_class.duplicate_lock_key(other_b_param)).to eq lock_key
+          expect(lock_key).not_to match(/something|serial/i)
+        end
+
+        context "no_duplicate false" do
+          let(:bike_params) { default_params.merge(no_duplicate: false) }
+          it "has no key" do
+            expect(lock_key).to be_nil
+          end
+        end
+
+        context "unknown serial" do
+          let(:bike_params) { default_params.merge(serial_number: "unknown") }
+          it "has no key" do
+            expect(lock_key).to be_nil
+          end
+        end
+
+        it "holds the lock while registering, and releases it" do
+          expect(BikeServices::Builder).to receive(:find_or_build).and_wrap_original do |method, *args|
+            expect(lock_manager.locked?(lock_key)).to be_truthy
+            method.call(*args)
+          end
+          bike = instance.create_bike(b_param)
+          expect(bike.id).to be_present
+          expect(lock_manager.locked?(lock_key)).to be_falsey
+        end
+
+        it "waits for a concurrent registration, then finds its bike" do
+          redlock = lock_manager.lock(lock_key, 5_000)
+          waiting = Thread.new { instance.create_bike(b_param) }
+          sleep 0.5
+          expect(waiting).to be_alive
+          # The concurrent registration saves its bike, then releases the lock
+          first_bike = FactoryBot.create(:bike, :with_ownership, serial_number: serial, owner_email: email, manufacturer:)
+          lock_manager.unlock(redlock)
+          expect(waiting.value&.id).to eq first_bike.id
+          expect(Bike.unscoped.pluck(:id)).to eq([first_bike.id])
+        end
+
+        it "registers anyway when Redis errors" do
+          allow_any_instance_of(Redlock::Client).to receive(:lock).and_raise(Redlock::LockAcquisitionError.new("error", []))
+          expect(instance.create_bike(b_param).id).to be_present
+        end
+      end
       context "user_hidden" do
         it "finds duplicate" do
           existing_bike.update(marked_user_hidden: true)
@@ -549,7 +667,7 @@ RSpec.describe BikeServices::Creator do
           expect(b_param.reload.created_bike_id).to be_blank
           expect(b_param.no_duplicate?).to be_truthy
           expect(Bike.unscoped.pluck(:id)).to match_array([existing_bike.id])
-          expect(Bike.with_user_hidden.pluck(:id)).to match_array([existing_bike.id])
+          expect(Bike.current_with_user_hidden.pluck(:id)).to match_array([existing_bike.id])
           expect(Ownership.count).to eq 1
           expect(found_duplicate&.id).to eq existing_bike.id
           expect(instance.create_bike(b_param)&.id).to eq existing_bike.id
@@ -565,7 +683,7 @@ RSpec.describe BikeServices::Creator do
           existing_bike.destroy
           expect(b_param.no_duplicate?).to be_truthy
           expect(Bike.unscoped.pluck(:id)).to match_array([existing_bike.id])
-          expect(Bike.with_user_hidden.pluck(:id)).to match_array([])
+          expect(Bike.current_with_user_hidden.pluck(:id)).to match_array([])
           expect(Ownership.count).to eq 1
           bike = instance.create_bike(b_param)
           expect(Bike.pluck(:id)).to match_array([bike.id])
@@ -643,6 +761,19 @@ RSpec.describe BikeServices::Creator do
         it "refuses it" do
           instance.attach_photo(b_param, bike)
           expect(bike.public_images.count).to eq 0
+        end
+      end
+
+      context "R2 unavailable" do
+        before do
+          blob.update!(identified: false)
+          allow_any_instance_of(blob.service.class).to receive(:download_chunk)
+            .and_raise(Seahorse::Client::NetworkingError.new(Net::ReadTimeout.new))
+        end
+
+        it "leaves the photo to the job rather than failing the registration" do
+          instance.attach_photo(b_param, bike)
+          expect(ImageJobs::AttachBlobJob.jobs.map { it["args"] }).to eq [[b_param.id, bike.id]]
         end
       end
 
@@ -737,6 +868,57 @@ RSpec.describe BikeServices::Creator do
           expect(b_param.bike["primary_frame_color_id"]).to eq(color.id)
         end
       end
+    end
+  end
+
+  describe "concurrent no_duplicate registrations", strategy: :truncation do
+    self.use_transactional_tests = false
+
+    let(:parent_organization) { FactoryBot.create(:organization) }
+    let(:child_organization) { FactoryBot.create(:organization_child, parent_organization:) }
+    let(:bike_params) do
+      {
+        serial_number: "some serial",
+        manufacturer_id: manufacturer.id,
+        primary_frame_color_id: color.id,
+        owner_email: "something@gmail.com",
+        no_duplicate: true
+      }
+    end
+    let!(:b_params) do
+      [parent_organization, child_organization].map do |organization|
+        BParam.create(creator: user, params: {bike: bike_params.merge(creation_organization_id: organization.id)})
+      end
+    end
+
+    def waiting_on_postgres
+      Bike.lease_connection.select_value(<<~SQL)
+        SELECT COUNT(*) FROM pg_locks
+        WHERE NOT granted AND database = (SELECT oid FROM pg_database WHERE datname = current_database())
+      SQL
+    end
+
+    it "registers one bike, for both organizations" do
+      Organization.example # Creates it if missing, which the threads would race to do
+
+      # SHARE lets reads through and holds writes. One registration reaches its insert while the other is started
+      threads = Bike.transaction do
+        Bike.lease_connection.execute("LOCK TABLE bikes IN SHARE MODE")
+        started = b_params.map do |b_param|
+          Thread.new { Bike.connection_pool.with_connection { described_class.new.create_bike(b_param) } }
+        end
+        Timeout.timeout(10) { sleep(0.01) until waiting_on_postgres >= 1 }
+        sleep 0.5
+        started
+      end
+
+      bike_ids = threads.map { it.value.id }.uniq
+      expect(bike_ids.size).to eq 1
+      expect(Bike.unscoped.pluck(:id)).to eq(bike_ids)
+      expect(Ownership.pluck(:bike_id)).to eq(bike_ids)
+      expect(b_params.map { it.reload.created_bike_id }.uniq).to eq(bike_ids)
+      expect(BikeOrganization.where(bike_id: bike_ids).pluck(:organization_id))
+        .to match_array([parent_organization.id, child_organization.id])
     end
   end
 end

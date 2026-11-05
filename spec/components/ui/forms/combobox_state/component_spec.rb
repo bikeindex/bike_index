@@ -23,4 +23,30 @@ RSpec.describe UI::Forms::ComboboxState::Component, type: :component do
       expect(component.css("input[type='hidden'][name='state']").first["value"]).to eq "TX"
     end
   end
+
+  context "with states submitting their own values" do
+    let(:options) { {states: [{name: "Ontario", abbr: "ON", value: "CA-ON"}], html_options: {value: "CA-ON"}} }
+
+    it "submits the value, showing the abbreviation" do
+      expect(component).to have_css("[role='option'][data-value='CA-ON']", text: "Ontario (ON)", visible: :all)
+      expect(component).to have_css("[data-hw-combobox-prefilled-display-value='Ontario (ON)']")
+    end
+  end
+
+  context "with ids, on a form" do
+    let(:california) { FactoryBot.create(:state_california) }
+    let(:address_record) { AddressRecord.new(region_record_id: california.id) }
+    let(:form) do
+      BikeIndexFormBuilder.new(:address_record, address_record, ActionView::Base.new(ActionView::LookupContext.new([]), {}, nil), {})
+    end
+    let(:options) { {name: :region_record_id, ids: true, html_options: {form:}} }
+
+    it "submits the State record's id, showing the form object's" do
+      expect(component).to have_css("[role='option'][data-value='#{california.id}']", text: "California (CA)", visible: :all)
+      expect(component).to have_css("[data-hw-combobox-prefilled-display-value='California (CA)']")
+      expect(component.css("input[type='hidden'][name='address_record[region_record_id]']").first["value"]).to eq california.id.to_s
+      # without JavaScript the fallback select is what submits, so it has to hold the saved state too
+      expect(component.css("noscript").to_html).to include("<option selected=\"selected\" value=\"#{california.id}\">California (CA)</option>")
+    end
+  end
 end

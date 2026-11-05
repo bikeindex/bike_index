@@ -13,10 +13,10 @@ RSpec.describe Pages::Admin::Navbar::Component, type: :component do
   end
   let(:component) { with_request_url(url) { render_inline(instance) } }
   # The picker's "All" link
-  let(:view_all_link) { "a.text-muted" }
+  let(:view_all_link) { "nav > a:not([href='/'])" }
 
   it "renders the shortcut links and an option per admin page, minus the dev pages" do
-    expect(component.css("ul.navbar-nav a").map(&:text)).to eq(%w[Users Bikes Organizations News Stolen])
+    expect(component.css("nav ul a").map(&:text)).to eq(%w[Users Bikes Organizations News Stolen])
     expect(component).to have_css("[data-controller='admin--navbar'][data-action='hw-combobox:selection->admin--navbar#navigate']")
     expect(component).to have_css("[role='option'][data-value='#{admin_bikes}']", text: "Bikes", visible: :all)
     expect(component).to have_css("[role='option'][data-value='/admin/organizations']", text: "Organizations", visible: :all)
@@ -40,12 +40,12 @@ RSpec.describe Pages::Admin::Navbar::Component, type: :component do
     it "renders only the brand and the exit link" do
       expect(component).to have_css("a", text: "Exit Admin")
       expect(component).to_not have_css("[role='option']", visible: :all)
-      expect(component).to_not have_css("ul.navbar-nav")
+      expect(component).to_not have_css("nav ul")
     end
   end
 
   describe "the shortcut links" do
-    let(:shortcuts) { component.css("ul.navbar-nav a[data-controller='ui--active-link']") }
+    let(:shortcuts) { component.css("nav ul a[data-controller='ui--active-link']") }
 
     # The shortcuts take what they cover from nav_select_links, so they stay active across a
     # section rather than only on its index. UI::ActiveLink resolves that in the browser,

@@ -56,6 +56,74 @@ RSpec.describe BulkImportJob, type: :job do
         expect(UnknownOrganizationForAscendImportJob.jobs.map { |j| j["args"] }.flatten).to eq([bulk_import.id])
       end
     end
+    context "ascend import with lock held" do
+      let(:organization) { FactoryBot.create(:organization_with_auto_user, ascend_name: "BIKELaneChiC", kind: "bike_shop", pos_kind: "ascend_pos") }
+      let!(:bulk_import) { FactoryBot.create(:bulk_import_ascend, organization:) }
+      let(:locked_organization_id) { organization.id }
+      before do
+        allow_any_instance_of(BulkImport).to receive(:open_file) { StringIO.new(csv_string) }
+        @lock_manager = described_class.new_lock_manager
+        @redlock = @lock_manager.lock(described_class.redlock_key(locked_organization_id), 5000)
+      end
+      after { @lock_manager.unlock(@redlock) }
+
+      it "defers processing" do
+        expect {
+          instance.perform(bulk_import.id)
+        }.to change(described_class.jobs, :count).by(1)
+        expect(Bike.count).to eq 0
+        expect(described_class.jobs.last["args"]).to eq([bulk_import.id, true])
+        expect(described_class.jobs.last["at"]).to be > 50.seconds.from_now.to_f
+        expect(bulk_import.reload.pending?).to be_truthy
+      end
+
+      context "with an invalid extension" do
+        before { allow_any_instance_of(BulkImport).to receive(:invalid_extension?) { true } }
+        it "only notifies about the extension on the first attempt" do
+          expect {
+            instance.perform(bulk_import.id)
+            instance.perform(bulk_import.id, true)
+          }.to change(InvalidExtensionForAscendImportJob.jobs, :count).by(1)
+          expect(described_class.jobs.last(2).map { it["args"] }).to eq([[bulk_import.id, true]] * 2)
+        end
+      end
+
+      context "when Redis errors prevent locking" do
+        before { allow_any_instance_of(Redlock::Client).to receive(:lock).and_raise(Redlock::LockAcquisitionError.new("down", [])) }
+        it "defers processing rather than dropping the import" do
+          expect {
+            instance.perform(bulk_import.id)
+          }.to change(described_class.jobs, :count).by(1)
+          expect(described_class.jobs.last["args"]).to eq([bulk_import.id, true])
+          expect(bulk_import.reload.pending?).to be_truthy
+        end
+      end
+
+      context "for a different organization" do
+        let(:locked_organization_id) { organization.id + 1 }
+        it "processes, and releases its lock" do
+          expect {
+            instance.perform(bulk_import.id)
+          }.to_not change(described_class.jobs, :count)
+          expect(Bike.count).to eq 2
+          expect(bulk_import.reload.finished?).to be_truthy
+          expect(described_class.new_lock_manager.locked?(described_class.redlock_key(organization.id))).to be_falsey
+        end
+
+        it "renews its lock while it works through a long file" do
+          allow_any_instance_of(BulkImport).to receive(:open_file) { StringIO.new(([csv_lines.first.join(",")] + [","] * 60).join("\n")) }
+          lock_options = []
+          allow_any_instance_of(Redlock::Client).to receive(:lock).and_wrap_original do |method, *args, **options|
+            lock_options << options
+            method.call(*args, **options)
+          end
+          instance.perform(bulk_import.id)
+          expect(bulk_import.reload.finished?).to be_truthy
+          expect(lock_options.map { it[:extend_only_if_locked] }).to eq([false, true])
+          expect(described_class.new_lock_manager.locked?(described_class.redlock_key(organization.id))).to be_falsey
+        end
+      end
+    end
     context "erroring" do
       let!(:color) { FactoryBot.create(:color, name: "White") }
       before do
@@ -265,7 +333,7 @@ RSpec.describe BulkImportJob, type: :job do
           expect(bike2.public_images.count).to eq 1
           expect(bike2.frame_size).to eq "m"
           expect(bike2.frame_size_unit).to eq "ordinal"
-          expect(bike2.registration_address).to_not be_present
+          expect(bike2.registration_address_record).to be_nil
           expect(bike2.phone).to be_nil
           expect(bike2.extra_registration_number).to eq "extra serial number"
           expect(bike2.owner_name).to eq "Sally"
@@ -275,7 +343,7 @@ RSpec.describe BulkImportJob, type: :job do
           expect(bike_sticker.bike_sticker_updates.count).to eq 1
         end
       end
-      context "no_duplicate" do
+      context "allow_duplicate" do
         it "creates the bikes, doesn't have any errors", :flaky do
           expect(bike_sticker.reload.claimed?).to be_falsey
           expect(bike_sticker.bike_sticker_updates.count).to eq 0
@@ -286,12 +354,12 @@ RSpec.describe BulkImportJob, type: :job do
             expect {
               instance.perform(bulk_import.id)
               # This test is being flaky! Add debug printout #2101 (actually after, but still...)
-              pp "Error no_duplicate", bulk_import.import_errors if bulk_import.reload.blocking_error?
+              pp "Error allow_duplicate", bulk_import.import_errors if bulk_import.reload.blocking_error?
             }.to change(Bike, :count).by 2
           end
-          # It doesn't duplicate if no duplicate is true
-          bulk_import.update(no_duplicate: true, progress: "pending")
-          expect(bulk_import.reload.no_duplicate).to be_truthy
+          # It doesn't duplicate by default
+          bulk_import.update(progress: "pending")
+          expect(bulk_import.reload.allow_duplicate).to be_falsey
           VCR.use_cassette("bulk_import-perform-success") do
             expect {
               instance.perform(bulk_import.id)
@@ -301,9 +369,9 @@ RSpec.describe BulkImportJob, type: :job do
           expect(bike_sticker.reload.claimed?).to be_truthy
           expect(bike_sticker.bike_sticker_updates.count).to eq 1
 
-          # But with no_duplicate false, it does duplicate
-          bulk_import.update(no_duplicate: false, progress: "pending")
-          expect(bulk_import.reload.no_duplicate).to be_falsey
+          # But with allow_duplicate, it does duplicate
+          bulk_import.update(allow_duplicate: true, progress: "pending")
+          expect(bulk_import.reload.allow_duplicate).to be_truthy
           VCR.use_cassette("bulk_import-perform-success") do
             expect {
               instance.perform(bulk_import.id)
@@ -335,7 +403,7 @@ RSpec.describe BulkImportJob, type: :job do
             description: "I love this, it's my favorite",
             frame_size: "29in",
             frame_size_unit: "in",
-            registration_address: {},
+            registration_address_record: nil,
             public_images: [],
             phone: "8887776666",
             extra_registration_number: nil,
@@ -354,7 +422,7 @@ RSpec.describe BulkImportJob, type: :job do
             year: nil,
             frame_size: "m",
             frame_size_unit: "ordinal",
-            registration_address: {},
+            registration_address_record: nil,
             phone: nil,
             extra_registration_number: "extra serial number",
             owner_name: "Sally",
@@ -468,6 +536,78 @@ RSpec.describe BulkImportJob, type: :job do
     end
   end
 
+  context "repeated row" do
+    let!(:trek) { FactoryBot.create(:manufacturer, name: "Trek") }
+    let!(:color_green) { FactoryBot.create(:color, name: "Green") }
+    let(:serial) { "xyz_test" }
+    let(:row) { ["Trek", "Roscoe 8", "2019", "Green", "test@bikeindex.org", serial].join(",") }
+    let(:csv_lines) { [sample_csv_lines[0].join(","), row, row] }
+    let(:bulk_import_attrs) { {} }
+    let(:bulk_import) { FactoryBot.create(:bulk_import, progress: "pending", **bulk_import_attrs) }
+    before { allow_any_instance_of(BulkImport).to receive(:open_file) { File.open(tempfile.path, "r") } }
+
+    it "creates one bike" do
+      expect { instance.perform(bulk_import.id) }.to change(Bike, :count).by 1
+      expect(bulk_import.reload.import_errors).to be_blank
+      # The repeated row matched a bike this import registered
+      expect(bulk_import.matched_count).to eq 0
+    end
+    context "file uploaded again" do
+      let(:bulk_import2) { FactoryBot.create(:bulk_import, progress: "pending", **bulk_import_attrs) }
+      it "counts the matching rows, and isn't empty" do
+        instance.perform(bulk_import.id)
+        expect { described_class.new.perform(bulk_import2.id) }.to change(Bike, :count).by 0
+        expect(bulk_import2.reload).to have_attributes(matched_count: 2, no_bikes?: false, import_errors: {})
+        expect(BulkImport.no_bikes.pluck(:id)).to eq([])
+        # Run again from the start, it counts the rows again rather than adding to the count
+        bulk_import2.update(progress: "pending")
+        described_class.new.perform(bulk_import2.id)
+        expect(bulk_import2.reload.matched_count).to eq 2
+      end
+
+      it "keeps the count when an error stops the import, and resuming skips the rows before it" do
+        instance.perform(bulk_import.id)
+        register_count = 0
+        allow_any_instance_of(described_class).to receive(:register_bike).and_wrap_original do |method, *args|
+          raise "Unexpected error" if (register_count += 1) == 2
+          method.call(*args)
+        end
+        expect { described_class.new.perform(bulk_import2.id) }.to raise_error("Unexpected error")
+        expect(bulk_import2.reload).to have_attributes(matched_count: 1, file_import_error_lines: [3])
+
+        RSpec::Mocks.space.proxy_for(described_class).reset
+        bulk_import2.update(progress: "pending")
+        expect { described_class.new.perform(bulk_import2.id) }.to change(Bike, :count).by 0
+        expect(bulk_import2.reload).to have_attributes(matched_count: 1, no_bikes?: false)
+      end
+    end
+    context "allow_duplicate: true" do
+      let(:bulk_import_attrs) { {allow_duplicate: true} }
+      it "creates two bikes" do
+        expect { instance.perform(bulk_import.id) }.to change(Bike, :count).by 2
+      end
+    end
+    context "different serials" do
+      let(:csv_lines) { [sample_csv_lines[0].join(","), row, row.sub(serial, "other_serial")] }
+      it "creates two bikes" do
+        expect { instance.perform(bulk_import.id) }.to change(Bike, :count).by 2
+      end
+    end
+    context "short serial" do
+      let(:serial) { "12345" }
+      it "creates two bikes" do
+        expect { instance.perform(bulk_import.id) }.to change(Bike, :count).by 2
+      end
+    end
+    context "stolen import, with allow_duplicate" do
+      let(:bulk_import_attrs) { {kind: "stolen", data: {stolen_record: {date_stolen: "2022-04-12T16:00", timezone: "America/Los_Angeles"}}, allow_duplicate: true} }
+      it "creates two bikes, so each keeps its stolen record" do
+        expect { instance.perform(bulk_import.id) }.to change(Bike, :count).by 2
+        expect(Bike.status_stolen.count).to eq 2
+      end
+    end
+  end
+
   context "with assigned bulk import" do
     before { instance.bulk_import = bulk_import }
     describe "process_csv" do
@@ -537,7 +677,7 @@ RSpec.describe BulkImportJob, type: :job do
           send_email: true,
           creation_organization_id: nil,
           bike_sticker: nil,
-          no_duplicate: false
+          no_duplicate: true
         }
       end
       describe "row_to_b_param_hash" do
@@ -577,7 +717,7 @@ RSpec.describe BulkImportJob, type: :job do
             send_email: true,
             creation_organization_id: nil,
             bike_sticker: nil,
-            no_duplicate: false
+            no_duplicate: true
           }
         end
         let(:target_impound) do

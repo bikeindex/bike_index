@@ -11,7 +11,8 @@ module Pages
           check: {classes: "tw:bg-[#ffd660] tw:text-slate-900", glyph: "!"},
           fail: {classes: "tw:bg-[#cc0000] tw:text-white", icon: "icons/x.svg"},
           info: {classes: "tw:bg-gray-200 tw:text-gray-700", glyph: "i"},
-          unknown: {classes: "tw:bg-gray-600 tw:text-white", glyph: "?"}
+          unknown: {classes: "tw:bg-gray-600 tw:text-white", glyph: "?"},
+          unknown_warning: {classes: "tw:bg-[#ffd660] tw:text-slate-900", glyph: "?"}
         }.freeze
 
         SIZES = {

@@ -18,6 +18,16 @@ RSpec.describe UI::Forms::Combobox::Component, :js, type: :system do
     expect(page).to have_css('[role="option"]', count: CycleType.slugs.count)
     expect_axe_clean
 
+    # A query matching nothing says so, and Enter keeps it open to edit
+    fill_in "Cycle type", with: "zzqq"
+
+    expect(page).to have_no_css('[role="option"]')
+    no_matches = "getComputedStyle(document.querySelector('[role=listbox]'), '::before').content"
+    expect(page.evaluate_script(no_matches)).to eq '"No matches"'
+    send_keys(:enter)
+    expect(page).to have_css('[aria-expanded="true"]')
+    expect(find_field("Cycle type").value).to eq "zzqq"
+
     # Filters the options as you type
     fill_in "Cycle type", with: "cargo"
 

@@ -4,7 +4,7 @@
   <head>
     <%= render(SharedBlocks::HeaderTags::Component.new(**header_tags_component_options)) %>
     <%= csrf_meta_tags %>
-    <%= stylesheet_link_tag 'registrations', media: 'all' %>
+    <%= stylesheet_link_tag 'tailwind', 'registrations', media: 'all' %>
     <%= javascript_include_tag 'registrations' %>
     <%= javascript_importmap_tags %>
   </head>

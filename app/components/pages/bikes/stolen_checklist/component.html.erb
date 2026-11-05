@@ -1,6 +1,14 @@
 <% if organization_stolen_message.present? %>
   <div class="also-give-me-padding-x">
-    <%= render partial: "/bikes/organization_stolen_message", locals: {stolen_record: @stolen_record} %>
+    <% if @email %>
+      <div class="organization-stolen-message-alert">
+        <%= render partial: "/bikes/organization_stolen_message", locals: {stolen_record: @stolen_record} %>
+      </div>
+    <% else %>
+      <%= render(UI::Alerts::Base::Component.new(kind: :warning)) do %>
+        <%= render partial: "/bikes/organization_stolen_message", locals: {stolen_record: @stolen_record} %>
+      <% end %>
+    <% end %>
   </div>
 <% end %>
 

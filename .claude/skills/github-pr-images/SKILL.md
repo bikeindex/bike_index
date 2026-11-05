@@ -19,6 +19,10 @@ allowed-tools: Bash(gh:*), Bash(rtk proxy gh:*), Bash(ruby .claude/skills/github
 
 **There's no upload-only call**: assets upload as part of posting, so callers hand over a body that references local paths, never URLs they need back first.
 
+## Who runs this
+
+From a session with history, hand this skill to a subagent the way `AGENTS.md`'s **Who runs this** describes — `model: "sonnet"` (it works out which comment and which upload route) — briefed with the PR number and either a composed body file referencing local image paths or the images plus where they go. It replies with the comment (or PR) URL and Step 4's verification result.
+
 ## Preflight: which route this run takes
 
 `$CLAUDE_CODE_REMOTE` decides which, before anything else here.
@@ -56,6 +60,8 @@ A caller's body is posted verbatim — don't recompose it. Composing it yourself
 
 <img src="tmp/screenshot.png" width="500">
 ```
+
+When a `## Screenshots` comment already exists (step 3 finds it), compose from its current body: a recapture **replaces** the image it supersedes in place — never a new "Updated"/"After merging main" section appended below the old shots. A state the comment doesn't show yet gets its own block, in the shape of the ones there.
 
 Images in table cells want `<img … width=…>`; elsewhere `![alt](path)` is fine. Don't give an `<img>`'s file a `#alt` on `--attach` — step 3's script finds its upload by the basename gh uses as the default alt.
 

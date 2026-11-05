@@ -20,7 +20,7 @@
   <% end %>
 
   <% table.column(label: "Gear ID") do |strava_gear| %>
-    <code><%= strava_gear.strava_id %></code>
+    <%= render(UI::Code::Inline::Component.new(text: strava_gear.strava_id)) %>
   <% end %>
 
   <% table.column(sortable: "total_distance_kilometers", label: "Distance (mi)") do |strava_gear| %>
@@ -35,7 +35,7 @@
 
   <% table.column(label: "Linked Bike") do |strava_gear| %>
     <% if strava_gear.item.present? %>
-      <%= link_to strava_gear.item.title_string.truncate(30), bike_path(strava_gear.item), class: "small" %>
+      <%= link_to strava_gear.item.title_string.truncate(30), bike_path(strava_gear.item), class: "twlink tw:text-sm" %>
     <% end %>
   <% end %>
 

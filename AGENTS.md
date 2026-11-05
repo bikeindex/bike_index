@@ -94,6 +94,13 @@ Delegate the enumeration rather than eyeballing a grep — a hand-written grep a
 
 **Tell a backgrounded reviewer not to spawn its own subagents.** It hands part of its scope to them, then finishes with "still running" and none of their findings — three of five did on #4505, and each needed a follow-up message to report.
 
+**A skill that takes many turns costs mostly in re-reading the session it runs in** — 65–87% of each skill's cost in the transcripts measured; shortening a skill's text doesn't cut that. So a multi-turn skill opens with a **Who runs this** section naming the model, the brief and the reply for handing it to one subagent, and every such hand-off works the same way:
+
+- **From a session with history, spawn one `general-purpose` `Agent` that invokes the skill** (the `Skill` tool, so the skill's `allowed-tools` apply) and relay its reply rather than redoing its work. A job of a command or two is cheaper done in the session than briefed.
+- **Brief it with what only the conversation knows** — the branch's purpose, choices already made — or it undoes them.
+- **Wait for it, and stay out of the checkout meanwhile** — it may check out the base, run specs, or drive the shared browser.
+- **Any subagent skips a Who runs this section** and does the work itself; handing off again only loses context.
+
 ## Testing
 
 Uses RSpec. All business logic should be tested. The `rspec-testing` skill covers project-specific style (`context`+`let`, request specs over controller specs, avoiding mocks). A test that fails intermittently is the `fixing-flaky-failures` skill — coverage is never what gives way to make CI green.

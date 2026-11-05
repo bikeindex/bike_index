@@ -14,16 +14,15 @@ module Admin
     end
 
     def show
-      redirect_to edit_admin_user_url(params[:id])
+      @active_tab = Pages::Admin::Users::Show::Component::TABS.find { it.to_s == params[:active_tab] }
+      return redirect_to(edit_admin_user_url(params[:id])) unless @active_tab
+
+      @page_title = "#{Pages::Admin::Users::Tabs::Component::TABS[@active_tab]}: #{@user.display_name}"
     end
 
     def edit
       # urls with user IDs rather than usernames are more helpful in superadmin
-      if params[:id] == @user.username
-        redirect_to edit_admin_user_path(@user.id)
-        return
-      end
-      calculate_user_bikes
+      redirect_to edit_admin_user_path(@user.id) if params[:id] == @user.username
     end
 
     def update
@@ -49,6 +48,7 @@ module Admin
         @user.username = params[:user][:username]
         @user.can_send_many_stolen_notifications = params[:user][:can_send_many_stolen_notifications]
         @user.can_send_many_marketplace_messages = params[:user][:can_send_many_marketplace_messages]
+        @user.dark_mode_preview = Binxtils::InputNormalizer.boolean(params[:user][:dark_mode_preview]) if @user == current_user
         @user.phone = params[:user][:phone]
         # skip_update so the save doesn't auto-enqueue AfterUserChangeJob - it's enqueued
         # once below, after UserBan.create! (which marks the user banned) has run
@@ -58,11 +58,10 @@ module Admin
           elsif ban_params[:reason].present?
             @user.user_ban&.update(ban_params.slice(:reason, :description))
           end
-          @user.confirm(@user.confirmation_token) if params[:user][:confirmed]
+          @user.confirm(@user.confirmation_token) if Binxtils::InputNormalizer.boolean(params[:user][:confirmed])
           CallbackJobs::AfterUserChangeJob.perform_async(@user.id)
           redirect_to admin_users_url, notice: "User Updated"
         else
-          calculate_user_bikes
           render action: :edit, status: :unprocessable_entity
         end
       end
@@ -184,13 +183,6 @@ module Admin
       else
         :valid_only
       end
-    end
-
-    def calculate_user_bikes
-      # If the user has a bunch of bikes, it can cause timeouts. In those cases, use rough approximation
-      bikes = @user.bikes
-      @bikescount = @user.bikes.count
-      @bikes = bikes.reorder(created_at: :desc).limit(10)
     end
   end
 end

@@ -66,6 +66,32 @@ RSpec.describe CustomerMailer, type: :mailer do
     end
   end
 
+  describe "donation ask" do
+    let(:html) { CustomerMailer.welcome_email(user).deliver_now.html_part.body.to_s }
+    let(:organization) { FactoryBot.create(:invoice_with_payment).organization }
+
+    it "renders" do
+      expect(html).to include(support_the_index_url)
+    end
+
+    context "paid organization member" do
+      let(:user) { FactoryBot.create(:organization_role_claimed, organization:).user }
+
+      it "doesn't render" do
+        expect(html).to_not include(support_the_index_url)
+      end
+    end
+
+    context "paid organization email domain" do
+      let(:user) { FactoryBot.create(:user, email: "someone@paid-university.edu") }
+      before { organization.update(user_email_domain: "paid-university.edu") }
+
+      it "doesn't render" do
+        expect(html).to_not include(support_the_index_url)
+      end
+    end
+  end
+
   describe "additional_email_confirmation" do
     let(:user_email) { FactoryBot.create(:user_email) }
     it "renders email" do
@@ -190,6 +216,17 @@ RSpec.describe CustomerMailer, type: :mailer do
       expect(mail2.subject).to eq(stolen_notification.subject)
       stolen_notification.reload
       expect(stolen_notification.send_dates[1]).to be > stolen_notification.updated_at.to_i - 2
+    end
+
+    # Honeybadger 135003447: the bike box read the token off a nil current_ownership
+    context "bike without a current ownership" do
+      let!(:bike) { FactoryBot.create(:stolen_bike) }
+
+      it "renders the bike link without a token" do
+        expect(bike.current_ownership).to be_nil
+        mail = CustomerMailer.stolen_notification_email(stolen_notification)
+        expect(mail.deliver_now.html_part.body.to_s).to include(%(href="#{bike_url(bike)}"))
+      end
     end
   end
 

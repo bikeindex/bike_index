@@ -45,12 +45,18 @@ RSpec.describe Admin::RegistrationSequencesController, type: :request do
           get base_url
           expect(assigns(:template)).to eq template_draft
           expect(response.body).to include("Template Draft sequence")
-          expect(Capybara.string(response.body)).to have_css("td span.twless-strong", text: "Template", count: 2)
+          expect(Capybara.string(response.body)).to have_css("td span.less-strong", text: "Template", count: 2)
         end
       end
 
       context "with search_status" do
         let!(:active) { FactoryBot.create(:registration_sequence_active, :with_pages, organization:) }
+
+        it "badges active as success" do
+          get base_url, params: {search_status: "active"}
+          expect(response.status).to eq(200)
+          expect(Capybara.string(response.body)).to have_css("span.tw\\:bg-green-50", text: "Active")
+        end
 
         it "filters by status" do
           get base_url, params: {search_status: "draft"}

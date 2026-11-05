@@ -5,18 +5,55 @@ require "rails_helper"
 RSpec.describe EbikeRuleServices::BikebookVehicles do
   before { stub_bikebook_catalog }
 
+  # Level 2 as the catalog would publish it without classifications, each mode changed by the block
+  def stub_unclassified_level_2
+    block = JSON.parse(BikebookCatalogHelpers::FIXTURES.join("models/aventon/2022.json").read)
+    block["models"]["m/aventon/2022/level_2"]["motors"].flat_map { it["operating_modes"] }.each do |mode|
+      mode.delete("e_vehicle_classifications")
+      yield mode if block_given?
+    end
+    WebMock.stub_request(:get, "#{Integrations::Bikebook::Catalog::URL}models/aventon/2022.json").to_return(body: block.to_json)
+  end
+
   describe "find" do
     it "reads a model's class, motor, speeds and certifications" do
       bike = described_class.find("m/specialized/2025/haul_st")
 
       expect(bike).to have_attributes(bikebook_id: "m/specialized/2025/haul_st", manufacturer_name: "Specialized",
-        model: "Haul ST", first_year: 2025, e_bike_class: 3, class_unknown: false, e_vehicle_classifications: %w[evc/us/class_3 evc/us/class_2], watts: 700, top_assist_mph: 28, throttle: true,
-        throttle_mph: 20, ul2849: :certified, ul2271: :certified, manual?: false)
+        model: "Haul ST", first_year: 2025, e_bike_class: 3, class_unknown: false, e_vehicle_classifications: %w[evc/us/class_3 evc/us/class_2], optional_classes: {2 => "throttle"}, watts: 700, top_assist_mph: 28, throttle: true,
+        stock_throttle: false, throttle_mph: 20, ul2849: :certified, ul2271: :certified, manual?: false,
+        # as the catalog records them
+        top_assist_kmh: 45, throttle_kmh: 32, top_kmh: 45, assists_past_kmh: nil)
+    end
+
+    it "has a stock throttle from a throttle mode sold with it, or a throttle propulsion with no throttle mode" do
+      expect(described_class.find("m/aventon/2026/level_4_adv")).to have_attributes(throttle: true, stock_throttle: true)
+
+      block = JSON.parse(BikebookCatalogHelpers::FIXTURES.join("models/aventon/2022.json").read)
+      block["models"]["m/aventon/2022/level_2"]["motors"].each { it["operating_modes"].reject! { it["mode"] == "throttle" } }
+      WebMock.stub_request(:get, "#{Integrations::Bikebook::Catalog::URL}models/aventon/2022.json").to_return(body: block.to_json)
+      expect(described_class.find("m/aventon/2022/level_2")).to have_attributes(throttle: false, stock_throttle: true)
+    end
+
+    it "counts a mode an app update unlocks as one it's sold with, in place of the ones of its kind it replaces" do
+      expect(described_class.find("m/aventon/2026/pace_5_rec_step_through")).to have_attributes(e_bike_classes: [2, 3], optional_classes: {})
+
+      # Class 1 assist an app updates to Class 3, and a throttle sold separately
+      block = JSON.parse(BikebookCatalogHelpers::FIXTURES.join("models/aventon/2022.json").read)
+      modes = block["models"]["m/aventon/2022/level_2"]["motors"].first["operating_modes"]
+      modes.find { it["mode"] == "assist" }.merge!("max_speed" => 32, "e_vehicle_classifications" => ["evc/us/class_1"])
+      modes.find { it["mode"] == "throttle" }["availability"] = "upgrade"
+      modes << {"mode" => "assist", "availability" => "app_update", "max_speed" => 45, "e_vehicle_classifications" => ["evc/us/class_3"]}
+      WebMock.stub_request(:get, "#{Integrations::Bikebook::Catalog::URL}models/aventon/2022.json").to_return(body: block.to_json)
+      expect(described_class.find("m/aventon/2022/level_2"))
+        .to have_attributes(stock_e_bike_classes: [3], optional_classes: {2 => "throttle"}, top_assist_mph: 28)
     end
 
     it "classes an unclassified model by its speeds" do
+      stub_unclassified_level_2
+
       expect(described_class.find("m/aventon/2022/level_2"))
-        .to have_attributes(e_bike_class: 1, watts: 500, top_assist_mph: 20, throttle: false)
+        .to have_attributes(e_bike_class: 2, class_unknown: false, watts: 500, top_assist_mph: 20, throttle: true)
     end
 
     it "gives no class to a model too fast for one, whose motors' power is their total" do
@@ -25,16 +62,23 @@ RSpec.describe EbikeRuleServices::BikebookVehicles do
     end
 
     it "can't tell the class of an unclassified model with no speeds" do
-      block = JSON.parse(BikebookCatalogHelpers::FIXTURES.join("models/aventon/2022.json").read)
-      block["models"]["m/aventon/2022/level_2"]["motors"].each { it["operating_modes"].each { it.delete("max_speed") } }
-      WebMock.stub_request(:get, "#{Integrations::Bikebook::Catalog::URL}models/aventon/2022.json").to_return(body: block.to_json)
+      stub_unclassified_level_2 { it.delete("max_speed") }
 
       expect(described_class.find("m/aventon/2022/level_2")).to have_attributes(e_bike_class: nil, class_unknown: true)
     end
 
     it "gives no class to a model classified as something else" do
       expect(described_class.find("m/sur_ron/2026/ultra_bee_hp_x_us"))
-        .to have_attributes(e_bike_class: nil, class_unknown: false, e_vehicle_classifications: %w[evc/us/ca/off_highway_electric_motorcycle evc/off_highway_motorcycle])
+        .to have_attributes(e_bike_class: nil, class_unknown: false, e_vehicle_classifications: %w[evc/off_highway_motorcycle])
+    end
+
+    it "classes a model under another jurisdiction's e-bike law by its speeds" do
+      vocabulary = JSON.parse(BikebookCatalogHelpers::FIXTURES.join("vocabulary.json").read)
+      vocabulary["e_vehicle_classifications"]["evc/eu/epac"] = {"jurisdiction" => "EU", "name" => "Electrically Power Assisted Cycle (EPAC)", "e_bike_law" => true}
+      WebMock.stub_request(:get, "#{Integrations::Bikebook::Catalog::URL}vocabulary.json").to_return(body: vocabulary.to_json)
+      stub_unclassified_level_2 { it["e_vehicle_classifications"] = ["evc/eu/epac"] }
+
+      expect(described_class.find("m/aventon/2022/level_2")).to have_attributes(e_bike_class: 2, class_unknown: false)
     end
 
     it "is nil for a model the catalog lacks, a model without a motor, and no id" do

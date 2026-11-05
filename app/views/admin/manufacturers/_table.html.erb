@@ -13,6 +13,10 @@
     <%= check_mark if manufacturer.motorized_only %>
   <% end %>
 
+  <% table.column(sortable: "close_year") do |manufacturer| %>
+    <%= manufacturer.close_year %>
+  <% end %>
+
   <% table.column(label: "Website") do |manufacturer| %>
     <% if manufacturer.website %>
       <%= link_to "Company website", manufacturer.website, class: "twlink" %>
