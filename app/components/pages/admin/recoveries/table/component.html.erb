@@ -58,7 +58,7 @@
     <% end %>
   <% end %>
 
-  <% table.column(hideable: :owner_cell, classes: "tw:leading-none") do |(recovery, bike)| %>
+  <% table.column(hideable: :owner_cell, classes: "tw:leading-none tw:min-w-32 tw:wrap-anywhere") do |(recovery, bike)| %>
     <% if bike.present? %>
       <%= bike.owner_email %>
       <%= render(Atoms::Admin::Badges::User::Component.new(user: bike.user)) %>
@@ -76,11 +76,11 @@
     <% end %>
   <% end %>
 
-  <% table.column(hideable: :theft_description_cell, classes: "tw:min-w-56 tw:text-xs tw:text-gray-500") do |(recovery)| %>
+  <% table.column(hideable: :theft_description_cell, classes: "tw:min-w-40 tw:text-xs tw:text-gray-500") do |(recovery)| %>
     <%= recovery.theft_description&.truncate(200) %>
   <% end %>
 
-  <% table.column(hideable: :story_cell, classes: "tw:min-w-72") do |(recovery, _bike, defaults)| %>
+  <% table.column(hideable: :story_cell, classes: "tw:min-w-56") do |(recovery, _bike, defaults)| %>
     <% if defaults %>
       <div
         data-controller="admin--character-count"

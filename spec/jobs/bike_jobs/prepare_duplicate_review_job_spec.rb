@@ -8,12 +8,16 @@ RSpec.describe BikeJobs::PrepareDuplicateReviewJob, type: :job do
   it "stores the groups and their cue keys for the dashboard, then releases its claim" do
     manufacturer = FactoryBot.create(:manufacturer)
     bikes = Array.new(2) { FactoryBot.create(:bike, :with_ownership, manufacturer:, serial_number: "EN 14764 A1") }
-    expect(finder.fetch_group_snapshot).to be_nil
+    expect(finder.fetch_group_snapshot("unresolved")).to be_nil
     claim = RedisPool.conn { it.get(finder::PREPARING_KEY) }
     expect(described_class.jobs.map { it["args"] }).to eq [[claim]]
 
     described_class.new.perform(claim)
-    group = finder.fetch_group_snapshot[:groups].sole
+    snapshot = finder.fetch_group_snapshot("unresolved")
+    expect(snapshot[:counts]["unresolved"]).to eq("groups" => 1, "records" => 2)
+    expect(snapshot[:counts]["handoff_priority"]).to eq("groups" => 0, "records" => 0)
+    expect(finder.fetch_group_snapshot("handoff_priority")[:groups]).to eq []
+    group = snapshot[:groups].sole
     expect(group["bike_ids"]).to match_array(bikes.map(&:id))
     expect(group["first_at"]).to eq bikes.first.created_at.to_i
     expect(group["cue_keys"]).to eq ["standard_marking"]
@@ -37,7 +41,7 @@ RSpec.describe BikeJobs::PrepareDuplicateReviewJob, type: :job do
     expect(finder.group_snapshot_failed_at).to be_within(2.seconds).of(Time.current)
     expect(RedisPool.conn { it.get(finder::PREPARING_KEY) }).to eq "claim"
     expect(RedisPool.conn { it.ttl(finder::PREPARING_KEY) }).to be_within(5).of(finder::PREPARING_TTL.to_i)
-    expect(finder.fetch_group_snapshot).to be_nil
+    expect(finder.fetch_group_snapshot("unresolved")).to be_nil
     expect(described_class.jobs).to be_empty
 
     allow(BikeDuplicatesServices::Cues).to receive(:fetch_manufacturer_name_serials).and_call_original

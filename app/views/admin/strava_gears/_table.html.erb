@@ -20,7 +20,7 @@
   <% end %>
 
   <% table.column(label: "Gear ID") do |strava_gear| %>
-    <code class="twcode"><%= strava_gear.strava_id %></code>
+    <%= render(UI::Code::Inline::Component.new(text: strava_gear.strava_id)) %>
   <% end %>
 
   <% table.column(sortable: "total_distance_kilometers", label: "Distance (mi)") do |strava_gear| %>

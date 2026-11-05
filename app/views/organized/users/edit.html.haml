@@ -15,7 +15,7 @@
     - else
       = t(".has_not_signed_up_html", name: @organization_role.invited_display_name)
   - list.with_row(label: t(".last_login"), value: render(UI::Time::Component.new(time: @organization_role.user&.last_login_at, format: :localize_time_precise)))
-  - list.with_row(label: t(".last_login_ip"), value: (tag.code(@organization_role.user.last_login_ip) if @organization_role.user&.last_login_ip.present?))
+  - list.with_row(label: t(".last_login_ip"), value: (render(UI::Code::Inline::Component.new(text: @organization_role.user.last_login_ip)) if @organization_role.user&.last_login_ip.present?))
 
 = form_for @organization_role, { as: :organization_role, url: organization_user_path(id: @organization_role.id, organization_id: current_organization.to_param), action: 'update', html: { class: 'organized-form' } } do |f|
   .form-group.row

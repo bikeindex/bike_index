@@ -148,9 +148,9 @@
 
           <span class="below-input-help mt-2">
             For example:
-            <code>https://bikeindex.org/bikes/123, https://bikeindex.org/bikes/4567</code>
+            <%= render(UI::Code::Inline::Component.new(text: "https://bikeindex.org/bikes/123, https://bikeindex.org/bikes/4567")) %>
             <br>
-            <span class="less-strong">(can also be just the IDs - e.g. for the above: <code>123, 4567</code>)</span>
+            <span class="less-strong">(can also be just the IDs - e.g. for the above: <%= render(UI::Code::Inline::Component.new(text: "123, 4567")) %>)</span>
           </span>
 
           <label class="checkbox mt-0">

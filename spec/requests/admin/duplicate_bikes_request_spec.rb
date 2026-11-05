@@ -49,7 +49,7 @@ RSpec.describe Admin::DuplicateBikesController, type: :request do
     it "tries again on the next visit when the job can't be enqueued" do
       RedisPool.conn { it.del(finder::SNAPSHOT_KEY) }
       allow(BikeJobs::PrepareDuplicateReviewJob).to receive(:perform_async).and_raise(RedisClient::CannotConnectError)
-      expect { finder.fetch_group_snapshot }.to raise_error(RedisClient::CannotConnectError)
+      expect { finder.fetch_group_snapshot("large_group") }.to raise_error(RedisClient::CannotConnectError)
       expect(RedisPool.conn { it.get(finder::PREPARING_KEY) }).to be_nil
     end
 
@@ -71,6 +71,21 @@ RSpec.describe Admin::DuplicateBikesController, type: :request do
 
       get base_url, params: {search_kind: "large_group", search_organization_id: "0"}
       expect(response.code).to eq "200"
+      expect(assigns(:groups)).to be_empty
+    end
+
+    it "filters by an organization linked after registration, but not by a removed link" do
+      linked_organization = FactoryBot.create(:organization)
+      removed_organization = FactoryBot.create(:organization)
+      BikeOrganization.create!(bike: marked_bikes.last, organization: linked_organization)
+      BikeOrganization.create!(bike: marked_bikes.last, organization: removed_organization).destroy
+      finder.store_group_snapshot
+
+      get base_url, params: {search_kind: "large_group", search_organization_id: linked_organization.id}
+      expect(assigns(:groups).map { it["record_count"] }).to eq [11]
+      expect(response.body).to include(linked_organization.name)
+
+      get base_url, params: {search_kind: "large_group", search_organization_id: removed_organization.id}
       expect(assigns(:groups)).to be_empty
     end
 
@@ -130,6 +145,16 @@ RSpec.describe Admin::DuplicateBikesController, type: :request do
       FactoryBot.create(:bike, :with_ownership_claimed, user:, manufacturer:, serial_number: "HAND0FF123")
       expect(finder.groups.find { it["bike_ids"].include?(shop_bike.id) }["kind"]).to eq "handoff_priority"
     end
+
+    it "keeps a pair the comparison page doesn't pass out of the priority queue" do
+      user = FactoryBot.create(:user_confirmed)
+      shop_bike = FactoryBot.create(:bike_lightspeed_pos, manufacturer: Manufacturer.other, serial_number: "HAND0FF123", owner_email: user.email, created_at: 2.days.ago)
+      customer_bike = FactoryBot.create(:bike, :with_ownership_claimed, user:, manufacturer: Manufacturer.other, serial_number: "HAND0FF123")
+      expect(finder.groups.find { it["bike_ids"].include?(shop_bike.id) }["kind"]).to eq "shop_customer"
+
+      get "#{base_url}/compare", params: {bike_ids: [shop_bike.id, customer_bike.id].join(",")}
+      expect(response.body).to include("Uncertain — admin judgment", "Manufacturer is Other")
+    end
   end
 
   describe "segments" do
@@ -175,6 +200,14 @@ RSpec.describe Admin::DuplicateBikesController, type: :request do
       expect(response.body).to include("Show all 11 records")
     end
 
+    it "compares the live records when the reference has been deleted" do
+      marked_bikes.first.update_column(:deleted_at, Time.current)
+      get "#{base_url}/serial", params: {reference_bike_id: marked_bikes.first.id}
+      expect(response.code).to eq "200"
+      expect(assigns(:bikes_count)).to eq 10
+      expect(assigns(:reference_bike)).to eq marked_bikes.second
+    end
+
     it "lists records oldest first, or newest first on request" do
       get "#{base_url}/serial", params: {reference_bike_id: marked_bikes.first.id}
       expect(assigns(:bikes).first).to eq marked_bikes.first
@@ -203,6 +236,40 @@ RSpec.describe Admin::DuplicateBikesController, type: :request do
       get "#{base_url}/compare", params: {bike_ids: [shop_bike.id, customer_bike.id].join(",")}
       expect(response.code).to eq "200"
       expect(response.body).to include("Shop default? Confirm propulsion with the owner", "Meets the strict same-owner evidence")
+    end
+
+    it "says what's wrong with a comparison's IDs, and keeps them in the form" do
+      segments_path = admin_duplicate_bikes_path(search_view: "segments", bike_ids: pair.first.id.to_s)
+      get "#{base_url}/compare", params: {bike_ids: pair.first.id.to_s}
+      expect(response).to redirect_to(segments_path)
+      expect(flash[:error]).to eq "Enter between 2 and 50 bike record IDs to compare"
+
+      get "#{base_url}/compare"
+      expect(flash[:error]).to eq "Enter between 2 and 50 bike record IDs to compare"
+
+      get "#{base_url}/compare", params: {bike_ids: (1..51).to_a.join(",")}
+      expect(flash[:error]).to eq "Enter between 2 and 50 bike record IDs to compare"
+
+      get "#{base_url}/compare", params: {bike_ids: "#{pair.first.id},12a"}
+      expect(flash[:error]).to eq "Not bike record IDs: 12a"
+
+      missing_id = Bike.unscoped.maximum(:id) + 1
+      get "#{base_url}/compare", params: {bike_ids: "#{pair.first.id},#{missing_id}"}
+      expect(flash[:error]).to eq "No bike records with IDs: #{missing_id}"
+
+      follow_redirect!
+      expect(response.body).to include("value=\"#{pair.first.id},#{missing_id}\"")
+    end
+
+    it "counts private photos and listings on a bike's versions" do
+      FactoryBot.create(:public_image, imageable: pair.first, is_private: true)
+      FactoryBot.create(:marketplace_listing, item: FactoryBot.create(:bike_version, bike: pair.first))
+      get "#{base_url}/compare", params: {bike_ids: pair.map(&:id).join(",")}
+      review = assigns(:review)
+      expect(review.photo_count(pair.first)).to eq 1
+      expect(review.marketplace_count(pair.first)).to eq 1
+      expect(review.marketplace_count(pair.last)).to eq 0
+      expect(Capybara.string(response.body).text).to include("1 photos")
     end
 
     it "flags a part-number serial as not a duplicate match" do
@@ -262,6 +329,12 @@ RSpec.describe Admin::DuplicateBikesController, type: :request do
         expect(response.body).to_not match(email_pattern)
       end
 
+      it "returns compare errors as JSON" do
+        get "#{base_url}/compare.json", params: token_param.merge(bike_ids: "#{pair.first.id},x")
+        expect(response.status).to eq 422
+        expect(json_result[:error]).to eq "Not bike record IDs: x"
+      end
+
       it "returns a comparison without contact emails" do
         get "#{base_url}/serial.json", params: token_param.merge(reference_bike_id: pair.last.id)
         expect(response.status).to eq 200
@@ -274,7 +347,7 @@ RSpec.describe Admin::DuplicateBikesController, type: :request do
       end
 
       it "rechecks the stolen veto live and blocks the comparison" do
-        kind = finder.fetch_group_snapshot[:groups].find { it["bike_ids"].include?(pair.first.id) }["kind"]
+        kind = finder.groups.find { it["bike_ids"].include?(pair.first.id) }["kind"]
         FactoryBot.create(:stolen_bike, serial_number: "WTU123456")
         get url, params: token_param.merge(search_kind: kind)
         expect(json_result[:groups].find { it[:bike_ids].include?(pair.first.id) }[:serial_stolen]).to be true

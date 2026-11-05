@@ -27,7 +27,7 @@
 
     <% table.column(sortable: "referral_source") do |payment| %>
       <% if payment.referral_source.present? %>
-        <code class="twcode"><%= payment.referral_source %></code>
+        <%= render(UI::Code::Inline::Component.new(text: payment.referral_source)) %>
         <% if render_sortable %>
           <%= link_to search_emoji, url_for(sort_state.search_params.merge(query: payment.referral_source)), class: "display-sortable-link tw:text-sm" %>
         <% end %>

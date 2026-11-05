@@ -27,13 +27,13 @@
     <%= render UI::Badge::Component.new(text: "Transferred", color: :cyan, size: :sm) %>
   <% end %>
 
-  <% if @bike.marketplace_listings.any? %>
+  <% if @review.marketplace_count(@bike).positive? %>
     <%= render UI::Badge::Component.new(text: "Marketplace", color: :cyan, size: :sm) %>
   <% end %>
 
-  <% if @bike.public_images.any? %>
+  <% if @review.photo_count(@bike).positive? %>
     <%= render UI::Badge::Component.new(text: "photos", color: :empty, size: :sm) do %>
-      <%= number_display(@bike.public_images.size) %>&nbsp;photos
+      <%= number_display(@review.photo_count(@bike)) %>&nbsp;photos
     <% end %>
   <% end %>
 

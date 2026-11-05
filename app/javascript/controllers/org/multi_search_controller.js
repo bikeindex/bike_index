@@ -129,7 +129,6 @@ export default class extends Controller {
     // Trigger column settings to apply stored column visibility to new tables
     this.element.dispatchEvent(new Event('turbo:frame-render', { bubbles: true }))
     this.alignTableColumns()
-    window.timeLocalizer?.localize()
     this.buttonTarget.disabled = false
     this.searching = false
   }

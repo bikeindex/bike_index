@@ -10,7 +10,7 @@ module ApplicationComponentHelper
   end
 
   def number_display(number)
-    content_tag(:span, number_with_delimiter(number), class: ((number == 0) ? "twless-strong" : ""))
+    content_tag(:span, number_with_delimiter(number), class: ((number == 0) ? "less-strong" : ""))
   end
 
   # Hyphenated words never wrap at the hyphen, which splits "e-bike" across lines

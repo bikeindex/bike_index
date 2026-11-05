@@ -8,7 +8,8 @@ module Pages
       # Picking an option navigates -- see admin/navbar_controller.js.
       class Component < ApplicationComponent
         NAV_LINK_CLASS = "tw:block tw:p-2 tw:no-underline tw:text-black/50 " \
-          "tw:hover:text-black/70 tw:focus:text-black/70 tw:is-active:text-black/90"
+          "tw:hover:text-black/70 tw:focus:text-black/70 tw:is-active:text-black/90 " \
+          "tw:dark:text-white/50 tw:dark:hover:text-white/70 tw:dark:focus:text-white/70 tw:is-active:dark:text-white/90"
 
         def initialize(current_user:, user_root_url:, search_filtered: false)
           @current_user = current_user

@@ -34,7 +34,7 @@
             <%= link_to "only", only_path(status), class: "twlink tw:text-sm" %>
 
             <% if default_on?(status) %>
-              <em class="twless-strong tw:text-xs">on by default</em>
+              <em class="less-strong tw:text-xs">on by default</em>
 
               <%= render(UI::Tooltip::Component.new(text: "enabled because of your superuser settings")) %>
             <% end %>

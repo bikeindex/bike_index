@@ -20,7 +20,7 @@
 
       <% if stripe_price.present? %>
         <%= stripe_price.membership_level %>
-        <span class="twless-strong"><%= stripe_price.interval %></span>
+        <span class="less-strong"><%= stripe_price.interval %></span>
         <% unless stripe_price.currency_enum == "usd" %>
           <small><%= stripe_price.currency_name %></small>
         <% end %>
@@ -68,7 +68,7 @@
           <% end %>
 
           <% if stripe_status.present? %>
-            <code class="tw:text-sm"><%= stripe_status %></code>
+            <%= render(UI::Code::Inline::Component.new(text: stripe_status)) %>
           <% end %>
         <% end %>
       <% end %>

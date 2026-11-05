@@ -3,15 +3,15 @@
 <div class="twwiderow tw:mt-6 tw:items-start">
   <%= render(UI::TableList::Component.new) do |list| %>
     <% if display_dev_info? %>
-      <% list.with_row(label: "ID", dev_only: true, value: tag.code(@bug_report.id, class: "twcode")) %>
-      <% list.with_row(label: "Inbound email", dev_only: true, value: tag.code(@bug_report.inbound_email_id, class: "twcode")) %>
+      <% list.with_row(label: "ID", dev_only: true, value: render(UI::Code::Inline::Component.new(text: @bug_report.id))) %>
+      <% list.with_row(label: "Inbound email", dev_only: true, value: render(UI::Code::Inline::Component.new(text: @bug_report.inbound_email_id))) %>
     <% end %>
 
     <% list.with_row(label: "Sender") do %>
       <div><%= @bug_report.from_name %></div>
 
       <div>
-        <%= content_tag(:code, @bug_report.email, class: "twcode") %>
+        <%= render(UI::Code::Inline::Component.new(text: @bug_report.email)) %>
 
         <%= mail_to @bug_report.email, inline_svg_tag("icons/envelope.svg", class: "tw:inline-block tw:h-4 tw:w-4"), class: "twlink tw:ml-1", title: "Email #{@bug_report.email}" %>
 
@@ -23,7 +23,7 @@
       <% if @bug_report.user_id.present? %>
         <%= render Atoms::Admin::TableCells::User::Component.new(user: @bug_report.user, user_id: @bug_report.user_id) %>
       <% else %>
-        <span class="twless-strong">no user</span>
+        <span class="less-strong">no user</span>
       <% end %>
     <% end %>
 
@@ -93,10 +93,10 @@
     <% @bug_report.images.each do |image| %>
       <div>
         <%= link_to BlobUrl.for(image.blob), target: "_blank", rel: "noopener" do %>
-          <%= image_tag BlobUrl.for(image.blob), alt: image.filename, class: "tw:max-h-72 tw:rounded tw:border tw:border-gray-200 tw:p-1" %>
+          <%= image_tag BlobUrl.for(image.blob), alt: image.filename, class: "tw:max-h-72 tw:rounded tw:border tw:border-gray-200 tw:p-1 tw:dark:border-gray-700" %>
         <% end %>
 
-        <div class="twless-strong tw:text-sm">
+        <div class="less-strong tw:text-sm">
           <%= image.filename %>
           <%= number_to_human_size(image.byte_size) %>
         </div>

@@ -58,7 +58,7 @@ module Pages
             # A bike's page has the bike already
             return {column_settings: column_settings.merge(storage_key: "adminBikeRecoveriesColumns", defaults: DEFAULT_COLUMNS - %i[photo_cell bike_cell])} unless @editable
 
-            {column_settings: column_settings.merge(storage_key: "adminRecoveriesColumns", defaults: DEFAULT_COLUMNS),
+            {column_settings: column_settings.merge(storage_key: "adminRecoveriesColumns", defaults: DEFAULT_COLUMNS - %i[location_cell]),
              form: {url: bulk_update_admin_recoveries_path, method: :patch},
              data: {controller: "admin--personal-info", action: "submit->admin--personal-info#confirmDisplay",
                     "admin--personal-info-patterns-value": PERSONAL_INFO.transform_values { {label: it[:label], source: it[:pattern].source} }.to_json}}

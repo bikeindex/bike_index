@@ -13,13 +13,13 @@
         - batch[:stickers].each do |sticker|
           %strong{class: "tw:block tw:text-sm"}= sticker
       - table.column(label: tag.em("Code Prefix")) do |batch|
-        %code.twcode= batch[:prefix]
+        = render(UI::Code::Inline::Component.new(text: batch[:prefix]))
       - table.column(label: tag.em("Initial Sticker number")) do |batch|
-        %code.twcode= batch[:initial]
+        = render(UI::Code::Inline::Component.new(text: batch[:initial]))
       - table.column(label: tag.em("Number of stickers to create")) do |batch|
-        %code.twcode= batch[:count]
+        = render(UI::Code::Inline::Component.new(text: batch[:count]))
       - table.column(label: tag.em("Code Number Length")) do |batch|
-        %code.twcode= batch[:length]
+        = render(UI::Code::Inline::Component.new(text: batch[:length]))
 
 = form_for [:admin, @bike_sticker_batch], url: {action: "create", controller: "bike_stickers"} do |f|
   = render(UI::Alerts::ObjectError::Component.new(name: "Sticker Batch", object: @bike_sticker_batch))

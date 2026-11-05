@@ -196,19 +196,18 @@ RSpec.describe BikeDuplicatesServices::Review do
   end
 
   context "assessing a pair for a future invitation" do
-    let(:second_user_id) { 10 }
-    # Test markers and stolen records are looked up by bike ID
-    let(:second_bike_id) { 2 }
-    let(:pair) do
-      [[10, true], [second_user_id, false]].each_with_index.map do |(user_id, claimed), index|
-        ownership = ownership_class.new(id: index + 1, created_at: Time.at(index), user_id:, owner_email: "rider@bikeindex.org", claimed:)
-        record_class.new(id: index.zero? ? 1 : second_bike_id, created_at: Time.at(index), serial_normalized_no_space: "WTU123456", manufacturer_id: 1,
-          frame_model: "Roadster", ownerships: [ownership], current_ownership: ownership, marketplace_listings: [])
-      end
-    end
-    let(:review) { described_class.new(bikes: pair) }
+    let(:manufacturer) { FactoryBot.create(:manufacturer) }
+    let(:user) { FactoryBot.create(:user_confirmed) }
+    let(:serial_number) { "WTU123456" }
+    let(:shared_attributes) { {manufacturer:, frame_model: "Roadster"} }
+    let(:first_bike) { FactoryBot.create(:bike, :with_ownership_claimed, user:, serial_number:, created_at: 2.days.ago, **shared_attributes) }
+    let(:second_bike) { FactoryBot.create(:bike, :with_ownership_claimed, user:, serial_number:, **shared_attributes) }
+    let(:bikes) { [first_bike, second_bike] }
+    let(:review) { described_class.new(bikes: bikes.map { Bike.unscoped.find(it.id) }) }
     let(:checks) { review.readiness_checks }
     let(:blocked_labels) { checks.select { it.status == :blocked }.map(&:label) }
+    let(:uncertain_labels) { checks.select { it.status == :uncertain }.map(&:label) }
+    let(:history_label) { "Transfer, marketplace, impound or a status other than with owner to preserve — not a simple merge" }
 
     it "meets the strict evidence with one known, current, claiming account" do
       expect(checks.map(&:status).uniq).to eq [:pass]
@@ -216,22 +215,80 @@ RSpec.describe BikeDuplicatesServices::Review do
     end
 
     context "with the same email on different accounts" do
-      let(:second_user_id) { 11 }
+      before { second_bike.current_ownership.update_column(:user_id, FactoryBot.create(:user_confirmed).id) }
 
       it "keeps an email-only match tentative" do
-        expect(checks.map(&:label)).to include("Same initial email only — tentative; shops and shared inboxes reuse emails")
+        expect(uncertain_labels).to include("Same initial email only — tentative; shops and shared inboxes reuse emails")
         expect(review.readiness).to eq :uncertain
+      end
+    end
+
+    context "with the same account and different emails" do
+      before { second_bike.current_ownership.update_column(:owner_email, "another@bikeindex.org") }
+
+      it "isn't the strict evidence" do
+        expect(uncertain_labels).to include("Same known account, but the initial emails differ or one is missing")
+      end
+    end
+
+    context "with the Other manufacturer" do
+      let(:manufacturer) { Manufacturer.other }
+
+      it "isn't the strict evidence" do
+        expect(uncertain_labels).to eq ["Manufacturer is Other, so it can't corroborate the match"]
+      end
+    end
+
+    context "with stored serials that only normalizing joins" do
+      before { second_bike.update_column(:serial_number, "WTU12345G") }
+
+      it "isn't the strict evidence" do
+        expect(uncertain_labels).to eq ["Stored serials differ — normalizing may have joined different numbers"]
+      end
+    end
+
+    context "with a status other than with owner" do
+      before { second_bike.update_column(:status, "status_abandoned") }
+
+      it "isn't the strict evidence" do
+        expect(uncertain_labels).to eq [history_label]
+      end
+    end
+
+    context "with a marketplace listing on a bike version" do
+      before do
+        FactoryBot.create(:marketplace_listing, item: FactoryBot.create(:bike_version, bike: second_bike, owner: user), seller: user)
+      end
+
+      it "isn't the strict evidence" do
+        expect(uncertain_labels).to eq [history_label]
+      end
+    end
+
+    context "with a claimed shop registration" do
+      before { first_bike.current_ownership.update_column(:pos_kind, "lightspeed_pos") }
+
+      it "isn't the strict evidence" do
+        expect(uncertain_labels).to eq ["A shop registration has been claimed"]
+      end
+    end
+
+    context "with three records" do
+      let(:bikes) { [first_bike, second_bike, FactoryBot.create(:bike, :with_ownership_claimed, user:, serial_number:, **shared_attributes)] }
+
+      it "needs record-by-record review" do
+        expect(uncertain_labels).to eq ["Not exactly two registrations — larger groups need record-by-record review"]
       end
     end
 
     it "vetoes stolen history on the whole serial" do
       FactoryBot.create(:bike, :with_stolen_record, serial_number: "WTU 123456")
-      expect(review.readiness_checks.first.label).to eq "Stolen history on this whole serial (any record, manufacturer or status) is a hard merge veto"
+      expect(checks.first.label).to eq "Stolen history on this whole serial (any record, manufacturer or status) is a hard merge veto"
       expect(review.readiness).to eq :blocked
     end
 
     context "with a test record" do
-      let(:second_bike_id) { FactoryBot.create(:bike, owner_email: "testing@example.com").id }
+      before { second_bike.update_column(:owner_email, "testing@example.com") }
 
       it "keeps it out" do
         expect(review.test_count).to eq 1
@@ -239,33 +296,20 @@ RSpec.describe BikeDuplicatesServices::Review do
       end
     end
 
-    context "with a stolen record on one record, recovered ones on deleted bikes included" do
-      let(:second_bike_id) { FactoryBot.create(:stolen_record_recovered).bike.tap { it.update_column(:deleted_at, Time.current) }.id }
+    context "with a recovered stolen record on a deleted bike" do
+      before do
+        FactoryBot.create(:stolen_record_recovered, bike: second_bike)
+        second_bike.update_columns(deleted_at: Time.current, serial_normalized_no_space: nil)
+      end
 
       it "vetoes it whatever the whole-serial lookup found" do
-        expect(review.stolen_count(pair.last)).to eq 1
-        expect(blocked_labels).to eq ["A record has its own stolen history, a hard merge veto whatever its serial"]
-      end
-    end
-
-    context "with a stolen status and no stolen record" do
-      before { pair.last.status = "status_stolen" }
-
-      it "vetoes it" do
-        expect(blocked_labels).to eq ["A record has its own stolen history, a hard merge veto whatever its serial"]
-      end
-    end
-
-    context "with a current stolen record" do
-      before { pair.last.current_stolen_record_id = 5 }
-
-      it "vetoes it" do
-        expect(blocked_labels).to eq ["A record has its own stolen history, a hard merge veto whatever its serial"]
+        expect(review.stolen_count(second_bike)).to eq 1
+        expect(blocked_labels).to include("A record has its own stolen history, a hard merge veto whatever its serial")
       end
     end
 
     context "with different whole serials" do
-      before { pair.last.serial_normalized_no_space = "WTU123457" }
+      before { second_bike.update_column(:serial_normalized_no_space, "WTU123457") }
 
       it "blocks the comparison" do
         expect(blocked_labels).to eq ["Whole normalized serials differ, or one is missing or shorter than 6 characters"]
@@ -273,31 +317,15 @@ RSpec.describe BikeDuplicatesServices::Review do
     end
 
     context "with short serials" do
-      before { pair.each { it.serial_normalized_no_space = "WTU12" } }
+      let(:serial_number) { "WTU12" }
 
       it "blocks the comparison" do
-        expect(blocked_labels).to eq ["Whole normalized serials differ, or one is missing or shorter than 6 characters"]
-      end
-    end
-
-    context "with a missing serial" do
-      before { pair.last.serial_normalized_no_space = nil }
-
-      it "blocks the comparison" do
-        expect(blocked_labels).to eq ["Whole normalized serials differ, or one is missing or shorter than 6 characters"]
+        expect(blocked_labels).to include("Whole normalized serials differ, or one is missing or shorter than 6 characters")
       end
     end
 
     context "with different manufacturers" do
-      before { pair.last.manufacturer_id = 2 }
-
-      it "blocks the comparison" do
-        expect(blocked_labels).to eq ["Manufacturers differ, or one is missing"]
-      end
-    end
-
-    context "with no manufacturer" do
-      before { pair.each { it.manufacturer_id = nil } }
+      before { second_bike.update_column(:manufacturer_id, FactoryBot.create(:manufacturer).id) }
 
       it "blocks the comparison" do
         expect(blocked_labels).to eq ["Manufacturers differ, or one is missing"]

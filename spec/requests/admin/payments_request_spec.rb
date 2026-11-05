@@ -70,6 +70,7 @@ RSpec.describe Admin::PaymentsController, type: :request do
       get "#{base_url}/new"
       expect(response.status).to eq(200)
       expect(response).to render_template(:new)
+      expect(Capybara.string(response.body).find("input[name='payment[payment_method]']", visible: :all).value).to eq "check"
     end
   end
 

@@ -1,11 +1,6 @@
 <%= render(UI::Card::Component.new) do %>
   <div class="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2">
-    <h2
-      class="
-        tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2]
-        tw:uppercase
-      "
-    >
+    <h2 class="tw:tweyebrow">
       <%= translation(".this_bike_is_for_sale", bike_type: @bike.type) %>
     </h2>
 
