@@ -32,6 +32,7 @@ en:
             other: Classes %{n} are recognized
           classes_start_on: Classes take effect %{date}. Until then, check the state's
             current rules
+          e_bike_rules_in: E-bike rules in %{state}
           entered_unverified: Entered by you, not verified by BikeBook.
           fails_rule: Does not meet this rule
           falls_under_name: In %{state}, it falls under %{name}.

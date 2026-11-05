@@ -57,8 +57,7 @@ RSpec.describe EbikeRulesController, type: :request do
       # a three-class state's own Class 3 limits, and what its motorcycle needs, in place of most states'
       get "/ebike-rules/US/CA", headers: frame
       expect(page).to have_css("h3", text: "Class 3").and have_css("[role=button]", text: "California specifics")
-        .and have_css("li", text: "Riders must be 16 or older to ride a Class 3")
-        .and have_css("li", text: /Class 3 can.t be sold to anyone under 16 California Vehicle Code §§21212\.5, 21213 1 2 3/, normalize_ws: true)
+        .and have_css("li", text: "Not a motor vehicle: no driver's license")
         .and have_css("li", text: "Registered and plated with the DMV, and must carry liability insurance")
         .and have_no_css("li", text: "Allowed on freeways")
         .and have_no_text("Often comes with a helmet rule")
@@ -70,7 +69,7 @@ RSpec.describe EbikeRulesController, type: :request do
       get "/ebike-rules/US/CA", params: {e_bike_class: 3}, headers: frame.call(3)
       expect(page).to have_css("turbo-frame#ebike-rules-class-card-3 h3", text: "Class 3")
         .and have_css("[role=button]", text: "California specifics")
-        .and have_css("li", text: "Riders must be 16 or older to ride a Class 3")
+        .and have_css("li", text: "Not a motor vehicle: no driver's license")
         .and have_no_css("h3", text: "Class 1").and have_no_css("#ebike-rules-classes")
 
       get "/ebike-rules/US/CA", params: {e_bike_class: "12"}, headers: frame.call("emoto")

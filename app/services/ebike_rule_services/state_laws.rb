@@ -42,15 +42,17 @@ module EbikeRuleServices
 
     def three_classes?(law) = law[:classes] == [1, 2, 3]
 
-    # The helmet, age and path rules in force for a Class 3 under the state's e-bike law
-    def class_3_rules(abbreviation, today: Time.zone.today)
-      find(abbreviation, today:)&.dig(:restrictions).to_a
-        .select { it[:starts_on].nil? && it[:rule].match?(/\bclass 3\b/i) && it[:rule].match?(/helmet|older|\bage\b|path|trail/i) }
-    end
+    # The top rules in force of the state's e-bike law, which name the class where one is about it alone
+    def e_bike_top_rules(abbreviation, today: Time.zone.today) = top_rules(find(abbreviation, today:)&.dig(:restrictions).to_a)
 
-    # The license, registration and insurance rules in force for the state's motorcycle, which an e-moto usually is
-    def emoto_rules(abbreviation, today: Time.zone.today)
-      current(parsed[:motorcycles][abbreviation].to_a, today).select { it[:starts_on].nil? && it[:rule].match?(/licen|regist|insur/i) }
+    # The top rules in force for the state's motorcycle, which an e-moto usually is
+    def emoto_rules(abbreviation, today: Time.zone.today) = top_rules(current(parsed[:motorcycles][abbreviation].to_a, today))
+
+    # With its rule_groups, each leading with its top rules, and its top_rules. Each rule goes under the first group it's in
+    def with_rule_groups(classification)
+      top, rest = classification[:restrictions].partition { it[:categories].include?("top_rule") }
+      rule_groups = (top + rest).group_by { |rule| RULE_GROUPS.find { rule[:categories].include?(it) } || RULE_GROUPS.last }
+      classification.merge(rule_groups: rule_groups.slice(*RULE_GROUPS), top_rules: top_rules(top))
     end
 
     # Any jurisdiction's classification by its ID, as a state's own classes are, the e-moto for an out of class marker,
@@ -72,7 +74,7 @@ module EbikeRuleServices
 
     # By ISO 3166-2 code, each place outside the US the catalog classifies e-vehicles in: its e-bike laws, or without
     # one of its own its country's, and its other classes, slowest first and off-highway last
-    def places = vocabulary("places_with_laws") { parse_places(it) } || {}
+    def places = vocabulary("places_with_rule_categories") { parse_places(it) } || {}
 
     # What a bike is checked against in a place outside the US: its own e-bike law, or without one, the class its
     # country's e-bike falls into there, a motor vehicle's, as New Brunswick's Motor Driven Cycle
@@ -86,12 +88,11 @@ module EbikeRuleServices
     end
 
     # The state's classification for a vehicle with these classifications, other than its e-bike law: its own, or one
-    # sharing their group, with its restrictions not yet ended, its rule_groups each leading with their top rules, and its
-    # top_rules in force today
+    # sharing their group, with its restrictions not yet ended and its rule_groups
     def other_classification(abbreviation, ids, today: Time.zone.today)
       parsed => {groups:, tiers:}
       shared = ids.flat_map { [it, *groups[it]] }
-      tiers[abbreviation]&.find { it[:ids].intersect?(shared) }&.then { ranked_rules(in_force(it, today)) }
+      tiers[abbreviation]&.find { it[:ids].intersect?(shared) }&.then { with_rule_groups(in_force(it, today)) }
     end
 
     # The lightest of the state's road classifications a vehicle whose record names none fits. Only a known speed is
@@ -99,7 +100,7 @@ module EbikeRuleServices
     def classification_by_limits(abbreviation, mph:, watts:, today: Time.zone.today)
       fitting = parsed[:tiers][abbreviation].to_a.select { within_limits?(it, mph, watts) }
       ROAD_GROUPS.filter_map { |group| fitting.find { it[:ids].include?(group) } }.first
-        &.then { ranked_rules(in_force(it, today)).merge(by_limits: true) }
+        &.then { with_rule_groups(in_force(it, today)).merge(by_limits: true) }
     end
 
     # From a request's Cloudflare location headers
@@ -233,16 +234,12 @@ module EbikeRuleServices
 
     def upcoming(date, today) = (date if date&.>(today))
 
-    def ranked_rules(classification)
-      top, rest = classification[:restrictions].partition { it[:categories].include?("top_rule") }
-      rule_groups = (top + rest).group_by { |rule| RULE_GROUPS.find { rule[:categories].include?(it) } || RULE_GROUPS.last }
-      classification.merge(rule_groups: rule_groups.slice(*RULE_GROUPS), top_rules: top.select { it[:starts_on].nil? })
-    end
+    def top_rules(restrictions) = restrictions.select { it[:starts_on].nil? && it[:categories].include?("top_rule") }
 
     def within_limits?(tier, mph, watts)
       (tier[:mph].nil? || mph&.<=(tier[:mph])) && (watts.nil? || (tier[:min_watts]..tier[:watt_cap]).cover?(watts))
     end
 
-    conceal :parsed, :classifications, :vocabulary, :parse, :parse_places, :motor_vehicle_law, :state_classes, :by_speed, :state_class, :metric?, :mph, :law, :restriction, :web_pages, :date, :in_force, :current, :upcoming, :ranked_rules, :within_limits?
+    conceal :parsed, :classifications, :vocabulary, :parse, :parse_places, :motor_vehicle_law, :state_classes, :by_speed, :state_class, :metric?, :mph, :law, :restriction, :web_pages, :date, :in_force, :current, :upcoming, :top_rules, :within_limits?
   end
 end

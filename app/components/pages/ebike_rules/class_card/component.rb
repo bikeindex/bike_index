@@ -36,7 +36,7 @@ module Pages
         end
 
         def us_card
-          rules = @place && (@e_bike_class == 3) && EbikeRuleServices::StateLaws.class_3_rules(@place[:abbr]).presence
+          rules = @place && EbikeRuleServices::StateLaws.e_bike_top_rules(@place[:abbr]).presence
           tag, body = case @e_bike_class
           when 1 then [translation(".class_1_tag"), translation(".class_1_body")]
           when 2 then [translation(".class_2_tag"), translation(".class_2_body")]

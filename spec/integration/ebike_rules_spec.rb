@@ -116,9 +116,20 @@ RSpec.describe "E-bike rules", :js, type: :system do
       .and have_text(/Rules that may apply in California/i)
     expect(page).to have_current_path("/ebike-rules/US/CA?manual=1&top_speed=28&throttle=1&rules=1")
 
+    # as "Read more" does the state's e-bike law, under the cards and in the URL apart from them
+    expect(page).to have_no_text(/E-bike rules in California/i)
+    find("[role='button']", text: "Read more").click
+    expect(page).to have_text(/E-bike rules in California/i)
+    expect(page).to have_current_path("/ebike-rules/US/CA?manual=1&top_speed=28&throttle=1&rules=1&state_rules=1")
+    find("[role='status'] [role='button']", text: "Moped rules").click
+    expect(page).to have_no_text(/Rules that may apply in California/i)
+    expect(page).to have_text(/E-bike rules in California/i)
+    expect(page).to have_current_path("/ebike-rules/US/CA?manual=1&top_speed=28&throttle=1&rules=0&state_rules=1")
+
     # which a link to it opens
     visit "/ebike-rules/US/CA?manual=1&top_speed=28&throttle=1&rules=1"
-    expect(page).to have_css("section > [data-ui--collapse-target='content'] h3", text: "Rider rules")
+    expect(page).to have_text(/Rules that may apply in California/i)
+    expect(page).to have_no_text(/E-bike rules in California/i)
   end
 
   it "filters the states, opens the one an old link's anchor names, and checks a bike in each from its rules" do

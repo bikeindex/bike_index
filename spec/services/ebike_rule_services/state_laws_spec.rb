@@ -121,19 +121,18 @@ RSpec.describe EbikeRuleServices::StateLaws do
     end
   end
 
-  describe "class_3_rules" do
-    it "is the state's e-bike law's helmet, age and path rules for a Class 3" do
-      rules = described_class.class_3_rules("CA").pluck(:rule)
-      expect(rules).to include(a_string_starting_with("Riders must be 16 or older to ride a Class 3"))
-      expect(rules).to all(match(/class 3/i))
-      expect(described_class.class_3_rules("WY")).to eq []
+  describe "e_bike_top_rules" do
+    it "is the top rules of the state's e-bike law" do
+      expect(described_class.e_bike_top_rules("CA").pluck(:rule)).to match [a_string_starting_with("Not a motor vehicle"), a_string_starting_with("Riders under 18"),
+        a_string_starting_with("Ridden wherever bicycles may go")]
+      expect(described_class.e_bike_top_rules("WY")).to eq []
     end
   end
 
   describe "emoto_rules" do
-    it "is the license, registration and insurance rules for the state's motorcycle" do
+    it "is the top rules for the state's motorcycle" do
       expect(described_class.emoto_rules("CA").pluck(:rule)).to eq ["Riders need a driver's license with an M1 motorcycle endorsement",
-        "Registered and plated with the DMV, and must carry liability insurance"]
+        "Riders must wear a motorcycle helmet", "Registered and plated with the DMV, and must carry liability insurance"]
       expect(described_class.emoto_rules("WY")).to eq []
     end
   end
