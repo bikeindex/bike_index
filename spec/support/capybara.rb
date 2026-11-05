@@ -54,6 +54,12 @@ BLOCKED_EXTERNAL_HOSTS = %w[
   www.facebook.com
 ].freeze
 
+# application.js imports this pin, so a stalled jsDelivr holds `load` the same way, and
+# aborting it would leave every Stimulus controller unconnected. A new version of the pin
+# needs its published file here.
+TIME_LOCALIZER_PIN = Rails.application.importmap.packages["@bikeindex/time-localizer"].path
+TIME_LOCALIZER_JS = Rails.root.join("spec/fixtures/time-localizer-#{TIME_LOCALIZER_PIN[/@([\d.]+)/, 1]}.min.js").read
+
 # Point BASE_URL at Capybara's server for `:js` specs, so `*_url` helpers rendered
 # during the example resolve to it. default_url_options is read off BASE_URL once at
 # boot, so it takes the same treatment -- otherwise a helper called outside a request
@@ -83,6 +89,9 @@ RSpec.configure do |config|
       BLOCKED_EXTERNAL_HOSTS.each do |host|
         playwright_page.route("https://#{host}/**", ->(route, _request) { route.abort })
       end
+      playwright_page.route(TIME_LOCALIZER_PIN, ->(route, _request) {
+        route.fulfill(body: TIME_LOCALIZER_JS, contentType: "text/javascript")
+      })
 
       # Capybara reports a nil current_path for three URLs, not just the about:blank one
       # (session.rb: nil for an `about:` scheme, then `path unless path&.empty?`) -- an
