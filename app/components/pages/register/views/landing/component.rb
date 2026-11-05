@@ -8,16 +8,13 @@ module Pages
         # posts into the flow itself, so everything after it is the flow's own steps
         class Component < ApplicationComponent
           BLANK_IMAGE = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+          REFERRAL_SOURCE = "register-landing"
 
-          def initialize(b_param:, flow:, recoveries_count:, recoveries_value:, organizations_count:,
-            bikes_count:, current_user: nil)
+          def initialize(b_param:, flow:, stripe_prices:, current_user: nil)
             @b_param = b_param
             @flow = flow
             @current_user = current_user
-            @recoveries_count = recoveries_count
-            @recoveries_value = recoveries_value
-            @organizations_count = organizations_count
-            @bikes_count = bikes_count
+            @donate_form = Pages::Donate::Form::Component.new(stripe_prices:, current_user:, referral_source: REFERRAL_SOURCE)
           end
 
           def before_render
@@ -32,32 +29,24 @@ module Pages
             [translation(".check_two_minutes"), translation(".check_free_forever"), translation(".check_add_later")]
           end
 
-          def stats
-            [{value: number_display(@bikes_count), label: translation(".stat_bikes_registered")},
-              {value: number_display(@recoveries_count), label: translation(".stat_bikes_recovered")},
-              {value: render(Atoms::CurrencyMillions::Component.new(dollars_usd: @recoveries_value)),
-               label: translation(".stat_value_returned")},
-              {value: safe_join([number_display(@organizations_count), "+"]), label: translation(".stat_partners")}]
-          end
-
           def benefits
-            [{icon: "icons/file-check.svg", circle: "tw:bg-blue-600 tw:text-white",
+            [{icon: "icons/file-check.svg", circle: "tw:bg-blue-600",
               title: translation(".benefit_proof_title"), body: translation(".benefit_proof_body")},
-              {icon: "icons/siren.svg", circle: "tw:bg-[#cc0000] tw:text-white",
+              {icon: "icons/siren.svg", circle: "tw:bg-[#cc0000]",
                title: translation(".benefit_alerts_title"), body: translation(".benefit_alerts_body")},
-              {icon: "icons/searcher.svg", circle: "tw:bg-purple-500 tw:text-white",
+              {icon: "icons/searcher.svg", circle: "tw:bg-purple-500",
                title: translation(".benefit_resell_title"), body: translation(".benefit_resell_body")},
-              {icon: "icons/bell-ring.svg", circle: "tw:bg-blue-500 tw:text-white",
+              {icon: "icons/bell-ring.svg", circle: "tw:bg-blue-500",
                title: translation(".benefit_found_title"), body: translation(".benefit_found_body")},
-              {icon: "icons/repeat.svg", circle: "tw:bg-slate-900 tw:text-white",
+              {icon: "icons/repeat.svg", circle: "tw:bg-slate-900 tw:dark:bg-slate-600",
                title: translation(".benefit_transfer_title"), body: translation(".benefit_transfer_body")},
-              {icon: "icons/shield-check.svg", circle: "tw:bg-[#ffd660] tw:text-slate-900",
+              {icon: "icons/shield-check.svg", circle: "tw:bg-[#ffd660] tw:text-slate-900!",
                title: translation(".benefit_private_title"), body: translation(".benefit_private_body")},
-              {icon: "icons/store.svg", circle: "tw:bg-purple-500 tw:text-white",
+              {icon: "icons/lucide-store.svg", circle: "tw:bg-purple-500",
                title: translation(".benefit_marketplace_title"), body: translation(".benefit_marketplace_body")},
-              {icon: "icons/users.svg", circle: "tw:bg-slate-900 tw:text-white",
+              {icon: "icons/users.svg", circle: "tw:bg-slate-900 tw:dark:bg-slate-600",
                title: translation(".benefit_network_title"), body: translation(".benefit_network_body")},
-              {icon: "icons/smartphone.svg", circle: "tw:bg-blue-600 tw:text-white",
+              {icon: "icons/smartphone.svg", circle: "tw:bg-blue-600",
                title: translation(".benefit_app_title"), body: translation(".benefit_app_body")}]
           end
 
@@ -79,9 +68,9 @@ module Pages
               [translation(".faq_privacy_question"), translation(".faq_privacy_answer")]]
           end
 
-          def section_inner = "tw:mx-auto tw:max-w-6xl tw:px-5 tw:py-10 tw:sm:py-12 tw:lg:px-6 tw:lg:py-18"
+          def band = "tw:border-gray-200 tw:bg-gray-50 tw:dark:border-gray-700 tw:dark:bg-gray-800/60"
 
-          def h2_classes = "tw:m-0 tw:font-header tw:text-[26px] tw:leading-tight tw:sm:text-[32px] tw:font-extrabold tw:text-slate-900 tw:lg:text-[38px]"
+          def section_inner = "tw:py-10 tw:sm:py-12 tw:lg:py-18 #{SharedBlocks::Marketing::Wrapper::Component::CONTAINER_CLASSES}"
         end
       end
     end

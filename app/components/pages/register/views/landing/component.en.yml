@@ -5,6 +5,8 @@ en:
       register:
         views:
           landing:
+            a_million_bikes: A million bikes are registered. Not one owner paid to
+              be there.
             benefit_alerts_body: >-
               If it's taken, mark it stolen and we alert partner shops, police, and
               riders near where it happened.
@@ -46,6 +48,8 @@ en:
             check_add_later: You can add photos and details later
             check_free_forever: Free forever. No ads, no data sales.
             check_two_minutes: Takes about two minutes
+            donations_keep_it_free: Bike Index is a nonprofit. Donations are what
+              keep it free.
             faq_free_answer: >-
               Yes. Registering, reporting, and searching are free for everyone, forever.
               Bike Index is a 501(c)(3) nonprofit.
@@ -59,17 +63,15 @@ en:
               the bottom bracket, where the pedals meet the frame.
             faq_serial_question: I don't know my serial number.
             free_nonprofit_worldwide: Free · Nonprofit · Worldwide
+            fund_the_next_recovery: Fund the next recovery
             give_your_bike_a_way_home: Give your bike a way home.
             if_the_worst_happens: If the worst happens
+            keep_it_free: Keep it free
             lede: >-
               Register it now and you'll have proof it's yours, a one-click stolen
               alert, and a network of shops, police, and riders watching for it.
             quick_answers: Quick answers
             register_your_bike: Register your bike
-            stat_bikes_recovered: stolen bikes recovered
-            stat_bikes_registered: bikes registered, free
-            stat_partners: partner shops, police departments, and cities
-            stat_value_returned: value returned to owners
             sticker_flagged_body: >-
               When a shop, buyer, or officer checks the serial, it comes up stolen,
               and you get the message.
