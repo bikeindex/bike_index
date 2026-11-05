@@ -44,7 +44,8 @@ RSpec.describe EbikeRulesController, type: :request do
       expect(page).to have_css("turbo-frame#ebike-rules-classes h2", text: "New Jersey e-bike classes")
         .and have_css("h3", text: "Low-Speed Electric Bicycle")
         .and have_css("h3", text: "Not an e-bike")
-        .and have_no_css("h3", text: "Dirt Bike")
+        .and have_no_css("[class*='group/class-cards'] h3", text: "Dirt Bike")
+        .and have_css("label", text: "Dirt Bike")
         .and have_no_css("h3", text: "Class 1")
         .and have_no_css("#ebike-rules-check")
 
@@ -58,10 +59,12 @@ RSpec.describe EbikeRulesController, type: :request do
       get "/ebike-rules/US/CA", headers: frame
       expect(page).to have_css("h3", text: "Class 3").and have_css("[role=button]", text: "California specifics")
         .and have_css("[role=button]", text: "California E-bike rules")
+        .and have_css("[role=button]", text: "California non-e-bike rules")
+        .and have_css("label", text: "Off-Highway Electric Motorcycle")
         .and have_css("#ebike-rules-classes h3", text: "Rider rules")
         .and have_css("li", text: "Ridden wherever bicycles may go")
         .and have_css("li", text: "Registered and plated with the DMV, and must carry liability insurance")
-        .and have_no_css("li", text: "Allowed on freeways")
+        .and have_no_css("[class*='group/class-cards'] li", text: "Allowed on freeways")
         .and have_no_text("Often comes with a helmet rule")
         .and have_no_text("Most states treat these")
     end
@@ -302,7 +305,7 @@ RSpec.describe EbikeRulesController, type: :request do
         .and have_css("label", text: "32 km/h").and have_css("label", text: "Over 32 km/h")
         .and have_css("#ebike-rules-classes h2", text: "E-bike laws in Canada")
         .and have_css("#ebike-rules-classes h3", text: "Canadian Power-Assisted Bicycle")
-        .and have_no_css("[role=button]", text: "E-bike rules")
+        .and have_no_css("[role=button]", text: /e-bike rules/i)
         .and have_css("h2", text: "E-bike laws by province and territory")
         .and have_link("Check an e-bike in Ontario", href: "/ebike-rules/CA/ON#check", visible: :all)
         .and have_css("#state-panel-ca-nb h3", text: "Motor Driven Cycle", visible: :all)

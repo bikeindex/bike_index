@@ -12,8 +12,7 @@ module EbikeRuleServices
     MOTORCYCLE = "evc/motorcycle"
     ROAD_GROUPS = ["evc/moped", "evc/motor_driven_cycle", MOTORCYCLE].freeze
     RULE_GROUPS = %w[rider_rule enforcement legal_context seller_rule vehicle_definition].freeze
-    # TODO: only the numbered ones, once the catalog publishes schema 0.26.2
-    TOP_RULE = /\Atop_rule(?:_(\d+))?\z/
+    TOP_RULE = /\Atop_rule_(\d+)\z/
     # Corrections the catalog doesn't carry yet: `either` limits are alternatives, and NOT_AN_EBIKE folds a
     # class into the one e-moto entry, listed last. New Jersey's law counts an electric motorized bicycle as
     # a motorcycle, and a dirt bike is one too
@@ -96,6 +95,9 @@ module EbikeRuleServices
       shared = ids.flat_map { [it, *groups[it]] }
       tiers[abbreviation]&.find { it[:ids].intersect?(shared) }&.then { with_rule_groups(in_force(it, today)) }
     end
+
+    # Each of the state's classifications that isn't its e-bike law, with its rule_groups and top_rules
+    def non_e_bike_classifications(abbreviation, today: Time.zone.today) = parsed[:tiers][abbreviation].to_a.map { with_rule_groups(in_force(it, today)) }
 
     # The lightest of the state's road classifications a vehicle whose record names none fits. Only a known speed is
     # within a speed cap; an unknown power is within any
@@ -238,9 +240,9 @@ module EbikeRuleServices
 
     def top_rules(restrictions) = ranked_top_rules(restrictions).select { it[:starts_on].nil? }
 
-    def ranked_top_rules(restrictions) = restrictions.select { top_rule_rank(it) }.sort_by.with_index { |restriction, index| [top_rule_rank(restriction), index] }
+    def ranked_top_rules(restrictions) = restrictions.select { top_rule_rank(it) }.sort_by { top_rule_rank(it) }
 
-    def top_rule_rank(restriction) = restriction[:categories].filter_map { it[TOP_RULE] && it[TOP_RULE, 1].to_i }.first
+    def top_rule_rank(restriction) = restriction[:categories].filter_map { it[TOP_RULE, 1]&.to_i }.first
 
     def within_limits?(tier, mph, watts)
       (tier[:mph].nil? || mph&.<=(tier[:mph])) && (watts.nil? || (tier[:min_watts]..tier[:watt_cap]).cover?(watts))

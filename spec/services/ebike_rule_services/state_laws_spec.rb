@@ -128,6 +128,16 @@ RSpec.describe EbikeRuleServices::StateLaws do
     end
   end
 
+  describe "non_e_bike_classifications" do
+    it "is each of the state's classifications but its e-bike law, ready to list" do
+      classifications = described_class.non_e_bike_classifications("CA")
+      expect(classifications.pluck(:name)).to include("Moped", "Off-Highway Electric Motorcycle")
+      expect(classifications.pluck(:name)).not_to include("Electric Bicycle")
+      expect(classifications.first[:rule_groups]).to be_present
+      expect(described_class.non_e_bike_classifications("WY")).to eq []
+    end
+  end
+
   describe "emoto_rules" do
     it "is the top rules for the state's motorcycle" do
       expect(described_class.emoto_rules("CA").pluck(:rule)).to eq ["Riders need a driver's license with an M1 motorcycle endorsement",

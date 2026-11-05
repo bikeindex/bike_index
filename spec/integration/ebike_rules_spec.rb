@@ -126,6 +126,25 @@ RSpec.describe "E-bike rules", :js, type: :system do
     expect(page).to have_css("#ebike-rules-classes [data-ui--collapse-target='content'] h3", text: "Rider rules")
     expect(page).to have_current_path("/ebike-rules/US/CA?manual=1&top_speed=28&throttle=1&rules=0&state_rules=1")
 
+    # the state's non-e-bike rules take its place, one open at a time, with a toggle for each classification
+    state_rules = "#ebike-rules-classes [data-ui--collapse-target='content']"
+    find("[role='button']", text: "California non-e-bike rules").click
+    expect(page).to have_css("#{state_rules} h3", exact_text: "Moped")
+      .and have_no_css("#{state_rules} h3", exact_text: "Electric Bicycle")
+    expect(page).to have_current_path(/state_rules=0&non_e_bike_rules=1\z/)
+    find("#{state_rules} label", text: "Off-Highway Electric Motorcycle").click
+    expect(page).to have_css("#{state_rules} h3", exact_text: "Off-Highway Electric Motorcycle")
+      .and have_no_css("#{state_rules} h3", exact_text: "Moped")
+    expect(page).to have_current_path(/non_e_bike_rules=1&non_e_bike_type=off_highway_electric_motorcycle\z/)
+    find("[role='button']", text: "California E-bike rules").click
+    expect(page).to have_css("#{state_rules} h3", exact_text: "Electric Bicycle")
+      .and have_no_css("#{state_rules} h3", exact_text: "Off-Highway Electric Motorcycle")
+    expect(page).to have_current_path(/state_rules=1&non_e_bike_rules=0/)
+
+    # which a link to it opens, on the classification it names
+    visit "/ebike-rules/US/CA?non_e_bike_rules=1&non_e_bike_type=motor_driven_cycle"
+    expect(page).to have_css("#{state_rules} h3", exact_text: "Motor-Driven Cycle")
+
     # which a link to it opens
     visit "/ebike-rules/US/CA?manual=1&top_speed=28&throttle=1&rules=1"
     expect(page).to have_text(/Rules that may apply in California/i)
