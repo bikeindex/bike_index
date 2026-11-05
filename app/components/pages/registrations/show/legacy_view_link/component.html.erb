@@ -8,7 +8,7 @@
       <% if @show_legacy %>
         <%= link_to translation(".view_in_legacy", bike_type: @bike.type), bike_path(@bike, request.query_parameters), class: "twlink-underlined tw:text-sm" %>
       <% else %>
-        <%= render(UI::ButtonLink::Component.new(text: translation(".switch_to_classic"), href: toggle_legacy_view_registration_path(@bike, request.query_parameters.merge(show_legacy: true)), method: :post, color: :secondary, size: :sm)) %>
+        <%= render(UI::ButtonLink::Component.new(text: translation(".switch_to_classic"), href: update_legacy_view_registration_path(@bike, request.query_parameters.merge(show_legacy: true)), method: :post, color: :secondary, size: :sm)) %>
       <% end %>
     </div>
   <% end %>

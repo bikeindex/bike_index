@@ -1,5 +1,5 @@
 class RegistrationsController < ApplicationController
-  before_action :allow_x_frame, except: %i[new show toggle_legacy_view]
+  before_action :allow_x_frame, except: %i[new show update_legacy_view]
   # A component takes its content type from the request, and a Turbo submission
   # redirected here asks for a turbo_stream - which Turbo then silently discards
   before_action :force_html_response, only: %i[show]
@@ -34,7 +34,7 @@ class RegistrationsController < ApplicationController
 
   # skip_update because a view preference doesn't warrant AfterUserChangeJob's
   # mailchimp/address recalculation
-  def toggle_legacy_view
+  def update_legacy_view
     bike = Bike.unscoped.find_id(params[:id])
     show_legacy = Binxtils::InputNormalizer.boolean(params[:show_legacy])
     query = request.query_parameters.except(:show_legacy)

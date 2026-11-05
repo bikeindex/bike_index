@@ -4,15 +4,15 @@ RSpec.describe Pages::Registrations::Show::ToggleView::Component, type: :compone
   let(:bike) { FactoryBot.create(:bike) }
   let(:component) { described_class.new(bike:) }
 
-  it "renders the invitation alert that posts to the toggle route" do
+  it "renders the invitation alert that posts to the update route" do
     render_inline(component)
     expect(page).to have_text("Try out the new bike viewer!")
-    form = page.find("form[action='/registrations/#{bike.id}/toggle_legacy_view?show_legacy=false'][method='post']")
+    form = page.find("form[action='/registrations/#{bike.id}/update_legacy_view?show_legacy=false'][method='post']")
     expect(form).to have_button("Switch to the new view")
   end
 
   it "carries the page's query through the toggle" do
     with_request_url("/bikes/#{bike.id}?t=token") { render_inline(component) }
-    expect(page).to have_css("form[action='/registrations/#{bike.id}/toggle_legacy_view?show_legacy=false&t=token']")
+    expect(page).to have_css("form[action='/registrations/#{bike.id}/update_legacy_view?show_legacy=false&t=token']")
   end
 end

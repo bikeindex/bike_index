@@ -806,7 +806,7 @@ RSpec.describe "BikesController#show", type: :request do
 
       context "session opted into the legacy view" do
         it "renders the legacy page" do
-          post toggle_legacy_view_registration_path(bike, show_legacy: true)
+          post update_legacy_view_registration_path(bike, show_legacy: true)
           get "#{base_url}/#{bike.id}"
           expect(response).to render_template(:show)
         end

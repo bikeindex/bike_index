@@ -197,7 +197,7 @@ Rails.application.routes.draw do
   get "registrations/*id", to: "registrations#show", constraints: {id: /r\W.*/i}, format: false
   resources :registrations, only: %i[new create show edit] do
     collection { get :embed }
-    member { post :toggle_legacy_view }
+    member { post :update_legacy_view }
   end
 
   # Redesigned registration flow: quick start, then complete on-site or via email.
