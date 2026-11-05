@@ -11,10 +11,7 @@ module EbikeRuleServices
     OFF_HIGHWAY = "evc/off_highway_motorcycle"
     MOTORCYCLE = "evc/motorcycle"
     ROAD_GROUPS = ["evc/moped", "evc/motor_driven_cycle", MOTORCYCLE].freeze
-    # The catalog doesn't rank a class's rules, so these read their wording: where it can go and what riding it takes
-    TOP_RULE = /\A(?:Ridden only|Never (?:ridden|allowed)|Not allowed|Barred from|Restricted to|Kept (?:off|to|out)|Can't be registered|Not registered|Riders need|Its operator needs|Needs an? (?:[\w'-]+ )*(?:license|endorsement)|Registered|Titled)\b/
-    RIDER_RULE = /\b(?:riders?|ride|ridden|operator|licen[sc]e|helmet|insurance|permit|sticker|decal|towed|allowed|barred|kept)\b/i
-    SELLER_RULE = /\AIts (?:maker|importer|seller)s?\b/
+    RULE_ORDER = %w[top_rule rider_rule enforcement vehicle_definition seller_rule legal_context].freeze
     # Corrections the catalog doesn't carry yet: `either` limits are alternatives, and NOT_AN_EBIKE folds a
     # class into the one e-moto entry, listed last. New Jersey's law counts an electric motorized bicycle as
     # a motorcycle, and a dirt bike is one too
@@ -89,7 +86,7 @@ module EbikeRuleServices
     end
 
     # The state's classification for a vehicle with these classifications, other than its e-bike law: its own, or one
-    # sharing their group, with its restrictions not yet ended: the top_rules in force today, then a rider's, then the rest
+    # sharing their group, with its restrictions not yet ended in RULE_ORDER, and its top_rules in force today
     def other_classification(abbreviation, ids, today: Time.zone.today)
       parsed => {groups:, tiers:}
       shared = ids.flat_map { [it, *groups[it]] }
@@ -116,7 +113,7 @@ module EbikeRuleServices
     # private below here
     #
 
-    def parsed = vocabulary("state_laws_with_tier_laws") { parse(it) } || {laws: {}, tiers: {}, groups: {}, classes: {}, motorcycles: {}, e_bike_laws: []}
+    def parsed = vocabulary("state_laws_with_rule_categories") { parse(it) } || {laws: {}, tiers: {}, groups: {}, classes: {}, motorcycles: {}, e_bike_laws: []}
 
     # apart from parsed, which every state's lookup reads
     def classifications
@@ -218,7 +215,7 @@ module EbikeRuleServices
       }
     end
 
-    def restriction(value) = {rule: value["rule"], citation: value["citation"], sources: web_pages(value["sources"]),
+    def restriction(value) = {rule: value["rule"], citation: value["citation"], categories: value["categories"].to_a, sources: web_pages(value["sources"]),
                               starts_on: date(value["starts_on"]), ends_on: date(value["ends_on"])}
 
     # link_to doesn't sanitize an href
@@ -236,8 +233,8 @@ module EbikeRuleServices
     def upcoming(date, today) = (date if date&.>(today))
 
     def ranked_rules(classification)
-      top, rest = classification[:restrictions].partition { it[:starts_on].nil? && it[:rule].match?(TOP_RULE) }
-      classification.merge(top_rules: top, restrictions: top + rest.partition { it[:rule].match?(RIDER_RULE) && !it[:rule].match?(SELLER_RULE) }.flatten)
+      restrictions = classification[:restrictions].sort_by.with_index { |rule, index| [RULE_ORDER.index { rule[:categories].include?(it) } || RULE_ORDER.size, index] }
+      classification.merge(restrictions:, top_rules: restrictions.select { it[:starts_on].nil? && it[:categories].include?("top_rule") })
     end
 
     def within_limits?(tier, mph, watts)

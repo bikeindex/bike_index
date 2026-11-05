@@ -92,18 +92,18 @@ RSpec.describe Pages::EbikeRules::Results::Component, type: :component do
     end
     let(:abbreviation) { "CA" }
 
-    it "bullets where it can go, with no citation, above its rules, which lead with them and a rider's, cited" do
+    it "bullets its top rules, with no citation, above its rules, which lead with them and a rider's, cited" do
       status = component.css("[role='status'] > div").first
       expect(status.css("> ul").first.css("li").map { it.text.strip }).to eq ["It isn't a Class 1, 2 or 3 e-bike. In California, it falls under Off-Highway Electric Motorcycle."]
       top_rules = status.css("> ul.tw\\:list-disc > li")
-      expect(top_rules.map { it.text.strip }).to eq ["Ridden only in designated OHV areas or on private property; never on highways, streets, sidewalks, bike lanes or bike paths",
-        "Can't be registered or converted for street use"]
+      expect(top_rules.map { it.text.strip }).to match [a_string_starting_with("Identified with a California OHV Green Sticker"),
+        a_string_starting_with("Ridden only in designated OHV areas"), a_string_starting_with("No driver's license needed")]
       expect(top_rules.css("a")).to be_empty
 
       rules = status.css("[data-ui--collapse-target='content'] ul").first.css("li")
-      expect(rules.map(&:text).first(4)).to match [a_string_including("Ridden only"), a_string_including("Can't be registered"),
-        a_string_including("Identified with a California OHV Green Sticker"), a_string_including("No driver's license needed")]
-      expect(rules.first.css("a").map(&:text)).to eq ["source"]
+      expect(rules.map(&:text).first(4)).to match [a_string_including("Identified with a California OHV Green Sticker"), a_string_including("Ridden only"),
+        a_string_including("No driver's license needed"), a_string_including("Can't be registered")]
+      expect(rules.first.css("a")).to_not be_empty
     end
   end
 

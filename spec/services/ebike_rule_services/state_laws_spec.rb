@@ -11,7 +11,7 @@ RSpec.describe EbikeRuleServices::StateLaws do
         classes: [1, 2, 3], watt_cap: 750, mph: 28, throttle: true)
       expect(described_class.find("CO")[:restrictions])
         .to include({rule: "Class 3 riders must be 16 or older; a younger passenger may ride on one designed to carry passengers",
-          citation: "Colorado Revised Statutes §42-4-1412", sources: ["https://olls.info/crs/crs2026-title-42.pdf#page=981"],
+          citation: "Colorado Revised Statutes §42-4-1412", categories: ["rider_rule"], sources: ["https://olls.info/crs/crs2026-title-42.pdf#page=981"],
           starts_on: nil, ends_on: nil})
       expect(described_class.find("CO")[:sources]).to include("https://leg.colorado.gov/bills/hb25-1197")
     end
@@ -161,17 +161,16 @@ RSpec.describe EbikeRuleServices::StateLaws do
         .to include(name: "Motorized Bicycle", restrictions: include(a_hash_including(rule: /moped \(class F\) license/, citation: "N.J.S.A. 39:4-14.3")))
     end
 
-    it "leads with the rules on where it can go and what riding it takes, then a rider's, ahead of what defines it" do
+    it "leads with its top rules, then a rider's, then enforcement, ahead of what defines it and a seller's" do
       classification = described_class.other_classification("CA", ["evc/moped"], today: Date.new(2026, 11, 4))
 
-      expect(classification[:top_rules].pluck(:rule)).to match [a_string_starting_with("Riders need a driver's license"), a_string_starting_with("Registered with the DMV"),
-        a_string_starting_with("Barred from any freeway"), a_string_starting_with("Kept off bike paths")]
+      expect(classification[:top_rules].pluck(:rule)).to match [a_string_starting_with("Riders need a driver's license"), a_string_starting_with("Riders must wear"),
+        a_string_starting_with("Registered with the DMV")]
       rules = classification[:restrictions].pluck(:rule)
-      expect(rules.first(4)).to eq classification[:top_rules].pluck(:rule)
-      expect(rules.fifth).to start_with("Riders must wear a motorcycle helmet")
+      expect(rules.first(3)).to eq classification[:top_rules].pluck(:rule)
+      expect(rules.fourth).to start_with("Barred from any freeway")
       expect(rules.index { it.start_with?("A peace officer") }).to be < rules.index { it.start_with?("Can't propel") }
-      # a seller's warning names the license and helmet laws, which isn't a rule for the rider
-      expect(rules.index { it.start_with?("Its maker") }).to be > rules.index { it.start_with?("Can't propel") }
+      expect(rules.last).to start_with("Its maker")
     end
 
     it "keeps a rule's start date until it starts, and drops one once it's ended" do
