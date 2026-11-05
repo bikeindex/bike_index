@@ -6029,8 +6029,8 @@ nl:
             status: Toestand
           legacy_view_link:
             switch_to_classic: Schakel terug naar de oude viewer.
-            using_new_view: Je probeert de nieuwe %{bike_type} viewer uit.
             view_in_legacy: bekijk %{bike_type} in de oude viewer
+            using_new_viewer: Je gebruikt de nieuwe %{bike_type} viewer.
           map:
             unavailable: De kaart kon niet worden geladen. Uw browser of apparaat
               ondersteunt deze mogelijk niet.
@@ -6103,11 +6103,8 @@ nl:
             stolen_at: Gestolen op
             stolen_details: Diefstal details
           toggle_view:
-            switch_to_legacy_default: Schakel standaard over naar de oude viewer.
             switch_to_new: Schakel over naar de nieuwe weergave
             try_new_view: Probeer de nieuwe %{bike_type} viewer eens uit!
-            view_in_new: Bekijken in een nieuwe viewer
-            viewing_in_legacy: Oude viewer (standaard gebruikt u de nieuwe viewer)
           wrapper_consumer:
             about_this_bike: Over dit %{bike_type}
             audience_owner: Uw %{bike_type}
