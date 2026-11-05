@@ -1,7 +1,7 @@
 <%= render(UI::Tooltip::Component.new) do |tooltip| %>
   <% tooltip.with_body { meaning } %>
 
-  <span class="tw:inline-flex tw:items-center tw:gap-2.5 tw:rounded-sm tw:py-2 tw:pr-4 tw:pl-2 tw:text-left <%= BACKGROUNDS.fetch(@status) %>">
+  <span class="tw:inline-flex tw:items-center tw:gap-2.5 tw:rounded-sm tw:py-2 tw:pr-4 tw:pl-2 tw:text-left <%= background %>">
     <%= render(Pages::EbikeRules::StatusIcon::Component.new(status: ICON_STATUSES.fetch(@status), size: :md)) %>
 
     <span class="tw:leading-tight">
