@@ -154,7 +154,6 @@ Rails.application.routes.draw do
     end
   end
   resource :my_account, only: %i[show update destroy] do
-    post :toggle_show_redesign
     resources :messages, only: %i[index show create], controller: "my_accounts/messages"
     resource :membership, only: %i[show], controller: "my_accounts/memberships"
     resources :marketplace_listings, only: %i[update], controller: "my_accounts/marketplace_listings"
@@ -198,6 +197,7 @@ Rails.application.routes.draw do
   get "registrations/*id", to: "registrations#show", constraints: {id: /r\W.*/i}, format: false
   resources :registrations, only: %i[new create show edit] do
     collection { get :embed }
+    member { post :update_legacy_view }
   end
 
   # Redesigned registration flow: quick start, then complete on-site or via email.

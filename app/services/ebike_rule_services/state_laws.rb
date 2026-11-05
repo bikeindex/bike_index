@@ -10,6 +10,12 @@ module EbikeRuleServices
     STATE_ID = %r{\Aevc/us/([a-z]{2})/}
     OFF_HIGHWAY = "evc/off_highway_motorcycle"
     MOTORCYCLE = "evc/motorcycle"
+    ROAD_GROUPS = ["evc/moped", "evc/motor_driven_cycle", MOTORCYCLE].freeze
+    RULE_GROUPS = %w[rider_rule enforcement legal_context seller_rule vehicle_definition].freeze
+    TOP_RULE = /\Atop_rule_(\d+)\z/
+    NAMED_CLASSES = /\bclass(?:es)? ((?:\d\b(?:,? (?:and|or) |, )?)+)/i
+    # "Only Class 1 is allowed" tells the other classes they aren't
+    ONLY_CLASS = /\bonly class \d|\bclass \d only\b/i
     # Corrections the catalog doesn't carry yet: `either` limits are alternatives, and NOT_AN_EBIKE folds a
     # class into the one e-moto entry, listed last. New Jersey's law counts an electric motorized bicycle as
     # a motorcycle, and a dirt bike is one too
@@ -40,15 +46,19 @@ module EbikeRuleServices
 
     def three_classes?(law) = law[:classes] == [1, 2, 3]
 
-    # The helmet, age and path rules in force for a Class 3 under the state's e-bike law
-    def class_3_rules(abbreviation, today: Time.zone.today)
-      find(abbreviation, today:)&.dig(:restrictions).to_a
-        .select { it[:starts_on].nil? && it[:rule].match?(/\bclass 3\b/i) && it[:rule].match?(/helmet|older|\bage\b|path|trail/i) }
+    # The top rules in force of the state's e-bike law for a class, without those only about other classes
+    def e_bike_top_rules(abbreviation, e_bike_class:, today: Time.zone.today)
+      top_rules(find(abbreviation, today:)&.dig(:restrictions).to_a).select { for_class?(it[:rule], e_bike_class) }
     end
 
-    # The license, registration and insurance rules in force for the state's motorcycle, which an e-moto usually is
-    def emoto_rules(abbreviation, today: Time.zone.today)
-      current(parsed[:motorcycles][abbreviation].to_a, today).select { it[:starts_on].nil? && it[:rule].match?(/licen|regist|insur/i) }
+    # The top rules in force for the state's motorcycle, which an e-moto usually is
+    def emoto_rules(abbreviation, today: Time.zone.today) = top_rules(current(parsed[:motorcycles][abbreviation].to_a, today))
+
+    # With its rule_groups, each leading with its top rules, and its top_rules. Each rule goes under the first group it's in
+    def with_rule_groups(classification)
+      top = ranked_top_rules(classification[:restrictions])
+      rule_groups = (top + (classification[:restrictions] - top)).group_by { |rule| RULE_GROUPS.find { rule[:categories].include?(it) } || RULE_GROUPS.last }
+      classification.merge(rule_groups: rule_groups.slice(*RULE_GROUPS), top_rules: top_rules(top))
     end
 
     # Any jurisdiction's classification by its ID, as a state's own classes are, the e-moto for an out of class marker,
@@ -70,7 +80,7 @@ module EbikeRuleServices
 
     # By ISO 3166-2 code, each place outside the US the catalog classifies e-vehicles in: its e-bike laws, or without
     # one of its own its country's, and its other classes, slowest first and off-highway last
-    def places = vocabulary("places_with_laws") { parse_places(it) } || {}
+    def places = vocabulary("places_with_rule_categories") { parse_places(it) } || {}
 
     # What a bike is checked against in a place outside the US: its own e-bike law, or without one, the class its
     # country's e-bike falls into there, a motor vehicle's, as New Brunswick's Motor Driven Cycle
@@ -84,12 +94,22 @@ module EbikeRuleServices
     end
 
     # The state's classification for a vehicle with these classifications, other than its e-bike law: its own, or one
-    # sharing their group, with its restrictions in force
+    # sharing their group, with its restrictions not yet ended and its rule_groups
     def other_classification(abbreviation, ids, today: Time.zone.today)
       parsed => {groups:, tiers:}
       shared = ids.flat_map { [it, *groups[it]] }
-      tiers[abbreviation]&.find { it[:ids].intersect?(shared) }
-        &.then { {name: it[:name], restrictions: current(it[:restrictions], today).select { it[:starts_on].nil? }} }
+      tiers[abbreviation]&.find { it[:ids].intersect?(shared) }&.then { with_rule_groups(in_force(it, today)) }
+    end
+
+    # Each of the state's classifications that isn't its e-bike law, with its rule_groups and top_rules
+    def non_e_bike_classifications(abbreviation, today: Time.zone.today) = parsed[:tiers][abbreviation].to_a.map { with_rule_groups(in_force(it, today)) }
+
+    # The lightest of the state's road classifications a vehicle whose record names none fits. Only a known speed is
+    # within a speed cap; an unknown power is within any
+    def classification_by_limits(abbreviation, mph:, watts:, today: Time.zone.today)
+      fitting = parsed[:tiers][abbreviation].to_a.select { within_limits?(it, mph, watts) }
+      ROAD_GROUPS.filter_map { |group| fitting.find { it[:ids].include?(group) } }.first
+        &.then { with_rule_groups(in_force(it, today)).merge(by_limits: true) }
     end
 
     # From a request's Cloudflare location headers
@@ -104,7 +124,7 @@ module EbikeRuleServices
     # private below here
     #
 
-    def parsed = vocabulary("state_laws_with_tier_restrictions") { parse(it) } || {laws: {}, tiers: {}, groups: {}, classes: {}, motorcycles: {}, e_bike_laws: []}
+    def parsed = vocabulary("state_laws_with_rule_categories") { parse(it) } || {laws: {}, tiers: {}, groups: {}, classes: {}, motorcycles: {}, e_bike_laws: []}
 
     # apart from parsed, which every state's lookup reads
     def classifications
@@ -128,7 +148,7 @@ module EbikeRuleServices
         .to_h { |abbreviation, id, record| [abbreviation, law(id, record)] }
       {
         laws:,
-        tiers: tiers.group_by(&:first).transform_values { it.map { |_, id, record| {name: record["name"], ids: [id, *record["groups"]], restrictions: record["restrictions"].to_a.map { restriction(it) }} } },
+        tiers: tiers.group_by(&:first).transform_values { it.map { |_, id, record| law(id, record).merge(ids: [id, *record["groups"]], min_watts: record["min_power"]) } },
         groups: records.filter_map { |id, record| [id, record["groups"]] if record["groups"] }.to_h,
         e_bike_laws: records.filter_map { |id, record| id if record["e_bike_law"] },
         classes: states.group_by(&:first).filter_map { |abbreviation, entries|
@@ -206,7 +226,7 @@ module EbikeRuleServices
       }
     end
 
-    def restriction(value) = {rule: value["rule"], citation: value["citation"], sources: web_pages(value["sources"]),
+    def restriction(value) = {rule: value["rule"], citation: value["citation"], categories: value["categories"].to_a, sources: web_pages(value["sources"]),
                               starts_on: date(value["starts_on"]), ends_on: date(value["ends_on"])}
 
     # link_to doesn't sanitize an href
@@ -223,6 +243,21 @@ module EbikeRuleServices
 
     def upcoming(date, today) = (date if date&.>(today))
 
-    conceal :parsed, :classifications, :vocabulary, :parse, :parse_places, :motor_vehicle_law, :state_classes, :by_speed, :state_class, :metric?, :mph, :law, :restriction, :web_pages, :date, :in_force, :current, :upcoming
+    def for_class?(rule, e_bike_class)
+      classes = rule.scan(NAMED_CLASSES).join.scan(/\d/).map(&:to_i)
+      classes.empty? || classes.include?(e_bike_class) || rule.match?(ONLY_CLASS)
+    end
+
+    def top_rules(restrictions) = ranked_top_rules(restrictions).select { it[:starts_on].nil? }
+
+    def ranked_top_rules(restrictions) = restrictions.select { top_rule_rank(it) }.sort_by { top_rule_rank(it) }
+
+    def top_rule_rank(restriction) = restriction[:categories].filter_map { it[TOP_RULE, 1]&.to_i }.first
+
+    def within_limits?(tier, mph, watts)
+      (tier[:mph].nil? || mph&.<=(tier[:mph])) && (watts.nil? || (tier[:min_watts]..tier[:watt_cap]).cover?(watts))
+    end
+
+    conceal :for_class?, :ranked_top_rules, :top_rule_rank, :parsed, :classifications, :vocabulary, :parse, :parse_places, :motor_vehicle_law, :state_classes, :by_speed, :state_class, :metric?, :mph, :law, :restriction, :web_pages, :date, :in_force, :current, :upcoming, :top_rules, :within_limits?
   end
 end

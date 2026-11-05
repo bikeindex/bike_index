@@ -389,7 +389,8 @@
       <div
         class="
           tw:rounded-lg tw:border tw:border-[#b20000] tw:bg-[#cc0000]
-          tw:px-5.5 tw:py-5 tw:text-white
+          tw:px-5.5 tw:py-5 tw:text-white tw:dark:border-red-800
+          tw:dark:bg-red-700
         "
       >
         <div
@@ -407,7 +408,7 @@
       </div>
 
       <%= render(UI::Card::Component.new(additional_classes: "tw:flex tw:items-start tw:gap-3.5 tw:rounded-lg! tw:px-5.5 tw:py-5")) do %>
-        <span class="tw:size-10! tw:bg-slate-900 <%= ICON_DISC_CLASSES %>">
+        <span class="tw:size-10! tw:bg-slate-900 tw:dark:bg-slate-600 <%= ICON_DISC_CLASSES %>">
           <%= helpers.inline_svg_tag("icons/list.svg", class: "tw:size-5", aria_hidden: true) %>
         </span>
 
@@ -441,12 +442,12 @@
     <div
       class="
         tw:min-w-[260px] tw:rounded-lg tw:bg-slate-900 tw:px-7 tw:py-4.5
-        tw:text-center tw:text-white
+        tw:text-center tw:text-white tw:dark:bg-slate-600
       "
     >
       <div
         class="
-          tw:text-xs tw:font-bold tw:tracking-[.08em] tw:text-[#ffd660]
+          tw:text-xs tw:font-bold tw:tracking-[.08em] tw:text-yellow-300
           tw:uppercase
         "
       >

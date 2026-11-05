@@ -46,7 +46,7 @@ module UI
 
         def unknown_manufacturer_option
           content = safe_join([
-            tag.span(translation(".unknown_manufacturer"), class: "tw:text-gray-500 tw:dark:text-gray-400"), " ",
+            tag.span(translation(".unknown_manufacturer"), class: "tw:text-gray-500 tw:dark:text-gray-300"), " ",
             tag.span(@q)
           ])
 

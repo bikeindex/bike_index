@@ -697,6 +697,7 @@ RSpec.describe "BikesController#create", type: :request do
 
           expect(response).to redirect_to embed_organization_path(id: organization.slug, b_param_id_token: b_param.id_token)
           expect(b_param.reload.status).to eq "status_stolen"
+          expect(b_param.bike_errors).to eq(["Manufacturer can't be blank"])
           testable_bike_params.except(:manufacturer_id)
             .each { |key, value| expect(assigns(:bike).send(key).to_s).to eq(value.to_s) }
 

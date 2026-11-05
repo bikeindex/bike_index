@@ -1,6 +1,6 @@
 <%# locals: (collection:, render_sortable: false) %>
 
-<%= render(UI::Table::Component.new(records: collection)) do |table| %>
+<%= render(UI::Table::Component.new(records: collection, render_sortable:)) do |table| %>
   <% table.column(label: "Name") do |plan| %>
     <%= link_to plan.name, edit_admin_theft_alert_plan_path(plan), class: "twlink" %>
   <% end %>

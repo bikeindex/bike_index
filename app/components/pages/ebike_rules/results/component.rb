@@ -5,13 +5,13 @@ module Pages
     module Results
       class Component < ApplicationComponent
         VERDICTS = {
-          green: {classes: "tw:bg-[#e8f5ee] tw:border-[#2e8b57]", icon: :pass},
-          yellow: {classes: "tw:bg-[#fff6da] tw:border-[#ffcc33]", icon: :check},
-          red: {classes: "tw:bg-[#fdecec] tw:border-[#cc0000]", icon: :fail},
-          gray: {classes: "tw:bg-gray-50 tw:border-gray-300", icon: :unknown}
+          green: {classes: "tw:bg-[#e8f5ee] tw:border-[#2e8b57] tw:dark:border-green-500/50 tw:dark:bg-green-500/25", icon: :pass},
+          yellow: {classes: "tw:bg-yellow-50 tw:border-yellow-400 tw:dark:border-yellow-300/50 tw:dark:bg-yellow-300/25", icon: :check},
+          red: {classes: "tw:bg-[#fdecec] tw:border-[#cc0000] tw:dark:border-red-500/50 tw:dark:bg-red-500/25", icon: :fail},
+          gray: {classes: "tw:bg-gray-50 tw:border-gray-300 tw:dark:border-gray-600 tw:dark:bg-gray-800", icon: :unknown}
         }.freeze
         EYEBROW_CLASSES = "tw:text-xs tw:font-bold tw:tracking-[.08em] tw:text-gray-600 tw:uppercase tw:dark:text-gray-400"
-        OUT_OF_CLASS_NOTES = %i[class_3_speed_with_throttle throttle_with_class_3_assist].freeze
+        OUT_OF_CLASS_NOTES = %i[not_classified class_3_speed_with_throttle throttle_with_class_3_assist].freeze
         NAME_CLASSES = "tw:mt-1 tw:font-header tw:text-[clamp(22px,3vw,26px)] tw:leading-tight tw:font-extrabold"
 
         def initialize(lookup:)
@@ -44,26 +44,30 @@ module Pages
           when :yellow then @us ? yellow_headline(name, state) : metric_yellow_headline(name, state)
           when :red
             # a hand-entered bike's name is "e-bike", which this headline says it isn't
-            @bike.manual? ? translation(".red_headline_manual", state:) : translation(".red_headline", name:, state:)
+            @bike.manual? ? translation(".red_headline_manual", state:) : translation(".not_classified_headline", name:, state:)
           else translation(".gray_headline", state:)
           end
         end
 
         def green_headline(name, state)
-          if optional_clause.present?
-            translation(".green_headline_optional", name:, state:, n: class_numbers, optional: optional_clause)
+          if @law[:classes].none?
+            translation(".green_headline_no_classes", name:, state:)
+          elsif optional_clause.present?
+            translation(".class_headline_optional", name:, state:, n: class_numbers, optional: optional_clause)
           else
-            translation(".green_headline", name:, state:, n: class_numbers)
+            translation(".class_headline", name:, state:, n: class_numbers)
           end
         end
 
         def yellow_headline(name, state)
           if without_throttle?
-            translation(".yellow_headline_without_throttle", name:, state:, n: class_numbers)
+            @law[:classes].none? ? translation(".yellow_headline_no_classes_without_throttle", name:, state:) : translation(".class_headline_without_throttle", name:, state:, n: class_numbers)
+          elsif @bike.e_bike_class && @law[:classes].none?
+            translation(".yellow_headline_no_classes", name:, state:, count: rule_count(:check))
           elsif @bike.e_bike_class && optional_clause.present?
-            translation(".yellow_headline_optional", name:, state:, n: class_numbers, optional: optional_clause, count: rule_count(:check))
+            translation(".class_headline_optional_with_rules", name:, state:, n: class_numbers, optional: optional_clause, count: rule_count(:check))
           elsif @bike.e_bike_class
-            translation(".yellow_headline", name:, state:, n: class_numbers, count: rule_count(:check))
+            translation(".class_headline_with_rules", name:, state:, n: class_numbers, count: rule_count(:check))
           else
             translation(".yellow_headline_class_unknown", name:, state:, count: rule_count(:check))
           end
@@ -104,14 +108,14 @@ module Pages
 
         def unrecognized_classes? = @rules.any? { it[:note] == :classes_not_recognized } && !@law[:classes].intersect?(@bike.stock_e_bike_classes)
 
-        # "and as Class 2 with its optional throttle", of the optional classes the state recognizes, and not a throttle's
+        # "and is also a Class 2 e-bike with its optional throttle", of the optional classes the state recognizes, and not a throttle's
         # where it would put the bike in no class
         def optional_clause
           @optional_clause ||= @bike.optional_classes.filter_map { |n, mode|
-            next unless @law[:classes].none? || @law[:classes].include?(n)
+            next unless @law[:classes].include?(n)
             next if mode == "throttle" && @bike.optionally_out_of_class_under?(@law)
 
-            (mode == "throttle") ? translation(".as_class_with_optional_throttle", n:) : translation(".as_class_with_optional_upgrade", n:)
+            (mode == "throttle") ? translation(".also_class_with_optional_throttle", n:) : translation(".also_class_with_optional_upgrade", n:)
           }.to_sentence
         end
 
@@ -125,7 +129,7 @@ module Pages
         def details
           @details ||= case @verdict
           when :yellow then without_throttle? ? [] : notes(:check)
-          when :red then [*notes(:fail), falls_under]
+          when :red then [safe_join([*red_reasons, falls_under], " ")]
           when :gray then @us ? [gray_detail] : []
           else []
           end
@@ -139,16 +143,28 @@ module Pages
           end
         end
 
+        # A model in no class has a name for what it is, and what it's over is on the state's rows. A hand entry has only what was entered
+        def red_reasons = (@rules.any? { it[:note] == :not_classified } && !@bike.manual?) ? [] : notes(:fail)
+
         def falls_under
           return copy[:may_be_moped] unless other_classification
 
-          translation(".falls_under_name", state: @state[:name], name: other_classification[:name])
+          state, name = @state[:name], other_classification[:name]
+          other_classification[:by_limits] ? translation(".may_fall_under_name", state:, name:) : translation(".falls_under_name", state:, name:)
+        end
+
+        def other_classification_eyebrow
+          state = @state[:name]
+          other_classification[:by_limits] ? translation(".rules_that_may_apply", state:) : translation(".rules_that_apply", state:)
         end
 
         def other_classification
           return @other_classification if defined?(@other_classification)
 
-          @other_classification = (EbikeRuleServices::StateLaws.other_classification(@state[:abbr], @bike.e_vehicle_classifications) if @us)
+          @other_classification = if @us
+            EbikeRuleServices::StateLaws.other_classification(@state[:abbr], @bike.e_vehicle_classifications) ||
+              EbikeRuleServices::StateLaws.classification_by_limits(@state[:abbr], mph: @bike.top_mph, watts: @bike.motor_watts)
+          end
         end
 
         # The copy that names a state, and Canada's in its place
@@ -169,7 +185,7 @@ module Pages
 
         def rule_count(status) = @rules.count { it[:status] == status }
 
-        # A Class 3's assist with a throttle is why its classes aren't permitted, which their note already says
+        # The headline already says it's in no class, and the classes' note why a Class 3's assist with a throttle isn't permitted
         def notes(status) = @rules.select { it[:status] == status && OUT_OF_CLASS_NOTES.exclude?(it[:note]) }.map { safe_join([note(it), "."]) }
 
         def subline
@@ -178,7 +194,7 @@ module Pages
 
         def specs
           [
-            [translation(".motor"), @bike.watts && translation(".watts_html", watts: number_display(@bike.watts))],
+            [translation(".motor"), @bike.motor_watts && translation(".watts_html", watts: number_display(@bike.motor_watts))],
             [translation(".top_speed"), top_speed_display],
             [translation(".throttle"), throttle_display]
           ]
@@ -189,16 +205,16 @@ module Pages
 
           if @bike.assists_past_mph
             translation(".over_mph_html", mph: number_display(@bike.assists_past_mph))
-          elsif @bike.top_assist_mph
-            translation(".mph_html", mph: number_display(@bike.top_assist_mph))
+          elsif @bike.speed_mph
+            translation(".mph_html", mph: number_display(@bike.speed_mph))
           end
         end
 
         def metric_top_speed_display
           if @bike.assists_past_kmh
             translation(".over_kmh_html", kmh: number_display(@bike.assists_past_kmh))
-          elsif @bike.top_assist_kmh
-            translation(".kmh_html", kmh: number_display(@bike.top_assist_kmh))
+          elsif @bike.speed_kmh
+            translation(".kmh_html", kmh: number_display(@bike.speed_kmh))
           end
         end
 
@@ -220,6 +236,18 @@ module Pages
             kmh ? translation(".optional_to_kmh_html", kmh:) : translation(".answer_optional")
           else
             kmh ? translation(".yes_to_kmh_html", kmh:) : translation(".answer_yes")
+          end
+        end
+
+        # What the law sets for a rule, with the rule named in the same line
+        def rule_heading(id)
+          value = render(Pages::EbikeRules::RuleValue::Component.new(law: @law, id:))
+          case id
+          when :classes then @law[:classes].any? ? translation(".heading_classes_html", classes: value) : value
+          when :power then @law[:watt_cap] ? translation(".heading_power_html", watts: value) : translation(".heading_no_power_cap")
+          when :speed then @law[:mph] ? translation(".heading_speed_html", speed: value) : translation(".heading_no_speed_cap")
+          when :vehicle then translation(".heading_vehicle_html", name: value)
+          else @law[:throttle] ? translation(".heading_throttle_allowed") : translation(".heading_throttle_not_allowed")
           end
         end
 
@@ -250,7 +278,6 @@ module Pages
         def metric_note(note, args)
           case note
           when :no_e_bike_category then translation(".no_e_bike_category")
-          when :watts_to_check then translation(".watts_to_check_html", **args)
           when :no_watt_cap then translation(".no_watt_cap_in_law")
           when :speed_within_cap then translation(".speed_within_cap_kmh_html", **args)
           when :speed_over_cap then translation(".speed_over_cap_kmh_html", **args)
@@ -281,9 +308,12 @@ module Pages
           when :limits_start_on then translation(".limits_start_on", **args)
           when :watts_within_cap then translation(".watts_within_cap_html", **args)
           when :watts_over_cap then translation(".watts_over_cap_html", **args)
+          when :watts_to_check then translation(".watts_to_check_html", **args)
           when :watts_not_provided then translation(".watts_not_provided")
           when :no_watt_cap then translation(".no_watt_cap")
           when :speed_within_cap then translation(".speed_within_cap_html", **args)
+          when :throttle_speed_within_cap then translation(".throttle_speed_within_cap_html", **args)
+          when :throttle_speed_over_cap then translation(".throttle_speed_over_cap_html", **args)
           when :class_3_speed_with_throttle then translation(".class_3_speed_with_throttle_html", **args)
           when :speed_over_cap then translation(".speed_over_cap_html", **args)
           when :speed_past_cap then translation(".speed_past_cap_html", **args)

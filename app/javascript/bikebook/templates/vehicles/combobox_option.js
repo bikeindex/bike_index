@@ -15,7 +15,7 @@ const yearBadge = ({ first_year: first, final_year: final }) => {
 
 const thumb = (photo, placeholderUrl) => html`<span class="tw:group tw:shrink-0" data-controller=${photo ? 'image-fallback' : nothing}
   data-broken=${photo ? nothing : ''}>${photo
-    ? html`<img alt="" loading="lazy" class="tw:h-8 tw:w-12 tw:rounded-sm tw:object-contain tw:group-data-broken:hidden"
+    ? html`<img alt="" loading="lazy" class="tw:h-8 tw:w-12 tw:rounded-sm tw:object-contain tw:group-data-broken:hidden tw:dark:bg-gray-300"
       data-action="error->image-fallback#fallBack" src=${photo}>`
     : nothing}<span class="tw:hidden tw:h-8 tw:w-12 tw:items-center tw:justify-center tw:rounded-sm tw:bg-gray-100
     tw:group-data-broken:flex tw:dark:bg-gray-800"><img alt="" class="tw:h-6 tw:w-6" src=${placeholderUrl}></span></span>`

@@ -287,7 +287,10 @@ module BikeServices
         creator_id: b_param.creator_id,
         can_edit_claimed: bike.creation_organization_id.present?,
         organization_id: bike.creation_organization_id,
-        address_record_id: bike.address_record_id
+        address_record_id: bike.address_record_id,
+        # Ownership can't read these off an unsaved bike, which fails a filled in email as blank
+        owner_email: bike.owner_email,
+        is_phone: bike.phone_registration?
       }.merge(registration_info: b_param.registration_info_attrs.merge(ip_address: @ip_address))
     end
 

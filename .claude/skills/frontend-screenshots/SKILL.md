@@ -106,7 +106,7 @@ browser_evaluate: () => {
 }
 ```
 
-The donation modal is why that starts with a dismiss: a seeded user who hasn't donated gets it over the page on `/my_account` and friends, and it covers the whole shot rather than sitting in a corner. **Drop the dismiss when a modal is what the diff changes** — the same rule as the footer, and it bites harder here, since the dismiss also sets `hideDonationModal` and the base-branch shot of a modal that was the whole point comes back without it.
+The donation modal is why that starts with a dismiss: a seeded user who hasn't donated gets it over the page on `/my_account` and friends, and it covers the whole shot rather than sitting in a corner. **Drop the dismiss when a modal is what the diff changes** — the same rule as the footer, and it bites harder here, since the dismiss also sets `hideDonationModal` and the base-branch shot of a modal that was the whole point comes back without it. **Drop it from the pre-shot re-run of a mid-interaction capture too** — its clicks land outside an open `UI::Dropdown` and close it.
 
 If the returned content height is **less than the viewport height**, `browser_resize` the height down to it before the shot (the `<html>` element's near-black background fills the gap otherwise), then resize back to the standard viewport before the next URL. Taller-than-viewport pages need no resize — `fullPage` scroll-stitches them.
 
