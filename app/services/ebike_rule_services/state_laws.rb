@@ -13,6 +13,9 @@ module EbikeRuleServices
     ROAD_GROUPS = ["evc/moped", "evc/motor_driven_cycle", MOTORCYCLE].freeze
     RULE_GROUPS = %w[rider_rule enforcement legal_context seller_rule vehicle_definition].freeze
     TOP_RULE = /\Atop_rule_(\d+)\z/
+    NAMED_CLASSES = /\bclass(?:es)? ((?:\d\b(?:,? (?:and|or) |, )?)+)/i
+    # "Only Class 1 is allowed" tells the other classes they aren't
+    ONLY_CLASS = /\bonly class \d|\bclass \d only\b/i
     # Corrections the catalog doesn't carry yet: `either` limits are alternatives, and NOT_AN_EBIKE folds a
     # class into the one e-moto entry, listed last. New Jersey's law counts an electric motorized bicycle as
     # a motorcycle, and a dirt bike is one too
@@ -43,8 +46,10 @@ module EbikeRuleServices
 
     def three_classes?(law) = law[:classes] == [1, 2, 3]
 
-    # The top rules in force of the state's e-bike law, which name the class where one is about it alone
-    def e_bike_top_rules(abbreviation, today: Time.zone.today) = top_rules(find(abbreviation, today:)&.dig(:restrictions).to_a)
+    # The top rules in force of the state's e-bike law for a class, without those only about other classes
+    def e_bike_top_rules(abbreviation, e_bike_class:, today: Time.zone.today)
+      top_rules(find(abbreviation, today:)&.dig(:restrictions).to_a).select { for_class?(it[:rule], e_bike_class) }
+    end
 
     # The top rules in force for the state's motorcycle, which an e-moto usually is
     def emoto_rules(abbreviation, today: Time.zone.today) = top_rules(current(parsed[:motorcycles][abbreviation].to_a, today))
@@ -238,6 +243,11 @@ module EbikeRuleServices
 
     def upcoming(date, today) = (date if date&.>(today))
 
+    def for_class?(rule, e_bike_class)
+      classes = rule.scan(NAMED_CLASSES).join.scan(/\d/).map(&:to_i)
+      classes.empty? || classes.include?(e_bike_class) || rule.match?(ONLY_CLASS)
+    end
+
     def top_rules(restrictions) = ranked_top_rules(restrictions).select { it[:starts_on].nil? }
 
     def ranked_top_rules(restrictions) = restrictions.select { top_rule_rank(it) }.sort_by { top_rule_rank(it) }
@@ -248,6 +258,6 @@ module EbikeRuleServices
       (tier[:mph].nil? || mph&.<=(tier[:mph])) && (watts.nil? || (tier[:min_watts]..tier[:watt_cap]).cover?(watts))
     end
 
-    conceal :ranked_top_rules, :top_rule_rank, :parsed, :classifications, :vocabulary, :parse, :parse_places, :motor_vehicle_law, :state_classes, :by_speed, :state_class, :metric?, :mph, :law, :restriction, :web_pages, :date, :in_force, :current, :upcoming, :top_rules, :within_limits?
+    conceal :for_class?, :ranked_top_rules, :top_rule_rank, :parsed, :classifications, :vocabulary, :parse, :parse_places, :motor_vehicle_law, :state_classes, :by_speed, :state_class, :metric?, :mph, :law, :restriction, :web_pages, :date, :in_force, :current, :upcoming, :top_rules, :within_limits?
   end
 end

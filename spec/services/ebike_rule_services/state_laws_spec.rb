@@ -122,9 +122,14 @@ RSpec.describe EbikeRuleServices::StateLaws do
   end
 
   describe "e_bike_top_rules" do
-    it "is the top rules of the state's e-bike law" do
-      expect(described_class.e_bike_top_rules("CA").pluck(:rule)).to match [a_string_starting_with("Ridden wherever bicycles may go"), a_string_starting_with("Riders must be 16 or older")]
-      expect(described_class.e_bike_top_rules("WY")).to eq []
+    it "is the top rules of the state's e-bike law for the class, without those only about others" do
+      expect(described_class.e_bike_top_rules("CA", e_bike_class: 3).pluck(:rule)).to match [a_string_starting_with("Ridden wherever bicycles may go"), a_string_starting_with("Riders must be 16 or older")]
+      expect(described_class.e_bike_top_rules("CA", e_bike_class: 1).pluck(:rule)).to match [a_string_starting_with("Ridden wherever bicycles may go")]
+      expect(described_class.e_bike_top_rules("WY", e_bike_class: 1)).to eq []
+    end
+
+    it "keeps a rule that only one class is allowed, for the others it bars" do
+      expect(described_class.e_bike_top_rules("AK", e_bike_class: 2).pluck(:rule)).to include(a_string_starting_with("In state parks, only Class 1"))
     end
   end
 
