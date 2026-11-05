@@ -12,11 +12,11 @@ class OwnershipsController < ApplicationController
         redirect_to edit_bike_url(bike)
       else
         flash[:error] = translation(:no_longer_your_bike, bike_type: bike.type)
-        redirect_to bike_view_path(bike)
+        redirect_to registration_view.path(bike)
       end
     else
       flash[:error] = translation(:not_your_bike, bike_type: bike.type)
-      redirect_to bike_view_path(bike)
+      redirect_to registration_view.path(bike)
     end
   end
 

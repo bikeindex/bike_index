@@ -1,7 +1,7 @@
 = render partial: "bike_show_overlays"
 
 .container
-  - if registration_redesign_enabled?
+  - if registration_view.redesign_enabled?
     = render(Pages::Registrations::Show::ToggleView::Component.new(bike: @bike))
 
   - if current_user.present? # Header row is super admin stuff and credibility badges

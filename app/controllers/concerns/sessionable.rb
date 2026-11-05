@@ -65,6 +65,15 @@ module Sessionable
 
   private
 
+  # Carries a signed-out opt-out onto the account, since the redesign's own claim and
+  # sign-up CTAs are what push people through signing in. Waits for confirmation because
+  # current_user is confirmed-only
+  def carry_registration_show_legacy(user)
+    return unless user.confirmed? && session[:registration_show_legacy]
+
+    session.delete(:registration_show_legacy) if user.update(feature_registration_show_legacy: true, skip_update: true)
+  end
+
   # SSO orgs force SSO: hand an SSO-managed email off to the IdP rather than let it sign in or
   # sign up any other way. As a before_action the redirect halts the chain; called inline it
   # reports whether it redirected, since a token flow has no email until the token resolves one.

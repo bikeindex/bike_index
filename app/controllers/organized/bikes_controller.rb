@@ -75,13 +75,13 @@ module Organized
 
       unless bike.visible_by?(current_user) && current_organization.enabled?("registration_notes")
         flash[:error] = "Not authorized to update notes"
-        redirect_to(bike_view_path(bike)) && return
+        redirect_to(registration_view.path(bike)) && return
       end
 
       BikeOrganizationNote.upsert(bike:, organization: current_organization, body: params[:notes], user: current_user)
 
       flash[:success] = "Note saved"
-      redirect_to bike_view_path(bike)
+      redirect_to registration_view.path(bike)
     end
 
     def create

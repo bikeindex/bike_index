@@ -15,6 +15,28 @@ module Bikes
 
     protected
 
+    # Make it possible to assign organization for a view by passing the organization_id parameter - mainly useful for superusers
+    # Also provides testable protection against seeing organization info on bikes
+    def assign_current_organization
+      org = current_organization || passive_organization # actually call #current_organization first
+      # If forced false, or no user present, skip everything else
+      return true if @current_organization_force_blank || current_user.blank?
+
+      # If there was an organization_id passed, and the user isn't authorized for that org, reset passive_organization to something they can access
+      # ... Particularly relevant for scanned stickers, which may be scanned by child orgs - but I think it's the behavior users expect regardless
+      default_organization = OrganizationRole.default_organization(current_user) if params[:organization_id].present?
+      if default_organization.present?
+        return true if org.present? && current_user.authorized?(org)
+
+        set_passive_organization(default_organization)
+      else
+        # If current_user isn't authorized for the organization, force assign nil
+        return true if org.blank? || org.present? && current_user.authorized?(org)
+
+        set_passive_organization(nil)
+      end
+    end
+
     # Fix issue with sticker batches #35 & #38
     def redirect_scanned_id
       return unless params[:id].present? && params[:id].match?(/scanned(uc|ui)\d+/i)
@@ -69,7 +91,7 @@ module Bikes
       return true unless error.present? # Can't assign directly to flash here, sometimes kick out of edit because other flash error
 
       flash[:error] = error
-      redirect_to(bike_view_path(@bike)) && return
+      redirect_to(registration_view.path(@bike)) && return
     end
 
     def update_organizations_can_edit_claimed(bike, organization_ids)

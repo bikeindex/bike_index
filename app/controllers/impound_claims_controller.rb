@@ -37,7 +37,7 @@ class ImpoundClaimsController < ApplicationController
     impounded_bike = @impound_claim.impound_record&.bike
     return redirect_back(fallback_location: user_root_url) if impounded_bike.blank?
 
-    redirect_to bike_view_path(impounded_bike, contact_owner: 1)
+    redirect_to registration_view.path(impounded_bike, contact_owner: 1)
   end
 
   def update
@@ -50,7 +50,7 @@ class ImpoundClaimsController < ApplicationController
     else
       flash[:error] = "Unable to save: #{@impound_claim.errors.full_messages.to_sentence}"
     end
-    redirect_back(fallback_location: bike_view_path(@impound_claim.bike_claimed, contact_owner: 1))
+    redirect_back(fallback_location: registration_view.path(@impound_claim.bike_claimed, contact_owner: 1))
   end
 
   protected

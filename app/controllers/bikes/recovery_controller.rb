@@ -7,7 +7,7 @@ module Bikes
       # redirect to bike show and set session - so the token isn't available to on page js
       # and so we can render show with a modal
       session[:recovery_link_token] = params[:token]
-      redirect_to bike_view_path(@bike)
+      redirect_to registration_view.path(@bike)
     end
 
     def update
@@ -17,7 +17,7 @@ module Bikes
       else
         session[:recovery_link_token] = params[:token]
       end
-      redirect_to bike_view_path(@bike)
+      redirect_to registration_view.path(@bike)
     end
 
     private
@@ -42,7 +42,7 @@ module Bikes
       else
         flash[:error] = translation(:incorrect_token)
       end
-      redirect_to(bike_view_path(@bike)) && return
+      redirect_to(registration_view.path(@bike)) && return
     end
   end
 end

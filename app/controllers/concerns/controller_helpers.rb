@@ -19,7 +19,7 @@ module ControllerHelpers
       :page_id, :default_bike_search_path, :every_bike_search_path, :bikehub_url, :show_general_alert,
       :display_dev_info?, :current_country_id, :current_currency, :turbo_request?,
       :render_donation_request?, :old_register_view?, :sort_state, :admin_index_state, :metric_units?,
-      :search_distance_unit, :request_location_hash, :registration_redesign_enabled?
+      :search_distance_unit, :request_location_hash, :registration_view
     before_action :enable_rack_profiler
 
     before_action do
@@ -360,57 +360,8 @@ module ControllerHelpers
 
   private
 
-  # Carries a signed-out opt-out onto the account, since the redesign's own claim and
-  # sign-up CTAs are what push people through signing in. Waits for confirmation because
-  # current_user is confirmed-only
-  def carry_registration_show_legacy(user)
-    return unless user.confirmed? && session[:registration_show_legacy]
-
-    session.delete(:registration_show_legacy) if user.update(feature_registration_show_legacy: true, skip_update: true)
-  end
-
-  def registration_show_legacy?
-    current_user&.feature_registration_show_legacy? || session[:registration_show_legacy].present?
-  end
-
-  # Kill switch for the redesign rollout - enabling the flag sends every viewer to the
-  # classic page
-  def registration_redesign_enabled?
-    return @registration_redesign_enabled if defined?(@registration_redesign_enabled)
-
-    @registration_redesign_enabled = !Flipper.enabled?(:registration_redesign_disabled)
-  end
-
-  def registration_redesign_shown?(show_legacy: registration_show_legacy?)
-    registration_redesign_enabled? && !show_legacy
-  end
-
-  # The bike's page as this viewer sees it, so a redirect lands there rather than
-  # hopping through bikes#show
-  def bike_view_path(bike, show_legacy: registration_show_legacy?, **query)
-    registration_redesign_shown?(show_legacy:) ? registration_path(bike, query) : bike_path(bike, query)
-  end
-
-  # Make it possible to assign organization for a view by passing the organization_id parameter - mainly useful for superusers
-  # Also provides testable protection against seeing organization info on bikes
-  def assign_current_organization
-    org = current_organization || passive_organization # actually call #current_organization first
-    # If forced false, or no user present, skip everything else
-    return true if @current_organization_force_blank || current_user.blank?
-
-    # If there was an organization_id passed, and the user isn't authorized for that org, reset passive_organization to something they can access
-    # ... Particularly relevant for scanned stickers, which may be scanned by child orgs - but I think it's the behavior users expect regardless
-    default_organization = OrganizationRole.default_organization(current_user) if params[:organization_id].present?
-    if default_organization.present?
-      return true if org.present? && current_user.authorized?(org)
-
-      set_passive_organization(default_organization)
-    else
-      # If current_user isn't authorized for the organization, force assign nil
-      return true if org.blank? || org.present? && current_user.authorized?(org)
-
-      set_passive_organization(nil)
-    end
+  def registration_view
+    @registration_view ||= RegistrationView.new(user: current_user, session_show_legacy: session[:registration_show_legacy])
   end
 
   # passive_organization is the organization set for the user - which is persisted in session
@@ -438,7 +389,11 @@ module ControllerHelpers
     else
       @current_organization = Organization.friendly_find(params[:organization_id])
       # Sometimes (e.g. embed registration), it's ok if current_user isn't authorized - but only set passive_organization if authorized
-      return @current_organization unless @current_organization.present? && current_user&.authorized?(@current_organization)
+      unless @current_organization.present? && current_user&.authorized?(@current_organization)
+        # passive_organization doesn't check authorization, so a lost membership leaves the session here
+        session.delete(:passive_organization_id) if session[:passive_organization_id] == @current_organization&.id
+        return @current_organization
+      end
     end
     set_passive_organization(@current_organization)
   end

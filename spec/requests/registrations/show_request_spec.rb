@@ -691,7 +691,7 @@ RSpec.describe "RegistrationsController#show", type: :request do
     context "passive_organization the user is no longer a member of" do
       let(:current_user) { FactoryBot.create(:organization_admin, organization:) }
 
-      it "falls back to the public view" do
+      it "falls back to the public view, and drops the organization once a request names it" do
         get "#{base_url}/#{bike.id}"
         expect(whitespace_normalized_body_text).to match("Staff")
         expect(session[:passive_organization_id]).to eq organization.id
@@ -702,6 +702,11 @@ RSpec.describe "RegistrationsController#show", type: :request do
         body = whitespace_normalized_body_text
         expect(body).to match("Public view")
         expect(body).to_not match("Staff")
+        # passive_organization doesn't check authorization
+        expect(session[:passive_organization_id]).to eq organization.id
+
+        get "#{base_url}/#{bike.id}", params: {organization_id: organization.slug}
+        expect(whitespace_normalized_body_text).to match("Public view")
         expect(session[:passive_organization_id]).to eq "0"
       end
     end

@@ -141,7 +141,7 @@ class PublicImagesController < ApplicationController
       render(json: {error: "Access denied"}, status: 401) && return if request.format.json?
 
       flash[:error] = translation(:no_permission_to_edit)
-      redirecting_path = @public_image.bike? ? bike_view_path(@public_image.imageable) : user_root_url
+      redirecting_path = @public_image.bike? ? registration_view.path(@public_image.imageable) : user_root_url
       redirect_to(redirecting_path) && return
     end
   end
