@@ -5,27 +5,29 @@
     </p>
   <% end %>
 
-  <div>
-    <h3 class="tw:text-sm tw:font-bold"><%= translation(".restrictions") %></h3>
+  <% rule_sections.each do |heading, restrictions| %>
+    <div>
+      <h3 class="tw:text-sm tw:font-bold"><%= heading %></h3>
 
-    <ul
-      class="
-        tw:mt-1.5 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-[15px]
-        tw:text-gray-700 tw:dark:text-gray-300
-      "
-    >
-      <% @law[:restrictions].each do |restriction| %>
-        <li>
-          <% if (dates = dates(restriction)) %>
-            <span class="tw:font-semibold"><%= dates %></span>
-          <% end %>
+      <ul
+        class="
+          tw:mt-1.5 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-[15px]
+          tw:text-gray-700 tw:dark:text-gray-300
+        "
+      >
+        <% restrictions.each do |restriction| %>
+          <li>
+            <% if (dates = dates(restriction)) %>
+              <span class="tw:font-semibold"><%= dates %></span>
+            <% end %>
 
-          <%= restriction[:rule] %>
-          <%= render(Pages::EbikeRules::RuleCitation::Component.new(restriction:)) %>
-        </li>
-      <% end %>
-    </ul>
-  </div>
+            <%= restriction[:rule] %>
+            <%= render(Pages::EbikeRules::RuleCitation::Component.new(restriction:)) %>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
 
   <% if @law[:sources].any? %>
     <div>

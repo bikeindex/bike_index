@@ -4,10 +4,14 @@ en:
     pages:
       ebike_rules:
         law_details:
+          enforcement: Enforcement
           from: 'From %{date}:'
           from_until: 'From %{starts_on} until %{ends_on}:'
+          legal_context: Legal context
           limits_start_on: These limits take effect %{date}. Until then, the rules
             below say what applies.
-          restrictions: Rules and restrictions
+          rider_rules: Rider rules
+          seller_rules: Seller rules
           sources: Sources
           until: 'Until %{date}:'
+          vehicle_definition: Vehicle definition

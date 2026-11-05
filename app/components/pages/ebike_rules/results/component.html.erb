@@ -1,5 +1,7 @@
 <section
   aria-live="polite"
+  data-controller="ui--collapse"
+  data-ui--collapse-param-value="rules"
   class="tw:flex tw:flex-col tw:gap-6 tw:pt-[clamp(28px,5vw,40px)] tw:pb-2 <%= SharedBlocks::Marketing::Wrapper::Component::CONTAINER_CLASSES %>"
 >
   <div
@@ -34,32 +36,39 @@
       <% end %>
 
       <% if @verdict == :red && other_classification %>
-        <div class="tw:text-[15px]" data-controller="ui--collapse">
-          <%= render(UI::Collapse::Component.new(text: translation(".other_classification_rules", name: other_classification[:name]), chevron: :trailing, color: :link)) %>
-
+        <% if other_classification[:top_rules].any? %>
           <ul
             class="
-              tw:mt-2 tw:hidden tw:list-disc tw:space-y-1 tw:pl-5 tw:text-sm
+              tw:mt-2 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-[15px]
               tw:text-gray-700 tw:dark:text-gray-300
             "
-            data-ui--collapse-target="content"
           >
-            <% other_classification[:restrictions].each do |restriction| %>
-              <li>
-                <%= restriction[:rule] %>
-                <%= render(Pages::EbikeRules::RuleCitation::Component.new(restriction:)) %>
-              </li>
+            <% other_classification[:top_rules].each do |restriction| %>
+              <li><%= restriction[:rule] %></li>
             <% end %>
           </ul>
+        <% end %>
+
+        <div class="tw:mt-4 tw:text-[15px]">
+          <%= render(UI::Collapse::Component.new(text: translation(".other_classification_rules", name: other_classification[:name]), chevron: :trailing, color: :link)) %>
         </div>
       <% end %>
     </div>
   </div>
 
+  <% if @verdict == :red && other_classification %>
+    <div class="tw:-mt-4 tw:hidden" data-ui--collapse-target="content">
+      <%= render(UI::Card::Component.new(additional_classes: "tw:p-[clamp(18px,3vw,28px)]!")) do %>
+        <span class="tw:mb-1 tw:block <%= EYEBROW_CLASSES %>"><%= other_classification_eyebrow %></span>
+        <%= render(Pages::EbikeRules::LawSummary::Component.new(law: other_classification, titled: true)) %>
+      <% end %>
+    </div>
+  <% end %>
+
   <div
     class="
       tw:grid tw:grid-cols-[repeat(auto-fit,minmax(min(100%,380px),1fr))]
-      tw:items-start tw:gap-6
+      tw:gap-6
     "
   >
     <%= render(UI::Card::Component.new(additional_classes: "tw:p-0!")) do %>
@@ -142,21 +151,12 @@
               <span class="tw:mt-px"><%= render(Pages::EbikeRules::StatusIcon::Component.new(status: row[:status], label: status_label(row[:status]))) %></span>
 
               <div class="tw:flex tw:min-w-0 tw:flex-col tw:gap-0.5">
-                <span class="tw:text-sm tw:font-bold"><%= render(Pages::EbikeRules::RuleLabel::Component.new(id: row[:id])) %></span>
-                <span class="tw:text-[15px] tw:text-gray-700 tw:dark:text-gray-300"><%= render(Pages::EbikeRules::RuleValue::Component.new(law: @law, id: row[:id])) %></span>
-                <span class="tw:text-sm tw:font-semibold"><%= note(row) %></span>
+                <span class="tw:text-sm tw:font-bold"><%= rule_heading(row[:id]) %></span>
+                <span class="tw:text-[15px] tw:text-gray-700 tw:dark:text-gray-300"><%= note(row) %></span>
               </div>
             </li>
           <% end %>
         </ul>
-
-        <div data-controller="ui--collapse">
-          <%= render(UI::Collapse::Component.new(text: translation(".read_more"), chevron: :trailing, color: :link)) %>
-
-          <div class="tw:mt-4 tw:hidden" data-ui--collapse-target="content">
-            <%= render(Pages::EbikeRules::LawDetails::Component.new(law: @law)) %>
-          </div>
-        </div>
 
         <p class="tw:text-[13px] tw:text-gray-700 tw:dark:text-gray-300">
           <%= source %>
