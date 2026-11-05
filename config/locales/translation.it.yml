@@ -7023,9 +7023,13 @@ it:
           from_until: 'Da %{starts_on} a %{ends_on}:'
           limits_start_on: Questi limiti entrano in vigore %{date}. Fino ad allora,
             si applicano le regole seguenti.
-          restrictions: Regole e restrizioni
           sources: Fonti
           until: 'Fino a %{date}:'
+          enforcement: Applicazione della legge
+          legal_context: contesto giuridico
+          rider_rules: Regole del cavaliere
+          seller_rules: Regole del venditore
+          vehicle_definition: Definizione di veicolo
         results:
           answer_no: 'No'
           answer_yes: Sì
@@ -7043,8 +7047,6 @@ it:
             1, 2 o 3. Controlla presso la %{state} DMV le normative locali.
           gray_headline: Non abbiamo ancora in archivio le regole per le e-bike di
             %{state}.
-          green_headline: La tua %{name} è legale da guidare in %{state} come e-bike
-            di classe %{n}.
           has_throttle: Ha un acceleratore
           is_registered: Questa bicicletta è immatricolata?
           legal_to_ride: È legale guidare
@@ -7064,8 +7066,6 @@ it:
           own_classes: Lo stato stabilisce i propri limiti anziché le tre classi standard
           recovered_more_often: Le biciclette rubate vengono recuperate con una frequenza
             doppia se registrate.
-          red_headline: Il tuo %{name} non è ammesso come e-bike secondo le attuali
-            norme %{state}.
           register_free: Registrati su Bike Index — gratis
           rule_to_check: Regola da controllare
           rules_not_on_file: Regole non presenti nel file
@@ -7090,11 +7090,6 @@ it:
           watts_not_provided: Potenza del motore non specificata
           watts_over_cap_html: Il motore %{watts}W supera il limite %{cap}W
           watts_within_cap_html: "%{watts}Il motore W è all'interno del tappo"
-          yellow_headline:
-            one: La tua %{name} è legale da guidare in %{state} come e-bike di classe
-              %{n}, con %{count} regola da verificare.
-            other: La tua %{name} è legale da guidare in %{state} come e-bike di classe
-              %{n}, con %{count} regole da verificare.
           yellow_headline_class_unknown:
             one: Il tuo %{name} potrebbe essere legale da guidare in %{state}, con
               la regola %{count} da verificare.
@@ -7120,31 +7115,18 @@ it:
           classes_recognized:
             one: La classe %{n} è riconosciuta
             other: Le classi %{n} sono riconosciute
-          read_more: Per saperne di più
           answer_optional: Opzionale
-          as_class_with_optional_throttle: come Classe %{n} con il suo acceleratore
-            opzionale
-          as_class_with_optional_upgrade: come Classe %{n} con aggiornamento opzionale
           class_3_optional_throttle_within_html: L'acceleratore opzionale si ferma
             a %{mph} mph
           class_3_speed_with_throttle_html: Assiste fino a %{mph} mph, non consentito
             con un acceleratore
           class_n: Classe %{n}
           classes_not_permitted: Si tratta di una e-bike %{classes}, che non è consentita
-          green_headline_optional: Il tuo %{name} è legale da guidare in %{state}
-            come e-bike di classe %{n} e %{optional}.
           manually_entered: Inserito manualmente
           model_year: modello %{year}
           optional_throttle_not_allowed: È legale solo senza l'acceleratore opzionale.
           optional_to_html: Opzionale, per %{mph}
           throttle_with_class_3_assist: Non consentito con assistenza di Classe 3
-          yellow_headline_optional:
-            one: La tua %{name} è legale da guidare in %{state} come e-bike di classe
-              %{n} e %{optional}, con la regola %{count} da verificare.
-            other: La tua %{name} è legale da guidare in %{state} come e-bike di classe
-              %{n} e %{optional}, con %{count} regole da verificare.
-          yellow_headline_without_throttle: La tua %{name} è legale da guidare in
-            %{state} come e-bike di classe %{n}, senza l'acceleratore opzionale.
           green_headline_law: Il tuo %{name} è autorizzato a circolare in %{state}
             secondo le regole %{law}.
           kmh_html: "%{kmh} km/h"
@@ -7200,6 +7182,51 @@ it:
             other: Le classi %{n} non sono riconosciute in %{state}, quindi è legale
               solo come venduto
           other_classification_rules: "%{name} regole"
+          also_class_with_optional_throttle: è anche una e-bike di classe %{n} con
+            acceleratore opzionale
+          also_class_with_optional_upgrade: è anche una e-bike di classe %{n} con
+            un aggiornamento opzionale
+          class_headline: La tua %{name} è una e-bike di classe %{n} in %{state}.
+          class_headline_optional: La tua %{name} è una e-bike di classe %{n} in %{state}
+            e %{optional}.
+          class_headline_optional_with_rules:
+            one: La tua %{name} è una e-bike di classe %{n} in %{state} e %{optional},
+              con la regola %{count} da verificare.
+            other: La tua %{name} è una e-bike di classe %{n} in %{state} e %{optional},
+              con %{count} regole da verificare.
+          class_headline_with_rules:
+            one: La tua %{name} è una e-bike di classe %{n} in %{state}, con %{count}
+              regola da verificare.
+            other: La tua %{name} è una e-bike di classe %{n} in %{state}, con %{count}
+              regole da verificare.
+          class_headline_without_throttle: La tua %{name} è una e-bike di classe %{n}
+            in %{state}, senza l'acceleratore opzionale.
+          green_headline_no_classes: Il tuo %{name} è classificato come e-bike in
+            %{state}.
+          heading_classes_html: "%{classes} riconosciuto"
+          heading_no_power_cap: Nessun limite di potenza del motore
+          heading_no_speed_cap: Nessun limite di velocità assistito superiore
+          heading_power_html: "%{watts} condensatore di potenza del motore"
+          heading_speed_html: "%{speed} velocità massima assistita"
+          heading_throttle_allowed: Acceleratore consentito
+          heading_throttle_not_allowed: Acceleratore non consentito
+          heading_vehicle_html: Regolamentato come %{name}
+          may_fall_under_name: In %{state}, può rientrare in %{name}.
+          not_classified_headline: Il tuo %{name} non è classificato come e-bike in
+            %{state}.
+          rules_that_apply: Regole applicabili in %{state}
+          rules_that_may_apply: Regole che possono essere applicate in %{state}
+          throttle_speed_over_cap_html: L'acceleratore raggiunge %{mph} mph, oltre
+            il limite di %{cap} mph.
+          throttle_speed_within_cap_html: L'acceleratore raggiunge %{mph} mph, entro
+            il limite
+          yellow_headline_no_classes:
+            one: Il tuo %{name} è classificato come e-bike in %{state}, con %{count}
+              regola da verificare.
+            other: Il tuo %{name} è classificato come e-bike in %{state}, con %{count}
+              regole da verificare.
+          yellow_headline_no_classes_without_throttle: La tua %{name} è classificata
+            come e-bike in %{state}, senza l'acceleratore opzionale.
         rule_label:
           classes: Classi riconosciute
           power: Limite di potenza del motore
@@ -7239,9 +7266,6 @@ it:
           certification_involves_heading: Cosa comporta la certificazione
           check_my_bike: Controlla la mia bici
           compare_html: Vuoi confrontare più biciclette? %{link}
-          disclaimer: Bike Index è un'organizzazione no-profit 501(c)(3). I riassunti
-            delle leggi statali sono forniti a titolo di riferimento e non costituiscono
-            consulenza legale.
           for_parents: Per i genitori
           form_label: Verifica della conformità delle e-bike
           has_throttle: Ha l'acceleratore?
@@ -7338,9 +7362,6 @@ it:
           choose_province: Seleziona la tua provincia o il tuo territorio dall'elenco.
           choose_state: Seleziona il tuo stato dall'elenco.
           detected_place_html: Abbiamo rilevato <strong>%{state}</strong> .
-          disclaimer_canada: Bike Index è un'organizzazione senza scopo di lucro.
-            I riassunti delle leggi provinciali e territoriali sono forniti a titolo
-            informativo e non costituiscono consulenza legale.
           kmh: "%{kmh} km/h"
           not_in_canada_html: Non sei in Canada? %{switch_country}
           over_kmh: Oltre %{kmh} km/h
@@ -7421,6 +7442,9 @@ it:
             e gli altri veicoli elettrici a due ruote in queste classi."
           other_classes: Altri veicoli elettrici in %{place}
           place_heading: Leggi sulle e-bike in %{place}
+          non_e_bike_rules: "%{state} regole non per e-bike"
+          rules_that_apply: Regole applicabili in %{state}
+          state_rules: "%{state} Regole per le e-bike"
         rule_citation:
           source: fonte
         class_card:
