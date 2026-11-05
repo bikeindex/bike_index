@@ -19,7 +19,7 @@ module Atoms
       end
 
       def call
-        return render(UI::CopyableCode::Component.new(value: @pretty_code, label: translation(".copy_sticker"))) if @copyable
+        return render(Atoms::CopyableCode::Component.new(value: @pretty_code, label: translation(".copy_sticker"))) if @copyable
         return code_block if @url.blank?
 
         link_to(code_block, @url, class: "twlink")

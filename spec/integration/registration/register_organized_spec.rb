@@ -333,6 +333,7 @@ RSpec.describe "Register flow, with an organization", :js, type: :system do
         type_into("#report_address_record_attributes_region_record_id", state.abbreviation)
         click_combobox_option(state.name)
         fill_in "report[address_record_attributes][postal_code]", with: "10007"
+        fill_in "report[theft_description]", with: "Cut lock outside the office"
         click_button "Complete Bike Registration"
 
         expect(page).to have_css("h1", text: "is listed as stolen on Bike Index", wait: 10)

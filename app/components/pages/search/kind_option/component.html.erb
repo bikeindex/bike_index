@@ -9,7 +9,7 @@
   ) do %>
     <%= @option_text %>
 
-    <span class="twless-strong" data-count-target="<%= @option %>"></span>
+    <span class="less-strong" data-count-target="<%= @option %>"></span>
   <% end %>
 <% else %>
   <div
@@ -31,7 +31,7 @@
     <%= label_tag("#{@option_kind}_#{@option}", class: "tw:w-full tw:py-3 tw:ms-2 tw:cursor-pointer") do %>
       <%= @option_text %>
 
-      <span class="twless-strong" data-count-target="<%= @option %>"></span>
+      <span class="less-strong" data-count-target="<%= @option %>"></span>
     <% end %>
   </div>
 <% end %>

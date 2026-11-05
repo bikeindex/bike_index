@@ -7,12 +7,9 @@ module Pages
       # preceded by an "All" link back to the active page's index when this isn't it.
       # Picking an option navigates -- see admin/navbar_controller.js.
       class Component < ApplicationComponent
-        # The vendored dump's .navbar-light .navbar-nav .nav-link, as utilities. admin.scss
-        # imports the dump unlayered, so it outranks every tailwind layer — dropping .nav-link
-        # is what lets a utility reach these links at all. Horizontal padding is the
-        # navbar-expand-md value, the only one the d-lg-flex list is ever visible at.
         NAV_LINK_CLASS = "tw:block tw:p-2 tw:no-underline tw:text-black/50 " \
-          "tw:hover:text-black/70 tw:focus:text-black/70 tw:is-active:text-black/90"
+          "tw:hover:text-black/70 tw:focus:text-black/70 tw:is-active:text-black/90 " \
+          "tw:dark:text-white/50 tw:dark:hover:text-white/70 tw:dark:focus:text-white/70 tw:is-active:dark:text-white/90"
 
         def initialize(current_user:, user_root_url:, search_filtered: false)
           @current_user = current_user
@@ -148,6 +145,7 @@ module Pages
             {title: "Maintenance", path: admin_maintenance_path, exact: true},
             {title: "Partial Bikes", path: admin_b_params_path},
             {title: "Component Types", path: admin_ctypes_path},
+            {title: "Cycle Types", path: admin_cycle_types_path},
             {title: "Graphs", path: admin_graphs_path},
             {title: "Paints", path: admin_paints_path},
             {title: "Feedback & Messages", path: admin_feedbacks_path},

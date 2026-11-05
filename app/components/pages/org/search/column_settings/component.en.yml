@@ -9,13 +9,17 @@ en:
             acknowledgment_cell_panel: Time - Registration sequence acknowledged
             address: 'Address:'
             all: all
+            all_bikes: All bikes
+            all_statuses: All statuses
             avery_cell: Avery Exportable
             color_cell: Color
+            copy_column_order_from_impounded_vehicles_search: Copy column order from
+              impounded vehicles search
+            copy_column_order_from_registrations_search: Copy column order from registrations
+              search
             created_at_cell: Registered
-            created_at_cell_panel: Time - registered
             creation_description_cell: Source
             cycle_type_cell: Vehicle type
-            default: default
             filter_impounded_html: only <strong>impounded</strong>
             filter_no_address_html: only <strong>no</strong> address
             filter_no_sticker_html: only <strong>no</strong> sticker
@@ -28,7 +32,15 @@ en:
             filter_with_address_html: only <strong>with</strong> address
             filter_with_stickers_html: only <strong>with</strong> stickers
             impound_id_cell: Impound ID
-            included_columns: Included columns
+            impound_location_cell: Location
+            impound_search_columns: Impound search columns
+            impound_status_cell: Impound status
+            impound_updated_at_cell: Impound updated
+            impound_updated_at_cell_panel: Time - Impound Record Updated
+            impound_user_cell: Last updator
+            impounded_at_cell: Impounded
+            impounded_at_cell_panel: Time - Impounded
+            impounded_from_cell: Impounded from
             location_search_disabled_no_address: >-
               %{org_name} doesn't collect registration addresses, so only stolen and
               impounded registrations have a location. Filter to one of those statuses
@@ -38,10 +50,10 @@ en:
               are searching just impounded and/or stolen registrations.
             manufacturer_cell: Manufacturer
             model_cell: Model
-            none: none
             notes_cell_html: Registration Notes <em>by %{org_name}</em>
             occurred_at_cell: Status at
-            occurred_at_cell_panel: Time - status
+            only_unregistered: Only unregistered
+            only_user_registered: Only user registered
             owner_email_cell: Sent to
             owner_name_cell: Owner name
             photo_cell: Photo
@@ -51,16 +63,23 @@ en:
             reg_organization_affiliation_cell_html: Affiliation <em>in %{org_name}</em>
             reg_phone_cell: Phone
             reg_student_id_cell_html: Student ID <em>for %{org_name}</em>
+            registered_cell_panel: Time - Registered
+            registration: 'Registration:'
+            registration_updated_cell_panel: Time - Registration Updated
+            resolved_at_cell: Resolved
+            resolved_at_cell_panel: Time - Resolved
             serial_number_cell: Serial
             show_location_search: show location search
             show_notes_search: show notes search
             status: 'Status:'
+            status_at_cell_hint: when stolen, impounded, etc
+            status_at_cell_panel: Time - Status
             status_cell: Status
+            status_records: "%{status} records"
             sticker_cell: Sticker
             stickers: 'Stickers:'
             unregistered: 'Unregistered:'
+            unregistered_cell: Unregistered
             updated_at_cell: Updated
-            updated_at_cell_panel: Time - updated
             url_cell: URL
             view_cell: View
-            visible_columns: Visible columns

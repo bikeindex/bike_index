@@ -1,5 +1,5 @@
 class OrganizationExportJob < ApplicationJob
-  ADDRESS_KEYS = {"address" => "street", "address_2" => "street_2", "city" => "city", "state" => "state", "zipcode" => "zipcode"}.freeze
+  ADDRESS_KEYS = {"address" => :street, "address_2" => :street_2, "city" => :city, "state" => :region, "zipcode" => :postal_code}.freeze
 
   sidekiq_options retry: false, queue: "med_priority"
 
@@ -135,7 +135,7 @@ class OrganizationExportJob < ApplicationJob
 
   # Each column's value as the registrations search table shows it
   def value_for_header(header, bike)
-    return bike.registration_address[ADDRESS_KEYS[header]] if ADDRESS_KEYS.key?(header)
+    return bike.registration_address_record&.public_send(ADDRESS_KEYS[header]) if ADDRESS_KEYS.key?(header)
     if ComponentStructs::OrgSearchSettings::EXPORT_HEADERS.key?("reg_#{header}_cell")
       return OrgServices::RegistrationFields.value(bike:, organization: @export.organization, reg_field: "reg_#{header}")
     end

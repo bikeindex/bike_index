@@ -5,7 +5,7 @@ require "rails_helper"
 RSpec.describe ComponentStructs::OrgSearchSettings do
   let(:instance) { described_class.new(**options) }
   let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs:) }
-  let(:enabled_feature_slugs) { %w[bike_search] }
+  let(:enabled_feature_slugs) { [] }
   let(:search_stickers) { nil }
   let(:search_address) { nil }
   let(:search_status) { "all" }
@@ -119,21 +119,42 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
   end
 
   describe "panel_columns" do
-    it "lists the always-visible view column with the toggleable ones, in label order" do
+    it "lists the always-visible view column with the toggleable ones" do
       expect(instance.panel_columns).to include("view_cell")
       expect(instance.enabled_columns).not_to include("view_cell")
-      expect(instance.panel_columns).to eq(instance.panel_columns.sort_by { |cell| instance.panel_labels[cell.to_sym] })
     end
   end
 
   describe "panel_labels" do
     it "prefixes the time columns, leaving the table headers short" do
-      expect(instance.panel_labels[:created_at_cell]).to eq "Time - registered"
-      expect(instance.panel_labels[:updated_at_cell]).to eq "Time - updated"
-      expect(instance.panel_labels[:occurred_at_cell]).to eq "Time - status"
+      expect(instance.panel_labels[:created_at_cell]).to eq "Time - Registered"
+      expect(instance.panel_labels[:updated_at_cell]).to eq "Time - Registration Updated"
+      expect(instance.panel_labels[:occurred_at_cell]).to eq "Time - Status"
       expect(instance.panel_labels[:acknowledgment_cell]).to eq "Time - Registration sequence acknowledged"
       expect(instance.column_renames[:created_at_cell]).to eq "Registered"
       expect(instance.panel_labels[:color_cell]).to eq "Color"
+    end
+  end
+
+  describe "impound" do
+    it "adds the impound columns and sorts, and drops the export" do
+      expect(instance.panel_columns).not_to include(*described_class::IMPOUND_COLUMNS)
+      impound_settings = described_class.new(organization:, impound: true)
+      expect(impound_settings.initially_checked_columns).to include("impound_id_cell", *described_class::IMPOUND_COLUMNS)
+      expect(impound_settings.panel_columns).to include(*described_class::IMPOUND_COLUMNS)
+      expect(impound_settings.impound_panel_columns).to match_array(["impound_id_cell", *described_class::IMPOUND_COLUMNS])
+      expect([instance.impound?, impound_settings.impound?]).to eq [false, true]
+      expect(instance.impound_search?).to be_falsey
+      expect(impound_settings.sort_column_label("user_id")).to eq "Last updator"
+      expect(impound_settings.sort_column_label("impounded_at")).to eq "Impounded"
+      expect(impound_settings.sort_column_label("resolved_at")).to eq "Resolved"
+      expect(impound_settings.render_export?).to be_falsey
+    end
+  end
+
+  describe "panel_hints" do
+    it "explains the status time, and nothing else" do
+      expect(instance.panel_hints).to eq("occurred_at_cell" => "when stolen, impounded, etc")
     end
   end
 
@@ -146,7 +167,7 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
     end
 
     context "with bike_stickers enabled" do
-      let(:enabled_feature_slugs) { %w[bike_search bike_stickers] }
+      let(:enabled_feature_slugs) { %w[bike_stickers] }
 
       it "includes sticker_cell" do
         expect(instance.initially_checked_columns).to include("sticker_cell")
@@ -155,7 +176,7 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
   end
 
   describe "column_renames" do
-    let(:enabled_feature_slugs) { %w[bike_search reg_student_id] }
+    let(:enabled_feature_slugs) { %w[reg_student_id] }
 
     it "names the organization in its own columns" do
       expect(instance.column_renames[:color_cell]).to eq "Color"
@@ -173,14 +194,14 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
   end
 
   describe "enabled_columns" do
-    let(:enabled_feature_slugs) { %w[bike_search impound_bikes] }
+    let(:enabled_feature_slugs) { %w[impound_bikes] }
 
     it "adds the feature's columns" do
       expect(instance.enabled_columns).to include("impound_id_cell", "url_cell")
     end
 
     context "without impound_bikes" do
-      let(:enabled_feature_slugs) { %w[bike_search] }
+      let(:enabled_feature_slugs) { [] }
 
       it "doesn't include the impound columns" do
         expect(instance.enabled_columns).to_not include("impound_id_cell")
@@ -189,7 +210,7 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
   end
 
   describe "filter_groups" do
-    let(:enabled_feature_slugs) { %w[bike_search bike_stickers reg_address impound_bikes] }
+    let(:enabled_feature_slugs) { %w[bike_stickers reg_address impound_bikes] }
     let(:search_status) { "impounded" }
 
     it "returns a group per enabled filter, carrying the searched value" do
@@ -204,7 +225,7 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
     end
 
     context "with no optional features" do
-      let(:enabled_feature_slugs) { %w[bike_search] }
+      let(:enabled_feature_slugs) { [] }
       let(:search_status) { "all" }
 
       it "returns only the ungated ones, without the impound statuses" do
@@ -218,7 +239,7 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
   end
 
   describe "export_disabled?" do
-    let(:enabled_feature_slugs) { %w[bike_search csv_exports] }
+    let(:enabled_feature_slugs) { %w[csv_exports] }
 
     it "is true once the search reaches past the organization, which still renders the export" do
       expect(instance.export_disabled?).to be false
@@ -238,7 +259,7 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
 
   describe "export_header_label" do
     it "is the panel's label, or a legacy header's own name" do
-      expect(instance.export_header_label("registered_at")).to eq "Time - registered"
+      expect(instance.export_header_label("registered_at")).to eq "Time - Registered"
       expect(instance.export_header_label("owner_email")).to eq "Sent to"
       expect(instance.export_header_label("is_stolen")).to eq "Is stolen"
       expect(instance.export_header_label("address_2")).to eq "Address 2"

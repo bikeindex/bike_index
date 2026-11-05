@@ -56,9 +56,9 @@ en:
         registration_confirm_message: >-
           You are one step away from activating the most effective bike registry and
           protecting your %{bike_type} in your community.
-        secure_both_wheels_either_with_two_ulocks: >-
-          Secure both wheels - either with two U-locks, or one U-lock and one heavy
-          duty cable.
+        secure_both_wheels_with_locking_skewers: >-
+          Secure both wheels - with locking skewers, a heavy duty cable and a U-lock
+          or two U-locks.
         sign_up_on_bikeindexorg_to_claim_your_bik: >-
           Sign up on BikeIndex.org to claim your %{bike_type} and edit it, upload
           photos and make sure you never lose track of your trusty steed!
@@ -72,11 +72,10 @@ en:
         thanks_for_adding_this_bike_type_you_found: Thanks for adding this %{bike_type}
           you found to Bike Index
         theft_victims_illustration: Theft victims illustration
-        ulock_illustration: U-Lock illustration
         updated_registration_guidance: >-
           If you move, sell, or make any changes to your %{bike_type}, update the
           registration so the record stays accurate and useful.
-        use_a_ulock: Use a U-Lock.
+        use_a_ulock_or_foldable_lock: Use a U-Lock or a heavy duty foldable lock.
         view_your_bike: View your %{bike_type}
         were_sorry_your_bike_type_was_stolen: We're sorry your %{bike_type} was stolen.
         what_if_my_bike_gets_stolen: What if my %{bike_type} gets stolen?

@@ -8,7 +8,7 @@
 
 <% if tokenized_url.present? %>
   <div class="mark-retrieved-box">
-    <%= link_to tokenized_url, "data-pm-no-track" => true, class: "binx-button" do %>
+    <%= render(Emails::Partials::TokenLink::Component.new(href: tokenized_url)) do %>
       Click to renew
     <% end %>
 

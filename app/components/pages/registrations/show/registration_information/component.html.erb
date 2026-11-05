@@ -1,5 +1,5 @@
 <%= render(UI::Card::Component.new) do %>
-  <h2 class="tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">
+  <h2 class="tw:tweyebrow">
     <%= translation(".registration_information") %>
   </h2>
 
@@ -14,7 +14,7 @@
                   tw:inline-block tw:rounded tw:px-2 tw:py-0.5 tw:font-bold
                   tw:text-white
                 "
-                style="background-color: <%= credibility_color %>"
+                style="background-color: <%= CredibilityScorer.color(credibility_score) %>"
               >
                 <%= credibility_score %>
               </span>

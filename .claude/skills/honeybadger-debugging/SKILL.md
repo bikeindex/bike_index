@@ -31,9 +31,8 @@ fetching again.
 
 It reads `HONEYBADGER_PERSONAL_AUTH_TOKEN` from `.env.development`. Without it
 the command exits saying so — get a new token at honeybadger.io/users/edit and
-ask the user to set it. Don't fall back to the `honeybadger` MCP server — it can't redirect a notice to
-a file, so a 130 KB backtrace lands whole in context. Aggregates are covered too
-— `binx_hb faults`, `trend` and `counts`.
+ask the user to set it. Aggregates are covered too — `binx_hb faults`, `trend`
+and `counts`.
 
 ## Read the notice in this order
 
@@ -59,6 +58,10 @@ Decide which kind of fault it is first — the two need different work.
 
 - Reproduce from `args`/`params` before changing code — `bundle exec rails
   runner` against the dev database is usually enough.
+- **A decoder error isn't proof the file is bad.** Production's libvips and libheif are Ubuntu's
+  packages (`.cloud66/deploy_hooks.yml`), older than Homebrew's — download the stored file and
+  decode it locally before treating it as corrupt. The "bad seek" in fault 134271942 read as
+  truncation, and was a valid iPhone HEIC that libheif 1.17 couldn't parse.
 - Cover the fix with a spec; the `rspec-testing` skill has the house style.
 - Check whether the same pattern exists elsewhere. `Errno::ENOENT` in one image
   job usually means every image job shares the bug.

@@ -317,5 +317,6 @@
     </div>
   </section>
 
-  <%= render(Pages::LandingPages::DemoModal::Component.new(feedback: @feedback, current_user: @current_user, name_label: "City", feedback_type: "lead_for_city", modal_id: "law-enforcement-demo-modal")) %>
+  <%= render(Pages::LandingPages::DemoModal::Component.new(feedback: @feedback, name_label: "City", feedback_type: "lead_for_city", modal_id: "law-enforcement-demo-modal",
+    return_to: for_law_enforcement_path)) %>
 </div>

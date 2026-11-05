@@ -9,7 +9,7 @@
 - if @suggested_activities.present?
   = render(UI::Header::Component.new(text: t(".suggested_activities"), tag: :h2))
   .full-screen-table
-    %table.table.table-striped.table-bordered.ambassador-tasks-table
+    %table.table.table-striped.table-bordered{class: "tw:[&_td_p]:inline"}
       %thead.small-header
         %tr
           %th= t(".activity")
@@ -28,7 +28,7 @@
 - if @completed_activities.present?
   = render(UI::Header::Component.new(text: t(".completed_activities"), tag: :h2))
   .full-screen-table
-    %table.table.table-striped.table-bordered.ambassador-tasks-table
+    %table.table.table-striped.table-bordered{class: "tw:[&_td_p]:inline"}
       %thead.small-header
         %tr
           %th= t(".activity")
