@@ -119,7 +119,7 @@ State the verdict in your reply to the user either way, naming the stored values
 rtk proxy git diff origin/main...HEAD --name-only --diff-filter=A -- app/assets/images
 ```
 
-Check each against `frontend-conventions`' image and icon rules: an original elsewhere in the repo (a design handoff's comes resized and renamed), an existing icon, or a plain character that should be text. Replace a duplicate with what already exists and delete it.
+Icons go through the markup audit below. Check each other image against `frontend-conventions`' image rules for an original elsewhere in the repo (a design handoff's comes resized and renamed). Replace a duplicate with what already exists and delete it.
 
 ### The controller audit
 
@@ -144,16 +144,7 @@ For each, name the existing component it renders or duplicates. One that wraps a
 
 ### The markup audit
 
-**Required when the branch adds markup.** List it:
-
-```bash
-rtk proxy git diff origin/main...HEAD -U0 -- '*.erb' '*.haml' 'app/components/*.rb' |
-  grep -E '^(\+\+\+ |\+\s*%[a-z]|\+.*(<[a-z]|link_to|button_to|content_tag|tag\.|tw:))'
-```
-
-Read `app/components/ui/` and `app/components/atoms/`, plus the sibling `pages/` and `shared_blocks/` components that render the same thing, and convert every hand-written piece one of them covers — cards to `UI::Card`, headings to `UI::Header`, link rows to `UI::ButtonGroup`, pills to `UI::Badge`, a `link_to … method:` to `UI::ButtonLink`. Icons go through the asset audit's rule even when the file is already in the repo. A class map repeating another component's moves to something both already render: `Atoms::RegistrationStatusBadge::Component::BORDER_CLASSES`.
-
-Convert without asking, and name any visible change in your reply. A class the component's own outranks takes a `!`, as `Pages::MyAccount::Show::PromptBar` does; a match that needs a new `UI::*` argument goes to the user. Name each hand-written piece you kept and what no component covers.
+**Required when the branch adds markup or an icon.** Run the `use-existing-markup` skill. It converts the hand-written markup to existing components without asking, covering marketing pages, buttons, icons and shadows. Put its callouts (big shadows, and hover states on things that aren't buttons) in your reply to the user.
 
 ### The cycle-type translation check
 
