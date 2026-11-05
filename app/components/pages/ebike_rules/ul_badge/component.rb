@@ -7,7 +7,11 @@ module Pages
       # what it means for the bike
       class Component < ApplicationComponent
         # BikeBook records a certification, not its absence, so a bike is never shown as uncertified
-        BACKGROUNDS = {certified: "tw:bg-[#e8f5ee]", unknown: "tw:bg-[#fff6da]", unrecorded: "tw:bg-[#fff6da]"}.freeze
+        BACKGROUNDS = {
+          certified: "tw:bg-[#e8f5ee] tw:dark:bg-green-950",
+          unknown: "tw:bg-[#fff6da] tw:dark:bg-yellow-950",
+          unrecorded: "tw:bg-[#fff6da] tw:dark:bg-yellow-950"
+        }.freeze
         ICON_STATUSES = {certified: :pass, unknown: :unknown_warning, unrecorded: :unknown_warning}.freeze
 
         # standard: 2849 or 2271, nil for neither. status: :certified, :unknown, or :unrecorded for a bike entered by hand

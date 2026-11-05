@@ -4,7 +4,7 @@
 >
   <div
     role="status"
-    class="tw:flex tw:gap-4 tw:rounded-lg tw:border-2 tw:px-[clamp(16px,3vw,28px)] tw:py-5 tw:dark:bg-gray-800 <%= VERDICTS[@verdict][:classes] %>"
+    class="tw:flex tw:gap-4 tw:rounded-lg tw:border-2 tw:px-[clamp(16px,3vw,28px)] tw:py-5 <%= VERDICTS[@verdict][:classes] %>"
   >
     <%= render(Pages::EbikeRules::StatusIcon::Component.new(status: VERDICTS[@verdict][:icon], size: :lg)) %>
 
