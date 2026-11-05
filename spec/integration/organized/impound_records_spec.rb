@@ -308,4 +308,22 @@ RSpec.describe "Organized impound records index", :js, type: :system do
     expect(impound_record.organization).to eq organization
     expect(impound_record.user).to eq user
   end
+
+  it "impounds a bike with an earlier notification, as a repeat at its location" do
+    earlier_notification = FactoryBot.create(:parking_notification_organized, organization:, bike: impound_bike)
+    visit registration_path(impound_bike)
+
+    click_button "Impound"
+    expect(page).to have_content(/impound this bike/i)
+    # Repeat is preselected and collapses the location controls
+    expect(page).to have_no_content("Set on map")
+
+    using_wait_time(10) { click_button "Impound this #{impound_bike.type}" }
+    expect(page).to have_content("Impounded this #{impound_bike.type}", wait: 10)
+    expect(page).to have_button("Update Impound Record")
+
+    parking_notification = impound_bike.reload.parking_notifications.last
+    expect(parking_notification.initial_record_id).to eq earlier_notification.id
+    expect(parking_notification.street).to eq earlier_notification.street
+  end
 end
