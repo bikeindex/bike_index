@@ -49,6 +49,8 @@ en:
             e-bike.
           green_headline_law: Your %{name} is legal to ride in %{state} under the
             %{law} rules.
+          green_headline_no_classes: Your %{name} is legal to ride in %{state} as
+            an e-bike.
           green_headline_optional: >-
             Your %{name} is legal to ride in %{state} as a Class %{n} e-bike, and
             %{optional}.
@@ -184,6 +186,16 @@ en:
             other: >-
               Your %{name} may be legal to ride in %{state} under the %{law} rules,
               with %{count} rules to check.
+          yellow_headline_no_classes:
+            one: >-
+              Your %{name} is legal to ride in %{state} as an e-bike, with %{count}
+              rule to check.
+            other: >-
+              Your %{name} is legal to ride in %{state} as an e-bike, with %{count}
+              rules to check.
+          yellow_headline_no_classes_without_throttle: >-
+            Your %{name} is legal to ride in %{state} as an e-bike, without its optional
+            throttle.
           yellow_headline_optional:
             one: >-
               Your %{name} is legal to ride in %{state} as a Class %{n} e-bike, and

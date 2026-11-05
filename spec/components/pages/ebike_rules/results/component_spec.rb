@@ -54,6 +54,26 @@ RSpec.describe Pages::EbikeRules::Results::Component, type: :component do
     end
   end
 
+  context "in a state without classes" do
+    let(:abbreviation) { "AK" }
+
+    context "with a rule to check" do
+      let(:bike) { super().with(e_bike_class: 3, throttle: true, stock_throttle: true) }
+
+      it "doesn't name a class" do
+        expect(component).to have_css("[role='status']", text: "Your Trek Verve+ 2 is legal to ride in Alaska as an e-bike, with 1 rule to check.")
+      end
+    end
+
+    context "with an optional throttle past the law's" do
+      let(:bike) { super().with(e_bike_class: 3, throttle: true, stock_throttle: false, throttle_mph: 28, optional_classes: {3 => "throttle"}) }
+
+      it "doesn't name a class" do
+        expect(component).to have_css("[role='status']", text: "Your Trek Verve+ 2 is legal to ride in Alaska as an e-bike, without its optional throttle.")
+      end
+    end
+  end
+
   context "with an e-moto" do
     let(:bike) do
       super().with(e_bike_class: nil, e_vehicle_classifications: ["evc/us/ca/off_highway_electric_motorcycle"], watts: 12_500,
@@ -94,7 +114,7 @@ RSpec.describe Pages::EbikeRules::Results::Component, type: :component do
 
     it "bullets its top rules, with no citation, and collapses the rest to a card of its own, by category" do
       status = component.css("[role='status'] > div").first
-      expect(status.css("> ul").first.css("li").map { it.text.strip }).to eq ["It isn't a Class 1, 2 or 3 e-bike. In California, it falls under Off-Highway Electric Motorcycle."]
+      expect(status.css("> ul").first.css("li").map { it.text.strip }).to eq ["In California, it falls under Off-Highway Electric Motorcycle."]
       top_rules = status.css("> ul.tw\\:list-disc > li")
       expect(top_rules.map { it.text.strip }).to match [a_string_starting_with("Identified with a California OHV Green Sticker"),
         a_string_starting_with("Ridden only in designated OHV areas"), a_string_starting_with("No driver's license needed")]

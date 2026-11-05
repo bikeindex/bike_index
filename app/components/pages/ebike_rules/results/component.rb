@@ -11,7 +11,7 @@ module Pages
           gray: {classes: "tw:bg-gray-50 tw:border-gray-300", icon: :unknown}
         }.freeze
         EYEBROW_CLASSES = "tw:text-xs tw:font-bold tw:tracking-[.08em] tw:text-gray-600 tw:uppercase tw:dark:text-gray-400"
-        OUT_OF_CLASS_NOTES = %i[class_3_speed_with_throttle throttle_with_class_3_assist].freeze
+        OUT_OF_CLASS_NOTES = %i[not_classified class_3_speed_with_throttle throttle_with_class_3_assist].freeze
         NAME_CLASSES = "tw:mt-1 tw:font-header tw:text-[clamp(22px,3vw,26px)] tw:leading-tight tw:font-extrabold"
 
         def initialize(lookup:)
@@ -50,7 +50,9 @@ module Pages
         end
 
         def green_headline(name, state)
-          if optional_clause.present?
+          if @law[:classes].none?
+            translation(".green_headline_no_classes", name:, state:)
+          elsif optional_clause.present?
             translation(".green_headline_optional", name:, state:, n: class_numbers, optional: optional_clause)
           else
             translation(".green_headline", name:, state:, n: class_numbers)
@@ -59,7 +61,9 @@ module Pages
 
         def yellow_headline(name, state)
           if without_throttle?
-            translation(".yellow_headline_without_throttle", name:, state:, n: class_numbers)
+            @law[:classes].none? ? translation(".yellow_headline_no_classes_without_throttle", name:, state:) : translation(".yellow_headline_without_throttle", name:, state:, n: class_numbers)
+          elsif @bike.e_bike_class && @law[:classes].none?
+            translation(".yellow_headline_no_classes", name:, state:, count: rule_count(:check))
           elsif @bike.e_bike_class && optional_clause.present?
             translation(".yellow_headline_optional", name:, state:, n: class_numbers, optional: optional_clause, count: rule_count(:check))
           elsif @bike.e_bike_class
@@ -108,7 +112,7 @@ module Pages
         # where it would put the bike in no class
         def optional_clause
           @optional_clause ||= @bike.optional_classes.filter_map { |n, mode|
-            next unless @law[:classes].none? || @law[:classes].include?(n)
+            next unless @law[:classes].include?(n)
             next if mode == "throttle" && @bike.optionally_out_of_class_under?(@law)
 
             (mode == "throttle") ? translation(".as_class_with_optional_throttle", n:) : translation(".as_class_with_optional_upgrade", n:)
@@ -178,7 +182,7 @@ module Pages
 
         def rule_count(status) = @rules.count { it[:status] == status }
 
-        # A Class 3's assist with a throttle is why its classes aren't permitted, which their note already says
+        # The headline already says it's in no class, and the classes' note why a Class 3's assist with a throttle isn't permitted
         def notes(status) = @rules.select { it[:status] == status && OUT_OF_CLASS_NOTES.exclude?(it[:note]) }.map { safe_join([note(it), "."]) }
 
         def subline

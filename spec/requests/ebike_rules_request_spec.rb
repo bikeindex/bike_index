@@ -205,7 +205,7 @@ RSpec.describe EbikeRulesController, type: :request do
     it "checks a bike against Alaska's e-bike law" do
       get "/ebike-rules/US/AK", params: {vehicle_models: "m/specialized/2025/haul_st"}
 
-      expect(page).to have_css("[role='status']", text: "Your Specialized Haul ST is legal to ride in Alaska")
+      expect(page).to have_css("[role='status']", text: "Your Specialized Haul ST is legal to ride in Alaska as an e-bike.")
       expect(page.find("#state-ak > h3")).to have_no_text("In review")
       expect(meta("description")).to_not include("still reviewing")
     end
