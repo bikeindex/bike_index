@@ -5,9 +5,13 @@ module CallbackJobs
     sidekiq_options queue: "med_priority"
 
     def perform(registration_sequence_id)
-      organization_id = RegistrationSequence.with_deleted.find_by(id: registration_sequence_id)&.organization_id
+      registration_sequence = RegistrationSequence.with_deleted.find_by(id: registration_sequence_id)
+      return if registration_sequence.blank?
+
+      # nil for the template, which owns its own pending acknowledgments.
       # An active sequence still has rules to agree to, so they're still owed
-      return if organization_id.blank? || RegistrationSequence.active.where(organization_id:).exists?
+      organization_id = registration_sequence.organization_id
+      return if RegistrationSequence.active.where(organization_id:).exists?
 
       RegistrationSequenceAcknowledgment.abandon_pending(organization_id)
     end

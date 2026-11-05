@@ -352,7 +352,7 @@ RSpec.describe OrganizationExportJob, type: :job do
           let(:acknowledged_at) { Time.current - 1.day }
           let!(:registration_sequence_acknowledgment) do
             FactoryBot.create(:registration_sequence_acknowledgment, bike:, acknowledged_at:,
-              registration_sequence: FactoryBot.create(:registration_sequence_active, organization:))
+              registration_sequence: FactoryBot.create(:registration_sequence_template_active))
           end
           let(:bike_row_hash) do
             {

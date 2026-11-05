@@ -24,7 +24,7 @@ module Pages
             @page.registration_sequence
           end
 
-          # What the editor promised - "Template" when admin previews the template
+          # What the editor promised
           def badge_name
             sequence&.badge_name
           end
