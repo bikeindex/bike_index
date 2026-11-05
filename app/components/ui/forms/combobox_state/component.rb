@@ -37,7 +37,7 @@ module UI
         def option(state)
           abbreviation = "(#{state[:abbr]})"
           {display: "#{state[:name]} #{abbreviation}", value: @ids ? state.fetch(:id) : state.fetch(:value, state[:abbr]),
-           content: safe_join([state[:name], " ", tag.span(abbreviation, class: "tw:text-gray-500")])}
+           content: safe_join([state[:name], " ", tag.span(abbreviation, class: "tw:text-gray-500 tw:dark:text-gray-300")])}
         end
       end
     end

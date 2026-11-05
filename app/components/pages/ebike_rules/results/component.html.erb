@@ -4,7 +4,7 @@
 >
   <div
     role="status"
-    class="tw:flex tw:gap-4 tw:rounded-lg tw:border-2 tw:px-[clamp(16px,3vw,28px)] tw:py-5 tw:dark:bg-gray-800 <%= VERDICTS[@verdict][:classes] %>"
+    class="tw:flex tw:gap-4 tw:rounded-lg tw:border-2 tw:px-[clamp(16px,3vw,28px)] tw:py-5 <%= VERDICTS[@verdict][:classes] %>"
   >
     <%= render(Pages::EbikeRules::StatusIcon::Component.new(status: VERDICTS[@verdict][:icon], size: :lg)) %>
 
@@ -68,7 +68,7 @@
           class="
             tw:h-[clamp(200px,26vw,260px)] tw:overflow-hidden
             tw:rounded-t-lg tw:border-b tw:border-gray-200 tw:bg-gray-50
-            tw:dark:border-gray-700 tw:dark:bg-gray-900
+            tw:dark:border-gray-700 tw:dark:bg-gray-300
           "
         >
           <%= image_tag @bike.photo_url, alt: bike_name, class: "tw:size-full tw:object-contain" %>

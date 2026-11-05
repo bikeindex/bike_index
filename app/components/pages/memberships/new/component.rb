@@ -69,7 +69,7 @@ module Pages
             title: translation(".free_registration_title"), body: translation(".free_registration_body")},
             {icon: "icons/megaphone.svg", circle: "tw:bg-red-600",
              title: translation(".free_alerts_title"), body: translation(".free_alerts_body")},
-            {icon: "icons/handshake.svg", circle: "tw:bg-slate-900",
+            {icon: "icons/handshake.svg", circle: "tw:bg-slate-900 tw:dark:bg-slate-600",
              title: translation(".free_partners_title"), body: translation(".free_partners_body")}]
         end
 

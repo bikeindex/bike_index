@@ -15,12 +15,12 @@ module UI
         "tw:[&_th]:px-4 tw:[&_th]:py-2.5 tw:[&_th]:text-2xs tw:[&_th]:font-normal tw:[&_th]:text-gray-400 tw:[&_th]:uppercase",
         # twlink's blue gives way to the header's gray, underlined like twlink-underlined
         "tw:[&_th_a]:text-inherit tw:[&_th_a]:underline tw:[&_th_a:hover]:decoration-2 tw:[&_th_a[data-active]]:decoration-2",
-        "tw:[&_td]:bg-white tw:[&_td]:px-4 tw:[&_td]:py-2.5 tw:[&_td]:text-sm tw:[&_tr:hover_td]:bg-amber-50",
+        "tw:[&_td]:bg-white tw:[&_td]:px-4 tw:[&_td]:py-2.5 tw:[&_td]:text-sm tw:[&_tr:hover_td]:bg-yellow-50",
         # Whatever follows the table draws the line under it
         "tw:[&_tbody_tr:last-child_td]:border-b-0",
         "tw:dark:[&_th]:border-gray-700 tw:dark:[&_th]:bg-gray-800 tw:dark:[&_td]:bg-gray-900",
         # Opaque, or the cells scrolling under the frozen column show through it
-        "tw:dark:[&_tr:hover_td]:bg-[color-mix(in_oklab,var(--tw-color-amber-950)_40%,var(--tw-color-gray-900))]"
+        "tw:dark:[&_tr:hover_td]:bg-[color-mix(in_oklab,var(--tw-color-yellow-950)_40%,var(--tw-color-gray-900))]"
       ].join(" ").freeze
 
       # The page's background in dark as well as light, so only the headers and settings stand out.

@@ -167,7 +167,7 @@
 
       &.get {
         :is(.heading, .content) {
-          @apply tw:dark:bg-blue-950 tw:dark:border-blue-900;
+          @apply tw:dark:bg-blue-500/25 tw:dark:border-blue-500/50;
         }
 
         :is(.options a, .content h4, .sandbox_header a) {
@@ -177,7 +177,7 @@
 
       &.post {
         :is(.heading, .content) {
-          @apply tw:dark:bg-green-950 tw:dark:border-green-900;
+          @apply tw:dark:bg-green-500/25 tw:dark:border-green-500/50;
         }
 
         :is(.options a, .content h4, .sandbox_header a) {
@@ -187,7 +187,7 @@
 
       &.put {
         :is(.heading, .content) {
-          @apply tw:dark:bg-yellow-950 tw:dark:border-yellow-900;
+          @apply tw:dark:bg-yellow-300/25 tw:dark:border-yellow-300/50;
         }
 
         :is(.options a, .content h4, .sandbox_header a) {
@@ -197,7 +197,7 @@
 
       &.delete {
         :is(.heading, .content) {
-          @apply tw:dark:bg-red-950 tw:dark:border-red-900;
+          @apply tw:dark:bg-red-500/25 tw:dark:border-red-500/50;
         }
 
         :is(.options a, .content h4, .sandbox_header a) {
