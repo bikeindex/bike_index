@@ -3880,18 +3880,6 @@ nl:
         re_send: opnieuw versturen
         motorized: e-voertuig?
         vehicle_type: Type
-      list:
-        added: Toegevoegd
-        bike: Fiets
-        color: Kleur
-        link: Link
-        manufacturer: Fabrikant
-        model: Model
-        num_bikes_registered_html: "<strong>%{num_bikes}</strong> geregistreerd"
-        sent_to: Verzonden naar
-        sent_to_a_new_owner: verzonden naar een nieuwe eigenaar
-        sticker: Sticker
-        stickers: stickers
       recoveries:
         description: Beschrijving
         mfg_model_color_html: fabrikant, model, <span class="less-strong">kleur</span>
@@ -4203,11 +4191,11 @@ nl:
         find_an_impound_record: Zoek een inbeslagnameverslag
         search_impound_records: Zoek in de inbeslagnamegegevens.
     registrations:
-      search:
+      index:
+        find_a_registration: Zoek een registratie
         search_all_email_disabled: Je kunt de registraties van je organisatie alleen
           doorzoeken op e-mailadres of naam van de eigenaar.
         search_registrations: Zoek registraties
-        find_a_registration: Zoek een registratie
   organized_mailer:
     custom_message:
       subject: "%{org_name} - de locatie van uw %{mnfg_name}"
