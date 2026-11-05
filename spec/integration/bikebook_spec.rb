@@ -2247,6 +2247,10 @@ RSpec.describe "BikeBook", :js, type: :system do
     find("select[aria-label='Size of Level 4 ADV']").select("Extra Large")
     expect(page).to have_field("Rider size", with: "5", wait: 10)
     expect(page).to have_no_css("#similar-m-aventon-2026-pace_5_rec_step_through").and have_css("#similar-m-aventon-2026-soltera_3_adv")
+    # and rescored in place for that size
+    find_field("Tire clearance").send_keys(:home)
+    expect(page).to have_css("[aria-label='Similar models to compare'] li:first-child #similar-m-aventon-2025-aventure_m")
+    expect(page).to have_no_css("#similar-m-aventon-2026-pace_5_rec_step_through")
     # the other propulsion's where they're included, without its e-bike fields counting against them, a frame only
     # without same_configuration, other wheel sizes only without same_wheels,
     # more tire clearance nearer than as much less but not than less that's nearer, a frame's weight not held against it,

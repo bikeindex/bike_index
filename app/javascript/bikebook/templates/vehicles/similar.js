@@ -75,7 +75,7 @@ export const similarAdjustments = ({ vehicle, type, complete, current, settings,
 
   const configuration = complete ? `Only complete ${type}s` : 'Only frames & forks'
   return html`<section aria-label="Comparison algorithm" class="tw:hidden tw:similar-open:block" data-controller="bikebook--similar ui--collapse"
-    data-ui--collapse-param-value="adjust" data-bikebook--similar-vehicle-value=${vehicle} data-action="input->bikebook--similar#change">${collapse({
+    data-ui--collapse-param-value="adjust" data-bikebook--similar-vehicle-value=${vehicle} data-bikebook--similar-size-value=${settings.size} data-action="input->bikebook--similar#change">${collapse({
       content: 'Adjust comparison algorithm', chevron: true, color: 'link', size: 'sm', htmlClass: 'tw:text-sm'
     })}<div data-ui--collapse-target="content" class="tw:hidden"><div class="tw:mt-4">${
       controls(groups, settings, type, configuration, current)}</div></div></section>`
