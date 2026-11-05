@@ -68,7 +68,7 @@ module UI
           when :error
             "#{text_color_classes} tw:bg-red-50 tw:dark:bg-red-950 tw:border-red-300 tw:dark:border-red-800"
           when :warning
-            "#{text_color_classes} tw:bg-yellow-50 tw:dark:bg-yellow-950 tw:border-yellow-300 tw:dark:border-yellow-800"
+            "#{text_color_classes} tw:bg-yellow-50 tw:dark:bg-yellow-300/25 tw:border-yellow-300 tw:dark:border-yellow-300/50"
           when :success
             "#{text_color_classes} tw:bg-green-50 tw:dark:bg-green-950 tw:border-green-300 tw:dark:border-green-800"
           when :purple
@@ -91,7 +91,7 @@ module UI
           when :error
             "tw:bg-red-50 tw:focus:ring-red-400 tw:hover:bg-red-200 tw:dark:bg-red-950 tw:dark:hover:bg-red-900"
           when :warning
-            "tw:bg-yellow-50 tw:focus:ring-yellow-400 tw:hover:bg-yellow-200 tw:dark:bg-yellow-950 tw:dark:hover:bg-yellow-900"
+            "tw:bg-yellow-50 tw:focus:ring-yellow-400 tw:hover:bg-yellow-200 tw:dark:bg-transparent tw:dark:hover:bg-yellow-300/25"
           when :success
             "tw:bg-green-50 tw:focus:ring-green-400 tw:hover:bg-green-200 tw:dark:bg-green-950 tw:dark:hover:bg-green-900"
           when :purple

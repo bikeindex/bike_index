@@ -17,7 +17,7 @@ module UI
       COLORS = {
         notice: "tw:bg-blue-50 tw:text-blue-700 tw:border-transparent tw:dark:bg-blue-400/15 tw:dark:text-blue-200",
         error: "tw:bg-red-50 tw:text-red-700 tw:border-transparent tw:dark:bg-red-400/15 tw:dark:text-red-200",
-        warning: "tw:bg-amber-50 tw:text-amber-700 tw:border-transparent tw:dark:bg-amber-400/15 tw:dark:text-amber-200",
+        warning: "tw:bg-yellow-50 tw:text-yellow-800 tw:border-transparent tw:dark:bg-yellow-300/25 tw:dark:text-yellow-200",
         success: "tw:bg-green-50 tw:text-green-700 tw:border-transparent tw:dark:bg-green-400/15 tw:dark:text-green-200",
         # Special badge classes:
         cyan: "tw:bg-cyan-50 tw:text-cyan-700 tw:border-transparent tw:dark:bg-cyan-400/15 tw:dark:text-cyan-200",

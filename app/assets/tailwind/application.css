@@ -128,6 +128,20 @@
   --color-purple-900: #2c244b;
   --color-purple-950: #1c162f;
 
+  /* Replaces Tailwind's default `yellow`, whose dark end reads brown. 300-500 are
+   * UI::Button's yellow and its hover and active; 800-950 are khaki on purpose. */
+  --color-yellow-50: #fff6da;
+  --color-yellow-100: #ffefbd;
+  --color-yellow-200: #ffe590;
+  --color-yellow-300: #ffd660;
+  --color-yellow-400: #ffcc33;
+  --color-yellow-500: #f5bc1b;
+  --color-yellow-600: #c99a12;
+  --color-yellow-700: #9c7a14;
+  --color-yellow-800: #776018;
+  --color-yellow-900: #5a4b1c;
+  --color-yellow-950: #3f3720;
+
   /* The dev-info marking, the legacy stylesheets' $dev-color */
   --color-dev: #9400d3;
 }
