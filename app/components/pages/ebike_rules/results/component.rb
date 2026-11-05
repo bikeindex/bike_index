@@ -10,9 +10,6 @@ module Pages
           red: {classes: "tw:bg-[#fdecec] tw:border-[#cc0000] tw:dark:border-red-500 tw:dark:bg-red-950", icon: :fail},
           gray: {classes: "tw:bg-gray-50 tw:border-gray-300 tw:dark:border-gray-600 tw:dark:bg-gray-800", icon: :unknown}
         }.freeze
-        REGISTER_DARK_CLASSES = "tw:dark:border-yellow-600 tw:dark:bg-yellow-600 tw:dark:text-slate-950 " \
-          "tw:dark:not-disabled:not-aria-disabled:hover:border-yellow-500 tw:dark:not-disabled:not-aria-disabled:hover:bg-yellow-500 " \
-          "tw:dark:is-active:border-yellow-500 tw:dark:is-active:bg-yellow-500"
         EYEBROW_CLASSES = "tw:text-xs tw:font-bold tw:tracking-[.08em] tw:text-gray-600 tw:uppercase tw:dark:text-gray-400"
         OUT_OF_CLASS_NOTES = %i[class_3_speed_with_throttle throttle_with_class_3_assist].freeze
         NAME_CLASSES = "tw:mt-1 tw:font-header tw:text-[clamp(22px,3vw,26px)] tw:leading-tight tw:font-extrabold"
