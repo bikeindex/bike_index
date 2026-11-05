@@ -18,7 +18,7 @@ module BikeDuplicatesServices
     STANDARD_DESIGNATIONS = ["ISO 4210", "ISO 8098", "ISO 6742", "EN 14764", "EN 14765", "EN 14766",
       "EN 14781", "EN 14872", "EN 15194", "EN 15532", "EN 17406", "EN 17128", "EN 14619", "EN 1888",
       "EN 12183", "EN 12184", "DIN 79100", "GB 3565", "GB 17761", "JIS D 9301", "CPSC", "CFR 1512"]
-      .to_h { [it, SerialNormalizer.no_space(SerialNormalizer.normalized_and_corrected(it))] }.freeze
+      .to_h { [it, it.delete(" ")] }.freeze
     # Component part numbers, which identify a model of part rather than one bicycle
     PART_NUMBER_SERIALS = {
       "170 FC-TY301" => "Shimano Tourney FC-TY301 crankset, 170 mm",
@@ -65,8 +65,12 @@ module BikeDuplicatesServices
 
     def review_contact_sql(column) = "(#{column} ~ '#{REVIEW_CONTACT_DOMAIN_PATTERN}')"
 
-    def cues(serials:, record_count:, contact_count:, test_count:, review_contact_count:, single_contact:, model_match_count: 0, manufacturer_names: {}, shop_default_propulsion: false)
-      marking = standard_marking(serials)
+    # Markings match the serial as entered, since normalizing turns ISO designations into digits
+    # that ordinary serials contain ("ISO 4210" becomes 1504210)
+    def simple_serial(serial) = serial.to_s.upcase.gsub(/[^A-Z0-9]/, "")
+
+    def cues(serials:, entered_serials:, record_count:, contact_count:, test_count:, review_contact_count:, single_contact:, model_match_count: 0, manufacturer_names: {}, shop_default_propulsion: false)
+      marking = standard_marking(entered_serials)
       not_serial = Array(serials).filter_map { not_a_serial(it, manufacturer_names:) }.first
       code_reasons = [
         ("repeated on #{record_count} live registrations" if record_count >= Finder::LARGE_GROUP_MINIMUM),
@@ -106,7 +110,8 @@ module BikeDuplicatesServices
     end
 
     def group_cues(group)
-      cues(serials: [group["serial"]], record_count: group["record_count"], contact_count: group["email_count"],
+      cues(serials: [group["serial"]], entered_serials: group["simple_serials"],
+        record_count: group["record_count"], contact_count: group["email_count"],
         test_count: group["test_count"], review_contact_count: group["review_contact_count"],
         manufacturer_names: group_manufacturer_names(group),
         single_contact: single_contact?(group))
@@ -136,8 +141,8 @@ module BikeDuplicatesServices
     #
 
     def standard_marking(serials)
-      normalized = Array(serials).compact.map { SerialNormalizer.no_space(it.to_s.upcase) }
-      STANDARD_DESIGNATIONS.find { |_designation, marking| normalized.any? { it.include?(marking) } }&.first
+      simple = Array(serials).map { simple_serial(it) }
+      STANDARD_DESIGNATIONS.find { |_designation, marking| simple.any? { it.include?(marking) } }&.first
     end
 
     def calculated_manufacturer_name_serials
@@ -152,6 +157,6 @@ module BikeDuplicatesServices
       (filter == "none") ? (keys - ["single_contact"]).none? : keys.include?(filter)
     end
 
-    conceal :calculated_manufacturer_name_serials, :matches_filter?, :standard_marking
+    conceal :calculated_manufacturer_name_serials, :matches_filter?, :simple_serial, :standard_marking
   end
 end

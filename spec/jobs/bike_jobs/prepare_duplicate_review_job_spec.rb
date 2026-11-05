@@ -7,7 +7,7 @@ RSpec.describe BikeJobs::PrepareDuplicateReviewJob, type: :job do
 
   it "stores the groups and their cue keys for the dashboard, then releases its claim" do
     manufacturer = FactoryBot.create(:manufacturer)
-    bikes = Array.new(2) { FactoryBot.create(:bike, :with_ownership, manufacturer:, serial_number: "EN 14764 A1") }
+    bikes = ["EN 14764 AO", "EN-14764-A0"].map { FactoryBot.create(:bike, :with_ownership, manufacturer:, serial_number: it) }
     expect(finder.fetch_group_snapshot("unresolved")).to be_nil
     claim = RedisPool.conn { it.get(finder::PREPARING_KEY) }
     expect(described_class.jobs.map { it["args"] }).to eq [[claim]]
@@ -20,6 +20,7 @@ RSpec.describe BikeJobs::PrepareDuplicateReviewJob, type: :job do
     group = snapshot[:groups].sole
     expect(group["bike_ids"]).to match_array(bikes.map(&:id))
     expect(group["first_at"]).to eq bikes.first.created_at.to_i
+    expect(group["simple_serials"]).to match_array %w[EN14764AO EN14764A0]
     expect(group["cue_keys"]).to eq ["standard_marking"]
     expect(RedisPool.conn { it.get(finder::PREPARING_KEY) }).to be_nil
   end

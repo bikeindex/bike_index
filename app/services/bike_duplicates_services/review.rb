@@ -244,7 +244,7 @@ module BikeDuplicatesServices
     def build_cues
       emails = initial_emails
       accounts = bikes.filter_map { initial_ownership(it)&.user_id }
-      BikeDuplicatesServices::Cues.cues(serials: bikes.map(&:serial_normalized_no_space).uniq,
+      BikeDuplicatesServices::Cues.cues(serials: bikes.map(&:serial_normalized_no_space).uniq, entered_serials: bikes.map(&:serial_number),
         record_count: bikes.size, contact_count: emails.uniq.size, test_count:,
         review_contact_count:, model_match_count:, manufacturer_names:, shop_default_propulsion: shop_default_propulsion?,
         single_contact: [emails, accounts].any? { it.size == bikes.size && it.uniq.size == 1 })
