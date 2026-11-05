@@ -11,7 +11,7 @@ module UI
         nil => BASE_CLASSES,
         :small => "#{BASE_CLASSES} tw:shadow-sm",
         :large => "#{BASE_CLASSES} tw:shadow-[0_10px_30px_rgba(44,62,80,.16)]",
-        :black => "#{BACKGROUND_CLASSES} tw:border-3 tw:border-[#111] tw:shadow-[4px_4px_0_#111] tw:dark:border-gray-300 tw:dark:shadow-[4px_4px_0_var(--tw-color-gray-300)]"
+        :black => "#{BACKGROUND_CLASSES} tw:border-3 tw:border-[#111] tw:shadow-[4px_4px_0_#111] tw:dark:border-gray-300 tw:dark:shadow-gray-300"
       }.freeze
       # A divided card's rows bring their own padding, so it has none of its own
       DIVIDED_CLASSES = "tw:rounded-xl tw:divide-y tw:divide-gray-200 tw:dark:divide-gray-700"

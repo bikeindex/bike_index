@@ -1,4 +1,4 @@
-<%= render(UI::CardTable::Component.new(records: rows, render_sortable: @editable, sort_state: @sort_state, **card_options)) do |table| %>
+<%= render(UI::TableInCard::Component.new(records: rows, render_sortable: @editable, sort_state: @sort_state, **card_options)) do |table| %>
   <% if @editable %>
     <% table.with_description do %>
       Edit the story, name and location to match our guidelines, then display.

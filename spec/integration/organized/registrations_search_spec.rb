@@ -4,7 +4,7 @@ require "rails_helper"
 
 RSpec.describe "Organized registrations search", :js, type: :system do
   let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs:, created_at: 5.years.ago) }
-  let(:enabled_feature_slugs) { %w[bike_search csv_exports impound_bikes registration_notes show_bulk_import] }
+  let(:enabled_feature_slugs) { %w[csv_exports impound_bikes registration_notes show_bulk_import] }
   let(:user) { FactoryBot.create(:organization_admin, organization:) }
   let(:bikes_path) { "/o/#{organization.to_param}/registrations" }
   let(:search_all_email_disabled) { "You can only search your organization's registrations with owner email or name" }
@@ -417,6 +417,13 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     Timeout.timeout(10) { sleep 0.05 until held.any? }
     expect(chart_busy?).to be true
     expect(asked).to eq(["organized_bikes_results_frame"])
+    # The table hides for the spinner, which isn't the card's table getting narrower
+    expect(page).to have_no_css("turbo-frame#organized_bikes_results_frame table", wait: 10)
+    table_bleed = page.evaluate_script(<<~JS)
+      new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(() =>
+        resolve(document.querySelector(".search-results-card").dataset.tableBleed))))
+    JS
+    expect(table_bleed).to eq "true"
 
     # Turned away, the chart stops spinning and stays on the search it's answering
     held.shift.fulfill(status: 429, contentType: "text/plain", body: "Slow down")
@@ -443,11 +450,14 @@ RSpec.describe "Organized registrations search", :js, type: :system do
   it "moves the result view through the address bar, and back from localStorage" do
     visit bikes_path
     expect(page).to have_css("turbo-frame#organized_bikes_results_frame table", wait: 10)
+    # Only a table wider than the card takes it to the page's edges
+    expect(page).to have_css(".search-results-card[data-table-bleed='true']")
 
     click_link "Cards"
     expect(page).to have_current_path(/search_result_view=cards/, wait: 10)
     expect(page).to have_css("a[data-active='true']", text: "Cards", wait: 10)
     expect(page).to have_no_css("turbo-frame#organized_bikes_results_frame table")
+    expect(page).to have_css(".search-results-card[data-table-bleed='false']")
 
     fill_in "search_email", with: "alice@example.com"
     click_button "Search registrations"
@@ -471,7 +481,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
   end
 
   context "with stolen and impounded bikes" do
-    let(:enabled_feature_slugs) { %w[bike_search impound_bikes] }
+    let(:enabled_feature_slugs) { %w[impound_bikes] }
     let!(:stolen_bike) { FactoryBot.create(:bike_organized, :with_stolen_record, creation_organization: organization) }
     let!(:impounded_bike) { FactoryBot.create(:bike_organized, :impounded, creation_organization: organization) }
 
@@ -652,7 +662,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     end
 
     context "with bike_stickers enabled" do
-      let(:enabled_feature_slugs) { %w[bike_search csv_exports impound_bikes registration_notes bike_stickers] }
+      let(:enabled_feature_slugs) { %w[csv_exports impound_bikes registration_notes bike_stickers] }
       let(:claimed_bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
       let!(:sticker_a) { FactoryBot.create(:bike_sticker, code: "STKR100", organization:) }
       let!(:sticker_b) { FactoryBot.create(:bike_sticker_claimed, code: "STKR200", organization:, bike: claimed_bike) }
@@ -708,7 +718,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
   end
 
   context "with avery_export enabled" do
-    let(:enabled_feature_slugs) { %w[bike_search avery_export reg_address bike_stickers csv_exports] }
+    let(:enabled_feature_slugs) { %w[avery_export reg_address bike_stickers csv_exports] }
     include_context :geocoder_stubbed_bounding_box
     let!(:avery_bike) do
       bike = FactoryBot.create(:bike_organized, :with_address_record, creation_organization: organization)

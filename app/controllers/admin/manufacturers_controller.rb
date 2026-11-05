@@ -74,7 +74,7 @@ module Admin
     protected
 
     def sortable_columns
-      %w[name created_at frame_maker priority motorized_only]
+      %w[name created_at frame_maker priority motorized_only close_year]
     end
 
     def default_direction

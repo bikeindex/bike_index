@@ -3,7 +3,7 @@
 require "rails_helper"
 require "ostruct"
 
-RSpec.describe UI::CardTable::Component, type: :component do
+RSpec.describe UI::TableInCard::Component, type: :component do
   let(:records) { [OpenStruct.new(name: "Alice", email: "alice@example.com")] }
   let(:options) { {records:} }
   let(:component) do

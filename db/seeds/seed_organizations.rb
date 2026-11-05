@@ -33,7 +33,6 @@ feature_name_and_slugs = [
   {name: "Organization Views: Bulk Import stolen", feature_slugs: ["show_bulk_import_stolen"]},
   {name: "Organization Views: Custom emails", feature_slugs: ["customize_emails"]},
   {name: "Organization Views: Partially registered bikes", feature_slugs: ["show_partial_registrations"]},
-  {name: "Organization Views: Search bikes", feature_slugs: ["bike_search"]},
   {name: "Parking Notifications", feature_slugs: ["parking_notifications", "impound_bikes"]},
   {name: "Passwordless users", feature_slugs: ["passwordless_users", "user_role_for_user_email_domain"]},
   {name: "Product review", feature_slugs: []},
@@ -56,7 +55,6 @@ feature_name_and_slugs = [
 brakebills_feature_ids = []
 official_manufacturer_feature_id = nil
 law_enforcement_feature_id = nil
-bike_search_feature_id = nil
 
 brakebills_skipped_feature_names = ["Avery Export", "Passwordless users", "Single Sign On (SSO)", "Skip ownership email"]
 
@@ -70,7 +68,6 @@ feature_name_and_slugs.each do |attrs|
     official_manufacturer_feature_id = org_feature.id
   else
     law_enforcement_feature_id = org_feature.id if attrs[:name] == "Law Enforcement functionality"
-    bike_search_feature_id = org_feature.id if attrs[:name] == "Organization Views: Search bikes"
     brakebills_feature_ids << org_feature.id
   end
 end
@@ -132,12 +129,11 @@ recovery_team = Organization.find_by_name("Bike Recovery Team") ||
 seed_organization_member(organization: recovery_team, name: "Recovery Team Member", email: "recovery@bikeindex.org")
 seed_invoice(organization: recovery_team, feature_ids: [law_enforcement_feature_id], subscription_end_at: 1.year.from_now)
 
-# --- City of Palo Alto: municipality with bike search ---
+# --- City of Palo Alto: municipality with no invoice ---
 SeedHelpers.tick
 palo_alto = Organization.find_by_name("City of Palo Alto") ||
   Organization.create!(name: "City of Palo Alto", short_name: "Palo Alto", kind: :municipality)
 seed_organization_member(organization: palo_alto, name: "Palo Alto Staffer", email: "paloalto@bikeindex.org")
-seed_invoice(organization: palo_alto, feature_ids: [bike_search_feature_id], subscription_end_at: 1.year.from_now)
 
 seed_organization_member(organization: Organization.example, email: "example_user@bikeindex.org")
 

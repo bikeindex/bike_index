@@ -73,3 +73,4 @@ if (honeybadgerApiKey) {
 
 document.addEventListener('DOMContentLoaded', localizeTime)
 document.addEventListener('turbo:render', localizeTime)
+document.addEventListener('turbo:frame-render', localizeTime)
