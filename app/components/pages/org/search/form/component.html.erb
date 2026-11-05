@@ -5,10 +5,9 @@
   <%# search--form only needs to hold the form; the card is the outer element %>
   <div data-controller="<%= turbo? ? "search--form" : "" %>">
     <%= form_with(url: @target_search_path,
-      builder: BikeIndexFormBuilder,
       method: :get,
       id: "Search_Form",
-      data: form_data) do |f| %>
+      data: form_data) do %>
       <% if turbo? %>
         <%= hidden_field_tag :search_no_js, true %>
       <% end %>
@@ -106,7 +105,7 @@
       <%= content %>
 
       <%= render partial: "/shared/hidden_search_fields", locals: {kind: "organized_bike_search",
-        skip_organization: true, skip_period: @settings_and_filters_component.present?} %>
+        skip_organization: true, skip_period_and_status: @settings_and_filters_component.present?} %>
 
       <% unless @settings_and_filters_component %>
         <%= hidden_field_tag :search_stickers, @interpreted_params[:search_stickers] %>

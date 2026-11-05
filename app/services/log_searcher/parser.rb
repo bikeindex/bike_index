@@ -36,7 +36,7 @@ module LogSearcher
     FILTERED_PARAMS = %w[access_token page].freeze
     NON_QUERY_ITEMS = (
       FILTERED_PARAMS +
-      %w[stolenness location distance locale organization_id organization_slug sort sort_direction render_chart utf8]
+      %w[stolenness location distance locale organization_id organization_slug sort direction sort_direction render_chart utf8]
     ).freeze
 
     def parse_log_line(log_line)

@@ -14,7 +14,8 @@ export const ordered = (filters) => ['year', 'price'].reduce((each, name) => {
   return each[min] && each[max] && Number(each[min]) > Number(each[max]) ? { ...each, [min]: each[max], [max]: each[min] } : each
 }, filters)
 
-export const FILTERS = [...LISTS, ...SINGLES, ...RANGES, 'electric', 'jurisdiction', 'sort', 'year_dir', 'price_dir']
+export const NARROWING = [...LISTS, ...SINGLES, ...RANGES, 'electric', 'market_scope', 'jurisdiction']
+export const FILTERS = [...NARROWING, 'sort', 'year_dir', 'price_dir']
 
 // to_query: keys sorted and CGI-escaped, blank values dropped, commas and slashes left readable
 export const toQuery = (params) => {
@@ -23,3 +24,6 @@ export const toQuery = (params) => {
   return Object.keys(params).filter((key) => String(params[key] ?? '').trim() !== '').sort()
     .map((key) => `${cgiEscape(key)}=${cgiEscape(params[key])}`).join('&')
 }
+
+// Whether the page at `url` is of what the comparison adds, the similar models or a frame material
+export const comparing = (url) => url.searchParams.get('similar') === '1' || url.searchParams.get('frame_material')

@@ -57,7 +57,7 @@ module Pages
             {href: "#education", icon: "icons/bolt.svg", color: "tw:bg-purple-500", new: true,
              title: translation(".program_education_title"), body: translation(".program_education_body"),
              link: translation(".program_education_link")},
-            {href: "#recovery", icon: "icons/megaphone.svg", color: "tw:bg-[#cc0000]", number: "02",
+            {href: "#recovery", icon: "icons/megaphone.svg", color: "tw:bg-[#cc0000] tw:dark:bg-red-700", number: "02",
              title: translation(".program_recovery_title"), body: translation(".program_recovery_body"),
              link: translation(".program_recovery_link")}
           ]
@@ -74,8 +74,8 @@ module Pages
 
         def recovery_steps
           [
-            ["tw:bg-[#cc0000]", translation(".recovery_step_1_title"), translation(".recovery_step_1_body")],
-            ["tw:bg-slate-900", translation(".recovery_step_2_title"), translation(".recovery_step_2_body")],
+            ["tw:bg-[#cc0000] tw:dark:bg-red-700", translation(".recovery_step_1_title"), translation(".recovery_step_1_body")],
+            ["tw:bg-slate-900 tw:dark:bg-slate-600", translation(".recovery_step_2_title"), translation(".recovery_step_2_body")],
             ["tw:bg-blue-600", translation(".recovery_step_3_title"), translation(".recovery_step_3_body")]
           ]
         end
@@ -90,7 +90,7 @@ module Pages
 
         def hierarchy_points
           [
-            {icon: "icons/map-pin.svg", color: "tw:bg-slate-900", title: translation(".hierarchy_city_title"), body: translation(".hierarchy_city_body")},
+            {icon: "icons/map-pin.svg", color: "tw:bg-slate-900 tw:dark:bg-slate-600", title: translation(".hierarchy_city_title"), body: translation(".hierarchy_city_body")},
             {icon: "icons/users.svg", color: "tw:bg-purple-500", title: translation(".hierarchy_programs_title"), body: translation(".hierarchy_programs_body")},
             {icon: "icons/bar-chart.svg", color: "tw:bg-blue-600", title: translation(".hierarchy_dashboard_title"), body: translation(".hierarchy_dashboard_body")}
           ]
@@ -113,7 +113,7 @@ module Pages
           [
             {icon: "icons/qr-code.svg", color: "tw:bg-purple-500", title: translation(".field_qr_title"), body: translation(".field_qr_body")},
             {icon: "icons/searcher.svg", color: "tw:bg-blue-600", title: translation(".field_serial_title"), body: translation(".field_serial_body")},
-            {icon: "icons/check.svg", color: "tw:bg-slate-900", title: translation(".field_attestations_title"), body: translation(".field_attestations_body")},
+            {icon: "icons/check.svg", color: "tw:bg-slate-900 tw:dark:bg-slate-600", title: translation(".field_attestations_title"), body: translation(".field_attestations_body")},
             {icon: "icons/bolt.svg", color: "tw:bg-blue-600", title: translation(".field_battery_title"), body: translation(".field_battery_body")}
           ]
         end
@@ -128,7 +128,7 @@ module Pages
 
         def faqs
           [
-            [translation(".faq_checker_question"), translation(".faq_checker_answer")],
+            [translation(".faq_checker_question"), translation(".faq_checker_answer_html", bikebook_link: link_to("BikeBook", bikebook_path, class: "twlink"))],
             [translation(".faq_account_question"), translation(".faq_account_answer")],
             [translation(".faq_rules_question"), translation(".faq_rules_answer")],
             [translation(".faq_cost_question"), translation(".faq_cost_answer")],

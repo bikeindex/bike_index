@@ -3,7 +3,7 @@
 module Pages
   module EbikeRules
     module LawDetails
-      # A state law's restrictions and sources, as BikeBook records them
+      # A state law's restrictions, under a heading for each of its rule_groups, and its sources, as BikeBook records them
       class Component < ApplicationComponent
         def initialize(law:)
           @law = law
@@ -11,8 +11,17 @@ module Pages
 
         private
 
-        # The address without its scheme or www, which the link truncates; its title holds the whole
-        def source_label(url) = url.sub(%r{\Ahttps?://(www\.)?}, "")
+        def rule_sections = EbikeRuleServices::StateLaws.with_rule_groups(@law)[:rule_groups].map { |category, restrictions| [group_heading(category), restrictions] }
+
+        def group_heading(category)
+          case category
+          when "rider_rule" then translation(".rider_rules")
+          when "enforcement" then translation(".enforcement")
+          when "legal_context" then translation(".legal_context")
+          when "seller_rule" then translation(".seller_rules")
+          else translation(".vehicle_definition")
+          end
+        end
 
         # calendar days, which UI::Time would shift into the viewer's time zone
         def day(date) = l(date, format: :long)

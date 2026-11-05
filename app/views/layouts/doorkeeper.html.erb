@@ -26,7 +26,7 @@
     <!--[if IE]>$('body').prepend("<div id='old-browser-warning'><h4>Your browser is out of date!</h4><p>As a result, Bike Index will not function correctly. <a href=\"http://whatbrowser.com\">Learn more here</a>.</p></div>")<![endif]-->
   </head>
 
-  <%= body_tag do %>
+  <%= body_tag(html_class: class_names(body_class, dark: current_user&.dark_mode_preview?)) do %>
     <%= render SharedBlocks::Navbar::Wrapper::Component.new(logo_only: true) %>
 
     <%= render(UI::Alerts::FlashMessage::Component.new(flash:)) %>

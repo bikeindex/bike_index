@@ -1,5 +1,4 @@
 Rails.application.config.dartsass.builds = {
-  "admin.scss" => "admin.css",
   "documentation_v2.scss" => "documentation_v2.css",
   "email.scss" => "email.css",
   "embed_styles.scss" => "embed_styles.css",

@@ -21,7 +21,7 @@
       <% if outside_us %>
         <div class="tw:mt-7 tw:flex tw:flex-col tw:gap-8">
           <% outside_us[:laws].each do |law| %>
-            <%= render(UI::Card::Component.new(shadow: true, additional_classes: "tw:rounded-lg tw:p-6!")) do %>
+            <%= render(UI::Card::Component.new(additional_classes: "tw:p-6!")) do %>
               <%= render(Pages::EbikeRules::LawSummary::Component.new(law:, titled: true)) %>
             <% end %>
           <% end %>
@@ -36,15 +36,95 @@
 
       <div
         class="
-          tw:grid
+          tw:group/class-cards tw:grid
           tw:grid-cols-[repeat(auto-fit,minmax(min(100%,240px),1fr))]
           tw:gap-4
         "
       >
-        <% cards.each do |card| %>
-          <%= render(card) %>
-        <% end %>
+        <%= safe_join(cards.map { render(it) }) %>
       </div>
+
+      <% if state_law || non_e_bike_classifications.any? %>
+        <div
+          class="
+            tw:mt-6 tw:flex tw:flex-wrap tw:justify-between tw:gap-x-6
+            tw:gap-y-2
+          "
+        >
+          <% if state_law %>
+            <div
+              class="tw:contents"
+              data-controller="ui--collapse"
+              data-ui--collapse-param-value="state_rules"
+              data-ui--collapse-group-value="state-rules"
+              data-action="ui--collapse:shown@window->ui--collapse#closeForGroup"
+            >
+              <%= render(UI::Collapse::Component.new(text: translation(".state_rules", state: @place[:name]), chevron: :trailing, color: :link)) %>
+
+              <div
+                class="tw:order-last tw:mt-2 tw:hidden tw:w-full"
+                data-ui--collapse-target="content"
+              >
+                <%= render(UI::Card::Component.new(additional_classes: "tw:p-[clamp(18px,3vw,28px)]!")) do %>
+                  <span class="tw:mb-1 tw:block <%= Pages::EbikeRules::Results::Component::EYEBROW_CLASSES %>"><%= translation(".rules_that_apply", state: @place[:name]) %></span>
+
+                  <h3 class="tw:mb-3 tw:font-header tw:text-xl tw:font-extrabold">
+                    <%= state_law[:name] %>
+                  </h3>
+
+                  <%= render(Pages::EbikeRules::LawDetails::Component.new(law: state_law)) %>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+
+          <% if non_e_bike_classifications.any? %>
+            <div
+              class="tw:contents"
+              data-controller="ui--collapse"
+              data-ui--collapse-param-value="non_e_bike_rules"
+              data-ui--collapse-group-value="state-rules"
+              data-action="ui--collapse:shown@window->ui--collapse#closeForGroup"
+            >
+              <%= render(UI::Collapse::Component.new(text: translation(".non_e_bike_rules", state: @place[:name]), chevron: :trailing, color: :link)) %>
+
+              <div
+                class="tw:order-last tw:mt-2 tw:hidden tw:w-full"
+                data-ui--collapse-target="content"
+              >
+                <%= render(UI::Card::Component.new(additional_classes: "tw:p-[clamp(18px,3vw,28px)]!")) do %>
+                  <div
+                    data-controller="ebike-rules--classification-toggle"
+                    data-ebike-rules--classification-toggle-param-value="non_e_bike_type"
+                  >
+                    <span class="tw:mb-1 tw:block <%= Pages::EbikeRules::Results::Component::EYEBROW_CLASSES %>"><%= translation(".rules_that_apply", state: @place[:name]) %></span>
+
+                    <% if non_e_bike_classifications.many? %>
+                      <div
+                        class="tw:my-3"
+                        data-action="change->ebike-rules--classification-toggle#pick"
+                      >
+                        <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "non_e_bike_type", kind: :toggle, selected: classification_value(non_e_bike_classifications.first),
+                          entries: non_e_bike_classifications.map { {value: classification_value(it), label: ERB::Util.html_escape(it[:name])} })) %>
+                      </div>
+                    <% end %>
+
+                    <% non_e_bike_classifications.each_with_index do |classification, index| %>
+                      <div
+                        class="<%= "tw:hidden" unless index.zero? %>"
+                        data-classification="<%= classification_value(classification) %>"
+                        data-ebike-rules--classification-toggle-target="panel"
+                      >
+                        <%= render(Pages::EbikeRules::LawSummary::Component.new(law: classification, titled: true)) %>
+                      </div>
+                    <% end %>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
     </div>
   </section>
 <% end %>

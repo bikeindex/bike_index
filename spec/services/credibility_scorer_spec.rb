@@ -15,6 +15,18 @@ RSpec.describe CredibilityScorer do
     end
   end
 
+  describe "low?" do
+    it "is true below 31" do
+      expect([30, 31].map { described_class.low?(it) }).to eq([true, false])
+    end
+  end
+
+  describe "color" do
+    it "is red below 31, yellow below 70, green above" do
+      expect([25, 50, 80].map { described_class.color(it) }).to eq(%w[#dc3545 #ffc107 #28a745])
+    end
+  end
+
   describe "badge_value" do
     it "returns the badge_value" do
       expect(subject.badge_value(%i[created_this_month no_creator])).to eq(-20)

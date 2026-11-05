@@ -208,9 +208,6 @@ $(document).ready ->
   $('#has_no_serial').change (e) ->
     updateSerial(e)
 
-  $('#alert-block .close').click ->
-    $(this).closest('.alert').fadeOut('fast')
-
   $('a.optional-form-block').click (e) ->
     e.preventDefault()
     optionalFormUpdate(e)

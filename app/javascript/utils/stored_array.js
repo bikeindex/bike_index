@@ -1,11 +1,11 @@
-/* global localStorage */
+import { storage } from 'utils/storage'
 
 // The array saved under key, or null - clearing anything else saved there
 export function storedArray (key) {
   try {
-    const value = JSON.parse(localStorage.getItem(key))
+    const value = JSON.parse(storage.getItem(key))
     if (value === null || Array.isArray(value)) return value
   } catch {}
-  localStorage.removeItem(key)
+  storage.removeItem(key)
   return null
 }

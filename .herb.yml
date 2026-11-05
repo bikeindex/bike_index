@@ -11,7 +11,9 @@
 # GitHub Repo: https://github.com/marcoroth/herb
 #
 
-version: 0.10.3
+version: 0.11.1
+
+framework: actionview
 
 files:
 #   # Additional patterns beyond the defaults (**.html, **.rhtml, **.html.erb, etc.)
@@ -74,6 +76,9 @@ linter:
     # Every inline <script> would need a nonce, and CSP ignores unsafe_inline once one is
     # present - so turning this on means moving the whole policy to nonces at the same time
     html-require-script-nonce:
+      enabled: false
+    # --fix rewrites every <a href="<%= %>"> in whichever file gets linted next
+    actionview-prefer-link-to-helper:
       enabled: false
 
     #

@@ -1797,13 +1797,11 @@ it:
       you_have_claimed_the_maximum_permitted: Hai richiesto il numero massimo di codici
         bici consentiti.
     show:
-      change_the_bike_sticker_linked_to: Cambiare la bici a cui si collega
       contact_the_owner: Contatta il proprietario
       created_to_record_parking_notification: creato da %{organization} per registrare
         una notifica di parcheggio
       from: da
       in: in
-      is_this_linked_to_incorrect_bike: Questo adesivo è collegato alla bici sbagliata?
       know_something_about_this_bike_type: Sapete qualcosa di questa %{bike_type}?
       link_url: Collegamento
       looking_for_correct_owner: Cerco il proprietario corretto di questa %{bike_type}!
@@ -1813,16 +1811,12 @@ it:
       send_message: Invia il messaggio
       share_it: Condividilo!
       spread_the_word: Diffondi la notizia!
-      switch_to_new_bike_id: Passa a un nuovo codice identificativo della bicicletta
       test_registration: registrazione di test
-      update: Aggiorna
       view_users_other_registrations: Visualizza le altre registrazioni dell'utente
       where_did_you_see_this_bike: Dove hai visto questo %{bike_type}? Se ci contatti
         in merito a un annuncio che hai trovato online, includi il link nel campo
         sottostante.
       write_them_a_message: Scrivigli un messaggio
-      you_scanned_this_sticker_html: È stata eseguita la scansione dell'adesivo <strong>%{pretty_code}</strong>,
-        assegnato a questa %{bike_type}.
       view_public_non_listing: Visualizza la registrazione pubblica
       viewing_listing_preview: Questa è un'anteprima del tuo annuncio di vendita.
         Non è visibile pubblicamente.
@@ -1867,6 +1861,25 @@ it:
     stolen_map:
       unavailable: 'Impossibile caricare la mappa: il browser o il dispositivo in
         uso potrebbero non supportarla.'
+    owner_bike_status_alerts:
+      address: Indirizzo
+      by: Di
+      created: Creato
+      current_notifications:
+        one: "%{count} notifica corrente per questo %{bike_type}!"
+        other: "%{count} notifiche correnti per questo %{bike_type}!"
+      currently_impounded: Il tuo %{bike_type} è attualmente sotto sequestro!
+      have_you_retrieved: Hai recuperato questo %{bike_type}?
+      impounded_by_from_html: Sequestrato %{time} da <strong>%{organization}</strong>
+        a %{address}
+      impounded_by_html: Sequestrato %{time} da <strong>%{organization}</strong>
+      kind: Tipo
+      kind_by_organization_html: "- <em>%{kind}</em> - di <strong>%{organization}</strong>"
+      let_organization_know: Fai sapere %{organization}
+      mark_retrieved: segno recuperato
+      notification: Notifica#
+      notification_number: Notifica n. %{number}
+      was_this_retrieved: È stato recuperato %{bike_type}?
   bikes_edit:
     accessories:
       add_a_component: Aggiungi un componente
@@ -2196,7 +2209,6 @@ it:
           bike_recovered: Bicicletta ritrovata! Grazie!
       resolve_token:
         marked_remaining: "%{bike_type} contrassegnato come rimanente!"
-        marked_retrieved: "%{@bike_type} contrassegnato come recuperato!"
         notification_already_retrieved: Quel %{bike_type} è già stato contrassegnato
           come recuperato!
         notification_impounded: L'oggetto %{bike_type} è stato sequestrato! Contatta
@@ -2204,6 +2216,7 @@ it:
         unable_to_find_graduated_notification: Impossibile trovare la notifica di
           conseguimento del diploma!
         unable_to_find_parking_notification: Impossibile trovare l'avviso di parcheggio!
+        bike_type_marked_retrieved: "%{bike_type} contrassegnato come recuperato!"
       scanned:
         unable_to_find_sticker: 'Impossibile trovare l''etichetta: %{scanned_id}'
       update:
@@ -4048,9 +4061,6 @@ it:
       help_prevent_theft: Aiuta a prevenire il furto di biciclette,
       make_a_donation: fai una donazione.
       the_bike_index_team: Il team di Bike Index
-    embed_layout:
-      error: errore
-      please_fix_the_following: Si prega di correggere quanto segue
     payments_layout:
       be_a_bike_saver: Contribuisci a salvare le biciclette.
       support_bike_index_today: Sostieni Bike Index oggi stesso.
@@ -4417,7 +4427,6 @@ it:
         Index, gratuitamente, in tre semplici passaggi:'
       bike_index_account: Account Bike Index
       confirm_your_email: Conferma il tuo indirizzo email
-      error: errore
       fill_out_the_form_that_will_appear: Compila il modulo che apparirà su questa
         pagina una volta effettuato l'accesso.
       filling_out_this_form_will_create_a_new_org: Compilando questo modulo si creerà
@@ -4428,7 +4437,6 @@ it:
       new_organization: Nuova organizzazione
       organization_kind: Tipo di organizzazione
       organization_name: Nome dell'organizzazione
-      please_fix_the_following_errors: Correggi i seguenti %{errors}
       sign_up_for_a_new_account_html: Iscriviti a un %{new_account_link}
       you_are_already_a_member_of_org_html: Sei già membro di %{org_link}.
       your_current_account_will_be_a_member_html: Il tuo conto corrente ( <strong>%{user_email}</strong>
@@ -4591,18 +4599,6 @@ it:
         sent: Inviato
         through_org: attraverso %{org_name}
         vehicle_type: Tipo
-      list:
-        added: Aggiunto
-        bike: bicicletta
-        color: Colore
-        link: Collegamento
-        manufacturer: Produttore
-        model: Modello
-        num_bikes_registered_html: "<strong>%{num_bikes}</strong> registrato"
-        sent_to: Inviato a
-        sent_to_a_new_owner: inviato a un nuovo proprietario
-        sticker: Adesivo
-        stickers: Adesivi
       recoveries:
         description: Descrizione
         mfg_model_color_html: produttore, modello, <span class="less-strong">colore</span>
@@ -4685,6 +4681,14 @@ it:
         your_headers_must_match_html: Le tue intestazioni devono corrispondere <em>esattamente</em>
           alle nostre; ad esempio, se hai "numero di serie" come intestazione, l'importazione
           non funzionerà.
+        create_duplicates_html: 'Crea duplicati: aggiungi registrazioni quando una
+          riga corrisponde al numero di serie e all''indirizzo email del proprietario
+          di una registrazione esistente <span class="twless-strong">(disattivato
+          per impostazione predefinita).</span>'
+        create_duplicates_enabled_html: 'Crea duplicati: aggiungi registrazioni quando
+          una riga corrisponde al numero di serie e all''indirizzo email del proprietario
+          di una registrazione esistente <span class="twless-strong">(abilitato per
+          impostazione predefinita per evitare la perdita di dati rubati/sequestrati).</span>'
       show:
         ascend_import: Importazione Ascend
         bulk_import: Importazione massiva
@@ -4697,6 +4701,7 @@ it:
         file_removed_explanation: Dopo alcuni giorni, eliminiamo il file caricato
           per risparmiare spazio.
         progress: Progresso
+        matched_count: Righe corrispondenti alle registrazioni esistenti
     exports:
       index:
         bikes_in_export: Registrazioni per l'esportazione
@@ -4907,11 +4912,11 @@ it:
         find_an_impound_record: Trovare un registro dei sequestri
         search_impound_records: Consultare i registri dei sequestri
     registrations:
-      search:
+      index:
+        find_a_registration: Trova una registrazione
         search_all_email_disabled: È possibile cercare le registrazioni della propria
           organizzazione solo tramite l'indirizzo email o il nome del proprietario.
         search_registrations: Cerca registrazioni
-        find_a_registration: Trova una registrazione
   organized_mailer:
     custom_message:
       subject: "%{org_name} - la posizione del tuo %{mnfg_name}"
@@ -4965,9 +4970,6 @@ it:
     form:
       cancel_update: Annulla aggiornamento
       do_not_display: Non visualizzare
-      error: Errore
-      errors_prevented_photo_from_saving: "%{errors_count} ha impedito il salvataggio
-        della foto"
       image_name: Nome dell'immagine
       no_one_will_be_able_to_see_this_image_exc: "(Nessuno potrà vedere questa immagine
         tranne te)"
@@ -5402,8 +5404,6 @@ it:
       total_bikes_registered: Total Bikes Registrato
       total_recovery_value: Valore totale del recupero
       used_by: Utilizzato da
-    recovery_stories:
-      recovery_stories: Storie di recupero
     update_browser:
       go_here_to_learn_more: Clicca qui per saperne di più
       oh_no: Oh No!
@@ -5678,11 +5678,16 @@ it:
         in_the_past_year: nell'ultimo anno
         now: Ora
         to: a
-      column_settings:
+      table_column_settings:
         all: Tutti
         default: predefinito
+        included_columns: Colonne incluse
         none: nessuno
         visible_columns: Colonne visibili
+        return_to_default_column_order: Ripristina l'ordine predefinito delle colonne
+      drag_handle:
+        move: Sposta %{name}
+        moved: Posizione %{position} di %{count}
     atoms:
       serial:
         hidden: nascosto
@@ -5707,6 +5712,7 @@ it:
         copy_sticker: Copia adesivo
       recovery_display_card:
         recovered: Riparato
+        translated_from_english: tradotto dall'inglese
     pages:
       messages:
         thread_show:
@@ -5798,6 +5804,7 @@ it:
             view_list: Lista
             view_table: Tavolo
             loading_results: Caricamento dei risultati...
+            per_page_option: "%{number} per pagina"
           chart_card:
             caption_search: Ricerca attuale
             caption_year: Riepilogo dell'anno scorso
@@ -5821,7 +5828,6 @@ it:
             created_at_cell: Registrato
             creation_description_cell: Fonte
             cycle_type_cell: Tipo di veicolo
-            default: predefinito
             filter_impounded_html: solo <strong>sequestrato</strong>
             filter_no_address_html: solo <strong>nessun</strong> indirizzo
             filter_no_sticker_html: solo <strong>senza</strong> adesivo
@@ -5835,7 +5841,6 @@ it:
             impound_id_cell: ID del sequestro
             manufacturer_cell: Produttore
             model_cell: Modello
-            none: nessuno
             owner_email_cell: Inviato a
             owner_name_cell: Nome del proprietario
             propulsion_type_cell: Veicolo elettrico (propulsione)
@@ -5851,7 +5856,6 @@ it:
             unregistered: 'Non registrato:'
             updated_at_cell: Fatto
             url_cell: URL
-            visible_columns: Colonne visibili
             notes_cell_html: Note di registrazione <em>di %{org_name}</em>
             reg_organization_affiliation_cell_html: Affiliazione <em>in %{org_name}</em>
             reg_student_id_cell_html: Numero di matricola dello studente <em>%{org_name}</em>
@@ -5859,9 +5863,6 @@ it:
             photo_cell: Foto
             view_cell: Visualizzazione
             acknowledgment_cell_panel: Sequenza di registrazione temporale confermata
-            created_at_cell_panel: Tempo - registrato
-            occurred_at_cell_panel: Tempo - stato
-            updated_at_cell_panel: Ora - aggiornato
             filter_stolen_or_impounded_html: solo <strong>rubati</strong> o <strong>sequestrati</strong>
             location_search_disabled_no_address: "%{org_name} non raccoglie gli indirizzi
               di immatricolazione, quindi solo le immatricolazioni rubate o sequestrate
@@ -5871,13 +5872,40 @@ it:
               per località quando si cercano tutte le immatricolazioni, a meno che
               non si stiano cercando solo immatricolazioni sequestrate e/o rubate.
             show_location_search: mostra la ricerca della posizione
-            included_columns: Colonne incluse
+            all_bikes: Tutte le biciclette
+            all_statuses: Tutti gli stati
+            impound_location_cell: Luogo
+            impound_status_cell: stato di sequestro
+            impound_updated_at_cell: Blocco aggiornato
+            impound_updated_at_cell_panel: Ora - Registro dei sequestri aggiornato
+            impound_user_cell: Ultimo aggiornamento
+            impounded_at_cell: Sequestrato
+            impounded_at_cell_panel: Tempo - Sequestrato
+            impounded_from_cell: Sequestrato da
+            only_unregistered: Solo non registrati
+            only_user_registered: Solo utenti registrati
+            registered_cell_panel: Tempo - Registrato
+            registration: 'Registrazione:'
+            registration_updated_cell_panel: Ora - Registrazione aggiornata
+            resolved_at_cell: Risolto
+            resolved_at_cell_panel: Tempo - Risolto
+            status_at_cell_hint: quando rubato, sequestrato, ecc.
+            status_at_cell_panel: Tempo - Stato
+            status_records: "%{status} record"
+            unregistered_cell: Non registrato
+            copy_column_order_from_impounded_vehicles_search: Copia l'ordine delle
+              colonne dalla ricerca dei veicoli sequestrati
+            copy_column_order_from_registrations_search: Copia l'ordine delle colonne
+              dalla ricerca delle registrazioni
+            impound_search_columns: Colonne di ricerca per i sequestri
           column_settings_toggle:
             column_settings: Impostazioni della colonna
           settings_and_filters:
             date_range: 'Intervallo di date:'
             search_settings_and_filters: Impostazioni e filtri di ricerca
             filters: Filtri
+            impound_search: la ricerca dei veicoli sequestrati
+            view_in_impound_search_html: Visualizza in %{impound_search}
           search_all:
             search_all_html: Cerca tutte le registrazioni <span class="twless-strong">(non
               solo %{org_name})</span>
@@ -5889,9 +5917,8 @@ it:
             hidden: nascosto
             not_registered_with: Nascosto perché non è registrato con %{org_name}
             acknowledgment_title: Conferma della sequenza di registrazione a
-            occurred_at_tooltip: Quando è stato rubato, sequestrato, ritrovato o messo
-              in vendita
             view: Visualizzazione
+            toggle_all_checked: Seleziona tutto
           multi_result_chip:
             no_results: nessuna corrispondenza
           multi_results:
@@ -5904,16 +5931,8 @@ it:
             view_all: visualizza tutto
         impound_records:
           index:
-            all_bikes: Tutte le biciclette
-            all_statuses: Tutti gli stati
             cannot_update_with_kind: Questo record non può essere aggiornato con '{kind}'
             hide_update: Aggiornamento nascosto
-            matching_impound_record:
-              one: record di sequestro corrispondente
-              other: corrispondenti registri di sequestro
-            only_unregistered: Solo non registrati
-            only_user_registered: Solo utenti registrati
-            status_records: "%{status} record"
             update_multiple_records: Aggiorna più record
         parking_notifications:
           index:
@@ -5967,6 +5986,9 @@ it:
           map_unavailable: 'Impossibile caricare la mappa: la posizione è ancora impostata
             dal tuo dispositivo.'
           set_on_map: Imposta sulla mappa
+        registration_sequence:
+          page_edit_bullet:
+            bullet: proiettile
       registrations:
         show:
           bike_details:
@@ -6975,6 +6997,13 @@ it:
           any_handlebar_type: Qualsiasi tipo di manubrio
           frame_material: Materiale del telaio
           handlebar_type: Tipo di manubrio
+          market_scope: Modelli provenienti da altri mercati
+          only_market_html: Solo %{market}
+          prefer_market_sold_in_html: Preferire veicoli venduti in %{market}
+          select_a_vehicle_type: Seleziona un %{bike_type}, scegli più opzioni per
+            confrontarle
+          select_an_vehicle_type: Seleziona un %{bike_type}, scegli più opzioni per
+            confrontarle
         donate_strip:
           donate: Donare
           pitch: Questo fantastico prodotto è offerto dall'organizzazione no-profit
@@ -6994,9 +7023,13 @@ it:
           from_until: 'Da %{starts_on} a %{ends_on}:'
           limits_start_on: Questi limiti entrano in vigore %{date}. Fino ad allora,
             si applicano le regole seguenti.
-          restrictions: Regole e restrizioni
           sources: Fonti
           until: 'Fino a %{date}:'
+          enforcement: Applicazione della legge
+          legal_context: contesto giuridico
+          rider_rules: Regole del cavaliere
+          seller_rules: Regole del venditore
+          vehicle_definition: Definizione di veicolo
         results:
           answer_no: 'No'
           answer_yes: Sì
@@ -7014,8 +7047,6 @@ it:
             1, 2 o 3. Controlla presso la %{state} DMV le normative locali.
           gray_headline: Non abbiamo ancora in archivio le regole per le e-bike di
             %{state}.
-          green_headline: La tua %{name} è legale da guidare in %{state} come e-bike
-            di classe %{n}.
           has_throttle: Ha un acceleratore
           is_registered: Questa bicicletta è immatricolata?
           legal_to_ride: È legale guidare
@@ -7035,8 +7066,6 @@ it:
           own_classes: Lo stato stabilisce i propri limiti anziché le tre classi standard
           recovered_more_often: Le biciclette rubate vengono recuperate con una frequenza
             doppia se registrate.
-          red_headline: Il tuo %{name} non è ammesso come e-bike secondo le attuali
-            norme %{state}.
           register_free: Registrati su Bike Index — gratis
           rule_to_check: Regola da controllare
           rules_not_on_file: Regole non presenti nel file
@@ -7061,11 +7090,6 @@ it:
           watts_not_provided: Potenza del motore non specificata
           watts_over_cap_html: Il motore %{watts}W supera il limite %{cap}W
           watts_within_cap_html: "%{watts}Il motore W è all'interno del tappo"
-          yellow_headline:
-            one: La tua %{name} è legale da guidare in %{state} come e-bike di classe
-              %{n}, con %{count} regola da verificare.
-            other: La tua %{name} è legale da guidare in %{state} come e-bike di classe
-              %{n}, con %{count} regole da verificare.
           yellow_headline_class_unknown:
             one: Il tuo %{name} potrebbe essere legale da guidare in %{state}, con
               la regola %{count} da verificare.
@@ -7091,31 +7115,18 @@ it:
           classes_recognized:
             one: La classe %{n} è riconosciuta
             other: Le classi %{n} sono riconosciute
-          read_more: Per saperne di più
           answer_optional: Opzionale
-          as_class_with_optional_throttle: come Classe %{n} con il suo acceleratore
-            opzionale
-          as_class_with_optional_upgrade: come Classe %{n} con aggiornamento opzionale
           class_3_optional_throttle_within_html: L'acceleratore opzionale si ferma
             a %{mph} mph
           class_3_speed_with_throttle_html: Assiste fino a %{mph} mph, non consentito
             con un acceleratore
           class_n: Classe %{n}
           classes_not_permitted: Si tratta di una e-bike %{classes}, che non è consentita
-          green_headline_optional: Il tuo %{name} è legale da guidare in %{state}
-            come e-bike di classe %{n} e %{optional}.
           manually_entered: Inserito manualmente
           model_year: modello %{year}
           optional_throttle_not_allowed: È legale solo senza l'acceleratore opzionale.
           optional_to_html: Opzionale, per %{mph}
           throttle_with_class_3_assist: Non consentito con assistenza di Classe 3
-          yellow_headline_optional:
-            one: La tua %{name} è legale da guidare in %{state} come e-bike di classe
-              %{n} e %{optional}, con la regola %{count} da verificare.
-            other: La tua %{name} è legale da guidare in %{state} come e-bike di classe
-              %{n} e %{optional}, con %{count} regole da verificare.
-          yellow_headline_without_throttle: La tua %{name} è legale da guidare in
-            %{state} come e-bike di classe %{n}, senza l'acceleratore opzionale.
           green_headline_law: Il tuo %{name} è autorizzato a circolare in %{state}
             secondo le regole %{law}.
           kmh_html: "%{kmh} km/h"
@@ -7171,6 +7182,51 @@ it:
             other: Le classi %{n} non sono riconosciute in %{state}, quindi è legale
               solo come venduto
           other_classification_rules: "%{name} regole"
+          also_class_with_optional_throttle: è anche una e-bike di classe %{n} con
+            acceleratore opzionale
+          also_class_with_optional_upgrade: è anche una e-bike di classe %{n} con
+            un aggiornamento opzionale
+          class_headline: La tua %{name} è una e-bike di classe %{n} in %{state}.
+          class_headline_optional: La tua %{name} è una e-bike di classe %{n} in %{state}
+            e %{optional}.
+          class_headline_optional_with_rules:
+            one: La tua %{name} è una e-bike di classe %{n} in %{state} e %{optional},
+              con la regola %{count} da verificare.
+            other: La tua %{name} è una e-bike di classe %{n} in %{state} e %{optional},
+              con %{count} regole da verificare.
+          class_headline_with_rules:
+            one: La tua %{name} è una e-bike di classe %{n} in %{state}, con %{count}
+              regola da verificare.
+            other: La tua %{name} è una e-bike di classe %{n} in %{state}, con %{count}
+              regole da verificare.
+          class_headline_without_throttle: La tua %{name} è una e-bike di classe %{n}
+            in %{state}, senza l'acceleratore opzionale.
+          green_headline_no_classes: Il tuo %{name} è classificato come e-bike in
+            %{state}.
+          heading_classes_html: "%{classes} riconosciuto"
+          heading_no_power_cap: Nessun limite di potenza del motore
+          heading_no_speed_cap: Nessun limite di velocità assistito superiore
+          heading_power_html: "%{watts} condensatore di potenza del motore"
+          heading_speed_html: "%{speed} velocità massima assistita"
+          heading_throttle_allowed: Acceleratore consentito
+          heading_throttle_not_allowed: Acceleratore non consentito
+          heading_vehicle_html: Regolamentato come %{name}
+          may_fall_under_name: In %{state}, può rientrare in %{name}.
+          not_classified_headline: Il tuo %{name} non è classificato come e-bike in
+            %{state}.
+          rules_that_apply: Regole applicabili in %{state}
+          rules_that_may_apply: Regole che possono essere applicate in %{state}
+          throttle_speed_over_cap_html: L'acceleratore raggiunge %{mph} mph, oltre
+            il limite di %{cap} mph.
+          throttle_speed_within_cap_html: L'acceleratore raggiunge %{mph} mph, entro
+            il limite
+          yellow_headline_no_classes:
+            one: Il tuo %{name} è classificato come e-bike in %{state}, con %{count}
+              regola da verificare.
+            other: Il tuo %{name} è classificato come e-bike in %{state}, con %{count}
+              regole da verificare.
+          yellow_headline_no_classes_without_throttle: La tua %{name} è classificata
+            come e-bike in %{state}, senza l'acceleratore opzionale.
         rule_label:
           classes: Classi riconosciute
           power: Limite di potenza del motore
@@ -7210,9 +7266,6 @@ it:
           certification_involves_heading: Cosa comporta la certificazione
           check_my_bike: Controlla la mia bici
           compare_html: Vuoi confrontare più biciclette? %{link}
-          disclaimer: Bike Index è un'organizzazione no-profit 501(c)(3). I riassunti
-            delle leggi statali sono forniti a titolo di riferimento e non costituiscono
-            consulenza legale.
           for_parents: Per i genitori
           form_label: Verifica della conformità delle e-bike
           has_throttle: Ha l'acceleratore?
@@ -7309,9 +7362,6 @@ it:
           choose_province: Seleziona la tua provincia o il tuo territorio dall'elenco.
           choose_state: Seleziona il tuo stato dall'elenco.
           detected_place_html: Abbiamo rilevato <strong>%{state}</strong> .
-          disclaimer_canada: Bike Index è un'organizzazione senza scopo di lucro.
-            I riassunti delle leggi provinciali e territoriali sono forniti a titolo
-            informativo e non costituiscono consulenza legale.
           kmh: "%{kmh} km/h"
           not_in_canada_html: Non sei in Canada? %{switch_country}
           over_kmh: Oltre %{kmh} km/h
@@ -7392,6 +7442,9 @@ it:
             e gli altri veicoli elettrici a due ruote in queste classi."
           other_classes: Altri veicoli elettrici in %{place}
           place_heading: Leggi sulle e-bike in %{place}
+          non_e_bike_rules: "%{state} regole non per e-bike"
+          rules_that_apply: Regole applicabili in %{state}
+          state_rules: "%{state} Regole per le e-bike"
         rule_citation:
           source: fonte
         class_card:
@@ -7508,7 +7561,6 @@ it:
           official_registry: Il registro ufficiale di oltre 1.000 dipartimenti di
             polizia, università, città e negozi.
           or_make_a_one_time_donation: Oppure fai una donazione una tantum
-          partner_organizations: negozi partner, dipartimenti di polizia e città
           per_month: "/ mese"
           per_year: "/ anno"
           perk_cycling_cap: Cappellino da ciclista per i membri di Bike Index
@@ -7526,7 +7578,6 @@ it:
           plans_from: Piani a partire da %{price} un mese
           questions: Domande
           recommended: Raccomandato
-          stolen_bikes_recovered: biciclette rubate recuperate
           summary_monthly: "%{level} abbonamento, %{price} al mese"
           summary_yearly: "%{level} iscrizione, %{price} un anno"
           sun_shirt: camicia da sole
@@ -7538,12 +7589,10 @@ it:
             no-profit 501(c)(3), EIN 81-4296194.
           the_registry_open_to_everyone: Il registro, aperto a tutti
           two_months_free: Due mesi gratis
-          value_returned_to_owners: valore restituito ai proprietari
           view_your_membership: Visualizza la tua iscrizione a %{level}
           wear_the_shield: Indossa lo scudo
           what_members_make_possible: Ciò che i membri rendono possibile
           yearly: Annuale
-          bikes_registered: biciclette registrate
           bikes_registered_keep_it_free: "%{bikes} Le biciclette sono registrate.
             I membri mantengono il servizio gratuito per il prossimo milione."
           millions_registered_keep_it_free: "%{millions} milioni di biciclette sono
@@ -7555,19 +7604,10 @@ it:
             sempre gratuito. È grazie ai nostri soci che possiamo garantirlo.
       donate:
         page:
-          already_member: 'Sei già un membro di Bike Index: grazie! Puoi modificare
-            il tuo livello di abbonamento o i dettagli di pagamento dalle impostazioni
-            del tuo account.'
-          cadence: Con quale frequenza somministrare
           cta_headline: Un milione di biciclette sono registrate. Nessun proprietario
             ha pagato per essere presente.
           cta_sub: Lasciatelo gratuito per il prossimo milione.
           eyebrow: Recuperato e restituito
-          fine_print: Bike Index è un'organizzazione no-profit 501(c)(3), EIN 81-4296194.
-            La tua donazione è deducibile dalle tasse negli Stati Uniti. Puoi annullare
-            la donazione mensile in qualsiasi momento.
-          fine_print_short: Organizzazione no-profit 501(c)(3), EIN 81-4296194. Detraibile
-            dalle tasse negli Stati Uniti.
           form_title: Finanziare la prossima ripresa
           headline: Tutte le biciclette sopra elencate sono tornate a casa perché
             la registrazione era gratuita
@@ -7588,17 +7628,6 @@ it:
           major_partner: Partner
           major_title: Le donazioni più consistenti permettono di inserire intere
             città nel registro.
-          manage_membership: Gestisci il tuo abbonamento
-          membership_link: Cosa include l'abbonamento
-          membership_note: 'Il supporto mensile ti rende un membro di Bike Index:
-            avrai accesso agli annunci sul marketplace, al badge di membro e a vantaggi
-            che aumentano man mano che li sviluppiamo. I livelli sono %{amounts} al
-            mese.'
-          monthly: Mensile
-          monthly_submit: Diventa socio — %{amount}/mese
-          one_time: Una volta
-          one_time_submit: Dona %{amount}
-          other_amount: Altro importo
           other_ways_daf: Sovvenzioni da fondi gestiti da donatori — possiamo inviarvi
             il nostro codice EIN e i dettagli della sovvenzione.
           other_ways_match: 'Contributo equivalente da parte del datore di lavoro:
@@ -7608,20 +7637,7 @@ it:
             evitare le imposte sulle plusvalenze derivanti dall'apprezzamento del
             valore degli asset.
           other_ways_title: Altri modi per donare a questo livello
-          stat_bikes: biciclette registrate, gratis
-          stat_partners: negozi partner, dipartimenti di polizia e città
-          stat_recoveries: biciclette rubate recuperate
-          stat_value: valore restituito ai proprietari
           stories_title: Nelle parole dei loro proprietari
-          tier_basic: Abbonamento base
-          tier_basic_benefit: Pubblicazione di biciclette sul marketplace, badge di
-            membro e supporto più rapido
-          tier_patron: Adesione come sostenitore
-          tier_patron_benefit: Tutto incluso nel pacchetto Plus, posizionamento di
-            rilievo sul mercato, maglietta e badge da sostenitore.
-          tier_plus: Abbonamento Plus
-          tier_plus_benefit: Tutto incluso nel pacchetto Base, un avviso gratuito
-            in caso di furto della bicicletta e un limite di abbonamento.
           uses_alerts_body: Il sistema di allerta per biciclette rubate e le notifiche
             sponsorizzate che promuovono un annuncio nei feed relativi al furto.
           uses_alerts_title: Avvisi che raggiungono le persone
@@ -7638,6 +7654,36 @@ it:
           uses_partners_title: Partner e indagini
           uses_title: Dove vanno i soldi
           wall_photo_alt: Una bicicletta recuperata grazie a Bike Index
+        form:
+          already_member: 'Sei già un membro di Bike Index: grazie! Puoi modificare
+            il tuo livello di abbonamento o i dettagli di pagamento dalle impostazioni
+            del tuo account.'
+          cadence: Con quale frequenza somministrare
+          fine_print: Bike Index è un'organizzazione no-profit 501(c)(3), EIN 81-4296194.
+            La tua donazione è deducibile dalle tasse negli Stati Uniti. Puoi annullare
+            la donazione mensile in qualsiasi momento.
+          fine_print_short: Organizzazione no-profit 501(c)(3), EIN 81-4296194. Detraibile
+            dalle tasse negli Stati Uniti.
+          manage_membership: Gestisci il tuo abbonamento
+          membership_link: Cosa include l'abbonamento
+          membership_note: 'Il supporto mensile ti rende un membro di Bike Index:
+            avrai accesso agli annunci sul marketplace, al badge di membro e a vantaggi
+            che aumentano man mano che li sviluppiamo. I livelli sono %{amounts} al
+            mese.'
+          monthly: Mensile
+          monthly_submit: Diventa socio — %{amount}/mese
+          one_time: Una volta
+          one_time_submit: Dona %{amount}
+          other_amount: Altro importo
+          tier_basic: Abbonamento base
+          tier_basic_benefit: Pubblicazione di biciclette sul marketplace, badge di
+            membro e supporto più rapido
+          tier_patron: Adesione come sostenitore
+          tier_patron_benefit: Tutto incluso nel pacchetto Plus, posizionamento di
+            rilievo sul mercato, maglietta e badge da sostenitore.
+          tier_plus: Abbonamento Plus
+          tier_plus_benefit: Tutto incluso nel pacchetto Base, un avviso gratuito
+            in caso di furto della bicicletta e un limite di abbonamento.
       landing_pages:
         demo_modal:
           field_message: C'è qualcos'altro che dovremmo sapere?
@@ -7712,10 +7758,6 @@ it:
             e contenuti didattici propri. Il personale di ogni livello gestisce esclusivamente
             le proprie regole.
           faq_account_question: Chi gestisce l'account?
-          faq_checker_answer: I dettagli delle biciclette provengono da BikeBook,
-            un catalogo di modelli di e-bike con la relativa classe, motore, velocità
-            e certificazione UL. Le normative statali sono elencate con le relative
-            leggi di riferimento.
           faq_checker_question: Da dove ricava i dati lo strumento di verifica della
             conformità?
           faq_cost_answer: Non sono previste spese di pre-registrazione e la registrazione
@@ -7933,6 +7975,10 @@ it:
             una e-bike, accedono direttamente a una breve sessione informativa sulle
             normative della propria città.
           submit_demo: Richiedi una demo
+          faq_checker_answer_html: I dettagli delle biciclette provengono da %{bikebook_link},
+            un catalogo di modelli di e-bike con la relativa classe, motore, velocità
+            e certificazione UL. Le normative statali sono elencate con i relativi
+            statuti.
         for_cities_education:
           all_set: È tutto pronto.
           back: Indietro
@@ -8029,7 +8075,6 @@ it:
           across_town_intro: Ogni vendita avviene direttamente tra privati. Bike Index
             non gestisce i pagamenti né le spedizioni, pertanto acquirente e venditore
             si accordano direttamente su prezzo, pagamento e consegna.
-          back_to_marketplace: Torna al marketplace
           bike_index_members: Membri di Bike Index
           bike_index_members_body: I venditori che supportano Bike Index sottoscrivendo
             un abbonamento mostrano un badge di membro Bike Index sui loro annunci.
@@ -8123,6 +8168,32 @@ it:
             qui si riferisce a una bicicletta regolarmente registrata, una bicicletta
             denunciata come rubata non può essere pubblicata e la registrazione segue
             la bicicletta al suo nuovo proprietario.
+      recovery_stories:
+        index:
+          donors_keep_it_free: Bike Index non addebita alcun costo ai ciclisti, non
+            vende dati e non pubblica annunci pubblicitari. Ogni recupero presente
+            in questa pagina è stato reso possibile grazie alle donazioni che mantengono
+            gratuiti per tutti la registrazione, la ricerca e gli avvisi di furto.
+          every_one_found_its_way_home: Ognuna di queste biciclette è tornata a casa.
+          fund_the_next_recovery: Finanziare la prossima ripresa
+          help_it_come_home: Da qualche parte stanotte, una bicicletta verrà rubata.
+            Aiutatela a tornare a casa.
+          in_their_own_words: Con le loro stesse parole
+          lede: Dietro ogni foto c'è un motociclista che pensava di averlo perso per
+            sempre, e qualcuno che si è preoccupato abbastanza da controllare. Un
+            meccanico. Un agente di polizia. Uno sconosciuto che si è ricordato di
+            un avviso. Questo è ciò che rende possibile un registro libero e aperto,
+            e rimane tale grazie a persone come te.
+          recovery_stories: Storie di guarigione
+          register_your_bike: Registra la tua bicicletta
+          share_your_story: Condividi la tua storia
+          shared_by_the_person: Ogni storia qui raccontata è stata condivisa da chi
+            ha ritrovato la propria bicicletta.
+          started_with_a_registration: Ogni storia qui è iniziata con una registrazione.
+          takes_two_minutes: Ci vogliono circa due minuti. È gratis, per sempre.
+        stories:
+          load_more_stories: Carica altre storie
+          newer_stories: Storie più recenti
     shared_blocks:
       footer:
         about: Di
@@ -8320,6 +8391,11 @@ it:
           read_more_recovery_stories: Leggi altre storie di guarigione
           reported_by_owners: Ogni ritrovamento viene segnalato dalla persona che
             ha recuperato la propria bicicletta.
+        registry_stats:
+          stat_bikes: biciclette registrate, gratis
+          stat_partners: negozi partner, dipartimenti di polizia e città
+          stat_recoveries: biciclette rubate recuperate
+          stat_value: valore restituito ai proprietari
   user_emails:
     confirm:
       confirm_email: Conferma email

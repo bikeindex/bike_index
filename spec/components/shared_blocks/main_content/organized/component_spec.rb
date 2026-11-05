@@ -12,6 +12,16 @@ RSpec.describe SharedBlocks::MainContent::Organized::Component, type: :component
   let(:container_class) { component.at_css(".organized-wrap > div")["class"] }
   let(:javascript_pack) { component.css("script[src='/vendored_assets/application.js']").any? }
 
+  context "law enforcement without the verified features" do
+    let(:organization) { FactoryBot.build(:organization, kind: "law_enforcement") }
+    let(:controller_name) { "users" }
+
+    it "renders a dismissable alert" do
+      expect(component.at_css("[role=alert] a[href='mailto:gavin@bikeindex.org']")).to be_present
+      expect(component.at_css("[role=alert] button[aria-label='Close']")).to be_present
+    end
+  end
+
   context "users" do
     let(:controller_name) { "users" }
     it "is a container, without the legacy bundle" do

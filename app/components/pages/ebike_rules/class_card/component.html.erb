@@ -35,7 +35,8 @@
   <% if card[:rules] %>
     <div
       class="
-        tw:text-[15px] tw:leading-relaxed tw:text-gray-700
+        tw:mt-auto tw:text-[15px] tw:text-gray-700
+        tw:group-has-[[aria-expanded=true]]/class-cards:mt-0
         tw:dark:text-gray-300
       "
       data-controller="ui--collapse"
@@ -43,14 +44,11 @@
       <%= render(UI::Collapse::Component.new(text: translation(".state_specifics", state: @place&.dig(:name)), chevron: :trailing, color: :link)) %>
 
       <ul
-        class="tw:mt-2 tw:hidden tw:list-disc tw:space-y-1 tw:pl-5 tw:text-sm"
+        class="tw:mt-2 tw:hidden tw:list-disc tw:space-y-1 tw:pl-5"
         data-ui--collapse-target="content"
       >
         <% card[:rules].each do |restriction| %>
-          <li>
-            <%= restriction[:rule] %>
-            <%= render(Pages::EbikeRules::RuleCitation::Component.new(restriction:)) %>
-          </li>
+          <li><%= restriction[:rule] %></li>
         <% end %>
       </ul>
     </div>
@@ -67,7 +65,7 @@
 
 <% card_html = capture do %>
   <% if @framed %>
-    <%= render(UI::Card::Component.new(shadow: true, additional_classes: "tw:flex tw:flex-col tw:gap-4 tw:rounded-lg tw:p-6!")) { content } %>
+    <%= render(UI::Card::Component.new(additional_classes: "tw:flex tw:flex-col tw:gap-4 tw:p-6!")) { content } %>
   <% else %>
     <div
       class="

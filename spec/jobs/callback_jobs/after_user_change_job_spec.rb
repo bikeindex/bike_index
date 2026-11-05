@@ -213,18 +213,15 @@ RSpec.describe CallbackJobs::AfterUserChangeJob, type: :job do
   end
 
   describe "user_address" do
-    # registration_address is keyed the legacy way
-    def registration_address(bike)
-      address = bike.reload.registration_address(true).symbolize_keys
-      address.except(:zipcode, :state, :country)
-        .merge(postal_code: address[:zipcode], region: address[:state], country: Country.friendly_find(address[:country])&.name)
+    def registration_address_hash(bike)
+      bike.reload.registration_address_record.address_hash(visible_attribute: :street, render_country: true)
     end
 
     let(:user) { FactoryBot.create(:user) }
     let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, :with_address_record, address_in: :vancouver, user:) }
     let(:target_address) { {street: "278 W Broadway", postal_code: "V5Y 1P5", city: "Vancouver", country: "Canada", region: "BC", latitude: 49.253992, longitude: -123.241084, street_2: nil} }
     it "sets based on bikes" do
-      expect(registration_address(bike)).to eq target_address
+      expect(registration_address_hash(bike)).to eq target_address
       expect(bike.address_set_manually).to be_truthy
       expect(user.address_present?).to be_falsey
       expect(user.address_set_manually).to be_falsey
@@ -238,7 +235,7 @@ RSpec.describe CallbackJobs::AfterUserChangeJob, type: :job do
       expect(user.latitude).to be_within(0.01).of(49.253992)
       expect(user.longitude).to be_within(0.01).of(-123.241084)
 
-      expect(registration_address(bike)).to eq target_address
+      expect(registration_address_hash(bike)).to eq target_address
       expect(bike.address_set_manually).to be_falsey # It's switched to being set by user :shrug:
     end
     context "address_set_manually" do
@@ -246,14 +243,14 @@ RSpec.describe CallbackJobs::AfterUserChangeJob, type: :job do
       let(:user) { FactoryBot.create(:user, address_record:, address_set_manually: true) }
       let(:target_address) { {street: "100 W 1st St", city: "Los Angeles", region: "CA", postal_code: "90021", country: "United States", latitude: 34.05223, longitude: -118.24368, street_2: nil} }
       it "updates bike to be users address" do
-        expect(registration_address(bike)).to eq target_address
+        expect(registration_address_hash(bike)).to eq target_address
         expect(user.reload.address_hash(render_country: true, visible_attribute: :street)).to eq target_address
         # Inline so it processes the bikes
         Sidekiq::Job.clear_all
         Sidekiq::Testing.inline! do
           instance.perform(user.id)
         end
-        expect(registration_address(bike)).to eq target_address
+        expect(registration_address_hash(bike)).to eq target_address
         expect(bike.address_set_manually).to be_falsey
         expect(bike.latitude).to be_within(0.01).of(34.05223)
         expect(bike.longitude).to be_within(0.01).of(-118.24368)
@@ -262,13 +259,13 @@ RSpec.describe CallbackJobs::AfterUserChangeJob, type: :job do
       context "user not backfilled" do
         let(:user) { FactoryBot.create(:user, :with_address_record, address_in: :los_angeles, address_set_manually: true) }
         it "updates bike to be users address" do
-          expect(registration_address(bike)).to eq target_address
+          expect(registration_address_hash(bike)).to eq target_address
           # Inline so it processes the bikes
           Sidekiq::Job.clear_all
           Sidekiq::Testing.inline! do
             instance.perform(user.id)
           end
-          expect(registration_address(bike)).to eq target_address
+          expect(registration_address_hash(bike)).to eq target_address
           expect(bike.address_set_manually).to be_falsey
           expect(bike.latitude).to be_within(0.01).of(34.05223)
           expect(bike.longitude).to be_within(0.01).of(-118.24368)

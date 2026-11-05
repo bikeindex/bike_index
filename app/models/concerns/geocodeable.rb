@@ -13,8 +13,6 @@ module Geocodeable
         obj.internal_address_attrs.merge(skip_geocoding: obj.latitude.present?, skip_callback_job: true)
       elsif defined?(obj.address_record) && obj.address_record.present?
         attrs_to_duplicate(obj.address_record)
-      elsif defined?(obj.street)
-        attrs_from_legacy(obj)
       else
         {}
       end
@@ -25,22 +23,6 @@ module Geocodeable
       return str unless country_id == Country.canada_id && str.gsub(/\s+/, "").length == 6
 
       str.gsub(/\s+/, "").scan(/.{1,3}/).join(" ")
-    end
-
-    private
-
-    def attrs_from_legacy(obj)
-      {
-        skip_geocoding: obj.latitude.present?, # Skip geocoding if already geocoded
-        skip_callback_job: true, # they're already in sync
-        street: obj.street,
-        city: obj.city,
-        region_record_id: obj.state_id,
-        postal_code: obj.zipcode,
-        country_id: obj.country_id,
-        latitude: obj.latitude,
-        longitude: obj.longitude
-      }
     end
   end
 
@@ -60,10 +42,6 @@ module Geocodeable
 
   def with_location?
     latitude.present?
-  end
-
-  def without_location?
-    latitude.blank?
   end
 
   def without_street?
@@ -109,14 +87,6 @@ module Geocodeable
       postal_code: %i[street postal_code].include?(visible_attr) ? postal_code : nil,
       latitude:, longitude:
     }.merge(country_hash)
-  end
-
-  def address_hash_legacy(address_record_id: false)
-    l_hash = address_hash(visible_attribute: :street, render_country: true).dup
-    l_hash[:zipcode] = l_hash.delete(:postal_code)
-    l_hash[:state] = l_hash.delete(:region)
-    l_hash[:address_record_id] = id if address_record_id
-    l_hash.with_indifferent_access
   end
 
   def formatted_address_string(visible_attribute: nil, render_country: nil, current_country_id: nil, current_country_iso: nil)

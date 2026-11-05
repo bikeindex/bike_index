@@ -98,8 +98,7 @@
             <% end %>
 
             <p class="tw:mt-4">
-              <%= link_to translation(".check_in_state", state: state[:name]), ebike_rules_place_path(*state[:code].split("-"), anchor: "check"),
-                class: "twlink tw:font-semibold", data: {check_state: state[:code]} %>
+              <%= render(UI::ButtonLink::Component.new(text: translation(".check_in_state", state: state[:name]), href: ebike_rules_place_path(*state[:code].split("-"), anchor: "check"), data: {check_state: state[:code]})) %>
             </p>
           </div>
         </div>

@@ -181,7 +181,7 @@
   </div>
 
   <%# Form needs to wrap the table too %>
-  <%= form_for ParkingNotification.new, url: organization_parking_notifications_path(organization_id: @organization), html: {data: {controller: "table-multi-checkbox"}} do |f| %>
+  <%= form_for ParkingNotification.new, url: organization_parking_notifications_path(organization_id: @organization), html: {data: {controller: "table-multi-checkbox"}} do %>
     <div
       class="tw:hidden"
       data-org--parking-notifications-index-target="repeatForm"

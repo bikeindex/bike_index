@@ -55,6 +55,18 @@ module UI
         render(UI::ButtonLink::Component.new(text: "Link Disabled", href: "#", color: :link, disabled: true))
       end
 
+      def link_gray
+        render(UI::ButtonLink::Component.new(text: "Link gray", href: "#", color: :link_gray))
+      end
+
+      def link_gray_active
+        render(UI::ButtonLink::Component.new(text: "Link Gray Active", href: "#", color: :link_gray, active: true))
+      end
+
+      def link_gray_disabled
+        render(UI::ButtonLink::Component.new(text: "Link Gray Disabled", href: "#", color: :link_gray, disabled: true))
+      end
+
       # Filled purple primary
       def purple
         render(UI::ButtonLink::Component.new(text: "Purple Link", href: "#", color: :purple))
@@ -79,19 +91,6 @@ module UI
 
       def yellow_disabled
         render(UI::ButtonLink::Component.new(text: "Yellow Disabled", href: "#", color: :yellow, disabled: true))
-      end
-
-      # The secondary call to action on a dark band, beside a yellow one
-      def outline_white
-        render_with_template(template: "ui/button_link/component_preview/outline_white", locals: {text: "Outline White Link", active: false, disabled: false})
-      end
-
-      def outline_white_active
-        render_with_template(template: "ui/button_link/component_preview/outline_white", locals: {text: "Outline White Active", active: true, disabled: false})
-      end
-
-      def outline_white_disabled
-        render_with_template(template: "ui/button_link/component_preview/outline_white", locals: {text: "Outline White Disabled", active: false, disabled: true})
       end
       # @!endgroup
 
