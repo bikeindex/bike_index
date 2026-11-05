@@ -55,7 +55,7 @@ module Pages
 
         def color
           if @optional && @e_bike_class.nil?
-            "tw:border-2 tw:border-[#cc0000] tw:text-[#cc0000]! tw:dark:border-red-400 tw:dark:text-red-400!"
+            "tw:border-2 tw:border-[#cc0000] tw:text-[#cc0000]! tw:dark:border-red-500 tw:dark:text-red-500!"
           elsif @optional
             "tw:border-2 tw:border-slate-900 tw:text-slate-900! tw:dark:border-slate-300 tw:dark:text-slate-100!"
           elsif @e_bike_class
