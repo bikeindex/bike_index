@@ -39,6 +39,7 @@ export default class extends Controller {
   static values = {
     notificationHeading: String,
     impoundHeading: String,
+    notificationSubmit: String,
     defaultKind: String,
     orgLatitude: Number,
     orgLongitude: Number,
@@ -61,6 +62,9 @@ export default class extends Controller {
     const impound = name === 'impound'
     if (this.hasHeadingTarget) {
       this.headingTarget.textContent = impound ? this.impoundHeadingValue : this.notificationHeadingValue
+    }
+    if (this.hasSubmitTarget) {
+      this.submitTarget.textContent = impound ? this.impoundHeadingValue : this.notificationSubmitValue
     }
     const radio = this.element.querySelector(`input[name$="[kind]"][value="${impound ? 'impound_notification' : this.defaultKindValue}"]`)
     if (radio) radio.checked = true

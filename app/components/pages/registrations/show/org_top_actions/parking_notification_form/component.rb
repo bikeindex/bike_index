@@ -10,6 +10,8 @@ module Pages
           # `org--parking-notification-form` controller wires up the map pin,
           # geolocation, the address fields and the impound/notification switch
           class Component < ApplicationComponent
+            NOTIFICATION_SUBMIT = "Create parking notification"
+
             def initialize(bike:, organization:)
               @bike = bike
               @organization = organization
