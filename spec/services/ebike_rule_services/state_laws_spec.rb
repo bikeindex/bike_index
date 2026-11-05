@@ -161,16 +161,18 @@ RSpec.describe EbikeRuleServices::StateLaws do
         .to include(name: "Motorized Bicycle", restrictions: include(a_hash_including(rule: /moped \(class F\) license/, citation: "N.J.S.A. 39:4-14.3")))
     end
 
-    it "leads with its top rules, then a rider's, then enforcement, ahead of what defines it and a seller's" do
+    it "groups its rules by category, each rule once, its top rules leading, and keeps those in force as top_rules" do
       classification = described_class.other_classification("CA", ["evc/moped"], today: Date.new(2026, 11, 4))
+      groups = classification[:rule_groups].transform_values { it.pluck(:rule) }
 
       expect(classification[:top_rules].pluck(:rule)).to match [a_string_starting_with("Riders need a driver's license"), a_string_starting_with("Riders must wear"),
         a_string_starting_with("Registered with the DMV")]
-      rules = classification[:restrictions].pluck(:rule)
-      expect(rules.first(3)).to eq classification[:top_rules].pluck(:rule)
-      expect(rules.fourth).to start_with("Barred from any freeway")
-      expect(rules.index { it.start_with?("A peace officer") }).to be < rules.index { it.start_with?("Can't propel") }
-      expect(rules.last).to start_with("Its maker")
+      expect(groups.keys).to eq %w[rider_rule enforcement seller_rule vehicle_definition]
+      expect(groups.values.sum(&:size)).to eq classification[:restrictions].size
+      expect(groups["rider_rule"].first(3)).to eq classification[:top_rules].pluck(:rule)
+      # a seller's duty that also defines the vehicle goes under the first of the two
+      expect(groups["seller_rule"]).to include(a_string_starting_with("Built for highway use"), a_string_starting_with("Its maker"))
+      expect(groups["vehicle_definition"]).to_not include(a_string_starting_with("Built for highway use"))
     end
 
     it "keeps a rule's start date until it starts, and drops one once it's ended" do

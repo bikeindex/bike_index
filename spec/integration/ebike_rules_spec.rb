@@ -105,6 +105,20 @@ RSpec.describe "E-bike rules", :js, type: :system do
     retry_on_detach { find("[role='option']", text: "Specialized Haul ST").click }
     expect(page).to have_current_path("/ebike-rules/US/CO?vehicle_models=m/specialized/2025/haul_st")
     expect(page).to have_field("Motor wattage (W)", with: "700").and have_css("legend", exact_text: "Specialized Haul ST details")
+
+    # the alert's link opens the rules of the class it falls under in a block of their own
+    visit "/ebike-rules/US/CA?manual=1&top_speed=28&throttle=1"
+    wait_for_stimulus("ui--collapse")
+    expect(page).to have_css("[role='status']", text: "In California, it may fall under Moped.")
+      .and have_no_text(/Rules that may apply in California/i)
+    find("[role='status'] [role='button']", text: "Moped rules").click
+    expect(page).to have_css("section > [data-ui--collapse-target='content'] h3", text: "Rider rules")
+      .and have_text(/Rules that may apply in California/i)
+    expect(page).to have_current_path("/ebike-rules/US/CA?manual=1&top_speed=28&throttle=1&rules=1")
+
+    # which a link to it opens
+    visit "/ebike-rules/US/CA?manual=1&top_speed=28&throttle=1&rules=1"
+    expect(page).to have_css("section > [data-ui--collapse-target='content'] h3", text: "Rider rules")
   end
 
   it "filters the states, opens the one an old link's anchor names, and checks a bike in each from its rules" do

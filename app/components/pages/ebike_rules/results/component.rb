@@ -146,6 +146,11 @@ module Pages
           other_classification[:by_limits] ? translation(".may_fall_under_name", state:, name:) : translation(".falls_under_name", state:, name:)
         end
 
+        def other_classification_eyebrow
+          state = @state[:name]
+          other_classification[:by_limits] ? translation(".rules_that_may_apply", state:) : translation(".rules_that_apply", state:)
+        end
+
         def other_classification
           return @other_classification if defined?(@other_classification)
 

@@ -11,7 +11,7 @@ module EbikeRuleServices
     OFF_HIGHWAY = "evc/off_highway_motorcycle"
     MOTORCYCLE = "evc/motorcycle"
     ROAD_GROUPS = ["evc/moped", "evc/motor_driven_cycle", MOTORCYCLE].freeze
-    RULE_ORDER = %w[top_rule rider_rule enforcement vehicle_definition seller_rule legal_context].freeze
+    RULE_GROUPS = %w[rider_rule enforcement legal_context seller_rule vehicle_definition].freeze
     # Corrections the catalog doesn't carry yet: `either` limits are alternatives, and NOT_AN_EBIKE folds a
     # class into the one e-moto entry, listed last. New Jersey's law counts an electric motorized bicycle as
     # a motorcycle, and a dirt bike is one too
@@ -86,7 +86,8 @@ module EbikeRuleServices
     end
 
     # The state's classification for a vehicle with these classifications, other than its e-bike law: its own, or one
-    # sharing their group, with its restrictions not yet ended in RULE_ORDER, and its top_rules in force today
+    # sharing their group, with its restrictions not yet ended, its rule_groups each leading with their top rules, and its
+    # top_rules in force today
     def other_classification(abbreviation, ids, today: Time.zone.today)
       parsed => {groups:, tiers:}
       shared = ids.flat_map { [it, *groups[it]] }
@@ -233,8 +234,9 @@ module EbikeRuleServices
     def upcoming(date, today) = (date if date&.>(today))
 
     def ranked_rules(classification)
-      restrictions = classification[:restrictions].sort_by.with_index { |rule, index| [RULE_ORDER.index { rule[:categories].include?(it) } || RULE_ORDER.size, index] }
-      classification.merge(restrictions:, top_rules: restrictions.select { it[:starts_on].nil? && it[:categories].include?("top_rule") })
+      top, rest = classification[:restrictions].partition { it[:categories].include?("top_rule") }
+      rule_groups = (top + rest).group_by { |rule| RULE_GROUPS.find { rule[:categories].include?(it) } || RULE_GROUPS.last }
+      classification.merge(rule_groups: rule_groups.slice(*RULE_GROUPS), top_rules: top.select { it[:starts_on].nil? })
     end
 
     def within_limits?(tier, mph, watts)

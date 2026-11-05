@@ -92,18 +92,23 @@ RSpec.describe Pages::EbikeRules::Results::Component, type: :component do
     end
     let(:abbreviation) { "CA" }
 
-    it "bullets its top rules, with no citation, above its rules, which lead with them and a rider's, cited" do
+    it "bullets its top rules, with no citation, and collapses the rest to a card of its own, by category" do
       status = component.css("[role='status'] > div").first
       expect(status.css("> ul").first.css("li").map { it.text.strip }).to eq ["It isn't a Class 1, 2 or 3 e-bike. In California, it falls under Off-Highway Electric Motorcycle."]
       top_rules = status.css("> ul.tw\\:list-disc > li")
       expect(top_rules.map { it.text.strip }).to match [a_string_starting_with("Identified with a California OHV Green Sticker"),
         a_string_starting_with("Ridden only in designated OHV areas"), a_string_starting_with("No driver's license needed")]
       expect(top_rules.css("a")).to be_empty
+      expect(status).to have_css("[role='button']", text: "Off-Highway Electric Motorcycle rules")
+        .and have_no_css("[data-ui--collapse-target='content']")
 
-      rules = status.css("[data-ui--collapse-target='content'] ul").first.css("li")
-      expect(rules.map(&:text).first(4)).to match [a_string_including("Identified with a California OHV Green Sticker"), a_string_including("Ridden only"),
+      card = component.css("section > [data-ui--collapse-target='content']").first
+      expect(card).to have_text("Rules that apply in California")
+      expect(card.css("h3").map { it.text.strip }).to eq ["Off-Highway Electric Motorcycle", "Rider rules", "Seller rules", "Vehicle definition", "Sources"]
+      rider_rules = card.css("ul").first.css("li")
+      expect(rider_rules.map(&:text)).to match [a_string_including("Identified with a California OHV Green Sticker"), a_string_including("Ridden only"),
         a_string_including("No driver's license needed"), a_string_including("Can't be registered")]
-      expect(rules.first.css("a")).to_not be_empty
+      expect(rider_rules.first.css("a")).to_not be_empty
     end
   end
 
@@ -119,6 +124,7 @@ RSpec.describe Pages::EbikeRules::Results::Component, type: :component do
     it "lists the rules of the class its speed and power fit, with the ones still to come dated" do
       expect(component).to have_css("[role='status'] li", text: "In California, it may fall under Moped.")
         .and have_css("[role='status'] [role='button']", text: "Moped rules")
+        .and have_css("[data-ui--collapse-target='content']", text: "Rules that may apply in California")
         .and have_css("[role='status'] > div > ul > li", text: /\A\s*Riders need a driver's license with an M1 or M2[^§]*\z/)
         .and have_css("[data-ui--collapse-target='content'] li", text: /Riders need a driver's license with an M1 or M2.*§§12500, 12804\.9/m)
         .and have_css("[data-ui--collapse-target='content'] li", text: /A peace officer may remove it.*§22651\.08, added by AB 875/m)

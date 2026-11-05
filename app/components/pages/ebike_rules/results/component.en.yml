@@ -103,6 +103,8 @@ en:
           register_free: Register on Bike Index — free
           rule_to_check: Rule to check
           rules_not_on_file: Rules not on file
+          rules_that_apply: Rules that apply in %{state}
+          rules_that_may_apply: Rules that may apply in %{state}
           source_html: >-
             Source: %{link}'s catalog of state law. Summaries are for reference, not
             legal advice.
