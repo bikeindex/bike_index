@@ -6999,9 +6999,13 @@ es:
           from_until: 'Desde %{starts_on} hasta %{ends_on}:'
           limits_start_on: Estos límites entran en vigor %{date}. Hasta entonces,
             las reglas que se indican a continuación establecen lo que se aplica.
-          restrictions: Normas y restricciones
           sources: Fuentes
           until: 'Hasta %{date}:'
+          enforcement: Aplicación
+          legal_context: Contexto jurídico
+          rider_rules: Reglas del jinete
+          seller_rules: Reglas del vendedor
+          vehicle_definition: Definición de vehículo
         results:
           answer_no: 'No'
           answer_yes: Sí
@@ -7019,8 +7023,6 @@ es:
             de Clase 1, 2 o 3. Consulta las normas locales en el DMV de %{state}.
           gray_headline: Todavía no tenemos registradas las normas sobre bicicletas
             eléctricas de %{state}.
-          green_headline: Tu %{name} es legal para circular en %{state} como bicicleta
-            eléctrica de Clase %{n}.
           has_throttle: Tiene acelerador
           is_registered: "¿Está matriculada esta bicicleta?"
           legal_to_ride: Es legal conducirlo
@@ -7041,8 +7043,6 @@ es:
             clases estándar.
           recovered_more_often: Las bicicletas robadas se recuperan dos veces más
             a menudo cuando están registradas.
-          red_headline: Su %{name} no está permitido como bicicleta eléctrica según
-            las normas %{state} vigentes.
           register_free: Regístrate en Bike Index — gratis
           rule_to_check: Regla para comprobar
           rules_not_on_file: Reglas no archivadas
@@ -7067,11 +7067,6 @@ es:
           watts_not_provided: Potencia del motor no proporcionada
           watts_over_cap_html: El motor %{watts}W supera la capacidad %{cap}W
           watts_within_cap_html: El motor %{watts}W está dentro de la tapa
-          yellow_headline:
-            one: Tu %{name} es legal para circular en %{state} como una bicicleta
-              eléctrica de clase %{n}, con la regla %{count} a verificar.
-            other: Tu %{name} es legal para circular en %{state} como bicicleta eléctrica
-              de clase %{n}, con %{count} reglas que debes consultar.
           yellow_headline_class_unknown:
             one: Tu %{name} puede ser legal para viajar en %{state}, con la regla
               %{count} para verificar.
@@ -7099,30 +7094,18 @@ es:
           classes_recognized:
             one: Se reconoce la clase %{n}.
             other: Se reconocen las clases %{n}.
-          read_more: Leer más
           answer_optional: Opcional
-          as_class_with_optional_throttle: como Clase %{n} con su acelerador opcional
-          as_class_with_optional_upgrade: como Clase %{n} con una actualización opcional
           class_3_optional_throttle_within_html: El acelerador opcional se detiene
             a %{mph} mph.
           class_3_speed_with_throttle_html: Ayuda a %{mph} mph, no permitido con acelerador.
           class_n: Clase %{n}
           classes_not_permitted: Es una bicicleta eléctrica %{classes}, lo cual no
             está permitido.
-          green_headline_optional: Tu %{name} es legal para circular en %{state} como
-            bicicleta eléctrica de clase %{n} y %{optional}.
           manually_entered: Introducido manualmente
           model_year: Modelo %{year}
           optional_throttle_not_allowed: Es legal únicamente sin su acelerador opcional.
           optional_to_html: Opcional, a %{mph}
           throttle_with_class_3_assist: No permitido con asistencia de Clase 3
-          yellow_headline_optional:
-            one: Tu %{name} es legal para circular en %{state} como una bicicleta
-              eléctrica de clase %{n}, y %{optional}, con la regla %{count} a verificar.
-            other: Tu %{name} es legal para circular en %{state} como una bicicleta
-              eléctrica de clase %{n}, y %{optional}, con %{count} reglas para verificar.
-          yellow_headline_without_throttle: Tu %{name} es legal para circular en %{state}
-            como una bicicleta eléctrica de Clase %{n}, sin su acelerador opcional.
           green_headline_law: Tu %{name} tiene permiso para viajar en %{state} según
             las reglas %{law}.
           kmh_html: "%{kmh} km/h"
@@ -7181,6 +7164,51 @@ es:
             other: Las clases %{n} no se reconocen en %{state}, por lo que es legal
               solo como se vende.
           other_classification_rules: Reglas %{name}
+          also_class_with_optional_throttle: También es una bicicleta eléctrica de
+            clase %{n} con acelerador opcional.
+          also_class_with_optional_upgrade: También es una bicicleta eléctrica de
+            clase %{n} con una actualización opcional.
+          class_headline: Tu %{name} es una bicicleta eléctrica de clase %{n} en %{state}.
+          class_headline_optional: Tu %{name} es una bicicleta eléctrica de clase
+            %{n} en %{state} y %{optional}.
+          class_headline_optional_with_rules:
+            one: Tu %{name} es una bicicleta eléctrica de clase %{n} en %{state} y
+              %{optional}, con la regla %{count} para verificar.
+            other: Tu %{name} es una bicicleta eléctrica de clase %{n} en %{state}
+              y %{optional}, con %{count} reglas para verificar.
+          class_headline_with_rules:
+            one: Tu %{name} es una bicicleta eléctrica de clase %{n} en %{state},
+              con la regla %{count} para verificar.
+            other: Tu %{name} es una bicicleta eléctrica de clase %{n} en %{state},
+              con %{count} reglas para verificar.
+          class_headline_without_throttle: Tu %{name} es una bicicleta eléctrica de
+            clase %{n} en %{state}, sin su acelerador opcional.
+          green_headline_no_classes: Tu %{name} está clasificado como una bicicleta
+            eléctrica en %{state}.
+          heading_classes_html: "%{classes} reconocido"
+          heading_no_power_cap: Sin condensador de potencia del motor
+          heading_no_speed_cap: Sin límite de velocidad máxima asistida
+          heading_power_html: "%{watts} condensador de potencia del motor"
+          heading_speed_html: "%{speed} velocidad máxima asistida"
+          heading_throttle_allowed: Acelerador permitido
+          heading_throttle_not_allowed: Acelerador no permitido
+          heading_vehicle_html: Regulado como %{name}
+          may_fall_under_name: En %{state}, puede quedar dentro de %{name}.
+          not_classified_headline: Tu %{name} no está clasificado como bicicleta eléctrica
+            en %{state}.
+          rules_that_apply: Reglas que se aplican en %{state}
+          rules_that_may_apply: Reglas que pueden aplicarse en %{state}
+          throttle_speed_over_cap_html: El acelerador alcanza %{mph} mph, superando
+            el límite de %{cap} mph.
+          throttle_speed_within_cap_html: El acelerador alcanza las %{mph} mph, dentro
+            del límite.
+          yellow_headline_no_classes:
+            one: Tu %{name} está clasificado como una bicicleta eléctrica en %{state},
+              con la regla %{count} para verificar.
+            other: Tu %{name} está clasificado como una bicicleta eléctrica en %{state},
+              con %{count} reglas para verificar.
+          yellow_headline_no_classes_without_throttle: Tu %{name} está clasificado
+            como una bicicleta eléctrica en %{state}, sin su acelerador opcional.
         rule_label:
           classes: Clases reconocidas
           power: condensador de potencia del motor
@@ -7219,9 +7247,6 @@ es:
           certification_involves_heading: "¿Qué implica la certificación?"
           check_my_bike: Revisa mi bicicleta
           compare_html: "¿Quieres comparar varias bicicletas? %{link}"
-          disclaimer: Bike Index es una organización sin fines de lucro 501(c)(3).
-            Los resúmenes de las leyes estatales son solo de referencia y no constituyen
-            asesoramiento legal.
           for_parents: Para padres
           form_label: Consulta de cumplimiento de normativas para bicicletas eléctricas
           has_throttle: "¿Tiene acelerador?"
@@ -7318,9 +7343,6 @@ es:
           choose_province: Seleccione su provincia o territorio de la lista.
           choose_state: Elige tu estado de la lista.
           detected_place_html: Hemos detectado <strong>%{state}</strong> .
-          disclaimer_canada: Bike Index es una organización sin fines de lucro. Los
-            resúmenes de las leyes provinciales y territoriales son solo para referencia,
-            no constituyen asesoramiento legal.
           kmh: "%{kmh} km/h"
           not_in_canada_html: "¿No estás en Canadá? %{switch_country}"
           over_kmh: Más de %{kmh} km/h
@@ -7400,6 +7422,9 @@ es:
             y otros vehículos eléctricos de dos ruedas en estas clases."
           other_classes: Otros vehículos eléctricos en %{place}
           place_heading: Leyes sobre bicicletas eléctricas en %{place}
+          non_e_bike_rules: "%{state} Normas para bicicletas no eléctricas"
+          rules_that_apply: Reglas que se aplican en %{state}
+          state_rules: "%{state} Normas para bicicletas eléctricas"
         rule_citation:
           source: fuente
         class_card:
