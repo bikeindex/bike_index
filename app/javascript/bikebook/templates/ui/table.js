@@ -11,7 +11,7 @@ export const table = ({ records, classes, columns, alignKey }) => html`<div clas
     columns.map((column) => html`<th class=${join('tw:px-1 tw:py-2 tw:border-b tw:border-l tw:border-t tw:border-gray-200 tw:dark:border-gray-600',
       column.classes, column.headerClasses)}>${column.label}</th>`)}</tr></thead><tbody>${
     records.map((record, index) => html`<tr data-align-row=${alignKey ? `${alignKey}:${index}` : nothing}>${columns.map((column) => {
-      const cellClasses = join('tw:px-1 tw:py-1', 'tw:border-b tw:border-l tw:border-gray-200 tw:dark:border-gray-700', column.classes, column.cellClass?.(record))
+      const cellClasses = join('tw:px-1 tw:py-1', 'tw:border-b tw:border-l tw:border-gray-200 tw:dark:border-gray-700 tw:dark:[tr:not(:last-child)>&]:border-b-gray-800', column.classes, column.cellClass?.(record))
       return column.rowHeader
         ? html`<th scope="row" class=${cellClasses}>${column.cell(record)}</th>`
         : html`<td class=${cellClasses}>${column.cell(record)}</td>`

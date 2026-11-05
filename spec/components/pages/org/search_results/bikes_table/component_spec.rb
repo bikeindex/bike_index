@@ -5,7 +5,7 @@ require "rails_helper"
 RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :component do
   let(:component) { render_table }
   let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs:) }
-  let(:enabled_feature_slugs) { %w[bike_search] }
+  let(:enabled_feature_slugs) { [] }
   let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
   let(:bikes) { [bike] }
   let(:options) { {organization:, bikes:} }
@@ -31,7 +31,7 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
   end
 
   context "with impound_records" do
-    let(:enabled_feature_slugs) { %w[bike_search impound_bikes] }
+    let(:enabled_feature_slugs) { %w[impound_bikes] }
     let(:impound_record) { FactoryBot.create(:impound_record_with_organization, organization:, bike:, unregistered_bike: true) }
     let(:options) do
       {organization:, impound_records: [impound_record], render_sortable: true,
@@ -60,7 +60,7 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
     end
 
     context "with impound_bikes_locations" do
-      let(:enabled_feature_slugs) { %w[bike_search impound_bikes impound_bikes_locations] }
+      let(:enabled_feature_slugs) { %w[impound_bikes impound_bikes_locations] }
       let(:location) { FactoryBot.create(:location, organization:, name: "Back lot", impound_location: true) }
       let(:impound_record) { FactoryBot.create(:impound_record_with_organization, organization:, bike:, location:) }
 
@@ -132,7 +132,7 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
 
   context "with every column's feature enabled" do
     let(:enabled_feature_slugs) do
-      %w[bike_search avery_export bike_stickers impound_bikes registration_notes registration_sequences
+      %w[avery_export bike_stickers impound_bikes registration_notes registration_sequences
         reg_address reg_extra_registration_number reg_organization_affiliation reg_phone reg_student_id]
     end
     # The panel builds a checkbox per enabled_columns entry, and ui--table-column-settings
@@ -165,7 +165,7 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
   end
 
   context "with reg_student_id enabled" do
-    let(:enabled_feature_slugs) { %w[bike_search reg_student_id] }
+    let(:enabled_feature_slugs) { %w[reg_student_id] }
     let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization) }
     before { bike.current_ownership.update(registration_info: {"student_id" => "JD_4821"}) }
 
@@ -175,7 +175,7 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
   end
 
   context "with registration_sequences enabled" do
-    let(:enabled_feature_slugs) { %w[bike_search registration_sequences] }
+    let(:enabled_feature_slugs) { %w[registration_sequences] }
     let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization, propulsion_type: "pedal-assist") }
     let(:unacknowledged_bike) { FactoryBot.create(:bike_organized, creation_organization: organization, propulsion_type: "pedal-assist") }
     let(:bikes) { [bike, unacknowledged_bike] }
@@ -217,7 +217,7 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
   end
 
   context "with impound_bikes enabled" do
-    let(:enabled_feature_slugs) { %w[bike_search impound_bikes] }
+    let(:enabled_feature_slugs) { %w[impound_bikes] }
 
     it "renders the impound columns" do
       expect(component).to have_css("th.impound_id_cell", visible: :all, text: "Impound ID")
@@ -243,7 +243,7 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
   end
 
   context "when a bike does not belong to the organization" do
-    let(:enabled_feature_slugs) { %w[bike_search reg_phone reg_extra_registration_number] }
+    let(:enabled_feature_slugs) { %w[reg_phone reg_extra_registration_number] }
     let(:other_org) { FactoryBot.create(:organization) }
     let(:bike) do
       FactoryBot.create(:bike_organized,
@@ -283,7 +283,7 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
     end
 
     context "with bike_stickers enabled" do
-      let(:enabled_feature_slugs) { %w[bike_search bike_stickers] }
+      let(:enabled_feature_slugs) { %w[bike_stickers] }
       let(:bike_sticker) { FactoryBot.create(:bike_sticker, organization:) }
 
       it "serves rows assigning a sticker from the same cache, the assign column hidden in both" do

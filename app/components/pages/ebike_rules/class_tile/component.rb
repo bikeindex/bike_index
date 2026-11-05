@@ -55,15 +55,15 @@ module Pages
 
         def color
           if @optional && @e_bike_class.nil?
-            "tw:border-2 tw:border-[#cc0000] tw:text-[#cc0000]!"
+            "tw:border-2 tw:border-[#cc0000] tw:text-[#cc0000]! tw:dark:border-red-400 tw:dark:text-red-400!"
           elsif @optional
             "tw:border-2 tw:border-slate-900 tw:text-slate-900! tw:dark:border-slate-300 tw:dark:text-slate-100!"
           elsif @e_bike_class
-            "tw:bg-slate-900"
+            "tw:bg-slate-900 tw:dark:bg-slate-600"
           elsif @class_unknown
             "tw:bg-gray-500"
           else
-            "tw:bg-[#cc0000]"
+            "tw:bg-[#cc0000] tw:dark:bg-red-700"
           end
         end
 
@@ -78,9 +78,11 @@ module Pages
         end
 
         def class_number
-          tag.span(translation(".class"), class: "#{@size[:label]} tw:font-bold tw:tracking-[.12em] tw:uppercase #{@optional ? "tw:text-slate-500 tw:dark:text-slate-400" : "tw:text-[#ffd660]"}") +
+          tag.span(translation(".class"), class: "#{@size[:label]} tw:font-bold tw:tracking-[.12em] tw:uppercase #{class_label_color}") +
             tag.span(@e_bike_class || "?", class: "#{@size[:number]} tw:mt-0.5 tw:font-header tw:font-black")
         end
+
+        def class_label_color = @optional ? "tw:text-slate-500 tw:dark:text-slate-400" : "tw:text-yellow-300 tw:dark:text-yellow-200"
 
         def emoto
           tag.span(translation(".emoto"), class: "#{@size[:label]} tw:font-bold tw:tracking-[.12em] tw:uppercase") +

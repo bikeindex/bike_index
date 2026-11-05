@@ -8,7 +8,7 @@ require "rails_helper"
 # rendered DOM. Lives at the integration layer because the controllers react
 # to the rendered DOM.
 RSpec.describe "Organized impound records index", :js, type: :system do
-  let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[parking_notifications impound_bikes bike_search]) }
+  let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[parking_notifications impound_bikes]) }
   let(:user) { FactoryBot.create(:organization_admin, organization:) }
   let(:base_url) { "/o/#{organization.to_param}/impound_records" }
 

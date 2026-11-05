@@ -71,7 +71,7 @@ RSpec.describe "Listing a registration on the marketplace", :js, type: :system d
 
     # ---- Into the listing form, from the registration it's for ----
     click_link "View your registration"
-    expect(page).to have_current_path(bike_path(bike), ignore_query: true)
+    expect(page).to have_current_path(registration_path(bike), ignore_query: true)
     click_link "Edit"
     click_link "List for sale"
 
@@ -118,10 +118,10 @@ RSpec.describe "Listing a registration on the marketplace", :js, type: :system d
     # The footer links the marketplace too, so name the navbar's
     within("#primary-main-menu") { click_link "Marketplace" }
     click_link "Surly Cross Check"
-    expect(page).to have_current_path(bike_path(bike), ignore_query: true)
+    expect(page).to have_current_path(registration_path(bike), ignore_query: true)
     expect_listing_shown
 
-    click_link "contact the owner"
+    click_link "Contact the seller"
 
     # Messaging asks them to log in, and this buyer has no account to log in to - so they
     # cross to sign-up from the navbar, which carries no return_to of its own
@@ -140,7 +140,7 @@ RSpec.describe "Listing a registration on the marketplace", :js, type: :system d
     buyer = User.find_by(email: buyer_email)
     expect(buyer.confirmed?).to be_falsey
 
-    # Confirming spends the return_to stored when they clicked "contact the owner"
+    # Confirming spends the return_to stored when they clicked "Contact the seller"
     EmailJobs::ConfirmationJob.drain
     visit emailed_path("/users/confirm")
     click_button "Sign in"

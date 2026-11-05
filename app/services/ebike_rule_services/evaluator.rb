@@ -11,10 +11,10 @@ module EbikeRuleServices
     # with them, comes with its licence and registration rules to check
     def rules(law:, bike:)
       if law[:metric]
-        [(row(:vehicle, :check, :no_e_bike_category) if law[:motor_vehicle]), power_rule(law, bike.watts),
+        [(row(:vehicle, :check, :no_e_bike_category) if law[:motor_vehicle]), power_rule(law, bike),
           metric_speed_rule(law, bike), throttle_rule(law, bike)].compact
       else
-        [classes_rule(law, bike), power_rule(law, bike.watts), speed_rule(law, bike), throttle_rule(law, bike)]
+        [classes_rule(law, bike), power_rule(law, bike), speed_rule(law, bike), throttle_rule(law, bike)]
       end
     end
 
@@ -57,8 +57,9 @@ module EbikeRuleServices
       end
     end
 
-    def power_rule(law, watts)
+    def power_rule(law, bike)
       cap = law[:watt_cap]
+      watts = bike.motor_watts
       if (date = law[:limits_start_on])
         row(:power, :info, :limits_start_on, date:)
       # outside the US, a cap under the 750W many e-bikes are rated
@@ -68,6 +69,9 @@ module EbikeRuleServices
         row(:power, :info, :watts_not_provided)
       elsif cap.nil?
         row(:power, :pass, :no_watt_cap)
+      # a cap is on rated power, which a peak over it says nothing of
+      elsif watts > cap && bike.watts.nil?
+        row(:power, :check, :watts_to_check, cap:)
       elsif watts > cap
         row(:power, :fail, :watts_over_cap, watts:, cap:)
       else
@@ -77,7 +81,8 @@ module EbikeRuleServices
 
     def speed_rule(law, bike)
       cap = law[:mph]
-      mph = bike.top_assist_mph
+      mph = bike.speed_mph
+      by_throttle = bike.top_assist_mph.nil?
       past = bike.assists_past_mph
       if (date = law[:limits_start_on])
         row(:speed, :info, :limits_start_on, date:)
@@ -91,9 +96,9 @@ module EbikeRuleServices
       elsif cap.nil?
         row(:speed, :pass, :no_speed_cap)
       elsif mph > cap
-        row(:speed, :fail, :speed_over_cap, mph:, cap:)
+        row(:speed, :fail, by_throttle ? :throttle_speed_over_cap : :speed_over_cap, mph:, cap:)
       else
-        row(:speed, :pass, :speed_within_cap, mph:)
+        row(:speed, :pass, by_throttle ? :throttle_speed_within_cap : :speed_within_cap, mph:)
       end
     end
 

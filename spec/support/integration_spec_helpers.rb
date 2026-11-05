@@ -354,6 +354,8 @@ module IntegrationSpecHelpers
       @gate.push(@gate.pop)
     end
 
+    def held? = @held
+
     # A pattern that stops matching holds nothing, leaving the example green against no race
     def release
       raise "hold_requests held nothing - has the pattern stopped matching?" unless @held

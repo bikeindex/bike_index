@@ -66,7 +66,7 @@ module Pages
             title: translation(".pillar_record_title"), body: translation(".pillar_record_body")},
             {icon: "icons/users.svg", circle: "tw:bg-purple-500",
              title: translation(".pillar_network_title"), body: translation(".pillar_network_millions_body")},
-            {icon: "icons/megaphone.svg", circle: "tw:bg-slate-900",
+            {icon: "icons/megaphone.svg", circle: "tw:bg-slate-900 tw:dark:bg-slate-600",
              title: translation(".pillar_alerts_title"), body: translation(".pillar_alerts_promoted_body")}]
         end
 

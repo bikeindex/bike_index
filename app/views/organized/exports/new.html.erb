@@ -81,14 +81,14 @@
         <a
           class="field-expander"
           href="#"
-          style="<%= show_start ? 'display: none;' : '' %>"
+          style="<%= show_end ? 'display: none;' : '' %>"
         >
           Set before time
         </a>
 
         <div
           class="collapsed-fields"
-          style="<%= show_start ? 'display: block;' : '' %>"
+          style="<%= show_end ? 'display: block;' : '' %>"
         >
           <%= f.datetime_local_field :end_at, step: 60, class: "form-control" %>
           <a class="field-collapser" href="#"> remove </a>

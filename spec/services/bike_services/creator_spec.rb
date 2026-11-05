@@ -15,6 +15,16 @@ RSpec.describe BikeServices::Creator do
 
   describe "create_bike" do
     context "errors" do
+      context "invalid bike, with a phone number for the owner_email" do
+        let(:bike_params) { {serial_number: "Serial 1", primary_frame_color_id: color.id, owner_email: "5551234567", is_phone: true} }
+
+        it "only reports what's wrong with the bike" do
+          bike = instance.create_bike(b_param)
+          expect(bike.id).to be_blank
+          expect(bike.cleaned_error_messages).to eq(["Manufacturer can't be blank"])
+        end
+      end
+
       context "owner_email format error" do
         let(:bike_params) do
           {

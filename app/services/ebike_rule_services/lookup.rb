@@ -46,7 +46,7 @@ module EbikeRuleServices
     def details
       return {} unless submitted && bike
 
-      top_speed, throttle, watts = manual ? [manual_top_speed, manual_throttle, manual_watts] : [model_top_speed, bike.throttle, bike.watts || bike.peak_watts]
+      top_speed, throttle, watts = manual ? [manual_top_speed, manual_throttle, manual_watts] : [model_top_speed, bike.throttle, bike.motor_watts]
       {top_speed:, throttle: {true => 1, false => 0}[throttle], watts:}
     end
 
