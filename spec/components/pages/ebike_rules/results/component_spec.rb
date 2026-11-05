@@ -114,8 +114,8 @@ RSpec.describe Pages::EbikeRules::Results::Component, type: :component do
       status = component.css("[role='status'] > div").first
       expect(status.css("> ul").first.css("li").map { it.text.strip }).to eq ["In California, it falls under Off-Highway Electric Motorcycle."]
       top_rules = status.css("> ul.tw\\:list-disc > li")
-      expect(top_rules.map { it.text.strip }).to match [a_string_starting_with("Identified with a California OHV Green Sticker"),
-        a_string_starting_with("Ridden only in designated OHV areas"), a_string_starting_with("No driver's license needed")]
+      expect(top_rules.map { it.text.strip }).to match [a_string_starting_with("Ridden only in designated OHV areas"),
+        a_string_starting_with("Identified with a California OHV Green Sticker"), a_string_starting_with("Can't be registered")]
       expect(top_rules.css("a")).to be_empty
       expect(status).to have_css("[role='button']", text: "Off-Highway Electric Motorcycle rules")
         .and have_no_css("[data-ui--collapse-target='content']")
@@ -124,8 +124,8 @@ RSpec.describe Pages::EbikeRules::Results::Component, type: :component do
       expect(card).to have_text("Rules that apply in California")
       expect(card.css("h3").map { it.text.strip }).to eq ["Off-Highway Electric Motorcycle", "Rider rules", "Seller rules", "Vehicle definition", "Sources"]
       rider_rules = card.css("ul").first.css("li")
-      expect(rider_rules.map(&:text)).to match [a_string_including("Identified with a California OHV Green Sticker"), a_string_including("Ridden only"),
-        a_string_including("No driver's license needed"), a_string_including("Can't be registered")]
+      expect(rider_rules.map(&:text)).to match [a_string_including("Ridden only"), a_string_including("Identified with a California OHV Green Sticker"),
+        a_string_including("Can't be registered"), a_string_including("No driver's license needed")]
       expect(rider_rules.first.css("a")).to_not be_empty
     end
   end

@@ -13,7 +13,7 @@ RSpec.describe Pages::EbikeRules::LawDetails::Component, type: :component do
 
     it "groups its rules under a heading for each category it has, in the order a rider needs them" do
       expect(component.css("h3").map { it.text.strip }).to eq ["Rider rules", "Legal context", "Seller rules", "Vehicle definition", "Sources"]
-      expect(component.css("ul").first.css("li").first.text).to include("Not a motor vehicle")
+      expect(component.css("ul").first.css("li").first.text).to include("Ridden wherever bicycles may go")
     end
 
     it "marks each with the days it runs, and the rest without" do

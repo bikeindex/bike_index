@@ -12,6 +12,8 @@ module EbikeRuleServices
     MOTORCYCLE = "evc/motorcycle"
     ROAD_GROUPS = ["evc/moped", "evc/motor_driven_cycle", MOTORCYCLE].freeze
     RULE_GROUPS = %w[rider_rule enforcement legal_context seller_rule vehicle_definition].freeze
+    # TODO: only the numbered ones, once the catalog publishes schema 0.26.2
+    TOP_RULE = /\Atop_rule(?:_(\d+))?\z/
     # Corrections the catalog doesn't carry yet: `either` limits are alternatives, and NOT_AN_EBIKE folds a
     # class into the one e-moto entry, listed last. New Jersey's law counts an electric motorized bicycle as
     # a motorcycle, and a dirt bike is one too
@@ -50,8 +52,8 @@ module EbikeRuleServices
 
     # With its rule_groups, each leading with its top rules, and its top_rules. Each rule goes under the first group it's in
     def with_rule_groups(classification)
-      top, rest = classification[:restrictions].partition { it[:categories].include?("top_rule") }
-      rule_groups = (top + rest).group_by { |rule| RULE_GROUPS.find { rule[:categories].include?(it) } || RULE_GROUPS.last }
+      top = ranked_top_rules(classification[:restrictions])
+      rule_groups = (top + (classification[:restrictions] - top)).group_by { |rule| RULE_GROUPS.find { rule[:categories].include?(it) } || RULE_GROUPS.last }
       classification.merge(rule_groups: rule_groups.slice(*RULE_GROUPS), top_rules: top_rules(top))
     end
 
@@ -234,12 +236,16 @@ module EbikeRuleServices
 
     def upcoming(date, today) = (date if date&.>(today))
 
-    def top_rules(restrictions) = restrictions.select { it[:starts_on].nil? && it[:categories].include?("top_rule") }
+    def top_rules(restrictions) = ranked_top_rules(restrictions).select { it[:starts_on].nil? }
+
+    def ranked_top_rules(restrictions) = restrictions.select { top_rule_rank(it) }.sort_by.with_index { |restriction, index| [top_rule_rank(restriction), index] }
+
+    def top_rule_rank(restriction) = restriction[:categories].filter_map { it[TOP_RULE] && it[TOP_RULE, 1].to_i }.first
 
     def within_limits?(tier, mph, watts)
       (tier[:mph].nil? || mph&.<=(tier[:mph])) && (watts.nil? || (tier[:min_watts]..tier[:watt_cap]).cover?(watts))
     end
 
-    conceal :parsed, :classifications, :vocabulary, :parse, :parse_places, :motor_vehicle_law, :state_classes, :by_speed, :state_class, :metric?, :mph, :law, :restriction, :web_pages, :date, :in_force, :current, :upcoming, :top_rules, :within_limits?
+    conceal :ranked_top_rules, :top_rule_rank, :parsed, :classifications, :vocabulary, :parse, :parse_places, :motor_vehicle_law, :state_classes, :by_speed, :state_class, :metric?, :mph, :law, :restriction, :web_pages, :date, :in_force, :current, :upcoming, :top_rules, :within_limits?
   end
 end

@@ -59,7 +59,7 @@ RSpec.describe EbikeRulesController, type: :request do
       expect(page).to have_css("h3", text: "Class 3").and have_css("[role=button]", text: "California specifics")
         .and have_css("[role=button]", text: "California E-bike rules")
         .and have_css("#ebike-rules-classes h3", text: "Rider rules")
-        .and have_css("li", text: "Not a motor vehicle: no driver's license")
+        .and have_css("li", text: "Ridden wherever bicycles may go")
         .and have_css("li", text: "Registered and plated with the DMV, and must carry liability insurance")
         .and have_no_css("li", text: "Allowed on freeways")
         .and have_no_text("Often comes with a helmet rule")
@@ -71,7 +71,7 @@ RSpec.describe EbikeRulesController, type: :request do
       get "/ebike-rules/US/CA", params: {e_bike_class: 3}, headers: frame.call(3)
       expect(page).to have_css("turbo-frame#ebike-rules-class-card-3 h3", text: "Class 3")
         .and have_css("[role=button]", text: "California specifics")
-        .and have_css("li", text: "Not a motor vehicle: no driver's license")
+        .and have_css("li", text: "Ridden wherever bicycles may go")
         .and have_no_css("li a")
         .and have_no_css("h3", text: "Class 1").and have_no_css("#ebike-rules-classes")
 
@@ -218,7 +218,7 @@ RSpec.describe EbikeRulesController, type: :request do
       expect(page).to have_css("[role='status']", text: "Your Aventón Level 4 ADV is not classified as an e-bike in California.")
       top_line = page.all("[role='status'] > div > ul > li").map { it.text.strip }
       expect(top_line.first).to eq "It is a Class 2 and Class 3 e-bike, which is not permitted. In California, it may fall under Moped."
-      expect(top_line.second).to start_with "Riders need a driver's license"
+      expect(top_line.second).to start_with "Kept off bike paths and trails"
       # its speed and throttle fail too, which the classes' note already gives as the reason
       speed = page.find("li", text: /28\W*mph top assisted speed\s*Assists to 28\W*mph, not allowed with a throttle/)
       throttle = page.find("li", text: /Throttle allowed\s*Not allowed with Class 3 assist/)

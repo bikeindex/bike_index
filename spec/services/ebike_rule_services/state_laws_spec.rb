@@ -11,7 +11,7 @@ RSpec.describe EbikeRuleServices::StateLaws do
         classes: [1, 2, 3], watt_cap: 750, mph: 28, throttle: true)
       expect(described_class.find("CO")[:restrictions])
         .to include({rule: "Class 3 riders must be 16 or older; a younger passenger may ride on one designed to carry passengers",
-          citation: "Colorado Revised Statutes §42-4-1412", categories: ["rider_rule"], sources: ["https://olls.info/crs/crs2026-title-42.pdf#page=981"],
+          citation: "Colorado Revised Statutes §42-4-1412", categories: ["rider_rule", "top_rule_1"], sources: ["https://olls.info/crs/crs2026-title-42.pdf#page=981"],
           starts_on: nil, ends_on: nil})
       expect(described_class.find("CO")[:sources]).to include("https://leg.colorado.gov/bills/hb25-1197")
     end
@@ -123,8 +123,7 @@ RSpec.describe EbikeRuleServices::StateLaws do
 
   describe "e_bike_top_rules" do
     it "is the top rules of the state's e-bike law" do
-      expect(described_class.e_bike_top_rules("CA").pluck(:rule)).to match [a_string_starting_with("Not a motor vehicle"), a_string_starting_with("Riders under 18"),
-        a_string_starting_with("Ridden wherever bicycles may go")]
+      expect(described_class.e_bike_top_rules("CA").pluck(:rule)).to match [a_string_starting_with("Ridden wherever bicycles may go"), a_string_starting_with("Riders must be 16 or older")]
       expect(described_class.e_bike_top_rules("WY")).to eq []
     end
   end
@@ -164,7 +163,7 @@ RSpec.describe EbikeRuleServices::StateLaws do
       classification = described_class.other_classification("CA", ["evc/moped"], today: Date.new(2026, 11, 4))
       groups = classification[:rule_groups].transform_values { it.pluck(:rule) }
 
-      expect(classification[:top_rules].pluck(:rule)).to match [a_string_starting_with("Riders need a driver's license"), a_string_starting_with("Riders must wear"),
+      expect(classification[:top_rules].pluck(:rule)).to match [a_string_starting_with("Kept off bike paths and trails"), a_string_starting_with("Riders need a driver's license"),
         a_string_starting_with("Registered with the DMV")]
       expect(groups.keys).to eq %w[rider_rule enforcement seller_rule vehicle_definition]
       expect(groups.values.sum(&:size)).to eq classification[:restrictions].size
