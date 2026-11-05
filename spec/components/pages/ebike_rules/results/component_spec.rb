@@ -52,6 +52,17 @@ RSpec.describe Pages::EbikeRules::Results::Component, type: :component do
     end
   end
 
+  context "with only a peak power, over the state's cap" do
+    let(:bike) { super().with(watts: nil, peak_watts: 800) }
+
+    it "leaves the rating to check, showing the peak" do
+      expect(component).to have_css("[role='status']", text: "Legal, with rules to check")
+        .and have_css("[role='status']", text: "Your Trek Verve+ 2 is a Class 1 e-bike in Indiana, with 1 rule to check.")
+        .and have_css("[role='status'] li", text: "Check that its motor is rated 750W or less.")
+        .and have_css("dd", text: "800W")
+    end
+  end
+
   context "in a state without classes" do
     let(:abbreviation) { "AK" }
 

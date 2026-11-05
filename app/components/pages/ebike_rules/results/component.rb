@@ -278,7 +278,6 @@ module Pages
         def metric_note(note, args)
           case note
           when :no_e_bike_category then translation(".no_e_bike_category")
-          when :watts_to_check then translation(".watts_to_check_html", **args)
           when :no_watt_cap then translation(".no_watt_cap_in_law")
           when :speed_within_cap then translation(".speed_within_cap_kmh_html", **args)
           when :speed_over_cap then translation(".speed_over_cap_kmh_html", **args)
@@ -309,6 +308,7 @@ module Pages
           when :limits_start_on then translation(".limits_start_on", **args)
           when :watts_within_cap then translation(".watts_within_cap_html", **args)
           when :watts_over_cap then translation(".watts_over_cap_html", **args)
+          when :watts_to_check then translation(".watts_to_check_html", **args)
           when :watts_not_provided then translation(".watts_not_provided")
           when :no_watt_cap then translation(".no_watt_cap")
           when :speed_within_cap then translation(".speed_within_cap_html", **args)

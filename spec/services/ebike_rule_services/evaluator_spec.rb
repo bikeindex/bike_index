@@ -167,9 +167,17 @@ RSpec.describe EbikeRuleServices::Evaluator do
   context "with only a peak power and a stock throttle's speed on record" do
     let(:attributes) { super().merge(e_bike_class: nil, watts: nil, peak_watts: 8_000, top_assist_mph: nil, throttle: true, stock_throttle: true, throttle_mph: 47) }
 
-    it "checks them against the caps" do
-      expect(rules.find { it[:id] == :power }).to include(status: :fail, note: :watts_over_cap, args: {watts: 8_000, cap: 750})
+    it "leaves a peak over the cap to check, and fails the speed" do
+      expect(rules.find { it[:id] == :power }).to include(status: :check, note: :watts_to_check, args: {cap: 750})
       expect(rules.find { it[:id] == :speed }).to include(status: :fail, note: :throttle_speed_over_cap, args: {mph: 47, cap: 28})
+    end
+
+    context "with a peak within the cap" do
+      let(:attributes) { super().merge(peak_watts: 500) }
+
+      it "passes" do
+        expect(rules.find { it[:id] == :power }).to include(status: :pass, note: :watts_within_cap, args: {watts: 500})
+      end
     end
 
     context "with a rating too" do
