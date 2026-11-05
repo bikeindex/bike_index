@@ -20,6 +20,23 @@ en:
           class_3_throttle_over_html: Throttle runs to %{mph} mph, past the 20 mph
             a Class 3's throttle is allowed
           class_3_throttle_within_html: Throttle stops at %{mph} mph
+          class_headline: Your %{name} is a Class %{n} e-bike in %{state}.
+          class_headline_optional: Your %{name} is a Class %{n} e-bike in %{state},
+            and %{optional}.
+          class_headline_optional_with_rules:
+            one: >-
+              Your %{name} is a Class %{n} e-bike in %{state}, and %{optional}, with
+              %{count} rule to check.
+            other: >-
+              Your %{name} is a Class %{n} e-bike in %{state}, and %{optional}, with
+              %{count} rules to check.
+          class_headline_with_rules:
+            one: Your %{name} is a Class %{n} e-bike in %{state}, with %{count} rule
+              to check.
+            other: Your %{name} is a Class %{n} e-bike in %{state}, with %{count}
+              rules to check.
+          class_headline_without_throttle: Your %{name} is a Class %{n} e-bike in
+            %{state}, without its optional throttle.
           class_n: Class %{n}
           class_unknown_check_label: BikeBook doesn't list its class or top speed,
             so check the class on its label
@@ -32,27 +49,6 @@ en:
             other: Classes %{n} are recognized
           classes_start_on: Classes take effect %{date}. Until then, check the state's
             current rules
-          classified_headline: Your %{name} is classified as a Class %{n} e-bike in
-            %{state}.
-          classified_headline_optional: Your %{name} is classified as a Class %{n}
-            e-bike in %{state}, and %{optional}.
-          classified_headline_optional_with_rules:
-            one: >-
-              Your %{name} is classified as a Class %{n} e-bike in %{state}, and %{optional},
-              with %{count} rule to check.
-            other: >-
-              Your %{name} is classified as a Class %{n} e-bike in %{state}, and %{optional},
-              with %{count} rules to check.
-          classified_headline_with_rules:
-            one: >-
-              Your %{name} is classified as a Class %{n} e-bike in %{state}, with
-              %{count} rule to check.
-            other: >-
-              Your %{name} is classified as a Class %{n} e-bike in %{state}, with
-              %{count} rules to check.
-          classified_headline_without_throttle: >-
-            Your %{name} is classified as a Class %{n} e-bike in %{state}, without
-            its optional throttle.
           entered_unverified: Entered by you, not verified by BikeBook.
           fails_rule: Does not meet this rule
           falls_under_name: In %{state}, it falls under %{name}.
@@ -67,8 +63,7 @@ en:
           gray_headline: We don't have %{state}'s e-bike rules on file yet.
           green_headline_law: Your %{name} is legal to ride in %{state} under the
             %{law} rules.
-          green_headline_no_classes: Your %{name} is legal to ride in %{state} as
-            an e-bike.
+          green_headline_no_classes: Your %{name} is classified as an e-bike in %{state}.
           has_throttle: Has a throttle
           heading_classes_html: "%{classes} recognized"
           heading_no_power_cap: No motor power cap
@@ -199,13 +194,13 @@ en:
               with %{count} rules to check.
           yellow_headline_no_classes:
             one: >-
-              Your %{name} is legal to ride in %{state} as an e-bike, with %{count}
-              rule to check.
+              Your %{name} is classified as an e-bike in %{state}, with %{count} rule
+              to check.
             other: >-
-              Your %{name} is legal to ride in %{state} as an e-bike, with %{count}
-              rules to check.
+              Your %{name} is classified as an e-bike in %{state}, with %{count} rules
+              to check.
           yellow_headline_no_classes_without_throttle: >-
-            Your %{name} is legal to ride in %{state} as an e-bike, without its optional
+            Your %{name} is classified as an e-bike in %{state}, without its optional
             throttle.
           yes_to_html: Yes, to %{mph}
           yes_to_kmh_html: Yes, to %{kmh} km/h

@@ -53,21 +53,21 @@ module Pages
           if @law[:classes].none?
             translation(".green_headline_no_classes", name:, state:)
           elsif optional_clause.present?
-            translation(".classified_headline_optional", name:, state:, n: class_numbers, optional: optional_clause)
+            translation(".class_headline_optional", name:, state:, n: class_numbers, optional: optional_clause)
           else
-            translation(".classified_headline", name:, state:, n: class_numbers)
+            translation(".class_headline", name:, state:, n: class_numbers)
           end
         end
 
         def yellow_headline(name, state)
           if without_throttle?
-            @law[:classes].none? ? translation(".yellow_headline_no_classes_without_throttle", name:, state:) : translation(".classified_headline_without_throttle", name:, state:, n: class_numbers)
+            @law[:classes].none? ? translation(".yellow_headline_no_classes_without_throttle", name:, state:) : translation(".class_headline_without_throttle", name:, state:, n: class_numbers)
           elsif @bike.e_bike_class && @law[:classes].none?
             translation(".yellow_headline_no_classes", name:, state:, count: rule_count(:check))
           elsif @bike.e_bike_class && optional_clause.present?
-            translation(".classified_headline_optional_with_rules", name:, state:, n: class_numbers, optional: optional_clause, count: rule_count(:check))
+            translation(".class_headline_optional_with_rules", name:, state:, n: class_numbers, optional: optional_clause, count: rule_count(:check))
           elsif @bike.e_bike_class
-            translation(".classified_headline_with_rules", name:, state:, n: class_numbers, count: rule_count(:check))
+            translation(".class_headline_with_rules", name:, state:, n: class_numbers, count: rule_count(:check))
           else
             translation(".yellow_headline_class_unknown", name:, state:, count: rule_count(:check))
           end

@@ -22,7 +22,7 @@ RSpec.describe Pages::EbikeRules::Results::Component, type: :component do
 
   it "renders a legal bike, its BikeBook photo, specs and certifications, and its state's limits" do
     expect(component).to have_css("[role='status']", text: "Legal to ride")
-      .and have_css("[role='status']", text: "Your Trek Verve+ 2 is classified as a Class 1 e-bike in Indiana.")
+      .and have_css("[role='status']", text: "Your Trek Verve+ 2 is a Class 1 e-bike in Indiana.")
       .and have_css("img[src='https://bikebook.bikeindex.org/trek/2025/verve.jpg'][alt='Trek Verve+ 2']")
       .and have_css("[role='img'][aria-label='Class 1 e-bike']")
       .and have_css("p", text: /\A\s*2025 model\s*\z/)
@@ -42,7 +42,7 @@ RSpec.describe Pages::EbikeRules::Results::Component, type: :component do
 
     it "renders the rule to check, with no photo and unknown certifications" do
       expect(component).to have_css("[role='status']", text: "Legal, with rules to check")
-        .and have_css("[role='status']", text: "Your e-bike is classified as a Class 2 and 3 e-bike in Colorado, with 1 rule to check.")
+        .and have_css("[role='status']", text: "Your e-bike is a Class 2 and 3 e-bike in Colorado, with 1 rule to check.")
         .and have_css("[role='status'] li", text: "Throttle must cut out at 20 mph.")
         .and have_css("p", text: /\A\s*Entered manually\s*\z/)
         .and have_css("dd", text: "28 mph")
@@ -59,7 +59,7 @@ RSpec.describe Pages::EbikeRules::Results::Component, type: :component do
       let(:bike) { super().with(e_bike_class: 3, throttle: true, stock_throttle: true) }
 
       it "doesn't name a class" do
-        expect(component).to have_css("[role='status']", text: "Your Trek Verve+ 2 is legal to ride in Alaska as an e-bike, with 1 rule to check.")
+        expect(component).to have_css("[role='status']", text: "Your Trek Verve+ 2 is classified as an e-bike in Alaska, with 1 rule to check.")
       end
     end
 
@@ -67,7 +67,7 @@ RSpec.describe Pages::EbikeRules::Results::Component, type: :component do
       let(:bike) { super().with(e_bike_class: 3, throttle: true, stock_throttle: false, throttle_mph: 28, optional_classes: {3 => "throttle"}) }
 
       it "doesn't name a class" do
-        expect(component).to have_css("[role='status']", text: "Your Trek Verve+ 2 is legal to ride in Alaska as an e-bike, without its optional throttle.")
+        expect(component).to have_css("[role='status']", text: "Your Trek Verve+ 2 is classified as an e-bike in Alaska, without its optional throttle.")
       end
     end
   end
