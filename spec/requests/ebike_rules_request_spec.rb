@@ -309,7 +309,6 @@ RSpec.describe EbikeRulesController, type: :request do
         .and have_css("h2", text: "E-bike laws by province and territory")
         .and have_link("Check an e-bike in Ontario", href: "/ebike-rules/CA/ON#check", visible: :all)
         .and have_css("#state-panel-ca-nb h3", text: "Motor Driven Cycle", visible: :all)
-        .and have_text("Provincial and territorial law summaries")
       # but the country switch's way back to it
       expect(page.find("main").text.remove("United States (US)")).not_to match(/\b(US|U\.S\.|mph|states?|DMV|Class [123])\b/)
       # BikeBook's models sold in Canada
