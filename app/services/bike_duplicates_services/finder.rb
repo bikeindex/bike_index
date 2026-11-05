@@ -84,7 +84,7 @@ module BikeDuplicatesServices
       ActiveRecord::Base.connection.select_all(query).to_a.map do |group|
         group["manufacturer_name_serial"] = manufacturer_names[group["serial"]]
         group = group.except("linked_organization_ids").merge("kind" => kind(group),
-          "bike_ids" => JSON.parse(group["bike_ids"]),
+          "bike_ids" => JSON.parse(group["bike_ids"]), "simple_serials" => JSON.parse(group["simple_serials"]),
           "organization_ids" => (JSON.parse(group["organization_ids"] || "[]") + JSON.parse(group["linked_organization_ids"] || "[]").flatten).uniq,
           "first_at" => group["first_at"].in_time_zone.to_i,
           "last_at" => group["last_at"].in_time_zone.to_i)
@@ -236,6 +236,7 @@ module BikeDuplicatesServices
           LEFT JOIN stolen_serials s ON s.serial = live.serial
         ), #{registrations_sql("duplicates")}
         SELECT manufacturer_id, serial, min(id) reference_id, jsonb_agg(id ORDER BY created_at, id) bike_ids,
+          jsonb_agg(DISTINCT simple_serial) simple_serials,
           count(*)::integer record_count, count(*) FILTER (WHERE test)::integer test_count,
           count(*) FILTER (WHERE pos)::integer pos_count, count(*) FILTER (WHERE customer)::integer customer_count,
           count(*) FILTER (WHERE claimed)::integer claimed_count,

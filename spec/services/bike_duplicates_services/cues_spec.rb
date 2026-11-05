@@ -7,12 +7,17 @@ RSpec.describe BikeDuplicatesServices::Cues do
   end
   let(:cue_keys) { described_class.group_cues(group).map(&:key) }
 
-  def cue_labels(serials) = described_class.cues(serials:, record_count: 2, contact_count: 2, test_count: 0, review_contact_count: 0, single_contact: false).map(&:label)
+  def cue_labels(serials, entered_serials: serials) = described_class.cues(serials:, entered_serials:, record_count: 2, contact_count: 2, test_count: 0, review_contact_count: 0, single_contact: false).map(&:label)
 
-  it "finds standards designations through serial normalization" do
-    expect(cue_labels(["EN14764"])).to eq ["Possible standards marking: EN 14764"]
-    expect(cue_labels([SerialNormalizer.no_space(SerialNormalizer.normalized_and_corrected("iso 4210-2"))])).to eq ["Possible standards marking: ISO 4210"]
+  it "finds standards designations in the serial as entered" do
+    expect(cue_labels(["EN14764"], entered_serials: ["en 14764"])).to eq ["Possible standards marking: EN 14764"]
+    expect(cue_labels(["1504210"], entered_serials: ["iso 4210-2"])).to eq ["Possible standards marking: ISO 4210"]
     expect(cue_labels(["WTU123456", nil])).to eq []
+  end
+
+  it "doesn't find ISO designations in serials that normalize to the same digits" do
+    expect(cue_labels(["W15042103"], entered_serials: ["W15042103"])).to eq []
+    expect(cue_labels(["W15042103"], entered_serials: ["WIS042103"])).to eq []
   end
 
   it "recognizes whole part-number, manufacturer-name and repeated-character serials only" do
@@ -37,7 +42,7 @@ RSpec.describe BikeDuplicatesServices::Cues do
   end
 
   context "a repeated standards marking with many example contacts" do
-    let(:group) { super().merge("serial" => "EN14764", "record_count" => 12, "email_count" => 12, "review_contact_count" => 12) }
+    let(:group) { super().merge("serial" => "EN14764", "simple_serials" => ["EN14764"], "record_count" => 12, "email_count" => 12, "review_contact_count" => 12) }
 
     it "explains each cue" do
       expect(cue_keys).to eq %w[standard_marking possible_code review_contact]
