@@ -283,9 +283,9 @@ Rails.application.routes.draw do
       end
     end
 
+    get "bikes/duplicates", to: redirect("/admin/duplicate_bikes?search_view=segments")
     resources :bikes do
       collection do
-        get :duplicates
         put :ignore_duplicate_toggle
         get :missing_manufacturer
         post :update_manufacturers
@@ -298,6 +298,7 @@ Rails.application.routes.draw do
         put :undelete
       end
     end
+    resources :duplicate_bikes, only: %i[index show]
     get "credibility_badges", to: "dashboard#credibility_badges"
     get "maintenance", to: "dashboard#maintenance"
     get "scheduled_jobs", to: "dashboard#scheduled_jobs"
