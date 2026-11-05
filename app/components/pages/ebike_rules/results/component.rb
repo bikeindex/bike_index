@@ -5,9 +5,9 @@ module Pages
     module Results
       class Component < ApplicationComponent
         VERDICTS = {
-          green: {classes: "tw:bg-[#e8f5ee] tw:border-[#2e8b57] tw:dark:bg-green-950", icon: :pass},
-          yellow: {classes: "tw:bg-[#fff6da] tw:border-[#ffcc33] tw:dark:border-yellow-300/50 tw:dark:bg-yellow-300/25", icon: :check},
-          red: {classes: "tw:bg-[#fdecec] tw:border-[#cc0000] tw:dark:border-red-500 tw:dark:bg-red-950", icon: :fail},
+          green: {classes: "tw:bg-[#e8f5ee] tw:border-[#2e8b57] tw:dark:border-green-500/50 tw:dark:bg-green-500/25", icon: :pass},
+          yellow: {classes: "tw:bg-yellow-50 tw:border-yellow-400 tw:dark:border-yellow-300/50 tw:dark:bg-yellow-300/25", icon: :check},
+          red: {classes: "tw:bg-[#fdecec] tw:border-[#cc0000] tw:dark:border-red-500/50 tw:dark:bg-red-500/25", icon: :fail},
           gray: {classes: "tw:bg-gray-50 tw:border-gray-300 tw:dark:border-gray-600 tw:dark:bg-gray-800", icon: :unknown}
         }.freeze
         EYEBROW_CLASSES = "tw:text-xs tw:font-bold tw:tracking-[.08em] tw:text-gray-600 tw:uppercase tw:dark:text-gray-400"

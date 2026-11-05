@@ -82,7 +82,7 @@ module Pages
             tag.span(@e_bike_class || "?", class: "#{@size[:number]} tw:mt-0.5 tw:font-header tw:font-black")
         end
 
-        def class_label_color = @optional ? "tw:text-slate-500 tw:dark:text-slate-400" : "tw:text-[#ffd660] tw:dark:text-yellow-200"
+        def class_label_color = @optional ? "tw:text-slate-500 tw:dark:text-slate-400" : "tw:text-yellow-300 tw:dark:text-yellow-200"
 
         def emoto
           tag.span(translation(".emoto"), class: "#{@size[:label]} tw:font-bold tw:tracking-[.12em] tw:uppercase") +

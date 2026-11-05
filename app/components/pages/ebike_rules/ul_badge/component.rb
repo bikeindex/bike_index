@@ -19,7 +19,7 @@ module Pages
 
         def certified? = @status == :certified
 
-        def background = certified? ? "tw:bg-[#e8f5ee] tw:dark:bg-green-950" : "tw:bg-[#fff6da] tw:dark:bg-yellow-300/25"
+        def background = certified? ? "tw:bg-[#e8f5ee] tw:dark:bg-green-500/25" : "tw:bg-yellow-50 tw:dark:bg-yellow-300/25"
 
         def title = certified? ? translation(".certified", standard: @standard) : translation(".certification_unknown")
 

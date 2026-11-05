@@ -3,7 +3,7 @@
 /* Marks where a compared vehicle's spec differs from the first one's, in the comparison view */
 @utility spec-diff {
   [data-comparison] & {
-    @apply tw:bg-yellow-50 tw:dark:bg-yellow-950;
+    @apply tw:bg-yellow-50 tw:dark:bg-yellow-300/25;
   }
 }
 

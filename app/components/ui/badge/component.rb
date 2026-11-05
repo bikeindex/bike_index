@@ -32,14 +32,14 @@ module UI
         orange: "tw:bg-orange-50 tw:text-orange-700 tw:border-transparent tw:dark:bg-orange-400/15 tw:dark:text-orange-200",
         empty: "tw:bg-white tw:text-gray-700 tw:border-gray-300 tw:dark:bg-gray-900 tw:dark:text-gray-200 tw:dark:border-gray-600",
         # UI::Button's yellow
-        yellow: "tw:bg-[#ffd660] tw:text-slate-900 tw:border-transparent"
+        yellow: "tw:bg-yellow-300 tw:text-slate-900 tw:border-transparent"
       }.freeze
 
       # Solid pills (saturated background + white text) — e.g. the redesign audience pill
       SOLID_COLORS = {
         notice: "tw:bg-blue-500 tw:text-white tw:border-transparent",
-        error: "tw:bg-red-600 tw:text-white tw:border-transparent",
-        warning: "tw:bg-amber-500 tw:text-white tw:border-transparent",
+        error: "tw:bg-red-600 tw:text-white tw:border-transparent tw:dark:bg-red-700",
+        warning: "tw:bg-yellow-300 tw:text-slate-900 tw:border-transparent",
         success: "tw:bg-green-600 tw:text-white tw:border-transparent",
         cyan: "tw:bg-cyan-500 tw:text-white tw:border-transparent",
         gray: "tw:bg-gray-500 tw:text-white tw:border-transparent",

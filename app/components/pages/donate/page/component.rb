@@ -34,7 +34,7 @@ module Pages
             title: translation(".uses_free_title"), body: translation(".uses_free_body")},
             {icon: "icons/lucide-megaphone.svg", circle: "tw:bg-purple-500",
              title: translation(".uses_alerts_title"), body: translation(".uses_alerts_body")},
-            {icon: "icons/lucide-handshake.svg", circle: "tw:bg-slate-900",
+            {icon: "icons/lucide-handshake.svg", circle: "tw:bg-slate-900 tw:dark:bg-slate-600",
              title: translation(".uses_partners_title"), body: translation(".uses_partners_body")},
             {icon: "icons/lucide-store.svg", circle: "tw:bg-blue-500",
              title: translation(".uses_owners_title"), body: translation(".uses_owners_body")}]

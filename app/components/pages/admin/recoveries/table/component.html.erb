@@ -54,7 +54,7 @@
       <% end %>
       <%= render(Atoms::Admin::Badges::BikeHiddenExplanation::Component.new(bike:)) %>
     <% else %>
-      <span class="tw:text-amber-600">no bike</span>
+      <span class="tw:text-yellow-800 tw:dark:text-yellow-300">no bike</span>
     <% end %>
   <% end %>
 
@@ -70,7 +70,7 @@
         Recovered by
         <%= link_to recovery.recovering_user.display_name, admin_user_path(recovery.recovering_user.to_param), class: "twlink" %>
         <% unless recovery.recovering_user == bike&.user %>
-          <span class="tw:text-amber-600">not owner!</span>
+          <span class="tw:text-yellow-800 tw:dark:text-yellow-300">not owner!</span>
         <% end %>
       </small>
     <% end %>
@@ -97,7 +97,10 @@
           "
         >
           <p
-            class="tw:m-0 tw:text-amber-700 tw:empty:hidden"
+            class="
+              tw:m-0 tw:text-yellow-800 tw:empty:hidden
+              tw:dark:text-yellow-300
+            "
             data-admin--personal-info-target="warning"
           ></p>
 
