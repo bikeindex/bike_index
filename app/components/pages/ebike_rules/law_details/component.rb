@@ -3,7 +3,7 @@
 module Pages
   module EbikeRules
     module LawDetails
-      # A state law's restrictions and sources, as BikeBook records them, under a heading for each of its rule_groups
+      # A state law's restrictions, under a heading for each of its rule_groups, and its sources, as BikeBook records them
       class Component < ApplicationComponent
         def initialize(law:)
           @law = law
@@ -11,11 +11,7 @@ module Pages
 
         private
 
-        def rule_sections
-          return [[translation(".restrictions"), @law[:restrictions]]] unless @law[:rule_groups]
-
-          @law[:rule_groups].map { |category, restrictions| [group_heading(category), restrictions] }
-        end
+        def rule_sections = EbikeRuleServices::StateLaws.with_rule_groups(@law)[:rule_groups].map { |category, restrictions| [group_heading(category), restrictions] }
 
         def group_heading(category)
           case category

@@ -10,7 +10,6 @@ en:
           legal_context: Legal context
           limits_start_on: These limits take effect %{date}. Until then, the rules
             below say what applies.
-          restrictions: Rules and restrictions
           rider_rules: Rider rules
           seller_rules: Seller rules
           sources: Sources

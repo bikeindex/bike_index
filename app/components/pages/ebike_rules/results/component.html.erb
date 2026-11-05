@@ -194,7 +194,7 @@
             <%= @law[:name] %>
           </h3>
 
-          <%= render(Pages::EbikeRules::LawDetails::Component.new(law: EbikeRuleServices::StateLaws.with_rule_groups(@law))) %>
+          <%= render(Pages::EbikeRules::LawDetails::Component.new(law: @law)) %>
         <% end %>
       </div>
     <% end %>

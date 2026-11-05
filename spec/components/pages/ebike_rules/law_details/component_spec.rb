@@ -11,6 +11,11 @@ RSpec.describe Pages::EbikeRules::LawDetails::Component, type: :component do
   context "with rules still to come" do
     let(:abbreviation) { "CA" }
 
+    it "groups its rules under a heading for each category it has, in the order a rider needs them" do
+      expect(component.css("h3").map { it.text.strip }).to eq ["Rider rules", "Legal context", "Seller rules", "Vehicle definition", "Sources"]
+      expect(component.css("ul").first.css("li").first.text).to include("Not a motor vehicle")
+    end
+
     it "marks each with the days it runs, and the rest without" do
       expect(component).to have_css("li", text: /\A\s*From January 1, 2027 until January 1, 2031:\s+Cities in San Mateo County may bar riders under 12/)
         .and have_css("li", text: /\A\s*From January 1, 2029:\s+Every new Class 2 must have a speedometer/)
