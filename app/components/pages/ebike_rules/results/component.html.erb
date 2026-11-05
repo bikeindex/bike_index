@@ -163,13 +163,13 @@
             <% end %>
           </ul>
 
-          <div>
-            <%= render(UI::Collapse::Component.new(text: translation(".read_more"), chevron: :trailing, color: :link)) %>
-          </div>
-
           <p class="tw:text-[13px] tw:text-gray-700 tw:dark:text-gray-300">
             <%= source %>
           </p>
+
+          <div class="tw:mt-auto">
+            <%= render(UI::Collapse::Component.new(text: translation(".read_more"), chevron: :trailing, color: :link)) %>
+          </div>
         <% else %>
           <div
             class="
