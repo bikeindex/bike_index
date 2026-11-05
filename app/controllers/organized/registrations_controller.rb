@@ -17,46 +17,32 @@ module Organized
       set_period
       @bike_sticker = BikeSticker.lookup_with_fallback(params[:bike_sticker], organization_id: current_organization.id) if params[:bike_sticker].present?
 
-      if current_organization.enabled?("bike_search")
-        @search_claimedness = "all"
-        # Owner email and name only search the organization's own registrations
-        @search_all_locked = params[:search_email].present?
-        @search_all = !@search_all_locked && Binxtils::InputNormalizer.boolean(params[:search_all])
-        @chart_scope = Pages::Org::Search::ChartCard::Component.permitted_scope(params[:chart_scope])
-        # ui--collapse's, not the server's - normalized only so the form's hidden field
-        # carries 1/0 rather than the blank a rider who never touched the card would send
-        @chart_open = Binxtils::InputNormalizer.boolean(params[:chart_open]) ? "1" : "0"
-        @result_view = Pages::Org::Search::Wrapper::Component.permitted_result_view(params[:search_result_view])
-        @render_results = Binxtils::InputNormalizer.boolean(params[:search_no_js]) || turbo_request?
-        @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_registration_search_params, ip: forwarded_ip_address)
-        @per_page = permitted_per_page(default: 10)
+      # Owner email and name only search the organization's own registrations
+      @search_all_locked = params[:search_email].present?
+      @search_all = !@search_all_locked && Binxtils::InputNormalizer.boolean(params[:search_all])
+      @chart_scope = Pages::Org::Search::ChartCard::Component.permitted_scope(params[:chart_scope])
+      # ui--collapse's, not the server's - normalized only so the form's hidden field
+      # carries 1/0 rather than the blank a rider who never touched the card would send
+      @chart_open = Binxtils::InputNormalizer.boolean(params[:chart_open]) ? "1" : "0"
+      @result_view = Pages::Org::Search::Wrapper::Component.permitted_result_view(params[:search_result_view])
+      @render_results = Binxtils::InputNormalizer.boolean(params[:search_no_js]) || turbo_request?
+      @interpreted_params = BikeSearchable.searchable_interpreted_params(
+        permitted_org_registration_search_params.merge(distance_unit: search_distance_unit), ip: forwarded_ip_address
+      )
+      @per_page = permitted_per_page(default: 10)
 
-        if create_export?
-          search_organization_bikes
-          create_export_and_redirect
-        elsif chart_only?
-          # The card counts the organization's own registrations, even while the search reaches past them
-          @search_all = false
-          search_organization_bikes
-          render chart_card_component, layout: false
-        elsif @render_results
-          search_organization_bikes
-          respond_to do |format|
-            format.html { render :search }
-            format.turbo_stream
-          end
-        else
-          set_search_filter_params
-          render :search
-        end
+      if create_export?
+        search_organization_bikes
+        create_export_and_redirect
+      elsif chart_only?
+        # The card counts the organization's own registrations, even while the search reaches past them
+        @search_all = false
+        search_organization_bikes
+        render chart_card_component, layout: false
+      elsif @render_results
+        search_organization_bikes
       else
-        @per_page = permitted_per_page(default: 50)
-        @available_bikes = if current_organization.enabled?("claimed_ownerships")
-          claimed_ownerships_search
-        else
-          organization_bikes.where(created_at: @time_range)
-        end
-        @pagy, @bikes = pagy(:countish, @available_bikes.order("bikes.created_at desc"), limit: @per_page, page: permitted_page)
+        set_search_filter_params
       end
     end
 
@@ -87,11 +73,13 @@ module Organized
     def settings
       @page_title = I18n.t("meta_titles.registration_form_settings")
       render Pages::Org::RegisterSettings::Component.new(organization: current_organization, old_view: old_register_view?,
+        old_unregistered_notification_view: old_unregistered_notification_view?,
         **BikeServices::Register.session_settings(session[:register_settings], current_organization.id))
     end
 
     # An unchecked box turns its setting off; the old view disables them, so the session keeps theirs
     def switches
+      session[:old_unregistered_notification_view] = params[:old_unregistered_notification_view].present?
       if params[:old_view].present?
         session[:old_register_view] = true
         return redirect_to new_organization_bike_path(organization_id: current_organization.to_param)
@@ -148,12 +136,6 @@ module Organized
       SORTABLE_COLUMNS
     end
 
-    # The frame asking, with no render_chart gate: the card always loads, and the scope links
-    # put this URL in the address bar, where a reload has to be the whole page
-    def chart_only?
-      turbo_frame_request_id == Pages::Org::Search::ChartCard::Component::FRAME_ID.to_s
-    end
-
     def chart_card_component
       Pages::Org::Search::ChartCard::Component.new(scope: @chart_scope, scope_paths: chart_scope_paths,
         chart: registrations_chart, stats: registrations_stats)
@@ -175,7 +157,7 @@ module Organized
     end
 
     def chart_bikes
-      @chart_bikes ||= chart_scope_year? ? organization_bikes : @searched_bikes
+      @chart_bikes ||= chart_scope_year? ? current_organization.bikes : @searched_bikes
     end
 
     # Whole months, so the bars are comparable rather than the first and last being part ones
@@ -201,7 +183,8 @@ module Organized
         time_range: chart_time_range,
         colors: Pages::Org::Search::ChartCard::Component::BANDS.values.map { it[:hex] },
         height: Pages::Org::Search::ChartCard::Component::CHART_HEIGHT,
-        stacked: true
+        stacked: true,
+        skip_legend_counts: true
       )
     end
 
@@ -230,10 +213,6 @@ module Organized
       UI::Chart::Component.time_range_counts(collection: bikes, time_range: chart_time_range, column: "bikes.created_at")
     end
 
-    def organization_bikes
-      current_organization.bikes.reorder("bikes.created_at desc")
-    end
-
     def current_root_path
       organization_registrations_path(organization_id: current_organization.to_param)
     end
@@ -247,7 +226,8 @@ module Organized
       bikes = BikeServices::OrganizedSearch.notes(bikes, params[:search_notes], org) if params[:search_notes].present? && org.present?
       if org.present?
         bikes = BikeServices::OrganizedSearch.location(bikes, @interpreted_params[:location], @interpreted_params[:distance],
-          organization: org, search_all: @search_all, search_status:, ip_address: forwarded_ip_address)
+          organization: org, search_all: @search_all, search_status:, ip_address: forwarded_ip_address,
+          distance_unit: @interpreted_params[:distance_unit])
       end
       bikes = BikeServices::OrganizedSearch.stickers(bikes, @search_stickers)
       bikes = BikeServices::OrganizedSearch.address(bikes, @search_address)
@@ -368,7 +348,7 @@ module Organized
       return false if @interpreted_params[:stolenness]&.downcase != "all"
 
       # A distance is only a search alongside a location
-      @interpreted_params.except(:stolenness, :distance).values.reject(&:blank?).none?
+      @interpreted_params.except(:stolenness, :distance, :distance_unit).values.reject(&:blank?).none?
     end
 
     def directly_create_export?(bikes_count)
@@ -396,19 +376,6 @@ module Organized
       new_export_params_custom_bike_ids.merge(kind: "organization",
         headers: Export.permitted_headers(current_organization),
         user_id: current_user.id)
-    end
-
-    def claimed_ownerships_search
-      bikes = organization_bikes
-      @search_claimedness = %w[transferred initial].include?(params[:search_claimedness]) ? params[:search_claimedness] : "all"
-      bikes = if @search_claimedness == "initial"
-        bikes.joins(:ownerships).where(ownerships: {current: true, previous_ownership_id: nil})
-      elsif @search_claimedness == "transferred"
-        bikes.joins(:ownerships).where.not(ownerships: {previous_ownership_id: nil})
-      else
-        bikes
-      end
-      bikes.where(created_at: @time_range)
     end
   end
 end

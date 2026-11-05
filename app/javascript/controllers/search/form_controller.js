@@ -1,5 +1,4 @@
 import { Controller } from '@hotwired/stimulus'
-import TimeLocalizer from '@bikeindex/time-localizer'
 
 /* global window */
 
@@ -28,10 +27,9 @@ export default class extends Controller {
     // submit here - just reconcile a restored snapshot with the address bar.
     this.refreshResults()
 
-    // Add timeLocalizer and watch for turbo-frame renders
-    if (!window.timeLocalizer) window.timeLocalizer = new TimeLocalizer()
     document.addEventListener('turbo:frame-render', this.handleFrameRender)
     document.addEventListener('turbo:load', this.handleTurboLoad)
+    document.addEventListener('turbo:before-visit', this.handleBeforeVisit)
     // Surface throttling: the eager results frame and the kind-count fetch can
     // both come back 429 during active searching. Catch the frame's response
     // here; the count fetch signals via the search:rate-limited window event.
@@ -48,6 +46,7 @@ export default class extends Controller {
   disconnect () {
     document.removeEventListener('turbo:frame-render', this.handleFrameRender)
     document.removeEventListener('turbo:load', this.handleTurboLoad)
+    document.removeEventListener('turbo:before-visit', this.handleBeforeVisit)
     document.removeEventListener('turbo:before-fetch-request', this.handleFetchRequest)
     document.removeEventListener('turbo:before-fetch-response', this.handleFetchResponse)
     document.removeEventListener('turbo:fetch-request-error', this.handleFetchError)
@@ -58,6 +57,14 @@ export default class extends Controller {
 
   handleTurboLoad = () => {
     this.refreshResults()
+  }
+
+  // A frame navigation pushes its history entry, renders, then starts a visit to the entry, which
+  // cancels any running visit - so a back/forward landing before that loses its restoration, the
+  // one thing that re-renders the form. That visit renders nothing, so nothing's lost without it.
+  handleBeforeVisit = (event) => {
+    const { url } = event.detail
+    if (url === this.frameElement?.src && this.differentSearchOnSamePage(url, window.location.href)) event.preventDefault()
   }
 
   submit () {
@@ -84,9 +91,16 @@ export default class extends Controller {
     // here it can't mean the frame is ahead of the address bar
     this.requestedURL = null
     const params = new URLSearchParams(window.location.search)
-    // Opted in, where the server renders no default for a URL without the param
-    this.formTarget.querySelectorAll('input[name=search_email], input[name=serial], input[name=search_notes], input[data-restores-from-url]')
-      .forEach(input => { input.value = params.get(input.name) || '' })
+    // Opted in, where the server renders no default for a URL without the param. elements,
+    // not querySelectorAll: the settings panel's radios reach the form with form=
+    ;[...this.formTarget.elements]
+      .filter(input => input.matches('input[name=search_email], input[name=serial], input[name=search_notes], input[data-restores-from-url]'))
+      .forEach(input => {
+        if (input.type !== 'radio') return (input.value = params.get(input.name) || '')
+        // A radio group the URL doesn't name is on its first, which isn't filtering
+        const group = this.formTarget.elements.namedItem(input.name)
+        group.value = params.get(input.name) ?? group[0].value
+      })
   }
 
   // A back/forward restoration can leave the results frame showing a snapshot for
@@ -142,10 +156,6 @@ export default class extends Controller {
   handleFrameRender = () => {
     // A frame render means results came back, so clear any failure notice
     this.hideNotices()
-    // Run the time localization command on frame render
-    if (window.timeLocalizer && typeof window.timeLocalizer.localize === 'function') {
-      window.timeLocalizer.localize()
-    }
     this.syncHiddenFieldsFromUrl()
   }
 

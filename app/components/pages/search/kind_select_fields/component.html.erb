@@ -26,8 +26,10 @@
 
     <span class="tw:mt-3 tw:flex tw:flex-nowrap tw:sm:mt-0">
       <span class="tw:mr-2 tw:block tw:py-1.5 tw:text-nowrap">
-        <%= translation(".miles_of") %>
+        <%= (@distance_unit == "km") ? translation(".kilometers_of") : translation(".miles_of") %>
       </span>
+
+      <%= hidden_field_tag :distance_unit, @distance_unit %>
 
       <%= label_tag :location,
       translation(".search_location"),

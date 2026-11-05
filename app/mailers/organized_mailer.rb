@@ -14,6 +14,16 @@ class OrganizedMailer < ApplicationMailer
   CONFIRMATION_REPORTS = {"status_stolen" => "stolen", "status_abandoned" => "abandoned",
                           "status_impounded" => "found"}.freeze
 
+  # Whoever a paying organization covers - its emails, members, registrants and email domain - isn't
+  # asked to donate on top of it
+  def self.render_donation?(organization: nil, user: nil, emails: nil)
+    return false if organization&.paid_money?
+    return false if user.present? && (user.organizations.paid_money.exists? || user.paid_organization_registration?)
+
+    domains = Array(emails).filter_map { Organization.email_domain(it) }
+    domains.none? || !Organization.paid_money.where(user_email_domain: domains).exists?
+  end
+
   def partial_registration(b_param)
     b_param_mail(b_param, Emails::PartialRegistration::Component.new(b_param:), tag: __callee__)
   end
@@ -27,10 +37,10 @@ class OrganizedMailer < ApplicationMailer
     bike = Bike.unscoped.find_id(ownership.bike_id)
     @organization = ownership.organization
     component = Emails::FinishedRegistration::Component.new(ownership:, bike:)
-    subject = I18n.t("organized_mailer.finished#{finished_registration_type(bike, ownership)}_registration.subject", **default_subject_vars(bike:))
     tag = __callee__
     tag = "#{tag}_pos" if ownership.pos? && ownership.new_registration?
     I18n.with_locale(ownership.owner&.preferred_language) do
+      subject = I18n.t("organized_mailer.finished#{finished_registration_type(bike, ownership)}_registration.subject", **default_subject_vars(bike:))
       mail(reply_to: reply_to,
         to: ownership.owner_email,
         subject:,
@@ -71,7 +81,7 @@ class OrganizedMailer < ApplicationMailer
     bike = graduated_notification.bike
     component = Emails::GraduatedNotification::Component.new(graduated_notification:, bike:)
 
-    I18n.with_locale(@user&.preferred_language) do
+    I18n.with_locale(graduated_notification.user&.preferred_language) do
       mail(reply_to: reply_to,
         to: graduated_notification.email,
         subject: graduated_notification.subject,

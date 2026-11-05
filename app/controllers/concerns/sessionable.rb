@@ -21,7 +21,7 @@ module Sessionable
 
   def sign_in_and_redirect(user, signed_up: false, via_saml: false)
     if user.banned? # If user is banned, tell them about it.
-      flash.now[:error] = translation(:user_is_banned, scope: SIGN_IN_SCOPE)
+      flash[:error] = translation(:user_is_banned, scope: SIGN_IN_SCOPE)
       redirect_back(fallback_location: new_session_url) && return
     end
     return if !via_saml && redirect_forced_saml(user.email)

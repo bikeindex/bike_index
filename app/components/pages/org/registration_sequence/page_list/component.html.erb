@@ -24,7 +24,7 @@
       <%= tag.div(class: "tw:py-1.5", data: page_data(page)) do %>
         <div class="tw:flex tw:items-baseline">
           <% if @editable %>
-            <%= render UI::DragHandle::Component.new(controller: "sortable", html_class: "tw:pr-4") %>
+            <%= render UI::DragHandle::Component.new(controller: "sortable", label: page.title, html_class: "tw:pr-4") %>
           <% end %>
 
           <div class="tw:min-w-0 tw:flex-1">

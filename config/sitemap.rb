@@ -19,6 +19,9 @@ SitemapGenerator::Sitemap.create do
     SitemapPages::ADDITIONAL.each { |i| add("/#{i}", priority: 0.8, changefreq: "daily") }
 
     LandingPageOrganizations::SLUGS.each { |i| add("/o/#{i}", priority: 0.7, changefreq: "weekly") }
+
+    # /ebike-rules itself redirects by the visitor's location
+    EbikeRuleServices::Places.all.each { add(ebike_rules_place_path(*it[:code].split("-")), priority: 0.8, changefreq: "weekly") }
   end
 
   group(filename: :blog) do

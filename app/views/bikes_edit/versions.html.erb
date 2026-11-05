@@ -1,4 +1,4 @@
-<%= form_for @bike, multipart: true, html: { class: 'primary-edit-bike-form' } do |f| %>
+<%= form_for @bike, multipart: true, html: { class: 'primary-edit-bike-form' } do %>
   <% if params[:return_to].present? %>
     <%= hidden_field_tag :return_to, params[:return_to] %>
   <% end %>
@@ -88,9 +88,7 @@
               </p>
 
               <% if strava_integration.syncing? %>
-                <div class="alert alert-info mb-3">
-                  <%= t("bikes_edit.strava_gear.sync_not_finished") %>
-                </div>
+                <%= render(UI::Alerts::Base::Component.new(kind: :notice, text: t("bikes_edit.strava_gear.sync_not_finished"), margin_classes: "tw:mb-3")) %>
               <% end %>
             </div>
 
@@ -122,10 +120,8 @@
                       >
                         <%= gear.name %>
 
-                        <% if gear.total_distance_miles.present? %>
-                          (
-                          <%= number_with_delimiter(gear.total_distance_miles) %>
-                          miles)
+                        <% if gear.total_distance_kilometers.present? %>
+                          (<%= metric_units? ? "#{number_with_delimiter(gear.total_distance_kilometers)} km" : "#{number_with_delimiter(gear.total_distance_miles)} miles" %>)
                         <% end %>
                       </option>
                     <% end %>

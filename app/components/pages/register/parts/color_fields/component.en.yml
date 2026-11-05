@@ -1,0 +1,14 @@
+---
+en:
+  components:
+    pages:
+      register:
+        parts:
+          color_fields:
+            add_another_color: Add another color
+            color: Color
+            primary_color_blank: Primary color — e.g. Black
+            remove_additional_color: Remove color
+            second_color_blank: Second color — e.g. Red
+            third_color_blank: Third color
+            up_to_3: up to 3

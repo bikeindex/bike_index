@@ -300,6 +300,17 @@ RSpec.describe Bikes::EditsController, type: :request do
         expect(flash[:error]).to match(/impounded/i)
         expect(response).to redirect_to(bike_path(bike.id))
       end
+      context "superuser" do
+        let(:current_user) { FactoryBot.create(:superuser) }
+
+        it "renders the impounded alert above the edit page" do
+          get base_url
+          expect(response).to render_template(:bike_details)
+          alert = Nokogiri::HTML(response.body).at_css("#edit-bike-skeleton [role=alert]:has(h4)")
+          expect(alert.at_css("h4").text.strip).to eq "Your bike is currently impounded!"
+          expect(alert.text.squish).to match(/by #{Regexp.escape(impound_record.organization.name)}\z/)
+        end
+      end
       context "unclaimed" do
         let!(:bike) { FactoryBot.create(:bike, :with_ownership, user: nil, owner_email: "something@stuff.com") }
         let(:current_user) { FactoryBot.create(:user_confirmed, email: "something@stuff.com") }
@@ -387,13 +398,21 @@ RSpec.describe Bikes::EditsController, type: :request do
 
   context "strava_gear template" do
     let!(:strava_integration) { FactoryBot.create(:strava_integration, :synced, user: current_user) }
-    let!(:strava_gear) { FactoryBot.create(:strava_gear, strava_integration:, strava_id: "b12345", name: "My Road Bike") }
+    let!(:strava_gear) do
+      FactoryBot.create(:strava_gear, strava_integration:, strava_id: "b12345", name: "My Road Bike",
+        total_distance_kilometers: 100)
+    end
 
     it "renders versions template with strava gear fields" do
       get "#{base_url}/strava_gear"
       expect(response.code).to eq("200")
       expect(response).to render_template(:versions)
       expect(response.body).to include("My Road Bike")
+      expect(Capybara.string(response.body).find("option[value='b12345']").text.squish).to eq "My Road Bike (100 km)"
+
+      current_user.update(preferred_unit_system: "imperial")
+      get "#{base_url}/strava_gear"
+      expect(Capybara.string(response.body).find("option[value='b12345']").text.squish).to eq "My Road Bike (62 miles)"
     end
 
     it "renders versions template without strava when not connected" do
@@ -402,6 +421,16 @@ RSpec.describe Bikes::EditsController, type: :request do
       get "#{base_url}/strava_gear"
       expect(response.code).to eq("200")
       expect(response).to render_template(:versions)
+    end
+
+    context "still syncing" do
+      let!(:strava_integration) { FactoryBot.create(:strava_integration, :syncing, user: current_user) }
+
+      it "renders the sync notice in an alert" do
+        get "#{base_url}/strava_gear"
+        expect(response).to render_template(:versions)
+        expect(Capybara.string(response.body)).to have_css("[role=alert]", text: "Strava sync hasn't finished yet")
+      end
     end
   end
 end

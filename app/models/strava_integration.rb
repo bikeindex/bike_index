@@ -138,7 +138,7 @@ class StravaIntegration < ApplicationRecord
   end
 
   def calculated_status
-    return :error if status == :error
+    return :error if error?
     return :syncing if strava_requests.list_activities.count == 0
 
     if strava_requests.list_activities.pending.count > 0

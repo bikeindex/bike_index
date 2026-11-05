@@ -123,7 +123,7 @@ module BikeServices
           }
         end
       end
-      single_image_hash(bike.public_images.limit(1)&.first&.image_url(:large))
+      single_image_hash(bike.public_images.first&.image_url(:large))
     end
 
     #

@@ -21,8 +21,8 @@
   <p><%= translation("click_below_to_complete_your_registration") %></p>
 <% end %>
 
-<%= link_to rules_owed? ? translation("review_the_rules") : translation("finish_it"), tokenized_url,
-    "data-pm-no-track" => true, class: "binx-button" %>
+<%= render(Emails::Partials::TokenLink::Component.new(href: tokenized_url,
+  text: rules_owed? ? translation("review_the_rules") : translation("finish_it"))) %>
 
 <% if rules_owed? %>
   <p>

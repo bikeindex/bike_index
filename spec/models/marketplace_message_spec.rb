@@ -291,6 +291,18 @@ RSpec.describe MarketplaceMessage, type: :model do
           expect(MarketplaceMessage.can_send_message?(user: seller, marketplace_listing:, marketplace_message:)).to be_truthy
         end
       end
+      context "with the sellers replying" do
+        before do
+          [marketplace_message1, marketplace_message2, marketplace_message3].each do |message|
+            FactoryBot.create(:marketplace_message, sender: message.receiver, initial_record: message,
+              marketplace_listing: message.marketplace_listing)
+          end
+        end
+        it "is likely_spam" do
+          expect(MarketplaceMessage.send(:likely_spam?, user:, marketplace_listing:)).to be_truthy
+        end
+      end
+
       context "with message yesterday" do
         let(:created_at) { Time.current - 25.hours }
         it "is valid" do

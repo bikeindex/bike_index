@@ -2,6 +2,7 @@
 
 module UI
   module Collapse
+    # Template Dependency: UI::Button::Component
     # The trigger for a ui--collapse controller on an ancestor, which keeps
     # aria-expanded and the chevron's rotation in sync with its content.
     # chevron: true leads the label with it, :trailing follows. A block renders in place of text.
@@ -29,10 +30,10 @@ module UI
 
       private
 
-      # .twlink bolds when active, which :active makes a closed trigger for the length of a drag-select,
+      # A link color bolds when active, which :active makes a closed trigger for the length of a drag-select,
       # reflowing the label under the pointer. A caller's own weight already outranks it
       def trigger_classes
-        pin_weight = @color == :link && !@html_class.to_s.include?("tw:font-")
+        pin_weight = UI::Button::Component::LINK_COLORS.include?(@color) && !@html_class.to_s.include?("tw:font-")
         [UI::Button::Component.build_classes(color: @color, size: @size, html_class: @html_class),
           ("tw:not-data-[active=true]:[font-weight:inherit]" if pin_weight)].compact.join(" ")
       end

@@ -28,7 +28,9 @@
       = render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :send_self_registration_email, class_name: "tw:mt-4")) do
         = t(".send_self_registration_email_html", email: @organization.auto_user&.email)
       %span.below-input-help
-        = t(".send_self_registration_email_helper")
+        = t(".send_self_registration_email_note", email: @organization.auto_user&.email)
+        - if @organization.enabled?("parking_notifications")
+          = t(".send_self_registration_email_includes_unregistered")
 
   - unless Organization.admin_required_kinds.include?(@organization.kind)
     .form-group.row

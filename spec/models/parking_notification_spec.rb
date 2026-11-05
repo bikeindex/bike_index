@@ -14,6 +14,14 @@ RSpec.describe ParkingNotification, type: :model do
       expect(bike.status).to eq "status_abandoned"
       expect(parking_notification.organization).to be_nil
     end
+    context "bike registered to contact@bikeindex.org" do
+      let(:bike) { FactoryBot.create(:bike, owner_email: "contact@bikeindex.org") }
+      let(:parking_notification) { FactoryBot.create(:parking_notification, bike:) }
+      it "doesn't send email" do
+        expect(parking_notification.owner_known?).to be_truthy
+        expect(parking_notification.send_email?).to be_falsey
+      end
+    end
     context "organized record" do
       let(:organization) { FactoryBot.create(:organization) }
       let(:bike) { FactoryBot.create(:bike, created_at: Time.current - 2.weeks) }

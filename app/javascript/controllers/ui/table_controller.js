@@ -142,11 +142,11 @@ export default class extends Controller {
       }
     }
 
-    // Body and footer rows
+    // Body and footer rows, whose row headers are th
     const bodyRows = table.querySelectorAll('tbody tr, tfoot tr')
     if (bordered) {
       bodyRows.forEach(row => {
-        const tds = this.visibleCells(row, 'td')
+        const tds = this.visibleCells(row, 'td, th')
         if (tds.length) {
           tds[0].classList.add(tdFirst)
           tds[tds.length - 1].classList.add(tdLast)
@@ -154,7 +154,7 @@ export default class extends Controller {
       })
     } else if (bodyRows.length > 0) {
       const lastRow = bodyRows[bodyRows.length - 1]
-      const tds = this.visibleCells(lastRow, 'td')
+      const tds = this.visibleCells(lastRow, 'td, th')
       if (tds.length) {
         tds[0].classList.add(tdFirst)
         tds[tds.length - 1].classList.add(tdLast)

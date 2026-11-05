@@ -20,10 +20,10 @@ module Pages
               if @stolen_record.recovering_user.present?
                 recovering_user_link
               elsif @stolen_record.pre_recovering_user?
-                tag.small("pre-recording of recovering user", class: "twless-strong")
+                tag.small("pre-recording of recovering user", class: "less-strong")
               else
                 safe_join([tag.small("No user present"),
-                  tag.span("most likely recovered by owner", class: "twless-strong tw:text-sm")], " ")
+                  tag.span("most likely recovered by owner", class: "less-strong tw:text-sm")], " ")
               end
             end
 

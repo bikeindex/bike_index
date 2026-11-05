@@ -6,11 +6,13 @@ module Pages
   module Org
     module RegisterSettings
       # The switches that change the shape of the organization's add-a-registration page, or send it
-      # back to the legacy one
+      # or the unregistered notification page back to the legacy one
       class Component < ApplicationComponent
-        def initialize(organization:, old_view: false, single_page: false, separate_attestation: false)
+        def initialize(organization:, old_view: false, old_unregistered_notification_view: false, single_page: false,
+          separate_attestation: false)
           @organization = organization
           @old_view = old_view
+          @old_unregistered_notification_view = old_unregistered_notification_view
           @single_page = single_page
           @separate_attestation = separate_attestation
         end

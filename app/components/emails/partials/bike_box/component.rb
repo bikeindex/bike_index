@@ -12,10 +12,6 @@ module Emails
 
         private
 
-        def skip_link_tracking?
-          @bike_url_path.match?(/\?/)
-        end
-
         def thumb_url
           @bike.thumb_path || @bike.stock_photo_url || "https://files.bikeindex.org/email_assets/bike_photo_placeholder.png"
         end

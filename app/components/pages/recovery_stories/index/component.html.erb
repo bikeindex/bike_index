@@ -1,0 +1,115 @@
+<% container = SharedBlocks::Marketing::Wrapper::Component::CONTAINER_CLASSES %>
+<% muted = "tw:text-gray-600 tw:dark:text-gray-400" %>
+<% rule = "tw:border-gray-200 tw:dark:border-gray-700" %>
+
+<section class="tw:border-b <%= rule %>">
+  <div class="twwiderow tw:items-start tw:gap-y-6 tw:pt-8 tw:pb-7 <%= container %>">
+    <div class="tw:flex tw:flex-col tw:gap-3">
+      <p class="tw:m-0 <%= SharedBlocks::Marketing::SectionHeading::Component.eyebrow_classes(:red) %>">
+        <%= translation(".recovery_stories") %>
+      </p>
+
+      <h1
+        class="
+          tw:m-0 tw:font-header tw:text-[clamp(32px,3.8vw,44px)]
+          tw:leading-[1.08] tw:font-extrabold tw:tracking-tight
+          tw:text-balance
+        "
+      >
+        <%= translation(".every_one_found_its_way_home") %>
+      </h1>
+
+      <p class="tw:m-0 tw:max-w-145 tw:text-[17px] tw:leading-[1.6] <%= muted %>">
+        <%= translation(".lede") %>
+      </p>
+    </div>
+
+    <div class="tw:flex tw:flex-col tw:gap-5.5 tw:pt-1.5">
+      <%= render(SharedBlocks::Marketing::RegistryStats::Component.new) %>
+
+      <div class="tw:flex tw:flex-wrap tw:gap-3">
+        <%= render(UI::ButtonLink::Component.new(href: "#fund-the-next-recovery",
+          text: translation(".fund_the_next_recovery"), color: :primary, size: :callout,
+          html_class: "tw:px-8! tw:py-3!")) %>
+
+        <%= render(UI::ButtonLink::Component.new(href: new_register_path,
+          text: translation(".register_your_bike"), color: :secondary, size: :callout,
+          html_class: "#{Pages::RecoveryStories::Stories::Component::PURPLE_OUTLINE} tw:px-8! tw:py-3!")) %>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="tw:pt-9 tw:pb-18 <%= container %>">
+  <%= render(SharedBlocks::Marketing::SectionHeading::Component.new(heading: translation(".in_their_own_words"),
+    intro: translation(".shared_by_the_person"), html_class: "tw:mb-5.5")) %>
+
+  <div
+    class="
+      tw:grid tw:grid-cols-[repeat(auto-fill,minmax(min(100%,300px),1fr))]
+      tw:gap-6
+    "
+  >
+    <%= render(Pages::RecoveryStories::Stories::Component.new(recovery_displays: @recovery_displays, pagy: @pagy)) %>
+  </div>
+</section>
+
+<section id="fund-the-next-recovery" class="tw:bg-blue-600 tw:text-white">
+  <div class="twwiderow tw:items-center tw:gap-x-16 tw:gap-y-12 tw:py-18 <%= container %>">
+    <div class="tw:flex tw:flex-col tw:items-start tw:gap-4.5">
+      <%= image_tag("kelsey/illustrations/comic-assets_bike-love-1.png", alt: "",
+        class: "tw:block tw:h-auto tw:w-30") %>
+
+      <h2
+        class="
+          tw:text-[clamp(30px,3.6vw,42px)] tw:leading-[1.1] tw:text-balance tw:text-white
+          <%= h2_classes %>
+        "
+      >
+        <%= translation(".help_it_come_home") %>
+      </h2>
+
+      <p class="tw:m-0 tw:max-w-125 tw:text-lg tw:leading-[1.6]">
+        <%= translation(".donors_keep_it_free") %>
+      </p>
+    </div>
+
+    <%= render(UI::Card::Component.new(shadow: :large,
+      additional_classes: "tw:flex tw:flex-col tw:gap-4 tw:p-7! tw:text-slate-900 tw:dark:text-gray-100")) do %>
+      <h3 class="tw:text-2xl <%= h2_classes %>">
+        <%= translation(".fund_the_next_recovery") %>
+      </h3>
+
+      <%= render(@form) %>
+    <% end %>
+  </div>
+</section>
+
+<section class="tw:border-b tw:bg-gray-50 tw:dark:bg-gray-800/60 <%= rule %>">
+  <div
+    class="
+      tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-x-8 tw:gap-y-5 tw:py-9
+      <%= container %>
+    "
+  >
+    <div class="tw:flex tw:flex-col tw:gap-1">
+      <h2 class="tw:text-[22px] <%= h2_classes %>">
+        <%= translation(".started_with_a_registration") %>
+      </h2>
+
+      <p class="tw:m-0 tw:text-base <%= muted %>">
+        <%= translation(".takes_two_minutes") %>
+      </p>
+    </div>
+
+    <div class="tw:flex tw:flex-wrap tw:gap-3">
+      <%= render(UI::ButtonLink::Component.new(href: new_register_path,
+        text: translation(".register_your_bike"), color: :primary, size: :callout,
+        html_class: "tw:px-8! tw:py-3! tw:normal-case!")) %>
+
+      <%= render(UI::ButtonLink::Component.new(href: my_account_path,
+        text: translation(".share_your_story"), color: :link,
+        html_class: "tw:px-6! tw:py-3! tw:font-semibold")) %>
+    </div>
+  </div>
+</section>

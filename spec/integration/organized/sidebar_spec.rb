@@ -91,12 +91,12 @@ RSpec.describe "Organization sidebar", :js, type: :system do
     expect_open("#{organization.short_name} Registrations")
     expect_current_group("Impounded Vehicles")
 
-    within("#org_sidebar_nav") { click_link "Organization Registrations" }
+    within("#org_sidebar_nav") { click_link "Search Registrations" }
 
     expect(page).to have_current_path("/o/#{slug}/registrations", ignore_query: true)
     expect_open("#{organization.short_name} Registrations")
     expect_current_group("#{organization.short_name} Registrations")
-    expect(page).to have_css "#org_sidebar_nav a[aria-current='page']", text: "Organization Registrations"
+    expect(page).to have_css "#org_sidebar_nav a[aria-current='page']", text: "Search Registrations"
     expect(page).to have_no_css "#org_sidebar_nav a[aria-current]", text: "Search Impounded Vehicles"
 
     # Short enough that the menu scrolls, with Manage users past its fold
@@ -108,6 +108,15 @@ RSpec.describe "Organization sidebar", :js, type: :system do
     wait_for { current_row_in_view? }
     # Guards this against going vacuous on a menu that turns out to fit
     expect(scroller_top).to be > 0
+
+    # ui--collapse's module landing well behind this controller's, as on a slow connection
+    collapse_module = hold_requests("**/ui/collapse_controller*.js")
+    visit "/o/#{slug}/impound_records"
+
+    expect(page).to have_css "#org_sidebar_nav a[aria-current]", text: "Search Impounded Vehicles", visible: :all
+    sleep 1
+    collapse_module.release
+    expect_open("Impounded Vehicles")
   end
 
   it "lays a flash beside the sidebar, and tells add-a-registration from the notification row by the param" do
@@ -131,13 +140,13 @@ RSpec.describe "Organization sidebar", :js, type: :system do
     expect(page).to have_css "#org_sidebar_nav a[aria-current]", text: "Add a registration"
     expect(page).to have_no_css "#org_sidebar_nav a[aria-current]", text: "New unregistered notification"
 
-    visit "/o/#{slug}/bikes/new?parking_notification=true"
+    visit "/o/#{slug}/parking_notifications/new"
 
     expect(page).to have_css "#org_sidebar_nav a[aria-current]", text: "New unregistered notification"
     expect(page).to have_no_css "#org_sidebar_nav a[aria-current]", text: "Add a registration"
 
-    # Going back to the old view moves add-a-registration onto organized/bikes#new alongside the
-    # notification's row, where the query string is all that tells the two apart
+    # Going back to both old views moves add-a-registration onto organized/bikes#new alongside the
+    # legacy notification page, where the query string is all that tells the two apart
     visit "/o/#{slug}/registrations/new"
     click_link "Registration form settings"
     check "Use the old registration page"
@@ -145,11 +154,18 @@ RSpec.describe "Organization sidebar", :js, type: :system do
     uncheck "Use the old registration page"
     expect(page).to have_field("Single page registration form", disabled: false)
     check "Use the old registration page"
+    check "Use the old unregistered notification page"
     within("form[action$='/registrations/switches']") { click_button "Update" }
     click_link "Add a registration"
 
     expect(page).to have_css "#org_sidebar_nav a[aria-current]", text: "Add a registration"
     expect(page).to have_no_css "#org_sidebar_nav a[aria-current]", text: "New unregistered notification"
+
+    # The notification's own page hands the old view back to the legacy form
+    visit "/o/#{slug}/parking_notifications/new"
+
+    expect(page).to have_current_path("/o/#{slug}/bikes/new?parking_notification=true")
+    expect(page).to have_no_css "#org_sidebar_nav a[aria-current]", text: "Add a registration"
   end
 
   # The sidebar stands in for the navbar on every page a member sees, including ones no

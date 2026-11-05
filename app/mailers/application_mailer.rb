@@ -1,5 +1,6 @@
 class ApplicationMailer < ActionMailer::Base
-  CONTACT_BIKEINDEX = '"Bike Index" <contact@bikeindex.org>'.freeze
+  CONTACT_EMAIL = "contact@bikeindex.org".freeze
+  CONTACT_BIKEINDEX = "\"Bike Index\" <#{CONTACT_EMAIL}>".freeze
   default from: CONTACT_BIKEINDEX, message_stream: "outbound"
 
   helper :mailer

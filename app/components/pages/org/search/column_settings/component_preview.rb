@@ -4,8 +4,8 @@ module Pages
   module Org
     module Search
       module ColumnSettings
-        # Renders the panel open, with a ColumnSettingsToggle to collapse it. Its column toggle
-        # is the org search's own — checking a box here changes what the real search page shows.
+        # The panel, with a ColumnSettingsToggle to open it. It stores to the org search's own
+        # key — checking a box here changes what the real search page shows.
         class ComponentPreview < ApplicationComponentPreview
           # @!group Variants
           # An organization without features — only the columns every organization gets
@@ -33,7 +33,7 @@ module Pages
             settings = ComponentStructs::OrgSearchSettings.new(organization:)
 
             {template: "pages/org/search/column_settings/component_preview/panel",
-             locals: {settings:, data: Component.column_settings_data_attributes(controllers: Component::COLLAPSE_DATA[:controller])}}
+             locals: {settings:, data: Component.column_settings_data_attributes}}
           end
         end
       end

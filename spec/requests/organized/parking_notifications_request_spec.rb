@@ -76,6 +76,55 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
     end
   end
 
+  describe "new" do
+    it "renders the unregistered notification form, which submits to organized bikes" do
+      get "#{base_url}/new"
+      expect(response.status).to eq(200)
+      expect(response.body).to include(%(action="/o/#{current_organization.to_param}/bikes"))
+      expect(response.body).to include("parking_notification[kind]")
+      expect(response.body).to include("/o/#{current_organization.to_param}/registrations/settings")
+    end
+
+    context "with the old unregistered notification page" do
+      let(:registrations_url) { "/o/#{current_organization.to_param}/registrations" }
+      let(:legacy_path) { new_organization_bike_path(organization_id: current_organization.to_param, parking_notification: true) }
+      # Not a let - it's read after each request in turn, and a let would memoize the first
+      def old_view_checkbox
+        get "#{registrations_url}/settings"
+        Nokogiri::HTML(response.body).at_css("input[name=old_unregistered_notification_view]")
+      end
+
+      it "sends the page to the legacy form, apart from the registration page's setting" do
+        expect(old_view_checkbox["checked"]).to be_blank
+
+        post "#{registrations_url}/switches", params: {old_unregistered_notification_view: true}
+        expect(session[:old_unregistered_notification_view]).to be_truthy
+        expect(old_view_checkbox["checked"]).to be_present
+        get "#{base_url}/new"
+        expect(response).to redirect_to legacy_path
+
+        # Both submit together, so the old registration page alone turns this off
+        post "#{registrations_url}/switches", params: {old_view: true}
+        expect(session[:old_register_view]).to be_truthy
+        get "#{base_url}/new"
+        expect(response.status).to eq 200
+      end
+    end
+
+    context "organization without parking_notifications" do
+      let(:enabled_feature_slugs) { [] }
+
+      it "redirects, and the settings don't offer its old page" do
+        get "#{base_url}/new"
+        expect(response).to redirect_to organization_root_path(organization_id: current_organization.to_param)
+        expect(flash[:error]).to be_present
+
+        get "/o/#{current_organization.to_param}/registrations/settings"
+        expect(response.body).to_not include("old_unregistered_notification_view")
+      end
+    end
+  end
+
   describe "show" do
     let(:parking_notification) { FactoryBot.create(:parking_notification, organization: current_organization) }
     it "renders" do

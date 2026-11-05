@@ -4,8 +4,6 @@ import { collapse } from 'utils/collapse_utils'
 // Connects to data-controller='admin--recovery-display-form'
 export default class extends Controller {
   static targets = [
-    'characterCounter',
-    'characterTotal',
     'remotePhotoUrl',
     'bikeImageText',
     'useImageButton',
@@ -15,13 +13,10 @@ export default class extends Controller {
 
   static values = {
     toggleImage: Boolean,
-    maxCharacterCount: Number,
     remotePhotoUrl: String
   }
 
   connect () {
-    this.setCharacterCount()
-
     if (this.usingBikeImageTargets.length > 0) {
       this.toggleBikeImageForDisplay()
     }
@@ -46,14 +41,5 @@ export default class extends Controller {
       this.remotePhotoUrlTarget.value = ''
       this.toggleImageValue = true
     }
-  }
-
-  updateCharacterCount () {
-    this.setCharacterCount()
-  }
-
-  setCharacterCount () {
-    const length = this.characterCounterTarget.value.length
-    this.characterTotalTarget.textContent = `${length}/${this.maxCharacterCountValue}`
   }
 }

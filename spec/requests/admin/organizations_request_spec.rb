@@ -19,6 +19,23 @@ RSpec.describe Admin::OrganizationsController, type: :request do
         expect(response).to render_template("admin/organizations/index")
         expect(assigns(:organizations)).to eq([organization])
       end
+      context "with a feature that has no slugs" do
+        let(:organization_feature) { FactoryBot.create(:organization_feature, feature_slugs: []) }
+        let(:invoice) { FactoryBot.create(:invoice_paid, organization:) }
+        let(:ended_invoice) { FactoryBot.create(:invoice_paid, start_at: 2.years.ago) }
+
+        before do
+          invoice.update(organization_feature_ids: [organization_feature.id])
+          ended_invoice.update(organization_feature_ids: [organization_feature.id])
+        end
+
+        it "finds the organizations with an active invoice for it" do
+          get base_url, params: {search_features_and_settings: organization_feature.id.to_s}
+
+          expect(assigns(:organizations)).to eq([organization])
+        end
+      end
+
       it "renders the chart" do
         get base_url, params: {search_query: "cool", render_chart: true}
         expect(response.status).to eq 200
@@ -511,7 +528,8 @@ RSpec.describe Admin::OrganizationsController, type: :request do
       it "updates the organization attributes" do
         expect(organization_stolen_message).to be_present # Because of organization feature
         expect(organization_stolen_message.kind).to eq "area"
-        expect(organization_stolen_message.search_radius_miles).to eq 10.0
+        # No location, so metric - and the default is a round number of kilometers
+        expect(organization_stolen_message.search_radius_kilometers).to eq 100
         put "#{base_url}/#{organization.to_param}", params: {
           organization: update_params,
           organization_stolen_message_search_radius_miles: 44,

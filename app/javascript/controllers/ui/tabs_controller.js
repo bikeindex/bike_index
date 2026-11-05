@@ -21,8 +21,10 @@ export default class extends Controller {
 
   activeTargetConnected (element) {
     this.#syncScrollable()
-    // Assigning scrollLeft clamps to the scrollable range, and no-ops without one
-    this.element.scrollLeft = element.offsetLeft - (this.element.clientWidth - element.offsetWidth) / 2
+    // By their boxes rather than offsetLeft, which a positioned ancestor outside the row measures from. Assigning
+    // scrollLeft clamps to the scrollable range, and no-ops without one
+    const [row, active] = [this.element, element].map((each) => each.getBoundingClientRect())
+    this.element.scrollLeft += active.left + active.width / 2 - (row.left + row.width / 2)
   }
 
   // The nav's padding is the gutter twgutter-bleed puts back, not room the tabs can grow into

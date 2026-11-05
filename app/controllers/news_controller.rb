@@ -5,10 +5,17 @@ class NewsController < ApplicationController
 
   def index
     @blogs = matching_blogs
-    @blogs_count ||= @blogs.count
-    @page_updated_at = matching_blogs.maximum(:updated_at)
+    @blogs_count = @blogs.count
+    @page_updated_at = @blogs.maximum(:updated_at)
     @show_discuss = Binxtils::InputNormalizer.boolean(ENV["SHOW_DISCOURSE"])
-    redirect_to news_index_url(format: "atom") if request.format == "xml"
+    respond_to do |format|
+      format.html do
+        # A plain preload loses each post's tag order
+        ActiveRecord::Associations::Preloader.new(records: @blogs.to_a, associations: :content_tags, scope: ContentTag.commonness).call
+      end
+      format.atom
+      format.xml { redirect_to news_index_url(format: "atom") }
+    end
   end
 
   def show
@@ -39,7 +46,6 @@ class NewsController < ApplicationController
     if params[:search_tags].present?
       @search_tags = ContentTag.matching(params[:search_tags])
       blogs = blogs.with_tag_ids(@search_tags.pluck(:id))
-      @blogs_count = blogs.count.keys.count
     end
     blogs
   end

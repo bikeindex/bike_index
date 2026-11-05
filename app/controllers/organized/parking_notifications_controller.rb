@@ -3,8 +3,10 @@ module Organized
     include Binxtils::SortableTable
 
     DEFAULT_PER_PAGE = 200
-    before_action :ensure_access_to_parking_notifications!, only: %i[index create]
+    before_action :ensure_access_to_parking_notifications!, only: %i[index new create]
     around_action :set_reading_role, only: :index
+    # A component takes its content type from the request
+    before_action :force_html_response, only: :new
 
     before_action :set_failed_and_repeated_ivars
 
@@ -31,6 +33,14 @@ module Organized
       respond_to do |format|
         format.html { render index_component }
       end
+    end
+
+    def new
+      if old_unregistered_notification_view?
+        return redirect_to(new_organization_bike_path(organization_id: current_organization.to_param, parking_notification: true))
+      end
+
+      render Pages::Org::ParkingNotifications::New::Component.new(organization: current_organization)
     end
 
     def show

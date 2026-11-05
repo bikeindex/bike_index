@@ -51,6 +51,19 @@ RSpec.describe Pages::Registrations::Show::RegistrationInformation::Component, t
       end
     end
 
+    context "on an unregistered parking notification e-vehicle" do
+      let(:bike) do
+        FactoryBot.create(:bike_organized, creation_organization: organization, propulsion_type: "pedal-assist",
+          status: "unregistered_parking_notification")
+      end
+
+      it "doesn't render the row" do
+        render_inline(component)
+
+        expect(page).to have_no_text("Registration sequence")
+      end
+    end
+
     context "without the registration_sequences feature" do
       let(:organization) { FactoryBot.create(:organization) }
 

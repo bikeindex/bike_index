@@ -307,7 +307,7 @@ RSpec.describe Organized::EmailsController, type: :request do
             expect(response.status).to eq(200)
             expect(components).to include("Emails::FinishedRegistration::Component")
             # When claim_message is present, it renders the claim_message partial
-            expect(response.body).to include("something here") # organization_stolen_message body
+            expect(Nokogiri::HTML(response.body).at_css(".organization-stolen-message-alert").text).to include("something here")
             expect(response.body).to include("registered your bike on Bike Index")
             # Stolen-specific text rendered by the FinishedRegistration component
             expect(response.body).to include("Mark your bike recovered")
@@ -320,6 +320,18 @@ RSpec.describe Organized::EmailsController, type: :request do
             expect(response.body).to include(OrgServices::EmailPreview::TOKEN_PATH)
             expect(response.body).to_not match(bike.current_ownership.token)
           end
+        end
+      end
+      context "impound_claim_denied with an impound_record but no claims" do
+        let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, organization: current_organization) }
+        let!(:mail_snippet) do
+          FactoryBot.create(:organization_mail_snippet, organization: current_organization, kind: "impound_claim_denied", body: "<p>Snippet body</p>")
+        end
+        it "renders the organization's snippet" do
+          components = rendered_view_component_names { get "#{base_url}/impound_claim_denied" }
+          expect(response.status).to eq(200)
+          expect(components).to include("Emails::ImpoundClaimApprovedOrDenied::Component")
+          expect(response.body).to include("Snippet body")
         end
       end
     end

@@ -10,6 +10,9 @@ RSpec.describe CallbackJobs::AfterManufacturerChangeJob, type: :job do
   let!(:bike2) { FactoryBot.create(:bike, manufacturer: Manufacturer.other, manufacturer_other: "PEDEGO ELECTRIC bikes ") }
   let!(:bike3) { FactoryBot.create(:bike, manufacturer: Manufacturer.other, manufacturer_other: "PEDEGOgo") }
   let!(:bike4) { FactoryBot.create(:bike, manufacturer: Manufacturer.other, manufacturer_other: "PEDEGOes") }
+  let!(:bike5) { FactoryBot.create(:bike, manufacturer: Manufacturer.other, manufacturer_other: "Pedego Electric-Bikes") }
+  let(:other_manufacturer) { FactoryBot.create(:manufacturer) }
+  let!(:bike6) { FactoryBot.create(:bike, manufacturer: other_manufacturer, manufacturer_other: "Pedego") }
   let!(:component1) { FactoryBot.create(:component, bike:, manufacturer: Manufacturer.other, manufacturer_other: "\nPEDEGO ELECTRIC bikes ") }
   let!(:component2) { FactoryBot.create(:component, bike:, manufacturer: Manufacturer.other, manufacturer_other: "   PEDEGOes") }
 
@@ -38,6 +41,11 @@ RSpec.describe CallbackJobs::AfterManufacturerChangeJob, type: :job do
 
     expect(bike4.reload.manufacturer_id).to eq Manufacturer.other.id
     expect(bike4.manufacturer_other).to eq "PEDEGOes"
+
+    expect(bike5.reload.manufacturer_id).to eq manufacturer.id
+    expect(bike5.manufacturer_other).to be_nil
+
+    expect(bike6.reload.manufacturer_id).to eq other_manufacturer.id
 
     expect(component1.reload.manufacturer_id).to eq manufacturer.id
     expect(component1.manufacturer_other).to be_nil

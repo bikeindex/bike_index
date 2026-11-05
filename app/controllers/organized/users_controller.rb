@@ -6,8 +6,7 @@ module Organized
     before_action :reject_self_updates, only: [:update, :destroy]
 
     def index
-      params[:page] || 1
-      per_page = (params[:per_page] || 25).to_i
+      per_page = permitted_per_page
       @show_user_search = params[:query].present? || current_organization.organization_roles.count > per_page
       @show_matching_count = @show_user_search && params[:query].present?
       @pagy, @organization_roles = pagy(:countish,

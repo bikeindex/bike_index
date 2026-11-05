@@ -25,8 +25,15 @@ RSpec.describe Search::RegistrationsController, type: :request do
       get base_url
       expect(response.code).to eq("200")
       expect(response).to render_template(:index)
-      expect(assigns(:interpreted_params)).to eq(stolenness: "stolen")
+      expect(assigns(:interpreted_params)).to eq(distance_unit: "km", stolenness: "stolen")
       expect(assigns(:bikes)).to be_blank
+      expect(Capybara.string(response.body)).to have_text("km of")
+        .and have_field("distance_unit", type: :hidden, with: "km")
+
+      # A searched URL keeps its unit
+      get base_url, params: {distance_unit: "mi"}
+      expect(assigns(:interpreted_params)).to eq(distance_unit: "mi", stolenness: "stolen")
+      expect(Capybara.string(response.body)).to have_text("miles of")
     end
 
     describe "facebook pixel" do
@@ -56,7 +63,7 @@ RSpec.describe Search::RegistrationsController, type: :request do
         get "#{base_url}?search_no_js=true"
         expect(response.code).to eq("200")
         expect(response).to render_template(:index)
-        expect(assigns(:interpreted_params)).to eq(stolenness: "stolen")
+        expect(assigns(:interpreted_params)).to eq(distance_unit: "km", stolenness: "stolen")
 
         expect(assigns(:bikes).pluck(:id).sort).to eq target_bike_ids
       end
@@ -65,7 +72,7 @@ RSpec.describe Search::RegistrationsController, type: :request do
     context "with stolenness: for_sale" do
       it "redirects to marketplace" do
         get "#{base_url}?search_no_js=true&stolenness=for_sale&location=Chicago%2C+IL"
-        expect(response).to redirect_to("/search/marketplace?location=Chicago%2C+IL&search_no_js=true")
+        expect(response).to redirect_to("/search/marketplace?distance_unit=km&location=Chicago%2C+IL&search_no_js=true")
       end
     end
 
@@ -78,7 +85,7 @@ RSpec.describe Search::RegistrationsController, type: :request do
 
         expect(response.body).to include("<turbo-stream action=\"update\" target=\"search_registrations_results_frame\">")
         expect(response).to render_template(:index)
-        expect(assigns(:interpreted_params)).to eq(stolenness: "stolen")
+        expect(assigns(:interpreted_params)).to eq(distance_unit: "km", stolenness: "stolen")
         expect(assigns(:bikes).pluck(:id).sort).to eq target_bike_ids
         # Expect there to be a link to the bike url
         expect(response.body).to match(/href="#{ENV["BASE_URL"]}\/bikes\/#{target_bike_ids.first}"/)
@@ -88,7 +95,7 @@ RSpec.describe Search::RegistrationsController, type: :request do
         let(:serial) { "1234567890" }
         let(:ip_address) { "23.115.69.69" }
         let(:target_location) { default_location[:formatted_address] }
-        let(:target_interpreted_params) { BikeSearchable.searchable_interpreted_params(query_params, ip: ip_address) }
+        let(:target_interpreted_params) { BikeSearchable.searchable_interpreted_params(query_params.reverse_merge(distance_unit: "km"), ip: ip_address) }
         let(:headers) { {"HTTP_CF_CONNECTING_IP" => ip_address} }
         include_context :geocoder_stubbed_bounding_box
         include_context :geocoder_default_location
@@ -99,21 +106,21 @@ RSpec.describe Search::RegistrationsController, type: :request do
             expect(response.status).to eq 200
             expect(response).to render_template(:index)
             expect(flash).to_not be_present
-            expect(assigns(:interpreted_params)).to eq(stolenness: "stolen")
+            expect(assigns(:interpreted_params)).to eq(distance_unit: "km", stolenness: "stolen")
             expect(assigns(:bikes).map(&:id)).to match_array([stolen_bike.id, stolen_bike_2.id, impounded_bike.id])
             # Test cycle_type
             get "#{base_url}?query_items%5B%5D=v_16", as: :turbo_stream
             expect(response.status).to eq 200
             expect(response).to render_template(:index)
             expect(flash).to_not be_present
-            expect(assigns(:interpreted_params)).to eq(stolenness: "stolen", cycle_type: :"e-scooter")
+            expect(assigns(:interpreted_params)).to eq(distance_unit: "km", stolenness: "stolen", cycle_type: :"e-scooter")
             expect(assigns(:bikes).map(&:id)).to eq([stolen_bike_2.id])
             # Test impounded
             get "#{base_url}?stolenness=found", as: :turbo_stream
-            expect(assigns(:interpreted_params)).to eq(stolenness: "found")
+            expect(assigns(:interpreted_params)).to eq(distance_unit: "km", stolenness: "found")
             expect(assigns(:bikes).map(&:id)).to match_array([impounded_bike.id])
             get base_url, params: {stolenness: "impounded"}, as: :turbo_stream
-            expect(assigns(:interpreted_params)).to eq(stolenness: "impounded")
+            expect(assigns(:interpreted_params)).to eq(distance_unit: "km", stolenness: "impounded")
             expect(assigns(:bikes).map(&:id)).to match_array([impounded_bike.id])
           end
           context "query_items and serial search" do
@@ -139,11 +146,11 @@ RSpec.describe Search::RegistrationsController, type: :request do
               get base_url, params: {page: ""}, as: :turbo_stream
               expect(response.status).to eq 200
               expect(assigns(:page)).to eq 1
-              expect(assigns(:interpreted_params)).to eq({stolenness: "stolen"})
+              expect(assigns(:interpreted_params)).to eq(distance_unit: "km", stolenness: "stolen")
             end
           end
           context "ip proximity" do
-            let(:query_params) { {location: "yoU", distance: 1, stolenness: "proximity"} }
+            let(:query_params) { {location: "yoU", distance: 1, distance_unit: "mi", stolenness: "proximity"} }
             context "found location" do
               it "assigns passed parameters and close_serials" do
                 get base_url, params: query_params, headers: headers, as: :turbo_stream
@@ -202,6 +209,7 @@ RSpec.describe Search::RegistrationsController, type: :request do
                 colors: %w[3 4],
                 location: "5",
                 distance: "6",
+                distance_unit: "km",
                 serial: "9",
                 query_items: %w[7 8],
                 stolenness: "all"
@@ -211,6 +219,7 @@ RSpec.describe Search::RegistrationsController, type: :request do
                 :colors,
                 :location,
                 :distance,
+                :distance_unit,
                 :serial,
                 :query_items,
                 :stolenness
@@ -232,7 +241,7 @@ RSpec.describe Search::RegistrationsController, type: :request do
     let(:serial) { "1234667890" }
     let(:target_params) do
       {raw_serial: "1234667890", serial: "1234667890", serial_no_space: "1234667890",
-       stolenness: "stolen"}
+       stolenness: "stolen", distance_unit: "km"}
     end
 
     it "renders" do
@@ -247,7 +256,7 @@ RSpec.describe Search::RegistrationsController, type: :request do
   describe "serials_containing" do
     let(:serial) { "3456789" }
     let(:target_params) do
-      {raw_serial: "3456789", serial: "3456789", serial_no_space: "3456789", stolenness: "stolen"}
+      {raw_serial: "3456789", serial: "3456789", serial_no_space: "3456789", stolenness: "stolen", distance_unit: "km"}
     end
 
     it "renders" do

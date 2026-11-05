@@ -13,7 +13,7 @@ module UserServices
       return [] if organization.nil? || current_user.nil?
 
       # Rails.cache.fetch gets none of the locale ApplicationComponentHelper#cache folds into fragments
-      Rails.cache.fetch(["menu_items_org_v2", organization, current_user,
+      Rails.cache.fetch(["menu_items_org_v3", organization, current_user,
         old_register_view, I18n.locale]) do
         build_items(organization, current_user, old_register_view)
       end
@@ -86,7 +86,7 @@ module UserServices
         *registrations_links(organization),
         enabled_link(organization, "show_partial_registrations", translation(:incomplete_registrations),
           routes.incompletes_organization_bikes_path(organization.to_param)),
-        enabled_link(organization, "bike_search", translation(:multi_search),
+        ComponentStructs::Shapes.link(translation(:multi_search),
           routes.multi_search_organization_registrations_path(organization.to_param)),
         enabled_link(organization, "show_recoveries", translation(:recoveries),
           routes.recoveries_organization_bikes_path(organization.to_param)),
@@ -107,8 +107,8 @@ module UserServices
           routes.search_registrations_path(stolenness: "all"))]
     end
 
-    # The old view puts this row on organized/bikes#new, which the parking notification row
-    # also links, so the param is what tells them apart
+    # The old view puts this row on organized/bikes#new, which the legacy unregistered
+    # notification page shares, so the param is what tells them apart
     def add_registration_link(organization, old_register_view)
       path = if old_register_view
         routes.new_organization_bike_path(organization.to_param)
@@ -148,8 +148,7 @@ module UserServices
         ComponentStructs::Shapes.link(translation(:search_parking_notifications),
           routes.organization_parking_notifications_path(organization_id: organization.to_param)),
         ComponentStructs::Shapes.link(translation(:parking_notification_unregistered),
-          routes.new_organization_bike_path(organization.to_param, parking_notification: true),
-          match_params: {parking_notification: true})
+          routes.new_organization_parking_notification_path(organization.to_param))
       ]
 
       ComponentStructs::Shapes.group(:parking, translation(:parking_notifications_group), "map-pin", children)

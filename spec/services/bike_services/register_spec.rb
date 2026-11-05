@@ -86,6 +86,24 @@ RSpec.describe BikeServices::Register do
     end
   end
 
+  describe "with_prefill" do
+    let(:params) { {"bike" => bike, "prefill" => {"manufacturer" => "Nope Cycles", "frame_model" => "Haul LT"}} }
+    let(:bike) { {"owner_email" => "owner@example.com"} }
+
+    it "fills a blank manufacturer and model, an unknown manufacturer as Other, named" do
+      expect(described_class.with_prefill(params)["bike"]).to eq("owner_email" => "owner@example.com",
+        "manufacturer_id" => Manufacturer.other.id, "manufacturer_other" => "Nope Cycles", "frame_model" => "Haul LT")
+    end
+
+    context "with the bike's own values" do
+      let(:bike) { {"manufacturer_id" => 12, "frame_model" => "Mine"} }
+
+      it "keeps them" do
+        expect(described_class.with_prefill(params)["bike"]).to eq bike
+      end
+    end
+  end
+
   describe "find_token" do
     let(:creator) { FactoryBot.create(:user_confirmed) }
     let(:b_param) do
@@ -308,6 +326,39 @@ RSpec.describe BikeServices::Register do
           expect(described_class.save_step_2(b_param, user:, image: nil, image_signed_id: nil,
             bike_params: {"frame_size" => "m"})).to be_truthy
           expect(described_class.send(:details_completed?, b_param.reload)).to be_truthy
+        end
+
+        context "whose account has no name" do
+          let(:user) { FactoryBot.create(:user_confirmed, email: "owner@example.com", name: nil) }
+
+          it "doesn't complete the step" do
+            expect(described_class.save_step_2(b_param, user:, image: nil, image_signed_id: nil,
+              bike_params: {"frame_size" => "m"})).to be_falsey
+            expect(described_class.send(:details_completed?, b_param.reload)).to be_falsey
+          end
+        end
+      end
+    end
+
+    context "registering their own bike with a user_name" do
+      let(:user) { FactoryBot.create(:user_confirmed, email: "owner@example.com", name:) }
+      let(:name) { nil }
+      let(:result) do
+        described_class.save_step_2(b_param, user:, image: nil, image_signed_id: nil,
+          bike_params: {"user_name" => "Sarah Rider"})
+      end
+
+      it "names their account" do
+        expect(result).to be_truthy
+        expect(user.reload.name).to eq "Sarah Rider"
+      end
+
+      context "whose account already has a name" do
+        let(:name) { "Their Own Choice" }
+
+        it "keeps it" do
+          expect(result).to be_truthy
+          expect(user.reload.name).to eq "Their Own Choice"
         end
       end
     end

@@ -2,6 +2,13 @@
 
 module BikeServices
   class Creator
+    REDLOCK_PREFIX = "BikeCreatorDuplicateLock-#{Rails.env.slice(0, 3)}"
+    # Expires the lock if a process dies mid-registration
+    LOCK_DURATION_MS = 30.seconds.in_milliseconds.to_i
+    # Waits up to about 10 seconds for a concurrent registration of the same bike
+    LOCK_RETRY_COUNT = 50
+    LOCK_RETRY_DELAY_MS = 200
+
     PERMITTED_ATTRS = %i[
       abandoned
       approved_stolen
@@ -88,12 +95,82 @@ module BikeServices
       ]).freeze
     end
 
+    class << self
+      # Hashed, so the owner's email and serial aren't stored in Redis
+      def duplicate_lock_key(b_param)
+        return unless b_param&.no_duplicate?
+
+        serial = SerialNormalizer.no_space(SerialNormalizer.normalized_and_corrected(b_param.bike["serial_number"]))
+        email = EmailNormalizer.normalize(b_param.owner_email)
+        return if serial.blank? || email.blank?
+
+        "#{REDLOCK_PREFIX}-#{Digest::SHA256.hexdigest("#{email} #{serial}")}"
+      end
+
+      def new_lock_manager
+        Redlock::Client.new([Bikeindex::Application.config.redis_default_url],
+          retry_count: LOCK_RETRY_COUNT, retry_delay: LOCK_RETRY_DELAY_MS)
+      end
+    end
+
     def initialize(ip_address: nil)
       @ip_address = ip_address
     end
 
     def create_bike(b_param)
       add_bike_book_data(b_param)
+      with_duplicate_lock(b_param) { find_or_create_bike(b_param) }
+    end
+
+    # Called from ImageAssociatorJob, so can't be private
+    def attach_photo(b_param, bike)
+      return if b_param.image_signed_id.blank? && b_param.image.blank?
+
+      if b_param.image_signed_id.present?
+        begin
+          attach_blob(b_param, bike)
+        rescue Seahorse::Client::NetworkingError, Aws::Errors::ServiceError
+          # Attaching reads the blob back from R2 to identify it. Raising here strands the bike
+          # without a created_bike_id, so resubmitting the form would register a second one
+          ImageJobs::AttachBlobJob.perform_in(1.minute, b_param.id, bike.id)
+        end
+      else
+        PublicImage.create(imageable: bike, image: b_param.image)
+        b_param.update(image_processed: true)
+      end
+      bike.reload
+    end
+
+    def attach_blob(b_param, bike)
+      blob = b_param.image_blob # nil once reaped - drop the photo, not the registration
+      PublicImage.create(imageable: bike, file: blob) if blob
+    end
+
+    private
+
+    # Previously all of this stuff was public.
+    # In an effort to refactor and simplify, anything not accessed outside of this class was explicitly made private (PR#1478)
+
+    # Two registrations of one bike, seconds apart, can't see each other's unsaved bike, so no_duplicate misses.
+    # The second waits for the first. If the lock isn't acquired, it registers anyway rather than failing
+    def with_duplicate_lock(b_param)
+      key = self.class.duplicate_lock_key(b_param)
+      return yield if key.blank?
+
+      lock_manager = self.class.new_lock_manager
+      redlock = begin
+        lock_manager.lock(key, LOCK_DURATION_MS)
+      rescue Redlock::LockAcquisitionError
+        false
+      end
+      begin
+        yield
+      ensure
+        lock_manager.unlock(redlock) if redlock
+      end
+    end
+
+    def find_or_create_bike(b_param)
       bike = BikeServices::Builder.find_or_build(b_param)
 
       # Skip processing if this bike is already created
@@ -107,30 +184,11 @@ module BikeServices
       bike
     end
 
-    # Called from ImageAssociatorJob, so can't be private
-    def attach_photo(b_param, bike)
-      return if b_param.image_signed_id.blank? && b_param.image.blank?
-
-      if b_param.image_signed_id.present?
-        blob = b_param.image_blob # nil once reaped - drop the photo, not the registration
-        PublicImage.create(imageable: bike, file: blob) if blob
-      else
-        PublicImage.create(imageable: bike, image: b_param.image)
-        b_param.update(image_processed: true)
-      end
-      bike.reload
-    end
-
-    private
-
-    # Previously all of this stuff was public.
-    # In an effort to refactor and simplify, anything not accessed outside of this class was explicitly made private (PR#1478)
-
     def add_bike_book_data(b_param = nil)
       return nil unless b_param&.bike.present? && b_param.manufacturer_id.present?
       return nil unless b_param.bike["frame_model"].present? && b_param.bike["year"].present?
 
-      bb_data = Integrations::BikeBook.new.get_model({
+      bb_data = Integrations::Bikebook::Data.new.get_model({
         manufacturer: Manufacturer.find(b_param.bike["manufacturer_id"]).name,
         year: b_param.bike["year"],
         frame_model: b_param.bike["frame_model"]
@@ -229,7 +287,10 @@ module BikeServices
         creator_id: b_param.creator_id,
         can_edit_claimed: bike.creation_organization_id.present?,
         organization_id: bike.creation_organization_id,
-        address_record_id: bike.address_record_id
+        address_record_id: bike.address_record_id,
+        # Ownership can't read these off an unsaved bike, which fails a filled in email as blank
+        owner_email: bike.owner_email,
+        is_phone: bike.phone_registration?
       }.merge(registration_info: b_param.registration_info_attrs.merge(ip_address: @ip_address))
     end
 
@@ -260,12 +321,13 @@ module BikeServices
         # notification will update it
         ParkingNotification.create!(b_param.parking_notification_params.merge(bike_id: bike.id))
       else
-        parking_notification_attrs = bike.address_hash_legacy
-        parking_notification_attrs.merge!(kind: b_param.bike["parking_notification_kind"],
+        address_attrs = Geocodeable.attrs_to_duplicate(bike).slice(*ParkingNotification.attribute_names, "skip_geocoding")
+        ParkingNotification.create(address_attrs.merge(
+          kind: b_param.bike["parking_notification_kind"],
           bike_id: bike.id,
           user_id: bike.creator.id,
-          organization_id: b_param.creation_organization_id)
-        ParkingNotification.create(parking_notification_attrs)
+          organization_id: b_param.creation_organization_id
+        ))
       end
       # Reload to pick up changes from ProcessParkingNotificationJob (e.g. user_hidden cleared by impound).
       # attr_accessors persist through reload, so clear marked_user_hidden for impound notifications

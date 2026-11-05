@@ -77,10 +77,6 @@ class ParkingNotification < ActiveRecord::Base
   before_validation :set_calculated_attributes
   after_commit :process_notification
 
-  scope :with_location, -> { where.not(latitude: nil) }
-  scope :with_street, -> { with_location.where.not(street: nil) }
-  scope :without_street, -> { where(street: ["", nil]) }
-
   scope :active, -> { where(resolved_at: nil) }
   scope :resolved, -> { where.not(resolved_at: nil) }
   scope :initial_records, -> { where(initial_record_id: nil) }
@@ -218,7 +214,7 @@ class ParkingNotification < ActiveRecord::Base
   end
 
   def send_email?
-    owner_known? && !organization&.skip_email_to?(email)
+    owner_known? && email != ApplicationMailer::CONTACT_EMAIL && !organization&.skip_email_to?(email)
   end
 
   def publicly_visible_attribute = :street

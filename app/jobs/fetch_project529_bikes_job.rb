@@ -20,6 +20,6 @@ class FetchProject529BikesJob < ScheduledJob
 
     return if created_bikes.empty?
 
-    self.class.perform_async(updated_since, page + 1)
+    self.class.perform_async(updated_since.to_s, page + 1)
   end
 end

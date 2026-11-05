@@ -26,4 +26,17 @@ RSpec.describe Pages::Org::RegisterSettings::Component, type: :component do
         .to eq(%w[old_view single_page separate_attestation])
     end
   end
+
+  context "with parking notifications, and the old unregistered notification page set" do
+    let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[parking_notifications]) }
+    let(:options) { {organization:, old_unregistered_notification_view: true} }
+
+    it "offers it below the form options, outside the old registration page's reach" do
+      expect(component).to have_text "Unregistered Notification page"
+      expect(switches.css("input[type=checkbox]").map { it["name"] })
+        .to eq(%w[old_view single_page old_unregistered_notification_view])
+      expect(switches.css("input[type=checkbox][checked]").map { it["name"] }).to eq(%w[old_unregistered_notification_view])
+      expect(switches.at_css("input[name=old_unregistered_notification_view]")["data-org--register-settings-target"]).to be_nil
+    end
+  end
 end

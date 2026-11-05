@@ -43,7 +43,7 @@
 #  index_ownerships_on_organization_id    (organization_id)
 #  index_ownerships_on_owner_email_trgm   (owner_email) USING gin
 #  index_ownerships_on_sale_id            (sale_id)
-#  index_ownerships_on_user_id            (user_id)
+#  index_ownerships_on_user_id_and_id     (user_id,id) WHERE (user_id IS NOT NULL)
 #
 class Ownership < ApplicationRecord
   include RegistrationInfoable
@@ -137,11 +137,11 @@ class Ownership < ApplicationRecord
     end
 
     def current_at(time)
-      where("created_at < ?", time).order(created_at: :desc).first
+      where("created_at < ?", time).reorder(created_at: :desc).first
     end
 
     def claimed_at(time)
-      where("claimed_at <= ?", time).order(created_at: :desc).first
+      where("claimed_at <= ?", time).reorder(created_at: :desc).first
     end
   end
 
@@ -251,7 +251,8 @@ class Ownership < ApplicationRecord
 
   def calculated_send_email
     return false if skip_email || bike.blank? || phone_registration? || bike.example? || bike.likely_spam?
-    return false if spam_risky_email? || user&.no_non_theft_notification || organization&.skip_email_to?(owner_email)
+    return false if owner_email == ApplicationMailer::CONTACT_EMAIL || spam_risky_email? || user&.no_non_theft_notification
+    return false if organization&.skip_email_to?(owner_email)
 
     # Unless this is the first ownership for a bike with a creation organization, it's good to send!
     true unless organization.present? && organization.enabled?("skip_ownership_email")
@@ -292,8 +293,8 @@ class Ownership < ApplicationRecord
     self.owner_name ||= user&.name.presence || fallback_owner_name
     if claimed?
       self.claimed_at ||= Time.current
-      # Update owner name always! Keep it in track
-      self.owner_name = user.name if user.present?
+      # Track the account's name - but a nameless account (SSO, emailed link) keeps the one typed at registration
+      self.owner_name = user.name if user&.name.present?
     end
     self.address_record ||= address_record_from_registration_info
   end

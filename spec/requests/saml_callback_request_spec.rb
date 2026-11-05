@@ -137,7 +137,29 @@ RSpec.describe "SAML SSO login", :saml_env, type: :request do
         user = User.find_by(email:)
         expect(identity.user).to eq user
         expect(user.last_login_at).to be_within(5.seconds).of Time.current
+        expect(user.name).to be_blank
         expect(signed_in?).to be true
+      end
+
+      context "with the name released" do
+        it "names the new user from displayName" do
+          post_callback(attributes: {"urn:oid:2.16.840.1.113730.3.1.241" => "Cardinal Rider"})
+          expect(User.find_by(email:).name).to eq "Cardinal Rider"
+        end
+
+        it "names the new user from given name and surname" do
+          post_callback(attributes: {"urn:oid:2.5.4.42" => "Cardinal", "urn:oid:2.5.4.4" => "Rider"})
+          expect(User.find_by(email:).name).to eq "Cardinal Rider"
+        end
+
+        context "existing user with a name" do
+          let!(:existing) { FactoryBot.create(:user_confirmed, email:, name: "Their Own Choice") }
+
+          it "keeps theirs" do
+            post_callback(attributes: {"displayName" => "Cardinal Rider"})
+            expect(existing.reload.name).to eq "Their Own Choice"
+          end
+        end
       end
 
       context "inactive configuration" do
@@ -384,8 +406,18 @@ RSpec.describe "SAML SSO login", :saml_env, type: :request do
         expect(response.headers["X-Robots-Tag"]).to eq "noindex, nofollow"
         expect(response.body).to include("You were signed up successfully!")
         expect(diagnostic_value("Account")).to include(email, "created by this login")
+        expect(diagnostic_value("Asserted name")).to eq "(missing)"
         expect(SsoIdentity.last.email).to eq email
         expect(signed_in?).to be true
+      end
+
+      context "with the name released" do
+        let(:test_options) { {attributes: {"displayName" => "Cardinal Rider"}} }
+
+        it "reports it" do
+          post_test_callback(**test_options)
+          expect(diagnostic_value("Asserted name")).to eq "Cardinal Rider"
+        end
       end
     end
 

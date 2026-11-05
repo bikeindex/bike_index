@@ -49,9 +49,7 @@
   <% end %>
 
   <% table.column(label: "Params") do |strava_request| %>
-    <small>
-      <%= strava_request.parameters&.to_json if strava_request.parameters.present? %>
-    </small>
+    <%= render(UI::Code::Json::Component.new(data: strava_request.parameters, small: true, max_width: :table_cell)) %>
   <% end %>
 
   <% table.column(label: "Rate limit") do |strava_request| %>

@@ -523,7 +523,7 @@ RSpec.describe "BikesController#show", type: :request do
         Sidekiq::Job.clear_all
         Sidekiq::Testing.inline! do
           put "#{base_url}/#{bike.id}/resolve_token?token=#{parking_notification.retrieval_link_token}&token_type=appears_abandoned_notification"
-          expect(flash[:success]).to be_present
+          expect(flash[:success]).to eq "Bike marked retrieved!"
         end
         # parking_notification_abandoned was marked retrieved - even though the token was for parking_notification
         expect(parking_notification_abandoned.reload.status).to eq "retrieved"
@@ -550,6 +550,45 @@ RSpec.describe "BikesController#show", type: :request do
       end
     end
   end
+  context "with organized impound_record, viewed by the owner" do
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
+    let(:current_user) { bike.user }
+    let(:organization) { FactoryBot.create(:organization, name: "Brakebills") }
+    let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, bike:, organization:) }
+    let(:alert) { Nokogiri::HTML(response.body).at_css("[role=alert]:has(h4)") }
+
+    it "renders the impounded alert" do
+      get "#{base_url}/#{bike.id}"
+      expect(response).to render_template(:show)
+      expect(alert.at_css("h4").text.strip).to eq "Your bike is currently impounded!"
+      expect(alert.text.squish).to match(/Impounded .+ by Brakebills\z/)
+      expect(alert.at_css(".localizeTime")).to be_present
+    end
+
+    context "impounded from a parking notification" do
+      let!(:parking_notification) { FactoryBot.create(:parking_notification_organized, bike:, organization:, impound_record:) }
+
+      it "includes the notification's address" do
+        get "#{base_url}/#{bike.id}"
+        expect(alert.text.squish).to match(/by Brakebills from #{Regexp.escape(parking_notification.formatted_address_string)}\z/)
+      end
+    end
+  end
+
+  context "with active parking_notification, viewed by the owner" do
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
+    let(:current_user) { bike.user }
+    let!(:parking_notification) { FactoryBot.create(:parking_notification_organized, bike:) }
+
+    it "renders the notifications alert, with a link to mark it retrieved" do
+      get "#{base_url}/#{bike.id}"
+      alert = Nokogiri::HTML(response.body).at_css("[role=alert]:has(h4)")
+      expect(alert.at_css("h4").text.strip).to eq "1 current notification for this bike!"
+      expect(alert.text.squish).to match "Have you retrieved this bike?"
+      expect(alert.at_css("a[href*='parking_notification_retrieved=#{parking_notification.reload.retrieval_link_token}']").text.strip).to eq "mark retrieved"
+    end
+  end
+
   context "with impound_record" do
     let(:impound_record) { FactoryBot.create(:impound_record, bike: bike) }
     let(:current_user) { FactoryBot.create(:user_confirmed) }
@@ -862,6 +901,9 @@ RSpec.describe "BikesController#show", type: :request do
       expect(flash).to_not be_present
       expect(assigns(:bike_sticker)).to eq bike_sticker
       expect(current_user.authorized?(assigns(:bike_sticker))).to be_truthy
+      alert = Capybara.string(response.body).find("[role=alert]", text: "You scanned")
+      expect(alert).to have_text("assigned to this bike")
+      expect(alert).to have_css("form[action^='/bike_stickers/#{bike_sticker.code}'] input[name='bike_id']", visible: :all)
     end
 
     context "viewer isn't the bike owner" do
@@ -874,6 +916,8 @@ RSpec.describe "BikesController#show", type: :request do
         expect(flash).to_not be_present
         expect(assigns(:bike_sticker)).to eq bike_sticker
         expect(current_user.authorized?(assigns(:bike_sticker))).to be_falsey
+        alert = Capybara.string(response.body).find("[role=alert]", text: "You scanned")
+        expect(alert).to have_no_css("form", visible: :all)
       end
     end
   end

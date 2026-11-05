@@ -42,6 +42,7 @@ RSpec.describe DocumentationController, type: :request do
       expect(response.code).to eq("200")
       expect(response).to render_template("api_v3")
       expect(flash).to_not be_present
+      expect(Nokogiri::HTML(response.body).at_css("body.dark")).to be_nil
     end
   end
 end

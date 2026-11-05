@@ -26,7 +26,7 @@ RSpec.describe GeocodeHelper do
           result = described_class.assignable_address_hash_for(latitude: latitude, longitude: longitude)
           # Ensure assignable_address_hash_for returns original lat & long
           expect(result).to eq target_assignable_hash
-          expect(result.keys.map(&:to_s).sort).to eq GeocodeableLegacy.location_attrs.sort
+          expect(result.keys.map(&:to_s).sort).to eq %w[city country_id latitude longitude neighborhood state_id street zipcode]
         end
       end
       context "new_attrs" do
@@ -220,6 +220,13 @@ RSpec.describe GeocodeHelper do
         expect(described_class.permitted_distance(5_000)).to eq 1_000
         expect(described_class.permitted_distance("-2", default_distance: 10)).to eq 1
         expect(described_class.permitted_distance(" 0")).to eq 1
+      end
+    end
+    context "in kilometers" do
+      it "clamps to the bounds in miles" do
+        expect(described_class.permitted_distance(50, unit: "km")).to eq 50
+        expect(described_class.permitted_distance(" 0", unit: "km")).to eq 1.61
+        expect(described_class.permitted_distance(5_000, unit: "km")).to eq 1_609.34
       end
     end
   end

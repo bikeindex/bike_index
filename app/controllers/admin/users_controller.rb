@@ -3,6 +3,7 @@ module Admin
     include Binxtils::SortableTable
 
     before_action :find_user, only: %i[show edit update destroy]
+    before_action :ensure_can_change_user!, only: %i[update destroy]
     helper_method :invalid_user_options
 
     def index
@@ -13,16 +14,15 @@ module Admin
     end
 
     def show
-      redirect_to edit_admin_user_url(params[:id])
+      @active_tab = Pages::Admin::Users::Show::Component::TABS.find { it.to_s == params[:active_tab] }
+      return redirect_to(edit_admin_user_url(params[:id])) unless @active_tab
+
+      @page_title = "#{Pages::Admin::Users::Tabs::Component::TABS[@active_tab]}: #{@user.display_name}"
     end
 
     def edit
       # urls with user IDs rather than usernames are more helpful in superadmin
-      if params[:id] == @user.username
-        redirect_to edit_admin_user_path(@user.id)
-        return
-      end
-      calculate_user_bikes
+      redirect_to edit_admin_user_path(@user.id) if params[:id] == @user.username
     end
 
     def update
@@ -31,10 +31,13 @@ module Admin
       else
         @user.name = params[:user][:name]
         @user.email = params[:user][:email]
-        if Binxtils::InputNormalizer.boolean(params[:user][:superuser])
-          @user.superuser_abilities.find_or_create_by(controller_name: nil, action_name: nil)
-        else
-          @user.superuser_abilities.universal.destroy_all
+        # Only a universal superuser can grant or revoke universal access
+        if current_user.superuser?
+          if Binxtils::InputNormalizer.boolean(params[:user][:superuser])
+            @user.superuser_abilities.find_or_create_by(controller_name: nil, action_name: nil)
+          else
+            @user.superuser_abilities.universal.destroy_all
+          end
         end
         @user.developer = params[:user][:developer] if current_user.developer? && params[:user].key?(:developer)
         ban_params = permitted_ban_parameters
@@ -45,6 +48,7 @@ module Admin
         @user.username = params[:user][:username]
         @user.can_send_many_stolen_notifications = params[:user][:can_send_many_stolen_notifications]
         @user.can_send_many_marketplace_messages = params[:user][:can_send_many_marketplace_messages]
+        @user.dark_mode_preview = Binxtils::InputNormalizer.boolean(params[:user][:dark_mode_preview]) if @user == current_user
         @user.phone = params[:user][:phone]
         # skip_update so the save doesn't auto-enqueue AfterUserChangeJob - it's enqueued
         # once below, after UserBan.create! (which marks the user banned) has run
@@ -54,11 +58,10 @@ module Admin
           elsif ban_params[:reason].present?
             @user.user_ban&.update(ban_params.slice(:reason, :description))
           end
-          @user.confirm(@user.confirmation_token) if params[:user][:confirmed]
+          @user.confirm(@user.confirmation_token) if Binxtils::InputNormalizer.boolean(params[:user][:confirmed])
           CallbackJobs::AfterUserChangeJob.perform_async(@user.id)
           redirect_to admin_users_url, notice: "User Updated"
         else
-          calculate_user_bikes
           render action: :edit, status: :unprocessable_entity
         end
       end
@@ -88,6 +91,14 @@ module Admin
     def find_user
       @user = User.unscoped.friendly_find(params[:id])
       raise ActiveRecord::RecordNotFound unless @user.present?
+    end
+
+    # Changing another superuser's email would let a limited superuser take over their access
+    def ensure_can_change_user!
+      return if current_user.superuser? || @user == current_user || @user.superuser_abilities.none?
+
+      flash[:error] = "Only a universal superuser can change another superuser"
+      redirect_to edit_admin_user_path(@user.id)
     end
 
     def permitted_ban_parameters
@@ -172,13 +183,6 @@ module Admin
       else
         :valid_only
       end
-    end
-
-    def calculate_user_bikes
-      # If the user has a bunch of bikes, it can cause timeouts. In those cases, use rough approximation
-      bikes = @user.bikes
-      @bikescount = @user.bikes.count
-      @bikes = bikes.reorder(created_at: :desc).limit(10)
     end
   end
 end

@@ -63,6 +63,18 @@ RSpec.describe Admin::SuperuserAbilitiesController, type: :request do
       end
     end
 
+    context "superuser limited to superuser_abilities" do
+      let(:current_user) { FactoryBot.create(:user_confirmed) }
+      let!(:superuser_ability) { SuperuserAbility.create(user: current_user, controller_name: "superuser_abilities") }
+      it "doesn't create" do
+        expect {
+          post base_url, params: {superuser_ability: {user_identifier: current_user.email, controller_name: ""}}
+        }.to_not change(SuperuserAbility, :count)
+        expect(response).to redirect_to(admin_superuser_abilities_path)
+        expect(current_user.reload.superuser?).to be_falsey
+      end
+    end
+
     context "with an unmatched user" do
       it "renders new" do
         expect {
@@ -78,6 +90,17 @@ RSpec.describe Admin::SuperuserAbilitiesController, type: :request do
       get "#{base_url}/#{superuser_ability.id}/edit"
       expect(response.status).to eq(200)
       expect(response).to render_template(:edit)
+      expect(response.body).to include("Delete superuser ability")
+    end
+
+    context "deleted" do
+      before { superuser_ability.destroy }
+
+      it "renders without the delete button" do
+        get "#{base_url}/#{superuser_ability.id}/edit"
+        expect(response.status).to eq(200)
+        expect(response.body).to_not include("Delete superuser ability")
+      end
     end
   end
 
@@ -90,6 +113,29 @@ RSpec.describe Admin::SuperuserAbilitiesController, type: :request do
       }
       superuser_ability.reload
       expect(superuser_ability.reload.su_options).to eq(%w[no_always_show_credibility no_hide_spam])
+    end
+  end
+
+  describe "destroy" do
+    it "soft deletes, removing the user's access" do
+      expect(user_subject.reload.superuser?).to be_truthy
+      expect {
+        delete "#{base_url}/#{superuser_ability.id}"
+      }.to change(SuperuserAbility, :count).by(-1)
+      expect(response).to redirect_to(admin_superuser_abilities_path)
+      expect(superuser_ability.reload.deleted_at).to be_present
+      expect(user_subject.reload.superuser?).to be_falsey
+    end
+
+    context "superuser limited to superuser_abilities" do
+      let(:current_user) { FactoryBot.create(:user_confirmed) }
+      let!(:current_user_ability) { SuperuserAbility.create(user: current_user, controller_name: "superuser_abilities") }
+      it "doesn't delete" do
+        expect {
+          delete "#{base_url}/#{superuser_ability.id}"
+        }.to_not change(SuperuserAbility, :count)
+        expect(response).to redirect_to(admin_superuser_abilities_path)
+      end
     end
   end
 end

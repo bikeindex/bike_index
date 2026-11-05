@@ -73,6 +73,16 @@ RSpec.describe UserJobs::CreateOrUpdateMembershipFromPaymentJob, type: :job do
       expect(membership.reload).to have_attributes_with_time_within updated_attrs
     end
 
+    context "when the membership is open-ended" do
+      let(:end_at) { nil }
+      it "links the payment without ending the membership" do
+        instance.perform(payment.id, creator_id)
+        expect(payment.reload.membership_id).to eq membership.id
+        expect(membership.reload.end_at).to be_nil
+        expect(membership.status).to eq "active"
+      end
+    end
+
     context "when the membership ended" do
       let(:end_at) { Time.current - 1.day }
       it "creates a new membership from today" do

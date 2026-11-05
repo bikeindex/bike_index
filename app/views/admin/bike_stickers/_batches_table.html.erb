@@ -2,7 +2,7 @@
 
 <%= render(UI::Table::Component.new(records: bike_sticker_batches, render_sortable:, sort_state:)) do |table| %>
   <% table.column(sortable: "id", label: "Batch") do |batch| %>
-    <%= link_to "##{batch.id}", admin_bike_stickers_path(search_bike_sticker_batch_id: batch.id) %>
+    <%= link_to "##{batch.id}", admin_bike_stickers_path(search_bike_sticker_batch_id: batch.id), class: "twlink" %>
   <% end %>
 
   <% table.column(sortable: "created_at") do |batch| %>

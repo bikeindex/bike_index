@@ -123,7 +123,7 @@ class Notification < ApplicationRecord
     # A ban blocks mail to the user, not mail about them - and account recovery is
     # how a wrongly banned user gets back in
     def email_ban_exempt_kinds
-      admin_kinds + %w[password_reset theft_alert_recovered]
+      admin_kinds + %w[password_reset magic_login_link theft_alert_recovered]
     end
 
     def sender_auto_kinds

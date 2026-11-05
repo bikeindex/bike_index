@@ -118,7 +118,7 @@
         </td>
 
         <td>
-          <% if bulk_import.user_id.present? %>
+          <% if bulk_import.user.present? %>
             <%= bulk_import.user.display_name %>
           <% elsif bulk_import.ascend? %>
             <small class="less-strong">ascend</small>

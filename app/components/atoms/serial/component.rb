@@ -62,7 +62,7 @@ module Atoms
       def explanation_block
         return tooltip(explanation_text) if @explanation == :tooltip
 
-        em = content_tag(:em, explanation_text, class: "small less-less-strong")
+        em = content_tag(:em, explanation_text, class: "less-strong tw:text-xs")
         return em unless serial_visible?
 
         safe_join([em, " ", tooltip(status_text)])

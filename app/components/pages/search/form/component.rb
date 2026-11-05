@@ -40,7 +40,7 @@ module Pages
         def kind_select_options
           kind_scope = @marketplace_scope || @interpreted_params[:stolenness]
 
-          @interpreted_params.slice(:location, :distance).merge(kind_scope:)
+          @interpreted_params.slice(:location, :distance, :distance_unit).merge(kind_scope:)
         end
 
         def query

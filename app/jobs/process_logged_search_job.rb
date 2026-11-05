@@ -19,7 +19,7 @@ class ProcessLoggedSearchJob < ApplicationJob
   def assign_ip_location(logged_search)
     return if logged_search.latitude.present?
 
-    logged_search.attributes = GeocodeHelper.assignable_address_hash_for(logged_search.ip_address)
+    logged_search.attributes = GeocodeHelper.assignable_address_hash_for(logged_search.ip_address, new_attrs: true)
   end
 
   def assign_user_attributes(logged_search)

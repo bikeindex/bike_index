@@ -14,6 +14,16 @@ RSpec.describe Admin::BikesController, type: :request do
       expect(assigns(:page_id)).to eq "admin_bikes_index"
     end
 
+    context "sorted by occurred_at" do
+      let!(:bike) { FactoryBot.create(:bike, :with_ownership) }
+      let!(:stolen_bike) { FactoryBot.create(:stolen_bike) }
+      it "puts the bikes without one last" do
+        get base_url, params: {sort: "occurred_at", direction: "asc"}
+        expect(response.code).to eq("200")
+        expect(assigns(:bikes).pluck(:id)).to eq([stolen_bike.id, bike.id])
+      end
+    end
+
     context "with render_chart and search_email" do
       let!(:bike) { FactoryBot.create(:bike, :with_ownership, :with_ownership_claimed, user:) }
       let(:user) { FactoryBot.create(:user_confirmed, email: "somethingcool@bikeindex.org") }
@@ -28,6 +38,19 @@ RSpec.describe Admin::BikesController, type: :request do
         expect(response.code).to eq("200")
         expect(response.body).to include('data-controller="ui--chart"')
         expect(assigns(:user_subject)).to eq user
+      end
+    end
+
+    context "user_id with deleted_only" do
+      let!(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user:) }
+      let!(:bike_deleted) { FactoryBot.create(:bike, :with_ownership_claimed, user:, deleted_at: Time.current) }
+      let(:user) { FactoryBot.create(:user_confirmed) }
+      it "finds the user's deleted bikes" do
+        get base_url, params: {user_id: user.id}
+        expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
+
+        get base_url, params: {user_id: user.id, search_status_deleted_only: true}
+        expect(assigns(:bikes).pluck(:id)).to eq([bike_deleted.id])
       end
     end
   end
@@ -48,6 +71,40 @@ RSpec.describe Admin::BikesController, type: :request do
       expect(response.code).to eq("200")
       expect(response).to render_template("missing_manufacturer")
       expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
+    end
+
+    context "authenticated with an API token" do
+      let(:current_user) { false }
+      include_context :admin_doorkeeper_token
+      let(:url) { "#{base_url}/missing_manufacturer.json" }
+      include_examples "rejects_unauthorized_token"
+
+      context "token for a bikes superuser" do
+        before { FactoryBot.create(:superuser_ability, user: token_user, controller_name: "bikes") }
+        let!(:bike_2) { FactoryBot.create(:bike, manufacturer: Manufacturer.other, manufacturer_other: "Cool Bikes", created_at: 1.week.ago) }
+        let!(:bike_3) { FactoryBot.create(:bike, manufacturer: Manufacturer.other, manufacturer_other: "Party") }
+
+        it "renders the manufacturer_other counts and first bike times" do
+          get url, params: token_param
+          expect(response.status).to eq 200
+          expect(json_result["missing_manufacturers"]).to match_array([
+            {"manufacturer_other" => "Cool Bikes", "count" => 2, "first_created_at" => bike_2.created_at.utc.as_json, "last_created_at" => bike.created_at.utc.as_json},
+            {"manufacturer_other" => "Party", "count" => 1, "first_created_at" => bike_3.created_at.utc.as_json, "last_created_at" => bike_3.created_at.utc.as_json}
+          ])
+        end
+
+        it "returns the most common per_page" do
+          get url, params: token_param.merge(per_page: 1)
+          expect(json_result["missing_manufacturers"].pluck("manufacturer_other")).to eq(["Cool Bikes"])
+        end
+
+        it "turns the token away from other actions" do
+          expect {
+            get "#{base_url}/#{bike.id}/get_destroy", params: token_param
+          }.not_to change(Bike, :count)
+          expect(response.status).to eq 403
+        end
+      end
     end
   end
 
@@ -107,6 +164,19 @@ RSpec.describe Admin::BikesController, type: :request do
       # A tab the show action doesn't render would otherwise raise from the tabs component
       get "#{base_url}/#{bike.id}?active_tab=party"
       expect(response).to redirect_to("#{base_url}/#{bike.id}/edit")
+    end
+
+    context "with a recovery waiting on a decision" do
+      let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, bike:, recovered_description: "Got it back from the shop") }
+      before { stolen_record.update_column(:recovery_display_status, "waiting_on_decision") }
+      it "renders it without the bulk display form" do
+        get "#{base_url}/#{bike.id}?active_tab=recoveries"
+        expect(response.code).to eq("200")
+        expect(response.body).to include("Got it back from the shop")
+        expect(response.body).to_not include("display[#{stolen_record.id}][quote]")
+        expect(response.body).to_not include("sr_selected")
+        expect(response.body).to_not include("bulk_update")
+      end
     end
 
     context "with an organization message" do
@@ -253,7 +323,7 @@ RSpec.describe Admin::BikesController, type: :request do
             "0" => {
               street: "Cortland and Ashland",
               city: "Chicago",
-              zipcode: "60622"
+              postal_code: "60622"
             }
           }
         }
@@ -351,6 +421,19 @@ RSpec.describe Admin::BikesController, type: :request do
       bike3.reload
       expect(bike3.manufacturer_other).to eq "69" # Sanity check
       expect(UpdateModelAuditJob.jobs.map { |j| j["args"] }.flatten).to match_array([11, 12])
+    end
+  end
+
+  describe "undelete" do
+    let!(:bike) { FactoryBot.create(:bike, :with_ownership, deleted_at: Time.current) }
+
+    it "restores the bike" do
+      expect(Bike.pluck(:id)).to eq([])
+      put "#{base_url}/#{bike.id}/undelete"
+      expect(response).to redirect_to(edit_admin_bike_url(bike))
+      expect(flash[:success]).to match(/un-deleted/i)
+      expect(Bike.pluck(:id)).to eq([bike.id])
+      expect(CallbackJobs::AfterBikeSaveJob).to have_enqueued_sidekiq_job(bike.id)
     end
   end
 

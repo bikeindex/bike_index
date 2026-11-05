@@ -144,18 +144,18 @@ class StolenBikeListing < ActiveRecord::Base
       case frame_size.downcase
       when /xxs/
         "xxs"
-      when /x*sma/, "xs"
+      when /(x|extra)\W?sma/, "xs"
         "xs"
       when /sma/, "s"
         "s"
       when /med/, "m"
         "m"
-      when /(lg)|(large)/, "l"
-        "l"
       when /xxl/
         "xxl"
-      when /x*l/, "xl"
+      when /(x|extra)\W?l/, "xl"
         "xl"
+      when /(lg)|(large)/, "l"
+        "l"
       end
     end
     true

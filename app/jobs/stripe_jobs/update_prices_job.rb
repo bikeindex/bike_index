@@ -5,7 +5,7 @@ module StripeJobs
     def perform
       updated_ids = []
 
-      Stripe::Price.list({limit: 100}).each do |price|
+      Stripe::Price.list({limit: 100}).auto_paging_each do |price|
         stripe_price = StripePrice.find_by(stripe_id: price.id) || StripePrice.new(stripe_id: price.id)
         new_attributes = {
           currency: price.currency,
@@ -36,7 +36,7 @@ module StripeJobs
     def product_membership_level
       return @product_membership_level if defined?(@product_membership_level)
 
-      membership_products = Stripe::Product.list({active: true, limit: 100})
+      membership_products = Stripe::Product.list({active: true, limit: 100}).auto_paging_each
         .select { it.name.match?(/member/i) }
 
       @product_membership_level = [
