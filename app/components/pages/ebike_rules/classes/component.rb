@@ -3,8 +3,8 @@
 module Pages
   module EbikeRules
     module Classes
-      # The three US classes, the chosen state's own where its law doesn't use them, or a place outside the US's laws
-      # and its other classes. A frame, so choosing a place reloads it
+      # The three US classes, the chosen state's own where its law doesn't use them, each followed by the state's rules, or a
+      # place outside the US's laws and its other classes. A frame, so choosing a place reloads it
       class Component < ApplicationComponent
         FRAME_ID = "ebike-rules-classes"
 
@@ -25,6 +25,12 @@ module Pages
           return @outside_us if defined?(@outside_us)
 
           @outside_us = @place && EbikeRuleServices::StateLaws.places[@place[:code]]
+        end
+
+        def state_law
+          return @state_law if defined?(@state_law)
+
+          @state_law = @place && EbikeRuleServices::Places.us?(@place) && EbikeRuleServices::StateLaws.find(@place[:abbr])
         end
 
         def cards = @cards ||= class_cards

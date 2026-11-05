@@ -14,3 +14,4 @@ en:
           state_classes_intro: >-
             %{state} doesn’t use the three-class system most states do. Its law sorts
             e-bikes and other electric two-wheelers into these classes instead.
+          state_rules: "%{state} E-bike rules"

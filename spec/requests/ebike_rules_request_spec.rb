@@ -57,6 +57,8 @@ RSpec.describe EbikeRulesController, type: :request do
       # a three-class state's own Class 3 limits, and what its motorcycle needs, in place of most states'
       get "/ebike-rules/US/CA", headers: frame
       expect(page).to have_css("h3", text: "Class 3").and have_css("[role=button]", text: "California specifics")
+        .and have_css("[role=button]", text: "California E-bike rules")
+        .and have_css("#ebike-rules-classes h3", text: "Rider rules")
         .and have_css("li", text: "Not a motor vehicle: no driver's license")
         .and have_css("li", text: "Registered and plated with the DMV, and must carry liability insurance")
         .and have_no_css("li", text: "Allowed on freeways")
@@ -300,6 +302,7 @@ RSpec.describe EbikeRulesController, type: :request do
         .and have_css("label", text: "32 km/h").and have_css("label", text: "Over 32 km/h")
         .and have_css("#ebike-rules-classes h2", text: "E-bike laws in Canada")
         .and have_css("#ebike-rules-classes h3", text: "Canadian Power-Assisted Bicycle")
+        .and have_no_css("[role=button]", text: "E-bike rules")
         .and have_css("h2", text: "E-bike laws by province and territory")
         .and have_link("Check an e-bike in Ontario", href: "/ebike-rules/CA/ON#check", visible: :all)
         .and have_css("#state-panel-ca-nb h3", text: "Motor Driven Cycle", visible: :all)

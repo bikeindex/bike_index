@@ -45,6 +45,26 @@
           <%= render(card) %>
         <% end %>
       </div>
+
+      <% if state_law %>
+        <div
+          class="tw:mt-6"
+          data-controller="ui--collapse"
+          data-ui--collapse-param-value="state_rules"
+        >
+          <%= render(UI::Collapse::Component.new(text: translation(".state_rules", state: @place[:name]), chevron: :trailing, color: :link)) %>
+
+          <div class="tw:mt-4 tw:hidden" data-ui--collapse-target="content">
+            <%= render(UI::Card::Component.new(additional_classes: "tw:p-[clamp(18px,3vw,28px)]!")) do %>
+              <h3 class="tw:mb-3 tw:font-header tw:text-xl tw:font-extrabold">
+                <%= state_law[:name] %>
+              </h3>
+
+              <%= render(Pages::EbikeRules::LawDetails::Component.new(law: state_law)) %>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
     </div>
   </section>
 <% end %>

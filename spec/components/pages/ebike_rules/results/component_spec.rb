@@ -20,7 +20,7 @@ RSpec.describe Pages::EbikeRules::Results::Component, type: :component do
   end
   let(:component) { render_inline(described_class.new(lookup:)) }
 
-  it "renders a legal bike, its BikeBook photo, specs and certifications, and its state's law" do
+  it "renders a legal bike, its BikeBook photo, specs and certifications, and its state's limits" do
     expect(component).to have_css("[role='status']", text: "Legal to ride")
       .and have_css("[role='status']", text: "Your Trek Verve+ 2 is legal to ride in Indiana as a Class 1 e-bike.")
       .and have_css("img[src='https://bikebook.bikeindex.org/trek/2025/verve.jpg'][alt='Trek Verve+ 2']")
@@ -32,8 +32,6 @@ RSpec.describe Pages::EbikeRules::Results::Component, type: :component do
       .and have_no_text("UL 2271")
       .and have_css("li", text: /Classes 1, 2, and 3 recognized\s*Class 1 is recognized/)
       .and have_css("li [role='img'][aria-label='Meets this rule']", count: 4)
-      .and have_css("li", text: "Class 3 riders must be 15 or older")
-      .and have_link(href: "https://in.gov/dnr/rules-and-regulations/e-bike-rules")
       .and have_link("BikeBook", href: "/bikebook?vehicle_models=evc/us/in/electric_bicycle")
       .and have_link("Register on Bike Index — free", href: "/register/new?frame_model=Verve%2B+2&manufacturer=Trek")
   end
@@ -160,7 +158,6 @@ RSpec.describe Pages::EbikeRules::Results::Component, type: :component do
         .and have_css("li", text: /32 km\/h top assisted speed\s*Assists to 32 km\/h, within the limit/)
         .and have_css("dd", text: "32 km/h")
         .and have_text("Your province or territory")
-        .and have_text("Riders must be 16 or older")
         .and have_text("catalog of e-bike law")
         .and have_no_css("[role='img'][aria-label='Class 1 e-bike']")
         .and have_no_text("recognized")
@@ -185,7 +182,6 @@ RSpec.describe Pages::EbikeRules::Results::Component, type: :component do
         expect(component).to have_css("[role='status']", text: "Your Trek Verve+ 2 may be legal to ride in New Brunswick under the Motor Driven Cycle rules, " \
           "with 1 rule to check.")
           .and have_css("li", text: /Regulated as Motor Driven Cycle\s*There's no e-bike category here/)
-          .and have_css("li", text: "Registered with one plate")
       end
     end
   end

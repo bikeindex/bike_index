@@ -28,7 +28,7 @@ RSpec.describe "E-bike rules", :js, type: :system do
     expect(page).to have_current_path(%r{\A/ebike-rules/US/CO\?vehicle_models=m/specialized/2025/haul_st\z})
     expect(page).to have_title("Colorado e-bike laws")
     expect(find_field("Bike model", disabled: false, wait: 10).value).to eq "Specialized Haul ST"
-    find("[role='button']", text: "Read more").click
+    find("[role='button']", text: "Colorado E-bike rules").click
     expect(page).to have_css("li", text: "Class 3 riders must be 16 or older")
 
     # the model's details fill the panel, named for it
@@ -116,20 +116,20 @@ RSpec.describe "E-bike rules", :js, type: :system do
       .and have_text(/Rules that may apply in California/i)
     expect(page).to have_current_path("/ebike-rules/US/CA?manual=1&top_speed=28&throttle=1&rules=1")
 
-    # as "Read more" does the state's e-bike law, under the cards and in the URL apart from them
-    expect(page).to have_no_text(/E-bike rules in California/i)
-    find("[role='button']", text: "Read more").click
-    expect(page).to have_text(/E-bike rules in California/i)
+    # as the link under the class cards does the state's e-bike law, in the URL apart from them
+    expect(page).to have_no_css("#ebike-rules-classes [data-ui--collapse-target='content'] h3", text: "Rider rules")
+    find("[role='button']", text: "California E-bike rules").click
+    expect(page).to have_css("#ebike-rules-classes [data-ui--collapse-target='content'] h3", text: "Rider rules")
     expect(page).to have_current_path("/ebike-rules/US/CA?manual=1&top_speed=28&throttle=1&rules=1&state_rules=1")
     find("[role='status'] [role='button']", text: "Moped rules").click
     expect(page).to have_no_text(/Rules that may apply in California/i)
-    expect(page).to have_text(/E-bike rules in California/i)
+    expect(page).to have_css("#ebike-rules-classes [data-ui--collapse-target='content'] h3", text: "Rider rules")
     expect(page).to have_current_path("/ebike-rules/US/CA?manual=1&top_speed=28&throttle=1&rules=0&state_rules=1")
 
     # which a link to it opens
     visit "/ebike-rules/US/CA?manual=1&top_speed=28&throttle=1&rules=1"
     expect(page).to have_text(/Rules that may apply in California/i)
-    expect(page).to have_no_text(/E-bike rules in California/i)
+    expect(page).to have_no_css("#ebike-rules-classes [data-ui--collapse-target='content'] h3", text: "Rider rules")
   end
 
   it "filters the states, opens the one an old link's anchor names, and checks a bike in each from its rules" do
