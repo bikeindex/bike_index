@@ -72,7 +72,7 @@ module Pages
             claimed_bike_link = link_to(translation(".this_claimed_bike_type", kind: impound_claim.kind, bike_type: claimed_bike.type),
               bike_path(claimed_bike), class: "twlink-underlined")
             tag.div(translation(".impound_claim_html", status: impound_claim.status_humanized.titleize, claimed_bike: claimed_bike_link),
-              class: "tw:text-sm tw:text-amber-700 tw:dark:text-amber-300")
+              class: "tw:text-sm tw:text-yellow-800 tw:dark:text-yellow-300")
           end
 
           def sale_link_text

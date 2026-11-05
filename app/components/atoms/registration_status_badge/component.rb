@@ -21,7 +21,7 @@ module Atoms
         success: "tw:border-l-green-600!",
         purple: "tw:border-l-purple-500!",
         error: "tw:border-l-red-600!",
-        warning: "tw:border-l-amber-500!",
+        warning: "tw:border-l-yellow-300!",
         pink: "tw:border-l-pink-400!"
       }.freeze
 
