@@ -16,13 +16,13 @@ module SharedBlocks
           "tw:text-sm tw:leading-tight tw:font-bold tw:group-data-[collapsed=true]/sidebar:justify-center tw:max-[760px]:py-3.5"
         ROW_HOVER = "tw:hover:bg-gray-100 tw:dark:hover:bg-gray-700"
         # A link goes current off the aria-current the is-active variant already reads
-        ROW_CURRENT = "tw:is-active:bg-blue-50 tw:is-active:text-blue-600 tw:is-active:dark:bg-gray-700"
+        ROW_CURRENT = "tw:is-active:bg-blue-50 tw:is-active:text-blue-600 tw:is-active:dark:bg-gray-700 tw:is-active:dark:text-blue-300"
         # A group toggle goes current while its group holds that link, open or not -- not
         # is-active, which an open group's toggle also gets. Important so hover can't gray it,
         # the way is-active's sort order keeps it from graying a link
         GROUP_CURRENT = "tw:group-has-[[aria-current]]/nav-group:bg-blue-50! " \
-          "tw:group-has-[[aria-current]]/nav-group:text-blue-600 tw:group-has-[[aria-current]]/nav-group:dark:bg-gray-700! " \
-          "tw:active:bg-blue-50 tw:active:text-blue-600 tw:active:dark:bg-gray-700"
+          "tw:group-has-[[aria-current]]/nav-group:text-blue-600 tw:group-has-[[aria-current]]/nav-group:dark:bg-gray-700! tw:group-has-[[aria-current]]/nav-group:dark:text-blue-300 " \
+          "tw:active:bg-blue-50 tw:active:text-blue-600 tw:active:dark:bg-gray-700 tw:active:dark:text-blue-300"
         ROW_RESTING = "tw:text-gray-900 tw:dark:text-gray-300"
 
         # A row inside a group, indented past its parent's icon

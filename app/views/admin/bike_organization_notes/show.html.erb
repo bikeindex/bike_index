@@ -2,7 +2,7 @@
 
 <div class="twwiderow tw:mt-6 tw:items-start">
   <%= render(UI::TableList::Component.new) do |list| %>
-    <% list.with_row(label: "ID", dev_only: true, value: tag.code(@bike_organization_note.id, class: "twcode"), if: display_dev_info?) %>
+    <% list.with_row(label: "ID", dev_only: true, value: render(UI::Code::Inline::Component.new(text: @bike_organization_note.id)), if: display_dev_info?) %>
 
     <% list.with_row(label: "User", value: render(Atoms::Admin::TableCells::User::Component.new(user: @bike_organization_note.user, user_id: @bike_organization_note.user_id))) %>
 

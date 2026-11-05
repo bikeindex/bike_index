@@ -8,6 +8,10 @@ import { marketNote } from 'bikebook/templates/vehicles/market_note'
 // SharedBlocks::SearchResults::BikeCard::Component::LIST_CLASSES
 export const MODEL_CARDS_CLASSES = 'tw:grid tw:grid-cols-[repeat(auto-fill,minmax(max(14rem,calc((100%_-_3rem)/4)),1fr))] tw:gap-4'
 
+// On a small screen, a row running sideways, two cards high, with a little of the next and previous showing
+export const MODEL_CARDS_ROW_CLASSES = 'tw:max-sm:twpagebleed tw:max-sm:auto-cols-[min(100vw-2.5rem,300px)] tw:max-sm:grid-cols-none tw:max-sm:grid-flow-col tw:max-sm:grid-rows-[auto_auto] ' +
+  'tw:max-sm:gap-x-2 tw:max-sm:snap-x tw:max-sm:snap-mandatory tw:max-sm:overflow-x-auto tw:max-sm:px-(--gutter) tw:max-sm:pt-0.5 tw:max-sm:pb-3 tw:max-sm:*:snap-center'
+
 // The years a model is sold in, one alone where its first is its final
 const cardYears = ({ first_year: first, final_year: final }) => !first || first === final ? final ?? first : `${first}–${final ?? 'current'}`
 

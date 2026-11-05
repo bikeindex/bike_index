@@ -22,7 +22,7 @@
       <%= render Atoms::Admin::TableCells::User::Component.new(user: bug_report.user, user_id: bug_report.user_id) %>
     <% else %>
       <span class="tw:block tw:xl:inline"><%= bug_report.from_name %></span>
-      <%= content_tag(:code, bug_report.email, class: "twcode") %>
+      <%= render(UI::Code::Inline::Component.new(text: bug_report.email)) %>
     <% end %>
 
     <%# a fixed path rather than sortable_search_params, which caching would bake in %>
@@ -57,7 +57,7 @@
 
   <% table.column(hideable: :tags_cell) do |bug_report| %>
     <% bug_report.tags.each do |tag| %>
-      <code class="twcode tw:text-xs tw:text-black"><%= tag %></code>
+      <%= render(UI::Code::Inline::Component.new(text: tag, small: true)) %>
     <% end %>
   <% end %>
 

@@ -1,38 +1,3 @@
-<% nav_header_list_items = capture do %>
-  <li>
-    <% endpoint_filter_name = @endpoint == "all" ? "All endpoints" : special_endpoints.include?(@endpoint) ? @endpoint.humanize : @endpoint %>
-
-    <%= render(UI::Dropdown::Component.new(name: endpoint_filter_name, button_size: :sm,
-          active: @endpoint != "all")) do |dropdown| %>
-      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All endpoints", path: url_for(sortable_search_params.merge(search_endpoint: nil)), match_params: {search_endpoint: nil}) } %>
-
-      <% special_endpoints.each do |endpoint| %>
-        <% endpoint_active = @endpoint == endpoint %>
-        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: endpoint.humanize, path: url_for(sortable_search_params.merge(search_endpoint: endpoint_active ? nil : endpoint)), match_params: {search_endpoint: endpoint}) } %>
-      <% end %>
-
-      <% dropdown.with_entry_divider %>
-
-      <% LoggedSearch.endpoints.keys.each do |endpoint| %>
-        <% endpoint_active = @endpoint == endpoint %>
-        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: endpoint, path: url_for(sortable_search_params.merge(search_endpoint: endpoint_active ? nil : endpoint)), match_params: {search_endpoint: endpoint}) } %>
-      <% end %>
-    <% end %>
-  </li>
-
-  <li>
-    <%= render(UI::ButtonLink::Component.new(text: "serial", href: url_for(sortable_search_params.merge(search_serial: !@serial)), size: :sm, active: @serial)) %>
-  </li>
-
-  <li>
-    <%= render(UI::ButtonLink::Component.new(text: "location", href: url_for(sortable_search_params.merge(search_with_location: !@with_location)), size: :sm, active: @with_location)) %>
-  </li>
-
-  <li>
-    <%= render(UI::ButtonLink::Component.new(text: "include query", href: url_for(sortable_search_params.merge(search_includes_query: !@includes_query)), size: :sm, active: @includes_query)) %>
-  </li>
-<% end %>
-
 <% rendered_chart = nil %>
 
 <% if @render_chart %>
@@ -54,7 +19,7 @@
       <% if special_endpoints.include?(params[:search_endpoint]) %>
         <em><%= params[:search_endpoint].humanize %></em>
       <% else %>
-        <code class="twcode"><%= params[:search_endpoint] %></code>
+        <%= render(UI::Code::Inline::Component.new(text: params[:search_endpoint])) %>
       <% end %>
       <%= render(UI::ButtonLink::Component.new(href: url_for(sortable_search_params.merge(search_endpoint: nil)), text: "view for all endpoints", color: :link_gray, html_class: "tw:text-sm")) %>
     </p>
@@ -63,7 +28,8 @@
   <% if params[:search_ip_address].present? %>
     <p class="tw:mb-4">
       Viewing only Searches <strong>from</strong>
-      <code class="twcode"><%= params[:search_ip_address] %></code>
+      <%= render(UI::Code::Inline::Component.new(text: params[:search_ip_address])) %>
+
       <%= render(UI::ButtonLink::Component.new(href: url_for(sortable_search_params.merge(search_ip_address: nil)), text: "view from any ip address", color: :link_gray, html_class: "tw:text-sm")) %>
     </p>
   <% end %>
@@ -76,6 +42,32 @@
   collection: @logged_searches,
   viewing: "Logged Searches",
   rendered_chart:,
-  nav_header_list_items:,
   table_view:,
-)) %>
+)) do |skeleton| %>
+  <% skeleton.with_nav_item do %>
+    <% endpoint_filter_name = @endpoint == "all" ? "All endpoints" : special_endpoints.include?(@endpoint) ? @endpoint.humanize : @endpoint %>
+
+    <%= render(UI::Dropdown::Component.new(name: endpoint_filter_name, button_size: :sm,
+          active: @endpoint != "all")) do |dropdown| %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All endpoints", path: url_for(sortable_search_params.merge(search_endpoint: nil)), match_params: {search_endpoint: nil}) } %>
+
+      <% special_endpoints.each do |endpoint| %>
+        <% endpoint_active = @endpoint == endpoint %>
+        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: endpoint.humanize, path: url_for(sortable_search_params.merge(search_endpoint: endpoint_active ? nil : endpoint)), match_params: {search_endpoint: endpoint}) } %>
+      <% end %>
+
+      <% dropdown.with_entry_divider %>
+
+      <% LoggedSearch.endpoints.keys.each do |endpoint| %>
+        <% endpoint_active = @endpoint == endpoint %>
+        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: endpoint, path: url_for(sortable_search_params.merge(search_endpoint: endpoint_active ? nil : endpoint)), match_params: {search_endpoint: endpoint}) } %>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <% skeleton.with_nav_item { render(UI::ButtonLink::Component.new(text: "serial", href: url_for(sortable_search_params.merge(search_serial: !@serial)), size: :sm, active: @serial)) } %>
+
+  <% skeleton.with_nav_item { render(UI::ButtonLink::Component.new(text: "location", href: url_for(sortable_search_params.merge(search_with_location: !@with_location)), size: :sm, active: @with_location)) } %>
+
+  <% skeleton.with_nav_item { render(UI::ButtonLink::Component.new(text: "include query", href: url_for(sortable_search_params.merge(search_includes_query: !@includes_query)), size: :sm, active: @includes_query)) } %>
+<% end %>

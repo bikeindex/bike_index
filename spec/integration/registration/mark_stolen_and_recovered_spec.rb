@@ -94,6 +94,7 @@ RSpec.describe "Reporting a registration stolen, then recovered", :js, type: :sy
 
     within("#toggle-stolen") do
       expect(page).to have_css(".modal-body", visible: true, wait: 5)
+      expect(page).to have_no_content("Not enough information!")
       fill_in "mark_recovered_reason", with: "Found it locked up around the corner"
       click_button "Mark recovered"
     end

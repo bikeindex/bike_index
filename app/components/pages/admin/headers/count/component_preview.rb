@@ -5,17 +5,18 @@ module Pages
     module Headers
       module Count
         class ComponentPreview < ApplicationComponentPreview
+          # @!group Variants
+
+          # Templates, so the count can render inside UI::Header
           def default
-            render(UI::Header::Component.new(tag: :h2)) do
-              safe_join(["Notifications", render(Pages::Admin::Headers::Count::Component.new(count: 12, href: "#"))])
-            end
+            {template: "pages/admin/headers/count/component_preview/default"}
           end
 
           def with_parenthetical
-            render(UI::Header::Component.new(tag: :h2)) do
-              safe_join(["Bikes", render(Pages::Admin::Headers::Count::Component.new(count: 250, href: "#", parenthetical: "first 100 shown"))])
-            end
+            {template: "pages/admin/headers/count/component_preview/with_parenthetical"}
           end
+
+          # @!endgroup
         end
       end
     end

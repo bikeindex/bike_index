@@ -27,7 +27,7 @@
 
   <% table.column(label: "#") do |parking_notification| %>
     <% if parking_notification.repeat_record? %>
-      <small class="twless-strong"><%= parking_notification.notification_number %></small>
+      <small class="less-strong"><%= parking_notification.notification_number %></small>
     <% end %>
   <% end %>
 

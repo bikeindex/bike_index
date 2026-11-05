@@ -6,6 +6,20 @@ module BikeDuplicatesServices
     Check = Data.define(:status, :label)
     # Separate review, never invitation candidates
     SEPARATE_REVIEW_CUES = %w[not_a_serial standard_marking possible_code test_marker review_contact].freeze
+    # Finder's same-owner criteria, other than the account and email: what to say when [met, unmet].
+    # A nil is nothing worth saying
+    SAME_OWNER_LABELS = {
+      "two_records" => ["Exactly two registrations", "Not exactly two registrations — larger groups need record-by-record review"],
+      "current_owner" => ["Current ownership matches the initial registration on every record", "Current ownership differs from the initial registration on a record"],
+      "claimed" => ["A registration is claimed", "Never claimed — the email may belong to a shop"],
+      "shop_unclaimed" => [nil, "A shop registration has been claimed"],
+      "simple_history" => [nil, "Transfer, marketplace, impound or a status other than with owner to preserve — not a simple merge"],
+      "one_model" => [nil, "Model differs between records"],
+      "one_year" => [nil, "Year differs between records"],
+      "one_manufacturer_other" => [nil, "Custom manufacturer details differ between records"],
+      "one_stored_serial" => [nil, "Stored serials differ — normalizing may have joined different numbers"],
+      "named_manufacturer" => [nil, "Manufacturer is Other, so it can't corroborate the match"]
+    }.freeze
 
     FIELDS = {
       "Manufacturer" => ->(bike) { [bike.manufacturer&.name, bike.manufacturer_other].compact_blank.join(" ") },
@@ -119,6 +133,12 @@ module BikeDuplicatesServices
       @serial_stolen = BikeDuplicatesServices::Finder.stolen_serials?(bikes.map(&:serial_normalized_no_space).uniq)
     end
 
+    # Listings on the bike and on its versions, as the queues count them
+    def marketplace_count(bike) = marketplace_counts.fetch(bike.id, 0)
+
+    # Private images too, which public_images leaves out
+    def photo_count(bike) = photo_counts.fetch(bike.id, 0)
+
     # The same test-marker rule the dashboard queues use
     def test?(bike) = test_bike_ids.include?(bike.id)
 
@@ -182,9 +202,7 @@ module BikeDuplicatesServices
     private
 
     def build_readiness_checks
-      initials = bikes.map { initial_ownership(it) }
-      accounts = initials.map { it&.user_id }
-      emails = initials.map { normalized_email(it) }
+      evidence = BikeDuplicatesServices::Finder.same_owner_evidence(bikes.map(&:id))
       separate_cues = cues.select { SEPARATE_REVIEW_CUES.include?(it.key) }
       serials = bikes.map { it.serial_normalized_no_space.to_s }
       manufacturer_ids = bikes.map(&:manufacturer_id)
@@ -202,23 +220,18 @@ module BikeDuplicatesServices
           Check.new(:blocked, "Manufacturers differ, or one is missing")),
         ((bikes.any? { it.deleted_at || it.example || it.likely_spam }) ? Check.new(:blocked, "Includes a deleted, example or spam record") : nil),
         *separate_cues.map { Check.new(:blocked, "#{it.label} — needs separate review, not an invitation") },
-        if accounts.compact.size == bikes.size && accounts.uniq.size == 1
-          Check.new(:pass, "Same known account on every initial registration")
-        elsif emails.compact.size == bikes.size && emails.uniq.size == 1
+        if evidence["one_account"] && evidence["one_email"]
+          Check.new(:pass, "Same known account and email on every initial registration")
+        elsif evidence["one_account"]
+          Check.new(:uncertain, "Same known account, but the initial emails differ or one is missing")
+        elsif evidence["one_email"]
           Check.new(:uncertain, "Same initial email only — tentative; shops and shared inboxes reuse emails")
         else
           Check.new(:blocked, "Initial contacts differ or are missing — not a same-owner candidate")
         end,
-        ((bikes.all? { it.current_ownership&.user_id && it.current_ownership.user_id == accounts.first }) ?
-          Check.new(:pass, "Current ownership is that same account on every record") :
-          Check.new(:uncertain, "Current ownership is not the same known account on every record")),
-        ((initials.any? { claim_status(it) == "Claimed" }) ? Check.new(:pass, "Claimed by the account holder") :
-          Check.new(:uncertain, "Never claimed — the email may belong to a shop")),
-        ((bikes.size == 2) ? Check.new(:pass, "Exactly two registrations") :
-          Check.new(:uncertain, "#{bikes.size} registrations — larger groups need record-by-record review")),
-        (differing_fields & ["Manufacturer", "Model", "Year"]).presence&.then { Check.new(:uncertain, "#{it.to_sentence} #{(it.size == 1) ? "differs" : "differ"} between records") },
-        ((bikes.any? { transferred?(it) || it.marketplace_listings.any? || it.current_impound_record_id }) ?
-          Check.new(:uncertain, "Transfer, marketplace or impound history to preserve — not a simple merge") : nil)
+        *SAME_OWNER_LABELS.filter_map do |criterion, (met, unmet)|
+          evidence.fetch(criterion) ? (met && Check.new(:pass, met)) : Check.new(:uncertain, unmet)
+        end
       ].compact
     end
 
@@ -240,6 +253,16 @@ module BikeDuplicatesServices
 
     def stolen_record_counts
       @stolen_record_counts ||= StolenRecord.unscoped.where(bike_id: bikes.map(&:id)).group(:bike_id).count
+    end
+
+    def marketplace_counts
+      @marketplace_counts ||= MarketplaceListing.where(item_type: "Bike", item_id: bikes.map(&:id)).group(:item_id).count
+        .merge(MarketplaceListing.where(item_type: "BikeVersion").joins("INNER JOIN bike_versions ON bike_versions.id = marketplace_listings.item_id")
+          .where(bike_versions: {bike_id: bikes.map(&:id)}).group("bike_versions.bike_id").count) { |_bike_id, direct, versions| direct + versions }
+    end
+
+    def photo_counts
+      @photo_counts ||= PublicImage.unscoped.where(imageable_type: "Bike", imageable_id: bikes.map(&:id)).group(:imageable_id).count
     end
 
     def test_bike_ids = @test_bike_ids ||= BikeDuplicatesServices::Finder.test_bike_ids(bikes.map(&:id)).to_set

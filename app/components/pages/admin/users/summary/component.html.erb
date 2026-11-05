@@ -1,6 +1,6 @@
 <div class="twwiderow tw:items-start">
   <%= render(UI::TableList::Component.new) do |list| %>
-    <% list.with_row(label: "ID", value: tag.code(@user.id, class: "twcode"), class: "only-dev-visible") %>
+    <% list.with_row(label: "ID", value: render(UI::Code::Inline::Component.new(text: @user.id)), class: "only-dev-visible") %>
     <% list.with_row(label: "Icons", value: render(Atoms::Admin::Badges::User::Component.new(user: @user, full_text: true))) %>
     <% list.with_row(label: "Created", value: render(UI::Time::Component.new(time: @user.created_at, format: :localize_time_precise))) %>
     <% list.with_row(label: "Updated", value: render(UI::Time::Component.new(time: @user.updated_at, format: :localize_time_precise))) %>
@@ -9,7 +9,7 @@
       <%= render(UI::Time::Component.new(time: @user.last_login_at, format: :localize_time_precise)) %>
 
       <% if @user.last_login_ip.present? %>
-        <small class="twless-strong"><%= @user.last_login_ip %></small>
+        <small class="less-strong"><%= @user.last_login_ip %></small>
       <% end %>
     <% end %>
 
@@ -17,7 +17,7 @@
       <% if @user.no_address? %>
         <strong class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:success] %>">TRUE</strong>
       <% else %>
-        <small class="twless-strong">address permitted</small>
+        <small class="less-strong">address permitted</small>
       <% end %>
     <% end %>
 
@@ -32,7 +32,7 @@
         <strong>full superuser</strong>
         <% superuser_ability = superuser_abilities.universal.first %>
         <% if superuser_ability.present? %>
-          <small class="twless-strong">
+          <small class="less-strong">
             since
             <%= render(UI::Time::Component.new(time: superuser_ability.created_at, format: :localize_time_precise)) %>
           </small>
@@ -61,7 +61,10 @@
       <div class="tw:grid tw:grid-cols-3 tw:gap-x-8">
         <div>
           <small
-            class="tw:block tw:border-b tw:border-gray-200"
+            class="
+              tw:block tw:border-b tw:border-gray-200
+              tw:dark:border-gray-700
+            "
             title="Receive Bike Index newsletters"
           >
             Newsletters
@@ -70,13 +73,16 @@
           <% if @user.notification_newsletters %>
             <%= check_mark %>
           <% else %>
-            <small class="twless-strong">false</small>
+            <small class="less-strong">false</small>
           <% end %>
         </div>
 
         <div>
           <small
-            class="tw:block tw:border-b tw:border-gray-200"
+            class="
+              tw:block tw:border-b tw:border-gray-200
+              tw:dark:border-gray-700
+            "
             title="Receive non-stolen theft emails"
           >
             Unstolen
@@ -85,13 +91,16 @@
           <% if @user.notification_unstolen %>
             <%= check_mark %>
           <% else %>
-            <small class="twless-strong <%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">false</small>
+            <small class="less-strong <%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">false</small>
           <% end %>
         </div>
 
         <div>
           <small
-            class="tw:block tw:border-b tw:border-gray-200"
+            class="
+              tw:block tw:border-b tw:border-gray-200
+              tw:dark:border-gray-700
+            "
             title="No non theft emails"
           >
             NONE
@@ -100,7 +109,7 @@
           <% if @user.no_non_theft_notification %>
             <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>"><%= check_mark %></span>
           <% else %>
-            <small class="twless-strong">false</small>
+            <small class="less-strong">false</small>
           <% end %>
         </div>
       </div>
@@ -112,7 +121,7 @@
       <% if @user.confirmed? %>
         <%= check_mark %>
       <% else %>
-        <small class="twless-strong">false</small>
+        <small class="less-strong">false</small>
       <% end %>
     <% end %>
 
@@ -150,11 +159,11 @@
             <li>
               <%= render Atoms::Phone::Component.new(phone: user_phone.phone, skip_link: true) %>
 
-              <small class="twless-strong <%= user_phone.confirmed? ? UI::Alerts::Base::Component::TEXT_CLASSES[:success] : UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>">
+              <small class="less-strong <%= user_phone.confirmed? ? UI::Alerts::Base::Component::TEXT_CLASSES[:success] : UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>">
                 <%= user_phone.confirmed? ? "confirmed" : "unconfirmed" %>
               </small>
 
-              <small class="twless-strong"><%= render(UI::Time::Component.new(time: user_phone.created_at, preposition: true)) %></small>
+              <small class="less-strong"><%= render(UI::Time::Component.new(time: user_phone.created_at, preposition: true)) %></small>
 
               <% if display_phone && Phonifyer.phonify(user_phone.phone) == Phonifyer.phonify(@user.phone) %>
                 <% display_phone = false %>
@@ -165,12 +174,12 @@
           <% if display_phone %>
             <li>
               <%= render Atoms::Phone::Component.new(phone: @user.phone, skip_link: true) %>
-              <small class="twless-strong <%= UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>">unconfirmed</small>
+              <small class="less-strong <%= UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>">unconfirmed</small>
             </li>
           <% end %>
         </ul>
         <% unless Flipper.enabled?(:phone_verification) %>
-          <em class="twless-strong tw:text-sm">
+          <em class="less-strong tw:text-sm">
             Phone verification is currently disabled, users don't see the option
             to confirm their phones
           </em>

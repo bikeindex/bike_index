@@ -1,16 +1,19 @@
-= render(Pages::Admin::Headers::Nav::Component.new(title: "Stolen Notification")) do
-  %li= render(UI::ButtonLink::Component.new(text: "Resend", href: resend_admin_stolen_notification_url(@stolen_notification, pretty_please: true), color: :primary, size: :sm))
+= render(Pages::Admin::Headers::Nav::Component.new(title: "Stolen Notification")) do |nav|
+  - nav.with_item { render(UI::ButtonLink::Component.new(text: "Resend", href: resend_admin_stolen_notification_url(@stolen_notification, pretty_please: true), color: :primary, size: :sm)) }
 = render(UI::Header::Component.new(tag: :h3)) do
   Created
   = link_to render(UI::Time::Component.new(time: @stolen_notification.created_at, format: :localize_time_precise)), admin_stolen_notification_url(@stolen_notification), class: "twlink"
 = render(UI::TableList::Component.new) do |list|
   - list.with_row(label: "Bike") do
-    = link_to @bike.title_string, edit_admin_stolen_bike_url(@bike), class: "twlink"
-    %small
-      %em total messages sent to bike:
-      = number_display(@bike.messages_count)
+    - if @bike.present?
+      = link_to @bike.title_string, edit_admin_stolen_bike_url(@bike), class: "twlink"
+      %small
+        %em total messages sent to bike:
+        = number_display(@bike.messages_count)
+    - else
+      Bike deleted!
   - list.with_row(label: "Receiver Name", value: @stolen_notification.receiver_email)
-  - list.with_row(label: "Bike phone", if: @bike.current_stolen_record.present?) do
+  - list.with_row(label: "Bike phone", if: @bike&.current_stolen_record.present?) do
     = @bike.current_stolen_record.phone
   - list.with_row(label: "Sent to owner") do
     = @stolen_notification.send_dates_parsed.count

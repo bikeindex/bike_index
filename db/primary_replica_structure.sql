@@ -4538,7 +4538,8 @@ CREATE TABLE public.users (
     can_send_many_marketplace_messages boolean DEFAULT false NOT NULL,
     feature_registration_show_legacy boolean DEFAULT false NOT NULL,
     passwordless_user boolean DEFAULT false NOT NULL,
-    preferred_unit_system integer
+    preferred_unit_system integer,
+    dark_mode_preview boolean DEFAULT false NOT NULL
 );
 
 
@@ -8037,6 +8038,7 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261102171029'),
 ('20261030102135'),
 ('20261020153612'),
 ('20261017210000'),
