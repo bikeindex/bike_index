@@ -173,7 +173,9 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
     # Bootstrap's collapse plugin, which is no longer loaded).
     # The example above covers the same flow on the redesigned page
     visit bike_path(bike)
-    click_button "Switch back to the legacy viewer"
+    wait_for_stimulus("ui--dropdown")
+    click_button "Open #{organization.short_name} menu"
+    click_button "View in Legacy Viewer"
     expect(page).to have_css(".organized-access-panel")
     wait_for_page_script
     click_on "New parking notification"

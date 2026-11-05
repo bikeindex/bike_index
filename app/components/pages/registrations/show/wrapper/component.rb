@@ -27,7 +27,8 @@ module Pages
             safe_join([
               token_prompt ? render(token_prompt) : "",
               capture { cache(cache_key) { concat(render(inner_component)) } },
-              render(Pages::Registrations::Show::LegacyViewLink::Component.new(bike: @bike, show_legacy: @show_legacy))
+              # An org view's way to the legacy page is its ViewSwitcher
+              @view.last ? "" : render(Pages::Registrations::Show::LegacyViewLink::Component.new(bike: @bike, show_legacy: @show_legacy))
             ])
           end
 

@@ -8,10 +8,18 @@ RSpec.describe Pages::Registrations::Show::ViewSwitcher::Component, type: :compo
     described_class.new(bike:, current_view: [:public, nil], available_views:, label: "Public", color: :gray, current_user:)
   end
 
-  it "renders a plain badge when there's nowhere to switch to" do
+  it "offers only the legacy page when there's no other view to switch to" do
     render_inline(component)
-    expect(page).to have_text("Public")
+    expect(page).to have_css("li[role='menuitem'] span[data-active='true']", text: "Viewing as Public")
     expect(page).to have_no_css("a")
+    form = page.find("form[action='/registrations/#{bike.id}/update_legacy_view?show_legacy=true'][method='post']")
+    expect(form["data-controller"]).to eq "csrf-refresh"
+    expect(form).to have_button("View in Legacy Viewer")
+  end
+
+  it "leaves the request's query out of the cached legacy form" do
+    with_request_url("/registrations/#{bike.id}?t=token") { render_inline(component) }
+    expect(page).to have_css("form[action='/registrations/#{bike.id}/update_legacy_view?show_legacy=true']")
   end
 
   context "with another view available" do
