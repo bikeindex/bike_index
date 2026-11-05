@@ -2,8 +2,8 @@ import { html } from 'lit-html'
 import { tooltip } from 'bikebook/templates/ui/tooltip'
 
 const COLORS = {
-  gray: 'tw:bg-[#f0f0f2] tw:text-[#666666] tw:border-transparent tw:dark:bg-gray-800 tw:dark:text-gray-400',
-  purple: 'tw:bg-purple-50 tw:text-purple-700 tw:border-transparent tw:dark:bg-purple-950 tw:dark:text-purple-200'
+  gray: 'tw:bg-[#f0f0f2] tw:text-[#666666] tw:border-transparent tw:dark:bg-white/10 tw:dark:text-gray-400',
+  purple: 'tw:bg-purple-50 tw:text-purple-700 tw:border-transparent tw:dark:bg-purple-400/15 tw:dark:text-purple-200'
 }
 const SIZES = {
   sm: 'tw:font-medium tw:px-1 tw:py-px',

@@ -68,7 +68,7 @@
           class="
             tw:h-[clamp(200px,26vw,260px)] tw:overflow-hidden
             tw:rounded-t-lg tw:border-b tw:border-gray-200 tw:bg-gray-50
-            tw:dark:border-gray-700 tw:dark:bg-gray-900
+            tw:dark:border-gray-700 tw:dark:bg-gray-300
           "
         >
           <%= image_tag @bike.photo_url, alt: bike_name, class: "tw:size-full tw:object-contain" %>
@@ -187,6 +187,6 @@
       </p>
     </div>
 
-    <%= render(UI::ButtonLink::Component.new(href: register_href, text: translation(".register_free"), color: :yellow, size: :callout)) %>
+    <%= render(UI::ButtonLink::Component.new(href: register_href, text: translation(".register_free"), color: :yellow, size: :callout, html_class: REGISTER_DARK_CLASSES)) %>
   <% end %>
 </section>
