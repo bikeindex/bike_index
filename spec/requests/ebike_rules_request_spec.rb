@@ -213,7 +213,7 @@ RSpec.describe EbikeRulesController, type: :request do
     it "checks a Class 3 with a stock throttle as out of class in California alone" do
       get "/ebike-rules/US/CA", params: {vehicle_models: "m/aventon/2026/level_4_adv"}
 
-      expect(page).to have_css("[role='status']", text: "Your Aventón Level 4 ADV is not permitted as an e-bike under current California rules.")
+      expect(page).to have_css("[role='status']", text: "Your Aventón Level 4 ADV is not classified as an e-bike in California.")
       top_line = page.all("[role='status'] > div > ul > li").map { it.text.strip }
       expect(top_line.first).to eq "It is a Class 2 and Class 3 e-bike, which is not permitted. In California, it may fall under Moped."
       expect(top_line.second).to start_with "Riders need a driver's license"

@@ -151,7 +151,7 @@ RSpec.describe Pages::EbikeRules::Results::Component, type: :component do
       let(:bike) { super().with(watts: 750, throttle: true, stock_throttle: true, throttle_kmh: 32) }
 
       it "isn't permitted" do
-        expect(component).to have_css("[role='status']", text: "Your Trek Verve+ 2 is not permitted as an e-bike under current Ontario rules.")
+        expect(component).to have_css("[role='status']", text: "Your Trek Verve+ 2 is not classified as an e-bike in Ontario.")
           .and have_css("[role='status'] li", text: "750W motor exceeds the 500W cap.")
           .and have_css("[role='status'] li", text: "which can require registration and a licence.")
           .and have_css("dd", text: "Yes, to 32 km/h")

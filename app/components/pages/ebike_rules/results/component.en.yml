@@ -90,6 +90,8 @@ en:
           no_watt_cap: No power cap in state law
           no_watt_cap_in_law: No power cap in its law
           not_classified: It isn't a Class 1, 2 or 3 e-bike
+          not_classified_headline: Your %{name} is not classified as an e-bike in
+            %{state}.
           not_permitted: Not permitted
           optional_classes_not_recognized_in:
             one: Class %{n} isn't recognized in %{state}, so it's legal only as sold
@@ -105,8 +107,6 @@ en:
             classes
           read_more: Read more
           recovered_more_often: Stolen bikes are recovered 2× more often when registered.
-          red_headline: Your %{name} is not permitted as an e-bike under current %{state}
-            rules.
           red_headline_manual: This isn't an e-bike under current %{state} rules.
           register_free: Register on Bike Index — free
           rule_to_check: Rule to check

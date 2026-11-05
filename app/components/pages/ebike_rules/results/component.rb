@@ -44,7 +44,7 @@ module Pages
           when :yellow then @us ? yellow_headline(name, state) : metric_yellow_headline(name, state)
           when :red
             # a hand-entered bike's name is "e-bike", which this headline says it isn't
-            @bike.manual? ? translation(".red_headline_manual", state:) : translation(".red_headline", name:, state:)
+            @bike.manual? ? translation(".red_headline_manual", state:) : translation(".not_classified_headline", name:, state:)
           else translation(".gray_headline", state:)
           end
         end
