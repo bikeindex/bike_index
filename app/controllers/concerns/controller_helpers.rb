@@ -19,7 +19,7 @@ module ControllerHelpers
       :page_id, :default_bike_search_path, :every_bike_search_path, :bikehub_url, :show_general_alert,
       :display_dev_info?, :current_country_id, :current_currency, :turbo_request?,
       :render_donation_request?, :old_register_view?, :sort_state, :admin_index_state, :metric_units?,
-      :search_distance_unit, :request_location_hash, :registration_view
+      :search_distance_unit, :request_location_hash
     before_action :enable_rack_profiler
 
     before_action do
@@ -359,10 +359,6 @@ module ControllerHelpers
   end
 
   private
-
-  def registration_view
-    @registration_view ||= RegistrationView.new(user: current_user, session_show_legacy: session[:registration_show_legacy])
-  end
 
   # passive_organization is the organization set for the user - which is persisted in session
   # The user may or may not be interacting with the current_organization in any given request

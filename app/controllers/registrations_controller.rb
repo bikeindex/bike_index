@@ -13,8 +13,6 @@ class RegistrationsController < ApplicationController
     @bike = Bike.unscoped.find_id(params[:id])
     fail ActiveRecord::RecordNotFound unless @bike.visible_by?(current_user)
 
-    redirect_to(bike_path(@bike, request.query_parameters)) && return unless registration_view.redesign_enabled?
-
     requested_view = view_from_param(params[:view_as])
     available_views = BikeServices::ShowViews.available(bike: @bike, current_user:,
       organization: view_organization, preview_organization: requested_view&.last)
@@ -27,7 +25,7 @@ class RegistrationsController < ApplicationController
       organization_id: params[:organization_id], user: current_user)
 
     render(Pages::Registrations::Show::Wrapper::Component.new(bike: @bike, current_user:, view:,
-      available_views:, bike_sticker:, current_alerts:, show_legacy: registration_view.show_legacy?,
+      available_views:, bike_sticker:, current_alerts:, show_legacy: RegistrationView.show_legacy?(user: current_user, session:),
       display_dev_info: display_dev_info?), layout: "application")
   end
 
@@ -41,11 +39,11 @@ class RegistrationsController < ApplicationController
       # Unrelated validations (e.g. a preferred_language no longer available) can block
       # the update, so return to the view they came from rather than bouncing them
       flash[:error] = "Sorry, unable to update. Email contact@bikeindex.org for help fixing this!"
-      return redirect_to(registration_view.path(bike, show_legacy: !show_legacy, **query))
+      return redirect_to(RegistrationView.path(bike, user: current_user, session:, show_legacy: !show_legacy, **query))
     end
     # Signed in, the account holds it - a session copy would outlast a change on another device
     session[:registration_show_legacy] = current_user.blank? && show_legacy
-    redirect_to(registration_view.path(bike, show_legacy:, **query))
+    redirect_to(RegistrationView.path(bike, user: current_user, session:, show_legacy:, **query))
   end
 
   # The redesign has no edit view of its own; edit still lives on the bike

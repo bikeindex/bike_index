@@ -91,7 +91,7 @@ module Bikes
       return true unless error.present? # Can't assign directly to flash here, sometimes kick out of edit because other flash error
 
       flash[:error] = error
-      redirect_to(registration_view.path(@bike)) && return
+      redirect_to(RegistrationView.path(@bike, user: current_user, session:)) && return
     end
 
     def update_organizations_can_edit_claimed(bike, organization_ids)

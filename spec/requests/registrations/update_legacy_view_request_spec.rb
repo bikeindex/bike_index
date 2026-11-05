@@ -96,20 +96,6 @@ RSpec.describe "RegistrationsController#update_legacy_view", type: :request do
     end
   end
 
-  context "redesign disabled" do
-    before { Flipper.enable(:registration_redesign_disabled) }
-
-    it "records the preference and redirects to the classic page either way" do
-      post update_legacy_view_registration_path(bike, show_legacy: true)
-      expect(response).to redirect_to(bike_path(bike))
-      expect(session[:registration_show_legacy]).to be_truthy
-
-      post update_legacy_view_registration_path(bike, show_legacy: false)
-      expect(response).to redirect_to(bike_path(bike))
-      expect(session[:registration_show_legacy]).to be_falsey
-    end
-  end
-
   context "user logged in" do
     let(:current_user) { FactoryBot.create(:user_confirmed) }
 

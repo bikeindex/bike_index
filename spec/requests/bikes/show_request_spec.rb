@@ -7,10 +7,10 @@ RSpec.describe "BikesController#show", type: :request do
   let(:current_user) { ownership.creator }
   let(:bike) { ownership.bike }
   # RearGearType is required by show, if it isn't present it raises ReadOnlyError.
-  # The redesign is the default, so the kill switch is what keeps this page reachable
+  # The redesign is the default, so opting out is what keeps this page reachable
   before do
     RearGearType.fixed
-    Flipper.enable(:registration_redesign_disabled)
+    post update_legacy_view_registration_path(bike, show_legacy: true)
   end
 
   context "example bike" do
@@ -749,21 +749,8 @@ RSpec.describe "BikesController#show", type: :request do
       end
     end
   end
-  context "redesign disabled" do
-    it "renders the classic page without the invitation to the redesign" do
-      get "#{base_url}/#{bike.id}"
-      expect(response).to render_template(:show)
-      expect(response.body).to_not match("Try out the new")
-    end
-
-    it "sends the redesigned page back to the classic one, params and all" do
-      get "/registrations/#{bike.id}?scanned_id=XD8888"
-      expect(response).to redirect_to(bike_path(bike, scanned_id: "XD8888"))
-    end
-  end
-
-  context "redesign enabled" do
-    before { Flipper.disable(:registration_redesign_disabled) }
+  context "not opted out of the redesign" do
+    before { post update_legacy_view_registration_path(bike, show_legacy: false) }
 
     it "redirects the html page but still renders the qr code png" do
       get "#{base_url}/#{bike.id}"
