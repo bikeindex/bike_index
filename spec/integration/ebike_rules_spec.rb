@@ -23,7 +23,7 @@ RSpec.describe "E-bike rules", :js, type: :system do
     type_into(find_field("State"), "Colorado")
     retry_on_detach { find("[role='option']", text: "Colorado").click }
     expect(page).to have_css("[role='status']",
-      text: "Your Specialized Haul ST is legal to ride in Colorado as a Class 3 e-bike, and as Class 2 with its optional throttle.")
+      text: "Your Specialized Haul ST is classified as a Class 3 e-bike in Colorado, and as Class 2 with its optional throttle.")
     # a String path matches escaped slashes too, which Turbo writes into history for a frame's URL
     expect(page).to have_current_path(%r{\A/ebike-rules/US/CO\?vehicle_models=m/specialized/2025/haul_st\z})
     expect(page).to have_title("Colorado e-bike laws")
@@ -77,7 +77,7 @@ RSpec.describe "E-bike rules", :js, type: :system do
     # picking it again checks it, and its own details replace them
     type_into(find_field("Bike model"), "haul")
     retry_on_detach { find("[role='option']", text: "Specialized Haul ST").click }
-    expect(page).to have_css("[role='status']", text: "Your Specialized Haul ST is legal to ride in Colorado")
+    expect(page).to have_css("[role='status']", text: "Your Specialized Haul ST is classified as a Class 3 e-bike in Colorado")
     expect(page).to have_current_path("/ebike-rules/US/CO?vehicle_models=m/specialized/2025/haul_st")
     expect(page).to have_field("Motor wattage (W)", with: "700").and have_css("legend", exact_text: "Specialized Haul ST details")
 
@@ -91,7 +91,7 @@ RSpec.describe "E-bike rules", :js, type: :system do
 
     # details alone are a check once they have a top speed
     find("label", text: "20 mph").click
-    expect(page).to have_css("[role='status']", text: "Your e-bike is legal to ride in Colorado as a Class 1 e-bike.")
+    expect(page).to have_css("[role='status']", text: "Your e-bike is classified as a Class 1 e-bike in Colorado.")
     expect(page).to have_current_path("/ebike-rules/US/CO?manual=1&top_speed=20")
 
     # details changed from a model return to its own once it's picked again

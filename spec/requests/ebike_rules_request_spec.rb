@@ -138,7 +138,7 @@ RSpec.describe EbikeRulesController, type: :request do
       get "/ebike-rules/US/CO", params: {vehicle_models: "m/specialized/2025/haul_st"}
 
       expect(page).to have_css("[role='status']",
-        text: "Your Specialized Haul ST is legal to ride in Colorado as a Class 3 e-bike, and as Class 2 with its optional throttle.")
+        text: "Your Specialized Haul ST is classified as a Class 3 e-bike in Colorado, and as Class 2 with its optional throttle.")
         .and have_css("li", text: "Classes 2 and 3 are recognized")
         .and have_css("li", text: "Optional throttle stops at 20 mph")
         .and have_css("dd", text: "Optional, to 20")
@@ -228,7 +228,7 @@ RSpec.describe EbikeRulesController, type: :request do
       [speed, throttle].each { expect(it).to have_css("[role='img'][aria-label='Does not meet this rule']") }
 
       get "/ebike-rules/US/CO", params: {vehicle_models: "m/aventon/2026/level_4_adv"}
-      expect(page).to have_css("[role='status']", text: "Your Aventón Level 4 ADV is legal to ride in Colorado as a Class 2 and 3 e-bike")
+      expect(page).to have_css("[role='status']", text: "Your Aventón Level 4 ADV is classified as a Class 2 and 3 e-bike in Colorado")
 
       # as is one entered by hand, which is both classes as such a model is
       get "/ebike-rules/US/CA", params: {manual: "1", top_speed: "28", throttle: "1"}
@@ -240,7 +240,7 @@ RSpec.describe EbikeRulesController, type: :request do
       # a throttle sold separately isn't the bike's as sold, but an option, which would put it in no class: its Class 3
       # tile, then the e-moto's captioned with the throttle
       get "/ebike-rules/US/CA", params: {vehicle_models: "m/specialized/2025/haul_st"}
-      expect(page).to have_css("[role='status']", text: "Your Specialized Haul ST is legal to ride in California as a Class 3 e-bike, without its optional throttle.")
+      expect(page).to have_css("[role='status']", text: "Your Specialized Haul ST is classified as a Class 3 e-bike in California, without its optional throttle.")
         .and have_no_css("[role='status'] li")
         .and have_css("li", text: /Throttle allowed\s*It's legal only without its optional throttle/)
       expect(page.all("section[aria-live] [data-controller~='ui--tooltip'] > button[aria-label$='e-bike']").map { it[:"aria-label"] })
@@ -418,7 +418,7 @@ RSpec.describe EbikeRulesController, type: :request do
     it "fills the details from a picked model, and checks the details changed from it, keeping the model" do
       get "/ebike-rules/US/CO", params: {vehicle_models: "m/specialized/2025/haul_st"}
 
-      expect(page).to have_css("[role='status']", text: "Your Specialized Haul ST is legal to ride in Colorado")
+      expect(page).to have_css("[role='status']", text: "Your Specialized Haul ST is classified as a Class 3 e-bike in Colorado")
         .and have_checked_field("top_speed", with: "28")
         .and have_checked_field("throttle", with: "1")
         .and have_field("watts", with: "700")
@@ -441,7 +441,7 @@ RSpec.describe EbikeRulesController, type: :request do
     it "classes a bike entered by hand by its top speed and throttle" do
       get "/ebike-rules/US/CO", params: {manual: "1", top_speed: "20", watts: "250"}
 
-      expect(page).to have_css("[role='status']", text: "Your e-bike is legal to ride in Colorado as a Class 1 e-bike.")
+      expect(page).to have_css("[role='status']", text: "Your e-bike is classified as a Class 1 e-bike in Colorado.")
         .and have_checked_field("top_speed", with: "20")
         .and have_checked_field("throttle", with: "0")
 
@@ -505,7 +505,7 @@ RSpec.describe EbikeRulesController, type: :request do
       # a manual check needs no wattage
       get "/ebike-rules/US/CO", params: {manual: "1", top_speed: "20", watts: ""}
 
-      expect(page).to have_css("[role='status']", text: "Your e-bike is legal to ride in Colorado as a Class 1 e-bike.")
+      expect(page).to have_css("[role='status']", text: "Your e-bike is classified as a Class 1 e-bike in Colorado.")
         .and have_no_css("[role='alert']")
     end
   end
