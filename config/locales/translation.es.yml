@@ -4580,18 +4580,6 @@ es:
         through_org: a través de %{org_name}
         motorized: "¿Vehículo eléctrico?"
         vehicle_type: Tipo
-      list:
-        added: Agregado
-        bike: bicicleta
-        color: Color
-        link: Enlace
-        manufacturer: Fabricante
-        model: Modelo
-        num_bikes_registered_html: "<strong>%{num_bikes}</strong> registrado"
-        sent_to: Enviado a
-        sent_to_a_new_owner: enviado a un nuevo propietario
-        sticker: Etiqueta engomada
-        stickers: Pegatinas
       recoveries:
         description: Descripción
         mfg_model_color_html: fabricante, modelo, <span class="less-strong">color</span>
@@ -4906,11 +4894,11 @@ es:
         find_an_impound_record: Encontrar un registro de depósito
         search_impound_records: Buscar registros de incautación
     registrations:
-      search:
+      index:
+        find_a_registration: Encuentra un registro
         search_all_email_disabled: Solo puedes buscar los registros de tu organización
           con el correo electrónico o el nombre del propietario.
         search_registrations: Buscar registros
-        find_a_registration: Encuentra un registro
   organized_mailer:
     custom_message:
       subject: "%{org_name} - la ubicación de su %{mnfg_name}"

@@ -4599,18 +4599,6 @@ it:
         sent: Inviato
         through_org: attraverso %{org_name}
         vehicle_type: Tipo
-      list:
-        added: Aggiunto
-        bike: bicicletta
-        color: Colore
-        link: Collegamento
-        manufacturer: Produttore
-        model: Modello
-        num_bikes_registered_html: "<strong>%{num_bikes}</strong> registrato"
-        sent_to: Inviato a
-        sent_to_a_new_owner: inviato a un nuovo proprietario
-        sticker: Adesivo
-        stickers: Adesivi
       recoveries:
         description: Descrizione
         mfg_model_color_html: produttore, modello, <span class="less-strong">colore</span>
@@ -4924,11 +4912,11 @@ it:
         find_an_impound_record: Trovare un registro dei sequestri
         search_impound_records: Consultare i registri dei sequestri
     registrations:
-      search:
+      index:
+        find_a_registration: Trova una registrazione
         search_all_email_disabled: È possibile cercare le registrazioni della propria
           organizzazione solo tramite l'indirizzo email o il nome del proprietario.
         search_registrations: Cerca registrazioni
-        find_a_registration: Trova una registrazione
   organized_mailer:
     custom_message:
       subject: "%{org_name} - la posizione del tuo %{mnfg_name}"

@@ -4378,18 +4378,6 @@ nb:
         through_org: gjennom %{org_name}
         motorized: e-kjøretøy?
         vehicle_type: Type
-      list:
-        added: La til
-        bike: sykkel
-        color: Farge
-        link: Link
-        manufacturer: Produsent
-        model: Modell
-        num_bikes_registered_html: "<strong>%{num_bikes}</strong> registrert"
-        sent_to: Sendt til
-        sent_to_a_new_owner: sendt til ny eier
-        sticker: Klistremerke
-        stickers: Klistremerker
       recoveries:
         description: Beskrivelse
         mfg_model_color_html: produsent, modell, <span class="less-strong">farge</span>
@@ -4694,11 +4682,11 @@ nb:
         find_an_impound_record: Finn en beslaglagt registrering
         search_impound_records: Søk i beslaglagte poster
     registrations:
-      search:
+      index:
+        find_a_registration: Finn en registrering
         search_all_email_disabled: Du kan bare søke i organisasjonens registreringer
           med eierens e-postadresse eller navn.
         search_registrations: Søk etter registreringer
-        find_a_registration: Finn en registrering
   organized_mailer:
     custom_message:
       subject: "%{org_name} - plasseringen av din %{mnfg_name}"

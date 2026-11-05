@@ -352,7 +352,7 @@ class Organization < ApplicationRecord
   end
 
   def show_single_search_menu_item?
-    enabled?("bike_search") && !law_enforcement?
+    !law_enforcement? && !ambassador?
   end
 
   # WARNING! This is not efficient

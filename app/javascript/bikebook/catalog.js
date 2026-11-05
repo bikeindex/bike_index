@@ -182,6 +182,6 @@ export const renderCounts = (root, count) => renderInto(root.getElementById('veh
 
 // in UI::Alerts::Base's warning colors
 const unmatched = html`<span class="tw:rounded-sm tw:border tw:border-yellow-300 tw:bg-yellow-50 tw:px-1 tw:text-yellow-800
-  tw:dark:border-yellow-800 tw:dark:bg-yellow-950 tw:dark:text-yellow-400">(model doesn't match filters)</span>`
+  tw:dark:border-yellow-300/50 tw:dark:bg-yellow-300/25 tw:dark:text-yellow-400">(model doesn't match filters)</span>`
 
 export const matching = (count) => html`(${numberDisplay(count)} matching ${count === 1 ? 'model' : 'models'})`
