@@ -16,6 +16,15 @@ module Atoms
         unregistered: :pink
       }.freeze
 
+      # Forced, because a card's tw:dark:border-gray-700 sorts after them and sets every side
+      BORDER_CLASSES = {
+        success: "tw:border-l-green-600!",
+        purple: "tw:border-l-purple-500!",
+        error: "tw:border-l-red-600!",
+        warning: "tw:border-l-amber-500!",
+        pink: "tw:border-l-pink-400!"
+      }.freeze
+
       # Tables and columns that only call out the exceptional statuses pass skip_with_owner
       def self.status_humanized(bike, override_status: nil, skip_with_owner: false)
         status = override_status.presence || bike.status_humanized
@@ -25,6 +34,8 @@ module Atoms
       def self.status_key(status_humanized) = status_humanized.tr(" ", "_").to_sym
 
       def self.color(bike) = COLORS[status_key(status_humanized(bike))]
+
+      def self.border_class(bike) = BORDER_CLASSES[color(bike)]
 
       # override_status: the marketplace preview, where the listing is still a draft
       # time: when the status began, rendered after the label

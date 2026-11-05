@@ -3,6 +3,10 @@ require "rails_helper"
 RSpec.describe Atoms::RegistrationStatusBadge::Component, type: :component do
   let(:component) { described_class.new(bike:) }
 
+  it "has a border for every colour a status can badge as" do
+    expect(described_class::BORDER_CLASSES.keys).to include(*described_class::COLORS.values.uniq)
+  end
+
   context "with owner (default)" do
     let(:bike) { FactoryBot.create(:bike) }
     it "shows registered, explained by a tooltip" do

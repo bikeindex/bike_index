@@ -8,13 +8,6 @@ module Pages
         # the cache, since resolving or dismissing one doesn't touch the bike. Each is loaded
         # once for the page, and each box picks out its own
         class Component < ApplicationComponent
-          # Literal strings so Tailwind's scanner generates them. Forced, because the card's
-          # tw:dark:border-gray-700 sorts after them and sets every side
-          ACCENTS = {
-            success: "tw:border-l-green-600!", purple: "tw:border-l-purple-500!", error: "tw:border-l-red-600!",
-            warning: "tw:border-l-amber-500!", pink: "tw:border-l-pink-400!"
-          }.freeze
-
           def self.user_alerts(user)
             return [] unless user.alert_slugs.intersect?(UserAlert.account_kinds)
 
@@ -42,7 +35,7 @@ module Pages
 
           def grid? = @view == :grid
 
-          def accent_classes = ACCENTS[Atoms::RegistrationStatusBadge::Component.color(@bike)]
+          def accent_classes = Atoms::RegistrationStatusBadge::Component.border_class(@bike)
 
           def thumb_image_url = @thumb_image_url ||= BikeServices::Displayer.thumb_image_url(@bike)
 
@@ -54,7 +47,7 @@ module Pages
           def add_photo_prompt
             return if @bike.thumb_path.present?
 
-            tag.span(translation(".add_a_photo"), class: "tw:absolute tw:bottom-2 tw:left-2 tw:rounded-full tw:bg-white/90 tw:px-2.5 tw:py-0.5 tw:text-xs tw:font-semibold tw:text-gray-700 tw:dark:bg-gray-900/90 tw:dark:text-gray-200")
+            tag.span(render(UI::Badge::Component.new(text: translation(".add_a_photo"), color: :empty)), class: "tw:absolute tw:bottom-2 tw:left-2")
           end
 
           def strava_gear_link

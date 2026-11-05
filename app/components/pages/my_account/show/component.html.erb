@@ -11,14 +11,7 @@
     "
   >
     <div class="tw:flex tw:flex-col tw:gap-1.5">
-      <h1
-        class="
-          tw:m-0 tw:font-header tw:text-[40px] tw:leading-tight
-          tw:font-extrabold tw:tracking-tight tw:text-pretty
-        "
-      >
-        <%= translation(".header_title", current_user_name: @user.display_name) %>
-      </h1>
+      <%= render(UI::Header::Component.new(text: translation(".header_title", current_user_name: @user.display_name), html_class: "tw:m-0! tw:font-header tw:text-[40px] tw:leading-tight tw:text-pretty")) %>
 
       <div class="tw:text-[15px] tw:text-gray-500 tw:dark:text-gray-400">
         <%= translation(".bike_count", count: bike_count) %> ·
@@ -42,17 +35,8 @@
     </div>
 
     <% unless @locks_tab %>
-      <div
-        class="
-          tw:flex tw:gap-1.5 tw:border-b tw:border-gray-300 tw:pb-2
-          tw:dark:border-gray-700
-        "
-      >
-        <% view_toggles.each do |view, icon, label| %>
-          <%= link_to my_account_path(@page_params.merge(view:)), class: toggle_classes(view), title: label, aria: {label:, current: ("true" if view == @view)} do %>
-            <%= helpers.inline_svg_tag(icon, class: "tw:size-[18px]", aria_hidden: true) %>
-          <% end %>
-        <% end %>
+      <div class="tw:border-b tw:border-gray-300 tw:pb-2 tw:dark:border-gray-700">
+        <%= render(UI::ButtonGroup::Component.new(entries: view_entries, kind: :toggle)) %>
       </div>
     <% end %>
   </div>
@@ -61,34 +45,30 @@
     <% if @locks.any? %>
       <ul class="tw:m-0 tw:flex tw:list-none tw:flex-col tw:gap-3.5 tw:p-0">
         <% @locks.each do |lock| %>
-          <li
-            class="
-              tw:flex tw:flex-wrap tw:items-center tw:justify-between
-              tw:gap-4 tw:rounded-[10px] tw:border tw:border-gray-200
-              tw:p-3.5 tw:dark:border-gray-700
-            "
-          >
-            <div class="tw:flex tw:flex-col tw:gap-1.5">
-              <div class="tw:text-lg">
-                <strong><%= lock.mnfg_name %></strong> <%= lock.lock_type&.name %>
+          <li>
+            <%= render(UI::Card::Component.new(additional_classes: "tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-4 tw:rounded-[10px]!")) do %>
+              <div class="tw:flex tw:flex-col tw:gap-1.5">
+                <div class="tw:text-lg">
+                  <strong><%= lock.mnfg_name %></strong> <%= lock.lock_type&.name %>
+                </div>
+
+                <div class="tw:text-[15px] tw:text-gray-500 tw:dark:text-gray-400">
+                  <% if lock.key_serial.present? %>
+                    <%= translation(".key_serial") %>:
+                    <span class="tw:font-mono"><%= lock.key_serial %></span>
+                  <% end %>
+
+                  <% if lock.combination.present? %>
+                    <%= translation(".combination") %>:
+                    <span class="tw:font-mono"><%= lock.combination %></span>
+                  <% end %>
+
+                  <%= translation(".registered") %> <%= render(UI::Time::Component.new(time: lock.created_at)) %>
+                </div>
               </div>
 
-              <div class="tw:text-[15px] tw:text-gray-500 tw:dark:text-gray-400">
-                <% if lock.key_serial.present? %>
-                  <%= translation(".key_serial") %>:
-                  <span class="tw:font-mono"><%= lock.key_serial %></span>
-                <% end %>
-
-                <% if lock.combination.present? %>
-                  <%= translation(".combination") %>:
-                  <span class="tw:font-mono"><%= lock.combination %></span>
-                <% end %>
-
-                <%= translation(".registered") %> <%= render(UI::Time::Component.new(time: lock.created_at)) %>
-              </div>
-            </div>
-
-            <%= link_to translation(".edit"), edit_lock_path(lock), class: "twlink tw:px-2 tw:py-1 tw:text-[15px] tw:font-semibold" %>
+              <%= link_to translation(".edit"), edit_lock_path(lock), class: "twlink tw:px-2 tw:py-1 tw:text-[15px] tw:font-semibold" %>
+            <% end %>
           </li>
         <% end %>
       </ul>

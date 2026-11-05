@@ -5,14 +5,8 @@
 
   <% cache(cache_key) do %>
     <% if grid? %>
-      <div
-        class="
-          tw:flex tw:h-full tw:flex-col tw:overflow-hidden tw:rounded-[10px]
-          tw:border tw:border-gray-200 tw:bg-white tw:dark:border-gray-700
-          tw:dark:bg-gray-900
-        "
-      >
-        <%= link_to photo_path, class: "tw:relative tw:flex tw:h-[170px] tw:items-center tw:justify-center tw:bg-gray-100 tw:text-gray-300 tw:dark:bg-gray-800 tw:dark:text-gray-600" do %>
+      <%= render(UI::Card::Component.new(divided: true, additional_classes: "tw:flex tw:h-full tw:flex-col tw:overflow-hidden")) do %>
+        <%= link_to photo_path, class: "tw:relative tw:flex tw:h-[170px] tw:items-center tw:justify-center tw:bg-gray-100 tw:text-gray-300 tw:dark:bg-gray-900 tw:dark:text-gray-600" do %>
           <% if thumb_image_url %>
             <%= image_tag(thumb_image_url, alt: @bike.title_string, skip_pipeline: true, class: "tw:size-full tw:object-cover") %>
           <% else %>
@@ -56,9 +50,8 @@
 
         <div
           class="
-            tw:flex tw:flex-wrap tw:gap-x-3 tw:gap-y-1 tw:border-t
-            tw:border-gray-100 tw:px-4 tw:py-3 tw:text-sm tw:font-semibold
-            tw:dark:border-gray-800
+            tw:flex tw:flex-wrap tw:gap-x-3 tw:gap-y-1 tw:px-4 tw:py-3
+            tw:text-sm tw:font-semibold
           "
         >
           <%= link_to translation(".edit"), edit_bike_path(@bike, edit_template: @bike.default_edit_template), class: "twlink tw:py-1" %>
@@ -68,10 +61,10 @@
             <%= link_to translation(".report_stolen"), edit_bike_path(@bike, edit_template: "report_stolen"), class: "tw:ml-auto tw:py-1 tw:text-red-600 tw:dark:text-red-400" %>
           <% end %>
         </div>
-      </div>
+      <% end %>
     <% else %>
-      <div class="<%= class_names("tw:flex tw:flex-wrap tw:items-stretch tw:gap-[18px] tw:rounded-[10px] tw:border tw:border-l-[5px] tw:border-gray-200 tw:bg-white tw:p-3.5 tw:dark:border-gray-700 tw:dark:bg-gray-900", accent_classes) %>">
-        <%= link_to photo_path, class: "tw:relative tw:flex tw:h-[124px] tw:flex-none tw:basis-[180px] tw:items-center tw:justify-center tw:overflow-hidden tw:rounded-lg tw:bg-gray-100 tw:text-gray-300 tw:dark:bg-gray-800 tw:dark:text-gray-600" do %>
+      <%= render(UI::Card::Component.new(additional_classes: class_names("tw:flex tw:flex-wrap tw:items-stretch tw:gap-[18px] tw:rounded-[10px]! tw:border-l-[5px]", accent_classes))) do %>
+        <%= link_to photo_path, class: "tw:relative tw:flex tw:h-[124px] tw:flex-none tw:basis-[180px] tw:items-center tw:justify-center tw:overflow-hidden tw:rounded-lg tw:bg-gray-100 tw:text-gray-300 tw:dark:bg-gray-900 tw:dark:text-gray-600" do %>
           <% if thumb_image_url %>
             <%= image_tag(thumb_image_url, alt: @bike.title_string, skip_pipeline: true, class: "tw:size-full tw:object-cover") %>
           <% else %>
@@ -117,7 +110,7 @@
               class="
                 tw:rounded-[5px] tw:border tw:border-gray-200 tw:bg-gray-50
                 tw:px-2.5 tw:py-1 tw:font-mono tw:text-[15px]
-                tw:dark:border-gray-700 tw:dark:bg-gray-800
+                tw:dark:border-gray-700 tw:dark:bg-gray-900
               "
             >
               <%= render(Atoms::Serial::Component.new(bike: @bike, user: @current_user, explanation: :tooltip)) %>
@@ -141,7 +134,7 @@
             <%= link_to translation(".report_stolen"), edit_bike_path(@bike, edit_template: "report_stolen"), class: "tw:py-1 tw:text-red-600 tw:dark:text-red-400" %>
           <% end %>
         </div>
-      </div>
+      <% end %>
     <% end %>
   <% end %>
 

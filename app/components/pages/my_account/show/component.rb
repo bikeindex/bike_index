@@ -31,16 +31,11 @@ module Pages
             ComponentStructs::Shapes.tab(translation(".locks"), my_account_path(active_tab: "locks"), active: @locks_tab, count: @locks.size)]
         end
 
-        def view_toggles
-          [[:grid, "icons/lucide-layout-grid.svg", translation(".grid_view")],
-            [:list, "icons/list.svg", translation(".list_view")]]
-        end
-
-        def toggle_classes(view)
-          base = "tw:flex tw:size-10 tw:items-center tw:justify-center tw:rounded-lg tw:border tw:transition-colors"
-          return "#{base} tw:border-purple-500 tw:bg-purple-500 tw:text-white" if view == @view
-
-          "#{base} tw:border-gray-200 tw:bg-white tw:text-gray-500 tw:hover:bg-gray-50 tw:dark:border-gray-700 tw:dark:bg-gray-900 tw:dark:hover:bg-gray-800"
+        def view_entries
+          [[:grid, "icons/image.svg", translation(".grid_view")], [:list, "icons/list.svg", translation(".list_view")]].map do |view, icon, label|
+            ComponentStructs::Shapes.entry(helpers.inline_svg_tag(icon, class: "tw:block tw:size-[18px]", aria_hidden: true),
+              href: my_account_path(@page_params.merge(view:)), active: view == @view, title: label, aria: {label:})
+          end
         end
 
         def user_alerts = @user_alerts ||= Pages::MyAccount::Show::BikeBox::Component.user_alerts(@user)

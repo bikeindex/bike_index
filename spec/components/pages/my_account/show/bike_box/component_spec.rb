@@ -16,10 +16,6 @@ RSpec.describe Pages::MyAccount::Show::BikeBox::Component, type: :component do
       unfinished_b_params: described_class.unfinished_b_params([bike], user))
   end
 
-  it "has an accent for every colour a registration's status can badge as" do
-    expect(described_class::ACCENTS.keys).to include(*Atoms::RegistrationStatusBadge::Component::COLORS.values.uniq)
-  end
-
   it "renders the registration, with no alerts" do
     expect(component).to have_link(href: "/bikes/#{bike.id}")
     expect(component).to have_css("strong", text: "Surly")
@@ -72,7 +68,8 @@ RSpec.describe Pages::MyAccount::Show::BikeBox::Component, type: :component do
     let(:impound_record) { FactoryBot.create(:impound_record, bike: bike_claimed) }
     let!(:impound_claim) { FactoryBot.create(:impound_claim, stolen_record:, impound_record:, user:, status: :submitting) }
 
-    it "links to the bike it claims" do
+    it "edges the card in the status's colour, and links to the bike it claims" do
+      expect(component).to have_css(".tw\\:border-l-red-600\\!")
       expect(component).to have_text("Submitted claim to")
       expect(component).to have_link("this found bike", href: "/bikes/#{bike_claimed.id}")
     end
@@ -143,7 +140,7 @@ RSpec.describe Pages::MyAccount::Show::BikeBox::Component, type: :component do
       expect(component).to have_css("[role=alert]", count: 1)
       expect(component).to have_text("associated with Brakebills")
       expect(component).to have_css("form[action='/user_alerts/#{user_alert.id}?add_bike_organization=true'] button", text: "Add it now!")
-      expect(component).to have_link("Ignore this suggestion", href: "/user_alerts/#{user_alert.id}?alert_action=dismiss")
+      expect(component).to have_css("form[action='/user_alerts/#{user_alert.id}?alert_action=dismiss'] button", text: "Ignore this suggestion")
     end
   end
 
