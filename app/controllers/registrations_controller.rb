@@ -1,5 +1,8 @@
 class RegistrationsController < ApplicationController
-  before_action :allow_x_frame, except: %i[new show]
+  before_action :allow_x_frame, except: %i[new show update_legacy_view]
+  # A component takes its content type from the request, and a Turbo submission
+  # redirected here asks for a turbo_stream - which Turbo then silently discards
+  before_action :force_html_response, only: %i[show]
   skip_before_action :verify_authenticity_token, only: [:create] # Because it was causing issues, and we don't need it here
   before_action :sign_in_if_not!, only: %i[show]
   before_action :simple_header, except: %i[show edit]
@@ -12,7 +15,7 @@ class RegistrationsController < ApplicationController
 
     requested_view = view_from_param(params[:view_as])
     available_views = BikeServices::ShowViews.available(bike: @bike, current_user:,
-      organization: current_organization || passive_organization, preview_organization: requested_view&.last)
+      organization: view_organization, preview_organization: requested_view&.last)
 
     view = current_view(available_views, requested_view)
     # So the view_as organization sticks on the next request
@@ -22,7 +25,25 @@ class RegistrationsController < ApplicationController
       organization_id: params[:organization_id], user: current_user)
 
     render(Pages::Registrations::Show::Wrapper::Component.new(bike: @bike, current_user:, view:,
-      available_views:, bike_sticker:, current_alerts:, display_dev_info: display_dev_info?), layout: "application")
+      available_views:, bike_sticker:, current_alerts:, show_legacy: RegistrationView.show_legacy?(user: current_user, session:),
+      display_dev_info: display_dev_info?), layout: "application")
+  end
+
+  # skip_update because a view preference doesn't warrant AfterUserChangeJob's
+  # mailchimp/address recalculation
+  def update_legacy_view
+    bike = Bike.unscoped.find_id(params[:id])
+    show_legacy = Binxtils::InputNormalizer.boolean(params[:show_legacy])
+    query = request.query_parameters.except(:show_legacy)
+    if current_user.present? && !current_user.update(feature_registration_show_legacy: show_legacy, skip_update: true)
+      # Unrelated validations (e.g. a preferred_language no longer available) can block
+      # the update, so return to the view they came from rather than bouncing them
+      flash[:error] = "Sorry, unable to update. Email contact@bikeindex.org for help fixing this!"
+      return redirect_to(RegistrationView.path(bike, user: current_user, session:, show_legacy: !show_legacy, **query))
+    end
+    # Signed in, the account holds it - a session copy would outlast a change on another device
+    session[:registration_show_legacy] = current_user.blank? && show_legacy
+    redirect_to(RegistrationView.path(bike, user: current_user, session:, show_legacy:, **query))
   end
 
   # The redesign has no edit view of its own; edit still lives on the bike
@@ -84,7 +105,14 @@ class RegistrationsController < ApplicationController
       flash.now[:error] = "You're not allowed to view this registration that way"
       requested_view = nil
     end
-    requested_view || BikeServices::ShowViews.default_view_for(bike: @bike, current_user:, organization: current_organization || passive_organization)
+    requested_view || BikeServices::ShowViews.default_view_for(bike: @bike, current_user:, organization: view_organization)
+  end
+
+  # A scanned sticker's organization_id can name an organization the viewer isn't in
+  def view_organization
+    return @view_organization if defined?(@view_organization)
+
+    @view_organization = [current_organization, passive_organization].find { current_user&.authorized?(it) }
   end
 
   # The [kind, organization] view requested via ?view_as, or nil when absent/unknown.
