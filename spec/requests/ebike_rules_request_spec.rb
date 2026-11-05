@@ -138,7 +138,7 @@ RSpec.describe EbikeRulesController, type: :request do
       get "/ebike-rules/US/CO", params: {vehicle_models: "m/specialized/2025/haul_st"}
 
       expect(page).to have_css("[role='status']",
-        text: "Your Specialized Haul ST is a Class 3 e-bike in Colorado, and as Class 2 with its optional throttle.")
+        text: "Your Specialized Haul ST is a Class 3 e-bike in Colorado, and is also a Class 2 e-bike with its optional throttle.")
         .and have_css("li", text: "Classes 2 and 3 are recognized")
         .and have_css("li", text: "Optional throttle stops at 20 mph")
         .and have_css("dd", text: "Optional, to 20")

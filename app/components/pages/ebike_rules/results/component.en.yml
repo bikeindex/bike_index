@@ -4,11 +4,13 @@ en:
     pages:
       ebike_rules:
         results:
+          also_class_with_optional_throttle: is also a Class %{n} e-bike with its
+            optional throttle
+          also_class_with_optional_upgrade: is also a Class %{n} e-bike with an optional
+            upgrade
           answer_no: 'No'
           answer_optional: Optional
           answer_yes: 'Yes'
-          as_class_with_optional_throttle: as Class %{n} with its optional throttle
-          as_class_with_optional_upgrade: as Class %{n} with an optional upgrade
           being_compiled: Rules for this state are being compiled from primary sources.
           bikebook_name: BikeBook
           class_1_throttle: Class 1 bikes can't have a throttle

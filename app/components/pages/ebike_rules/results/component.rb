@@ -108,14 +108,14 @@ module Pages
 
         def unrecognized_classes? = @rules.any? { it[:note] == :classes_not_recognized } && !@law[:classes].intersect?(@bike.stock_e_bike_classes)
 
-        # "and as Class 2 with its optional throttle", of the optional classes the state recognizes, and not a throttle's
+        # "and is also a Class 2 e-bike with its optional throttle", of the optional classes the state recognizes, and not a throttle's
         # where it would put the bike in no class
         def optional_clause
           @optional_clause ||= @bike.optional_classes.filter_map { |n, mode|
             next unless @law[:classes].include?(n)
             next if mode == "throttle" && @bike.optionally_out_of_class_under?(@law)
 
-            (mode == "throttle") ? translation(".as_class_with_optional_throttle", n:) : translation(".as_class_with_optional_upgrade", n:)
+            (mode == "throttle") ? translation(".also_class_with_optional_throttle", n:) : translation(".also_class_with_optional_upgrade", n:)
           }.to_sentence
         end
 

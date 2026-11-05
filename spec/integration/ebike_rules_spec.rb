@@ -23,7 +23,7 @@ RSpec.describe "E-bike rules", :js, type: :system do
     type_into(find_field("State"), "Colorado")
     retry_on_detach { find("[role='option']", text: "Colorado").click }
     expect(page).to have_css("[role='status']",
-      text: "Your Specialized Haul ST is a Class 3 e-bike in Colorado, and as Class 2 with its optional throttle.")
+      text: "Your Specialized Haul ST is a Class 3 e-bike in Colorado, and is also a Class 2 e-bike with its optional throttle.")
     # a String path matches escaped slashes too, which Turbo writes into history for a frame's URL
     expect(page).to have_current_path(%r{\A/ebike-rules/US/CO\?vehicle_models=m/specialized/2025/haul_st\z})
     expect(page).to have_title("Colorado e-bike laws")
