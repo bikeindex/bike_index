@@ -105,6 +105,29 @@ RSpec.describe MyAccountsController, type: :request do
             end
           end
         end
+        context "with a view" do
+          let!(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: current_user) }
+
+          it "defaults to the list, and remembers the view chosen" do
+            get base_url
+            expect(assigns(:view)).to eq :list
+
+            get base_url, params: {view: "grid"}
+            expect(assigns(:view)).to eq :grid
+            get base_url
+            expect(assigns(:view)).to eq :grid
+
+            get base_url, params: {view: "nonsense"}
+            expect(assigns(:view)).to eq :grid
+          end
+
+          it "keeps the page and per_page in the toggle, and nothing else from the URL" do
+            get base_url, params: {page: 1, per_page: 1, host: "attacker.test"}
+            expect(response.status).to eq(200)
+            expect(response.body).to include("/my_account?page=1&amp;per_page=1&amp;view=grid")
+            expect(response.body).not_to include("attacker.test")
+          end
+        end
         context "with lock with deleted manufacturer" do
           let(:lock) { FactoryBot.create(:lock, user: current_user) }
           it "renders and user things are assigned" do

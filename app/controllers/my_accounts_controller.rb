@@ -7,6 +7,7 @@ class MyAccountsController < ApplicationController
 
   def show
     @locks_active_tab = params[:active_tab] == "locks"
+    @view = remembered_view
     @per_page = permitted_per_page
     @pagy, @bikes = pagy(:countish, current_user.bikes.reorder(updated_at: :desc), limit: @per_page, page: permitted_page)
     @locks = current_user.locks.reorder(created_at: :desc)
@@ -84,6 +85,13 @@ class MyAccountsController < ApplicationController
   end
 
   private
+
+  # A chosen view is kept in a cookie, so the next visit opens the way the last one left off
+  def remembered_view
+    chosen = Pages::MyAccount::Show::Component::VIEWS.find { it.to_s == params[:view] }
+    cookies.permanent[:my_account_view] = chosen.to_s if chosen
+    Pages::MyAccount::Show::Component.permitted_view(chosen || cookies[:my_account_view])
+  end
 
   def edit_templates
     @edit_templates ||= {

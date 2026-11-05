@@ -109,7 +109,7 @@ RSpec.describe "Signup", type: :system do
       click_button "Sign in"
       expect(page).to have_link("set a password to sign in", wait: 10)
 
-      click_link "Update your profile"
+      click_link "Update profile"
       wait_for_page_script
       click_link "Add additional email"
       # Typed into mid-collapse, the final keystroke lands at the start of the value

@@ -12,7 +12,7 @@ RSpec.describe SharedBlocks::SearchResults::BikeListItem::Component, type: :comp
   end
 
   it "renders the bike linking to its org page, edged in its status's color" do
-    expect(component).to have_css("li.tw\\:border-l-red-600")
+    expect(component).to have_css("li.tw\\:border-l-red-600\\!")
     expect(component).to have_link(href: "/bikes/#{bike.id}?organization_id=#{organization.to_param}")
     expect(component).to have_css("strong", text: "Surly")
     expect(component).to have_text("Stolen ·")
@@ -31,7 +31,7 @@ RSpec.describe SharedBlocks::SearchResults::BikeListItem::Component, type: :comp
     let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
 
     it "is edged in the registered color, badged without its date" do
-      expect(component).to have_css("li.tw\\:border-l-green-600")
+      expect(component).to have_css("li.tw\\:border-l-green-600\\!")
       expect(component).to have_text("Registered")
       expect(component).to have_no_css("span.localizeTime")
     end
@@ -55,7 +55,7 @@ RSpec.describe SharedBlocks::SearchResults::BikeListItem::Component, type: :comp
     let(:bike) { listing.item.reload }
 
     it "links to the public bike page, edged in the for-sale color" do
-      expect(component).to have_css("li.tw\\:border-l-purple-500")
+      expect(component).to have_css("li.tw\\:border-l-purple-500\\!")
       expect(component).to have_link(href: "/bikes/#{bike.id}")
       expect(component).to have_text("420")
       expect(component).not_to have_text("Registered with")

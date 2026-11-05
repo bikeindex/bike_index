@@ -13,14 +13,6 @@ module SharedBlocks
         # The rows wrap against their list, so they fit a narrow card too
         LIST_CLASSES = "tw:@container tw:flex tw:flex-col tw:gap-3"
 
-        BORDER_CLASSES = {
-          success: "tw:border-l-green-600",
-          purple: "tw:border-l-purple-500",
-          error: "tw:border-l-red-600",
-          warning: "tw:border-l-yellow-300",
-          pink: "tw:border-l-pink-400"
-        }.freeze
-
         def initialize(bike:, organization: nil, search_all: false)
           @bike = bike
           @organization = organization
@@ -30,7 +22,7 @@ module SharedBlocks
         private
 
         def row_border_class
-          BORDER_CLASSES.fetch(Atoms::RegistrationStatusBadge::Component.color(@bike), "tw:border-l-gray-300")
+          Atoms::RegistrationStatusBadge::Component.border_class(@bike) || "tw:border-l-gray-300"
         end
 
         # Like the table's rows, not per viewer. The organization record rather than its id,
