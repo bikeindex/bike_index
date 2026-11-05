@@ -5,7 +5,7 @@ export const DISABLED_CLASSES = 'tw:disabled:opacity-50 tw:disabled:cursor-not-a
 const SIZES = { sm: 'tw:px-2.5 tw:py-1 tw:text-xs', md: 'tw:px-3 tw:py-1.5 tw:text-sm' }
 const COLORS = {
   secondary: 'tw:text-gray-800 tw:bg-white/80 tw:border-gray-200 tw:not-disabled:not-aria-disabled:hover:border-purple-500 ' +
-    'tw:not-disabled:not-aria-disabled:hover:bg-purple-50 tw:focus:ring-purple-500/40 tw:dark:bg-gray-900/80 tw:dark:text-gray-100 ' +
+    'tw:not-disabled:not-aria-disabled:hover:bg-purple-50 tw:focus:ring-purple-500/40 tw:dark:bg-gray-800/80 tw:dark:text-gray-100 ' +
     'tw:dark:border-gray-700 tw:dark:not-disabled:not-aria-disabled:hover:border-purple-500 tw:dark:not-disabled:not-aria-disabled:hover:bg-purple-950',
   link: 'twlink tw:rounded-lg tw:p-0 tw:focus:ring-blue-500/40',
   link_gray: 'twlink-underlined tw:text-gray-500 tw:not-disabled:not-aria-disabled:hover:text-gray-700 tw:dark:text-gray-400 ' +

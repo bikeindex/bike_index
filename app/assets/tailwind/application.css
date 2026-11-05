@@ -226,6 +226,7 @@
 
 @layer base {
   button:not(:disabled),
+  select:not(:disabled),
   [role="button"]:not(:disabled),
   input:where([type="button"], [type="reset"], [type="submit"]):not(:disabled) {
     cursor: pointer;
