@@ -58,6 +58,23 @@
     @apply tw:dark:text-gray-300;
   }
 
+  /* An alert stays light, so its close keeps the alert's color */
+  .alert .close {
+    @apply tw:dark:text-inherit;
+  }
+
+  /* The can's lines are the surface's color showing through it */
+  .trash-can-icon {
+    .trash-lid,
+    .trash-container {
+      @apply tw:dark:bg-gray-300 tw:dark:in-[a:hover]:bg-blue-400;
+    }
+
+    span {
+      @apply tw:dark:bg-gray-800;
+    }
+  }
+
   /* These pages stay light, so a margin between their sections mustn't show a dark body */
   body:has(.kelsey_styles) {
     @apply tw:dark:bg-white! tw:dark:text-gray-900!;

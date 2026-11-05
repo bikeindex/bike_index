@@ -82,7 +82,7 @@ module SharedBlocks
           "tw:flex tw:w-full tw:items-center tw:gap-2.5 tw:rounded-[11px] tw:px-2.5 tw:py-2 " \
             "tw:group-data-[collapsed=true]/sidebar:justify-center " \
             "tw:group-data-[collapsed=true]/sidebar:[&_.twdropdown-chevron]:hidden " \
-            "tw:hover:bg-gray-100 tw:aria-expanded:bg-gray-100 tw:dark:hover:bg-gray-700"
+            "tw:hover:bg-gray-100 tw:aria-expanded:bg-gray-100 tw:dark:hover:bg-gray-700 tw:dark:aria-expanded:bg-gray-700"
         end
 
         def avatar_url

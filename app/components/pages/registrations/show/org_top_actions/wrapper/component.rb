@@ -11,11 +11,12 @@ module Pages
             # Parking-notification statuses that are still ongoing (vs replaced/retrieved/resolved)
             ACTIVE_PARKING_STATUSES = %w[current impounded].freeze
 
-            # [tile background, icon color] per action-icon tile
+            # [tile background, icon color] per action-icon tile. An open panel's button is purple
+            # in both modes, so its tile keeps the light colors there
             TILES = {
-              purple: ["tw:bg-purple-100", "tw:text-purple-500"],
-              blue: ["tw:bg-[#e7f3fb]", "tw:text-blue-600"],
-              amber: ["tw:bg-[#fff8e1]", "tw:text-[#caa11a]"]
+              purple: ["tw:bg-purple-100 tw:dark:not-in-data-[active=true]:bg-purple-500/15", "tw:text-purple-500 tw:dark:not-in-data-[active=true]:text-purple-300"],
+              blue: ["tw:bg-[#e7f3fb] tw:dark:not-in-data-[active=true]:bg-blue-500/10", "tw:text-blue-600 tw:dark:not-in-data-[active=true]:text-blue-300"],
+              amber: ["tw:bg-[#fff8e1] tw:dark:not-in-data-[active=true]:bg-yellow-300/5", "tw:text-[#caa11a] tw:dark:not-in-data-[active=true]:text-yellow-600"]
             }.freeze
 
             def initialize(bike:, organization:, org_role:, current_user: nil, display_dev_info: false)
