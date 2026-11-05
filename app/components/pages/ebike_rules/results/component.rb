@@ -129,7 +129,7 @@ module Pages
         def details
           @details ||= case @verdict
           when :yellow then without_throttle? ? [] : notes(:check)
-          when :red then [safe_join([*notes(:fail), falls_under], " ")]
+          when :red then [safe_join([*red_reasons, falls_under], " ")]
           when :gray then @us ? [gray_detail] : []
           else []
           end
@@ -142,6 +142,9 @@ module Pages
             translation(".gray_detail_unclassified", name: bike_name, state: @state[:name])
           end
         end
+
+        # A model in no class has a name for what it is, and what it's over is on the state's rows. A hand entry has only what was entered
+        def red_reasons = (@rules.any? { it[:note] == :not_classified } && !@bike.manual?) ? [] : notes(:fail)
 
         def falls_under
           return copy[:may_be_moped] unless other_classification
@@ -160,7 +163,7 @@ module Pages
 
           @other_classification = if @us
             EbikeRuleServices::StateLaws.other_classification(@state[:abbr], @bike.e_vehicle_classifications) ||
-              EbikeRuleServices::StateLaws.classification_by_limits(@state[:abbr], mph: @bike.top_mph, watts: @bike.watts)
+              EbikeRuleServices::StateLaws.classification_by_limits(@state[:abbr], mph: @bike.top_mph, watts: @bike.motor_watts)
           end
         end
 
@@ -191,7 +194,7 @@ module Pages
 
         def specs
           [
-            [translation(".motor"), @bike.watts && translation(".watts_html", watts: number_display(@bike.watts))],
+            [translation(".motor"), @bike.motor_watts && translation(".watts_html", watts: number_display(@bike.motor_watts))],
             [translation(".top_speed"), top_speed_display],
             [translation(".throttle"), throttle_display]
           ]
@@ -202,16 +205,16 @@ module Pages
 
           if @bike.assists_past_mph
             translation(".over_mph_html", mph: number_display(@bike.assists_past_mph))
-          elsif @bike.top_assist_mph
-            translation(".mph_html", mph: number_display(@bike.top_assist_mph))
+          elsif @bike.speed_mph
+            translation(".mph_html", mph: number_display(@bike.speed_mph))
           end
         end
 
         def metric_top_speed_display
           if @bike.assists_past_kmh
             translation(".over_kmh_html", kmh: number_display(@bike.assists_past_kmh))
-          elsif @bike.top_assist_kmh
-            translation(".kmh_html", kmh: number_display(@bike.top_assist_kmh))
+          elsif @bike.speed_kmh
+            translation(".kmh_html", kmh: number_display(@bike.speed_kmh))
           end
         end
 
@@ -309,6 +312,8 @@ module Pages
           when :watts_not_provided then translation(".watts_not_provided")
           when :no_watt_cap then translation(".no_watt_cap")
           when :speed_within_cap then translation(".speed_within_cap_html", **args)
+          when :throttle_speed_within_cap then translation(".throttle_speed_within_cap_html", **args)
+          when :throttle_speed_over_cap then translation(".throttle_speed_over_cap_html", **args)
           when :class_3_speed_with_throttle then translation(".class_3_speed_with_throttle_html", **args)
           when :speed_over_cap then translation(".speed_over_cap_html", **args)
           when :speed_past_cap then translation(".speed_past_cap_html", **args)

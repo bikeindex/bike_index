@@ -150,6 +150,10 @@ en:
           throttle_not_allowed_in_law: Its law doesn't allow a throttle
           throttle_not_stated: The state's law doesn't say whether a throttle is allowed
           throttle_not_stated_in_law: Its law doesn't say whether a throttle is allowed
+          throttle_speed_over_cap_html: Throttle runs to %{mph} mph, over the %{cap}
+            mph limit
+          throttle_speed_within_cap_html: Throttle runs to %{mph} mph, within the
+            limit
           throttle_with_class_3_assist: Not allowed with Class 3 assist
           top_speed: Top speed
           watts_html: "%{watts}W"

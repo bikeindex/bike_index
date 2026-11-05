@@ -83,8 +83,8 @@ RSpec.describe Pages::EbikeRules::Results::Component, type: :component do
 
     it "names what the state classes it as" do
       expect(component).to have_css("[role='status']", text: "Not permitted")
-        .and have_css("[role='status'] li", text: "12,500W motor exceeds the 750W cap.")
-        .and have_css("[role='status'] li", text: "In Texas, it falls under Off-Highway Motorcycle.")
+        .and have_css("[role='status'] li", exact_text: "In Texas, it falls under Off-Highway Motorcycle.")
+        .and have_css("li", text: "12,500W motor exceeds the 750W cap")
         .and have_css("button[aria-label='E-moto, not an e-bike'] + [role='tooltip'] h3", text: "Not an e-bike", visible: :all)
         .and have_css("[role='tooltip'] code", text: /\A\s*evc\/out_of_class\s*\z/, visible: :all)
     end

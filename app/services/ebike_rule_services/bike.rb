@@ -65,6 +65,13 @@ module EbikeRuleServices
     # nil for a hand entry past any class, whose speed is unknown. A Class 3's 28 mph, whatever its record gives
     def top_mph = [top_assist_mph, throttle_mph, (28 if e_bike_classes.include?(3))].compact.max
 
+    def motor_watts = watts || peak_watts
+
+    # A throttle it isn't sold with says nothing of how fast it goes as sold
+    def speed_mph = top_assist_mph || (throttle_mph if stock_throttle)
+
+    def speed_kmh = top_assist_kmh || (throttle_kmh if stock_throttle)
+
     def make_and_model = [manufacturer_name, model].compact.join(" ")
   end
 end
