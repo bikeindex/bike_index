@@ -70,6 +70,7 @@ RSpec.describe EbikeRulesController, type: :request do
       expect(page).to have_css("turbo-frame#ebike-rules-class-card-3 h3", text: "Class 3")
         .and have_css("[role=button]", text: "California specifics")
         .and have_css("li", text: "Not a motor vehicle: no driver's license")
+        .and have_no_css("li a")
         .and have_no_css("h3", text: "Class 1").and have_no_css("#ebike-rules-classes")
 
       get "/ebike-rules/US/CA", params: {e_bike_class: "12"}, headers: frame.call("emoto")
