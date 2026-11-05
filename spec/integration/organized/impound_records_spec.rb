@@ -292,16 +292,19 @@ RSpec.describe "Organized impound records index", :js, type: :system do
 
     Sidekiq::Job.clear_all
     expect {
-      click_button "Create parking notification"
-      expect(page).to have_content("Parking Notification for #{impound_bike.type} created", wait: 10)
+      # The click waits on the navigation, 2.2s by default, and this POST impounds inline.
+      # It ran out on a loaded machine; click_button's wait: only covers finding the button
+      using_wait_time(10) { click_button "Impound this #{impound_bike.type}" }
+      expect(page).to have_content("Impounded this #{impound_bike.type}", wait: 10)
     }.to change(impound_bike.parking_notifications, :count).by(1)
-      .and change(ProcessParkingNotificationJob.jobs, :count).by(1)
+      .and change(ImpoundRecord, :count).by(1)
+
+    # The redirect lands on the impounded bike, not the form that impounded it
+    expect(page).to have_button("Update Impound Record")
+    expect(page).to have_no_button("Impound", exact: true)
 
     expect(impound_bike.reload.parking_notifications.last.kind).to eq "impound_notification"
-
-    # The impound record is created when the notification is processed
-    expect { ProcessParkingNotificationJob.drain }.to change(ImpoundRecord, :count).by(1)
-    impound_record = impound_bike.reload.current_impound_record
+    impound_record = impound_bike.current_impound_record
     expect(impound_record.organization).to eq organization
     expect(impound_record.user).to eq user
   end

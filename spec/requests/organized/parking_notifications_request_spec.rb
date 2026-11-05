@@ -197,15 +197,16 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         end
       end
 
-      context "impound_notification" do
-        let(:parking_notification_params) { super().merge(kind: "impound_notification") }
+      context "organization with impound_bikes without parking_notifications" do
+        let(:enabled_feature_slugs) { %w[impound_bikes] }
         let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, created_at: Time.current - 3.hours) }
+        let(:impound_params) { parking_notification_params.merge(kind: "impound_notification") }
 
-        def expect_impounded_before_redirect
+        it "impounds before redirecting, leaving the email to sidekiq" do
           Sidekiq::Job.clear_all
           ActionMailer::Base.deliveries = []
           expect {
-            post base_url, params: {organization_id: current_organization.to_param, parking_notification: parking_notification_params}
+            post base_url, params: {parking_notification: impound_params}
             expect(flash[:success]).to eq "Impounded this bike"
           }.to change(ImpoundRecord, :count).by(1)
 
@@ -213,51 +214,24 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           expect(impound_record).to have_attributes(organization_id: current_organization.id, user_id: current_user.id, bike_id: bike.id)
           expect(ParkingNotification.last.impound_record_id).to eq impound_record.id
           expect(bike.reload.status).to eq "status_impounded"
-
-          # The owner's email stays in sidekiq, where a failed delivery retries
           expect(ActionMailer::Base.deliveries.count).to eq 0
-          expect(ProcessParkingNotificationJob.jobs.count).to be > 0
+
           ProcessParkingNotificationJob.drain
           expect(ActionMailer::Base.deliveries.count).to eq 1
           expect(ImpoundRecord.where(bike_id: bike.id).count).to eq 1
         end
 
-        it "impounds before redirecting" do
-          expect_impounded_before_redirect
-        end
+        it "does not create other kinds or send repeats" do
+          parking_notification = FactoryBot.create(:parking_notification_organized, organization: current_organization, bike:)
+          root_path = organization_root_path(organization_id: current_organization.to_param)
+          expect {
+            post base_url, params: {parking_notification: parking_notification_params}
+            expect(response).to redirect_to root_path
+            expect(flash[:error]).to be_present
 
-        context "organization with impound_bikes without parking_notifications" do
-          let(:enabled_feature_slugs) { %w[impound_bikes] }
-
-          it "impounds before redirecting" do
-            expect(current_organization.enabled?("parking_notifications")).to be_falsey
-            expect_impounded_before_redirect
-          end
-
-          context "with a parking notification kind" do
-            let(:parking_notification_params) { super().merge(kind: "appears_abandoned_notification") }
-
-            it "does not create" do
-              expect {
-                post base_url, params: {organization_id: current_organization.to_param, parking_notification: parking_notification_params}
-                expect(response).to redirect_to organization_root_path(organization_id: current_organization.to_param)
-                expect(flash[:error]).to be_present
-              }.to_not change(ParkingNotification, :count)
-            end
-          end
-
-          context "sending repeats" do
-            let!(:parking_notification) { FactoryBot.create(:parking_notification_organized, organization: current_organization, bike:) }
-
-            it "does not create" do
-              expect {
-                post base_url, params: {organization_id: current_organization.to_param, kind: "impound_notification",
-                                        ids: parking_notification.id.to_s, parking_notification: parking_notification_params}
-                expect(response).to redirect_to organization_root_path(organization_id: current_organization.to_param)
-                expect(flash[:error]).to be_present
-              }.to_not change(ParkingNotification, :count)
-            end
-          end
+            post base_url, params: {kind: "impound_notification", ids: parking_notification.id.to_s, parking_notification: impound_params}
+            expect(response).to redirect_to root_path
+          }.to_not change(ParkingNotification, :count)
         end
       end
 

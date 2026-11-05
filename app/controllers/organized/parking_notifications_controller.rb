@@ -54,15 +54,13 @@ module Organized
       else
         @parking_notification = ParkingNotification.new(permitted_parameters)
         @parking_notification.skip_update = @parking_notification.impound_notification?
-        if @parking_notification.save
-          flash[:success] = if @parking_notification.impound_notification?
-            impound_before_redirect
-            translation(:successfully_impounded, bike_type: @parking_notification.bike.type)
-          else
-            translation(:successfully_created, bike_type: @parking_notification.bike.type)
-          end
-        else
+        if !@parking_notification.save
           flash[:error] = translation(:unable_to_create, errors: @parking_notification.errors.full_messages.to_sentence)
+        elsif @parking_notification.impound_notification?
+          impound_before_redirect
+          flash[:success] = translation(:successfully_impounded, bike_type: @parking_notification.bike.type)
+        else
+          flash[:success] = translation(:successfully_created, bike_type: @parking_notification.bike.type)
         end
       end
       if @redirect_location.present?
@@ -155,6 +153,7 @@ module Organized
     # impounded the bike. The email stays in sidekiq, where a failed delivery retries
     def impound_before_redirect
       ProcessParkingNotificationJob.new.perform(@parking_notification.id, true)
+    ensure
       ProcessParkingNotificationJob.perform_async(@parking_notification.id)
     end
 

@@ -4,7 +4,7 @@
   data-controller="org--parking-notification-form"
   data-org--parking-notification-form-notification-heading-value="<%= translation(".create_parking_notification") %>"
   data-org--parking-notification-form-impound-heading-value="<%= translation(".impound_this_bike_type", bike_type: @bike.type) %>"
-  data-org--parking-notification-form-notification-submit-value="<%= NOTIFICATION_SUBMIT %>"
+  data-org--parking-notification-form-notification-submit-value="<%= translation(".submit_parking_notification") %>"
   data-org--parking-notification-form-default-kind-value="<%= new_parking_notification.kind %>"
   data-org--parking-notification-form-org-latitude-value="<%= org_map_coordinates[:latitude] %>"
   data-org--parking-notification-form-org-longitude-value="<%= org_map_coordinates[:longitude] %>"
@@ -51,7 +51,7 @@
           <% group.with_label_note { translation(".not_shown_to_user") } %>
         <% end %>
 
-        <%= render(UI::Button::Component.new(text: NOTIFICATION_SUBMIT, color: :primary, type: "submit", disabled: true, data: {"org--parking-notification-form-target": "submit"})) %>
+        <%= render(UI::Button::Component.new(text: translation(".submit_parking_notification"), color: :primary, type: "submit", disabled: true, data: {"org--parking-notification-form-target": "submit"})) %>
       <% end %>
     </div>
   <% end %>
