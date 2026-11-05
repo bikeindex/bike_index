@@ -55,8 +55,7 @@ BLOCKED_EXTERNAL_HOSTS = %w[
 ].freeze
 
 # application.js imports this pin, so a stalled jsDelivr holds `load` the same way, and
-# aborting it would leave every Stimulus controller unconnected. A new version of the pin
-# needs its published file here.
+# aborting it would leave every Stimulus controller unconnected.
 TIME_LOCALIZER_PIN = Rails.application.importmap.packages["@bikeindex/time-localizer"].path
 TIME_LOCALIZER_JS = Rails.root.join("spec/fixtures/time-localizer-#{TIME_LOCALIZER_PIN[/@([\d.]+)/, 1]}.min.js").read
 
