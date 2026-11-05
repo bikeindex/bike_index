@@ -14,16 +14,16 @@ module SharedBlocks
         # the same height as each other
         ROW = "tw:mx-2 tw:flex tw:items-center tw:gap-[11px] tw:rounded-[11px] tw:px-3 tw:py-[9px] " \
           "tw:text-sm tw:leading-tight tw:font-bold tw:group-data-[collapsed=true]/sidebar:justify-center tw:max-[760px]:py-3.5"
-        ROW_HOVER = "tw:hover:bg-gray-100 tw:dark:hover:bg-gray-700"
+        ROW_HOVER = "tw:hover:bg-gray-100 tw:dark:hover:bg-white/2"
         # A link goes current off the aria-current the is-active variant already reads
-        ROW_CURRENT = "tw:is-active:bg-blue-50 tw:is-active:text-blue-600 tw:is-active:dark:bg-gray-700 tw:is-active:dark:text-blue-300"
+        ROW_CURRENT = "tw:is-active:bg-blue-50 tw:is-active:text-blue-600 tw:is-active:dark:bg-blue-600/5 tw:is-active:dark:text-blue-400"
         # A group toggle goes current while its group holds that link, open or not -- not
         # is-active, which an open group's toggle also gets. Important so hover can't gray it,
         # the way is-active's sort order keeps it from graying a link
         GROUP_CURRENT = "tw:group-has-[[aria-current]]/nav-group:bg-blue-50! " \
-          "tw:group-has-[[aria-current]]/nav-group:text-blue-600 tw:group-has-[[aria-current]]/nav-group:dark:bg-gray-700! tw:group-has-[[aria-current]]/nav-group:dark:text-blue-300 " \
-          "tw:active:bg-blue-50 tw:active:text-blue-600 tw:active:dark:bg-gray-700 tw:active:dark:text-blue-300"
-        ROW_RESTING = "tw:text-gray-900 tw:dark:text-gray-300"
+          "tw:group-has-[[aria-current]]/nav-group:text-blue-600 tw:group-has-[[aria-current]]/nav-group:dark:bg-blue-600/5! tw:group-has-[[aria-current]]/nav-group:dark:text-blue-400 " \
+          "tw:active:bg-blue-50 tw:active:text-blue-600 tw:active:dark:bg-blue-600/5 tw:active:dark:text-blue-400"
+        ROW_RESTING = "tw:text-gray-900 tw:dark:text-gray-100"
 
         # A row inside a group, indented past its parent's icon
         CHILD = "tw:mx-2 tw:block tw:rounded-[10px] tw:py-2 tw:pr-3 tw:pl-11 tw:text-[13.5px] " \
@@ -35,7 +35,7 @@ module SharedBlocks
 
         # One bar of the hamburgler, which folds into an X while the menu is open
         BAR = "tw:h-0.5 tw:w-5 tw:rounded-sm tw:bg-gray-900 tw:transition-all " \
-          "tw:duration-200 tw:dark:bg-gray-300"
+          "tw:duration-200 tw:dark:bg-gray-100"
 
         # TODO: #4185 - remove old_register_view when removing the legacy org new bike iframe
         def initialize(organization:, current_user:, old_register_view: false)
@@ -73,7 +73,7 @@ module SharedBlocks
         end
 
         def child_class
-          [CHILD, "tw:no-underline tw:hover:text-blue-600", CHILD_RESTING, ROW_CURRENT].join(" ")
+          [CHILD, "tw:no-underline tw:hover:text-blue-600 tw:dark:hover:text-blue-400", CHILD_RESTING, ROW_CURRENT].join(" ")
         end
 
         # Replaces UI::Button's classes entirely -- this trigger is a sidebar row, not a button.
@@ -82,7 +82,7 @@ module SharedBlocks
           "tw:flex tw:w-full tw:items-center tw:gap-2.5 tw:rounded-[11px] tw:px-2.5 tw:py-2 " \
             "tw:group-data-[collapsed=true]/sidebar:justify-center " \
             "tw:group-data-[collapsed=true]/sidebar:[&_.twdropdown-chevron]:hidden " \
-            "tw:hover:bg-gray-100 tw:aria-expanded:bg-gray-100 tw:dark:hover:bg-gray-700 tw:dark:aria-expanded:bg-gray-700"
+            "tw:hover:bg-gray-100 tw:aria-expanded:bg-gray-100 tw:dark:hover:bg-white/2 tw:dark:aria-expanded:bg-white/2"
         end
 
         def avatar_url
