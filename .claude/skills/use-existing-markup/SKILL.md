@@ -37,11 +37,11 @@ Convert every hand-written piece an existing component covers, without asking fi
 
 ## Marketing pages: `SharedBlocks::Marketing`
 
-A marketing page is the donate, recovery stories, e-bike rules, marketplace "how it works" or register landing page, or one like them. It goes together from this kit, not from `ui/` alone:
+A marketing page is a `for_*` landing page, or the donate, recovery stories, e-bike rules, marketplace "how it works" or register landing page, or one like them. It goes together from this kit, not from `ui/` alone. A design handoff draws these blocks by hand, so its mock is no sign they're missing:
 
 | Hand-written | Use |
 |---|---|
-| The page root (`tw:-mt-(--nav-gap) tw:-mb-18 tw:bg-white …`) and its font `<link>` | `SharedBlocks::Marketing::Wrapper`, rendered from the controller (`render SharedBlocks::Marketing::Wrapper::Component.new(page: …)`) |
+| The page root (`tw:-mt-(--nav-gap) tw:-mb-(--footer-gap) tw:bg-white …`) and its font `<link>` | `SharedBlocks::Marketing::Wrapper`, rendered from the controller (`render SharedBlocks::Marketing::Wrapper::Component.new(page: …)`) |
 | A section's content width (`tw:mx-auto tw:max-w-6xl tw:px-…`) | `SharedBlocks::Marketing::Wrapper::Component::CONTAINER_CLASSES` |
 | An `h2` with an eyebrow or intro paragraph | `SharedBlocks::Marketing::SectionHeading` (`eyebrow:`, `eyebrow_color:`, `intro:`) |
 | An eyebrow on its own | `SharedBlocks::Marketing::SectionHeading::Component.eyebrow_classes(color)` |
