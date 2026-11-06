@@ -44,7 +44,28 @@ class PosRegistrationMatch < ApplicationRecord
   scope :review_candidate, -> { where.not(review_reasons: []) }
   scope :with_review_reason, ->(reason) { where("review_reasons @> ARRAY[?]::text[]", reason) }
 
+  # What makes a pair a review candidate on its own: stolen history on the serial (any manufacturer, including
+  # deleted and example bikes), an entanglement of either registration, or a serial that isn't one
+  def self.review_reasons_for(bike, pos_bike)
+    serial = bike.serial_normalized_no_space
+    bike_ids = [bike.id, pos_bike.id]
+    listings = MarketplaceListing.where(item_type: "Bike", item_id: bike_ids)
+      .or(MarketplaceListing.where(item_type: "BikeVersion", item_id: BikeVersion.unscoped.where(bike_id: bike_ids).select(:id)))
+    not_a_serial = BikeDuplicatesServices::Cues.not_a_serial(serial,
+      manufacturer_names: BikeDuplicatesServices::Cues.fetch_manufacturer_name_serials)
+    ordered_reasons([("stolen_history" if BikeDuplicatesServices::Finder.stolen_serials?([serial])),
+      ("impounded" if ImpoundRecord.where(bike_id: bike_ids).exists?),
+      ("marketplace_listing" if listings.exists?), ("not_a_serial" if not_a_serial)].compact)
+  end
+
+  def self.ordered_reasons(reasons) = REVIEW_REASONS.keys & reasons
+
   def merge_candidate? = review_reasons.none?
+
+  # Reasons are only added, so a recorded stolen veto is never cleared
+  def add_review_reasons!(reasons, **attributes)
+    update!(review_reasons: self.class.ordered_reasons(review_reasons + reasons), **attributes)
+  end
 
   def bucket = merge_candidate? ? "merge_candidate" : "review_candidate"
 end

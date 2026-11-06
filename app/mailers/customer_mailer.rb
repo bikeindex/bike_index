@@ -191,6 +191,17 @@ class CustomerMailer < ApplicationMailer
     end
   end
 
+  def pos_registration_match_email(pos_registration_match, user)
+    @user = user
+    component = Emails::PosRegistrationMatch::Component.new(pos_registration_match:)
+
+    I18n.with_locale(@user.preferred_language) do
+      mail(to: @user.email, subject: default_i18n_subject(bike_type: pos_registration_match.pos_bike.type), tag: __callee__) do |format|
+        format.html { render component }
+      end
+    end
+  end
+
   def recovered_from_link(stolen_record)
     @stolen_record = stolen_record
     @bike = stolen_record.bike

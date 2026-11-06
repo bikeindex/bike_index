@@ -58,6 +58,12 @@ RSpec.describe BikeJobs::PosRegistrationMatchFinderJob, type: :job do
     expect(match.reload.duplicate_bike_group).to be_present
   end
 
+  it "emails the owner about a new merge candidate, not a rerun or a review candidate" do
+    perform_for(bike)
+    perform_for(bike)
+    expect(EmailJobs::PosRegistrationMatchJob.jobs.map { it["args"] }).to eq([[PosRegistrationMatch.sole.id]])
+  end
+
   it "doesn't match before the serial is grouped" do
     instance.perform(bike.id)
     expect(PosRegistrationMatch.count).to eq 0
@@ -132,6 +138,11 @@ RSpec.describe BikeJobs::PosRegistrationMatchFinderJob, type: :job do
     before { FactoryBot.create(:stolen_bike, serial_number:) }
 
     include_examples "records a review candidate", ["stolen_history"]
+
+    it "doesn't email" do
+      perform_for(bike)
+      expect(EmailJobs::PosRegistrationMatchJob.jobs.size).to eq 0
+    end
   end
 
   context "registered from a sticker" do
