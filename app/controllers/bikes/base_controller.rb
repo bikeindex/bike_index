@@ -8,6 +8,7 @@ end
 
 module Bikes
   class BaseController < ApplicationController
+    before_action :redirect_scanned_id
     before_action :find_bike
     before_action :assign_current_organization
     before_action :ensure_user_allowed_to_edit
@@ -36,19 +37,17 @@ module Bikes
       end
     end
 
+    # Fix issue with sticker batches #35 & #38
+    def redirect_scanned_id
+      return unless params[:id].present? && params[:id].match?(/scanned(uc|ui)\d+/i)
+
+      permitted_params = params.except(:action, :controller, :id).as_json
+        .merge(id: params[:id].gsub("scanned", ""))
+      redirect_to(scanned_bike_path(permitted_params))
+    end
+
     def find_bike
-      # Fix issue with sticker batches #35 & #38
-      if params[:id].present? && params[:id].match?(/scanned(uc|ui)\d+/i)
-        permitted_params = params.except(:action, :controller, :id).as_json
-          .merge(id: params[:id].gsub("scanned", ""))
-        redirect_to(scanned_bike_path(permitted_params))
-        return
-      end
-      begin
-        @bike = Bike.unscoped.find_id(params[:bike_id] || params[:id])
-      rescue ActiveRecord::StatementInvalid => e
-        raise e.to_s.match?(/PG..NumericValueOutOfRange/) ? ActiveRecord::RecordNotFound : e
-      end
+      @bike = Bike.unscoped.find_id(params[:bike_id] || params[:id])
       return @bike if @bike.visible_by?(current_user)
 
       fail ActiveRecord::RecordNotFound
@@ -92,7 +91,7 @@ module Bikes
       return true unless error.present? # Can't assign directly to flash here, sometimes kick out of edit because other flash error
 
       flash[:error] = error
-      redirect_to(bike_path(@bike)) && return
+      redirect_to(RegistrationView.path(@bike, user: current_user, session:)) && return
     end
 
     def update_organizations_can_edit_claimed(bike, organization_ids)

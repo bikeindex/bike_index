@@ -21,9 +21,10 @@ module Pages
         DASH_CLASSES = "tw:absolute tw:top-3 tw:left-1 tw:block tw:min-h-[0.2em] tw:min-w-6 " \
           "tw:border-2 tw:border-[#919197] tw:bg-[#919197]"
 
-        def initialize(bike:, stolen_record:)
+        def initialize(bike:, stolen_record:, email: false)
           @bike = bike
           @stolen_record = stolen_record
+          @email = email
         end
 
         def render? = @stolen_record&.display_checklist?

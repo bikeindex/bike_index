@@ -35,7 +35,7 @@ RSpec.describe Bikes::EditsController, type: :request do
     let(:current_user) { nil }
     it "redirects and sets the flash" do
       get base_url
-      expect(response).to redirect_to bike_path(bike)
+      expect(response).to redirect_to registration_path(bike)
       expect(flash[:error]).to be_present
       expect(session[:return_to]).to eq(edit_bike_path(bike))
     end
@@ -45,7 +45,7 @@ RSpec.describe Bikes::EditsController, type: :request do
     it "redirects and sets the flash" do
       expect(bike.authorized?(current_user)).to be_falsey
       get base_url
-      expect(response).to redirect_to bike_path(bike)
+      expect(response).to redirect_to registration_path(bike)
       expect(flash[:error]).to be_present
       expect(session[:return_to]).to be_blank
       # Because user is not bike#user
@@ -298,7 +298,18 @@ RSpec.describe Bikes::EditsController, type: :request do
         expect(bike.reload.status).to eq "status_impounded"
         get base_url
         expect(flash[:error]).to match(/impounded/i)
-        expect(response).to redirect_to(bike_path(bike.id))
+        expect(response).to redirect_to(registration_path(bike.id))
+      end
+      context "superuser" do
+        let(:current_user) { FactoryBot.create(:superuser) }
+
+        it "renders the impounded alert above the edit page" do
+          get base_url
+          expect(response).to render_template(:bike_details)
+          alert = Nokogiri::HTML(response.body).at_css("#edit-bike-skeleton [role=alert]:has(h4)")
+          expect(alert.at_css("h4").text.strip).to eq "Your bike is currently impounded!"
+          expect(alert.text.squish).to match(/by #{Regexp.escape(impound_record.organization.name)}\z/)
+        end
       end
       context "unclaimed" do
         let!(:bike) { FactoryBot.create(:bike, :with_ownership, user: nil, owner_email: "something@stuff.com") }
@@ -312,7 +323,7 @@ RSpec.describe Bikes::EditsController, type: :request do
           expect(bike.status).to eq "status_impounded"
           get base_url
           expect(flash[:error]).to match(/impounded/i)
-          expect(response).to redirect_to(bike_path(bike.id))
+          expect(response).to redirect_to(registration_path(bike.id))
           bike.reload
           expect(bike.current_ownership.claimed?).to be_truthy
           expect(bike.user.id).to eq current_user.id
@@ -410,6 +421,16 @@ RSpec.describe Bikes::EditsController, type: :request do
       get "#{base_url}/strava_gear"
       expect(response.code).to eq("200")
       expect(response).to render_template(:versions)
+    end
+
+    context "still syncing" do
+      let!(:strava_integration) { FactoryBot.create(:strava_integration, :syncing, user: current_user) }
+
+      it "renders the sync notice in an alert" do
+        get "#{base_url}/strava_gear"
+        expect(response).to render_template(:versions)
+        expect(Capybara.string(response.body)).to have_css("[role=alert]", text: "Strava sync hasn't finished yet")
+      end
     end
   end
 end

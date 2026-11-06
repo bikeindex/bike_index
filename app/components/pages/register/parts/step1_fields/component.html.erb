@@ -20,7 +20,7 @@
   <% cycle_type_options = CycleType.select_options(traditional_bike: true).map do |label, slug|
       base, parens = label.split(" (", 2)
       content = if parens
-        safe_join([base, " ", content_tag(:span, "(#{parens}", class: "tw:text-[#9a9aa2] tw:dark:text-gray-500")])
+        safe_join([base, " ", content_tag(:span, "(#{parens}", class: "tw:text-[#9a9aa2] tw:dark:text-gray-300")])
       else
         label
       end

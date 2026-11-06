@@ -40,7 +40,7 @@ module UI
 
       # Filled in by ui--chart, since a series from a path has no totals until it's fetched
       def legend
-        count = tag.span(class: "twless-strong tw:-ml-0.5 tw:text-xs") unless @skip_legend_counts
+        count = tag.span(class: "less-strong tw:-ml-0.5 tw:text-xs") unless @skip_legend_counts
         item = safe_join([render(UI::ColorSwatch::Component.new(size: :sm)), tag.span, " ", count])
         [
           tag.div(class: class_names("tw:flex tw:shrink-0 tw:flex-wrap tw:justify-center tw:gap-x-5 tw:gap-y-1 tw:py-1",

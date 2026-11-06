@@ -8,8 +8,8 @@
       <%= link_to render(UI::Time::Component.new(time: bulk_import.created_at)), admin_bulk_import_url(bulk_import), class: "twlink" %>
 
       <% if bulk_import.organization_id.present? %>
-        <small class="twless-strong">
-          <%= link_to "org view", organization_bulk_import_path(bulk_import, organization_id: bulk_import.organization.to_param), class: "twlink twless-strong tw:italic" %>
+        <small class="less-strong">
+          <%= link_to "org view", organization_bulk_import_path(bulk_import, organization_id: bulk_import.organization.to_param), class: "twlink less-strong tw:italic" %>
         </small>
       <% end %>
     <% end %>
@@ -33,7 +33,7 @@
       <% end %>
 
       <% if bulk_import.ascend? %>
-        <small class="twless-strong">ascend</small>
+        <small class="less-strong">ascend</small>
         <% if bulk_import.ascend_unprocessable? %>
           <small class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>">
             missing Ascend Organization!

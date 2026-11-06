@@ -45,7 +45,7 @@ class ScheduledJobRunner < ScheduledJob
       CreateStolenGeojsonJob,
       CreateUserAlertNotificationJob,
       EmailJobs::ScheduledSurveyJob,
-      FetchProject529BikesJob,
+      # FetchProject529BikesJob,
       FileCacheMaintenanceJob,
       ImageJobs::CleanUnattachedBlobsJob,
       ImpoundExpirationJob,

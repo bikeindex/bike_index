@@ -24,6 +24,16 @@ HwComboboxController.prototype.connect = function () {
   this.element.addEventListener('mousedown', keepFocusOnPick)
   connect.call(this)
   source?.prime?.(this)
+  searchEarlyTyping(this)
+}
+
+// Step 1 autofocuses its manufacturer, so typing can beat this module to the page. No event says so, and closing
+// clears a query that never searched, so it searches on connect, as the keystrokes would have
+const searchEarlyTyping = (controller) => {
+  if (document.activeElement !== controller._actingCombobox || !controller._fullQuery || controller._fieldValueString) return
+
+  controller.prepareToFilter({ key: 'ArrowDown' })
+  controller.filterAndSelect({})
 }
 
 // The gem reads a multiselect's value as empty only from a data attribute the server-rendered field

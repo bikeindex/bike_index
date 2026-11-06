@@ -164,6 +164,39 @@ RSpec.describe EbikeRuleServices::Evaluator do
     end
   end
 
+  context "with only a peak power and a stock throttle's speed on record" do
+    let(:attributes) { super().merge(e_bike_class: nil, watts: nil, peak_watts: 8_000, top_assist_mph: nil, throttle: true, stock_throttle: true, throttle_mph: 47) }
+
+    it "leaves a peak over the cap to check, and fails the speed" do
+      expect(rules.find { it[:id] == :power }).to include(status: :check, note: :watts_to_check, args: {cap: 750})
+      expect(rules.find { it[:id] == :speed }).to include(status: :fail, note: :throttle_speed_over_cap, args: {mph: 47, cap: 28})
+    end
+
+    context "with a peak within the cap" do
+      let(:attributes) { super().merge(peak_watts: 500) }
+
+      it "passes" do
+        expect(rules.find { it[:id] == :power }).to include(status: :pass, note: :watts_within_cap, args: {watts: 500})
+      end
+    end
+
+    context "with a rating too" do
+      let(:attributes) { super().merge(watts: 750) }
+
+      it "checks the rating" do
+        expect(rules.find { it[:id] == :power }).to include(status: :pass, note: :watts_within_cap, args: {watts: 750})
+      end
+    end
+
+    context "with the throttle only an option" do
+      let(:attributes) { super().merge(stock_throttle: false) }
+
+      it "doesn't hold its speed against what's sold" do
+        expect(rules.find { it[:id] == :speed }).to include(status: :info, note: :speed_not_provided)
+      end
+    end
+  end
+
   context "with a bike that has no class" do
     let(:attributes) { super().merge(e_bike_class: nil, watts: 1_700, top_assist_mph: 50, throttle: true, stock_throttle: true) }
 

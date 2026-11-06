@@ -207,6 +207,15 @@ RSpec.describe Organized::ExportsController, type: :request do
         expect(response).to render_template(:new)
         expect(flash).to_not be_present
       end
+
+      it "expands the time field that has a value, not the other one" do
+        get "#{base_url}/new?end_at=2016-03-08T02:00"
+        expect(response.code).to eq("200")
+        page = Nokogiri::HTML(response.body)
+        expect(page.at_css("[name='export[end_at]']").parent["style"]).to eq("display: block;")
+        expect(page.at_css("[name='export[start_at]']").parent["style"]).to eq("")
+      end
+
       context "organization has all feature slugs" do
         let(:enabled_feature_slugs) { ["csv_exports"] + OrganizationFeature::REG_FIELDS }
         it "renders still" do

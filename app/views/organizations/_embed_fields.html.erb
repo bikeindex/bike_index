@@ -296,7 +296,7 @@
     <%= f.label :organization_affiliation, label_affiliation %>
 
     <div class="controls">
-      <%= f.select :organization_affiliation, @organization.organization_affiliation_options, class: "form-control" %>
+      <%= f.select :organization_affiliation, @organization.organization_affiliation_options, selected: @b_param.organization_affiliation, class: "form-control" %>
     </div>
   </div>
 <% end %>
@@ -314,7 +314,7 @@
       <% end %>
 
       <div class="controls">
-        <%= f.text_field :student_id, autocomplete: "off", autocorrect: "off", autocapitalize: "off", required: student_id_required %>
+        <%= f.text_field :student_id, value: @b_param.student_id, autocomplete: "off", autocorrect: "off", autocapitalize: "off", required: student_id_required %>
       </div>
     </div>
   </div>

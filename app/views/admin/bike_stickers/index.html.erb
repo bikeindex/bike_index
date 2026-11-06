@@ -8,10 +8,10 @@
           matching <%= "batch".pluralize(@bike_sticker_batches.count) %>
         <% elsif @all_batches %>
           batches
-          <small class="twless-strong">- show <%= link_to "only most recent", url_for(sortable_search_params.merge(search_all_batches: false)), class: "twlink" %></small>
+          <small class="less-strong">- show <%= link_to "only most recent", url_for(sortable_search_params.merge(search_all_batches: false)), class: "twlink" %></small>
         <% else %>
           most recent batches
-          <small class="twless-strong">- <%= number_display(BikeStickerBatch.count) %> <%= link_to "total batches", url_for(sortable_search_params.merge(search_all_batches: true)), class: "twlink twless-strong" %></small>
+          <small class="less-strong">- <%= number_display(BikeStickerBatch.count) %> <%= link_to "total batches", url_for(sortable_search_params.merge(search_all_batches: true)), class: "twlink less-strong" %></small>
         <% end %>
       <% end %>
 
@@ -26,7 +26,7 @@
       <div class="tw:my-6">
         <%= render(UI::Header::Component.new(tag: :h2)) do %>
           Showing Problem stickers
-          <small><%= link_to "hide", url_for(sortable_search_params.merge(search_show_problems: false)), class: "twlink twless-strong" %></small>
+          <small><%= link_to "hide", url_for(sortable_search_params.merge(search_show_problems: false)), class: "twlink less-strong" %></small>
         <% end %>
 
         <% duplicated = @bike_sticker_batch.duplicated_integers %>
@@ -41,7 +41,7 @@
             <% end %>
           </ul>
         <% else %>
-          <em class="twless-strong">None</em>
+          <em class="less-strong">None</em>
         <% end %>
 
         <span class="strong tw:block">Non-sequential stickers:</span>
@@ -53,7 +53,7 @@
             <% end %>
           </ul>
         <% else %>
-          <em class="twless-strong">none</em>
+          <em class="less-strong">none</em>
         <% end %>
       </div>
       <hr class="twhr">
@@ -61,7 +61,7 @@
       <div class="tw:pt-6 tw:text-center">
         <%= render(UI::ButtonLink::Component.new(text: "Show problem stickers for Batch ##{@bike_sticker_batch.id}", href: url_for(sortable_search_params.merge(search_show_problems: true)), color: :yellow, size: :sm)) %>
 
-        <em class="twless-strong tw:ml-2">
+        <em class="less-strong tw:ml-2">
           (duplicates and non-sequential stickers)
         </em>
       </div>
@@ -74,7 +74,7 @@
         <%= number_display(matching_bike_stickers.size) %> matching
         <%= "sticker".pluralize(matching_bike_stickers.size) %>
         <% unless @search_claimed %>
-          <span class="twless-strong">
+          <span class="less-strong">
             <%= number_with_delimiter(matching_bike_stickers.claimed.count) %>
             claimed
           </span>
@@ -132,7 +132,7 @@
 
   <% skeleton.with_nav_item do %>
     <small>
-      <%= render(UI::ButtonLink::Component.new(text: "reassign", href: reassign_admin_bike_stickers_path, color: :link, html_class: "twless-strong")) %>
+      <%= render(UI::ButtonLink::Component.new(text: "reassign", href: reassign_admin_bike_stickers_path, color: :link, html_class: "less-strong")) %>
     </small>
   <% end %>
 <% end %>

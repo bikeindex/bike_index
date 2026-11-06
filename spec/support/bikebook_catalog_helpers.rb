@@ -26,6 +26,15 @@ module BikebookCatalogHelpers
       playwright_page.context.route(%r{^https://bikebook\.bikeindex\.org/}, ->(route, _request) { route.abort })
     end
   end
+
+  # Holds each request for a catalog file matching `pattern`, the queue they're answered from
+  def hold_bikebook_catalog_file(pattern)
+    Queue.new.tap do |held|
+      page.driver.with_playwright_page do |playwright_page|
+        playwright_page.context.route("#{Integrations::Bikebook::Catalog::URL}#{pattern}", ->(route, _request) { held << route })
+      end
+    end
+  end
 end
 
 RSpec.configure { it.include BikebookCatalogHelpers }

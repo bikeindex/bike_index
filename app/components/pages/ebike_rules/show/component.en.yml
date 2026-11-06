@@ -35,12 +35,6 @@ en:
           custom_details: Custom details
           details_legend: Your bike's details
           detected_place_html: We detected <strong>%{state}</strong>.
-          disclaimer: >-
-            Bike Index is a 501(c)(3) nonprofit. State law summaries are for reference,
-            not legal advice.
-          disclaimer_canada: >-
-            Bike Index is a nonprofit. Provincial and territorial law summaries are
-            for reference, not legal advice.
           for_parents: For parents
           form_label: E-bike compliance lookup
           has_throttle: Has a throttle?

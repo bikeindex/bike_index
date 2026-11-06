@@ -1,5 +1,5 @@
 <%= render(UI::Card::Component.new) do %>
-  <h2 class="tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">
+  <h2 class="tw:tweyebrow">
     <%= translation(".registration_information") %>
   </h2>
 
@@ -38,10 +38,6 @@
                       </span>
                     <% end %>
                   </span>
-                <% end %>
-
-                <% tooltip.with_tooltip_button(class: "tw:inline-flex tw:size-4 tw:items-center tw:justify-center tw:rounded-full tw:bg-gray-200 tw:text-[10px] tw:font-bold tw:text-gray-600 tw:hover:bg-gray-300 tw:dark:bg-gray-700 tw:dark:text-gray-200") do %>
-                  ?
                 <% end %>
               <% end %>
             </span>

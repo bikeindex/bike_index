@@ -4,7 +4,7 @@
   <%= render(UI::Alerts::Base::Component.new(kind: :notice)) do %>
     This is a law enforcement organization without unstolen notifications. To
     enable unstolen notifications,
-    <%= link_to "add an invoice for this organization", new_admin_organization_invoice_path(organization_id: @organization.to_param, end_at: (Time.current + 10.years).to_i), class: "twlink" %>
+    <%= link_to "add an invoice for this organization", new_admin_organization_invoice_path(organization_id: @organization.to_param, end_at: (Time.current + 10.years).to_i), class: "twlink-underlined" %>
     and enable "Law Enforcement functionality" in it
   <% end %>
 <% end %>

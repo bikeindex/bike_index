@@ -9,7 +9,7 @@ RSpec.describe Pages::Org::Search::SettingsAndFilters::Component, type: :compone
     end
   end
   let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs:) }
-  let(:enabled_feature_slugs) { %w[bike_search bike_stickers] }
+  let(:enabled_feature_slugs) { %w[bike_stickers] }
   let(:settings) do
     ComponentStructs::OrgSearchSettings.new(organization:, search_stickers:, search_status: "all")
   end
@@ -53,7 +53,7 @@ RSpec.describe Pages::Org::Search::SettingsAndFilters::Component, type: :compone
   end
 
   context "with an impound search to point to" do
-    let(:enabled_feature_slugs) { %w[bike_search impound_bikes] }
+    let(:enabled_feature_slugs) { %w[impound_bikes] }
     let(:impound_search_path) { "/o/#{organization.to_param}/impound_records" }
     let(:options) { super().merge(impound_search_path:) }
     let(:settings) { ComponentStructs::OrgSearchSettings.new(organization:, search_status:) }
@@ -76,7 +76,7 @@ RSpec.describe Pages::Org::Search::SettingsAndFilters::Component, type: :compone
   end
 
   context "with registration_notes enabled" do
-    let(:enabled_feature_slugs) { %w[bike_search registration_notes] }
+    let(:enabled_feature_slugs) { %w[registration_notes] }
 
     it "renders the notes toggle" do
       expect(component).to have_text("show notes search")

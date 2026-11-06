@@ -91,12 +91,12 @@ RSpec.describe "Organization sidebar", :js, type: :system do
     expect_open("#{organization.short_name} Registrations")
     expect_current_group("Impounded Vehicles")
 
-    within("#org_sidebar_nav") { click_link "Organization Registrations" }
+    within("#org_sidebar_nav") { click_link "Search Registrations" }
 
     expect(page).to have_current_path("/o/#{slug}/registrations", ignore_query: true)
     expect_open("#{organization.short_name} Registrations")
     expect_current_group("#{organization.short_name} Registrations")
-    expect(page).to have_css "#org_sidebar_nav a[aria-current='page']", text: "Organization Registrations"
+    expect(page).to have_css "#org_sidebar_nav a[aria-current='page']", text: "Search Registrations"
     expect(page).to have_no_css "#org_sidebar_nav a[aria-current]", text: "Search Impounded Vehicles"
 
     # Short enough that the menu scrolls, with Manage users past its fold
@@ -108,6 +108,15 @@ RSpec.describe "Organization sidebar", :js, type: :system do
     wait_for { current_row_in_view? }
     # Guards this against going vacuous on a menu that turns out to fit
     expect(scroller_top).to be > 0
+
+    # ui--collapse's module landing well behind this controller's, as on a slow connection
+    collapse_module = hold_requests("**/ui/collapse_controller*.js")
+    visit "/o/#{slug}/impound_records"
+
+    expect(page).to have_css "#org_sidebar_nav a[aria-current]", text: "Search Impounded Vehicles", visible: :all
+    sleep 1
+    collapse_module.release
+    expect_open("Impounded Vehicles")
   end
 
   it "lays a flash beside the sidebar, and tells add-a-registration from the notification row by the param" do

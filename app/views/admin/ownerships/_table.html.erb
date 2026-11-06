@@ -58,7 +58,7 @@
         <% if ownership.claimed_at.present? %>
           <%= render UI::Time::Component.new(time: ownership.claimed_at) %>
         <% else %>
-          <small class="twless-strong">unknown time</small>
+          <small class="less-strong">unknown time</small>
         <% end %>
       <% end %>
     <% end %>

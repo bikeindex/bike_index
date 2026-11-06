@@ -304,6 +304,10 @@ RSpec.describe MyAccountsController, type: :request do
         patch base_url, params: {id: current_user.username, user: {username: "confirm"}, edit_template: "sharing"}
         expect(response).to render_template(:edit)
         expect(assigns(:page_errors)).to include("Username is reserved")
+        page = Nokogiri::HTML(response.body)
+        expect(page.at_css("[role=alert] li").text).to eq "Username is reserved"
+        # BikeIndexAlerts hides .primary-alert-block whenever it holds no .alert
+        expect(page.at_css(".primary-alert-block [role=alert]")).to be_blank
         current_user.reload
         expect(current_user.username).to eq("something")
       end
@@ -866,45 +870,6 @@ RSpec.describe MyAccountsController, type: :request do
         end.to change(User, :count).by(0)
         expect(Bike.count).to eq 1
         expect(flash[:error]).to eq "Organization admins cannot delete their accounts. Email support@bikeindex.org for help"
-      end
-    end
-  end
-
-  describe "toggle_show_redesign" do
-    let(:bike) { FactoryBot.create(:bike) }
-    context "user not logged in" do
-      it "redirects to sign in without toggling" do
-        post "#{base_url}/toggle_show_redesign", params: {bike_id: bike.id}
-        expect(response).to redirect_to(/session\/new/)
-      end
-    end
-    context "user logged in" do
-      include_context :request_spec_logged_in_as_user
-      let(:current_user) { FactoryBot.create(:user_confirmed) }
-
-      it "opts into the legacy view and redirects to the legacy page" do
-        post "#{base_url}/toggle_show_redesign", params: {bike_id: bike.id}
-        expect(response).to redirect_to(bike_path(bike))
-        expect(current_user.reload.feature_registration_show_legacy).to be_truthy
-      end
-
-      context "user opted into the legacy view" do
-        let(:current_user) { FactoryBot.create(:user_confirmed, feature_registration_show_legacy: true) }
-        it "opts back out and redirects to the redesign" do
-          post "#{base_url}/toggle_show_redesign", params: {bike_id: bike.id}
-          expect(response).to redirect_to(registration_path(bike))
-          expect(current_user.reload.feature_registration_show_legacy).to be_falsey
-        end
-      end
-
-      context "user invalid for an unrelated reason" do
-        before { current_user.update_column(:preferred_language, "xx") }
-        it "flashes an error and returns to the view they came from" do
-          post "#{base_url}/toggle_show_redesign", params: {bike_id: bike.id}
-          expect(response).to redirect_to(registration_path(bike))
-          expect(flash[:error]).to match(/unable to update/i)
-          expect(current_user.reload.feature_registration_show_legacy).to be_falsey
-        end
       end
     end
   end

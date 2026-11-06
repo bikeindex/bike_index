@@ -12,7 +12,7 @@
       = render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :no_notify, label: "Don't send emails to registrations"))
       = render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :allow_duplicate)) do
         Create duplicates - add registrations when a row matches an existing registration's serial and owner email
-        %span.twless-strong (off by default)
+        %span.less-strong (off by default)
 
     %div{class: "tw:flex tw:justify-end"}
       = render(UI::Button::Component.new(text: "Create", color: :primary, type: "submit"))

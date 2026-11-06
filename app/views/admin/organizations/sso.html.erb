@@ -4,7 +4,7 @@
   <%= render(Pages::Admin::Organizations::Form::TabForm::Component.new(organization: @organization, tab: "sso",
         fields_component: Pages::Admin::Organizations::Form::SamlSso::Component)) %>
 <% else %>
-  <p class="twless-strong tw:mb-4">
+  <p class="less-strong tw:mb-4">
     SAML SSO is not enabled for this organization. Enable it through
     <%= link_to "its invoices", admin_organization_invoices_path(organization_id: @organization.to_param), class: "twlink" %>.
   </p>
