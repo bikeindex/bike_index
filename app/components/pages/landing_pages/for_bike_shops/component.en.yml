@@ -10,7 +10,6 @@ en:
           bike_book_body: >-
             Compare specifications, geometry, and a host of other features across
             thousands of bike models.
-          bikes_registered_free: bikes registered, free
           bikes_that_came_home: Bikes that came home
           browse_bike_book: Browse BikeBook
           bulk_order_email_subject: Bulk sticker order
@@ -73,7 +72,6 @@ en:
             Bike Index connects to your POS and registers every bike you sell, automatically.
             Your customers get free theft protection. You get a shop that clearly
             puts them first.
-          home: HOME!
           live: Live
           min: min
           more_from_bike_index: More from Bike Index
@@ -86,7 +84,6 @@ en:
           nothing_to_manage: Nothing to manage.
           nothing_to_manage_body: 10 minutes to connect, then it runs on every sale.
           order_stickers: Order stickers
-          partner_organizations: partner shops, police, and cities
           peace_of_mind_on_a_sticker: One-time peace of mind, on a sticker.
           pos_ascend: Ascend
           pos_lightspeed: Lightspeed
@@ -98,8 +95,6 @@ en:
             Bike Index is a nonprofit with very restrictive privacy policies. Customer
             information from your shop is used to register and recover bikes. It is
             never sold, shared, or used for advertising.
-          read_more_recovery_stories: Read more recovery stories
-          recovered: Recovered
           ring_up_the_sale: Ring up the sale. We handle the rest.
           safe: SAFE!
           safer_used_bike_sales: Safer used-bike sales.
@@ -129,13 +124,11 @@ en:
             QR code, register their bike, and link the sticker to it. It works for
             any bike, including ones that didn't come through your POS.
           sticker_sheet_alt: Bike Index registration sticker sheet
-          stolen_bikes_recovered: stolen bikes recovered
           suggested_retail: Suggested retail
           suggested_retail_price: "$7.99"
           ten_minutes_now: Ten minutes now. Protected bikes for good.
           to_set_up: to set up
           used_only_for_bikes: Used only for bikes
-          value_returned_to_owners: value returned to owners
           we_never_sell_or_share: We never sell or share customer data.
           well_email_you: We'll email you about connecting your POS.
           what_your_customers_get: What your customers get. What your shop gets.

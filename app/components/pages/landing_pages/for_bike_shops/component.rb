@@ -6,19 +6,24 @@ module Pages
       class Component < ApplicationComponent
         include MoneyHelper
 
-        COMIC_BOX = "tw:rounded-lg tw:border-3 tw:border-black tw:bg-white tw:shadow-[4px_4px_0_#000]"
+        SECTION_CLASSES = SharedBlocks::Marketing::Wrapper::Component::CONTAINER_CLASSES
         # Loaded by this page alone, so not a theme font
         COMIC_FONT = "tw:font-['Bangers',cursive]"
+        MUTED = "tw:text-gray-500 tw:dark:text-gray-400"
+        HEADING_CLASSES = "tw:m-0 tw:font-header tw:font-extrabold"
+        BAND = "tw:border-gray-200 tw:bg-gray-50 tw:dark:border-gray-700 tw:dark:bg-gray-800"
+        PRIVACY_ICON = SharedBlocks::Marketing::SectionHeading::Component::EYEBROW_COLORS[:yellow]
 
-        def initialize(total_bikes:, recoveries_count:, recoveries_value:, organizations_count:, recovery_displays:,
-          feedback:, current_user: nil)
-          @total_bikes = total_bikes
-          @recoveries_count = recoveries_count
-          @recoveries_value = recoveries_value
-          @organizations_count = organizations_count
-          @recovery_displays = recovery_displays.first(3)
+        def initialize(recovery_displays:, feedback:, current_user: nil)
+          @recovery_displays = recovery_displays
           @feedback = feedback
           @current_user = current_user
+        end
+
+        def before_render
+          helpers.content_for(:header) do
+            tag.link(href: "https://fonts.googleapis.com/css2?family=Bangers&display=swap", rel: "stylesheet")
+          end
         end
 
         private
@@ -49,28 +54,27 @@ module Pages
         end
 
         def benefit_cards
-          [{title: translation(".for_your_customers"), burst: translation(".safe"), color: "tw:text-blue-600",
+          [{title: translation(".for_your_customers"), burst: translation(".safe"), color: "tw:text-blue-600", circle: "tw:bg-blue-600",
             rows: [["icons/gift.svg", translation(".free_registration"), translation(".free_registration_body")],
               ["icons/siren.svg", translation(".help_if_stolen"), translation(".help_if_stolen_body")],
               ["icons/shield-check.svg", translation(".data_stays_private"), translation(".data_stays_private_body")],
-              ["icons/wrench.svg", translation(".free_tools_title"), translation(".free_tools_fun_body"), true]]},
-            {title: translation(".for_your_shop"), burst: translation(".pow"), color: "tw:text-purple-500",
+              ["icons/wrench.svg", translation(".free_tools_title"), with_tools_link(translation(".free_tools_fun_body"))]]},
+            {title: translation(".for_your_shop"), burst: translation(".pow"), color: "tw:text-purple-500", circle: "tw:bg-purple-500",
              rows: [["icons/timer.svg", translation(".nothing_to_manage"), translation(".nothing_to_manage_body")],
                ["icons/heart-handshake.svg", translation(".a_reason_to_trust_you"), translation(".a_reason_to_trust_you_body")],
                ["icons/lucide-search.svg", translation(".safer_used_bike_sales"), translation(".safer_used_bike_sales_body")],
-               ["icons/wrench.svg", translation(".free_tools_title"), translation(".free_tools_choose_body"), true]]}]
+               ["icons/wrench.svg", translation(".free_tools_title"), with_tools_link(translation(".free_tools_choose_body"))]]}]
         end
 
-        def impact_stats
-          [[number_display(@total_bikes), translation(".bikes_registered_free")],
-            [number_display(@recoveries_count), translation(".stolen_bikes_recovered")],
-            [render(Atoms::CurrencyMillions::Component.new(dollars_usd: @recoveries_value)),
-              translation(".value_returned_to_owners")],
-            [safe_join([number_display(@organizations_count), "+"]), translation(".partner_organizations")]]
+        def with_tools_link(body)
+          link = link_to("#free-tools", class: "twlink tw:font-semibold tw:whitespace-nowrap") do
+            safe_join([translation(".see_the_tools"), tag.span("↓", aria: {hidden: true})], " ")
+          end
+          safe_join([body, link], " ")
         end
 
         def privacy_points
-          [["icons/ban.svg", translation(".never_sold")], ["icons/lock.svg", translation(".never_shared")],
+          [["icons/ban.svg", translation(".never_sold")], ["kelsey/registration_show/lock.svg", translation(".never_shared")],
             ["icons/bike.svg", translation(".used_only_for_bikes")]]
         end
 
@@ -95,14 +99,6 @@ module Pages
             [translation(".faq_customer_question"), translation(".faq_customer_answer")],
             [translation(".faq_stickers_question"), translation(".faq_stickers_answer")]]
         end
-
-        def eyebrow_classes = "tw:m-0 tw:mb-2 tw:text-[13px] tw:font-bold tw:tracking-widest tw:uppercase"
-
-        def heading_classes = "tw:m-0 tw:font-header tw:font-extrabold tw:text-slate-900"
-
-        def section_inner = "tw:mx-auto tw:max-w-300 tw:px-6"
-
-        def navy_gradient = "tw:bg-linear-160 tw:from-slate-900 tw:to-[#233140] tw:text-white"
       end
     end
   end
