@@ -115,6 +115,8 @@ The register landing page had four copies in `register_landing/`, all resized We
 
 ## The reply
 
+Always report, and lead with the conversions whenever there are any. The user should never find a change to their page that the reply didn't mention.
+
 1. Each conversion, with the visible change it makes.
 2. Each big shadow kept.
 3. Each hover state on a non-button.

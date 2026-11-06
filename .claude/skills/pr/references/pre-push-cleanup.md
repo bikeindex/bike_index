@@ -144,7 +144,7 @@ For each, name the existing component it renders or duplicates. One that wraps a
 
 ### The markup audit
 
-**Required when the branch adds markup or an icon.** Run the `use-existing-markup` skill. It converts the hand-written markup to existing components without asking, covering marketing pages, buttons, icons and shadows. Put its callouts (big shadows, and hover states on things that aren't buttons) in your reply to the user.
+**Required when the branch adds markup or an icon.** Run the `use-existing-markup` skill. It converts the hand-written markup to existing components without asking, covering marketing pages, buttons, icons and shadows. **Whenever it changes anything, tell the user in your reply.** List each conversion with the visible change it makes, and the commit it landed in. A page that looks different after a PR update, with no word about why, is what this prevents. Put its callouts (big shadows, and hover states on things that aren't buttons) in the same reply. When it changes nothing, say so in one line.
 
 ### The cycle-type translation check
 
