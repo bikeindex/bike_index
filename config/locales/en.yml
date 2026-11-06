@@ -1818,11 +1818,18 @@ en:
           unable_to_leave: 'Unable to leave %{org_name}: contact support@bikeindex.org
             for help'
       pos_registration_matches:
+        redirect_by_status:
+          already_combined: These are already combined into one registration.
+          already_kept_separate: You told us these are different, so they're staying
+            separate.
+          cant_combine_here: >-
+            These registrations can't be combined here. Email support@bikeindex.org
+            if you need help.
         update:
           combined: Combined! Your %{bike_type} is now one registration.
           couldnt_combine: >-
-            We couldn't combine these automatically, so someone at Bike Index will
-            take a look.
+            We couldn't combine these, so they're still separate. Email support@bikeindex.org
+            if you need help.
           kept_separate: Thanks, we'll keep them as separate registrations.
       update:
         current_password_doesnt_match: Current password doesn't match, it's required

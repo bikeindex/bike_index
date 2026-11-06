@@ -14,7 +14,10 @@
       <% [[translation(".registered_when_you_bought_it"), @pos_bike], [translation(".your_registration"), @bike]].each do |heading, registration| %>
         <div>
           <h3 class="tw:mb-2 tw:font-bold"><%= heading %></h3>
-          <%= render(SharedBlocks::SearchResults::BikeCard::Component.new(bike: registration)) %>
+
+          <ul class="tw:m-0 tw:list-none tw:p-0">
+            <%= render(SharedBlocks::SearchResults::BikeCard::Component.new(bike: registration)) %>
+          </ul>
         </div>
       <% end %>
     </div>

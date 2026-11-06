@@ -2,57 +2,74 @@ require "rails_helper"
 
 RSpec.describe MyAccounts::PosRegistrationMatchesController, type: :request do
   let(:base_url) { "/my_account/pos_registration_matches" }
-  let(:match) { FactoryBot.create(:pos_registration_match, user: current_user) }
 
   context "signed in as the owner" do
     include_context :request_spec_logged_in_as_user
+    let(:pos_registration_match) { FactoryBot.create(:pos_registration_match, user: current_user) }
+    let(:url) { "#{base_url}/#{pos_registration_match.id}" }
 
     it "shows both registrations" do
-      get "#{base_url}/#{match.id}"
+      get url
       expect(response.status).to eq 200
-      expect(response.body).to include("Is this the same bike?", bike_path(match.pos_bike), bike_path(match.bike))
+      expect(response.body).to include("Is this the same bike?", bike_path(pos_registration_match.pos_bike),
+        bike_path(pos_registration_match.bike), "name=\"same_bike\"")
     end
 
     it "combines them" do
-      patch "#{base_url}/#{match.id}", params: {same_bike: "true"}
-      expect(response).to redirect_to(bike_path(match.pos_bike))
+      patch url, params: {same_bike: "true"}
+      expect(response).to redirect_to(bike_path(pos_registration_match.pos_bike))
       expect(flash[:success]).to eq "Combined! Your bike is now one registration."
-      expect(match.reload.status).to eq "merged"
-      expect(Bike.unscoped.find(match.bike_id).deleted_at).to be_present
+      expect(pos_registration_match.reload.status).to eq "merged"
+      expect(Bike.unscoped.find(pos_registration_match.bike_id).deleted_at).to be_present
+
+      get url
+      expect(response).to redirect_to(bike_path(pos_registration_match.pos_bike))
+      expect(flash[:notice]).to eq "These are already combined into one registration."
     end
 
     it "keeps them separate" do
-      patch "#{base_url}/#{match.id}", params: {same_bike: "false"}
+      patch url, params: {same_bike: "false"}
       expect(response).to redirect_to(my_account_path)
-      expect(match.reload.status).to eq "declined"
-      expect(match.bike.reload.deleted_at).to be_blank
+      expect(flash[:success]).to eq "Thanks, we'll keep them as separate registrations."
+      expect(pos_registration_match.reload.status).to eq "declined"
+
+      get url
+      expect(response).to redirect_to(my_account_path)
+      expect(flash[:notice]).to match(/told us these are different/)
     end
 
-    it "leaves a match that can't be merged confirmed for an admin" do
-      FactoryBot.create(:stolen_bike, serial_number: match.bike.serial_number)
-      patch "#{base_url}/#{match.id}", params: {same_bike: "true"}
-      expect(response).to redirect_to(my_account_path)
-      expect(flash[:notice]).to include("couldn't combine")
-      expect(match.reload).to have_attributes(status: "confirmed", review_reasons: ["stolen_history"])
+    context "stolen since the match" do
+      before { FactoryBot.create(:stolen_bike, serial_number: pos_registration_match.bike.serial_number) }
+
+      it "leaves it confirmed for an admin" do
+        patch url, params: {same_bike: "true"}
+        expect(response).to redirect_to(my_account_path)
+        expect(flash[:notice]).to include("couldn't combine")
+        expect(pos_registration_match.reload).to have_attributes(status: "confirmed", review_reasons: ["stolen_history"])
+      end
     end
 
-    it "404s a review candidate" do
-      match.update!(review_reasons: ["impounded"])
-      get "#{base_url}/#{match.id}"
-      expect(response.status).to eq 404
+    context "a review candidate" do
+      before { pos_registration_match.update!(review_reasons: ["impounded"]) }
+
+      it "doesn't ask" do
+        get url
+        expect(response).to redirect_to(my_account_path)
+        expect(flash[:notice]).to include("can't be combined here")
+      end
     end
   end
 
   context "signed in as someone else" do
     include_context :request_spec_logged_in_as_user
-    let(:match) { FactoryBot.create(:pos_registration_match) }
+    let(:pos_registration_match) { FactoryBot.create(:pos_registration_match) }
 
     it "404s" do
-      get "#{base_url}/#{match.id}"
+      get "#{base_url}/#{pos_registration_match.id}"
       expect(response.status).to eq 404
-      patch "#{base_url}/#{match.id}", params: {same_bike: "false"}
+      patch "#{base_url}/#{pos_registration_match.id}", params: {same_bike: "false"}
       expect(response.status).to eq 404
-      expect(match.reload.status).to eq "pending"
+      expect(pos_registration_match.reload.status).to eq "pending"
     end
   end
 

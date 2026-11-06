@@ -6,8 +6,8 @@ en:
         pos_registration_matches:
           show:
             combining_keeps: >-
-              Combining them keeps one registration with your %{bike_type}'s photos
-              and details, and the shop's record of the sale. Your separate registration
+              Combining them keeps the shop's registration of your %{bike_type}, with
+              your photos and the details you entered. Your separate registration
               is removed.
             is_this_the_same: Is this the same %{bike_type}?
             no_theyre_different: No, they're different

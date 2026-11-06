@@ -29,6 +29,7 @@ class PosRegistrationMatch < ApplicationRecord
     "multiple_registrations" => "More than one new registration matches the POS registration",
     "impounded" => "A registration was impounded",
     "marketplace_listing" => "A registration has a marketplace listing",
+    "bike_versions" => "A registration has versions",
     "not_a_serial" => "Serial is a part number or placeholder"
   }.freeze
 
@@ -47,22 +48,32 @@ class PosRegistrationMatch < ApplicationRecord
   # Hidden registrations still match
   def self.live_bike?(bike) = bike.present? && bike.deleted_at.blank? && !bike.example && !bike.likely_spam
 
-  # Stolen history counts any manufacturer's bike with the serial, including deleted and example ones
+  # Stolen history counts any manufacturer's bike with either serial, including deleted and example ones
   def self.review_reasons_for(bike, pos_bike)
     serial = bike.serial_normalized_no_space
+    serials = [serial, pos_bike.serial_normalized_no_space].uniq
     bike_ids = [bike.id, pos_bike.id]
     listings = MarketplaceListing.where(item_type: "Bike", item_id: bike_ids)
       .or(MarketplaceListing.where(item_type: "BikeVersion", item_id: BikeVersion.unscoped.where(bike_id: bike_ids).select(:id)))
     not_a_serial = BikeDuplicatesServices::Cues.not_a_serial(serial,
       manufacturer_names: BikeDuplicatesServices::Cues.fetch_manufacturer_name_serials)
-    ordered_reasons([("stolen_history" if BikeDuplicatesServices::Finder.stolen_serials?([serial])),
+    ordered_reasons([("stolen_history" if BikeDuplicatesServices::Finder.stolen_serials?(serials)),
       ("impounded" if ImpoundRecord.where(bike_id: bike_ids).exists?),
-      ("marketplace_listing" if listings.exists?), ("not_a_serial" if not_a_serial)].compact)
+      ("marketplace_listing" if listings.exists?),
+      ("bike_versions" if BikeVersion.unscoped.where(bike_id: bike_ids).exists?), ("not_a_serial" if not_a_serial)].compact)
   end
 
   def self.ordered_reasons(reasons) = REVIEW_REASONS.keys & reasons
 
   def merge_candidate? = review_reasons.none?
+
+  # Whether the owner can still be asked: still the same bike (an edited serial or manufacturer could otherwise
+  # slip past the stolen veto), both live, and both theirs
+  def confirmable?(bike, pos_bike)
+    pending? && merge_candidate? && [bike, pos_bike].all? { self.class.live_bike?(it) } &&
+      bike.user_id.present? && bike.user_id == pos_bike.user_id &&
+      bike.serial_normalized_no_space == pos_bike.serial_normalized_no_space && bike.manufacturer_id == pos_bike.manufacturer_id
+  end
 
   # Reasons are only added, so a recorded stolen veto is never cleared
   def add_review_reasons!(reasons, **attributes)

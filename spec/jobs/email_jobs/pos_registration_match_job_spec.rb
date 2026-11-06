@@ -30,6 +30,19 @@ RSpec.describe EmailJobs::PosRegistrationMatchJob, type: :job do
       expect(ActionMailer::Base.deliveries.count).to eq 1
     end
 
+    it "records a theft since the match and doesn't email" do
+      FactoryBot.create(:stolen_bike, serial_number: match.bike.serial_number)
+      described_class.new.perform(match.id)
+      expect(match.reload.review_reasons).to eq ["stolen_history"]
+      expect(ActionMailer::Base.deliveries.count).to eq 0
+    end
+
+    it "doesn't email once the POS registration is someone else's" do
+      BikeServices::OwnershipTransferer.find_or_create(match.pos_bike, updator: user, new_owner_email: "new-owner@example.com")
+      described_class.new.perform(match.id)
+      expect(ActionMailer::Base.deliveries.count).to eq 0
+    end
+
     it "doesn't email a review candidate or a match that's no longer pending" do
       match.update!(review_reasons: ["impounded"])
       described_class.new.perform(match.id)

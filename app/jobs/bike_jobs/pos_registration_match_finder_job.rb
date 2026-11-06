@@ -26,8 +26,11 @@ module BikeJobs
           other_matches.select(&:pending?).each { add_reasons(it, ["multiple_registrations"]) }
           record_match(bike, pos_bike, duplicate_bike_group_id, reasons)
         end
-        # After the lock's transaction commits, so the email job finds the match
-        EmailJobs::PosRegistrationMatchJob.perform_async(match.id) if match.previously_new_record? && match.merge_candidate?
+        # After the lock's transaction commits, so the email job finds the match. Until it's sent, so a failed
+        # enqueue is retried while the new registration is still being matched
+        if match.pending? && match.merge_candidate? && !Notification.pos_registration_match.exists?(notifiable: match)
+          EmailJobs::PosRegistrationMatchJob.perform_async(match.id)
+        end
       end
     end
 

@@ -4,8 +4,8 @@ en:
     emails:
       pos_registration_match:
         combine_them: >-
-          Combining them keeps your %{bike_type}'s photos, details and history in
-          one registration.
+          Combining them keeps one registration for your %{bike_type}, with your photos
+          and the details you entered.
         if_theyre_different: If they're different, you can tell us on the same page.
         is_this_the_same: Is this the same %{bike_type}?
         pos_registered_it: >-
