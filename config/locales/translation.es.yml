@@ -3978,43 +3978,6 @@ es:
       use_ascend: "¿Usar Ascend?"
       use_lightspeed_retail: "¿Utilizas Lightspeed Retail?"
       used_at_bike_shops_everywhere: Se utiliza en todas las tiendas de bicicletas.
-    for_community_groups:
-      bike_index_for_community_groups: Índice de bicicletas para grupos comunitarios
-      bike_index_launches_new_ambassadors_progr: Bike Index lanza un nuevo programa
-        de embajadores.
-      bike_index_welcomes_stolen_bikes_nola: Bike Index da la bienvenida a Stolen
-        Bikes NOLA.
-      embed_a_bike_index_registration_form: Integre un formulario de registro de bicicletas
-        en su sitio web.
-      gone_are_the_days_where_you_had_to_regist: Se acabaron los días en que tenías
-        que registrar tu bicicleta en tu barrio, condado, ciudad, estado y país. Simplemente
-        registra todas tus bicicletas en Bike Index y tu registro será válido en cualquier
-        lugar. ¿Organizas campañas de registro? ¿Organizas eventos ciclistas comunitarios?
-        Avísanos y te enviaremos los materiales de Bike Index.
-      help_us_help_you: Ayúdanos a ayudarte
-      here: aquí
-      partners_made_in_heaven: Compañeros hechos en el cielo
-      purchase_a_pack_of_advocacy_html: Adquiera un paquete de materiales de promoción
-        %{link}.
-      registration_drive: Utilice Bike Index para organizar una campaña de registro.
-      registrations_are_free_forever_join_bike_: Las inscripciones son gratuitas.
-        Para siempre. Únete a Bike Index y empieza a registrarte hoy mismo.
-      related_articles: 'Artículos relacionados:'
-      sign_up_for_free: Regístrate gratis
-      spread_the_bike_index_word_html: Difunda la información sobre Bike Index entre
-        sus electores para que puedan andar en bicicleta de forma segura. Cree una
-        cuenta gratuita para su organización %{link}.
-      the_most_widereaching_and_effective_tools: Las herramientas más eficaces y de
-        mayor alcance contra el robo de bicicletas, sin duda alguna.
-      trusted_by_community_groups_everywhere: Con la confianza de grupos comunitarios
-        de todo el mundo.
-      used_by_community_groups_everywhere: Utilizado por grupos comunitarios en todas
-        partes.
-      we_provide_free_and_easy_access_to_our_re: Ofrecemos acceso gratuito y sencillo
-        a nuestro registro para cualquier persona que use la bicicleta, sin importar
-        su nivel de actividad. Bike Index es una iniciativa comunitaria para recuperar
-        bicicletas perdidas o robadas. Sin importar el tipo de bicicleta o ciclista,
-        queremos que todas las bicicletas sigan rodando con sus dueños.
     packages_list:
       forever: Para siempre
       free: Gratis
@@ -4158,6 +4121,9 @@ es:
     register_landing: Registra tu bicicleta gratis en Bike Index. Obtén un comprobante
       de propiedad, alertas de robo con un solo clic y acceso a una red de tiendas,
       policía y ciclistas que la buscan.
+    landing_pages_for_community_groups: Bike Index es un registro de bicicletas gratuito
+      y sin fines de lucro. Ayuda a tus ciclistas a registrarse para que una bicicleta
+      robada pueda regresar a casa. Gratis para grupos comunitarios, para siempre.
   meta_titles:
     bikes_index: Resultados de la búsqueda
     bikes_new: "¡Inscribe una bicicleta!"
@@ -8127,6 +8093,102 @@ es:
           start_over: Volver a empezar
           tabs_label: Organizaciones de ejemplo
           viewing_as: Considerando como
+        for_community_groups:
+          a_registered_bike_can_come_home: Una bicicleta matriculada es una bicicleta
+            que puede volver a casa.
+          ask_about_ebike_education: Pregúntanos cómo estamos informando a los ciclistas
+            sobre las bicicletas eléctricas.
+          become_an_ambassador: Conviértete en embajador
+          bike_index_for_bike_shops: Índice de bicicletas para tiendas de bicicletas
+          charge_it_safely: Cárgalo de forma segura.
+          charge_it_safely_detail: Cuidado de las baterías, almacenamiento y cargadores
+            certificados.
+          check_ebike_rules: Consulta las normas sobre bicicletas eléctricas en tu
+            estado.
+          create_an_organization_account: Crea una cuenta de organización y comienza
+            a registrar tu comunidad hoy mismo.
+          ebike_education: educación sobre bicicletas eléctricas
+          ebike_registration_education: Cuando una bicicleta eléctrica se registra
+            en Bike Index, el ciclista recibe una breve formación sobre su uso seguro
+            y su correcta propiedad. Tu grupo dispone de una manera sencilla de llegar
+            a nuevos ciclistas con los conceptos básicos, sin necesidad de crear un
+            programa desde cero.
+          ebikes_bring_new_riders: Las bicicletas eléctricas están atrayendo a mucha
+            gente al mundo del ciclismo por primera vez. Son más pesadas, más rápidas
+            y más valiosas que la mayoría de las bicicletas, y eso conlleva algunas
+            cosas que todo propietario debería saber.
+          embed_a_registration_form: Insertar un formulario de registro
+          everything_you_need: Todo lo que necesitas para registrar tu comunidad.
+          eyebrow: Para grupos comunitarios · Gratis, siempre
+          free_forever: Gratis para grupos y ciclistas. Para siempre.
+          free_tools_for_your_group: Herramientas gratuitas para tu grupo
+          get_started: Comience
+          help_your_riders: Ayuda a tus ciclistas a recuperar sus bicicletas.
+          host_a_registration_drive: Organiza una campaña de inscripción
+          join_us: Únete a nosotros. Es gratis, para siempre.
+          know_where_to_ride: Saber dónde montar.
+          know_where_to_ride_detail: Normativa local para caminos, senderos y carreteras.
+          know_your_class: Conoce tu clase.
+          know_your_class_detail: Clase de motor y velocidad máxima asistida.
+          lede: Bike Index es un registro de bicicletas gratuito y sin ánimo de lucro
+            utilizado por ciclistas, tiendas y la policía en todo el mundo. Cuando
+            tus miembros se registran, una bicicleta robada tiene una forma real de
+            regresar a casa. No cobramos nada a los grupos comunitarios. Solo les
+            pedimos que difundan la información.
+          most_stolen_bikes_are_never_returned: La mayoría de las bicicletas robadas
+            nunca se recuperan porque nadie puede demostrar quién es el dueño. El
+            registro en Bike Index deja constancia del número de serie, fotos y propietario
+            antes de que ocurra cualquier incidente. Su grupo es la voz de confianza
+            que motiva a los ciclistas a registrarse.
+          new_for_ebike_riders: Novedad para los ciclistas de bicicletas eléctricas
+          nonprofit: Organización sin fines de lucro 501(c)(3)
+          protect_it: Protégelo.
+          protect_it_detail: Registrado, fotografiado y cerrado con llave correctamente.
+          recovered_in_their_own_words: Recuperados, en sus propias palabras
+          recovery_stories: Historias de recuperación
+          ride_prepared: Viaje preparado.
+          ride_prepared_detail: Frenar a alta velocidad, usar casco y compartir el
+            espacio.
+          sign_up_for_free: Regístrate gratis
+          step_home_body: Los compradores y las tiendas cotejan los números de serie
+            con el índice, y las coincidencias se devuelven a sus propietarios.
+          step_home_title: Vuelve a casa
+          step_register_body: Marca, modelo, número de serie y fotos. Tarda unos dos
+            minutos.
+          step_register_title: Registro de ciclistas
+          step_spread_body: Comparte un enlace, inserta el formulario o realiza una
+            campaña de inscripción en tu próxima ruta.
+          step_spread_title: Difunde la noticia
+          step_stolen_body: El propietario lo denuncia como robado y alertamos a las
+            tiendas, a la policía y a los ciclistas de la zona.
+          step_stolen_title_html: Una bicicleta es %{stolen}
+          stolen: ROBADO
+          testimonial_attribution_html: GObike Buffalo, %{link}
+          tool_account_body: Consulta todas las bicicletas registradas a través de
+            tu grupo, en un solo lugar.
+          tool_account_title: Cuenta de organización gratuita
+          tool_ambassadors_body: Ofrezca a sus miembros más activos una forma de promover
+            la inscripción a nivel local.
+          tool_ambassadors_title: Programa de embajadores
+          tool_drives_body: "¿Organizas paseos y eventos comunitarios? Avísanos y
+            te enviaremos los materiales de Bike Index."
+          tool_drives_title: campañas de inscripción
+          tool_ebike_body: Ayuda a educar a los usuarios de bicicletas eléctricas
+            de tu comunidad sobre el uso y la propiedad seguros de las mismas.
+          tool_ebike_title: Flujo educativo sobre bicicletas eléctricas
+          tool_embed_body: Coloca un formulario de índice de bicicletas directamente
+            en tu sitio web.
+          tool_embed_title: Formulario de registro integrable
+          tool_search_body: Busca bicicletas robadas en tu zona y apoya las labores
+            de recuperación.
+          tool_search_title: Base de datos consultable
+          valid_anywhere: Un único registro, válido en cualquier lugar.
+          we_also_work_with_bike_shops: También colaboramos con tiendas de bicicletas
+            de tu comunidad mediante integraciones con sistemas de punto de venta.
+          we_love_ebikes: Nos encantan las bicicletas eléctricas. Ayudemos a los nuevos
+            ciclistas a estar preparados para montar en bici.
+          why_it_matters: Por qué es importante
+          zoom: "¡ZOOM!"
       marketplace:
         how_it_works:
           across_town_heading: Al otro lado de la ciudad o al otro lado del país.
