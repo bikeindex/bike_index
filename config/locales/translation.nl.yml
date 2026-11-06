@@ -3721,6 +3721,10 @@ nl:
     marketplace_how_it_works: Hoe werkt kopen en verkopen op de Bike Index Marketplace,
       waar elke fiets geregistreerd staat en een als gestolen opgegeven fiets niet
       te koop aangeboden kan worden.
+    register_landing: Registreer je fiets gratis op Bike Index. Je krijgt bewijs dat
+      de fiets van jou is, ontvangt met één klik een melding als de fiets gestolen
+      is en je wordt aangesloten bij een netwerk van winkels, politie en fietsers
+      die uitkijken naar je fiets.
   meta_titles:
     bikes_index: Zoekresultaten
     bikes_new: Registreer een fiets!
@@ -3774,6 +3778,7 @@ nl:
     strava_search_index: Fietsindex Strava-zoekfunctie
     registration_form_settings: Instellingen voor het registratieformulier
     marketplace_how_it_works: Hoe de Bike Index Marketplace werkt
+    register_landing: Registreer je fiets gratis
   organized:
     ambassador_dashboards:
       getting_started:
@@ -6832,6 +6837,87 @@ nl:
               kans dat je %{cycle_type} terugkomt — je kunt het nummer later toevoegen.
           step_review:
             complete_registration: Voltooi de %{cycle_type}-registratie
+          landing:
+            a_million_bikes: Er staan een miljoen fietsen geregistreerd. Geen enkele
+              eigenaar heeft betaald om erbij te zijn.
+            benefit_alerts_body: Als het gestolen wordt, markeer het dan als gestolen
+              en wij waarschuwen partnerwinkels, de politie en fietsers in de buurt
+              van de plaats waar het is gebeurd.
+            benefit_alerts_title: Meldingen bij diefstal met één klik
+            benefit_app_body: Registreer en beheer al je fietsen via de Bike Index
+              iOS-app en meld diefstal waar je ook bent.
+            benefit_app_title: Je garage in je zak
+            benefit_found_body: Als iemand je fiets vindt en het serienummer opzoekt,
+              brengen we die persoon rechtstreeks met je in contact.
+            benefit_found_title: Gevonden? Wij vertellen het u.
+            benefit_marketplace_body: Verkoop je fiets gratis op de Bike Index-marktplaats.
+              Elke advertentie begint met een geregistreerde fiets en wordt gecontroleerd
+              aan de hand van diefstalrapporten, zodat kopers zeker weten dat de fiets
+              legitiem is.
+            benefit_marketplace_title: Een betrouwbare marktplaats
+            benefit_network_body: Vrijwilligers, lokale opsporingsteams en meer dan
+              1000 politiekorpsen, universiteiten, steden en winkels houden de wacht
+              voor gestolen fietsen en signaleren deze.
+            benefit_network_title: Mensen die ernaar op zoek zijn
+            benefit_private_body: Je contactgegevens blijven verborgen. Wij zijn een
+              non-profitorganisatie, dus we verkopen geen gegevens en plaatsen geen
+              advertenties.
+            benefit_private_title: Standaard privé
+            benefit_proof_body: Uw serienummer, foto's en aankoopbewijs worden allemaal
+              in één permanent dossier bewaard. Handig voor politierapporten en verzekeringsclaims.
+            benefit_proof_title: Bewijs dat het van jou is
+            benefit_resell_body: Kopers, winkels en de politie controleren serienummers
+              aan de hand van het register. Een geregistreerde gestolen fiets is een
+              fiets die niemand wil kopen.
+            benefit_resell_title: Moeilijker door te verkopen
+            benefit_transfer_body: Draag het kentekenbewijs in een paar klikken over
+              aan de volgende eigenaar, zodat de geschiedenis van de motorfiets met
+              hem meereist.
+            benefit_transfer_title: Makkelijk te verkopen of door te geven.
+            bike_already_stolen: Is je fiets gestolen? Bekijk wat je nu moet doen.
+            check_add_later: Je kunt later foto's en details toevoegen.
+            check_free_no_data_sharing: Voor altijd gratis. Wij verkopen of delen
+              uw gegevens niet.
+            check_two_minutes: Het duurt ongeveer twee minuten.
+            donations_keep_it_free: Bike Index is een non-profitorganisatie. Donaties
+              maken het mogelijk dat de dienst gratis blijft.
+            faq_free_answer: Ja. Registreren, meldingen doen en zoeken is voor iedereen
+              gratis, voor altijd. Bike Index is een 501(c)(3) non-profitorganisatie.
+            faq_free_question: Is het echt gratis?
+            faq_privacy_answer: De openbare gegevens van de fiets zijn opvraagbaar.
+              Je naam, e-mailadres en adres worden nooit openbaar weergegeven.
+            faq_privacy_question: Wie kan mijn gegevens zien?
+            faq_serial_answer: Registreer je sowieso en voeg het later toe. Draai
+              de fiets om en kijk onder de trapas, waar de pedalen het frame raken.
+            faq_serial_question: Ik weet mijn serienummer niet.
+            free_nonprofit_worldwide: Gratis · Non-profit · Wereldwijd
+            fund_the_next_recovery: Financier het volgende herstel
+            give_your_bike_a_way_home: Geef je fiets een manier om thuis te komen.
+            if_the_worst_happens: Als het ergste gebeurt
+            keep_it_free: Houd het gratis
+            lede: Registreer hem nu en je hebt bewijs dat hij van jou is, een diefstalmelding
+              die je met één klik kunt versturen, en een netwerk van winkels, politie
+              en motorrijders die ernaar uitkijken.
+            quick_answers: Snelle antwoorden
+            register_your_bike: Registreer uw fiets
+            sticker_flagged_body: Als een winkel, koper of agent het serienummer controleert,
+              blijkt het gestolen te zijn en krijg je dat bericht.
+            sticker_flagged_sound: DING!
+            sticker_flagged_title: 3. Het wordt gemarkeerd
+            sticker_register_body: Het serienummer en de gegevens van je fiets worden
+              geregistreerd voordat er iets misgaat. Dat is het gedeelte dat de meeste
+              mensen overslaan.
+            sticker_register_sound: KLIK!
+            sticker_register_title: 1. Registreer je vandaag nog
+            sticker_stolen_body: Met één klik wordt het op de lijst met gestolen goederen
+              geplaatst en worden partners in de buurt gewaarschuwd. Spreek niemand
+              aan. Neem contact op met de politie.
+            sticker_stolen_sound: GESTOLEN!
+            sticker_stolen_title: 2. Markeer het als gestolen
+            what_registering_gets_you: Wat je krijgt als je je registreert
+            what_registering_subhead: De meeste gestolen fietsen komen nooit meer
+              thuis, omdat niemand kan bewijzen van wie ze zijn. Een kentekenbewijs
+              lost dat probleem op.
       bikebook:
         show:
           any_activity: Elke activiteit

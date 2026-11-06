@@ -4173,6 +4173,9 @@ it:
     marketplace_how_it_works: Come funziona la compravendita sul marketplace di Bike
       Index, dove ogni bicicletta è registrata e una denunciata come rubata non può
       essere messa in vendita.
+    register_landing: Registra gratuitamente la tua bici su Bike Index. Ottieni la
+      prova che è tua, ricevi avvisi di furto con un solo clic e accedi a una rete
+      di negozi, forze dell'ordine e ciclisti che la tengono d'occhio.
   meta_titles:
     bikes_index: Risultati della ricerca
     bikes_new: Registra una bicicletta!
@@ -4226,6 +4229,7 @@ it:
     strava_search_index: Indice biciclette Ricerca Strava
     registration_form_settings: Impostazioni del modulo di registrazione
     marketplace_how_it_works: Come funziona il marketplace di Bike Index
+    register_landing: Registra la tua bici gratuitamente
   money:
     currencies:
       en: USD
@@ -6940,6 +6944,91 @@ it:
               le migliori possibilità di tornare — puoi aggiungere il numero in seguito.
           step_review:
             complete_registration: Completare la registrazione %{cycle_type}
+          landing:
+            a_million_bikes: Un milione di biciclette sono registrate. Nessun proprietario
+              ha pagato per essere presente.
+            benefit_alerts_body: Se viene rubato, segnalalo come rubato e noi avviseremo
+              i negozi partner, la polizia e i corrieri nelle vicinanze.
+            benefit_alerts_title: Avvisi di furto con un solo clic
+            benefit_app_body: Registra e gestisci tutte le tue biciclette tramite
+              l'app Bike Index per iOS e segnala un furto ovunque ti trovi.
+            benefit_app_title: Il tuo garage in tasca
+            benefit_found_body: Quando qualcuno trova la tua bicicletta e ne cerca
+              il numero di serie, lo mettiamo in contatto direttamente con te.
+            benefit_found_title: Trovato? Ve lo diciamo noi.
+            benefit_marketplace_body: Vendi la tua bici sul marketplace di Bike Index
+              senza commissioni. Ogni annuncio parte da una bici registrata e viene
+              verificato rispetto alle segnalazioni di furto, così gli acquirenti
+              hanno la certezza che sia un annuncio legittimo.
+            benefit_marketplace_title: Un mercato affidabile
+            benefit_network_body: Volontari, squadre di recupero locali e oltre 1.000
+              dipartimenti di polizia, università, città e negozi sorvegliano le biciclette
+              rubate e le segnalano.
+            benefit_network_title: Persone che lo cercano
+            benefit_private_body: Le tue informazioni di contatto rimarranno riservate.
+              Siamo un'organizzazione senza scopo di lucro, quindi non vendiamo dati
+              né pubblichiamo annunci pubblicitari.
+            benefit_private_title: Privato per impostazione predefinita
+            benefit_proof_body: Il numero di serie, le foto e la ricevuta sono conservati
+              in un unico archivio permanente. Utile per le denunce alla polizia e
+              le richieste di risarcimento assicurativo.
+            benefit_proof_title: Prova che è tuo
+            benefit_resell_body: Acquirenti, negozi e polizia verificano i numeri
+              di serie confrontandoli con l'indice. Una bicicletta rubata ma registrata
+              è una bicicletta che nessuno vuole comprare.
+            benefit_resell_title: Più difficile da rivendere
+            benefit_transfer_body: Trasferisci la registrazione al nuovo proprietario
+              in pochi clic, così la storia della moto lo seguirà ovunque.
+            benefit_transfer_title: Facile da vendere o cedere
+            bike_already_stolen: Bicicletta rubata? Scopri cosa fare ora
+            check_add_later: Potrai aggiungere foto e dettagli in seguito.
+            check_free_no_data_sharing: Gratis per sempre. Non vendiamo né condividiamo
+              i tuoi dati.
+            check_two_minutes: Ci vogliono circa due minuti
+            donations_keep_it_free: Bike Index è un'organizzazione senza scopo di
+              lucro. È grazie alle donazioni che rimane gratuita.
+            faq_free_answer: Sì. La registrazione, la segnalazione e la ricerca sono
+              gratuite per tutti, per sempre. Bike Index è un'organizzazione no-profit
+              501(c)(3).
+            faq_free_question: È davvero gratuito?
+            faq_privacy_answer: È possibile effettuare una ricerca sui dettagli pubblici
+              della bicicletta. Il tuo nome, indirizzo email e indirizzo di residenza
+              non saranno mai resi pubblici.
+            faq_privacy_question: Chi può visualizzare le mie informazioni?
+            faq_serial_answer: Registrati comunque e aggiungilo in seguito. Capovolgi
+              la bici e guarda sotto il movimento centrale, dove i pedali si uniscono
+              al telaio.
+            faq_serial_question: Non conosco il mio numero di serie.
+            free_nonprofit_worldwide: Gratuito · Senza scopo di lucro · In tutto il
+              mondo
+            fund_the_next_recovery: Finanziare la prossima ripresa
+            give_your_bike_a_way_home: Dai alla tua bicicletta un modo per tornare
+              a casa.
+            if_the_worst_happens: Se dovesse accadere il peggio
+            keep_it_free: Mantienilo libero
+            lede: Registrala ora e avrai la prova che è tua, un avviso di furto con
+              un solo clic e una rete di negozi, polizia e motociclisti che la terranno
+              d'occhio.
+            quick_answers: Risposte rapide
+            register_your_bike: Registra la tua bicicletta
+            sticker_flagged_body: Quando un negozio, un acquirente o un agente controlla
+              il numero di serie, risulta rubato e tu ricevi il messaggio.
+            sticker_flagged_sound: DING!
+            sticker_flagged_title: 3. Viene segnalato
+            sticker_register_body: Il numero di serie e i dettagli della tua bicicletta
+              vengono registrati prima che si verifichi qualsiasi problema. Questa
+              è la parte che la maggior parte delle persone salta.
+            sticker_register_sound: CLIC!
+            sticker_register_title: 1. Registrati oggi
+            sticker_stolen_body: Con un solo clic, l'oggetto viene inserito nella
+              lista dei rubati e i contatti nelle vicinanze vengono avvisati. Non
+              affrontare nessuno. Contatta la polizia.
+            sticker_stolen_sound: RUBATO!
+            sticker_stolen_title: 2. Segnalalo come rubato
+            what_registering_gets_you: Cosa si ottiene registrandosi
+            what_registering_subhead: La maggior parte delle biciclette rubate non
+              torna mai a casa perché nessuno può dimostrare a chi appartengono. La
+              registrazione risolve questo problema.
       bikebook:
         show:
           any_activity: Qualsiasi attività
