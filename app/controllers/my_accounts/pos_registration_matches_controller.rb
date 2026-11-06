@@ -19,6 +19,9 @@ module MyAccounts
 
       unless Binxtils::InputNormalizer.boolean(params[:same_bike])
         BikeServices::PosRegistrationMerger.decline(@pos_registration_match, user: current_user)
+        # Another request may have settled it first
+        return redirect_by_status unless @pos_registration_match.declined?
+
         flash[:success] = translation(:kept_separate)
         return redirect_to(my_account_path)
       end
@@ -26,9 +29,11 @@ module MyAccounts
       if BikeServices::PosRegistrationMerger.confirm(@pos_registration_match, user: current_user)
         flash[:success] = translation(:combined, bike_type: @pos_bike.type)
         redirect_to bike_path(@pos_bike)
-      else
+      elsif @pos_registration_match.confirmed?
         flash[:notice] = translation(:couldnt_combine)
         redirect_to my_account_path
+      else
+        redirect_by_status
       end
     end
 
@@ -43,7 +48,7 @@ module MyAccounts
 
     # The emailed link stays the same as the match changes
     def redirect_by_status
-      if @pos_registration_match.merged? && @pos_bike.present?
+      if @pos_registration_match.merged? && @pos_bike&.user_id == current_user.id
         flash[:notice] = translation(:already_combined)
         redirect_to bike_path(@pos_bike)
       else

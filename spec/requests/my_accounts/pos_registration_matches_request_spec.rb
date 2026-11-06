@@ -41,7 +41,7 @@ RSpec.describe MyAccounts::PosRegistrationMatchesController, type: :request do
     context "stolen since the match" do
       before { FactoryBot.create(:stolen_bike, serial_number: pos_registration_match.bike.serial_number) }
 
-      it "leaves it confirmed for an admin" do
+      it "leaves it confirmed and points to support" do
         patch url, params: {same_bike: "true"}
         expect(response).to redirect_to(my_account_path)
         expect(flash[:notice]).to include("couldn't combine")

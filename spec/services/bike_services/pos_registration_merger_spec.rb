@@ -29,7 +29,23 @@ RSpec.describe BikeServices::PosRegistrationMerger do
       expect(pos_bike.current_ownership.reload).to have_attributes(claimed: true, registration_info: {"phone" => "7183839292"})
       expect(match.reload.status).to eq "merged"
       expect(Bike.unscoped.find(bike.id).deleted_at).to be_present
-      expect(CallbackJobs::AfterBikeSaveJob.jobs.map { it["args"] }).to include([bike.id], [pos_bike.id, false, true])
+      expect(CallbackJobs::AfterBikeSaveJob.jobs.map { it["args"] }).to include([bike.id], [pos_bike.id])
+    end
+
+    it "keeps the shop's values over the owner's defaults, and the stricter organization permission" do
+      pos_bike.update!(propulsion_type: "pedal-assist")
+      expect(bike.reload.propulsion_type).to eq "foot-pedal"
+      organization = pos_bike.bike_organizations.first.organization
+      FactoryBot.create(:bike_organization, bike:, organization:, can_not_edit_claimed: true)
+      address_record = FactoryBot.create(:address_record, kind: :ownership)
+      bike.current_ownership.update!(address_record:)
+      strava_gear = FactoryBot.create(:strava_gear, item: bike)
+
+      expect(described_class.confirm(match, user:)).to be_truthy
+      expect(pos_bike.reload.propulsion_type).to eq "pedal-assist"
+      expect(pos_bike.bike_organizations.find_by(organization:).can_not_edit_claimed).to be_truthy
+      expect(pos_bike.current_ownership.address_record_id).to eq address_record.id
+      expect(strava_gear.reload.item_id).to eq pos_bike.id
     end
 
     it "records a theft since the match and leaves it confirmed" do
