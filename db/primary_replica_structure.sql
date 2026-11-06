@@ -3276,11 +3276,10 @@ ALTER SEQUENCE public.pghero_query_stats_id_seq OWNED BY public.pghero_query_sta
 
 CREATE TABLE public.pos_registration_matches (
     id bigint NOT NULL,
+    duplicate_bike_group_id bigint NOT NULL,
     bike_id bigint NOT NULL,
     pos_bike_id bigint NOT NULL,
-    user_id bigint NOT NULL,
     status integer DEFAULT 0 NOT NULL,
-    bucket integer DEFAULT 0 NOT NULL,
     review_reasons text[] DEFAULT '{}'::text[] NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
@@ -7532,17 +7531,17 @@ CREATE UNIQUE INDEX index_pos_registration_matches_on_bike_id_and_pos_bike_id ON
 
 
 --
+-- Name: index_pos_registration_matches_on_duplicate_bike_group_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_pos_registration_matches_on_duplicate_bike_group_id ON public.pos_registration_matches USING btree (duplicate_bike_group_id);
+
+
+--
 -- Name: index_pos_registration_matches_on_pos_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_pos_registration_matches_on_pos_bike_id ON public.pos_registration_matches USING btree (pos_bike_id);
-
-
---
--- Name: index_pos_registration_matches_on_user_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_pos_registration_matches_on_user_id ON public.pos_registration_matches USING btree (user_id);
 
 
 --

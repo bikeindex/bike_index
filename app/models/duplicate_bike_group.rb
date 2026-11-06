@@ -12,6 +12,7 @@
 class DuplicateBikeGroup < ApplicationRecord
   has_many :normalized_serial_segments
   has_many :bikes, through: :normalized_serial_segments
+  has_many :pos_registration_matches
 
   before_save :update_added_bike_at
 

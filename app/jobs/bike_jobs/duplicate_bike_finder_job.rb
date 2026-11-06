@@ -33,6 +33,8 @@ module BikeJobs
       end
 
       serial_segments.destroy_all if should_delete
+      # Only new registrations are matched, and this also runs when a bike is edited
+      BikeJobs::PosRegistrationMatchFinderJob.perform_async(bike_id) if !should_delete && bike.created_at > Time.current - 1.day
     end
 
     def remove_orphaned_duplicate(duplicate_bike_group, normalized_serial_segment)

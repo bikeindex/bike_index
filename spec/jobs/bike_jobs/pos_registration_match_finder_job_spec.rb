@@ -19,9 +19,18 @@ RSpec.describe BikeJobs::PosRegistrationMatchFinderJob, type: :job do
     FactoryBot.create(pos_bike_factory, owner_email: pos_owner_email, manufacturer:, serial_number:, created_at: pos_created_at)
   end
 
+  # Registration saves serial segments, and DuplicateBikeFinderJob groups them before it enqueues this job
+  def perform_for(new_bike)
+    Bike.unscoped.where(serial_normalized_no_space: new_bike.serial_normalized_no_space).find_each do
+      it.create_normalized_serial_segments
+      BikeJobs::DuplicateBikeFinderJob.new.perform(it.id)
+    end
+    instance.perform(new_bike.id)
+  end
+
   shared_examples "records a match" do
     it "records a match" do
-      instance.perform(bike.id)
+      perform_for(bike)
       expect(PosRegistrationMatch.pluck(:bike_id, :pos_bike_id)).to eq([[bike.id, pos_bike.id]])
     end
   end
@@ -29,33 +38,40 @@ RSpec.describe BikeJobs::PosRegistrationMatchFinderJob, type: :job do
   it "records a pending merge candidate once" do
     expect(pos_bike.current_ownership.user_id).to eq user.id
     expect {
-      instance.perform(bike.id)
-      instance.perform(bike.id)
+      perform_for(bike)
+      perform_for(bike)
     }.to change(PosRegistrationMatch, :count).by 1
-    expect(PosRegistrationMatch.last).to have_attributes(bike_id: bike.id, pos_bike_id: pos_bike.id, user_id: user.id,
+    duplicate_bike_group = bike.normalized_serial_segments.find_by(segment: bike.serial_normalized_no_space).duplicate_bike_group
+    expect(PosRegistrationMatch.last).to have_attributes(bike_id: bike.id, pos_bike_id: pos_bike.id, duplicate_bike_group:,
       status: "pending", bucket: "merge_candidate", review_reasons: [])
+    expect(duplicate_bike_group.pos_registration_matches.pluck(:id)).to eq([PosRegistrationMatch.last.id])
+  end
+
+  it "doesn't match before the serial is grouped" do
+    instance.perform(bike.id)
+    expect(PosRegistrationMatch.count).to eq 0
   end
 
   it "updates a pending match's reasons when it runs again" do
-    instance.perform(bike.id)
+    perform_for(bike)
     FactoryBot.create(:stolen_bike, serial_number:)
-    instance.perform(bike.id)
+    perform_for(bike)
     expect(PosRegistrationMatch.sole).to have_attributes(bucket: "review_candidate", review_reasons: ["stolen_history"])
   end
 
   # Written because an overlapping run that read the serial before a theft was reported cleared the veto
   it "keeps a recorded stolen veto when a run doesn't see the theft" do
-    instance.perform(bike.id)
+    perform_for(bike)
     PosRegistrationMatch.sole.update!(review_reasons: %w[stolen_history])
-    instance.perform(bike.id)
+    perform_for(bike)
     expect(PosRegistrationMatch.sole).to have_attributes(bucket: "review_candidate", review_reasons: ["stolen_history"])
   end
 
   it "leaves a match that's no longer pending alone" do
-    instance.perform(bike.id)
+    perform_for(bike)
     PosRegistrationMatch.sole.update!(status: :confirmed)
     FactoryBot.create(:stolen_bike, serial_number:)
-    instance.perform(bike.id)
+    perform_for(bike)
     expect(PosRegistrationMatch.sole).to have_attributes(bucket: "merge_candidate", review_reasons: [])
   end
 
@@ -65,17 +81,17 @@ RSpec.describe BikeJobs::PosRegistrationMatchFinderJob, type: :job do
     end
 
     it "makes both matches review candidates" do
-      instance.perform(bike.id)
-      instance.perform(bike2.id)
-      expect(PosRegistrationMatch.pluck(:bike_id, :bucket, :review_reasons))
+      perform_for(bike)
+      perform_for(bike2)
+      expect(PosRegistrationMatch.all.map { [it.bike_id, it.bucket, it.review_reasons] })
         .to match_array([bike, bike2].map { [it.id, "review_candidate", ["multiple_registrations"]] })
     end
 
     it "doesn't count a deleted registration" do
-      instance.perform(bike.id)
+      perform_for(bike)
       bike.update_column(:deleted_at, Time.current)
-      instance.perform(bike2.id)
-      expect(PosRegistrationMatch.pluck(:bike_id, :bucket, :review_reasons))
+      perform_for(bike2)
+      expect(PosRegistrationMatch.all.map { [it.bike_id, it.bucket, it.review_reasons] })
         .to match_array([bike, bike2].map { [it.id, "merge_candidate", []] })
     end
   end
@@ -89,14 +105,14 @@ RSpec.describe BikeJobs::PosRegistrationMatchFinderJob, type: :job do
 
   shared_examples "records no match" do
     it "doesn't record a match" do
-      instance.perform(bike.id)
+      perform_for(bike)
       expect(PosRegistrationMatch.count).to eq 0
     end
   end
 
   shared_examples "records a review candidate" do |review_reasons|
     it "records a review candidate with #{review_reasons.to_sentence}" do
-      instance.perform(bike.id)
+      perform_for(bike)
       expect(PosRegistrationMatch.sole).to have_attributes(pos_bike_id: pos_bike.id, bucket: "review_candidate", review_reasons:)
     end
   end
@@ -216,8 +232,8 @@ RSpec.describe BikeJobs::PosRegistrationMatchFinderJob, type: :job do
     let!(:pos_bike2) { FactoryBot.create(:bike_lightspeed_pos, owner_email: user.email, manufacturer:, serial_number:, created_at: pos_created_at) }
 
     it "records a review candidate for each" do
-      instance.perform(bike.id)
-      expect(PosRegistrationMatch.pluck(:pos_bike_id, :bucket, :review_reasons))
+      perform_for(bike)
+      expect(PosRegistrationMatch.all.map { [it.pos_bike_id, it.bucket, it.review_reasons] })
         .to match_array([pos_bike, pos_bike2].map { [it.id, "review_candidate", ["multiple_pos_bikes"]] })
     end
   end

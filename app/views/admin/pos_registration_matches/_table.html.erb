@@ -5,8 +5,8 @@
     <%= render UI::Time::Component.new(time: match.created_at) %>
   <% end %>
 
-  <% table.column(sortable: "bucket", label: "Bucket") do |match| %>
-    <%= render UI::Badge::Component.new(text: match.bucket.humanize, color: match.merge_candidate? ? :success : :warning, size: :sm) %>
+  <% table.column(label: "Bucket") do |match| %>
+    <%= render UI::Badge::Component.new(text: match.bucket.humanize, color: (match.bucket == "merge_candidate") ? :success : :warning, size: :sm) %>
   <% end %>
 
   <% table.column(label: "Review reasons") do |match| %>
@@ -23,8 +23,8 @@
     <%= render Atoms::Admin::TableCells::Bike::Component.new(bike: match.pos_bike, bike_id: match.pos_bike_id) %>
   <% end %>
 
-  <% table.column(sortable: "user_id", label: "Owner") do |match| %>
-    <%= render Atoms::Admin::TableCells::User::Component.new(user: match.user, user_id: match.user_id, sort_state:, render_search: true) %>
+  <% table.column(label: "Owner") do |match| %>
+    <%= render Atoms::Admin::TableCells::User::Component.new(user: match.bike&.user, user_id: match.bike&.user_id, sort_state:, render_search: true) %>
   <% end %>
 
   <% table.column(sortable: "status", label: "Status") do |match| %>

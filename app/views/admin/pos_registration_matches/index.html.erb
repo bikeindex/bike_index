@@ -1,5 +1,5 @@
 <% filters = {
-  search_bucket: [@searched_bucket, "All buckets", PosRegistrationMatch.buckets.keys.index_with(&:humanize)],
+  search_bucket: [@searched_bucket, "All buckets", PosRegistrationMatch::BUCKETS.index_with(&:humanize)],
   search_reason: [@searched_reason, "All review reasons", PosRegistrationMatch::REVIEW_REASONS],
   search_status: [@searched_status, "All statuses", PosRegistrationMatch.statuses.keys.index_with(&:humanize)]
 } %>

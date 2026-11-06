@@ -9,12 +9,14 @@ RSpec.describe Admin::PosRegistrationMatchesController, type: :request do
 
   describe "#index" do
     let(:pos_bike) { FactoryBot.create(:bike_lightspeed_pos) }
-    let!(:merge_candidate) { PosRegistrationMatch.create!(bike: FactoryBot.create(:bike), pos_bike:, user: current_user) }
+    let(:duplicate_bike_group) { DuplicateBikeGroup.create }
+    let(:owned_bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: current_user) }
+    let!(:merge_candidate) { PosRegistrationMatch.create!(duplicate_bike_group:, bike: owned_bike, pos_bike:) }
     let!(:review_candidate) do
-      PosRegistrationMatch.create!(bike: FactoryBot.create(:bike), pos_bike:, user: current_user, review_reasons: %w[stolen_history impounded])
+      PosRegistrationMatch.create!(duplicate_bike_group:, bike: FactoryBot.create(:bike), pos_bike:, review_reasons: %w[stolen_history impounded])
     end
 
-    it "lists matches and filters by bucket and reason" do
+    it "lists matches and filters by bucket, reason and owner" do
       expect(review_candidate.reload).to have_attributes(bucket: "review_candidate", review_reasons: %w[stolen_history impounded])
 
       get base_url
@@ -31,6 +33,9 @@ RSpec.describe Admin::PosRegistrationMatchesController, type: :request do
 
       get base_url, params: {search_reason: "not_a_reason"}
       expect(assigns(:collection).pluck(:id)).to match_array([merge_candidate.id, review_candidate.id])
+
+      get base_url, params: {user_id: current_user.id}
+      expect(assigns(:collection).pluck(:id)).to eq([merge_candidate.id])
     end
   end
 end

@@ -3,27 +3,26 @@
 # Table name: pos_registration_matches
 # Database name: primary
 #
-#  id             :bigint           not null, primary key
-#  bucket         :integer          default("merge_candidate"), not null
-#  review_reasons :text             default([]), not null, is an Array
-#  status         :integer          default("pending"), not null
-#  created_at     :datetime         not null
-#  updated_at     :datetime         not null
-#  bike_id        :bigint           not null
-#  pos_bike_id    :bigint           not null
-#  user_id        :bigint           not null
+#  id                      :bigint           not null, primary key
+#  review_reasons          :text             default([]), not null, is an Array
+#  status                  :integer          default("pending"), not null
+#  created_at              :datetime         not null
+#  updated_at              :datetime         not null
+#  bike_id                 :bigint           not null
+#  duplicate_bike_group_id :bigint           not null
+#  pos_bike_id             :bigint           not null
 #
 # Indexes
 #
 #  index_pos_registration_matches_on_bike_id_and_pos_bike_id  (bike_id,pos_bike_id) UNIQUE
+#  index_pos_registration_matches_on_duplicate_bike_group_id  (duplicate_bike_group_id)
 #  index_pos_registration_matches_on_pos_bike_id              (pos_bike_id)
-#  index_pos_registration_matches_on_user_id                  (user_id)
 #
-# A new self-registration whose serial and manufacturer match a bike a shop's POS
-# registered to the same owner, recorded by BikeJobs::PosRegistrationMatchFinderJob
+# A new self-registration of a bike a shop's POS registered to the same owner: a pair within the
+# whole-serial DuplicateBikeGroup, recorded by BikeJobs::PosRegistrationMatchFinderJob
 class PosRegistrationMatch < ApplicationRecord
   STATUS_ENUM = {pending: 0, confirmed: 1, declined: 2, merged: 3}.freeze
-  BUCKET_ENUM = {merge_candidate: 0, review_candidate: 1}.freeze
+  BUCKETS = %w[merge_candidate review_candidate].freeze
   REVIEW_REASONS = {
     "stolen_history" => "Stolen history on the serial",
     "multiple_pos_bikes" => "More than one POS registration matches",
@@ -34,21 +33,16 @@ class PosRegistrationMatch < ApplicationRecord
   }.freeze
 
   enum :status, STATUS_ENUM
-  enum :bucket, BUCKET_ENUM
 
+  belongs_to :duplicate_bike_group
   belongs_to :bike
   belongs_to :pos_bike, class_name: "Bike"
-  belongs_to :user
 
-  validates_presence_of :bike_id, :pos_bike_id, :user_id
+  validates_presence_of :duplicate_bike_group_id, :bike_id, :pos_bike_id
 
-  before_validation :set_bucket
-
+  scope :merge_candidate, -> { where(review_reasons: []) }
+  scope :review_candidate, -> { where.not(review_reasons: []) }
   scope :with_review_reason, ->(reason) { where("review_reasons @> ARRAY[?]::text[]", reason) }
 
-  private
-
-  def set_bucket
-    self.bucket = review_reasons.any? ? :review_candidate : :merge_candidate
-  end
+  def bucket = review_reasons.none? ? "merge_candidate" : "review_candidate"
 end
