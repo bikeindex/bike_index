@@ -3,7 +3,7 @@ name: use-existing-markup
 description: >-
   Convert a branch's hand-written markup to the components that already render it.
   Covers marketing and landing pages on `SharedBlocks::Marketing` and the donate form,
-  `UI::*` and `Atoms::*` everywhere else, icons the repo already has, buttons snapped to
+  `UI::*` and `Atoms::*` everywhere else, icons and images the repo already has, buttons snapped to
   existing colors, shadows, and hover states to report. Trigger when a branch adds or
   redesigns a page's markup, especially a marketing, landing, donate or "how it works"
   page or a design handoff built from a mockup. Also trigger on "use existing
@@ -86,6 +86,23 @@ ls app/assets/images/icons | grep -iE '<subject>|<synonym>'
 ```
 
 On the register landing page, `store.svg` was a second Lucide store icon beside main's `lucide-store.svg`. A trailing arrow is the text `<span aria-hidden="true">→</span>` (`frontend-conventions` has that rule), not an `arrow-right.svg`.
+
+## Images: use the original, never a copy
+
+Check **every PNG, JPG, WebP or GIF the branch adds, in any directory**, not just the icons. A design handoff's illustrations are already in the repo. The drawn originals are in `kelsey_redesign/`, and a served one is a byte-identical copy under its original name in `app/assets/images/kelsey/illustrations/`. A handoff's copy comes resized, re-encoded and renamed, so neither a hash nor the filename matches. Search on the subject words instead, across the whole repo:
+
+```bash
+git ls-files | grep -iE '<subject>|<synonym>' | grep -iE '\.(png|jpe?g|webp|gif|svg)$'
+```
+
+Then open both files and compare the drawings. For a match:
+
+- **Already served** (under `app/assets/images/`): reference that file.
+- **Only in `kelsey_redesign/`**: copy it unchanged into `app/assets/images/kelsey/illustrations/`, keeping its original name.
+
+Either way, delete the branch's copy. Never shrink or convert it to WebP to save bytes; pages already serve the originals.
+
+The register landing page had four copies in `register_landing/`, all resized WebPs. `bike-hero.webp` was `comic-assets_bike-hero.png` (already on five pages), and `bike-bell.webp` was `comic-assets_bike-bell.png`. `u-lock.webp` and `stolen-alert.webp` were `comic-assets_u-lock.png` and `comic-assets_presentation-stolenalert.png`, which were only in `kelsey_redesign/` until then. A check of `icons/` alone missed all four.
 
 ## Shadows
 

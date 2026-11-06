@@ -119,7 +119,7 @@ State the verdict in your reply to the user either way, naming the stored values
 rtk proxy git diff origin/main...HEAD --name-only --diff-filter=A -- app/assets/images
 ```
 
-Icons go through the markup audit below. Check each other image against `frontend-conventions`' image rules for an original elsewhere in the repo (a design handoff's comes resized and renamed). Replace a duplicate with what already exists and delete it.
+Icons and images both go through the markup audit below, which checks each one for a file the repo already has.
 
 ### The controller audit
 
