@@ -34,7 +34,7 @@ module BikeJobs
 
       serial_segments.destroy_all if should_delete
       # Only new registrations are matched, and this also runs when a bike is edited
-      if !should_delete && bike.created_at > Time.current - 1.day && serial_segments.duplicate_bike_group.exists?
+      if bike.created_at > Time.current - 1.day && serial_segments.duplicate_bike_group.exists?
         BikeJobs::PosRegistrationMatchFinderJob.perform_async(bike_id)
       end
     end

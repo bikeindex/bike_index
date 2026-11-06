@@ -47,12 +47,13 @@ RSpec.describe BikeJobs::PosRegistrationMatchFinderJob, type: :job do
     expect(duplicate_bike_group.pos_registration_matches.pluck(:id)).to eq([PosRegistrationMatch.last.id])
   end
 
-  it "keeps the match when the group is removed, and takes the rebuilt group on a rerun" do
+  it "keeps the match when deleting the registration removes the group, and takes a rebuilt group on a rerun" do
     perform_for(bike)
     match = PosRegistrationMatch.sole
-    match.duplicate_bike_group.destroy
+    bike.update_column(:deleted_at, Time.current)
+    BikeJobs::DuplicateBikeFinderJob.new.perform(bike.id)
     expect(match.reload.duplicate_bike_group_id).to be_nil
-    NormalizedSerialSegment.update_all(duplicate_bike_group_id: nil)
+    bike.update_column(:deleted_at, nil)
     perform_for(bike)
     expect(match.reload.duplicate_bike_group).to be_present
   end
