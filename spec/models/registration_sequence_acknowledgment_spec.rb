@@ -124,4 +124,19 @@ RSpec.describe RegistrationSequenceAcknowledgment, type: :model do
       expect(described_class.for_organization(organization).pluck(:id)).to eq([acknowledgment.id])
     end
   end
+
+  describe "an organization reading what its bike agreed to" do
+    let(:bike) { FactoryBot.create(:bike) }
+    let(:template) { FactoryBot.create(:registration_sequence_template_active) }
+    let!(:bike_organization) { FactoryBot.create(:bike_organization, bike:, organization:) }
+    let!(:acknowledgment) { FactoryBot.create(:registration_sequence_acknowledgment, bike:, registration_sequence: template) }
+
+    it "finds one made against the template, not another organization's" do
+      expect(described_class.find_for(bike:, organization:)).to eq acknowledgment
+      expect(described_class.for_organization(organization).count).to eq 0
+
+      acknowledgment.update(registration_sequence: FactoryBot.create(:registration_sequence_active))
+      expect(described_class.find_for(bike:, organization:)).to be_nil
+    end
+  end
 end

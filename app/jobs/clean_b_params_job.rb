@@ -10,6 +10,7 @@ class CleanBParamsJob < ScheduledJob
   end
 
   def perform
+    RegistrationSequenceAcknowledgment.abandon_expired_template_pending
     b_params.delete_all
   end
 

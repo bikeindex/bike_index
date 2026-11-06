@@ -36,12 +36,16 @@ module Emails
         confirm_register_url(b_param_token: @b_param.id_token, confirmation_token: token)
       end
 
-      # defined?, since false is the common answer - each ask is a query
-      def rules_owed?
-        return @rules_owed if defined?(@rules_owed)
+      # defined?, since nil is the common answer
+      def pending_acknowledgment
+        return @pending_acknowledgment if defined?(@pending_acknowledgment)
 
-        @rules_owed = @b_param.acknowledgment_pending?
+        @pending_acknowledgment = @b_param.pending_acknowledgment
       end
+
+      def rules_owed? = pending_acknowledgment.present?
+
+      def rules_organization = pending_acknowledgment.registration_sequence.organization
 
       def organization_snippet_body
         organization&.mail_snippet_body("partial_registration", time: snippet_time)

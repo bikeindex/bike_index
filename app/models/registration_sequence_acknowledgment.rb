@@ -1,4 +1,4 @@
-# The record that a registrant agreed to an organization's e-vehicle safety rules.
+# The record that a registrant agreed to e-vehicle safety rules.
 # Outlives the registration it came from - the b_param is swept once its bike exists.
 # Pending (no acknowledged_at) from when the bike is created until they're agreed to, which
 # holds the bike's finished registration email back.
@@ -28,6 +28,10 @@
 #  index_registration_sequence_acknowledgments_pending          (b_param_id) WHERE (acknowledged_at IS NULL)
 #
 class RegistrationSequenceAcknowledgment < ApplicationRecord
+  # The template's rules are Bike Index's advice rather than an organization's requirement, so
+  # not agreeing to them only holds the registration's email this long
+  TEMPLATE_PENDING_EXPIRATION = 1.week
+
   # with_deleted: the sequence is soft-deleted with its organization, and this record
   # reads what was agreed to straight off it
   belongs_to :registration_sequence, -> { with_deleted }
@@ -43,6 +47,10 @@ class RegistrationSequenceAcknowledgment < ApplicationRecord
   scope :acknowledged, -> { where.not(acknowledged_at: nil) }
   scope :for_organization, ->(organization) {
     joins(:registration_sequence).where(registration_sequences: {organization_id: organization})
+  }
+  # What an organization's bike agreed to: its rules, or the template's where they stood in
+  scope :for_organization_or_template, ->(organization) {
+    joins(:registration_sequence).where(registration_sequences: {organization_id: [organization.id, nil]})
   }
 
   class << self
@@ -68,10 +76,14 @@ class RegistrationSequenceAcknowledgment < ApplicationRecord
       pending.for_organization(organization_id).each(&:abandon!)
     end
 
-    def find_for(bike:, organization:) = acknowledged.for_organization(organization).where(bike_id: bike.id).last
+    def abandon_expired_template_pending
+      pending.for_organization(nil).where(created_at: ...TEMPLATE_PENDING_EXPIRATION.ago).find_each(&:abandon!)
+    end
+
+    def find_for(bike:, organization:) = acknowledged.for_organization_or_template(organization).where(bike_id: bike.id).last
 
     def bikes_order(organization:, direction:)
-      acknowledged_at = for_organization(organization)
+      acknowledged_at = for_organization_or_template(organization)
         .where("registration_sequence_acknowledgments.bike_id = bikes.id")
         .select("MAX(registration_sequence_acknowledgments.acknowledged_at)")
       Arel.sql("(#{acknowledged_at.to_sql}) #{(direction == "asc") ? "ASC" : "DESC"}")

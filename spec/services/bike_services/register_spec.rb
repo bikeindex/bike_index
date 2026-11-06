@@ -728,6 +728,132 @@ RSpec.describe BikeServices::Register do
         end
       end
 
+      context "with the template" do
+        let!(:template) { FactoryBot.create(:registration_sequence_template_active, :with_pages) }
+
+        it "is the organization's own sequence over the template" do
+          expect(described_class.registration_sequence(b_param)).to eq sequence
+        end
+
+        context "without an organization" do
+          let(:bike_params) { super().except(:creation_organization_id) }
+
+          it "is the template, except for the legacy forms" do
+            expect(described_class.registration_sequence(b_param)).to eq template
+            expect(described_class.registration_sequence(b_param, template: false)).to be_nil
+          end
+        end
+
+        context "the organization's sequence is still a draft" do
+          let!(:sequence) { FactoryBot.create(:registration_sequence, :with_pages, organization:) }
+
+          it "is the template, except for the legacy forms" do
+            expect(described_class.registration_sequence(b_param)).to eq template
+            expect(described_class.registration_sequence(b_param, template: false)).to be_nil
+          end
+
+          it "stays on the template once started, until resumed on the organization's own" do
+            described_class.acknowledge_page(b_param, template.registration_sequence_pages.first, checked: %w[1 1])
+            sequence.make_active!
+
+            expect(described_class.registration_sequence(b_param)).to eq template
+            expect(described_class.resume_registration_sequence(b_param, sequence: template)).to eq([template, false])
+            template.update(end_at: Time.current)
+            expect(described_class.resume_registration_sequence(b_param, sequence: template.reload)).to eq([sequence, true])
+          end
+
+          it "leaves the legacy forms on the organization's own, even started on the template" do
+            described_class.acknowledge_page(b_param, template.registration_sequence_pages.first, checked: %w[1 1])
+            expect(described_class.registration_sequence(b_param, template: false)).to be_nil
+            sequence.make_active!
+            expect(described_class.registration_sequence(b_param, template: false)).to eq sequence
+          end
+        end
+
+        context "the organization has no live sequence" do
+          let!(:sequence) { nil }
+          let(:pages) { [] }
+          let(:member) { FactoryBot.create(:user_confirmed, email: "member@example.com") }
+
+          it "is the template for a registrant's own, and anonymously" do
+            expect(described_class.registration_sequence(b_param)).to eq template
+            b_param.update(creator_id: FactoryBot.create(:user_confirmed, email: b_param.owner_email).id)
+            expect(described_class.registration_sequence(b_param.reload)).to eq template
+          end
+
+          it "is nil for a member registering someone else's, even for the owner they've emailed" do
+            b_param.update(creator_id: member.id)
+            expect(b_param.self_made?(member)).to be_falsey
+            expect(described_class.registration_sequence(b_param.reload)).to be_nil
+            owner = FactoryBot.create(:user_confirmed, email: b_param.owner_email)
+            expect(described_class.registration_sequence(b_param, user: owner)).to be_nil
+          end
+
+          it "is nil for a theft or a find, even with the pages started" do
+            described_class.acknowledge_page(b_param, template.registration_sequence_pages.first, checked: %w[1 1])
+            %w[status_stolen status_impounded].each do |status|
+              b_param.params = b_param.params.deep_merge("bike" => {"status" => status})
+              expect(described_class.registration_sequence(b_param)).to be_nil
+            end
+          end
+
+          it "doesn't walk the template's organization-specific pages" do
+            template.registration_sequence_pages.first.update_column(:organization_specific, true)
+            expect(template.reload.registration_sequence_pages.count).to eq 2
+            expect(described_class.sequence_pages(template).map(&:id)).to eq([template.registration_sequence_pages.last.id])
+          end
+
+          describe "motorized_review" do
+            let(:single_page) { described_class.flow(b_param, sequence: nil, single_page: true) }
+
+            it "depends on the email typed, since the template is only for the registrant's own" do
+              expect(described_class.motorized_review(b_param, single_page, separate_attestation: false)).to eq :own_emails
+              template.update(end_at: Time.current)
+              expect(described_class.motorized_review(b_param, single_page, separate_attestation: false)).to be false
+            end
+          end
+        end
+
+        context "started on the template, then naming an organization with its own" do
+          let(:bike_params) { super().except(:creation_organization_id) }
+          let!(:acknowledgment) do
+            described_class.acknowledge_page(b_param, template.registration_sequence_pages.first, checked: %w[1 1])
+            described_class.save_acknowledgment(b_param, template, acknowledged_all: "1")
+            RegistrationSequenceAcknowledgment.find_by(b_param_id: b_param.id)
+          end
+
+          it "owes the organization's rules, with the template's agreement gone" do
+            expect(described_class.registration_sequence(b_param)).to eq template
+            expect(described_class.acknowledged?(b_param, sequence: template)).to be_truthy
+
+            described_class.assign_organization(b_param, organization)
+            b_param.reload
+            expect(b_param.creation_organization_id).to eq organization.id
+            expect(b_param.params["registration_sequence"]).to be_nil
+            expect(described_class.registration_sequence(b_param)).to eq sequence
+            expect(described_class.acknowledged?(b_param, sequence:)).to be_falsey
+            expect(RegistrationSequenceAcknowledgment.count).to eq 0
+          end
+        end
+
+        context "started under an automatic organization, then dropping it at step 2" do
+          let(:user) { FactoryBot.create(:user_confirmed, email: b_param.owner_email) }
+          let(:bike_params) { super().except(:creation_organization_id).merge(creation_organization_id: organization.id) }
+
+          it "restarts the rules on the template" do
+            b_param.update(creator_id: user.id, params: b_param.params.merge("auto_organization_id" => organization.id))
+            described_class.acknowledge_page(b_param, pages.first, checked: %w[1 1])
+            expect(described_class.registration_sequence(b_param.reload, user:)).to eq sequence
+
+            described_class.save_step_2(b_param, user:, image: nil, image_signed_id: nil, bike_params: {"user_name" => "Owner"}.with_indifferent_access,
+              register_with_organization: "false")
+            expect(b_param.reload.creation_organization_id).to be_blank
+            expect(b_param.params["registration_sequence"]).to be_nil
+            expect(described_class.registration_sequence(b_param, user:)).to eq template
+          end
+        end
+      end
+
       context "separate_attestation" do
         let(:member) { FactoryBot.create(:user_confirmed, email: "member@example.com") }
         let(:registrant) { FactoryBot.create(:user_confirmed, email: "owner@example.com") }

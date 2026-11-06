@@ -301,10 +301,14 @@ class BParam < ApplicationRecord
     created_bike_id.present?
   end
 
-  # The bike is created ahead of its organization's safety rules, which are still required -
+  # The bike is created ahead of the safety rules, which are still required -
   # so the registration isn't finished until they're agreed to
   def acknowledgment_pending?
     persisted? && RegistrationSequenceAcknowledgment.pending.exists?(b_param_id: id)
+  end
+
+  def pending_acknowledgment
+    RegistrationSequenceAcknowledgment.pending.find_by(b_param_id: id) if persisted?
   end
 
   def finished_registration? = with_bike? && !acknowledgment_pending?

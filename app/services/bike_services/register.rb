@@ -99,6 +99,7 @@ module BikeServices
         organization.id == b_param.auto_organization_id
       return if b_param.creation_organization_id.to_s == organization.id.to_s
 
+      restart_rules(b_param)
       b_param.params = b_param.params.except("auto_organization_id")
       b_param.clean_params({bike: {creation_organization_id: organization.id}}.as_json)
       b_param.save
@@ -117,20 +118,24 @@ module BikeServices
     end
 
     # The safety rules a registration acknowledges, only for an e-vehicle - the organization's
-    # active sequence, or the one its pages are being agreed to from, even once replaced.
+    # active sequence or else the template, or the one its pages are being agreed to from, even
+    # once replaced.
+    # template: false is the legacy forms, which pass on only an organization's own rules.
     # motorized: the single page asks what an e-vehicle would get, before it's said it's one.
     # Checked first - it's in memory, and creation_organization is a query
-    def registration_sequence(b_param, separate_attestation: false, user: nil, motorized: b_param.motorized?)
+    def registration_sequence(b_param, separate_attestation: false, user: nil, motorized: b_param.motorized?, template: true)
       return nil unless motorized
       # Left to the owner, so this flow has none - create_bike holds the bike for them to agree
       return nil if separate_attestation && !b_param.self_made?(user)
 
       organization = b_param.creation_organization
-      return nil if organization.blank?
-
       started_id = b_param.params.dig("registration_sequence", "id")
-      (RegistrationSequence.find_by(id: started_id, organization:) if started_id.present?) ||
-        RegistrationSequence.active_for(organization)
+      sequence = (RegistrationSequence.find_by(id: started_id, organization_id: [organization&.id, nil]) if started_id.present?) ||
+        RegistrationSequence.active_or_template_for(organization)
+      return sequence unless sequence&.template?
+      return sequence if template && template_applies?(b_param, user)
+
+      RegistrationSequence.active_for(organization) if organization.present?
     end
 
     # registration_sequence for a link back into the flow, and whether the rules restarted:
@@ -162,10 +167,12 @@ module BikeServices
 
     def step_for_page_index(index) = (index + ACKNOWLEDGMENT_OFFSET).to_s
 
-    # to_a: callers ask for count/any?/[] repeatedly, and a CollectionProxy re-queries
+    # What a registrant walks. A template's organization-specific pages are for the organizations
+    # cloning it. to_a: callers ask for count/any?/[] repeatedly, and a CollectionProxy re-queries
     # for each of them
     def sequence_pages(sequence)
-      sequence&.registration_sequence_pages&.to_a || []
+      pages = sequence&.registration_sequence_pages&.to_a || []
+      sequence&.template? ? pages.reject(&:organization_specific) : pages
     end
 
     # Placing the report asks whether there's a creator yet, which is a query, so this is
@@ -177,11 +184,13 @@ module BikeServices
 
     # The single page's electric checkbox is on the same form as its submit button, so the
     # button is told what it'd lead to for an e-vehicle. Separate attestation leaves the rules
-    # to an owner who isn't the registrant, which the email typed above it decides - :own_emails
+    # to an owner who isn't the registrant, which the email typed above it decides - :own_emails.
+    # The template is only ever for the registrant's own, so it's decided the same way
     def motorized_review(b_param, flow, separate_attestation:)
-      return false unless flow.single_page? && registration_sequence(b_param, motorized: true).present?
+      return false unless flow.single_page?
+      return (separate_attestation ? :own_emails : true) if registration_sequence(b_param, motorized: true, template: false).present?
 
-      separate_attestation ? :own_emails : true
+      RegistrationSequence.active_template.present? ? :own_emails : false
     end
 
     # Whether the flow includes the report step - what was stolen, or what was found
@@ -382,6 +391,19 @@ module BikeServices
     # private below here
     #
 
+    # A rider registering their own vehicle - not a member registering a customer's, and not a
+    # theft or found report. Anonymous counts as the owner, whose email gets confirmed
+    def template_applies?(b_param, user)
+      registrant = b_param.creator || user
+      !report_step?(b_param.status) && (registrant.blank? || b_param.self_made?(registrant))
+    end
+
+    # An agreement to one organization's rules says nothing about another's
+    def restart_rules(b_param)
+      b_param.params = b_param.params.except("registration_sequence")
+      RegistrationSequenceAcknowledgment.where(b_param_id: b_param.id).destroy_all
+    end
+
     # Whether a bike registered some other way is this registration's. Step 1 says only
     # what it is, so any bike of that make and type is; whatever came after has to match too
     def matches_bike?(b_param, bike)
@@ -423,11 +445,13 @@ module BikeServices
     def set_auto_organization(b_param, register_with_organization)
       return if b_param.auto_organization_id.blank?
 
+      organization_id = b_param.creation_organization_id
       if Binxtils::InputNormalizer.boolean(register_with_organization)
         b_param.creation_organization_id = b_param.auto_organization_id
       else
         b_param.params = b_param.params.merge("bike" => b_param.bike.except("creation_organization_id"))
       end
+      restart_rules(b_param) if b_param.creation_organization_id.to_s != organization_id.to_s
     end
 
     # Ownership requires a creator, and signing in can happen anywhere in the flow -
@@ -456,7 +480,7 @@ module BikeServices
     # The switches ride to the ownership's registration_info, so registrations can be counted by them
     def create_bike(b_param, sequence:, ip_address:, rules_to_owner: false)
       b_param.creator_id ||= confirmed_email_creator_id(b_param)
-      owners_sequence = registration_sequence(b_param) if sequence.blank? &&
+      owners_sequence = registration_sequence(b_param, template: !rules_to_owner) if sequence.blank? &&
         (rules_to_owner || b_param.rules_left_to_owner?(b_param.creator))
       b_param.params = b_param.params.deep_merge("bike" => {
         "register_single_page" => b_param.params["register_single_page"],
@@ -647,7 +671,7 @@ module BikeServices
       additional.present? ? bike_params.to_h.merge("likely_spam" => true) : bike_params.to_h
     end
 
-    conceal :matches_bike?, :auto_organization, :assign_auto_organization, :set_auto_organization,
+    conceal :template_applies?, :restart_rules, :matches_bike?, :auto_organization, :assign_auto_organization, :set_auto_organization,
       :claim_creator, :acknowledgment_owed?, :create_bike_if_ready, :create_bike, :send_rules_email, :email_confirmation_link,
       :report_completed?, :clear_stale_report, :report_errors, :stolen_report_attrs,
       :impound_report_attrs, :resumable_by?, :reusable?, :destroy_discardable, :report_placement, :permitted_steps, :step_completed?,
