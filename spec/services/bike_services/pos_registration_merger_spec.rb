@@ -32,8 +32,9 @@ RSpec.describe BikeServices::PosRegistrationMerger do
       expect(CallbackJobs::AfterBikeSaveJob.jobs.map { it["args"] }).to include([bike.id], [pos_bike.id])
     end
 
-    it "keeps the shop's values over the owner's defaults, and the stricter organization permission" do
-      pos_bike.update!(propulsion_type: "pedal-assist")
+    it "keeps the shop's values over the owner's defaults and blanks, and the stricter organization permission" do
+      pos_bike.update!(propulsion_type: "pedal-assist", description: "Shop notes", frame_size: "56cm")
+      bike.update_columns(description: "", frame_size: "m", frame_size_number: nil, frame_size_unit: "ordinal")
       expect(bike.reload.propulsion_type).to eq "foot-pedal"
       organization = pos_bike.bike_organizations.first.organization
       FactoryBot.create(:bike_organization, bike:, organization:, can_not_edit_claimed: true)
@@ -42,7 +43,9 @@ RSpec.describe BikeServices::PosRegistrationMerger do
       strava_gear = FactoryBot.create(:strava_gear, item: bike)
 
       expect(described_class.confirm(match, user:)).to be_truthy
-      expect(pos_bike.reload.propulsion_type).to eq "pedal-assist"
+      # The owner's frame size replaces the shop's whole, not just its unit
+      expect(pos_bike.reload).to have_attributes(propulsion_type: "pedal-assist", description: "Shop notes", frame_size: "m",
+        frame_size_number: nil, frame_size_unit: "ordinal")
       expect(pos_bike.bike_organizations.find_by(organization:).can_not_edit_claimed).to be_truthy
       expect(pos_bike.current_ownership.address_record_id).to eq address_record.id
       expect(strava_gear.reload.item_id).to eq pos_bike.id
