@@ -1,0 +1,22 @@
+---
+en:
+  components:
+    pages:
+      my_account:
+        pos_registration_matches:
+          show:
+            combining_keeps: >-
+              Combining them keeps the shop's registration of your %{bike_type}, with
+              your photos and the details you entered. Your separate registration
+              is removed.
+            is_this_the_same: Is this the same %{bike_type}?
+            no_theyre_different: No, they're different
+            pos_registered_it: >-
+              The shop you bought your %{bike_type} from had already registered it
+              to you with the same serial.
+            registered_when_you_bought_it: Registered when you bought it
+            shop_registered_it: >-
+              %{shop_name} had already registered a %{bike_type} to you with the same
+              serial when you bought it.
+            yes_combine_them: Yes, combine them
+            your_registration: Your registration

@@ -58,6 +58,14 @@ RSpec.describe BikeJobs::PosRegistrationMatchFinderJob, type: :job do
     expect(match.reload.duplicate_bike_group).to be_present
   end
 
+  it "enqueues the owner's email until it's been sent" do
+    perform_for(bike)
+    expect(EmailJobs::PosRegistrationMatchJob.jobs.map { it["args"] }).to eq([[PosRegistrationMatch.sole.id]])
+    Notification.create!(kind: "pos_registration_match", notifiable: PosRegistrationMatch.sole, user:)
+    perform_for(bike)
+    expect(EmailJobs::PosRegistrationMatchJob.jobs.size).to eq 1
+  end
+
   it "doesn't match before the serial is grouped" do
     instance.perform(bike.id)
     expect(PosRegistrationMatch.count).to eq 0
@@ -132,6 +140,11 @@ RSpec.describe BikeJobs::PosRegistrationMatchFinderJob, type: :job do
     before { FactoryBot.create(:stolen_bike, serial_number:) }
 
     include_examples "records a review candidate", ["stolen_history"]
+
+    it "doesn't email" do
+      perform_for(bike)
+      expect(EmailJobs::PosRegistrationMatchJob.jobs.size).to eq 0
+    end
   end
 
   context "registered from a sticker" do
@@ -287,7 +300,7 @@ RSpec.describe BikeJobs::PosRegistrationMatchFinderJob, type: :job do
   context "pos bike version with a marketplace listing" do
     before { FactoryBot.create(:marketplace_listing, item: FactoryBot.create(:bike_version, bike: pos_bike)) }
 
-    include_examples "records a review candidate", ["marketplace_listing"]
+    include_examples "records a review candidate", ["marketplace_listing", "bike_versions"]
   end
 
   context "deleted pos bike version with a marketplace listing" do
@@ -297,6 +310,6 @@ RSpec.describe BikeJobs::PosRegistrationMatchFinderJob, type: :job do
       bike_version.update_column(:deleted_at, Time.current)
     end
 
-    include_examples "records a review candidate", ["marketplace_listing"]
+    include_examples "records a review candidate", ["marketplace_listing", "bike_versions"]
   end
 end

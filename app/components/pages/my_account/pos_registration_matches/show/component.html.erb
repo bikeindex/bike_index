@@ -1,0 +1,36 @@
+<div class="twgutter tw:py-8 tw:lg:py-12">
+  <%= render(UI::Container::Component.new) do %>
+    <%= render(UI::Header::Component.new(text: translation(".is_this_the_same", bike_type:))) %>
+
+    <p>
+      <% if shop_name.present? %>
+        <%= translation(".shop_registered_it", shop_name:, bike_type:) %>
+      <% else %>
+        <%= translation(".pos_registered_it", bike_type:) %>
+      <% end %>
+    </p>
+
+    <div class="twwiderow tw:my-6">
+      <% [[translation(".registered_when_you_bought_it"), @pos_bike], [translation(".your_registration"), @bike]].each do |heading, registration| %>
+        <div>
+          <h3 class="tw:mb-2 tw:font-bold"><%= heading %></h3>
+
+          <ul class="tw:m-0 tw:list-none tw:p-0">
+            <%= render(SharedBlocks::SearchResults::BikeCard::Component.new(bike: registration)) %>
+          </ul>
+        </div>
+      <% end %>
+    </div>
+
+    <p><%= translation(".combining_keeps", bike_type:) %></p>
+
+    <%= form_with(url: my_account_pos_registration_match_path(@pos_registration_match), method: :patch,
+      class: "tw:mt-4 tw:flex tw:flex-wrap tw:gap-3") do %>
+      <%= render(UI::Button::Component.new(text: translation(".yes_combine_them"), color: :primary, type: "submit",
+        name: "same_bike", value: "true")) %>
+
+      <%= render(UI::Button::Component.new(text: translation(".no_theyre_different"), type: "submit",
+        name: "same_bike", value: "false")) %>
+    <% end %>
+  <% end %>
+</div>

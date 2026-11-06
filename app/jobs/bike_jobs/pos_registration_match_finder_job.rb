@@ -8,7 +8,7 @@ module BikeJobs
 
     def perform(bike_id)
       bike = Bike.unscoped.find_by_id(bike_id)
-      return unless live?(bike) && matchable_bike?(bike) && self_registration?(bike)
+      return unless PosRegistrationMatch.live_bike?(bike) && matchable_bike?(bike) && self_registration?(bike)
 
       pos_bikes = earlier_pos_bikes(bike)
       return if pos_bikes.none?
@@ -16,26 +16,25 @@ module BikeJobs
       duplicate_bike_group_id = bike.normalized_serial_segments.where(segment: bike.serial_normalized_no_space).pick(:duplicate_bike_group_id)
       return if duplicate_bike_group_id.blank?
 
-      shared_reasons = serial_review_reasons(bike.serial_normalized_no_space)
-      shared_reasons << "multiple_pos_bikes" if pos_bikes.many?
       pos_bikes.each do |pos_bike|
-        reasons = shared_reasons + entanglements([bike.id, pos_bike.id])
+        reasons = PosRegistrationMatch.review_reasons_for(bike, pos_bike) + (pos_bikes.many? ? ["multiple_pos_bikes"] : [])
         # Locks the POS bike, so concurrent registrations of it each see the other's match
-        pos_bike.with_lock do
+        match = pos_bike.with_lock do
           other_matches = PosRegistrationMatch.where(pos_bike_id: pos_bike.id).where.not(bike_id: bike.id)
-            .select { live?(Bike.unscoped.find_by(id: it.bike_id)) }
+            .select { PosRegistrationMatch.live_bike?(Bike.unscoped.find_by(id: it.bike_id)) }
           reasons += ["multiple_registrations"] if other_matches.any?
-          record_match(bike, pos_bike, duplicate_bike_group_id, reasons)
           other_matches.select(&:pending?).each { add_reasons(it, ["multiple_registrations"]) }
+          record_match(bike, pos_bike, duplicate_bike_group_id, reasons)
+        end
+        # After the lock's transaction commits, so the email job finds the match. Until it's sent, so a failed
+        # enqueue is retried while the new registration is still being matched
+        if match.pending? && match.merge_candidate? && !Notification.pos_registration_match.exists?(notifiable: match)
+          EmailJobs::PosRegistrationMatchJob.perform_async(match.id)
         end
       end
     end
 
     private
-
-    def live?(bike)
-      bike.present? && bike.deleted_at.blank? && !bike.example && !bike.likely_spam
-    end
 
     def matchable_bike?(bike)
       bike.manufacturer.present? && !bike.manufacturer.other? &&
@@ -57,33 +56,18 @@ module BikeJobs
         .select { bike.creation_organization_id.in?([nil, it.creation_organization_id]) }
     end
 
-    def serial_review_reasons(serial)
-      not_a_serial = BikeDuplicatesServices::Cues.not_a_serial(serial,
-        manufacturer_names: BikeDuplicatesServices::Cues.fetch_manufacturer_name_serials)
-      [("stolen_history" if BikeDuplicatesServices::Finder.stolen_serials?([serial])),
-        ("not_a_serial" if not_a_serial)].compact
-    end
-
-    def entanglements(bike_ids)
-      listings = MarketplaceListing.where(item_type: "Bike", item_id: bike_ids)
-        .or(MarketplaceListing.where(item_type: "BikeVersion", item_id: BikeVersion.unscoped.where(bike_id: bike_ids).select(:id)))
-      [("impounded" if ImpoundRecord.where(bike_id: bike_ids).exists?),
-        ("marketplace_listing" if listings.exists?)].compact
-    end
-
     def record_match(bike, pos_bike, duplicate_bike_group_id, reasons)
       match = PosRegistrationMatch.create_or_find_by!(bike_id: bike.id, pos_bike_id: pos_bike.id) do
         it.duplicate_bike_group_id = duplicate_bike_group_id
-        it.review_reasons = ordered(reasons)
+        it.review_reasons = PosRegistrationMatch.ordered_reasons(reasons)
       end
-      # A rerun only adds reasons, so it can't clear an earlier stolen veto; the group may have been replaced since
+      # The group may have been replaced since
       add_reasons(match, reasons, duplicate_bike_group_id:) unless match.previously_new_record?
+      match
     end
 
     def add_reasons(match, reasons, **attributes)
-      match.update!(review_reasons: ordered(match.review_reasons + reasons), **attributes) if match.pending?
+      match.add_review_reasons!(reasons, **attributes) if match.pending?
     end
-
-    def ordered(reasons) = PosRegistrationMatch::REVIEW_REASONS.keys & reasons
   end
 end
