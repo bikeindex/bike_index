@@ -19,12 +19,12 @@ RSpec.describe BikeJobs::PosRegistrationMatchFinderJob, type: :job do
     FactoryBot.create(pos_bike_factory, owner_email: pos_owner_email, manufacturer:, serial_number:, created_at: pos_created_at)
   end
 
-  # Registration saves serial segments, and DuplicateBikeFinderJob groups them before it enqueues this job
+  # Registration saves serial segments, and the new bike's DuplicateBikeFinderJob groups them before it enqueues this job
   def perform_for(new_bike)
     Bike.unscoped.where(serial_normalized_no_space: new_bike.serial_normalized_no_space).find_each do
-      it.create_normalized_serial_segments
-      BikeJobs::DuplicateBikeFinderJob.new.perform(it.id)
+      it.create_normalized_serial_segments if it.normalized_serial_segments.none?
     end
+    BikeJobs::DuplicateBikeFinderJob.new.perform(new_bike.id)
     instance.perform(new_bike.id)
   end
 
@@ -45,6 +45,16 @@ RSpec.describe BikeJobs::PosRegistrationMatchFinderJob, type: :job do
     expect(PosRegistrationMatch.last).to have_attributes(bike_id: bike.id, pos_bike_id: pos_bike.id, duplicate_bike_group:,
       status: "pending", bucket: "merge_candidate", review_reasons: [])
     expect(duplicate_bike_group.pos_registration_matches.pluck(:id)).to eq([PosRegistrationMatch.last.id])
+  end
+
+  it "keeps the match when the group is removed, and takes the rebuilt group on a rerun" do
+    perform_for(bike)
+    match = PosRegistrationMatch.sole
+    match.duplicate_bike_group.destroy
+    expect(match.reload.duplicate_bike_group_id).to be_nil
+    NormalizedSerialSegment.update_all(duplicate_bike_group_id: nil)
+    perform_for(bike)
+    expect(match.reload.duplicate_bike_group).to be_present
   end
 
   it "doesn't match before the serial is grouped" do

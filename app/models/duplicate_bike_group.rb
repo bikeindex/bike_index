@@ -12,7 +12,8 @@
 class DuplicateBikeGroup < ApplicationRecord
   has_many :normalized_serial_segments
   has_many :bikes, through: :normalized_serial_segments
-  has_many :pos_registration_matches
+  # Kept when DuplicateBikeFinderJob rebuilds or removes the group, which a merge does
+  has_many :pos_registration_matches, dependent: :nullify
 
   before_save :update_added_bike_at
 

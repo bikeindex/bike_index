@@ -1,7 +1,7 @@
 class CreatePosRegistrationMatches < ActiveRecord::Migration[8.1]
   def change
     create_table :pos_registration_matches do |t|
-      t.references :duplicate_bike_group, null: false
+      t.references :duplicate_bike_group
       # No standalone index - the unique index below starts with bike_id
       t.references :bike, null: false, index: false
       t.references :pos_bike, null: false

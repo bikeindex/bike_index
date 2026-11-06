@@ -9,7 +9,7 @@
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null
 #  bike_id                 :bigint           not null
-#  duplicate_bike_group_id :bigint           not null
+#  duplicate_bike_group_id :bigint
 #  pos_bike_id             :bigint           not null
 #
 # Indexes
@@ -38,11 +38,13 @@ class PosRegistrationMatch < ApplicationRecord
   belongs_to :bike
   belongs_to :pos_bike, class_name: "Bike"
 
-  validates_presence_of :duplicate_bike_group_id, :bike_id, :pos_bike_id
+  validates_presence_of :bike_id, :pos_bike_id
 
   scope :merge_candidate, -> { where(review_reasons: []) }
   scope :review_candidate, -> { where.not(review_reasons: []) }
   scope :with_review_reason, ->(reason) { where("review_reasons @> ARRAY[?]::text[]", reason) }
 
-  def bucket = review_reasons.none? ? "merge_candidate" : "review_candidate"
+  def merge_candidate? = review_reasons.none?
+
+  def bucket = merge_candidate? ? "merge_candidate" : "review_candidate"
 end

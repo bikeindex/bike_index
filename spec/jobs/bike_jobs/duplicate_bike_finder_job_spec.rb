@@ -20,18 +20,26 @@ RSpec.describe BikeJobs::DuplicateBikeFinderJob, type: :job do
 
   describe "enqueuing the POS registration match finder" do
     let(:bike) { FactoryBot.create(:bike, serial_number: "WTU123C4567") }
+    let(:earlier_bike) { FactoryBot.create(:bike, serial_number: "WTU123C4567") }
+    before { [earlier_bike, bike].each(&:create_normalized_serial_segments) }
 
-    it "enqueues for a new bike" do
+    it "enqueues for a new bike that's grouped" do
       instance.perform(bike.id)
       expect(BikeJobs::PosRegistrationMatchFinderJob.jobs.map { it["args"] }).to eq([[bike.id]])
     end
 
-    it "doesn't enqueue for a bike registered more than a day ago or deleted" do
+    context "no other bike with the serial" do
+      let(:earlier_bike) { FactoryBot.create(:bike, serial_number: "OTHER12345") }
+
+      it "doesn't enqueue" do
+        instance.perform(bike.id)
+        expect(BikeJobs::PosRegistrationMatchFinderJob.jobs.size).to eq 0
+      end
+    end
+
+    it "doesn't enqueue for a bike registered more than a day ago" do
       bike.update_column(:created_at, Time.current - 25.hours)
       instance.perform(bike.id)
-      bike2 = FactoryBot.create(:bike, serial_number: "WTU123C4567")
-      bike2.update_column(:deleted_at, Time.current)
-      instance.perform(bike2.id)
       expect(BikeJobs::PosRegistrationMatchFinderJob.jobs.size).to eq 0
     end
   end

@@ -3276,7 +3276,7 @@ ALTER SEQUENCE public.pghero_query_stats_id_seq OWNED BY public.pghero_query_sta
 
 CREATE TABLE public.pos_registration_matches (
     id bigint NOT NULL,
-    duplicate_bike_group_id bigint NOT NULL,
+    duplicate_bike_group_id bigint,
     bike_id bigint NOT NULL,
     pos_bike_id bigint NOT NULL,
     status integer DEFAULT 0 NOT NULL,

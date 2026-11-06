@@ -76,12 +76,13 @@ module BikeJobs
         it.duplicate_bike_group_id = duplicate_bike_group_id
         it.review_reasons = ordered(reasons)
       end
-      # A rerun only adds reasons, so it can't clear a stolen veto an earlier run recorded
-      add_reasons(match, reasons) unless match.previously_new_record?
+      # A rerun only adds reasons, so it can't clear a stolen veto an earlier run recorded. It takes the
+      # current group, which DuplicateBikeFinderJob can rebuild
+      add_reasons(match, reasons, duplicate_bike_group_id:) unless match.previously_new_record?
     end
 
-    def add_reasons(match, reasons)
-      match.update!(review_reasons: ordered(match.review_reasons + reasons)) if match.pending?
+    def add_reasons(match, reasons, **attributes)
+      match.update!(review_reasons: ordered(match.review_reasons + reasons), **attributes) if match.pending?
     end
 
     def ordered(reasons) = PosRegistrationMatch::REVIEW_REASONS.keys & reasons

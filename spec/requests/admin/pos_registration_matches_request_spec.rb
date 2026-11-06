@@ -36,6 +36,11 @@ RSpec.describe Admin::PosRegistrationMatchesController, type: :request do
 
       get base_url, params: {user_id: current_user.id}
       expect(assigns(:collection).pluck(:id)).to eq([merge_candidate.id])
+
+      # Hidden registrations are out of the bike association's default scope
+      owned_bike.update_column(:user_hidden, true)
+      get base_url, params: {user_id: current_user.id}
+      expect(response.body).to include(current_user.email)
     end
   end
 end
