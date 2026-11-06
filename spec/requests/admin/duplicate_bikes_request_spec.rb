@@ -200,12 +200,19 @@ RSpec.describe Admin::DuplicateBikesController, type: :request do
       expect(response.body).to include("Show all 11 records")
     end
 
-    it "compares the live records when the reference has been deleted" do
+    it "compares from the oldest live record when the reference has been deleted" do
       marked_bikes.first.update_column(:deleted_at, Time.current)
+      # A backdated import: the oldest registration, though not the lowest ID
+      marked_bikes.last.update_column(:created_at, marked_bikes.first.created_at - 1.day)
       get "#{base_url}/serial", params: {reference_bike_id: marked_bikes.first.id}
       expect(response.code).to eq "200"
       expect(assigns(:bikes_count)).to eq 10
-      expect(assigns(:reference_bike)).to eq marked_bikes.second
+      expect(assigns(:reference_bike)).to eq marked_bikes.last
+    end
+
+    it "404s for a reference that isn't one of the compared records" do
+      get "#{base_url}/compare", params: {bike_ids: pair.map(&:id).join(","), reference_bike_id: marked_bikes.first.id}
+      expect(response.code).to eq "404"
     end
 
     it "lists records oldest first, or newest first on request" do

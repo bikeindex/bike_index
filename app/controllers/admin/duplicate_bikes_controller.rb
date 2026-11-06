@@ -56,9 +56,14 @@ module Admin
         :bike_organizations, :bike_stickers, ownerships: :organization).reorder(:created_at, :id).to_a
       raise ActiveRecord::RecordNotFound if all_bikes.empty?
       @bikes_count = all_bikes.size
-      # A snapshot's reference can be deleted, or marked example or spam, after it's listed. The serial's live
-      # records still compare, from the oldest
-      @reference_bike = all_bikes.find { it.id == params[:reference_bike_id].to_i } || all_bikes.min_by(&:id)
+      @reference_bike = if params[:reference_bike_id].blank?
+        all_bikes.min_by(&:id)
+      else
+        all_bikes.find { it.id == params[:reference_bike_id].to_i } ||
+          # A snapshot's reference can be deleted, or marked example or spam, after it's listed. The serial's
+          # live records still compare, from the oldest
+          ((params[:id] == "serial") ? all_bikes.first : raise(ActiveRecord::RecordNotFound))
+      end
       @review = BikeDuplicatesServices::Review.new(bikes: all_bikes, reference_bike: @reference_bike)
       @contact_group = @review.contact_groups.find { it.number == params[:search_contact].to_i }
       @per_page = permitted_per_page(default: 25)
