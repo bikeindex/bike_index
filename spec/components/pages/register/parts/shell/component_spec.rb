@@ -11,8 +11,8 @@ RSpec.describe Pages::Register::Parts::Shell::Component, type: :component do
     expect(component.to_html).to include "tw:bg-gray-100"
   end
 
-  context "embed" do
-    let(:component) { render_inline(described_class.new(embed: true)) { "page content" } }
+  context "bare" do
+    let(:component) { render_inline(described_class.new(bare: true)) { "page content" } }
 
     it "renders the content without the gray shell around it" do
       expect(component).to have_text "page content"
