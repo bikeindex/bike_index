@@ -28,7 +28,7 @@ export default class extends Controller {
     const labels = this.labels(field)
     const flagged = labels.length > 0
     field.classList.toggle('tw:ring-2', flagged)
-    field.classList.toggle('tw:ring-amber-400', flagged)
+    field.classList.toggle('tw:ring-yellow-400', flagged)
     this.warningTargets.find(warning => warning.closest('td') === field.closest('td')).textContent =
       flagged ? `Contains ${labels.join(', ')}` : ''
   }

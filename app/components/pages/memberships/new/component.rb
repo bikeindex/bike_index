@@ -9,14 +9,10 @@ module Pages
         MONTHLY_ONLY = "tw:group-has-[[value=yearly]:checked]/membership:hidden"
         YEARLY_ONLY = "tw:hidden tw:group-has-[[value=yearly]:checked]/membership:inline"
 
-        def initialize(stripe_prices:, bikes_count:, recoveries_count:, recoveries_value:, organizations_count:,
-          recovery_displays:, level: nil, referral_source: nil, membership: nil)
+        def initialize(stripe_prices:, bikes_count:, recovery_displays:, level: nil, referral_source: nil, membership: nil)
           @currency = stripe_prices.first&.currency_obj || Currency.default
           @amounts = stripe_prices.to_h { [[it.membership_level.to_sym, it.interval.to_sym], it.amount_cents] }
           @bikes_count = bikes_count
-          @recoveries_count = recoveries_count
-          @recoveries_value = recoveries_value
-          @organizations_count = organizations_count
           @recovery_displays = recovery_displays
           @referral_source = referral_source
           @membership = membership
@@ -45,25 +41,12 @@ module Pages
           number_with_precision(@bikes_count / 1_000_000.0, precision: 1, round_mode: :floor, strip_insignificant_zeros: true)
         end
 
-        def bikes_display
-          return safe_join([number_display(@bikes_count), "+"]) if @bikes_count < 1_000_000
-
-          "#{bikes_millions}M+"
-        end
-
         def members_keep_it_free
           if @bikes_count < 1_000_000
             return translation(".bikes_registered_keep_it_free", bikes: number_with_delimiter(@bikes_count))
           end
 
           translation(".millions_registered_keep_it_free", millions: bikes_millions)
-        end
-
-        def stats
-          [[bikes_display, translation(".bikes_registered")],
-            [number_display(@recoveries_count), translation(".stolen_bikes_recovered")],
-            [render(Atoms::CurrencyMillions::Component.new(dollars_usd: @recoveries_value)), translation(".value_returned_to_owners")],
-            [safe_join([number_display(@organizations_count), "+"]), translation(".partner_organizations")]]
         end
 
         def tiers
@@ -86,7 +69,7 @@ module Pages
             title: translation(".free_registration_title"), body: translation(".free_registration_body")},
             {icon: "icons/megaphone.svg", circle: "tw:bg-red-600",
              title: translation(".free_alerts_title"), body: translation(".free_alerts_body")},
-            {icon: "icons/handshake.svg", circle: "tw:bg-slate-900",
+            {icon: "icons/handshake.svg", circle: "tw:bg-slate-900 tw:dark:bg-slate-600",
              title: translation(".free_partners_title"), body: translation(".free_partners_body")}]
         end
 

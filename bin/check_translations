@@ -61,12 +61,18 @@ if [ "$current_branch" != "$TRANSLATION_BRANCH" ]; then
   pre_merge_head="$(git rev-parse HEAD)"
   # Conflicts can only be in config/locales, which the sync rewrites wholesale
   git merge --no-edit -X ours FETCH_HEAD
-  # Gems are baked into the image from this branch's lockfile, and its final stage
-  # carries no compiler for a bump the merge just brought in — so the sync, which
-  # reads translation keys rather than gems, runs against what's installed
-  git show "$pre_merge_head:Gemfile" > Gemfile
-  git show "$pre_merge_head:Gemfile.lock" > Gemfile.lock
 fi
+
+# Gems are baked into the image from this branch's lockfile, and its final stage
+# carries no compiler for a bump the merge brought in — so anything that boots
+# Rails, here or in the job's later steps, runs against what's installed
+use_installed_gems() {
+  if [ -n "$pre_merge_head" ]; then
+    git show "$pre_merge_head:Gemfile" > Gemfile
+    git show "$pre_merge_head:Gemfile.lock" > Gemfile.lock
+  fi
+}
+use_installed_gems
 
 echo bundle exec rake translation:sync_and_purge prepare_translations
 bundle exec rake translation:sync_and_purge prepare_translations
@@ -83,6 +89,7 @@ git checkout HEAD db/
 set +x
 
 if [[ -z "$(git --no-pager diff)" ]]; then
+  use_installed_gems
   output "${GREEN}" "No uncommitted translations. Done."
   exit 0
 else

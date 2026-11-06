@@ -9,13 +9,17 @@
 
 /* A utility rather than a class in the layer below: `@apply` only takes utilities */
 @utility twtext-color {
-  @apply tw:text-gray-900 tw:dark:text-gray-400;
+  @apply tw:text-gray-900 tw:dark:text-gray-100;
 }
 
 /* A card that meets the page's own gutter rather than sitting inset inside it twice over,
  * once the .twwiderow holding it has dropped to one column. Keyed to the row rather than the
  * viewport so it can't disagree with the column count - 672px is where .twwiderow's second
  * 320px column stops fitting, and a container query can't read that from a var(). */
+@utility tweyebrow {
+  @apply tw:text-xs tw:font-bold tw:tracking-wider tw:text-purple-500 tw:uppercase tw:dark:text-purple-300;
+}
+
 @utility twfullbleed {
   @container twwiderow (width < 672px) {
     /* All forced. Tailwind sorts a custom utility by the properties it sets, so each one added
@@ -108,8 +112,12 @@
     @apply tw:m-0;
   }
 
-  .twless-strong {
+  .less-strong {
     @apply tw:opacity-65 tw:decoration-gray-900/65 tw:dark:decoration-gray-400/65;
+
+    &:is(.btn, .form-control):is(:hover, :focus) {
+      opacity: 1;
+    }
   }
 
   .twinput {
@@ -124,7 +132,12 @@
    * stops the spacing depending on where the field sits. Utilities still win,
    * so `twlabel tw:m-0` and the checkbox's `tw:flex` override as before. */
   .twlabel {
-    @apply tw:block tw:mb-1 tw:text-sm tw:font-medium tw:text-gray-800 tw:dark:text-gray-500 tw:cursor-pointer;
+    @apply tw:block tw:mb-1 tw:text-sm tw:font-medium tw:text-gray-800 tw:dark:text-gray-300 tw:cursor-pointer;
+  }
+
+  /* An empty one is a spacer column, with nothing to click */
+  .form-well-label:not(:empty) {
+    @apply tw:cursor-pointer;
   }
 
   /* Fields that read as one control -- a city and its state, a name and its phone. The

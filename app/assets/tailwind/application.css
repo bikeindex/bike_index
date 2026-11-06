@@ -28,6 +28,18 @@
 /* /bikebook with its similar models open */
 @custom-variant similar-open (&:where(:has(#similar-toggle[aria-expanded=true]) *));
 
+/* A table's card running to the page's edges: once its .twwiderow has dropped to one column,
+ * the same 672px as .twfullbleed, or its table is wider than the card, which ui--table-overflow flags */
+@custom-variant table-bleed {
+  @container twwiderow (width < 672px) {
+    @slot;
+  }
+
+  &:where([data-table-bleed=true], [data-table-bleed=true] *) {
+    @slot;
+  }
+}
+
 /* The selected/pressed state of a button, link or menu item, however it's flagged —
  * including a <label> around a checked radio (UI::Forms::RadioButtonGroup).
  * Keep it the last @custom-variant: tailwind sorts custom variants in declaration
@@ -116,12 +128,27 @@
   --color-purple-900: #2c244b;
   --color-purple-950: #1c162f;
 
+  /* Replaces Tailwind's default `yellow`, whose dark end reads brown. 300-500 are
+   * UI::Button's yellow and its hover and active; 800-950 are khaki on purpose. */
+  --color-yellow-50: #fff6da;
+  --color-yellow-100: #ffefbd;
+  --color-yellow-200: #ffe590;
+  --color-yellow-300: #ffd660;
+  --color-yellow-400: #ffcc33;
+  --color-yellow-500: #f5bc1b;
+  --color-yellow-600: #c99a12;
+  --color-yellow-700: #9c7a14;
+  --color-yellow-800: #776018;
+  --color-yellow-900: #5a4b1c;
+  --color-yellow-950: #3f3720;
+
   /* The dev-info marking, the legacy stylesheets' $dev-color */
   --color-dev: #9400d3;
 }
 
 @import "./bike_index_components.css";
 @import "./bikebook.css";
+@import "./legacy_dark.css";
 
 @layer components {
   /* Style tables with CSS selectors to prevent caching issues */
@@ -199,9 +226,28 @@
 
 @layer base {
   button:not(:disabled),
+  select:not(:disabled),
   [role="button"]:not(:disabled),
   input:where([type="button"], [type="reset"], [type="submit"]):not(:disabled) {
     cursor: pointer;
+  }
+}
+
+@layer base {
+  /* Tailwind's shadows take this color over the one they're written with, which is pitched for
+   * a light page and doesn't show on a dark one. It doesn't inherit, so every element sets it.
+   * A shadow that's a chosen color rather than a shadow sets its own: tw:dark:shadow-gray-300 */
+  * {
+    @variant dark {
+      /* A drop shadow's filter reads this rather than a color */
+      --tw-drop-shadow-md: 0 3px 3px rgb(0 0 0 / 0.5);
+
+      &,
+      &::before,
+      &::after {
+        --tw-shadow-color: rgb(0 0 0 / 0.5);
+      }
+    }
   }
 }
 
@@ -218,6 +264,12 @@ body {
   body {
     --nav-gap: 60px;
   }
+}
+
+/* .primary-footer's margin-top, which the full-bleed pages pull down by to sit flush on the
+   footer. On :root, so a page that zeroes it on body wins from any layer */
+:root {
+  --footer-gap: 72px;
 }
 /* The controller narrows it as the sidebar collapses, in an inline style that
    outranks this; the expanded width keeps the content still until stimulus connects */

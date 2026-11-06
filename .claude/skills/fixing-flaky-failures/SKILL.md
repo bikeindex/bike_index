@@ -154,6 +154,11 @@ scratch file when you're done. Two things this buys that reasoning doesn't: it
 distinguishes "the event never arrived" from "the event arrived and the assertion
 misread it", and it tells you *when* things happened, which is usually the answer.
 
+A click that succeeds on a retry reports nothing, and `DEBUG=pw:api` doesn't reach Ruby's stderr. Its
+action log is in a trace: `context.tracing.start(snapshots: false, screenshots: false)` before the click,
+`tracing.stop(path:)` after, then the `log` events in the zip's `trace.trace`. Keep only the traces from
+failing runs, as the failure can be rare.
+
 ### 4. Try to reproduce, and treat failure-to-reproduce as information
 
 ```bash
@@ -321,6 +326,12 @@ retry_on_detach { first(".bike-box-item .title-link a").click }
 This is *not* a coverage reduction: the assertions are untouched, the click just
 happens on a DOM that has stopped moving.
 
+**A retried click moves the scroller it's in.** Each retry scrolls the target first — `inline: "end"`,
+then center, then start — so a click that finds its link `not stable` shifts the row before any mouse
+event, and `snap-mandatory` can carry it further. It reads as the app losing a scroll position. A hover
+transition left by a parked pointer is one source: `settle_animations` on the element that transitions,
+then click. `expect_sideways_cards` in `spec/integration/bikebook_spec.rb` is the pattern.
+
 **A probe that measures itself instead of the app.** When a spec observes
 behaviour by listening for an event, check whether what it reads is a property of
 the app or of the listener's position. `event.defaultPrevented` read *inside* a
@@ -348,10 +359,13 @@ arrived; and prefer asserting the user-visible consequence alongside the interna
 verdict.
 
 **Programmatic back/forward.** Playwright drives these specs and there is no
-BFCache, so `go_back`/`go_forward` onto a `turbo-action: advance` entry is
-genuinely unreliable. Prefer not to chain a real navigation onto the tail of a
-back/forward sequence. If a spec must, expect to need the settle-then-click
-pattern above.
+BFCache, so a traversal onto a `turbo-action: advance` entry depends on Turbo's
+restoration visit finishing. Check for an app race before blaming the harness:
+`search_marketplace_spec`'s `:flaky` tag blamed `go_forward` no-op'ing, when `go_forward`
+never did and a frame's follow-up visit was cancelling the restoration, which a rider
+can hit too. Logging `popstate`, `turbo:before-visit` and `turbo:load` tells them apart.
+Prefer not to chain a real navigation onto the tail of a back/forward sequence. If a
+spec must, expect to need the settle-then-click pattern above.
 
 ## What a finished fix looks like
 

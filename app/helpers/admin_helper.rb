@@ -69,7 +69,7 @@ module AdminHelper
     elsif theft_alert.pending?
       UI::Alerts::Base::Component::TEXT_CLASSES[:warning]
     elsif theft_alert.inactive?
-      "twless-strong tw:text-xs"
+      "less-strong tw:text-xs"
     end
     theft_alert.recovered? ? text_class + " tw:text-xs" : text_class
   end

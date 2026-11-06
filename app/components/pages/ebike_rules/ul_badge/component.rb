@@ -7,7 +7,6 @@ module Pages
       # what it means for the bike
       class Component < ApplicationComponent
         # BikeBook records a certification, not its absence, so a bike is never shown as uncertified
-        BACKGROUNDS = {certified: "tw:bg-[#e8f5ee]", unknown: "tw:bg-[#fff6da]", unrecorded: "tw:bg-[#fff6da]"}.freeze
         ICON_STATUSES = {certified: :pass, unknown: :unknown_warning, unrecorded: :unknown_warning}.freeze
 
         # standard: 2849 or 2271, nil for neither. status: :certified, :unknown, or :unrecorded for a bike entered by hand
@@ -19,6 +18,8 @@ module Pages
         private
 
         def certified? = @status == :certified
+
+        def background = certified? ? "tw:bg-[#e8f5ee] tw:dark:bg-green-500/25" : "tw:bg-yellow-50 tw:dark:bg-yellow-300/25"
 
         def title = certified? ? translation(".certified", standard: @standard) : translation(".certification_unknown")
 

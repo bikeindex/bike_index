@@ -25,7 +25,7 @@
       <% if last_email_errored.any? %>
         <%= render(UI::Alerts::Base::Component.new(kind: :error, header: "Last email to user errored!")) do %>
           Check the
-          <%= link_to "notifications", admin_notifications_path(user_id: @user.id), class: "twlink" %>
+          <%= link_to "notifications", admin_notifications_path(user_id: @user.id), class: "twlink-underlined" %>
           for the delivery errors
         <% end %>
       <% end %>
@@ -37,10 +37,10 @@
             <strong><%= email_ban.email %></strong>
             <%= email_ban.reason_humanized %>
 
-            <small class="twless-strong">
+            <small class="less-strong">
               <% if email_ban.reason == "email_domain" %>
                 - the
-                <%= link_to "email domain", admin_email_domain_path(email_ban.email_domain), class: "twlink" %>
+                <%= link_to "email domain", admin_email_domain_path(email_ban.email_domain), class: "twlink-underlined" %>
                 was banned.
               <% elsif email_ban.reason == "email_duplicate" %>
                 - the email looks like a duplicate of another email. In 2025, we

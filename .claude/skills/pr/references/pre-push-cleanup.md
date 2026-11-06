@@ -10,7 +10,7 @@ Skip it when the diff has no code in it — a docs- or skill-only branch gives i
 
 **Read `git diff` as soon as the agents return, before running anything.** An agent that stops mid-verification leaves its edit in the tree — including a sweeping edit it reverted to test, which then reads as your regression.
 
-**Brief the agents with the constraint, not the shape you think satisfies it.** "A cell block is instance_exec'd, so a component method is unreachable inside one" is a fact they can work from; "the lambda is required, judge only how it's used" is a conclusion, and it hid that `method(:…)` is how four sibling org tables already bind exactly that. Likewise "the user asked for a shared component" is a constraint, while "the user requested this new component" is a conclusion — it kept `UI::BulkTableCard` from the reuse reviewer, when the shared component was `UI::CardTable` extended. Declining a finding is yours to do on the way back, not theirs to be told up front — the exception is a *second* run, where naming what a previous pass already triaged is what keeps them off it.
+**Brief the agents with the constraint, not the shape you think satisfies it.** "A cell block is instance_exec'd, so a component method is unreachable inside one" is a fact they can work from; "the lambda is required, judge only how it's used" is a conclusion, and it hid that `method(:…)` is how four sibling org tables already bind exactly that. Likewise "the user asked for a shared component" is a constraint, while "the user requested this new component" is a conclusion — it kept `UI::BulkTableCard` from the reuse reviewer, when the shared component was `UI::TableInCard` extended. Declining a finding is yours to do on the way back, not theirs to be told up front — the exception is a *second* run, where naming what a previous pass already triaged is what keeps them off it.
 
 **On a second run against the same branch, scope it to the commits since the last one** — `/simplify` defaults to the whole branch diff, so re-running it resurfaces every finding already triaged, including the ones deliberately declined. Pass the range (`git diff <last-simplify-commit>..HEAD`) as its argument.
 
@@ -119,7 +119,7 @@ State the verdict in your reply to the user either way, naming the stored values
 rtk proxy git diff origin/main...HEAD --name-only --diff-filter=A -- app/assets/images
 ```
 
-Check each against `frontend-conventions`' image and icon rules: an original elsewhere in the repo (a design handoff's comes resized and renamed), an existing icon, or a plain character that should be text. Replace a duplicate with what already exists and delete it.
+Icons and images both go through the markup audit below, which checks each one for a file the repo already has.
 
 ### The controller audit
 
@@ -140,7 +140,11 @@ For each controller named, look for one that already does its job — a shared o
 rtk proxy git diff origin/main...HEAD --name-only --diff-filter=A -- 'app/components/**/component.rb'
 ```
 
-For each, name the existing component it renders or duplicates. One that wraps a single `UI::*` component in chrome is that component with an argument — ask the user whether to fold it in, since a new `UI::*` argument needs their permission. `UI::BulkTableCard` into `UI::CardTable`'s `column_settings:` is the pattern.
+For each, name the existing component it renders or duplicates. One that wraps a single `UI::*` component in chrome is that component with an argument — ask the user whether to fold it in, since a new `UI::*` argument needs their permission. `UI::BulkTableCard` into `UI::TableInCard`'s `column_settings:` is the pattern.
+
+### The markup audit
+
+**Required when the branch adds markup or an icon.** Run the `use-existing-markup` skill. It converts the hand-written markup to existing components without asking, covering marketing pages, buttons, icons and shadows. **Whenever it changes anything, tell the user in your reply.** List each conversion with the visible change it makes, and the commit it landed in. A page that looks different after a PR update, with no word about why, is what this prevents. Put its callouts (big shadows, and hover states on things that aren't buttons) in the same reply. When it changes nothing, say so in one line.
 
 ### The cycle-type translation check
 

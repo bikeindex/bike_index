@@ -145,7 +145,7 @@ RSpec.describe BikesController, type: :request do
         let(:b_param) { BParam.create(params: {bike: {}}, created_bike_id: created_bike.id, creator_id: current_user.id) }
         it "redirects to the bike" do
           get "#{base_url}/new?b_param_token=#{b_param.id_token}"
-          expect(response).to redirect_to(bike_path(created_bike.id))
+          expect(response).to redirect_to(registration_path(created_bike.id))
         end
       end
     end
@@ -218,7 +218,7 @@ RSpec.describe BikesController, type: :request do
         expect(bike.graduated?(organization)).to be_truthy
         expect(bike.bike_organizations.pluck(:organization_id)).to eq([])
         put "#{base_url}/#{bike.id}/resolve_token?token=#{graduated_notification.marked_remaining_link_token}&token_type=graduated_notification"
-        expect(response).to redirect_to(bike_path(bike.id))
+        expect(response).to redirect_to(registration_path(bike.id))
         expect(flash[:success]).to be_present
         bike.reload
         graduated_notification.reload
@@ -238,7 +238,7 @@ RSpec.describe BikesController, type: :request do
           expect(bike.graduated?(organization)).to be_truthy
           expect(bike.bike_organizations.pluck(:organization_id)).to eq([])
           put "#{base_url}/#{bike.id}/resolve_token?token=#{graduated_notification.marked_remaining_link_token}&token_type=graduated_notification"
-          expect(response).to redirect_to(bike_path(bike.id))
+          expect(response).to redirect_to(registration_path(bike.id))
           expect(flash[:success]).to be_present
           bike.reload
           graduated_notification.reload
@@ -276,7 +276,7 @@ RSpec.describe BikesController, type: :request do
           expect(bike2.graduated?(organization)).to be_truthy
           expect(bike2.bike_organizations.pluck(:organization_id)).to eq([])
           put "#{base_url}/#{bike.id}/resolve_token?token=#{graduated_notification.marked_remaining_link_token}&token_type=graduated_notification"
-          expect(response).to redirect_to(bike_path(bike.id))
+          expect(response).to redirect_to(registration_path(bike.id))
           expect(flash[:success]).to be_present
           bike.reload
           graduated_notification.reload
@@ -303,7 +303,7 @@ RSpec.describe BikesController, type: :request do
             token: graduated_notification.marked_remaining_link_token,
             token_type: "graduated_notification"
           }
-          expect(response).to redirect_to(bike_path(bike.id))
+          expect(response).to redirect_to(registration_path(bike.id))
           expect(flash[:success]).to be_present
           bike.reload
           graduated_notification.reload
@@ -319,7 +319,7 @@ RSpec.describe BikesController, type: :request do
           expect(bike.graduated?(organization)).to be_truthy
           expect(bike.bike_organizations.pluck(:organization_id)).to eq([])
           put "#{base_url}/#{bike.id}/resolve_token?token=333#{graduated_notification.marked_remaining_link_token}&token_type=graduated_notification"
-          expect(response).to redirect_to(bike_path(bike.id))
+          expect(response).to redirect_to(registration_path(bike.id))
           expect(flash[:error]).to be_present
           bike.reload
           graduated_notification.reload
@@ -338,7 +338,7 @@ RSpec.describe BikesController, type: :request do
         expect(parking_notification.retrieval_link_token).to be_present
         expect(bike.current_parking_notification).to eq parking_notification
         put "#{base_url}/#{bike.id}/resolve_token?token=#{parking_notification.retrieval_link_token}&token_type=parked_incorrectly_notification"
-        expect(response).to redirect_to(bike_path(bike.id))
+        expect(response).to redirect_to(registration_path(bike.id))
         expect(flash[:success]).to be_present
         bike.reload
         parking_notification.reload
@@ -357,7 +357,7 @@ RSpec.describe BikesController, type: :request do
           expect(parking_notification.retrieved?).to be_falsey
           expect(bike.current_parking_notification).to eq parking_notification
           put "#{base_url}/#{bike.id}/resolve_token?token=#{parking_notification.retrieval_link_token}&token_type=parked_incorrectly_notification"
-          expect(response).to redirect_to(bike_path(bike.id))
+          expect(response).to redirect_to(registration_path(bike.id))
           expect(assigns(:bike)).to eq bike
           expect(flash[:success]).to be_present
           bike.reload
@@ -377,7 +377,7 @@ RSpec.describe BikesController, type: :request do
           expect(parking_notification.retrieval_link_token).to be_present
           expect(bike.current_parking_notification).to eq parking_notification
           put "#{base_url}/#{bike.id}/resolve_token?token=#{parking_notification.retrieval_link_token}&user_recovery=true&token_type=parked_incorrectly_notification"
-          expect(response).to redirect_to(bike_path(bike.id))
+          expect(response).to redirect_to(registration_path(bike.id))
           expect(assigns(:bike)).to eq bike
           expect(flash[:success]).to be_present
           bike.reload
@@ -397,7 +397,7 @@ RSpec.describe BikesController, type: :request do
           expect(parking_notification.retrieved?).to be_falsey
           expect(bike.current_parking_notification).to eq parking_notification
           put "#{base_url}/#{bike.id}/resolve_token?token=#{parking_notification.retrieval_link_token}xxx&token_type=parked_incorrectly_notification"
-          expect(response).to redirect_to(bike_path(bike.id))
+          expect(response).to redirect_to(registration_path(bike.id))
           expect(assigns(:bike)).to eq bike
           expect(flash[:error]).to be_present
           parking_notification.reload
@@ -414,7 +414,7 @@ RSpec.describe BikesController, type: :request do
           expect(parking_notification.retrieved?).to be_truthy
           expect(bike.current_parking_notification).to be_blank
           put "#{base_url}/#{bike.id}/resolve_token?token=#{parking_notification.retrieval_link_token}&token_type=parked_incorrectly_notification"
-          expect(response).to redirect_to(bike_path(bike.id))
+          expect(response).to redirect_to(registration_path(bike.id))
           expect(assigns(:bike)).to eq bike
           expect(flash[:notice]).to match(/retrieved/)
           parking_notification.reload
@@ -434,7 +434,7 @@ RSpec.describe BikesController, type: :request do
           Sidekiq::Job.clear_all
           Sidekiq::Testing.inline! do
             put "#{base_url}/#{bike.id}/resolve_token?token=#{parking_notification.retrieval_link_token}&token_type=appears_abandoned_notification"
-            expect(response).to redirect_to(bike_path(bike.id))
+            expect(response).to redirect_to(registration_path(bike.id))
             expect(assigns(:bike)).to eq bike
             expect(flash[:success]).to be_present
           end
@@ -463,7 +463,7 @@ RSpec.describe BikesController, type: :request do
           Sidekiq::Job.clear_all
           Sidekiq::Testing.inline! do
             put "#{base_url}/#{bike.id}/resolve_token?token=#{parking_notification.retrieval_link_token}&token_type=parked_incorrectly_notification"
-            expect(response).to redirect_to(bike_path(bike.id))
+            expect(response).to redirect_to(registration_path(bike.id))
             expect(assigns(:bike)).to eq bike
             expect(flash[:error]).to match(/impound/i)
           end
@@ -489,10 +489,10 @@ RSpec.describe BikesController, type: :request do
 
       it "redirects to the bike however the code arrives, and to user root when it matches none" do
         get "#{base_url}/scanned", params: {card_id: " 000000900"}
-        expect(response).to redirect_to bike_url(bike)
+        expect(response).to redirect_to registration_path(bike)
 
         get "#{base_url}/scanned", params: {id: 900}
-        expect(response).to redirect_to bike_url(bike)
+        expect(response).to redirect_to registration_path(bike)
 
         get "#{base_url}/scanned", params: {card_id: " 1393242"}
         expect(response).to redirect_to root_path
@@ -503,14 +503,14 @@ RSpec.describe BikesController, type: :request do
         let!(:bike_sticker) { FactoryBot.create(:bike_sticker, code: "sss", bike:) }
         it "redirects, preserving scanned_id" do
           get "#{base_url}/scanned", params: {scanned_id: "sss"}
-          expect(response).to redirect_to bike_url(bike, scanned_id: "sss")
+          expect(response).to redirect_to registration_path(bike, scanned_id: "sss")
         end
 
         context "organization sticker" do
           let!(:bike_sticker) { FactoryBot.create(:bike_sticker, code: "XD934292", organization:, bike:) }
           it "redirects, preserving scanned_id and organization_id" do
             get "#{base_url}/scanned", params: {scanned_id: "XD934292", organization_id: organization.id}
-            expect(response).to redirect_to bike_url(bike, scanned_id: "XD934292", organization_id: organization.id)
+            expect(response).to redirect_to registration_path(bike, scanned_id: "XD934292", organization_id: organization.id)
           end
         end
       end
@@ -608,6 +608,8 @@ RSpec.describe BikesController, type: :request do
         expect(response).to render_template("scanned")
         expect(assigns(:bike_sticker)&.id).to eq bike_sticker3.id
         get "/bikes/scannedU01101"
+        expect(response).to redirect_to(registration_path("scannedU01101".to_i(36)))
+        follow_redirect!
         expect(response.status).to eq 404
       end
     end

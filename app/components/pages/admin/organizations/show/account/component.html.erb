@@ -32,7 +32,7 @@
 
   <% list.with_row(label: "POS integration:") do %>
     <% if @organization.no_pos? %>
-      <em class="twless-strong tw:text-sm">no integration</em>
+      <em class="less-strong tw:text-sm">no integration</em>
     <% elsif @organization.ascend_or_broken_ascend? %>
       <%= link_to "Ascend POS", organization_bulk_imports_path(organization_id: @organization.to_param), class: "twlink" %>
       <small>Ascend name: <em><%= @organization.ascend_name %></em></small>
@@ -40,7 +40,7 @@
       <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">POS Integration broken!</span>
       <%= @organization.pos_kind.humanize %>
     <% elsif @organization.does_not_need_pos? %>
-      <small class="twless-strong">Does not need POS integration</small>
+      <small class="less-strong">Does not need POS integration</small>
     <% end %>
 
     <% if @organization.lightspeed_pos? || @organization.broken_pos? && @organization.bikes.lightspeed_pos.any? %>
@@ -49,14 +49,14 @@
 
     <% if @display_dev_info && @organization.manual_pos_kind.present? %>
       <small class="only-dev-visible tw:ml-2 tw:inline-block">
-        <em class="twless-strong">manual POS kind set:</em>
+        <em class="less-strong">manual POS kind set:</em>
         <%= @organization.manual_pos_kind %>
       </small>
     <% end %>
 
     <% if !@organization.no_pos? || @organization.opted_into_theft_survey_2023 %>
       <small class="tw:ml-4">
-        <span class="twless-strong">theft survey?</span>
+        <span class="less-strong">theft survey?</span>
         <%= @organization.opted_into_theft_survey_2023 %>
       </small>
     <% end %>

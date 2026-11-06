@@ -551,7 +551,7 @@ RSpec.describe "BikesController#update", type: :request do
     let(:current_user) { FactoryBot.create(:user_confirmed) }
     it "does not update and redirects" do
       patch base_url, params: {bike: {serial_number: "69"}}
-      expect(response).to redirect_to bike_url(bike)
+      expect(response).to redirect_to registration_url(bike)
       expect(flash[:error]).to be_present
       expect(bike.reload.serial_number).to_not eq "69"
     end
