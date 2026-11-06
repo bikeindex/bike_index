@@ -36,6 +36,34 @@ RSpec.describe BikeJobs::PosRegistrationMatchFinderJob, type: :job do
     expect(PosRegistrationMatch.sole).to have_attributes(bucket: "review_candidate", review_reasons: ["stolen_history"])
   end
 
+  it "keeps a recorded stolen veto when a run doesn't see the theft" do
+    instance.perform(bike.id)
+    PosRegistrationMatch.sole.update!(review_reasons: %w[stolen_history impounded])
+    instance.perform(bike.id)
+    expect(PosRegistrationMatch.sole).to have_attributes(bucket: "review_candidate", review_reasons: ["stolen_history"])
+  end
+
+  it "leaves a match that's no longer pending alone" do
+    instance.perform(bike.id)
+    PosRegistrationMatch.sole.update!(status: :confirmed)
+    FactoryBot.create(:stolen_bike, serial_number:)
+    instance.perform(bike.id)
+    expect(PosRegistrationMatch.sole).to have_attributes(bucket: "merge_candidate", review_reasons: [])
+  end
+
+  context "a second new registration of the pos bike" do
+    let(:bike2) do
+      FactoryBot.create(:bike, :with_ownership_claimed, user:, manufacturer:, serial_number:, creation_state_origin:, claimed_at: Time.current)
+    end
+
+    it "makes both matches review candidates" do
+      instance.perform(bike.id)
+      instance.perform(bike2.id)
+      expect(PosRegistrationMatch.pluck(:bike_id, :bucket, :review_reasons))
+        .to match_array([bike, bike2].map { [it.id, "review_candidate", ["multiple_registrations"]] })
+    end
+  end
+
   context "ascend pos bike registered from the app" do
     let(:pos_bike_factory) { :bike_ascend_pos }
     let(:creation_state_origin) { "api_v3" }
@@ -112,8 +140,37 @@ RSpec.describe BikeJobs::PosRegistrationMatchFinderJob, type: :job do
     include_examples "records no match"
   end
 
-  context "new bike registered by an organization" do
+  context "new bike credited to the POS bike's shop, as the register flow does by default" do
+    let(:creation_state_origin) { "register_flow_organized" }
+    let(:creation_organization) { pos_bike.creation_organization }
+
+    it "records a match" do
+      instance.perform(bike.id)
+      expect(PosRegistrationMatch.pluck(:bike_id, :pos_bike_id)).to eq([[bike.id, pos_bike.id]])
+    end
+  end
+
+  context "new bike credited to another organization" do
+    let(:creation_state_origin) { "register_flow_organized" }
     let(:creation_organization) { FactoryBot.create(:organization) }
+
+    include_examples "records no match"
+  end
+
+  context "new bike marked spam" do
+    before { bike.update_column(:likely_spam, true) }
+
+    include_examples "records no match"
+  end
+
+  context "pos bike deleted" do
+    before { pos_bike.update_column(:deleted_at, Time.current) }
+
+    include_examples "records no match"
+  end
+
+  context "pos bike from another manufacturer" do
+    before { pos_bike.update_column(:manufacturer_id, FactoryBot.create(:manufacturer).id) }
 
     include_examples "records no match"
   end
@@ -189,6 +246,12 @@ RSpec.describe BikeJobs::PosRegistrationMatchFinderJob, type: :job do
 
   context "new bike with a marketplace listing" do
     before { FactoryBot.create(:marketplace_listing, item: bike) }
+
+    include_examples "records a review candidate", ["marketplace_listing"]
+  end
+
+  context "pos bike version with a marketplace listing" do
+    before { FactoryBot.create(:marketplace_listing, item: FactoryBot.create(:bike_version, bike: pos_bike)) }
 
     include_examples "records a review candidate", ["marketplace_listing"]
   end

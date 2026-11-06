@@ -28,7 +28,7 @@ class PosRegistrationMatch < ApplicationRecord
   REVIEW_REASONS = {
     "stolen_history" => "Stolen history on the serial",
     "multiple_pos_bikes" => "More than one POS registration matches",
-    "transferred" => "A registration was transferred",
+    "multiple_registrations" => "More than one new registration matches the POS registration",
     "impounded" => "A registration was impounded",
     "marketplace_listing" => "A registration has a marketplace listing",
     "not_a_serial" => "Serial is a part number or placeholder"

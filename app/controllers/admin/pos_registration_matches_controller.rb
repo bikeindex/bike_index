@@ -30,7 +30,7 @@ module Admin
       matches = matches.with_review_reason(@searched_reason) if @searched_reason.present?
       @searched_status = params[:search_status] if PosRegistrationMatch.statuses.key?(params[:search_status])
       matches = matches.where(status: @searched_status) if @searched_status.present?
-      matches = matches.where(user_id: params[:user_id]) if params[:user_id].present?
+      matches = matches.where(user_id: user_subject&.id || params[:user_id]) if params[:user_id].present?
       matches.where(created_at: @time_range)
     end
   end

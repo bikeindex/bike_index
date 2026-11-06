@@ -47,6 +47,16 @@ RSpec.describe BikeServices::Creator do
       end
     end
 
+    context "new bike" do
+      let(:bike_params) { {serial_number: "WTU123C4567", manufacturer_id: manufacturer.id, primary_frame_color_id: color.id, owner_email: user.email} }
+
+      it "enqueues the POS registration match finder" do
+        Sidekiq::Job.clear_all
+        bike = instance.create_bike(b_param)
+        expect(BikeJobs::PosRegistrationMatchFinderJob.jobs.map { it["args"] }).to eq([[bike.id]])
+      end
+    end
+
     describe "existing_bike" do
       let!(:existing_bike) { FactoryBot.create(:bike) }
       it "does not create" do

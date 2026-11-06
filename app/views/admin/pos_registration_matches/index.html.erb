@@ -8,7 +8,6 @@
   index: admin_index_state,
   collection: @collection,
   viewing: "POS Registration Matches",
-  table_view: render(Pages::Admin::PosRegistrationMatches::Table::Component.new(collection: @collection, sort_state:, render_sortable: true)),
   chart_collection: @render_chart && matching_pos_registration_matches
 )) do |skeleton| %>
   <% filters.each do |param, (searched, all_label, options)| %>
