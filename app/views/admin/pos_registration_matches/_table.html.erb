@@ -6,7 +6,7 @@
   <% end %>
 
   <% table.column(sortable: "bucket", label: "Bucket") do |match| %>
-    <%= render UI::Badge::Component.new(text: PosRegistrationMatch.bucket_display(match.bucket), color: match.merge_candidate? ? :success : :warning, size: :sm) %>
+    <%= render UI::Badge::Component.new(text: match.bucket.humanize, color: match.merge_candidate? ? :success : :warning, size: :sm) %>
   <% end %>
 
   <% table.column(label: "Review reasons") do |match| %>

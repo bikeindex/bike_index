@@ -1,9 +1,9 @@
-# Recorded so the owner can later be asked to merge the two registrations. Stolen history, entanglements,
-# several matching registrations or a serial that isn't one make the match a review candidate rather than a merge candidate
+# Recorded so the owner can later be asked to merge the two registrations
 module BikeJobs
   class PosRegistrationMatchFinderJob < ApplicationJob
     sidekiq_options queue: "droppable", retry: 2
 
+    # Owners registering their own bike, including from the app (the API). Not organization_form, which shop staff fill in
     CUSTOMER_ORIGINS = (Ownership::ORIGIN_REG_FLOW + %w[web embed embed_extended embed_partial sticker api_v2 api_v3]).freeze
 
     def perform(bike_id)
@@ -48,10 +48,8 @@ module BikeJobs
         .pluck(:bike_id)
       return [] if bike_ids.none?
 
-      Bike.unscoped.where(id: bike_ids, manufacturer_id: bike.manufacturer_id,
-        serial_normalized_no_space: bike.serial_normalized_no_space,
-        created_at: (bike.created_at - 365.days)...bike.created_at)
-        .select { live?(it) && bike.creation_organization_id.in?([nil, it.creation_organization_id]) }
+      BikeDuplicatesServices::Finder.serial_bikes(bike).where(id: bike_ids, created_at: (bike.created_at - 365.days)...bike.created_at)
+        .select { bike.creation_organization_id.in?([nil, it.creation_organization_id]) }
     end
 
     def serial_review_reasons(serial)
@@ -73,9 +71,8 @@ module BikeJobs
         it.user_id = bike.user_id
         it.review_reasons = ordered(reasons)
       end
-      # Reasons are recomputed while pending, except stolen history: an overlapping run that read the
-      # serial before a theft was reported can't clear the veto
-      match.with_lock { match.update!(review_reasons: ordered(reasons + match.review_reasons.intersection(%w[stolen_history]))) if match.pending? }
+      # A rerun only adds reasons, so it can't clear a stolen veto an earlier run recorded
+      add_reasons(match, reasons) unless match.previously_new_record?
     end
 
     def add_reasons(match, reasons)

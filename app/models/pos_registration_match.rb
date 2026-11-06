@@ -20,8 +20,7 @@
 #  index_pos_registration_matches_on_user_id                  (user_id)
 #
 # A new self-registration whose serial and manufacturer match a bike a shop's POS
-# registered to the same owner, recorded by BikeJobs::PosRegistrationMatchFinderJob.
-# A match with no review reasons is a merge candidate; any reason makes it a review candidate
+# registered to the same owner, recorded by BikeJobs::PosRegistrationMatchFinderJob
 class PosRegistrationMatch < ApplicationRecord
   STATUS_ENUM = {pending: 0, confirmed: 1, declined: 2, merged: 3}.freeze
   BUCKET_ENUM = {merge_candidate: 0, review_candidate: 1}.freeze
@@ -46,8 +45,6 @@ class PosRegistrationMatch < ApplicationRecord
   before_validation :set_bucket
 
   scope :with_review_reason, ->(reason) { where("review_reasons @> ARRAY[?]::text[]", reason) }
-
-  def self.bucket_display(bucket) = bucket.to_s.humanize
 
   private
 

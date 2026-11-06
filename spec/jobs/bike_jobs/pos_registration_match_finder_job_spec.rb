@@ -19,6 +19,13 @@ RSpec.describe BikeJobs::PosRegistrationMatchFinderJob, type: :job do
     FactoryBot.create(pos_bike_factory, owner_email: pos_owner_email, manufacturer:, serial_number:, created_at: pos_created_at)
   end
 
+  shared_examples "records a match" do
+    it "records a match" do
+      instance.perform(bike.id)
+      expect(PosRegistrationMatch.pluck(:bike_id, :pos_bike_id)).to eq([[bike.id, pos_bike.id]])
+    end
+  end
+
   it "records a pending merge candidate once" do
     expect(pos_bike.current_ownership.user_id).to eq user.id
     expect {
@@ -36,9 +43,10 @@ RSpec.describe BikeJobs::PosRegistrationMatchFinderJob, type: :job do
     expect(PosRegistrationMatch.sole).to have_attributes(bucket: "review_candidate", review_reasons: ["stolen_history"])
   end
 
+  # Written because an overlapping run that read the serial before a theft was reported cleared the veto
   it "keeps a recorded stolen veto when a run doesn't see the theft" do
     instance.perform(bike.id)
-    PosRegistrationMatch.sole.update!(review_reasons: %w[stolen_history impounded])
+    PosRegistrationMatch.sole.update!(review_reasons: %w[stolen_history])
     instance.perform(bike.id)
     expect(PosRegistrationMatch.sole).to have_attributes(bucket: "review_candidate", review_reasons: ["stolen_history"])
   end
@@ -68,10 +76,7 @@ RSpec.describe BikeJobs::PosRegistrationMatchFinderJob, type: :job do
     let(:pos_bike_factory) { :bike_ascend_pos }
     let(:creation_state_origin) { "api_v3" }
 
-    it "records a match" do
-      instance.perform(bike.id)
-      expect(PosRegistrationMatch.pluck(:bike_id, :pos_bike_id)).to eq([[bike.id, pos_bike.id]])
-    end
+    include_examples "records a match"
   end
 
   shared_examples "records no match" do
@@ -97,10 +102,7 @@ RSpec.describe BikeJobs::PosRegistrationMatchFinderJob, type: :job do
   context "registered from a sticker" do
     let(:creation_state_origin) { "sticker" }
 
-    it "records a match" do
-      instance.perform(bike.id)
-      expect(PosRegistrationMatch.pluck(:bike_id, :pos_bike_id)).to eq([[bike.id, pos_bike.id]])
-    end
+    include_examples "records a match"
   end
 
   context "a bike with the serial only has stolen status" do
@@ -144,10 +146,7 @@ RSpec.describe BikeJobs::PosRegistrationMatchFinderJob, type: :job do
     let(:creation_state_origin) { "register_flow_organized" }
     let(:creation_organization) { pos_bike.creation_organization }
 
-    it "records a match" do
-      instance.perform(bike.id)
-      expect(PosRegistrationMatch.pluck(:bike_id, :pos_bike_id)).to eq([[bike.id, pos_bike.id]])
-    end
+    include_examples "records a match"
   end
 
   context "new bike credited to another organization" do
