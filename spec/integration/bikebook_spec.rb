@@ -2115,7 +2115,7 @@ RSpec.describe "BikeBook", :js, type: :system do
     click_on "Adjust comparison algorithm"
     expect(page).to have_css("#vehicle-filters #similar-adjustments [role='button']:focus", text: "Adjust comparison algorithm")
     adjustments = find("#similar-adjustments")
-    expect(adjustments).to have_field("Frame material", with: "2")
+    expect(adjustments).to have_field("Frame material", with: "2").and have_field("Target riders", with: "3")
     expect(page).to have_no_css("[aria-label='Similar models'] button", text: "Adjust comparison algorithm")
     # a bare track, showing no weight, though the default is 2
     groupset = adjustments.find_field("Groupset", disabled: true).ancestor("[data-controller='ui--forms--range']")
@@ -2239,28 +2239,42 @@ RSpec.describe "BikeBook", :js, type: :system do
     # and one no longer sold matches any year's by default
     visit bikebook_path(vehicle_models: "m/specialized/2025/haul_st_ca", similar: 1, adjust: 1, search: 1, filters: 1)
     expect(page).to have_checked_field("Include cargo bikes that are not current", wait: 10)
+    # a rider's fit, scored only for a size whose riders are shorter or taller than every model fits
+    visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_adv,m/aventon/2026/level_4_rec", view: "geometry", similar: 1, adjust: 1, search: 1, filters: 1, weights: "fit.5")
+    expect(find_field("Rider size", disabled: true, wait: 10).ancestor("[data-controller='ui--forms--range']"))
+      .to have_text("Only for sizes fitting riders under 5′5″ or over 6′2″")
+    expect(page).to have_css("#similar-m-aventon-2026-pace_5_rec_step_through")
+    find("select[aria-label='Size of Level 4 ADV']").select("Extra Large")
+    expect(page).to have_field("Rider size", with: "5", wait: 10)
+    expect(page).to have_no_css("#similar-m-aventon-2026-pace_5_rec_step_through").and have_css("#similar-m-aventon-2026-soltera_3_adv")
+    # and rescored in place for that size
+    find_field("Tire clearance").send_keys(:home)
+    expect(page).to have_css("[aria-label='Similar models to compare'] li:first-child #similar-m-aventon-2025-aventure_m")
+    expect(page).to have_no_css("#similar-m-aventon-2026-pace_5_rec_step_through")
     # the other propulsion's where they're included, without its e-bike fields counting against them, a frame only
     # without same_configuration, other wheel sizes only without same_wheels,
     # more tire clearance nearer than as much less but not than less that's nearer, a frame's weight not held against it,
     # and a frame of the same material and bars of the same type closer, and only the same type with its slider at the top. None
     # nearly as far as one it knows nothing about, a groupset's tier however its series is written, and a slider's whole
     # weight on the fields the model lists, a rigid frame's suspension outweighing its material, and its own activity
-    # closer than another of its family
+    # closer than another of its family. A short rider's fit by a size's stated riders, else its family's line through them
+    # by stack plus reach, and a kids' model farther than a women's
     matched = page.evaluate_script(<<~JS)
       (async () => {
         const { GROUPS, scorer, settingsFrom } = await import('bikebook/similarity')
         const names = [...Object.values(GROUPS).flatMap(({ fields }) => Object.keys(fields)), 'groupset_series']
         // each alike in its geometry, wheels and weight, as a catalog model lists most of them
         const alike = { head_angle: 70, seat_angle: 74, stack_reach: 1.5, bb_drop: 70, chainstay_gap: 80, front_bsd: 622, rear_bsd: 622, tire_clearance: 45, total_weight: 10 }
-        const fields = { ...Object.fromEntries(names.map((name) => [name, [null, null, null]])), ...Object.fromEntries(Object.entries(alike).map(([name, value]) => [name, [value, value, value]])) }
+        const fields = (count) => ({ ...Object.fromEntries(names.map((name) => [name, Array(count).fill(null)])),
+          ...Object.fromEntries(Object.entries(alike).map(([name, value]) => [name, Array(count).fill(value)])) })
         const model = (id, electric, handlebar_type, suspension, activity = 'commuting') => ({ id, electric, handlebar_type, suspension, vehicle_type: 'bike', model_configuration: 'complete', manufacturer: id, group_key: id, primary_activity: activity, markets: ['US'] })
         const urban = [{ slug: 'commuting', family: 'urban' }]
-        const scoring = (models, extra = {}, activities = urban) => scorer(models, { format: 2, fields: { ...fields, ...extra } }, activities)
+        const scoring = (models, extra = {}, activities = urban) => scorer(models, { format: 2, fields: { ...fields(models.length), ...extra } }, activities)
         const score = scoring([model('e', true), model('other_e', true), model('acoustic', false)], { battery_size: [500, 500, null] })
         const propulsions = [() => true, ({ electric }) => !electric].map((included) => score('e', settingsFrom(new URLSearchParams()), included).models.map(({ id }) => id))
         const materials = scoring([model('a', false), model('steel', false), model('aluminum', false)], { frame_material: ['aluminum', 'steel', 'aluminum'] })
         const bars = scoring([model('a', false, 'drop_bar'), model('flat', false, 'horizontal'), model('drop', false, 'drop_bar')])
-        const ids = (score, query = '') => score('a', settingsFrom(new URLSearchParams(query))).models.map(({ id }) => id)
+        const ids = (score, query = '', size) => score('a', settingsFrom(new URLSearchParams(query), size)).models.map(({ id }) => id)
         const far = scoring([model('a', false), model('near', false), model('far', false)],
           Object.fromEntries(Object.entries(alike).map(([name, value]) => [name, [value, value, value + 10]])))
         const groupsets = scoring([model('a', false), model('tiagra', false), model('s1000', false)], { groupset_series: ['S-1000', 'Tiagra', 'S1000'] })
@@ -2274,11 +2288,22 @@ RSpec.describe "BikeBook", :js, type: :system do
           { tire_clearance: [32, tight, roomy] }))
         const weighed = scoring([model('a', false), model('complete', false), { ...model('frame', false), model_configuration: 'frame_fork' }],
           { total_weight: [10, 3, 3] })
+        const line = Array.from({ length: 100 }, (_, index) => 500 + index)
+        const fits = scoring([model('a', false), model('medium', false), model('small', false), model('estimated', false), model('line', false)], {
+          size_names: [['S', 'M'], ['M'], ['S', 'M'], ['S'], line],
+          size_stack: [null, null, null, [500], line],
+          size_reach: [null, null, null, [450], line.map(() => 400)],
+          size_min_rider_height: [[1500, 1700], [1700], [1500, 1700], null, line.map((stack) => stack + 950)],
+          size_max_rider_height: [[1600, 1800], [1800], [1600, 1800], null, line.map((stack) => stack + 1050)]
+        })
+        const riders = scoring([model('a', false), model('kid', false), model('woman', false), model('unisex', false)], { target_riders: [null, ['kid'], ['woman'], null] })
         return [...propulsions, ids(configurations), ids(configurations, 'same_configuration=1'),
-          ids(wheels), ids(wheels, 'same_wheels=1'), ...clearances.map((each) => ids(each)), ids(weighed), ids(materials), ids(bars), ids(bars, 'weights=handlebar.4'), ids(far), ids(groupsets), ids(suspensions), ids(activities)]
+          ids(wheels), ids(wheels, 'same_wheels=1'), ...clearances.map((each) => ids(each)), ids(weighed), ids(materials), ids(bars), ids(bars, 'weights=handlebar.4'), ids(far), ids(groupsets), ids(suspensions), ids(activities),
+          ...[1, 0].map((size) => ids(fits, '', size)), ids(fits, 'weights=fit.5', 0), ids(riders), ids(riders, 'weights=riders.5')]
       })()
     JS
-    expect(matched).to eq([["other_e", "acoustic"], ["acoustic"], ["complete", "frame"], ["complete"], ["small", "road"], ["road"], ["36", "28"], ["28", "40"], ["frame", "complete"], ["aluminum", "steel"], ["drop"], ["drop", "flat"], ["near"], ["s1000", "tiagra"], ["steel", "full"], ["commuting", "touring"]])
+    expect(matched).to eq([["other_e", "acoustic"], ["acoustic"], ["complete", "frame"], ["complete"], ["small", "road"], ["road"], ["36", "28"], ["28", "40"], ["frame", "complete"], ["aluminum", "steel"], ["drop"], ["drop", "flat"], ["near"], ["s1000", "tiagra"], ["steel", "full"], ["commuting", "touring"],
+      ["medium", "small", "estimated", "line"], ["small", "estimated", "line", "medium"], ["small", "estimated", "line"], ["unisex", "woman", "kid"], ["unisex"]])
   end
 
   it "shows what each of the catalog's files allows as it lands, keeping the picked vehicles if the index fails" do
