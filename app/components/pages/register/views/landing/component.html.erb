@@ -39,7 +39,7 @@
     <%= render(UI::Card::Component.new(shadow: :large, additional_classes: "tw:w-full tw:max-w-130 tw:justify-self-center " \
       "tw:p-5! tw:sm:p-8! tw:lg:col-start-2 tw:lg:row-span-2 tw:lg:row-start-1 tw:lg:justify-self-end")) do %>
       <%= render(Pages::Register::Views::Step1::Component.new(b_param: @b_param, flow: @flow,
-        current_user: @current_user, landing: true)) %>
+        current_user: @current_user, bare: true)) %>
     <% end %>
 
     <div
