@@ -8,7 +8,7 @@ module BikeJobs
 
     def perform(bike_id)
       bike = Bike.unscoped.find_by_id(bike_id)
-      return unless bike.present? && live?(bike) && matchable_bike?(bike) && self_registration?(bike)
+      return unless live?(bike) && matchable_bike?(bike) && self_registration?(bike)
 
       pos_bikes = earlier_pos_bikes(bike)
       return if pos_bikes.none?
@@ -16,19 +16,22 @@ module BikeJobs
       shared_reasons = serial_review_reasons(bike.serial_normalized_no_space)
       shared_reasons << "multiple_pos_bikes" if pos_bikes.many?
       pos_bikes.each do |pos_bike|
-        other_matches = PosRegistrationMatch.where(pos_bike_id: pos_bike.id).where.not(bike_id: bike.id)
         reasons = shared_reasons + entanglements([bike.id, pos_bike.id])
-        reasons << "multiple_registrations" if other_matches.exists?
-        record_match(bike, pos_bike, reasons)
-        # An earlier registration's match was recorded before this one existed
-        other_matches.pending.each { add_reasons(it, ["multiple_registrations"]) }
+        # Locks the POS bike, so concurrent registrations of it each see the other's match
+        pos_bike.with_lock do
+          other_matches = PosRegistrationMatch.where(pos_bike_id: pos_bike.id).where.not(bike_id: bike.id)
+            .select { live?(Bike.unscoped.find_by(id: it.bike_id)) }
+          reasons += ["multiple_registrations"] if other_matches.any?
+          record_match(bike, pos_bike, reasons)
+          other_matches.select(&:pending?).each { add_reasons(it, ["multiple_registrations"]) }
+        end
       end
     end
 
     private
 
     def live?(bike)
-      bike.deleted_at.blank? && !bike.example && !bike.likely_spam
+      bike.present? && bike.deleted_at.blank? && !bike.example && !bike.likely_spam
     end
 
     def matchable_bike?(bike)
@@ -61,7 +64,7 @@ module BikeJobs
 
     def entanglements(bike_ids)
       listings = MarketplaceListing.where(item_type: "Bike", item_id: bike_ids)
-        .or(MarketplaceListing.where(item_type: "BikeVersion", item_id: BikeVersion.where(bike_id: bike_ids).select(:id)))
+        .or(MarketplaceListing.where(item_type: "BikeVersion", item_id: BikeVersion.unscoped.where(bike_id: bike_ids).select(:id)))
       [("impounded" if ImpoundRecord.where(bike_id: bike_ids).exists?),
         ("marketplace_listing" if listings.exists?)].compact
     end
@@ -76,7 +79,7 @@ module BikeJobs
     end
 
     def add_reasons(match, reasons)
-      match.with_lock { match.update!(review_reasons: ordered(match.review_reasons + reasons)) if match.pending? }
+      match.update!(review_reasons: ordered(match.review_reasons + reasons)) if match.pending?
     end
 
     def ordered(reasons) = PosRegistrationMatch::REVIEW_REASONS.keys & reasons

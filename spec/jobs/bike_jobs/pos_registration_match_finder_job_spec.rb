@@ -70,6 +70,14 @@ RSpec.describe BikeJobs::PosRegistrationMatchFinderJob, type: :job do
       expect(PosRegistrationMatch.pluck(:bike_id, :bucket, :review_reasons))
         .to match_array([bike, bike2].map { [it.id, "review_candidate", ["multiple_registrations"]] })
     end
+
+    it "doesn't count a deleted registration" do
+      instance.perform(bike.id)
+      bike.update_column(:deleted_at, Time.current)
+      instance.perform(bike2.id)
+      expect(PosRegistrationMatch.pluck(:bike_id, :bucket, :review_reasons))
+        .to match_array([bike, bike2].map { [it.id, "merge_candidate", []] })
+    end
   end
 
   context "ascend pos bike registered from the app" do
@@ -251,6 +259,16 @@ RSpec.describe BikeJobs::PosRegistrationMatchFinderJob, type: :job do
 
   context "pos bike version with a marketplace listing" do
     before { FactoryBot.create(:marketplace_listing, item: FactoryBot.create(:bike_version, bike: pos_bike)) }
+
+    include_examples "records a review candidate", ["marketplace_listing"]
+  end
+
+  context "deleted pos bike version with a marketplace listing" do
+    before do
+      bike_version = FactoryBot.create(:bike_version, bike: pos_bike)
+      FactoryBot.create(:marketplace_listing, item: bike_version)
+      bike_version.update_column(:deleted_at, Time.current)
+    end
 
     include_examples "records a review candidate", ["marketplace_listing"]
   end
