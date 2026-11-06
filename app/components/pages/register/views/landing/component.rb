@@ -26,7 +26,7 @@ module Pages
           private
 
           def checks
-            [translation(".check_two_minutes"), translation(".check_free_forever"), translation(".check_add_later")]
+            [translation(".check_two_minutes"), translation(".check_free_no_data_sharing"), translation(".check_add_later")]
           end
 
           def benefits

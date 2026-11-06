@@ -46,7 +46,8 @@ en:
             benefit_transfer_title: Easy to sell or pass on
             bike_already_stolen: Bike already stolen? See what to do now
             check_add_later: You can add photos and details later
-            check_free_forever: Free forever. No ads, no data sales.
+            check_free_no_data_sharing: Free forever. We don't sell or share your
+              data.
             check_two_minutes: Takes about two minutes
             donations_keep_it_free: Bike Index is a nonprofit. Donations are what
               keep it free.
