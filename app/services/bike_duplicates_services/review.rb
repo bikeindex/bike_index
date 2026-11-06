@@ -6,7 +6,7 @@ module BikeDuplicatesServices
       # Never the email itself
       def as_json(*)
         {number:, email_present: !email.nil?, bike_ids: bikes.map(&:id),
-         review_contact: Cues.review_contact?(email)}.as_json
+         review_contact: BikeDuplicatesServices::Cues.review_contact?(email)}.as_json
       end
     end
     Check = Data.define(:status, :label)

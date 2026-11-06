@@ -128,11 +128,11 @@ def token_request(method, path, form: nil)
   [res.code.to_i, res.body]
 end
 
-# token_request, refreshing the token and retrying once on a 401. Returns body or nil -
-# anything else (403, a 422 from update) is reported rather than retried.
 # 202 is a duplicate review still preparing - its body says so
 def success?(status) = [200, 202].include?(status)
 
+# token_request, refreshing the token and retrying once on a 401. Returns body or nil -
+# anything else (403, a 422 from update) is reported rather than retried.
 def with_token(method, path, form: nil)
   status, body = token_request(method, path, form:)
   return body if success?(status)

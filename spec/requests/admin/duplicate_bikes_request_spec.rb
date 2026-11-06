@@ -186,6 +186,10 @@ RSpec.describe Admin::DuplicateBikesController, type: :request do
       get "#{base_url}/#{duplicate_group.id}"
       expect(response).to redirect_to(admin_duplicate_bikes_path(search_view: "segments"))
       expect(flash[:error]).to eq "2 records are too many to review together"
+
+      get "#{base_url}/#{duplicate_group.id}.json"
+      expect(response.status).to eq 422
+      expect(response.parsed_body).to eq("error" => "2 records are too many to review together")
     end
 
     it "summarizes a large group and filters to one contact" do

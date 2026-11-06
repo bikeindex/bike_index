@@ -33,12 +33,13 @@ module Admin
       elsif params[:id] == "compare"
         values = Array(params[:bike_ids]).flat_map { it.to_s.split(",") }.map(&:strip).compact_blank.uniq
         invalid = values.grep_v(/\A\d+\z/)
-        return compare_error("Not bike record IDs: #{invalid.join(", ")}", values) if invalid.any?
-        return compare_error("Enter between 2 and 50 bike record IDs to compare", values) unless values.size.between?(2, 50)
+        compare_params = {search_view: "segments", bike_ids: values.join(",")}
+        return review_error("Not bike record IDs: #{invalid.join(", ")}", **compare_params) if invalid.any?
+        return review_error("Enter between 2 and 50 bike record IDs to compare", **compare_params) unless values.size.between?(2, 50)
 
         bikes = Bike.unscoped.where(id: values.map(&:to_i))
         missing = values.map(&:to_i) - bikes.pluck(:id)
-        return compare_error("No bike records with IDs: #{missing.join(", ")}", values) if missing.any?
+        return review_error("No bike records with IDs: #{missing.join(", ")}", **compare_params) if missing.any?
       else
         @duplicate_group = DuplicateBikeGroup.find(params[:id])
         # Admins review every record in the group, including hidden and deleted ones
@@ -47,8 +48,7 @@ module Admin
 
       records_count = bikes.count
       if records_count > MAX_REVIEW_RECORDS
-        flash[:error] = "#{records_count} records are too many to review together"
-        return redirect_to admin_duplicate_bikes_path(search_view: @duplicate_group && "segments")
+        return review_error("#{records_count} records are too many to review together", search_view: @duplicate_group && "segments")
       end
 
       # Summaries cover every record, so the whole group loads
@@ -86,11 +86,11 @@ module Admin
       super
     end
 
-    def compare_error(message, values)
+    def review_error(message, **redirect_params)
       respond_to do |format|
         format.html do
           flash[:error] = message
-          redirect_to admin_duplicate_bikes_path(search_view: "segments", bike_ids: values.join(","))
+          redirect_to admin_duplicate_bikes_path(redirect_params)
         end
         format.json { render json: {error: message}, status: :unprocessable_content }
       end
@@ -151,8 +151,7 @@ module Admin
       end
     end
 
-    # Token JSON carries record IDs and review evidence, never contact emails: contact groups
-    # serialize without them and the rest is picked field by field
+    # Token JSON never carries contact emails
     def dashboard_json
       {generated_at: @group_snapshot[:generated_at], kind: @kind, cue: @cue, sort: sort_column, direction: sort_direction,
        queues: BikeDuplicatesServices::Finder::KINDS.to_h { |kind, label| [kind, {label:, **@group_snapshot[:counts].fetch(kind)}] },
