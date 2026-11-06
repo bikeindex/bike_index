@@ -38,6 +38,7 @@ class ImpoundClaim < ApplicationRecord
     canceled: 4,
     retrieved: 5 # After submitted, updated by impound_record_updates
   }.freeze
+  STALLED_AFTER = 90.days
 
   enum :status, STATUS_ENUM
 
@@ -64,6 +65,11 @@ class ImpoundClaim < ApplicationRecord
   scope :active, -> { where(status: active_statuses) }
   scope :resolved, -> { where(status: resolved_statuses) }
   scope :not_rejected, -> { where.not(status: rejected_statuses) }
+  # submitted_at is only set in the submitting status, so a claim approved straight from pending has none
+  scope :stalled, -> {
+    where(status: %w[submitting approved], impound_record_id: ImpoundRecord.unorganized.select(:id))
+      .where("COALESCE(impound_claims.submitted_at, impound_claims.created_at) < ?", STALLED_AFTER.ago)
+  }
 
   def self.statuses
     STATUS_ENUM.keys.map(&:to_s)

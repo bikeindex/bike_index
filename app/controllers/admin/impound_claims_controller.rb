@@ -21,7 +21,7 @@ module Admin
     protected
 
     def available_statuses
-      %w[all current resolved] + (ImpoundClaim.statuses - ["current"]) # current ordered the way we want to display
+      %w[all current stalled resolved] + (ImpoundClaim.statuses - ["current"]) # current ordered the way we want to display
     end
 
     def sortable_columns
@@ -41,6 +41,8 @@ module Admin
         @search_status = available_statuses.include?(params[:search_status]) ? params[:search_status] : available_statuses.first
         impound_claims = if ImpoundClaim.statuses.include?(@search_status)
           impound_claims.where(status: @search_status)
+        elsif @search_status == "current"
+          impound_claims.active
         else
           impound_claims.public_send(@search_status)
         end
