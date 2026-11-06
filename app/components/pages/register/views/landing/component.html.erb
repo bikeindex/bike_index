@@ -12,7 +12,9 @@
         tw:lg:self-end
       "
     >
-      <%= render(UI::Badge::Component.new(text: translation(".free_nonprofit_worldwide"), color: :empty, size: :lg)) %>
+      <%= render(UI::Badge::Component.new(text: translation(".free_nonprofit_worldwide"), color: :empty, size: :lg)) do %>
+        <span class="tw:uppercase"><%= translation(".free_nonprofit_worldwide") %></span>
+      <% end %>
 
       <h1
         class="
