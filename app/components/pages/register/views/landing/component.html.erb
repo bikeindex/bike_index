@@ -12,16 +12,7 @@
         tw:lg:self-end
       "
     >
-      <span
-        class="
-          tw:rounded-full tw:border tw:border-gray-200 tw:bg-white tw:px-3.5
-          tw:py-1.5 tw:text-[13px] tw:font-bold tw:tracking-widest
-          tw:text-blue-600 tw:uppercase tw:dark:border-gray-700
-          tw:dark:bg-gray-800 tw:dark:text-blue-400
-        "
-      >
-        <%= translation(".free_nonprofit_worldwide") %>
-      </span>
+      <%= render(UI::Badge::Component.new(text: translation(".free_nonprofit_worldwide"), color: :empty, size: :lg)) %>
 
       <h1
         class="
