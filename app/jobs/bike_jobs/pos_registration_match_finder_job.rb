@@ -8,7 +8,7 @@ module BikeJobs
 
     def perform(bike_id)
       bike = Bike.unscoped.find_by_id(bike_id)
-      return unless live?(bike) && matchable_bike?(bike) && self_registration?(bike)
+      return unless PosRegistrationMatch.live_bike?(bike) && matchable_bike?(bike) && self_registration?(bike)
 
       pos_bikes = earlier_pos_bikes(bike)
       return if pos_bikes.none?
@@ -21,7 +21,7 @@ module BikeJobs
         # Locks the POS bike, so concurrent registrations of it each see the other's match
         match = pos_bike.with_lock do
           other_matches = PosRegistrationMatch.where(pos_bike_id: pos_bike.id).where.not(bike_id: bike.id)
-            .select { live?(Bike.unscoped.find_by(id: it.bike_id)) }
+            .select { PosRegistrationMatch.live_bike?(Bike.unscoped.find_by(id: it.bike_id)) }
           reasons += ["multiple_registrations"] if other_matches.any?
           other_matches.select(&:pending?).each { add_reasons(it, ["multiple_registrations"]) }
           record_match(bike, pos_bike, duplicate_bike_group_id, reasons)
@@ -32,10 +32,6 @@ module BikeJobs
     end
 
     private
-
-    def live?(bike)
-      bike.present? && bike.deleted_at.blank? && !bike.example && !bike.likely_spam
-    end
 
     def matchable_bike?(bike)
       bike.manufacturer.present? && !bike.manufacturer.other? &&
@@ -62,7 +58,7 @@ module BikeJobs
         it.duplicate_bike_group_id = duplicate_bike_group_id
         it.review_reasons = PosRegistrationMatch.ordered_reasons(reasons)
       end
-      # A rerun only adds reasons, so it can't clear an earlier stolen veto; the group may have been replaced since
+      # The group may have been replaced since
       add_reasons(match, reasons, duplicate_bike_group_id:) unless match.previously_new_record?
       match
     end

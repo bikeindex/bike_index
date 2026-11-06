@@ -10,40 +10,13 @@
       <% end %>
     </p>
 
-    <div class="tw:my-6 tw:grid tw:gap-6 tw:md:grid-cols-2">
-      <div>
-        <h3 class="tw:mb-2 tw:font-bold">
-          <%= translation(".registered_when_you_bought_it") %>
-        </h3>
-
-        <%= render(UI::DefinitionList::Container::Component.new) do %>
-          <%= render(UI::DefinitionList::Row::Component.new(label: translation(".registration"),
-            value: link_to(@pos_bike.title_string, bike_path(@pos_bike), class: "twlink"))) %>
-
-          <%= render(UI::DefinitionList::Row::Component.new(label: translation(".serial"),
-            value: render(Atoms::Serial::Component.new(bike: @pos_bike)))) %>
-
-          <%= render(UI::DefinitionList::Row::Component.new(label: translation(".registered"),
-            value: render(UI::Time::Component.new(time: @pos_bike.created_at)))) %>
-        <% end %>
-      </div>
-
-      <div>
-        <h3 class="tw:mb-2 tw:font-bold">
-          <%= translation(".your_registration") %>
-        </h3>
-
-        <%= render(UI::DefinitionList::Container::Component.new) do %>
-          <%= render(UI::DefinitionList::Row::Component.new(label: translation(".registration"),
-            value: link_to(@bike.title_string, bike_path(@bike), class: "twlink"))) %>
-
-          <%= render(UI::DefinitionList::Row::Component.new(label: translation(".serial"),
-            value: render(Atoms::Serial::Component.new(bike: @bike)))) %>
-
-          <%= render(UI::DefinitionList::Row::Component.new(label: translation(".registered"),
-            value: render(UI::Time::Component.new(time: @bike.created_at)))) %>
-        <% end %>
-      </div>
+    <div class="twwiderow tw:my-6">
+      <% [[translation(".registered_when_you_bought_it"), @pos_bike], [translation(".your_registration"), @bike]].each do |heading, registration| %>
+        <div>
+          <h3 class="tw:mb-2 tw:font-bold"><%= heading %></h3>
+          <%= render(SharedBlocks::SearchResults::BikeCard::Component.new(bike: registration)) %>
+        </div>
+      <% end %>
     </div>
 
     <p><%= translation(".combining_keeps", bike_type:) %></p>
@@ -53,7 +26,7 @@
       <%= render(UI::Button::Component.new(text: translation(".yes_combine_them"), color: :primary, type: "submit",
         name: "same_bike", value: "true")) %>
 
-      <%= render(UI::Button::Component.new(text: translation(".no_theyre_different", bike_type:), type: "submit",
+      <%= render(UI::Button::Component.new(text: translation(".no_theyre_different"), type: "submit",
         name: "same_bike", value: "false")) %>
     <% end %>
   <% end %>

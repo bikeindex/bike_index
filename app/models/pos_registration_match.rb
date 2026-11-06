@@ -44,8 +44,10 @@ class PosRegistrationMatch < ApplicationRecord
   scope :review_candidate, -> { where.not(review_reasons: []) }
   scope :with_review_reason, ->(reason) { where("review_reasons @> ARRAY[?]::text[]", reason) }
 
-  # What makes a pair a review candidate on its own: stolen history on the serial (any manufacturer, including
-  # deleted and example bikes), an entanglement of either registration, or a serial that isn't one
+  # Hidden registrations still match
+  def self.live_bike?(bike) = bike.present? && bike.deleted_at.blank? && !bike.example && !bike.likely_spam
+
+  # Stolen history counts any manufacturer's bike with the serial, including deleted and example ones
   def self.review_reasons_for(bike, pos_bike)
     serial = bike.serial_normalized_no_space
     bike_ids = [bike.id, pos_bike.id]

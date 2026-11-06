@@ -3,10 +3,10 @@
 module Emails
   module PosRegistrationMatch
     class Component < ApplicationComponent
-      def initialize(pos_registration_match:)
+      def initialize(bike:, pos_bike:, pos_registration_match:)
+        @bike = bike
+        @pos_bike = pos_bike
         @pos_registration_match = pos_registration_match
-        @bike = Bike.unscoped.find(pos_registration_match.bike_id)
-        @pos_bike = Bike.unscoped.find(pos_registration_match.pos_bike_id)
       end
 
       private

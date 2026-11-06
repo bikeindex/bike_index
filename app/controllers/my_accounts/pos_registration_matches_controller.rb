@@ -31,7 +31,6 @@ module MyAccounts
 
     private
 
-    # Open merge candidates only, and only for the owner of both registrations
     def find_pos_registration_match
       @pos_registration_match = PosRegistrationMatch.pending.merge_candidate.find(params[:id])
       @bike = Bike.unscoped.find(@pos_registration_match.bike_id)

@@ -14,10 +14,7 @@ en:
             pos_registered_it: >-
               The shop you bought your %{bike_type} from had already registered it
               to you with the same serial.
-            registered: Registered
             registered_when_you_bought_it: Registered when you bought it
-            registration: Registration
-            serial: Serial
             shop_registered_it: >-
               %{shop_name} had already registered a %{bike_type} to you with the same
               serial when you bought it.

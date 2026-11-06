@@ -26,22 +26,28 @@ module BikeServices
 
       ActiveRecord::Base.transaction do
         pos_bike.update!(FILLED_ATTRIBUTES.select { pos_bike[it].blank? && bike[it].present? }.index_with { bike[it] })
-        bike.public_images.each { it.update!(imageable: pos_bike) }
+        bike.public_images.update_all(imageable_id: pos_bike.id)
         bike.components.update_all(bike_id: pos_bike.id)
         bike.bike_stickers.each { it.claim(bike: pos_bike, user: bike.user) }
         pos_bike.current_ownership.mark_claimed unless pos_bike.current_ownership.claimed?
         match.update!(status: :merged)
         bike.destroy!
       end
-      [bike.id, pos_bike.id].each { CallbackJobs::AfterBikeSaveJob.perform_async(it) }
+      CallbackJobs::AfterBikeSaveJob.perform_async(bike.id)
+      # Resaved, so its thumbnail comes from the photos it took
+      CallbackJobs::AfterBikeSaveJob.perform_async(pos_bike.id, false, true)
       true
     end
 
+    # private below here
+
     def mergeable?(match, bike, pos_bike)
-      return false unless match.pending? || match.confirmed?
-      return false unless match.merge_candidate? && [bike, pos_bike].all? { it.present? && it.deleted_at.blank? && !it.example && !it.likely_spam }
+      return false unless match.merge_candidate? && %w[pending confirmed].include?(match.status)
+      return false unless [bike, pos_bike].all? { PosRegistrationMatch.live_bike?(it) }
 
       bike.user_id.present? && bike.user_id == pos_bike.user_id
     end
+
+    conceal :mergeable?
   end
 end

@@ -24,6 +24,12 @@ RSpec.describe EmailJobs::PosRegistrationMatchJob, type: :job do
         bike_id: match.pos_bike_id, delivery_status: "delivery_success")
     end
 
+    it "emails about a POS registration the owner hid" do
+      match.pos_bike.update_column(:user_hidden, true)
+      described_class.new.perform(match.id)
+      expect(ActionMailer::Base.deliveries.count).to eq 1
+    end
+
     it "doesn't email a review candidate or a match that's no longer pending" do
       match.update!(review_reasons: ["impounded"])
       described_class.new.perform(match.id)

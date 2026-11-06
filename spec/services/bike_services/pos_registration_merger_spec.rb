@@ -21,7 +21,7 @@ RSpec.describe BikeServices::PosRegistrationMerger do
     expect(pos_bike.current_ownership.reload.claimed?).to be_truthy
     expect(match.reload.status).to eq "merged"
     expect(Bike.unscoped.find(bike.id).deleted_at).to be_present
-    expect(CallbackJobs::AfterBikeSaveJob.jobs.map { it["args"] }).to include([bike.id], [pos_bike.id])
+    expect(CallbackJobs::AfterBikeSaveJob.jobs.map { it["args"] }).to include([bike.id], [pos_bike.id, false, true])
   end
 
   it "records a theft since the match and doesn't merge" do
