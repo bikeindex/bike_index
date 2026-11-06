@@ -102,7 +102,7 @@ Then open both files and compare the drawings. For a match:
 
 Either way, delete the branch's copy. Never shrink or convert it to WebP to save bytes; pages already serve the originals.
 
-The register landing page had four copies in `register_landing/`, all resized WebPs. `bike-hero.webp` was `comic-assets_bike-hero.png` (already on five pages), and `bike-bell.webp` was `comic-assets_bike-bell.png`. `u-lock.webp` and `stolen-alert.webp` were `comic-assets_u-lock.png` and `comic-assets_presentation-stolenalert.png`, which were only in `kelsey_redesign/` until then. A check of `icons/` alone missed all four.
+The register landing page had four copies in `register_landing/`, all resized WebPs. `bike-hero.webp` was `comic-assets_bike-hero.png` (already on four pages), and `bike-bell.webp` was `comic-assets_bike-bell.png`. `u-lock.webp` and `stolen-alert.webp` were `comic-assets_u-lock.png` and `comic-assets_presentation-stolenalert.png`, which were only in `kelsey_redesign/` until then. A check of `icons/` alone missed all four.
 
 ## Shadows
 
