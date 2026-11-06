@@ -6,7 +6,9 @@ class ReviewImpoundClaimsController < ApplicationController
   end
 
   def update
-    if !@impound_claim.submitting?
+    if params[:submit] == "retrieved_by_owner"
+      mark_retrieved_by_owner
+    elsif !@impound_claim.submitting?
       flash[:error] = if @impound_claim.responded?
         "That claim has already been responded to"
       else
@@ -19,14 +21,7 @@ class ReviewImpoundClaimsController < ApplicationController
         # add the response message - but don't deliver a message yet
         @impound_claim.update(permitted_update_params.merge(skip_update: true))
         @impound_claim.skip_update = false
-        impound_record_update = @impound_record.impound_record_updates.build(user: current_user,
-          kind: update_status,
-          impound_claim: @impound_claim)
-        if impound_record_update.save
-          flash[:success] = impound_record_update.kind_humanized
-        else
-          flash[:error] = "Unable to record: #{impound_record_update.errors.full_messages.to_sentence}"
-        end
+        create_impound_record_update(kind: update_status, impound_claim: @impound_claim)
       else
         flash[:error] = "Unknown update action"
       end
@@ -48,6 +43,26 @@ class ReviewImpoundClaimsController < ApplicationController
       @impound_claim = impound_claim
     else
       raise ActiveRecord::RecordNotFound
+    end
+  end
+
+  # ProcessImpoundUpdatesJob merges this claim, recovering its stolen record
+  def mark_retrieved_by_owner
+    if !@impound_record.authorized?(current_user, no_superuser_override: true)
+      flash[:error] = "Only the person who found the bike can mark it returned"
+    elsif @impound_claim.approved? && @impound_record.active?
+      create_impound_record_update(kind: "retrieved_by_owner", impound_claim: @impound_claim)
+    else
+      flash[:error] = "Only an approved claim can be marked returned"
+    end
+  end
+
+  def create_impound_record_update(**attributes)
+    impound_record_update = @impound_record.impound_record_updates.create(user: current_user, **attributes)
+    if impound_record_update.persisted?
+      flash[:success] = impound_record_update.kind_humanized
+    else
+      flash[:error] = "Unable to record: #{impound_record_update.errors.full_messages.to_sentence}"
     end
   end
 

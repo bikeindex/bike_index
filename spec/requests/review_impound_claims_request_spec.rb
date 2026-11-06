@@ -5,9 +5,10 @@ RSpec.describe ReviewImpoundClaimsController, type: :request do
   include_context :request_spec_logged_in_as_user_if_present
   let(:impound_record) { FactoryBot.create(:impound_record, user: current_user, bike: bike_claimed) }
   let(:bike_claimed) { FactoryBot.create(:bike, :with_ownership_claimed, user: current_user) }
-  let(:impound_claim) { FactoryBot.create(:impound_claim, :with_stolen_record, status: status, impound_record: impound_record) }
+  let(:impound_claim) { FactoryBot.create(:impound_claim, :with_stolen_record, status: status, impound_record: impound_record, submitted_at:) }
   let(:bike_submitting) { impound_claim.bike_submitting }
   let(:status) { "submitting" }
+  let(:submitted_at) { nil }
 
   describe "show" do
     it "renders" do
@@ -22,6 +23,16 @@ RSpec.describe ReviewImpoundClaimsController, type: :request do
       expect(response.status).to eq(200)
       expect(response).to render_template(:show)
       expect(assigns(:impound_claim)).to eq impound_claim
+    end
+    context "approved" do
+      let(:status) { "approved" }
+      let(:submitted_at) { Time.current }
+      it "renders the mark returned button" do
+        get "#{base_url}/#{impound_claim.to_param}"
+        expect(response.status).to eq(200)
+        expect(response.body).to match(/Mark returned to owner/)
+        expect(response.body).to include('name="submit" value="retrieved_by_owner"')
+      end
     end
     context "not users impound_record" do
       let(:impound_record) { FactoryBot.create(:impound_record) }
@@ -144,6 +155,94 @@ RSpec.describe ReviewImpoundClaimsController, type: :request do
           expect(impound_claim.notifications.pluck(:kind)).to match_array(%w[impound_claim_approved impound_claim_submitting])
           expect(impound_claim.impound_record_updates.pluck(:id)).to eq([impound_record_update.id])
           expect(impound_claim.response_message).to eq response_message
+        end
+      end
+    end
+    context "retrieved_by_owner" do
+      let(:status) { "approved" }
+      let(:submitted_at) { Time.current }
+      let(:retrieved_params) { {submit: "retrieved_by_owner"} }
+      before do
+        Sidekiq::Job.clear_all
+        ActionMailer::Base.deliveries = []
+      end
+
+      it "records the retrieval, and the job marks the claim retrieved" do
+        expect(impound_claim.status).to eq "approved"
+        patch "#{base_url}/#{impound_claim.to_param}", params: retrieved_params
+        expect(flash[:success]).to be_present
+        expect(response).to redirect_to review_impound_claim_path(impound_claim.id)
+        impound_record_update = impound_record.reload.impound_record_updates.sole
+        expect(impound_record_update).to have_attributes(kind: "retrieved_by_owner", user_id: current_user.id)
+        expect(impound_record.status).to eq "retrieved_by_owner"
+
+        # A repeat submission is blocked once the impound_record is resolved
+        patch "#{base_url}/#{impound_claim.to_param}", params: retrieved_params
+        expect(flash[:error]).to be_present
+        expect(impound_record.impound_record_updates.count).to eq 1
+
+        Sidekiq::Job.drain_all
+        expect(impound_record_update.reload.impound_claim_id).to eq impound_claim.id
+        expect(impound_claim.reload.status).to eq "retrieved"
+        expect(impound_claim.stolen_record.reload.recovered?).to be_truthy
+        expect(bike_claimed.reload.current_impound_record_id).to be_nil
+        expect(bike_claimed.status).to_not eq "status_impounded"
+        # ImpoundClaimJob only emails submitting/approved/denied claims. Recovery only emails
+        # (theft_alert_recovered) when the stolen record has a promoted alert, which this one doesn't
+        expect(ActionMailer::Base.deliveries.count).to eq 0
+        expect(impound_claim.notifications.count).to eq 0
+      end
+
+      context "with an earlier approved claim" do
+        let(:other_claim) { FactoryBot.create(:impound_claim, :with_stolen_record, status: "approved", impound_record:, submitted_at: Time.current) }
+        let(:impound_claim) { other_claim && super() } # the other claim is approved.first
+        it "retrieves the selected claim" do
+          patch "#{base_url}/#{impound_claim.to_param}", params: retrieved_params
+          Sidekiq::Job.drain_all
+          expect(impound_record.reload.impound_record_updates.sole.impound_claim_id).to eq impound_claim.id
+          expect(impound_claim.reload.status).to eq "retrieved"
+          expect(impound_claim.stolen_record.reload.recovered?).to be_truthy
+          expect(other_claim.reload.status).to eq "approved"
+          expect(other_claim.stolen_record.reload.recovered?).to be_falsey
+        end
+      end
+
+      context "superuser who isn't the finder" do
+        let(:impound_record) { FactoryBot.create(:impound_record, bike: bike_claimed) }
+        let(:bike_claimed) { FactoryBot.create(:bike, :with_ownership_claimed) }
+        let(:current_user) { FactoryBot.create(:superuser) }
+        it "doesn't record" do
+          patch "#{base_url}/#{impound_claim.to_param}", params: retrieved_params
+          expect(flash[:error]).to be_present
+          expect(impound_record.reload.impound_record_updates.count).to eq 0
+        end
+      end
+
+      context "not approved" do
+        let(:status) { "submitting" }
+        it "doesn't record" do
+          patch "#{base_url}/#{impound_claim.to_param}", params: retrieved_params
+          expect(flash[:error]).to be_present
+          expect(impound_record.reload.impound_record_updates.count).to eq 0
+          expect(impound_claim.reload.status).to eq "submitting"
+        end
+      end
+
+      context "not the finder" do
+        let(:impound_record) { FactoryBot.create(:impound_record, bike: bike_claimed) }
+        it "404s" do
+          patch "#{base_url}/#{impound_claim.to_param}", params: retrieved_params
+          expect(response.status).to eq 404
+          expect(impound_record.reload.impound_record_updates.count).to eq 0
+        end
+      end
+
+      context "organized impound_record" do
+        let(:impound_record) { FactoryBot.create(:impound_record_with_organization, user: current_user) }
+        it "redirects without recording" do
+          patch "#{base_url}/#{impound_claim.to_param}", params: retrieved_params
+          expect(response).to redirect_to organization_impound_claim_path(impound_claim.id, organization_id: impound_record.organization_id)
+          expect(impound_record.reload.impound_record_updates.count).to eq 0
         end
       end
     end
