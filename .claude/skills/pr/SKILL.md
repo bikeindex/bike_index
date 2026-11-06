@@ -20,7 +20,7 @@ description: >-
 
 Five sections, run in this order:
 
-1. **Orient** — the working tree, and the base branch
+1. **Orient** — commit the current work, then the base branch
 2. **Prepare the branch** — merge, cleanup, migrations. Skipped for a description-only ask
 3. **Publish** — read the final diff, write the body, push, create or update
 4. **Screenshots** — frontend diffs only
@@ -34,12 +34,16 @@ Run the `gh` commands as written. The appendix at the bottom covers the one envi
 
 ### Check the working tree
 
-First: **A Conductor `<name>-v1` local tracking `origin/<name>` gets moved onto `<name>`, without asking** — `bin/conductor_branch` does it at workspace setup and session start. If `git branch --show-current` still ends in `-v1`, run it, and follow what it prints when it can't.
+**Commit the current work before anything else runs.** Everything below diffs `origin/main...HEAD`, which only sees committed work, and the merge in **Prepare the branch** needs a clean tree. Uncommitted work is silently skipped by the cleanup, the audits, the classifier and the body, so the PR describes the wrong diff.
 
-`git status` (no `-uall`). Everything below diffs `origin/main...HEAD`, which only sees **committed** work, and the merge in **Prepare the branch** needs a clean tree — so the tree has to be clean before you go further.
+`git status` (no `-uall`):
 
-- Uncommitted changes you made in this session: commit them now. Otherwise the cleanup, the classifier and the diff you describe all silently skip them, and the PR body describes the wrong diff.
+- Uncommitted changes from this session's work: commit them now, before the merge, `/simplify` or any audit.
 - Uncommitted changes you didn't make: stop and ask. Don't sweep someone else's work into a commit.
+
+**Handing this skill to a subagent? Commit first.** To a subagent, every uncommitted change looks like someone else's work, so it stops and asks. Commit the session's changes before spawning it, and say in the brief that the tree is clean.
+
+Then: **A Conductor `<name>-v1` local tracking `origin/<name>` gets moved onto `<name>`, without asking** — `bin/conductor_branch` does it at workspace setup and session start. If `git branch --show-current` still ends in `-v1`, run it, and follow what it prints when it can't.
 
 ### Determine the base branch
 
@@ -59,7 +63,7 @@ This has to happen before the cleanup below, which diffs against `origin/main`.
 
 ### Simplify, lint, and conform to AGENTS.md
 
-`references/pre-push-cleanup.md` has this in full: `/simplify`, `bin/lint` scoped to the branch's files, branch-scoped specs, a pass over the changed files against `AGENTS.md`, its audits — spec, documentation, churn, comment, backfill and, when the branch adds them, asset, controller and component — and the cycle-type translation and product-name checks. The audits are required every run, not just when the diff looks messy. Commit everything it produces before re-dating migrations.
+`references/pre-push-cleanup.md` has this in full: `/simplify`, `bin/lint` scoped to the branch's files, branch-scoped specs, a pass over the changed files against `AGENTS.md`, its audits — spec, documentation, churn, comment, backfill and, when the branch adds them, asset, controller, component and markup (the `use-existing-markup` skill) — and the cycle-type translation and product-name checks. The audits are required every run, not just when the diff looks messy. Commit everything it produces before re-dating migrations.
 
 ### Freshen stale migration timestamps
 
