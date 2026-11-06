@@ -825,10 +825,12 @@ RSpec.describe BikeServices::Register do
           it "owes the organization's rules, with the template's agreement gone" do
             expect(described_class.registration_sequence(b_param)).to eq template
             expect(described_class.acknowledged?(b_param, sequence: template)).to be_truthy
+            expect(b_param.params["details_completed"]).to be_truthy
 
             described_class.assign_organization(b_param, organization)
             b_param.reload
             expect(b_param.creation_organization_id).to eq organization.id
+            expect(b_param.params["details_completed"]).to be_nil
             expect(b_param.params["registration_sequence"]).to be_nil
             expect(described_class.registration_sequence(b_param)).to eq sequence
             expect(described_class.acknowledged?(b_param, sequence:)).to be_falsey
