@@ -6111,8 +6111,8 @@ es:
             status: Estado
           legacy_view_link:
             switch_to_classic: Volver al visor anterior
-            using_new_view: Estás probando el nuevo visor %{bike_type}.
             view_in_legacy: Ver %{bike_type} en el visor antiguo
+            using_new_viewer: Estás utilizando el nuevo visor %{bike_type}.
           map:
             unavailable: No se pudo cargar el mapa; es posible que su navegador o
               dispositivo no lo admita.
@@ -6185,11 +6185,8 @@ es:
             stolen_at: Robado en
             stolen_details: Detalles del robo
           toggle_view:
-            switch_to_legacy_default: Cambiar al visor antiguo por defecto.
             switch_to_new: Cambiar a la nueva vista
             try_new_view: "¡Prueba el nuevo visor %{bike_type}!"
-            view_in_new: Ver en un nuevo visor
-            viewing_in_legacy: Visor antiguo (por defecto se utiliza el nuevo visor)
           wrapper_consumer:
             about_this_bike: Acerca de esto %{bike_type}
             audience_owner: Tu %{bike_type}

@@ -35,7 +35,7 @@ RSpec.describe Bikes::EditsController, type: :request do
     let(:current_user) { nil }
     it "redirects and sets the flash" do
       get base_url
-      expect(response).to redirect_to bike_path(bike)
+      expect(response).to redirect_to registration_path(bike)
       expect(flash[:error]).to be_present
       expect(session[:return_to]).to eq(edit_bike_path(bike))
     end
@@ -45,7 +45,7 @@ RSpec.describe Bikes::EditsController, type: :request do
     it "redirects and sets the flash" do
       expect(bike.authorized?(current_user)).to be_falsey
       get base_url
-      expect(response).to redirect_to bike_path(bike)
+      expect(response).to redirect_to registration_path(bike)
       expect(flash[:error]).to be_present
       expect(session[:return_to]).to be_blank
       # Because user is not bike#user
@@ -298,7 +298,7 @@ RSpec.describe Bikes::EditsController, type: :request do
         expect(bike.reload.status).to eq "status_impounded"
         get base_url
         expect(flash[:error]).to match(/impounded/i)
-        expect(response).to redirect_to(bike_path(bike.id))
+        expect(response).to redirect_to(registration_path(bike.id))
       end
       context "superuser" do
         let(:current_user) { FactoryBot.create(:superuser) }
@@ -323,7 +323,7 @@ RSpec.describe Bikes::EditsController, type: :request do
           expect(bike.status).to eq "status_impounded"
           get base_url
           expect(flash[:error]).to match(/impounded/i)
-          expect(response).to redirect_to(bike_path(bike.id))
+          expect(response).to redirect_to(registration_path(bike.id))
           bike.reload
           expect(bike.current_ownership.claimed?).to be_truthy
           expect(bike.user.id).to eq current_user.id

@@ -52,17 +52,6 @@ module Admin
       redirect_back(fallback_location: root_url)
     end
 
-    def duplicates
-      duplicate_groups = if params[:show_ignored]
-        DuplicateBikeGroup.order("created_at desc")
-      else
-        DuplicateBikeGroup.unignored.order("created_at desc")
-      end
-      @per_page = permitted_per_page
-      @duplicate_groups_count = duplicate_groups.size
-      @pagy, @duplicate_groups = pagy(:countish, duplicate_groups, limit: @per_page, page: permitted_page)
-    end
-
     def ignore_duplicate_toggle
       duplicate_bike_group = DuplicateBikeGroup.find(params[:id])
       duplicate_bike_group.ignore = !duplicate_bike_group.ignore

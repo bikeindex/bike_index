@@ -5856,8 +5856,8 @@ nb:
             status: Status
           legacy_view_link:
             switch_to_classic: Bytt tilbake til den eldre visningsfunksjonen
-            using_new_view: Du prøver ut den nye %{bike_type}-visningsfunksjonen.
             view_in_legacy: visning %{bike_type} i eldre visningsprogram
+            using_new_viewer: Du bruker det nye %{bike_type}-visningsprogrammet.
           map:
             unavailable: Kartet kunne ikke lastes inn – nettleseren eller enheten
               din støtter det kanskje ikke.
@@ -5928,12 +5928,8 @@ nb:
             stolen_at: Stjålet kl
             stolen_details: Tyveridetaljer
           toggle_view:
-            switch_to_legacy_default: Bytt til eldre visningsprogram som standard.
             switch_to_new: Bytt til den nye visningen
             try_new_view: Prøv ut den nye %{bike_type}-visningen!
-            view_in_new: Vis i nytt visningsprogram
-            viewing_in_legacy: Eldre visningsprogram (som standard bruker du det nye
-              visningsprogrammet)
           wrapper_consumer:
             about_this_bike: Om dette %{bike_type}
             audience_owner: Din %{bike_type}

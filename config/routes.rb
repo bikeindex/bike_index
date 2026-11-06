@@ -154,7 +154,6 @@ Rails.application.routes.draw do
     end
   end
   resource :my_account, only: %i[show update destroy] do
-    post :toggle_show_redesign
     resources :messages, only: %i[index show create], controller: "my_accounts/messages"
     resource :membership, only: %i[show], controller: "my_accounts/memberships"
     resources :marketplace_listings, only: %i[update], controller: "my_accounts/marketplace_listings"
@@ -198,6 +197,7 @@ Rails.application.routes.draw do
   get "registrations/*id", to: "registrations#show", constraints: {id: /r\W.*/i}, format: false
   resources :registrations, only: %i[new create show edit] do
     collection { get :embed }
+    member { post :update_legacy_view }
   end
 
   # Redesigned registration flow: quick start, then complete on-site or via email.
@@ -284,9 +284,9 @@ Rails.application.routes.draw do
       end
     end
 
+    get "bikes/duplicates", to: redirect("/admin/duplicate_bikes?search_view=segments")
     resources :bikes do
       collection do
-        get :duplicates
         put :ignore_duplicate_toggle
         get :missing_manufacturer
         post :update_manufacturers
@@ -299,6 +299,7 @@ Rails.application.routes.draw do
         put :undelete
       end
     end
+    resources :duplicate_bikes, only: %i[index show]
     get "credibility_badges", to: "dashboard#credibility_badges"
     get "maintenance", to: "dashboard#maintenance"
     get "scheduled_jobs", to: "dashboard#scheduled_jobs"
