@@ -10,7 +10,6 @@ en:
             e-bikes.
           become_an_ambassador: Become an ambassador
           bike_index_for_bike_shops: Bike Index for bike shops
-          bikes_registered_free: bikes registered, free
           charge_it_safely: Charge it safely.
           charge_it_safely_detail: Battery care, storage, and certified chargers.
           check_ebike_rules: Check e-bike rules in your state
@@ -51,7 +50,6 @@ en:
             riders to do it.
           new_for_ebike_riders: New for e-bike riders
           nonprofit: 501(c)(3) nonprofit
-          partner_organizations: partner shops, police departments, and cities
           protect_it: Protect it.
           protect_it_detail: Registered, photographed, and locked right.
           recovered_in_their_own_words: Recovered, in their own words
@@ -73,7 +71,6 @@ en:
             and riders nearby.
           step_stolen_title_html: A bike is %{stolen}
           stolen: STOLEN
-          stolen_bikes_recovered: stolen bikes recovered
           testimonial_attribution_html: GObike Buffalo, %{link}
           tool_account_body: See the bikes registered through your group, all in one
             place.
@@ -93,7 +90,6 @@ en:
             efforts.
           tool_search_title: Searchable database
           valid_anywhere: One registration, valid anywhere
-          value_returned_to_owners: value returned to owners
           we_also_work_with_bike_shops: We also work with bike shops in your community
             through POS integrations.
           we_love_ebikes: We love e-bikes. Let's help new riders ride ready.

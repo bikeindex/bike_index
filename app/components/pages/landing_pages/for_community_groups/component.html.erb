@@ -24,7 +24,7 @@
           color: :primary, size: :callout)) %>
 
         <%= render(UI::ButtonLink::Component.new(href: recovery_stories_path, text: translation(".recovery_stories"),
-          color: :secondary, size: :callout, html_class: OUTLINE)) %>
+          color: :secondary, size: :callout)) %>
       </div>
 
       <p class="tw:m-0 tw:mt-6 <%= CALLOUT %>">
@@ -71,7 +71,7 @@
     <%= render(SharedBlocks::Marketing::SectionHeading::Component.new(eyebrow: translation(".why_it_matters"), eyebrow_color: :red,
       heading: translation(".a_registered_bike_can_come_home"), intro: translation(".most_stolen_bikes_are_never_returned"))) %>
 
-    <%= render(SharedBlocks::Marketing::NumberBlocks::Component.new(items: stats)) %>
+    <%= render(SharedBlocks::Marketing::RegistryStats::Component.new) %>
   </div>
 
   <ol
@@ -82,7 +82,7 @@
   >
     <% steps.each_with_index do |(color, title, body), index| %>
       <li class="tw:flex">
-        <%= render(UI::Card::Component.new(additional_classes: "tw:w-full tw:rounded-lg! tw:p-6!")) do %>
+        <%= render(UI::Card::Component.new(additional_classes: "tw:w-full tw:p-6!")) do %>
           <span class="tw:mb-2.5 tw:block tw:font-header tw:text-[34px] tw:leading-none tw:font-black <%= color %>">
             <%= index + 1 %>
           </span>
@@ -236,9 +236,10 @@
   >
     <% get_started_links.each do |text, path| %>
       <li>
-        <%= link_to(path, class: "tw:flex tw:items-center tw:justify-between tw:gap-4 tw:rounded-lg tw:border tw:border-gray-200 tw:px-5 tw:py-4.5 tw:font-semibold tw:text-inherit tw:transition-colors tw:hover:border-blue-600 tw:dark:border-gray-700") do %>
+        <%= render(UI::ButtonLink::Component.new(href: path, color: :secondary, size: :lg,
+          html_class: "tw:w-full tw:justify-between! tw:gap-4! tw:px-5! tw:py-4.5!")) do %>
           <%= text %>
-          <span aria-hidden="true" class="tw:text-blue-600">→</span>
+          <span aria-hidden="true">→</span>
         <% end %>
       </li>
     <% end %>

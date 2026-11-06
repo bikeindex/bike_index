@@ -7,36 +7,16 @@ module Pages
         SECTION_CLASSES = SharedBlocks::Marketing::Wrapper::Component::CONTAINER_CLASSES
         MUTED = "tw:text-gray-600 tw:dark:text-gray-300"
         CALLOUT = "tw:flex tw:items-center tw:gap-x-3.5 tw:text-base #{MUTED}"
-        OUTLINE = "tw:border-2! tw:border-blue-600! tw:normal-case! tw:text-blue-600! tw:hover:bg-blue-600! tw:hover:text-white! " \
-          "tw:dark:border-blue-400! tw:dark:text-blue-300! tw:dark:hover:bg-blue-500! tw:dark:hover:text-white!"
 
         # GObike Buffalo's tweet, quoted verbatim, so it isn't translated
         TESTIMONIAL = "At press conf. announcing partnership w/ @BPDAlerts, @BikeIndex, Erie Cty. DA's office & local bike shops to register bikes, prevent theft"
 
-        def initialize(recovery_displays:, total_bikes:, recoveries_count:, recoveries_value:, organizations_count:,
-          sign_up_path:)
+        def initialize(recovery_displays:, sign_up_path:)
           @recovery_displays = recovery_displays
           @sign_up_path = sign_up_path
-          @total_bikes = total_bikes
-          @recoveries_count = recoveries_count
-          @recoveries_value = recoveries_value
-          @organizations_count = organizations_count
         end
 
         private
-
-        def stats
-          [[bikes_display, translation(".bikes_registered_free")],
-            [number_display(@recoveries_count), translation(".stolen_bikes_recovered")],
-            [render(Atoms::CurrencyMillions::Component.new(dollars_usd: @recoveries_value)), translation(".value_returned_to_owners")],
-            [safe_join([number_display(@organizations_count), "+"]), translation(".partner_organizations")]]
-        end
-
-        def bikes_display
-          return number_display(@total_bikes) if @total_bikes < 1_000_000
-
-          "#{number_with_precision(@total_bikes / 1_000_000.0, precision: 1, round_mode: :floor, strip_insignificant_zeros: true)}M+"
-        end
 
         def trust_items
           [["icons/heart-handshake.svg", translation(".free_forever")],

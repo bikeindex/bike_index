@@ -7,15 +7,11 @@ class LandingPagesController < ApplicationController
   end
 
   def for_community_groups
-    total_bikes, recoveries_count, recoveries_value, organizations_count =
-      Counts.retrieve_many("total_bikes", "recoveries", "recoveries_value", "organizations")
-
     organization_path = new_organization_path(kind: "bike_advocacy")
     sign_up_path = current_user.present? ? organization_path : new_user_path(return_to: organization_path)
 
     render SharedBlocks::Marketing::Wrapper::Component.new(page: Pages::LandingPages::ForCommunityGroups::Component.new(
-      recovery_displays: RecoveryDisplay.with_photo.limit(4), total_bikes:, recoveries_count:, recoveries_value:,
-      organizations_count:, sign_up_path:
+      recovery_displays: RecoveryDisplay.with_photo.limit(4), sign_up_path:
     ))
   end
 
