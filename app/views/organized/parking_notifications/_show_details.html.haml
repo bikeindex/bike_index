@@ -36,7 +36,7 @@
                 or mark retrieved
             .card-body
               -# Matching form is on parking notification index
-              .row{ data: {controller: "org--parking-notification-repeat"} }
+              .row{ data: {controller: "org--parking-notification-repeat", "org--parking-notification-repeat-resolve-text-value": "Resolve notification"} }
                 .col-xs-12.col-sm-6
                   = select_tag :kind, options_for_select(parking_notification_repeat_kinds, selected: @parking_notification.kind), class: "form-control", data: {action: "org--parking-notification-repeat#updateSubmitText"}
                 .col-xs-12.col-sm-6.text-center

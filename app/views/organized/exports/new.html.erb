@@ -13,7 +13,7 @@
         <%= f.label :avery_export, "Avery Label Export", class: "org-form-label" %>
 
         <div class="col-sm-4">
-          <%= f.check_box :avery_export, checked: @export.avery_export?, data: {"org--export-form-target": "averyCheckbox", action: "org--export-form#update"} %>
+          <%= f.check_box :avery_export, data: {"org--export-form-target": "averyCheckbox", action: "org--export-form#update"} %>
         </div>
       </div>
     <% elsif current_organization.enabled?("bike_stickers") %>
@@ -57,61 +57,35 @@
         export_headers: @export.headers.presence || settings.default_export_headers)) %>
     </div>
 
-    <div
-      class="form-group row mt-4"
-      data-controller="org--field-expander"
-      data-org--export-form-target="hiddenOnOnlyCustom"
-    >
-      <%= f.label :start_at, "Registered after", class: "org-form-label" %>
+    <% {start_at: ["Registered after", "Set after time"], end_at: ["Registered before", "Set before time"]}.each do |attribute, (label_text, trigger)| %>
+      <% shown = @export.public_send(attribute).present? %>
 
-      <div class="col-sm-4">
-        <% show_start = @export.start_at.present? %>
+      <div
+        class="<%= class_names("form-group row", "mt-4": attribute == :start_at) %>"
+        data-controller="org--field-expander"
+        data-org--export-form-target="hiddenOnOnlyCustom"
+      >
+        <%= f.label attribute, label_text, class: "org-form-label" %>
 
-        <%= render(UI::Button::Component.new(text: "Set after time", color: :link,
-          html_class: class_names(expander_classes, "tw:hidden!": show_start),
-          data: {"org--field-expander-target": "collapsed", action: "org--field-expander#expand"})) %>
+        <div class="col-sm-4">
+          <%= render(UI::Button::Component.new(text: trigger, color: :link,
+            html_class: class_names(expander_classes, "tw:hidden!": shown),
+            data: {"org--field-expander-target": "collapsed", action: "org--field-expander#expand"})) %>
 
-        <div
-          class="<%= "tw:hidden" unless show_start %>"
-          data-org--field-expander-target="expanded"
-        >
-          <%= f.datetime_local_field :start_at, step: 60, class: "form-control", data: {"org--field-expander-target": "time"} %>
+          <div
+            class="<%= "tw:hidden" unless shown %>"
+            data-org--field-expander-target="expanded"
+          >
+            <%= f.datetime_local_field attribute, step: 60, class: "form-control", data: {"org--field-expander-target": "time"} %>
 
-          <div class="tw:text-right">
-            <%= render(UI::Button::Component.new(text: "remove", color: :link, html_class: "tw:text-xs",
-              data: {action: "org--field-expander#collapse"})) %>
+            <div class="tw:text-right">
+              <%= render(UI::Button::Component.new(text: "remove", color: :link, html_class: "tw:text-xs",
+                data: {action: "org--field-expander#collapse"})) %>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-
-    <div
-      class="form-group row"
-      data-controller="org--field-expander"
-      data-org--export-form-target="hiddenOnOnlyCustom"
-    >
-      <%= f.label :end_at, "Registered before", class: "org-form-label" %>
-
-      <div class="col-sm-4">
-        <% show_end = @export.end_at.present? %>
-
-        <%= render(UI::Button::Component.new(text: "Set before time", color: :link,
-          html_class: class_names(expander_classes, "tw:hidden!": show_end),
-          data: {"org--field-expander-target": "collapsed", action: "org--field-expander#expand"})) %>
-
-        <div
-          class="<%= "tw:hidden" unless show_end %>"
-          data-org--field-expander-target="expanded"
-        >
-          <%= f.datetime_local_field :end_at, step: 60, class: "form-control", data: {"org--field-expander-target": "time"} %>
-
-          <div class="tw:text-right">
-            <%= render(UI::Button::Component.new(text: "remove", color: :link, html_class: "tw:text-xs",
-              data: {action: "org--field-expander#collapse"})) %>
-          </div>
-        </div>
-      </div>
-    </div>
+    <% end %>
 
     <div class="form-group row" data-controller="org--field-expander">
       <%= f.label :custom_bike_ids, "Bikes to export", class: "org-form-label" %>

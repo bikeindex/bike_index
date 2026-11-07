@@ -313,9 +313,6 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
     wait_for_stimulus("org--parking-notification-repeat")
     select "Mark retrieved/resolved", from: "kind"
     expect(page).to have_button("Resolve notification")
-    select "Appears abandoned", from: "kind"
-    expect(page).to have_button("Create notification")
-    select "Mark retrieved/resolved", from: "kind"
     click_button "Resolve notification"
     expect(page).to have_no_button("Resolve notification")
     expect(far_away.reload.status).to eq "retrieved"

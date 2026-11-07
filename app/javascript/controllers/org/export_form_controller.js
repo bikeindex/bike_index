@@ -11,11 +11,14 @@ export default class extends Controller {
 
   // Unanimated, since a re-rendered form or a browser's restored checkboxes can start checked
   connect () {
-    this.#apply(0)
+    this.update({ duration: 0 })
   }
 
-  update () {
-    this.#apply()
+  update ({ duration } = {}) {
+    const avery = anyChecked(this.averyCheckboxTargets)
+    collapse(avery ? 'hide' : 'show', this.hiddenOnAveryTargets, duration)
+    collapse(avery || anyChecked(this.assignStickersCheckboxTargets) ? 'show' : 'hide', this.stickerFieldTargets, duration)
+    collapse(anyChecked(this.onlyCustomCheckboxTargets) ? 'hide' : 'show', this.hiddenOnOnlyCustomTargets, duration)
   }
 
   selectOnlyCustom () {
@@ -23,12 +26,5 @@ export default class extends Controller {
 
     this.onlyCustomCheckboxTarget.checked = true
     this.update()
-  }
-
-  #apply (duration) {
-    const avery = anyChecked(this.averyCheckboxTargets)
-    collapse(avery ? 'hide' : 'show', this.hiddenOnAveryTargets, duration)
-    collapse(avery || anyChecked(this.assignStickersCheckboxTargets) ? 'show' : 'hide', this.stickerFieldTargets, duration)
-    collapse(anyChecked(this.onlyCustomCheckboxTargets) ? 'hide' : 'show', this.hiddenOnOnlyCustomTargets, duration)
   }
 }

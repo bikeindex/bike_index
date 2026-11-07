@@ -115,8 +115,8 @@ RSpec.describe Organized::ExportsController, type: :request do
           expect(response.body).to_not include(reloads)
         end
       end
-      context "pending for more than 5 minutes" do
-        let(:export) { FactoryBot.create(:export_organization, organization: current_organization, created_at: 6.minutes.ago) }
+      context "pending for more than 10 minutes" do
+        let(:export) { FactoryBot.create(:export_organization, organization: current_organization, created_at: 11.minutes.ago) }
         it "doesn't reload" do
           get "#{base_url}/#{export.id}"
           expect(response.body).to_not include(reloads)

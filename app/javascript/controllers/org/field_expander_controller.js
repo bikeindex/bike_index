@@ -1,12 +1,11 @@
 import { Controller } from '@hotwired/stimulus'
 import { collapse } from 'utils/collapse_utils'
 
-// The browser's local date, which toISOString would otherwise give in UTC
-const startOfToday = () => `${new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10)}T00:00`
+// en-CA writes the local date as YYYY-MM-DD
+const startOfToday = () => `${new Date().toLocaleDateString('en-CA')}T00:00`
 
 // Connects to data-controller='org--field-expander'
-// Swaps the collapsed targets for the expanded ones. A time target starts at today when
-// expanded, and is cleared when collapsed so the form doesn't submit a hidden value
+// A time target is cleared when collapsed, so the form doesn't submit a hidden value
 export default class extends Controller {
   static targets = ['collapsed', 'expanded', 'time']
 

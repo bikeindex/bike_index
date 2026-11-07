@@ -19,13 +19,13 @@ module Organized
 
     def create
       if Binxtils::InputNormalizer.boolean(params.dig(:export, :avery_export))
-        create_avery_export
+        error = create_avery_export
       else
         @export = Export.new(permitted_parameters)
         @export.options[:impounded_bikes] = Binxtils::InputNormalizer.boolean(params[:include_impounded_bikes])
         @export.options[:partial_registrations] = !@export.options[:impounded_bikes] && partial_registration_params
       end
-      if flash[:error].blank? && @export.update(kind: "organization", organization_id: current_organization.id, user_id: current_user.id)
+      if error.blank? && @export.update(kind: "organization", organization_id: current_organization.id, user_id: current_user.id)
         OrganizationExportJob.perform_async(@export.id)
         if @export.avery_export? # Send to the show page, with avery export parameter set so we can redirect when the processing is finished
           flash[:success] = translation(:with_avery_redirect)
@@ -35,7 +35,7 @@ module Organized
           redirect_to organization_exports_path(organization_id: current_organization.to_param)
         end
       else
-        @export ||= Export.new
+        flash.now[:error] = error if error
         render :new
       end
     end
@@ -59,17 +59,13 @@ module Organized
 
     private
 
+    # Returns the error blocking it, if there is one
     def create_avery_export
-      if current_organization.enabled?("avery_export")
-        @export = Export.new(avery_export_parameters) # Note: avery export can't include partials
-        bike_sticker = current_organization.bike_stickers.lookup(@export.bike_code_start) if @export.bike_code_start.present?
+      @export = Export.new(avery_export_parameters) # Note: avery export can't include partials
+      return translation(:do_not_have_permission) unless current_organization.enabled?("avery_export")
 
-        if bike_sticker.present? && bike_sticker.claimed?
-          flash.now[:error] = translation(:sticker_already_assigned)
-        end
-      else
-        flash.now[:error] = translation(:do_not_have_permission)
-      end
+      bike_sticker = current_organization.bike_stickers.lookup(@export.bike_code_start) if @export.bike_code_start.present?
+      translation(:sticker_already_assigned) if bike_sticker&.claimed?
     end
 
     def permitted_new_parameters
