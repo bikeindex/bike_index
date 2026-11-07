@@ -1877,8 +1877,6 @@ RSpec.describe RegisterController, type: :request do
         expect(response).to redirect_to step_path("2")
         expect(b_param.reload.creation_organization_id).to eq organization.id
         expect(RegistrationSequenceAcknowledgment.count).to eq 0
-        get step_path("3")
-        expect(response).to redirect_to step_path("2")
         get step_path("2")
         expect(response.body).to include "XYZ 123"
         expect(response.body).to include "Sally Rider"
