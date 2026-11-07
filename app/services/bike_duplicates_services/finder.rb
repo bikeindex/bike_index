@@ -41,7 +41,7 @@ module BikeDuplicatesServices
     # Every queue's counts and one queue's groups, or nil until the first ones are prepared. The query takes
     # most of a minute in production, so a missing or hour-old snapshot enqueues the job - once across every
     # server - rather than running it here. Group times are epoch seconds and cues are keys, for
-    # Cues.group_cues to build
+    # BikeDuplicatesServices::Cues.group_cues to build
     def fetch_group_snapshot(kind)
       summary_json, groups_json = RedisPool.conn { it.mget(SNAPSHOT_KEY, kind_key(kind)) }
       summary = JSON.parse(summary_json) if summary_json
@@ -80,7 +80,7 @@ module BikeDuplicatesServices
     end
 
     def groups
-      manufacturer_names = Cues.fetch_manufacturer_name_serials
+      manufacturer_names = BikeDuplicatesServices::Cues.fetch_manufacturer_name_serials
       ActiveRecord::Base.connection.select_all(query).to_a.map do |group|
         group["manufacturer_name_serial"] = manufacturer_names[group["serial"]]
         group = group.except("linked_organization_ids").merge("kind" => kind(group),
@@ -88,7 +88,7 @@ module BikeDuplicatesServices
           "organization_ids" => (JSON.parse(group["organization_ids"] || "[]") + JSON.parse(group["linked_organization_ids"] || "[]").flatten).uniq,
           "first_at" => group["first_at"].in_time_zone.to_i,
           "last_at" => group["last_at"].in_time_zone.to_i)
-        group.merge("cue_keys" => Cues.group_cues(group).map(&:key))
+        group.merge("cue_keys" => BikeDuplicatesServices::Cues.group_cues(group).map(&:key))
       end
     end
 
@@ -96,14 +96,14 @@ module BikeDuplicatesServices
     # so it outranks the rest
     def kind(group)
       return "stolen_history" if group["serial_stolen"]
-      return "not_a_serial" if Cues.not_a_serial(group["serial"], manufacturer_names: Cues.group_manufacturer_names(group))
+      return "not_a_serial" if BikeDuplicatesServices::Cues.not_a_serial(group["serial"], manufacturer_names: BikeDuplicatesServices::Cues.group_manufacturer_names(group))
       return "internal_test" if group["test_count"] == group["record_count"]
       return "mixed_test" if group["test_count"].positive?
       return "large_group" if group["record_count"] >= LARGE_GROUP_MINIMUM
       return "handoff_priority" if group["handoff_priority"]
       return "pos_repeat" if group["pos_count"] == group["record_count"] && group["ever_claimed_count"].zero? && group["transfer_count"].zero? && group["email_count"] == 1 && group["missing_email_count"].zero? && group["organization_count"] == 1 && group["missing_organization_count"].zero?
       return "shop_customer" if group["record_count"] == 2 && group["pos_count"] == 1 && group["customer_count"] == 1 && group["pos_first"]
-      return "same_identity" if Cues.single_contact?(group)
+      return "same_identity" if BikeDuplicatesServices::Cues.single_contact?(group)
 
       "unresolved"
     end
@@ -243,7 +243,7 @@ module BikeDuplicatesServices
           count(*) FILTER (WHERE ever_claimed)::integer ever_claimed_count,
           count(*) FILTER (WHERE transferred)::integer transfer_count,
           count(DISTINCT email)::integer email_count, count(*) FILTER (WHERE email IS NULL)::integer missing_email_count,
-          count(*) FILTER (WHERE #{Cues.review_contact_sql("email")})::integer review_contact_count,
+          count(*) FILTER (WHERE #{BikeDuplicatesServices::Cues.review_contact_sql("email")})::integer review_contact_count,
           count(DISTINCT user_id)::integer account_count, count(*) FILTER (WHERE user_id IS NULL)::integer missing_account_count,
           count(DISTINCT organization_id)::integer organization_count, count(*) FILTER (WHERE organization_id IS NULL)::integer missing_organization_count,
           jsonb_agg(DISTINCT organization_id) FILTER (WHERE organization_id IS NOT NULL) organization_ids,

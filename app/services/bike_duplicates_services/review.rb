@@ -248,7 +248,7 @@ module BikeDuplicatesServices
 
     def ownership_pair(bike, initial:) = [bike, reference_bike].map { initial ? initial_ownership(it) : it&.current_ownership }
 
-    # Cues.fetch_manufacturer_name_serials, so a brand typed as the serial is caught
+    # BikeDuplicatesServices::Cues.fetch_manufacturer_name_serials, so a brand typed as the serial is caught
     def manufacturer_names = @manufacturer_names ||= BikeDuplicatesServices::Cues.fetch_manufacturer_name_serials
 
     def stolen_record_counts
