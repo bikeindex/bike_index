@@ -446,7 +446,7 @@ RSpec.describe Bike, type: :model do
 
   describe "unfinished_registration?" do
     let(:bike) { FactoryBot.create(:bike) }
-    let!(:acknowledgment) { FactoryBot.create(:registration_sequence_acknowledgment_pending, bike:) }
+    let!(:acknowledgment) { FactoryBot.create(:education_course_acknowledgment_pending, bike:) }
 
     it "is true until the safety rules are agreed to" do
       expect(bike.unfinished_registration?).to be_truthy
@@ -1406,12 +1406,12 @@ RSpec.describe Bike, type: :model do
     end
   end
 
-  describe "registration_sequence_applies?" do
+  describe "education_course_applies?" do
     it "is only an e-vehicle's, and never an unregistered parking notification's" do
-      expect(Bike.new(propulsion_type: "foot-pedal").registration_sequence_applies?).to be_falsey
-      expect(Bike.new(propulsion_type: "pedal-assist").registration_sequence_applies?).to be_truthy
+      expect(Bike.new(propulsion_type: "foot-pedal").education_course_applies?).to be_falsey
+      expect(Bike.new(propulsion_type: "pedal-assist").education_course_applies?).to be_truthy
       expect(Bike.new(propulsion_type: "pedal-assist", status: "unregistered_parking_notification")
-        .registration_sequence_applies?).to be_falsey
+        .education_course_applies?).to be_falsey
     end
   end
 

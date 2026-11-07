@@ -101,12 +101,12 @@
     </small>
   <% end %>
 
-  <% if organization.enabled?("registration_sequences") %>
-    <% column.(sortable: "acknowledged_at", label: tag.span(settings.column_renames[:acknowledgment_cell], title: translation(".acknowledgment_title")), classes: "hideableColumn acknowledgment_cell tw:leading-none") do |bike| %>
-      <% if bike.registration_sequence_applies? %>
+  <% if organization.enabled?("education_courses") %>
+    <% column.(sortable: "acknowledged_at", label: tag.span(settings.column_renames[:acknowledgment_cell], title: translation(".course_acknowledgment_title")), classes: "hideableColumn acknowledgment_cell tw:leading-none") do |bike| %>
+      <% if bike.education_course_applies? %>
         <% if bike.organized?(organization) %>
           <small>
-            <%= render(UI::Time::Component.new(time: RegistrationSequenceAcknowledgment.find_for(bike:, organization:)&.acknowledged_at)) %>
+            <%= render(UI::Time::Component.new(time: EducationCourseAcknowledgment.find_for(bike:, organization:)&.acknowledged_at)) %>
           </small>
         <% else %>
           <%= hidden_html.call %>

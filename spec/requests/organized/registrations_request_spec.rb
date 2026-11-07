@@ -438,16 +438,16 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       end
     end
 
-    context "sorted by registration sequence acknowledgment" do
-      let(:enabled_feature_slugs) { %w[registration_sequences show_partial_registrations] }
-      let(:registration_sequence) { FactoryBot.create(:registration_sequence_active, :with_pages, organization: current_organization) }
+    context "sorted by education course acknowledgment" do
+      let(:enabled_feature_slugs) { %w[education_courses show_partial_registrations] }
+      let(:education_course) { FactoryBot.create(:education_course_active, :with_pages, organization: current_organization) }
       let!(:bike_acknowledged_earlier) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }
       let!(:bike_acknowledged_later) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }
       before do
-        FactoryBot.create(:registration_sequence_acknowledgment, registration_sequence:, bike: bike_acknowledged_earlier, acknowledged_at: 2.days.ago)
-        FactoryBot.create(:registration_sequence_acknowledgment, registration_sequence:, bike: bike_acknowledged_later, acknowledged_at: 1.day.ago)
+        FactoryBot.create(:education_course_acknowledgment, education_course:, bike: bike_acknowledged_earlier, acknowledged_at: 2.days.ago)
+        FactoryBot.create(:education_course_acknowledgment, education_course:, bike: bike_acknowledged_later, acknowledged_at: 1.day.ago)
         # Another organization's acknowledgment doesn't count
-        FactoryBot.create(:registration_sequence_acknowledgment, bike:)
+        FactoryBot.create(:education_course_acknowledgment, bike:)
       end
 
       def sorted_bike_ids(direction)
@@ -480,11 +480,11 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         expect(sorted_bike_ids("desc").first(2)).to match_array([bike.id, registered_bike.id])
         expect(sorted_bike_ids("asc").last(2)).to match_array([bike.id, registered_bike.id])
 
-        registration_sequence.registration_sequence_pages.each_with_index do |page, index|
-          patch "/register/acknowledge", params: {b_param_token: b_param.id_token, registration_sequence_id: registration_sequence.id,
+        education_course.education_course_pages.each_with_index do |page, index|
+          patch "/register/acknowledge", params: {b_param_token: b_param.id_token, education_course_id: education_course.id,
                                                   step: (index + 3).to_s, acknowledged: page.bullets.each_index.to_h { [it.to_s, "1"] }}
         end
-        patch "/register/acknowledge", params: {b_param_token: b_param.id_token, registration_sequence_id: registration_sequence.id,
+        patch "/register/acknowledge", params: {b_param_token: b_param.id_token, education_course_id: education_course.id,
                                                 step: "review", acknowledged_all: "1"}
         expect(registered_bike.unfinished_registration?).to be_falsey
 
@@ -684,7 +684,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
     end
 
     context "both steps on one page" do
-      let!(:sequence) { FactoryBot.create(:registration_sequence_active, :with_pages, organization: current_organization) }
+      let!(:sequence) { FactoryBot.create(:education_course_active, :with_pages, organization: current_organization) }
       let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Trek") }
       let(:color) { FactoryBot.create(:color, name: "Red") }
 
@@ -724,14 +724,14 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       it "stops at the safety pages, which the submission is what asks for, then goes back for the next" do
         b_param = nil
         expect { b_param = register_on_single_page }
-          .to change(Bike, :count).by(1).and change(RegistrationSequenceAcknowledgment.pending, :count).by 1
+          .to change(Bike, :count).by(1).and change(EducationCourseAcknowledgment.pending, :count).by 1
         expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: "3")
 
         %w[3 4].each do |step|
-          patch acknowledge_register_path, params: {b_param_token: b_param.id_token, registration_sequence_id: sequence.id,
+          patch acknowledge_register_path, params: {b_param_token: b_param.id_token, education_course_id: sequence.id,
                                                     step:, acknowledged: {"0" => "1", "1" => "1"}}
         end
-        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, registration_sequence_id: sequence.id,
+        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, education_course_id: sequence.id,
                                                   step: "review", acknowledged_all: "1"}
         expect(response).to redirect_to "#{base_url}/new"
         expect(flash[:success]).to eq "The Trek is registered - we've emailed customer@example.com so they can claim it."
@@ -750,7 +750,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
 
       it "says the owner was sent the safety rules, when they're left to them" do
         expect { register_on_single_page(separate_attestation: true) }
-          .to change(Bike, :count).by(1).and change(RegistrationSequenceAcknowledgment.pending, :count).by 1
+          .to change(Bike, :count).by(1).and change(EducationCourseAcknowledgment.pending, :count).by 1
         expect(response).to redirect_to "#{base_url}/new"
         expect(flash[:success]).to eq "The Trek is registered - we've emailed customer@example.com the safety rules " \
           "to agree to, which finishes the registration."
@@ -758,7 +758,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
     end
 
     context "the registrant fills out the attestation separately" do
-      let!(:sequence) { FactoryBot.create(:registration_sequence_active, :with_pages, organization: current_organization) }
+      let!(:sequence) { FactoryBot.create(:education_course_active, :with_pages, organization: current_organization) }
       let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Trek") }
       let(:color) { FactoryBot.create(:color, name: "Red") }
       let(:owner_email) { "customer@example.com" }
@@ -781,7 +781,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       it "finishes the member's registration off step 2, and sends the owner the safety rules to agree to" do
         b_param = nil
         expect { b_param = register_e_scooter }
-          .to change(Bike, :count).by(1).and change(RegistrationSequenceAcknowledgment.pending, :count).by 1
+          .to change(Bike, :count).by(1).and change(EducationCourseAcknowledgment.pending, :count).by 1
         expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: "finished")
         expect(Bike.last).to have_attributes(owner_email:, cycle_type: "e-scooter")
         expect(Bike.last.current_ownership.registration_info.slice("register_single_page", "register_separate_attestation"))
@@ -801,15 +801,15 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         get "/register", params: {b_param_token: b_param.id_token}
         expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: "3")
         %w[3 4].each do |step|
-          patch acknowledge_register_path, params: {b_param_token: b_param.id_token, registration_sequence_id: sequence.id,
+          patch acknowledge_register_path, params: {b_param_token: b_param.id_token, education_course_id: sequence.id,
                                                     step:, acknowledged: {"0" => "1", "1" => "1"}}
         end
         expect {
-          patch acknowledge_register_path, params: {b_param_token: b_param.id_token, registration_sequence_id: sequence.id,
+          patch acknowledge_register_path, params: {b_param_token: b_param.id_token, education_course_id: sequence.id,
                                                     step: "review", acknowledged_all: "1"}
-        }.to change(RegistrationSequenceAcknowledgment.acknowledged, :count).by 1
+        }.to change(EducationCourseAcknowledgment.acknowledged, :count).by 1
         expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: "finished")
-        expect(RegistrationSequenceAcknowledgment.sole.user.email).to eq owner_email
+        expect(EducationCourseAcknowledgment.sole.user.email).to eq owner_email
         expect { EmailJobs::OwnershipInvitationJob.drain }.to change(ActionMailer::Base.deliveries, :count).by 1
       end
 
@@ -866,7 +866,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         it "asks for the attestation, which is theirs to agree to" do
           b_param = nil
           expect { b_param = register_e_scooter }
-            .to change(Bike, :count).by(1).and change(RegistrationSequenceAcknowledgment.pending, :count).by 1
+            .to change(Bike, :count).by(1).and change(EducationCourseAcknowledgment.pending, :count).by 1
           expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: "3")
         end
       end
@@ -886,7 +886,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
 
       context "registering for another organization" do
         let(:other_organization) { FactoryBot.create(:organization) }
-        let!(:other_sequence) { FactoryBot.create(:registration_sequence_active, :with_pages, organization: other_organization) }
+        let!(:other_sequence) { FactoryBot.create(:education_course_active, :with_pages, organization: other_organization) }
 
         it "asks for its attestation - the switch is this organization's" do
           post "#{base_url}/switches", params: {separate_attestation: true}
@@ -896,7 +896,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
           post "/register", params: {b_param_token: b_param.id_token, propulsion_type_motorized: true,
                                      b_param: {manufacturer_id: "Trek", cycle_type: "e-scooter", owner_email:}}
           expect { patch "/register", params: {b_param_token: b_param.id_token, bike: details} }
-            .to change(Bike, :count).by(1).and change(RegistrationSequenceAcknowledgment.pending, :count).by 1
+            .to change(Bike, :count).by(1).and change(EducationCourseAcknowledgment.pending, :count).by 1
           expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: "3")
         end
       end

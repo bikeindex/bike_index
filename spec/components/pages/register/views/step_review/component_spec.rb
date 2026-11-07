@@ -5,7 +5,7 @@ require "rails_helper"
 RSpec.describe Pages::Register::Views::StepReview::Component, type: :component do
   let(:organization) { FactoryBot.create(:organization) }
   let(:sequence) do
-    FactoryBot.create(:registration_sequence_active, :with_pages, organization:,
+    FactoryBot.create(:education_course_active, :with_pages, organization:,
       acknowledgment_text: "agree to all of it")
   end
   let(:current_user) { FactoryBot.create(:user_confirmed, name: "Filling It In") }

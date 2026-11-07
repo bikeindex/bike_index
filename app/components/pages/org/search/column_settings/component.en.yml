@@ -6,7 +6,7 @@ en:
         search:
           column_settings:
             acknowledgment_cell: Reg acknowledged
-            acknowledgment_cell_panel: Time - Registration sequence acknowledged
+            acknowledgment_cell_panel: Time - Education course acknowledged
             address: 'Address:'
             all: all
             all_bikes: All bikes

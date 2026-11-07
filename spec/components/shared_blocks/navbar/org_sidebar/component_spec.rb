@@ -57,10 +57,10 @@ RSpec.describe SharedBlocks::Navbar::OrgSidebar::Component, type: :component do
       .to eq "/o/#{organization.to_param}/registrations"
 
     # Editing a page of a sequence is its own path, off the sequences one
-    sequences = rows.find { |row| row.text.strip == "Registration sequences" }
+    sequences = rows.find { |row| row.text.strip == "Education courses" }
     expect(sequences["data-ui--active-link-match-paths-value"])
-      .to eq "/o/#{organization.to_param}/registration_sequences/** " \
-        "/o/#{organization.to_param}/registration_sequence_pages/**"
+      .to eq "/o/#{organization.to_param}/education_courses/** " \
+        "/o/#{organization.to_param}/education_course_pages/**"
   end
 
   it "links the unregistered notification row to its own page" do

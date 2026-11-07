@@ -70,7 +70,7 @@ RSpec.describe Pages::Register::Views::StepReport::Component, type: :component d
 
   context "with acknowledgment pages after it" do
     let(:organization) { FactoryBot.create(:organization) }
-    let!(:sequence) { FactoryBot.create(:registration_sequence_active, :with_pages, organization:) }
+    let!(:sequence) { FactoryBot.create(:education_course_active, :with_pages, organization:) }
     let(:params) do
       {bike: {owner_email: current_user.email, manufacturer_id: 12, status:, cycle_type: "e-scooter",
               creation_organization_id: organization.id}}
@@ -86,7 +86,7 @@ RSpec.describe Pages::Register::Views::StepReport::Component, type: :component d
     # The emailed link is clicked after the pages, so the report is what's left - the same
     # step list as above, which is why the button reads off what's been agreed to instead
     context "already acknowledged" do
-      before { FactoryBot.create(:registration_sequence_acknowledgment, b_param:, registration_sequence: sequence) }
+      before { FactoryBot.create(:education_course_acknowledgment, b_param:, education_course: sequence) }
 
       it "finishes the registration" do
         render_inline(described_class.new(b_param:, sequence:, flow:))

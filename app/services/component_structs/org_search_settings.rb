@@ -269,7 +269,7 @@ module ComponentStructs
         ("notes_cell" if @organization.enabled?("registration_notes")),
         ("impound_id_cell" if impound_search?),
         ("avery_cell" if @organization.enabled?("avery_export")),
-        ("acknowledgment_cell" if @organization.enabled?("registration_sequences"))
+        ("acknowledgment_cell" if @organization.enabled?("education_courses"))
       ].compact.uniq
     end
 
