@@ -186,6 +186,10 @@ RSpec.describe Admin::DuplicateBikesController, type: :request do
       get "#{base_url}/#{duplicate_group.id}"
       expect(response).to redirect_to(admin_duplicate_bikes_path(search_view: "segments"))
       expect(flash[:error]).to eq "2 records are too many to review together"
+
+      get "#{base_url}/#{duplicate_group.id}.json"
+      expect(response.status).to eq 422
+      expect(response.parsed_body).to eq("error" => "2 records are too many to review together")
     end
 
     it "summarizes a large group and filters to one contact" do
@@ -198,6 +202,21 @@ RSpec.describe Admin::DuplicateBikesController, type: :request do
       get "#{base_url}/serial", params: {reference_bike_id: marked_bikes.first.id, search_contact: 2}
       expect(assigns(:bikes).size).to eq 1
       expect(response.body).to include("Show all 11 records")
+    end
+
+    it "compares from the oldest live record when the reference has been deleted" do
+      marked_bikes.first.update_column(:deleted_at, Time.current)
+      # A backdated import: the oldest registration, though not the lowest ID
+      marked_bikes.last.update_column(:created_at, marked_bikes.first.created_at - 1.day)
+      get "#{base_url}/serial", params: {reference_bike_id: marked_bikes.first.id}
+      expect(response.code).to eq "200"
+      expect(assigns(:bikes_count)).to eq 10
+      expect(assigns(:reference_bike)).to eq marked_bikes.last
+    end
+
+    it "404s for a reference that isn't one of the compared records" do
+      get "#{base_url}/compare", params: {bike_ids: pair.map(&:id).join(","), reference_bike_id: marked_bikes.first.id}
+      expect(response.code).to eq "404"
     end
 
     it "lists records oldest first, or newest first on request" do
@@ -295,6 +314,71 @@ RSpec.describe Admin::DuplicateBikesController, type: :request do
         get "#{base_url}/compare", params: {bike_ids: pair.map(&:id).join(",")}
         expect(response.code).to eq "200"
         expect(response.body).to include("Do not merge: this whole serial has stolen history")
+      end
+    end
+  end
+
+  describe "authenticated with an API token" do
+    let(:current_user) { false } # No session - the token is the authentication
+    include_context :admin_doorkeeper_token
+
+    let(:url) { "#{base_url}.json" }
+    include_examples "rejects_unauthorized_token"
+
+    context "token for a duplicate_bikes superuser" do
+      let(:email_pattern) { /[^@\s"]+@[^@\s"]+\.\w+/ }
+      before { FactoryBot.create(:superuser_ability, user: token_user, controller_name: "duplicate_bikes") }
+
+      it "returns queues and groups without contact emails" do
+        get url, params: token_param.merge(search_kind: "large_group")
+        expect(response.status).to eq 200
+        expect(json_result[:queues][:large_group]).to eq({label: "Large groups — validate the serial", groups: 1, records: 11}.as_json)
+        group = json_result[:groups].first
+        expect(group[:bike_ids]).to match_array marked_bikes.map(&:id)
+        expect(group[:cues].map { it[:key] }).to include("standard_marking", "review_contact")
+        expect(json_result[:total_count]).to eq 1
+        expect(response.body).to_not match(email_pattern)
+      end
+
+      it "returns compare errors as JSON" do
+        get "#{base_url}/compare.json", params: token_param.merge(bike_ids: "#{pair.first.id},x")
+        expect(response.status).to eq 422
+        expect(json_result[:error]).to eq "Not bike record IDs: x"
+      end
+
+      it "returns a comparison without contact emails" do
+        get "#{base_url}/serial.json", params: token_param.merge(reference_bike_id: pair.last.id)
+        expect(response.status).to eq 200
+        expect(json_result[:records].map { it[:id] }).to eq pair.map(&:id)
+        expect(json_result[:differing_fields].keys).to include("Model")
+        expect(json_result[:contact_groups].first).to include(number: 1, email_present: true)
+        expect(json_result[:serial_stolen]).to be false
+        expect(json_result[:checks].first.keys).to eq %w[status label]
+        expect(response.body).to_not match(email_pattern)
+      end
+
+      it "rechecks the stolen veto live and blocks the comparison" do
+        kind = finder.groups.find { it["bike_ids"].include?(pair.first.id) }["kind"]
+        FactoryBot.create(:stolen_bike, serial_number: "WTU123456")
+        get url, params: token_param.merge(search_kind: kind)
+        expect(json_result[:groups].find { it[:bike_ids].include?(pair.first.id) }[:serial_stolen]).to be true
+
+        get "#{base_url}/serial.json", params: token_param.merge(reference_bike_id: pair.last.id)
+        expect(json_result[:serial_stolen]).to be true
+        expect(json_result[:readiness]).to eq "blocked"
+      end
+
+      it "refuses HTML, whose links would carry the token" do
+        get base_url, params: token_param
+        expect(response.status).to eq 406
+        expect(response.body).to_not include(doorkeeper_token.token)
+      end
+
+      it "reports preparation while the groups are prepared" do
+        RedisPool.conn { it.del(finder::SNAPSHOT_KEY) }
+        get url, params: token_param
+        expect(response.status).to eq 202
+        expect(json_result[:status]).to eq "preparing"
       end
     end
   end

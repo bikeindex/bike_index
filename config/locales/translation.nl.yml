@@ -3589,39 +3589,6 @@ nl:
         op uw website
       bike_shops_deck: fietswinkel partner deck
       check_out: Bekijk onze
-    for_community_groups:
-      bike_index_for_community_groups: Bike Index voor Community's
-      bike_index_launches_new_ambassadors_progr: Bike Index lanceert een nieuw Ambassadeurs
-        programma
-      bike_index_welcomes_stolen_bikes_nola: Bike Index verwelkomt Stolen Bikes NOLA
-      gone_are_the_days_where_you_had_to_regist: Voorbij zijn de dagen dat u uw fiets
-        moest registreren in uw buurt, provincie, stad, staat en land. Registreer
-        simpelweg alle fietsen in Bike Index en een registratie voor fietsers is overal
-        geldig. Registratie-testen uitvoeren? Gemeenschappelijke wielerevenementen
-        hosten? Laat het ons weten en we sturen u Bike Index-materialen toe.
-      help_us_help_you: Help ons u te helpen
-      here: hier
-      partners_made_in_heaven: Partners gemaakt in de hemel
-      purchase_a_pack_of_advocacy_html: Koop een pakket advocacy-materialen %{link}.
-      registrations_are_free_forever_join_bike_: Inschrijvingen zijn gratis. Voor
-        altijd. Word lid van Bike Index en begin vandaag nog met registreren.
-      related_articles: 'Gerelateerde artikelen:'
-      sign_up_for_free: Meld u aan gratis aan
-      spread_the_bike_index_word_html: Verspreid het Bike Index-woord naar uw kiezers
-        om ze beschermd te rijden. Maak een gratis organisatieaccount %{link}.
-      the_most_widereaching_and_effective_tools: De meest uitgebreide en effectieve
-        tools tegen fietsdiefstal - periode.
-      trusted_by_community_groups_everywhere: Overal vertrouwd door communitygroepen
-      used_by_community_groups_everywhere: Overal gebruikt door Community's
-      we_provide_free_and_easy_access_to_our_re: We bieden gratis en gemakkelijke
-        toegang tot ons register voor iedereen en iedereen die op een fiets rijdt,
-        in welke hoedanigheid dan ook. Bike Index is een gemeenschapsgedreven poging
-        om verloren en gestolen fietsen terug te vinden. Ongeacht het type fiets of
-        fietser, we willen alle fietsen laten rijden met de eigenaren die ze nodig
-        hebben.
-      embed_a_bike_index_registration_form: Een fietsregistratieformulier insluiten
-        op uw website
-      registration_drive: Gebruik Bike Index om een registratierit te hosten
     packages_list:
       forever: Voor altijd
       free: GRATIS
@@ -3721,6 +3688,13 @@ nl:
     marketplace_how_it_works: Hoe werkt kopen en verkopen op de Bike Index Marketplace,
       waar elke fiets geregistreerd staat en een als gestolen opgegeven fiets niet
       te koop aangeboden kan worden.
+    register_landing: Registreer je fiets gratis op Bike Index. Je krijgt bewijs dat
+      de fiets van jou is, ontvangt met één klik een melding als de fiets gestolen
+      is en je wordt aangesloten bij een netwerk van winkels, politie en fietsers
+      die uitkijken naar je fiets.
+    landing_pages_for_community_groups: Bike Index is een gratis, non-profit fietsregister.
+      Help je fietsers zich te registreren, zodat een gestolen fiets weer thuisgebracht
+      kan worden. Gratis voor buurtverenigingen, voor altijd.
   meta_titles:
     bikes_index: Zoekresultaten
     bikes_new: Registreer een fiets!
@@ -3774,6 +3748,7 @@ nl:
     strava_search_index: Fietsindex Strava-zoekfunctie
     registration_form_settings: Instellingen voor het registratieformulier
     marketplace_how_it_works: Hoe de Bike Index Marketplace werkt
+    register_landing: Registreer je fiets gratis
   organized:
     ambassador_dashboards:
       getting_started:
@@ -6832,6 +6807,87 @@ nl:
               kans dat je %{cycle_type} terugkomt — je kunt het nummer later toevoegen.
           step_review:
             complete_registration: Voltooi de %{cycle_type}-registratie
+          landing:
+            a_million_bikes: Er staan een miljoen fietsen geregistreerd. Geen enkele
+              eigenaar heeft betaald om erbij te zijn.
+            benefit_alerts_body: Als het gestolen wordt, markeer het dan als gestolen
+              en wij waarschuwen partnerwinkels, de politie en fietsers in de buurt
+              van de plaats waar het is gebeurd.
+            benefit_alerts_title: Meldingen bij diefstal met één klik
+            benefit_app_body: Registreer en beheer al je fietsen via de Bike Index
+              iOS-app en meld diefstal waar je ook bent.
+            benefit_app_title: Je garage in je zak
+            benefit_found_body: Als iemand je fiets vindt en het serienummer opzoekt,
+              brengen we die persoon rechtstreeks met je in contact.
+            benefit_found_title: Gevonden? Wij vertellen het u.
+            benefit_marketplace_body: Verkoop je fiets gratis op de Bike Index-marktplaats.
+              Elke advertentie begint met een geregistreerde fiets en wordt gecontroleerd
+              aan de hand van diefstalrapporten, zodat kopers zeker weten dat de fiets
+              legitiem is.
+            benefit_marketplace_title: Een betrouwbare marktplaats
+            benefit_network_body: Vrijwilligers, lokale opsporingsteams en meer dan
+              1000 politiekorpsen, universiteiten, steden en winkels houden de wacht
+              voor gestolen fietsen en signaleren deze.
+            benefit_network_title: Mensen die ernaar op zoek zijn
+            benefit_private_body: Je contactgegevens blijven verborgen. Wij zijn een
+              non-profitorganisatie, dus we verkopen geen gegevens en plaatsen geen
+              advertenties.
+            benefit_private_title: Standaard privé
+            benefit_proof_body: Uw serienummer, foto's en aankoopbewijs worden allemaal
+              in één permanent dossier bewaard. Handig voor politierapporten en verzekeringsclaims.
+            benefit_proof_title: Bewijs dat het van jou is
+            benefit_resell_body: Kopers, winkels en de politie controleren serienummers
+              aan de hand van het register. Een geregistreerde gestolen fiets is een
+              fiets die niemand wil kopen.
+            benefit_resell_title: Moeilijker door te verkopen
+            benefit_transfer_body: Draag het kentekenbewijs in een paar klikken over
+              aan de volgende eigenaar, zodat de geschiedenis van de motorfiets met
+              hem meereist.
+            benefit_transfer_title: Makkelijk te verkopen of door te geven.
+            bike_already_stolen: Is je fiets gestolen? Bekijk wat je nu moet doen.
+            check_add_later: Je kunt later foto's en details toevoegen.
+            check_free_no_data_sharing: Voor altijd gratis. Wij verkopen of delen
+              uw gegevens niet.
+            check_two_minutes: Het duurt ongeveer twee minuten.
+            donations_keep_it_free: Bike Index is een non-profitorganisatie. Donaties
+              maken het mogelijk dat de dienst gratis blijft.
+            faq_free_answer: Ja. Registreren, meldingen doen en zoeken is voor iedereen
+              gratis, voor altijd. Bike Index is een 501(c)(3) non-profitorganisatie.
+            faq_free_question: Is het echt gratis?
+            faq_privacy_answer: De openbare gegevens van de fiets zijn opvraagbaar.
+              Je naam, e-mailadres en adres worden nooit openbaar weergegeven.
+            faq_privacy_question: Wie kan mijn gegevens zien?
+            faq_serial_answer: Registreer je sowieso en voeg het later toe. Draai
+              de fiets om en kijk onder de trapas, waar de pedalen het frame raken.
+            faq_serial_question: Ik weet mijn serienummer niet.
+            free_nonprofit_worldwide: Gratis · Non-profit · Wereldwijd
+            fund_the_next_recovery: Financier het volgende herstel
+            give_your_bike_a_way_home: Geef je fiets een manier om thuis te komen.
+            if_the_worst_happens: Als het ergste gebeurt
+            keep_it_free: Houd het gratis
+            lede: Registreer hem nu en je hebt bewijs dat hij van jou is, een diefstalmelding
+              die je met één klik kunt versturen, en een netwerk van winkels, politie
+              en motorrijders die ernaar uitkijken.
+            quick_answers: Snelle antwoorden
+            register_your_bike: Registreer uw fiets
+            sticker_flagged_body: Als een winkel, koper of agent het serienummer controleert,
+              blijkt het gestolen te zijn en krijg je dat bericht.
+            sticker_flagged_sound: DING!
+            sticker_flagged_title: 3. Het wordt gemarkeerd
+            sticker_register_body: Het serienummer en de gegevens van je fiets worden
+              geregistreerd voordat er iets misgaat. Dat is het gedeelte dat de meeste
+              mensen overslaan.
+            sticker_register_sound: KLIK!
+            sticker_register_title: 1. Registreer je vandaag nog
+            sticker_stolen_body: Met één klik wordt het op de lijst met gestolen goederen
+              geplaatst en worden partners in de buurt gewaarschuwd. Spreek niemand
+              aan. Neem contact op met de politie.
+            sticker_stolen_sound: GESTOLEN!
+            sticker_stolen_title: 2. Markeer het als gestolen
+            what_registering_gets_you: Wat je krijgt als je je registreert
+            what_registering_subhead: De meeste gestolen fietsen komen nooit meer
+              thuis, omdat niemand kan bewijzen van wie ze zijn. Een kentekenbewijs
+              lost dat probleem op.
       bikebook:
         show:
           any_activity: Elke activiteit
@@ -7927,6 +7983,100 @@ nl:
           start_over: Begin opnieuw
           tabs_label: Voorbeelden van organisaties
           viewing_as: Beschouwen als
+        for_community_groups:
+          a_registered_bike_can_come_home: Een geregistreerde fiets is een fiets die
+            mee naar huis genomen kan worden.
+          ask_about_ebike_education: Vraag ons gerust hoe wij fietsers voorlichten
+            over e-bikes.
+          become_an_ambassador: Word een ambassadeur
+          bike_index_for_bike_shops: Bike Index voor fietsenwinkels
+          charge_it_safely: Laad hem veilig op.
+          charge_it_safely_detail: Batterijverzorging, -opslag en gecertificeerde
+            opladers.
+          check_ebike_rules: Controleer de regels voor e-bikes in uw staat.
+          create_an_organization_account: Maak een organisatieaccount aan en begin
+            vandaag nog met het registreren van uw community.
+          ebike_education: E-bike-educatie
+          ebike_registration_education: Wanneer een e-bike wordt geregistreerd op
+            Bike Index, krijgt de gebruiker een korte instructie over veilig gebruik
+            en eigendom. Zo krijgt uw groep een eenvoudige manier om nieuwe gebruikers
+            de basisprincipes bij te brengen, zonder een programma helemaal vanaf
+            nul te hoeven opzetten.
+          ebikes_bring_new_riders: E-bikes zorgen ervoor dat veel mensen voor het
+            eerst gaan fietsen. Ze zijn zwaarder, sneller en waardevoller dan de meeste
+            fietsen, en dat brengt een aantal zaken met zich mee die elke eigenaar
+            moet weten.
+          embed_a_registration_form: Een registratieformulier insluiten
+          everything_you_need: Alles wat je nodig hebt om je community te registreren.
+          eyebrow: Voor buurtverenigingen · Gratis, altijd
+          free_forever: Gratis voor groepen en deelnemers. Voor altijd.
+          free_tools_for_your_group: Gratis tools voor uw groep
+          get_started: Aan de slag
+          help_your_riders: Help je fietsers hun fiets terug te krijgen.
+          host_a_registration_drive: Organiseer een registratieactie.
+          join_us: Doe mee. Het is gratis, voor altijd.
+          know_where_to_ride: Weet waar je moet rijden.
+          know_where_to_ride_detail: Lokale regels voor paden, wandelroutes en wegen.
+          know_your_class: Ken je klas.
+          know_your_class_detail: Motorklasse en maximale ondersteunde snelheid.
+          lede: Bike Index is een gratis, non-profit fietsregister dat wereldwijd
+            wordt gebruikt door fietsers, fietsenwinkels en de politie. Wanneer uw
+            leden zich registreren, heeft een gestolen fiets een daadwerkelijke route
+            terug naar huis. We brengen gemeenschapsgroepen niets in rekening. We
+            vragen u alleen om het nieuws te verspreiden.
+          most_stolen_bikes_are_never_returned: De meeste gestolen fietsen worden
+            nooit teruggevonden omdat niemand kan bewijzen wie de eigenaar is. Een
+            registratie bij Bike Index zorgt ervoor dat het serienummer, foto's en
+            de eigenaar worden vastgelegd voordat er iets gebeurt. Jullie groep is
+            de betrouwbare instantie die fietsers aanmoedigt om dit te doen.
+          new_for_ebike_riders: Nieuw voor e-bike-rijders
+          nonprofit: 501 (c) (3) non-profit
+          protect_it: Bescherm het.
+          protect_it_detail: Geregistreerd, gefotografeerd en rechts vergrendeld.
+          recovered_in_their_own_words: Hersteld, zoals ze het zelf zeggen.
+          recovery_stories: Herstelverhalen
+          ride_prepared: Rijd goed voorbereid.
+          ride_prepared_detail: Remmen op hoge snelheid, helmen dragen en ruimte delen.
+          sign_up_for_free: Meld u aan gratis aan
+          step_home_body: Kopers en winkels controleren serienummers aan de hand van
+            de index, waarna de overeenkomende exemplaren weer bij de rechtmatige
+            eigenaar terechtkomen.
+          step_home_title: Het komt thuis
+          step_register_body: Merk, model, serienummer en foto's. Het duurt ongeveer
+            twee minuten.
+          step_register_title: Rijders registreren zich
+          step_spread_body: Deel een link, integreer het formulier of organiseer een
+            inschrijfactie tijdens je volgende fietstocht.
+          step_spread_title: Jij verspreidt het woord.
+          step_stolen_body: De eigenaar meldt het als gestolen en wij waarschuwen
+            winkels, de politie en fietsers in de buurt.
+          step_stolen_title_html: Een fiets is %{stolen}
+          stolen: GESTOLEN
+          testimonial_attribution_html: GObike Buffalo, %{link}
+          tool_account_body: Bekijk alle fietsen die via jouw groep geregistreerd
+            staan, overzichtelijk op één plek.
+          tool_account_title: Gratis organisatieaccount
+          tool_ambassadors_body: Geef je meest actieve leden de mogelijkheid om zich
+            lokaal in te zetten voor ledenwerving.
+          tool_ambassadors_title: Ambassadeursprogramma
+          tool_drives_body: Organiseer je fietstochten en evenementen voor de buurt?
+            Laat het ons weten en we sturen je informatiemateriaal van Bike Index.
+          tool_drives_title: Registratiecampagnes
+          tool_ebike_body: Help mee om e-bikegebruikers in uw omgeving voor te lichten
+            over veilig gebruik en bezit van e-bikes.
+          tool_ebike_title: Educatiestroom voor e-bikes
+          tool_embed_body: Plaats een fietsindexformulier direct op uw website.
+          tool_embed_title: In te sluiten registratieformulier
+          tool_search_body: Zoek naar gestolen fietsen in uw omgeving en steun de
+            zoekacties.
+          tool_search_title: Doorzoekbare database
+          valid_anywhere: Eén registratie, geldig overal
+          we_also_work_with_bike_shops: We werken ook samen met fietsenwinkels in
+            uw buurt via kassasysteemintegraties.
+          we_love_ebikes: Wij zijn dol op e-bikes. Laten we nieuwe fietsers helpen
+            om klaar te zijn voor de start.
+          why_it_matters: Waarom het belangrijk is
+          zoom: ZOOM!
       marketplace:
         how_it_works:
           across_town_heading: Aan de andere kant van de stad of aan de andere kant

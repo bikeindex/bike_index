@@ -3802,37 +3802,6 @@ nb:
       use_ascend: Bruk Ascend?
       use_lightspeed_retail: Bruker du Lightspeed Retail?
       used_at_bike_shops_everywhere: Brukes i sykkelbutikker overalt
-    for_community_groups:
-      bike_index_for_community_groups: Sykkelindeks for fellesskapsgrupper
-      bike_index_launches_new_ambassadors_progr: Bike Index lanserer nytt Ambassadors-program
-      bike_index_welcomes_stolen_bikes_nola: Bike Index ønsker Stolen Bikes NOLA velkommen
-      embed_a_bike_index_registration_form: Legg inn et sykkelregistreringsskjema
-        på nettstedet ditt
-      gone_are_the_days_where_you_had_to_regist: Borte er dagene da du måtte registrere
-        sykkelen din i ditt nabolag, fylke, by, stat og land. Bare registrer alle
-        sykler i Bike Index og en syklistregistrering vil være gyldig hvor som helst.
-        Kjøre registreringsstasjoner? Arrangere felles sykkelarrangementer? Gi oss
-        beskjed, så sender vi deg Bike Index-materiell.
-      help_us_help_you: Hjelp oss å hjelpe deg
-      here: her
-      partners_made_in_heaven: Partnere laget i himmelen
-      purchase_a_pack_of_advocacy_html: Kjøp en pakke med støttemateriale %{link}.
-      registration_drive: Bruk Bike Index til å være vert for en registreringsstasjon
-      registrations_are_free_forever_join_bike_: Registreringer er gratis. For alltid.
-        Bli med Bike Index og begynn å registrere deg i dag.
-      related_articles: 'Relaterte artikler:'
-      sign_up_for_free: Registrer deg gratis
-      spread_the_bike_index_word_html: Spre Bike Index-ordet til velgerne dine for
-        å beskytte dem når de kjører. Opprett en gratis organisasjonskonto %{link}.
-      the_most_widereaching_and_effective_tools: De mest vidtrekkende og effektive
-        verktøyene mot sykkeltyveri — punktum.
-      trusted_by_community_groups_everywhere: Stolt på av samfunnsgrupper overalt
-      used_by_community_groups_everywhere: Brukes av samfunnsgrupper overalt
-      we_provide_free_and_easy_access_to_our_re: Vi gir gratis og enkel tilgang til
-        vårt register for alle og enhver som sykler, uansett kapasitet. Bike Index
-        er en samfunnsdrevet innsats for å gjenopprette tapte og stjålne sykler. Uansett
-        type sykkel eller syklist, ønsker vi å holde alle sykler rullende med eierne
-        som trenger dem.
     packages_list:
       forever: For alltid
       free: Gratis
@@ -3966,6 +3935,12 @@ nb:
       til turer som mangler det.
     marketplace_how_it_works: Slik fungerer kjøp og salg på Bike Index Marketplace,
       der hver sykkel er registrert og én meldt stjålet ikke kan listes opp.
+    register_landing: Registrer sykkelen din gratis på Bike Index. Få bevis på at
+      den er din, varsler om stjålet sykkel med ett klikk og et nettverk av butikker,
+      politi og motorsyklister som holder utkikk etter den.
+    landing_pages_for_community_groups: Bike Index er et gratis, ideell sykkelregister.
+      Hjelp syklistene dine med å registrere seg, slik at en stjålet sykkel har en
+      reell vei hjem. Gratis for lokalsamfunnsgrupper, for alltid.
   meta_titles:
     bikes_index: Søkeresultater
     bikes_new: Registrer en sykkel!
@@ -4019,6 +3994,7 @@ nb:
     strava_search_index: Sykkelindeks Strava-søk
     registration_form_settings: Innstillinger for registreringsskjema
     marketplace_how_it_works: Slik fungerer Bike Index Marketplace
+    register_landing: Registrer sykkelen din gratis
   money:
     currencies:
       en: USD
@@ -6635,6 +6611,82 @@ nb:
               den beste sjansen til å komme tilbake – du kan legge til nummeret senere.
           step_review:
             complete_registration: Fullfør registreringen %{cycle_type}
+          landing:
+            a_million_bikes: En million sykler er registrert. Ikke én eier betalte
+              for å være der.
+            benefit_alerts_body: Hvis den blir stjålet, merker vi den som stjålet,
+              og vi varsler partnerbutikker, politi og passasjerer i nærheten av der
+              det skjedde.
+            benefit_alerts_title: Varsler om tyveri med ett klikk
+            benefit_app_body: Registrer og administrer alle syklene dine fra Bike
+              Index iOS-appen, og rapporter tyveri uansett hvor du er.
+            benefit_app_title: Garasjen din i lommen
+            benefit_found_body: Når noen finner sykkelen din og slår opp serienummeret,
+              kobler vi dem direkte til deg.
+            benefit_found_title: Funnet? Vi sier deg det.
+            benefit_marketplace_body: Selg sykkelen din på Bike Index-markedsplassen
+              uten gebyrer. Hver oppføring starter med en registrert sykkel og sjekkes
+              mot tyverirapporter, slik at kjøpere vet at den er ekte.
+            benefit_marketplace_title: En pålitelig markedsplass
+            benefit_network_body: Frivillige, lokale bergingsteam og mer enn 1000
+              politiavdelinger, universiteter, byer og butikker ser etter stjålne
+              sykler og varsler dem.
+            benefit_network_title: Folk ser etter det
+            benefit_private_body: Kontaktinformasjonen din forblir skjult. Vi er en
+              ideell organisasjon, så vi selger ikke data eller kjører annonser.
+            benefit_private_title: Privat som standard
+            benefit_proof_body: Serienummeret, bildene og kvitteringen din lagres
+              i én permanent oversikt. Nyttig for politirapporter og forsikringskrav.
+            benefit_proof_title: Bevis på at det er ditt
+            benefit_resell_body: Kjøpere, butikker og politi sjekker serienumrene
+              mot indeksen. En registrert stjålet sykkel er en sykkel ingen vil kjøpe.
+            benefit_resell_title: Vanskeligere å videreselge
+            benefit_transfer_body: Overfør registreringen til neste eier med noen
+              få klikk, slik at sykkelens historikk blir med den.
+            benefit_transfer_title: Lett å selge eller gi videre
+            bike_already_stolen: Sykkelen er allerede stjålet? Se hva du skal gjøre
+              nå
+            check_add_later: Du kan legge til bilder og detaljer senere
+            check_free_no_data_sharing: Gratis for alltid. Vi verken selger eller
+              deler dataene dine.
+            check_two_minutes: Tar omtrent to minutter
+            donations_keep_it_free: Bike Index er en ideell organisasjon. Det er donasjoner
+              som gjør den gratis.
+            faq_free_answer: Ja. Registrering, rapportering og søking er gratis for
+              alle, for alltid. Bike Index er en ideell organisasjon i henhold til
+              501(c)(3).
+            faq_free_question: Er det virkelig gratis?
+            faq_privacy_answer: Sykkelens offentlige detaljer er søkbare. Navnet ditt,
+              e-postadressen din og adressen din vises aldri offentlig.
+            faq_privacy_question: Hvem kan se informasjonen min?
+            faq_serial_answer: Registrer deg likevel og legg den til senere. Snu sykkelen
+              og se under kranklageret, der pedalene møter rammen.
+            faq_serial_question: Jeg vet ikke serienummeret mitt.
+            free_nonprofit_worldwide: Gratis · Non-profit · Verden over
+            fund_the_next_recovery: Finansier den neste gjenopprettingen
+            give_your_bike_a_way_home: Gi sykkelen din en vei hjem.
+            if_the_worst_happens: Hvis det verste skjer
+            keep_it_free: Hold det fritt
+            lede: Registrer den nå, så får du bevis på at den er din, et varsel om
+              tyveri med ett klikk og et nettverk av butikker, politi og passasjerer
+              som holder utkikk etter den.
+            quick_answers: Raske svar
+            register_your_bike: Registrer sykkelen din
+            sticker_flagged_body: Når en butikk, kjøper eller ansatt sjekker serienummeret,
+              viser det seg at det er stjålet, og du får beskjeden.
+            sticker_flagged_sound: DING!
+            sticker_flagged_title: 3. Det blir flagget
+            sticker_register_body: Sykkelens serienummer og detaljer lagres før noe
+              går galt. Det er den delen folk flest hopper over.
+            sticker_register_sound: KLIKK!
+            sticker_register_title: 1. Du registrerer deg i dag
+            sticker_stolen_body: Ett klikk setter den på stjåletlisten og varsler
+              partnere i nærheten. Ikke konfronter noen. Kontakt politiet.
+            sticker_stolen_sound: STJÅLET!
+            sticker_stolen_title: 2. Merk det som stjålet
+            what_registering_gets_you: Hva du får ved å registrere deg
+            what_registering_subhead: De fleste stjålne sykler kommer aldri hjem fordi
+              ingen kan bevise hvem de tilhører. En registrering fikser det.
       bikebook:
         show:
           any_activity: Enhver aktivitet
@@ -7666,6 +7718,93 @@ nb:
           start_over: Start på nytt
           tabs_label: Eksempelorganisasjoner
           viewing_as: Viser som
+        for_community_groups:
+          a_registered_bike_can_come_home: En registrert sykkel er en sykkel som kan
+            tas med hjem.
+          ask_about_ebike_education: Spør oss om hvordan vi lærer opp syklister om
+            elsykler.
+          become_an_ambassador: Bli ambassadør
+          bike_index_for_bike_shops: Sykkelindeks for sykkelbutikker
+          charge_it_safely: Lad den trygt.
+          charge_it_safely_detail: Batteripleie, oppbevaring og sertifiserte ladere.
+          check_ebike_rules: Sjekk elsykkelreglene i din stat
+          create_an_organization_account: Opprett en organisasjonskonto og begynn
+            å registrere fellesskapet ditt i dag.
+          ebike_education: Elsykkelopplæring
+          ebike_registration_education: Når en elsykkel registreres på Bike Index,
+            får syklisten kort opplæring i sikker bruk og eierskap. Gruppen din får
+            en enkel måte å nå nye syklister med det grunnleggende, uten å måtte bygge
+            et program fra bunnen av.
+          ebikes_bring_new_riders: Elsykler får mange til å sykle for første gang.
+            De er tyngre, raskere og mer verdifulle enn de fleste sykler, og det kommer
+            med et par ting alle eiere bør vite.
+          embed_a_registration_form: Legg inn et registreringsskjema
+          everything_you_need: Alt du trenger for å registrere fellesskapet ditt.
+          eyebrow: For samfunnsgrupper · Gratis, alltid
+          free_forever: Gratis for grupper og passasjerer. For alltid.
+          free_tools_for_your_group: Gratis verktøy for gruppen din
+          get_started: Kom i gang
+          help_your_riders: Hjelp syklistene dine med å få tilbake syklene sine.
+          host_a_registration_drive: Hold en registreringskampanje
+          join_us: Bli med oss. Det er gratis, for alltid.
+          know_where_to_ride: Vit hvor du skal sykle.
+          know_where_to_ride_detail: Lokale regler for stier, stier og veier.
+          know_your_class: Kjenn klassen din.
+          know_your_class_detail: Motorklasse og topp assistert hastighet.
+          lede: Bike Index er et gratis, ideell sykkelregister som brukes av syklister,
+            butikker og politi over hele verden. Når medlemmene dine registrerer seg,
+            har en stjålet sykkel en reell vei hjem. Vi tar ikke betalt for noe fra
+            lokalsamfunnsgrupper. Vi ber deg bare om å spre ordet.
+          most_stolen_bikes_are_never_returned: De fleste stjålne sykler blir aldri
+            returnert fordi ingen kan bevise hvem som eier dem. En Bike Index-registrering
+            registrerer serienummer, bilder og eier før noe skjer. Gruppen din er
+            den pålitelige stemmen som får syklistene til å gjøre det.
+          new_for_ebike_riders: Nytt for elsykkelsyklister
+          nonprofit: 501(c)(3) ideell organisasjon
+          protect_it: Beskytt det.
+          protect_it_detail: Registrert, fotografert og låst riktig.
+          recovered_in_their_own_words: Gjenopprettet, med deres egne ord
+          recovery_stories: Historier om gjenoppretting
+          ride_prepared: Ride forberedt.
+          ride_prepared_detail: Bremsing i fart, hjelmer og deling av plass.
+          sign_up_for_free: Registrer deg gratis
+          step_home_body: Kjøpere og butikker sjekker serienumre mot indeksen, og
+            treffene kommer tilbake til eierne.
+          step_home_title: Den kommer hjem
+          step_register_body: Merke, modell, serienummer og bilder. Det tar omtrent
+            to minutter.
+          step_register_title: Ryttere registrerer seg
+          step_spread_body: Del en lenke, legg inn skjemaet, eller kjør en registreringskampanje
+            på din neste tur.
+          step_spread_title: Du sprer ordet
+          step_stolen_body: Eieren merker den som stjålet, og vi varsler butikker,
+            politi og passasjerer i nærheten.
+          step_stolen_title_html: En sykkel er %{stolen}
+          stolen: STJÅLET
+          testimonial_attribution_html: GObike Buffalo, %{link}
+          tool_account_body: Se syklene som er registrert gjennom gruppen din, alt
+            på ett sted.
+          tool_account_title: Gratis organisasjonskonto
+          tool_ambassadors_body: Gi dine mest aktive medlemmer en måte å fremme registrering
+            lokalt.
+          tool_ambassadors_title: Ambassadørprogram
+          tool_drives_body: Skal du arrangere turer og arrangementer i lokalsamfunnet?
+            Fortell oss det, så sender vi deg Bike Index-materiell.
+          tool_drives_title: Registreringskjøringer
+          tool_ebike_body: Hjelp med å lære opp elsykkelsyklister i lokalsamfunnet
+            ditt om sikker bruk og eierskap.
+          tool_ebike_title: Elsykkelopplæringsflyt
+          tool_embed_body: Legg ut et sykkelindeksskjema direkte på nettstedet ditt.
+          tool_embed_title: Innebyggbart registreringsskjema
+          tool_search_body: Søk etter stjålne sykler i ditt område og støtt gjenopprettingsarbeidet.
+          tool_search_title: Søkbar database
+          valid_anywhere: Én registrering, gyldig hvor som helst
+          we_also_work_with_bike_shops: Vi samarbeider også med sykkelbutikker i lokalsamfunnet
+            ditt gjennom POS-integrasjoner.
+          we_love_ebikes: Vi elsker elsykler. La oss hjelpe nye syklister med å bli
+            klare til å sykle.
+          why_it_matters: Hvorfor det er viktig
+          zoom: ZOOM!
       marketplace:
         how_it_works:
           across_town_heading: På tvers av byen eller på tvers av landet
