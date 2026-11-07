@@ -16,7 +16,8 @@
  * ramp's 600 — so they track it instead of restating it. The red and the grays stay
  * literal: these grays are neutral where Tailwind's are blue-tinted (dE ~11-13), and
  * its red-500 is the OG #e74c3c. */
-:root {
+:root,
+.kelsey_styles_light {
   --redesign-blue-500: var(--tw-color-blue-500);
   --redesign-blue-800: var(--tw-color-blue-600);
   --redesign-purple-500: var(--tw-color-purple-500);

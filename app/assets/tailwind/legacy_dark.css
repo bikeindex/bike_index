@@ -3,7 +3,7 @@
   :is(.container, .container-fluid, .bootstrapstyle, .doorkeeper-container) {
     @apply tw:dark:text-gray-100;
 
-    :is(h1, h2, h3, h4, h5, h6):not(.root-landing-who *) {
+    :is(h1, h2, h3, h4, h5, h6) {
       @apply tw:dark:text-inherit;
     }
   }
@@ -94,9 +94,10 @@
     @apply tw:dark:text-gray-900;
   }
 
-  /* !important to beat kelsey_styles.css */
-  .kelsey_styles_buttons-grid .category-button:not(:hover) span {
-    @apply tw:dark:text-gray-200!;
+  .kelsey_styles_buttons-grid {
+    @variant dark {
+      --redesign-gray-800: var(--tw-color-gray-200);
+    }
   }
 
   .nav-tabs .nav-link:not(.active) {

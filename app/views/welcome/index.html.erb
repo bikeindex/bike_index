@@ -14,11 +14,9 @@
   <% end %>
 
   <% cache("root_who_and_numbers", expires_in: 1.hour) do %>
-    <div class="root-landing-who scrolled tw:dark:bg-gray-900">
+    <div class="root-landing-who scrolled tw:dark:isolate tw:dark:bg-gray-900">
       <div class="container">
-        <h3 class="landing-container-label tw:dark:text-gray-100">
-          <%= t(".used_by") %>
-        </h3>
+        <h3 class="landing-container-label"><%= t(".used_by") %></h3>
 
         <%# These images have a color overlay (aka fill) of #676767 %>
         <div class="root-landing-who-wrap tw:dark:invert tw:dark:mix-blend-screen">
