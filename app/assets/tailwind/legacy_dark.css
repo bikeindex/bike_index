@@ -54,8 +54,20 @@
   .inline-input-help,
   .right-input-help a,
   .selectize-input input,
-  .close {
+  .close:not(.alert *) {
     @apply tw:dark:text-gray-300;
+  }
+
+  /* The can's lines are the surface's color showing through it */
+  .delete-from-index .trash-can-icon {
+    .trash-lid,
+    .trash-container {
+      @apply tw:dark:bg-gray-300 tw:dark:in-[a:hover]:bg-blue-400;
+    }
+
+    span {
+      @apply tw:dark:bg-gray-800;
+    }
   }
 
   /* These pages stay light, so a margin between their sections mustn't show a dark body */

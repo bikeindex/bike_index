@@ -69,7 +69,7 @@ RSpec.describe Bikes::TheftAlertsController, type: :request, vcr: true, match_re
       let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, :with_stolen_record) }
       it "flash errors and redirects" do
         get "#{base_url}/new"
-        expect(response).to redirect_to(bike_path(bike))
+        expect(response).to redirect_to(registration_path(bike))
         expect(flash[:error]).to match(/don't own that bike/)
       end
     end
