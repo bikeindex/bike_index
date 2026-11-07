@@ -1,7 +1,7 @@
 = render(Pages::Admin::Headers::Nav::Component.new(title: safe_join(["Email Domain ", tag.strong(@email_domain.domain)])))
 
 .twwiderow{class: "tw:items-start tw:mt-6"}
-  = render(UI::TableList::Component.new) do |list|
+  = render(UI::Table::List::Component.new) do |list|
     - list.with_row(label: "Creator", value: render(Atoms::Admin::TableCells::User::Component.new(user: @email_domain.creator, user_id: @email_domain.creator_id)))
     - list.with_row(label: "Created", class: "tw:text-sm", value: render(UI::Time::Component.new(time: @email_domain.created_at, format: :localize_time_precise)))
     - list.with_row(label: "Updated", class: "tw:text-sm", value: render(UI::Time::Component.new(time: @email_domain.updated_at, format: :localize_time_precise)))
@@ -24,7 +24,7 @@
       - if @email_domain&.no_auto_assign_status?
         %small{class: "tw:ml-1 tw:text-sky-400"} no auto status
 
-  = render(UI::TableList::Component.new) do |list|
+  = render(UI::Table::List::Component.new) do |list|
     - list.with_row(label: "Ban Blockers", class: "tw:text-sm") do
       - ban_blockers = @email_domain.ban_blockers.any?
       = ban_blockers ? check_mark : cross_mark

@@ -2,7 +2,7 @@
 <% invoice_link = method(:invoice_link) %>
 <% end_at_class = method(:end_at_class) %>
 
-<%= render(UI::Table::Component.new(records:, render_sortable: @render_sortable)) do |table| %>
+<%= render(UI::Table::Base::Component.new(records:, render_sortable: @render_sortable)) do |table| %>
   <% table.column(sortable: "id", label: "#") do |invoice| %>
     <%= invoice_link.call(invoice) %>
   <% end %>

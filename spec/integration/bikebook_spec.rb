@@ -1787,7 +1787,7 @@ RSpec.describe "BikeBook", :js, type: :system do
       end
 
       table = ApplicationController.render(inline: <<~ERB, layout: false, locals: {rows: [{type: "Disc", position: "Front"}, {type: "Rim", position: "Rear"}]})
-        <%= render(UI::Table::Component.new(records: rows, classes: "tw:table-fixed")) do |table|
+        <%= render(UI::Table::Base::Component.new(records: rows, classes: "tw:table-fixed")) do |table|
           table.column(label: "Brakes", classes: "tw:w-[18%]", header_classes: "tw:spec-eyebrow") { |record| record[:type] }
           table.column(label: "Position", classes: "tw:w-[12%]") { |record| record[:position] }
         end %>
@@ -1799,7 +1799,7 @@ RSpec.describe "BikeBook", :js, type: :system do
       JS
 
       row_headed = ApplicationController.render(inline: <<~ERB, layout: false, locals: {rows: [{label: "Year", value: 2026}, {label: "Reach", value: 450}]})
-        <%= render(UI::Table::Component.new(records: rows)) do |table|
+        <%= render(UI::Table::Base::Component.new(records: rows)) do |table|
           table.column(label: "", row_header: true) { |record| record[:label] }
           table.column(label: "Level 2") { |record| record[:value].to_s }
         end %>

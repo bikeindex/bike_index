@@ -1,7 +1,7 @@
 <%= render(Pages::Admin::Headers::Nav::Component.new(title: "Marketplace Listing")) %>
 
 <div class="twwiderow tw:mt-6 tw:items-start">
-  <%= render(UI::TableList::Component.new) do |list| %>
+  <%= render(UI::Table::List::Component.new) do |list| %>
     <% list.with_row(label: "ID", dev_only: true, value: render(UI::Code::Inline::Component.new(text: @marketplace_listing.id)), if: display_dev_info?) %>
 
     <% list.with_row(label: "Status", value: render(Atoms::Admin::Badges::MarketplaceListing::Component.new(status: @marketplace_listing.status, status_humanized: @marketplace_listing.status_humanized, kind: :marketplace_listing))) %>
@@ -27,7 +27,7 @@
     <% list.with_row(label: "Ended", class: "tw:text-sm", value: render(UI::Time::Component.new(time: @marketplace_listing.end_at, format: :localize_time_precise)), if: @marketplace_listing.end_at.present?) %>
   <% end %>
 
-  <%= render(UI::TableList::Component.new) do |list| %>
+  <%= render(UI::Table::List::Component.new) do |list| %>
     <% list.with_row(label: "Item") do %>
       <% if @marketplace_listing.item.is_a?(Bike) %>
         <%= render Atoms::Admin::TableCells::Bike::Component.new(bike: @marketplace_listing.item, bike_id: @marketplace_listing.item_id, bike_link_path: bike_path(@marketplace_listing.item_id, view_as: "marketplace_preview")) %>

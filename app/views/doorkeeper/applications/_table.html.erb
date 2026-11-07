@@ -4,7 +4,7 @@
   data-controller="update-cached-sortable-links"
   data-update-cached-sortable-links-base-url-value="<%= url_for(sort_state.search_params) %>"
 >
-  <%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:,
+  <%= render(UI::Table::Base::Component.new(records: collection, render_sortable:, sort_state:,
         cache_key: cache_fragment_name(["doorkeeper_applications_table", render_sortable]),
         cache_records: ->(application) { [application.owner] },
         row_attributes: ->(application) { {id: "application_#{application.id}"} })) do |table| %>
