@@ -18,7 +18,7 @@ RSpec.describe "Organized education courses", :js, type: :system do
     visit "/o/#{organization.to_param}/education_courses"
 
     # Build the draft (cloned from the seeded template) and open the management view
-    click_button "Create a sequence"
+    click_button "Create a course"
     expect(page).to have_content("Draft education course")
     expect(page).to have_content("Batteries & charging") # cloned from the template
 
@@ -87,7 +87,7 @@ RSpec.describe "Organized education courses", :js, type: :system do
 
   it "gates each preview page on its rules like the real flow, then finishes to editing" do
     visit "/o/#{organization.to_param}/education_courses"
-    click_button "Create a sequence"
+    click_button "Create a course"
 
     click_link "Preview"
     # Continue is disabled until every rule is checked - the same register--acknowledgment
@@ -112,7 +112,7 @@ RSpec.describe "Organized education courses", :js, type: :system do
   # too. That specific regression is guarded by spec/javascript_controller_imports_spec.rb.
   it "adds a bullet to a page that already has bullets" do
     visit "/o/#{organization.to_param}/education_courses"
-    click_button "Create a sequence"
+    click_button "Create a course"
     click_link "Edit", match: :first
     expect(page).to have_css("lexxy-editor lexxy-toolbar", wait: 10) # editors upgrade lazily
 

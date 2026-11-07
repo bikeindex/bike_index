@@ -35,7 +35,7 @@ RSpec.describe Pages::Org::EducationCourse::PageForm::Component, type: :componen
       render_inline(described_class.new(page: education_course.education_course_pages.new, admin: true))
 
       expect(page).to have_css("form[action='/admin/education_courses/#{education_course.id}/pages']")
-      expect(page).to have_link("Back to sequence overview", href: "/admin/education_courses/#{education_course.id}/edit")
+      expect(page).to have_link("Back to course overview", href: "/admin/education_courses/#{education_course.id}/edit")
       # Admin's header is the h1
       expect(page).to have_css("h2", text: "Add page")
       expect(page).to_not have_css("h1")

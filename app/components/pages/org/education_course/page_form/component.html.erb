@@ -2,7 +2,7 @@
   <div class="tw:mb-6 tw:flex tw:items-center tw:justify-between">
     <%= render(UI::Header::Component.new(text: editing? ? "Edit page" : "Add page", **heading_options)) %>
 
-    <%= link_to "Back to sequence overview", sequence_path, class: "twlink" %>
+    <%= link_to "Back to course overview", sequence_path, class: "twlink" %>
   </div>
 
   <%= form_with model: @page, url: form_url, html: {multipart: true} do |f| %>

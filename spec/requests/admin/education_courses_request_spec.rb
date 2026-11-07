@@ -44,7 +44,7 @@ RSpec.describe Admin::EducationCoursesController, type: :request do
         it "links the template draft - that's what there is to do to it" do
           get base_url
           expect(assigns(:template)).to eq template_draft
-          expect(response.body).to include("Template Draft sequence")
+          expect(response.body).to include("Template Draft course")
           expect(Capybara.string(response.body)).to have_css("td span.less-strong", text: "Template", count: 2)
         end
       end

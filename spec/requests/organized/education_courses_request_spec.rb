@@ -13,9 +13,9 @@ RSpec.describe Organized::EducationCoursesController, type: :request do
         expect(response.status).to eq(200)
         expect(response).to render_template(:index)
         expect(response.body).to include("There is no active education course")
-        expect(response.body).to include("You don't have a draft sequence")
+        expect(response.body).to include("You don't have a draft course")
         # Nothing to copy yet, so the button starts a fresh one
-        expect(response.body).to include("Create a sequence")
+        expect(response.body).to include("Create a course")
       end
 
       context "with a draft" do
@@ -50,7 +50,7 @@ RSpec.describe Organized::EducationCoursesController, type: :request do
           expect(response.body).to include("Batteries &amp; charging")
           expect(response.body).to include("Charge with the manufacturer's charger")
           # No draft yet, so editing starts from a copy of the live sequence
-          expect(response.body).to include("Copy current sequence and edit")
+          expect(response.body).to include("Copy current course and edit")
           # Frozen, so no editing affordances on it
           expect(response.body).to_not include("data-sortable-target=\"item\"")
         end
@@ -165,7 +165,7 @@ RSpec.describe Organized::EducationCoursesController, type: :request do
       expect(response.body).to include(active.education_course_pages.first.title)
       # The whole draft section is gone - not an empty-state, not a read-only listing
       expect(response.body).to_not include(">Draft</h2>")
-      expect(response.body).to_not include("You don't have a draft sequence")
+      expect(response.body).to_not include("You don't have a draft course")
       expect(response.body).to_not include(">Edit<")
       expect(response.body).to_not include("Discard draft")
     end

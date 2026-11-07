@@ -20,7 +20,7 @@
 
   <% skeleton.with_nav_item do %>
     <% if @template.present? %>
-      <%= render(UI::ButtonLink::Component.new(text: "#{@template.display_name} sequence", href: EducationCoursePaths.sequence(@template, admin: true), size: :sm)) %>
+      <%= render(UI::ButtonLink::Component.new(text: "#{@template.display_name} course", href: EducationCoursePaths.sequence(@template, admin: true), size: :sm)) %>
     <% else %>
       <%# Nothing for organizations to clone yet - the first template is drafted here %>
       <%= render UI::ButtonLink::Component.new(text: "Create template", href: EducationCoursePaths.create_draft(nil), method: :post, color: :primary, size: :sm) %>
