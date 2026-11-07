@@ -49,7 +49,7 @@
 
         <div class="tw:mt-4 tw:text-[15px]">
           <%= render(UI::ButtonLink::Component.new(href: other_classification_href, color: :link,
-            data: {classification: Pages::EbikeRules::Classes::Component.classification_value(other_classification), turbo_frame: "_top"})) do %>
+            data: {classification: other_classification[:value], turbo_frame: "_top"})) do %>
             <%= translation(".other_classification_rules", name: other_classification[:name]) %>
             <%= render(UI::IconChevron::Component.new) %>
           <% end %>

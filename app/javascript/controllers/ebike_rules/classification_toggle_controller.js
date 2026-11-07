@@ -2,15 +2,15 @@ import { Controller } from '@hotwired/stimulus'
 import { urlParam, setUrlParam } from 'utils/url_param'
 
 // Connects to data-controller='ebike-rules--classification-toggle'
-// Shows the panel its radio picks, and keeps the pick in the URL. A link elsewhere on the page naming one of its
-// panels in data-classification, as the check's alert has, picks it, dispatches revealed and scrolls to the link's anchor
+// Shows the panel its radio picks, and keeps the pick in the URL, as does a link anywhere on the page whose
+// data-classification names a panel
 export default class extends Controller {
   static targets = ['panel']
   static values = { param: String }
 
   connect () {
-    const picked = this.#panel(urlParam(this.paramValue))
-    if (picked) this.#pick(picked.dataset.classification)
+    const classification = urlParam(this.paramValue)
+    if (this.#panel(classification)) this.#pick(classification)
   }
 
   pick ({ target }) {
@@ -26,7 +26,7 @@ export default class extends Controller {
     this.#pick(link.dataset.classification)
     setUrlParam(this.paramValue, link.dataset.classification)
     this.dispatch('revealed')
-    document.getElementById(link.hash.slice(1))?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    document.querySelector(link.hash)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
   #panel (classification) {

@@ -9,8 +9,6 @@ module Pages
         FRAME_ID = "ebike-rules-classes"
         NON_E_BIKE_RULES_ID = "non-e-bike-rules"
 
-        def self.classification_value(classification) = classification[:id].split("/").last
-
         def initialize(place:, additional_classes: nil)
           @place = place
           @additional_classes = additional_classes
@@ -41,9 +39,6 @@ module Pages
         end
 
         def us_state? = @place && EbikeRuleServices::Places.us?(@place)
-
-        # The id's last segment: moped, of evc/us/ca/moped
-        def classification_value(classification) = self.class.classification_value(classification)
 
         def cards = @cards ||= class_cards
 

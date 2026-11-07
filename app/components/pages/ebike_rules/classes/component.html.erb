@@ -106,15 +106,15 @@
                         class="tw:my-3"
                         data-action="change->ebike-rules--classification-toggle#pick"
                       >
-                        <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "non_e_bike_type", kind: :toggle, selected: classification_value(non_e_bike_classifications.first),
-                          entries: non_e_bike_classifications.map { {value: classification_value(it), label: ERB::Util.html_escape(it[:name])} })) %>
+                        <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "non_e_bike_type", kind: :toggle, selected: non_e_bike_classifications.first[:value],
+                          entries: non_e_bike_classifications.map { {value: it[:value], label: ERB::Util.html_escape(it[:name])} })) %>
                       </div>
                     <% end %>
 
                     <% non_e_bike_classifications.each_with_index do |classification, index| %>
                       <div
                         class="<%= "tw:hidden" unless index.zero? %>"
-                        data-classification="<%= classification_value(classification) %>"
+                        data-classification="<%= classification[:value] %>"
                         data-ebike-rules--classification-toggle-target="panel"
                       >
                         <%= render(Pages::EbikeRules::LawSummary::Component.new(law: classification, titled: true)) %>

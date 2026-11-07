@@ -153,10 +153,9 @@ module Pages
           other_classification[:by_limits] ? translation(".may_fall_under_name", state:, name:) : translation(".falls_under_name", state:, name:)
         end
 
-        # The classes frame's non-e-bike rules, opened on this classification, from the page's own query
         def other_classification_href
-          query = request.query_parameters.merge(non_e_bike_rules: 1, non_e_bike_type: Pages::EbikeRules::Classes::Component.classification_value(other_classification))
-          "?#{query.to_query}##{Pages::EbikeRules::Classes::Component::NON_E_BIKE_RULES_ID}"
+          query = request.query_parameters.merge(non_e_bike_rules: 1, non_e_bike_type: other_classification[:value])
+          "#{ReadableQuery.path("", query)}##{Pages::EbikeRules::Classes::Component::NON_E_BIKE_RULES_ID}"
         end
 
         def other_classification
