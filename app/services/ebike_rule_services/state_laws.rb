@@ -102,7 +102,7 @@ module EbikeRuleServices
     end
 
     # Each of the state's classifications that isn't its e-bike law, with its rule_groups and top_rules, slowest and
-    # least powerful first
+    # least powerful first, off-highway last
     def non_e_bike_classifications(abbreviation, today: Time.zone.today)
       parsed[:tiers][abbreviation].to_a.sort_by.with_index { |tier, index| [*speed_rank(tier[:ids], tier[:kmh]), tier[:watt_cap] || Float::INFINITY, index] }
         .map { with_rule_groups(in_force(it, today)) }
