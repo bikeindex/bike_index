@@ -91,6 +91,8 @@ Every legacy stylesheet wraps itself in `@layer legacy` (see `app/assets/stylesh
 
 The same instinct applies beyond buttons: **check `app/components/ui/` and `app/components/atoms/` before hand-rolling any UI primitive** (dropdowns → `UI::Dropdown`, tooltips → `UI::Tooltip`, form fields → `UI::Forms::*`, label-beside-value tables → `UI::Table::List` — only email CSS still styles `.table-list`, so the legacy class renders bare on a page — inline code → `UI::Code::Inline`, a block of JSON → `UI::Code::Json`, badges, modals, pagination, tables…). If a component exists for the pattern, use it. **Never add an argument to a `UI::*` component without the user's explicit permission** — its arguments are the design system's surface, and one added for a single caller stays for every caller. If it almost fits, ask, and don't fork its markup inline meanwhile.
 
+**A marketing page — a `for_*` landing page, donate, a how-it-works — builds on `SharedBlocks::Marketing`**; the `use-existing-markup` skill maps each hand-drawn block to its component.
+
 Four of those carry a rule beyond "use the component":
 
 - **`UI::Tooltip` keeps its default `?` button trigger** unless the user explicitly says otherwise — never pass a label as the trigger content.

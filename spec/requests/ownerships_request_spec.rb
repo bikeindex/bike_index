@@ -81,6 +81,7 @@ RSpec.describe OwnershipsController, type: :request do
       it "auto-confirms and claims after visiting the bike page with a valid token" do
         expect(current_user.reload.unconfirmed?).to be_truthy
         get "/bikes/#{ownership.bike.id}", params: {t: ownership.token, email: ownership.owner_email}
+        follow_redirect! # bike show redirects to the redesigned registration page
         expect(response.code).to eq("200")
 
         get "#{base_url}/#{ownership.id}"
@@ -98,6 +99,7 @@ RSpec.describe OwnershipsController, type: :request do
 
       it "does not confirm when the token in the URL does not match" do
         get "/bikes/#{ownership.bike.id}", params: {t: "wrong-token", email: ownership.owner_email}
+        follow_redirect!
         expect(response.code).to eq("200")
 
         get "#{base_url}/#{ownership.id}"
@@ -111,6 +113,7 @@ RSpec.describe OwnershipsController, type: :request do
 
         it "does not confirm even if the bike was visited with a valid token" do
           get "/bikes/#{ownership.bike.id}", params: {t: ownership.token, email: ownership.owner_email}
+          follow_redirect!
           expect(response.code).to eq("200")
 
           get "#{base_url}/#{ownership.id}"

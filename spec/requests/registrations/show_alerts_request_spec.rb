@@ -3,15 +3,13 @@
 require "rails_helper"
 
 # The token-carrying links in Bike Index's emails point at /bikes/:id, which redirects
-# redesign users to /registrations/:id. These walk each link the whole way — email link
-# -> redirect -> rendered prompt — because a redirect that drops a token fails silently
+# to /registrations/:id. These walk each link the whole way — email link -> redirect ->
+# rendered prompt — because a redirect that drops a token fails silently
 RSpec.describe "RegistrationsController#show alerts", type: :request do
   include_context :request_spec_logged_in_as_user_if_present
   before { RearGearType.fixed }
 
   let(:current_user) { FactoryBot.create(:user_confirmed) }
-  # Only the redirect-following examples need the flag; /registrations/:id is direct
-  before { Flipper.enable_actor(:bike_show_redesign_toggle, current_user) if current_user.present? }
 
   describe "recovery link" do
     let(:bike) { FactoryBot.create(:stolen_bike, :with_ownership_claimed, user: current_user) }
@@ -20,12 +18,8 @@ RSpec.describe "RegistrationsController#show alerts", type: :request do
 
     it "carries the session token through the redirect and renders the recovery form once" do
       get "/bikes/#{bike.to_param}/recovery/edit?token=#{recovery_link_token}"
-      expect(response).to redirect_to bike_path(bike)
+      expect(response).to redirect_to registration_path(bike)
       expect(session[:recovery_link_token]).to eq recovery_link_token
-
-      # bikes#show bounces the redesign user on to the registration
-      follow_redirect!
-      expect(response).to redirect_to(registration_path(bike))
 
       follow_redirect!
       expect(response.status).to eq(200)

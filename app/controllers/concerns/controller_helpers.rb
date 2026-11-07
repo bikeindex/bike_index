@@ -385,7 +385,11 @@ module ControllerHelpers
     else
       @current_organization = Organization.friendly_find(params[:organization_id])
       # Sometimes (e.g. embed registration), it's ok if current_user isn't authorized - but only set passive_organization if authorized
-      return @current_organization unless @current_organization.present? && current_user&.authorized?(@current_organization)
+      unless @current_organization.present? && current_user&.authorized?(@current_organization)
+        # passive_organization doesn't check authorization, so a lost membership leaves the session here
+        session.delete(:passive_organization_id) if session[:passive_organization_id] == @current_organization&.id
+        return @current_organization
+      end
     end
     set_passive_organization(@current_organization)
   end

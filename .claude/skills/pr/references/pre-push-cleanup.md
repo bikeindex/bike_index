@@ -119,7 +119,7 @@ State the verdict in your reply to the user either way, naming the stored values
 rtk proxy git diff origin/main...HEAD --name-only --diff-filter=A -- app/assets/images
 ```
 
-Check each against `frontend-conventions`' image and icon rules: an original elsewhere in the repo (a design handoff's comes resized and renamed), an existing icon, or a plain character that should be text. Replace a duplicate with what already exists and delete it.
+Icons and images both go through the markup audit below, which checks each one for a file the repo already has.
 
 ### The controller audit
 
@@ -141,6 +141,10 @@ rtk proxy git diff origin/main...HEAD --name-only --diff-filter=A -- 'app/compon
 ```
 
 For each, name the existing component it renders or duplicates. One that wraps a single `UI::*` component in chrome is that component with an argument — ask the user whether to fold it in, since a new `UI::*` argument needs their permission. `UI::BulkTableCard` into `UI::Table::InCard`'s `column_settings:` is the pattern.
+
+### The markup audit
+
+**Required when the branch adds markup or an icon.** Run the `use-existing-markup` skill. It converts the hand-written markup to existing components without asking, covering marketing pages, buttons, icons and shadows. **Whenever it changes anything, tell the user in your reply.** List each conversion with the visible change it makes, and the commit it landed in. A page that looks different after a PR update, with no word about why, is what this prevents. Put its callouts (big shadows, and hover states on things that aren't buttons) in the same reply. When it changes nothing, say so in one line.
 
 ### The cycle-type translation check
 

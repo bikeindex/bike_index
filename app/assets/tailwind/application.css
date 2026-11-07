@@ -226,6 +226,7 @@
 
 @layer base {
   button:not(:disabled),
+  select:not(:disabled),
   [role="button"]:not(:disabled),
   input:where([type="button"], [type="reset"], [type="submit"]):not(:disabled) {
     cursor: pointer;
@@ -263,6 +264,12 @@ body {
   body {
     --nav-gap: 60px;
   }
+}
+
+/* .primary-footer's margin-top, which the full-bleed pages pull down by to sit flush on the
+   footer. On :root, so a page that zeroes it on body wins from any layer */
+:root {
+  --footer-gap: 72px;
 }
 /* The controller narrows it as the sidebar collapses, in an inline style that
    outranks this; the expanded width keeps the content still until stimulus connects */
