@@ -1,4 +1,4 @@
-<div class="kelsey_styles">
+<div class="kelsey_styles kelsey_styles_dark">
   <section class="hero-section">
     <div class="hero-content">
       <div class="hero-stats">
@@ -29,11 +29,14 @@
         </div>
       </div>
 
-      <h1>The bike registry that works.</h1>
+      <h1 class="tw:dark:bg-gray-900/85!">The bike registry that works.</h1>
     </div>
 
     <div
-      class="bike-tiles-grid"
+      class="
+        bike-tiles-grid tw:dark:opacity-50 tw:dark:invert
+        tw:dark:hue-rotate-180
+      "
       data-controller="homepage--bike-tiles"
       data-homepage--bike-tiles-target="grid"
       data-homepage--bike-tiles-images-value="<%= bike_tile_images.to_json %>"
@@ -69,7 +72,7 @@
         </div>
 
         <div class="testimonial-container">
-          <div class="testimonial-box">
+          <div class="testimonial-box tw:dark:bg-gray-800/95!">
             <%= image_tag "kelsey/location-pin_purple.png", alt: "Location pin", class: "location-pin" %>
 
             <ul class="tw:list-none">
@@ -165,7 +168,7 @@
       <%# Recovery Process Steps %>
       <div class="recovery-process">
         <div class="crank-animation-container">
-          <div class="crank-wrapper">
+          <div class="crank-wrapper tw:dark:invert tw:dark:hue-rotate-180">
             <%= image_tag "kelsey/step1.gif", alt: "Step background", class: "step-background", id: "stepBackground" %>
 
             <%= image_tag "kelsey/bike-crank.png", alt: "Bike crank", class: "bike-crank", id: "bikeCrank" %>

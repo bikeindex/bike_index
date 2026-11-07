@@ -124,7 +124,7 @@
 
 /* Partners Carousel Section */
 .kelsey_styles .le-municipalities-section {
-  background-color: white;
+  background-color: var(--redesign-surface);
   padding: 3rem 0;
   overflow: hidden;
 }
@@ -212,7 +212,7 @@
 }
 
 .kelsey_styles .le-feature-block {
-  background-color: white;
+  background-color: var(--redesign-surface);
   padding: 2.5rem 2rem;
   text-align: center;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -252,18 +252,18 @@
 .kelsey_styles .le-tabbed-widget {
   max-width: 1100px;
   margin: 0 auto;
-  background-color: white;
+  background-color: var(--redesign-surface);
 }
 
 .kelsey_styles .le-tab-buttons {
   display: flex;
-  border-bottom: 3px solid #e0e0e0;
+  border-bottom: 3px solid var(--redesign-gray-200);
 }
 
 .kelsey_styles .le-tab-button {
   flex: 1;
   padding: 1.5rem 2rem;
-  background-color: #f8f8f8;
+  background-color: var(--redesign-gray-50);
   border: none;
   font-size: 1.1rem;
   font-weight: 600;
@@ -335,7 +335,7 @@
 .kelsey_styles .le-tab-text ul li {
   font-size: 1rem;
   line-height: 1.7;
-  color: #555;
+  color: var(--redesign-gray-600);
   margin-bottom: 1rem;
   padding-left: 1.5rem;
   position: relative;
@@ -352,7 +352,7 @@
 
 /* Tools Overview Section */
 .kelsey_styles .le-tools-section {
-  background-color: white;
+  background-color: var(--redesign-surface);
   padding: 3rem 0;
 }
 
@@ -445,7 +445,7 @@
   display: flex;
   align-items: center;
   gap: 2rem;
-  background-color: white;
+  background-color: var(--redesign-surface);
   padding: 2rem;
   border-left: 4px solid var(--redesign-purple-500);
   min-height: 280px;
