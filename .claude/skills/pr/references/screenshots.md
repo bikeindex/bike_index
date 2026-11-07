@@ -8,7 +8,7 @@ The flow: decide what to capture → capture the branch → capture the same URL
 
 **This phase needs `gh`. Without it, skip the whole thing** — don't capture, don't upload, don't post anything in its place. Say in your summary that screenshots need `gh`, and hand back the PR URL. Run `github-pr-images`' preflight here, before step 1 — it upgrades a `gh` too old to `--attach`.
 
-**The web sandbox is the exception to that skip.** It has no `gh`, but hosts in the PR branch's own history instead — capture and post normally, following `github-pr-images`' [references/web-sandbox.md](../../github-pr-images/references/web-sandbox.md) for the hosting. Those URLs last only as long as the branch's objects, so say in your summary that a merged PR's screenshots aren't archival.
+**The web sandbox is the exception to that skip.** `gh` doesn't work there, but it hosts in the PR branch's own history instead — capture and post normally, following `github-pr-images`' [references/web-sandbox.md](../../github-pr-images/references/web-sandbox.md) for the hosting. Those URLs last only as long as the branch's objects, so say in your summary that a merged PR's screenshots aren't archival.
 
 **Skipping means posting nothing at all**, not posting something else. Substitute evidence — a rendered-HTML diff, a note about what couldn't be captured — leaves a comment the next run can't find or replace, because it isn't the `## Screenshots` comment; that's how #4126 ended up with three comments telling one story. If it's worth having, put it in your summary and let the user decide where it goes.
 

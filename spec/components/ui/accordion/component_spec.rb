@@ -10,4 +10,12 @@ RSpec.describe UI::Accordion::Component, type: :component do
     expect(component).to have_css("[data-ui--collapse-target='content']:not(.tw\\:hidden)", text: "First answer")
     expect(component).to have_css("[data-ui--collapse-target='content'].tw\\:hidden", text: "Second answer", visible: :all)
   end
+
+  context "boxed" do
+    let(:component) { render_inline(described_class.new(items: [["First question", "First answer"]], boxed: true)) }
+
+    it "makes each item a card, padding the trigger so the whole row toggles" do
+      expect(component).to have_css("[data-controller='ui--collapse'].tw\\:rounded-lg > [role='button'].tw\\:py-4\\!", text: "First question")
+    end
+  end
 end
