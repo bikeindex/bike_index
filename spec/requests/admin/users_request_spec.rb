@@ -10,7 +10,7 @@ RSpec.describe Admin::UsersController, type: :request do
     let!(:organization_user) { FactoryBot.create(:organization_user) }
     let!(:developer) { FactoryBot.create(:developer) }
     let!(:superuser_ability) { SuperuserAbility.create(user: user_subject) }
-    let!(:legacy_viewer) { FactoryBot.create(:user_confirmed, feature_registration_show_legacy: true) }
+    let!(:legacy_viewer) { FactoryBot.create(:user, feature_registration_show_legacy: true) }
 
     it "searches in the sort direction it's showing" do
       get base_url, params: {sort: "created_at", direction: "asc"}
