@@ -99,11 +99,28 @@ RSpec.describe Organized::ExportsController, type: :request do
     end
 
     describe "show" do
-      it "renders" do
+      let(:reloads) { "data-controller=\"org--export-progress\"" }
+
+      it "renders, reloading while the export runs" do
         get "#{base_url}/#{export.id}"
         expect(response.code).to eq("200")
         expect(response).to render_template(:show)
         expect(flash).to_not be_present
+        expect(response.body).to include(reloads)
+      end
+      context "errored" do
+        before { export.update(progress: "errored") }
+        it "doesn't reload" do
+          get "#{base_url}/#{export.id}"
+          expect(response.body).to_not include(reloads)
+        end
+      end
+      context "pending for more than 5 minutes" do
+        let(:export) { FactoryBot.create(:export_organization, organization: current_organization, created_at: 6.minutes.ago) }
+        it "doesn't reload" do
+          get "#{base_url}/#{export.id}"
+          expect(response.body).to_not include(reloads)
+        end
       end
       context "with assigned bike stickers" do
         let(:export) { FactoryBot.create(:export_avery, organization: current_organization, bike_code_start: "a1111") }
@@ -212,8 +229,8 @@ RSpec.describe Organized::ExportsController, type: :request do
         get "#{base_url}/new?end_at=2016-03-08T02:00"
         expect(response.code).to eq("200")
         page = Nokogiri::HTML(response.body)
-        expect(page.at_css("[name='export[end_at]']").parent["style"]).to eq("display: block;")
-        expect(page.at_css("[name='export[start_at]']").parent["style"]).to eq("")
+        expect(page.at_css("[name='export[end_at]']").parent["class"]).to be_blank
+        expect(page.at_css("[name='export[start_at]']").parent["class"]).to eq("tw:hidden")
       end
 
       context "organization has all feature slugs" do

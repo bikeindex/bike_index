@@ -27,7 +27,10 @@
     <% list.with_row(label: t(".by"), value: @export.user&.display_name) %>
     <% list.with_row(label: t(".format"), value: @export.file_format) %>
 
-    <% list.with_row(label: t(".progress"), id: "exportProgress", class: @export.progress, data: {createdat: @export.created_at.to_i}) do %>
+    <%# Past 5 minutes, it's assumed stuck %>
+    <% still_running = !@export.finished_processing? && @export.created_at > 5.minutes.ago %>
+
+    <% list.with_row(label: t(".progress"), data: ({controller: "org--export-progress"} if still_running)) do %>
       <span class="<%= export_progress_class(@export) %>">
         <%= @export.calculated_progress %>
       </span>

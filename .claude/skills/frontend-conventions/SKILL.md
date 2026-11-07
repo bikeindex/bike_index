@@ -135,16 +135,14 @@ Only add an `id` or non-utility `class` when something concrete consumes it — 
 When deleting an `id`/`class`, grep the repo for the name before deciding what to do with it:
 
 **On a page that loads a vendored bundle, grep `public/vendored_assets/*.js` as well as `app/`.** The
-organization pages load `application.js` and the Doorkeeper layout `application_standalone.js`; both bind
+Doorkeeper layout loads `application_standalone.js` and the bike versions index `bikes_search1.js`; they bind
 behaviour by id and class, and their source left the repo with the webpack config, so they can't be rebuilt —
 a hook with no consumer in `app/` is routinely live. Each `.js.map` still carries the original source in
 `sourcesContent`, which reads far better than the minified bundle. Handlers are guarded on a hook being present, and the guard is often a *different* id than the one bound: `#blog-image-form` gates the module
 that binds `#infoCheck`. So removing an id silently disables behaviour, sometimes behaviour attached
 to another id entirely.
 Grep for what a module *assigns*, not only the hooks it binds — a guarded init publishes globals and
-its callers don't re-check the guard. `#timeSelectionBtnGroup` gates `window.periodSelector`, which
-`binxAppOrgParkingNotificationMapping.urlParamsForOpts` calls regardless. No spec catches it; a
-converted page's `browser_console_messages` does.
+its callers don't re-check the guard. No spec catches it; a converted page's `browser_console_messages` does.
 
 - Zero consumers: delete it, don't rename it.
 - Consumers exist: either update them, or leave the hook in place — the consumers are the *reason* it earns its spot in the markup.

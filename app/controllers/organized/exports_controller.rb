@@ -65,10 +65,10 @@ module Organized
         bike_sticker = current_organization.bike_stickers.lookup(@export.bike_code_start) if @export.bike_code_start.present?
 
         if bike_sticker.present? && bike_sticker.claimed?
-          flash[:error] = translation(:sticker_already_assigned)
+          flash.now[:error] = translation(:sticker_already_assigned)
         end
       else
-        flash[:error] = translation(:do_not_have_permission)
+        flash.now[:error] = translation(:do_not_have_permission)
       end
     end
 
