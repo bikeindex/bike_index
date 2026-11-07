@@ -1910,7 +1910,7 @@ RSpec.describe Bike, type: :model do
       before { bike.update(updated_at: Time.current) } # bump thumb path
       it "is the public image" do
         expect(bike.reload.thumb_path).to be_present
-        expect(Bike::REMOTE_IMAGE_FALLBACK_URLS).to be_falsey
+        expect(PublicImage::REMOTE_IMAGE_FALLBACK_URLS).to be_falsey
         expect(bike.image_url).to eq public_image.image_url
         # reload so the version URL reconstructs from the stored identifier (generation is backgrounded)
         expect(bike.image_url(:medium)).to eq public_image.reload.image_url(:medium)
@@ -1922,14 +1922,6 @@ RSpec.describe Bike, type: :model do
       it "does not call blank? on the uploader" do
         expect_any_instance_of(ImageUploader).not_to receive(:blank?)
         bike.reload.image_url
-      end
-      it "with REMOTE_IMAGE_FALLBACK_URLS true return URL" do
-        stub_const("BikeAttributable::REMOTE_IMAGE_FALLBACK_URLS", true)
-        expect(Bike::REMOTE_IMAGE_FALLBACK_URLS).to be_truthy
-        # Approximates what happens for local dev with remote images
-        allow_any_instance_of(ImageUploader).to receive(:blank?) { true }
-        image_url = public_image.image_url
-        expect(bike.reload.image_url).to eq image_url.gsub("http://test.host", "https://files.bikeindex.org")
       end
       context "activestorage backed public_image" do
         let!(:public_image) { FactoryBot.create(:public_image, :with_attached_file, imageable: bike) }
@@ -1945,7 +1937,7 @@ RSpec.describe Bike, type: :model do
       # This happens sometimes when images are deleted
       before { bike.update_column(:thumb_path, "https://files.bikeindex.org/uploads/Pu/33333/adsf.jpg") }
       it "is nil" do
-        expect(Bike::REMOTE_IMAGE_FALLBACK_URLS).to be_falsey
+        expect(PublicImage::REMOTE_IMAGE_FALLBACK_URLS).to be_falsey
         expect(bike.reload.image_url).to be_blank
       end
     end
