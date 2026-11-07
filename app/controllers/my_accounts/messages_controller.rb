@@ -15,7 +15,7 @@ module MyAccounts
     def show
       if new_message_to_self?
         flash[:notice] = translation(:sorry_that_is_you)
-        redirect_back(fallback_location: bike_path(@marketplace_listing.item_id)) && return
+        redirect_back(fallback_location: RegistrationView.path(@marketplace_listing.item_id, user: current_user, session:)) && return
       end
 
       @marketplace_messages = matching_marketplace_thread
