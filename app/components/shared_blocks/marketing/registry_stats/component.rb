@@ -4,7 +4,8 @@ module SharedBlocks
   module Marketing
     module RegistryStats
       class Component < ApplicationComponent
-        def initialize(html_class: nil)
+        def initialize(layout: :grid, html_class: nil)
+          @layout = layout
           @html_class = html_class
         end
 

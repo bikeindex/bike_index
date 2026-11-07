@@ -10,6 +10,11 @@ RSpec.describe OrganizationsController, type: :request do
         expect(response.status).to eq(200)
         expect(response).to render_template(:new)
       end
+
+      it "keeps the kind through sign up" do
+        get "#{base_url}/new", params: {kind: "bike_advocacy"}
+        expect(response.body).to include("return_to=%2Forganizations%2Fnew%3Fkind%3Dbike_advocacy")
+      end
     end
     context "with user" do
       include_context :request_spec_logged_in_as_user
@@ -17,6 +22,14 @@ RSpec.describe OrganizationsController, type: :request do
         get "#{base_url}/new"
         expect(response.status).to eq(200)
         expect(response).to render_template(:new)
+      end
+
+      it "preselects a creatable kind" do
+        get "#{base_url}/new", params: {kind: "bike_advocacy"}
+        expect(Capybara.string(response.body)).to have_css("input[value=bike_advocacy][checked]")
+
+        get "#{base_url}/new", params: {kind: "ambassador"}
+        expect(Capybara.string(response.body)).to_not have_css("input[checked]")
       end
     end
   end
