@@ -102,7 +102,11 @@ module EbikeRuleServices
     end
 
     # Each of the state's classifications that isn't its e-bike law, with its rule_groups and top_rules
-    def non_e_bike_classifications(abbreviation, today: Time.zone.today) = parsed[:tiers][abbreviation].to_a.map { with_rule_groups(in_force(it, today)) }
+    def non_e_bike_classifications(abbreviation, today: Time.zone.today)
+      parsed[:tiers][abbreviation].to_a.sort_by.with_index { |tier, index|
+        [tier[:ids].include?(OFF_HIGHWAY) ? 1 : 0, tier[:mph] || Float::INFINITY, tier[:watt_cap] || Float::INFINITY, index]
+      }.map { with_rule_groups(in_force(it, today)) }
+    end
 
     # The lightest of the state's road classifications a vehicle whose record names none fits. Only a known speed is
     # within a speed cap; an unknown power is within any
