@@ -1,9 +1,9 @@
-/* Legacy sorts below this layer and utilities above it; kelsey_styles.css is unlayered, so its pages stay light */
+/* Legacy sorts below this layer and utilities above it; kelsey_styles.css is unlayered, so its pages stay light unless they opt in with .kelsey_styles_dark */
 @layer components {
   :is(.container, .container-fluid, .bootstrapstyle, .doorkeeper-container) {
     @apply tw:dark:text-gray-100;
 
-    :is(h1, h2, h3, h4, h5, h6):not(.root-landing-who *) {
+    :is(h1, h2, h3, h4, h5, h6) {
       @apply tw:dark:text-inherit;
     }
   }
@@ -71,8 +71,22 @@
   }
 
   /* These pages stay light, so a margin between their sections mustn't show a dark body */
-  body:has(.kelsey_styles) {
+  body:has(.kelsey_styles:not(.kelsey_styles_dark)) {
     @apply tw:dark:bg-white! tw:dark:text-gray-900!;
+  }
+
+  /* On <body> rather than the wrapper, since its background reads --redesign-blue-800 too */
+  body:has(.kelsey_styles_dark) {
+    @variant dark {
+      --redesign-surface: var(--tw-color-gray-900);
+      --redesign-gray-50: var(--tw-color-gray-800);
+      --redesign-gray-100: var(--tw-color-gray-800);
+      --redesign-gray-200: var(--tw-color-gray-700);
+      --redesign-gray-500: var(--tw-color-gray-300);
+      --redesign-gray-600: var(--tw-color-gray-300);
+      --redesign-gray-800: var(--tw-color-gray-100);
+      --redesign-blue-800: var(--tw-color-blue-900);
+    }
   }
 
   /* The map stays light, so its controls and popups mustn't inherit a dark page's text */
@@ -80,9 +94,10 @@
     @apply tw:dark:text-gray-900;
   }
 
-  /* !important to beat kelsey_styles.css, away from the homepage's section it leaves light */
-  .kelsey_styles_buttons-grid:not(.for-section *) .category-button:not(:hover) span {
-    @apply tw:dark:text-gray-200!;
+  .kelsey_styles_buttons-grid {
+    @variant dark {
+      --redesign-gray-800: var(--tw-color-gray-200);
+    }
   }
 
   .nav-tabs .nav-link:not(.active) {

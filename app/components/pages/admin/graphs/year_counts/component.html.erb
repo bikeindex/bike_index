@@ -1,4 +1,4 @@
-<%= render(UI::Table::Component.new(records: rows)) do |table| %>
+<%= render(UI::Table::Base::Component.new(records: rows)) do |table| %>
   <% table.column(label: "") do |row| %>
     <%= row.year %>
   <% end %>

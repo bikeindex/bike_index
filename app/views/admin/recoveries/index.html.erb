@@ -10,7 +10,7 @@
         <% valued_recoveries = available_recoveries.pluck(:estimated_value).reject(&:blank?) %>
         <% recovery_amount = valued_recoveries.sum + (available_recoveries.count - valued_recoveries.count) * Counts.recovery_average_value %>
 
-        <%= render(UI::TableList::Component.new(wide_definition: true, classes: "tw:[&_th]:not-italic")) do |list| %>
+        <%= render(UI::Table::List::Component.new(wide_definition: true, classes: "tw:[&_th]:not-italic")) do |list| %>
           <% list.with_row(label: "With user entered value", class: "tw:text-sm", value: number_display(valued_recoveries.count)) %>
 
           <% list.with_row(label: "Total user entered value", class: "tw:text-sm", value: safe_join(["$", number_display(valued_recoveries.sum)])) %>

@@ -8,7 +8,7 @@
   data-controller="update-cached-sortable-links"
   data-update-cached-sortable-links-base-url-value="<%= url_for(sort_state.search_params) %>"
 >
-  <%= render(UI::Table::Component.new(records: logged_searches, render_sortable: true, sort_state:,
+  <%= render(UI::Table::Base::Component.new(records: logged_searches, render_sortable: true, sort_state:,
         cache_key: cache_fragment_name(["admin_logged_searches", render_created_at, render_serial]),
         cache_records: ->(logged_search) { [logged_search.user, logged_search.organization] })) do |table| %>
     <% table.column(sortable: "request_at") do |logged_search| %>

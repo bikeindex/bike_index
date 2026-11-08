@@ -22,7 +22,7 @@
     <% end %>
   <% end %>
 
-  <%= render(UI::TableList::Component.new) do |list| %>
+  <%= render(UI::Table::List::Component.new) do |list| %>
     <% list.with_row(label: t(".created"), value: render(UI::Time::Component.new(time: @export.created_at, format: :localize_time_precise))) %>
     <% list.with_row(label: t(".by"), value: @export.user&.display_name) %>
     <% list.with_row(label: t(".format"), value: @export.file_format) %>

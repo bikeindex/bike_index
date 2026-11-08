@@ -5396,16 +5396,17 @@ nb:
         in_the_past_year: i løpet av det siste året
         now: nå
         to: til
-      table_column_settings:
-        all: Alle
-        default: misligholde
-        included_columns: Inkluderte kolonner
-        none: ingen
-        visible_columns: Synlige kolonner
-        return_to_default_column_order: Gå tilbake til standard kolonnerekkefølge
       drag_handle:
         move: Flytt %{name}
         moved: Posisjon %{position} til %{count}
+      table:
+        column_settings:
+          all: Alle
+          default: misligholde
+          included_columns: Inkluderte kolonner
+          none: ingen
+          return_to_default_column_order: Gå tilbake til standard kolonnerekkefølge
+          visible_columns: Synlige kolonner
     atoms:
       serial:
         hidden: skjult
