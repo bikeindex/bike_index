@@ -4,7 +4,7 @@ import { Controller } from '@hotwired/stimulus'
 
 // Connects to data-controller='ui--table-overflow'
 // Flags data-overflowing while the table is wider than its scroll container, which is what
-// UI::TableInCard's frozen column shadow keys off, and data-scrolled-end once it's scrolled all the way,
+// UI::Table::InCard's frozen column shadow keys off, and data-scrolled-end once it's scrolled all the way,
 // which drops the right edge's. Toggling columns resizes the table or its headers, so they're observed too.
 // A card marked data-table-bleed is set true while the table is wider than it.
 export default class extends Controller {
