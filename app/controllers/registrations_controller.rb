@@ -112,7 +112,7 @@ class RegistrationsController < ApplicationController
   def view_organization
     return @view_organization if defined?(@view_organization)
 
-    @view_organization = [current_organization, passive_organization].compact.find { current_user&.authorized?(it) }
+    @view_organization = [current_organization, passive_organization].find { current_user&.member_of?(it) }
   end
 
   # The [kind, organization] view requested via ?view_as, or nil when absent/unknown.

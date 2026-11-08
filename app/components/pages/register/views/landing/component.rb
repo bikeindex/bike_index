@@ -45,7 +45,7 @@ module Pages
               {icon: "icons/lucide-store.svg", circle: "tw:bg-purple-500",
                title: translation(".benefit_marketplace_title"), body: translation(".benefit_marketplace_body")},
               {icon: "icons/users.svg", circle: "tw:bg-slate-900 tw:dark:bg-slate-600",
-               title: translation(".benefit_network_title"), body: translation(".benefit_network_body")},
+               title: translation(".benefit_network_title"), body: translation(".benefit_network_partners_body", partners: number_with_delimiter(Counts.organizations.floor(-2)))},
               {icon: "icons/smartphone.svg", circle: "tw:bg-blue-600",
                title: translation(".benefit_app_title"), body: translation(".benefit_app_body")}]
           end
@@ -66,6 +66,16 @@ module Pages
             [[translation(".faq_free_question"), translation(".faq_free_answer")],
               [translation(".faq_serial_question"), translation(".faq_serial_answer")],
               [translation(".faq_privacy_question"), translation(".faq_privacy_answer")]]
+          end
+
+          def bikes_registered
+            total_bikes = Counts.total_bikes
+            if total_bikes < 1_000_000
+              return translation(".bikes_registered_no_owner_paid", bikes: number_with_delimiter(total_bikes))
+            end
+
+            translation(".millions_registered_no_owner_paid",
+              millions: number_with_precision(total_bikes / 1_000_000.0, precision: 1, round_mode: :floor, strip_insignificant_zeros: true))
           end
 
           def band = "tw:border-gray-200 tw:bg-gray-50 tw:dark:border-gray-700 tw:dark:bg-gray-800/60"

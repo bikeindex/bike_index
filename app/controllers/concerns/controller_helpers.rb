@@ -369,8 +369,8 @@ module ControllerHelpers
       return @passive_organization = nil if session[:passive_organization_id].to_i == 0
 
       organization = Organization.friendly_find(session[:passive_organization_id])
-      # A lost membership leaves the session pointing at the organization
-      @passive_organization = organization if current_user&.authorized?(organization)
+      # A signed in user can lose the membership the session still names
+      @passive_organization = organization if current_user.blank? || current_user.member_of?(organization)
     end
     @passive_organization ||= set_passive_organization(OrganizationRole.default_organization(current_user))
   end
