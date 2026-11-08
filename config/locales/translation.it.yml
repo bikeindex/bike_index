@@ -5648,16 +5648,17 @@ it:
         in_the_past_year: nell'ultimo anno
         now: Ora
         to: a
-      table_column_settings:
-        all: Tutti
-        default: predefinito
-        included_columns: Colonne incluse
-        none: nessuno
-        visible_columns: Colonne visibili
-        return_to_default_column_order: Ripristina l'ordine predefinito delle colonne
       drag_handle:
         move: Sposta %{name}
         moved: Posizione %{position} di %{count}
+      table:
+        column_settings:
+          all: Tutti
+          default: predefinito
+          included_columns: Colonne incluse
+          none: nessuno
+          return_to_default_column_order: Ripristina l'ordine predefinito delle colonne
+          visible_columns: Colonne visibili
     atoms:
       serial:
         hidden: nascosto

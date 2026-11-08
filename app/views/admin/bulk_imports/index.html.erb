@@ -10,7 +10,7 @@
         <% import_counts = matching_bulk_imports.group(:organization_id).count %>
         <% organizations = Organization.where(id: import_counts.keys).index_by(&:id) %>
 
-        <%= render(UI::Table::Component.new(records: import_counts.to_a, sort_state:)) do |table| %>
+        <%= render(UI::Table::Base::Component.new(records: import_counts.to_a, sort_state:)) do |table| %>
           <% table.column(label: "Organization") do |(id)| %>
             <% if id.present? %>
               <%= link_to organizations[id]&.name || id, url_for(sort_state.search_params.merge(organization_id: id)), class: "twlink" %>

@@ -7,7 +7,7 @@
     - else
       = t(".bulk_import")
     = link_to "superadmin", admin_bulk_import_path(@bulk_import.to_param), class: "btn btn-outline-info less-strong float-right"
-= render(UI::TableList::Component.new) do |list|
+= render(UI::Table::List::Component.new) do |list|
   - list.with_row(label: t(".created"), value: render(UI::Time::Component.new(time: @bulk_import.created_at)))
   - list.with_row(label: t(".progress"), value: render(partial: "/organized/bulk_imports/progress_display", locals: {bulk_import: @bulk_import, show_extended: true}))
   - list.with_row(label: t(".file")) do

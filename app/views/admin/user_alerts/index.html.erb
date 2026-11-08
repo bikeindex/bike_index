@@ -14,7 +14,7 @@
       <%= render(UI::Card::Component.new(additional_classes: "tw:my-6")) do %>
         <%= render(UI::Header::Component.new(text: "Kinds", tag: :h2)) %>
 
-        <%= render(UI::TableList::Component.new(wide_definition: true)) do |list| %>
+        <%= render(UI::Table::List::Component.new(wide_definition: true)) do |list| %>
           <% UserAlert.kinds.each_with_index do |kind, index| %>
             <% count = matching_user_alerts.where(kind: kind).count %>
             <% next unless count > 0 %>

@@ -216,7 +216,7 @@
     <%# instance_exec'd cell blocks can't see the ivar, so it comes across as a local %>
     <% display_dev_info = @display_dev_info %>
 
-    <%= render(UI::Table::Component.new(records: bike_organizations)) do |table| %>
+    <%= render(UI::Table::Base::Component.new(records: bike_organizations)) do |table| %>
       <% table.column(label: "Organizations") do |bike_organization| %>
         <%= render(Atoms::Admin::TableCells::Organization::Component.new(organization: bike_organization.organization,
               organization_id: bike_organization.organization_id)) %>
