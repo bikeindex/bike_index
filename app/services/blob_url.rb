@@ -12,6 +12,9 @@ module BlobUrl
     cloudflare_dev: ENV.fetch("ACTIVE_STORAGE_HOST_DEV", "https://dev-uploads.bikeindex.org"),
     cloudflare_test: ENV.fetch("ACTIVE_STORAGE_HOST_TEST", "https://test-uploads.bikeindex.org")
   }.freeze
+  # Variant keys digest SECRET_KEY_BASE, so a production-derived dev database can only name
+  # another environment's originals
+  FOREIGN_BLOB_ORIGINALS = Rails.env.development?
 
   def for(blob = nil)
     return if blob.blank?
@@ -27,7 +30,7 @@ module BlobUrl
   # check per image per render, and the post-attach job guarantees they exist
   def for_variant(attached = nil, size = nil)
     return if attached.blank?
-    return self.for(attached.blob) if size.blank?
+    return self.for(attached.blob) if size.blank? || foreign_blob?(attached.blob)
 
     variant = attached.variant(size)
     if local_storage?(attached.blob)
@@ -49,5 +52,9 @@ module BlobUrl
     STORAGE_HOSTS[blob.service&.name] || STORAGE_HOST
   end
 
-  conceal :local_storage?, :storage_host_for
+  def foreign_blob?(blob)
+    FOREIGN_BLOB_ORIGINALS && blob.service_name != SERVICE.to_s
+  end
+
+  conceal :local_storage?, :storage_host_for, :foreign_blob?
 end
