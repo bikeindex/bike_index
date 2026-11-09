@@ -911,7 +911,7 @@ RSpec.describe BParam, type: :model do
       end
 
       context "with the safety rules still to agree to" do
-        let!(:acknowledgment) { FactoryBot.create(:registration_sequence_acknowledgment_pending, b_param:) }
+        let!(:acknowledgment) { FactoryBot.create(:education_course_acknowledgment_pending, b_param:) }
 
         it "alerts until they're agreed to" do
           b_param.update(created_bike_id: FactoryBot.create(:bike).id)

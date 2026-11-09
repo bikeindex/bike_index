@@ -4977,6 +4977,7 @@ en:
       bulk_import_and_export: Bulk Import & Export
       bulk_imports: Bulk Imports
       discuss: Discuss
+      education_courses: Education courses
       exports: Exports
       getting_started: Getting started
       graduated_notifications: Graduated notifications
@@ -4999,7 +5000,6 @@ en:
       parking_notifications_group: Parking Notifications
       recoveries: Recoveries
       registration_form_settings: Registration form settings
-      registration_sequences: Registration sequences
       registration_stickers: Registration stickers
       registrations_index: Organization Registrations
       reports: Reports

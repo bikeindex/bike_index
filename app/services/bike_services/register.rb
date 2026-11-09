@@ -120,7 +120,7 @@ module BikeServices
     # active sequence, or the one its pages are being agreed to from, even once replaced.
     # motorized: the single page asks what an e-vehicle would get, before it's said it's one.
     # Checked first - it's in memory, and creation_organization is a query
-    def registration_sequence(b_param, separate_attestation: false, user: nil, motorized: b_param.motorized?)
+    def education_course(b_param, separate_attestation: false, user: nil, motorized: b_param.motorized?)
       return nil unless motorized
       # Left to the owner, so this flow has none - create_bike holds the bike for them to agree
       return nil if separate_attestation && !b_param.self_made?(user)
@@ -128,19 +128,19 @@ module BikeServices
       organization = b_param.creation_organization
       return nil if organization.blank?
 
-      started_id = b_param.params.dig("registration_sequence", "id")
-      (RegistrationSequence.find_by(id: started_id, organization:) if started_id.present?) ||
-        RegistrationSequence.active_for(organization)
+      started_id = b_param.params.dig("education_course", "id")
+      (EducationCourse.find_by(id: started_id, organization:) if started_id.present?) ||
+        EducationCourse.active_for(organization)
     end
 
-    # registration_sequence for a link back into the flow, and whether the rules restarted:
+    # education_course for a link back into the flow, and whether the rules restarted:
     # resuming starts over on the organization's current version rather than finishing one
     # it's replaced since. An agreement already made stands
-    def resume_registration_sequence(b_param, sequence:)
+    def resume_education_course(b_param, sequence:)
       return [sequence, false] if sequence.blank? || sequence.active? || acknowledged?(b_param, sequence:)
 
-      b_param.update(params: b_param.params.except("registration_sequence"))
-      [registration_sequence(b_param), true]
+      b_param.update(params: b_param.params.except("education_course"))
+      [education_course(b_param), true]
     end
 
     # The step to show: finished once the bike exists (or it's awaiting the email),
@@ -165,7 +165,7 @@ module BikeServices
     # to_a: callers ask for count/any?/[] repeatedly, and a CollectionProxy re-queries
     # for each of them
     def sequence_pages(sequence)
-      sequence&.registration_sequence_pages&.to_a || []
+      sequence&.education_course_pages&.to_a || []
     end
 
     # Placing the report asks whether there's a creator yet, which is a query, so this is
@@ -179,7 +179,7 @@ module BikeServices
     # button is told what it'd lead to for an e-vehicle. Separate attestation leaves the rules
     # to an owner who isn't the registrant, which the email typed above it decides - :own_emails
     def motorized_review(b_param, flow, separate_attestation:)
-      return false unless flow.single_page? && registration_sequence(b_param, motorized: true).present?
+      return false unless flow.single_page? && education_course(b_param, motorized: true).present?
 
       separate_attestation ? :own_emails : true
     end
@@ -192,13 +192,13 @@ module BikeServices
 
     # Nothing to agree to without a sequence, otherwise the acknowledgment record
     def acknowledged?(b_param, sequence:)
-      sequence_pages(sequence).none? || RegistrationSequenceAcknowledgment.acknowledged.exists?(b_param_id: b_param.id)
+      sequence_pages(sequence).none? || EducationCourseAcknowledgment.acknowledged.exists?(b_param_id: b_param.id)
     end
 
     # Which pages have been acknowledged so far. In-flight progress, so it lives on
     # the b_param alongside the rest of the wizard's state
     def acknowledged_page_ids(b_param)
-      b_param.params.dig("registration_sequence", "acknowledged_page_ids") || []
+      b_param.params.dig("education_course", "acknowledged_page_ids") || []
     end
 
     # All or nothing: a page is only acknowledged with every one of its rules checked
@@ -210,8 +210,8 @@ module BikeServices
         !agreed.all? { Binxtils::InputNormalizer.boolean(it) }
 
       # id alongside the pages, so the acknowledged ids are unambiguously scoped
-      b_param.clean_params({registration_sequence: {id: page.registration_sequence_id,
-                                                    acknowledged_page_ids: (acknowledged_page_ids(b_param) + [page.id]).uniq}}.as_json)
+      b_param.clean_params({education_course: {id: page.education_course_id,
+                                               acknowledged_page_ids: (acknowledged_page_ids(b_param) + [page.id]).uniq}}.as_json)
       b_param.save
     end
 
@@ -228,7 +228,7 @@ module BikeServices
       return false unless Binxtils::InputNormalizer.boolean(acknowledged_all) && sequence.present?
       return true if acknowledged?(b_param, sequence:)
 
-      RegistrationSequenceAcknowledgment.acknowledge(b_param, sequence:, user:)
+      EducationCourseAcknowledgment.acknowledge(b_param, sequence:, user:)
     end
 
     # The bike exists with its rules agreed to, or everything reachable is entered and awaiting
@@ -456,7 +456,7 @@ module BikeServices
     # The switches ride to the ownership's registration_info, so registrations can be counted by them
     def create_bike(b_param, sequence:, ip_address:, rules_to_owner: false)
       b_param.creator_id ||= confirmed_email_creator_id(b_param)
-      owners_sequence = registration_sequence(b_param) if sequence.blank? &&
+      owners_sequence = education_course(b_param) if sequence.blank? &&
         (rules_to_owner || b_param.rules_left_to_owner?(b_param.creator))
       b_param.params = b_param.params.deep_merge("bike" => {
         "register_single_page" => b_param.params["register_single_page"],
@@ -464,7 +464,7 @@ module BikeServices
       })
       owed = sequence || owners_sequence
       # Ahead of the bike, so the ownership it creates holds its email back
-      pending = RegistrationSequenceAcknowledgment.create_pending(b_param, sequence: owed) unless acknowledged?(b_param, sequence: owed)
+      pending = EducationCourseAcknowledgment.create_pending(b_param, sequence: owed) unless acknowledged?(b_param, sequence: owed)
       bike = BikeServices::Creator.new(ip_address:).create_bike(b_param)
       if bike.id.blank?
         pending&.destroy
@@ -472,7 +472,7 @@ module BikeServices
       end
 
       # The bike is what the acknowledgment hangs off once the b_param is swept
-      acknowledgment = pending || RegistrationSequenceAcknowledgment.find_by(b_param_id: b_param.id)
+      acknowledgment = pending || EducationCourseAcknowledgment.find_by(b_param_id: b_param.id)
       acknowledgment&.update(bike_id: bike.id, user_id: acknowledgment.user_id || b_param.creator_id)
       return bike if pending.blank?
       return if owners_sequence.blank?

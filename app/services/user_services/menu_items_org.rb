@@ -13,7 +13,7 @@ module UserServices
       return [] if organization.nil? || current_user.nil?
 
       # Rails.cache.fetch gets none of the locale ApplicationComponentHelper#cache folds into fragments
-      Rails.cache.fetch(["menu_items_org_v3", organization, current_user,
+      Rails.cache.fetch(["menu_items_org_v4", organization, current_user,
         old_register_view, I18n.locale]) do
         build_items(organization, current_user, old_register_view)
       end
@@ -222,7 +222,7 @@ module UserServices
     def settings_group(organization, admin)
       return nil unless admin
 
-      sequences = routes.organization_registration_sequences_path(organization_id: organization.to_param)
+      sequences = routes.organization_education_courses_path(organization_id: organization.to_param)
       children = [
         ComponentStructs::Shapes.link(translation(:org_profile, org_name: organization.short_name),
           routes.organization_manage_path(organization_id: organization.to_param)),
@@ -237,8 +237,8 @@ module UserServices
         ComponentStructs::Shapes.link(translation(:registration_form_settings),
           routes.settings_organization_registrations_path(organization_id: organization.to_param)),
         # Editing a page of a sequence is the same section of the menu, on a path of its own
-        enabled_link(organization, "registration_sequences", translation(:registration_sequences), sequences,
-          match_paths: ["#{sequences}/**", "#{org_root(organization)}/registration_sequence_pages/**"])
+        enabled_link(organization, "education_courses", translation(:education_courses), sequences,
+          match_paths: ["#{sequences}/**", "#{org_root(organization)}/education_course_pages/**"])
       ]
 
       ComponentStructs::Shapes.group(:settings,

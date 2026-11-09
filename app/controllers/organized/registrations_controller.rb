@@ -64,7 +64,7 @@ module Organized
       # The form carries this registration's token, and a cached page would carry a stale one
       response.set_header("Cache-Control", "no-store")
       BikeServices::Register.settings(@b_param, session[:register_settings]) => {single_page:, separate_attestation:}
-      sequence = BikeServices::Register.registration_sequence(@b_param, user: current_user, separate_attestation:)
+      sequence = BikeServices::Register.education_course(@b_param, user: current_user, separate_attestation:)
       flow = BikeServices::Register.flow(@b_param, sequence:, single_page:)
       render Pages::Org::Registrations::New::Component.new(b_param: @b_param, flow:, organization: current_organization,
         current_user:, motorized_review: BikeServices::Register.motorized_review(@b_param, flow, separate_attestation:))
@@ -258,7 +258,7 @@ module Organized
     def search_order(organization)
       return sortable_order(Bike) if sort_column != "acknowledged_at"
 
-      RegistrationSequenceAcknowledgment.bikes_order(organization:, direction: sort_direction)
+      EducationCourseAcknowledgment.bikes_order(organization:, direction: sort_direction)
     end
 
     # The shell render and the search both read the filters normalized here
