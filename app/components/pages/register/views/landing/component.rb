@@ -69,8 +69,7 @@ module Pages
           end
 
           def bikes_registered
-            translation(".millions_registered_no_owner_paid",
-              millions: number_with_precision(Counts.total_bikes / 1_000_000.0, precision: 1, round_mode: :floor, strip_insignificant_zeros: true))
+            translation(".millions_registered_no_owner_paid", millions: Counts.in_millions(Counts.total_bikes))
           end
 
           def band = "tw:border-gray-200 tw:bg-gray-50 tw:dark:border-gray-700 tw:dark:bg-gray-800/60"

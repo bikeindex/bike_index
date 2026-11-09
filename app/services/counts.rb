@@ -46,6 +46,11 @@ module Counts
     retrieve_for("organizations")
   end
 
+  # Floored, so "1.2 million" never overstates the count
+  def in_millions(count)
+    ActiveSupport::NumberHelper.number_to_rounded(count / 1_000_000.0, precision: 1, round_mode: :floor, strip_insignificant_zeros: true)
+  end
+
   def week_creation_chart
     chart_data = RedisPool.conn { |r| r.hget STORAGE_KEY, "week_creation_chart" }
     chart_data.present? ? JSON.parse(chart_data) : chart_data
