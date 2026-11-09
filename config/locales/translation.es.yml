@@ -6891,8 +6891,6 @@ es:
           step_review:
             complete_registration: Registro completo %{cycle_type}
           landing:
-            a_million_bikes: Un millón de bicicletas están registradas. Ni un solo
-              propietario pagó para estar allí.
             benefit_alerts_body: Si se lo roban, márquelo como robado y avisaremos
               a las tiendas asociadas, a la policía y a los repartidores que se encuentren
               cerca del lugar donde ocurrió.
@@ -6908,9 +6906,6 @@ es:
               verifica con los informes de robo, para que los compradores tengan la
               seguridad de que es legítima.
             benefit_marketplace_title: Un mercado de confianza
-            benefit_network_body: Voluntarios, equipos locales de recuperación y más
-              de 1.000 departamentos de policía, universidades, ciudades y tiendas
-              vigilan y denuncian las bicicletas robadas.
             benefit_network_title: La gente lo está buscando
             benefit_private_body: Tu información de contacto permanece oculta. Somos
               una organización sin ánimo de lucro, por lo que no vendemos datos ni
@@ -6973,6 +6968,11 @@ es:
             what_registering_subhead: La mayoría de las bicicletas robadas nunca regresan
               a casa porque nadie puede demostrar a quién pertenecen. El registro
               soluciona ese problema.
+            benefit_network_partners_body: Voluntarios, equipos locales de recuperación
+              y más de %{partners} departamentos de policía, universidades, ciudades
+              y tiendas vigilan las bicicletas robadas y las denuncian.
+            millions_registered_no_owner_paid: "%{millions} millones de bicicletas
+              están registradas. Ni un solo propietario pagó para estar allí."
       bikebook:
         show:
           any_activity: Cualquier actividad
@@ -7068,16 +7068,11 @@ es:
             las reglas vigentes del estado.
           fails_rule: No cumple con esta regla.
           for_your_information: Para tu información
-          gray_detail: Tu %{name} está catalogada como una bicicleta eléctrica de
-            clase %{n}. Consulta las normas locales en el %{state} DMV.
-          gray_detail_unclassified: Tu %{name} no figura como bicicleta eléctrica
-            de Clase 1, 2 o 3. Consulta las normas locales en el DMV de %{state}.
           gray_headline: Todavía no tenemos registradas las normas sobre bicicletas
             eléctricas de %{state}.
           has_throttle: Tiene acelerador
           is_registered: "¿Está matriculada esta bicicleta?"
           legal_to_ride: Es legal conducirlo
-          legal_with_rules: Legal, con reglas para verificar
           limits_start_on: Estos límites entran en vigor %{date}
           manual_bike_name: bicicleta eléctrica
           may_be_moped: En su lugar, podría estar regulado como un ciclomotor o un
@@ -7118,14 +7113,7 @@ es:
           watts_not_provided: Potencia del motor no proporcionada
           watts_over_cap_html: El motor %{watts}W supera la capacidad %{cap}W
           watts_within_cap_html: El motor %{watts}W está dentro de la tapa
-          yellow_headline_class_unknown:
-            one: Tu %{name} puede ser legal para viajar en %{state}, con la regla
-              %{count} para verificar.
-            other: Tu %{name} puede ser legal para viajar en %{state}, con %{count}
-              reglas para verificar.
           yes_to_html: Sí, a %{mph}
-          your_bike: Tu bicicleta
-          your_ebike: Tu bicicleta eléctrica
           your_state: Tu estado
           bikebook_name: Libro de bicicletas
           class_3_throttle_over_html: El acelerador funciona hasta %{mph} mph, más
@@ -7152,13 +7140,10 @@ es:
           class_n: Clase %{n}
           classes_not_permitted: Es una bicicleta eléctrica %{classes}, lo cual no
             está permitido.
-          manually_entered: Introducido manualmente
           model_year: Modelo %{year}
           optional_throttle_not_allowed: Es legal únicamente sin su acelerador opcional.
           optional_to_html: Opcional, a %{mph}
           throttle_with_class_3_assist: No permitido con asistencia de Clase 3
-          green_headline_law: Tu %{name} tiene permiso para viajar en %{state} según
-            las reglas %{law}.
           kmh_html: "%{kmh} km/h"
           law_source_html: 'Fuente: Catálogo de leyes sobre bicicletas eléctricas
             de %{link}. Los resúmenes son solo de referencia y no constituyen asesoramiento
@@ -7191,18 +7176,6 @@ es:
           throttle_not_stated_in_law: Su ley no especifica si se permite un acelerador.
           watts_to_check_html: Compruebe que su motor tenga una potencia nominal de
             %{cap}W o inferior.
-          yellow_headline_law:
-            one: Tu %{name} es legal para viajar en %{state} según las reglas %{law},
-              con la regla %{count} para verificar.
-            other: Tu %{name} es legal para viajar en %{state} según las reglas %{law},
-              con reglas %{count} para verificar.
-          yellow_headline_law_without_throttle: Tu %{name} es legal para circular
-            en %{state} según las reglas %{law}, sin su acelerador opcional.
-          yellow_headline_motor_vehicle_law:
-            one: Tu %{name} puede ser legal para montar en %{state} según las reglas
-              %{law}, con la regla %{count} para verificar.
-            other: Tu %{name} puede ser legal para montar en %{state} según las reglas
-              %{law}, con reglas %{count} para verificar.
           yes_to_kmh_html: Sí, a %{kmh} km/h
           your_province: Su provincia o territorio
           classes_not_recognized_in:
@@ -7219,23 +7192,6 @@ es:
             clase %{n} con acelerador opcional.
           also_class_with_optional_upgrade: También es una bicicleta eléctrica de
             clase %{n} con una actualización opcional.
-          class_headline: Tu %{name} es una bicicleta eléctrica de clase %{n} en %{state}.
-          class_headline_optional: Tu %{name} es una bicicleta eléctrica de clase
-            %{n} en %{state} y %{optional}.
-          class_headline_optional_with_rules:
-            one: Tu %{name} es una bicicleta eléctrica de clase %{n} en %{state} y
-              %{optional}, con la regla %{count} para verificar.
-            other: Tu %{name} es una bicicleta eléctrica de clase %{n} en %{state}
-              y %{optional}, con %{count} reglas para verificar.
-          class_headline_with_rules:
-            one: Tu %{name} es una bicicleta eléctrica de clase %{n} en %{state},
-              con la regla %{count} para verificar.
-            other: Tu %{name} es una bicicleta eléctrica de clase %{n} en %{state},
-              con %{count} reglas para verificar.
-          class_headline_without_throttle: Tu %{name} es una bicicleta eléctrica de
-            clase %{n} en %{state}, sin su acelerador opcional.
-          green_headline_no_classes: Tu %{name} está clasificado como una bicicleta
-            eléctrica en %{state}.
           heading_classes_html: "%{classes} reconocido"
           heading_no_power_cap: Sin condensador de potencia del motor
           heading_no_speed_cap: Sin límite de velocidad máxima asistida
@@ -7245,20 +7201,61 @@ es:
           heading_throttle_not_allowed: Acelerador no permitido
           heading_vehicle_html: Regulado como %{name}
           may_fall_under_name: En %{state}, puede quedar dentro de %{name}.
-          not_classified_headline: Tu %{name} no está clasificado como bicicleta eléctrica
-            en %{state}.
-          rules_that_apply: Reglas que se aplican en %{state}
-          rules_that_may_apply: Reglas que pueden aplicarse en %{state}
           throttle_speed_over_cap_html: El acelerador alcanza %{mph} mph, superando
             el límite de %{cap} mph.
           throttle_speed_within_cap_html: El acelerador alcanza las %{mph} mph, dentro
             del límite.
-          yellow_headline_no_classes:
-            one: Tu %{name} está clasificado como una bicicleta eléctrica en %{state},
+          class_summary: La %{name} es una bicicleta eléctrica de clase %{n} en %{state}.
+          class_summary_optional: La %{name} es una bicicleta eléctrica de clase %{n}
+            en %{state} y %{optional}.
+          class_summary_optional_with_rules:
+            one: La %{name} es una bicicleta eléctrica de clase %{n} en %{state} y
+              %{optional}, con la regla %{count} para verificar.
+            other: La %{name} es una bicicleta eléctrica de clase %{n} en %{state}
+              y %{optional}, con %{count} reglas para verificar.
+          class_summary_with_rules:
+            one: La %{name} es una bicicleta eléctrica de clase %{n} en %{state},
+              con regla %{count} para verificar.
+            other: La %{name} es una bicicleta eléctrica de clase %{n} en %{state},
+              con reglas %{count} para verificar.
+          class_summary_without_throttle: La %{name} es una bicicleta eléctrica de
+            clase %{n} en %{state}, sin su acelerador opcional.
+          classified_with_rules: Clasificada como bicicleta eléctrica, con normas
+            que consultar.
+          gray_listed_detail: La %{name} está catalogada como una bicicleta eléctrica
+            de Clase %{n}. Consulte el DMV %{state} para conocer las normas locales.
+          gray_unlisted_detail: La %{name} no figura como bicicleta eléctrica de Clase
+            1, 2 o 3. Consulta la normativa local en el DMV de %{state}.
+          green_summary_law: El %{name} es legal para viajar en %{state} según las
+            reglas %{law}.
+          green_summary_no_classes: El %{name} está clasificado como una bicicleta
+            eléctrica en %{state}.
+          manually_entered_ebike: Bicicleta eléctrica introducida manualmente
+          not_classified_summary: El %{name} no está clasificado como bicicleta eléctrica
+            en %{state}.
+          yellow_summary_class_unknown:
+            one: "%{name} puede ser legal para viajar en %{state}, con la regla %{count}
+              para verificar."
+            other: Puede que sea legal viajar en %{name} en %{state}, con %{count}
+              reglas para verificar.
+          yellow_summary_law:
+            one: El %{name} es legal para viajar en %{state} según las reglas %{law},
               con la regla %{count} para verificar.
-            other: Tu %{name} está clasificado como una bicicleta eléctrica en %{state},
+            other: El %{name} es legal para viajar en %{state} según las reglas %{law},
+              con reglas %{count} para verificar.
+          yellow_summary_law_without_throttle: El %{name} es legal para circular en
+            %{state} según las reglas %{law}, sin su acelerador opcional.
+          yellow_summary_motor_vehicle_law:
+            one: El %{name} puede ser legal para montar en %{state} según las reglas
+              %{law}, con la regla %{count} para verificar.
+            other: El %{name} puede ser legal para montar en %{state} según las reglas
+              %{law}, con reglas %{count} para verificar.
+          yellow_summary_no_classes:
+            one: El %{name} se clasifica como una bicicleta eléctrica en %{state},
+              con la regla %{count} para verificar.
+            other: La %{name} está clasificada como una bicicleta eléctrica en %{state},
               con %{count} reglas para verificar.
-          yellow_headline_no_classes_without_throttle: Tu %{name} está clasificado
+          yellow_summary_no_classes_without_throttle: La %{name} está clasificada
             como una bicicleta eléctrica en %{state}, sin su acelerador opcional.
         rule_label:
           classes: Clases reconocidas
@@ -7587,8 +7584,6 @@ es:
           next_oem_parts_title: Piezas OEM e imágenes de stock
           next_versioning_body: Lleva un registro de los cambios que haga tu bicicleta.
           next_versioning_title: Versión de bicicletas
-          official_registry: El registro oficial de más de 1.000 departamentos de
-            policía, universidades, ciudades y tiendas.
           or_make_a_one_time_donation: O bien, haga una donación única.
           per_month: "/ mes"
           per_year: "/ año"
@@ -7632,20 +7627,16 @@ es:
             que permiten recuperarlas, y también se financian las nuevas herramientas
             que desarrollamos. Registrar una bicicleta y denunciar un robo siempre
             será gratuito. Gracias a nuestros miembros podemos garantizarlo.
+          official_registry_partners: El registro oficial de más de %{partners} departamentos
+            de policía, universidades, ciudades y tiendas
       donate:
         page:
-          cta_headline: Un millón de bicicletas están registradas. Ni un solo propietario
-            pagó para estar allí.
           cta_sub: Que siga siendo gratuito para el próximo millón.
           eyebrow: Recuperado y regresado
           form_title: Financiar la próxima recuperación
           headline: Todas las bicicletas mencionadas anteriormente regresaron a casa
             porque el registro era gratuito.
           larger_gift_link: Háblanos sobre una donación mayor.
-          lede: Bike Index es una organización sin fines de lucro. Registrarse es
-            gratis, buscar bicicletas es gratis y denunciar un robo es gratis; por
-            eso hay un millón de bicicletas registradas y por eso la policía y las
-            tiendas lo utilizan. Las donaciones son lo que permite que siga funcionando.
           lede_short: Bike Index es una organización sin fines de lucro. El registro,
             la búsqueda y los informes de robo son gratuitos. Las donaciones son las
             que permiten que siga siendo así.
@@ -7685,6 +7676,13 @@ es:
           uses_partners_title: Socios e investigaciones
           uses_title: "¿Adónde va el dinero?"
           wall_photo_alt: Una bicicleta recuperada a través de Bike Index.
+          lede_millions_registered: Bike Index es una organización sin fines de lucro.
+            Registrarse es gratis, buscar es gratis y denunciar un robo es gratis;
+            por eso hay %{millions} millones de bicicletas registradas y por eso los
+            departamentos de policía y las tiendas lo utilizan. Las donaciones son
+            lo que permite que siga funcionando.
+          millions_registered_no_owner_paid: "%{millions} millones de bicicletas están
+            registradas. Ni un solo propietario pagó para estar allí."
         form:
           already_member: Ya eres miembro de Bike Index. ¡Gracias! Puedes cambiar
             tu nivel o los detalles de pago desde la configuración de tu membresía.
