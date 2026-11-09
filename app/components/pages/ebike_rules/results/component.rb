@@ -217,6 +217,7 @@ module Pages
         def throttle_display
           return translation(".answer_no") unless @bike.throttle
           return metric_throttle_display unless @us
+          return translation(".yes_over_mph_html", mph: number_display(@bike.throttle_past_mph)) if @bike.throttle_past_mph
 
           mph = @bike.throttle_mph && number_display(@bike.throttle_mph)
           if @bike.optional_throttle?
@@ -279,6 +280,8 @@ module Pages
           when :speed_over_cap then translation(".speed_over_cap_kmh_html", **args)
           when :speed_past_cap then translation(".speed_past_cap_kmh_html", **args)
           when :speed_past then translation(".speed_past_kmh_html", **args)
+          when :throttle_past_cap then translation(".throttle_past_cap_kmh_html", **args)
+          when :throttle_past then translation(".throttle_past_kmh_html", **args)
           when :speed_to_check then translation(".speed_to_check_kmh_html", **args)
           when :no_speed_cap then translation(".no_speed_cap_in_law")
           when :throttle_not_allowed then translation(".throttle_not_allowed_in_law")
@@ -330,6 +333,7 @@ module Pages
               translation(".class_3_throttle_within_html", **args)
             end
           when :class_3_throttle_over then translation(".class_3_throttle_over_html", **args)
+          when :class_3_throttle_past then translation(".class_3_throttle_past")
           else translation(".has_throttle")
           end
         end

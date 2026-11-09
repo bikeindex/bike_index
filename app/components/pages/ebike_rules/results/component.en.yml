@@ -21,6 +21,8 @@ en:
           class_3_throttle: Throttle must cut out at 20 mph
           class_3_throttle_over_html: Throttle runs to %{mph} mph, past the 20 mph
             a Class 3's throttle is allowed
+          class_3_throttle_past: Throttle runs past the 20 mph a Class 3's throttle
+            is allowed
           class_3_throttle_within_html: Throttle stops at %{mph} mph
           class_n: Class %{n}
           class_summary: The %{name} is a Class %{n} e-bike in %{state}.
@@ -158,6 +160,10 @@ en:
           throttle_not_allowed_in_law: Its law doesn't allow a throttle
           throttle_not_stated: The state's law doesn't say whether a throttle is allowed
           throttle_not_stated_in_law: Its law doesn't say whether a throttle is allowed
+          throttle_past_cap_kmh_html: Throttle runs past %{past} km/h, over the %{cap}
+            km/h limit
+          throttle_past_kmh_html: Throttle runs past %{past} km/h; check that it stops
+            by %{cap} km/h
           throttle_speed_over_cap_html: Throttle runs to %{mph} mph, over the %{cap}
             mph limit
           throttle_speed_within_cap_html: Throttle runs to %{mph} mph, within the
@@ -200,6 +206,7 @@ en:
           yellow_summary_no_classes_without_throttle: >-
             The %{name} is classified as an e-bike in %{state}, without its optional
             throttle.
+          yes_over_mph_html: Yes, over %{mph} mph
           yes_to_html: Yes, to %{mph}
           yes_to_kmh_html: Yes, to %{kmh} km/h
           your_province: Your province or territory

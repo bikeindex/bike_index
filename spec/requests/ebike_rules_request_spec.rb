@@ -23,7 +23,7 @@ RSpec.describe EbikeRulesController, type: :request do
         .and have_css("[role='option']", text: "District of Columbia", visible: :all)
         .and have_css("[role='option']", text: "Wyoming", visible: :all)
         .and have_css("form[action='/ebike-rules']")
-        .and have_css("[data-inline-note]", text: "Choose your state from the list.")
+        .and have_css("p", text: "Choose your state.")
         .and have_css("[data-ebike-rules--lookup-manifest-url-value='#{Integrations::Bikebook::Catalog::MANIFEST_URL}']")
         .and have_no_css("[role='status']")
         .and have_no_css("[role='alert']")
@@ -342,7 +342,7 @@ RSpec.describe EbikeRulesController, type: :request do
 
       # without a bike, a prompt to pick one
       get "/ebike-rules/CA"
-      expect(page).to have_css("[data-inline-note]", text: "Choose your province or territory from the list.")
+      expect(page).to have_css("p", text: "Choose your province or territory.")
     end
 
     it "checks a bike against a province's law, in km/h" do
@@ -440,12 +440,13 @@ RSpec.describe EbikeRulesController, type: :request do
       expect(page).to have_css("[role='status']", text: "The Specialized Haul ST is a Class 3 e-bike in Colorado")
         .and have_checked_field("top_speed", with: "28")
         .and have_checked_field("throttle", with: "1")
+        .and have_checked_field("throttle_speed", with: "20")
         .and have_field("watts", with: "700")
         .and have_css("legend", text: "Specialized Haul ST details")
       expect(page.find("form[data-details]")["data-details"]).to eq "model"
       # its id alone is the check
       expect(page.find("input[name='manual']", visible: :all)[:disabled]).to eq "disabled"
-      expect(page.find("[data-bike-details]", visible: :all)["data-bike-details"]).to eq({top_speed: 28, throttle: 1, watts: 700}.to_json)
+      expect(page.find("[data-bike-details]", visible: :all)["data-bike-details"]).to eq({top_speed: 28, throttle: 1, throttle_speed: 20, watts: 700}.to_json)
 
       get "/ebike-rules/US/CO", params: {vehicle_models: "m/specialized/2025/haul_st", manual: "1", top_speed: "28", throttle: "1", watts: "1000"}
       expect(page).to have_css("[role='status']", text: "This isn't an e-bike under current Colorado rules.")
@@ -474,6 +475,24 @@ RSpec.describe EbikeRulesController, type: :request do
         .and have_css("dd", text: "Over 28 mph")
         .and have_text("Look for the UL mark on the frame and battery labels.")
         .and have_checked_field("top_speed", with: "29")
+    end
+
+    it "classes a bike entered by hand by its throttle's speed as well as its assist's" do
+      get "/ebike-rules/US/CO", params: {manual: "1", top_speed: "28", watts: "250", throttle: "1", throttle_speed: "20"}
+      expect(page).to have_css("[role='status']", text: "is a Class 2 and 3 e-bike")
+        .and have_checked_field("throttle_speed", with: "20")
+
+      get "/ebike-rules/US/CO", params: {manual: "1", top_speed: "20", watts: "250", throttle: "1", throttle_speed: "21"}
+      expect(page).to have_css("[role='status']", text: "This isn't an e-bike under current Colorado rules.")
+        .and have_css("[role='status'] li", text: "Throttle runs past the 20 mph a Class 3's throttle is allowed.")
+        .and have_css("dd", text: "Yes, over 20 mph")
+        .and have_checked_field("throttle_speed", with: "21")
+        .and have_css("input[name='throttle_speed']", visible: :all, count: 2)
+        .and have_checked_field("top_speed", with: "20")
+
+      # a throttle speed left behind by answering no isn't one
+      get "/ebike-rules/US/CO", params: {manual: "1", top_speed: "20", watts: "250", throttle: "0", throttle_speed: "21"}
+      expect(page).to have_css("[role='status']", text: "is a Class 1 e-bike").and have_no_checked_field("throttle_speed")
     end
 
     it "fills a model's details from what its record has: its peak power without a rating, its class without a speed" do
