@@ -3,6 +3,17 @@ require "rails_helper"
 RSpec.describe Organized::EducationCoursesController, type: :request do
   let(:base_url) { "/o/#{current_organization.to_param}/education_courses" }
 
+  describe "registration sequence URLs" do
+    it "redirects organization and admin paths, keeping the query" do
+      expect(get("/o/brakebills/registration_sequences")).to redirect_to("/o/brakebills/education_courses")
+      expect(get("/o/brakebills/registration_sequences/2/edit?page=1")).to redirect_to("/o/brakebills/education_courses/2/edit?page=1")
+      expect(get("/o/brakebills/registration_sequence_pages/4/edit")).to redirect_to("/o/brakebills/education_course_pages/4/edit")
+      expect(get("/admin/registration_sequences?search_status=draft")).to redirect_to("/admin/education_courses?search_status=draft")
+      expect(get("/admin/registration_sequences/2/preview")).to redirect_to("/admin/education_courses/2/preview")
+      expect(get("/admin/registration_sequence_pages/4/edit")).to redirect_to("/admin/education_course_pages/4/edit")
+    end
+  end
+
   context "logged_in_as_organization_admin" do
     include_context :request_spec_logged_in_as_organization_admin
     before { current_organization.update_columns(enabled_feature_slugs: %w[education_courses education_courses_edit]) }
