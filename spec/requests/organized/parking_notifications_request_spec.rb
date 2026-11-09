@@ -197,6 +197,85 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         end
       end
 
+      # The form collapses its location controls for a repeat, so nothing locates the pin
+      context "repeat with no location of its own" do
+        let!(:earlier_notification) { FactoryBot.create(:parking_notification_organized, organization: current_organization, bike:, kind: "parked_incorrectly_notification") }
+        let(:repeat_params) do
+          {bike_id: bike.id, is_repeat: "true", use_entered_address: "false", latitude: "", longitude: "", street: "", city: "", country_id: Country.united_states.id}
+        end
+
+        it "reuses the earlier notification's location, impounding" do
+          expect {
+            post base_url, params: {parking_notification: repeat_params.merge(kind: "impound_notification")}
+            expect(flash[:success]).to eq "Impounded this bike"
+          }.to change(ImpoundRecord, :count).by(1)
+
+          parking_notification = ParkingNotification.last
+          expect(parking_notification.initial_record_id).to eq earlier_notification.id
+          expect(parking_notification).to have_attributes(earlier_notification.reload.attributes.slice("street", "city", "latitude", "longitude"))
+          expect(parking_notification.street).to be_present
+        end
+
+        it "reuses the earlier notification's location, notifying" do
+          expect {
+            post base_url, params: {parking_notification: repeat_params.merge(kind: "appears_abandoned_notification")}
+            expect(flash[:success]).to be_present
+          }.to change(ParkingNotification, :count).by(1)
+
+          expect(ParkingNotification.last).to have_attributes(earlier_notification.reload.attributes.slice("street", "latitude", "longitude"))
+        end
+
+        it "keeps a first notice to its own location" do
+          first_notice_params = repeat_params.merge(kind: "appears_abandoned_notification", is_repeat: "false")
+          expect {
+            post base_url, params: {parking_notification: first_notice_params}
+            expect(flash[:error]).to match(/address/i)
+          }.to_not change(ParkingNotification, :count)
+
+          post base_url, params: {parking_notification: first_notice_params.merge(latitude: default_location[:latitude], longitude: default_location[:longitude])}
+          expect(flash[:success]).to be_present
+          expect(ParkingNotification.last).to have_attributes(initial_record_id: nil, repeat_number: 0, formatted_address_string: default_location[:formatted_address_no_country])
+        end
+      end
+
+      context "organization with impound_bikes without parking_notifications" do
+        let(:enabled_feature_slugs) { %w[impound_bikes] }
+        let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, created_at: Time.current - 3.hours) }
+        let(:impound_params) { parking_notification_params.merge(kind: "impound_notification") }
+
+        it "impounds before redirecting, leaving the email to sidekiq" do
+          Sidekiq::Job.clear_all
+          ActionMailer::Base.deliveries = []
+          expect {
+            post base_url, params: {parking_notification: impound_params}
+            expect(flash[:success]).to eq "Impounded this bike"
+          }.to change(ImpoundRecord, :count).by(1)
+
+          impound_record = ImpoundRecord.last
+          expect(impound_record).to have_attributes(organization_id: current_organization.id, user_id: current_user.id, bike_id: bike.id)
+          expect(ParkingNotification.last.impound_record_id).to eq impound_record.id
+          expect(bike.reload.status).to eq "status_impounded"
+          expect(ActionMailer::Base.deliveries.count).to eq 0
+
+          ProcessParkingNotificationJob.drain
+          expect(ActionMailer::Base.deliveries.count).to eq 1
+          expect(ImpoundRecord.where(bike_id: bike.id).count).to eq 1
+        end
+
+        it "does not create other kinds or send repeats" do
+          parking_notification = FactoryBot.create(:parking_notification_organized, organization: current_organization, bike:)
+          root_path = organization_root_path(organization_id: current_organization.to_param)
+          expect {
+            post base_url, params: {parking_notification: parking_notification_params}
+            expect(response).to redirect_to root_path
+            expect(flash[:error]).to be_present
+
+            post base_url, params: {kind: "impound_notification", ids: parking_notification.id.to_s, parking_notification: impound_params}
+            expect(response).to redirect_to root_path
+          }.to_not change(ParkingNotification, :count)
+        end
+      end
+
       it "creates" do
         FactoryBot.create(:state_new_york)
         expect(current_organization.enabled?("parking_notifications")).to be_truthy

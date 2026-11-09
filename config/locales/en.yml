@@ -1918,6 +1918,7 @@ en:
       parking_notifications:
         create:
           successfully_created: Parking Notification for %{bike_type} created
+          successfully_impounded: Impounded this %{bike_type}
           unable_to_create: Unable to create - %{errors}
       stickers:
         ensure_sticker_for_current_organization:
