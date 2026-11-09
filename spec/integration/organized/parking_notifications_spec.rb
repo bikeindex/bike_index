@@ -308,5 +308,13 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
     expect(page).not_to have_current_path(/map_location/)
     # The ungeocoded row has no pin to bring into view
     expect(page).not_to have_button("Fit map to notifications")
+
+    find("#{row_for(far_away)} a[href$='/parking_notifications/#{far_away.id}']").click
+    wait_for_stimulus("org--parking-notification-repeat")
+    select "Mark retrieved/resolved", from: "kind"
+    expect(page).to have_button("Resolve notification")
+    click_button "Resolve notification"
+    expect(page).to have_no_button("Resolve notification")
+    expect(far_away.reload.status).to eq "retrieved"
   end
 end
