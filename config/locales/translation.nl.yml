@@ -4459,7 +4459,6 @@ nl:
       parking_notification_unregistered: Niet-geregistreerde fietsmelding
       parking_notifications_group: Parkeermeldingen
       recoveries: terugvorderingen
-      registration_sequences: Registratiesequenties
       registration_stickers: Registratie stickers
       reports: Rapporten
       resources: Middelen
@@ -4473,6 +4472,7 @@ nl:
       search_all_registrations: Zoek alle registraties
       add_a_registration: Voeg een registratie toe
       registration_form_settings: Instellingen voor het registratieformulier
+      education_courses: Onderwijscursussen
   users:
     accept_terms:
       i_agree_to_tos_html: Ik ga akkoord met de <strong>Servicevoorwaarden van</strong>
@@ -5740,7 +5740,6 @@ nl:
             occurred_at_cell: Status bij
             photo_cell: Foto
             view_cell: Weergave
-            acknowledgment_cell_panel: Tijd - Registratievolgorde bevestigd
             filter_stolen_or_impounded_html: alleen <strong>gestolen</strong> of <strong>in
               beslag genomen</strong>
             location_search_disabled_no_address: "%{org_name} verzamelt geen registratieadressen,
@@ -5776,6 +5775,7 @@ nl:
             copy_column_order_from_registrations_search: Kopieer de kolomvolgorde
               uit de zoekopdracht naar registraties.
             impound_search_columns: Inbeslagname zoekkolommen
+            course_acknowledgment_cell_panel: Tijd - Erkende onderwijscursus
           column_settings_toggle:
             column_settings: Kolominstellingen
           settings_and_filters:
@@ -5794,9 +5794,10 @@ nl:
             link_sticker: link sticker
             hidden: verborgen
             not_registered_with: Verborgen omdat het niet is geregistreerd bij %{org_name}
-            acknowledgment_title: Bevestiging van de registratieprocedure bij
             view: Weergave
             toggle_all_checked: Alles aangevinkt weergeven/verbergen
+            course_acknowledgment_title: Erkenning van deelname aan de onderwijscursus
+              bij
           multi_result_chip:
             no_results: geen overeenkomsten
           multi_results:
@@ -5866,7 +5867,7 @@ nl:
           map_unavailable: De kaart kon niet worden geladen; de locatie was nog steeds
             ingesteld via uw apparaat.
           set_on_map: Op de kaart plaatsen
-        registration_sequence:
+        education_course:
           page_edit_bullet:
             bullet: kogel
       registrations:
@@ -6149,9 +6150,9 @@ nl:
             not_audited: Niet gecontroleerd
             organization_registered: Organisatie
             registration_information: Registratiegegevens
-            registration_sequence: Registratievolgorde
             sticker: Sticker
             sticker_claimed: beweerde
+            education_course: Onderwijscursus
           internal_notes:
             current_note: Huidige notitie
             deleted_user: een verwijderde gebruiker
