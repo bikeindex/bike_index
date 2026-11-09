@@ -1,6 +1,6 @@
 <%# locals: (collection:, render_sortable: false) %>
 
-<%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
+<%= render(UI::Table::Base::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
   <% table.column(sortable: "created_at", label: "Created", lower_right: ->(education_course) { education_course.id }) do |education_course| %>
     <%= link_to render(UI::Time::Component.new(time: education_course.created_at)),
       admin_education_course_path(education_course), class: "twlink" %>

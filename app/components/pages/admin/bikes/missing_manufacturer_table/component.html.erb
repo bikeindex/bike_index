@@ -1,5 +1,5 @@
 <%#
-  UI::Table instance_execs its cell blocks, so this component's own methods are out of
+  UI::Table::Base instance_execs its cell blocks, so this component's own methods are out of
   reach inside them - each one it needs comes across as a local
 %>
 
@@ -8,7 +8,7 @@
 <% paint_for = ->(bike) { unmatched_paint(bike) } %>
 <% searched_other_name = @searched_other_name %>
 
-<%= render(UI::TableInCard::Component.new(records: @bikes,
+<%= render(UI::Table::InCard::Component.new(records: @bikes,
   column_settings: {storage_key: "adminMissingManufacturerColumns", columns: COLUMNS, defaults: COLUMNS.keys, narrow_hidden: %i[created_by_cell]},
   form: {url: update_manufacturers_admin_bikes_path, method: :post})) do |table| %>
   <% table.with_actions do %>

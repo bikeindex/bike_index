@@ -23,7 +23,7 @@
                amount_paid: MoneyFormatter.money_format(invoices.sum(:amount_paid_cents))}
             end %>
 
-          <%= render(UI::Table::Component.new(records: invoice_rows)) do |table| %>
+          <%= render(UI::Table::Base::Component.new(records: invoice_rows)) do |table| %>
             <% table.column(label: "", footer: all_row[:name]) { |row| row[:name] } %>
             <% table.column(label: "count", footer: all_row[:count]) { |row| row[:count] } %>
             <% table.column(label: "amount due", footer: all_row[:amount_due]) { |row| row[:amount_due] } %>

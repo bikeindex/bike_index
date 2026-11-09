@@ -27,7 +27,7 @@
 
     %div{class: "tw:mt-4"}
       = render(UI::Button::Component.new(text: "Update the ownership", color: :primary, type: "submit"))
-  = render(UI::TableList::Component.new) do |list|
+  = render(UI::Table::List::Component.new) do |list|
     - list.with_row(label: "Created At", value: render(UI::Time::Component.new(time: @bike.created_at)))
     - list.with_row(label: "Owner Email", value: @bike.owner_email)
     - list.with_row(label: "Current Owner", value: @bike.owner.email)

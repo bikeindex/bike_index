@@ -1,4 +1,4 @@
-<%= render(UI::TableList::Component.new) do |list| %>
+<%= render(UI::Table::List::Component.new) do |list| %>
   <% list.with_row(label: "Auto user email", value: (@organization.auto_user.email if @organization.auto_user.present?)) %>
 
   <% if @display_dev_info %>

@@ -9,7 +9,7 @@
 
 .row.mt-4
   .col-md-6
-    = render(UI::TableList::Component.new) do |list|
+    = render(UI::Table::List::Component.new) do |list|
       - list.with_row(label: "Manufacturer") do
         = @model_audit.mnfg_name
         %small= link_to "view all manufacturer's audits", organization_model_audits_path(search_mnfg_name: @model_audit.mnfg_name, organization_id: current_organization.to_param)
@@ -17,7 +17,7 @@
       - list.with_row(label: "Vehicle type", value: @model_audit.cycle_type_name)
       - list.with_row(label: "Propulsion", value: @model_audit.propulsion_type_name)
   .col-md-6
-    = render(UI::TableList::Component.new) do |list|
+    = render(UI::Table::List::Component.new) do |list|
       - list.with_row(label: "Total vehicles") do
         = number_display @bikes_count
         %small= link_to "search matching vehicles", organization_registrations_path(organization_id: current_organization.id, search_model_audit_id: @model_audit.id)

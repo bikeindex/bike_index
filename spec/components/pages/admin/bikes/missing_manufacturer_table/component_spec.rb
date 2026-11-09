@@ -19,7 +19,7 @@ RSpec.describe Pages::Admin::Bikes::MissingManufacturerTable::Component, type: :
     end
   end
 
-  # UI::Table instance_execs its cell blocks, so every method a cell needs is passed as a
+  # UI::Table::Base instance_execs its cell blocks, so every method a cell needs is passed as a
   # local - a cell reaching for the component directly renders nothing and raises
   it "renders each cell, including the ones that call component methods" do
     expect(component.css("input[data-table-multi-checkbox-target='checkbox']").count).to eq 1
