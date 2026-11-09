@@ -23,7 +23,7 @@ module EbikeRuleServices
       new(bikebook_id: nil, manufacturer_name: nil, model: nil, first_year: nil, vehicle_type: "bike", e_bike_class:, class_unknown: false,
         e_vehicle_classifications: classes.map { "evc/us/class_#{it}" }, optional_classes: {}, watts:, peak_watts: nil,
         top_assist_mph: (top_mph if e_bike_class), top_assist_kmh: nil, assists_past_kmh: nil, throttle:, stock_throttle: throttle,
-        throttle_mph: (throttle_mph if e_bike_class), throttle_kmh: nil, ul2849: :unrecorded, ul2271: :unrecorded, photo_url: nil)
+        throttle_mph: (throttle_mph if e_bike_class && throttle_mph.to_i <= 20), throttle_kmh: nil, ul2849: :unrecorded, ul2271: :unrecorded, photo_url: nil)
     end
 
     # Entered as within a Canadian law's cap, or past it, which is past Class 1 and 2's 20 mph too
@@ -60,8 +60,8 @@ module EbikeRuleServices
     # Entered by hand as faster than any class, so its top speed is only known to be past Class 3's
     def assists_past_mph = (28 if manual? && e_bike_class.nil?)
 
-    # Entered by hand as over Class 2's 20 mph, so its throttle's speed is known no better than that
-    def throttle_past_mph = (20 if manual? && throttle_mph.to_i > 20)
+    # Entered by hand as over Class 2's 20 mph, as a Class 3 with any other throttle is Class 2 as well
+    def throttle_past_mph = (20 if manual? && throttle && e_bike_classes == [3])
 
     # A law outside the US caps the motor's speed however it's reached
     def top_kmh = [top_assist_kmh, throttle_kmh].compact.max

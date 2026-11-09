@@ -3,7 +3,7 @@ import { Turbo } from '@hotwired/turbo-rails'
 import { CURRENT_MARK, CatalogComboboxSource, loadCatalog } from 'bikebook/catalog'
 import { localSources } from 'utils/hw_combobox_patch'
 import { readable, replaceUrl } from 'bikebook/replace_url'
-import { collapse, COLLAPSE_DURATION_MS } from 'utils/collapse_utils'
+import { collapseField, COLLAPSE_DURATION_MS } from 'utils/collapse_utils'
 
 const RESULT_FRAME = 'ebike-rules-check'
 const CLASSES_FRAME = 'ebike-rules-classes'
@@ -137,7 +137,6 @@ export default class extends Controller {
     const fields = new FormData(this.element)
     fields.delete('state')
     if (this.#mode === 'model') DETAILS.forEach((name) => fields.delete(name))
-    if (fields.get('throttle') !== '1') fields.delete('throttle_speed')
     for (const [name, value] of [...fields]) if (value === '') fields.delete(name)
     if (fields.get('vehicle_models') || fields.get('top_speed')) return readable(new URL(`${this.element.action}?${new URLSearchParams(fields)}`))
   }
@@ -219,7 +218,7 @@ export default class extends Controller {
   #collapseThrottleSpeed (duration = COLLAPSE_DURATION_MS) {
     const field = this.throttleSpeedTarget
     const direction = window.getComputedStyle(field.parentElement).flexDirection === 'row' ? 'horizontal' : 'vertical'
-    collapse(this.element.elements.throttle.value === '1' ? 'show' : 'hide', field, duration, direction)
+    collapseField(field, this.element.elements.throttle.value === '1', duration, direction)
   }
 
   // A combobox handle's clear empties the field without a selection event, so the field itself is watched

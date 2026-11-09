@@ -94,7 +94,7 @@ module Pages
         def throttle_speed_entries
           return top_speed_entries unless us?
 
-          [{value: 20, label: translation(".mph", mph: 20)}, {value: 21, label: translation(".over_20_mph")}]
+          [top_speed_entries.first, {value: 21, label: translation(".over_20_mph")}]
         end
 
         # The copy that names a state, the US's classes or its laws, and Canada's in their place

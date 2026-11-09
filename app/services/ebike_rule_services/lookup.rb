@@ -64,13 +64,13 @@ module EbikeRuleServices
 
     private
 
-    # Its assist's, or with no assist its throttle's, or without a speed on record, the answer a hand entry would take to reach its class - over
+    # Without a speed on record, the answer a hand entry would take to reach its class - over
     # 28 mph for one classified as something else. Blank for a model whose class the catalog can't tell
     def model_top_speed
       return model_top_kmh unless us?
 
       mph = bike.top_assist_mph || bike.throttle_mph
-      return speed_answer(mph) if mph
+      return speed_answer(mph, [20, 28, 29]) if mph
       return if bike.class_unknown
 
       {1 => 20, 2 => 20, 3 => 28}.fetch(bike.e_bike_class, 29)
@@ -78,7 +78,7 @@ module EbikeRuleServices
 
     def model_top_kmh
       kmh = bike.top_assist_kmh || bike.throttle_kmh
-      return speed_answer(kmh) if kmh
+      return speed_answer(kmh, canada_speeds) if kmh
       return if bike.class_unknown
 
       cap = Places::CANADA_SPEED_CAP_KMH
@@ -86,16 +86,13 @@ module EbikeRuleServices
     end
 
     def model_throttle_speed
-      return bike.throttle_mph && ((bike.throttle_mph <= 20) ? 20 : 21) if us?
+      return bike.throttle_mph && speed_answer(bike.throttle_mph, [20, 21]) if us?
 
-      speed_answer(bike.throttle_kmh) if bike.throttle_kmh
+      bike.throttle_kmh && speed_answer(bike.throttle_kmh, canada_speeds)
     end
 
-    def speed_answer(speed)
-      return [20, 28].find { speed <= it } || 29 if us?
+    def speed_answer(speed, answers) = answers.find { speed <= it } || answers.last
 
-      cap = Places::CANADA_SPEED_CAP_KMH
-      (speed <= cap) ? cap : cap + 1
-    end
+    def canada_speeds = [Places::CANADA_SPEED_CAP_KMH, Places::CANADA_SPEED_CAP_KMH + 1]
   end
 end
