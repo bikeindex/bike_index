@@ -383,10 +383,6 @@ RSpec.describe RegisterController, type: :request do
       Counts.assign_for("organizations", 1_234)
       get "/register/landing"
       expect(response.body).to include("1.2 million bikes are registered.", "more than 1,200 police departments")
-
-      Counts.assign_for("total_bikes", 456_789)
-      get "/register/landing"
-      expect(response.body).to include("456,789 bikes are registered.")
     end
 
     it "renders step 1 in the page, posting into the flow on the session's registration" do

@@ -43,8 +43,6 @@ en:
               bike's history travels with it.
             benefit_transfer_title: Easy to sell or pass on
             bike_already_stolen: Bike already stolen? See what to do now
-            bikes_registered_no_owner_paid: "%{bikes} bikes are registered. Not one
-              owner paid to be there."
             check_add_later: You can add photos and details later
             check_free_no_data_sharing: Free forever. We don't sell or share your
               data.
