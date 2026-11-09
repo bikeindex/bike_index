@@ -7257,6 +7257,13 @@ es:
               con %{count} reglas para verificar.
           yellow_summary_no_classes_without_throttle: La %{name} está clasificada
             como una bicicleta eléctrica en %{state}, sin su acelerador opcional.
+          class_3_throttle_past: El acelerador supera las 20 mph, velocidad permitida
+            para un vehículo de Clase 3.
+          throttle_past_cap_kmh_html: El acelerador supera los %{past} km/h, sobrepasando
+            el límite de %{cap} km/h.
+          throttle_past_kmh_html: El acelerador supera los %{past} km/h; compruebe
+            que se detiene a %{cap} km/h.
+          yes_over_mph_html: Sí, más de %{mph} mph
         rule_label:
           classes: Clases reconocidas
           power: condensador de potencia del motor
@@ -7374,7 +7381,6 @@ es:
           how_to_check_lookup: Consulta el modelo que aparece más arriba. BikeBook
             muestra la certificación cuando está registrada.
           over_28_mph: Más de 28 mph
-          top_speed: "¿Cuál es su velocidad máxima?"
           visit_bikebook_link: Visita BikeBook.
           custom_details: Detalles personalizados
           details_legend: Detalles de tu bicicleta
@@ -7388,8 +7394,6 @@ es:
             agencias de transporte público están adoptando normas para el almacenamiento
             y la carga de bicicletas eléctricas en interiores, y la certificación
             es un requisito fundamental.
-          choose_province: Seleccione su provincia o territorio de la lista.
-          choose_state: Elige tu estado de la lista.
           detected_place_html: Hemos detectado <strong>%{state}</strong> .
           kmh: "%{kmh} km/h"
           not_in_canada_html: "¿No estás en Canadá? %{switch_country}"
@@ -7413,6 +7417,11 @@ es:
           subheading_canada: Ingresa tu provincia o territorio y ve a tu bicicleta
             para ver sus reglas.
           watts_placeholder_canada: p. ej. 500
+          choose_your_province: Elige tu provincia o territorio.
+          choose_your_state: Elige tu estado.
+          over_20_mph: Más de 32 km/h
+          top_assist_speed: Velocidad máxima con asistencia al pedaleo
+          top_throttle_speed: Velocidad máxima del acelerador
         state_reference:
           compiling: Estamos recopilando las normas sobre bicicletas eléctricas de
             %{state} de la legislatura estatal y del DMV. Vuelva pronto.

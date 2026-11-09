@@ -7173,6 +7173,14 @@ nl:
               regels die gecontroleerd moeten worden.
           yellow_summary_no_classes_without_throttle: De %{name} wordt in %{state}
             als e-bike geclassificeerd, zonder de optionele gashendel.
+          class_3_throttle_past: Het gaspedaal wordt ingedrukt als de snelheid van
+            20 mph (32 km/u) wordt overschreden, de snelheid die is toegestaan voor
+            een voertuig van klasse 3.
+          throttle_past_cap_kmh_html: Het gaspedaal slaat door tot voorbij %{past}
+            km/u, boven de %{cap} km/u limiet.
+          throttle_past_kmh_html: Het gaspedaal slaat door tot voorbij %{past} km/u;
+            controleer of het stopt bij %{cap} km/u.
+          yes_over_mph_html: Ja, meer dan %{mph} mph
         rule_label:
           classes: Erkende klassen
           power: Motorvermogenscapaciteit
@@ -7285,7 +7293,6 @@ nl:
           how_to_check_lookup: Zoek het model hierboven op. BikeBook toont de certificering
             waar deze geregistreerd staat.
           over_28_mph: Meer dan 45 km/u
-          top_speed: Wat is de topsnelheid?
           visit_bikebook_link: Bezoek BikeBook.
           custom_details: Aangepaste details
           details_legend: De gegevens van uw fiets
@@ -7298,8 +7305,6 @@ nl:
           banned_body_canada: Universiteiten, woningbouworganisaties en openbaarvervoersbedrijven
             stellen regels op voor het stallen en opladen van e-bikes binnenshuis,
             en certificering is waar ze naar op zoek zijn.
-          choose_province: Kies uw provincie of territorium uit de lijst.
-          choose_state: Kies uw staat uit de lijst.
           detected_place_html: We hebben <strong>%{state}</strong> gedetecteerd.
           kmh: "%{kmh} km/u"
           not_in_canada_html: Niet in Canada? %{switch_country}
@@ -7322,6 +7327,11 @@ nl:
           subheading_canada: Voer je provincie of territorium in en fiets om de regels
             te bekijken.
           watts_placeholder_canada: bijv. 500
+          choose_your_province: Kies uw provincie of territorium.
+          choose_your_state: Kies uw staat.
+          over_20_mph: Meer dan 32 km/u
+          top_assist_speed: Topsnelheid met trapondersteuning
+          top_throttle_speed: Topsnelheid bij gas geven
         state_reference:
           compiling: We verzamelen momenteel de regels voor e-bikes van %{state} op
             basis van gegevens van de staatslegislatuur en de RDW. Kom binnenkort
