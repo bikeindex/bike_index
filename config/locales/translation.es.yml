@@ -5244,7 +5244,6 @@ es:
       parking_notification_unregistered: Nueva notificación no registrada
       parking_notifications_group: Avisos de estacionamiento
       recoveries: Recuperaciones
-      registration_sequences: Secuencias de registro
       registration_stickers: pegatinas de registro
       reports: Informes
       resources: Recursos
@@ -5258,6 +5257,7 @@ es:
       search_all_registrations: Buscar en todos los registros
       add_a_registration: Agregar un registro
       registration_form_settings: Configuración del formulario de registro
+      education_courses: cursos de formación
   theft_alert_plans:
     theft_alert_plan:
       days: Días
@@ -5820,7 +5820,6 @@ es:
             occurred_at_cell: Estado en
             photo_cell: Foto
             view_cell: Vista
-            acknowledgment_cell_panel: Tiempo - Secuencia de registro reconocida
             filter_stolen_or_impounded_html: solo <strong>robado</strong> o <strong>confiscado</strong>
             location_search_disabled_no_address: "%{org_name} no recopila direcciones
               de registro, por lo que solo los registros robados o confiscados tienen
@@ -5855,6 +5854,7 @@ es:
             copy_column_order_from_registrations_search: Copiar el orden de las columnas
               de la búsqueda de registros
             impound_search_columns: Columnas de búsqueda de depósitos
+            course_acknowledgment_cell_panel: Tiempo - Curso de educación reconocido
           column_settings_toggle:
             column_settings: Configuración de columnas
           settings_and_filters:
@@ -5873,9 +5873,9 @@ es:
             link_sticker: pegatina de enlace
             hidden: oculto
             not_registered_with: Oculto porque no está registrado con %{org_name}
-            acknowledgment_title: Confirmación de la secuencia de registro en
             view: Vista
             toggle_all_checked: Activar/desactivar todas las selecciones
+            course_acknowledgment_title: Reconocimiento del curso de educación en
           multi_result_chip:
             no_results: no hay coincidencias
           multi_results:
@@ -5943,7 +5943,7 @@ es:
           map_unavailable: No se pudo cargar el mapa; la ubicación aún estaba configurada
             desde su dispositivo.
           set_on_map: Colocar en el mapa
-        registration_sequence:
+        education_course:
           page_edit_bullet:
             bullet: bala
       registrations:
@@ -6227,9 +6227,9 @@ es:
             not_audited: No auditado
             organization_registered: Organización
             registration_information: Información de registro
-            registration_sequence: Secuencia de registro
             sticker: Etiqueta engomada
             sticker_claimed: afirmado
+            education_course: Curso de formación
           internal_notes:
             current_note: Nota actual
             deleted_user: un usuario eliminado

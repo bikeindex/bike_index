@@ -5012,7 +5012,6 @@ nb:
       parking_notification_unregistered: Ny uregistrert melding
       parking_notifications_group: Parkeringsvarsler
       recoveries: Gjenopprettinger
-      registration_sequences: Registreringssekvenser
       registration_stickers: Registreringsklistremerker
       reports: Rapporter
       resources: Ressurser
@@ -5026,6 +5025,7 @@ nb:
       search_all_registrations: Søk i alle registreringer
       add_a_registration: Legg til en registrering
       registration_form_settings: Innstillinger for registreringsskjema
+      education_courses: Utdanningskurs
   theft_alert_plans:
     theft_alert_plan:
       days: Dager
@@ -5574,7 +5574,6 @@ nb:
             occurred_at_cell: Status på
             photo_cell: Foto
             view_cell: Utsikt
-            acknowledgment_cell_panel: Tid - Registreringssekvens bekreftet
             filter_stolen_or_impounded_html: bare <strong>stjålet</strong> eller <strong>beslaglagt</strong>
             location_search_disabled_no_address: "%{org_name} samler ikke inn registreringsadresser,
               så bare stjålne og beslaglagte registreringer har en plassering. Filtrer
@@ -5609,6 +5608,7 @@ nb:
             copy_column_order_from_registrations_search: Kopier kolonnerekkefølge
               fra registreringssøk
             impound_search_columns: Beslaglegg søkekolonner
+            course_acknowledgment_cell_panel: Tid - Utdanningskurs godkjent
           column_settings_toggle:
             column_settings: Kolonneinnstillinger
           settings_and_filters:
@@ -5627,9 +5627,9 @@ nb:
             link_sticker: lenkeklistremerke
             hidden: skjult
             not_registered_with: Skjult fordi den ikke er registrert hos %{org_name}
-            acknowledgment_title: Bekreftelse på registreringssekvens kl.
             view: Utsikt
             toggle_all_checked: Slå av/på alle avkryssede
+            course_acknowledgment_title: Bekreftelse på utdanningskurs på
           multi_result_chip:
             no_results: ingen treff
           multi_results:
@@ -5695,7 +5695,7 @@ nb:
           map_unavailable: Kartet kunne ikke lastes inn – posisjonen var fortsatt
             angitt fra enheten din.
           set_on_map: Sett på kartet
-        registration_sequence:
+        education_course:
           page_edit_bullet:
             bullet: kule
       registrations:
@@ -5974,9 +5974,9 @@ nb:
             not_audited: Ikke revidert
             organization_registered: Organisasjon
             registration_information: Registreringsinformasjon
-            registration_sequence: Registreringssekvens
             sticker: Klistremerke
             sticker_claimed: hevdet
+            education_course: Utdanningskurs
           internal_notes:
             current_note: Gjeldende notat
             deleted_user: en slettet bruker
