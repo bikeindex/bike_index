@@ -25,6 +25,8 @@ module Pages
 
         private
 
+        def bikes_millions = @bikes_millions ||= Counts.in_millions(Counts.total_bikes)
+
         def major_gifts
           MAJOR_AMOUNTS.zip([translation(".major_partner"), translation(".major_benefactor")])
         end

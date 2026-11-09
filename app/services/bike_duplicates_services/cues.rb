@@ -73,7 +73,7 @@ module BikeDuplicatesServices
       marking = standard_marking(entered_serials)
       not_serial = Array(serials).filter_map { not_a_serial(it, manufacturer_names:) }.first
       code_reasons = [
-        ("repeated on #{record_count} live registrations" if record_count >= Finder::LARGE_GROUP_MINIMUM),
+        ("repeated on #{record_count} live registrations" if record_count >= BikeDuplicatesServices::Finder::LARGE_GROUP_MINIMUM),
         ("shared by #{contact_count} different initial contact emails" if contact_count >= REPEATED_CONTACT_MINIMUM),
         ("matches the model text on #{model_match_count} #{"record".pluralize(model_match_count)}" if model_match_count.positive?)
       ].compact
