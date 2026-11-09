@@ -23,7 +23,7 @@ RSpec.describe "E-bike rules", :js, type: :system do
     type_into(find_field("State"), "Colorado")
     retry_on_detach { find("[role='option']", text: "Colorado").click }
     expect(page).to have_css("[role='status']",
-      text: "Your Specialized Haul ST is a Class 3 e-bike in Colorado, and is also a Class 2 e-bike with its optional throttle.")
+      text: "The Specialized Haul ST is a Class 3 e-bike in Colorado, and is also a Class 2 e-bike with its optional throttle.")
     # a String path matches escaped slashes too, which Turbo writes into history for a frame's URL
     expect(page).to have_current_path(%r{\A/ebike-rules/US/CO\?vehicle_models=m/specialized/2025/haul_st\z})
     expect(page).to have_title("Colorado e-bike laws")
@@ -77,7 +77,7 @@ RSpec.describe "E-bike rules", :js, type: :system do
     # picking it again checks it, and its own details replace them
     type_into(find_field("Bike model"), "haul")
     retry_on_detach { find("[role='option']", text: "Specialized Haul ST").click }
-    expect(page).to have_css("[role='status']", text: "Your Specialized Haul ST is a Class 3 e-bike in Colorado")
+    expect(page).to have_css("[role='status']", text: "The Specialized Haul ST is a Class 3 e-bike in Colorado")
     expect(page).to have_current_path("/ebike-rules/US/CO?vehicle_models=m/specialized/2025/haul_st")
     expect(page).to have_field("Motor wattage (W)", with: "700").and have_css("legend", exact_text: "Specialized Haul ST details")
 
@@ -91,7 +91,7 @@ RSpec.describe "E-bike rules", :js, type: :system do
 
     # details alone are a check once they have a top speed
     find("label", text: "20 mph").click
-    expect(page).to have_css("[role='status']", text: "Your e-bike is a Class 1 e-bike in Colorado.")
+    expect(page).to have_css("[role='status']", text: "The e-bike is a Class 1 e-bike in Colorado.")
     expect(page).to have_current_path("/ebike-rules/US/CO?manual=1&top_speed=20")
 
     # details changed from a model return to its own once it's picked again
@@ -106,28 +106,16 @@ RSpec.describe "E-bike rules", :js, type: :system do
     expect(page).to have_current_path("/ebike-rules/US/CO?vehicle_models=m/specialized/2025/haul_st")
     expect(page).to have_field("Motor wattage (W)", with: "700").and have_css("legend", exact_text: "Specialized Haul ST details")
 
-    # the alert's link opens the rules of the class it falls under in a block of their own
+    # the link under the class cards opens the state's e-bike law, in the URL apart from them
     visit "/ebike-rules/US/CA?manual=1&top_speed=28&throttle=1"
-    wait_for_stimulus("ui--collapse")
-    expect(page).to have_css("[role='status']", text: "In California, it may fall under Moped.")
-      .and have_no_text(/Rules that may apply in California/i)
-    find("[role='status'] [role='button']", text: "Moped rules").click
-    expect(page).to have_css("section > [data-ui--collapse-target='content'] h3", text: "Rider rules")
-      .and have_text(/Rules that may apply in California/i)
-    expect(page).to have_current_path("/ebike-rules/US/CA?manual=1&top_speed=28&throttle=1&rules=1")
-
-    # as the link under the class cards does the state's e-bike law, in the URL apart from them
-    expect(page).to have_no_css("#ebike-rules-classes [data-ui--collapse-target='content'] h3", text: "Rider rules")
+    wait_for_stimulus("ebike-rules--classification-toggle")
+    state_rules = "#ebike-rules-classes [data-ui--collapse-target='content']"
+    expect(page).to have_no_css("#{state_rules} h3", text: "Rider rules")
     find("[role='button']", text: "California E-bike rules").click
-    expect(page).to have_css("#ebike-rules-classes [data-ui--collapse-target='content'] h3", text: "Rider rules")
-    expect(page).to have_current_path("/ebike-rules/US/CA?manual=1&top_speed=28&throttle=1&rules=1&state_rules=1")
-    find("[role='status'] [role='button']", text: "Moped rules").click
-    expect(page).to have_no_text(/Rules that may apply in California/i)
-    expect(page).to have_css("#ebike-rules-classes [data-ui--collapse-target='content'] h3", text: "Rider rules")
-    expect(page).to have_current_path("/ebike-rules/US/CA?manual=1&top_speed=28&throttle=1&rules=0&state_rules=1")
+    expect(page).to have_css("#{state_rules} h3", text: "Rider rules")
+    expect(page).to have_current_path("/ebike-rules/US/CA?manual=1&top_speed=28&throttle=1&state_rules=1")
 
     # the state's non-e-bike rules take its place, one open at a time, with a toggle for each classification
-    state_rules = "#ebike-rules-classes [data-ui--collapse-target='content']"
     find("[role='button']", text: "California non-e-bike rules").click
     expect(page).to have_css("#{state_rules} h3", exact_text: "Moped")
       .and have_no_css("#{state_rules} h3", exact_text: "Electric Bicycle")
@@ -141,14 +129,21 @@ RSpec.describe "E-bike rules", :js, type: :system do
       .and have_no_css("#{state_rules} h3", exact_text: "Off-Highway Electric Motorcycle")
     expect(page).to have_current_path(/state_rules=1&non_e_bike_rules=0/)
 
-    # which a link to it opens, on the classification it names
+    # the alert's link opens them on the classification it falls under, and scrolls to them
+    expect(page).to have_css("[role='status']", text: "In California, it may fall under Moped.")
+    click_link "Moped rules"
+    expect(page).to have_css("#{state_rules} h3", exact_text: "Moped")
+      .and have_no_css("#{state_rules} h3", exact_text: "Off-Highway Electric Motorcycle")
+      .and have_no_css("#{state_rules} h3", exact_text: "Electric Bicycle")
+    expect(page).to have_current_path(/throttle=1&state_rules=0&non_e_bike_rules=1&non_e_bike_type=moped\z/)
+    page.document.synchronize do
+      top = page.evaluate_script("document.getElementById('non-e-bike-rules').getBoundingClientRect().top")
+      raise Capybara::ExpectationNotMet, "non-e-bike rules at #{top}px" unless top.between?(0, 40)
+    end
+
+    # as a link to them does, on the classification it names
     visit "/ebike-rules/US/CA?non_e_bike_rules=1&non_e_bike_type=motor_driven_cycle"
     expect(page).to have_css("#{state_rules} h3", exact_text: "Motor-Driven Cycle")
-
-    # which a link to it opens
-    visit "/ebike-rules/US/CA?manual=1&top_speed=28&throttle=1&rules=1"
-    expect(page).to have_text(/Rules that may apply in California/i)
-    expect(page).to have_no_css("#ebike-rules-classes [data-ui--collapse-target='content'] h3", text: "Rider rules")
   end
 
   it "filters the states, opens the one an old link's anchor names, and checks a bike in each from its rules" do
@@ -192,7 +187,7 @@ RSpec.describe "E-bike rules", :js, type: :system do
     type_into(find_field("Bike model", disabled: false, wait: 10), "haul")
     expect(page).to have_css("[role='option']", count: 1)
     retry_on_detach { find("[role='option']", text: "Specialized Haul ST").click }
-    expect(page).to have_css("[role='status']", text: "Your Specialized Haul ST is legal to ride in Ontario under the Power-Assisted Bicycle rules.")
+    expect(page).to have_css("[role='status']", text: "The Specialized Haul ST is legal to ride in Ontario under the Power-Assisted Bicycle rules.")
     expect(page).to have_current_path("/ebike-rules/CA/ON?vehicle_models=m/specialized/2025/haul_st_ca")
     expect(page).to have_title("Ontario e-bike laws")
     expect(page).to have_checked_field("top_speed", with: "32", visible: :all).and have_field("Motor wattage (W)", with: "500")

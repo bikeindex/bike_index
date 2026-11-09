@@ -30,7 +30,7 @@ module Pages
         def verdict_label
           case @verdict
           when :green then translation(".legal_to_ride")
-          when :yellow then translation(".legal_with_rules")
+          when :yellow then translation(".classified_with_rules")
           when :red then translation(".not_permitted")
           else translation(".rules_not_on_file")
           end
@@ -40,36 +40,36 @@ module Pages
           name = bike_name
           state = @state[:name]
           case @verdict
-          when :green then @us ? green_headline(name, state) : translation(".green_headline_law", name:, state:, law: @law[:name])
+          when :green then @us ? green_headline(name, state) : translation(".green_summary_law", name:, state:, law: @law[:name])
           when :yellow then @us ? yellow_headline(name, state) : metric_yellow_headline(name, state)
           when :red
             # a hand-entered bike's name is "e-bike", which this headline says it isn't
-            @bike.manual? ? translation(".red_headline_manual", state:) : translation(".not_classified_headline", name:, state:)
+            @bike.manual? ? translation(".red_headline_manual", state:) : translation(".not_classified_summary", name:, state:)
           else translation(".gray_headline", state:)
           end
         end
 
         def green_headline(name, state)
           if @law[:classes].none?
-            translation(".green_headline_no_classes", name:, state:)
+            translation(".green_summary_no_classes", name:, state:)
           elsif optional_clause.present?
-            translation(".class_headline_optional", name:, state:, n: class_numbers, optional: optional_clause)
+            translation(".class_summary_optional", name:, state:, n: class_numbers, optional: optional_clause)
           else
-            translation(".class_headline", name:, state:, n: class_numbers)
+            translation(".class_summary", name:, state:, n: class_numbers)
           end
         end
 
         def yellow_headline(name, state)
           if without_throttle?
-            @law[:classes].none? ? translation(".yellow_headline_no_classes_without_throttle", name:, state:) : translation(".class_headline_without_throttle", name:, state:, n: class_numbers)
+            @law[:classes].none? ? translation(".yellow_summary_no_classes_without_throttle", name:, state:) : translation(".class_summary_without_throttle", name:, state:, n: class_numbers)
           elsif @bike.e_bike_class && @law[:classes].none?
-            translation(".yellow_headline_no_classes", name:, state:, count: rule_count(:check))
+            translation(".yellow_summary_no_classes", name:, state:, count: rule_count(:check))
           elsif @bike.e_bike_class && optional_clause.present?
-            translation(".class_headline_optional_with_rules", name:, state:, n: class_numbers, optional: optional_clause, count: rule_count(:check))
+            translation(".class_summary_optional_with_rules", name:, state:, n: class_numbers, optional: optional_clause, count: rule_count(:check))
           elsif @bike.e_bike_class
-            translation(".class_headline_with_rules", name:, state:, n: class_numbers, count: rule_count(:check))
+            translation(".class_summary_with_rules", name:, state:, n: class_numbers, count: rule_count(:check))
           else
-            translation(".yellow_headline_class_unknown", name:, state:, count: rule_count(:check))
+            translation(".yellow_summary_class_unknown", name:, state:, count: rule_count(:check))
           end
         end
 
@@ -77,11 +77,11 @@ module Pages
         def metric_yellow_headline(name, state)
           law = @law[:name]
           if without_throttle?
-            translation(".yellow_headline_law_without_throttle", name:, state:, law:)
+            translation(".yellow_summary_law_without_throttle", name:, state:, law:)
           elsif @law[:motor_vehicle]
-            translation(".yellow_headline_motor_vehicle_law", name:, state:, law:, count: rule_count(:check))
+            translation(".yellow_summary_motor_vehicle_law", name:, state:, law:, count: rule_count(:check))
           else
-            translation(".yellow_headline_law", name:, state:, law:, count: rule_count(:check))
+            translation(".yellow_summary_law", name:, state:, law:, count: rule_count(:check))
           end
         end
 
@@ -137,9 +137,9 @@ module Pages
 
         def gray_detail
           if @bike.e_bike_class
-            translation(".gray_detail", name: bike_name, n: class_numbers, state: @state[:name])
+            translation(".gray_listed_detail", name: bike_name, n: class_numbers, state: @state[:name])
           else
-            translation(".gray_detail_unclassified", name: bike_name, state: @state[:name])
+            translation(".gray_unlisted_detail", name: bike_name, state: @state[:name])
           end
         end
 
@@ -153,9 +153,9 @@ module Pages
           other_classification[:by_limits] ? translation(".may_fall_under_name", state:, name:) : translation(".falls_under_name", state:, name:)
         end
 
-        def other_classification_eyebrow
-          state = @state[:name]
-          other_classification[:by_limits] ? translation(".rules_that_may_apply", state:) : translation(".rules_that_apply", state:)
+        def other_classification_href
+          query = request.query_parameters.merge(non_e_bike_rules: 1, non_e_bike_type: other_classification[:value])
+          "#{ReadableQuery.path("", query)}##{Pages::EbikeRules::Classes::Component::NON_E_BIKE_RULES_ID}"
         end
 
         def other_classification
@@ -187,10 +187,6 @@ module Pages
 
         # The headline already says it's in no class, and the classes' note why a Class 3's assist with a throttle isn't permitted
         def notes(status) = @rules.select { it[:status] == status && OUT_OF_CLASS_NOTES.exclude?(it[:note]) }.map { safe_join([note(it), "."]) }
-
-        def subline
-          @bike.manual? ? translation(".manually_entered") : translation(".model_year", year: @bike.first_year)
-        end
 
         def specs
           [
