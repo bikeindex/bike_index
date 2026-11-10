@@ -28,8 +28,8 @@ en:
             then inspected on an ongoing basis to keep the listing.
           certification_involves_heading: What certification involves
           check_my_bike: Check my bike
-          choose_province: Choose your province or territory from the list.
-          choose_state: Choose your state from the list.
+          choose_your_province: Choose your province or territory.
+          choose_your_state: Choose your state.
           compare_html: Want to compare multiple bikes? %{link}
           country: Country
           custom_details: Custom details
@@ -51,6 +51,7 @@ en:
           mph: "%{mph} mph"
           not_in_canada_html: Not in Canada? %{switch_country}
           not_in_us_html: Not in the US? %{switch_country}
+          over_20_mph: Over 20 mph
           over_28_mph: Over 28 mph
           over_kmh: Over %{kmh} km/h
           parent_step_1_body: >-
@@ -111,7 +112,8 @@ en:
             rules.
           switch_country: switch country
           switch_country_title: Switch country
-          top_speed: What is its top speed?
+          top_assist_speed: Top speed with pedal assist
+          top_throttle_speed: Throttle top speed
           ul_2271_body: >-
             Tests the lithium-ion battery pack on its own. Common on bikes and replacement
             batteries; it doesn't cover the charger or motor.

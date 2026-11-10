@@ -3,10 +3,11 @@ import { Turbo } from '@hotwired/turbo-rails'
 import { CURRENT_MARK, CatalogComboboxSource, loadCatalog } from 'bikebook/catalog'
 import { localSources } from 'utils/hw_combobox_patch'
 import { readable, replaceUrl } from 'bikebook/replace_url'
+import { collapseField, COLLAPSE_DURATION_MS } from 'utils/collapse_utils'
 
 const RESULT_FRAME = 'ebike-rules-check'
 const CLASSES_FRAME = 'ebike-rules-classes'
-const DETAILS = ['manual', 'top_speed', 'throttle', 'watts']
+const DETAILS = ['manual', 'top_speed', 'throttle', 'throttle_speed', 'watts']
 
 // Connects to data-controller='ebike-rules--lookup'
 // The bike field is a stand-in until the catalog loads, since the combobox must have its source
@@ -16,10 +17,12 @@ const DETAILS = ['manual', 'top_speed', 'throttle', 'watts']
 // The form's data-details says which the check is of: a picked "model", whose details its check copies
 // into the panel; "custom" details changed from the model's; or "manual" details with no model
 export default class extends Controller {
-  static targets = ['combobox', 'comboboxSlot', 'state', 'stateNote', 'stateNeeded', 'manual', 'legend']
+  static targets = ['combobox', 'comboboxSlot', 'state', 'stateNote', 'stateNeeded', 'stateChoose', 'manual', 'throttleSpeed', 'legend']
   static values = { manifestUrl: String, path: String, countryPath: String, display: String, failedText: String, title: String, legend: String, modelLegend: String }
 
   async connect () {
+    delete this.throttleSpeedTarget.dataset.beforeCollapse
+    this.#collapseThrottleSpeed(0)
     this.lastUrl = window.location.href.split('#')[0]
     this.classesPath = window.location.pathname
     this.observers = [this.#watchCleared(this.#stateField, () => this.chooseState())]
@@ -105,6 +108,7 @@ export default class extends Controller {
 
   // Changing a picked model's details checks them instead
   checkDetails () {
+    this.#collapseThrottleSpeed()
     const watts = this.element.elements.watts
     if (!watts.checkValidity()) return watts.reportValidity()
 
@@ -168,7 +172,7 @@ export default class extends Controller {
   #awaitState () {
     const url = this.#checkUrl
     this.#leaveCheck(url ?? this.element.action)
-    if (!url) return this.stateNoteTarget.replaceChildren()
+    if (!url) return this.stateNoteTarget.replaceChildren(this.stateChooseTarget.content.cloneNode(true))
 
     // A model's details don't wait: without a state, its frame carries them and no check
     if (this.#mode === 'model') document.getElementById(RESULT_FRAME).src = url
@@ -203,10 +207,18 @@ export default class extends Controller {
 
   #fill (details) {
     const { elements } = this.element
-    for (const name of ['top_speed', 'throttle']) {
+    for (const name of ['top_speed', 'throttle', 'throttle_speed']) {
       for (const radio of elements[name]) radio.checked = radio.value === String(details[name])
     }
     elements.watts.value = details.watts ?? ''
+    this.#collapseThrottleSpeed()
+  }
+
+  // Sideways beside the throttle question; stacked under it on a phone, a width collapse wouldn't shrink the row
+  #collapseThrottleSpeed (duration = COLLAPSE_DURATION_MS) {
+    const field = this.throttleSpeedTarget
+    const direction = window.getComputedStyle(field.parentElement).flexDirection === 'row' ? 'horizontal' : 'vertical'
+    collapseField(field, this.element.elements.throttle.value === '1', duration, direction)
   }
 
   // A combobox handle's clear empties the field without a selection event, so the field itself is watched
