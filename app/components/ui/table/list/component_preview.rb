@@ -11,7 +11,7 @@ module UI
         end
 
         def wide_definition
-          {template: "ui/table/list/component_preview/default", locals: {wide_definition: true}}
+          {template: "ui/table/list/component_preview/wide_definition"}
         end
 
         # Long unbroken values in a panel narrower than they are

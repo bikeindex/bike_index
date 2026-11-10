@@ -406,7 +406,7 @@
                 <%= render(UI::Code::Inline::Component.new(text: normalized_segment.segment)) %>
               <% end %>
             </p>
-            <%= render(UI::Table::List::Component.new(wide_definition: true)) do |list| %>
+            <%= render(UI::Table::List::Component.new) do |list| %>
               <% duplicate_bikes.each do |duplicate_bike| %>
                 <% list.with_row(label: render(UI::Time::Component.new(time: duplicate_bike.created_at))) do %>
                   <%= link_to organized_bike_text(duplicate_bike), bike_path(duplicate_bike), class: "twlink" %>
