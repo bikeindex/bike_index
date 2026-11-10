@@ -2397,6 +2397,7 @@ es:
           successfully_created: Se ha creado una notificación de estacionamiento para
             %{bike_type}.
           unable_to_create: No se puede crear - %{errors}
+          successfully_impounded: Se confiscó este %{bike_type}
       stickers:
         find_bike_sticker:
           unable_to_find_sticker: 'No se pudo encontrar la pegatina con el código:
@@ -6117,6 +6118,7 @@ es:
               impound_this_bike_type: Confiscar esto %{bike_type}
               not_shown_to_user: no se muestra al usuario
               parking_notification_notes: "%{org_name} notas internas"
+              submit_parking_notification: Crear notificación de estacionamiento
             parking_notification_show:
               no_notifications: No hay notificaciones de estacionamiento para este
                 %{bike_type}
