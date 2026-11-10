@@ -6960,6 +6960,19 @@ nb:
           throttle_past_kmh_html: Gasspedalen går forbi %{past} km/t; sjekk at den
             stopper ved %{cap} km/t
           yes_over_mph_html: Ja, over %{mph} mph
+          class_summary_manual: Denne elsykkelen er en elsykkel i klasse %{n} i %{state}.
+          class_summary_with_rules_manual:
+            one: Denne elsykkelen er en elsykkel i klasse %{n} i %{state}, med en
+              %{count}-regel som må kontrolleres.
+            other: Denne elsykkelen er en elsykkel i klasse %{n} i %{state}, med %{count}
+              regler som må kontrolleres.
+          green_summary_no_classes_manual: Dette er klassifisert som en elsykkel i
+            %{state}.
+          yellow_summary_no_classes_manual:
+            one: Dette er klassifisert som en elsykkel i %{state}, med en %{count}-regel
+              for å sjekke.
+            other: Dette er klassifisert som en elsykkel i %{state}, med %{count}
+              regler som må kontrolleres.
         rule_label:
           classes: Klasser anerkjent
           power: Motoreffektbegrensning

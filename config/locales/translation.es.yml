@@ -7264,6 +7264,20 @@ es:
           throttle_past_kmh_html: El acelerador supera los %{past} km/h; compruebe
             que se detiene a %{cap} km/h.
           yes_over_mph_html: Sí, más de %{mph} mph
+          class_summary_manual: Esta bicicleta eléctrica es una bicicleta eléctrica
+            de clase %{n} en %{state}.
+          class_summary_with_rules_manual:
+            one: Esta bicicleta eléctrica es una bicicleta eléctrica de clase %{n}
+              en %{state}, con la regla %{count} para verificar.
+            other: Esta bicicleta eléctrica es una bicicleta eléctrica de clase %{n}
+              en %{state}, con %{count} reglas para verificar.
+          green_summary_no_classes_manual: Esto se clasifica como una bicicleta eléctrica
+            en %{state}.
+          yellow_summary_no_classes_manual:
+            one: Esto se clasifica como una bicicleta eléctrica en %{state}, con la
+              regla %{count} para verificar.
+            other: Esto se clasifica como una bicicleta eléctrica en %{state}, con
+              reglas %{count} para verificar.
         rule_label:
           classes: Clases reconocidas
           power: condensador de potencia del motor

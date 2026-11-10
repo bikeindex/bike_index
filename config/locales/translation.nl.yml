@@ -7181,6 +7181,19 @@ nl:
           throttle_past_kmh_html: Het gaspedaal slaat door tot voorbij %{past} km/u;
             controleer of het stopt bij %{cap} km/u.
           yes_over_mph_html: Ja, meer dan %{mph} mph
+          class_summary_manual: Deze e-bike is een e-bike van klasse %{n} in %{state}.
+          class_summary_with_rules_manual:
+            one: Deze e-bike is een e-bike van klasse %{n} in %{state}, met regel
+              %{count} om te controleren.
+            other: Deze e-bike is een e-bike van klasse %{n} in %{state}, met %{count}
+              regels om te controleren.
+          green_summary_no_classes_manual: Dit wordt geclassificeerd als een e-bike
+            in %{state}.
+          yellow_summary_no_classes_manual:
+            one: Dit wordt geclassificeerd als een e-bike in %{state}, met %{count}-regel
+              om te controleren.
+            other: Dit wordt geclassificeerd als een e-bike in %{state}, met %{count}
+              regels om te controleren.
         rule_label:
           classes: Erkende klassen
           power: Motorvermogenscapaciteit
