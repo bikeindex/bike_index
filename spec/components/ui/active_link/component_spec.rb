@@ -38,11 +38,11 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
     end
 
     context "with patterns of its own" do
-      let(:options) { {match_paths: ["/o/example/registration_sequences/**", "/bikes/*/edit"]} }
+      let(:options) { {match_paths: ["/o/example/education_courses/**", "/bikes/*/edit"]} }
 
       it "carries them in place of the href's page" do
         expect(link["data-ui--active-link-match-paths-value"])
-          .to eq "/o/example/registration_sequences/** /bikes/*/edit"
+          .to eq "/o/example/education_courses/** /bikes/*/edit"
       end
     end
 

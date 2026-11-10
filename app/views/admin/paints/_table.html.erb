@@ -1,7 +1,7 @@
 <%# locals: (collection:, render_sortable: true) %>
 
 <% if collection.present? %>
-  <%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
+  <%= render(UI::Table::Base::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
     <% table.column(sortable: "created_at") do |paint| %>
       <%= link_to admin_paint_url(paint), class: "twlink" do %>
         <%= render UI::Time::Component.new(time: paint.created_at) %>

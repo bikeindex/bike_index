@@ -1,8 +1,0 @@
----
-en:
-  components:
-    pages:
-      org:
-        registration_sequence:
-          page_edit_bullet:
-            bullet: bullet

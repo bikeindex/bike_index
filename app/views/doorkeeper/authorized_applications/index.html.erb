@@ -4,7 +4,7 @@
 
 <main role="main">
   <div class="full-screen-table">
-    <%= render(UI::Table::Component.new(records: @applications)) do |table| %>
+    <%= render(UI::Table::Base::Component.new(records: @applications)) do |table| %>
       <% table.column(label: "Application") do |application| %>
         <%= application.name %>
       <% end %>

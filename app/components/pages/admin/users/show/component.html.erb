@@ -18,7 +18,7 @@
     <%= render(Pages::Admin::Headers::Count::Component.new(count: records.count)) %>
   <% end %>
 
-  <%= render(UI::Table::Component.new(records: records.reorder(id: :desc))) do |table| %>
+  <%= render(UI::Table::Base::Component.new(records: records.reorder(id: :desc))) do |table| %>
     <% table.column(label: "Created", lower_right: ->(user_email) { user_email.id }) do |user_email| %>
       <%= render UI::Time::Component.new(time: user_email.created_at) %>
     <% end %>
@@ -53,7 +53,7 @@
     <%= render(Pages::Admin::Headers::Count::Component.new(count: records.count, parenthetical: ambassador_progress)) %>
   <% end %>
 
-  <%= render(UI::Table::Component.new(records: records.task_ordered)) do |table| %>
+  <%= render(UI::Table::Base::Component.new(records: records.task_ordered)) do |table| %>
     <% table.column(label: "Task") do |assignment| %>
       <strong><%= assignment.title %></strong>
     <% end %>

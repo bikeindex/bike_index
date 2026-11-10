@@ -81,13 +81,12 @@
             </p>
           </template>
 
-          <%# A note on the place runs on into the country switch, until a pick clears it %>
-          <div
-            class="
-              tw:flex tw:flex-col tw:gap-2 tw:has-[[data-inline-note]]:block
-              tw:has-[[data-inline-note]]:[&_p]:inline
-            "
-          >
+          <template data-ebike-rules--lookup-target="stateChoose">
+            <%= choose_place_note %>
+          </template>
+
+          <%# A note or error on the place runs on into the country switch, until a pick clears it %>
+          <div class="tw:[&_p]:inline">
             <div
               data-ebike-rules--lookup-target="stateNote"
               class="tw:contents"
@@ -95,21 +94,13 @@
               <% if error?(:state) %>
                 <%= field_error(:state, copy[:state_error]) %>
               <% elsif detected? %>
-                <p
-                  class="tw:text-[13px] tw:text-gray-700 tw:dark:text-gray-300"
-                  data-inline-note
-                >
+                <p class="tw:text-[13px] tw:text-gray-700 tw:dark:text-gray-300">
                   <%= helpers.inline_svg_tag("icons/map-pin.svg", class: "tw:inline tw:size-3.5 tw:align-[-2px] tw:text-blue-600", aria_hidden: true) %>
 
                   <span><%= translation(".detected_place_html", state: @lookup.detected_place[:name]) %></span>
                 </p>
               <% elsif place_value.nil? %>
-                <p
-                  class="tw:text-[13px] tw:text-gray-700 tw:dark:text-gray-300"
-                  data-inline-note
-                >
-                  <%= copy[:choose_place] %>
-                </p>
+                <%= choose_place_note %>
               <% end %>
             </div>
 
@@ -192,29 +183,49 @@
 
         <div class="tw:flex tw:flex-wrap tw:items-start tw:gap-5">
           <%# Each control centered in the wattage field's height, so their text lines up %>
+          <%# One flex item, its spacing the speed field's own, as a flex gap can't collapse with it %>
+          <div class="tw:flex tw:flex-col tw:sm:flex-row">
+            <div>
+              <span id="manual-throttle-label" class="twlabel"><%= translation(".has_throttle") %></span>
+
+              <div
+                role="radiogroup"
+                aria-labelledby="manual-throttle-label"
+                class="tw:flex tw:min-h-12 tw:items-center"
+              >
+                <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "throttle", entries: throttle_entries, kind: :toggle,
+                  selected: @lookup.details[:throttle])) %>
+              </div>
+            </div>
+
+            <%# Until the lookup connects, or without JavaScript, the throttle answer reveals it by itself %>
+            <%= tag.div(class: "tw:mt-5 tw:hidden tw:shrink-0 tw:sm:mt-0 tw:sm:pl-5 tw:data-[before-collapse]:group-has-[[name=throttle][value='1']:checked]/lookup:block",
+              data: {"ebike-rules--lookup-target": "throttleSpeed", before_collapse: true}) do %>
+              <div class="tw:w-max">
+                <span id="manual-throttle-speed-label" class="twlabel"><%= translation(".top_throttle_speed") %></span>
+
+                <div
+                  role="radiogroup"
+                  aria-labelledby="manual-throttle-speed-label"
+                  class="tw:grid tw:min-h-12 tw:items-center"
+                >
+                  <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "throttle_speed", entries: throttle_speed_entries,
+                    selected: @lookup.details[:throttle_speed])) %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+
           <div class="tw:flex-[2_1_260px]">
-            <span id="manual-top-speed-label" class="twlabel"><%= translation(".top_speed") %></span>
+            <span id="manual-top-speed-label" class="twlabel"><%= translation(".top_assist_speed") %></span>
 
             <div
               role="radiogroup"
               aria-labelledby="manual-top-speed-label"
               class="tw:grid tw:min-h-12 tw:items-center"
             >
-              <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "top_speed", entries: top_speed_entries,
+              <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "top_speed", entries: top_speed_entries, full_width: true,
                 selected: @lookup.details[:top_speed])) %>
-            </div>
-          </div>
-
-          <div class="tw:flex-[1_1_150px]">
-            <span id="manual-throttle-label" class="twlabel"><%= translation(".has_throttle") %></span>
-
-            <div
-              role="radiogroup"
-              aria-labelledby="manual-throttle-label"
-              class="tw:flex tw:min-h-12 tw:items-center"
-            >
-              <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "throttle", entries: throttle_entries, kind: :toggle,
-                selected: @lookup.details[:throttle])) %>
             </div>
           </div>
 

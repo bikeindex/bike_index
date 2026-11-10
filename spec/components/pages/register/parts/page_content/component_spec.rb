@@ -4,9 +4,9 @@ require "rails_helper"
 
 RSpec.describe Pages::Register::Parts::PageContent::Component, type: :component do
   let(:organization) { FactoryBot.create(:organization, name: "Brakebills University", short_name: "Brakebills") }
-  let(:registration_sequence) { FactoryBot.create(:registration_sequence, organization:, faq_url: "https://example.com/faq") }
+  let(:education_course) { FactoryBot.create(:education_course, organization:, faq_url: "https://example.com/faq") }
   let(:page_record) do
-    FactoryBot.build(:registration_sequence_page, registration_sequence:, title: "Battery safety",
+    FactoryBot.build(:education_course_page, education_course:, title: "Battery safety",
       heading: "Charge safely", subtitle: "A few rules",
       body: "<ul><li>Use the right charger</li><li>Store it cool</li></ul>")
   end
@@ -47,7 +47,7 @@ RSpec.describe Pages::Register::Parts::PageContent::Component, type: :component 
     end
 
     context "on the template" do
-      let(:registration_sequence) { FactoryBot.create(:registration_sequence_template) }
+      let(:education_course) { FactoryBot.create(:education_course_template) }
 
       it "badges the template, matching what the editor promised, as set by Bike Index" do
         page_record.organization_specific = true
@@ -60,7 +60,7 @@ RSpec.describe Pages::Register::Parts::PageContent::Component, type: :component 
   end
 
   context "without an faq_url" do
-    let(:registration_sequence) { FactoryBot.create(:registration_sequence, organization:) }
+    let(:education_course) { FactoryBot.create(:education_course, organization:) }
 
     it "leaves out the FAQ affordance" do
       render_inline(described_class.new(page: page_record))

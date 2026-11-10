@@ -8,8 +8,9 @@ module Pages
         # it records the notification - always one page, whatever the registration form
         # settings say, and with the serial optional
         class Component < ApplicationComponent
-          def initialize(organization:)
+          def initialize(organization:, kind: nil)
             @organization = organization
+            @kind = kind || ParkingNotification.kinds.first
           end
 
           private

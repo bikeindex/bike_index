@@ -2,7 +2,13 @@ require "did_you_mean/levenshtein"
 
 module BikeDuplicatesServices
   class Review
-    ContactGroup = Data.define(:number, :email, :bikes)
+    ContactGroup = Data.define(:number, :email, :bikes) do
+      # Never the email itself
+      def as_json(*)
+        {number:, email_present: !email.nil?, bike_ids: bikes.map(&:id),
+         review_contact: BikeDuplicatesServices::Cues.review_contact?(email)}.as_json
+      end
+    end
     Check = Data.define(:status, :label)
     # Separate review, never invitation candidates
     SEPARATE_REVIEW_CUES = %w[not_a_serial standard_marking possible_code test_marker review_contact].freeze
@@ -248,7 +254,7 @@ module BikeDuplicatesServices
 
     def ownership_pair(bike, initial:) = [bike, reference_bike].map { initial ? initial_ownership(it) : it&.current_ownership }
 
-    # Cues.fetch_manufacturer_name_serials, so a brand typed as the serial is caught
+    # So a brand typed as the serial is caught
     def manufacturer_names = @manufacturer_names ||= BikeDuplicatesServices::Cues.fetch_manufacturer_name_serials
 
     def stolen_record_counts

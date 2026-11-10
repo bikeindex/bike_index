@@ -141,6 +141,12 @@ RSpec.describe EbikeRuleServices::StateLaws do
       expect(classifications.first[:rule_groups]).to be_present
       expect(described_class.non_e_bike_classifications("WY")).to eq []
     end
+
+    it "is lowest speed cap first, then power cap, and off-highway last" do
+      expect(described_class.non_e_bike_classifications("CA").pluck(:name)).to eq ["Moped", "Motor-Driven Cycle", "Motorcycle",
+        "Off-Highway Motor Vehicle", "Off-Highway Electric Motorcycle"]
+      expect(described_class.non_e_bike_classifications("NJ").pluck(:name)).to eq ["Motorized Bicycle", "Dirt Bike"]
+    end
   end
 
   describe "emoto_rules" do

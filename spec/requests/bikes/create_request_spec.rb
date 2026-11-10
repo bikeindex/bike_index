@@ -113,13 +113,13 @@ RSpec.describe "BikesController#create", type: :request do
   end
   context "an e-vehicle, from an organization with safety rules" do
     let(:organization) { FactoryBot.create(:organization) }
-    let!(:sequence) { FactoryBot.create(:registration_sequence_active, :with_pages, organization:) }
+    let!(:course) { FactoryBot.create(:education_course_active, :with_pages, organization:) }
     let(:bike_params) { basic_bike_params.merge(creation_organization_id: organization.id, cycle_type: "bike") }
 
     it "leaves the rules to the owner, even registering their own" do
       Sidekiq::Job.clear_all
       expect { post base_url, params: {propulsion_type_motorized: "true", bike: bike_params} }
-        .to change(Bike, :count).by(1).and change(RegistrationSequenceAcknowledgment.pending, :count).by 1
+        .to change(Bike, :count).by(1).and change(EducationCourseAcknowledgment.pending, :count).by 1
       bike = Bike.last
       expect(response).to redirect_to(edit_bike_url(bike))
       expect(EmailJobs::PartialRegistrationJob.jobs.map { it["args"] }).to eq([[BParam.last.id, "partial_registration"]])
@@ -602,11 +602,11 @@ RSpec.describe "BikesController#create", type: :request do
     end
 
     context "an e-vehicle, with the organization's safety rules" do
-      let!(:sequence) { FactoryBot.create(:registration_sequence_active, :with_pages, organization:) }
+      let!(:course) { FactoryBot.create(:education_course_active, :with_pages, organization:) }
 
       it "leaves the rules to the owner" do
         expect { post base_url, params: {propulsion_type_motorized: "true", bike: bike_params} }
-          .to change(Bike, :count).by(1).and change(RegistrationSequenceAcknowledgment.pending, :count).by 1
+          .to change(Bike, :count).by(1).and change(EducationCourseAcknowledgment.pending, :count).by 1
         expect(EmailJobs::PartialRegistrationJob.jobs.map { it["args"] }).to eq([[b_param.id, "partial_registration"]])
       end
     end
@@ -772,7 +772,7 @@ RSpec.describe "BikesController#create", type: :request do
     end
 
     context "an e-vehicle, with the organization's safety rules" do
-      let!(:sequence) { FactoryBot.create(:registration_sequence_active, :with_pages, organization:) }
+      let!(:course) { FactoryBot.create(:education_course_active, :with_pages, organization:) }
       let(:current_user) { FactoryBot.create(:organization_user, organization:) }
       let(:owner_email) { "flow@goodtimes.com" }
       let(:e_vehicle_params) do
@@ -783,7 +783,7 @@ RSpec.describe "BikesController#create", type: :request do
         Sidekiq::Job.clear_all
         ActionMailer::Base.deliveries = []
         expect { post base_url, params: e_vehicle_params }
-          .to change(Bike, :count).by(1).and change(RegistrationSequenceAcknowledgment.pending, :count).by 1
+          .to change(Bike, :count).by(1).and change(EducationCourseAcknowledgment.pending, :count).by 1
         expect(response).to redirect_to(embed_extended_organization_url(organization))
 
         expect { EmailJobs::OwnershipInvitationJob.drain }.to_not change(ActionMailer::Base.deliveries, :count)
@@ -797,13 +797,13 @@ RSpec.describe "BikesController#create", type: :request do
         get "/register", params: {b_param_token: b_param.id_token}
         expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: "3")
         %w[3 4].each do |step|
-          patch acknowledge_register_path, params: {b_param_token: b_param.id_token, registration_sequence_id: sequence.id,
+          patch acknowledge_register_path, params: {b_param_token: b_param.id_token, education_course_id: course.id,
                                                     step:, acknowledged: {"0" => "1", "1" => "1"}}
         end
-        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, registration_sequence_id: sequence.id,
+        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, education_course_id: course.id,
                                                   step: "review", acknowledged_all: "1"}
         expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: "finished")
-        expect(RegistrationSequenceAcknowledgment.sole.user.email).to eq owner_email
+        expect(EducationCourseAcknowledgment.sole.user.email).to eq owner_email
         expect { EmailJobs::OwnershipInvitationJob.drain }.to change(ActionMailer::Base.deliveries, :count).by 1
       end
 
@@ -812,7 +812,7 @@ RSpec.describe "BikesController#create", type: :request do
 
         it "still leaves the rules to the email, since the form never shows them" do
           expect { post base_url, params: e_vehicle_params }
-            .to change(RegistrationSequenceAcknowledgment.pending, :count).by 1
+            .to change(EducationCourseAcknowledgment.pending, :count).by 1
           expect(EmailJobs::PartialRegistrationJob.jobs.map { it["args"] }).to eq([[b_param.id, "partial_registration"]])
         end
       end

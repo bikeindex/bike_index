@@ -80,7 +80,7 @@
             %li Bike is hidden, deleted, or spam
 
 .twwiderow{class: "tw:mt-6 tw:items-start"}
-  = render(UI::TableList::Component.new) do |list|
+  = render(UI::Table::List::Component.new) do |list|
     - list.with_row(label: "Link") do
       - if @theft_alert.facebook_post_url.present?
         %strong
@@ -120,7 +120,7 @@
     - list.with_row(label: safe_join(["Campaign", tag.small("Objective")], " "), value: render(UI::Code::Inline::Component.new(text: @theft_alert.objective_campaign)))
     - list.with_row(label: safe_join(["Adset", tag.small("Objective")], " "), value: render(UI::Code::Inline::Component.new(text: @theft_alert.objective_adset)))
 
-  = render(UI::TableList::Component.new) do |list|
+  = render(UI::Table::List::Component.new) do |list|
     - list.with_row(label: "Target Spend", value: @theft_alert.amount_facebook)
     - list.with_row(label: "Actual Fbook Spend") do
       = @theft_alert.amount_facebook_spent

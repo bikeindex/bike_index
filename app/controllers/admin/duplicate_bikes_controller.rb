@@ -1,6 +1,9 @@
 module Admin
   class DuplicateBikesController < Admin::BaseController
     include Binxtils::SortableTable
+    include Admin::TokenAccessible
+
+    token_accessible :index, :show
 
     LINK_PARAM_KEYS = %w[sort direction page per_page reference_bike_id bike_ids].freeze
     # A review loads every record in the group. A segment shared by thousands of bikes ("000000") is
@@ -30,12 +33,13 @@ module Admin
       elsif params[:id] == "compare"
         values = Array(params[:bike_ids]).flat_map { it.to_s.split(",") }.map(&:strip).compact_blank.uniq
         invalid = values.grep_v(/\A\d+\z/)
-        return compare_error("Not bike record IDs: #{invalid.join(", ")}", values) if invalid.any?
-        return compare_error("Enter between 2 and 50 bike record IDs to compare", values) unless values.size.between?(2, 50)
+        compare_params = {search_view: "segments", bike_ids: values.join(",")}
+        return review_error("Not bike record IDs: #{invalid.join(", ")}", **compare_params) if invalid.any?
+        return review_error("Enter between 2 and 50 bike record IDs to compare", **compare_params) unless values.size.between?(2, 50)
 
         bikes = Bike.unscoped.where(id: values.map(&:to_i))
         missing = values.map(&:to_i) - bikes.pluck(:id)
-        return compare_error("No bike records with IDs: #{missing.join(", ")}", values) if missing.any?
+        return review_error("No bike records with IDs: #{missing.join(", ")}", **compare_params) if missing.any?
       else
         @duplicate_group = DuplicateBikeGroup.find(params[:id])
         # Admins review every record in the group, including hidden and deleted ones
@@ -44,8 +48,7 @@ module Admin
 
       records_count = bikes.count
       if records_count > MAX_REVIEW_RECORDS
-        flash[:error] = "#{records_count} records are too many to review together"
-        return redirect_to admin_duplicate_bikes_path(search_view: @duplicate_group && "segments")
+        return review_error("#{records_count} records are too many to review together", search_view: @duplicate_group && "segments")
       end
 
       # Summaries cover every record, so the whole group loads
@@ -53,10 +56,13 @@ module Admin
         :bike_organizations, :bike_stickers, ownerships: :organization).reorder(:created_at, :id).to_a
       raise ActiveRecord::RecordNotFound if all_bikes.empty?
       @bikes_count = all_bikes.size
-      @reference_bike = if params[:reference_bike_id].present?
-        all_bikes.find { it.id == params[:reference_bike_id].to_i } || raise(ActiveRecord::RecordNotFound)
-      else
+      @reference_bike = if params[:reference_bike_id].blank?
         all_bikes.min_by(&:id)
+      else
+        all_bikes.find { it.id == params[:reference_bike_id].to_i } ||
+          # A snapshot's reference can be deleted, or marked example or spam, after it's listed. The serial's
+          # live records still compare, from the oldest
+          ((params[:id] == "serial") ? all_bikes.first : raise(ActiveRecord::RecordNotFound))
       end
       @review = BikeDuplicatesServices::Review.new(bikes: all_bikes, reference_bike: @reference_bike)
       @contact_group = @review.contact_groups.find { it.number == params[:search_contact].to_i }
@@ -64,13 +70,30 @@ module Admin
       listed_bikes = @contact_group&.bikes || all_bikes
       listed_bikes = listed_bikes.reverse if sort_direction == "desc"
       @pagy, @bikes = pagy(:offset, listed_bikes, limit: @per_page, page: permitted_page)
+
+      respond_to do |format|
+        format.html
+        format.json { render json: review_json }
+      end
     end
 
     private
 
-    def compare_error(message, values)
-      flash[:error] = message
-      redirect_to admin_duplicate_bikes_path(search_view: "segments", bike_ids: values.join(","))
+    # Tooling reads the JSON - a token in an HTML page's URL would sit in browser history and copied links
+    def require_index_admin!
+      return head(:not_acceptable) if token_request? && !request.format.json?
+
+      super
+    end
+
+    def review_error(message, **redirect_params)
+      respond_to do |format|
+        format.html do
+          flash[:error] = message
+          redirect_to admin_duplicate_bikes_path(redirect_params)
+        end
+        format.json { render json: {error: message}, status: :unprocessable_content }
+      end
     end
 
     # url_for reads host, protocol and the like from its hash, so links only carry the page's own params
@@ -83,7 +106,12 @@ module Admin
       @kind = params[:search_kind].presence_in(BikeDuplicatesServices::Finder::KINDS.keys) || "handoff_priority"
       @group_snapshot = BikeDuplicatesServices::Finder.fetch_group_snapshot(@kind)
       @group_snapshot_failed_at = BikeDuplicatesServices::Finder.group_snapshot_failed_at
-      return render :preparing unless @group_snapshot
+      unless @group_snapshot
+        return respond_to do |format|
+          format.html { render :preparing }
+          format.json { render json: {status: "preparing", failed_at: @group_snapshot_failed_at&.to_i}, status: :accepted }
+        end
+      end
 
       groups = @group_snapshot[:groups]
       if params[:search_organization_id].present?
@@ -112,10 +140,49 @@ module Admin
         group.merge("serial_stolen" => stolen_serials.include?(group["serial"]), "cues" => BikeDuplicatesServices::Cues.group_cues(group),
           "first_at" => Time.zone.at(group["first_at"]), "last_at" => Time.zone.at(group["last_at"]))
       end
-      @representatives = Bike.unscoped.where(id: @groups.map { it["reference_id"] })
-        .includes(:manufacturer, :ownerships).index_by(&:id)
-      @organizations = Organization.unscoped.where(id: @groups.flat_map { it["organization_ids"] }).index_by(&:id)
-      render :dashboard
+      respond_to do |format|
+        format.html do
+          @representatives = Bike.unscoped.where(id: @groups.map { it["reference_id"] })
+            .includes(:manufacturer, :ownerships).index_by(&:id)
+          @organizations = Organization.unscoped.where(id: @groups.flat_map { it["organization_ids"] }).index_by(&:id)
+          render :dashboard
+        end
+        format.json { render json: dashboard_json }
+      end
+    end
+
+    # Token JSON never carries contact emails
+    def dashboard_json
+      {generated_at: @group_snapshot[:generated_at], kind: @kind, cue: @cue, sort: sort_column, direction: sort_direction,
+       queues: BikeDuplicatesServices::Finder::KINDS.to_h { |kind, label| [kind, {label:, **@group_snapshot[:counts].fetch(kind)}] },
+       cue_counts: @cue_counts, registrations_count: @registrations_count,
+       page: @pagy.page, per_page: @per_page, total_count: @pagy.count, groups: @groups.map { group_json(it) }}
+    end
+
+    def group_json(group)
+      group.slice("reference_id", "bike_ids", "manufacturer_id", "serial", "record_count", "first_at", "last_at", "kind",
+        "serial_stolen", "test_count", "email_count", "account_count", "organization_ids", "handoff_priority", "cues")
+    end
+
+    def review_json
+      {reference_bike_id: @reference_bike.id, records_count: @bikes_count, serial_stolen: @review.serial_stolen?,
+       not_a_serial: @review.not_a_serial, readiness: @review.readiness, checks: @review.readiness_checks, cues: @review.cues,
+       shared_fields: @review.shared_fields.to_h { [it, @review.field_value(@reference_bike, it)] },
+       differing_fields: @review.differing_fields.to_h { [it, @review.field_distribution(it)] },
+       contact_groups: @review.contact_groups, test_bike_ids: @review.bikes.select { @review.test?(it) }.map(&:id), contact_group: @contact_group&.number,
+       direction: sort_direction, page: @pagy.page, per_page: @per_page, total_count: @pagy.count,
+       records: @bikes.map { record_json(it) }}
+    end
+
+    def record_json(bike)
+      initial = @review.initial_ownership(bike)
+      bike.as_json(only: %w[id created_at manufacturer_id frame_model year serial_number status])
+        .merge("serial_normalized" => bike.serial_normalized_no_space, "source" => @review.source(bike),
+          "initial_organization_id" => @review.organization(bike)&.id, "initial_account_id" => initial&.user_id,
+          "current_account_id" => bike.current_ownership&.user_id, "claim_status" => @review.claim_status(initial),
+          "transferred" => @review.transferred?(bike), "contact_group" => @review.contact_group(bike)&.number,
+          "differences" => @review.differences(bike), "test" => @review.test?(bike),
+          "stolen_record_count" => @review.stolen_count(bike))
     end
 
     # Comparison records sort by registration; dashboard groups (snapshot hashes) by record count,

@@ -89,7 +89,7 @@
     <% if @location_counts %>
       <%= render(UI::Container::Component.new) do %>
         <div class="tw:mb-4" style="max-height: 500px; overflow-y: scroll;">
-          <%= render(UI::Table::Component.new(records: searched_theft_alerts.cities_count, sort_state:)) do |table| %>
+          <%= render(UI::Table::Base::Component.new(records: searched_theft_alerts.cities_count, sort_state:)) do |table| %>
             <% table.column(label: "Country", classes: "tw:text-xs") do |(country)| %>
               <%= country %>
             <% end %>

@@ -19,13 +19,13 @@ class ProcessParkingNotificationJob < ApplicationJob
     1.minute.in_milliseconds.to_i
   end
 
-  def perform(parking_notification_id)
+  def perform(parking_notification_id, skip_email = false)
     lock_manager = self.class.new_lock_manager
     redlock = lock_manager.lock(self.class.redlock_key(parking_notification_id), lock_duration_ms)
     return unless redlock
 
     begin
-      run(parking_notification_id)
+      run(parking_notification_id, skip_email)
     ensure
       lock_manager.unlock(redlock)
     end
@@ -33,7 +33,7 @@ class ProcessParkingNotificationJob < ApplicationJob
 
   private
 
-  def run(parking_notification_id)
+  def run(parking_notification_id, skip_email)
     parking_notification = ParkingNotification.find(parking_notification_id)
 
     current_record = current_impound_record(parking_notification)
@@ -67,7 +67,7 @@ class ProcessParkingNotificationJob < ApplicationJob
     end
 
     # The owner was already emailed by the notification that impounded the bike
-    unless current_record.present? || earlier_impound_notification?(parking_notification)
+    unless skip_email || current_record.present? || earlier_impound_notification?(parking_notification)
       send_notification_if_should(parking_notification)
     end
   end

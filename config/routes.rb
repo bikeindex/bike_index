@@ -349,11 +349,12 @@ Rails.application.routes.draw do
 
     resources :theft_alert_plans, only: %i[index edit update new create]
 
-    resources :registration_sequences, only: %i[index create show edit update destroy] do
+    resources :education_courses, only: %i[index create show edit update destroy] do
       member { get :preview }
-      resources :pages, only: %i[new create], controller: "registration_sequence_pages"
+      resources :pages, only: %i[new create], controller: "education_course_pages"
     end
-    resources :registration_sequence_pages, only: %i[edit update destroy]
+    resources :education_course_pages, only: %i[edit update destroy]
+    resources :education_course_acknowledgments, only: %i[index]
 
     resources :bug_reports, only: %i[index show update] do
       collection do
@@ -551,10 +552,10 @@ Rails.application.routes.draw do
     end
     resource :manage_impounding
     resources :users, except: %i[show]
-    resources :registration_sequences, only: %i[index create show edit update destroy] do
-      resources :pages, only: %i[new create], controller: "registration_sequence_pages"
+    resources :education_courses, only: %i[index create show edit update destroy] do
+      resources :pages, only: %i[new create], controller: "education_course_pages"
     end
-    resources :registration_sequence_pages, only: %i[edit update destroy]
+    resources :education_course_pages, only: %i[edit update destroy]
   end
 
   # This is the public organizations section
@@ -565,6 +566,10 @@ Rails.application.routes.draw do
   # old search URLs to new search URLs
   get "/bikes", to: redirect("search/registrations")
   get "/marketplace", to: redirect("search/marketplace")
+
+  # registration sequences became education courses
+  get "*path", to: redirect { |_params, request| request.fullpath.sub("registration_sequence", "education_course") },
+    constraints: {path: %r{(?:admin|o/[^/]+)/registration_sequence.*}}, format: false
 
   # Short bike URLs: /r/<short_id> (and /R/...). The whole path is passed through
   # so ShortId#decode strips the "r/" prefix itself, even when the body starts with "r".

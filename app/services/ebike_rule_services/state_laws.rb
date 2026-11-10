@@ -101,8 +101,12 @@ module EbikeRuleServices
       tiers[abbreviation]&.find { it[:ids].intersect?(shared) }&.then { with_rule_groups(in_force(it, today)) }
     end
 
-    # Each of the state's classifications that isn't its e-bike law, with its rule_groups and top_rules
-    def non_e_bike_classifications(abbreviation, today: Time.zone.today) = parsed[:tiers][abbreviation].to_a.map { with_rule_groups(in_force(it, today)) }
+    # Each of the state's classifications that isn't its e-bike law, with its rule_groups and top_rules, slowest and
+    # least powerful first, off-highway last
+    def non_e_bike_classifications(abbreviation, today: Time.zone.today)
+      parsed[:tiers][abbreviation].to_a.sort_by.with_index { |tier, index| [*speed_rank(tier[:ids], tier[:kmh]), tier[:watt_cap] || Float::INFINITY, index] }
+        .map { with_rule_groups(in_force(it, today)) }
+    end
 
     # The lightest of the state's road classifications a vehicle whose record names none fits. Only a known speed is
     # within a speed cap; an unknown power is within any
@@ -148,7 +152,7 @@ module EbikeRuleServices
         .to_h { |abbreviation, id, record| [abbreviation, law(id, record)] }
       {
         laws:,
-        tiers: tiers.group_by(&:first).transform_values { it.map { |_, id, record| law(id, record).merge(ids: [id, *record["groups"]], min_watts: record["min_power"]) } },
+        tiers: tiers.group_by(&:first).transform_values { it.map { |_, id, record| law(id, record).merge(ids: [id, *record["groups"]], value: id.split("/").last, min_watts: record["min_power"]) } },
         groups: records.filter_map { |id, record| [id, record["groups"]] if record["groups"] }.to_h,
         e_bike_laws: records.filter_map { |id, record| id if record["e_bike_law"] },
         classes: states.group_by(&:first).filter_map { |abbreviation, entries|
@@ -190,12 +194,10 @@ module EbikeRuleServices
       (law + by_speed(others)).map { |_, id, record| state_class(id, record) }
     end
 
+    def by_speed(entries) = entries.each_with_index.sort_by { |(_, _, record), index| [*speed_rank(record["groups"].to_a, record["max_speed"]), index] }.map(&:first)
+
     # Slowest first, and off-highway last
-    def by_speed(entries)
-      entries.each_with_index.sort_by { |(_, _, record), index|
-        [record["groups"].to_a.include?(OFF_HIGHWAY) ? 1 : 0, record["max_speed"] || Float::INFINITY, index]
-      }.map(&:first)
-    end
+    def speed_rank(groups, kmh) = [groups.include?(OFF_HIGHWAY) ? 1 : 0, kmh || Float::INFINITY]
 
     def state_class(id, record)
       {id:, name: record["name"], description: record["description"], throttle: record["throttle"], mph: mph(record["max_speed"]),
@@ -258,6 +260,6 @@ module EbikeRuleServices
       (tier[:mph].nil? || mph&.<=(tier[:mph])) && (watts.nil? || (tier[:min_watts]..tier[:watt_cap]).cover?(watts))
     end
 
-    conceal :for_class?, :ranked_top_rules, :top_rule_rank, :parsed, :classifications, :vocabulary, :parse, :parse_places, :motor_vehicle_law, :state_classes, :by_speed, :state_class, :metric?, :mph, :law, :restriction, :web_pages, :date, :in_force, :current, :upcoming, :top_rules, :within_limits?
+    conceal :for_class?, :ranked_top_rules, :top_rule_rank, :parsed, :classifications, :vocabulary, :parse, :parse_places, :motor_vehicle_law, :state_classes, :by_speed, :speed_rank, :state_class, :metric?, :mph, :law, :restriction, :web_pages, :date, :in_force, :current, :upcoming, :top_rules, :within_limits?
   end
 end
