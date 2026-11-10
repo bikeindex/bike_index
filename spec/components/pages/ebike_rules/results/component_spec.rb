@@ -41,7 +41,7 @@ RSpec.describe Pages::EbikeRules::Results::Component, type: :component do
 
     it "renders the rule to check, with no photo and unknown certifications" do
       expect(component).to have_css("[role='status']", text: "Classified as an e-bike, with rules to check")
-        .and have_css("[role='status']", text: "This is a Class 2 and 3 e-bike in Colorado, with 1 rule to check.")
+        .and have_css("[role='status']", text: "This e-bike is a Class 2 and 3 e-bike in Colorado, with 1 rule to check.")
         .and have_css("[role='status'] li", text: "Throttle must cut out at 20 mph.")
         .and have_css("h2", text: "Manually entered e-bike").and have_no_text("Entered manually")
         .and have_css("dd", text: "28 mph")
@@ -54,7 +54,7 @@ RSpec.describe Pages::EbikeRules::Results::Component, type: :component do
       let(:bike) { EbikeRuleServices::Bike.manual(top_mph: 20, watts: 250, throttle: false) }
 
       it "has no model name to set apart" do
-        expect(component).to have_css("[role='status'] p.tw\\:font-normal", text: "This is a Class 1 e-bike in Colorado.")
+        expect(component).to have_css("[role='status'] p.tw\\:font-normal", text: "This e-bike is a Class 1 e-bike in Colorado.")
           .and have_no_css("[role='status'] strong")
       end
 
