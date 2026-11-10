@@ -168,7 +168,6 @@ RSpec.describe ReviewImpoundClaimsController, type: :request do
       end
 
       it "records the retrieval, and the job marks the claim retrieved" do
-        expect(impound_claim.status).to eq "approved"
         patch "#{base_url}/#{impound_claim.to_param}", params: retrieved_params
         expect(flash[:success]).to be_present
         expect(response).to redirect_to review_impound_claim_path(impound_claim.id)

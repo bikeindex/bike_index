@@ -49,7 +49,7 @@ class ReviewImpoundClaimsController < ApplicationController
   # ProcessImpoundUpdatesJob merges this claim, recovering its stolen record
   def mark_retrieved_by_owner
     if !@impound_record.authorized?(current_user, no_superuser_override: true)
-      flash[:error] = "Only the person who found the bike can mark it returned"
+      flash[:error] = "Only the person who found the #{@impound_claim.bike_type} can mark it returned"
     elsif @impound_claim.approved? && @impound_record.active?
       create_impound_record_update(kind: "retrieved_by_owner", impound_claim: @impound_claim)
     else
