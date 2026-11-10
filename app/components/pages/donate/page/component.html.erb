@@ -41,7 +41,7 @@
           "
         >
           <span class="tw:lg:hidden"><%= translation(".lede_short") %></span>
-          <span class="tw:hidden tw:lg:inline"><%= translation(".lede") %></span>
+          <span class="tw:hidden tw:lg:inline"><%= translation(".lede_millions_registered", millions: bikes_millions) %></span>
         </p>
 
         <%= render(SharedBlocks::Marketing::RegistryStats::Component.new(html_class: "tw:max-w-150 tw:lg:my-auto")) %>
@@ -159,7 +159,7 @@
     </div>
   </section>
 
-  <%= render(SharedBlocks::Marketing::CallToActionBanner::Component.new(heading: translation(".cta_headline"),
+  <%= render(SharedBlocks::Marketing::CallToActionBanner::Component.new(heading: translation(".millions_registered_no_owner_paid", millions: bikes_millions),
     subheading: translation(".cta_sub"))) do %>
     <%= render UI::Button::Component.new(
       text: @form.submit_label,

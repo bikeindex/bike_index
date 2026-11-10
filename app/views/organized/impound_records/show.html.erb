@@ -16,7 +16,7 @@
 
 <div class="row">
   <div class="col-md-6">
-    <%= render(UI::TableList::Component.new) do |list| %>
+    <%= render(UI::Table::List::Component.new) do |list| %>
       <% list.with_row(label: "ID") do %>
         <strong><%= @impound_record.display_id %></strong>
 
@@ -59,7 +59,7 @@
   </div>
 
   <div class="col-md-6">
-    <%= render(UI::TableList::Component.new) do |list| %>
+    <%= render(UI::Table::List::Component.new) do |list| %>
       <% list.with_row(label: "Status", value: tag.strong(status_display(@impound_record.status_humanized))) %>
 
       <% list.with_row(label: "Location", value: @impound_record.location&.name, if: locations_enabled) %>

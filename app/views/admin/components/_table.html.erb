@@ -3,7 +3,7 @@
 <% ctype_other_id = Ctype.other.id %>
 <% manufacturer_other_id = Manufacturer.other.id %>
 
-<%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
+<%= render(UI::Table::Base::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
   <% table.column(sortable: "created_at", lower_right: ->(record) { content_tag(:span, record.id, class: "only-dev-visible") }) do |component| %>
     <%= render UI::Time::Component.new(time: component.created_at) %>
   <% end %>

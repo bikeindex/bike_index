@@ -3,13 +3,13 @@
 require "rails_helper"
 
 RSpec.describe Pages::Registrations::Show::RegistrationInformation::Component, type: :component do
-  let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[registration_sequences]) }
+  let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[education_courses]) }
   let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization) }
   let(:org_role) { :staff }
   let(:component) { described_class.new(bike: bike.reload, organization:, org_role:) }
 
-  describe "registration sequence" do
-    def acknowledgment_value = page.find("dt", text: "Registration sequence").sibling("dd")
+  describe "education course" do
+    def acknowledgment_value = page.find("dt", text: "Education course").sibling("dd")
 
     let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization, propulsion_type: "pedal-assist") }
 
@@ -20,8 +20,8 @@ RSpec.describe Pages::Registrations::Show::RegistrationInformation::Component, t
     end
 
     context "with an acknowledgment" do
-      let(:registration_sequence) { FactoryBot.create(:registration_sequence_active, organization:) }
-      let!(:acknowledgment) { FactoryBot.create(:registration_sequence_acknowledgment, registration_sequence:, bike:) }
+      let(:education_course) { FactoryBot.create(:education_course_active, organization:) }
+      let!(:acknowledgment) { FactoryBot.create(:education_course_acknowledgment, education_course:, bike:) }
 
       it "renders when it was acknowledged" do
         render_inline(component)
@@ -31,7 +31,7 @@ RSpec.describe Pages::Registrations::Show::RegistrationInformation::Component, t
       end
 
       context "to another organization's sequence" do
-        let(:registration_sequence) { FactoryBot.create(:registration_sequence_active) }
+        let(:education_course) { FactoryBot.create(:education_course_active) }
 
         it "doesn't render it" do
           render_inline(component)
@@ -47,7 +47,7 @@ RSpec.describe Pages::Registrations::Show::RegistrationInformation::Component, t
       it "doesn't render the row" do
         render_inline(component)
 
-        expect(page).to have_no_text("Registration sequence")
+        expect(page).to have_no_text("Education course")
       end
     end
 
@@ -60,17 +60,17 @@ RSpec.describe Pages::Registrations::Show::RegistrationInformation::Component, t
       it "doesn't render the row" do
         render_inline(component)
 
-        expect(page).to have_no_text("Registration sequence")
+        expect(page).to have_no_text("Education course")
       end
     end
 
-    context "without the registration_sequences feature" do
+    context "without the education_courses feature" do
       let(:organization) { FactoryBot.create(:organization) }
 
       it "doesn't render the row" do
         render_inline(component)
 
-        expect(page).to have_no_text("Registration sequence")
+        expect(page).to have_no_text("Education course")
       end
     end
   end

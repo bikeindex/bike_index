@@ -42,7 +42,6 @@ RSpec.describe LandingPagesController, type: :request do
   {
     for_bike_shops: "Bike Index for Bike Shops",
     for_cities: "Bike Index for Cities",
-    for_community_groups: "Bike Index for Community Groups",
     for_law_enforcement: "Bike Index for Law Enforcement",
     for_schools: "Bike Index for Schools",
     ascend: "Ascend POS on Bike Index",
@@ -58,6 +57,30 @@ RSpec.describe LandingPagesController, type: :request do
         expect(response).to render_template(controller_action)
         expect(response.body).to match("<title>#{page_title}</title>")
         expect(response.body).to match('<html lang="en">') # Accessibility
+      end
+    end
+  end
+
+  describe "#for_community_groups" do
+    let!(:recovery_display) { FactoryBot.create(:recovery_display_with_photo, quote: "Recovered in under four hours") }
+
+    it "renders the latest recovery stories" do
+      get "/for_community_groups"
+
+      expect(response.status).to eq(200)
+      expect(response.body).to match("<title>Bike Index for Community Groups</title>")
+      expect(response.body).to include("Recovered in under four hours")
+      expect(response.body).to include("/users/new?return_to=%2Forganizations%2Fnew%3Fkind%3Dbike_advocacy")
+    end
+
+    context "with a user" do
+      include_context :request_spec_logged_in_as_user
+
+      it "links straight to the organization form" do
+        get "/for_community_groups"
+
+        expect(response.body).to include('href="/organizations/new?kind=bike_advocacy"')
+        expect(response.body).to_not include("/users/new?return_to")
       end
     end
   end

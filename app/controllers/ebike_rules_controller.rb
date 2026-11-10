@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class EbikeRulesController < ApplicationController
-  LOOKUP_PARAMS = %i[vehicle_models manual top_speed watts throttle].freeze
+  LOOKUP_PARAMS = %i[vehicle_models manual top_speed watts throttle throttle_speed].freeze
 
   def show
     # a form's place - the lookup's without JavaScript, or the country switch's - which can't send it to the place's own page

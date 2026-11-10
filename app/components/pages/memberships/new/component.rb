@@ -37,16 +37,12 @@ module Pages
 
         def interval_labels(level) = %i[monthly yearly].index_with { labels(level, it) }
 
-        def bikes_millions
-          number_with_precision(@bikes_count / 1_000_000.0, precision: 1, round_mode: :floor, strip_insignificant_zeros: true)
-        end
-
         def members_keep_it_free
           if @bikes_count < 1_000_000
             return translation(".bikes_registered_keep_it_free", bikes: number_with_delimiter(@bikes_count))
           end
 
-          translation(".millions_registered_keep_it_free", millions: bikes_millions)
+          translation(".millions_registered_keep_it_free", millions: Counts.in_millions(@bikes_count))
         end
 
         def tiers
@@ -69,7 +65,7 @@ module Pages
             title: translation(".free_registration_title"), body: translation(".free_registration_body")},
             {icon: "icons/megaphone.svg", circle: "tw:bg-red-600",
              title: translation(".free_alerts_title"), body: translation(".free_alerts_body")},
-            {icon: "icons/handshake.svg", circle: "tw:bg-slate-900",
+            {icon: "icons/handshake.svg", circle: "tw:bg-slate-900 tw:dark:bg-slate-600",
              title: translation(".free_partners_title"), body: translation(".free_partners_body")}]
         end
 

@@ -1,4 +1,4 @@
-<%= render(UI::Table::Component.new(records: [[start_count, end_count]], classes: "tw:mb-8")) do |table| %>
+<%= render(UI::Table::Base::Component.new(records: [[start_count, end_count]], classes: "tw:mb-8")) do |table| %>
   <% table.column(label: show_with_pos_counts? ? "Active POS at start" : "Matching statuses at start") do |(start, _end)| %>
     <%= number_display(start) %>
   <% end %>

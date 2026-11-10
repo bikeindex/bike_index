@@ -139,7 +139,7 @@ RSpec.describe Organized::StickersController, type: :request do
           }.to change(BikeStickerUpdate, :count).by 1
           expect(assigns(:current_organization)&.id).to eq current_organization.id
           expect(flash[:success]).to be_present
-          expect(response).to redirect_to bike_path(bike2)
+          expect(response).to redirect_to registration_path(bike2)
           bike_sticker.reload
           expect(bike_sticker.bike_id).to eq bike2.id
           expect(bike_sticker.previous_bike_id).to eq(bike.id)
@@ -155,7 +155,7 @@ RSpec.describe Organized::StickersController, type: :request do
             }.to change(BikeStickerUpdate, :count).by 1
             expect(assigns(:current_organization)&.id).to eq current_organization.id
             expect(flash[:success]).to be_present
-            expect(response).to redirect_to bike_path(bike2)
+            expect(response).to redirect_to registration_path(bike2)
             bike_sticker.reload
             expect(bike_sticker.bike_id).to eq bike2.id
             expect(bike_sticker.previous_bike_id).to eq bike.id
@@ -183,7 +183,7 @@ RSpec.describe Organized::StickersController, type: :request do
               }.to change(BikeStickerUpdate, :count).by 1
               expect(assigns(:current_organization)&.id).to eq current_organization.id
               expect(flash[:success]).to be_present
-              expect(response).to redirect_to bike_path(bike2)
+              expect(response).to redirect_to registration_path(bike2)
               bike_sticker.reload
               expect(bike_sticker.bike_id).to eq bike2.id
             end
@@ -201,7 +201,7 @@ RSpec.describe Organized::StickersController, type: :request do
             }.to change(BikeStickerUpdate, :count).by 1
             expect(assigns(:current_organization)&.id).to eq current_organization.id
             expect(flash[:success]).to be_present
-            expect(response).to redirect_to bike_path(bike2)
+            expect(response).to redirect_to registration_path(bike2)
             bike_sticker.reload
             expect(bike_sticker.organization_id).to eq og_organization.id
             expect(bike_sticker.secondary_organization_id).to eq current_organization.id

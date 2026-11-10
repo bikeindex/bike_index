@@ -67,7 +67,7 @@ RSpec.describe MyAccounts::MessagesController, type: :request do
         let(:current_user) { marketplace_listing.seller }
         it "redirects" do
           get show_url
-          expect(response).to redirect_to(bike_path(marketplace_listing.item_id))
+          expect(response).to redirect_to(registration_path(marketplace_listing.item_id))
           expect(flash[:notice]).to be_present
         end
 
@@ -76,7 +76,7 @@ RSpec.describe MyAccounts::MessagesController, type: :request do
           it "renders" do
             expect(marketplace_message.reload.receiver_id).to eq current_user.id
             get show_url
-            expect(response).to redirect_to(bike_path(marketplace_listing.item_id))
+            expect(response).to redirect_to(registration_path(marketplace_listing.item_id))
 
             get "#{base_url}/#{marketplace_message.id}"
             expect(response.status).to eq(200)
@@ -90,7 +90,7 @@ RSpec.describe MyAccounts::MessagesController, type: :request do
             it "renders" do
               expect(marketplace_message.reload.receiver_id).to eq current_user.id
               get show_url
-              expect(response).to redirect_to(bike_path(marketplace_listing.item_id))
+              expect(response).to redirect_to(registration_path(marketplace_listing.item_id))
 
               get "#{base_url}/#{marketplace_message.id}"
               expect(response.status).to eq(200)

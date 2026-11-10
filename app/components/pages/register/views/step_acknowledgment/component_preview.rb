@@ -30,7 +30,7 @@ module Pages
 
             sequence = preview_sequence
             page = ::BikeServices::Register.sequence_pages(sequence)[index]
-            return missing_notice("a registration sequence with #{index + 1} pages") if page.blank?
+            return missing_notice("an education course with #{index + 1} pages") if page.blank?
 
             b_param = preview_b_param(sequence, acknowledged ? [page.id] : [])
             render(Pages::Register::Views::StepAcknowledgment::Component.new(sequence:, b_param:,
@@ -43,12 +43,12 @@ module Pages
             ::BParam.new(origin: "register_flow", params: {
               bike: {owner_email: lookbook_user&.email, cycle_type: "e-scooter",
                      creation_organization_id: sequence.organization_id},
-              registration_sequence: {id: sequence.id, acknowledged_page_ids:}
+              education_course: {id: sequence.id, acknowledged_page_ids:}
             }.as_json)
           end
 
           # The live template stands in where no organization has activated a sequence
-          def preview_sequence = ::RegistrationSequence.active_or_template_for(lookbook_organization)
+          def preview_sequence = ::EducationCourse.active_or_template_for(lookbook_organization)
         end
       end
     end

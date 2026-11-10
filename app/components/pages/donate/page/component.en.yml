@@ -4,17 +4,16 @@ en:
     pages:
       donate:
         page:
-          cta_headline: A million bikes are registered. Not one owner paid to be there.
           cta_sub: Keep it free for the next million.
           eyebrow: Recovered and returned
           form_title: Fund the next recovery
           headline: Every bike above came home because the registry was free
           larger_gift_link: Talk to us about a larger gift
-          lede: >-
+          lede_millions_registered: >-
             Bike Index is a nonprofit. Registration costs nothing, searching costs
-            nothing, and reporting a theft costs nothing — which is why a million
-            bikes are in the registry and why police departments and shops actually
-            use it. Donations are what keep it that way.
+            nothing, and reporting a theft costs nothing — which is why %{millions}
+            million bikes are in the registry and why police departments and shops
+            actually use it. Donations are what keep it that way.
           lede_short: >-
             Bike Index is a nonprofit. Registration, search, and theft reports cost
             nothing. Donations are what keep it that way.
@@ -25,6 +24,8 @@ en:
           major_eyebrow: Major giving
           major_partner: Partner
           major_title: Larger gifts move whole cities onto the registry
+          millions_registered_no_owner_paid: "%{millions} million bikes are registered.
+            Not one owner paid to be there."
           other_ways_daf: Donor-advised fund grants — we can send our EIN and grant
             details.
           other_ways_match: >-

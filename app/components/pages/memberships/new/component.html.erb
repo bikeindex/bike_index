@@ -278,7 +278,7 @@
   <section class="tw:border-b tw:border-gray-200">
     <div class="tw:py-8 tw:lg:py-11 <%= SharedBlocks::Marketing::Wrapper::Component::CONTAINER_CLASSES %>">
       <h2 class="tw:m-0 tw:text-center tw:text-[15px] tw:font-bold">
-        <%= translation(".official_registry") %>
+        <%= translation(".official_registry_partners", partners: number_with_delimiter(Counts.organizations.floor(-2))) %>
       </h2>
 
       <ul

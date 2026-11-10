@@ -9,7 +9,7 @@
         method: :put,
         class: "btn btn-danger"
 
-= render(UI::TableList::Component.new) do |list|
+= render(UI::Table::List::Component.new) do |list|
   - list.with_row(label: t(".sticker"), value: @bike_sticker.pretty_code)
   - list.with_row(label: t(".claimed"), value: (render(UI::Time::Component.new(time: @bike_sticker.created_at)) if @bike_sticker.claimed_at.present?))
   - list.with_row(label: t(".bike")) do
