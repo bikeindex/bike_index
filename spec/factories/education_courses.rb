@@ -2,7 +2,7 @@ FactoryBot.define do
   factory :education_course do
     organization
 
-    # Built rather than created, so they save alongside the sequence - activation
+    # Built rather than created, so they save alongside the course - activation
     # freezes the pages, so they have to be there first
     trait :with_pages do
       after(:build) do |education_course|
@@ -20,7 +20,7 @@ FactoryBot.define do
 
     factory :education_course_active, traits: [:activated]
 
-    # The template drafts, activates and archives like an organization's sequence
+    # The template drafts, activates and archives like an organization's course
     factory :education_course_template do
       organization { nil }
 

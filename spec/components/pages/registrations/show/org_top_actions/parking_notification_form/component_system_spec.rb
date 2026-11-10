@@ -161,6 +161,7 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::ParkingNotificationFor
     expect(page).to have_content(/Impound this #{bike.type}/i, wait: 10)
     expect(page).to have_no_content("Notification because")
     expect(find("input[name='parking_notification[kind]'][value='impound_notification']", visible: :all)).to be_checked
+    expect(page).to have_button("Impound this #{bike.type}", visible: :all)
   end
 
   # The device fix has landed: the pin is on it and mirrored into the URL. MapLibre

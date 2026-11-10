@@ -52,7 +52,7 @@ RSpec.describe Admin::OrganizationsController, type: :request do
     end
     context "education_courses tab" do
       let!(:education_course) { FactoryBot.create(:education_course, organization:) }
-      it "renders the organization's sequences in place of its profile" do
+      it "renders the organization's courses in place of its profile" do
         get "#{base_url}/#{organization.to_param}", params: {active_tab: "education_courses"}
         expect(response.status).to eq(200)
         expect(response).to render_template("admin/organizations/education_courses")

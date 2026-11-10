@@ -8,7 +8,7 @@ RSpec.describe Pages::Org::EducationCourse::PageForm::Component, type: :componen
   let(:organization_id) { organization.to_param }
 
   context "an organization's draft" do
-    it "posts a new page to the sequence, without a preview or a delete" do
+    it "posts a new page to the course, without a preview or a delete" do
       render_inline(described_class.new(page: education_course.education_course_pages.new))
 
       expect(page).to have_css("h1", text: "Add page")

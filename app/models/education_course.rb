@@ -25,13 +25,13 @@
 class EducationCourse < ApplicationRecord
   acts_as_paranoid
 
-  # The admin index's filters. "template" is which sequence rather than which status - a
+  # The admin index's filters. "template" is which course rather than which status - a
   # template is drafted, activated and archived like an organization's
   STATUS_SCOPES = {"draft" => :draft, "active" => :active, "archived" => :archived, "template" => :templates}.freeze
   STATUSES = STATUS_SCOPES.keys.freeze
   COPIED_PAGE_ATTRS = %w[title heading subtitle body listing_order organization_specific].freeze
-  # Follows "I, <registrant's name>," on the flow's final acknowledgment. Seeded onto the
-  # template, so an organization edits its own copy
+  # Follows "I, <registrant's name>," on the flow's final acknowledgment, for a course
+  # without its own text
   DEFAULT_ACKNOWLEDGMENT_TEXT = "have read, understood, and agree to comply with all of the " \
     "e-vehicle safety rules above as a condition of registering my vehicle. I understand that " \
     "failure to comply may result in revocation of my registration and/or disciplinary action."
@@ -67,7 +67,7 @@ class EducationCourse < ApplicationRecord
     end
 
     # What a draft is cloned from, and what the registration flow shows: the owner's live
-    # sequence, falling back to the template every organization starts from
+    # course, falling back to the template every organization starts from
     def active_or_template_for(organization) = active_for(organization) || active_template
 
     # The draft as it stands - draft_for opens one when there isn't one
@@ -88,7 +88,7 @@ class EducationCourse < ApplicationRecord
 
     private
 
-    # Start the draft from what's live so an edit tweaks the current sequence rather than
+    # Start the draft from what's live so an edit tweaks the current course rather than
     # discarding the organization's customizations. Nothing sits above the template, so its
     # very first draft starts empty.
     def build_draft_for(organization)
@@ -104,7 +104,7 @@ class EducationCourse < ApplicationRecord
     end
 
     # Duplicate into a new blob; attaching the source blob directly would share it,
-    # so purging either record's image (page/sequence/org destroy) would break the other.
+    # so purging either record's image (page/course/org destroy) would break the other.
     def copy_image(source, target)
       blob = source.blob
       target.attach(io: StringIO.new(blob.download), filename: blob.filename, content_type: blob.content_type)
@@ -130,14 +130,14 @@ class EducationCourse < ApplicationRecord
 
   def status_display = STATUS_DISPLAY[status]
 
-  # Which sequence this is, e.g. "Brakebills Current" or "Template Draft"
+  # Which course this is, e.g. "Brakebills Current" or "Template Draft"
   def display_name = "#{badge_name} #{status_display}"
 
-  # Who this sequence belongs to - badges an organization-specific page, and names the
-  # sequence in display_name
+  # Who this course belongs to - badges an organization-specific page, and names the
+  # course in display_name
   def badge_name = organization&.short_name || "Template"
 
-  # Activation freezes the sequence and its pages. Acknowledgments reference them by id, so
+  # Activation freezes the course and its pages. Acknowledgments reference them by id, so
   # what a registrant agreed to has to keep saying the same thing - a change belongs in a
   # new draft, which activating supersedes this with.
   def activated? = !draft?
@@ -163,7 +163,7 @@ class EducationCourse < ApplicationRecord
     end
   end
 
-  # Throw an unactivated draft away entirely, pages and all. Unlike an archived sequence,
+  # Throw an unactivated draft away entirely, pages and all. Unlike an archived course,
   # nothing has acknowledged it, so there's nothing to preserve.
   def discard_draft!
     return false if activated?
@@ -185,7 +185,7 @@ class EducationCourse < ApplicationRecord
     throw :abort
   end
 
-  # The register flow only reads an organization's own sequence, never the template
+  # The register flow only reads an organization's own course, never the template
   def enqueue_after_change_job
     CallbackJobs::AfterEducationCourseChangeJob.perform_async(id) unless template?
   end

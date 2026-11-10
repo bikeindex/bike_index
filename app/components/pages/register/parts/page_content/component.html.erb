@@ -14,11 +14,11 @@
 <% end %>
 
 <%= render Pages::Register::Parts::SectionLabel::Component.new(text: @page.title) do %>
-  <% if sequence.faq_url.present? %>
+  <% if course.faq_url.present? %>
     <%= render UI::Tooltip::Component.new(text: translation(".have_questions")) do |tooltip| %>
       <% tooltip.with_body do %>
         <%= translation(".have_questions") %>
-        <%= link_to translation(".read_the_faq"), sequence.faq_url, target: "_blank", rel: "noopener", class: "twlink" %>
+        <%= link_to translation(".read_the_faq"), course.faq_url, target: "_blank", rel: "noopener", class: "twlink" %>
       <% end %>
     <% end %>
   <% end %>

@@ -22,7 +22,7 @@ RSpec.describe Pages::Org::EducationCourse::PageList::Component, type: :componen
     expect(page).to have_link("Edit", count: 2)
   end
 
-  context "activated sequence" do
+  context "activated course" do
     let(:education_course) do
       FactoryBot.create(:education_course_active, :with_pages, organization:,
         faq_url: "https://example.com/faq", acknowledgment_text: "agree to the rules above")
