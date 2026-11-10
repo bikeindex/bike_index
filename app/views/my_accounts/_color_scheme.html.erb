@@ -1,0 +1,39 @@
+<%# locals: (color_scheme:) %>
+<% entries = [
+  {value: "light", label: t(".light"), icon: "icons/sun.svg", icon_class: "tw:text-yellow-500"},
+  {value: "dark", label: t(".dark"), icon: "icons/moon.svg", icon_class: "tw:text-indigo-400"},
+  {value: "system", label: t(".system"), icon: "icons/computer.svg", icon_class: "tw:text-gray-500"}
+] %>
+
+<div class="form-group row unnested-field">
+  <label class="form-well-label"><%= t(".appearance") %></label>
+
+  <%# dirtyignore keeps dirtyForms' leave-page prompt off fields that save as they're picked %>
+  <div
+    class="form-well-input dirtyignore tw:flex tw:gap-3"
+    role="radiogroup"
+    aria-label="<%= t(".appearance") %>"
+    data-controller="color-scheme"
+    data-color-scheme-url-value="<%= my_account_path %>"
+  >
+    <% entries.each do |entry| %>
+      <label
+        class="
+          tw:relative tw:mb-0 tw:flex tw:flex-1 tw:cursor-pointer
+          tw:flex-col tw:items-center tw:gap-2 tw:rounded-lg tw:border
+          tw:border-gray-200 tw:p-3 tw:opacity-60 tw:transition-all
+          tw:hover:border-purple-300 tw:has-[:checked]:opacity-100
+          tw:has-[:checked]:ring-2 tw:has-[:checked]:ring-purple-400
+          tw:has-[:focus-visible]:outline-2
+          tw:has-[:focus-visible]:outline-offset-2
+          tw:has-[:focus-visible]:outline-purple-500
+          tw:dark:border-purple-700
+        "
+      >
+        <%= radio_button_tag "user[color_scheme]", entry[:value], color_scheme == entry[:value], class: "tw:sr-only", data: {action: "change->color-scheme#select"} %>
+        <%= inline_svg_tag(entry[:icon], class: "tw:size-6 #{entry[:icon_class]}", aria_hidden: true) %>
+        <span class="tw:text-xs tw:text-gray-600 tw:dark:text-gray-400"><%= entry[:label] %></span>
+      </label>
+    <% end %>
+  </div>
+</div>
