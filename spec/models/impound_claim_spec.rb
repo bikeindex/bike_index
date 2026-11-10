@@ -54,7 +54,7 @@ RSpec.describe ImpoundClaim, type: :model do
     let(:stalled_at) { Time.current - ImpoundClaim::STALLED_AFTER - 1.day }
     let!(:impound_claim_submitted) { FactoryBot.create(:impound_claim, impound_record:, status: "submitting", submitted_at: stalled_at) }
     let!(:impound_claim_approved) { FactoryBot.create(:impound_claim, impound_record:, status: "approved", created_at: stalled_at) }
-    let!(:impound_claim_recent) { FactoryBot.create(:impound_claim, impound_record:, status: "submitting", created_at: stalled_at) }
+    let!(:impound_claim_recent) { FactoryBot.create(:impound_claim, impound_record:, status: "approved", submitted_at: Time.current, created_at: stalled_at) }
     let!(:impound_claim_organized) { FactoryBot.create(:impound_claim, status: "submitting", submitted_at: stalled_at) }
     let!(:impound_claims_other_statuses) do
       %w[pending denied retrieved].map { |status| FactoryBot.create(:impound_claim, impound_record:, status:, created_at: stalled_at) }
