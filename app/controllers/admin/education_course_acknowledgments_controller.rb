@@ -32,7 +32,11 @@ module Admin
     def matching_education_course_acknowledgments
       acknowledgments = EducationCourseAcknowledgment.all
       @status = searchable_statuses.include?(params[:search_status]) ? params[:search_status] : nil
-      acknowledgments = acknowledgments.public_send(@status) if @status.present?
+      acknowledgments = case @status
+      when "pending" then acknowledgments.pending
+      when "acknowledged" then acknowledgments.acknowledged
+      else acknowledgments
+      end
 
       if params[:organization_id].present?
         acknowledgments = acknowledgments.for_organization(current_organization)
