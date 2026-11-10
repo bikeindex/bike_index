@@ -12,9 +12,8 @@ module Slugifyer
     return nil unless string
 
     name = remove_parens(string).gsub(/\sco(\.|mpany)/i, " ").gsub(/\s(frame)?works/i, " ")
-    slug = book_slug(name)
     # Manufacturer.friendly_find reads an all-digit string as an id
-    slug.match?(/\A\d+\z/) ? slugify(name.strip).tr("-", "_") : slug
+    book_slug(name).then { it.match?(/\D/) ? it : slugify(name).tr("-", "_") }
   end
 
   # underscores, also removes some extra stuff
