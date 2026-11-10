@@ -35,6 +35,14 @@ RSpec.describe Manufacturer, type: :model do
     end
   end
 
+  describe "slug validation" do
+    it "is invalid when a slug is all digits" do
+      expect(FactoryBot.build(:manufacturer, name: "333")).not_to be_valid
+      expect(FactoryBot.build(:manufacturer, name: "Foo (101)")).not_to be_valid
+      expect(FactoryBot.build(:manufacturer, name: "Foo (101 Bikes)")).to be_valid
+    end
+  end
+
   describe "friendly_find" do
     it "finds manufacturers by their slug" do
       mnfg = FactoryBot.create(:manufacturer, name: "Poopy PANTERS")
