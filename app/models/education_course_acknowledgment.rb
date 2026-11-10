@@ -2,7 +2,7 @@
 # Outlives the registration it came from - the b_param is swept once its bike exists.
 # Pending (no acknowledged_at) from when the bike is created until they're agreed to, which
 # holds the bike's finished registration email back.
-# What was agreed to is read off the sequence, which activation froze.
+# What was agreed to is read off the course, which activation froze.
 # == Schema Information
 #
 # Table name: education_course_acknowledgments
@@ -28,7 +28,7 @@
 #  index_education_course_acknowledgments_pending                 (b_param_id) WHERE (acknowledged_at IS NULL)
 #
 class EducationCourseAcknowledgment < ApplicationRecord
-  # with_deleted: the sequence is soft-deleted with its organization, and this record
+  # with_deleted: the course is soft-deleted with its organization, and this record
   # reads what was agreed to straight off it
   belongs_to :education_course, -> { with_deleted }
   belongs_to :b_param
@@ -52,14 +52,14 @@ class EducationCourseAcknowledgment < ApplicationRecord
   class << self
     # The pages are acknowledged one at a time on the b_param; this is the moment they're
     # agreed to as a whole - onto the pending one when the bike came first, against the
-    # sequence the pages were read from rather than the one it was pending on.
+    # course the pages were read from rather than the one it was pending on.
     # Whoever is agreeing, over the creator create_bike stood in with
-    def acknowledge(b_param, sequence:, user: nil)
-      find_or_initialize_by(b_param:).acknowledge!(sequence:, user:)
+    def acknowledge(b_param, course:, user: nil)
+      find_or_initialize_by(b_param:).acknowledge!(course:, user:)
     end
 
-    def create_pending(b_param, sequence:)
-      create(education_course: sequence, b_param:, owner_email: b_param.owner_email)
+    def create_pending(b_param, course:)
+      create(education_course: course, b_param:, owner_email: b_param.owner_email)
     end
 
     # Whether the finished registration email is still waiting on the rules. Only the initial
@@ -83,7 +83,7 @@ class EducationCourseAcknowledgment < ApplicationRecord
   end
 
   # The review is only reachable with every page acknowledged, so the whole (frozen)
-  # sequence is what was agreed to
+  # course is what was agreed to
   def acknowledged_pages
     education_course&.education_course_pages
   end
@@ -92,8 +92,8 @@ class EducationCourseAcknowledgment < ApplicationRecord
     education_course&.acknowledgment
   end
 
-  def acknowledge!(sequence:, user: nil)
-    return false unless update(education_course: sequence, user_id: user&.id || user_id,
+  def acknowledge!(course:, user: nil)
+    return false unless update(education_course: course, user_id: user&.id || user_id,
       owner_email: b_param.owner_email, acknowledged_at: Time.current)
 
     release_held_email
