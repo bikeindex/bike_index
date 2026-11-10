@@ -75,6 +75,6 @@ class ProcessImpoundUpdatesJob < ApplicationJob
     # TODO: make this actually merge attributes in from the bike, rather than just delete it?
     impound_record.parking_notification&.bike&.delete
     # Recalculate the impounded bike (unless just deleted), so it drops out of impounded/found searches
-    Bike.find_by(id: impound_record.bike_id)&.update(updated_at: Time.current)
+    Bike.unscoped.without_deleted.find_by(id: impound_record.bike_id)&.update(updated_at: Time.current)
   end
 end

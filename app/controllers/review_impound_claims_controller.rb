@@ -6,7 +6,10 @@ class ReviewImpoundClaimsController < ApplicationController
   end
 
   def update
-    if params[:submit] == "retrieved_by_owner"
+    # Superusers can view, but an update would make them the record's user in place of the finder
+    if !@impound_record.authorized?(current_user, no_superuser_override: true)
+      flash[:error] = "Only the person who found the #{@impound_claim.bike_type} can update this claim"
+    elsif params[:submit] == "retrieved_by_owner"
       mark_retrieved_by_owner
     elsif !@impound_claim.submitting?
       flash[:error] = if @impound_claim.responded?
@@ -48,9 +51,7 @@ class ReviewImpoundClaimsController < ApplicationController
 
   # ProcessImpoundUpdatesJob merges this claim, recovering its stolen record
   def mark_retrieved_by_owner
-    if !@impound_record.authorized?(current_user, no_superuser_override: true)
-      flash[:error] = "Only the person who found the #{@impound_claim.bike_type} can mark it returned"
-    elsif @impound_claim.approved? && @impound_record.active?
+    if @impound_claim.approved? && @impound_record.active?
       create_impound_record_update(kind: "retrieved_by_owner", impound_claim: @impound_claim)
     else
       flash[:error] = "Only an approved claim can be marked returned"

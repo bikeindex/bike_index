@@ -215,6 +215,31 @@ RSpec.describe ReviewImpoundClaimsController, type: :request do
           expect(flash[:error]).to be_present
           expect(impound_record.reload.impound_record_updates.count).to eq 0
         end
+
+        # The latest update's user becomes the record's, which would lock the finder out of marking it returned
+        context "approving" do
+          let(:status) { "submitting" }
+          it "doesn't record" do
+            patch "#{base_url}/#{impound_claim.to_param}", params: {submit: "Approve", impound_claim: {response_message: "ok"}}
+            expect(flash[:error]).to be_present
+            expect(impound_record.reload.impound_record_updates.count).to eq 0
+            expect(impound_record.user_id).to_not eq current_user.id
+            expect(impound_claim.reload.status).to eq "submitting"
+          end
+        end
+      end
+
+      context "finder hid the found registration" do
+        it "recalculates it" do
+          bike_claimed.update(marked_user_hidden: true)
+          expect(Bike.unscoped.find(bike_claimed.id).user_hidden).to be_truthy
+          patch "#{base_url}/#{impound_claim.to_param}", params: retrieved_params
+          Sidekiq::Job.drain_all
+          expect(impound_claim.reload.status).to eq "retrieved"
+          bike = Bike.unscoped.find(bike_claimed.id)
+          expect(bike.current_impound_record_id).to be_nil
+          expect(bike.status).to_not eq "status_impounded"
+        end
       end
 
       context "not approved" do
