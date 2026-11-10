@@ -11,10 +11,10 @@ module EbikeRuleServices
     # with them, comes with its licence and registration rules to check
     def rules(law:, bike:)
       if law[:metric]
-        [(row(:vehicle, :check, :no_e_bike_category) if law[:motor_vehicle]), power_rule(law, bike.watts),
+        [(row(:vehicle, :check, :no_e_bike_category) if law[:motor_vehicle]), power_rule(law, bike),
           metric_speed_rule(law, bike), throttle_rule(law, bike)].compact
       else
-        [classes_rule(law, bike), power_rule(law, bike.watts), speed_rule(law, bike), throttle_rule(law, bike)]
+        [classes_rule(law, bike), power_rule(law, bike), speed_rule(law, bike), throttle_rule(law, bike)]
       end
     end
 
@@ -57,8 +57,9 @@ module EbikeRuleServices
       end
     end
 
-    def power_rule(law, watts)
+    def power_rule(law, bike)
       cap = law[:watt_cap]
+      watts = bike.motor_watts
       if (date = law[:limits_start_on])
         row(:power, :info, :limits_start_on, date:)
       # outside the US, a cap under the 750W many e-bikes are rated
@@ -68,6 +69,9 @@ module EbikeRuleServices
         row(:power, :info, :watts_not_provided)
       elsif cap.nil?
         row(:power, :pass, :no_watt_cap)
+      # a cap is on rated power, which a peak over it says nothing of
+      elsif watts > cap && bike.watts.nil?
+        row(:power, :check, :watts_to_check, cap:)
       elsif watts > cap
         row(:power, :fail, :watts_over_cap, watts:, cap:)
       else
@@ -77,7 +81,8 @@ module EbikeRuleServices
 
     def speed_rule(law, bike)
       cap = law[:mph]
-      mph = bike.top_assist_mph
+      mph = bike.speed_mph
+      by_throttle = bike.top_assist_mph.nil?
       past = bike.assists_past_mph
       if (date = law[:limits_start_on])
         row(:speed, :info, :limits_start_on, date:)
@@ -85,15 +90,15 @@ module EbikeRuleServices
       elsif bike.out_of_class_under?(law)
         row(:speed, :fail, :class_3_speed_with_throttle, mph: [mph, 28].compact.max)
       elsif past && cap
-        (cap <= past) ? row(:speed, :fail, :speed_past_cap, past:, cap:) : row(:speed, :check, :speed_past, past:, cap:)
+        past_row(past, cap)
       elsif mph.nil? && past.nil?
         row(:speed, :info, :speed_not_provided)
       elsif cap.nil?
         row(:speed, :pass, :no_speed_cap)
       elsif mph > cap
-        row(:speed, :fail, :speed_over_cap, mph:, cap:)
+        row(:speed, :fail, by_throttle ? :throttle_speed_over_cap : :speed_over_cap, mph:, cap:)
       else
-        row(:speed, :pass, :speed_within_cap, mph:)
+        row(:speed, :pass, by_throttle ? :throttle_speed_within_cap : :speed_within_cap, mph:)
       end
     end
 
@@ -105,7 +110,7 @@ module EbikeRuleServices
       if (date = law[:limits_start_on])
         row(:speed, :check, :limits_start_on, date:)
       elsif past && cap
-        (cap <= past) ? row(:speed, :fail, :speed_past_cap, past:, cap:) : row(:speed, :check, :speed_past, past:, cap:)
+        past_row(past, cap, by_throttle: bike.top_assist_kmh.present?)
       elsif cap.nil?
         row(:speed, :pass, :no_speed_cap)
       elsif kmh.nil?
@@ -114,6 +119,15 @@ module EbikeRuleServices
         row(:speed, :fail, :speed_over_cap, kmh:, cap:)
       else
         row(:speed, :pass, :speed_within_cap, kmh:)
+      end
+    end
+
+    # A hand entry's assist within the cap leaves the throttle as what's past it
+    def past_row(past, cap, by_throttle: false)
+      if cap <= past
+        row(:speed, :fail, by_throttle ? :throttle_past_cap : :speed_past_cap, past:, cap:)
+      else
+        row(:speed, :check, by_throttle ? :throttle_past : :speed_past, past:, cap:)
       end
     end
 
@@ -133,7 +147,7 @@ module EbikeRuleServices
       case bike.e_bike_class
       when 1 then row(:throttle, :fail, :class_1_throttle)
       when 2 then row(:throttle, :pass, :throttle_allowed)
-      when 3 then class_3_throttle(bike.throttle_mph)
+      when 3 then bike.throttle_past_mph ? row(:throttle, :fail, :class_3_throttle_past) : class_3_throttle(bike.throttle_mph)
       else row(:throttle, :info, :has_throttle)
       end
     end
@@ -149,6 +163,6 @@ module EbikeRuleServices
       end
     end
 
-    conceal :row, :classes_rule, :power_rule, :speed_rule, :metric_speed_rule, :throttle_rule, :throttle_row, :class_3_throttle
+    conceal :row, :classes_rule, :power_rule, :speed_rule, :metric_speed_rule, :past_row, :throttle_rule, :throttle_row, :class_3_throttle
   end
 end

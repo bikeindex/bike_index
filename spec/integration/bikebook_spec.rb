@@ -1787,7 +1787,7 @@ RSpec.describe "BikeBook", :js, type: :system do
       end
 
       table = ApplicationController.render(inline: <<~ERB, layout: false, locals: {rows: [{type: "Disc", position: "Front"}, {type: "Rim", position: "Rear"}]})
-        <%= render(UI::Table::Component.new(records: rows, classes: "tw:table-fixed")) do |table|
+        <%= render(UI::Table::Base::Component.new(records: rows, classes: "tw:table-fixed")) do |table|
           table.column(label: "Brakes", classes: "tw:w-[18%]", header_classes: "tw:spec-eyebrow") { |record| record[:type] }
           table.column(label: "Position", classes: "tw:w-[12%]") { |record| record[:position] }
         end %>
@@ -1799,7 +1799,7 @@ RSpec.describe "BikeBook", :js, type: :system do
       JS
 
       row_headed = ApplicationController.render(inline: <<~ERB, layout: false, locals: {rows: [{label: "Year", value: 2026}, {label: "Reach", value: 450}]})
-        <%= render(UI::Table::Component.new(records: rows)) do |table|
+        <%= render(UI::Table::Base::Component.new(records: rows)) do |table|
           table.column(label: "", row_header: true) { |record| record[:label] }
           table.column(label: "Level 2") { |record| record[:value].to_s }
         end %>
@@ -1860,7 +1860,7 @@ RSpec.describe "BikeBook", :js, type: :system do
     expect(page).to have_css(".hw-combobox__chip", text: "Off-Highway Motorcycle")
     expect(page).to have_css("#classification-cards h3", exact_text: "Off-Highway Motorcycle")
     find("#classification-cards [role=button]", text: "California specifics").click
-    expect(page).to have_css("#classification-cards li", text: "Riders must be 16 or older to ride a Class 3")
+    expect(page).to have_css("#classification-cards li", text: "Ridden wherever bicycles may go")
     # a view's tab keeps them as they were, open and unrequested, and the field's chips without a bare frame between
     page.evaluate_script(<<~JS)
       (() => {
@@ -1871,7 +1871,7 @@ RSpec.describe "BikeBook", :js, type: :system do
     JS
     click_link "Sizes & geometry"
     expect(page).to have_current_path(/[?&]view=geometry\b/)
-    expect(page).to have_css("#classification-cards li", text: "Riders must be 16 or older to ride a Class 3")
+    expect(page).to have_css("#classification-cards li", text: "Ridden wherever bicycles may go")
       .and have_css("#classification-cards h3", exact_text: "Off-Highway Motorcycle")
     expect(cards_asked.count).to eq 2
     expect(page.evaluate_script("window.fewestChips")).to eq 3
@@ -1879,7 +1879,7 @@ RSpec.describe "BikeBook", :js, type: :system do
     type_into(vehicle_field("an e-motorcycle"), "evc/moped")
     retry_on_detach { find("[role='option'][data-value='evc/moped']").click }
     expect(page).to have_css("#classification-cards h3", exact_text: "Moped, up to 2 hp and 30 mph", wait: 10)
-    expect(page).to have_css("#classification-cards li", text: "Riders must be 16 or older to ride a Class 3")
+    expect(page).to have_css("#classification-cards li", text: "Ridden wherever bicycles may go")
     expect(cards_asked.count).to eq 3
     # as is an out of class marker, which the vocabulary has no record of, its card the e-moto's
     type_into(vehicle_field("an e-motorcycle"), "evc/out_of_class/us/ca")

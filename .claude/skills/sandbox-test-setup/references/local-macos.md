@@ -27,5 +27,9 @@ No `eval "$(ruby bin/env --export)"` needed for Ruby commands — `config/boot.r
 
 A pending-migration abort from `rails_helper` → `bundle exec rails db:create db:migrate`.
 
+Every `:js` example raising `Playwright::Error: timeout: expected float, got undefined` →
+a merge bumped `playwright-ruby-client` past the workspace's `node_modules/playwright`.
+`npm install`.
+
 Postgres, redis and the network are your local environment's, so the only other thing
 that bites here is the CSS build in SKILL.md.

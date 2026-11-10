@@ -55,6 +55,8 @@ module Pages
 
         def error?(field) = @lookup.errors.include?(field)
 
+        def choose_place_note = tag.p(copy[:choose_place], class: "tw:text-[13px] tw:text-gray-700 tw:dark:text-gray-300")
+
         # Which of the bike's two inputs the check is of: the picked model, details changed from it, or details alone
         def details_mode
           if @lookup.custom?
@@ -89,24 +91,28 @@ module Pages
             {value: 29, label: translation(".over_28_mph")}]
         end
 
+        def throttle_speed_entries
+          return top_speed_entries unless us?
+
+          [top_speed_entries.first, {value: 21, label: translation(".over_20_mph")}]
+        end
+
         # The copy that names a state, the US's classes or its laws, and Canada's in their place
         def copy
           @copy ||= if us?
             {subheading: translation(".subheading"), state: translation(".state"), select_state: translation(".select_state"),
-             state_error: translation(".state_error"), choose_place: translation(".choose_state"),
+             state_error: translation(".state_error"), choose_place: translation(".choose_your_state"),
              not_in_country: translation(".not_in_us_html", switch_country:), watts_placeholder: translation(".watts_placeholder"),
              parents_body: translation(".parents_body"), parents_link: translation(".parents_link"),
              parent_step_1_body: translation(".parent_step_1_body"), parent_step_2_title: translation(".parent_step_2_title"),
-             parent_step_2_body: translation(".parent_step_2_body"), banned_body: translation(".banned_body"),
-             disclaimer: translation(".disclaimer")}
+             parent_step_2_body: translation(".parent_step_2_body"), banned_body: translation(".banned_body")}
           else
             {subheading: translation(".subheading_canada"), state: translation(".province"), select_state: translation(".select_province"),
-             state_error: translation(".province_error"), choose_place: translation(".choose_province"),
+             state_error: translation(".province_error"), choose_place: translation(".choose_your_province"),
              not_in_country: translation(".not_in_canada_html", switch_country:), watts_placeholder: translation(".watts_placeholder_canada"),
              parents_body: translation(".parents_body_canada"), parents_link: translation(".parents_link_canada"),
              parent_step_1_body: translation(".parent_step_1_body_canada"), parent_step_2_title: translation(".parent_step_2_title_canada"),
-             parent_step_2_body: translation(".parent_step_2_body_canada"), banned_body: translation(".banned_body_canada"),
-             disclaimer: translation(".disclaimer_canada")}
+             parent_step_2_body: translation(".parent_step_2_body_canada"), banned_body: translation(".banned_body_canada")}
           end
         end
 

@@ -159,13 +159,13 @@ class OrganizationExportJob < ApplicationJob
     when "bike_sticker" then bike.bike_stickers.map(&:pretty_code).join(" and ")
     when "assigned_sticker" then assign_bike_code_and_increment(bike)
     when "impound_id" then bike.current_impound_record&.display_id if bike.status_impounded?
-    when "acknowledged_at" then acknowledged_ats[bike.id]&.utc if bike.registration_sequence_applies?
+    when "acknowledged_at" then acknowledged_ats[bike.id]&.utc if bike.education_course_applies?
     end
   end
 
-  # Ordered so each bike keeps its latest, as RegistrationSequenceAcknowledgment.find_for does
+  # Ordered so each bike keeps its latest, as EducationCourseAcknowledgment.find_for does
   def acknowledged_ats
-    @acknowledged_ats ||= RegistrationSequenceAcknowledgment.acknowledged.for_organization_or_template(@export.organization)
+    @acknowledged_ats ||= EducationCourseAcknowledgment.acknowledged.for_organization_or_template(@export.organization)
       .where(bike_id: @export.organization.bike_organizations.select(:bike_id))
       .order(:id).pluck(:bike_id, :acknowledged_at).to_h
   end

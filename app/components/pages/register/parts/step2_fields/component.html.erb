@@ -228,7 +228,7 @@
     "status_stolen" => [translation(".stolen"), translation(".stolen_description", cycle_type:)],
     "status_impounded" => [translation(".found"), translation(".found_description", cycle_type:)]}.map do |status, (title, description)|
     content = safe_join([content_tag(:span, title, class: "tw:block tw:font-semibold"),
-      content_tag(:span, description, class: "tw:block tw:text-xs tw:text-[#9a9aa2] tw:dark:text-gray-500")])
+      content_tag(:span, description, class: "tw:block tw:text-xs tw:text-[#9a9aa2] tw:dark:text-gray-300")])
     {display: title, value: status, content:}
   end %>
 

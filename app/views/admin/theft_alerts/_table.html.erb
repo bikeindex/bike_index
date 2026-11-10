@@ -4,7 +4,7 @@
   data-controller="update-cached-sortable-links"
   data-update-cached-sortable-links-base-url-value="<%= url_for(sort_state.search_params) %>"
 >
-  <%= render(UI::Table::Component.new(records: theft_alerts, render_sortable:, sort_state:,
+  <%= render(UI::Table::Base::Component.new(records: theft_alerts, render_sortable:, sort_state:,
         cache_key: cache_fragment_name(["admin_theft_alerts", render_sortable, skip_bike]),
         cache_records: ->(theft_alert) { [theft_alert.user, theft_alert.theft_alert_plan] })) do |table| %>
     <% table.column(sortable: "created_at", lower_right: ->(theft_alert) { theft_alert.id }) do |theft_alert| %>

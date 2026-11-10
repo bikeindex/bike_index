@@ -44,7 +44,7 @@ RSpec.describe UI::Badge::Component, type: :component do
       success: "tw:bg-green-50",
       notice: "tw:bg-blue-50",
       purple: "tw:bg-purple-50",
-      warning: "tw:bg-amber-50",
+      warning: "tw:bg-yellow-50",
       cyan: "tw:bg-cyan-50",
       error: "tw:bg-red-50",
       gray: "tw:bg-[#f0f0f2]",

@@ -31,9 +31,9 @@ module Pages
         end
 
         # Unsaved - an example to render, not one to keep
-        def sequence(name, short_name = name) = RegistrationSequence.new(organization: Organization.new(name:, short_name:))
+        def sequence(name, short_name = name) = EducationCourse.new(organization: Organization.new(name:, short_name:))
 
-        def pages(sequence, attributes) = attributes.map { RegistrationSequencePage.new(registration_sequence: sequence, **it) }
+        def pages(sequence, attributes) = attributes.map { EducationCoursePage.new(education_course: sequence, **it) }
 
         def page(title:, rules:, subtitle: nil, heading: nil, organization_specific: false)
           {title:, heading:, subtitle:, organization_specific:, body: tag.ul(safe_join(rules.map { tag.li(it) })).to_s}

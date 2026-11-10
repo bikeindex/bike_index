@@ -129,7 +129,7 @@ module Pages
             {title: "Memberships", path: admin_memberships_path},
             {title: "Payments", path: admin_payments_path},
             {title: "Organization Features", path: admin_organization_features_path},
-            {title: "Registration Sequences", path: admin_registration_sequences_path},
+            {title: "Education Courses", path: admin_education_courses_path},
             # An organization's invoices are the same section, on a path nested under theirs
             {title: "Invoices", path: admin_invoices_path(query: "active", direction: "asc", sort: "subscription_end_at"),
              match_paths: ["#{admin_invoices_path}/**", "#{admin_organizations_path}/*/invoices"]},
@@ -156,7 +156,7 @@ module Pages
             {title: "Sticker Updates", path: admin_bike_sticker_updates_path},
             {title: "Exports", path: admin_exports_path},
             {title: "Bulk Imports", path: admin_bulk_imports_path},
-            {title: "Duplicate Bikes", path: duplicates_admin_bikes_path, exact: true},
+            {title: "Duplicate Bikes", path: admin_duplicate_bikes_path},
             {title: "Model Audits", path: admin_model_audits_path},
             {title: "Marketplace Listings", path: admin_marketplace_listings_path},
             {title: "Marketplace Messages", path: admin_marketplace_messages_path},

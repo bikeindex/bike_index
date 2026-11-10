@@ -25,15 +25,15 @@ RSpec.describe CleanBParamsJob, type: :job do
     end
 
     context "with the template's safety rules still to agree to" do
-      let(:template) { FactoryBot.create(:registration_sequence_template_active, :with_pages) }
+      let(:template) { FactoryBot.create(:education_course_template_active, :with_pages) }
       let(:bike_expired) { FactoryBot.create(:bike, :with_ownership) }
       let(:bike_recent) { FactoryBot.create(:bike, :with_ownership) }
-      let!(:expired) { pending_on_template(bike_expired, Time.current - RegistrationSequenceAcknowledgment::TEMPLATE_PENDING_EXPIRATION - 1.day) }
+      let!(:expired) { pending_on_template(bike_expired, Time.current - EducationCourseAcknowledgment::TEMPLATE_PENDING_EXPIRATION - 1.day) }
       let!(:recent) { pending_on_template(bike_recent, Time.current - 1.day) }
 
       def pending_on_template(bike, created_at)
         b_param = FactoryBot.create(:b_param, created_bike_id: bike.id, updated_at: stale)
-        FactoryBot.create(:registration_sequence_acknowledgment_pending, b_param:, bike:, registration_sequence: template, created_at:)
+        FactoryBot.create(:education_course_acknowledgment_pending, b_param:, bike:, education_course: template, created_at:)
         b_param
       end
 
@@ -54,7 +54,7 @@ RSpec.describe CleanBParamsJob, type: :job do
           created_at: Time.current - BParam::TOKEN_EXPIRATION - 1.day,
           params: {bike: {manufacturer_id: 1}}.as_json)
       end
-      before { FactoryBot.create(:registration_sequence_acknowledgment_pending, b_param: b_param_pending, bike:) }
+      before { FactoryBot.create(:education_course_acknowledgment_pending, b_param: b_param_pending, bike:) }
 
       it "keeps it, even expired, since its token is how they're resumed" do
         expect { described_class.new.perform }.to change(BParam, :count).by(-2)
@@ -65,7 +65,7 @@ RSpec.describe CleanBParamsJob, type: :job do
 
     context "with an e-vehicle acknowledgment" do
       let!(:acknowledgment) do
-        FactoryBot.create(:registration_sequence_acknowledgment, b_param: b_param_with_bike, bike:)
+        FactoryBot.create(:education_course_acknowledgment, b_param: b_param_with_bike, bike:)
       end
 
       it "sweeps the registration, leaving the acknowledgment record standing" do

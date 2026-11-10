@@ -132,7 +132,7 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
 
   context "with every column's feature enabled" do
     let(:enabled_feature_slugs) do
-      %w[avery_export bike_stickers impound_bikes registration_notes registration_sequences
+      %w[avery_export bike_stickers impound_bikes registration_notes education_courses
         reg_address reg_extra_registration_number reg_organization_affiliation reg_phone reg_student_id]
     end
     # The panel builds a checkbox per enabled_columns entry, and ui--table-column-settings
@@ -174,16 +174,16 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
     end
   end
 
-  context "with registration_sequences enabled" do
-    let(:enabled_feature_slugs) { %w[registration_sequences] }
+  context "with education_courses enabled" do
+    let(:enabled_feature_slugs) { %w[education_courses] }
     let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization, propulsion_type: "pedal-assist") }
     let(:unacknowledged_bike) { FactoryBot.create(:bike_organized, creation_organization: organization, propulsion_type: "pedal-assist") }
     let(:bikes) { [bike, unacknowledged_bike] }
-    let(:registration_sequence) { FactoryBot.create(:registration_sequence_active, organization:) }
-    let!(:acknowledgment) { FactoryBot.create(:registration_sequence_acknowledgment, registration_sequence:, bike:) }
+    let(:education_course) { FactoryBot.create(:education_course_active, organization:) }
+    let!(:acknowledgment) { FactoryBot.create(:education_course_acknowledgment, education_course:, bike:) }
 
     it "renders when each bike was acknowledged" do
-      expect(component).to have_css("th.acknowledgment_cell span[title='Registration sequence acknowledgment at']",
+      expect(component).to have_css("th.acknowledgment_cell span[title='Education course acknowledgment at']",
         visible: :all, normalize_ws: true, exact_text: "Reg acknowledged")
       expect(component.css("td.acknowledgment_cell .localizeTime").count).to eq 1
     end

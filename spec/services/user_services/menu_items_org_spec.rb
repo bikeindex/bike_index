@@ -172,8 +172,8 @@ RSpec.describe UserServices::MenuItemsOrg do
           link_item("Impounding", "/o/#{slug}/manage_impounding/edit"),
           link_item("Stolen Bike Hot Sheet", "/o/#{slug}/hot_sheet/edit"),
           link_item("Registration form settings", "/o/#{slug}/registrations/settings"),
-          link_item("Registration sequences", "/o/#{slug}/registration_sequences",
-            match_paths: ["/o/#{slug}/registration_sequences/**", "/o/#{slug}/registration_sequence_pages/**"])
+          link_item("Education courses", "/o/#{slug}/education_courses",
+            match_paths: ["/o/#{slug}/education_courses/**", "/o/#{slug}/education_course_pages/**"])
         ])
       end
     end

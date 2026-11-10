@@ -3,7 +3,7 @@
 <%# Shown while "Toggle data" is expanded; the label stays a content target, since a ui--collapse with none never closes %>
 <% data_column_classes = "tw:hidden tw:in-[[data-controller~=ui--collapse]:has([data-ui--collapse-target~=trigger][aria-expanded=true])]:table-cell" %>
 
-<%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
+<%= render(UI::Table::Base::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
   <% table.column(sortable: "email") do |mailchimp_datum| %>
     <%= render Atoms::Admin::TableCells::User::Component.new(user: mailchimp_datum.user, user_id: mailchimp_datum.user_id, email: mailchimp_datum.email) %>
   <% end %>

@@ -64,6 +64,11 @@ RSpec.describe Pages::Memberships::New::Component, type: :component do
     end
   end
 
+  it "states the live partner count" do
+    Counts.assign_for("organizations", 1_234)
+    expect(component).to have_text("The official registry for more than 1,200 police departments")
+  end
+
   context "with fewer than a million bikes" do
     let(:options) { super().merge(bikes_count: 456_789) }
 

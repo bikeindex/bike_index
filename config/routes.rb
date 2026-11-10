@@ -154,7 +154,6 @@ Rails.application.routes.draw do
     end
   end
   resource :my_account, only: %i[show update destroy] do
-    post :toggle_show_redesign
     resources :messages, only: %i[index show create], controller: "my_accounts/messages"
     resource :membership, only: %i[show], controller: "my_accounts/memberships"
     resources :marketplace_listings, only: %i[update], controller: "my_accounts/marketplace_listings"
@@ -198,6 +197,7 @@ Rails.application.routes.draw do
   get "registrations/*id", to: "registrations#show", constraints: {id: /r\W.*/i}, format: false
   resources :registrations, only: %i[new create show edit] do
     collection { get :embed }
+    member { post :update_legacy_view }
   end
 
   # Redesigned registration flow: quick start, then complete on-site or via email.
@@ -205,6 +205,7 @@ Rails.application.routes.draw do
   # ?step=1|2|report|3…|review|finished (and handles the emailed confirmation link)
   resource :register, only: %i[new create show update], controller: :register do
     get :embed
+    get :landing
     patch :report
     patch :acknowledge
     # The emailed confirmation link, and the form it posts itself to
@@ -283,9 +284,9 @@ Rails.application.routes.draw do
       end
     end
 
+    get "bikes/duplicates", to: redirect("/admin/duplicate_bikes?search_view=segments")
     resources :bikes do
       collection do
-        get :duplicates
         put :ignore_duplicate_toggle
         get :missing_manufacturer
         post :update_manufacturers
@@ -298,6 +299,7 @@ Rails.application.routes.draw do
         put :undelete
       end
     end
+    resources :duplicate_bikes, only: %i[index show]
     get "credibility_badges", to: "dashboard#credibility_badges"
     get "maintenance", to: "dashboard#maintenance"
     get "scheduled_jobs", to: "dashboard#scheduled_jobs"
@@ -345,11 +347,11 @@ Rails.application.routes.draw do
 
     resources :theft_alert_plans, only: %i[index edit update new create]
 
-    resources :registration_sequences, only: %i[index create show edit update destroy] do
+    resources :education_courses, only: %i[index create show edit update destroy] do
       member { get :preview }
-      resources :pages, only: %i[new create], controller: "registration_sequence_pages"
+      resources :pages, only: %i[new create], controller: "education_course_pages"
     end
-    resources :registration_sequence_pages, only: %i[edit update destroy]
+    resources :education_course_pages, only: %i[edit update destroy]
 
     resources :bug_reports, only: %i[index show update] do
       collection do
@@ -547,10 +549,10 @@ Rails.application.routes.draw do
     end
     resource :manage_impounding
     resources :users, except: %i[show]
-    resources :registration_sequences, only: %i[index create show edit update destroy] do
-      resources :pages, only: %i[new create], controller: "registration_sequence_pages"
+    resources :education_courses, only: %i[index create show edit update destroy] do
+      resources :pages, only: %i[new create], controller: "education_course_pages"
     end
-    resources :registration_sequence_pages, only: %i[edit update destroy]
+    resources :education_course_pages, only: %i[edit update destroy]
   end
 
   # This is the public organizations section
@@ -561,6 +563,10 @@ Rails.application.routes.draw do
   # old search URLs to new search URLs
   get "/bikes", to: redirect("search/registrations")
   get "/marketplace", to: redirect("search/marketplace")
+
+  # registration sequences became education courses
+  get "*path", to: redirect { |_params, request| request.fullpath.sub("registration_sequence", "education_course") },
+    constraints: {path: %r{(?:admin|o/[^/]+)/registration_sequence.*}}, format: false
 
   # Short bike URLs: /r/<short_id> (and /R/...). The whole path is passed through
   # so ShortId#decode strips the "r/" prefix itself, even when the body starts with "r".

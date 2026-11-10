@@ -12,6 +12,9 @@ RSpec.describe Organized::ManagesController, type: :request do
       expect(session[:passive_organization_id]).to eq current_organization.id
       expect(flash[:notice]).to be_present
       expect(response).to redirect_to(new_session_path)
+
+      follow_redirect!
+      expect(session[:passive_organization_id]).to eq current_organization.id
     end
 
     context "organization has passwordless_users" do

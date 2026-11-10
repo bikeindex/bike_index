@@ -130,7 +130,7 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
       expect(instance.panel_labels[:created_at_cell]).to eq "Time - Registered"
       expect(instance.panel_labels[:updated_at_cell]).to eq "Time - Registration Updated"
       expect(instance.panel_labels[:occurred_at_cell]).to eq "Time - Status"
-      expect(instance.panel_labels[:acknowledgment_cell]).to eq "Time - Registration sequence acknowledged"
+      expect(instance.panel_labels[:acknowledgment_cell]).to eq "Time - Education course acknowledged"
       expect(instance.column_renames[:created_at_cell]).to eq "Registered"
       expect(instance.panel_labels[:color_cell]).to eq "Color"
     end

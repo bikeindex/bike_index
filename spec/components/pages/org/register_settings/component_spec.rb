@@ -17,8 +17,8 @@ RSpec.describe Pages::Org::RegisterSettings::Component, type: :component do
     expect(switches.css("input[type=checkbox][checked]")).to be_empty
   end
 
-  context "with an active registration sequence, and both set" do
-    let!(:sequence) { FactoryBot.create(:registration_sequence_active, :with_pages, organization:) }
+  context "with an active education course, and both set" do
+    let!(:sequence) { FactoryBot.create(:education_course_active, :with_pages, organization:) }
     let(:options) { {organization:, old_view: true, single_page: true, separate_attestation: true} }
 
     it "offers the separate attestation switch as well, checking all three" do

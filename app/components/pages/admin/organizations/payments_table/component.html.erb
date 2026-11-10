@@ -1,6 +1,6 @@
 <% organization_id = @organization.to_param %>
 
-<%= render(UI::Table::Component.new(records: payments)) do |table| %>
+<%= render(UI::Table::Base::Component.new(records: payments)) do |table| %>
   <% table.column(label: "Paid at") do |payment| %>
     <%= link_to edit_admin_payment_path(payment), class: "twlink" do %>
       <%= render(UI::Time::Component.new(time: payment.created_at)) %>

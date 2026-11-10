@@ -45,7 +45,7 @@ module Emails
 
       def rules_owed? = pending_acknowledgment.present?
 
-      def rules_organization = pending_acknowledgment.registration_sequence.organization
+      def rules_organization = pending_acknowledgment.education_course.organization
 
       def organization_snippet_body
         organization&.mail_snippet_body("partial_registration", time: snippet_time)

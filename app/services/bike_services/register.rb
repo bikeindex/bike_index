@@ -124,29 +124,29 @@ module BikeServices
     # template: false is the legacy forms, which pass on only an organization's own rules.
     # motorized: the single page asks what an e-vehicle would get, before it's said it's one.
     # Checked first - it's in memory, and creation_organization is a query
-    def registration_sequence(b_param, separate_attestation: false, user: nil, motorized: b_param.motorized?, template: true)
+    def education_course(b_param, separate_attestation: false, user: nil, motorized: b_param.motorized?, template: true)
       return nil unless motorized
       # Left to the owner, so this flow has none - create_bike holds the bike for them to agree
       return nil if separate_attestation && !b_param.self_made?(user)
 
       organization = b_param.creation_organization
-      started_id = b_param.params.dig("registration_sequence", "id")
-      sequence = (RegistrationSequence.find_by(id: started_id, organization_id: [organization&.id, nil]) if started_id.present?) ||
-        RegistrationSequence.active_or_template_for(organization)
+      started_id = b_param.params.dig("education_course", "id")
+      sequence = (EducationCourse.find_by(id: started_id, organization_id: [organization&.id, nil]) if started_id.present?) ||
+        EducationCourse.active_or_template_for(organization)
       return sequence unless sequence&.template?
       return sequence if template && template_applies?(b_param, user)
 
-      RegistrationSequence.active_for(organization) if organization.present?
+      EducationCourse.active_for(organization) if organization.present?
     end
 
-    # registration_sequence for a link back into the flow, and whether the rules restarted:
+    # education_course for a link back into the flow, and whether the rules restarted:
     # resuming starts over on the organization's current version rather than finishing one
     # it's replaced since. An agreement already made stands
-    def resume_registration_sequence(b_param, sequence:)
+    def resume_education_course(b_param, sequence:)
       return [sequence, false] if sequence.blank? || sequence.active? || acknowledged?(b_param, sequence:)
 
-      b_param.update(params: b_param.params.except("registration_sequence"))
-      [registration_sequence(b_param), true]
+      b_param.update(params: b_param.params.except("education_course"))
+      [education_course(b_param), true]
     end
 
     # The step to show: finished once the bike exists (or it's awaiting the email),
@@ -172,7 +172,7 @@ module BikeServices
     # cloning it. to_a: callers ask for count/any?/[] repeatedly, and a CollectionProxy re-queries
     # for each of them
     def sequence_pages(sequence)
-      pages = sequence&.registration_sequence_pages&.to_a || []
+      pages = sequence&.education_course_pages&.to_a || []
       sequence&.template? ? pages.reject(&:organization_specific) : pages
     end
 
@@ -189,9 +189,9 @@ module BikeServices
     # The template is only ever for the registrant's own, so it's decided the same way
     def motorized_review(b_param, flow, separate_attestation:)
       return false unless flow.single_page?
-      return (separate_attestation ? :own_emails : true) if registration_sequence(b_param, motorized: true, template: false).present?
+      return (separate_attestation ? :own_emails : true) if education_course(b_param, motorized: true, template: false).present?
 
-      RegistrationSequence.active_template.present? ? :own_emails : false
+      EducationCourse.active_template.present? ? :own_emails : false
     end
 
     # Whether the flow includes the report step - what was stolen, or what was found
@@ -202,13 +202,13 @@ module BikeServices
 
     # Nothing to agree to without a sequence, otherwise the acknowledgment record
     def acknowledged?(b_param, sequence:)
-      sequence_pages(sequence).none? || RegistrationSequenceAcknowledgment.acknowledged.exists?(b_param_id: b_param.id)
+      sequence_pages(sequence).none? || EducationCourseAcknowledgment.acknowledged.exists?(b_param_id: b_param.id)
     end
 
     # Which pages have been acknowledged so far. In-flight progress, so it lives on
     # the b_param alongside the rest of the wizard's state
     def acknowledged_page_ids(b_param)
-      b_param.params.dig("registration_sequence", "acknowledged_page_ids") || []
+      b_param.params.dig("education_course", "acknowledged_page_ids") || []
     end
 
     # All or nothing: a page is only acknowledged with every one of its rules checked
@@ -220,8 +220,8 @@ module BikeServices
         !agreed.all? { Binxtils::InputNormalizer.boolean(it) }
 
       # id alongside the pages, so the acknowledged ids are unambiguously scoped
-      b_param.clean_params({registration_sequence: {id: page.registration_sequence_id,
-                                                    acknowledged_page_ids: (acknowledged_page_ids(b_param) + [page.id]).uniq}}.as_json)
+      b_param.clean_params({education_course: {id: page.education_course_id,
+                                               acknowledged_page_ids: (acknowledged_page_ids(b_param) + [page.id]).uniq}}.as_json)
       b_param.save
     end
 
@@ -238,7 +238,7 @@ module BikeServices
       return false unless Binxtils::InputNormalizer.boolean(acknowledged_all) && sequence.present?
       return true if acknowledged?(b_param, sequence:)
 
-      RegistrationSequenceAcknowledgment.acknowledge(b_param, sequence:, user:)
+      EducationCourseAcknowledgment.acknowledge(b_param, sequence:, user:)
     end
 
     # The bike exists with its rules agreed to, or everything reachable is entered and awaiting
@@ -401,8 +401,8 @@ module BikeServices
 
     # An agreement to one organization's rules says nothing about another's
     def restart_rules(b_param)
-      b_param.params = b_param.params.except("registration_sequence")
-      RegistrationSequenceAcknowledgment.where(b_param_id: b_param.id).destroy_all
+      b_param.params = b_param.params.except("education_course")
+      EducationCourseAcknowledgment.where(b_param_id: b_param.id).destroy_all
     end
 
     # Whether a bike registered some other way is this registration's. Step 1 says only
@@ -481,7 +481,7 @@ module BikeServices
     # The switches ride to the ownership's registration_info, so registrations can be counted by them
     def create_bike(b_param, sequence:, ip_address:, rules_to_owner: false)
       b_param.creator_id ||= confirmed_email_creator_id(b_param)
-      owners_sequence = registration_sequence(b_param, template: !rules_to_owner) if sequence.blank? &&
+      owners_sequence = education_course(b_param, template: !rules_to_owner) if sequence.blank? &&
         (rules_to_owner || b_param.rules_left_to_owner?(b_param.creator))
       b_param.params = b_param.params.deep_merge("bike" => {
         "register_single_page" => b_param.params["register_single_page"],
@@ -489,7 +489,7 @@ module BikeServices
       })
       owed = sequence || owners_sequence
       # Ahead of the bike, so the ownership it creates holds its email back
-      pending = RegistrationSequenceAcknowledgment.create_pending(b_param, sequence: owed) unless acknowledged?(b_param, sequence: owed)
+      pending = EducationCourseAcknowledgment.create_pending(b_param, sequence: owed) unless acknowledged?(b_param, sequence: owed)
       bike = BikeServices::Creator.new(ip_address:).create_bike(b_param)
       if bike.id.blank?
         pending&.destroy
@@ -497,7 +497,7 @@ module BikeServices
       end
 
       # The bike is what the acknowledgment hangs off once the b_param is swept
-      acknowledgment = pending || RegistrationSequenceAcknowledgment.find_by(b_param_id: b_param.id)
+      acknowledgment = pending || EducationCourseAcknowledgment.find_by(b_param_id: b_param.id)
       acknowledgment&.update(bike_id: bike.id, user_id: acknowledgment.user_id || b_param.creator_id)
       return bike if pending.blank?
       return if owners_sequence.blank?
