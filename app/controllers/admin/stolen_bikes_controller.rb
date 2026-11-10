@@ -27,8 +27,7 @@ module Admin
     end
 
     def bulk_update
-      selected = params[:sr_selected].respond_to?(:keys) ? params[:sr_selected].keys : Array(params[:sr_selected])
-      stolen_records = StolenRecord.unscoped.where(id: selected)
+      stolen_records = StolenRecord.unscoped.where(id: selected_ids(:sr_selected))
       if stolen_records.none?
         flash[:error] = "No stolen records selected!"
       elsif BULK_ACTIONS.include?(params[:bulk_action])
@@ -110,8 +109,10 @@ module Admin
       @only_without_location = Binxtils::InputNormalizer.boolean(params[:search_without_location])
       if @unapproved_only
         available_stolen_records = StolenRecord.current.unapproved
-        unless @only_without_location
-          @unapproved_without_location_count = available_stolen_records.without_street.count
+        if @only_without_location
+          available_stolen_records = available_stolen_records.without_location
+        else
+          @unapproved_without_location_count = available_stolen_records.without_location.count
           available_stolen_records = available_stolen_records.with_location
         end
       else
@@ -132,11 +133,6 @@ module Admin
     end
 
     private
-
-    def require_index_admin!
-      ability = BULK_ACTIONS.dig(params[:bulk_action], :ability) if action_name == "bulk_update"
-      ability ? super(**ability) : super
-    end
 
     # Each returns how many it changed
     def bulk_approve(stolen_records)

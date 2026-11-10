@@ -1,5 +1,5 @@
 import { Controller } from '@hotwired/stimulus'
-/* global ResizeObserver */
+/* global CSS, ResizeObserver */
 
 // Connects to data-controller='ui--forms--combobox-display'
 // (rendered by UI::Forms::Combobox rich_display:)
@@ -78,14 +78,11 @@ export default class extends Controller {
     this.reposition()
   }
 
-  // Matched on the attribute rather than a `[data-value="…"]` selector, which a
-  // value containing a quote would make invalid (see utils/hw_combobox_patch.js)
   selectedOption () {
     const value = this.hiddenField?.value
     if (!value) return null
 
-    return [...this.element.querySelectorAll('[role="option"]')]
-      .find((option) => option.dataset.value === value)
+    return this.element.querySelector(`[role="option"][data-value="${CSS.escape(value)}"]`)
   }
 
   reposition () {

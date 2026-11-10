@@ -66,17 +66,12 @@ $border-radius-sm: 1px;
 @import 'bootstrap/grid';
 @import 'bootstrap/tables';
 
-.table-compact-long {
-  line-height: 1.2em;
-}
-
 @import 'bootstrap/forms';
 
 // @import "bootstrap/buttons"; // Override buttons with our own buttons
 
 // Components
 @import 'bootstrap/animation';
-@import 'bootstrap/dropdown';
 @import 'bootstrap/button-group';
 @import 'bootstrap/input-group';
 @import 'bootstrap/custom-forms';
@@ -323,28 +318,6 @@ body {
 
 .text-center {
   text-align: center;
-}
-
-.less-strong {
-  opacity: 0.65;
-  // Couldn't get & + input to work, so manually specifying the applicable element classes
-  a:hover,
-  & + a:hover,
-  .btn:hover,
-  &.btn:hover,
-  .btn:focus,
-  &.btn:focus,
-  .form-control:hover,
-  &.form-control:hover,
-  .form-control:focus,
-  &.form-control:focus {
-    opacity: 1;
-  }
-}
-
-.less-less-strong {
-  @extend .less-strong;
-  opacity: 0.4;
 }
 
 .gray-link {

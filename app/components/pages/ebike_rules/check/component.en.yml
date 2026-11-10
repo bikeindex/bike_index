@@ -1,0 +1,9 @@
+---
+en:
+  components:
+    pages:
+      ebike_rules:
+        check:
+          outside_checked_countries: >-
+            Bike checks cover US states and Canadian provinces for now. %{place}'s
+            e-bike laws are below.

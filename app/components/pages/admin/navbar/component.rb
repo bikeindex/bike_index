@@ -7,12 +7,9 @@ module Pages
       # preceded by an "All" link back to the active page's index when this isn't it.
       # Picking an option navigates -- see admin/navbar_controller.js.
       class Component < ApplicationComponent
-        # The vendored dump's .navbar-light .navbar-nav .nav-link, as utilities. admin.scss
-        # imports the dump unlayered, so it outranks every tailwind layer — dropping .nav-link
-        # is what lets a utility reach these links at all. Horizontal padding is the
-        # navbar-expand-md value, the only one the d-lg-flex list is ever visible at.
         NAV_LINK_CLASS = "tw:block tw:p-2 tw:no-underline tw:text-black/50 " \
-          "tw:hover:text-black/70 tw:focus:text-black/70 tw:is-active:text-black/90"
+          "tw:hover:text-black/70 tw:focus:text-black/70 tw:is-active:text-black/90 " \
+          "tw:dark:text-white/50 tw:dark:hover:text-white/70 tw:dark:focus:text-white/70 tw:is-active:dark:text-white/90"
 
         def initialize(current_user:, user_root_url:, search_filtered: false)
           @current_user = current_user
@@ -132,7 +129,8 @@ module Pages
             {title: "Memberships", path: admin_memberships_path},
             {title: "Payments", path: admin_payments_path},
             {title: "Organization Features", path: admin_organization_features_path},
-            {title: "Registration Sequences", path: admin_registration_sequences_path},
+            {title: "Education Courses", path: admin_education_courses_path},
+            {title: "Education Course Acknowledgments", path: admin_education_course_acknowledgments_path},
             # An organization's invoices are the same section, on a path nested under theirs
             {title: "Invoices", path: admin_invoices_path(query: "active", direction: "asc", sort: "subscription_end_at"),
              match_paths: ["#{admin_invoices_path}/**", "#{admin_organizations_path}/*/invoices"]},
@@ -148,6 +146,7 @@ module Pages
             {title: "Maintenance", path: admin_maintenance_path, exact: true},
             {title: "Partial Bikes", path: admin_b_params_path},
             {title: "Component Types", path: admin_ctypes_path},
+            {title: "Cycle Types", path: admin_cycle_types_path},
             {title: "Graphs", path: admin_graphs_path},
             {title: "Paints", path: admin_paints_path},
             {title: "Feedback & Messages", path: admin_feedbacks_path},
@@ -158,7 +157,7 @@ module Pages
             {title: "Sticker Updates", path: admin_bike_sticker_updates_path},
             {title: "Exports", path: admin_exports_path},
             {title: "Bulk Imports", path: admin_bulk_imports_path},
-            {title: "Duplicate Bikes", path: duplicates_admin_bikes_path, exact: true},
+            {title: "Duplicate Bikes", path: admin_duplicate_bikes_path},
             {title: "Model Audits", path: admin_model_audits_path},
             {title: "Marketplace Listings", path: admin_marketplace_listings_path},
             {title: "Marketplace Messages", path: admin_marketplace_messages_path},

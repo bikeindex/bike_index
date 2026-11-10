@@ -11,7 +11,7 @@ window.canonicalHtml = (html) => {
   const attribute = ({ name, value }) => {
     if (name === 'class') value = [...new Set(value.split(/\s+/).filter(Boolean))].sort().join(' ')
     // tooltip and option ids are random on both sides
-    value = value.replace(/tooltip-[\da-f]{8}|[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}/g, (id) => {
+    value = value.replace(/(?:tooltip-)?[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}|tooltip-[\da-f]{8}/g, (id) => {
       if (!ids.has(id)) ids.set(id, `id-${ids.size}`)
       return ids.get(id)
     })

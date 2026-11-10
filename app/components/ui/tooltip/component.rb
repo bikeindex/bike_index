@@ -12,7 +12,7 @@ module UI
 
       BUTTON_CLASS = "keep-with-previous tw:inline-flex tw:items-center tw:justify-center tw:h-4 tw:w-4 tw:rounded-full " \
         "tw:bg-gray-200 tw:text-gray-700 tw:hover:bg-gray-300 " \
-        "tw:dark:bg-gray-700 tw:dark:text-gray-200 tw:dark:hover:bg-gray-600 " \
+        "tw:dark:bg-white/10 tw:dark:text-gray-200 tw:dark:hover:bg-white/20 " \
         "tw:text-2xs tw:font-bold tw:cursor-help " \
         "tw:focus:outline-none tw:focus:ring-3 tw:focus:ring-blue-500/40"
 
@@ -73,7 +73,7 @@ module UI
           id: tooltip_id,
           data: {"ui--tooltip-target": "tooltip"},
           class: "tw:twtext-color tw:hidden tw:pointer-events-none tw:whitespace-normal tw:w-max tw:max-w-[min(24rem,90vw)] tw:rounded tw:text-left " \
-            "tw:px-2 tw:py-1 tw:font-sans tw:text-xs tw:font-normal tw:normal-case tw:border tw:shadow-lg tw:z-50 #{SURFACE_CLASS}"
+            "tw:px-2 tw:py-1 tw:font-sans tw:text-xs tw:font-normal tw:normal-case tw:border tw:shadow-lg #{SURFACE_CLASS}"
         )
       end
 

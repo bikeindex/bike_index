@@ -8,7 +8,7 @@ module Admin
     # The Pages::Admin::Bikes::Tabs tabs show renders; the rest are other controllers' screens
     SHOW_TABS = %w[duplicates messages ownerships stickers recoveries impound].freeze
 
-    before_action :find_bike, only: %i[edit update show]
+    before_action :find_bike, only: %i[edit update show undelete]
     before_action :set_period, only: %i[index missing_manufacturer]
     around_action :set_reading_role, only: %i[index show missing_manufacturer]
 
@@ -52,17 +52,6 @@ module Admin
       redirect_back(fallback_location: root_url)
     end
 
-    def duplicates
-      duplicate_groups = if params[:show_ignored]
-        DuplicateBikeGroup.order("created_at desc")
-      else
-        DuplicateBikeGroup.unignored.order("created_at desc")
-      end
-      @per_page = permitted_per_page
-      @duplicate_groups_count = duplicate_groups.size
-      @pagy, @duplicate_groups = pagy(:countish, duplicate_groups, limit: @per_page, page: permitted_page)
-    end
-
     def ignore_duplicate_toggle
       duplicate_bike_group = DuplicateBikeGroup.find(params[:id])
       duplicate_bike_group.ignore = !duplicate_bike_group.ignore
@@ -77,7 +66,7 @@ module Admin
 
     def get_destroy
       if params[:id] == "multi_delete"
-        bike_ids = params[:bikes_selected].respond_to?(:keys) ? params[:bikes_selected].keys : Array(params[:bikes_selected])
+        bike_ids = selected_ids(:bikes_selected)
         if bike_ids.any?
           bike_ids.each { |id| BikeJobs::BikeDeleterJob.perform_async(id.to_i, false, current_user.id) }
           flash[:success] = "#{bike_ids.count} #{"bike".pluralize(bike_ids.count)} deleted!"
@@ -88,6 +77,14 @@ module Admin
       else
         destroy_bike
       end
+    end
+
+    def undelete
+      # restore writes with update_columns, skipping the save callbacks
+      @bike.restore
+      CallbackJobs::AfterBikeSaveJob.perform_async(@bike.id)
+      flash[:success] = "#{@bike.type_titleize} un-deleted!"
+      redirect_to edit_admin_bike_url(@bike)
     end
 
     def show
@@ -165,7 +162,7 @@ module Admin
     end
 
     def sortable_columns
-      %w[id owner_email manufacturer_id updated_by_user_at]
+      %w[id owner_email manufacturer_id updated_by_user_at occurred_at propulsion_type]
     end
 
     def permitted_parameters
@@ -198,7 +195,7 @@ module Admin
 
     def matching_bikes
       bikes = if params[:user_id].present?
-        user_subject&.bikes
+        Bike.unscoped.current_owner(user_subject.id)
       elsif params[:search_phone].present?
         Bike.search_phone(params[:search_phone])
       else

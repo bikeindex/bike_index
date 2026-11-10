@@ -49,7 +49,7 @@ module Pages
           end
 
           def acknowledged_bike
-            org_bikes.where(id: ::RegistrationSequenceAcknowledgment.for_organization(lookbook_organization).select(:bike_id)).last
+            org_bikes.where(id: ::EducationCourseAcknowledgment.for_organization(lookbook_organization).select(:bike_id)).last
           end
 
           def other_bike

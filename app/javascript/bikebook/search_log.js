@@ -2,7 +2,7 @@ import { FILTERS, toQuery } from 'bikebook/query'
 
 const LOGGED = [...FILTERS, 'vehicle_models', 'q', 'count']
 // A search is what it asks for, apart from its order and the jurisdiction whose classes it shows
-const SEARCHED = LOGGED.filter((name) => !['jurisdiction', 'year_dir', 'price_dir', 'count'].includes(name))
+const SEARCHED = LOGGED.filter((name) => !['jurisdiction', 'sort', 'year_dir', 'price_dir', 'count'].includes(name))
 const SETTLE_MS = 1000
 
 // Reports the searches the browser runs to the server's search logs, a typed one once it settles

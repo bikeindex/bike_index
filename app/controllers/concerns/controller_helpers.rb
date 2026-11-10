@@ -19,7 +19,7 @@ module ControllerHelpers
       :page_id, :default_bike_search_path, :every_bike_search_path, :bikehub_url, :show_general_alert,
       :display_dev_info?, :current_country_id, :current_currency, :turbo_request?,
       :render_donation_request?, :old_register_view?, :sort_state, :admin_index_state, :metric_units?,
-      :search_distance_unit
+      :search_distance_unit, :request_location_hash
     before_action :enable_rack_profiler
 
     before_action do
@@ -368,7 +368,9 @@ module ControllerHelpers
     if session[:passive_organization_id].present?
       return @passive_organization = nil if session[:passive_organization_id].to_i == 0
 
-      @passive_organization = Organization.friendly_find(session[:passive_organization_id])
+      organization = Organization.friendly_find(session[:passive_organization_id])
+      # A signed in user can lose the membership the session still names
+      @passive_organization = organization if current_user.blank? || current_user.member_of?(organization)
     end
     @passive_organization ||= set_passive_organization(OrganizationRole.default_organization(current_user))
   end
@@ -478,7 +480,8 @@ module ControllerHelpers
   end
 
   def invalid_return_to?(target)
-    return true if target.blank?
+    # The session is a cookie, which overflows past 4KB
+    return true if target.blank? || target.length > 2000
 
     # return_to can't be a sign in/up page, or we'll loop
     ["/users/new", "/session/new", "/session/magic_link", "/integrations", "/users/please_confirm_email"].any? { |r| target.match?(r) }

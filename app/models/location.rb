@@ -59,13 +59,6 @@ class Location < ApplicationRecord
     Location.where(organization_id: organization_id).where.not(id: id)
   end
 
-  # Override AddressRecorded delegation to fall back to legacy fields
-  def address_present?
-    return address_record.address_present? if address_record?
-
-    [street, city, zipcode].any?(&:present?)
-  end
-
   def find_or_build_address_record(current_country_id: nil)
     return address_record if address_record?
 

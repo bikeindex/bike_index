@@ -27,6 +27,20 @@ RSpec.describe Admin::StolenBikesController, type: :request do
         expect(assigns(:stolen_records)).to match_array([])
       end
 
+      context "with a stolen record without a location" do
+        let!(:stolen_record_without_location) do
+          FactoryBot.create(:stolen_bike, latitude: nil, longitude: nil).current_stolen_record
+        end
+        it "counts and lists it separately" do
+          expect(stolen_record_without_location.latitude).to be_nil
+          get base_url
+          expect(assigns(:stolen_records)).to match_array([stolen_record])
+          expect(assigns(:unapproved_without_location_count)).to eq 1
+          get "#{base_url}?search_without_location=true"
+          expect(assigns(:stolen_records)).to match_array([stolen_record_without_location])
+        end
+      end
+
       context "with a period" do
         it "narrows by it" do
           stolen_record.update_column :created_at, 1.month.ago
@@ -147,7 +161,7 @@ RSpec.describe Admin::StolenBikesController, type: :request do
         expect(stolen_record.reload.approved).to be_falsey
         expect(stolen_record2.approved).to be_falsey
         Sidekiq::Job.clear_all
-        post "#{base_url}/bulk_update", params: {sr_selected:, bulk_action: "approve"}
+        patch "#{base_url}/bulk_update", params: {sr_selected:, bulk_action: "approve"}
         expect(stolen_record.reload.approved).to be_truthy
         expect(stolen_record2.reload.approved).to be_truthy
         # Sanity check!
@@ -157,7 +171,7 @@ RSpec.describe Admin::StolenBikesController, type: :request do
       end
 
       it "marks the bikes spam" do
-        post "#{base_url}/bulk_update", params: {sr_selected:, bulk_action: "spam"}
+        patch "#{base_url}/bulk_update", params: {sr_selected:, bulk_action: "spam"}
         expect(flash[:success]).to eq "2 stolen bikes marked spam"
         expect(Bike.unscoped.find(bike.id).likely_spam).to be_truthy
         expect(Bike.unscoped.find(stolen_record2.bike_id).likely_spam).to be_truthy
@@ -165,7 +179,7 @@ RSpec.describe Admin::StolenBikesController, type: :request do
       end
 
       it "deletes the bikes" do
-        post "#{base_url}/bulk_update", params: {sr_selected:, bulk_action: "delete"}
+        patch "#{base_url}/bulk_update", params: {sr_selected:, bulk_action: "delete"}
         expect(flash[:success]).to eq "2 stolen bikes deleted"
         expect(Bike.unscoped.find(bike.id).deleted_at).to be_present
         expect(Bike.unscoped.find(stolen_record2.bike_id).deleted_at).to be_present
@@ -174,7 +188,7 @@ RSpec.describe Admin::StolenBikesController, type: :request do
 
       context "with sr_selected as an array" do
         it "approves them" do
-          post "#{base_url}/bulk_update", params: {sr_selected: [stolen_record.id, stolen_record2.id], bulk_action: "approve"}
+          patch "#{base_url}/bulk_update", params: {sr_selected: [stolen_record.id, stolen_record2.id], bulk_action: "approve"}
           expect(flash[:success]).to eq "2 stolen bikes approved"
           expect(stolen_record.reload.approved).to be_truthy
         end
@@ -182,14 +196,14 @@ RSpec.describe Admin::StolenBikesController, type: :request do
 
       context "nothing selected" do
         it "flashes an error" do
-          post "#{base_url}/bulk_update", params: {bulk_action: "approve"}
+          patch "#{base_url}/bulk_update", params: {bulk_action: "approve"}
           expect(flash[:error]).to be_present
         end
       end
 
       context "unknown action" do
         it "flashes an error" do
-          post "#{base_url}/bulk_update", params: {sr_selected:, bulk_action: "destroy_all"}
+          patch "#{base_url}/bulk_update", params: {sr_selected:, bulk_action: "destroy_all"}
           expect(flash[:error]).to be_present
           expect(stolen_record.reload.approved).to be_falsey
         end
@@ -202,11 +216,11 @@ RSpec.describe Admin::StolenBikesController, type: :request do
       let(:sr_selected) { {stolen_record.id => stolen_record.id} }
 
       it "bulk approves, but doesn't delete" do
-        post "#{base_url}/bulk_update", params: {sr_selected:, bulk_action: "approve"}
+        patch "#{base_url}/bulk_update", params: {sr_selected:, bulk_action: "approve"}
         expect(flash[:success]).to eq "1 stolen bike approved"
         expect(stolen_record.reload.approved).to be_truthy
 
-        post "#{base_url}/bulk_update", params: {sr_selected:, bulk_action: "delete"}
+        patch "#{base_url}/bulk_update", params: {sr_selected:, bulk_action: "delete"}
         expect(flash[:error]).to match(/administrator/)
         expect(bike.reload.deleted_at).to be_blank
       end

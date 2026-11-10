@@ -49,27 +49,6 @@ RSpec.describe BParam, type: :model do
     end
   end
 
-  describe "stolen_attrs" do
-    context "legacy attribute names" do
-      let(:b_param) { BParam.new(params: {stolen_record: {address: "100 Main St", zipcode: "60622", state_id: 12}}) }
-      it "renames to the current attributes" do
-        expect(b_param.stolen_attrs).to eq({"street" => "100 Main St", "postal_code" => "60622", "region_record_id" => 12})
-      end
-      context "nested in stolen_records_attributes" do
-        let(:b_param) { BParam.new(params: {bike: {stolen_records_attributes: {"0" => {zipcode: "60622", street: "100 Main St"}}}}) }
-        it "renames to the current attributes" do
-          expect(b_param.stolen_attrs).to eq({"street" => "100 Main St", "postal_code" => "60622"})
-        end
-      end
-      context "with both legacy and current names" do
-        let(:b_param) { BParam.new(params: {stolen_record: {zipcode: "60622", postal_code: "10007"}}) }
-        it "prefers the current name" do
-          expect(b_param.stolen_attrs).to eq({"postal_code" => "10007"})
-        end
-      end
-    end
-  end
-
   describe "clean_params" do
     context "passed params" do
       it "calls the things we want it to call" do
@@ -932,7 +911,7 @@ RSpec.describe BParam, type: :model do
       end
 
       context "with the safety rules still to agree to" do
-        let!(:acknowledgment) { FactoryBot.create(:registration_sequence_acknowledgment_pending, b_param:) }
+        let!(:acknowledgment) { FactoryBot.create(:education_course_acknowledgment_pending, b_param:) }
 
         it "alerts until they're agreed to" do
           b_param.update(created_bike_id: FactoryBot.create(:bike).id)

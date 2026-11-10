@@ -7,6 +7,11 @@ RSpec.describe EmailNormalizer do
         expect(EmailNormalizer.normalize(" awesome@stuff.COM \t")).to eq "awesome@stuff.com"
       end
     end
+    context "null byte" do
+      it "strips it" do
+        expect(EmailNormalizer.normalize("Awesome\u0000@stuff.com")).to eq "awesome@stuff.com"
+      end
+    end
     context "nil" do
       it "doesn't break on nil" do
         expect(EmailNormalizer.normalize).to be_nil

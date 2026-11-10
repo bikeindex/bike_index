@@ -1,25 +1,28 @@
 import { Controller } from '@hotwired/stimulus'
 import { Turbo } from '@hotwired/turbo-rails'
-import { CatalogComboboxSource, loadCatalog } from 'bikebook/catalog'
+import { CURRENT_MARK, CatalogComboboxSource, loadCatalog } from 'bikebook/catalog'
 import { localSources } from 'utils/hw_combobox_patch'
-import { replaceUrl } from 'bikebook/replace_url'
+import { readable, replaceUrl } from 'bikebook/replace_url'
+import { collapseField, COLLAPSE_DURATION_MS } from 'utils/collapse_utils'
 
 const RESULT_FRAME = 'ebike-rules-check'
 const CLASSES_FRAME = 'ebike-rules-classes'
-const DETAILS = ['manual', 'top_speed', 'throttle', 'watts']
+const DETAILS = ['manual', 'top_speed', 'throttle', 'throttle_speed', 'watts']
 
 // Connects to data-controller='ebike-rules--lookup'
 // The bike field is a stand-in until the catalog loads, since the combobox must have its source
-// before it connects, and stays one if the catalog fails, leaving the details. Each state has its own
-// page, so the state is the form's path rather than a field. There's no submit button: a pick or a
-// change to the details loads its check into the result frame, advancing the URL to the check's own.
+// before it connects, and stays one if the catalog fails, leaving the details. Each place has its own
+// page, so the place is the form's path rather than a field. There's no submit button: a pick or a
+// change to the details loads its check into the result frame, replacing the URL with the check's own.
 // The form's data-details says which the check is of: a picked "model", whose details its check copies
 // into the panel; "custom" details changed from the model's; or "manual" details with no model
 export default class extends Controller {
-  static targets = ['combobox', 'comboboxSlot', 'state', 'stateNote', 'stateNeeded', 'manual', 'legend']
-  static values = { manifestUrl: String, path: String, display: String, failedText: String, title: String, legend: String, modelLegend: String }
+  static targets = ['combobox', 'comboboxSlot', 'state', 'stateNote', 'stateNeeded', 'stateChoose', 'manual', 'throttleSpeed', 'legend']
+  static values = { manifestUrl: String, path: String, countryPath: String, display: String, failedText: String, title: String, legend: String, modelLegend: String }
 
   async connect () {
+    delete this.throttleSpeedTarget.dataset.beforeCollapse
+    this.#collapseThrottleSpeed(0)
     this.lastUrl = window.location.href.split('#')[0]
     this.classesPath = window.location.pathname
     this.observers = [this.#watchCleared(this.#stateField, () => this.chooseState())]
@@ -46,13 +49,13 @@ export default class extends Controller {
     this.observers.forEach((observer) => observer.disconnect())
   }
 
-  // A check in the form comes along to the new state, whose page it loads even without one for its title;
-  // clearing the state leaves the check waiting for one
+  // A check in the form comes along to the new place, whose page it loads even without one for its title;
+  // clearing the place leaves the check waiting for one, on its country's page
   chooseState () {
-    const abbreviation = this.#stateField.value.toLowerCase()
-    this.element.action = abbreviation ? `${this.pathValue}/${abbreviation}` : this.pathValue
+    const code = this.#stateField.value
+    this.element.action = code ? `${this.pathValue}/${code.replace('-', '/')}` : this.countryPathValue
     this.#loadClasses()
-    if (!abbreviation) {
+    if (!code) {
       document.title = this.titleValue
       return this.#awaitState()
     }
@@ -60,26 +63,52 @@ export default class extends Controller {
     this.#visit(this.#checkUrl ?? this.element.action)
   }
 
+  // A place's link in the rules below picks it here, as its option would, rather than loading its page
+  checkInState (event) {
+    const link = event.target.closest('a[data-check-state]')
+    if (!link || event.metaKey || event.ctrlKey || event.shiftKey) return
+
+    event.preventDefault()
+    this.stateTarget.querySelector(`[role=option][data-value="${link.dataset.checkState}"]`).click()
+    this.chooseState()
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  // A pick, by an option's press or Enter, noted before the gem selects it: its selection event reads the same as the
+  // one it announces on connecting or on a blur
+  notePick ({ type, target }) {
+    this.picking = type === 'keydown' || Boolean(target.closest('[role=option]'))
+  }
+
+  // The gem announces a selection only when it changes, so a pick of the model already chosen - to return custom
+  // details to its own - is left for once the gem has handled the press
+  repick () {
+    const value = this.comboboxSlotTarget.querySelector('[data-hw-combobox-target=hiddenField]')?.value
+    if (this.picking && value === this.model) this.chooseBike({ detail: { value } })
+  }
+
   // The gem leaves the autocompleted part of a pick selected, and the catalog's "(current)" says
-  // nothing a picked model needs. It also announces the prefilled model on connecting, which keeps the
-  // page's custom details
+  // nothing a picked model needs. Its announcement keeps the page's custom details, which a pick of
+  // their model returns to its own
   chooseBike ({ detail } = {}) {
     const input = this.comboboxSlotTarget.querySelector('input[role=combobox]')
     if (detail?.value && input) {
-      input.value = input.value.replace(/ \(current\)$/, '')
+      input.value = input.value.replace(CURRENT_MARK, '')
       input.setSelectionRange(input.value.length, input.value.length)
     }
-    if (detail?.value && detail.value !== this.model) {
+    if (detail?.value && (detail.value !== this.model || this.picking)) {
       this.model = detail.value
       this.#setMode('model')
       // the pick's name, without the catalog's years
       this.legendTarget.textContent = this.modelLegendValue.replace('%{model}', input.value.replace(/ \([^)]*\)$/, ''))
     }
+    this.picking = false
     this.#check()
   }
 
   // Changing a picked model's details checks them instead
   checkDetails () {
+    this.#collapseThrottleSpeed()
     const watts = this.element.elements.watts
     if (!watts.checkValidity()) return watts.reportValidity()
 
@@ -91,10 +120,12 @@ export default class extends Controller {
     this.stateTarget.querySelector('input[role=combobox]').focus()
   }
 
-  // A frame load keeps the page's title, which names the state, and shows its verdict wherever it lands
+  // A frame load keeps the page's title, which names the state, and shows its verdict wherever it lands.
+  // Turbo re-escapes the check's URL on the way into history
   checkLoaded ({ target }) {
     if (target.id !== RESULT_FRAME) return
 
+    replaceUrl(new URL(window.location.href))
     const { pageTitle, bikeDetails } = target.querySelector('[data-page-title]')?.dataset ?? {}
     if (pageTitle) document.title = pageTitle
     if (this.#mode === 'model' && bikeDetails) this.#fill(JSON.parse(bikeDetails))
@@ -107,7 +138,7 @@ export default class extends Controller {
     fields.delete('state')
     if (this.#mode === 'model') DETAILS.forEach((name) => fields.delete(name))
     for (const [name, value] of [...fields]) if (value === '') fields.delete(name)
-    if (fields.get('vehicle_models') || fields.get('top_speed')) return `${this.element.action}?${new URLSearchParams(fields)}`
+    if (fields.get('vehicle_models') || fields.get('top_speed')) return readable(new URL(`${this.element.action}?${new URLSearchParams(fields)}`))
   }
 
   // Without a check left in the form - a cleared bike - there's nothing to ask the server for
@@ -124,10 +155,10 @@ export default class extends Controller {
     if (url === this.lastUrl) return
 
     this.lastUrl = url
-    Turbo.visit(url, { frame: RESULT_FRAME, action: 'advance' })
+    Turbo.visit(url, { frame: RESULT_FRAME, action: 'replace' })
   }
 
-  // A state's own classes, where it doesn't use the three. The gem announces a prefilled state on connecting,
+  // A place's own classes, where it doesn't use the three. The gem announces a prefilled place on connecting,
   // which is the page's own
   #loadClasses () {
     const path = new URL(this.element.action).pathname
@@ -141,7 +172,7 @@ export default class extends Controller {
   #awaitState () {
     const url = this.#checkUrl
     this.#leaveCheck(url ?? this.element.action)
-    if (!url) return this.stateNoteTarget.replaceChildren()
+    if (!url) return this.stateNoteTarget.replaceChildren(this.stateChooseTarget.content.cloneNode(true))
 
     // A model's details don't wait: without a state, its frame carries them and no check
     if (this.#mode === 'model') document.getElementById(RESULT_FRAME).src = url
@@ -176,10 +207,18 @@ export default class extends Controller {
 
   #fill (details) {
     const { elements } = this.element
-    for (const name of ['top_speed', 'throttle']) {
+    for (const name of ['top_speed', 'throttle', 'throttle_speed']) {
       for (const radio of elements[name]) radio.checked = radio.value === String(details[name])
     }
     elements.watts.value = details.watts ?? ''
+    this.#collapseThrottleSpeed()
+  }
+
+  // Sideways beside the throttle question; stacked under it on a phone, a width collapse wouldn't shrink the row
+  #collapseThrottleSpeed (duration = COLLAPSE_DURATION_MS) {
+    const field = this.throttleSpeedTarget
+    const direction = window.getComputedStyle(field.parentElement).flexDirection === 'row' ? 'horizontal' : 'vertical'
+    collapseField(field, this.element.elements.throttle.value === '1', duration, direction)
   }
 
   // A combobox handle's clear empties the field without a selection event, so the field itself is watched

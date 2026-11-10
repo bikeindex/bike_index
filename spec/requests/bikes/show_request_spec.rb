@@ -6,8 +6,12 @@ RSpec.describe "BikesController#show", type: :request do
   let(:ownership) { FactoryBot.create(:ownership) }
   let(:current_user) { ownership.creator }
   let(:bike) { ownership.bike }
-  # This is required by show, if it isn't present it raises ReadOnlyError
-  before { RearGearType.fixed }
+  # RearGearType is required by show, if it isn't present it raises ReadOnlyError.
+  # The redesign is the default, so opting out is what keeps this page reachable
+  before do
+    RearGearType.fixed
+    post update_legacy_view_registration_path(bike, show_legacy: true)
+  end
 
   context "example bike" do
     it "shows the bike" do
@@ -519,7 +523,7 @@ RSpec.describe "BikesController#show", type: :request do
         Sidekiq::Job.clear_all
         Sidekiq::Testing.inline! do
           put "#{base_url}/#{bike.id}/resolve_token?token=#{parking_notification.retrieval_link_token}&token_type=appears_abandoned_notification"
-          expect(flash[:success]).to be_present
+          expect(flash[:success]).to eq "Bike marked retrieved!"
         end
         # parking_notification_abandoned was marked retrieved - even though the token was for parking_notification
         expect(parking_notification_abandoned.reload.status).to eq "retrieved"
@@ -546,6 +550,45 @@ RSpec.describe "BikesController#show", type: :request do
       end
     end
   end
+  context "with organized impound_record, viewed by the owner" do
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
+    let(:current_user) { bike.user }
+    let(:organization) { FactoryBot.create(:organization, name: "Brakebills") }
+    let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, bike:, organization:) }
+    let(:alert) { Nokogiri::HTML(response.body).at_css("[role=alert]:has(h4)") }
+
+    it "renders the impounded alert" do
+      get "#{base_url}/#{bike.id}"
+      expect(response).to render_template(:show)
+      expect(alert.at_css("h4").text.strip).to eq "Your bike is currently impounded!"
+      expect(alert.text.squish).to match(/Impounded .+ by Brakebills\z/)
+      expect(alert.at_css(".localizeTime")).to be_present
+    end
+
+    context "impounded from a parking notification" do
+      let!(:parking_notification) { FactoryBot.create(:parking_notification_organized, bike:, organization:, impound_record:) }
+
+      it "includes the notification's address" do
+        get "#{base_url}/#{bike.id}"
+        expect(alert.text.squish).to match(/by Brakebills from #{Regexp.escape(parking_notification.formatted_address_string)}\z/)
+      end
+    end
+  end
+
+  context "with active parking_notification, viewed by the owner" do
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
+    let(:current_user) { bike.user }
+    let!(:parking_notification) { FactoryBot.create(:parking_notification_organized, bike:) }
+
+    it "renders the notifications alert, with a link to mark it retrieved" do
+      get "#{base_url}/#{bike.id}"
+      alert = Nokogiri::HTML(response.body).at_css("[role=alert]:has(h4)")
+      expect(alert.at_css("h4").text.strip).to eq "1 current notification for this bike!"
+      expect(alert.text.squish).to match "Have you retrieved this bike?"
+      expect(alert.at_css("a[href*='parking_notification_retrieved=#{parking_notification.reload.retrieval_link_token}']").text.strip).to eq "mark retrieved"
+    end
+  end
+
   context "with impound_record" do
     let(:impound_record) { FactoryBot.create(:impound_record, bike: bike) }
     let(:current_user) { FactoryBot.create(:user_confirmed) }
@@ -706,46 +749,64 @@ RSpec.describe "BikesController#show", type: :request do
       end
     end
   end
-  context "bike_show_redesign_toggle flag" do
-    it "renders the legacy page when the flag is disabled" do
+  context "not opted out of the redesign" do
+    before { post update_legacy_view_registration_path(bike, show_legacy: false) }
+
+    it "redirects the html page but still renders the qr code png" do
       get "#{base_url}/#{bike.id}"
-      expect(response).to render_template(:show)
+      expect(response).to redirect_to(registration_path(bike))
+
+      get "#{base_url}/#{bike.id}.png"
+      expect(response.status).to eq(200)
     end
 
-    context "flag enabled for the current user" do
-      before { Flipper.enable_actor(:bike_show_redesign_toggle, current_user) }
+    it "redirects with the query params, so scanned stickers aren't lost" do
+      get "#{base_url}/#{bike.id}?scanned_id=XD8888&organization_id=cool-org"
+      expect(response).to redirect_to(registration_path(bike, scanned_id: "XD8888", organization_id: "cool-org"))
+    end
 
-      it "redirects the html page but still renders the qr code png" do
+    it "redirects a Turbo submission, which asks for a turbo_stream" do
+      get "#{base_url}/#{bike.id}", headers: {"Accept" => "text/vnd.turbo-stream.html, text/html, application/xhtml+xml"}
+      expect(response).to redirect_to(registration_path(bike))
+    end
+
+    it "normalizes the id, rather than passing it along" do
+      get "#{base_url}/r/#{bike.id}"
+      expect(response).to redirect_to(registration_path(bike))
+
+      get "#{base_url}/embed"
+      expect(response).to redirect_to(registration_path("embed".to_i(36)))
+      follow_redirect!
+      expect(response.status).to eq 404
+
+      get "#{base_url}/r"
+      expect(response.status).to eq 404
+    end
+
+    it "lets a scanned sticker id through to its redirect" do
+      get "#{base_url}/scannedUC123?organization_id=cool-org"
+      expect(response).to redirect_to(scanned_bike_path("UC123", organization_id: "cool-org"))
+    end
+
+    context "signed out" do
+      let(:current_user) { nil }
+
+      it "redirects" do
         get "#{base_url}/#{bike.id}"
         expect(response).to redirect_to(registration_path(bike))
-
-        get "#{base_url}/#{bike.id}.png"
-        expect(response.status).to eq(200)
       end
 
-      it "redirects with the query params, so scanned stickers aren't lost" do
-        get "#{base_url}/#{bike.id}?scanned_id=XD8888&organization_id=cool-org"
-        expect(response).to redirect_to(registration_path(bike, scanned_id: "XD8888", organization_id: "cool-org"))
-      end
-
-      it "renders the legacy page when no_redesign is passed" do
-        get "#{base_url}/#{bike.id}?no_redesign=true"
-        expect(response).to render_template(:show)
-      end
-
-      context "user opted into the legacy view" do
-        before { current_user.update(feature_registration_show_legacy: true) }
-
+      context "session opted into the legacy view" do
         it "renders the legacy page" do
+          post update_legacy_view_registration_path(bike, show_legacy: true)
           get "#{base_url}/#{bike.id}"
           expect(response).to render_template(:show)
         end
       end
     end
 
-    context "flag enabled only for another user" do
-      let(:other_user) { FactoryBot.create(:user_confirmed) }
-      before { Flipper.enable_actor(:bike_show_redesign_toggle, other_user) }
+    context "user opted into the legacy view" do
+      before { current_user.update(feature_registration_show_legacy: true) }
 
       it "renders the legacy page" do
         get "#{base_url}/#{bike.id}"
@@ -850,6 +911,9 @@ RSpec.describe "BikesController#show", type: :request do
       expect(flash).to_not be_present
       expect(assigns(:bike_sticker)).to eq bike_sticker
       expect(current_user.authorized?(assigns(:bike_sticker))).to be_truthy
+      alert = Capybara.string(response.body).find("[role=alert]", text: "You scanned")
+      expect(alert).to have_text("assigned to this bike")
+      expect(alert).to have_css("form[action^='/bike_stickers/#{bike_sticker.code}'] input[name='bike_id']", visible: :all)
     end
 
     context "viewer isn't the bike owner" do
@@ -862,6 +926,8 @@ RSpec.describe "BikesController#show", type: :request do
         expect(flash).to_not be_present
         expect(assigns(:bike_sticker)).to eq bike_sticker
         expect(current_user.authorized?(assigns(:bike_sticker))).to be_falsey
+        alert = Capybara.string(response.body).find("[role=alert]", text: "You scanned")
+        expect(alert).to have_no_css("form", visible: :all)
       end
     end
   end

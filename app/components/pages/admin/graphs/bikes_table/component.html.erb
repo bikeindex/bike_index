@@ -3,7 +3,7 @@
     <%= render(UI::LoadingSpinner::Component.new) %>
   <% else %>
     <% bikes = @bikes %>
-    <%# a local, since UI::Table cell blocks are instance_exec'd %>
+    <%# a local, since UI::Table::Base cell blocks are instance_exec'd %>
     <% sortable_params = @sortable_params %>
 
     <% if @kind == "origin" %>
@@ -15,12 +15,12 @@
         ] %>
       <% colors = ORIGIN_COLORS %>
 
-      <%= render(UI::Table::Component.new(records: origin_rows)) do |table| %>
+      <%= render(UI::Table::Base::Component.new(records: origin_rows)) do |table| %>
         <% table.column(label: "Origin") do |(origin)| %>
           <% if colors.key?(origin) %>
             <%# Chartkick fills its columns at half opacity and outlines them; the swatch matches %>
             <span
-              class="d-inline-block mr-1"
+              class="tw:mr-1 tw:inline-block"
               style="width: .75rem; height: .75rem; border: 1px solid <%= colors[origin] %>; background-color: <%= colors[origin] %>80;"
             ></span>
             <%= render(Atoms::Org::OriginDisplay::Component.new(creation_kind: origin)) %>
@@ -35,7 +35,7 @@
         <% end %>
       <% end %>
     <% elsif @kind == "ios_version" %>
-      <%= render(UI::Table::Component.new(records: ios_version_bike_counts)) do |table| %>
+      <%= render(UI::Table::Base::Component.new(records: ios_version_bike_counts)) do |table| %>
         <% table.column(label: "iOS version") do |(version)| %>
           <%= version %>
         <% end %>
@@ -45,7 +45,7 @@
         <% end %>
       <% end %>
     <% elsif @kind == "pos" %>
-      <%= render(UI::Table::Component.new(records: POS_SEARCH_KINDS)) do |table| %>
+      <%= render(UI::Table::Base::Component.new(records: POS_SEARCH_KINDS)) do |table| %>
         <% table.column(label: "Kind") do |pos_kind| %>
           <%= pos_kind.humanize %>
           <%= link_to search_emoji, admin_bikes_path(sortable_params.merge(search_pos: pos_kind)) %>
@@ -56,7 +56,7 @@
         <% end %>
       <% end %>
     <% elsif @kind == "register_setting" %>
-      <%= render(UI::Table::Component.new(records: register_setting_bike_counts)) do |table| %>
+      <%= render(UI::Table::Base::Component.new(records: register_setting_bike_counts)) do |table| %>
         <% table.column(label: "Registration setting") do |(key)| %>
           <% if key == "organization_form" %>
             <%= render(Atoms::Org::OriginDisplay::Component.new(creation_kind: key)) %>
@@ -74,19 +74,13 @@
       <% organizations = Organization.unscoped.where(id: organization_counts.map(&:first)).index_by(&:id) %>
       <% organization_rows = organization_counts.map { |org_id, bike_count| [org_id, organizations[org_id], bike_count] } %>
 
-      <%= render(UI::Table::Component.new(records: organization_rows)) do |table| %>
+      <%= render(UI::Table::Base::Component.new(records: organization_rows)) do |table| %>
         <% table.column(label: "Organization") do |org_id, organization| %>
           <% if organization.present? %>
             <%= link_to organization.name, admin_bikes_path(sortable_params.merge(organization_id: org_id, render_chart: true)), class: "twlink" %>
             <%= link_to search_emoji, admin_bikes_path(sortable_params.merge(organization_id: org_id)) %>
           <% else %>
-            <a
-              class="gray-link"
-              href="<%= admin_bikes_path(sortable_params.merge(organization_id: "false", render_chart: true)) %>"
-              title="(id: <%= org_id %>)"
-            >
-              no organization
-            </a>
+            <%= render(UI::ButtonLink::Component.new(href: admin_bikes_path(sortable_params.merge(organization_id: "false", render_chart: true)), text: "no organization", color: :link_gray, title: "(id: #{org_id})")) %>
           <% end %>
         <% end %>
 

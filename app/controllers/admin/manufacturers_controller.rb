@@ -3,12 +3,15 @@ module Admin
     include Binxtils::SortableTable
     include Admin::TokenAccessible
 
-    token_accessible :create, :update
+    token_accessible :index, :create, :update
+
+    JSON_ATTRIBUTES = %w[id name slug secondary_slug website frame_maker motorized_only priority].freeze
 
     before_action :find_manufacturer, only: [:edit, :update, :destroy, :show]
 
     def index
       @manufacturers = searched_manufacturers.reorder(sortable_order(Manufacturer))
+      render json: {manufacturers: @manufacturers.as_json(only: JSON_ATTRIBUTES)} if request.format.json?
     end
 
     def show
@@ -24,7 +27,7 @@ module Admin
 
     def update
       if @manufacturer.update(permitted_parameters)
-        AutocompleteLoaderJob.perform_async
+        AutocompleteLoaderJob.enqueue_reload
         respond_to do |format|
           format.html { redirect_to admin_manufacturer_url(@manufacturer), flash: {success: "Manufacturer Saved!"} }
           format.json { render_manufacturer_json }
@@ -40,7 +43,7 @@ module Admin
     def create
       @manufacturer = Manufacturer.new(permitted_parameters)
       if @manufacturer.save
-        AutocompleteLoaderJob.perform_async
+        AutocompleteLoaderJob.enqueue_reload
         respond_to do |format|
           format.html { redirect_to admin_manufacturer_url(@manufacturer), flash: {success: "Manufacturer Created!"} }
           format.json { render_manufacturer_json }
@@ -60,7 +63,7 @@ module Admin
 
     def import
       if params[:file]
-        Manufacturer.import(params[:file])
+        Spreadsheets::Manufacturers.import(params[:file].path)
         flash[:success] = "Manufacturers imported"
       else
         flash[:notice] = "You gotta choose a file to import!"
@@ -71,7 +74,7 @@ module Admin
     protected
 
     def sortable_columns
-      %w[name created_at frame_maker priority motorized_only]
+      %w[name created_at frame_maker priority motorized_only close_year]
     end
 
     def default_direction
@@ -94,7 +97,7 @@ module Admin
     end
 
     def render_manufacturer_json
-      render json: {manufacturer: @manufacturer.as_json(only: %w[id name slug secondary_slug website frame_maker motorized_only])}
+      render json: {manufacturer: @manufacturer.as_json(only: JSON_ATTRIBUTES)}
     end
 
     def render_errors_json

@@ -32,8 +32,6 @@
 
 # b_param stands for Bike param
 class BParam < ApplicationRecord
-  # TODO: #3952 - stolen record legacy attrs, to support accepting the old names
-  LEGACY_STOLEN_ATTRS = {"address" => "street", "zipcode" => "postal_code", "state_id" => "region_record_id"}.freeze
   REGISTRATION_INFO_ATTRS = %w[
     accuracy
     bike_code
@@ -114,7 +112,7 @@ class BParam < ApplicationRecord
   scope :unexpired_with_token, ->(toke) { unexpired.where(id_token: toke) }
   # = ANY(ARRAY(...)) rather than IN (...): the pkey can take it, so ORing it with an
   # indexed condition is a BitmapOr instead of a seq scan
-  scope :acknowledgment_pending, -> { where("b_params.id = ANY(ARRAY(?))", RegistrationSequenceAcknowledgment.pending.select(:b_param_id)) }
+  scope :acknowledgment_pending, -> { where("b_params.id = ANY(ARRAY(?))", EducationCourseAcknowledgment.pending.select(:b_param_id)) }
   scope :unfinished_registrations, -> { unexpired.step_1_submitted.and(without_bike.or(acknowledgment_pending)) }
   scope :unprocessed_image, -> { where(image_processed: false).where.not(image: nil) }
   scope :with_cycle_type, -> { bike_params.where("(params -> 'bike' -> 'cycle_type') IS NOT NULL") }
@@ -154,14 +152,6 @@ class BParam < ApplicationRecord
         h["stolen_record"] = stolen_attrs
       end
       h
-    end
-
-    # TODO: #3952 - stolen record legacy attrs
-    def rename_legacy_stolen_attrs(s_attrs)
-      LEGACY_STOLEN_ATTRS.each_with_object(s_attrs) do |(legacy, renamed), attrs|
-        value = attrs.delete(legacy)
-        attrs[renamed] = value if value.present? && attrs[renamed].blank?
-      end
     end
 
     # The lookup half of find_or_new_from_token - what the embed forms resolve their token
@@ -314,7 +304,7 @@ class BParam < ApplicationRecord
   # The bike is created ahead of its organization's safety rules, which are still required -
   # so the registration isn't finished until they're agreed to
   def acknowledgment_pending?
-    persisted? && RegistrationSequenceAcknowledgment.pending.exists?(b_param_id: id)
+    persisted? && EducationCourseAcknowledgment.pending.exists?(b_param_id: id)
   end
 
   def finished_registration? = with_bike? && !acknowledgment_pending?
@@ -350,7 +340,7 @@ class BParam < ApplicationRecord
     # Set the date_stolen if it was passed, if something else didn't already set date_stolen
     date_stolen = params.dig("bike", "date_stolen")
     s_attrs["date_stolen"] ||= date_stolen if date_stolen.present?
-    self.class.rename_legacy_stolen_attrs(s_attrs.except("phone_no_show", "show_address"))
+    s_attrs.except("phone_no_show", "show_address")
   end
 
   def impound_attrs
@@ -490,8 +480,8 @@ class BParam < ApplicationRecord
   # Unsaved - read through the same whitelist that turns these into the created bike's address
   def address_record = AddressRecord.new(self.class.address_record_attributes(bike))
 
-  # Mirrors Bike#registration_address
-  def registration_address = @registration_address ||= address_record.address_hash_legacy
+  # Mirrors Bike#registration_address_record
+  def registration_address_record = @registration_address_record ||= address_record
 
   def email_confirmed?
     params["email_confirmed_at"].present?

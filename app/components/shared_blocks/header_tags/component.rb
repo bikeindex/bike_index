@@ -155,7 +155,8 @@ module SharedBlocks
           new: "New",
           edit: "Edit",
           show: "View",
-          create: "Created"
+          # A create that renders rather than redirects is the form again, with its errors
+          create: "New"
         }.as_json.freeze[action_name]
       end
 

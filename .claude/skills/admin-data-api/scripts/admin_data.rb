@@ -33,11 +33,15 @@ TOKEN_KEY = LOCAL ? "ADMIN_DATA_LOCAL_TOKEN" : "ADMIN_DATA_TOKEN"
 PRODUCTION_ONLY_COMMANDS = %w[authorize-url set-tokens refresh].freeze
 
 BUG_REPORTS = "/admin/bug_reports" # Admin pages rather than API routes, same admin token
+DUPLICATE_BIKES = "/admin/duplicate_bikes"
 PATHS = {
   "sidekiq" => "/api/admin_data/sidekiq",
   "pghero" => "/api/admin_data/pghero",
   "bug_reports" => "#{BUG_REPORTS}.json",
-  "missing_manufacturers" => "/admin/bikes/missing_manufacturer.json"
+  "missing_manufacturers" => "/admin/bikes/missing_manufacturer.json",
+  "manufacturers" => "/admin/manufacturers.json",
+  "duplicates" => "#{DUPLICATE_BIKES}.json",
+  "duplicate_comparison" => "#{DUPLICATE_BIKES}/serial.json"
 }.freeze
 
 def env_get(key)
@@ -124,11 +128,14 @@ def token_request(method, path, form: nil)
   [res.code.to_i, res.body]
 end
 
+# 202 is a duplicate review still preparing - its body says so
+def success?(status) = [200, 202].include?(status)
+
 # token_request, refreshing the token and retrying once on a 401. Returns body or nil -
 # anything else (403, a 422 from update) is reported rather than retried.
 def with_token(method, path, form: nil)
   status, body = token_request(method, path, form:)
-  return body if status == 200
+  return body if success?(status)
   if status && status != 401
     warn body.to_s[0, 500]
     return nil
@@ -138,7 +145,7 @@ def with_token(method, path, form: nil)
   return nil unless refresh_token!
 
   status, body = token_request(method, path, form:)
-  (status == 200) ? body : nil
+  success?(status) ? body : nil
 end
 
 def get_endpoint(endpoint, params = {})
@@ -156,8 +163,9 @@ def array_length(value)
 end
 
 # "nothing abnormal" verdicts. A queue backlogs at latency > 30s or size > 400 (not
-# transient depth). PgHero hit rates and unused/duplicate indexes are informational,
-# and "System stats not enabled" is a disabled feature, not a fault.
+# transient depth), and a slow query over 10% of query time. PgHero hit rates and
+# unused/duplicate indexes are informational, and "System stats not enabled" is a
+# disabled feature, not a fault.
 def sidekiq_verdict(data)
   stats = data["stats"] || {}
   processes = data["processes"] || []
@@ -193,6 +201,8 @@ def pghero_verdict(data)
   reasons << "transaction_id_danger" if array_length(data["transaction_id_danger"]) > 0
   reasons << "autovacuum_danger=#{array_length(data["autovacuum_danger"])}" if array_length(data["autovacuum_danger"]) > 0
   reasons << "index_hit_rate=#{data["index_hit_rate"]}" if data["index_hit_rate"] && data["index_hit_rate"].to_f < 0.90
+  heavy_slow = Array(data["slow_queries"]).select { it.is_a?(Hash) && it["total_percent"].to_f > 10 }.length
+  reasons << "slow_queries over 10% of query time=#{heavy_slow}" if heavy_slow > 0
   max_conn = (data["settings"] || {})["max_connections"] || "?"
   <<~OUT.chomp
     summary: connections=#{data["total_connections"]}/#{max_conn} db=#{data["database_size"]} running=#{array_length(data["running_queries"])} index_hit=#{data["index_hit_rate"].to_s[0, 5]} table_hit(info)=#{data["table_hit_rate"].to_s[0, 5]} unused_indexes=#{array_length(data["unused_indexes"])}
@@ -207,9 +217,9 @@ def slow_query_lines(data)
   return "slow_queries: not returned (query stats disabled, or endpoint not yet deployed)" unless slow.is_a?(Array)
 
   rows = slow.sort_by { -it["total_minutes"].to_f }.first(10).map do |query|
-    format("  %8.1f min  %7d ms avg  %9d calls  %s", query["total_minutes"].to_f, query["average_time"].to_f.round, query["calls"].to_i, query["query"].to_s.gsub(/\s+/, " ")[0, 160])
+    format("  %8.1f min  %3d%%  %7d ms avg  %9d calls  %s", query["total_minutes"].to_f, query["total_percent"].to_f.round, query["average_time"].to_f.round, query["calls"].to_i, query["query"].to_s.gsub(/\s+/, " ")[0, 160])
   end
-  ["slow_queries: #{slow.length}, stats since #{data["last_stats_reset_time"] || "unknown"}", *rows].join("\n")
+  ["slow_queries: #{slow.length}, stats since #{data["query_stats_since"] || data["last_stats_reset_time"] || "unknown"}", *rows].join("\n")
 end
 
 def verdict_line(reasons)
