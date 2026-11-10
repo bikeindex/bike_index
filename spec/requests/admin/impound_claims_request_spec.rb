@@ -33,7 +33,6 @@ RSpec.describe Admin::ImpoundClaimsController, type: :request do
     context "search_status stalled" do
       let(:impound_record) { FactoryBot.create(:impound_record) }
       let!(:impound_claim_stalled) { FactoryBot.create(:impound_claim, impound_record:, status: "submitting", submitted_at: Time.current - 100.days) }
-      let!(:impound_claim_recent) { FactoryBot.create(:impound_claim, impound_record:, status: "submitting") }
 
       it "renders only stalled claims" do
         get base_url, params: {search_status: "stalled", render_chart: true}
