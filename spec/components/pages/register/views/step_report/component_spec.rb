@@ -8,7 +8,7 @@ RSpec.describe Pages::Register::Views::StepReport::Component, type: :component d
   let(:sequence) { nil }
   let(:params) { {bike: {owner_email: current_user.email, manufacturer_id: 12, status:}} }
   let(:b_param) { BParam.create(origin: "register_flow", creator_id: current_user.id, params: params.as_json) }
-  let(:flow) { BikeServices::Register.flow(b_param, sequence:) }
+  let(:flow) { BikeServices::Register.flow(b_param, course: sequence) }
 
   it "asks about the theft, and is the last step" do
     render_inline(described_class.new(b_param:, sequence:, flow:))

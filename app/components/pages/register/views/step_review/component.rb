@@ -17,7 +17,7 @@ module Pages
           private
 
           def pages
-            @pages ||= BikeServices::Register.sequence_pages(@sequence)
+            @pages ||= BikeServices::Register.course_pages(@sequence)
           end
 
           # The review is the last acknowledgment step, so it's both the number and the total

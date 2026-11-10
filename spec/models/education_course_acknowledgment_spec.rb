@@ -14,7 +14,7 @@ RSpec.describe EducationCourseAcknowledgment, type: :model do
 
     it "records who agreed, and reads what they agreed to off the sequence" do
       user = FactoryBot.create(:user_confirmed)
-      expect(described_class.acknowledge(b_param, sequence:, user:)).to be_truthy
+      expect(described_class.acknowledge(b_param, course: sequence, user:)).to be_truthy
 
       expect(acknowledgment).to have_attributes(education_course_id: sequence.id,
         b_param_id: b_param.id, user_id: user.id, owner_email: "owner@example.com",
@@ -28,7 +28,7 @@ RSpec.describe EducationCourseAcknowledgment, type: :model do
       let(:sequence) { FactoryBot.create(:education_course_active, organization:, acknowledgment_text: nil) }
 
       it "falls back to the default" do
-        described_class.acknowledge(b_param, sequence:)
+        described_class.acknowledge(b_param, course: sequence)
         expect(acknowledgment.acknowledgment_text).to eq EducationCourse::DEFAULT_ACKNOWLEDGMENT_TEXT
       end
     end
@@ -37,13 +37,13 @@ RSpec.describe EducationCourseAcknowledgment, type: :model do
       let(:user) { FactoryBot.create(:user_confirmed) }
       let(:previous_sequence) { FactoryBot.create(:education_course_active) }
       let!(:pending) do
-        described_class.create_pending(b_param, sequence: previous_sequence).tap { it.update(user:) }
+        described_class.create_pending(b_param, course: previous_sequence).tap { it.update(user:) }
       end
 
       it "acknowledges that one, against the sequence passed, keeping the stand-in creator" do
         expect(described_class.pending.pluck(:id)).to eq([pending.id])
         expect {
-          described_class.acknowledge(b_param, sequence:)
+          described_class.acknowledge(b_param, course: sequence)
         }.to_not change(described_class, :count)
         expect(pending.reload).to have_attributes(education_course_id: sequence.id, user_id: user.id)
         expect(pending.acknowledged_at).to be_present
@@ -52,7 +52,7 @@ RSpec.describe EducationCourseAcknowledgment, type: :model do
 
       it "records whoever agrees over that stand-in" do
         agreeing = FactoryBot.create(:user_confirmed)
-        described_class.acknowledge(b_param, sequence:, user: agreeing)
+        described_class.acknowledge(b_param, course: sequence, user: agreeing)
 
         expect(pending.reload.user_id).to eq agreeing.id
       end
@@ -84,7 +84,7 @@ RSpec.describe EducationCourseAcknowledgment, type: :model do
       BikeServices::OwnershipTransferer.find_or_create(bike, updator: nil, new_owner_email: "new@example.com")
 
       Sidekiq::Job.clear_all
-      expect(described_class.acknowledge(b_param, sequence:)).to be_truthy
+      expect(described_class.acknowledge(b_param, course: sequence)).to be_truthy
       expect(enqueued).to eq([[initial_ownership.id]])
     end
 

@@ -21,7 +21,7 @@ module Pages
           private
 
           def pages
-            BikeServices::Register.sequence_pages(@education_course)
+            BikeServices::Register.course_pages(@education_course)
           end
 
           def reviewing?
@@ -35,7 +35,7 @@ module Pages
           # The registration's own steps, so the progress bar matches the real flow. No
           # b_param, so it's the flow without a report - which is what a preview walks
           def progress_flow
-            @progress_flow ||= BikeServices::Register.flow(nil, sequence: @education_course)
+            @progress_flow ||= BikeServices::Register.flow(nil, course: @education_course)
           end
 
           def progress_step

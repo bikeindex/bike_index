@@ -825,7 +825,7 @@ RSpec.describe RegisterController, type: :request do
         expect { post base_url, params: create_params }
           .to_not change(EmailJobs::PartialRegistrationJob.jobs, :size)
         expect(response).to have_http_status(:unprocessable_entity)
-        expect(BikeServices::Register.finished?(empty_b_param.reload, sequence: nil)).to be_falsey
+        expect(BikeServices::Register.finished?(empty_b_param.reload, course: nil)).to be_falsey
 
         VCR.use_cassette("integrations_turnstile-verified") do
           expect { post base_url, params: create_params.merge("cf-turnstile-response" => "XXXX.DUMMY.TOKEN.XXXX") }
@@ -1146,7 +1146,7 @@ RSpec.describe RegisterController, type: :request do
           # Everything entered is kept, but incomplete - so the flow stays on step 2
           expect(b_param.reload.bike["serial_number"]).to eq "XYZ 123"
           expect(BikeServices::Register.send(:details_completed?, b_param)).to be_falsey
-          expect(BikeServices::Register.permitted_step(b_param, "review", sequence: nil)).to eq "2"
+          expect(BikeServices::Register.permitted_step(b_param, "review", course: nil)).to eq "2"
         end
       end
 

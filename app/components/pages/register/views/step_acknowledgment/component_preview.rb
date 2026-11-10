@@ -29,13 +29,13 @@ module Pages
             return production_notice("registration") if Rails.env.production?
 
             sequence = preview_sequence
-            page = ::BikeServices::Register.sequence_pages(sequence)[index]
+            page = ::BikeServices::Register.course_pages(sequence)[index]
             return missing_notice("an education course with #{index + 1} pages") if page.blank?
 
             b_param = preview_b_param(sequence, acknowledged ? [page.id] : [])
             render(Pages::Register::Views::StepAcknowledgment::Component.new(sequence:, b_param:,
               step: ::BikeServices::Register.step_for_page_index(index),
-              flow: ::BikeServices::Register.flow(b_param, sequence:)))
+              flow: ::BikeServices::Register.flow(b_param, course: sequence)))
           end
 
           # The pages only appear for an e-vehicle registered with the organization

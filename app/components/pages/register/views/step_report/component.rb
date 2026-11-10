@@ -46,7 +46,7 @@ module Pages
           # link is what opened it - the step list is the same either way, so what says whether
           # this finishes the registration is whether anything is left to agree to
           def submit_text
-            return translation(".next") unless BikeServices::Register.acknowledged?(@b_param, sequence: @sequence)
+            return translation(".next") unless BikeServices::Register.acknowledged?(@b_param, course: @sequence)
 
             translation(".complete_registration", cycle_type: @b_param.type_titleize)
           end

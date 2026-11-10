@@ -11,7 +11,7 @@ RSpec.describe Pages::Register::Views::StepReview::Component, type: :component d
   let(:current_user) { FactoryBot.create(:user_confirmed, name: "Filling It In") }
   let(:bike_params) { {owner_email: "someone-else@example.com", user_name:} }
   let(:b_param) { BParam.create(origin: "register_flow", params: {bike: bike_params}.as_json) }
-  let(:flow) { BikeServices::Register.flow(b_param, sequence:) }
+  let(:flow) { BikeServices::Register.flow(b_param, course: sequence) }
 
   describe "who is agreeing" do
     context "registered for someone else" do

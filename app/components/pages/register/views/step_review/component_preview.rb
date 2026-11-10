@@ -10,12 +10,12 @@ module Pages
             return production_notice("registration") if Rails.env.production?
 
             sequence = preview_sequence
-            pages = ::BikeServices::Register.sequence_pages(sequence)
+            pages = ::BikeServices::Register.course_pages(sequence)
             return missing_notice("an education course with pages") if pages.none?
 
             b_param = preview_b_param(sequence, pages.map(&:id))
             render(Pages::Register::Views::StepReview::Component.new(sequence:, b_param:, current_user: lookbook_user,
-              flow: ::BikeServices::Register.flow(b_param, sequence:)))
+              flow: ::BikeServices::Register.flow(b_param, course: sequence)))
           end
 
           private
