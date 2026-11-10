@@ -433,41 +433,13 @@ $form-icon-warning: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://ww
 $form-icon-danger: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23d9534f' viewBox='-2 -2 7 7'%3E%3Cpath stroke='%23d9534f' d='M0 0l3 3m0-3L0 3'/%3E%3Ccircle r='.5'/%3E%3Ccircle cx='3' r='.5'/%3E%3Ccircle cy='3' r='.5'/%3E%3Ccircle cx='3' cy='3' r='.5'/%3E%3C/svg%3E") !default;
 
 
-// Dropdowns
-//
-// Dropdown menu container and contents.
-
-$dropdown-min-width:             160px !default;
-$dropdown-padding-y:             5px !default;
-$dropdown-margin-top:            2px !default;
-$dropdown-bg:                    #fff !default;
-$dropdown-border-color:          rgba(0,0,0,.15) !default;
-$dropdown-border-width:          $border-width !default;
-$dropdown-divider-bg:            #e5e5e5 !default;
-$dropdown-box-shadow:            0 6px 12px rgba(0,0,0,.175) !default;
-
-$dropdown-link-color:            $gray-dark !default;
-$dropdown-link-hover-color:      darken($gray-dark, 5%) !default;
-$dropdown-link-hover-bg:         #f5f5f5 !default;
-
-$dropdown-link-active-color:     $component-active-color !default;
-$dropdown-link-active-bg:        $component-active-bg !default;
-
-$dropdown-link-disabled-color:   $gray-light !default;
-
-$dropdown-item-padding-x:        20px !default;
-
-$dropdown-header-color:          $gray-light !default;
-
 
 // Z-index master list
 //
 // Warning: Avoid customizing these values. They're used for a bird's eye view
 // of components dependent on the z-axis and are designed to all work together.
 
-$zindex-dropdown-backdrop:  990 !default;
 $zindex-navbar:            1000 !default;
-$zindex-dropdown:          1000 !default;
 $zindex-popover:           1060 !default;
 $zindex-tooltip:           1070 !default;
 $zindex-navbar-fixed:      1030 !default;
