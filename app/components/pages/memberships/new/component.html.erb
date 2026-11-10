@@ -123,6 +123,7 @@
                   tw:ml-auto tw:flex tw:size-6 tw:shrink-0 tw:items-center
                   tw:justify-center tw:rounded-full tw:border-[1.5px]
                   tw:border-gray-300 tw:bg-white tw:text-white
+                  tw:dark:border-gray-500 tw:dark:bg-gray-800
                   tw:group-has-checked/tier:border-blue-600
                   tw:group-has-checked/tier:bg-blue-600
                 "
@@ -162,7 +163,8 @@
             <ul
               class="
                 tw:m-0 tw:flex tw:list-none tw:flex-col tw:gap-2.75
-                tw:border-t tw:border-gray-200 tw:p-0 tw:pt-4
+                tw:border-t tw:border-gray-200 tw:dark:border-gray-700
+                tw:p-0 tw:pt-4
               "
             >
               <% tier[:perks].each do |perk| %>
@@ -244,7 +246,7 @@
             <li
               class="
                 tw:flex tw:items-center tw:gap-4 tw:border-b
-                tw:border-gray-200 tw:py-3.5
+                tw:border-gray-200 tw:dark:border-gray-700 tw:py-3.5
               "
             >
               <div class="tw:flex-1">

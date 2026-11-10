@@ -321,7 +321,8 @@
           <div
             class="
               tw:self-start tw:rounded tw:border tw:border-gray-200
-              tw:bg-gray-50 tw:p-3 tw:[grid-area:notes]
+              tw:bg-gray-50 tw:dark:border-gray-700 tw:dark:bg-gray-800
+              tw:p-3 tw:[grid-area:notes]
             "
           >
             <label
@@ -339,7 +340,7 @@
 
               <div class="tw:mt-2 tw:flex tw:items-center tw:justify-between">
                 <% if bike_organization_note.present? %>
-                  <small class="tw:text-gray-500">
+                  <small class="tw:text-gray-500 tw:dark:text-gray-400">
                     <%= translation(".note_by", user: bike_organization_note.user&.display_name) %>
 
                     <span class="localizeTime withPreposition">
