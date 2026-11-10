@@ -7,7 +7,7 @@ module Admin
     def index
       @per_page = permitted_per_page(default: 50)
       @pagy, @collection = pagy(:countish,
-        matching_education_course_acknowledgments.preload(:user, :bike, education_course: :organization)
+        matching_education_course_acknowledgments.preload(:bike, education_course: :organization, user: %i[membership_active email_bans_active])
           .reorder(sortable_order(EducationCourseAcknowledgment)),
         limit: @per_page,
         page: permitted_page)

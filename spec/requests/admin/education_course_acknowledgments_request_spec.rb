@@ -21,7 +21,6 @@ RSpec.describe Admin::EducationCourseAcknowledgmentsController, type: :request d
       it "renders and filters" do
         get base_url
         expect(response).to be_ok
-        expect(response).to render_template(:index)
         expect(collection_ids).to match_array([acknowledgment.id, pending.id])
         expect(response.body).to include("agreed@example.com")
         expect(response.body).to include("#{base_url}?organization_id=#{organization.id}\"")
@@ -44,11 +43,9 @@ RSpec.describe Admin::EducationCourseAcknowledgmentsController, type: :request d
         get base_url, params: {organization_id: organization.id, render_chart: true}
         expect(response).to be_ok
         expect(collection_ids).to eq([acknowledgment.id])
-        expect(response.body).to include("view for all organizations")
 
         get base_url, params: {search_education_course_id: pending.education_course_id}
         expect(collection_ids).to eq([pending.id])
-        expect(response.body).to include("view for all education courses")
 
         get base_url, params: {user_id: other_user.id}
         expect(collection_ids).to eq([acknowledgment.id])

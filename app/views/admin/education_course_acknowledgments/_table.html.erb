@@ -19,7 +19,7 @@
     <% if education_course.template? %>
       <span class="less-strong">Template</span>
     <% else %>
-      <%= render Atoms::Admin::TableCells::Organization::Component.new(organization: education_course.organization, organization_id: education_course.organization_id, render_search: render_sortable, search_url: admin_education_course_acknowledgments_path(sort_state.search_params.to_h.merge(organization_id: education_course.organization_id))) %>
+      <%= render Atoms::Admin::TableCells::Organization::Component.new(organization: education_course.organization, organization_id: education_course.organization_id, render_search: render_sortable, search_url: url_for(sort_state.search_params.merge(organization_id: education_course.organization_id))) %>
     <% end %>
   <% end %>
 
