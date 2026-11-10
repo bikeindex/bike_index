@@ -58,6 +58,34 @@ RSpec.describe Pages::Registrations::Show::WrapperOrgAdmin::Component, type: :co
     end
   end
 
+  describe "owner & access, on a bike registered elsewhere" do
+    let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[unstolen_notifications]) }
+    let(:current_user) { FactoryBot.create(:organization_user, organization:) }
+    let(:owner) { FactoryBot.create(:user_confirmed, notification_unstolen: true, phone: "7183914410") }
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: owner, cycle_type: "e-scooter") }
+    let(:owner_access) { page.find("h2", text: "Owner & access").find(:xpath, "..") }
+
+    it "shows the phone, and says the rest of the contact details aren't available" do
+      render_inline(described_class.new(bike: bike.reload, current_user:, organization:, org_role: :staff))
+
+      expect(owner_access).to have_link("718-391-4410", href: "tel:718-391-4410")
+      expect(owner_access).to have_text("Not registered with #{organization.short_name}")
+      expect(owner_access).to have_text("Other owner contact details aren't available, since this e-scooter isn't registered with your organization")
+      expect(owner_access).to_not have_text(bike.owner_email)
+    end
+
+    context "when the owner turned off non-stolen notifications" do
+      let(:owner) { FactoryBot.create(:user_confirmed, notification_unstolen: false, phone: "7183914410") }
+
+      it "doesn't show the phone" do
+        render_inline(described_class.new(bike: bike.reload, current_user:, organization:, org_role: :staff))
+
+        expect(page).to_not have_link("718-391-4410", visible: :all)
+        expect(owner_access).to have_text("Owner contact isn't available for bikes outside your organization")
+      end
+    end
+  end
+
   describe "other registrations" do
     let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[additional_registrations_information]) }
 

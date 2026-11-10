@@ -13,6 +13,9 @@ en:
             not_registered_message: >-
               Owner contact isn't available for bikes outside your organization. You
               can still add internal notes.
+            not_registered_phone_message: >-
+              Other owner contact details aren't available, since this %{bike_type}
+              isn't registered with your organization.
             not_registered_title: Not registered with %{org_name}
             org_can_edit: "%{org_name} can edit this %{bike_type}"
             org_can_edit_sub: Including after the %{bike_type} is claimed.
