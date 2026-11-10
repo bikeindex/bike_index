@@ -682,7 +682,7 @@
 /* Resources Page */
 .kelsey_styles .resources-section {
   padding: 4rem 0;
-  background-color: white;
+  background-color: var(--redesign-surface);
 }
 
 .kelsey_styles .dev-resources-section {
@@ -775,7 +775,7 @@
 }
 
 .kelsey_styles .dev-resource-item {
-  background-color: white;
+  background-color: var(--redesign-surface);
   padding: 1.75rem;
   border-left: 4px solid var(--redesign-purple-500);
 }

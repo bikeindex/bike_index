@@ -324,7 +324,12 @@
               tw:bg-gray-50 tw:p-3 tw:[grid-area:notes]
             "
           >
-            <label class="tw:mb-1 tw:block tw:text-sm tw:font-medium tw:text-gray-600">
+            <label
+              class="
+                tw:mb-1 tw:block tw:text-sm tw:font-medium tw:text-gray-600
+                tw:dark:text-gray-400
+              "
+            >
               <%= @organization.short_name %>
               <%= translation(".notes") %>
             </label>
