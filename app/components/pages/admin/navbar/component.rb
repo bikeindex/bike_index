@@ -130,6 +130,7 @@ module Pages
             {title: "Payments", path: admin_payments_path},
             {title: "Organization Features", path: admin_organization_features_path},
             {title: "Education Courses", path: admin_education_courses_path},
+            {title: "Education Course Acknowledgments", path: admin_education_course_acknowledgments_path},
             # An organization's invoices are the same section, on a path nested under theirs
             {title: "Invoices", path: admin_invoices_path(query: "active", direction: "asc", sort: "subscription_end_at"),
              match_paths: ["#{admin_invoices_path}/**", "#{admin_organizations_path}/*/invoices"]},

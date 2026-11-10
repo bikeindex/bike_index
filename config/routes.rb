@@ -352,6 +352,7 @@ Rails.application.routes.draw do
       resources :pages, only: %i[new create], controller: "education_course_pages"
     end
     resources :education_course_pages, only: %i[edit update destroy]
+    resources :education_course_acknowledgments, only: %i[index]
 
     resources :bug_reports, only: %i[index show update] do
       collection do
