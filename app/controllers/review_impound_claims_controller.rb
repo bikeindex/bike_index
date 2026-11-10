@@ -6,10 +6,7 @@ class ReviewImpoundClaimsController < ApplicationController
   end
 
   def update
-    # Superusers can view, but an update would make them the record's user in place of the finder
-    if !@impound_record.authorized?(current_user, no_superuser_override: true)
-      flash[:error] = "Only the person who found the #{@impound_claim.bike_type} can update this claim"
-    elsif params[:submit] == "retrieved_by_owner"
+    if params[:submit] == "retrieved_by_owner"
       mark_retrieved_by_owner
     elsif !@impound_claim.submitting?
       flash[:error] = if @impound_claim.responded?

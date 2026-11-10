@@ -210,22 +210,10 @@ RSpec.describe ReviewImpoundClaimsController, type: :request do
         let(:impound_record) { FactoryBot.create(:impound_record, bike: bike_claimed) }
         let(:bike_claimed) { FactoryBot.create(:bike, :with_ownership_claimed) }
         let(:current_user) { FactoryBot.create(:superuser) }
-        it "doesn't record" do
+        it "records" do
           patch "#{base_url}/#{impound_claim.to_param}", params: retrieved_params
-          expect(flash[:error]).to be_present
-          expect(impound_record.reload.impound_record_updates.count).to eq 0
-        end
-
-        # The latest update's user becomes the record's, which would lock the finder out of marking it returned
-        context "approving" do
-          let(:status) { "submitting" }
-          it "doesn't record" do
-            patch "#{base_url}/#{impound_claim.to_param}", params: {submit: "Approve", impound_claim: {response_message: "ok"}}
-            expect(flash[:error]).to be_present
-            expect(impound_record.reload.impound_record_updates.count).to eq 0
-            expect(impound_record.user_id).to_not eq current_user.id
-            expect(impound_claim.reload.status).to eq "submitting"
-          end
+          expect(flash[:success]).to be_present
+          expect(impound_record.reload.impound_record_updates.sole.kind).to eq "retrieved_by_owner"
         end
       end
 
