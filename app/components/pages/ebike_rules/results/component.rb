@@ -49,11 +49,20 @@ module Pages
           end
         end
 
+        def headline_html
+          return unbroken_hyphen(headline) if @verdict != :green || @bike.manual?
+
+          before, name, after = headline.partition(bike_name)
+          safe_join([unbroken_hyphen(before), tag.strong(unbroken_hyphen(name), class: "tw:font-bold"), unbroken_hyphen(after)])
+        end
+
         def green_headline(name, state)
           if @law[:classes].none?
-            translation(".green_summary_no_classes", name:, state:)
+            @bike.manual? ? translation(".green_summary_no_classes_manual", state:) : translation(".green_summary_no_classes", name:, state:)
           elsif optional_clause.present?
             translation(".class_summary_optional", name:, state:, n: class_numbers, optional: optional_clause)
+          elsif @bike.manual?
+            translation(".class_summary_manual", state:, n: class_numbers)
           else
             translation(".class_summary", name:, state:, n: class_numbers)
           end
@@ -63,9 +72,15 @@ module Pages
           if without_throttle?
             @law[:classes].none? ? translation(".yellow_summary_no_classes_without_throttle", name:, state:) : translation(".class_summary_without_throttle", name:, state:, n: class_numbers)
           elsif @bike.e_bike_class && @law[:classes].none?
-            translation(".yellow_summary_no_classes", name:, state:, count: rule_count(:check))
+            if @bike.manual?
+              translation(".yellow_summary_no_classes_manual", state:, count: rule_count(:check))
+            else
+              translation(".yellow_summary_no_classes", name:, state:, count: rule_count(:check))
+            end
           elsif @bike.e_bike_class && optional_clause.present?
             translation(".class_summary_optional_with_rules", name:, state:, n: class_numbers, optional: optional_clause, count: rule_count(:check))
+          elsif @bike.e_bike_class && @bike.manual?
+            translation(".class_summary_with_rules_manual", state:, n: class_numbers, count: rule_count(:check))
           elsif @bike.e_bike_class
             translation(".class_summary_with_rules", name:, state:, n: class_numbers, count: rule_count(:check))
           else

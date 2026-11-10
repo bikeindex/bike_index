@@ -26,6 +26,7 @@ en:
           class_3_throttle_within_html: Throttle stops at %{mph} mph
           class_n: Class %{n}
           class_summary: The %{name} is a Class %{n} e-bike in %{state}.
+          class_summary_manual: This e-bike is a Class %{n} e-bike in %{state}.
           class_summary_optional: The %{name} is a Class %{n} e-bike in %{state},
             and %{optional}.
           class_summary_optional_with_rules:
@@ -39,6 +40,11 @@ en:
             one: The %{name} is a Class %{n} e-bike in %{state}, with %{count} rule
               to check.
             other: The %{name} is a Class %{n} e-bike in %{state}, with %{count} rules
+              to check.
+          class_summary_with_rules_manual:
+            one: This e-bike is a Class %{n} e-bike in %{state}, with %{count} rule
+              to check.
+            other: This e-bike is a Class %{n} e-bike in %{state}, with %{count} rules
               to check.
           class_summary_without_throttle: The %{name} is a Class %{n} e-bike in %{state},
             without its optional throttle.
@@ -69,6 +75,7 @@ en:
           green_summary_law: The %{name} is legal to ride in %{state} under the %{law}
             rules.
           green_summary_no_classes: The %{name} is classified as an e-bike in %{state}.
+          green_summary_no_classes_manual: This is classified as an e-bike in %{state}.
           has_throttle: Has a throttle
           heading_classes_html: "%{classes} recognized"
           heading_no_power_cap: No motor power cap
@@ -202,6 +209,11 @@ en:
               rule to check.
             other: >-
               The %{name} is classified as an e-bike in %{state}, with %{count} rules
+              to check.
+          yellow_summary_no_classes_manual:
+            one: This is classified as an e-bike in %{state}, with %{count} rule to
+              check.
+            other: This is classified as an e-bike in %{state}, with %{count} rules
               to check.
           yellow_summary_no_classes_without_throttle: >-
             The %{name} is classified as an e-bike in %{state}, without its optional
