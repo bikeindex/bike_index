@@ -24,30 +24,6 @@ RSpec.describe CleanBParamsJob, type: :job do
       expect(BParam.pluck(:id)).to match_array([b_param_with_values.id, b_param_with_recent_bike.id, b_param_blank_recent.id])
     end
 
-    context "with the template's safety rules still to agree to" do
-      let(:template) { FactoryBot.create(:education_course_template_active, :with_pages) }
-      let(:bike_expired) { FactoryBot.create(:bike, :with_ownership) }
-      let(:bike_recent) { FactoryBot.create(:bike, :with_ownership) }
-      let!(:expired) { pending_on_template(bike_expired, Time.current - EducationCourseAcknowledgment::TEMPLATE_PENDING_EXPIRATION - 1.day) }
-      let!(:recent) { pending_on_template(bike_recent, Time.current - 1.day) }
-
-      def pending_on_template(bike, created_at)
-        b_param = FactoryBot.create(:b_param, created_bike_id: bike.id, updated_at: stale)
-        FactoryBot.create(:education_course_acknowledgment_pending, b_param:, bike:, education_course: template, created_at:)
-        b_param
-      end
-
-      it "gives up on the expired, releasing their held email" do
-        Sidekiq::Job.clear_all
-        described_class.new.perform
-        expect(bike_expired.reload.unfinished_registration?).to be_falsey
-        expect(BParam.pluck(:id)).not_to include expired.id
-        expect(bike_recent.reload.unfinished_registration?).to be_truthy
-        expect(BParam.pluck(:id)).to include recent.id
-        expect(EmailJobs::OwnershipInvitationJob.jobs.map { it["args"] }).to eq([[bike_expired.current_ownership.id]])
-      end
-    end
-
     context "with the safety rules still to agree to" do
       let!(:b_param_pending) do
         FactoryBot.create(:b_param, created_bike_id: bike.id, updated_at: stale, origin: "register_flow",

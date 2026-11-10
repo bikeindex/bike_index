@@ -28,10 +28,6 @@
 #  index_education_course_acknowledgments_pending                 (b_param_id) WHERE (acknowledged_at IS NULL)
 #
 class EducationCourseAcknowledgment < ApplicationRecord
-  # The template's rules are Bike Index's advice rather than an organization's requirement, so
-  # not agreeing to them only holds the registration's email this long
-  TEMPLATE_PENDING_EXPIRATION = 1.week
-
   # with_deleted: the sequence is soft-deleted with its organization, and this record
   # reads what was agreed to straight off it
   belongs_to :education_course, -> { with_deleted }
@@ -74,10 +70,6 @@ class EducationCourseAcknowledgment < ApplicationRecord
 
     def abandon_pending(organization_id)
       pending.for_organization(organization_id).each(&:abandon!)
-    end
-
-    def abandon_expired_template_pending
-      pending.for_organization(nil).where(created_at: ...TEMPLATE_PENDING_EXPIRATION.ago).find_each(&:abandon!)
     end
 
     def find_for(bike:, organization:) = acknowledged.for_organization_or_template(organization).where(bike_id: bike.id).last
