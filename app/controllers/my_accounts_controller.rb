@@ -181,6 +181,7 @@ class MyAccountsController < ApplicationController
     if pparams.key?("username")
       pparams.delete("username") unless pparams["username"].present?
     end
-    pparams
+    # The switcher's json save is a display preference, which AfterUserChangeJob has no work for
+    request.format.json? ? pparams.merge(skip_update: true) : pparams
   end
 end

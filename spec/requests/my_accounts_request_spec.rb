@@ -843,9 +843,11 @@ RSpec.describe MyAccountsController, type: :request do
         expect(current_user.reload.color_scheme).to eq "dark"
       end
 
-      it "answers the switcher's json save without a redirect" do
+      it "answers the switcher's json save without a redirect or the after-change job" do
+        Sidekiq::Job.clear_all
         patch base_url, params: {user: {color_scheme: "light"}}, as: :json
         expect(response.status).to eq 204
+        expect(CallbackJobs::AfterUserChangeJob.jobs.count).to eq 0
         expect(current_user.reload.color_scheme).to eq "light"
 
         patch base_url, params: {user: {color_scheme: "plaid"}}, as: :json
