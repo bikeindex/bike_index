@@ -1,5 +1,5 @@
 # Seeds the global EducationCourse template (org drafts are cloned from it). This is the
-# e-vehicle acknowledgment sequence from kelsey_redesign/register-your-bike.html, verbatim —
+# e-vehicle acknowledgment course from kelsey_redesign/register-your-bike.html, verbatim —
 # its three screens, their headings and their checkbox rules. The bullets become each page's
 # `body`, a single HTML list authored in the Lexxy rich-text editor on the form.
 #
@@ -53,23 +53,23 @@ end
 # Organizations clone the live template, so the seeded one has to be activated
 template.make_active!
 
-# Brakebills registers e-vehicles, so give it a live sequence — without an active one
+# Brakebills registers e-vehicles, so give it a live course — without an active one
 # the acknowledgment pages never appear, and the flow can't be seen in development.
 brakebills = Organization.find_by_name("Brakebills")
 if brakebills.present?
-  sequence = EducationCourse.draft_for(brakebills)
+  course = EducationCourse.draft_for(brakebills)
   # The school names its own page, the way an organization would in the editor - the
   # template can't, since it's cloned by every organization
-  sequence.education_course_pages.where(organization_specific: true)
+  course.education_course_pages.where(organization_specific: true)
     .update_all(heading: "#{brakebills.short_name} campus policies")
-  sequence.make_active!
-  puts "Education course activated for Brakebills: #{sequence.education_course_pages.count} pages\n"
+  course.make_active!
+  puts "Education course activated for Brakebills: #{course.education_course_pages.count} pages\n"
 
   # All but one of the e-vehicles, so a registration shows both with and without an acknowledgment
   acknowledged = brakebills.bikes.motorized.order(:id).to_a[0...-1]
   acknowledged.each do |bike|
     SeedHelpers.tick
-    EducationCourseAcknowledgment.create!(education_course: sequence, bike:, user: bike.creator,
+    EducationCourseAcknowledgment.create!(education_course: course, bike:, user: bike.creator,
       owner_email: bike.owner_email, acknowledged_at: Time.current)
   end
   puts "Acknowledged the Brakebills education course for #{acknowledged.count} e-vehicles\n"

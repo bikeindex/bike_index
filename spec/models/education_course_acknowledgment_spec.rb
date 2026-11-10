@@ -2,57 +2,57 @@ require "rails_helper"
 
 RSpec.describe EducationCourseAcknowledgment, type: :model do
   let(:organization) { FactoryBot.create(:organization) }
-  let(:sequence) do
+  let(:course) do
     FactoryBot.create(:education_course_active, :with_pages, organization:,
       acknowledgment_text: "agree to all of it")
   end
-  let(:pages) { sequence.education_course_pages.to_a }
+  let(:pages) { course.education_course_pages.to_a }
   let(:b_param) { BParam.create(origin: "register_flow", params: {bike: {owner_email: "owner@example.com"}}.as_json) }
 
   describe ".acknowledge" do
     let(:acknowledgment) { described_class.find_by(b_param_id: b_param.id) }
 
-    it "records who agreed, and reads what they agreed to off the sequence" do
+    it "records who agreed, and reads what they agreed to off the course" do
       user = FactoryBot.create(:user_confirmed)
-      expect(described_class.acknowledge(b_param, course: sequence, user:)).to be_truthy
+      expect(described_class.acknowledge(b_param, course:, user:)).to be_truthy
 
-      expect(acknowledgment).to have_attributes(education_course_id: sequence.id,
+      expect(acknowledgment).to have_attributes(education_course_id: course.id,
         b_param_id: b_param.id, user_id: user.id, owner_email: "owner@example.com",
         acknowledgment_text: "agree to all of it")
       expect(acknowledgment.acknowledged_at).to be_within(5).of(Time.current)
-      # Attesting requires every page, so the whole sequence is what was agreed to
+      # Attesting requires every page, so the whole course is what was agreed to
       expect(acknowledgment.acknowledged_pages.pluck(:id)).to match_array(pages.map(&:id))
     end
 
-    context "sequence without its own text" do
-      let(:sequence) { FactoryBot.create(:education_course_active, organization:, acknowledgment_text: nil) }
+    context "course without its own text" do
+      let(:course) { FactoryBot.create(:education_course_active, organization:, acknowledgment_text: nil) }
 
       it "falls back to the default" do
-        described_class.acknowledge(b_param, course: sequence)
+        described_class.acknowledge(b_param, course:)
         expect(acknowledgment.acknowledgment_text).to eq EducationCourse::DEFAULT_ACKNOWLEDGMENT_TEXT
       end
     end
 
-    context "pending since the bike was created, on a sequence since replaced" do
+    context "pending since the bike was created, on a course since replaced" do
       let(:user) { FactoryBot.create(:user_confirmed) }
-      let(:previous_sequence) { FactoryBot.create(:education_course_active) }
+      let(:previous_course) { FactoryBot.create(:education_course_active) }
       let!(:pending) do
-        described_class.create_pending(b_param, course: previous_sequence).tap { it.update(user:) }
+        described_class.create_pending(b_param, course: previous_course).tap { it.update(user:) }
       end
 
-      it "acknowledges that one, against the sequence passed, keeping the stand-in creator" do
+      it "acknowledges that one, against the course passed, keeping the stand-in creator" do
         expect(described_class.pending.pluck(:id)).to eq([pending.id])
         expect {
-          described_class.acknowledge(b_param, course: sequence)
+          described_class.acknowledge(b_param, course:)
         }.to_not change(described_class, :count)
-        expect(pending.reload).to have_attributes(education_course_id: sequence.id, user_id: user.id)
+        expect(pending.reload).to have_attributes(education_course_id: course.id, user_id: user.id)
         expect(pending.acknowledged_at).to be_present
         expect(described_class.pending.count).to eq 0
       end
 
       it "records whoever agrees over that stand-in" do
         agreeing = FactoryBot.create(:user_confirmed)
-        described_class.acknowledge(b_param, course: sequence, user: agreeing)
+        described_class.acknowledge(b_param, course:, user: agreeing)
 
         expect(pending.reload.user_id).to eq agreeing.id
       end
@@ -61,7 +61,7 @@ RSpec.describe EducationCourseAcknowledgment, type: :model do
 
   describe ".find_for" do
     let(:bike) { FactoryBot.create(:bike) }
-    let!(:pending) { FactoryBot.create(:education_course_acknowledgment_pending, education_course: sequence, bike:) }
+    let!(:pending) { FactoryBot.create(:education_course_acknowledgment_pending, education_course: course, bike:) }
 
     it "is only an acknowledged one" do
       expect(described_class.find_for(bike:, organization:)).to be_nil
@@ -74,7 +74,7 @@ RSpec.describe EducationCourseAcknowledgment, type: :model do
   describe "the held email" do
     let(:bike) { FactoryBot.create(:bike, :with_ownership) }
     let!(:pending) do
-      FactoryBot.create(:education_course_acknowledgment_pending, education_course: sequence,
+      FactoryBot.create(:education_course_acknowledgment_pending, education_course: course,
         b_param:, bike:)
     end
     let(:initial_ownership) { bike.ownerships.initial.first }
@@ -84,7 +84,7 @@ RSpec.describe EducationCourseAcknowledgment, type: :model do
       BikeServices::OwnershipTransferer.find_or_create(bike, updator: nil, new_owner_email: "new@example.com")
 
       Sidekiq::Job.clear_all
-      expect(described_class.acknowledge(b_param, course: sequence)).to be_truthy
+      expect(described_class.acknowledge(b_param, course:)).to be_truthy
       expect(enqueued).to eq([[initial_ownership.id]])
     end
 
@@ -103,13 +103,13 @@ RSpec.describe EducationCourseAcknowledgment, type: :model do
   end
 
   describe "the organization being destroyed" do
-    let!(:acknowledgment) { FactoryBot.create(:education_course_acknowledgment, b_param:, education_course: sequence) }
+    let!(:acknowledgment) { FactoryBot.create(:education_course_acknowledgment, b_param:, education_course: course) }
 
-    it "keeps the record, and the soft-deleted sequence still says what was agreed to" do
+    it "keeps the record, and the soft-deleted course still says what was agreed to" do
       expect { organization.destroy }.to_not change(described_class, :count)
-      expect(EducationCourse.find_by(id: sequence.id)).to be_nil # gone from the live scope
+      expect(EducationCourse.find_by(id: course.id)).to be_nil # gone from the live scope
 
-      expect(acknowledgment.reload.education_course_id).to eq sequence.id
+      expect(acknowledgment.reload.education_course_id).to eq course.id
       expect(acknowledgment.owner_email).to eq "owner@example.com"
       expect(acknowledgment.acknowledgment_text).to eq "agree to all of it"
       expect(acknowledgment.acknowledged_pages.pluck(:id)).to match_array(pages.map(&:id))
@@ -117,10 +117,10 @@ RSpec.describe EducationCourseAcknowledgment, type: :model do
   end
 
   describe ".for_organization" do
-    let!(:acknowledgment) { FactoryBot.create(:education_course_acknowledgment, b_param:, education_course: sequence) }
+    let!(:acknowledgment) { FactoryBot.create(:education_course_acknowledgment, b_param:, education_course: course) }
     let!(:other) { FactoryBot.create(:education_course_acknowledgment) }
 
-    it "is the acknowledgments against the organization's own sequences" do
+    it "is the acknowledgments against the organization's own courses" do
       expect(described_class.for_organization(organization).pluck(:id)).to eq([acknowledgment.id])
     end
   end

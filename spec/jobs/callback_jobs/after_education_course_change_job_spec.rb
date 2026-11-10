@@ -7,15 +7,15 @@ RSpec.describe CallbackJobs::AfterEducationCourseChangeJob, type: :job do
   let!(:b_param) { pending_b_param(education_course) }
   let!(:b_param_other_organization) { pending_b_param(FactoryBot.create(:education_course_active)) }
 
-  # Pending against the organization's own sequence, the way create_pending makes it
-  def pending_b_param(sequence)
+  # Pending against the organization's own course, the way create_pending makes it
+  def pending_b_param(course)
     bike = FactoryBot.create(:bike, :with_ownership)
     BParam.create(origin: "register_flow", created_bike_id: bike.id,
-      params: {bike: {creation_organization_id: sequence.organization_id}}.as_json)
-      .tap { FactoryBot.create(:education_course_acknowledgment_pending, b_param: it, bike:, education_course: sequence) }
+      params: {bike: {creation_organization_id: course.organization_id}}.as_json)
+      .tap { FactoryBot.create(:education_course_acknowledgment_pending, b_param: it, bike:, education_course: course) }
   end
 
-  it "finishes the organization's pending registrations once it has no active sequence" do
+  it "finishes the organization's pending registrations once it has no active course" do
     Sidekiq::Job.clear_all
     education_course.update(end_at: Time.current)
     expect(described_class.jobs.map { it["args"] }).to eq([[education_course.id]])
@@ -30,7 +30,7 @@ RSpec.describe CallbackJobs::AfterEducationCourseChangeJob, type: :job do
   end
 
   context "with the organization destroyed" do
-    it "finishes them too, reaching the sequence it soft-deleted" do
+    it "finishes them too, reaching the course it soft-deleted" do
       organization.destroy
       expect(education_course.reload.deleted?).to be_truthy
 
@@ -41,7 +41,7 @@ RSpec.describe CallbackJobs::AfterEducationCourseChangeJob, type: :job do
     end
   end
 
-  context "with a new sequence activated in its place" do
+  context "with a new course activated in its place" do
     it "leaves the registrations pending" do
       FactoryBot.create(:education_course, :with_pages, organization:).make_active!
       expect(education_course.reload.archived?).to be_truthy

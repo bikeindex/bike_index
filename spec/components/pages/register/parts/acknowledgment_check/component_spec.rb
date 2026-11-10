@@ -6,7 +6,7 @@ RSpec.describe Pages::Register::Parts::AcknowledgmentCheck::Component, type: :co
   let(:education_course) { FactoryBot.create(:education_course, acknowledgment_text: "agree to the rules.") }
 
   it "signs with the registrant's name and submits under the given name" do
-    render_inline(described_class.new(sequence: education_course, registrant_name: "Alice Quinn",
+    render_inline(described_class.new(course: education_course, registrant_name: "Alice Quinn",
       checkbox_name: :acknowledged_all))
 
     expect(page).to have_css("strong", text: "Alice Quinn")
@@ -15,7 +15,7 @@ RSpec.describe Pages::Register::Parts::AcknowledgmentCheck::Component, type: :co
   end
 
   it "stands in a placeholder when nobody is signing" do
-    render_inline(described_class.new(sequence: education_course))
+    render_inline(described_class.new(course: education_course))
 
     expect(page).to have_css("em", text: "registrant's name")
     expect(page).to have_css("input[type=checkbox]:not([name])")

@@ -46,7 +46,7 @@ module Admin
 
     private
 
-    # Activation freezes a sequence and its pages, so only drafts are edited
+    # Activation freezes a course and its pages, so only drafts are edited
     def find_education_course
       @education_course = ::EducationCourse.draft.find(params[:education_course_id])
     end

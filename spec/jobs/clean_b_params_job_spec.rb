@@ -47,7 +47,7 @@ RSpec.describe CleanBParamsJob, type: :job do
       it "sweeps the registration, leaving the acknowledgment record standing" do
         expect { described_class.new.perform }.to change(BParam, :count).by(-2)
         expect(acknowledgment.reload.bike_id).to eq bike.id
-        expect(acknowledgment.acknowledgment_text).to be_present # read off the sequence
+        expect(acknowledgment.acknowledgment_text).to be_present # read off the course
       end
     end
   end

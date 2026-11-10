@@ -113,7 +113,7 @@ RSpec.describe Pages::Register::Views::Step1::Component, type: :component do
       end
     end
 
-    # A failed e-vehicle submission re-renders with its sequence resolved, and the electric
+    # A failed e-vehicle submission re-renders with its course resolved, and the electric
     # checkbox, not the server, is what says the safety pages come next
     context "re-rendered with the safety pages resolved" do
       let(:component) do

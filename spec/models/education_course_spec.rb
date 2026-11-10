@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe EducationCourse, type: :model do
-  # The template is the sequence no organization owns, so nil is its organization throughout
+  # The template is the course no organization owns, so nil is its organization throughout
   describe ".draft_for(nil) - the template's draft" do
     it "starts an empty draft - nothing sits above the template to clone" do
       expect { EducationCourse.draft_for(nil) }.to change(EducationCourse, :count).by(1)
@@ -71,12 +71,12 @@ RSpec.describe EducationCourse, type: :model do
       expect(page.image.filename.to_s).to eq("battery.jpg")
     end
 
-    context "with an active sequence" do
+    context "with an active course" do
       let!(:active) do
         FactoryBot.create(:education_course_active, :with_pages, organization:, faq_url: "https://example.com/live")
       end
 
-      it "clones the live sequence, not the template" do
+      it "clones the live course, not the template" do
         template = FactoryBot.create(:education_course_template)
         template.education_course_pages.create!(title: "Template only",
           body: "<ul><li>from template</li></ul>", listing_order: 0)
@@ -116,37 +116,37 @@ RSpec.describe EducationCourse, type: :model do
 
   describe "immutability once activated" do
     let(:organization) { FactoryBot.create(:organization) }
-    let!(:sequence) { FactoryBot.create(:education_course, :with_pages, organization:) }
-    let(:page) { sequence.education_course_pages.first }
+    let!(:course) { FactoryBot.create(:education_course, :with_pages, organization:) }
+    let(:page) { course.education_course_pages.first }
 
     it "is editable as a draft, frozen once active, and archivable after" do
-      expect(sequence.update(acknowledgment_text: "still a draft")).to be_truthy
+      expect(course.update(acknowledgment_text: "still a draft")).to be_truthy
       expect(page.update(title: "still a draft")).to be_truthy
-      expect(sequence.reorder_page!(page, 1)).to_not eq false
+      expect(course.reorder_page!(page, 1)).to_not eq false
 
-      expect(sequence.make_active!).to be_truthy
+      expect(course.make_active!).to be_truthy
 
       # An acknowledgment points at these by id, so they can't move under it
-      expect(sequence.reload.update(acknowledgment_text: "changed")).to be_falsey
-      expect(sequence.errors.full_messages.to_sentence).to match(/can't be edited/)
-      expect(sequence.reload.acknowledgment_text).to eq "still a draft"
+      expect(course.reload.update(acknowledgment_text: "changed")).to be_falsey
+      expect(course.errors.full_messages.to_sentence).to match(/can't be edited/)
+      expect(course.reload.acknowledgment_text).to eq "still a draft"
 
       expect(page.reload.update(title: "changed")).to be_falsey
       expect(page.reload.title).to eq "still a draft"
       expect(page.destroy).to be_falsey
       # update_all skips callbacks, so reorder guards itself
-      expect(sequence.reorder_page!(page, 1)).to eq false
+      expect(course.reorder_page!(page, 1)).to eq false
 
       # Adding a page would rewrite what past registrants agreed to
-      expect(EducationCoursePage.create(education_course: sequence, title: "Added later"))
+      expect(EducationCoursePage.create(education_course: course, title: "Added later"))
         .to_not be_persisted
 
       # Archiving is the one change activation still allows
-      expect(sequence.reload.update(end_at: Time.current)).to be_truthy
-      expect(sequence.reload).to be_archived
+      expect(course.reload.update(end_at: Time.current)).to be_truthy
+      expect(course.reload).to be_archived
     end
 
-    it "allows a sequence created together with its pages - nothing can have acknowledged it yet" do
+    it "allows a course created together with its pages - nothing can have acknowledged it yet" do
       born_active = FactoryBot.create(:education_course_active, :with_pages,
         organization: FactoryBot.create(:organization))
 
@@ -155,12 +155,12 @@ RSpec.describe EducationCourse, type: :model do
     end
 
     it "is soft-deleted with its organization, keeping its pages readable" do
-      sequence.make_active!
+      course.make_active!
 
       expect { organization.destroy }.to_not change(EducationCoursePage, :count)
       # Out of the live scope, but still there for the acknowledgments that reference it
-      expect(EducationCourse.find_by(id: sequence.id)).to be_nil
-      deleted = EducationCourse.with_deleted.find(sequence.id)
+      expect(EducationCourse.find_by(id: course.id)).to be_nil
+      deleted = EducationCourse.with_deleted.find(course.id)
       expect(deleted.deleted_at).to be_present
       expect(deleted.education_course_pages.count).to eq 2
     end
@@ -178,7 +178,7 @@ RSpec.describe EducationCourse, type: :model do
       expect(template_draft.display_name).to eq "Template Current"
       expect(EducationCourse.active_template).to eq template_draft
 
-      # Frozen like any live sequence - editing means a new draft
+      # Frozen like any live course - editing means a new draft
       expect(template_draft.update(faq_url: "https://example.com/faq")).to be_falsey
 
       replacement = EducationCourse.draft_for(nil)
@@ -250,7 +250,7 @@ RSpec.describe EducationCourse, type: :model do
       expect(EducationCourse.with_deleted.find_by(id: draft.id)).to be_nil
     end
 
-    it "refuses to discard an activated sequence" do
+    it "refuses to discard an activated course" do
       active = FactoryBot.create(:education_course_active, :with_pages, organization:)
       expect(active.discard_draft!).to eq false
       expect(active.reload).to be_active
@@ -261,7 +261,7 @@ RSpec.describe EducationCourse, type: :model do
     let(:draft) { FactoryBot.create(:education_course) }
     let!(:pages) { FactoryBot.create_list(:education_course_page, 3, education_course: draft) }
 
-    it "moves the page to the position and re-sequences listing_order from zero" do
+    it "moves the page to the position and re-courses listing_order from zero" do
       draft.reorder_page!(pages.last, 0)
 
       reordered = draft.education_course_pages.reload
