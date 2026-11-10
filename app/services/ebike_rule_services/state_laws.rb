@@ -88,11 +88,6 @@ module EbikeRuleServices
 
     def place_laws(today: Time.zone.today) = places.transform_values { it[:law]&.then { in_force(it, today) } }
 
-    # nil for anything but an abbreviation, such as a query's array
-    def state(abbreviation)
-      STATES.find { it[:abbr] == abbreviation.upcase } if abbreviation.is_a?(String)
-    end
-
     # The state's classification for a vehicle with these classifications, other than its e-bike law: its own, or one
     # sharing their group, with its restrictions not yet ended and its rule_groups
     def other_classification(abbreviation, ids, today: Time.zone.today)

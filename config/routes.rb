@@ -564,10 +564,6 @@ Rails.application.routes.draw do
   get "/bikes", to: redirect("search/registrations")
   get "/marketplace", to: redirect("search/marketplace")
 
-  # registration sequences became education courses
-  get "*path", to: redirect { |_params, request| request.fullpath.sub("registration_sequence", "education_course") },
-    constraints: {path: %r{(?:admin|o/[^/]+)/registration_sequence.*}}, format: false
-
   # Short bike URLs: /r/<short_id> (and /R/...). The whole path is passed through
   # so ShortId#decode strips the "r/" prefix itself, even when the body starts with "r".
   get "*id", to: "registrations#show", constraints: {id: %r{[rR]/.*}}, format: false

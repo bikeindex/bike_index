@@ -69,13 +69,11 @@ class EbikeRulesController < ApplicationController
   # US-CA's is /ebike-rules/US/CA
   def place_path(place, query = {}) = ReadableQuery.path(ebike_rules_place_path(*place[:code].split("-")), query)
 
-  # Two lowercase letters were a US state's before places outside the US had pages, as two uppercase ones still are
-  # where no place has them. The rest are a place's code in any case
+  # A place's code in any case, or a US state's capitals where no place has them
   def place_for(code)
     return unless code.is_a?(String)
 
-    us = (state = EbikeRuleServices::StateLaws.state(code)) && EbikeRuleServices::Places.find("US-#{state[:abbr]}")
-    (code == code.downcase && us) || EbikeRuleServices::Places.find(code.upcase) || us
+    EbikeRuleServices::Places.find(code.upcase) || EbikeRuleServices::Places.find("US-#{code}")
   end
 
   # The checked country of the page a form was sent from, /ebike-rules/US's too

@@ -268,7 +268,7 @@ RSpec.describe EbikeRulesController, type: :request do
       expect(page.all("section[aria-live] [role='tooltip'] code", visible: :all).map { it.text(:all).strip }).to eq ["evc/us/class_3", "evc/out_of_class/us/ca"]
     end
 
-    it "moves a place from the query, or a state's old path, to its own page, and 404s one that isn't a place" do
+    it "moves a place from the query, or another form of its path, to its own page, and 404s one that isn't a place" do
       get "/ebike-rules", params: {state: "US-CO", vehicle_models: "m/specialized/2025/haul_st"}
       expect(response).to redirect_to("/ebike-rules/US/CO?vehicle_models=m/specialized/2025/haul_st")
       expect(response).to have_http_status(:moved_permanently)
@@ -279,9 +279,12 @@ RSpec.describe EbikeRulesController, type: :request do
       get "/ebike-rules", params: {country: "CA"}
       expect(response).to redirect_to("/ebike-rules/CA")
 
-      # a state's lowercase abbreviation, as its page's path was, even where it's a country's code too
+      # a state's lowercase abbreviation isn't a path, and is the country's where one has that code
+      get "/ebike-rules/co"
+      expect(response).to have_http_status(:not_found)
+
       get "/ebike-rules/ca"
-      expect(response).to redirect_to("/ebike-rules/US/CA")
+      expect(response).to redirect_to("/ebike-rules/CA")
       expect(response).to have_http_status(:moved_permanently)
 
       # in capitals, a state's where no place has it
@@ -495,8 +498,8 @@ RSpec.describe EbikeRulesController, type: :request do
       get "/e-bike-rules"
       expect(response).to redirect_to("/ebike-rules")
 
-      get "/e-bike-rules/co?manual=1&watts=250"
-      expect(response).to redirect_to("/ebike-rules/co?manual=1&watts=250")
+      get "/e-bike-rules/US/CO?manual=1&watts=250"
+      expect(response).to redirect_to("/ebike-rules/US/CO?manual=1&watts=250")
     end
 
     it "explains what's missing" do
