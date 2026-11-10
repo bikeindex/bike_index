@@ -25,9 +25,10 @@ RSpec.describe UI::Table::List::Component, type: :component do
   context "with wide_definition and classes" do
     let(:options) { {wide_definition: true, classes: "mt-4"} }
 
-    it "narrows the value column" do
+    it "gives the labels the width" do
       expect(component).to have_css("table.ui-table.mt-4")
-      expect(component).to have_css("td.tw\\:w-\\[70\\%\\]", count: 3)
+      expect(component).to have_css("th.tw:text-left:not(.tw:italic)", count: 3)
+      expect(component).to have_css("td.tw:w-px.tw:whitespace-nowrap", count: 3)
     end
   end
 

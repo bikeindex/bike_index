@@ -103,6 +103,15 @@ RSpec.describe Pages::Admin::IndexSkeleton::IndexInfo::Component, type: :compone
       end
     end
 
+    context "with search_education_course_id param" do
+      let(:params) { {search_education_course_id: 42} }
+
+      it "links the course and offers to drop the filter" do
+        expect(component).to have_link("Education Course 42", href: "/admin/education_courses/42")
+        expect(component).to have_css("a", text: "view for all education courses")
+      end
+    end
+
     context "with search_membership_id param" do
       let(:params) { {search_membership_id: 42} }
       let(:options) { {index: index_state, viewing: "Transaction"} }

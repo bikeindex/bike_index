@@ -394,6 +394,10 @@ class Organization < ApplicationRecord
     hot_sheet_configuration.present? && hot_sheet_configuration.on?
   end
 
+  def hot_sheet_viewable?
+    hot_sheet_on? || search_coordinates_set?
+  end
+
   def current_invoices
     invoices.active
   end

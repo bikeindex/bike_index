@@ -461,7 +461,7 @@ RSpec.describe EbikeRulesController, type: :request do
     it "classes a bike entered by hand by its top speed and throttle" do
       get "/ebike-rules/US/CO", params: {manual: "1", top_speed: "20", watts: "250"}
 
-      expect(page).to have_css("[role='status']", text: "The e-bike is a Class 1 e-bike in Colorado.")
+      expect(page).to have_css("[role='status']", text: "This e-bike is a Class 1 e-bike in Colorado.")
         .and have_checked_field("top_speed", with: "20")
         .and have_checked_field("throttle", with: "0")
 
@@ -543,7 +543,7 @@ RSpec.describe EbikeRulesController, type: :request do
       # a manual check needs no wattage
       get "/ebike-rules/US/CO", params: {manual: "1", top_speed: "20", watts: ""}
 
-      expect(page).to have_css("[role='status']", text: "The e-bike is a Class 1 e-bike in Colorado.")
+      expect(page).to have_css("[role='status']", text: "This e-bike is a Class 1 e-bike in Colorado.")
         .and have_no_css("[role='alert']")
     end
   end

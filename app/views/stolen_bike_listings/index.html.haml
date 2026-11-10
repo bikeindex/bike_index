@@ -44,67 +44,43 @@
             \- view
             = link_to "all stolen bike listings", stolen_bike_listings_path
 .container-fluid
-  .full-screen-table.mt-4
-    %table.table.table-bordered.table-striped.table-sm
-      %thead.thead-light.sortable
-        -#- if display_dev_info?
-        -#  %th.small folder
-        %th
-          = sortable "listed_at"
-        %th
-          = sortable "amount_cents", "price"
-        %th
-          = sortable "mnfg_name", "Manufacturer"
-        %th
-          Color
-        %th
-          Model
-        %th
-          Size
-        %th
-          Listing text
-        %th
-          Photos
-      %tbody
-        - @stolen_bike_listings.each do |stolen_bike_listing|
-          %tr
-            -#- if display_dev_info?
-            -#  %td{style: "min-width: 13em;"}
-            -#    %code.small.only-dev-visible
-            -#      = stolen_bike_listing.updated_photo_folder
-            %td
-              %small.localizeTime
-                = l stolen_bike_listing.listed_at, format: :convert_time
-              - if display_dev_info?
-                %em.small.less-strong.only-dev-visible
-                  = stolen_bike_listing.line
-            %td
-              %span{ title: "#{stolen_bike_listing.amount_formatted} #{stolen_bike_listing.currency_name}"}
-                = stolen_bike_listing.amount_usd_formatted
-            %td
-              = stolen_bike_listing.mnfg_name
-            %td
-              = stolen_bike_listing.frame_colors.to_sentence
-            %td
-              = stolen_bike_listing.frame_model
-            %td
-              = stolen_bike_listing.frame_size&.upcase
-            %td.listing-text-cell
-              = stolen_bike_listing.listing_text
-
-            %td
-              .listing-images
-                - if stolen_bike_listing.full_photo_urls.any?
-                  - preview_image = stolen_bike_listing.full_photo_urls.first
-                  = link_to image_tag(preview_image), preview_image, id: [stolen_bike_listing.id, 0].join("-"), class: "preview-image"
-                  - urls = stolen_bike_listing.full_photo_urls[1..stolen_bike_listing.full_photo_urls.length]
-                  - if urls.any?
-                    .additional-photos.mt-1.less-strong
-                      %em
-                        additional photos:
-                        = safe_join(urls.each_with_index.map { |u, i| content_tag(:a, i + 1, href: u, id: [stolen_bike_listing.id, i + 1].join("-")) }, ", ")
-                - else
-                  %em.less-strong We haven't uploaded the photos for this bike yet
+  .mt-4
+    - show_dev_info = display_dev_info?
+    = render(UI::Table::Base::Component.new(records: @stolen_bike_listings, render_sortable: true, sort_state:)) do |table|
+      -# - table.column(label: "folder", classes: "tw:min-w-[13em]", header_classes: "tw:text-xs") do |stolen_bike_listing|
+      -#   %code.small.only-dev-visible
+      -#     = stolen_bike_listing.updated_photo_folder
+      - table.column(sortable: "listed_at") do |stolen_bike_listing|
+        %small= render(UI::Time::Component.new(time: stolen_bike_listing.listed_at))
+        - if show_dev_info
+          %em.small.less-strong.only-dev-visible
+            = stolen_bike_listing.line
+      - table.column(sortable: "amount_cents", label: "price") do |stolen_bike_listing|
+        %span{ title: "#{stolen_bike_listing.amount_formatted} #{stolen_bike_listing.currency_name}"}
+          = stolen_bike_listing.amount_usd_formatted
+      - table.column(sortable: "mnfg_name", label: "Manufacturer") do |stolen_bike_listing|
+        = stolen_bike_listing.mnfg_name
+      - table.column(label: "Color") do |stolen_bike_listing|
+        = stolen_bike_listing.frame_colors.to_sentence
+      - table.column(label: "Model") do |stolen_bike_listing|
+        = stolen_bike_listing.frame_model
+      - table.column(label: "Size") do |stolen_bike_listing|
+        = stolen_bike_listing.frame_size&.upcase
+      - table.column(label: "Listing text", classes: "listing-text-cell") do |stolen_bike_listing|
+        = stolen_bike_listing.listing_text
+      - table.column(label: "Photos") do |stolen_bike_listing|
+        .listing-images
+          - if stolen_bike_listing.full_photo_urls.any?
+            - preview_image = stolen_bike_listing.full_photo_urls.first
+            = link_to image_tag(preview_image), preview_image, id: [stolen_bike_listing.id, 0].join("-"), class: "preview-image"
+            - urls = stolen_bike_listing.full_photo_urls[1..stolen_bike_listing.full_photo_urls.length]
+            - if urls.any?
+              .additional-photos.mt-1.less-strong
+                %em
+                  additional photos:
+                  = safe_join(urls.each_with_index.map { |u, i| content_tag(:a, i + 1, href: u, id: [stolen_bike_listing.id, i + 1].join("-")) }, ", ")
+          - else
+            %em.less-strong We haven't uploaded the photos for this bike yet
 
   .paginate-container.paginate-container-bottom.row
     .col-md-4.mt-4
