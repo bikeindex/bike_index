@@ -1,5 +1,6 @@
 # The global EducationCourse template: the safety rules for an e-vehicle registration
 # without an organization course of its own, and what organization drafts are cloned from
+Flipper.enable(:education_course_for_all)
 list_html = ->(bullets) { "<ul>#{bullets.map { "<li>#{it}</li>" }.join}</ul>" }
 
 default_pages = [

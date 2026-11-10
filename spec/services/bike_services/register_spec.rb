@@ -730,9 +730,24 @@ RSpec.describe BikeServices::Register do
 
       context "with the template" do
         let!(:template) { FactoryBot.create(:education_course_template_active, :with_pages) }
+        before { Flipper.enable(:education_course_for_all) }
 
         it "is the organization's own course over the template" do
           expect(described_class.education_course(b_param)).to eq course
+        end
+
+        context "switched off" do
+          let(:bike_params) { super().except(:creation_organization_id) }
+          before { Flipper.disable(:education_course_for_all) }
+
+          it "is nil, except for a registration whose bike was created owing it" do
+            expect(described_class.education_course(b_param)).to be_nil
+            single_page = described_class.flow(b_param, course: nil, single_page: true)
+            expect(described_class.motorized_review(b_param, single_page, separate_attestation: false)).to be false
+
+            EducationCourseAcknowledgment.create_pending(b_param, course: template)
+            expect(described_class.education_course(b_param)).to eq template
+          end
         end
 
         context "without an organization" do

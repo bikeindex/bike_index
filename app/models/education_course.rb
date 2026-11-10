@@ -62,6 +62,10 @@ class EducationCourse < ApplicationRecord
     # The template belongs to no organization, so nil is its owner in every lookup here
     def active_template = active_for(nil)
 
+    # Whether registrations without an organization course of their own get the template.
+    # A Flipper flag (/admin/feature_flags), off until it's turned on
+    def template_for_all? = Flipper.enabled?(:education_course_for_all)
+
     def active_for(organization)
       active.find_by(organization:)
     end

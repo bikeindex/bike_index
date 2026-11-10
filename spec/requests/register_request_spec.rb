@@ -1802,6 +1802,7 @@ RSpec.describe RegisterController, type: :request do
     context "without an organization, with the template" do
       let(:organization) { nil }
       let(:owner_email) { current_user.email }
+      before { Flipper.enable(:education_course_for_all) }
       let(:b_param) do
         BParam.create(origin: "register_flow",
           params: {bike: {owner_email:, manufacturer_id: "Trek", cycle_type: "e-scooter"}}.as_json)
@@ -1894,6 +1895,7 @@ RSpec.describe RegisterController, type: :request do
 
     context "agreeing to the template, then naming an organization with its own" do
       let!(:template) { FactoryBot.create(:education_course_template_active, :with_pages) }
+      before { Flipper.enable(:education_course_for_all) }
       let(:b_param) do
         BParam.create(origin: "register_flow",
           params: {bike: {owner_email:, manufacturer_id: "Trek", cycle_type: "e-scooter"}}.as_json)

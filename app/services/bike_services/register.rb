@@ -190,7 +190,7 @@ module BikeServices
       return false unless flow.single_page?
       return (separate_attestation ? :own_emails : true) if education_course(b_param, motorized: true, template: false).present?
 
-      EducationCourse.active_template.present? ? :own_emails : false
+      (EducationCourse.template_for_all? && EducationCourse.active_template.present?) ? :own_emails : false
     end
 
     # Whether the flow includes the report step - what was stolen, or what was found
@@ -392,8 +392,11 @@ module BikeServices
     #
 
     # A rider registering their own vehicle - not a member registering a customer's, and not a
-    # theft or found report. Anonymous counts as the owner, whose email gets confirmed
+    # theft or found report. Anonymous counts as the owner, whose email gets confirmed.
+    # Switched off, still for one whose bike was created owing it
     def template_applies?(b_param, user)
+      return false unless EducationCourse.template_for_all? || b_param.acknowledgment_pending?
+
       registrant = b_param.creator || user
       !report_step?(b_param.status) && (registrant.blank? || b_param.self_made?(registrant))
     end
