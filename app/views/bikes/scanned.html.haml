@@ -29,7 +29,7 @@
           = t(".or_click_html", bike_sticker_kind: @bike_sticker.kind)
 
         - bike_sticker = @bike_sticker
-        - link_bike_sticker_kind = t(".link_bike_sticker_kind", bike_sticker_kind: @bike_sticker.kind)
+        - link_bike_sticker_kind = t(".link_bike_sticker_kind", bike_sticker_kind: bike_sticker.kind)
         = render(UI::Table::Base::Component.new(records: @bikes)) do |table|
           - table.column(label: safe_join([t(".added"), " ", tag.small(class: "localizeTimezone")])) do |bike|
             %small
