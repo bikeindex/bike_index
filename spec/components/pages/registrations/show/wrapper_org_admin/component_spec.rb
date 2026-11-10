@@ -65,10 +65,13 @@ RSpec.describe Pages::Registrations::Show::WrapperOrgAdmin::Component, type: :co
     let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: owner, cycle_type: "e-scooter") }
     let(:owner_access) { page.find("h2", text: "Owner & access").find(:xpath, "..") }
 
-    it "shows the phone, and says the rest of the contact details aren't available" do
+    it "shows the phone behind a toggle, and says the rest of the contact details aren't available" do
       render_inline(described_class.new(bike: bike.reload, current_user:, organization:, org_role: :staff))
 
-      expect(owner_access).to have_link("718-391-4410", href: "tel:718-391-4410")
+      phone_toggle = owner_access.find("[data-controller='ui--collapse'][data-ui--collapse-param-value='phone_shown']")
+      expect(phone_toggle).to have_css("[role='button'][aria-expanded='false']", text: "Show phone")
+      expect(phone_toggle.find("[data-ui--collapse-target='content']")[:class]).to include("tw:hidden")
+      expect(phone_toggle.find("[data-ui--collapse-target='content']")).to have_link("718-391-4410", href: "tel:718-391-4410")
       expect(owner_access).to have_text("Not registered with #{organization.short_name}")
       expect(owner_access).to have_text("Other owner contact details aren't available, since this e-scooter isn't registered with your organization")
       expect(owner_access).to_not have_text(bike.owner_email)

@@ -32,6 +32,7 @@ en:
             restricted_title: Restricted for your role
             role_limited: Limited
             role_staff: Staff
+            show_phone: Show phone
             showing_recent: Showing the %{count} most recent
             sticker_code: Sticker code
             unregistered_owner: >-
