@@ -50,7 +50,7 @@ class EducationCourseAcknowledgment < ApplicationRecord
   }
   # What an organization's bike agreed to: its rules, or the template's where they stood in
   scope :for_organization_or_template, ->(organization) {
-    joins(:registration_sequence).where(registration_sequences: {organization_id: [organization.id, nil]})
+    joins(:education_course).where(education_courses: {organization_id: [organization.id, nil]})
   }
 
   class << self

@@ -190,7 +190,7 @@ module BikeServices
       return false unless flow.single_page?
       return (separate_attestation ? :own_emails : true) if education_course(b_param, motorized: true, template: false).present?
 
-      RegistrationSequence.active_template.present? ? :own_emails : false
+      EducationCourse.active_template.present? ? :own_emails : false
     end
 
     # Whether the flow includes the report step - what was stolen, or what was found
@@ -400,8 +400,8 @@ module BikeServices
 
     # An agreement to one organization's rules says nothing about another's
     def restart_rules(b_param)
-      b_param.params = b_param.params.except("registration_sequence")
-      RegistrationSequenceAcknowledgment.where(b_param_id: b_param.id).destroy_all
+      b_param.params = b_param.params.except("education_course")
+      EducationCourseAcknowledgment.where(b_param_id: b_param.id).destroy_all
     end
 
     # Whether a bike registered some other way is this registration's. Step 1 says only

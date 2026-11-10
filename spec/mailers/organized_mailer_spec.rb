@@ -85,8 +85,8 @@ RSpec.describe OrganizedMailer, type: :mailer do
       end
 
       context "owing the template's safety rules" do
-        let(:template) { FactoryBot.create(:registration_sequence_template_active, :with_pages) }
-        before { RegistrationSequenceAcknowledgment.create_pending(b_param, sequence: template) }
+        let(:template) { FactoryBot.create(:education_course_template_active, :with_pages) }
+        before { EducationCourseAcknowledgment.create_pending(b_param, sequence: template) }
 
         it "asks for the e-vehicle safety rules, without an organization's name" do
           mail = OrganizedMailer.partial_registration(b_param)

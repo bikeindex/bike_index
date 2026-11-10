@@ -52,7 +52,7 @@ RSpec.describe CallbackJobs::AfterEducationCourseChangeJob, type: :job do
   end
 
   context "with the template" do
-    let(:template) { FactoryBot.create(:registration_sequence_template_active, :with_pages) }
+    let(:template) { FactoryBot.create(:education_course_template_active, :with_pages) }
     let!(:b_param_template) { pending_b_param(template) }
 
     it "finishes its pending registrations once it's ended, without touching an organization's" do

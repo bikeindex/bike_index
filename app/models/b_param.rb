@@ -308,7 +308,7 @@ class BParam < ApplicationRecord
   end
 
   def pending_acknowledgment
-    RegistrationSequenceAcknowledgment.pending.find_by(b_param_id: id) if persisted?
+    EducationCourseAcknowledgment.pending.find_by(b_param_id: id) if persisted?
   end
 
   def finished_registration? = with_bike? && !acknowledgment_pending?
