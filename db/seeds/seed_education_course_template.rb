@@ -1,5 +1,5 @@
 # The global EducationCourse template: the safety rules for an e-vehicle registration
-# without an organization sequence of its own, and what organization drafts are cloned from
+# without an organization course of its own, and what organization drafts are cloned from
 list_html = ->(bullets) { "<ul>#{bullets.map { "<li>#{it}</li>" }.join}</ul>" }
 
 default_pages = [
@@ -39,24 +39,24 @@ end
 # Organizations clone the live template, so the seeded one has to be activated
 template.make_active!
 
-# Brakebills registers e-vehicles, so give it a live sequence of its own, with a campus page
+# Brakebills registers e-vehicles, so give it a live course of its own, with a campus page
 # the way an organization would add one in the editor
 brakebills = Organization.find_by_name("Brakebills")
 if brakebills.present?
-  sequence = EducationCourse.draft_for(brakebills)
-  sequence.education_course_pages.create!(title: "Campus-specific rules", organization_specific: true,
+  course = EducationCourse.draft_for(brakebills)
+  course.education_course_pages.create!(title: "Campus-specific rules", organization_specific: true,
     heading: "#{brakebills.short_name} campus policies",
     subtitle: "Your school has a couple of additional rules for riding on campus.",
     body: list_html.call(["I will ride only on designated campus paths and dismount in all posted dismount zones.",
       "I will park only in campus e-vehicle corrals — never at pedestrian entrances or building exits."]))
-  sequence.make_active!
-  puts "Education course activated for Brakebills: #{sequence.education_course_pages.count} pages\n"
+  course.make_active!
+  puts "Education course activated for Brakebills: #{course.education_course_pages.count} pages\n"
 
   # All but one of the e-vehicles, so a registration shows both with and without an acknowledgment
   acknowledged = brakebills.bikes.motorized.order(:id).to_a[0...-1]
   acknowledged.each do |bike|
     SeedHelpers.tick
-    EducationCourseAcknowledgment.create!(education_course: sequence, bike:, user: bike.creator,
+    EducationCourseAcknowledgment.create!(education_course: course, bike:, user: bike.creator,
       owner_email: bike.owner_email, acknowledged_at: Time.current)
   end
   puts "Acknowledged the Brakebills education course for #{acknowledged.count} e-vehicles\n"

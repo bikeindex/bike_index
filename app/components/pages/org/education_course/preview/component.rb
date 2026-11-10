@@ -47,7 +47,7 @@ module Pages
           end
 
           def back_path
-            @index.zero? ? exit_path : sequence_path(page: @index)
+            @index.zero? ? exit_path : course_path(page: @index)
           end
 
           # The URL page param is 1-indexed; @index is 0-based
@@ -55,7 +55,7 @@ module Pages
 
           # A GET form appends ?page= from a hidden field, since a form's own query string
           # is dropped on submit
-          def sequence_path(page: nil)
+          def course_path(page: nil)
             EducationCoursePaths.preview(@education_course, page:, admin: @admin)
           end
 

@@ -9,7 +9,7 @@ module CallbackJobs
       return if education_course.blank?
 
       # nil for the template, which owns its own pending acknowledgments.
-      # An active sequence still has rules to agree to, so they're still owed
+      # An active course still has rules to agree to, so they're still owed
       organization_id = education_course.organization_id
       return if EducationCourse.active.where(organization_id:).exists?
 

@@ -222,7 +222,7 @@ module UserServices
     def settings_group(organization, admin)
       return nil unless admin
 
-      sequences = routes.organization_education_courses_path(organization_id: organization.to_param)
+      courses = routes.organization_education_courses_path(organization_id: organization.to_param)
       children = [
         ComponentStructs::Shapes.link(translation(:org_profile, org_name: organization.short_name),
           routes.organization_manage_path(organization_id: organization.to_param)),
@@ -236,9 +236,9 @@ module UserServices
           routes.edit_organization_hot_sheet_path(organization_id: organization.to_param)),
         ComponentStructs::Shapes.link(translation(:registration_form_settings),
           routes.settings_organization_registrations_path(organization_id: organization.to_param)),
-        # Editing a page of a sequence is the same section of the menu, on a path of its own
-        enabled_link(organization, "education_courses", translation(:education_courses), sequences,
-          match_paths: ["#{sequences}/**", "#{org_root(organization)}/education_course_pages/**"])
+        # Editing a page of a course is the same section of the menu, on a path of its own
+        enabled_link(organization, "education_courses", translation(:education_courses), courses,
+          match_paths: ["#{courses}/**", "#{org_root(organization)}/education_course_pages/**"])
       ]
 
       ComponentStructs::Shapes.group(:settings,

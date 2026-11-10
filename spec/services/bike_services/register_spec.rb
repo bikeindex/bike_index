@@ -631,21 +631,21 @@ RSpec.describe BikeServices::Register do
 
     context "with acknowledgment pages" do
       let(:organization) { FactoryBot.create(:organization) }
-      let!(:sequence) { FactoryBot.create(:education_course_active, :with_pages, organization:) }
+      let!(:course) { FactoryBot.create(:education_course_active, :with_pages, organization:) }
       let(:bike_params) do
         super().merge(cycle_type: "e-scooter", creation_organization_id: organization.id)
       end
 
       it "comes before them" do
-        expect(described_class.education_course(b_param)).to eq sequence
+        expect(described_class.education_course(b_param)).to eq course
         # Two detail steps, the report, a page each and the review
-        flow = described_class.flow(b_param, course: sequence)
+        flow = described_class.flow(b_param, course:)
         expect(flow.steps).to eq %w[1 2 report 3 4 review]
-        expect(described_class.permitted_step(b_param, "3", course: sequence)).to eq "report"
+        expect(described_class.permitted_step(b_param, "3", course:)).to eq "report"
         expect(flow.before("3")).to eq "report"
 
         described_class.save_report(b_param, report_params:)
-        expect(described_class.permitted_step(b_param, nil, course: sequence)).to eq "3"
+        expect(described_class.permitted_step(b_param, nil, course:)).to eq "3"
         expect(flow.position("3")).to eq 4
       end
 
@@ -656,18 +656,18 @@ RSpec.describe BikeServices::Register do
         end
 
         it "comes after them - the emailed link is clicked once they're acknowledged" do
-          pages = described_class.course_pages(sequence)
-          expect(described_class.flow(b_param, course: sequence).steps).to eq %w[1 2 3 4 review report]
-          expect(described_class.permitted_step(b_param, "report", course: sequence)).to eq "3"
+          pages = described_class.course_pages(course)
+          expect(described_class.flow(b_param, course:).steps).to eq %w[1 2 3 4 review report]
+          expect(described_class.permitted_step(b_param, "report", course:)).to eq "3"
 
           pages.each { described_class.acknowledge_page(b_param, it, checked: %w[1 1]) }
-          described_class.save_acknowledgment(b_param, sequence, acknowledged_all: "1")
-          expect(described_class.finished?(b_param, course: sequence)).to be_truthy
+          described_class.save_acknowledgment(b_param, course, acknowledged_all: "1")
+          expect(described_class.finished?(b_param, course:)).to be_truthy
 
           # Confirming the email is what opens the report
           b_param.update(creator_id: creator.id)
-          expect(described_class.permitted_step(b_param, nil, course: sequence)).to eq "report"
-          expect(described_class.flow(b_param, course: sequence).before("report")).to eq "2"
+          expect(described_class.permitted_step(b_param, nil, course:)).to eq "report"
+          expect(described_class.flow(b_param, course:).before("report")).to eq "2"
         end
       end
     end
@@ -675,8 +675,8 @@ RSpec.describe BikeServices::Register do
 
   describe "e-vehicle acknowledgment" do
     let(:organization) { FactoryBot.create(:organization) }
-    let!(:sequence) { FactoryBot.create(:education_course_active, :with_pages, organization:) }
-    let(:pages) { sequence.education_course_pages.to_a }
+    let!(:course) { FactoryBot.create(:education_course_active, :with_pages, organization:) }
+    let(:pages) { course.education_course_pages.to_a }
     let(:bike_params) do
       {owner_email: "owner@example.com", manufacturer_id: 12, cycle_type: "e-scooter",
        creation_organization_id: organization.id}
@@ -692,7 +692,7 @@ RSpec.describe BikeServices::Register do
           primary_frame_color_id: FactoryBot.create(:color).id, status: "status_with_owner")
       end
 
-      # Only the switch leaves the rules to the owner - a caller without a sequence doesn't
+      # Only the switch leaves the rules to the owner - a caller without a course doesn't
       it "doesn't hold the bike for the owner without separate attestation" do
         b_param.update(creator_id: FactoryBot.create(:user_confirmed).id)
         bike = described_class.complete(b_param, user: nil, course: nil, ip_address: nil)
@@ -703,10 +703,10 @@ RSpec.describe BikeServices::Register do
     end
 
     describe "education_course" do
-      it "is the organization's active sequence" do
-        expect(described_class.education_course(b_param)).to eq sequence
+      it "is the organization's active course" do
+        expect(described_class.education_course(b_param)).to eq course
         # Two detail steps, a page each and the review
-        expect(described_class.flow(b_param, course: sequence).steps.count).to eq 5
+        expect(described_class.flow(b_param, course:).steps.count).to eq 5
       end
 
       context "not an e-vehicle" do
@@ -719,11 +719,11 @@ RSpec.describe BikeServices::Register do
         end
       end
 
-      context "the organization's sequence is still a draft" do
-        let!(:sequence) { FactoryBot.create(:education_course, :with_pages, organization:) }
+      context "the organization's course is still a draft" do
+        let!(:course) { FactoryBot.create(:education_course, :with_pages, organization:) }
 
         it "is nil - a draft isn't shown to registrants" do
-          expect(sequence).to be_draft
+          expect(course).to be_draft
           expect(described_class.education_course(b_param)).to be_nil
         end
       end
@@ -731,8 +731,8 @@ RSpec.describe BikeServices::Register do
       context "with the template" do
         let!(:template) { FactoryBot.create(:education_course_template_active, :with_pages) }
 
-        it "is the organization's own sequence over the template" do
-          expect(described_class.education_course(b_param)).to eq sequence
+        it "is the organization's own course over the template" do
+          expect(described_class.education_course(b_param)).to eq course
         end
 
         context "without an organization" do
@@ -744,8 +744,8 @@ RSpec.describe BikeServices::Register do
           end
         end
 
-        context "the organization's sequence is still a draft" do
-          let!(:sequence) { FactoryBot.create(:education_course, :with_pages, organization:) }
+        context "the organization's course is still a draft" do
+          let!(:course) { FactoryBot.create(:education_course, :with_pages, organization:) }
 
           it "is the template, except for the legacy forms" do
             expect(described_class.education_course(b_param)).to eq template
@@ -754,24 +754,24 @@ RSpec.describe BikeServices::Register do
 
           it "stays on the template once started, until resumed on the organization's own" do
             described_class.acknowledge_page(b_param, template.education_course_pages.first, checked: %w[1 1])
-            sequence.make_active!
+            course.make_active!
 
             expect(described_class.education_course(b_param)).to eq template
             expect(described_class.resume_education_course(b_param, course: template)).to eq([template, false])
             template.update(end_at: Time.current)
-            expect(described_class.resume_education_course(b_param, course: template.reload)).to eq([sequence, true])
+            expect(described_class.resume_education_course(b_param, course: template.reload)).to eq([course, true])
           end
 
           it "leaves the legacy forms on the organization's own, even started on the template" do
             described_class.acknowledge_page(b_param, template.education_course_pages.first, checked: %w[1 1])
             expect(described_class.education_course(b_param, template: false)).to be_nil
-            sequence.make_active!
-            expect(described_class.education_course(b_param, template: false)).to eq sequence
+            course.make_active!
+            expect(described_class.education_course(b_param, template: false)).to eq course
           end
         end
 
-        context "the organization has no live sequence" do
-          let!(:sequence) { nil }
+        context "the organization has no live course" do
+          let!(:course) { nil }
           let(:pages) { [] }
           let(:member) { FactoryBot.create(:user_confirmed, email: "member@example.com") }
 
@@ -830,8 +830,8 @@ RSpec.describe BikeServices::Register do
             b_param.reload
             expect(b_param.creation_organization_id).to eq organization.id
             expect(b_param.params["education_course"]).to be_nil
-            expect(described_class.education_course(b_param)).to eq sequence
-            expect(described_class.acknowledged?(b_param, course: sequence)).to be_falsey
+            expect(described_class.education_course(b_param)).to eq course
+            expect(described_class.acknowledged?(b_param, course:)).to be_falsey
             expect(EducationCourseAcknowledgment.count).to eq 0
           end
         end
@@ -843,7 +843,7 @@ RSpec.describe BikeServices::Register do
           it "restarts the rules on the template" do
             b_param.update(creator_id: user.id, params: b_param.params.merge("auto_organization_id" => organization.id))
             described_class.acknowledge_page(b_param, pages.first, checked: %w[1 1])
-            expect(described_class.education_course(b_param.reload, user:)).to eq sequence
+            expect(described_class.education_course(b_param.reload, user:)).to eq course
 
             described_class.save_step_2(b_param, user:, image: nil, image_signed_id: nil, bike_params: {"user_name" => "Owner"}.with_indifferent_access,
               register_with_organization: "false")
@@ -863,9 +863,9 @@ RSpec.describe BikeServices::Register do
           expect(described_class.flow(b_param, course: nil).steps.count).to eq 2
         end
 
-        it "is the sequence when the registrant is the one registering" do
+        it "is the course when the registrant is the one registering" do
           expect(described_class.education_course(b_param, separate_attestation: true, user: registrant))
-            .to eq sequence
+            .to eq course
         end
       end
 
@@ -883,29 +883,29 @@ RSpec.describe BikeServices::Register do
       end
 
       context "with a page acknowledged, then a newer version activated" do
-        let(:new_sequence) { FactoryBot.create(:education_course, :with_pages, organization:) }
+        let(:new_course) { FactoryBot.create(:education_course, :with_pages, organization:) }
         before do
           described_class.acknowledge_page(b_param, pages.first, checked: %w[1 1])
-          new_sequence.make_active!
+          new_course.make_active!
         end
 
         it "stays on the version being agreed to, until resumed on the newer one" do
           started = described_class.education_course(b_param)
-          expect(started).to eq sequence
+          expect(started).to eq course
 
-          expect(described_class.resume_education_course(b_param, course: started)).to eq([new_sequence, true])
+          expect(described_class.resume_education_course(b_param, course: started)).to eq([new_course, true])
           expect(described_class.acknowledged_page_ids(b_param)).to eq([])
-          expect(described_class.education_course(b_param)).to eq new_sequence
-          expect(described_class.resume_education_course(b_param, course: new_sequence)).to eq([new_sequence, false])
+          expect(described_class.education_course(b_param)).to eq new_course
+          expect(described_class.resume_education_course(b_param, course: new_course)).to eq([new_course, false])
         end
 
         context "already agreed to" do
-          before { described_class.save_acknowledgment(b_param, sequence, acknowledged_all: "1") }
+          before { described_class.save_acknowledgment(b_param, course, acknowledged_all: "1") }
 
           it "isn't restarted" do
             started = described_class.education_course(b_param)
             expect(started.archived?).to be_truthy
-            expect(described_class.resume_education_course(b_param, course: started)).to eq([sequence, false])
+            expect(described_class.resume_education_course(b_param, course: started)).to eq([course, false])
           end
         end
       end
@@ -914,46 +914,46 @@ RSpec.describe BikeServices::Register do
     it "opens one page at a time, then the review" do
       expect(pages.count).to eq 2
       # The details are in, so the first safety page is where the flow now stands
-      expect(described_class.acknowledged?(b_param, course: sequence)).to be_falsey
-      expect(described_class.permitted_step(b_param, nil, course: sequence)).to eq "3"
-      expect(described_class.permitted_step(b_param, "4", course: sequence)).to eq "3"
-      expect(described_class.page_for_step("3", course: sequence)).to eq pages.first
-      expect(described_class.page_for_step("review", course: sequence)).to be_nil
+      expect(described_class.acknowledged?(b_param, course:)).to be_falsey
+      expect(described_class.permitted_step(b_param, nil, course:)).to eq "3"
+      expect(described_class.permitted_step(b_param, "4", course:)).to eq "3"
+      expect(described_class.page_for_step("3", course:)).to eq pages.first
+      expect(described_class.page_for_step("review", course:)).to be_nil
 
       expect(described_class.acknowledge_page(b_param, pages.first, checked: %w[1 1])).to be_truthy
       expect(described_class.acknowledged_page_ids(b_param)).to eq([pages.first.id])
-      expect(described_class.permitted_step(b_param, nil, course: sequence)).to eq "4"
+      expect(described_class.permitted_step(b_param, nil, course:)).to eq "4"
       # Every earlier step stays browsable
-      expect(described_class.permitted_step(b_param, "3", course: sequence)).to eq "3"
-      expect(described_class.permitted_step(b_param, "1", course: sequence)).to eq "1"
+      expect(described_class.permitted_step(b_param, "3", course:)).to eq "3"
+      expect(described_class.permitted_step(b_param, "1", course:)).to eq "1"
 
       described_class.acknowledge_page(b_param, pages.last, checked: %w[1 1])
-      expect(described_class.permitted_step(b_param, nil, course: sequence)).to eq "review"
-      expect(described_class.acknowledged?(b_param, course: sequence)).to be_falsey
+      expect(described_class.permitted_step(b_param, nil, course:)).to eq "review"
+      expect(described_class.acknowledged?(b_param, course:)).to be_falsey
 
       expect {
-        expect(described_class.save_acknowledgment(b_param, sequence, acknowledged_all: "1")).to be_truthy
+        expect(described_class.save_acknowledgment(b_param, course, acknowledged_all: "1")).to be_truthy
       }.to change(EducationCourseAcknowledgment, :count).by 1
-      expect(described_class.acknowledged?(b_param, course: sequence)).to be_truthy
+      expect(described_class.acknowledged?(b_param, course:)).to be_truthy
 
-      # The agreement is its own record, naming who agreed and to which sequence
+      # The agreement is its own record, naming who agreed and to which course
       acknowledgment = EducationCourseAcknowledgment.last
-      expect(acknowledgment).to have_attributes(education_course_id: sequence.id,
+      expect(acknowledgment).to have_attributes(education_course_id: course.id,
         b_param_id: b_param.id, owner_email: b_param.owner_email, bike_id: nil,
-        acknowledgment_text: sequence.acknowledgment)
+        acknowledgment_text: course.acknowledgment)
       expect(acknowledgment.acknowledged_pages.pluck(:id)).to match_array(pages.map(&:id))
       expect(acknowledgment.acknowledged_at).to be_within(5).of(Time.current)
 
       # Without a creator the registration now waits on the confirmation email
-      expect(described_class.finished?(b_param, course: sequence)).to be_truthy
+      expect(described_class.finished?(b_param, course:)).to be_truthy
     end
 
     it "attests once, even if the review is submitted twice" do
       pages.each { described_class.acknowledge_page(b_param, it, checked: %w[1 1]) }
-      described_class.save_acknowledgment(b_param, sequence, acknowledged_all: "1")
+      described_class.save_acknowledgment(b_param, course, acknowledged_all: "1")
 
       expect {
-        expect(described_class.save_acknowledgment(b_param, sequence, acknowledged_all: "1")).to be_truthy
+        expect(described_class.save_acknowledgment(b_param, course, acknowledged_all: "1")).to be_truthy
       }.to_not change(EducationCourseAcknowledgment, :count)
     end
 
@@ -962,18 +962,18 @@ RSpec.describe BikeServices::Register do
       expect(described_class.acknowledge_page(b_param, pages.first, checked: nil)).to be_falsey
       expect(described_class.acknowledge_page(b_param, nil, checked: %w[1 1])).to be_falsey
       expect(described_class.acknowledged_page_ids(b_param)).to eq([])
-      expect(described_class.permitted_step(b_param, nil, course: sequence)).to eq "3"
+      expect(described_class.permitted_step(b_param, nil, course:)).to eq "3"
     end
 
     it "refuses an unchecked acknowledgment" do
       pages.each { described_class.acknowledge_page(b_param, it, checked: %w[1 1]) }
       expect {
-        expect(described_class.save_acknowledgment(b_param, sequence, acknowledged_all: "0")).to be_falsey
+        expect(described_class.save_acknowledgment(b_param, course, acknowledged_all: "0")).to be_falsey
       }.to_not change(EducationCourseAcknowledgment, :count)
-      expect(described_class.acknowledged?(b_param, course: sequence)).to be_falsey
+      expect(described_class.acknowledged?(b_param, course:)).to be_falsey
     end
 
-    context "without a sequence" do
+    context "without a course" do
       it "has nothing to acknowledge" do
         expect(described_class.acknowledged?(b_param, course: nil)).to be_truthy
         expect(described_class.permitted_step(b_param, nil, course: nil)).to eq "finished"

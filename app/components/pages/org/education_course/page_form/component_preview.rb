@@ -15,15 +15,15 @@ module Pages
 
           # Adding one POSTs, and has no preview to go stale
           def new_page
-            sequence = organization_drafts.last
-            return missing_notice("draft education courses") if sequence.blank?
+            course = organization_drafts.last
+            return missing_notice("draft education courses") if course.blank?
 
-            render(Pages::Org::EducationCourse::PageForm::Component.new(page: sequence.education_course_pages.new))
+            render(Pages::Org::EducationCourse::PageForm::Component.new(page: course.education_course_pages.new))
           end
 
           private
 
-          # An activated sequence's pages have no editor, so their paths 404. The template's
+          # An activated course's pages have no editor, so their paths 404. The template's
           # are edited in admin, so they'd render the organization's paths for it
           def organization_drafts = ::EducationCourse.draft.where.not(organization_id: nil)
 
