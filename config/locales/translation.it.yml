@@ -5258,7 +5258,6 @@ it:
       parking_notification_unregistered: Nuova notifica non registrata
       parking_notifications_group: Notifiche di parcheggio
       recoveries: Recuperi
-      registration_sequences: Sequenze di registrazione
       registration_stickers: Adesivi di registrazione
       reports: Rapporti
       resources: Risorse
@@ -5272,6 +5271,7 @@ it:
       search_all_registrations: Cerca tutte le registrazioni
       add_a_registration: Aggiungi una registrazione
       registration_form_settings: Impostazioni del modulo di registrazione
+      education_courses: Corsi di formazione
   theft_alert_plans:
     theft_alert_plan:
       days: Giorni
@@ -5833,7 +5833,6 @@ it:
             occurred_at_cell: Volare a
             photo_cell: Foto
             view_cell: Visualizzazione
-            acknowledgment_cell_panel: Sequenza di registrazione temporale confermata
             filter_stolen_or_impounded_html: solo <strong>rubati</strong> o <strong>sequestrati</strong>
             location_search_disabled_no_address: "%{org_name} non raccoglie gli indirizzi
               di immatricolazione, quindi solo le immatricolazioni rubate o sequestrate
@@ -5869,6 +5868,7 @@ it:
             copy_column_order_from_registrations_search: Copia l'ordine delle colonne
               dalla ricerca delle registrazioni
             impound_search_columns: Colonne di ricerca per i sequestri
+            course_acknowledgment_cell_panel: Tempo - Corso di formazione riconosciuto
           column_settings_toggle:
             column_settings: Impostazioni della colonna
           settings_and_filters:
@@ -5887,9 +5887,9 @@ it:
             link_sticker: adesivo di collegamento
             hidden: nascosto
             not_registered_with: Nascosto perché non è registrato con %{org_name}
-            acknowledgment_title: Conferma della sequenza di registrazione a
             view: Visualizzazione
             toggle_all_checked: Seleziona tutto
+            course_acknowledgment_title: Riconoscimento del corso di formazione presso
           multi_result_chip:
             no_results: nessuna corrispondenza
           multi_results:
@@ -5957,7 +5957,7 @@ it:
           map_unavailable: 'Impossibile caricare la mappa: la posizione è ancora impostata
             dal tuo dispositivo.'
           set_on_map: Imposta sulla mappa
-        registration_sequence:
+        education_course:
           page_edit_bullet:
             bullet: proiettile
       registrations:
@@ -6241,9 +6241,9 @@ it:
             not_audited: Non sottoposto a revisione contabile
             organization_registered: Organizzazione
             registration_information: Informazioni di registrazione
-            registration_sequence: Sequenza di registrazione
             sticker: Adesivo
             sticker_claimed: reclamato
+            education_course: Corso di formazione
           internal_notes:
             current_note: Nota corrente
             deleted_user: un utente eliminato
@@ -7273,6 +7273,13 @@ it:
               regole da verificare.
           yellow_summary_no_classes_without_throttle: Il modello %{name} è classificato
             come e-bike in %{state}, senza l'acceleratore opzionale.
+          class_3_throttle_past: L'acceleratore supera i 20 mph consentiti per un
+            acceleratore di Classe 3
+          throttle_past_cap_kmh_html: L'acceleratore supera %{past} km/h, oltre il
+            limite %{cap} km/h
+          throttle_past_kmh_html: L'acceleratore supera %{past} km/h; verificare che
+            si fermi a %{cap} km/h
+          yes_over_mph_html: Sì, oltre %{mph} mph
         rule_label:
           classes: Classi riconosciute
           power: Limite di potenza del motore
@@ -7392,7 +7399,6 @@ it:
           how_to_check_lookup: Guarda il modello qui sopra. BikeBook mostra la certificazione
             laddove è registrata.
           over_28_mph: Oltre 28 miglia orarie
-          top_speed: Qual è la sua velocità massima?
           visit_bikebook_link: Visita BikeBook.
           custom_details: Dettagli personalizzati
           details_legend: Dettagli della tua bici
@@ -7405,8 +7411,6 @@ it:
           banned_body_canada: Università, enti gestori di alloggi e aziende di trasporto
             pubblico stanno adottando normative per la conservazione e la ricarica
             delle e-bike al chiuso, e la certificazione è ciò che ricercano.
-          choose_province: Seleziona la tua provincia o il tuo territorio dall'elenco.
-          choose_state: Seleziona il tuo stato dall'elenco.
           detected_place_html: Abbiamo rilevato <strong>%{state}</strong> .
           kmh: "%{kmh} km/h"
           not_in_canada_html: Non sei in Canada? %{switch_country}
@@ -7430,6 +7434,11 @@ it:
           subheading_canada: Inserisci la tua provincia o territorio e la tua bicicletta
             per visualizzare le relative regole.
           watts_placeholder_canada: ad esempio 500
+          choose_your_province: Scegli la tua provincia o il tuo territorio.
+          choose_your_state: Seleziona il tuo stato.
+          over_20_mph: Oltre 20 miglia orarie
+          top_assist_speed: Velocità massima con pedalata assistita
+          top_throttle_speed: Velocità massima dell'acceleratore
         state_reference:
           compiling: Stiamo raccogliendo le normative sulle e-bike di %{state} provenienti
             dalla legislatura statale e dal DMV. Tornate a trovarci presto.

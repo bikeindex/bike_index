@@ -5012,7 +5012,6 @@ nb:
       parking_notification_unregistered: Ny uregistrert melding
       parking_notifications_group: Parkeringsvarsler
       recoveries: Gjenopprettinger
-      registration_sequences: Registreringssekvenser
       registration_stickers: Registreringsklistremerker
       reports: Rapporter
       resources: Ressurser
@@ -5026,6 +5025,7 @@ nb:
       search_all_registrations: Søk i alle registreringer
       add_a_registration: Legg til en registrering
       registration_form_settings: Innstillinger for registreringsskjema
+      education_courses: Utdanningskurs
   theft_alert_plans:
     theft_alert_plan:
       days: Dager
@@ -5574,7 +5574,6 @@ nb:
             occurred_at_cell: Status på
             photo_cell: Foto
             view_cell: Utsikt
-            acknowledgment_cell_panel: Tid - Registreringssekvens bekreftet
             filter_stolen_or_impounded_html: bare <strong>stjålet</strong> eller <strong>beslaglagt</strong>
             location_search_disabled_no_address: "%{org_name} samler ikke inn registreringsadresser,
               så bare stjålne og beslaglagte registreringer har en plassering. Filtrer
@@ -5609,6 +5608,7 @@ nb:
             copy_column_order_from_registrations_search: Kopier kolonnerekkefølge
               fra registreringssøk
             impound_search_columns: Beslaglegg søkekolonner
+            course_acknowledgment_cell_panel: Tid - Utdanningskurs godkjent
           column_settings_toggle:
             column_settings: Kolonneinnstillinger
           settings_and_filters:
@@ -5627,9 +5627,9 @@ nb:
             link_sticker: lenkeklistremerke
             hidden: skjult
             not_registered_with: Skjult fordi den ikke er registrert hos %{org_name}
-            acknowledgment_title: Bekreftelse på registreringssekvens kl.
             view: Utsikt
             toggle_all_checked: Slå av/på alle avkryssede
+            course_acknowledgment_title: Bekreftelse på utdanningskurs på
           multi_result_chip:
             no_results: ingen treff
           multi_results:
@@ -5695,7 +5695,7 @@ nb:
           map_unavailable: Kartet kunne ikke lastes inn – posisjonen var fortsatt
             angitt fra enheten din.
           set_on_map: Sett på kartet
-        registration_sequence:
+        education_course:
           page_edit_bullet:
             bullet: kule
       registrations:
@@ -5974,9 +5974,9 @@ nb:
             not_audited: Ikke revidert
             organization_registered: Organisasjon
             registration_information: Registreringsinformasjon
-            registration_sequence: Registreringssekvens
             sticker: Klistremerke
             sticker_claimed: hevdet
+            education_course: Utdanningskurs
           internal_notes:
             current_note: Gjeldende notat
             deleted_user: en slettet bruker
@@ -6953,6 +6953,13 @@ nb:
               regler som må kontrolleres."
           yellow_summary_no_classes_without_throttle: "%{name} er klassifisert som
             en elsykkel i %{state}, uten den valgfrie gasspedalen."
+          class_3_throttle_past: Gasspedalen går forbi 20 mph (32 km/t) som er tillatt
+            for klasse 3-gasspedalen.
+          throttle_past_cap_kmh_html: Gasspedalen går forbi %{past} km/t, over %{cap}
+            km/t-grensen
+          throttle_past_kmh_html: Gasspedalen går forbi %{past} km/t; sjekk at den
+            stopper ved %{cap} km/t
+          yes_over_mph_html: Ja, over %{mph} mph
         rule_label:
           classes: Klasser anerkjent
           power: Motoreffektbegrensning
@@ -7058,7 +7065,6 @@ nb:
           how_to_check_lookup: Se modellen ovenfor. BikeBook viser sertifisering der
             den er registrert.
           over_28_mph: Over 45 km/t
-          top_speed: Hva er toppfarten?
           visit_bikebook_link: Besøk BikeBook.
           custom_details: Tilpassede detaljer
           details_legend: Detaljer om sykkelen din
@@ -7071,8 +7077,6 @@ nb:
           banned_body_canada: Universiteter, boligleverandører og transportbyråer
             innfører regler for oppbevaring og lading av elsykler innendørs, og sertifisering
             er det de ser etter.
-          choose_province: Velg provinsen eller territoriet ditt fra listen.
-          choose_state: Velg staten din fra listen.
           detected_place_html: Vi oppdaget <strong>%{state}</strong> .
           kmh: "%{kmh} km/t"
           not_in_canada_html: Ikke i Canada? %{switch_country}
@@ -7093,6 +7097,11 @@ nb:
           subheading_canada: Gå inn i provinsen eller territoriet ditt og sykle for
             å se reglene.
           watts_placeholder_canada: f.eks. 500
+          choose_your_province: Velg provins eller territorium.
+          choose_your_state: Velg din stat.
+          over_20_mph: Over 20 mph
+          top_assist_speed: Toppfart med pedalassistanse
+          top_throttle_speed: Topphastighet på gass
         state_reference:
           compiling: Vi samler %{state}s elsykkelregler fra delstatsforsamlingen og
             DMV. Sjekk tilbake snart.

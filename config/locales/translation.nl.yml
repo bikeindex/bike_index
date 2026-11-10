@@ -4459,7 +4459,6 @@ nl:
       parking_notification_unregistered: Niet-geregistreerde fietsmelding
       parking_notifications_group: Parkeermeldingen
       recoveries: terugvorderingen
-      registration_sequences: Registratiesequenties
       registration_stickers: Registratie stickers
       reports: Rapporten
       resources: Middelen
@@ -4473,6 +4472,7 @@ nl:
       search_all_registrations: Zoek alle registraties
       add_a_registration: Voeg een registratie toe
       registration_form_settings: Instellingen voor het registratieformulier
+      education_courses: Onderwijscursussen
   users:
     accept_terms:
       i_agree_to_tos_html: Ik ga akkoord met de <strong>Servicevoorwaarden van</strong>
@@ -5740,7 +5740,6 @@ nl:
             occurred_at_cell: Status bij
             photo_cell: Foto
             view_cell: Weergave
-            acknowledgment_cell_panel: Tijd - Registratievolgorde bevestigd
             filter_stolen_or_impounded_html: alleen <strong>gestolen</strong> of <strong>in
               beslag genomen</strong>
             location_search_disabled_no_address: "%{org_name} verzamelt geen registratieadressen,
@@ -5776,6 +5775,7 @@ nl:
             copy_column_order_from_registrations_search: Kopieer de kolomvolgorde
               uit de zoekopdracht naar registraties.
             impound_search_columns: Inbeslagname zoekkolommen
+            course_acknowledgment_cell_panel: Tijd - Erkende onderwijscursus
           column_settings_toggle:
             column_settings: Kolominstellingen
           settings_and_filters:
@@ -5794,9 +5794,10 @@ nl:
             link_sticker: link sticker
             hidden: verborgen
             not_registered_with: Verborgen omdat het niet is geregistreerd bij %{org_name}
-            acknowledgment_title: Bevestiging van de registratieprocedure bij
             view: Weergave
             toggle_all_checked: Alles aangevinkt weergeven/verbergen
+            course_acknowledgment_title: Erkenning van deelname aan de onderwijscursus
+              bij
           multi_result_chip:
             no_results: geen overeenkomsten
           multi_results:
@@ -5866,7 +5867,7 @@ nl:
           map_unavailable: De kaart kon niet worden geladen; de locatie was nog steeds
             ingesteld via uw apparaat.
           set_on_map: Op de kaart plaatsen
-        registration_sequence:
+        education_course:
           page_edit_bullet:
             bullet: kogel
       registrations:
@@ -6149,9 +6150,9 @@ nl:
             not_audited: Niet gecontroleerd
             organization_registered: Organisatie
             registration_information: Registratiegegevens
-            registration_sequence: Registratievolgorde
             sticker: Sticker
             sticker_claimed: beweerde
+            education_course: Onderwijscursus
           internal_notes:
             current_note: Huidige notitie
             deleted_user: een verwijderde gebruiker
@@ -7172,6 +7173,14 @@ nl:
               regels die gecontroleerd moeten worden.
           yellow_summary_no_classes_without_throttle: De %{name} wordt in %{state}
             als e-bike geclassificeerd, zonder de optionele gashendel.
+          class_3_throttle_past: Het gaspedaal wordt ingedrukt als de snelheid van
+            20 mph (32 km/u) wordt overschreden, de snelheid die is toegestaan voor
+            een voertuig van klasse 3.
+          throttle_past_cap_kmh_html: Het gaspedaal slaat door tot voorbij %{past}
+            km/u, boven de %{cap} km/u limiet.
+          throttle_past_kmh_html: Het gaspedaal slaat door tot voorbij %{past} km/u;
+            controleer of het stopt bij %{cap} km/u.
+          yes_over_mph_html: Ja, meer dan %{mph} mph
         rule_label:
           classes: Erkende klassen
           power: Motorvermogenscapaciteit
@@ -7284,7 +7293,6 @@ nl:
           how_to_check_lookup: Zoek het model hierboven op. BikeBook toont de certificering
             waar deze geregistreerd staat.
           over_28_mph: Meer dan 45 km/u
-          top_speed: Wat is de topsnelheid?
           visit_bikebook_link: Bezoek BikeBook.
           custom_details: Aangepaste details
           details_legend: De gegevens van uw fiets
@@ -7297,8 +7305,6 @@ nl:
           banned_body_canada: Universiteiten, woningbouworganisaties en openbaarvervoersbedrijven
             stellen regels op voor het stallen en opladen van e-bikes binnenshuis,
             en certificering is waar ze naar op zoek zijn.
-          choose_province: Kies uw provincie of territorium uit de lijst.
-          choose_state: Kies uw staat uit de lijst.
           detected_place_html: We hebben <strong>%{state}</strong> gedetecteerd.
           kmh: "%{kmh} km/u"
           not_in_canada_html: Niet in Canada? %{switch_country}
@@ -7321,6 +7327,11 @@ nl:
           subheading_canada: Voer je provincie of territorium in en fiets om de regels
             te bekijken.
           watts_placeholder_canada: bijv. 500
+          choose_your_province: Kies uw provincie of territorium.
+          choose_your_state: Kies uw staat.
+          over_20_mph: Meer dan 32 km/u
+          top_assist_speed: Topsnelheid met trapondersteuning
+          top_throttle_speed: Topsnelheid bij gas geven
         state_reference:
           compiling: We verzamelen momenteel de regels voor e-bikes van %{state} op
             basis van gegevens van de staatslegislatuur en de RDW. Kom binnenkort
