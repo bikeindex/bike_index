@@ -71,7 +71,7 @@ RSpec.describe "Organized education courses", :js, type: :system do
     expect(edited.subtitle).to eq "Charge safely on campus"
     expect(edited.body).to include("reviewed 2026")
     expect(edited.image).to be_attached
-    expect(draft.education_course_pages.pluck(:title)).to include("Campus-specific rules")
+    expect(draft.education_course_pages.pluck(:title)).to include("Batteries & charging")
 
     # A Turbo DELETE gated by an onclick -- dismissing has to stop Turbo too
     pages_before = draft.education_course_pages.count
