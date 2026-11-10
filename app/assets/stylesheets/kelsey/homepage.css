@@ -1,6 +1,6 @@
 /* Hero Section */
 .kelsey_styles .hero-section {
-  background-color: white;
+  background-color: var(--redesign-surface);
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -187,7 +187,7 @@
   font-weight: bold;
   color: var(--redesign-gray-800);
   margin-bottom: 2rem;
-  background-color: rgba(255, 255, 255, 0.85);
+  background-color: color-mix(in srgb, var(--redesign-surface) 85%, transparent);
   padding: 2rem 3rem;
   padding-top: 3rem;
   display: inline-block;
@@ -532,7 +532,7 @@
 
 /* Stolen Question Section */
 .kelsey_styles .stolen-question-section {
-  background-color: white;
+  background-color: var(--redesign-surface);
   padding: 3rem 0 2rem;
   position: relative;
   z-index: 10;

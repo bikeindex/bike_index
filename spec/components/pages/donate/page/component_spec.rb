@@ -14,6 +14,12 @@ RSpec.describe Pages::Donate::Page::Component, type: :component do
     expect(component).to have_no_css("a[data-amount][data-active='true']")
   end
 
+  it "states the live bike count" do
+    Counts.assign_for("total_bikes", 1_234_567)
+    expect(component).to have_text("1.2 million bikes are registered. Not one owner paid to be there.")
+    expect(component).to have_text("which is why 1.2 million bikes are in the registry")
+  end
+
   context "with a major gift initial_amount" do
     let(:initial_amount) { "1000" }
 

@@ -103,7 +103,6 @@ module SharedBlocks
           SharedBlocks::MainContent::Organized::Component.new(
             current_organization: @current_organization,
             current_user: @current_user,
-            passive_organization: @passive_organization,
             show_general_alert: @show_general_alert,
             controller_name: @controller_name,
             action_name: @action_name

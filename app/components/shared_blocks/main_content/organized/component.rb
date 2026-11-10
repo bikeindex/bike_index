@@ -11,16 +11,11 @@ module SharedBlocks
                            %w[registrations settings] => "container",
                            %w[bulk_imports show] => "container-fluid"}.freeze
         FLUID_CONTROLLERS = %w[parking_notifications impound_records impound_claims graduated_notifications
-          lines model_audits registrations].freeze
-        JAVASCRIPT_PACK_PAGES = {%w[parking_notifications index] => false, %w[bikes recoveries] => true,
-                                 %w[bikes incompletes] => true, %w[exports show] => true, %w[exports new] => true,
-                                 %w[users new] => true, %w[dashboard index] => true}.freeze
+          model_audits registrations].freeze
 
-        def initialize(current_organization:, current_user:, passive_organization:,
-          show_general_alert:, controller_name:, action_name:)
+        def initialize(current_organization:, current_user:, show_general_alert:, controller_name:, action_name:)
           @current_organization = current_organization
           @current_user = current_user
-          @passive_organization = passive_organization
           @show_general_alert = show_general_alert
           @controller_name = controller_name
           @action_name = action_name
@@ -34,10 +29,6 @@ module SharedBlocks
 
         def container
           PAGE_CONTAINERS.fetch(page) { FLUID_CONTROLLERS.include?(@controller_name) ? "container-fluid" : "container" }
-        end
-
-        def include_javascript_pack?
-          JAVASCRIPT_PACK_PAGES.fetch(page) { container == "container-fluid" }
         end
       end
     end

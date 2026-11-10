@@ -68,22 +68,22 @@ RSpec.describe Pages::Admin::Organizations::Tabs::Component, type: :component do
     end
   end
 
-  describe "the registration sequences tab" do
+  describe "the education courses tab" do
     it "is absent without the feature" do
-      expect(component).to_not have_link("Registration sequences")
+      expect(component).to_not have_link("Education courses")
     end
 
-    context "with registration_sequences enabled" do
+    context "with education_courses enabled" do
       let(:organization) do
         FactoryBot.create(:organization_with_organization_features, name: "Cool Bikes",
-          enabled_feature_slugs: "registration_sequences")
+          enabled_feature_slugs: "education_courses")
       end
 
-      before { FactoryBot.create(:registration_sequence, organization:) }
+      before { FactoryBot.create(:education_course, organization:) }
 
       it "renders, counting them" do
-        expect(component).to have_link("Registration sequences 1",
-          href: "/admin/organizations/#{organization.to_param}?active_tab=registration_sequences")
+        expect(component).to have_link("Education courses 1",
+          href: "/admin/organizations/#{organization.to_param}?active_tab=education_courses")
       end
     end
   end
@@ -122,11 +122,11 @@ RSpec.describe Pages::Admin::Organizations::Tabs::Component, type: :component do
       end
     end
 
-    context "on registration sequences" do
-      let(:active) { :registration_sequences }
+    context "on education courses" do
+      let(:active) { :education_courses }
 
-      it "links to the organization's registration sequences" do
-        expect(organized_view["href"]).to eq "/o/#{organization.to_param}/registration_sequences"
+      it "links to the organization's education courses" do
+        expect(organized_view["href"]).to eq "/o/#{organization.to_param}/education_courses"
       end
     end
 

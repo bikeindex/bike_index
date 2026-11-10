@@ -173,7 +173,7 @@
         class: "tw:block tw:h-auto tw:w-22 tw:lg:w-30", loading: "lazy") %>
 
       <%= render(SharedBlocks::Marketing::SectionHeading::Component.new(eyebrow: translation(".keep_it_free"),
-        eyebrow_color: :purple, heading: translation(".a_million_bikes"), intro: translation(".donations_keep_it_free"))) %>
+        eyebrow_color: :purple, heading: bikes_registered, intro: translation(".donations_keep_it_free"))) %>
     </div>
 
     <%= render(UI::Card::Component.new(additional_classes: "tw:flex tw:flex-col tw:gap-4 tw:p-7!")) do %>

@@ -45,39 +45,28 @@
       = number_with_delimiter(@pagy.count)
     = t(".matching_user").pluralize(@pagy.count)
 
-.full-screen-table
-  %table.table.table-striped.table-bordered.table-sm
-    %thead.sortable
-      %th= sortable "created_at", t(".created")
-      %th= sortable "invited_email", t(".to")
-      %th= sortable "claimed_at", t(".claimed")
-      %th= sortable "role", t(".role")
-      %th
-        %small
-          = sortable "sender_id", t(".sender")
-    %tbody
-      - @organization_roles.each do |organization_role|
-        %tr
-          %td
-            %a.localizeTime{ href: edit_organization_user_path(organization_role.id, organization_id: current_organization.to_param) }
-              = l(organization_role.created_at, format: :convert_time)
-          %td
-            = organization_role.invited_display_name
-            %small.less-strong.d-none.d-lg-inline-block
-              = organization_role.invited_email
-          %td
-            - if organization_role.claimed_at.present?
-              %span.localizeTime
-                = l(organization_role.created_at, format: :convert_time)
-          %td
-            - if organization_role.admin?
-              %span.text-info= t(".admin")
-            - else
-              %span.less-strong= t(".member")
-              - if organization_role.member_no_bike_edit?
-                %small= t(".no_bike_edit")
-
-          %td
-            - if organization_role.sender.present?
-              %small
-                = organization_role.sender.display_name
+- organization_id = current_organization.to_param
+- admin = t(".admin")
+- member = t(".member")
+- no_bike_edit = t(".no_bike_edit")
+= render(UI::Table::Base::Component.new(records: @organization_roles, render_sortable: true, sort_state:)) do |table|
+  - table.column(sortable: "created_at", label: t(".created")) do |organization_role|
+    = link_to render(UI::Time::Component.new(time: organization_role.created_at)), edit_organization_user_path(organization_role.id, organization_id:), class: "twlink"
+  - table.column(sortable: "invited_email", label: t(".to")) do |organization_role|
+    = organization_role.invited_display_name
+    %small.less-strong.d-none.d-lg-inline-block
+      = organization_role.invited_email
+  - table.column(sortable: "claimed_at", label: t(".claimed")) do |organization_role|
+    - if organization_role.claimed_at.present?
+      = render(UI::Time::Component.new(time: organization_role.created_at))
+  - table.column(sortable: "role", label: t(".role")) do |organization_role|
+    - if organization_role.admin?
+      %span.text-info= admin
+    - else
+      %span.less-strong= member
+      - if organization_role.member_no_bike_edit?
+        %small= no_bike_edit
+  - table.column(sortable: "sender_id", label: t(".sender"), header_classes: "tw:text-xs") do |organization_role|
+    - if organization_role.sender.present?
+      %small
+        = organization_role.sender.display_name

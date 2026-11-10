@@ -1,7 +1,7 @@
 <%= render(Pages::Admin::Headers::Nav::Component.new(title: "Bug Report")) %>
 
 <div class="twwiderow tw:mt-6 tw:items-start">
-  <%= render(UI::TableList::Component.new) do |list| %>
+  <%= render(UI::Table::List::Component.new) do |list| %>
     <% if display_dev_info? %>
       <% list.with_row(label: "ID", dev_only: true, value: render(UI::Code::Inline::Component.new(text: @bug_report.id))) %>
       <% list.with_row(label: "Inbound email", dev_only: true, value: render(UI::Code::Inline::Component.new(text: @bug_report.inbound_email_id))) %>

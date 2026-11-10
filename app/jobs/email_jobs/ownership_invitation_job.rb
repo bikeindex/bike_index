@@ -23,7 +23,7 @@ module EmailJobs
       end
       return if ownership.skip_email
       # Below the write-back, not in calculated_send_email, which it would latch into skip_email
-      return if RegistrationSequenceAcknowledgment.holding_email?(ownership)
+      return if EducationCourseAcknowledgment.holding_email?(ownership)
 
       notification = Notification.find_or_create_by(notifiable: ownership,
         kind: "finished_registration")

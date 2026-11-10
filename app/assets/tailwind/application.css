@@ -184,7 +184,7 @@
   .ui-table-bordered thead tr th:last-child {
     @apply tw:ui-table-bordered-th-last;
   }
-  /* A table with no thead, as UI::TableList is, draws its top edge on its first row */
+  /* A table with no thead, as UI::Table::List is, draws its top edge on its first row */
   .ui-table-bordered tbody:first-child tr:first-child :is(td, th) {
     @apply tw:border-t;
   }
@@ -196,7 +196,7 @@
   }
   /* A 🔎 or tooltip "?" stays on the line of what it follows. Only the whole cell
      works: Chromium still breaks after a preceding element that wraps. A .keep-together
-     already holds it with its last word, so the rest of the cell can wrap. UI::TableList
+     already holds it with its last word, so the rest of the cell can wrap. UI::Table::List
      has no scroller to spill into, so its cells always wrap */
   .ui-table:not(.ui-table-list) td:has(.keep-with-previous:not(.keep-together *)) {
     @apply tw:whitespace-nowrap;
@@ -264,6 +264,12 @@ body {
   body {
     --nav-gap: 60px;
   }
+}
+
+/* .primary-footer's margin-top, which the full-bleed pages pull down by to sit flush on the
+   footer. On :root, so a page that zeroes it on body wins from any layer */
+:root {
+  --footer-gap: 72px;
 }
 /* The controller narrows it as the sidebar collapses, in an inline style that
    outranks this; the expanded width keeps the content still until stimulus connects */

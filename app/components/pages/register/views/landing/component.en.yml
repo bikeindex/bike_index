@@ -5,8 +5,6 @@ en:
       register:
         views:
           landing:
-            a_million_bikes: A million bikes are registered. Not one owner paid to
-              be there.
             benefit_alerts_body: >-
               If it's taken, mark it stolen and we alert partner shops, police, and
               riders near where it happened.
@@ -24,8 +22,8 @@ en:
               starts from a registered bike and is checked against theft reports,
               so buyers know it's legit.
             benefit_marketplace_title: A trusted marketplace
-            benefit_network_body: >-
-              Volunteers, local recovery teams, and more than 1,000 police departments,
+            benefit_network_partners_body: >-
+              Volunteers, local recovery teams, and more than %{partners} police departments,
               universities, cities, and shops watch for stolen bikes and flag them.
             benefit_network_title: People looking out for it
             benefit_private_body: >-
@@ -71,6 +69,8 @@ en:
             lede: >-
               Register it now and you'll have proof it's yours, a one-click stolen
               alert, and a network of shops, police, and riders watching for it.
+            millions_registered_no_owner_paid: "%{millions} million bikes are registered.
+              Not one owner paid to be there."
             quick_answers: Quick answers
             register_your_bike: Register your bike
             sticker_flagged_body: >-

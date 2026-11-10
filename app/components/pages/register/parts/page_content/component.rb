@@ -4,7 +4,7 @@ module Pages
   module Register
     module Parts
       module PageContent
-        # One registration-sequence page as a registrant sees it. Shared by the live
+        # One education-course page as a registrant sees it. Shared by the live
         # acknowledgment flow and the org's preview of it, so the two can't drift.
         class Component < ApplicationComponent
           # first: the flow's opening page, where the registrant is told why these appeared
@@ -20,18 +20,18 @@ module Pages
 
           private
 
-          def sequence
-            @page.registration_sequence
+          def course
+            @page.education_course
           end
 
           # What the editor promised - "Template" when admin previews the template
           def badge_name
-            sequence&.badge_name
+            course&.badge_name
           end
 
           # The template's rules are Bike Index's
           def set_by_name
-            sequence&.organization&.name || translation(".bike_index")
+            course&.organization&.name || translation(".bike_index")
           end
 
           def checkbox_name(index)

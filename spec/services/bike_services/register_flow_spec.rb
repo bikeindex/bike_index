@@ -25,7 +25,7 @@ RSpec.describe BikeServices::RegisterFlow do
     end
   end
 
-  context "without a sequence" do
+  context "without a course" do
     let(:flow) { described_class.new }
 
     it "is the two detail steps" do
@@ -34,7 +34,7 @@ RSpec.describe BikeServices::RegisterFlow do
     end
   end
 
-  context "the single page, without a sequence" do
+  context "the single page, without a course" do
     let(:flow) { described_class.new(single_page: true) }
 
     it "is one step" do
