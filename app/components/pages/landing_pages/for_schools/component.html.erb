@@ -1,4 +1,4 @@
-<div class="kelsey_styles">
+<div class="kelsey_styles kelsey_styles_dark">
   <%# Hero Section %>
   <section class="le-hero-section">
     <div
@@ -39,8 +39,8 @@
     </div>
   </section>
 
-  <%# Trusted Universities Section %>
-  <section class="le-municipalities-section">
+  <%# Trusted Universities Section. Light in dark mode too, for the logos with opaque white backgrounds %>
+  <section class="le-municipalities-section kelsey_styles_light">
     <div class="container">
       <h2>Used proudly on campuses nationwide</h2>
 
@@ -71,7 +71,7 @@
         <% features.each do |feature| %>
           <div class="le-feature-block">
             <div class="le-feature-icon">
-              <%= image_tag feature[:image], alt: feature[:title] %>
+              <%= image_tag feature[:image], alt: feature[:title], class: "tw:dark:invert tw:dark:hue-rotate-180" %>
             </div>
 
             <h3><%= feature[:title] %></h3>
@@ -125,7 +125,7 @@
           >
             <div class="le-tab-panel-content">
               <div class="le-tab-icon">
-                <%= image_tag "kelsey/unis.gif", alt: "Database Management" %>
+                <%= image_tag "kelsey/unis.gif", alt: "Database Management", class: "tw:dark:invert tw:dark:hue-rotate-180" %>
               </div>
 
               <div class="le-tab-text">
@@ -167,7 +167,7 @@
           >
             <div class="le-tab-panel-content">
               <div class="le-tab-icon">
-                <%= image_tag "kelsey/theft-victims.gif", alt: "First Line of Defense" %>
+                <%= image_tag "kelsey/theft-victims.gif", alt: "First Line of Defense", class: "tw:dark:invert tw:dark:hue-rotate-180" %>
               </div>
 
               <div class="le-tab-text">
@@ -210,7 +210,7 @@
       <div class="le-tools-grid">
         <% tools.each do |tool| %>
           <div class="le-tool-item">
-            <%= image_tag tool[:image], alt: tool[:title] %>
+            <%= image_tag tool[:image], alt: tool[:title], class: "tw:dark:invert tw:dark:hue-rotate-180" %>
 
             <h4><%= tool[:title] %></h4>
 
@@ -251,7 +251,7 @@
                 </div>
 
                 <div class="le-testimonial-image">
-                  <%= image_tag testimonial[:image], alt: testimonial[:author] %>
+                  <%= image_tag testimonial[:image], alt: testimonial[:author], class: "tw:dark:invert tw:dark:hue-rotate-180" %>
                 </div>
               </div>
             </div>
@@ -315,5 +315,6 @@
     </div>
   </section>
 
-  <%= render(Pages::LandingPages::DemoModal::Component.new(feedback: @feedback, current_user: @current_user, name_label: "School", feedback_type: "lead_for_school", modal_id: "schools-demo-modal")) %>
+  <%= render(Pages::LandingPages::DemoModal::Component.new(feedback: @feedback, name_label: "School", feedback_type: "lead_for_school", modal_id: "schools-demo-modal",
+    return_to: for_schools_path)) %>
 </div>

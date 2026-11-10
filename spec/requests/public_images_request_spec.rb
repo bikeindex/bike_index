@@ -48,7 +48,7 @@ RSpec.describe PublicImagesController, type: :request do
             expect(response.body).to include("/uploads/Pu/#{public_image.id}/bike.jpg")
             expect(response.body).to_not include("small_bike.jpg")
             expect(response.body).to include("image-fallback")
-            expect(response.body).to include("useOriginal")
+            expect(response.body).to include("image-fallback#fallBack")
             public_image.image.remove!
           end
         end
@@ -380,7 +380,7 @@ RSpec.describe PublicImagesController, type: :request do
         it "redirects" do
           expect(bike.authorized?(current_user)).to be_falsey
           get "#{base_url}/#{public_image.id}/edit"
-          expect(response).to redirect_to bike_path(bike)
+          expect(response).to redirect_to registration_path(bike)
         end
       end
     end

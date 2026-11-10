@@ -1,0 +1,19 @@
+<% if @education_course.organization.present? %>
+  <%= render(Pages::Admin::Organizations::Tabs::Component.new(organization: @education_course.organization, active: :education_courses, display_dev_info: display_dev_info?)) %>
+<% end %>
+
+<div class="tw:mx-auto tw:max-w-3xl tw:py-4">
+  <%= render Pages::Admin::EducationCourse::Header::Component.new(education_course: @education_course, mode: :preview) %>
+
+  <%# pt cancels the flow shell's negative top margin; padding doesn't collapse %>
+  <div class="tw:pt-(--nav-gap)">
+    <%= render Pages::Org::EducationCourse::Preview::Component.new(education_course: @education_course, index: @preview_pagy.page - 1, admin: true) %>
+  </div>
+
+  <%# Below the gray. mt-24 clears the flow shell's -mb-18 pull-up. %>
+  <div class="tw:mt-24">
+    <%= render UI::Pagination::Component.new(pagy: @preview_pagy, page_params: {id: @education_course.id}) %>
+  </div>
+
+  <%= render Pages::Admin::EducationCourse::DiscardDraft::Component.new(education_course: @education_course) %>
+</div>

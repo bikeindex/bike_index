@@ -171,8 +171,13 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
     # Create a parking notification through the bike show interface. Regression:
     # the "New parking notification" button must open the form (it was wired to
     # Bootstrap's collapse plugin, which is no longer loaded).
+    # The example above covers the same flow on the redesigned page
     visit bike_path(bike)
+    wait_for_stimulus("ui--dropdown")
+    click_button "Open #{organization.short_name} menu"
+    click_button "View in Legacy Viewer"
     expect(page).to have_css(".organized-access-panel")
+    wait_for_page_script
     click_on "New parking notification"
     choose "Parked incorrectly"
 
@@ -303,5 +308,13 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
     expect(page).not_to have_current_path(/map_location/)
     # The ungeocoded row has no pin to bring into view
     expect(page).not_to have_button("Fit map to notifications")
+
+    find("#{row_for(far_away)} a[href$='/parking_notifications/#{far_away.id}']").click
+    wait_for_stimulus("org--parking-notification-repeat")
+    select "Mark retrieved/resolved", from: "kind"
+    expect(page).to have_button("Resolve notification")
+    click_button "Resolve notification"
+    expect(page).to have_no_button("Resolve notification")
+    expect(far_away.reload.status).to eq "retrieved"
   end
 end

@@ -1,5 +1,5 @@
 <%# uncap: the org preview renders in a layout that upper-cases headings; the flow's doesn't %>
-<%= render UI::Header::Component.new(text: translation(".youre_almost_done"), subtitle:, html_class: "uncap") %>
+<%= render UI::Header::Component.new(text: translation(".youre_almost_done"), subtitle:, tag: @heading_tag, html_class: "uncap") %>
 
 <%= render UI::Card::Component.new(divided: true) do %>
   <% @pages.each_with_index do |page, index| %>

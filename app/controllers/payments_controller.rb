@@ -39,9 +39,14 @@ class PaymentsController < ApplicationController
     !amount_cents.to_i.between?(1, 99_999_999)
   end
 
+  # A typed amount (in dollars) wins over a checked preset - without javascript both submit
+  def permitted_amount_cents
+    Amountable.to_cents(params.dig(:payment, :amount).presence) || params.dig(:payment, :amount_cents)
+  end
+
   def permitted_create_parameters
     params.require(:payment)
       .permit(:kind, :amount_cents, :email, :currency, :referral_source)
-      .merge(user_id: current_user&.id)
+      .merge(user_id: current_user&.id, amount_cents: permitted_amount_cents)
   end
 end

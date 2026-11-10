@@ -2,10 +2,10 @@
 
 .form-group.row.unnested-field
   = srecord.hidden_field :timezone, value: "", class: "hiddenFieldTimezone"
-  = srecord.label :date_stolen, t(".when_was_it_stolen_at"), class: 'form-well-label'
+  = srecord.label :date_stolen, safe_join([t(".when_was_it_stolen_at"), render(UI::Forms::RequiredMarker::Component.new)], "\u00A0"), class: 'form-well-label'
   .form-well-input
     - srecord.object.date_stolen = Binxtils::TimeParser.round(srecord.object.date_stolen || Time.current)
-    = srecord.datetime_local_field :date_stolen, max: Binxtils::TimeParser.round(Time.current + 1.day), required: true, class: 'form-control dateInputUpdateZone', "data-initialtime" => l(srecord.object.date_stolen, format: :convert_time)
+    = srecord.datetime_local_field :date_stolen, max: Binxtils::TimeParser.round(Time.current + 1.day), required: true, class: 'form-control dateInputUpdateZone', "data-controller" => "max-now", "data-initialtime" => l(srecord.object.date_stolen, format: :convert_time)
 
 .related-fields
   .form-group.row
@@ -54,9 +54,9 @@
       = srecord.select(:lock_defeat_description, StolenRecord.locking_defeat_description_select_options, prompt: '')
 
 .form-group.row.unnested-field
-  = srecord.label :theft_description, t(".description_of_the_incident"), class:  'form-well-label'
+  = srecord.label :theft_description, safe_join([t(".description_of_the_incident"), render(UI::Forms::RequiredMarker::Component.new)], "\u00A0"), class:  'form-well-label'
   .form-well-input-large
-    = srecord.text_area :theft_description, rows: 3, class: 'form-control'
+    = srecord.text_area :theft_description, rows: 3, required: true, class: 'form-control'
 -# policeReportNumber is used in the stolen checklist to link directly to the field
 .form-group.row.unnested-field#policeReportNumber
   = srecord.label :police_report_number, t(".police_report"), class: 'form-well-label'

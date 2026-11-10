@@ -10,7 +10,7 @@ RSpec.describe Pages::Admin::Bikes::Summary::Details::Component, type: :componen
   # The row's own label - matching on a value risks colliding with a factory sequence
   # somewhere else in the summary, which is how the phone assertion used to fail on CI
   def row_labels
-    component.css("table.table-list tr td:first-child").map { |td| td.text.squish }
+    component.css("table.ui-table-list th[scope=row]").map { |th| th.text.squish }
   end
 
   it "renders the owner and creation, and no dev rows" do

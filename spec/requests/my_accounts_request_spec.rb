@@ -8,6 +8,13 @@ RSpec.describe MyAccountsController, type: :request do
       it "redirects" do
         get base_url
         expect(response).to redirect_to(/session\/new/) # weird subdomain issue matching url directly otherwise
+        expect(session[:return_to]).to eq base_url
+      end
+
+      it "doesn't store a return_to too long for the session cookie" do
+        get base_url, params: {q: "x" * 4_000}
+        expect(response).to redirect_to(/session\/new/)
+        expect(session[:return_to]).to be_blank
       end
     end
 
@@ -297,6 +304,10 @@ RSpec.describe MyAccountsController, type: :request do
         patch base_url, params: {id: current_user.username, user: {username: "confirm"}, edit_template: "sharing"}
         expect(response).to render_template(:edit)
         expect(assigns(:page_errors)).to include("Username is reserved")
+        page = Nokogiri::HTML(response.body)
+        expect(page.at_css("[role=alert] li").text).to eq "Username is reserved"
+        # BikeIndexAlerts hides .primary-alert-block whenever it holds no .alert
+        expect(page.at_css(".primary-alert-block [role=alert]")).to be_blank
         current_user.reload
         expect(current_user.username).to eq("something")
       end
@@ -715,11 +726,11 @@ RSpec.describe MyAccountsController, type: :request do
         context "with multiple user_registration_organizations" do
           let(:organization2) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["reg_organization_affiliation"]) }
           let(:user_registration_organization2) { FactoryBot.create(:user_registration_organization, all_bikes: true, user: current_user, organization: organization2) }
-          let(:bike3_information) { {bike_sticker: "vvvv"}.merge(default_location_registration_address).as_json }
+          let(:bike3_information) { {bike_sticker: "vvvv"}.merge(default_location_registration_info).as_json }
           let(:bike3) { FactoryBot.create(:bike, :with_ownership_claimed, :with_address_record, address_in: :new_york, user: current_user, creation_registration_info: bike3_information) }
           let(:target_extra_info) do
             target_info.merge("organization_affiliation_#{organization2.id}" => "employee")
-              .merge(default_location_registration_address).as_json
+              .merge(default_location_registration_info).as_json
           end
           it "updates" do
             expect_bike1_initiated
@@ -738,7 +749,7 @@ RSpec.describe MyAccountsController, type: :request do
             bike1_organization2.destroy
 
             expect(bike3.reload.registration_info).to eq(bike3_information)
-            expect(bike3.address_hash_legacy).to eq default_location_registration_address.merge(country: "United States", street_2: nil).as_json
+            expect(bike3.address_record).to have_attributes default_location_address_record_attrs
 
             Sidekiq::Job.clear_all
             put base_url, params: {
@@ -773,18 +784,15 @@ RSpec.describe MyAccountsController, type: :request do
             expect(bike_organization1.overridden_by_user_registration?).to be_truthy
 
             expect(bike2.reload.bike_organizations.pluck(:organization_id)).to match_array([organization1.id, organization2.id])
-            expect(bike2.registration_info).to eq target_extra_info.merge(default_location_registration_address).as_json
+            expect(bike2.registration_info).to eq target_extra_info.merge(default_location_registration_info).as_json
             expect(bike2_organization1.can_edit_claimed).to be_falsey
             expect(bike2_organization1.overridden_by_user_registration?).to be_truthy
 
             expect(bike3.reload.organizations.pluck(:id)).to match_array([organization1.id])
-            target_bike3_info = bike3_information.merge(target_extra_info).merge(default_location_registration_address).as_json
+            target_bike3_info = bike3_information.merge(target_extra_info).merge(default_location_registration_info).as_json
             expect(bike3.registration_info).to eq target_bike3_info
 
             expect(current_user.reload.address_record).to have_attributes default_location_address_record_attrs.merge(kind: "user")
-
-            expect(current_user.address_hash_legacy)
-              .to eq default_location_registration_address.merge("country" => "United States", "street_2" => nil)
           end
         end
       end
@@ -862,45 +870,6 @@ RSpec.describe MyAccountsController, type: :request do
         end.to change(User, :count).by(0)
         expect(Bike.count).to eq 1
         expect(flash[:error]).to eq "Organization admins cannot delete their accounts. Email support@bikeindex.org for help"
-      end
-    end
-  end
-
-  describe "toggle_show_redesign" do
-    let(:bike) { FactoryBot.create(:bike) }
-    context "user not logged in" do
-      it "redirects to sign in without toggling" do
-        post "#{base_url}/toggle_show_redesign", params: {bike_id: bike.id}
-        expect(response).to redirect_to(/session\/new/)
-      end
-    end
-    context "user logged in" do
-      include_context :request_spec_logged_in_as_user
-      let(:current_user) { FactoryBot.create(:user_confirmed) }
-
-      it "opts into the legacy view and redirects to the legacy page" do
-        post "#{base_url}/toggle_show_redesign", params: {bike_id: bike.id}
-        expect(response).to redirect_to(bike_path(bike))
-        expect(current_user.reload.feature_registration_show_legacy).to be_truthy
-      end
-
-      context "user opted into the legacy view" do
-        let(:current_user) { FactoryBot.create(:user_confirmed, feature_registration_show_legacy: true) }
-        it "opts back out and redirects to the redesign" do
-          post "#{base_url}/toggle_show_redesign", params: {bike_id: bike.id}
-          expect(response).to redirect_to(registration_path(bike))
-          expect(current_user.reload.feature_registration_show_legacy).to be_falsey
-        end
-      end
-
-      context "user invalid for an unrelated reason" do
-        before { current_user.update_column(:preferred_language, "xx") }
-        it "flashes an error and returns to the view they came from" do
-          post "#{base_url}/toggle_show_redesign", params: {bike_id: bike.id}
-          expect(response).to redirect_to(registration_path(bike))
-          expect(flash[:error]).to match(/unable to update/i)
-          expect(current_user.reload.feature_registration_show_legacy).to be_falsey
-        end
       end
     end
   end

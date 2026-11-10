@@ -10,6 +10,11 @@ RSpec.describe OrganizationsController, type: :request do
         expect(response.status).to eq(200)
         expect(response).to render_template(:new)
       end
+
+      it "keeps the kind through sign up" do
+        get "#{base_url}/new", params: {kind: "bike_advocacy"}
+        expect(response.body).to include("return_to=%2Forganizations%2Fnew%3Fkind%3Dbike_advocacy")
+      end
     end
     context "with user" do
       include_context :request_spec_logged_in_as_user
@@ -17,6 +22,14 @@ RSpec.describe OrganizationsController, type: :request do
         get "#{base_url}/new"
         expect(response.status).to eq(200)
         expect(response).to render_template(:new)
+      end
+
+      it "preselects a creatable kind" do
+        get "#{base_url}/new", params: {kind: "bike_advocacy"}
+        expect(Capybara.string(response.body)).to have_css("input[value=bike_advocacy][checked]")
+
+        get "#{base_url}/new", params: {kind: "ambassador"}
+        expect(Capybara.string(response.body)).to_not have_css("input[checked]")
       end
     end
   end
@@ -147,6 +160,18 @@ RSpec.describe OrganizationsController, type: :request do
         expect(assigns(:current_organization)&.id).to be_blank
       end
     end
+    context "b_param from a failed submission, for an organization that asks for its fields" do
+      let(:current_organization) { FactoryBot.create(:organization_with_auto_user, :organization_features, enabled_feature_slugs: %w[reg_student_id reg_organization_affiliation]) }
+      let(:b_param) { FactoryBot.create(:b_param, creator: nil, params: {bike: {student_id: "S1234", organization_affiliation: "employee"}}) }
+
+      it "keeps what they entered, though a built bike has no ownership to hold it" do
+        get "#{base_url}/#{current_organization.slug}/embed?b_param_id_token=#{b_param.id_token}"
+        page = Capybara.string(response.body)
+        expect(page).to have_field("bike[student_id]", with: "S1234")
+        expect(page).to have_select("bike[organization_affiliation]", selected: "Employee")
+      end
+    end
+
     context "stolen" do
       it "renders embed without xframe block" do
         get "#{base_url}/#{current_organization.slug}/embed?stolen=1&non_stolen=true"

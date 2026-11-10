@@ -1,0 +1,26 @@
+<% if @titled %>
+  <h3 class="tw:mb-2 tw:font-header tw:text-xl tw:font-extrabold">
+    <%= @law[:name] %>
+  </h3>
+<% end %>
+
+<p
+  class="
+    tw:mb-3 tw:max-w-[720px] tw:text-[15px] tw:text-gray-700
+    tw:dark:text-gray-300
+  "
+>
+  <%= @law[:description] %>
+</p>
+
+<div class="tw:mb-4">
+  <%= render(UI::DefinitionList::Container::Component.new(term: :below)) do %>
+    <% rule_ids.each do |id| %>
+      <%= render(UI::DefinitionList::Row::Component.new(label: render(Pages::EbikeRules::RuleLabel::Component.new(id:)))) do %>
+        <%= render(Pages::EbikeRules::RuleValue::Component.new(law: @law, id:)) %>
+      <% end %>
+    <% end %>
+  <% end %>
+</div>
+
+<%= render(Pages::EbikeRules::LawDetails::Component.new(law: @law)) %>

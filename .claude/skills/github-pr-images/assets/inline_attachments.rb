@@ -1,7 +1,8 @@
 # Usage: ruby .claude/skills/github-pr-images/assets/inline_attachments.rb <owner/repo> <comment-id>
 #
 # `gh --attach` rewrites only markdown `![](path)` references; an `<img src="path">`
-# keeps its local path and the upload is appended as `![<basename>](url)` instead.
+# keeps its local path and the upload is appended as `![<basename>](url)` instead,
+# with the basename's dots turned to spaces.
 # This moves each appended URL into the `src` naming that file, drops the appended
 # lines, and PATCHes the comment.
 require "json"
@@ -15,7 +16,7 @@ body = JSON.parse(Open3.capture2("gh", "api", path).first).fetch("body")
 
 appended = /^!\[([^\]]+)\]\((https:\/\/github\.com\/user-attachments\/assets\/[0-9a-f-]+)\)\s*/
 inlined = body.scan(appended).reduce(body.gsub(appended, "").rstrip + "\n") do |result, (name, url)|
-  result.gsub(/src="(?:[^"]*\/)?#{Regexp.escape(name)}\.\w+"/, %(src="#{url}"))
+  result.gsub(/src="(?:[^"]*\/)?#{Regexp.escape(name).gsub("\\ ", "[. ]")}\.\w+"/, %(src="#{url}"))
 end
 
 leftover = inlined.scan(/src="(?!https?:)([^"]+)"/).flatten

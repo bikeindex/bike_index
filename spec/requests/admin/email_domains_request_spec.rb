@@ -61,6 +61,14 @@ RSpec.describe Admin::EmailDomainsController, type: :request do
         expect(email_domain.no_auto_assign_status?).to be_falsey
       end
     end
+
+    it "re-renders the form when the domain is blank" do
+      expect { post base_url, params: {email_domain: {domain: ""}} }.not_to change(EmailDomain, :count)
+
+      expect(response.status).to eq 422
+      expect(response).to render_template(:new)
+      expect(flash[:error]).to match(/can't be blank/)
+    end
   end
 
   describe "#update" do

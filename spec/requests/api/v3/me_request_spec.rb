@@ -29,10 +29,10 @@ RSpec.describe "Me API V3", type: :request do
           {type: "group", key: "registrations", label: "#{organization.short_name} Registrations",
            icon: "bike",
            children: [
-             {type: "link", label: "Organization Registrations",
+             {type: "link", label: "Search Registrations",
               path: "/o/#{organization.slug}/registrations", icon: nil},
-             {type: "link", label: "Search all registrations",
-              path: "/search/registrations?stolenness=all", icon: nil}
+             {type: "link", label: "Multi search",
+              path: "/o/#{organization.slug}/registrations/multi_search", icon: nil}
            ]},
           {type: "link", label: "Add a registration", path: "/o/#{organization.slug}/registrations/new",
            icon: "plus-circle", match_params: {parking_notification: nil}}
@@ -180,6 +180,18 @@ RSpec.describe "Me API V3", type: :request do
         expect(response.response_code).to eq(200)
         result = json_result["bikes"].find { |b| b["id"] == bike.id }
         expect(result).to include("status" => "with owner", "for_sale" => true)
+      end
+    end
+
+    context "with impounded bike" do
+      let!(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user:) }
+      before { FactoryBot.create(:impound_record, bike:) }
+
+      it "shows the owner the serial" do
+        token.update_attribute :scopes, "read_bikes"
+        get "/api/v3/me/bikes", params: {access_token: token.token}, headers: {format: :json}
+        result = json_result["bikes"].find { |b| b["id"] == bike.id }
+        expect(result).to include("status" => "found", "serial" => bike.serial_number.upcase)
       end
     end
 

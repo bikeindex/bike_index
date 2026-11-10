@@ -10,7 +10,7 @@ module Atoms
       end
 
       def call
-        render(UI::CopyableCode::Component.new(value: @short_id, label: translation(".copy_id")))
+        render(Atoms::CopyableCode::Component.new(value: @short_id, label: translation(".copy_id")))
       end
 
       private

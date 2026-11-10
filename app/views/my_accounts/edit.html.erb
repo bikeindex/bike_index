@@ -1,4 +1,4 @@
-<% def template_url(template); template == "membership" ? edit_membership_path : edit_my_account_path(edit_template: template) end %>
+<% template_url = ->(template) { template == "membership" ? my_account_membership_path : edit_my_account_path(edit_template: template) } %>
 
 <%= form_for @user, url: my_account_path, method: :patch, multipart: true, html: { class: 'primary-edit-user-form', "data-controller" => "strip-inputs", "data-action" => "submit->strip-inputs#submit" } do |f| %>
   <div class="form-well-container container">
@@ -10,7 +10,10 @@
             <li>
               <% classname = @edit_template == template ? 'active' : '' %>
 
-              <a href="<%= template_url(template) %>" class="<%= classname %>">
+              <a
+                href="<%= template_url.call(template) %>"
+                class="<%= classname %>"
+              >
                 <h4><%= description %></h4>
               </a>
             </li>
@@ -22,7 +25,7 @@
           <select class="dirtyignore">
             <% @edit_templates.each do |template, description| %>
               <option
-                value="<%= template_url(template) %>"
+                value="<%= template_url.call(template) %>"
                 <% if @edit_template == template %>
                   selected
                 <% end %>
@@ -48,15 +51,13 @@
 
 <div class="mobile-nonfloating-menu pl-1 pr-1 text-center">
   <strong class="d-inline-block"><%= t(".edit_pages") %></strong>
-  <% menu_link_count = @edit_templates.keys.count %>
 
-  <% @edit_templates.each_with_index do |t_d, i| %>
-    <% template, description = t_d[0], t_d[1] %>
+  <% @edit_templates.each do |template, description| %>
     <% is_active = 'active' if @edit_template.match(/#{template}/) %>
 
     <a
       class="ml-1 mr-1 d-inline-block text-underline <%= is_active %>"
-      href="<%= template_url(template) %>"
+      href="<%= template_url.call(template) %>"
     >
       <%= description %>
     </a>

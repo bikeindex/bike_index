@@ -115,7 +115,7 @@ class Organization < ApplicationRecord
   has_many :locations, inverse_of: :organization, dependent: :destroy
   has_many :location_address_records, -> { where(kind: :organization) }, class_name: "AddressRecord", foreign_key: :organization_id
   has_many :mail_snippets
-  has_many :registration_sequences, dependent: :destroy
+  has_many :education_courses, dependent: :destroy
   has_many :parking_notifications
   has_many :impound_records
   has_many :impound_claims
@@ -352,7 +352,7 @@ class Organization < ApplicationRecord
   end
 
   def show_single_search_menu_item?
-    enabled?("bike_search") && !law_enforcement?
+    !law_enforcement? && !ambassador?
   end
 
   # WARNING! This is not efficient
@@ -392,6 +392,10 @@ class Organization < ApplicationRecord
 
   def hot_sheet_on?
     hot_sheet_configuration.present? && hot_sheet_configuration.on?
+  end
+
+  def hot_sheet_viewable?
+    hot_sheet_on? || search_coordinates_set?
   end
 
   def current_invoices
@@ -725,7 +729,7 @@ class Organization < ApplicationRecord
     # If it has stickers, add reg_bike_sticker field
     fslugs += ["reg_bike_sticker"] if fslugs.include?("bike_stickers")
     # Alone, the edit feature would lock the organization out - viewing is gated separately
-    fslugs += ["registration_sequences"] if fslugs.include?("registration_sequences_edit")
+    fslugs += ["education_courses"] if fslugs.include?("education_courses_edit")
 
     if fslugs.include?("impound_bikes")
       # If impound_bikes enabled and there is a default location for impounding bikes, add impound_bikes_locations

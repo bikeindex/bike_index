@@ -67,7 +67,6 @@ $border-radius-sm: 1px;
 
 // Components
 // @import "bootstrap/animation";
-// @import "bootstrap/dropdown";
 // @import "bootstrap/button-group";
 @import "bootstrap/input-group";
 @import "bootstrap/custom-forms";
@@ -248,6 +247,10 @@ img {
 // REGISTRATION FORM SPECIFIC STYLES
 //
 #binx_registration_widget {
+  // tailwind's unlayered body rule would otherwise reach the widget by inheritance
+  font-family: $font-family-base;
+  color: $body-color;
+
   margin: 0 auto;
   position: relative;
   border-radius: $border-radius;
@@ -259,6 +262,7 @@ img {
 
   h2 {
     font-size: 30px;
+    font-weight: $strong-font-weight;
     margin: $vertical-height 0 (1.5 * $vertical-height);
   }
 
@@ -279,6 +283,7 @@ img {
       margin: 0;
       text-align: center;
       font-size: 21px;
+      font-weight: $strong-font-weight;
     }
   }
 

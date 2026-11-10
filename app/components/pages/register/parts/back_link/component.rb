@@ -14,8 +14,8 @@ module Pages
 
           def call
             content_tag(:p, class: "tw:mt-3 tw:mb-0 tw:text-center") do
-              link_to("← #{translation(".back")}", @href,
-                class: "tw:text-sm tw:font-medium tw:text-gray-500 tw:no-underline tw:hover:text-gray-700 tw:dark:text-gray-400")
+              render(UI::ButtonLink::Component.new(href: @href, text: "← #{translation(".back")}", color: :link_gray,
+                html_class: "tw:text-sm tw:font-medium"))
             end
           end
         end

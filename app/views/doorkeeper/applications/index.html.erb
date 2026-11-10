@@ -18,64 +18,47 @@
   <%= "application".pluralize(@applications.count) %> created
 </h3>
 
-<div class="full-screen-table">
-  <table class="table table-striped margined">
-    <thead>
-      <tr>
-        <th>Created</th>
-        <th>Name</th>
-        <th>Callback URL</th>
-        <th></th>
-        <th></th>
-        <th></th>
-      </tr>
-    </thead>
+<% display_dev_info = display_dev_info? %>
 
-    <tbody>
-      <% @applications.each do |application| %>
-        <tr id="application_<%= application.id %>">
-          <td>
-            <span class="localizeTime">
-              <%= l application.created_at, format: :convert_time %>
-            </span>
+<%= render(UI::Table::Base::Component.new(records: @applications, row_attributes: ->(application) { {id: "application_#{application.id}"} })) do |table| %>
+  <% table.column(label: "Created") do |application| %>
+    <%= render(UI::Time::Component.new(time: application.created_at)) %>
 
-            <% if display_dev_info? %>
-              <span class="only-dev-visible"><%= application.id %></span>
-            <% end %>
-          </td>
+    <% if display_dev_info %>
+      <span class="only-dev-visible"><%= application.id %></span>
+    <% end %>
+  <% end %>
 
-          <td>
-            <%= application.name %>
+  <% table.column(label: "Name") do |application| %>
+    <%= application.name %>
 
-            <% if application.is_internal %>
-              <%= render(UI::Badge::Component.new(text: "Internal", color: :notice, size: :sm)) %>
-            <% end %>
+    <% if application.is_internal %>
+      <%= render(UI::Badge::Component.new(text: "Internal", color: :notice, size: :sm)) %>
+    <% end %>
 
-            <% if application.can_send_stolen_notifications? %>
-              <span class="text-warning">
-                Has permission to send stolen notifications
-              </span>
-            <% end %>
-          </td>
+    <% if application.can_send_stolen_notifications? %>
+      <span class="text-warning">
+        Has permission to send stolen notifications
+      </span>
+    <% end %>
+  <% end %>
 
-          <td>
-            <pre class="small"><%= application.redirect_uri.gsub(/\s+/, "\n") %></pre>
-          </td>
+  <% table.column(label: "Callback URL") do |application| %>
+    <pre class="small"><%= application.redirect_uri.gsub(/\s+/, "\n") %></pre>
+  <% end %>
 
-          <td>
-            <%= link_to "View", oauth_application_url(application), class: 'btn btn-default' %>
-          </td>
+  <% table.column do |application| %>
+    <%= link_to "View", oauth_application_url(application), class: 'btn btn-default' %>
+  <% end %>
 
-          <td>
-            <%= link_to 'Edit', edit_oauth_application_url(application), class: 'btn btn-primary' %>
-          </td>
+  <% table.column do |application| %>
+    <%= link_to 'Edit', edit_oauth_application_url(application), class: 'btn btn-primary' %>
+  <% end %>
 
-          <td><%= render 'delete_form', application: application %></td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
-</div>
+  <% table.column do |application| %>
+    <%= render partial: "/doorkeeper/applications/delete_form", locals: {application:} %>
+  <% end %>
+<% end %>
 
 <h3 class="mt-4 mb-5 header-font-alt text-center">
   Documentation on the API is available at

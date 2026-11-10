@@ -29,57 +29,46 @@
           = submit_tag t(".search"), class: "btn btn-primary"
 
 - include_child_org = current_organization.child_ids.present?
-%table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border
-  %thead.small-header
-  %thead.sortable
-    %th
-      = sortable "id" do
-        = t(".sent")
-        %small.localizeTimezone
-    %th= t(".bike")
-    %th= sortable "cycle_type", t(".vehicle_type")
-    %th= sortable "motorized", t(".motorized")
-    %th= sortable "email", t(".email")
-  %tbody
-    - @b_params.each do |b_param|
-      %tr
-        %td
-          %span.localizeTime
-            = l b_param.created_at, format: :convert_time
-          - if display_dev_info?
-            %small.only-dev-visible= b_param.id
-        %td
-          %strong
-            = b_param.primary_frame_color
-          = b_param.mnfg_name
-        %td
-          - cycle_type = b_param.cycle_type
-          - if cycle_type.present? && cycle_type != 'bike'
-            = CycleType.slug_translation(cycle_type)
-          - else
-            %span.less-strong bike
-        %td
-          = check_mark if b_param.motorized?
-        %td
-          = b_param.owner_email
-          - if include_child_org && b_param.organization != current_organization
-            %small.less-strong{ style: "display: block; line-height: 1;" }
-              = t(".through_org", org_name: b_param.organization.short_name)
-        %td
-          - resend_notifications = b_param.partial_notification_resends.pluck(:created_at, :delivery_status)
-          .less-strong-hold{style: "min-width:2rem;"}
-            - resend_notifications.each do |resend|
-              %span.d-block{style: "line-height:1.2;"}
-                %small.localizeTime
-                  = l resend[0], format: :convert_time
-                = notification_delivery_display(resend[1])
-            -# Hacky restriction on the number of resends you can do
-            - unless resend_notifications.count > 3
-              %span.less-strong-right
-                = render(UI::ButtonLink::Component.new(text: t(".re_send"),
-                  href: resend_incomplete_email_organization_bike_path(id: b_param.to_param, organization_id: current_organization.to_param),
-                  color: :link, html_class: "gray-link",
-                  method: :post, confirm: t(".only_resend_with_permission")))
+- organization = current_organization
+- show_dev_info = display_dev_info?
+- re_send = t(".re_send")
+- only_resend_with_permission = t(".only_resend_with_permission")
+= render(UI::Table::Base::Component.new(records: @b_params, render_sortable: true, sort_state:)) do |table|
+  - table.column(sortable: "id", label: safe_join([t(".sent"), " ", tag.small(class: "localizeTimezone")])) do |b_param|
+    = render(UI::Time::Component.new(time: b_param.created_at))
+    - if show_dev_info
+      %small.only-dev-visible= b_param.id
+  - table.column(label: t(".bike")) do |b_param|
+    %strong
+      = b_param.primary_frame_color
+    = b_param.mnfg_name
+  - table.column(sortable: "cycle_type", label: t(".vehicle_type")) do |b_param|
+    - cycle_type = b_param.cycle_type
+    - if cycle_type.present? && cycle_type != 'bike'
+      = CycleType.slug_translation(cycle_type)
+    - else
+      %span.less-strong bike
+  - table.column(sortable: "motorized", label: t(".motorized")) do |b_param|
+    = check_mark if b_param.motorized?
+  - table.column(sortable: "email", label: t(".email")) do |b_param|
+    = b_param.owner_email
+    - if include_child_org && b_param.organization != organization
+      %small.less-strong{ style: "display: block; line-height: 1;" }
+        = t("organized.bikes.incompletes.through_org", org_name: b_param.organization.short_name)
+  - table.column do |b_param|
+    - resend_notifications = b_param.partial_notification_resends.pluck(:created_at, :delivery_status)
+    .less-strong-hold{style: "min-width:2rem;"}
+      - resend_notifications.each do |resend|
+        %span.d-block{style: "line-height:1.2;"}
+          %small= render(UI::Time::Component.new(time: resend[0]))
+          = helpers.notification_delivery_display(resend[1])
+      -# Hacky restriction on the number of resends you can do
+      - unless resend_notifications.count > 3
+        %span.less-strong-right.less-strong
+          = render(UI::ButtonLink::Component.new(text: re_send,
+            href: resend_incomplete_email_organization_bike_path(id: b_param.to_param, organization_id: organization.to_param),
+            color: :link_gray,
+            method: :post, confirm: only_resend_with_permission))
 
 .pt-4.pb-4
   = render(UI::Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg))

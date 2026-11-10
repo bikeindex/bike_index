@@ -13,6 +13,14 @@ export default class extends Controller {
     document.removeEventListener('keydown', this.focusField)
   }
 
+  // Opens the field's list, after the click that asked, which it would otherwise close as one outside it
+  open () {
+    setTimeout(() => {
+      this.fieldTarget.focus()
+      this.fieldTarget.click()
+    })
+  }
+
   focusField = (event) => {
     if (event.key !== '/' || event.metaKey || event.ctrlKey || event.altKey) return
 

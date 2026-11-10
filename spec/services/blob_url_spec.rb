@@ -77,6 +77,18 @@ RSpec.describe BlobUrl do
         urls = PublicImage::VARIANTS.keys.map { described_class.for_variant(attached, it) }
         expect(urls.uniq.count).to eq PublicImage::VARIANTS.count
       end
+
+      context "with FOREIGN_BLOB_ORIGINALS" do
+        before { stub_const("BlobUrl::FOREIGN_BLOB_ORIGINALS", true) }
+
+        it "returns the original for another environment's blob, variants for this one's" do
+          expect(described_class.for_variant(attached, :large)).to include "/variants/"
+
+          allow(attached.blob).to receive(:service_name).and_return("cloudflare_production")
+          expect(described_class.for_variant(attached, :large))
+            .to eq "https://uploads.bikeindex.org/#{attached.blob.key}"
+        end
+      end
     end
   end
 end

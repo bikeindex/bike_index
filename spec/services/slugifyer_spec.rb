@@ -81,5 +81,12 @@ RSpec.describe Slugifyer do
       slug = Slugifyer.manufacturer("Riese & Müller (Riese and Muller)")
       expect(slug).to eq "riese_amp_muller"
     end
+    it "keeps the suffix when removing it would leave only digits" do
+      expect(Slugifyer.manufacturer("101 Bikes")).to eq "101_bikes"
+      expect(Slugifyer.manufacturer("101_bikes")).to eq "101_bikes"
+      expect(Slugifyer.manufacturer("101 Electric Bikes (Other Name)")).to eq "101_electric_bikes"
+      expect(Slugifyer.manufacturer("22 Bicycle Co.")).to eq "22_bicycle"
+      expect(Slugifyer.manufacturer("24 Seven Bikes")).to eq "24_seven"
+    end
   end
 end
