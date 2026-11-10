@@ -46,12 +46,10 @@
        } %>
 
     <%= render(UI::Dropdown::Component.new(name: search_filters[@search_filter], button_size: :sm, active: @search_filter != "all")) do |dropdown| %>
-      <% search_filters.each do |s_filter, s_filter_name| %>
-        <% s_filter_params = sortable_search_params.merge(organization_id: current_organization.to_param, search_filter: ((@search_filter == s_filter) ? nil : s_filter)) %>
+      <% search_filters.each do |filter, filter_name| %>
+        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: filter_name, path: organization_bulk_imports_path(sortable_search_params.merge(organization_id: current_organization.to_param, search_filter: (@search_filter == filter) ? nil : filter)), match_params: {search_filter: (filter == "all") ? [filter, nil] : filter}) } %>
 
-        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: s_filter_name, path: organization_bulk_imports_path(s_filter_params), match_params: {search_filter: (s_filter == "all") ? [s_filter, nil] : s_filter}) } %>
-
-        <% dropdown.with_entry_divider if s_filter == "without_errors" %>
+        <% dropdown.with_entry_divider if filter == "without_errors" %>
       <% end %>
     <% end %>
 
