@@ -146,7 +146,7 @@ class EducationCourse < ApplicationRecord
   # new draft, which activating supersedes this with.
   def activated? = !draft?
 
-  # Moves page to position and re-courses listing_order (drag-and-drop on the show page).
+  # Moves page to position and re-sequences listing_order (drag-and-drop on the show page).
   # update_all skips the pages' own callbacks, so the guard is here too
   def reorder_page!(page, position)
     return false if activated?

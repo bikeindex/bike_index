@@ -39,7 +39,7 @@
         <p class="twlabel"><%= translation(".notification_because") %></p>
 
         <%= render UI::Forms::RadioButtonGroup::Component.new(name: "parking_notification[kind]",
-            selected: ParkingNotification.kinds.first, entries: kind_entries) %>
+            selected: @kind, entries: kind_entries) %>
       </div>
 
       <%= render(UI::Forms::Group::Component.new(form_builder: n, attribute: :internal_notes, kind: :text_area,

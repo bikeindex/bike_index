@@ -292,8 +292,7 @@ RSpec.describe "Organized impound records index", :js, type: :system do
 
     Sidekiq::Job.clear_all
     expect {
-      # The click waits on the navigation, 2.2s by default, and this POST impounds inline.
-      # It ran out on a loaded machine; click_button's wait: only covers finding the button
+      # This POST impounds inline, past the click's default navigation wait
       using_wait_time(10) { click_button "Impound this #{impound_bike.type}" }
       expect(page).to have_content("Impounded this #{impound_bike.type}", wait: 10)
     }.to change(impound_bike.parking_notifications, :count).by(1)

@@ -13,7 +13,7 @@ module UserServices
       return [] if organization.nil? || current_user.nil?
 
       # Rails.cache.fetch gets none of the locale ApplicationComponentHelper#cache folds into fragments
-      Rails.cache.fetch(["menu_items_org_v4", organization, current_user,
+      Rails.cache.fetch(["menu_items_org_v5", organization, current_user,
         old_register_view, I18n.locale]) do
         build_items(organization, current_user, old_register_view)
       end
@@ -41,12 +41,12 @@ module UserServices
       [[registrations_group(organization), add_registration_link(organization, old_register_view)],
         [impounded_group(organization),
           parking_group(organization),
-          bulk_group(organization),
+          bulk_group(organization, admin),
           lightspeed_link(organization),
           messaging_link(organization, admin),
           model_audits_link(organization),
           graduated_link(organization),
-          hot_sheet_link(organization),
+          hot_sheet_link(organization, admin),
           reports_link(organization)],
         [settings_group(organization, admin)]]
     end
@@ -120,9 +120,7 @@ module UserServices
     end
 
     # Managing impounding is the settings group's, which is where the org's other
-    # configuration lives -- this group is for the vehicles themselves. Add an Impounded
-    # Vehicle is in the design with nothing to link to, since organized routes no
-    # impound_records#new, so it renders greyed rather than the menu losing the row
+    # configuration lives -- this group is for the vehicles themselves
     def impounded_group(organization)
       return nil unless organization.enabled?("impound_bikes")
 
@@ -135,10 +133,20 @@ module UserServices
              routes.organization_impound_claims_path(organization_id: organization.to_param),
              section: true)
          end),
-        ComponentStructs::Shapes.disabled(translation(:add_an_impounded_vehicle))
+        add_impounded_link(organization)
       ]
 
       ComponentStructs::Shapes.group(:impounded, translation(:impounded_vehicles), "impound", children)
+    end
+
+    # Organized routes no impound_records#new, so the unregistered parking notification form
+    # is the only way to add one. Without that feature the design's row renders greyed
+    def add_impounded_link(organization)
+      return ComponentStructs::Shapes.disabled(translation(:add_an_impounded_vehicle)) unless organization.enabled?("parking_notifications")
+
+      ComponentStructs::Shapes.link(translation(:add_an_impounded_vehicle),
+        routes.new_organization_parking_notification_path(organization.to_param, kind: "impound_notification"),
+        match_params: {kind: "impound_notification"})
     end
 
     def parking_group(organization)
@@ -148,16 +156,16 @@ module UserServices
         ComponentStructs::Shapes.link(translation(:search_parking_notifications),
           routes.organization_parking_notifications_path(organization_id: organization.to_param)),
         ComponentStructs::Shapes.link(translation(:parking_notification_unregistered),
-          routes.new_organization_parking_notification_path(organization.to_param))
+          routes.new_organization_parking_notification_path(organization.to_param), match_params: {kind: nil})
       ]
 
       ComponentStructs::Shapes.group(:parking, translation(:parking_notifications_group), "map-pin", children)
     end
 
-    def bulk_group(organization)
+    def bulk_group(organization, admin)
       import_label = organization.ascend_or_broken_ascend? ? translation(:ascend_imports) : translation(:bulk_imports)
       children = [
-        (if organization.show_bulk_import?
+        (if admin && organization.show_bulk_import?
            ComponentStructs::Shapes.link(import_label,
              routes.organization_bulk_imports_path(organization_id: organization.to_param), section: true)
          end),
@@ -204,7 +212,10 @@ module UserServices
         icon: "graduation-cap", section: true)
     end
 
-    def hot_sheet_link(organization)
+    # An admin of an organization that can't view it lands on its edit page, which says why
+    def hot_sheet_link(organization, admin)
+      return nil unless admin || organization.hot_sheet_viewable?
+
       enabled_link(organization, "hot_sheet", translation(:stolen_hot_sheet),
         routes.organization_hot_sheet_path(organization_id: organization.to_param), icon: "clipboard")
     end
@@ -263,7 +274,7 @@ module UserServices
 
     conceal :build_items, :organization_sections, :super_admin_link, :ambassador_items,
       :registrations_group, :registrations_links, :add_registration_link, :impounded_group,
-      :parking_group, :bulk_group, :lightspeed_link, :messaging_link, :model_audits_link, :graduated_link,
+      :add_impounded_link, :parking_group, :bulk_group, :lightspeed_link, :messaging_link, :model_audits_link, :graduated_link,
       :hot_sheet_link, :reports_link, :settings_group, :org_root, :enabled_link, :translation, :routes
   end
 end
