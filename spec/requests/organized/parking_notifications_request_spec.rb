@@ -83,9 +83,21 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
       expect(response.body).to include(%(action="/o/#{current_organization.to_param}/bikes"))
       expect(response.body).to include("parking_notification[kind]")
       expect(response.body).to include("/o/#{current_organization.to_param}/registrations/settings")
+      expect(checked_kind).to eq "appears_abandoned_notification"
+
+      get "#{base_url}/new", params: {kind: "impound_notification"}
+      expect(checked_kind).to eq "impound_notification"
+
+      get "#{base_url}/new", params: {kind: "not_a_kind"}
+      expect(checked_kind).to eq "appears_abandoned_notification"
+    end
+
+    def checked_kind
+      Nokogiri::HTML(response.body).at_css("input[name='parking_notification[kind]'][checked]")["value"]
     end
 
     context "with the old unregistered notification page" do
+      let(:current_organization) { FactoryBot.create(:organization_with_organization_features, :with_auto_user, enabled_feature_slugs:) }
       let(:registrations_url) { "/o/#{current_organization.to_param}/registrations" }
       let(:legacy_path) { new_organization_bike_path(organization_id: current_organization.to_param, parking_notification: true) }
       # Not a let - it's read after each request in turn, and a let would memoize the first
@@ -102,6 +114,16 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         expect(old_view_checkbox["checked"]).to be_present
         get "#{base_url}/new"
         expect(response).to redirect_to legacy_path
+
+        impounded_path = new_organization_bike_path(organization_id: current_organization.to_param,
+          parking_notification: true, kind: "impound_notification")
+        get "#{base_url}/new", params: {kind: "impound_notification"}
+        expect(response).to redirect_to impounded_path
+        follow_redirect!
+        iframe_src = Nokogiri::HTML(response.body).at_css("iframe")["src"]
+        expect(iframe_src).to include("kind=impound_notification")
+        get iframe_src
+        expect(checked_kind).to eq "impound_notification"
 
         # Both submit together, so the old registration page alone turns this off
         post "#{registrations_url}/switches", params: {old_view: true}
