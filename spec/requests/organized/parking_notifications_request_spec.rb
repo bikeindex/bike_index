@@ -219,7 +219,6 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         end
       end
 
-      # The form collapses its location controls for a repeat, so nothing locates the pin
       context "repeat with no location of its own" do
         let!(:earlier_notification) { FactoryBot.create(:parking_notification_organized, organization: current_organization, bike:, kind: "parked_incorrectly_notification") }
         let(:repeat_params) do
