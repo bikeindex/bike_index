@@ -21,6 +21,7 @@ RSpec.describe Pages::EbikeRules::Results::Component, type: :component do
   it "renders a legal bike, its BikeBook photo, specs and certifications, and its state's limits" do
     expect(component).to have_css("[role='status']", text: "Legal to ride")
       .and have_css("[role='status']", text: "The Trek Verve+ 2 is a Class 1 e-bike in Indiana.")
+      .and have_css("[role='status'] p.tw\\:font-normal strong.tw\\:font-bold", exact_text: "Trek Verve+ 2")
       .and have_css("img[src='https://bikebook.bikeindex.org/trek/2025/verve.jpg'][alt='Trek Verve+ 2']")
       .and have_css("[role='img'][aria-label='Class 1 e-bike']")
       .and have_css("p", text: /\A\s*2025 model\s*\z/)
@@ -40,13 +41,38 @@ RSpec.describe Pages::EbikeRules::Results::Component, type: :component do
 
     it "renders the rule to check, with no photo and unknown certifications" do
       expect(component).to have_css("[role='status']", text: "Classified as an e-bike, with rules to check")
-        .and have_css("[role='status']", text: "The e-bike is a Class 2 and 3 e-bike in Colorado, with 1 rule to check.")
+        .and have_css("[role='status']", text: "This is a Class 2 and 3 e-bike in Colorado, with 1 rule to check.")
         .and have_css("[role='status'] li", text: "Throttle must cut out at 20 mph.")
         .and have_css("h2", text: "Manually entered e-bike").and have_no_text("Entered manually")
         .and have_css("dd", text: "28 mph")
         .and have_text("Entered by you, not verified by BikeBook.")
         .and have_text("Certification unknown").and have_no_text("E-bike electrical system")
         .and have_no_css("img")
+    end
+
+    context "when it's legal to ride" do
+      let(:bike) { EbikeRuleServices::Bike.manual(top_mph: 20, watts: 250, throttle: false) }
+
+      it "has no model name to set apart" do
+        expect(component).to have_css("[role='status'] p.tw\\:font-normal", text: "This is a Class 1 e-bike in Colorado.")
+          .and have_no_css("[role='status'] strong")
+      end
+
+      context "in a state with no classes" do
+        let(:abbreviation) { "AK" }
+
+        it "says it's classified" do
+          expect(component).to have_css("[role='status'] p", text: "This is classified as an e-bike in Alaska.")
+        end
+
+        context "with a rule to check" do
+          let(:bike) { EbikeRuleServices::Bike.manual(top_mph: 28, watts: 250, throttle: true) }
+
+          it "says how many" do
+            expect(component).to have_css("[role='status'] p", text: "This is classified as an e-bike in Alaska, with 1 rule to check.")
+          end
+        end
+      end
     end
   end
 
@@ -55,7 +81,8 @@ RSpec.describe Pages::EbikeRules::Results::Component, type: :component do
 
     it "leaves the rating to check, showing the peak" do
       expect(component).to have_css("[role='status']", text: "Classified as an e-bike, with rules to check")
-        .and have_css("[role='status']", text: "The Trek Verve+ 2 is a Class 1 e-bike in Indiana, with 1 rule to check.")
+        .and have_css("[role='status'] p.tw\\:font-bold", text: "The Trek Verve+ 2 is a Class 1 e-bike in Indiana, with 1 rule to check.")
+        .and have_no_css("[role='status'] strong")
         .and have_css("[role='status'] li", text: "Check that its motor is rated 750W or less.")
         .and have_css("dd", text: "800W")
     end
