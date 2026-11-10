@@ -2186,6 +2186,7 @@ nl:
         create:
           successfully_created: Parkeermelding %{bike_type} gemaakt
           unable_to_create: Kan niet maken - %{errors}
+          successfully_impounded: In beslag genomen dit %{bike_type}
       manages:
         destroy:
           contact_support_to_delete: Neem contact op met support@bikeindex.org om
@@ -6042,6 +6043,7 @@ nl:
               impound_this_bike_type: Neem dit in beslag %{bike_type}
               not_shown_to_user: niet aan de gebruiker getoond
               parking_notification_notes: "%{org_name} interne notities"
+              submit_parking_notification: Maak een parkeermelding aan
             parking_notification_show:
               no_notifications: Geen parkeermeldingen voor deze %{bike_type}
               parking_notifications: Verlaten records
