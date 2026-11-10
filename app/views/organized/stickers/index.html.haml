@@ -41,39 +41,23 @@
           %input{ type: "radio", name: "search_claimedness", autocomplete: "off", checked: claimedness == "unclaimed", value: "unclaimed" }
           = t(".unclaimed")
 
-.full-screen-table.mt-4
+.mt-4
   %p{ style: "margin-bottom: 0;" }
     %strong= pluralize(number_with_delimiter(@pagy.count), t(".sticker"))
 
-  %table.table.table-striped.table-bordered.table-sm.without-exterior-border
-    %thead.sortable
-      %th
-        = sortable "created_at", t(".added_html")
-      %th
-        - if claimedness == "claimed"
-          = sortable "claimed_at", t(".claimed")
-        - else
-          = t(".claimed")
-      %th= t(".bike")
-      %th
-        = sortable "code_integer", t(".coded")
-
-    %tbody
-      - @bike_stickers.each do |bike_sticker|
-        %tr
-          %td
-            %a.localizeTime{ href: edit_organization_sticker_path(organization_id: current_organization.to_param, id: bike_sticker.code) }
-              = l(bike_sticker.created_at, format: :convert_time)
-          %td
-            - if bike_sticker.claimed? && bike_sticker.claimed_at.present?
-              %span.localizeTime
-                = l(bike_sticker.claimed_at, format: :convert_time)
-          %td
-            - if bike_sticker.claimed?
-              -# For these, use bike_id to avoid loading association
-              = link_to(organized_bike_text(bike_sticker.bike), bike_path(bike_sticker.bike, organization_id: current_organization.to_param))
-          %td
-            %strong= bike_sticker.pretty_code
+  - organization_id = current_organization.to_param
+  = render(UI::Table::Base::Component.new(records: @bike_stickers, render_sortable: true, sort_state:)) do |table|
+    - table.column(sortable: "created_at", label: t(".added_html")) do |bike_sticker|
+      = link_to render(UI::Time::Component.new(time: bike_sticker.created_at)), edit_organization_sticker_path(organization_id:, id: bike_sticker.code), class: "twlink"
+    - table.column(sortable: ("claimed_at" if claimedness == "claimed"), label: t(".claimed")) do |bike_sticker|
+      - if bike_sticker.claimed? && bike_sticker.claimed_at.present?
+        = render(UI::Time::Component.new(time: bike_sticker.claimed_at))
+    - table.column(label: t(".bike")) do |bike_sticker|
+      - if bike_sticker.claimed?
+        -# For these, use bike_id to avoid loading association
+        = link_to(helpers.organized_bike_text(bike_sticker.bike), bike_path(bike_sticker.bike, organization_id:), class: "twlink")
+    - table.column(sortable: "code_integer", label: t(".coded")) do |bike_sticker|
+      %strong= bike_sticker.pretty_code
 
 .pt-4.pb-4
   = render(UI::Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg))

@@ -2,13 +2,12 @@ module BikeServices
   class StolenRecordUpdator
     # Used to be in StolenRecord - but now it's here. Eventually, I'd like to actually do permitted params handling in here
     # recovery_tweet, recovery_share # We edit this in the admin panel
-    OLD_ATTR_ACCESSIBLE = (%i[police_report_number police_report_department locking_description lock_defeat_description
+    OLD_ATTR_ACCESSIBLE = %i[police_report_number police_report_department locking_description lock_defeat_description
       timezone date_stolen bike creation_organization_id country_id region_record_id region_string street postal_code city latitude
       longitude theft_description current phone secondary_phone phone_for_everyone
       phone_for_users phone_for_shops phone_for_police receive_notifications proof_of_ownership
       approved recovered_at recovered_description index_helped_recovery can_share_recovery
-      recovery_posted tsved_at estimated_value] +
-      BParam::LEGACY_STOLEN_ATTRS.keys.map(&:to_sym)).freeze # TODO: #3952 - stolen record legacy attrs
+      recovery_posted tsved_at estimated_value].freeze
 
     attr_reader :stolen_params
 

@@ -30,7 +30,7 @@ module Organized
     private
 
     def ensure_valid_hot_sheet_configuration!
-      return true if @hot_sheet_configuration&.is_on? || current_organization.search_coordinates_set?
+      return true if current_organization.hot_sheet_viewable?
 
       # The edit page renders its own missing location alert, so skip the flash there
       return redirect_to(edit_organization_hot_sheet_path(current_organization)) if current_user&.admin_of?(current_organization)

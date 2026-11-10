@@ -107,7 +107,7 @@ RSpec.describe "BikesController#update", type: :request do
         bike.reload
         expect(bike.address_record).to have_attributes(target_address_record_attributes)
         expect(bike.address_set_manually).to be_truthy
-        expect(bike.registration_address).to match_hash_indifferently(target_address_record_attributes.slice(:latitude, :longitude))
+        expect(bike.registration_address_record).to have_attributes(target_address_record_attributes.slice(:latitude, :longitude))
         # NOTE: There is an issue with coordinate precision locally vs on CI. It isn't relevant, so bypassing
         expect(bike.latitude).to be_within(0.01).of(53.5183351)
         expect(bike.longitude).to be_within(0.01).of(-113.5015663)
@@ -374,21 +374,6 @@ RSpec.describe "BikesController#update", type: :request do
       }
     end
 
-    context "with legacy stolen attribute names" do
-      let(:legacy_stolen_params) do
-        stolen_params.except(:postal_code, :region_record_id).merge(zipcode: "10007", state_id: state.id)
-      end
-      it "updates with the renamed attributes" do
-        expect(bike.reload.current_stolen_record_id).to eq stolen_record.id
-        patch base_url, params: {bike: {stolen: "true", stolen_records_attributes: {"0" => legacy_stolen_params}}}
-        expect(flash[:success]).to be_present
-        stolen_record.reload
-        expect(stolen_record.street).to eq "278 Broadway"
-        expect(stolen_record.postal_code).to eq "10007"
-        expect(stolen_record.region_record_id).to eq state.id
-      end
-    end
-
     it "clears the existing alert image" do
       # Cassette required for alert image
       VCR.use_cassette("bike_request-stolen", match_requests_on: [:method], re_record_interval: 1.month) do
@@ -566,7 +551,7 @@ RSpec.describe "BikesController#update", type: :request do
     let(:current_user) { FactoryBot.create(:user_confirmed) }
     it "does not update and redirects" do
       patch base_url, params: {bike: {serial_number: "69"}}
-      expect(response).to redirect_to bike_url(bike)
+      expect(response).to redirect_to registration_url(bike)
       expect(flash[:error]).to be_present
       expect(bike.reload.serial_number).to_not eq "69"
     end

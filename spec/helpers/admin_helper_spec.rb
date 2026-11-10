@@ -43,20 +43,6 @@ RSpec.describe AdminHelper, type: :helper do
     end
   end
 
-  describe "credibility_scorer_color" do
-    it "returns yellow for 50" do
-      expect(credibility_scorer_color(50)).to eq "#ffc107"
-      expect(credibility_scorer_color_table(50)).to eq ""
-    end
-    it "returns red for 25" do
-      expect(credibility_scorer_color(25)).to eq "#dc3545"
-      expect(credibility_scorer_color_table(25)).to eq "#dc3545"
-    end
-    it "returns green for 80" do
-      expect(credibility_scorer_color(80)).to eq "#28a745"
-    end
-  end
-
   describe "admin_path_for_object" do
     it "returns blank" do
       expect(admin_path_for_object).to be_blank
@@ -74,6 +60,14 @@ RSpec.describe AdminHelper, type: :helper do
     context "stolen_record" do
       it "returns" do
         expect(admin_path_for_object(StolenRecord.new(id: 22))).to eq admin_stolen_bike_path(22, stolen_record_id: 22)
+      end
+    end
+    context "a record without a show page" do
+      it "returns the page that lists it" do
+        expect(admin_path_for_object(ParkingNotification.new(id: 1, bike_id: 42))).to eq admin_parking_notifications_path(search_bike_id: 42)
+        expect(admin_path_for_object(GraduatedNotification.new(id: 1, bike_id: 42))).to eq admin_graduated_notifications_path(search_bike_id: 42)
+        expect(admin_path_for_object(OrganizationStatus.new(id: 1, organization_id: 42))).to eq admin_organization_statuses_path(organization_id: 42)
+        expect(admin_path_for_object(UserEmail.new(id: 1, user_id: 42))).to eq admin_user_path(42)
       end
     end
     context "payment" do

@@ -1,22 +1,43 @@
-<%= render(UI::Modal::Component.new(title: "Contact us for a free trial", id: @modal_id)) do |modal| %>
-  <% modal.with_body do %>
-    <%= form_for @feedback, html: {data: {controller: "form-persist", action: "input->form-persist#save submit->form-persist#clear"}} do |f| %>
-      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :name, label_text: @name_label, html_options: {required: true})) %>
-      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :contact_name, label_text: "Name")) %>
+<% if (url = sent_from_url) %>
+  <% helpers.content_for(:header) { javascript_tag("history.replaceState(history.state, '', #{url.to_json})") } %>
+<% end %>
 
-      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :email, required: true)) do %>
-        <%= render(UI::Forms::Email::Component.new(form_builder: f, required: true, html_options: {value: @current_user&.email})) %>
+<%= render(UI::Modal::Component.new(id: @modal_id, title:, open: @feedback.errors.any?)) do |modal| %>
+  <% modal.with_body do %>
+    <%= form_for @feedback, html: {data: {controller: form_controllers, "form-persist-save-value": @feedback.errors.any?,
+      action: "input->form-persist#save submit->strip-inputs#submit submit->form-persist#clear"}} do |f| %>
+      <%= render(UI::Alerts::ObjectError::Component.new(object: @feedback, name: translation(".request_name"))) %>
+
+      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :name, label_text: @name_label,
+        html_options: {required: true})) %>
+
+      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :contact_name, label_text: translation(".field_name"),
+        html_options: {required: true})) %>
+
+      <% if @role_options %>
+        <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :contact_role, label_text: translation(".field_role"), required: true)) do %>
+          <%= render(UI::Forms::Select::Component.new(form_builder: f, attribute: :contact_role, option_tags: @role_options,
+            options: {include_blank: true}, required: true)) %>
+        <% end %>
       <% end %>
 
-      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :phone_number)) %>
+      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :email, required: true)) do %>
+        <%= render(UI::Forms::Email::Component.new(form_builder: f, required: true)) %>
+      <% end %>
+
+      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :phone_number, kind: :telephone_field,
+        html_options: {required: true, pattern: PHONE_PATTERN, title: translation(".phone_hint")})) %>
+
+      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :body, kind: :text_area,
+        label_text: translation(".field_message"), html_options: {rows: 3})) %>
 
       <%= render(UI::Forms::Honeypot::Component.new(form_builder: f)) %>
-
       <%= f.hidden_field :feedback_type, value: @feedback_type %>
-      <%= f.hidden_field :body, value: "lead" %>
+      <%= hidden_field_tag :return_to, @return_to, id: nil %>
 
       <div class="tw:pt-2">
-        <%= render(UI::Button::Component.new(text: "Let's chat", color: :yellow, size: :callout, type: "submit", html_class: "tw:w-full")) %>
+        <%= render(UI::Button::Component.new(text: submit_text, color: @submit_color, size: :lg, type: "submit",
+          html_class: "tw:w-full tw:justify-center")) %>
       </div>
     <% end %>
   <% end %>

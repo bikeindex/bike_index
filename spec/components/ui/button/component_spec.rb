@@ -14,7 +14,7 @@ RSpec.describe UI::Button::Component, type: :component do
     expect(component).to have_css("button[type='button']")
     expect(component).to have_text("Click me")
     html = component.to_html
-    expect(html).to include("tw:bg-white")
+    expect(html).to include("tw:bg-white/80")
     expect(html).to include("tw:border-gray-200")
   end
 
@@ -76,6 +76,24 @@ RSpec.describe UI::Button::Component, type: :component do
       it "renders the passed classes alongside twlink" do
         expect(component).to have_css("button.twlink.tw\\:font-bold.tw\\:text-xs")
       end
+    end
+
+    context "with non-default size" do
+      let(:size) { :lg }
+
+      it "raises ArgumentError" do
+        expect { instance }.to raise_error(ArgumentError, /size is not supported for link color/)
+      end
+    end
+  end
+
+  context "with link_gray color" do
+    let(:color) { :link_gray }
+
+    it "renders gray link styles, underlined, without a size" do
+      tokens = component.css("button").first["class"].split
+      expect(tokens).to include("twlink-underlined", "tw:text-gray-500")
+      expect(tokens).to_not include("twlink", "tw:no-underline", "tw:px-3", "tw:py-1.5", "tw:text-sm")
     end
 
     context "with non-default size" do

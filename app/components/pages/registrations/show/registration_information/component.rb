@@ -49,14 +49,6 @@ module Pages
             @credibility_score ||= credibility_scorer.score
           end
 
-          # Matches the credibility_scorer_color used on bikes/show
-          def credibility_color
-            return "#dc3545" if credibility_score < 31
-            return "#ffc107" if credibility_score < 70
-
-            "#28a745"
-          end
-
           def credibility_badges
             @credibility_badges ||= CredibilityScorer.permitted_badges_hash(credibility_scorer.badges)
           end
@@ -91,14 +83,14 @@ module Pages
               OrganizationModelAudit.find_by(organization_id: @organization.id, model_audit_id: @bike.model_audit_id)
           end
 
-          def show_registration_sequence?
-            @bike.registration_sequence_applies? && @organization.enabled?("registration_sequences")
+          def show_education_course?
+            @bike.education_course_applies? && @organization.enabled?("education_courses")
           end
 
           def acknowledgment
             return @acknowledgment if defined?(@acknowledgment)
 
-            @acknowledgment = RegistrationSequenceAcknowledgment.find_for(bike: @bike, organization: @organization)
+            @acknowledgment = EducationCourseAcknowledgment.find_for(bike: @bike, organization: @organization)
           end
 
           # Sticker and phone are shown elsewhere

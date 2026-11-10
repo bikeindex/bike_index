@@ -16,7 +16,7 @@ module Organized
         redirect_back(fallback_location: current_root_path)
       else
         @page_errors = @organization.errors
-        flash[:error] = translation(:could_not_update, org_name: current_organization.name)
+        flash.now[:error] = translation(:could_not_update, org_name: current_organization.name)
         render :show
       end
     end

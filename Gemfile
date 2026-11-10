@@ -61,7 +61,7 @@ gem "carrierwave", "~> 3.1" # File uploader
 # Using bikeindex fork to support rails 8
 gem "carrierwave_backgrounder", github: "bikeindex/carrierwave_backgrounder" # background processing of images
 gem "caxlsx" # Write Excel files (OrganizationExports)
-gem "lexxy", "~> 0.9" # Rich text editor (Action Text) for registration sequences. Minor bumps rewrite the toolbar DOM lexxy_overrides.css targets
+gem "lexxy", "~> 0.9" # Rich text editor (Action Text) for education courses. Minor bumps rewrite the toolbar DOM lexxy_overrides.css targets
 # gem "wicked_pdf" # TODO: PDFs are broken right now - commented out because they're unused
 # gem "wkhtmltopdf-binary" # TODO: PDFs are broken right now - commented out because they're unused
 gem "rqrcode", "3.2.0" # QR Code image generator
@@ -114,7 +114,7 @@ gem "tailwindcss-rails" # Use Tailwind CSS [https://github.com/rails/tailwindcss
 gem "view_component" # view components!
 gem "lookbook" # view_component preview
 gem "inline_svg" # render SVGs inline and give them classes
-gem "hotwire_combobox" # accessible autocomplete/combobox
+gem "hotwire_combobox", github: "josefarias/hotwire_combobox" # accessible autocomplete/combobox
 
 group :production do
   gem "skylight" # Performance monitoring

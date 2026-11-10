@@ -7,6 +7,32 @@ RSpec.describe LandingPagesController, type: :request do
     end
   end
 
+  describe "/ucmerced" do
+    it "redirects to registering with uc-merced" do
+      expect(get("/ucmerced")).to redirect_to(new_register_path(organization_id: "uc-merced"))
+    end
+  end
+
+  describe "#for_cities" do
+    it "starts the checker on the visitor's state, and asks for one without a location" do
+      get "/for_cities", headers: {"HTTP_CF_IPCOUNTRY" => "US", "HTTP_CF_REGION" => "Indiana"}
+      expect(Capybara.string(response.body)).to have_field("state", type: :hidden, with: "US-IN")
+
+      get "/for_cities"
+      expect(Capybara.string(response.body)).to have_css("input[role=combobox][placeholder='Choose a state']")
+        .and have_no_field("state", type: :hidden, with: /US-/)
+    end
+
+    # A bare CA or IN is Canada's or India's, so each option carries the US it belongs to
+    it "sends a state the checker reads as a US state, not as a country with the same code" do
+      get "/for_cities"
+      expect(Capybara.string(response.body)).to have_css("option[value='US-CA']", text: "California (CA)", visible: :all)
+
+      get "/ebike-rules", params: {state: "US-CA", manual: 1, top_speed: 28, throttle: 1}
+      expect(response).to redirect_to("/ebike-rules/US/CA?manual=1&throttle=1&top_speed=28")
+    end
+  end
+
   describe "#for_advocacy" do
     it "redirects to for_community_groups_path" do
       expect(get("/for_advocacy")).to redirect_to(for_community_groups_path)
@@ -16,7 +42,6 @@ RSpec.describe LandingPagesController, type: :request do
   {
     for_bike_shops: "Bike Index for Bike Shops",
     for_cities: "Bike Index for Cities",
-    for_community_groups: "Bike Index for Community Groups",
     for_law_enforcement: "Bike Index for Law Enforcement",
     for_schools: "Bike Index for Schools",
     ascend: "Ascend POS on Bike Index",
@@ -32,6 +57,30 @@ RSpec.describe LandingPagesController, type: :request do
         expect(response).to render_template(controller_action)
         expect(response.body).to match("<title>#{page_title}</title>")
         expect(response.body).to match('<html lang="en">') # Accessibility
+      end
+    end
+  end
+
+  describe "#for_community_groups" do
+    let!(:recovery_display) { FactoryBot.create(:recovery_display_with_photo, quote: "Recovered in under four hours") }
+
+    it "renders the latest recovery stories" do
+      get "/for_community_groups"
+
+      expect(response.status).to eq(200)
+      expect(response.body).to match("<title>Bike Index for Community Groups</title>")
+      expect(response.body).to include("Recovered in under four hours")
+      expect(response.body).to include("/users/new?return_to=%2Forganizations%2Fnew%3Fkind%3Dbike_advocacy")
+    end
+
+    context "with a user" do
+      include_context :request_spec_logged_in_as_user
+
+      it "links straight to the organization form" do
+        get "/for_community_groups"
+
+        expect(response.body).to include('href="/organizations/new?kind=bike_advocacy"')
+        expect(response.body).to_not include("/users/new?return_to")
       end
     end
   end

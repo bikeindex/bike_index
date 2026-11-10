@@ -1,7 +1,7 @@
 <%# locals: (user_alerts:, render_sortable: false, skip_user: false) %>
 <%# render_message ||= false # Hidden by default, I don't think this is really a thing %>
 
-<%= render(UI::Table::Component.new(records: user_alerts, render_sortable:, sort_state:)) do |table| %>
+<%= render(UI::Table::Base::Component.new(records: user_alerts, render_sortable:, sort_state:)) do |table| %>
   <% table.column(sortable: "created_at") do |user_alert| %>
     <%= render UI::Time::Component.new(time: user_alert.created_at) %>
   <% end %>
@@ -22,21 +22,21 @@
 
   <% table.column(label: "Object") do |user_alert| %>
     <% if user_alert.bike_id.present? %>
-      <span class="d-block">
+      <span class="tw:block">
         <small>bike:</small>
         <%= render Atoms::Admin::TableCells::Bike::Component.new(bike: user_alert.bike, bike_id: user_alert.bike_id, search_url: url_for(sort_state.search_params.merge(search_bike_id: user_alert.bike_id)), render_search: true) %>
       </span>
     <% end %>
 
     <% if (alertable = user_alert.alertable) %>
-      <span class="d-block">
+      <span class="tw:block">
         <small><%= alertable.class.polymorphic_name.underscore %>:</small>
         <%= link_to alertable.id, helpers.admin_path_for_object(alertable), class: "twlink" %>
       </span>
     <% end %>
 
     <% if user_alert.organization_id.present? %>
-      <span class="d-block">
+      <span class="tw:block">
         <small>organization:</small>
         <%= render Atoms::Admin::TableCells::Organization::Component.new(organization: user_alert.organization, organization_id: user_alert.organization_id, search_url: url_for(sort_state.search_params.merge(organization_id: user_alert.organization_id)), render_search: true) %>
       </span>

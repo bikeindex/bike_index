@@ -43,7 +43,7 @@
 #  index_ownerships_on_organization_id    (organization_id)
 #  index_ownerships_on_owner_email_trgm   (owner_email) USING gin
 #  index_ownerships_on_sale_id            (sale_id)
-#  index_ownerships_on_user_id            (user_id)
+#  index_ownerships_on_user_id_and_id     (user_id,id) WHERE (user_id IS NOT NULL)
 #
 class Ownership < ApplicationRecord
   include RegistrationInfoable

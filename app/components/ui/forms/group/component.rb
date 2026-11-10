@@ -66,7 +66,7 @@ module UI
           safe_join([@label_text, label_suffix_markup, label_note_markup].compact, " ")
         end
 
-        def label_note_markup = label_note? ? tag.small(label_note, class: "twless-strong") : nil
+        def label_note_markup = label_note? ? tag.small(label_note, class: "less-strong") : nil
 
         def label_suffix_markup
           return required? ? required_marker : optional_marker unless @required_toggleable

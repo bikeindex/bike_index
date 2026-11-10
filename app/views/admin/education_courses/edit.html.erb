@@ -1,0 +1,11 @@
+<% if @education_course.organization.present? %>
+  <%= render(Pages::Admin::Organizations::Tabs::Component.new(organization: @education_course.organization, active: :education_courses, display_dev_info: display_dev_info?)) %>
+<% end %>
+
+<div class="tw:mx-auto tw:max-w-3xl tw:py-4">
+  <%= render Pages::Admin::EducationCourse::Header::Component.new(education_course: @education_course, mode: :edit) %>
+
+  <%= render Pages::Org::EducationCourse::Edit::Component.new(education_course: @education_course, admin: true) %>
+
+  <%= render Pages::Admin::EducationCourse::DiscardDraft::Component.new(education_course: @education_course) %>
+</div>

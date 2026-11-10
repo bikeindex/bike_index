@@ -6,7 +6,7 @@
   data-controller="update-cached-sortable-links"
   data-update-cached-sortable-links-base-url-value="<%= url_for(sort_state.search_params) %>"
 >
-  <%= render(UI::Table::Component.new(records: payments, render_sortable:, sort_state:,
+  <%= render(UI::Table::Base::Component.new(records: payments, render_sortable:, sort_state:,
         cache_key: cache_fragment_name(["admin_payments", render_sortable, skip_user, skip_paid_at, skip_kind, render_method, render_organization_search]),
         cache_records: ->(payment) { [payment.user, payment.organization, payment.invoice] })) do |table| %>
     <% table.column(sortable: "created_at") do |payment| %>
@@ -27,9 +27,9 @@
 
     <% table.column(sortable: "referral_source") do |payment| %>
       <% if payment.referral_source.present? %>
-        <code class="small"><%= payment.referral_source %></code>
+        <%= render(UI::Code::Inline::Component.new(text: payment.referral_source)) %>
         <% if render_sortable %>
-          <%= link_to search_emoji, url_for(sort_state.search_params.merge(query: payment.referral_source)), class: "display-sortable-link small" %>
+          <%= link_to search_emoji, url_for(sort_state.search_params.merge(query: payment.referral_source)), class: "display-sortable-link tw:text-sm" %>
         <% end %>
       <% end %>
     <% end %>
@@ -43,7 +43,7 @@
         <% end %>
 
         <% if render_sortable %>
-          <%= link_to search_emoji, url_for(sort_state.search_params.merge(search_kind: payment.kind)), class: "display-sortable-link small" %>
+          <%= link_to search_emoji, url_for(sort_state.search_params.merge(search_kind: payment.kind)), class: "display-sortable-link tw:text-sm" %>
         <% end %>
       <% end %>
     <% end %>
@@ -64,7 +64,7 @@
           <%= payment.payment_method.humanize.downcase %>
         <% end %>
 
-        <%= link_to search_emoji, url_for(sort_state.search_params.merge(search_payment_method: payment.payment_method)), class: "display-sortable-link small" %>
+        <%= link_to search_emoji, url_for(sort_state.search_params.merge(search_payment_method: payment.payment_method)), class: "display-sortable-link tw:text-sm" %>
       <% end %>
     <% end %>
 

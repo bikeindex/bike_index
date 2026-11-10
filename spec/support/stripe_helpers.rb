@@ -26,3 +26,14 @@ module StripeHelpers
 
   alias_method :stripe_token, :stripe_token_approved
 end
+
+# Production always has an active price for every level and interval
+RSpec.shared_context :active_stripe_prices do
+  let(:currency_enum) { "usd" }
+  let!(:stripe_prices) do
+    {basic: 500, plus: 1500, patron: 5000}.flat_map do |membership_level, amount_cents|
+      [FactoryBot.create(:stripe_price, membership_level:, currency_enum:, amount_cents:),
+        FactoryBot.create(:stripe_price, membership_level:, currency_enum:, interval: "yearly", amount_cents: amount_cents * 10)]
+    end
+  end
+end

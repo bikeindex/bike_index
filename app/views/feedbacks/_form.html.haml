@@ -12,7 +12,7 @@
       = f.text_field :title, placeholder: t(".subject"), class: 'form-control'
   .row.form-group
     .col-sm-12
-      = f.text_area :body, placeholder: t(".your_message"), rows: 7, class: 'form-control'
+      = f.text_area :body, value: @feedback.body.presence || t(".message_template"), placeholder: t(".your_message"), rows: 7, class: 'form-control'
   .row.form-group
     .col-sm-12
       = f.submit t(".send_it"), class: 'btn btn-primary'

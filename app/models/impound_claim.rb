@@ -144,7 +144,7 @@ class ImpoundClaim < ApplicationRecord
 
   # return private images too
   def bike_submitting_images
-    return [] unless bike_submitting.present?
+    return PublicImage.none unless bike_submitting.present?
 
     PublicImage.unscoped.where(imageable_id: bike_submitting.id).bike.order(:listing_order)
   end

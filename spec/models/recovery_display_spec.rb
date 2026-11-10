@@ -95,6 +95,34 @@ RSpec.describe RecoveryDisplay, type: :model do
     end
   end
 
+  describe "quote_by" do
+    it "keeps the whole name" do
+      recovery_display = FactoryBot.create(:recovery_display, quote_by: "  Portland Police Bureau ")
+      expect(recovery_display.quote_by).to eq "Portland Police Bureau"
+      recovery_display.update(quote_by: " ")
+      expect(recovery_display.quote_by).to be_nil
+    end
+  end
+
+  describe "first_name" do
+    it "skips a title" do
+      expect(RecoveryDisplay.first_name("Dr. Alex Chen")).to eq "Alex"
+      expect(RecoveryDisplay.first_name("mrs Pat Smith")).to eq "Pat"
+      expect(RecoveryDisplay.first_name("Prof.")).to be_nil
+      expect(RecoveryDisplay.first_name("Drew Chen")).to eq "Drew"
+    end
+  end
+
+  describe "calculated_owner_name" do
+    it "is the owner's, not the creator's of an unclaimed bike" do
+      bike = FactoryBot.create(:bike, :with_ownership, creator: FactoryBot.create(:user, name: "Shop Staff"))
+      expect(bike.owner.name).to eq "Shop Staff"
+      expect(RecoveryDisplay.calculated_owner_name(bike)).to be_nil
+      ownership = FactoryBot.create(:ownership, creator: bike.creator, registration_info: {user_name: "Pat Smith"})
+      expect(RecoveryDisplay.calculated_owner_name(ownership.bike)).to eq "Pat Smith"
+    end
+  end
+
   describe "from_stolen_record_id" do
     it "doesn't break if stolen record isn't present" do
       recovery_display = RecoveryDisplay.from_stolen_record_id(69)

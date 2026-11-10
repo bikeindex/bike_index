@@ -12,6 +12,9 @@ RSpec.describe Organized::ManagesController, type: :request do
       expect(session[:passive_organization_id]).to eq current_organization.id
       expect(flash[:notice]).to be_present
       expect(response).to redirect_to(new_session_path)
+
+      follow_redirect!
+      expect(session[:passive_organization_id]).to eq current_organization.id
     end
 
     context "organization has passwordless_users" do
@@ -133,6 +136,17 @@ RSpec.describe Organized::ManagesController, type: :request do
     end
 
     describe "update" do
+      context "invalid" do
+        it "shows the error on the page it renders, and not the next one" do
+          put base_url, params: {organization_id: current_organization.to_param, id: current_organization.to_param, organization: {name: "Help"}}
+          expect(response).to render_template(:show)
+          expect(flash[:error]).to match(/trouble updating/)
+          get base_url
+          expect(response.status).to eq 200
+          expect(flash[:error]).to be_blank
+        end
+      end
+
       context "dissallowed attributes" do
         let(:org_attributes) do
           {
@@ -457,6 +471,7 @@ RSpec.describe Organized::ManagesController, type: :request do
           it "still updates the organization" do
             expect(current_organization.locations.count).to eq 0
             expect(current_organization.search_coordinates_set?).to be_falsey
+            initial_cache_key = current_organization.cache_key_with_version
 
             VCR.use_cassette("organized_manages-create-location", match_requests_on: [:path]) do
               Sidekiq::Job.clear_all
@@ -487,6 +502,7 @@ RSpec.describe Organized::ManagesController, type: :request do
 
             expect(current_organization.to_coordinates).to eq [location.latitude, location.longitude]
             expect(current_organization.search_coordinates_set?).to be_truthy
+            expect(current_organization.cache_key_with_version).to_not eq initial_cache_key
           end
         end
       end
