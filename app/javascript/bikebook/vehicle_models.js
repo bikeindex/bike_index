@@ -30,7 +30,6 @@ export const vehicleKeys = (ids) => ids.map((id, index) => {
   return time > 1 ? `${id}#${time}` : id
 })
 
-// [key, entry] of each vehicle
 const keyed = (url) => {
   const entries = vehiclesOf(url)
   const keys = vehicleKeys(entries.map(({ id }) => id))
