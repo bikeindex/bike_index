@@ -13,17 +13,17 @@
       <%# Full bleed drops the card's gutter, so the header meets the page's %>
       <div
         class="
-          tw:flex tw:flex-wrap tw:items-center tw:justify-end tw:gap-x-4
-          tw:gap-y-2 tw:px-4 tw:py-3 tw:table-bleed:px-0
+          tw:flex tw:flex-wrap tw:items-baseline-last tw:justify-end
+          tw:gap-x-4 tw:gap-y-2 tw:px-4 tw:py-3 tw:table-bleed:px-0
         "
       >
         <% if description? %>
           <p class="tw:m-0 tw:text-xs tw:text-gray-500"><%= description %></p>
         <% end %>
 
-        <div class="tw:ml-auto tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+        <div class="tw:ml-auto tw:flex tw:flex-wrap tw:items-baseline-last tw:gap-2">
           <% if actions? %>
-            <div class="tw:flex tw:flex-wrap tw:items-end tw:gap-2">
+            <div class="tw:flex tw:flex-wrap tw:items-baseline-last tw:gap-2">
               <%= actions %>
             </div>
           <% end %>

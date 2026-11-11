@@ -30,18 +30,22 @@ RSpec.describe UI::Table::InCard::Component, :js, type: :system do
     JS
   end
 
-  it "selects a shift-clicked range, toggles all, and bleeds once the table is wider than the card, without flipping back" do
+  it "selects a shift-clicked range, reveals the checked-only field, toggles all, and bleeds once the table is wider than the card, without flipping back" do
     visit("/lookbook/preview/ui/table/in_card/variants")
     wait_for_stimulus("table-multi-checkbox")
     boxes = (1..6).map { find_field("cryptids[#{it}]") }
+    expect(page).to have_no_field("Habitat")
 
     boxes[1].click
     boxes[3].click(:shift)
     expect(boxes.map(&:checked?)).to eq [false, true, true, true, false, false]
+    expect(page).to have_field("Habitat", disabled: false)
 
     boxes[3].click
     boxes[1].click(:shift)
     expect(boxes.map(&:checked?)).to all(be false)
+    expect(page).to have_no_field("Habitat", wait: 2)
+    expect(page).to have_field("Habitat", disabled: true, visible: :hidden)
 
     click_button(title: "Toggle all checked")
     expect(boxes.map(&:checked?)).to all(be true)
