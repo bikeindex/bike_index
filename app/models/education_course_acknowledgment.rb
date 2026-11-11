@@ -1,4 +1,4 @@
-# The record that a registrant agreed to an organization's e-vehicle safety rules.
+# The record that a registrant agreed to e-vehicle safety rules.
 # Outlives the registration it came from - the b_param is swept once its bike exists.
 # Pending (no acknowledged_at) from when the bike is created until they're agreed to, which
 # holds the bike's finished registration email back.
@@ -44,6 +44,10 @@ class EducationCourseAcknowledgment < ApplicationRecord
   scope :for_organization, ->(organization) {
     joins(:education_course).where(education_courses: {organization_id: organization})
   }
+  # What an organization's bike agreed to: its rules, or the template's where they stood in
+  scope :for_organization_or_template, ->(organization) {
+    joins(:education_course).where(education_courses: {organization_id: [organization.id, nil]})
+  }
 
   class << self
     # The pages are acknowledged one at a time on the b_param; this is the moment they're
@@ -68,10 +72,10 @@ class EducationCourseAcknowledgment < ApplicationRecord
       pending.for_organization(organization_id).each(&:abandon!)
     end
 
-    def find_for(bike:, organization:) = acknowledged.for_organization(organization).where(bike_id: bike.id).last
+    def find_for(bike:, organization:) = acknowledged.for_organization_or_template(organization).where(bike_id: bike.id).last
 
     def bikes_order(organization:, direction:)
-      acknowledged_at = for_organization(organization)
+      acknowledged_at = for_organization_or_template(organization)
         .where("education_course_acknowledgments.bike_id = bikes.id")
         .select("MAX(education_course_acknowledgments.acknowledged_at)")
       Arel.sql("(#{acknowledged_at.to_sql}) #{(direction == "asc") ? "ASC" : "DESC"}")

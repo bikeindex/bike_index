@@ -24,7 +24,7 @@ module Pages
             @page.education_course
           end
 
-          # What the editor promised - "Template" when admin previews the template
+          # What the editor promised
           def badge_name
             course&.badge_name
           end

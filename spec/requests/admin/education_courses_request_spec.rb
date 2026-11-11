@@ -37,6 +37,15 @@ RSpec.describe Admin::EducationCoursesController, type: :request do
         expect(response.body).to include("Create template")
       end
 
+      it "says whether the template is for all, linking its flag" do
+        get base_url
+        expect(response.body).to include("Template for all: off")
+          .and include("/admin/feature_flags/features/education_course_for_all")
+        Flipper.enable(:education_course_for_all)
+        get base_url
+        expect(response.body).to include("Template for all: on")
+      end
+
       context "with a live template and a draft above it" do
         let!(:live_template) { FactoryBot.create(:education_course_template_active, :with_pages) }
         let!(:template_draft) { FactoryBot.create(:education_course_template) }

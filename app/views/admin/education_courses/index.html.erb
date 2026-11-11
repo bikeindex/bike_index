@@ -19,6 +19,11 @@
   <% end %>
 
   <% skeleton.with_nav_item do %>
+    <%= render(UI::ButtonLink::Component.new(text: "Template for all: #{EducationCourse.template_for_all? ? "on" : "off"}",
+      href: "#{admin_feature_flags_path}/features/education_course_for_all", size: :sm)) %>
+  <% end %>
+
+  <% skeleton.with_nav_item do %>
     <% if @template.present? %>
       <%= render(UI::ButtonLink::Component.new(text: "#{@template.display_name} course", href: EducationCoursePaths.course(@template, admin: true), size: :sm)) %>
     <% else %>
