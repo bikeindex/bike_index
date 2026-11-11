@@ -90,7 +90,8 @@ module BikeServices
     # An organization can be named in the URL after the registration starts
     # (/register?...&organization_id=slug), right up until the bike is created. Without one
     # named, who the registrant is stands in - which step 2 offers to drop, so a link's
-    # organization clears the marker that puts the offer there
+    # organization clears the marker that puts the offer there. Step 2 is asked again, for
+    # the fields the organization requires
     def assign_organization(b_param, organization, user: nil, passive_organization: nil)
       return if b_param.with_bike?
       # Step 1 posts back the organization it rendered with, which doesn't make an
@@ -100,7 +101,7 @@ module BikeServices
       return if b_param.creation_organization_id.to_s == organization.id.to_s
 
       restart_rules(b_param)
-      b_param.params = b_param.params.except("auto_organization_id")
+      b_param.params = b_param.params.except("auto_organization_id", "details_completed")
       b_param.clean_params({bike: {creation_organization_id: organization.id}}.as_json)
       b_param.save
     end

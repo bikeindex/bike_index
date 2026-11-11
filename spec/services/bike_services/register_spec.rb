@@ -829,6 +829,7 @@ RSpec.describe BikeServices::Register do
             described_class.assign_organization(b_param, organization)
             b_param.reload
             expect(b_param.creation_organization_id).to eq organization.id
+            expect(b_param.params["details_completed"]).to be_nil
             expect(b_param.params["education_course"]).to be_nil
             expect(described_class.education_course(b_param)).to eq course
             expect(described_class.acknowledged?(b_param, course:)).to be_falsey
