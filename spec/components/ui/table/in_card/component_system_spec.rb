@@ -35,11 +35,13 @@ RSpec.describe UI::Table::InCard::Component, :js, type: :system do
     wait_for_stimulus("table-multi-checkbox")
     boxes = (1..6).map { find_field("cryptids[#{it}]") }
     expect(page).to have_no_field("Habitat")
+    expect(page).to have_no_button("Relocate selected")
 
     boxes[1].click
     boxes[3].click(:shift)
     expect(boxes.map(&:checked?)).to eq [false, true, true, true, false, false]
     expect(page).to have_field("Habitat", disabled: false)
+    expect(page).to have_button("Relocate selected")
 
     boxes[3].click
     boxes[1].click(:shift)

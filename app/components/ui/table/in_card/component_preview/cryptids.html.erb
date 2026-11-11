@@ -6,11 +6,9 @@
   form: ({url: "#"} if selection))) do |table| %>
   <% if selection %>
     <% table.with_actions do %>
-      <div class="tw:hidden!" data-table-multi-checkbox-target="whenChecked">
-        <%= render(UI::Forms::Group::Component.new(attribute: :habitat, required: true, wrapper_class: "tw:mb-0")) do %>
-          <%= text_field_tag :habitat, nil, required: true, class: "twinput" %>
-        <% end %>
-      </div>
+      <%= render(UI::Forms::Group::Component.new(attribute: :habitat, required: true, wrapper_class: "tw:mb-0")) do %>
+        <%= text_field_tag :habitat, nil, required: true, class: "twinput" %>
+      <% end %>
 
       <%= render(UI::Button::Component.new(text: "Relocate selected", color: :primary, size: :sm, type: :submit)) %>
     <% end %>
