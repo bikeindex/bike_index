@@ -95,9 +95,30 @@
     }
   }
 
-  /* The map stays light, so its controls and popups mustn't inherit a dark page's text */
+  /* The map stays light, so its controls mustn't inherit a dark page's text */
   .maplibregl-map {
     @apply tw:dark:text-gray-900;
+  }
+
+  /* Popups hold a table row, which goes dark with the page. MapLibre's stylesheet is unlayered, hence the ! */
+  .maplibregl-popup-content {
+    @apply tw:dark:bg-gray-800! tw:dark:text-gray-100;
+  }
+
+  [class*="maplibregl-popup-anchor-bottom"] .maplibregl-popup-tip {
+    @apply tw:dark:border-t-gray-800!;
+  }
+
+  [class*="maplibregl-popup-anchor-top"] .maplibregl-popup-tip {
+    @apply tw:dark:border-b-gray-800!;
+  }
+
+  .maplibregl-popup-anchor-left .maplibregl-popup-tip {
+    @apply tw:dark:border-r-gray-800!;
+  }
+
+  .maplibregl-popup-anchor-right .maplibregl-popup-tip {
+    @apply tw:dark:border-l-gray-800!;
   }
 
   .kelsey_styles_buttons-grid {
