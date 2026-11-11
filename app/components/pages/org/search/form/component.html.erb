@@ -44,12 +44,12 @@
               <%= tag.div(class: ["tw:flex-1", ("tw:hidden" if notes_toggled?)],
                 data: ({"org--search-target": "optionalField", field: "notes", storage_key: "orgRegistrationNotesSearchOpen"} if notes_toggled?)) do %>
                 <%= label_tag :search_notes,
-                  @notes_placeholder || translation(".search_notes"),
+                  notes_placeholder,
                   class: "twlabel tw:sr-only" %>
 
                 <%= text_field_tag :search_notes,
                   @interpreted_params[:search_notes],
-                  placeholder: @notes_placeholder || translation(".search_notes"),
+                  placeholder: notes_placeholder,
                   class: "twinput tw:w-full fieldResetsCounts" %>
               <% end %>
             <% end %>

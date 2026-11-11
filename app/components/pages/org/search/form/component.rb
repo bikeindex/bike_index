@@ -16,6 +16,7 @@ module Pages
             "tw:search-all-checked:grow-0 tw:search-all-checked:p-0! tw:search-all-checked:border-0! " \
             "tw:search-all-checked:-mb-2 tw:lg:search-all-checked:mb-0 tw:lg:search-all-checked:-mr-2"
 
+          # notes_placeholder: shows the notes field without the settings panel's toggle
           def initialize(target_search_path:, interpreted_params:, heading:, submit_text:,
             target_frame: nil, settings_and_filters_component: nil, notes_placeholder: nil)
             @target_search_path = target_search_path
@@ -49,10 +50,11 @@ module Pages
             @interpreted_params[:raw_serial].present? && @interpreted_params[:serial].blank?
           end
 
-          # Behind the settings panel's toggle, unless the page passes its own always-shown placeholder
           def notes_toggled?
             @settings_and_filters_component&.notes_search?
           end
+
+          def notes_placeholder = @notes_placeholder || translation(".search_notes")
 
           def render_location_fields?
             @settings_and_filters_component&.location_search?

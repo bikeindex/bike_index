@@ -132,7 +132,7 @@ module Organized
         per_page: @per_page,
         # Symbol keys, or organization_id repeats as a query param beside the path segment
         sort_state: sort_state.with(search_params: sort_state.search_params.to_h.symbolize_keys),
-        interpreted_params: @interpreted_params.merge(params.permit(:search_email, :search_notes).to_h.symbolize_keys).compact,
+        interpreted_params: @interpreted_params.merge(search_email: params[:search_email], search_notes: params[:search_notes]).compact,
         search_kind: @search_kind,
         search_status: @search_status,
         search_unregistered: @search_unregistered,

@@ -9,6 +9,8 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
   let(:enabled_feature_slugs) { %w[parking_notifications impound_bikes] }
 
   describe "index" do
+    def notification_rows = response.body.scan(%r{/parking_notifications/(\d+)"}).flatten.map(&:to_i).uniq
+
     it "renders" do
       get base_url
       expect(response.status).to eq(200)
@@ -45,7 +47,6 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
       let!(:parking_notification1) { FactoryBot.create(:parking_notification, organization: current_organization, latitude: coords1.first, longitude: coords1.last) }
       let!(:parking_notification2) { FactoryBot.create(:parking_notification, organization: current_organization, latitude: coords2.first, longitude: coords2.last) }
       let(:bike) { parking_notification2.bike }
-      def notification_rows = response.body.scan(%r{/parking_notifications/(\d+)"}).flatten.map(&:to_i).uniq
 
       it "renders" do
         expect(parking_notification1.to_coordinates).to eq coords1
@@ -71,7 +72,6 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
     context "searching notes" do
       let!(:parking_notification1) { FactoryBot.create(:parking_notification, organization: current_organization, message: "Locked to the RAILING by the door") }
       let!(:parking_notification2) { FactoryBot.create(:parking_notification, organization: current_organization, internal_notes: "Owner called about it") }
-      def notification_rows = response.body.scan(%r{/parking_notifications/(\d+)"}).flatten.map(&:to_i).uniq
 
       it "matches the message and the internal notes" do
         get base_url, params: {search_notes: " railing "}
