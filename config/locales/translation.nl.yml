@@ -2186,6 +2186,7 @@ nl:
         create:
           successfully_created: Parkeermelding %{bike_type} gemaakt
           unable_to_create: Kan niet maken - %{errors}
+          successfully_impounded: In beslag genomen dit %{bike_type}
       manages:
         destroy:
           contact_support_to_delete: Neem contact op met support@bikeindex.org om
@@ -5428,6 +5429,9 @@ nl:
           om de registratie te voltooien.
         link_signs_you_in: Deze link geeft je een account bij Bike Index, dus stuur
           hem niet door. Hij is %{days} dagen geldig.
+        e_vehicle_safety_rules_owed_html: Uw <strong>%{color_and_brand}</strong> is
+          geregistreerd op Bike Index. Ga akkoord met de veiligheidsregels voor e-voertuigen
+          om de registratie te voltooien.
       confirmation_email:
         click_to_sign_in_html: Klik op de knop <em>'Inloggen'</em> om je registratie
           te voltooien!
@@ -6042,6 +6046,7 @@ nl:
               impound_this_bike_type: Neem dit in beslag %{bike_type}
               not_shown_to_user: niet aan de gebruiker getoond
               parking_notification_notes: "%{org_name} interne notities"
+              submit_parking_notification: Maak een parkeermelding aan
             parking_notification_show:
               no_notifications: Geen parkeermeldingen voor deze %{bike_type}
               parking_notifications: Verlaten records

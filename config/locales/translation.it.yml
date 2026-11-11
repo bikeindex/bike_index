@@ -2394,6 +2394,7 @@ it:
         create:
           successfully_created: Avviso di parcheggio per %{bike_type} creato
           unable_to_create: Impossibile creare - %{errors}
+          successfully_impounded: Sequestrato questo %{bike_type}
       stickers:
         find_bike_sticker:
           unable_to_find_sticker: 'Impossibile trovare l''etichetta con il codice:
@@ -5521,6 +5522,9 @@ it:
           per completare la registrazione.
         link_signs_you_in: Questo link ti permette di accedere a Bike Index, quindi
           non inoltrarlo. È valido per %{days} giorni.
+        e_vehicle_safety_rules_owed_html: Il tuo <strong>%{color_and_brand}</strong>
+          è registrato su Bike Index. Accetta le norme di sicurezza per i veicoli
+          elettrici per completare la registrazione.
       confirmation_email:
         click_to_sign_in_html: Fai clic sul pulsante <em>Accedi</em> per completare
           la registrazione!
@@ -6133,6 +6137,7 @@ it:
               impound_this_bike_type: Sequestrare questo %{bike_type}
               not_shown_to_user: non mostrato all'utente
               parking_notification_notes: "%{org_name} note interne"
+              submit_parking_notification: Crea avviso di parcheggio
             parking_notification_show:
               no_notifications: Nessuna notifica di parcheggio per questo %{bike_type}
               parking_notifications: Notifiche di parcheggio

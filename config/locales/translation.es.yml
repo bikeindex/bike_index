@@ -2397,6 +2397,7 @@ es:
           successfully_created: Se ha creado una notificación de estacionamiento para
             %{bike_type}.
           unable_to_create: No se puede crear - %{errors}
+          successfully_impounded: Se confiscó este %{bike_type}
       stickers:
         find_bike_sticker:
           unable_to_find_sticker: 'No se pudo encontrar la pegatina con el código:
@@ -5510,6 +5511,9 @@ es:
           para finalizar el registro.
         link_signs_you_in: Este enlace te da acceso a Bike Index, así que no lo reenvíes.
           Funciona durante %{days} días.
+        e_vehicle_safety_rules_owed_html: Tu <strong>%{color_and_brand}</strong> está
+          registrado en Bike Index. Acepta las normas de seguridad para vehículos
+          eléctricos para finalizar el registro.
       confirmation_email:
         click_to_sign_in_html: ¡Haz clic en el botón <em>"Iniciar sesión</em> " para
           finalizar tu registro!
@@ -6117,6 +6121,7 @@ es:
               impound_this_bike_type: Confiscar esto %{bike_type}
               not_shown_to_user: no se muestra al usuario
               parking_notification_notes: "%{org_name} notas internas"
+              submit_parking_notification: Crear notificación de estacionamiento
             parking_notification_show:
               no_notifications: No hay notificaciones de estacionamiento para este
                 %{bike_type}
