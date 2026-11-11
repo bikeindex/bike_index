@@ -11,7 +11,7 @@ module UI
           render_with_template(template: "ui/table/in_card/component_preview/cryptids", locals: {selection: false})
         end
 
-        # Shift-click a checkbox to give every one since the last clicked its state
+        # Shift-click a checkbox to give every one since the last clicked its state. The actions show once a row is checked
         def selection
           render_with_template(template: "ui/table/in_card/component_preview/cryptids", locals: {selection: true})
         end

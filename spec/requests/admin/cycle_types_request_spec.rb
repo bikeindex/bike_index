@@ -6,7 +6,7 @@ RSpec.describe Admin::CycleTypesController, type: :request do
   include_context :request_spec_logged_in_as_superuser
 
   describe "#index" do
-    it "renders a row drawing each cycle type by its BikeBook vehicle type, and hands the type_details their examples" do
+    it "renders a row drawing each cycle type by its Bike Book vehicle type, and hands the type_details their examples" do
       get "/admin/cycle_types"
       expect(response.status).to eq(200)
       document = Nokogiri::HTML(response.body)

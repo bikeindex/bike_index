@@ -5,7 +5,7 @@ require "rails_helper"
 RSpec.describe "E-bike rules", :js, type: :system do
   before { serve_bikebook_catalog }
 
-  it "checks a BikeBook model or one entered by hand as each is chosen, keeping it in the URL" do
+  it "checks a Bike Book model or one entered by hand as each is chosen, keeping it in the URL" do
     visit ebike_rules_path
     history_length = page.evaluate_script("history.length")
     wait_for_stimulus("ebike-rules--lookup")
