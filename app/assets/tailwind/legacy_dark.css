@@ -100,7 +100,7 @@
     @apply tw:dark:text-gray-900;
   }
 
-  /* Popups hold a table row, which goes dark with the page. MapLibre's stylesheet is unlayered, hence the ! */
+  /* Popups hold page content, so they go dark with the page. MapLibre's stylesheet is unlayered, hence the ! */
   .maplibregl-popup-content {
     @apply tw:dark:bg-gray-800! tw:dark:text-gray-100;
   }
