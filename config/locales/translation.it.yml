@@ -5915,6 +5915,8 @@ it:
             parking_notifications: Notifiche di parcheggio
             find_a_parking_notification: Trova una notifica di parcheggio
             search_parking_notifications: Cerca notifiche di parcheggio
+            search_notification_message_or_notes: Messaggio/note di notifica della
+              ricerca
           table:
             address: Indirizzo
             bike: Bicicletta

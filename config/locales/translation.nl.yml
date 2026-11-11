@@ -5824,6 +5824,7 @@ nl:
             parking_notifications: Verlaten records
             find_a_parking_notification: Zoek een parkeermelding
             search_parking_notifications: Zoek naar parkeermeldingen
+            search_notification_message_or_notes: Zoekmelding/notities
           table:
             address: Adres
             bike: Fiets

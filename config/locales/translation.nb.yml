@@ -5655,6 +5655,7 @@ nb:
             parking_notifications: Parkeringsmeldinger
             find_a_parking_notification: Finn et parkeringsvarsel
             search_parking_notifications: Søk etter parkeringsvarsler
+            search_notification_message_or_notes: Søk etter varslingsmelding/-notater
           table:
             address: Adresse
             bike: Sykkel

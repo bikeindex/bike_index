@@ -5901,6 +5901,8 @@ es:
             parking_notifications: notificaciones de estacionamiento
             find_a_parking_notification: Encontrar una notificación de estacionamiento
             search_parking_notifications: Buscar notificaciones de estacionamiento
+            search_notification_message_or_notes: Mensaje/notas de notificación de
+              búsqueda
           table:
             address: DIRECCIÓN
             bike: Bicicleta
