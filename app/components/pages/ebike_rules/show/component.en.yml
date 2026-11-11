@@ -16,11 +16,11 @@ en:
             look for.
           banned_heading: Why uncertified bikes are being banned
           battery_safety: Battery and fire safety
+          bike_book_didnt_load: Bike Book didn't load. Enter your bike's details below.
+          bike_book_loading: Loading Bike Book…
           bike_error: Pick a bike from the list, or enter its details manually.
           bike_model: Bike model
           bike_placeholder: Search your bike (make, model, year)
-          bikebook_didnt_load: BikeBook didn't load. Enter your bike's details below.
-          bikebook_loading: Loading BikeBook…
           bikes_registered_html: "%{number} bikes registered"
           certification_involves_body: >-
             A nationally recognized testing lab puts production samples through overcharge,
@@ -43,8 +43,8 @@ en:
             label.
           how_to_check_2: Search that number in UL Product iQ.
           how_to_check_heading: How to check a bike
-          how_to_check_lookup: Look the model up above. BikeBook shows certification
-            where it's on record.
+          how_to_check_lookup_bike_book: Look the model up above. Bike Book shows
+            certification where it's on record.
           kmh: "%{kmh} km/h"
           model_details: "%{model} details"
           motor_wattage: Motor wattage (W)
@@ -134,6 +134,6 @@ en:
             means an independent lab tested the bike or battery against fire and electrical
             failure. More campuses, landlords and cities now ask for proof of it before
             an e-bike comes indoors.
-          visit_bikebook_link: Visit BikeBook.
+          visit_bike_book_link: Visit Bike Book.
           watts_placeholder: e.g. 750
           watts_placeholder_canada: e.g. 500

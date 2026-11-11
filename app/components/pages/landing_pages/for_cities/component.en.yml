@@ -19,8 +19,8 @@ en:
             A free public tool from Bike Index. Riders pick their state and bike and
             see, in under 30 seconds, whether it's legal to ride, what certification
             it carries, and what rules apply. The answer leads straight to registration.
-          checker_point_bikebook: >-
-            Class, motor, top speed, and UL certification from BikeBook's catalog
+          checker_point_bike_book: >-
+            Class, motor, top speed, and UL certification from Bike Book's catalog
             of e-bike models
           checker_point_program: >-
             Inside your program, staff see the class and compliance status of every
@@ -245,9 +245,9 @@ en:
             Under two minutes from any phone, through a city-branded landing page,
             a form on your website, or a QR sticker.
           registration_step_1_title: Residents register
-          registration_step_2_body: >-
-            BikeBook identifies the model and its class, and the rider completes your
-            education flow. Regular bikes skip it.
+          registration_step_2_bike_book_body: >-
+            Bike Book identifies the model and its class, and the rider completes
+            your education flow. Regular bikes skip it.
           registration_step_2_title: E-bikes get classified
           registration_step_3_body: >-
             Status (registered, stolen, or recovered), make, model, color, and serial.
