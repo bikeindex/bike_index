@@ -109,7 +109,7 @@ const tier = (name) => {
   const key = name.toLowerCase().replace(/[^a-z0-9]+/g, ' ').replace(SERIES_WORDS, ' ').replace(/\s+/g, ' ').trim()
   if (key in TIERS) return TIERS[key]
   // parsers add spellings, which the table then has to
-  if (!unmapped.has(name)) console.warn(`BikeBook: no groupset tier for "${name}"`)
+  if (!unmapped.has(name)) console.warn(`Bike Book: no groupset tier for "${name}"`)
   unmapped.add(name)
   return null
 }

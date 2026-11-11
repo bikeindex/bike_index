@@ -64,7 +64,7 @@
 
     <div class="tw:mt-6">
       <%= render(UI::Header::Component.new(tag: :h2)) do %>
-        BikeBook searches
+        Bike Book searches
         <%= render(Pages::Admin::Headers::Count::Component.new(count: week_searches.values_at("web_bikebook", "web_bikebook_comparison", "web_ebike_rules").sum, suffix: "in the past week")) %>
       <% end %>
 

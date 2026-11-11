@@ -19,7 +19,7 @@ module Pages
         private
 
         def frame
-          # its links (register, the BikeBook entry) leave the page; only the lookup loads a check into it.
+          # its links (register, the Bike Book entry) leave the page; only the lookup loads a check into it.
           # The busy min-height gives the spinner room while the frame is empty
           helpers.turbo_frame_tag(FRAME_ID, class: "tw:peer tw:block tw:transition-opacity tw:[&[busy]]:opacity-30 tw:[&[busy]]:min-h-36",
             target: "_top") do
