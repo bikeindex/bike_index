@@ -7,7 +7,8 @@ import { pickedClassifications, renderClassCards } from 'bikebook/templates/vehi
 import { tooltip } from 'bikebook/templates/ui/tooltip'
 import { FILTERS, LISTS, RANGES, SINGLES, ordered, searching, toQuery } from 'bikebook/query'
 import { fragmentOf, renderInto } from 'bikebook/render'
-import { preferredSize } from 'bikebook/sizes'
+import { chosenSizes, pickedSizes, preferredSize } from 'bikebook/sizes'
+import { array } from 'bikebook/templates/values'
 import { settingsFrom } from 'bikebook/similarity'
 import { chosenPhotos, MAX_COMPARE, VehicleViewer } from 'bikebook/vehicle_viewer'
 
@@ -103,12 +104,15 @@ export async function unpickedVehicles (catalog, page, url) {
 const pickedOf = (catalog, url, { market }) => catalog.vehicles(url.searchParams.get('vehicle_models')?.split(',') ?? [], { market })
 
 // The models most like the first of `vehicles` where the catalog publishes what it compares, scored once their section
-// is open, of those the `filters` leave. `waiting`, until the comparison says whether it does
+// is open, of those the `filters` leave, for the rider of the size it's compared in, by its index in its sizes. `waiting`,
+// until the comparison says whether it does
 const similarOf = async (catalog, url, vehicles, filters) => {
   if (catalog.comparable === false || !vehicles.length) return null
   if (catalog.comparable === undefined) return { waiting: true }
-  const settings = settingsFrom(url.searchParams)
-  return { ...settings, results: url.searchParams.get('similar') === '1' ? await catalog.similar(vehicles[0].value, settings, filters) : undefined }
+  const [{ value, data }] = vehicles
+  const [size] = chosenSizes([{ key: value, data }], { picked: pickedSizes(url), preferred: preferredSize() })
+  const settings = settingsFrom(url.searchParams, array(data.sizes).indexOf(size))
+  return { ...settings, results: url.searchParams.get('similar') === '1' ? await catalog.similar(value, settings, filters) : undefined }
 }
 
 // What opens and adjusts the similar models, from beside their section
