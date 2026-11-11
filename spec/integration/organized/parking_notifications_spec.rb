@@ -302,6 +302,8 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
     # Back on the searched place, with only the far away notification left. Fitting to it
     # leaves the place, so the URL stops reopening there
     expect(page).to have_current_path(/map_location=New/)
+    # The resolve reloads the page, and the map waits on MapLibre from the CDN again
+    expect(page).to have_content("0 visible", wait: 15)
     click_button "Fit map to notifications"
     # The count updates when the fly from New York to Chicago lands, a few seconds out
     expect(page).to have_content("1 visible", wait: 10)
