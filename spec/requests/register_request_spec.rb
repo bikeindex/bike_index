@@ -1799,17 +1799,16 @@ RSpec.describe RegisterController, type: :request do
       end
     end
 
-    context "without an organization, with the template" do
+    context "without an organization, with the default course" do
       let(:organization) { nil }
       let(:owner_email) { current_user.email }
-      before { Flipper.enable(:education_course_for_all) }
       let(:b_param) do
         BParam.create(origin: "register_flow",
           params: {bike: {owner_email:, manufacturer_id: "Trek", cycle_type: "e-scooter"}}.as_json)
       end
 
-      it "walks the template's safety pages, without its organization-specific one, before finishing" do
-        expect(course.template?).to be_truthy
+      it "walks the default course's safety pages, without its organization-specific one, before finishing" do
+        expect(course.default?).to be_truthy
         expect {
           patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
         }.to change(Bike, :count).by(1).and change(EducationCourseAcknowledgment.pending, :count).by 1
@@ -1834,7 +1833,7 @@ RSpec.describe RegisterController, type: :request do
         end
 
         it "has no rules to walk" do
-          expect(course.template?).to be_truthy
+          expect(course.default?).to be_truthy
           expect(b_param.self_made?(current_user)).to be_truthy
           expect(BikeServices::Register.education_course(b_param, user: current_user)).to be_nil
           get register_path(b_param_token: b_param.id_token, step: "3")
@@ -1846,7 +1845,7 @@ RSpec.describe RegisterController, type: :request do
         let(:owner_email) { "owner@example.com" }
 
         it "finishes without holding the bike on the rules" do
-          expect(course.template?).to be_truthy
+          expect(course.default?).to be_truthy
           expect {
             patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
           }.to change(Bike, :count).by 1
@@ -1893,9 +1892,8 @@ RSpec.describe RegisterController, type: :request do
       expect(response).to redirect_to step_path("finished")
     end
 
-    context "agreeing to the template, then naming an organization with its own" do
-      let!(:template) { FactoryBot.create(:education_course_template_active, :with_pages) }
-      before { Flipper.enable(:education_course_for_all) }
+    context "agreeing to the default course, then naming an organization with its own" do
+      let!(:default_course) { FactoryBot.create(:education_course_default_active, :with_pages) }
       let(:b_param) do
         BParam.create(origin: "register_flow",
           params: {bike: {owner_email:, manufacturer_id: "Trek", cycle_type: "e-scooter"}}.as_json)
@@ -1906,14 +1904,14 @@ RSpec.describe RegisterController, type: :request do
                                  bike: {primary_frame_color_id: color.id, serial_number: "XYZ 123",
                                         status: "status_with_owner", user_name: "Sally Rider"}}
         expect(response).to redirect_to step_path("3")
-        template.education_course_pages.each_with_index do |page, index|
-          patch acknowledge_register_path, params: {b_param_token: b_param.id_token, education_course_id: template.id,
+        default_course.education_course_pages.each_with_index do |page, index|
+          patch acknowledge_register_path, params: {b_param_token: b_param.id_token, education_course_id: default_course.id,
                                                     step: (index + 3).to_s,
                                                     acknowledged: page.bullets.each_index.to_h { [it.to_s, "1"] }}
         end
-        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, education_course_id: template.id, step: "review", acknowledged_all: "1"}
+        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, education_course_id: default_course.id, step: "review", acknowledged_all: "1"}
         expect(response).to redirect_to step_path("finished")
-        expect(EducationCourseAcknowledgment.acknowledged.pluck(:education_course_id)).to eq([template.id])
+        expect(EducationCourseAcknowledgment.acknowledged.pluck(:education_course_id)).to eq([default_course.id])
 
         get register_path(b_param_token: b_param.id_token, organization_id: organization.to_param)
         expect(response).to redirect_to step_path("3")

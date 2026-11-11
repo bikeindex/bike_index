@@ -84,9 +84,9 @@ RSpec.describe OrganizedMailer, type: :mailer do
         expect(mail.html_part.decoded).to include "bikes/new?b_param_token=#{b_param.id_token}"
       end
 
-      context "owing the template's safety rules" do
-        let(:template) { FactoryBot.create(:education_course_template_active, :with_pages) }
-        before { EducationCourseAcknowledgment.create_pending(b_param, course: template) }
+      context "owing the default course's safety rules" do
+        let(:default_course) { FactoryBot.create(:education_course_default_active, :with_pages) }
+        before { EducationCourseAcknowledgment.create_pending(b_param, course: default_course) }
 
         it "asks for the e-vehicle safety rules, without an organization's name" do
           mail = OrganizedMailer.partial_registration(b_param)

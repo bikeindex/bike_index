@@ -16,8 +16,8 @@
   <% table.column(label: "Organization") do |acknowledgment| %>
     <% education_course = acknowledgment.education_course %>
 
-    <% if education_course.template? %>
-      <span class="less-strong">Template</span>
+    <% if education_course.default? %>
+      <span class="less-strong">Default</span>
     <% else %>
       <%= render Atoms::Admin::TableCells::Organization::Component.new(organization: education_course.organization, organization_id: education_course.organization_id, render_search: render_sortable, search_url: url_for(sort_state.search_params.merge(organization_id: education_course.organization_id))) %>
     <% end %>

@@ -118,12 +118,12 @@ module BikeServices
     end
 
     # The safety rules a registration acknowledges, only for an e-vehicle - the organization's
-    # active course or else the template, or the one its pages are being agreed to from, even
+    # active course or else the default, or the one its pages are being agreed to from, even
     # once replaced.
-    # template: false is the legacy forms, which pass on only an organization's own rules.
+    # default_course: false is the legacy forms, which pass on only an organization's own rules.
     # motorized: the single page asks what an e-vehicle would get, before it's said it's one.
     # Checked first - it's in memory, and creation_organization is a query
-    def education_course(b_param, separate_attestation: false, user: nil, motorized: b_param.motorized?, template: true)
+    def education_course(b_param, separate_attestation: false, user: nil, motorized: b_param.motorized?, default_course: true)
       return nil unless motorized
       # Left to the owner, so this flow has none - create_bike holds the bike for them to agree
       return nil if separate_attestation && !b_param.self_made?(user)
@@ -131,9 +131,9 @@ module BikeServices
       organization = b_param.creation_organization
       started_id = b_param.params.dig("education_course", "id")
       course = (EducationCourse.find_by(id: started_id, organization_id: [organization&.id, nil]) if started_id.present?) ||
-        EducationCourse.active_or_template_for(organization)
-      return course unless course&.template?
-      return course if template && template_applies?(b_param, user)
+        EducationCourse.active_or_default_for(organization)
+      return course unless course&.default?
+      return course if default_course && default_applies?(b_param, user)
 
       EducationCourse.active_for(organization) if organization.present?
     end
@@ -167,12 +167,12 @@ module BikeServices
 
     def step_for_page_index(index) = (index + ACKNOWLEDGMENT_OFFSET).to_s
 
-    # What a registrant walks. A template's organization-specific pages are for the organizations
-    # cloning it. to_a: callers ask for count/any?/[] repeatedly, and a CollectionProxy re-queries
+    # What a registrant walks. The default course's organization-specific pages are for the
+    # organizations cloning it. to_a: callers ask for count/any?/[] repeatedly, and a CollectionProxy re-queries
     # for each of them
     def course_pages(course)
       pages = course&.education_course_pages&.to_a || []
-      course&.template? ? pages.reject(&:organization_specific) : pages
+      course&.default? ? pages.reject(&:organization_specific) : pages
     end
 
     # Placing the report asks whether there's a creator yet, which is a query, so this is
@@ -185,12 +185,12 @@ module BikeServices
     # The single page's electric checkbox is on the same form as its submit button, so the
     # button is told what it'd lead to for an e-vehicle. Separate attestation leaves the rules
     # to an owner who isn't the registrant, which the email typed above it decides - :own_emails.
-    # The template is only ever for the registrant's own, so it's decided the same way
+    # The default course is only ever for the registrant's own, so it's decided the same way
     def motorized_review(b_param, flow, separate_attestation:)
       return false unless flow.single_page?
-      return (separate_attestation ? :own_emails : true) if education_course(b_param, motorized: true, template: false).present?
+      return (separate_attestation ? :own_emails : true) if education_course(b_param, motorized: true, default_course: false).present?
 
-      (EducationCourse.template_for_all? && EducationCourse.active_template.present?) ? :own_emails : false
+      EducationCourse.active_default.present? ? :own_emails : false
     end
 
     # Whether the flow includes the report step - what was stolen, or what was found
@@ -392,11 +392,8 @@ module BikeServices
     #
 
     # A rider registering their own vehicle - not a member registering a customer's, and not a
-    # theft or found report. Anonymous counts as the owner, whose email gets confirmed.
-    # Switched off, still for one whose bike was created owing it
-    def template_applies?(b_param, user)
-      return false unless EducationCourse.template_for_all? || b_param.acknowledgment_pending?
-
+    # theft or found report. Anonymous counts as the owner, whose email gets confirmed
+    def default_applies?(b_param, user)
       registrant = b_param.creator || user
       !report_step?(b_param.status) && (registrant.blank? || b_param.self_made?(registrant))
     end
@@ -483,7 +480,7 @@ module BikeServices
     # The switches ride to the ownership's registration_info, so registrations can be counted by them
     def create_bike(b_param, course:, ip_address:, rules_to_owner: false)
       b_param.creator_id ||= confirmed_email_creator_id(b_param)
-      owners_course = education_course(b_param, template: !rules_to_owner) if course.blank? &&
+      owners_course = education_course(b_param, default_course: !rules_to_owner) if course.blank? &&
         (rules_to_owner || b_param.rules_left_to_owner?(b_param.creator))
       b_param.params = b_param.params.deep_merge("bike" => {
         "register_single_page" => b_param.params["register_single_page"],
@@ -674,7 +671,7 @@ module BikeServices
       additional.present? ? bike_params.to_h.merge("likely_spam" => true) : bike_params.to_h
     end
 
-    conceal :template_applies?, :restart_rules, :matches_bike?, :auto_organization, :assign_auto_organization, :set_auto_organization,
+    conceal :default_applies?, :restart_rules, :matches_bike?, :auto_organization, :assign_auto_organization, :set_auto_organization,
       :claim_creator, :acknowledgment_owed?, :create_bike_if_ready, :create_bike, :send_rules_email, :email_confirmation_link,
       :report_completed?, :clear_stale_report, :report_errors, :stolen_report_attrs,
       :impound_report_attrs, :resumable_by?, :reusable?, :destroy_discardable, :report_placement, :permitted_steps, :step_completed?,

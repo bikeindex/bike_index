@@ -1,6 +1,5 @@
-# The global EducationCourse template: the safety rules for an e-vehicle registration
-# without an organization course of its own, and what organization drafts are cloned from
-Flipper.enable(:education_course_for_all)
+# The default EducationCourse: the safety rules for an e-vehicle registration without an
+# organization course of its own, and what organization drafts are cloned from
 list_html = ->(bullets) { "<ul>#{bullets.map { "<li>#{it}</li>" }.join}</ul>" }
 
 default_pages = [
@@ -30,15 +29,15 @@ default_pages = [
 
 # faq_url is the ⓘ on every acknowledgment page; an organization can point it at its own
 # policy page, the Bike Index FAQ is the default
-template = EducationCourse.create!(faq_url: "/info/#{Blog.e_vehicle_acknowledgment_faq}",
+default_course = EducationCourse.create!(faq_url: "/info/#{Blog.e_vehicle_acknowledgment_faq}",
   acknowledgment_text: "have read and understood the e-vehicle safety information above.")
 
 default_pages.each_with_index do |attributes, index|
-  template.education_course_pages.create!(**attributes.except(:bullet_points), listing_order: index,
+  default_course.education_course_pages.create!(**attributes.except(:bullet_points), listing_order: index,
     body: list_html.call(attributes[:bullet_points]))
 end
-# Organizations clone the live template, so the seeded one has to be activated
-template.make_active!
+# Organizations clone the live default, so the seeded one has to be activated
+default_course.make_active!
 
 # Brakebills registers e-vehicles, so give it a live course of its own, with a campus page
 # the way an organization would add one in the editor

@@ -69,7 +69,7 @@ RSpec.describe Organized::EducationCoursesController, type: :request do
     end
 
     describe "create" do
-      it "builds a draft from the template and redirects to the management page" do
+      it "builds a draft from the default course and redirects to the management page" do
         expect {
           post base_url
         }.to change { current_organization.education_courses.draft.count }.by(1)

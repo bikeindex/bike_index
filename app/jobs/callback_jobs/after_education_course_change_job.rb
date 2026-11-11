@@ -8,7 +8,7 @@ module CallbackJobs
       education_course = EducationCourse.with_deleted.find_by(id: education_course_id)
       return if education_course.blank?
 
-      # nil for the template, which owns its own pending acknowledgments.
+      # nil for the default course, which owns its own pending acknowledgments.
       # An active course still has rules to agree to, so they're still owed
       organization_id = education_course.organization_id
       return if EducationCourse.active.where(organization_id:).exists?

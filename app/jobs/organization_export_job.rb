@@ -165,7 +165,7 @@ class OrganizationExportJob < ApplicationJob
 
   # Ordered so each bike keeps its latest, as EducationCourseAcknowledgment.find_for does
   def acknowledged_ats
-    @acknowledged_ats ||= EducationCourseAcknowledgment.acknowledged.for_organization_or_template(@export.organization)
+    @acknowledged_ats ||= EducationCourseAcknowledgment.acknowledged.for_organization_or_default(@export.organization)
       .where(bike_id: @export.organization.bike_organizations.select(:bike_id))
       .order(:id).pluck(:bike_id, :acknowledged_at).to_h
   end

@@ -352,7 +352,7 @@ RSpec.describe OrganizationExportJob, type: :job do
           let(:acknowledged_at) { Time.current - 1.day }
           let!(:education_course_acknowledgment) do
             FactoryBot.create(:education_course_acknowledgment, bike:, acknowledged_at:,
-              education_course: FactoryBot.create(:education_course_template_active))
+              education_course: FactoryBot.create(:education_course_default_active))
           end
           let(:bike_row_hash) do
             {

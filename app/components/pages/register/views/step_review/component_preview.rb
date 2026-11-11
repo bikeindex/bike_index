@@ -29,8 +29,8 @@ module Pages
             }.as_json)
           end
 
-          # The live template stands in where no organization has activated a course
-          def preview_course = ::EducationCourse.active_or_template_for(lookbook_organization)
+          # The live default course stands in where no organization has activated a course
+          def preview_course = ::EducationCourse.active_or_default_for(lookbook_organization)
         end
       end
     end
