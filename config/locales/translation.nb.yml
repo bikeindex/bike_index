@@ -2344,6 +2344,7 @@ nb:
         create:
           successfully_created: Parkeringsvarsel for %{bike_type} opprettet
           unable_to_create: Kan ikke opprette - %{errors}
+          successfully_impounded: Beslagla dette %{bike_type}
       stickers:
         find_bike_sticker:
           unable_to_find_sticker: 'Kan ikke finne klistremerke med kode: %{bike_sticker}.'
@@ -5867,6 +5868,7 @@ nb:
               impound_this_bike_type: Beslaglegg dette %{bike_type}
               not_shown_to_user: ikke vist for brukeren
               parking_notification_notes: "%{org_name} interne notater"
+              submit_parking_notification: Opprett parkeringsvarsel
             parking_notification_show:
               no_notifications: Ingen parkeringsvarsler for denne %{bike_type}
               parking_notifications: Parkeringsmeldinger
