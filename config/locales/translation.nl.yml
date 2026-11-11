@@ -5824,6 +5824,7 @@ nl:
             parking_notifications: Verlaten records
             find_a_parking_notification: Zoek een parkeermelding
             search_parking_notifications: Zoek naar parkeermeldingen
+            search_notification_message_or_notes: Zoekmelding/notities
           table:
             address: Adres
             bike: Fiets
@@ -6128,6 +6129,10 @@ nl:
             unregistered_owner: Deze %{bike_type} is niet geregistreerd bij een gebruiker.
               Het is toegevoegd om parkeermeldingen te volgen.
             view_all_registrations: alles bekijken →
+            not_registered_phone_message: Andere contactgegevens van de eigenaar zijn
+              niet beschikbaar, aangezien dit %{bike_type} niet bij uw organisatie
+              is geregistreerd.
+            show_phone: Toon telefoon
           marketplace_listing_card:
             condition: Voorwaarde
             contact_seller: Neem contact op met de verkoper
