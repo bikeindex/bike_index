@@ -611,11 +611,10 @@ RSpec.describe "BikesController#create", type: :request do
       end
     end
 
-    context "an e-vehicle, with only the template's safety rules" do
-      let!(:template) { FactoryBot.create(:education_course_template_active, :with_pages) }
-      before { Flipper.enable(:education_course_for_all) }
+    context "an e-vehicle, with only the default course's safety rules" do
+      let!(:default_course) { FactoryBot.create(:education_course_default_active, :with_pages) }
 
-      it "has none to leave to the owner - only the register flow shows the template" do
+      it "has none to leave to the owner - only the register flow shows the default course" do
         expect { post base_url, params: {propulsion_type_motorized: "true", bike: bike_params} }
           .to change(Bike, :count).by 1
         expect(EducationCourseAcknowledgment.count).to eq 0

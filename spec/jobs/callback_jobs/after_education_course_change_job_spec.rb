@@ -51,27 +51,27 @@ RSpec.describe CallbackJobs::AfterEducationCourseChangeJob, type: :job do
     end
   end
 
-  context "with the template" do
-    let(:template) { FactoryBot.create(:education_course_template_active, :with_pages) }
-    let!(:b_param_template) { pending_b_param(template) }
+  context "with the default course" do
+    let(:default_course) { FactoryBot.create(:education_course_default_active, :with_pages) }
+    let!(:b_param_default) { pending_b_param(default_course) }
 
     it "finishes its pending registrations once it's ended, without touching an organization's" do
       Sidekiq::Job.clear_all
-      template.update(end_at: Time.current)
-      expect(described_class.jobs.map { it["args"] }).to eq([[template.id]])
+      default_course.update(end_at: Time.current)
+      expect(described_class.jobs.map { it["args"] }).to eq([[default_course.id]])
 
-      instance.perform(template.id)
-      expect(b_param_template.reload.acknowledgment_pending?).to be_falsey
+      instance.perform(default_course.id)
+      expect(b_param_default.reload.acknowledgment_pending?).to be_falsey
       expect(b_param.reload.acknowledgment_pending?).to be_truthy
-      expect(EmailJobs::OwnershipInvitationJob.jobs.map { it["args"] }).to eq([[b_param_template.created_bike.current_ownership.id]])
+      expect(EmailJobs::OwnershipInvitationJob.jobs.map { it["args"] }).to eq([[b_param_default.created_bike.current_ownership.id]])
     end
 
     it "leaves them pending when a new one replaces it" do
-      FactoryBot.create(:education_course_template, :with_pages).make_active!
-      expect(template.reload.archived?).to be_truthy
+      FactoryBot.create(:education_course_default, :with_pages).make_active!
+      expect(default_course.reload.archived?).to be_truthy
 
-      instance.perform(template.id)
-      expect(b_param_template.reload.acknowledgment_pending?).to be_truthy
+      instance.perform(default_course.id)
+      expect(b_param_default.reload.acknowledgment_pending?).to be_truthy
     end
   end
 end

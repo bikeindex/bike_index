@@ -9,7 +9,7 @@ module Admin
     def index
       # The course organizations' drafts are cloned from, reachable without hunting the
       # table for it. Its draft when there is one - that's what there is to do to it
-      @template = ::EducationCourse.existing_draft_for(nil) || ::EducationCourse.active_template
+      @default_course = ::EducationCourse.existing_draft_for(nil) || ::EducationCourse.active_default
       @per_page = permitted_per_page(default: 50)
       @pagy, @collection = pagy(:countish,
         matching_education_courses.includes(:organization, :education_course_pages)
@@ -48,7 +48,7 @@ module Admin
     end
 
     # Opens the draft, cloning the live course on first edit. No organization_id is the
-    # template - friendly_find! so a typo 404s rather than opening the template's draft
+    # default course - friendly_find! so a typo 404s rather than opening the default's draft
     def create
       organization = ::Organization.friendly_find!(params[:organization_id]) if params[:organization_id].present?
       redirect_to EducationCoursePaths.edit(::EducationCourse.draft_for(organization), admin: true)

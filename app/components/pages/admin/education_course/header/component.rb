@@ -56,9 +56,9 @@ module Pages
               "It can't be edited afterward."
           end
 
-          # The template has no organization to view it in
+          # The default course has no organization to view it in
           def organization_course_path
-            return if @education_course.template?
+            return if @education_course.default?
 
             EducationCoursePaths.course(@education_course)
           end

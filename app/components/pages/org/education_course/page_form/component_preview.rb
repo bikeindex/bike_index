@@ -23,8 +23,8 @@ module Pages
 
           private
 
-          # An activated course's pages have no editor, so their paths 404. The template's
-          # are edited in admin, so they'd render the organization's paths for it
+          # An activated course's pages have no editor, so their paths 404. The default
+          # course's are edited in admin, so they'd render the organization's paths for it
           def organization_drafts = ::EducationCourse.draft.where.not(organization_id: nil)
 
           def editable_pages

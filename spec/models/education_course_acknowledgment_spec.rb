@@ -127,11 +127,11 @@ RSpec.describe EducationCourseAcknowledgment, type: :model do
 
   describe "an organization reading what its bike agreed to" do
     let(:bike) { FactoryBot.create(:bike) }
-    let(:template) { FactoryBot.create(:education_course_template_active) }
+    let(:default_course) { FactoryBot.create(:education_course_default_active) }
     let!(:bike_organization) { FactoryBot.create(:bike_organization, bike:, organization:) }
-    let!(:acknowledgment) { FactoryBot.create(:education_course_acknowledgment, bike:, education_course: template) }
+    let!(:acknowledgment) { FactoryBot.create(:education_course_acknowledgment, bike:, education_course: default_course) }
 
-    it "finds one made against the template, not another organization's" do
+    it "finds one made against the default course, not another organization's" do
       expect(described_class.find_for(bike:, organization:)).to eq acknowledgment
       expect(described_class.for_organization(organization).count).to eq 0
 

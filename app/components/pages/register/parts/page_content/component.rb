@@ -29,7 +29,7 @@ module Pages
             course&.badge_name
           end
 
-          # The template's rules are Bike Index's
+          # The default course's rules are Bike Index's
           def set_by_name
             course&.organization&.name || translation(".bike_index")
           end
