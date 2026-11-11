@@ -6206,6 +6206,9 @@ es:
             unregistered_owner: Este %{bike_type} no está registrado a ningún usuario.
               Se agregó para realizar un seguimiento de las notificaciones de estacionamiento.
             view_all_registrations: ver todo →
+            not_registered_phone_message: No se dispone de otros datos de contacto
+              del propietario, ya que este %{bike_type} no está registrado en su organización.
+            show_phone: Mostrar teléfono
           marketplace_listing_card:
             condition: Condición
             contact_seller: Contacta con el vendedor

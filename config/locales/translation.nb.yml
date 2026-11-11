@@ -5952,6 +5952,10 @@ nb:
             unregistered_owner: Denne %{bike_type} er ikke registrert på en bruker.
               Den ble lagt til for å spore parkeringsvarsler.
             view_all_registrations: se alle →
+            not_registered_phone_message: Andre kontaktdetaljer for eiere er ikke
+              tilgjengelige, siden denne %{bike_type} ikke er registrert hos organisasjonen
+              din.
+            show_phone: Vis telefonen
           marketplace_listing_card:
             condition: Betingelse
             contact_seller: Kontakt selgeren
