@@ -21,6 +21,12 @@ module Integrations
         model && {title: "#{model["manufacturer"]} #{model["model"]}", description: model["description"], image_url: model["stock_photo"]}
       end
 
+      # vehicle_models' entries: each vehicle's id, then in braces what's picked for it, m/trek/2026/marlin_5{size:M}{json}.
+      # A name's commas are inside its braces
+      def vehicle_entries(vehicle_models) = vehicle_models.to_s.scan(/(?:[^,{]|\{[^}]*\})+/)
+
+      def vehicle_id(entry) = entry.split("{").first.to_s.strip
+
       # nil while the catalog doesn't answer
       def manifest = cached("bikebook_catalog/manifest", "manifest.json", expires_in: 5.minutes)
 

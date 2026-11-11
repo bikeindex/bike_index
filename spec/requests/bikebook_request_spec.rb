@@ -20,7 +20,7 @@ RSpec.describe BikebookController, type: :request do
       expect(shell).to have_field("vehicle_models", placeholder: "Search by manufacturer or model…")
         .and have_css("#manufacturer-hw-listbox", visible: :all)
         .and have_css("#vehicle-viewers", visible: :all)
-      expect(page).to have_title("BikeBook", exact: true)
+      expect(page).to have_title("Bike Book", exact: true)
         .and have_css("meta[property='og:image'][content*='/assets/logos/bikebook_icon']", visible: :all)
         .and have_css("meta[name='twitter:card'][content='summary']", visible: :all)
       expect(response.headers["X-Robots-Tag"]).to be_nil
@@ -60,7 +60,7 @@ RSpec.describe BikebookController, type: :request do
       include BikebookCatalogHelpers
 
       let(:catalog_status) { 200 }
-      let(:params) { {vehicle_models: "m/segway/2025/gt3_pro", filters: "1"} }
+      let(:params) { {vehicle_models: "m/segway/2025/gt3_pro{size:M}{json}", filters: "1"} }
       let(:page) { Capybara.string(response.body) }
 
       before do
@@ -69,11 +69,11 @@ RSpec.describe BikebookController, type: :request do
       end
       after { WebMock.reset! }
 
-      it "renders the model's page, titled and described for it, canonically without the search" do
+      it "renders the model's page, titled and described for it, canonically without the search or what's picked for it" do
         expect(response).to have_http_status(:ok)
         expect(response.headers["X-Robots-Tag"]).to be_nil
         expect(page).to have_title("Segway GT3 Pro", exact: true)
-          .and have_css("[data-controller='bikebook--page'][data-bikebook--page-title-value='BikeBook']")
+          .and have_css("[data-controller='bikebook--page'][data-bikebook--page-title-value='Bike Book']")
         expect(page).to have_css("meta[name='description'][content^='Experience elite performance with the Segway GT3 Pro']", visible: :all)
           .and have_css("meta[property='og:image'][content='https://bikebook.bikeindex.org/segway/2025/gt3_pro.png']", visible: :all)
           .and have_css("meta[name='twitter:card'][content='summary_large_image']", visible: :all)
@@ -95,7 +95,7 @@ RSpec.describe BikebookController, type: :request do
 
         it "renders the page for the browser to try, as unavailable to a crawler" do
           expect(response).to have_http_status(:service_unavailable)
-          expect(page).to have_title("BikeBook", exact: true)
+          expect(page).to have_title("Bike Book", exact: true)
             .and have_css("link[rel='canonical'][href='http://www.example.com/bikebook?vehicle_models=m/segway/2025/gt3_pro']", visible: :all)
         end
       end
@@ -107,7 +107,7 @@ RSpec.describe BikebookController, type: :request do
         Capybara.string(response.body)
       end
 
-      it "renders under the BikeBook heading" do
+      it "renders under the Bike Book heading" do
         expect(page).to have_css("h1", text: "find your next ride.")
         expect(page.find("section[aria-label='Donate to Bike Index']")).to have_link("Donate", href: "/donate?source=bikebook")
           .and have_no_css("button")
@@ -168,11 +168,11 @@ RSpec.describe BikebookController, type: :request do
         expect(response).to redirect_to("/bikebook?filters=1&vehicle_models=m/segway/2025/gt3_pro,m/aventon/2022/level_2")
       end
 
-      context "with sizes and colorways picked" do
-        it "moves each with its vehicle" do
-          get "/bikebook/m/segway/2025/gt3_pro", params: {vehicle_models: "m/aventon/2022/level_2,m/segway/2025/gt3_pro,m/aventon/2026/current_adv",
-                                                          vehicle_sizes: "Large,,Small", vehicle_colorways: ",,Sage"}
-          expect(response).to redirect_to("/bikebook?vehicle_colorways=,,Sage&vehicle_models=m/segway/2025/gt3_pro,m/aventon/2022/level_2,m/aventon/2026/current_adv&vehicle_sizes=,Large,Small")
+      context "with what's picked for each" do
+        it "keeps each with its vehicle, a name's commas its own" do
+          vehicle_models = "m/aventon/2022/level_2{size:Large}{json},m/segway/2025/gt3_pro{color:Navy, Fade},m/aventon/2026/current_adv{size:Small}{color:Sage}"
+          get "/bikebook/m/segway/2025/gt3_pro", params: {vehicle_models:}
+          expect(response).to redirect_to("/bikebook?vehicle_models=m/segway/2025/gt3_pro{color:Navy,+Fade},m/aventon/2022/level_2{size:Large}{json},m/aventon/2026/current_adv{size:Small}{color:Sage}")
         end
       end
     end

@@ -2,8 +2,9 @@
 
 class BikebookController < ApplicationController
   def show
-    model = params[:vehicle_models].to_s
-    return render_vehicle(model) if model.match?(Integrations::Bikebook::Catalog::MODEL_ID)
+    entries = Integrations::Bikebook::Catalog.vehicle_entries(params[:vehicle_models])
+    model = Integrations::Bikebook::Catalog.vehicle_id(entries.first.to_s) if entries.one?
+    return render_vehicle(model) if model&.match?(Integrations::Bikebook::Catalog::MODEL_ID)
 
     # comparisons and searches, whose models each have their own page
     response.headers["X-Robots-Tag"] = "noindex, follow" if request.query_parameters.present?
@@ -11,19 +12,12 @@ class BikebookController < ApplicationController
   end
 
   # /bikebook/m/segway/2025/gt3_pro, or without its m/, or its id alone, /m/segway/2025/gt3_pro, picks that vehicle ahead
-  # of any already picked
+  # of any already picked, with what's picked for it there
   def vehicle
-    path = params[:vehicle_model]
-    id = "m/#{path.delete_prefix("m/")}"
-    picked = params[:vehicle_models].to_s.split(",")
-    vehicle_models = [id, *picked].uniq
-    query = request.query_parameters.merge("vehicle_models" => vehicle_models.join(","))
-    # vehicle_sizes and vehicle_colorways are in vehicle_models' order, so each pick moves with its vehicle
-    %w[vehicle_sizes vehicle_colorways].each do |param|
-      next if params[param].blank?
-      picks = picked.zip(params[param].split(",")).to_h
-      query[param] = vehicle_models.map { picks[it] }.join(",").sub(/,+\z/, "")
-    end
+    id = "m/#{params[:vehicle_model].delete_prefix("m/")}"
+    picked, others = Integrations::Bikebook::Catalog.vehicle_entries(params[:vehicle_models])
+      .partition { Integrations::Bikebook::Catalog.vehicle_id(it) == id }
+    query = request.query_parameters.merge("vehicle_models" => [picked.first || id, *others].join(","))
     redirect_to ReadableQuery.path(bikebook_path, query)
   end
 
@@ -41,7 +35,7 @@ class BikebookController < ApplicationController
     render_page(status: :service_unavailable)
   end
 
-  def render_page(title = "BikeBook", status: :ok)
+  def render_page(title = "Bike Book", status: :ok)
     @page_title = title
     # the icon is taller than wide, which the large card crops to a banner
     @twitter_card = "summary" unless @page_image
