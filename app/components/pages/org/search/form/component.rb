@@ -17,13 +17,14 @@ module Pages
             "tw:search-all-checked:-mb-2 tw:lg:search-all-checked:mb-0 tw:lg:search-all-checked:-mr-2"
 
           def initialize(target_search_path:, interpreted_params:, heading:, submit_text:,
-            target_frame: nil, settings_and_filters_component: nil)
+            target_frame: nil, settings_and_filters_component: nil, notes_placeholder: nil)
             @target_search_path = target_search_path
             @interpreted_params = interpreted_params
             @target_frame = target_frame
             @settings_and_filters_component = settings_and_filters_component
             @heading = heading
             @submit_text = submit_text
+            @notes_placeholder = notes_placeholder
             @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
           end
 
@@ -48,7 +49,8 @@ module Pages
             @interpreted_params[:raw_serial].present? && @interpreted_params[:serial].blank?
           end
 
-          def render_notes_field?
+          # Behind the settings panel's toggle, unless the page passes its own always-shown placeholder
+          def notes_toggled?
             @settings_and_filters_component&.notes_search?
           end
 

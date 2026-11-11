@@ -68,6 +68,25 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         expect(notification_rows).to eq([parking_notification1.id])
       end
     end
+    context "searching notes" do
+      let!(:parking_notification1) { FactoryBot.create(:parking_notification, organization: current_organization, message: "Locked to the RAILING by the door") }
+      let!(:parking_notification2) { FactoryBot.create(:parking_notification, organization: current_organization, internal_notes: "Owner called about it") }
+      def notification_rows = response.body.scan(%r{/parking_notifications/(\d+)"}).flatten.map(&:to_i).uniq
+
+      it "matches the message and the internal notes" do
+        get base_url, params: {search_notes: " railing "}
+        expect(response.status).to eq(200)
+        expect(notification_rows).to eq([parking_notification1.id])
+        expect(response.body).to include(%(placeholder="Search notification message/notes"))
+        expect(response.body).to include(%(value=" railing "))
+
+        get base_url, params: {search_notes: "owner called"}
+        expect(notification_rows).to eq([parking_notification2.id])
+
+        get base_url, params: {search_notes: "%"}
+        expect(notification_rows).to eq([])
+      end
+    end
     context "json" do
       it "isn't served" do
         get base_url, params: {format: :json}

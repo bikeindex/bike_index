@@ -104,6 +104,7 @@ module Organized
         bikes = BikeServices::OrganizedSearch.email_and_name(bikes, params[:search_email])
         notifications = notifications.where(bike_id: bikes.pluck(:id))
       end
+      notifications = notifications.notes_matching(params[:search_notes]) if params[:search_notes].present?
       if @search_bounding_box.present?
         notifications = notifications.search_bounding_box(*@search_bounding_box)
       end
@@ -131,7 +132,7 @@ module Organized
         per_page: @per_page,
         # Symbol keys, or organization_id repeats as a query param beside the path segment
         sort_state: sort_state.with(search_params: sort_state.search_params.to_h.symbolize_keys),
-        interpreted_params: @interpreted_params.merge(search_email: params[:search_email]).compact,
+        interpreted_params: @interpreted_params.merge(params.permit(:search_email, :search_notes).to_h.symbolize_keys).compact,
         search_kind: @search_kind,
         search_status: @search_status,
         search_unregistered: @search_unregistered,

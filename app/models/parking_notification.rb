@@ -88,6 +88,9 @@ class ParkingNotification < ActiveRecord::Base
   scope :first_notification, -> { where(repeat_number: 0) }
   scope :not_replaced, -> { where.not(status: "replaced") }
   scope :email_success, -> { joins(:notifications).merge(Notification.delivered).distinct }
+  scope :notes_matching, ->(query) {
+    where("message ILIKE :query OR internal_notes ILIKE :query", query: "%#{sanitize_sql_like(query.strip)}%")
+  }
 
   def self.kinds
     KIND_ENUM.keys.map(&:to_s)
