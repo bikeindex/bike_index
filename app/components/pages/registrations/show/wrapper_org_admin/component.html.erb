@@ -125,6 +125,19 @@
                 <% owner_reg_field_rows.each do |label, value| %>
                   <%= info_row(label, value) %>
                 <% end %>
+              <% elsif show_phone_only? %>
+                <%= info_row(translation(".owner_phone")) do %>
+                  <div
+                    data-controller="ui--collapse"
+                    data-ui--collapse-param-value="phone_shown"
+                  >
+                    <%= render(UI::Collapse::Component.new(text: translation(".show_phone"), color: :link, html_class: "tw:aria-expanded:hidden")) %>
+
+                    <div data-ui--collapse-target="content" class="tw:hidden">
+                      <%= render Atoms::Phone::Component.new(phone: owner_phone) %>
+                    </div>
+                  </div>
+                <% end %>
               <% end %>
             <% end %>
           <% end %>

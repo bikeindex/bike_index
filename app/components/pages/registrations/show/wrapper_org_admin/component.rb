@@ -79,7 +79,13 @@ module Pages
           end
 
           def contact_blocked_message
-            organization_registered? ? translation(".restricted_message") : translation(".not_registered_message", org_name: @organization.short_name)
+            if organization_registered?
+              translation(".restricted_message")
+            elsif show_phone_only?
+              translation(".not_registered_phone_message", bike_type: @bike.type)
+            else
+              translation(".not_registered_message", org_name: @organization.short_name)
+            end
           end
 
           def title
@@ -91,7 +97,14 @@ module Pages
           end
 
           def owner_phone
-            @bike.phone if @bike.phoneable_by?(@current_user, @organization)
+            return @owner_phone if defined?(@owner_phone)
+
+            @owner_phone = (@bike.phone if @bike.phoneable_by?(@current_user, @organization))
+          end
+
+          # phoneable_by? reaches past the org's own bikes; on those, show_contact? decides
+          def show_phone_only?
+            !organization_registered? && owner_phone
           end
 
           # The address renders its own row
