@@ -1,5 +1,5 @@
 <div class="tw:mb-3 tw:flex tw:items-baseline tw:justify-between tw:gap-4">
-  <%# Admin's header names the sequence %>
+  <%# Admin's header names the course %>
   <% if @admin %>
     <%= render(UI::Header::Component.new(tag: :h2, html_class: "uncap tw:mb-0! tw:font-normal! tw:text-gray-500!")) do %>
       <%= helpers.number_display(pages.size) %> <%= "page".pluralize(pages.size) %>
@@ -22,7 +22,7 @@
 
 <% if @editable %>
   <%= render UI::Card::Component.new(additional_classes: "tw:mt-8") do %>
-    <%= form_with model: @education_course, url: sequence_path, method: :patch do |f| %>
+    <%= form_with model: @education_course, url: course_path, method: :patch do |f| %>
       <div class="tw:flex tw:flex-col tw:gap-4">
         <div>
           <%= f.label :faq_url, "FAQ link", class: "twlabel" %>
@@ -56,5 +56,5 @@
 
 <%# Admin's header carries the switch %>
 <% unless @admin %>
-  <%= render UI::ButtonLink::Component.new(text: "Preview", href: sequence_path, color: :secondary, size: :lg, html_class: "tw:mt-8 tw:w-full") %>
+  <%= render UI::ButtonLink::Component.new(text: "Preview", href: course_path, color: :secondary, size: :lg, html_class: "tw:mt-8 tw:w-full") %>
 <% end %>

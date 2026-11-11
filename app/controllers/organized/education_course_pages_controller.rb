@@ -59,7 +59,7 @@ module Organized
       @draft = current_organization.education_courses.draft.find(params[:education_course_id])
     end
 
-    # Pages are only editable on the org's draft sequence
+    # Pages are only editable on the org's draft course
     def find_page
       @page = EducationCoursePage
         .where(education_course: current_organization.education_courses.draft)

@@ -7,7 +7,7 @@ RSpec.describe Pages::Admin::EducationCourse::Header::Component, type: :componen
   let(:education_course) { FactoryBot.create(:education_course, organization:) }
   let(:admin_url) { "/admin/education_courses/#{education_course.id}" }
 
-  it "names the organization and status, and links the sequence's three screens" do
+  it "names the organization and status, and links the course's three screens" do
     render_inline(described_class.new(education_course:))
 
     expect(page).to have_content("Viewing Brakebills Draft education course", normalize_ws: true)
@@ -35,7 +35,7 @@ RSpec.describe Pages::Admin::EducationCourse::Header::Component, type: :componen
     expect { described_class.new(education_course:, mode: :destroy) }.to raise_error(ArgumentError, /mode/)
   end
 
-  context "activated sequence" do
+  context "activated course" do
     let(:education_course) { FactoryBot.create(:education_course_active, organization:) }
 
     it "offers Edit as a disabled button - activation freezes it" do
@@ -92,7 +92,7 @@ RSpec.describe Pages::Admin::EducationCourse::Header::Component, type: :componen
     context "live" do
       let(:education_course) { FactoryBot.create(:education_course_template_active) }
 
-      it "is frozen like any live sequence, and drafts without an organization" do
+      it "is frozen like any live course, and drafts without an organization" do
         render_inline(described_class.new(education_course:, mode: :edit))
 
         expect(page).to have_content("Editing Template Current education course", normalize_ws: true)

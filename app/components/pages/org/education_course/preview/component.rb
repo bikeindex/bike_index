@@ -21,7 +21,7 @@ module Pages
           private
 
           def pages
-            BikeServices::Register.sequence_pages(@education_course)
+            BikeServices::Register.course_pages(@education_course)
           end
 
           def reviewing?
@@ -35,7 +35,7 @@ module Pages
           # The registration's own steps, so the progress bar matches the real flow. No
           # b_param, so it's the flow without a report - which is what a preview walks
           def progress_flow
-            @progress_flow ||= BikeServices::Register.flow(nil, sequence: @education_course)
+            @progress_flow ||= BikeServices::Register.flow(nil, course: @education_course)
           end
 
           def progress_step
@@ -47,7 +47,7 @@ module Pages
           end
 
           def back_path
-            @index.zero? ? exit_path : sequence_path(page: @index)
+            @index.zero? ? exit_path : course_path(page: @index)
           end
 
           # The URL page param is 1-indexed; @index is 0-based
@@ -55,7 +55,7 @@ module Pages
 
           # A GET form appends ?page= from a hidden field, since a form's own query string
           # is dropped on submit
-          def sequence_path(page: nil)
+          def course_path(page: nil)
             EducationCoursePaths.preview(@education_course, page:, admin: @admin)
           end
 

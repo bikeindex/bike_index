@@ -18,7 +18,7 @@ RSpec.describe Pages::Org::RegisterSettings::Component, type: :component do
   end
 
   context "with an active education course, and both set" do
-    let!(:sequence) { FactoryBot.create(:education_course_active, :with_pages, organization:) }
+    let!(:course) { FactoryBot.create(:education_course_active, :with_pages, organization:) }
     let(:options) { {organization:, old_view: true, single_page: true, separate_attestation: true} }
 
     it "offers the separate attestation switch as well, checking all three" do

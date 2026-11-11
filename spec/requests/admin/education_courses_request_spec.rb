@@ -22,7 +22,7 @@ RSpec.describe Admin::EducationCoursesController, type: :request do
       context "filtered to an organization" do
         let!(:other_draft) { FactoryBot.create(:education_course, organization: FactoryBot.create(:organization)) }
 
-        it "renders the organization's sequences" do
+        it "renders the organization's courses" do
           get base_url, params: {organization_id: organization.id}
           expect(response.status).to eq(200)
           expect(assigns(:collection).pluck(:id)).to eq([draft.id])
@@ -35,6 +35,15 @@ RSpec.describe Admin::EducationCoursesController, type: :request do
         get base_url
         expect(assigns(:template)).to be_nil
         expect(response.body).to include("Create template")
+      end
+
+      it "says whether the template is for all, linking its flag" do
+        get base_url
+        expect(response.body).to include("Template for all: off")
+          .and include("/admin/feature_flags/features/education_course_for_all")
+        Flipper.enable(:education_course_for_all)
+        get base_url
+        expect(response.body).to include("Template for all: on")
       end
 
       context "with a live template and a draft above it" do
@@ -95,7 +104,7 @@ RSpec.describe Admin::EducationCoursesController, type: :request do
         end
       end
 
-      context "activated sequence" do
+      context "activated course" do
         let!(:active) { FactoryBot.create(:education_course_active, :with_pages, organization:) }
 
         it "renders, read-only" do
@@ -107,7 +116,7 @@ RSpec.describe Admin::EducationCoursesController, type: :request do
     end
 
     describe "show" do
-      it "renders the sequence read-only" do
+      it "renders the course read-only" do
         get "#{base_url}/#{draft.id}"
         expect(response.status).to eq(200)
         expect(response).to render_template(:show)
@@ -146,7 +155,7 @@ RSpec.describe Admin::EducationCoursesController, type: :request do
         expect(draft.acknowledgment_text).to eq "agree to the rules"
       end
 
-      context "activated sequence" do
+      context "activated course" do
         let!(:active) { FactoryBot.create(:education_course_active, :with_pages, organization:) }
 
         it "404s - activation freezes it" do
@@ -189,7 +198,7 @@ RSpec.describe Admin::EducationCoursesController, type: :request do
           end
         end
 
-        context "activated sequence" do
+        context "activated course" do
           let!(:active) { FactoryBot.create(:education_course_active, :with_pages, organization:) }
 
           it "404s" do
@@ -236,7 +245,7 @@ RSpec.describe Admin::EducationCoursesController, type: :request do
         expect(response).to redirect_to("/admin/organizations/#{organization.to_param}?active_tab=education_courses")
       end
 
-      context "activated sequence" do
+      context "activated course" do
         let!(:active) { FactoryBot.create(:education_course_active, :with_pages, organization:) }
 
         it "404s - only a draft is thrown away" do

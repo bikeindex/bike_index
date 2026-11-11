@@ -14,7 +14,7 @@ RSpec.describe "Organized education courses", :js, type: :system do
     sign_in(user)
   end
 
-  it "builds a draft from the template, edits a page and the sequence, then deletes the page" do
+  it "builds a draft from the template, edits a page and the course, then deletes the page" do
     visit "/o/#{organization.to_param}/education_courses"
 
     # Build the draft (cloned from the seeded template) and open the management view
@@ -22,7 +22,7 @@ RSpec.describe "Organized education courses", :js, type: :system do
     expect(page).to have_content("Draft education course")
     expect(page).to have_content("Batteries & charging") # cloned from the template
 
-    # --- Edit the sequence: add a page. Done before the page edit so the success flash from a
+    # --- Edit the course: add a page. Done before the page edit so the success flash from a
     # save isn't covering the "+ Add page" header link. ---
     click_link "Add page"
     expect(page).to have_css("lexxy-editor lexxy-toolbar", wait: 10) # editors upgrade lazily

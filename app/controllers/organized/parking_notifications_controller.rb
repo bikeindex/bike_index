@@ -36,11 +36,12 @@ module Organized
     end
 
     def new
+      kind = params[:kind].presence_in(ParkingNotification.kinds)
       if old_unregistered_notification_view?
-        return redirect_to(new_organization_bike_path(organization_id: current_organization.to_param, parking_notification: true))
+        return redirect_to(new_organization_bike_path(organization_id: current_organization.to_param, parking_notification: true, kind:))
       end
 
-      render Pages::Org::ParkingNotifications::New::Component.new(organization: current_organization)
+      render Pages::Org::ParkingNotifications::New::Component.new(organization: current_organization, kind:)
     end
 
     def show

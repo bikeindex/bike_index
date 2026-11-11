@@ -56,9 +56,9 @@ RSpec.describe SharedBlocks::Navbar::OrgSidebar::Component, type: :component do
     expect(search["data-ui--active-link-match-paths-value"])
       .to eq "/o/#{organization.to_param}/registrations"
 
-    # Editing a page of a sequence is its own path, off the sequences one
-    sequences = rows.find { |row| row.text.strip == "Education courses" }
-    expect(sequences["data-ui--active-link-match-paths-value"])
+    # Editing a page of a course is its own path, off the courses one
+    courses = rows.find { |row| row.text.strip == "Education courses" }
+    expect(courses["data-ui--active-link-match-paths-value"])
       .to eq "/o/#{organization.to_param}/education_courses/** " \
         "/o/#{organization.to_param}/education_course_pages/**"
   end

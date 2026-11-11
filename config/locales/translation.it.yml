@@ -7280,6 +7280,19 @@ it:
           throttle_past_kmh_html: L'acceleratore supera %{past} km/h; verificare che
             si fermi a %{cap} km/h
           yes_over_mph_html: Sì, oltre %{mph} mph
+          class_summary_manual: Questa e-bike è una e-bike di classe %{n} in %{state}.
+          class_summary_with_rules_manual:
+            one: Questa e-bike è una e-bike di classe %{n} in %{state}, con la regola
+              %{count} da verificare.
+            other: Questa e-bike è una e-bike di Classe %{n} in %{state}, con %{count}
+              regole da verificare.
+          green_summary_no_classes_manual: Questo è classificato come una e-bike in
+            %{state}.
+          yellow_summary_no_classes_manual:
+            one: Questo è classificato come una e-bike in %{state}, con la regola
+              %{count} da verificare.
+            other: Questo è classificato come una e-bike in %{state}, con %{count}
+              regole da verificare.
         rule_label:
           classes: Classi riconosciute
           power: Limite di potenza del motore

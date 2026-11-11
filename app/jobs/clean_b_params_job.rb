@@ -10,7 +10,6 @@ class CleanBParamsJob < ScheduledJob
   end
 
   def perform
-    EducationCourseAcknowledgment.abandon_expired_template_pending
     b_params.delete_all
   end
 

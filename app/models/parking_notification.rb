@@ -53,8 +53,6 @@ class ParkingNotification < ActiveRecord::Base
   STATUS_ENUM = {current: 0, replaced: 1, impounded: 2, retrieved: 3, impounded_retrieved: 5, resolved_otherwise: 4}.freeze
   RETRIEVED_KIND_ENUM = {organization_recovery: 0, link_token_recovery: 1, user_recovery: 2, ownership_transfer: 3}.freeze
   MAX_PER_PAGE = 250
-  LOCATION_ATTRIBUTES = %w[street city neighborhood postal_code region_string region_record_id country_id
-    latitude longitude accuracy location_from_address].freeze
   # Marker delivery_error for notifications backfilled from the legacy delivery_status column
   PRE_TRACKING_ERROR = "Failed pre-notification tracking"
   enum :kind, KIND_ENUM
@@ -330,7 +328,7 @@ class ParkingNotification < ActiveRecord::Base
 
   def set_calculated_attributes
     if Binxtils::InputNormalizer.boolean(is_repeat)
-      self.initial_record_id ||= potential_initial_record&.id
+      self.initial_record ||= potential_initial_record
       reuse_initial_record_location
     end
     self.repeat_number ||= calculated_repeat_number
@@ -388,7 +386,7 @@ class ParkingNotification < ActiveRecord::Base
   def reuse_initial_record_location
     return if id.present? || initial_record.blank? || street.present? || latitude.present?
 
-    self.attributes = initial_record.attributes.slice(*LOCATION_ATTRIBUTES)
+    self.attributes = initial_record.slice(*Geocodeable::GEO_ATTRS - [:street_2], :neighborhood, :accuracy, :location_from_address)
     self.skip_geocoding = true
   end
 

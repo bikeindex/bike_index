@@ -35,6 +35,14 @@ RSpec.describe Manufacturer, type: :model do
     end
   end
 
+  describe "slug validation" do
+    it "is invalid when a slug is all digits" do
+      expect(FactoryBot.build(:manufacturer, name: "333")).not_to be_valid
+      expect(FactoryBot.build(:manufacturer, name: "Foo (101)")).not_to be_valid
+      expect(FactoryBot.build(:manufacturer, name: "Foo (101 Bikes)")).to be_valid
+    end
+  end
+
   describe "friendly_find" do
     it "finds manufacturers by their slug" do
       mnfg = FactoryBot.create(:manufacturer, name: "Poopy PANTERS")
@@ -59,6 +67,18 @@ RSpec.describe Manufacturer, type: :model do
       expect(Manufacturer.find_by_secondary_slug("s_and_m")&.id).to eq mnfg.id
       expect(Manufacturer.friendly_find("s and m bikes")&.id).to eq mnfg.id
       expect(Manufacturer.friendly_find("s and m")&.id).to eq mnfg.id
+    end
+    context "name of digits and a removed suffix, where the digits are another manufacturer's id" do
+      let!(:other_manufacturer) { FactoryBot.create(:manufacturer) }
+      let(:name) { "#{other_manufacturer.id} Bikes" }
+      let!(:manufacturer) { FactoryBot.create(:manufacturer, name:) }
+
+      it "finds each by its own identifier" do
+        expect(manufacturer.to_param).to eq "#{other_manufacturer.id}_bikes"
+        expect(Manufacturer.friendly_find(manufacturer.to_param)).to eq manufacturer
+        expect(Manufacturer.friendly_find(name)).to eq manufacturer
+        expect(Manufacturer.friendly_find(other_manufacturer.id.to_s)).to eq other_manufacturer
+      end
     end
   end
 

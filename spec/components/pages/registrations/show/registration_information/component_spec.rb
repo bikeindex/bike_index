@@ -30,7 +30,7 @@ RSpec.describe Pages::Registrations::Show::RegistrationInformation::Component, t
         expect(acknowledgment_value).to have_css(".localizeTime.withPreposition")
       end
 
-      context "to another organization's sequence" do
+      context "to another organization's course" do
         let(:education_course) { FactoryBot.create(:education_course_active) }
 
         it "doesn't render it" do

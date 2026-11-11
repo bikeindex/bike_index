@@ -30,42 +30,34 @@
   .container.main-compare-packages-container
     %h2.header-font-uncap= t(".compare_plans_and_features")
 
-    %table.table.compare-packages-table.table-striped
-      %thead
-        %tr
-          %th
-          %th
-            - plans.each do |plan, plan_data|
-              - if plan == :free
-                %h4= t(".free")
-                %h3= number_to_currency(0, precision: 0)
-                %p= t(".forever")
-                = link_to t(".sign_up_now"), new_organization_path, class: "btn btn-primary"
+    = render(UI::Table::Base::Component.new(records: plan_features, classes: "compare-packages-table")) do |table|
+      - table.column do |feature|
+        = feature[:title]
+      - plans.each do |plan, plan_data|
+        - plan_header = capture do
+          - if plan == :free
+            %h4= t(".free")
+            %h3= number_to_currency(0, precision: 0)
+            %p= t(".forever")
+            = link_to t(".sign_up_now"), new_organization_path, class: "btn btn-primary"
+          - else
+            %h4 #{plan.to_s.titleize} #{lead_type.humanize.downcase}
+            %h3= number_to_currency(plan_data[:cost], precision: 0)
+            %p
+              = default_currency
+              = "/"
+              = t(".year")
+            = link_to t(".try_for_free"), nil , class: "btn btn-primary tryPaidButton", data: {plan: plan.to_s}
+        - table.column(label: plan_header) do |feature|
+          - if feature[plan].is_a?(String)
+            = feature[plan]
+          - else
+            %span.feature-boolean
+              - if feature[plan]
+                %span.included-feature
+                  &#8226;
               - else
-                %th
-                  %h4 #{plan.to_s.titleize} #{lead_type.humanize.downcase}
-                  %h3= number_to_currency(plan_data[:cost], precision: 0)
-                  %p
-                    = default_currency
-                    = "/"
-                    = t(".year")
-                  = link_to t(".try_for_free"), nil , class: "btn btn-primary tryPaidButton", data: {plan: plan.to_s}
-
-      %tbody
-        - plan_features.each do |feature|
-          %tr
-            %td= feature[:title]
-            - plan_sizes.each do |size|
-              %td
-                - if feature[size].is_a?(String)
-                  = feature[size]
-                - else
-                  %span.feature-boolean
-                    - if feature[size]
-                      %span.included-feature
-                        &#8226;
-                    - else
-                      &dash;
+                &dash;
 
 
     %ul.packages-price-list-small-screens

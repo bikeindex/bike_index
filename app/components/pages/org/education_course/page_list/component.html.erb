@@ -46,7 +46,10 @@
             <% if page.subtitle.present? %>
               <p
                 data-ui--collapse-target="content"
-                class="tw:mt-1 tw:mb-0 tw:pl-5 tw:text-sm tw:text-gray-600"
+                class="
+                  tw:mt-1 tw:mb-0 tw:pl-5 tw:text-sm tw:text-gray-600
+                  tw:dark:text-gray-400
+                "
               >
                 <%= page.subtitle %>
               </p>
@@ -86,7 +89,10 @@
             <% if @education_course.faq_url.present? %>
               <p
                 data-ui--collapse-target="content"
-                class="tw:mt-1 tw:mb-0 tw:pl-5 tw:text-sm tw:text-gray-600"
+                class="
+                  tw:mt-1 tw:mb-0 tw:pl-5 tw:text-sm tw:text-gray-600
+                  tw:dark:text-gray-400
+                "
               >
                 <%= link_to "FAQ link", @education_course.faq_url, class: "twlink" %>
               </p>

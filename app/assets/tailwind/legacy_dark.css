@@ -49,6 +49,12 @@
     @apply tw:dark:bg-gray-700 tw:dark:border-gray-600 tw:dark:text-gray-200;
   }
 
+  .input-group-addon {
+    @apply tw:dark:bg-gray-800 tw:dark:border-gray-600 tw:dark:text-gray-300;
+  }
+
+  .nfp-info,
+  .nfp-info a,
   .add_fields,
   .optional-form-block,
   .inline-input-help,
