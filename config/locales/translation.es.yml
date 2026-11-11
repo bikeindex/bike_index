@@ -5511,6 +5511,9 @@ es:
           para finalizar el registro.
         link_signs_you_in: Este enlace te da acceso a Bike Index, así que no lo reenvíes.
           Funciona durante %{days} días.
+        e_vehicle_safety_rules_owed_html: Tu <strong>%{color_and_brand}</strong> está
+          registrado en Bike Index. Acepta las normas de seguridad para vehículos
+          eléctricos para finalizar el registro.
       confirmation_email:
         click_to_sign_in_html: ¡Haz clic en el botón <em>"Iniciar sesión</em> " para
           finalizar tu registro!
