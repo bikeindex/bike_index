@@ -168,8 +168,8 @@ module BikeServices
     def step_for_page_index(index) = (index + ACKNOWLEDGMENT_OFFSET).to_s
 
     # What a registrant walks. The default course's organization-specific pages are for the
-    # organizations cloning it. to_a: callers ask for count/any?/[] repeatedly, and a CollectionProxy re-queries
-    # for each of them
+    # organizations cloning it. to_a: callers ask for count/any?/[] repeatedly, and a
+    # CollectionProxy re-queries for each of them
     def course_pages(course)
       pages = course&.education_course_pages&.to_a || []
       course&.default? ? pages.reject(&:organization_specific) : pages
@@ -190,7 +190,7 @@ module BikeServices
       return false unless flow.single_page?
       return (separate_attestation ? :own_emails : true) if education_course(b_param, motorized: true, default_course: false).present?
 
-      EducationCourse.active_default.present? ? :own_emails : false
+      EducationCourse.active_default.present? && :own_emails
     end
 
     # Whether the flow includes the report step - what was stolen, or what was found

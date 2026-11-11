@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe EducationCourse, type: :model do
-  # The default course is the course no organization owns, so nil is its organization throughout
+  # The default course has no organization, so nil stands in for one throughout
   describe ".draft_for(nil) - the default course's draft" do
     it "starts an empty draft - nothing sits above the default course to clone" do
       expect { EducationCourse.draft_for(nil) }.to change(EducationCourse, :count).by(1)
