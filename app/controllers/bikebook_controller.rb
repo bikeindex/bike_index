@@ -3,7 +3,7 @@
 class BikebookController < ApplicationController
   def show
     entries = Integrations::Bikebook::Catalog.vehicle_entries(params[:vehicle_models])
-    model = Integrations::Bikebook::Catalog.vehicle_id(entries.first.to_s) if entries.one?
+    model = Integrations::Bikebook::Catalog.vehicle_id(entries.first) if entries.one?
     return render_vehicle(model) if model&.match?(Integrations::Bikebook::Catalog::MODEL_ID)
 
     # comparisons and searches, whose models each have their own page

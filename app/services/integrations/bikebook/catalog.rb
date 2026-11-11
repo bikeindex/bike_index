@@ -25,7 +25,7 @@ module Integrations
       # A name's commas are inside its braces
       def vehicle_entries(vehicle_models) = vehicle_models.to_s.scan(/(?:[^,{]|\{[^}]*\})+/)
 
-      def vehicle_id(entry) = entry.split("{").first.to_s.strip
+      def vehicle_id(entry) = entry.split("{").first.strip
 
       # nil while the catalog doesn't answer
       def manifest = cached("bikebook_catalog/manifest", "manifest.json", expires_in: 5.minutes)
