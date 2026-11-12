@@ -9,19 +9,27 @@ module Pages
       class Component < ApplicationComponent
         ONE_TIME_AMOUNTS = [25, 50, 100].freeze
 
-        def initialize(stripe_prices:, initial_amount: nil, referral_source: nil, current_user: nil)
+        # amounts/default_amount: the one-time presets, and the one selected without an initial_amount
+        # default_cadence: :monthly or :one_time, whichever tab leads and is selected first
+        # ten_percent: :open or :closed adds the helper that fills the other amount from a bike's value
+        def initialize(stripe_prices:, initial_amount: nil, referral_source: nil, current_user: nil,
+          amounts: ONE_TIME_AMOUNTS, default_amount: 50, default_cadence: :monthly, ten_percent: nil)
           @currency = stripe_prices.first&.currency_obj || Currency.default
           @monthly_prices = stripe_prices.select(&:monthly?).to_h do
             [it.membership_level.to_sym, MoneyFormatter.money_format_no_cents_if_whole(it.amount_cents, @currency.slug)]
           end
           @initial_amount = initial_amount.to_i if initial_amount.to_i.positive?
           @referral_source = referral_source
+          @amounts = amounts
+          @default_amount = default_amount
+          @default_cadence = default_cadence
+          @ten_percent = ten_percent
           @email = current_user&.email
           @member = current_user&.membership_active.present?
         end
 
         def custom_amount
-          @initial_amount unless ONE_TIME_AMOUNTS.include?(@initial_amount)
+          @initial_amount unless @amounts.include?(@initial_amount)
         end
 
         def submit_label = one_time? ? one_time_submit : monthly_submit
@@ -36,9 +44,9 @@ module Pages
 
         def monthly? = !@member
 
-        def one_time? = !monthly? || @initial_amount.present?
+        def one_time? = !monthly? || @initial_amount.present? || @default_cadence == :one_time
 
-        def selected_one_time = @initial_amount || 50
+        def selected_one_time = @initial_amount || @default_amount
 
         def tier_amount(level) = @monthly_prices[level]
 
@@ -49,6 +57,10 @@ module Pages
         def one_time_submit = one_time_label(money(selected_one_time))
 
         def monthly_submit = monthly_label(tier_amount(:plus))
+
+        def cadences
+          [["monthly", translation(".monthly")], ["one-time", translation(".one_time")]].then { (@default_cadence == :one_time) ? it.reverse : it }
+        end
 
         def tiers
           [

@@ -1,9 +1,7 @@
 <% container = SharedBlocks::Marketing::Wrapper::Component::CONTAINER_CLASSES %>
 <% eyebrow = "tw:text-[10.5px] tw:font-extrabold tw:tracking-widest tw:uppercase tw:lg:text-[11.5px]" %>
 <% muted = "tw:text-[#666] tw:dark:text-gray-400" %>
-<% card = "tw:rounded-lg tw:border tw:border-[#e0e0e0] tw:bg-white tw:dark:border-gray-700 tw:dark:bg-gray-800" %>
 <% band = "tw:border-[#e0e0e0] tw:bg-[#f8f8f8] tw:dark:border-gray-700 tw:dark:bg-gray-800/60" %>
-<% selectable = "tw:transition-colors tw:hover:border-[#a9d2f0] tw:is-active:border-blue-600 tw:is-active:ring-1 tw:is-active:ring-blue-600" %>
 
 <div
   data-controller="donate--page"
@@ -77,27 +75,8 @@
         "
       >
         <% major_gifts.each do |amount, label| %>
-          <a
-            href="<%= donate_path(initial_amount: amount, source: @referral_source, anchor: "donate-form") %>"
-            class="tw:flex tw:flex-col tw:gap-1 tw:p-5.5 tw:text-inherit tw:no-underline tw:focus-visible:ring-3 tw:focus-visible:ring-blue-500/40 tw:focus-visible:outline-none tw:md:flex-1 tw:lg:w-59 tw:lg:flex-none <%= card %> <%= selectable %>"
-            data-amount="<%= amount %>"
-            data-donate--page-target="majorGift"
-            data-active="<%= amount == @form.custom_amount %>"
-            data-action="donate--page#selectMajor"
-          >
-            <span
-              class="
-                tw:font-header tw:text-[28px] tw:font-extrabold
-                tw:lg:text-[38px]
-              "
-            >
-              <%= @form.money(amount) %>
-            </span>
-
-            <span class="tw:text-xs tw:font-bold tw:uppercase <%= muted %>">
-              <%= label %>
-            </span>
-          </a>
+          <%= render(Pages::Donate::MajorGift::Component.new(amount:, label:, display: @form.money(amount), active: amount == @form.custom_amount, html_class: "tw:md:flex-1 tw:lg:w-59 tw:lg:flex-none",
+            href: donate_path(initial_amount: amount, source: @referral_source, anchor: "donate-form"))) %>
         <% end %>
 
         <div

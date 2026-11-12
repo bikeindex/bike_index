@@ -2,6 +2,7 @@
 <% card = "tw:rounded-lg tw:border tw:border-[#e0e0e0] tw:bg-white tw:dark:border-gray-700 tw:dark:bg-gray-800" %>
 <% selectable = "tw:transition-colors tw:hover:border-[#a9d2f0] tw:is-active:border-blue-600 tw:is-active:ring-1 tw:is-active:ring-blue-600" %>
 <% row = "tw:group/row tw:flex tw:cursor-pointer tw:items-center tw:gap-3 tw:px-3.5 tw:py-4 tw:xs:gap-4 tw:xs:px-4.5 tw:has-focus-visible:ring-3 tw:has-focus-visible:ring-blue-500/40 #{card} #{selectable}" %>
+<% one_time_panel = monthly? ? "tw:flex-col tw:gap-4 tw:hidden tw:group-has-[#donate-cadence-one-time:checked]/donate:flex" : "tw:flex-col tw:gap-4 tw:flex" %>
 <% amount_classes = "tw:font-header tw:text-[19px] tw:font-extrabold tw:group-has-checked/row:text-blue-600 tw:lg:text-[22px] tw:dark:group-has-checked/row:text-blue-400" %>
 
 <%# the callout's 40px padding and 16px type don't fit a label in the 404px card %>
@@ -21,7 +22,7 @@
       role="radiogroup"
       aria-label="<%= translation(".cadence") %>"
     >
-      <% [["monthly", translation(".monthly")], ["one-time", translation(".one_time")]].each do |cadence, label| %>
+      <% cadences.each do |cadence, label| %>
         <label
           class="
             tw:-mb-px tw:flex-1 tw:cursor-pointer tw:border-b-3
@@ -125,76 +126,80 @@
     <% end %>
   </div>
 
-  <%= form_tag payments_path,
-  method: :post,
-  class:
-    class_names(
-      "tw:flex-col tw:gap-2.25",
-      monthly? ? "tw:hidden tw:group-has-[#donate-cadence-one-time:checked]/donate:flex" : "tw:flex",
-    ),
-  data: {
-    donate__form_target: "oneTimeForm",
-  } do %>
-    <%= hidden_field_tag "payment[kind]", "donation", id: nil %>
-    <%= hidden_field_tag "payment[currency]", @currency.name, id: nil %>
-    <%= hidden_field_tag "payment[email]", @email, id: nil %>
-    <%= hidden_field_tag "payment[referral_source]", @referral_source, id: nil %>
+  <%# the helper's input sits outside the form so Enter in it doesn't submit a donation %>
+  <div class="<%= one_time_panel %>">
+    <% if @ten_percent %>
+      <%= render(Pages::Donate::TenPercent::Component.new(open: @ten_percent == :open, currency_symbol: @currency.symbol)) %>
+    <% end %>
 
-    <fieldset class="tw:flex tw:flex-col tw:gap-2.25">
-      <legend class="tw:sr-only"><%= translation(".one_time") %></legend>
+    <%= form_tag payments_path,
+    method: :post,
+    class: "tw:flex tw:flex-col tw:gap-2.25",
+    data: {
+      donate__form_target: "oneTimeForm",
+    } do %>
+      <%= hidden_field_tag "payment[kind]", "donation", id: nil %>
+      <%= hidden_field_tag "payment[currency]", @currency.name, id: nil %>
+      <%= hidden_field_tag "payment[email]", @email, id: nil %>
+      <%= hidden_field_tag "payment[referral_source]", @referral_source, id: nil %>
 
-      <% ONE_TIME_AMOUNTS.each do |amount| %>
-        <label class="<%= row %>">
-          <%= radio_button_tag "payment[amount_cents]",
+      <fieldset class="tw:flex tw:flex-col tw:gap-2.25">
+        <legend class="tw:sr-only"><%= translation(".one_time") %></legend>
+
+        <% @amounts.each do |amount| %>
+          <label class="<%= row %>">
+            <%= radio_button_tag "payment[amount_cents]",
           amount * 100,
           amount == selected_one_time,
           class: "tw:sr-only",
           autocomplete: "off",
           data: {
             amount: money(amount),
+            default: (true if amount == @default_amount),
             donate__form_target: "oneTimeAmount",
             action: "donate--form#selectPreset",
           } %>
 
-          <span class="<%= amount_classes %>"><%= money(amount) %></span>
+            <span class="<%= amount_classes %>"><%= money(amount) %></span>
 
-          <%= radio_mark %>
-        </label>
-      <% end %>
-    </fieldset>
+            <%= radio_mark %>
+          </label>
+        <% end %>
+      </fieldset>
 
-    <label
-      class="
-        tw:flex tw:items-center tw:gap-1.5 tw:rounded-[5px] tw:border
-        tw:border-[#e0e0e0] tw:bg-white tw:px-3.5
-        tw:has-focus:border-blue-500 tw:has-focus:ring-3
-        tw:has-focus:ring-blue-500/25 tw:dark:border-gray-700
-        tw:dark:bg-gray-800
-      "
-    >
-      <span class="tw:font-bold <%= muted %>" aria-hidden="true"><%= @currency.symbol %></span>
-      <span class="tw:sr-only"><%= translation(".other_amount") %></span>
-
-      <input
-        type="number"
-        min="1"
-        step="0.01"
-        inputmode="decimal"
-        autocomplete="off"
-        name="payment[amount]"
-        value="<%= custom_amount %>"
-        placeholder="<%= translation(".other_amount") %>"
+      <label
         class="
-          tw:w-full tw:border-0 tw:bg-transparent tw:py-3.5 tw:text-[15.5px]
-          tw:outline-none tw:focus:ring-0
+          tw:flex tw:items-center tw:gap-1.5 tw:rounded-[5px] tw:border
+          tw:border-[#e0e0e0] tw:bg-white tw:px-3.5
+          tw:has-focus:border-blue-500 tw:has-focus:ring-3
+          tw:has-focus:ring-blue-500/25 tw:dark:border-gray-700
+          tw:dark:bg-gray-800
         "
-        data-donate--form-target="customAmount"
-        data-action="input->donate--form#customInput"
       >
-    </label>
+        <span class="tw:font-bold <%= muted %>" aria-hidden="true"><%= @currency.symbol %></span>
+        <span class="tw:sr-only"><%= translation(".other_amount") %></span>
 
-    <%= submit_button.(one_time_submit) %>
-  <% end %>
+        <input
+          type="number"
+          min="1"
+          step="0.01"
+          inputmode="decimal"
+          autocomplete="off"
+          name="payment[amount]"
+          value="<%= custom_amount %>"
+          placeholder="<%= translation(".other_amount") %>"
+          class="
+            tw:w-full tw:border-0 tw:bg-transparent tw:py-3.5
+            tw:text-[15.5px] tw:outline-none tw:focus:ring-0
+          "
+          data-donate--form-target="customAmount"
+          data-action="input->donate--form#customInput"
+        >
+      </label>
+
+      <%= submit_button.(one_time_submit) %>
+    <% end %>
+  </div>
 
   <p class="tw:mb-0 tw:text-xs <%= muted %>">
     <span class="tw:lg:hidden"><%= translation(".fine_print_short") %></span>

@@ -8,8 +8,8 @@ export default class extends Controller {
   static values = { monthlyLabel: String, oneTimeLabel: String, currencySymbol: String }
 
   connect () {
-    // [1] is $50, the server's default when an other amount came in instead
-    this.lastPreset = this.oneTimeAmountTargets.find(radio => radio.checked) || this.oneTimeAmountTargets[1]
+    // The server's default preset when an other amount came in instead
+    this.lastPreset = this.oneTimeAmountTargets.find(radio => radio.checked) || this.oneTimeAmountTargets.find(radio => radio.dataset.default)
     this.update()
   }
 

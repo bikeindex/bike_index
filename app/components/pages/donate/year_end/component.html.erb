@@ -1,0 +1,347 @@
+<% container = SharedBlocks::Marketing::Wrapper::Component::CONTAINER_CLASSES %>
+<% muted = "tw:text-[#666] tw:dark:text-gray-400" %>
+<% band = "tw:border-[#e0e0e0] tw:bg-[#f8f8f8] tw:dark:border-gray-700 tw:dark:bg-gray-800/60" %>
+<% heading = SharedBlocks::Marketing::SectionHeading::Component %>
+
+<div
+  data-controller="donate--page"
+  data-action="donate--form:change@window->donate--page#formChanged"
+>
+  <div class="tw:grid tw:grid-cols-3 tw:gap-[3px] tw:bg-[#2c3e50] tw:md:grid-cols-7">
+    <% photos.each do |url| %>
+      <%= image_tag url,
+      alt: translation(".photo_alt"),
+      class: "tw:h-26 tw:w-full tw:object-cover tw:max-md:last:hidden tw:md:h-40 tw:lg:h-37.5" %>
+    <% end %>
+  </div>
+
+  <section class="tw:py-6.5 tw:lg:py-14 <%= container %>">
+    <div
+      class="
+        tw:flex tw:flex-col tw:gap-6 tw:lg:grid tw:lg:grid-cols-[1fr_26rem]
+        tw:lg:gap-x-14 tw:lg:gap-y-8
+      "
+    >
+      <div class="tw:flex tw:flex-col tw:gap-4.5">
+        <p class="tw:mb-0 <%= heading.eyebrow_classes(:red) %>">
+          <%= translation(".eyebrow") %>
+        </p>
+
+        <h1
+          class="
+            tw:mb-0 tw:font-header tw:text-[31px] tw:leading-[1.07]
+            tw:font-extrabold tw:tracking-[-.01em] tw:text-balance
+            tw:md:text-[42px] tw:xl:text-[52px] tw:xl:leading-[1.04]
+          "
+        >
+          <%= @recovered ? translation(".headline_recovered") : translation(".headline") %>
+        </h1>
+
+        <p class="tw:mb-0 tw:max-w-160 tw:text-base tw:leading-[1.55] tw:text-pretty tw:xl:text-[19px] <%= muted %>">
+          <%= @recovered ? translation(".ten_percent_statement") : translation(".lede") %>
+        </p>
+      </div>
+
+      <div
+        id="donate-form"
+        class="tw:-mx-5 tw:flex tw:scroll-mt-6 tw:flex-col tw:gap-4 tw:border-y tw:px-5 tw:py-6.5 tw:md:mx-auto tw:md:w-full tw:md:max-w-xl tw:md:rounded-lg tw:md:border tw:md:p-6.5 tw:lg:sticky tw:lg:top-6 tw:lg:col-start-2 tw:lg:row-span-2 tw:lg:row-start-1 tw:lg:mx-0 tw:lg:max-w-none tw:lg:self-start <%= band %>"
+      >
+        <div class="tw:flex tw:flex-col tw:gap-1.5">
+          <h2
+            class="
+              tw:mb-0 tw:font-header tw:text-[22px] tw:font-extrabold
+              tw:lg:text-2xl
+            "
+          >
+            <%= translation(".form_title") %>
+          </h2>
+
+          <p class="tw:mb-0 tw:text-sm <%= muted %>">
+            <%= translation(".goal", goal: @form.money(GOAL)) %>
+          </p>
+        </div>
+
+        <%= render(@form) %>
+      </div>
+
+      <div class="tw:flex tw:flex-col tw:gap-5 tw:lg:col-start-1 tw:lg:row-start-2">
+        <dl
+          class="
+            tw:m-0 tw:grid tw:max-w-155 tw:grid-cols-3 tw:gap-px
+            tw:overflow-hidden tw:rounded-lg tw:border tw:border-[#e0e0e0]
+            tw:bg-[#e0e0e0] tw:dark:border-gray-700 tw:dark:bg-gray-700
+          "
+        >
+          <% stats.each do |figure, caption| %>
+            <div
+              class="
+                tw:flex tw:flex-col tw:gap-1 tw:bg-white tw:px-3 tw:py-4
+                tw:lg:px-5 tw:dark:bg-gray-800
+              "
+            >
+              <dd
+                class="
+                  tw:order-first tw:m-0 tw:font-header tw:text-2xl
+                  tw:leading-none tw:font-extrabold tw:text-blue-600
+                  tw:lg:text-3xl tw:dark:text-blue-400
+                "
+              >
+                <%= figure %>
+              </dd>
+
+              <dt class="tw:text-[13px] tw:leading-snug tw:font-normal <%= muted %>">
+                <%= caption %>
+              </dt>
+            </div>
+          <% end %>
+        </dl>
+
+        <figure
+          class="
+            tw:m-0 tw:flex tw:max-w-150 tw:flex-col tw:gap-2 tw:border-l-3
+            tw:border-[#a9d2f0] tw:pl-5 tw:dark:border-blue-900
+          "
+        >
+          <blockquote
+            class="
+              tw:m-0 tw:text-base tw:leading-relaxed tw:text-[#444]
+              tw:italic tw:text-pretty tw:dark:text-gray-300
+            "
+          >
+            <%= translation(".quote") %>
+          </blockquote>
+
+          <figcaption class="tw:text-[13px] tw:font-bold">
+            <%= translation(".quote_caption") %>
+          </figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="tw:border-y tw:py-11 tw:lg:py-16 <%= band %>">
+    <div class="tw:flex tw:flex-col tw:gap-8 <%= container %>">
+      <%= render(heading.new(eyebrow: translation(".impact_eyebrow"), heading: translation(".impact_title"), intro: translation(".impact_intro"), html_class: "tw:max-w-180")) %>
+
+      <div class="twwiderow twwiderow-3 tw:gap-y-4">
+        <% stories.each do |title, quote| %>
+          <%= render(UI::Card::Component.new(additional_classes: "tw:flex tw:flex-col tw:gap-3.5 tw:p-6!")) do %>
+            <h3 class="tw:m-0 tw:text-[17px] tw:leading-tight tw:font-extrabold">
+              <%= title %>
+            </h3>
+
+            <p
+              class="
+                tw:m-0 tw:text-[15px] tw:leading-relaxed tw:text-[#444]
+                tw:text-pretty tw:dark:text-gray-300
+              "
+            >
+              <%= quote %>
+            </p>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <section class="tw:py-11 tw:lg:py-16 <%= container %>">
+    <%= render(heading.new(eyebrow: translation(".shipped_eyebrow"), heading: translation(".shipped_title"), intro: translation(".shipped_intro"), html_class: "tw:mb-8 tw:max-w-180")) %>
+
+    <div class="twwiderow twwiderow-3 tw:gap-y-7">
+      <% shipped.each do |feature| %>
+        <%= render(SharedBlocks::Marketing::IconFeature::Component.new(**feature)) %>
+      <% end %>
+    </div>
+  </section>
+
+  <section
+    class="
+      dark tw:bg-linear-160 tw:from-[#2c3e50] tw:to-[#233140] tw:py-14
+      tw:text-white tw:lg:py-18
+    "
+  >
+    <div class="tw:flex tw:flex-col tw:gap-9 <%= container %>">
+      <%= render(heading.new(eyebrow: translation(".building_eyebrow"), eyebrow_color: :yellow, heading: translation(".building_title"), intro: translation(".building_intro"),
+        html_class: "tw:max-w-190 tw:[&_h2]:text-white tw:[&_p:last-child]:text-[#dfe6ec]")) %>
+
+      <div class="twwiderow tw:gap-y-5">
+        <% building.each do |card| %>
+          <div
+            class="
+              inverted tw:flex tw:flex-col tw:overflow-hidden tw:rounded-lg
+              tw:bg-white tw:text-slate-900
+            "
+          >
+            <div
+              class="
+                tw:flex tw:h-40 tw:items-center tw:justify-center
+                tw:border-b tw:border-[#e0e0e0] tw:bg-[#e8f3fc]
+              "
+            >
+              <%= helpers.inline_svg_tag(card[:icon], class: "tw:size-16 tw:text-blue-500", aria_hidden: true) %>
+            </div>
+
+            <div class="tw:flex tw:flex-col tw:gap-2 tw:px-6.5 tw:pt-6 tw:pb-7">
+              <p class="tw:m-0 <%= heading.eyebrow_classes(:purple) %>">
+                <%= card[:eyebrow] %>
+              </p>
+
+              <h3 class="tw:m-0 tw:font-header tw:text-2xl tw:font-extrabold">
+                <%= card[:title] %>
+              </h3>
+
+              <p class="tw:m-0 tw:text-[15.5px] tw:leading-normal <%= muted %>">
+                <%= card[:body] %>
+              </p>
+
+              <%= link_to card[:link_text], card[:href], class: "twlink tw:mt-1.5 tw:text-[15px] tw:font-bold" %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="tw:flex tw:flex-col tw:gap-4.5">
+        <h3
+          class="
+            tw:m-0 tw:font-header tw:text-[22px] tw:font-extrabold
+            tw:text-white
+          "
+        >
+          <%= translation(".network_title") %>
+        </h3>
+
+        <div
+          class="
+            tw:grid
+            tw:grid-cols-[repeat(auto-fit,minmax(min(100%,260px),1fr))]
+            tw:gap-px tw:overflow-hidden tw:rounded-lg tw:border
+            tw:border-white/20 tw:bg-white/20
+          "
+        >
+          <% network.each do |title, body| %>
+            <div
+              class="
+                tw:flex tw:flex-col tw:gap-1.5 tw:bg-[#2c3e50] tw:px-6
+                tw:py-5.5
+              "
+            >
+              <span class="tw:text-base tw:font-extrabold tw:text-yellow-300"><%= title %></span>
+
+              <p class="tw:m-0 tw:text-[15px] tw:leading-normal tw:text-[#dfe6ec]">
+                <%= body %>
+              </p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="tw:flex tw:flex-wrap tw:items-center tw:gap-x-10 tw:gap-y-6 tw:py-12 tw:lg:py-18 <%= container %>">
+    <div class="tw:flex tw:flex-1 tw:basis-105 tw:flex-col tw:gap-3.5">
+      <span
+        class="
+          tw:font-header tw:text-[clamp(72px,10vw,120px)] tw:leading-[.9]
+          tw:font-black tw:tracking-[-.03em] tw:text-blue-600
+          tw:dark:text-blue-400
+        "
+      >
+        10%
+      </span>
+
+      <p
+        class="
+          tw:m-0 tw:max-w-155 tw:font-header
+          tw:text-[clamp(20px,2.2vw,26px)] tw:leading-snug tw:font-bold
+          tw:text-pretty
+        "
+      >
+        <%= translation(".ten_percent_statement") %>
+      </p>
+    </div>
+
+    <div class="tw:flex tw:flex-col tw:items-start tw:gap-3.5 tw:basis-90">
+      <p class="tw:m-0 tw:text-base <%= muted %>">
+        <%= translation(".ten_percent_prompt") %>
+      </p>
+
+      <%= render UI::Button::Component.new(text: translation(".ten_percent_button"), color: :primary, size: :callout_sm,
+        data: {action: "donate--page#openTenPercent"}) %>
+    </div>
+  </section>
+
+  <section class="tw:border-y tw:py-12 <%= band %>">
+    <div class="twwiderow twwiderow-3 tw:gap-y-8 <%= container %>">
+      <div class="tw:flex tw:flex-col tw:gap-2.5">
+        <p class="tw:m-0 <%= heading.eyebrow_classes(:purple) %>">
+          <%= translation(".major_eyebrow") %>
+        </p>
+
+        <h3
+          class="
+            tw:m-0 tw:font-header tw:text-[22px] tw:leading-tight
+            tw:font-extrabold
+          "
+        >
+          <%= translation(".major_title") %>
+        </h3>
+
+        <div class="tw:mt-1.5 tw:flex tw:gap-2.5">
+          <% major_gifts.each do |amount, tier| %>
+            <%= render(Pages::Donate::MajorGift::Component.new(amount:, label: tier, display: @form.money(amount), active: amount == @form.custom_amount,
+              html_class: "tw:flex-1 tw:p-4! tw:[&>span:first-child]:text-[26px]!",
+              href: donate_year_end_path(initial_amount: amount, source: @referral_source, anchor: "donate-form"))) %>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="tw:flex tw:flex-col tw:gap-2.5">
+        <h3 class="tw:m-0 tw:text-[17px] tw:font-extrabold">
+          <%= translation(".other_ways_title") %>
+        </h3>
+
+        <ul class="tw:m-0 tw:flex tw:list-none tw:flex-col tw:gap-2 tw:pl-0">
+          <% other_ways.each do |way| %>
+            <li class="tw:flex tw:gap-2.5 tw:text-[15px] <%= muted %>">
+              <span
+                class="
+                  tw:mt-2.5 tw:size-1.25 tw:shrink-0 tw:rounded-full
+                  tw:bg-purple-500
+                "
+              ></span>
+
+              <%= way %>
+            </li>
+          <% end %>
+        </ul>
+
+        <%= mail_to "donate@bikeindex.org", translation(".larger_gift_link"), class: "twlink tw:text-[15px] tw:font-bold" %>
+      </div>
+
+      <div class="tw:flex tw:flex-col tw:gap-2.5">
+        <h3 class="tw:m-0 tw:text-[17px] tw:font-extrabold">
+          <%= translation(".merch_title") %>
+        </h3>
+
+        <p class="tw:m-0 tw:text-[15px] <%= muted %>">
+          <%= translation(".merch_body") %>
+        </p>
+
+        <%= link_to translation(".merch_link"), store_path, class: "twlink tw:text-[15px] tw:font-bold" %>
+      </div>
+    </div>
+  </section>
+
+  <%= render(SharedBlocks::Marketing::CallToActionBanner::Component.new(heading: translation(".cta_title"), subheading: translation(".cta_sub"))) do %>
+    <%= render UI::Button::Component.new(
+      text: @form.submit_label,
+      color: :yellow,
+      size: :callout,
+      html_class: "tw:w-full tw:md:w-auto tw:max-md:px-4! tw:max-xs:text-xs!",
+      data: {
+        donate__page_target: "submit",
+        action: "donate--page#submit"
+      }
+    ) %>
+  <% end %>
+</div>

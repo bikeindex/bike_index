@@ -1,0 +1,121 @@
+---
+en:
+  components:
+    pages:
+      donate:
+        year_end:
+          bikebook_body: The world's bicycle library — search, compare, and find your
+            next ride.
+          bikebook_eyebrow: Your bike garage, on the internet
+          bikebook_link: See a sneak peek of Bike Book
+          bikebook_title: Meet Bike Book
+          building_eyebrow: What your gift builds next
+          building_intro: Our goal is to make Bike Index your bike's home on the internet.
+          building_title: Help us build what's next
+          cta_sub: Keep it free for the next million riders. Our team thanks you!
+          cta_title: Free since day one. Free for good.
+          eyebrow: Year-end giving · 2026
+          form_title: Make your year-end gift
+          goal: Our goal is %{goal} by December 31.
+          headline: Make a year-end gift to Bike Index. Bring more stolen bikes home
+            in 2027.
+          headline_recovered: Your bike made it home. Help the next one get there.
+          impact_eyebrow: What your support did in 2026
+          impact_intro: >-
+            Every one of these came back because someone checked a serial number against
+            a registry that costs nothing to use.
+          impact_title: Bikes that made it home
+          larger_gift_link: Talk to us about a larger gift
+          lede: >-
+            Bike Index has been free since day one, and it stays free for good. This
+            year that free registry helped 1,358 stolen bikes get home. Your year-end
+            gift keeps it running and pays for what we build next.
+          major_benefactor: Benefactor
+          major_eyebrow: Major giving
+          major_partner: Partner
+          major_title: Larger gifts move whole cities onto the registry
+          marketplace_body: Continuing to build out the most trusted place to sell
+            a used bicycle.
+          marketplace_eyebrow: Buy and sell used
+          marketplace_link: Visit the Marketplace
+          marketplace_title: Marketplace
+          merch_body: Shirts, stickers, and caps. Every purchase supports the registry.
+          merch_link: Visit the shop
+          merch_title: Merch and more
+          network_police: Recovered bikes matched to owners instead of sitting in
+            a property room.
+          network_police_title: Law enforcement
+          network_shops: >-
+            Tools that make checking a serial at intake routine. That's how Ted's
+            held a stolen bike for its owner.
+          network_shops_title: Bike shops
+          network_title: Building a more useful network
+          network_universities: >-
+            Campus registration and impound tools, so students' bikes come back instead
+            of being cleared out.
+          network_universities_title: Universities
+          other_ways_daf: Donor-advised fund grants — we can send our EIN and grant
+            details.
+          other_ways_match: >-
+            Employer matching — many employers will match a donation at no extra cost
+            to you.
+          other_ways_stock: Gifts of stock or crypto, which avoid capital gains on
+            appreciated assets.
+          other_ways_title: Other ways to give
+          photo_alt: A bike recovered through Bike Index
+          quote: >-
+            “Four years later I received an email through Bike Index's message service
+            that someone had my bike and wanted to return it to me. I picked it up
+            this weekend and so grateful for the gracious man for returning it and
+            Bike Index for providing a platform for us to connect!”
+          quote_caption: Home after four years
+          shipped_dashboard: Your bikes, alerts, and messages in one place.
+          shipped_dashboard_title: See it all on your new dashboard
+          shipped_ebike: Registering an e-bike now explains its class as you go.
+          shipped_ebike_title: E-bike education, built in
+          shipped_eyebrow: Shipped this year
+          shipped_intro: A faster, friendlier Bike Index. Donations paid for every
+            part of it.
+          shipped_legality: >-
+            Find out where your e-bike is legal to ride, by class and jurisdiction,
+            before you buy or before you ride somewhere new.
+          shipped_legality_title: E-bike legality checker
+          shipped_messaging: Streamlined communication flow for stolen bike recovery
+            partners.
+          shipped_messaging_title: Better messaging
+          shipped_partners: >-
+            Smoother impounding for cities and campuses, and custom registration flows
+            for e-bike and direct-to-consumer brands.
+          shipped_partners_title: New partner features
+          shipped_registration: Fewer steps between getting a bike and getting it
+            registered.
+          shipped_registration_title: A streamlined registration flow
+          shipped_title: Your new Bike Index is here
+          stat_recovered: stolen bikes recovered in 2026
+          stat_recovered_figure: '1,358'
+          stat_registered: bikes registered this year, free
+          stat_registered_figure: '96,328'
+          stat_value: in bikes returned to their owners
+          stat_value_figure: "$1.5M"
+          story_country: >-
+            “The serial number was searched from a bike shop in Henderson Nevada and
+            shipped back to me. Swanys Cycles is a phenomenal bike shop and Bike Index
+            led them to me!”
+          story_country_title: Found across the country
+          story_magic: >-
+            “Guy in Rosemount won a bid on an abandoned storage unit in Minneapolis.
+            In the unit, there were multiple bikes. Mine was the only one registered.
+            He reached out via Bike Index, and we set up a time for me to pick it
+            up.”
+          story_magic_title: A little bit of Bike Index magic
+          story_shop: >-
+            “Ted's Bicycle Shop in Colorado Springs picked it up from someone who
+            brought it in for service there. They compared the serial number to the
+            one listed here and they were able to hold on to it for me.”
+          story_shop_title: Ted's Bicycle Shop, Colorado Springs
+          ten_percent_button: Work out my 10%
+          ten_percent_prompt: Tell us what your bike is worth and we'll work out the
+            gift.
+          ten_percent_statement: >-
+            If everyone whose stolen bike was recovered with Bike Index donated 10%
+            of its value, we'd cover our baseline operating costs for the next year.

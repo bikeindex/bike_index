@@ -126,6 +126,25 @@ RSpec.describe InfoController, type: :request do
       end
     end
 
+    describe "donate/year-end" do
+      include_context :active_stripe_prices
+
+      it "renders the year-end page outside the content wrapper, submitting the same forms as /donate" do
+        get "/donate/year-end"
+        expect(response.status).to eq(200)
+        expect(response.body).to include("Make a year-end gift to Bike Index")
+        expect(response.body).to match(/name="payment\[referral_source\]"[^>]*value="eoy-2026"/)
+        expect(response.body).to include('action="/payments"')
+        expect(response.body).to_not include("sidebar-nav")
+      end
+
+      it "passes the email's source on and picks the recovered audience from it" do
+        get "/donate/year-end?source=eoy-2026-recovered"
+        expect(response.body).to include("Your bike made it home")
+        expect(response.body).to match(/name="payment\[referral_source\]"[^>]*value="eoy-2026-recovered"/)
+      end
+    end
+
     # serials is the one static page that links default_bike_search_path
     describe "serials search links" do
       let(:organization) { FactoryBot.create(:organization) }

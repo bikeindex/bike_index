@@ -1,0 +1,24 @@
+<a
+  href="<%= @href %>"
+  class="
+    tw:flex tw:flex-col tw:gap-1 tw:rounded-lg tw:border tw:border-[#e0e0e0] tw:bg-white tw:p-5.5 tw:text-inherit tw:no-underline tw:transition-colors tw:hover:border-[#a9d2f0] tw:focus-visible:ring-3 tw:focus-visible:ring-blue-500/40 tw:focus-visible:outline-none tw:is-active:border-blue-600 tw:is-active:ring-1 tw:is-active:ring-blue-600 tw:dark:border-gray-700 tw:dark:bg-gray-800
+    <%= @html_class %>
+  "
+  data-amount="<%= @amount %>"
+  data-donate--page-target="majorGift"
+  data-active="<%= @active %>"
+  data-action="donate--page#selectMajor"
+>
+  <span class="tw:font-header tw:text-[28px] tw:font-extrabold tw:lg:text-[38px]">
+    <%= @display %>
+  </span>
+
+  <span
+    class="
+      tw:text-xs tw:font-bold tw:text-[#666] tw:uppercase
+      tw:dark:text-gray-400
+    "
+  >
+    <%= @label %>
+  </span>
+</a>
