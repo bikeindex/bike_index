@@ -7547,23 +7547,14 @@ nl:
           form_title: Financier het volgende herstel
           headline: Alle bovenstaande fietsen zijn mee naar huis genomen omdat de
             registratie gratis was.
-          larger_gift_link: Neem contact met ons op voor een grotere gift.
           lede_short: Bike Index is een non-profitorganisatie. Registratie, zoeken
             en diefstalmeldingen zijn gratis. Donaties maken dit mogelijk.
-          major_benefactor: Weldoener
           major_body: Donaties op dit niveau worden gebruikt voor het inwerken van
             partners, grensoverschrijdende diefstalonderzoeken en de technische ontwikkeling
             van gepromote waarschuwingen.
           major_eyebrow: Grote donaties
-          major_partner: Partner
           major_title: Grotere giften zorgen ervoor dat hele steden op de schenkingslijst
             komen te staan.
-          other_ways_daf: Subsidies via donorfondsen — we kunnen ons EIN-nummer en
-            de subsidiegegevens doorgeven.
-          other_ways_match: Bijdragen van werkgevers — veel werkgevers verdubbelen
-            een donatie zonder extra kosten voor u.
-          other_ways_stock: Schenkingen van aandelen of cryptovaluta, waarmee vermogenswinstbelasting
-            op waardestijgingen wordt vermeden.
           other_ways_title: Andere manieren om op dit niveau te doneren
           stories_title: In de woorden van hun eigenaren
           uses_alerts_body: Het systeem voor het melden van gestolen fietsen en de
@@ -7583,7 +7574,6 @@ nl:
             registergegevens.
           uses_partners_title: Partners en onderzoeken
           uses_title: Waar gaat het geld naartoe?
-          wall_photo_alt: Een fiets teruggevonden via Bike Index
           lede_millions_registered: Bike Index is een non-profitorganisatie. Registratie
             kost niets, zoeken kost niets en het melden van diefstal kost niets —
             daarom staan er %{millions} miljoen fietsen in het register en daarom
@@ -7619,6 +7609,131 @@ nl:
           tier_plus: Plus-lidmaatschap
           tier_plus_benefit: Alles in Basic, een gratis promotiemelding als je fiets
             gestolen wordt, en een ledenlimiet.
+        major_gift:
+          benefactor: Weldoener
+          partner: Partner
+        other_ways:
+          daf: Subsidies via donorfondsen — we kunnen ons EIN-nummer en de subsidiegegevens
+            doorgeven.
+          larger_gift_link: Neem contact met ons op voor een grotere gift.
+          match: Bijdragen van werkgevers — veel werkgevers verdubbelen een donatie
+            zonder extra kosten voor u.
+          stock: Schenkingen van aandelen of cryptovaluta, waarmee vermogenswinstbelasting
+            op waardestijgingen wordt vermeden.
+        photo_wall:
+          photo_alt: Een fiets teruggevonden via Bike Index
+        ten_percent:
+          bike_value: Wat is je fiets waard?
+          heading: Heeft u een fiets teruggekregen via Bike Index? Doneer dan 10%
+            van de waarde ervan.
+          result_html: 10% is %{amount}. We hebben dat hieronder als uw gift ingesteld.
+        year_end:
+          bikebook_body: 'De wereldwijde fietsenbibliotheek: zoek, vergelijk en vind
+            je volgende fiets.'
+          bikebook_eyebrow: Jouw fietsenstalling, online.
+          bikebook_link: Bekijk een voorproefje van Bike Book
+          bikebook_title: Maak kennis met Bike Book
+          building_eyebrow: Wat er vervolgens met jouw gift wordt opgebouwd
+          building_intro: Ons doel is om van Bike Index dé online thuisbasis voor
+            jouw fiets te maken.
+          building_title: Help ons de toekomst vorm te geven
+          cta_sub: Houd het gratis voor de volgende miljoen gebruikers. Ons team dankt
+            u!
+          cta_title: Gratis vanaf dag één. Gratis voor altijd.
+          eyebrow: Donaties aan het einde van het jaar · 2026
+          form_title: Geef uw eindejaarsgift.
+          goal: Ons doel is %{goal} tegen 31 december.
+          headline: Doneer aan Bike Index aan het einde van het jaar. Zorg ervoor
+            dat er in 2027 meer gestolen fietsen worden teruggebracht.
+          headline_recovered: Je fiets is veilig thuisgekomen. Help de volgende om
+            daar te komen.
+          impact_eyebrow: Wat uw steun in 2026 heeft betekend.
+          impact_intro: Al deze apparaten werden teruggestuurd omdat iemand het serienummer
+            had gecontroleerd aan de hand van een register waarvan het gebruik gratis
+            is.
+          impact_title: Fietsen die veilig thuis zijn gekomen
+          lede_recovered_count: Bike Index is vanaf dag één gratis geweest en blijft
+            dat ook voor altijd. Dit jaar heeft het gratis register ervoor gezorgd
+            dat %{recovered} gestolen fietsen weer thuisgebracht werden. Uw eindejaarsgift
+            zorgt ervoor dat het platform blijft bestaan en financiert wat we in de
+            toekomst gaan bouwen.
+          major_eyebrow: Grote donaties
+          major_title: Grotere giften zorgen ervoor dat hele steden op de schenkingslijst
+            komen te staan.
+          marketplace_body: We blijven werken aan de uitbouw van de meest vertrouwde
+            plek om een tweedehands fiets te verkopen.
+          marketplace_eyebrow: Koop en verkoop tweedehands
+          marketplace_link: Bezoek de marktplaats
+          marketplace_title: Marktplaats
+          merch_body: Shirts, stickers en petten. Elke aankoop ondersteunt het cadeauregister.
+          merch_link: Bezoek de winkel
+          merch_title: Merchandise en meer
+          network_police: Teruggevonden fietsen worden aan hun eigenaren gekoppeld
+            in plaats van dat ze in een opslagruimte staan.
+          network_police_title: Rechtshandhaving
+          network_shops: Gereedschap dat het controleren van een serienummer bij binnenkomst
+            tot een routineprocedure maakt. Zo heeft Ted een gestolen fiets voor de
+            eigenaar bewaard.
+          network_shops_title: Fietsenwinkels
+          network_title: Een nuttiger netwerk opbouwen
+          network_universities: Campusregistratie- en inbeslagnamesystemen zorgen
+            ervoor dat de fietsen van studenten teruggebracht worden in plaats van
+            weggehaald te worden.
+          network_universities_title: Universiteiten
+          other_ways_title: Andere manieren om te geven
+          quote: "“Vier jaar later ontving ik via de berichtenservice van Bike Index
+            een e-mail dat iemand mijn fiets had gevonden en hem wilde terugbrengen.
+            Ik heb hem dit weekend opgehaald en ben ontzettend dankbaar voor de vriendelijke
+            man die hem terugbracht en voor Bike Index dat ze een platform bieden
+            waarop we met elkaar in contact kunnen komen!”"
+          quote_caption: Na vier jaar weer thuis.
+          shipped_dashboard: Je fietsen, meldingen en berichten op één plek.
+          shipped_dashboard_title: Bekijk alles op je nieuwe dashboard.
+          shipped_ebike: Bij het registreren van een e-bike wordt de klasse ervan
+            tijdens het gebruik duidelijk.
+          shipped_ebike_title: E-bike-educatie, ingebouwd in
+          shipped_eyebrow: Verzonden dit jaar
+          shipped_intro: Een snellere, gebruiksvriendelijkere fietsindex. Volledig
+            gefinancierd door donaties.
+          shipped_legality: Zoek uit waar en per categorie en in welk rechtsgebied
+            je met je e-bike mag rijden, voordat je er een koopt of ergens nieuw gaat
+            rijden.
+          shipped_legality_title: Controle op de legaliteit van e-bikes
+          shipped_messaging: Gestroomlijnde communicatiestroom voor partners die zich
+            bezighouden met het terugvinden van gestolen fietsen.
+          shipped_messaging_title: Betere berichtgeving
+          shipped_partners: Een soepeler inbeslagnameproces voor steden en campussen,
+            en aangepaste registratieprocedures voor e-bike- en direct-to-consumer-merken.
+          shipped_partners_title: Nieuwe partnerfuncties
+          shipped_registration: Minder stappen tussen het aanschaffen van een fiets
+            en de registratie ervan.
+          shipped_registration_title: Een gestroomlijnde registratieprocedure
+          shipped_title: Uw nieuwe fietsindex is hier.
+          stat_recovered: Gestolen fietsen teruggevonden in 2026
+          stat_registered: Fietsen die dit jaar geregistreerd zijn, gratis.
+          stat_value: fietsen die aan hun eigenaren zijn teruggegeven
+          stat_value_figure: "$1,5 miljoen"
+          story_country: "“Het serienummer werd opgezocht bij een fietsenwinkel in
+            Henderson, Nevada, en naar mij teruggestuurd. Swanys Cycles is een fantastische
+            fietsenwinkel en Bike Index heeft hen naar mij doorverwezen!”"
+          story_country_title: Te vinden in het hele land
+          story_magic: '"Een man uit Rosemount heeft een bod gewonnen op een verlaten
+            opslagruimte in Minneapolis. In de opslagruimte stonden meerdere fietsen.
+            De mijne was de enige die geregistreerd stond. Hij nam contact met me
+            op via Bike Index en we hebben een tijdstip afgesproken waarop ik de fiets
+            kon ophalen."'
+          story_magic_title: Een vleugje Bike Index-magie
+          story_shop: '"Ted''s Bicycle Shop in Colorado Springs heeft hem overgenomen
+            van iemand die hem daar voor onderhoud had gebracht. Ze hebben het serienummer
+            vergeleken met het nummer dat hier vermeld staat en konden hem daarom
+            voor me reserveren."'
+          story_shop_title: Ted's Fietsenwinkel, Colorado Springs
+          ten_percent_button: Bereken mijn 10%
+          ten_percent_prompt: Vertel ons wat je fiets waard is en wij bepalen het
+            cadeau.
+          ten_percent_statement: Als iedereen wiens gestolen fiets via Bike Index
+            is teruggevonden 10% van de waarde ervan zou doneren, zouden we onze basiskosten
+            voor het komende jaar kunnen dekken.
       landing_pages:
         demo_modal:
           field_message: Is er verder nog iets dat we moeten weten?
