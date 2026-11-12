@@ -47,12 +47,12 @@ RSpec.describe Pages::Org::EducationCourse::Edit::Component, type: :component do
   end
 
   context "admin" do
-    let(:education_course) { FactoryBot.create(:education_course_template, :with_pages) }
+    let(:education_course) { FactoryBot.create(:education_course_default, :with_pages) }
 
     it "counts the pages and links Add page through the admin routes" do
       render_inline(described_class.new(education_course:, admin: true))
 
-      # Admin renders its own header, which names the sequence
+      # Admin renders its own header, which names the course
       expect(page).to have_content("2 pages")
       expect(page).to_not have_content("education course")
       expect(page).to have_link("Add page", href: "/admin/education_courses/#{education_course.id}/pages/new")
@@ -61,7 +61,7 @@ RSpec.describe Pages::Org::EducationCourse::Edit::Component, type: :component do
       expect(page).to_not have_link("Preview")
     end
 
-    context "activated sequence" do
+    context "activated course" do
       let(:education_course) { FactoryBot.create(:education_course_active, :with_pages, organization:) }
 
       it "renders read-only - acknowledgments reference what it says" do

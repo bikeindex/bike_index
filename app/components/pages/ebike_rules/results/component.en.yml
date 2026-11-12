@@ -12,7 +12,7 @@ en:
           answer_optional: Optional
           answer_yes: 'Yes'
           being_compiled: Rules for this state are being compiled from primary sources.
-          bikebook_name: BikeBook
+          bike_book_name: Bike Book
           class_1_throttle: Class 1 bikes can't have a throttle
           class_3_optional_throttle_within_html: Optional throttle stops at %{mph}
             mph
@@ -26,6 +26,7 @@ en:
           class_3_throttle_within_html: Throttle stops at %{mph} mph
           class_n: Class %{n}
           class_summary: The %{name} is a Class %{n} e-bike in %{state}.
+          class_summary_manual: This e-bike is a Class %{n} e-bike in %{state}.
           class_summary_optional: The %{name} is a Class %{n} e-bike in %{state},
             and %{optional}.
           class_summary_optional_with_rules:
@@ -40,10 +41,15 @@ en:
               to check.
             other: The %{name} is a Class %{n} e-bike in %{state}, with %{count} rules
               to check.
+          class_summary_with_rules_manual:
+            one: This e-bike is a Class %{n} e-bike in %{state}, with %{count} rule
+              to check.
+            other: This e-bike is a Class %{n} e-bike in %{state}, with %{count} rules
+              to check.
           class_summary_without_throttle: The %{name} is a Class %{n} e-bike in %{state},
             without its optional throttle.
-          class_unknown_check_label: BikeBook doesn't list its class or top speed,
-            so check the class on its label
+          class_unknown_in_bike_book_label: Bike Book doesn't list its class or top
+            speed, so check the class on its label
           classes_not_permitted: It is a %{classes} e-bike, which is not permitted
           classes_not_recognized_in:
             one: Class %{n} isn't recognized in %{state}
@@ -54,11 +60,11 @@ en:
           classes_start_on: Classes take effect %{date}. Until then, check the state's
             current rules
           classified_with_rules: Classified as an e-bike, with rules to check
-          entered_unverified: Entered by you, not verified by BikeBook.
+          entered_unverified_by_bike_book: Entered by you, not verified by Bike Book.
           fails_rule: Does not meet this rule
           falls_under_name: In %{state}, it falls under %{name}.
           for_your_information: For your information
-          full_bikebook_entry: View full BikeBook entry
+          full_bike_book_entry: View full Bike Book entry
           gray_headline: We don't have %{state}'s e-bike rules on file yet.
           gray_listed_detail: >-
             The %{name} is listed as a Class %{n} e-bike. Check the %{state} DMV for
@@ -69,6 +75,7 @@ en:
           green_summary_law: The %{name} is legal to ride in %{state} under the %{law}
             rules.
           green_summary_no_classes: The %{name} is classified as an e-bike in %{state}.
+          green_summary_no_classes_manual: This is classified as an e-bike in %{state}.
           has_throttle: Has a throttle
           heading_classes_html: "%{classes} recognized"
           heading_no_power_cap: No motor power cap
@@ -139,8 +146,8 @@ en:
             mph
           speed_past_kmh_html: Assists past %{past} km/h; check that it stops by %{cap}
             km/h
-          speed_to_check_kmh_html: >-
-            BikeBook doesn't list its top speed, so check that the motor stops by
+          speed_to_check_bike_book_kmh_html: >-
+            Bike Book doesn't list its top speed, so check that the motor stops by
             %{cap} km/h
           speed_within_cap_html: Assists to %{mph} mph, within the limit
           speed_within_cap_kmh_html: Assists to %{kmh} km/h, within the limit
@@ -202,6 +209,11 @@ en:
               rule to check.
             other: >-
               The %{name} is classified as an e-bike in %{state}, with %{count} rules
+              to check.
+          yellow_summary_no_classes_manual:
+            one: This is classified as an e-bike in %{state}, with %{count} rule to
+              check.
+            other: This is classified as an e-bike in %{state}, with %{count} rules
               to check.
           yellow_summary_no_classes_without_throttle: >-
             The %{name} is classified as an e-bike in %{state}, without its optional

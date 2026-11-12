@@ -11,7 +11,7 @@ module Pages
 
             b_param = ::BParam.new(origin: "register_flow")
             render(Pages::Register::Views::Landing::Component.new(b_param:, current_user: lookbook_user,
-              flow: ::BikeServices::Register.flow(b_param, sequence: nil), stripe_prices: ::StripePrice.active_for(::Currency.default)))
+              flow: ::BikeServices::Register.flow(b_param, course: nil), stripe_prices: ::StripePrice.active_for(::Currency.default)))
           end
         end
       end

@@ -16,7 +16,7 @@ module Pages
             @form_builder.object.bullets.presence || [""]
           end
 
-          # There's no badge to name until the page belongs to a sequence
+          # There's no badge to name until the page belongs to a course
           def badge_name = @form_builder.object.education_course&.badge_name
         end
       end

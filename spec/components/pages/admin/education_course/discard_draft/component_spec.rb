@@ -13,13 +13,13 @@ RSpec.describe Pages::Admin::EducationCourse::DiscardDraft::Component, type: :co
     expect(rendered.to_html).to include("confirm('Discard this draft and its pages?")
   end
 
-  it "renders for the template's draft too" do
-    render_inline(described_class.new(education_course: FactoryBot.create(:education_course_template)))
+  it "renders for the default course's draft too" do
+    render_inline(described_class.new(education_course: FactoryBot.create(:education_course_default)))
 
     expect(page).to have_link("Discard draft")
   end
 
-  context "activated sequence" do
+  context "activated course" do
     let(:education_course) { FactoryBot.create(:education_course_active) }
 
     it "renders nothing - there's no draft to throw away" do

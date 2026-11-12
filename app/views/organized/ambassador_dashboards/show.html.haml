@@ -8,51 +8,31 @@
 
 - if @suggested_activities.present?
   = render(UI::Header::Component.new(text: t(".suggested_activities"), tag: :h2))
-  .full-screen-table
-    %table.table.table-striped.table-bordered{class: "tw:[&_td_p]:inline"}
-      %thead.small-header
-        %tr
-          %th= t(".activity")
-          %th= t(".actions")
-      %tbody
-        - @suggested_activities.each do |task|
-          %tr
-            %td
-              %strong= task.title
-              %br
-              = task.description_html.html_safe
-            %td.ambassador-toggle
-              - if task.is_a?(AmbassadorTaskAssignment)
-                = button_to_toggle_task_completion_status(task, current_user, current_organization)
+  - user = current_user
+  - organization = current_organization
+  = render(UI::Table::Base::Component.new(records: @suggested_activities, classes: "tw:[&_td_p]:inline")) do |table|
+    - table.column(label: t(".activity")) do |task|
+      %strong= task.title
+      %br
+      = task.description_html.html_safe
+    - table.column(label: t(".actions"), classes: "ambassador-toggle") do |task|
+      - if task.is_a?(AmbassadorTaskAssignment)
+        = helpers.button_to_toggle_task_completion_status(task, user, organization)
 
 - if @completed_activities.present?
   = render(UI::Header::Component.new(text: t(".completed_activities"), tag: :h2))
-  .full-screen-table
-    %table.table.table-striped.table-bordered{class: "tw:[&_td_p]:inline"}
-      %thead.small-header
-        %tr
-          %th= t(".activity")
-          %th= t(".completed")
-      %tbody
-        - @completed_activities.each do |task|
-          %tr
-            %td
-              %strong= task.title
-              %br
-              = task.description_html.html_safe
-            %td
-              %span.localizeTime= l task.completed_at, format: :convert_time
+  = render(UI::Table::Base::Component.new(records: @completed_activities, classes: "tw:[&_td_p]:inline")) do |table|
+    - table.column(label: t(".activity")) do |task|
+      %strong= task.title
+      %br
+      = task.description_html.html_safe
+    - table.column(label: t(".completed")) do |task|
+      = render(UI::Time::Component.new(time: task.completed_at))
 
 
 = render(UI::Header::Component.new(text: t(".leaderboard"), tag: :h2))
-.full-screen-table
-  %table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border
-    %thead.small-header
-      %tr
-        %th= t(".name")
-        %th= t(".activities")
-    %tbody
-      - @ambassadors.each do |ambassador|
-        %tr
-          %td= ambassador.name
-          %td= ambassador.progress_count
+= render(UI::Table::Base::Component.new(records: @ambassadors)) do |table|
+  - table.column(label: t(".name")) do |ambassador|
+    = ambassador.name
+  - table.column(label: t(".activities")) do |ambassador|
+    = number_display(ambassador.progress_count)

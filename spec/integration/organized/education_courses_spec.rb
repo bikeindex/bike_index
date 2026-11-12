@@ -9,20 +9,20 @@ RSpec.describe "Organized education courses", :js, type: :system do
   let(:user) { FactoryBot.create(:organization_admin, organization:) }
 
   before do
-    # Org drafts are cloned from the global template seeded here
-    load Rails.root.join("db/seeds/seed_education_course_template.rb").to_s
+    # Org drafts are cloned from the default course seeded here
+    load Rails.root.join("db/seeds/seed_education_course_default.rb").to_s
     sign_in(user)
   end
 
-  it "builds a draft from the template, edits a page and the sequence, then deletes the page" do
+  it "builds a draft from the default course, edits a page and the course, then deletes the page" do
     visit "/o/#{organization.to_param}/education_courses"
 
-    # Build the draft (cloned from the seeded template) and open the management view
+    # Build the draft (cloned from the seeded default course) and open the management view
     click_button "Create a course"
     expect(page).to have_content("Draft education course")
-    expect(page).to have_content("Batteries & charging") # cloned from the template
+    expect(page).to have_content("Batteries & charging") # cloned from the default course
 
-    # --- Edit the sequence: add a page. Done before the page edit so the success flash from a
+    # --- Edit the course: add a page. Done before the page edit so the success flash from a
     # save isn't covering the "+ Add page" header link. ---
     click_link "Add page"
     expect(page).to have_css("lexxy-editor lexxy-toolbar", wait: 10) # editors upgrade lazily
@@ -71,7 +71,7 @@ RSpec.describe "Organized education courses", :js, type: :system do
     expect(edited.subtitle).to eq "Charge safely on campus"
     expect(edited.body).to include("reviewed 2026")
     expect(edited.image).to be_attached
-    expect(draft.education_course_pages.pluck(:title)).to include("Campus-specific rules")
+    expect(draft.education_course_pages.pluck(:title)).to include("Batteries & charging")
 
     # A Turbo DELETE gated by an onclick -- dismissing has to stop Turbo too
     pages_before = draft.education_course_pages.count
@@ -117,7 +117,7 @@ RSpec.describe "Organized education courses", :js, type: :system do
     expect(page).to have_css("lexxy-editor lexxy-toolbar", wait: 10) # editors upgrade lazily
 
     initial = all("[data-bullet-editors-target='item']", visible: :all).count
-    expect(initial).to be > 1 # the cloned template page ships several bullets
+    expect(initial).to be > 1 # the cloned default page ships several bullets
 
     click_button "+ Add bullet"
 

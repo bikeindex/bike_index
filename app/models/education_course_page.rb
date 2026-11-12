@@ -19,7 +19,7 @@
 #  index_education_course_pages_on_education_course_id  (education_course_id)
 #
 class EducationCoursePage < ApplicationRecord
-  # with_deleted: a soft-deleted sequence keeps its pages, so they can still be read
+  # with_deleted: a soft-deleted course keeps its pages, so they can still be read
   # through it - and the guard below needs to see that it was activated
   belongs_to :education_course, -> { with_deleted }, inverse_of: :education_course_pages
 
@@ -54,12 +54,12 @@ class EducationCoursePage < ApplicationRecord
 
   private
 
-  # An acknowledgment means every page of its sequence, so activation freezes the set as
+  # An acknowledgment means every page of its course, so activation freezes the set as
   # well as each page - adding one later would rewrite what past registrants agreed to.
   # The cascade from a destroyed organization still goes through.
   def prevent_activated_change
     return unless education_course&.activated?
-    # A sequence saved together with its pages is fine - nothing can have acknowledged
+    # A course saved together with its pages is fine - nothing can have acknowledged
     # it yet. What's blocked is changing the pages of one that already existed.
     return if new_record? && education_course.previously_new_record?
 
@@ -67,7 +67,7 @@ class EducationCoursePage < ApplicationRecord
     throw :abort
   end
 
-  # Appended to the end; reordering is done by drag-and-drop on the sequence show page
+  # Appended to the end; reordering is done by drag-and-drop on the course show page
   def set_listing_order
     self.listing_order ||= (education_course&.education_course_pages&.maximum(:listing_order) || -1) + 1
   end

@@ -15,23 +15,23 @@
 #
 # Indexes
 #
-#  index_education_courses_on_deleted_at        (deleted_at)
-#  index_education_courses_on_organization_id   (organization_id)
-#  index_education_courses_one_active_per_org   (organization_id) UNIQUE WHERE ((start_at IS NOT NULL) AND (end_at IS NULL) AND (deleted_at IS NULL))
-#  index_education_courses_one_active_template  (((organization_id IS NULL))) UNIQUE WHERE ((organization_id IS NULL) AND (start_at IS NOT NULL) AND (end_at IS NULL) AND (deleted_at IS NULL))
-#  index_education_courses_one_draft_per_org    (organization_id) UNIQUE WHERE ((start_at IS NULL) AND (organization_id IS NOT NULL) AND (deleted_at IS NULL))
-#  index_education_courses_one_draft_template   (((organization_id IS NULL))) UNIQUE WHERE ((organization_id IS NULL) AND (start_at IS NULL) AND (deleted_at IS NULL))
+#  index_education_courses_on_deleted_at       (deleted_at)
+#  index_education_courses_on_organization_id  (organization_id)
+#  index_education_courses_one_active_default  (((organization_id IS NULL))) UNIQUE WHERE ((organization_id IS NULL) AND (start_at IS NOT NULL) AND (end_at IS NULL) AND (deleted_at IS NULL))
+#  index_education_courses_one_active_per_org  (organization_id) UNIQUE WHERE ((start_at IS NOT NULL) AND (end_at IS NULL) AND (deleted_at IS NULL))
+#  index_education_courses_one_draft_default   (((organization_id IS NULL))) UNIQUE WHERE ((organization_id IS NULL) AND (start_at IS NULL) AND (deleted_at IS NULL))
+#  index_education_courses_one_draft_per_org   (organization_id) UNIQUE WHERE ((start_at IS NULL) AND (organization_id IS NOT NULL) AND (deleted_at IS NULL))
 #
 class EducationCourse < ApplicationRecord
   acts_as_paranoid
 
-  # The admin index's filters. "template" is which sequence rather than which status - a
-  # template is drafted, activated and archived like an organization's
-  STATUS_SCOPES = {"draft" => :draft, "active" => :active, "archived" => :archived, "template" => :templates}.freeze
+  # The admin index's filters. "default" is which course rather than which status - the
+  # default course is drafted, activated and archived like an organization's
+  STATUS_SCOPES = {"draft" => :draft, "active" => :active, "archived" => :archived, "default" => :defaults}.freeze
   STATUSES = STATUS_SCOPES.keys.freeze
   COPIED_PAGE_ATTRS = %w[title heading subtitle body listing_order organization_specific].freeze
-  # Follows "I, <registrant's name>," on the flow's final acknowledgment. Seeded onto the
-  # template, so an organization edits its own copy
+  # Follows "I, <registrant's name>," on the flow's final acknowledgment, for a course
+  # without its own text
   DEFAULT_ACKNOWLEDGMENT_TEXT = "have read, understood, and agree to comply with all of the " \
     "e-vehicle safety rules above as a condition of registering my vehicle. I understand that " \
     "failure to comply may result in revocation of my registration and/or disciplinary action."
@@ -52,23 +52,23 @@ class EducationCourse < ApplicationRecord
   before_update :prevent_activated_change
   after_commit :enqueue_after_change_job
 
-  scope :templates, -> { where(organization_id: nil) }
+  scope :defaults, -> { where(organization_id: nil) }
   # Everything activation hasn't frozen
   scope :draft, -> { where(start_at: nil) }
   scope :active, -> { where.not(start_at: nil).where(end_at: nil) }
   scope :archived, -> { where.not(start_at: nil).where.not(end_at: nil) }
 
   class << self
-    # The template belongs to no organization, so nil is its owner in every lookup here
-    def active_template = active_for(nil)
+    # The default course belongs to no organization, so nil is its owner in every lookup here
+    def active_default = active_for(nil)
 
     def active_for(organization)
       active.find_by(organization:)
     end
 
     # What a draft is cloned from, and what the registration flow shows: the owner's live
-    # sequence, falling back to the template every organization starts from
-    def active_or_template_for(organization) = active_for(organization) || active_template
+    # course, falling back to the default every organization starts from
+    def active_or_default_for(organization) = active_for(organization) || active_default
 
     # The draft as it stands - draft_for opens one when there isn't one
     def existing_draft_for(organization) = draft.find_by(organization:)
@@ -88,11 +88,11 @@ class EducationCourse < ApplicationRecord
 
     private
 
-    # Start the draft from what's live so an edit tweaks the current sequence rather than
-    # discarding the organization's customizations. Nothing sits above the template, so its
+    # Start the draft from what's live so an edit tweaks the current course rather than
+    # discarding the organization's customizations. Nothing sits above the default, so its
     # very first draft starts empty.
     def build_draft_for(organization)
-      source = active_or_template_for(organization)
+      source = active_or_default_for(organization)
       transaction do
         draft = create!(organization:, faq_url: source&.faq_url, acknowledgment_text: source&.acknowledgment_text)
         source&.education_course_pages&.each do |source_page|
@@ -104,7 +104,7 @@ class EducationCourse < ApplicationRecord
     end
 
     # Duplicate into a new blob; attaching the source blob directly would share it,
-    # so purging either record's image (page/sequence/org destroy) would break the other.
+    # so purging either record's image (page/course/org destroy) would break the other.
     def copy_image(source, target)
       blob = source.blob
       target.attach(io: StringIO.new(blob.download), filename: blob.filename, content_type: blob.content_type)
@@ -113,7 +113,7 @@ class EducationCourse < ApplicationRecord
 
   def acknowledgment = acknowledgment_text.presence || DEFAULT_ACKNOWLEDGMENT_TEXT
 
-  def template? = organization_id.blank?
+  def default? = organization_id.blank?
 
   def draft? = start_at.blank?
 
@@ -130,14 +130,14 @@ class EducationCourse < ApplicationRecord
 
   def status_display = STATUS_DISPLAY[status]
 
-  # Which sequence this is, e.g. "Brakebills Current" or "Template Draft"
+  # Which course this is, e.g. "Brakebills Current" or "Default Draft"
   def display_name = "#{badge_name} #{status_display}"
 
-  # Who this sequence belongs to - badges an organization-specific page, and names the
-  # sequence in display_name
-  def badge_name = organization&.short_name || "Template"
+  # Who this course belongs to - badges an organization-specific page, and names the
+  # course in display_name
+  def badge_name = organization&.short_name || "Default"
 
-  # Activation freezes the sequence and its pages. Acknowledgments reference them by id, so
+  # Activation freezes the course and its pages. Acknowledgments reference them by id, so
   # what a registrant agreed to has to keep saying the same thing - a change belongs in a
   # new draft, which activating supersedes this with.
   def activated? = !draft?
@@ -163,7 +163,7 @@ class EducationCourse < ApplicationRecord
     end
   end
 
-  # Throw an unactivated draft away entirely, pages and all. Unlike an archived sequence,
+  # Throw an unactivated draft away entirely, pages and all. Unlike an archived course,
   # nothing has acknowledged it, so there's nothing to preserve.
   def discard_draft!
     return false if activated?
@@ -185,8 +185,7 @@ class EducationCourse < ApplicationRecord
     throw :abort
   end
 
-  # The register flow only reads an organization's own sequence, never the template
   def enqueue_after_change_job
-    CallbackJobs::AfterEducationCourseChangeJob.perform_async(id) unless template?
+    CallbackJobs::AfterEducationCourseChangeJob.perform_async(id)
   end
 end

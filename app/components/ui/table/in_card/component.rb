@@ -43,8 +43,8 @@ module UI
           "tw:data-scrolled-end:after:hidden tw:table-bleed:after:hidden"
 
         # column_settings: UI::Table::ColumnSettings' columns, defaults and narrow_hidden, plus its storage_key.
-        # form: form_with's options, making the card a form whose actions apply to the rows checked in
-        # selection_column. data: the outermost element's, its controllers and actions joining these.
+        # form: form_with's options, making the card a form whose actions apply to - and show once there are -
+        # rows checked in selection_column. data: the outermost element's, its controllers and actions joining these.
         # The rest go to UI::Table::Base
         def initialize(column_settings: nil, form: nil, data: {}, **table_options)
           @column_settings = column_settings

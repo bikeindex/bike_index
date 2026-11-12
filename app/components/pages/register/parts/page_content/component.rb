@@ -20,18 +20,18 @@ module Pages
 
           private
 
-          def sequence
+          def course
             @page.education_course
           end
 
-          # What the editor promised - "Template" when admin previews the template
+          # What the editor promised
           def badge_name
-            sequence&.badge_name
+            course&.badge_name
           end
 
-          # The template's rules are Bike Index's
+          # The default course's rules are Bike Index's
           def set_by_name
-            sequence&.organization&.name || translation(".bike_index")
+            course&.organization&.name || translation(".bike_index")
           end
 
           def checkbox_name(index)

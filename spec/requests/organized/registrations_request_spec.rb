@@ -455,7 +455,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         assigns(:bikes).map(&:id)
       end
 
-      it "sorts by when this organization's sequence was acknowledged, a register flow bike once its rules are agreed to" do
+      it "sorts by when this organization's course was acknowledged, a register flow bike once its rules are agreed to" do
         expect(sorted_bike_ids("desc")).to eq([bike.id, bike_acknowledged_later.id, bike_acknowledged_earlier.id])
         expect(sorted_bike_ids("asc")).to eq([bike_acknowledged_earlier.id, bike_acknowledged_later.id, bike.id])
 
@@ -684,7 +684,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
     end
 
     context "both steps on one page" do
-      let!(:sequence) { FactoryBot.create(:education_course_active, :with_pages, organization: current_organization) }
+      let!(:course) { FactoryBot.create(:education_course_active, :with_pages, organization: current_organization) }
       let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Trek") }
       let(:color) { FactoryBot.create(:color, name: "Red") }
 
@@ -719,7 +719,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         expect(JSON.parse(submit_label["data-motorized-own-emails"])).to include current_user.email
       end
 
-      # The submission is what makes it an e-vehicle, so the sequence isn't knowable
+      # The submission is what makes it an e-vehicle, so the course isn't knowable
       # until it's saved - and nothing after this post resolves it again
       it "stops at the safety pages, which the submission is what asks for, then goes back for the next" do
         b_param = nil
@@ -728,10 +728,10 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: "3")
 
         %w[3 4].each do |step|
-          patch acknowledge_register_path, params: {b_param_token: b_param.id_token, education_course_id: sequence.id,
+          patch acknowledge_register_path, params: {b_param_token: b_param.id_token, education_course_id: course.id,
                                                     step:, acknowledged: {"0" => "1", "1" => "1"}}
         end
-        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, education_course_id: sequence.id,
+        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, education_course_id: course.id,
                                                   step: "review", acknowledged_all: "1"}
         expect(response).to redirect_to "#{base_url}/new"
         expect(flash[:success]).to eq "The Trek is registered - we've emailed customer@example.com so they can claim it."
@@ -758,7 +758,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
     end
 
     context "the registrant fills out the attestation separately" do
-      let!(:sequence) { FactoryBot.create(:education_course_active, :with_pages, organization: current_organization) }
+      let!(:course) { FactoryBot.create(:education_course_active, :with_pages, organization: current_organization) }
       let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Trek") }
       let(:color) { FactoryBot.create(:color, name: "Red") }
       let(:owner_email) { "customer@example.com" }
@@ -801,11 +801,11 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         get "/register", params: {b_param_token: b_param.id_token}
         expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: "3")
         %w[3 4].each do |step|
-          patch acknowledge_register_path, params: {b_param_token: b_param.id_token, education_course_id: sequence.id,
+          patch acknowledge_register_path, params: {b_param_token: b_param.id_token, education_course_id: course.id,
                                                     step:, acknowledged: {"0" => "1", "1" => "1"}}
         end
         expect {
-          patch acknowledge_register_path, params: {b_param_token: b_param.id_token, education_course_id: sequence.id,
+          patch acknowledge_register_path, params: {b_param_token: b_param.id_token, education_course_id: course.id,
                                                     step: "review", acknowledged_all: "1"}
         }.to change(EducationCourseAcknowledgment.acknowledged, :count).by 1
         expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: "finished")
@@ -886,7 +886,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
 
       context "registering for another organization" do
         let(:other_organization) { FactoryBot.create(:organization) }
-        let!(:other_sequence) { FactoryBot.create(:education_course_active, :with_pages, organization: other_organization) }
+        let!(:other_course) { FactoryBot.create(:education_course_active, :with_pages, organization: other_organization) }
 
         it "asks for its attestation - the switch is this organization's" do
           post "#{base_url}/switches", params: {separate_attestation: true}

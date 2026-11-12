@@ -13,19 +13,19 @@
       <%# Full bleed drops the card's gutter, so the header meets the page's %>
       <div
         class="
-          tw:flex tw:flex-wrap tw:items-center tw:justify-end tw:gap-x-4
-          tw:gap-y-2 tw:px-4 tw:py-3 tw:table-bleed:px-0
+          tw:flex tw:flex-wrap tw:items-baseline-last tw:justify-end
+          tw:gap-x-4 tw:gap-y-2 tw:px-4 tw:py-3 tw:table-bleed:px-0
         "
       >
         <% if description? %>
           <p class="tw:m-0 tw:text-xs tw:text-gray-500"><%= description %></p>
         <% end %>
 
-        <div class="tw:ml-auto tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+        <div class="tw:ml-auto tw:flex tw:flex-wrap tw:items-baseline-last tw:gap-2">
           <% if actions? %>
-            <div class="tw:flex tw:flex-wrap tw:items-end tw:gap-2">
-              <%= actions %>
-            </div>
+            <%# Unwrapped and unshrunk, or they'd reflow at every width collapse_utils animates through %>
+            <%= tag.div(actions, class: token_list("tw:flex tw:flex-wrap tw:items-baseline-last tw:gap-2 tw:sm:flex-nowrap tw:sm:*:shrink-0", "tw:hidden!": @form),
+              data: ({table_multi_checkbox_target: "whenChecked"} if @form)) %>
           <% end %>
 
           <%= render(UI::Collapse::Component.new(text: "Column settings", chevron: :trailing, size: :sm)) %>

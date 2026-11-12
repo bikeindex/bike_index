@@ -3,7 +3,7 @@
 module Pages
   module EbikeRules
     module LawDetails
-      # A state law's restrictions, under a heading for each of its rule_groups, and its sources, as BikeBook records them
+      # A state law's restrictions, under a heading for each of its rule_groups, and its sources, as Bike Book records them
       class Component < ApplicationComponent
         def initialize(law:)
           @law = law

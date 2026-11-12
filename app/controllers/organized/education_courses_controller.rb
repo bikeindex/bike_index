@@ -20,7 +20,7 @@ module Organized
       @preview_pagy = Pagy::Offset.new(count: screen_count, limit: 1, page: permitted_page(max: screen_count))
     end
 
-    # Manage the draft's pages (add / reorder / edit) and its sequence-wide settings
+    # Manage the draft's pages (add / reorder / edit) and its course-wide settings
     def edit
       @education_course = find_draft
     end
@@ -37,13 +37,13 @@ module Organized
       end
     end
 
-    # Opens the draft the org manages, cloning the live sequence (or the template) on first edit
+    # Opens the draft the org manages, cloning the live course (or the default) on first edit
     def create
       draft = EducationCourse.draft_for(current_organization)
       redirect_to edit_organization_education_course_path(organization_id: current_organization.to_param, id: draft.id)
     end
 
-    # Throw the draft away to start over; the live sequence is untouched
+    # Throw the draft away to start over; the live course is untouched
     def destroy
       find_draft.discard_draft!
       flash[:success] = "Draft discarded"
