@@ -97,10 +97,11 @@ export default class extends Controller {
     const watts = this.element.elements.watts
     if (!watts.checkValidity()) return watts.reportValidity()
 
-    const combobox = this.comboboxSlotTarget.querySelector('.hw-combobox')
-    if (this.#mode === 'model' && combobox) {
+    if (this.#mode === 'model') {
       this.#setMode('manual')
-      clearCombobox(combobox)
+      // without the catalog there's no combobox, nor its cleared field to hear
+      const combobox = this.comboboxSlotTarget.querySelector('.hw-combobox')
+      combobox ? clearCombobox(combobox) : this.#clearModel()
     }
     this.#check()
   }
