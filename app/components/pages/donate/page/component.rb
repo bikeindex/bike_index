@@ -6,8 +6,6 @@ module Pages
       # The major gift cards and the closing CTA sit outside Pages::Donate::Form, so the
       # donate--page controller reaches its donate--form controller through window events
       class Component < ApplicationComponent
-        MAJOR_AMOUNTS = [500, 1000].freeze
-
         # Hand-picked recovery story photos that show the whole bike - the newest story
         # photos are as often a serial sticker or a selfie
         WALL_PHOTOS = %w[
@@ -26,10 +24,6 @@ module Pages
         private
 
         def bikes_millions = @bikes_millions ||= Counts.in_millions(Counts.total_bikes)
-
-        def major_gifts
-          MAJOR_AMOUNTS.zip([translation(".major_partner"), translation(".major_benefactor")])
-        end
 
         def money_uses
           [{icon: "icons/lucide-search.svg", circle: "tw:bg-blue-600",

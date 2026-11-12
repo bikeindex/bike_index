@@ -77,7 +77,7 @@ RSpec.describe Pages::Donate::Form::Component, type: :component do
 
   context "with campaign options" do
     let(:options) do
-      {stripe_prices:, initial_amount:, current_user:, amounts: [50, 100, 250], default_amount: 100,
+      {stripe_prices:, initial_amount:, current_user:, amounts: [50, 100, 250],
        default_cadence: :one_time, ten_percent: :closed}
     end
 

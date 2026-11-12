@@ -17,12 +17,10 @@ en:
           lede_short: >-
             Bike Index is a nonprofit. Registration, search, and theft reports cost
             nothing. Donations are what keep it that way.
-          major_benefactor: Benefactor
           major_body: >-
             Gifts at this level go toward partner onboarding, cross-border theft investigations,
             and the engineering behind promoted alerts.
           major_eyebrow: Major giving
-          major_partner: Partner
           major_title: Larger gifts move whole cities onto the registry
           millions_registered_no_owner_paid: "%{millions} million bikes are registered.
             Not one owner paid to be there."

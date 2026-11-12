@@ -74,8 +74,8 @@
           tw:md:flex-wrap tw:lg:flex-nowrap
         "
       >
-        <% major_gifts.each do |amount, label| %>
-          <%= render(Pages::Donate::MajorGift::Component.new(amount:, label:, display: @form.money(amount), active: amount == @form.custom_amount, html_class: "tw:md:flex-1 tw:lg:w-59 tw:lg:flex-none",
+        <% Pages::Donate::MajorGift::Component::AMOUNTS.each do |amount| %>
+          <%= render(Pages::Donate::MajorGift::Component.new(amount:, display: @form.money(amount), active: amount == @form.custom_amount, html_class: "tw:md:flex-1 tw:lg:w-59 tw:lg:flex-none",
             href: donate_path(initial_amount: amount, source: @referral_source, anchor: "donate-form"))) %>
         <% end %>
 

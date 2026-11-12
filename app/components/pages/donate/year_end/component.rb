@@ -7,27 +7,19 @@ module Pages
       # presets; its source - the email's own, so each is told apart - names the audience. A source containing
       # "recovered" gets the recovered-bike headline and the 10% helper open.
       class Component < ApplicationComponent
-        # The form is the same one /donate submits, so this changes only what it offers
-        AMOUNTS = [50, 100, 250].freeze
-        DEFAULT_AMOUNT = 100
         GOAL = 20_000
-        MAJOR_AMOUNTS = [500, 1000].freeze
         REFERRAL_SOURCE = "eoy-2026"
 
         def initialize(stripe_prices:, initial_amount: nil, referral_source: nil, current_user: nil)
           @referral_source = referral_source.presence || REFERRAL_SOURCE
           @recovered = @referral_source.match?(/recovered/i)
           @form = Pages::Donate::Form::Component.new(stripe_prices:, initial_amount:, current_user:, referral_source: @referral_source,
-            amounts: AMOUNTS, default_amount: DEFAULT_AMOUNT, default_cadence: :one_time, ten_percent: @recovered ? :open : :closed)
+            amounts: [50, 100, 250], default_cadence: :one_time, ten_percent: @recovered ? :open : :closed)
         end
 
         private
 
         def photos = Pages::Donate::Page::Component::WALL_PHOTOS
-
-        def major_gifts
-          MAJOR_AMOUNTS.zip([translation(".major_partner"), translation(".major_benefactor")])
-        end
 
         def stats
           [[translation(".stat_recovered_figure"), translation(".stat_recovered")],
@@ -42,17 +34,17 @@ module Pages
         end
 
         def shipped
-          [{icon: "icons/lucide-clipboard-check.svg", circle: "tw:bg-blue-600", title: translation(".shipped_registration_title"), body: translation(".shipped_registration")},
-            {icon: "icons/lucide-zap.svg", circle: "tw:bg-purple-500", title: translation(".shipped_ebike_title"), body: translation(".shipped_ebike")},
-            {icon: "icons/lucide-map-pin-check.svg", circle: "tw:bg-slate-900 tw:dark:bg-slate-600", title: translation(".shipped_legality_title"), body: translation(".shipped_legality")},
-            {icon: "icons/lucide-message-circle.svg", circle: "tw:bg-blue-500", title: translation(".shipped_messaging_title"), body: translation(".shipped_messaging")},
+          [{icon: "icons/clipboard.svg", circle: "tw:bg-blue-600", title: translation(".shipped_registration_title"), body: translation(".shipped_registration")},
+            {icon: "icons/bolt.svg", circle: "tw:bg-purple-500", title: translation(".shipped_ebike_title"), body: translation(".shipped_ebike")},
+            {icon: "icons/map-pin.svg", circle: "tw:bg-slate-900 tw:dark:bg-slate-600", title: translation(".shipped_legality_title"), body: translation(".shipped_legality")},
+            {icon: "icons/chat.svg", circle: "tw:bg-blue-500", title: translation(".shipped_messaging_title"), body: translation(".shipped_messaging")},
             {icon: "icons/lucide-layout-dashboard.svg", circle: "tw:bg-blue-600", title: translation(".shipped_dashboard_title"), body: translation(".shipped_dashboard")},
             {icon: "icons/lucide-handshake.svg", circle: "tw:bg-purple-500", title: translation(".shipped_partners_title"), body: translation(".shipped_partners")}]
         end
 
         # position: where the screenshot's results start, so the card's short window shows bikes rather than the header
         def building
-          [{image: "donate/year-end-bikebook.png", alt: translation(".bikebook_image_alt"), position: "tw:object-[center_83%]",
+          [{image: "donate/year-end-bikebook.webp", alt: translation(".bikebook_image_alt"), position: "tw:object-[center_83%]",
             eyebrow: translation(".bikebook_eyebrow"), title: translation(".bikebook_title"),
             body: translation(".bikebook_body"), link_text: translation(".bikebook_link"), href: bikebook_path},
             {image: "donate/year-end-marketplace.webp", alt: translation(".marketplace_image_alt"), position: "tw:object-[center_89%]",

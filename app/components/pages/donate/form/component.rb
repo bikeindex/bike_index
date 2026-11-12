@@ -8,14 +8,13 @@ module Pages
       # without javascript - the donate--form controller only keeps the labels in step.
       class Component < ApplicationComponent
         ONE_TIME_AMOUNTS = [25, 50, 100].freeze
-        # PaymentsController refuses anything over 99,999,999 cents
-        MAX_AMOUNT = 999_999.99
+        MAX_AMOUNT = Payment::MAX_AMOUNT_CENTS / 100.0
 
-        # amounts/default_amount: the one-time presets, and the one selected without an initial_amount
+        # amounts: the one-time presets, the middle one selected without an initial_amount
         # default_cadence: :monthly or :one_time, whichever tab leads and is selected first
         # ten_percent: :open or :closed adds the helper that fills the other amount from a bike's value
         def initialize(stripe_prices:, initial_amount: nil, referral_source: nil, current_user: nil,
-          amounts: ONE_TIME_AMOUNTS, default_amount: 50, default_cadence: :monthly, ten_percent: nil)
+          amounts: ONE_TIME_AMOUNTS, default_cadence: :monthly, ten_percent: nil)
           @currency = stripe_prices.first&.currency_obj || Currency.default
           @monthly_prices = stripe_prices.select(&:monthly?).to_h do
             [it.membership_level.to_sym, MoneyFormatter.money_format_no_cents_if_whole(it.amount_cents, @currency.slug)]
@@ -23,7 +22,6 @@ module Pages
           @initial_amount = initial_amount.to_i if initial_amount.to_i.between?(1, MAX_AMOUNT)
           @referral_source = referral_source
           @amounts = amounts
-          @default_amount = default_amount
           @default_cadence = default_cadence
           @ten_percent = ten_percent
           @email = current_user&.email
@@ -48,7 +46,7 @@ module Pages
 
         def one_time? = !monthly? || @initial_amount.present? || @default_cadence == :one_time
 
-        def selected_one_time = @initial_amount || @default_amount
+        def selected_one_time = @initial_amount || @amounts[1]
 
         def tier_amount(level) = @monthly_prices[level]
 
