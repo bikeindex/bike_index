@@ -4570,6 +4570,7 @@ it:
         sent: Inviato
         through_org: attraverso %{org_name}
         vehicle_type: Tipo
+        step: Fare un passo
       recoveries:
         description: Descrizione
         mfg_model_color_html: produttore, modello, <span class="less-strong">colore</span>
@@ -5688,6 +5689,14 @@ it:
       recovery_display_card:
         recovered: Riparato
         translated_from_english: tradotto dall'inglese
+      registration_step:
+        awaiting_email_confirmation: In attesa di conferma via email
+        education_page: Pagina didattica %{number}
+        education_review: revisione della remunerazione
+        finished: Finito
+        report: Rapporto
+        step_1: Passo 1
+        step_2: Passo 2
     pages:
       messages:
         thread_show:
@@ -6276,6 +6285,12 @@ it:
               link nel campo sottostante.
           share:
             link_copied: Link copiato
+          potential_duplicates:
+            count_html: "%{count} trovato"
+            matching_segments: 'Registrazioni con un numero di serie corrispondente
+              ai segmenti di questo %{bike_type}:'
+            potential_duplicates: Potenziali duplicati
+            showing_recent: Mostrando il %{count} più recente
       search:
         everything_combobox:
           made_by: realizzato da
