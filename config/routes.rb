@@ -68,7 +68,9 @@ Rails.application.routes.draw do
   end
   get "ebike-rules", to: "ebike_rules#show", as: :ebike_rules
   get "ebike-rules/:country(/:region)", to: "ebike_rules#show", as: :ebike_rules_place, constraints: {country: /[a-z]{2}/i, region: /[a-z0-9]{1,3}/i}
-  get "e-bike-rules(/*rest)", to: redirect { |_, request| request.fullpath.sub("/e-bike-rules", "/ebike-rules") }
+  %w[e-bike-rules ebike_rules].each do |path|
+    get "#{path}(/*rest)", to: redirect { |_, request| request.fullpath.sub("/#{path}", "/ebike-rules") }
+  end
   get "marketplace/how-it-works", to: "marketplace#how_it_works", as: :marketplace_how_it_works
 
   resource :session, only: %i[new create destroy] do

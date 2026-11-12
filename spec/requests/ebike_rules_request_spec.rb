@@ -297,6 +297,12 @@ RSpec.describe EbikeRulesController, type: :request do
       get "/ebike-rules/ca/nb"
       expect(response).to redirect_to("/ebike-rules/CA/NB")
 
+      get "/ebike_rules/US/CO?vehicle_models=m/specialized/2025/haul_st"
+      expect(response).to redirect_to("/ebike-rules/US/CO?vehicle_models=m/specialized/2025/haul_st")
+
+      get "/e-bike-rules"
+      expect(response).to redirect_to("/ebike-rules")
+
       get "/ebike-rules/CA"
       expect(response).to have_http_status(:ok)
 
