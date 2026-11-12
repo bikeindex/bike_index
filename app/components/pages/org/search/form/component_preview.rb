@@ -12,9 +12,13 @@ module Pages
             registrations_search(search_all: false)
           end
 
-          # The impound records, graduated notifications and parking notifications searches
+          # The impound records and graduated notifications searches
           def default
             render(Pages::Org::Search::Form::Component.new(**default_options))
+          end
+
+          def parking_notifications
+            render(Pages::Org::Search::Form::Component.new(**default_options, notes_placeholder: "Search notification message/notes"))
           end
 
           def searching_all_registrations

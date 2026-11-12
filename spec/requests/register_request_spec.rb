@@ -1899,7 +1899,7 @@ RSpec.describe RegisterController, type: :request do
           params: {bike: {owner_email:, manufacturer_id: "Trek", cycle_type: "e-scooter"}}.as_json)
       end
 
-      it "walks the organization's rules instead" do
+      it "asks step 2 again, filled in, then walks the organization's rules instead" do
         patch base_url, params: {b_param_token: b_param.id_token,
                                  bike: {primary_frame_color_id: color.id, serial_number: "XYZ 123",
                                         status: "status_with_owner", user_name: "Sally Rider"}}
@@ -1914,9 +1914,15 @@ RSpec.describe RegisterController, type: :request do
         expect(EducationCourseAcknowledgment.acknowledged.pluck(:education_course_id)).to eq([default_course.id])
 
         get register_path(b_param_token: b_param.id_token, organization_id: organization.to_param)
-        expect(response).to redirect_to step_path("3")
+        expect(response).to redirect_to step_path("2")
         expect(b_param.reload.creation_organization_id).to eq organization.id
         expect(EducationCourseAcknowledgment.count).to eq 0
+        get step_path("2")
+        expect(response.body).to include "XYZ 123"
+        expect(response.body).to include "Sally Rider"
+
+        patch base_url, params: {b_param_token: b_param.id_token, bike: {user_name: "Sally Rider"}}
+        expect(response).to redirect_to step_path("3")
         patch acknowledge_register_path, params: {b_param_token: b_param.id_token, education_course_id: course.id, step: "3",
                                                   acknowledged: course.education_course_pages.first.bullets.each_index.to_h { [it.to_s, "1"] }}
         expect(response).to redirect_to step_path("4")
