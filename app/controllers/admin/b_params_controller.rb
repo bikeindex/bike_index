@@ -32,6 +32,8 @@ module Admin
       else
         @search_completeness = "all"
       end
+      @education_course_in_progress = Binxtils::InputNormalizer.boolean(params[:search_education_course_in_progress])
+      matching_b_params = matching_b_params.education_course_in_progress if @education_course_in_progress
       matching_b_params = matching_b_params.where(organization_id: current_organization.id) if params[:organization_id].present?
       matching_b_params = matching_b_params.email_search(params[:query]) if params[:query].present?
       matching_b_params.where(created_at: @time_range)

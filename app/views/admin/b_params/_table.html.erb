@@ -1,4 +1,4 @@
-<%# locals: (collection:, render_sortable: true) %>
+<%# locals: (collection:, render_sortable: true, show_data: false) %>
 
 <% render_search = params[:organization_id].blank? %>
 
@@ -27,6 +27,13 @@
     <% end %>
   <% end %>
 
+  <% table.column(label: "Step", classes: "tw:text-xs") do |b_param| %>
+    <% step = BikeServices::Register.current_step(b_param) %>
+    <% page_index = BikeServices::Register.page_index_for_step(step.to_s) %>
+
+    <%= page_index.negative? ? step : "rules page #{page_index + 1}" %>
+  <% end %>
+
   <% table.column(sortable: "origin", classes: "tw:text-xs") do |b_param| %>
     <%= render(Atoms::Org::OriginDisplay::Component.new(creation_kind: b_param.origin)) %>
   <% end %>
@@ -43,7 +50,9 @@
     <% end %>
   <% end %>
 
-  <% table.column(label: "Data") do |b_param| %>
-    <%= render UI::Code::Json::Component.new(data: b_param.params, small: true, max_width: :table_cell) %>
+  <% if show_data %>
+    <% table.column(label: "Data") do |b_param| %>
+      <%= render UI::Code::Json::Component.new(data: b_param.params, small: true, max_width: :table_cell) %>
+    <% end %>
   <% end %>
 <% end %>

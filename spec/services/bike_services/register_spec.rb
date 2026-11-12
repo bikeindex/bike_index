@@ -383,6 +383,8 @@ RSpec.describe BikeServices::Register do
       expect(described_class.permitted_step(b_param, nil, course: nil)).to eq "2"
       expect(described_class.permitted_step(b_param, "1", course: nil)).to eq "1"
       expect(described_class.permitted_step(b_param, "finished", course: nil)).to eq "2"
+      expect(described_class.current_step(b_param)).to eq "2"
+      expect(described_class.current_step(BParam.new(origin: "api_v3", params: b_param.params))).to be_nil
     end
 
     context "step 1 not submitted" do
@@ -923,6 +925,7 @@ RSpec.describe BikeServices::Register do
       expect(described_class.acknowledge_page(b_param, pages.first, checked: %w[1 1])).to be_truthy
       expect(described_class.acknowledged_page_ids(b_param)).to eq([pages.first.id])
       expect(described_class.permitted_step(b_param, nil, course:)).to eq "4"
+      expect(described_class.current_step(b_param)).to eq "4"
       # Every earlier step stays browsable
       expect(described_class.permitted_step(b_param, "3", course:)).to eq "3"
       expect(described_class.permitted_step(b_param, "1", course:)).to eq "1"
