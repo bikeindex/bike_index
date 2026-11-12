@@ -4312,6 +4312,7 @@ en:
         search: Search
         search_emails: Search emails
         sent: Sent
+        step: Step
         through_org: through %{org_name}
         vehicle_type: Type
       new:
