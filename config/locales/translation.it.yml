@@ -5915,6 +5915,8 @@ it:
             parking_notifications: Notifiche di parcheggio
             find_a_parking_notification: Trova una notifica di parcheggio
             search_parking_notifications: Cerca notifiche di parcheggio
+            search_notification_message_or_notes: Messaggio/note di notifica della
+              ricerca
           table:
             address: Indirizzo
             bike: Bicicletta
@@ -6218,6 +6220,10 @@ it:
             unregistered_owner: Questo %{bike_type} non è registrato a un utente.
               È stato aggiunto per tenere traccia delle notifiche di parcheggio.
             view_all_registrations: visualizza tutto →
+            not_registered_phone_message: Altri dettagli di contatto del proprietario
+              non sono disponibili, poiché questo %{bike_type} non è registrato presso
+              la tua organizzazione.
+            show_phone: Mostra il telefono
           marketplace_listing_card:
             condition: Condizione
             contact_seller: Contatta il venditore
