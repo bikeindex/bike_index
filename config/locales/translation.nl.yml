@@ -3856,6 +3856,7 @@ nl:
         re_send: opnieuw versturen
         motorized: e-voertuig?
         vehicle_type: Type
+        step: Stap
       recoveries:
         description: Beschrijving
         mfg_model_color_html: fabrikant, model, <span class="less-strong">kleur</span>
@@ -5594,6 +5595,14 @@ nl:
       recovery_display_card:
         recovered: Hersteld
         translated_from_english: vertaald uit het Engels
+      registration_step:
+        awaiting_email_confirmation: Wachten op e-mailbevestiging
+        education_page: Onderwijspagina %{number}
+        education_review: Onderwijsbeoordeling
+        finished: Afgerond
+        report: Rapport
+        step_1: Stap 1
+        step_2: Stap 2
     pages:
       messages:
         thread_show:
@@ -6184,6 +6193,12 @@ nl:
               u een link op in het onderstaande veld
           share:
             link_copied: Link gekopieerd
+          potential_duplicates:
+            count_html: "%{count} gevonden"
+            matching_segments: 'Registraties met een serienummer dat overeenkomt met
+              de segmenten van %{bike_type}:'
+            potential_duplicates: Mogelijke duplicaten
+            showing_recent: De meest recente %{count} weergeven
       search:
         everything_combobox:
           made_by: gemaakt door
