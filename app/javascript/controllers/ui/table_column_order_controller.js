@@ -7,7 +7,8 @@ import { collapse } from 'utils/collapse_utils'
 // Connects to data-controller='ui--table-column-order'
 // Drag a th.hideableColumn by its UI::DragHandle to move its column, or move it a place at a time
 // by the handle's arrow keys. A column is named by its *_cell class, as ui--table-column-settings
-// names it. The hideable columns follow the fixed ones, so a row's are reordered by appending them.
+// names it. Every table in scope shares one order. The hideable columns follow the fixed ones, so a
+// row's are reordered by appending them.
 // An order is saved only while it differs from the one the page rendered, which the reset target
 // returns to. The copy target takes another table's saved order, by its data-storage-key.
 // Pointer events rather than native HTML5 drag, which is dead on touch and deaf to keys
@@ -169,7 +170,6 @@ export default class extends Controller {
     window.dispatchEvent(new Event('ui-table:refresh'))
   }
 
-  // The first table's, since every table in it shares the order
   get #order () {
     return this.#headersBeside(this.element.querySelector('th.hideableColumn')).map(header => this.cellName(header))
   }

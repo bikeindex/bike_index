@@ -185,7 +185,7 @@
   </div>
 
   <% if show_other_registrations? %>
-    <%# One column settings panel for both tables %>
+    <%# One column settings panel for both tables: a second would duplicate its checkbox ids %>
     <%= tag.div(class: "org-search-component tw:flex tw:flex-col tw:gap-6", data: (Pages::Org::Search::ColumnSettings::Component.column_settings_data_attributes(controllers: "org--search") if other_registrations? || potential_duplicates_component.render?)) do %>
       <%= render(UI::Card::Component.new) do %>
         <div class="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2">
@@ -210,11 +210,11 @@
 
         <% if other_registrations? %>
           <div class="tw:mt-3">
-            <%= render(Pages::Org::Search::ColumnSettings::Component.new(settings: other_registrations_settings)) %>
+            <%= render(Pages::Org::Search::ColumnSettings::Component.new(settings: search_settings)) %>
           </div>
 
           <div class="tw:mt-3">
-            <%= render(Pages::Org::SearchResults::BikesTable::Component.new(organization: @organization, bikes: recent_other_registrations, settings: other_registrations_settings)) %>
+            <%= render(Pages::Org::SearchResults::BikesTable::Component.new(organization: @organization, bikes: recent_other_registrations, settings: search_settings)) %>
           </div>
         <% end %>
 

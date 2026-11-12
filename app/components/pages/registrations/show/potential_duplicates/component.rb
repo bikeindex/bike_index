@@ -4,12 +4,12 @@ module Pages
   module Registrations
     module Show
       module PotentialDuplicates
-        # Registrations sharing a serial segment with the bike, for law enforcement lookups. Rendered
-        # inside an element given Pages::Org::Search::ColumnSettings' data attributes, whose panel and
-        # toggle it renders with column_settings
+        # Registrations sharing a serial segment with the bike, for law enforcement lookups
         class Component < ApplicationComponent
           LIMIT = 25
 
+          # Inside an element with Pages::Org::Search::ColumnSettings' data attributes;
+          # column_settings renders that element's panel and toggle
           def initialize(bike:, organization:, settings:, column_settings: false)
             @bike = bike
             @organization = organization

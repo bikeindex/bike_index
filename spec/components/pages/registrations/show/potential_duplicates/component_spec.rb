@@ -7,7 +7,8 @@ RSpec.describe Pages::Registrations::Show::PotentialDuplicates::Component, type:
   let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs:) }
   let(:settings) { ComponentStructs::OrgSearchSettings.new(organization:) }
   let(:bike) { FactoryBot.create(:bike, serial_number: "duplicateserialnumber", cycle_type: "stroller") }
-  let(:instance) { described_class.new(bike: bike.reload, organization:, settings:) }
+  let(:column_settings) { false }
+  let(:instance) { described_class.new(bike: bike.reload, organization:, settings:, column_settings:) }
 
   it "doesn't render without a duplicate" do
     expect(render_inline(instance).to_html).to be_blank
@@ -29,11 +30,15 @@ RSpec.describe Pages::Registrations::Show::PotentialDuplicates::Component, type:
       expect(page).to_not have_text("Visible columns")
     end
 
-    it "renders the column settings with column_settings" do
-      render_inline(described_class.new(bike: bike.reload, organization:, settings:, column_settings: true))
+    context "with column_settings" do
+      let(:column_settings) { true }
 
-      expect(page).to have_text("Visible columns")
-      expect(page).to have_button("Column settings", visible: :all)
+      it "renders the column settings" do
+        render_inline(instance)
+
+        expect(page).to have_text("Visible columns")
+        expect(page).to have_button("Column settings", visible: :all)
+      end
     end
 
     it "changes its cache version when another duplicate is registered" do

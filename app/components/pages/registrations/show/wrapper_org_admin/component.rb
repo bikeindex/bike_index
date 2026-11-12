@@ -40,7 +40,7 @@ module Pages
 
           def potential_duplicates_component
             @potential_duplicates_component ||= Pages::Registrations::Show::PotentialDuplicates::Component.new(bike: @bike,
-              organization: @organization, settings: other_registrations_settings, column_settings: !other_registrations?)
+              organization: @organization, settings: search_settings, column_settings: !other_registrations?)
           end
 
           def current_alerts_component
@@ -145,9 +145,9 @@ module Pages
               .where.not(id: @bike.id)
           end
 
-          # Shared with the BikesTable so its column set/labels match the toggle panel
-          def other_registrations_settings
-            @other_registrations_settings ||= ComponentStructs::OrgSearchSettings.new(organization: @organization)
+          # Shared by both BikesTables so their column set/labels match the toggle panel
+          def search_settings
+            @search_settings ||= ComponentStructs::OrgSearchSettings.new(organization: @organization)
           end
 
           def other_registrations_count
