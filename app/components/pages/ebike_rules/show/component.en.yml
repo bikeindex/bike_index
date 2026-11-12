@@ -32,7 +32,6 @@ en:
           choose_your_state: Choose your state.
           compare_html: Want to compare multiple bikes? %{link}
           country: Country
-          custom_details: Custom details
           details_legend: Your bike's details
           detected_place_html: We detected <strong>%{state}</strong>.
           for_parents: For parents
@@ -103,6 +102,7 @@ en:
             stolen. Registration is free.
           register_your_bike: Register your bike
           select_country: Select a country
+          select_custom_values: Select custom values
           select_province: Select your province or territory
           select_state: Select your state
           state: State
