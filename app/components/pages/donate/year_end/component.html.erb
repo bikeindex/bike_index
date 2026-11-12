@@ -172,14 +172,7 @@
               tw:bg-white tw:text-slate-900
             "
           >
-            <div
-              class="
-                tw:flex tw:h-40 tw:items-center tw:justify-center
-                tw:border-b tw:border-[#e0e0e0] tw:bg-[#e8f3fc]
-              "
-            >
-              <%= helpers.inline_svg_tag(card[:icon], class: "tw:size-16 tw:text-blue-500", aria_hidden: true) %>
-            </div>
+            <%= image_tag card[:image], alt: card[:alt], class: "tw:h-45 tw:w-full tw:border-b tw:border-[#e0e0e0] tw:object-cover #{card[:position]}" %>
 
             <div class="tw:flex tw:flex-col tw:gap-2 tw:px-6.5 tw:pt-6 tw:pb-7">
               <p class="tw:m-0 <%= heading.eyebrow_classes(:purple) %>">

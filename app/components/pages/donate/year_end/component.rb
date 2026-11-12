@@ -50,11 +50,13 @@ module Pages
             {icon: "icons/lucide-handshake.svg", circle: "tw:bg-purple-500", title: translation(".shipped_partners_title"), body: translation(".shipped_partners")}]
         end
 
-        # No screenshots yet, so each card's top is the product's own icon
+        # position: where the screenshot's results start, so the card's short window shows bikes rather than the header
         def building
-          [{icon: "logos/bikebook_mark.svg", eyebrow: translation(".bikebook_eyebrow"), title: translation(".bikebook_title"),
+          [{image: "donate/year-end-bikebook.png", alt: translation(".bikebook_image_alt"), position: "tw:object-[center_83%]",
+            eyebrow: translation(".bikebook_eyebrow"), title: translation(".bikebook_title"),
             body: translation(".bikebook_body"), link_text: translation(".bikebook_link"), href: bikebook_path},
-            {icon: "icons/lucide-store.svg", eyebrow: translation(".marketplace_eyebrow"), title: translation(".marketplace_title"),
+            {image: "donate/year-end-marketplace.webp", alt: translation(".marketplace_image_alt"), position: "tw:object-[center_89%]",
+             eyebrow: translation(".marketplace_eyebrow"), title: translation(".marketplace_title"),
              body: translation(".marketplace_body"), link_text: translation(".marketplace_link"), href: search_marketplace_path}]
         end
 

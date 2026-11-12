@@ -7,6 +7,7 @@ en:
           bikebook_body: The world's bicycle library — search, compare, and find your
             next ride.
           bikebook_eyebrow: Your bike garage, on the internet
+          bikebook_image_alt: Bike Book's catalog of bike models, with prices
           bikebook_link: See a sneak peek of Bike Book
           bikebook_title: Meet Bike Book
           building_eyebrow: What your gift builds next
@@ -37,6 +38,7 @@ en:
           marketplace_body: Continuing to build out the most trusted place to sell
             a used bicycle.
           marketplace_eyebrow: Buy and sell used
+          marketplace_image_alt: Bike Index Marketplace listings from registered bikes
           marketplace_link: Visit the Marketplace
           marketplace_title: Marketplace
           merch_body: Shirts, stickers, and caps. Every purchase supports the registry.
