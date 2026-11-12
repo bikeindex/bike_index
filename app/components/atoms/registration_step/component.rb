@@ -22,7 +22,7 @@ module Atoms
         when "1" then translation(".step_1")
         when "2" then translation(".step_2")
         when "report" then translation(".report")
-        when "review" then translation(".review")
+        when "review" then translation(".education_review")
         # Without a bike, finished is entered and waiting on the email confirming the address
         else @b_param.with_bike? ? translation(".finished") : translation(".awaiting_email_confirmation")
         end
