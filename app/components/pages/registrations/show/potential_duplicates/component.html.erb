@@ -4,9 +4,15 @@
       <%= translation(".potential_duplicates") %>
     </h2>
 
-    <span class="tw:text-xs tw:opacity-65">
-      <%= translation(".count_html", count: helpers.number_display(duplicate_bikes_count)) %>
-    </span>
+    <div class="tw:flex tw:items-center tw:gap-3">
+      <span class="tw:text-xs tw:opacity-65">
+        <%= translation(".count_html", count: helpers.number_display(duplicate_bikes_count)) %>
+      </span>
+
+      <% if @column_settings %>
+        <%= render(Pages::Org::Search::ColumnSettingsToggle::Component.new) %>
+      <% end %>
+    </div>
   </div>
 
   <p class="tw:mt-2 tw:text-sm">
@@ -17,22 +23,14 @@
     <% end %>
   </p>
 
-  <% current_user = @current_user %>
+  <% if @column_settings %>
+    <div class="tw:mt-3">
+      <%= render(Pages::Org::Search::ColumnSettings::Component.new(settings: @settings)) %>
+    </div>
+  <% end %>
 
   <div class="tw:mt-3">
-    <%= render(UI::Table::Base::Component.new(records: recent_duplicate_bikes)) do |table| %>
-      <% table.column(label: translation(".registered")) do |duplicate_bike| %>
-        <%= render(UI::Time::Component.new(time: duplicate_bike.created_at)) %>
-      <% end %>
-
-      <% table.column(label: translation(".registration")) do |duplicate_bike| %>
-        <%= link_to helpers.organized_bike_text(duplicate_bike), bike_path(duplicate_bike), class: "twlink" %>
-      <% end %>
-
-      <% table.column(label: translation(".serial")) do |duplicate_bike| %>
-        <%= render(Atoms::Serial::Component.new(bike: duplicate_bike, user: current_user)) %>
-      <% end %>
-    <% end %>
+    <%= render(Pages::Org::SearchResults::BikesTable::Component.new(organization: @organization, bikes: recent_duplicate_bikes, settings: @settings)) %>
   </div>
 
   <% if more_duplicate_bikes? %>

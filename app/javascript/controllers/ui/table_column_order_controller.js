@@ -39,7 +39,7 @@ export default class extends Controller {
 
   // Past the columns showing, not the ones unchecked
   moveByKey (event) {
-    moveByKey(event, () => this.headers.filter(th => th.offsetParent), (th, target, after) => this.#move(th, target, after))
+    moveByKey(event, () => this.#headersBeside(event.target).filter(th => th.offsetParent), (th, target, after) => this.#move(th, target, after))
   }
 
   #onPointerDown = (event) => {
@@ -48,7 +48,7 @@ export default class extends Controller {
     this.dragged = event.target.closest('th.hideableColumn')
     this.dragged.classList.add('tw:opacity-50')
     this.scroller = this.dragged.closest('table').parentElement
-    this.dragHeaders = this.headers
+    this.dragHeaders = this.#headersBeside(this.dragged)
     this.stopFollowing = followPointer(event, { move: this.#onPointerMove, drop: this.#drop, done: this.#done })
   }
 
@@ -169,12 +169,13 @@ export default class extends Controller {
     window.dispatchEvent(new Event('ui-table:refresh'))
   }
 
+  // The first table's, since every table in it shares the order
   get #order () {
-    return this.headers.map(header => this.cellName(header))
+    return this.#headersBeside(this.element.querySelector('th.hideableColumn')).map(header => this.cellName(header))
   }
 
-  get headers () {
-    return [...this.element.querySelectorAll('th.hideableColumn')]
+  #headersBeside (element) {
+    return element ? [...element.closest('tr').querySelectorAll(':scope > th.hideableColumn')] : []
   }
 
   cellName (element) {

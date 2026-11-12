@@ -9,7 +9,4 @@ en:
             matching_segments: 'Registrations with a serial matching this %{bike_type}''s
               segments:'
             potential_duplicates: Potential duplicates
-            registered: Registered
-            registration: Registration
-            serial: Serial
             showing_recent: Showing the %{count} most recent

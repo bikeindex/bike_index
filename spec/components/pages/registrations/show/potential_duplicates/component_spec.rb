@@ -5,9 +5,9 @@ require "rails_helper"
 RSpec.describe Pages::Registrations::Show::PotentialDuplicates::Component, type: :component do
   let(:enabled_feature_slugs) { %w[additional_registrations_information] }
   let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs:) }
-  let(:current_user) { FactoryBot.create(:organization_user, organization:) }
+  let(:settings) { ComponentStructs::OrgSearchSettings.new(organization:) }
   let(:bike) { FactoryBot.create(:bike, serial_number: "duplicateserialnumber", cycle_type: "stroller") }
-  let(:instance) { described_class.new(bike: bike.reload, organization:, current_user:) }
+  let(:instance) { described_class.new(bike: bike.reload, organization:, settings:) }
 
   it "doesn't render without a duplicate" do
     expect(render_inline(instance).to_html).to be_blank
@@ -23,15 +23,23 @@ RSpec.describe Pages::Registrations::Show::PotentialDuplicates::Component, type:
       expect(page).to have_text("Potential duplicates")
       expect(page).to have_text("1 found")
       expect(page).to have_text(/Registrations with a serial matching this stroller's segments:\s+DUP11CATE5ER1A1NUM8ER/)
-      expect(page).to have_link(href: "/bikes/#{duplicate_bike.id}")
+      expect(page).to have_link(href: "/bikes/#{duplicate_bike.id}?organization_id=#{organization.to_param}")
       expect(page).to have_text("DUPLICATESERIALNUMBER")
-      expect(page).to_not have_link(href: "/bikes/#{bike.id}")
+      expect(page).to_not have_link(href: %r{/bikes/#{bike.id}\b})
+      expect(page).to_not have_text("Visible columns")
+    end
+
+    it "renders the column settings with column_settings" do
+      render_inline(described_class.new(bike: bike.reload, organization:, settings:, column_settings: true))
+
+      expect(page).to have_text("Visible columns")
+      expect(page).to have_button("Column settings", visible: :all)
     end
 
     it "changes its cache version when another duplicate is registered" do
       expect {
         FactoryBot.create(:duplicate_bike_group, bike1: bike)
-      }.to change { described_class.new(bike: bike.reload, organization:, current_user:).cache_version }
+      }.to change { described_class.new(bike: bike.reload, organization:, settings:).cache_version }
     end
 
     context "without additional_registrations_information" do

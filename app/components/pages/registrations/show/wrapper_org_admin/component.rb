@@ -40,7 +40,7 @@ module Pages
 
           def potential_duplicates_component
             @potential_duplicates_component ||= Pages::Registrations::Show::PotentialDuplicates::Component.new(bike: @bike,
-              organization: @organization, current_user: @current_user)
+              organization: @organization, settings: other_registrations_settings, column_settings: !other_registrations?)
           end
 
           def current_alerts_component
