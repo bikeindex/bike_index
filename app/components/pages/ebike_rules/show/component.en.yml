@@ -32,10 +32,6 @@ en:
           choose_your_state: Choose your state.
           compare_html: Want to compare multiple bikes? %{link}
           country: Country
-          custom_details: Custom details
-          custom_details_note_html: >-
-            These aren't the %{model}'s settings anymore — you changed them, so the
-            check is of yours.
           details_legend: Your bike's details
           detected_place_html: We detected <strong>%{state}</strong>.
           for_parents: For parents
@@ -105,7 +101,6 @@ en:
           register_band_heading: Registered bikes are recovered 2× more often when
             stolen. Registration is free.
           register_your_bike: Register your bike
-          reset_details: Reset to its settings
           select_country: Select a country
           select_custom_values: Select custom values
           select_province: Select your province or territory

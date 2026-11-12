@@ -434,7 +434,7 @@ RSpec.describe EbikeRulesController, type: :request do
       expect(page.find("form[data-details]")["data-details"]).to eq "manual"
     end
 
-    it "fills the details from a picked model, and checks the details changed from it, keeping the model" do
+    it "fills the details from a picked model, collapsed, and drops the model from details changed from it" do
       get "/ebike-rules/US/CO", params: {vehicle_models: "m/specialized/2025/haul_st"}
 
       expect(page).to have_css("[role='status']", text: "The Specialized Haul ST is a Class 3 e-bike in Colorado")
@@ -450,16 +450,17 @@ RSpec.describe EbikeRulesController, type: :request do
       expect(page.find("input[name='manual']", visible: :all)[:disabled]).to eq "disabled"
       expect(page.find("[data-bike-details]", visible: :all)["data-bike-details"]).to eq({top_speed: 28, throttle: 1, throttle_speed: 20, watts: 700}.to_json)
 
-      get "/ebike-rules/US/CO", params: {vehicle_models: "m/specialized/2025/haul_st", manual: "1", top_speed: "28", throttle: "1", watts: "1000"}
+      get "/ebike-rules?vehicle_models=m/tern/2026/hsd_p5i_gen_2_us&manual=1&throttle=0&top_speed=28&watts=250"
+      expect(response).to redirect_to("/ebike-rules?manual=1&throttle=0&top_speed=28&watts=250")
+      expect(response).to have_http_status(:moved_permanently)
+
+      get "/ebike-rules/US/CO", params: {manual: "1", top_speed: "28", throttle: "1", watts: "1000"}
       expect(page).to have_css("[role='status']", text: "This isn't an e-bike under current Colorado rules.")
         .and have_field("watts", with: "1000")
-        .and have_css("legend span.tw\\:hidden", text: "Custom details")
-        .and have_css("legend", text: "Specialized Haul ST details")
-        .and have_text("These aren't the Specialized Haul ST's settings anymore")
-      expect(page.find("form[data-details]")["data-details"]).to eq "custom"
+        .and have_css("legend", text: "Your bike's details")
+      expect(page.find("form[data-details]")["data-details"]).to eq "manual"
       expect(page.find("[data-ebike-rules--lookup-target='details']")[:class]).not_to include "tw:hidden!"
       expect(page.find("[data-ebike-rules--lookup-target='customize']", visible: :all)[:hidden]).to eq "hidden"
-      expect(page.find("form[data-details]")["data-ebike-rules--lookup-display-value"]).to eq "Specialized Haul ST 2025"
       expect(page.find("input[name='manual']", visible: :all)[:disabled]).to be_nil
     end
 

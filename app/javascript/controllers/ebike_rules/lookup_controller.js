@@ -1,7 +1,7 @@
 import { Controller } from '@hotwired/stimulus'
 import { Turbo } from '@hotwired/turbo-rails'
 import { CURRENT_MARK, CatalogComboboxSource, loadCatalog } from 'bikebook/catalog'
-import { localSources } from 'utils/hw_combobox_patch'
+import { clearCombobox, localSources } from 'utils/hw_combobox_patch'
 import { readable, replaceUrl } from 'bikebook/replace_url'
 import { collapse, collapseField, COLLAPSE_DURATION_MS } from 'utils/collapse_utils'
 
@@ -15,9 +15,9 @@ const DETAILS = ['manual', 'top_speed', 'throttle', 'throttle_speed', 'watts']
 // page, so the place is the form's path rather than a field. There's no submit button: a pick or a
 // change to the details loads its check into the result frame, replacing the URL with the check's own.
 // The form's data-details says which the check is of: a picked "model", whose details its check copies
-// into the panel, collapsed until asked for; "custom" details changed from the model's; or "manual" details with no model
+// into the panel, collapsed until asked for; or "manual" details, which changing a model's clears it for
 export default class extends Controller {
-  static targets = ['combobox', 'comboboxSlot', 'state', 'stateNote', 'stateNeeded', 'stateChoose', 'manual', 'throttleSpeed', 'legend', 'modelName', 'details', 'customize']
+  static targets = ['combobox', 'comboboxSlot', 'state', 'stateNote', 'stateNeeded', 'stateChoose', 'manual', 'throttleSpeed', 'legend', 'details', 'customize']
   static values = { manifestUrl: String, path: String, countryPath: String, display: String, failedText: String, title: String, legend: String, modelLegend: String }
 
   async connect () {
@@ -74,53 +74,34 @@ export default class extends Controller {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  // A pick, by an option's press or Enter, noted before the gem selects it: its selection event reads the same as the
-  // one it announces on connecting or on a blur
-  notePick ({ type, target }) {
-    this.picking = type === 'keydown' || Boolean(target.closest('[role=option]'))
-  }
-
-  // The gem announces a selection only when it changes, so a pick of the model already chosen - to return custom
-  // details to its own - is left for once the gem has handled the press
-  repick () {
-    const value = this.comboboxSlotTarget.querySelector('[data-hw-combobox-target=hiddenField]')?.value
-    if (this.picking && value === this.model) this.chooseBike({ detail: { value } })
-  }
-
   // The gem leaves the autocompleted part of a pick selected, and the catalog's "(current)" says
-  // nothing a picked model needs. Its announcement keeps the page's custom details, which a pick of
-  // their model returns to its own
+  // nothing a picked model needs. It announces the prefilled model on connecting, and again on a blur
   chooseBike ({ detail } = {}) {
     const input = this.comboboxSlotTarget.querySelector('input[role=combobox]')
     if (detail?.value && input) {
       input.value = input.value.replace(CURRENT_MARK, '')
       input.setSelectionRange(input.value.length, input.value.length)
     }
-    if (detail?.value && (detail.value !== this.model || this.picking)) {
+    if (detail?.value && detail.value !== this.model) {
       this.model = detail.value
       this.#setMode('model')
       // the pick's name, without the catalog's years
-      const name = input.value.replace(/ \([^)]*\)$/, '')
-      this.legendTarget.textContent = this.modelLegendValue.replace('%{model}', name)
-      this.modelNameTarget.textContent = name
+      this.legendTarget.textContent = this.modelLegendValue.replace('%{model}', input.value.replace(/ \([^)]*\)$/, ''))
     }
-    this.picking = false
     this.#check()
   }
 
-  // Changing a picked model's details checks them instead
+  // Changed details are no longer a picked model's, so it's cleared and they're checked on their own
   checkDetails () {
     this.#collapseThrottleSpeed()
     const watts = this.element.elements.watts
     if (!watts.checkValidity()) return watts.reportValidity()
 
-    if (this.#mode === 'model') this.#setMode('custom')
-    this.#check()
-  }
-
-  // Its check copies the model's own details back into the panel
-  resetDetails () {
-    this.#setMode('model')
+    const combobox = this.comboboxSlotTarget.querySelector('.hw-combobox')
+    if (this.#mode === 'model' && combobox) {
+      this.#setMode('manual')
+      clearCombobox(combobox)
+    }
     this.#check()
   }
 
@@ -199,7 +180,7 @@ export default class extends Controller {
     replaceUrl(new URL(url))
   }
 
-  // Clearing the model clears the details it filled, and leaves custom ones to check on their own
+  // Clearing the model clears the details it filled, and leaves changed ones to check on their own
   #clearModel () {
     this.model = ''
     this.legendTarget.textContent = this.legendValue
