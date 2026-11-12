@@ -111,46 +111,32 @@
         </div>
 
         <div class="tw:flex tw:min-w-0 tw:flex-[4_1_300px] tw:flex-col tw:gap-2">
-          <%# Grayed while custom details stand in for the model's, until it's picked from again %>
-          <div
-            class="
-              tw:flex tw:flex-col tw:gap-2 tw:transition-opacity
-              tw:group-data-[details=custom]/lookup:not-focus-within:opacity-50
-            "
-          >
-            <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :vehicle_models, label_text: translation(".bike_model"),
+          <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :vehicle_models, label_text: translation(".bike_model"),
             optional_badge: false, wrapper_class: nil)) do %>
-              <%# Stamped once the catalog loads, so the combobox searches it from its first keystroke %>
-              <template data-ebike-rules--lookup-target="combobox">
-                <%= render(UI::Forms::Combobox::Component.new(name: "vehicle_models", src: bikebook_path(electric: 1, market: @lookup.country),
+            <%# Stamped once the catalog loads, so the combobox searches it from its first keystroke %>
+            <template data-ebike-rules--lookup-target="combobox">
+              <%= render(UI::Forms::Combobox::Component.new(name: "vehicle_models", src: bikebook_path(electric: 1, market: @lookup.country),
                 dialog_label: translation(".bike_model"),
                 html_options: {value: @lookup.bikebook_id, placeholder: translation(".bike_placeholder"),
                                aria: {invalid: (true if error?(:bike))}})) %>
-              </template>
+            </template>
 
-              <div
-                data-ebike-rules--lookup-target="comboboxSlot"
-                data-action="
-                  hw-combobox:selection->ebike-rules--lookup#chooseBike
-                  pointerdown->ebike-rules--lookup#notePick:capture
-                  keydown.enter->ebike-rules--lookup#notePick:capture
-                  click->ebike-rules--lookup#repick
-                  keydown.enter->ebike-rules--lookup#repick
-                "
+            <div
+              data-ebike-rules--lookup-target="comboboxSlot"
+              data-action="hw-combobox:selection->ebike-rules--lookup#chooseBike"
+            >
+              <input
+                id="vehicle_models"
+                type="text"
+                class="twinput tw:min-h-12 tw:text-base!"
+                placeholder="<%= translation(".bike_book_loading") %>"
+                autocomplete="off"
+                disabled
               >
-                <input
-                  id="vehicle_models"
-                  type="text"
-                  class="twinput tw:min-h-12 tw:text-base!"
-                  placeholder="<%= translation(".bike_book_loading") %>"
-                  autocomplete="off"
-                  disabled
-                >
-              </div>
-            <% end %>
+            </div>
+          <% end %>
 
-            <%= field_error(:bike, translation(".bike_error")) %>
-          </div>
+          <%= field_error(:bike, translation(".bike_error")) %>
 
           <p class="tw:text-[13px] tw:text-gray-700 tw:dark:text-gray-300">
             <%= translation(".compare_html", link: link_to(translation(".visit_bike_book_link"), bikebook_path, class: "twlink")) %>
@@ -163,19 +149,17 @@
         </noscript>
       </div>
 
-      <%= tag.fieldset(data: {action: "change->ebike-rules--lookup#checkDetails"},
-        class: "tw:flex tw:flex-col tw:gap-4 tw:rounded-lg tw:border tw:border-gray-200 tw:bg-gray-50 tw:px-[clamp(14px,3vw,22px)] tw:py-4.5 tw:dark:border-gray-700 tw:dark:bg-gray-900") do %>
-        <legend class="tw:px-1.5 tw:text-[15px] tw:font-bold">
-          <span
-            class="tw:group-data-[details=custom]/lookup:hidden"
-            data-ebike-rules--lookup-target="legend"
-          >
-            <%= details_legend %>
-          </span>
+      <%# A picked model's details are its check's, so they stay collapsed until asked for %>
+      <%= render(UI::Button::Component.new(text: translation(".select_custom_values"), color: :link, html_class: "twlink-underlined tw:self-start",
+        hidden: details_mode != "model", data: {action: "ebike-rules--lookup#showDetails", "ebike-rules--lookup-target": "customize"})) %>
 
-          <span class="tw:hidden tw:group-data-[details=custom]/lookup:inline">
-            <%= translation(".custom_details") %>
-          </span>
+      <%= tag.fieldset(data: {action: "change->ebike-rules--lookup#checkDetails", "ebike-rules--lookup-target": "details"},
+        class: "#{"tw:hidden! " if details_mode == "model"}tw:flex tw:flex-col tw:gap-4 tw:rounded-lg tw:border tw:border-gray-200 tw:bg-gray-50 tw:px-[clamp(14px,3vw,22px)] tw:py-4.5 tw:dark:border-gray-700 tw:dark:bg-gray-900") do %>
+        <legend
+          class="tw:px-1.5 tw:text-[15px] tw:font-bold"
+          data-ebike-rules--lookup-target="legend"
+        >
+          <%= details_legend %>
         </legend>
 
         <%# Disabled while the model is the check, so its details stay out of the URL %>

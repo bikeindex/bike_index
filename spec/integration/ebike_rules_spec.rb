@@ -24,7 +24,7 @@ RSpec.describe "E-bike rules", :js, type: :system do
     expect(page).to have_current_path("/ebike-rules?vehicle_models=m/specialized/2025/haul_st")
     expect(page).to have_no_css("[role='status']")
     # its details don't
-    expect(page).to have_checked_field("top_speed", with: "28", visible: :all).and have_field("Motor wattage (W)", with: "700")
+    expect(page).to have_checked_field("top_speed", with: "28", visible: :all).and have_field("Motor wattage (W)", with: "700", visible: :all)
 
     # the bike comes along to the state's page, checked against it
     wait_for_stimulus("ebike-rules--lookup")
@@ -39,7 +39,9 @@ RSpec.describe "E-bike rules", :js, type: :system do
     find("[role='button']", text: "Colorado E-bike rules").click
     expect(page).to have_css("li", text: "Class 3 riders must be 16 or older")
 
-    # the model's details fill the panel, named for it
+    # the model's details fill the panel, named for it and collapsed until asked for
+    expect(page).to have_no_field("Motor wattage (W)")
+    click_button "Select custom values"
     expect(page).to have_css("legend", text: "Specialized Haul ST details")
       .and have_checked_field("top_speed", with: "28", visible: :all)
       .and have_checked_field("throttle", with: "1", visible: :all)
@@ -47,19 +49,20 @@ RSpec.describe "E-bike rules", :js, type: :system do
       .and have_field("Motor wattage (W)", with: "700")
     expect(page).to have_text("Throttle top speed")
 
-    # changing one checks the custom details instead, keeping the model
+    # changing one clears the model, checking the details on their own
     fill_in "Motor wattage (W)", with: "1000"
     find_field("Motor wattage (W)").send_keys(:enter)
     expect(page).to have_css("[role='status']", text: "This isn't an e-bike under current Colorado rules.")
-    expect(page).to have_css("legend", exact_text: "Custom details")
-    custom_query = "vehicle_models=m/specialized/2025/haul_st&manual=1&throttle=1&throttle_speed=20&top_speed=28&watts=1000"
-    expect(page).to have_current_path("/ebike-rules/US/CO?#{custom_query}")
+    expect(page).to have_css("legend", exact_text: "Your bike's details").and have_field("Bike model", with: "")
+      .and have_field("Motor wattage (W)", with: "1000").and have_no_button("Select custom values")
+    details_query = "manual=1&throttle=1&throttle_speed=20&top_speed=28&watts=1000"
+    expect(page).to have_current_path("/ebike-rules/US/CO?#{details_query}")
 
     wait_for_stimulus("ebike-rules--lookup")
     type_into(find_field("State"), "New York")
     retry_on_detach { find("[role='option']", text: "New York").click }
     expect(page).to have_css("[role='status']", text: "This isn't an e-bike under current New York rules.")
-    expect(page).to have_current_path("/ebike-rules/US/NY?#{custom_query}")
+    expect(page).to have_current_path("/ebike-rules/US/NY?#{details_query}")
     expect(page).to have_title("New York e-bike laws")
     # New York doesn't use the three classes, so its own replace them
     expect(page).to have_css("#ebike-rules-classes h2", text: "New York e-bike classes")
@@ -73,26 +76,18 @@ RSpec.describe "E-bike rules", :js, type: :system do
     retry_on_detach { find("[role='option']", text: "Colorado").click }
     expect(page).to have_css("[role='status']", text: "This isn't an e-bike under current Colorado rules.")
     expect(page).to have_css("#ebike-rules-classes h2", text: "E-bike classes, explained")
-    expect(page).to have_current_path("/ebike-rules/US/CO?#{custom_query}")
-
-    # clearing the model leaves its custom details, checked on their own
-    clear_bike = -> { find("[data-ebike-rules--lookup-target='comboboxSlot'] .hw-combobox__handle").click }
-    find_field("Bike model", disabled: false, wait: 10)
-    clear_bike.call
-    expect(page).to have_current_path("/ebike-rules/US/CO?manual=1&throttle=1&throttle_speed=20&top_speed=28&watts=1000")
-    expect(page).to have_css("[role='status']", text: "This isn't an e-bike under current Colorado rules.")
-      .and have_css("legend", exact_text: "Your bike's details")
-    find_field("Bike model").send_keys(:escape)
+    expect(page).to have_current_path("/ebike-rules/US/CO?#{details_query}")
 
     # picking it again checks it, and its own details replace them
     type_into(find_field("Bike model"), "haul")
     retry_on_detach { find("[role='option']", text: "Specialized Haul ST").click }
     expect(page).to have_css("[role='status']", text: "The Specialized Haul ST is a Class 3 e-bike in Colorado")
     expect(page).to have_current_path("/ebike-rules/US/CO?vehicle_models=m/specialized/2025/haul_st")
-    expect(page).to have_field("Motor wattage (W)", with: "700").and have_css("legend", exact_text: "Specialized Haul ST details")
+    expect(page).to have_field("Motor wattage (W)", with: "700", visible: :all).and have_button("Select custom values")
+      .and have_no_field("Motor wattage (W)")
 
     # clearing the model clears its details and its check
-    clear_bike.call
+    find("[data-ebike-rules--lookup-target='comboboxSlot'] .hw-combobox__handle").click
     expect(page).to have_current_path("/ebike-rules/US/CO")
     expect(page).to have_no_css("[role='status']")
     expect(page).to have_field("Motor wattage (W)", with: "").and have_no_checked_field("top_speed", visible: :all)
@@ -103,18 +98,6 @@ RSpec.describe "E-bike rules", :js, type: :system do
     find("label", text: "20 mph").click
     expect(page).to have_css("[role='status']", text: "This e-bike is a Class 1 e-bike in Colorado.")
     expect(page).to have_current_path("/ebike-rules/US/CO?manual=1&top_speed=20")
-
-    # details changed from a model return to its own once it's picked again
-    type_into(find_field("Bike model"), "haul")
-    retry_on_detach { find("[role='option']", text: "Specialized Haul ST").click }
-    expect(page).to have_current_path("/ebike-rules/US/CO?vehicle_models=m/specialized/2025/haul_st")
-    fill_in "Motor wattage (W)", with: "1000"
-    find_field("Motor wattage (W)").send_keys(:enter)
-    expect(page).to have_css("legend", exact_text: "Custom details")
-    type_into(find_field("Bike model"), "haul")
-    retry_on_detach { find("[role='option']", text: "Specialized Haul ST").click }
-    expect(page).to have_current_path("/ebike-rules/US/CO?vehicle_models=m/specialized/2025/haul_st")
-    expect(page).to have_field("Motor wattage (W)", with: "700").and have_css("legend", exact_text: "Specialized Haul ST details")
 
     # the link under the class cards opens the state's e-bike law, in the URL apart from them
     visit "/ebike-rules/US/CA?manual=1&top_speed=28&throttle=1"
@@ -200,7 +183,7 @@ RSpec.describe "E-bike rules", :js, type: :system do
     expect(page).to have_css("[role='status']", text: "The Specialized Haul ST is legal to ride in Ontario under the Power-Assisted Bicycle rules.")
     expect(page).to have_current_path("/ebike-rules/CA/ON?vehicle_models=m/specialized/2025/haul_st_ca")
     expect(page).to have_title("Ontario e-bike laws")
-    expect(page).to have_checked_field("top_speed", with: "32", visible: :all).and have_field("Motor wattage (W)", with: "500")
+    expect(page).to have_checked_field("top_speed", with: "32", visible: :all).and have_field("Motor wattage (W)", with: "500", visible: :all)
 
     # clearing the province leaves the bike waiting on Canada's page
     find("[data-ebike-rules--lookup-target='state'] .hw-combobox__handle").click

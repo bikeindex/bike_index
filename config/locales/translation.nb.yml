@@ -4355,6 +4355,7 @@ nb:
         through_org: gjennom %{org_name}
         motorized: e-kjøretøy?
         vehicle_type: Type
+        step: Skritt
       recoveries:
         description: Beskrivelse
         mfg_model_color_html: produsent, modell, <span class="less-strong">farge</span>
@@ -5434,6 +5435,14 @@ nb:
       recovery_display_card:
         recovered: Gjenopprettet
         translated_from_english: oversatt fra engelsk
+      registration_step:
+        awaiting_email_confirmation: Venter på e-postbekreftelse
+        education_page: Utdanningsside %{number}
+        education_review: Utdanningsgjennomgang
+        finished: Ferdig
+        report: Rapportere
+        step_1: Trinn 1
+        step_2: Trinn 2
     pages:
       messages:
         thread_show:
@@ -6007,6 +6016,12 @@ nb:
               om en annonse du fant på nettet, inkluderer du en lenke i feltet nedenfor
           share:
             link_copied: Lenken er kopiert
+          potential_duplicates:
+            count_html: "%{count} funnet"
+            matching_segments: 'Registreringer med en serienummer som samsvarer med
+              segmentene i denne %{bike_type}:'
+            potential_duplicates: Potensielle duplikater
+            showing_recent: Viser den nyeste %{count}
       search:
         everything_combobox:
           made_by: laget av
@@ -7084,7 +7099,6 @@ nb:
             utleiere og byer ber nå om bevis på dette før en elsykkel kommer innendørs.
           watts_placeholder: f.eks. 750
           over_28_mph: Over 45 km/t
-          custom_details: Tilpassede detaljer
           details_legend: Detaljer om sykkelen din
           model_details: "%{model} detaljer"
           country: Land
@@ -7126,6 +7140,7 @@ nb:
           how_to_check_lookup_bike_book: Slå opp modellen ovenfor. Sykkelhåndboken
             viser sertifisering der den er registrert.
           visit_bike_book_link: Besøk Sykkelbok.
+          select_custom_values: Velg egendefinerte verdier
         state_reference:
           compiling: Vi samler %{state}s elsykkelregler fra delstatsforsamlingen og
             DMV. Sjekk tilbake snart.

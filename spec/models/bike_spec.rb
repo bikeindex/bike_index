@@ -890,6 +890,21 @@ RSpec.describe Bike, type: :model do
     end
   end
 
+  describe "duplicate_bikes" do
+    let(:bike) { FactoryBot.create(:bike, serial_number: "ABCDEF12 GHIJKL34") }
+    let!(:duplicate_bike) { FactoryBot.create(:bike, serial_number: bike.serial_number) }
+
+    it "lists a bike matching on two segments once" do
+      [bike, duplicate_bike].each do |matching_bike|
+        matching_bike.create_normalized_serial_segments
+        BikeJobs::DuplicateBikeFinderJob.new.perform(matching_bike.id)
+      end
+      expect(bike.duplicate_bike_groups.count).to eq 3
+      expect(bike.duplicate_bikes.pluck(:id)).to eq([duplicate_bike.id])
+      expect(bike.duplicate_bikes.count).to eq 1
+    end
+  end
+
   describe "status_humanized_translated" do
     let(:bike) { Bike.new(status: status) }
     let(:status) { "unregistered_parking_notification" }

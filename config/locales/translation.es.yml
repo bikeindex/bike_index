@@ -4551,6 +4551,7 @@ es:
         through_org: a través de %{org_name}
         motorized: "¿Vehículo eléctrico?"
         vehicle_type: Tipo
+        step: Paso
       recoveries:
         description: Descripción
         mfg_model_color_html: fabricante, modelo, <span class="less-strong">color</span>
@@ -5676,6 +5677,14 @@ es:
       recovery_display_card:
         recovered: Recuperado
         translated_from_english: traducido del inglés
+      registration_step:
+        awaiting_email_confirmation: Esperando confirmación por correo electrónico
+        education_page: Página de educación %{number}
+        education_review: Revisión de educación
+        finished: Finalizado
+        report: Informe
+        step_1: Paso 1
+        step_2: Paso 2
     pages:
       messages:
         thread_show:
@@ -6261,6 +6270,12 @@ es:
               a continuación."
           share:
             link_copied: Enlace copiado
+          potential_duplicates:
+            count_html: "%{count} encontrado"
+            matching_segments: 'Registros con un número de serie que coincida con
+              los segmentos de este %{bike_type}:'
+            potential_duplicates: Posibles duplicados
+            showing_recent: Mostrando el %{count} más reciente
       search:
         everything_combobox:
           made_by: hecho por
@@ -7401,7 +7416,6 @@ es:
             a espacios cerrados.
           watts_placeholder: p. ej. 750
           over_28_mph: Más de 28 mph
-          custom_details: Detalles personalizados
           details_legend: Detalles de tu bicicleta
           model_details: "%{model} detalles"
           country: País
@@ -7447,6 +7461,7 @@ es:
           how_to_check_lookup_bike_book: Mira el modelo de arriba. Bike Book muestra
             la certificación cuando está registrada.
           visit_bike_book_link: Visita Bike Book.
+          select_custom_values: Seleccione valores personalizados
         state_reference:
           compiling: Estamos recopilando las normas sobre bicicletas eléctricas de
             %{state} de la legislatura estatal y del DMV. Vuelva pronto.
