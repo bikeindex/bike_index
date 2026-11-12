@@ -177,4 +177,63 @@ RSpec.describe BikebookController, type: :request do
       end
     end
   end
+
+  describe "license" do
+    let(:section_ids) do
+      %w[what-you-can-do what-you-need-to-do how-to-credit share-alike what-this-license-covers disclaimer
+        contributing versions-and-downloads show-that-you-use-bike-book questions]
+    end
+
+    it "renders the license, with an anchor for each section and its credit snippets" do
+      get "/bikebook/license"
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("<title>Bike Book license and attribution | Bike Index</title>")
+      page = Capybara.string(response.body)
+      expect(page).to have_css("h1", text: "Bike Book license and attribution")
+      section_ids.each { expect(page).to have_css("h2##{it}") }
+      expect(page.find("meta[name='description']", visible: false)["content"])
+        .to eq "Bike Book data is open under CC BY-SA 4.0. Here's how to use it and how to credit Bike Index."
+      expect(page.find("link[rel='canonical']", visible: false)["href"]).to eq "https://bikeindex.org/bikebook/license"
+      # the pointers to sections link to them
+      expect(page).to have_link("How to credit Bike Book", href: "#how-to-credit")
+        .and have_link("Share-alike: what has to stay open", href: "#share-alike")
+      # no copy waits on a person to fill it in; the Markdown snippet's own brackets are in a pre
+      expect(page.all("h2, p, li, td").map(&:text).join).not_to match(/\[[^\]]+\]/)
+      # every address is a mailto link
+      expect(page.all("a[href='mailto:licensing@bikeindex.org']").count).to eq 6
+      expect(page.find("body").text.scan("licensing@bikeindex.org").count).to eq 6
+      # snippets are text, with a button to copy each
+      expect(page).to have_css("pre code", text: 'Bike data: <a href="https://bikeindex.org/bikebook/license">Bike Book by Bike Index</a>')
+        .and have_css("pre code", text: "Bike data: [Bike Book by Bike Index](https://bikeindex.org/bikebook/license)")
+      expect(page).to have_css("[data-controller='ui--copy-button']", count: 2)
+      expect(page).to have_css("table th", text: "Where you use the data")
+    end
+
+    it "has the Dataset JSON-LD" do
+      get "/bikebook/license"
+
+      page = Capybara.string(response.body)
+      dataset = page.all("script[type='application/ld+json']", visible: false)
+        .map { JSON.parse(it.text(:all)) }.find { it["@type"] == "Dataset" }
+      expect(dataset).to include("name" => "Bike Book", "license" => "https://creativecommons.org/licenses/by-sa/4.0/",
+        "url" => "https://bikeindex.org/bikebook/license")
+      expect(dataset["creator"]).to eq({"@type" => "Organization", "name" => "Bike Index, NFP", "url" => "https://bikeindex.org"})
+    end
+  end
+
+  describe "badge" do
+    it "renders each badge, with a download of each file" do
+      get "/bikebook/badge"
+
+      expect(response).to have_http_status(:ok)
+      page = Capybara.string(response.body)
+      expect(page).to have_css("h1", text: "Powered by Bike Index badge")
+      expect(page).to have_css("img[alt='Powered by Bike Index']", count: 4)
+      expect(page).to have_link("SVG", count: 4).and have_link("PNG 2x", count: 4).and have_link("PNG 4x", count: 4)
+      page.all("a[download]").each do |link|
+        expect(Rails.public_path.join(link["href"].delete_prefix("/"))).to exist
+      end
+    end
+  end
 end
