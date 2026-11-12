@@ -37,7 +37,7 @@
 
   <% if more_duplicate_bikes? %>
     <p class="tw:mt-3 tw:text-xs tw:opacity-65">
-      <%= translation(".showing_recent", count: recent_duplicate_bikes.size) %>
+      <%= translation(".showing_recent", count: LIMIT) %>
     </p>
   <% end %>
 <% end %>

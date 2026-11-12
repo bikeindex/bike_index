@@ -16,7 +16,6 @@ module Pages
 
           def render? = enabled? && duplicate_bikes_count.positive?
 
-          # A duplicate's writes don't touch the bike, so its cache version misses them
           def cache_version
             enabled? ? [duplicate_bikes.maximum(:updated_at), duplicate_bikes_count] : []
           end
@@ -25,18 +24,13 @@ module Pages
 
           def enabled? = @organization.enabled?("additional_registrations_information")
 
-          # A bike matching on two segments joins through both groups
-          def duplicate_bikes
-            @duplicate_bikes ||= @bike.duplicate_bikes.distinct
-          end
+          def duplicate_bikes = @bike.duplicate_bikes
 
           def duplicate_bikes_count
             @duplicate_bikes_count ||= duplicate_bikes.count
           end
 
-          def recent_duplicate_bikes
-            @recent_duplicate_bikes ||= duplicate_bikes.reorder(id: :desc).limit(LIMIT)
-          end
+          def recent_duplicate_bikes = duplicate_bikes.reorder(id: :desc).limit(LIMIT)
 
           def more_duplicate_bikes? = duplicate_bikes_count > LIMIT
 

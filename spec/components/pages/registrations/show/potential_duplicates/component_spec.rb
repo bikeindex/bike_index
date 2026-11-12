@@ -14,8 +14,8 @@ RSpec.describe Pages::Registrations::Show::PotentialDuplicates::Component, type:
   end
 
   context "with a duplicate" do
-    let!(:duplicate_bike_group) { FactoryBot.create(:duplicate_bike_group, bike1: bike) }
-    let(:duplicate_bike) { duplicate_bike_group.reload.bikes.where.not(id: bike.id).first }
+    let(:duplicate_bike) { FactoryBot.create(:bike, serial_number: bike.serial_number) }
+    let!(:duplicate_bike_group) { FactoryBot.create(:duplicate_bike_group, bike1: bike, bike2: duplicate_bike) }
 
     it "lists the duplicate with the matching segments" do
       render_inline(instance)

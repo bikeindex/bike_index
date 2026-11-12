@@ -419,9 +419,9 @@ class Bike < ApplicationRecord
     errors.full_messages.reject { |m| m[/(bike can.t be blank|are you sure the bike was created)/i] }
   end
 
-  # Have to remove self from duplicate bike groups
+  # A bike matching on two segments joins once per group; DISTINCT can't pluck under the default ORDER BY
   def duplicate_bikes
-    duplicate_bikes_including_self.where.not(id: id)
+    Bike.where(id: duplicate_bikes_including_self.select(:id)).where.not(id:)
   end
 
   def calculated_listing_order
