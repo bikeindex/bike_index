@@ -131,7 +131,7 @@ RSpec.describe EbikeRulesController, type: :request do
         .and have_text("We detected Indiana.")
         .and have_no_css("[role='alert']")
 
-      # a bike comes along, as from BikeBook's link, to be checked there
+      # a bike comes along, as from Bike Book's link, to be checked there
       get "/ebike-rules", params: {vehicle_models: "m/specialized/2025/haul_st"}, headers: indiana
       expect(response).to redirect_to("/ebike-rules/US/IN?vehicle_models=m/specialized/2025/haul_st")
 
@@ -163,7 +163,7 @@ RSpec.describe EbikeRulesController, type: :request do
         .and have_css("li", text: "Optional throttle stops at 20 mph")
         .and have_css("dd", text: "Optional, to 20")
         .and have_css("[data-ebike-rules--lookup-display-value='Specialized Haul ST 2025']")
-        .and have_link("View full BikeBook entry", href: "/bikebook?vehicle_models=m/specialized/2025/haul_st&view=motors")
+        .and have_link("View full Bike Book entry", href: "/bikebook?vehicle_models=m/specialized/2025/haul_st&view=motors")
         .and have_title("Colorado e-bike laws", exact: true)
       # each class's tile a tooltip of its US class card, in order, the optional throttle's captioned
       tiles = page.all("[data-controller~='ui--tooltip']:has(> button [role='img'])")
@@ -330,7 +330,7 @@ RSpec.describe EbikeRulesController, type: :request do
         .and have_css("#state-panel-ca-nb h3", text: "Motor Driven Cycle", visible: :all)
       # but the country switch's way back to it
       expect(page.find("main").text.remove("United States (US)")).not_to match(/\b(US|U\.S\.|mph|states?|DMV|Class [123])\b/)
-      # BikeBook's models sold in Canada
+      # Bike Book's models sold in Canada
       expect(response.body).to include("/bikebook?electric=1&amp;market=CA")
       expect(page.all("[data-ebike-rules--state-filter-target='state']").count).to eq 2
       expect(meta("description")).to start_with("Canada e-bike law:")
@@ -434,7 +434,7 @@ RSpec.describe EbikeRulesController, type: :request do
       expect(page.find("form[data-details]")["data-details"]).to eq "manual"
     end
 
-    it "fills the details from a picked model, and checks the details changed from it, keeping the model" do
+    it "fills the details from a picked model, collapsed, and drops the model from details changed from it" do
       get "/ebike-rules/US/CO", params: {vehicle_models: "m/specialized/2025/haul_st"}
 
       expect(page).to have_css("[role='status']", text: "The Specialized Haul ST is a Class 3 e-bike in Colorado")
@@ -444,17 +444,23 @@ RSpec.describe EbikeRulesController, type: :request do
         .and have_field("watts", with: "700")
         .and have_css("legend", text: "Specialized Haul ST details")
       expect(page.find("form[data-details]")["data-details"]).to eq "model"
+      expect(page.find("[data-ebike-rules--lookup-target='details']")[:class]).to include "tw:hidden!"
+      expect(page.find("[data-ebike-rules--lookup-target='customize']")[:hidden]).to be_nil
       # its id alone is the check
       expect(page.find("input[name='manual']", visible: :all)[:disabled]).to eq "disabled"
       expect(page.find("[data-bike-details]", visible: :all)["data-bike-details"]).to eq({top_speed: 28, throttle: 1, throttle_speed: 20, watts: 700}.to_json)
 
-      get "/ebike-rules/US/CO", params: {vehicle_models: "m/specialized/2025/haul_st", manual: "1", top_speed: "28", throttle: "1", watts: "1000"}
+      get "/ebike-rules?vehicle_models=m/tern/2026/hsd_p5i_gen_2_us&manual=1&throttle=0&top_speed=28&watts=250"
+      expect(response).to redirect_to("/ebike-rules?manual=1&throttle=0&top_speed=28&watts=250")
+      expect(response).to have_http_status(:moved_permanently)
+
+      get "/ebike-rules/US/CO", params: {manual: "1", top_speed: "28", throttle: "1", watts: "1000"}
       expect(page).to have_css("[role='status']", text: "This isn't an e-bike under current Colorado rules.")
         .and have_field("watts", with: "1000")
-        .and have_css("legend span.tw\\:hidden", text: "Custom details")
-        .and have_css("legend", text: "Specialized Haul ST details")
-      expect(page.find("form[data-details]")["data-details"]).to eq "custom"
-      expect(page.find("form[data-details]")["data-ebike-rules--lookup-display-value"]).to eq "Specialized Haul ST 2025"
+        .and have_css("legend", text: "Your bike's details")
+      expect(page.find("form[data-details]")["data-details"]).to eq "manual"
+      expect(page.find("[data-ebike-rules--lookup-target='details']")[:class]).not_to include "tw:hidden!"
+      expect(page.find("[data-ebike-rules--lookup-target='customize']", visible: :all)[:hidden]).to eq "hidden"
       expect(page.find("input[name='manual']", visible: :all)[:disabled]).to be_nil
     end
 

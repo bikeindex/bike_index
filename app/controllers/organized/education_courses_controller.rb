@@ -37,7 +37,7 @@ module Organized
       end
     end
 
-    # Opens the draft the org manages, cloning the live course (or the template) on first edit
+    # Opens the draft the org manages, cloning the live course (or the default) on first edit
     def create
       draft = EducationCourse.draft_for(current_organization)
       redirect_to edit_organization_education_course_path(organization_id: current_organization.to_param, id: draft.id)

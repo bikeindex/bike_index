@@ -41,9 +41,6 @@ module EbikeRuleServices
 
     def us? = country == "US"
 
-    # A model whose details were changed, which checks the details
-    def custom? = manual && bikebook_id.present?
-
     # The details panel's values: the entered ones, or the model's own, which the browser copies in after a pick
     def details
       return {} unless submitted && bike

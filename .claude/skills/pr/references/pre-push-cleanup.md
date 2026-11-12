@@ -161,14 +161,14 @@ Read each hit. Key names (`about_this_bike:`), the product name ("Bike Index"), 
 
 ### The product-name check
 
-Copy spells the products "Bike Index" and "BikeBook" — never "BikeIndex", "Bike index", "Bike Book" or "Bikebook":
+Copy spells the products "Bike Index" and "Bike Book" — never "BikeIndex", "Bike index", "BikeBook", "Bike book" or "Bikebook":
 
 ```bash
 rtk proxy git diff origin/main...HEAD -- '*.yml' '*.erb' '*.haml' '*.rb' '*.js' '*.md' |
-  grep -nE '^\+[^+].*(BikeIndex|[Bb]ike index|Bike [Bb]ook|[Bb]ike book|Bikebook)'
+  grep -nE '^\+[^+].*(BikeIndex|[Bb]ike index|BikeBook|Bike book|Bikebook)'
 ```
 
-Fix every hit in copy. Code identifiers (`BikeIndexFormBuilder`, `Bikebook::`, `bikebook_path`) and the `BikeIndex.org` domain are fine.
+Fix every hit in copy. Code identifiers (`BikeIndexFormBuilder`, `BikeBookUpdateJob`, `Bikebook::`, `bikebook_path`) and the `BikeIndex.org` domain are fine.
 
 ### Only if you have rtk: `rtk proxy` anything you grep or count
 

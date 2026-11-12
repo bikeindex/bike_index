@@ -18,7 +18,7 @@ RSpec.describe Pages::EbikeRules::Results::Component, type: :component do
   end
   let(:component) { render_inline(described_class.new(lookup:)) }
 
-  it "renders a legal bike, its BikeBook photo, specs and certifications, and its state's limits" do
+  it "renders a legal bike, its Bike Book photo, specs and certifications, and its state's limits" do
     expect(component).to have_css("[role='status']", text: "Legal to ride")
       .and have_css("[role='status']", text: "The Trek Verve+ 2 is a Class 1 e-bike in Indiana.")
       .and have_css("[role='status'] p.tw\\:font-normal strong.tw\\:font-bold", exact_text: "Trek Verve+ 2")
@@ -31,7 +31,7 @@ RSpec.describe Pages::EbikeRules::Results::Component, type: :component do
       .and have_no_text("UL 2271")
       .and have_css("li", text: /Classes 1, 2, and 3 recognized\s*Class 1 is recognized/)
       .and have_css("li [role='img'][aria-label='Meets this rule']", count: 4)
-      .and have_link("BikeBook", href: "/bikebook?vehicle_models=evc/us/in/electric_bicycle")
+      .and have_link("Bike Book", href: "/bikebook?vehicle_models=evc/us/in/electric_bicycle")
       .and have_link("Register on Bike Index — free", href: "/register/new?frame_model=Verve%2B+2&manufacturer=Trek")
   end
 
@@ -45,7 +45,7 @@ RSpec.describe Pages::EbikeRules::Results::Component, type: :component do
         .and have_css("[role='status'] li", text: "Throttle must cut out at 20 mph.")
         .and have_css("h2", text: "Manually entered e-bike").and have_no_text("Entered manually")
         .and have_css("dd", text: "28 mph")
-        .and have_text("Entered by you, not verified by BikeBook.")
+        .and have_text("Entered by you, not verified by Bike Book.")
         .and have_text("Certification unknown").and have_no_text("E-bike electrical system")
         .and have_no_css("img")
     end

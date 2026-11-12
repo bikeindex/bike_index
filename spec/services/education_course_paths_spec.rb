@@ -25,7 +25,7 @@ RSpec.describe EducationCoursePaths do
   end
 
   context "admin" do
-    let(:education_course) { FactoryBot.create(:education_course_template) }
+    let(:education_course) { FactoryBot.create(:education_course_default) }
 
     it "builds the admin routes, which don't scope to an organization" do
       expect(described_class.index(education_course, admin: true)).to eq "/admin/education_courses"

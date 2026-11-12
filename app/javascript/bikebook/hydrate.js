@@ -8,6 +8,7 @@ import { tooltip } from 'bikebook/templates/ui/tooltip'
 import { FILTERS, LISTS, RANGES, SINGLES, ordered, searching, toQuery } from 'bikebook/query'
 import { fragmentOf, renderInto } from 'bikebook/render'
 import { preferredSize } from 'bikebook/sizes'
+import { groupId, vehicleIds } from 'bikebook/vehicle_models'
 import { settingsFrom } from 'bikebook/similarity'
 import { chosenPhotos, MAX_COMPARE, VehicleViewer } from 'bikebook/vehicle_viewer'
 
@@ -100,7 +101,7 @@ export async function unpickedVehicles (catalog, page, url) {
   return { vehicles: new VehicleViewer(catalog.kit, catalog.vocabulary, filters).render([], url, null, await unpicked(catalog, page, filters)), adjustments: nothing }
 }
 
-const pickedOf = (catalog, url, { market }) => catalog.vehicles(url.searchParams.get('vehicle_models')?.split(',') ?? [], { market })
+const pickedOf = (catalog, url, { market }) => catalog.vehicles(vehicleIds(url), { market })
 
 // The models most like the first of `vehicles` where the catalog publishes what it compares, scored once their section
 // is open, of those the `filters` leave. `waiting`, until the comparison says whether it does
@@ -127,10 +128,9 @@ export async function rescoredSimilar (catalog, page, url, vehicle, settings) {
 
 // the model group `url`'s overview shows, of one of its vehicles, in the `filters`' market
 const groupOf = (catalog, url, filters) => {
-  const id = url.searchParams.get('group')
+  const id = groupId(url)
   const view = url.searchParams.get('view')
-  const picked = url.searchParams.get('vehicle_models')?.split(',').slice(0, MAX_COMPARE) ?? []
-  return picked.includes(id) && (!view || view === 'basics') ? catalog.group(id, filters) : null
+  return vehicleIds(url).slice(0, MAX_COMPARE).includes(id) && (!view || view === 'basics') ? catalog.group(id, filters) : null
 }
 
 // The picked vehicles' place for `url`'s jurisdiction, which decides which are out of class there, and market, which

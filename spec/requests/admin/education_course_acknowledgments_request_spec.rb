@@ -24,6 +24,7 @@ RSpec.describe Admin::EducationCourseAcknowledgmentsController, type: :request d
         expect(collection_ids).to match_array([acknowledgment.id, pending.id])
         expect(response.body).to include("agreed@example.com")
         expect(response.body).to include("#{base_url}?organization_id=#{organization.id}\"")
+        expect(response.body).to include("/admin/b_params?search_education_course_in_progress=true")
 
         get base_url, params: {search_status: "pending"}
         expect(collection_ids).to eq([pending.id])

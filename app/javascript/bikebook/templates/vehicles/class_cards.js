@@ -1,7 +1,7 @@
 import { html, nothing } from 'lit-html'
-import { toQuery } from 'bikebook/query'
+import { paramList, toQuery } from 'bikebook/query'
 import { fragmentOf, keepPermanent } from 'bikebook/render'
-import { paramList } from 'bikebook/sizes'
+import { vehiclesOf, withVehicles } from 'bikebook/vehicle_models'
 import { filterOption } from 'bikebook/templates/filter_option'
 import { US_CLASS } from 'bikebook/templates/vehicles/model_viewer'
 
@@ -16,13 +16,12 @@ export const classificationOption = (query, selected, classifications) => {
   return label && !selected.includes(id) ? filterOption({ value: id, display: label, name: label }) : null
 }
 
-// The vehicle combobox picks classifications beside models; the URL keeps them apart, as vehicle_sizes lines up with
-// vehicle_models
+// The vehicle combobox picks classifications beside models; the URL keeps them apart, as vehicle_models carries what's
+// picked for each model
 export const withClassifications = (url, classifications) => {
-  const picked = paramList(url, 'vehicle_models').filter(Boolean)
-  const [cards, models] = [picked.filter((id) => hasCard(id, classifications)), picked.filter((id) => !hasCard(id, classifications))]
-  const next = new URL(url)
-  models.length ? next.searchParams.set('vehicle_models', models.join(',')) : next.searchParams.delete('vehicle_models')
+  const picked = vehiclesOf(url)
+  const cards = picked.filter(({ id }) => hasCard(id, classifications)).map(({ id }) => id)
+  const next = withVehicles(url, picked.filter(({ id }) => !hasCard(id, classifications)))
   cards.length ? next.searchParams.set(PARAM, cards.join(',')) : next.searchParams.delete(PARAM)
   return next
 }

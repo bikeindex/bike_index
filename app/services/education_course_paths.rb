@@ -8,7 +8,7 @@ module EducationCoursePaths
   # Admin lists an organization's courses on a tab of its organization page
   def index(education_course, admin: false)
     return routes.organization_education_courses_path(organization_id: organization_param(education_course)) unless admin
-    return routes.admin_education_courses_path if education_course.template?
+    return routes.admin_education_courses_path if education_course.default?
 
     routes.admin_organization_path(organization_param(education_course), active_tab: "education_courses")
   end
@@ -36,7 +36,7 @@ module EducationCoursePaths
   end
 
   # POSTs open the owner's draft, cloning one if there isn't one. A blank organization
-  # is the template
+  # is the default course
   def create_draft(organization_id) = routes.admin_education_courses_path(organization_id:)
 
   def edit(education_course, admin: false)

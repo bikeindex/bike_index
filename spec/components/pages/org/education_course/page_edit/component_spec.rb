@@ -34,13 +34,13 @@ RSpec.describe Pages::Org::EducationCourse::PageEdit::Component, type: :componen
     end
   end
 
-  context "on the template" do
-    let(:education_course) { FactoryBot.create(:education_course_template) }
+  context "on the default course" do
+    let(:education_course) { FactoryBot.create(:education_course_default) }
     let(:page) { FactoryBot.create(:education_course_page, education_course:) }
 
-    it "names the toggle for the template, which has no organization" do
+    it "names the toggle for the default course, which has no organization" do
       expect(component).to have_field("education_course_page_organization_specific")
-      expect(component).to have_content("Specific to Template")
+      expect(component).to have_content("Specific to Default")
     end
   end
 end

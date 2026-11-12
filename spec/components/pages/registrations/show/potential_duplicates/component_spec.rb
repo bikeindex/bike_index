@@ -1,0 +1,59 @@
+# frozen_string_literal: true
+
+require "rails_helper"
+
+RSpec.describe Pages::Registrations::Show::PotentialDuplicates::Component, type: :component do
+  let(:enabled_feature_slugs) { %w[additional_registrations_information] }
+  let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs:) }
+  let(:settings) { ComponentStructs::OrgSearchSettings.new(organization:) }
+  let(:bike) { FactoryBot.create(:bike, serial_number: "duplicateserialnumber", cycle_type: "stroller") }
+  let(:column_settings) { false }
+  let(:instance) { described_class.new(bike: bike.reload, organization:, settings:, column_settings:) }
+
+  it "doesn't render without a duplicate" do
+    expect(render_inline(instance).to_html).to be_blank
+  end
+
+  context "with a duplicate" do
+    let(:duplicate_bike) { FactoryBot.create(:bike, serial_number: bike.serial_number) }
+    let!(:duplicate_bike_group) { FactoryBot.create(:duplicate_bike_group, bike1: bike, bike2: duplicate_bike) }
+
+    it "lists the duplicate with the matching segments" do
+      render_inline(instance)
+
+      expect(page).to have_text("Potential duplicates")
+      expect(page).to have_text("1 found")
+      expect(page).to have_text(/Registrations with a serial matching this stroller's segments:\s+DUP11CATE5ER1A1NUM8ER/)
+      expect(page).to have_link(href: "/bikes/#{duplicate_bike.id}?organization_id=#{organization.to_param}")
+      expect(page).to have_text("DUPLICATESERIALNUMBER")
+      expect(page).to_not have_link(href: %r{/bikes/#{bike.id}\b})
+      expect(page).to_not have_text("Visible columns")
+    end
+
+    context "with column_settings" do
+      let(:column_settings) { true }
+
+      it "renders the column settings" do
+        render_inline(instance)
+
+        expect(page).to have_text("Visible columns")
+        expect(page).to have_button("Column settings", visible: :all)
+      end
+    end
+
+    it "changes its cache version when another duplicate is registered" do
+      expect {
+        FactoryBot.create(:duplicate_bike_group, bike1: bike)
+      }.to change { described_class.new(bike: bike.reload, organization:, settings:).cache_version }
+    end
+
+    context "without additional_registrations_information" do
+      let(:enabled_feature_slugs) { %w[registration_notes] }
+
+      it "doesn't render" do
+        expect(render_inline(instance).to_html).to be_blank
+        expect(instance.cache_version).to eq([])
+      end
+    end
+  end
+end

@@ -11,7 +11,7 @@
   <% end %>
 
   <% table.column(sortable: "organization_id", label: "Organization") do |education_course| %>
-    <% if education_course.template? %>
+    <% if education_course.default? %>
       <span class="less-strong"><%= education_course.badge_name %></span>
     <% else %>
       <%= render(Atoms::Admin::TableCells::Organization::Component.new(organization: education_course.organization,

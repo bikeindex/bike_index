@@ -6859,6 +6859,13 @@ CREATE INDEX index_education_courses_on_organization_id ON public.education_cour
 
 
 --
+-- Name: index_education_courses_one_active_default; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_education_courses_one_active_default ON public.education_courses USING btree (((organization_id IS NULL))) WHERE ((organization_id IS NULL) AND (start_at IS NOT NULL) AND (end_at IS NULL) AND (deleted_at IS NULL));
+
+
+--
 -- Name: index_education_courses_one_active_per_org; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6866,10 +6873,10 @@ CREATE UNIQUE INDEX index_education_courses_one_active_per_org ON public.educati
 
 
 --
--- Name: index_education_courses_one_active_template; Type: INDEX; Schema: public; Owner: -
+-- Name: index_education_courses_one_draft_default; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX index_education_courses_one_active_template ON public.education_courses USING btree (((organization_id IS NULL))) WHERE ((organization_id IS NULL) AND (start_at IS NOT NULL) AND (end_at IS NULL) AND (deleted_at IS NULL));
+CREATE UNIQUE INDEX index_education_courses_one_draft_default ON public.education_courses USING btree (((organization_id IS NULL))) WHERE ((organization_id IS NULL) AND (start_at IS NULL) AND (deleted_at IS NULL));
 
 
 --
@@ -6877,13 +6884,6 @@ CREATE UNIQUE INDEX index_education_courses_one_active_template ON public.educat
 --
 
 CREATE UNIQUE INDEX index_education_courses_one_draft_per_org ON public.education_courses USING btree (organization_id) WHERE ((start_at IS NULL) AND (organization_id IS NOT NULL) AND (deleted_at IS NULL));
-
-
---
--- Name: index_education_courses_one_draft_template; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX index_education_courses_one_draft_template ON public.education_courses USING btree (((organization_id IS NULL))) WHERE ((organization_id IS NULL) AND (start_at IS NULL) AND (deleted_at IS NULL));
 
 
 --
@@ -8037,6 +8037,7 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261111155046'),
 ('20261110154720'),
 ('20261106120000'),
 ('20261102171029'),
