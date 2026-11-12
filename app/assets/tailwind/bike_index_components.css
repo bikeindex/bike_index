@@ -58,10 +58,14 @@
   .twlink {
     @apply tw:text-blue-600 tw:dark:text-blue-400 tw:transition-colors;
 
-    /* Outranks the hover below on specificity, so a selected link doesn't take the
-     * hover color when the pointer is over it */
+    /* Outranks the hover below on specificity, so a selected link darkens a step past
+     * the hover color, as a selected UI::Button does */
     @variant is-active {
       @apply tw:text-blue-700 tw:underline tw:font-bold tw:dark:text-blue-300;
+
+      &:hover {
+        @apply tw:text-blue-800 tw:dark:text-blue-200;
+      }
     }
   }
 

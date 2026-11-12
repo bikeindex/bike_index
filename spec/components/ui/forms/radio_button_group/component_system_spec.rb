@@ -6,6 +6,7 @@ RSpec.describe UI::Forms::RadioButtonGroup::Component, :js, type: :system do
   let(:base_path) { "/rails/view_components/ui/forms/radio_button_group/component/" }
   # match_style retries, so it waits out the color transition
   let(:purple) { {"background-color" => "rgb(113, 94, 178)"} }
+  let(:hovered_purple) { {"background-color" => "rgb(93, 75, 156)"} }
   let(:white) { {"background-color" => "rgb(255, 255, 255)"} }
   # secondary's resting bg-white/80
   let(:translucent_white) { {"background-color" => "oklab(0.999994 0.0000455677 0.0000200868 / 0.8)"} }
@@ -29,9 +30,13 @@ RSpec.describe UI::Forms::RadioButtonGroup::Component, :js, type: :system do
 
       find("label", text: "Inactive").click
       expect(page).to have_css "input[name='search_status'][value='inactive']:checked", visible: :all
-      # The is-active variant matches a label around a checked radio
-      expect(label("Inactive")).to match_style(purple)
+      # The is-active variant matches a label around a checked radio — still under the
+      # pointer, so in its hovered shade
+      expect(label("Inactive")).to match_style(hovered_purple)
       expect(label("Active")).to match_style(translucent_white)
+
+      find("label", text: "All").hover
+      expect(label("Inactive")).to match_style(purple)
     end
   end
 

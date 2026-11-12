@@ -47,13 +47,15 @@ module UI
       #
       # No :link — .twlink states its own active look under the same variant, and a utility
       # here would win over it, so link color would stop following the class it's built from.
+      #
+      # Each darkens a step on hover, which is also how any button looks pressed
       ACTIVE_COLORS = {
-        primary: "tw:is-active:bg-blue-800 tw:is-active:ring-2 tw:is-active:ring-blue-500/40 tw:is-active:dark:bg-blue-700",
-        secondary: "tw:is-active:text-white tw:is-active:bg-purple-500 tw:is-active:border-purple-500 tw:is-active:ring-2 tw:is-active:ring-purple-500/40",
-        error: "tw:is-active:bg-red-100 tw:is-active:border-[#c0392b] tw:is-active:ring-2 tw:is-active:ring-red-500/40 tw:is-active:dark:bg-red-950 tw:is-active:dark:border-red-700",
-        purple: "tw:is-active:bg-purple-700 tw:is-active:border-purple-700 tw:is-active:ring-2 tw:is-active:ring-purple-500/40",
-        yellow: "tw:is-active:bg-yellow-500 tw:is-active:border-yellow-500 tw:is-active:ring-2 tw:is-active:ring-yellow-300/60",
-        link_gray: "tw:is-active:text-gray-900 tw:is-active:dark:text-gray-100"
+        primary: "tw:is-active:bg-blue-800 tw:is-active:ring-2 tw:is-active:ring-blue-500/40 tw:is-active:dark:bg-blue-700 tw:is-active:hover:bg-blue-900 tw:is-active:dark:hover:bg-blue-800",
+        secondary: "tw:is-active:text-white tw:is-active:bg-purple-500 tw:is-active:border-purple-500 tw:is-active:ring-2 tw:is-active:ring-purple-500/40 tw:is-active:hover:bg-purple-600 tw:is-active:hover:border-purple-600",
+        error: "tw:is-active:bg-red-100 tw:is-active:border-[#c0392b] tw:is-active:ring-2 tw:is-active:ring-red-500/40 tw:is-active:dark:bg-red-950 tw:is-active:dark:border-red-700 tw:is-active:hover:bg-red-200 tw:is-active:dark:hover:bg-red-900",
+        purple: "tw:is-active:bg-purple-700 tw:is-active:border-purple-700 tw:is-active:ring-2 tw:is-active:ring-purple-500/40 tw:is-active:hover:bg-purple-800 tw:is-active:hover:border-purple-800",
+        yellow: "tw:is-active:bg-yellow-500 tw:is-active:border-yellow-500 tw:is-active:ring-2 tw:is-active:ring-yellow-300/60 tw:is-active:hover:bg-yellow-600 tw:is-active:hover:border-yellow-600",
+        link_gray: "tw:is-active:text-gray-900 tw:is-active:dark:text-gray-100 tw:is-active:hover:text-gray-950 tw:is-active:dark:hover:text-white"
       }.freeze
 
       # No pointer-events-none: with pointer events off the browser takes the cursor from

@@ -41,18 +41,18 @@ RSpec.describe UI::Button::Component, :js, type: :system do
       expect(looks.values.uniq.count).to eq(4), "#{color} repeats a look: #{looks.inspect}"
       expect_axe_clean if index.zero?
 
-      # It's already wearing its active colors, so hover has nothing to add and :active has
-      # no color left to change — both focus and press just widen the ring
+      # Hovered, it looks the way any button does pressed — a press is hovered too — so
+      # pressing it adds only focus's ring
       visit "/rails/view_components/ui/button/component/#{color}_active"
       active = find("button[data-active='true']")
       active_looks = {resting: state_of(active)}
       hover_then_press(active) { |state| active_looks[state] = state_of(active) }
       active_looks[:focus] = state_of(active)
 
-      expect(active_looks[:hover]).to eq(active_looks[:resting]), "#{color} changed on hover"
+      expect(active_looks[:hover].first).to eq(looks[:press].first), "#{color} hovers active unlike it presses"
+      expect(active_looks[:hover]).to_not eq(active_looks[:resting]), "#{color} shows nothing on hover"
       expect(active_looks[:focus]).to_not eq(active_looks[:resting]), "#{color} shows nothing on focus"
-      expect(active_looks[:press]).to eq(active_looks[:focus]), "#{color} presses differently than it focuses"
-      expect(active_looks.values.map(&:first).uniq.count).to eq(1), "#{color} changed color, not just its ring"
+      expect(active_looks[:press]).to eq([active_looks[:hover].first, active_looks[:focus].last]), "#{color} presses unlike it hovers and focuses"
       expect_axe_clean if index.zero?
 
       # Three mechanisms have to hold for this: the guarded hovers, the is-active variant,
