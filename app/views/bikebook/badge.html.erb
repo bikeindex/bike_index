@@ -12,7 +12,7 @@
     tw:twtext-color
   "
 >
-  <h1 class="tw:mb-4 tw:text-4xl tw:font-bold">Powered by Bike Index badge</h1>
+  <%= render(UI::Header::Component.new(text: "Powered by Bike Index badge")) %>
 
   <p class="tw:my-3">
     Use the badge as provided, link it to
@@ -26,13 +26,7 @@
     <% badges.each do |layout, theme, width, height| %>
       <% name = "powered-by-bike-index-#{layout}-#{theme}" %>
 
-      <section
-        class="
-          tw:flex tw:flex-col tw:rounded-sm tw:border tw:border-gray-200
-          tw:p-4 tw:dark:border-gray-700
-        "
-        aria-label="<%= layout.capitalize %>, <%= theme %>"
-      >
+      <%= render(UI::Card::Component.new(additional_classes: "tw:flex tw:flex-col")) do %>
         <div class="tw:flex tw:min-h-28 tw:items-center tw:justify-center">
           <%= image_tag("#{base}/svg/#{name}.svg", alt: "Powered by Bike Index", width:, height:) %>
         </div>
@@ -47,7 +41,7 @@
           <%= link_to("PNG 2x", "#{base}/png/#{name}-2x.png", download: "#{name}-2x.png", class: "twlink") %>,
           <%= link_to("PNG 4x", "#{base}/png/#{name}-4x.png", download: "#{name}-4x.png", class: "twlink") %>
         </p>
-      </section>
+      <% end %>
     <% end %>
   </div>
 </div>
