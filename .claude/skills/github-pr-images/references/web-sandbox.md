@@ -35,6 +35,13 @@ untouched — so create the comment, then always `update_issue_comment` it with 
 same body, which also drops the appended footer. Widths belong to the caller — the
 `pr` skill's table wants `width="500"` desktop, `"250"` mobile.
 
+**Read the comment back after that update.** On #4792 `update_issue_comment` rewrote
+the body as well — each URL wrapped in backticks, `<img` escaped to `&lt;img`, the
+footer appended — and so did reference-style links, so no body form survived. Edits
+there only stack more rewrites, and nothing here deletes a comment. When it comes back
+mangled, stop: leave the one `## Screenshots` comment, and in your reply give the user
+the `tmp/pr_screenshots/` paths, the hosted URLs and the body you meant to post.
+
 **Call it once, after every capture including the base branch's.** Each call costs
 two commits and a push, and it refuses on a detached HEAD, so it can't run mid-checkout
 anyway.
