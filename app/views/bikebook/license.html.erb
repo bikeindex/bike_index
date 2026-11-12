@@ -158,7 +158,14 @@
     <div class="tw:relative tw:my-3">
       <pre class="<%= pre_class %>"><code><%= snippet %></code></pre>
 
-      <span class="license-copy tw:absolute tw:top-2 tw:right-2"><%= render(UI::CopyButton::Component.new(value: snippet, label: "Copy #{name}")) %></span>
+      <span
+        class="
+          license-copy tw:absolute tw:top-1.5 tw:right-1.5 tw:rounded-sm
+          tw:bg-gray-50 tw:dark:bg-gray-800
+        "
+      >
+        <%= render(UI::CopyButton::Component.new(value: snippet, label: "Copy #{name}")) %>
+      </span>
     </div>
   <% end %>
 
