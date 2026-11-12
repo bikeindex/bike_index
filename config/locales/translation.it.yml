@@ -3943,59 +3943,6 @@ it:
       get_in_touch_link: Contattaci
       want_qr_stickers: Desideri adesivi con codice QR? Chiedici come il loro costo
         incide sul prezzo del pacchetto.
-    for_bike_shops:
-      5_ways_to_grow_community_for_your_bike_sh: 5 modi per far crescere la community
-        del tuo negozio di biciclette
-      automatic_registration_at_point_of_sale: Registrazione automatica al punto vendita
-      bike_index_for_bike_shops: Indice di biciclette per negozi di biciclette
-      bike_shops_deck: mazzo di carte del partner del negozio di biciclette
-      bikes_before_they: Unitevi contro il furto di biciclette e proteggete le bici
-        dei vostri clienti ancor prima che escano di casa.
-      build_goodwill_with_your_customers_with_a: Conquistate la fiducia dei vostri
-        clienti offrendo un servizio gratuito. Recuperate una bicicletta rubata e
-        vi assicurerete un cliente per la vita.
-      check_out: Dai un'occhiata al nostro
-      connect_your_ascend_account_html: Collega il tuo account Ascend al tuo account
-        negozio Bike Index. Ogni notte, Ascend esporterà le biciclette che hai venduto
-        e noi le importeremo in Bike Index per i tuoi clienti. A parte la configurazione
-        iniziale, hai finito! Scopri di più sull'integrazione con Ascend %{ascend_link}.
-      connect_your_lightspeed_account: collega il tuo account Lightspeed
-      curious_what_information_html: Curioso di sapere quali informazioni vengono
-        raccolte? Leggi la descrizione di %{security_link}.
-      do_right_by_your_customers: Fai la cosa giusta per i tuoi clienti in soli 5
-        clic.
-      dont_use_ascend_or_lightspeed_html: Non utilizzi Ascend o Lightspeed POS? Chiedici
-        informazioni su %{printed_materials}.
-      driving_service_revenues_with_bicycle_reg: Incrementare i ricavi dei servizi
-        con la registrazione delle biciclette
-      embed_a_bike_index_registration_form: Inserisci un modulo di registrazione per
-        biciclette sul tuo sito web
-      for_free_we_provide_you_with_t: Vi forniamo gratuitamente gli strumenti necessari
-        per registrare automaticamente ogni bicicletta venduta in Bike Index tramite
-        il vostro sistema POS. Bastano pochi minuti di configurazione, utilizzando
-        il vostro account Ascend o Lightspeed Retail.
-      here: qui
-      join_our_network_link_html: Unisciti al nostro gruppo %{network_link}.
-      learn_more: Saperne di più
-      network_of_shop_partners: rete di negozi partner
-      or: O
-      our_official_lightspeed_integration_provi: La nostra integrazione ufficiale
-        con Lightspeed garantisce la registrazione completamente automatizzata di
-        ogni bicicletta venduta. Tutto ciò che devi fare è inserire il numero di serie
-        e acquisire l'indirizzo email del cliente.
-      printed_materials: materiali stampati
-      register_bikes_for_your_customers: Registra le biciclette per i tuoi clienti
-      related_articles: 'Articoli correlati:'
-      security_link_text: sicurezza e privacy delle integrazioni qui
-      sign_up_for_a_free_bike_index_account_html: Registrati per un account Bike Index
-        gratuito per il tuo negozio %{new_org_link}.
-      sign_up_for_free: Iscriviti gratuitamente
-      trusted_by_bike_shops_everywhere: Scelto dai negozi di biciclette di tutto il
-        mondo.
-      use_ascend: Utilizzate Ascend?
-      use_lightspeed_retail: Utilizzare Lightspeed Retail?
-      used_at_bike_shops_everywhere: Utilizzato nei negozi di biciclette di tutto
-        il mondo
     packages_list:
       forever: Per sempre
       free: Gratuito
@@ -4143,6 +4090,9 @@ it:
       scopo di lucro per le biciclette. Aiuta i tuoi ciclisti a registrarsi, così
       che una bicicletta rubata possa tornare a casa. Gratuito per i gruppi della
       comunità, per sempre.
+    landing_pages_for_bike_shops: Bike Index si collega al tuo sistema POS e registra
+      automaticamente ogni bicicletta che vendi. È gratuito sia per i negozi che per
+      i clienti e non vendiamo né condividiamo mai i dati dei clienti.
   meta_titles:
     bikes_index: Risultati della ricerca
     bikes_new: Registra una bicicletta!
@@ -8260,6 +8210,135 @@ it:
             a partire.
           why_it_matters: Perché è importante
           zoom: ZOOM!
+        for_bike_shops:
+          a_reason_to_trust_you: Un motivo per fidarmi di te.
+          a_reason_to_trust_you_body: Un omaggio gratuito che dimostra la tua attenzione
+            anche dopo la vendita.
+          bike_book_body: Confronta specifiche, geometrie e una miriade di altre caratteristiche
+            tra migliaia di modelli di biciclette.
+          bikes_that_came_home: Biciclette che sono tornate a casa
+          browse_bike_book_spaced: Sfoglia il libro sulle biciclette
+          bulk_order_email_subject: Ordine di adesivi all'ingrosso
+          check_your_state: Controlla il tuo stato
+          choose_your_pos: Scegli il tuo POS
+          coming_soon: Prossimamente
+          contact_us: Contattaci
+          contact_us_for_bulk_orders_html: "%{contact_link} per ordini all'ingrosso."
+          customer_records_sold_or_shared: dati dei clienti venduti o condivisi
+          data_stays_private: I loro dati restano privati.
+          data_stays_private_body: Mai venduto, mai condiviso.
+          ding: DING!
+          ebike_legality_checker: Verificatore di legalità delle e-bike
+          ebike_legality_checker_body: Linee guida stato per stato sulle classi di
+            e-bike, sui luoghi in cui è consentito circolare e sulle normative relative
+            all'età e all'equipaggiamento. Utili quando un cliente chiede informazioni
+            sulla legalità del prodotto prima dell'acquisto.
+          email_our_shop_team: Invia un'e-mail al nostro team del negozio
+          email_placeholder: tu@tuonegozio.com
+          faq: FAQ
+          faq_cost_answer: Niente. Bike Index è gratuito sia per i negozi che per
+            i vostri clienti. Gli adesivi di registrazione sono un prodotto opzionale
+            da vendere al dettaglio.
+          faq_cost_question: Quanto costa?
+          faq_customer_answer: Niente allo sportello. Ricevono un'e-mail da Bike Index
+            per confermare la registrazione e aggiungere le foto.
+          faq_customer_question: Cosa deve fare il mio cliente?
+          faq_data_answer: No. Abbiamo politiche sulla privacy molto restrittive e
+            non vendiamo né condividiamo mai i dati dei clienti.
+          faq_data_question: Vendete o condividete i dati dei clienti?
+          faq_pos_answer: Lightspeed e Ascend sono disponibili da oggi. Shopify arriverà
+            presto. I negozi sprovvisti di un sistema POS compatibile possono comunque
+            registrare le biciclette tramite il proprio account.
+          faq_pos_question: Con quali sistemi POS vi integrate?
+          faq_setup_answer: Circa 10 minuti. Una volta collegato il POS, le biciclette
+            vengono registrate automaticamente a ogni transazione.
+          faq_setup_question: Quanto tempo richiede l'installazione?
+          faq_stickers_answer: Gli adesivi sono venduti a dozzine nel nostro negozio
+            online, con un prezzo al dettaglio consigliato di $7,99. I prezzi all'ingrosso
+            sono visualizzati nel carrello.
+          faq_stickers_question: Come faccio a ordinare gli adesivi per la registrazione?
+          for_bike_shops_free_nonprofit: Per i negozi di biciclette · Gratuito · Organizzazione
+            senza scopo di lucro
+          for_you_and_your_customers: per te e per i tuoi clienti
+          for_your_customers: Per i tuoi clienti
+          for_your_shop: Per il tuo negozio
+          free_for_shops_and_customers: Gratis per negozi e clienti, per sempre.
+          free_forever: Gratis, per sempre. Ti aiuteremo a collegare il tuo POS.
+          free_registration: Iscrizione gratuita.
+          free_registration_body: La loro moto viene ripresa prima che se ne vadano.
+          free_tools: Strumenti gratuiti per te e i tuoi clienti.
+          free_tools_choose_body: per aiutare i clienti a scegliere.
+          free_tools_fun_body: per rendere più divertente possedere una bicicletta.
+          free_tools_title: Strumenti gratuiti
+          help_if_stolen: Aiuto in caso di furto.
+          help_if_stolen_body: Con un solo clic si invia un avviso a negozi, polizia
+            e motociclisti.
+          hero_lede_trust: Bike Index si collega al tuo sistema POS e registra automaticamente
+            ogni bicicletta che vendi. I tuoi clienti ottengono una protezione antifurto
+            gratuita. Il tuo negozio diventerà un punto di riferimento affidabile.
+          live: In diretta
+          min: min
+          more_from_bike_index: Altro da Bike Index
+          never_shared: Mai condiviso
+          never_sold: mai venduto
+          new_our_first_retail_product: Novità · Il nostro primo prodotto al dettaglio
+          no_extra_forms: Niente moduli aggiuntivi al banco e nessuna formazione per
+            il personale. Una volta collegato il sistema POS, ogni vendita di biciclette
+            si trasforma in una registrazione Bike Index.
+          nothing_to_manage: Niente da gestire.
+          nothing_to_manage_body: 10 minuti per la connessione, dopodiché viene applicato
+            a ogni vendita.
+          order_stickers: Adesivi per ordinare
+          peace_of_mind_on_a_sticker: Una piccola consolazione, racchiusa in un adesivo.
+          pos_ascend: Ascendere
+          pos_lightspeed: Velocità della luce
+          pos_other_or_none: Altro / nessuno
+          pos_shopify_coming_soon: Shopify (disponibile a breve)
+          pricing_shown_in_cart: Il prezzo verrà visualizzato nel carrello.
+          privacy_body: Bike Index è un'organizzazione senza scopo di lucro con politiche
+            sulla privacy molto restrittive. Le informazioni dei clienti del tuo negozio
+            vengono utilizzate per registrare e recuperare le biciclette. Non vengono
+            mai vendute, condivise o utilizzate a fini pubblicitari.
+          ring_up_the_sale: Registra la vendita. Al resto pensiamo noi.
+          safer_used_bike_sales: Vendita di biciclette usate più sicura.
+          safer_used_bike_sales_body: Verificare i numeri di serie rispetto al registro.
+          see_the_tools: Guarda gli strumenti
+          send_every_bike_home_with_a_sidekick: Consegnate a casa ogni bicicletta
+            con un compagno di viaggio.
+          set_it_and_forget_it: Impostalo e dimenticatene
+          shop_name: Nome del negozio
+          shop_name_placeholder: Cicli a raggi e catena
+          sign_up_free: Iscrizione gratuita
+          sign_up_your_shop: Registra il tuo negozio
+          signup_name: iscrizione
+          something_else_html: Qualcos'altro? %{email_link}.
+          step_connect_body: Collega Lightspeed o Ascend al tuo account gratuito del
+            negozio. Ci vogliono circa 10 minuti.
+          step_connect_title: Collega il tuo POS
+          step_covered_body: Ricevono un'e-mail per riscattare la loro registrazione,
+            con il numero di serie e i dettagli già precompilati.
+          step_covered_title: Il tuo cliente è coperto
+          step_sell_body: Al banco non cambia nulla. Ogni vendita di biciclette viene
+            registrata automaticamente su Bike Index.
+          step_sell_title: Vendi biciclette come sempre
+          sticker_body: Vendi gli adesivi di registrazione Bike Index al banco. I
+            ciclisti scansionano il codice QR, registrano la loro bici e associano
+            l'adesivo ad essa. Funziona con qualsiasi bici, anche quelle che non sono
+            passate attraverso il tuo punto vendita.
+          sticker_sheet_alt: Foglio di adesivi per la registrazione Bike Index
+          suggested_retail: Prezzo al dettaglio consigliato
+          suggested_retail_price: "$7,99"
+          ten_minutes_now: Dieci minuti ormai. Biciclette protette per sempre.
+          to_set_up: per impostare
+          used_only_for_bikes: Utilizzabile solo per biciclette
+          we_never_sell_or_share: Non vendiamo né condividiamo mai i dati dei clienti.
+          well_email_you: Ti invieremo un'email con le istruzioni per collegare il
+            tuo sistema POS.
+          what_your_customers_get: Ciò che ottengono i tuoi clienti. Ciò che ottiene
+            il tuo negozio.
+          wholesale: Commercio all'ingrosso
+          your_pos: Il tuo POS
+          youre_in: Sei dentro.
       marketplace:
         how_it_works:
           across_town_heading: Dall'altra parte della città o dall'altra parte del
