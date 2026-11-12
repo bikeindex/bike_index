@@ -1,0 +1,18 @@
+<div
+  id="donate-form"
+  class="tw:-mx-5 tw:flex tw:flex-col tw:gap-4 tw:border-y tw:border-[#e0e0e0] tw:bg-[#f8f8f8] tw:px-5 tw:py-6.5 tw:md:mx-auto tw:md:w-full tw:md:max-w-xl tw:md:rounded-lg tw:md:border tw:md:p-6.5 tw:dark:border-gray-700 tw:dark:bg-gray-800/60 <%= @html_class %>"
+>
+  <div class="tw:flex tw:flex-col tw:gap-1.5">
+    <h2 class="tw:mb-0 tw:font-header tw:text-[22px] tw:font-extrabold tw:lg:text-2xl">
+      <%= @title %>
+    </h2>
+
+    <% if @subtitle.present? %>
+      <p class="tw:mb-0 tw:text-sm tw:text-[#666] tw:dark:text-gray-400">
+        <%= @subtitle %>
+      </p>
+    <% end %>
+  </div>
+
+  <%= content %>
+</div>

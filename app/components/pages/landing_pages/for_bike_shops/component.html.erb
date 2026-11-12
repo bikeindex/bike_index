@@ -263,44 +263,7 @@
 
   <div class="twwiderow tw:gap-6">
     <% tools.each do |tool| %>
-      <%= render(UI::Card::Component.new(additional_classes: "tw:relative tw:flex tw:flex-col tw:gap-3 tw:overflow-hidden tw:p-7! tw:pt-0! tw:transition-all tw:duration-300 tw:hover:-translate-y-1.25 tw:hover:shadow-[0_10px_30px_rgba(44,62,80,.16)]")) do %>
-        <div
-          class="
-            tw:@container tw:relative tw:-mx-7 tw:aspect-[1040/630]
-            tw:w-[calc(100%+3.5rem)] tw:overflow-hidden tw:border-x-2
-            tw:border-t-2 tw:border-b tw:border-gray-200
-            tw:dark:border-gray-700
-          "
-        >
-          <iframe
-            src="<%= tool[:frame] %>"
-            title="<%= tool[:title] %>"
-            loading="lazy"
-            sandbox="allow-scripts allow-same-origin"
-            tabindex="-1"
-            aria-hidden="true"
-            inert
-            class="tw:pointer-events-none tw:absolute tw:[top:calc(var(--frame-crop-top)*var(--frame-scale)*-1)] tw:[left:calc(var(--frame-crop-x)*var(--frame-scale)*-1)] tw:[height:calc(100%/var(--frame-scale)_+_var(--frame-crop-top))] tw:[width:calc(100%/var(--frame-scale)_+_var(--frame-crop-x)*2)] tw:origin-top-left tw:[scale:var(--frame-scale)] <%= tool[:frame_class] %>"
-          ></iframe>
-        </div>
-
-        <span class="tw:relative tw:-mt-9 tw:flex tw:size-12 tw:items-center tw:justify-center tw:rounded-full tw:text-white tw:ring-4 tw:ring-white tw:dark:ring-gray-800 <%= tool[:circle] %>">
-          <%= helpers.inline_svg_tag(tool[:icon], class: "tw:size-5.5", aria_hidden: true) %>
-        </span>
-
-        <h3 class="tw:text-[22px] <%= HEADING_CLASSES %>">
-          <%= tool[:title] %>
-        </h3>
-
-        <p class="tw:m-0 tw:flex-1 tw:text-base tw:leading-relaxed <%= MUTED %>">
-          <%= tool[:body] %>
-        </p>
-
-        <%= link_to(tool[:href], class: "twlink tw:font-bold tw:after:absolute tw:after:inset-0") do %>
-          <%= tool[:action] %>
-          <span aria-hidden="true">→</span>
-        <% end %>
-      <% end %>
+      <%= render(SharedBlocks::Marketing::FramedCard::Component.new(**tool)) %>
     <% end %>
   </div>
 </section>

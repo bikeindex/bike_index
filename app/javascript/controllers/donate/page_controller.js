@@ -1,7 +1,7 @@
 import { Controller } from '@hotwired/stimulus'
 
 // Connects to data-controller='donate--page'
-// The major gift cards and the closing CTA, relayed to and from Pages::Donate::Form's controller
+// The major gift cards, the closing CTA and the 10% button, relayed to and from Pages::Donate::Form's controller
 export default class extends Controller {
   static targets = ['majorGift', 'submit']
 
@@ -15,6 +15,12 @@ export default class extends Controller {
   submit () {
     const { defaultPrevented } = this.dispatch('submit', { target: window })
     if (!defaultPrevented) document.getElementById('donate-form').scrollIntoView({ behavior: 'smooth' })
+  }
+
+  // Scrolls without waiting for donate--ten-percent, which loads separately
+  openTenPercent () {
+    this.dispatch('open-ten-percent', { target: window })
+    document.getElementById('donate-form').scrollIntoView({ behavior: 'smooth' })
   }
 
   formChanged ({ detail: { label, customAmount } }) {

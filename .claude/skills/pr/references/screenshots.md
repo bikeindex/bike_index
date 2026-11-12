@@ -10,6 +10,8 @@ The flow: decide what to capture → capture the branch → capture the same URL
 
 **The web sandbox is the exception to that skip.** `gh` doesn't work there, but it hosts in the PR branch's own history instead — capture and post normally, following `github-pr-images`' [references/web-sandbox.md](../../github-pr-images/references/web-sandbox.md) for the hosting. Those URLs last only as long as the branch's objects, so say in your summary that a merged PR's screenshots aren't archival.
 
+**Run that file's probe before anything else in this phase** — before the dev server, the captures and the hosting commits. Some sessions' comment tools rewrite every image URL into inert text, which only shows after the capture round, and the probe finds out for two calls. When it fails, the phase ends there: its one-line update to the `## Screenshots` comment is the only thing posted — the exception to the next paragraph — and your summary gives the user the reason.
+
 **Skipping means posting nothing at all**, not posting something else. Substitute evidence — a rendered-HTML diff, a note about what couldn't be captured — leaves a comment the next run can't find or replace, because it isn't the `## Screenshots` comment; that's how #4126 ended up with three comments telling one story. If it's worth having, put it in your summary and let the user decide where it goes.
 
 ## Preflight: a CSS diff needs a fresh tailwind build

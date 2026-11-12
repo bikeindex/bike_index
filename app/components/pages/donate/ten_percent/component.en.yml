@@ -1,0 +1,9 @@
+---
+en:
+  components:
+    pages:
+      donate:
+        ten_percent:
+          bike_value: What's your bike worth?
+          heading: Got a bike back with Bike Index? Give 10% of its value.
+          result_html: 10% is %{amount}. We've set that as your gift below.

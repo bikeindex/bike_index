@@ -12,6 +12,8 @@ module Pages
         BAND = "tw:border-gray-200 tw:bg-gray-50 tw:dark:border-gray-700 tw:dark:bg-gray-800"
         BIKE_BOOK_MODELS = %w[m/trek/2026/domane_sl_6_gen_4 m/specialized/2026/tarmac_sl8_pro_shimano_ultegra_di2
           m/cannondale/2025/synapse_carbon_1].freeze
+        # Bike Book's banner is taller below 1024px, which its frame reaches at 410px
+        BIKE_BOOK_FRAME_CLASS = "tw:[--frame-crop-x:0px] tw:[--frame-crop-top:258px] tw:@min-[410px]:[--frame-crop-top:240px] tw:[--frame-scale:0.4]"
         PRIVACY_ICON = SharedBlocks::Marketing::SectionHeading::Component::EYEBROW_COLORS[:yellow]
 
         # checker_place: the visitor's, as /ebike-rules detects it, which the checker's frame shows
@@ -74,9 +76,7 @@ module Pages
             ["icons/bike.svg", translation(".used_only_for_bikes")]]
         end
 
-        # frame_class scales the framed page and crops its navbar off the top (an #anchor would scroll this page too).
-        # The checker lays out at a fixed 900px, where its box's top doesn't move; tan(atan2()) divides two lengths.
-        # Bike Book's banner is taller below 1024px, which its frame reaches at 410px
+        # The checker lays out at a fixed 900px, where its box's top doesn't move; tan(atan2()) divides two lengths
         def tools
           [{href: ebike_rules_path, icon: "icons/bolt.svg", circle: "tw:bg-blue-600",
             frame: ebike_rules_place_path(*(@checker_place&.dig(:code) || "US-CA").split("-"), manual: 1, top_speed: 20, watts: 750, throttle: 0),
@@ -85,7 +85,7 @@ module Pages
             action: translation(".check_your_state")},
             {href: bikebook_path, icon: "icons/book-open.svg", circle: "tw:bg-purple-500",
              frame: bikebook_path(vehicle_models: BIKE_BOOK_MODELS.join(",")),
-             frame_class: "tw:[--frame-crop-x:0px] tw:[--frame-crop-top:258px] tw:@min-[410px]:[--frame-crop-top:240px] tw:[--frame-scale:0.4]",
+             frame_class: BIKE_BOOK_FRAME_CLASS,
              title: "Bike Book", body: translation(".bike_book_body"), action: translation(".browse_bike_book_spaced")}]
         end
 

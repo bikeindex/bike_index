@@ -9,7 +9,16 @@ RSpec.describe SharedBlocks::Marketing::InvertedBlock::Component, type: :compone
 
   it "renders the content inside an inverted section with the default padding" do
     expect(component.css("section.inverted p").text).to eq "Partner with us"
-    expect(grid_classes).to include("tw:py-20")
+    expect(grid_classes).to include("tw:py-20", "tw:grid")
+  end
+
+  context "stacked" do
+    let(:options) { {layout: :stacked} }
+
+    it "puts the content in one column" do
+      expect(grid_classes).to include("tw:flex", "tw:flex-col")
+      expect(grid_classes).not_to include("tw:grid")
+    end
   end
 
   context "with an html_class" do
