@@ -15,27 +15,11 @@
       </h1>
 
       <p class="tw:m-0 tw:mb-7 tw:max-w-125 tw:text-[17px] tw:leading-[1.55] tw:md:text-[19px] <%= MUTED %>">
-        <%= translation(".hero_lede") %>
+        <%= translation(".hero_lede_trust") %>
       </p>
 
-      <div class="tw:grid tw:max-w-140 tw:grid-cols-3 tw:gap-3">
-        <% hero_stats.each do |value, label| %>
-          <div
-            class="
-              tw:border-t-2 tw:border-gray-200 tw:pt-2.5
-              tw:dark:border-gray-700
-            "
-          >
-            <div class="tw:text-[28px] tw:leading-none tw:text-blue-600 tw:uppercase tw:md:text-[34px] <%= COMIC_FONT %>">
-              <%= value %>
-            </div>
-
-            <div class="tw:mt-1 tw:text-sm <%= MUTED %>">
-              <%= label %>
-            </div>
-          </div>
-        <% end %>
-      </div>
+      <%= render(SharedBlocks::Marketing::NumberBlocks::Component.new(items: hero_stats, layout: :row_from_md,
+        html_class: "tw:max-w-140 tw:md:grid-cols-3!")) %>
     </div>
 
     <div id="shop-signup" class="tw:scroll-mt-20">
@@ -51,7 +35,7 @@
             tw:target:block
           "
         >
-          <div class="tw:text-5xl tw:leading-none tw:text-blue-600 <%= COMIC_FONT %>">
+          <div class="tw:text-5xl tw:leading-none tw:text-blue-600 <%= HEADING_CLASSES %>">
             <%= translation(".ding") %>
           </div>
 
@@ -146,7 +130,7 @@
           "
         >
           <span
-            class="tw:flex tw:size-14 tw:items-center tw:justify-center tw:rounded-full tw:border-2 tw:border-blue-600 tw:bg-blue-100 tw:text-3xl tw:text-blue-600 <%= COMIC_FONT %>"
+            class="tw:flex tw:size-14 tw:items-center tw:justify-center tw:rounded-full tw:border-2 tw:border-blue-600 tw:bg-blue-100 tw:text-3xl tw:text-blue-600 <%= HEADING_CLASSES %>"
             aria-hidden="true"
           >
             <%= number_display(index + 1) %>
@@ -181,18 +165,9 @@
     <div class="twwiderow tw:gap-6">
       <% benefit_cards.each do |card| %>
         <%= render(UI::Card::Component.new(shadow: :black, additional_classes: "tw:p-7!")) do %>
-          <div class="tw:mb-4 tw:flex tw:items-center tw:justify-between tw:gap-3">
-            <h3 class="tw:text-xl <%= HEADING_CLASSES %>">
-              <%= card[:title] %>
-            </h3>
-
-            <span
-              class="tw:text-2xl <%= card[:color] %> <%= COMIC_FONT %>"
-              aria-hidden="true"
-            >
-              <%= card[:burst] %>
-            </span>
-          </div>
+          <h3 class="tw:mb-4 tw:text-xl <%= HEADING_CLASSES %>">
+            <%= card[:title] %>
+          </h3>
 
           <div class="tw:grid tw:gap-4">
             <% card[:rows].each do |icon, title, body| %>
@@ -322,8 +297,8 @@
       intro: translation(".something_else_html",
         email_link: mail_to("support@bikeindex.org", translation(".email_our_shop_team"), class: "twlink tw:font-semibold")))) %>
 
-    <div class="tw:flex tw:flex-col tw:gap-2.5">
-      <%= render(UI::Accordion::Component.new(items: faqs, boxed: true)) %>
+    <div>
+      <%= render(UI::Accordion::Component.new(items: faqs)) %>
     </div>
   </div>
 </section>

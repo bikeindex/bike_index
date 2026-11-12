@@ -7,8 +7,6 @@ module Pages
         include MoneyHelper
 
         SECTION_CLASSES = SharedBlocks::Marketing::Wrapper::Component::CONTAINER_CLASSES
-        # Loaded by this page alone, so not a theme font
-        COMIC_FONT = "tw:font-['Bangers',cursive]"
         MUTED = "tw:text-gray-500 tw:dark:text-gray-400"
         HEADING_CLASSES = "tw:m-0 tw:font-header tw:font-extrabold"
         BAND = "tw:border-gray-200 tw:bg-gray-50 tw:dark:border-gray-700 tw:dark:bg-gray-800"
@@ -18,12 +16,6 @@ module Pages
           @recovery_displays = recovery_displays
           @feedback = feedback
           @current_user = current_user
-        end
-
-        def before_render
-          helpers.content_for(:header) do
-            tag.link(href: "https://fonts.googleapis.com/css2?family=Bangers&display=swap", rel: "stylesheet")
-          end
         end
 
         private
@@ -54,12 +46,12 @@ module Pages
         end
 
         def benefit_cards
-          [{title: translation(".for_your_customers"), burst: translation(".safe"), color: "tw:text-blue-600", circle: "tw:bg-blue-600",
+          [{title: translation(".for_your_customers"), circle: "tw:bg-blue-600",
             rows: [["icons/gift.svg", translation(".free_registration"), translation(".free_registration_body")],
               ["icons/siren.svg", translation(".help_if_stolen"), translation(".help_if_stolen_body")],
               ["icons/shield-check.svg", translation(".data_stays_private"), translation(".data_stays_private_body")],
               ["icons/wrench.svg", translation(".free_tools_title"), with_tools_link(translation(".free_tools_fun_body"))]]},
-            {title: translation(".for_your_shop"), burst: translation(".pow"), color: "tw:text-purple-500", circle: "tw:bg-purple-500",
+            {title: translation(".for_your_shop"), circle: "tw:bg-purple-500",
              rows: [["icons/timer.svg", translation(".nothing_to_manage"), translation(".nothing_to_manage_body")],
                ["icons/heart-handshake.svg", translation(".a_reason_to_trust_you"), translation(".a_reason_to_trust_you_body")],
                ["icons/lucide-search.svg", translation(".safer_used_bike_sales"), translation(".safer_used_bike_sales_body")],

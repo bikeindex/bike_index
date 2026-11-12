@@ -68,10 +68,10 @@ en:
           free_tools_title: Free tools
           help_if_stolen: Help if it's stolen.
           help_if_stolen_body: One click sends an alert to shops, police, and riders.
-          hero_lede: >-
+          hero_lede_trust: >-
             Bike Index connects to your POS and registers every bike you sell, automatically.
-            Your customers get free theft protection. You get a shop that clearly
-            puts them first.
+            Your customers get free theft protection. You become a shop that they
+            trust.
           live: Live
           min: min
           more_from_bike_index: More from Bike Index
@@ -89,14 +89,12 @@ en:
           pos_lightspeed: Lightspeed
           pos_other_or_none: Other / none
           pos_shopify_coming_soon: Shopify (coming soon)
-          pow: POW!
           pricing_shown_in_cart: Pricing shown in cart
           privacy_body: >-
             Bike Index is a nonprofit with very restrictive privacy policies. Customer
             information from your shop is used to register and recover bikes. It is
             never sold, shared, or used for advertising.
           ring_up_the_sale: Ring up the sale. We handle the rest.
-          safe: SAFE!
           safer_used_bike_sales: Safer used-bike sales.
           safer_used_bike_sales_body: Check serials against the registry.
           see_the_tools: See the tools
