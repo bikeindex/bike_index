@@ -28,10 +28,7 @@
   <% end %>
 
   <% table.column(label: "Step", classes: "tw:text-xs") do |b_param| %>
-    <% step = BikeServices::Register.current_step(b_param) %>
-    <% page_index = BikeServices::Register.page_index_for_step(step) %>
-
-    <%= page_index.negative? ? step : "rules page #{page_index + 1}" %>
+    <%= render(Atoms::RegistrationStep::Component.new(b_param:)) %>
   <% end %>
 
   <% table.column(sortable: "origin", classes: "tw:text-xs") do |b_param| %>

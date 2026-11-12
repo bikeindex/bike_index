@@ -47,7 +47,7 @@ RSpec.describe base_url, type: :request do
         get base_url
 
         expect(response.code).to eq("200")
-        expect(response.body).to match(%r{<td[^>]*>\s*2\s*</td>})
+        expect(response.body).to include("Step 2")
       end
     end
 

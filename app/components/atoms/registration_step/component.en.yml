@@ -1,0 +1,12 @@
+---
+en:
+  components:
+    atoms:
+      registration_step:
+        awaiting_email_confirmation: Awaiting email confirmation
+        finished: Finished
+        report: Report
+        review: Rules review
+        rules_page: Rules page %{number}
+        step_1: Step 1
+        step_2: Step 2
