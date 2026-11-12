@@ -12,6 +12,7 @@ module Pages
         RECOVERED = 1_358
         REGISTERED = 96_328
         REFERRAL_SOURCE = "eoy-2026"
+        MARKETPLACE_FRAME_CLASS = "tw:[--frame-crop-x:0px] tw:[--frame-crop-top:700px] tw:[--frame-scale:0.4]"
 
         def initialize(stripe_prices:, initial_amount: nil, referral_source: nil, current_user: nil)
           # a source[]= param arrives as an Array
@@ -48,14 +49,16 @@ module Pages
             {icon: "icons/lucide-handshake.svg", circle: "tw:bg-purple-500", title: translation(".shipped_partners_title"), body: translation(".shipped_partners")}]
         end
 
-        # position: where the screenshot's results start, so the card's short window shows bikes rather than the header
         def building
-          [{image: "donate/year-end-bikebook.webp", alt: translation(".bikebook_image_alt"), position: "tw:object-[center_83%]",
+          [{href: bikebook_path, icon: "icons/book-open.svg", circle: "tw:bg-purple-500",
+            frame: bikebook_path(vehicle_models: Pages::LandingPages::ForBikeShops::Component::BIKE_BOOK_MODELS.join(",")),
+            frame_class: Pages::LandingPages::ForBikeShops::Component::BIKE_BOOK_FRAME_CLASS,
             eyebrow: translation(".bikebook_eyebrow"), title: translation(".bikebook_title"),
-            body: translation(".bikebook_body"), link_text: translation(".bikebook_link"), href: bikebook_path},
-            {image: "donate/year-end-marketplace.webp", alt: translation(".marketplace_image_alt"), position: "tw:object-[center_89%]",
+            body: translation(".bikebook_body"), action: translation(".bikebook_link")},
+            {href: search_marketplace_path, icon: "icons/lucide-store.svg", circle: "tw:bg-blue-600",
+             frame: search_marketplace_path, frame_class: MARKETPLACE_FRAME_CLASS,
              eyebrow: translation(".marketplace_eyebrow"), title: translation(".marketplace_title"),
-             body: translation(".marketplace_body"), link_text: translation(".marketplace_link"), href: search_marketplace_path}]
+             body: translation(".marketplace_body"), action: translation(".marketplace_link")}]
         end
 
         def network

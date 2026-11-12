@@ -166,32 +166,10 @@
       <%= render(heading.new(eyebrow: translation(".building_eyebrow"), eyebrow_color: :yellow, heading: translation(".building_title"), intro: translation(".building_intro"),
         on_dark: true, html_class: "tw:max-w-190")) %>
 
-      <div class="twwiderow tw:gap-y-5">
+      <%# inverted keeps the cards light in this dark section %>
+      <div class="inverted twwiderow tw:gap-6 tw:text-slate-900">
         <% building.each do |card| %>
-          <div
-            class="
-              inverted tw:flex tw:flex-col tw:overflow-hidden tw:rounded-lg
-              tw:bg-white tw:text-slate-900
-            "
-          >
-            <%= image_tag card[:image], alt: card[:alt], loading: "lazy", width: 1100, height: 924, class: "tw:h-45 tw:w-full tw:border-b tw:border-[#e0e0e0] tw:object-cover #{card[:position]}" %>
-
-            <div class="tw:flex tw:flex-col tw:gap-2 tw:px-6.5 tw:pt-6 tw:pb-7">
-              <p class="tw:m-0 <%= heading.eyebrow_classes(:purple) %>">
-                <%= card[:eyebrow] %>
-              </p>
-
-              <h3 class="tw:m-0 tw:font-header tw:text-2xl tw:font-extrabold">
-                <%= card[:title] %>
-              </h3>
-
-              <p class="tw:m-0 tw:text-[15.5px] tw:leading-normal <%= muted %>">
-                <%= card[:body] %>
-              </p>
-
-              <%= link_to card[:link_text], card[:href], class: "twlink tw:mt-1.5 tw:text-[15px] tw:font-bold" %>
-            </div>
-          </div>
+          <%= render(SharedBlocks::Marketing::FramedCard::Component.new(**card)) %>
         <% end %>
       </div>
 

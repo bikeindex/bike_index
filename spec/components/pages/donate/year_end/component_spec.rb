@@ -27,8 +27,8 @@ RSpec.describe Pages::Donate::YearEnd::Component, type: :component do
     expect(component).to have_css("h3", text: "E-bike legality checker")
     expect(component).to have_link("Visit the Marketplace", href: "/search/marketplace")
     expect(component).to have_link("See a sneak peek of Bike Book", href: "/bikebook")
-    expect(component).to have_css("img[alt^='Bike Book'][src*='year-end-bikebook']")
-    expect(component).to have_css("img[alt^='Bike Index Marketplace'][src*='year-end-marketplace']")
+    expect(component).to have_css("iframe[inert][title='Meet Bike Book'][src^='/bikebook?vehicle_models=']")
+    expect(component).to have_css("iframe[inert][title='Marketplace'][src='/search/marketplace']")
   end
 
   it "links the major gifts to this page, with their amount" do

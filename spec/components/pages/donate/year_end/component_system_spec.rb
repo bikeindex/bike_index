@@ -7,6 +7,8 @@ RSpec.describe Pages::Donate::YearEnd::Component, :js, type: :system do
     FactoryBot.create(:stripe_price_basic)
     FactoryBot.create(:stripe_price_plus)
     FactoryBot.create(:stripe_price_patron)
+    # for the Bike Book card's frame
+    serve_bikebook_catalog
   end
 
   it "fills the gift from a bike's value, and works the 10% button and major gifts" do
