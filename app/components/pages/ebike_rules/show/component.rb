@@ -83,8 +83,6 @@ module Pages
         # Named for the model, which the browser renames for a later pick
         def details_legend = model ? translation(".model_details", model: model.make_and_model) : translation(".details_legend")
 
-        def custom_note = model && translation(".custom_details_note", model: model.make_and_model)
-
         def top_speed_entries
           cap = EbikeRuleServices::Places::CANADA_SPEED_CAP_KMH
           return [{value: cap, label: translation(".kmh", kmh: cap)}, {value: cap + 1, label: translation(".over_kmh", kmh: cap)}] unless us?

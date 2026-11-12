@@ -33,7 +33,7 @@ en:
           compare_html: Want to compare multiple bikes? %{link}
           country: Country
           custom_details: Custom details
-          custom_details_note: >-
+          custom_details_note_html: >-
             These aren't the %{model}'s settings anymore — you changed them, so the
             check is of yours.
           details_legend: Your bike's details
