@@ -28,6 +28,22 @@ RSpec.describe Pages::Donate::YearEnd::Component, :js, type: :system do
     expect(page).to have_checked_field("payment[amount_cents]", with: "10000", visible: :all)
     expect(page).to have_button("Donate $100", count: 2)
 
+    # Another amount takes over from the helper, so it stops claiming the gift
+    fill_in "What's your bike worth?", with: "2400"
+    expect(page).to have_text("10% is $240")
+    choose "$50", allow_label_click: true
+    expect(page).to have_no_text("10% is $240")
+    expect(page).to have_field("What's your bike worth?", with: "")
+    fill_in "What's your bike worth?", with: "2400"
+    fill_in "Other amount", with: "75"
+    expect(page).to have_no_text("10% is $240")
+    expect(page).to have_field("What's your bike worth?", with: "")
+    # A tenth over the most a payment can be isn't filled in
+    fill_in "What's your bike worth?", with: "12000000"
+    expect(page).to have_no_text("10% is")
+    expect(page).to have_field("Other amount", with: "")
+    fill_in "What's your bike worth?", with: ""
+
     choose "Monthly", allow_label_click: true
     expect(page).to have_button("Become a member — $9.99/month", count: 2)
     click_on "Work out my 10%"

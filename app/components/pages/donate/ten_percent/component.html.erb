@@ -6,7 +6,7 @@
   "
   data-controller="ui--collapse donate--ten-percent"
   data-donate--ten-percent-currency-symbol-value="<%= @currency_symbol %>"
-  data-action="donate--page:open-ten-percent@window->ui--collapse#show donate--page:open-ten-percent@window->donate--ten-percent#focus"
+  data-action="donate--page:open-ten-percent@window->ui--collapse#show donate--page:open-ten-percent@window->donate--ten-percent#focus donate--form:change@window->donate--ten-percent#formChanged"
 >
   <%= render UI::Collapse::Component.new(color: :link, chevron: :trailing, html_class: "tw:w-full tw:justify-between tw:gap-2.5 tw:text-left tw:text-[14.5px]") do %>
     <span class="tw:flex tw:items-center tw:gap-2.5">
@@ -45,7 +45,7 @@
           autocomplete="off"
           placeholder="<%= translation(".bike_value") %>"
           class="
-            tw:w-full tw:border-0 tw:bg-transparent tw:py-3 tw:text-[15px]
+            tw:w-full tw:border-0 tw:bg-transparent tw:py-3 tw:text-base
             tw:outline-none tw:focus:ring-0
           "
           data-donate--ten-percent-target="value"

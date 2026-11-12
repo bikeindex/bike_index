@@ -41,6 +41,16 @@ RSpec.describe Pages::Donate::Form::Component, type: :component do
     end
   end
 
+  context "with an initial_amount over what a payment can be" do
+    let(:initial_amount) { "1000000" }
+
+    it "ignores it, and caps the other amount at that limit" do
+      expect(component).to have_field("payment[amount]", with: "")
+      expect(component).to have_css("input[name='payment[amount]'][max='999999.99']")
+      expect(component).to have_css("input[name='payment[amount_cents]'][value='5000'][checked]")
+    end
+  end
+
   context "with a custom initial_amount" do
     let(:initial_amount) { "500" }
 

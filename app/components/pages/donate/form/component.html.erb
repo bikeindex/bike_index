@@ -28,7 +28,8 @@
             tw:-mb-px tw:flex-1 tw:cursor-pointer tw:border-b-3
             tw:border-transparent tw:py-2.75 tw:text-center tw:text-sm
             tw:font-semibold tw:tracking-wider tw:text-[#666] tw:uppercase
-            tw:has-checked:border-blue-500 tw:has-checked:text-blue-500
+            tw:has-checked:border-blue-500 tw:has-checked:text-blue-600
+            tw:dark:has-checked:text-blue-400
             tw:has-focus-visible:bg-blue-50 tw:lg:text-[15px]
             tw:dark:text-gray-400 tw:dark:has-focus-visible:bg-gray-700
           "
@@ -182,6 +183,7 @@
         <input
           type="number"
           min="1"
+          max="<%= MAX_AMOUNT %>"
           step="0.01"
           inputmode="decimal"
           autocomplete="off"
@@ -189,8 +191,8 @@
           value="<%= custom_amount %>"
           placeholder="<%= translation(".other_amount") %>"
           class="
-            tw:w-full tw:border-0 tw:bg-transparent tw:py-3.5
-            tw:text-[15.5px] tw:outline-none tw:focus:ring-0
+            tw:w-full tw:border-0 tw:bg-transparent tw:py-3.5 tw:text-base
+            tw:outline-none tw:focus:ring-0
           "
           data-donate--form-target="customAmount"
           data-action="input->donate--form#customInput"

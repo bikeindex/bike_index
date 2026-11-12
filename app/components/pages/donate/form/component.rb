@@ -8,6 +8,8 @@ module Pages
       # without javascript - the donate--form controller only keeps the labels in step.
       class Component < ApplicationComponent
         ONE_TIME_AMOUNTS = [25, 50, 100].freeze
+        # PaymentsController refuses anything over 99,999,999 cents
+        MAX_AMOUNT = 999_999.99
 
         # amounts/default_amount: the one-time presets, and the one selected without an initial_amount
         # default_cadence: :monthly or :one_time, whichever tab leads and is selected first
@@ -18,7 +20,7 @@ module Pages
           @monthly_prices = stripe_prices.select(&:monthly?).to_h do
             [it.membership_level.to_sym, MoneyFormatter.money_format_no_cents_if_whole(it.amount_cents, @currency.slug)]
           end
-          @initial_amount = initial_amount.to_i if initial_amount.to_i.positive?
+          @initial_amount = initial_amount.to_i if initial_amount.to_i.between?(1, MAX_AMOUNT)
           @referral_source = referral_source
           @amounts = amounts
           @default_amount = default_amount
