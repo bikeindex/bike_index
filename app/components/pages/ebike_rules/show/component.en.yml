@@ -107,6 +107,7 @@ en:
           register_your_bike: Register your bike
           reset_details: Reset to its settings
           select_country: Select a country
+          select_custom_values: Select custom values
           select_province: Select your province or territory
           select_state: Select your state
           state: State

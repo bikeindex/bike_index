@@ -444,6 +444,8 @@ RSpec.describe EbikeRulesController, type: :request do
         .and have_field("watts", with: "700")
         .and have_css("legend", text: "Specialized Haul ST details")
       expect(page.find("form[data-details]")["data-details"]).to eq "model"
+      expect(page.find("[data-ebike-rules--lookup-target='details']")[:class]).to include "tw:hidden!"
+      expect(page.find("[data-ebike-rules--lookup-target='customize']")[:hidden]).to be_nil
       # its id alone is the check
       expect(page.find("input[name='manual']", visible: :all)[:disabled]).to eq "disabled"
       expect(page.find("[data-bike-details]", visible: :all)["data-bike-details"]).to eq({top_speed: 28, throttle: 1, throttle_speed: 20, watts: 700}.to_json)
@@ -455,6 +457,8 @@ RSpec.describe EbikeRulesController, type: :request do
         .and have_css("legend", text: "Specialized Haul ST details")
         .and have_text("These aren't the Specialized Haul ST's settings anymore")
       expect(page.find("form[data-details]")["data-details"]).to eq "custom"
+      expect(page.find("[data-ebike-rules--lookup-target='details']")[:class]).not_to include "tw:hidden!"
+      expect(page.find("[data-ebike-rules--lookup-target='customize']", visible: :all)[:hidden]).to eq "hidden"
       expect(page.find("form[data-details]")["data-ebike-rules--lookup-display-value"]).to eq "Specialized Haul ST 2025"
       expect(page.find("input[name='manual']", visible: :all)[:disabled]).to be_nil
     end

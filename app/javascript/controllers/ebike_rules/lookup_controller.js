@@ -3,7 +3,7 @@ import { Turbo } from '@hotwired/turbo-rails'
 import { CURRENT_MARK, CatalogComboboxSource, loadCatalog } from 'bikebook/catalog'
 import { localSources } from 'utils/hw_combobox_patch'
 import { readable, replaceUrl } from 'bikebook/replace_url'
-import { collapseField, COLLAPSE_DURATION_MS } from 'utils/collapse_utils'
+import { collapse, collapseField, COLLAPSE_DURATION_MS } from 'utils/collapse_utils'
 
 const RESULT_FRAME = 'ebike-rules-check'
 const CLASSES_FRAME = 'ebike-rules-classes'
@@ -15,9 +15,9 @@ const DETAILS = ['manual', 'top_speed', 'throttle', 'throttle_speed', 'watts']
 // page, so the place is the form's path rather than a field. There's no submit button: a pick or a
 // change to the details loads its check into the result frame, replacing the URL with the check's own.
 // The form's data-details says which the check is of: a picked "model", whose details its check copies
-// into the panel; "custom" details changed from the model's; or "manual" details with no model
+// into the panel, collapsed until asked for; "custom" details changed from the model's; or "manual" details with no model
 export default class extends Controller {
-  static targets = ['combobox', 'comboboxSlot', 'state', 'stateNote', 'stateNeeded', 'stateChoose', 'manual', 'throttleSpeed', 'legend', 'modelName']
+  static targets = ['combobox', 'comboboxSlot', 'state', 'stateNote', 'stateNeeded', 'stateChoose', 'manual', 'throttleSpeed', 'legend', 'modelName', 'details', 'customize']
   static values = { manifestUrl: String, path: String, countryPath: String, display: String, failedText: String, title: String, legend: String, modelLegend: String }
 
   async connect () {
@@ -124,6 +124,10 @@ export default class extends Controller {
     this.#check()
   }
 
+  showDetails () {
+    this.#showDetails(true)
+  }
+
   focusState () {
     this.stateTarget.querySelector('input[role=combobox]').focus()
   }
@@ -207,6 +211,12 @@ export default class extends Controller {
   #setMode (mode) {
     this.element.dataset.details = mode
     this.manualTarget.disabled = mode === 'model'
+    this.#showDetails(mode !== 'model')
+  }
+
+  #showDetails (shown) {
+    collapse(shown ? 'show' : 'hide', this.detailsTarget)
+    this.customizeTarget.hidden = shown
   }
 
   get #mode () {
