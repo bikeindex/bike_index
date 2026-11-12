@@ -7,6 +7,7 @@ module Pages
         class Component < ApplicationComponent
           # Template Dependency: Pages::Registrations::Show::ComponentList::Component
           # Template Dependency: Pages::Registrations::Show::CurrentAlerts::Wrapper::Component
+          # Template Dependency: Pages::Registrations::Show::PotentialDuplicates::Component
           include BikeHelper
 
           OTHER_REGISTRATIONS_LIMIT = 10
@@ -32,10 +33,15 @@ module Pages
           # Records shown here that don't touch the bike, so its cache version misses them
           def cache_version
             [other_registrations.maximum(:updated_at), other_registrations_count,
-              *current_alerts_component.cache_version]
+              *current_alerts_component.cache_version, *potential_duplicates_component.cache_version]
           end
 
           private
+
+          def potential_duplicates_component
+            @potential_duplicates_component ||= Pages::Registrations::Show::PotentialDuplicates::Component.new(bike: @bike,
+              organization: @organization, current_user: @current_user)
+          end
 
           def current_alerts_component
             @current_alerts_component ||= CurrentAlerts::Wrapper::Component.new(bike: @bike,
