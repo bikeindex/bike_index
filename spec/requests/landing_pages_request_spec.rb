@@ -21,6 +21,10 @@ RSpec.describe LandingPagesController, type: :request do
       get "/for_bike_shops"
       expect(Capybara.string(response.body)).to have_css("iframe[src^='/ebike_rules/US/CA?']", visible: :all)
     end
+
+    it "redirects the dashed spelling, keeping the query" do
+      expect(get("/for-bike-shops?utm_source=newsletter")).to redirect_to("/for_bike_shops?utm_source=newsletter")
+    end
   end
 
   describe "#for_cities" do
@@ -46,10 +50,6 @@ RSpec.describe LandingPagesController, type: :request do
   describe "#for_advocacy" do
     it "redirects to for_community_groups_path" do
       expect(get("/for_advocacy")).to redirect_to(for_community_groups_path)
-    end
-
-    it "redirects the dashed spelling, keeping the query" do
-      expect(get("/for-bike-shops?utm_source=newsletter")).to redirect_to("/for_bike_shops?utm_source=newsletter")
     end
   end
 

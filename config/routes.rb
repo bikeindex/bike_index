@@ -40,7 +40,7 @@ Rails.application.routes.draw do
     get slug, to: "landing_pages#show", organization_id: slug
   end
 
-  # Marketing pages are routed with underscores, and their dashed spelling redirects there
+  # A dashed spelling redirects rather than renders, since the canonical <link> is the request URL
   underscored = redirect { |_, request| [request.path.tr("-", "_"), request.query_string.presence].compact.join("?") }
   marketing = lambda do |path, **options|
     get(path, **options)
