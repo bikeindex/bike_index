@@ -170,8 +170,11 @@
           tw:flex tw:items-center tw:gap-1.5 tw:rounded-[5px] tw:border
           tw:border-[#e0e0e0] tw:bg-white tw:px-3.5
           tw:has-focus:border-blue-500 tw:has-focus:ring-3
-          tw:has-focus:ring-blue-500/25 tw:dark:border-gray-700
-          tw:dark:bg-gray-800
+          tw:has-focus:ring-blue-500/25
+          tw:has-[input:not(:placeholder-shown)]:border-blue-600
+          tw:has-[input:not(:placeholder-shown)]:ring-1
+          tw:has-[input:not(:placeholder-shown)]:ring-blue-600
+          tw:dark:border-gray-700 tw:dark:bg-gray-800
         "
       >
         <span class="tw:font-bold <%= muted %>" aria-hidden="true"><%= @currency.symbol %></span>
