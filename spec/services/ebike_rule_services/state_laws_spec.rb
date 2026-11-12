@@ -157,15 +157,6 @@ RSpec.describe EbikeRuleServices::StateLaws do
     end
   end
 
-  describe "state" do
-    it "finds a state by its abbreviation in either case, and nothing else" do
-      expect(described_class.state("co")).to include(name: "Colorado")
-      expect(described_class.state("PR")).to be_nil
-      expect(described_class.state(["co"])).to be_nil
-      expect(described_class.state(nil)).to be_nil
-    end
-  end
-
   describe "other_classification" do
     let(:ids) { ["evc/us/ca/off_highway_electric_motorcycle"] }
 

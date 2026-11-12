@@ -68,7 +68,9 @@ Rails.application.routes.draw do
   end
   get "ebike-rules", to: "ebike_rules#show", as: :ebike_rules
   get "ebike-rules/:country(/:region)", to: "ebike_rules#show", as: :ebike_rules_place, constraints: {country: /[a-z]{2}/i, region: /[a-z0-9]{1,3}/i}
-  get "e-bike-rules(/*rest)", to: redirect { |_, request| request.fullpath.sub("/e-bike-rules", "/ebike-rules") }
+  %w[e-bike-rules ebike_rules].each do |path|
+    get "#{path}(/*rest)", to: redirect { |_, request| request.fullpath.sub("/#{path}", "/ebike-rules") }
+  end
   get "marketplace/how-it-works", to: "marketplace#how_it_works", as: :marketplace_how_it_works
 
   resource :session, only: %i[new create destroy] do
@@ -564,10 +566,6 @@ Rails.application.routes.draw do
   # old search URLs to new search URLs
   get "/bikes", to: redirect("search/registrations")
   get "/marketplace", to: redirect("search/marketplace")
-
-  # registration sequences became education courses
-  get "*path", to: redirect { |_params, request| request.fullpath.sub("registration_sequence", "education_course") },
-    constraints: {path: %r{(?:admin|o/[^/]+)/registration_sequence.*}}, format: false
 
   # Short bike URLs: /r/<short_id> (and /R/...). The whole path is passed through
   # so ShortId#decode strips the "r/" prefix itself, even when the body starts with "r".
