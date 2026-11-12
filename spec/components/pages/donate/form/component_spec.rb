@@ -91,7 +91,7 @@ RSpec.describe Pages::Donate::Form::Component, type: :component do
 
     it "puts the one_time_intro outside the form, so Enter in it doesn't submit" do
       component = render_inline(described_class.new(**options)) do |form|
-        form.with_one_time_intro(Pages::Donate::TenPercent::Component.new(open: false, currency_symbol: form.currency_symbol))
+        form.with_one_time_intro(Pages::Donate::TenPercent::Component.new(open: false, currency_symbol: form.currency.symbol))
       end
       expect(component).to have_css("[data-controller~='donate--ten-percent'][data-donate--ten-percent-max-value] [data-ui--collapse-target='content'].tw\\:hidden")
       expect(component).to have_no_css("form [data-controller~='donate--ten-percent']")

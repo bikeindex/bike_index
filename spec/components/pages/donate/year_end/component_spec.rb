@@ -32,7 +32,7 @@ RSpec.describe Pages::Donate::YearEnd::Component, type: :component do
   end
 
   it "links the major gifts to this page, with their amount" do
-    expect(component).to have_css("a[data-amount='500'][href='/donate/year-end?initial_amount=500&source=eoy-2026#donate-form']")
+    expect(component).to have_css("a[data-amount='500'][href='/donate/year-end-2026?initial_amount=500&source=eoy-2026#donate-form']")
     expect(component).to have_css("a[data-amount='1000']", text: "$1,000")
   end
 
@@ -50,7 +50,7 @@ RSpec.describe Pages::Donate::YearEnd::Component, type: :component do
 
     it "keeps the goal in dollars and the currency on the major gift links" do
       expect(component).to have_text("Our goal is $20,000 by December 31.")
-      expect(component).to have_css("a[data-amount='500'][href='/donate/year-end?currency=eur&initial_amount=500&source=eoy-2026#donate-form']", text: "€500")
+      expect(component).to have_css("a[data-amount='500'][href='/donate/year-end-2026?currency=eur&initial_amount=500&source=eoy-2026#donate-form']", text: "€500")
     end
   end
 

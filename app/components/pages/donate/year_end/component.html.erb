@@ -7,13 +7,7 @@
   data-controller="donate--page"
   data-action="donate--form:change@window->donate--page#formChanged"
 >
-  <div class="tw:grid tw:grid-cols-3 tw:gap-[3px] tw:bg-[#2c3e50] tw:md:grid-cols-7">
-    <% photos.each do |url| %>
-      <%= image_tag url,
-      alt: translation(".photo_alt"),
-      class: "tw:h-26 tw:w-full tw:object-cover tw:max-md:last:hidden tw:md:h-40 tw:lg:h-37.5" %>
-    <% end %>
-  </div>
+  <%= render(Pages::Donate::PhotoWall::Component.new(short: true)) %>
 
   <section class="tw:py-6.5 tw:lg:py-14 <%= container %>">
     <div
@@ -23,80 +17,21 @@
       "
     >
       <div class="tw:flex tw:flex-col tw:gap-4.5">
-        <p class="tw:mb-0 <%= heading.eyebrow_classes(:red) %>">
-          <%= translation(".eyebrow") %>
-        </p>
-
-        <h1
-          class="
-            tw:mb-0 tw:font-header tw:text-[31px] tw:leading-[1.07]
-            tw:font-extrabold tw:tracking-[-.01em] tw:text-balance
-            tw:md:text-[42px] tw:xl:text-[52px] tw:xl:leading-[1.04]
-          "
-        >
-          <%= @recovered ? translation(".headline_recovered") : translation(".headline") %>
-        </h1>
-
-        <p class="tw:mb-0 tw:max-w-160 tw:text-base tw:leading-[1.55] tw:text-pretty tw:xl:text-[19px] <%= muted %>">
+        <%= render(Pages::Donate::Hero::Component.new(eyebrow: translation(".eyebrow"),
+          headline: @recovered ? translation(".headline_recovered") : translation(".headline"))) do %>
           <%= @recovered ? translation(".ten_percent_statement") : translation(".lede_recovered_count", recovered: helpers.number_with_delimiter(RECOVERED)) %>
-        </p>
-      </div>
-
-      <div
-        id="donate-form"
-        class="tw:-mx-5 tw:flex tw:scroll-mt-6 tw:flex-col tw:gap-4 tw:border-y tw:px-5 tw:py-6.5 tw:md:mx-auto tw:md:w-full tw:md:max-w-xl tw:md:rounded-lg tw:md:border tw:md:p-6.5 tw:lg:sticky tw:lg:top-6 tw:lg:col-start-2 tw:lg:row-span-2 tw:lg:row-start-1 tw:lg:mx-0 tw:lg:max-w-none tw:lg:self-start <%= band %>"
-      >
-        <div class="tw:flex tw:flex-col tw:gap-1.5">
-          <h2
-            class="
-              tw:mb-0 tw:font-header tw:text-[22px] tw:font-extrabold
-              tw:lg:text-2xl
-            "
-          >
-            <%= translation(".form_title") %>
-          </h2>
-
-          <p class="tw:mb-0 tw:text-sm <%= muted %>">
-            <%= translation(".goal", goal:) %>
-          </p>
-        </div>
-
-        <%= render(@form) do |form| %>
-          <% form.with_one_time_intro(Pages::Donate::TenPercent::Component.new(open: @recovered, currency_symbol: form.currency_symbol)) %>
         <% end %>
       </div>
 
-      <div class="tw:flex tw:flex-col tw:gap-5 tw:lg:col-start-1 tw:lg:row-start-2">
-        <dl
-          class="
-            tw:m-0 tw:grid tw:max-w-155 tw:grid-cols-3 tw:gap-px
-            tw:overflow-hidden tw:rounded-lg tw:border tw:border-[#e0e0e0]
-            tw:bg-[#e0e0e0] tw:dark:border-gray-700 tw:dark:bg-gray-700
-          "
-        >
-          <% stats.each do |figure, caption| %>
-            <div
-              class="
-                tw:flex tw:flex-col tw:gap-1 tw:bg-white tw:px-3 tw:py-4
-                tw:lg:px-5 tw:dark:bg-gray-800
-              "
-            >
-              <dt class="tw:text-[13px] tw:leading-snug tw:font-normal <%= muted %>">
-                <%= caption %>
-              </dt>
+      <%= render(Pages::Donate::FormCard::Component.new(title: translation(".form_title"), subtitle: translation(".goal", goal:),
+        html_class: "tw:scroll-mt-6 tw:lg:sticky tw:lg:top-6 tw:lg:col-start-2 tw:lg:row-span-2 tw:lg:row-start-1 tw:lg:mx-0 tw:lg:max-w-none tw:lg:self-start")) do %>
+        <%= render(@form) do |form| %>
+          <% form.with_one_time_intro(Pages::Donate::TenPercent::Component.new(open: @recovered, currency_symbol: form.currency.symbol)) %>
+        <% end %>
+      <% end %>
 
-              <dd
-                class="
-                  tw:order-first tw:m-0 tw:font-header tw:text-2xl
-                  tw:leading-none tw:font-extrabold tw:text-blue-600
-                  tw:lg:text-3xl tw:dark:text-blue-400
-                "
-              >
-                <%= figure %>
-              </dd>
-            </div>
-          <% end %>
-        </dl>
+      <div class="tw:flex tw:flex-col tw:gap-5 tw:lg:col-start-1 tw:lg:row-start-2">
+        <%= render(SharedBlocks::Marketing::NumberBlocks::Component.new(items: stats, layout: :row_of_three_from_md, html_class: "tw:max-w-155")) %>
 
         <figure
           class="
@@ -156,59 +91,59 @@
     </div>
   </section>
 
-  <section
-    class="
-      dark tw:bg-linear-160 tw:from-[#2c3e50] tw:to-[#233140] tw:py-14
-      tw:text-white tw:lg:py-18
-    "
-  >
-    <div class="tw:flex tw:flex-col tw:gap-9 <%= container %>">
-      <%= render(heading.new(eyebrow: translation(".building_eyebrow"), eyebrow_color: :yellow, heading: translation(".building_title"), intro: translation(".building_intro"),
-        on_dark: true, html_class: "tw:max-w-190")) %>
+  <%= render(SharedBlocks::Marketing::InvertedBlock::Component.new(layout: :stacked, html_class: "tw:py-14 tw:lg:py-18")) do %>
+    <%= render(heading.new(eyebrow: translation(".building_eyebrow"), eyebrow_color: :yellow, heading: translation(".building_title"),
+      intro: translation(".building_intro"), html_class: "tw:max-w-190")) %>
 
-      <%# inverted keeps the cards light in this dark section %>
-      <div class="inverted twwiderow tw:gap-6 tw:text-slate-900">
-        <% building.each do |card| %>
-          <%= render(SharedBlocks::Marketing::FramedCard::Component.new(**card)) %>
-        <% end %>
-      </div>
+    <div class="twwiderow tw:gap-6">
+      <% building.each do |card| %>
+        <%= render(SharedBlocks::Marketing::FramedCard::Component.new(**card)) %>
+      <% end %>
+    </div>
 
-      <div class="tw:flex tw:flex-col tw:gap-4.5">
-        <h3
-          class="
-            tw:m-0 tw:font-header tw:text-[22px] tw:font-extrabold
-            tw:text-white
-          "
-        >
-          <%= translation(".network_title") %>
-        </h3>
+    <div class="tw:flex tw:flex-col tw:gap-4.5">
+      <h3 class="tw:m-0 tw:font-header tw:text-[22px] tw:font-extrabold">
+        <%= translation(".network_title") %>
+      </h3>
 
-        <div
-          class="
-            tw:grid
-            tw:grid-cols-[repeat(auto-fit,minmax(min(100%,260px),1fr))]
-            tw:gap-px tw:overflow-hidden tw:rounded-lg tw:border
-            tw:border-white/20 tw:bg-white/20
-          "
-        >
-          <% network.each do |title, body| %>
-            <div
+      <div
+        class="
+          tw:grid
+          tw:grid-cols-[repeat(auto-fit,minmax(min(100%,260px),1fr))]
+          tw:gap-px tw:overflow-hidden tw:rounded-lg tw:border
+          tw:border-gray-200 tw:bg-gray-200 tw:dark:border-white/20
+          tw:dark:bg-white/20
+        "
+      >
+        <% network.each do |title, body| %>
+          <div
+            class="
+              tw:flex tw:flex-col tw:gap-1.5 tw:bg-white tw:px-6 tw:py-5.5
+              tw:dark:bg-[#2c3e50]
+            "
+          >
+            <span
               class="
-                tw:flex tw:flex-col tw:gap-1.5 tw:bg-[#2c3e50] tw:px-6
-                tw:py-5.5
+                tw:text-base tw:font-extrabold tw:text-yellow-800
+                tw:dark:text-yellow-300
               "
             >
-              <span class="tw:text-base tw:font-extrabold tw:text-yellow-300"><%= title %></span>
+              <%= title %>
+            </span>
 
-              <p class="tw:m-0 tw:text-[15px] tw:leading-normal tw:text-[#dfe6ec]">
-                <%= body %>
-              </p>
-            </div>
-          <% end %>
-        </div>
+            <p
+              class="
+                tw:m-0 tw:text-[15px] tw:leading-normal tw:text-gray-600
+                tw:dark:text-[#dfe6ec]
+              "
+            >
+              <%= body %>
+            </p>
+          </div>
+        <% end %>
       </div>
     </div>
-  </section>
+  <% end %>
 
   <section class="tw:flex tw:flex-wrap tw:items-center tw:gap-x-10 tw:gap-y-6 tw:py-12 tw:lg:py-18 <%= container %>">
     <div class="tw:flex tw:flex-1 tw:basis-105 tw:flex-col tw:gap-3.5">

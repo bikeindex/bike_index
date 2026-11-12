@@ -15,6 +15,8 @@ module Pages
         # one_time_intro: above the one-time form, outside it - so Enter in an input there doesn't submit a donation
         renders_one :one_time_intro, ->(component) { component }
 
+        attr_reader :currency
+
         def initialize(stripe_prices:, initial_amount: nil, referral_source: nil, current_user: nil,
           amounts: ONE_TIME_AMOUNTS, default_cadence: :monthly)
           @currency = stripe_prices.first&.currency_obj || Currency.default
@@ -32,8 +34,6 @@ module Pages
         def custom_amount
           @initial_amount unless @amounts.include?(@initial_amount)
         end
-
-        def currency_symbol = @currency.symbol
 
         # for a link back to the page, which takes its currency from the params
         def currency_param = (@currency.slug unless @currency.slug == Currency.default.slug)

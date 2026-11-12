@@ -478,7 +478,9 @@ Rails.application.routes.draw do
     how_not_to_buy_stolen lightspeed membership].freeze.each do |page|
     get page, controller: "info", action: page
   end
-  get "donate/year-end", to: "info#donate_year_end", as: :donate_year_end
+  get "donate/year-end-2026", to: "info#donate_year_end", as: :donate_year_end
+  # 302, since a later year's campaign takes it over
+  get "donate/year-end", to: redirect(path: "/donate/year-end-2026", status: 302)
   get "why-donate", to: redirect("/donate")
   get "why_donate", to: redirect("/donate")
   get "lightspeed_integration", to: redirect("/lightspeed")

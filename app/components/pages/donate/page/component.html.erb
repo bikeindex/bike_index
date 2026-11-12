@@ -1,65 +1,27 @@
 <% container = SharedBlocks::Marketing::Wrapper::Component::CONTAINER_CLASSES %>
-<% eyebrow = "tw:text-[10.5px] tw:font-extrabold tw:tracking-widest tw:uppercase tw:lg:text-[11.5px]" %>
-<% muted = "tw:text-[#666] tw:dark:text-gray-400" %>
 <% band = "tw:border-[#e0e0e0] tw:bg-[#f8f8f8] tw:dark:border-gray-700 tw:dark:bg-gray-800/60" %>
 
 <div
   data-controller="donate--page"
   data-action="donate--form:change@window->donate--page#formChanged"
 >
-  <div class="tw:grid tw:grid-cols-3 tw:gap-[3px] tw:bg-[#2c3e50] tw:md:grid-cols-7">
-    <% WALL_PHOTOS.each do |url| %>
-      <%= image_tag url,
-      alt: translation(".wall_photo_alt"),
-      class: "tw:h-26 tw:w-full tw:object-cover tw:max-md:last:hidden tw:md:h-40 tw:lg:h-55" %>
-    <% end %>
-  </div>
+  <%= render(Pages::Donate::PhotoWall::Component.new) %>
 
   <section class="tw:pt-6.5 tw:md:pb-10 tw:lg:pt-11.5 <%= container %>">
     <div class="tw:flex tw:flex-col tw:gap-6 tw:lg:flex-row tw:lg:gap-14">
       <div class="tw:flex tw:flex-1 tw:flex-col tw:gap-4.5">
-        <p class="tw:mb-0 tw:text-[#cc0000] <%= eyebrow %>">
-          <%= translation(".eyebrow") %>
-        </p>
-
-        <h1
-          class="
-            tw:mb-0 tw:font-header tw:text-[31px] tw:leading-[1.07]
-            tw:font-extrabold tw:tracking-[-.01em] tw:md:text-[42px]
-            tw:xl:text-[52px] tw:xl:leading-[1.04]
-          "
-        >
-          <%= translation(".headline") %>
-        </h1>
-
-        <p
-          class="
-            tw:mb-0 tw:max-w-160 tw:text-base tw:leading-[1.55] tw:xl:text-[19px]
-            <%= muted %>
-          "
-        >
+        <%= render(Pages::Donate::Hero::Component.new(eyebrow: translation(".eyebrow"), headline: translation(".headline"))) do %>
           <span class="tw:lg:hidden"><%= translation(".lede_short") %></span>
           <span class="tw:hidden tw:lg:inline"><%= translation(".lede_millions_registered", millions: bikes_millions) %></span>
-        </p>
+        <% end %>
 
         <%= render(SharedBlocks::Marketing::RegistryStats::Component.new(html_class: "tw:max-w-150 tw:lg:my-auto")) %>
       </div>
 
-      <div
-        id="donate-form"
-        class="tw:-mx-5 tw:flex tw:scroll-mt-4 tw:flex-col tw:gap-4 tw:border-y tw:px-5 tw:py-6.5 tw:md:mx-auto tw:md:w-full tw:md:max-w-xl tw:md:rounded-lg tw:md:border tw:md:p-6.5 tw:lg:mx-0 tw:lg:w-101 tw:lg:shrink-0 tw:lg:self-start <%= band %>"
-      >
-        <h2
-          class="
-            tw:mb-0 tw:font-header tw:text-[22px] tw:font-extrabold
-            tw:lg:text-2xl
-          "
-        >
-          <%= translation(".form_title") %>
-        </h2>
-
+      <%= render(Pages::Donate::FormCard::Component.new(title: translation(".form_title"),
+        html_class: "tw:scroll-mt-4 tw:lg:mx-0 tw:lg:w-101 tw:lg:shrink-0 tw:lg:self-start")) do %>
         <%= render(@form) %>
-      </div>
+      <% end %>
     </div>
   </section>
 

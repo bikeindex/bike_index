@@ -24,8 +24,6 @@ module Pages
 
         private
 
-        def photos = Pages::Donate::Page::Component::WALL_PHOTOS
-
         def goal = MoneyFormatter.money_format_without_cents(GOAL * 100, Currency.default)
 
         def stats
