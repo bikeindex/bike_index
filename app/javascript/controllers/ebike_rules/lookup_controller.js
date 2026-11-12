@@ -15,7 +15,7 @@ const DETAILS = ['manual', 'top_speed', 'throttle', 'throttle_speed', 'watts']
 // page, so the place is the form's path rather than a field. There's no submit button: a pick or a
 // change to the details loads its check into the result frame, replacing the URL with the check's own.
 // The form's data-details says which the check is of: a picked "model", whose details its check copies
-// into the panel, collapsed until asked for; or "manual" details, which changing a model's clears it for
+// into the panel, collapsed until asked for; or "manual" details
 export default class extends Controller {
   static targets = ['combobox', 'comboboxSlot', 'state', 'stateNote', 'stateNeeded', 'stateChoose', 'manual', 'throttleSpeed', 'legend', 'details', 'customize']
   static values = { manifestUrl: String, path: String, countryPath: String, display: String, failedText: String, title: String, legend: String, modelLegend: String }

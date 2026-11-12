@@ -55,14 +55,14 @@ RSpec.describe "E-bike rules", :js, type: :system do
     expect(page).to have_css("[role='status']", text: "This isn't an e-bike under current Colorado rules.")
     expect(page).to have_css("legend", exact_text: "Your bike's details").and have_field("Bike model", with: "")
       .and have_field("Motor wattage (W)", with: "1000").and have_no_button("Select custom values")
-    custom_query = "manual=1&throttle=1&throttle_speed=20&top_speed=28&watts=1000"
-    expect(page).to have_current_path("/ebike-rules/US/CO?#{custom_query}")
+    details_query = "manual=1&throttle=1&throttle_speed=20&top_speed=28&watts=1000"
+    expect(page).to have_current_path("/ebike-rules/US/CO?#{details_query}")
 
     wait_for_stimulus("ebike-rules--lookup")
     type_into(find_field("State"), "New York")
     retry_on_detach { find("[role='option']", text: "New York").click }
     expect(page).to have_css("[role='status']", text: "This isn't an e-bike under current New York rules.")
-    expect(page).to have_current_path("/ebike-rules/US/NY?#{custom_query}")
+    expect(page).to have_current_path("/ebike-rules/US/NY?#{details_query}")
     expect(page).to have_title("New York e-bike laws")
     # New York doesn't use the three classes, so its own replace them
     expect(page).to have_css("#ebike-rules-classes h2", text: "New York e-bike classes")
@@ -76,7 +76,7 @@ RSpec.describe "E-bike rules", :js, type: :system do
     retry_on_detach { find("[role='option']", text: "Colorado").click }
     expect(page).to have_css("[role='status']", text: "This isn't an e-bike under current Colorado rules.")
     expect(page).to have_css("#ebike-rules-classes h2", text: "E-bike classes, explained")
-    expect(page).to have_current_path("/ebike-rules/US/CO?#{custom_query}")
+    expect(page).to have_current_path("/ebike-rules/US/CO?#{details_query}")
 
     # picking it again checks it, and its own details replace them
     type_into(find_field("Bike model"), "haul")
