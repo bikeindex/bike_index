@@ -14,10 +14,10 @@
       <p
         class="
           tw:font-header tw:text-[clamp(18px,2.4vw,22px)] tw:leading-snug
-          tw:font-bold
+          <%= (@verdict == :green) ? "tw:font-normal" : "tw:font-bold" %>
         "
       >
-        <%= unbroken_hyphen(headline) %>
+        <%= headline_html %>
       </p>
 
       <% if details.any? %>
@@ -110,11 +110,11 @@
               tw:text-gray-700 tw:dark:bg-gray-900 tw:dark:text-gray-300
             "
           >
-            <%= translation(".entered_unverified") %>
+            <%= translation(".entered_unverified_by_bike_book") %>
           </p>
         <% else %>
           <%= link_to ReadableQuery.path(bikebook_path, vehicle_models: @bike.bikebook_id, view: "motors"), class: "twlink tw:inline-flex tw:items-center tw:gap-1.5 tw:text-[15px] tw:font-semibold" do %>
-            <%= translation(".full_bikebook_entry") %>
+            <%= translation(".full_bike_book_entry") %>
             <%= helpers.inline_svg_tag("icons/external-link.svg", class: "tw:size-4", aria_hidden: true) %>
           <% end %>
         <% end %>

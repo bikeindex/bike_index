@@ -4,7 +4,7 @@ module Pages
   module Org
     module EducationCourse
       module PageForm
-        # Adding or editing one page of a sequence, with the registrant's view of it below.
+        # Adding or editing one page of a course, with the registrant's view of it below.
         class Component < ApplicationComponent
           def initialize(page:, admin: false)
             @page = page
@@ -30,7 +30,7 @@ module Pages
 
           def page_path = EducationCoursePaths.page(@page, admin: @admin)
 
-          def sequence_path = EducationCoursePaths.edit(@education_course, admin: @admin)
+          def course_path = EducationCoursePaths.edit(@education_course, admin: @admin)
         end
       end
     end

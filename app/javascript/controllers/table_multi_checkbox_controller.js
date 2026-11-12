@@ -1,12 +1,15 @@
 import { Controller } from '@hotwired/stimulus'
+import { collapseField } from 'utils/collapse_utils'
 
 // Connects to data-controller="table-multi-checkbox"
+// whenChecked targets show only while a row is checked
 export default class extends Controller {
-  static targets = ['checkbox']
+  static targets = ['checkbox', 'whenChecked']
 
   connect () {
     this.element.addEventListener('keydown', this.ignoreFieldEnter)
     this.element.addEventListener('click', this.selectRange)
+    this.syncWhenChecked(0)
   }
 
   disconnect () {
@@ -26,6 +29,7 @@ export default class extends Controller {
         .forEach(checkbox => { if (!checkbox.disabled) checkbox.checked = event.target.checked })
     }
     this.lastClicked = event.target
+    this.syncWhenChecked()
   }
 
   toggleAll (event) {
@@ -33,6 +37,7 @@ export default class extends Controller {
     // Disabled checkboxes can't be selected
     const anyUnchecked = this.checkboxTargets.some(cb => !cb.disabled && !cb.checked)
     this.checkboxTargets.forEach(cb => { if (!cb.disabled) cb.checked = anyUnchecked })
+    this.syncWhenChecked()
   }
 
   // Checks the row's checkbox, so editing a row's fields selects it
@@ -40,6 +45,12 @@ export default class extends Controller {
     if (event.target.type === 'checkbox') return
     const checkbox = event.target.closest('tr')?.querySelector('input[type=checkbox]')
     if (checkbox && !checkbox.disabled) checkbox.checked = true
+    this.syncWhenChecked()
+  }
+
+  syncWhenChecked (duration) {
+    const checked = this.checkboxTargets.some(cb => cb.checked)
+    this.whenCheckedTargets.forEach(field => collapseField(field, checked, duration, 'horizontal'))
   }
 
   // Editing a row checks it, so a submit button with data-discards-edits asks before acting on edited rows

@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe Organized::EducationCoursePagesController, type: :request do
   let(:base_url) { "/o/#{current_organization.to_param}/education_courses/#{draft.id}/pages" }
   let(:member_url) { "/o/#{current_organization.to_param}/education_course_pages" }
-  let(:sequence_path) { edit_organization_education_course_path(organization_id: current_organization.to_param, id: draft.id) }
+  let(:course_path) { edit_organization_education_course_path(organization_id: current_organization.to_param, id: draft.id) }
 
   context "logged_in_as_organization_admin" do
     include_context :request_spec_logged_in_as_organization_admin
@@ -19,11 +19,11 @@ RSpec.describe Organized::EducationCoursePagesController, type: :request do
     end
 
     describe "create" do
-      it "adds the page and returns to the sequence" do
+      it "adds the page and returns to the course" do
         expect {
           post base_url, params: {education_course_page: {title: "Storage", body: "<ul><li>Store safely</li></ul>"}}
         }.to change { draft.education_course_pages.count }.by(1)
-        expect(response).to redirect_to(sequence_path)
+        expect(response).to redirect_to(course_path)
         expect(draft.education_course_pages.reorder(:id).last.title).to eq("Storage")
       end
 
@@ -66,12 +66,12 @@ RSpec.describe Organized::EducationCoursePagesController, type: :request do
 
       it "removes the page" do
         expect { delete "#{member_url}/#{page.id}" }.to change { draft.education_course_pages.count }.by(-1)
-        expect(response).to redirect_to(sequence_path)
+        expect(response).to redirect_to(course_path)
       end
     end
 
     describe "update with a position" do
-      it "moves the page to the position and re-sequences" do
+      it "moves the page to the position and re-courses" do
         ids = draft.education_course_pages.pluck(:id)
         patch "#{member_url}/#{ids.last}", params: {position: 0}
         expect(response.status).to eq(200)
@@ -79,7 +79,7 @@ RSpec.describe Organized::EducationCoursePagesController, type: :request do
       end
     end
 
-    context "non-draft sequence" do
+    context "non-draft course" do
       let!(:active) { FactoryBot.create(:education_course_active, :with_pages, organization: current_organization) }
 
       it "404s on create" do
@@ -87,7 +87,7 @@ RSpec.describe Organized::EducationCoursePagesController, type: :request do
         expect(response.status).to eq(404)
       end
 
-      it "404s when editing a page on a non-draft sequence" do
+      it "404s when editing a page on a non-draft course" do
         get "#{member_url}/#{active.education_course_pages.first.id}/edit"
         expect(response.status).to eq(404)
       end

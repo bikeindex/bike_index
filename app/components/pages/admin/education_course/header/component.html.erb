@@ -27,8 +27,8 @@
         tw:gap-y-1
       "
     >
-      <% if organization_sequence_path.present? %>
-        <%= link_to "View in organization", organization_sequence_path, class: "twlink tw:text-sm" %>
+      <% if organization_course_path.present? %>
+        <%= link_to "View in organization", organization_course_path, class: "twlink tw:text-sm" %>
       <% end %>
 
       <% if @education_course.draft? %>

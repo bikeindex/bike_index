@@ -3,13 +3,13 @@ module Admin
     include Binxtils::SortableTable
 
     before_action :find_education_course, only: %i[show preview edit]
-    # Activation freezes a sequence, so the actions that change one only ever find a draft
+    # Activation freezes a course, so the actions that change one only ever find a draft
     before_action :find_draft, only: %i[update destroy]
 
     def index
-      # The sequence organizations' drafts are cloned from, reachable without hunting the
+      # The course organizations' drafts are cloned from, reachable without hunting the
       # table for it. Its draft when there is one - that's what there is to do to it
-      @template = ::EducationCourse.existing_draft_for(nil) || ::EducationCourse.active_template
+      @default_course = ::EducationCourse.existing_draft_for(nil) || ::EducationCourse.active_default
       @per_page = permitted_per_page(default: 50)
       @pagy, @collection = pagy(:countish,
         matching_education_courses.includes(:organization, :education_course_pages)
@@ -18,7 +18,7 @@ module Admin
         page: permitted_page)
     end
 
-    # The sequence's pages and settings, read-only - editing it is #edit
+    # The course's pages and settings, read-only - editing it is #edit
     def show
     end
 
@@ -29,7 +29,7 @@ module Admin
       @preview_pagy = Pagy::Offset.new(count: screen_count, limit: 1, page: permitted_page(max: screen_count))
     end
 
-    # An activated sequence renders read-only - acknowledgments reference what it says
+    # An activated course renders read-only - acknowledgments reference what it says
     def edit
     end
 
@@ -47,14 +47,14 @@ module Admin
       end
     end
 
-    # Opens the draft, cloning the live sequence on first edit. No organization_id is the
-    # template - friendly_find! so a typo 404s rather than opening the template's draft
+    # Opens the draft, cloning the live course on first edit. No organization_id is the
+    # default course - friendly_find! so a typo 404s rather than opening the default's draft
     def create
       organization = ::Organization.friendly_find!(params[:organization_id]) if params[:organization_id].present?
       redirect_to EducationCoursePaths.edit(::EducationCourse.draft_for(organization), admin: true)
     end
 
-    # Throw the draft away to start over; the live sequence is untouched
+    # Throw the draft away to start over; the live course is untouched
     def destroy
       @education_course.discard_draft!
       flash[:success] = "Draft discarded"
@@ -100,12 +100,12 @@ module Admin
       @education_course = ::EducationCourse.draft.find(params[:id])
     end
 
-    # Archives the sequence it supersedes. Organizations ask us to do this for them -
+    # Archives the course it supersedes. Organizations ask us to do this for them -
     # their own screens only get them as far as a finished draft
     def make_active
       if @education_course.make_active!
         flash[:success] = "#{@education_course.display_name} education course is live"
-        redirect_to EducationCoursePaths.sequence(@education_course, admin: true)
+        redirect_to EducationCoursePaths.course(@education_course, admin: true)
       else
         flash[:error] = "Unable to activate - every page needs a title and rules"
         redirect_to EducationCoursePaths.edit(@education_course, admin: true)

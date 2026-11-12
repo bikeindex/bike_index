@@ -2394,6 +2394,7 @@ it:
         create:
           successfully_created: Avviso di parcheggio per %{bike_type} creato
           unable_to_create: Impossibile creare - %{errors}
+          successfully_impounded: Sequestrato questo %{bike_type}
       stickers:
         find_bike_sticker:
           unable_to_find_sticker: 'Impossibile trovare l''etichetta con il codice:
@@ -5521,6 +5522,9 @@ it:
           per completare la registrazione.
         link_signs_you_in: Questo link ti permette di accedere a Bike Index, quindi
           non inoltrarlo. È valido per %{days} giorni.
+        e_vehicle_safety_rules_owed_html: Il tuo <strong>%{color_and_brand}</strong>
+          è registrato su Bike Index. Accetta le norme di sicurezza per i veicoli
+          elettrici per completare la registrazione.
       confirmation_email:
         click_to_sign_in_html: Fai clic sul pulsante <em>Accedi</em> per completare
           la registrazione!
@@ -5911,6 +5915,8 @@ it:
             parking_notifications: Notifiche di parcheggio
             find_a_parking_notification: Trova una notifica di parcheggio
             search_parking_notifications: Cerca notifiche di parcheggio
+            search_notification_message_or_notes: Messaggio/note di notifica della
+              ricerca
           table:
             address: Indirizzo
             bike: Bicicletta
@@ -6133,6 +6139,7 @@ it:
               impound_this_bike_type: Sequestrare questo %{bike_type}
               not_shown_to_user: non mostrato all'utente
               parking_notification_notes: "%{org_name} note interne"
+              submit_parking_notification: Crea avviso di parcheggio
             parking_notification_show:
               no_notifications: Nessuna notifica di parcheggio per questo %{bike_type}
               parking_notifications: Notifiche di parcheggio
@@ -6213,6 +6220,10 @@ it:
             unregistered_owner: Questo %{bike_type} non è registrato a un utente.
               È stato aggiunto per tenere traccia delle notifiche di parcheggio.
             view_all_registrations: visualizza tutto →
+            not_registered_phone_message: Altri dettagli di contatto del proprietario
+              non sono disponibili, poiché questo %{bike_type} non è registrato presso
+              la tua organizzazione.
+            show_phone: Mostra il telefono
           marketplace_listing_card:
             condition: Condizione
             contact_seller: Contatta il venditore
@@ -7021,7 +7032,6 @@ it:
             senza scopo di lucro.
           tagline: 'La biblioteca mondiale delle biciclette: cerca, confronta e trova
             la tua prossima bici.'
-          about_bikebook_label: Informazioni su BikeBook
           activities: Attività
           activity_examples: "(ad esempio mountain bike, ciclocross, ecc.)"
           configuration_examples: "(completo/frameset)"
@@ -7055,6 +7065,7 @@ it:
             confrontarle
           select_an_vehicle_type: Seleziona un %{bike_type}, scegli più opzioni per
             confrontarle
+          about_bike_book_label: Informazioni sul libro sulle biciclette
         donate_strip:
           donate: Donare
           pitch: Questo fantastico prodotto è offerto dall'organizzazione no-profit
@@ -7138,14 +7149,9 @@ it:
           watts_within_cap_html: "%{watts}Il motore W è all'interno del tappo"
           yes_to_html: Sì, a %{mph}
           your_state: Il tuo stato
-          bikebook_name: BikeBook
           class_3_throttle_over_html: L'acceleratore funziona fino a %{mph} mph, oltre
             i 20 mph è consentito l'acceleratore di una Classe 3
           class_3_throttle_within_html: L'acceleratore si ferma a %{mph} mph
-          class_unknown_check_label: BikeBook non indica la sua classe o la velocità
-            massima, quindi controlla la classe sull'etichetta.
-          entered_unverified: Dati inseriti da te, non verificati da BikeBook.
-          full_bikebook_entry: Visualizza la voce completa su BikeBook
           over_mph_html: Oltre %{mph} mph
           red_headline_manual: Questa non è una e-bike secondo le attuali regole %{state}.
           speed_past_cap_html: Assiste oltre %{past} mph, oltre il limite %{cap} mph
@@ -7182,8 +7188,6 @@ it:
             km/h
           speed_past_kmh_html: Assiste oltre %{past} km/h; verificare che si fermi
             entro %{cap} km/h
-          speed_to_check_kmh_html: BikeBook non indica la sua velocità massima, quindi
-            verifica che il motore si fermi a %{cap} km/h
           speed_within_cap_kmh_html: Assiste fino a %{kmh} km/h, entro il limite
           still_reviewing_province_body: Consulta il ministero dei trasporti della
             tua provincia o territorio per le normative vigenti sulle e-bike. Nella
@@ -7280,6 +7284,27 @@ it:
           throttle_past_kmh_html: L'acceleratore supera %{past} km/h; verificare che
             si fermi a %{cap} km/h
           yes_over_mph_html: Sì, oltre %{mph} mph
+          class_summary_manual: Questa e-bike è una e-bike di classe %{n} in %{state}.
+          class_summary_with_rules_manual:
+            one: Questa e-bike è una e-bike di classe %{n} in %{state}, con la regola
+              %{count} da verificare.
+            other: Questa e-bike è una e-bike di Classe %{n} in %{state}, con %{count}
+              regole da verificare.
+          green_summary_no_classes_manual: Questo è classificato come una e-bike in
+            %{state}.
+          yellow_summary_no_classes_manual:
+            one: Questo è classificato come una e-bike in %{state}, con la regola
+              %{count} da verificare.
+            other: Questo è classificato come una e-bike in %{state}, con %{count}
+              regole da verificare.
+          bike_book_name: Libro di biciclette
+          class_unknown_in_bike_book_label: Bike Book non indica la sua classe o la
+            velocità massima, quindi controlla la classe sull'etichetta.
+          entered_unverified_by_bike_book: Dati inseriti da te, non verificati da
+            Bike Book.
+          full_bike_book_entry: Visualizza la voce completa del Bike Book
+          speed_to_check_bike_book_kmh_html: Bike Book non indica la sua velocità
+            massima, quindi controlla che il motore si fermi a %{cap} km/h
         rule_label:
           classes: Classi riconosciute
           power: Limite di potenza del motore
@@ -7393,13 +7418,7 @@ it:
             proprietari di immobili e comuni richiedono questa certificazione prima
             di introdurre una e-bike all'interno degli edifici.
           watts_placeholder: ad esempio 750
-          bikebook_didnt_load: BikeBook non si è caricato. Inserisci i dettagli della
-            tua bici qui sotto.
-          bikebook_loading: Caricamento di BikeBook in corso…
-          how_to_check_lookup: Guarda il modello qui sopra. BikeBook mostra la certificazione
-            laddove è registrata.
           over_28_mph: Oltre 28 miglia orarie
-          visit_bikebook_link: Visita BikeBook.
           custom_details: Dettagli personalizzati
           details_legend: Dettagli della tua bici
           model_details: "%{model} dettagli"
@@ -7439,6 +7458,12 @@ it:
           over_20_mph: Oltre 20 miglia orarie
           top_assist_speed: Velocità massima con pedalata assistita
           top_throttle_speed: Velocità massima dell'acceleratore
+          bike_book_didnt_load: Bike Book non si è caricato. Inserisci i dettagli
+            della tua bici qui sotto.
+          bike_book_loading: Caricamento del libro sulle biciclette…
+          how_to_check_lookup_bike_book: Guarda il modello qui sopra. Bike Book mostra
+            la certificazione laddove è registrata.
+          visit_bike_book_link: Visita Bike Book.
         state_reference:
           compiling: Stiamo raccogliendo le normative sulle e-bike di %{state} provenienti
             dalla legislatura statale e dal DMV. Tornate a trovarci presto.
@@ -7765,8 +7790,6 @@ it:
             e, in meno di 30 secondi, scoprono se è legale guidarla, quali certificazioni
             possiede e quali norme si applicano. La risposta permette di procedere
             direttamente all'immatricolazione.
-          checker_point_bikebook: Classe, motore, velocità massima e certificazione
-            UL dal catalogo di modelli di e-bike di BikeBook.
           checker_point_program: All'interno del programma, il personale può visualizzare
             la classe e lo stato di conformità di ogni e-bike registrata.
           checker_point_states: Norme statali relative a classi, limiti di cilindrata,
@@ -7995,9 +8018,6 @@ it:
             una landing page personalizzata con il logo della città, un modulo sul
             tuo sito web o un codice QR.
           registration_step_1_title: registro dei residenti
-          registration_step_2_body: BikeBook identifica il modello e la sua categoria,
-            e il ciclista completa il percorso formativo. Le moto normali saltano
-            questo passaggio.
           registration_step_2_title: Le e-bike vengono classificate
           registration_step_3_body: Stato (registrato, rubato o recuperato), marca,
             modello, colore e numero di serie. Gli agenti e il personale lo recuperano
@@ -8034,6 +8054,11 @@ it:
             un catalogo di modelli di e-bike con la relativa classe, motore, velocità
             e certificazione UL. Le normative statali sono elencate con i relativi
             statuti.
+          checker_point_bike_book: Classe, motore, velocità massima e certificazione
+            UL dal catalogo di modelli di e-bike di Bike Book.
+          registration_step_2_bike_book_body: Bike Book identifica il modello e la
+            sua categoria, e il motociclista completa il percorso formativo. Le moto
+            standard saltano questo passaggio.
         for_cities_education:
           all_set: È tutto pronto.
           back: Indietro

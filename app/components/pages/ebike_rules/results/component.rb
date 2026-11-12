@@ -49,11 +49,20 @@ module Pages
           end
         end
 
+        def headline_html
+          return unbroken_hyphen(headline) if @verdict != :green || @bike.manual?
+
+          before, name, after = headline.partition(bike_name)
+          safe_join([unbroken_hyphen(before), tag.strong(unbroken_hyphen(name), class: "tw:font-bold"), unbroken_hyphen(after)])
+        end
+
         def green_headline(name, state)
           if @law[:classes].none?
-            translation(".green_summary_no_classes", name:, state:)
+            @bike.manual? ? translation(".green_summary_no_classes_manual", state:) : translation(".green_summary_no_classes", name:, state:)
           elsif optional_clause.present?
             translation(".class_summary_optional", name:, state:, n: class_numbers, optional: optional_clause)
+          elsif @bike.manual?
+            translation(".class_summary_manual", state:, n: class_numbers)
           else
             translation(".class_summary", name:, state:, n: class_numbers)
           end
@@ -63,9 +72,15 @@ module Pages
           if without_throttle?
             @law[:classes].none? ? translation(".yellow_summary_no_classes_without_throttle", name:, state:) : translation(".class_summary_without_throttle", name:, state:, n: class_numbers)
           elsif @bike.e_bike_class && @law[:classes].none?
-            translation(".yellow_summary_no_classes", name:, state:, count: rule_count(:check))
+            if @bike.manual?
+              translation(".yellow_summary_no_classes_manual", state:, count: rule_count(:check))
+            else
+              translation(".yellow_summary_no_classes", name:, state:, count: rule_count(:check))
+            end
           elsif @bike.e_bike_class && optional_clause.present?
             translation(".class_summary_optional_with_rules", name:, state:, n: class_numbers, optional: optional_clause, count: rule_count(:check))
+          elsif @bike.e_bike_class && @bike.manual?
+            translation(".class_summary_with_rules_manual", state:, n: class_numbers, count: rule_count(:check))
           elsif @bike.e_bike_class
             translation(".class_summary_with_rules", name:, state:, n: class_numbers, count: rule_count(:check))
           else
@@ -119,7 +134,7 @@ module Pages
           }.to_sentence
         end
 
-        # A BikeBook model's maker and model fill in the registration it starts
+        # A Bike Book model's maker and model fill in the registration it starts
         def register_href
           return new_register_path if @bike.manual?
 
@@ -179,7 +194,7 @@ module Pages
         end
 
         def source
-          link = link_to(translation(".bikebook_name"), ReadableQuery.path(bikebook_path, vehicle_models: @law[:id]), class: "twlink")
+          link = link_to(translation(".bike_book_name"), ReadableQuery.path(bikebook_path, vehicle_models: @law[:id]), class: "twlink")
           @us ? translation(".source_html", link:) : translation(".law_source_html", link:)
         end
 
@@ -282,7 +297,7 @@ module Pages
           when :speed_past then translation(".speed_past_kmh_html", **args)
           when :throttle_past_cap then translation(".throttle_past_cap_kmh_html", **args)
           when :throttle_past then translation(".throttle_past_kmh_html", **args)
-          when :speed_to_check then translation(".speed_to_check_kmh_html", **args)
+          when :speed_to_check then translation(".speed_to_check_bike_book_kmh_html", **args)
           when :no_speed_cap then translation(".no_speed_cap_in_law")
           when :throttle_not_allowed then translation(".throttle_not_allowed_in_law")
           when :throttle_not_stated then translation(".throttle_not_stated_in_law")
@@ -301,7 +316,7 @@ module Pages
           when :classes_not_permitted
             translation(".classes_not_permitted", classes: row[:args][:e_bike_classes].map { translation(".class_n", n: it) }.to_sentence)
           when :not_classified then translation(".not_classified")
-          when :class_unknown then translation(".class_unknown_check_label")
+          when :class_unknown then translation(".class_unknown_in_bike_book_label")
           when :own_classes then translation(".own_classes")
           when :classes_start_on then translation(".classes_start_on", **args)
           when :limits_start_on then translation(".limits_start_on", **args)

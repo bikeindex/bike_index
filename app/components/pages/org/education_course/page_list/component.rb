@@ -4,7 +4,7 @@ module Pages
   module Org
     module EducationCourse
       module PageList
-        # A sequence's pages, each collapsing to reveal its rules. An editable one
+        # A course's pages, each collapsing to reveal its rules. An editable one
         # drags to reorder and links into each page.
         class Component < ApplicationComponent
           # editable: admin's read-only screen lists a draft without its controls
@@ -20,7 +20,7 @@ module Pages
             @pages ||= @education_course.education_course_pages.to_a
           end
 
-          # Sortable only reorders an editable sequence; a frozen one has nothing to drag
+          # Sortable only reorders an editable course; a frozen one has nothing to drag
           def list_data
             @editable ? {controller: "sortable"} : {}
           end

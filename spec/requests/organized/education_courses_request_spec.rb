@@ -33,13 +33,13 @@ RSpec.describe Organized::EducationCoursesController, type: :request do
         end
       end
 
-      context "with an active sequence" do
+      context "with an active course" do
         # Built as a draft and activated, the way an organization gets one
         let!(:active) do
-          FactoryBot.create(:education_course, organization: current_organization).tap do |sequence|
-            sequence.education_course_pages.create!(title: "Batteries & charging",
+          FactoryBot.create(:education_course, organization: current_organization).tap do |course|
+            course.education_course_pages.create!(title: "Batteries & charging",
               body: "<ul><li>Charge with the manufacturer's charger</li></ul>")
-            sequence.make_active!
+            course.make_active!
           end
         end
 
@@ -49,7 +49,7 @@ RSpec.describe Organized::EducationCoursesController, type: :request do
           expect(response.body).to include("This is the active version your registrants see")
           expect(response.body).to include("Batteries &amp; charging")
           expect(response.body).to include("Charge with the manufacturer's charger")
-          # No draft yet, so editing starts from a copy of the live sequence
+          # No draft yet, so editing starts from a copy of the live course
           expect(response.body).to include("Copy current course and edit")
           # Frozen, so no editing affordances on it
           expect(response.body).to_not include("data-sortable-target=\"item\"")
@@ -58,7 +58,7 @@ RSpec.describe Organized::EducationCoursesController, type: :request do
     end
 
     describe "create" do
-      it "builds a draft from the template and redirects to the management page" do
+      it "builds a draft from the default course and redirects to the management page" do
         expect {
           post base_url
         }.to change { current_organization.education_courses.draft.count }.by(1)
@@ -88,7 +88,7 @@ RSpec.describe Organized::EducationCoursesController, type: :request do
         expect(response.body).to include("almost done")
       end
 
-      context "with an active (non-draft) sequence" do
+      context "with an active (non-draft) course" do
         let!(:active) { FactoryBot.create(:education_course_active, :with_pages, organization: current_organization) }
 
         it "renders the preview, titled live" do
@@ -109,7 +109,7 @@ RSpec.describe Organized::EducationCoursesController, type: :request do
         expect(response).to render_template(:edit)
       end
 
-      it "404s for a non-draft sequence" do
+      it "404s for a non-draft course" do
         active = FactoryBot.create(:education_course_active, organization: current_organization)
         get "#{base_url}/#{active.id}/edit"
         expect(response.status).to eq(404)
@@ -143,7 +143,7 @@ RSpec.describe Organized::EducationCoursesController, type: :request do
         expect(EducationCourse.with_deleted.find_by(id: draft.id)).to be_nil
       end
 
-      it "404s for a non-draft sequence" do
+      it "404s for a non-draft course" do
         active = FactoryBot.create(:education_course_active, organization: current_organization)
         expect { delete "#{base_url}/#{active.id}" }.to_not change(EducationCourse, :count)
         expect(response.status).to eq(404)
@@ -170,7 +170,7 @@ RSpec.describe Organized::EducationCoursesController, type: :request do
       expect(response.body).to_not include("Discard draft")
     end
 
-    it "renders the preview of the active sequence" do
+    it "renders the preview of the active course" do
       get "#{base_url}/#{active.id}"
       expect(response.status).to eq(200)
       expect(response).to render_template(:show)

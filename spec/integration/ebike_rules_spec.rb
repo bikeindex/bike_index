@@ -5,7 +5,7 @@ require "rails_helper"
 RSpec.describe "E-bike rules", :js, type: :system do
   before { serve_bikebook_catalog }
 
-  it "checks a BikeBook model or one entered by hand as each is chosen, keeping it in the URL" do
+  it "checks a Bike Book model or one entered by hand as each is chosen, keeping it in the URL" do
     visit ebike_rules_path
     history_length = page.evaluate_script("history.length")
     wait_for_stimulus("ebike-rules--lookup")
@@ -101,7 +101,7 @@ RSpec.describe "E-bike rules", :js, type: :system do
 
     # details alone are a check once they have a top speed
     find("label", text: "20 mph").click
-    expect(page).to have_css("[role='status']", text: "The e-bike is a Class 1 e-bike in Colorado.")
+    expect(page).to have_css("[role='status']", text: "This e-bike is a Class 1 e-bike in Colorado.")
     expect(page).to have_current_path("/ebike-rules/US/CO?manual=1&top_speed=20")
 
     # details changed from a model return to its own once it's picked again

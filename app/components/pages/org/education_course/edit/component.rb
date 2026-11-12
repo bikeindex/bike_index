@@ -4,7 +4,7 @@ module Pages
   module Org
     module EducationCourse
       module Edit
-        # The drag-to-reorder page list and the sequence-wide settings form.
+        # The drag-to-reorder page list and the course-wide settings form.
         class Component < ApplicationComponent
           def initialize(education_course:, admin: false)
             @education_course = education_course
@@ -20,7 +20,7 @@ module Pages
 
           def new_page_path = EducationCoursePaths.new_page(@education_course, admin: @admin)
 
-          def sequence_path = EducationCoursePaths.sequence(@education_course, admin: @admin)
+          def course_path = EducationCoursePaths.course(@education_course, admin: @admin)
         end
       end
     end

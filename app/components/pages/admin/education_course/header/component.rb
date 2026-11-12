@@ -4,7 +4,7 @@ module Pages
   module Admin
     module EducationCourse
       module Header
-        # Shared by every admin education-course screen: which sequence is open,
+        # Shared by every admin education-course screen: which course is open,
         # what's being done to it, and the switch between its three screens.
         class Component < ApplicationComponent
           ACTION_WORDS = {view: "Viewing", preview: "Previewing", edit: "Editing"}.freeze
@@ -21,10 +21,10 @@ module Pages
 
           def action_word = ACTION_WORDS[@mode]
 
-          # Activation freezes a sequence, so its Edit is offered but inert
+          # Activation freezes a course, so its Edit is offered but inert
           def entries
             [ComponentStructs::Shapes.entry("View",
-              href: EducationCoursePaths.sequence(@education_course, admin: true), active: @mode == :view),
+              href: EducationCoursePaths.course(@education_course, admin: true), active: @mode == :view),
               ComponentStructs::Shapes.entry("Preview",
                 href: EducationCoursePaths.preview(@education_course, admin: true), active: @mode == :preview),
               ComponentStructs::Shapes.entry("Edit",
@@ -32,7 +32,7 @@ module Pages
                 active: @mode == :edit, disabled: !@education_course.draft?)]
           end
 
-          # Archived sequences are frozen too, so name which one this is
+          # Archived courses are frozen too, so name which one this is
           def uneditable_title
             return if @education_course.draft?
 
@@ -43,8 +43,8 @@ module Pages
 
           def create_draft_path = EducationCoursePaths.create_draft(@education_course.organization_id)
 
-          # What the frozen sequence offers in place of its inert Edit chip. The draft belongs
-          # to the owner rather than to this sequence, so a second archived one points at it too
+          # What the frozen course offers in place of its inert Edit chip. The draft belongs
+          # to the owner rather than to this course, so a second archived one points at it too
           def create_draft_text
             return "Edit draft" if ::EducationCourse.existing_draft_for(@education_course.organization).present?
 
@@ -56,11 +56,11 @@ module Pages
               "It can't be edited afterward."
           end
 
-          # The template has no organization to view it in
-          def organization_sequence_path
-            return if @education_course.template?
+          # The default course has no organization to view it in
+          def organization_course_path
+            return if @education_course.default?
 
-            EducationCoursePaths.sequence(@education_course)
+            EducationCoursePaths.course(@education_course)
           end
         end
       end

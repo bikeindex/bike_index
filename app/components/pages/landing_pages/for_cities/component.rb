@@ -66,7 +66,7 @@ module Pages
         def registration_steps
           [
             [translation(".registration_step_1_title"), translation(".registration_step_1_body")],
-            [translation(".registration_step_2_title"), translation(".registration_step_2_body")],
+            [translation(".registration_step_2_title"), translation(".registration_step_2_bike_book_body")],
             [translation(".registration_step_3_title"), translation(".registration_step_3_body")],
             [translation(".registration_step_4_title"), translation(".registration_step_4_body")]
           ]
@@ -97,7 +97,7 @@ module Pages
         end
 
         def checker_points
-          [translation(".checker_point_bikebook"), translation(".checker_point_states"), translation(".checker_point_program")]
+          [translation(".checker_point_bike_book"), translation(".checker_point_states"), translation(".checker_point_program")]
         end
 
         def state_options = EbikeRuleServices::Places.combobox_options(EbikeRuleServices::Places.us_states, country: "US")
@@ -128,7 +128,7 @@ module Pages
 
         def faqs
           [
-            [translation(".faq_checker_question"), translation(".faq_checker_answer_html", bikebook_link: link_to("BikeBook", bikebook_path, class: "twlink"))],
+            [translation(".faq_checker_question"), translation(".faq_checker_answer_html", bikebook_link: link_to("Bike Book", bikebook_path, class: "twlink"))],
             [translation(".faq_account_question"), translation(".faq_account_answer")],
             [translation(".faq_rules_question"), translation(".faq_rules_answer")],
             [translation(".faq_cost_question"), translation(".faq_cost_answer")],

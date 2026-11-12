@@ -22,7 +22,8 @@ module Pages
         # The search until bikebook--page fills it in from the URL: hidden as searching() hides a lone model's, and blank
         # where the URL sets anything but picks, which it says are loading
         def placeholder_class
-          models, classifications = %w[vehicle_models classifications].map { @query[it].to_s.split(",").compact_blank }
+          models = Integrations::Bikebook::Catalog.vehicle_entries(@query["vehicle_models"]).map { Integrations::Bikebook::Catalog.vehicle_id(it) }.compact_blank
+          classifications = @query["classifications"].to_s.split(",").compact_blank
           return "tw:hidden" if models.one? && classifications.none? && !@query.key?("search")
           "tw:invisible" if @query.except("search", "vehicle_models").any?
         end

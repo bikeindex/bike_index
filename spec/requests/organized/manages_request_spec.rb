@@ -471,6 +471,7 @@ RSpec.describe Organized::ManagesController, type: :request do
           it "still updates the organization" do
             expect(current_organization.locations.count).to eq 0
             expect(current_organization.search_coordinates_set?).to be_falsey
+            initial_cache_key = current_organization.cache_key_with_version
 
             VCR.use_cassette("organized_manages-create-location", match_requests_on: [:path]) do
               Sidekiq::Job.clear_all
@@ -501,6 +502,7 @@ RSpec.describe Organized::ManagesController, type: :request do
 
             expect(current_organization.to_coordinates).to eq [location.latitude, location.longitude]
             expect(current_organization.search_coordinates_set?).to be_truthy
+            expect(current_organization.cache_key_with_version).to_not eq initial_cache_key
           end
         end
       end
