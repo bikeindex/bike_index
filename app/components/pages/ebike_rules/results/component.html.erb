@@ -1,7 +1,5 @@
 <section
   aria-live="polite"
-  data-controller="ui--collapse"
-  data-ui--collapse-param-value="rules"
   class="tw:flex tw:flex-col tw:gap-6 tw:pt-[clamp(28px,5vw,40px)] tw:pb-2 <%= SharedBlocks::Marketing::Wrapper::Component::CONTAINER_CLASSES %>"
 >
   <div
@@ -16,10 +14,10 @@
       <p
         class="
           tw:font-header tw:text-[clamp(18px,2.4vw,22px)] tw:leading-snug
-          tw:font-bold
+          <%= (@verdict == :green) ? "tw:font-normal" : "tw:font-bold" %>
         "
       >
-        <%= unbroken_hyphen(headline) %>
+        <%= headline_html %>
       </p>
 
       <% if details.any? %>
@@ -50,20 +48,15 @@
         <% end %>
 
         <div class="tw:mt-4 tw:text-[15px]">
-          <%= render(UI::Collapse::Component.new(text: translation(".other_classification_rules", name: other_classification[:name]), chevron: :trailing, color: :link)) %>
+          <%= render(UI::ButtonLink::Component.new(href: other_classification_href, color: :link,
+            data: {classification: other_classification[:value], turbo_frame: "_top"})) do %>
+            <%= translation(".other_classification_rules", name: other_classification[:name]) %>
+            <%= render(UI::IconChevron::Component.new) %>
+          <% end %>
         </div>
       <% end %>
     </div>
   </div>
-
-  <% if @verdict == :red && other_classification %>
-    <div class="tw:-mt-4 tw:hidden" data-ui--collapse-target="content">
-      <%= render(UI::Card::Component.new(additional_classes: "tw:p-[clamp(18px,3vw,28px)]!")) do %>
-        <span class="tw:mb-1 tw:block <%= EYEBROW_CLASSES %>"><%= other_classification_eyebrow %></span>
-        <%= render(Pages::EbikeRules::LawSummary::Component.new(law: other_classification, titled: true)) %>
-      <% end %>
-    </div>
-  <% end %>
 
   <div
     class="
@@ -86,15 +79,15 @@
 
       <div class="tw:flex tw:flex-col tw:gap-5 tw:p-[clamp(18px,3vw,28px)]">
         <div>
-          <span class="<%= EYEBROW_CLASSES %>"><%= translation(".your_bike") %></span>
-
           <h2 class="<%= NAME_CLASSES %>">
-            <%= @bike.manual? ? translation(".your_ebike") : @bike.make_and_model %>
+            <%= @bike.manual? ? translation(".manually_entered_ebike") : @bike.make_and_model %>
           </h2>
 
-          <p class="tw:mt-1 tw:text-[15px] tw:text-gray-700 tw:dark:text-gray-300">
-            <%= subline %>
-          </p>
+          <% unless @bike.manual? %>
+            <p class="tw:mt-1 tw:text-[15px] tw:text-gray-700 tw:dark:text-gray-300">
+              <%= translation(".model_year", year: @bike.first_year) %>
+            </p>
+          <% end %>
         </div>
 
         <%= render(Pages::EbikeRules::BikeSummary::Component.new(vehicle_type: @bike.vehicle_type, specs:, ul2849: @bike.ul2849, ul2271: @bike.ul2271)) do |summary| %>
@@ -117,11 +110,11 @@
               tw:text-gray-700 tw:dark:bg-gray-900 tw:dark:text-gray-300
             "
           >
-            <%= translation(".entered_unverified") %>
+            <%= translation(".entered_unverified_by_bike_book") %>
           </p>
         <% else %>
           <%= link_to ReadableQuery.path(bikebook_path, vehicle_models: @bike.bikebook_id, view: "motors"), class: "twlink tw:inline-flex tw:items-center tw:gap-1.5 tw:text-[15px] tw:font-semibold" do %>
-            <%= translation(".full_bikebook_entry") %>
+            <%= translation(".full_bike_book_entry") %>
             <%= helpers.inline_svg_tag("icons/external-link.svg", class: "tw:size-4", aria_hidden: true) %>
           <% end %>
         <% end %>

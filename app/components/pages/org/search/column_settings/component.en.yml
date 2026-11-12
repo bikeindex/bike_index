@@ -6,7 +6,6 @@ en:
         search:
           column_settings:
             acknowledgment_cell: Reg acknowledged
-            acknowledgment_cell_panel: Time - Registration sequence acknowledged
             address: 'Address:'
             all: all
             all_bikes: All bikes
@@ -17,6 +16,7 @@ en:
               impounded vehicles search
             copy_column_order_from_registrations_search: Copy column order from registrations
               search
+            course_acknowledgment_cell_panel: Time - Education course acknowledged
             created_at_cell: Registered
             creation_description_cell: Source
             cycle_type_cell: Vehicle type

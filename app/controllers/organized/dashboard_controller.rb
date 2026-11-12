@@ -39,6 +39,7 @@ module Organized
         .where(date_stolen: @time_range)
       @stolen_records = stolen_records.where(current: true)
       @recovered_records = stolen_records.where(current: false)
+      set_claimed_ownerships
       render "manufacturer"
     end
 
@@ -55,17 +56,21 @@ module Organized
         @bikes_in_nearby_organizations_count = Bike.organization(current_organization.regional_ids).where(created_at: @time_range).count
         @bikes_in_region_not_in_organizations_count = @bikes_not_in_organizations.count
       end
-      if current_organization.enabled?("claimed_ownerships")
-        non_org_ownerships = Ownership.unscoped.joins(:bike).where(bikes: {creation_organization_id: current_organization.id})
-          .where.not(owner_email: current_organization.users.pluck(:email))
-        # In general, we're not using Bike#creation_organization_id - mostly, it should be accessed through ownerships
-        # but this requires creation_organization_id for ease of joining
-        @claimed_ownerships = non_org_ownerships.where(claimed_at: @time_range)
-        # We added this - but it isn't a relevant metric for most organizations.
-        # It's only relevant to organizations that register to themselves first (e.g. Pro's Closet)
-        @ownerships_to_new_owner = non_org_ownerships.where(created_at: @time_range)
-      end
+      set_claimed_ownerships
       render "child_and_regional"
+    end
+
+    def set_claimed_ownerships
+      return unless current_organization.enabled?("claimed_ownerships")
+
+      non_org_ownerships = Ownership.unscoped.joins(:bike).where(bikes: {creation_organization_id: current_organization.id})
+        .where.not(owner_email: current_organization.users.pluck(:email))
+      # In general, we're not using Bike#creation_organization_id - mostly, it should be accessed through ownerships
+      # but this requires creation_organization_id for ease of joining
+      @claimed_ownerships = non_org_ownerships.where(claimed_at: @time_range)
+      # We added this - but it isn't a relevant metric for most organizations.
+      # It's only relevant to organizations that register to themselves first (e.g. Pro's Closet)
+      @ownerships_to_new_owner = non_org_ownerships.where(created_at: @time_range)
     end
 
     def set_fallback_period

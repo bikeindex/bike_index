@@ -106,22 +106,22 @@ RSpec.describe "Register flow, with an organization", :js, type: :system do
   context "e-vehicle with an organization's safety rules" do
     let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills") }
     # Built as a draft and activated below, since activation freezes the pages
-    let(:sequence) do
-      FactoryBot.create(:registration_sequence, organization:,
+    let(:course) do
+      FactoryBot.create(:education_course, organization:,
         acknowledgment_text: "agree to comply with all of the rules above.")
     end
     let!(:battery_page) do
-      FactoryBot.create(:registration_sequence_page, registration_sequence: sequence, listing_order: 0,
+      FactoryBot.create(:education_course_page, education_course: course, listing_order: 0,
         title: "Battery & charging", subtitle: "Unsafe charging is the biggest cause of e-bike fires.",
         body: "<ul><li>Charge with the manufacturer's charger</li><li>Report a swollen battery</li></ul>")
     end
     let!(:campus_page) do
-      FactoryBot.create(:registration_sequence_page, registration_sequence: sequence, listing_order: 1,
+      FactoryBot.create(:education_course_page, education_course: course, listing_order: 1,
         title: "Campus rules", body: "<ul><li>Dismount in posted zones</li></ul>",
         organization_specific: true)
     end
 
-    before { sequence.make_active! }
+    before { course.make_active! }
 
     # flaky: the color combobox below is typed into right after step 1's Turbo navigation,
     # and filters nothing when its controller hasn't connected yet. wait_for_details_step
@@ -180,8 +180,8 @@ RSpec.describe "Register flow, with an organization", :js, type: :system do
       click_button "Complete Bike Registration"
 
       expect(page).to have_css("h1", text: "Progress saved")
-      acknowledgment = RegistrationSequenceAcknowledgment.last
-      expect(acknowledgment).to have_attributes(registration_sequence_id: sequence.id,
+      acknowledgment = EducationCourseAcknowledgment.last
+      expect(acknowledgment).to have_attributes(education_course_id: course.id,
         b_param_id: BParam.last.id, owner_email:,
         acknowledgment_text: "agree to comply with all of the rules above.")
       expect(acknowledgment.acknowledged_pages.pluck(:id)).to match_array([battery_page.id, campus_page.id])
@@ -342,7 +342,7 @@ RSpec.describe "Register flow, with an organization", :js, type: :system do
         expect(Bike.last.current_stolen_record.street).to eq "278 Broadway"
         # A retry that landed twice would be a second registration, or a second signature
         expect(Bike.count).to eq 1
-        expect(RegistrationSequenceAcknowledgment.count).to eq 1
+        expect(EducationCourseAcknowledgment.count).to eq 1
 
         # Every step of the flow failed, and none of them more than once
         expect(failed_steps).to eq([["/register", "1"], ["/register", "2"],

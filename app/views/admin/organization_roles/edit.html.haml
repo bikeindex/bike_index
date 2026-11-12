@@ -8,7 +8,7 @@
 
 
 .twwiderow{class: "tw:items-start"}
-  = render(UI::TableList::Component.new) do |list|
+  = render(UI::Table::List::Component.new) do |list|
     - list.with_row(label: "Sender") do
       - if @organization_role.sender_id.present?
         = render Atoms::Admin::TableCells::User::Component.new(user: @organization_role.sender, user_id: @organization_role.user_id)

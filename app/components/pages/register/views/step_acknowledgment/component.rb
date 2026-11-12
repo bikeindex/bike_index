@@ -7,9 +7,9 @@ module Pages
         # One page of the organization's e-vehicle safety rules. Every rule has to be
         # checked before the flow moves on, so the page is agreed to as a whole.
         class Component < ApplicationComponent
-          def initialize(b_param:, sequence:, step:, flow:)
+          def initialize(b_param:, course:, step:, flow:)
             @b_param = b_param
-            @sequence = sequence
+            @course = course
             @step = step
             @flow = flow
           end
@@ -17,7 +17,7 @@ module Pages
           private
 
           def pages
-            @pages ||= BikeServices::Register.sequence_pages(@sequence)
+            @pages ||= BikeServices::Register.course_pages(@course)
           end
 
           def position

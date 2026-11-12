@@ -765,6 +765,11 @@ RSpec.describe "BikesController#show", type: :request do
       expect(response).to redirect_to(registration_path(bike, scanned_id: "XD8888", organization_id: "cool-org"))
     end
 
+    it "redirects a Turbo submission, which asks for a turbo_stream" do
+      get "#{base_url}/#{bike.id}", headers: {"Accept" => "text/vnd.turbo-stream.html, text/html, application/xhtml+xml"}
+      expect(response).to redirect_to(registration_path(bike))
+    end
+
     it "normalizes the id, rather than passing it along" do
       get "#{base_url}/r/#{bike.id}"
       expect(response).to redirect_to(registration_path(bike))

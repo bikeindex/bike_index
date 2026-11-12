@@ -16,11 +16,11 @@ en:
             look for.
           banned_heading: Why uncertified bikes are being banned
           battery_safety: Battery and fire safety
+          bike_book_didnt_load: Bike Book didn't load. Enter your bike's details below.
+          bike_book_loading: Loading Bike Book…
           bike_error: Pick a bike from the list, or enter its details manually.
           bike_model: Bike model
           bike_placeholder: Search your bike (make, model, year)
-          bikebook_didnt_load: BikeBook didn't load. Enter your bike's details below.
-          bikebook_loading: Loading BikeBook…
           bikes_registered_html: "%{number} bikes registered"
           certification_involves_body: >-
             A nationally recognized testing lab puts production samples through overcharge,
@@ -28,11 +28,10 @@ en:
             then inspected on an ongoing basis to keep the listing.
           certification_involves_heading: What certification involves
           check_my_bike: Check my bike
-          choose_province: Choose your province or territory from the list.
-          choose_state: Choose your state from the list.
+          choose_your_province: Choose your province or territory.
+          choose_your_state: Choose your state.
           compare_html: Want to compare multiple bikes? %{link}
           country: Country
-          custom_details: Custom details
           details_legend: Your bike's details
           detected_place_html: We detected <strong>%{state}</strong>.
           for_parents: For parents
@@ -43,14 +42,15 @@ en:
             label.
           how_to_check_2: Search that number in UL Product iQ.
           how_to_check_heading: How to check a bike
-          how_to_check_lookup: Look the model up above. BikeBook shows certification
-            where it's on record.
+          how_to_check_lookup_bike_book: Look the model up above. Bike Book shows
+            certification where it's on record.
           kmh: "%{kmh} km/h"
           model_details: "%{model} details"
           motor_wattage: Motor wattage (W)
           mph: "%{mph} mph"
           not_in_canada_html: Not in Canada? %{switch_country}
           not_in_us_html: Not in the US? %{switch_country}
+          over_20_mph: Over 20 mph
           over_28_mph: Over 28 mph
           over_kmh: Over %{kmh} km/h
           parent_step_1_body: >-
@@ -102,6 +102,7 @@ en:
             stolen. Registration is free.
           register_your_bike: Register your bike
           select_country: Select a country
+          select_custom_values: Select custom values
           select_province: Select your province or territory
           select_state: Select your state
           state: State
@@ -111,7 +112,8 @@ en:
             rules.
           switch_country: switch country
           switch_country_title: Switch country
-          top_speed: What is its top speed?
+          top_assist_speed: Top speed with pedal assist
+          top_throttle_speed: Throttle top speed
           ul_2271_body: >-
             Tests the lithium-ion battery pack on its own. Common on bikes and replacement
             batteries; it doesn't cover the charger or motor.
@@ -132,6 +134,6 @@ en:
             means an independent lab tested the bike or battery against fire and electrical
             failure. More campuses, landlords and cities now ask for proof of it before
             an e-bike comes indoors.
-          visit_bikebook_link: Visit BikeBook.
+          visit_bike_book_link: Visit Bike Book.
           watts_placeholder: e.g. 750
           watts_placeholder_canada: e.g. 500

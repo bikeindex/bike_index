@@ -1,7 +1,6 @@
 import { html, nothing } from 'lit-html'
 import { chosenColorway, colorwayValue, colorwayYears } from 'bikebook/colorways'
 import { amountDisplay, missing } from 'bikebook/templates/helpers'
-import { badge } from 'bikebook/templates/ui/badge'
 import { buttonClasses } from 'bikebook/templates/ui/button'
 import { collapse } from 'bikebook/templates/ui/collapse'
 import { radioButtonGroup } from 'bikebook/templates/ui/forms/radio_button_group'
@@ -50,28 +49,28 @@ const manufacturerPage = (vehicle) => {
 // A year's colorways by their paint, not their photos
 const paint = (year) => JSON.stringify(array(year.colorways).map(({ name, colors, color_code: code }) => [name, colors, code]))
 
-// the newest colorways, to choose between where there are several, the `picked` one chosen, and behind a link that shows
-// them, each paint the earlier years had, but the newest's
+// the newest colorways, to choose between where there are several, and behind a link that shows them, each paint the
+// earlier years had, but the newest's, all of them choices once there are any, the `picked` one chosen and shown
 const colors = (presenter, vehicle, key, picked) => {
   const [[newest] = [], ...earlier] = Map.groupBy(colorwayYears(vehicle), paint).values()
   if (!newest) return null
 
   const latest = array(newest.colorways)
-  const chosen = chosenColorway(vehicle, picked)
-  // the toggle scrolling out to its cell's edges where one's name is wider than it
-  const shown = latest.length > 1
-    ? html`<div class="twgutter-bleed tw:overflow-x-auto tw:[--gutter:--spacing(2.5)]">${radioButtonGroup({
-      name: `colorway-${key}`,
-      entries: latest.map((each, index) => ({ value: colorwayValue(each, index), label: colorway(presenter, each) })),
-      selected: colorwayValue(chosen, latest.indexOf(chosen)),
-      attributes: { 'data-action': 'change->bikebook--page#pickColorway', 'data-bikebook--page-vehicle-param': key }
-    })}</div>`
-    : colorways(presenter, latest)
-  if (earlier.length === 0) return shown
+  const selected = chosenColorway(vehicle, picked).value
+  // a toggle scrolling out to its cell's edges where one's name is wider than it
+  const toggle = (each, year) => html`<div class="twgutter-bleed tw:overflow-x-auto tw:[--gutter:--spacing(2.5)]">${radioButtonGroup({
+    name: `colorway-${key}`,
+    entries: each.map((one, index) => ({ value: colorwayValue(one, index, year), label: colorway(presenter, one) })),
+    selected,
+    attributes: { 'data-action': 'change->bikebook--page#pickColorway', 'data-bikebook--page-vehicle-param': key }
+  })}</div>`
+  if (earlier.length === 0) return latest.length > 1 ? toggle(latest) : colorways(presenter, latest)
 
-  return html`<div class="tw:space-y-2" data-controller="ui--collapse">${shown}<div class="tw:hidden tw:space-y-1" data-ui--collapse-target="content">${
-    earlier.map((years) => html`<div class="tw:flex tw:flex-wrap tw:items-baseline tw:gap-x-2 tw:gap-y-1"><span class="tw:text-xs tw:font-bold tw:whitespace-nowrap tw:tabular-nums">${
-      years.map(({ year }) => year).toReversed().join(', ')}</span>${badge({ text: colorways(presenter, array(years[0].colorways)) })}</div>`)}</div><div>${collapse({ color: 'link_gray', htmlClass: 'tw:text-sm tw:aria-expanded:hidden', content: 'View previous years colors' })}</div></div>`
+  const open = !latest.some((each, index) => colorwayValue(each, index) === selected)
+  return html`<div class="tw:space-y-2" data-controller="ui--collapse">${toggle(latest)}<div class="${open ? '' : 'tw:hidden'} tw:space-y-2"
+    data-ui--collapse-target="content">${earlier.map((years) => html`<div class="tw:space-y-1"><div class="tw:text-xs tw:font-bold tw:tabular-nums">${
+      years.map(({ year }) => year).toReversed().join(', ')}</div>${toggle(array(years[0].colorways), years[0].year)}</div>`)}</div><div>${
+      collapse({ color: 'link_gray', htmlClass: 'tw:text-sm tw:aria-expanded:hidden', content: 'View previous years colors' })}</div></div>`
 }
 
 const EXCERPT_LENGTH = 200

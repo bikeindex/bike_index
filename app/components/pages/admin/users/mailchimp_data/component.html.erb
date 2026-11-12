@@ -8,7 +8,7 @@
     <% end %>
 
     <div class="twwiderow tw:items-start">
-      <%= render(UI::TableList::Component.new) do |list| %>
+      <%= render(UI::Table::List::Component.new) do |list| %>
         <% list.with_row(label: "ID", value: tag.span(@mailchimp_datum.id, class: "tw:text-sm"), class: "only-dev-visible tw:hidden", data: {"ui--collapse-target": "content"}) %>
         <% list.with_row(label: "Status", value: @mailchimp_datum.status) %>
         <% list.with_row(label: "Lists", value: @mailchimp_datum.lists.join(", ")) %>

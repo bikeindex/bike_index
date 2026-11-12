@@ -102,8 +102,8 @@
               <% end %>
             <% end %>
           <% end %>
-          <% if show_registration_sequence? %>
-            <%= info_row(translation(".registration_sequence")) do %>
+          <% if show_education_course? %>
+            <%= info_row(translation(".education_course")) do %>
               <% if acknowledgment.present? %>
                 <%= translation(".acknowledged_html", time: render(UI::Time::Component.new(time: acknowledgment.acknowledged_at, preposition: true))) %>
               <% end %>

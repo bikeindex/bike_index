@@ -419,9 +419,9 @@ class Bike < ApplicationRecord
     errors.full_messages.reject { |m| m[/(bike can.t be blank|are you sure the bike was created)/i] }
   end
 
-  # Have to remove self from duplicate bike groups
+  # A bike matching on two segments joins once per group; DISTINCT can't pluck under the default ORDER BY
   def duplicate_bikes
-    duplicate_bikes_including_self.where.not(id: id)
+    Bike.where(id: duplicate_bikes_including_self.select(:id)).where.not(id:)
   end
 
   def calculated_listing_order
@@ -480,7 +480,7 @@ class Bike < ApplicationRecord
   end
 
   # The register flow creates the bike ahead of its organization's safety rules
-  def unfinished_registration? = persisted? && RegistrationSequenceAcknowledgment.pending.exists?(bike_id: id)
+  def unfinished_registration? = persisted? && EducationCourseAcknowledgment.pending.exists?(bike_id: id)
 
   def current_parking_notification
     parking_notifications.current.first
@@ -507,7 +507,7 @@ class Bike < ApplicationRecord
 
   # Only e-vehicles agree to an organization's safety rules, and an unregistered parking
   # notification has no registrant to agree to them
-  def registration_sequence_applies?
+  def education_course_applies?
     motorized? && !unregistered_parking_notification?
   end
 

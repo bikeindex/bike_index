@@ -17,23 +17,23 @@ module Pages
 
         # The city's programs carry its pages, each adding a page of its own
         def build_organizations
-          city = sequence(translation(".city_name"))
+          city = course(translation(".city_name"))
           city_pages = pages(city, [battery, city_riding, city_rules])
-          school = sequence(translation(".school_name"), translation(".school_tab"))
-          housing = sequence(translation(".housing_name"), translation(".housing_tab"))
-          riverside = sequence(translation(".riverside_name"), translation(".riverside_tab"))
+          school = course(translation(".school_name"), translation(".school_tab"))
+          housing = course(translation(".housing_name"), translation(".housing_tab"))
+          riverside = course(translation(".riverside_name"), translation(".riverside_tab"))
           [
-            {key: :city, blurb: translation(".city_blurb"), sequence: city, pages: city_pages},
-            {key: :school, blurb: translation(".school_campus_blurb"), sequence: school, pages: city_pages + pages(school, [school_rules])},
-            {key: :housing, blurb: translation(".housing_building_blurb"), sequence: housing, pages: city_pages + pages(housing, [housing_rules])},
-            {key: :riverside, blurb: translation(".riverside_blurb"), sequence: riverside, pages: city_pages + pages(riverside, [riverside_rules])}
+            {key: :city, blurb: translation(".city_blurb"), course: city, pages: city_pages},
+            {key: :school, blurb: translation(".school_campus_blurb"), course: school, pages: city_pages + pages(school, [school_rules])},
+            {key: :housing, blurb: translation(".housing_building_blurb"), course: housing, pages: city_pages + pages(housing, [housing_rules])},
+            {key: :riverside, blurb: translation(".riverside_blurb"), course: riverside, pages: city_pages + pages(riverside, [riverside_rules])}
           ]
         end
 
         # Unsaved - an example to render, not one to keep
-        def sequence(name, short_name = name) = RegistrationSequence.new(organization: Organization.new(name:, short_name:))
+        def course(name, short_name = name) = EducationCourse.new(organization: Organization.new(name:, short_name:))
 
-        def pages(sequence, attributes) = attributes.map { RegistrationSequencePage.new(registration_sequence: sequence, **it) }
+        def pages(course, attributes) = attributes.map { EducationCoursePage.new(education_course: course, **it) }
 
         def page(title:, rules:, subtitle: nil, heading: nil, organization_specific: false)
           {title:, heading:, subtitle:, organization_specific:, body: tag.ul(safe_join(rules.map { tag.li(it) })).to_s}

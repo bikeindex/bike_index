@@ -1,12 +1,13 @@
 import { Controller } from '@hotwired/stimulus'
 import { Turbo } from '@hotwired/turbo-rails'
 import { CURRENT_MARK, CatalogComboboxSource, loadCatalog } from 'bikebook/catalog'
-import { localSources } from 'utils/hw_combobox_patch'
+import { clearCombobox, localSources } from 'utils/hw_combobox_patch'
 import { readable, replaceUrl } from 'bikebook/replace_url'
+import { collapse, collapseField, COLLAPSE_DURATION_MS } from 'utils/collapse_utils'
 
 const RESULT_FRAME = 'ebike-rules-check'
 const CLASSES_FRAME = 'ebike-rules-classes'
-const DETAILS = ['manual', 'top_speed', 'throttle', 'watts']
+const DETAILS = ['manual', 'top_speed', 'throttle', 'throttle_speed', 'watts']
 
 // Connects to data-controller='ebike-rules--lookup'
 // The bike field is a stand-in until the catalog loads, since the combobox must have its source
@@ -14,12 +15,14 @@ const DETAILS = ['manual', 'top_speed', 'throttle', 'watts']
 // page, so the place is the form's path rather than a field. There's no submit button: a pick or a
 // change to the details loads its check into the result frame, replacing the URL with the check's own.
 // The form's data-details says which the check is of: a picked "model", whose details its check copies
-// into the panel; "custom" details changed from the model's; or "manual" details with no model
+// into the panel, collapsed until asked for; or "manual" details
 export default class extends Controller {
-  static targets = ['combobox', 'comboboxSlot', 'state', 'stateNote', 'stateNeeded', 'manual', 'legend']
+  static targets = ['combobox', 'comboboxSlot', 'state', 'stateNote', 'stateNeeded', 'stateChoose', 'manual', 'throttleSpeed', 'legend', 'details', 'customize']
   static values = { manifestUrl: String, path: String, countryPath: String, display: String, failedText: String, title: String, legend: String, modelLegend: String }
 
   async connect () {
+    delete this.throttleSpeedTarget.dataset.beforeCollapse
+    this.#collapseThrottleSpeed(0)
     this.lastUrl = window.location.href.split('#')[0]
     this.classesPath = window.location.pathname
     this.observers = [this.#watchCleared(this.#stateField, () => this.chooseState())]
@@ -71,45 +74,40 @@ export default class extends Controller {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  // A pick, by an option's press or Enter, noted before the gem selects it: its selection event reads the same as the
-  // one it announces on connecting or on a blur
-  notePick ({ type, target }) {
-    this.picking = type === 'keydown' || Boolean(target.closest('[role=option]'))
-  }
-
-  // The gem announces a selection only when it changes, so a pick of the model already chosen - to return custom
-  // details to its own - is left for once the gem has handled the press
-  repick () {
-    const value = this.comboboxSlotTarget.querySelector('[data-hw-combobox-target=hiddenField]')?.value
-    if (this.picking && value === this.model) this.chooseBike({ detail: { value } })
-  }
-
   // The gem leaves the autocompleted part of a pick selected, and the catalog's "(current)" says
-  // nothing a picked model needs. Its announcement keeps the page's custom details, which a pick of
-  // their model returns to its own
+  // nothing a picked model needs. It announces the prefilled model on connecting, and again on a blur
   chooseBike ({ detail } = {}) {
     const input = this.comboboxSlotTarget.querySelector('input[role=combobox]')
     if (detail?.value && input) {
       input.value = input.value.replace(CURRENT_MARK, '')
       input.setSelectionRange(input.value.length, input.value.length)
     }
-    if (detail?.value && (detail.value !== this.model || this.picking)) {
+    if (detail?.value && detail.value !== this.model) {
       this.model = detail.value
       this.#setMode('model')
       // the pick's name, without the catalog's years
       this.legendTarget.textContent = this.modelLegendValue.replace('%{model}', input.value.replace(/ \([^)]*\)$/, ''))
     }
-    this.picking = false
     this.#check()
   }
 
-  // Changing a picked model's details checks them instead
+  // Changed details are no longer a picked model's, so it's cleared and they're checked on their own
   checkDetails () {
+    this.#collapseThrottleSpeed()
     const watts = this.element.elements.watts
     if (!watts.checkValidity()) return watts.reportValidity()
 
-    if (this.#mode === 'model') this.#setMode('custom')
+    if (this.#mode === 'model') {
+      this.#setMode('manual')
+      // without the catalog there's no combobox, nor its cleared field to hear
+      const combobox = this.comboboxSlotTarget.querySelector('.hw-combobox')
+      combobox ? clearCombobox(combobox) : this.#clearModel()
+    }
     this.#check()
+  }
+
+  showDetails () {
+    this.#showDetails(true)
   }
 
   focusState () {
@@ -168,7 +166,7 @@ export default class extends Controller {
   #awaitState () {
     const url = this.#checkUrl
     this.#leaveCheck(url ?? this.element.action)
-    if (!url) return this.stateNoteTarget.replaceChildren()
+    if (!url) return this.stateNoteTarget.replaceChildren(this.stateChooseTarget.content.cloneNode(true))
 
     // A model's details don't wait: without a state, its frame carries them and no check
     if (this.#mode === 'model') document.getElementById(RESULT_FRAME).src = url
@@ -183,7 +181,7 @@ export default class extends Controller {
     replaceUrl(new URL(url))
   }
 
-  // Clearing the model clears the details it filled, and leaves custom ones to check on their own
+  // Clearing the model clears the details it filled, and leaves changed ones to check on their own
   #clearModel () {
     this.model = ''
     this.legendTarget.textContent = this.legendValue
@@ -195,6 +193,12 @@ export default class extends Controller {
   #setMode (mode) {
     this.element.dataset.details = mode
     this.manualTarget.disabled = mode === 'model'
+    this.#showDetails(mode !== 'model')
+  }
+
+  #showDetails (shown) {
+    collapse(shown ? 'show' : 'hide', this.detailsTarget)
+    this.customizeTarget.hidden = shown
   }
 
   get #mode () {
@@ -203,10 +207,18 @@ export default class extends Controller {
 
   #fill (details) {
     const { elements } = this.element
-    for (const name of ['top_speed', 'throttle']) {
+    for (const name of ['top_speed', 'throttle', 'throttle_speed']) {
       for (const radio of elements[name]) radio.checked = radio.value === String(details[name])
     }
     elements.watts.value = details.watts ?? ''
+    this.#collapseThrottleSpeed()
+  }
+
+  // Sideways beside the throttle question; stacked under it on a phone, a width collapse wouldn't shrink the row
+  #collapseThrottleSpeed (duration = COLLAPSE_DURATION_MS) {
+    const field = this.throttleSpeedTarget
+    const direction = window.getComputedStyle(field.parentElement).flexDirection === 'row' ? 'horizontal' : 'vertical'
+    collapseField(field, this.element.elements.throttle.value === '1', duration, direction)
   }
 
   // A combobox handle's clear empties the field without a selection event, so the field itself is watched

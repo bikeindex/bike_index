@@ -190,6 +190,8 @@ end
 RSpec.configure do |config|
   config.before(:suite) do
     DatabaseCleaner.clean_with(:deletion)
+    # DatabaseCleaner only reaches the primary database, and CI seeds shard 0's before the suite
+    PaperTrail::Version.delete_all
   end
 
   config.before(:all, :context_state) do

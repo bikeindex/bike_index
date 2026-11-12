@@ -2,8 +2,6 @@ import { array } from 'bikebook/templates/values'
 import { storage } from 'utils/storage'
 
 const KEY = 'bikebook:sizes'
-const SIZES = 'vehicle_sizes'
-const COLORWAYS = 'vehicle_colorways'
 
 // Size names that say the same thing, by their letters and digits alone: "Medium", "M", "MD". No "SM",
 // which is how "S/M" reads
@@ -67,38 +65,6 @@ export const preferredSize = () => {
 }
 
 export const storePreferredSize = (size) => storage.setItem(KEY, JSON.stringify(size))
-
-// Each of `ids` as itself, and a model picked again as its id and which time: m/trek/2026/marlin_5#2
-export const vehicleKeys = (ids) => ids.map((id, index) => {
-  const time = ids.slice(0, index).filter((each) => each === id).length + 1
-  return time > 1 ? `${id}#${time}` : id
-})
-
-// vehicle_sizes and vehicle_colorways are each vehicle's picked size and colorway in vehicle_models' order, blank where it
-// has none
-export const paramList = (url, param) => url.searchParams.get(param)?.split(',') ?? []
-const pickedOf = (url, param) => {
-  const picks = paramList(url, param)
-  return Object.fromEntries(vehicleKeys(paramList(url, 'vehicle_models')).map((key, index) => [key, picks[index]]).filter(([, pick]) => pick))
-}
-export const pickedSizes = (url) => pickedOf(url, SIZES)
-export const pickedColorways = (url) => pickedOf(url, COLORWAYS)
-export const picksParam = (ids, picked) => {
-  const picks = vehicleKeys(ids).map((key) => picked[key] ?? '')
-  return picks.slice(0, picks.findLastIndex(Boolean) + 1).join(',')
-}
-const withPicked = (url, picked, param) => {
-  const next = new URL(url)
-  const value = picksParam(paramList(next, 'vehicle_models'), picked)
-  value ? next.searchParams.set(param, value) : next.searchParams.delete(param)
-  return next
-}
-export const withSize = (url, key, name) => withPicked(url, { ...pickedSizes(url), [key]: name }, SIZES)
-export const withColorway = (url, key, name) => withPicked(url, { ...pickedColorways(url), [key]: name }, COLORWAYS)
-// `url` with each size and colorway following its vehicle from `previous`, whose vehicles it's reordered, added to or
-// removed from
-export const realigned = (url, previous = new URL(window.location.href)) =>
-  withPicked(withPicked(url, pickedSizes(previous), SIZES), pickedColorways(previous), COLORWAYS)
 
 // Each vehicle's size: its pick, else the first's preferred size and the others' the first's, each the one of its name,
 // else the nearest for its riders or by top tube, else medium

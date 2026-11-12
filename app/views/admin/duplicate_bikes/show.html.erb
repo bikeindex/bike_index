@@ -350,7 +350,7 @@
 
     <% contact_link_params = link_params.except("page") # cell blocks run in the component, outside the view's helpers %>
 
-    <%= render UI::Table::Component.new(records: listed_contact_groups, classes: "tw:mt-2") do |table| %>
+    <%= render UI::Table::Base::Component.new(records: listed_contact_groups, classes: "tw:mt-2") do |table| %>
       <% table.column(label: "Contact") do |group| %>
         <div class="tw:font-semibold">Contact <%= group.number %></div>
 

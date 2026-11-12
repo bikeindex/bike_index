@@ -59,7 +59,7 @@ module ComponentStructs
       created_at_cell: :registered_cell_panel,
       updated_at_cell: :registration_updated_cell_panel,
       occurred_at_cell: :status_at_cell_panel,
-      acknowledgment_cell: :acknowledgment_cell_panel,
+      acknowledgment_cell: :course_acknowledgment_cell_panel,
       impounded_at_cell: :impounded_at_cell_panel,
       impound_updated_at_cell: :impound_updated_at_cell_panel,
       resolved_at_cell: :resolved_at_cell_panel
@@ -269,7 +269,7 @@ module ComponentStructs
         ("notes_cell" if @organization.enabled?("registration_notes")),
         ("impound_id_cell" if impound_search?),
         ("avery_cell" if @organization.enabled?("avery_export")),
-        ("acknowledgment_cell" if @organization.enabled?("registration_sequences"))
+        ("acknowledgment_cell" if @organization.enabled?("education_courses"))
       ].compact.uniq
     end
 

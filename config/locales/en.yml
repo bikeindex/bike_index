@@ -1918,6 +1918,7 @@ en:
       parking_notifications:
         create:
           successfully_created: Parking Notification for %{bike_type} created
+          successfully_impounded: Impounded this %{bike_type}
           unable_to_create: Unable to create - %{errors}
       stickers:
         ensure_sticker_for_current_organization:
@@ -4261,6 +4262,7 @@ en:
         search: Search
         search_emails: Search emails
         sent: Sent
+        step: Step
         through_org: through %{org_name}
         vehicle_type: Type
       new:
@@ -4927,6 +4929,7 @@ en:
       bulk_import_and_export: Bulk Import & Export
       bulk_imports: Bulk Imports
       discuss: Discuss
+      education_courses: Education courses
       exports: Exports
       getting_started: Getting started
       graduated_notifications: Graduated notifications
@@ -4949,7 +4952,6 @@ en:
       parking_notifications_group: Parking Notifications
       recoveries: Recoveries
       registration_form_settings: Registration form settings
-      registration_sequences: Registration sequences
       registration_stickers: Registration stickers
       registrations_index: Organization Registrations
       reports: Reports

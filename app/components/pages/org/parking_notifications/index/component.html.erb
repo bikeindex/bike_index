@@ -141,7 +141,8 @@
         target_search_path: organization_parking_notifications_path(organization_id: @organization.to_param),
         interpreted_params: @interpreted_params,
         heading: translation(".find_a_parking_notification"),
-        submit_text: translation(".search_parking_notifications")
+        submit_text: translation(".search_parking_notifications"),
+        notes_placeholder: translation(".search_notification_message_or_notes")
       )) %>
     </div>
   </div>
@@ -200,14 +201,18 @@
               </div>
 
               <div class="card-body">
-                <%# Matching form is on parking notification index %>
-                <div class="row">
+                <%# Matching form is on parking notification show %>
+                <div
+                  class="row"
+                  data-controller="org--parking-notification-repeat"
+                  data-org--parking-notification-repeat-resolve-text-value="Resolve notifications"
+                >
                   <div class="col-xs-6">
-                    <%= select_tag :kind, options_for_select(helpers.parking_notification_repeat_kinds), prompt: "...", class: "form-control", required: true, data: {action: "org--parking-notifications-index#updateSubmitText"} %>
+                    <%= select_tag :kind, options_for_select(helpers.parking_notification_repeat_kinds), prompt: "...", class: "form-control", required: true, data: {action: "org--parking-notification-repeat#updateSubmitText"} %>
                   </div>
 
                   <div class="col-xs-6 text-center">
-                    <%= submit_tag "Create notifications", class: "btn btn-success btn-md-lg", data: {"org--parking-notifications-index-target": "submit"} %>
+                    <%= submit_tag "Create notifications", class: "btn btn-success btn-md-lg", data: {"org--parking-notification-repeat-target": "submit"} %>
                   </div>
                 </div>
               </div>

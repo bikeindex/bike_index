@@ -2186,6 +2186,7 @@ nl:
         create:
           successfully_created: Parkeermelding %{bike_type} gemaakt
           unable_to_create: Kan niet maken - %{errors}
+          successfully_impounded: In beslag genomen dit %{bike_type}
       manages:
         destroy:
           contact_support_to_delete: Neem contact op met support@bikeindex.org om
@@ -3855,6 +3856,7 @@ nl:
         re_send: opnieuw versturen
         motorized: e-voertuig?
         vehicle_type: Type
+        step: Stap
       recoveries:
         description: Beschrijving
         mfg_model_color_html: fabrikant, model, <span class="less-strong">kleur</span>
@@ -4459,7 +4461,6 @@ nl:
       parking_notification_unregistered: Niet-geregistreerde fietsmelding
       parking_notifications_group: Parkeermeldingen
       recoveries: terugvorderingen
-      registration_sequences: Registratiesequenties
       registration_stickers: Registratie stickers
       reports: Rapporten
       resources: Middelen
@@ -4473,6 +4474,7 @@ nl:
       search_all_registrations: Zoek alle registraties
       add_a_registration: Voeg een registratie toe
       registration_form_settings: Instellingen voor het registratieformulier
+      education_courses: Onderwijscursussen
   users:
     accept_terms:
       i_agree_to_tos_html: Ik ga akkoord met de <strong>Servicevoorwaarden van</strong>
@@ -5428,6 +5430,9 @@ nl:
           om de registratie te voltooien.
         link_signs_you_in: Deze link geeft je een account bij Bike Index, dus stuur
           hem niet door. Hij is %{days} dagen geldig.
+        e_vehicle_safety_rules_owed_html: Uw <strong>%{color_and_brand}</strong> is
+          geregistreerd op Bike Index. Ga akkoord met de veiligheidsregels voor e-voertuigen
+          om de registratie te voltooien.
       confirmation_email:
         click_to_sign_in_html: Klik op de knop <em>'Inloggen'</em> om je registratie
           te voltooien!
@@ -5554,16 +5559,17 @@ nl:
         in_the_past_year: in het afgelopen jaar
         now: nu
         to: Naar
-      table_column_settings:
-        all: Alle
-        default: standaard
-        included_columns: Inbegrepen kolommen
-        none: geen
-        visible_columns: Zichtbare kolommen
-        return_to_default_column_order: Terug naar de standaard kolomvolgorde
       drag_handle:
         move: Verplaats %{name}
         moved: Positie %{position} van %{count}
+      table:
+        column_settings:
+          all: Alle
+          default: standaard
+          included_columns: Inbegrepen kolommen
+          none: geen
+          return_to_default_column_order: Terug naar de standaard kolomvolgorde
+          visible_columns: Zichtbare kolommen
     atoms:
       serial:
         hidden: verborgen
@@ -5589,6 +5595,14 @@ nl:
       recovery_display_card:
         recovered: Hersteld
         translated_from_english: vertaald uit het Engels
+      registration_step:
+        awaiting_email_confirmation: Wachten op e-mailbevestiging
+        education_page: Onderwijspagina %{number}
+        education_review: Onderwijsbeoordeling
+        finished: Afgerond
+        report: Rapport
+        step_1: Stap 1
+        step_2: Stap 2
     pages:
       messages:
         thread_show:
@@ -5739,7 +5753,6 @@ nl:
             occurred_at_cell: Status bij
             photo_cell: Foto
             view_cell: Weergave
-            acknowledgment_cell_panel: Tijd - Registratievolgorde bevestigd
             filter_stolen_or_impounded_html: alleen <strong>gestolen</strong> of <strong>in
               beslag genomen</strong>
             location_search_disabled_no_address: "%{org_name} verzamelt geen registratieadressen,
@@ -5775,6 +5788,7 @@ nl:
             copy_column_order_from_registrations_search: Kopieer de kolomvolgorde
               uit de zoekopdracht naar registraties.
             impound_search_columns: Inbeslagname zoekkolommen
+            course_acknowledgment_cell_panel: Tijd - Erkende onderwijscursus
           column_settings_toggle:
             column_settings: Kolominstellingen
           settings_and_filters:
@@ -5793,9 +5807,10 @@ nl:
             link_sticker: link sticker
             hidden: verborgen
             not_registered_with: Verborgen omdat het niet is geregistreerd bij %{org_name}
-            acknowledgment_title: Bevestiging van de registratieprocedure bij
             view: Weergave
             toggle_all_checked: Alles aangevinkt weergeven/verbergen
+            course_acknowledgment_title: Erkenning van deelname aan de onderwijscursus
+              bij
           multi_result_chip:
             no_results: geen overeenkomsten
           multi_results:
@@ -5818,6 +5833,7 @@ nl:
             parking_notifications: Verlaten records
             find_a_parking_notification: Zoek een parkeermelding
             search_parking_notifications: Zoek naar parkeermeldingen
+            search_notification_message_or_notes: Zoekmelding/notities
           table:
             address: Adres
             bike: Fiets
@@ -5865,7 +5881,7 @@ nl:
           map_unavailable: De kaart kon niet worden geladen; de locatie was nog steeds
             ingesteld via uw apparaat.
           set_on_map: Op de kaart plaatsen
-        registration_sequence:
+        education_course:
           page_edit_bullet:
             bullet: kogel
       registrations:
@@ -6040,6 +6056,7 @@ nl:
               impound_this_bike_type: Neem dit in beslag %{bike_type}
               not_shown_to_user: niet aan de gebruiker getoond
               parking_notification_notes: "%{org_name} interne notities"
+              submit_parking_notification: Maak een parkeermelding aan
             parking_notification_show:
               no_notifications: Geen parkeermeldingen voor deze %{bike_type}
               parking_notifications: Verlaten records
@@ -6121,6 +6138,10 @@ nl:
             unregistered_owner: Deze %{bike_type} is niet geregistreerd bij een gebruiker.
               Het is toegevoegd om parkeermeldingen te volgen.
             view_all_registrations: alles bekijken →
+            not_registered_phone_message: Andere contactgegevens van de eigenaar zijn
+              niet beschikbaar, aangezien dit %{bike_type} niet bij uw organisatie
+              is geregistreerd.
+            show_phone: Toon telefoon
           marketplace_listing_card:
             condition: Voorwaarde
             contact_seller: Neem contact op met de verkoper
@@ -6148,9 +6169,9 @@ nl:
             not_audited: Niet gecontroleerd
             organization_registered: Organisatie
             registration_information: Registratiegegevens
-            registration_sequence: Registratievolgorde
             sticker: Sticker
             sticker_claimed: beweerde
+            education_course: Onderwijscursus
           internal_notes:
             current_note: Huidige notitie
             deleted_user: een verwijderde gebruiker
@@ -6172,6 +6193,12 @@ nl:
               u een link op in het onderstaande veld
           share:
             link_copied: Link gekopieerd
+          potential_duplicates:
+            count_html: "%{count} gevonden"
+            matching_segments: 'Registraties met een serienummer dat overeenkomt met
+              de segmenten van %{bike_type}:'
+            potential_duplicates: Mogelijke duplicaten
+            showing_recent: De meest recente %{count} weergeven
       search:
         everything_combobox:
           made_by: gemaakt door
@@ -6808,8 +6835,6 @@ nl:
           step_review:
             complete_registration: Voltooi de %{cycle_type}-registratie
           landing:
-            a_million_bikes: Er staan een miljoen fietsen geregistreerd. Geen enkele
-              eigenaar heeft betaald om erbij te zijn.
             benefit_alerts_body: Als het gestolen wordt, markeer het dan als gestolen
               en wij waarschuwen partnerwinkels, de politie en fietsers in de buurt
               van de plaats waar het is gebeurd.
@@ -6825,9 +6850,6 @@ nl:
               aan de hand van diefstalrapporten, zodat kopers zeker weten dat de fiets
               legitiem is.
             benefit_marketplace_title: Een betrouwbare marktplaats
-            benefit_network_body: Vrijwilligers, lokale opsporingsteams en meer dan
-              1000 politiekorpsen, universiteiten, steden en winkels houden de wacht
-              voor gestolen fietsen en signaleren deze.
             benefit_network_title: Mensen die ernaar op zoek zijn
             benefit_private_body: Je contactgegevens blijven verborgen. Wij zijn een
               non-profitorganisatie, dus we verkopen geen gegevens en plaatsen geen
@@ -6888,6 +6910,11 @@ nl:
             what_registering_subhead: De meeste gestolen fietsen komen nooit meer
               thuis, omdat niemand kan bewijzen van wie ze zijn. Een kentekenbewijs
               lost dat probleem op.
+            benefit_network_partners_body: Vrijwilligers, lokale opsporingsteams en
+              meer dan %{partners} politieafdelingen, universiteiten, steden en winkels
+              houden de wacht voor gestolen fietsen en signaleren deze.
+            millions_registered_no_owner_paid: "%{millions} miljoen fietsen zijn geregistreerd.
+              Geen enkele eigenaar heeft betaald om erbij te zijn."
       bikebook:
         show:
           any_activity: Elke activiteit
@@ -6913,7 +6940,6 @@ nl:
           byline: Een gratis naslagwerk van Bike Index, het non-profit fietsregister.
           tagline: 'De wereldwijde fietsenbibliotheek: zoek, vergelijk en vind je
             volgende fiets.'
-          about_bikebook_label: Over BikeBook
           activities: Activiteiten
           activity_examples: "(bijv. mountainbiken, cyclocross, enz.)"
           configuration_examples: "(compleet/framework)"
@@ -6948,6 +6974,7 @@ nl:
             vergelijken
           select_an_vehicle_type: Selecteer een %{bike_type}, kies meerdere om ze
             te vergelijken
+          about_bike_book_label: Over het fietsboek
         donate_strip:
           donate: Schenken
           pitch: Dit fantastische product wordt u aangeboden door de non-profitorganisatie
@@ -6985,15 +7012,10 @@ nl:
             regels van de staat raadplegen.
           fails_rule: Voldoet niet aan deze regel.
           for_your_information: Ter informatie
-          gray_detail: Uw %{name} staat geregistreerd als een e-bike van klasse %{n}.
-            Raadpleeg de %{state} RDW voor de lokale regels.
-          gray_detail_unclassified: Uw %{name} staat niet geregistreerd als een e-bike
-            van klasse 1, 2 of 3. Raadpleeg de %{state} DMV voor de lokale regels.
           gray_headline: We hebben de e-bike-regels van %{state} nog niet in ons bestand.
           has_throttle: Heeft een gasklep
           is_registered: Is deze fiets geregistreerd?
           legal_to_ride: Legaal om te rijden
-          legal_with_rules: Legaal, met regels om te controleren
           limits_start_on: Deze limieten treden in werking %{date}
           manual_bike_name: e-bike
           may_be_moped: Het kan ook zijn dat het voertuig wordt gereguleerd als een
@@ -7035,23 +7057,11 @@ nl:
           watts_not_provided: Motorvermogen niet opgegeven
           watts_over_cap_html: "%{watts}W motor overschrijdt de %{cap}W capaciteit"
           watts_within_cap_html: "%{watts}W-motor bevindt zich in de kap"
-          yellow_headline_class_unknown:
-            one: Je %{name} mag mogelijk legaal rijden in %{state}, met %{count}-regel
-              om te controleren.
-            other: Je %{name} mag mogelijk legaal rijden in %{state}, met %{count}
-              regels die je moet controleren.
           yes_to_html: Ja, naar %{mph}
-          your_bike: Jouw fiets
-          your_ebike: Jouw e-bike
           your_state: Uw staat
-          bikebook_name: BikeBook
           class_3_throttle_over_html: Het gaspedaal gaat tot %{mph} mph, voorbij de
             20 mph die het gaspedaal van een klasse 3-voertuig is toegestaan.
           class_3_throttle_within_html: Gashendel stopt bij %{mph} mph
-          class_unknown_check_label: BikeBook vermeldt de klasse of topsnelheid niet,
-            dus controleer de klasse op het label.
-          entered_unverified: Invoer door u, niet geverifieerd door BikeBook.
-          full_bikebook_entry: Bekijk het volledige BikeBook-artikel
           over_mph_html: Meer dan %{mph} mph
           red_headline_manual: Dit is geen e-bike volgens de huidige %{state} regels.
           speed_past_cap_html: Assistentie bij snelheden boven %{past} mph, boven
@@ -7068,15 +7078,12 @@ nl:
             met gashendel
           class_n: Klasse %{n}
           classes_not_permitted: Het is een %{classes} e-bike, wat niet is toegestaan.
-          manually_entered: Handmatig ingevoerd
           model_year: "%{year} model"
           optional_throttle_not_allowed: Het is alleen legaal zonder de optionele
             gasklep.
           optional_to_html: Optioneel, naar %{mph}
           throttle_with_class_3_assist: Niet toegestaan met assistentie van klasse
             3
-          green_headline_law: Je %{name} mag legaal in %{state} rijden volgens de
-            %{law}-regels.
           kmh_html: "%{kmh} km/u"
           law_source_html: 'Bron: %{link}''s catalogus van wetgeving betreffende e-bikes.
             Samenvattingen dienen ter referentie en zijn geen juridisch advies.'
@@ -7095,8 +7102,6 @@ nl:
             de %{cap} km/u-limiet
           speed_past_kmh_html: Assisteert voorbij %{past} km/u; controleer of het
             stopt bij %{cap} km/u.
-          speed_to_check_kmh_html: BikeBook vermeldt de topsnelheid niet, dus controleer
-            of de motor stopt bij %{cap} km/u.
           speed_within_cap_kmh_html: Assistentie tot %{kmh} km/u, binnen de limiet
           still_reviewing_province_body: Raadpleeg het ministerie van Transport van
             uw provincie of territorium voor de actuele regelgeving met betrekking
@@ -7107,18 +7112,6 @@ nl:
           throttle_not_stated_in_law: De wet zegt niet of een gasklep is toegestaan.
           watts_to_check_html: Controleer of de motor een vermogen heeft van %{cap}W
             of minder.
-          yellow_headline_law:
-            one: Je %{name} mag legaal in %{state} rijden volgens de %{law}-regels,
-              met %{count}-regel om te controleren.
-            other: Je %{name} mag legaal in %{state} rijden volgens de %{law}-regels,
-              waarbij de %{count}-regels nog gecontroleerd moeten worden.
-          yellow_headline_law_without_throttle: Je %{name} mag legaal in %{state}
-            rijden volgens de %{law}-regels, zonder de optionele gashendel.
-          yellow_headline_motor_vehicle_law:
-            one: Je %{name} mag mogelijk legaal in %{state} rijden volgens de %{law}-regels,
-              waarbij %{count}-regel nog gecontroleerd moet worden.
-            other: Je %{name} mag mogelijk legaal in %{state} rijden volgens de %{law}-regels,
-              waarbij de %{count}-regels nog gecontroleerd moeten worden.
           yes_to_kmh_html: Ja, tot %{kmh} km/u
           your_province: Uw provincie of territorium
           classes_not_recognized_in:
@@ -7135,22 +7128,6 @@ nl:
             optionele gashendel
           also_class_with_optional_upgrade: is ook een e-bike van klasse %{n} met
             een optionele upgrade
-          class_headline: Jouw %{name} is een e-bike van klasse %{n} in %{state}.
-          class_headline_optional: Jouw %{name} is een e-bike van klasse %{n} in %{state}
-            en %{optional}.
-          class_headline_optional_with_rules:
-            one: Jouw %{name} is een e-bike van klasse %{n} in %{state} en %{optional},
-              met regel %{count} om te controleren.
-            other: Jouw %{name} is een e-bike van klasse %{n} in %{state} en %{optional},
-              met %{count} regels om te controleren.
-          class_headline_with_rules:
-            one: Jouw %{name} is een e-bike van klasse %{n} in %{state}, met regel
-              %{count} om te controleren.
-            other: Jouw %{name} is een e-bike van klasse %{n} in %{state}, met %{count}
-              regels die gecontroleerd moeten worden.
-          class_headline_without_throttle: Jouw %{name} is een e-bike van klasse %{n}
-            in %{state}, zonder de optionele gashendel.
-          green_headline_no_classes: Uw %{name} wordt in %{state} als een e-bike geclassificeerd.
           heading_classes_html: "%{classes} herkend"
           heading_no_power_cap: Geen motorvermogenslimiet
           heading_no_speed_cap: Geen snelheidslimiet met bovenondersteuning
@@ -7160,20 +7137,89 @@ nl:
           heading_throttle_not_allowed: Gas geven is niet toegestaan
           heading_vehicle_html: Gereguleerd als %{name}
           may_fall_under_name: In %{state} kan het onder %{name} vallen.
-          not_classified_headline: Uw %{name} wordt in %{state} niet als e-bike geclassificeerd.
-          rules_that_apply: Regels die van toepassing zijn in %{state}
-          rules_that_may_apply: Regels die van toepassing kunnen zijn in %{state}
           throttle_speed_over_cap_html: Het gaspedaal loopt door tot %{mph} mph, boven
             de %{cap} mph-limiet.
           throttle_speed_within_cap_html: Gashendel loopt tot %{mph} mph, binnen de
             limiet
-          yellow_headline_no_classes:
-            one: Jouw %{name} is geclassificeerd als een e-bike in %{state}, met %{count}-regel
+          class_summary: De %{name} is een e-bike van klasse %{n} in %{state}.
+          class_summary_optional: De %{name} is een e-bike van klasse %{n} in %{state}
+            en %{optional}.
+          class_summary_optional_with_rules:
+            one: De %{name} is een klasse %{n} e-bike in %{state} en %{optional},
+              met %{count} regel om te controleren.
+            other: De %{name} is een e-bike van klasse %{n} in %{state} en %{optional},
+              met %{count} regels om te controleren.
+          class_summary_with_rules:
+            one: De %{name} is een e-bike van klasse %{n} in %{state}, met regel %{count}
               om te controleren.
-            other: Jouw %{name} is geclassificeerd als een e-bike in %{state}, met
-              %{count} regels die gecontroleerd moeten worden.
-          yellow_headline_no_classes_without_throttle: Uw %{name} wordt in %{state}
+            other: De %{name} is een e-bike van klasse %{n} in %{state}, met %{count}
+              regels om te controleren.
+          class_summary_without_throttle: De %{name} is een e-bike van klasse %{n}
+            in %{state}, zonder de optionele gashendel.
+          classified_with_rules: Geclassificeerd als een e-bike, met regels om te
+            controleren
+          gray_listed_detail: De %{name} staat geregistreerd als een e-bike van klasse
+            %{n}. Raadpleeg de %{state} DMV voor lokale regels.
+          gray_unlisted_detail: De %{name} staat niet geregistreerd als een e-bike
+            van klasse 1, 2 of 3. Raadpleeg de %{state} DMV voor de lokale regels.
+          green_summary_law: De %{name} mag legaal in %{state} rijden volgens de %{law}-regels.
+          green_summary_no_classes: De %{name} wordt in %{state} als e-bike geclassificeerd.
+          manually_entered_ebike: Handmatig ingevoerde e-bike
+          not_classified_summary: De %{name} wordt in %{state} niet als e-bike geclassificeerd.
+          yellow_summary_class_unknown:
+            one: Het is mogelijk dat %{name} legaal is om in %{state} te rijden, met
+              %{count}-regel om te controleren.
+            other: Het is mogelijk dat %{name} legaal is om mee te rijden in %{state},
+              met %{count} regels om te controleren.
+          yellow_summary_law:
+            one: De %{name} mag legaal in %{state} rijden volgens de %{law}-regels,
+              met %{count}-regel ter controle.
+            other: De %{name} mag legaal in %{state} rijden volgens de %{law}-regels,
+              met %{count}-regels om te controleren.
+          yellow_summary_law_without_throttle: De %{name} mag legaal in %{state} rijden
+            volgens de %{law}-regels, zonder de optionele gashendel.
+          yellow_summary_motor_vehicle_law:
+            one: Het is mogelijk dat %{name} legaal is om in %{state} te rijden volgens
+              de %{law}-regels, waarbij %{count}-regel gecontroleerd moet worden.
+            other: Het is mogelijk dat %{name} legaal is om in %{state} te rijden
+              volgens de %{law}-regels, waarbij de %{count}-regels gecontroleerd moeten
+              worden.
+          yellow_summary_no_classes:
+            one: De %{name} wordt in %{state} als e-bike geclassificeerd, met %{count}-regel
+              om te controleren.
+            other: De %{name} wordt in %{state} als e-bike geclassificeerd, met %{count}
+              regels die gecontroleerd moeten worden.
+          yellow_summary_no_classes_without_throttle: De %{name} wordt in %{state}
             als e-bike geclassificeerd, zonder de optionele gashendel.
+          class_3_throttle_past: Het gaspedaal wordt ingedrukt als de snelheid van
+            20 mph (32 km/u) wordt overschreden, de snelheid die is toegestaan voor
+            een voertuig van klasse 3.
+          throttle_past_cap_kmh_html: Het gaspedaal slaat door tot voorbij %{past}
+            km/u, boven de %{cap} km/u limiet.
+          throttle_past_kmh_html: Het gaspedaal slaat door tot voorbij %{past} km/u;
+            controleer of het stopt bij %{cap} km/u.
+          yes_over_mph_html: Ja, meer dan %{mph} mph
+          class_summary_manual: Deze e-bike is een e-bike van klasse %{n} in %{state}.
+          class_summary_with_rules_manual:
+            one: Deze e-bike is een e-bike van klasse %{n} in %{state}, met regel
+              %{count} om te controleren.
+            other: Deze e-bike is een e-bike van klasse %{n} in %{state}, met %{count}
+              regels om te controleren.
+          green_summary_no_classes_manual: Dit wordt geclassificeerd als een e-bike
+            in %{state}.
+          yellow_summary_no_classes_manual:
+            one: Dit wordt geclassificeerd als een e-bike in %{state}, met %{count}-regel
+              om te controleren.
+            other: Dit wordt geclassificeerd als een e-bike in %{state}, met %{count}
+              regels om te controleren.
+          bike_book_name: Fietsboek
+          class_unknown_in_bike_book_label: Bike Book vermeldt de klasse of topsnelheid
+            niet, dus controleer de klasse op het label.
+          entered_unverified_by_bike_book: Invoer door u, niet geverifieerd door Bike
+            Book.
+          full_bike_book_entry: Bekijk het volledige Bike Book-artikel
+          speed_to_check_bike_book_kmh_html: Bike Book vermeldt de topsnelheid niet,
+            dus controleer of de motor stopt bij %{cap} km/u.
         rule_label:
           classes: Erkende klassen
           power: Motorvermogenscapaciteit
@@ -7280,15 +7326,7 @@ nl:
             Steeds meer campussen, verhuurders en gemeenten vragen nu om een dergelijk
             bewijs voordat een e-bike binnen mag worden gebruikt.
           watts_placeholder: bijv. 750
-          bikebook_didnt_load: BikeBook kon niet worden geladen. Voer hieronder de
-            gegevens van uw fiets in.
-          bikebook_loading: BikeBook wordt geladen…
-          how_to_check_lookup: Zoek het model hierboven op. BikeBook toont de certificering
-            waar deze geregistreerd staat.
           over_28_mph: Meer dan 45 km/u
-          top_speed: Wat is de topsnelheid?
-          visit_bikebook_link: Bezoek BikeBook.
-          custom_details: Aangepaste details
           details_legend: De gegevens van uw fiets
           model_details: "%{model} details"
           country: Land
@@ -7299,8 +7337,6 @@ nl:
           banned_body_canada: Universiteiten, woningbouworganisaties en openbaarvervoersbedrijven
             stellen regels op voor het stallen en opladen van e-bikes binnenshuis,
             en certificering is waar ze naar op zoek zijn.
-          choose_province: Kies uw provincie of territorium uit de lijst.
-          choose_state: Kies uw staat uit de lijst.
           detected_place_html: We hebben <strong>%{state}</strong> gedetecteerd.
           kmh: "%{kmh} km/u"
           not_in_canada_html: Niet in Canada? %{switch_country}
@@ -7323,6 +7359,18 @@ nl:
           subheading_canada: Voer je provincie of territorium in en fiets om de regels
             te bekijken.
           watts_placeholder_canada: bijv. 500
+          choose_your_province: Kies uw provincie of territorium.
+          choose_your_state: Kies uw staat.
+          over_20_mph: Meer dan 32 km/u
+          top_assist_speed: Topsnelheid met trapondersteuning
+          top_throttle_speed: Topsnelheid bij gas geven
+          bike_book_didnt_load: Bike Book is niet geladen. Voer hieronder de gegevens
+            van uw fiets in.
+          bike_book_loading: Fietsboek laden…
+          how_to_check_lookup_bike_book: Zoek het model hierboven op. Bike Book toont
+            de certificering waar deze geregistreerd staat.
+          visit_bike_book_link: Bezoek Bike Book.
+          select_custom_values: Selecteer aangepaste waarden
         state_reference:
           compiling: We verzamelen momenteel de regels voor e-bikes van %{state} op
             basis van gegevens van de staatslegislatuur en de RDW. Kom binnenkort
@@ -7495,8 +7543,6 @@ nl:
           next_oem_parts_title: OEM-onderdelen en stockfoto's
           next_versioning_body: Houd bij hoe je fiets verandert.
           next_versioning_title: Fietsversie
-          official_registry: Het officiële register voor meer dan 1.000 politiekorpsen,
-            universiteiten, steden en winkels.
           or_make_a_one_time_donation: Of doe een eenmalige donatie.
           per_month: "/ maand"
           per_year: "/ jaar"
@@ -7539,20 +7585,16 @@ nl:
             nieuwe tools die we in de toekomst gaan ontwikkelen. Het registreren van
             een fiets en het melden van een diefstal is altijd gratis. Dankzij onze
             leden kunnen we dat garanderen.
+          official_registry_partners: Het officiële register voor meer dan %{partners}
+            politiekorpsen, universiteiten, steden en winkels
       donate:
         page:
-          cta_headline: Er staan een miljoen fietsen geregistreerd. Geen enkele eigenaar
-            heeft betaald om erbij te zijn.
           cta_sub: Houd het gratis voor de volgende miljoen.
           eyebrow: Hersteld en teruggebracht
           form_title: Financier het volgende herstel
           headline: Alle bovenstaande fietsen zijn mee naar huis genomen omdat de
             registratie gratis was.
           larger_gift_link: Neem contact met ons op voor een grotere gift.
-          lede: Bike Index is een non-profitorganisatie. Registratie is gratis, zoeken
-            is gratis en het melden van diefstal is gratis. Daarom staan er een miljoen
-            fietsen in het register en maken politiediensten en fietsenwinkels er
-            gebruik van. Donaties zorgen ervoor dat dit zo blijft.
           lede_short: Bike Index is een non-profitorganisatie. Registratie, zoeken
             en diefstalmeldingen zijn gratis. Donaties maken dit mogelijk.
           major_benefactor: Weldoener
@@ -7589,6 +7631,13 @@ nl:
           uses_partners_title: Partners en onderzoeken
           uses_title: Waar gaat het geld naartoe?
           wall_photo_alt: Een fiets teruggevonden via Bike Index
+          lede_millions_registered: Bike Index is een non-profitorganisatie. Registratie
+            kost niets, zoeken kost niets en het melden van diefstal kost niets —
+            daarom staan er %{millions} miljoen fietsen in het register en daarom
+            maken politiediensten en fietsenwinkels er ook daadwerkelijk gebruik van.
+            Donaties zorgen ervoor dat dit zo blijft.
+          millions_registered_no_owner_paid: "%{millions} miljoen fietsen zijn geregistreerd.
+            Geen enkele eigenaar heeft betaald om erbij te zijn."
         form:
           already_member: Je bent al lid van Bike Index - bedankt! Je kunt je lidmaatschapsniveau
             of betaalgegevens wijzigen via je lidmaatschapsinstellingen.
@@ -7642,8 +7691,6 @@ nl:
             hun staat en fiets en zien binnen 30 seconden of het legaal is om ermee
             te rijden, welke certificeringen er zijn en welke regels gelden. Het antwoord
             leidt direct naar de registratiepagina.
-          checker_point_bikebook: Klasse, motor, topsnelheid en UL-certificering uit
-            de e-bikecatalogus van BikeBook.
           checker_point_program: Binnen uw programma kunnen medewerkers de classificatie
             en de nalevingsstatus van elke geregistreerde e-bike inzien.
           checker_point_states: Staatsregels betreffende motorklassen, maximumsnelheden,
@@ -7858,9 +7905,6 @@ nl:
             landingspagina met de huisstijl van de stad, een formulier op uw website
             of een QR-code.
           registration_step_1_title: Bewoners registreren zich
-          registration_step_2_body: BikeBook identificeert het model en de klasse
-            waartoe het behoort, waarna de fietser het leerproces doorloopt. Bij gewone
-            fietsen wordt deze stap overgeslagen.
           registration_step_2_title: E-bikes worden geclassificeerd
           registration_step_3_body: Status (geregistreerd, gestolen of teruggevonden),
             merk, model, kleur en serienummer. Agenten en medewerkers kunnen het voertuig
@@ -7896,6 +7940,11 @@ nl:
           faq_checker_answer_html: De fietsdetails zijn afkomstig van %{bikebook_link},
             een catalogus van e-bike modellen met hun klasse, motor, snelheid en UL-certificering.
             De staatsregels worden vermeld met de bijbehorende wetgeving.
+          checker_point_bike_book: Klasse, motor, topsnelheid en UL-certificering
+            uit de e-bike catalogus van Bike Book.
+          registration_step_2_bike_book_body: Bike Book identificeert het model en
+            de klasse waartoe het behoort, waarna de fietser het leerproces doorloopt.
+            Bij gewone fietsen wordt deze stap overgeslagen.
         for_cities_education:
           all_set: Je bent er helemaal klaar voor.
           back: Rug

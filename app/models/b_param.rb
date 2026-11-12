@@ -112,7 +112,12 @@ class BParam < ApplicationRecord
   scope :unexpired_with_token, ->(toke) { unexpired.where(id_token: toke) }
   # = ANY(ARRAY(...)) rather than IN (...): the pkey can take it, so ORing it with an
   # indexed condition is a BitmapOr instead of a seq scan
-  scope :acknowledgment_pending, -> { where("b_params.id = ANY(ARRAY(?))", RegistrationSequenceAcknowledgment.pending.select(:b_param_id)) }
+  scope :acknowledgment_pending, -> { where("b_params.id = ANY(ARRAY(?))", EducationCourseAcknowledgment.pending.select(:b_param_id)) }
+  # Pages acknowledged, but not yet agreed to as a whole. The b_param_id term keeps a NULL out of NOT IN
+  scope :education_course_in_progress, -> {
+    where("(params -> 'education_course') IS NOT NULL")
+      .where.not(id: EducationCourseAcknowledgment.acknowledged.where.not(b_param_id: nil).select(:b_param_id))
+  }
   scope :unfinished_registrations, -> { unexpired.step_1_submitted.and(without_bike.or(acknowledgment_pending)) }
   scope :unprocessed_image, -> { where(image_processed: false).where.not(image: nil) }
   scope :with_cycle_type, -> { bike_params.where("(params -> 'bike' -> 'cycle_type') IS NOT NULL") }
@@ -301,10 +306,14 @@ class BParam < ApplicationRecord
     created_bike_id.present?
   end
 
-  # The bike is created ahead of its organization's safety rules, which are still required -
+  # The bike is created ahead of the safety rules, which are still required -
   # so the registration isn't finished until they're agreed to
   def acknowledgment_pending?
-    persisted? && RegistrationSequenceAcknowledgment.pending.exists?(b_param_id: id)
+    persisted? && EducationCourseAcknowledgment.pending.exists?(b_param_id: id)
+  end
+
+  def pending_acknowledgment
+    EducationCourseAcknowledgment.pending.find_by(b_param_id: id) if persisted?
   end
 
   def finished_registration? = with_bike? && !acknowledgment_pending?
