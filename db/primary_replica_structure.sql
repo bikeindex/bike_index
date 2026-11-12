@@ -7966,8 +7966,8 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261112085354'),
 ('20261111155046'),
-('20261109180000'),
 ('20261106120000'),
 ('20261102171029'),
 ('20261030102135'),
