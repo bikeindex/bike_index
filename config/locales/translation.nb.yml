@@ -7084,7 +7084,6 @@ nb:
             utleiere og byer ber nå om bevis på dette før en elsykkel kommer innendørs.
           watts_placeholder: f.eks. 750
           over_28_mph: Over 45 km/t
-          custom_details: Tilpassede detaljer
           details_legend: Detaljer om sykkelen din
           model_details: "%{model} detaljer"
           country: Land
@@ -7126,6 +7125,7 @@ nb:
           how_to_check_lookup_bike_book: Slå opp modellen ovenfor. Sykkelhåndboken
             viser sertifisering der den er registrert.
           visit_bike_book_link: Besøk Sykkelbok.
+          select_custom_values: Velg egendefinerte verdier
         state_reference:
           compiling: Vi samler %{state}s elsykkelregler fra delstatsforsamlingen og
             DMV. Sjekk tilbake snart.

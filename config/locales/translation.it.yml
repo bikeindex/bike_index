@@ -7419,7 +7419,6 @@ it:
             di introdurre una e-bike all'interno degli edifici.
           watts_placeholder: ad esempio 750
           over_28_mph: Oltre 28 miglia orarie
-          custom_details: Dettagli personalizzati
           details_legend: Dettagli della tua bici
           model_details: "%{model} dettagli"
           country: Paese
@@ -7464,6 +7463,7 @@ it:
           how_to_check_lookup_bike_book: Guarda il modello qui sopra. Bike Book mostra
             la certificazione laddove è registrata.
           visit_bike_book_link: Visita Bike Book.
+          select_custom_values: Seleziona valori personalizzati
         state_reference:
           compiling: Stiamo raccogliendo le normative sulle e-bike di %{state} provenienti
             dalla legislatura statale e dal DMV. Tornate a trovarci presto.
