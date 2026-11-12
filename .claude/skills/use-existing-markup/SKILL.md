@@ -39,6 +39,8 @@ rtk proxy git diff origin/main...HEAD -- app/components/ui app/components/atoms 
 
 The exception is an argument the user asked for in this conversation.
 
+**The same override can sit outside the component.** A wrapper whose classes restyle what renders inside it is a variant by another route: `<span class="tw:uppercase tw:tracking-wider">` around a `UI::Badge` or a `[&_a]:` selector on a button's parent. Strip those classes and keep only the wrapper's layout (margin, display, grid placement). Drop the wrapper if layout was all it carried.
+
 ## Replace, don't ask
 
 Convert every hand-written piece an existing component covers, without asking first. Then name each visible change in your reply.
