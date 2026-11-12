@@ -14,10 +14,12 @@ module Pages
           m/cannondale/2025/synapse_carbon_1].freeze
         PRIVACY_ICON = SharedBlocks::Marketing::SectionHeading::Component::EYEBROW_COLORS[:yellow]
 
-        def initialize(recovery_displays:, feedback:, current_user: nil)
+        # checker_place: the visitor's, as /ebike-rules detects it, which the checker's frame shows
+        def initialize(recovery_displays:, feedback:, current_user: nil, checker_place: nil)
           @recovery_displays = recovery_displays
           @feedback = feedback
           @current_user = current_user
+          @checker_place = checker_place
         end
 
         private
@@ -76,7 +78,7 @@ module Pages
         # The checker steps its scale to lay out between 768 and 1024px, where its container padding is 20px
         def tools
           [{href: ebike_rules_path, icon: "icons/bolt.svg", circle: "tw:bg-blue-600",
-            frame: ebike_rules_place_path("US", "CA", manual: 1, top_speed: 28, watts: 750, throttle: 0),
+            frame: ebike_rules_place_path(*(@checker_place&.dig(:code) || "US-CA").split("-"), manual: 1, top_speed: 20, watts: 750, throttle: 0),
             frame_class: "tw:[--frame-crop-x:20px] tw:[--frame-crop-top:240px] tw:[--frame-scale:0.4] tw:@min-[380px]:[--frame-scale:0.5] " \
               "tw:@min-[492px]:[--frame-scale:0.66] tw:@min-[640px]:[--frame-scale:0.7]",
             title: translation(".ebike_legality_checker"), body: translation(".ebike_legality_checker_body"),

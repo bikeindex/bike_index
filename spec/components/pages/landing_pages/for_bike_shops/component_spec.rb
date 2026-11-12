@@ -34,6 +34,18 @@ RSpec.describe Pages::LandingPages::ForBikeShops::Component, type: :component do
     expect(component).to have_css("#shop-signed-up.tw\\:hidden", text: "You're in.", visible: :all)
   end
 
+  it "frames the checker on California" do
+    expect(component).to have_css("iframe[src='/ebike-rules/US/CA?manual=1&throttle=0&top_speed=20&watts=750']", visible: :all)
+  end
+
+  context "with the visitor's place" do
+    let(:options) { {recovery_displays:, feedback: Feedback.new, checker_place: EbikeRuleServices::Places.find("US-OR")} }
+
+    it "frames the checker on it" do
+      expect(component).to have_css("iframe[src^='/ebike-rules/US/OR?']", visible: :all)
+    end
+  end
+
   context "with recovery displays" do
     let(:recovery_displays) do
       Array.new(4) { |i| FactoryBot.create(:recovery_display, quote: "Quote #{i}", quote_by: "Owner #{i}", recovered_at: Time.current - i.days) }
