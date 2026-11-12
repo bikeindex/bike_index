@@ -44,8 +44,8 @@ RSpec.describe Atoms::RegistrationStep::Component, type: :component do
       BikeServices::Register.acknowledge_page(b_param, course.education_course_pages.first, checked: %w[1 1])
     end
 
-    it "renders the rules page" do
-      expect(component).to have_text("Rules page 2")
+    it "renders the education page" do
+      expect(component).to have_text("Education page 2")
     end
   end
 end

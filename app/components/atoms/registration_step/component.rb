@@ -16,7 +16,7 @@ module Atoms
 
       def label
         page_index = BikeServices::Register.page_index_for_step(step)
-        return translation(".rules_page", number: page_index + 1) unless page_index.negative?
+        return translation(".education_page", number: page_index + 1) unless page_index.negative?
 
         case step
         when "1" then translation(".step_1")
