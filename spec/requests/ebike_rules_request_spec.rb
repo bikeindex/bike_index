@@ -453,6 +453,7 @@ RSpec.describe EbikeRulesController, type: :request do
         .and have_field("watts", with: "1000")
         .and have_css("legend span.tw\\:hidden", text: "Custom details")
         .and have_css("legend", text: "Specialized Haul ST details")
+        .and have_css("[data-ebike-rules--lookup-target='customNote']", text: "These aren't the Specialized Haul ST's settings anymore")
       expect(page.find("form[data-details]")["data-details"]).to eq "custom"
       expect(page.find("form[data-details]")["data-ebike-rules--lookup-display-value"]).to eq "Specialized Haul ST 2025"
       expect(page.find("input[name='manual']", visible: :all)[:disabled]).to be_nil

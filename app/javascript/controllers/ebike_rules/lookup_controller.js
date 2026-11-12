@@ -17,8 +17,8 @@ const DETAILS = ['manual', 'top_speed', 'throttle', 'throttle_speed', 'watts']
 // The form's data-details says which the check is of: a picked "model", whose details its check copies
 // into the panel; "custom" details changed from the model's; or "manual" details with no model
 export default class extends Controller {
-  static targets = ['combobox', 'comboboxSlot', 'state', 'stateNote', 'stateNeeded', 'stateChoose', 'manual', 'throttleSpeed', 'legend']
-  static values = { manifestUrl: String, path: String, countryPath: String, display: String, failedText: String, title: String, legend: String, modelLegend: String }
+  static targets = ['combobox', 'comboboxSlot', 'state', 'stateNote', 'stateNeeded', 'stateChoose', 'manual', 'throttleSpeed', 'legend', 'customNote']
+  static values = { manifestUrl: String, path: String, countryPath: String, display: String, failedText: String, title: String, legend: String, modelLegend: String, customNote: String }
 
   async connect () {
     delete this.throttleSpeedTarget.dataset.beforeCollapse
@@ -100,7 +100,9 @@ export default class extends Controller {
       this.model = detail.value
       this.#setMode('model')
       // the pick's name, without the catalog's years
-      this.legendTarget.textContent = this.modelLegendValue.replace('%{model}', input.value.replace(/ \([^)]*\)$/, ''))
+      const name = input.value.replace(/ \([^)]*\)$/, '')
+      this.legendTarget.textContent = this.modelLegendValue.replace('%{model}', name)
+      this.customNoteTarget.textContent = this.customNoteValue.replace('%{model}', name)
     }
     this.picking = false
     this.#check()
@@ -113,6 +115,12 @@ export default class extends Controller {
     if (!watts.checkValidity()) return watts.reportValidity()
 
     if (this.#mode === 'model') this.#setMode('custom')
+    this.#check()
+  }
+
+  // Its check copies the model's own details back into the panel
+  resetDetails () {
+    this.#setMode('model')
     this.#check()
   }
 

@@ -52,6 +52,7 @@ RSpec.describe "E-bike rules", :js, type: :system do
     find_field("Motor wattage (W)").send_keys(:enter)
     expect(page).to have_css("[role='status']", text: "This isn't an e-bike under current Colorado rules.")
     expect(page).to have_css("legend", exact_text: "Custom details")
+      .and have_text("These aren't the Specialized Haul ST's settings anymore")
     custom_query = "vehicle_models=m/specialized/2025/haul_st&manual=1&throttle=1&throttle_speed=20&top_speed=28&watts=1000"
     expect(page).to have_current_path("/ebike-rules/US/CO?#{custom_query}")
 
@@ -115,6 +116,15 @@ RSpec.describe "E-bike rules", :js, type: :system do
     retry_on_detach { find("[role='option']", text: "Specialized Haul ST").click }
     expect(page).to have_current_path("/ebike-rules/US/CO?vehicle_models=m/specialized/2025/haul_st")
     expect(page).to have_field("Motor wattage (W)", with: "700").and have_css("legend", exact_text: "Specialized Haul ST details")
+
+    # or once they're reset
+    fill_in "Motor wattage (W)", with: "1000"
+    find_field("Motor wattage (W)").send_keys(:enter)
+    expect(page).to have_css("legend", exact_text: "Custom details")
+    click_button "Reset to its settings"
+    expect(page).to have_current_path("/ebike-rules/US/CO?vehicle_models=m/specialized/2025/haul_st")
+    expect(page).to have_field("Motor wattage (W)", with: "700").and have_css("legend", exact_text: "Specialized Haul ST details")
+      .and have_no_button("Reset to its settings")
 
     # the link under the class cards opens the state's e-bike law, in the URL apart from them
     visit "/ebike-rules/US/CA?manual=1&top_speed=28&throttle=1"
