@@ -25,11 +25,15 @@ export default class extends Controller {
     this.update()
   }
 
-  selectAmount ({ detail: { amount } }) {
-    const oneTime = this.cadenceTargets.find(radio => radio.value === 'one-time')
-    if (oneTime) oneTime.checked = true
+  fill ({ detail: { amount } }) {
     this.customAmountTarget.value = amount
     this.customInput()
+  }
+
+  selectAmount (event) {
+    const oneTime = this.cadenceTargets.find(radio => radio.value === 'one-time')
+    if (oneTime) oneTime.checked = true
+    this.fill(event)
     // the card the page put the form in, heading included
     this.element.parentElement.scrollIntoView({ behavior: 'smooth' })
   }
@@ -44,7 +48,7 @@ export default class extends Controller {
     const label = isOneTime ? this.oneTimeLabelValue : this.monthlyLabelValue
     const text = label.replace('%{amount}', this.selectedAmount(isOneTime))
     this.submitTargets.forEach(button => { button.textContent = text })
-    this.dispatch('change', { target: window, detail: { label: text, customAmount: isOneTime ? this.customAmountTarget.value : '' } })
+    this.dispatch('change', { target: window, detail: { label: text, isOneTime, customAmount: isOneTime ? this.customAmountTarget.value : '' } })
   }
 
   // Without a monthly form there are no cadence tabs, only the one-time form

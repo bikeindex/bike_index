@@ -143,6 +143,12 @@ RSpec.describe InfoController, type: :request do
         expect(response.body).to include("Your bike made it home")
         expect(response.body).to match(/name="payment\[referral_source\]"[^>]*value="eoy-2026-recovered"/)
       end
+
+      it "falls back to the campaign's source for an array param" do
+        get "/donate/year-end?source[]=eoy-2026-recovered"
+        expect(response.status).to eq(200)
+        expect(response.body).to match(/name="payment\[referral_source\]"[^>]*value="eoy-2026"/)
+      end
     end
 
     # serials is the one static page that links default_bike_search_path

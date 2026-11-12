@@ -8,7 +8,6 @@ en:
           eyebrow: Recovered and returned
           form_title: Fund the next recovery
           headline: Every bike above came home because the registry was free
-          larger_gift_link: Talk to us about a larger gift
           lede_millions_registered: >-
             Bike Index is a nonprofit. Registration costs nothing, searching costs
             nothing, and reporting a theft costs nothing — which is why %{millions}
@@ -24,13 +23,6 @@ en:
           major_title: Larger gifts move whole cities onto the registry
           millions_registered_no_owner_paid: "%{millions} million bikes are registered.
             Not one owner paid to be there."
-          other_ways_daf: Donor-advised fund grants — we can send our EIN and grant
-            details.
-          other_ways_match: >-
-            Employer matching — many employers will match a donation at no extra cost
-            to you.
-          other_ways_stock: Gifts of stock or crypto, which avoid capital gains on
-            appreciated assets.
           other_ways_title: Other ways to give at this level
           stories_title: In their owners' words
           uses_alerts_body: >-

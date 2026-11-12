@@ -19,4 +19,12 @@ RSpec.describe Pages::Donate::MajorGift::Component, type: :component do
       expect(component).to have_text("Benefactor")
     end
   end
+
+  context "small" do
+    let(:options) { super().merge(size: :small) }
+
+    it "renders the smaller tile" do
+      expect(component).to have_css("a.tw\\:p-4 span.tw\\:text-\\[26px\\]", text: "$500")
+    end
+  end
 end

@@ -38,7 +38,7 @@
         </h1>
 
         <p class="tw:mb-0 tw:max-w-160 tw:text-base tw:leading-[1.55] tw:text-pretty tw:xl:text-[19px] <%= muted %>">
-          <%= @recovered ? translation(".ten_percent_statement") : translation(".lede") %>
+          <%= @recovered ? translation(".ten_percent_statement") : translation(".lede_recovered_count", recovered: helpers.number_with_delimiter(RECOVERED)) %>
         </p>
       </div>
 
@@ -57,11 +57,13 @@
           </h2>
 
           <p class="tw:mb-0 tw:text-sm <%= muted %>">
-            <%= translation(".goal", goal: @form.money(GOAL)) %>
+            <%= translation(".goal", goal:) %>
           </p>
         </div>
 
-        <%= render(@form) %>
+        <%= render(@form) do |form| %>
+          <% form.with_one_time_intro(Pages::Donate::TenPercent::Component.new(open: @recovered, currency_symbol: form.currency_symbol)) %>
+        <% end %>
       </div>
 
       <div class="tw:flex tw:flex-col tw:gap-5 tw:lg:col-start-1 tw:lg:row-start-2">
@@ -79,6 +81,10 @@
                 tw:lg:px-5 tw:dark:bg-gray-800
               "
             >
+              <dt class="tw:text-[13px] tw:leading-snug tw:font-normal <%= muted %>">
+                <%= caption %>
+              </dt>
+
               <dd
                 class="
                   tw:order-first tw:m-0 tw:font-header tw:text-2xl
@@ -88,10 +94,6 @@
               >
                 <%= figure %>
               </dd>
-
-              <dt class="tw:text-[13px] tw:leading-snug tw:font-normal <%= muted %>">
-                <%= caption %>
-              </dt>
             </div>
           <% end %>
         </dl>
@@ -104,8 +106,8 @@
         >
           <blockquote
             class="
-              tw:m-0 tw:text-base tw:leading-relaxed tw:text-[#444]
-              tw:italic tw:text-pretty tw:dark:text-gray-300
+              tw:m-0 tw:text-base tw:leading-relaxed tw:text-pretty
+              tw:text-[#444] tw:italic tw:dark:text-gray-300
             "
           >
             <%= translation(".quote") %>
@@ -132,8 +134,8 @@
 
             <p
               class="
-                tw:m-0 tw:text-[15px] tw:leading-relaxed tw:text-[#444]
-                tw:text-pretty tw:dark:text-gray-300
+                tw:m-0 tw:text-[15px] tw:leading-relaxed tw:text-pretty
+                tw:text-[#444] tw:dark:text-gray-300
               "
             >
               <%= quote %>
@@ -162,7 +164,7 @@
   >
     <div class="tw:flex tw:flex-col tw:gap-9 <%= container %>">
       <%= render(heading.new(eyebrow: translation(".building_eyebrow"), eyebrow_color: :yellow, heading: translation(".building_title"), intro: translation(".building_intro"),
-        html_class: "tw:max-w-190 tw:[&_h2]:text-white tw:[&_p:last-child]:text-[#dfe6ec]")) %>
+        on_dark: true, html_class: "tw:max-w-190")) %>
 
       <div class="twwiderow tw:gap-y-5">
         <% building.each do |card| %>
@@ -253,7 +255,7 @@
       </p>
     </div>
 
-    <div class="tw:flex tw:flex-col tw:items-start tw:gap-3.5 tw:basis-90">
+    <div class="tw:flex tw:basis-90 tw:flex-col tw:items-start tw:gap-3.5">
       <p class="tw:m-0 tw:text-base <%= muted %>">
         <%= translation(".ten_percent_prompt") %>
       </p>
@@ -282,8 +284,8 @@
         <div class="tw:mt-1.5 tw:flex tw:gap-2.5">
           <% Pages::Donate::MajorGift::Component::AMOUNTS.each do |amount| %>
             <%= render(Pages::Donate::MajorGift::Component.new(amount:, display: @form.money(amount), active: amount == @form.custom_amount,
-              html_class: "tw:flex-1 tw:p-4! tw:[&>span:first-child]:text-[26px]!",
-              href: donate_year_end_path(initial_amount: amount, source: @referral_source, anchor: "donate-form"))) %>
+              size: :small, html_class: "tw:flex-1",
+              href: donate_year_end_path(initial_amount: amount, source: @referral_source, currency: @form.currency_param, anchor: "donate-form"))) %>
           <% end %>
         </div>
       </div>
@@ -293,22 +295,7 @@
           <%= translation(".other_ways_title") %>
         </h3>
 
-        <ul class="tw:m-0 tw:flex tw:list-none tw:flex-col tw:gap-2 tw:pl-0">
-          <% other_ways.each do |way| %>
-            <li class="tw:flex tw:gap-2.5 tw:text-[15px] <%= muted %>">
-              <span
-                class="
-                  tw:mt-2.5 tw:size-1.25 tw:shrink-0 tw:rounded-full
-                  tw:bg-purple-500
-                "
-              ></span>
-
-              <%= way %>
-            </li>
-          <% end %>
-        </ul>
-
-        <%= mail_to "donate@bikeindex.org", translation(".larger_gift_link"), class: "twlink tw:text-[15px] tw:font-bold" %>
+        <%= render(Pages::Donate::OtherWays::Component.new) %>
       </div>
 
       <div class="tw:flex tw:flex-col tw:gap-2.5">

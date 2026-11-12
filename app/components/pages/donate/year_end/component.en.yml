@@ -26,11 +26,10 @@ en:
             Every one of these came back because someone checked a serial number against
             a registry that costs nothing to use.
           impact_title: Bikes that made it home
-          larger_gift_link: Talk to us about a larger gift
-          lede: >-
+          lede_recovered_count: >-
             Bike Index has been free since day one, and it stays free for good. This
-            year that free registry helped 1,358 stolen bikes get home. Your year-end
-            gift keeps it running and pays for what we build next.
+            year that free registry helped %{recovered} stolen bikes get home. Your
+            year-end gift keeps it running and pays for what we build next.
           major_eyebrow: Major giving
           major_title: Larger gifts move whole cities onto the registry
           marketplace_body: Continuing to build out the most trusted place to sell
@@ -54,13 +53,6 @@ en:
             Campus registration and impound tools, so students' bikes come back instead
             of being cleared out.
           network_universities_title: Universities
-          other_ways_daf: Donor-advised fund grants — we can send our EIN and grant
-            details.
-          other_ways_match: >-
-            Employer matching — many employers will match a donation at no extra cost
-            to you.
-          other_ways_stock: Gifts of stock or crypto, which avoid capital gains on
-            appreciated assets.
           other_ways_title: Other ways to give
           photo_alt: A bike recovered through Bike Index
           quote: >-
@@ -92,9 +84,7 @@ en:
           shipped_registration_title: A streamlined registration flow
           shipped_title: Your new Bike Index is here
           stat_recovered: stolen bikes recovered in 2026
-          stat_recovered_figure: '1,358'
           stat_registered: bikes registered this year, free
-          stat_registered_figure: '96,328'
           stat_value: in bikes returned to their owners
           stat_value_figure: "$1.5M"
           story_country: >-

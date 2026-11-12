@@ -9,8 +9,12 @@ module Pages
         # The first is the Partner tier, the second Benefactor
         AMOUNTS = [500, 1000].freeze
 
-        def initialize(amount:, href:, display:, active: false, html_class: nil)
+        SIZES = %i[default small].freeze
+
+        def initialize(amount:, href:, display:, active: false, size: :default, html_class: nil)
+          raise_if_invalid_value!(:size, size, SIZES)
           @amount = amount
+          @small = size == :small
           @href = href
           @display = display
           @active = active

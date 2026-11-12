@@ -78,7 +78,7 @@ RSpec.describe Pages::Donate::Form::Component, type: :component do
   context "with campaign options" do
     let(:options) do
       {stripe_prices:, initial_amount:, current_user:, amounts: [50, 100, 250],
-       default_cadence: :one_time, ten_percent: :closed}
+       default_cadence: :one_time}
     end
 
     it "leads with one-time, at the campaign presets" do
@@ -89,8 +89,11 @@ RSpec.describe Pages::Donate::Form::Component, type: :component do
       expect(component).to have_button("Donate $100")
     end
 
-    it "offers the 10% helper collapsed, outside the form so Enter in it doesn't submit" do
-      expect(component).to have_css("[data-controller~='donate--ten-percent'] [data-ui--collapse-target='content'].tw\\:hidden")
+    it "puts the one_time_intro outside the form, so Enter in it doesn't submit" do
+      component = render_inline(described_class.new(**options)) do |form|
+        form.with_one_time_intro(Pages::Donate::TenPercent::Component.new(open: false, currency_symbol: form.currency_symbol))
+      end
+      expect(component).to have_css("[data-controller~='donate--ten-percent'][data-donate--ten-percent-max-value] [data-ui--collapse-target='content'].tw\\:hidden")
       expect(component).to have_no_css("form [data-controller~='donate--ten-percent']")
       expect(component).to have_no_css("[data-controller~='donate--ten-percent'] input[name]")
     end
@@ -111,15 +114,6 @@ RSpec.describe Pages::Donate::Form::Component, type: :component do
         expect(component).to have_field("payment[amount]", with: "25")
         expect(component).to have_no_css("input[name='payment[amount_cents]'][checked]")
         expect(component).to have_button("Donate $25")
-      end
-    end
-
-    context "with the helper open" do
-      let(:options) { super().merge(ten_percent: :open) }
-
-      it "renders it expanded" do
-        expect(component).to have_css("[data-controller~='donate--ten-percent'] [data-ui--collapse-target='content']")
-        expect(component).to have_no_css("[data-controller~='donate--ten-percent'] [data-ui--collapse-target='content'].tw\\:hidden")
       end
     end
   end

@@ -1,7 +1,8 @@
 <a
   href="<%= @href %>"
   class="
-    tw:flex tw:flex-col tw:gap-1 tw:rounded-lg tw:border tw:border-[#e0e0e0] tw:bg-white tw:p-5.5 tw:text-inherit tw:no-underline tw:transition-colors tw:hover:border-[#a9d2f0] tw:focus-visible:ring-3 tw:focus-visible:ring-blue-500/40 tw:focus-visible:outline-none tw:is-active:border-blue-600 tw:is-active:ring-1 tw:is-active:ring-blue-600 tw:dark:border-gray-700 tw:dark:bg-gray-800
+    tw:flex tw:flex-col tw:gap-1 tw:rounded-lg tw:border tw:border-[#e0e0e0] tw:bg-white tw:text-inherit tw:no-underline tw:transition-colors tw:hover:border-[#a9d2f0] tw:focus-visible:ring-3 tw:focus-visible:ring-blue-500/40 tw:focus-visible:outline-none tw:dark:border-gray-700 tw:dark:bg-gray-800 tw:is-active:border-blue-600 tw:is-active:ring-1 tw:is-active:ring-blue-600
+    <%= @small ? "tw:p-4" : "tw:p-5.5" %>
     <%= @html_class %>
   "
   data-amount="<%= @amount %>"
@@ -9,7 +10,7 @@
   data-active="<%= @active %>"
   data-action="donate--page#selectMajor"
 >
-  <span class="tw:font-header tw:text-[28px] tw:font-extrabold tw:lg:text-[38px]">
+  <span class="tw:font-header tw:font-extrabold <%= @small ? "tw:text-[26px]" : "tw:text-[28px] tw:lg:text-[38px]" %>">
     <%= @display %>
   </span>
 

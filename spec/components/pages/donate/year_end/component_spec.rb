@@ -20,7 +20,8 @@ RSpec.describe Pages::Donate::YearEnd::Component, type: :component do
   end
 
   it "lists the figures and what shipped" do
-    expect(component).to have_text("1,358")
+    expect(component).to have_css("dl > div > dt + dd", text: "1,358")
+    expect(component).to have_text("helped 1,358 stolen bikes get home")
     expect(component).to have_text("$1.5M")
     expect(component).to have_text("96,328")
     expect(component).to have_css("h3", text: "E-bike legality checker")
@@ -35,6 +36,24 @@ RSpec.describe Pages::Donate::YearEnd::Component, type: :component do
     expect(component).to have_css("a[data-amount='1000']", text: "$1,000")
   end
 
+  context "with a source param that isn't a string" do
+    let(:referral_source) { ["eoy-2026-recovered"] }
+
+    it "uses the campaign's source" do
+      expect(component).to have_css("#donate-form input[name='payment[referral_source]'][value='eoy-2026']", visible: :all)
+      expect(component).to have_no_text("Your bike made it home")
+    end
+  end
+
+  context "in another currency" do
+    let(:currency_enum) { "eur" }
+
+    it "keeps the goal in dollars and the currency on the major gift links" do
+      expect(component).to have_text("Our goal is $20,000 by December 31.")
+      expect(component).to have_css("a[data-amount='500'][href='/donate/year-end?currency=eur&initial_amount=500&source=eoy-2026#donate-form']", text: "€500")
+    end
+  end
+
   context "with a recovered source" do
     let(:referral_source) { "eoy-2026-recovered" }
 
@@ -43,6 +62,7 @@ RSpec.describe Pages::Donate::YearEnd::Component, type: :component do
       expect(component).to have_no_text("helped 1,358 stolen bikes get home")
       expect(component).to have_css("#donate-form input[name='payment[referral_source]'][value='eoy-2026-recovered']", visible: :all)
       expect(component).to have_no_css("[data-ui--collapse-target='content'].tw\\:hidden")
+      expect(component).to have_css("[data-controller~='donate--ten-percent'] [aria-live='polite'] [data-donate--ten-percent-target='result']")
     end
   end
 

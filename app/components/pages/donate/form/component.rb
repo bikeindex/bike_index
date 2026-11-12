@@ -12,9 +12,11 @@ module Pages
 
         # amounts: the one-time presets, the middle one selected without an initial_amount
         # default_cadence: :monthly or :one_time, whichever tab leads and is selected first
-        # ten_percent: :open or :closed adds the helper that fills the other amount from a bike's value
+        # one_time_intro: above the one-time form, outside it - so Enter in an input there doesn't submit a donation
+        renders_one :one_time_intro, ->(component) { component }
+
         def initialize(stripe_prices:, initial_amount: nil, referral_source: nil, current_user: nil,
-          amounts: ONE_TIME_AMOUNTS, default_cadence: :monthly, ten_percent: nil)
+          amounts: ONE_TIME_AMOUNTS, default_cadence: :monthly)
           @currency = stripe_prices.first&.currency_obj || Currency.default
           @monthly_prices = stripe_prices.select(&:monthly?).to_h do
             [it.membership_level.to_sym, MoneyFormatter.money_format_no_cents_if_whole(it.amount_cents, @currency.slug)]
@@ -23,7 +25,6 @@ module Pages
           @referral_source = referral_source
           @amounts = amounts
           @default_cadence = default_cadence
-          @ten_percent = ten_percent
           @email = current_user&.email
           @member = current_user&.membership_active.present?
         end
@@ -31,6 +32,11 @@ module Pages
         def custom_amount
           @initial_amount unless @amounts.include?(@initial_amount)
         end
+
+        def currency_symbol = @currency.symbol
+
+        # for a link back to the page, which takes its currency from the params
+        def currency_param = (@currency.slug unless @currency.slug == Currency.default.slug)
 
         def submit_label = one_time? ? one_time_submit : monthly_submit
 
@@ -46,7 +52,9 @@ module Pages
 
         def one_time? = !monthly? || @initial_amount.present? || @default_cadence == :one_time
 
-        def selected_one_time = @initial_amount || @amounts[1]
+        def default_amount = @amounts[@amounts.size / 2]
+
+        def selected_one_time = @initial_amount || default_amount
 
         def tier_amount(level) = @monthly_prices[level]
 

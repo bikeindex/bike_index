@@ -14,7 +14,7 @@
   data-donate--form-monthly-label-value="<%= monthly_label("%{amount}") %>"
   data-donate--form-one-time-label-value="<%= one_time_label("%{amount}") %>"
   data-donate--form-currency-symbol-value="<%= @currency.symbol %>"
-  data-action="donate--page:select-amount@window->donate--form#selectAmount:prevent donate--page:submit@window->donate--form#submitActive:prevent"
+  data-action="donate--page:select-amount@window->donate--form#selectAmount:prevent donate--page:submit@window->donate--form#submitActive:prevent donate--ten-percent:fill@window->donate--form#fill"
 >
   <% if monthly? %>
     <div
@@ -29,9 +29,9 @@
             tw:border-transparent tw:py-2.75 tw:text-center tw:text-sm
             tw:font-semibold tw:tracking-wider tw:text-[#666] tw:uppercase
             tw:has-checked:border-blue-500 tw:has-checked:text-blue-600
-            tw:dark:has-checked:text-blue-400
             tw:has-focus-visible:bg-blue-50 tw:lg:text-[15px]
-            tw:dark:text-gray-400 tw:dark:has-focus-visible:bg-gray-700
+            tw:dark:text-gray-400 tw:dark:has-checked:text-blue-400
+            tw:dark:has-focus-visible:bg-gray-700
           "
         >
           <%= radio_button_tag :donate_cadence,
@@ -127,11 +127,8 @@
     <% end %>
   </div>
 
-  <%# the helper's input sits outside the form so Enter in it doesn't submit a donation %>
   <div class="<%= one_time_panel %>">
-    <% if @ten_percent %>
-      <%= render(Pages::Donate::TenPercent::Component.new(open: @ten_percent == :open, currency_symbol: @currency.symbol)) %>
-    <% end %>
+    <%= one_time_intro %>
 
     <%= form_tag payments_path,
     method: :post,
@@ -156,7 +153,7 @@
           autocomplete: "off",
           data: {
             amount: money(amount),
-            default: (true if amount == @amounts[1]),
+            default: (true if amount == default_amount),
             donate__form_target: "oneTimeAmount",
             action: "donate--form#selectPreset",
           } %>

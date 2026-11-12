@@ -7,24 +7,30 @@ module Pages
       # presets; its source - the email's own, so each is told apart - names the audience. A source containing
       # "recovered" gets the recovered-bike headline and the 10% helper open.
       class Component < ApplicationComponent
+        # USD, like the stats beside it, whatever currency the form is in
         GOAL = 20_000
+        RECOVERED = 1_358
+        REGISTERED = 96_328
         REFERRAL_SOURCE = "eoy-2026"
 
         def initialize(stripe_prices:, initial_amount: nil, referral_source: nil, current_user: nil)
-          @referral_source = referral_source.presence || REFERRAL_SOURCE
+          # a source[]= param arrives as an Array
+          @referral_source = (referral_source if referral_source.is_a?(String)).presence || REFERRAL_SOURCE
           @recovered = @referral_source.match?(/recovered/i)
           @form = Pages::Donate::Form::Component.new(stripe_prices:, initial_amount:, current_user:, referral_source: @referral_source,
-            amounts: [50, 100, 250], default_cadence: :one_time, ten_percent: @recovered ? :open : :closed)
+            amounts: [50, 100, 250], default_cadence: :one_time)
         end
 
         private
 
         def photos = Pages::Donate::Page::Component::WALL_PHOTOS
 
+        def goal = MoneyFormatter.money_format_without_cents(GOAL * 100, Currency.default)
+
         def stats
-          [[translation(".stat_recovered_figure"), translation(".stat_recovered")],
+          [[number_display(RECOVERED), translation(".stat_recovered")],
             [translation(".stat_value_figure"), translation(".stat_value")],
-            [translation(".stat_registered_figure"), translation(".stat_registered")]]
+            [number_display(REGISTERED), translation(".stat_registered")]]
         end
 
         def stories
@@ -56,10 +62,6 @@ module Pages
           [[translation(".network_shops_title"), translation(".network_shops")],
             [translation(".network_police_title"), translation(".network_police")],
             [translation(".network_universities_title"), translation(".network_universities")]]
-        end
-
-        def other_ways
-          [translation(".other_ways_match"), translation(".other_ways_daf"), translation(".other_ways_stock")]
         end
       end
     end
