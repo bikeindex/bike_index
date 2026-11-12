@@ -1,7 +1,7 @@
 <section class="tw:border-b tw:border-gray-200 tw:dark:border-gray-700">
   <div class="tw:grid tw:items-center tw:gap-16 tw:py-10 tw:md:py-16 tw:lg:grid-cols-[1.15fr_0.85fr] tw:lg:gap-12 <%= SECTION_CLASSES %>">
     <div>
-      <span class="tw:mb-4.5 tw:inline-block tw:tracking-wider tw:uppercase">
+      <span class="tw:mb-4.5 tw:inline-block">
         <%= render(UI::Badge::Component.new(text: translation(".for_bike_shops_free_nonprofit"), color: :notice, size: :lg)) %>
       </span>
 
@@ -108,13 +108,11 @@
             <%= render(UI::Card::Component.new(additional_classes: "tw:flex tw:items-center tw:justify-between tw:gap-3")) do %>
               <span class="tw:text-lg <%= HEADING_CLASSES %>"><%= name %></span>
 
-              <span class="tw:tracking-wider tw:uppercase">
-                <% if live %>
-                  <%= render(UI::Badge::Component.new(text: translation(".live"), color: :success)) %>
-                <% else %>
-                  <%= render(UI::Badge::Component.new(text: translation(".coming_soon"), color: :purple)) %>
-                <% end %>
-              </span>
+              <% if live %>
+                <%= render(UI::Badge::Component.new(text: translation(".live"), color: :success)) %>
+              <% else %>
+                <%= render(UI::Badge::Component.new(text: translation(".coming_soon"), color: :purple)) %>
+              <% end %>
             <% end %>
           </li>
         <% end %>
@@ -190,7 +188,7 @@
     "
   >
     <div>
-      <span class="tw:mb-3.5 tw:inline-block tw:tracking-widest tw:uppercase">
+      <span class="tw:mb-3.5 tw:inline-block">
         <%= render(UI::Badge::Component.new(text: translation(".new_our_first_retail_product"), color: :yellow)) %>
       </span>
 
@@ -265,12 +263,29 @@
 
   <div class="twwiderow tw:gap-6">
     <% tools.each do |tool| %>
-      <%= link_to(tool[:href],
-        class: "#{UI::Card::Component::BASE_CLASSES} tw:flex tw:flex-col tw:gap-3 tw:overflow-hidden tw:rounded-lg tw:px-7 tw:pb-7 tw:text-inherit tw:no-underline tw:transition-all tw:duration-300 tw:hover:-translate-y-1.25 tw:hover:text-inherit tw:hover:no-underline tw:hover:shadow-[0_10px_30px_rgba(44,62,80,.16)]") do %>
-        <%= image_tag(tool[:screenshot], alt: "", loading: "lazy",
-          class: "tw:-mx-7 tw:block tw:aspect-[1040/630] tw:w-[calc(100%+3.5rem)] tw:max-w-none tw:border-b tw:border-gray-200 tw:object-cover tw:object-top tw:dark:border-gray-700") %>
+      <div class="tw:relative tw:flex tw:flex-col tw:gap-3 tw:overflow-hidden tw:rounded-lg tw:px-7 tw:pb-7 tw:transition-all tw:duration-300 tw:hover:-translate-y-1.25 tw:hover:shadow-[0_10px_30px_rgba(44,62,80,.16)] <%= UI::Card::Component::BASE_CLASSES %>">
+        <%# The live page, scaled by tools' frame_class. sandbox blocks its autofocus %>
 
-        <span class="tw:-mt-9 tw:flex tw:size-12 tw:items-center tw:justify-center tw:rounded-full tw:text-white tw:ring-4 tw:ring-white tw:dark:ring-gray-800 <%= tool[:circle] %>">
+        <div
+          class="
+            tw:@container tw:relative tw:-mx-7 tw:aspect-[1040/630]
+            tw:w-[calc(100%+3.5rem)] tw:overflow-hidden tw:border-b
+            tw:border-gray-200 tw:dark:border-gray-700
+          "
+        >
+          <iframe
+            src="<%= tool[:frame] %>"
+            title="<%= tool[:title] %>"
+            loading="lazy"
+            sandbox="allow-scripts allow-same-origin"
+            tabindex="-1"
+            aria-hidden="true"
+            inert
+            class="tw:pointer-events-none tw:absolute tw:[top:calc(var(--frame-crop-top)*var(--frame-scale)*-1)] tw:[left:calc(var(--frame-crop-x)*var(--frame-scale)*-1)] tw:[height:calc(100%/var(--frame-scale)_+_var(--frame-crop-top))] tw:[width:calc(100%/var(--frame-scale)_+_var(--frame-crop-x)*2)] tw:origin-top-left tw:[scale:var(--frame-scale)] <%= tool[:frame_class] %>"
+          ></iframe>
+        </div>
+
+        <span class="tw:relative tw:-mt-9 tw:flex tw:size-12 tw:items-center tw:justify-center tw:rounded-full tw:text-white tw:ring-4 tw:ring-white tw:dark:ring-gray-800 <%= tool[:circle] %>">
           <%= helpers.inline_svg_tag(tool[:icon], class: "tw:size-5.5", aria_hidden: true) %>
         </span>
 
@@ -282,11 +297,11 @@
           <%= tool[:body] %>
         </p>
 
-        <span class="tw:font-bold tw:text-blue-600 tw:dark:text-blue-400">
+        <%= link_to(tool[:href], class: "tw:font-bold tw:text-blue-600 tw:no-underline tw:after:absolute tw:after:inset-0 tw:hover:text-blue-600 tw:hover:no-underline tw:dark:text-blue-400") do %>
           <%= tool[:action] %>
           <span aria-hidden="true">→</span>
-        </span>
-      <% end %>
+        <% end %>
+      </div>
     <% end %>
   </div>
 </section>

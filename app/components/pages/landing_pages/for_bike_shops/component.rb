@@ -10,6 +10,8 @@ module Pages
         MUTED = "tw:text-gray-500 tw:dark:text-gray-400"
         HEADING_CLASSES = "tw:m-0 tw:font-header tw:font-extrabold"
         BAND = "tw:border-gray-200 tw:bg-gray-50 tw:dark:border-gray-700 tw:dark:bg-gray-800"
+        BIKE_BOOK_MODELS = %w[m/trek/2026/domane_sl_6_gen_4 m/specialized/2026/tarmac_sl8_pro_shimano_ultegra_di2
+          m/cannondale/2025/synapse_carbon_1].freeze
         PRIVACY_ICON = SharedBlocks::Marketing::SectionHeading::Component::EYEBROW_COLORS[:yellow]
 
         def initialize(recovery_displays:, feedback:, current_user: nil)
@@ -70,12 +72,21 @@ module Pages
             ["icons/bike.svg", translation(".used_only_for_bikes")]]
         end
 
+        # frame: the tool showing a result. frame_class sets the frame's scale, so it lays out wider than the card, and the
+        # page's own pixels to crop: its navbar off the top, as an anchor would scroll this page too, and the checker's
+        # container padding off the sides. The checker steps its scale with the card's width, laying out between 768 and
+        # 1024px, where that padding is 20px; Bike Book's comparison needs 40% throughout
         def tools
-          [{href: ebike_rules_path, icon: "icons/bolt.svg", circle: "tw:bg-blue-600", screenshot: "landing_pages/ebike-checker.webp",
+          [{href: ebike_rules_path, icon: "icons/bolt.svg", circle: "tw:bg-blue-600",
+            frame: ebike_rules_place_path("US", "CA", manual: 1, top_speed: 28, watts: 750, throttle: 0),
+            frame_class: "tw:[--frame-crop-x:20px] tw:[--frame-crop-top:240px] tw:[--frame-scale:0.4] tw:@min-[380px]:[--frame-scale:0.5] " \
+              "tw:@min-[492px]:[--frame-scale:0.66] tw:@min-[640px]:[--frame-scale:0.7]",
             title: translation(".ebike_legality_checker"), body: translation(".ebike_legality_checker_body"),
             action: translation(".check_your_state")},
-            {href: bikebook_path, icon: "icons/book-open.svg", circle: "tw:bg-purple-500", screenshot: "landing_pages/bikebook-compare.webp",
-             title: translation(".bike_book"), body: translation(".bike_book_body"), action: translation(".browse_bike_book")}]
+            {href: bikebook_path, icon: "icons/book-open.svg", circle: "tw:bg-purple-500",
+             frame: bikebook_path(vehicle_models: BIKE_BOOK_MODELS.join(",")),
+             frame_class: "tw:[--frame-crop-x:0px] tw:[--frame-crop-top:280px] tw:[--frame-scale:0.4]",
+             title: "Bike Book", body: translation(".bike_book_body"), action: translation(".browse_bike_book_spaced")}]
         end
 
         def sticker_prices
