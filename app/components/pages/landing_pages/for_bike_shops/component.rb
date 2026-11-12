@@ -79,13 +79,14 @@ module Pages
         def tools
           [{href: ebike_rules_path, icon: "icons/bolt.svg", circle: "tw:bg-blue-600",
             frame: ebike_rules_place_path(*(@checker_place&.dig(:code) || "US-CA").split("-"), manual: 1, top_speed: 20, watts: 750, throttle: 0),
-            frame_class: "tw:[--frame-crop-x:20px] tw:[--frame-crop-top:240px] tw:[--frame-scale:0.4] tw:@min-[380px]:[--frame-scale:0.5] " \
-              "tw:@min-[492px]:[--frame-scale:0.66] tw:@min-[640px]:[--frame-scale:0.7]",
+            frame_class: "tw:[--frame-crop-x:20px] tw:[--frame-crop-top:232px] tw:[--frame-scale:0.36] tw:@min-[352px]:[--frame-scale:0.4] " \
+              "tw:@min-[390px]:[--frame-scale:0.46] tw:@min-[448px]:[--frame-scale:0.52] tw:@min-[500px]:[--frame-scale:0.57] " \
+              "tw:@min-[556px]:[--frame-scale:0.64] tw:@min-[620px]:[--frame-scale:0.69]",
             title: translation(".ebike_legality_checker"), body: translation(".ebike_legality_checker_body"),
             action: translation(".check_your_state")},
             {href: bikebook_path, icon: "icons/book-open.svg", circle: "tw:bg-purple-500",
              frame: bikebook_path(vehicle_models: BIKE_BOOK_MODELS.join(",")),
-             frame_class: "tw:[--frame-crop-x:0px] tw:[--frame-crop-top:280px] tw:[--frame-scale:0.4]",
+             frame_class: "tw:[--frame-crop-x:0px] tw:[--frame-crop-top:236px] tw:[--frame-scale:0.4]",
              title: "Bike Book", body: translation(".bike_book_body"), action: translation(".browse_bike_book_spaced")}]
         end
 
