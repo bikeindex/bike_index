@@ -51,7 +51,7 @@
         html_options: {value: "",
                        placeholder: translation(".search_placeholder"),
                        data: {controller: "bikebook--chip-reorder", repeatable: true},
-                       input: {autofocus: true, data: {"bikebook--focus-shortcut-target": "field"}}}
+                       input: {autofocus: !@framed, data: {"bikebook--focus-shortcut-target": "field"}}}
       )) %>
 
         <%# Each chip's grip, cloned by bikebook/catalog's renderChips, which names its chip for %{name} %>

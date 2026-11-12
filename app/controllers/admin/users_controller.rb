@@ -136,6 +136,7 @@ module Admin
       @search_superusers = Binxtils::InputNormalizer.boolean(params[:search_superusers])
       @search_developers = Binxtils::InputNormalizer.boolean(params[:search_developers])
       @search_with_organization = Binxtils::InputNormalizer.boolean(params[:search_with_organization])
+      @search_legacy_viewer = Binxtils::InputNormalizer.boolean(params[:search_legacy_viewer])
       @updated_at = Binxtils::InputNormalizer.boolean(params[:search_updated_at])
       @search_unconfirmed = Binxtils::InputNormalizer.boolean(params[:search_unconfirmed])
       @search_confirmed = @search_unconfirmed ? false : Binxtils::InputNormalizer.boolean(params[:search_confirmed])
@@ -154,6 +155,7 @@ module Admin
       users = users.admins if @search_superusers
       users = users.where(developer: true) if @search_developers
       users = users.where(id: OrganizationRole.select(:user_id)) if @search_with_organization
+      users = users.where(feature_registration_show_legacy: true) if @search_legacy_viewer
       users = users.unconfirmed if @search_unconfirmed
       users = users.confirmed if @search_confirmed
 

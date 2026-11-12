@@ -13,6 +13,16 @@ RSpec.describe LandingPagesController, type: :request do
     end
   end
 
+  describe "#for_bike_shops" do
+    it "frames the checker on the visitor's place, and California without a location" do
+      get "/for_bike_shops", headers: {"HTTP_CF_IPCOUNTRY" => "US", "HTTP_CF_REGION" => "Indiana"}
+      expect(Capybara.string(response.body)).to have_css("iframe[src^='/ebike-rules/US/IN?']", visible: :all)
+
+      get "/for_bike_shops"
+      expect(Capybara.string(response.body)).to have_css("iframe[src^='/ebike-rules/US/CA?']", visible: :all)
+    end
+  end
+
   describe "#for_cities" do
     it "starts the checker on the visitor's state, and asks for one without a location" do
       get "/for_cities", headers: {"HTTP_CF_IPCOUNTRY" => "US", "HTTP_CF_REGION" => "Indiana"}

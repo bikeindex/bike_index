@@ -3755,54 +3755,6 @@ nb:
       get_in_touch_link: Ta kontakt
       want_qr_stickers: Vil du ha QR-klistremerker? Spør oss hvordan kostnadene deres
         oppveier prisen på en pakke.
-    for_bike_shops:
-      5_ways_to_grow_community_for_your_bike_sh: 5 måter å utvide fellesskapet for
-        sykkelbutikken din
-      automatic_registration_at_point_of_sale: Automatisk registrering på salgsstedet
-      bike_index_for_bike_shops: Sykkelindeks for sykkelbutikker
-      bike_shops_deck: sykkelbutikk partnerdekk
-      bikes_before_they: Foren deg mot sykkeltyveri og beskytt kundenes sykler før
-        de er der ute.
-      build_goodwill_with_your_customers_with_a: Bygg goodwill med kundene dine med
-        en tjeneste du kan tilby uten kostnad. Gjenopprett en stjålet sykkel, og du
-        vil ha en kunde for livet.
-      check_out: Sjekk ut vår
-      connect_your_ascend_account_html: Koble til Ascend-kontoen din og Bike Index-butikkkontoen
-        din. Hver natt eksporterer Ascend syklene du har solgt, og vi importerer dem
-        til Bike Index for kundene dine. Bortsett fra oppsettet, er du ferdig! Lær
-        mer om Ascend-integrasjonen %{ascend_link}.
-      connect_your_lightspeed_account: koble til Lightspeed-kontoen din
-      curious_what_information_html: Lurer du på hvilken informasjon som samles inn?
-        Les om %{security_link}.
-      do_right_by_your_customers: Gjør rett ved kundene dine med bare 5 klikk.
-      dont_use_ascend_or_lightspeed_html: Bruker du ikke Ascend eller Lightspeed POS?
-        Spør oss om %{printed_materials}.
-      driving_service_revenues_with_bicycle_reg: Kjøre tjenesteinntekter med sykkelregistrering
-      embed_a_bike_index_registration_form: Legg inn et sykkelregistreringsskjema
-        på nettstedet ditt
-      for_free_we_provide_you_with_t: Gratis gir vi deg verktøyene som trengs for
-        automatisk å registrere hver sykkel du selger i Bike Index via POS. Alt som
-        trengs er noen få minutter med oppsett, enten med Ascend- eller Lightspeed
-        Retail-kontoen din.
-      here: her
-      join_our_network_link_html: Bli med i vår %{network_link}.
-      learn_more: Lære mer
-      network_of_shop_partners: nettverk av butikkpartnere
-      or: eller
-      our_official_lightspeed_integration_provi: Vår offisielle Lightspeed-integrasjon
-        gir helt automatisert registrering for hver sykkel du selger. Alt du trenger
-        å gjøre er å legge inn serienummeret og ta kundens e-post.
-      printed_materials: trykte materialer
-      register_bikes_for_your_customers: Registrer sykler for kundene dine
-      related_articles: 'Relaterte artikler:'
-      security_link_text: sikkerhet og personvern for integrasjonene her
-      sign_up_for_a_free_bike_index_account_html: Registrer deg for en gratis Bike
-        Index-konto for butikken din %{new_org_link}.
-      sign_up_for_free: Registrer deg gratis
-      trusted_by_bike_shops_everywhere: Godkjent av sykkelbutikker overalt
-      use_ascend: Bruk Ascend?
-      use_lightspeed_retail: Bruker du Lightspeed Retail?
-      used_at_bike_shops_everywhere: Brukes i sykkelbutikker overalt
     packages_list:
       forever: For alltid
       free: Gratis
@@ -3942,6 +3894,9 @@ nb:
     landing_pages_for_community_groups: Bike Index er et gratis, ideell sykkelregister.
       Hjelp syklistene dine med å registrere seg, slik at en stjålet sykkel har en
       reell vei hjem. Gratis for lokalsamfunnsgrupper, for alltid.
+    landing_pages_for_bike_shops: Bike Index kobler seg til kasseapparatet ditt og
+      registrerer automatisk alle sykler du selger. Gratis for butikker og kunder,
+      og vi selger eller deler aldri kundedata.
   meta_titles:
     bikes_index: Søkeresultater
     bikes_new: Registrer en sykkel!
@@ -7850,6 +7805,127 @@ nb:
             klare til å sykle.
           why_it_matters: Hvorfor det er viktig
           zoom: ZOOM!
+        for_bike_shops:
+          a_reason_to_trust_you: En grunn til å stole på deg.
+          a_reason_to_trust_you_body: En gratis fordel som viser at du bryr deg etter
+            salget.
+          bike_book_body: Sammenlign spesifikasjoner, geometri og en rekke andre funksjoner
+            på tvers av tusenvis av sykkelmodeller.
+          bikes_that_came_home: Sykler som ble med hjem
+          browse_bike_book_spaced: Bla gjennom sykkelboken
+          bulk_order_email_subject: Storbestilling av klistremerker
+          check_your_state: Sjekk staten din
+          choose_your_pos: Velg ditt POS-sted
+          coming_soon: Kommer snart
+          contact_us: Kontakt oss
+          contact_us_for_bulk_orders_html: "%{contact_link} for bulkbestillinger."
+          customer_records_sold_or_shared: kundeoppføringer solgt eller delt
+          data_stays_private: Dataene deres forblir private.
+          data_stays_private_body: Aldri solgt, aldri delt.
+          ding: DING!
+          ebike_legality_checker: Lovlighetssjekker for elsykler
+          ebike_legality_checker_body: Veiledning fra stat til stat om elsykkelklasser,
+            hvor de kan sykle, og regler for alder og utstyr. Nyttig når en kunde
+            spør hva som er lovlig før de kjøper.
+          email_our_shop_team: Send e-post til butikkteamet vårt
+          email_placeholder: du@dinbutikk.com
+          faq: Vanlige spørsmål
+          faq_cost_answer: Ingenting. Bike Index er gratis for butikker og for kundene
+            dine. Registreringsklistremerker er et valgfritt detaljhandelsprodukt.
+          faq_cost_question: Hva koster det?
+          faq_customer_answer: Ingenting i skranken. De mottar en e-post fra Bike
+            Index for å gjøre krav på registreringen sin og legge til bilder.
+          faq_customer_question: Hva må kunden min gjøre?
+          faq_data_answer: Nei. Vi har svært restriktive personvernregler og selger
+            eller deler aldri kundedata.
+          faq_data_question: Selger eller deler dere kundedata?
+          faq_pos_answer: Lightspeed og Ascend i dag. Shopify kommer snart. Butikker
+            uten støttet POS kan fortsatt registrere sykler fra butikkkontoen sin.
+          faq_pos_question: Hvilke POS-systemer integrerer dere med?
+          faq_setup_answer: Omtrent 10 minutter. Når POS-en din er koblet til, registreres
+            sykler automatisk med hver transaksjon.
+          faq_setup_question: Hvor lang tid tar oppsettet?
+          faq_stickers_answer: Klistremerker selges i dusinvis gjennom nettbutikken
+            vår, med en veiledende utsalgspris på 7,99 dollar. Engrospriser vises
+            i handlekurven.
+          faq_stickers_question: Hvordan bestiller jeg registreringsklistremerker?
+          for_bike_shops_free_nonprofit: For sykkelbutikker · Gratis · Non-profit
+          for_you_and_your_customers: for deg og dine kunder
+          for_your_customers: For kundene dine
+          for_your_shop: For butikken din
+          free_for_shops_and_customers: Gratis for butikker og kunder, for alltid.
+          free_forever: Gratis, for alltid. Vi hjelper deg med å koble til POS-en
+            din.
+          free_registration: Gratis registrering.
+          free_registration_body: Sykkelen deres er registrert før de sykler av gårde.
+          free_tools: Gratis verktøy for deg og dine kunder
+          free_tools_choose_body: for å hjelpe kundene med å velge.
+          free_tools_fun_body: for å gjøre det morsommere å eie en sykkel.
+          free_tools_title: Gratis verktøy
+          help_if_stolen: Hjelp hvis den blir stjålet.
+          help_if_stolen_body: Ett klikk sender et varsel til butikker, politi og
+            passasjerer.
+          hero_lede_trust: Bike Index kobler seg til kasseapparatet ditt og registrerer
+            automatisk alle sykler du selger. Kundene dine får gratis tyveribeskyttelse.
+            Du blir en butikk de stoler på.
+          live: Aktiv
+          min: min
+          more_from_bike_index: Mer fra Bike Index
+          never_shared: Aldri delt
+          never_sold: Aldri solgt
+          new_our_first_retail_product: Ny · Vårt første detaljhandelsprodukt
+          no_extra_forms: Ingen ekstra skjemaer ved skranken og ingen opplæring av
+            ansatte. Når POS-en din er tilkoblet, blir hvert sykkelsalg en Bike Index-registrering.
+          nothing_to_manage: Ingenting å administrere.
+          nothing_to_manage_body: 10 minutter å koble til, så kjører den på hvert
+            salg.
+          order_stickers: Bestill klistremerker
+          peace_of_mind_on_a_sticker: Engangs sinnsro, på et klistremerke.
+          pos_ascend: Stige
+          pos_lightspeed: Lyshastighet
+          pos_other_or_none: Annet / ingen
+          pos_shopify_coming_soon: Shopify (kommer snart)
+          pricing_shown_in_cart: Priser vist i handlekurven
+          privacy_body: Bike Index er en ideell organisasjon med svært restriktive
+            personvernregler. Kundeinformasjon fra butikken din brukes til å registrere
+            og gjenopprette sykler. Den selges, deles eller brukes aldri til reklame.
+          ring_up_the_sale: Ring oss for å avtale salget, så tar vi oss av resten.
+          safer_used_bike_sales: Tryggere salg av brukte sykler.
+          safer_used_bike_sales_body: Sjekk serienumrene mot registeret.
+          see_the_tools: Se verktøyene
+          send_every_bike_home_with_a_sidekick: Send hver sykkel hjem med en sidekick.
+          set_it_and_forget_it: Sett det opp og glem det
+          shop_name: Butikknavn
+          shop_name_placeholder: Eike- og kjedesykler
+          sign_up_free: Registrer deg gratis
+          sign_up_your_shop: Registrer butikken din
+          signup_name: registrering
+          something_else_html: Noe annet? %{email_link}.
+          step_connect_body: Koble Lightspeed eller Ascend til din gratis butikkkonto.
+            Det tar omtrent 10 minutter.
+          step_connect_title: Koble til POS-en din
+          step_covered_body: De får en e-post for å kreve registreringen sin, med
+            serienummer og detaljer allerede utfylt.
+          step_covered_title: Kunden din er dekket
+          step_sell_body: Ingenting endres ved skranken. Hvert sykkelsalg registreres
+            automatisk på Bike Index.
+          step_sell_title: Selger sykler som alltid
+          sticker_body: Selg Bike Index-registreringsklistremerker ved skranken. Syklister
+            skanner QR-koden, registrerer sykkelen sin og kobler klistremerket til
+            den. Det fungerer for alle sykler, inkludert de som ikke kom gjennom kassen
+            din.
+          sticker_sheet_alt: Klistremerkeark for registrering av sykkelindeks
+          suggested_retail: Foreslått detaljhandel
+          suggested_retail_price: 7,99 dollar
+          ten_minutes_now: Ti minutter nå. Beskyttede sykler for godt.
+          to_set_up: å sette opp
+          used_only_for_bikes: Brukes kun til sykler
+          we_never_sell_or_share: Vi selger eller deler aldri kundedata.
+          well_email_you: Vi sender deg en e-post om tilkobling av POS-en din.
+          what_your_customers_get: Det kundene dine får. Det butikken din får.
+          wholesale: Engroshandel
+          your_pos: Ditt salgssted
+          youre_in: Du er med.
       marketplace:
         how_it_works:
           across_town_heading: På tvers av byen eller på tvers av landet
