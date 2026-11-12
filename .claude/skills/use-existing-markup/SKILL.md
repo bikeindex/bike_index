@@ -27,6 +27,18 @@ rtk proxy git diff origin/main...HEAD --name-only --diff-filter=A -- app/assets/
 
 Nearly every template line matches `tw:`, so treat the output as a map of where to read. Read the templates whole.
 
+## Undo what the branch added to a shared component
+
+A page that already renders the right component can still have bent it to fit the mockup. Diff the shared components themselves:
+
+```bash
+rtk proxy git diff origin/main...HEAD -- app/components/ui app/components/atoms app/components/shared_blocks
+```
+
+**Every keyword argument, variant or style map the branch added there is a mockup override.** Revert that component and its spec to `origin/main` and render the default at the call site, without asking. Don't tidy the new variant up or move its classes around. That keeps it, and a variant added for one caller stays for every caller. #4678 added `boxed:` to `UI::Accordion` so one FAQ matched its mock, while every other FAQ on the site renders the default rows.
+
+The exception is an argument the user asked for in this conversation.
+
 ## Replace, don't ask
 
 Convert every hand-written piece an existing component covers, without asking first. Then name each visible change in your reply.
@@ -117,7 +129,7 @@ The register landing page had four copies in `register_landing/`, all resized We
 
 Always report, and lead with the conversions whenever there are any. The user should never find a change to their page that the reply didn't mention.
 
-1. Each conversion, with the visible change it makes.
+1. Each conversion, and each component argument you reverted, with the visible change it makes.
 2. Each big shadow kept.
 3. Each hover state on a non-button.
 4. Each hand-written piece kept, and what no component covers.
