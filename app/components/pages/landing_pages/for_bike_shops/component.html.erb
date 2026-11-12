@@ -263,9 +263,7 @@
 
   <div class="twwiderow tw:gap-6">
     <% tools.each do |tool| %>
-      <div class="tw:relative tw:flex tw:flex-col tw:gap-3 tw:overflow-hidden tw:rounded-lg tw:px-7 tw:pb-7 tw:transition-all tw:duration-300 tw:hover:-translate-y-1.25 tw:hover:shadow-[0_10px_30px_rgba(44,62,80,.16)] <%= UI::Card::Component::BASE_CLASSES %>">
-        <%# The live page, scaled by tools' frame_class. sandbox blocks its autofocus %>
-
+      <%= render(UI::Card::Component.new(additional_classes: "tw:relative tw:flex tw:flex-col tw:gap-3 tw:overflow-hidden tw:p-7! tw:pt-0! tw:transition-all tw:duration-300 tw:hover:-translate-y-1.25 tw:hover:shadow-[0_10px_30px_rgba(44,62,80,.16)]")) do %>
         <div
           class="
             tw:@container tw:relative tw:-mx-7 tw:aspect-[1040/630]
@@ -297,11 +295,11 @@
           <%= tool[:body] %>
         </p>
 
-        <%= link_to(tool[:href], class: "tw:font-bold tw:text-blue-600 tw:no-underline tw:after:absolute tw:after:inset-0 tw:hover:text-blue-600 tw:hover:no-underline tw:dark:text-blue-400") do %>
+        <%= link_to(tool[:href], class: "twlink tw:font-bold tw:after:absolute tw:after:inset-0") do %>
           <%= tool[:action] %>
           <span aria-hidden="true">→</span>
         <% end %>
-      </div>
+      <% end %>
     <% end %>
   </div>
 </section>

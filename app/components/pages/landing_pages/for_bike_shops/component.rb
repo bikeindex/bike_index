@@ -72,10 +72,8 @@ module Pages
             ["icons/bike.svg", translation(".used_only_for_bikes")]]
         end
 
-        # frame: the tool showing a result. frame_class sets the frame's scale, so it lays out wider than the card, and the
-        # page's own pixels to crop: its navbar off the top, as an anchor would scroll this page too, and the checker's
-        # container padding off the sides. The checker steps its scale with the card's width, laying out between 768 and
-        # 1024px, where that padding is 20px; Bike Book's comparison needs 40% throughout
+        # frame_class scales the framed page and crops its navbar off the top (an #anchor would scroll this page too).
+        # The checker steps its scale to lay out between 768 and 1024px, where its container padding is 20px
         def tools
           [{href: ebike_rules_path, icon: "icons/bolt.svg", circle: "tw:bg-blue-600",
             frame: ebike_rules_place_path("US", "CA", manual: 1, top_speed: 28, watts: 750, throttle: 0),
