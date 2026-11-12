@@ -17,7 +17,7 @@ export default class extends Controller {
     if (!defaultPrevented) document.getElementById('donate-form').scrollIntoView({ behavior: 'smooth' })
   }
 
-  // donate--ten-percent opens, and moves to the one-time tab, wherever it loaded; the scroll doesn't wait on it
+  // Scrolls without waiting for donate--ten-percent, which loads separately
   openTenPercent () {
     this.dispatch('open-ten-percent', { target: window })
     document.getElementById('donate-form').scrollIntoView({ behavior: 'smooth' })
