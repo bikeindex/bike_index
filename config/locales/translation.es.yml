@@ -7401,7 +7401,6 @@ es:
             a espacios cerrados.
           watts_placeholder: p. ej. 750
           over_28_mph: Más de 28 mph
-          custom_details: Detalles personalizados
           details_legend: Detalles de tu bicicleta
           model_details: "%{model} detalles"
           country: País
@@ -7447,6 +7446,7 @@ es:
           how_to_check_lookup_bike_book: Mira el modelo de arriba. Bike Book muestra
             la certificación cuando está registrada.
           visit_bike_book_link: Visita Bike Book.
+          select_custom_values: Seleccione valores personalizados
         state_reference:
           compiling: Estamos recopilando las normas sobre bicicletas eléctricas de
             %{state} de la legislatura estatal y del DMV. Vuelva pronto.

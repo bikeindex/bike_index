@@ -7312,7 +7312,6 @@ nl:
             bewijs voordat een e-bike binnen mag worden gebruikt.
           watts_placeholder: bijv. 750
           over_28_mph: Meer dan 45 km/u
-          custom_details: Aangepaste details
           details_legend: De gegevens van uw fiets
           model_details: "%{model} details"
           country: Land
@@ -7356,6 +7355,7 @@ nl:
           how_to_check_lookup_bike_book: Zoek het model hierboven op. Bike Book toont
             de certificering waar deze geregistreerd staat.
           visit_bike_book_link: Bezoek Bike Book.
+          select_custom_values: Selecteer aangepaste waarden
         state_reference:
           compiling: We verzamelen momenteel de regels voor e-bikes van %{state} op
             basis van gegevens van de staatslegislatuur en de RDW. Kom binnenkort
