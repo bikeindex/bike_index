@@ -164,7 +164,7 @@ RSpec.describe "Bike Book", :js, type: :system do
     copy_id = find("[aria-label='Overview'] thead button[aria-label='Copy ID (m/aventon/2026/level_4_rec_step_through)']")
     copy_id.hover
     expect(page).to have_css("[role='tooltip']", exact_text: "Copy ID (m/aventon/2026/level_4_rec_step_through)", visible: true)
-    # its certifications as /ebike-rules shows them, each a tooltip of what it means
+    # its certifications as /ebike_rules shows them, each a tooltip of what it means
     certifications = find("[aria-label='Overview'] tr", text: /\AElectric Certification/)
     expect(certifications).to have_text(/UL 2849 Certified\s*E-bike electrical system\s*UL 2271 Certified\s*Battery pack\z/)
     certifications.find("button", text: "UL 2271 Certified").hover
@@ -667,7 +667,7 @@ RSpec.describe "Bike Book", :js, type: :system do
     uncheck "Out of Class"
     expect(page).to have_css("#vehicle-models-count", exact_text: "(23 matching models)")
     expect(page).to have_field("Human powered (Acoustic)", checked: false, disabled: false).and have_checked_field("e-Vehicle (motorized)")
-    # as on /ebike-rules, a state on the three US classes keeps them and one with its own shows those,
+    # as on /ebike_rules, a state on the three US classes keeps them and one with its own shows those,
     # each matching the models in its groups, leaving the other jurisdiction's unchecked
     check "US Class 2"
     choose_option("Jurisdiction", "California")
@@ -764,7 +764,7 @@ RSpec.describe "Bike Book", :js, type: :system do
     expect(page).to have_css("[aria-label='Overview comparison'] thead th", count: 6, wait: 10)
     width = ->(selector) { page.evaluate_script("document.querySelector(#{selector.to_json}).getBoundingClientRect().width") }
     expect(width.call("[aria-label='Overview comparison'] table")).to be > width.call("[data-bikebook--catalog-filters-target='vehicleCombobox']") + 100
-    # the e-motos as /ebike-rules has them, one classified a motor vehicle and one too fast for a class, each under
+    # the e-motos as /ebike_rules has them, one classified a motor vehicle and one too fast for a class, each under
     # the e-moto's tile, a tooltip of its card
     all("[aria-label='Overview comparison'] button[aria-label='E-moto, not an e-bike']", count: 2).first.click
     expect(page).to have_css("[role='tooltip'] h3", exact_text: "Not an e-bike", visible: true)
@@ -1080,11 +1080,11 @@ RSpec.describe "Bike Book", :js, type: :system do
     expect(page).to have_current_path("/bikebook?price_max=3000&search=1&vehicle_models=m/specialized/2025/haul_st")
     # scrolled to its views, rather than left under the search
     page.document.synchronize { raise Capybara::ExpectationNotMet unless page.evaluate_script("document.getElementById('vehicle-views').getBoundingClientRect().top").round == 16 }
-    # its classes' tiles as /ebike-rules has them, in order, the optional throttle's captioned
+    # its classes' tiles as /ebike_rules has them, in order, the optional throttle's captioned
     overview = find("[aria-label='Overview']")
     expect(overview.all("td button[aria-label$=' e-bike']").map { it[:"aria-label"] }).to eq ["Class 2 e-bike", "Class 3 e-bike"]
     expect(overview).to have_css("td", text: "w/ optional throttle")
-    expect(overview).to have_link("View on e-bike rules", href: "/ebike-rules?vehicle_models=m/specialized/2025/haul_st")
+    expect(overview).to have_link("View on e-bike rules", href: "/ebike_rules?vehicle_models=m/specialized/2025/haul_st")
     # beside its years, its page on the manufacturer's site, the newest year's still up rather than one archived since
     expect(overview.find("tr", text: /\AYears/)).to have_link("manufacturer's page", href: "https://www.specialized.com/us/en/haul-st/p/277759")
     expect(page).to have_css(".hw-combobox__chip", text: "Specialized Haul ST")
@@ -1866,7 +1866,7 @@ RSpec.describe "Bike Book", :js, type: :system do
     expect(tooltip).to have_css("code", exact_text: "evc/off_highway_motorcycle")
       .and have_button("Copy ID").and have_no_link
 
-    # a classification's exact id is an option, whose pick shows its /ebike-rules card above the vehicles, a US class's
+    # a classification's exact id is an option, whose pick shows its /ebike_rules card above the vehicles, a US class's
     # its state jurisdiction's own with its rules
     type_into(vehicle_field("an e-motorcycle"), "evc/us/class_3")
     retry_on_detach { find("[role='option'][data-value='evc/us/class_3']", text: "US Class 3").click }

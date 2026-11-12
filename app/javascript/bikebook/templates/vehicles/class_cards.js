@@ -28,8 +28,8 @@ export const withClassifications = (url, classifications) => {
 
 export const pickedClassifications = (url, classifications) => paramList(url, PARAM).filter((id) => hasCard(id, classifications))
 
-// The `ids`' /ebike-rules cards into `root`'s slot, centered: a US class's from the page, which its jurisdiction's own,
-// with its rules, loads over, and any other's from /ebike-rules. Each is permanent, so one already shown is kept as it is
+// The `ids`' /ebike_rules cards into `root`'s slot, centered: a US class's from the page, which its jurisdiction's own,
+// with its rules, loads over, and any other's from /ebike_rules. Each is permanent, so one already shown is kept as it is
 export const renderClassCards = (root, ids, classifications) => {
   const slot = root.getElementById('classification-cards')
   const jurisdiction = root.getElementById('jurisdiction-hw-hidden-field').value

@@ -34,7 +34,7 @@ pin_all_from "app/javascript/utils", under: "utils", to: "utils"
 pin "lexxy", to: "lexxy.js", preload: false
 pin "@rails/activestorage", to: "activestorage.esm.js", preload: false
 
-# /bikebook's modules, which /ebike-rules searches the catalog with too
+# /bikebook's modules, which /ebike_rules searches the catalog with too
 pin_all_from "app/javascript/bikebook", under: "bikebook", preload: false
 pin "lit-html", to: "lit-html.js", preload: false
 pin "lit-html/directive.js", to: "lit-html--directive.js", preload: false

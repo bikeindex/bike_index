@@ -439,7 +439,7 @@ class ModelViewer {
     return html`${label} ${presenter.measurement(limit, 'kg')} ${tooltip({ text, body })}`
   }
 
-  // As /ebike-rules shows them: its US classes' tiles in order, an optional one's outlined, and an e-moto's, alone where
+  // As /ebike_rules shows them: its US classes' tiles in order, an optional one's outlined, and an e-moto's, alone where
   // it's out of class as sold, and outlined in place of its optional throttle's where that would put it there, both with
   // that jurisdiction's ID. Without any, its classes' names
   #classTiles () {
@@ -454,11 +454,11 @@ class ModelViewer {
     return tiles.length ? classBadges(tiles) : presence(this.classificationNames(this.#sortedClassifications(this.vehicle)))
   }
 
-  // Its classes beside its /ebike-rules check
+  // Its classes beside its /ebike_rules check
   eVehicleClass () {
     const classes = this.#classTiles()
     return classes && html`<div class="tw:flex tw:flex-wrap tw:items-end tw:gap-x-3 tw:gap-y-1"><div>${classes}</div><a class="twlink tw:text-sm"
-      href=${`/ebike-rules?vehicle_models=${this.data.id}`}>View on e-bike rules</a></div>`
+      href=${`/ebike_rules?vehicle_models=${this.data.id}`}>View on e-bike rules</a></div>`
   }
 
   // As EbikeRuleServices::BikebookVehicles has them: the US classes only a mode it isn't sold with brings, by that mode,
@@ -471,7 +471,7 @@ class ModelViewer {
     return new Map(modes.filter((mode) => !stock(mode)).flatMap((mode) => numbers(mode).filter((number) => !sold.has(number)).map((number) => [number, mode.mode])))
   }
 
-  // As /ebike-rules has it (EbikeRuleServices::BikebookVehicles): a classification other than an e-bike law's or a US
+  // As /ebike_rules has it (EbikeRuleServices::BikebookVehicles): a classification other than an e-bike law's or a US
   // class, or with neither, a mode over 28 mph
   #emoto (ids) {
     const tiers = ids.filter((id) => !this.presenter.vocabulary.e_vehicle_classifications[id]?.e_bike_law)
@@ -651,7 +651,7 @@ class ModelViewer {
     return truthy(value) ? join(compact([this.presenter.measurement(value, 'mm'), suffix])) : null
   }
 
-  // As /ebike-rules shows a bike: its class tiles, its motor, top assisted speed and throttle, and its certifications
+  // As /ebike_rules shows a bike: its class tiles, its motor, top assisted speed and throttle, and its certifications
   electricSummary () {
     const { presenter, vehicle } = this
     if (blank(vehicle.motors)) return nothing
