@@ -89,14 +89,14 @@ export default class extends Controller {
     const inputRect = this.input.getBoundingClientRect()
     const wrapperRect = this.element.getBoundingClientRect()
     const computed = window.getComputedStyle(this.input)
-    // The rects are in screen pixels, the styles in the wrapper's own - they part under a
-    // CSS zoom or scale, like the /for_cities phones
-    const scale = this.element.offsetWidth / wrapperRect.width || 1
+    // The rects are zoomed and the styles get zoomed again, inside a CSS zoom like the
+    // /for_cities phones. Not offsetWidth's ratio, which rounds the overlay off its input
+    const zoom = this.element.currentCSSZoom || 1
     Object.assign(this.overlayTarget.style, {
-      top: `${(inputRect.top - wrapperRect.top) * scale}px`,
-      left: `${(inputRect.left - wrapperRect.left) * scale}px`,
-      width: `${inputRect.width * scale}px`,
-      height: `${inputRect.height * scale}px`,
+      top: `${(inputRect.top - wrapperRect.top) / zoom}px`,
+      left: `${(inputRect.left - wrapperRect.left) / zoom}px`,
+      width: `${inputRect.width / zoom}px`,
+      height: `${inputRect.height / zoom}px`,
       font: computed.font,
       paddingLeft: computed.paddingLeft,
       paddingRight: computed.paddingRight,
