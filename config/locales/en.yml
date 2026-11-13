@@ -1825,8 +1825,9 @@ en:
           cant_combine_here: >-
             These registrations can't be combined here. Email support@bikeindex.org
             if you need help.
+          combining: We're combining these into one registration. It takes a minute.
         update:
-          combined: Combined! Your %{bike_type} is now one registration.
+          combining: Thanks! We're combining your %{bike_type}'s registrations into one. It takes a minute.
           couldnt_combine: >-
             We couldn't combine these, so they're still separate. Email support@bikeindex.org
             if you need help.

@@ -15,25 +15,19 @@ module MyAccounts
     end
 
     def update
-      return redirect_by_status unless @pos_registration_match.confirmable?(@bike, @pos_bike)
+      same_bike = Binxtils::InputNormalizer.boolean(params[:same_bike])
+      # Another request may have settled it first
+      return redirect_by_status unless @pos_registration_match.answer!(user: current_user, same_bike:)
 
-      unless Binxtils::InputNormalizer.boolean(params[:same_bike])
-        BikeServices::PosRegistrationMerger.decline(@pos_registration_match, user: current_user)
-        # Another request may have settled it first
-        return redirect_by_status unless @pos_registration_match.declined?
-
+      if !same_bike
         flash[:success] = translation(:kept_separate)
-        return redirect_to(my_account_path)
-      end
-
-      if BikeServices::PosRegistrationMerger.confirm(@pos_registration_match, user: current_user)
-        flash[:success] = translation(:combined, bike_type: @pos_bike.type)
+        redirect_to my_account_path
+      elsif @pos_registration_match.merge_candidate?
+        flash[:success] = translation(:combining, bike_type: @pos_bike.type)
         redirect_to bike_path(@pos_bike)
-      elsif @pos_registration_match.confirmed?
+      else
         flash[:notice] = translation(:couldnt_combine)
         redirect_to my_account_path
-      else
-        redirect_by_status
       end
     end
 
@@ -48,8 +42,9 @@ module MyAccounts
 
     # The emailed link stays the same as the match changes
     def redirect_by_status
-      if @pos_registration_match.merged? && @pos_bike&.user_id == current_user.id
-        flash[:notice] = translation(:already_combined)
+      combining = @pos_registration_match.confirmed? && @pos_registration_match.merge_candidate?
+      if (@pos_registration_match.merged? || combining) && @pos_bike&.user_id == current_user.id
+        flash[:notice] = combining ? translation(:combining) : translation(:already_combined)
         redirect_to bike_path(@pos_bike)
       else
         flash[:notice] = @pos_registration_match.declined? ? translation(:already_kept_separate) : translation(:cant_combine_here)

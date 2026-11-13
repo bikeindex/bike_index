@@ -15,16 +15,34 @@ RSpec.describe MyAccounts::PosRegistrationMatchesController, type: :request do
         bike_path(pos_registration_match.bike), "name=\"same_bike\"")
     end
 
-    it "combines them" do
-      patch url, params: {same_bike: "true"}
-      expect(response).to redirect_to(bike_path(pos_registration_match.pos_bike))
-      expect(flash[:success]).to eq "Combined! Your bike is now one registration."
+    it "combines them, and sends the deleted registration's links to the POS registration" do
+      Sidekiq::Testing.inline! do
+        patch url, params: {same_bike: "true"}
+      end
+      pos_bike = pos_registration_match.pos_bike
+      expect(response).to redirect_to(bike_path(pos_bike))
+      expect(flash[:success]).to eq "Thanks! We're combining your bike's registrations into one. It takes a minute."
       expect(pos_registration_match.reload.status).to eq "merged"
       expect(Bike.unscoped.find(pos_registration_match.bike_id).deleted_at).to be_present
 
       get url
-      expect(response).to redirect_to(bike_path(pos_registration_match.pos_bike))
+      expect(response).to redirect_to(bike_path(pos_bike))
       expect(flash[:notice]).to eq "These are already combined into one registration."
+
+      get bike_path(pos_registration_match.bike_id)
+      expect(response).to redirect_to(registration_path(pos_registration_match.bike_id))
+      get registration_path(pos_registration_match.bike_id)
+      expect(response).to redirect_to(registration_path(pos_bike.id))
+    end
+
+    it "says it's combining until the merge runs" do
+      patch url, params: {same_bike: "true"}
+      expect(pos_registration_match.reload.status).to eq "confirmed"
+      expect(BikeJobs::MergePosRegistrationJob.jobs.count).to eq 1
+
+      get url
+      expect(response).to redirect_to(bike_path(pos_registration_match.pos_bike))
+      expect(flash[:notice]).to eq "We're combining these into one registration. It takes a minute."
     end
 
     it "keeps them separate" do

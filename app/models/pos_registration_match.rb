@@ -65,14 +65,46 @@ class PosRegistrationMatch < ApplicationRecord
 
   def self.ordered_reasons(reasons) = REVIEW_REASONS.keys & reasons
 
+  # The registration a deleted one was merged into, so its links still go somewhere
+  def self.merged_into_id(bike) = bike.deleted? ? merged.where(bike_id: bike.id).pick(:pos_bike_id) : nil
+
   def merge_candidate? = review_reasons.none?
 
-  # Whether the owner can still be asked: still the same bike (an edited serial or manufacturer could otherwise
-  # slip past the stolen veto), both live, and both theirs
-  def confirmable?(bike, pos_bike)
-    pending? && merge_candidate? && [bike, pos_bike].all? { self.class.live_bike?(it) } &&
+  # Whether the owner can still be asked
+  def confirmable?(bike, pos_bike) = pending? && mergeable?(bike, pos_bike)
+
+  # Still the same bike (an edited serial or manufacturer could otherwise slip past the stolen veto), both live,
+  # and both theirs
+  def mergeable?(bike, pos_bike)
+    merge_candidate? && [bike, pos_bike].all? { self.class.live_bike?(it) } &&
       bike.user_id.present? && bike.user_id == pos_bike.user_id &&
       bike.serial_normalized_no_space == pos_bike.serial_normalized_no_space && bike.manufacturer_id == pos_bike.manufacturer_id
+  end
+
+  # The POS bike, then the match, the order the finder locks them in; then the registration
+  def with_locked_bikes
+    pos_bike = Bike.unscoped.find_by(id: pos_bike_id)
+    return false if pos_bike.blank?
+
+    pos_bike.with_lock do
+      lock!
+      yield Bike.unscoped.lock.find_by(id: bike_id), pos_bike
+    end
+  end
+
+  # The owner's answer, while they can still give one. Returns whether it was recorded. A yes is merged by
+  # BikeJobs::MergePosRegistrationJob, unless a review reason has come up since the email
+  def answer!(user:, same_bike:)
+    recorded = with_locked_bikes do |bike, pos_bike|
+      next false unless confirmable?(bike, pos_bike) && bike.user_id == user&.id
+      next update!(status: :declined) unless same_bike
+
+      update!(status: :confirmed)
+      add_review_reasons!(self.class.review_reasons_for(bike, pos_bike))
+    end
+    # After the lock's transaction commits, so the job finds the match confirmed
+    BikeJobs::MergePosRegistrationJob.perform_async(id) if recorded && confirmed? && merge_candidate?
+    recorded
   end
 
   # Reasons are only added, so a recorded stolen veto is never cleared
