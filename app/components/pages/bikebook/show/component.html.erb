@@ -445,4 +445,10 @@
       </div>
     </div>
   </div>
+
+  <%# Flush on the footer, as SharedBlocks::Marketing::Wrapper's pages are %>
+  <section class="tw:-mb-(--footer-gap) tw:px-5 tw:py-2.5 tw:text-center tw:text-sm <%= SharedBlocks::Marketing::InvertedBlock::Component::BAND_CLASSES %>">
+    <%= translation(".open_data_license") %>
+    <%= link_to(translation(".read_the_license"), bikebook_license_path, class: "twlink tw:whitespace-nowrap") %>
+  </section>
 </div>

@@ -24,6 +24,8 @@ RSpec.describe BikebookController, type: :request do
         .and have_css("meta[property='og:image'][content*='/assets/logos/bikebook_icon']", visible: :all)
         .and have_css("meta[name='twitter:card'][content='summary']", visible: :all)
       expect(response.headers["X-Robots-Tag"]).to be_nil
+      expect(page.find("section.inverted")).to have_text("Bike Book data is open, under CC BY-SA 4.0.")
+        .and have_link("Read the license", href: "/bikebook/license")
     end
 
     context "comparing" do
