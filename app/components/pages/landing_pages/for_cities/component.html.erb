@@ -80,10 +80,14 @@
           <div class="<%= PHONE_SCREEN_CLASSES %>">
             <%= phone_status_bar %>
 
-            <div class="tw:px-4.5 tw:pt-3">
-              <%# embed: a form with nothing that saves a draft, takes focus or loads Turnstile %>
-              <%= render(Pages::Register::Views::Step1::Component.new(b_param: step_1_b_param, flow: register_flow,
-              embed: true, skip_heading: true)) %>
+            <div class="<%= PHONE_CONTENT_CLASSES %>">
+              <%= render(Pages::Register::Parts::Progress::Component.new(flow: register_flow, step: 1)) %>
+
+              <%# fields rather than a form: step 1's parts, without the register page's own behavior %>
+              <%= fields(:b_param, model: step_1_b_param) do |form| %>
+                <%= render(Pages::Register::Parts::Step1Fields::Component.new(b_param: step_1_b_param, form:, organization: nil)) %>
+                <%= render(Pages::Register::Parts::Step1Submit::Component.new(b_param: step_1_b_param, flow: register_flow)) %>
+              <% end %>
             </div>
           </div>
         </div>
@@ -103,7 +107,7 @@
           <div class="<%= PHONE_SCREEN_CLASSES %>">
             <%= phone_status_bar %>
 
-            <div class="tw:px-5 tw:pt-4">
+            <div class="<%= PHONE_CONTENT_CLASSES %>">
               <%= render(Pages::Register::Parts::Progress::Component.new(flow: register_flow, step: BikeServices::Register.step_for_page_index(0))) %>
 
               <%= render(Pages::Register::Parts::AcknowledgmentProgress::Component.new(number: 1,

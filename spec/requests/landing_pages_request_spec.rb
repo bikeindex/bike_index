@@ -44,7 +44,7 @@ RSpec.describe LandingPagesController, type: :request do
 
     it "shows the registration flow's step 1 and the default course's first page, only once there's a course" do
       get "/for_cities"
-      expect(Capybara.string(response.body)).to have_no_css("[inert] form")
+      expect(Capybara.string(response.body)).to have_no_css("[inert]", visible: :all)
 
       FactoryBot.create(:education_course_default_active, :with_pages)
       get "/for_cities"
