@@ -57,9 +57,8 @@ Rails.application.routes.draw do
 
   get "recovery_stories", to: "welcome#recovery_stories", as: :recovery_stories
   get "bikebook", to: "bikebook#show"
-  # before the glob below, which would take them for a model
+  # before the glob below, which would take it for a model
   get "bikebook/license", to: "bikebook#license", as: :bikebook_license
-  get "bikebook/badge", to: "bikebook#badge", as: :bikebook_badge
   get "bikebook/*vehicle_model", to: "bikebook#vehicle", format: false
   # a catalog model's own id, its manufacturer, year and model
   get "m/*vehicle_model", to: "bikebook#vehicle", format: false, constraints: {vehicle_model: %r{[a-z0-9_]+/\d{4}/[a-z0-9_]+}}

@@ -220,17 +220,8 @@ RSpec.describe BikebookController, type: :request do
         .and have_css("pre code", text: "Bike data: [Bike Book by Bike Index](https://bikeindex.org/bikebook/license)")
       expect(page).to have_css("[data-controller='ui--copy-button']", count: 2)
       expect(page).to have_css("table th", text: "Where you use the data")
-    end
-  end
-
-  describe "badge" do
-    it "renders each badge, with a download of each file" do
-      get "/bikebook/badge"
-
-      expect(response).to have_http_status(:ok)
-      page = Capybara.string(response.body)
-      expect(page).to have_css("h1", text: "Powered by Bike Index badge")
-      expect(page).to have_css("img[alt='Powered by Bike Index']", count: 4)
+      # the badges, with a download of each file
+      expect(page).to have_css("#badge img[alt='Powered by Bike Index']", count: 4)
       expect(page).to have_link("SVG", count: 4).and have_link("PNG 2x", count: 4).and have_link("PNG 4x", count: 4)
       page.all("a[download]").each do |link|
         expect(Rails.public_path.join(link["href"].delete_prefix("/"))).to exist

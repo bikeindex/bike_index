@@ -17,11 +17,6 @@ class BikebookController < ApplicationController
     @page_url = "https://bikeindex.org/bikebook/license"
   end
 
-  def badge
-    @page_title = "Powered by Bike Index badge | Bike Index"
-    @page_description = "Download the Powered by Bike Index badge, for projects that use Bike Book data."
-  end
-
   # /bikebook/m/segway/2025/gt3_pro, or without its m/, or its id alone, /m/segway/2025/gt3_pro, picks that vehicle ahead
   # of any already picked, with what's picked for it there
   def vehicle

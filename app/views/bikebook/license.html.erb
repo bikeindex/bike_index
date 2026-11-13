@@ -5,6 +5,8 @@
   html_credit = %(Bike data: <a href="#{credit_url}">Bike Book by Bike Index</a>, <a href="#{cc_license}">CC BY-SA 4.0</a>)
   markdown_credit = "Bike data: [Bike Book by Bike Index](#{credit_url}), [CC BY-SA 4.0](#{cc_license})"
   email = mail_to("licensing@bikeindex.org", nil, class: "twlink")
+  badge_base = "/powered-by-bike-index"
+  badges = [["horizontal", "light", 191, 58], ["horizontal", "dark", 191, 58], ["stacked", "light", 106, 99], ["stacked", "dark", 106, 99]]
   section = ->(id, text) { link_to(text, "##{id}", class: "twlink") }
   ext = ->(url, text) { link_to(text, url, class: "twlink") }
   h2_class = "tw:mt-10 tw:mb-3 tw:scroll-mt-4 tw:text-2xl tw:font-bold"
@@ -38,10 +40,11 @@
   <%= render(UI::Header::Component.new(text: "Bike Book license and attribution")) %>
 
   <p class="<%= p_class %>">
-    Bike Book is an open database of bicycle and e-bike models: makes, models,
-    years, e-bike classes, UL certifications, specifications, geometry and MSRP
-    pricing. It's built and maintained by Bike Index, NFP, a nonprofit that
-    helps people register bikes and recover stolen ones.
+    <%= ext.call(bikebook_path, "Bike Book") %> is an open database of bicycle,
+    e-bike and EPAMD models: makes, models, years, e-bike classes, UL
+    certifications, specifications, geometry and MSRP pricing. It's built and
+    maintained by Bike Index, NFP, a nonprofit that helps people register bikes
+    and recover stolen ones.
   </p>
 
   <p class="<%= p_class %>">
@@ -305,11 +308,36 @@
 
   <ul class="<%= list_class %>">
     <li>
-      <strong>The "Powered by Bike Index" badge (optional).</strong>
-      <%= ext.call(bikebook_badge_path, "Download the badge") %> in light and
-      dark versions. Use it as provided, link it to this page, and place it near
-      the data or with your other data credits. The badge doesn't replace the
-      credit above. For any other use of our name or logo, email <%= email %>.
+      <strong>The "Powered by Bike Index" badge (optional).</strong> Use it as
+      provided, link it to this page, and place it near the data or with your
+      other data credits. The badge doesn't replace the credit above. For any
+      other use of our name or logo, email <%= email %>.
+
+      <div
+        id="badge"
+        class="tw:my-4 tw:grid tw:scroll-mt-4 tw:gap-4 tw:sm:grid-cols-2"
+      >
+        <% badges.each do |layout, theme, width, height| %>
+          <% name = "powered-by-bike-index-#{layout}-#{theme}" %>
+
+          <%= render(UI::Card::Component.new(additional_classes: "tw:flex tw:flex-col")) do %>
+            <div class="tw:flex tw:min-h-28 tw:items-center tw:justify-center">
+              <%= image_tag("#{badge_base}/svg/#{name}.svg", alt: "Powered by Bike Index", width:, height:) %>
+            </div>
+
+            <p class="tw:mt-4 tw:mb-1 tw:font-bold">
+              <%= layout.capitalize %>, <%= theme %>
+            </p>
+
+            <p class="tw:m-0 tw:text-sm">
+              Download:
+              <%= link_to("SVG", "#{badge_base}/svg/#{name}.svg", download: "#{name}.svg", class: "twlink") %>,
+              <%= link_to("PNG 2x", "#{badge_base}/png/#{name}-2x.png", download: "#{name}-2x.png", class: "twlink") %>,
+              <%= link_to("PNG 4x", "#{badge_base}/png/#{name}-4x.png", download: "#{name}-4x.png", class: "twlink") %>
+            </p>
+          <% end %>
+        <% end %>
+      </div>
     </li>
 
     <li>
