@@ -43,6 +43,10 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
     click_link text
   end
 
+  # Turbo Drive is off, so the click itself waits on the POST, its redirect and the
+  # page render - past its default 2.2s when the machine is busy
+  def submit_notification = using_wait_time(10) { click_button "Create parking notification" }
+
   def row_for(notification) = "tr:has(> td > a[href$='/parking_notifications/#{notification.id}'])"
 
   # The rows the map controller tracks - which excludes the popup's clone, stripped of its map cell
@@ -66,7 +70,7 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
     choose "Parked incorrectly", allow_label_click: true
 
     expect {
-      click_button "Create parking notification"
+      submit_notification
       expect(page).to have_content("Parking Notification for #{bike.type} created", wait: 10)
     }.to change(bike.parking_notifications, :count).by(1)
 
@@ -112,7 +116,7 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
       fill_in "parking_notification[internal_notes]", with: "Locked to the rail"
 
       expect {
-        click_button "Create parking notification"
+        submit_notification
         expect(page).to have_content("Parking notification created for bike", wait: 10)
       }.to change(Bike.unscoped, :count).by(1)
 
@@ -153,7 +157,7 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
       expect(coordinate("longitude")).to be_within(0.000001).of(longitude)
 
       expect {
-        click_button "Create parking notification"
+        submit_notification
         expect(page).to have_content("Parking Notification for #{bike.type} created", wait: 10)
       }.to change(bike.parking_notifications, :count).by(1)
 
@@ -302,6 +306,8 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
     # Back on the searched place, with only the far away notification left. Fitting to it
     # leaves the place, so the URL stops reopening there
     expect(page).to have_current_path(/map_location=New/)
+    # The resolve reloads the page, and the map waits on MapLibre from the CDN again
+    expect(page).to have_content("0 visible", wait: 15)
     click_button "Fit map to notifications"
     # The count updates when the fly from New York to Chicago lands, a few seconds out
     expect(page).to have_content("1 visible", wait: 10)

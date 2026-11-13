@@ -9,6 +9,8 @@
     .form-well-input
       = f.text_field :name, class: "form-control"
 
+  = render("color_scheme", color_scheme: @user.color_scheme)
+
   .related-fields.my-account-checks
     .form-group.row
       %label.form-well-label

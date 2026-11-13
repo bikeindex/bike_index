@@ -1,0 +1,33 @@
+<%# locals: (color_scheme:) %>
+<div class="form-group row unnested-field">
+  <label class="form-well-label" id="color_scheme_label"><%= t(".appearance") %></label>
+
+  <%# dirtyignore keeps dirtyForms' leave-page prompt off fields that save as they're picked %>
+  <div
+    class="form-well-input dirtyignore tw:flex tw:gap-3"
+    role="radiogroup"
+    aria-labelledby="color_scheme_label"
+    data-controller="color-scheme"
+    data-color-scheme-url-value="<%= my_account_path %>"
+  >
+    <% [["light", t(".light"), "sun", "tw:text-yellow-500"], ["dark", t(".dark"), "moon", "tw:text-indigo-400"], ["system", t(".system"), "computer", "tw:text-gray-500"]].each do |value, label, icon, icon_class| %>
+      <label
+        class="
+          tw:relative tw:mb-0 tw:flex tw:flex-1 tw:cursor-pointer
+          tw:flex-col tw:items-center tw:gap-2 tw:rounded-lg tw:border
+          tw:border-gray-200 tw:p-3 tw:opacity-60 tw:transition-all
+          tw:hover:border-purple-300 tw:has-[:checked]:opacity-100
+          tw:has-[:checked]:ring-2 tw:has-[:checked]:ring-purple-400
+          tw:has-[:focus-visible]:outline-2
+          tw:has-[:focus-visible]:outline-offset-2
+          tw:has-[:focus-visible]:outline-purple-500
+          tw:dark:border-purple-700
+        "
+      >
+        <%= radio_button_tag "user[color_scheme]", value, color_scheme == value, class: "tw:sr-only", data: {action: "change->color-scheme#select"} %>
+        <%= inline_svg_tag("icons/#{icon}.svg", class: "tw:size-6 #{icon_class}", aria_hidden: true) %>
+        <span class="tw:text-xs tw:text-gray-600 tw:dark:text-gray-400"><%= label %></span>
+      </label>
+    <% end %>
+  </div>
+</div>

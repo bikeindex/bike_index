@@ -11,21 +11,6 @@ import { useAuth } from './AuthContext';
 
 let mockAthlete: { country?: string; measurement_preference?: string } | null = null;
 
-// Mock matchMedia for dark mode detection
-Object.defineProperty(window, 'matchMedia', {
-  writable: true,
-  value: vi.fn().mockImplementation((query: string) => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addListener: vi.fn(),
-    removeListener: vi.fn(),
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn(),
-    dispatchEvent: vi.fn(),
-  })),
-});
-
 function TestConsumer() {
   const { units } = usePreferences();
   return <div data-testid="units">{units}</div>;

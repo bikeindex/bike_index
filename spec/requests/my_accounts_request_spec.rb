@@ -228,6 +228,9 @@ RSpec.describe MyAccountsController, type: :request do
         expect(response).to render_template("layouts/application")
         expect(Capybara.string(response.body)).to have_select("user_preferred_unit_system",
           options: ["Automatic, from your location", "Metric (kilometers, millimeters)", "Imperial (miles, inches)"])
+        radios = Nokogiri::HTML(response.body).css("input[type=radio][name='user[color_scheme]']")
+        expect(radios.map { it["value"] }).to eq %w[light dark system]
+        expect(radios.select { it["checked"] }.map { it["value"] }).to eq %w[system]
       end
     end
     context "application layout" do
@@ -822,6 +825,34 @@ RSpec.describe MyAccountsController, type: :request do
         expect(flash[:success]).to be_blank
         expect(response).to render_template(:edit)
         expect(current_user.reload.preferred_language).to eq(nil)
+      end
+    end
+
+    describe "color_scheme" do
+      it "updates, and rejects an unknown value" do
+        patch base_url, params: {id: current_user.username, user: {color_scheme: "system"}}
+        expect(flash[:success]).to be_present
+        expect(current_user.reload.color_scheme).to eq "system"
+
+        patch base_url, params: {id: current_user.username, user: {color_scheme: "dark"}}
+        expect(current_user.reload.color_scheme).to eq "dark"
+
+        patch base_url, params: {id: current_user.username, user: {color_scheme: "plaid"}}
+        expect(flash[:success]).to be_blank
+        expect(response).to render_template(:edit)
+        expect(current_user.reload.color_scheme).to eq "dark"
+      end
+
+      it "answers the switcher's json save without a redirect or the after-change job" do
+        Sidekiq::Job.clear_all
+        patch base_url, params: {user: {color_scheme: "light"}}, as: :json
+        expect(response.status).to eq 204
+        expect(CallbackJobs::AfterUserChangeJob.jobs.count).to eq 0
+        expect(current_user.reload.color_scheme).to eq "light"
+
+        patch base_url, params: {user: {color_scheme: "plaid"}}, as: :json
+        expect(response.status).to eq 422
+        expect(current_user.reload.color_scheme).to eq "light"
       end
     end
 

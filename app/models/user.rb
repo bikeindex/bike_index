@@ -12,9 +12,9 @@
 #  banned                             :boolean          default(FALSE), not null
 #  can_send_many_marketplace_messages :boolean          default(FALSE), not null
 #  can_send_many_stolen_notifications :boolean          default(FALSE), not null
+#  color_scheme                       :integer          default("system"), not null
 #  confirmation_token                 :string(255)
 #  confirmed                          :boolean          default(FALSE), not null
-#  dark_mode_preview                  :boolean          default(FALSE), not null
 #  deleted_at                         :datetime
 #  description                        :text
 #  developer                          :boolean          default(FALSE), not null
@@ -77,6 +77,7 @@ class User < ApplicationRecord
   AUTH_TOKEN_EXPIRY = 1.hour
   # nil leaves it to UnitSystem
   PREFERRED_UNIT_SYSTEM_ENUM = {metric: 0, imperial: 1}.freeze
+  COLOR_SCHEME_ENUM = {light: 0, dark: 1, system: 2}.freeze
 
   cattr_accessor :current_user
 
@@ -84,6 +85,7 @@ class User < ApplicationRecord
   has_secure_password
 
   enum :preferred_unit_system, PREFERRED_UNIT_SYSTEM_ENUM, prefix: true, validate: {allow_nil: true}
+  enum :color_scheme, COLOR_SCHEME_ENUM, prefix: true, validate: true
 
   has_many :ambassador_task_assignments
   has_many :b_params, foreign_key: :creator_id
