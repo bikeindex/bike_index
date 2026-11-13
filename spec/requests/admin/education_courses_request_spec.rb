@@ -31,21 +31,21 @@ RSpec.describe Admin::EducationCoursesController, type: :request do
         end
       end
 
-      it "offers to create the template when there isn't one" do
+      it "offers to create the default course when there isn't one" do
         get base_url
-        expect(assigns(:template)).to be_nil
-        expect(response.body).to include("Create template")
+        expect(assigns(:default_course)).to be_nil
+        expect(response.body).to include("Create default course")
       end
 
-      context "with a live template and a draft above it" do
-        let!(:live_template) { FactoryBot.create(:education_course_template_active, :with_pages) }
-        let!(:template_draft) { FactoryBot.create(:education_course_template) }
+      context "with a live default course and a draft above it" do
+        let!(:live_default) { FactoryBot.create(:education_course_default_active, :with_pages) }
+        let!(:default_draft) { FactoryBot.create(:education_course_default) }
 
-        it "links the template draft - that's what there is to do to it" do
+        it "links the default draft - that's what there is to do to it" do
           get base_url
-          expect(assigns(:template)).to eq template_draft
-          expect(response.body).to include("Template Draft course")
-          expect(Capybara.string(response.body)).to have_css("td span.less-strong", text: "Template", count: 2)
+          expect(assigns(:default_course)).to eq default_draft
+          expect(response.body).to include("Default Draft course")
+          expect(Capybara.string(response.body)).to have_css("td span.less-strong", text: "Default", count: 2)
         end
       end
 
@@ -75,21 +75,21 @@ RSpec.describe Admin::EducationCoursesController, type: :request do
         expect(assigns(:education_course)).to eq draft
       end
 
-      context "template draft" do
-        let!(:template) { FactoryBot.create(:education_course_template, :with_pages) }
+      context "default draft" do
+        let!(:default_course) { FactoryBot.create(:education_course_default, :with_pages) }
 
         it "renders" do
-          get "#{base_url}/#{template.id}/edit"
+          get "#{base_url}/#{default_course.id}/edit"
           expect(response.status).to eq(200)
           expect(response).to render_template(:edit)
         end
       end
 
-      context "live template" do
-        let!(:template) { FactoryBot.create(:education_course_template_active, :with_pages) }
+      context "live default course" do
+        let!(:default_course) { FactoryBot.create(:education_course_default_active, :with_pages) }
 
-        it "renders, read-only - activation freezes the template too" do
-          get "#{base_url}/#{template.id}/edit"
+        it "renders, read-only - activation freezes the default course too" do
+          get "#{base_url}/#{default_course.id}/edit"
           expect(response.status).to eq(200)
           expect(response.body).to_not include("education_course[faq_url]")
         end
@@ -116,11 +116,11 @@ RSpec.describe Admin::EducationCoursesController, type: :request do
           text: /Education courses\s+1/)
       end
 
-      context "template" do
-        let!(:template) { FactoryBot.create(:education_course_template, :with_pages) }
+      context "default course" do
+        let!(:default_course) { FactoryBot.create(:education_course_default, :with_pages) }
 
         it "renders without organization tabs" do
-          get "#{base_url}/#{template.id}"
+          get "#{base_url}/#{default_course.id}"
           expect(response.status).to eq(200)
           expect(response.body).to_not include("Organization sections")
         end
@@ -164,16 +164,16 @@ RSpec.describe Admin::EducationCoursesController, type: :request do
           expect(draft.reload).to be_active
         end
 
-        context "template draft" do
-          let!(:template) { FactoryBot.create(:education_course_template, :with_pages) }
-          let!(:previous_template) { FactoryBot.create(:education_course_template_active, :with_pages) }
+        context "default draft" do
+          let!(:default_course) { FactoryBot.create(:education_course_default, :with_pages) }
+          let!(:previous_default) { FactoryBot.create(:education_course_default_active, :with_pages) }
 
-          it "makes it the live template, archiving the one it supersedes" do
-            patch "#{base_url}/#{template.id}", params: {activate: true}
+          it "makes it the live default course, archiving the one it supersedes" do
+            patch "#{base_url}/#{default_course.id}", params: {activate: true}
 
-            expect(response).to redirect_to("#{base_url}/#{template.id}")
-            expect(EducationCourse.active_template).to eq template
-            expect(previous_template.reload).to be_archived
+            expect(response).to redirect_to("#{base_url}/#{default_course.id}")
+            expect(EducationCourse.active_default).to eq default_course
+            expect(previous_default.reload).to be_archived
           end
         end
 
@@ -208,19 +208,19 @@ RSpec.describe Admin::EducationCoursesController, type: :request do
       end
 
       context "no organization" do
-        let!(:live_template) { FactoryBot.create(:education_course_template_active, :with_pages) }
+        let!(:live_default) { FactoryBot.create(:education_course_default_active, :with_pages) }
 
-        it "opens the template's draft, cloning the live template" do
+        it "opens the default course's draft, cloning the live default course" do
           expect { post base_url }.to change(EducationCourse, :count).by(1)
 
-          template_draft = EducationCourse.existing_draft_for(nil)
-          expect(response).to redirect_to("#{base_url}/#{template_draft.id}/edit")
-          expect(template_draft.education_course_pages.count).to eq 2
+          default_draft = EducationCourse.existing_draft_for(nil)
+          expect(response).to redirect_to("#{base_url}/#{default_draft.id}/edit")
+          expect(default_draft.education_course_pages.count).to eq 2
         end
       end
 
       context "organization that doesn't resolve" do
-        it "404s rather than opening the template every organization clones" do
+        it "404s rather than opening the default course every organization clones" do
           expect { post base_url, params: {organization_id: "#{organization.to_param}-typo"} }
             .to_not change(EducationCourse, :count)
           expect(response.status).to eq(404)

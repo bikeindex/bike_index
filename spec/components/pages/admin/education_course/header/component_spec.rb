@@ -77,25 +77,25 @@ RSpec.describe Pages::Admin::EducationCourse::Header::Component, type: :componen
     end
   end
 
-  context "template" do
-    let(:education_course) { FactoryBot.create(:education_course_template) }
+  context "default course" do
+    let(:education_course) { FactoryBot.create(:education_course_default) }
 
-    it "names the template's status, with no organization to view it in" do
+    it "names the default course's status, with no organization to view it in" do
       render_inline(described_class.new(education_course:))
 
-      expect(page).to have_content("Viewing Template Draft education course", normalize_ws: true)
+      expect(page).to have_content("Viewing Default Draft education course", normalize_ws: true)
       expect(page).to have_link("Edit", href: "#{admin_url}/edit")
       expect(page).to_not have_link("View in organization")
       expect(page).to have_link("Activate")
     end
 
     context "live" do
-      let(:education_course) { FactoryBot.create(:education_course_template_active) }
+      let(:education_course) { FactoryBot.create(:education_course_default_active) }
 
       it "is frozen like any live course, and drafts without an organization" do
         render_inline(described_class.new(education_course:, mode: :edit))
 
-        expect(page).to have_content("Editing Template Current education course", normalize_ws: true)
+        expect(page).to have_content("Editing Default Current education course", normalize_ws: true)
         expect(page).to have_css("button[disabled]", text: "Edit")
         expect(page).to have_css("form[action='/admin/education_courses'] button", text: "Create draft")
       end

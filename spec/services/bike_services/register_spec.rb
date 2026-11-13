@@ -383,6 +383,8 @@ RSpec.describe BikeServices::Register do
       expect(described_class.permitted_step(b_param, nil, course: nil)).to eq "2"
       expect(described_class.permitted_step(b_param, "1", course: nil)).to eq "1"
       expect(described_class.permitted_step(b_param, "finished", course: nil)).to eq "2"
+      expect(described_class.current_step(b_param)).to eq "2"
+      expect(described_class.current_step(BParam.new(origin: "api_v3", params: b_param.params))).to be_nil
     end
 
     context "step 1 not submitted" do
@@ -728,6 +730,133 @@ RSpec.describe BikeServices::Register do
         end
       end
 
+      context "with the default course" do
+        let!(:default_course) { FactoryBot.create(:education_course_default_active, :with_pages) }
+
+        it "is the organization's own course over the default course" do
+          expect(described_class.education_course(b_param)).to eq course
+        end
+
+        context "without an organization" do
+          let(:bike_params) { super().except(:creation_organization_id) }
+
+          it "is the default course, except for the legacy forms" do
+            expect(described_class.education_course(b_param)).to eq default_course
+            expect(described_class.education_course(b_param, default_course: false)).to be_nil
+          end
+        end
+
+        context "the organization's course is still a draft" do
+          let!(:course) { FactoryBot.create(:education_course, :with_pages, organization:) }
+
+          it "is the default course, except for the legacy forms" do
+            expect(described_class.education_course(b_param)).to eq default_course
+            expect(described_class.education_course(b_param, default_course: false)).to be_nil
+          end
+
+          it "stays on the default course once started, until resumed on the organization's own" do
+            described_class.acknowledge_page(b_param, default_course.education_course_pages.first, checked: %w[1 1])
+            course.make_active!
+
+            expect(described_class.education_course(b_param)).to eq default_course
+            expect(described_class.resume_education_course(b_param, course: default_course)).to eq([default_course, false])
+            default_course.update(end_at: Time.current)
+            expect(described_class.resume_education_course(b_param, course: default_course.reload)).to eq([course, true])
+          end
+
+          it "leaves the legacy forms on the organization's own, even started on the default course" do
+            described_class.acknowledge_page(b_param, default_course.education_course_pages.first, checked: %w[1 1])
+            expect(described_class.education_course(b_param, default_course: false)).to be_nil
+            course.make_active!
+            expect(described_class.education_course(b_param, default_course: false)).to eq course
+          end
+        end
+
+        context "the organization has no live course" do
+          let!(:course) { nil }
+          let(:pages) { [] }
+          let(:member) { FactoryBot.create(:user_confirmed, email: "member@example.com") }
+
+          it "is the default course for a registrant's own, and anonymously" do
+            expect(described_class.education_course(b_param)).to eq default_course
+            b_param.update(creator_id: FactoryBot.create(:user_confirmed, email: b_param.owner_email).id)
+            expect(described_class.education_course(b_param.reload)).to eq default_course
+          end
+
+          it "is nil for a member registering someone else's, even for the owner they've emailed" do
+            b_param.update(creator_id: member.id)
+            expect(b_param.self_made?(member)).to be_falsey
+            expect(described_class.education_course(b_param.reload)).to be_nil
+            owner = FactoryBot.create(:user_confirmed, email: b_param.owner_email)
+            expect(described_class.education_course(b_param, user: owner)).to be_nil
+          end
+
+          it "is nil for a theft or a find, even with the pages started" do
+            described_class.acknowledge_page(b_param, default_course.education_course_pages.first, checked: %w[1 1])
+            %w[status_stolen status_impounded].each do |status|
+              b_param.params = b_param.params.deep_merge("bike" => {"status" => status})
+              expect(described_class.education_course(b_param)).to be_nil
+            end
+          end
+
+          it "doesn't walk the default course's organization-specific pages" do
+            default_course.education_course_pages.first.update_column(:organization_specific, true)
+            expect(default_course.reload.education_course_pages.count).to eq 2
+            expect(described_class.course_pages(default_course).map(&:id)).to eq([default_course.education_course_pages.last.id])
+          end
+
+          describe "motorized_review" do
+            let(:single_page) { described_class.flow(b_param, course: nil, single_page: true) }
+
+            it "depends on the email typed, since the default course is only for the registrant's own" do
+              expect(described_class.motorized_review(b_param, single_page, separate_attestation: false)).to eq :own_emails
+              default_course.update(end_at: Time.current)
+              expect(described_class.motorized_review(b_param, single_page, separate_attestation: false)).to be false
+            end
+          end
+        end
+
+        context "started on the default course, then naming an organization with its own" do
+          let(:bike_params) { super().except(:creation_organization_id) }
+          let!(:acknowledgment) do
+            described_class.acknowledge_page(b_param, default_course.education_course_pages.first, checked: %w[1 1])
+            described_class.save_acknowledgment(b_param, default_course, acknowledged_all: "1")
+            EducationCourseAcknowledgment.find_by(b_param_id: b_param.id)
+          end
+
+          it "owes the organization's rules, with the default course's agreement gone" do
+            expect(described_class.education_course(b_param)).to eq default_course
+            expect(described_class.acknowledged?(b_param, course: default_course)).to be_truthy
+
+            described_class.assign_organization(b_param, organization)
+            b_param.reload
+            expect(b_param.creation_organization_id).to eq organization.id
+            expect(b_param.params["details_completed"]).to be_nil
+            expect(b_param.params["education_course"]).to be_nil
+            expect(described_class.education_course(b_param)).to eq course
+            expect(described_class.acknowledged?(b_param, course:)).to be_falsey
+            expect(EducationCourseAcknowledgment.count).to eq 0
+          end
+        end
+
+        context "started under an automatic organization, then dropping it at step 2" do
+          let(:user) { FactoryBot.create(:user_confirmed, email: b_param.owner_email) }
+          let(:bike_params) { super().except(:creation_organization_id).merge(creation_organization_id: organization.id) }
+
+          it "restarts the rules on the default course" do
+            b_param.update(creator_id: user.id, params: b_param.params.merge("auto_organization_id" => organization.id))
+            described_class.acknowledge_page(b_param, pages.first, checked: %w[1 1])
+            expect(described_class.education_course(b_param.reload, user:)).to eq course
+
+            described_class.save_step_2(b_param, user:, image: nil, image_signed_id: nil, bike_params: {"user_name" => "Owner"}.with_indifferent_access,
+              register_with_organization: "false")
+            expect(b_param.reload.creation_organization_id).to be_blank
+            expect(b_param.params["education_course"]).to be_nil
+            expect(described_class.education_course(b_param, user:)).to eq default_course
+          end
+        end
+      end
+
       context "separate_attestation" do
         let(:member) { FactoryBot.create(:user_confirmed, email: "member@example.com") }
         let(:registrant) { FactoryBot.create(:user_confirmed, email: "owner@example.com") }
@@ -797,6 +926,7 @@ RSpec.describe BikeServices::Register do
       expect(described_class.acknowledge_page(b_param, pages.first, checked: %w[1 1])).to be_truthy
       expect(described_class.acknowledged_page_ids(b_param)).to eq([pages.first.id])
       expect(described_class.permitted_step(b_param, nil, course:)).to eq "4"
+      expect(described_class.current_step(b_param)).to eq "4"
       # Every earlier step stays browsable
       expect(described_class.permitted_step(b_param, "3", course:)).to eq "3"
       expect(described_class.permitted_step(b_param, "1", course:)).to eq "1"

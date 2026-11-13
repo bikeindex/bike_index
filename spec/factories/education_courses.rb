@@ -20,11 +20,11 @@ FactoryBot.define do
 
     factory :education_course_active, traits: [:activated]
 
-    # The template drafts, activates and archives like an organization's course
-    factory :education_course_template do
+    # The default course drafts, activates and archives like an organization's course
+    factory :education_course_default do
       organization { nil }
 
-      factory :education_course_template_active, traits: [:activated]
+      factory :education_course_default_active, traits: [:activated]
     end
   end
 end

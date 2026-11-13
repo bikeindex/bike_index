@@ -51,11 +51,27 @@ RSpec.describe CallbackJobs::AfterEducationCourseChangeJob, type: :job do
     end
   end
 
-  context "with the template" do
-    it "doesn't enqueue" do
+  context "with the default course" do
+    let(:default_course) { FactoryBot.create(:education_course_default_active, :with_pages) }
+    let!(:b_param_default) { pending_b_param(default_course) }
+
+    it "finishes its pending registrations once it's ended, without touching an organization's" do
       Sidekiq::Job.clear_all
-      FactoryBot.create(:education_course_template_active)
-      expect(described_class.jobs.count).to eq 0
+      default_course.update(end_at: Time.current)
+      expect(described_class.jobs.map { it["args"] }).to eq([[default_course.id]])
+
+      instance.perform(default_course.id)
+      expect(b_param_default.reload.acknowledgment_pending?).to be_falsey
+      expect(b_param.reload.acknowledgment_pending?).to be_truthy
+      expect(EmailJobs::OwnershipInvitationJob.jobs.map { it["args"] }).to eq([[b_param_default.created_bike.current_ownership.id]])
+    end
+
+    it "leaves them pending when a new one replaces it" do
+      FactoryBot.create(:education_course_default, :with_pages).make_active!
+      expect(default_course.reload.archived?).to be_truthy
+
+      instance.perform(default_course.id)
+      expect(b_param_default.reload.acknowledgment_pending?).to be_truthy
     end
   end
 end

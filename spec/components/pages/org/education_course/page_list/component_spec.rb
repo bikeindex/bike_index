@@ -72,14 +72,14 @@ RSpec.describe Pages::Org::EducationCourse::PageList::Component, type: :componen
       expect(page).to have_content("Brakebills")
     end
 
-    context "on the template" do
-      let(:education_course) { FactoryBot.create(:education_course_template, :with_pages) }
+    context "on the default course" do
+      let(:education_course) { FactoryBot.create(:education_course_default, :with_pages) }
 
-      it "badges it with the template, which has no organization" do
-        # Only admin edits the template - there's no organization to route it through
+      it "badges it with the default course, which has no organization" do
+        # Only admin edits the default course - there's no organization to route it through
         render_inline(described_class.new(education_course:, admin: true))
 
-        expect(page).to have_content("Template")
+        expect(page).to have_content("Default")
       end
     end
   end

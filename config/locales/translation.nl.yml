@@ -2186,6 +2186,7 @@ nl:
         create:
           successfully_created: Parkeermelding %{bike_type} gemaakt
           unable_to_create: Kan niet maken - %{errors}
+          successfully_impounded: In beslag genomen dit %{bike_type}
       manages:
         destroy:
           contact_support_to_delete: Neem contact op met support@bikeindex.org om
@@ -3855,6 +3856,7 @@ nl:
         re_send: opnieuw versturen
         motorized: e-voertuig?
         vehicle_type: Type
+        step: Stap
       recoveries:
         description: Beschrijving
         mfg_model_color_html: fabrikant, model, <span class="less-strong">kleur</span>
@@ -5428,6 +5430,9 @@ nl:
           om de registratie te voltooien.
         link_signs_you_in: Deze link geeft je een account bij Bike Index, dus stuur
           hem niet door. Hij is %{days} dagen geldig.
+        e_vehicle_safety_rules_owed_html: Uw <strong>%{color_and_brand}</strong> is
+          geregistreerd op Bike Index. Ga akkoord met de veiligheidsregels voor e-voertuigen
+          om de registratie te voltooien.
       confirmation_email:
         click_to_sign_in_html: Klik op de knop <em>'Inloggen'</em> om je registratie
           te voltooien!
@@ -5590,6 +5595,14 @@ nl:
       recovery_display_card:
         recovered: Hersteld
         translated_from_english: vertaald uit het Engels
+      registration_step:
+        awaiting_email_confirmation: Wachten op e-mailbevestiging
+        education_page: Onderwijspagina %{number}
+        education_review: Onderwijsbeoordeling
+        finished: Afgerond
+        report: Rapport
+        step_1: Stap 1
+        step_2: Stap 2
     pages:
       messages:
         thread_show:
@@ -5820,6 +5833,7 @@ nl:
             parking_notifications: Verlaten records
             find_a_parking_notification: Zoek een parkeermelding
             search_parking_notifications: Zoek naar parkeermeldingen
+            search_notification_message_or_notes: Zoekmelding/notities
           table:
             address: Adres
             bike: Fiets
@@ -6042,6 +6056,7 @@ nl:
               impound_this_bike_type: Neem dit in beslag %{bike_type}
               not_shown_to_user: niet aan de gebruiker getoond
               parking_notification_notes: "%{org_name} interne notities"
+              submit_parking_notification: Maak een parkeermelding aan
             parking_notification_show:
               no_notifications: Geen parkeermeldingen voor deze %{bike_type}
               parking_notifications: Verlaten records
@@ -6123,6 +6138,10 @@ nl:
             unregistered_owner: Deze %{bike_type} is niet geregistreerd bij een gebruiker.
               Het is toegevoegd om parkeermeldingen te volgen.
             view_all_registrations: alles bekijken →
+            not_registered_phone_message: Andere contactgegevens van de eigenaar zijn
+              niet beschikbaar, aangezien dit %{bike_type} niet bij uw organisatie
+              is geregistreerd.
+            show_phone: Toon telefoon
           marketplace_listing_card:
             condition: Voorwaarde
             contact_seller: Neem contact op met de verkoper
@@ -6174,6 +6193,12 @@ nl:
               u een link op in het onderstaande veld
           share:
             link_copied: Link gekopieerd
+          potential_duplicates:
+            count_html: "%{count} gevonden"
+            matching_segments: 'Registraties met een serienummer dat overeenkomt met
+              de segmenten van %{bike_type}:'
+            potential_duplicates: Mogelijke duplicaten
+            showing_recent: De meest recente %{count} weergeven
       search:
         everything_combobox:
           made_by: gemaakt door
@@ -6915,7 +6940,6 @@ nl:
           byline: Een gratis naslagwerk van Bike Index, het non-profit fietsregister.
           tagline: 'De wereldwijde fietsenbibliotheek: zoek, vergelijk en vind je
             volgende fiets.'
-          about_bikebook_label: Over BikeBook
           activities: Activiteiten
           activity_examples: "(bijv. mountainbiken, cyclocross, enz.)"
           configuration_examples: "(compleet/framework)"
@@ -6950,6 +6974,7 @@ nl:
             vergelijken
           select_an_vehicle_type: Selecteer een %{bike_type}, kies meerdere om ze
             te vergelijken
+          about_bike_book_label: Over het fietsboek
         donate_strip:
           donate: Schenken
           pitch: Dit fantastische product wordt u aangeboden door de non-profitorganisatie
@@ -7034,14 +7059,9 @@ nl:
           watts_within_cap_html: "%{watts}W-motor bevindt zich in de kap"
           yes_to_html: Ja, naar %{mph}
           your_state: Uw staat
-          bikebook_name: BikeBook
           class_3_throttle_over_html: Het gaspedaal gaat tot %{mph} mph, voorbij de
             20 mph die het gaspedaal van een klasse 3-voertuig is toegestaan.
           class_3_throttle_within_html: Gashendel stopt bij %{mph} mph
-          class_unknown_check_label: BikeBook vermeldt de klasse of topsnelheid niet,
-            dus controleer de klasse op het label.
-          entered_unverified: Invoer door u, niet geverifieerd door BikeBook.
-          full_bikebook_entry: Bekijk het volledige BikeBook-artikel
           over_mph_html: Meer dan %{mph} mph
           red_headline_manual: Dit is geen e-bike volgens de huidige %{state} regels.
           speed_past_cap_html: Assistentie bij snelheden boven %{past} mph, boven
@@ -7082,8 +7102,6 @@ nl:
             de %{cap} km/u-limiet
           speed_past_kmh_html: Assisteert voorbij %{past} km/u; controleer of het
             stopt bij %{cap} km/u.
-          speed_to_check_kmh_html: BikeBook vermeldt de topsnelheid niet, dus controleer
-            of de motor stopt bij %{cap} km/u.
           speed_within_cap_kmh_html: Assistentie tot %{kmh} km/u, binnen de limiet
           still_reviewing_province_body: Raadpleeg het ministerie van Transport van
             uw provincie of territorium voor de actuele regelgeving met betrekking
@@ -7194,6 +7212,14 @@ nl:
               om te controleren.
             other: Dit wordt geclassificeerd als een e-bike in %{state}, met %{count}
               regels om te controleren.
+          bike_book_name: Fietsboek
+          class_unknown_in_bike_book_label: Bike Book vermeldt de klasse of topsnelheid
+            niet, dus controleer de klasse op het label.
+          entered_unverified_by_bike_book: Invoer door u, niet geverifieerd door Bike
+            Book.
+          full_bike_book_entry: Bekijk het volledige Bike Book-artikel
+          speed_to_check_bike_book_kmh_html: Bike Book vermeldt de topsnelheid niet,
+            dus controleer of de motor stopt bij %{cap} km/u.
         rule_label:
           classes: Erkende klassen
           power: Motorvermogenscapaciteit
@@ -7300,14 +7326,7 @@ nl:
             Steeds meer campussen, verhuurders en gemeenten vragen nu om een dergelijk
             bewijs voordat een e-bike binnen mag worden gebruikt.
           watts_placeholder: bijv. 750
-          bikebook_didnt_load: BikeBook kon niet worden geladen. Voer hieronder de
-            gegevens van uw fiets in.
-          bikebook_loading: BikeBook wordt geladen…
-          how_to_check_lookup: Zoek het model hierboven op. BikeBook toont de certificering
-            waar deze geregistreerd staat.
           over_28_mph: Meer dan 45 km/u
-          visit_bikebook_link: Bezoek BikeBook.
-          custom_details: Aangepaste details
           details_legend: De gegevens van uw fiets
           model_details: "%{model} details"
           country: Land
@@ -7345,6 +7364,13 @@ nl:
           over_20_mph: Meer dan 32 km/u
           top_assist_speed: Topsnelheid met trapondersteuning
           top_throttle_speed: Topsnelheid bij gas geven
+          bike_book_didnt_load: Bike Book is niet geladen. Voer hieronder de gegevens
+            van uw fiets in.
+          bike_book_loading: Fietsboek laden…
+          how_to_check_lookup_bike_book: Zoek het model hierboven op. Bike Book toont
+            de certificering waar deze geregistreerd staat.
+          visit_bike_book_link: Bezoek Bike Book.
+          select_custom_values: Selecteer aangepaste waarden
         state_reference:
           compiling: We verzamelen momenteel de regels voor e-bikes van %{state} op
             basis van gegevens van de staatslegislatuur en de RDW. Kom binnenkort
@@ -7665,8 +7691,6 @@ nl:
             hun staat en fiets en zien binnen 30 seconden of het legaal is om ermee
             te rijden, welke certificeringen er zijn en welke regels gelden. Het antwoord
             leidt direct naar de registratiepagina.
-          checker_point_bikebook: Klasse, motor, topsnelheid en UL-certificering uit
-            de e-bikecatalogus van BikeBook.
           checker_point_program: Binnen uw programma kunnen medewerkers de classificatie
             en de nalevingsstatus van elke geregistreerde e-bike inzien.
           checker_point_states: Staatsregels betreffende motorklassen, maximumsnelheden,
@@ -7881,9 +7905,6 @@ nl:
             landingspagina met de huisstijl van de stad, een formulier op uw website
             of een QR-code.
           registration_step_1_title: Bewoners registreren zich
-          registration_step_2_body: BikeBook identificeert het model en de klasse
-            waartoe het behoort, waarna de fietser het leerproces doorloopt. Bij gewone
-            fietsen wordt deze stap overgeslagen.
           registration_step_2_title: E-bikes worden geclassificeerd
           registration_step_3_body: Status (geregistreerd, gestolen of teruggevonden),
             merk, model, kleur en serienummer. Agenten en medewerkers kunnen het voertuig
@@ -7919,6 +7940,11 @@ nl:
           faq_checker_answer_html: De fietsdetails zijn afkomstig van %{bikebook_link},
             een catalogus van e-bike modellen met hun klasse, motor, snelheid en UL-certificering.
             De staatsregels worden vermeld met de bijbehorende wetgeving.
+          checker_point_bike_book: Klasse, motor, topsnelheid en UL-certificering
+            uit de e-bike catalogus van Bike Book.
+          registration_step_2_bike_book_body: Bike Book identificeert het model en
+            de klasse waartoe het behoort, waarna de fietser het leerproces doorloopt.
+            Bij gewone fietsen wordt deze stap overgeslagen.
         for_cities_education:
           all_set: Je bent er helemaal klaar voor.
           back: Rug

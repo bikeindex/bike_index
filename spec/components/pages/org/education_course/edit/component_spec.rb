@@ -47,7 +47,7 @@ RSpec.describe Pages::Org::EducationCourse::Edit::Component, type: :component do
   end
 
   context "admin" do
-    let(:education_course) { FactoryBot.create(:education_course_template, :with_pages) }
+    let(:education_course) { FactoryBot.create(:education_course_default, :with_pages) }
 
     it "counts the pages and links Add page through the admin routes" do
       render_inline(described_class.new(education_course:, admin: true))

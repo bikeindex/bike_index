@@ -2397,6 +2397,7 @@ es:
           successfully_created: Se ha creado una notificación de estacionamiento para
             %{bike_type}.
           unable_to_create: No se puede crear - %{errors}
+          successfully_impounded: Se confiscó este %{bike_type}
       stickers:
         find_bike_sticker:
           unable_to_find_sticker: 'No se pudo encontrar la pegatina con el código:
@@ -4550,6 +4551,7 @@ es:
         through_org: a través de %{org_name}
         motorized: "¿Vehículo eléctrico?"
         vehicle_type: Tipo
+        step: Paso
       recoveries:
         description: Descripción
         mfg_model_color_html: fabricante, modelo, <span class="less-strong">color</span>
@@ -5510,6 +5512,9 @@ es:
           para finalizar el registro.
         link_signs_you_in: Este enlace te da acceso a Bike Index, así que no lo reenvíes.
           Funciona durante %{days} días.
+        e_vehicle_safety_rules_owed_html: Tu <strong>%{color_and_brand}</strong> está
+          registrado en Bike Index. Acepta las normas de seguridad para vehículos
+          eléctricos para finalizar el registro.
       confirmation_email:
         click_to_sign_in_html: ¡Haz clic en el botón <em>"Iniciar sesión</em> " para
           finalizar tu registro!
@@ -5672,6 +5677,14 @@ es:
       recovery_display_card:
         recovered: Recuperado
         translated_from_english: traducido del inglés
+      registration_step:
+        awaiting_email_confirmation: Esperando confirmación por correo electrónico
+        education_page: Página de educación %{number}
+        education_review: Revisión de educación
+        finished: Finalizado
+        report: Informe
+        step_1: Paso 1
+        step_2: Paso 2
     pages:
       messages:
         thread_show:
@@ -5897,6 +5910,8 @@ es:
             parking_notifications: notificaciones de estacionamiento
             find_a_parking_notification: Encontrar una notificación de estacionamiento
             search_parking_notifications: Buscar notificaciones de estacionamiento
+            search_notification_message_or_notes: Mensaje/notas de notificación de
+              búsqueda
           table:
             address: DIRECCIÓN
             bike: Bicicleta
@@ -6117,6 +6132,7 @@ es:
               impound_this_bike_type: Confiscar esto %{bike_type}
               not_shown_to_user: no se muestra al usuario
               parking_notification_notes: "%{org_name} notas internas"
+              submit_parking_notification: Crear notificación de estacionamiento
             parking_notification_show:
               no_notifications: No hay notificaciones de estacionamiento para este
                 %{bike_type}
@@ -6199,6 +6215,9 @@ es:
             unregistered_owner: Este %{bike_type} no está registrado a ningún usuario.
               Se agregó para realizar un seguimiento de las notificaciones de estacionamiento.
             view_all_registrations: ver todo →
+            not_registered_phone_message: No se dispone de otros datos de contacto
+              del propietario, ya que este %{bike_type} no está registrado en su organización.
+            show_phone: Mostrar teléfono
           marketplace_listing_card:
             condition: Condición
             contact_seller: Contacta con el vendedor
@@ -6251,6 +6270,12 @@ es:
               a continuación."
           share:
             link_copied: Enlace copiado
+          potential_duplicates:
+            count_html: "%{count} encontrado"
+            matching_segments: 'Registros con un número de serie que coincida con
+              los segmentos de este %{bike_type}:'
+            potential_duplicates: Posibles duplicados
+            showing_recent: Mostrando el %{count} más reciente
       search:
         everything_combobox:
           made_by: hecho por
@@ -6998,7 +7023,6 @@ es:
             ánimo de lucro.
           tagline: 'La biblioteca mundial de bicicletas: busca, compara y encuentra
             tu próxima bici.'
-          about_bikebook_label: Acerca de BikeBook
           activities: Actividades
           activity_examples: "(p. ej., ciclismo de montaña, ciclocross, etc.)"
           configuration_examples: "(completo/conjunto de fotogramas)"
@@ -7031,6 +7055,7 @@ es:
           prefer_market_sold_in_html: Prefiero los vehículos vendidos en %{market}
           select_a_vehicle_type: Seleccione un %{bike_type}, elija varios para compararlos.
           select_an_vehicle_type: Seleccione un %{bike_type}, elija varios para compararlos.
+          about_bike_book_label: Acerca del libro sobre bicicletas
         donate_strip:
           donate: Donar
           pitch: Este fantástico producto es posible gracias a la organización sin
@@ -7115,14 +7140,9 @@ es:
           watts_within_cap_html: El motor %{watts}W está dentro de la tapa
           yes_to_html: Sí, a %{mph}
           your_state: Tu estado
-          bikebook_name: Libro de bicicletas
           class_3_throttle_over_html: El acelerador funciona hasta %{mph} mph, más
             allá de las 20 mph se permite el acelerador de un Clase 3.
           class_3_throttle_within_html: El acelerador se detiene a %{mph} mph
-          class_unknown_check_label: BikeBook no indica su clase ni su velocidad máxima,
-            así que compruebe la clase en su etiqueta.
-          entered_unverified: Ingresado por usted, no verificado por BikeBook.
-          full_bikebook_entry: Ver la entrada completa en BikeBook
           over_mph_html: Más de %{mph} mph
           red_headline_manual: Esto no es una bicicleta eléctrica según las normas
             %{state} vigentes.
@@ -7164,8 +7184,6 @@ es:
             límite de %{cap} km/h
           speed_past_kmh_html: Ayuda a superar %{past} km/h; comprueba que se detenga
             a %{cap} km/h.
-          speed_to_check_kmh_html: BikeBook no indica su velocidad máxima, así que
-            compruebe que el motor se detiene a %{cap} km/h.
           speed_within_cap_kmh_html: Ayuda a %{kmh} km/h, dentro del límite
           still_reviewing_province_body: Consulta la normativa vigente sobre bicicletas
             eléctricas en el ministerio de transporte de tu provincia o territorio.
@@ -7278,6 +7296,14 @@ es:
               regla %{count} para verificar.
             other: Esto se clasifica como una bicicleta eléctrica en %{state}, con
               reglas %{count} para verificar.
+          bike_book_name: Libro de bicicletas
+          class_unknown_in_bike_book_label: Bike Book no indica su clase ni su velocidad
+            máxima, así que compruebe la clase en su etiqueta.
+          entered_unverified_by_bike_book: Ingresado por usted, no verificado por
+            Bike Book.
+          full_bike_book_entry: Ver la entrada completa del Libro de Bicicletas
+          speed_to_check_bike_book_kmh_html: Bike Book no indica su velocidad máxima,
+            así que compruebe que el motor se detiene a %{cap} km/h.
         rule_label:
           classes: Clases reconocidas
           power: condensador de potencia del motor
@@ -7389,14 +7415,7 @@ es:
             exigen esta certificación antes de permitir el acceso de bicicletas eléctricas
             a espacios cerrados.
           watts_placeholder: p. ej. 750
-          bikebook_didnt_load: BikeBook no se cargó. Introduce los datos de tu bicicleta
-            a continuación.
-          bikebook_loading: Cargando BikeBook…
-          how_to_check_lookup: Consulta el modelo que aparece más arriba. BikeBook
-            muestra la certificación cuando está registrada.
           over_28_mph: Más de 28 mph
-          visit_bikebook_link: Visita BikeBook.
-          custom_details: Detalles personalizados
           details_legend: Detalles de tu bicicleta
           model_details: "%{model} detalles"
           country: País
@@ -7436,6 +7455,13 @@ es:
           over_20_mph: Más de 32 km/h
           top_assist_speed: Velocidad máxima con asistencia al pedaleo
           top_throttle_speed: Velocidad máxima del acelerador
+          bike_book_didnt_load: No se pudo cargar Bike Book. Introduce los datos de
+            tu bicicleta a continuación.
+          bike_book_loading: Cargando libro de bicicletas…
+          how_to_check_lookup_bike_book: Mira el modelo de arriba. Bike Book muestra
+            la certificación cuando está registrada.
+          visit_bike_book_link: Visita Bike Book.
+          select_custom_values: Seleccione valores personalizados
         state_reference:
           compiling: Estamos recopilando las normas sobre bicicletas eléctricas de
             %{state} de la legislatura estatal y del DMV. Vuelva pronto.
@@ -7759,8 +7785,6 @@ es:
             seleccionan su estado y su bicicleta y, en menos de 30 segundos, pueden
             comprobar si es legal circular con ella, qué certificación posee y qué
             normas se aplican. La respuesta permite registrarla directamente.
-          checker_point_bikebook: Clase, motor, velocidad máxima y certificación UL
-            del catálogo de modelos de bicicletas eléctricas de BikeBook.
           checker_point_program: Dentro de su programa, el personal puede ver la clase
             y el estado de cumplimiento de cada bicicleta eléctrica registrada.
           checker_point_states: Normativa estatal sobre clases, límites de cilindrada,
@@ -7984,9 +8008,6 @@ es:
             a través de una página de destino con la marca de la ciudad, un formulario
             en su sitio web o una pegatina con código QR.
           registration_step_1_title: Registro de residentes
-          registration_step_2_body: BikeBook identifica el modelo y su clase, y el
-            ciclista completa el proceso de aprendizaje. Las bicicletas convencionales
-            no lo incluyen.
           registration_step_2_title: Las bicicletas eléctricas se clasifican
           registration_step_3_body: Estado (registrado, robado o recuperado), marca,
             modelo, color y número de serie. Los agentes y el personal lo buscan por
@@ -8025,6 +8046,11 @@ es:
             un catálogo de modelos de bicicletas eléctricas con su clase, motor, velocidad
             y certificación UL. Las normas estatales se enumeran junto con las leyes
             que las respaldan.
+          checker_point_bike_book: Clase, motor, velocidad máxima y certificación
+            UL del catálogo de modelos de bicicletas eléctricas de Bike Book.
+          registration_step_2_bike_book_body: Bike Book identifica el modelo y su
+            clase, y el ciclista completa su proceso de aprendizaje. Las bicicletas
+            convencionales no lo incluyen.
         for_cities_education:
           all_set: Ya está todo listo.
           back: Atrás

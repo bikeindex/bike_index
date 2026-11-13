@@ -1,7 +1,8 @@
 import { html, nothing } from 'lit-html'
 import { basics } from 'bikebook/templates/vehicles/basics'
 import { withColorwayPhoto } from 'bikebook/colorways'
-import { chosenSizes, paramList, pickedColorways, pickedSizes, picksParam, vehicleKeys } from 'bikebook/sizes'
+import { chosenSizes } from 'bikebook/sizes'
+import { groupId, openJson, pickedColorways, pickedSizes, vehicleIds, vehicleKeys, vehiclesOf, withGroup, withoutVehicle, withSize, withVehicles } from 'bikebook/vehicle_models'
 import { comparisonTable } from 'bikebook/templates/vehicles/comparison_table'
 import { cycleDrawing } from 'bikebook/templates/vehicles/cycle_drawing'
 import { emptyState } from 'bikebook/templates/vehicles/empty_state'
@@ -38,7 +39,6 @@ export class VehicleViewer {
   // above the views, its settings, and its `results` once they're scored
   render (picks, url, preferredSize, search, { group = null, similar } = {}) {
     const { presenter, outOfClassId } = this
-    const values = picks.map(({ value }) => value)
     const vehicles = withChosenPhotos(url, picks)
     const photos = pickedPhotos(vehicles)
     const colorways = pickedColorways(url)
@@ -60,13 +60,9 @@ export class VehicleViewer {
     const selectedSizes = new Map(vehicles.map(({ key }, index) => [key, sizes[index]?.name]))
     const baseline = vehicles[0]
     const others = (key) => key === baseline.key ? [] : [baseline.data]
-    // without the vehicle at `index`, the others' picked sizes and colorways following them
-    const removePath = (index) => {
-      const without = (list) => list.filter((_, each) => each !== index).join(',')
-      const remaining = (chosen) => without(vehicles.map(({ key }) => chosen[key] ?? '')).replace(/,+$/, '')
-      return pathWith(url, { vehicle_models: without(values), vehicle_sizes: remaining(picked), vehicle_colorways: remaining(colorways) })
-    }
-    const sizePath = (key) => (name) => pathWith(url, { vehicle_sizes: picksParam(values, { ...picked, [key]: name }) })
+    const json = openJson(url)
+    const removePath = (index) => pathWith(withoutVehicle(url, vehicles[index].key))
+    const sizePath = (key) => (name) => pathWith(withSize(url, key, name))
     // a figure's letter lights it on each drawing, card and table row, until it's clicked again
     const highlight = url.searchParams.get('figure')
     const figurePath = (key) => pathWith(url, { figure: key === highlight ? '' : key })
@@ -133,7 +129,7 @@ export class VehicleViewer {
     const views = {
       // comparing, the overlay, each column topped and footed in its frame's color
       basics: () => {
-        const overview = { presenter, vehicles, market: this.card.market, outOfClassId, removePath, colorways, groupPath: (value) => pathWith(url, { group: value }), shownGroup: group && url.searchParams.get('group') }
+        const overview = { presenter, vehicles, market: this.card.market, outOfClassId, removePath, colorways, groupPath: (value) => pathWith(withGroup(url, value)), shownGroup: group && groupId(url) }
         const groupModels = group ? modelGroup({ group, card: (model) => this.#toggleCard(url, model, 'group', photos) }) : nothing
         if (!comparing) return html`${basics(overview)}${groupModels}`
         return html`${withOverlay((corner) => basics({
@@ -172,7 +168,7 @@ export class VehicleViewer {
       motors: () => cardRow('tw:mt-6', cards('motors', 'No motor', (data, key) => motorsOf({ presenter, data, others: others(key), outOfClassId }))),
       all: () => {
         const full = vehicles.map(({ data, value, key }, index) => modelViewer({
-          presenter, data, value, market: this.card.market, comparing, idSuffix: index + 1, others: others(key), removePath: removePath(index), selectedSize: selectedSizes.get(key), sizePath: sizePath(key), outOfClassId
+          presenter, data, value, key, jsonOpen: Boolean(json[key]), market: this.card.market, comparing, idSuffix: index + 1, others: others(key), removePath: removePath(index), selectedSize: selectedSizes.get(key), sizePath: sizePath(key), outOfClassId
         }))
         return cardRow('tw:mt-6', full)
       }
@@ -225,19 +221,19 @@ export class VehicleViewer {
 
   // The cards of the models most like the first at `url`, those it compares showing `photos`' photo of them
   similarResults (url, results, photos) {
-    const full = paramList(url, 'vehicle_models').filter(Boolean).length >= MAX_COMPARE && MAX_COMPARE
+    const full = vehicleIds(url).length >= MAX_COMPARE && MAX_COMPARE
     return similarResults({ results, cards: results?.models.map((model) => this.#toggleCard(url, model, 'similar', photos)), full })
   }
 
   // `model`'s card, a link adding it to the comparison at `url` or taking it out, which renders in place, focusing it again
   #toggleCard (url, model, idPrefix, photos) {
-    const values = paramList(url, 'vehicle_models').filter(Boolean)
-    const active = values.includes(model.id)
-    const next = active ? values.filter((value) => value !== model.id) : [...values, model.id]
+    const picked = vehiclesOf(url)
+    const active = picked.some(({ id }) => id === model.id)
+    const next = active ? picked.filter(({ id }) => id !== model.id) : [...picked, { id: model.id }]
     const id = `${idPrefix}-${model.id.replaceAll('/', '-')}`
     return modelCard({
       model: photos.has(model.id) ? { ...model, stock_photo: photos.get(model.id) } : model,
-      href: active || values.length < MAX_COMPARE ? comparedPath(url, next) : null,
+      href: active || picked.length < MAX_COMPARE ? pathWith(withVehicles(url, next)) : null,
       ...this.card,
       toggle: true,
       active,
@@ -259,13 +255,9 @@ const pickedPhotos = (vehicles) => new Map(vehicles.filter(({ data }) => present
 export const chosenPhotos = (url, picks) => pickedPhotos(withChosenPhotos(url, picks))
 
 // This page's URL with `params` laid over its own
-const pathWith = (url, params) => {
+const pathWith = (url, params = {}) => {
   const query = toQuery({ ...Object.fromEntries(url.searchParams), ...params })
   return query ? `${url.pathname}?${query}` : url.pathname
 }
 const typeName = (presenter, data) => presenter.named(presenter.kit.schemas.vehicle, data).type || 'bike'
 const modelName = (presenter, data) => presenter.named(presenter.kit.schemas.vehicle, data).model
-// comparing `ids`, each picked size and colorway following its vehicle
-const comparedPath = (url, ids) => pathWith(url, {
-  vehicle_models: ids.join(','), vehicle_sizes: picksParam(ids, pickedSizes(url)), vehicle_colorways: picksParam(ids, pickedColorways(url))
-})

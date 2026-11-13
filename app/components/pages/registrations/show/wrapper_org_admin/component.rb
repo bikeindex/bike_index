@@ -7,6 +7,7 @@ module Pages
         class Component < ApplicationComponent
           # Template Dependency: Pages::Registrations::Show::ComponentList::Component
           # Template Dependency: Pages::Registrations::Show::CurrentAlerts::Wrapper::Component
+          # Template Dependency: Pages::Registrations::Show::PotentialDuplicates::Component
           include BikeHelper
 
           OTHER_REGISTRATIONS_LIMIT = 10
@@ -32,10 +33,15 @@ module Pages
           # Records shown here that don't touch the bike, so its cache version misses them
           def cache_version
             [other_registrations.maximum(:updated_at), other_registrations_count,
-              *current_alerts_component.cache_version]
+              *current_alerts_component.cache_version, *potential_duplicates_component.cache_version]
           end
 
           private
+
+          def potential_duplicates_component
+            @potential_duplicates_component ||= Pages::Registrations::Show::PotentialDuplicates::Component.new(bike: @bike,
+              organization: @organization, settings: search_settings, column_settings: !other_registrations?)
+          end
 
           def current_alerts_component
             @current_alerts_component ||= CurrentAlerts::Wrapper::Component.new(bike: @bike,
@@ -79,7 +85,13 @@ module Pages
           end
 
           def contact_blocked_message
-            organization_registered? ? translation(".restricted_message") : translation(".not_registered_message", org_name: @organization.short_name)
+            if organization_registered?
+              translation(".restricted_message")
+            elsif show_phone_only?
+              translation(".not_registered_phone_message", bike_type: @bike.type)
+            else
+              translation(".not_registered_message", org_name: @organization.short_name)
+            end
           end
 
           def title
@@ -91,7 +103,14 @@ module Pages
           end
 
           def owner_phone
-            @bike.phone if @bike.phoneable_by?(@current_user, @organization)
+            return @owner_phone if defined?(@owner_phone)
+
+            @owner_phone = (@bike.phone if @bike.phoneable_by?(@current_user, @organization))
+          end
+
+          # phoneable_by? reaches past the org's own bikes; on those, show_contact? decides
+          def show_phone_only?
+            !organization_registered? && owner_phone
           end
 
           # The address renders its own row
@@ -126,9 +145,9 @@ module Pages
               .where.not(id: @bike.id)
           end
 
-          # Shared with the BikesTable so its column set/labels match the toggle panel
-          def other_registrations_settings
-            @other_registrations_settings ||= ComponentStructs::OrgSearchSettings.new(organization: @organization)
+          # Shared by both BikesTables so their column set/labels match the toggle panel
+          def search_settings
+            @search_settings ||= ComponentStructs::OrgSearchSettings.new(organization: @organization)
           end
 
           def other_registrations_count

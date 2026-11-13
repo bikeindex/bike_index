@@ -19,7 +19,7 @@ module Admin
     end
 
     def earliest_period_date
-      Time.at(1792454400) # 2026-10-20 - POS registration matches introduced
+      Time.at(1793491200) # 2026-11-01 - POS registration matches introduced
     end
 
     def matching_pos_registration_matches

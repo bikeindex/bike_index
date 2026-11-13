@@ -4,7 +4,17 @@
   sort_state: ComponentStructs::SortState.new(search_params: {period: "all"}, sort: "first_seen", direction: "desc"),
   column_settings: {storage_key: selection ? "tableInCardSelectionPreview" : "tableInCardPreview", columns:, defaults: columns.keys},
   form: ({url: "#"} if selection))) do |table| %>
-  <% table.selection_column(param: "cryptids") if selection %>
+  <% if selection %>
+    <% table.with_actions do %>
+      <%= render(UI::Forms::Group::Component.new(attribute: :habitat, required: true, wrapper_class: "tw:mb-0")) do %>
+        <%= text_field_tag :habitat, nil, required: true, class: "twinput" %>
+      <% end %>
+
+      <%= render(UI::Button::Component.new(text: "Relocate selected", color: :primary, size: :sm, type: :submit)) %>
+    <% end %>
+
+    <% table.selection_column(param: "cryptids") %>
+  <% end %>
 
   <%# lower_right takes no room of its own, and the frozen column shrinks to its content %>
   <% table.column(label: "Cryptid", lower_right: ->(record) { record.region }) { |record| tag.div(record.name, class: "tw:min-w-60") } %>
