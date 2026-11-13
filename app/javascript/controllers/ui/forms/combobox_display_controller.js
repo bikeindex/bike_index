@@ -89,11 +89,14 @@ export default class extends Controller {
     const inputRect = this.input.getBoundingClientRect()
     const wrapperRect = this.element.getBoundingClientRect()
     const computed = window.getComputedStyle(this.input)
+    // The rects are in screen pixels, the styles in the wrapper's own - they part under a
+    // CSS zoom or scale, like the /for_cities phones
+    const scale = this.element.offsetWidth / wrapperRect.width || 1
     Object.assign(this.overlayTarget.style, {
-      top: `${inputRect.top - wrapperRect.top}px`,
-      left: `${inputRect.left - wrapperRect.left}px`,
-      width: `${inputRect.width}px`,
-      height: `${inputRect.height}px`,
+      top: `${(inputRect.top - wrapperRect.top) * scale}px`,
+      left: `${(inputRect.left - wrapperRect.left) * scale}px`,
+      width: `${inputRect.width * scale}px`,
+      height: `${inputRect.height * scale}px`,
       font: computed.font,
       paddingLeft: computed.paddingLeft,
       paddingRight: computed.paddingRight,
