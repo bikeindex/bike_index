@@ -9,6 +9,11 @@ RSpec.describe "Sitemaps pages" do
     expect((SitemapPages::ADDITIONAL & target_additional_paths).count).to eq target_additional_paths.count
   end
 
+  it "lists only routed paths" do
+    (SitemapPages::INFORMATION + SitemapPages::ADDITIONAL)
+      .each { expect(Rails.application.routes.recognize_path("/#{it}")).to be_present }
+  end
+
   context "with parsed routes" do
     let(:all_app_routes) do
       Rails.application.routes.routes.collect { |route|
