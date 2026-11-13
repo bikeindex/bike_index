@@ -475,8 +475,12 @@ class Bike < ApplicationRecord
   end
 
   # matches current scope
+  def current_with_user_hidden?
+    !example? && deleted_at.blank? && !likely_spam
+  end
+
   def current?
-    !example? && !user_hidden && deleted_at.blank? && !likely_spam
+    current_with_user_hidden? && !user_hidden
   end
 
   # The register flow creates the bike ahead of its organization's safety rules

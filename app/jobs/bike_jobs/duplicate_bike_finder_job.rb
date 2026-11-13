@@ -6,8 +6,7 @@ module BikeJobs
       bike = Bike.unscoped.find_by_id(bike_id)
       return true if bike.blank?
 
-      should_delete = bike.blank? || bike.deleted_at.present? || bike.example ||
-        bike.likely_spam
+      should_delete = !bike.current_with_user_hidden?
 
       serial_segments = NormalizedSerialSegment.where(bike_id: bike_id)
 
@@ -39,8 +38,7 @@ module BikeJobs
       other_segments = duplicate_bike_group.normalized_serial_segments.where.not(id: normalized_serial_segment.id)
       # Check the other segments to verify that *they* aren't orphans
       valid_segments, orphaned_segments = other_segments.partition do |other_segment|
-        bike = Bike.unscoped.find_by_id(other_segment.bike_id)
-        bike.present? && bike.deleted_at.blank? && !bike.example && !bike.likely_spam
+        Bike.unscoped.find_by_id(other_segment.bike_id)&.current_with_user_hidden?
       end
       orphaned_segments.each(&:destroy)
       return if valid_segments.count > 1
