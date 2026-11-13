@@ -24,7 +24,7 @@ RSpec.describe BikeJobs::MergePosRegistrationJob, type: :job do
     bike_sticker = FactoryBot.create(:bike_sticker_claimed, bike:, user:)
     bike_organization = FactoryBot.create(:bike_organization, bike:)
     customer_contact = FactoryBot.create(:customer_contact, bike:)
-    organization_message = FactoryBot.create(:organization_message, bike:)
+    notification = FactoryBot.create(:notification, user:, bike:, kind: :finished_registration)
     bike.current_ownership.update!(registration_info: {"phone" => "7183839292"})
     expect(pos_bike.reload.user_hidden).to be_truthy
 
@@ -33,7 +33,7 @@ RSpec.describe BikeJobs::MergePosRegistrationJob, type: :job do
     expect(pos_bike.reload).to have_attributes(frame_model: "Roadster", year: 2023, description: "Red basket",
       propulsion_type: "pedal-assist", user_hidden: false)
     expect([public_image, private_image].map { PublicImage.unscoped.find(it.id).imageable_id }).to eq([pos_bike.id] * 2)
-    expect([component, bike_sticker, bike_organization, customer_contact, organization_message].map { it.reload.bike_id })
+    expect([component, bike_sticker, bike_organization, customer_contact, notification].map { it.reload.bike_id })
       .to eq([pos_bike.id] * 5)
     expect(pos_bike.current_ownership.reload).to have_attributes(claimed: true, registration_info: {"phone" => "7183839292"})
     expect(match.reload.status).to eq "merged"

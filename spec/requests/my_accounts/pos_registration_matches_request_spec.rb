@@ -16,9 +16,8 @@ RSpec.describe MyAccounts::PosRegistrationMatchesController, type: :request do
     end
 
     it "combines them, and sends the deleted registration's links to the POS registration" do
-      Sidekiq::Testing.inline! do
-        patch url, params: {same_bike: "true"}
-      end
+      patch url, params: {same_bike: "true"}
+      BikeJobs::MergePosRegistrationJob.drain
       pos_bike = pos_registration_match.pos_bike
       expect(response).to redirect_to(bike_path(pos_bike))
       expect(flash[:success]).to eq "Thanks! We're combining your bike's registrations into one. It takes a minute."
