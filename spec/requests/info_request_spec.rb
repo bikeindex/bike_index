@@ -155,6 +155,12 @@ RSpec.describe InfoController, type: :request do
         expect(response).to redirect_to("/donate/year-end-2026?initial_amount=500&source=eoy-2026-recovered")
         expect(response.status).to eq(302)
       end
+
+      it "redirects the underscored spelling, with the email's params" do
+        get "/donate/year_end_2026?source=eoy-2026-recovered"
+        expect(response).to redirect_to("/donate/year-end-2026?source=eoy-2026-recovered")
+        expect(response.status).to eq(301)
+      end
     end
 
     # serials is the one static page that links default_bike_search_path
@@ -233,7 +239,7 @@ RSpec.describe InfoController, type: :request do
       get "/why-donate"
       expect(response).to redirect_to("/donate")
       get "/why_donate"
-      expect(response).to redirect_to("/donate")
+      expect(response).to redirect_to("/why-donate")
       get "/info/#{blog.title_slug}"
       expect(response).to redirect_to("/donate")
     end

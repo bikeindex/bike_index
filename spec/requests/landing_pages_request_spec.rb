@@ -58,6 +58,10 @@ RSpec.describe LandingPagesController, type: :request do
     it "redirects to for_community_groups_path" do
       expect(get("/for_advocacy")).to redirect_to(for_community_groups_path)
     end
+
+    it "redirects the dashed spelling, keeping the query" do
+      expect(get("/for-advocacy?utm_source=newsletter")).to redirect_to("/for_advocacy?utm_source=newsletter")
+    end
   end
 
   {
