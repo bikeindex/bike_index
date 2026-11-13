@@ -24,6 +24,10 @@ RSpec.describe UI::Forms::RadioButtonGroup::Component, :js, type: :system do
       expect(page).to have_css "input[name='search_status'][value=''][checked]", visible: :all
       expect_axe_clean
 
+      # Keyboard focus widens the selected chip's ring past is-active's ring-2
+      page.send_keys(:tab)
+      expect(computed_ring(label("All"))).to include("0px 0px 0px 3px")
+
       find("label", text: "Active").click
       expect(page).to have_css "input[name='search_status'][value='active']:checked", visible: :all
 
