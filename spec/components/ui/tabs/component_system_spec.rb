@@ -8,6 +8,9 @@ RSpec.describe UI::Tabs::Component, :js, type: :system do
   it "scrolls the row only when the tabs are wider than it" do
     page.current_window.resize_to(500, 800)
     visit "/rails/view_components/ui/tabs/component/many_tabs"
+    # The overflow class is server-rendered, so only the lazy-loaded controller's connect says
+    # it has measured the row and scrolled to the active tab
+    wait_for_stimulus("ui--tabs")
 
     # Too narrow for seven tabs, so the row scrolls, and starts scrolled to the active last one
     expect(page).to have_css(scrolling)
