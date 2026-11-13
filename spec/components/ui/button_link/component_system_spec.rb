@@ -16,18 +16,19 @@ RSpec.describe UI::ButtonLink::Component, :js, type: :system do
       expect(looks.values.uniq.count).to eq(4), "#{color} repeats a look: #{looks.inspect}"
       expect_axe_clean if index.zero?
 
-      # The same contract the button holds: hovered, it looks the way any link does pressed,
-      # and pressing it adds only focus's ring
+      # The same contract the button holds: an active link is already showing its active
+      # colors, so hover, focus and press only widen the ring, where it has one
       visit "/rails/view_components/ui/button_link/component/#{color}_active"
       active = find("a[data-active='true']")
       active_looks = {resting: state_of(active)}
       hover_then_press(active) { |state| active_looks[state] = state_of(active) }
       active_looks[:focus] = state_of(active)
 
-      expect(active_looks[:hover].first).to eq(looks[:press].first), "#{color} hovers active unlike it presses"
-      expect(active_looks[:hover]).to_not eq(active_looks[:resting]), "#{color} shows nothing on hover"
+      ringed = !UI::Button::Component::LINK_COLORS.include?(color)
+      expect(active_looks[:hover] != active_looks[:resting]).to eq(ringed), "#{color} hovers wrong: #{active_looks.inspect}"
       expect(active_looks[:focus]).to_not eq(active_looks[:resting]), "#{color} shows nothing on focus"
-      expect(active_looks[:press]).to eq([active_looks[:hover].first, active_looks[:focus].last]), "#{color} presses unlike it hovers and focuses"
+      expect(active_looks[:press]).to eq(active_looks[:focus]), "#{color} presses differently than it focuses"
+      expect(active_looks.values.map(&:first).uniq.count).to eq(1), "#{color} changed color, not just its ring"
       expect_axe_clean if index.zero?
 
       # An <a> takes no :disabled, so what holds here is the aria-disabled half of each guard

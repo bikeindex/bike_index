@@ -8,7 +8,7 @@ const SEGMENT_CLASSES = `${BASE_CLASSES} ${FOCUS_CLASSES} ${DISABLED_CLASSES} ` 
   'tw:rounded-lg tw:px-3 tw:py-[5px] tw:text-[11.5px]/[1.2] tw:font-extrabold tw:whitespace-nowrap tw:transition-colors tw:justify-start! tw:no-underline ' +
   'tw:hover:no-underline tw:text-gray-600 tw:dark:text-gray-400 tw:not-disabled:not-aria-disabled:hover:text-gray-900 tw:dark:not-disabled:not-aria-disabled:hover:text-gray-100 tw:focus:ring-purple-500/40 tw:is-active:bg-white ' +
   'tw:is-active:text-gray-900 tw:is-active:shadow-sm tw:is-active:dark:bg-gray-900 tw:is-active:dark:text-gray-100 tw:mb-0 tw:relative ' +
-  'tw:has-[:focus-visible]:outline-none tw:has-[:focus-visible]:ring-3 tw:has-[:focus-visible]:ring-purple-500/40'
+  'tw:has-[:focus-visible]:outline-none tw:has-[:focus-visible]:ring-3 tw:is-active:has-[:focus-visible]:ring-3 tw:has-[:focus-visible]:ring-purple-500/40'
 
 // UI::Forms::RadioButtonGroup::Component of the toggle kind. `attributes` is its html_options, on each radio, less a class
 export const radioButtonGroup = ({ name, entries, selected, attributes: htmlOptions = {} }) => html`<div class=${TRACK_CLASSES} data-controller="ui--toggle">${entries.map(({ value, label, disabled }) =>

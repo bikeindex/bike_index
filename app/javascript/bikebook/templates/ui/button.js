@@ -12,9 +12,8 @@ const COLORS = {
     'tw:dark:not-disabled:not-aria-disabled:hover:text-gray-200 tw:rounded-lg tw:p-0 tw:focus:ring-gray-500/40'
 }
 const ACTIVE_COLORS = {
-  secondary: 'tw:is-active:text-white tw:is-active:bg-purple-500 tw:is-active:border-purple-500 tw:is-active:ring-2 tw:is-active:ring-purple-500/40 ' +
-    'tw:is-active:hover:bg-purple-600 tw:is-active:hover:border-purple-600',
-  link_gray: 'tw:is-active:text-gray-900 tw:is-active:dark:text-gray-100 tw:is-active:hover:text-gray-950 tw:is-active:dark:hover:text-white'
+  secondary: 'tw:is-active:text-white tw:is-active:bg-purple-500 tw:is-active:border-purple-500 tw:is-active:ring-2 tw:is-active:hover:ring-3 tw:is-active:ring-purple-500/40',
+  link_gray: 'tw:is-active:text-gray-900 tw:is-active:dark:text-gray-100'
 }
 // UI::Button::Component::LINK_COLORS
 export const LINK_COLORS = ['link', 'link_gray']
