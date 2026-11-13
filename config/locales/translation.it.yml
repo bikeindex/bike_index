@@ -7654,26 +7654,15 @@ it:
           form_title: Finanziare la prossima ripresa
           headline: Tutte le biciclette sopra elencate sono tornate a casa perché
             la registrazione era gratuita
-          larger_gift_link: Parlaci di una donazione più consistente
           lede_short: Bike Index è un'organizzazione senza scopo di lucro. La registrazione,
             la ricerca e la segnalazione di furti sono gratuite. Sono le donazioni
             che permettono di mantenerla tale.
-          major_benefactor: Benefattore
           major_body: Le donazioni di questo livello sono destinate all'inserimento
             dei partner, alle indagini sui furti transfrontalieri e allo sviluppo
             tecnico delle notifiche promozionali.
           major_eyebrow: Donazioni importanti
-          major_partner: Partner
           major_title: Le donazioni più consistenti permettono di inserire intere
             città nel registro.
-          other_ways_daf: Sovvenzioni da fondi gestiti da donatori — possiamo inviarvi
-            il nostro codice EIN e i dettagli della sovvenzione.
-          other_ways_match: 'Contributo equivalente da parte del datore di lavoro:
-            molti datori di lavoro raddoppiano la donazione senza alcun costo aggiuntivo
-            per te.'
-          other_ways_stock: Donazioni di azioni o criptovalute, che consentono di
-            evitare le imposte sulle plusvalenze derivanti dall'apprezzamento del
-            valore degli asset.
           other_ways_title: Altri modi per donare a questo livello
           stories_title: Nelle parole dei loro proprietari
           uses_alerts_body: Il sistema di allerta per biciclette rubate e le notifiche
@@ -7691,7 +7680,6 @@ it:
             lunghe indagini sulle bande di ladri che scaturiscono dai dati del registro.
           uses_partners_title: Partner e indagini
           uses_title: Dove vanno i soldi
-          wall_photo_alt: Una bicicletta recuperata grazie a Bike Index
           lede_millions_registered: 'Bike Index è un''organizzazione senza scopo di
             lucro. La registrazione è gratuita, la ricerca è gratuita e la segnalazione
             di un furto è gratuita: ecco perché %{millions} milioni di biciclette
@@ -7729,6 +7717,137 @@ it:
           tier_plus: Abbonamento Plus
           tier_plus_benefit: Tutto incluso nel pacchetto Base, un avviso gratuito
             in caso di furto della bicicletta e un limite di abbonamento.
+        major_gift:
+          benefactor: Benefattore
+          partner: Partner
+        other_ways:
+          daf: Sovvenzioni da fondi gestiti da donatori — possiamo inviarvi il nostro
+            codice EIN e i dettagli della sovvenzione.
+          larger_gift_link: Parlaci di una donazione più consistente
+          match: 'Contributo equivalente da parte del datore di lavoro: molti datori
+            di lavoro raddoppiano la donazione senza alcun costo aggiuntivo per te.'
+          stock: Donazioni di azioni o criptovalute, che consentono di evitare le
+            imposte sulle plusvalenze derivanti dall'apprezzamento del valore degli
+            asset.
+        photo_wall:
+          photo_alt: Una bicicletta recuperata grazie a Bike Index
+        ten_percent:
+          bike_value: Quanto vale la tua bicicletta?
+          heading: Hai ricevuto indietro una bicicletta tramite Bike Index? Dona il
+            10% del suo valore.
+          result_html: Il 10% corrisponde a %{amount}. Lo abbiamo impostato come tuo
+            regalo qui sotto.
+        year_end:
+          bikebook_body: 'La biblioteca mondiale delle biciclette: cerca, confronta
+            e trova la tua prossima bici.'
+          bikebook_eyebrow: Il tuo garage per biciclette, su internet
+          bikebook_link: Dai un'occhiata in anteprima a Bike Book
+          bikebook_title: Incontra Bike Book
+          building_eyebrow: Cosa costruirà il tuo dono in futuro
+          building_intro: Il nostro obiettivo è rendere Bike Index il punto di riferimento
+            online per la tua bicicletta.
+          building_title: Aiutaci a costruire il futuro
+          cta_sub: Lasciate che il servizio rimanga gratuito per il prossimo milione
+            di utenti. Il nostro team vi ringrazia!
+          cta_title: Gratis fin dal primo giorno. Gratis per sempre.
+          eyebrow: Donazioni di fine anno · 2026
+          form_title: Fai il tuo regalo di fine anno
+          goal: Il nostro obiettivo è %{goal} entro il 31 dicembre.
+          headline: Fai una donazione di fine anno a Bike Index. Aiutaci a recuperare
+            più biciclette rubate nel 2027.
+          headline_recovered: La tua bici è arrivata a casa. Aiuta la prossima ad
+            arrivarci.
+          impact_eyebrow: Ecco cosa ha fatto il tuo sostegno nel 2026
+          impact_intro: Ognuno di questi articoli è stato restituito perché qualcuno
+            ha verificato il numero di serie confrontandolo con un registro il cui
+            utilizzo è gratuito.
+          impact_title: Biciclette arrivate a casa
+          lede_recovered_count: Bike Index è gratuito sin dal primo giorno e lo rimarrà
+            per sempre. Quest'anno, grazie a questo servizio di registrazione gratuito,
+            %{recovered} biciclette rubate sono tornate a casa. La tua donazione di
+            fine anno ci permette di continuare a utilizzarlo e di finanziare i nostri
+            progetti futuri.
+          major_eyebrow: Donazioni importanti
+          major_title: Le donazioni più consistenti permettono di inserire intere
+            città nel registro.
+          marketplace_body: Continuiamo a impegnarci per diventare il sito più affidabile
+            dove vendere biciclette usate.
+          marketplace_eyebrow: Compra e vendi usato
+          marketplace_link: Visita il Marketplace
+          marketplace_title: Mercato
+          merch_body: Magliette, adesivi e cappellini. Ogni acquisto contribuisce
+            a sostenere la lista nascita.
+          merch_link: Visita il negozio
+          merch_title: Merchandising e altro
+          network_police: Le biciclette recuperate sono state riconsegnate ai rispettivi
+            proprietari, anziché rimanere inutilizzate in un deposito.
+          network_police_title: forze dell'ordine
+          network_shops: Strumenti che rendono di routine il controllo del numero
+            di serie al momento dell'accettazione. È così che Ted's ha custodito una
+            bicicletta rubata per conto del proprietario.
+          network_shops_title: Negozi di biciclette
+          network_title: Costruire una rete più utile
+          network_universities: Registrazione nel campus e sequestro degli attrezzi,
+            in modo che le biciclette degli studenti vengano restituite invece di
+            essere portate via.
+          network_universities_title: Università
+          other_ways_title: Altri modi per donare
+          quote: '"Quattro anni dopo ho ricevuto un''email tramite il servizio di
+            messaggistica di Bike Index in cui mi veniva comunicato che qualcuno aveva
+            la mia bicicletta e voleva restituirmela. L''ho ritirata questo fine settimana
+            e sono davvero grato all''uomo gentile che me l''ha restituita e a Bike
+            Index per averci fornito una piattaforma che ci ha permesso di entrare
+            in contatto!"'
+          quote_caption: A casa dopo quattro anni
+          shipped_dashboard: Le tue biciclette, gli avvisi e i messaggi, tutto in
+            un unico posto.
+          shipped_dashboard_title: Visualizza tutto sulla tua nuova dashboard
+          shipped_ebike: Registrando ora una e-bike, la sua categoria viene specificata
+            man mano che si procede.
+          shipped_ebike_title: Formazione sulle e-bike, integrata
+          shipped_eyebrow: Spedito quest'anno
+          shipped_intro: Un Bike Index più veloce e intuitivo. Tutto è stato finanziato
+            grazie alle donazioni.
+          shipped_legality: Prima di acquistare una e-bike o di utilizzarla in un
+            luogo nuovo, verifica dove è legale circolare, in base alla classe e alla
+            giurisdizione.
+          shipped_legality_title: Verificatore di legalità delle e-bike
+          shipped_messaging: Flusso di comunicazione semplificato per i partner addetti
+            al recupero di biciclette rubate.
+          shipped_messaging_title: Messaggi migliori
+          shipped_partners: Procedure di sequestro più snelle per città e campus universitari,
+            e flussi di registrazione personalizzati per le e-bike e i marchi che
+            vendono direttamente ai consumatori.
+          shipped_partners_title: Nuove funzionalità per i partner
+          shipped_registration: Meno passaggi tra l'acquisto di una bicicletta e la
+            sua immatricolazione.
+          shipped_registration_title: Un processo di registrazione semplificato
+          shipped_title: Il tuo nuovo Bike Index è qui
+          stat_recovered: Biciclette rubate recuperate nel 2026
+          stat_registered: biciclette immatricolate quest'anno, gratis
+          stat_value: in biciclette restituite ai proprietari
+          stat_value_figure: 1,5 milioni di dollari
+          story_country: '"Il numero di serie è stato trovato presso un negozio di
+            biciclette a Henderson, in Nevada, e mi è stato rispedito. Swanys Cycles
+            è un negozio di biciclette eccezionale e Bike Index mi ha messo in contatto
+            con loro!"'
+          story_country_title: Presente in tutto il paese
+          story_magic: '"Un ragazzo di Rosemount si è aggiudicato un''asta per un
+            deposito abbandonato a Minneapolis. Nel deposito c''erano diverse biciclette.
+            La mia era l''unica registrata. Mi ha contattato tramite Bike Index e
+            abbiamo concordato un orario per il ritiro."'
+          story_magic_title: Un pizzico di magia di Bike Index
+          story_shop: '"Il negozio di biciclette Ted''s Bicycle Shop di Colorado Springs
+            l''ha presa da qualcuno che l''aveva portata lì per una riparazione. Hanno
+            confrontato il numero di serie con quello riportato qui e sono riusciti
+            a tenerla da parte per me."'
+          story_shop_title: Negozio di biciclette di Ted, Colorado Springs
+          ten_percent_button: Calcola il mio 10%
+          ten_percent_prompt: Dicci quanto vale la tua bicicletta e calcoleremo il
+            regalo.
+          ten_percent_statement: Se tutti coloro a cui è stata rubata e ritrovata
+            la bicicletta grazie a Bike Index donassero il 10% del suo valore, copriremmo
+            i nostri costi operativi di base per il prossimo anno.
       landing_pages:
         demo_modal:
           field_message: C'è qualcos'altro che dovremmo sapere?
@@ -7876,29 +7995,6 @@ it:
             con i numeri di telefono dei proprietari, aggiornato in tempo reale per
             il tuo dipartimento di polizia.
           hot_sheet_title: Foglio informativo sui furti di biciclette
-          mock_batteries: Batterie e ricarica
-          mock_bike_info: Informazioni sulla bicicletta
-          mock_continue: Continuare
-          mock_detected: Rilevato elettrico (motorizzato)
-          mock_electric: Elettrico (motorizzato)
-          mock_electric_help: Verifichiamo che le e-bike siano elettriche, in modo
-            da poterle segnalare e verificarne la certificazione.
-          mock_manufacturer: Produttore
-          mock_next: Prossimo
-          mock_progress: Progressi salvati · Conferma veicolo elettrico · Fase 1 di
-            4
-          mock_rule_certified: Utilizzerò esclusivamente batterie certificate secondo
-            gli standard UL 2849 / UL 2271 (o equivalenti).
-          mock_rule_charger: Utilizzerò esclusivamente il caricabatterie del produttore,
-            mai incustodito o in corridoi o vie di fuga.
-          mock_rule_report: Smetterò di utilizzare il prodotto e segnalerò qualsiasi
-            batteria danneggiata, gonfia o surriscaldata.
-          mock_sub: Westbrook ha alcune norme di sicurezza da rispettare prima di
-            poter completare la registrazione.
-          mock_title: Sembra che tu abbia un veicolo elettrico!
-          mock_traditional_bike: Bicicletta tradizionale
-          mock_traditional_bike_note: "(2 ruote, 1 sedile, pedali)"
-          mock_vehicle_type: Tipo di veicolo
           nav_checker: Controllore di stato
           nav_education: Regole per le e-bike
           nav_faq: FAQ

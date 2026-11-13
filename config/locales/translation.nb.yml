@@ -7303,23 +7303,14 @@ nb:
           eyebrow: Gjenopprettet og returnert
           form_title: Finansier den neste gjenopprettingen
           headline: Alle syklene ovenfor kom hjem fordi registeret var gratis
-          larger_gift_link: Snakk med oss om en større gave
           lede_short: Bike Index er en ideell organisasjon. Registrering, ransaking
             og tyverirapporter koster ingenting. Donasjoner er det som holder det
             slik.
-          major_benefactor: Velgjører
           major_body: Gaver på dette nivået går til onboarding av partnere, etterforskning
             av tyveri på tvers av landegrenser og ingeniørarbeidet bak promoterte
             varsler.
           major_eyebrow: Stor gaver
-          major_partner: Partner
           major_title: Større gaver flytter hele byer inn i registeret
-          other_ways_daf: Giverstyrte fondstilskudd – vi kan sende deg EIN-nummeret
-            ditt og stipendinformasjonen din.
-          other_ways_match: Arbeidsgivermatching – mange arbeidsgivere vil matche
-            en donasjon uten ekstra kostnad for deg.
-          other_ways_stock: Gaver i form av aksjer eller kryptovaluta, som unngår
-            kapitalgevinster på verdiøkende eiendeler.
           other_ways_title: Andre måter å gi på dette nivået
           stories_title: Med eiernes ord
           uses_alerts_body: Varslingssystemet for stjålne sykler og de promoterte
@@ -7336,7 +7327,6 @@ nb:
             de langvarige tyveriundersøkelsene som kommer ut av registerdataene.
           uses_partners_title: Partnere og etterforskninger
           uses_title: Hvor pengene går
-          wall_photo_alt: En sykkel funnet gjennom Bike Index
           lede_millions_registered: Bike Index er en ideell organisasjon. Registrering
             koster ingenting, søking koster ingenting, og rapportering av tyveri koster
             ingenting – og det er derfor %{millions} millioner sykler er i registeret,
@@ -7372,6 +7362,119 @@ nb:
           tier_plus: Pluss-medlemskap
           tier_plus_benefit: Alt i Basic, et gratis promoteringsvarsel hvis sykkelen
             din blir stjålet og et medlemskapstak
+        major_gift:
+          benefactor: Velgjører
+          partner: Partner
+        other_ways:
+          daf: Giverstyrte fondstilskudd – vi kan sende deg EIN-nummeret ditt og stipendinformasjonen
+            din.
+          larger_gift_link: Snakk med oss om en større gave
+          match: Arbeidsgivermatching – mange arbeidsgivere vil matche en donasjon
+            uten ekstra kostnad for deg.
+          stock: Gaver i form av aksjer eller kryptovaluta, som unngår kapitalgevinster
+            på verdiøkende eiendeler.
+        photo_wall:
+          photo_alt: En sykkel funnet gjennom Bike Index
+        ten_percent:
+          bike_value: Hva er sykkelen din verdt?
+          heading: Har du fått tilbake en sykkel med Bike Index? Gi 10 % av verdien.
+          result_html: 10 % er %{amount}. Vi har angitt det som din gave nedenfor.
+        year_end:
+          bikebook_body: Verdens sykkelbibliotek – søk, sammenlign og finn din neste
+            sykkeltur.
+          bikebook_eyebrow: Sykkelgarasjen din, på internett
+          bikebook_link: Se en sniktitt på Bike Book
+          bikebook_title: Møt sykkelboken
+          building_eyebrow: Hva gaven din bygger opp videre
+          building_intro: Målet vårt er å gjøre Bike Index til sykkelens hjem på internett.
+          building_title: Hjelp oss med å bygge det neste
+          cta_sub: Hold det gratis for den neste millionen passasjerer. Teamet vårt
+            takker deg!
+          cta_title: Fri fra dag én. Fri for alltid.
+          eyebrow: Årsavslutningsgave · 2026
+          form_title: Lag din gave til slutten av året
+          goal: Målet vårt er %{goal} innen 31. desember.
+          headline: Gi en gave til Bike Index på slutten av året. Ta med flere stjålne
+            sykler hjem i 2027.
+          headline_recovered: Sykkelen din kom seg hjem. Hjelp den neste med å komme
+            dit.
+          impact_eyebrow: Hva din støtte gjorde i 2026
+          impact_intro: Hver og en av disse kom tilbake fordi noen sjekket et serienummer
+            mot et register som ikke koster noe å bruke.
+          impact_title: Sykler som kom seg hjem
+          lede_recovered_count: Bike Index har vært gratis siden dag én, og den forblir
+            gratis for godt. I år hjalp det gratis registeret %{recovered} stjålne
+            sykler med å komme hjem. Din gave til slutten av året holder den i gang
+            og betaler for det vi bygger videre.
+          major_eyebrow: Stor gaver
+          major_title: Større gaver flytter hele byer inn i registeret
+          marketplace_body: Fortsetter å bygge opp det mest pålitelige stedet å selge
+            brukte sykler.
+          marketplace_eyebrow: Kjøp og selg brukt
+          marketplace_link: Besøk markedsplassen
+          marketplace_title: Markedsplass
+          merch_body: Skjorter, klistremerker og capser. Hvert kjøp støtter registeret.
+          merch_link: Besøk butikken
+          merch_title: Varer og mer
+          network_police: Gjenfunnede sykler matchet med eiere i stedet for å stå
+            på et rom.
+          network_police_title: Rettshåndhevelse
+          network_shops: Verktøy som gjør det til en rutine å sjekke serienummeret
+            ved innsug. Slik holdt Ted en stjålet sykkel for eieren.
+          network_shops_title: Sykkelbutikker
+          network_title: Bygge et mer nyttig nettverk
+          network_universities: Registrering på campus og beslaglegging av verktøy,
+            slik at studentenes sykler kommer tilbake i stedet for å bli tømt.
+          network_universities_title: Universiteter
+          other_ways_title: Andre måter å gi på
+          quote: "«Fire år senere fikk jeg en e-post gjennom Bike Index sin meldingstjeneste
+            om at noen hadde sykkelen min og ville returnere den til meg. Jeg hentet
+            den i helgen og er så takknemlig for den hyggelige mannen som returnerte
+            den, og for at Bike Index ga oss en plattform der vi kunne komme i kontakt!»"
+          quote_caption: Hjemme etter fire år
+          shipped_dashboard: Sykler, varsler og meldinger på ett sted.
+          shipped_dashboard_title: Se alt på det nye dashbordet ditt
+          shipped_ebike: Registrering av en elsykkel forklarer nå klassen underveis.
+          shipped_ebike_title: Elsykkelopplæring, innebygd
+          shipped_eyebrow: Sendt i år
+          shipped_intro: En raskere og mer brukervennlig sykkelindeks. Donasjoner
+            er betalt for hver del av den.
+          shipped_legality: Finn ut hvor det er lovlig å bruke elsykkelen din, etter
+            klasse og jurisdiksjon, før du kjøper den eller før du sykler et nytt
+            sted.
+          shipped_legality_title: Lovlighetssjekker for elsykler
+          shipped_messaging: Strømlinjeformet kommunikasjonsflyt for partnere innen
+            gjenvinning av stjålne sykler.
+          shipped_messaging_title: Bedre meldinger
+          shipped_partners: Smidigere beslaglegging for byer og campuser, og tilpassede
+            registreringsflyter for elsykler og direkte-til-forbruker-merker.
+          shipped_partners_title: Nye partnerfunksjoner
+          shipped_registration: Færre steg mellom å få en sykkel og å få den registrert.
+          shipped_registration_title: En strømlinjeformet registreringsflyt
+          shipped_title: Din nye sykkelindeks er her
+          stat_recovered: stjålne sykler funnet i 2026
+          stat_registered: sykler registrert i år, gratis
+          stat_value: i sykler returnert til eierne sine
+          stat_value_figure: 1,5 millioner dollar
+          story_country: "«Serienummeret ble søkt opp hos en sykkelbutikk i Henderson,
+            Nevada, og sendt tilbake til meg. Swanys Cycles er en fenomenal sykkelbutikk,
+            og Bike Index ledet dem til meg!»"
+          story_country_title: Finnes over hele landet
+          story_magic: "«En fyr i Rosemount vant et anbud på en forlatt bod i Minneapolis.
+            I boden var det flere sykler. Min var den eneste som var registrert. Han
+            kontaktet meg via Bike Index, og vi avtalte et tidspunkt jeg kunne hente
+            den.»"
+          story_magic_title: Litt Bike Index-magi
+          story_shop: "«Teds sykkelbutikk i Colorado Springs hentet den fra noen som
+            hadde tatt den med til service der. De sammenlignet serienummeret med
+            det som er oppført her, og de klarte å beholde det for meg.»"
+          story_shop_title: Teds sykkelbutikk, Colorado Springs
+          ten_percent_button: Regn ut mine 10%
+          ten_percent_prompt: Fortell oss hva sykkelen din er verdt, så ordner vi
+            gaven.
+          ten_percent_statement: Hvis alle som fikk tilbake stjålne sykkeler med Bike
+            Index donerte 10 % av verdien, ville vi dekket våre grunnleggende driftskostnader
+            for det neste året.
       landing_pages:
         demo_modal:
           field_message: Noe annet vi burde vite?
@@ -7503,28 +7606,6 @@ nb:
           hot_sheet_body: En utskrivbar liste over stjålne sykler i ditt område med
             eiernes telefonnumre, oppdatert i sanntid for politiet ditt.
           hot_sheet_title: Stjålet Bike Hot Sheet
-          mock_batteries: Batterier og lading
-          mock_bike_info: Sykkelinformasjon
-          mock_continue: Fortsette
-          mock_detected: Elektrisk (motorisert) oppdaget
-          mock_electric: Elektrisk (motorisert)
-          mock_electric_help: Sjekk elektriske slik at vi flagger elsykler og verifiserer
-            sertifisering.
-          mock_manufacturer: Produsent
-          mock_next: Neste
-          mock_progress: Fremdrift lagret · Bekreftelse av elbil · Trinn 1 av 4
-          mock_rule_certified: Jeg vil kun bruke batterier som er sertifisert i henhold
-            til UL 2849 / UL 2271 (eller tilsvarende).
-          mock_rule_charger: Jeg lader kun med produsentens lader, aldri uten tilsyn
-            eller i en gang eller utgangsvei.
-          mock_rule_report: Jeg vil slutte å bruke det og rapportere eventuelle skadede,
-            hovne eller overopphetede batterier.
-          mock_sub: Westbrook har noen sikkerhetsregler du må gjennomgå før du kan
-            fullføre registreringen.
-          mock_title: Ser ut som du har et elbil!
-          mock_traditional_bike: Tradisjonell sykkel
-          mock_traditional_bike_note: "(2 hjul, 1 sete, pedaler)"
-          mock_vehicle_type: Bil type
           nav_checker: Statskontrollør
           nav_education: Regler for elsykkel
           nav_faq: Vanlige spørsmål
