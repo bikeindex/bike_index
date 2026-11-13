@@ -41,6 +41,17 @@ RSpec.describe LandingPagesController, type: :request do
       get "/ebike-rules", params: {state: "US-CA", manual: 1, top_speed: 28, throttle: 1}
       expect(response).to redirect_to("/ebike-rules/US/CA?manual=1&throttle=1&top_speed=28")
     end
+
+    it "shows the registration flow's step 1 and the default course's first page, only once there's a course" do
+      get "/for_cities"
+      expect(Capybara.string(response.body)).to have_no_css("[inert] form")
+
+      FactoryBot.create(:education_course_default_active, :with_pages)
+      get "/for_cities"
+      phones = Capybara.string(response.body).all("[inert]", visible: :all)
+      expect(phones.first).to have_field("propulsion_type_motorized", checked: true, visible: :all)
+      expect(phones.last).to have_css("h2", text: "Safety check", visible: :all).and have_text("Step 1 of 3")
+    end
   end
 
   describe "#for_advocacy" do
