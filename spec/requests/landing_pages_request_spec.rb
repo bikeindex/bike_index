@@ -16,14 +16,10 @@ RSpec.describe LandingPagesController, type: :request do
   describe "#for_bike_shops" do
     it "frames the checker on the visitor's place, and California without a location" do
       get "/for_bike_shops", headers: {"HTTP_CF_IPCOUNTRY" => "US", "HTTP_CF_REGION" => "Indiana"}
-      expect(Capybara.string(response.body)).to have_css("iframe[src^='/ebike_rules/US/IN?']", visible: :all)
+      expect(Capybara.string(response.body)).to have_css("iframe[src^='/ebike-rules/US/IN?']", visible: :all)
 
       get "/for_bike_shops"
-      expect(Capybara.string(response.body)).to have_css("iframe[src^='/ebike_rules/US/CA?']", visible: :all)
-    end
-
-    it "redirects the dashed spelling, keeping the query" do
-      expect(get("/for-bike-shops?utm_source=newsletter")).to redirect_to("/for_bike_shops?utm_source=newsletter")
+      expect(Capybara.string(response.body)).to have_css("iframe[src^='/ebike-rules/US/CA?']", visible: :all)
     end
   end
 
@@ -42,14 +38,18 @@ RSpec.describe LandingPagesController, type: :request do
       get "/for_cities"
       expect(Capybara.string(response.body)).to have_css("option[value='US-CA']", text: "California (CA)", visible: :all)
 
-      get "/ebike_rules", params: {state: "US-CA", manual: 1, top_speed: 28, throttle: 1}
-      expect(response).to redirect_to("/ebike_rules/US/CA?manual=1&throttle=1&top_speed=28")
+      get "/ebike-rules", params: {state: "US-CA", manual: 1, top_speed: 28, throttle: 1}
+      expect(response).to redirect_to("/ebike-rules/US/CA?manual=1&throttle=1&top_speed=28")
     end
   end
 
   describe "#for_advocacy" do
     it "redirects to for_community_groups_path" do
       expect(get("/for_advocacy")).to redirect_to(for_community_groups_path)
+    end
+
+    it "redirects the dashed spelling, keeping the query" do
+      expect(get("/for-advocacy?utm_source=newsletter")).to redirect_to("/for_advocacy?utm_source=newsletter")
     end
   end
 

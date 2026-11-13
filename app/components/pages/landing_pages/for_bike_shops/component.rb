@@ -16,7 +16,7 @@ module Pages
         BIKE_BOOK_FRAME_CLASS = "tw:[--frame-crop-x:0px] tw:[--frame-crop-top:258px] tw:@min-[410px]:[--frame-crop-top:240px] tw:[--frame-scale:0.4]"
         PRIVACY_ICON = SharedBlocks::Marketing::SectionHeading::Component::EYEBROW_COLORS[:yellow]
 
-        # checker_place: the visitor's, as /ebike_rules detects it, which the checker's frame shows
+        # checker_place: the visitor's, as /ebike-rules detects it, which the checker's frame shows
         def initialize(recovery_displays:, feedback:, current_user: nil, checker_place: nil)
           @recovery_displays = recovery_displays
           @feedback = feedback

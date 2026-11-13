@@ -35,14 +35,14 @@ RSpec.describe Pages::LandingPages::ForBikeShops::Component, type: :component do
   end
 
   it "frames the checker on California" do
-    expect(component).to have_css("iframe[src='/ebike_rules/US/CA?manual=1&throttle=0&top_speed=20&watts=750']", visible: :all)
+    expect(component).to have_css("iframe[src='/ebike-rules/US/CA?manual=1&throttle=0&top_speed=20&watts=750']", visible: :all)
   end
 
   context "with the visitor's place" do
     let(:options) { {recovery_displays:, feedback: Feedback.new, checker_place: EbikeRuleServices::Places.find("US-OR")} }
 
     it "frames the checker on it" do
-      expect(component).to have_css("iframe[src^='/ebike_rules/US/OR?']", visible: :all)
+      expect(component).to have_css("iframe[src^='/ebike-rules/US/OR?']", visible: :all)
     end
   end
 

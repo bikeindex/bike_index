@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module EbikeRuleServices
-  # Where /ebike_rules has rules, by ISO 3166-2 code: the US states, with their abbreviation, and the places outside
+  # Where /ebike-rules has rules, by ISO 3166-2 code: the US states, with their abbreviation, and the places outside
   # the US the catalog classifies e-vehicles in. A US state's page checks a bike, as a Canadian province's does
   module Places
     extend Functionable

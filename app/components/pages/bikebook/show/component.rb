@@ -53,7 +53,7 @@ module Pages
         def jurisdiction_names = {"US" => translation(".united_states")}
           .merge(EbikeRuleServices::StateLaws::STATES.to_h { ["US-#{it[:abbr]}", it[:name]] })
 
-        # The US classes, then the states' own, which /ebike_rules shows too; a state without them uses the US ones
+        # The US classes, then the states' own, which /ebike-rules shows too; a state without them uses the US ones
         def class_groups
           us = [{id: "class_1", name: translation(".us_class_1")}, {id: "class_2", name: translation(".us_class_2")},
             {id: "class_3", name: translation(".us_class_3")}, EbikeRuleServices::StateLaws::NOT_AN_EBIKE]

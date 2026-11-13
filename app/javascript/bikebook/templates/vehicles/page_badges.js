@@ -36,7 +36,7 @@ export const certificationsOf = (certifications) => {
   return { ul2849: status(2849), ul2271: status(2271), others: listed.filter((each) => !/^UL (2849|2271)$/.test(each)).join(', ') }
 }
 
-// As /ebike_rules shows them: UL 2849's and 2271's badges, then any other the motors' `certifications` list
+// As /ebike-rules shows them: UL 2849's and 2271's badges, then any other the motors' `certifications` list
 export const certificationBadges = (certifications) => {
   const { ul2849, ul2271, others } = certificationsOf(certifications)
   return html`${ulBadges({ ul2849, ul2271 })}${others ? html`<span class="tw:mt-2 tw:block">${others}</span>` : nothing}`

@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe StolenBikeListingsController, type: :request do
   describe "theft-ring" do
     it "redirects to stolen_bike_listings" do
-      get "/theft_rings"
+      get "/theft-rings"
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)
       expect(assigns(:blog)&.id).to be_blank
@@ -12,15 +12,13 @@ RSpec.describe StolenBikeListingsController, type: :request do
       blog.update_column :id, Blog.theft_rings_id
       blog.reload
       expect(blog.id).to eq Blog.theft_rings_id
-      get "/theft_rings"
+      get "/theft-rings"
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)
       expect(assigns(:blog)&.id).to eq blog.id
       expect(assigns(:render_info)).to be_truthy
-      get "/theft_ring"
-      expect(response).to redirect_to("/theft_rings")
-      get "/theft-rings"
-      expect(response).to redirect_to("/theft_rings")
+      get "/theft-ring"
+      expect(response).to redirect_to("/theft-rings")
     end
   end
   describe "index" do

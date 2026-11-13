@@ -27,7 +27,7 @@ class EbikeRulesController < ApplicationController
     end
 
     code = params[:country] && [params[:country], params[:region]].compact.join("-")
-    # /ebike_rules/US, the US chosen from outside it, which picks no state
+    # /ebike-rules/US, the US chosen from outside it, which picks no state
     us_chosen = code == "US"
     place = place_for(code) || raise(ActionController::RoutingError, "Not Found") if code && !us_chosen
     return redirect_to(place_path(place, request.query_parameters), status: :moved_permanently) if place && place[:code] != code
@@ -70,7 +70,7 @@ class EbikeRulesController < ApplicationController
     payload[:logged_search] = true if @logged_search
   end
 
-  # US-CA's is /ebike_rules/US/CA
+  # US-CA's is /ebike-rules/US/CA
   def place_path(place, query = {}) = ReadableQuery.path(ebike_rules_place_path(*place[:code].split("-")), query)
 
   # Two lowercase letters were a US state's before places outside the US had pages, as two uppercase ones still are
@@ -82,7 +82,7 @@ class EbikeRulesController < ApplicationController
     (code == code.downcase && us) || EbikeRuleServices::Places.find(code.upcase) || us
   end
 
-  # The checked country of the page a form was sent from, /ebike_rules/US's too
+  # The checked country of the page a form was sent from, /ebike-rules/US's too
   def page_country
     country, region = request.path_parameters.values_at(:country, :region)
     page = country && place_for([country, region].compact.join("-"))
@@ -92,7 +92,7 @@ class EbikeRulesController < ApplicationController
 
   def default_title =translation(:title, controller_method: :show)
 
-  # The title of the page a place cleared from the form goes to: /ebike_rules, or a checked country's own
+  # The title of the page a place cleared from the form goes to: /ebike-rules, or a checked country's own
   def country_title(country)
     return default_title if country == "US"
 

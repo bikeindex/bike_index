@@ -46,22 +46,18 @@ Rails.application.routes.draw do
     protect_your_bike serials about where vendor_terms resources privacy terms security
     how_not_to_buy_stolen lightspeed membership].each { get it, controller: "info", action: it }
   get "recovery_stories", to: "welcome#recovery_stories", as: :recovery_stories
-  get "donate/year_end_2026", to: "info#donate_year_end", as: :donate_year_end
-  # 302, since a later year's campaign takes it over
-  get "donate/year_end", to: redirect(path: "/donate/year_end_2026", status: 302)
-  get "ebike_rules", to: "ebike_rules#show", as: :ebike_rules
-  get "ebike_rules/:country(/:region)", to: "ebike_rules#show", as: :ebike_rules_place, constraints: {country: /[a-z]{2}/i, region: /[a-z0-9]{1,3}/i}
-  get "e_bike_rules(/*rest)", to: redirect { |_, request| request.fullpath.sub("/e_bike_rules", "/ebike_rules") }
-  get "marketplace/how_it_works", to: "marketplace#how_it_works", as: :marketplace_how_it_works
-  get "theft_rings", to: "stolen_bike_listings#index" # Temporary, may switch to being an info post
+  get "donate/year-end-2026", to: "info#donate_year_end", as: :donate_year_end
+  get "donate/year-end", to: redirect(path: "/donate/year-end-2026", status: 302) # a later year's campaign takes it over
+  get "ebike-rules", to: "ebike_rules#show", as: :ebike_rules
+  get "ebike-rules/:country(/:region)", to: "ebike_rules#show", as: :ebike_rules_place, constraints: {country: /[a-z]{2}/i, region: /[a-z0-9]{1,3}/i}
+  get "e-bike-rules(/*rest)", to: redirect { |_, request| request.fullpath.sub("/e-bike-rules", "/ebike-rules") }
+  get "marketplace/how-it-works", to: "marketplace#how_it_works", as: :marketplace_how_it_works
+  get "theft-rings", to: "stolen_bike_listings#index" # Temporary, may switch to being an info post
 
-  get "for_advocacy", to: redirect(path: "/for_community_groups")
-  get "for_shops", to: redirect(path: "/for_bike_shops")
-  get "ambassadors", to: redirect(path: "/ambassadors_how_to")
-  get "why_donate", to: redirect(path: "/donate")
-  get "lightspeed_integration", to: redirect(path: "/lightspeed")
-  get "theft_ring", to: redirect(path: "/theft_rings")
   %w[stolen_bikes roadmap spokecard how_it_works image_resources dev_and_design].each { get it, to: redirect(path: "/resources") }
+  {"for_advocacy" => "/for_community_groups", "for_shops" => "/for_bike_shops", "ambassadors" => "/ambassadors_how_to",
+   "lightspeed_integration" => "/lightspeed", "why-donate" => "/donate", "theft-ring" => "/theft-rings"}
+    .each { |path, target| get path, to: redirect(path: target) }
   get "ucmerced", to: redirect("/register/new?organization_id=uc-merced")
   get "ambassadors/new", to: redirect("https://docs.google.com/forms/d/e/1FAIpQLSenRXqarY4KFNw1AQ3u5iHwIaaIpgy6cb1sD3YTSQiR0ICeCQ/viewform"), as: :new_ambassador
 
@@ -573,8 +569,8 @@ Rails.application.routes.draw do
   # Short marketplace_listing URLs: /f/<short_id> (and /F/...)
   get "*id", to: "marketplace_listings#show", constraints: {id: %r{[fF]/.*}}, format: false
 
-  # /for-bike-shops answers too, redirecting to /for_bike_shops
-  get "*path", to: redirect { |_, request| DashedPathRedirect.location(request) }, constraints: DashedPathRedirect, format: false
+  # /for-bike-shops and /ebike_rules answer too, redirecting to the spelling routed above
+  get "*path", to: redirect { |_, request| PathSpellingRedirect.location(request) }, constraints: PathSpellingRedirect, format: false
 
   get "*unmatched_route", to: "errors#not_found" if Rails.env.production? || Rails.env.sandbox? # Handle 404s with lograge
 end

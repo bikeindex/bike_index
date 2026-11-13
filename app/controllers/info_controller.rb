@@ -13,7 +13,7 @@ class InfoController < ApplicationController
     elsif @blog.title_slug == Blog.why_donate_slug
       redirect_to(donate_path) && return
     elsif @blog.id == Blog.theft_rings_id
-      redirect_to(theft_rings_path) && return
+      redirect_to("/theft-rings") && return
     elsif @blog.blog?
       redirect_to(news_path(@blog.to_param)) && return
     end
