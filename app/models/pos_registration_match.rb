@@ -70,6 +70,9 @@ class PosRegistrationMatch < ApplicationRecord
 
   def merge_candidate? = review_reasons.none?
 
+  # The owner said yes and BikeJobs::MergePosRegistrationJob hasn't run yet
+  def merging? = confirmed? && merge_candidate?
+
   # Whether the owner can still be asked
   def confirmable?(bike, pos_bike) = pending? && mergeable?(bike, pos_bike)
 
@@ -103,7 +106,7 @@ class PosRegistrationMatch < ApplicationRecord
       add_review_reasons!(self.class.review_reasons_for(bike, pos_bike))
     end
     # After the lock's transaction commits, so the job finds the match confirmed
-    BikeJobs::MergePosRegistrationJob.perform_async(id) if recorded && confirmed? && merge_candidate?
+    BikeJobs::MergePosRegistrationJob.perform_async(id) if recorded && merging?
     recorded
   end
 

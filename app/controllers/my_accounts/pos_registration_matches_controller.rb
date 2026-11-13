@@ -22,7 +22,7 @@ module MyAccounts
       if !same_bike
         flash[:success] = translation(:kept_separate)
         redirect_to my_account_path
-      elsif @pos_registration_match.merge_candidate?
+      elsif @pos_registration_match.merging?
         flash[:success] = translation(:combining, bike_type: @pos_bike.type)
         redirect_to bike_path(@pos_bike)
       else
@@ -42,9 +42,8 @@ module MyAccounts
 
     # The emailed link stays the same as the match changes
     def redirect_by_status
-      combining = @pos_registration_match.confirmed? && @pos_registration_match.merge_candidate?
-      if (@pos_registration_match.merged? || combining) && @pos_bike&.user_id == current_user.id
-        flash[:notice] = combining ? translation(:combining) : translation(:already_combined)
+      if (@pos_registration_match.merged? || @pos_registration_match.merging?) && @pos_bike&.user_id == current_user.id
+        flash[:notice] = @pos_registration_match.merging? ? translation(:combining) : translation(:already_combined)
         redirect_to bike_path(@pos_bike)
       else
         flash[:notice] = @pos_registration_match.declined? ? translation(:already_kept_separate) : translation(:cant_combine_here)

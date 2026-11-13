@@ -50,10 +50,7 @@ module Bikes
       @bike = Bike.unscoped.find_id(params[:bike_id] || params[:id])
       return @bike if @bike.visible_by?(current_user)
 
-      merged_into_id = PosRegistrationMatch.merged_into_id(@bike)
-      return redirect_to(bike_path(merged_into_id)) if merged_into_id.present?
-
-      fail ActiveRecord::RecordNotFound
+      redirect_merged_bike_or_not_found(@bike)
     end
 
     def find_or_new_b_param

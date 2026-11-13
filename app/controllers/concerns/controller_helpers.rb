@@ -106,6 +106,14 @@ module ControllerHelpers
       Rack::MiniProfiler.current.present?
   end
 
+  # For a bike the user can't see: a registration merged into its shop's POS registration sends its links there
+  def redirect_merged_bike_or_not_found(bike)
+    merged_into_id = request.get? && PosRegistrationMatch.merged_into_id(bike)
+    fail ActiveRecord::RecordNotFound if merged_into_id.blank?
+
+    redirect_to(bike_path(merged_into_id))
+  end
+
   def set_reading_role
     ActiveRecord::Base.connected_to(role: :reading) do
       yield

@@ -11,12 +11,7 @@ class RegistrationsController < ApplicationController
 
   def show
     @bike = Bike.unscoped.find_id(params[:id])
-    unless @bike.visible_by?(current_user)
-      merged_into_id = PosRegistrationMatch.merged_into_id(@bike)
-      return redirect_to(registration_path(merged_into_id)) if merged_into_id.present?
-
-      fail ActiveRecord::RecordNotFound
-    end
+    return redirect_merged_bike_or_not_found(@bike) unless @bike.visible_by?(current_user)
 
     requested_view = view_from_param(params[:view_as])
     available_views = BikeServices::ShowViews.available(bike: @bike, current_user:,

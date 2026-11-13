@@ -9,8 +9,8 @@ RSpec.describe BikeJobs::MergePosRegistrationJob, type: :job do
 
   # Written because UserJobs::MergeAdditionalEmailJob left impound updates and claims on the old user (#4777)
   it "moves or lists every table with a bike_id" do
-    connection = ActiveRecord::Base.connection
-    tables = connection.tables.select { connection.column_exists?(it, :bike_id) }
+    tables = ActiveRecord::Base.connection.select_values("SELECT table_name FROM information_schema.columns " \
+      "WHERE column_name = 'bike_id' AND table_schema = 'public'")
     expect(tables).to match_array(described_class::MOVED_MODELS.map(&:table_name) + described_class::MERGED_TABLES +
       described_class::LEFT_TABLES.keys)
   end
