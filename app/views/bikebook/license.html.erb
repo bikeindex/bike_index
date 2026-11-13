@@ -1,7 +1,5 @@
 <%# Plain English-only view, not a translated component: the license copy is reviewed by a lawyer in English only. %>
-<%# TODO: Lawyer review - the whole page and the contributing terms get a short IP review before launch %>
-<%
-  cc_license = "https://creativecommons.org/licenses/by-sa/4.0/"
+<% cc_license = "https://creativecommons.org/licenses/by-sa/4.0/"
   cc_legalcode = "#{cc_license}legalcode"
   credit_url = "https://bikeindex.org/bikebook/license"
   html_credit = %(Bike data: <a href="#{credit_url}">Bike Book by Bike Index</a>, <a href="#{cc_license}">CC BY-SA 4.0</a>)
@@ -33,8 +31,7 @@
     "creator" => {"@type" => "Organization", "name" => "Bike Index, NFP", "url" => "https://bikeindex.org"},
     "copyrightHolder" => {"@type" => "Organization", "name" => "Bike Index, NFP"},
     "distribution" => {"@type" => "DataDownload", "encodingFormat" => "application/json", "contentUrl" => "https://github.com/bikeindex/bikebook"}
-  }
-%>
+  } %>
 
 <% content_for(:header) do %>
   <%= tag.script(dataset_json_ld.to_json.html_safe, type: "application/ld+json", data: {turbo_eval: "false"}) %>
@@ -301,12 +298,13 @@
   <h2 id="contributing" class="<%= h2_class %>">Contributing</h2>
 
   <p class="<%= p_class %>">
-    We welcome corrections and new models. Before contributing, please email us
-    at <%= email %> so we can coordinate. By contributing, you agree that your
-    contribution is licensed under CC BY-SA 4.0.
+    We welcome corrections and new models: open a pull request on the
+    <%= ext.call("https://github.com/bikeindex/bikebook", "bikeindex/bikebook repository") %>.
+    Before your first contribution is merged, you'll be asked to sign our
+    Contributor License Agreement.
   </p>
 
-  <%# TODO: Contributors letting Bike Index relicense their submissions - clause left out until the lawyer approves the wording %>
+  <%# TODO: Contributor License Agreement - the lawyer drafts it (Discourse's is the model), then link it here and have a CLA bot ask for it on the repo's pull requests %>
 
   <h2 id="versions-and-downloads" class="<%= h2_class %>">
     Versions and downloads
@@ -336,6 +334,7 @@
       <strong>Get listed.</strong> We're starting a list of projects that use
       Bike Book. To be included, contact <%= email %>.
     </li>
+
     <%# TODO: "Who uses Bike Book" page - when it exists, link "Get listed" to it %>
   </ul>
 

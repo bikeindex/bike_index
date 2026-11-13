@@ -213,8 +213,8 @@ RSpec.describe BikebookController, type: :request do
       # no copy waits on a person to fill it in; the Markdown snippet's own brackets are in a pre
       expect(page.all("h2, p, li, td").map(&:text).join).not_to match(/\[[^\]]+\]/)
       # every address is a mailto link
-      expect(page.all("a[href='mailto:licensing@bikeindex.org']").count).to eq 6
-      expect(page.find("body").text.scan("licensing@bikeindex.org").count).to eq 6
+      expect(page.all("a[href='mailto:licensing@bikeindex.org']").count).to eq 5
+      expect(page.find("body").text.scan("licensing@bikeindex.org").count).to eq 5
       # snippets are text, with a button to copy each
       expect(page).to have_css("pre code", text: 'Bike data: <a href="https://bikeindex.org/bikebook/license">Bike Book by Bike Index</a>')
         .and have_css("pre code", text: "Bike data: [Bike Book by Bike Index](https://bikeindex.org/bikebook/license)")
