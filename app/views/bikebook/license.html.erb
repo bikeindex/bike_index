@@ -21,7 +21,7 @@
     ["Printed materials, PDFs and slides", "Next to the data or in the credits, with the full address written out"],
     ["Video", "In the on-screen credits or the description, with the full address"],
     ["AI tools and chatbots", "When an answer draws on Bike Book data, cite \"Bike Index (Bike Book)\" with a link, and include the credit on your product's data sources page"],
-    ["Research and publications", safe_join(["Cite as: Bike Index, NFP. ", tag.em("Bike Book"), " (dataset), accessed (date). bikeindex.org/bikebook. CC BY-SA 4.0"])]
+    ["Research and publications", safe_join(["Cite as: Bike Index. ", tag.em("Bike Book"), " (dataset), accessed (date). bikeindex.org/bikebook. CC BY-SA 4.0"])]
   ] %>
 
 <% content_for(:header) do %>
@@ -41,10 +41,8 @@
 
   <p class="<%= p_class %>">
     <%= ext.call(bikebook_path, "Bike Book") %> is an open database of bicycle,
-    e-bike and EPAMD models: makes, models, years, e-bike classes, UL
-    certifications, specifications, geometry and MSRP pricing. It's built and
-    maintained by Bike Index, NFP, a nonprofit that helps people register bikes
-    and recover stolen ones.
+    e-bike and EPAMD models and data. It's built and maintained by Bike Index, a
+    nonprofit that helps people register bikes and recover stolen ones.
   </p>
 
   <p class="<%= p_class %>">
@@ -73,8 +71,7 @@
   </ol>
 
   <p class="<%= p_class %>">
-    <strong>Copyright notice:</strong> © Bike Index, NFP and Bike Book
-    contributors.
+    <strong>Copyright notice:</strong> © Bike Index and Bike Book contributors.
   </p>
 
   <h2 id="what-you-can-do" class="<%= h2_class %>">What you can do</h2>
@@ -240,7 +237,7 @@
 
   <p class="<%= p_class %>">
     <strong>Covered:</strong> the Bike Book model data published in the
-    <%= ext.call("https://github.com/bikeindex/bikebook", "bikeindex/bikebook repository") %>
+    <%= ext.call(Integrations::Bikebook::Catalog::GITHUB_REPO_URL, "bikeindex/bikebook repository") %>
     and on Bike Book pages, downloads and API responses.
   </p>
 
@@ -287,7 +284,7 @@
 
   <p class="<%= p_class %>">
     We welcome corrections and new models: open a pull request on the
-    <%= ext.call("https://github.com/bikeindex/bikebook", "bikeindex/bikebook repository") %>.
+    <%= ext.call(Integrations::Bikebook::Catalog::GITHUB_REPO_URL, "bikeindex/bikebook repository") %>.
     Before your first contribution is merged, you'll be asked to sign our
     Contributor License Agreement.
   </p>
@@ -298,7 +295,7 @@
 
   <p class="<%= p_class %>">
     The full dataset is available as JSON from the
-    <%= ext.call("https://github.com/bikeindex/bikebook", "bikeindex/bikebook repository") %>.
+    <%= ext.call(Integrations::Bikebook::Catalog::GITHUB_REPO_URL, "bikeindex/bikebook repository") %>.
     Each change is tracked in git.
   </p>
 

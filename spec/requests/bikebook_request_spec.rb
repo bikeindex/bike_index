@@ -24,8 +24,10 @@ RSpec.describe BikebookController, type: :request do
         .and have_css("meta[property='og:image'][content*='/assets/logos/bikebook_icon']", visible: :all)
         .and have_css("meta[name='twitter:card'][content='summary']", visible: :all)
       expect(response.headers["X-Robots-Tag"]).to be_nil
-      expect(page.find("section.inverted")).to have_text("Bike Book data is open, under CC BY-SA 4.0.")
-        .and have_link("Read the license", href: "/bikebook/license")
+      expect(page.find("section.inverted")).to have_text("Bike Book data is free to use under CC BY-SA 4.0.")
+        .and have_link("Learn how to use it", href: "/bikebook/license")
+        .and have_link("view the raw data", href: "https://github.com/bikeindex/bikebook")
+        .and have_text("Learn how to use it or view the raw data.", normalize_ws: true)
     end
 
     context "comparing" do
