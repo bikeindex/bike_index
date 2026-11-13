@@ -86,7 +86,7 @@ class SerialNormalizer
   def save_segments(bike_id)
     existing = NormalizedSerialSegment.where(bike_id: bike_id)
     existing.map(&:destroy) if existing.present?
-    return false if Bike.current_with_user_hidden.where(id: bike_id).none?
+    return false unless Bike.current_with_user_hidden.exists?(id: bike_id)
 
     normalized_segments.each do |seg|
       NormalizedSerialSegment.create(bike_id: bike_id, segment: seg)
