@@ -41,16 +41,15 @@ RSpec.describe UI::Button::Component, :js, type: :system do
       expect(looks.values.uniq.count).to eq(4), "#{color} repeats a look: #{looks.inspect}"
       expect_axe_clean if index.zero?
 
-      # It's already wearing its active colors, so :active has no color left to change —
-      # hover, focus and press just widen the ring, which the link colors don't have
+      # It's already wearing its active colors, so hover has nothing to add and :active has
+      # no color left to change — both focus and press just widen the ring
       visit "/rails/view_components/ui/button/component/#{color}_active"
       active = find("button[data-active='true']")
       active_looks = {resting: state_of(active)}
       hover_then_press(active) { |state| active_looks[state] = state_of(active) }
       active_looks[:focus] = state_of(active)
 
-      ringed = !UI::Button::Component::LINK_COLORS.include?(color)
-      expect(active_looks[:hover] != active_looks[:resting]).to eq(ringed), "#{color} hovers wrong: #{active_looks.inspect}"
+      expect(active_looks[:hover]).to eq(active_looks[:resting]), "#{color} changed on hover"
       expect(active_looks[:focus]).to_not eq(active_looks[:resting]), "#{color} shows nothing on focus"
       expect(active_looks[:press]).to eq(active_looks[:focus]), "#{color} presses differently than it focuses"
       expect(active_looks.values.map(&:first).uniq.count).to eq(1), "#{color} changed color, not just its ring"

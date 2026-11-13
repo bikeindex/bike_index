@@ -47,14 +47,12 @@ module UI
       #
       # No :link — .twlink states its own active look under the same variant, and a utility
       # here would win over it, so link color would stop following the class it's built from.
-      #
-      # A ringed one widens its ring on hover, as focus does - its colors hold
       ACTIVE_COLORS = {
-        primary: "tw:is-active:bg-blue-800 tw:is-active:ring-2 tw:is-active:hover:ring-3 tw:is-active:ring-blue-500/40 tw:is-active:dark:bg-blue-700",
-        secondary: "tw:is-active:text-white tw:is-active:bg-purple-500 tw:is-active:border-purple-500 tw:is-active:ring-2 tw:is-active:hover:ring-3 tw:is-active:ring-purple-500/40",
-        error: "tw:is-active:bg-red-100 tw:is-active:border-[#c0392b] tw:is-active:ring-2 tw:is-active:hover:ring-3 tw:is-active:ring-red-500/40 tw:is-active:dark:bg-red-950 tw:is-active:dark:border-red-700",
-        purple: "tw:is-active:bg-purple-700 tw:is-active:border-purple-700 tw:is-active:ring-2 tw:is-active:hover:ring-3 tw:is-active:ring-purple-500/40",
-        yellow: "tw:is-active:bg-yellow-500 tw:is-active:border-yellow-500 tw:is-active:ring-2 tw:is-active:hover:ring-3 tw:is-active:ring-yellow-300/60",
+        primary: "tw:is-active:bg-blue-800 tw:is-active:ring-2 tw:is-active:ring-blue-500/40 tw:is-active:dark:bg-blue-700",
+        secondary: "tw:is-active:text-white tw:is-active:bg-purple-500 tw:is-active:border-purple-500 tw:is-active:ring-2 tw:is-active:ring-purple-500/40",
+        error: "tw:is-active:bg-red-100 tw:is-active:border-[#c0392b] tw:is-active:ring-2 tw:is-active:ring-red-500/40 tw:is-active:dark:bg-red-950 tw:is-active:dark:border-red-700",
+        purple: "tw:is-active:bg-purple-700 tw:is-active:border-purple-700 tw:is-active:ring-2 tw:is-active:ring-purple-500/40",
+        yellow: "tw:is-active:bg-yellow-500 tw:is-active:border-yellow-500 tw:is-active:ring-2 tw:is-active:ring-yellow-300/60",
         link_gray: "tw:is-active:text-gray-900 tw:is-active:dark:text-gray-100"
       }.freeze
 

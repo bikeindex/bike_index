@@ -52,8 +52,7 @@ RSpec.describe UI::ButtonLink::Component, type: :component do
     it "keeps hover off it" do
       hovers = component.css("a").first["class"].split.grep(/hover:/)
       expect(hovers).to be_present
-      # is-active excludes aria-disabled itself
-      expect(hovers.grep_v(/not-aria-disabled:|is-active:/)).to eq([])
+      expect(hovers.grep_v(/not-aria-disabled:/)).to eq([])
     end
 
     context "with method" do

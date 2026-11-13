@@ -17,15 +17,14 @@ RSpec.describe UI::ButtonLink::Component, :js, type: :system do
       expect_axe_clean if index.zero?
 
       # The same contract the button holds: an active link is already showing its active
-      # colors, so hover, focus and press only widen the ring, where it has one
+      # colors, so only focus and press change anything, and they change the same thing
       visit "/rails/view_components/ui/button_link/component/#{color}_active"
       active = find("a[data-active='true']")
       active_looks = {resting: state_of(active)}
       hover_then_press(active) { |state| active_looks[state] = state_of(active) }
       active_looks[:focus] = state_of(active)
 
-      ringed = !UI::Button::Component::LINK_COLORS.include?(color)
-      expect(active_looks[:hover] != active_looks[:resting]).to eq(ringed), "#{color} hovers wrong: #{active_looks.inspect}"
+      expect(active_looks[:hover]).to eq(active_looks[:resting]), "#{color} changed on hover"
       expect(active_looks[:focus]).to_not eq(active_looks[:resting]), "#{color} shows nothing on focus"
       expect(active_looks[:press]).to eq(active_looks[:focus]), "#{color} presses differently than it focuses"
       expect(active_looks.values.map(&:first).uniq.count).to eq(1), "#{color} changed color, not just its ring"
