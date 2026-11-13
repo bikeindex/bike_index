@@ -61,18 +61,20 @@ module UI
           (@kind == :error) ? "icons/exclamation-triangle.svg" : "icons/info.svg"
         end
 
+        # Dark backgrounds are the 25% tint pre-mixed onto the page's gray-900, not an alpha:
+        # a flash floats over content, which showed through
         def color_classes
           case @kind
           when :notice
-            "#{text_color_classes} tw:bg-blue-50 tw:dark:bg-blue-500/25 tw:border-blue-300 tw:dark:border-blue-500/50"
+            "#{text_color_classes} tw:bg-blue-50 tw:dark:bg-[color-mix(in_srgb,var(--tw-color-blue-500)_25%,var(--tw-color-gray-900))] tw:border-blue-300 tw:dark:border-blue-500/50"
           when :error
-            "#{text_color_classes} tw:bg-red-50 tw:dark:bg-red-500/25 tw:border-red-300 tw:dark:border-red-500/50"
+            "#{text_color_classes} tw:bg-red-50 tw:dark:bg-[color-mix(in_srgb,var(--tw-color-red-500)_25%,var(--tw-color-gray-900))] tw:border-red-300 tw:dark:border-red-500/50"
           when :warning
-            "#{text_color_classes} tw:bg-yellow-50 tw:dark:bg-yellow-300/25 tw:border-yellow-300 tw:dark:border-yellow-300/50"
+            "#{text_color_classes} tw:bg-yellow-50 tw:dark:bg-[color-mix(in_srgb,var(--tw-color-yellow-300)_25%,var(--tw-color-gray-900))] tw:border-yellow-300 tw:dark:border-yellow-300/50"
           when :success
-            "#{text_color_classes} tw:bg-green-50 tw:dark:bg-green-500/25 tw:border-green-300 tw:dark:border-green-500/50"
+            "#{text_color_classes} tw:bg-green-50 tw:dark:bg-[color-mix(in_srgb,var(--tw-color-green-500)_25%,var(--tw-color-gray-900))] tw:border-green-300 tw:dark:border-green-500/50"
           when :purple
-            "#{text_color_classes} tw:bg-purple-50 tw:dark:bg-purple-500/25 tw:border-purple-300 tw:dark:border-purple-500/50"
+            "#{text_color_classes} tw:bg-purple-50 tw:dark:bg-[color-mix(in_srgb,var(--tw-color-purple-500)_25%,var(--tw-color-gray-900))] tw:border-purple-300 tw:dark:border-purple-500/50"
           end
         end
 

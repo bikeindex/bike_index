@@ -65,7 +65,10 @@
       <%= t(".skip_to_main_content") %>
     </a>
 
-    <%= render(SharedBlocks::ReviewAppBanner::Component.from_env(current_user:, return_to: request.fullpath)) %>
+    <%# Not in a frame, whose crop is measured from production's page %>
+    <% unless request.headers["Sec-Fetch-Dest"] == "iframe" %>
+      <%= render(SharedBlocks::ReviewAppBanner::Component.from_env(current_user:, return_to: request.fullpath)) %>
+    <% end %>
 
     <%= render navbar %>
 

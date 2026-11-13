@@ -31,6 +31,7 @@ class Payment < ApplicationRecord
   include Currencyable
   include Amountable
 
+  MAX_AMOUNT_CENTS = 99_999_999
   PAYMENT_METHOD_ENUM = {stripe: 0, check: 1}.freeze
   KIND_ENUM = {donation: 0, payment: 1, invoice_payment: 2, theft_alert: 3, membership_donation: 4}
 

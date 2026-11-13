@@ -16,6 +16,12 @@ RSpec.describe "E-bike rules", :js, type: :system do
       .and have_css("p", text: "Choose your state.")
     choose("throttle", option: "0", allow_label_click: true)
     expect(page).to have_no_text("Throttle top speed")
+    # a top speed is a check waiting on a state, which arrowing through them doesn't move focus to
+    find("label", text: "20 mph").click
+    expect(page).to have_css("[role='alert']", text: "Choose a state.")
+    page.send_keys(:right)
+    expect(page).to have_checked_field("top_speed", with: "28", visible: :all)
+    expect(page.evaluate_script("document.activeElement.name")).to eq "top_speed"
     type_into(find_field("Bike model", disabled: false, wait: 10), "haul")
     # US models alone, so not its Canadian one of the same name
     expect(page).to have_css("[role='option']", count: 1)

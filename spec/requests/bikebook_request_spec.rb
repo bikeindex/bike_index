@@ -37,6 +37,18 @@ RSpec.describe BikebookController, type: :request do
       end
     end
 
+    context "in a frame" do
+      it "doesn't autofocus the search, which would take the host page's focus" do
+        get "/bikebook"
+        expect(Capybara.string(response.body)).to have_css("#vehicle_models[autofocus]")
+
+        get "/bikebook", headers: {"Sec-Fetch-Dest" => "iframe"}
+        expect(response).to have_http_status(:ok)
+        expect(Capybara.string(response.body)).to have_css("#vehicle_models")
+          .and have_no_css("#vehicle_models[autofocus]")
+      end
+    end
+
     context "the search the server can't fill in" do
       let(:shell_class) { Capybara.string(response.body).find("[inert]")[:class] }
 
