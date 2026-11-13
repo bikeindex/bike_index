@@ -150,8 +150,8 @@ RSpec.describe InfoController, type: :request do
         expect(response.body).to match(/name="payment\[referral_source\]"[^>]*value="eoy-2026"/)
       end
 
-      it "is where /donate/year-end goes, with the email's params" do
-        get "/donate/year-end?source=eoy-2026-recovered&initial_amount=500"
+      it "is where /donate/year_end goes, with the email's params" do
+        get "/donate/year_end?source=eoy-2026-recovered&initial_amount=500"
         expect(response).to redirect_to("/donate/year_end_2026?initial_amount=500&source=eoy-2026-recovered")
         expect(response.status).to eq(302)
       end
@@ -237,7 +237,7 @@ RSpec.describe InfoController, type: :request do
     let!(:blog) { FactoryBot.create(:blog, title: Blog.why_donate_slug) }
     it "redirects to donate" do
       get "/why-donate"
-      expect(response).to redirect_to("/donate")
+      expect(response).to redirect_to("/why_donate")
       get "/why_donate"
       expect(response).to redirect_to("/donate")
       get "/info/#{blog.title_slug}"

@@ -40,35 +40,28 @@ Rails.application.routes.draw do
     get slug, to: "landing_pages#show", organization_id: slug
   end
 
-  # A dashed spelling redirects rather than renders, since the canonical <link> is the request URL
-  underscored = redirect { |_, request| [request.path.tr("-", "_"), request.query_string.presence].compact.join("?") }
-  marketing = lambda do |path, **options|
-    get(path, **options)
-    get(path.dasherize, to: underscored, as: nil, **options.slice(:constraints)) if path.include?("_")
-  end
-
-  {
-    landing_pages: %w[ambassadors_current ambassadors_how_to ascend bike_shop_packages for_bike_shops
-      for_community_groups for_cities for_law_enforcement for_schools],
-    info: %w[donate support_bike_index support_the_index support_the_bike_index primary_activities
-      protect_your_bike serials about where vendor_terms resources privacy terms security
-      how_not_to_buy_stolen lightspeed membership],
-    welcome: %w[recovery_stories]
-  }.each { |controller, pages| pages.each { marketing.call(it, controller:, action: it) } }
-  marketing.call("donate/year_end_2026", to: "info#donate_year_end", as: :donate_year_end)
+  %w[ambassadors_current ambassadors_how_to ascend bike_shop_packages for_bike_shops
+    for_community_groups for_cities for_law_enforcement for_schools].each { get it, controller: "landing_pages", action: it }
+  %w[donate support_bike_index support_the_index support_the_bike_index primary_activities
+    protect_your_bike serials about where vendor_terms resources privacy terms security
+    how_not_to_buy_stolen lightspeed membership].each { get it, controller: "info", action: it }
+  get "recovery_stories", to: "welcome#recovery_stories", as: :recovery_stories
+  get "donate/year_end_2026", to: "info#donate_year_end", as: :donate_year_end
   # 302, since a later year's campaign takes it over
-  %w[donate/year_end donate/year-end].each { get it, to: redirect(path: "/donate/year_end_2026", status: 302) }
-  marketing.call("ebike_rules", to: "ebike_rules#show", as: :ebike_rules)
-  marketing.call("ebike_rules/:country(/:region)", to: "ebike_rules#show", as: :ebike_rules_place,
-    constraints: {country: /[a-z]{2}/i, region: /[a-z0-9]{1,3}/i})
-  get "e-bike-rules(/*rest)", to: redirect { |_, request| request.fullpath.sub("/e-bike-rules", "/ebike_rules") }
-  marketing.call("marketplace/how_it_works", to: "marketplace#how_it_works", as: :marketplace_how_it_works)
-  marketing.call("theft_rings", to: "stolen_bike_listings#index") # Temporary, may switch to being an info post
+  get "donate/year_end", to: redirect(path: "/donate/year_end_2026", status: 302)
+  get "ebike_rules", to: "ebike_rules#show", as: :ebike_rules
+  get "ebike_rules/:country(/:region)", to: "ebike_rules#show", as: :ebike_rules_place, constraints: {country: /[a-z]{2}/i, region: /[a-z0-9]{1,3}/i}
+  get "e_bike_rules(/*rest)", to: redirect { |_, request| request.fullpath.sub("/e_bike_rules", "/ebike_rules") }
+  get "marketplace/how_it_works", to: "marketplace#how_it_works", as: :marketplace_how_it_works
+  get "theft_rings", to: "stolen_bike_listings#index" # Temporary, may switch to being an info post
 
-  %w[stolen_bikes roadmap spokecard how_it_works image_resources dev_and_design].index_with("/resources")
-    .merge("for_advocacy" => "/for_community_groups", "for_shops" => "/for_bike_shops", "ambassadors" => "/ambassadors_how_to",
-      "why_donate" => "/donate", "lightspeed_integration" => "/lightspeed", "theft_ring" => "/theft_rings")
-    .each { |path, target| [path, path.dasherize].uniq.each { get it, to: redirect(path: target) } }
+  get "for_advocacy", to: redirect(path: "/for_community_groups")
+  get "for_shops", to: redirect(path: "/for_bike_shops")
+  get "ambassadors", to: redirect(path: "/ambassadors_how_to")
+  get "why_donate", to: redirect(path: "/donate")
+  get "lightspeed_integration", to: redirect(path: "/lightspeed")
+  get "theft_ring", to: redirect(path: "/theft_rings")
+  %w[stolen_bikes roadmap spokecard how_it_works image_resources dev_and_design].each { get it, to: redirect(path: "/resources") }
   get "ucmerced", to: redirect("/register/new?organization_id=uc-merced")
   get "ambassadors/new", to: redirect("https://docs.google.com/forms/d/e/1FAIpQLSenRXqarY4KFNw1AQ3u5iHwIaaIpgy6cb1sD3YTSQiR0ICeCQ/viewform"), as: :new_ambassador
 
@@ -579,6 +572,9 @@ Rails.application.routes.draw do
   get "*id", to: "bike_versions#show", constraints: {id: %r{[vV]/.*}}, format: false
   # Short marketplace_listing URLs: /f/<short_id> (and /F/...)
   get "*id", to: "marketplace_listings#show", constraints: {id: %r{[fF]/.*}}, format: false
+
+  # /for-bike-shops answers too, redirecting to /for_bike_shops
+  get "*path", to: redirect { |_, request| DashedPathRedirect.location(request) }, constraints: DashedPathRedirect, format: false
 
   get "*unmatched_route", to: "errors#not_found" if Rails.env.production? || Rails.env.sandbox? # Handle 404s with lograge
 end

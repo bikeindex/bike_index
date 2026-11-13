@@ -516,11 +516,13 @@ RSpec.describe EbikeRulesController, type: :request do
         .and have_field("watts", with: "24500")
     end
 
-    it "redirects /e-bike-rules and /ebike-rules, keeping the state and query" do
-      get "/e-bike-rules"
+    it "redirects /e_bike_rules and the dashed spellings, keeping the state and query" do
+      get "/e_bike_rules"
       expect(response).to redirect_to("/ebike_rules")
 
       get "/e-bike-rules/co?manual=1&watts=250"
+      expect(response).to redirect_to("/e_bike_rules/co?manual=1&watts=250")
+      get "/e_bike_rules/co?manual=1&watts=250"
       expect(response).to redirect_to("/ebike_rules/co?manual=1&watts=250")
 
       get "/ebike-rules/US/CO?manual=1&watts=250"

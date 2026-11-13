@@ -17,7 +17,9 @@ RSpec.describe StolenBikeListingsController, type: :request do
       expect(response).to render_template(:index)
       expect(assigns(:blog)&.id).to eq blog.id
       expect(assigns(:render_info)).to be_truthy
-      get "/theft-ring"
+      get "/theft_ring"
+      expect(response).to redirect_to("/theft_rings")
+      get "/theft-rings"
       expect(response).to redirect_to("/theft_rings")
     end
   end
