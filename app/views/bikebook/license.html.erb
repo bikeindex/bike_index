@@ -19,23 +19,10 @@
     ["Printed materials, PDFs and slides", "Next to the data or in the credits, with the full address written out"],
     ["Video", "In the on-screen credits or the description, with the full address"],
     ["AI tools and chatbots", "When an answer draws on Bike Book data, cite \"Bike Index (Bike Book)\" with a link, and include the credit on your product's data sources page"],
-    ["Research and publications", safe_join(["Cite as: Bike Index, NFP. ", tag.em("Bike Book"), " (dataset), version (date). bikeindex.org/bikebook. CC BY-SA 4.0"])]
-  ]
-  dataset_json_ld = {
-    "@context" => "https://schema.org",
-    "@type" => "Dataset",
-    "name" => "Bike Book",
-    "description" => "An open database of bicycle and e-bike models: makes, models, years, e-bike classes, UL certifications, specifications, geometry and MSRP pricing.",
-    "url" => credit_url,
-    "license" => cc_license,
-    "creator" => {"@type" => "Organization", "name" => "Bike Index, NFP", "url" => "https://bikeindex.org"},
-    "copyrightHolder" => {"@type" => "Organization", "name" => "Bike Index, NFP"},
-    "distribution" => {"@type" => "DataDownload", "encodingFormat" => "application/json", "contentUrl" => "https://github.com/bikeindex/bikebook"}
-  } %>
+    ["Research and publications", safe_join(["Cite as: Bike Index, NFP. ", tag.em("Bike Book"), " (dataset), accessed (date). bikeindex.org/bikebook. CC BY-SA 4.0"])]
+  ] %>
 
 <% content_for(:header) do %>
-  <%= tag.script(dataset_json_ld.to_json.html_safe, type: "application/ld+json", data: {turbo_eval: "false"}) %>
-
   <%# Without JavaScript the copy buttons can't work, so they go %>
   <noscript>
     <style>.license-copy { display: none; }</style>
@@ -128,8 +115,8 @@
   <h2 id="how-to-credit" class="<%= h2_class %>">How to credit Bike Book</h2>
 
   <p class="<%= p_class %>">
-    Credit Bike Index where people see the data. Following this section meets
-    the attribution requirements of CC BY-SA 4.0; the
+    Credit Bike Index where people see the data. This section explains how to
+    credit Bike Book under CC BY-SA 4.0; the
     <%= ext.call(cc_legalcode, "license") %> itself is what governs.
   </p>
 
@@ -146,8 +133,6 @@
     Where you show a specific bike, link "Bike Book by Bike Index" to that
     bike's Bike Book page instead. Copy-ready versions:
   </p>
-
-  <%# TODO: Confirm each bike's own Bike Book page exists at launch - the copy says to link a specific bike's page where one exists %>
 
   <% {"HTML" => html_credit, "Markdown" => markdown_credit}.each do |name, snippet| %>
     <div class="tw:relative tw:my-3">
@@ -184,7 +169,7 @@
   <p class="<%= p_class %>">
     The credit can't be hidden only in your terms of service, and it shouldn't
     suggest the data came from anyone else. If space is tight, a short "Bike
-    data: Bike Index" linked to this page is fine.
+    data: Bike Index, CC BY-SA 4.0" linked to this page is fine.
   </p>
 
   <p class="<%= p_class %>">
@@ -267,8 +252,8 @@
     <li>Search, comparison and usage data from Bike Index and Bike Book</li>
 
     <li>
-      The Bike Index name, logo, "Powered by Bike Index" badge and "Verified"
-      label. For permission to use them, email <%= email %>
+      The Bike Index name, logo and "Powered by Bike Index" badge. For
+      permission to use them, email <%= email %>
     </li>
 
     <li>
@@ -303,8 +288,6 @@
     Before your first contribution is merged, you'll be asked to sign our
     Contributor License Agreement.
   </p>
-
-  <%# TODO: Contributor License Agreement - the lawyer drafts it (Discourse's is the model), then link it here and have a CLA bot ask for it on the repo's pull requests %>
 
   <h2 id="versions-and-downloads" class="<%= h2_class %>">
     Versions and downloads

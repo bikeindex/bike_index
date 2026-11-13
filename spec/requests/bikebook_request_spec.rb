@@ -221,17 +221,6 @@ RSpec.describe BikebookController, type: :request do
       expect(page).to have_css("[data-controller='ui--copy-button']", count: 2)
       expect(page).to have_css("table th", text: "Where you use the data")
     end
-
-    it "has the Dataset JSON-LD" do
-      get "/bikebook/license"
-
-      page = Capybara.string(response.body)
-      dataset = page.all("script[type='application/ld+json']", visible: false)
-        .map { JSON.parse(it.text(:all)) }.find { it["@type"] == "Dataset" }
-      expect(dataset).to include("name" => "Bike Book", "license" => "https://creativecommons.org/licenses/by-sa/4.0/",
-        "url" => "https://bikeindex.org/bikebook/license")
-      expect(dataset["creator"]).to eq({"@type" => "Organization", "name" => "Bike Index, NFP", "url" => "https://bikeindex.org"})
-    end
   end
 
   describe "badge" do
