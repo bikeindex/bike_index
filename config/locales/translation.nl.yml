@@ -7875,29 +7875,6 @@ nl:
             met telefoonnummers van de eigenaren, die in realtime wordt bijgewerkt
             voor uw politieafdeling.
           hot_sheet_title: Stolen Bike Hot Sheet
-          mock_batteries: Batterijen en opladen
-          mock_bike_info: Fietsinformatie
-          mock_continue: Doorgaan
-          mock_detected: Elektrisch (gemotoriseerd) gedetecteerd
-          mock_electric: Elektrisch (gemotoriseerd)
-          mock_electric_help: Vink 'elektrisch' aan, zodat we e-bikes kunnen markeren
-            en de certificering kunnen controleren.
-          mock_manufacturer: Fabrikant
-          mock_next: Volgende
-          mock_progress: Voortgang opgeslagen · Bevestiging e-voertuig · Stap 1 van
-            4
-          mock_rule_certified: Ik gebruik uitsluitend batterijen die gecertificeerd
-            zijn volgens UL 2849 / UL 2271 (of een gelijkwaardige norm).
-          mock_rule_charger: Ik laad mijn apparaat uitsluitend op met de oplader van
-            de fabrikant, nooit onbeheerd en nooit in een gang of vluchtroute.
-          mock_rule_report: Ik zal het gebruik staken en elke beschadigde, opgezwollen
-            of oververhitte batterij melden.
-          mock_sub: Westbrook heeft een aantal veiligheidsregels die je moet doornemen
-            voordat je je kunt inschrijven.
-          mock_title: Het lijkt erop dat je een elektrische auto hebt!
-          mock_traditional_bike: Traditionele fiets
-          mock_traditional_bike_note: "(2 wielen, 1 zitje, pedalen)"
-          mock_vehicle_type: 'Voertuigtype:'
           nav_checker: Staatscontroleur
           nav_education: Regels voor e-bikes
           nav_faq: Veelgestelde vragen

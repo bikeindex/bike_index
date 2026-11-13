@@ -7995,29 +7995,6 @@ it:
             con i numeri di telefono dei proprietari, aggiornato in tempo reale per
             il tuo dipartimento di polizia.
           hot_sheet_title: Foglio informativo sui furti di biciclette
-          mock_batteries: Batterie e ricarica
-          mock_bike_info: Informazioni sulla bicicletta
-          mock_continue: Continuare
-          mock_detected: Rilevato elettrico (motorizzato)
-          mock_electric: Elettrico (motorizzato)
-          mock_electric_help: Verifichiamo che le e-bike siano elettriche, in modo
-            da poterle segnalare e verificarne la certificazione.
-          mock_manufacturer: Produttore
-          mock_next: Prossimo
-          mock_progress: Progressi salvati · Conferma veicolo elettrico · Fase 1 di
-            4
-          mock_rule_certified: Utilizzerò esclusivamente batterie certificate secondo
-            gli standard UL 2849 / UL 2271 (o equivalenti).
-          mock_rule_charger: Utilizzerò esclusivamente il caricabatterie del produttore,
-            mai incustodito o in corridoi o vie di fuga.
-          mock_rule_report: Smetterò di utilizzare il prodotto e segnalerò qualsiasi
-            batteria danneggiata, gonfia o surriscaldata.
-          mock_sub: Westbrook ha alcune norme di sicurezza da rispettare prima di
-            poter completare la registrazione.
-          mock_title: Sembra che tu abbia un veicolo elettrico!
-          mock_traditional_bike: Bicicletta tradizionale
-          mock_traditional_bike_note: "(2 ruote, 1 sedile, pedali)"
-          mock_vehicle_type: Tipo di veicolo
           nav_checker: Controllore di stato
           nav_education: Regole per le e-bike
           nav_faq: FAQ

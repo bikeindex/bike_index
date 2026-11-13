@@ -7606,28 +7606,6 @@ nb:
           hot_sheet_body: En utskrivbar liste over stjålne sykler i ditt område med
             eiernes telefonnumre, oppdatert i sanntid for politiet ditt.
           hot_sheet_title: Stjålet Bike Hot Sheet
-          mock_batteries: Batterier og lading
-          mock_bike_info: Sykkelinformasjon
-          mock_continue: Fortsette
-          mock_detected: Elektrisk (motorisert) oppdaget
-          mock_electric: Elektrisk (motorisert)
-          mock_electric_help: Sjekk elektriske slik at vi flagger elsykler og verifiserer
-            sertifisering.
-          mock_manufacturer: Produsent
-          mock_next: Neste
-          mock_progress: Fremdrift lagret · Bekreftelse av elbil · Trinn 1 av 4
-          mock_rule_certified: Jeg vil kun bruke batterier som er sertifisert i henhold
-            til UL 2849 / UL 2271 (eller tilsvarende).
-          mock_rule_charger: Jeg lader kun med produsentens lader, aldri uten tilsyn
-            eller i en gang eller utgangsvei.
-          mock_rule_report: Jeg vil slutte å bruke det og rapportere eventuelle skadede,
-            hovne eller overopphetede batterier.
-          mock_sub: Westbrook har noen sikkerhetsregler du må gjennomgå før du kan
-            fullføre registreringen.
-          mock_title: Ser ut som du har et elbil!
-          mock_traditional_bike: Tradisjonell sykkel
-          mock_traditional_bike_note: "(2 hjul, 1 sete, pedaler)"
-          mock_vehicle_type: Bil type
           nav_checker: Statskontrollør
           nav_education: Regler for elsykkel
           nav_faq: Vanlige spørsmål

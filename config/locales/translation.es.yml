@@ -7963,29 +7963,6 @@ es:
             los números de teléfono de los propietarios, actualizada en tiempo real
             para su departamento de policía.
           hot_sheet_title: Lista de bicicletas robadas
-          mock_batteries: Baterías y carga
-          mock_bike_info: Información sobre bicicletas
-          mock_continue: Continuar
-          mock_detected: Eléctrico (motorizado) detectado
-          mock_electric: Eléctrico (motorizado)
-          mock_electric_help: Verificamos que sean eléctricas para poder marcarlas
-            y comprobar su certificación.
-          mock_manufacturer: Fabricante
-          mock_next: Próximo
-          mock_progress: Progreso guardado · Confirmación del vehículo eléctrico ·
-            Paso 1 de 4
-          mock_rule_certified: Solo utilizaré baterías certificadas según las normas
-            UL 2849 / UL 2271 (o equivalentes).
-          mock_rule_charger: Solo cargaré el dispositivo con el cargador del fabricante,
-            nunca lo dejaré desatendido ni en un pasillo o ruta de salida.
-          mock_rule_report: Dejaré de usar la batería e informaré sobre cualquier
-            daño, hinchazón o sobrecalentamiento.
-          mock_sub: Westbrook tiene algunas normas de seguridad que debes repasar
-            antes de poder completar la inscripción.
-          mock_title: "¡Parece que tienes un vehículo eléctrico!"
-          mock_traditional_bike: Bicicleta tradicional
-          mock_traditional_bike_note: "(2 ruedas, 1 asiento, pedales)"
-          mock_vehicle_type: Tipo de vehículo
           nav_checker: comprobador de estado
           nav_education: Normativa sobre bicicletas eléctricas
           nav_faq: Preguntas frecuentes
