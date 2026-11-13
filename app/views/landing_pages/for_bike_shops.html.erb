@@ -1,0 +1,4 @@
+<%# A template rather than a controller render: FeedbacksController re-renders it when a signup fails validation %>
+<%= render(SharedBlocks::Marketing::Wrapper::Component.new(page: Pages::LandingPages::ForBikeShops::Component.new(
+  recovery_displays: RecoveryDisplay.where.not(quote_by: [nil, ""]), feedback: @feedback, current_user:,
+  checker_place: EbikeRuleServices::Places.from_location(request_location_hash)))) %>

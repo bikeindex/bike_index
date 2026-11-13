@@ -36,7 +36,7 @@ class PaymentsController < ApplicationController
   def invalid_amount_cents?(amount_cents)
     return true if amount_cents.blank?
 
-    !amount_cents.to_i.between?(1, 99_999_999)
+    !amount_cents.to_i.between?(1, Payment::MAX_AMOUNT_CENTS)
   end
 
   # A typed amount (in dollars) wins over a checked preset - without javascript both submit

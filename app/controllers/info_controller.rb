@@ -63,11 +63,18 @@ class InfoController < ApplicationController
     # amount is a fixed payment, which the payments page takes
     return redirect_to_payment if params[:amount].present?
 
-    @page_title = "Support Bike Index"
-    @skip_general_alert = true
-    render SharedBlocks::Marketing::Wrapper::Component.new(page: Pages::Donate::Page::Component.new(
+    render_donate_page(Pages::Donate::Page::Component.new(
       stripe_prices: StripePrice.active_for(current_currency),
       recovery_displays: RecoveryDisplay.with_photo,
+      initial_amount: params[:initial_amount],
+      referral_source: params[:source],
+      current_user:
+    ))
+  end
+
+  def donate_year_end
+    render_donate_page(Pages::Donate::YearEnd::Component.new(
+      stripe_prices: StripePrice.active_for(current_currency),
       initial_amount: params[:initial_amount],
       referral_source: params[:source],
       current_user:
@@ -97,6 +104,12 @@ class InfoController < ApplicationController
   end
 
   private
+
+  def render_donate_page(page)
+    @page_title = "Support Bike Index"
+    @skip_general_alert = true
+    render SharedBlocks::Marketing::Wrapper::Component.new(page:)
+  end
 
   def redirect_to_donation_or_payment
     params[:amount].present? ? redirect_to_payment : redirect_to(donate_url(params.permit(:source, :initial_amount, :currency)))

@@ -126,6 +126,43 @@ RSpec.describe InfoController, type: :request do
       end
     end
 
+    describe "donate/year-end-2026" do
+      include_context :active_stripe_prices
+
+      it "renders the year-end page outside the content wrapper, submitting the same forms as /donate" do
+        get "/donate/year-end-2026"
+        expect(response.status).to eq(200)
+        expect(response.body).to include("Make a year-end gift to Bike Index")
+        expect(response.body).to match(/name="payment\[referral_source\]"[^>]*value="eoy-2026"/)
+        expect(response.body).to include('action="/payments"')
+        expect(response.body).to_not include("sidebar-nav")
+      end
+
+      it "passes the email's source on and picks the recovered audience from it" do
+        get "/donate/year-end-2026?source=eoy-2026-recovered"
+        expect(response.body).to include("Your bike made it home")
+        expect(response.body).to match(/name="payment\[referral_source\]"[^>]*value="eoy-2026-recovered"/)
+      end
+
+      it "falls back to the campaign's source for an array param" do
+        get "/donate/year-end-2026?source[]=eoy-2026-recovered"
+        expect(response.status).to eq(200)
+        expect(response.body).to match(/name="payment\[referral_source\]"[^>]*value="eoy-2026"/)
+      end
+
+      it "is where /donate/year-end goes, with the email's params" do
+        get "/donate/year-end?source=eoy-2026-recovered&initial_amount=500"
+        expect(response).to redirect_to("/donate/year-end-2026?initial_amount=500&source=eoy-2026-recovered")
+        expect(response.status).to eq(302)
+      end
+
+      it "redirects the underscored spelling, with the email's params" do
+        get "/donate/year_end_2026?source=eoy-2026-recovered"
+        expect(response).to redirect_to("/donate/year-end-2026?source=eoy-2026-recovered")
+        expect(response.status).to eq(301)
+      end
+    end
+
     # serials is the one static page that links default_bike_search_path
     describe "serials search links" do
       let(:organization) { FactoryBot.create(:organization) }
@@ -202,7 +239,7 @@ RSpec.describe InfoController, type: :request do
       get "/why-donate"
       expect(response).to redirect_to("/donate")
       get "/why_donate"
-      expect(response).to redirect_to("/donate")
+      expect(response).to redirect_to("/why-donate")
       get "/info/#{blog.title_slug}"
       expect(response).to redirect_to("/donate")
     end

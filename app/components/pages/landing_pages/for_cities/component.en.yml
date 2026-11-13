@@ -145,28 +145,6 @@ en:
             A printable list of stolen bikes in your area with owner phone numbers,
             updated in real time for your police department.
           hot_sheet_title: Stolen Bike Hot Sheet
-          mock_batteries: Batteries & charging
-          mock_bike_info: Bike info
-          mock_continue: Continue
-          mock_detected: Electric (motorized) detected
-          mock_electric: Electric (motorized)
-          mock_electric_help: Check electric so we flag e-bikes and verify certification.
-          mock_manufacturer: Manufacturer
-          mock_next: Next
-          mock_progress: Progress saved · E-Vehicle Acknowledgment · Step 1 of 4
-          mock_rule_certified: I will use only batteries certified to UL 2849 / UL
-            2271 (or equivalent).
-          mock_rule_charger: >-
-            I will charge only with the manufacturer's charger, never unattended or
-            in a hallway or exit route.
-          mock_rule_report: I will stop using and report any damaged, swollen, or
-            overheating battery.
-          mock_sub: >-
-            Westbrook has a few safety rules to go over before you can complete registration.
-          mock_title: Looks like you have an e-vehicle!
-          mock_traditional_bike: Traditional Bike
-          mock_traditional_bike_note: "(2 wheels, 1 seat, pedals)"
-          mock_vehicle_type: Vehicle type
           nav_checker: State checker
           nav_education: E-bike rules
           nav_faq: FAQ

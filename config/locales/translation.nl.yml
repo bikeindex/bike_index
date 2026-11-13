@@ -3540,56 +3540,6 @@ nl:
         en video-ondersteuning en zoeken in het Bike Index-register.
       want_qr_stickers: Wilt u QR-stickers? Vraag ons hoe hun kosten de prijs van
         een pakket compenseren.
-    for_bike_shops:
-      5_ways_to_grow_community_for_your_bike_sh: 5 manieren om community te laten
-        groeien voor uw fietsenwinkel
-      bike_index_for_bike_shops: Bike Index voor fietsenwinkels
-      bikes_before_they: Laten we ons verenigen om fietsendiefstal tegen te gaan en
-        bescherm ook de fietsen van uw klanten, voordat ze überhaupt verkocht zijn.
-      build_goodwill_with_your_customers_with_a: Bouw goodwill op bij uw klanten met
-        een service die u gratis kunt aanbieden.  een gestolen fiets en je hebt een
-        klant voor het leven.
-      connect_your_ascend_account_html: Verbind uw Ascend-account en uw Bike Index-winkelaccount.
-        Elke nacht exporteert Ascend de fietsen die u heeft verkocht en importeren
-        we deze in Bike Index voor uw klanten. U hoeft het alleen in te stellen en
-        dan bent u klaar! Meer informatie over de Ascend-integratie %{ascend_link}.
-      connect_your_lightspeed_account: verbind uw Lightspeed-account
-      do_right_by_your_customers: Help uw klanten in slechts 5 klikken.
-      dont_use_ascend_or_lightspeed_html: Maakt u geen gebruik van Ascend of Lightspeed
-        POS? Vraag ons naar %{printed_materials}.
-      driving_service_revenues_with_bicycle_reg: 'Lopende service inkomsten met behulp
-        van fietsregistratie '
-      here: hier
-      join_our_network_link_html: Doe mee met onze %{network_link}.
-      learn_more: Leer meer
-      network_of_shop_partners: netwerk van winkelpartners
-      or: of
-      our_official_lightspeed_integration_provi: Onze officiële Lightspeed-integratie
-        biedt volledig geautomatiseerde registratie voor elke fiets die u verkoopt.
-        Het enige dat u hoeft te doen, is ervoor zorgen dat u het serienummer invoert
-        en de e-mail van de klant opneemt.
-      printed_materials: bedrukte materialen
-      register_bikes_for_your_customers: Registreer fietsen voor uw klanten
-      related_articles: 'Gerelateerde artikelen:'
-      sign_up_for_a_free_bike_index_account_html: Meld u aan voor een gratis Bike
-        Index-account voor uw winkel %{new_org_link}.
-      trusted_by_bike_shops_everywhere: Vertrouwd door fietsenwinkels overal ter wereld
-      use_lightspeed_retail: Lightspeed Retail gebruiken?
-      used_at_bike_shops_everywhere: Overal gebruikt door fietsenwinkels
-      curious_what_information_html: Benieuwd welke informatie wordt verzameld? Lees
-        de %{security_link}.
-      security_link_text: veiligheid en privacy van de integraties hier
-      automatic_registration_at_point_of_sale: Automatische registratie op het verkooppunt
-      for_free_we_provide_you_with_t: We bieden je gratis de tools die nodig zijn
-        om elke fiets die je verkoopt automatisch te registreren in Bike Index via
-        je POS. Het enige dat nodig is, is een paar minuten installatie, met je Ascend-
-        of Lightspeed Retail-account.
-      sign_up_for_free: Gratis inschrijven
-      use_ascend: Ascend gebruiken?
-      embed_a_bike_index_registration_form: Een fietsregistratieformulier insluiten
-        op uw website
-      bike_shops_deck: fietswinkel partner deck
-      check_out: Bekijk onze
     packages_list:
       forever: Voor altijd
       free: GRATIS
@@ -3696,6 +3646,9 @@ nl:
     landing_pages_for_community_groups: Bike Index is een gratis, non-profit fietsregister.
       Help je fietsers zich te registreren, zodat een gestolen fiets weer thuisgebracht
       kan worden. Gratis voor buurtverenigingen, voor altijd.
+    landing_pages_for_bike_shops: Bike Index koppelt zich aan uw kassasysteem en registreert
+      automatisch elke fiets die u verkoopt. Gratis voor winkels en klanten, en we
+      verkopen of delen nooit klantgegevens.
   meta_titles:
     bikes_index: Zoekresultaten
     bikes_new: Registreer een fiets!
@@ -7594,23 +7547,14 @@ nl:
           form_title: Financier het volgende herstel
           headline: Alle bovenstaande fietsen zijn mee naar huis genomen omdat de
             registratie gratis was.
-          larger_gift_link: Neem contact met ons op voor een grotere gift.
           lede_short: Bike Index is een non-profitorganisatie. Registratie, zoeken
             en diefstalmeldingen zijn gratis. Donaties maken dit mogelijk.
-          major_benefactor: Weldoener
           major_body: Donaties op dit niveau worden gebruikt voor het inwerken van
             partners, grensoverschrijdende diefstalonderzoeken en de technische ontwikkeling
             van gepromote waarschuwingen.
           major_eyebrow: Grote donaties
-          major_partner: Partner
           major_title: Grotere giften zorgen ervoor dat hele steden op de schenkingslijst
             komen te staan.
-          other_ways_daf: Subsidies via donorfondsen — we kunnen ons EIN-nummer en
-            de subsidiegegevens doorgeven.
-          other_ways_match: Bijdragen van werkgevers — veel werkgevers verdubbelen
-            een donatie zonder extra kosten voor u.
-          other_ways_stock: Schenkingen van aandelen of cryptovaluta, waarmee vermogenswinstbelasting
-            op waardestijgingen wordt vermeden.
           other_ways_title: Andere manieren om op dit niveau te doneren
           stories_title: In de woorden van hun eigenaren
           uses_alerts_body: Het systeem voor het melden van gestolen fietsen en de
@@ -7630,7 +7574,6 @@ nl:
             registergegevens.
           uses_partners_title: Partners en onderzoeken
           uses_title: Waar gaat het geld naartoe?
-          wall_photo_alt: Een fiets teruggevonden via Bike Index
           lede_millions_registered: Bike Index is een non-profitorganisatie. Registratie
             kost niets, zoeken kost niets en het melden van diefstal kost niets —
             daarom staan er %{millions} miljoen fietsen in het register en daarom
@@ -7666,6 +7609,131 @@ nl:
           tier_plus: Plus-lidmaatschap
           tier_plus_benefit: Alles in Basic, een gratis promotiemelding als je fiets
             gestolen wordt, en een ledenlimiet.
+        major_gift:
+          benefactor: Weldoener
+          partner: Partner
+        other_ways:
+          daf: Subsidies via donorfondsen — we kunnen ons EIN-nummer en de subsidiegegevens
+            doorgeven.
+          larger_gift_link: Neem contact met ons op voor een grotere gift.
+          match: Bijdragen van werkgevers — veel werkgevers verdubbelen een donatie
+            zonder extra kosten voor u.
+          stock: Schenkingen van aandelen of cryptovaluta, waarmee vermogenswinstbelasting
+            op waardestijgingen wordt vermeden.
+        photo_wall:
+          photo_alt: Een fiets teruggevonden via Bike Index
+        ten_percent:
+          bike_value: Wat is je fiets waard?
+          heading: Heeft u een fiets teruggekregen via Bike Index? Doneer dan 10%
+            van de waarde ervan.
+          result_html: 10% is %{amount}. We hebben dat hieronder als uw gift ingesteld.
+        year_end:
+          bikebook_body: 'De wereldwijde fietsenbibliotheek: zoek, vergelijk en vind
+            je volgende fiets.'
+          bikebook_eyebrow: Jouw fietsenstalling, online.
+          bikebook_link: Bekijk een voorproefje van Bike Book
+          bikebook_title: Maak kennis met Bike Book
+          building_eyebrow: Wat er vervolgens met jouw gift wordt opgebouwd
+          building_intro: Ons doel is om van Bike Index dé online thuisbasis voor
+            jouw fiets te maken.
+          building_title: Help ons de toekomst vorm te geven
+          cta_sub: Houd het gratis voor de volgende miljoen gebruikers. Ons team dankt
+            u!
+          cta_title: Gratis vanaf dag één. Gratis voor altijd.
+          eyebrow: Donaties aan het einde van het jaar · 2026
+          form_title: Geef uw eindejaarsgift.
+          goal: Ons doel is %{goal} tegen 31 december.
+          headline: Doneer aan Bike Index aan het einde van het jaar. Zorg ervoor
+            dat er in 2027 meer gestolen fietsen worden teruggebracht.
+          headline_recovered: Je fiets is veilig thuisgekomen. Help de volgende om
+            daar te komen.
+          impact_eyebrow: Wat uw steun in 2026 heeft betekend.
+          impact_intro: Al deze apparaten werden teruggestuurd omdat iemand het serienummer
+            had gecontroleerd aan de hand van een register waarvan het gebruik gratis
+            is.
+          impact_title: Fietsen die veilig thuis zijn gekomen
+          lede_recovered_count: Bike Index is vanaf dag één gratis geweest en blijft
+            dat ook voor altijd. Dit jaar heeft het gratis register ervoor gezorgd
+            dat %{recovered} gestolen fietsen weer thuisgebracht werden. Uw eindejaarsgift
+            zorgt ervoor dat het platform blijft bestaan en financiert wat we in de
+            toekomst gaan bouwen.
+          major_eyebrow: Grote donaties
+          major_title: Grotere giften zorgen ervoor dat hele steden op de schenkingslijst
+            komen te staan.
+          marketplace_body: We blijven werken aan de uitbouw van de meest vertrouwde
+            plek om een tweedehands fiets te verkopen.
+          marketplace_eyebrow: Koop en verkoop tweedehands
+          marketplace_link: Bezoek de marktplaats
+          marketplace_title: Marktplaats
+          merch_body: Shirts, stickers en petten. Elke aankoop ondersteunt het cadeauregister.
+          merch_link: Bezoek de winkel
+          merch_title: Merchandise en meer
+          network_police: Teruggevonden fietsen worden aan hun eigenaren gekoppeld
+            in plaats van dat ze in een opslagruimte staan.
+          network_police_title: Rechtshandhaving
+          network_shops: Gereedschap dat het controleren van een serienummer bij binnenkomst
+            tot een routineprocedure maakt. Zo heeft Ted een gestolen fiets voor de
+            eigenaar bewaard.
+          network_shops_title: Fietsenwinkels
+          network_title: Een nuttiger netwerk opbouwen
+          network_universities: Campusregistratie- en inbeslagnamesystemen zorgen
+            ervoor dat de fietsen van studenten teruggebracht worden in plaats van
+            weggehaald te worden.
+          network_universities_title: Universiteiten
+          other_ways_title: Andere manieren om te geven
+          quote: "“Vier jaar later ontving ik via de berichtenservice van Bike Index
+            een e-mail dat iemand mijn fiets had gevonden en hem wilde terugbrengen.
+            Ik heb hem dit weekend opgehaald en ben ontzettend dankbaar voor de vriendelijke
+            man die hem terugbracht en voor Bike Index dat ze een platform bieden
+            waarop we met elkaar in contact kunnen komen!”"
+          quote_caption: Na vier jaar weer thuis.
+          shipped_dashboard: Je fietsen, meldingen en berichten op één plek.
+          shipped_dashboard_title: Bekijk alles op je nieuwe dashboard.
+          shipped_ebike: Bij het registreren van een e-bike wordt de klasse ervan
+            tijdens het gebruik duidelijk.
+          shipped_ebike_title: E-bike-educatie, ingebouwd in
+          shipped_eyebrow: Verzonden dit jaar
+          shipped_intro: Een snellere, gebruiksvriendelijkere fietsindex. Volledig
+            gefinancierd door donaties.
+          shipped_legality: Zoek uit waar en per categorie en in welk rechtsgebied
+            je met je e-bike mag rijden, voordat je er een koopt of ergens nieuw gaat
+            rijden.
+          shipped_legality_title: Controle op de legaliteit van e-bikes
+          shipped_messaging: Gestroomlijnde communicatiestroom voor partners die zich
+            bezighouden met het terugvinden van gestolen fietsen.
+          shipped_messaging_title: Betere berichtgeving
+          shipped_partners: Een soepeler inbeslagnameproces voor steden en campussen,
+            en aangepaste registratieprocedures voor e-bike- en direct-to-consumer-merken.
+          shipped_partners_title: Nieuwe partnerfuncties
+          shipped_registration: Minder stappen tussen het aanschaffen van een fiets
+            en de registratie ervan.
+          shipped_registration_title: Een gestroomlijnde registratieprocedure
+          shipped_title: Uw nieuwe fietsindex is hier.
+          stat_recovered: Gestolen fietsen teruggevonden in 2026
+          stat_registered: Fietsen die dit jaar geregistreerd zijn, gratis.
+          stat_value: fietsen die aan hun eigenaren zijn teruggegeven
+          stat_value_figure: "$1,5 miljoen"
+          story_country: "“Het serienummer werd opgezocht bij een fietsenwinkel in
+            Henderson, Nevada, en naar mij teruggestuurd. Swanys Cycles is een fantastische
+            fietsenwinkel en Bike Index heeft hen naar mij doorverwezen!”"
+          story_country_title: Te vinden in het hele land
+          story_magic: '"Een man uit Rosemount heeft een bod gewonnen op een verlaten
+            opslagruimte in Minneapolis. In de opslagruimte stonden meerdere fietsen.
+            De mijne was de enige die geregistreerd stond. Hij nam contact met me
+            op via Bike Index en we hebben een tijdstip afgesproken waarop ik de fiets
+            kon ophalen."'
+          story_magic_title: Een vleugje Bike Index-magie
+          story_shop: '"Ted''s Bicycle Shop in Colorado Springs heeft hem overgenomen
+            van iemand die hem daar voor onderhoud had gebracht. Ze hebben het serienummer
+            vergeleken met het nummer dat hier vermeld staat en konden hem daarom
+            voor me reserveren."'
+          story_shop_title: Ted's Fietsenwinkel, Colorado Springs
+          ten_percent_button: Bereken mijn 10%
+          ten_percent_prompt: Vertel ons wat je fiets waard is en wij bepalen het
+            cadeau.
+          ten_percent_statement: Als iedereen wiens gestolen fiets via Bike Index
+            is teruggevonden 10% van de waarde ervan zou doneren, zouden we onze basiskosten
+            voor het komende jaar kunnen dekken.
       landing_pages:
         demo_modal:
           field_message: Is er verder nog iets dat we moeten weten?
@@ -7807,29 +7875,6 @@ nl:
             met telefoonnummers van de eigenaren, die in realtime wordt bijgewerkt
             voor uw politieafdeling.
           hot_sheet_title: Stolen Bike Hot Sheet
-          mock_batteries: Batterijen en opladen
-          mock_bike_info: Fietsinformatie
-          mock_continue: Doorgaan
-          mock_detected: Elektrisch (gemotoriseerd) gedetecteerd
-          mock_electric: Elektrisch (gemotoriseerd)
-          mock_electric_help: Vink 'elektrisch' aan, zodat we e-bikes kunnen markeren
-            en de certificering kunnen controleren.
-          mock_manufacturer: Fabrikant
-          mock_next: Volgende
-          mock_progress: Voortgang opgeslagen · Bevestiging e-voertuig · Stap 1 van
-            4
-          mock_rule_certified: Ik gebruik uitsluitend batterijen die gecertificeerd
-            zijn volgens UL 2849 / UL 2271 (of een gelijkwaardige norm).
-          mock_rule_charger: Ik laad mijn apparaat uitsluitend op met de oplader van
-            de fabrikant, nooit onbeheerd en nooit in een gang of vluchtroute.
-          mock_rule_report: Ik zal het gebruik staken en elke beschadigde, opgezwollen
-            of oververhitte batterij melden.
-          mock_sub: Westbrook heeft een aantal veiligheidsregels die je moet doornemen
-            voordat je je kunt inschrijven.
-          mock_title: Het lijkt erop dat je een elektrische auto hebt!
-          mock_traditional_bike: Traditionele fiets
-          mock_traditional_bike_note: "(2 wielen, 1 zitje, pedalen)"
-          mock_vehicle_type: 'Voertuigtype:'
           nav_checker: Staatscontroleur
           nav_education: Regels voor e-bikes
           nav_faq: Veelgestelde vragen
@@ -8126,6 +8171,133 @@ nl:
             om klaar te zijn voor de start.
           why_it_matters: Waarom het belangrijk is
           zoom: ZOOM!
+        for_bike_shops:
+          a_reason_to_trust_you: Een reden om je te vertrouwen.
+          a_reason_to_trust_you_body: Een gratis extraatje dat laat zien dat u ook
+            na de verkoop om uw klanten geeft.
+          bike_book_body: Vergelijk specificaties, geometrie en tal van andere kenmerken
+            van duizenden fietsmodellen.
+          bikes_that_came_home: Fietsen die mee naar huis zijn genomen
+          browse_bike_book_spaced: Blader door het fietsboek
+          bulk_order_email_subject: Grote bestelling stickers
+          check_your_state: Controleer uw staat
+          choose_your_pos: Kies uw kassasysteem (POS).
+          coming_soon: Binnenkort beschikbaar
+          contact_us: Contacteer ons
+          contact_us_for_bulk_orders_html: "%{contact_link} voor bulkbestellingen."
+          customer_records_sold_or_shared: klantgegevens verkocht of gedeeld
+          data_stays_private: Hun gegevens blijven privé.
+          data_stays_private_body: Nooit verkocht, nooit gedeeld.
+          ding: DING!
+          ebike_legality_checker: Controle op de legaliteit van e-bikes
+          ebike_legality_checker_body: Per staat is er een overzicht van de toegestane
+            categorieën e-bikes, waar ze mogen worden gebruikt en de leeftijds- en
+            uitrustingsregels. Handig wanneer een klant vraagt wat legaal is voordat
+            hij of zij een e-bike koopt.
+          email_our_shop_team: Stuur een e-mail naar ons winkelteam.
+          email_placeholder: jij@jouwwinkel.com
+          faq: Veelgestelde vragen
+          faq_cost_answer: Niets. Bike Index is gratis voor winkels en voor uw klanten.
+            Registratiestickers zijn een optioneel product dat in de winkel verkrijgbaar
+            is.
+          faq_cost_question: Wat zijn de kosten?
+          faq_customer_answer: Niets aan de balie. Ze ontvangen een e-mail van Bike
+            Index om hun registratie te bevestigen en foto's toe te voegen.
+          faq_customer_question: Wat moet mijn klant doen?
+          faq_data_answer: Nee. We hanteren zeer strikte privacyregels en verkopen
+            of delen nooit klantgegevens.
+          faq_data_question: Verkoopt of deelt u klantgegevens?
+          faq_pos_answer: Lightspeed en Ascend zijn nu beschikbaar. Shopify volgt
+            binnenkort. Winkels zonder een ondersteund kassasysteem kunnen nog steeds
+            fietsen registreren via hun winkelaccount.
+          faq_pos_question: Met welke kassasystemen integreert u?
+          faq_setup_answer: Ongeveer 10 minuten. Zodra uw kassasysteem is aangesloten,
+            worden fietsen automatisch geregistreerd bij elke transactie.
+          faq_setup_question: Hoe lang duurt de installatie?
+          faq_stickers_answer: Stickers worden per dozijn verkocht via onze webshop,
+            met een adviesprijs van $7,99. Groothandelsprijzen worden weergegeven
+            in het winkelmandje.
+          faq_stickers_question: Hoe bestel ik registratiestickers?
+          for_bike_shops_free_nonprofit: Voor fietsenwinkels · Gratis · Non-profit
+          for_you_and_your_customers: voor u en uw klanten
+          for_your_customers: Voor uw klanten
+          for_your_shop: Voor uw winkel
+          free_for_shops_and_customers: Gratis voor winkels en klanten, voor altijd.
+          free_forever: Gratis, voor altijd. Wij helpen u uw kassasysteem aan te sluiten.
+          free_registration: Gratis inschrijven.
+          free_registration_body: Hun fiets wordt geregistreerd voordat ze wegrijden.
+          free_tools: Gratis tools voor jou en je klanten
+          free_tools_choose_body: om klanten te helpen bij hun keuze.
+          free_tools_fun_body: Om het bezit van een fiets leuker te maken.
+          free_tools_title: Gratis tools
+          help_if_stolen: Help als het gestolen is.
+          help_if_stolen_body: Met één klik verstuurt u een melding naar winkels,
+            de politie en fietsers.
+          hero_lede_trust: Bike Index koppelt zich aan uw kassasysteem en registreert
+            automatisch elke fiets die u verkoopt. Uw klanten krijgen gratis diefstalbeveiliging.
+            U wordt een winkel die ze vertrouwen.
+          live: Leven
+          min: mijn
+          more_from_bike_index: Meer van Bike Index
+          never_shared: Nooit gedeeld
+          never_sold: Nooit verkocht
+          new_our_first_retail_product: Nieuw · Ons eerste product voor de detailhandel
+          no_extra_forms: Geen extra formulieren aan de balie en geen personeelstraining
+            nodig. Zodra uw kassasysteem is aangesloten, wordt elke fietsverkoop een
+            registratie in Bike Index.
+          nothing_to_manage: Niets te beheren.
+          nothing_to_manage_body: Het duurt 10 minuten om verbinding te maken, daarna
+            wordt het bij elke verkoop uitgevoerd.
+          order_stickers: Bestel stickers
+          peace_of_mind_on_a_sticker: Eenmalige gemoedsrust, op een sticker.
+          pos_ascend: Stijg op
+          pos_lightspeed: Lichtsnelheid
+          pos_other_or_none: Anders / geen
+          pos_shopify_coming_soon: Shopify (binnenkort beschikbaar)
+          pricing_shown_in_cart: Prijzen weergegeven in winkelwagen
+          privacy_body: Bike Index is een non-profitorganisatie met zeer strikte privacyregels.
+            Klantgegevens van uw winkel worden gebruikt voor het registreren en terugvinden
+            van fietsen. Deze gegevens worden nooit verkocht, gedeeld of gebruikt
+            voor reclamedoeleinden.
+          ring_up_the_sale: Sla de verkoop op. Wij regelen de rest.
+          safer_used_bike_sales: Veiligere verkoop van tweedehands fietsen.
+          safer_used_bike_sales_body: Controleer de serienummers aan de hand van het
+            register.
+          see_the_tools: Bekijk de tools
+          send_every_bike_home_with_a_sidekick: Geef elke fiets een hulpje mee naar
+            huis.
+          set_it_and_forget_it: Instellen en vergeten.
+          shop_name: Winkelnaam
+          shop_name_placeholder: Spaak- en kettingfietsen
+          sign_up_free: Meld je gratis aan
+          sign_up_your_shop: Meld je winkel aan
+          signup_name: aanmelden
+          something_else_html: Nog iets anders? %{email_link}.
+          step_connect_body: Koppel Lightspeed of Ascend aan je gratis winkelaccount.
+            Dit duurt ongeveer 10 minuten.
+          step_connect_title: Verbind uw kassasysteem.
+          step_covered_body: Ze ontvangen een e-mail ter bevestiging van hun registratie,
+            waarbij het serienummer en de gegevens al zijn ingevuld.
+          step_covered_title: Uw klant is gedekt.
+          step_sell_body: Er verandert niets aan de kassa. Elke fietsverkoop wordt
+            automatisch geregistreerd in Bike Index.
+          step_sell_title: Verkoop fietsen zoals altijd.
+          sticker_body: Verkoop Bike Index-registratiestickers aan de balie. Fietsers
+            scannen de QR-code, registreren hun fiets en koppelen de sticker eraan.
+            Het werkt voor elke fiets, ook voor fietsen die niet via uw kassasysteem
+            zijn binnengekomen.
+          sticker_sheet_alt: Stickervel voor registratie bij Bike Index
+          suggested_retail: Adviesprijs
+          suggested_retail_price: "$7,99"
+          ten_minutes_now: Nog tien minuten. Fietsen zijn nu definitief beschermd.
+          to_set_up: om op te zetten
+          used_only_for_bikes: Uitsluitend te gebruiken voor fietsen.
+          we_never_sell_or_share: Wij verkopen of delen nooit klantgegevens.
+          well_email_you: We sturen u een e-mail over het koppelen van uw kassasysteem.
+          what_your_customers_get: Wat uw klanten krijgen. Wat uw winkel krijgt.
+          wholesale: Groothandel
+          your_pos: Uw kassasysteem
+          youre_in: Je bent binnen.
       marketplace:
         how_it_works:
           across_town_heading: Aan de andere kant van de stad of aan de andere kant

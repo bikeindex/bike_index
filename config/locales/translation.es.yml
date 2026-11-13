@@ -3927,58 +3927,6 @@ es:
       get_in_touch_link: Ponte en contacto
       want_qr_stickers: "¿Quieres pegatinas con código QR? Pregúntanos cómo su coste
         compensa el precio del paquete."
-    for_bike_shops:
-      5_ways_to_grow_community_for_your_bike_sh: 5 maneras de fomentar la comunidad
-        en tu tienda de bicicletas.
-      automatic_registration_at_point_of_sale: Registro automático en el punto de
-        venta.
-      bike_index_for_bike_shops: Índice de bicicletas para tiendas de bicicletas
-      bike_shops_deck: Terraza del socio de la tienda de bicicletas
-      bikes_before_they: Únete a la lucha contra el robo de bicicletas y protege las
-        bicicletas de tus clientes incluso antes de que salgan a la calle.
-      build_goodwill_with_your_customers_with_a: Gánate la confianza de tus clientes
-        ofreciéndoles un servicio gratuito. Recupera una bicicleta robada y tendrás
-        un cliente para toda la vida.
-      check_out: Echa un vistazo a nuestra
-      connect_your_ascend_account_html: Conecta tu cuenta de Ascend con la de tu tienda
-        en Bike Index. Cada noche, Ascend exportará las bicicletas que hayas vendido
-        y nosotros las importaremos a Bike Index para tus clientes. ¡Solo tienes que
-        configurarlo! Obtén más información sobre la integración con Ascend %{ascend_link}.
-      connect_your_lightspeed_account: Conecta tu cuenta de Lightspeed
-      curious_what_information_html: "¿Tienes curiosidad por saber qué información
-        se recopila? Lee sobre %{security_link}."
-      do_right_by_your_customers: Trata bien a tus clientes en tan solo 5 clics.
-      dont_use_ascend_or_lightspeed_html: "¿No usas Ascend o Lightspeed POS? Pregúntanos
-        sobre %{printed_materials}."
-      driving_service_revenues_with_bicycle_reg: Generar ingresos por servicios mediante
-        el registro de bicicletas.
-      embed_a_bike_index_registration_form: Integre un formulario de registro de bicicletas
-        en su sitio web.
-      for_free_we_provide_you_with_t: Te proporcionamos gratuitamente las herramientas
-        necesarias para registrar automáticamente cada bicicleta que vendas en Bike
-        Index a través de tu sistema de punto de venta. Solo te llevará unos minutos
-        configurarlo, ya sea con tu cuenta de Ascend o Lightspeed Retail.
-      here: aquí
-      join_our_network_link_html: Únete a nuestro %{network_link}.
-      learn_more: Más información
-      network_of_shop_partners: red de socios comerciales
-      or: o
-      our_official_lightspeed_integration_provi: Nuestra integración oficial con Lightspeed
-        ofrece un registro totalmente automatizado para cada bicicleta que vendas.
-        Solo tienes que asegurarte de introducir el número de serie y el correo electrónico
-        del cliente.
-      printed_materials: materiales impresos
-      register_bikes_for_your_customers: Registra las bicicletas de tus clientes.
-      related_articles: 'Artículos relacionados:'
-      security_link_text: seguridad y privacidad de las integraciones aquí
-      sign_up_for_a_free_bike_index_account_html: Regístrate para obtener una cuenta
-        gratuita de Bike Index para tu tienda %{new_org_link}.
-      sign_up_for_free: Regístrate gratis
-      trusted_by_bike_shops_everywhere: Con la confianza de las tiendas de bicicletas
-        de todo el mundo.
-      use_ascend: "¿Usar Ascend?"
-      use_lightspeed_retail: "¿Utilizas Lightspeed Retail?"
-      used_at_bike_shops_everywhere: Se utiliza en todas las tiendas de bicicletas.
     packages_list:
       forever: Para siempre
       free: Gratis
@@ -4125,6 +4073,9 @@ es:
     landing_pages_for_community_groups: Bike Index es un registro de bicicletas gratuito
       y sin fines de lucro. Ayuda a tus ciclistas a registrarse para que una bicicleta
       robada pueda regresar a casa. Gratis para grupos comunitarios, para siempre.
+    landing_pages_for_bike_shops: Bike Index se conecta a tu sistema de punto de venta
+      y registra automáticamente cada bicicleta que vendes. Es gratis para tiendas
+      y clientes, y nunca vendemos ni compartimos datos de clientes.
   meta_titles:
     bikes_index: Resultados de la búsqueda
     bikes_new: "¡Inscribe una bicicleta!"
@@ -7685,26 +7636,15 @@ es:
           form_title: Financiar la próxima recuperación
           headline: Todas las bicicletas mencionadas anteriormente regresaron a casa
             porque el registro era gratuito.
-          larger_gift_link: Háblanos sobre una donación mayor.
           lede_short: Bike Index es una organización sin fines de lucro. El registro,
             la búsqueda y los informes de robo son gratuitos. Las donaciones son las
             que permiten que siga siendo así.
-          major_benefactor: Benefactor
           major_body: Las donaciones de este nivel se destinan a la incorporación
             de socios, las investigaciones de robos transfronterizos y el desarrollo
             de las alertas promocionales.
           major_eyebrow: Donaciones importantes
-          major_partner: Pareja
           major_title: Las donaciones más grandes hacen que ciudades enteras se incluyan
             en la lista de regalos.
-          other_ways_daf: 'Subvenciones de fondos de donaciones asesoradas: podemos
-            enviar nuestro número de identificación fiscal (EIN) y los detalles de
-            la subvención.'
-          other_ways_match: 'Donaciones de la empresa: muchas empresas igualarán tu
-            donación sin coste adicional para ti.'
-          other_ways_stock: Donaciones de acciones o criptomonedas, que evitan el
-            impuesto sobre las ganancias de capital derivadas de la apreciación de
-            los activos.
           other_ways_title: Otras formas de donar a este nivel
           stories_title: En palabras de sus dueños
           uses_alerts_body: El sistema de alerta de bicicletas robadas y las alertas
@@ -7724,7 +7664,6 @@ es:
             surgen de los datos del registro.
           uses_partners_title: Socios e investigaciones
           uses_title: "¿Adónde va el dinero?"
-          wall_photo_alt: Una bicicleta recuperada a través de Bike Index.
           lede_millions_registered: Bike Index es una organización sin fines de lucro.
             Registrarse es gratis, buscar es gratis y denunciar un robo es gratis;
             por eso hay %{millions} millones de bicicletas registradas y por eso los
@@ -7760,6 +7699,128 @@ es:
           tier_plus: Membresía Plus
           tier_plus_benefit: Todo lo incluido en el paquete Básico, una alerta promocional
             gratuita si te roban la bicicleta y un límite de miembros.
+        major_gift:
+          benefactor: Benefactor
+          partner: Pareja
+        other_ways:
+          daf: 'Subvenciones de fondos de donaciones asesoradas: podemos enviar nuestro
+            número de identificación fiscal (EIN) y los detalles de la subvención.'
+          larger_gift_link: Háblanos sobre una donación mayor.
+          match: 'Donaciones de la empresa: muchas empresas igualarán tu donación
+            sin coste adicional para ti.'
+          stock: Donaciones de acciones o criptomonedas, que evitan el impuesto sobre
+            las ganancias de capital derivadas de la apreciación de los activos.
+        photo_wall:
+          photo_alt: Una bicicleta recuperada a través de Bike Index.
+        ten_percent:
+          bike_value: "¿Cuánto vale tu bicicleta?"
+          heading: "¿Te devolvieron una bicicleta con Bike Index? Dona el 10% de su
+            valor."
+          result_html: El 10% es %{amount}. Lo hemos configurado como tu regalo a
+            continuación.
+        year_end:
+          bikebook_body: 'La biblioteca mundial de bicicletas: busca, compara y encuentra
+            tu próxima bici.'
+          bikebook_eyebrow: Tu taller de bicicletas, en internet.
+          bikebook_link: Vea un adelanto de Bike Book.
+          bikebook_title: Conoce el libro de bicicletas
+          building_eyebrow: "¿Qué construirá tu donación a continuación?"
+          building_intro: Nuestro objetivo es convertir Bike Index en el lugar de
+            referencia para tu bicicleta en internet.
+          building_title: Ayúdanos a construir el futuro.
+          cta_sub: Manténgalo gratuito para el próximo millón de usuarios. ¡Nuestro
+            equipo se lo agradece!
+          cta_title: Gratis desde el primer día. Gratis para siempre.
+          eyebrow: Donaciones de fin de año · 2026
+          form_title: Haz tu regalo de fin de año
+          goal: Nuestro objetivo es %{goal} antes del 31 de diciembre.
+          headline: Haz una donación de fin de año a Bike Index. Ayúdanos a recuperar
+            más bicicletas robadas en 2027.
+          headline_recovered: Tu bicicleta llegó a casa. Ayuda a que la próxima también
+            lo haga.
+          impact_eyebrow: Lo que logró tu apoyo en 2026
+          impact_intro: Todos estos casos se resolvieron porque alguien verificó un
+            número de serie con un registro cuyo uso es gratuito.
+          impact_title: Bicicletas que llegaron a casa
+          lede_recovered_count: Bike Index ha sido gratuito desde el primer día y
+            seguirá siéndolo. Este año, este registro gratuito ayudó a que %{recovered}
+            bicicletas robadas volvieran a sus dueños. Tu donación de fin de año nos
+            permite seguir funcionando y financiar nuestros próximos proyectos.
+          major_eyebrow: Donaciones importantes
+          major_title: Las donaciones más grandes hacen que ciudades enteras se incluyan
+            en la lista de regalos.
+          marketplace_body: Seguimos trabajando para convertirnos en el lugar más
+            fiable para vender bicicletas usadas.
+          marketplace_eyebrow: Compra y venta de artículos usados
+          marketplace_link: Visita el mercado
+          marketplace_title: Mercado
+          merch_body: Camisetas, pegatinas y gorras. Cada compra contribuye al registro.
+          merch_link: Visita la tienda
+          merch_title: Merchandising y más
+          network_police: Las bicicletas recuperadas se asignan a sus dueños en lugar
+            de permanecer guardadas en un depósito de objetos perdidos.
+          network_police_title: fuerzas del orden
+          network_shops: Herramientas que hacen que comprobar el número de serie al
+            recibir la bicicleta sea una tarea rutinaria. Así es como Ted guardó una
+            bicicleta robada para su dueño.
+          network_shops_title: Tiendas de bicicletas
+          network_title: Construyendo una red más útil
+          network_universities: Herramientas de registro y depósito en el campus,
+            para que las bicicletas de los estudiantes sean devueltas en lugar de
+            ser retiradas.
+          network_universities_title: Universidades
+          other_ways_title: Otras formas de dar
+          quote: Cuatro años después, recibí un correo electrónico a través del servicio
+            de mensajería de Bike Index informándome de que alguien tenía mi bicicleta
+            y quería devolvérmela. La recogí este fin de semana y estoy muy agradecido
+            a ese amable señor por devolvérmela y a Bike Index por brindarnos la plataforma
+            para conectarnos.
+          quote_caption: De vuelta a casa después de cuatro años.
+          shipped_dashboard: Tus bicicletas, alertas y mensajes en un solo lugar.
+          shipped_dashboard_title: Véalo todo en su nuevo panel de control.
+          shipped_ebike: Al registrar una bicicleta eléctrica, ahora se explica su
+            clase a medida que la usas.
+          shipped_ebike_title: Educación en bicicletas eléctricas, integrada en
+          shipped_eyebrow: Enviado este año
+          shipped_intro: Un índice de bicicletas más rápido y fácil de usar. Financiado
+            íntegramente con donaciones.
+          shipped_legality: Infórmese sobre dónde es legal circular con su bicicleta
+            eléctrica, según su categoría y jurisdicción, antes de comprarla o antes
+            de ir a un lugar nuevo.
+          shipped_legality_title: Comprobador de legalidad de bicicletas eléctricas
+          shipped_messaging: Flujo de comunicación optimizado para los socios de recuperación
+            de bicicletas robadas.
+          shipped_messaging_title: Mejor mensaje
+          shipped_partners: Proceso de incautación más ágil para ciudades y campus
+            universitarios, y flujos de registro personalizados para marcas de bicicletas
+            eléctricas y de venta directa al consumidor.
+          shipped_partners_title: Nuevas funciones para socios
+          shipped_registration: Menos pasos entre comprar una bicicleta y matricularla.
+          shipped_registration_title: Un proceso de registro simplificado
+          shipped_title: Aquí está tu nuevo índice de bicicletas.
+          stat_recovered: Bicicletas robadas recuperadas en 2026
+          stat_registered: Bicicletas matriculadas este año, gratis.
+          stat_value: en bicicletas devueltas a sus dueños
+          stat_value_figure: 1,5 millones de dólares
+          story_country: "“El número de serie se buscó en una tienda de bicicletas
+            en Henderson, Nevada, y me lo enviaron de vuelta. Swanys Cycles es una
+            tienda de bicicletas fenomenal, ¡y Bike Index me los recomendó!”"
+          story_country_title: Presente en todo el país
+          story_magic: Un hombre de Rosemount ganó la subasta de un trastero abandonado
+            en Minneapolis. Dentro había varias bicicletas, pero la mía era la única
+            registrada. Se puso en contacto conmigo a través de Bike Index y quedamos
+            en que la recogiera.
+          story_magic_title: Un poco de magia de Bike Index
+          story_shop: "“La tienda de bicicletas de Ted en Colorado Springs la recogió
+            de alguien que la llevó allí para que le hicieran mantenimiento. Compararon
+            el número de serie con el que aparece aquí y pudieron guardármela.”"
+          story_shop_title: Tienda de bicicletas de Ted, Colorado Springs
+          ten_percent_button: Calcula mi 10%
+          ten_percent_prompt: Dinos cuánto vale tu bicicleta y te propondremos un
+            regalo.
+          ten_percent_statement: Si todas las personas cuyas bicicletas robadas fueron
+            recuperadas por Bike Index donaran el 10% de su valor, cubriríamos nuestros
+            costos operativos básicos para el próximo año.
       landing_pages:
         demo_modal:
           field_message: "¿Hay algo más que debamos saber?"
@@ -7902,29 +7963,6 @@ es:
             los números de teléfono de los propietarios, actualizada en tiempo real
             para su departamento de policía.
           hot_sheet_title: Lista de bicicletas robadas
-          mock_batteries: Baterías y carga
-          mock_bike_info: Información sobre bicicletas
-          mock_continue: Continuar
-          mock_detected: Eléctrico (motorizado) detectado
-          mock_electric: Eléctrico (motorizado)
-          mock_electric_help: Verificamos que sean eléctricas para poder marcarlas
-            y comprobar su certificación.
-          mock_manufacturer: Fabricante
-          mock_next: Próximo
-          mock_progress: Progreso guardado · Confirmación del vehículo eléctrico ·
-            Paso 1 de 4
-          mock_rule_certified: Solo utilizaré baterías certificadas según las normas
-            UL 2849 / UL 2271 (o equivalentes).
-          mock_rule_charger: Solo cargaré el dispositivo con el cargador del fabricante,
-            nunca lo dejaré desatendido ni en un pasillo o ruta de salida.
-          mock_rule_report: Dejaré de usar la batería e informaré sobre cualquier
-            daño, hinchazón o sobrecalentamiento.
-          mock_sub: Westbrook tiene algunas normas de seguridad que debes repasar
-            antes de poder completar la inscripción.
-          mock_title: "¡Parece que tienes un vehículo eléctrico!"
-          mock_traditional_bike: Bicicleta tradicional
-          mock_traditional_bike_note: "(2 ruedas, 1 asiento, pedales)"
-          mock_vehicle_type: Tipo de vehículo
           nav_checker: comprobador de estado
           nav_education: Normativa sobre bicicletas eléctricas
           nav_faq: Preguntas frecuentes
@@ -8237,6 +8275,138 @@ es:
             ciclistas a estar preparados para montar en bici.
           why_it_matters: Por qué es importante
           zoom: "¡ZOOM!"
+        for_bike_shops:
+          a_reason_to_trust_you: Un motivo para confiar en ti.
+          a_reason_to_trust_you_body: Un obsequio gratuito que demuestra que te importa
+            después de la venta.
+          bike_book_body: Compara las especificaciones, la geometría y muchas otras
+            características de miles de modelos de bicicletas.
+          bikes_that_came_home: Bicicletas que volvieron a casa
+          browse_bike_book_spaced: Consultar el catálogo de bicicletas
+          bulk_order_email_subject: Pedido de pegatinas al por mayor
+          check_your_state: Consulta tu estado
+          choose_your_pos: Elige tu TPV
+          coming_soon: Muy pronto
+          contact_us: Contacta
+          contact_us_for_bulk_orders_html: "%{contact_link} para pedidos al por mayor."
+          customer_records_sold_or_shared: registros de clientes vendidos o compartidos
+          data_stays_private: Sus datos permanecen privados.
+          data_stays_private_body: Nunca vendido, nunca compartido.
+          ding: "¡TIMBRE!"
+          ebike_legality_checker: Comprobador de legalidad de bicicletas eléctricas
+          ebike_legality_checker_body: Información específica de cada estado sobre
+            las categorías de bicicletas eléctricas, dónde se pueden usar y las normas
+            de edad y equipamiento. Muy útil cuando un cliente pregunta qué es legal
+            antes de comprar.
+          email_our_shop_team: Envía un correo electrónico a nuestro equipo de la
+            tienda.
+          email_placeholder: tú@tutienda.com
+          faq: Preguntas frecuentes
+          faq_cost_answer: Nada. Bike Index es gratuito para las tiendas y para sus
+            clientes. Las pegatinas de registro son un producto de venta opcional.
+          faq_cost_question: "¿Cuánto cuesta?"
+          faq_customer_answer: No hay nada en el mostrador. Reciben un correo electrónico
+            de Bike Index para reclamar su registro y añadir fotos.
+          faq_customer_question: "¿Qué debe hacer mi cliente?"
+          faq_data_answer: No. Tenemos políticas de privacidad muy estrictas y nunca
+            vendemos ni compartimos datos de nuestros clientes.
+          faq_data_question: "¿Vendes o compartes datos de clientes?"
+          faq_pos_answer: Lightspeed y Ascend ya están disponibles. Shopify estará
+            disponible próximamente. Las tiendas que no cuenten con un sistema de
+            punto de venta compatible aún pueden registrar bicicletas desde su cuenta.
+          faq_pos_question: "¿Con qué sistemas de punto de venta (POS) se integran?"
+          faq_setup_answer: Aproximadamente 10 minutos. Una vez conectado el terminal
+            de punto de venta, las bicicletas se registran automáticamente con cada
+            transacción.
+          faq_setup_question: "¿Cuánto tiempo tarda la instalación?"
+          faq_stickers_answer: Las pegatinas se venden por docenas a través de nuestra
+            tienda en línea, con un precio de venta sugerido de $7.99. El precio al
+            por mayor se muestra en el carrito de compra.
+          faq_stickers_question: "¿Cómo puedo pedir pegatinas de registro?"
+          for_bike_shops_free_nonprofit: Para tiendas de bicicletas · Gratis · Sin
+            ánimo de lucro
+          for_you_and_your_customers: para usted y sus clientes
+          for_your_customers: Para sus clientes
+          for_your_shop: Para tu tienda
+          free_for_shops_and_customers: Gratis para tiendas y clientes, para siempre.
+          free_forever: Gratis, para siempre. Te ayudaremos a conectar tu TPV.
+          free_registration: Registro gratuito.
+          free_registration_body: Su bicicleta queda registrada antes de que se marchen.
+          free_tools: Herramientas gratuitas para usted y sus clientes.
+          free_tools_choose_body: para ayudar a los clientes a elegir.
+          free_tools_fun_body: para que tener una bicicleta sea más divertido.
+          free_tools_title: Herramientas gratuitas
+          help_if_stolen: Ayuda en caso de robo.
+          help_if_stolen_body: Con un solo clic se envía una alerta a las tiendas,
+            la policía y los repartidores.
+          hero_lede_trust: Bike Index se conecta a tu sistema de punto de venta y
+            registra automáticamente cada bicicleta que vendes. Tus clientes obtienen
+            protección antirrobo gratuita. Te conviertes en una tienda de confianza.
+          live: Vivir
+          min: min
+          more_from_bike_index: Más de Bike Index
+          never_shared: Nunca compartido
+          never_sold: Nunca se vendió
+          new_our_first_retail_product: Nuevo · Nuestro primer producto de venta al
+            público
+          no_extra_forms: No se requieren formularios adicionales en el mostrador
+            ni capacitación del personal. Una vez conectado su sistema de punto de
+            venta, cada venta de bicicleta se registra en Bike Index.
+          nothing_to_manage: Nada que gestionar.
+          nothing_to_manage_body: Se tarda 10 minutos en conectarlo y luego se ejecuta
+            en cada venta.
+          order_stickers: Pegatinas de pedido
+          peace_of_mind_on_a_sticker: Tranquilidad por única vez, en una pegatina.
+          pos_ascend: Ascender
+          pos_lightspeed: Velocidad de la luz
+          pos_other_or_none: Otro / ninguno
+          pos_shopify_coming_soon: Shopify (próximamente)
+          pricing_shown_in_cart: Precios mostrados en el carrito
+          privacy_body: Bike Index es una organización sin ánimo de lucro con políticas
+            de privacidad muy estrictas. La información de los clientes de su tienda
+            se utiliza para registrar y recuperar bicicletas. Nunca se vende, comparte
+            ni utiliza con fines publicitarios.
+          ring_up_the_sale: Cobra la venta. Nosotros nos encargamos del resto.
+          safer_used_bike_sales: Venta de bicicletas usadas más segura.
+          safer_used_bike_sales_body: Compruebe los números de serie con el registro.
+          see_the_tools: Ver las herramientas
+          send_every_bike_home_with_a_sidekick: Envía a cada ciclista a casa con un
+            acompañante.
+          set_it_and_forget_it: Configúralo y olvídate.
+          shop_name: Nombre de la tienda
+          shop_name_placeholder: Ciclos de radios y cadena
+          sign_up_free: Regístrate gratis
+          sign_up_your_shop: Registra tu tienda
+          signup_name: inscribirse
+          something_else_html: "¿Algo más? %{email_link}."
+          step_connect_body: Vincula Lightspeed o Ascend a tu cuenta gratuita de la
+            tienda. Tarda unos 10 minutos.
+          step_connect_title: Conecta tu TPV
+          step_covered_body: Reciben un correo electrónico para reclamar su registro,
+            con el número de serie y los datos ya cumplimentados.
+          step_covered_title: Su cliente está cubierto
+          step_sell_body: En el mostrador no cambia nada. Cada venta de bicicleta
+            se registra automáticamente en Bike Index.
+          step_sell_title: Vender bicicletas como siempre
+          sticker_body: Vende las pegatinas de registro de Bike Index en el mostrador.
+            Los ciclistas escanean el código QR, registran su bicicleta y vinculan
+            la pegatina a ella. Funciona con cualquier bicicleta, incluso con las
+            que no se registraron en tu punto de venta.
+          sticker_sheet_alt: Hoja de pegatinas de registro del Índice de Bicicletas
+          suggested_retail: Precio minorista sugerido
+          suggested_retail_price: "$7.99"
+          ten_minutes_now: Diez minutos ya. Bicicletas protegidas para siempre.
+          to_set_up: para configurar
+          used_only_for_bikes: Utilizado únicamente para bicicletas
+          we_never_sell_or_share: Nunca vendemos ni compartimos datos de nuestros
+            clientes.
+          well_email_you: Le enviaremos un correo electrónico con instrucciones para
+            conectar su terminal de punto de venta (TPV).
+          what_your_customers_get: Lo que obtienen tus clientes. Lo que obtiene tu
+            tienda.
+          wholesale: Al por mayor
+          your_pos: Tu TPV
+          youre_in: Estás dentro.
       marketplace:
         how_it_works:
           across_town_heading: Al otro lado de la ciudad o al otro lado del país.
