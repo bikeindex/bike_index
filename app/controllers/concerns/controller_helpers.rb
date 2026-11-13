@@ -111,7 +111,8 @@ module ControllerHelpers
     merged_into_id = request.get? && PosRegistrationMatch.merged_into_id(bike)
     fail ActiveRecord::RecordNotFound if merged_into_id.blank?
 
-    redirect_to(bike_path(merged_into_id))
+    # Keeps tokens, e.g. a parking notification's retrieval link
+    redirect_to(bike_path(merged_into_id, request.query_parameters))
   end
 
   def set_reading_role

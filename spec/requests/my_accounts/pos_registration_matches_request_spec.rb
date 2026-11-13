@@ -30,8 +30,8 @@ RSpec.describe MyAccounts::PosRegistrationMatchesController, type: :request do
 
       get bike_path(pos_registration_match.bike_id)
       expect(response).to redirect_to(registration_path(pos_registration_match.bike_id))
-      get registration_path(pos_registration_match.bike_id)
-      expect(response).to redirect_to(bike_path(pos_bike.id))
+      get registration_path(pos_registration_match.bike_id, parking_notification_retrieved: "token")
+      expect(response).to redirect_to(bike_path(pos_bike.id, parking_notification_retrieved: "token"))
       # A form submission isn't sent on
       patch bike_path(pos_registration_match.bike_id), params: {bike: {description: "Lost"}}
       expect(response.status).to eq 404
