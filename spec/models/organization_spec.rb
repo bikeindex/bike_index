@@ -409,29 +409,23 @@ RSpec.describe Organization, type: :model do
   describe "show_single_search_menu_item?" do
     let(:organization) { Organization.new }
 
-    it "is falsey without bike_search" do
-      expect(organization.show_single_search_menu_item?).to be_falsey
+    it "is truthy" do
+      expect(organization.show_single_search_menu_item?).to be_truthy
     end
 
-    context "with bike_search" do
-      let(:organization) do
-        FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["bike_search"])
+    context "law_enforcement" do
+      let(:organization) { Organization.new(kind: "law_enforcement") }
+
+      it "is falsey" do
+        expect(organization.show_single_search_menu_item?).to be_falsey
       end
+    end
 
-      it "is truthy" do
-        expect(organization.show_single_search_menu_item?).to be_truthy
-      end
+    context "ambassador" do
+      let(:organization) { Organization.new(kind: "ambassador") }
 
-      context "law_enforcement" do
-        let(:organization) do
-          FactoryBot.create(:organization_with_organization_features, kind: "law_enforcement",
-            enabled_feature_slugs: ["bike_search"])
-        end
-
-        it "is falsey" do
-          expect(organization.enabled?("bike_search")).to be_truthy
-          expect(organization.show_single_search_menu_item?).to be_falsey
-        end
+      it "is falsey" do
+        expect(organization.show_single_search_menu_item?).to be_falsey
       end
     end
   end
@@ -486,11 +480,11 @@ RSpec.describe Organization, type: :model do
       expect(organization.child_ids).to eq([organization_child.id])
       expect(organization.child_organizations.pluck(:id)).to eq([organization_child.id])
     end
-    context "registration_sequences_edit" do
-      let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["registration_sequences_edit"]) }
+    context "education_courses_edit" do
+      let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["education_courses_edit"]) }
 
-      it "adds registration_sequences, since editing without viewing locks the organization out" do
-        expect(organization.reload.enabled_feature_slugs).to match_array(%w[registration_sequences registration_sequences_edit])
+      it "adds education_courses, since editing without viewing locks the organization out" do
+        expect(organization.reload.enabled_feature_slugs).to match_array(%w[education_courses education_courses_edit])
       end
     end
     context "regional bike_stickers" do

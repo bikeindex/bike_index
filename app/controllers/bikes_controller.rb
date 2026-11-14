@@ -1,15 +1,17 @@
 class BikesController < Bikes::BaseController
   skip_before_action :verify_authenticity_token, only: %i[create]
+  skip_before_action :redirect_scanned_id, except: %i[show update pdf resolve_token]
+  before_action :hand_off_to_redesign, only: %i[show]
+  # Redeclared to run behind the hand-off, since registrations#show repeats them
+  before_action :find_bike, only: %i[show update pdf resolve_token]
+  before_action :assign_current_organization, only: %i[show]
+  before_action :ensure_user_allowed_to_edit, only: %i[update pdf]
   before_action :sign_in_if_not!, only: %i[show]
   before_action :render_ad, only: %i[show]
-  skip_before_action :find_bike, except: %i[show update pdf resolve_token]
-  skip_before_action :assign_current_organization, except: %i[show]
-  skip_before_action :ensure_user_allowed_to_edit, except: %i[update pdf]
   around_action :set_reading_role, only: %i[show]
 
   def show
     redirect_to(format: "png") && return if request.format == "gif"
-    redirect_to(registration_path(@bike, request.query_parameters)) && return if show_redesign?
 
     if @bike.current_stolen_record.present?
       # Show contact owner box on load - happens if user has clicked on it and then logged in
@@ -66,7 +68,7 @@ class BikesController < Bikes::BaseController
       flash[:error] = translation(:unable_to_find_sticker, scanned_id: params[:scanned_id])
       redirect_to user_root_url
     elsif @bike_sticker.bike.present?
-      redirect_to(bike_url(@bike_sticker.bike_id, scanned_id: params[:scanned_id], organization_id: params[:organization_id])) && return
+      redirect_to(RegistrationView.path(@bike_sticker.bike_id, user: current_user, session:, scanned_id: params[:scanned_id], organization_id: params[:organization_id])) && return
     elsif current_user.present?
       if current_user.member_of?(@bike_sticker.organization)
         set_passive_organization(@bike_sticker.organization)
@@ -89,7 +91,7 @@ class BikesController < Bikes::BaseController
       redirect_to(new_user_path) && return
     end
     find_or_new_b_param
-    redirect_to(bike_path(@b_param.created_bike_id)) && return if @b_param.created_bike.present?
+    redirect_to(RegistrationView.path(@b_param.created_bike_id, user: current_user, session:)) && return if @b_param.created_bike.present?
 
     # Let them know if they sent an invalid b_param token - notice rather than error because we're aggressive about removing b_params
     flash[:notice] = translation(:we_couldnt_find_that_registration) if @b_param.id.blank? && params[:b_param_token].present?
@@ -194,7 +196,7 @@ class BikesController < Bikes::BaseController
       matching_notification = @bike.parking_notifications.where(retrieval_link_token: params[:token]).first
       if matching_notification.present?
         if matching_notification.active?
-          flash[:success] = translation(:marked_retrieved, bike_type: @bike.type)
+          flash[:success] = translation(:bike_type_marked_retrieved, bike_type: @bike.type_titleize)
           # Quick hack to skip making another endpoint
           retrieved_kind = params[:user_recovery].present? ? "user_recovery" : "link_token_recovery"
           matching_notification.mark_retrieved!(retrieved_by_id: current_user&.id, retrieved_kind: retrieved_kind)
@@ -209,7 +211,7 @@ class BikesController < Bikes::BaseController
       end
     end
 
-    redirect_to bike_path(@bike.id)
+    redirect_to RegistrationView.path(@bike.id, user: current_user, session:)
   end
 
   private
@@ -220,11 +222,12 @@ class BikesController < Bikes::BaseController
     Binxtils::InputNormalizer.boolean(params[:contact_owner])
   end
 
-  # no_redesign reaches the classic page without changing the viewer's preference
-  def show_redesign?
-    return false if Binxtils::InputNormalizer.boolean(params[:no_redesign])
+  # An id that decodes to nothing has no registration path, so find_bike 404s it
+  def hand_off_to_redesign
+    return if !request.format.html? || RegistrationView.show_legacy?(user: current_user, session:)
 
-    request.format.html? && current_user&.registration_show_redesign?
+    id = ShortId.decode("Bike", params[:id])
+    redirect_to(registration_path(id, request.query_parameters)) if id.present?
   end
 
   def show_for_sale?(bike)

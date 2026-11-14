@@ -25,6 +25,22 @@ RSpec.describe "Register flow", :js, type: :system do
     end
   end
 
+  it "searches what was typed before the combobox's module landed" do
+    hold = hold_requests(%r{hotwire_combobox.*\.js})
+    # A plain visit waits for the load the held module is holding up
+    page.driver.with_playwright_page { it.goto("#{Capybara.app_host || page.server_url}/register/new", waitUntil: "commit") }
+
+    find("#b_param_manufacturer_id").send_keys("Surly")
+    wait_for { hold.held? }
+    hold.release
+
+    click_combobox_option("Surly")
+    expect(page).to have_field("b_param_manufacturer_id", with: "Surly")
+    fill_in "b_param[owner_email]", with: owner_email
+    click_button "Next"
+    expect(page).to have_field("bike[serial_number]", wait: 10)
+  end
+
   it "keeps a step 1 draft across a reload, and comes back to what it submitted" do
     visit "/register/new"
     type_into("#b_param_manufacturer_id", "Surly")
@@ -72,6 +88,30 @@ RSpec.describe "Register flow", :js, type: :system do
     send_keys("Kona")
 
     expect(page).to have_field("b_param_manufacturer_id", with: "Kona")
+  end
+
+  it "registers without a draft where the browser blocks storage" do
+    errors = []
+    page.driver.with_playwright_page do |playwright_page|
+      # Chrome with site data blocked throws on any read of the property
+      playwright_page.add_init_script(script: <<~JS)
+        Object.defineProperty(window, "localStorage", {
+          get () { throw new DOMException("Access is denied for this document.", "SecurityError") }
+        })
+      JS
+      playwright_page.on("pageerror", ->(error) { errors << error.message })
+    end
+
+    visit "/register/new"
+    type_into("#b_param_manufacturer_id", "Surly")
+    click_combobox_option("Surly")
+    fill_in "b_param[owner_email]", with: owner_email
+    sleep 0.5 # past form-persist's write debounce
+    click_button "Next"
+
+    wait_for_details_step
+    expect(BParam.last).to have_attributes(manufacturer_id: manufacturer.id, owner_email:)
+    expect(errors).to eq([])
   end
 
   it "starts a registration, keeps a full details draft across a reload, and completes" do

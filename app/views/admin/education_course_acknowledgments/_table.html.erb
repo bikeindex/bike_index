@@ -1,0 +1,45 @@
+<%# locals: (collection:, render_sortable: false) %>
+
+<%= render(UI::Table::Base::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
+  <% table.column(sortable: "created_at", label: "Created", lower_right: ->(acknowledgment) { tag.span(acknowledgment.id, class: "only-dev-visible") }) do |acknowledgment| %>
+    <%= render UI::Time::Component.new(time: acknowledgment.created_at) %>
+  <% end %>
+
+  <% table.column(sortable: "acknowledged_at", label: "Acknowledged") do |acknowledgment| %>
+    <% if acknowledgment.acknowledged_at.present? %>
+      <%= render UI::Time::Component.new(time: acknowledgment.acknowledged_at) %>
+    <% else %>
+      <%= render UI::Badge::Component.new(text: "Pending", color: :warning, size: :sm) %>
+    <% end %>
+  <% end %>
+
+  <% table.column(label: "Organization") do |acknowledgment| %>
+    <% education_course = acknowledgment.education_course %>
+
+    <% if education_course.default? %>
+      <span class="less-strong"><%= education_course.badge_name %></span>
+    <% else %>
+      <%= render Atoms::Admin::TableCells::Organization::Component.new(organization: education_course.organization, organization_id: education_course.organization_id, render_search: render_sortable, search_url: url_for(sort_state.search_params.merge(organization_id: education_course.organization_id))) %>
+    <% end %>
+  <% end %>
+
+  <% table.column(sortable: "education_course_id", label: "Course") do |acknowledgment| %>
+    <% education_course = acknowledgment.education_course %>
+
+    <%# A soft-deleted course has no admin page to link to %>
+    <%= link_to_unless education_course.deleted?, education_course.status_display, admin_education_course_path(education_course), class: "twlink" %>
+    <%= link_to search_emoji, url_for(sort_state.search_params.merge(search_education_course_id: education_course.id)), class: "display-sortable-link tw:text-xs" %>
+  <% end %>
+
+  <% table.column(sortable: "bike_id", label: "Bike") do |acknowledgment| %>
+    <%= render Atoms::Admin::TableCells::Bike::Component.new(sort_state:, bike: acknowledgment.bike, bike_id: acknowledgment.bike_id, render_search: render_sortable) %>
+  <% end %>
+
+  <% table.column(sortable: "user_id", label: "User") do |acknowledgment| %>
+    <%= render Atoms::Admin::TableCells::User::Component.new(sort_state:, user: acknowledgment.user, user_id: acknowledgment.user_id, render_search: render_sortable) %>
+  <% end %>
+
+  <% table.column(sortable: "owner_email", label: "Owner email", classes: "tw:text-xs") do |acknowledgment| %>
+    <%= acknowledgment.owner_email %>
+  <% end %>
+<% end %>

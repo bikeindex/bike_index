@@ -12,6 +12,8 @@
 class DuplicateBikeGroup < ApplicationRecord
   has_many :normalized_serial_segments
   has_many :bikes, through: :normalized_serial_segments
+  # A merge deletes the new registration, which can remove the group; the match outlives it
+  has_many :pos_registration_matches, dependent: :nullify
 
   before_save :update_added_bike_at
 

@@ -1,6 +1,6 @@
 <%# locals: (collection:, render_sortable: false, show_count: false) %>
 
-<%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
+<%= render(UI::Table::Base::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
   <% table.column(sortable: "created_at", lower_right: ->(primary_activity) { primary_activity.id }) do |primary_activity| %>
     <%= link_to edit_admin_primary_activity_path(primary_activity.id), class: "twlink" do %>
       <%= render UI::Time::Component.new(time: primary_activity.created_at) %>

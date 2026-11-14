@@ -1,1 +1,4 @@
-<%= render(Pages::Memberships::ChooseMembership::Component.new(currency: current_currency, referral_source: @referral_source, level: @initial_level)) %>
+<%= render(SharedBlocks::Marketing::Wrapper::Component.new(page: Pages::Memberships::New::Component.new(
+  stripe_prices: @stripe_prices, level: @initial_level, referral_source: @referral_source, bikes_count: Counts.total_bikes,
+  recovery_displays: RecoveryDisplay.with_photo,
+  membership: current_user&.membership_active))) %>

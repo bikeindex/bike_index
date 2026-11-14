@@ -43,6 +43,7 @@ module Sessionable
   # a destination of their own
   def sign_in_user(user)
     confirm_user_from_claim_token(user)
+    carry_registration_show_legacy(user)
     session[:last_seen] = Time.current
     session[:render_donation_request] = user.render_donation_request if user&.render_donation_request
     set_passive_organization(OrganizationRole.default_organization(user)) # Set that organization!
@@ -63,6 +64,15 @@ module Sessionable
   end
 
   private
+
+  # Carries a signed-out opt-out onto the account, since the redesign's own claim and
+  # sign-up CTAs are what push people through signing in. Waits for confirmation because
+  # current_user is confirmed-only
+  def carry_registration_show_legacy(user)
+    return unless user.confirmed? && session[:registration_show_legacy]
+
+    session.delete(:registration_show_legacy) if user.update(feature_registration_show_legacy: true, skip_update: true)
+  end
 
   # SSO orgs force SSO: hand an SSO-managed email off to the IdP rather than let it sign in or
   # sign up any other way. As a before_action the redirect halts the chain; called inline it

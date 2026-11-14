@@ -161,6 +161,15 @@ RSpec.describe SharedBlocks::HeaderTags::Component, type: :component do
         expect(component.css("title")).to have_text "🧰 #{title}"
       end
     end
+
+    context "create, which only renders when the record didn't save" do
+      let(:controller_name) { "manufacturers" }
+      let(:action_name) { "create" }
+
+      it "titles it as the new form" do
+        expect(component.css("title")).to have_text "🧰 New manufacturer"
+      end
+    end
   end
 
   context "organized" do

@@ -26,7 +26,7 @@ RSpec.describe GeocodeHelper do
           result = described_class.assignable_address_hash_for(latitude: latitude, longitude: longitude)
           # Ensure assignable_address_hash_for returns original lat & long
           expect(result).to eq target_assignable_hash
-          expect(result.keys.map(&:to_s).sort).to eq GeocodeableLegacy.location_attrs.sort
+          expect(result.keys.map(&:to_s).sort).to eq %w[city country_id latitude longitude neighborhood state_id street zipcode]
         end
       end
       context "new_attrs" do

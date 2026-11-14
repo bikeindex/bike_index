@@ -10,7 +10,7 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
     end
   end
   let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs:) }
-  let(:enabled_feature_slugs) { %w[bike_search] }
+  let(:enabled_feature_slugs) { [] }
   let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
   let(:pagy) { Pagy::Offset.new(count: 25, page: 1, limit: 10) }
   let(:search_stickers) { nil }
@@ -41,19 +41,23 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
     expect(component).to have_css("[data-ui--collapse-target='content'].tw\\:hidden\\!", visible: :all)
     expect(component).to have_css("input[type='checkbox']", visible: :all)
     expect(component).to have_button("Column settings", visible: :all)
+    # the search page's org--search spans the form too, so the card runs only the columns
+    card_controllers = component.at_css(".search-results-card")["data-controller"].split
+    expect(card_controllers).to eq %w[ui--collapse ui--table-column-settings ui--table-column-order]
     # footer
     expect(component).to have_text("showing 1–10 of 25")
-    expect(component).to have_css("select#per_page_select")
+    expect(component).to have_css("select#per_page_select option[selected]", text: "10 per page")
     # bike data in cells
     expect(component).to have_text(bike.mnfg_name)
-    # the table bleeds to the page's edges once the card is full bleed
-    expect(component.at_css("div:has(> [data-controller~='org--bikes-table-overflow'])")[:class].split)
-      .to include(*described_class::TABLE_BLEED_CLASSES.split)
+    # the table's overflow flags the card, and the table bleeds to the page's edges with it
+    expect(component).to have_css(".search-results-card[data-table-bleed='false']", visible: :all)
+    expect(component.at_css("div:has(> [data-controller~='ui--table-overflow'])")[:class].split)
+      .to include("tw:table-bleed:-mx-(--gutter)")
     # the card marks itself for the frame's loading swap, and the rows swap off the
     # frame's tw:group for the spinner that replaces them
     expect(component).to have_css(".search-results-card", visible: :all)
     expect(component).to have_css(".tw\\:group-\\[\\[busy\\]\\]\\:block", visible: :all)
-    expect(component.at_css("div:has(> [data-controller~='org--bikes-table-overflow'])")[:class].split)
+    expect(component.at_css("div:has(> [data-controller~='ui--table-overflow'])")[:class].split)
       .to include("tw:group-[[busy]]:hidden")
     expect(component).to have_text("Loading results...")
   end
@@ -74,7 +78,7 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
     end
 
     context "with csv_exports enabled" do
-      let(:enabled_feature_slugs) { %w[bike_search csv_exports] }
+      let(:enabled_feature_slugs) { %w[csv_exports] }
 
       it "renders no export" do
         expect(component).to have_css("ul li", text: bike.mnfg_name)
@@ -120,16 +124,15 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
       # no results frame above this card, so nothing sets [busy] and there's no loading swap
       expect(component).not_to have_css(".search-results-card", visible: :all)
       expect(component).not_to have_text("Loading results...")
-      expect(component).to have_css("[data-controller~='org--search-column-settings']")
+      expect(component).to have_css("[data-controller~='org--search'][data-controller~='ui--table-column-settings']")
       expect(component).to have_button("Column settings", visible: :all)
       # the header's button is the only one - the panel doesn't carry the legacy one
       expect(component).to have_css("[data-ui--collapse-target='trigger']", count: 1, visible: :all)
-      expect(component.at_css("div:has(> [data-controller~='org--bikes-table-overflow'])")[:class].split)
-        .not_to include(*described_class::TABLE_BLEED_CLASSES.split)
+      expect(component).to have_css("[data-controller~='org--search'][data-table-bleed='false']")
     end
 
     context "with csv_exports enabled" do
-      let(:enabled_feature_slugs) { %w[bike_search csv_exports] }
+      let(:enabled_feature_slugs) { %w[csv_exports] }
 
       it "renders no export, since this page's params aren't a search of what's shown" do
         expect(component).not_to have_text("Export CSV")
@@ -138,7 +141,7 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
   end
 
   context "with impound_bikes enabled" do
-    let(:enabled_feature_slugs) { %w[bike_search impound_bikes] }
+    let(:enabled_feature_slugs) { %w[impound_bikes] }
 
     it "renders impound columns" do
       expect(component).to have_css("th.impound_id_cell", visible: :all, text: "Impound ID")
@@ -146,7 +149,7 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
   end
 
   context "with search_all" do
-    let(:enabled_feature_slugs) { %w[bike_search csv_exports] }
+    let(:enabled_feature_slugs) { %w[csv_exports] }
     let(:options) { super().merge(search_all: true) }
 
     it "disables the export, which would reach past the organization, and says why" do
@@ -196,7 +199,7 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
   end
 
   context "with csv_exports enabled" do
-    let(:enabled_feature_slugs) { %w[bike_search csv_exports] }
+    let(:enabled_feature_slugs) { %w[csv_exports] }
 
     it "renders the export in the header, beside the column settings button" do
       expect(component).to have_link("Export CSV", visible: :all)
@@ -205,7 +208,7 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
   end
 
   context "when bike does not belong to the organization" do
-    let(:enabled_feature_slugs) { %w[bike_search reg_phone reg_extra_registration_number bike_stickers] }
+    let(:enabled_feature_slugs) { %w[reg_phone reg_extra_registration_number bike_stickers] }
     let(:other_org) { FactoryBot.create(:organization) }
     let(:bike) do
       FactoryBot.create(:bike_organized,

@@ -58,6 +58,36 @@ RSpec.describe Pages::Registrations::Show::WrapperOrgAdmin::Component, type: :co
     end
   end
 
+  describe "owner & access, on a bike registered elsewhere" do
+    let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[unstolen_notifications]) }
+    let(:current_user) { FactoryBot.create(:organization_user, organization:) }
+    let(:owner) { FactoryBot.create(:user_confirmed, notification_unstolen: true, phone: "7183914410") }
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: owner, cycle_type: "e-scooter") }
+    let(:owner_access) { page.find("h2", text: "Owner & access").find(:xpath, "..") }
+
+    it "shows the phone behind a toggle, and says the rest of the contact details aren't available" do
+      render_inline(described_class.new(bike: bike.reload, current_user:, organization:, org_role: :staff))
+
+      phone_toggle = owner_access.find("[data-ui--collapse-param-value='phone_shown']")
+      expect(phone_toggle).to have_css("[role='button'][aria-expanded='false']", text: "Show phone")
+      expect(phone_toggle).to have_css("[data-ui--collapse-target='content'].tw\\:hidden a[href='tel:718-391-4410']", text: "718-391-4410", visible: :all)
+      expect(owner_access).to have_text("Not registered with #{organization.short_name}")
+      expect(owner_access).to have_text("Other owner contact details aren't available, since this e-scooter isn't registered with your organization")
+      expect(owner_access).to_not have_text(bike.owner_email)
+    end
+
+    context "when the owner turned off non-stolen notifications" do
+      let(:owner) { FactoryBot.create(:user_confirmed, notification_unstolen: false, phone: "7183914410") }
+
+      it "doesn't show the phone" do
+        render_inline(described_class.new(bike: bike.reload, current_user:, organization:, org_role: :staff))
+
+        expect(page).to_not have_link("718-391-4410", visible: :all)
+        expect(owner_access).to have_text("Owner contact isn't available for bikes outside your organization")
+      end
+    end
+  end
+
   describe "other registrations" do
     let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[additional_registrations_information]) }
 
@@ -67,7 +97,7 @@ RSpec.describe Pages::Registrations::Show::WrapperOrgAdmin::Component, type: :co
       it "renders the column settings inside the card" do
         render_inline(described_class.new(bike: bike.reload, current_user:, organization:, org_role: :staff))
 
-        expect(page).to have_css("[data-controller~='org--search-column-settings']")
+        expect(page).to have_css("[data-controller~='ui--table-column-settings']")
         expect(page).to have_text("Visible columns")
         expect(page).to have_button("Column settings", visible: :all)
       end

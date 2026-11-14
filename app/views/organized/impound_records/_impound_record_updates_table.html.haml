@@ -1,35 +1,22 @@
 -# Must pass in impound_record_updates
 
-%table.table.table-striped.table-bordered.table-sm.without-exterior-border.mt-0
-  %thead.small-header.hidden-md-down
-    %th
-      Updated
-    %th
-      By
-    %th
-      Kind
-    %th
-      Info
-  %tbody
-    - impound_record_updates.each do |impound_record_update|
-      %tr
-        %td
-          %span.localizeTime.preciseTime
-            = l(impound_record_update.created_at, format: :convert_time)
-        %td
-          = impound_record_update.user&.display_name
-        %td
-          %em
-            = impound_record_update.kind_humanized
-        %td
-          - if impound_record_update.move_location?
-            Moved to #{impound_record_update.location&.name}
-          - elsif impound_record_update.transferred_to_new_owner?
-            Sent to
-            %strong
-              = impound_record_update.transfer_email
+= render(UI::Table::Base::Component.new(records: impound_record_updates)) do |table|
+  - table.column(label: "Updated") do |impound_record_update|
+    = render(UI::Time::Component.new(time: impound_record_update.created_at, format: :localize_time_precise))
+  - table.column(label: "By") do |impound_record_update|
+    = impound_record_update.user&.display_name
+  - table.column(label: "Kind") do |impound_record_update|
+    %em
+      = impound_record_update.kind_humanized
+  - table.column(label: "Info") do |impound_record_update|
+    - if impound_record_update.move_location?
+      Moved to #{impound_record_update.location&.name}
+    - elsif impound_record_update.transferred_to_new_owner?
+      Sent to
+      %strong
+        = impound_record_update.transfer_email
 
-          - if !impound_record_update.note? && impound_record_update.notes.present?
-            %br
-          %small
-            = impound_record_update.notes
+    - if !impound_record_update.note? && impound_record_update.notes.present?
+      %br
+    %small
+      = impound_record_update.notes

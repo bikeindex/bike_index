@@ -1,0 +1,17 @@
+<% if memberships.any? %>
+  <%= render(UI::Header::Component.new(tag: :h2)) do %>
+    Memberships
+    <%= render(Pages::Admin::Headers::Count::Component.new(count: memberships.size, href: admin_memberships_path(user_id: @user.id))) %>
+  <% end %>
+
+  <%= render partial: "/admin/memberships/table", locals: {memberships:, skip_user: true} %>
+<% end %>
+
+<%= render(UI::Header::Component.new(tag: :h2)) do %>
+  Payments
+  <%= render(Pages::Admin::Headers::Count::Component.new(count: payments.size, href: admin_payments_path(user_id: @user.id))) %>
+<% end %>
+
+<% if payments.any? %>
+  <%= render partial: "/admin/payments/table", locals: {payments:, skip_user: true} %>
+<% end %>

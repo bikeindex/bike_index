@@ -1,0 +1,50 @@
+<div class="twgutter tw:py-8 tw:lg:py-12">
+  <%= render(UI::Container::Component.new) do %>
+    <%= render(UI::Header::Component.new(text: translation(".your_membership"))) %>
+
+    <% if @membership.blank? %>
+      <p><%= translation(".not_a_member") %></p>
+
+      <%= render(UI::ButtonLink::Component.new(text: translation(".see_membership_tiers"),
+        href: new_membership_path, color: :primary)) %>
+    <% else %>
+      <div class="tw:mb-6 tw:flex tw:items-center tw:gap-4">
+        <%= render(Atoms::MemberBadge::Component.new(level: @membership.level, classes: "tw:w-20")) %>
+
+        <p class="tw:m-0 tw:text-lg tw:font-bold">
+          <%= translation(".you_are_a_member", level:) %>
+        </p>
+      </div>
+
+      <%= render(UI::DefinitionList::Container::Component.new) do %>
+        <%= render(UI::DefinitionList::Row::Component.new(label: translation(".started"),
+          value: render(UI::Time::Component.new(time: @membership.start_at)))) %>
+
+        <% if @membership.end_at.present? %>
+          <%= render(UI::DefinitionList::Row::Component.new(label: translation(".ends"),
+            value: render(UI::Time::Component.new(time: @membership.end_at)))) %>
+        <% end %>
+
+        <% if @stripe_price.present? %>
+          <%= render(UI::DefinitionList::Row::Component.new(label: translation(".your_price"),
+            value: price_display(@stripe_price))) %>
+        <% end %>
+      <% end %>
+
+      <% if @membership.admin_managed? %>
+        <p class="tw:mt-4"><%= translation(".complimentary") %></p>
+      <% elsif @current_price.present? %>
+        <p class="tw:mt-4"><%= price_comparison %></p>
+      <% end %>
+
+      <div class="tw:mt-6 tw:flex tw:flex-wrap tw:items-center tw:gap-4">
+        <% if @membership.stripe_managed? %>
+          <%= render(UI::ButtonLink::Component.new(text: translation(".manage_billing"),
+            href: edit_membership_path, color: :primary)) %>
+        <% end %>
+
+        <%= link_to(translation(".see_membership_tiers"), new_membership_path, class: "twlink") %>
+      </div>
+    <% end %>
+  <% end %>
+</div>

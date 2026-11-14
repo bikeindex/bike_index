@@ -109,6 +109,10 @@ VCR.configure do |config|
   end
 end
 
+# CarrierWave's SSRF filter resolves the host over real DNS, which VCR can't intercept,
+# and a slow lookup fails a remote_*_url download silently
+CarrierWave.configure { |config| config.skip_ssrf_protection = true }
+
 # retry flaky specs on CI
 if ENV["RETRY_FLAKY"]
   require "rspec/retry"
@@ -186,6 +190,8 @@ end
 RSpec.configure do |config|
   config.before(:suite) do
     DatabaseCleaner.clean_with(:deletion)
+    # DatabaseCleaner only reaches the primary database, and CI seeds shard 0's before the suite
+    PaperTrail::Version.delete_all
   end
 
   config.before(:all, :context_state) do

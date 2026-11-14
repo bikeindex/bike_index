@@ -12,8 +12,7 @@
   </div>
 
   <%= render(UI::Forms::Input::Component.new(form_builder: form, attribute: :search_query,
-    html_options: {value: @index.params[:search_query], placeholder: "Name/Location",
-                   class: "tw:w-full tw:sm:w-64"})) %>
+    html_options: {value: @index.params[:search_query], placeholder: "Name/Location"})) %>
 
   <%= render(UI::Button::Component.new(text: "Search", color: :primary, type: "submit", name: "search")) %>
 <% end %>

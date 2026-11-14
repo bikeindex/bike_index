@@ -4,7 +4,7 @@
   data-controller="update-cached-sortable-links"
   data-update-cached-sortable-links-base-url-value="<%= url_for(sort_state.search_params) %>"
 >
-  <%= render(UI::Table::Component.new(records: theft_alerts, render_sortable:, sort_state:,
+  <%= render(UI::Table::Base::Component.new(records: theft_alerts, render_sortable:, sort_state:,
         cache_key: cache_fragment_name(["admin_theft_alerts", render_sortable, skip_bike]),
         cache_records: ->(theft_alert) { [theft_alert.user, theft_alert.theft_alert_plan] })) do |table| %>
     <% table.column(sortable: "created_at", lower_right: ->(theft_alert) { theft_alert.id }) do |theft_alert| %>
@@ -13,13 +13,13 @@
 
     <% table.column(sortable: "status") do |theft_alert| %>
       <% if theft_alert.recovered? %>
-        <%= link_to "recovered!", admin_recovery_path(theft_alert.stolen_record), class: "text-success" %>
+        <%= link_to "recovered!", admin_recovery_path(theft_alert.stolen_record), class: UI::Alerts::Base::Component::TEXT_CLASSES[:success] %>
       <% end %>
 
       <% if theft_alert.failed_to_activate? %>
-        <span class="text-danger">Failed activation!</span>
+        <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">Failed activation!</span>
       <% elsif theft_alert.activating? %>
-        <span class="text-success">activating!</span>
+        <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:success] %>">activating!</span>
       <% else %>
         <% unless theft_alert.recovered? && theft_alert.inactive? %>
           <span class="<%= helpers.theft_alert_status_class(theft_alert) %>">
@@ -28,10 +28,10 @@
         <% end %>
         <% if theft_alert.pending? %>
           <% if theft_alert.activateable? %>
-            <em class="small text-success">activateable</em>
+            <em class="tw:text-sm <%= UI::Alerts::Base::Component::TEXT_CLASSES[:success] %>">activateable</em>
           <% else %>
-            <em class="small d-block">
-              <span class="text-danger">missing:</span>
+            <em class="tw:block tw:text-sm">
+              <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">missing:</span>
 
               <%= [
                 ("photo" if theft_alert.missing_photo?),
@@ -112,7 +112,7 @@
       <%= theft_alert.notes %>
 
       <% if theft_alert.facebook_post_url.present? %>
-        <small class="d-block">
+        <small class="tw:block">
           <%= link_to "facebook", theft_alert.facebook_post_url, class: "twlink" %>
         </small>
       <% end %>

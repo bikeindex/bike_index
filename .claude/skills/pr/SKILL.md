@@ -20,7 +20,7 @@ description: >-
 
 Five sections, run in this order:
 
-1. **Orient** — the working tree, and the base branch
+1. **Orient** — commit the current work, then the base branch
 2. **Prepare the branch** — merge, cleanup, migrations. Skipped for a description-only ask
 3. **Publish** — read the final diff, write the body, push, create or update
 4. **Screenshots** — frontend diffs only
@@ -28,16 +28,22 @@ Five sections, run in this order:
 
 **Shell state does not persist between commands.** Each command below runs in its own shell, so a `BASE=main` in one is gone by the next. Substitute the real values into every command — write `origin/main`, not `origin/$BASE` — and carry the base branch and PR number in your head, not in the environment. Every `origin/main` below means "the base branch from **Orient**".
 
-Run the `gh` commands as written. The appendix at the bottom covers the one environment that has no `gh`.
+Run the `gh` commands as written. The appendix at the bottom covers the one environment where `gh` doesn't work.
 
 ## Orient
 
 ### Check the working tree
 
-`git status` (no `-uall`). Everything below diffs `origin/main...HEAD`, which only sees **committed** work, and the merge in **Prepare the branch** needs a clean tree — so the tree has to be clean before you go further.
+**Commit the current work before anything else runs.** Everything below diffs `origin/main...HEAD`, which only sees committed work, and the merge in **Prepare the branch** needs a clean tree. Uncommitted work is silently skipped by the cleanup, the audits, the classifier and the body, so the PR describes the wrong diff.
 
-- Uncommitted changes you made in this session: commit them now. Otherwise the cleanup, the classifier and the diff you describe all silently skip them, and the PR body describes the wrong diff.
+`git status` (no `-uall`):
+
+- Uncommitted changes from this session's work: commit them now, before the merge, `/simplify` or any audit.
 - Uncommitted changes you didn't make: stop and ask. Don't sweep someone else's work into a commit.
+
+**Handing this skill to a subagent? Commit first.** To a subagent, every uncommitted change looks like someone else's work, so it stops and asks. Commit the session's changes before spawning it, and say in the brief that the tree is clean.
+
+Then: **A Conductor `<name>-v1` local tracking `origin/<name>` gets moved onto `<name>`, without asking** — `bin/conductor_branch` does it at workspace setup and session start. If `git branch --show-current` still ends in `-v1`, run it, and follow what it prints when it can't.
 
 ### Determine the base branch
 
@@ -57,7 +63,7 @@ This has to happen before the cleanup below, which diffs against `origin/main`.
 
 ### Simplify, lint, and conform to AGENTS.md
 
-`references/pre-push-cleanup.md` has this in full: `/simplify`, `bin/lint` scoped to the branch's files, branch-scoped specs, a pass over the changed files against `AGENTS.md`, its audits — spec, documentation, churn, comment, backfill and, when the branch adds images, asset — and the cycle-type translation check. The audits are required every run, not just when the diff looks messy. Commit everything it produces before re-dating migrations.
+`references/pre-push-cleanup.md` has this in full: `/simplify`, `bin/lint` scoped to the branch's files, branch-scoped specs, a pass over the changed files against `AGENTS.md`, its audits — spec, documentation, churn, comment, backfill and, when the branch adds them, asset, controller, component and markup (the `use-existing-markup` skill) — and the cycle-type translation and product-name checks. The audits are required every run, not just when the diff looks messy. Commit everything it produces before re-dating migrations.
 
 ### Freshen stale migration timestamps
 
@@ -125,9 +131,7 @@ If a bullet is turning into an essay, compress it to one sentence naming the *ki
 git push -u origin HEAD
 ```
 
-Don't report the local branch name differing from the name in the invocation when the branch has no upstream — pushing `HEAD` creates a matching remote, so it's benign. Only flag a mismatch when the local branch already tracks a differently-named upstream. If the push is rejected as non-fast-forward, go back to **Prepare the branch**.
-
-**A branch already tracking a differently-named upstream** — a Conductor `-v1` local on `origin/<name>` — takes `git push origin HEAD:<upstream-branch>` instead. `git push -u origin HEAD` creates a second remote branch and leaves the existing PR behind on the first.
+Don't report the local branch name differing from the name in the invocation — pushing `HEAD` creates a matching remote, so it's benign. **Still on a `-v1` that tracks `origin/<name>`** is the exception: push `git push origin HEAD:<name>`, since `-u origin HEAD` creates a second remote branch and leaves the PR behind on the first. If the push is rejected as non-fast-forward, go back to **Prepare the branch**.
 
 - **Open PR found above**: `gh pr edit <number> --title "..." --body-file <tmp-body-file>`. Refresh the title to match the current diff (that's what "update pr" expects) unless the user gave it a deliberate custom title — if unsure, keep the title and update only the body.
 
@@ -147,7 +151,7 @@ The one that talks itself into existence is the "still accurate" update — a la
 Two gates, either of which skips the section outright:
 
 - **Not a frontend diff** — per the classifier above. **Unless a `## Screenshots` comment already exists**: the user asked for those captures, so a commit since the last one that changes what they show stales them even here. Recapture only those pages.
-- **No `gh`**, with `$CLAUDE_CODE_REMOTE` unset. Then there is nowhere to host or post the images, so don't capture them and don't post anything in their place. Say so in your summary. **The web sandbox is not this case**, though it has no `gh`: `$CLAUDE_CODE_REMOTE` is `true` there, and the section runs, because `github-pr-images` hosts through the PR branch's history — see the appendix.
+- **No `gh`**, with `$CLAUDE_CODE_REMOTE` unset. Then there is nowhere to host or post the images, so don't capture them and don't post anything in their place. Say so in your summary. **The web sandbox is not this case**, though `gh` doesn't work there: `$CLAUDE_CODE_REMOTE` is `true` there, and the section runs, because `github-pr-images` hosts through the PR branch's history — see the appendix.
 
 **A dev server you believe is down is not a gate.** Run `curl -fs "$BASE_URL/"` now, whatever an earlier check in the session said — the user starts `bin/dev` whenever, and #4319 went out without screenshots on a stale "isn't running". Only a failing curl *this* run is a reason to stop and ask.
 
@@ -173,9 +177,9 @@ Then make the edit — commit it onto the branch, push, and update the body if i
 
 Then return the PR URL.
 
-## Appendix: the sandbox with no `gh`
+## Appendix: the sandbox where `gh` doesn't work
 
-Only the Claude Code web sandbox (`/home/user/bike_index`, where `$CLAUDE_CODE_REMOTE` is `true`) lacks the GitHub CLI; everywhere else the sections above run as written, and you shouldn't check. If a `gh` command comes back "command not found", swap in the GitHub MCP equivalents — the rest of the workflow is unchanged, including `git push`.
+Only the Claude Code web sandbox (`/home/user/bike_index`, where `$CLAUDE_CODE_REMOTE` is `true`) lacks the GitHub CLI; everywhere else the sections above run as written, and you shouldn't check. If a `gh` command comes back "command not found" — or, since a `gh` binary can be present there, `HTTP 403: GitHub GraphQL is not available from Claude Code sessions` — swap in the GitHub MCP equivalents — the rest of the workflow is unchanged, including `git push`.
 
 | Where | `gh` | MCP |
 | --- | --- | --- |
@@ -186,4 +190,4 @@ Only the Claude Code web sandbox (`/home/user/bike_index`, where `$CLAUDE_CODE_R
 
 Three traps in that column: `head` takes `owner:branch` when listing but a bare branch name when creating; the body is a string parameter, so `--body-file` has no equivalent; and `list_pull_requests` reports `merged: false` even for merged PRs — which is why the branch-state query asks for open PRs rather than filtering `all` on that field.
 
-**Screenshots do run here**, though `gh` doesn't: `github-pr-images`' `references/web-sandbox.md` commits the images to the PR's branch, deletes them in a second commit, and posts sha-pinned `raw.githubusercontent.com` URLs through the MCP tools. Capture as normal and follow that reference for the hosting and posting steps. Those URLs live as long as the branch's objects do, so say in your summary that a merged PR's screenshots aren't archival.
+**Screenshots do run here**, though `gh` doesn't: `github-pr-images`' `references/web-sandbox.md` commits the images to the PR's branch, deletes them in a second commit, and posts sha-pinned `raw.githubusercontent.com` URLs through the MCP tools. Follow that reference from its probe — a session whose comment tools rewrite image URLs ends the phase before any capture — then capture as normal and follow it for the hosting and posting steps. Those URLs live as long as the branch's objects do, so say in your summary that a merged PR's screenshots aren't archival.

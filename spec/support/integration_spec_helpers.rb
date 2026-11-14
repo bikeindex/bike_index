@@ -113,9 +113,11 @@ module IntegrationSpecHelpers
   # Playwright's fill, which dispatches only an `input` event; JS that opens on
   # keydown (e.g. hotwire_combobox's async dropdown) needs real key events. A combobox
   # typed into before its controller connects never searches, so that waits first.
+  # has_ancestor? because matches_css? can't ask this: it resolves against the field's parent,
+  # and Playwright scopes a selector to its root, so an ancestor above that never matches.
   def type_into(locator, text)
     field = locator.is_a?(Capybara::Node::Element) ? locator : find(locator)
-    wait_for_stimulus("hw-combobox") if field.matches_css?("[data-controller~='hw-combobox'] *", wait: 0)
+    wait_for_stimulus("hw-combobox") if field.has_ancestor?("[data-controller~='hw-combobox']", wait: 0)
     field.set("")
     field.send_keys(text)
     field
@@ -251,9 +253,9 @@ module IntegrationSpecHelpers
 
   # Click an async hotwire_combobox option, re-finding it if a later async
   # response re-renders the listbox and detaches the node between find and click.
-  # The pick filters once more, debounced, and Turbo renders that response by putting focus
-  # back where it was when the render began - so a fill landing in that frame types into the
-  # field filled before it. This waits for the response and the frame after it.
+  # The pick filters once more, and Turbo renders that response by putting focus back where
+  # it was when the render began - so a fill landing in that frame types into the field
+  # filled before it. This waits for the response and the frame after it.
   def click_combobox_option(text)
     combobox = nil
     retry_on_detach do
@@ -261,15 +263,8 @@ module IntegrationSpecHelpers
       combobox = option.ancestor("[data-controller~='hw-combobox']")
       option.click
     end
-    page.evaluate_async_script(<<~JS, combobox)
-      const [element, done] = arguments
-      const controller = window.Stimulus.getControllerForElementAndIdentifier(element, "hw-combobox")
-      if (!controller?.hasAsyncSrcValue) return done()
-      const giveUpAt = performance.now() + 10000
-      const settle = () => (controller.callbackQueue.length && performance.now() < giveUpAt)
-        ? setTimeout(settle, 50) : requestAnimationFrame(() => requestAnimationFrame(done))
-      setTimeout(settle, controller.debounceIntervalValue)
-    JS
+    expect(combobox).to have_no_css("[data-pending]", wait: 10)
+    page.evaluate_async_script("requestAnimationFrame(() => requestAnimationFrame(arguments[0]))")
   end
 
   # Takes the trigger (a page with two of them opens the same modal from either), which names
@@ -358,6 +353,8 @@ module IntegrationSpecHelpers
       # Pushing the token back leaves the gate open for the next one
       @gate.push(@gate.pop)
     end
+
+    def held? = @held
 
     # A pattern that stops matching holds nothing, leaving the example green against no race
     def release

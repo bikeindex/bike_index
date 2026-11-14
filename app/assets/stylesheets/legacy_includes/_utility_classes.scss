@@ -89,13 +89,6 @@ label {
   cursor: default;
 }
 
-input.less-strong {
-  border: none;
-  background: transparent;
-  font-size: 0.8em;
-  box-shadow: none;
-}
-
 .overflow-text {
   @include text-overflow;
 }

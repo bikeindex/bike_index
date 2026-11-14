@@ -1,0 +1,73 @@
+import { Controller } from '@hotwired/stimulus'
+
+// Connects to data-controller='donate--form'
+// The cadence radios show and hide the two forms in CSS; this keeps every submit label on
+// the selected amount, and unchecks the presets while an other amount is typed
+export default class extends Controller {
+  static targets = ['cadence', 'monthlyForm', 'oneTimeForm', 'oneTimeAmount', 'customAmount', 'submit']
+  static values = { monthlyLabel: String, oneTimeLabel: String, currencySymbol: String }
+
+  connect () {
+    // The server's default preset when an other amount came in instead
+    this.lastPreset = this.oneTimeAmountTargets.find(radio => radio.checked) || this.oneTimeAmountTargets.find(radio => radio.dataset.default)
+    this.update()
+  }
+
+  selectPreset (event) {
+    this.lastPreset = event.currentTarget
+    this.customAmountTarget.value = ''
+    this.update()
+  }
+
+  customInput () {
+    const hasCustom = this.customDollars() > 0
+    this.oneTimeAmountTargets.forEach(radio => { radio.checked = !hasCustom && radio === this.lastPreset })
+    this.update()
+  }
+
+  fill ({ detail: { amount } }) {
+    this.customAmountTarget.value = amount
+    this.customInput()
+  }
+
+  selectAmount (event) {
+    const oneTime = this.cadenceTargets.find(radio => radio.value === 'one-time')
+    if (oneTime) oneTime.checked = true
+    this.fill(event)
+    // the card the page put the form in, heading included
+    this.element.parentElement.scrollIntoView({ behavior: 'smooth' })
+  }
+
+  submitActive () {
+    const form = this.isOneTime ? this.oneTimeFormTarget : this.monthlyFormTarget
+    form.requestSubmit()
+  }
+
+  update () {
+    const isOneTime = this.isOneTime
+    const label = isOneTime ? this.oneTimeLabelValue : this.monthlyLabelValue
+    const text = label.replace('%{amount}', this.selectedAmount(isOneTime))
+    this.submitTargets.forEach(button => { button.textContent = text })
+    this.dispatch('change', { target: window, detail: { label: text, isOneTime, customAmount: isOneTime ? this.customAmountTarget.value : '' } })
+  }
+
+  // Without a monthly form there are no cadence tabs, only the one-time form
+  get isOneTime () {
+    return !this.hasMonthlyFormTarget || this.cadenceTargets.find(radio => radio.checked)?.value === 'one-time'
+  }
+
+  customDollars () {
+    return parseFloat(this.customAmountTarget.value)
+  }
+
+  // Formats the way MoneyFormatter does the server-rendered presets
+  selectedAmount (isOneTime) {
+    const dollars = this.customDollars()
+    if (isOneTime && dollars > 0) {
+      const digits = Number.isInteger(dollars) ? 0 : 2
+      return this.currencySymbolValue + dollars.toLocaleString('en-US', { minimumFractionDigits: digits, maximumFractionDigits: digits })
+    }
+    const form = isOneTime ? this.oneTimeFormTarget : this.monthlyFormTarget
+    return form.querySelector('input[type="radio"]:checked')?.dataset.amount || ''
+  }
+}

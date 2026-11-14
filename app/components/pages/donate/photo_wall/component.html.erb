@@ -1,0 +1,7 @@
+<div class="tw:grid tw:grid-cols-3 tw:gap-[3px] tw:bg-[#2c3e50] tw:md:grid-cols-7">
+  <% PHOTOS.each do |url| %>
+    <%= image_tag url,
+    alt: translation(".photo_alt"),
+    class: "tw:h-26 tw:w-full tw:object-cover tw:max-md:last:hidden tw:md:h-40 #{@short ? "tw:lg:h-37.5" : "tw:lg:h-55"}" %>
+  <% end %>
+</div>

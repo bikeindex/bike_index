@@ -31,6 +31,18 @@ RSpec.describe OrganizationsController, type: :request do
         expect(assigns(:current_organization)&.id).to be_blank
       end
     end
+    context "b_param from a failed submission, for an organization that asks for its fields" do
+      let(:current_organization) { FactoryBot.create(:organization_with_auto_user, :organization_features, enabled_feature_slugs: %w[reg_student_id reg_organization_affiliation]) }
+      let(:b_param) { FactoryBot.create(:b_param, creator: nil, params: {bike: {student_id: "S1234", organization_affiliation: "employee"}}) }
+
+      it "keeps what they entered, though a built bike has no ownership to hold it" do
+        get "#{base_url}/#{current_organization.slug}/embed?b_param_id_token=#{b_param.id_token}"
+        page = Capybara.string(response.body)
+        expect(page).to have_field("bike[student_id]", with: "S1234")
+        expect(page).to have_select("bike[organization_affiliation]", selected: "Employee")
+      end
+    end
+
     context "stolen" do
       it "renders embed without xframe block" do
         get "#{base_url}/#{current_organization.slug}/embed?stolen=1&non_stolen=true"

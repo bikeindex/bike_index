@@ -34,6 +34,11 @@ module UI
           end
         end
       end
+
+      # Held open, it hides while the container's scrolled its trigger out of view
+      def in_a_scroll_container
+        render_with_template(template: "ui/tooltip/component_preview/in_a_scroll_container")
+      end
       # @!endgroup
     end
   end

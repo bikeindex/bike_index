@@ -1,7 +1,9 @@
 import { Controller } from '@hotwired/stimulus'
 import { collapse } from 'utils/collapse_utils'
+import { storage } from 'utils/storage'
+import { setUrlParam } from 'utils/url_param'
 
-/* global localStorage */
+/* global requestAnimationFrame */
 
 // Connects to data-controller='ui--collapse'
 // Animates [data-ui--collapse-target=content] open/closed. Optionally rotates a
@@ -10,10 +12,14 @@ import { collapse } from 'utils/collapse_utils'
 // data-ui--collapse-param-value set, the open state persists to the URL query
 // (?param=1, ?param=0 collapsed) so it survives reloads and navigation; with
 // data-ui--collapse-storage-key-value it persists to localStorage instead, for a panel
-// whose state is the rider's preference rather than part of the address.
+// whose state is the rider's preference rather than part of the address. A toggle that
+// opens it dispatches ui--collapse:shown, for content loaded once it's wanted, and one that
+// closes it ui--collapse:hidden, for state kept somewhere a param can't. Those sharing
+// data-ui--collapse-group-value, with ui--collapse:shown@window->ui--collapse#closeForGroup,
+// are open one at a time.
 export default class extends Controller {
   static targets = ['content', 'chevron', 'trigger']
-  static values = { param: String, storageKey: String, direction: String }
+  static values = { param: String, storageKey: String, direction: String, group: String }
 
   connect () {
     // Restore the persisted state without animating on load. Restoring applies rather than
@@ -52,6 +58,10 @@ export default class extends Controller {
     this.setExpanded(false)
   }
 
+  closeForGroup ({ target, detail }) {
+    if (target !== this.element && detail.group === this.groupValue && !this.collapsed) this.hide()
+  }
+
   get collapsed () {
     return this.contentTargets.every((content) =>
       content.classList.contains('tw:hidden') || content.classList.contains('tw:hidden!'))
@@ -68,13 +78,28 @@ export default class extends Controller {
   }
 
   get stored () {
-    return localStorage.getItem(this.storageKeyValue) === 'true'
+    return storage.getItem(this.storageKeyValue) === 'true'
   }
 
   // duration 0 restores state without animating
   setExpanded (expanding, duration) {
     this.applyExpanded(expanding, duration)
     this.persist(expanding)
+    this.keepFocus(expanding)
+    this.dispatch(expanding ? 'shown' : 'hidden', { detail: { group: this.groupValue } })
+  }
+
+  // A focused trigger the toggle hides - inside the content it collapses, or in what an open panel hides - hands focus
+  // to one still showing, rather than dropping it to the page
+  keepFocus (expanding) {
+    const focused = this.triggerTargets.find((trigger) => trigger === document.activeElement)
+    if (!focused) return
+
+    const showing = (trigger) => trigger.checkVisibility() && (expanding || !this.contentTargets.some((content) => content.contains(trigger)))
+    // once the styles keyed off aria-expanded apply
+    requestAnimationFrame(() => {
+      if (!showing(focused)) this.triggerTargets.find(showing)?.focus()
+    })
   }
 
   applyExpanded (expanding, duration) {
@@ -91,18 +116,9 @@ export default class extends Controller {
   }
 
   persist (expanding) {
-    if (this.hasStorageKeyValue) localStorage.setItem(this.storageKeyValue, String(expanding))
-    if (!this.hasParamValue) return
-    const url = new URL(window.location)
+    if (this.hasStorageKeyValue) storage.setItem(this.storageKeyValue, String(expanding))
     // Collapsed writes 0 rather than dropping the param: a caller rebuilding the query
     // string from its own fields can't copy an absent one forward.
-    const pair = `${encodeURIComponent(this.paramValue)}=${expanding ? '1' : '0'}`
-    // Its own pair alone, rather than through URLSearchParams, which would re-encode the
-    // rest of the query
-    const pairs = url.search.slice(1).split('&').filter(Boolean)
-    const at = pairs.findIndex((each) => decodeURIComponent(each.split('=')[0]) === this.paramValue)
-    url.search = (at < 0 ? [...pairs, pair] : pairs.map((each, index) => index === at ? pair : each)).join('&')
-    // replaceState (not pushState) so a toggle doesn't stack history entries.
-    window.history.replaceState(window.history.state, '', url)
+    if (this.hasParamValue) setUrlParam(this.paramValue, expanding ? '1' : '0')
   }
 }

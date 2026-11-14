@@ -19,19 +19,9 @@
 
     <title>settings</title>
 
-    <circle
-      class="cls-1"
-      cx="10.68"
-      cy="19.41"
-      r="3.78"
-    />
+    <circle class="cls-1" cx="10.68" cy="19.41" r="3.78" />
 
-    <circle
-      class="cls-1"
-      cx="23.92"
-      cy="6.17"
-      r="1.89"
-    />
+    <circle class="cls-1" cx="23.92" cy="6.17" r="1.89" />
 
     <path
       class="cls-1"
@@ -53,9 +43,9 @@
     <% when :divider %>
       <li class="divider-nav-item" aria-hidden="true"></li>
     <% when :link %>
-      <li>
+      <%= tag.li(class: item_class(item)) do %>
         <%= render entry(item) %>
-      </li>
+      <% end %>
     <% when :disabled %>
       <li>
         <span class="nav-link tw:text-gray-400! tw:italic" data-active="true"><%= item[:label] %></span>

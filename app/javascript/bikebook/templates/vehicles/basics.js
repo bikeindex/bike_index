@@ -1,0 +1,166 @@
+import { html, nothing } from 'lit-html'
+import { chosenColorway, colorwayValue, colorwayYears } from 'bikebook/colorways'
+import { amountDisplay, missing } from 'bikebook/templates/helpers'
+import { buttonClasses } from 'bikebook/templates/ui/button'
+import { collapse } from 'bikebook/templates/ui/collapse'
+import { radioButtonGroup } from 'bikebook/templates/ui/forms/radio_button_group'
+import { table } from 'bikebook/templates/ui/table'
+import { seriesBorders } from 'bikebook/templates/vehicles/geometry_overlay'
+import { removeLink } from 'bikebook/templates/vehicles/remove_link'
+import { basicsOf, simpleFormat } from 'bikebook/templates/vehicles/model_viewer'
+import { colorway, colorways } from 'bikebook/templates/vehicles/model_years'
+import { vehicleTitle } from 'bikebook/templates/vehicles/vehicle_title'
+import { array, isNumber, join, present } from 'bikebook/templates/values'
+
+// `only` ones once a shown model is electric, suspended, a cargo vehicle or sold outside the visitor's market, the rest once one lists it, and `differing`
+// ones where the models' values of it differ
+const FIELDS = [
+  { label: 'Price', key: 'price' },
+  { label: 'Markets', key: 'markets', only: 'outside_market' },
+  { label: 'Model group', key: 'model_group' },
+  { label: 'Years', key: 'years' },
+  { label: 'Colorway', key: 'colors' },
+  { label: 'Vehicle type', key: 'vehicle_type', differing: 'type' },
+  { label: 'Cargo', key: 'cargo', only: 'cargo_vehicle' },
+  { label: 'Primary activity', key: 'primary_activity' },
+  { label: 'Frame material', key: 'frame_material' },
+  { label: 'Wheel & tire size', key: 'wheel_size' },
+  { label: 'Suspension front/rear', key: 'suspension', only: 'suspended' },
+  { label: 'Groupset', key: 'groupset' },
+  { label: 'E-vehicle class', key: 'e_vehicle_class', only: 'electric' },
+  { label: 'Electric Certification', key: 'certification', only: 'electric' },
+  { label: 'Description', key: 'description' }
+]
+// the label column's 12.5rem and 12rem per one of the section's --models, so a phone scrolls the table rather than
+// squeezing it. One model's column is as wide as each of two's, the label's 12.5rem and half what's left
+const MIN_WIDTH = 'tw:min-w-[calc(12.5rem+12rem*var(--models))]!'
+// past three models, out of the page's column toward the window's edges, each model's column up to 500px
+const MAX_WIDTH = 'tw:max-w-[calc(12.5rem+500px*var(--models))]'
+
+// years come newest first
+const priced = (vehicle) => array(vehicle.years).find((year) => isNumber(year.original_msrp))
+
+// the newest year's page still on the manufacturer's site, rather than an archived one
+const manufacturerPage = (vehicle) => {
+  const url = array(vehicle.years).find((year) => year.url_live && present(year.url))?.url
+  return url && html`<small class="tw:text-gray-500 tw:dark:text-gray-400"><a class="twlink-underlined" href=${url}>manufacturer's page</a></small>`
+}
+
+// A year's colorways by their paint, not their photos
+const paint = (year) => JSON.stringify(array(year.colorways).map(({ name, colors, color_code: code }) => [name, colors, code]))
+
+// the newest colorways, to choose between where there are several, and behind a link that shows them, each paint the
+// earlier years had, but the newest's, all of them choices once there are any, the `picked` one chosen and shown
+const colors = (presenter, vehicle, key, picked) => {
+  const [[newest] = [], ...earlier] = Map.groupBy(colorwayYears(vehicle), paint).values()
+  if (!newest) return null
+
+  const latest = array(newest.colorways)
+  const selected = chosenColorway(vehicle, picked).value
+  // a toggle scrolling out to its cell's edges where one's name is wider than it
+  const toggle = (each, year) => html`<div class="twgutter-bleed tw:overflow-x-auto tw:[--gutter:--spacing(2.5)]">${radioButtonGroup({
+    name: `colorway-${key}`,
+    entries: each.map((one, index) => ({ value: colorwayValue(one, index, year), label: colorway(presenter, one) })),
+    selected,
+    attributes: { 'data-action': 'change->bikebook--page#pickColorway', 'data-bikebook--page-vehicle-param': key }
+  })}</div>`
+  if (earlier.length === 0) return latest.length > 1 ? toggle(latest) : colorways(presenter, latest)
+
+  const open = !latest.some((each, index) => colorwayValue(each, index) === selected)
+  return html`<div class="tw:space-y-2" data-controller="ui--collapse">${toggle(latest)}<div class="${open ? '' : 'tw:hidden'} tw:space-y-2"
+    data-ui--collapse-target="content">${earlier.map((years) => html`<div class="tw:space-y-1"><div class="tw:text-xs tw:font-bold tw:tabular-nums">${
+      years.map(({ year }) => year).toReversed().join(', ')}</div>${toggle(array(years[0].colorways), years[0].year)}</div>`)}</div><div>${
+      collapse({ color: 'link_gray', htmlClass: 'tw:text-sm tw:aria-expanded:hidden', content: 'View previous years colors' })}</div></div>`
+}
+
+const EXCERPT_LENGTH = 200
+const MARKETS_SHOWN = 3
+
+// `text`'s first 200 characters, cut at a word and keeping its paragraphs, which a collapse swaps for the whole of it as
+// `content`
+const readMore = (text, content) => {
+  const raw = String(text).replace(/\r\n?/g, '\n').trim()
+  if (raw.length <= EXCERPT_LENGTH) return content
+
+  // the next character too, so a cut landing on a word's end keeps the word
+  const words = raw.slice(0, EXCERPT_LENGTH + 1).replace(/\s+\S*$/, '').slice(0, EXCERPT_LENGTH)
+  const excerpt = `${words.replace(/[\s,.;:—–-]+$/, '')}…`
+  return html`<div class="tw:group/read-more" data-controller="ui--collapse"><div
+    class="tw:space-y-2 tw:group-has-[[aria-expanded=true]]/read-more:hidden">${simpleFormat(excerpt)}</div><div class="tw:hidden"
+    data-ui--collapse-target="content">${content}</div>${collapse({
+      color: 'link',
+      chevron: 'trailing',
+      htmlClass: 'tw:group/more tw:mt-1 tw:text-sm',
+      content: html`<span class="tw:group-aria-expanded/more:hidden">Read more</span><span class="tw:hidden tw:group-aria-expanded/more:inline">Show less</span>`
+    })}</div>`
+}
+
+// The first MARKETS_SHOWN of `names`, the rest behind a gray link saying how many there are in all, which goes with
+// the ellipsis once it shows them
+const marketList = (names) => names.length <= MARKETS_SHOWN
+  ? names.join(', ')
+  : html`<span class="tw:group/markets" data-controller="ui--collapse">${names.slice(0, MARKETS_SHOWN).join(', ')}<span
+    class="tw:group-has-[[aria-expanded=true]]/markets:hidden">…</span><span class="tw:hidden"
+    data-ui--collapse-target="content">, ${names.slice(MARKETS_SHOWN).join(', ')}</span> ${collapse({
+      color: 'link_gray',
+      htmlClass: 'tw:text-sm tw:aria-expanded:hidden',
+      content: `${names.length} total`
+    })}</span>`
+
+// shows the `value`'s group under the overview, or once it's the `shownGroup`, hides it
+const viewGroup = (groupPath, value, shownGroup) => html`<a href=${groupPath(value === shownGroup ? '' : value)}
+  class=${buttonClasses({ size: 'sm', htmlClass: 'tw:ml-2' })} aria-current=${value === shownGroup ? 'true' : nothing} data-in-place="#model-group">View group</a>`
+
+// The models' names, photos and headline fields side by side in a table, one model's as two's, each photo with an ×
+// to the page without it at `removePath`, each column topped and footed in its color among the overlay's `frames`, the
+// table's section with its `sectionClasses` and its corner with `corner`
+export const basics = ({ presenter, vehicles, market, outOfClassId, removePath, colorways: pickedColorways = {}, groupPath, shownGroup, frames = [], sectionClasses = '', corner = nothing }) => {
+  const shown = vehicles.map(({ data, value, key, outsideMarket }, index) => {
+    const price = priced(data)
+    const fields = basicsOf({ presenter, data, outOfClassId })
+    return {
+      ...fields,
+      value,
+      removeHref: removePath(index),
+      model_group: fields.model_group && join([fields.model_group, viewGroup(groupPath, value, shownGroup)], ' '),
+      markets: marketList(array(data.markets).map((code) => presenter.vocabulary.names?.markets?.[code] ?? code)),
+      outside_market: outsideMarket,
+      title: vehicleTitle({ manufacturer: fields.manufacturer, model: fields.model, data, value, market, configurations: presenter.kit.model_configurations }),
+      years: join([fields.years, manufacturerPage(data)].filter(present), ' '),
+      colors: colors(presenter, data, key, pickedColorways[key]),
+      price: price && amountDisplay(price.original_msrp, price.original_msrp_currency, presenter.vocabulary.currencies),
+      description: fields.description && readMore(data.description, fields.description)
+    }
+  })
+  const fields = FIELDS.filter((field) => (field.only ? shown.some((each) => each[field.only]) : shown.some((each) => present(each[field.key]))) &&
+    (!field.differing || new Set(shown.map((each) => each[field.differing])).size > 1))
+  return compared(shown, fields, frames, sectionClasses, corner)
+}
+
+const compared = (vehicles, fields, frames, sectionClasses, corner) => html`<section aria-label=${vehicles.length > 1 ? 'Overview comparison' : 'Overview'} class="tw:mt-6 ${vehicles.length > 3
+  ? 'tw:twpagebleed tw:px-4'
+  : ''} ${sectionClasses}" style=${`--models: ${vehicles.length}`}>${table({
+  classes: `${vehicles.length === 1 ? 'tw:w-full tw:md:w-[calc(50%+6.25rem)] tw:md:min-w-0!' : `tw:w-full ${MIN_WIDTH}`} tw:table-fixed ${vehicles.length > 3 ? `tw:mx-auto ${MAX_WIDTH}` : ''}`,
+  records: fields,
+  columns: [
+    { label: html`<span class="tw:sr-only">Field</span>${corner}`, rowHeader: true, classes: 'tw:w-32 tw:md:w-50 tw:px-2.5! tw:py-2! tw:align-top tw:font-bold', cell: ({ label }) => label },
+    ...vehicles.map((vehicle, index) => {
+      const border = seriesBorders(frames, index)
+      return {
+        label: html`${vehicle.photo('tw:mb-2 tw:aspect-[4/3]')}${removeLink({
+          label: `Remove ${[vehicle.manufacturer, vehicle.model].filter(present).join(' ')}`,
+          href: vehicle.removeHref,
+          corner: true
+        })}${vehicle.title}`,
+        classes: 'tw:px-2.5! tw:py-2! tw:align-top',
+        headerClasses: `tw:relative ${border.top}`,
+        cellClass: ({ key }) => [key === 'description' && 'tw:text-sm', key === fields.at(-1).key && border.bottom].filter(Boolean).join(' '),
+        cell: ({ key, only }) => {
+          if (present(vehicle[key])) return vehicle[key]
+          if (only !== 'electric' || vehicle.electric) return missing
+          return key === 'e_vehicle_class' ? html`<span class="less-strong">not e-vehicle</span>` : nothing
+        }
+      }
+    })
+  ]
+})}</section>`

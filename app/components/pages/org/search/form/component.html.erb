@@ -5,10 +5,9 @@
   <%# search--form only needs to hold the form; the card is the outer element %>
   <div data-controller="<%= turbo? ? "search--form" : "" %>">
     <%= form_with(url: @target_search_path,
-      builder: BikeIndexFormBuilder,
       method: :get,
       id: "Search_Form",
-      data: form_data) do |f| %>
+      data: form_data) do %>
       <% if turbo? %>
         <%= hidden_field_tag :search_no_js, true %>
       <% end %>
@@ -41,22 +40,18 @@
               placeholder: translation(".search_for_serial_number"),
               class: "twinput tw:flex-1 fieldResetsCounts" %>
 
-            <% if render_notes_field? %>
-              <div
-                class="tw:hidden tw:flex-1"
-                data-org--search-target="optionalField"
-                data-field="notes"
-                data-storage-key="orgRegistrationNotesSearchOpen"
-              >
+            <% if notes_toggled? || @notes_placeholder %>
+              <%= tag.div(class: ["tw:flex-1", ("tw:hidden" if notes_toggled?)],
+                data: ({"org--search-target": "optionalField", field: "notes", storage_key: "orgRegistrationNotesSearchOpen"} if notes_toggled?)) do %>
                 <%= label_tag :search_notes,
-                  translation(".search_notes"),
+                  notes_placeholder,
                   class: "twlabel tw:sr-only" %>
 
                 <%= text_field_tag :search_notes,
                   @interpreted_params[:search_notes],
-                  placeholder: translation(".search_notes"),
+                  placeholder: notes_placeholder,
                   class: "twinput tw:w-full fieldResetsCounts" %>
-              </div>
+              <% end %>
             <% end %>
           </div>
 
@@ -106,7 +101,7 @@
       <%= content %>
 
       <%= render partial: "/shared/hidden_search_fields", locals: {kind: "organized_bike_search",
-        skip_organization: true, skip_period: @settings_and_filters_component.present?} %>
+        skip_organization: true, skip_period_and_status: @settings_and_filters_component.present?} %>
 
       <% unless @settings_and_filters_component %>
         <%= hidden_field_tag :search_stickers, @interpreted_params[:search_stickers] %>

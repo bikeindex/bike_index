@@ -12,8 +12,9 @@ module UI
       # as a tab
       TAB_CLASSES = "twlink tw:-mb-px tw:inline-flex tw:items-baseline tw:gap-1 tw:whitespace-nowrap " \
         "tw:rounded-t-md tw:border tw:border-transparent tw:px-4 tw:py-2 tw:text-sm tw:no-underline " \
-        "tw:hover:bg-gray-100 tw:is-active:border-gray-300 tw:is-active:border-b-white " \
-        "tw:is-active:bg-white tw:is-active:font-semibold tw:is-active:text-gray-900"
+        "tw:hover:bg-gray-100 tw:dark:hover:bg-gray-800 tw:is-active:border-gray-300 tw:is-active:border-b-white " \
+        "tw:is-active:bg-white tw:is-active:font-semibold tw:is-active:text-gray-900 tw:dark:is-active:border-gray-700 " \
+        "tw:dark:is-active:border-b-gray-900 tw:dark:is-active:bg-gray-900 tw:dark:is-active:text-gray-100"
 
       # turbo: Drive is off app-wide and opted into per element; one data-turbo on the nav
       # covers every tab, since Turbo reads it off the closest ancestor carrying it

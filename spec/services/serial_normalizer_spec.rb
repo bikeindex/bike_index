@@ -40,6 +40,27 @@ RSpec.describe SerialNormalizer do
         expect(SerialNormalizer.normalized_and_corrected("   unkown \n")).to be_nil
       end
     end
+
+    context "placeholders" do
+      let(:placeholders) do
+        [
+          "NOT ASSIGNED", "Not Assigned", " not   assigned ", "Not-Assigned", "NO SERIAL NUMBER", "NOSERIAL",
+          "To Be Specified", "TBD - special order", "pending", "ADD SN ON BUILD", "Will add later.",
+          "I DON'T HAVE IT", "I don’t have it", "dont have", "Can't find", "cannot find", "illegible", "N A"
+        ]
+      end
+      let(:not_placeholders) { ["EN 14764", "STOLEN", "WTU123P4567", "NOT ASSIGNED 2", "PENDING123", "HIDDEN VALLEY"] }
+
+      it "normalizes placeholders to unknown, and leaves serials and excluded values" do
+        placeholders.each do |serial|
+          expect(SerialNormalizer.unknown_and_absent_corrected(serial)).to eq("unknown"), "Failure: '#{serial}'"
+        end
+        not_placeholders.each do |serial|
+          expect(SerialNormalizer.unknown_and_absent_corrected(serial)).to eq(serial), "Failure: '#{serial}'"
+        end
+        expect(SerialNormalizer.normalized_and_corrected("Not Assigned")).to be_nil
+      end
+    end
   end
 
   describe "made_without_serial" do

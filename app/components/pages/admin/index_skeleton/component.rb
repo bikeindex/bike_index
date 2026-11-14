@@ -4,12 +4,13 @@ module Pages
   module Admin
     module IndexSkeleton
       class Component < ApplicationComponent
+        renders_many :nav_items
+
         def initialize(
           index:,
           collection:,
           viewing:,
           index_title: nil,
-          nav_header_list_items: nil,
           skip_charting: false,
           rendered_chart: nil,
           render_sortable: true,
@@ -24,7 +25,6 @@ module Pages
           @collection = collection
           @viewing = viewing
           @index_title = index_title
-          @nav_header_list_items = nav_header_list_items
           @skip_charting = skip_charting
           @rendered_chart = rendered_chart
           @render_sortable = render_sortable
@@ -56,7 +56,7 @@ module Pages
         end
 
         def index_info_component
-          Pages::Admin::Headers::IndexInfo::Component.new(index: @index, viewing: @viewing)
+          Pages::Admin::IndexSkeleton::IndexInfo::Component.new(index: @index, viewing: @viewing)
         end
 
         def pagination_component(skip_total: false)

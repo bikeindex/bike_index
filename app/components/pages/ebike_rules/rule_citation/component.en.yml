@@ -1,0 +1,7 @@
+---
+en:
+  components:
+    pages:
+      ebike_rules:
+        rule_citation:
+          source: source

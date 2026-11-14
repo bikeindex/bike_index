@@ -14,6 +14,16 @@ class OrganizedMailer < ApplicationMailer
   CONFIRMATION_REPORTS = {"status_stolen" => "stolen", "status_abandoned" => "abandoned",
                           "status_impounded" => "found"}.freeze
 
+  # Whoever a paying organization covers - its emails, members, registrants and email domain - isn't
+  # asked to donate on top of it
+  def self.render_donation?(organization: nil, user: nil, emails: nil)
+    return false if organization&.paid_money?
+    return false if user.present? && (user.organizations.paid_money.exists? || user.paid_organization_registration?)
+
+    domains = Array(emails).filter_map { Organization.email_domain(it) }
+    domains.none? || !Organization.paid_money.where(user_email_domain: domains).exists?
+  end
+
   def partial_registration(b_param)
     b_param_mail(b_param, Emails::PartialRegistration::Component.new(b_param:), tag: __callee__)
   end

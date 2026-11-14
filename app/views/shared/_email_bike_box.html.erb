@@ -1,6 +1,5 @@
 <% @ownership ||= @bike.current_ownership %>
-<% bike_url_path ||= bike_url(@bike, t: @ownership.token) %>
-<% skip_link_tracking = bike_url_path.match?(/\?/) # Skip link tracking if there are query parameters - e.g. token %>
+<% bike_url_path ||= bike_url(@bike, t: @ownership&.token) %>
 <% bike_url_path = @email_preview_tokenized_url if @email_preview %>
 <% thumb_url = @bike.thumb_path || @bike.stock_photo_url %>
 
@@ -13,12 +12,9 @@
   <tbody>
     <tr>
       <td class="image-holder <%= thumbclass %>">
-        <a
-          href="<%= bike_url_path %>"
-          data-pm-no-track="<%= skip_link_tracking %>"
-        >
+        <%= render(Emails::Partials::TokenLink::Component.new(href: bike_url_path, html_class: nil)) do %>
           <%= image_tag thumb_url, alt: "Bike photo" %>
-        </a>
+        <% end %>
       </td>
 
       <td class="info-holder">

@@ -5,10 +5,12 @@ module UI
     module RadioButtonGroup
       class Component < ApplicationComponent
         # Template Dependency: UI::ButtonGroup::Component
-        # A <label> never takes focus, so the ring hangs off the radio inside it
+        # A <label> never takes focus, so the ring hangs off the radio inside it - restated
+        # under is-active, which sorts after it, as UI::Button's FOCUS_CLASSES does
         LABEL_CLASSES = [
           "tw:mb-0", # a <label>, which legacy CSS gives a bottom margin
-          "tw:has-[:focus-visible]:outline-none tw:has-[:focus-visible]:ring-3 tw:has-[:focus-visible]:ring-purple-500/40"
+          "tw:relative", # the sr-only radio's containing block, which a scrolling ancestor otherwise doesn't clip
+          "tw:has-[:focus-visible]:outline-none tw:has-[:focus-visible]:ring-3 tw:is-active:has-[:focus-visible]:ring-3 tw:has-[:focus-visible]:ring-purple-500/40"
         ].join(" ").freeze
 
         CHIP_CLASSES = [UI::ButtonGroup::Component::CHIP_CLASSES, LABEL_CLASSES].join(" ").freeze
@@ -21,6 +23,7 @@ module UI
         # html_options go on each radio
         def initialize(name:, entries:, selected: nil, full_width: false, kind: :button, html_options: {})
           @group_classes = UI::ButtonGroup::Component.group_classes(kind:, full_width:)
+          @group_data = UI::ButtonGroup::Component.group_data(kind:)
           @label_classes = (kind == :toggle) ? SEGMENT_CLASSES : CHIP_CLASSES
           @name = name
           @entries = entries
@@ -29,7 +32,7 @@ module UI
         end
 
         def call
-          tag.div(class: @group_classes) do
+          tag.div(class: @group_classes, data: @group_data) do
             safe_join(@entries.map { |option| chip(option) })
           end
         end

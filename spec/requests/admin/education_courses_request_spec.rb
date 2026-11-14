@@ -1,0 +1,259 @@
+require "rails_helper"
+
+RSpec.describe Admin::EducationCoursesController, type: :request do
+  let(:base_url) { "/admin/education_courses" }
+  let(:organization) { FactoryBot.create(:organization) }
+
+  context "logged_in_as_superuser" do
+    include_context :request_spec_logged_in_as_superuser
+
+    let!(:draft) { FactoryBot.create(:education_course, :with_pages, organization:) }
+
+    describe "index" do
+      it "renders" do
+        get base_url
+        expect(response.status).to eq(200)
+        expect(response).to render_template(:index)
+        expect(assigns(:collection).pluck(:id)).to eq([draft.id])
+        expect(response.body).to_not include("Organization sections")
+        expect(response.body).to include("/admin/education_courses?organization_id=#{organization.id}\"")
+      end
+
+      context "filtered to an organization" do
+        let!(:other_draft) { FactoryBot.create(:education_course, organization: FactoryBot.create(:organization)) }
+
+        it "renders the organization's courses" do
+          get base_url, params: {organization_id: organization.id}
+          expect(response.status).to eq(200)
+          expect(assigns(:collection).pluck(:id)).to eq([draft.id])
+          expect(response.body).to_not include("Organization sections")
+          expect(response.body).to include("view for all organizations")
+        end
+      end
+
+      it "offers to create the default course when there isn't one" do
+        get base_url
+        expect(assigns(:default_course)).to be_nil
+        expect(response.body).to include("Create default course")
+      end
+
+      context "with a live default course and a draft above it" do
+        let!(:live_default) { FactoryBot.create(:education_course_default_active, :with_pages) }
+        let!(:default_draft) { FactoryBot.create(:education_course_default) }
+
+        it "links the default draft - that's what there is to do to it" do
+          get base_url
+          expect(assigns(:default_course)).to eq default_draft
+          expect(response.body).to include("Default Draft course")
+          expect(Capybara.string(response.body)).to have_css("td span.less-strong", text: "Default", count: 2)
+        end
+      end
+
+      context "with search_status" do
+        let!(:active) { FactoryBot.create(:education_course_active, :with_pages, organization:) }
+
+        it "badges active as success" do
+          get base_url, params: {search_status: "active"}
+          expect(response.status).to eq(200)
+          expect(Capybara.string(response.body)).to have_css("span.tw\\:bg-green-50", text: "Active")
+        end
+
+        it "filters by status" do
+          get base_url, params: {search_status: "draft"}
+          expect(response.status).to eq(200)
+          expect(assigns(:collection).pluck(:id)).to eq([draft.id])
+          expect(response.body).to include("/admin/education_courses?organization_id=#{organization.id}&amp;search_status=draft")
+        end
+      end
+    end
+
+    describe "edit" do
+      it "renders the editor for an organization's draft" do
+        get "#{base_url}/#{draft.id}/edit"
+        expect(response.status).to eq(200)
+        expect(response).to render_template(:edit)
+        expect(assigns(:education_course)).to eq draft
+      end
+
+      context "default draft" do
+        let!(:default_course) { FactoryBot.create(:education_course_default, :with_pages) }
+
+        it "renders" do
+          get "#{base_url}/#{default_course.id}/edit"
+          expect(response.status).to eq(200)
+          expect(response).to render_template(:edit)
+        end
+      end
+
+      context "live default course" do
+        let!(:default_course) { FactoryBot.create(:education_course_default_active, :with_pages) }
+
+        it "renders, read-only - activation freezes the default course too" do
+          get "#{base_url}/#{default_course.id}/edit"
+          expect(response.status).to eq(200)
+          expect(response.body).to_not include("education_course[faq_url]")
+        end
+      end
+
+      context "activated course" do
+        let!(:active) { FactoryBot.create(:education_course_active, :with_pages, organization:) }
+
+        it "renders, read-only" do
+          get "#{base_url}/#{active.id}/edit"
+          expect(response.status).to eq(200)
+          expect(response.body).to_not include("education_course[faq_url]")
+        end
+      end
+    end
+
+    describe "show" do
+      it "renders the course read-only" do
+        get "#{base_url}/#{draft.id}"
+        expect(response.status).to eq(200)
+        expect(response).to render_template(:show)
+        expect(response.body).to_not include("education_course[faq_url]")
+        expect(Capybara.string(response.body)).to have_css("nav a[aria-current][href='/admin/organizations/#{organization.to_param}?active_tab=education_courses']",
+          text: /Education courses\s+1/)
+      end
+
+      context "default course" do
+        let!(:default_course) { FactoryBot.create(:education_course_default, :with_pages) }
+
+        it "renders without organization tabs" do
+          get "#{base_url}/#{default_course.id}"
+          expect(response.status).to eq(200)
+          expect(response.body).to_not include("Organization sections")
+        end
+      end
+    end
+
+    describe "preview" do
+      it "renders the preview walk-through" do
+        get "#{base_url}/#{draft.id}/preview", params: {page: 2}
+        expect(response.status).to eq(200)
+        expect(response).to render_template(:preview)
+        expect(assigns(:preview_pagy).page).to eq 2
+      end
+    end
+
+    describe "update" do
+      it "updates the settings shared by every page" do
+        patch "#{base_url}/#{draft.id}", params: {
+          education_course: {faq_url: "https://example.com/faq", acknowledgment_text: "agree to the rules"}
+        }
+        expect(response).to redirect_to("#{base_url}/#{draft.id}/edit")
+        expect(draft.reload.faq_url).to eq "https://example.com/faq"
+        expect(draft.acknowledgment_text).to eq "agree to the rules"
+      end
+
+      context "activated course" do
+        let!(:active) { FactoryBot.create(:education_course_active, :with_pages, organization:) }
+
+        it "404s - activation freezes it" do
+          patch "#{base_url}/#{active.id}", params: {education_course: {faq_url: "https://example.com/faq"}}
+          expect(response.status).to eq(404)
+          expect(active.reload.faq_url).to be_blank
+        end
+      end
+
+      context "activate" do
+        it "makes the draft live" do
+          patch "#{base_url}/#{draft.id}", params: {activate: true}
+
+          expect(response).to redirect_to("#{base_url}/#{draft.id}")
+          expect(draft.reload).to be_active
+        end
+
+        context "default draft" do
+          let!(:default_course) { FactoryBot.create(:education_course_default, :with_pages) }
+          let!(:previous_default) { FactoryBot.create(:education_course_default_active, :with_pages) }
+
+          it "makes it the live default course, archiving the one it supersedes" do
+            patch "#{base_url}/#{default_course.id}", params: {activate: true}
+
+            expect(response).to redirect_to("#{base_url}/#{default_course.id}")
+            expect(EducationCourse.active_default).to eq default_course
+            expect(previous_default.reload).to be_archived
+          end
+        end
+
+        context "draft without pages" do
+          let!(:draft) { FactoryBot.create(:education_course, organization:) }
+
+          it "says why it can't go live" do
+            patch "#{base_url}/#{draft.id}", params: {activate: true}
+
+            expect(response).to redirect_to("#{base_url}/#{draft.id}/edit")
+            expect(flash[:error]).to match(/every page needs/)
+            expect(draft.reload).to be_draft
+          end
+        end
+
+        context "activated course" do
+          let!(:active) { FactoryBot.create(:education_course_active, :with_pages, organization:) }
+
+          it "404s" do
+            patch "#{base_url}/#{active.id}", params: {activate: true}
+            expect(response.status).to eq(404)
+          end
+        end
+      end
+    end
+
+    describe "create" do
+      it "opens the organization's existing draft" do
+        expect { post base_url, params: {organization_id: organization.to_param} }
+          .to_not change(EducationCourse, :count)
+        expect(response).to redirect_to("#{base_url}/#{draft.id}/edit")
+      end
+
+      context "no organization" do
+        let!(:live_default) { FactoryBot.create(:education_course_default_active, :with_pages) }
+
+        it "opens the default course's draft, cloning the live default course" do
+          expect { post base_url }.to change(EducationCourse, :count).by(1)
+
+          default_draft = EducationCourse.existing_draft_for(nil)
+          expect(response).to redirect_to("#{base_url}/#{default_draft.id}/edit")
+          expect(default_draft.education_course_pages.count).to eq 2
+        end
+      end
+
+      context "organization that doesn't resolve" do
+        it "404s rather than opening the default course every organization clones" do
+          expect { post base_url, params: {organization_id: "#{organization.to_param}-typo"} }
+            .to_not change(EducationCourse, :count)
+          expect(response.status).to eq(404)
+        end
+      end
+    end
+
+    describe "destroy" do
+      it "discards the draft and its pages" do
+        expect { delete "#{base_url}/#{draft.id}" }
+          .to change(EducationCourse, :count).by(-1)
+          .and change(EducationCoursePage, :count).by(-2)
+        expect(response).to redirect_to("/admin/organizations/#{organization.to_param}?active_tab=education_courses")
+      end
+
+      context "activated course" do
+        let!(:active) { FactoryBot.create(:education_course_active, :with_pages, organization:) }
+
+        it "404s - only a draft is thrown away" do
+          delete "#{base_url}/#{active.id}"
+          expect(response.status).to eq(404)
+          expect(active.reload).to be_active
+        end
+      end
+    end
+  end
+
+  context "logged_in_as_user" do
+    include_context :request_spec_logged_in_as_user
+
+    it "blocks non-superusers" do
+      get base_url
+      expect(response).to_not render_template(:index)
+    end
+  end
+end

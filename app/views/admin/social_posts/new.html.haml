@@ -1,6 +1,3 @@
-.admin-subnav
-  .col-12
-    %h1
-      New Post
+= render(Pages::Admin::Headers::Nav::Component.new(title: "New Post"))
 
 = render(Pages::Admin::SocialPosts::Form::Component.new(social_post: @social_post))

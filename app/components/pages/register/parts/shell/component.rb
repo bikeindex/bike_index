@@ -8,14 +8,16 @@ module Pages
         # margins pull over the layout's nav/footer spacing so the gray runs
         # edge to edge; content is centered at form width.
         class Component < ApplicationComponent
+          BACKGROUND_CLASSES = "tw:bg-gray-100 tw:dark:bg-gray-900"
+
           # data: for a step-wide controller, since this wraps everything on the page
           # (register--heading needs both the heading and the form in scope).
           # wide: for a page that isn't a form - the finished theft report's checklist
-          # embed: framed on someone else's page, which supplies the shell instead
-          def initialize(data: {}, wide: false, embed: false)
+          # bare: inside a frame or card that supplies the surroundings
+          def initialize(data: {}, wide: false, bare: false)
             @data = data
             @wide = wide
-            @embed = embed
+            @bare = bare
           end
 
           def call
@@ -34,9 +36,9 @@ module Pages
 
           # p-1 so a focus ring at the form's edge isn't clipped by the frame
           def shell_class
-            return "tw:p-1" if @embed
+            return "tw:p-1" if @bare
 
-            "tw:-mt-(--nav-gap) tw:-mb-18 tw:bg-gray-100 tw:px-4 tw:py-10 tw:dark:bg-gray-900"
+            "tw:-mt-(--nav-gap) tw:-mb-18 tw:px-4 tw:py-10 #{BACKGROUND_CLASSES}"
           end
 
           # Revealed by register--retry when a submission can't be retried into working. Ships

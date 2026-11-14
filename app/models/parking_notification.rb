@@ -77,10 +77,6 @@ class ParkingNotification < ActiveRecord::Base
   before_validation :set_calculated_attributes
   after_commit :process_notification
 
-  scope :with_location, -> { where.not(latitude: nil) }
-  scope :with_street, -> { with_location.where.not(street: nil) }
-  scope :without_street, -> { where(street: ["", nil]) }
-
   scope :active, -> { where(resolved_at: nil) }
   scope :resolved, -> { where.not(resolved_at: nil) }
   scope :initial_records, -> { where(initial_record_id: nil) }
@@ -92,6 +88,9 @@ class ParkingNotification < ActiveRecord::Base
   scope :first_notification, -> { where(repeat_number: 0) }
   scope :not_replaced, -> { where.not(status: "replaced") }
   scope :email_success, -> { joins(:notifications).merge(Notification.delivered).distinct }
+  scope :notes_matching, ->(query) {
+    where("message ILIKE :query OR internal_notes ILIKE :query", query: "%#{sanitize_sql_like(query.strip)}%")
+  }
 
   def self.kinds
     KIND_ENUM.keys.map(&:to_s)
@@ -331,7 +330,10 @@ class ParkingNotification < ActiveRecord::Base
   end
 
   def set_calculated_attributes
-    self.initial_record_id ||= potential_initial_record&.id if is_repeat
+    if Binxtils::InputNormalizer.boolean(is_repeat)
+      self.initial_record ||= potential_initial_record
+      reuse_initial_record_location
+    end
     self.repeat_number ||= calculated_repeat_number
     self.resolved_at ||= calculated_resolved_at # Used by by calculated_status, so must come first
     self.status = calculated_status
@@ -382,6 +384,14 @@ class ParkingNotification < ActiveRecord::Base
   end
 
   private
+
+  # The org form collapses its location controls for a repeat, so nothing locates the pin
+  def reuse_initial_record_location
+    return if id.present? || initial_record.blank? || street.present? || latitude.present?
+
+    self.attributes = initial_record.slice(*Geocodeable::GEO_ATTRS - [:street_2], :neighborhood, :accuracy, :location_from_address)
+    self.skip_geocoding = true
+  end
 
   def location_present
     # in case geocoder is failing (which happens sometimes), permit if either is present
