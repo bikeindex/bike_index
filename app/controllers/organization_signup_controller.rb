@@ -47,7 +47,9 @@ class OrganizationSignupController < ApplicationController
     return complete_signup if OrgServices::Signup.ready_to_complete?(@signup)
 
     # Step 2 says the link is on its way, so it goes out here rather than at the end
-    OrgServices::Signup.send_confirmation_email(@signup)
+    unless OrgServices::Signup.send_confirmation_email(@signup) || @signup.email_confirmation_token.present?
+      flash[:error] = translation(:no_more_links, email: @signup.email, controller_method: "resend")
+    end
     redirect_to organization_signup_path(step: @signup.details_completed? ? :finished : 2)
   end
 

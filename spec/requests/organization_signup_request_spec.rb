@@ -131,6 +131,7 @@ RSpec.describe OrganizationSignupController, type: :request do
     end
     expect(EmailJobs::OrganizationSignupConfirmationJob.jobs.count).to eq OrgServices::Signup::MAX_CONFIRMATION_EMAILS
     expect(OrganizationSignup.last.email).to eq "six@bikeindex.org"
+    expect(flash[:error]).to match(/can't send another/)
 
     expect { post "#{base_url}/resend" }.to_not change(EmailJobs::OrganizationSignupConfirmationJob.jobs, :size)
     expect(flash[:error]).to match(/can't send another/)

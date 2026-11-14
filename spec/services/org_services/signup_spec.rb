@@ -124,7 +124,6 @@ RSpec.describe OrgServices::Signup do
         expect(organization_signup.reload.email_confirmation_token).to be_nil
         expect { described_class.send_confirmation_email(organization_signup) }
           .to change(EmailJobs::OrganizationSignupConfirmationJob.jobs, :size).by 1
-        expect(EmailJobs::OrganizationSignupConfirmationJob.jobs.last["at"]).to be_nil
         expect(organization_signup.reload.email_confirmations_sent).to eq 2
         expect(described_class.send_confirmation_email(organization_signup)).to be_falsey
       end

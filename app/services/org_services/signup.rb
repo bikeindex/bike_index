@@ -67,15 +67,13 @@ module OrgServices
       false
     end
 
-    # Anyone holding the signup's session can ask for a resend, so an address gets one per
-    # interval - a changed one has no link yet, so it goes straight away, and the cap stops
-    # alternating addresses from making this a mailer. The link in their inbox keeps working
-    # unless it's expired
+    # A changed address has no token, so it skips the interval - the cap is what stops
+    # alternating addresses from making this a mailer
     def send_confirmation_email(signup)
       return false if signup.likely_spam || signup.email.blank? || signup.email_confirmed?
       return false if confirmation_emails_exhausted?(signup)
       return false if signup.email_confirmation_token.present? &&
-        signup.email_confirmation_sent_at&.>(Time.current - CONFIRMATION_EMAIL_INTERVAL)
+        signup.email_confirmation_sent_at.after?(CONFIRMATION_EMAIL_INTERVAL.ago)
 
       token = signup.email_confirmation_token_expired? ? SecurityTokenizer.new_token : signup.email_confirmation_token
       signup.update(email_confirmation_token: token, email_confirmation_sent_at: Time.current,

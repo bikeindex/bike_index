@@ -37,10 +37,7 @@
         <%= translation(".your_registration_link") %>
       </p>
 
-      <div class="tw:flex tw:items-start tw:gap-1">
-        <span class="tw:min-w-0 tw:flex-1 tw:font-mono tw:text-xs tw:break-all"><%= registration_url %></span>
-        <%= render UI::CopyButton::Component.new(value: registration_url, label: translation(".copy_registration_link")) %>
-      </div>
+      <%= render Atoms::CopyableCode::Component.new(value: registration_url, label: translation(".copy_registration_link")) %>
 
       <p class="tw:mt-2 tw:mb-0 tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">
         <%= translation(".registration_link_explained") %>
