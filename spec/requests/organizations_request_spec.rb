@@ -3,138 +3,12 @@ require "rails_helper"
 base_url = "/organizations"
 RSpec.describe OrganizationsController, type: :request do
   describe "new" do
-    before { Country.united_states } # Read replica
-    context "with out user" do
-      it "renders" do
-        get "#{base_url}/new"
-        expect(response.status).to eq(200)
-        expect(response).to render_template(:new)
-      end
+    it "redirects to the signup flow" do
+      get "#{base_url}/new"
+      expect(response).to redirect_to new_organization_signup_path
 
-      it "keeps the kind through sign up" do
-        get "#{base_url}/new", params: {kind: "bike_advocacy"}
-        expect(response.body).to include("return_to=%2Forganizations%2Fnew%3Fkind%3Dbike_advocacy")
-      end
-    end
-    context "with user" do
-      include_context :request_spec_logged_in_as_user
-      it "renders with revised_layout" do
-        get "#{base_url}/new"
-        expect(response.status).to eq(200)
-        expect(response).to render_template(:new)
-      end
-
-      it "preselects a creatable kind" do
-        get "#{base_url}/new", params: {kind: "bike_advocacy"}
-        expect(Capybara.string(response.body)).to have_css("input[value=bike_advocacy][checked]")
-
-        get "#{base_url}/new", params: {kind: "ambassador"}
-        expect(Capybara.string(response.body)).to_not have_css("input[checked]")
-      end
-    end
-  end
-
-  describe "create" do
-    include_context :request_spec_logged_in_as_user
-    let(:address_record_attrs) { {street: "somewhere", city: "San Francisco", postal_code: "94119", country_id: Country.united_states.id} }
-    let(:org_attrs) do
-      {
-        name: "a new org",
-        kind: "bike_shop",
-        website: "http://example.com",
-        locations_attributes: {"0" => {name: "Main", address_record_attributes: address_record_attrs}}
-      }
-    end
-    it "creates org, organization_role, filters approved attrs & redirect to org with current_user" do
-      expect(Organization.count).to eq(0)
-      post base_url, params: {organization: org_attrs}
-      expect(Organization.count).to eq(1)
-      organization = Organization.where(name: "a new org").first
-      expect(response).to redirect_to organization_manage_path(organization_id: organization.to_param)
-      expect(organization.approved).to be_truthy
-      expect(organization.api_access_approved).to be_falsey
-      expect(organization.auto_user_id).to eq(current_user.id)
-      expect(organization.organization_roles.count).to eq(1)
-      expect(organization.organization_roles.first.user_id).to eq(current_user.id)
-      expect(organization.kind).to eq "bike_shop"
-      expect(organization.website).to eq "http://example.com"
-
-      expect(organization.locations.count).to eq 1
-      expect(organization.locations.first.address_record).to have_attributes(address_record_attrs)
-    end
-
-    it "creates org, organization_role, filters approved attrs & redirect to org with current_user and mails" do
-      Sidekiq::Testing.inline! do
-        expect(Organization.count).to eq(0)
-        ActionMailer::Base.deliveries = []
-        post base_url, params: {organization: org_attrs.merge(kind: "property_management", approved: false, api_access_approved: true)}
-        expect(ActionMailer::Base.deliveries).not_to be_empty
-        expect(Organization.count).to eq(1)
-        organization = Organization.where(name: "a new org").first
-        expect(response).to redirect_to organization_manage_path(organization_id: organization.to_param)
-        expect(organization.approved).to be_truthy
-        expect(organization.api_access_approved).to be_falsey
-        expect(organization.auto_user_id).to eq(current_user.id)
-        expect(organization.organization_roles.count).to eq(1)
-        expect(organization.organization_roles.first.user_id).to eq(current_user.id)
-        expect(organization.kind).to eq "property_management"
-      end
-    end
-
-    context "existing org with name" do
-      let!(:organization_existing) { FactoryBot.create(:organization, name: "some name", short_name: "A NEW org", kind: :bike_advocacy) }
-      let(:target_error) { "Abbreviated name already in use by another organization. If you don't think that should be the case, contact support@bikeindex.org" }
-      it "creates with a different name" do
-        expect(organization_existing.reload.slug).to eq "a-new-org"
-        expect {
-          post base_url, params: {organization: org_attrs}
-        }.to_not change(Organization, :count)
-        rendered_organization = assigns(:organization)
-        expect(rendered_organization.errors.full_messages).to eq([target_error])
-        expect(rendered_organization.name).to eq "a new org"
-        expect(rendered_organization.locations.first).to be_present
-
-        expect(organization_existing.reload.slug).to eq "a-new-org"
-        expect(organization_existing.name).to eq "some name"
-        expect(organization_existing.short_name).to eq "A NEW org"
-      end
-    end
-
-    it "Doesn't xss" do
-      expect(Organization.count).to eq(0)
-      post base_url, params: {
-        organization: org_attrs.merge(name: "<script>alert(document.cookie)</script>",
-          website: "<script>alert(document.cookie)</script>",
-          kind: "cooooooolll_software")
-      }
-      expect(Organization.count).to eq(1)
-      current_user.reload
-      expect(current_user.organizations.count).to eq 1
-      organization = Organization.last
-      expect(organization.name).not_to eq("<script>alert(document.cookie)</script>")
-      expect(organization.website).not_to eq("<script>alert(document.cookie)</script>")
-      expect(organization.kind).to eq "other"
-    end
-
-    context "privileged kinds" do
-      Organization.admin_required_kinds.each do |kind|
-        it "prevents creating privileged #{kind}" do
-          post base_url, params: {organization: org_attrs.merge(kind: kind)}
-
-          expect(Organization.count).to eq(1)
-          expect(Organization.last.kind).to eq("other")
-        end
-      end
-    end
-
-    context "no current_user" do
-      let(:current_user) { false }
-      it "doesn't create" do
-        expect {
-          post base_url, params: {organization: org_attrs}
-        }.to_not change(Organization, :count)
-        expect(flash[:error]).to match "an account"
-      end
+      get "#{base_url}/new", params: {kind: "bike_advocacy"}
+      expect(response).to redirect_to new_organization_signup_path(kind: "bike_advocacy")
     end
   end
 
@@ -338,18 +212,18 @@ RSpec.describe OrganizationsController, type: :request do
     end
     context "with user without organization" do
       include_context :request_spec_logged_in_as_user
-      it "redirects to posintegration" do
+      it "redirects to the signup flow" do
         get "/lightspeed_interface"
         expect(flash[:notice]).to match(/organization/)
-        expect(response).to redirect_to new_organization_path
+        expect(response).to redirect_to new_organization_signup_path(return_to: lightspeed_interface_path)
       end
     end
     context "without user" do
-      it "redirects to posintegration" do
-        get "/lightspeed_interface"
-        expect(response).to redirect_to new_user_path
-        expect(flash[:notice]).to match(/sign up/)
-        expect(session[:return_to]).to eq lightspeed_interface_path
+      it "redirects to the signup flow, which makes the account too - and signing in comes back here" do
+        get "/lightspeed_interface", params: {organization_id: 12}
+        expect(response).to redirect_to new_organization_signup_path(return_to: lightspeed_interface_path)
+        expect(flash[:notice]).to match(/Sign in/)
+        expect(session[:return_to]).to eq lightspeed_interface_path(organization_id: 12)
       end
     end
   end

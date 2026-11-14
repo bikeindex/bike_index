@@ -218,8 +218,35 @@ class Organization < ApplicationRecord
       %w[ambassador bike_depot].freeze
     end
 
+    # In the order they're offered: related kinds side by side, other last
     def user_creatable_kinds
-      kinds - admin_required_kinds
+      %w[bike_shop bike_advocacy law_enforcement school municipality bike_manufacturer software
+        property_management other].freeze
+    end
+
+    # What would stop a new organization taking this name: :too_short, :reserved or :taken.
+    # Without building one, whose callbacks query (and can write) far more than this needs
+    def name_problem(name)
+      name = sanitize_name(name)
+      short_name = shorten_name(name)
+      return :too_short if Slugifyer.slugify(short_name).length < 2
+      # Organization validates all three, and shortening or slugging can land on a reserved word
+      return :reserved unless [name, short_name, slug_for(short_name)].all? { OrganizationNameValidator.valid?(it) }
+
+      :taken if name_taken_by(name).present?
+    end
+
+    # Short names are unique, and cut to 30 characters - so a long name can be taken by a different one
+    def name_taken_by(name) = find_by("LOWER(short_name) = ?", shorten_name(sanitize_name(name)).downcase)
+
+    def sanitize_name(str) = Binxtils::InputNormalizer.sanitize(str&.strip).gsub("&amp;", "&")
+
+    def slug_for(short_name) = Slugifyer.slugify(short_name).delete_prefix("admin")
+
+    def shorten_name(str)
+      # Remove parens if the name is too long
+      str = str.gsub(/\(.*\)/, "") if str.length > 30 && str.match?(/\(.*\)/)
+      str.gsub(/\s+/, " ").strip.truncate(30, omission: "", separator: " ").strip
     end
 
     def kind_humanized(str)
@@ -591,7 +618,7 @@ class Organization < ApplicationRecord
     self.graduated_notification_interval = nil unless graduated_notification_interval.to_i > 0
     # For now, just use them. However - nesting organizations probably need slightly modified organization_feature slugs
     self.enabled_feature_slugs = calculated_enabled_feature_slugs.compact.sort
-    new_slug = Slugifyer.slugify(short_name).delete_prefix("admin")
+    new_slug = self.class.slug_for(short_name)
     self.slug = calculated_slug(new_slug) if new_slug != slug
     self.access_token ||= SecurityTokenizer.new_token
     # NOTE: only organizations with child_organizations feature can be selected in admin view, but this doesn't block assignment
@@ -688,16 +715,10 @@ class Organization < ApplicationRecord
       .reorder(id: :asc)
   end
 
-  def strip_name_tags(str)
-    Binxtils::InputNormalizer.sanitize(name&.strip).gsub("&amp;", "&")
-  end
+  def strip_name_tags(str) = self.class.sanitize_name(name)
 
   def name_shortener(str)
-    # Remove parens if the name is too long
-    if str.length > 30 && str.match?(/\(.*\)/)
-      str = str.gsub(/\(.*\)/, "")
-    end
-    str = str.gsub(/\s+/, " ").strip.truncate(30, omission: "", separator: " ").strip
+    str = self.class.shorten_name(str)
     return str unless deleted_at.present?
 
     str.match?("-deleted") ? str : "#{str}-deleted"

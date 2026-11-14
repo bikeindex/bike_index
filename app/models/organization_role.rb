@@ -100,6 +100,7 @@ class OrganizationRole < ApplicationRecord
 
   def send_invitation_email?
     return false if created_by_magic_link # Don't send an email if they're already being emailed
+    return false if user_id.present? && user_id == sender_id # They added themselves, e.g. creating the organization
     return false if email_invitation_sent_at.present?
 
     invited_email.present?

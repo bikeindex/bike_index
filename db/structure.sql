@@ -3045,6 +3045,51 @@ ALTER SEQUENCE public.organization_saml_configurations_id_seq OWNED BY public.or
 
 
 --
+-- Name: organization_signups; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.organization_signups (
+    id bigint NOT NULL,
+    id_token character varying NOT NULL,
+    email character varying,
+    name character varying,
+    kind integer,
+    website character varying,
+    phone character varying,
+    publicly_visible boolean DEFAULT true NOT NULL,
+    address jsonb DEFAULT '{}'::jsonb NOT NULL,
+    likely_spam boolean DEFAULT false NOT NULL,
+    email_confirmation_token character varying,
+    email_confirmation_sent_at timestamp(6) without time zone,
+    email_confirmations_sent integer DEFAULT 0 NOT NULL,
+    email_confirmed_at timestamp(6) without time zone,
+    return_to character varying,
+    organization_id bigint,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: organization_signups_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.organization_signups_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: organization_signups_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.organization_signups_id_seq OWNED BY public.organization_signups.id;
+
+
+--
 -- Name: organization_stolen_messages; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -5135,6 +5180,13 @@ ALTER TABLE ONLY public.organization_saml_configurations ALTER COLUMN id SET DEF
 
 
 --
+-- Name: organization_signups id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organization_signups ALTER COLUMN id SET DEFAULT nextval('public.organization_signups_id_seq'::regclass);
+
+
+--
 -- Name: organization_stolen_messages id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -6008,6 +6060,14 @@ ALTER TABLE ONLY public.organization_roles
 
 ALTER TABLE ONLY public.organization_saml_configurations
     ADD CONSTRAINT organization_saml_configurations_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: organization_signups organization_signups_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organization_signups
+    ADD CONSTRAINT organization_signups_pkey PRIMARY KEY (id);
 
 
 --
@@ -7440,6 +7500,20 @@ CREATE UNIQUE INDEX index_organization_saml_configurations_on_organization_id ON
 
 
 --
+-- Name: index_organization_signups_on_id_token; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_organization_signups_on_id_token ON public.organization_signups USING btree (id_token);
+
+
+--
+-- Name: index_organization_signups_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_organization_signups_on_organization_id ON public.organization_signups USING btree (organization_id);
+
+
+--
 -- Name: index_organization_stolen_messages_on_organization_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -8037,6 +8111,7 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261114001527'),
 ('20261111155046'),
 ('20261110154720'),
 ('20261106120000'),

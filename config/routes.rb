@@ -23,7 +23,16 @@ Rails.application.routes.draw do
   get "/discuss", to: redirect("https://discuss.bikeindex.org"), as: :discuss
   get "discourse_authentication", to: "discourse_authentication#index"
 
-  resources :organizations do
+  # Before resources :organizations, whose show would take "signup" as an id
+  resource :organization_signup, only: %i[new create show update], path: "organizations/signup",
+    controller: :organization_signup do
+    get :confirm
+    post :confirm_email
+    post :resend
+    get :welcome
+  end
+
+  resources :organizations, only: :new do
     member do
       get :embed
       get :embed_extended, as: :embed_extended
