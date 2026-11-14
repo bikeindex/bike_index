@@ -8,7 +8,7 @@ module BikeJobs
 
     def perform(bike_id)
       bike = Bike.unscoped.find_by_id(bike_id)
-      return unless PosRegistrationMatch.live_bike?(bike) && matchable_bike?(bike) && self_registration?(bike)
+      return unless bike&.current_with_user_hidden? && matchable_bike?(bike) && self_registration?(bike)
 
       pos_bikes = earlier_pos_bikes(bike)
       return if pos_bikes.none?

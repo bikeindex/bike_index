@@ -10,6 +10,7 @@ command -v mise >/dev/null && eval "$(mise activate bash --shims)"
 # bin/setup backgrounds redis-server, which would hold a captured stdout open;
 # tmp/ because bin/setup's log:clear truncates log/*.log
 LOG="$ROOT/tmp/workspace_setup.log"
+mkdir -p "$ROOT/tmp"
 if (cd "$ROOT" && bin/workspace_setup --without_seeds) >"$LOG" 2>&1; then
   echo "This worktree was set up by bin/workspace_setup --without_seeds (WORKSPACE_ID $(<"$ROOT/.workspace_id")). The database is unseeded."
 else

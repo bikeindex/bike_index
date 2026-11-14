@@ -50,9 +50,6 @@ class PosRegistrationMatch < ApplicationRecord
   scope :review_candidate, -> { where.not(review_reasons: []) }
   scope :with_review_reason, ->(reason) { where("review_reasons @> ARRAY[?]::text[]", reason) }
 
-  # Hidden registrations still match
-  def self.live_bike?(bike) = bike.present? && bike.deleted_at.blank? && !bike.example && !bike.likely_spam
-
   # Stolen history counts any manufacturer's bike with either serial, including deleted and example ones
   def self.review_reasons_for(bike, pos_bike)
     serial = bike.serial_normalized_no_space
@@ -84,7 +81,7 @@ class PosRegistrationMatch < ApplicationRecord
   # Still the same bike (an edited serial or manufacturer could otherwise slip past the stolen veto), both live,
   # and both theirs
   def mergeable?
-    merge_candidate? && [bike, pos_bike].all? { self.class.live_bike?(it) } &&
+    merge_candidate? && [bike, pos_bike].all? { it&.current_with_user_hidden? } &&
       bike.user_id.present? && bike.user_id == pos_bike.user_id &&
       bike.serial_normalized_no_space == pos_bike.serial_normalized_no_space && bike.manufacturer_id == pos_bike.manufacturer_id
   end
