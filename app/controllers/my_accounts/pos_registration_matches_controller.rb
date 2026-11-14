@@ -4,29 +4,32 @@ module MyAccounts
   class PosRegistrationMatchesController < ApplicationController
     include Sessionable
 
+    # The emailed link reaches this through the sign-in redirect, which Turbo asks to be a turbo_stream
+    before_action :force_html_response, only: %i[show]
     before_action :authenticate_user_for_my_accounts_controller
     before_action :find_pos_registration_match
 
+    ANSWERS = {"merge" => true, "decline" => false}.freeze
+
     def show
-      return redirect_by_status unless @pos_registration_match.confirmable?(@bike, @pos_bike)
+      return redirect_by_status unless @pos_registration_match.confirmable?
 
       render(Pages::MyAccount::PosRegistrationMatches::Show::Component.new(bike: @bike, pos_bike: @pos_bike,
         pos_registration_match: @pos_registration_match))
     end
 
     def update
-      same_bike = Binxtils::InputNormalizer.boolean(params[:same_bike])
+      merge = ANSWERS[params[:answer]]
+      # Only an answer from the page's buttons is recorded
+      return redirect_to(my_account_pos_registration_match_path(@pos_registration_match)) if merge.nil?
       # Another request may have settled it first
-      return redirect_by_status unless @pos_registration_match.answer!(user: current_user, same_bike:)
+      return redirect_by_status unless @pos_registration_match.answer!(user: current_user, merge:)
 
-      if !same_bike
-        flash[:success] = translation(:kept_separate)
-        redirect_to my_account_path
-      elsif @pos_registration_match.merging?
+      if merge
         flash[:success] = translation(:combining, bike_type: @pos_bike.type)
         redirect_to bike_path(@pos_bike)
       else
-        flash[:notice] = translation(:couldnt_combine)
+        flash[:success] = translation(:kept_separate)
         redirect_to my_account_path
       end
     end
@@ -35,8 +38,8 @@ module MyAccounts
 
     def find_pos_registration_match
       @pos_registration_match = PosRegistrationMatch.find(params[:id])
-      @bike = Bike.unscoped.find_by(id: @pos_registration_match.bike_id)
-      @pos_bike = Bike.unscoped.find_by(id: @pos_registration_match.pos_bike_id)
+      @bike = @pos_registration_match.bike
+      @pos_bike = @pos_registration_match.pos_bike
       raise ActiveRecord::RecordNotFound unless @bike.present? && @bike.user_id == current_user.id
     end
 
@@ -46,7 +49,13 @@ module MyAccounts
         flash[:notice] = @pos_registration_match.merging? ? translation(:combining) : translation(:already_combined)
         redirect_to bike_path(@pos_bike)
       else
-        flash[:notice] = @pos_registration_match.declined? ? translation(:already_kept_separate) : translation(:cant_combine_here)
+        flash[:notice] = if @pos_registration_match.declined?
+          translation(:already_kept_separate)
+        elsif @pos_registration_match.confirmed?
+          translation(:couldnt_combine)
+        else
+          translation(:cant_combine_here)
+        end
         redirect_to my_account_path
       end
     end

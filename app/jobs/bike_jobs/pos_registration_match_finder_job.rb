@@ -21,14 +21,14 @@ module BikeJobs
         # Locks the POS bike, so concurrent registrations of it each see the other's match
         match = pos_bike.with_lock do
           other_matches = PosRegistrationMatch.where(pos_bike_id: pos_bike.id).where.not(bike_id: bike.id)
-            .select { PosRegistrationMatch.live_bike?(Bike.unscoped.find_by(id: it.bike_id)) }
+            .where(bike_id: Bike.current_with_user_hidden.select(:id)).to_a
           reasons += ["multiple_registrations"] if other_matches.any?
-          other_matches.select(&:pending?).each { add_reasons(it, ["multiple_registrations"]) }
+          other_matches.each { add_reasons(it, ["multiple_registrations"]) }
           record_match(bike, pos_bike, duplicate_bike_group_id, reasons)
         end
         # After the lock's transaction commits, so the email job finds the match. Until it's sent, so a failed
-        # enqueue is retried while the new registration is still being matched
-        if match.pending? && match.merge_candidate? && !Notification.pos_registration_match.exists?(notifiable: match)
+        # enqueue or send is retried while the new registration is still being matched
+        if match.pending? && match.merge_candidate? && !Notification.pos_registration_match.settled.exists?(notifiable: match)
           EmailJobs::PosRegistrationMatchJob.perform_async(match.id)
         end
       end

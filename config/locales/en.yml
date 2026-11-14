@@ -1826,11 +1826,11 @@ en:
             These registrations can't be combined here. Email support@bikeindex.org
             if you need help.
           combining: We're combining these into one registration. It takes a minute.
-        update:
-          combining: Thanks! We're combining your %{bike_type}'s registrations into one. It takes a minute.
           couldnt_combine: >-
             We couldn't combine these, so they're still separate. Email support@bikeindex.org
             if you need help.
+        update:
+          combining: Thanks! We're combining your %{bike_type}'s registrations into one. It takes a minute.
           kept_separate: Thanks, we'll keep them as separate registrations.
       update:
         current_password_doesnt_match: Current password doesn't match, it's required

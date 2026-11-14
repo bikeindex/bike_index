@@ -5,26 +5,19 @@ module EmailJobs
     sidekiq_options queue: "notify", retry: 3
 
     def perform(pos_registration_match_id)
-      return unless Flipper.enabled?(:pos_registration_match_emails)
+      return if skip_job?
 
-      match = PosRegistrationMatch.find_by_id(pos_registration_match_id)
-      return if match.blank?
+      with_redlock(pos_registration_match_id) do
+        match = PosRegistrationMatch.find_by_id(pos_registration_match_id)
+        # Rechecked, since a theft or a transfer can come after the match
+        next unless match&.confirmable?
 
-      # Rechecked, since a theft or a transfer can come after the match
-      notification = match.with_lock do
-        bike = Bike.unscoped.find_by(id: match.bike_id)
-        pos_bike = Bike.unscoped.find_by(id: match.pos_bike_id)
-        next unless match.confirmable?(bike, pos_bike)
-
-        match.add_review_reasons!(PosRegistrationMatch.review_reasons_for(bike, pos_bike))
+        match.add_review_reasons!(PosRegistrationMatch.review_reasons_for(match.bike, match.pos_bike))
         next unless match.merge_candidate?
 
-        Notification.pos_registration_match.where(notifiable: match).first_or_create(user: bike.user, bike_id: pos_bike.id)
-      end
-      return if notification.blank?
-
-      # The notification's lock, not the match's, so confirming isn't held up by the send. Concurrent runs send once
-      notification.with_lock do
+        notification = Notification.pos_registration_match.where(notifiable: match)
+          .first_or_create(user: match.bike.user, bike_id: match.pos_bike_id)
+        # Skips a notification that's already been sent
         Notifications::Deliver.track_email(notification) do
           CustomerMailer.pos_registration_match_email(match, notification.user).deliver_now
         end

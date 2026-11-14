@@ -106,13 +106,16 @@ module ControllerHelpers
       Rack::MiniProfiler.current.present?
   end
 
-  # For a bike the user can't see: a registration merged into its shop's POS registration sends its links there
+  # For a bike the user can't see: a registration merged into its shop's POS registration sends its links to the
+  # same page of that one, if they can see it
   def redirect_merged_bike_or_not_found(bike)
-    merged_into_id = request.get? && PosRegistrationMatch.merged_into_id(bike)
-    fail ActiveRecord::RecordNotFound if merged_into_id.blank?
+    merged_into = PosRegistrationMatch.merged_into(bike) if request.get?
+    fail ActiveRecord::RecordNotFound unless merged_into&.visible_by?(current_user)
 
+    id_param = params.key?(:bike_id) ? :bike_id : :id
     # Keeps tokens, e.g. a parking notification's retrieval link
-    redirect_to(bike_path(merged_into_id, request.query_parameters))
+    redirect_to(url_for(request.path_parameters.merge(id_param => merged_into.id, :only_path => true)
+      .merge(request.query_parameters)))
   end
 
   def set_reading_role

@@ -29,8 +29,8 @@ RSpec.describe BikeJobs::MergePosRegistrationJob, type: :job do
     expect(pos_bike.reload.user_hidden).to be_truthy
 
     instance.perform(match.id)
-    # The owner's propulsion wins, the shop's year stays and its blank model is filled
-    expect(pos_bike.reload).to have_attributes(frame_model: "Roadster", year: 2023, description: "Red basket",
+    # What the owner entered wins
+    expect(pos_bike.reload).to have_attributes(frame_model: "Roadster", year: 2024, description: "Red basket",
       propulsion_type: "pedal-assist", user_hidden: false)
     expect([public_image, private_image].map { PublicImage.unscoped.find(it.id).imageable_id }).to eq([pos_bike.id] * 2)
     expect([component, bike_sticker, bike_organization, customer_contact, notification].map { it.reload.bike_id })
@@ -39,7 +39,7 @@ RSpec.describe BikeJobs::MergePosRegistrationJob, type: :job do
     expect(match.reload.status).to eq "merged"
     expect(Bike.unscoped.find(bike.id).deleted_at).to be_present
     expect(CallbackJobs::AfterBikeSaveJob.jobs.map { it["args"] }).to include([bike.id], [pos_bike.id])
-    expect(PosRegistrationMatch.merged_into_id(Bike.unscoped.find(bike.id))).to eq pos_bike.id
+    expect(PosRegistrationMatch.merged_into(Bike.unscoped.find(bike.id))).to eq pos_bike
   end
 
   it "keeps the shop's values over the owner's defaults and blanks, and the shop's organization permission and note" do
@@ -53,7 +53,8 @@ RSpec.describe BikeJobs::MergePosRegistrationJob, type: :job do
     other_note = FactoryBot.create(:bike_organization_note, bike:, organization: FactoryBot.create(:organization))
     address_record = FactoryBot.create(:address_record, kind: :ownership)
     bike.current_ownership.update!(address_record:)
-    strava_gear = FactoryBot.create(:strava_gear, item: bike)
+    strava_integration = FactoryBot.create(:strava_integration, user:)
+    strava_gear = FactoryBot.create(:strava_gear, item: bike, strava_integration:)
 
     instance.perform(match.id)
     # The owner's frame size replaces the shop's whole, not just its unit
@@ -73,18 +74,27 @@ RSpec.describe BikeJobs::MergePosRegistrationJob, type: :job do
     expect(CallbackJobs::AfterBikeSaveJob.jobs).to be_empty
   end
 
+  it "leaves another athlete's Strava gear" do
+    strava_gear = FactoryBot.create(:strava_gear, item: bike)
+    instance.perform(match.id)
+    expect(match.reload.status).to eq "merged"
+    expect(strava_gear.reload.item_id).to eq bike.id
+  end
+
   # Written because a stolen serial edited onto the POS registration slipped past the veto
-  it "doesn't merge once a serial was edited" do
+  it "doesn't merge once a serial was edited, and records why" do
     pos_bike.update!(serial_number: "OTHER98765")
     FactoryBot.create(:stolen_bike, serial_number: "OTHER98765")
     instance.perform(match.id)
-    expect(match.reload.status).to eq "confirmed"
+    expect(match.reload).to have_attributes(status: "confirmed", review_reasons: ["changed_since_confirmed"])
+    expect(match.merging?).to be_falsey
     expect(bike.reload.deleted_at).to be_blank
   end
 
   it "doesn't merge once the POS registration is someone else's, or an unconfirmed match" do
     BikeServices::OwnershipTransferer.find_or_create(pos_bike, updator: user, new_owner_email: "new-owner@example.com")
     instance.perform(match.id)
+    expect(match.reload.review_reasons).to eq ["changed_since_confirmed"]
     expect(bike.reload.deleted_at).to be_blank
 
     pending_match = FactoryBot.create(:pos_registration_match)

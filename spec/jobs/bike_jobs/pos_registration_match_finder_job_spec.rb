@@ -61,9 +61,13 @@ RSpec.describe BikeJobs::PosRegistrationMatchFinderJob, type: :job do
   it "enqueues the owner's email until it's been sent" do
     perform_for(bike)
     expect(EmailJobs::PosRegistrationMatchJob.jobs.map { it["args"] }).to eq([[PosRegistrationMatch.sole.id]])
-    Notification.create!(kind: "pos_registration_match", notifiable: PosRegistrationMatch.sole, user:)
+    notification = Notification.create!(kind: "pos_registration_match", notifiable: PosRegistrationMatch.sole, user:,
+      delivery_status: "delivery_failure")
     perform_for(bike)
-    expect(EmailJobs::PosRegistrationMatchJob.jobs.size).to eq 1
+    expect(EmailJobs::PosRegistrationMatchJob.jobs.size).to eq 2
+    notification.update!(delivery_status: "delivery_success")
+    perform_for(bike)
+    expect(EmailJobs::PosRegistrationMatchJob.jobs.size).to eq 2
   end
 
   it "doesn't match before the serial is grouped" do

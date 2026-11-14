@@ -30,14 +30,19 @@ class PosRegistrationMatch < ApplicationRecord
     "impounded" => "A registration was impounded",
     "marketplace_listing" => "A registration has a marketplace listing",
     "bike_versions" => "A registration has versions",
-    "not_a_serial" => "Serial is a part number or placeholder"
+    "not_a_serial" => "Serial is a part number or placeholder",
+    "changed_since_confirmed" => "A registration was edited, removed or transferred after the owner said yes"
   }.freeze
+
+  # Bike's default scope (Bike.current) leaves these out
+  BIKE_SCOPE_COLUMNS = %i[example user_hidden deleted_at likely_spam].freeze
 
   enum :status, STATUS_ENUM
 
   belongs_to :duplicate_bike_group
-  belongs_to :bike
-  belongs_to :pos_bike, class_name: "Bike"
+  # Merged matches have a deleted bike, and POS bikes are often hidden. Without the default scope's includes too
+  belongs_to :bike, -> { unscope(:includes, :order, where: BIKE_SCOPE_COLUMNS) }
+  belongs_to :pos_bike, -> { unscope(:includes, :order, where: BIKE_SCOPE_COLUMNS) }, class_name: "Bike"
 
   validates_presence_of :bike_id, :pos_bike_id
 
@@ -66,7 +71,7 @@ class PosRegistrationMatch < ApplicationRecord
   def self.ordered_reasons(reasons) = REVIEW_REASONS.keys & reasons
 
   # The registration a deleted one was merged into, so its links still go somewhere
-  def self.merged_into_id(bike) = bike.deleted? ? merged.where(bike_id: bike.id).pick(:pos_bike_id) : nil
+  def self.merged_into(bike) = bike.deleted? ? merged.find_by(bike_id: bike.id)&.pos_bike : nil
 
   def merge_candidate? = review_reasons.none?
 
@@ -74,39 +79,26 @@ class PosRegistrationMatch < ApplicationRecord
   def merging? = confirmed? && merge_candidate?
 
   # Whether the owner can still be asked
-  def confirmable?(bike, pos_bike) = pending? && mergeable?(bike, pos_bike)
+  def confirmable? = pending? && mergeable?
 
   # Still the same bike (an edited serial or manufacturer could otherwise slip past the stolen veto), both live,
   # and both theirs
-  def mergeable?(bike, pos_bike)
+  def mergeable?
     merge_candidate? && [bike, pos_bike].all? { self.class.live_bike?(it) } &&
       bike.user_id.present? && bike.user_id == pos_bike.user_id &&
       bike.serial_normalized_no_space == pos_bike.serial_normalized_no_space && bike.manufacturer_id == pos_bike.manufacturer_id
   end
 
-  # The POS bike, then the match, the order the finder locks them in; then the registration
-  def with_locked_bikes
-    pos_bike = Bike.unscoped.find_by(id: pos_bike_id)
-    return false if pos_bike.blank?
+  # The owner's answer, while they can still give one. Returns whether it was recorded. A yes is rechecked and
+  # merged by BikeJobs::MergePosRegistrationJob
+  def answer!(user:, merge:)
+    recorded = with_lock do
+      next false unless confirmable? && bike.user_id == user&.id
 
-    pos_bike.with_lock do
-      lock!
-      yield Bike.unscoped.lock.find_by(id: bike_id), pos_bike
-    end
-  end
-
-  # The owner's answer, while they can still give one. Returns whether it was recorded. A yes is merged by
-  # BikeJobs::MergePosRegistrationJob, unless a review reason has come up since the email
-  def answer!(user:, same_bike:)
-    recorded = with_locked_bikes do |bike, pos_bike|
-      next false unless confirmable?(bike, pos_bike) && bike.user_id == user&.id
-      next update!(status: :declined) unless same_bike
-
-      update!(status: :confirmed)
-      add_review_reasons!(self.class.review_reasons_for(bike, pos_bike))
+      update!(status: merge ? :confirmed : :declined)
     end
     # After the lock's transaction commits, so the job finds the match confirmed
-    BikeJobs::MergePosRegistrationJob.perform_async(id) if recorded && merging?
+    BikeJobs::MergePosRegistrationJob.perform_async(id) if recorded && merge
     recorded
   end
 
