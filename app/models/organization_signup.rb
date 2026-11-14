@@ -8,6 +8,7 @@
 #  email                      :string
 #  email_confirmation_sent_at :datetime
 #  email_confirmation_token   :string
+#  email_confirmations_sent   :integer          default(0), not null
 #  email_confirmed_at         :datetime
 #  id_token                   :string           not null
 #  kind                       :integer

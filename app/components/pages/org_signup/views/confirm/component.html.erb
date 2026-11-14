@@ -1,7 +1,7 @@
 <%= render Pages::Register::Parts::Shell::Component.new do %>
   <div class="tw:px-1 tw:py-6 tw:text-center">
     <%= render UI::Header::Component.new(text: translation(".activate_org", name: @organization_signup.name),
-        subtitle: translation(".confirm_to_activate")) %>
+        subtitle: translation(".confirm_email_to_activate_html", email: tag.strong(@organization_signup.email))) %>
 
     <% if @signed_in_as.present? %>
       <%= render UI::Alerts::Base::Component.new(kind: :warning,

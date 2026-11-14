@@ -67,6 +67,8 @@ class OrganizationSignupController < ApplicationController
   def resend
     if OrgServices::Signup.send_confirmation_email(@signup)
       flash[:success] = translation(:link_resent, email: @signup.email)
+    elsif OrgServices::Signup.confirmation_emails_exhausted?(@signup)
+      flash[:error] = translation(:no_more_links, email: @signup.email)
     else
       flash[:notice] = translation(:link_recently_sent, email: @signup.email)
     end

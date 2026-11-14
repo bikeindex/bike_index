@@ -7,9 +7,9 @@ en:
           confirm:
             activate: Activate
             activate_org: Activate %{name}
-            confirm_to_activate: >-
-              Confirm your email, and we'll set up the organization with you as its
-              administrator.
+            confirm_email_to_activate_html: >-
+              Confirm %{email} is your email, and we'll set up the organization with
+              you as its administrator.
             sign_out_and_activate: Sign out and activate
             signed_in_as_other: >-
               You're signed in as %{signed_in_as}, but this link is for %{email}.

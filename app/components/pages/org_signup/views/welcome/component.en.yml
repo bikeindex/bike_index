@@ -7,7 +7,7 @@ en:
           welcome:
             add_a_registration: Add a registration
             continue_where_you_were: Continue where you were
-            download_qr_code: Download its QR code
+            copy_registration_link: Copy registration link
             get_started: Here's how to get started.
             invite_your_team: Invite your team
             is_active: "%{name} is active!"
@@ -16,4 +16,5 @@ en:
             registration_link_explained: Anyone who registers through this link is
               registered with your organization.
             set_a_password: Set a password
+            show_qr_code: Show QR code
             your_registration_link: Your registration link

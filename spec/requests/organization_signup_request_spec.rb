@@ -119,16 +119,21 @@ RSpec.describe OrganizationSignupController, type: :request do
     end
   end
 
-  # Turnstile only challenges risky domains, so the rate limit is all that's left for the rest
-  it "sends one email per interval, however often the address changes" do
+  # Turnstile only challenges risky domains, so the cap is all that's left for the rest
+  it "sends a changed address its link straight away, up to the cap" do
     post base_url, params: {organization_signup: start_params}
-    expect(EmailJobs::OrganizationSignupConfirmationJob.jobs.map { it["at"] }).to eq [nil]
-
-    Sidekiq::Job.clear_all
-    post base_url, params: {organization_signup: start_params.merge(email: "other@bikeindex.org")}
-    post base_url, params: {organization_signup: start_params.merge(email: "third@bikeindex.org")}
     expect(EmailJobs::OrganizationSignupConfirmationJob.jobs.count).to eq 1
-    expect(EmailJobs::OrganizationSignupConfirmationJob.jobs.first["at"]).to be_within(5).of(5.minutes.from_now.to_f)
+    post base_url, params: {organization_signup: start_params}
+    expect(EmailJobs::OrganizationSignupConfirmationJob.jobs.count).to eq 1
+
+    %w[two three four five six].each do |name|
+      post base_url, params: {organization_signup: start_params.merge(email: "#{name}@bikeindex.org")}
+    end
+    expect(EmailJobs::OrganizationSignupConfirmationJob.jobs.count).to eq OrgServices::Signup::MAX_CONFIRMATION_EMAILS
+    expect(OrganizationSignup.last.email).to eq "six@bikeindex.org"
+
+    expect { post "#{base_url}/resend" }.to_not change(EmailJobs::OrganizationSignupConfirmationJob.jobs, :size)
+    expect(flash[:error]).to match(/can't send another/)
   end
 
   context "a risky email, with the challenge configured" do

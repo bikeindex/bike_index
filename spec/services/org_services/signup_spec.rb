@@ -122,11 +122,10 @@ RSpec.describe OrgServices::Signup do
         expect(saved).to be_truthy
         expect(described_class.save_start(organization_signup, user:, **start_params, email: "new@bikeindex.org")).to be_truthy
         expect(organization_signup.reload.email_confirmation_token).to be_nil
-        expect(organization_signup.email_confirmation_sent_at).to be_present
-        # The send time stays, so the new address's link waits out the interval
         expect { described_class.send_confirmation_email(organization_signup) }
           .to change(EmailJobs::OrganizationSignupConfirmationJob.jobs, :size).by 1
-        expect(EmailJobs::OrganizationSignupConfirmationJob.jobs.last["at"]).to be > 4.minutes.from_now.to_f
+        expect(EmailJobs::OrganizationSignupConfirmationJob.jobs.last["at"]).to be_nil
+        expect(organization_signup.reload.email_confirmations_sent).to eq 2
         expect(described_class.send_confirmation_email(organization_signup)).to be_falsey
       end
     end
@@ -204,6 +203,8 @@ RSpec.describe OrgServices::Signup do
       expect(organization.locations.first.address_record)
         .to have_attributes(street: "10544 82 Ave NW", city: "Edmonton", country_id: Country.canada_id)
       expect(organization.organization_roles.pluck(:user_id, :role)).to eq([[user.id, "admin"]])
+      UserJobs::ProcessOrganizationRoleJob.drain
+      expect(Notification.where(kind: "organization_invitation").count).to eq 0
       expect(organization_signup.reload.organization_id).to eq organization.id
       expect(Feedback.last.feedback_type).to eq "organization_created"
     end

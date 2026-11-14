@@ -1853,6 +1853,9 @@ en:
           We sent a link to %{email} in the last few minutes - it can take a little
           while to arrive, so check your spam folder too.
         link_resent: We've sent a new link to %{email}.
+        no_more_links: >-
+          We've already sent several links to %{email}, so we can't send another.
+          Check your spam folder, or contact support@bikeindex.org.
     organizations:
       find_organization:
         not_found: >-
@@ -3834,8 +3837,10 @@ en:
     news_index: Bike Index Blog
     organization_signup_confirm: Activate your organization
     organization_signup_create: Add your organization to Bike Index
+    organization_signup_new: Add your organization to Bike Index
     organization_signup_show: Add your organization to Bike Index
     organization_signup_update: Add your organization to Bike Index
+    organization_signup_welcome: "%{organization} is active"
     payments_create: Thanks for your support!
     payments_new: Support Bike Index!
     register_acknowledgment: Safety check for your %{cycle_type}

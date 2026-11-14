@@ -33,25 +33,18 @@
         tw:py-3 tw:text-left tw:dark:bg-gray-800
       "
     >
-      <label
-        for="organization-registration-url"
-        class="twlabel tw:text-sm tw:font-semibold"
-      >
+      <p class="twlabel tw:mb-1 tw:text-sm tw:font-semibold">
         <%= translation(".your_registration_link") %>
-      </label>
+      </p>
 
-      <input
-        id="organization-registration-url"
-        type="text"
-        readonly
-        value="<%= registration_url %>"
-        class="twinput tw:mt-1 tw:w-full tw:font-mono tw:text-xs"
-        autocomplete="off"
-      >
+      <div class="tw:flex tw:items-start tw:gap-1">
+        <span class="tw:min-w-0 tw:flex-1 tw:font-mono tw:text-xs tw:break-all"><%= registration_url %></span>
+        <%= render UI::CopyButton::Component.new(value: registration_url, label: translation(".copy_registration_link")) %>
+      </div>
 
       <p class="tw:mt-2 tw:mb-0 tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">
         <%= translation(".registration_link_explained") %>
-        <%= link_to translation(".download_qr_code"), qr_organization_path(@organization), class: "twlink" %>
+        <%= link_to translation(".show_qr_code"), qr_organization_path(@organization), class: "twlink" %>
       </p>
     </div>
 

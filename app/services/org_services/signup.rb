@@ -8,6 +8,7 @@ module OrgServices
     extend Functionable
 
     CONFIRMATION_EMAIL_INTERVAL = 5.minutes
+    MAX_CONFIRMATION_EMAILS = 5
     STEPS = %w[1 2 finished].freeze
 
     def find(token)
@@ -44,8 +45,7 @@ module OrgServices
     end
 
     # A signed in user's own address is the one confirmed - they aren't asked for it.
-    # Changing the address makes the link already sent useless, so it's replaced - but the
-    # send time stays, or alternating addresses would dodge the rate limit
+    # Changing the address makes the link already sent useless, so it's replaced
     def save_start(signup, user:, name:, kind:, email:, additional: nil)
       email = EmailNormalizer.normalize(user&.email || email)
       if email != signup.email
@@ -67,24 +67,24 @@ module OrgServices
       false
     end
 
-    # One email per interval, whatever the address: anyone holding the signup's session can ask
-    # for a resend. A changed address has no link yet, so it's queued for when the interval ends.
-    # The link already in their inbox keeps working unless it's expired
+    # Anyone holding the signup's session can ask for a resend, so an address gets one per
+    # interval - a changed one has no link yet, so it goes straight away, and the cap stops
+    # alternating addresses from making this a mailer. The link in their inbox keeps working
+    # unless it's expired
     def send_confirmation_email(signup)
       return false if signup.likely_spam || signup.email.blank? || signup.email_confirmed?
-
-      next_send_at = signup.email_confirmation_sent_at&.+(CONFIRMATION_EMAIL_INTERVAL)
-      return false if next_send_at&.future? && signup.email_confirmation_token.present?
+      return false if confirmation_emails_exhausted?(signup)
+      return false if signup.email_confirmation_token.present? &&
+        signup.email_confirmation_sent_at&.>(Time.current - CONFIRMATION_EMAIL_INTERVAL)
 
       token = signup.email_confirmation_token_expired? ? SecurityTokenizer.new_token : signup.email_confirmation_token
-      # The queued one sends whichever address and link are current when it runs
-      return signup.update(email_confirmation_token: token) if signup.email_confirmation_sent_at&.future?
-
-      send_at = [next_send_at, Time.current].compact.max
-      signup.update(email_confirmation_token: token, email_confirmation_sent_at: send_at)
-      EmailJobs::OrganizationSignupConfirmationJob.perform_at(send_at, signup.id)
+      signup.update(email_confirmation_token: token, email_confirmation_sent_at: Time.current,
+        email_confirmations_sent: signup.email_confirmations_sent + 1)
+      EmailJobs::OrganizationSignupConfirmationJob.perform_async(signup.id)
       true
     end
+
+    def confirmation_emails_exhausted?(signup) = signup.email_confirmations_sent >= MAX_CONFIRMATION_EMAILS
 
     def confirmation_token_valid?(signup, token)
       return false if signup.email_confirmation_token_expired?
@@ -106,7 +106,7 @@ module OrgServices
       Organization.transaction do
         next unless organization.save
 
-        OrganizationRole.create!(user:, organization:, role: "admin")
+        OrganizationRole.create!(user:, organization:, role: "admin", sender: user)
         signup.update!(organization:)
       end
       return organization unless organization.persisted?

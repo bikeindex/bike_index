@@ -12,6 +12,7 @@ class CreateOrganizationSignups < ActiveRecord::Migration[8.1]
       t.boolean :likely_spam, default: false, null: false
       t.string :email_confirmation_token
       t.datetime :email_confirmation_sent_at
+      t.integer :email_confirmations_sent, default: 0, null: false
       t.datetime :email_confirmed_at
       t.string :return_to
       t.references :organization, index: true

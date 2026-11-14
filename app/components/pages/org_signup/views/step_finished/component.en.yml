@@ -13,7 +13,11 @@ en:
             no_email_yet: >-
               No email? It can take a few minutes - check your spam folder, or have
               us send it again.
-            register_for_customers: Register vehicles for your customers and community
+            register_for_community: Register vehicles for your community
+            register_for_residents: Register vehicles for your residents
+            register_for_students: Register vehicles for your students and staff
+            register_for_tenants: Register vehicles for your tenants
+            register_for_your_customers: Register vehicles for your customers
             send_it_again: Send it again
             share_your_link: Share your registration link and QR code
             wrong_address: Wrong address?

@@ -3061,6 +3061,7 @@ CREATE TABLE public.organization_signups (
     likely_spam boolean DEFAULT false NOT NULL,
     email_confirmation_token character varying,
     email_confirmation_sent_at timestamp(6) without time zone,
+    email_confirmations_sent integer DEFAULT 0 NOT NULL,
     email_confirmed_at timestamp(6) without time zone,
     return_to character varying,
     organization_id bigint,
