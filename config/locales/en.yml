@@ -1862,6 +1862,9 @@ en:
         must_create_an_organization_first: >-
           You have to create an organization on Bike Index before you can connect
           with Lightspeed
+        sign_in_or_add_organization: >-
+          Sign in to connect your organization with Lightspeed - or, if it isn't on
+          Bike Index yet, add it here.
       set_bparam:
         no_user: >-
           We're sorry, that organization doesn't have a user set up to register bikes

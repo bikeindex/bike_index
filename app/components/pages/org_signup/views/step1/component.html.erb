@@ -10,6 +10,9 @@
   <%= form_with(model: @organization_signup, url: organization_signup_path, method: :post, scope: :organization_signup, data: form_data) do |f| %>
     <%= render UI::Forms::Honeypot::Component.new %>
 
+    <%# Saved with step 1 - until then, nothing else holds it %>
+    <%= hidden_field_tag :return_to, @organization_signup.return_to if @organization_signup.new_record? %>
+
     <%= render Pages::Register::Parts::SectionLabel::Component.new(text: translation(".your_organization")) %>
 
     <%= render UI::Forms::Group::Component.new(form_builder: f, attribute: :name,
@@ -40,10 +43,14 @@
       </p>
     <% else %>
       <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :email,
-          label_text: translation(".email"), required: true, wrapper_class: "tw:mb-6")) do %>
+          label_text: translation(".email"), required: true, wrapper_class: "tw:mb-2")) do %>
         <%= render UI::Forms::Email::Component.new(form_builder: f, attribute: :email, required: true,
             html_options: {value: @organization_signup.email, placeholder: translation(".email_placeholder")}) %>
       <% end %>
+
+      <p class="tw:mb-6 tw:text-sm tw:text-gray-600 tw:dark:text-gray-300">
+        <%= translation(".already_on_bike_index_html", sign_in_link: link_to(translation(".sign_in"), new_session_path, class: "twlink")) %>
+      </p>
     <% end %>
 
     <%= render UI::Forms::Turnstile::Component.new(email: @organization_signup.email, user: @current_user) %>

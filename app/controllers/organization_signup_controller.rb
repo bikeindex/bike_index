@@ -13,12 +13,17 @@ class OrganizationSignupController < ApplicationController
   # Picks up where the session (or a confirmed address) left off - every "sign up your
   # organization" link lands here, including mid-way through
   def new
-    signup = OrgServices::Signup.resumable(token: session[SESSION_KEY], user: current_user) if params[:restart].blank?
-    signup ||= OrgServices::Signup.start(user: current_user)
-    signup.update(return_to:) if return_to.present?
+    @signup = OrgServices::Signup.resumable(token: session[SESSION_KEY], user: current_user) if params[:restart].blank?
+    if @signup.blank?
+      session.delete(SESSION_KEY)
+      @signup = OrgServices::Signup.build(user: current_user, return_to:, kind: params[:kind])
+      return render(step_page("1"))
+    end
+
+    @signup.update(return_to:) if return_to.present?
     # A link's kind preselects step 1, but never overrides one already chosen
-    signup.update(kind: params[:kind]) if signup.kind.blank? && Organization.user_creatable_kinds.include?(params[:kind])
-    session[SESSION_KEY] = signup.id_token
+    @signup.update(kind: params[:kind]) if @signup.kind.blank? && Organization.user_creatable_kinds.include?(params[:kind])
+    session[SESSION_KEY] = @signup.id_token
     redirect_to organization_signup_path
   end
 
@@ -30,10 +35,14 @@ class OrganizationSignupController < ApplicationController
   end
 
   def create
-    saved = OrgServices::Signup.save_start(@signup, user: current_user, name: params.dig(:organization_signup, :name),
-      kind: params.dig(:organization_signup, :kind), email: params.dig(:organization_signup, :email),
-      additional: params[:additional]) && turnstile_verified?(@signup, @signup.email)
+    start = params.fetch(:organization_signup, {})
+    # First, so its error stops save_start saving - a saved step 1 lets the rest of the flow send the email
+    turnstile_verified?(@signup, current_user&.email || start[:email])
+    saved = OrgServices::Signup.save_start(@signup, user: current_user, name: start[:name], kind: start[:kind],
+      email: start[:email], additional: params[:additional])
     return render(step_page("1"), status: :unprocessable_entity) unless saved
+
+    session[SESSION_KEY] = @signup.id_token
     # Renamed after the name was taken at activation
     return complete_signup if OrgServices::Signup.ready_to_complete?(@signup)
 
@@ -70,8 +79,8 @@ class OrganizationSignupController < ApplicationController
   end
 
   def confirm_email
-    # Single use, so a second click has nothing left to do
-    return redirect_to(organization_signup_path) if @signup.email_confirmed?
+    # Single use, so a second click has nothing left to do - new resumes it for whoever it was
+    return redirect_to(new_organization_signup_path) if @signup.email_confirmed?
 
     unless OrgServices::Signup.confirmation_token_valid?(@signup, params[:confirmation_token])
       flash[:error] = if OrgServices::Signup.send_confirmation_email(@signup)
@@ -81,6 +90,9 @@ class OrganizationSignupController < ApplicationController
       end
       return redirect_to(organization_signup_path)
     end
+
+    # The only way back to a signup opened in another browser
+    session[SESSION_KEY] = @signup.id_token
 
     if signed_in_as_someone_else?
       unless params[:sign_out].present?
@@ -124,9 +136,10 @@ class OrganizationSignupController < ApplicationController
     end
   end
 
-  # Only a path of our own, so a link can't send a new admin off-site
+  # Only a path of our own, so a link can't send a new admin off-site. Browsers read a
+  # backslash as a slash and drop tabs and newlines, so "/\evil.com" is "//evil.com" too
   def return_to
-    params[:return_to] if params[:return_to].to_s.match?(%r{\A/(?!/)})
+    params[:return_to] if params[:return_to].to_s.match?(%r{\A/(?!/)[^\\[:space:][:cntrl:]]*\z})
   end
 
   def email_owner = @email_owner ||= User.fuzzy_confirmed_or_unconfirmed_email_find(@signup.email)
@@ -171,21 +184,20 @@ class OrganizationSignupController < ApplicationController
 
   def find_signup
     @signup = OrgServices::Signup.find(session[SESSION_KEY])
+    @signup ||= OrgServices::Signup.build(user: current_user, return_to:) if action_name == "create"
     return redirect_to(new_organization_signup_path) if @signup.blank?
 
     redirect_to_organization(@signup.organization) if @signup.organization.present?
   end
 
-  # The emailed token authorizes this, not the session - which follows it, since it's the
-  # only way back to a signup opened in another browser
+  # The emailed token authorizes this, not the session - which confirm_email attaches once it checks out
   def find_signup_for_confirmation
     @signup = OrgServices::Signup.find(params[:signup_token])
     if @signup.blank?
       flash[:notice] = translation(:signup_not_found)
       return redirect_to(new_organization_signup_path(restart: true))
     end
-    return redirect_to_organization(@signup.organization) if @signup.organization.present?
 
-    session[SESSION_KEY] = @signup.id_token if action_name == "confirm_email"
+    redirect_to_organization(@signup.organization) if @signup.organization.present?
   end
 end

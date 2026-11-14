@@ -15,6 +15,7 @@ RSpec.describe Pages::OrgSignup::Views::Step1::Component, type: :component do
     expect(kinds).to match_array(Organization.user_creatable_kinds)
     expect(kinds.index("municipality")).to eq kinds.index("school") + 1
     expect(kinds.last).to eq "other"
+    expect(component).to have_link "Sign in", href: "/session/new"
   end
 
   context "signed in" do
@@ -24,6 +25,7 @@ RSpec.describe Pages::OrgSignup::Views::Step1::Component, type: :component do
       expect(component).to have_no_field("organization_signup[email]")
       expect(component).to have_text("You're signed in as #{current_user.email}")
       expect(component).to have_no_text("You're already part of")
+      expect(component).to have_no_link "Sign in"
     end
 
     context "already part of an organization" do
@@ -36,10 +38,11 @@ RSpec.describe Pages::OrgSignup::Views::Step1::Component, type: :component do
   end
 
   context "a brand new signup" do
-    let(:organization_signup) { FactoryBot.create(:organization_signup) }
+    let(:organization_signup) { OrgServices::Signup.build(user: nil, return_to: "/lightspeed_interface") }
 
-    it "has nothing to start over from" do
+    it "has nothing to start over from, and carries what it'll save" do
       expect(component).to have_no_link("Start a different organization instead")
+      expect(component).to have_field("return_to", type: :hidden, with: "/lightspeed_interface")
     end
   end
 

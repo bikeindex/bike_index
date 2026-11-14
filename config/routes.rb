@@ -32,7 +32,7 @@ Rails.application.routes.draw do
     get :welcome
   end
 
-  resources :organizations do
+  resources :organizations, only: :new do
     member do
       get :embed
       get :embed_extended, as: :embed_extended

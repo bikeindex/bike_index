@@ -121,9 +121,13 @@ RSpec.describe OrgServices::Signup do
 
         expect(saved).to be_truthy
         expect(described_class.save_start(organization_signup, user:, **start_params, email: "new@bikeindex.org")).to be_truthy
-        expect(organization_signup.reload).to have_attributes(email_confirmation_token: nil, email_confirmation_sent_at: nil)
+        expect(organization_signup.reload.email_confirmation_token).to be_nil
+        expect(organization_signup.email_confirmation_sent_at).to be_present
+        # The send time stays, so the new address's link waits out the interval
         expect { described_class.send_confirmation_email(organization_signup) }
           .to change(EmailJobs::OrganizationSignupConfirmationJob.jobs, :size).by 1
+        expect(EmailJobs::OrganizationSignupConfirmationJob.jobs.last["at"]).to be > 4.minutes.from_now.to_f
+        expect(described_class.send_confirmation_email(organization_signup)).to be_falsey
       end
     end
   end
@@ -171,6 +175,18 @@ RSpec.describe OrgServices::Signup do
     it "rate limits resends" do
       expect { described_class.send_confirmation_email(organization_signup) }
         .to_not change(EmailJobs::OrganizationSignupConfirmationJob.jobs, :size)
+    end
+
+    # The email says the link works for 30 days, and a resend reuses it
+    it "lasts, with its signup, for 30 days from the latest email" do
+      token = organization_signup.reload.email_confirmation_token
+      organization_signup.update(created_at: 40.days.ago, email_confirmation_sent_at: 29.days.ago)
+      expect(described_class.find(organization_signup.id_token)).to eq organization_signup
+      expect(described_class.confirmation_token_valid?(organization_signup, token)).to be_truthy
+
+      organization_signup.update(email_confirmation_sent_at: 31.days.ago)
+      expect(described_class.find(organization_signup.id_token)).to be_nil
+      expect(described_class.confirmation_token_valid?(organization_signup, token)).to be_falsey
     end
   end
 

@@ -11,8 +11,14 @@ class OrganizationsController < ApplicationController
       redirect_to("https://posintegration.bikeindex.org?organization_id=#{params[:organization_id]}", allow_other_host: true) && return
     end
 
-    # Signing up makes the account too, so it's where everyone without an organization goes
-    flash[:notice] = translation(:must_create_an_organization_first)
+    # Signing up makes the account too, so it's where everyone without an organization goes -
+    # but a signed out admin of one signs in from there, and comes back here
+    if current_user.present?
+      flash[:notice] = translation(:must_create_an_organization_first)
+    else
+      store_return_to(lightspeed_interface_path(organization_id: params[:organization_id]))
+      flash[:notice] = translation(:sign_in_or_add_organization)
+    end
     redirect_to new_organization_signup_path(return_to: lightspeed_interface_path)
   end
 

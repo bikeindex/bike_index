@@ -27,7 +27,7 @@
 #  index_organization_signups_on_organization_id  (organization_id)
 #
 class OrganizationSignup < ApplicationRecord
-  # How long a signup resumes by token, and so how long its emailed link works
+  # How long a signup resumes by token, and its emailed link works, after the latest email
   TOKEN_EXPIRATION = 30.days
   # The state (or region) isn't here: which one a country has is the form's to decide
   REQUIRED_ADDRESS_ATTRS = %w[street city postal_code country_id].freeze
@@ -39,17 +39,15 @@ class OrganizationSignup < ApplicationRecord
   before_validation :set_calculated_attributes
   before_create { self.id_token = SecurityTokenizer.new_token }
 
-  scope :unexpired, -> { where("created_at >= ?", Time.current - TOKEN_EXPIRATION) }
-
-  def expired? = created_at < Time.current - TOKEN_EXPIRATION
+  scope :unexpired, -> { where("GREATEST(created_at, email_confirmation_sent_at) >= ?", Time.current - TOKEN_EXPIRATION) }
 
   def email_confirmed? = email_confirmed_at.present?
 
   def details_completed? = REQUIRED_ADDRESS_ATTRS.all? { address[it].present? }
 
-  # A blank token reads as expired - token_time floors at EARLIEST_TOKEN_TIME
+  # A resend reuses the token, so it lasts from the latest email - which promises that long
   def email_confirmation_token_expired?
-    SecurityTokenizer.token_time(email_confirmation_token) < Time.current - TOKEN_EXPIRATION
+    email_confirmation_token.blank? || email_confirmation_sent_at.to_i < (Time.current - TOKEN_EXPIRATION).to_i
   end
 
   def address_record = AddressRecord.new(address)

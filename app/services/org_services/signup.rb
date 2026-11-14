@@ -22,7 +22,10 @@ module OrgServices
         (unfinished.where(email: user.email).where.not(email_confirmed_at: nil).order(:id).last if user.present?)
     end
 
-    def start(user:, return_to: nil) = OrganizationSignup.create!(email: user&.email, return_to:)
+    # Unsaved until step 1 is, so a visit that doesn't sign up leaves nothing behind
+    def build(user:, return_to: nil, kind: nil)
+      OrganizationSignup.new(email: user&.email, return_to:, kind: (kind if Organization.user_creatable_kinds.include?(kind)))
+    end
 
     # What Pages::Register::Parts::Progress reads off a flow
     def steps = STEPS
@@ -41,11 +44,12 @@ module OrgServices
     end
 
     # A signed in user's own address is the one confirmed - they aren't asked for it.
-    # Changing the address makes the link already sent useless, so it's replaced
+    # Changing the address makes the link already sent useless, so it's replaced - but the
+    # send time stays, or alternating addresses would dodge the rate limit
     def save_start(signup, user:, name:, kind:, email:, additional: nil)
       email = EmailNormalizer.normalize(user&.email || email)
       if email != signup.email
-        signup.assign_attributes(email_confirmation_token: nil, email_confirmation_sent_at: nil, email_confirmed_at: nil)
+        signup.assign_attributes(email_confirmation_token: nil, email_confirmed_at: nil)
       end
       signup.assign_attributes(name:, email:, kind: (kind if Organization.user_creatable_kinds.include?(kind)),
         likely_spam: signup.likely_spam || additional.present?)
@@ -63,15 +67,22 @@ module OrgServices
       false
     end
 
-    # Rate limited: anyone holding the signup's session can ask for a resend. The link already
-    # in their inbox keeps working unless it's expired
+    # One email per interval, whatever the address: anyone holding the signup's session can ask
+    # for a resend. A changed address has no link yet, so it's queued for when the interval ends.
+    # The link already in their inbox keeps working unless it's expired
     def send_confirmation_email(signup)
       return false if signup.likely_spam || signup.email.blank? || signup.email_confirmed?
-      return false if signup.email_confirmation_sent_at.to_i > (Time.current - CONFIRMATION_EMAIL_INTERVAL).to_i
+
+      next_send_at = signup.email_confirmation_sent_at&.+(CONFIRMATION_EMAIL_INTERVAL)
+      return false if next_send_at&.future? && signup.email_confirmation_token.present?
 
       token = signup.email_confirmation_token_expired? ? SecurityTokenizer.new_token : signup.email_confirmation_token
-      signup.update(email_confirmation_token: token, email_confirmation_sent_at: Time.current)
-      EmailJobs::OrganizationSignupConfirmationJob.perform_async(signup.id)
+      # The queued one sends whichever address and link are current when it runs
+      return signup.update(email_confirmation_token: token) if signup.email_confirmation_sent_at&.future?
+
+      send_at = [next_send_at, Time.current].compact.max
+      signup.update(email_confirmation_token: token, email_confirmation_sent_at: send_at)
+      EmailJobs::OrganizationSignupConfirmationJob.perform_at(send_at, signup.id)
       true
     end
 

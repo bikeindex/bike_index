@@ -14,18 +14,17 @@ RSpec.describe OrganizationSignupController, type: :request do
 
   it "creates the organization, and its admin's account, once the email is confirmed" do
     get "#{base_url}/new"
-    expect(response).to redirect_to base_url
-    get "#{base_url}?step=2"
-    expect(response).to redirect_to "#{base_url}?step=1"
-    get "#{base_url}?step=1"
     expect(response.status).to eq 200
     expect(response.body).to include "Add your organization"
+    get "#{base_url}?step=2"
+    expect(response).to redirect_to "#{base_url}/new"
 
     expect {
       post base_url, params: {organization_signup: start_params.merge(name: "")}
     }.to_not change(EmailJobs::OrganizationSignupConfirmationJob.jobs, :size)
     expect(response.status).to eq 422
     expect(response.body).to include "Organization name is required"
+    expect(OrganizationSignup.count).to eq 0
 
     expect {
       post base_url, params: {organization_signup: start_params}
@@ -89,9 +88,9 @@ RSpec.describe OrganizationSignupController, type: :request do
   end
 
   context "a link that doesn't work, once the last email is a while old" do
-    let!(:organization_signup) { FactoryBot.create(:organization_signup_details_completed) }
     before do
-      OrgServices::Signup.send_confirmation_email(organization_signup)
+      post base_url, params: {organization_signup: start_params}
+      patch base_url, params: {organization_signup: details_params}
       organization_signup.update(email_confirmation_sent_at: 6.minutes.ago)
     end
 
@@ -111,10 +110,51 @@ RSpec.describe OrganizationSignupController, type: :request do
       expect(response).to redirect_to "#{base_url}?step=finished"
       expect(flash[:success]).to eq "We've sent a new link to org_admin@bikeindex.org."
     end
+
+    it "doesn't open the signup to another browser" do
+      other_browser = open_session
+      other_browser.post "#{base_url}/confirm_email", params: confirm_params.merge(confirmation_token: "wrong")
+      other_browser.get base_url
+      expect(other_browser.response.location).to eq "http://www.example.com#{base_url}/new"
+    end
+  end
+
+  # Turnstile only challenges risky domains, so the rate limit is all that's left for the rest
+  it "sends one email per interval, however often the address changes" do
+    post base_url, params: {organization_signup: start_params}
+    expect(EmailJobs::OrganizationSignupConfirmationJob.jobs.map { it["at"] }).to eq [nil]
+
+    Sidekiq::Job.clear_all
+    post base_url, params: {organization_signup: start_params.merge(email: "other@bikeindex.org")}
+    post base_url, params: {organization_signup: start_params.merge(email: "third@bikeindex.org")}
+    expect(EmailJobs::OrganizationSignupConfirmationJob.jobs.count).to eq 1
+    expect(EmailJobs::OrganizationSignupConfirmationJob.jobs.first["at"]).to be_within(5).of(5.minutes.from_now.to_f)
+  end
+
+  context "a risky email, with the challenge configured" do
+    before do
+      stub_const("Integrations::Turnstile::ENABLED", true)
+      stub_const("Integrations::Turnstile::SECRET_KEY", "1x0000000000000000000000000000000AA")
+    end
+
+    it "saves nothing, so nothing else in the flow can send the email, until the challenge is answered" do
+      post base_url, params: {organization_signup: start_params.merge(email: "rider@yahoo.com")}
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response.body).to include "not a robot"
+      expect(response.body).to include "Shifty Bike Shop"
+      expect(OrganizationSignup.count).to eq 0
+      get "#{base_url}?step=2"
+      expect(response).to redirect_to "#{base_url}/new"
+
+      VCR.use_cassette("integrations_turnstile-verified") do
+        post base_url, params: {:organization_signup => start_params.merge(email: "rider@yahoo.com"),
+                                "cf-turnstile-response" => "XXXX.DUMMY.TOKEN.XXXX"}
+      end
+      expect(response).to redirect_to "#{base_url}?step=2"
+    end
   end
 
   it "picks the signup back up from any signup link, unless asked to start over" do
-    get "#{base_url}/new"
     post base_url, params: {organization_signup: start_params}
     get "/organizations/new"
     expect(response).to redirect_to new_organization_signup_path
@@ -127,17 +167,17 @@ RSpec.describe OrganizationSignupController, type: :request do
     get "#{base_url}?step=1"
     expect(response.body).to include "Start a different organization instead"
     get "#{base_url}/new", params: {restart: true}
-    expect(OrganizationSignup.count).to eq 2
-    get response.location
-    expect(response).to redirect_to "#{base_url}?step=1"
+    expect(response.body).to_not include "Start a different organization instead"
+    post base_url, params: {organization_signup: start_params.merge(name: "Shifty Bikes East")}
+    expect(OrganizationSignup.pluck(:name)).to match_array ["Shifty Bike Shop", "Shifty Bikes East"]
   end
 
   it "preselects a creatable kind from the link, but keeps one already chosen" do
     get "#{base_url}/new", params: {kind: "ambassador"}
-    expect(organization_signup.kind).to be_nil
+    expect(Capybara.string(response.body)).to_not have_css("input[checked]")
     get "#{base_url}/new", params: {kind: "bike_advocacy"}
-    get "#{base_url}?step=1"
     expect(Capybara.string(response.body)).to have_css("input[value=bike_advocacy][checked]")
+    expect(OrganizationSignup.count).to eq 0
 
     post base_url, params: {organization_signup: start_params}
     get "#{base_url}/new", params: {kind: "bike_advocacy"}
@@ -165,7 +205,6 @@ RSpec.describe OrganizationSignupController, type: :request do
   end
 
   it "creates the organization when step 2 is finished in the browser that started it, after the link was clicked elsewhere" do
-    get "#{base_url}/new"
     post base_url, params: {organization_signup: start_params}
     phone = open_session
     phone.post "#{base_url}/confirm_email", params: confirm_params
@@ -221,7 +260,6 @@ RSpec.describe OrganizationSignupController, type: :request do
 
     it "uses their email, and still waits on the link" do
       get "#{base_url}/new"
-      get "#{base_url}?step=1"
       expect(response.body).to include current_user.email
       expect(response.body).to_not include "organization_signup[email]"
       post base_url, params: {organization_signup: start_params}
@@ -240,7 +278,9 @@ RSpec.describe OrganizationSignupController, type: :request do
       it "offers the way back there once the organization exists" do
         get "/lightspeed_interface"
         get response.location
-        post base_url, params: {organization_signup: start_params}
+        # Unsaved until step 1 is, so the form carries it
+        expect(Capybara.string(response.body)).to have_field("return_to", type: :hidden, with: lightspeed_interface_path)
+        post base_url, params: {organization_signup: start_params, return_to: lightspeed_interface_path}
         patch base_url, params: {organization_signup: details_params}
         post "#{base_url}/confirm_email", params: confirm_params
         organization = Organization.last
@@ -248,6 +288,11 @@ RSpec.describe OrganizationSignupController, type: :request do
         get response.location
         expect(response.body).to include "Continue where you were"
         expect(response.body).to include %(href="#{lightspeed_interface_path}")
+
+        ["//evil.com", "/\\evil.com", "/\t/evil.com", "https://evil.com"].each do |return_to|
+          get welcome_path(organization, return_to:)
+          expect(response.body).to_not include "Continue where you were"
+        end
       end
     end
 
