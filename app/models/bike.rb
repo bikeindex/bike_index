@@ -474,10 +474,9 @@ class Bike < ApplicationRecord
     !impounded? && owner_name.present? && valid_mailing_address?
   end
 
-  # matches current scope
-  def current?
-    !example? && !user_hidden && deleted_at.blank? && !likely_spam
-  end
+  def current_with_user_hidden? = !example? && deleted_at.blank? && !likely_spam
+
+  def current? = current_with_user_hidden? && !user_hidden
 
   # The register flow creates the bike ahead of its organization's safety rules
   def unfinished_registration? = persisted? && EducationCourseAcknowledgment.pending.exists?(bike_id: id)
