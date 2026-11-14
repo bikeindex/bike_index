@@ -132,6 +132,18 @@ RSpec.describe OrganizationSignupController, type: :request do
     expect(response).to redirect_to "#{base_url}?step=1"
   end
 
+  it "preselects a creatable kind from the link, but keeps one already chosen" do
+    get "#{base_url}/new", params: {kind: "ambassador"}
+    expect(organization_signup.kind).to be_nil
+    get "#{base_url}/new", params: {kind: "bike_advocacy"}
+    get "#{base_url}?step=1"
+    expect(Capybara.string(response.body)).to have_css("input[value=bike_advocacy][checked]")
+
+    post base_url, params: {organization_signup: start_params}
+    get "#{base_url}/new", params: {kind: "bike_advocacy"}
+    expect(organization_signup.reload.kind).to eq "bike_shop"
+  end
+
   context "the link clicked in another browser before step 2 is finished" do
     let!(:organization_signup) { FactoryBot.create(:organization_signup_started) }
     before { OrgServices::Signup.send_confirmation_email(organization_signup) }

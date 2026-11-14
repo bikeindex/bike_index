@@ -6,6 +6,9 @@ RSpec.describe OrganizationsController, type: :request do
     it "redirects to the signup flow" do
       get "#{base_url}/new"
       expect(response).to redirect_to new_organization_signup_path
+
+      get "#{base_url}/new", params: {kind: "bike_advocacy"}
+      expect(response).to redirect_to new_organization_signup_path(kind: "bike_advocacy")
     end
   end
 

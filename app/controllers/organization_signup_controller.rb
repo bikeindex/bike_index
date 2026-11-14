@@ -16,6 +16,8 @@ class OrganizationSignupController < ApplicationController
     signup = OrgServices::Signup.resumable(token: session[SESSION_KEY], user: current_user) if params[:restart].blank?
     signup ||= OrgServices::Signup.start(user: current_user)
     signup.update(return_to:) if return_to.present?
+    # A link's kind preselects step 1, but never overrides one already chosen
+    signup.update(kind: params[:kind]) if signup.kind.blank? && Organization.user_creatable_kinds.include?(params[:kind])
     session[SESSION_KEY] = signup.id_token
     redirect_to organization_signup_path
   end

@@ -3,7 +3,7 @@ class OrganizationsController < ApplicationController
   before_action :allow_x_frame, only: %i[embed embed_extended embed_create_success]
 
   def new
-    redirect_to new_organization_signup_path
+    redirect_to new_organization_signup_path(kind: params[:kind])
   end
 
   def lightspeed_interface
