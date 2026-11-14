@@ -191,6 +191,20 @@ class CustomerMailer < ApplicationMailer
     end
   end
 
+  def pos_registration_match_email(pos_registration_match, user)
+    @user = user
+    # Unscoped, since hidden registrations match
+    bike = Bike.unscoped.find(pos_registration_match.bike_id)
+    pos_bike = Bike.unscoped.find(pos_registration_match.pos_bike_id)
+    component = Emails::PosRegistrationMatch::Component.new(bike:, pos_bike:, pos_registration_match:)
+
+    I18n.with_locale(@user.preferred_language) do
+      mail(to: @user.email, subject: default_i18n_subject(bike_type: pos_bike.type), tag: __callee__) do |format|
+        format.html { render component }
+      end
+    end
+  end
+
   def recovered_from_link(stolen_record)
     @stolen_record = stolen_record
     @bike = stolen_record.bike

@@ -50,7 +50,7 @@ module Bikes
       @bike = Bike.unscoped.find_id(params[:bike_id] || params[:id])
       return @bike if @bike.visible_by?(current_user)
 
-      fail ActiveRecord::RecordNotFound
+      redirect_merged_bike_or_not_found(@bike)
     end
 
     def find_or_new_b_param

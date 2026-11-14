@@ -1817,6 +1817,21 @@ en:
           left_organization: You've left %{org_name}
           unable_to_leave: 'Unable to leave %{org_name}: contact support@bikeindex.org
             for help'
+      pos_registration_matches:
+        redirect_by_status:
+          already_combined: These are already combined into one registration.
+          already_kept_separate: You told us these are different, so they're staying
+            separate.
+          cant_combine_here: >-
+            These registrations can't be combined here. Email support@bikeindex.org
+            if you need help.
+          combining: We're combining these into one registration. It takes a minute.
+          couldnt_combine: >-
+            We couldn't combine these, so they're still separate. Email support@bikeindex.org
+            if you need help.
+        update:
+          combining: Thanks! We're combining your %{bike_type}'s registrations into one. It takes a minute.
+          kept_separate: Thanks, we'll keep them as separate registrations.
       update:
         current_password_doesnt_match: Current password doesn't match, it's required
           for updating your password.
@@ -2151,6 +2166,8 @@ en:
         whoops_it_appears_you_have_forgotten_your: Whoops! It appears you have forgotten
           your Bike Index password!
       subject: Instructions to reset your password
+    pos_registration_match_email:
+      subject: Is this the same %{bike_type}?
     recovered_from_link:
       html:
         marked_recovered_by: 'Marked recovered by:'

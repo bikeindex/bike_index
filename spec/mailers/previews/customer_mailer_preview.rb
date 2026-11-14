@@ -93,6 +93,11 @@ class CustomerMailerPreview < ActionMailer::Preview
     CustomerMailer.recovered_from_link(recovered_record)
   end
 
+  def pos_registration_match_email
+    match = PosRegistrationMatch.merge_candidate.order(:id).last
+    CustomerMailer.pos_registration_match_email(match, Bike.unscoped.find(match.bike_id).user)
+  end
+
   def bike_possibly_found_email
     contact = CustomerContact.bike_possibly_found.last
     CustomerMailer.bike_possibly_found_email(contact)
