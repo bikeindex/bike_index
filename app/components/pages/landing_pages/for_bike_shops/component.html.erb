@@ -1,0 +1,287 @@
+<section class="tw:border-b tw:border-gray-200 tw:dark:border-gray-700">
+  <div class="tw:grid tw:items-center tw:gap-16 tw:py-10 tw:md:py-16 tw:lg:grid-cols-[1.15fr_0.85fr] tw:lg:gap-12 <%= SECTION_CLASSES %>">
+    <div>
+      <span class="tw:mb-4.5 tw:inline-block">
+        <%= render(UI::Badge::Component.new(text: translation(".for_bike_shops_free_nonprofit"), color: :notice, size: :lg)) %>
+      </span>
+
+      <h1
+        class="
+          tw:m-0 tw:mb-4 tw:font-header tw:text-[38px] tw:leading-[1.05]
+          tw:font-black tw:tracking-tight tw:text-balance tw:md:text-[54px]
+        "
+      >
+        <%= translation(".send_every_bike_home_with_a_sidekick") %>
+      </h1>
+
+      <p class="tw:m-0 tw:mb-7 tw:max-w-125 tw:text-[17px] tw:leading-[1.55] tw:md:text-[19px] <%= MUTED %>">
+        <%= translation(".hero_lede_trust") %>
+      </p>
+
+      <%= render(SharedBlocks::Marketing::NumberBlocks::Component.new(items: hero_stats, layout: :row_from_md,
+        html_class: "tw:max-w-140 tw:md:grid-cols-3!")) %>
+    </div>
+
+    <div id="shop-signup" class="tw:scroll-mt-20">
+      <%= render(UI::Card::Component.new(shadow: :black, additional_classes: "tw:relative tw:p-7!")) do %>
+        <%= image_tag("kelsey/illustrations/comic-assets_logo-cape.png", alt: "",
+          class: "tw:absolute tw:-top-9.5 tw:-right-3 tw:h-20 tw:md:-top-11.5 tw:md:-right-6 tw:md:h-24") %>
+
+        <%# A signup returns here, which :target turns into the thank you in place of the form %>
+        <div
+          id="shop-signed-up"
+          class="
+            tw:peer tw:hidden tw:scroll-mt-20 tw:px-2 tw:py-9 tw:text-center
+            tw:target:block
+          "
+        >
+          <div class="tw:text-5xl tw:leading-none tw:text-blue-600 <%= HEADING_CLASSES %>">
+            <%= translation(".ding") %>
+          </div>
+
+          <h2 class="tw:mt-2.5 tw:mb-1.5 tw:text-[22px] <%= HEADING_CLASSES %>">
+            <%= translation(".youre_in") %>
+          </h2>
+
+          <p class="tw:m-0 tw:leading-relaxed <%= MUTED %>">
+            <%= translation(".well_email_you") %>
+          </p>
+        </div>
+
+        <div class="tw:peer-target:hidden">
+          <h2 class="tw:mb-1 tw:pr-20 tw:text-[22px] <%= HEADING_CLASSES %>">
+            <%= translation(".sign_up_your_shop") %>
+          </h2>
+
+          <p class="tw:m-0 tw:mb-4.5 tw:text-sm <%= MUTED %>">
+            <%= translation(".free_forever") %>
+          </p>
+
+          <%= form_for @feedback, html: {data: {controller: "form-persist strip-inputs",
+            action: "input->form-persist#save submit->strip-inputs#submit submit->form-persist#clear"}} do |f| %>
+            <%= render(UI::Alerts::ObjectError::Component.new(object: @feedback, name: translation(".signup_name"))) %>
+
+            <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :name,
+              label_text: translation(".shop_name"), required: true,
+              html_options: {required: true, maxlength: 255, placeholder: translation(".shop_name_placeholder")})) %>
+
+            <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :email, required: true)) do %>
+              <%= render(UI::Forms::Email::Component.new(form_builder: f, required: true,
+                html_options: {value: @feedback.email.presence || @current_user&.email, maxlength: 255,
+                  placeholder: translation(".email_placeholder")})) %>
+            <% end %>
+
+            <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :body,
+              label_text: translation(".your_pos"), required: true)) do %>
+              <%= render(UI::Forms::Select::Component.new(form_builder: f, attribute: :body, option_tags: pos_options,
+                options: {prompt: translation(".choose_your_pos")}, required: true)) %>
+            <% end %>
+
+            <%= render(UI::Forms::Honeypot::Component.new(form_builder: f)) %>
+
+            <%= f.hidden_field :feedback_type, value: "lead_for_bike_shop" %>
+            <%= hidden_field_tag :return_to, for_bike_shops_path(anchor: "shop-signed-up"), id: nil %>
+
+            <%= render(UI::Button::Component.new(text: translation(".sign_up_free"), color: :primary,
+              size: :callout, type: "submit", html_class: "tw:w-full")) %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</section>
+
+<section class="tw:pt-12 tw:pb-12 tw:md:pt-18 tw:md:pb-16 <%= SECTION_CLASSES %>">
+  <div
+    class="
+      tw:grid tw:items-start tw:gap-10 tw:lg:grid-cols-[0.9fr_1.1fr]
+      tw:lg:gap-14
+    "
+  >
+    <div>
+      <%= render(SharedBlocks::Marketing::SectionHeading::Component.new(eyebrow: translation(".set_it_and_forget_it"),
+        heading: translation(".ring_up_the_sale"), intro: translation(".no_extra_forms"), html_class: "tw:mb-6")) %>
+
+      <ul class="tw:m-0 tw:flex tw:list-none tw:flex-col tw:gap-3 tw:p-0">
+        <% integrations.each do |name, live| %>
+          <li>
+            <%= render(UI::Card::Component.new(additional_classes: "tw:flex tw:items-center tw:justify-between tw:gap-3")) do %>
+              <span class="tw:text-lg <%= HEADING_CLASSES %>"><%= name %></span>
+
+              <% if live %>
+                <%= render(UI::Badge::Component.new(text: translation(".live"), color: :success)) %>
+              <% else %>
+                <%= render(UI::Badge::Component.new(text: translation(".coming_soon"), color: :purple)) %>
+              <% end %>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+
+    <ol class="tw:m-0 tw:list-none tw:p-0">
+      <% steps.each_with_index do |(title, body), index| %>
+        <li
+          class="
+            tw:grid tw:grid-cols-[64px_1fr] tw:gap-4.5 tw:border-b
+            tw:border-gray-200 tw:py-5.5 tw:dark:border-gray-700
+          "
+        >
+          <span
+            class="tw:flex tw:size-14 tw:items-center tw:justify-center tw:rounded-full tw:border-2 tw:border-blue-600 tw:bg-blue-100 tw:text-3xl tw:text-blue-600 <%= HEADING_CLASSES %>"
+            aria-hidden="true"
+          >
+            <%= number_display(index + 1) %>
+          </span>
+
+          <div>
+            <h3
+              class="
+                tw:m-0 tw:mt-1 tw:mb-1.5 tw:font-header tw:text-xl
+                tw:font-bold
+              "
+            >
+              <span class="tw:sr-only"><%= number_display(index + 1) %>.</span>
+              <%= title %>
+            </h3>
+
+            <p class="tw:m-0 tw:text-base tw:leading-relaxed <%= MUTED %>">
+              <%= body %>
+            </p>
+          </div>
+        </li>
+      <% end %>
+    </ol>
+  </div>
+</section>
+
+<section class="tw:border-y <%= BAND %>">
+  <div class="tw:py-12 tw:md:py-18 <%= SECTION_CLASSES %>">
+    <%= render(SharedBlocks::Marketing::SectionHeading::Component.new(heading: translation(".what_your_customers_get"),
+      html_class: "tw:mb-8 tw:max-w-170")) %>
+
+    <div class="twwiderow tw:gap-6">
+      <% benefit_cards.each do |card| %>
+        <%= render(UI::Card::Component.new(shadow: :black, additional_classes: "tw:p-7!")) do %>
+          <h3 class="tw:mb-4 tw:text-xl <%= HEADING_CLASSES %>">
+            <%= card[:title] %>
+          </h3>
+
+          <div class="tw:grid tw:gap-4">
+            <% card[:rows].each do |icon, title, body| %>
+              <%= render(SharedBlocks::Marketing::IconFeature::Component.new(icon:, circle: card[:circle], title:, body:)) %>
+            <% end %>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+
+    <%= render(SharedBlocks::Marketing::RegistryStats::Component.new(layout: :row_from_md, html_class: "tw:mt-10")) %>
+  </div>
+</section>
+
+<section>
+  <div
+    class="
+      tw:grid tw:items-center tw:gap-12 tw:py-12 tw:md:py-18 tw:lg:grid-cols-[1.1fr_0.9fr] tw:lg:gap-14
+      <%= SECTION_CLASSES %>
+    "
+  >
+    <div>
+      <span class="tw:mb-3.5 tw:inline-block">
+        <%= render(UI::Badge::Component.new(text: translation(".new_our_first_retail_product"), color: :yellow)) %>
+      </span>
+
+      <%= render(SharedBlocks::Marketing::SectionHeading::Component.new(heading: translation(".peace_of_mind_on_a_sticker"),
+        intro: translation(".sticker_body"), html_class: "tw:mb-5.5 tw:max-w-135")) %>
+
+      <%= render(SharedBlocks::Marketing::NumberBlocks::Component.new(items: sticker_prices, html_class: "tw:mb-6.5 tw:max-w-90")) %>
+
+      <%= render(UI::ButtonLink::Component.new(href: "https://bikeindex.myshopify.com/", text: translation(".order_stickers"),
+        color: :primary, size: :callout)) %>
+
+      <p class="tw:m-0 tw:mt-3.5 tw:text-[15px]">
+        <%= translation(".contact_us_for_bulk_orders_html",
+          contact_link: mail_to("gavin@bikeindex.org", translation(".contact_us"),
+            subject: translation(".bulk_order_email_subject"), class: "twlink-underlined tw:font-bold")) %>
+      </p>
+    </div>
+
+    <div class="tw:flex tw:justify-center">
+      <%= image_tag("landing_pages/sticker-sheet.jpg", alt: translation(".sticker_sheet_alt"), loading: "lazy",
+        class: "#{UI::Card::Component::SHADOWS[:black]} tw:block tw:w-full tw:max-w-90 tw:rotate-2 tw:rounded-lg") %>
+    </div>
+  </div>
+</section>
+
+<%= render(SharedBlocks::Marketing::InvertedBlock::Component.new(html_class: "tw:py-12 tw:md:py-16")) do %>
+  <div
+    class="
+      tw:grid tw:items-center tw:gap-8 tw:rounded-lg tw:bg-slate-900/5
+      tw:p-7 tw:md:grid-cols-[auto_1fr] tw:md:gap-10 tw:md:p-10
+      tw:dark:bg-white/8
+    "
+  >
+    <span
+      class="
+        tw:flex tw:size-24 tw:items-center tw:justify-center tw:rounded-full
+        tw:bg-slate-900/8 tw:dark:bg-white/12
+      "
+    >
+      <%= helpers.inline_svg_tag("icons/shield-check.svg", class: "tw:size-12 #{PRIVACY_ICON}", aria_hidden: true) %>
+    </span>
+
+    <div>
+      <%= render(SharedBlocks::Marketing::SectionHeading::Component.new(heading: translation(".we_never_sell_or_share"),
+        intro: translation(".privacy_body"), html_class: "tw:mb-4.5 tw:max-w-190")) %>
+
+      <ul class="tw:m-0 tw:flex tw:list-none tw:flex-wrap tw:gap-6 tw:p-0">
+        <% privacy_points.each do |icon, title| %>
+          <li class="tw:flex tw:items-center tw:gap-2 tw:text-[15px] tw:font-semibold">
+            <%= helpers.inline_svg_tag(icon, class: "tw:size-4.5 #{PRIVACY_ICON}", aria_hidden: true) %>
+            <%= title %>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+<% end %>
+
+<% if @recovery_displays.any? %>
+  <section class="tw:py-12 tw:md:py-18 <%= SECTION_CLASSES %>">
+    <%= render(SharedBlocks::Marketing::RecoveryStories::Component.new(heading: translation(".bikes_that_came_home"),
+      recovery_displays: @recovery_displays)) %>
+  </section>
+<% end %>
+
+<section
+  id="free-tools"
+  class="tw:scroll-mt-8 tw:pb-12 tw:md:pb-18 <%= SECTION_CLASSES %> <%= "tw:pt-12 tw:md:pt-18" if @recovery_displays.none? %>"
+>
+  <%= render(SharedBlocks::Marketing::SectionHeading::Component.new(eyebrow: translation(".more_from_bike_index"),
+    eyebrow_color: :purple, heading: translation(".free_tools"), html_class: "tw:mb-6")) %>
+
+  <div class="twwiderow tw:gap-6">
+    <% tools.each do |tool| %>
+      <%= render(SharedBlocks::Marketing::FramedCard::Component.new(**tool)) %>
+    <% end %>
+  </div>
+</section>
+
+<section class="tw:border-t <%= BAND %>">
+  <div class="tw:grid tw:gap-8 tw:py-12 tw:md:py-16 tw:lg:grid-cols-[0.7fr_1.3fr] tw:lg:gap-12 <%= SECTION_CLASSES %>">
+    <%= render(SharedBlocks::Marketing::SectionHeading::Component.new(heading: translation(".faq"),
+      intro: translation(".something_else_html",
+        email_link: mail_to("support@bikeindex.org", translation(".email_our_shop_team"), class: "twlink tw:font-semibold")))) %>
+
+    <div>
+      <%= render(UI::Accordion::Component.new(items: faqs)) %>
+    </div>
+  </div>
+</section>
+
+<%= render(SharedBlocks::Marketing::CallToActionBanner::Component.new(heading: translation(".ten_minutes_now"),
+  subheading: translation(".free_for_shops_and_customers"))) do %>
+  <%= render(UI::ButtonLink::Component.new(href: "#shop-signup", text: translation(".sign_up_your_shop"),
+    color: :yellow, size: :callout)) %>
+<% end %>

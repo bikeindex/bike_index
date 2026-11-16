@@ -11,6 +11,33 @@ is composed with them rather than with local paths.
 Use it only when `$CLAUDE_CODE_REMOTE` is `true`. Elsewhere `--attach`'s
 `user-attachments` URLs are permanent and leave no commits behind.
 
+## Probe the posting before capturing
+
+Posting is the last step and the only one a capture round can't recover from. In some
+sessions (#4792) the comment tools rewrite every URL in a body: each wrapped in
+backticks, `<img` escaped to `&lt;img`, plain and reference-style links alike, and
+the footer appended. No retry or body form got past it, and nothing here deletes a
+comment — so find out first, before any capture or hosting commit.
+
+1. Create the `## Screenshots` comment — or update the existing one — with this body:
+
+   ```
+   ## Screenshots
+
+   <img alt="probe" src="https://raw.githubusercontent.com/bikeindex/bike_index/main/app/assets/images/logos/bikebook_icon.png" width="40" />
+   ```
+
+2. Read it back with `get_comments`. It posted if the body still holds a literal
+   `<img ` and no backtick sits beside the URL. It was rewritten if it holds `&lt;img`
+   or a backtick before `https://`.
+3. **Rewritten: stop.** Don't capture, host or retry — every retry stacks another
+   rewrite. Update the comment to a body with no URLs: `## Screenshots` and a line
+   saying the screenshots couldn't be posted from this session (that goes through;
+   the footer still gets appended). Then tell the user the sandbox's comment tools
+   rewrite URLs, so the screenshots have to be captured and attached by hand — and
+   skip the rest of this file.
+4. **Posted: carry on.** The probe is the comment you edit in place with the real body.
+
 ## Hosting
 
 ```bash
@@ -28,12 +55,11 @@ hosted at 9223ff3fa4… (branch claude/…)
 The blob stays reachable through the branch's history, so those URLs keep serving
 after the deletion while the PR's **Files changed** stays empty.
 
-**Post the tags verbatim — never rewrap them as `![](url)`.** The MCP server
-backticks a markdown image's URL, posting an `<img>` with no `src`. `add_issue_comment`
-backticks an HTML `<img>`'s `src` too (#4562), while `update_issue_comment` passes it
-untouched — so create the comment, then always `update_issue_comment` it with the
-same body, which also drops the appended footer. Widths belong to the caller — the
-`pr` skill's table wants `width="500"` desktop, `"250"` mobile.
+**Post the tags verbatim — never rewrap them as `![](url)`.** Widths belong to the caller —
+the `pr` skill's table wants `width="500"` desktop, `"250"` mobile. Create the comment
+with `add_issue_comment`, then `update_issue_comment` it with the same body, and read
+it back: whether either tool leaves an `<img>` alone depends on the session, which is
+what the probe below is for.
 
 **Call it once, after every capture including the base branch's.** Each call costs
 two commits and a push, and it refuses on a detached HEAD, so it can't run mid-checkout

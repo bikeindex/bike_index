@@ -158,6 +158,15 @@ module BikeServices
       reached.include?(requested_step) ? requested_step : reached.last
     end
 
+    # permitted_step without a request: the switches step 1 saved stand in for the session's
+    def current_step(b_param)
+      return unless b_param.register_flow?
+
+      settings(b_param, nil) => {single_page:, separate_attestation:}
+      course = education_course(b_param, separate_attestation:)
+      permitted_step(b_param, nil, course:, flow: flow(b_param, course:, single_page:))
+    end
+
     # The course page a step renders, or nil for any other step
     def page_for_step(step, course:)
       index = page_index_for_step(step)

@@ -9,6 +9,11 @@ RSpec.describe "Sitemaps pages" do
     expect((SitemapPages::ADDITIONAL & target_additional_paths).count).to eq target_additional_paths.count
   end
 
+  it "lists only routed paths" do
+    (SitemapPages::INFORMATION + SitemapPages::ADDITIONAL)
+      .each { expect(Rails.application.routes.recognize_path("/#{it}")).to be_present }
+  end
+
   context "with parsed routes" do
     let(:all_app_routes) do
       Rails.application.routes.routes.collect { |route|
@@ -18,7 +23,7 @@ RSpec.describe "Sitemaps pages" do
     let(:info_routes) { all_app_routes.select { |r| r.controller == "info" }.map { |r| to_formatted_path(r) } }
     let(:landing_pages_routes) { all_app_routes.select { |r| r.controller == "landing_pages" }.map { |r| to_formatted_path(r) } }
     let(:excluded_routes) do
-      ["support_bike_index", "support_the_index", "support_the_bike_index", "info/:id", "primary_activities",
+      ["support_bike_index", "support_the_index", "support_the_bike_index", "info/:id", "primary_activities", "donate/year-end-2026",
         "info/how-to-get-your-stolen-bike-back", *LandingPageOrganizations::SLUGS]
     end
 

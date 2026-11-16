@@ -269,8 +269,8 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     # cookie — so the cookie override only takes effect while session is empty.
     expect(browser_cookie_value("timezone")).to be_present
 
-    # 5 AM UTC = 9 PM PDT (or 12 AM CDT) the previous day, so PDT and CDT fall on different days.
-    chart_bike_created_at = 14.days.ago.utc.beginning_of_day + 5.hours
+    # 6 AM UTC is past midnight in Chicago and before it in LA, with or without daylight saving
+    chart_bike_created_at = 14.days.ago.utc.beginning_of_day + 6.hours
     bike2.update_columns(created_at: chart_bike_created_at)
     la_date_key = chart_bike_created_at.in_time_zone("America/Los_Angeles").strftime("%Y-%-m-%-d")
     cdt_date_key = chart_bike_created_at.in_time_zone("America/Chicago").strftime("%Y-%-m-%-d")

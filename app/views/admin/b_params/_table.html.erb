@@ -1,4 +1,4 @@
-<%# locals: (collection:, render_sortable: true) %>
+<%# locals: (collection:, render_sortable: true, show_data: false) %>
 
 <% render_search = params[:organization_id].blank? %>
 
@@ -27,6 +27,10 @@
     <% end %>
   <% end %>
 
+  <% table.column(label: "Step", classes: "tw:text-xs") do |b_param| %>
+    <%= render(Atoms::RegistrationStep::Component.new(b_param:)) %>
+  <% end %>
+
   <% table.column(sortable: "origin", classes: "tw:text-xs") do |b_param| %>
     <%= render(Atoms::Org::OriginDisplay::Component.new(creation_kind: b_param.origin)) %>
   <% end %>
@@ -43,7 +47,9 @@
     <% end %>
   <% end %>
 
-  <% table.column(label: "Data") do |b_param| %>
-    <%= render UI::Code::Json::Component.new(data: b_param.params, small: true, max_width: :table_cell) %>
+  <% if show_data %>
+    <% table.column(label: "Data") do |b_param| %>
+      <%= render UI::Code::Json::Component.new(data: b_param.params, small: true, max_width: :table_cell) %>
+    <% end %>
   <% end %>
 <% end %>

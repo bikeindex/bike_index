@@ -224,7 +224,7 @@ module BikeDuplicatesServices
           Check.new(:blocked, "Whole normalized serials differ, or one is missing or shorter than 6 characters")),
         ((manufacturer_ids.uniq.size == 1 && manufacturer_ids.first) ? Check.new(:pass, "Same manufacturer on every record") :
           Check.new(:blocked, "Manufacturers differ, or one is missing")),
-        ((bikes.any? { it.deleted_at || it.example || it.likely_spam }) ? Check.new(:blocked, "Includes a deleted, example or spam record") : nil),
+        (Check.new(:blocked, "Includes a deleted, example or spam record") unless bikes.all?(&:current_with_user_hidden?)),
         *separate_cues.map { Check.new(:blocked, "#{it.label} — needs separate review, not an invitation") },
         if evidence["one_account"] && evidence["one_email"]
           Check.new(:pass, "Same known account and email on every initial registration")

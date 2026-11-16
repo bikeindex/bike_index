@@ -113,6 +113,11 @@ class BParam < ApplicationRecord
   # = ANY(ARRAY(...)) rather than IN (...): the pkey can take it, so ORing it with an
   # indexed condition is a BitmapOr instead of a seq scan
   scope :acknowledgment_pending, -> { where("b_params.id = ANY(ARRAY(?))", EducationCourseAcknowledgment.pending.select(:b_param_id)) }
+  # Pages acknowledged, but not yet agreed to as a whole. The b_param_id term keeps a NULL out of NOT IN
+  scope :education_course_in_progress, -> {
+    where("(params -> 'education_course') IS NOT NULL")
+      .where.not(id: EducationCourseAcknowledgment.acknowledged.where.not(b_param_id: nil).select(:b_param_id))
+  }
   scope :unfinished_registrations, -> { unexpired.step_1_submitted.and(without_bike.or(acknowledgment_pending)) }
   scope :unprocessed_image, -> { where(image_processed: false).where.not(image: nil) }
   scope :with_cycle_type, -> { bike_params.where("(params -> 'bike' -> 'cycle_type') IS NOT NULL") }

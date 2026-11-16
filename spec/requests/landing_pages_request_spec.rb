@@ -13,6 +13,16 @@ RSpec.describe LandingPagesController, type: :request do
     end
   end
 
+  describe "#for_bike_shops" do
+    it "frames the checker on the visitor's place, and California without a location" do
+      get "/for_bike_shops", headers: {"HTTP_CF_IPCOUNTRY" => "US", "HTTP_CF_REGION" => "Indiana"}
+      expect(Capybara.string(response.body)).to have_css("iframe[src^='/ebike-rules/US/IN?']", visible: :all)
+
+      get "/for_bike_shops"
+      expect(Capybara.string(response.body)).to have_css("iframe[src^='/ebike-rules/US/CA?']", visible: :all)
+    end
+  end
+
   describe "#for_cities" do
     it "starts the checker on the visitor's state, and asks for one without a location" do
       get "/for_cities", headers: {"HTTP_CF_IPCOUNTRY" => "US", "HTTP_CF_REGION" => "Indiana"}
@@ -31,11 +41,26 @@ RSpec.describe LandingPagesController, type: :request do
       get "/ebike-rules", params: {state: "US-CA", manual: 1, top_speed: 28, throttle: 1}
       expect(response).to redirect_to("/ebike-rules/US/CA?manual=1&throttle=1&top_speed=28")
     end
+
+    it "shows the registration flow's step 1 and the default course's first page, only once there's a course" do
+      get "/for_cities"
+      expect(Capybara.string(response.body)).to have_no_css("[inert]", visible: :all)
+
+      FactoryBot.create(:education_course_default_active, :with_pages)
+      get "/for_cities"
+      phones = Capybara.string(response.body).all("[inert]", visible: :all)
+      expect(phones.first).to have_field("propulsion_type_motorized", checked: true, visible: :all)
+      expect(phones.last).to have_css("h2", text: "Safety check", visible: :all).and have_text("Step 1 of 3")
+    end
   end
 
   describe "#for_advocacy" do
     it "redirects to for_community_groups_path" do
       expect(get("/for_advocacy")).to redirect_to(for_community_groups_path)
+    end
+
+    it "redirects the dashed spelling, keeping the query" do
+      expect(get("/for-advocacy?utm_source=newsletter")).to redirect_to("/for_advocacy?utm_source=newsletter")
     end
   end
 

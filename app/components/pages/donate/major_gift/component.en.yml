@@ -1,0 +1,8 @@
+---
+en:
+  components:
+    pages:
+      donate:
+        major_gift:
+          benefactor: Benefactor
+          partner: Partner
