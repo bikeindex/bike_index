@@ -1,0 +1,358 @@
+<%# Plain English-only view, not a translated component. %>
+<% cc_license = "https://creativecommons.org/licenses/by-sa/4.0/"
+  cc_legalcode = "#{cc_license}legalcode"
+  credit_url = "https://bikeindex.org/bikebook/license"
+  html_credit = %(Bike data: <a href="#{credit_url}">Bike Book by Bike Index</a>, <a href="#{cc_license}">CC BY-SA 4.0</a>)
+  markdown_credit = "Bike data: [Bike Book by Bike Index](#{credit_url}), [CC BY-SA 4.0](#{cc_license})"
+  email = mail_to("licensing@bikeindex.org", nil, class: "twlink")
+  badge_base = "/powered-by-bike-index"
+  badges = [["horizontal", "light", 191, 58], ["horizontal", "dark", 191, 58], ["stacked", "light", 106, 99], ["stacked", "dark", 106, 99]]
+  section = ->(id, text) { link_to(text, "##{id}", class: "twlink") }
+  ext = ->(url, text) { link_to(text, url, class: "twlink") }
+  h2_class = "tw:mt-10 tw:mb-3 tw:scroll-mt-4 tw:text-2xl tw:font-bold"
+  p_class = "tw:my-3"
+  list_class = "tw:my-3 tw:list-disc tw:space-y-1.5 tw:pl-6"
+  pre_class = "tw:overflow-x-auto tw:rounded-sm tw:border tw:border-gray-200 tw:bg-gray-50 tw:p-3 tw:pr-12 " \
+    "tw:text-sm tw:whitespace-pre tw:dark:border-gray-700 tw:dark:bg-gray-800"
+  where_to_put_it = [
+    ["Websites and web apps", "On the page that shows the data, near it or in the page footer, visible without clicking or hovering"],
+    ["Mobile and desktop apps", "On the screen that shows the data, or in an About or Data sources screen one tap away"],
+    ["Datasets, downloads and APIs you share", "Keep the LICENSE file and this credit in your download, and include it in your API documentation and response metadata. Release the data under CC BY-SA 4.0"],
+    ["Printed materials, PDFs and slides", "Next to the data or in the credits, with the full address written out"],
+    ["Video", "In the on-screen credits or the description, with the full address"],
+    ["AI tools and chatbots", "When an answer draws on Bike Book data, cite \"Bike Index (Bike Book)\" with a link, and include the credit on your product's data sources page"],
+    ["Research and publications", safe_join(["Cite as: Bike Index. ", tag.em("Bike Book"), " (dataset), accessed (date). bikeindex.org/bikebook. CC BY-SA 4.0"])]
+  ] %>
+
+<% content_for(:header) do %>
+  <%# Without JavaScript the copy buttons can't work, so they go %>
+  <noscript>
+    <style>.license-copy { display: none; }</style>
+  </noscript>
+<% end %>
+
+<div
+  class="
+    tw:mx-auto tw:max-w-3xl tw:px-5 tw:py-10 tw:text-base tw:leading-relaxed
+    tw:twtext-color
+  "
+>
+  <%= render(UI::Header::Component.new(text: "Bike Book license and attribution")) %>
+
+  <p class="<%= p_class %>">
+    <%= ext.call(bikebook_path, "Bike Book") %> is an open database of bicycle,
+    e-bike and EPAMD models and data. It's built and maintained by Bike Index, a
+    nonprofit that helps people register bikes and recover stolen ones.
+  </p>
+
+  <p class="<%= p_class %>">
+    Bike Book data is licensed under the
+    <%= ext.call(cc_license, "Creative Commons Attribution-ShareAlike 4.0 International license") %>
+    (CC BY-SA 4.0). You're free to use it, including commercially. In return:
+  </p>
+
+  <ol class="tw:my-3 tw:list-decimal tw:space-y-1.5 tw:pl-6">
+    <li>
+      <strong>Credit Bike Index</strong> wherever people see the data. See
+      "<%= section.call("how-to-credit", "How to credit Bike Book") %>" below.
+    </li>
+
+    <li>
+      <strong>Keep it open.</strong> Anything you share that's built from Bike
+      Book data must also be under CC BY-SA 4.0. See
+      "<%= section.call("share-alike", "Share-alike: what has to stay open") %>"
+      below.
+    </li>
+
+    <li>
+      <strong>Don't add restrictions</strong> that stop others from using the
+      data under this license.
+    </li>
+  </ol>
+
+  <p class="<%= p_class %>">
+    <strong>Copyright notice:</strong> © Bike Index and Bike Book contributors.
+  </p>
+
+  <h2 id="what-you-can-do" class="<%= h2_class %>">What you can do</h2>
+
+  <ul class="<%= list_class %>">
+    <li>
+      <strong>Share:</strong> copy and redistribute the data in any medium or
+      format.
+    </li>
+
+    <li><strong>Adapt:</strong> combine, transform and build on the data.</li>
+    <li><strong>Use it for any purpose,</strong> including commercial use.</li>
+  </ul>
+
+  <h2 id="what-you-need-to-do" class="<%= h2_class %>">What you need to do</h2>
+
+  <ul class="<%= list_class %>">
+    <li>
+      <strong>Credit Bike Index</strong> as shown in
+      "<%= section.call("how-to-credit", "How to credit Bike Book") %>," keep
+      the copyright notice, and say that the data is under CC BY-SA 4.0 with a
+      link to the license.
+    </li>
+
+    <li>
+      <strong>Say if you changed it.</strong> If you modified the data, say so.
+    </li>
+
+    <li>
+      <strong>Share alike.</strong> Anything you share that's built from Bike
+      Book data must stay open under CC BY-SA 4.0.
+    </li>
+
+    <li>
+      <strong>Don't add restrictions.</strong> You can't apply terms or
+      technical measures that stop others from using the data under this
+      license.
+    </li>
+  </ul>
+
+  <h2 id="how-to-credit" class="<%= h2_class %>">How to credit Bike Book</h2>
+
+  <p class="<%= p_class %>">
+    Credit Bike Index where people see the data. This section explains how to
+    credit Bike Book under CC BY-SA 4.0; the
+    <%= ext.call(cc_legalcode, "license") %> itself is what governs.
+  </p>
+
+  <p class="<%= p_class %>">
+    <strong>The credit.</strong> Use this credit, linked as shown:
+  </p>
+
+  <blockquote class="tw:my-3 tw:border-l-4 tw:border-gray-300 tw:pl-4 tw:dark:border-gray-600">
+    Bike data: <%= ext.call(credit_url, "Bike Book by Bike Index") %>,
+    <%= ext.call(cc_license, "CC BY-SA 4.0") %>
+  </blockquote>
+
+  <p class="<%= p_class %>">
+    Where you show a specific bike, link "Bike Book by Bike Index" to that
+    bike's Bike Book page instead. Copy-ready versions:
+  </p>
+
+  <% {"HTML" => html_credit, "Markdown" => markdown_credit}.each do |name, snippet| %>
+    <div class="tw:relative tw:my-3">
+      <pre class="<%= pre_class %>"><code><%= snippet %></code></pre>
+
+      <span
+        class="
+          license-copy tw:absolute tw:top-1.5 tw:right-1.5 tw:rounded-sm
+          tw:bg-gray-50 tw:dark:bg-gray-800
+        "
+      >
+        <%= render(UI::CopyButton::Component.new(value: snippet, label: "Copy #{name}")) %>
+      </span>
+    </div>
+  <% end %>
+
+  <p class="<%= p_class %>">
+    Plain text, where links aren't possible:
+    <em>Bike data: Bike Book by Bike Index, CC BY-SA 4.0, bikeindex.org/bikebook/license</em>
+  </p>
+
+  <p class="<%= p_class %>">
+    If you changed the data, add "modified":
+    <em>Bike data (modified): Bike Book by Bike Index…</em>
+  </p>
+
+  <p class="<%= p_class %>"><strong>Where to put it.</strong></p>
+
+  <%= render(UI::Table::Base::Component.new(records: where_to_put_it)) do |table|
+    table.column(label: "Where you use the data", row_header: true) { |row| row.first }
+    table.column(label: "Where the credit goes") { |row| row.last }
+  end %>
+
+  <p class="<%= p_class %>">
+    The credit can't be hidden only in your terms of service, and it shouldn't
+    suggest the data came from anyone else. If space is tight, a short "Bike
+    data: Bike Index, CC BY-SA 4.0" linked to this page is fine.
+  </p>
+
+  <p class="<%= p_class %>">
+    <strong>Please keep Bike Book IDs.</strong> Each model has a permanent Bike
+    Book ID. Please keep it in any data you store or share. IDs let corrections
+    flow back, let your records match registrations on Bike Index, and help
+    everyone refer to the same bike the same way.
+  </p>
+
+  <%# TODO: Promise that Bike Book IDs never change - sentence left out until approved. It goes after "Please keep Bike Book IDs" %>
+
+  <h2 id="share-alike" class="<%= h2_class %>">
+    Share-alike: what has to stay open
+  </h2>
+
+  <p class="<%= p_class %>">
+    <strong>Anything you share that's built from Bike Book data must be released under CC BY-SA 4.0, so it stays open for everyone.</strong>
+    You can still use the data commercially; share-alike sets the terms for what
+    you share afterward.
+  </p>
+
+  <p class="<%= p_class %>">
+    <strong>Must be shared under CC BY-SA 4.0:</strong>
+  </p>
+
+  <ul class="<%= list_class %>">
+    <li>
+      A dataset that combines Bike Book with your own or other data, or corrects
+      or extends it
+    </li>
+
+    <li>
+      A copy of Bike Book with changes, including a cleaned-up version you
+      publish or sell
+    </li>
+
+    <li>An API or data feed that serves data built from Bike Book</li>
+    <li>A bike, e-bike class or legality database built on Bike Book data</li>
+  </ul>
+
+  <p class="<%= p_class %>"><strong>Not affected:</strong></p>
+
+  <ul class="<%= list_class %>">
+    <li>
+      Your own software, app design and branding. The Bike Book data inside your
+      product follows share-alike; the product itself doesn't.
+    </li>
+
+    <li>Using Bike Book data inside your organization without sharing it</li>
+
+    <li>
+      Your own separate data, as long as you don't combine it with Bike Book
+      into one dataset
+    </li>
+  </ul>
+
+  <p class="<%= p_class %>">
+    If you're unsure whether something you're building counts as sharing data
+    built from Bike Book, contact us at <%= email %>.
+  </p>
+
+  <h2 id="what-this-license-covers" class="<%= h2_class %>">
+    What this license covers
+  </h2>
+
+  <p class="<%= p_class %>">
+    <strong>Covered:</strong> the Bike Book model data published in the
+    <%= ext.call(Integrations::Bikebook::Catalog::GITHUB_REPO_URL, "bikeindex/bikebook repository") %>
+    and on Bike Book pages, downloads and API responses.
+  </p>
+
+  <p class="<%= p_class %>"><strong>Not covered:</strong></p>
+
+  <ul class="<%= list_class %>">
+    <li>
+      Bike registrations, ownership records, theft reports and any personal
+      information
+    </li>
+
+    <li>Search, comparison and usage data from Bike Index and Bike Book</li>
+
+    <li>
+      The Bike Index name, logo and "Powered by Bike Index" badge. For
+      permission to use them, email <%= email %>
+    </li>
+
+    <li>
+      Bike Book and Bike Index software, which is under the
+      <%= ext.call("https://www.gnu.org/licenses/agpl-3.0.html", "GNU Affero General Public License v3.0") %>
+      (AGPL-3.0)
+    </li>
+
+    <li>Third-party content elsewhere on bikeindex.org</li>
+  </ul>
+
+  <p class="<%= p_class %>">
+    Nothing in this license suggests that Bike Index endorses you or your use of
+    the data.
+  </p>
+
+  <h2 id="disclaimer" class="<%= h2_class %>">Disclaimer</h2>
+
+  <p class="<%= p_class %>">
+    Bike Book data is provided as is, without warranties of any kind, as set out
+    in the license. E-bike class, certification and legality information is for
+    general guidance only and is not legal advice. Laws vary by state, city and
+    campus and change over time, so check local rules and the manufacturer's
+    documentation before relying on them.
+  </p>
+
+  <h2 id="contributing" class="<%= h2_class %>">Contributing</h2>
+
+  <p class="<%= p_class %>">
+    We welcome corrections and new models: open a pull request on the
+    <%= ext.call(Integrations::Bikebook::Catalog::GITHUB_REPO_URL, "bikeindex/bikebook repository") %>.
+    Before your first contribution is merged, you'll be asked to sign our
+    Contributor License Agreement.
+  </p>
+
+  <h2 id="versions-and-downloads" class="<%= h2_class %>">
+    Versions and downloads
+  </h2>
+
+  <p class="<%= p_class %>">
+    The full dataset is available as JSON from the
+    <%= ext.call(Integrations::Bikebook::Catalog::GITHUB_REPO_URL, "bikeindex/bikebook repository") %>.
+    Each change is tracked in git.
+  </p>
+
+  <h2 id="show-that-you-use-bike-book" class="<%= h2_class %>">
+    Show that you use Bike Book
+  </h2>
+
+  <ul class="<%= list_class %>">
+    <li>
+      <strong>The "Powered by Bike Index" badge (optional).</strong> Use it as
+      provided, link it to this page, and place it near the data or with your
+      other data credits. The badge doesn't replace the credit above. For any
+      other use of our name or logo, email <%= email %>.
+
+      <div
+        id="badge"
+        class="tw:my-4 tw:grid tw:scroll-mt-4 tw:gap-4 tw:sm:grid-cols-2"
+      >
+        <% badges.each do |layout, theme, width, height| %>
+          <% name = "powered-by-bike-index-#{layout}-#{theme}" %>
+
+          <%= render(UI::Card::Component.new(additional_classes: "tw:flex tw:flex-col")) do %>
+            <div class="tw:flex tw:min-h-28 tw:items-center tw:justify-center">
+              <%= image_tag("#{badge_base}/svg/#{name}.svg", alt: "Powered by Bike Index", width:, height:) %>
+            </div>
+
+            <p class="tw:mt-4 tw:mb-1 tw:font-bold">
+              <%= layout.capitalize %>, <%= theme %>
+            </p>
+
+            <p class="tw:m-0 tw:text-sm">
+              Download:
+              <%= link_to("SVG", "#{badge_base}/svg/#{name}.svg", download: "#{name}.svg", class: "twlink") %>,
+              <%= link_to("PNG 2x", "#{badge_base}/png/#{name}-2x.png", download: "#{name}-2x.png", class: "twlink") %>,
+              <%= link_to("PNG 4x", "#{badge_base}/png/#{name}-4x.png", download: "#{name}-4x.png", class: "twlink") %>
+            </p>
+          <% end %>
+        <% end %>
+      </div>
+    </li>
+
+    <li>
+      <strong>Get listed.</strong> We're starting a list of projects that use
+      Bike Book. To be included, contact <%= email %>.
+    </li>
+
+    <%# TODO: "Who uses Bike Book" page - when it exists, link "Get listed" to it %>
+  </ul>
+
+  <h2 id="questions" class="<%= h2_class %>">Questions</h2>
+
+  <p class="<%= p_class %>">
+    For license or attribution questions, or permission requests, contact
+    <%= email %>.
+  </p>
+
+  <p class="<%= p_class %>">
+    <strong>Full license text:</strong> <%= ext.call(cc_legalcode, "CC BY-SA 4.0 legal code") %>
+  </p>
+</div>
