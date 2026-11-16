@@ -136,10 +136,10 @@ module EbikeRuleServices
     end
 
     # The vocabulary's classifications as the block reads them. Its file name carries its digest, so a republished one
-    # is a new key
+    # is a new key, and the version moves when the block reads different keys
     def vocabulary(name)
       path = Integrations::Bikebook::Catalog.manifest&.dig("vocabulary")
-      path && Rails.cache.fetch(["bikebook_catalog/#{name}", path], expires_in: 1.week, skip_nil: true) do
+      path && Rails.cache.fetch(["bikebook_catalog/#{name}", 2, path], expires_in: 1.week, skip_nil: true) do
         Integrations::Bikebook::Catalog.file(path)&.dig("e_vehicle_classifications")&.then { yield it }
       end
     end
