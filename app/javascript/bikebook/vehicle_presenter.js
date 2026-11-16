@@ -17,6 +17,7 @@ const mark = (content) => html`<span class="tw:spec-diff">${content}</span>`
 
 const MATERIALS = 'frame.material'
 const TOP_TUBES = 'frame.top_tube'
+const INTERFACES = 'frame.mounts.interface'
 // lengths in centimeters, with an imperial viewer's feet and inches after
 const IN_CENTIMETERS = ['wheelbase', 'standover', 'standover_above_bb']
 const SINGULAR = { feet: 'foot', inches: 'inch' }
@@ -34,11 +35,12 @@ export class VehiclePresenter {
       acronyms: { ...kit.acronyms, bb: 'BB' },
       geometry: { ...kit.geometry, labels: { ...kit.geometry.labels, standover_above_bb: 'Standover above BB', seat_angle_actual: 'Seat Angle (actual)' } }
     }
-    // the catalog names carbon "Carbon or Composite", and leaves its top tubes and target riders unnamed
+    // the catalog names carbon "Carbon or Composite", and leaves its top tubes, target riders and rack interfaces unnamed
     const materials = { ...vocabulary.names[MATERIALS], carbon: 'Carbon/Composite' }
+    const interfaces = { mik: 'MIK', mik_hd: 'MIK HD', racktime_snapit: 'Racktime SnapIt', atranvelo_avs: 'Atranvelo AVS', thule_yepp_easyfit: 'Thule Yepp EasyFit', ...vocabulary.names[INTERFACES] }
     const topTubes = { step_through: 'Step-through', sloping: 'Sloping', horizontal: 'Horizontal', ...vocabulary.names[TOP_TUBES] }
     const riders = { kid: 'Kids', woman: "Women's", adaptive: 'Adaptive', ...vocabulary.names.target_riders }
-    this.vocabulary = { ...vocabulary, names: { ...vocabulary.names, [MATERIALS]: materials, [TOP_TUBES]: topTubes, target_riders: riders } }
+    this.vocabulary = { ...vocabulary, names: { ...vocabulary.names, [MATERIALS]: materials, [TOP_TUBES]: topTubes, [INTERFACES]: interfaces, target_riders: riders } }
     this.half = new RegExp(kit.shis.half)
     this.shisPattern = new RegExp(kit.shis.pattern)
     // standover above the bottom bracket in feet and inches, as a wheelbase is, where the kit's standover reads in inches

@@ -48,7 +48,17 @@ const stock = ({ availability }) => [undefined, null, 'stock', 'app_update'].inc
 const WIDE_TIRE = 50
 const MAX_LOAD = 'Max load (rider + cargo)'
 const GROSS_WEIGHT = 'Gross weight rating (bike + rider + cargo)'
-const FRAME_LABELS = { max_weight_total: MAX_LOAD, gross_weight_rating: GROSS_WEIGHT }
+const WEIGHT_LOADS = {
+  rider: 'Rider',
+  cargo: 'Cargo',
+  payload: 'Payload (rider + cargo)',
+  gross: 'Gross vehicle weight',
+  rear_rack: 'Rear rack',
+  front_rack: 'Front rack',
+  handlebar_basket: 'Handlebar basket',
+  pannier_per_side: 'Pannier, each side',
+  trailer: 'Trailer'
+}
 // In the box rather than on the bike, so listed apart and never compared part by part
 const INCLUDED = 'included_not_installed'
 
@@ -79,8 +89,14 @@ const modes = (key) => (vehicle) => highest(array(vehicle.motors).flatMap((motor
 // cargo_bike, cargo_tricycle and their _rear kinds
 export const isCargo = (data) => /^cargo_/.test(data.type ?? '')
 
-// A vehicle's max load or gross weight rating, or else its rider limit in `size`, and its cargo area
+// A vehicle's cargo area in `size`
 export const cargoAt = (presenter, data, size) => new ModelViewer({ presenter, data, others: [] }).cargo(size)
+
+// The weight `load` is limited to in `size`: the limit naming it, else the one for every size
+export const weightLimit = (data, load, size) => {
+  const limits = array(data.weight_limits).filter((limit) => limit.load === load)
+  return (limits.find(({ sizes }) => array(sizes).includes(size?.name)) ?? limits.find(({ sizes }) => !sizes))?.weight ?? null
+}
 
 export const tireWidth = (presenter, width) => new ModelViewer({ presenter, data: {}, others: [] }).tireWidthSummary(width, null)
 
@@ -104,10 +120,11 @@ export const motorsOf = ({ presenter, data, others, outOfClassId }) => {
   return sideBySide([viewer.electricSummary(), viewer.motorSections()])
 }
 
-// A vehicle's frame, wheels and brakes beside its suspension and drivetrain, marked where they differ from `others`'
+// A vehicle's frame, weight limits, wheels and brakes beside its suspension and drivetrain, marked where they differ from `others`'
 export const runningGearOf = ({ presenter, data, others }) => {
   const viewer = new ModelViewer({ presenter, data, others })
-  return sideBySide([[viewer.frame(), viewer.wheels(), viewer.positioned('Brakes', 'brakes', 'Brake', (brake) => viewer.brakeSummary(brake))], [viewer.suspension(), viewer.drivetrain()]])
+  return sideBySide([[viewer.frame(), viewer.weightLimits(), viewer.wheels(), viewer.positioned('Brakes', 'brakes', 'Brake', (brake) => viewer.brakeSummary(brake))],
+    [viewer.suspension(), viewer.drivetrain()]])
 }
 
 // Side by side once their container is wide enough, else one after the other
@@ -157,6 +174,7 @@ class ModelViewer {
       this.frame()
     ], [this.electricSummary(), ...this.motorSections()], [
       section({ heading: 'Cargo', content: presenter.measurementRows(this.specRows('cargo')) }),
+      this.weightLimits(),
       this.wheels(),
       this.positioned('Brakes', 'brakes', 'Brake', (brake) => this.brakeSummary(brake)),
       this.drivetrain()
@@ -241,8 +259,9 @@ class ModelViewer {
   #mountLabel (mount) {
     const place = this.#mountPlace(mount)
     const where = place == null ? null : place.startsWith('under') ? place : `on ${place}`
+    const notes = compact([mount.interface, mount.description])
     return upcaseFirst(compact([this.presenter.positionLabel(mount.position), mount.holes != null ? `${mount.holes}-hole` : null,
-      mount.type.replaceAll('_', ' '), where, mount.description != null ? `(${mount.description})` : null]).join(' '))
+      mount.type.replaceAll('_', ' '), where, notes.length ? `(${notes.join(', ')})` : null]).join(' '))
   }
 
   #bottleMountLabel (mount) {
@@ -319,7 +338,7 @@ class ModelViewer {
     const list = (value) => join(array(value), ', ')
     return section({
       content: join([
-        row('Model group', 'vehicle_model_group'),
+        row('Model group', 'model_group'),
         configuration !== 'complete' || this.differs('model_configuration')
           ? row('Configuration', 'model_configuration', configurationName)
           : '',
@@ -347,7 +366,7 @@ class ModelViewer {
       model: vehicle.model,
       photo: (frame) => this.stockPhoto(frame),
       electric: present(vehicle.motors),
-      model_group: vehicle.vehicle_model_group,
+      model_group: vehicle.model_group,
       years: this.yearRange(),
       vehicle_type: presence(typeLabel(vehicle, { riders: false })),
       type: vehicle.type,
@@ -363,7 +382,7 @@ class ModelViewer {
       suspended: present(vehicle.suspension),
       suspension: this.suspensionTravels(),
       groupset: this.groupsetWithDrivetrain(),
-      certification: present(vehicle.motors) ? certificationBadges(array(vehicle.motors).map((motor) => motor.certification)) : null,
+      certification: present(vehicle.motors) ? certificationBadges(this.#certifications()) : null,
       description
     }
   }
@@ -384,7 +403,7 @@ class ModelViewer {
   }
 
   // "Total length 6' 4", Cargo 2' 7" ?", each spelled out in its tooltip, over "Max load 200 kg ?". Without a `size`, as
-  // the Overview has none, its total length, which a size's geometry has a row of its own for
+  // the Overview has none, its total length and weight limit, which a size's comparison has rows of their own for
   cargo (size) {
     const { presenter } = this
     const { length, width, volume } = this.data.cargo ?? {}
@@ -408,7 +427,7 @@ class ModelViewer {
     const lengths = shortened.length
       ? join([join(shortened, ', '), ' ', tooltip({ text: 'Lengths', body: join(spelled.map((line) => html`<span class="tw:block">${line}</span>`)) })])
       : null
-    const lines = [lengths, this.#cargoWeight(size)].filter(present)
+    const lines = [lengths, size ? null : this.#cargoWeight()].filter(present)
     return lines.length ? join(lines.map((line) => html`<span class="tw:block">${line}</span>`)) : null
   }
 
@@ -421,17 +440,15 @@ class ModelViewer {
   }
 
   // The max load, or without one the gross weight rating, with the other limits in its tooltip, or without either the
-  // rider limit: in `size`, or its sizes' range
-  #cargoWeight (size) {
+  // rider limit, its sizes' range
+  #cargoWeight () {
     const { presenter } = this
-    const { max_weight_total: maxLoad, gross_weight_rating: gross } = this.data.frame ?? {}
-    const riders = (size ? [size] : array(this.data.sizes)).map((each) => each.geometry?.max_weight_rider).filter(isNumber)
-    const riderLimit = () => join([`${this.kit.geometry.labels.max_weight_rider} `,
-      join([...new Set([Math.min(...riders), Math.max(...riders)])].map((kg) => presenter.measurement(kg, 'kg')), '–')])
+    const [maxLoad, gross, cargo] = ['payload', 'gross', 'cargo'].map((load) => weightLimit(this.data, load))
+    const riders = array(this.data.weight_limits).filter(({ load }) => load === 'rider').map(({ weight }) => weight)
+    const riderLimit = () => join(['Max rider weight ', join([...new Set([Math.min(...riders), Math.max(...riders)])].map((kg) => presenter.measurement(kg, 'kg')), '–')])
     const [limit, label, text] = isNumber(maxLoad) ? [maxLoad, 'Max load', MAX_LOAD] : [gross, 'Gross weight rating', GROSS_WEIGHT]
     if (!isNumber(limit)) return riders.length ? riderLimit() : null
 
-    const cargo = this.data.cargo?.max_weight_cargo
     const lines = [isNumber(maxLoad) && isNumber(gross) && html`${GROSS_WEIGHT} ${presenter.measurement(gross, 'kg')}`,
       riders.some((kg) => kg !== limit) && riderLimit(),
       isNumber(cargo) && html`Max cargo weight ${presenter.measurement(cargo, 'kg')}`].filter(Boolean)
@@ -571,7 +588,24 @@ class ModelViewer {
   }
 
   frame () {
-    return section({ heading: 'Frame', content: this.presenter.measurementRows(this.specRows('frame', undefined, FRAME_LABELS)) })
+    return section({ heading: 'Frame', content: this.presenter.measurementRows(this.specRows('frame')) })
+  }
+
+  // A row per load, its weight for every size first, then each other size's: "136 kg, 150 kg (sizes L–XL)"
+  weightLimits () {
+    const { presenter } = this
+    const limits = (vehicle, load) => array(vehicle.weight_limits).filter((limit) => limit.load === load)
+    const summary = (entries) => presence(join(entries.map(({ weight, sizes }) =>
+      sizes ? join([presenter.measurement(weight, 'kg'), ` (sizes ${this.sizeRange(array(sizes))})`]) : presenter.measurement(weight, 'kg')), ', '))
+    const rows = Object.entries(WEIGHT_LOADS).map(([load, label]) => definitionListRow({
+      label, content: this.againstCounterparts(limits(this.vehicle, load), this.others.map((other) => limits(other, load)), summary)
+    }))
+    return section({ heading: 'Weight limits', content: join(rows) })
+  }
+
+  // Its motors' standards, once each
+  #certifications () {
+    return [...new Set(array(this.vehicle.motors).flatMap((motor) => array(motor.certifications)))]
   }
 
   suspensionSummary (suspension) {
@@ -669,7 +703,7 @@ class ModelViewer {
     const throttle = throttles.length ? join([throttles.some(stock) ? 'Yes' : 'Optional', ...(throttleSpeed ? [', to ', throttleSpeed] : [])]) : 'No'
     const rated = array(vehicle.motors).map((motor) => motor.rated_power).filter(isNumber)
     const specs = [['Motor', rated.length ? presenter.measurement(sum(rated), 'w') : null], ['Top speed', fastest(of('assist'))], ['Throttle', throttle]]
-    const certifications = certificationsOf(array(vehicle.motors).map((motor) => motor.certification))
+    const certifications = certificationsOf(this.#certifications())
     return html`<div class="tw:mb-6">${bikeSummary({ vehicleType: this.data.type, tiles: this.eVehicleClass(), specs, ...certifications })}</div>`
   }
 
