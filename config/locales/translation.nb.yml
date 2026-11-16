@@ -6725,6 +6725,10 @@ nb:
           select_an_vehicle_type: Velg en %{bike_type}, velg flere for å sammenligne
             dem
           about_bike_book_label: Om Bike Book
+          free_to_use: Bike Book-data er gratis å bruke under CC BY-SA 4.0.
+          learn_how_to_use_it: Lær hvordan du bruker det
+          learn_or_view_html: "%{learn_how_to_use_it} eller %{view_the_raw_data}."
+          view_the_raw_data: se rådataene
         donate_strip:
           donate: Donere
           pitch: Dette kule produktet er levert av den ideelle organisasjonen Bike
