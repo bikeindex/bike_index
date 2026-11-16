@@ -7031,6 +7031,11 @@ it:
           select_an_vehicle_type: Seleziona un %{bike_type}, scegli più opzioni per
             confrontarle
           about_bike_book_label: Informazioni sul libro sulle biciclette
+          free_to_use: I dati di Bike Book sono liberamente utilizzabili secondo la
+            licenza CC BY-SA 4.0.
+          learn_how_to_use_it: Impara come usarlo
+          learn_or_view_html: "%{learn_how_to_use_it} o %{view_the_raw_data}."
+          view_the_raw_data: visualizza i dati grezzi
         donate_strip:
           donate: Donare
           pitch: Questo fantastico prodotto è offerto dall'organizzazione no-profit
