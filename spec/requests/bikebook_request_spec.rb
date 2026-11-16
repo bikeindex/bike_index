@@ -194,6 +194,20 @@ RSpec.describe BikebookController, type: :request do
     end
   end
 
+  describe "other spellings" do
+    it "redirects them to /bikebook, keeping the rest of the path and the query" do
+      get "/BikeBook"
+      expect(response).to redirect_to("/bikebook")
+      expect(response).to have_http_status(:moved_permanently)
+
+      get "/bike-book?vehicle_models=m/segway/2025/gt3_pro"
+      expect(response).to redirect_to("/bikebook?vehicle_models=m/segway/2025/gt3_pro")
+
+      get "/bike_book/m/segway/2025/gt3_pro"
+      expect(response).to redirect_to("/bikebook/m/segway/2025/gt3_pro")
+    end
+  end
+
   describe "license" do
     let(:section_ids) do
       %w[what-you-can-do what-you-need-to-do how-to-credit share-alike what-this-license-covers disclaimer
