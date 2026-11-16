@@ -44,16 +44,18 @@ module AdminData
       {
         query_stats_since: (start_at if safe(:historical_query_stats_enabled?) == true),
         query_stats: stats.first(QUERY_STATS_LIMIT),
-        slow_queries: ::PgHero.slow_queries(query_stats: stats)
+        slow_queries: database.slow_queries(query_stats: stats)
       }
     end
 
     def safe(...)
-      ::PgHero.public_send(...)
+      database.public_send(...)
     rescue => e
       {error: e.message}
     end
 
-    conceal :query_stats_payload, :safe
+    def database = ::PgHero.databases[:primary]
+
+    conceal :query_stats_payload, :safe, :database
   end
 end

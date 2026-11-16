@@ -50,6 +50,7 @@ RSpec.describe "Admin Data API", type: :request do
         get url, params: token_param
         expect(response.status).to eq 200
         expect(json_result.keys).to include("query_stats_enabled", "slow_queries", "database_size", "index_usage")
+        expect(json_result["query_stats_enabled"]).to be_in([true, false])
       end
     end
   end
