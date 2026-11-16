@@ -27,12 +27,12 @@ const FEET_AND_INCHES = ["'", '"']
 
 export class VehiclePresenter {
   constructor (kit, vocabulary) {
-    // the extras' bb_drop_low as the catalog's own labels write "BB Drop", and standover above it short, as its tooltip
-    // explains it
+    // an extra's bb as the catalog's own labels write "BB Drop", standover above it short, as its tooltip
+    // explains it, and the actual seat angle without the catalog's note on it
     this.kit = {
       ...kit,
       acronyms: { ...kit.acronyms, bb: 'BB' },
-      geometry: { ...kit.geometry, labels: { ...kit.geometry.labels, standover_above_bb: 'Standover above BB' } }
+      geometry: { ...kit.geometry, labels: { ...kit.geometry.labels, standover_above_bb: 'Standover above BB', seat_angle_actual: 'Seat Angle (actual)' } }
     }
     // the catalog names carbon "Carbon or Composite", and leaves its top tubes and target riders unnamed
     const materials = { ...vocabulary.names[MATERIALS], carbon: 'Carbon/Composite' }
@@ -117,6 +117,22 @@ export class VehiclePresenter {
     const shown = feet ? this.#tooltipped(imperial, compact([this.#inWords(value), inCentimeters ? null : metric])) : imperial
     // muted by its color, as an opacity would fade the tooltip inside it too
     return this.#unitSystems(metric, inCentimeters ? join([metric, ' ', html`<span class="tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">(${shown})</span>`]) : shown)
+  }
+
+  // "760–890 mm", one figure where they're equal, or the end it has: "18 yr min". A height in feet and inches reads in
+  // centimeters in metric, as measurement has it
+  range (min, max, unit, key) {
+    if (min == null || max == null) return join([this.measurement(min ?? max, unit, key), min == null ? ' max' : ' min'])
+    if (min === max) return this.measurement(min, unit, key)
+
+    const parts = this.#imperialParts(unit, key)
+    const ends = (convert, ...label) => join([this.labeled(this.rounded(convert(min))), '–', this.labeled(this.rounded(convert(max)), ...label)])
+    if (parts.length === 2) {
+      const feet = (mm) => join(this.#significant(parts, mm).map(({ part, convert }) => this.labeled(convert(mm), unit, part)), ' ')
+      return this.#unitSystems(ends((mm) => mm / this.kit.conversions.mm.cm, 'cm', this.kit.presenter.centimeters), join([feet(min), '–', feet(max)]))
+    }
+    const metric = ends((value) => value, unit)
+    return parts.length ? this.#unitSystems(metric, ends(parts[0].convert, unit, parts[0].part)) : metric
   }
 
   // In feet and inches, or centimeters in metric: "6' 4"", "194 cm"

@@ -64,7 +64,7 @@ export const wheelsAt = (presenter, data, size) => {
   const viewer = new ModelViewer({ presenter, data, others: [] })
   return Object.fromEntries(['front', 'rear'].map((position) => {
     const built = at(viewer.builtWheels(), position, size)[0]
-    const widths = at(viewer.vehicle.wheels, position, size).map((wheel) => wheel.max_tire_width).filter((width) => typeof width === 'number')
+    const widths = at(viewer.vehicle.wheels, position, size).map((wheel) => wheel.tire_width_max).filter((width) => typeof width === 'number')
     return [position, {
       parts: built && viewer.wheelParts({ ...built, sizes: null }, { fitting: false }).map(([key, content]) => [key, { size: built.bsd, tire: built.tire_width }[key] ?? null, content]),
       maxTire: widths.length ? Math.max(...widths) : null
@@ -595,10 +595,13 @@ class ModelViewer {
   suspensionRows (suspension) {
     const { presenter } = this
     const component = suspension.component
-    const dimensions = except(this.kit.schemas.component_dimensions, ['travel', 'extra_measurements'])
+    const { axle_diameter: diameter, axle_spacing: spacing } = component?.dimensions ?? {}
+    // a thru axle reads as it's sold, "15 × 110 mm"
+    const axle = isNumber(diameter) && isNumber(spacing)
+    const dimensions = except(this.kit.schemas.component_dimensions, ['travel', 'extra_measurements', ...(axle ? ['axle_diameter', 'axle_spacing'] : [])])
     const componentRows = component
-      ? [[component.type_detail ?? component.type, component.description], ['Manufacturer', component.manufacturer], ...presenter.rowsFor(dimensions, component.dimensions)]
-          .filter((row) => present(row[1]))
+      ? [[component.type_detail ?? component.type, component.description], ['Manufacturer', component.manufacturer], ...presenter.rowsFor(dimensions, component.dimensions),
+          ['Axle', axle ? this.measurements([diameter, spacing], 'mm', ' × ') : null]].filter((row) => present(row[1]))
       : []
     return [...presenter.rowsFor(this.kit.viewer.suspension_fields, suspension, { labels: this.kit.viewer.suspension_labels, display: suspensionValue }), ...componentRows]
   }
@@ -720,12 +723,12 @@ class ModelViewer {
     return [['front', front], ['rear', rear]].filter(([, wheel]) => wheel).flatMap(([position, wheel]) => rows(label(position), `${label(position)} tire`, wheel))
   }
 
-  // the wheels the frame takes but the build doesn't come with, as [bsd, max_tire_width, positions]
+  // the wheels the frame takes but the build doesn't come with, as [bsd, tire_width_max, positions]
   clearances (vehicle = this.vehicle) {
     const groups = new Map()
     for (const wheel of array(vehicle.wheels).filter((each) => each.configured === false)) {
-      const key = JSON.stringify([wheel.bsd ?? null, wheel.max_tire_width ?? null])
-      if (!groups.has(key)) groups.set(key, [wheel.bsd ?? null, wheel.max_tire_width ?? null, []])
+      const key = JSON.stringify([wheel.bsd ?? null, wheel.tire_width_max ?? null])
+      if (!groups.has(key)) groups.set(key, [wheel.bsd ?? null, wheel.tire_width_max ?? null, []])
       groups.get(key)[2].push(...array(wheel.position))
     }
     return [...groups.values()].map(([bsd, max, positions]) => [bsd, max, [...new Set(positions)].sort()])
@@ -760,7 +763,7 @@ class ModelViewer {
   // `fitting`: how the wheel fits the frame, its cassette, dropout and axle
   wheelSummary (wheel, { fitting = true } = {}) {
     const summary = join(this.wheelParts(wheel, { fitting }).map(([, content]) => content), ', ')
-    return wheel.max_tire_width != null ? join([summary, this.tireWidthSummary(wheel.max_tire_width, 'tire max')], html`<br>`) : summary
+    return wheel.tire_width_max != null ? join([summary, this.tireWidthSummary(wheel.tire_width_max, 'tire max')], html`<br>`) : summary
   }
 
   wheelParts (wheel, { fitting = true } = {}) {
@@ -809,7 +812,7 @@ class ModelViewer {
   // "2.4 in tire max", or "2.4 in front, 2.6 in rear tire max"
   tireMax () {
     const [front, rear] = ['front', 'rear'].map((position) =>
-      highest(this.builtWheels().filter((wheel) => array(wheel.position).includes(position)).map((wheel) => wheel.max_tire_width)))
+      highest(this.builtWheels().filter((wheel) => array(wheel.position).includes(position)).map((wheel) => wheel.tire_width_max)))
     if (front === rear) return front == null ? null : this.tireWidthSummary(front, 'tire max')
 
     const widths = compact([front != null ? join([this.tireWidthSummary(front, ''), ' front']) : null, rear != null ? join([this.tireWidthSummary(rear, ''), ' rear']) : null])
@@ -826,7 +829,7 @@ class ModelViewer {
   brakeSummary (brake) {
     const typeAndRotor = presence(join(compact([brakeType(brake), this.millimeters(brake.rotor_diameter, ' rotor')]), ', '))
     const summary = join(compact([this.onSizes(typeAndRotor, brake.sizes), presence(brake.caliper_mount?.replace(/^Disc /, '')), brake.anti_lock ? 'ABS' : null]), ', ')
-    return brake.max_rotor_diameter != null ? join([summary, this.millimeters(brake.max_rotor_diameter, ' rotor max')], html`<br>`) : summary
+    return brake.rotor_diameter_max != null ? join([summary, this.millimeters(brake.rotor_diameter_max, ' rotor max')], html`<br>`) : summary
   }
 
   drivetrain () {

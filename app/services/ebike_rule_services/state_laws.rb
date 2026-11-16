@@ -152,7 +152,7 @@ module EbikeRuleServices
         .to_h { |abbreviation, id, record| [abbreviation, law(id, record)] }
       {
         laws:,
-        tiers: tiers.group_by(&:first).transform_values { it.map { |_, id, record| law(id, record).merge(ids: [id, *record["groups"]], value: id.split("/").last, min_watts: record["min_power"]) } },
+        tiers: tiers.group_by(&:first).transform_values { it.map { |_, id, record| law(id, record).merge(ids: [id, *record["groups"]], value: id.split("/").last, min_watts: record["power_min"]) } },
         groups: records.filter_map { |id, record| [id, record["groups"]] if record["groups"] }.to_h,
         e_bike_laws: records.filter_map { |id, record| id if record["e_bike_law"] },
         classes: states.group_by(&:first).filter_map { |abbreviation, entries|
@@ -201,7 +201,7 @@ module EbikeRuleServices
 
     def state_class(id, record)
       {id:, name: record["name"], description: record["description"], throttle: record["throttle"], mph: mph(record["max_speed"]),
-       kmh: record["max_speed"], metric: metric?(record), watt_cap: record["max_power"], min_watts: record["min_power"]}
+       kmh: record["max_speed"], metric: metric?(record), watt_cap: record["power_max"], min_watts: record["power_min"]}
     end
 
     # Outside the US, where a limit reads in km/h
@@ -215,7 +215,7 @@ module EbikeRuleServices
         name: record["name"],
         description: record["description"],
         classes: record["groups"].to_a.filter_map { it[BikebookCatalog::US_CLASS, 1]&.to_i }.sort,
-        watt_cap: record["max_power"],
+        watt_cap: record["power_max"],
         mph: mph(record["max_speed"]),
         kmh: record["max_speed"],
         metric: metric?(record),

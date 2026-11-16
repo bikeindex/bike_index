@@ -78,7 +78,7 @@ RSpec.describe EbikeRuleServices::StateLaws do
     it "is a state's own where its e-bike law isn't the three US classes: the law, then slowest first and off-highway last" do
       vocabulary = JSON.parse(BikebookCatalogHelpers::FIXTURES.join("vocabulary.json").read)
       vocabulary["e_vehicle_classifications"] = {
-        "evc/us/nj/electric_motorized_bicycle" => {"name" => "Electric Motorized Bicycle", "throttle" => true, "min_power" => 750},
+        "evc/us/nj/electric_motorized_bicycle" => {"name" => "Electric Motorized Bicycle", "throttle" => true, "power_min" => 750},
         "evc/us/nj/motorcycle" => {"name" => "Motorcycle", "throttle" => true, "groups" => ["evc/motorcycle"]},
         "evc/us/nj/motorized_bicycle" => {"name" => "Motorized Bicycle", "throttle" => true, "max_speed" => 45.06},
         **vocabulary["e_vehicle_classifications"]

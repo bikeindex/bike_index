@@ -261,7 +261,7 @@ RSpec.describe "Bike Book", :js, type: :system do
         const [{ VehiclePresenter }, { basics }, { fragmentOf }, { kit }, vocabulary] = await Promise.all([import('bikebook/vehicle_presenter'),
           import('bikebook/templates/vehicles/basics'), import('bikebook/render'), catalog('kit.json'), catalog('vocabulary.json')])
         const wheels = (front, rear, tire, [frontMax, rearMax] = []) =>
-          [{ bsd: front, tire_width: tire, max_tire_width: frontMax, position: ['front'] }, { bsd: rear, tire_width: tire, max_tire_width: rearMax, position: ['rear'] }]
+          [{ bsd: front, tire_width: tire, tire_width_max: frontMax, position: ['front'] }, { bsd: rear, tire_width: tire, tire_width_max: rearMax, position: ['rear'] }]
         const lines = (cell) => { cell.querySelectorAll('br').forEach((br) => br.replaceWith('|')); return cell.textContent.split('|').map((line) => line.replace(/\\s+/g, ' ').trim()) }
         const rowsOf = (datas) => [...fragmentOf(basics({ presenter: new VehiclePresenter(kit, vocabulary), vehicles: datas.map((data, index) => ({ value: String(index), data })), removePath: () => '/bikebook' }))
           .querySelectorAll('tbody tr')]
@@ -524,9 +524,9 @@ RSpec.describe "Bike Book", :js, type: :system do
           import('bikebook/templates/vehicles/model_viewer'), import('bikebook/render'), catalog('kit.json'), catalog('vocabulary.json')])
         const data = { wheels: [
           { position: ['front', 'rear'], sizes: ['S'], bsd: 584, tire_width: 28 },
-          { position: ['front'], sizes: ['M', 'L'], bsd: 622, tire_width: 28, max_tire_width: 32, cassette_interface: 'Shimano HG', dropout: 'vertical', axle: 'thru_axle', axle_diameter: 12 },
+          { position: ['front'], sizes: ['M', 'L'], bsd: 622, tire_width: 28, tire_width_max: 32, cassette_interface: 'Shimano HG', dropout: 'vertical', axle: 'thru_axle', axle_diameter: 12 },
           { position: ['rear'], sizes: ['M', 'L'], bsd: 622, tire_width: 28 },
-          { position: ['front', 'rear'], configured: false, bsd: 584, max_tire_width: 50 }
+          { position: ['front', 'rear'], configured: false, bsd: 584, tire_width_max: 50 }
         ] }
         const text = (content) => fragmentOf(content).textContent.replace(/\\s+/g, ' ').trim()
         const presenter = new VehiclePresenter(kit, vocabulary)
@@ -793,8 +793,8 @@ RSpec.describe "Bike Book", :js, type: :system do
     marked = ->(heading, selector) { haul.find("h2", text: heading).ancestor("section").all(selector).map { it.text.strip } }
     expect(marked.call(/\Amodel years\z/i, "tr:last-child td.tw\\:spec-diff")).to eq(["2025"])
     expect(marked.call(/\Adrivetrain\z/i, "span.tw\\:rounded-sm.tw\\:spec-diff")).to eq(["9 Rear"])
-    # an extra measurement's BB as the catalog's own labels write it
-    expect(haul).to have_css("dt", exact_text: "BB drop low").and have_css("dt", exact_text: "BB Height")
+    # its flip chip's low setting under its stock geometry
+    expect(haul.find("h4", text: /\Alow setting\z/i).find("+ dl")).to have_css("dt", exact_text: "BB Drop")
 
     # and on a phone too, rather than stacking
     page.current_window.resize_to(390, 844)
@@ -1166,7 +1166,7 @@ RSpec.describe "Bike Book", :js, type: :system do
       (async () => {
         const { chosenSizes } = await import('bikebook/sizes')
         const size = (name, topTube, reach, riders = {}) => ({ name, geometry: { top_tube_effective: topTube, reach, ...riders } })
-        const riders = (min, max) => ({ min_rider_height: min, max_rider_height: max })
+        const riders = (min, max) => ({ rider_height_min: min, rider_height_max: max })
         const vehicle = (key, ...sizes) => ({ key, data: { sizes: sizes.map((each) => typeof each === 'string' ? { name: each } : each) } })
         const names = (vehicles, options) => chosenSizes(vehicles, options).map((each) => each?.name ?? 'none')
         const canyon = vehicle('canyon', size('S', 546, 390), size('M', 555, 393), size('L', 569, 401))
@@ -1544,6 +1544,36 @@ RSpec.describe "Bike Book", :js, type: :system do
     # in their tooltip
     expect(standover).to match(["?", "Standover above BB ? Some bikes (typically BMX and dirt jumpers) list standover from the bottom bracket, instead of the ground",
       [/\A23\.5\W*cm\z/, /\A23\.5\W*cm \(9" 9\.3 inches\)\z/]])
+    # each min and max pair one row of its range, a fixed seat's one figure, the seat heights named by what they're from, the
+    # weights together, and each flip chip setting after the stock geometry, listing what it changes, an extra's BB as the
+    # catalog's own labels write it. A fork's thru axle as it's sold
+    fit = page.evaluate_script(<<~JS)
+      (async () => {
+        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
+        const [{ VehiclePresenter }, { geometryCard }, { runningGearOf }, { fragmentOf }, { render }, { kit }, vocabulary] = await Promise.all([
+          import('bikebook/vehicle_presenter'), import('bikebook/templates/vehicles/geometry_card'), import('bikebook/templates/vehicles/model_viewer'),
+          import('bikebook/render'), import('lit-html'), catalog('kit.json'), catalog('vocabulary.json')])
+        const presenter = new VehiclePresenter(kit, vocabulary)
+        const container = document.createElement('div')
+        document.body.append(container)
+        render(geometryCard({ presenter, size: { name: 'M', geometry: {
+          seat_angle: 73.5, seat_angle_actual: 71, seat_height_min: 760, seat_height_max: 760, seat_height_bb_min: 650, seat_height_bb_max: 780,
+          total_weight: 3.1, frame_weight: 1.9, fork_weight: 1.2, rider_height_min: 1600, rider_height_max: 1750, rider_inseam_min: 720,
+          rider_inseam_max: 820, rider_age_min: 8, bb_drop: 70
+        }, geometry_settings: [{ name: 'low', geometry: { bb_drop: 78, extra_measurements: { bb_offset: 5 } } }] }, others: [] }), container)
+        const rows = (dl) => [...dl.querySelectorAll(':scope > div')].map((row) => [row.querySelector('dt').textContent.trim(), row.querySelector('dd').innerText.replace(/\\s+/g, ' ').trim()])
+        const groups = [[...container.querySelectorAll('h4')].map((heading) => heading.textContent), [...container.querySelectorAll('dl')].map(rows)]
+        container.remove()
+        const fork = { suspension: { front: { travel: 100 } }, components: [{ type: 'fork', description: 'Psylo', dimensions: { offset: 44, axle_diameter: 15, axle_spacing: 110 } }] }
+        return [groups, fragmentOf(runningGearOf({ presenter, data: fork, others: [] })).textContent.replace(/\\s+/g, ' ')]
+      })()
+    JS
+    expect(fit.first).to match([["Low setting"], [[
+      ["Seat Angle (effective)", /\A73\.5\W*°\z/], ["Seat Angle (actual)", /\A71\W*°\z/], ["BB Drop", /\A70\W*mm\z/], ["Seat height from ground", /\A760\W*mm\z/],
+      ["Seat height from BB", /\A650\W*–\W*780\W*mm\z/], ["Total vehicle weight at this size", /\A3\.1\W*kg\z/], ["Frame weight", /\A1\.9\W*kg\z/],
+      ["Fork weight", /\A1\.2\W*kg\z/], ["Rider height", /\A160\W*–\W*175\W*cm\z/], ["Rider inseam", /\A720\W*–\W*820\W*mm\z/], ["Rider age", /\A8\W*yr min\z/]
+    ], [["BB Drop", /\A78\W*mm\z/], ["BB offset", /\A5\W*mm\z/]]]])
+    expect(fit.last).to match(/Axle: 15\W*×\W*110\W*mm/).and match(/Offset: 44\W*mm/).and(satisfy { !it.include?("Axle diameter") })
     # a tandem's captain's figures under a bike's keys and its stoker's prefixed, and its front end as a bike's: its head
     # tube's bottom up its fork's length from the front axle, square to the steering axis by its rake, its fork's length
     # typical where it lists none. A step-through's riders' standovers over its step tubes, and its boom tube, where it
@@ -1856,7 +1886,7 @@ RSpec.describe "Bike Book", :js, type: :system do
     expect(page).to have_no_css("#vehicle-filters")
     expect(classification).to have_xpath("ancestor::section[.//dt[text()='Propulsion']]")
     expect(page).to have_no_css("dt", exact_text: "Classifications")
-    expect(page).to have_css("div", text: /\AMin rider age\s*18\W*yr\z/, visible: :all)
+    expect(page).to have_css("div", text: /\ARider age\s*18\W*–\W*60\W*yr\z/, visible: :all)
     # each suspended end, including one that states nothing
     suspension = ->(title) { find("article h1", text: title).ancestor("article").find("h2", text: /\Asuspension\z/i).ancestor("section") }
     expect(suspension.call("Ultra Bee")).to have_css("div", text: /\AFront\s*241\W*mm\z/).and have_css("div", text: /\ARear\s*320\W*×\W*85\W*mm 3\.35in\z/)
