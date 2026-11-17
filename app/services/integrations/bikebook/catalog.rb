@@ -12,6 +12,8 @@ module Integrations
       MANIFEST_URL = LOCAL_DIRECTORY ? "#{LOCAL_PATH}/manifest.json" : "#{URL}manifest.json"
       GITHUB_REPO_URL = "https://github.com/bikeindex/bikebook"
       MODEL_ID = %r{\Am/([a-z0-9_]+/\d{4})/[a-z0-9_]+\z}
+      # the published format bikebook/catalog_worker.js and similarity.js read
+      FORMAT = 3
 
       Unreachable = Class.new(StandardError)
 
@@ -28,8 +30,8 @@ module Integrations
 
       def vehicle_id(entry) = entry.split("{").first.strip
 
-      # nil while the catalog doesn't answer
-      def manifest = cached("bikebook_catalog/manifest", "manifest.json", expires_in: 5.minutes)
+      # nil while the catalog doesn't answer, or answers in a format the reader doesn't
+      def manifest = cached("bikebook_catalog/manifest", "manifest.json", expires_in: 5.minutes)&.then { it if it["format"] == FORMAT }
 
       # A published file, nil while the catalog doesn't answer. Its name is a digest of its contents,
       # so it keeps while it's published
