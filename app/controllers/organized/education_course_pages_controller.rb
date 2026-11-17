@@ -4,7 +4,7 @@ module Organized
     before_action :find_draft, only: %i[new create]
     before_action :find_page, only: %i[edit update destroy]
 
-    # A blank page to fill in; it's only persisted once it has a title and rules
+    # A blank page to fill in; it's only persisted once it has a title and bullets
     def new
       @page = @draft.education_course_pages.new
       render :edit

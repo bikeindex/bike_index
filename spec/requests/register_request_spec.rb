@@ -1320,7 +1320,7 @@ RSpec.describe RegisterController, type: :request do
             }.to_not change(EducationCourseAcknowledgment, :count)
             expect(b_param.reload.creation_organization_id).to be_blank
             expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :finished)
-            # Nothing holding it back, so it goes out rather than waiting on rules nobody owes
+            # Nothing holding it back, so it goes out rather than waiting on an education course nobody owes
             ActionMailer::Base.deliveries = []
             expect { EmailJobs::OwnershipInvitationJob.drain }.to change(ActionMailer::Base.deliveries, :count).by 1
           end
@@ -1599,7 +1599,7 @@ RSpec.describe RegisterController, type: :request do
       expect(b_param.acknowledgment_pending?).to be_truthy
       expect(bike.unfinished_registration?).to be_truthy
       expect(BParam.unfinished_registrations.pluck(:id)).to eq([b_param.id])
-      # The finished registration email waits on the rules, not on a skipped ownership
+      # The finished registration email waits on the education course, not on a skipped ownership
       expect(bike.current_ownership.skip_email).to be_falsey
       expect { EmailJobs::OwnershipInvitationJob.drain }.to_not change(ActionMailer::Base.deliveries, :count)
 
@@ -1612,7 +1612,7 @@ RSpec.describe RegisterController, type: :request do
       follow_redirect!
       # The cycle type reads as it's stored, so no title leads with it and stays sentence case
       expect(response.body).to include "<title>Safety check for your e-scooter</title>"
-      # The heading is the page's own; the title labels its rules and names it on the review
+      # The heading is the page's own; the title labels its bullets and names it on the review
       expect(response.body).to include "Looks like you have an e-vehicle!"
       expect(response.body).to include "Battery &amp; charging"
       expect(response.body).to include "Charge with the manufacturer's charger"
@@ -1631,7 +1631,7 @@ RSpec.describe RegisterController, type: :request do
 
       follow_redirect!
       expect(response.body).to include "Campus rules"
-      # The organization owns this page's rules, so its name is on them
+      # The organization owns this page's bullets, so its name is on them
       expect(response.body).to include organization.short_name
 
       expect {

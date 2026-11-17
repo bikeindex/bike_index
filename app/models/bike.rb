@@ -478,7 +478,7 @@ class Bike < ApplicationRecord
 
   def current? = current_with_user_hidden? && !user_hidden
 
-  # The register flow creates the bike ahead of its organization's safety rules
+  # The register flow creates the bike ahead of its organization's education course
   def unfinished_registration? = persisted? && EducationCourseAcknowledgment.pending.exists?(bike_id: id)
 
   def current_parking_notification
@@ -504,8 +504,8 @@ class Bike < ApplicationRecord
     status_impounded? || unregistered_parking_notification?
   end
 
-  # Only e-vehicles agree to an organization's safety rules, and an unregistered parking
-  # notification has no registrant to agree to them
+  # Only e-vehicles agree to an organization's education course, and an unregistered parking
+  # notification has no registrant to agree to it
   def education_course_applies?
     motorized? && !unregistered_parking_notification?
   end

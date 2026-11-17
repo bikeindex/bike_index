@@ -40,7 +40,7 @@ class EducationCoursePage < ApplicationRecord
   end
 
   # The big text at the top of the page. title is the page's name - shown as the
-  # label above its rules and in the review - so it stands in when there's no heading
+  # label above its bullets and in the review - so it stands in when there's no heading
   def heading_text = heading.presence || title
 
   # body is a single <ul>; the registration flow renders one checkbox per <li>, and the
@@ -76,7 +76,7 @@ class EducationCoursePage < ApplicationRecord
     self.body = ActionController::Base.helpers.sanitize(body) if body.present?
   end
 
-  # A page is rules to agree to; one with no bullets has nothing to acknowledge
+  # A page's bullets are what's agreed to; one with none has nothing to acknowledge
   def body_has_content
     return if Nokogiri::HTML.fragment(body.to_s).text.strip.present?
 
