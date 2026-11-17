@@ -1,0 +1,7 @@
+<%# Inline at the top of the body, because a Stimulus controller connects after the first paint %>
+<%# onchange is assigned rather than added since Turbo re-runs this on every visit %>
+<script>
+  window.colorSchemeQuery ||= window.matchMedia("(prefers-color-scheme: dark)");
+  window.colorSchemeQuery.onchange = () => document.body.classList.toggle("dark", window.colorSchemeQuery.matches);
+  window.colorSchemeQuery.onchange();
+</script>
