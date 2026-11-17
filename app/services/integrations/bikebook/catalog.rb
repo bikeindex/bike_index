@@ -10,6 +10,7 @@ module Integrations
       LOCAL_PATH = "/bikebook_catalog"
       URL = "https://bikebook-catalog.bikeindex.org/catalog/"
       MANIFEST_URL = LOCAL_DIRECTORY ? "#{LOCAL_PATH}/manifest.json" : "#{URL}manifest.json"
+      GITHUB_REPO_URL = "https://github.com/bikeindex/bikebook"
       MODEL_ID = %r{\Am/([a-z0-9_]+/\d{4})/[a-z0-9_]+\z}
 
       Unreachable = Class.new(StandardError)

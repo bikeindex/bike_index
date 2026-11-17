@@ -1353,6 +1353,32 @@ RSpec.describe Bike, type: :model do
     end
   end
 
+  describe "current? and current_with_user_hidden?" do
+    let(:bike) { Bike.new(user_hidden:, example:) }
+    let(:user_hidden) { false }
+    let(:example) { false }
+    it "is current" do
+      expect(bike.current?).to be_truthy
+      expect(bike.current_with_user_hidden?).to be_truthy
+    end
+
+    context "user_hidden" do
+      let(:user_hidden) { true }
+      it "is current_with_user_hidden, not current" do
+        expect(bike.current?).to be_falsey
+        expect(bike.current_with_user_hidden?).to be_truthy
+      end
+    end
+
+    context "example" do
+      let(:example) { true }
+      it "is neither" do
+        expect(bike.current?).to be_falsey
+        expect(bike.current_with_user_hidden?).to be_falsey
+      end
+    end
+  end
+
   describe "bike_sticker and no_bike_sticker" do
     let(:organization1) { FactoryBot.create(:organization) }
     let(:organization2) { FactoryBot.create(:organization) }

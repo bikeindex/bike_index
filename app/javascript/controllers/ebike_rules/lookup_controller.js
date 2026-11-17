@@ -172,7 +172,8 @@ export default class extends Controller {
     if (this.#mode === 'model') document.getElementById(RESULT_FRAME).src = url
 
     this.stateNoteTarget.replaceChildren(this.stateNeededTarget.content.cloneNode(true))
-    this.focusState()
+    // Arrowing through a radio group changes it at every step, so focus stays with the details
+    if (!this.detailsTarget.contains(document.activeElement)) this.focusState()
   }
 
   #leaveCheck (url) {
