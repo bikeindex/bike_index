@@ -57,25 +57,12 @@ module Pages
 
         def choose_place_note = tag.p(copy[:choose_place], class: "tw:text-[13px] tw:text-gray-700 tw:dark:text-gray-300")
 
-        # Which of the bike's two inputs the check is of: the picked model, details changed from it, or details alone
-        def details_mode
-          if @lookup.custom?
-            "custom"
-          elsif @lookup.bikebook_id
-            "model"
-          else
-            "manual"
-          end
-        end
+        # Which of the bike's two inputs the check is of: the picked model, or details alone
+        def details_mode = @lookup.bikebook_id ? "model" : "manual"
 
         def detected? = @lookup.detected_place.present? && @lookup.place == @lookup.detected_place
 
-        # The picked model. Custom details are the checked bike, so it's looked up on its own
-        def model
-          return @model if defined?(@model)
-
-          @model = @lookup.bikebook_id && (@lookup.custom? ? EbikeRuleServices::BikebookVehicles.find(@lookup.bikebook_id) : @lookup.bike)
-        end
+        def model = @lookup.bikebook_id && @lookup.bike
 
         # The model's name, which the combobox shows once the catalog loads
         def bike_display = model && [model.make_and_model, model.first_year].compact.join(" ")

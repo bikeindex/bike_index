@@ -6,6 +6,10 @@ class EbikeRulesController < ApplicationController
   def show
     # a form's place - the lookup's without JavaScript, or the country switch's - which can't send it to the place's own page
     query = request.query_parameters
+    # details changed from a model's are no longer its, as the lookup clears it when they change
+    if query["manual"] == "1" && query.key?("vehicle_models")
+      return redirect_to(ReadableQuery.path(request.path, query.except("vehicle_models")), status: :moved_permanently)
+    end
     if (key = %w[state country].find { query.key?(it) })
       code, query = query[key], query.except(key)
       chosen = place_for(code)

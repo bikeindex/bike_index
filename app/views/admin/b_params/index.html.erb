@@ -1,3 +1,4 @@
+<% show_data = Binxtils::InputNormalizer.boolean(params[:search_show_data]) %>
 <% rendered_chart = nil %>
 
 <% if @render_chart %>
@@ -39,8 +40,11 @@
   rendered_chart:,
   admin_search_form:,
   count_detail:,
-  table_view: render(partial: "table", locals: {collection: @b_params, render_sortable: true}),
+  table_view: render(partial: "table", locals: {collection: @b_params, render_sortable: true, show_data:}),
 )) do |skeleton| %>
+  <% skeleton.with_nav_item { render(UI::ButtonLink::Component.new(text: "Show data", href: url_for(sortable_search_params.merge(search_show_data: !show_data)), size: :sm, active: show_data)) } %>
+  <% skeleton.with_nav_item { render(UI::ButtonLink::Component.new(text: "Course in progress", href: url_for(sortable_search_params.merge(search_education_course_in_progress: !@education_course_in_progress)), size: :sm, active: @education_course_in_progress)) } %>
+
   <% skeleton.with_nav_item do %>
     <%= render(UI::Dropdown::Component.new(name: @search_completeness.humanize, button_size: :sm,
           active: @search_completeness != "all")) do |dropdown| %>

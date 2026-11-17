@@ -389,6 +389,7 @@ RSpec.describe Organized::BikesController, type: :request do
         get "#{base_url}/incompletes"
         expect(response.status).to eq(200)
         expect(assigns(:b_params).pluck(:id)).to eq([partial_registration.id])
+        expect(response.body).to include("Step 2")
 
         Sidekiq::Testing.inline! do
           expect { post "#{base_url}/#{partial_registration.id}/resend_incomplete_email" }

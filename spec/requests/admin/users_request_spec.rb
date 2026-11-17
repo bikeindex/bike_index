@@ -10,6 +10,7 @@ RSpec.describe Admin::UsersController, type: :request do
     let!(:organization_user) { FactoryBot.create(:organization_user) }
     let!(:developer) { FactoryBot.create(:developer) }
     let!(:superuser_ability) { SuperuserAbility.create(user: user_subject) }
+    let!(:legacy_viewer) { FactoryBot.create(:user, feature_registration_show_legacy: true) }
 
     it "searches in the sort direction it's showing" do
       get base_url, params: {sort: "created_at", direction: "asc"}
@@ -32,6 +33,9 @@ RSpec.describe Admin::UsersController, type: :request do
 
       get base_url, params: {search_developers: true}
       expect(assigns(:collection).pluck(:id)).to eq([developer.id])
+
+      get base_url, params: {search_legacy_viewer: true}
+      expect(assigns(:collection).pluck(:id)).to eq([legacy_viewer.id])
 
       get base_url, params: {search_unconfirmed: true}
       expect(assigns(:collection).pluck(:id)).to include(user_subject.id)

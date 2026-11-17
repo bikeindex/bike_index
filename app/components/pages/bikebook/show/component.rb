@@ -8,9 +8,10 @@ module Pages
       # and renders again for each pick and history step
       class Component < ApplicationComponent
         # market is the visitor's CF-IPCountry, which Cloudflare sends as XX, or T1 over Tor, when it can't
-        # tell; state is theirs in the US
-        def initialize(manifest_url:, market:, state:, query:, paint_colors:)
+        # tell; state is theirs in the US. framed: in an iframe, whose autofocus would take its host page's focus
+        def initialize(manifest_url:, market:, state:, query:, paint_colors:, framed: false)
           @manifest_url = manifest_url
+          @framed = framed
           @paint_colors = paint_colors
           @market = %w[XX T1].include?(market) ? "US" : market.presence || "US"
           @jurisdiction = state&.dig(:abbr) || "US"

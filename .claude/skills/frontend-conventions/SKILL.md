@@ -13,11 +13,11 @@ description: >-
   taking full keyword arguments instead of adding or extending one**,
   ViewComponent rules (when to write a partial instead, keyword arguments, instance variables,
   `helpers.` prefix in templates), and `UI::Time::Component` for every
-  date/time. Trigger
+  date/time, and that a new marketing page's URL is spelled with dashes. Trigger
   when adding or modifying views (`.html.erb`), view components, Stimulus
   controllers, Tailwind classes, image or icon files under `app/assets/images`
-  (which usually already exist), or any frontend code that touches styling
-  or interactivity. Stimulus.js is the
+  (which usually already exist), a page's route or a link's path, or any frontend
+  code that touches styling or interactivity. Stimulus.js is the
   JavaScript framework; SCSS and CoffeeScript files exist but are deprecated.
 ---
 
@@ -102,6 +102,12 @@ Four of those carry a rule beyond "use the component":
 - **Every chart goes through `UI::Chart::Component`** — chartkick's `column_chart`/`line_chart`/`pie_chart` helpers are pinned `preload: false` and fetched by the component's `ui--chart` controller, so a bare helper call renders the placeholder and nothing else. Pass `kind:` for a line or pie. A page with no Stimulus (`layout: false`) loads them itself: `app/views/welcome/bike_creation_graph.html.erb`.
 
 `Atoms::*` (`app/components/atoms/`) holds the small value-rendering components — `Atoms::Serial`, `Atoms::Sticker`, `Atoms::ShortId`, `Atoms::Phone`. Everything else is `UI::*`; older value renderers like `UI::AddressDisplay` predate the split and stay put. Render a serial with `Atoms::Serial::Component`.
+
+## URLs: dashes for a new marketing page
+
+**Spell a new marketing or landing page's path with dashes** — `/donate/year-end-2026`, `/ebike-rules`, `/marketplace/how-it-works` — since Google reads a hyphen as a word break and an underscore as joining two words. Give its route an underscored `as:` so the helper still reads like the rest (`get "ebike-rules", to: "ebike_rules#show", as: :ebike_rules`). Everything else, and the marketing pages that are already underscored (`/for_bike_shops`), stays as it is.
+
+**Don't add a route for the other spelling.** `PathSpellingRedirect`, the `*path` route at the end of `config/routes.rb`, 301s an unmatched path to whichever spelling is routed, keeping the query. Link with the path helper; where a literal has to stand (a JS template, an emailed link, a spec's `have_current_path`), write the routed spelling, since the other costs a redirect.
 
 ## Form drafts: always `form-persist`
 

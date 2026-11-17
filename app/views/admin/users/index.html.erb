@@ -16,6 +16,7 @@
     <%= hidden_field_tag :search_invalid, params[:search_invalid] %>
     <%= hidden_field_tag :search_confirmed, params[:search_confirmed] %>
     <%= hidden_field_tag :search_unconfirmed, params[:search_unconfirmed] %>
+    <%= hidden_field_tag :search_legacy_viewer, params[:search_legacy_viewer] %>
 
     <% if display_dev_info? %>
       <%= render(UI::Forms::Input::Component.new(form_builder: form, attribute: :search_domain,
@@ -103,5 +104,9 @@
       /
       <%= render(UI::ButtonLink::Component.new(text: "confirmed", href: url_for(sortable_search_params.merge(search_confirmed: !@search_confirmed, search_unconfirmed: false)), size: :sm)) %>
     </span>
+  <% end %>
+
+  <% skeleton.with_nav_item do %>
+    <%= render(UI::ButtonLink::Component.new(text: "Legacy viewer", href: url_for(sortable_search_params.merge(search_legacy_viewer: !@search_legacy_viewer)), size: :sm, active: @search_legacy_viewer)) %>
   <% end %>
 <% end %>

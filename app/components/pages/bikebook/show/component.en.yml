@@ -24,9 +24,12 @@ en:
           e_vehicle_motorized: e-Vehicle (motorized)
           failed: The catalog didn't load. Reload the page to try again.
           frame_material: Frame material
+          free_to_use: Bike Book data is free to use under CC BY-SA 4.0.
           handlebar_type: Handlebar type
           human_powered: Human powered (Acoustic)
           jurisdiction: Jurisdiction
+          learn_how_to_use_it: Learn how to use it
+          learn_or_view_html: "%{learn_how_to_use_it} or %{view_the_raw_data}."
           loading: Loading the catalog…
           loading_placeholder: Loading…
           manufacturers: Manufacturers
@@ -58,4 +61,5 @@ en:
           us_class_2: US Class 2
           us_class_3: US Class 3
           vehicle_types: Vehicle types
+          view_the_raw_data: view the raw data
           year: Year

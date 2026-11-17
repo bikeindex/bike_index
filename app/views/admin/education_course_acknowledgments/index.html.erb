@@ -4,6 +4,8 @@
   viewing: controller_name.humanize,
   chart_collection: @render_chart && matching_education_course_acknowledgments,
 )) do |skeleton| %>
+  <% skeleton.with_nav_item { render(UI::ButtonLink::Component.new(text: "Courses in progress", href: admin_b_params_path(search_education_course_in_progress: true, organization_id: params[:organization_id]), size: :sm)) } %>
+
   <% skeleton.with_nav_item do %>
     <%= render(UI::Dropdown::Component.new(
       name: @status.present? ? "#{@status.titleize} only" : "All statuses",

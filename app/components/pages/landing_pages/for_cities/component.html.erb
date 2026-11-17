@@ -69,169 +69,56 @@
           class: "tw:h-auto tw:w-full tw:max-w-28 tw:justify-self-end tw:min-[640px]:max-w-40 tw:min-[900px]:col-start-2 tw:min-[900px]:row-span-2 tw:min-[900px]:row-start-1 tw:min-[900px]:max-w-none" %>
     </div>
 
-    <div
-      class="
-        tw:mx-auto tw:grid tw:w-full tw:max-w-[980px] tw:cursor-default
-        tw:grid-cols-[1fr_auto_1fr] tw:items-stretch tw:select-none
-      "
-    >
-      <div class="<%= PHONE_CLASSES %>" aria-hidden="true" inert>
-        <div class="<%= PHONE_SCREEN_CLASSES %>">
-          <%= phone_status_bar %>
-
-          <div class="tw:flex tw:flex-col tw:gap-3 tw:px-5.5 tw:pt-3 tw:pb-6">
-            <div class="tw:grid tw:grid-cols-2 tw:gap-1.5">
-              <span class="tw:h-1 tw:rounded-sm tw:bg-purple-500"></span>
-              <span class="tw:h-1 tw:rounded-sm tw:bg-gray-300"></span>
-            </div>
-
-            <div
-              class="
-                tw:text-[11px] tw:font-bold tw:tracking-widest
-                tw:text-[#9aa3ae] tw:uppercase
-              "
-            >
-              <%= translation(".mock_bike_info") %>
-            </div>
-
-            <% [[translation(".mock_manufacturer"), "Trek", nil], [translation(".mock_vehicle_type"), translation(".mock_traditional_bike"), translation(".mock_traditional_bike_note")]].each do |label, value, note| %>
-              <div class="tw:flex tw:flex-col tw:gap-1.25">
-                <span class="tw:text-[13px]"><%= label %> <span class="tw:text-[#cc0000]">*</span></span>
-
-                <span
-                  class="
-                    tw:flex tw:items-center tw:justify-between
-                    tw:rounded-[5px] tw:border tw:border-[#d5d9de]
-                    tw:bg-white tw:px-3 tw:py-2.25 tw:text-sm
-                  "
-                >
-                  <span><%= value %> <span class="tw:text-[#9aa3ae]"><%= note %></span></span>
-                  <%= helpers.inline_svg_tag("icons/x.svg", class: "tw:size-3.5 tw:text-gray-500", aria_hidden: true) %>
-                </span>
-              </div>
-            <% end %>
-
-            <div class="tw:flex tw:flex-col tw:gap-0.75">
-              <div class="tw:flex tw:items-center tw:gap-2 tw:text-[13px]">
-                <span
-                  class="
-                    tw:flex tw:size-3.75 tw:flex-none tw:items-center
-                    tw:justify-center tw:rounded-[3px] tw:bg-blue-600
-                    tw:text-white
-                  "
-                >
-                  <%= helpers.inline_svg_tag("icons/check.svg", class: "tw:size-2.5 tw:stroke-[4]", aria_hidden: true) %>
-                </span>
-
-                <%= helpers.inline_svg_tag("icons/bolt.svg", class: "tw:size-3.5 tw:text-[#f5b400]", aria_hidden: true) %>
-                <%= translation(".mock_electric") %>
-              </div>
-
-              <div class="tw:text-xs tw:text-gray-500">
-                <%= translation(".mock_electric_help") %>
-              </div>
-            </div>
-
-            <div
-              class="
-                tw:rounded-md tw:bg-blue-600 tw:py-2.25 tw:text-center
-                tw:text-sm tw:text-white
-              "
-            >
-              <%= translation(".mock_next") %>
-            </div>
-          </div>
-        </div>
-      </div>
-
+    <% if course_pages.any? %>
       <div
         class="
-          tw:flex tw:flex-none tw:items-center tw:justify-center tw:px-1.5
-          tw:text-lg tw:font-bold tw:text-purple-500 tw:sm:px-3.5
-          tw:sm:text-2xl
+          tw:mx-auto tw:grid tw:w-full tw:max-w-[980px] tw:cursor-default
+          tw:grid-cols-[1fr_auto_1fr] tw:items-stretch tw:select-none
         "
-        aria-hidden="true"
       >
-        →
-      </div>
+        <div class="<%= PHONE_CLASSES %>" aria-hidden="true" inert>
+          <div class="<%= PHONE_SCREEN_CLASSES %>">
+            <%= phone_status_bar %>
 
-      <div class="<%= PHONE_CLASSES %>" aria-hidden="true" inert>
-        <div class="<%= PHONE_SCREEN_CLASSES %>">
-          <%= phone_status_bar %>
+            <div class="<%= PHONE_CONTENT_CLASSES %>">
+              <%= render(Pages::Register::Parts::Progress::Component.new(flow: register_flow, step: 1)) %>
 
-          <div class="tw:flex tw:flex-col tw:gap-2.5 tw:px-5.5 tw:pt-3 tw:pb-6">
-            <div class="tw:grid tw:grid-cols-6 tw:gap-1.25">
-              <% 6.times do |index| %>
-                <span class="tw:h-1 tw:rounded-sm <%= (index < 3) ? "tw:bg-purple-500" : "tw:bg-gray-300" %>"></span>
+              <%# fields rather than a form: step 1's parts, without the register page's own behavior %>
+              <%= fields(:b_param, model: step_1_b_param) do |form| %>
+                <%= render(Pages::Register::Parts::Step1Fields::Component.new(b_param: step_1_b_param, form:, organization: nil)) %>
+                <%= render(Pages::Register::Parts::Step1Submit::Component.new(b_param: step_1_b_param, flow: register_flow)) %>
               <% end %>
             </div>
+          </div>
+        </div>
 
-            <div class="tw:text-[11px] tw:font-semibold tw:text-gray-500">
-              <%= helpers.inline_svg_tag("icons/check.svg", class: "tw:inline tw:size-3 tw:stroke-3 tw:text-[#2e8b57]", aria_hidden: true) %>
-              <%= translation(".mock_progress") %>
-            </div>
+        <div
+          class="
+            tw:flex tw:flex-none tw:items-center tw:justify-center tw:px-1.5
+            tw:text-lg tw:font-bold tw:text-purple-500 tw:sm:px-3.5
+            tw:sm:text-2xl
+          "
+          aria-hidden="true"
+        >
+          →
+        </div>
 
-            <div>
-              <%= render(UI::Badge::Component.new(text: translation(".mock_detected"), color: :warning, size: :xs)) %>
-            </div>
+        <div class="<%= PHONE_CLASSES %>" aria-hidden="true" inert>
+          <div class="<%= PHONE_SCREEN_CLASSES %>">
+            <%= phone_status_bar %>
 
-            <div>
-              <div class="tw:text-[19px] tw:font-bold">
-                <%= unbroken_hyphen(translation(".mock_title")) %>
-              </div>
+            <div class="<%= PHONE_CONTENT_CLASSES %>">
+              <%= render(Pages::Register::Parts::Progress::Component.new(flow: register_flow, step: BikeServices::Register.step_for_page_index(0))) %>
 
-              <div class="tw:mt-0.5 tw:text-[13px] tw:text-gray-500">
-                <%= translation(".mock_sub") %>
-              </div>
-            </div>
+              <%= render(Pages::Register::Parts::AcknowledgmentProgress::Component.new(number: 1,
+              total: BikeServices::Register.acknowledgment_step_count(course))) %>
 
-            <div
-              class="
-                tw:text-[11px] tw:font-bold tw:tracking-widest
-                tw:text-[#9aa3ae] tw:uppercase
-              "
-            >
-              <%= translation(".mock_batteries") %>
-            </div>
-
-            <div
-              class="
-                tw:overflow-hidden tw:rounded-[10px] tw:border
-                tw:border-gray-200 tw:bg-white
-              "
-            >
-              <% [translation(".mock_rule_charger"), translation(".mock_rule_certified"), translation(".mock_rule_report")].each do |rule| %>
-                <div
-                  class="
-                    tw:flex tw:items-start tw:gap-2.5 tw:px-3 tw:py-2.5
-                    tw:text-[13px] tw:leading-[1.45] tw:text-gray-800
-                    tw:not-first:border-t tw:not-first:border-gray-200
-                  "
-                >
-                  <span
-                    class="
-                      tw:mt-0.5 tw:size-3.5 tw:flex-none tw:rounded-[3px]
-                      tw:border-[1.5px] tw:border-[#9aa3ae] tw:bg-white
-                    "
-                  ></span>
-
-                  <span><%= rule %></span>
-                </div>
-              <% end %>
-            </div>
-
-            <div
-              class="
-                tw:rounded-md tw:bg-[#7fb2dd] tw:py-2.25 tw:text-center
-                tw:text-sm tw:text-white
-              "
-            >
-              <%= translation(".mock_continue") %>
+              <%= render(Pages::Register::Parts::PageContent::Component.new(page: course_pages.first, first: true, heading_tag: :h2)) %>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    <% end %>
   </div>
 </section>
 

@@ -18,7 +18,7 @@ module SharedBlocks
           when "edits", "theft_alerts", "recovery"
             :edit_bike
           when "info"
-            :content unless %w[donate terms security vendor_terms privacy support_the_index resources].include?(action_name)
+            :content unless %w[donate donate_year_end terms security vendor_terms privacy support_the_index resources].include?(action_name)
           when "welcome"
             :content if action_name == "goodbye"
           when "organizations"
