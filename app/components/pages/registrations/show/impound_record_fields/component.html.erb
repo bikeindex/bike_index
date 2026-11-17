@@ -3,5 +3,21 @@
   <%= render(UI::DefinitionList::Row::Component.new(label: translation(".impounded_by"), value: impounded_by, render_with_no_value: true, no_value_text: "-")) %>
   <%= render(UI::DefinitionList::Row::Component.new(label: translation(".status"), value: @impound_record.status_humanized)) %>
   <%= render(UI::DefinitionList::Row::Component.new(label: translation(".last_update_by"), value: last_update_by, render_with_no_value: true, no_value_text: "-")) %>
-  <%= render(UI::DefinitionList::Row::Component.new(label: translation(".impounded_from"), value: @impound_record.formatted_address_string, render_with_no_value: true, no_value_text: "-")) %>
+  <%= render(UI::DefinitionList::Row::Component.new(label: translation(".location"), value: @impound_record.location&.name)) %>
+  <%= render(UI::DefinitionList::Row::Component.new(label: translation(".impounded_from"), value: impounded_from, render_with_no_value: true, no_value_text: "-")) %>
+
+  <% if noted_updates.any? %>
+    <%= render(UI::DefinitionList::Row::Component.new(label: translation(".notes"), full_width: true)) do %>
+      <% noted_updates.each do |impound_record_update| %>
+        <div class="tw:pt-2 tw:first:pt-0">
+          <%= render(UI::UserTextBlockDisplay::Component.new(text: impound_record_update.notes, max_height_class: "")) %>
+
+          <small class="tw:opacity-65">
+            <%= render(UI::Time::Component.new(time: impound_record_update.created_at)) %>
+            <%= impound_record_update.user&.display_name %>
+          </small>
+        </div>
+      <% end %>
+    <% end %>
+  <% end %>
 <% end %>

@@ -9,4 +9,6 @@ en:
             impounded_by: Impounded by
             impounded_from: Impounded from
             last_update_by: Last update by
+            location: Location
+            notes: Notes
             status: Status
