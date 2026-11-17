@@ -208,6 +208,38 @@ RSpec.describe BikebookController, type: :request do
     end
   end
 
+  describe "up", vcr: {cassette_name: "bikebook-up"} do
+    # WebMock stubs outlive their examples here, and answer ahead of the cassette
+    before do
+      WebMock.reset!
+      Rails.cache.clear
+    end
+
+    it "is ok, in the format the browser's reader reads" do
+      get "/up/bikebook"
+      expect(response).to have_http_status(:ok)
+      %w[catalog_worker similarity].each do |reader|
+        expect(Rails.root.join("app/javascript/bikebook/#{reader}.js").read).to include("const FORMAT = #{Integrations::Bikebook::Catalog::FORMAT}\n")
+      end
+    end
+
+    context "with the catalog in a format the reader doesn't read" do
+      it "is unavailable" do
+        stub_const("Integrations::Bikebook::Catalog::FORMAT", 2)
+        get "/up/bikebook"
+        expect(response).to have_http_status(:service_unavailable)
+      end
+    end
+
+    context "with no catalog published", vcr: {cassette_name: "bikebook-up_not_found"} do
+      it "is unavailable" do
+        stub_const("Integrations::Bikebook::Catalog::URL", "https://bikebook-catalog.bikeindex.org/not_a_catalog/")
+        get "/up/bikebook"
+        expect(response).to have_http_status(:service_unavailable)
+      end
+    end
+  end
+
   describe "license" do
     let(:section_ids) do
       %w[what-you-can-do what-you-need-to-do how-to-credit share-alike what-this-license-covers disclaimer
