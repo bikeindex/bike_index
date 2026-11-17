@@ -3,7 +3,7 @@ module Admin
     before_action :find_education_course, only: %i[new create]
     before_action :find_page, only: %i[edit update destroy]
 
-    # A blank page to fill in; it's only persisted once it has a title and rules
+    # A blank page to fill in; it's only persisted once it has a title and bullets
     def new
       @page = @education_course.education_course_pages.new
       render :edit

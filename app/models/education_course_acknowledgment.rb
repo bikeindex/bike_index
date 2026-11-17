@@ -1,6 +1,6 @@
-# The record that a registrant agreed to e-vehicle safety rules.
+# The record that a registrant agreed to an e-vehicle education course.
 # Outlives the registration it came from - the b_param is swept once its bike exists.
-# Pending (no acknowledged_at) from when the bike is created until they're agreed to, which
+# Pending (no acknowledged_at) from when the bike is created until it's agreed to, which
 # holds the bike's finished registration email back.
 # What was agreed to is read off the course, which activation froze.
 # == Schema Information
@@ -44,7 +44,7 @@ class EducationCourseAcknowledgment < ApplicationRecord
   scope :for_organization, ->(organization) {
     joins(:education_course).where(education_courses: {organization_id: organization})
   }
-  # What an organization's bike agreed to: its rules, or the default course's where it stood in
+  # What an organization's bike agreed to: its education course, or the default course where it stood in
   scope :for_organization_or_default, ->(organization) {
     joins(:education_course).where(education_courses: {organization_id: [organization.id, nil]})
   }
@@ -62,8 +62,8 @@ class EducationCourseAcknowledgment < ApplicationRecord
       create(education_course: course, b_param:, owner_email: b_param.owner_email)
     end
 
-    # Whether the finished registration email is still waiting on the rules. Only the initial
-    # ownership waits: the bike came before them, so a transfer since isn't owed anything
+    # Whether the finished registration email is still waiting on the education course. Only the initial
+    # ownership waits: the bike came before it, so a transfer since isn't owed anything
     def holding_email?(ownership)
       ownership.initial? && ownership.bike&.unfinished_registration?
     end
@@ -100,7 +100,7 @@ class EducationCourseAcknowledgment < ApplicationRecord
     true # Not release_held_email's job id - callers ask whether the write succeeded
   end
 
-  # Given up on rather than agreed to, so the record goes with the rules it was owed against
+  # Given up on rather than agreed to, so the record goes with the education course it was owed against
   def abandon!
     return false unless destroy
 

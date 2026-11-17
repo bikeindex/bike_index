@@ -694,7 +694,7 @@ RSpec.describe BikeServices::Register do
           primary_frame_color_id: FactoryBot.create(:color).id, status: "status_with_owner")
       end
 
-      # Only the switch leaves the rules to the owner - a caller without a course doesn't
+      # Only the switch leaves the education course to the owner - a caller without a course doesn't
       it "doesn't hold the bike for the owner without separate attestation" do
         b_param.update(creator_id: FactoryBot.create(:user_confirmed).id)
         bike = described_class.complete(b_param, user: nil, course: nil, ip_address: nil)

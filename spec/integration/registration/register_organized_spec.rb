@@ -154,7 +154,7 @@ RSpec.describe "Register flow, with an organization", :js, type: :system do
       click_button "Continue"
 
       expect(page).to have_content("Campus rules")
-      # The organization owns this page's rules, so they carry its name
+      # The organization owns this page's bullets, so they carry its name
       expect(page).to have_content("Brakebills")
       check "Dismount in posted zones"
       click_button "Continue"
@@ -209,9 +209,9 @@ RSpec.describe "Register flow, with an organization", :js, type: :system do
         fill_in "b_param[owner_email]", with: owner_email
         expect(page).to have_field("bike[user_name]")
 
-        # Separate attestation leaves the rules to an owner who isn't the member
+        # Separate attestation leaves the education course to an owner who isn't the member
         click_link "Registration form settings"
-        # The old view always leaves the rules to the owner
+        # The old view always leaves the education course to the owner
         check "Use the old registration page"
         expect(page).to have_checked_field("Registrant fills out the registration attestation separately", disabled: true)
         expect(page).to have_unchecked_field("Single page registration form", disabled: true)

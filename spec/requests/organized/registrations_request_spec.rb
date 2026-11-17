@@ -467,7 +467,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         get "/o/#{current_organization.to_param}/bikes/incompletes"
         expect(assigns(:b_params)).to eq([b_param])
 
-        # Step 2 creates the bike ahead of the safety rules - registered, not incomplete
+        # Step 2 creates the bike ahead of the education course - registered, not incomplete
         patch "/register", params: {b_param_token: b_param.id_token,
                                     bike: {primary_frame_color_id: FactoryBot.create(:color).id, serial_number: "XYZ 123",
                                            status: "status_with_owner", user_name: "Sally Rider"}}
@@ -791,7 +791,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         follow_redirect!
         expect(response.body).to include "the safety rules to agree to"
 
-        # The claim email waits on the rules, and the rules email is what goes out
+        # The claim email waits on the course, and the course's email is what goes out
         expect { EmailJobs::OwnershipInvitationJob.drain }.to_not change(ActionMailer::Base.deliveries, :count)
         expect { EmailJobs::PartialRegistrationJob.drain }.to change(ActionMailer::Base.deliveries, :count).by 1
         expect(ActionMailer::Base.deliveries.last.to).to eq([owner_email])
