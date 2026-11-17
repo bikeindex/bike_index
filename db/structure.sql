@@ -8088,8 +8088,8 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261117051637'),
 ('20261116222651'),
-('20261116174153'),
 ('20261111155046'),
 ('20261110154720'),
 ('20261106120000'),
