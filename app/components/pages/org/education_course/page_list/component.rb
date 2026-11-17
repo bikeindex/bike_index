@@ -4,7 +4,7 @@ module Pages
   module Org
     module EducationCourse
       module PageList
-        # A course's pages, each collapsing to reveal its rules. An editable one
+        # A course's pages, each collapsing to reveal its bullets. An editable one
         # drags to reorder and links into each page.
         class Component < ApplicationComponent
           # editable: admin's read-only screen lists a draft without its controls

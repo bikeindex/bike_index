@@ -188,7 +188,7 @@ class RegisterController < ApplicationController
     # Someone else's session stays theirs - the registration is still finished for the
     # address that was emailed, it just isn't that account's own
     if current_user.present?
-      # The rules are the owner's to agree to, and spending the link here would leave them no way in
+      # The education course is the owner's to agree to, and spending the link here would leave them no way in
       if @b_param.rules_left_to_owner?(current_user) && @b_param.acknowledgment_pending?
         flash[:error] = translation(:sign_out_to_agree, email: current_user.email)
         return redirect_to(confirm_register_path(b_param_token: @b_param.id_token,
@@ -199,7 +199,7 @@ class RegisterController < ApplicationController
     elsif sign_in_confirmed_user.blank?
       return redirect_to_current_step
     else
-      # The filter resolved it signed out, which separate attestation answers with no rules
+      # The filter resolved it signed out, which separate attestation answers with no education course
       find_education_course
     end
 
@@ -298,7 +298,7 @@ class RegisterController < ApplicationController
       separate_attestation: register_settings[:separate_attestation])
   end
 
-  # All resuming changes today: rules the organization has replaced since start over.
+  # All resuming changes today: an education course the organization has replaced since starts over.
   # No course to resume on is the common case, and returns what was already resolved
   def resume_registration
     @education_course, restarted = BikeServices::Register
@@ -346,7 +346,7 @@ class RegisterController < ApplicationController
     # The session follows whichever registration the token named, so the next tokenless
     # request stays on it - until its bike exists, when there's nothing left to go back
     # to and the bare /register should start the next registration instead. A bike whose
-    # rules were left to its owner is finished for everyone else
+    # education course was left to its owner is finished for everyone else
     if @b_param.finished_registration? || (@b_param.with_bike? && @b_param.rules_left_to_owner?(current_user))
       session.delete(:register_b_param_token)
     else
@@ -375,7 +375,7 @@ class RegisterController < ApplicationController
     end
   end
 
-  # Not for an owner finishing the safety rules a member left them
+  # Not for an owner finishing the education course a member left them
   def single_page_organization
     return if current_user.blank? || @b_param.creator_id != current_user.id
 

@@ -61,8 +61,8 @@ module Pages
             translation(".we_will_keep_watch", bike_display: @bike.mnfg_name)
           end
 
-          # The separate attestation switch left the safety rules to the owner, whose claim
-          # email waits on them
+          # The separate attestation switch left the education course to the owner, whose claim
+          # email waits on it
           def rules_sent? = !self_made? && @b_param.acknowledgment_pending?
 
           def owner_email_tag

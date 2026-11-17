@@ -26,7 +26,7 @@ module Emails
       def tokenized_url
         return OrgServices::EmailPreview::TOKEN_PATH if @email_preview
 
-        # The rules are only in the register flow, wherever the registration started
+        # The education course is only in the register flow, wherever the registration started
         return new_bike_url(b_param_token: @b_param.id_token) unless @b_param.register_flow? || rules_owed?
 
         # Separate attestation's link signs the owner in, since the member is who started it

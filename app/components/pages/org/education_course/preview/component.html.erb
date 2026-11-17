@@ -13,7 +13,7 @@
         spinner: true, disabled: true, html_class: "tw:w-full", data: {"register--acknowledgment-target": "submit"}) %>
     <% end %>
   <% else %>
-    <%# Continue is gated on checking every rule, the same as the real flow %>
+    <%# Continue is gated on checking every bullet, the same as the real flow %>
     <%= form_with url: course_path, method: :get, data: {controller: "register--acknowledgment"} do %>
       <%= hidden_field_tag :page, page_param(@index + 1) %>
 

@@ -94,7 +94,7 @@ RSpec.describe EducationCourseAcknowledgment, type: :model do
       expect(enqueued).to eq([[initial_ownership.id]])
     end
 
-    # A blanket release on save would send it before the rules were ever agreed to
+    # A blanket release on save would send it before the education course was ever agreed to
     it "stays held through a write that isn't the agreement" do
       Sidekiq::Job.clear_all
       pending.update(owner_email: "elsewhere@example.com")
