@@ -1,7 +1,7 @@
 // Searches the published catalog off the main thread, by the rules the catalog's own search follows
 /* global self */
 
-const FORMAT = 2
+const FORMAT = 3
 
 let models = []
 let byId = new Map()
