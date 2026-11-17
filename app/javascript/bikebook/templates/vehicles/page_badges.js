@@ -28,13 +28,15 @@ export const ulBadges = ({ ul2849, ul2271 }) => {
   return copies('data-bikebook-ul-badge', certified.length ? certified : ['unknown'], 'tw:flex tw:flex-wrap tw:gap-2')
 }
 
-// The standards the motors are certified to: UL 2849's and 2271's statuses, certified or not known to be, and any other
-export const certificationsOf = (listed) => {
+// The motors' `certifications`, each a comma-separated list: UL 2849's and 2271's statuses, certified or not known to
+// be, and any other they list
+export const certificationsOf = (certifications) => {
+  const listed = [...new Set(certifications.flatMap((each) => String(each ?? '').split(/,\s*/)).filter(Boolean))]
   const status = (standard) => listed.includes(`UL ${standard}`) ? 'certified' : 'unknown'
   return { ul2849: status(2849), ul2271: status(2271), others: listed.filter((each) => !/^UL (2849|2271)$/.test(each)).join(', ') }
 }
 
-// As /ebike-rules shows them: UL 2849's and 2271's badges, then any other of the motors' `certifications`
+// As /ebike-rules shows them: UL 2849's and 2271's badges, then any other the motors' `certifications` list
 export const certificationBadges = (certifications) => {
   const { ul2849, ul2271, others } = certificationsOf(certifications)
   return html`${ulBadges({ ul2849, ul2271 })}${others ? html`<span class="tw:mt-2 tw:block">${others}</span>` : nothing}`

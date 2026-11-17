@@ -5,7 +5,7 @@ import { missing } from 'bikebook/templates/helpers'
 import { table } from 'bikebook/templates/ui/table'
 import { tooltip } from 'bikebook/templates/ui/tooltip'
 import { seriesBorders, wheelName } from 'bikebook/templates/vehicles/geometry_overlay'
-import { cargoAt, isCargo, tireWidth, typeLabel, weightLimit, wheelsAt } from 'bikebook/templates/vehicles/model_viewer'
+import { cargoAt, isCargo, tireWidth, typeLabel, wheelsAt } from 'bikebook/templates/vehicles/model_viewer'
 import { vehicleTitle } from 'bikebook/templates/vehicles/vehicle_title'
 import { array, isNumber, join, present, slice, sum } from 'bikebook/templates/values'
 
@@ -14,8 +14,6 @@ const BETTER = 'tw:text-green-700 tw:dark:text-green-400'
 const WORSE = 'tw:text-red-700 tw:dark:text-red-400'
 // the size's, so it closes the geometry
 const WEIGHT = { label: 'Weight', read: (vehicle, size) => size?.geometry?.total_weight, better: -1, unit: 'kg' }
-const LIMITS = [['rider', 'Max rider weight'], ['payload', 'Max payload (rider + cargo)']]
-  .map(([load, label]) => ({ label, read: (vehicle, size) => weightLimit(vehicle, load, size), better: 1, unit: 'kg' }))
 
 // The compared models' sizes, wheels and frames side by side in their `sizes`, each column's numbers against the
 // first's, keyed to the overlay by `frames`. `beside` the overlay, it shares a row with it once the window is wide enough.
@@ -125,7 +123,7 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], marke
   const cargos = new Map(named.map((vehicle, index) => [vehicle, cargoAt(presenter, vehicles[index].data, sizes[index])]))
   const cargoRows = vehicles.some(({ data }) => isCargo(data)) ? records([{ label: 'Cargo', read: (vehicle) => cargos.get(vehicle) }]) : []
   const typeRows = new Set(named.map(typeLabel)).size > 1 ? records([{ label: 'Vehicle type', read: typeLabel }]) : []
-  const rows = [...typeRows, ...records(wheelRows), ...cargoRows, ...sizeRows, ...records([...geometry, length, WEIGHT, ...LIMITS])]
+  const rows = [...typeRows, ...records(wheelRows), ...cargoRows, ...sizeRows, ...records([...geometry, length, WEIGHT])]
   if (rows.length === 0) return nothing
 
   // Out to the window's edges, the table at least the page's 78rem column and wider as its vehicles need, scrolling
