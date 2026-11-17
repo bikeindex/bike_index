@@ -43,8 +43,7 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
     click_link text
   end
 
-  # Turbo Drive is off, so the click itself waits on the POST, its redirect and the
-  # page render - past its default 2.2s when the machine is busy
+  # Turbo Drive is off, so the click itself waits out the POST and its redirected page
   def submit_notification = using_wait_time(10) { click_button "Create parking notification" }
 
   def row_for(notification) = "tr:has(> td > a[href$='/parking_notifications/#{notification.id}'])"
