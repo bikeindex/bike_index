@@ -1,5 +1,6 @@
 import { builtWheel, frameGeometry, leg, radians, STANDOVER_X } from 'bikebook/frame_geometry'
-import { array, catalogValue, isNumber } from 'bikebook/templates/values'
+import { catalogValue } from 'bikebook/legacy_shape'
+import { array, isNumber } from 'bikebook/templates/values'
 
 // Each vehicle type's drawing, in mm with y up from the ground and the rider facing +x, as views of shapes and the
 // dimensions lettered on them, keyed type/type_detail for a detail drawn its own way. A figure the size doesn't list is

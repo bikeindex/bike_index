@@ -1,13 +1,14 @@
 import { html, nothing } from 'lit-html'
 import { listedFigure } from 'bikebook/cycle_drawings'
 import { OVERALL_LENGTH_ESTIMATE } from 'bikebook/frame_geometry'
+import { catalogValue, currentShape } from 'bikebook/legacy_shape'
 import { missing } from 'bikebook/templates/helpers'
 import { table } from 'bikebook/templates/ui/table'
 import { tooltip } from 'bikebook/templates/ui/tooltip'
 import { seriesBorders, wheelName } from 'bikebook/templates/vehicles/geometry_overlay'
 import { cargoAt, isCargo, tireWidth, typeLabel, weightLimit, wheelsAt } from 'bikebook/templates/vehicles/model_viewer'
 import { vehicleTitle } from 'bikebook/templates/vehicles/vehicle_title'
-import { array, catalogValue, isNumber, join, present, sum } from 'bikebook/templates/values'
+import { array, isNumber, join, present, sum } from 'bikebook/templates/values'
 
 const GEOMETRY = ['reach', 'stack', 'top_tube_effective', 'head_angle', 'seat_angle', 'chainstay', 'standover', 'wheelbase']
 const BETTER = 'tw:text-green-700 tw:dark:text-green-400'
@@ -24,7 +25,7 @@ const LIMITS = [['rider', 'Max rider weight'], ['payload', 'Max payload (rider +
 // none for a value that isn't compared. `parts` splits a value whose parts are each compared, and `amount` shows a
 // difference, given the number it's of
 export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], market, highlight, beside = false, corner = nothing }) => {
-  const named = vehicles.map(({ data }) => presenter.named(presenter.kit.schemas.vehicle, data))
+  const named = vehicles.map(({ data }) => presenter.named(presenter.kit.schemas.vehicle, currentShape(data)))
   const [first] = named
   const show = (row, value, vehicle) => row.format?.(value, vehicle, presenter) ?? (row.unit ? presenter.measurement(value, row.unit, row.key) : value)
   const geometry = GEOMETRY.map((key) => {

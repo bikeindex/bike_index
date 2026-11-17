@@ -1,4 +1,5 @@
-import { array, catalogValue, isNumber } from 'bikebook/templates/values'
+import { catalogValue } from 'bikebook/legacy_shape'
+import { array, isNumber } from 'bikebook/templates/values'
 import { TYPICAL_GEOMETRY } from 'bikebook/typical_geometry'
 
 // figures that size the front triangle, without any of which a frame would be all estimate - but a BMX's, whose typical

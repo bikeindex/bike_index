@@ -492,6 +492,19 @@ RSpec.describe "Bike Book", :js, type: :system do
         return [...rendered.querySelector('h3').parentElement.querySelectorAll('dl > div')].map((row) => [...row.children].map((each) => each.textContent.replace(/\\s+/g, ' ').trim()))
       })()
     JS
+    # a model published before 1.0.0, its battery's voltage and cells read out of its battery info
+    legacy_battery = page.evaluate_script(<<~JS)
+      (async () => {
+        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
+        const [{ VehiclePresenter }, { motorsOf }, { fragmentOf }, { kit }, vocabulary] = await Promise.all([import('bikebook/vehicle_presenter'),
+          import('bikebook/templates/vehicles/model_viewer'), import('bikebook/render'), catalog('kit.json'), catalog('vocabulary.json')])
+        const motor = { battery_size: 733, battery_chemistry: 'li-ion', battery_info: '36V, 20Ah, LG 21700 cells', charging_time: 300, certification: 'UL 2849, UL 2271' }
+        const rendered = fragmentOf(motorsOf({ presenter: new VehiclePresenter(kit, vocabulary), data: { motors: [motor] }, others: [] }))
+        const battery = [...rendered.querySelectorAll('h3')].find((heading) => /^battery$/i.test(heading.textContent.trim())).parentElement
+        return [...battery.querySelectorAll('dl > div')].map((row) => [...row.children].map((each) => each.textContent.replace(/\\s+/g, ' ').trim()))
+      })()
+    JS
+    expect(legacy_battery).to match([["Capacity", /\A733\W*Wh, 36\W*V Li-ion\z/], ["Charging time", "5 h"], ["Cells", "LG 21700"]])
     without_motor = page.evaluate_script(<<~JS)
       (async () => {
         const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())

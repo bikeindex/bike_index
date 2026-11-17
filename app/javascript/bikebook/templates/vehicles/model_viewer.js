@@ -1,5 +1,6 @@
 import { html, nothing, render } from 'lit-html'
 import { frameGeometry, OVERALL_LENGTH_ESTIMATE } from 'bikebook/frame_geometry'
+import { catalogValue, currentShape } from 'bikebook/legacy_shape'
 import { missing, numberDisplay } from 'bikebook/templates/helpers'
 import { inlineBadge } from 'bikebook/templates/ui/badge'
 import { collapse } from 'bikebook/templates/ui/collapse'
@@ -16,7 +17,7 @@ import { certificationBadges, certificationsOf, classBadges } from 'bikebook/tem
 import { removeLink } from 'bikebook/templates/vehicles/remove_link'
 import { manufacturerLine, modelLine } from 'bikebook/templates/vehicles/vehicle_title'
 import { disclosure, section } from 'bikebook/templates/vehicles/section'
-import { andSentence, array, blank, catalogValue, compact, equal, except, isNumber, join, partsOf, presence, present, slice, sum, truthy, upcaseFirst } from 'bikebook/templates/values'
+import { andSentence, array, blank, compact, equal, except, isNumber, join, partsOf, presence, present, slice, sum, truthy, upcaseFirst } from 'bikebook/templates/values'
 
 // Ruby's \s, which a thin space isn't
 const KEEP_TOGETHER = /^([^]*[ \t\r\n\f\v])?([^ \t\r\n\f\v]+)$/
@@ -202,11 +203,12 @@ class ModelViewer {
       alt="" class="tw:aspect-square tw:h-16 tw:min-h-0 tw:w-auto" src=${this.kit.placeholder_url}><span class="tw:text-sm tw:leading-none">No photo</span></div></div>`
   }
 
-  // Values by their vocabulary names, the parts in the box apart, then the frame's mount labels and each suspension's values
+  // In the current schema's shape, values by their vocabulary names, the parts in the box apart, then the frame's mount
+  // labels and each suspension's values
   #normalize (data) {
     const components = array(data.components)
     const vehicle = {
-      ...this.presenter.named(this.kit.schemas.vehicle, { ...data, components: components.filter(({ type }) => type !== INCLUDED) }),
+      ...this.presenter.named(this.kit.schemas.vehicle, { ...currentShape(data), components: components.filter(({ type }) => type !== INCLUDED) }),
       included: components.filter(({ type }) => type === INCLUDED)
     }
     const frame = vehicle.frame && { ...vehicle.frame, ...this.#frameMounts(vehicle.frame, vehicle.sizes) }
@@ -445,8 +447,8 @@ class ModelViewer {
   // rider limit, its sizes' range
   #cargoWeight () {
     const { presenter } = this
-    const [maxLoad, gross, cargo] = ['payload', 'gross', 'cargo'].map((load) => weightLimit(this.data, load))
-    const riders = limitsOf(this.data, 'rider').map(({ weight }) => weight)
+    const [maxLoad, gross, cargo] = ['payload', 'gross', 'cargo'].map((load) => weightLimit(this.vehicle, load))
+    const riders = limitsOf(this.vehicle, 'rider').map(({ weight }) => weight)
     const riderLimit = () => join(['Max rider weight ', join([...new Set([Math.min(...riders), Math.max(...riders)])].map((kg) => presenter.measurement(kg, 'kg')), '–')])
     const [limit, label, text] = isNumber(maxLoad) ? [maxLoad, 'Max load', MAX_LOAD] : [gross, 'Gross weight rating', GROSS_WEIGHT]
     if (!isNumber(limit)) return riders.length ? riderLimit() : null

@@ -1,4 +1,5 @@
-import { array, catalogValue } from 'bikebook/templates/values'
+import { catalogValue } from 'bikebook/legacy_shape'
+import { array } from 'bikebook/templates/values'
 import { storage } from 'utils/storage'
 
 const KEY = 'bikebook:sizes'
