@@ -208,11 +208,8 @@ RSpec.describe BikebookController, type: :request do
     end
   end
 
-  describe "up" do
-    let(:catalog_status) { 200 }
-
-    before { stub_bikebook_catalog(status: catalog_status) }
-    after { WebMock.reset! }
+  describe "up", vcr: {cassette_name: "bikebook-up"} do
+    before { Rails.cache.clear }
 
     it "is ok, in the format the browser's reader reads" do
       get "/up/bikebook"
@@ -222,18 +219,17 @@ RSpec.describe BikebookController, type: :request do
       end
     end
 
-    context "with the catalog unreachable" do
-      let(:catalog_status) { 503 }
-
+    context "with the catalog in a format the reader doesn't read" do
       it "is unavailable" do
+        stub_const("Integrations::Bikebook::Catalog::FORMAT", 2)
         get "/up/bikebook"
         expect(response).to have_http_status(:service_unavailable)
       end
     end
 
-    context "with the catalog in a format the reader doesn't read" do
+    context "with no catalog published", vcr: {cassette_name: "bikebook-up_not_found"} do
       it "is unavailable" do
-        stub_const("Integrations::Bikebook::Catalog::FORMAT", 2)
+        stub_const("Integrations::Bikebook::Catalog::URL", "https://bikebook-catalog.bikeindex.org/not_a_catalog/")
         get "/up/bikebook"
         expect(response).to have_http_status(:service_unavailable)
       end
