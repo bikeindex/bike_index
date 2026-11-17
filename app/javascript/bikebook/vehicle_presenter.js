@@ -29,9 +29,10 @@ const FEET_AND_INCHES = ["'", '"']
 export class VehiclePresenter {
   constructor (kit, vocabulary) {
     // an extra's bb as the catalog's own labels write "BB Drop", standover above it short, as its tooltip
-    // explains it, the actual seat angle without the catalog's note on it, and volts, which a kit before 1.0.0 has no unit for
+    // explains it, and the actual seat angle without the catalog's note on it
     this.kit = {
       ...kit,
+      // TODO: once the catalog publishes its 1.0.0 kit, which has volts, take its units as they are
       units: { v: { label: 'V', name: 'volts' }, ...kit.units },
       acronyms: { ...kit.acronyms, bb: 'BB' },
       geometry: { ...kit.geometry, labels: { ...kit.geometry.labels, standover_above_bb: 'Standover above BB', seat_angle_actual: 'Seat Angle (actual)' } }
@@ -79,6 +80,11 @@ export class VehiclePresenter {
       if (names) return [key, Array.isArray(value) ? value.map((item) => names[item] ?? item) : names[value] ?? value]
       return [key, value]
     }))
+  }
+
+  // TODO: once the catalog publishes its 1.0.0 kit, whose mounts have an interface field, `named` names it and this goes
+  interfaceName (slug) {
+    return this.vocabulary.names[INTERFACES][slug] ?? slug
   }
 
   classificationName (id) {
