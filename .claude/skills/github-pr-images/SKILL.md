@@ -6,7 +6,7 @@ description: >-
   with an existing PR (by #number, URL, branch name, or "the open PR"), regardless of verb —
   attach, embed, add, put, post, drop, show, document. Also covers visually documenting test runs,
   bug repros, UI states, or CI failures on an existing PR. Uploads through `gh`'s `--attach` flag —
-  except in the Claude Code web sandbox, which has no `gh` and hosts images through the PR branch's
+  except in the Claude Code web sandbox, where `gh` doesn't work and images are hosted through the PR branch's
   history instead. It also owns the PR's one `## Screenshots` comment — finding, creating, editing
   and verifying it — so other workflows (the `pr` skill's screenshot phase) hand it a composed body
   that references local image paths, and it posts it.
@@ -27,7 +27,7 @@ From a session with history, hand this skill to a subagent the way `AGENTS.md`'s
 
 `$CLAUDE_CODE_REMOTE` decides which, before anything else here.
 
-**`true`** — the web sandbox, which has no `gh` and follows [references/web-sandbox.md](references/web-sandbox.md) for the **whole flow**.
+**`true`** — the web sandbox, where `gh` is missing or refused (GraphQL 403s), and follows [references/web-sandbox.md](references/web-sandbox.md) for the **whole flow**.
 
 **Unset** — make sure `gh` has `--attach`:
 

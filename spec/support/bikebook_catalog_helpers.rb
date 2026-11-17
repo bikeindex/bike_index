@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-# The fixture catalog in place of the published one
+# The fixture catalog in place of the published one. Its kit is at the 1.0.0 vehicle schema and its models a mix, as
+# a catalog part way through migrating them publishes: Specialized's 2025 at 0.28.0, Segway's before 0.28.0
 module BikebookCatalogHelpers
   FIXTURES = Rails.root.join("spec/fixtures/bikebook_catalog")
 

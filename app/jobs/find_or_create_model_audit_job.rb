@@ -2,7 +2,7 @@ class FindOrCreateModelAuditJob < ApplicationJob
   sidekiq_options queue: "droppable", retry: 2
 
   def self.enqueue_for?(bike)
-    return false if bike.example? || bike.deleted? || bike.likely_spam?
+    return false unless bike.current_with_user_hidden?
     return true if bike.model_audit_id.present?
 
     ModelAudit.audit?(bike)

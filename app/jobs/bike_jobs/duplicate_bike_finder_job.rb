@@ -6,8 +6,7 @@ module BikeJobs
       bike = Bike.unscoped.find_by_id(bike_id)
       return true if bike.blank?
 
-      should_delete = bike.blank? || bike.deleted_at.present? || bike.example ||
-        bike.likely_spam
+      should_delete = !bike.current_with_user_hidden?
 
       serial_segments = NormalizedSerialSegment.where(bike_id: bike_id)
 
@@ -33,14 +32,17 @@ module BikeJobs
       end
 
       serial_segments.destroy_all if should_delete
+      # Only new registrations are matched, and this also runs when a bike is edited
+      if bike.created_at > Time.current - 1.day && serial_segments.duplicate_bike_group.exists?
+        BikeJobs::PosRegistrationMatchFinderJob.perform_async(bike_id)
+      end
     end
 
     def remove_orphaned_duplicate(duplicate_bike_group, normalized_serial_segment)
       other_segments = duplicate_bike_group.normalized_serial_segments.where.not(id: normalized_serial_segment.id)
       # Check the other segments to verify that *they* aren't orphans
       valid_segments, orphaned_segments = other_segments.partition do |other_segment|
-        bike = Bike.unscoped.find_by_id(other_segment.bike_id)
-        bike.present? && bike.deleted_at.blank? && !bike.example && !bike.likely_spam
+        Bike.unscoped.find_by_id(other_segment.bike_id)&.current_with_user_hidden?
       end
       orphaned_segments.each(&:destroy)
       return if valid_segments.count > 1

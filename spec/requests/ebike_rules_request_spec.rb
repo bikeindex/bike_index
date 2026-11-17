@@ -522,6 +522,10 @@ RSpec.describe EbikeRulesController, type: :request do
 
       get "/e-bike-rules/co?manual=1&watts=250"
       expect(response).to redirect_to("/ebike-rules/co?manual=1&watts=250")
+
+      get "/ebike_rules/US/CO?manual=1&watts=250"
+      expect(response).to redirect_to("/ebike-rules/US/CO?manual=1&watts=250")
+      expect(response.status).to eq(301)
     end
 
     it "explains what's missing" do
