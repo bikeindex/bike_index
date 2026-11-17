@@ -41,6 +41,26 @@ RSpec.describe BikebookController, type: :request do
       end
     end
 
+    context "cached", :caching do
+      include_context :caching_basic
+
+      it "is every visitor's and every search's, the page giving the visitor's market around it" do
+        get "/bikebook", params: {search: "1", manufacturer: "aventon"}, headers: {"CF-IPCountry" => "JP"}
+        japan = Nokogiri::HTML5(response.body)
+        get "/bikebook", params: {search: "1"}, headers: {"CF-IPCountry" => "US"}
+        us = Nokogiri::HTML5(response.body)
+
+        shell = "template[data-bikebook--page-target='shell']"
+        expect(us.at_css(shell).inner_html).to eq japan.at_css(shell).inner_html
+        expect(us.at_css(shell).inner_html).to_not include("default-market-value")
+        expect(japan.at_css("[inert]")[:class]).to eq "tw:invisible"
+        expect(us.at_css("[inert]")[:class]).to be_blank
+        expect([japan, us].map { it.at_css("[data-controller='bikebook--page']").attributes.slice(*%w[market market-name jurisdiction].map { "data-bikebook--page-#{it}-value" }).transform_values(&:value).values })
+          .to eq [%w[JP Japan US], ["US", "United States", "US"]]
+        expect(response.body).to include("https://github.com/bikeindex/bikebook (CC BY-SA 4.0). Clone that repository instead.")
+      end
+    end
+
     context "in a frame" do
       it "doesn't autofocus the search, which would take the host page's focus" do
         get "/bikebook"
