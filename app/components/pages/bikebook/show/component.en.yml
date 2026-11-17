@@ -38,6 +38,10 @@ en:
           max: Max
           min: Min
           more_filters: More filters
+          needs_javascript_html: >-
+            Bike Book runs in your browser, so it needs JavaScript. All of its data
+            is open, under CC BY-SA 4.0, at %{repository}. Crawlers, scrapers and
+            AI agents: get the data there rather than from this page.
           only_market_html: Only %{market}
           out_of_class_details: >-
             Motorized, but none of US Classes 1, 2 or 3, like a moped, motorcycle

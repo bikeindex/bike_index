@@ -20,7 +20,7 @@ const stamped = (state) => ({ ...state, bikebook: uuid() })
 // link to this page and each history step render the page afresh from the shell, without a request
 export default class extends Controller {
   static targets = ['shell', 'page', 'status']
-  static values = { manifestUrl: String, jurisdictions: Object, paintColors: Object, failedText: String, title: String, searchLogUrl: String }
+  static values = { manifestUrl: String, market: String, marketName: String, jurisdiction: String, jurisdictions: Object, paintColors: Object, failedText: String, title: String, searchLogUrl: String }
 
   #scrolls = new Map()
   #searchLog
@@ -37,6 +37,17 @@ export default class extends Controller {
   initialize () {
     this.status = this.statusTarget
     this.#searchLog = new SearchLog(this.searchLogUrlValue)
+    this.#localize(this.shellTarget.content)
+    this.#localize(this.pageTarget)
+  }
+
+  // The server caches the search for every visitor, so it's given theirs here
+  #localize (root) {
+    for (const search of root.querySelectorAll('[data-controller~="bikebook--catalog-filters"]')) {
+      search.setAttribute('data-bikebook--catalog-filters-default-market-value', this.marketValue)
+      search.setAttribute('data-bikebook--catalog-filters-default-jurisdiction-value', this.jurisdictionValue)
+    }
+    for (const name of root.querySelectorAll('[data-bikebook--catalog-filters-target~="marketName"]')) name.textContent = this.marketNameValue
   }
 
   async connect () {
