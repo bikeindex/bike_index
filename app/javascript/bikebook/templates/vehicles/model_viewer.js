@@ -263,7 +263,8 @@ class ModelViewer {
   #mountLabel (mount) {
     const place = this.#mountPlace(mount)
     const where = place == null ? null : place.startsWith('under') ? place : `on ${place}`
-    const notes = compact([mount.interface, mount.description])
+    // named here, as a kit before 1.0.0 has no interface field for the vocabulary's names to reach it by
+    const notes = compact([this.presenter.vocabulary.names['frame.mounts.interface'][mount.interface] ?? mount.interface, mount.description])
     return upcaseFirst(compact([this.presenter.positionLabel(mount.position), mount.holes != null ? `${mount.holes}-hole` : null,
       mount.type.replaceAll('_', ' '), where, notes.length ? `(${notes.join(', ')})` : null]).join(' '))
   }

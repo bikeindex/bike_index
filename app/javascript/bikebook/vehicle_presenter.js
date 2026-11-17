@@ -29,9 +29,10 @@ const FEET_AND_INCHES = ["'", '"']
 export class VehiclePresenter {
   constructor (kit, vocabulary) {
     // an extra's bb as the catalog's own labels write "BB Drop", standover above it short, as its tooltip
-    // explains it, and the actual seat angle without the catalog's note on it
+    // explains it, the actual seat angle without the catalog's note on it, and volts, which a kit before 1.0.0 has no unit for
     this.kit = {
       ...kit,
+      units: { v: { label: 'V', name: 'volts' }, ...kit.units },
       acronyms: { ...kit.acronyms, bb: 'BB' },
       geometry: { ...kit.geometry, labels: { ...kit.geometry.labels, standover_above_bb: 'Standover above BB', seat_angle_actual: 'Seat Angle (actual)' } }
     }
