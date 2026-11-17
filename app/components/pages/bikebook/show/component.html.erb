@@ -13,7 +13,7 @@
 <% end %>
 
 <% search = capture do %>
-  <% cache(cache_key(@framed), expires_in: CACHE_EXPIRY) do %>
+  <% cache(page_cache_key(@framed), expires_in: CACHE_EXPIRY) do %>
     <div
       class="tw:group"
       data-controller="bikebook--catalog-filters ui--collapse"
@@ -330,7 +330,7 @@
   data-bikebook--page-search-log-url-value="<%= search_bikebook_path %>"
   data-action="submit->bikebook--page#visit click->bikebook--page#follow popstate@window->bikebook--page#restore scroll@window->bikebook--page#track bikebook--catalog-filters:change->bikebook--page#refilter bikebook--similar:change->bikebook--page#rescore bikebook--similar:open->bikebook--page#refresh"
 >
-  <% cache(cache_key, expires_in: CACHE_EXPIRY) do %>
+  <% cache(page_cache_key, expires_in: CACHE_EXPIRY) do %>
     <section
       aria-label="<%= translation(".about_bike_book_label") %>"
       class="

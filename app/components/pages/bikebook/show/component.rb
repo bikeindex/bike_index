@@ -26,7 +26,7 @@ module Pages
         private
 
         # Every visitor's and every query's, which bikebook--page and placeholder_class fill in around them
-        def cache_key(*parts) = [self.class.cache_digest, *parts]
+        def page_cache_key(*parts) = [self.class.cache_digest, *parts]
 
         # A component's own fragment inside the page's. Not cache_on: these also render on /ebike-rules, where the same
         # tile twice would repeat its tooltip's id
