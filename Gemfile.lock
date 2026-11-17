@@ -921,6 +921,7 @@ DEPENDENCIES
   active_model_serializers (~> 0.8.3)
   annotaterb
   api-pagination
+  aws-sdk-core
   aws-sdk-s3
   bcrypt
   benchmark
