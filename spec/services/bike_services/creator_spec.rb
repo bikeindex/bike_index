@@ -234,8 +234,12 @@ RSpec.describe BikeServices::Creator do
           }
         end
         let(:not_matched_attrs) { %i[user_name propulsion_type_slug manufacturer_id manufacturer_other street address_record_attributes] }
+        let(:target_internal_address_attrs) do
+          {street: "Somewhere Ville", city: "New York", region_string: "NY", postal_code: "10007",
+           country_id: Country.united_states_id, latitude: default_location[:latitude], longitude: default_location[:longitude]}
+        end
         let(:target_address_record) do
-          {street: "Somewhere Ville", kind: "ownership", publicly_visible_attribute: "postal_code"}
+          target_internal_address_attrs.merge(neighborhood: "Tribeca", kind: "ownership", publicly_visible_attribute: "postal_code")
         end
 
         def expect_bike_created_with_extra_attrs
@@ -247,7 +251,7 @@ RSpec.describe BikeServices::Creator do
           expect(bike.creation_organization_id).to eq organization.id
           expect(bike.bike_organizations.count).to eq 1
           expect(bike.bike_organizations.first.can_edit_claimed).to be_truthy
-          expect(bike.registration_address_record.internal_address_attrs.compact).to eq({"street" => "Somewhere Ville"})
+          expect(bike.registration_address_record.internal_address_attrs.compact).to eq target_internal_address_attrs.as_json
           expect(BikeServices::CalculateLocation.registration_address_source(bike)).to eq "initial_creation"
           expect(bike.address_record.attributes.compact.symbolize_keys.except(:id, :updated_at, :created_at)).to eq target_address_record.merge(bike_id: bike.id)
 
@@ -267,7 +271,7 @@ RSpec.describe BikeServices::Creator do
           expect(ownership.organization_id).to eq organization.id
           expect(ownership.owner_email).to eq "stuff@stuff.com"
           expect(ownership.owner_name).to eq "Sally"
-          expect(ownership.address_record.internal_address_attrs.compact).to eq({"street" => "Somewhere Ville"})
+          expect(ownership.address_record.internal_address_attrs.compact).to eq target_internal_address_attrs.as_json
         end
 
         it "creates", :flaky do
