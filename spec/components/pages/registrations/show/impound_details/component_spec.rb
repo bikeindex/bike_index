@@ -31,6 +31,7 @@ RSpec.describe Pages::Registrations::Show::ImpoundDetails::Component, type: :com
       expect(page).to have_text("Back lot")
       expect(page).to have_text("1300 W 14th Pl, Chicago, IL 60608")
       expect(page).to have_text(/Owner called, picking up Tuesday.*Owner emailed/m)
+      expect(page).to have_css("small .localizeTime", count: 2)
     end
   end
 

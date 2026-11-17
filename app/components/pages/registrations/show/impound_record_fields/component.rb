@@ -4,8 +4,6 @@ module Pages
   module Registrations
     module Show
       module ImpoundRecordFields
-        # Shared impound-record definition list (created, who impounded, status, last
-        # updater, location, notes) — used by the org impound-record card and its panel
         class Component < ApplicationComponent
           def initialize(impound_record:)
             @impound_record = impound_record
@@ -26,8 +24,7 @@ module Pages
           end
 
           def noted_updates
-            @noted_updates ||= @impound_record.impound_record_updates.where.not(notes: [nil, ""])
-              .includes(:user).reorder(id: :desc)
+            @impound_record.impound_record_updates.includes(:user).reorder(id: :desc).select { it.notes.present? }
           end
         end
       end
