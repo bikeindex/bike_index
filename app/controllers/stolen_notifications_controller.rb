@@ -8,17 +8,15 @@ class StolenNotificationsController < ApplicationController
   def create
     @stolen_notification = StolenNotification.new(permitted_parameters)
     @stolen_notification.sender = current_user
-    @bike = @stolen_notification.bike
+    @bike = Bike.find(@stolen_notification.bike_id)
     if !@bike.contact_owner?(current_user)
       flash[:error] = translation(:unauthorized)
-      redirect_to @bike
     elsif @stolen_notification.save
       flash[:success] = translation(:thanks)
-      redirect_to @bike
     else
       flash[:error] = translation(:failure)
-      render @bike
     end
+    redirect_to @bike
   end
 
   private
