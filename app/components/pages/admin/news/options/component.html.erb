@@ -127,7 +127,12 @@
       <% end %>
     <% end %>
 
-    <div class="tw:mt-2 tw:grid tw:grid-cols-2 tw:gap-x-8 tw:sm:grid-cols-4">
+    <div
+      class="
+        tw:mt-2 tw:grid tw:grid-cols-2 tw:items-baseline-last tw:gap-x-8
+        tw:sm:grid-cols-4
+      "
+    >
       <div class="tw:col-span-2 tw:sm:col-span-1">
         <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :language)) do %>
           <%= render(UI::Forms::Select::Component.new(form_builder: @form_builder, attribute: :language,
@@ -136,7 +141,7 @@
       </div>
 
       <div>
-        <%= render(UI::ButtonLink::Component.new(text: "Preview", href: news_url(@blog.to_param), target: "_blank")) %>
+        <%= render(UI::ButtonLink::Component.new(text: "Preview", href: news_url(@blog.to_param), color: :yellow, target: "_blank")) %>
       </div>
 
       <div class="tw:text-right tw:sm:col-span-2">
