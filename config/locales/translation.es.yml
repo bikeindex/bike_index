@@ -4286,6 +4286,11 @@ es:
         already_sold: 'Atención: este %{item_type} ha sido %{listing_status}'
       index:
         marketplace_messages: Mensajes del mercado
+    color_scheme:
+      appearance: Apariencia
+      dark: Oscuro
+      light: Luz
+      system: Sistema
   news:
     index:
       bike_index_blog: Blog de Bike Index

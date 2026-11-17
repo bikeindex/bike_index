@@ -4303,6 +4303,11 @@ it:
         already_sold: 'Attenzione: questo %{item_type} è stato %{listing_status}'
       index:
         marketplace_messages: Messaggi del mercato
+    color_scheme:
+      appearance: Aspetto
+      dark: Buio
+      light: Leggero
+      system: Sistema
   news:
     index:
       bike_index_blog: Blog Bike Index

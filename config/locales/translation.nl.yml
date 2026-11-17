@@ -4969,6 +4969,11 @@ nl:
         already_sold: 'Let op: dit %{item_type} is %{listing_status} geweest.'
       index:
         marketplace_messages: Marktplaatsberichten
+    color_scheme:
+      appearance: Verschijning
+      dark: Donker
+      light: Licht
+      system: Systeem
   bikes_edit:
     accessories:
       add_a_component: Voeg een component toe

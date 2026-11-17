@@ -4100,6 +4100,11 @@ nb:
         already_sold: 'Merk: dette %{item_type} har vært %{listing_status}'
       index:
         marketplace_messages: Markedsplassmeldinger
+    color_scheme:
+      appearance: Utseende
+      dark: Mørk
+      light: Lys
+      system: System
   news:
     index:
       bike_index_blog: Sykkelindeksblogg
