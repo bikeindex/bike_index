@@ -1,4 +1,4 @@
-<%= render(UI::Card::Component.new) do %>
+<%= render(UI::Card::Component.new(additional_classes: CARD_CLASSES)) do %>
   <div class="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2">
     <h2 class="tw:mb-0 tw:tweyebrow">
       <%= translation(".potential_duplicates") %>

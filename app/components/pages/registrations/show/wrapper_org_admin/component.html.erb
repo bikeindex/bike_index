@@ -187,7 +187,7 @@
   <% if show_other_registrations? %>
     <%# One column settings panel for both tables: a second would duplicate its checkbox ids %>
     <%= tag.div(class: "org-search-component tw:flex tw:flex-col tw:gap-6", data: (Pages::Org::Search::ColumnSettings::Component.column_settings_data_attributes(controllers: "org--search") if other_registrations? || potential_duplicates_component.render?)) do %>
-      <%= render(UI::Card::Component.new) do %>
+      <%= render(UI::Card::Component.new(additional_classes: Pages::Registrations::Show::PotentialDuplicates::Component::CARD_CLASSES)) do %>
         <div class="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2">
           <h2 class="tw:mb-0 tw:tweyebrow">
             <%= translation(".other_registrations") %>
