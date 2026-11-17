@@ -12,18 +12,6 @@ module Integrations
       MANIFEST_URL = LOCAL_DIRECTORY ? "#{LOCAL_PATH}/manifest.json" : "#{URL}manifest.json"
       GITHUB_REPO_URL = "https://github.com/bikeindex/bikebook"
       MODEL_ID = %r{\Am/([a-z0-9_]+/\d{4})/[a-z0-9_]+\z}
-      # the CycleType slugs Bike Book's vehicle types name differently
-      CYCLE_TYPES = {
-        trailer: "bike_trailer",
-        cargo: "cargo_bike",
-        "cargo-rear": "cargo_bike_rear",
-        "cargo-trike": "cargo_tricycle",
-        "cargo-trike-rear": "cargo_tricycle_rear",
-        "personal-mobility": "epamd",
-        "non-e-scooter": "scooter",
-        "non-e-skateboard": "skateboard",
-        elliptical: "elliptical_bike"
-      }.freeze
 
       Unreachable = Class.new(StandardError)
 

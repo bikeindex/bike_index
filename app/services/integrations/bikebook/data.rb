@@ -25,7 +25,7 @@ module Integrations
         colorways = record.dig("years", year.to_s, "colorways").to_a
         colorway = colorways.first if colorways.one?
         {
-          cycle_type: CycleType.find_sym(Integrations::Bikebook::Catalog::CYCLE_TYPES.key(record["type"]) || record["type"])&.to_s,
+          cycle_type: CycleType.from_bikebook_type(record["type"])&.to_s,
           paint_description: colorway&.dig("name"),
           description: record["description"],
           rear_wheel_bsd: record["wheels"]&.find { it["position"]&.include?("rear") }&.dig("bsd"),

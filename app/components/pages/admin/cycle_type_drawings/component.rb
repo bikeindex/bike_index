@@ -42,7 +42,7 @@ module Pages
 
         def initialize(cycle_types:, manifest_url:)
           @rows = cycle_types.map do |cycle_type|
-            type = Integrations::Bikebook::Catalog::CYCLE_TYPES[cycle_type.slug] || cycle_type.slug.to_s.underscore
+            type = CycleType.bikebook_type(cycle_type.slug)
             Row.new(name: cycle_type.name, type:, example_model: EXAMPLE_MODELS[type])
           end.partition { !it.collapsed }.flatten
           @manifest_url = manifest_url
