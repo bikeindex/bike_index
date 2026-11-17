@@ -17,6 +17,9 @@ class BikebookController < ApplicationController
     @page_url = "https://bikeindex.org/bikebook/license"
   end
 
+  # For uptime monitoring: the page breaks whenever the catalog doesn't answer in the format it reads
+  def up = head(Integrations::Bikebook::Catalog.readable? ? :ok : :service_unavailable)
+
   # /bikebook/m/segway/2025/gt3_pro, or without its m/, or its id alone, /m/segway/2025/gt3_pro, picks that vehicle ahead
   # of any already picked, with what's picked for it there
   def vehicle
