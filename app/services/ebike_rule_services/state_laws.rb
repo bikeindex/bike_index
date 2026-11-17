@@ -78,6 +78,10 @@ module EbikeRuleServices
     # The classifications that are an e-bike law or class anywhere, as the EU's EPAC is, rather than a motor vehicle's
     def e_bike_law_ids = parsed[:e_bike_laws]
 
+    # The catalog's vocabulary file, whose name is a digest of the laws, to cache what's built from them under. nil while
+    # they aren't in
+    def version = (Integrations::Bikebook::Catalog.manifest&.dig("vocabulary") if parsed[:laws].any?)
+
     # By ISO 3166-2 code, each place outside the US the catalog classifies e-vehicles in: its e-bike laws, or without
     # one of its own its country's, and its other classes, slowest first and off-highway last
     def places = vocabulary("places_with_rule_categories") { parse_places(it) } || {}

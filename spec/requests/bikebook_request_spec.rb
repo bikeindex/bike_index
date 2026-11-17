@@ -53,6 +53,7 @@ RSpec.describe BikebookController, type: :request do
         shell = "template[data-bikebook--page-target='shell']"
         expect(us.at_css(shell).inner_html).to eq japan.at_css(shell).inner_html
         expect(us.at_css(shell).inner_html).to_not include("default-market-value")
+        expect(us.at_css(shell).inner_html).to include(%(data-jurisdiction="NY"))
         expect(japan.at_css("[inert]")[:class]).to eq "tw:invisible"
         expect(us.at_css("[inert]")[:class]).to be_blank
         expect([japan, us].map { it.at_css("[data-controller='bikebook--page']").attributes.slice(*%w[market market-name jurisdiction].map { "data-bikebook--page-#{it}-value" }).transform_values(&:value).values })
@@ -60,6 +61,17 @@ RSpec.describe BikebookController, type: :request do
         expect(response.body).to include("https://github.com/bikeindex/bikebook (CC BY-SA 4.0). Clone that repository instead.")
         expect(us.at_css("[data-controller='bikebook--page'] > noscript").text).to include("AI agents: get the data there")
           .and include("github.com/bikeindex/bikebook")
+      end
+
+      it "isn't kept while the catalog doesn't answer, which leaves the state laws out" do
+        WebMock.stub_request(:get, /#{Regexp.escape(Integrations::Bikebook::Catalog::URL)}/o).to_return(status: 503)
+        shells = 2.times.map do
+          get "/bikebook", params: {search: "1"}
+          Nokogiri::HTML5(response.body).at_css("template[data-bikebook--page-target='shell']").inner_html
+        end
+
+        expect(shells.first).to_not eq shells.last
+        expect(shells.first).to_not include("data-jurisdiction=\"NY\"")
       end
     end
 

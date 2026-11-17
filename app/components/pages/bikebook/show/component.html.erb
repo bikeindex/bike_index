@@ -13,7 +13,7 @@
 <% end %>
 
 <% search = capture do %>
-  <% cache(page_cache_key(@framed), expires_in: CACHE_EXPIRY) do %>
+  <% cache_if(catalog_version, page_cache_key(@framed)) do %>
     <div
       class="tw:group"
       data-controller="bikebook--catalog-filters ui--collapse"
@@ -330,7 +330,7 @@
   data-bikebook--page-search-log-url-value="<%= search_bikebook_path %>"
   data-action="submit->bikebook--page#visit click->bikebook--page#follow popstate@window->bikebook--page#restore scroll@window->bikebook--page#track bikebook--catalog-filters:change->bikebook--page#refilter bikebook--similar:change->bikebook--page#rescore bikebook--similar:open->bikebook--page#refresh"
 >
-  <% cache(page_cache_key, expires_in: CACHE_EXPIRY) do %>
+  <% cache_if(catalog_version, page_cache_key) do %>
     <%# First, for what reads the page without running it - which is how crawlers come for the data %>
     <noscript>
       <p class="twgutter tw:mx-auto tw:max-w-screen-xl tw:py-5">
@@ -386,7 +386,7 @@
       </div>
     </section>
 
-    <% cache(child_cache_key(Pages::Bikebook::DonateStrip::Component), CHILD_CACHE) do %>
+    <% cache_if(catalog_version, child_cache_key(Pages::Bikebook::DonateStrip::Component), skip_digest: true) do %>
       <%= render(Pages::Bikebook::DonateStrip::Component.new) %>
     <% end %>
 
@@ -400,7 +400,7 @@
       <template
         data-bikebook-class-badge="<%= [e_bike_class || "emoto", optional, out_of_class_id].compact.join("/") %>"
       >
-        <% cache(child_cache_key(Pages::EbikeRules::ClassTile::Component, e_bike_class, optional, out_of_class_id), CHILD_CACHE) do %>
+        <% cache_if(catalog_version, child_cache_key(Pages::EbikeRules::ClassTile::Component, e_bike_class, optional, out_of_class_id), skip_digest: true) do %>
           <%= render(Pages::EbikeRules::ClassTile::Component.new(e_bike_class:, optional:, size: :lg, explained: true, out_of_class_id:)) %>
         <% end %>
       </template>
@@ -411,7 +411,7 @@
       <template
         data-bikebook-ul-badge="<%= [standard, status].compact.join("/") %>"
       >
-        <% cache(child_cache_key(Pages::EbikeRules::UlBadge::Component, standard, status), CHILD_CACHE) do %>
+        <% cache_if(catalog_version, child_cache_key(Pages::EbikeRules::UlBadge::Component, standard, status), skip_digest: true) do %>
           <%= render(Pages::EbikeRules::UlBadge::Component.new(standard:, status:)) %>
         <% end %>
       </template>
@@ -420,7 +420,7 @@
     <%# The US classes' cards a picked classification shows, which a state jurisdiction's own, with its rules, replaces %>
     <% (1..3).each do |e_bike_class| %>
       <template data-bikebook-class-card="<%= e_bike_class %>">
-        <% cache(child_cache_key(Pages::EbikeRules::ClassCard::Component, e_bike_class), CHILD_CACHE) do %>
+        <% cache_if(catalog_version, child_cache_key(Pages::EbikeRules::ClassCard::Component, e_bike_class), skip_digest: true) do %>
           <%= render(Pages::EbikeRules::ClassCard::Component.new(e_bike_class:)) %>
         <% end %>
       </template>

@@ -9,11 +9,6 @@ module Pages
       class Component < ApplicationComponent
         # Template Dependency: SharedBlocks::Marketing::InvertedBlock::Component
 
-        # The digest doesn't cover EbikeRuleServices::StateLaws, whose classes it renders
-        CACHE_EXPIRY = 1.day
-        # Rails' digest of this template would expire them with any change to it, which their own digest stands in for
-        CHILD_CACHE = {expires_in: CACHE_EXPIRY, skip_digest: true}.freeze
-
         # market is the visitor's CF-IPCountry, which Cloudflare sends as XX, or T1 over Tor, when it can't
         # tell; state is theirs in the US. framed: in an iframe, whose autofocus would take its host page's focus
         def initialize(manifest_url:, market:, state:, query:, paint_colors:, framed: false)
@@ -27,12 +22,17 @@ module Pages
 
         private
 
-        # Every visitor's and every query's, which bikebook--page and placeholder_class fill in around them
-        def page_cache_key(*parts) = [self.class.cache_digest, *parts]
+        # The state laws are all the markup reads that its code doesn't, so the fragments keep until either changes, and
+        # aren't kept while the catalog doesn't answer, rendering without them
+        def catalog_version = @catalog_version ||= EbikeRuleServices::StateLaws.version
 
-        # A component's own fragment inside the page's. Not cache_on: these also render on /ebike-rules, where the same
-        # tile twice would repeat its tooltip's id
-        def child_cache_key(component, *parts) = [component.cache_digest, *parts]
+        # Every visitor's and every query's, which bikebook--page and placeholder_class fill in around them
+        def page_cache_key(*parts) = [self.class.cache_digest, catalog_version, *parts]
+
+        # A component's own fragment inside the page's, under skip_digest: Rails' digest of this template would expire it
+        # with any change here. Not cache_on: these also render on /ebike-rules, where the same tile twice would repeat
+        # its tooltip's id
+        def child_cache_key(component, *parts) = [component.cache_digest, catalog_version, *parts]
 
         # The search until bikebook--page fills it in from the URL: hidden as searching() hides a lone model's, and blank
         # where the URL sets anything but picks, which it says are loading
