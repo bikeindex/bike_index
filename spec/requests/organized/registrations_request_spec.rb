@@ -791,7 +791,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         follow_redirect!
         expect(response.body).to include "the safety rules to agree to"
 
-        # The claim email waits on the education course, and the education course email is what goes out
+        # The claim email waits on the course, and the course's email is what goes out
         expect { EmailJobs::OwnershipInvitationJob.drain }.to_not change(ActionMailer::Base.deliveries, :count)
         expect { EmailJobs::PartialRegistrationJob.drain }.to change(ActionMailer::Base.deliveries, :count).by 1
         expect(ActionMailer::Base.deliveries.last.to).to eq([owner_email])

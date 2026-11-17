@@ -298,7 +298,7 @@ class RegisterController < ApplicationController
       separate_attestation: register_settings[:separate_attestation])
   end
 
-  # All resuming changes today: an education course the organization has replaced since starts over.
+  # All resuming changes today: a course the organization has since replaced starts over.
   # No course to resume on is the common case, and returns what was already resolved
   def resume_registration
     @education_course, restarted = BikeServices::Register

@@ -391,7 +391,7 @@ module BikeServices
       register_flow.select { matches_bike?(it, bike) } + [embed_match].compact
     end
 
-    # The legacy forms show no education course, so an e-vehicle's goes to its owner even when self-registered
+    # The legacy forms show no education course, so an e-vehicle's course goes to its owner even when self-registered
     def create_legacy_bike(b_param, ip_address:)
       b_param.params = b_param.params.merge("register_separate_attestation" => true)
       create_bike(b_param, course: nil, ip_address:, rules_to_owner: true)
