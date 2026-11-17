@@ -233,7 +233,7 @@ RSpec.describe BikebookController, type: :request do
       # every address is a mailto link
       expect(page.all("a[href='mailto:licensing@bikeindex.org']").count).to eq 6
       expect(page.find("body").text.scan("licensing@bikeindex.org").count).to eq 6
-      expect(page).to have_css("p#manufacturer-content", text: "product descriptions and photos belong to their manufacturers", normalize_ws: true)
+      expect(page).to have_css("li", text: "Product descriptions and photos, which belong to their manufacturers", normalize_ws: true)
       # snippets are text, with a button to copy each
       expect(page).to have_css("pre code", text: 'Bike data: <a href="https://bikeindex.org/bikebook/license">Bike Book by Bike Index</a>')
         .and have_css("pre code", text: "Bike data: [Bike Book by Bike Index](https://bikeindex.org/bikebook/license)")
