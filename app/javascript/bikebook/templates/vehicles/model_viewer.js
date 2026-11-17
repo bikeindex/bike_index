@@ -16,7 +16,7 @@ import { certificationBadges, certificationsOf, classBadges } from 'bikebook/tem
 import { removeLink } from 'bikebook/templates/vehicles/remove_link'
 import { manufacturerLine, modelLine } from 'bikebook/templates/vehicles/vehicle_title'
 import { disclosure, section } from 'bikebook/templates/vehicles/section'
-import { andSentence, array, blank, compact, equal, except, isNumber, join, partsOf, presence, present, slice, sum, truthy, upcaseFirst } from 'bikebook/templates/values'
+import { andSentence, array, blank, catalogValue, compact, equal, except, isNumber, join, partsOf, presence, present, slice, sum, truthy, upcaseFirst } from 'bikebook/templates/values'
 
 // Ruby's \s, which a thin space isn't
 const KEEP_TOGETHER = /^([^]*[ \t\r\n\f\v])?([^ \t\r\n\f\v]+)$/
@@ -64,7 +64,7 @@ export const wheelsAt = (presenter, data, size) => {
   const viewer = new ModelViewer({ presenter, data, others: [] })
   return Object.fromEntries(['front', 'rear'].map((position) => {
     const built = at(viewer.builtWheels(), position, size)[0]
-    const widths = at(viewer.vehicle.wheels, position, size).map((wheel) => wheel.tire_width_max).filter((width) => typeof width === 'number')
+    const widths = at(viewer.vehicle.wheels, position, size).map((wheel) => catalogValue(wheel, 'tire_width_max')).filter((width) => typeof width === 'number')
     return [position, {
       parts: built && viewer.wheelParts({ ...built, sizes: null }, { fitting: false }).map(([key, content]) => [key, { size: built.bsd, tire: built.tire_width }[key] ?? null, content]),
       maxTire: widths.length ? Math.max(...widths) : null
@@ -727,8 +727,9 @@ class ModelViewer {
   clearances (vehicle = this.vehicle) {
     const groups = new Map()
     for (const wheel of array(vehicle.wheels).filter((each) => each.configured === false)) {
-      const key = JSON.stringify([wheel.bsd ?? null, wheel.tire_width_max ?? null])
-      if (!groups.has(key)) groups.set(key, [wheel.bsd ?? null, wheel.tire_width_max ?? null, []])
+      const clearance = [wheel.bsd ?? null, catalogValue(wheel, 'tire_width_max') ?? null]
+      const key = JSON.stringify(clearance)
+      if (!groups.has(key)) groups.set(key, [...clearance, []])
       groups.get(key)[2].push(...array(wheel.position))
     }
     return [...groups.values()].map(([bsd, max, positions]) => [bsd, max, [...new Set(positions)].sort()])
@@ -763,7 +764,8 @@ class ModelViewer {
   // `fitting`: how the wheel fits the frame, its cassette, dropout and axle
   wheelSummary (wheel, { fitting = true } = {}) {
     const summary = join(this.wheelParts(wheel, { fitting }).map(([, content]) => content), ', ')
-    return wheel.tire_width_max != null ? join([summary, this.tireWidthSummary(wheel.tire_width_max, 'tire max')], html`<br>`) : summary
+    const max = catalogValue(wheel, 'tire_width_max')
+    return max != null ? join([summary, this.tireWidthSummary(max, 'tire max')], html`<br>`) : summary
   }
 
   wheelParts (wheel, { fitting = true } = {}) {
@@ -812,7 +814,7 @@ class ModelViewer {
   // "2.4 in tire max", or "2.4 in front, 2.6 in rear tire max"
   tireMax () {
     const [front, rear] = ['front', 'rear'].map((position) =>
-      highest(this.builtWheels().filter((wheel) => array(wheel.position).includes(position)).map((wheel) => wheel.tire_width_max)))
+      highest(this.builtWheels().filter((wheel) => array(wheel.position).includes(position)).map((wheel) => catalogValue(wheel, 'tire_width_max'))))
     if (front === rear) return front == null ? null : this.tireWidthSummary(front, 'tire max')
 
     const widths = compact([front != null ? join([this.tireWidthSummary(front, ''), ' front']) : null, rear != null ? join([this.tireWidthSummary(rear, ''), ' rear']) : null])
@@ -829,7 +831,8 @@ class ModelViewer {
   brakeSummary (brake) {
     const typeAndRotor = presence(join(compact([brakeType(brake), this.millimeters(brake.rotor_diameter, ' rotor')]), ', '))
     const summary = join(compact([this.onSizes(typeAndRotor, brake.sizes), presence(brake.caliper_mount?.replace(/^Disc /, '')), brake.anti_lock ? 'ABS' : null]), ', ')
-    return brake.rotor_diameter_max != null ? join([summary, this.millimeters(brake.rotor_diameter_max, ' rotor max')], html`<br>`) : summary
+    const max = catalogValue(brake, 'rotor_diameter_max')
+    return max != null ? join([summary, this.millimeters(max, ' rotor max')], html`<br>`) : summary
   }
 
   drivetrain () {

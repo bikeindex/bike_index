@@ -536,6 +536,18 @@ RSpec.describe "Bike Book", :js, type: :system do
       })()
     JS
     expect(wheels).to match([/\A700 C, 28\W*mm tire\z/, 50, 50, /\A650 B, 28\W*mm tire\z/])
+    # a catalog before 0.28.0's widest tire and largest rotor, as it names them
+    legacy = page.evaluate_script(<<~JS)
+      (async () => {
+        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
+        const [{ VehiclePresenter }, { runningGearOf, wheelsAt }, { fragmentOf }, { kit }, vocabulary] = await Promise.all([import('bikebook/vehicle_presenter'),
+          import('bikebook/templates/vehicles/model_viewer'), import('bikebook/render'), catalog('kit.json'), catalog('vocabulary.json')])
+        const presenter = new VehiclePresenter(kit, vocabulary)
+        const data = { wheels: [{ position: ['front', 'rear'], bsd: 622, tire_width: 28, max_tire_width: 45 }], brakes: [{ position: ['front', 'rear'], type: 'Disc hydraulic', max_rotor_diameter: 203 }] }
+        return [wheelsAt(presenter, data, { name: 'M' }).front.maxTire, fragmentOf(runningGearOf({ presenter, data, others: [] })).textContent.replace(/\\s+/g, ' ')]
+      })()
+    JS
+    expect(legacy).to match([45, /45\W*mm tire max.*203\W*mm rotor max/])
     # a groupset is a line of the drivetrain's, its maker named once, and electronic shifting alone marked against the first's
     groupsets = page.evaluate_script(<<~JS)
       (async () => {
@@ -1167,6 +1179,7 @@ RSpec.describe "Bike Book", :js, type: :system do
         const { chosenSizes } = await import('bikebook/sizes')
         const size = (name, topTube, reach, riders = {}) => ({ name, geometry: { top_tube_effective: topTube, reach, ...riders } })
         const riders = (min, max) => ({ rider_height_min: min, rider_height_max: max })
+        const legacyRiders = (min, max) => ({ min_rider_height: min, max_rider_height: max })
         const vehicle = (key, ...sizes) => ({ key, data: { sizes: sizes.map((each) => typeof each === 'string' ? { name: each } : each) } })
         const names = (vehicles, options) => chosenSizes(vehicles, options).map((each) => each?.name ?? 'none')
         const canyon = vehicle('canyon', size('S', 546, 390), size('M', 555, 393), size('L', 569, 401))
@@ -1181,11 +1194,13 @@ RSpec.describe "Bike Book", :js, type: :system do
           // a top tube nearer the 55's than the M's riders are, which the riders' heights win over
           names([vehicle('trek', size('56', 560, 395, riders(1700, 1780))), vehicle('kona', size('55', 558, 396, riders(1550, 1650)), size('M', 575, 405, riders(1680, 1790)))]),
           // one with no tallest rider, which shares more of them with the size it overlaps further
-          names([vehicle('current', size('XL', 650, 420, riders(1854, null))), vehicle('level', size('M/L', 632, 445, riders(1800, 1890)), size('L/XL', 649, 460, riders(1900, 1950)))])
+          names([vehicle('current', size('XL', 650, 420, riders(1854, null))), vehicle('level', size('M/L', 632, 445, riders(1800, 1890)), size('L/XL', 649, 460, riders(1900, 1950)))]),
+          // as a catalog before 0.28.0 names its riders' heights
+          names([vehicle('trek', size('56', 560, 395, legacyRiders(1700, 1780))), vehicle('kona', size('55', 558, 396, legacyRiders(1550, 1650)), size('M', 575, 405, legacyRiders(1680, 1790)))])
         ]
       })()
     JS
-    expect(chosen).to eq([["M", "55"], ["57", "M"], ["M", "Regular", "S/M", "none"], ["Small", "S", "LG"], ["MD", "M"], ["56", "M"], ["XL", "L/XL"]])
+    expect(chosen).to eq([["M", "55"], ["57", "M"], ["M", "Regular", "S/M", "none"], ["Small", "S", "LG"], ["MD", "M"], ["56", "M"], ["XL", "L/XL"], ["56", "M"]])
 
     # a rendered size is its option's selected attribute, which a pick alone doesn't set, so it waits out the render
     size_select = ->(model) { find("select[aria-label='Size of #{model}']") }

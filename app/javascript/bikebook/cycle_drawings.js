@@ -1,5 +1,5 @@
 import { builtWheel, frameGeometry, leg, radians, STANDOVER_X } from 'bikebook/frame_geometry'
-import { array, isNumber } from 'bikebook/templates/values'
+import { array, catalogValue, isNumber } from 'bikebook/templates/values'
 
 // Each vehicle type's drawing, in mm with y up from the ground and the rider facing +x, as views of shapes and the
 // dimensions lettered on them, keyed type/type_detail for a detail drawn its own way. A figure the size doesn't list is
@@ -959,7 +959,7 @@ export const drawingViews = ({ type, data, typeDetail, size }) => {
   const wheelAt = (positions, fallback) => {
     const built = positions.map((position) => builtWheel(data, size, position)).find((each) => isNumber(each?.bsd))
     const figure = tireFigure(size, positions[0])
-    const tire = figure ?? built?.tire_width ?? assume('wheels', built?.tire_width_max ?? fallback.tire)
+    const tire = figure ?? built?.tire_width ?? assume('wheels', catalogValue(built, 'tire_width_max') ?? fallback.tire)
     return { r: (built?.bsd ?? assume('wheels', fallback.bsd)) / 2 + tire, tire, listed: Boolean(built), tireListed: isNumber(figure) || isNumber(built?.tire_width) }
   }
   // the first of `keys` it lists, else the first's typical

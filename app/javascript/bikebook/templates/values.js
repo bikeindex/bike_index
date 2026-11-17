@@ -57,6 +57,11 @@ export const slice = (hash, keys) => Object.fromEntries(keys.filter((key) => key
 export const except = (hash, keys) => Object.fromEntries(Object.entries(hash).filter(([key]) => !keys.includes(key)))
 export const array = (value) => value == null ? [] : [value].flat()
 
+// TODO: once the catalog publishes its 0.28.0 schema, read the new keys alone and delete this
+const LEGACY_KEYS = { rider_height_min: 'min_rider_height', rider_height_max: 'max_rider_height', tire_width_max: 'max_tire_width', rotor_diameter_max: 'max_rotor_diameter' }
+// `hash`'s `key`, or the name a catalog before 0.28.0 gives it
+export const catalogValue = (hash, key) => hash?.[key] ?? hash?.[LEGACY_KEYS[key]]
+
 // Array#sum, which adds floats with Kahan-Babuska compensation
 export const sum = (values) => {
   let total = 0

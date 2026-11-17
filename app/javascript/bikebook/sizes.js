@@ -1,4 +1,4 @@
-import { array } from 'bikebook/templates/values'
+import { array, catalogValue } from 'bikebook/templates/values'
 import { storage } from 'utils/storage'
 
 const KEY = 'bikebook:sizes'
@@ -31,7 +31,7 @@ const medium = (sizes) => matching(sizes, 'M') ?? sizes[Math.floor((sizes.length
 const gap = (a, b) => typeof a === 'number' && typeof b === 'number' ? Math.abs(a - b) : Infinity
 // the heights of the riders a size fits, [min, max], open where it lists only the other
 const riders = (size) => {
-  const [min, max] = ['rider_height_min', 'rider_height_max'].map((key) => size?.geometry?.[key])
+  const [min, max] = ['rider_height_min', 'rider_height_max'].map((key) => catalogValue(size?.geometry, key))
   return [min, max].some((each) => typeof each === 'number') ? [min ?? -Infinity, max ?? Infinity] : null
 }
 // how far apart the riders `size` and `target` fit are, 0 where they overlap, and how few of them they share
