@@ -12,6 +12,18 @@ module Integrations
       MANIFEST_URL = LOCAL_DIRECTORY ? "#{LOCAL_PATH}/manifest.json" : "#{URL}manifest.json"
       GITHUB_REPO_URL = "https://github.com/bikeindex/bikebook"
       MODEL_ID = %r{\Am/([a-z0-9_]+/\d{4})/[a-z0-9_]+\z}
+      # the CycleType slugs Bike Book's vehicle types name differently
+      CYCLE_TYPES = {
+        trailer: "bike_trailer",
+        cargo: "cargo_bike",
+        "cargo-rear": "cargo_bike_rear",
+        "cargo-trike": "cargo_tricycle",
+        "cargo-trike-rear": "cargo_tricycle_rear",
+        "personal-mobility": "epamd",
+        "non-e-scooter": "scooter",
+        "non-e-skateboard": "skateboard",
+        elliptical: "elliptical_bike"
+      }.freeze
 
       Unreachable = Class.new(StandardError)
 
@@ -20,6 +32,19 @@ module Integrations
         block = (manifest || raise(Unreachable)).dig("blocks", id[MODEL_ID, 1])
         model = block && (file(block) || raise(Unreachable)).dig("models", id)
         model && {title: "#{model["manufacturer"]} #{model["model"]}", description: model["description"], image_url: model["stock_photo"]}
+      end
+
+      # nil for an id the catalog lacks, or while it doesn't answer
+      def model(id)
+        block = manifest&.dig("blocks", id[MODEL_ID, 1])
+        block && file(block)&.dig("models", id)
+      end
+
+      # The id of the manufacturer's model of that name sold in that year, nil for one the catalog lacks
+      def model_id(manufacturer:, name:, year:)
+        name = Slugifyer.book_slug(name)
+        manufacturer_models(Slugifyer.manufacturer(manufacturer))
+          &.find { it["model"] == name && (it["first_year"]..it["final_year"]).cover?(year) }&.dig("id")
       end
 
       # vehicle_models' entries: each vehicle's id, then in braces what's picked for it, m/trek/2026/marlin_5{size:M}{json}.
@@ -49,6 +74,25 @@ module Integrations
         end || nil
       end
 
+      # The index is too big to cache whole, so it's cached by manufacturer
+      def manufacturer_models(manufacturer)
+        catalog = manifest
+        index = catalog&.dig("index")
+        return unless index && catalog["blocks"].each_key.any? { it.start_with?("#{manufacturer}/") }
+
+        key = ["bikebook_catalog/models", index, manufacturer]
+        Rails.cache.read(key) || cache_index(index)[key]
+      end
+
+      def cache_index(index)
+        read(index)["models"].group_by { it["manufacturer"] }.to_h do |manufacturer, models|
+          [["bikebook_catalog/models", index, manufacturer],
+            models.map { it.slice("id", "first_year", "final_year").merge("model" => Slugifyer.book_slug(it["model"])) }]
+        end.tap { Rails.cache.write_multi(it, expires_in: 1.week) }
+      rescue Faraday::Error, JSON::ParserError, SystemCallError
+        {}
+      end
+
       def read(path)
         JSON.parse(LOCAL_DIRECTORY ? File.read(File.join(LOCAL_DIRECTORY, path)) : connection.get(path).body)
       end
@@ -57,7 +101,7 @@ module Integrations
       # vocabulary and a model's block - which give up inside rack-timeout's 30s unless a body trickles in
       def connection = Faraday.new(url: URL, request: {open_timeout: 2, timeout: 7}) { it.response :raise_error }
 
-      conceal :cached, :read, :connection
+      conceal :cached, :manufacturer_models, :cache_index, :read, :connection
     end
   end
 end

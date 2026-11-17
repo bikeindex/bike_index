@@ -843,30 +843,28 @@ RSpec.describe BikeServices::Creator do
     it "returns the bike if stuff isn't present" do
       expect(instance.send(:add_bike_book_data)).to be_nil
     end
-    context "se data" do
-      let(:manufacturer_name) { "SE Bikes" }
+    context "a model in Bike Book" do
+      before { stub_bikebook_catalog }
+      let(:manufacturer_name) { "Specialized" }
       let(:bike_params) do
         {
           serial_number: "Some serial",
           description: "Input description",
           manufacturer_id: manufacturer.id,
-          year: 2014,
-          frame_model: "Draft",
+          year: 2025,
+          frame_model: "Haul ST",
           primary_frame_color_id: color.id
         }
       end
-      it "adds se bike data if it exists" do
-        VCR.use_cassette("bike_creator-include_bike_book", re_record_interval: 6.months) do
-          instance.send(:add_bike_book_data, b_param)
+      it "adds the model's data" do
+        instance.send(:add_bike_book_data, b_param)
 
-          b_param.reload
-          expect(b_param.params["components"].count).to be > 5
-          expect(b_param.params["components"].count { |c| c["is_stock"] }).to be > 5
-          expect(b_param.params["components"].count { |c| !c["is_stock"] }).to eq(0)
-          expect(b_param.bike["description"]).not_to eq("Input description")
-          expect(b_param.bike["serial_number"]).to eq("Some serial")
-          expect(b_param.bike["primary_frame_color_id"]).to eq(color.id)
-        end
+        b_param.reload
+        expect(b_param.params["components"].count).to be > 5
+        expect(b_param.params["components"]).to all(include("is_stock" => true))
+        expect(b_param.bike["description"]).to start_with("Input description Whatever you’re into")
+        expect(b_param.bike).to include("serial_number" => "Some serial", "primary_frame_color_id" => color.id,
+          "cycle_type" => "cargo", "stock_photo_url" => "https://bikebook.bikeindex.org/specialized/2025/haul_st.png")
       end
     end
   end
