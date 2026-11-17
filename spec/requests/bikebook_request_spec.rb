@@ -21,7 +21,7 @@ RSpec.describe BikebookController, type: :request do
         .and have_css("#manufacturer-hw-listbox", visible: :all)
         .and have_css("#vehicle-viewers", visible: :all)
       expect(page).to have_title("Bike Book", exact: true)
-        .and have_css("meta[property='og:image'][content*='/assets/logos/bikebook_icon']", visible: :all)
+        .and have_css("meta[property='og:image'][content*='/assets/logos/bikebook']", visible: :all)
         .and have_css("meta[name='twitter:card'][content='summary']", visible: :all)
       expect(response.headers["X-Robots-Tag"]).to be_nil
       expect(page.find("section.inverted")).to have_text("Bike Book data is free to use under CC BY-SA 4.0.")

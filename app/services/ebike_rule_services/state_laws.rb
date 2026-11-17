@@ -131,10 +131,10 @@ module EbikeRuleServices
     end
 
     # The vocabulary's classifications as the block reads them. Its file name carries its digest, so a republished one
-    # is a new key
+    # is a new key, and the version moves when the block reads different keys
     def vocabulary(name)
       path = Integrations::Bikebook::Catalog.manifest&.dig("vocabulary")
-      path && Rails.cache.fetch(["bikebook_catalog/#{name}", path], expires_in: 1.week, skip_nil: true) do
+      path && Rails.cache.fetch(["bikebook_catalog/#{name}", 2, path], expires_in: 1.week, skip_nil: true) do
         Integrations::Bikebook::Catalog.file(path)&.dig("e_vehicle_classifications")&.then { yield it }
       end
     end
@@ -147,7 +147,7 @@ module EbikeRuleServices
         .to_h { |abbreviation, id, record| [abbreviation, law(id, record)] }
       {
         laws:,
-        tiers: tiers.group_by(&:first).transform_values { it.map { |_, id, record| law(id, record).merge(ids: [id, *record["groups"]], value: id.split("/").last, min_watts: record["min_power"]) } },
+        tiers: tiers.group_by(&:first).transform_values { it.map { |_, id, record| law(id, record).merge(ids: [id, *record["groups"]], value: id.split("/").last, min_watts: power(record, "min")) } },
         groups: records.filter_map { |id, record| [id, record["groups"]] if record["groups"] }.to_h,
         e_bike_laws: records.filter_map { |id, record| id if record["e_bike_law"] },
         classes: states.group_by(&:first).filter_map { |abbreviation, entries|
@@ -196,7 +196,7 @@ module EbikeRuleServices
 
     def state_class(id, record)
       {id:, name: record["name"], description: record["description"], throttle: record["throttle"], mph: mph(record["max_speed"]),
-       kmh: record["max_speed"], metric: metric?(record), watt_cap: record["max_power"], min_watts: record["min_power"]}
+       kmh: record["max_speed"], metric: metric?(record), watt_cap: power(record, "max"), min_watts: power(record, "min")}
     end
 
     # Outside the US, where a limit reads in km/h
@@ -204,13 +204,16 @@ module EbikeRuleServices
 
     def mph(kilometers) = kilometers&.then { UnitSystem.kilometers_to_miles(it).round }
 
+    # TODO: once the catalog publishes its 0.28.0 schema, read power_min and power_max alone
+    def power(record, bound) = record["power_#{bound}"] || record["#{bound}_power"]
+
     def law(id, record)
       {
         id:,
         name: record["name"],
         description: record["description"],
         classes: record["groups"].to_a.filter_map { it[BikebookCatalog::US_CLASS, 1]&.to_i }.sort,
-        watt_cap: record["max_power"],
+        watt_cap: power(record, "max"),
         mph: mph(record["max_speed"]),
         kmh: record["max_speed"],
         metric: metric?(record),
@@ -255,6 +258,6 @@ module EbikeRuleServices
       (tier[:mph].nil? || mph&.<=(tier[:mph])) && (watts.nil? || (tier[:min_watts]..tier[:watt_cap]).cover?(watts))
     end
 
-    conceal :for_class?, :ranked_top_rules, :top_rule_rank, :parsed, :classifications, :vocabulary, :parse, :parse_places, :motor_vehicle_law, :state_classes, :by_speed, :speed_rank, :state_class, :metric?, :mph, :law, :restriction, :web_pages, :date, :in_force, :current, :upcoming, :top_rules, :within_limits?
+    conceal :for_class?, :ranked_top_rules, :top_rule_rank, :parsed, :classifications, :vocabulary, :parse, :parse_places, :motor_vehicle_law, :state_classes, :by_speed, :speed_rank, :state_class, :metric?, :mph, :power, :law, :restriction, :web_pages, :date, :in_force, :current, :upcoming, :top_rules, :within_limits?
   end
 end

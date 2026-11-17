@@ -82,6 +82,7 @@ gem "twilio-ruby" # Twilio, for verifying phone numbers
 gem "stripe" # Payments
 gem "fog-aws" # Aws used with carrierwave for S3 to store images
 gem "aws-sdk-s3", require: false # Used by ActiveStorage for Cloudflare R2
+gem "aws-sdk-core" # Loaded at boot: BikeServices::Creator rescues its errors
 gem "postmark-rails" # Transactional email
 gem "MailchimpMarketing", github: "mailchimp/mailchimp-marketing-ruby" # Marketing emails
 gem "facebookbusiness", github: "facebook/facebook-ruby-business-sdk", branch: "main" # For promoted alerts
