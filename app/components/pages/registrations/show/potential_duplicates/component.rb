@@ -7,6 +7,9 @@ module Pages
         # Registrations sharing a serial segment with the bike, for law enforcement lookups
         class Component < ApplicationComponent
           LIMIT = 25
+          # Out past UI::Card's p-4 to its border, which rounded-sm leaves 3px of radius inside
+          TABLE_CLASSES = "tw:mt-3 tw:-mx-4 tw:overflow-hidden tw:border-gray-200 tw:dark:border-gray-700 " \
+            "tw:not-last:border-b tw:last:-mb-4 tw:last:rounded-b-[3px]"
 
           # Inside an element with Pages::Org::Search::ColumnSettings' data attributes;
           # column_settings renders that element's panel and toggle

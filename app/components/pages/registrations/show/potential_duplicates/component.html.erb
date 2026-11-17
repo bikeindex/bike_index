@@ -29,7 +29,7 @@
     </div>
   <% end %>
 
-  <div class="tw:mt-3">
+  <div class="<%= TABLE_CLASSES %>">
     <%= render(Pages::Org::SearchResults::BikesTable::Component.new(organization: @organization, bikes: recent_duplicate_bikes, settings: @settings)) %>
   </div>
 
