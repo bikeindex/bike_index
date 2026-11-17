@@ -331,6 +331,13 @@
   data-action="submit->bikebook--page#visit click->bikebook--page#follow popstate@window->bikebook--page#restore scroll@window->bikebook--page#track bikebook--catalog-filters:change->bikebook--page#refilter bikebook--similar:change->bikebook--page#rescore bikebook--similar:open->bikebook--page#refresh"
 >
   <% cache(page_cache_key, expires_in: CACHE_EXPIRY) do %>
+    <%# First, for what reads the page without running it - which is how crawlers come for the data %>
+    <noscript>
+      <p class="twgutter tw:mx-auto tw:max-w-screen-xl tw:py-5">
+        <%= translation(".needs_javascript_html", repository: link_to("github.com/bikeindex/bikebook", Integrations::Bikebook::Catalog::GITHUB_REPO_URL, class: "twlink")) %>
+      </p>
+    </noscript>
+
     <section
       aria-label="<%= translation(".about_bike_book_label") %>"
       class="

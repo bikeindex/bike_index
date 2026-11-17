@@ -7,6 +7,8 @@ module Pages
       # The page is a <template> bikebook--page fills in from the URL and the catalog,
       # and renders again for each pick and history step
       class Component < ApplicationComponent
+        # Template Dependency: SharedBlocks::Marketing::InvertedBlock::Component
+
         # The digest doesn't cover EbikeRuleServices::StateLaws, whose classes it renders
         CACHE_EXPIRY = 1.day
         # Rails' digest of this template would expire them with any change to it, which their own digest stands in for

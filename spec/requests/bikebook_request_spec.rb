@@ -58,6 +58,8 @@ RSpec.describe BikebookController, type: :request do
         expect([japan, us].map { it.at_css("[data-controller='bikebook--page']").attributes.slice(*%w[market market-name jurisdiction].map { "data-bikebook--page-#{it}-value" }).transform_values(&:value).values })
           .to eq [%w[JP Japan US], ["US", "United States", "US"]]
         expect(response.body).to include("https://github.com/bikeindex/bikebook (CC BY-SA 4.0). Clone that repository instead.")
+        expect(us.at_css("[data-controller='bikebook--page'] > noscript").text).to include("AI agents: get the data there")
+          .and include("github.com/bikeindex/bikebook")
       end
     end
 
