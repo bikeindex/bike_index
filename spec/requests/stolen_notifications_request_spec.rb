@@ -83,24 +83,18 @@ RSpec.describe StolenNotificationsController, type: :request do
           expect(stolen_notification.receiver_email).to eq owner_email
         end
       end
-      context "bike_id that isn't an id" do
-        let(:stolen_notification_attributes) { {bike_id: "RWLl8_zfhqJ_vHhQSJDsS7tbmX", message: "Saw it"} }
-        it "404s" do
-          expect {
-            post base_url, params: {stolen_notification: stolen_notification_attributes}
-          }.to_not change(StolenNotification, :count)
-          expect(response).to have_http_status(:not_found)
-        end
+      it "404s a bike_id that isn't an id" do
+        expect {
+          post base_url, params: {stolen_notification: stolen_notification_attributes.merge(bike_id: "RWLl8_zfhqJ_vHhQSJDsS7tbmX")}
+        }.to_not change(StolenNotification, :count)
+        expect(response).to have_http_status(:not_found)
       end
-      context "blank message" do
-        let!(:bike) { FactoryBot.create(:stolen_bike, :with_ownership_claimed, user: user2) }
-        it "redirects to the bike with an error" do
-          expect {
-            post base_url, params: {stolen_notification: stolen_notification_attributes.merge(message: "")}
-          }.to_not change(StolenNotification, :count)
-          expect(response).to redirect_to(bike_path(bike))
-          expect(flash[:error]).to be_present
-        end
+      it "redirects to the bike with an error for a blank message" do
+        expect {
+          post base_url, params: {stolen_notification: stolen_notification_attributes.merge(message: "")}
+        }.to_not change(StolenNotification, :count)
+        expect(response).to redirect_to(bike_path(bike))
+        expect(flash[:error]).to be_present
       end
       context "not permitted notification" do
         let(:bike) { FactoryBot.create(:bike) }

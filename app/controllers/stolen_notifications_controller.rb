@@ -8,7 +8,7 @@ class StolenNotificationsController < ApplicationController
   def create
     @stolen_notification = StolenNotification.new(permitted_parameters)
     @stolen_notification.sender = current_user
-    @bike = Bike.find(@stolen_notification.bike_id)
+    @bike = @stolen_notification.bike = Bike.find(@stolen_notification.bike_id)
     if !@bike.contact_owner?(current_user)
       flash[:error] = translation(:unauthorized)
     elsif @stolen_notification.save
