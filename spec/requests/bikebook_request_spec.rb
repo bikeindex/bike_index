@@ -238,6 +238,7 @@ RSpec.describe BikebookController, type: :request do
     it "is ok, in the format the browser's reader reads" do
       get "/up/bikebook"
       expect(response).to have_http_status(:ok)
+      expect(response.body).to include(%(<body style="background-color: green">))
       %w[catalog_worker similarity].each do |reader|
         expect(Rails.root.join("app/javascript/bikebook/#{reader}.js").read).to include("const FORMAT = #{Integrations::Bikebook::Catalog::FORMAT}\n")
       end
@@ -248,6 +249,7 @@ RSpec.describe BikebookController, type: :request do
         stub_const("Integrations::Bikebook::Catalog::FORMAT", 2)
         get "/up/bikebook"
         expect(response).to have_http_status(:service_unavailable)
+        expect(response.body).to include(%(<body style="background-color: red">))
       end
     end
 
@@ -256,6 +258,7 @@ RSpec.describe BikebookController, type: :request do
         stub_const("Integrations::Bikebook::Catalog::URL", "https://bikebook-catalog.bikeindex.org/not_a_catalog/")
         get "/up/bikebook"
         expect(response).to have_http_status(:service_unavailable)
+        expect(response.body).to include(%(<body style="background-color: red">))
       end
     end
   end
