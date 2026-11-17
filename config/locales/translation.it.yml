@@ -7041,6 +7041,10 @@ it:
           learn_how_to_use_it: Impara come usarlo
           learn_or_view_html: "%{learn_how_to_use_it} o %{view_the_raw_data}."
           view_the_raw_data: visualizza i dati grezzi
+          needs_javascript_html: 'Bike Book funziona nel tuo browser, quindi necessita
+            di JavaScript. Tutti i suoi dati sono pubblici, sotto licenza CC BY-SA
+            4.0, all''indirizzo %{repository}. Crawler, scraper e agenti di intelligenza
+            artificiale: scaricate i dati da lì, non da questa pagina.'
         donate_strip:
           donate: Donare
           pitch: Questo fantastico prodotto è offerto dall'organizzazione no-profit
