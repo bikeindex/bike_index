@@ -126,9 +126,9 @@ class CycleType
       "bike"
     end
 
-    def bikebook_type(slug) = BIKEBOOK_TYPES[slug&.to_sym] || slug.to_s.underscore
+    def bikebook_type(slug) = BIKEBOOK_TYPES[slug.to_sym] || slug.to_s.underscore
 
-    # nil for a vehicle type that's no cycle type, as an e-ATV
+    # nil for a Bike Book type with no cycle type (e_atv)
     def from_bikebook_type(type) = BIKEBOOK_TYPES.key(type) || find_sym(type)
 
     private

@@ -235,8 +235,7 @@ RSpec.describe BikeServices::Creator do
         end
         let(:not_matched_attrs) { %i[user_name propulsion_type_slug manufacturer_id manufacturer_other street address_record_attributes] }
         let(:target_internal_address_attrs) do
-          {street: "Somewhere Ville", city: "New York", region_string: "NY", postal_code: "10007",
-           country_id: Country.united_states_id, latitude: default_location[:latitude], longitude: default_location[:longitude]}
+          default_location_address_record_attrs.except(:region).merge(street: "Somewhere Ville", region_string: "NY")
         end
         let(:target_address_record) do
           target_internal_address_attrs.merge(neighborhood: "Tribeca", kind: "ownership", publicly_visible_attribute: "postal_code")
