@@ -209,7 +209,11 @@ RSpec.describe BikebookController, type: :request do
   end
 
   describe "up", vcr: {cassette_name: "bikebook-up"} do
-    before { Rails.cache.clear }
+    # WebMock stubs outlive their examples here, and answer ahead of the cassette
+    before do
+      WebMock.reset!
+      Rails.cache.clear
+    end
 
     it "is ok, in the format the browser's reader reads" do
       get "/up/bikebook"

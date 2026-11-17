@@ -17,9 +17,10 @@ module Integrations
 
       Unreachable = Class.new(StandardError)
 
-      # The model's title, description and image_url, nil for one the catalog hasn't. Raises Unreachable when it doesn't answer
+      # The model's title, description and image_url, nil for one the catalog hasn't. Raises Unreachable when it isn't readable?
       def vehicle(id)
-        block = (manifest || raise(Unreachable)).dig("blocks", id[MODEL_ID, 1])
+        raise Unreachable unless readable?
+        block = manifest.dig("blocks", id[MODEL_ID, 1])
         model = block && (file(block) || raise(Unreachable)).dig("models", id)
         model && {title: "#{model["manufacturer"]} #{model["model"]}", description: model["description"], image_url: model["stock_photo"]}
       end
@@ -30,8 +31,11 @@ module Integrations
 
       def vehicle_id(entry) = entry.split("{").first.strip
 
-      # nil while the catalog doesn't answer, or answers in a format the reader doesn't
-      def manifest = cached("bikebook_catalog/manifest", "manifest.json", expires_in: 5.minutes)&.then { it if it["format"] == FORMAT }
+      # nil while the catalog doesn't answer
+      def manifest = cached("bikebook_catalog/manifest", "manifest.json", expires_in: 5.minutes)
+
+      # Whether the catalog answers in the format /bikebook reads. The e-bike law pages read the manifest regardless
+      def readable? = manifest&.dig("format") == FORMAT
 
       # A published file, nil while the catalog doesn't answer. Its name is a digest of its contents,
       # so it keeps while it's published
