@@ -21,7 +21,8 @@ module EbikeRuleServices
       modes = updated(motors.flat_map { it["operating_modes"] || [] })
       throttle_modes = modes.select { it["mode"] == "throttle" }
       assist_modes = modes.select { it["mode"] == "assist" }
-      certifications = motors.map { it["certification"] }.join(", ")
+      # TODO: once every model the catalog publishes is at its 1.0.0 schema, read certifications alone
+      certifications = motors.flat_map { Array(it["certifications"]).presence || it["certification"].to_s.split(/,\s*/) }
       classifications = modes.flat_map { Array(it["e_vehicle_classifications"]) }.uniq
       tiers = classifications - EbikeRuleServices::StateLaws.e_bike_law_ids
       {
