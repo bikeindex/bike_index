@@ -19,7 +19,7 @@ module Pages
 
         private
 
-        # Nothing to leave to the registrant until the organization has rules to agree to
+        # Nothing to leave to the registrant until the organization has an education course to agree to
         def safety_rules? = @organization.education_courses.active.exists?
       end
     end

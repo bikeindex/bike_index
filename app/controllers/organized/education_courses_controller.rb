@@ -10,7 +10,7 @@ module Organized
       @previous = current_organization.education_courses.archived.order(end_at: :desc).to_a
     end
 
-    # The faked registrant walk-through, one screen (?page=) per rule page plus the review
+    # The faked registrant walk-through, one screen (?page=) per education page plus the review
     # they end on. page is 1-indexed (Pagy); the preview component's index is 0-based.
     def show
       @education_course = current_organization.education_courses.find(params[:id])

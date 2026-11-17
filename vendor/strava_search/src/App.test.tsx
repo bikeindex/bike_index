@@ -19,7 +19,7 @@ vi.mock('./contexts/AuthContext', () => ({
 }));
 
 vi.mock('./contexts/PreferencesContext', () => ({
-  usePreferences: () => ({ units: 'imperial', autoEnrich: false, darkMode: 'system' }),
+  usePreferences: () => ({ units: 'imperial', autoEnrich: false }),
 }));
 
 vi.mock('./hooks/useActivitySync', () => ({

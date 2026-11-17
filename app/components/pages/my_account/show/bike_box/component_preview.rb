@@ -26,7 +26,7 @@ module Pages
             render_box(bike(id: 44, thumb_path: SharedBlocks::SearchResults::BikeBox::ComponentPreview.vehicles.first.thumb_path))
           end
 
-          # The alert checks the database that the safety rules are still owed, so this needs a
+          # The alert checks the database that the education course is still owed, so this needs a
           # real registration
           def unfinished_registration_alert
             b_param = ::BParam.unexpired.acknowledgment_pending.with_bike.reorder(:updated_at).last

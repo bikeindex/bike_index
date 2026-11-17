@@ -79,7 +79,7 @@ module BikeServices
 
     # Two waiting at most - the one new lands on and the one before it. Ordered the way
     # the unfinished_registration alert picks its one, so what goes is what it would
-    # never have pointed at. Without a bike, since one owing the safety rules is never discarded
+    # never have pointed at. Without a bike, since one owing an education course is never discarded
     def discard_extra(user:)
       return if user.blank?
 
@@ -118,10 +118,10 @@ module BikeServices
       %i[single_page separate_attestation].index_with { in_session && settings[it.to_s].present? }
     end
 
-    # The safety rules a registration acknowledges, only for an e-vehicle - the organization's
+    # The education course a registration acknowledges, only for an e-vehicle - the organization's
     # active course or else the default, or the one its pages are being agreed to from, even
     # once replaced.
-    # default_course: false is the legacy forms, which pass on only an organization's own rules.
+    # default_course: false is the legacy forms, which pass on only an organization's own course.
     # motorized: the single page asks what an e-vehicle would get, before it's said it's one.
     # Checked first - it's in memory, and creation_organization is a query
     def education_course(b_param, separate_attestation: false, user: nil, motorized: b_param.motorized?, default_course: true)
@@ -139,7 +139,7 @@ module BikeServices
       EducationCourse.active_for(organization) if organization.present?
     end
 
-    # education_course for a link back into the flow, and whether the rules restarted:
+    # education_course for a link back into the flow, and whether the education course restarted:
     # resuming starts over on the organization's current version rather than finishing one
     # it's replaced since. An agreement already made stands
     def resume_education_course(b_param, course:)
@@ -193,7 +193,7 @@ module BikeServices
     end
 
     # The single page's electric checkbox is on the same form as its submit button, so the
-    # button is told what it'd lead to for an e-vehicle. Separate attestation leaves the rules
+    # button is told what it'd lead to for an e-vehicle. Separate attestation leaves the education course
     # to an owner who isn't the registrant, which the email typed above it decides - :own_emails.
     # The default course is only ever for the registrant's own, so it's decided the same way
     def motorized_review(b_param, flow, separate_attestation:)
@@ -206,7 +206,7 @@ module BikeServices
     # Whether the flow includes the report step - what was stolen, or what was found
     def report_step?(status) = REPORT_RECORDS.key?(status)
 
-    # What the acknowledgment eyebrow counts: the rule pages, plus the review they end at
+    # What the acknowledgment eyebrow counts: the education pages, plus the review they end at
     def acknowledgment_step_count(course) = course_pages(course).count + 1
 
     # Nothing to agree to without a course, otherwise the acknowledgment record
@@ -220,7 +220,7 @@ module BikeServices
       b_param.params.dig("education_course", "acknowledged_page_ids") || []
     end
 
-    # All or nothing: a page is only acknowledged with every one of its rules checked
+    # All or nothing: a page is only acknowledged with every one of its bullets checked
     # (an unchecked box submits nothing, so the lengths only match when they all did)
     def acknowledge_page(b_param, page, checked:)
       bullets = page&.bullets || []
@@ -250,7 +250,7 @@ module BikeServices
       EducationCourseAcknowledgment.acknowledge(b_param, course:, user:)
     end
 
-    # The bike exists with its rules agreed to, or everything reachable is entered and awaiting
+    # The bike exists with its education course agreed to, or everything reachable is entered and awaiting
     # the email - the report step waits on that same confirmation, so it isn't what's left here
     def finished?(b_param, course:)
       return !acknowledgment_owed?(b_param, course:) if b_param.with_bike?
@@ -372,7 +372,7 @@ module BikeServices
     end
 
     # Everything a submission does once its step is saved. Returns the bike, or nil while the
-    # registration is short of finished - more to enter, the email unconfirmed, or rules owed
+    # registration is short of finished - more to enter, the email unconfirmed, or the education course owed
     def complete(b_param, user:, course:, ip_address:)
       claim_creator(b_param, user)
       return create_bike_if_ready(b_param, course:, ip_address:) unless b_param.with_bike?
@@ -391,7 +391,7 @@ module BikeServices
       register_flow.select { matches_bike?(it, bike) } + [embed_match].compact
     end
 
-    # The legacy forms show no rules, so an e-vehicle's go to its owner even when self-registered
+    # The legacy forms show no education course, so an e-vehicle's course goes to its owner even when self-registered
     def create_legacy_bike(b_param, ip_address:)
       b_param.params = b_param.params.merge("register_separate_attestation" => true)
       create_bike(b_param, course: nil, ip_address:, rules_to_owner: true)
@@ -408,7 +408,7 @@ module BikeServices
       !report_step?(b_param.status) && (registrant.blank? || b_param.self_made?(registrant))
     end
 
-    # An agreement to one organization's rules says nothing about another's
+    # An agreement to one organization's education course says nothing about another's
     def restart_rules(b_param)
       b_param.params = b_param.params.except("education_course")
       EducationCourseAcknowledgment.where(b_param_id: b_param.id).destroy_all
@@ -472,7 +472,7 @@ module BikeServices
       b_param.update(creator_id: user.id)
     end
 
-    # The bike is created before the safety rules, which the registration still has to agree
+    # The bike is created before the education course, which the registration still has to agree
     # to - unless the course has since gone, leaving nothing to agree to
     def acknowledgment_owed?(b_param, course:)
       b_param.acknowledgment_pending? && course_pages(course).any?
@@ -485,8 +485,8 @@ module BikeServices
       create_bike(b_param, course:, ip_address:)
     end
 
-    # Returns nil while the rules are owed - the bike exists, but the registration isn't finished -
-    # unless separate attestation left them to the owner, who's emailed the link back instead.
+    # Returns nil while the education course is owed - the bike exists, but the registration isn't finished -
+    # unless separate attestation left it to the owner, who's emailed the link back instead.
     # The switches ride to the ownership's registration_info, so registrations can be counted by them
     def create_bike(b_param, course:, ip_address:, rules_to_owner: false)
       b_param.creator_id ||= confirmed_email_creator_id(b_param)

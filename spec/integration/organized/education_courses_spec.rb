@@ -27,7 +27,7 @@ RSpec.describe "Organized education courses", :js, type: :system do
     click_link "Add page"
     expect(page).to have_css("lexxy-editor lexxy-toolbar", wait: 10) # editors upgrade lazily
     fill_in "Title", with: "Winter storage rules"
-    # A page needs at least one rule to save
+    # A page needs at least one bullet to save
     new_bullet = first("lexxy-editor [contenteditable='true']")
     new_bullet.click
     new_bullet.send_keys("Drain the battery before storing")
@@ -90,7 +90,7 @@ RSpec.describe "Organized education courses", :js, type: :system do
     click_button "Create a course"
 
     click_link "Preview"
-    # Continue is disabled until every rule is checked - the same register--acknowledgment
+    # Continue is disabled until every bullet is checked - the same register--acknowledgment
     # controller the real flow uses
     expect(page).to have_button("Continue", disabled: true)
 

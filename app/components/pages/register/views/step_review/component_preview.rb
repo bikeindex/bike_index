@@ -4,7 +4,7 @@ module Pages
   module Register
     module Views
       module StepReview
-        # The acknowledgment the rule pages end at, rendered from an organization's live course
+        # The acknowledgment the education pages end at, rendered from an organization's live course
         class ComponentPreview < ApplicationComponentPreview
           def default
             return production_notice("registration") if Rails.env.production?

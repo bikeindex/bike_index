@@ -4,7 +4,7 @@ module Pages
   module Register
     module Views
       module StepAcknowledgment
-        # One page of the organization's e-vehicle safety rules. Every rule has to be
+        # One page of the organization's e-vehicle education course. Every bullet has to be
         # checked before the flow moves on, so the page is agreed to as a whole.
         class Component < ApplicationComponent
           def initialize(b_param:, course:, step:, flow:)
