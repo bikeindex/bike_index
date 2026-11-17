@@ -9,6 +9,8 @@ module Pages
       class Component < ApplicationComponent
         # The digest doesn't cover EbikeRuleServices::StateLaws, whose classes it renders
         CACHE_EXPIRY = 1.day
+        # Rails' digest of this template would expire them with any change to it, which their own digest stands in for
+        CHILD_CACHE = {expires_in: CACHE_EXPIRY, skip_digest: true}.freeze
 
         # market is the visitor's CF-IPCountry, which Cloudflare sends as XX, or T1 over Tor, when it can't
         # tell; state is theirs in the US. framed: in an iframe, whose autofocus would take its host page's focus
@@ -25,6 +27,10 @@ module Pages
 
         # Every visitor's and every query's, which bikebook--page and placeholder_class fill in around them
         def cache_key(*parts) = [self.class.cache_digest, *parts]
+
+        # A component's own fragment inside the page's. Not cache_on: these also render on /ebike-rules, where the same
+        # tile twice would repeat its tooltip's id
+        def child_cache_key(component, *parts) = [component.cache_digest, *parts]
 
         # The search until bikebook--page fills it in from the URL: hidden as searching() hides a lone model's, and blank
         # where the URL sets anything but picks, which it says are loading

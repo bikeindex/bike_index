@@ -108,17 +108,13 @@
 
             <div class="tw:flex tw:flex-col tw:gap-4">
               <%= render(Pages::Bikebook::Show::FilterCombobox::Component.new(name: "primary_activity",
-          label: translation(".activities"), placeholder: translation(".any_activity"), multiselect: true)) do %>
-                <%= translation(".activity_examples") %>
-              <% end %>
+          label: translation(".activities"), placeholder: translation(".any_activity"), note: translation(".activity_examples"), multiselect: true)) %>
 
               <%= render(Pages::Bikebook::Show::FilterCombobox::Component.new(name: "vehicle_type",
           label: translation(".vehicle_types"), placeholder: translation(".any_vehicle_type"), multiselect: true)) %>
 
               <%= render(Pages::Bikebook::Show::FilterCombobox::Component.new(name: "manufacturer",
-          label: translation(".manufacturers"), placeholder: translation(".any_manufacturer"), multiselect: true)) do %>
-                <span id="manufacturer-count"></span>
-              <% end %>
+          label: translation(".manufacturers"), placeholder: translation(".any_manufacturer"), note: tag.span(id: "manufacturer-count"), multiselect: true)) %>
 
               <div
                 class="
@@ -208,9 +204,7 @@
             label: translation(".suspension"), placeholder: translation(".any_suspension"))) %>
 
                 <%= render(Pages::Bikebook::Show::FilterCombobox::Component.new(name: "model_configuration",
-            label: translation(".configuration"), placeholder: translation(".any_configuration"))) do %>
-                  <%= translation(".configuration_examples") %>
-                <% end %>
+            label: translation(".configuration"), placeholder: translation(".any_configuration"), note: translation(".configuration_examples"))) %>
               </div>
 
               <div class="tw:grid tw:gap-4 tw:sm:grid-cols-2">
@@ -385,7 +379,9 @@
       </div>
     </section>
 
-    <%= render(Pages::Bikebook::DonateStrip::Component.new) %>
+    <% cache(child_cache_key(Pages::Bikebook::DonateStrip::Component), CHILD_CACHE) do %>
+      <%= render(Pages::Bikebook::DonateStrip::Component.new) %>
+    <% end %>
 
     <%#
       The tiles the Overview shows, as /ebike-rules does: the US classes', each also as only an optional mode brings it,
@@ -397,7 +393,9 @@
       <template
         data-bikebook-class-badge="<%= [e_bike_class || "emoto", optional, out_of_class_id].compact.join("/") %>"
       >
-        <%= render(Pages::EbikeRules::ClassTile::Component.new(e_bike_class:, optional:, size: :lg, explained: true, out_of_class_id:)) %>
+        <% cache(child_cache_key(Pages::EbikeRules::ClassTile::Component, e_bike_class, optional, out_of_class_id), CHILD_CACHE) do %>
+          <%= render(Pages::EbikeRules::ClassTile::Component.new(e_bike_class:, optional:, size: :lg, explained: true, out_of_class_id:)) %>
+        <% end %>
       </template>
     <% end %>
 
@@ -406,14 +404,18 @@
       <template
         data-bikebook-ul-badge="<%= [standard, status].compact.join("/") %>"
       >
-        <%= render(Pages::EbikeRules::UlBadge::Component.new(standard:, status:)) %>
+        <% cache(child_cache_key(Pages::EbikeRules::UlBadge::Component, standard, status), CHILD_CACHE) do %>
+          <%= render(Pages::EbikeRules::UlBadge::Component.new(standard:, status:)) %>
+        <% end %>
       </template>
     <% end %>
 
     <%# The US classes' cards a picked classification shows, which a state jurisdiction's own, with its rules, replaces %>
     <% (1..3).each do |e_bike_class| %>
       <template data-bikebook-class-card="<%= e_bike_class %>">
-        <%= render(Pages::EbikeRules::ClassCard::Component.new(e_bike_class:)) %>
+        <% cache(child_cache_key(Pages::EbikeRules::ClassCard::Component, e_bike_class), CHILD_CACHE) do %>
+          <%= render(Pages::EbikeRules::ClassCard::Component.new(e_bike_class:)) %>
+        <% end %>
       </template>
     <% end %>
   <% end %>
