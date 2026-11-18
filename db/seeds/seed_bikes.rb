@@ -440,15 +440,15 @@ child_carrying_activity = PrimaryActivity.friendly_find("Child Carrying")
 
 # Stock build spec from Riese & Müller's Load4 75 rohloff (2023, universal size)
 rm_components = [
-  {ctype: "Chain Guide", description: "Riemenschutzring"},
+  {ctype: "Bashguard/Chain Guide", description: "Riemenschutzring"},
   {ctype: "Bell/Noisemaker", description: "Billy"},
   {ctype: "Brake", manufacturer: "Tektro", front: true, rear: true, description: "Tektro TRP C 2.3 disc brake"},
   {ctype: "Chainrings", description: "55T, for Gates drive belt CDX"},
-  {ctype: "Cassette", rear: true, description: "19T, for Gates drive belt CDX"},
+  {ctype: "Cog/Cassette/Freewheel", rear: true, description: "19T, for Gates drive belt CDX"},
   {ctype: "Crankset", description: "FSA/Riese & Müller, 170 mm"},
   {ctype: "Drive Belt", description: "Gates drive belt CDX"},
   {ctype: "E-vehicle Battery", description: "Akku Bosch PowerPack Frame 725"},
-  {ctype: "E-vehicle Remote", manufacturer: "Bosch", description: "Bosch Purion 200"},
+  {ctype: "E-vehicle Display/Remote", manufacturer: "Bosch", description: "Bosch Purion 200"},
   {ctype: "E-vehicle Motor", manufacturer: "Bosch", description: "Bosch Cargo Line (smart system)"},
   {ctype: "Fender", manufacturer: "SKS", description: "SKS A65R"},
   {ctype: "Fork", description: "Suntour Mobie 34 CGO Boost, 20\", 80mm"},
