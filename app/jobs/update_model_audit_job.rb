@@ -35,27 +35,10 @@ class UpdateModelAuditJob < ApplicationJob
     "#{REDLOCK_PREFIX}-#{model_audit_id}-#{bike_id}"
   end
 
-  def self.new_lock_manager
-    Redlock::Client.new([Bikeindex::Application.config.redis_default_url])
-  end
-
-  def self.locked_for?(model_audit_id)
-    lock_manager = new_lock_manager
-    lock_manager.locked?(redlock_key(model_audit_id))
-  end
-
-  def lock_duration_ms
-    (20.minutes * 1000).to_i
-  end
-
   def perform(model_audit_id = nil)
     return if SKIP_PROCESSING
 
-    lock_manager = self.class.new_lock_manager
-    redlock = lock_manager.lock(self.class.redlock_key(model_audit_id), lock_duration_ms)
-    return unless redlock
-
-    begin
+    with_redlock(model_audit_id, duration: 20.minutes) do
       model_audit = ModelAudit.find_by(id: model_audit_id)
       return if model_audit.blank?
 
@@ -71,9 +54,6 @@ class UpdateModelAuditJob < ApplicationJob
 
       OrganizationModelAudit.organizations_to_audit.pluck(:id)
         .each { |id| update_org_model_audit(model_audit, id) }
-    ensure
-      # Unlock!
-      lock_manager.unlock(redlock)
     end
   end
 
