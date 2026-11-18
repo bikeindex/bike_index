@@ -8,10 +8,10 @@ class ApplicationJob
   end
 
   def self.redlock_key(id) = "#{name}-#{Rails.env.slice(0, 3)}-#{id}"
+
   def skip_job?
     Binxtils::InputNormalizer.boolean(ENV.fetch(self.class.skip_env_var, nil))
   end
-
 
   # One run at a time per id; a run that finds it locked is skipped
   def with_redlock(id, duration: 1.minute)
