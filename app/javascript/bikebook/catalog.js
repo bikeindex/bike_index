@@ -10,7 +10,7 @@ import { fragmentOf, renderInto } from 'bikebook/render'
 // `jurisdictions` names the codes classifications are in, which the catalog doesn't, and `paintColors` are Bike Index's
 // colors' displays by their names, which its colorways' colors are. `onPicks` takes what `ids` render from, as soon as
 // it's in, where there are any, and `comparing` fetches the comparison alongside the index rather than after it. Aborting
-// `signal` ends the worker, whose index is tens of megabytes
+// `signal` ends the worker
 export async function loadCatalog (manifestUrl, ids = [], jurisdictions = {}, paintColors = {}, { onPicks = () => {}, comparing, signal } = {}) {
   const worker = new Worker(import.meta.resolve('bikebook/catalog_worker'), { type: 'module' })
   signal?.addEventListener('abort', () => worker.terminate())

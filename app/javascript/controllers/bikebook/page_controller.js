@@ -2,9 +2,7 @@ import { Controller } from '@hotwired/stimulus'
 import { Turbo } from '@hotwired/turbo-rails'
 import { CatalogComboboxSource, loadCatalog, renderCounts } from 'bikebook/catalog'
 import { addComparison, hydrate, loadingShell, pickedVehicles, picksShell, rescoredSimilar, unpickedVehicles } from 'bikebook/hydrate'
-import { html } from 'lit-html'
 import { keepPermanent, renderInto } from 'bikebook/render'
-import { buttonClasses } from 'bikebook/templates/ui/button'
 import { readable, replaceUrl } from 'bikebook/replace_url'
 import { NARROWING, comparing, searching } from 'bikebook/query'
 import { collapse } from 'utils/collapse_utils'
@@ -23,7 +21,7 @@ const stamped = (state) => ({ ...state, bikebook: uuid() })
 // link to this page and each history step render the page afresh from the shell, without a request
 export default class extends Controller {
   static targets = ['shell', 'page', 'status']
-  static values = { manifestUrl: String, market: String, marketName: String, jurisdiction: String, jurisdictions: Object, paintColors: Object, failedText: String, retryText: String, title: String, searchLogUrl: String }
+  static values = { manifestUrl: String, market: String, marketName: String, jurisdiction: String, jurisdictions: Object, paintColors: Object, title: String, searchLogUrl: String }
 
   #scrolls = new Map()
   #searchLog
@@ -34,15 +32,12 @@ export default class extends Controller {
   #picks
   #compared
   #renderedCatalog
-  #loadFailed = false
-  #failed = false
+  #failed
   #loading
-  #loadingStatus
 
   // The loading shell holds the status until the catalog's first render replaces it, and a failure puts it back
   initialize () {
     this.status = this.statusTarget
-    this.#loadingStatus = this.status.cloneNode(true)
     this.#searchLog = new SearchLog(this.searchLogUrlValue)
     this.#localize(this.shellTarget.content)
     this.#localize(this.pageTarget)
@@ -76,14 +71,15 @@ export default class extends Controller {
     if (!this.#failed) return
 
     this.#failed = false
-    this.status.replaceChildren(...this.#loadingStatus.cloneNode(true).childNodes)
+    this.#showFailure(false)
     this.catalog ? this.refresh() : this.#load()
   }
 
   async #load () {
     this.#loading?.abort()
     this.#loading = new AbortController()
-    this.#loadFailed = false
+    this.#failed = false
+    this.#picks = null
     const url = new URL(window.location.href)
     this.#render(url)
     try {
@@ -97,7 +93,6 @@ export default class extends Controller {
       })
       this.#picks = null
     } catch (error) {
-      this.#loadFailed = true
       return this.#fail(error)
     }
     // the URL's filters are the reader's, where the combobox's add the visitor's market
@@ -276,7 +271,7 @@ export default class extends Controller {
   async #render (url, scroll, { focus = '[autofocus]', reveal = false } = {}) {
     if (!this.catalog && !this.#picks) {
       this.pageTarget.replaceChildren(loadingShell(this.shellTarget, url, this.status))
-      return this.#loadFailed && this.#fail()
+      return this.#failed && this.#fail()
     }
 
     const render = ++this.#renders
@@ -323,7 +318,9 @@ export default class extends Controller {
       requestAnimationFrame(place)
     }
     this.#addComparison()
-    if (this.#loadFailed) this.#fail()
+    // past any failure once the catalog renders, where the picks alone still show the load's
+    if (catalog) this.#failed = false
+    else if (this.#failed) this.#fail()
   }
 
   // Into a page a catalog without the comparison rendered, whichever of the two lands last
@@ -340,10 +337,15 @@ export default class extends Controller {
   #fail (error) {
     if (error) console.error(error)
     this.#failed = true
-    renderInto(this.status, html`${this.failedTextValue} <button type="button" data-action="bikebook--page#retry"
-      class=${buttonClasses({ color: 'link', htmlClass: 'tw:ml-1' })}>${this.retryTextValue}</button>`)
+    this.#showFailure(true)
     for (const input of this.pageTarget.querySelectorAll('[data-awaiting-catalog]')) input.placeholder = ''
     const place = this.pageTarget.contains(this.status) ? this.status.parentElement : this.pageTarget.querySelector('#vehicle-viewers') ?? this.pageTarget
     place.prepend(this.status)
+  }
+
+  // the failure and its button that tries again, or the spinner
+  #showFailure (failed) {
+    this.status.querySelector('[data-loading]').hidden = failed
+    this.status.querySelector('[data-failed]').hidden = !failed
   }
 }

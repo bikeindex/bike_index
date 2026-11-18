@@ -22,15 +22,29 @@ const blocks = new Map()
 const orders = new Map()
 const sold = new Map()
 
-// A stalled answer never fails on its own. Only until it starts, as the index takes most of a minute on 3G
-const ANSWER_TIMEOUT = 30000
+// A stalled download never fails on its own. The wait restarts with each part, as the index takes most of a minute on 3G
+const STALL_TIMEOUT = 30000
 
 const fetchJson = async (url) => {
-  const answering = new AbortController()
-  const timeout = setTimeout(() => answering.abort(), ANSWER_TIMEOUT)
-  const response = await fetch(url, { signal: answering.signal }).finally(() => clearTimeout(timeout))
-  if (!response.ok) throw new Error(`${url} answered ${response.status}`)
-  return response.json()
+  const stalled = new AbortController()
+  let timeout
+  const waiting = () => {
+    clearTimeout(timeout)
+    timeout = setTimeout(() => stalled.abort(), STALL_TIMEOUT)
+  }
+  waiting()
+  try {
+    const response = await fetch(url, { signal: stalled.signal })
+    if (!response.ok) throw new Error(`${url} answered ${response.status}`)
+    return await new Response(response.body.pipeThrough(new TransformStream({
+      transform: (chunk, stream) => {
+        waiting()
+        stream.enqueue(chunk)
+      }
+    }))).json()
+  } finally {
+    clearTimeout(timeout)
+  }
 }
 
 const list = (value) => (value ?? '').split(',').filter(Boolean)

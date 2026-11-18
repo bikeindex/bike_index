@@ -203,19 +203,12 @@ export async function picksShell (picks, shell, url, status) {
   return { content: root, title: vehicles[0].display }
 }
 
-const optionedShells = new WeakMap()
+const optionFragments = new WeakMap()
 
-// The shell with the filters' `options`, rendered once for each set of them and cloned for every render after: some
-// thousand options, the manufacturers' most of them
-const optionedShell = (shell, options) => {
-  let optioned = optionedShells.get(options)
-  if (optioned?.shell !== shell) {
-    const root = shell.content.cloneNode(true)
-    for (const name of [...LISTS, ...SINGLES]) root.getElementById(`${name}-hw-listbox`).append(fragmentOf(options[name].map(filterOption)))
-    optioned = { shell, root }
-    optionedShells.set(options, optioned)
-  }
-  return optioned.root.cloneNode(true)
+// Some thousand options, rendered once for each list of them and cloned for every render after
+const optionsOf = (options) => {
+  if (!optionFragments.has(options)) optionFragments.set(options, fragmentOf(options.map(filterOption)))
+  return optionFragments.get(options).cloneNode(true)
 }
 
 // The page at `url`: the shell, with the catalog's filter options, filled in from the URL. Its
@@ -223,8 +216,9 @@ const optionedShell = (shell, options) => {
 // from their own options
 export async function hydrate (catalog, source, shell, url) {
   const { kit } = catalog
-  const root = optionedShell(shell, catalog.options)
+  const root = shell.content.cloneNode(true)
   panelOf(root).hidden = !searching(url)
+  for (const name of [...LISTS, ...SINGLES]) root.getElementById(`${name}-hw-listbox`).append(optionsOf(catalog.options[name]))
 
   // the visitor's country, when it's a market with models
   const panel = panelOf(root)
