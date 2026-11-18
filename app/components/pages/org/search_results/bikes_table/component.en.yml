@@ -11,5 +11,6 @@ en:
             hidden: hidden
             link_sticker: link sticker
             not_registered_with: Hidden because it is not registered with %{org_name}
+            same_as_impounded_from: same as impounded from
             toggle_all_checked: Toggle all checked
             view: View

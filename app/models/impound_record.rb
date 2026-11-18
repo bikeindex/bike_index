@@ -173,16 +173,17 @@ class ImpoundRecord < ApplicationRecord
     false
   end
 
+  # Where it was impounded from, not where it's held
   def latitude_public
-    return unless address_record&.latitude.present?
+    return unless impounded_from_address_record&.latitude.present?
 
-    show_address ? address_record.latitude : address_record.latitude&.round(Bike::PUBLIC_COORD_LENGTH)
+    show_address ? impounded_from_address_record.latitude : impounded_from_address_record.latitude&.round(Bike::PUBLIC_COORD_LENGTH)
   end
 
   def longitude_public
-    return unless address_record&.latitude.present?
+    return unless impounded_from_address_record&.latitude.present?
 
-    show_address ? address_record.longitude : address_record.longitude&.round(Bike::PUBLIC_COORD_LENGTH)
+    show_address ? impounded_from_address_record.longitude : impounded_from_address_record.longitude&.round(Bike::PUBLIC_COORD_LENGTH)
   end
 
   def unorganized?

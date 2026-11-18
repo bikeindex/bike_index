@@ -47,12 +47,11 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
       expect(component).to have_css("td.impounded_at_cell a[href*='/impound_records/#{impound_record.display_id}']")
       expect(component).to have_css("td.impound_status_cell", text: impound_record.status_humanized_short)
       expect(component).to have_css("th.resolved_at_cell a", text: "Resolved")
-      expect(component).to have_css("td.impound_id_cell", text: impound_record.display_id)
+      expect(component).to have_css("td.impound_id_cell code", text: impound_record.display_id)
       expect(component).to have_css("td.impound_user_cell", text: impound_record.user.display_name.truncate(20))
       expect(component).to have_css("td.unregistered_cell", text: /\S/)
       expect(component).to have_css("th.impound_notes_cell", text: "Impound notes")
       expect(component.css("td.impound_notes_cell small").map { it.text.strip }).to eq ["Owner called", "Owner emailed"]
-      expect(component).not_to have_css("th.impound_location_cell", visible: :all)
       # The search orders by the record, so only its columns sort
       expect(component).to have_css("th.impounded_at_cell a")
       expect(component).not_to have_css("th.manufacturer_cell a")
@@ -64,17 +63,27 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
       expect(component.css("th")[1][:class]).to include("multi-update-cell")
     end
 
-    context "with impound_bikes_locations" do
-      let(:enabled_feature_slugs) { %w[impound_bikes impound_bikes_locations] }
-      let(:location) { FactoryBot.create(:location, organization:, name: "Back lot", impound_location: true) }
-      let(:impound_record) { FactoryBot.create(:impound_record_with_organization, organization:, bike:, location:) }
+    context "impounded from an address" do
+      let(:impound_record) { FactoryBot.create(:impound_record_with_organization, :with_address_record, organization:, bike:) }
 
-      it "renders a sortable location column, checked in the panel" do
-        expect(component).to have_css("th.impound_location_cell a", text: "Location")
-        expect(component).to have_css("td.impound_location_cell", text: "Back lot")
+      it "renders a sortable current location column, the same as where it was impounded from" do
+        expect(component).to have_css("th.impound_current_location_cell a", text: "Current location")
+        expect(component).to have_css("td.impound_current_location_cell", text: "same as impounded from")
+        expect(component).to have_css("td.impounded_from_cell", text: "1300 W 14th Pl")
         settings = ComponentStructs::OrgSearchSettings.new(organization:, impound: true)
-        expect(settings.initially_checked_columns).to include("impound_location_cell")
-        expect(settings.sort_column_label("location_id")).to eq "Location"
+        expect(settings.initially_checked_columns).to include("impound_current_location_cell")
+        expect(settings.sort_column_label("location_id")).to eq "Current location"
+      end
+
+      context "held at a location" do
+        let(:enabled_feature_slugs) { %w[impound_bikes impound_bikes_locations] }
+        let(:location) { FactoryBot.create(:location, :with_address_record, address_in: :new_york, organization:, name: "Back lot", impound_location: true) }
+        let(:impound_record) { FactoryBot.create(:impound_record_with_organization, :with_address_record, organization:, bike:, location:) }
+
+        it "renders the location and its address" do
+          expect(component).to have_css("td.impound_current_location_cell", text: /Back lot\s+278 Broadway/)
+          expect(component).to have_css("td.impounded_from_cell", text: "1300 W 14th Pl")
+        end
       end
     end
 
@@ -242,7 +251,7 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
         expect(bike.reload.status_impounded?).to be true
         expect(impound_record.reload.display_id).to be_present
         expect(impound_record.display_id).to_not eq impound_record.id.to_s
-        expect(component.css("td.impound_id_cell").text.strip).to eq impound_record.display_id
+        expect(component.css("td.impound_id_cell code").text).to eq impound_record.display_id
       end
     end
   end

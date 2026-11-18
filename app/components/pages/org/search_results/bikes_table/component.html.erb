@@ -14,6 +14,7 @@
   <% hidden_html = method(:hidden_not_registered_tag) %>
   <% email_hidden = translation(".email_hidden") %>
   <% view_label = translation(".view") %>
+  <% same_as_impounded_from = translation(".same_as_impounded_from") %>
 
   <% column.(label: settings.column_renames[:view_cell]) do |bike| %>
     <%= render(UI::ButtonLink::Component.new(text: view_label, href: bike_path(bike, organization_id: organization.to_param), size: :sm, data: {turbo_frame: "_top"})) %>
@@ -64,10 +65,18 @@
       <%= impound_record.user&.display_name&.truncate(20) %>
     <% end %>
 
-    <% if organization.enabled?("impound_bikes_locations") %>
-      <% table.column(sortable: "location_id", label: settings.column_renames[:impound_location_cell], classes: "hideableColumn impound_location_cell") do |impound_record| %>
-        <small><%= impound_record.location&.name %></small>
-      <% end %>
+    <% table.column(sortable: "location_id", label: settings.column_renames[:impound_current_location_cell], classes: "hideableColumn impound_current_location_cell tw:leading-none") do |impound_record| %>
+      <small>
+        <% if impound_record.location.present? %>
+          <strong class="tw:block"><%= impound_record.location.name %></strong>
+        <% end %>
+
+        <% if impound_record.address_record_id.present? && impound_record.address_record_id == impound_record.impounded_from_address_record_id %>
+          <em class="tw:text-gray-400"><%= same_as_impounded_from %></em>
+        <% else %>
+          <%= render(UI::AddressDisplay::Component.new(address_record: impound_record.address_record, visible_attribute: :street, kind: :single_line)) %>
+        <% end %>
+      </small>
     <% end %>
 
     <% table.column(label: settings.column_renames[:impounded_from_cell], classes: "hideableColumn impounded_from_cell tw:leading-none") do |impound_record| %>
@@ -221,13 +230,13 @@
 
   <% if impound %>
     <% table.column(sortable: "display_id_integer", label: settings.column_renames[:impound_id_cell], classes: "hideableColumn impound_id_cell") do |impound_record| %>
-      <%= impound_record.display_id %>
+      <%= render(UI::Code::Inline::Component.new(text: impound_record.display_id, word_break: false)) %>
     <% end %>
   <% elsif organization.enabled?("impound_bikes") %>
     <% column.(label: settings.column_renames[:impound_id_cell], classes: "hideableColumn impound_id_cell tw:leading-none") do |bike| %>
       <% if bike.organized?(organization) %>
         <% if bike.status_impounded? && bike.current_impound_record.present? %>
-          <%= bike.current_impound_record.display_id %>
+          <%= render(UI::Code::Inline::Component.new(text: bike.current_impound_record.display_id, word_break: false)) %>
         <% end %>
       <% else %>
         <%= hidden_html.call %>

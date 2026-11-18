@@ -35,6 +35,12 @@ RSpec.describe Pages::Registrations::Show::ImpoundDetails::Component, type: :com
       # Pinned where it was impounded from, not at the location holding it
       expect(page).to have_css("[data-registrations--show--map-latitude-value='41.8624488']")
     end
+
+    it "pins the public card where it was impounded from, rounded" do
+      render_inline(described_class.new(bike:))
+      expect(page).to have_text("Impound details")
+      expect(page).to have_css("[data-registrations--show--map-latitude-value='#{41.8624488.round(Bike::PUBLIC_COORD_LENGTH)}']")
+    end
   end
 
   context "found bike" do

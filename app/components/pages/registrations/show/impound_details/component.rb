@@ -39,7 +39,7 @@ module Pages
             found? ? translation(".found_details") : translation(".impound_details")
           end
 
-          # The organization's pin matches its card's Impounded from, not where the bike is held
+          # Both pin where it was impounded from: the organization exactly, the public rounded
           def map_latitude
             org_record? ? impound_record.impounded_from_address_record&.latitude : impound_record.latitude_public
           end

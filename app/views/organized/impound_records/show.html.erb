@@ -18,7 +18,7 @@
   <div class="col-md-6">
     <%= render(UI::Table::List::Component.new) do |list| %>
       <% list.with_row(label: "ID") do %>
-        <strong><%= @impound_record.display_id %></strong>
+        <strong><%= render(UI::Code::Inline::Component.new(text: @impound_record.display_id)) %></strong>
 
         <% if display_dev_info? %>
           <small class="only-dev-visible ml-2">
