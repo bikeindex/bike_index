@@ -1,4 +1,4 @@
-import Dexie, { type Table, type Transaction } from 'dexie';
+import Dexie, { type Table } from 'dexie';
 import type { StravaActivity, StravaGear, StoredAuth } from '../types/strava';
 
 // Strava IDs are 64-bit and can pass Number.MAX_SAFE_INTEGER, so they stay strings
@@ -19,21 +19,6 @@ export interface SyncState {
   isInitialSyncComplete: boolean;
 }
 
-const SCHEMA = {
-  activities: 'id, athleteId, title, activity_type, sport_type, gear_id, start_date_in_zone, [athleteId+start_date_in_zone]',
-  gear: 'id, athleteId',
-  auth: 'id',
-  syncState: 'athleteId',
-};
-
-// A primary key can't be modified in place, so each table is rewritten
-async function rewriteTable<T>(transaction: Transaction, name: string, convert: (row: T) => T): Promise<void> {
-  const table = transaction.table<T>(name);
-  const rows = await table.toArray();
-  await table.clear();
-  await table.bulkAdd(rows.map(convert));
-}
-
 class StravaDatabase extends Dexie {
   activities!: Table<StoredActivity, string>;
   gear!: Table<StoredGear, string>;
@@ -43,21 +28,16 @@ class StravaDatabase extends Dexie {
   constructor() {
     super('StravaSearchDB');
 
-    this.version(1).stores(SCHEMA);
-    this.version(2).stores(SCHEMA).upgrade(async (transaction) => {
-      await rewriteTable<StoredActivity>(transaction, 'activities', (activity) => ({
-        ...activity,
-        id: activity.strava_id,
-        athleteId: String(activity.athleteId),
-      }));
-      await rewriteTable<StoredGear>(transaction, 'gear', (gear) => ({ ...gear, athleteId: String(gear.athleteId) }));
-      await rewriteTable<SyncState>(transaction, 'syncState', (state) => ({ ...state, athleteId: String(state.athleteId) }));
-      await rewriteTable<StoredAuth & { id: string }>(transaction, 'auth', (auth) => ({
-        ...auth,
-        id: String(auth.id),
-        athlete: { ...auth.athlete, id: String(auth.athlete.id) },
-      }));
+    this.version(1).stores({
+      activities: 'id, athleteId, title, activity_type, sport_type, gear_id, start_date_in_zone, [athleteId+start_date_in_zone]',
+      gear: 'id, athleteId',
+      auth: 'id',
+      syncState: 'athleteId',
     });
+    // Version 1 keyed rows by Number IDs. Everything here re-syncs from Bike Index when empty
+    this.version(2).upgrade((transaction) =>
+      Promise.all(transaction.storeNames.map((name) => transaction.table(name).clear()))
+    );
   }
 }
 
@@ -99,16 +79,14 @@ export async function getGearForAthlete(athleteId: string): Promise<StoredGear[]
   return db.gear.where('athleteId').equals(athleteId).toArray();
 }
 
+const AUTH_KEY = 'current';
+
 export async function saveAuth(auth: StoredAuth): Promise<void> {
-  await db.transaction('rw', db.auth, async () => {
-    await db.auth.clear();
-    await db.auth.put({ ...auth, id: auth.athlete.id });
-  });
+  await db.auth.put({ ...auth, id: AUTH_KEY });
 }
 
 export async function getAuth(): Promise<(StoredAuth & { id: string }) | undefined> {
-  const auths = await db.auth.toArray();
-  return auths[0];
+  return db.auth.get(AUTH_KEY);
 }
 
 export async function clearAuth(): Promise<void> {

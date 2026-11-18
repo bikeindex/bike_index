@@ -451,28 +451,23 @@ describe('database service integration tests', () => {
       expect((await getActivityById('9007199254740993'))?.title).toBe('Second');
     });
 
-    it('converts version 1 numeric IDs to strings on upgrade', async () => {
-      db.close();
-      await Dexie.delete('StravaSearchDB');
-      const legacy = new Dexie('StravaSearchDB');
+    it('clears version 1 data on upgrade', async () => {
+      await db.delete();
+      const legacy = new Dexie(db.name);
       legacy.version(1).stores({
         activities: 'id, athleteId, title, activity_type, sport_type, gear_id, start_date_in_zone, [athleteId+start_date_in_zone]',
         gear: 'id, athleteId',
         auth: 'id',
         syncState: 'athleteId',
       });
-      await legacy.table('activities').put({ ...createMockActivity({ strava_id: '16211859713' }), id: 16211859713, athleteId: 12345, syncedAt: 1 });
-      await legacy.table('gear').put({ ...createMockGear({ id: 'g1' }), athleteId: 12345 });
-      await legacy.table('auth').put({ ...createMockAuth('12345'), id: 12345, athlete: { ...createMockAuth('12345').athlete, id: 12345 } });
-      await legacy.table('syncState').put({ athleteId: 12345, lastSyncedAt: 1, oldestActivityDate: null, isInitialSyncComplete: true });
+      await legacy.table('activities').put({ ...createMockActivity({ strava_id: '16211859713' }), id: 16211859713, athleteId: 12345 });
+      await legacy.table('auth').put({ ...createMockAuth('12345'), id: 12345 });
       legacy.close();
 
       await db.open();
 
-      expect((await getActivitiesForAthlete('12345')).map((activity) => activity.id)).toEqual(['16211859713']);
-      expect(await getGearForAthlete('12345')).toHaveLength(1);
-      expect((await getAuth())?.athlete.id).toBe('12345');
-      expect((await getSyncState('12345'))?.isInitialSyncComplete).toBe(true);
+      expect(await db.activities.count()).toBe(0);
+      expect(await db.auth.count()).toBe(0);
     });
   });
 });
