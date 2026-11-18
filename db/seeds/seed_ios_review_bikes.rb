@@ -1,40 +1,24 @@
-# Creates a single deterministic bike for ios_review@bikeindex.org.
+# Seed one registered bike for ios_review@bikeindex.org, the App Store review account.
 #
-# MainContentUITest only needs "at least one bike" on the grid; ScreenshotUITest
-# uses user@fakegmail.com. We deliberately avoid a Riese & Müller (user@ already
-# owns one, and duplicate imagery would be confusing in screenshot comparisons).
-#
-# 2024 Giant Escape (3) — common city hybrid, distinct from all other test labels.
+# Idempotent, keyed on the owner: bin/docker-entrypoint re-runs this every deploy.
+# Its "2024 Giant" label must stay distinct from every other UI-test account's,
+# since StaleBikeUITest compares labels across accounts.
+
+require File.expand_path("db/seeds/seed_helpers", Rails.root)
 
 owner = User.find_by_email("ios_review@bikeindex.org")
-raise "ios_review user not found" unless owner
+return if owner.nil? || owner.bikes.exists?
 
-puts "Seeding 2024 Giant Escape (3) for ios_review@bikeindex.org..."
-
-creator = BikeServices::Creator.new
-
-# Use the same color as the test expects — "black" is consistent across environments.
-black_id = Color.friendly_find("black")&.id || Color.first&.id
+giant = Manufacturer.friendly_find("Giant")
 
 bike = SeedHelpers.seed_bike(
-  creator:,
-  user: owner,
-  params: {bike: SeedHelpers.bike_params(owner_email: owner.email).merge(
+  creator: BikeServices::Creator.new, user: owner, label: "iOS review bike",
+  params: {bike: SeedHelpers.bike_params(owner_email: owner.email, manufacturer_id: giant&.id).merge(
     year: 2024,
-    manufacturer_id: Manufacturer.friendly_find("Giant").id,
     frame_model: "Escape (3)",
     frame_material_slug: "aluminum",
-    cycle_type: "hybrid",
-    primary_frame_color_id: black_id,
-    handlebar_type: "flat",
-    description: "Giant Escape 3 hybrid commuter. 2024 model."
-  )},
-  origin: "organization_form",
-  label: "2024 Giant Escape (3)"
+    primary_frame_color_id: Color.friendly_find("Black").id,
+    description: "Giant Escape 3 hybrid commuter"
+  )}
 )
-
-raise "Failed to create bike: #{bike.errors.full_messages.join(", ")}" if bike.errors.any?
-
-bike.current_ownership.mark_claimed
-
-puts "  Created 2024 Giant Escape (3) for ios_review@bikeindex.org"
+puts "Created iOS review bike ##{bike.id} for #{owner.email}" unless bike.errors.any?

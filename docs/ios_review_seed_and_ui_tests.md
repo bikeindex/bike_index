@@ -1,9 +1,7 @@
 # iOS review seed account & UI test determinism
 
 Context for the App Store review seed (`ios_review@bikeindex.org`) and why the
-seeded bikes for the iOS UI tests had to become deterministic. Written
-2026-07-21 while on `cicd/add-ios_review-seed-account` (commits `786ed3d0b`,
-`4f9a99ee9`).
+seeded bikes for the iOS UI tests had to become deterministic.
 
 ## The accounts and what uses them
 
@@ -13,26 +11,17 @@ Seeded by `db/seeds/seed_ios_review_bikes.rb`, run from `db/seeds.rb` and
 re-run on every deploy by `bin/docker-entrypoint` (idempotent, keyed on
 `ios_review.bikes.exists?`).
 
-Bikes (all labels deterministic after `4f9a99ee9`):
-
-| Status | Bike | Serial |
-|---|---|---|
-| Found (impounded) | 2016 Specialized Sirrus | `IOSREVIEW01` |
-| Unregistered PN | 2020 FX 2 | `unknown` |
-| With owner | 2018 Jamis Allegro (black, flat bar) | `IOSREVIEWJA18` |
-| Graduated | 2021 Allez (Brakebills) | `IOSREVIEW01` |
+One bike: a registered, claimed **2024 Giant Escape (3)** (black, aluminum),
+labelled `2024 Giant`.
 
 No Riese & Müller Load4 on this account — its photos are identical to the
 `user@fakegmail.com` bike and the homepage recovery showcase, so screenshots
-would show duplicate imagery. The Jamis Allegro is the "clean registration"
-demo bike instead.
+would show duplicate imagery.
 
 Used by (in `~/dev/bike_index_ios`, branch `release_v1.7.1`):
 
-- `MainContentUITestCase` — taps the first bike in each of the four status
-  grids, so `ios_review` must have at least one bike per status.
-- `ScreenshotUITest.test_ios_review_claims_a_bike` — signs in, taps the found
-  (impounded) bike, taps Claim.
+- `MainContentUITestCase` — needs at least one bike on the grid.
+- `ScreenshotUITest` — uses `user@fakegmail.com`, not this account.
 - `StaleBikeUITest.test_staleBikesAreRemoved` — see below.
 - `UniversalLinksUITest` — deep links only, no data assertions.
 
@@ -67,8 +56,8 @@ needed. `member@brakebills.edu` is the second account in
 
 It compares labels, **not bike IDs**: the accessibility identifiers embed a
 section position, so they aren't a stable bike identity across users. That
-only works if two different bikes can never render the same label. Before the
-determinism commit, both accounts' unregistered bikes used
+only works if two different bikes can never render the same label. Before these
+seeds, the accounts' bikes used
 `SeedHelpers.weighted_frame_maker_id` (random manufacturer, no year), so the
 labels were random manufacturer names — a collision (both drawing the same
 maker) produces a **false-positive failure** even though no stale bikes exist.
@@ -77,7 +66,7 @@ The fix pins every label and keeps them mutually distinct:
 
 | Account | Labels |
 |---|---|
-| `ios_review` | `2016 Specialized`, `2020 FX 2`, `2021 Allez`, `2018 Jamis` |
+| `ios_review` | `2024 Giant` |
 | `transfer_provider` | `2019 Specialized` |
 | `member@brakebills.edu` | **still random** (see caveat) |
 
@@ -88,18 +77,17 @@ The fix pins every label and keeps them mutually distinct:
    `seed_unregistered_parking_notification` in
    `db/seeds/seed_organization_bikes_and_associations.rb` (the same helper
    that makes `user@`'s unregistered PN bike, also random). Its label can
-   still coincidentally match one of `ios_review`'s four fixed labels
+   still coincidentally match `ios_review`'s fixed label
    (low odds, but the maker list is small). To make the StaleBike test fully
    deterministic, apply the same year/frame_model pinning to the `member`
    call in that seed file (and consider the same for `user@`, which shares
    the helper).
 2. **Existing review databases won't pick up the new labels.** Both seed
    files guard on `owner.bikes.exists?`, so a database seeded before
-   `4f9a99ee9` keeps its old random-maker bikes. Fix with a one-off
+   them keeps its old random-maker bikes. Fix with a one-off
    `Bike.destroy_all` for the affected users (`ios_review`,
    `transfer_provider`) and a redeploy, or a fresh database.
 3. CI: `.github/workflows/ios-e2e.yml` currently only runs `UnitTests`; the
    UI test suite is not wired into CI yet. When it is, point it at a sandbox
-   where these seeds have run (the seeds are deploy-triggered via
-   `bin/docker-entrypoint`, not part of `rails db:seed`'s dev-only path —
-   verify this assumption before relying on it for a CI database).
+   where these seeds have run — `rails db:seed` runs them, and
+   `bin/docker-entrypoint` re-runs them on every sandbox deploy.
