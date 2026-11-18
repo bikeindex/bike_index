@@ -6,7 +6,7 @@ module Spreadsheets
   module Components
     extend Functionable
 
-    EXPORT_COLUMNS = %i[name secondary_name has_multiple_locations group].freeze
+    EXPORT_COLUMNS = %i[name secondary_name has_multiple_locations group short_name].freeze
 
     def to_csv(ctypes = nil)
       ctypes ||= Ctype.includes(:cgroup).order(:name)
@@ -32,6 +32,7 @@ module Spreadsheets
       ctype.name = row[:name] # correct casing on re-import; slug is set on create, so it's unchanged
       ctype.cgroup = find_or_create_cgroup(row[:group])
       ctype.secondary_name = row[:secondary_name]
+      ctype.short_name = row[:short_name] if row[:short_name].present?
       ctype.has_multiple = Binxtils::InputNormalizer.boolean(row[:has_multiple_locations])
       ctype.save! if ctype.changed?
     end
@@ -46,7 +47,7 @@ module Spreadsheets
     end
 
     def row_for(ctype)
-      [ctype.name, ctype.secondary_name, ctype.has_multiple, ctype.cgroup&.name]
+      [ctype.name, ctype.secondary_name, ctype.has_multiple, ctype.cgroup&.name, ctype.short_name]
     end
 
     conceal :update_or_create_for!, :find_or_create_cgroup, :row_for

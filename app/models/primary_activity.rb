@@ -7,6 +7,7 @@
 #  family                     :boolean
 #  name                       :string
 #  priority                   :integer
+#  short_name                 :string
 #  slug                       :string
 #  created_at                 :datetime         not null
 #  updated_at                 :datetime         not null
@@ -132,10 +133,7 @@ class PrimaryActivity < ApplicationRecord
   end
 
   def short_name
-    return "Road" if slug == "road-biking"
-    return "Track" if slug == "track-racing"
-
-    super
+    self[:short_name].presence || super
   end
 
   private

@@ -45,7 +45,7 @@ RSpec.describe PrimaryActivity, type: :model do
         expect(PrimaryActivity.friendly_find_id("ALl Terrain Biking")).to eq primary_activity_family.id
       end
       context "with other primary_activity with same name" do
-        let(:primary_activity_family_2) { FactoryBot.create(:primary_activity_family, name: "Road Biking") }
+        let(:primary_activity_family_2) { FactoryBot.create(:primary_activity_family, name: "Road Biking", short_name: "Road") }
         let(:primary_activity_2) { FactoryBot.create(:primary_activity, name:, primary_activity_family: primary_activity_family_2) }
         it "is valid for both" do
           expect(primary_activity).to be_valid
@@ -82,9 +82,9 @@ RSpec.describe PrimaryActivity, type: :model do
       end
 
       context "track racing" do
-        let(:primary_activity_family) { FactoryBot.create(:primary_activity_family, name: "Track racing") }
+        let(:primary_activity_family) { FactoryBot.create(:primary_activity_family, name: "Track racing", short_name: "Track") }
         let(:primary_activity) { FactoryBot.create(:primary_activity, name: "Pursuit", primary_activity_family:) }
-        it "shortens to Track" do
+        it "uses the stored short name" do
           expect(primary_activity.reload.name).to eq "Pursuit"
           expect(primary_activity.display_name).to eq "Track: Pursuit"
           expect(primary_activity.display_name_search).to eq "Track: ONLY Pursuit"

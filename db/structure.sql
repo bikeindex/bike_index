@@ -1176,7 +1176,8 @@ CREATE TABLE public.ctypes (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     has_multiple boolean DEFAULT false NOT NULL,
-    cgroup_id integer
+    cgroup_id integer,
+    short_name character varying
 );
 
 
@@ -3455,7 +3456,8 @@ CREATE TABLE public.primary_activities (
     family boolean,
     priority integer,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    short_name character varying
 );
 
 
@@ -8088,6 +8090,7 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261118200000'),
 ('20261117051637'),
 ('20261116222651'),
 ('20261111155046'),

@@ -8,6 +8,7 @@
 #  image          :string(255)
 #  name           :string(255)
 #  secondary_name :string(255)
+#  short_name     :string
 #  slug           :string(255)
 #  created_at     :datetime         not null
 #  updated_at     :datetime         not null
@@ -46,6 +47,10 @@ class Ctype < ApplicationRecord
     return @other if MEMOIZE_OTHER && defined?(@other)
 
     @other = where(name: "unknown", has_multiple: false, cgroup_id: Cgroup.additional_parts.id).first_or_create
+  end
+
+  def short_name
+    self[:short_name].presence || name
   end
 
   def set_calculated_attributes
