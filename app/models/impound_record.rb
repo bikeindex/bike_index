@@ -45,6 +45,7 @@ class ImpoundRecord < ApplicationRecord
   has_one :parking_notification
   has_one :ownership
   has_many :impound_record_updates
+  has_many :noted_updates, -> { where("notes ~ '\\S'").order(id: :desc) }, class_name: "ImpoundRecordUpdate"
   has_many :impound_claims
 
   validates_presence_of :user_id
@@ -173,17 +174,22 @@ class ImpoundRecord < ApplicationRecord
     false
   end
 
+  # A record not saved since impounded_from_address_record was added has it only as address_record
+  def impounded_from_address
+    impounded_from_address_record || (address_record if address_record&.impounded_from?)
+  end
+
   # Where it was impounded from, not where it's held
   def latitude_public
-    return unless impounded_from_address_record&.latitude.present?
+    return unless impounded_from_address&.latitude.present?
 
-    show_address ? impounded_from_address_record.latitude : impounded_from_address_record.latitude&.round(Bike::PUBLIC_COORD_LENGTH)
+    show_address ? impounded_from_address.latitude : impounded_from_address.latitude&.round(Bike::PUBLIC_COORD_LENGTH)
   end
 
   def longitude_public
-    return unless impounded_from_address_record&.latitude.present?
+    return unless impounded_from_address&.latitude.present?
 
-    show_address ? impounded_from_address_record.longitude : impounded_from_address_record.longitude&.round(Bike::PUBLIC_COORD_LENGTH)
+    show_address ? impounded_from_address.longitude : impounded_from_address.longitude&.round(Bike::PUBLIC_COORD_LENGTH)
   end
 
   def unorganized?
@@ -203,11 +209,6 @@ class ImpoundRecord < ApplicationRecord
     @bike ||= impound_claims.retrieved.first&.bike_submitting
     # Get it unscoped, because unregistered_bike notifications
     @bike ||= bike_id.present? ? Bike.unscoped.find_by_id(bike_id) : nil
-  end
-
-  # Filters in Ruby so a preloaded association serves it
-  def noted_updates
-    impound_record_updates.select { it.notes.present? }.sort_by { -it.id }
   end
 
   def notification_notes_and_messages

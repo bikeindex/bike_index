@@ -11,7 +11,7 @@ module OrgPublic
       @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
 
       @pagy, @impound_records = pagy(:countish, available_impound_records.reorder(sortable_order(ImpoundRecord))
-        .includes(:bike, :location, :impounded_from_address_record), limit: @per_page, page: permitted_page)
+        .includes(:bike, :location, :address_record, :impounded_from_address_record), limit: @per_page, page: permitted_page)
     end
 
     private

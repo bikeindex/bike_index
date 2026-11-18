@@ -111,7 +111,7 @@
           = render partial: "stolen_map", locals: { mapping_record: impound_record }
         .col-md-4
           = render(UI::DefinitionList::Container::Component.new) do
-            = render(UI::DefinitionList::Row::Component.new(label: t(".location"), value: impound_record.formatted_address_string))
+            = render(UI::DefinitionList::Row::Component.new(label: t(".location"), value: impound_record.impounded_from_address&.formatted_address_string))
             = render(UI::DefinitionList::Row::Component.new(label: @bike.status_found? ? t(".found_at") : t(".impounded_at"), value: impound_record.impounded_at, time_localizer_settings: %i[preciseTime originalTimeZone]))
             = render(UI::DefinitionList::Row::Component.new(label: t(".description_of_incident"), full_width: true, value: impound_record.impounded_description))
 

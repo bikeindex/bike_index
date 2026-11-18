@@ -24,7 +24,7 @@ module Organized
         render Pages::Org::Search::ChartCard::Component.new(scope: "search", chart: impound_records_chart), layout: false
       elsif @render_results
         @pagy, @impound_records = pagy(:countish, available_impound_records.reorder(sortable_order(ImpoundRecord))
-          .includes(:user, :location, :address_record, :impounded_from_address_record, :impound_claims, :impound_record_updates), limit: @per_page, page: permitted_page)
+          .includes(:user, :location, :impound_claims, :noted_updates, address_record: :region_record, impounded_from_address_record: :region_record), limit: @per_page, page: permitted_page)
         respond_to do |format|
           format.html
           format.turbo_stream

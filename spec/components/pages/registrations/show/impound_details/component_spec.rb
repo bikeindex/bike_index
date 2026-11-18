@@ -36,10 +36,20 @@ RSpec.describe Pages::Registrations::Show::ImpoundDetails::Component, type: :com
       expect(page).to have_css("[data-registrations--show--map-latitude-value='41.8624488']")
     end
 
+    it "renders the public card to another organization" do
+      FactoryBot.create(:impound_record_update, impound_record:, kind: "note", notes: "Owner emailed")
+      render_inline(described_class.new(bike:, organization: FactoryBot.create(:organization)))
+      expect(page).to have_text("Impound details")
+      expect(page).not_to have_text("Owner")
+      expect(page).not_to have_text("Back lot")
+    end
+
     it "pins the public card where it was impounded from, rounded" do
       render_inline(described_class.new(bike:))
       expect(page).to have_text("Impound details")
       expect(page).to have_css("[data-registrations--show--map-latitude-value='#{41.8624488.round(Bike::PUBLIC_COORD_LENGTH)}']")
+      expect(page).to have_text(/Location\s*Chicago, IL 60608/)
+      expect(page).not_to have_text("New York")
     end
   end
 

@@ -152,6 +152,7 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
       expect(response).to render_template(:show)
       expect(assigns(:impound_record)).to eq impound_record
       expect(response.body).not_to include("created from a parking notification")
+      expect(response.body).not_to include("Current location")
     end
     context "held at a location" do
       let(:location) { FactoryBot.create(:location, :with_address_record, address_in: :new_york, organization: current_organization, name: "Back lot") }

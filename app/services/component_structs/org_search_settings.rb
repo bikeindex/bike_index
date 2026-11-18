@@ -50,10 +50,11 @@ module ComponentStructs
 
     # The impound records search's own columns, on by default
     IMPOUND_COLUMNS = %w[impounded_at_cell impound_updated_at_cell resolved_at_cell impound_status_cell
-      impound_user_cell impound_current_location_cell impounded_from_cell impound_notes_cell unregistered_cell].freeze
+      impound_user_cell impounded_from_cell impound_notes_cell unregistered_cell].freeze
 
-    # Those and the impound ID, which its panel lists apart from the registration columns
-    IMPOUND_PANEL_COLUMNS = ["impound_id_cell", *IMPOUND_COLUMNS].freeze
+    # Those and the ones on by default only for some organizations, which its panel lists apart
+    # from the registration columns
+    IMPOUND_PANEL_COLUMNS = ["impound_id_cell", "impound_current_location_cell", *IMPOUND_COLUMNS].freeze
 
     # The panel groups the time columns under "Time - "; the table headers keep the short names
     PANEL_LABEL_KEYS = {
@@ -238,7 +239,9 @@ module ComponentStructs
       @initially_checked_columns ||= [
         *DEFAULT_COLUMNS,
         ("sticker_cell" if @organization.enabled?("bike_stickers")),
-        *(["impound_id_cell", *IMPOUND_COLUMNS] if @impound)
+        *(["impound_id_cell", *IMPOUND_COLUMNS] if @impound),
+        # Without locations it mostly repeats Impounded from
+        ("impound_current_location_cell" if @impound && @organization.enabled?("impound_bikes_locations"))
       ].compact
     end
 
@@ -268,6 +271,7 @@ module ComponentStructs
         *additional_registration_fields.map { |field| "#{field}_cell" },
         ("notes_cell" if @organization.enabled?("registration_notes")),
         ("impound_id_cell" if impound_search?),
+        ("impound_current_location_cell" if @impound),
         ("avery_cell" if @organization.enabled?("avery_export")),
         ("acknowledgment_cell" if @organization.enabled?("education_courses"))
       ].compact.uniq

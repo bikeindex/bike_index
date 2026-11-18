@@ -64,7 +64,7 @@ class BikeV2Serializer < ApplicationSerializer
   def location_found
     return nil unless object.status_impounded?
 
-    object.current_impound_record&.impounded_from_address_record&.formatted_address_string(render_country: true)
+    object.current_impound_record&.impounded_from_address&.formatted_address_string(render_country: true)
   end
 
   def date_stolen

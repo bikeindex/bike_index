@@ -10,8 +10,9 @@ module Pages
         class Component < ApplicationComponent
           STORAGE_KEY = "orgRegistrationColumns"
 
-          # The impound records search's columns differ, so its choices are kept apart
-          IMPOUND_STORAGE_KEY = "orgImpoundColumns"
+          # The impound records search's columns differ, so its choices are kept apart. A saved
+          # list hides any column added after it, so a new default column bumps the version
+          IMPOUND_STORAGE_KEY = "orgImpoundColumns2"
 
           # Goes on the element holding the panel and its table, which the caller renders
           def self.column_settings_data_attributes(controllers: nil, orderable: true, impound: false)

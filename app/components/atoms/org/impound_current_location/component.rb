@@ -18,7 +18,7 @@ module Atoms
         private
 
         def same_as_impounded_from?
-          @impound_record.address_record_id == @impound_record.impounded_from_address_record_id
+          @impound_record.address_record_id.present? && @impound_record.address_record_id == @impound_record.impounded_from_address&.id
         end
       end
     end

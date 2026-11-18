@@ -28,7 +28,7 @@ RSpec.describe Pages::Org::Search::ColumnSettings::Component, type: :component d
 
     it "keeps the impound records search's choices apart" do
       expect(described_class.column_settings_data_attributes(impound: true)[:"ui--table-column-settings-storage-key-value"])
-        .to eq "orgImpoundColumns"
+        .to eq "orgImpoundColumns2"
     end
   end
 
@@ -49,7 +49,7 @@ RSpec.describe Pages::Org::Search::ColumnSettings::Component, type: :component d
     let(:enabled_feature_slugs) { %w[impound_bikes] }
 
     it "copies the impound records search's column order" do
-      expect(component).to have_css("button[data-ui--table-column-order-target='copy'][data-storage-key='orgImpoundColumnsOrder']",
+      expect(component).to have_css("button[data-ui--table-column-order-target='copy'][data-storage-key='orgImpoundColumns2Order']",
         text: "Copy column order from impounded vehicles search", visible: :all)
       expect(component).to have_no_css("h3", text: "Impound search columns", visible: :all)
     end

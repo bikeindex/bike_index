@@ -39,8 +39,9 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
     end
 
     it "renders the record's bike, its impound columns, and a hidden multi-update checkbox" do
-      FactoryBot.create(:impound_record_update, impound_record:, kind: "note", notes: "Owner emailed")
-      FactoryBot.create(:impound_record_update, impound_record:, kind: "note", notes: "Owner called")
+      ["Owner emailed", "Owner called", "Owner visited"].each do |notes|
+        FactoryBot.create(:impound_record_update, impound_record:, kind: "note", notes:)
+      end
       impound_record.reload
       expect(component).to have_css("tbody tr", count: 1)
       expect(component).to have_text(bike.mnfg_name)
@@ -51,7 +52,8 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
       expect(component).to have_css("td.impound_user_cell", text: impound_record.user.display_name.truncate(20))
       expect(component).to have_css("td.unregistered_cell", text: /\S/)
       expect(component).to have_css("th.impound_notes_cell", text: "Impound notes")
-      expect(component.css("td.impound_notes_cell small").map { it.text.strip }).to eq ["Owner called", "Owner emailed"]
+      expect(component.css("td.impound_notes_cell small").map { it.text.strip }).to eq ["Owner visited", "Owner called"]
+      expect(component).to have_css("td.impound_notes_cell a[href*='/impound_records/#{impound_record.display_id}']", text: "+1 more")
       # The search orders by the record, so only its columns sort
       expect(component).to have_css("th.impounded_at_cell a")
       expect(component).not_to have_css("th.manufacturer_cell a")
@@ -66,13 +68,14 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
     context "impounded from an address" do
       let(:impound_record) { FactoryBot.create(:impound_record_with_organization, :with_address_record, organization:, bike:) }
 
-      it "renders a sortable current location column, the same as where it was impounded from" do
-        expect(component).to have_css("th.impound_current_location_cell a", text: "Current location")
+      it "renders an unsortable current location column, the same as where it was impounded from, off by default" do
+        expect(component).to have_css("th.impound_current_location_cell", text: "Current location")
+        expect(component).not_to have_css("th.impound_current_location_cell a")
         expect(component).to have_css("td.impound_current_location_cell", text: "same as impounded from")
         expect(component).to have_css("td.impounded_from_cell", text: "1300 W 14th Pl")
         settings = ComponentStructs::OrgSearchSettings.new(organization:, impound: true)
-        expect(settings.initially_checked_columns).to include("impound_current_location_cell")
-        expect(settings.sort_column_label("location_id")).to eq "Current location"
+        expect(settings.initially_checked_columns).not_to include("impound_current_location_cell")
+        expect(settings.impound_panel_columns).to include("impound_current_location_cell")
       end
 
       context "held at a location" do
@@ -80,9 +83,13 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
         let(:location) { FactoryBot.create(:location, :with_address_record, address_in: :new_york, organization:, name: "Back lot", impound_location: true) }
         let(:impound_record) { FactoryBot.create(:impound_record_with_organization, :with_address_record, organization:, bike:, location:) }
 
-        it "renders the location and its address" do
+        it "renders the location and its address, sortable and on by default" do
+          expect(component).to have_css("th.impound_current_location_cell a", text: "Current location")
           expect(component).to have_css("td.impound_current_location_cell", text: /Back lot\s+278 Broadway/)
           expect(component).to have_css("td.impounded_from_cell", text: "1300 W 14th Pl")
+          settings = ComponentStructs::OrgSearchSettings.new(organization:, impound: true)
+          expect(settings.initially_checked_columns).to include("impound_current_location_cell")
+          expect(settings.sort_column_label("location_id")).to eq "Current location"
         end
       end
     end

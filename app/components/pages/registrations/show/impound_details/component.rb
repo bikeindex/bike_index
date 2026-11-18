@@ -22,7 +22,7 @@ module Pages
           # The fuller impound-record card is for an org viewing an actually-impounded
           # bike; found-kind records keep the simpler public card
           def org_record?
-            @organization.present? && !found?
+            @organization.present? && impound_record.organization_id == @organization.id && !found?
           end
 
           def found?
@@ -41,11 +41,11 @@ module Pages
 
           # Both pin where it was impounded from: the organization exactly, the public rounded
           def map_latitude
-            org_record? ? impound_record.impounded_from_address_record&.latitude : impound_record.latitude_public
+            org_record? ? impound_record.impounded_from_address&.latitude : impound_record.latitude_public
           end
 
           def map_longitude
-            org_record? ? impound_record.impounded_from_address_record&.longitude : impound_record.longitude_public
+            org_record? ? impound_record.impounded_from_address&.longitude : impound_record.longitude_public
           end
 
           def map_precise?

@@ -82,8 +82,9 @@ RSpec.describe OrgPublic::ImpoundedBikesController, type: :request do
       it "shows where it was impounded from, not where it's held" do
         expect(impound_record.reload.address_record_id).to eq location.address_record_id
         get base_url
-        expect(response.body).to include("1300 W 14th Pl")
-        expect(response.body).not_to include("278 Broadway")
+        expect(response.body).to include("Chicago, IL 60608")
+        expect(response.body).not_to include("1300 W 14th Pl")
+        expect(response.body).not_to include("New York")
       end
     end
   end
