@@ -5,8 +5,8 @@ module Pages
     module Show
       module ImpoundDetails
         # Impound location and date for an impounded bike — mirrors the stolen card.
-        # When an organization is viewing, it shows the fuller impound-record card
-        # with the exact (rather than obscured) location.
+        # When an organization is viewing, it shows the fuller impound-record card,
+        # pinned exactly where the bike was impounded from.
         class Component < ApplicationComponent
           def initialize(bike:, organization: nil)
             @bike = bike
@@ -39,13 +39,13 @@ module Pages
             found? ? translation(".found_details") : translation(".impound_details")
           end
 
-          # The viewing organization sees the exact location; the public a rounded one
+          # The organization's pin matches its card's Impounded from, not where the bike is held
           def map_latitude
-            org_record? ? impound_record.address_record&.latitude : impound_record.latitude_public
+            org_record? ? impound_record.impounded_from_address_record&.latitude : impound_record.latitude_public
           end
 
           def map_longitude
-            org_record? ? impound_record.address_record&.longitude : impound_record.longitude_public
+            org_record? ? impound_record.impounded_from_address_record&.longitude : impound_record.longitude_public
           end
 
           def map_precise?

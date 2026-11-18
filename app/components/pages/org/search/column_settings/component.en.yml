@@ -33,6 +33,7 @@ en:
             filter_with_stickers_html: only <strong>with</strong> stickers
             impound_id_cell: Impound ID
             impound_location_cell: Location
+            impound_notes_cell: Impound notes
             impound_search_columns: Impound search columns
             impound_status_cell: Impound status
             impound_updated_at_cell: Impound updated

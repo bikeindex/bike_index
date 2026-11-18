@@ -44,12 +44,13 @@ module ComponentStructs
       impound_user_cell
       impound_location_cell
       impounded_from_cell
+      impound_notes_cell
       unregistered_cell
     ].freeze
 
     # The impound records search's own columns, on by default
     IMPOUND_COLUMNS = %w[impounded_at_cell impound_updated_at_cell resolved_at_cell impound_status_cell
-      impound_user_cell impounded_from_cell unregistered_cell].freeze
+      impound_user_cell impounded_from_cell impound_notes_cell unregistered_cell].freeze
 
     # Those and its feature-gated ones, which its panel lists apart from the registration columns
     IMPOUND_PANEL_COLUMNS = ["impound_id_cell", "impound_location_cell", *IMPOUND_COLUMNS].freeze

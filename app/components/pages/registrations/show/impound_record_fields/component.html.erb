@@ -7,7 +7,7 @@
   <%= render(UI::DefinitionList::Row::Component.new(label: translation(".impounded_from"), value: impounded_from, render_with_no_value: true, no_value_text: "-")) %>
 
   <%= render(UI::DefinitionList::Row::Component.new(label: translation(".notes"), full_width: true)) do %>
-    <% noted_updates.each do |impound_record_update| %>
+    <% @impound_record.noted_updates.each do |impound_record_update| %>
       <div class="tw:pt-2 tw:first:pt-0">
         <%= render(UI::UserTextBlockDisplay::Component.new(text: impound_record_update.notes, max_height_class: "")) %>
 

@@ -22,10 +22,6 @@ module Pages
           def impounded_from
             @impound_record.impounded_from_address_record&.formatted_address_string(visible_attribute: :street)
           end
-
-          def noted_updates
-            @impound_record.impound_record_updates.includes(:user).reorder(id: :desc).select { it.notes.present? }
-          end
         end
       end
     end

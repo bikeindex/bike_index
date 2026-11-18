@@ -19,7 +19,7 @@ RSpec.describe Pages::Registrations::Show::ImpoundDetails::Component, type: :com
     let(:component) { described_class.new(bike:, organization:) }
     let(:impound_record) { FactoryBot.create(:impound_record, :with_organization, :with_address_record, location:) }
     let(:organization) { impound_record.organization }
-    let(:location) { FactoryBot.create(:location, name: "Back lot") }
+    let(:location) { FactoryBot.create(:location, :with_address_record, address_in: :new_york, name: "Back lot") }
     let(:bike) { impound_record.bike.reload }
 
     it "renders the location, the full impounded-from address and the notes, newest first" do
@@ -32,6 +32,8 @@ RSpec.describe Pages::Registrations::Show::ImpoundDetails::Component, type: :com
       expect(page).to have_text("1300 W 14th Pl, Chicago, IL 60608")
       expect(page).to have_text(/Owner called, picking up Tuesday.*Owner emailed/m)
       expect(page).to have_css("small .localizeTime", count: 2)
+      # Pinned where it was impounded from, not at the location holding it
+      expect(page).to have_css("[data-registrations--show--map-latitude-value='41.8624488']")
     end
   end
 

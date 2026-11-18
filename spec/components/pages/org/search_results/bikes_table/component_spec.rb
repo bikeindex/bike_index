@@ -39,6 +39,9 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
     end
 
     it "renders the record's bike, its impound columns, and a hidden multi-update checkbox" do
+      FactoryBot.create(:impound_record_update, impound_record:, kind: "note", notes: "Owner emailed")
+      FactoryBot.create(:impound_record_update, impound_record:, kind: "note", notes: "Owner called")
+      impound_record.reload
       expect(component).to have_css("tbody tr", count: 1)
       expect(component).to have_text(bike.mnfg_name)
       expect(component).to have_css("td.impounded_at_cell a[href*='/impound_records/#{impound_record.display_id}']")
@@ -47,6 +50,8 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
       expect(component).to have_css("td.impound_id_cell", text: impound_record.display_id)
       expect(component).to have_css("td.impound_user_cell", text: impound_record.user.display_name.truncate(20))
       expect(component).to have_css("td.unregistered_cell", text: /\S/)
+      expect(component).to have_css("th.impound_notes_cell", text: "Impound notes")
+      expect(component.css("td.impound_notes_cell small").map(&:text)).to eq ["Owner called", "Owner emailed"]
       expect(component).not_to have_css("th.impound_location_cell", visible: :all)
       # The search orders by the record, so only its columns sort
       expect(component).to have_css("th.impounded_at_cell a")

@@ -204,6 +204,11 @@ class ImpoundRecord < ApplicationRecord
     @bike ||= bike_id.present? ? Bike.unscoped.find_by_id(bike_id) : nil
   end
 
+  # Newest first. Filters in Ruby so a preloaded association serves it
+  def noted_updates
+    impound_record_updates.sort_by(&:id).reverse.select { it.notes.present? }
+  end
+
   def notification_notes_and_messages
     return nil unless parking_notification.present?
 
