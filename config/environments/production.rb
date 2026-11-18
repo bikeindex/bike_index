@@ -75,7 +75,7 @@ Rails.application.configure do
 
   # Block requests that hit the server's IP directly (bot scanners) instead of coming through Cloudflare.
   # kamal-proxy's health check hits /up by container address
-  config.hosts = ["bikeindex.org", /.*\.bikeindex\.org/]
+  config.hosts = ["bikeindex.org", /.*\.bikeindex\.org/i]
   config.host_authorization = {exclude: ->(request) { request.path == "/up" }}
 
   # Prepend all log lines with the following tags.
