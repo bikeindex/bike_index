@@ -19,7 +19,14 @@ backticks, `<img` escaped to `&lt;img`, plain and reference-style links alike, a
 the footer appended. No retry or body form got past it, and nothing here deletes a
 comment — so find out first, before any capture or hosting commit.
 
-1. Create the `## Screenshots` comment — or update the existing one — with this body:
+**Probe with `update_issue_comment`, the call the real post ends in.** On #4821
+`add_issue_comment` left an `<img>` alone and `update_issue_comment` rewrote the same
+kind of tag, so a probe created with `add_issue_comment` passed and the real post
+failed after the whole capture round — leaving a comment that can never hold images.
+
+1. Make sure the `## Screenshots` comment exists — when it doesn't, create it with
+   `add_issue_comment` and a body of just `## Screenshots` — then **update** it with
+   `update_issue_comment` to this body:
 
    ```
    ## Screenshots
