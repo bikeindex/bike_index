@@ -3421,7 +3421,8 @@ CREATE TABLE public.pos_registration_matches (
     review_reasons text[] DEFAULT '{}'::text[] NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
-    merger_id bigint
+    merger_id bigint,
+    merged_at timestamp(6) without time zone
 );
 
 

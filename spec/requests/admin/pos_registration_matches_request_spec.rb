@@ -15,7 +15,7 @@ RSpec.describe Admin::PosRegistrationMatchesController, type: :request do
     let(:merger) { FactoryBot.create(:user) }
     let!(:review_candidate) do
       PosRegistrationMatch.create!(duplicate_bike_group:, bike: FactoryBot.create(:bike), pos_bike:, review_reasons: %w[stolen_history impounded],
-        status: :confirmed, merger:)
+        status: :merged, merged_at: Time.current, merger:)
     end
 
     it "lists matches and filters by bucket, reason and owner" do

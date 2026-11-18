@@ -15,7 +15,7 @@ module Admin
     protected
 
     def sortable_columns
-      %w[created_at updated_at status]
+      %w[created_at updated_at status merged_at]
     end
 
     def earliest_period_date

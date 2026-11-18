@@ -36,7 +36,7 @@ RSpec.describe BikeJobs::MergePosRegistrationJob, type: :job do
     expect([component, bike_sticker, bike_organization, customer_contact, notification].map { it.reload.bike_id })
       .to eq([pos_bike.id] * 5)
     expect(pos_bike.current_ownership.reload).to have_attributes(claimed: true, registration_info: {"phone" => "7183839292"})
-    expect(match.reload.status).to eq "merged"
+    expect(match.reload).to have_attributes(status: "merged", merged_at: be_within(1.minute).of(Time.current))
     expect(Bike.unscoped.find(bike.id).deleted_at).to be_present
     expect(CallbackJobs::AfterBikeSaveJob.jobs.map { it["args"] }).to include([bike.id], [pos_bike.id])
     expect(PosRegistrationMatch.merged_into(Bike.unscoped.find(bike.id))).to eq pos_bike
@@ -71,7 +71,7 @@ RSpec.describe BikeJobs::MergePosRegistrationJob, type: :job do
     allow_any_instance_of(Bike).to receive(:destroy!).and_raise(ActiveRecord::RecordNotDestroyed)
     expect { instance.perform(match.id) }.to raise_error(ActiveRecord::RecordNotDestroyed)
     expect(component.reload.bike_id).to eq bike.id
-    expect(match.reload).to have_attributes(status: "confirmed", review_reasons: [])
+    expect(match.reload).to have_attributes(status: "confirmed", review_reasons: [], merged_at: nil)
     expect(bike.reload.deleted_at).to be_blank
     expect(CallbackJobs::AfterBikeSaveJob.jobs).to be_empty
   end

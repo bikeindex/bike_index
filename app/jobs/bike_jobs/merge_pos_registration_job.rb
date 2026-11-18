@@ -47,7 +47,7 @@ module BikeJobs
 
         ActiveRecord::Base.transaction do
           merge(match.bike, match.pos_bike)
-          match.update!(status: :merged)
+          match.update!(status: :merged, merged_at: Time.current)
         end
         match
       end

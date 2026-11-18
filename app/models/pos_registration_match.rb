@@ -4,6 +4,7 @@
 # Database name: primary
 #
 #  id                      :bigint           not null, primary key
+#  merged_at               :datetime
 #  review_reasons          :text             default([]), not null, is an Array
 #  status                  :integer          default("pending"), not null
 #  created_at              :datetime         not null
