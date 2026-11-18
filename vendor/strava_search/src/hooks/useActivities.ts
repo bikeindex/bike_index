@@ -26,8 +26,8 @@ interface UseActivitiesResult {
   clearError: () => void;
   filters: SearchFilters;
   setFilters: React.Dispatch<React.SetStateAction<SearchFilters>>;
-  selectedIds: Set<number>;
-  setSelectedIds: React.Dispatch<React.SetStateAction<Set<number>>>;
+  selectedIds: Set<string>;
+  setSelectedIds: React.Dispatch<React.SetStateAction<Set<string>>>;
   selectAll: () => void;
   deselectAll: () => void;
   updateSelectedActivities: (updates: UpdatableActivity) => Promise<void>;
@@ -48,7 +48,7 @@ export function useActivities(): UseActivitiesResult {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useUrlFilters();
-  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isUpdating, setIsUpdating] = useState(false);
   const [updateProgress, setUpdateProgress] = useState<UpdateProgress | null>(null);
 
