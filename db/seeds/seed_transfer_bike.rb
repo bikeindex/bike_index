@@ -10,8 +10,16 @@ require File.expand_path("db/seeds/seed_helpers", Rails.root)
 owner = User.find_by_email("transfer_provider@bikeindex.org")
 return if owner.nil? || owner.bikes.exists?
 
+# Deterministic make/model so the iOS UI test's transfer target (the first bike in
+# the provider's by-status grid) is always "2019 Specialized"
+specialized = Manufacturer.friendly_find("Specialized")
+
 bike = SeedHelpers.seed_bike(
   creator: BikeServices::Creator.new, user: owner, label: "Transfer demo bike",
-  params: {bike: SeedHelpers.bike_params(owner_email: owner.email).merge(description: "Seeded for the account transfer demo")}
+  params: {bike: SeedHelpers.bike_params(owner_email: owner.email, manufacturer_id: specialized&.id).merge(
+    frame_model: "Sirrus",
+    year: 2019,
+    description: "Seeded for the account transfer demo"
+  )}
 )
 puts "Created transfer demo bike ##{bike.id} for #{owner.email}" unless bike.errors.any?
