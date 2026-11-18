@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Backfills
-  # Shorter names, so the slugs derived from them match. Slugs are set on create, so they're unchanged
+  # Slugs are set on create, so a renamed ctype keeps its old one
   class CtypeRenameJob < ApplicationJob
     sidekiq_options queue: "low_priority", retry: false
 

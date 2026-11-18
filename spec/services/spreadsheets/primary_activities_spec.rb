@@ -72,11 +72,7 @@ RSpec.describe Spreadsheets::PrimaryActivities do
       csv = described_class.to_csv
       PrimaryActivity.update_all(priority: 0)
 
-      Tempfile.create(["primary_activities", ".csv"], Rails.root.join("tmp")) do |file|
-        file.write(csv)
-        file.flush
-        described_class.import(file.path)
-      end
+      described_class.import(StringIO.new(csv))
 
       expect(described_class.to_csv).to eq csv
     end
@@ -123,11 +119,7 @@ RSpec.describe Spreadsheets::PrimaryActivities do
       end
 
       it "sets each row's priority on its own activity, not on the families it lists" do
-        Tempfile.create(["primary_activities", ".csv"], Rails.root.join("tmp")) do |file|
-          file.write("flavor,families,priority\n,Road Biking,590\nAll Road,ATB (All Terrain Biking) & Road Biking,268\nBike Polo,,401\n")
-          file.flush
-          described_class.import(file.path)
-        end
+        described_class.import(StringIO.new("flavor,families,priority\n,Road Biking,590\nAll Road,ATB (All Terrain Biking) & Road Biking,268\nBike Polo,,401\n"))
 
         expect(primary_activity.reload.priority).to eq 590
         all_road = PrimaryActivity.flavor.where(name: "All Road")

@@ -28,28 +28,14 @@ module Spreadsheets
     #
 
     def names_and_families(primary_activities)
-      flavors_families = {}
-      # A flavor in several families exports once, with its first (highest priority) record's attributes
-      flavor_records = {}
+      families, flavors = primary_activities.partition(&:family?)
       # A family exports as a flavor-less row; import upserts the family and creates no flavor
-      family_rows = []
-
-      primary_activities.each do |primary_activity|
-        if primary_activity.family?
-          family_rows << [nil, primary_activity.name, primary_activity.priority, primary_activity.short_name]
-          next
-        end
-
-        flavor_records[primary_activity.name] ||= primary_activity
-        family_name = primary_activity.top_level? ? nil : primary_activity.family_name
-        flavors_families[primary_activity.name] ||= family_name
-        next if flavors_families[primary_activity.name] == family_name
-
-        # If the name wasn't assigned in this block, add it
-        flavors_families[primary_activity.name] += " & #{family_name}"
+      family_rows = families.map { [nil, it.name, it.priority, it.short_name] }
+      # A flavor in several families exports once, with its first (highest priority) record's attributes
+      family_rows + flavors.group_by(&:name).map do |name, records|
+        family_names = records.reject(&:top_level?).map(&:family_name).join(" & ").presence
+        [name, family_names, records.first.priority, records.first.short_name]
       end
-
-      family_rows + flavors_families.map { |name, families| [name, families, flavor_records[name].priority, flavor_records[name].short_name] }
     end
 
     def update_or_create_for!(row)
@@ -67,7 +53,7 @@ module Spreadsheets
       end
     end
 
-    # Match by slug or exact name (not friendly_find's substring search), correct the stored name and priority, or create
+    # Slug or exact name, not friendly_find's substring search
     def upsert!(scope, name, priority:, **create_attrs)
       name = name.strip
       existing = scope.find_by(slug: Slugifyer.slugify(name)) ||
