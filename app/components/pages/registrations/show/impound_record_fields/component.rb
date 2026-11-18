@@ -22,6 +22,11 @@ module Pages
           def impounded_from
             @impound_record.impounded_from_address_record&.formatted_address_string(visible_attribute: :street)
           end
+
+          def noted_updates
+            @impound_record.noted_updates
+              .tap { ActiveRecord::Associations::Preloader.new(records: it, associations: :user).call }
+          end
         end
       end
     end

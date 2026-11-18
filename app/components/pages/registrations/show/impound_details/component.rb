@@ -5,8 +5,8 @@ module Pages
     module Show
       module ImpoundDetails
         # Impound location and date for an impounded bike — mirrors the stolen card.
-        # When an organization is viewing, it shows the fuller impound-record card,
-        # pinned exactly where the bike was impounded from.
+        # When an organization is viewing, it shows the fuller impound-record card
+        # with the exact (rather than obscured) location.
         class Component < ApplicationComponent
           def initialize(bike:, organization: nil)
             @bike = bike
