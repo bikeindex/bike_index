@@ -109,7 +109,7 @@ module ControllerHelpers
   # For a bike the user can't see: a registration merged into its shop's POS registration sends its links to the
   # same page of that one, if they can see it
   def redirect_merged_bike_or_not_found(bike)
-    merged_into = PosRegistrationMatch.merged_into(bike) if request.get?
+    merged_into = PosRegistrationMatch.merged_into(bike) if request.get? || request.head?
     fail ActiveRecord::RecordNotFound unless merged_into&.visible_by?(current_user)
 
     id_param = params.key?(:bike_id) ? :bike_id : :id

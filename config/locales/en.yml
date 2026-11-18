@@ -1830,7 +1830,9 @@ en:
             We couldn't combine these, so they're still separate. Email support@bikeindex.org
             if you need help.
         update:
-          combining: Thanks! We're combining your %{bike_type}'s registrations into one. It takes a minute.
+          combining: >-
+            Thanks! We're combining your %{bike_type}'s registrations into one. It
+            takes a minute.
           kept_separate: Thanks, we'll keep them as separate registrations.
       update:
         current_password_doesnt_match: Current password doesn't match, it's required
