@@ -81,12 +81,12 @@ end
 
 # Register an unknown-serial bike together with its parking notification, the way
 # the organized "unregistered" flow does (no ProcessParkingNotificationJob email).
-def seed_unregistered_parking_notification(creator:, member:, owner_email:, loc:, kind:, region_record_id:, country_id:)
+def seed_unregistered_parking_notification(creator:, member:, owner_email:, loc:, kind:, region_record_id:, country_id:, manufacturer_id: nil, year: nil)
   SeedHelpers.tick
   b_param = BParam.create!(
     creator: member,
     params: {
-      bike: org_bike_params(owner_email:).merge(serial_number: "unknown"),
+      bike: org_bike_params(owner_email:, manufacturer_id:).merge(serial_number: "unknown", year:),
       parking_notification: {kind:, street: loc[:street], city: loc[:city], postal_code: loc[:postal_code], region_record_id:, country_id:, skip_geocoding: true}
     }
   )
@@ -149,9 +149,11 @@ end
   puts "  Created impound notification ##{i + 1} with ImpoundRecord ##{pn.impound_record_id}"
 end
 
-# Create 2 unregistered_parking_notifications: one for the member, one owned by the primary test user
+# Create 2 unregistered_parking_notifications: one for the member, one owned by the primary test user.
+# The iOS StaleBikeUITest asserts member's labels share none of user's
 seed_unregistered_parking_notification(creator:, member:, owner_email: member.email, loc: sf_locations[10],
-  kind: "parked_incorrectly_notification", region_record_id: ca_state&.id, country_id: us&.id)
+  kind: "parked_incorrectly_notification", region_record_id: ca_state&.id, country_id: us&.id,
+  year: 2021, manufacturer_id: Manufacturer.friendly_find("Jamis")&.id)
 seed_unregistered_parking_notification(creator:, member:, owner_email: user.email, loc: sf_locations[11],
   kind: "appears_abandoned_notification", region_record_id: ca_state&.id, country_id: us&.id)
 
