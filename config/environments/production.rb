@@ -73,7 +73,8 @@ Rails.application.configure do
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
   config.force_ssl = true
 
-  # Block requests that hit the server's IP directly (bot scanners) instead of coming through Cloudflare.
+  # Turns away IP-sweeping scanners, which don't send a bikeindex.org Host. A direct request that
+  # does send one still gets in — the Cloud66 firewall, open only to Cloudflare's IPs, is what stops it.
   # kamal-proxy's health check hits /up by container address
   config.hosts = ["bikeindex.org", /.*\.bikeindex\.org/i]
   config.host_authorization = {exclude: ->(request) { request.path == "/up" }}
