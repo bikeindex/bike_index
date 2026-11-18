@@ -1,4 +1,5 @@
 <section
+  data-controller="shop--index"
   class="
     tw:border-b tw:border-gray-200 tw:bg-gray-50 tw:dark:border-gray-700
     tw:dark:bg-gray-800/60
@@ -28,7 +29,7 @@
       </p>
 
       <%= render(UI::ButtonLink::Component.new(href: "##{FIRST_PRODUCT_ID}", text: translation(".shop_the_gear"),
-        color: :yellow, size: :callout)) %>
+        color: :yellow, size: :callout, data: {action: "shop--index#scrollToProducts"})) %>
     </div>
 
     <%= image_tag("kelsey/illustrations/comic-assets_bike-hero.png", alt: "", class: "tw:mx-auto tw:w-full tw:max-w-105") %>
