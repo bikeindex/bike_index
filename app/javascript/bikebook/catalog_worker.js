@@ -21,8 +21,6 @@ let comparisonFetch = null
 const blocks = new Map()
 const orders = new Map()
 const sold = new Map()
-// a page load's, as each loads its own worker, so a reload features others and its history the same ones
-const SEED = crypto.getRandomValues(new Uint32Array(1))[0]
 
 const fetchJson = async (url) => {
   const response = await fetch(url)
@@ -79,7 +77,9 @@ async function load ({ rulesUrl, similarityUrl: similarityModule }) {
     group_key: `${model.manufacturer}/${model.model_group ?? model.model.split(' ')[0]}`,
     searchText: `${model.display}\n${model.id}`.toLowerCase(),
     // a current model's first year where it's sold ahead of the calendar
-    sortYear: model.final_year ?? Math.max(model.first_year, currentYear)
+    sortYear: model.final_year ?? Math.max(model.first_year, currentYear),
+    // drawn per worker, which each page load starts, so a reload features others and the page's own changes the same
+    chance: Math.random()
   }))
   byId = new Map(models.map((model) => [model.id, model]))
   // the index labels the out of class markers, which the vocabulary has no record of: "Out of class in California"
@@ -211,45 +211,44 @@ function matching (params) {
 }
 
 // The `count` of models the filters leave, and featured_rules' `COUNT` of them, by its rules, the models tying on them
-// in the page load's random order, shown cheapest first unless the reader picked a sort.
+// by `chance`, shown cheapest first unless the reader picked a sort.
 // `legalClasses` are the e-bike classes legal where the visitor is, by which every e-bike is legal where there are none
 function featured ({ params, legalClasses }) {
-  const { COUNT, requirements, preferences, quotas } = rules
+  const { COUNT, requirements, preferences, quotas, maximums } = rules
   const legalEbike = (model) => !legalClasses.length || legalClasses.some((propulsion) => propelled(model, propulsion, params.jurisdiction))
-  const filtered = sorted(params).filter(filter(params))
-  const candidates = shuffled(requirements.reduce((models, requirement) => {
-    const passing = models.filter((model) => requirement(model, { legalEbike, params }))
-    return passing.length ? passing : models
-  }, filtered))
+  const filtered = models.filter(filter(params))
+  const candidates = requirements.reduce((models, requirement) => narrow(models, (model) => requirement(model, { legalEbike, params })), filtered)
+    .toSorted((a, b) => a.chance - b.chance)
   const count = Math.min(COUNT, candidates.length)
-  const [caps, targets] = [quotas.filter(({ maximum }) => maximum != null), quotas.filter(({ maximum }) => maximum == null)]
   // a share's models and the others each at least their part of the picks
-  const minimums = targets.flatMap(({ matches, share, minimum = Math.round(count * share) }) => share == null
+  const minimums = quotas.flatMap(({ matches, share, minimum = Math.round(count * share) }) => share == null
     ? [{ matches, minimum }]
     : [{ matches, minimum }, { matches: (model) => !matches(model), minimum: count - minimum }])
+  // each candidate's quota matches, and the different ones among them, which bound the ranks any can reach
+  const matched = new Map(candidates.map((model) => [model, quotas.map(({ matches }) => matches(model))]))
+  const kinds = [...new Map([...matched.values()].map((each) => [each.join(), each])).values()]
   const picked = []
   while (picked.length < count) {
-    const capped = caps.reduce((models, { matches, maximum }) => {
-      const under = picked.filter(matches).length < maximum ? models : models.filter((model) => !matches(model))
-      return under.length ? under : models
-    }, candidates.filter((model) => !picked.includes(model)))
-    const pool = minimums.reduce((models, { matches, minimum }) => {
-      const narrowed = minimum - picked.filter(matches).length >= count - picked.length && models.filter(matches)
-      return narrowed?.length ? narrowed : models
-    }, capped)
+    const capped = maximums.reduce((models, { matches, maximum }) => picked.filter(matches).length < maximum
+      ? models
+      : narrow(models, (model) => !matches(model)), candidates.filter((model) => !picked.includes(model)))
+    const pool = minimums.reduce((models, { matches, minimum }) => minimum - picked.filter(matches).length >= count - picked.length
+      ? narrow(models, matches)
+      : models, capped)
     // a share's models while the picks fall short of it and the others while they're over, a minimum's until it's met.
     // A quota met ranks every model alike
-    const behind = targets.map(({ matches, share, minimum }) => (share == null ? minimum : share * picked.length) - picked.filter(matches).length)
-    const helps = (model) => targets.map(({ matches, share }, index) => share == null
-      ? behind[index] <= 0 || matches(model)
-      : behind[index] === 0 || (behind[index] > 0) === matches(model))
-    const ranks = (model) => [...preferences.map((prefers) => prefers(model, { picked })), ...helps(model)]
-    // no model outranks one meeting every rank
+    const behind = quotas.map(({ matches, share, minimum }) => (share == null ? minimum : share * picked.length) - picked.filter(matches).length)
+    const helps = (matching) => quotas.map(({ share }, index) => share == null
+      ? behind[index] <= 0 || matching[index]
+      : behind[index] === 0 || (behind[index] > 0) === matching[index])
+    const ranks = (model) => [...preferences.map((prefers) => prefers(model, { picked })), ...helps(matched.get(model))]
+    // no model outranks one reaching the ranks a model with every preference would
+    const ceiling = kinds.map((each) => [...preferences.map(() => true), ...helps(each)]).reduce((top, each) => outranks(each, top) ? each : top)
     let best = null
     for (const model of pool) {
       const modelRanks = ranks(model)
       if (!best || outranks(modelRanks, best.ranks)) best = { model, ranks: modelRanks }
-      if (modelRanks.every(Boolean)) break
+      if (!outranks(ceiling, modelRanks)) break
     }
     picked.push(best.model)
   }
@@ -275,22 +274,8 @@ function group ({ model: id, market, scope }) {
   }
 }
 
-// Fisher-Yates, by mulberry32 from SEED
-function shuffled (models) {
-  let state = SEED
-  const random = () => {
-    state = (state + 0x6d2b79f5) | 0
-    let t = Math.imul(state ^ (state >>> 15), 1 | state)
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
-  }
-  const result = [...models]
-  for (let index = result.length - 1; index > 0; index--) {
-    const other = Math.floor(random() * (index + 1))
-    ;[result[index], result[other]] = [result[other], result[index]]
-  }
-  return result
-}
+// `models` that `keep` keeps, unless that's none
+const narrow = (models, keep) => (kept => kept.length ? kept : models)(models.filter(keep))
 
 // Whether `a` wins at the first rank the two differ at
 const outranks = (a, b) => {

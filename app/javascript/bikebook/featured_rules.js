@@ -1,7 +1,6 @@
 // What the page features with nothing picked, from the models the filters leave. Each pick is the model ranking first
 // by `preferences`, then by which `quotas` it helps meet, of those passing every requirement. A quota narrows a pick to
-// its models once the picks left are all it still needs, the first quotas first, and one with no models left gives way.
-// A `maximum` met leaves its models out of the picks after it, unless that would leave none
+// its models once the picks left are all it still needs, the first quotas first, and one with no models left gives way
 
 export const COUNT = 12
 
@@ -17,7 +16,7 @@ const CYCLE_TYPES = ['bike', 'cargo_bike', 'cargo_bike_rear', 'tandem', 'tricycl
 // A model whose `key` none of the picks share
 const unseen = (key) => (model, { picked }) => !picked.some((each) => key(each) === key(model))
 const priced = (min, max = Infinity) => ({ msrp_cents: cents }) => cents > min && cents <= max
-const pricedIn = (...currencies) => ({ msrp_currency: currency }) => currencies.includes(currency)
+const local = ({ market }) => CURRENCIES[market] ?? 'USD'
 const riders = (rider) => ({ target_riders: targets }) => Boolean(targets?.includes(rider))
 
 // Each leaves out the models it fails, unless that would leave none. `legalEbike` is whether a model is an e-bike in a
@@ -25,16 +24,16 @@ const riders = (rider) => ({ target_riders: targets }) => Boolean(targets?.inclu
 export const requirements = [
   // an incomplete model's listed photo is often missing
   ({ photo, incomplete }) => Boolean(photo) && !incomplete,
-  ({ msrp_cents: cents }) => cents > 0,
+  priced(0),
   ({ vehicle_type: type }) => CYCLE_TYPES.includes(type),
   (model, { legalEbike }) => !model.electric || (legalEbike(model) && !model.e_vehicle_classifications?.includes('evc/out_of_class')),
-  (model) => !riders('kid')(model),
+  ({ target_riders: targets }) => !targets?.includes('kid'),
   ({ primary_activity: activity }) => !activity?.startsWith('bmx'),
   // the market's currency, else the dollar, as the quotas' prices are in it
-  (model, { params }) => pricedIn(CURRENCIES[params.market] ?? 'USD', 'USD')(model),
-  (model, { params }) => pricedIn(CURRENCIES[params.market] ?? 'USD')(model),
+  ({ msrp_currency: currency }, { params }) => [local(params), 'USD'].includes(currency),
+  ({ msrp_currency: currency }, { params }) => currency === local(params),
   // none over $10,000 until the reader filters by price, but Reactive Adaptations' adaptive bikes, which rarely cost less
-  (model, { params }) => params.price_min || params.price_max || !(model.msrp_cents > MAX_PRICE_CENTS) ||
+  (model, { params }) => params.price_min || params.price_max || !priced(MAX_PRICE_CENTS)(model) ||
     model.manufacturer === 'reactive_adaptations'
 ]
 
@@ -47,13 +46,17 @@ export const preferences = [
   ({ final_year: finalYear }) => finalYear == null
 ]
 
-// `share` is the picks' fraction, those it leaves being the other models; `minimum` and `maximum` are counts
+// `share` is the picks' fraction, those it leaves being the other models; `minimum` is a count
 export const quotas = [
   { matches: ({ electric }) => electric, share: 0.5 },
   { matches: priced(0, LOW_PRICE_CENTS), minimum: 4 },
   { matches: (model) => model.electric && priced(0, LOW_PRICE_CENTS)(model), minimum: 2 },
   { matches: priced(LOW_PRICE_CENTS, MID_PRICE_CENTS), minimum: 4 },
-  { matches: riders('woman'), minimum: 3 },
+  { matches: riders('woman'), minimum: 3 }
+]
+
+// Each leaves its models out of the picks once they number `maximum`, unless that would leave none
+export const maximums = [
   { matches: priced(HIGH_PRICE_CENTS), maximum: 2 },
   { matches: priced(TOP_PRICE_CENTS), maximum: 1 }
 ]

@@ -20,6 +20,8 @@ RSpec.describe "Bike Book", :js, type: :system do
 
   def featured_ids = all("[aria-label='Models to compare'] a").map { it[:href][/vehicle_models=([^&]+)/, 1] }
 
+  def featured_prices = all("[aria-label='Models to compare'] li").map { it.text[/\$([\d,]+)/, 1].to_s.delete(",").to_i }
+
   # How much of each neighbor shows either side of the card `step` along, centered, `step` being the cards to a column
   def neighbors_showing(row, step)
     row.evaluate_script(<<~JS)
@@ -115,8 +117,7 @@ RSpec.describe "Bike Book", :js, type: :system do
     picks = featured_ids
     expect(picks).to include("m/specialized/2025/ruby_sport", "m/aventon/2024/soltera_2_5")
     expect(picks.grep(%r{\Am/(kris_holm|reactive_adaptations|segway|sur_ron)/|jett_24|haul_st_ca|crux|roll_[23]|sirrus_2})).to be_empty
-    prices = all("[aria-label='Models to compare'] li").map { it.text[/\$([\d,]+)/, 1].delete(",").to_i }
-    expect(prices).to eq prices.sort
+    expect(featured_prices).to eq featured_prices.sort
     # others each page load, which a few tries make sure of, as the fixture's few models could repeat
     reloaded = 3.times.lazy.map do
       visit bikebook_path
@@ -1191,19 +1192,19 @@ RSpec.describe "Bike Book", :js, type: :system do
     visit bikebook_path(price_max: 3000)
     featured = find("[aria-label='Models to compare']", wait: 10)
     expect(featured).to have_css("a", count: 12)
-    picks = featured.all("a").map { it[:href][/vehicle_models=(.+)/, 1] }
+    picks = featured_ids
     expect(picks).not_to include("m/aventon/2026/level_4_adv", "m/aventon/2026/level_4_adv_step_through", "m/aventon/2025/pace_4_step_through",
       "m/aventon/2026/pace_5_rec_step_through")
 
-    # Price leads the order once clicked, and a second click turns it around
-    prices = ->(list) { list.all("li").map { it.text[/\$([\d,]+)/, 1].to_s.delete(",").to_i } }
+    # Price leads the order once clicked, and a second click turns it around, the same models either way
     click_on "More filters", match: :first
     within("#vehicle-filters") { click_on "Price" }
     expect(page).to have_current_path(/[?&]sort=price\b/).and have_css("#vehicle-filters button[aria-pressed='true']", text: "Price")
-    expect(page).to have_css("[aria-label='Models to compare']") { (listed = prices.call(it)) == listed.sort && listed.uniq.size > 1 }
+    expect(page).to have_css("[aria-label='Models to compare']") { (listed = featured_prices) == listed.sort && listed.uniq.size > 1 }
     within("#vehicle-filters") { click_on "Price" }
     expect(page).to have_current_path(/[?&]price_dir=desc\b/)
-    expect(page).to have_css("[aria-label='Models to compare']") { (listed = prices.call(it)) == listed.sort.reverse }
+    expect(page).to have_css("[aria-label='Models to compare']") { (listed = featured_prices) == listed.sort.reverse }
+    expect(featured_ids).to match_array(picks)
   end
 
   it "keeps each compared vehicle's size in the URL, the others the first's by name, else nearest it for its riders or by top tube, unless picked" do
