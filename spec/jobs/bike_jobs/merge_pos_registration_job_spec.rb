@@ -42,7 +42,7 @@ RSpec.describe BikeJobs::MergePosRegistrationJob, type: :job do
     expect(PosRegistrationMatch.merged_into(Bike.unscoped.find(bike.id))).to eq pos_bike
   end
 
-  it "keeps the shop's values over the owner's defaults and blanks, and the shop's organization permission and note" do
+  it "takes the owner's defaults and blanks too, and keeps the shop's organization permission and note" do
     pos_bike.update!(propulsion_type: "pedal-assist", description: "Shop notes", frame_size: "56cm")
     bike.update_columns(description: "", frame_size: "m", frame_size_number: nil, frame_size_unit: "ordinal")
     expect(bike.reload.propulsion_type).to eq "foot-pedal"
@@ -57,8 +57,7 @@ RSpec.describe BikeJobs::MergePosRegistrationJob, type: :job do
     strava_gear = FactoryBot.create(:strava_gear, item: bike, strava_integration:)
 
     instance.perform(match.id)
-    # The owner's frame size replaces the shop's whole, not just its unit
-    expect(pos_bike.reload).to have_attributes(propulsion_type: "pedal-assist", description: "Shop notes", frame_size: "m",
+    expect(pos_bike.reload).to have_attributes(propulsion_type: "foot-pedal", description: "", frame_size: "m",
       frame_size_number: nil, frame_size_unit: "ordinal")
     expect(pos_bike.bike_organizations.find_by(organization:).can_not_edit_claimed).to be_truthy
     expect([pos_bike_note, bike_note, other_note].map { it.reload.bike_id }).to eq([pos_bike.id, bike.id, pos_bike.id])

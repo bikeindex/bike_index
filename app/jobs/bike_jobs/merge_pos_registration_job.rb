@@ -7,13 +7,12 @@ module BikeJobs
   class MergePosRegistrationJob < ApplicationJob
     sidekiq_options queue: "high_priority"
 
-    # The owner's value wins, unless it's blank or the column's own default, which can't be told apart from not choosing
+    # What the owner entered replaces the shop's, blank or not
     OWNER_ATTRIBUTES = %w[name description frame_model year cycle_type propulsion_type primary_frame_color_id
       secondary_frame_color_id tertiary_frame_color_id paint_id frame_material handlebar_type
       front_wheel_size_id rear_wheel_size_id front_tire_narrow rear_tire_narrow front_gear_type_id rear_gear_type_id
-      belt_drive coaster_brake number_of_seats primary_activity_id extra_registration_number video_embed].freeze
-    # Taken together, since a number from one and a unit from the other make a size neither entered
-    FRAME_SIZE_ATTRIBUTES = %w[frame_size frame_size_number frame_size_unit].freeze
+      belt_drive coaster_brake number_of_seats primary_activity_id extra_registration_number video_embed
+      frame_size frame_size_number frame_size_unit].freeze
 
     # Moved over whole
     MOVED_MODELS = [BikeStickerUpdate, Component, CustomerContact, EducationCourseAcknowledgment, GraduatedNotification,
@@ -106,10 +105,7 @@ module BikeJobs
         registration_info: pos_ownership.registration_info.to_h.merge(owner_ownership&.registration_info.to_h.compact_blank),
         address_record_id: owner_ownership&.address_record_id || pos_ownership.address_record_id)
 
-      # Blank isn't a choice, but a non-default false is
-      pos_bike.assign_attributes(OWNER_ATTRIBUTES.reject { bike[it].to_s.blank? || bike[it] == Bike.column_defaults[it] }
-        .index_with { bike[it] })
-      pos_bike.assign_attributes(bike.slice(*FRAME_SIZE_ATTRIBUTES)) if bike.frame_size.present?
+      pos_bike.assign_attributes(bike.slice(*OWNER_ATTRIBUTES))
       pos_bike.assign_attributes(bike.user_hidden ? {marked_user_hidden: true} : {marked_user_unhidden: true})
     end
   end
