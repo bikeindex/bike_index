@@ -7,7 +7,6 @@
 #  family                     :boolean
 #  name                       :string
 #  priority                   :integer
-#  short_name                 :string
 #  slug                       :string
 #  created_at                 :datetime         not null
 #  updated_at                 :datetime         not null
@@ -23,7 +22,8 @@ class PrimaryActivity < ApplicationRecord
 
   SPECIAL_SHORT_NAMES = {
     "road" => "road-biking",
-    "track" => "track-racing"
+    "track" => "track-racing",
+    "endurance" => "endurance--sportive"
   }.freeze
 
   belongs_to :primary_activity_family, class_name: "PrimaryActivity"
@@ -133,7 +133,7 @@ class PrimaryActivity < ApplicationRecord
   end
 
   def short_name
-    self[:short_name].presence || super
+    SPECIAL_SHORT_NAMES.key(slug)&.capitalize || super
   end
 
   private

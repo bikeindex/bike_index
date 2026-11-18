@@ -5,8 +5,8 @@ RSpec.describe Spreadsheets::Components do
     let!(:cgroup) { FactoryBot.create(:cgroup, name: "Wheels") }
     let!(:ctype) { FactoryBot.create(:ctype, name: "Rim", secondary_name: nil, has_multiple: true, cgroup:) }
     let(:target) do
-      ["name,secondary_name,has_multiple_locations,group,short_name",
-        "Rim,,true,Wheels,Rim"]
+      ["name,secondary_name,has_multiple_locations,group",
+        "Rim,,true,Wheels"]
     end
     it "generates" do
       # Scope to this ctype -- a leaked Ctype.other from another spec would flake a global count.
@@ -18,8 +18,8 @@ RSpec.describe Spreadsheets::Components do
 
   describe "row" do
     let(:cgroup) { FactoryBot.create(:cgroup, name: "Frame and Fork") }
-    let(:ctype) { FactoryBot.create(:ctype, name: "Cog/Cassette/Freewheel", short_name: "Cassette", secondary_name: nil, has_multiple: false, cgroup:) }
-    let(:target) { ["Cog/Cassette/Freewheel", nil, false, "Frame and Fork", "Cassette"] }
+    let(:ctype) { FactoryBot.create(:ctype, name: "Stem", secondary_name: "Gooseneck", has_multiple: false, cgroup:) }
+    let(:target) { ["Stem", "Gooseneck", false, "Frame and Fork"] }
     it "returns expected" do
       expect(described_class.send(:row_for, ctype)).to eq target
     end
@@ -27,9 +27,9 @@ RSpec.describe Spreadsheets::Components do
 
   describe "import methods" do
     let(:csv_content) do
-      "name,secondary_name,has_multiple_locations,group,short_name\n" \
-        "Stem,Gooseneck,false,Frame and Fork,\n" \
-        "Pannier,,true,Cargo,Bag\n"
+      "name,secondary_name,has_multiple_locations,group\n" \
+        "Stem,Gooseneck,false,Frame and Fork\n" \
+        "Pannier,,true,Cargo\n"
     end
     # fresh StringIO each call, since CSV.foreach consumes it
     def import_csv = described_class.import(StringIO.new(csv_content))
@@ -40,12 +40,10 @@ RSpec.describe Spreadsheets::Components do
       expect(stem.secondary_name).to eq "Gooseneck"
       expect(stem.has_multiple).to be_falsey
       expect(stem.cgroup).to eq cgroup
-      expect(stem[:short_name]).to be_nil
 
       pannier = Ctype.friendly_find("Pannier")
       expect(pannier.has_multiple).to be_truthy
       expect(pannier.cgroup.name).to eq "Cargo"
-      expect(pannier.short_name).to eq "Bag"
     end
 
     describe "import" do
