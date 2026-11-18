@@ -22,8 +22,13 @@ const blocks = new Map()
 const orders = new Map()
 const sold = new Map()
 
+// A stalled answer never fails on its own. Only until it starts, as the index takes most of a minute on 3G
+const ANSWER_TIMEOUT = 30000
+
 const fetchJson = async (url) => {
-  const response = await fetch(url)
+  const answering = new AbortController()
+  const timeout = setTimeout(() => answering.abort(), ANSWER_TIMEOUT)
+  const response = await fetch(url, { signal: answering.signal }).finally(() => clearTimeout(timeout))
   if (!response.ok) throw new Error(`${url} answered ${response.status}`)
   return response.json()
 }

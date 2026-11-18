@@ -325,10 +325,11 @@
   data-bikebook--page-jurisdiction-value="<%= @jurisdiction %>"
   data-bikebook--page-jurisdictions-value="<%= jurisdiction_names.to_json %>"
   data-bikebook--page-paint-colors-value="<%= @paint_colors.to_json %>"
-  data-bikebook--page-failed-text-value="<%= translation(".failed") %>"
+  data-bikebook--page-failed-text-value="<%= translation(".load_failed") %>"
+  data-bikebook--page-retry-text-value="<%= translation(".try_again") %>"
   data-bikebook--page-title-value="Bike Book"
   data-bikebook--page-search-log-url-value="<%= search_bikebook_path %>"
-  data-action="submit->bikebook--page#visit click->bikebook--page#follow popstate@window->bikebook--page#restore scroll@window->bikebook--page#track bikebook--catalog-filters:change->bikebook--page#refilter bikebook--similar:change->bikebook--page#rescore bikebook--similar:open->bikebook--page#refresh"
+  data-action="submit->bikebook--page#visit click->bikebook--page#follow popstate@window->bikebook--page#restore online@window->bikebook--page#retry scroll@window->bikebook--page#track bikebook--catalog-filters:change->bikebook--page#refilter bikebook--similar:change->bikebook--page#rescore bikebook--similar:open->bikebook--page#refresh"
 >
   <% cache_if(catalog_version, page_cache_key) do %>
     <%# First, for what reads the page without running it - which is how crawlers come for the data %>
