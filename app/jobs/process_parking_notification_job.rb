@@ -7,28 +7,8 @@ class ProcessParkingNotificationJob < ApplicationJob
     "#{REDLOCK_PREFIX}-#{parking_notification_id}"
   end
 
-  def self.new_lock_manager
-    Redlock::Client.new([Bikeindex::Application.config.redis_default_url])
-  end
-
-  def self.locked_for?(parking_notification_id)
-    new_lock_manager.locked?(redlock_key(parking_notification_id))
-  end
-
-  def lock_duration_ms
-    1.minute.in_milliseconds.to_i
-  end
-
   def perform(parking_notification_id, skip_email = false)
-    lock_manager = self.class.new_lock_manager
-    redlock = lock_manager.lock(self.class.redlock_key(parking_notification_id), lock_duration_ms)
-    return unless redlock
-
-    begin
-      run(parking_notification_id, skip_email)
-    ensure
-      lock_manager.unlock(redlock)
-    end
+    with_redlock(parking_notification_id) { run(parking_notification_id, skip_email) }
   end
 
   private
