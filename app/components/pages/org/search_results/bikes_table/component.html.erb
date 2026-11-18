@@ -79,7 +79,7 @@
     <% table.column(label: settings.column_renames[:impound_notes_cell], classes: "hideableColumn impound_notes_cell tw:space-y-1 tw:leading-snug") do |impound_record| %>
       <% impound_record.noted_updates.each do |impound_record_update| %>
         <small
-          class="tw:line-clamp-2 tw:block tw:min-w-48"
+          class="tw:line-clamp-2 tw:min-w-48"
           title="<%= impound_record_update.notes %>"
         >
           <%= impound_record_update.notes %>
