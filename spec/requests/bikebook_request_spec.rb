@@ -41,6 +41,40 @@ RSpec.describe BikebookController, type: :request do
       end
     end
 
+    context "cached", :caching do
+      include_context :caching_basic
+
+      it "is every visitor's and every search's, the page giving the visitor's market around it" do
+        get "/bikebook", params: {search: "1", manufacturer: "aventon"}, headers: {"CF-IPCountry" => "JP"}
+        japan = Nokogiri::HTML5(response.body)
+        get "/bikebook", params: {search: "1"}, headers: {"CF-IPCountry" => "US"}
+        us = Nokogiri::HTML5(response.body)
+
+        shell = "template[data-bikebook--page-target='shell']"
+        expect(us.at_css(shell).inner_html).to eq japan.at_css(shell).inner_html
+        expect(us.at_css(shell).inner_html).to_not include("default-market-value")
+        expect(us.at_css(shell).inner_html).to include(%(data-jurisdiction="NY"))
+        expect(japan.at_css("[inert]")[:class]).to eq "tw:invisible"
+        expect(us.at_css("[inert]")[:class]).to be_blank
+        expect([japan, us].map { it.at_css("[data-controller='bikebook--page']").attributes.slice(*%w[market market-name jurisdiction].map { "data-bikebook--page-#{it}-value" }).transform_values(&:value).values })
+          .to eq [%w[JP Japan US], ["US", "United States", "US"]]
+        expect(response.body).to include("https://github.com/bikeindex/bikebook (CC BY-SA 4.0). Clone that repository instead.")
+        expect(us.at_css("[data-controller='bikebook--page'] > noscript").text).to include("AI agents: get the data there")
+          .and include("github.com/bikeindex/bikebook")
+      end
+
+      it "isn't kept while the catalog doesn't answer, which leaves the state laws out" do
+        WebMock.stub_request(:get, /#{Regexp.escape(Integrations::Bikebook::Catalog::URL)}/o).to_return(status: 503)
+        shells = 2.times.map do
+          get "/bikebook", params: {search: "1"}
+          Nokogiri::HTML5(response.body).at_css("template[data-bikebook--page-target='shell']").inner_html
+        end
+
+        expect(shells.first).to_not eq shells.last
+        expect(shells.first).to_not include("data-jurisdiction=\"NY\"")
+      end
+    end
+
     context "in a frame" do
       it "doesn't autofocus the search, which would take the host page's focus" do
         get "/bikebook"
@@ -205,6 +239,41 @@ RSpec.describe BikebookController, type: :request do
 
       get "/bike_book/m/segway/2025/gt3_pro"
       expect(response).to redirect_to("/bikebook/m/segway/2025/gt3_pro")
+    end
+  end
+
+  describe "up", vcr: {cassette_name: "bikebook-up"} do
+    # WebMock stubs outlive their examples here, and answer ahead of the cassette
+    before do
+      WebMock.reset!
+      Rails.cache.clear
+    end
+
+    it "is ok, in the format the browser's reader reads" do
+      get "/up/bikebook"
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(%(<body style="background-color: green">))
+      %w[catalog_worker similarity].each do |reader|
+        expect(Rails.root.join("app/javascript/bikebook/#{reader}.js").read).to include("const FORMAT = #{Integrations::Bikebook::Catalog::FORMAT}\n")
+      end
+    end
+
+    context "with the catalog in a format the reader doesn't read" do
+      it "is unavailable" do
+        stub_const("Integrations::Bikebook::Catalog::FORMAT", 2)
+        get "/up/bikebook"
+        expect(response).to have_http_status(:service_unavailable)
+        expect(response.body).to include(%(<body style="background-color: red">))
+      end
+    end
+
+    context "with no catalog published", vcr: {cassette_name: "bikebook-up_not_found"} do
+      it "is unavailable" do
+        stub_const("Integrations::Bikebook::Catalog::URL", "https://bikebook-catalog.bikeindex.org/not_a_catalog/")
+        get "/up/bikebook"
+        expect(response).to have_http_status(:service_unavailable)
+        expect(response.body).to include(%(<body style="background-color: red">))
+      end
     end
   end
 

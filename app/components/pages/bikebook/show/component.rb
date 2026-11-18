@@ -7,6 +7,8 @@ module Pages
       # The page is a <template> bikebook--page fills in from the URL and the catalog,
       # and renders again for each pick and history step
       class Component < ApplicationComponent
+        # Template Dependency: SharedBlocks::Marketing::InvertedBlock::Component
+
         # market is the visitor's CF-IPCountry, which Cloudflare sends as XX, or T1 over Tor, when it can't
         # tell; state is theirs in the US. framed: in an iframe, whose autofocus would take its host page's focus
         def initialize(manifest_url:, market:, state:, query:, paint_colors:, framed: false)
@@ -19,6 +21,18 @@ module Pages
         end
 
         private
+
+        # The state laws are all the markup reads that its code doesn't, so the fragments keep until either changes, and
+        # aren't kept while the catalog doesn't answer, rendering without them
+        def catalog_version = @catalog_version ||= EbikeRuleServices::StateLaws.version
+
+        # Every visitor's and every query's, which bikebook--page and placeholder_class fill in around them
+        def page_cache_key(*parts) = [self.class.cache_digest, catalog_version, *parts]
+
+        # A component's own fragment inside the page's, under skip_digest: Rails' digest of this template would expire it
+        # with any change here. Not cache_on: these also render on /ebike-rules, where the same tile twice would repeat
+        # its tooltip's id
+        def child_cache_key(component, *parts) = [component.cache_digest, catalog_version, *parts]
 
         # The search until bikebook--page fills it in from the URL: hidden as searching() hides a lone model's, and blank
         # where the URL sets anything but picks, which it says are loading
@@ -41,10 +55,10 @@ module Pages
         def more_filters = render(UI::Collapse::Component.new(text: translation(".more_filters"), chevron: true,
           color: :link, html_class: "tw:ml-auto", aria: {controls: "vehicle-filters"}))
 
-        # How the market narrows the search, preferring it - the blank default - unless only it or any will do. Named for
-        # the visitor's until bikebook--catalog-filters names the one picked
+        # How the market narrows the search, preferring it - the blank default - unless only it or any will do. Named by
+        # bikebook--page for the visitor's, then by bikebook--catalog-filters for the one picked
         def market_scopes
-          market = tag.span(I18n.t(@market, scope: :countries, default: @market), data: {"bikebook--catalog-filters-target": "marketName"})
+          market = tag.span(data: {"bikebook--catalog-filters-target": "marketName"})
           [{value: "", label: translation(".prefer_market_sold_in_html", market:)}, {value: "only", label: translation(".only_market_html", market:)},
             {value: "any", label: translation(".any_market")}]
         end

@@ -12,12 +12,15 @@ module Integrations
       MANIFEST_URL = LOCAL_DIRECTORY ? "#{LOCAL_PATH}/manifest.json" : "#{URL}manifest.json"
       GITHUB_REPO_URL = "https://github.com/bikeindex/bikebook"
       MODEL_ID = %r{\Am/([a-z0-9_]+/\d{4})/[a-z0-9_]+\z}
+      # the published format bikebook/catalog_worker.js and similarity.js read
+      FORMAT = 3
 
       Unreachable = Class.new(StandardError)
 
-      # The model's title, description and image_url, nil for one the catalog hasn't. Raises Unreachable when it doesn't answer
+      # The model's title, description and image_url, nil for one the catalog hasn't. Raises Unreachable when it isn't readable?
       def vehicle(id)
-        block = (manifest || raise(Unreachable)).dig("blocks", id[MODEL_ID, 1])
+        raise Unreachable unless readable?
+        block = manifest.dig("blocks", id[MODEL_ID, 1])
         model = block && (file(block) || raise(Unreachable)).dig("models", id)
         model && {title: "#{model["manufacturer"]} #{model["model"]}", description: model["description"], image_url: model["stock_photo"]}
       end
@@ -30,6 +33,9 @@ module Integrations
 
       # nil while the catalog doesn't answer
       def manifest = cached("bikebook_catalog/manifest", "manifest.json", expires_in: 5.minutes)
+
+      # Whether the catalog answers in the format /bikebook reads. The e-bike law pages read the manifest regardless
+      def readable? = manifest&.dig("format") == FORMAT
 
       # A published file, nil while the catalog doesn't answer. Its name is a digest of its contents,
       # so it keeps while it's published
