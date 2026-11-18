@@ -34,7 +34,8 @@ pin_all_from "app/javascript/utils", under: "utils", to: "utils"
 pin "lexxy", to: "lexxy.js", preload: false
 pin "@rails/activestorage", to: "activestorage.esm.js", preload: false
 
-# /bikebook's modules, which /ebike-rules searches the catalog with too
-pin_all_from "app/javascript/bikebook", under: "bikebook", preload: false
-pin "lit-html", to: "lit-html.js", preload: false
-pin "lit-html/directive.js", to: "lit-html--directive.js", preload: false
+# /bikebook's modules, which /ebike-rules searches the catalog with too. Preloaded by /bikebook alone, where importing
+# them one level at a time held up the catalog's first request by some fifteen round trips
+pin_all_from "app/javascript/bikebook", under: "bikebook", preload: "bikebook"
+pin "lit-html", to: "lit-html.js", preload: "bikebook"
+pin "lit-html/directive.js", to: "lit-html--directive.js", preload: "bikebook"

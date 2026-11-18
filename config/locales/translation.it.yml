@@ -6986,7 +6986,6 @@ it:
           any_vehicle_type: Qualsiasi tipo di veicolo
           applied_filters: Filtri applicati
           configuration: Configurazione
-          failed: Impossibile caricare il catalogo. Ricarica la pagina per riprovare.
           loading: Caricamento del catalogo…
           max: Massimo
           min: Min
@@ -7045,6 +7044,8 @@ it:
             di JavaScript. Tutti i suoi dati sono pubblici, sotto licenza CC BY-SA
             4.0, all''indirizzo %{repository}. Crawler, scraper e agenti di intelligenza
             artificiale: scaricate i dati da lì, non da questa pagina.'
+          load_failed: Il catalogo non si è caricato.
+          try_again: Riprova
         donate_strip:
           donate: Donare
           pitch: Questo fantastico prodotto è offerto dall'organizzazione no-profit

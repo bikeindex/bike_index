@@ -11,8 +11,13 @@ RSpec.describe BikebookController, type: :request do
       page = Capybara.string(response.body)
       bikebook = page.find("[data-controller='bikebook--page']")
       expect(bikebook["data-bikebook--page-manifest-url-value"]).to eq Integrations::Bikebook::Catalog::MANIFEST_URL
-      expect(bikebook).to have_css("[inert] #vehicle_models")
+      expect(bikebook).to have_css("[inert] #vehicle_models[placeholder='Loading…']")
         .and have_css("[role='status'] svg.tw\\:animate-spin")
+        .and have_css("[role='status']", text: "Loading the catalog…")
+      # its modules all asked for at once, beside the application's rather than repeating them
+      preloads = page.all("head link[rel='modulepreload']", visible: :all).map { it[:href] }
+      expect(preloads).to include(a_string_matching(%r{/bikebook/catalog-}), a_string_matching(%r{/lit-html-}))
+      expect(preloads).to eq preloads.uniq
       # the URL setting nothing, the search as it is until the browser fills it in
       expect(bikebook.find("[inert]")[:class]).to be_blank
 
