@@ -3,7 +3,11 @@
   <%= render(UI::DefinitionList::Row::Component.new(label: translation(".impounded_by"), value: impounded_by, render_with_no_value: true, no_value_text: "-")) %>
   <%= render(UI::DefinitionList::Row::Component.new(label: translation(".status"), value: @impound_record.status_humanized)) %>
   <%= render(UI::DefinitionList::Row::Component.new(label: translation(".last_update_by"), value: last_update_by, render_with_no_value: true, no_value_text: "-")) %>
-  <%= render(UI::DefinitionList::Row::Component.new(label: translation(".location"), value: @impound_record.location&.name)) %>
+
+  <%= render(UI::DefinitionList::Row::Component.new(label: translation(".current_location"))) do %>
+    <%= render(Atoms::Org::ImpoundCurrentLocation::Component.new(impound_record: @impound_record)) %>
+  <% end %>
+
   <%= render(UI::DefinitionList::Row::Component.new(label: translation(".impounded_from"), value: impounded_from, render_with_no_value: true, no_value_text: "-")) %>
 
   <%= render(UI::DefinitionList::Row::Component.new(label: translation(".notes"), full_width: true)) do %>

@@ -28,7 +28,7 @@ RSpec.describe Pages::Registrations::Show::ImpoundDetails::Component, type: :com
       FactoryBot.create(:impound_record_update, impound_record:, kind: "note", notes: " ")
       render_inline(component)
       expect(page).to have_text("#{organization.short_name} impound record")
-      expect(page).to have_text("Back lot")
+      expect(page).to have_text(/Current location\s*Back lot\s*278 Broadway/)
       expect(page).to have_text("1300 W 14th Pl, Chicago, IL 60608")
       expect(page).to have_text(/Owner called, picking up Tuesday.*Owner emailed/m)
       expect(page).to have_css("small .localizeTime", count: 2)

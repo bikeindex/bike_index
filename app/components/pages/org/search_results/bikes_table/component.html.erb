@@ -14,7 +14,6 @@
   <% hidden_html = method(:hidden_not_registered_tag) %>
   <% email_hidden = translation(".email_hidden") %>
   <% view_label = translation(".view") %>
-  <% same_as_impounded_from = translation(".same_as_impounded_from") %>
 
   <% column.(label: settings.column_renames[:view_cell]) do |bike| %>
     <%= render(UI::ButtonLink::Component.new(text: view_label, href: bike_path(bike, organization_id: organization.to_param), size: :sm, data: {turbo_frame: "_top"})) %>
@@ -67,15 +66,7 @@
 
     <% table.column(sortable: "location_id", label: settings.column_renames[:impound_current_location_cell], classes: "hideableColumn impound_current_location_cell tw:leading-none") do |impound_record| %>
       <small>
-        <% if impound_record.location.present? %>
-          <strong class="tw:block"><%= impound_record.location.name %></strong>
-        <% end %>
-
-        <% if impound_record.address_record_id.present? && impound_record.address_record_id == impound_record.impounded_from_address_record_id %>
-          <em class="tw:text-gray-400"><%= same_as_impounded_from %></em>
-        <% else %>
-          <%= render(UI::AddressDisplay::Component.new(address_record: impound_record.address_record, visible_attribute: :street, kind: :single_line)) %>
-        <% end %>
+        <%= render(Atoms::Org::ImpoundCurrentLocation::Component.new(impound_record:, kind: :single_line)) %>
       </small>
     <% end %>
 
