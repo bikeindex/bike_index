@@ -234,6 +234,13 @@ RSpec.describe EbikeRulesController, type: :request do
       expect(meta("description")).to_not include("still reviewing")
     end
 
+    it "checks a bike against a state's law in a catalog format /bikebook doesn't read" do
+      stub_const("Integrations::Bikebook::Catalog::FORMAT", 2)
+      get "/ebike-rules/US/AK", params: {vehicle_models: "m/specialized/2025/haul_st"}
+
+      expect(page).to have_css("[role='status']", text: "The Specialized Haul ST is classified as an e-bike in Alaska.")
+    end
+
     it "checks a Class 3 with a stock throttle as out of class in California alone" do
       get "/ebike-rules/US/CA", params: {vehicle_models: "m/aventon/2026/level_4_adv"}
 

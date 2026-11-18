@@ -6938,6 +6938,10 @@ nl:
           learn_how_to_use_it: Leer hoe je het moet gebruiken.
           learn_or_view_html: "%{learn_how_to_use_it} of %{view_the_raw_data}."
           view_the_raw_data: bekijk de onbewerkte gegevens
+          needs_javascript_html: 'Bike Book werkt in je browser en heeft daarom JavaScript
+            nodig. Alle gegevens zijn openbaar beschikbaar onder CC BY-SA 4.0, te
+            vinden op %{repository}. Crawlers, scrapers en AI-agenten: haal de gegevens
+            daar vandaan in plaats van op deze pagina.'
         donate_strip:
           donate: Schenken
           pitch: Dit fantastische product wordt u aangeboden door de non-profitorganisatie
