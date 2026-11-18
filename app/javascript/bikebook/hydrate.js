@@ -35,7 +35,8 @@ const labelSearch = (root, { vehicle_type: types }, [first]) => {
 // The fields as `filters` set them, none of which needs the catalog
 const fillFields = (root, filters) => {
   panelOf(root).setAttribute('data-bikebook--catalog-filters-sort-value', filters.sort === 'price' ? 'price' : 'year')
-  for (const field of ['year', 'price']) panelOf(root).setAttribute(`data-bikebook--catalog-filters-${field}-dir-value`, filters[`${field}_dir`] === 'asc' ? 'asc' : 'desc')
+  panelOf(root).setAttribute('data-bikebook--catalog-filters-year-dir-value', filters.year_dir === 'asc' ? 'asc' : 'desc')
+  panelOf(root).setAttribute('data-bikebook--catalog-filters-price-dir-value', filters.price_dir === 'desc' ? 'desc' : 'asc')
   for (const name of [...LISTS, ...SINGLES]) root.getElementById(`${name}-hw-hidden-field`).setAttribute('value', filters[name])
   for (const name of RANGES) root.querySelector(`input[name="${name}"]`).setAttribute('value', filters[name])
   const scope = root.querySelector(`input[name="market_scope"][value="${CSS.escape(filters.market_scope)}"]`) ?? root.querySelector('input[name="market_scope"][value=""]')

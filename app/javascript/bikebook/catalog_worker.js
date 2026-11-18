@@ -21,6 +21,8 @@ let comparisonFetch = null
 const blocks = new Map()
 const orders = new Map()
 const sold = new Map()
+// a page load's, as each loads its own worker, so a reload features others and its history the same ones
+const SEED = crypto.getRandomValues(new Uint32Array(1))[0]
 
 const fetchJson = async (url) => {
   const response = await fetch(url)
@@ -208,31 +210,37 @@ function matching (params) {
   return { filteredCount: filtered.length, matches, unfiltered: Boolean(exact) && matches.length > 0 && !passes(exact) }
 }
 
-// The `count` of models the filters leave, and featured_rules' `COUNT` of them, by its rules, in the filters' order.
+// The `count` of models the filters leave, and featured_rules' `COUNT` of them, by its rules, the models tying on them
+// in the page load's random order, shown cheapest first unless the reader picked a sort.
 // `legalClasses` are the e-bike classes legal where the visitor is, by which every e-bike is legal where there are none
 function featured ({ params, legalClasses }) {
   const { COUNT, requirements, preferences, quotas } = rules
   const legalEbike = (model) => !legalClasses.length || legalClasses.some((propulsion) => propelled(model, propulsion, params.jurisdiction))
   const filtered = sorted(params).filter(filter(params))
-  const candidates = requirements.reduce((models, requirement) => {
+  const candidates = shuffled(requirements.reduce((models, requirement) => {
     const passing = models.filter((model) => requirement(model, { legalEbike, params }))
     return passing.length ? passing : models
-  }, filtered)
+  }, filtered))
   const count = Math.min(COUNT, candidates.length)
+  const [caps, targets] = [quotas.filter(({ maximum }) => maximum != null), quotas.filter(({ maximum }) => maximum == null)]
   // a share's models and the others each at least their part of the picks
-  const minimums = quotas.flatMap(({ matches, share, minimum = Math.round(count * share) }) => share == null
+  const minimums = targets.flatMap(({ matches, share, minimum = Math.round(count * share) }) => share == null
     ? [{ matches, minimum }]
     : [{ matches, minimum }, { matches: (model) => !matches(model), minimum: count - minimum }])
   const picked = []
   while (picked.length < count) {
+    const capped = caps.reduce((models, { matches, maximum }) => {
+      const under = picked.filter(matches).length < maximum ? models : models.filter((model) => !matches(model))
+      return under.length ? under : models
+    }, candidates.filter((model) => !picked.includes(model)))
     const pool = minimums.reduce((models, { matches, minimum }) => {
       const narrowed = minimum - picked.filter(matches).length >= count - picked.length && models.filter(matches)
       return narrowed?.length ? narrowed : models
-    }, candidates.filter((model) => !picked.includes(model)))
+    }, capped)
     // a share's models while the picks fall short of it and the others while they're over, a minimum's until it's met.
     // A quota met ranks every model alike
-    const behind = quotas.map(({ matches, share, minimum }) => (share == null ? minimum : share * picked.length) - picked.filter(matches).length)
-    const helps = (model) => quotas.map(({ matches, share }, index) => share == null
+    const behind = targets.map(({ matches, share, minimum }) => (share == null ? minimum : share * picked.length) - picked.filter(matches).length)
+    const helps = (model) => targets.map(({ matches, share }, index) => share == null
       ? behind[index] <= 0 || matches(model)
       : behind[index] === 0 || (behind[index] > 0) === matches(model))
     const ranks = (model) => [...preferences.map((prefers) => prefers(model, { picked })), ...helps(model)]
@@ -245,7 +253,8 @@ function featured ({ params, legalClasses }) {
     }
     picked.push(best.model)
   }
-  return { count: filtered.length, featured: candidates.filter((model) => picked.includes(model)) }
+  const shown = params.sort || params.year_dir || params.price_dir ? params : { sort: 'price' }
+  return { count: filtered.length, featured: sorted(shown).filter((model) => picked.includes(model)) }
 }
 
 // The models of the `model` id's group by year, newest first, each under the newest it's sold in - so each once, and a
@@ -266,20 +275,36 @@ function group ({ model: id, market, scope }) {
   }
 }
 
+// Fisher-Yates, by mulberry32 from SEED
+function shuffled (models) {
+  let state = SEED
+  const random = () => {
+    state = (state + 0x6d2b79f5) | 0
+    let t = Math.imul(state ^ (state >>> 15), 1 | state)
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+  }
+  const result = [...models]
+  for (let index = result.length - 1; index > 0; index--) {
+    const other = Math.floor(random() * (index + 1))
+    ;[result[index], result[other]] = [result[other], result[index]]
+  }
+  return result
+}
+
 // Whether `a` wins at the first rank the two differ at
 const outranks = (a, b) => {
   const index = a.findIndex((value, each) => value !== b[each])
   return index !== -1 && a[index]
 }
 
-// Newest and priciest first unless asked otherwise, by year then price unless `sort` puts price first, the unpriced last
+// Newest and cheapest first unless asked otherwise, by year then price unless `sort` puts price first, the unpriced last
 // either way. Kept per order, so a query only has to filter
 function sorted ({ sort, year_dir: yearDir, price_dir: priceDir }) {
   const key = `${sort}/${yearDir}/${priceDir}`
   if (!orders.has(key)) {
-    const direction = (dir) => dir === 'asc' ? 1 : -1
-    const byYear = (a, b) => direction(yearDir) * (a.sortYear - b.sortYear)
-    const byPrice = (a, b) => (a.msrp_cents == null) - (b.msrp_cents == null) || direction(priceDir) * (a.msrp_cents - b.msrp_cents)
+    const byYear = (a, b) => (yearDir === 'asc' ? 1 : -1) * (a.sortYear - b.sortYear)
+    const byPrice = (a, b) => (a.msrp_cents == null) - (b.msrp_cents == null) || (priceDir === 'desc' ? -1 : 1) * (a.msrp_cents - b.msrp_cents)
     const [first, second] = sort === 'price' ? [byPrice, byYear] : [byYear, byPrice]
     orders.set(key, [...models].sort((a, b) => first(a, b) || second(a, b) || (a.id < b.id ? -1 : 1)))
   }
