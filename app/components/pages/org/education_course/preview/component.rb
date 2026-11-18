@@ -3,7 +3,7 @@
 module Pages
   module Org
     module EducationCourse
-      # A faked walk-through of the registrant flow: one page of rules per screen, paged
+      # A faked walk-through of the registrant flow: one course page per screen, paged
       # through with Continue/Back, ending on the acknowledgment review - so an org sees
       # exactly what registrants see. index == pages.count is that review screen.
       module Preview

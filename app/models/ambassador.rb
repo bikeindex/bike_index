@@ -12,9 +12,9 @@
 #  banned                             :boolean          default(FALSE), not null
 #  can_send_many_marketplace_messages :boolean          default(FALSE), not null
 #  can_send_many_stolen_notifications :boolean          default(FALSE), not null
+#  color_scheme                       :integer          default("system"), not null
 #  confirmation_token                 :string(255)
 #  confirmed                          :boolean          default(FALSE), not null
-#  dark_mode_preview                  :boolean          default(FALSE), not null
 #  deleted_at                         :datetime
 #  description                        :text
 #  developer                          :boolean          default(FALSE), not null

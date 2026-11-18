@@ -2,8 +2,8 @@ import { Controller } from '@hotwired/stimulus'
 
 // Connects to data-controller='register--acknowledgment'
 //
-// The safety rules are agreed to as a whole, so the submit button stays disabled
-// until every checkbox on the page is checked.
+// Agreed to as a whole, so the submit button stays disabled until every checkbox
+// in the form is checked.
 export default class extends Controller {
   static targets = ['checkbox', 'submit']
 

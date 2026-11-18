@@ -12,7 +12,7 @@ RSpec.describe Pages::Org::RegisterSettings::Component, type: :component do
     expect(component).to have_css("h1", text: "Registration form settings")
     expect(component).to have_text "These settings are just applied to your browser"
 
-    # No safety rules here, so nothing to leave to the registrant
+    # No education course here, so nothing to leave to the registrant
     expect(switches.css("input[type=checkbox]").map { it["name"] }).to eq(%w[old_view single_page])
     expect(switches.css("input[type=checkbox][checked]")).to be_empty
   end

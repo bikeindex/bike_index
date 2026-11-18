@@ -4,19 +4,16 @@ import {
   useState,
   useMemo,
   useCallback,
-  useEffect,
   type ReactNode,
 } from 'react';
 import { useAuth } from './AuthContext';
 import { getDefaultUnits, type UnitSystem } from '../utils/units';
 
 export type { UnitSystem };
-export type DarkMode = 'light' | 'dark' | 'system';
 
 interface StoredPreferences {
   units?: UnitSystem;
   autoEnrich?: boolean;
-  darkMode?: DarkMode;
 }
 
 interface PreferencesContextType {
@@ -24,9 +21,6 @@ interface PreferencesContextType {
   setUnits: (units: UnitSystem) => void;
   autoEnrich: boolean;
   setAutoEnrich: (autoEnrich: boolean) => void;
-  darkMode: DarkMode;
-  setDarkMode: (mode: DarkMode) => void;
-  isDark: boolean;
 }
 
 const STORAGE_KEY = 'strava-search-preferences';
@@ -62,38 +56,6 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
     return stored.autoEnrich ?? true;
   });
 
-  const [darkMode, setDarkModeState] = useState<DarkMode>(() => {
-    const stored = getStoredPreferences();
-    return stored.darkMode ?? 'system';
-  });
-
-  // Resolve whether dark mode is active
-  const isDark = useMemo(() => {
-    if (darkMode === 'dark') return true;
-    if (darkMode === 'light') return false;
-    return window.matchMedia('(prefers-color-scheme: dark)').matches;
-  }, [darkMode]);
-
-  // Apply dark class to document and listen for system changes
-  useEffect(() => {
-    const apply = () => {
-      let dark: boolean;
-      if (darkMode === 'dark') dark = true;
-      else if (darkMode === 'light') dark = false;
-      else dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-      document.documentElement.classList.toggle('dark', dark);
-    };
-
-    apply();
-
-    if (darkMode === 'system') {
-      const mq = window.matchMedia('(prefers-color-scheme: dark)');
-      mq.addEventListener('change', apply);
-      return () => mq.removeEventListener('change', apply);
-    }
-  }, [darkMode]);
-
   // Derive units: user preference takes priority, then athlete country, then browser locale
   const units = useMemo<UnitSystem>(() => {
     if (userSetUnits) {
@@ -112,13 +74,8 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
     storePreferences({ autoEnrich: value });
   }, []);
 
-  const setDarkMode = useCallback((mode: DarkMode) => {
-    setDarkModeState(mode);
-    storePreferences({ darkMode: mode });
-  }, []);
-
   return (
-    <PreferencesContext.Provider value={{ units, setUnits, autoEnrich, setAutoEnrich, darkMode, setDarkMode, isDark }}>
+    <PreferencesContext.Provider value={{ units, setUnits, autoEnrich, setAutoEnrich }}>
       {children}
     </PreferencesContext.Provider>
   );

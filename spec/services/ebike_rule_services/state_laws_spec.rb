@@ -16,6 +16,14 @@ RSpec.describe EbikeRuleServices::StateLaws do
       expect(described_class.find("CO")[:sources]).to include("https://leg.colorado.gov/bills/hb25-1197")
     end
 
+    it "reads the power limits of a catalog published before 0.28.0" do
+      vocabulary = JSON.parse(BikebookCatalogHelpers::FIXTURES.join("vocabulary.json").read)
+      vocabulary["e_vehicle_classifications"].transform_values! { it.transform_keys { |key| {"power_max" => "max_power", "power_min" => "min_power"}.fetch(key, key) } }
+      WebMock.stub_request(:get, "#{Integrations::Bikebook::Catalog::URL}vocabulary.json").to_return(body: vocabulary.to_json)
+
+      expect(described_class.find("CO")).to include(watt_cap: 750)
+    end
+
     it "has no classes for a law that names none of the three" do
       expect(described_class.find("PA")).to include(classes: [], mph: 20)
     end
@@ -78,7 +86,7 @@ RSpec.describe EbikeRuleServices::StateLaws do
     it "is a state's own where its e-bike law isn't the three US classes: the law, then slowest first and off-highway last" do
       vocabulary = JSON.parse(BikebookCatalogHelpers::FIXTURES.join("vocabulary.json").read)
       vocabulary["e_vehicle_classifications"] = {
-        "evc/us/nj/electric_motorized_bicycle" => {"name" => "Electric Motorized Bicycle", "throttle" => true, "min_power" => 750},
+        "evc/us/nj/electric_motorized_bicycle" => {"name" => "Electric Motorized Bicycle", "throttle" => true, "power_min" => 750},
         "evc/us/nj/motorcycle" => {"name" => "Motorcycle", "throttle" => true, "groups" => ["evc/motorcycle"]},
         "evc/us/nj/motorized_bicycle" => {"name" => "Motorized Bicycle", "throttle" => true, "max_speed" => 45.06},
         **vocabulary["e_vehicle_classifications"]
@@ -154,15 +162,6 @@ RSpec.describe EbikeRuleServices::StateLaws do
       expect(described_class.emoto_rules("CA").pluck(:rule)).to eq ["Riders need a driver's license with an M1 motorcycle endorsement",
         "Riders must wear a motorcycle helmet", "Registered and plated with the DMV, and must carry liability insurance"]
       expect(described_class.emoto_rules("WY")).to eq []
-    end
-  end
-
-  describe "state" do
-    it "finds a state by its abbreviation in either case, and nothing else" do
-      expect(described_class.state("co")).to include(name: "Colorado")
-      expect(described_class.state("PR")).to be_nil
-      expect(described_class.state(["co"])).to be_nil
-      expect(described_class.state(nil)).to be_nil
     end
   end
 

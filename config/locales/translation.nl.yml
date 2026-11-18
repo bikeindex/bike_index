@@ -4969,6 +4969,11 @@ nl:
         already_sold: 'Let op: dit %{item_type} is %{listing_status} geweest.'
       index:
         marketplace_messages: Marktplaatsberichten
+    color_scheme:
+      appearance: Verschijning
+      dark: Donker
+      light: Licht
+      system: Systeem
   bikes_edit:
     accessories:
       add_a_component: Voeg een component toe
@@ -6928,6 +6933,15 @@ nl:
           select_an_vehicle_type: Selecteer een %{bike_type}, kies meerdere om ze
             te vergelijken
           about_bike_book_label: Over het fietsboek
+          free_to_use: De gegevens van Bike Book mogen gratis worden gebruikt onder
+            de CC BY-SA 4.0-licentie.
+          learn_how_to_use_it: Leer hoe je het moet gebruiken.
+          learn_or_view_html: "%{learn_how_to_use_it} of %{view_the_raw_data}."
+          view_the_raw_data: bekijk de onbewerkte gegevens
+          needs_javascript_html: 'Bike Book werkt in je browser en heeft daarom JavaScript
+            nodig. Alle gegevens zijn openbaar beschikbaar onder CC BY-SA 4.0, te
+            vinden op %{repository}. Crawlers, scrapers en AI-agenten: haal de gegevens
+            daar vandaan in plaats van op deze pagina.'
         donate_strip:
           donate: Schenken
           pitch: Dit fantastische product wordt u aangeboden door de non-profitorganisatie

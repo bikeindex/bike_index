@@ -32,7 +32,8 @@
     <%= render "/shared/analytics" %>
   </head>
 
-  <%= body_tag(html_class: class_names("payments-layout-body", dark: current_user&.dark_mode_preview?)) do %>
+  <%= body_tag(html_class: class_names("payments-layout-body", dark: current_user&.color_scheme_dark?)) do %>
+    <%= render(SharedBlocks::SystemColorScheme::Component.new(user: current_user)) %>
     <%= render(UI::Alerts::FlashMessage::Component.new(flash:)) %>
     <%= render 'layouts/revised_messages' %>
 

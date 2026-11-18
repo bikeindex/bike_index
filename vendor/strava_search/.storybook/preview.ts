@@ -26,14 +26,6 @@ const preview: Preview = {
     (Story, context) => {
       const theme = context.globals.theme || 'light';
       const isDark = theme === 'dark';
-      // Override PreferencesProvider's default 'system' darkMode so it doesn't
-      // clobber the Storybook toolbar toggle via document.documentElement.classList
-      try {
-        const stored = JSON.parse(localStorage.getItem('strava-search-preferences') || '{}');
-        stored.darkMode = theme;
-        localStorage.setItem('strava-search-preferences', JSON.stringify(stored));
-      } catch { /* ignore */ }
-      // Also set it directly in case PreferencesProvider already ran
       document.documentElement.classList.toggle('dark', isDark);
       return React.createElement(
         'div',

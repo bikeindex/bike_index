@@ -17,6 +17,7 @@ const mark = (content) => html`<span class="tw:spec-diff">${content}</span>`
 
 const MATERIALS = 'frame.material'
 const TOP_TUBES = 'frame.top_tube'
+const INTERFACES = 'frame.mounts.interface'
 // lengths in centimeters, with an imperial viewer's feet and inches after
 const IN_CENTIMETERS = ['wheelbase', 'standover', 'standover_above_bb']
 const SINGULAR = { feet: 'foot', inches: 'inch' }
@@ -27,18 +28,21 @@ const FEET_AND_INCHES = ["'", '"']
 
 export class VehiclePresenter {
   constructor (kit, vocabulary) {
-    // the extras' bb_drop_low as the catalog's own labels write "BB Drop", and standover above it short, as its tooltip
-    // explains it
+    // an extra's bb as the catalog's own labels write "BB Drop", standover above it short, as its tooltip
+    // explains it, and the actual seat angle without the catalog's note on it
     this.kit = {
       ...kit,
+      // TODO: once the catalog publishes its 1.0.0 kit, which has volts, take its units as they are
+      units: { v: { label: 'V', name: 'volts' }, ...kit.units },
       acronyms: { ...kit.acronyms, bb: 'BB' },
-      geometry: { ...kit.geometry, labels: { ...kit.geometry.labels, standover_above_bb: 'Standover above BB' } }
+      geometry: { ...kit.geometry, labels: { ...kit.geometry.labels, standover_above_bb: 'Standover above BB', seat_angle_actual: 'Seat Angle (actual)' } }
     }
-    // the catalog names carbon "Carbon or Composite", and leaves its top tubes and target riders unnamed
+    // the catalog names carbon "Carbon or Composite", and leaves its top tubes, target riders and rack interfaces unnamed
     const materials = { ...vocabulary.names[MATERIALS], carbon: 'Carbon/Composite' }
+    const interfaces = { mik: 'MIK', mik_hd: 'MIK HD', racktime_snapit: 'Racktime SnapIt', atranvelo_avs: 'Atranvelo AVS', thule_yepp_easyfit: 'Thule Yepp EasyFit', ...vocabulary.names[INTERFACES] }
     const topTubes = { step_through: 'Step-through', sloping: 'Sloping', horizontal: 'Horizontal', ...vocabulary.names[TOP_TUBES] }
     const riders = { kid: 'Kids', woman: "Women's", adaptive: 'Adaptive', ...vocabulary.names.target_riders }
-    this.vocabulary = { ...vocabulary, names: { ...vocabulary.names, [MATERIALS]: materials, [TOP_TUBES]: topTubes, target_riders: riders } }
+    this.vocabulary = { ...vocabulary, names: { ...vocabulary.names, [MATERIALS]: materials, [TOP_TUBES]: topTubes, [INTERFACES]: interfaces, target_riders: riders } }
     this.half = new RegExp(kit.shis.half)
     this.shisPattern = new RegExp(kit.shis.pattern)
     // standover above the bottom bracket in feet and inches, as a wheelbase is, where the kit's standover reads in inches
@@ -76,6 +80,11 @@ export class VehiclePresenter {
       if (names) return [key, Array.isArray(value) ? value.map((item) => names[item] ?? item) : names[value] ?? value]
       return [key, value]
     }))
+  }
+
+  // TODO: once the catalog publishes its 1.0.0 kit, whose mounts have an interface field, `named` names it and this goes
+  interfaceName (slug) {
+    return this.vocabulary.names[INTERFACES][slug] ?? slug
   }
 
   classificationName (id) {
@@ -117,6 +126,22 @@ export class VehiclePresenter {
     const shown = feet ? this.#tooltipped(imperial, compact([this.#inWords(value), inCentimeters ? null : metric])) : imperial
     // muted by its color, as an opacity would fade the tooltip inside it too
     return this.#unitSystems(metric, inCentimeters ? join([metric, ' ', html`<span class="tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">(${shown})</span>`]) : shown)
+  }
+
+  // "760–890 mm", one figure where they're equal, or the end it has: "18 yr min". A height in feet and inches reads in
+  // centimeters in metric, as measurement has it
+  range (min, max, unit, key) {
+    if (min == null || max == null) return join([this.measurement(min ?? max, unit, key), min == null ? ' max' : ' min'])
+    if (min === max) return this.measurement(min, unit, key)
+
+    const parts = this.#imperialParts(unit, key)
+    const ends = (convert, ...label) => join([this.labeled(this.rounded(convert(min))), '–', this.labeled(this.rounded(convert(max)), ...label)])
+    if (parts.length === 2) {
+      const feet = (mm) => join(this.#significant(parts, mm).map(({ part, convert }) => this.labeled(convert(mm), unit, part)), ' ')
+      return this.#unitSystems(ends((mm) => mm / this.kit.conversions.mm.cm, 'cm', this.kit.presenter.centimeters), join([feet(min), '–', feet(max)]))
+    }
+    const metric = ends((value) => value, unit)
+    return parts.length ? this.#unitSystems(metric, ends(parts[0].convert, unit, parts[0].part)) : metric
   }
 
   // In feet and inches, or centimeters in metric: "6' 4"", "194 cm"

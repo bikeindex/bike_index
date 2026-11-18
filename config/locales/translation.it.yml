@@ -4303,6 +4303,11 @@ it:
         already_sold: 'Attenzione: questo %{item_type} è stato %{listing_status}'
       index:
         marketplace_messages: Messaggi del mercato
+    color_scheme:
+      appearance: Aspetto
+      dark: Buio
+      light: Leggero
+      system: Sistema
   news:
     index:
       bike_index_blog: Blog Bike Index
@@ -7031,6 +7036,15 @@ it:
           select_an_vehicle_type: Seleziona un %{bike_type}, scegli più opzioni per
             confrontarle
           about_bike_book_label: Informazioni sul libro sulle biciclette
+          free_to_use: I dati di Bike Book sono liberamente utilizzabili secondo la
+            licenza CC BY-SA 4.0.
+          learn_how_to_use_it: Impara come usarlo
+          learn_or_view_html: "%{learn_how_to_use_it} o %{view_the_raw_data}."
+          view_the_raw_data: visualizza i dati grezzi
+          needs_javascript_html: 'Bike Book funziona nel tuo browser, quindi necessita
+            di JavaScript. Tutti i suoi dati sono pubblici, sotto licenza CC BY-SA
+            4.0, all''indirizzo %{repository}. Crawler, scraper e agenti di intelligenza
+            artificiale: scaricate i dati da lì, non da questa pagina.'
         donate_strip:
           donate: Donare
           pitch: Questo fantastico prodotto è offerto dall'organizzazione no-profit

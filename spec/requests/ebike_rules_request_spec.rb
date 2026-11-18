@@ -234,6 +234,13 @@ RSpec.describe EbikeRulesController, type: :request do
       expect(meta("description")).to_not include("still reviewing")
     end
 
+    it "checks a bike against a state's law in a catalog format /bikebook doesn't read" do
+      stub_const("Integrations::Bikebook::Catalog::FORMAT", 2)
+      get "/ebike-rules/US/AK", params: {vehicle_models: "m/specialized/2025/haul_st"}
+
+      expect(page).to have_css("[role='status']", text: "The Specialized Haul ST is classified as an e-bike in Alaska.")
+    end
+
     it "checks a Class 3 with a stock throttle as out of class in California alone" do
       get "/ebike-rules/US/CA", params: {vehicle_models: "m/aventon/2026/level_4_adv"}
 
@@ -268,7 +275,7 @@ RSpec.describe EbikeRulesController, type: :request do
       expect(page.all("section[aria-live] [role='tooltip'] code", visible: :all).map { it.text(:all).strip }).to eq ["evc/us/class_3", "evc/out_of_class/us/ca"]
     end
 
-    it "moves a place from the query, or a state's old path, to its own page, and 404s one that isn't a place" do
+    it "moves a place from the query, or another form of its path, to its own page, and 404s one that isn't a place" do
       get "/ebike-rules", params: {state: "US-CO", vehicle_models: "m/specialized/2025/haul_st"}
       expect(response).to redirect_to("/ebike-rules/US/CO?vehicle_models=m/specialized/2025/haul_st")
       expect(response).to have_http_status(:moved_permanently)
@@ -279,9 +286,12 @@ RSpec.describe EbikeRulesController, type: :request do
       get "/ebike-rules", params: {country: "CA"}
       expect(response).to redirect_to("/ebike-rules/CA")
 
-      # a state's lowercase abbreviation, as its page's path was, even where it's a country's code too
+      # a state's lowercase abbreviation isn't a path, and is the country's where one has that code
+      get "/ebike-rules/co"
+      expect(response).to have_http_status(:not_found)
+
       get "/ebike-rules/ca"
-      expect(response).to redirect_to("/ebike-rules/US/CA")
+      expect(response).to redirect_to("/ebike-rules/CA")
       expect(response).to have_http_status(:moved_permanently)
 
       # in capitals, a state's where no place has it
@@ -520,8 +530,8 @@ RSpec.describe EbikeRulesController, type: :request do
       get "/e-bike-rules"
       expect(response).to redirect_to("/ebike-rules")
 
-      get "/e-bike-rules/co?manual=1&watts=250"
-      expect(response).to redirect_to("/ebike-rules/co?manual=1&watts=250")
+      get "/e-bike-rules/US/CO?manual=1&watts=250"
+      expect(response).to redirect_to("/ebike-rules/US/CO?manual=1&watts=250")
 
       get "/ebike_rules/US/CO?manual=1&watts=250"
       expect(response).to redirect_to("/ebike-rules/US/CO?manual=1&watts=250")

@@ -3345,6 +3345,35 @@ ALTER SEQUENCE public.payments_id_seq OWNED BY public.payments.id;
 
 
 --
+-- Name: pghero_queries; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.pghero_queries (
+    id bigint NOT NULL,
+    query text
+);
+
+
+--
+-- Name: pghero_queries_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.pghero_queries_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: pghero_queries_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.pghero_queries_id_seq OWNED BY public.pghero_queries.id;
+
+
+--
 -- Name: pghero_query_stats; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3352,11 +3381,11 @@ CREATE TABLE public.pghero_query_stats (
     id bigint NOT NULL,
     database text,
     "user" text,
-    query text,
     query_hash bigint,
     total_time double precision,
     calls bigint,
-    captured_at timestamp without time zone
+    captured_at timestamp without time zone,
+    query_id bigint
 );
 
 
@@ -4538,7 +4567,7 @@ CREATE TABLE public.users (
     feature_registration_show_legacy boolean DEFAULT false NOT NULL,
     passwordless_user boolean DEFAULT false NOT NULL,
     preferred_unit_system integer,
-    dark_mode_preview boolean DEFAULT false NOT NULL
+    color_scheme integer DEFAULT 2 NOT NULL
 );
 
 
@@ -5174,6 +5203,13 @@ ALTER TABLE ONLY public.parking_notifications ALTER COLUMN id SET DEFAULT nextva
 --
 
 ALTER TABLE ONLY public.payments ALTER COLUMN id SET DEFAULT nextval('public.payments_id_seq'::regclass);
+
+
+--
+-- Name: pghero_queries id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.pghero_queries ALTER COLUMN id SET DEFAULT nextval('public.pghero_queries_id_seq'::regclass);
 
 
 --
@@ -6056,6 +6092,14 @@ ALTER TABLE ONLY public.parking_notifications
 
 ALTER TABLE ONLY public.payments
     ADD CONSTRAINT payments_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pghero_queries pghero_queries_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.pghero_queries
+    ADD CONSTRAINT pghero_queries_pkey PRIMARY KEY (id);
 
 
 --
@@ -7601,6 +7645,13 @@ CREATE INDEX index_payments_on_user_id ON public.payments USING btree (user_id);
 
 
 --
+-- Name: index_pghero_queries_on_query; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_pghero_queries_on_query ON public.pghero_queries USING hash (query);
+
+
+--
 -- Name: index_pghero_query_stats_on_database_and_captured_at; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -8037,6 +8088,8 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261117051637'),
+('20261116222651'),
 ('20261111155046'),
 ('20261110154720'),
 ('20261106120000'),

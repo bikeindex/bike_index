@@ -18,6 +18,8 @@ cloudflare_test:
   bucket: bikeindex-test
   region: auto
   public: true
+  request_checksum_calculation: "when_required"
+  response_checksum_validation: "when_required"
 
 cloudflare_dev:
   service: S3
@@ -30,9 +32,9 @@ cloudflare_dev:
   http_open_timeout: 3
   http_read_timeout: 8
   retry_limit: 1
-  # When upgrading S3, this will need to be uncommented
-  # request_checksum_calculation: "when_required"
-  # response_checksum_validation: "when_required"
+  # R2 rejects the CRC32 the SDK adds beside ActiveStorage's Content-MD5
+  request_checksum_calculation: "when_required"
+  response_checksum_validation: "when_required"
 
 cloudflare_production:
   service: S3
@@ -47,6 +49,6 @@ cloudflare_production:
   http_open_timeout: 3
   http_read_timeout: 8
   retry_limit: 1
-  # When upgrading S3, this will need to be uncommented
-  # request_checksum_calculation: "when_required"
-  # response_checksum_validation: "when_required"
+  # R2 rejects the CRC32 the SDK adds beside ActiveStorage's Content-MD5
+  request_checksum_calculation: "when_required"
+  response_checksum_validation: "when_required"

@@ -1,0 +1,5 @@
+<ol class="tw:flex tw:list-decimal tw:flex-col tw:gap-3 tw:pl-6">
+  <% b_params.each do |b_param| %>
+    <li><%= render(Atoms::RegistrationStep::Component.new(b_param:)) %></li>
+  <% end %>
+</ol>

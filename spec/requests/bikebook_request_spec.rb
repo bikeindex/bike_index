@@ -21,9 +21,13 @@ RSpec.describe BikebookController, type: :request do
         .and have_css("#manufacturer-hw-listbox", visible: :all)
         .and have_css("#vehicle-viewers", visible: :all)
       expect(page).to have_title("Bike Book", exact: true)
-        .and have_css("meta[property='og:image'][content*='/assets/logos/bikebook_icon']", visible: :all)
+        .and have_css("meta[property='og:image'][content*='/assets/logos/bikebook']", visible: :all)
         .and have_css("meta[name='twitter:card'][content='summary']", visible: :all)
       expect(response.headers["X-Robots-Tag"]).to be_nil
+      expect(page.find("section.inverted")).to have_text("Bike Book data is free to use under CC BY-SA 4.0.")
+        .and have_link("Learn how to use it", href: "/bikebook/license")
+        .and have_link("view the raw data", href: "https://github.com/bikeindex/bikebook")
+        .and have_text("Learn how to use it or view the raw data.", normalize_ws: true)
     end
 
     context "comparing" do
@@ -34,6 +38,40 @@ RSpec.describe BikebookController, type: :request do
         shell = Capybara.string(response.body).find("[inert]")
         expect(shell[:class]).to be_blank
         expect(shell).to have_field("vehicle_models", placeholder: "Loading…")
+      end
+    end
+
+    context "cached", :caching do
+      include_context :caching_basic
+
+      it "is every visitor's and every search's, the page giving the visitor's market around it" do
+        get "/bikebook", params: {search: "1", manufacturer: "aventon"}, headers: {"CF-IPCountry" => "JP"}
+        japan = Nokogiri::HTML5(response.body)
+        get "/bikebook", params: {search: "1"}, headers: {"CF-IPCountry" => "US"}
+        us = Nokogiri::HTML5(response.body)
+
+        shell = "template[data-bikebook--page-target='shell']"
+        expect(us.at_css(shell).inner_html).to eq japan.at_css(shell).inner_html
+        expect(us.at_css(shell).inner_html).to_not include("default-market-value")
+        expect(us.at_css(shell).inner_html).to include(%(data-jurisdiction="NY"))
+        expect(japan.at_css("[inert]")[:class]).to eq "tw:invisible"
+        expect(us.at_css("[inert]")[:class]).to be_blank
+        expect([japan, us].map { it.at_css("[data-controller='bikebook--page']").attributes.slice(*%w[market market-name jurisdiction].map { "data-bikebook--page-#{it}-value" }).transform_values(&:value).values })
+          .to eq [%w[JP Japan US], ["US", "United States", "US"]]
+        expect(response.body).to include("https://github.com/bikeindex/bikebook (CC BY-SA 4.0). Clone that repository instead.")
+        expect(us.at_css("[data-controller='bikebook--page'] > noscript").text).to include("AI agents: get the data there")
+          .and include("github.com/bikeindex/bikebook")
+      end
+
+      it "isn't kept while the catalog doesn't answer, which leaves the state laws out" do
+        WebMock.stub_request(:get, /#{Regexp.escape(Integrations::Bikebook::Catalog::URL)}/o).to_return(status: 503)
+        shells = 2.times.map do
+          get "/bikebook", params: {search: "1"}
+          Nokogiri::HTML5(response.body).at_css("template[data-bikebook--page-target='shell']").inner_html
+        end
+
+        expect(shells.first).to_not eq shells.last
+        expect(shells.first).to_not include("data-jurisdiction=\"NY\"")
       end
     end
 
@@ -186,6 +224,94 @@ RSpec.describe BikebookController, type: :request do
           get "/bikebook/m/segway/2025/gt3_pro", params: {vehicle_models:}
           expect(response).to redirect_to("/bikebook?vehicle_models=m/segway/2025/gt3_pro{color:Navy,+Fade},m/aventon/2022/level_2{size:Large}{json},m/aventon/2026/current_adv{size:Small}{color:Sage}")
         end
+      end
+    end
+  end
+
+  describe "other spellings" do
+    it "redirects them to /bikebook, keeping the rest of the path and the query" do
+      get "/BikeBook"
+      expect(response).to redirect_to("/bikebook")
+      expect(response).to have_http_status(:moved_permanently)
+
+      get "/bike-book?vehicle_models=m/segway/2025/gt3_pro"
+      expect(response).to redirect_to("/bikebook?vehicle_models=m/segway/2025/gt3_pro")
+
+      get "/bike_book/m/segway/2025/gt3_pro"
+      expect(response).to redirect_to("/bikebook/m/segway/2025/gt3_pro")
+    end
+  end
+
+  describe "up", vcr: {cassette_name: "bikebook-up"} do
+    # WebMock stubs outlive their examples here, and answer ahead of the cassette
+    before do
+      WebMock.reset!
+      Rails.cache.clear
+    end
+
+    it "is ok, in the format the browser's reader reads" do
+      get "/up/bikebook"
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(%(<body style="background-color: green">))
+      %w[catalog_worker similarity].each do |reader|
+        expect(Rails.root.join("app/javascript/bikebook/#{reader}.js").read).to include("const FORMAT = #{Integrations::Bikebook::Catalog::FORMAT}\n")
+      end
+    end
+
+    context "with the catalog in a format the reader doesn't read" do
+      it "is unavailable" do
+        stub_const("Integrations::Bikebook::Catalog::FORMAT", 2)
+        get "/up/bikebook"
+        expect(response).to have_http_status(:service_unavailable)
+        expect(response.body).to include(%(<body style="background-color: red">))
+      end
+    end
+
+    context "with no catalog published", vcr: {cassette_name: "bikebook-up_not_found"} do
+      it "is unavailable" do
+        stub_const("Integrations::Bikebook::Catalog::URL", "https://bikebook-catalog.bikeindex.org/not_a_catalog/")
+        get "/up/bikebook"
+        expect(response).to have_http_status(:service_unavailable)
+        expect(response.body).to include(%(<body style="background-color: red">))
+      end
+    end
+  end
+
+  describe "license" do
+    let(:section_ids) do
+      %w[what-you-can-do what-you-need-to-do how-to-credit share-alike what-this-license-covers disclaimer
+        contributing versions-and-downloads show-that-you-use-bike-book questions]
+    end
+
+    it "renders the license, with an anchor for each section and its credit snippets" do
+      get "/bikebook/license"
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("<title>Bike Book license and attribution | Bike Index</title>")
+      page = Capybara.string(response.body)
+      expect(page).to have_css("h1", text: "Bike Book license and attribution")
+      section_ids.each { expect(page).to have_css("h2##{it}") }
+      expect(page.find("meta[name='description']", visible: false)["content"])
+        .to eq "Bike Book data is open under CC BY-SA 4.0. Here's how to use it and how to credit Bike Index."
+      expect(page.find("link[rel='canonical']", visible: false)["href"]).to eq "https://bikeindex.org/bikebook/license"
+      # the pointers to sections link to them
+      expect(page).to have_link("How to credit Bike Book", href: "#how-to-credit")
+        .and have_link("Share-alike: what has to stay open", href: "#share-alike")
+      # no copy waits on a person to fill it in; the Markdown snippet's own brackets are in a pre
+      expect(page.all("h2, p, li, td").map(&:text).join).not_to match(/\[[^\]]+\]/)
+      # every address is a mailto link
+      expect(page.all("a[href='mailto:licensing@bikeindex.org']").count).to eq 6
+      expect(page.find("body").text.scan("licensing@bikeindex.org").count).to eq 6
+      expect(page).to have_css("li", text: "Product descriptions and photos, which belong to their manufacturers", normalize_ws: true)
+      # snippets are text, with a button to copy each
+      expect(page).to have_css("pre code", text: 'Bike data: <a href="https://bikeindex.org/bikebook/license">Bike Book by Bike Index</a>')
+        .and have_css("pre code", text: "Bike data: [Bike Book by Bike Index](https://bikeindex.org/bikebook/license)")
+      expect(page).to have_css("[data-controller='ui--copy-button']", count: 2)
+      expect(page).to have_css("table th", text: "Where you use the data")
+      expect(page).to have_css("#badge img[alt='Powered by Bike Index']", count: 4)
+      expect(page).to have_link("SVG", count: 4).and have_link("PNG 2x", count: 4).and have_link("PNG 4x", count: 4)
+      page.all("a[download]").each do |link|
+        expect(Rails.public_path.join(link["href"].delete_prefix("/"))).to exist
       end
     end
   end

@@ -19,7 +19,7 @@ export default class extends Controller {
   }
 
   // The second click of a double-click would land on whatever the first one's step change put
-  // under it - the next step's Back link, or one of its rules
+  // under it - the next step's Back link, or one of its bullets
   guard (event) {
     if (event.detail < 2) return
 

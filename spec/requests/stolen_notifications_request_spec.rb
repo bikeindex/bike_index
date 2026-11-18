@@ -83,6 +83,19 @@ RSpec.describe StolenNotificationsController, type: :request do
           expect(stolen_notification.receiver_email).to eq owner_email
         end
       end
+      it "404s a bike_id that isn't an id" do
+        expect {
+          post base_url, params: {stolen_notification: stolen_notification_attributes.merge(bike_id: "RWLl8_zfhqJ_vHhQSJDsS7tbmX")}
+        }.to_not change(StolenNotification, :count)
+        expect(response).to have_http_status(:not_found)
+      end
+      it "redirects to the bike with an error for a blank message" do
+        expect {
+          post base_url, params: {stolen_notification: stolen_notification_attributes.merge(message: "")}
+        }.to_not change(StolenNotification, :count)
+        expect(response).to redirect_to(bike_path(bike))
+        expect(flash[:error]).to be_present
+      end
       context "not permitted notification" do
         let(:bike) { FactoryBot.create(:bike) }
         it "fails to create if the user isn't permitted to send a stolen_notification" do

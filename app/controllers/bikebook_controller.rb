@@ -11,6 +11,19 @@ class BikebookController < ApplicationController
     render_page
   end
 
+  def license
+    @page_title = "Bike Book license and attribution | Bike Index"
+    @page_description = "Bike Book data is open under CC BY-SA 4.0. Here's how to use it and how to credit Bike Index."
+    @page_url = "https://bikeindex.org/bikebook/license"
+  end
+
+  # For uptime monitoring: the page breaks whenever the catalog doesn't answer in the format it reads. Green or red, as /up is
+  def up
+    up = Integrations::Bikebook::Catalog.readable?
+    render html: %(<!DOCTYPE html><html><body style="background-color: #{up ? "green" : "red"}"></body></html>).html_safe,
+      status: up ? :ok : :service_unavailable
+  end
+
   # /bikebook/m/segway/2025/gt3_pro, or without its m/, or its id alone, /m/segway/2025/gt3_pro, picks that vehicle ahead
   # of any already picked, with what's picked for it there
   def vehicle
@@ -39,7 +52,7 @@ class BikebookController < ApplicationController
     @page_title = title
     # the icon is taller than wide, which the large card crops to a banner
     @twitter_card = "summary" unless @page_image
-    @page_image ||= helpers.image_url("logos/bikebook_icon.png")
+    @page_image ||= helpers.image_url("logos/bikebook.png")
     render Pages::Bikebook::Show::Component.new(manifest_url: Integrations::Bikebook::Catalog::MANIFEST_URL,
       market: request.env["HTTP_CF_IPCOUNTRY"], state: EbikeRuleServices::StateLaws.state_from_location(request_location_hash),
       query: request.query_parameters, paint_colors: Color.displays, framed: request.headers["Sec-Fetch-Dest"] == "iframe"), status:
