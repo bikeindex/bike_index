@@ -3,8 +3,8 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { Header } from './Header';
 
 const mockSyncRecent = vi.fn();
-const mockAthlete = { id: 12345, firstname: 'Test', lastname: 'User', profile_medium: '' };
-const mockSyncState = { athleteId: 12345, lastSyncedAt: Date.now(), isInitialSyncComplete: true, oldestActivityDate: null };
+const mockAthlete = { id: '12345', firstname: 'Test', lastname: 'User', profile_medium: '' };
+const mockSyncState = { athleteId: '12345', lastSyncedAt: Date.now(), isInitialSyncComplete: true, oldestActivityDate: null };
 
 vi.mock('../contexts/AuthContext', () => ({
   useAuth: vi.fn(() => ({
