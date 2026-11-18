@@ -180,17 +180,9 @@ class ImpoundRecord < ApplicationRecord
   end
 
   # Where it was impounded from, not where it's held
-  def latitude_public
-    return unless impounded_from_address&.latitude.present?
+  def latitude_public = public_coordinate(:latitude)
 
-    show_address ? impounded_from_address.latitude : impounded_from_address.latitude&.round(Bike::PUBLIC_COORD_LENGTH)
-  end
-
-  def longitude_public
-    return unless impounded_from_address&.latitude.present?
-
-    show_address ? impounded_from_address.longitude : impounded_from_address.longitude&.round(Bike::PUBLIC_COORD_LENGTH)
-  end
+  def longitude_public = public_coordinate(:longitude)
 
   def unorganized?
     !organized?
@@ -314,6 +306,13 @@ class ImpoundRecord < ApplicationRecord
   end
 
   private
+
+  def public_coordinate(attribute)
+    coordinate = impounded_from_address&.public_send(attribute)
+    return if coordinate.blank?
+
+    show_address ? coordinate : coordinate.round(Bike::PUBLIC_COORD_LENGTH)
+  end
 
   def set_calculated_display_id
     if organization_id.blank?

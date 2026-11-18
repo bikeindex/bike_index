@@ -19,6 +19,8 @@ en:
             course_acknowledgment_cell_panel: Time - Education course acknowledged
             created_at_cell: Registered
             creation_description_cell: Source
+            current_location_without_locations: You don't have impound locations,
+              so this mostly repeats Impounded from
             cycle_type_cell: Vehicle type
             filter_impounded_html: only <strong>impounded</strong>
             filter_no_address_html: only <strong>no</strong> address

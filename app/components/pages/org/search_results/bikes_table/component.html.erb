@@ -87,13 +87,15 @@
         </small>
       <% end %>
 
-      <% if impound_record.noted_updates.size > 2 %>
+      <% more_count = impound_record.noted_updates.size - 2 %>
+
+      <% if more_count.positive? %>
         <a
           class="twlink tw:block tw:text-xs"
           href="<%= organization_impound_record_path(impound_record.display_id, organization_id: organization.to_param) %>"
           data-turbo-frame="_top"
         >
-          <%= more_notes.(impound_record.noted_updates.size - 2) %>
+          <%= more_notes.(more_count) %>
         </a>
       <% end %>
     <% end %>

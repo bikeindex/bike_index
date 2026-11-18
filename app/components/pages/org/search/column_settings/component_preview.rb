@@ -18,6 +18,11 @@ module Pages
             render_panel(enabled_feature_slugs: OrganizationFeature::EXPECTED_SLUGS)
           end
 
+          # The impound records search for an organization without impound locations
+          def impound_search_without_locations
+            render_panel(enabled_feature_slugs: %w[impound_bikes], impound: true)
+          end
+
           # The export form's column fields, every feature enabled
           def export_form
             organization = ::Organization.new(short_name: "Preview org", enabled_feature_slugs: OrganizationFeature::EXPECTED_SLUGS)
@@ -28,12 +33,12 @@ module Pages
 
           private
 
-          def render_panel(enabled_feature_slugs:)
+          def render_panel(enabled_feature_slugs:, impound: false)
             organization = ::Organization.new(short_name: "Preview org", enabled_feature_slugs:)
-            settings = ComponentStructs::OrgSearchSettings.new(organization:)
+            settings = ComponentStructs::OrgSearchSettings.new(organization:, impound:)
 
             {template: "pages/org/search/column_settings/component_preview/panel",
-             locals: {settings:, data: Component.column_settings_data_attributes}}
+             locals: {settings:, data: Component.column_settings_data_attributes(impound:)}}
           end
         end
       end

@@ -90,6 +90,17 @@ RSpec.describe Pages::Org::Search::ColumnSettings::Component, type: :component d
       expect(after_heading).to match_array(settings.impound_panel_columns)
       expect(component).to have_css("button[data-ui--table-column-order-target='copy'][data-storage-key='orgRegistrationColumnsOrder']",
         text: "Copy column order from registrations search", visible: :all)
+      expect(component.at_css("label:has(#table_column_settings_impound_current_location_cell)").text)
+        .to include "You don't have impound locations"
+    end
+
+    context "with impound locations" do
+      let(:enabled_feature_slugs) { %w[impound_bikes impound_bikes_locations] }
+
+      it "doesn't explain Current location" do
+        expect(component).to have_field("impound_current_location_cell", visible: :all)
+        expect(component.text).not_to include "have impound locations"
+      end
     end
   end
 
