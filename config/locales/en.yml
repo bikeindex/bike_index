@@ -3776,6 +3776,9 @@ en:
       Index
     sessions_create: Log in to Bike Index
     sessions_new: Log in to Bike Index
+    shop_index: >-
+      Bike Index caps and registration stickers. Every purchase helps keep the registry
+      free.
     stolen_index: Bike Index helps recover your stolen bike
     stolen_merging: >-
       StolenBicycleRegistry.com merged with Bike Index in 2014 to become the largest
@@ -3828,6 +3831,7 @@ en:
     search_registrations_index: Search results
     sessions_create: Log in
     sessions_new: Log in
+    shop_index: Shop - Bike Index
     stolen_index: Bike registry
     strava_search_index: Bike Index Strava Search
     users_accept_terms: Terms of use - Bike Index

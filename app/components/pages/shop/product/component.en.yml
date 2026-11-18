@@ -1,0 +1,8 @@
+---
+en:
+  components:
+    pages:
+      shop:
+        product:
+          view: View
+          view_on_the_shop: View %{name} on the Bike Index shop (opens in a new tab)

@@ -1,0 +1,52 @@
+<%= tag.section(id: @id, class: ["tw:scroll-mt-4", section_classes]) do %>
+  <div
+    class="
+      twwiderow tw:items-center tw:gap-x-14 tw:gap-y-12 tw:py-12 tw:sm:py-18
+      <%= SharedBlocks::Marketing::Wrapper::Component::CONTAINER_CLASSES %>
+    "
+  >
+    <div class="<%= media_classes %>"><%= media %></div>
+
+    <div>
+      <div class="tw:mb-3.5 tw:flex tw:items-center tw:gap-3">
+        <%= render(UI::Badge::Component.new(text: @category, color: :yellow)) %>
+
+        <span
+          class="
+            tw:font-[Bangers,_cursive] tw:text-[28px] tw:text-purple-500
+            tw:dark:text-purple-300
+          "
+          aria-hidden="true"
+        >
+          <%= @sound %>
+        </span>
+      </div>
+
+      <h2
+        class="
+          tw:m-0 tw:mb-3.5 tw:font-header tw:text-[30px] tw:leading-[1.1]
+          tw:font-extrabold tw:text-balance tw:sm:text-[40px]
+        "
+      >
+        <%= @name %>
+      </h2>
+
+      <p
+        class="
+          tw:m-0 tw:mb-6 tw:max-w-125 tw:text-[17px] tw:leading-[1.6]
+          tw:text-gray-600 tw:dark:text-gray-400
+        "
+      >
+        <%= @description %>
+      </p>
+
+      <%= price %>
+
+      <%= render(UI::ButtonLink::Component.new(href: @url, text: translation(".view"), color: :purple, size: :callout,
+        html_class: "tw:px-8! tw:py-3!", target: "_blank", rel: "noopener",
+        aria: {label: translation(".view_on_the_shop", name: @name)})) %>
+
+      <%= note %>
+    </div>
+  </div>
+<% end %>
