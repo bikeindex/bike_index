@@ -37,7 +37,7 @@ RSpec.describe MyAccounts::PosRegistrationMatchesController, type: :request do
       expect(BikeJobs::MergePosRegistrationJob.jobs.count).to eq 1
 
       BikeJobs::MergePosRegistrationJob.drain
-      expect(pos_registration_match.reload.status).to eq "merged"
+      expect(pos_registration_match.reload).to have_attributes(status: "merged", merger_id: current_user.id)
       expect(Bike.unscoped.find(pos_registration_match.bike_id).deleted_at).to be_present
 
       get url

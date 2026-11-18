@@ -10,12 +10,14 @@
 #  updated_at              :datetime         not null
 #  bike_id                 :bigint           not null
 #  duplicate_bike_group_id :bigint
+#  merger_id               :bigint
 #  pos_bike_id             :bigint           not null
 #
 # Indexes
 #
 #  index_pos_registration_matches_on_bike_id_and_pos_bike_id  (bike_id,pos_bike_id) UNIQUE
 #  index_pos_registration_matches_on_duplicate_bike_group_id  (duplicate_bike_group_id)
+#  index_pos_registration_matches_on_merger_id                (merger_id)
 #  index_pos_registration_matches_on_pos_bike_id              (pos_bike_id)
 #
 # A new self-registration of a bike a shop's POS registered to the same owner: a pair within the
@@ -43,6 +45,8 @@ class PosRegistrationMatch < ApplicationRecord
   # Merged matches have a deleted bike, and POS bikes are often hidden. Without the default scope's includes too
   belongs_to :bike, -> { unscope(:includes, :order, where: BIKE_SCOPE_COLUMNS) }
   belongs_to :pos_bike, -> { unscope(:includes, :order, where: BIKE_SCOPE_COLUMNS) }, class_name: "Bike"
+  # Who said to merge them: the owner, or an admin merging for them
+  belongs_to :merger, class_name: "User", optional: true
 
   validates_presence_of :bike_id, :pos_bike_id
 
@@ -92,7 +96,7 @@ class PosRegistrationMatch < ApplicationRecord
     recorded = with_lock do
       next false unless confirmable? && bike.user_id == user&.id
 
-      update!(status: merge ? :confirmed : :declined)
+      merge ? update!(status: :confirmed, merger: user) : update!(status: :declined)
     end
     # After the lock's transaction commits, so the job finds the match confirmed
     BikeJobs::MergePosRegistrationJob.perform_async(id) if recorded && merge

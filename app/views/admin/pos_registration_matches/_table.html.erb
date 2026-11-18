@@ -29,6 +29,9 @@
 
   <% table.column(sortable: "status", label: "Status") do |match| %>
     <%= match.status.humanize %>
+    <% if match.merger_id.present? %>
+      <span class="tw:block tw:text-xs">by <%= render Atoms::Admin::TableCells::User::Component.new(user: match.merger, user_id: match.merger_id) %></span>
+    <% end %>
   <% end %>
 
   <% table.column do |match| %>

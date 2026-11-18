@@ -10,7 +10,7 @@ RSpec.describe PosRegistrationMatch, type: :model do
       expect(match.reload.status).to eq "pending"
 
       expect(match.answer!(user:, merge: true)).to be_truthy
-      expect(match.reload.status).to eq "confirmed"
+      expect(match.reload).to have_attributes(status: "confirmed", merger_id: user.id)
       expect(BikeJobs::MergePosRegistrationJob.jobs.map { it["args"] }).to eq([[match.id]])
       # Already answered
       expect(match.answer!(user:, merge: false)).to be_falsey
@@ -18,7 +18,7 @@ RSpec.describe PosRegistrationMatch, type: :model do
 
     it "declines" do
       expect(match.answer!(user:, merge: false)).to be_truthy
-      expect(match.reload.status).to eq "declined"
+      expect(match.reload).to have_attributes(status: "declined", merger_id: nil)
       expect(BikeJobs::MergePosRegistrationJob.jobs).to be_empty
     end
 
