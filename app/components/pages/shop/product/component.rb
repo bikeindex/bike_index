@@ -4,8 +4,7 @@ module Pages
   module Shop
     module Product
       # One product's full-width section, with a link out to its page on the Shopify store.
-      # media: the image side. price: what sits above the link. note: what follows it.
-      # flip: media on the right of the text once the row is two columns. band: the tinted, ruled background
+      # flip puts the media on the right once the row is two columns
       class Component < ApplicationComponent
         # Template Dependency: SharedBlocks::Marketing::Wrapper::Component
         BAND_CLASSES = "tw:border-y tw:border-gray-200 tw:bg-gray-50 tw:dark:border-gray-700 tw:dark:bg-gray-800/60"
@@ -27,11 +26,8 @@ module Pages
 
         private
 
-        def section_classes = @band ? BAND_CLASSES : nil
-
-        # 696px is two of twwiderow's 320px columns and this row's 56px gap, which it wraps at
-        # rather than at the 672px its default gap does
-        def media_classes = ["tw:relative", ("tw:@min-[696px]/twwiderow:order-2" if @flip)].compact.join(" ")
+        # 696px: two of twwiderow's 320px columns and this row's 56px gap
+        def media_classes = ["tw:relative", ("tw:@min-[696px]/twwiderow:order-2" if @flip)]
       end
     end
   end

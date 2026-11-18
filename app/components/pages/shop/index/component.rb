@@ -10,9 +10,7 @@ module Pages
         # Template Dependency: Pages::Shop::Product::Component
         STORE_URL = "https://bikeindex.myshopify.com/products"
         FIRST_PRODUCT_ID = "caped-registrant-cap"
-        SUPPORT_EMAIL = "support@bikeindex.org"
 
-        # The comic sound words stamped on the images
         BURST_CLASSES = "tw:absolute tw:font-[Bangers,_cursive] tw:text-[44px] tw:tracking-[.02em] " \
           "tw:[-webkit-text-stroke:2px_#000]"
         PRICE_CLASSES = "tw:m-0 tw:font-header tw:font-extrabold"
