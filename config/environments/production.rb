@@ -73,6 +73,12 @@ Rails.application.configure do
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
   config.force_ssl = true
 
+  # Block requests that hit the server's IP directly (bot scanners) instead of coming through Cloudflare.
+  # A leading dot allows one level of subdomain; sandbox (which loads this file) is pr-N.review.bikeindex.org.
+  # kamal-proxy's health check hits /up by container address
+  config.hosts = [".bikeindex.org", ".review.bikeindex.org"]
+  config.host_authorization = {exclude: ->(request) { request.path == "/up" }}
+
   # Prepend all log lines with the following tags.
   config.log_tags = [:request_id]
 
