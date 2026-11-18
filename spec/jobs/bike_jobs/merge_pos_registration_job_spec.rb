@@ -65,6 +65,24 @@ RSpec.describe BikeJobs::MergePosRegistrationJob, type: :job do
     expect(strava_gear.reload.item_id).to eq pos_bike.id
   end
 
+  # Sidekiq retries it, then it's dead and in Honeybadger
+  it "raises, leaving nothing half-merged, when the merge fails" do
+    component = FactoryBot.create(:component, bike:)
+    allow_any_instance_of(Bike).to receive(:destroy!).and_raise(ActiveRecord::RecordNotDestroyed)
+    expect { instance.perform(match.id) }.to raise_error(ActiveRecord::RecordNotDestroyed)
+    expect(component.reload.bike_id).to eq bike.id
+    expect(match.reload).to have_attributes(status: "confirmed", review_reasons: [])
+    expect(bike.reload.deleted_at).to be_blank
+    expect(CallbackJobs::AfterBikeSaveJob.jobs).to be_empty
+  end
+
+  it "raises when a sticker doesn't move" do
+    FactoryBot.create(:bike_sticker_claimed, bike:, user:)
+    allow_any_instance_of(BikeSticker).to receive(:claim) { |sticker| sticker }
+    expect { instance.perform(match.id) }.to raise_error(ActiveRecord::RecordNotSaved, /Couldn't move BikeSticker/)
+    expect(match.reload.status).to eq "confirmed"
+  end
+
   it "records a theft since the answer and leaves it confirmed" do
     FactoryBot.create(:stolen_bike, serial_number: bike.serial_number)
     instance.perform(match.id)

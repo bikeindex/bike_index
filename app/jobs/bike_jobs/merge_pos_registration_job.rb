@@ -68,7 +68,12 @@ module BikeJobs
         StravaGear.where(item: bike, strava_integration: StravaIntegration.where(user_id: pos_bike.user_id))
           .update_all(item_id: pos_bike.id)
       end
-      bike.bike_stickers.each { it.claim(bike: pos_bike, user: bike.user) }
+      # claim doesn't raise, and a sticker left on the deleted registration would stop working
+      bike.bike_stickers.each do |bike_sticker|
+        next if bike_sticker.claim(bike: pos_bike, user: bike.user).reload.bike_id == pos_bike.id
+
+        raise ActiveRecord::RecordNotSaved, "Couldn't move BikeSticker #{bike_sticker.id} to Bike #{pos_bike.id}"
+      end
       merge_bike_organizations(bike, pos_bike)
       # One note per organization
       bike.bike_organization_notes.where.not(organization_id: pos_bike.bike_organization_notes.select(:organization_id))
