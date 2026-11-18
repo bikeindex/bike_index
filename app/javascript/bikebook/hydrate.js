@@ -167,8 +167,8 @@ export function loadingShell (shell, url, status) {
   panel.hidden = !searching(url)
   const filters = urlFilters(root, url)
   fillFields(root, filters)
-  // one holding what only the catalog names, rather than the Any it isn't
-  for (const name of ['vehicle_models', ...LISTS, ...SINGLES].filter((each) => filters[each] ?? url.searchParams.get(each))) {
+  // the search, which answers from the catalog, and a filter holding what only the catalog names, rather than the Any it isn't
+  for (const name of ['vehicle_models', ...[...LISTS, ...SINGLES].filter((each) => filters[each] ?? url.searchParams.get(each))]) {
     const field = combobox(root, name)
     const input = field.querySelector('.hw-combobox__input')
     field.dataset.hwComboboxPrefilledDisplayValue = ''

@@ -1,3 +1,5 @@
+<% helpers.content_for(:header) { module_preloads } %>
+
 <%# bikebook--catalog-filters keeps its href, the page less its filters but the market, and shows it once any is set %>
 <% clear_filters = capture do %>
   <a
@@ -467,9 +469,9 @@
         role="status"
         data-bikebook--page-target="status"
       >
-        <span data-loading>
+        <span data-loading class="tw:flex tw:items-center tw:gap-2">
           <%= render UI::LoadingSpinner::Component.new %>
-          <span class="tw:sr-only"><%= translation(".loading") %></span>
+          <%= translation(".loading") %>
         </span>
 
         <span hidden data-failed>
