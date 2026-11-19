@@ -36,14 +36,6 @@ production:
       run_on: all_servers
       sudo: true
 
-  after_rails:
-    # Make papertrail connected
-    - source: /.cloud66/log_files.yml
-      destination: /etc/log_files.yml
-      sudo: true
-      target: rails
-      apply_during: build_only
-
   last_thing:
     # Trigger honeybadger deploy hook
     - command: cd $RAILS_STACK_PATH && bundle exec rake trigger_honeybadger_deploy
