@@ -23,8 +23,7 @@ const EXAMPLES = [
 const exampleLink = (url, [label, query]) => html`<a href=${`${url.pathname}?${query}`} class=${buttonClasses({ size: 'sm' })}
   data-active=${[...new URLSearchParams(query)].every(([name, value]) => url.searchParams.get(name) === value) || nothing}>${label}</a>`
 
-// What the search leaves, and the way on: into the search's list, or back to the filters when it's empty. Other samples
-// where the featured ones aren't every candidate
+// What the search leaves, and the way on: into the search's list, or back to the filters when it's empty
 const searchNote = ({ count, filtered, rotatable }) => html`<p class="tw:mt-3 tw:flex tw:flex-wrap tw:items-center tw:gap-x-3 tw:rounded-md tw:bg-blue-50 tw:px-4
   tw:py-3 tw:text-sm tw:dark:bg-blue-950">${count
   ? html`<span>${numberDisplay(count)} ${filtered
@@ -41,10 +40,10 @@ const featuredCards = ({ featured, vehiclePath, ...card }) => html`<ul aria-labe
 
 // With nothing picked, how the page works and comparisons to start from, or once they're dismissed, a prompt, and under
 // either what the search leaves and some of it. A classification's card, shown alone, leaves out the first two
-export const emptyState = ({ url, filtered, count, featured, candidates, ...cards }) => html`<div class="tw:mt-3" data-controller="bikebook--tips">${url.searchParams.get('classifications')
+export const emptyState = ({ url, filtered, count, featured, rotatable, ...cards }) => html`<div class="tw:mt-3" data-controller="bikebook--tips">${url.searchParams.get('classifications')
   ? nothing
   : tips(url)}${filtered || featured.length
-  ? searchNote({ count, filtered, rotatable: candidates > featured.length })
+  ? searchNote({ count, filtered, rotatable })
   : nothing}${featured.length ? featuredCards({ featured, ...cards }) : nothing}</div>`
 
 const tips = (url) => html`<div data-bikebook--tips-target="tips"><section aria-label="How to use Bike Book" tabindex="-1"

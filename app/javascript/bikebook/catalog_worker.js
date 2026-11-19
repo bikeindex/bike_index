@@ -97,7 +97,8 @@ async function load ({ rulesUrl, similarityUrl: similarityModule }) {
     searchText: `${model.display}\n${model.id}`.toLowerCase(),
     // a current model's first year where it's sold ahead of the calendar
     sortYear: model.final_year ?? Math.max(model.first_year, currentYear),
-    // drawn per worker, which each page load starts, so a reload features others and the page's own changes the same
+    // drawn per worker, which each page load starts, and again by `rotate`, so a reload features others and the page's
+    // own changes the same
     chance: Math.random()
   }))
   byId = new Map(models.map((model) => [model.id, model]))
@@ -229,8 +230,8 @@ function matching (params) {
   return { filteredCount: filtered.length, matches, unfiltered: Boolean(exact) && matches.length > 0 && !passes(exact) }
 }
 
-// The `count` of models the filters leave, and featured_rules' `COUNT` of the `candidates` its rules leave, the models
-// tying on them by `chance`, shown cheapest first unless the reader picked a sort.
+// The `count` of models the filters leave, and featured_rules' `COUNT` of them, by its rules, the models tying on them
+// by `chance`, shown cheapest first unless the reader picked a sort, and whether a rotation could pick others.
 // `legalClasses` are the e-bike classes legal where the visitor is, by which every e-bike is legal where there are none
 function featured ({ params, legalClasses }) {
   const { COUNT, requirements, preferences, quotas, maximums } = rules
@@ -272,7 +273,7 @@ function featured ({ params, legalClasses }) {
     picked.push(best.model)
   }
   const shown = params.sort || params.year_dir || params.price_dir ? params : { sort: 'price' }
-  return { count: filtered.length, featured: sorted(shown).filter((model) => picked.includes(model)), candidates: candidates.length }
+  return { count: filtered.length, featured: sorted(shown).filter((model) => picked.includes(model)), rotatable: candidates.length > COUNT }
 }
 
 // featured's picks drawn afresh, as a reload would

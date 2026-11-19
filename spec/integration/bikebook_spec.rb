@@ -130,9 +130,7 @@ RSpec.describe "Bike Book", :js, type: :system do
     # and others again when rotated, in place, which a few tries make sure of
     rotated = 3.times.any? do
       click_on "rotate samples"
-      page.document.synchronize(3) { (featured_ids.sort != picks.sort) || raise(Capybara::ExpectationNotMet) }
-    rescue Capybara::ExpectationNotMet
-      false
+      has_css?("[aria-label='Models to compare']", wait: 3) { featured_ids.sort != picks.sort }
     end
     expect(rotated).to be true
     picks = featured_ids
