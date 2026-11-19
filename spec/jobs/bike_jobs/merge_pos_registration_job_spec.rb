@@ -170,6 +170,15 @@ RSpec.describe BikeJobs::MergePosRegistrationJob, type: :job do
     expect(BikeOrganization.unscoped.find(pos_bike_organization.id).can_not_edit_claimed).to be_truthy
   end
 
+  it "keeps the POS registration's more restrictive permission from a graduated membership on the moved one" do
+    organization = FactoryBot.create(:organization)
+    FactoryBot.create(:bike_organization, bike: pos_bike, organization:, can_not_edit_claimed: true).destroy!
+    bike_organization = FactoryBot.create(:bike_organization, bike:, organization:)
+
+    instance.perform(match.id)
+    expect(bike_organization.reload).to have_attributes(bike_id: pos_bike.id, can_not_edit_claimed: true)
+  end
+
   it "doesn't merge once the POS registration is really deleted" do
     BikeJobs::BikeDeleterJob.new.perform(pos_bike.id, true)
     instance.perform(match.id)

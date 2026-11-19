@@ -117,7 +117,8 @@ module BikeJobs
       BikeOrganization.unscoped.where(bike_id: bike.id).each do |bike_organization|
         pos_bike_organization = pos_bike_organizations[bike_organization.organization_id]
         if pos_bike_organization.blank? || (pos_bike_organization.deleted? && !bike_organization.deleted?)
-          bike_organization.update_columns(bike_id: pos_bike.id)
+          bike_organization.update_columns(bike_id: pos_bike.id,
+            can_not_edit_claimed: bike_organization.can_not_edit_claimed || !!pos_bike_organization&.can_not_edit_claimed)
           next
         end
 
