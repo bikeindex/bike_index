@@ -95,7 +95,7 @@ class CustomerMailerPreview < ActionMailer::Preview
 
   def pos_registration_match_email
     match = PosRegistrationMatch.merge_candidate.order(:id).last
-    CustomerMailer.pos_registration_match_email(match, Bike.unscoped.find(match.bike_id).user)
+    CustomerMailer.pos_registration_match_email(match, match.bike.user)
   end
 
   def bike_possibly_found_email

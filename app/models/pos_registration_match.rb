@@ -46,7 +46,7 @@ class PosRegistrationMatch < ApplicationRecord
   # Merged matches have a deleted bike, and POS bikes are often hidden. Without the default scope's includes too
   belongs_to :bike, -> { unscope(:includes, :order, where: BIKE_SCOPE_COLUMNS) }
   belongs_to :pos_bike, -> { unscope(:includes, :order, where: BIKE_SCOPE_COLUMNS) }, class_name: "Bike"
-  # Who said to merge them: the owner, or an admin merging for them
+  # Who said to merge them
   belongs_to :merger, class_name: "User", optional: true
 
   validates_presence_of :bike_id, :pos_bike_id

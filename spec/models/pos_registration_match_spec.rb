@@ -16,6 +16,12 @@ RSpec.describe PosRegistrationMatch, type: :model do
       expect(match.answer!(user:, merge: false)).to be_falsey
     end
 
+    it "only takes true or false" do
+      expect(match.answer!(user:, merge: "merge")).to be_falsey
+      expect(match.answer!(user:, merge: nil)).to be_falsey
+      expect(match.reload.status).to eq "pending"
+    end
+
     it "declines" do
       expect(match.answer!(user:, merge: false)).to be_truthy
       expect(match.reload).to have_attributes(status: "declined", merger_id: nil)
@@ -26,6 +32,26 @@ RSpec.describe PosRegistrationMatch, type: :model do
       match.update!(review_reasons: ["multiple_registrations"])
       expect(match.answer!(user:, merge: true)).to be_falsey
       expect(match.reload.status).to eq "pending"
+    end
+  end
+
+  describe "review_reasons_for" do
+    let(:match) { FactoryBot.create(:pos_registration_match) }
+    let(:reasons) { described_class.review_reasons_for(match.bike, match.pos_bike) }
+
+    it "is empty for a clean pair" do
+      expect(reasons).to eq []
+    end
+
+    it "checks the POS registration's serial for stolen history too" do
+      match.pos_bike.update!(serial_number: "WTU999C9999")
+      FactoryBot.create(:stolen_bike, serial_number: "WTU999C9999")
+      expect(reasons).to eq ["stolen_history"]
+    end
+
+    it "includes bike versions" do
+      FactoryBot.create(:bike_version, bike: match.pos_bike)
+      expect(reasons).to eq ["bike_versions"]
     end
   end
 
