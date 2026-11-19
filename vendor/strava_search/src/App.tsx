@@ -55,7 +55,7 @@ function Dashboard() {
 
   // Expose fetchFullActivityData on window for console access
   useEffect(() => {
-    (window as unknown as { fetchFullActivityData: (ids?: number[]) => void }).fetchFullActivityData = (ids?: number[]) => {
+    (window as unknown as { fetchFullActivityData: (ids?: string[]) => void }).fetchFullActivityData = (ids?: string[]) => {
       const isForPage = !ids;
       const activityIds = ids ?? displayedActivityIds;
       console.log(`Fetching full data for ${activityIds.length} activities${isForPage ? ' on this page' : ''}...`);
@@ -87,7 +87,7 @@ function Dashboard() {
     refreshActivities(true);
   }, [refreshActivities]);
 
-  const handleToggleSelect = useCallback((id: number) => {
+  const handleToggleSelect = useCallback((id: string) => {
     setSelectedIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) {

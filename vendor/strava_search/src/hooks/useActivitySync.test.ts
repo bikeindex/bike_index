@@ -3,7 +3,7 @@ import { renderHook, act, waitFor } from '@testing-library/react';
 import { useActivitySync } from './useActivitySync';
 
 // Create stable mock objects
-const mockAthlete = { id: 12345, firstname: 'Test', lastname: 'User' };
+const mockAthlete = { id: '12345', firstname: 'Test', lastname: 'User' };
 
 vi.mock('../contexts/AuthContext', () => ({
   useAuth: vi.fn(() => ({
@@ -13,9 +13,9 @@ vi.mock('../contexts/AuthContext', () => ({
 }));
 
 vi.mock('../services/strava', () => ({
-  getAthlete: vi.fn(() => Promise.resolve({ id: 12345, bikes: [], shoes: [] })),
+  getAthlete: vi.fn(() => Promise.resolve({ id: '12345', bikes: [], shoes: [] })),
   getAllActivities: vi.fn(() => Promise.resolve([])),
-  getActivity: vi.fn(() => Promise.resolve({ id: 1, name: 'Test', muted: false })),
+  getActivity: vi.fn(() => Promise.resolve({ id: '1', name: 'Test', muted: false })),
   fetchEnrichedSince: vi.fn(() => Promise.resolve([])),
   fetchSyncStatus: vi.fn(() => Promise.resolve({ status: 'synced', activities_downloaded_count: 100, athlete_activity_count: 100, progress_percent: 100, rate_limited: false })),
 }));
@@ -24,7 +24,7 @@ vi.mock('../services/database', () => ({
   saveGear: vi.fn(() => Promise.resolve()),
   saveActivities: vi.fn(() => Promise.resolve()),
   updateSyncState: vi.fn(() => Promise.resolve()),
-  getSyncState: vi.fn(() => Promise.resolve({ athleteId: 12345, lastSyncedAt: Date.now() })),
+  getSyncState: vi.fn(() => Promise.resolve({ athleteId: '12345', lastSyncedAt: Date.now() })),
   getActivitiesForAthlete: vi.fn(() => Promise.resolve([])),
   getActivityById: vi.fn(() => Promise.resolve(undefined)),
 }));
@@ -96,7 +96,7 @@ describe('useActivitySync', () => {
       expect(result.current.error).toBe('First error');
 
       // Second call succeeds
-      vi.mocked(getAthlete).mockResolvedValueOnce({ id: 12345, bikes: [], shoes: [] } as never);
+      vi.mocked(getAthlete).mockResolvedValueOnce({ id: '12345', bikes: [], shoes: [] } as never);
 
       // Start another sync - error should be cleared immediately
       act(() => {
@@ -136,9 +136,9 @@ describe('useActivitySync', () => {
       const enrichedAt3 = null;
 
       vi.mocked(getActivitiesForAthlete).mockResolvedValueOnce([
-        { id: 1, enriched_at: enrichedAt1, athleteId: 12345, syncedAt: Date.now() },
-        { id: 2, enriched_at: enrichedAt2, athleteId: 12345, syncedAt: Date.now() },
-        { id: 3, enriched_at: enrichedAt3, athleteId: 12345, syncedAt: Date.now() },
+        { id: '1', enriched_at: enrichedAt1, athleteId: '12345', syncedAt: Date.now() },
+        { id: '2', enriched_at: enrichedAt2, athleteId: '12345', syncedAt: Date.now() },
+        { id: '3', enriched_at: enrichedAt3, athleteId: '12345', syncedAt: Date.now() },
       ] as never);
 
       const { result } = renderHook(() => useActivitySync());
@@ -169,8 +169,8 @@ describe('useActivitySync', () => {
       const { getActivitiesForAthlete } = await import('../services/database');
 
       vi.mocked(getActivitiesForAthlete).mockResolvedValueOnce([
-        { id: 1, enriched_at: null, athleteId: 12345, syncedAt: Date.now() },
-        { id: 2, enriched_at: null, athleteId: 12345, syncedAt: Date.now() },
+        { id: '1', enriched_at: null, athleteId: '12345', syncedAt: Date.now() },
+        { id: '2', enriched_at: null, athleteId: '12345', syncedAt: Date.now() },
       ] as never);
 
       const { result } = renderHook(() => useActivitySync());
@@ -192,21 +192,21 @@ describe('useActivitySync', () => {
       // Activity 2 does not have full data (enriched_at null)
       // Activity 3 does not exist in DB
       vi.mocked(getActivityById)
-        .mockResolvedValueOnce({ id: 1, name: 'Enriched', enriched_at: '2026-02-01T00:00:00Z', athleteId: 12345, syncedAt: Date.now() } as never)
-        .mockResolvedValueOnce({ id: 2, name: 'Not enriched', enriched_at: null, athleteId: 12345, syncedAt: Date.now() } as never)
+        .mockResolvedValueOnce({ id: '1', name: 'Enriched', enriched_at: '2026-02-01T00:00:00Z', athleteId: '12345', syncedAt: Date.now() } as never)
+        .mockResolvedValueOnce({ id: '2', name: 'Not enriched', enriched_at: null, athleteId: '12345', syncedAt: Date.now() } as never)
         .mockResolvedValueOnce(undefined);
 
-      vi.mocked(getActivity).mockResolvedValue({ id: 2, name: 'Full data' } as never);
+      vi.mocked(getActivity).mockResolvedValue({ id: '2', name: 'Full data' } as never);
 
       const { result } = renderHook(() => useActivitySync());
 
       await act(async () => {
-        await result.current.fetchFullActivityData([1, 2, 3]);
+        await result.current.fetchFullActivityData(['1', '2', '3']);
       });
 
       // Should only fetch activity 2 (activity 1 already enriched, activity 3 doesn't exist)
       expect(getActivity).toHaveBeenCalledTimes(1);
-      expect(getActivity).toHaveBeenCalledWith(2);
+      expect(getActivity).toHaveBeenCalledWith('2');
       expect(saveActivities).toHaveBeenCalledTimes(1);
     });
 
@@ -215,19 +215,19 @@ describe('useActivitySync', () => {
       const { getActivityById } = await import('../services/database');
 
       vi.mocked(getActivityById)
-        .mockResolvedValueOnce({ id: 1, enriched_at: null, athleteId: 12345, syncedAt: Date.now() } as never)
-        .mockResolvedValueOnce({ id: 2, enriched_at: null, athleteId: 12345, syncedAt: Date.now() } as never)
-        .mockResolvedValueOnce({ id: 3, enriched_at: null, athleteId: 12345, syncedAt: Date.now() } as never);
+        .mockResolvedValueOnce({ id: '1', enriched_at: null, athleteId: '12345', syncedAt: Date.now() } as never)
+        .mockResolvedValueOnce({ id: '2', enriched_at: null, athleteId: '12345', syncedAt: Date.now() } as never)
+        .mockResolvedValueOnce({ id: '3', enriched_at: null, athleteId: '12345', syncedAt: Date.now() } as never);
 
       vi.mocked(getActivity)
-        .mockResolvedValueOnce({ id: 1 } as never)
+        .mockResolvedValueOnce({ id: '1' } as never)
         .mockRejectedValueOnce(new Error('Not found'))
         .mockRejectedValueOnce(new Error('Server error'));
 
       const { result } = renderHook(() => useActivitySync());
 
       await act(async () => {
-        await result.current.fetchFullActivityData([1, 2, 3]);
+        await result.current.fetchFullActivityData(['1', '2', '3']);
       });
 
       expect(result.current.error).toBe('Failed to fetch 2 of 3 activities');
@@ -240,13 +240,13 @@ describe('useActivitySync', () => {
 
       // All activities already have full data (enriched_at set)
       vi.mocked(getActivityById)
-        .mockResolvedValueOnce({ id: 1, name: 'Enriched 1', enriched_at: '2026-02-01T00:00:00Z', athleteId: 12345, syncedAt: Date.now() } as never)
-        .mockResolvedValueOnce({ id: 2, name: 'Enriched 2', enriched_at: '2026-02-01T00:00:00Z', athleteId: 12345, syncedAt: Date.now() } as never);
+        .mockResolvedValueOnce({ id: '1', name: 'Enriched 1', enriched_at: '2026-02-01T00:00:00Z', athleteId: '12345', syncedAt: Date.now() } as never)
+        .mockResolvedValueOnce({ id: '2', name: 'Enriched 2', enriched_at: '2026-02-01T00:00:00Z', athleteId: '12345', syncedAt: Date.now() } as never);
 
       const { result } = renderHook(() => useActivitySync());
 
       await act(async () => {
-        await result.current.fetchFullActivityData([1, 2]);
+        await result.current.fetchFullActivityData(['1', '2']);
       });
 
       // Should not fetch any activities

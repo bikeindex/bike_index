@@ -13,7 +13,7 @@ vi.mock('./contexts/AuthContext', () => ({
   useAuth: () => ({
     isLoading: false,
     isAuthenticated: true,
-    athlete: { id: 12345 },
+    athlete: { id: '12345' },
     syncState: { isInitialSyncComplete: true, lastSyncedAt: Date.now() },
   }),
 }));

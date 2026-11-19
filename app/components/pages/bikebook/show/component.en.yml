@@ -16,13 +16,11 @@ en:
           any_suspension: Any suspension
           any_vehicle_type: Any vehicle type
           applied_filters: Applied filters
-          byline: A free reference from Bike Index, the non-profit bike registry.
           clear_filters: Clear filters
           configuration: Configuration
           configuration_examples: "(complete/frameset)"
           e_bike_classification: e-bike classification
           e_vehicle_motorized: e-Vehicle (motorized)
-          failed: The catalog didn't load. Reload the page to try again.
           frame_material: Frame material
           free_to_use: Bike Book data is free to use under CC BY-SA 4.0.
           handlebar_type: Handlebar type
@@ -30,6 +28,7 @@ en:
           jurisdiction: Jurisdiction
           learn_how_to_use_it: Learn how to use it
           learn_or_view_html: "%{learn_how_to_use_it} or %{view_the_raw_data}."
+          load_failed: The catalog didn't load.
           loading: Loading the catalog…
           loading_placeholder: Loading…
           manufacturers: Manufacturers
@@ -60,6 +59,7 @@ en:
           suspension: Suspension
           tagline: The world’s bicycle library — search, compare, and find your next
             ride.
+          try_again: Try again
           united_states: United States
           us_class_1: US Class 1
           us_class_2: US Class 2

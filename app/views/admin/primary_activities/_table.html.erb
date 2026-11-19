@@ -11,8 +11,8 @@
     <%= primary_activity.name %>
   <% end %>
 
-  <% table.column(label: "slug", classes: "only-dev-visible tw:text-xs") do |primary_activity| %>
-    <%= primary_activity.slug %>
+  <% table.column(label: "slug", classes: "only-dev-visible") do |primary_activity| %>
+    <%= render(UI::Code::Inline::Component.new(text: primary_activity.slug, small: true)) %>
   <% end %>
 
   <% table.column(label: "Display name", classes: "tw:text-xs") do |primary_activity| %>

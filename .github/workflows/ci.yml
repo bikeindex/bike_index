@@ -89,6 +89,9 @@ jobs:
       - name: Scan for common Rails security vulnerabilities using static analysis
         if: success() || failure()
         run: bin/brakeman
+      - name: Scan gems for known vulnerabilities
+        if: success() || failure()
+        run: bundle exec bundler-audit --update
 
       # Eventually this should be added:
       # - name: Scan for security vulnerabilities in JavaScript dependencies

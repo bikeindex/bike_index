@@ -6682,7 +6682,6 @@ nb:
           any_vehicle_type: Enhver kjøretøytype
           applied_filters: Anvendte filtre
           configuration: Konfigurasjon
-          failed: Katalogen lastet ikke inn. Last inn siden på nytt for å prøve igjen.
           loading: Laster inn katalogen…
           max: Maks
           min: Min.
@@ -6694,7 +6693,6 @@ nb:
           year: år
           filter_combobox:
             any: Noen
-          byline: En gratis referanse fra Bike Index, det ideelle sykkelregisteret.
           tagline: Verdens sykkelbibliotek – søk, sammenlign og finn din neste sykkeltur.
           activities: Aktiviteter
           activity_examples: "(f.eks. terrengsykling, sykkelcross osv.)"
@@ -6738,6 +6736,8 @@ nb:
             JavaScript. Alle dataene er åpne, under CC BY-SA 4.0, på %{repository}.
             Crawlere, skrapere og AI-agenter: Hent dataene der i stedet for fra denne
             siden.'
+          load_failed: Katalogen lastet ikke inn.
+          try_again: Prøv igjen
         donate_strip:
           donate: Donere
           pitch: Dette kule produktet er levert av den ideelle organisasjonen Bike

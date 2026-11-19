@@ -11,8 +11,13 @@ RSpec.describe BikebookController, type: :request do
       page = Capybara.string(response.body)
       bikebook = page.find("[data-controller='bikebook--page']")
       expect(bikebook["data-bikebook--page-manifest-url-value"]).to eq Integrations::Bikebook::Catalog::MANIFEST_URL
-      expect(bikebook).to have_css("[inert] #vehicle_models")
+      expect(bikebook).to have_css("[inert] #vehicle_models[placeholder='Loading…']")
         .and have_css("[role='status'] svg.tw\\:animate-spin")
+        .and have_css("[role='status']", text: "Loading the catalog…")
+      # its modules all asked for at once, beside the application's rather than repeating them
+      preloads = page.all("head link[rel='modulepreload']", visible: :all).map { it[:href] }
+      expect(preloads).to include(a_string_matching(%r{/bikebook/catalog-}), a_string_matching(%r{/lit-html-}))
+      expect(preloads).to eq preloads.uniq
       # the URL setting nothing, the search as it is until the browser fills it in
       expect(bikebook.find("[inert]")[:class]).to be_blank
 
@@ -24,8 +29,7 @@ RSpec.describe BikebookController, type: :request do
         .and have_css("meta[property='og:image'][content*='/assets/logos/bikebook']", visible: :all)
         .and have_css("meta[name='twitter:card'][content='summary']", visible: :all)
       expect(response.headers["X-Robots-Tag"]).to be_nil
-      expect(page.find("section.inverted")).to have_text("Bike Book data is free to use under CC BY-SA 4.0.")
-        .and have_link("Learn how to use it", href: "/bikebook/license")
+      expect(page.find("p", text: "Bike Book data is free to use under CC BY-SA 4.0.")).to have_link("Learn how to use it", href: "/bikebook/license")
         .and have_link("view the raw data", href: "https://github.com/bikeindex/bikebook")
         .and have_text("Learn how to use it or view the raw data.", normalize_ws: true)
     end
@@ -49,6 +53,9 @@ RSpec.describe BikebookController, type: :request do
         japan = Nokogiri::HTML5(response.body)
         get "/bikebook", params: {search: "1"}, headers: {"CF-IPCountry" => "US"}
         us = Nokogiri::HTML5(response.body)
+        # an EU member's visitor in the EU, which the catalog lists their models under
+        get "/bikebook", params: {search: "1"}, headers: {"CF-IPCountry" => "FR"}
+        france = Nokogiri::HTML5(response.body)
 
         shell = "template[data-bikebook--page-target='shell']"
         expect(us.at_css(shell).inner_html).to eq japan.at_css(shell).inner_html
@@ -56,8 +63,8 @@ RSpec.describe BikebookController, type: :request do
         expect(us.at_css(shell).inner_html).to include(%(data-jurisdiction="NY"))
         expect(japan.at_css("[inert]")[:class]).to eq "tw:invisible"
         expect(us.at_css("[inert]")[:class]).to be_blank
-        expect([japan, us].map { it.at_css("[data-controller='bikebook--page']").attributes.slice(*%w[market market-name jurisdiction].map { "data-bikebook--page-#{it}-value" }).transform_values(&:value).values })
-          .to eq [%w[JP Japan US], ["US", "United States", "US"]]
+        expect([japan, us, france].map { it.at_css("[data-controller='bikebook--page']").attributes.slice(*%w[market market-name jurisdiction].map { "data-bikebook--page-#{it}-value" }).transform_values(&:value).values })
+          .to eq [%w[JP Japan US], ["US", "United States", "US"], ["EU", "European Union", "US"]]
         expect(response.body).to include("https://github.com/bikeindex/bikebook (CC BY-SA 4.0). Clone that repository instead.")
         expect(us.at_css("[data-controller='bikebook--page'] > noscript").text).to include("AI agents: get the data there")
           .and include("github.com/bikeindex/bikebook")

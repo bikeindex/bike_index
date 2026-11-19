@@ -22,10 +22,29 @@ const blocks = new Map()
 const orders = new Map()
 const sold = new Map()
 
+// A stalled download never fails on its own. The wait restarts with each part, as the index takes most of a minute on 3G
+const STALL_TIMEOUT = 30000
+
 const fetchJson = async (url) => {
-  const response = await fetch(url)
-  if (!response.ok) throw new Error(`${url} answered ${response.status}`)
-  return response.json()
+  const stalled = new AbortController()
+  let timeout
+  const waiting = () => {
+    clearTimeout(timeout)
+    timeout = setTimeout(() => stalled.abort(), STALL_TIMEOUT)
+  }
+  waiting()
+  try {
+    const response = await fetch(url, { signal: stalled.signal })
+    if (!response.ok) throw new Error(`${url} answered ${response.status}`)
+    return await new Response(response.body.pipeThrough(new TransformStream({
+      transform: (chunk, stream) => {
+        waiting()
+        stream.enqueue(chunk)
+      }
+    }))).json()
+  } finally {
+    clearTimeout(timeout)
+  }
 }
 
 const list = (value) => (value ?? '').split(',').filter(Boolean)
@@ -77,7 +96,10 @@ async function load ({ rulesUrl, similarityUrl: similarityModule }) {
     group_key: `${model.manufacturer}/${model.model_group ?? model.model.split(' ')[0]}`,
     searchText: `${model.display}\n${model.id}`.toLowerCase(),
     // a current model's first year where it's sold ahead of the calendar
-    sortYear: model.final_year ?? Math.max(model.first_year, currentYear)
+    sortYear: model.final_year ?? Math.max(model.first_year, currentYear),
+    // drawn per worker, which each page load starts, and again by `rotate`, so a reload features others and the page's
+    // own changes the same
+    chance: Math.random()
   }))
   byId = new Map(models.map((model) => [model.id, model]))
   // the index labels the out of class markers, which the vocabulary has no record of: "Out of class in California"
@@ -208,44 +230,55 @@ function matching (params) {
   return { filteredCount: filtered.length, matches, unfiltered: Boolean(exact) && matches.length > 0 && !passes(exact) }
 }
 
-// The `count` of models the filters leave, and featured_rules' `COUNT` of them, by its rules, in the filters' order.
+// The `count` of models the filters leave, and featured_rules' `COUNT` of them, by its rules, the models tying on them
+// by `chance`, shown cheapest first unless the reader picked a sort, and whether a rotation could pick others.
 // `legalClasses` are the e-bike classes legal where the visitor is, by which every e-bike is legal where there are none
 function featured ({ params, legalClasses }) {
-  const { COUNT, requirements, preferences, quotas } = rules
+  const { COUNT, requirements, preferences, quotas, maximums } = rules
   const legalEbike = (model) => !legalClasses.length || legalClasses.some((propulsion) => propelled(model, propulsion, params.jurisdiction))
-  const filtered = sorted(params).filter(filter(params))
-  const candidates = requirements.reduce((models, requirement) => {
-    const passing = models.filter((model) => requirement(model, { legalEbike, params }))
-    return passing.length ? passing : models
-  }, filtered)
+  const filtered = models.filter(filter(params))
+  const candidates = requirements.reduce((models, requirement) => narrow(models, (model) => requirement(model, { legalEbike, params })), filtered)
+    .toSorted((a, b) => a.chance - b.chance)
   const count = Math.min(COUNT, candidates.length)
   // a share's models and the others each at least their part of the picks
   const minimums = quotas.flatMap(({ matches, share, minimum = Math.round(count * share) }) => share == null
     ? [{ matches, minimum }]
     : [{ matches, minimum }, { matches: (model) => !matches(model), minimum: count - minimum }])
+  // each candidate's quota matches, and the different ones among them, which bound the ranks any can reach
+  const matched = new Map(candidates.map((model) => [model, quotas.map(({ matches }) => matches(model))]))
+  const kinds = [...new Map([...matched.values()].map((each) => [each.join(), each])).values()]
   const picked = []
   while (picked.length < count) {
-    const pool = minimums.reduce((models, { matches, minimum }) => {
-      const narrowed = minimum - picked.filter(matches).length >= count - picked.length && models.filter(matches)
-      return narrowed?.length ? narrowed : models
-    }, candidates.filter((model) => !picked.includes(model)))
+    const capped = maximums.reduce((models, { matches, maximum }) => picked.filter(matches).length < maximum
+      ? models
+      : narrow(models, (model) => !matches(model)), candidates.filter((model) => !picked.includes(model)))
+    const pool = minimums.reduce((models, { matches, minimum }) => minimum - picked.filter(matches).length >= count - picked.length
+      ? narrow(models, matches)
+      : models, capped)
     // a share's models while the picks fall short of it and the others while they're over, a minimum's until it's met.
     // A quota met ranks every model alike
     const behind = quotas.map(({ matches, share, minimum }) => (share == null ? minimum : share * picked.length) - picked.filter(matches).length)
-    const helps = (model) => quotas.map(({ matches, share }, index) => share == null
-      ? behind[index] <= 0 || matches(model)
-      : behind[index] === 0 || (behind[index] > 0) === matches(model))
-    const ranks = (model) => [...preferences.map((prefers) => prefers(model, { picked })), ...helps(model)]
-    // no model outranks one meeting every rank
+    const helps = (matching) => quotas.map(({ share }, index) => share == null
+      ? behind[index] <= 0 || matching[index]
+      : behind[index] === 0 || (behind[index] > 0) === matching[index])
+    const ranks = (model) => [...preferences.map((prefers) => prefers(model, { picked })), ...helps(matched.get(model))]
+    // no model outranks one reaching the ranks a model with every preference would
+    const ceiling = kinds.map((each) => [...preferences.map(() => true), ...helps(each)]).reduce((top, each) => outranks(each, top) ? each : top)
     let best = null
     for (const model of pool) {
       const modelRanks = ranks(model)
       if (!best || outranks(modelRanks, best.ranks)) best = { model, ranks: modelRanks }
-      if (modelRanks.every(Boolean)) break
+      if (!outranks(ceiling, modelRanks)) break
     }
     picked.push(best.model)
   }
-  return { count: filtered.length, featured: candidates.filter((model) => picked.includes(model)) }
+  const shown = params.sort || params.year_dir || params.price_dir ? params : { sort: 'price' }
+  return { count: filtered.length, featured: sorted(shown).filter((model) => picked.includes(model)), rotatable: candidates.length > COUNT }
+}
+
+// featured's picks drawn afresh, as a reload would
+function rotate () {
+  for (const model of models) model.chance = Math.random()
 }
 
 // The models of the `model` id's group by year, newest first, each under the newest it's sold in - so each once, and a
@@ -266,20 +299,22 @@ function group ({ model: id, market, scope }) {
   }
 }
 
+// `models` that `keep` keeps, unless that's none
+const narrow = (models, keep) => (kept => kept.length ? kept : models)(models.filter(keep))
+
 // Whether `a` wins at the first rank the two differ at
 const outranks = (a, b) => {
   const index = a.findIndex((value, each) => value !== b[each])
   return index !== -1 && a[index]
 }
 
-// Newest and priciest first unless asked otherwise, by year then price unless `sort` puts price first, the unpriced last
+// Newest and cheapest first unless asked otherwise, by year then price unless `sort` puts price first, the unpriced last
 // either way. Kept per order, so a query only has to filter
 function sorted ({ sort, year_dir: yearDir, price_dir: priceDir }) {
   const key = `${sort}/${yearDir}/${priceDir}`
   if (!orders.has(key)) {
-    const direction = (dir) => dir === 'asc' ? 1 : -1
-    const byYear = (a, b) => direction(yearDir) * (a.sortYear - b.sortYear)
-    const byPrice = (a, b) => (a.msrp_cents == null) - (b.msrp_cents == null) || direction(priceDir) * (a.msrp_cents - b.msrp_cents)
+    const byYear = (a, b) => (yearDir === 'asc' ? 1 : -1) * (a.sortYear - b.sortYear)
+    const byPrice = (a, b) => (a.msrp_cents == null) - (b.msrp_cents == null) || (priceDir === 'desc' ? -1 : 1) * (a.msrp_cents - b.msrp_cents)
     const [first, second] = sort === 'price' ? [byPrice, byYear] : [byYear, byPrice]
     orders.set(key, [...models].sort((a, b) => first(a, b) || second(a, b) || (a.id < b.id ? -1 : 1)))
   }
@@ -338,7 +373,7 @@ function propelled ({ electric, e_vehicle_classifications: carried = [] }, propu
 
 self.onmessage = async ({ data: { id, type, ...args } }) => {
   try {
-    self.postMessage({ id, result: await { start, load, comparison: compare, search, featured, group, vehicles, displays, similar }[type](args) })
+    self.postMessage({ id, result: await { start, load, comparison: compare, search, featured, rotate, group, vehicles, displays, similar }[type](args) })
   } catch (error) {
     self.postMessage({ id, error: error.message })
   }

@@ -9,9 +9,11 @@ import { fragmentOf, renderInto } from 'bikebook/render'
 
 // `jurisdictions` names the codes classifications are in, which the catalog doesn't, and `paintColors` are Bike Index's
 // colors' displays by their names, which its colorways' colors are. `onPicks` takes what `ids` render from, as soon as
-// it's in, where there are any, and `comparing` fetches the comparison alongside the index rather than after it
-export async function loadCatalog (manifestUrl, ids = [], jurisdictions = {}, paintColors = {}, { onPicks = () => {}, comparing } = {}) {
+// it's in, where there are any, and `comparing` fetches the comparison alongside the index rather than after it. Aborting
+// `signal` ends the worker
+export async function loadCatalog (manifestUrl, ids = [], jurisdictions = {}, paintColors = {}, { onPicks = () => {}, comparing, signal } = {}) {
   const worker = new Worker(import.meta.resolve('bikebook/catalog_worker'), { type: 'module' })
+  signal?.addEventListener('abort', () => worker.terminate())
   const pending = new Map()
   let nextId = 0
   worker.onmessage = ({ data: { id, result, error } }) => {
@@ -48,6 +50,7 @@ export async function loadCatalog (manifestUrl, ids = [], jurisdictions = {}, pa
       }),
       search: (params, page, perPage) => call('search', { params, page, perPage }),
       featured: (params, legalClasses) => call('featured', { params, legalClasses }),
+      rotate: () => call('rotate'),
       group: (id, { market, market_scope: scope }) => call('group', { model: id, market, scope }),
       displays: (ids) => call('displays', { ids })
     }
@@ -71,14 +74,14 @@ export class CatalogComboboxSource {
   }
 
   // A pick re-renders the page, leaving the gem's debounced refilter behind on the combobox it replaced
-  async filter (combobox, inputType, { primed = false } = {}) {
+  async filter (combobox, inputType, { primed = false, signal } = {}) {
     if (!combobox.element.isConnected) return
 
     const query = new URL(combobox.asyncSrcValue, window.location.origin).searchParams
     this.params = { ...Object.fromEntries(query), q: combobox._fullQuery }
     this.#generation++
     // The gem settles a pending filter only on an input type, as its own request falls back to
-    await this.#render(combobox, 0, { inputType: primed ? undefined : inputType || 'hw:unspecifiedInput', primed })
+    await this.#render(combobox, 0, { inputType: primed ? undefined : inputType || 'hw:unspecifiedInput', primed, signal })
   }
 
   // The gem fetches the first page through a lazy turbo-frame on first open; list it here instead
@@ -86,10 +89,10 @@ export class CatalogComboboxSource {
     return this.filter(combobox, undefined, { primed: true })
   }
 
-  async #render (combobox, page, { inputType, primed }) {
+  async #render (combobox, page, { inputType, primed, signal }) {
     const generation = this.#generation
     const { total, filteredCount, unfiltered, models, nextPage } = await this.catalog.search(this.params, page, this.catalog.kit.per_page)
-    if ((page && generation !== this.#generation) || !combobox.element.isConnected) return
+    if (signal?.aborted || (page && generation !== this.#generation) || !combobox.element.isConnected) return
 
     const forId = combobox.element.dataset.asyncId
     const listbox = combobox._actingListbox
