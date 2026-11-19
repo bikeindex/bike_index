@@ -97,6 +97,16 @@ RSpec.describe MyAccounts::PosRegistrationMatchesController, type: :request do
       end
     end
 
+    context "POS registration really deleted" do
+      it "sends them to their account" do
+        BikeJobs::BikeDeleterJob.new.perform(pos_registration_match.pos_bike_id, true)
+
+        get url
+        expect(response).to redirect_to(my_account_path)
+        expect(flash[:notice]).to include("can't be combined here")
+      end
+    end
+
     context "a review candidate" do
       before { pos_registration_match.update!(review_reasons: ["impounded"]) }
 
