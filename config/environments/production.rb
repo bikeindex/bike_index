@@ -73,10 +73,12 @@ Rails.application.configure do
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
   config.force_ssl = true
 
-  # Turns away IP-sweeping scanners, which don't send a bikeindex.org Host. A direct request that
-  # does send one still gets in — the Cloud66 firewall, open only to Cloudflare's IPs, is what stops it.
+  base_url = URI.parse(ENV.fetch("BASE_URL", "https://bikeindex.org"))
+
+  # Turns away IP-sweeping scanners, which don't send our Host. A direct request that does send
+  # it still gets in — the Cloud66 firewall, open only to Cloudflare's IPs, is what stops it.
   # kamal-proxy's health check hits /up by container address
-  config.hosts = ["bikeindex.org", /.*\.bikeindex\.org/i]
+  config.hosts = [base_url.host, /.*\.#{Regexp.escape(base_url.host)}/i]
   config.host_authorization = {exclude: ->(request) { request.path == "/up" }}
 
   # Prepend all log lines with the following tags.
@@ -114,7 +116,6 @@ Rails.application.configure do
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
 
-  base_url = URI.parse(ENV.fetch("BASE_URL", "https://bikeindex.org"))
   config.action_mailer.default_url_options = {protocol: base_url.scheme, host: base_url.host}
   routes.default_url_options = config.action_mailer.default_url_options
 
