@@ -6,7 +6,7 @@ module CallbackJobs
 
     def perform(manufacturer_id)
       manufacturer = Manufacturer.find(manufacturer_id)
-      slugs = [manufacturer.legacy_slug, manufacturer.secondary_slug].compact_blank
+      slugs = [Slugifyer.legacy_manufacturer(manufacturer.name), manufacturer.secondary_slug].compact_blank
 
       matching_others(Bike, slugs).find_each { |bike| update_bike(bike, manufacturer_id) }
       matching_others(Component, slugs).find_each { it.update(manufacturer_id:, manufacturer_other: nil) }

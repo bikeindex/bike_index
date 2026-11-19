@@ -48,17 +48,23 @@ RSpec.describe Manufacturer, type: :model do
       mnfg = FactoryBot.create(:manufacturer, name: "Poopy PANTERS")
       expect(Manufacturer.friendly_find("poopy panters")).to eq(mnfg)
     end
-    it "finds by the slug and the legacy slug" do
+    it "finds by the slug and the previous slugs" do
       mnfg = FactoryBot.create(:manufacturer, name: "Kona Bicycle Company")
       expect(mnfg.slug).to eq "kona-bicycle-company"
-      expect(mnfg.legacy_slug).to eq "kona"
+      expect(mnfg.previous_slugs).to eq ["kona"]
       expect(Manufacturer.friendly_find("kona-bicycle-company")).to eq mnfg
       expect(Manufacturer.friendly_find("kona")).to eq mnfg
       expect(Manufacturer.friendly_find("Kona Bikes")).to eq mnfg
 
       kona = FactoryBot.create(:manufacturer, name: "Kona")
-      expect(kona.legacy_slug).to eq "kona"
+      expect(kona.previous_slugs).to eq []
       expect(Manufacturer.friendly_find("kona")).to eq kona
+      expect(Manufacturer.friendly_find("Kona Bicycles")).to eq kona
+      expect(Manufacturer.friendly_find("kona-bicycle-company")).to eq mnfg
+
+      mnfg.update(name: "Kona Bicycle Works")
+      expect(mnfg.reload.slug).to eq "kona-bicycle-works"
+      expect(mnfg.previous_slugs).to eq %w[kona kona-bicycle-company]
       expect(Manufacturer.friendly_find("kona-bicycle-company")).to eq mnfg
     end
     it "removes Accell (because it's widespread mnfg)" do
@@ -88,9 +94,9 @@ RSpec.describe Manufacturer, type: :model do
 
       it "finds each by its own identifier" do
         expect(manufacturer.to_param).to eq "#{other_manufacturer.id}-bikes"
-        expect(manufacturer.legacy_slug).to eq "#{other_manufacturer.id}_bikes"
+        expect(manufacturer.previous_slugs).to eq ["#{other_manufacturer.id}_bikes"]
         expect(Manufacturer.friendly_find(manufacturer.to_param)).to eq manufacturer
-        expect(Manufacturer.friendly_find(manufacturer.legacy_slug)).to eq manufacturer
+        expect(Manufacturer.friendly_find("#{other_manufacturer.id}_bikes")).to eq manufacturer
         expect(Manufacturer.friendly_find(name)).to eq manufacturer
         expect(Manufacturer.friendly_find(other_manufacturer.id.to_s)).to eq other_manufacturer
       end

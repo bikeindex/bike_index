@@ -7,13 +7,13 @@
 #  close_year         :integer
 #  description        :text
 #  frame_maker        :boolean
-#  legacy_slug        :string
 #  logo               :string(255)
 #  logo_source        :string(255)
 #  motorized_only     :boolean          default(FALSE)
 #  name               :string(255)
 #  notes              :text
 #  open_year          :integer
+#  previous_slugs     :string           default([]), not null, is an Array
 #  priority           :integer
 #  secondary_slug     :string
 #  slug               :string(255)
@@ -70,8 +70,10 @@ class Manufacturer < ApplicationRecord
       if n.is_a?(Integer) || n.match(/\A\d+\z/).present?
         where(id: n).first
       else
+        slug = Slugifyer.slugify(n)
         legacy_slug = Slugifyer.legacy_manufacturer(n)
-        find_by_slug(Slugifyer.slugify(n)) || find_by_legacy_slug(legacy_slug) ||
+        find_by_slug(slug) ||
+          where(slug: legacy_slug).or(where("previous_slugs && ARRAY[?]::varchar[]", [slug, legacy_slug])).first ||
           find_by_secondary_slug(legacy_slug)
       end
     end
@@ -123,7 +125,7 @@ class Manufacturer < ApplicationRecord
     self.name = Binxtils::InputNormalizer.string(name)
     self.secondary_slug = Slugifyer.legacy_manufacturer(secondary_name)
     self.slug = Slugifyer.slugify(name)
-    self.legacy_slug = Slugifyer.legacy_manufacturer(name)
+    self.previous_slugs = ([*previous_slugs, slug_in_database, Slugifyer.legacy_manufacturer(name)].compact_blank - [slug]).uniq
     self.website = website.present? ? Urlifyer.urlify(website) : nil
     self.logo_source = logo.present? ? (logo_source || "manual") : nil
     self.twitter_name = twitter_name.present? ? twitter_name.gsub(/\A@/, "") : nil

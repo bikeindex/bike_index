@@ -2379,7 +2379,7 @@ CREATE TABLE public.manufacturers (
     priority integer,
     motorized_only boolean DEFAULT false,
     secondary_slug character varying,
-    legacy_slug character varying
+    previous_slugs character varying[] DEFAULT '{}'::character varying[] NOT NULL
 );
 
 
