@@ -2428,8 +2428,8 @@ RSpec.describe "Bike Book", :js, type: :system do
           size_names: [['S', 'M'], ['M'], ['S', 'M'], ['S'], line],
           size_stack: [null, null, null, [500], line],
           size_reach: [null, null, null, [450], line.map(() => 400)],
-          size_min_rider_height: [[1500, 1700], [1700], [1500, 1700], null, line.map((stack) => stack + 950)],
-          size_max_rider_height: [[1600, 1800], [1800], [1600, 1800], null, line.map((stack) => stack + 1050)]
+          size_rider_height_min: [[1500, 1700], [1700], [1500, 1700], null, line.map((stack) => stack + 950)],
+          size_rider_height_max: [[1600, 1800], [1800], [1600, 1800], null, line.map((stack) => stack + 1050)]
         })
         const riders = scoring([model('a', false), model('kid', false), model('woman', false), model('unisex', false)], { target_riders: [null, ['kid'], ['woman'], null] })
         return [...propulsions, ids(configurations), ids(configurations, 'same_configuration=1'),

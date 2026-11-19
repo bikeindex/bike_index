@@ -61,8 +61,9 @@ export const GROUPS = {
   handlebar: { label: 'Handlebar type', fields: { handlebar_type: 'same' } },
   geometry: { label: 'Geometry', separate: true, shares: { head_angle: 3 }, fields: { head_angle: 'numeric', seat_angle: 'numeric', stack_reach: 'numeric', bb_drop: 'numeric', chainstay_gap: 'numeric' } },
   fit: { label: 'Rider size', unlisted: 'Only for sizes fitting riders under 5′5″ or over 6′2″', fields: { rider_height: 'fit' } },
-  // a kids' bike unlike any other, a women's or adaptive one only a little
-  riders: { label: 'Target riders', shares: { kid: 3 }, fields: { kid: 'same', target_riders: 'set' } },
+  // a kids' bike unlike any other, a women's or adaptive one only a little. Only a penalty, as nearly every model is for
+  // the same riders, which would otherwise outweigh what tells them apart
+  riders: { label: 'Target riders', penalty: true, shares: { kid: 3 }, fields: { kid: 'same', target_riders: 'set' } },
   tires: { label: 'Tire clearance', fields: { tire_clearance: 'roomier' } },
   suspension: { label: 'Suspension', same: 'suspension travel', fields: { travel_front: 'numeric', travel_rear: 'numeric', suspension: 'same' } },
   ebike: { label: 'E-vehicle motor and battery', same: 'motor and battery attributes', fields: { modes: 'set', assist_speed: 'numeric', throttle_speed: 'numeric', battery_size: 'numeric', motor_kind: 'same' } },
@@ -172,7 +173,7 @@ export const scorer = (models, { format, fields }, activities) => {
   // the same rider, or a kids' by its wheel size
   const sizeValue = (field, index, size) => fields[field]?.[index]?.[size] ?? null
   const statedHeights = (index, size) => {
-    const [min, max] = ['size_min_rider_height', 'size_max_rider_height'].map((field) => sizeValue(field, index, size))
+    const [min, max] = ['size_rider_height_min', 'size_rider_height_max'].map((field) => sizeValue(field, index, size))
     return min == null && max == null ? null : [min ?? max - SPAN, max ?? min + SPAN]
   }
   const measureOf = (index, size) => {
@@ -239,13 +240,14 @@ export const scorer = (models, { format, fields }, activities) => {
       rider_height: height && (height < SHORT || height > TALL) ? height : null
     }
     // each slider's weight shared among the fields the model lists, so a rigid bike, listing no travel, counts its suspension in full
-    const listed = Object.entries(GROUPS).flatMap(([group, { fields, separate, shares = {} }]) => {
+    const listed = Object.entries(GROUPS).flatMap(([group, { fields, separate, penalty, shares = {} }]) => {
       const present = Object.entries(fields).filter(([field]) => own[field] != null)
       const divisor = present.reduce((sum, [field]) => sum + (shares[field] ?? 1), 0) / (separate ? Math.sqrt(present.length) : 1)
       return present.map(([field, kind]) => ({
         group,
         field,
         kind,
+        penalty,
         scale: SCALED.includes(kind) ? scaleOf(field, family) : null,
         weight: (weights[group] ?? 0) * (shares[field] ?? 1) / divisor
       }))
@@ -256,7 +258,7 @@ export const scorer = (models, { format, fields }, activities) => {
       const weighted = fields.filter(({ weight }) => weight > 0)
       return {
         weighted,
-        available: weighted.reduce((total, { weight }) => total + weight, 0),
+        available: weighted.reduce((total, { weight, penalty }) => penalty ? total : total + weight, 0),
         required: [...weighted.filter(({ group, kind }) => weights[group] === MAX_WEIGHT && REQUIRABLE.includes(kind)), ...wheels]
       }
     })
@@ -273,12 +275,12 @@ export const scorer = (models, { format, fields }, activities) => {
 
       let shared = 0
       let total = 0
-      for (const { field, kind, scale, weight } of weighted) {
+      for (const { field, kind, scale, weight, penalty } of weighted) {
         const value = columns[field][index]
         // a frame's weight isn't a whole bike's
         if (value == null || (field === 'price' && candidate.msrp_currency !== model.msrp_currency) ||
           (field === 'total_weight' && complete(candidate) !== complete(model))) continue
-        shared += weight
+        if (!penalty) shared += weight
         total += weight * KINDS[kind](own[field], value, scale)
       }
       const score = (total + (available - shared) * UNLISTED) / available

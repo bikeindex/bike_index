@@ -7,9 +7,9 @@ import { pickedClassifications, renderClassCards } from 'bikebook/templates/vehi
 import { tooltip } from 'bikebook/templates/ui/tooltip'
 import { FILTERS, LISTS, RANGES, SINGLES, ordered, searching, toQuery } from 'bikebook/query'
 import { fragmentOf, renderInto } from 'bikebook/render'
-import { chosenSizes, pickedSizes, preferredSize } from 'bikebook/sizes'
+import { chosenSizes, preferredSize } from 'bikebook/sizes'
 import { array } from 'bikebook/templates/values'
-import { groupId, vehicleIds } from 'bikebook/vehicle_models'
+import { groupId, pickedSizes, vehicleIds } from 'bikebook/vehicle_models'
 import { settingsFrom } from 'bikebook/similarity'
 import { chosenPhotos, MAX_COMPARE, VehicleViewer } from 'bikebook/vehicle_viewer'
 
