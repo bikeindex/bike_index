@@ -68,8 +68,7 @@ class Manufacturer < ApplicationRecord
       end
     end
 
-    # A previous slug that's another manufacturer's slug, or shared by several manufacturers. friendly_find
-    # returns the manufacturer with the slug, or the first alphabetically
+    # A previous slug that's another manufacturer's slug, or shared by several manufacturers
     def slug_collisions
       unscoped.joins("CROSS JOIN unnest(manufacturers.previous_slugs) AS previous_slug")
         .joins("LEFT JOIN manufacturers current ON current.slug = previous_slug")
