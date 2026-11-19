@@ -8,21 +8,18 @@ RSpec.describe Pages::Registrations::Show::ViewSwitcher::Component, type: :compo
     described_class.new(bike:, current_view: [:public, nil], available_views:, label: "Public", color: :gray, current_user:)
   end
 
-  context "single view, toggle not enabled" do
-    it "renders a plain badge" do
-      render_inline(component)
-      expect(page).to have_text("Public")
-      expect(page).to have_no_link("View in Legacy Viewer")
-    end
+  it "offers only the legacy page when there's no other view to switch to" do
+    render_inline(component)
+    expect(page).to have_css("li[role='menuitem'] span[data-active='true']", text: "Viewing as Public")
+    expect(page).to have_no_css("a")
+    form = page.find("form[action='/registrations/#{bike.id}/update_legacy_view?show_legacy=true'][method='post']")
+    expect(form["data-controller"]).to eq "csrf-refresh"
+    expect(form).to have_button("View in Legacy Viewer")
   end
 
-  context "bike_show_redesign_toggle enabled" do
-    before { Flipper.enable_actor(:bike_show_redesign_toggle, current_user) }
-
-    it "renders the dropdown with a link to the legacy viewer" do
-      render_inline(component)
-      expect(page).to have_link("View in Legacy Viewer", href: "/bikes/#{bike.id}?no_redesign=true")
-    end
+  it "leaves the request's query out of the cached legacy form" do
+    with_request_url("/registrations/#{bike.id}?t=token") { render_inline(component) }
+    expect(page).to have_css("form[action='/registrations/#{bike.id}/update_legacy_view?show_legacy=true']")
   end
 
   context "with another view available" do

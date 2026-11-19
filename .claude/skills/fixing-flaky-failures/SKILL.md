@@ -81,6 +81,8 @@ help), and a wait you can't say what it's waiting for. A bump is honest when the
 assertion starts before the work does — a held route released, a job enqueued,
 an expensive response — and the comment names that.
 
+**`click_button(wait:)` doesn't extend the click.** It covers finding the button; the click, and its wait for the navigation it starts, gets `Capybara.default_max_wait_time`. `using_wait_time(10) { click_button ... }` covers both.
+
 ## Diagnose before you touch anything
 
 ### 1. Get the real failure, not the summary

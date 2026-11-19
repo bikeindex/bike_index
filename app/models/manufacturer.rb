@@ -39,6 +39,8 @@ class Manufacturer < ApplicationRecord
   validates_uniqueness_of :name
   validates_uniqueness_of :slug
   validates_uniqueness_of :secondary_slug, allow_nil: true
+  # friendly_find reads an all-digit string as an id
+  validates :slug, :secondary_slug, format: {without: /\A\d+\z/}
   validate :ensure_non_blocking_name
 
   before_validation :set_calculated_attributes

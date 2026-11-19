@@ -36,7 +36,7 @@
 
         <% nil_count = available_feedbacks.where(kind: nil).count %>
 
-        <%= render(UI::TableList::Component.new(wide_definition: true)) do |list| %>
+        <%= render(UI::Table::List::Component.new(wide_definition: true)) do |list| %>
           <% Feedback.kinds.each_with_index do |kind, index| %>
             <% count = available_feedbacks.where(kind: kind).count %>
             <% next unless count > 0 %>

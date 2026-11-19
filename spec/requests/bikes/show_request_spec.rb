@@ -6,8 +6,12 @@ RSpec.describe "BikesController#show", type: :request do
   let(:ownership) { FactoryBot.create(:ownership) }
   let(:current_user) { ownership.creator }
   let(:bike) { ownership.bike }
-  # This is required by show, if it isn't present it raises ReadOnlyError
-  before { RearGearType.fixed }
+  # RearGearType is required by show, if it isn't present it raises ReadOnlyError.
+  # The redesign is the default, so opting out is what keeps this page reachable
+  before do
+    RearGearType.fixed
+    post update_legacy_view_registration_path(bike, show_legacy: true)
+  end
 
   context "example bike" do
     it "shows the bike" do
@@ -745,46 +749,64 @@ RSpec.describe "BikesController#show", type: :request do
       end
     end
   end
-  context "bike_show_redesign_toggle flag" do
-    it "renders the legacy page when the flag is disabled" do
+  context "not opted out of the redesign" do
+    before { post update_legacy_view_registration_path(bike, show_legacy: false) }
+
+    it "redirects the html page but still renders the qr code png" do
       get "#{base_url}/#{bike.id}"
-      expect(response).to render_template(:show)
+      expect(response).to redirect_to(registration_path(bike))
+
+      get "#{base_url}/#{bike.id}.png"
+      expect(response.status).to eq(200)
     end
 
-    context "flag enabled for the current user" do
-      before { Flipper.enable_actor(:bike_show_redesign_toggle, current_user) }
+    it "redirects with the query params, so scanned stickers aren't lost" do
+      get "#{base_url}/#{bike.id}?scanned_id=XD8888&organization_id=cool-org"
+      expect(response).to redirect_to(registration_path(bike, scanned_id: "XD8888", organization_id: "cool-org"))
+    end
 
-      it "redirects the html page but still renders the qr code png" do
+    it "redirects a Turbo submission, which asks for a turbo_stream" do
+      get "#{base_url}/#{bike.id}", headers: {"Accept" => "text/vnd.turbo-stream.html, text/html, application/xhtml+xml"}
+      expect(response).to redirect_to(registration_path(bike))
+    end
+
+    it "normalizes the id, rather than passing it along" do
+      get "#{base_url}/r/#{bike.id}"
+      expect(response).to redirect_to(registration_path(bike))
+
+      get "#{base_url}/embed"
+      expect(response).to redirect_to(registration_path("embed".to_i(36)))
+      follow_redirect!
+      expect(response.status).to eq 404
+
+      get "#{base_url}/r"
+      expect(response.status).to eq 404
+    end
+
+    it "lets a scanned sticker id through to its redirect" do
+      get "#{base_url}/scannedUC123?organization_id=cool-org"
+      expect(response).to redirect_to(scanned_bike_path("UC123", organization_id: "cool-org"))
+    end
+
+    context "signed out" do
+      let(:current_user) { nil }
+
+      it "redirects" do
         get "#{base_url}/#{bike.id}"
         expect(response).to redirect_to(registration_path(bike))
-
-        get "#{base_url}/#{bike.id}.png"
-        expect(response.status).to eq(200)
       end
 
-      it "redirects with the query params, so scanned stickers aren't lost" do
-        get "#{base_url}/#{bike.id}?scanned_id=XD8888&organization_id=cool-org"
-        expect(response).to redirect_to(registration_path(bike, scanned_id: "XD8888", organization_id: "cool-org"))
-      end
-
-      it "renders the legacy page when no_redesign is passed" do
-        get "#{base_url}/#{bike.id}?no_redesign=true"
-        expect(response).to render_template(:show)
-      end
-
-      context "user opted into the legacy view" do
-        before { current_user.update(feature_registration_show_legacy: true) }
-
+      context "session opted into the legacy view" do
         it "renders the legacy page" do
+          post update_legacy_view_registration_path(bike, show_legacy: true)
           get "#{base_url}/#{bike.id}"
           expect(response).to render_template(:show)
         end
       end
     end
 
-    context "flag enabled only for another user" do
-      let(:other_user) { FactoryBot.create(:user_confirmed) }
-      before { Flipper.enable_actor(:bike_show_redesign_toggle, other_user) }
+    context "user opted into the legacy view" do
+      before { current_user.update(feature_registration_show_legacy: true) }
 
       it "renders the legacy page" do
         get "#{base_url}/#{bike.id}"

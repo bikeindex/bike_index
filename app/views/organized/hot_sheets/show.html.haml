@@ -78,7 +78,7 @@
                     = render(UI::Badge::Component.new(text: "Bike was recovered!", color: :success, solid: true, size: :lg))
                 %div{class: "tw:mb-1"}
                   = link_to organized_bike_text(bike, skip_creation: true), bike_link
-                = render(UI::TableList::Component.new(classes: "tw:mb-0!")) do |list|
+                = render(UI::Table::List::Component.new(classes: "tw:mb-0!")) do |list|
                   - list.with_row(label: "Serial", value: render(Atoms::Serial::Component.new(bike:, user: current_user)))
                   - if stolen_record.recovered?
                     - list.with_row(label: tag.span("Recovered", class: "text-success"),

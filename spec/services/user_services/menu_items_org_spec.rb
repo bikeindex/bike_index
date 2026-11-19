@@ -133,11 +133,15 @@ RSpec.describe UserServices::MenuItemsOrg do
         end
       end
 
-      it "renders the one row with nowhere to link as disabled" do
+      it "links adding an impounded vehicle to the notification form, opened on impounded" do
         impounded = items.find { |item| item[:key] == :impounded }
+        parking = items.find { |item| item[:key] == :parking }
 
-        expect(impounded[:children].last).to eq({type: :disabled, label: "Add an Impounded Vehicle"})
-        expect(items.select { |item| item[:type] == :disabled }).to eq([])
+        expect(impounded[:children].last).to eq(link_item("Add an Impounded Vehicle",
+          "/o/#{slug}/parking_notifications/new?kind=impound_notification",
+          match_params: {kind: "impound_notification"}))
+        expect(parking[:children].last).to eq(link_item("New unregistered notification",
+          "/o/#{slug}/parking_notifications/new", match_params: {kind: nil}))
       end
 
       it "points reports at the overview dashboard" do
@@ -172,8 +176,8 @@ RSpec.describe UserServices::MenuItemsOrg do
           link_item("Impounding", "/o/#{slug}/manage_impounding/edit"),
           link_item("Stolen Bike Hot Sheet", "/o/#{slug}/hot_sheet/edit"),
           link_item("Registration form settings", "/o/#{slug}/registrations/settings"),
-          link_item("Registration sequences", "/o/#{slug}/registration_sequences",
-            match_paths: ["/o/#{slug}/registration_sequences/**", "/o/#{slug}/registration_sequence_pages/**"])
+          link_item("Education courses", "/o/#{slug}/education_courses",
+            match_paths: ["/o/#{slug}/education_courses/**", "/o/#{slug}/education_course_pages/**"])
         ])
       end
     end
@@ -184,6 +188,77 @@ RSpec.describe UserServices::MenuItemsOrg do
       it "drops the settings group and messaging" do
         expect(items.map { |item| item[:key] }.compact).to eq(%i[registrations impounded parking bulk])
         expect(items.map { |item| item[:label] }).to_not include("Messaging")
+      end
+
+      it "drops bulk imports, which only an admin can open, and keeps exports" do
+        bulk = items.find { |item| item[:key] == :bulk }
+
+        expect(bulk[:children].map { |child| child[:label] }).to eq(["Exports"])
+      end
+    end
+
+    context "with impound_bikes but not parking_notifications" do
+      let(:organization) do
+        FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["impound_bikes"])
+      end
+
+      it "renders adding an impounded vehicle as disabled, there being nowhere to link" do
+        impounded = items.find { |item| item[:key] == :impounded }
+
+        expect(impounded[:children].last).to eq({type: :disabled, label: "Add an Impounded Vehicle"})
+      end
+    end
+
+    context "with only show_bulk_import" do
+      let(:organization) do
+        FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["show_bulk_import"])
+      end
+
+      it "drops the whole group for a member" do
+        expect(items.map { |item| item[:key] }).to_not include(:bulk)
+      end
+
+      context "for an admin" do
+        let(:current_user) { FactoryBot.create(:organization_admin, organization:) }
+
+        it "shows bulk imports" do
+          bulk = items.find { |item| item[:key] == :bulk }
+
+          expect(bulk[:children].map { |child| child[:label] }).to eq(["Bulk Imports"])
+        end
+      end
+    end
+
+    describe "the hot sheet row" do
+      let(:organization) do
+        FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["hot_sheet"])
+      end
+      let(:hot_sheet_row) { items.find { |item| item[:icon] == "clipboard" } }
+      let(:row_path) { "/o/#{organization.to_param}/hot_sheet" }
+
+      it "is hidden from a member when the page can't open" do
+        expect(organization.reload.search_coordinates_set?).to be_falsey
+        expect(hot_sheet_row).to be_nil
+      end
+
+      context "for an admin" do
+        let(:current_user) { FactoryBot.create(:organization_admin, organization:) }
+
+        it "stays, since it takes them to the page that explains the missing location" do
+          expect(organization.reload.search_coordinates_set?).to be_falsey
+          expect(hot_sheet_row[:path]).to eq row_path
+        end
+      end
+
+      context "with a location" do
+        let(:organization) do
+          FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: ["hot_sheet"])
+        end
+
+        it "shows for a member" do
+          expect(organization.reload.search_coordinates_set?).to be_truthy
+          expect(hot_sheet_row[:path]).to eq row_path
+        end
       end
     end
 
@@ -229,6 +304,7 @@ RSpec.describe UserServices::MenuItemsOrg do
         FactoryBot.create(:organization_with_organization_features,
           enabled_feature_slugs: ["csv_exports"], pos_kind: :ascend_pos)
       end
+      let(:current_user) { FactoryBot.create(:organization_admin, organization:) }
 
       it "labels the import Ascend" do
         bulk = items.find { |item| item[:key] == :bulk }

@@ -691,7 +691,7 @@ RSpec.describe "RegistrationsController#show", type: :request do
     context "passive_organization the user is no longer a member of" do
       let(:current_user) { FactoryBot.create(:organization_admin, organization:) }
 
-      it "falls back to the public view" do
+      it "falls back to the public view, and drops the organization from the session" do
         get "#{base_url}/#{bike.id}"
         expect(whitespace_normalized_body_text).to match("Staff")
         expect(session[:passive_organization_id]).to eq organization.id
@@ -702,7 +702,20 @@ RSpec.describe "RegistrationsController#show", type: :request do
         body = whitespace_normalized_body_text
         expect(body).to match("Public view")
         expect(body).to_not match("Staff")
-        # The stale id sticks - views are filtered by authorized?, so it grants no access
+        expect(session[:passive_organization_id]).to eq "0"
+      end
+    end
+
+    context "scanned a sticker from an organization the user isn't in" do
+      let(:current_user) { FactoryBot.create(:organization_admin, organization:) }
+      let(:organization2) { FactoryBot.create(:organization) }
+      let(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, bike:, organization: organization2) }
+
+      it "renders their own organization's view" do
+        get "/bikes/scanned/#{bike_sticker.code}", params: {organization_id: organization2.slug}
+        expect(response).to redirect_to(registration_path(bike, scanned_id: bike_sticker.code, organization_id: organization2.slug))
+        follow_redirect!
+        expect(whitespace_normalized_body_text).to match("Staff")
         expect(session[:passive_organization_id]).to eq organization.id
       end
     end
@@ -818,6 +831,9 @@ RSpec.describe "RegistrationsController#show", type: :request do
         # other offered role)
         expect(body).to match("Viewing as #{other_organization.short_name} staff")
         expect(body).to match("View as #{other_organization.short_name} limited")
+
+        get "#{base_url}/#{bike.id}"
+        expect(whitespace_normalized_body_text).to match("Viewing as #{other_organization.short_name} staff")
       end
     end
   end

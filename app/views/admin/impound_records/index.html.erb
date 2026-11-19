@@ -7,7 +7,7 @@
 
     <% unless params[:organization_id].present? %>
       <%= render(UI::Container::Component.new) do %>
-        <%= render(UI::TableList::Component.new(wide_definition: true, classes: "tw:mt-6")) do |list| %>
+        <%= render(UI::Table::List::Component.new(wide_definition: true, classes: "tw:mt-6")) do |list| %>
           <% matching_impound_records.distinct.pluck(:organization_id).map { |id| [id, matching_impound_records.where(organization_id: id).count] }.sort_by { |_id, number| number }.each do |id, number| %>
             <% organization = Organization.unscoped.find_by_id(id) if id.present? %>
 

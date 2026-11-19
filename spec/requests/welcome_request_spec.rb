@@ -138,7 +138,7 @@ RSpec.describe WelcomeController, type: :request do
     context "with an organization the user has since left" do
       include_context :request_spec_logged_in_as_organization_user
 
-      it "keeps rendering the organization as passive_organization" do
+      it "renders, dropping the organization from the session" do
         get "/my_account"
         expect(session[:passive_organization_id]).to eq current_organization.id
         current_user.organization_roles.destroy_all
@@ -146,9 +146,8 @@ RSpec.describe WelcomeController, type: :request do
         get "/recovery_stories"
         expect(response.status).to eq(200)
         expect(assigns(:recovery_displays).count).to eq 1
-        # passive_organization isn't re-authorized once it's in the session
-        expect(session[:passive_organization_id]).to eq current_organization.id
-        expect(assigns[:passive_organization]).to eq current_organization
+        expect(session[:passive_organization_id]).to eq "0"
+        expect(assigns[:passive_organization]).to be_nil
       end
     end
   end

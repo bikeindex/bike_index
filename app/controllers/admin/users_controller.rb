@@ -48,7 +48,6 @@ module Admin
         @user.username = params[:user][:username]
         @user.can_send_many_stolen_notifications = params[:user][:can_send_many_stolen_notifications]
         @user.can_send_many_marketplace_messages = params[:user][:can_send_many_marketplace_messages]
-        @user.dark_mode_preview = Binxtils::InputNormalizer.boolean(params[:user][:dark_mode_preview]) if @user == current_user
         @user.phone = params[:user][:phone]
         # skip_update so the save doesn't auto-enqueue AfterUserChangeJob - it's enqueued
         # once below, after UserBan.create! (which marks the user banned) has run
@@ -136,6 +135,7 @@ module Admin
       @search_superusers = Binxtils::InputNormalizer.boolean(params[:search_superusers])
       @search_developers = Binxtils::InputNormalizer.boolean(params[:search_developers])
       @search_with_organization = Binxtils::InputNormalizer.boolean(params[:search_with_organization])
+      @search_legacy_viewer = Binxtils::InputNormalizer.boolean(params[:search_legacy_viewer])
       @updated_at = Binxtils::InputNormalizer.boolean(params[:search_updated_at])
       @search_unconfirmed = Binxtils::InputNormalizer.boolean(params[:search_unconfirmed])
       @search_confirmed = @search_unconfirmed ? false : Binxtils::InputNormalizer.boolean(params[:search_confirmed])
@@ -154,6 +154,7 @@ module Admin
       users = users.admins if @search_superusers
       users = users.where(developer: true) if @search_developers
       users = users.where(id: OrganizationRole.select(:user_id)) if @search_with_organization
+      users = users.where(feature_registration_show_legacy: true) if @search_legacy_viewer
       users = users.unconfirmed if @search_unconfirmed
       users = users.confirmed if @search_confirmed
 

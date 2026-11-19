@@ -8,7 +8,7 @@
     - else
       = render(UI::Header::Component.new(text: tag.span("No Image", class: "less-strong"), tag: :h3))
   %div{class: "tw:col-span-9 tw:lg:col-span-5 tw:mb-2"}
-    = render(UI::TableList::Component.new) do |list|
+    = render(UI::Table::List::Component.new) do |list|
       - list.with_row(label: "Registry", value: @bike.registry_name)
       - list.with_row(label: "Registry ID", value: @bike.external_id)
       - list.with_row(label: "Status", value: render(Atoms::RegistrationStatusBadge::Component.new(bike: @bike, size: :sm)))
@@ -17,7 +17,7 @@
       - list.with_row(label: "Registry Link", value: link_to(@bike.url, @bike.url, target: :_blank, class: "twlink"))
 
   %div{class: "tw:col-span-12 tw:md:col-span-9 tw:lg:col-span-5 tw:mt-auto tw:mb-2"}
-    = render(UI::TableList::Component.new(classes: "tw:mb-0!")) do |list|
+    = render(UI::Table::List::Component.new(classes: "tw:mb-0!")) do |list|
       - list.with_row(label: "Serial number", value: @bike.serial_number)
       - list.with_row(label: "Description", value: @bike.description)
       - list.with_row(label: "Colors", value: @bike.frame_colors.to_sentence)

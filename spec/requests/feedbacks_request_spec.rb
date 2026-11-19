@@ -113,6 +113,24 @@ RSpec.describe FeedbacksController, type: :request do
         end
       end
 
+      context "from the bike shops page" do
+        let(:lead_params) { {name: "Spoke Shop", feedback_type: "lead_for_bike_shop", email: "shop@example.com", body: "POS: Ascend"} }
+
+        it "returns a signup to the thank you, after a failed submit left the referer at /feedbacks" do
+          post base_url, params: {feedback: lead_params.merge(email: " "), return_to: "/for_bike_shops#shop-signed-up"},
+            headers: {"HTTP_REFERER" => "http://www.example.com/for_bike_shops"}
+          expect(response).to render_template("landing_pages/for_bike_shops")
+          expect(response.body).to include("Spoke Shop", "Email can&#39;t be blank")
+
+          expect {
+            post base_url, params: {feedback: lead_params, return_to: "/for_bike_shops#shop-signed-up"},
+              headers: {"HTTP_REFERER" => "http://www.example.com/feedbacks"}
+          }.to change(EmailJobs::FeedbackNotificationJob.jobs, :count).by(1)
+          expect(response).to redirect_to "http://www.example.com/for_bike_shops#shop-signed-up"
+          expect(Feedback.last).to have_attributes(kind: "lead_for_bike_shop", title: "New Bike shop lead: Spoke Shop", body: "POS: Ascend")
+        end
+      end
+
       context "from a demo modal that names where to return" do
         let(:lead_params) { {name: "Chicago", feedback_type: "lead_for_city", email: "example@example.com"} }
 

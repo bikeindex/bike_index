@@ -1,11 +1,15 @@
 # frozen_string_literal: true
 
 class EbikeRulesController < ApplicationController
-  LOOKUP_PARAMS = %i[vehicle_models manual top_speed watts throttle].freeze
+  LOOKUP_PARAMS = %i[vehicle_models manual top_speed watts throttle throttle_speed].freeze
 
   def show
     # a form's place - the lookup's without JavaScript, or the country switch's - which can't send it to the place's own page
     query = request.query_parameters
+    # details changed from a model's are no longer its, as the lookup clears it when they change
+    if query["manual"] == "1" && query.key?("vehicle_models")
+      return redirect_to(ReadableQuery.path(request.path, query.except("vehicle_models")), status: :moved_permanently)
+    end
     if (key = %w[state country].find { query.key?(it) })
       code, query = query[key], query.except(key)
       chosen = place_for(code)
@@ -41,7 +45,7 @@ class EbikeRulesController < ApplicationController
     detected_place = nil if us_chosen && detected_place && !EbikeRuleServices::Places.us?(detected_place)
     if place.nil?
       # which place it goes to depends on where the visitor is, so neither Cloudflare nor a browser keeps it. A bike
-      # comes along, as from BikeBook's link; a frame's check waits for the place the form hasn't chosen
+      # comes along, as from Bike Book's link; a frame's check waits for the place the form hasn't chosen
       response.headers["Cache-Control"] = "no-store"
       return redirect_to place_path(detected_place, request.query_parameters) if detected_place && !turbo_frame_request?
     end
@@ -69,13 +73,11 @@ class EbikeRulesController < ApplicationController
   # US-CA's is /ebike-rules/US/CA
   def place_path(place, query = {}) = ReadableQuery.path(ebike_rules_place_path(*place[:code].split("-")), query)
 
-  # Two lowercase letters were a US state's before places outside the US had pages, as two uppercase ones still are
-  # where no place has them. The rest are a place's code in any case
+  # A place's code in any case, or a US state's capitals where no place has them
   def place_for(code)
     return unless code.is_a?(String)
 
-    us = (state = EbikeRuleServices::StateLaws.state(code)) && EbikeRuleServices::Places.find("US-#{state[:abbr]}")
-    (code == code.downcase && us) || EbikeRuleServices::Places.find(code.upcase) || us
+    EbikeRuleServices::Places.find(code.upcase) || EbikeRuleServices::Places.find("US-#{code}")
   end
 
   # The checked country of the page a form was sent from, /ebike-rules/US's too

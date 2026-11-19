@@ -22,7 +22,7 @@ RSpec.describe EmailJobs::OwnershipInvitationJob, type: :job do
     expect(notification.user_id).to be_blank
   end
   context "with the safety rules still to agree to" do
-    let!(:acknowledgment) { FactoryBot.create(:registration_sequence_acknowledgment_pending, bike:) }
+    let!(:acknowledgment) { FactoryBot.create(:education_course_acknowledgment_pending, bike:) }
 
     it "waits on them, without latching skip_email" do
       ActionMailer::Base.deliveries = []

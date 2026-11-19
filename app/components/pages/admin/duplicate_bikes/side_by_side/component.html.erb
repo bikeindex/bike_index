@@ -1,0 +1,58 @@
+<div class="tw:mt-2 tw:overflow-x-auto">
+  <table
+    class="
+      ui-table ui-table-bordered tw:min-w-full tw:border-separate
+      tw:border-spacing-0 tw:text-left tw:text-sm tw:leading-[1.25]
+    "
+  >
+    <thead>
+      <tr>
+        <th class="tw:w-48"></th>
+
+        <% @review.bikes.each do |bike| %>
+          <th class="tw:align-top">
+            <%= link_to "Bike ##{bike.id}", edit_admin_bike_path(bike), class: "twlink" %>
+            ·
+            <%= link_to "Registration", bike_path(bike), class: "twlink tw:font-normal" %>
+            <% if bike == @review.reference_bike %>
+              <%= render UI::Badge::Component.new(text: "Reference", color: :notice, size: :xs) %>
+            <% else %>
+              ·
+              <%= link_to "Use as reference", url_for(@link_params.merge("reference_bike_id" => bike.id)), class: "twlink tw:font-normal" %>
+            <% end %>
+            <div class="tw:mt-1 tw:font-normal">
+              <%= render Pages::Admin::DuplicateBikes::RecordFlags::Component.new(bike:, review: @review) %>
+            </div>
+          </th>
+        <% end %>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% rows.each do |label, values, display| %>
+        <tr class="<%= "tw:bg-amber-50 tw:dark:bg-amber-950" if differs?(values) %>">
+          <th class="tw:align-top tw:font-medium">
+            <%= label %>
+
+            <% if differs?(values) %>
+              <span
+                class="
+                  tw:block tw:text-xs tw:font-semibold tw:text-amber-700
+                  tw:dark:text-amber-300
+                "
+              >
+                Differs
+              </span>
+            <% end %>
+          </th>
+
+          <% (display || values).each do |value| %>
+            <td class="tw:align-top tw:break-all">
+              <%= cell(value) %>
+            </td>
+          <% end %>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

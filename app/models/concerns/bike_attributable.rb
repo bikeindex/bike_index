@@ -194,30 +194,12 @@ module BikeAttributable
     ].flatten.reject(&:blank?).uniq
   end
 
-  # development with remote image url fix
-  REMOTE_IMAGE_FALLBACK_URLS = Rails.env.development?
-
   def image_url(size = nil)
     if thumb_path.blank?
       return stock_photo_url.present? ? stock_photo_url : nil
     end
 
-    public_image = public_images.first
-    # PublicImage owns which backend a row is on
-    return public_image.image_url(size) if public_image&.activestorage?
-
-    image_col = public_image&.image
-    # NOTE: avoid image_col.blank? — on Fog storage it issues an S3 HEAD per call (timed out the API search).
-    return nil if image_col&.path.blank? && !REMOTE_IMAGE_FALLBACK_URLS
-
-    image_url = image_col&.send(:url, size)
-    # image_col.blank? and image_url.present? indicates it's a remote file in local development
-    if REMOTE_IMAGE_FALLBACK_URLS && image_col.blank? && image_url.present?
-      # Create a image_url using the aws path
-      "https://files.bikeindex.org" + image_url.gsub(ENV["BASE_URL"], "")
-    else
-      image_url
-    end
+    public_images.first&.image_url(size)
   end
 
   protected

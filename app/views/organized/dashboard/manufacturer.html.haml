@@ -26,60 +26,28 @@
 = render(UI::Header::Component.new(tag: :h3, html_class: "uncap mt-4")) do
   Registrations
   = render(UI::TimeRange::Component.new(time_range: @time_range, period: @period))
-.full-screen-table.mt-4
-  %table.table.table-striped.table-bordered.table-sm
-    %tbody
-      %tr
-        %td Registered with #{current_organization.name} organization
-        %td= number_with_delimiter(@bikes_in_organization_count)
-      - if current_organization.enabled?("claimed_ownerships")
-        -# %tr
-        -#   %td Registrations sent to new owners
-        -#   %td= number_with_delimiter(@ownerships_to_new_owner.count)
-        %tr
-          %td Registrations claimed by their owners
-          %td= number_with_delimiter(@claimed_ownerships.count)
-      -# TODO: add shops visibility
-      -# %tr
-      -#   %td
-      -#     Registered by shops giving you visibility
-      %tr
-        %td
-          %strong
-            Total
-            %em= current_organization.name
-            registrations
-          %td
-            %strong
-              = number_with_delimiter(@manufacturer_bikes.count)
-      %tr
-        %td
-          Total Stolen
-          %em= current_organization.name
-          bikes
-        %td= number_with_delimiter(@stolen_records.count)
-      %tr
-        %td
-          Total Recovered
-          %em= current_organization.name
-          bikes
-        %td= number_with_delimiter(@recovered_records.count)
+.mt-4
+  - organization_name = tag.em(current_organization.name)
+  = render(UI::Table::List::Component.new(wide_definition: true)) do |list|
+    - list.with_row(label: "Registered with #{current_organization.name} organization", value: number_display(@bikes_in_organization_count))
+    - if current_organization.enabled?("claimed_ownerships")
+      -# - list.with_row(label: "Registrations sent to new owners", value: number_display(@ownerships_to_new_owner.count))
+      - list.with_row(label: "Registrations claimed by their owners", value: number_display(@claimed_ownerships.count))
+    -# TODO: add shops visibility
+    -# - list.with_row(label: "Registered by shops giving you visibility")
+    - list.with_row(label: tag.strong(safe_join(["Total ", organization_name, " registrations"])), value: tag.strong(number_display(@manufacturer_bikes.count)))
+    - list.with_row(label: safe_join(["Total Stolen ", organization_name, " bikes"]), value: number_display(@stolen_records.count))
+    - list.with_row(label: safe_join(["Total Recovered ", organization_name, " bikes"]), value: number_display(@recovered_records.count))
 
   = render(UI::Header::Component.new(tag: :h3, html_class: "uncap mt-5")) do
     Registrations by organizations granting #{current_organization.name} visibility
     = render(UI::TimeRange::Component.new(time_range: @time_range, period: @period))
-  .full-screen-table.mt-4
-    %table.table.table-striped.table-bordered.table-sm
-      %thead
-        %th Organization
-        %th.small Signed up
-        %th Bikes
-      %tbody
-        - @child_organizations.reorder(:name).each do |organization|
-          %tr
-            %td
-              = link_to organization.name, organization_dashboard_index_path(organization_id: organization.to_param)
-            %td
-              %small.localizeTime= l(organization.created_at, format: :convert_time)
-            %td
-              = number_with_delimiter(organization.bikes.where(created_at: @time_range).count)
+  .mt-4
+    - time_range = @time_range
+    = render(UI::Table::Base::Component.new(records: @child_organizations.reorder(:name))) do |table|
+      - table.column(label: "Organization") do |organization|
+        = link_to organization.name, organization_dashboard_index_path(organization_id: organization.to_param), class: "twlink"
+      - table.column(label: "Signed up", header_classes: "tw:text-xs") do |organization|
+        %small= render(UI::Time::Component.new(time: organization.created_at))
+      - table.column(label: "Bikes") do |organization|
+        = number_display(organization.bikes.where(created_at: time_range).count)

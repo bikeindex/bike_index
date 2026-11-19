@@ -218,8 +218,9 @@ export function collapse (action, element, duration = COLLAPSE_DURATION_MS, dire
  * @param {HTMLElement} field - The wrapper to collapse
  * @param {boolean} shown - Whether the form is asking for it
  * @param {number} duration - Animation duration in milliseconds
+ * @param {string} direction - 'vertical' (height) or 'horizontal' (width)
  */
-export function collapseField (field, shown, duration) {
-  collapse(shown ? 'show' : 'hide', field, duration)
+export function collapseField (field, shown, duration, direction) {
+  collapse(shown ? 'show' : 'hide', field, duration, direction)
   field.querySelectorAll('input, select, textarea').forEach((el) => { el.disabled = !shown })
 }

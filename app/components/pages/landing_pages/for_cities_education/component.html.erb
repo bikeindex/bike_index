@@ -36,17 +36,17 @@
           data-landing-pages--tabs-target="button"
           data-action="click->landing-pages--tabs#select keydown->landing-pages--tabs#keydown"
         >
-          <%= organization[:sequence].organization.short_name %>
+          <%= organization[:course].organization.short_name %>
         </button>
       <% end %>
     </div>
 
     <% organizations.each do |organization| %>
-      <% sequence = organization[:sequence] %>
-      <% name = sequence.organization.name %>
-      <% sequence_pages = organization[:pages] %>
-      <% total = sequence_pages.size + 1 %>
-      <% register_flow = BikeServices::RegisterFlow.new(page_count: sequence_pages.size) %>
+      <% course = organization[:course] %>
+      <% name = course.organization.name %>
+      <% course_pages = organization[:pages] %>
+      <% total = course_pages.size + 1 %>
+      <% register_flow = BikeServices::RegisterFlow.new(page_count: course_pages.size) %>
 
       <div
         id="tab-<%= organization[:key] %>"
@@ -96,7 +96,7 @@
               tw:bg-white tw:dark:border-gray-700 tw:dark:bg-gray-800
             "
           >
-            <% [*sequence_pages.map { [it.title, translation(".rule_count", count: it.bullets.size)] },
+            <% [*course_pages.map { [it.title, translation(".rule_count", count: it.bullets.size)] },
                 [translation(".consent_category"), nil]].each_with_index do |(label, meta), index| %>
               <li
                 class="
@@ -169,7 +169,7 @@
             keeps the tallest step's height instead of jumping as the rider moves through them
           %>
 
-          <% sequence_pages.each_with_index do |page, index| %>
+          <% course_pages.each_with_index do |page, index| %>
             <div
               role="group"
               aria-label="<%= page.title %>"
@@ -200,8 +200,8 @@
           >
             <%= render(Pages::Register::Parts::Progress::Component.new(flow: register_flow, step: "review")) %>
             <%= render(Pages::Register::Parts::AcknowledgmentProgress::Component.new(number: total, total:)) %>
-            <%= render(Pages::Register::Parts::ReviewSummary::Component.new(pages: sequence_pages, heading_tag: :h3)) %>
-            <%= render(Pages::Register::Parts::AcknowledgmentCheck::Component.new(sequence:)) %>
+            <%= render(Pages::Register::Parts::ReviewSummary::Component.new(pages: course_pages, heading_tag: :h3)) %>
+            <%= render(Pages::Register::Parts::AcknowledgmentCheck::Component.new(course:)) %>
 
             <%= render(UI::Button::Component.new(text: translation(".complete_registration"), color: :primary, size: :lg,
             html_class: "tw:w-full tw:justify-center", disabled: true,
@@ -236,7 +236,7 @@
                   tw:dark:text-gray-300
                 "
               >
-                <%= translation(".done_message", count: sequence_pages.sum { it.bullets.size }, name:) %>
+                <%= translation(".done_message", count: course_pages.sum { it.bullets.size }, name:) %>
               </p>
 
               <%= render(UI::Button::Component.new(text: translation(".start_over"), color: :link,

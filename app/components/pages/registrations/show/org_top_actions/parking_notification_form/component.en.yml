@@ -10,3 +10,4 @@ en:
               impound_this_bike_type: Impound this %{bike_type}
               not_shown_to_user: not shown to user
               parking_notification_notes: "%{org_name} internal notes"
+              submit_parking_notification: Create parking notification

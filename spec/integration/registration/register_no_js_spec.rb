@@ -129,17 +129,17 @@ RSpec.describe "Register flow without JavaScript", type: :system, driver: :playw
   context "an organization's e-vehicle safety rules" do
     let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills") }
     # Built as a draft and activated below, since activation freezes the pages
-    let(:sequence) do
-      FactoryBot.create(:registration_sequence, organization:,
+    let(:course) do
+      FactoryBot.create(:education_course, organization:,
         acknowledgment_text: "agree to comply with all of the rules above.")
     end
     let!(:campus_page) do
-      FactoryBot.create(:registration_sequence_page, registration_sequence: sequence,
+      FactoryBot.create(:education_course_page, education_course: course,
         title: "Campus rules", body: "<ul><li>Dismount in posted zones</li></ul>",
         organization_specific: true)
     end
 
-    before { sequence.make_active! }
+    before { course.make_active! }
 
     it "walks the rules and signs the acknowledgment" do
       visit "/register/new?organization_id=#{organization.slug}"
@@ -167,7 +167,7 @@ RSpec.describe "Register flow without JavaScript", type: :system, driver: :playw
       click_button "Complete e-Scooter Registration"
 
       expect(page).to have_css("h1", text: "Progress saved")
-      expect(RegistrationSequenceAcknowledgment.count).to eq 1
+      expect(EducationCourseAcknowledgment.count).to eq 1
     end
   end
 

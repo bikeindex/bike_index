@@ -1,9 +1,9 @@
-<%# Cell blocks are instance_exec'd against UI::Table, so locals rather than ivars %>
+<%# Cell blocks are instance_exec'd against UI::Table::Base, so locals rather than ivars %>
 <% current_organization = @current_organization %>
 <% render_sortable = @render_sortable %>
 <% message_notes_cell = method(:message_notes) %>
 
-<%= render(UI::Table::Component.new(records: @parking_notifications, sort_state: @sort_state,
+<%= render(UI::Table::Base::Component.new(records: @parking_notifications, sort_state: @sort_state,
   render_sortable: @render_sortable)) do |table| %>
   <% if @map_rows %>
     <%# Renders on every mapped row, coordinates or not - the map controller derives its row list from these %>

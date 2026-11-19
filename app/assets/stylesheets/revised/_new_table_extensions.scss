@@ -20,16 +20,6 @@
     padding: 0 0 0 1.5rem;
     margin: 0.5rem 0 0.5rem;
   }
-
-  // Dropdown headers
-  .dropdown-toggle {
-    font-weight: normal;
-    &:active,
-    &.active {
-      font-weight: bold;
-      text-decoration: underline;
-    }
-  }
 }
 
 table thead.sortable {

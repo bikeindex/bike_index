@@ -1,0 +1,13 @@
+---
+en:
+  components:
+    pages:
+      donate:
+        other_ways:
+          daf: Donor-advised fund grants — we can send our EIN and grant details.
+          larger_gift_link: Talk to us about a larger gift
+          match: >-
+            Employer matching — many employers will match a donation at no extra cost
+            to you.
+          stock: Gifts of stock or crypto, which avoid capital gains on appreciated
+            assets.

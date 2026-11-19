@@ -76,36 +76,34 @@
           id="locks_tab_content"
         >
           <% if @locks.present? %>
-            <table class="table table-striped table-bordered">
-              <thead>
-                <th><%= t(".registered") %></th>
-                <th><%= t(".lock_type") %></th>
-                <th><%= t(".manufacturer") %></th>
-                <th><%= t(".key_serial") %></th>
-                <th><%= t(".combination") %></th>
-                <th class="small"><%= t(".updated") %></th>
-              </thead>
+            <% edit = t(".edit") %>
 
-              <tbody>
-                <% @locks.each do |lock| %>
-                  <tr>
-                    <td>
-                      <span class="localizeTime mr-2"><%= l lock.created_at, format: :convert_time %></span>
-                      <small><%= link_to(t(".edit"), edit_lock_path(lock)) %></small>
-                    </td>
+            <%= render(UI::Table::Base::Component.new(records: @locks)) do |table| %>
+              <% table.column(label: t(".registered")) do |lock| %>
+                <span class="mr-2"><%= render(UI::Time::Component.new(time: lock.created_at)) %></span>
+                <small><%= link_to(edit, edit_lock_path(lock), class: "twlink") %></small>
+              <% end %>
 
-                    <td><%= lock.lock_type&.name %></td>
-                    <td><%= lock.mnfg_name %></td>
-                    <td><%= lock.key_serial %></td>
-                    <td><%= lock.combination %></td>
+              <% table.column(label: t(".lock_type")) do |lock| %>
+                <%= lock.lock_type&.name %>
+              <% end %>
 
-                    <td>
-                      <small class="localizeTime"><%= l lock.updated_at, format: :convert_time %></small>
-                    </td>
-                  </tr>
-                <% end %>
-              </tbody>
-            </table>
+              <% table.column(label: t(".manufacturer")) do |lock| %>
+                <%= lock.mnfg_name %>
+              <% end %>
+
+              <% table.column(label: t(".key_serial")) do |lock| %>
+                <%= lock.key_serial %>
+              <% end %>
+
+              <% table.column(label: t(".combination")) do |lock| %>
+                <%= lock.combination %>
+              <% end %>
+
+              <% table.column(label: t(".updated"), header_classes: "tw:text-xs") do |lock| %>
+                <small><%= render(UI::Time::Component.new(time: lock.updated_at)) %></small>
+              <% end %>
+            <% end %>
           <% else %>
             <h2><%= t(".you_have_no_registered_locks") %></h2>
           <% end %>

@@ -135,6 +135,11 @@
     @apply tw:block tw:mb-1 tw:text-sm tw:font-medium tw:text-gray-800 tw:dark:text-gray-300 tw:cursor-pointer;
   }
 
+  /* An empty one is a spacer column, with nothing to click */
+  .form-well-label:not(:empty) {
+    @apply tw:cursor-pointer;
+  }
+
   /* Fields that read as one control -- a city and its state, a name and its phone. The
    * gutter is tighter than a page-level grid's, and auto-fit means the break to full width
    * comes from the row running out of room rather than from a viewport breakpoint, so a row

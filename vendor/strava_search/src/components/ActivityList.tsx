@@ -10,9 +10,9 @@ interface ActivityListProps {
   activities: StoredActivity[];
   gear: StoredGear[];
   isLoading: boolean;
-  selectedIds: Set<number>;
-  onToggleSelect: (id: number) => void;
-  onSelectIds: (ids: number[]) => void;
+  selectedIds: Set<string>;
+  onToggleSelect: (id: string) => void;
+  onSelectIds: (ids: string[]) => void;
   onDeselectAll: () => void;
   onUpdateSelected: (updates: UpdatableActivity) => Promise<void>;
   isUpdating: boolean;

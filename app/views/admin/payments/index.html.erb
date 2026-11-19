@@ -48,7 +48,7 @@
     </p>
 
     <% if payments_counts.present? %>
-      <%= render(UI::Table::Component.new(records: [payments_counts])) do |table| %>
+      <%= render(UI::Table::Base::Component.new(records: [payments_counts])) do |table| %>
         <% payments_counts.each do |payment_count| %>
           <% header = capture do %>
             <%= payment_count[:name].pluralize %>

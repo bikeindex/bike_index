@@ -3,8 +3,8 @@
 require "rails_helper"
 
 RSpec.describe Pages::Register::Parts::ReviewSummary::Component, type: :component do
-  let(:registration_sequence) { FactoryBot.create(:registration_sequence, :with_pages) }
-  let(:pages) { registration_sequence.registration_sequence_pages.to_a }
+  let(:education_course) { FactoryBot.create(:education_course, :with_pages) }
+  let(:pages) { education_course.education_course_pages.to_a }
 
   it "lists every page, without links when there's nowhere to send them" do
     render_inline(described_class.new(pages:))

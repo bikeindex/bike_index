@@ -117,7 +117,7 @@ class ModelAudit < ApplicationRecord
     end
 
     def counted_matching_bikes(bikes)
-      bikes.where(example: false, deleted_at: nil, likely_spam: false)
+      bikes.non_example.not_spam.without_deleted
     end
 
     def counted_matching_bikes_count(bikes)

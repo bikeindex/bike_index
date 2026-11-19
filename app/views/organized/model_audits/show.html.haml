@@ -9,7 +9,7 @@
 
 .row.mt-4
   .col-md-6
-    = render(UI::TableList::Component.new) do |list|
+    = render(UI::Table::List::Component.new) do |list|
       - list.with_row(label: "Manufacturer") do
         = @model_audit.mnfg_name
         %small= link_to "view all manufacturer's audits", organization_model_audits_path(search_mnfg_name: @model_audit.mnfg_name, organization_id: current_organization.to_param)
@@ -17,7 +17,7 @@
       - list.with_row(label: "Vehicle type", value: @model_audit.cycle_type_name)
       - list.with_row(label: "Propulsion", value: @model_audit.propulsion_type_name)
   .col-md-6
-    = render(UI::TableList::Component.new) do |list|
+    = render(UI::Table::List::Component.new) do |list|
       - list.with_row(label: "Total vehicles") do
         = number_display @bikes_count
         %small= link_to "search matching vehicles", organization_registrations_path(organization_id: current_organization.id, search_model_audit_id: @model_audit.id)
@@ -37,45 +37,29 @@
 - if @model_attestations.none?
   %p.less-strong.mt-4 No Attestations
 - else
-  %table.table.table-striped.table-bordered.table-sm.without-exterior-border
-    %thead.small-header.hidden-md-down
-      %th
-        Created
-      %th
-        Kind
-      %th
-        Submitted by
-      %th
-        Certification
-      %th
-        Documentation
-      %th
-        Information
-
-    %tbody
-      - @model_attestations.each do |model_attestation|
-        %tr
-          %td
-            %span.localizeTime.preciseTime
-              = l(model_attestation.created_at, format: :convert_time)
-            - if display_dev_info?
-              %span.only-dev-visible= render(UI::Code::Inline::Component.new(text: model_attestation.id))
-          %td
-            %span{class: status_display_class(model_attestation.kind)}
-              = model_attestation.kind_humanized
-          %td
-            = model_attestation.organization&.short_name
-            - if model_attestation.organization_id == current_organization.id
-              %small= model_attestation.user&.display_name
-          %td
-            = model_attestation.certification_type
-          %td
-            - if model_attestation.file.present?
-              %strong= link_to "File", model_attestation.file.url, target: "_blank"
-            - if model_attestation.url.present?
-              %small= link_to Urlifyer.display(model_attestation.url, length: 30), model_attestation.url
-          %td
-            = model_attestation.info
+  - show_dev_info = display_dev_info?
+  - current_organization_id = current_organization.id
+  = render(UI::Table::Base::Component.new(records: @model_attestations)) do |table|
+    - table.column(label: "Created") do |model_attestation|
+      = render(UI::Time::Component.new(time: model_attestation.created_at, format: :localize_time_precise))
+      - if show_dev_info
+        %span.only-dev-visible= render(UI::Code::Inline::Component.new(text: model_attestation.id))
+    - table.column(label: "Kind") do |model_attestation|
+      %span{class: helpers.status_display_class(model_attestation.kind)}
+        = model_attestation.kind_humanized
+    - table.column(label: "Submitted by") do |model_attestation|
+      = model_attestation.organization&.short_name
+      - if model_attestation.organization_id == current_organization_id
+        %small= model_attestation.user&.display_name
+    - table.column(label: "Certification") do |model_attestation|
+      = model_attestation.certification_type
+    - table.column(label: "Documentation") do |model_attestation|
+      - if model_attestation.file.present?
+        %strong= link_to "File", model_attestation.file.url, target: "_blank", class: "twlink"
+      - if model_attestation.url.present?
+        %small= link_to Urlifyer.display(model_attestation.url, length: 30), model_attestation.url, class: "twlink"
+    - table.column(label: "Information") do |model_attestation|
+      = model_attestation.info
 
 = render(UI::Header::Component.new(tag: :h2, html_class: "uncap pt-3 pb-2 mt-4 tw:mb-0!")) do
   Vehicles

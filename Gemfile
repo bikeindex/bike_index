@@ -61,7 +61,7 @@ gem "carrierwave", "~> 3.1" # File uploader
 # Using bikeindex fork to support rails 8
 gem "carrierwave_backgrounder", github: "bikeindex/carrierwave_backgrounder" # background processing of images
 gem "caxlsx" # Write Excel files (OrganizationExports)
-gem "lexxy", "~> 0.9" # Rich text editor (Action Text) for registration sequences. Minor bumps rewrite the toolbar DOM lexxy_overrides.css targets
+gem "lexxy", "~> 0.9" # Rich text editor (Action Text) for education courses. Minor bumps rewrite the toolbar DOM lexxy_overrides.css targets
 # gem "wicked_pdf" # TODO: PDFs are broken right now - commented out because they're unused
 # gem "wkhtmltopdf-binary" # TODO: PDFs are broken right now - commented out because they're unused
 gem "rqrcode", "3.2.0" # QR Code image generator
@@ -81,8 +81,8 @@ gem "twitter" # Twitter. For rendering tweets
 gem "twilio-ruby" # Twilio, for verifying phone numbers
 gem "stripe" # Payments
 gem "fog-aws" # Aws used with carrierwave for S3 to store images
-gem "aws-sdk-s3", "1.177.0", require: false # Used by ActiveStorage for Cloudflare R2
-gem "aws-sdk-core", "3.211" # Required for S3 compatibility, see github.com/rails/rails/issues/54374
+gem "aws-sdk-s3", require: false # Used by ActiveStorage for Cloudflare R2
+gem "aws-sdk-core" # Loaded at boot: BikeServices::Creator rescues its errors
 gem "postmark-rails" # Transactional email
 gem "MailchimpMarketing", github: "mailchimp/mailchimp-marketing-ruby" # Marketing emails
 gem "facebookbusiness", github: "facebook/facebook-ruby-business-sdk", branch: "main" # For promoted alerts
@@ -157,6 +157,7 @@ end
 
 group :development, :test do
   gem "brakeman", require: false
+  gem "bundler-audit", require: false
   gem "ruby-lsp" # Ruby language server (used by editor integrations)
   gem "database_cleaner"
   gem "factory_bot_rails"

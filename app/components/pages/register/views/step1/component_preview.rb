@@ -49,7 +49,7 @@ module Pages
             b_param = ::BParam.new(origin: "register_flow",
               params: {bike: {owner_email: lookbook_user&.email}.merge(bike).compact}.as_json)
             render(Pages::Register::Views::Step1::Component.new(b_param:, current_user: lookbook_user, embed:, button_color:,
-              flow: ::BikeServices::Register.flow(b_param, sequence: ::BikeServices::Register.registration_sequence(b_param),
+              flow: ::BikeServices::Register.flow(b_param, course: ::BikeServices::Register.education_course(b_param),
                 single_page:)))
           end
         end

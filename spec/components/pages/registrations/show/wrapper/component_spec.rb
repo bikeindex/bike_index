@@ -54,6 +54,27 @@ RSpec.describe Pages::Registrations::Show::Wrapper::Component, type: :component 
     end
   end
 
+  describe "legacy view alert" do
+    let(:alert_text) { "You're using the new bike viewer." }
+
+    it "renders on a consumer view" do
+      render_inline(described_class.new(bike:, current_user:, view: [:owner, nil], available_views: [[:owner, nil], [:public, nil]]))
+      expect(page).to have_text(alert_text)
+      expect(page).to have_button("View in Legacy Viewer")
+    end
+
+    context "organization view" do
+      let(:organization) { FactoryBot.create(:organization) }
+      let(:current_user) { FactoryBot.create(:organization_admin, organization:) }
+
+      it "leaves the legacy view to the view switcher" do
+        render_inline(described_class.new(bike:, current_user:, view: [:staff, organization], available_views: [[:staff, organization], [:public, nil]]))
+        expect(page).to have_no_text(alert_text)
+        expect(page).to have_button("View in Legacy Viewer")
+      end
+    end
+  end
+
   # What the preview resolves isn't reliably greppable out of the page it renders, so
   # these check the component it built
   describe "ComponentPreview" do

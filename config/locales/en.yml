@@ -1918,6 +1918,7 @@ en:
       parking_notifications:
         create:
           successfully_created: Parking Notification for %{bike_type} created
+          successfully_impounded: Impounded this %{bike_type}
           unable_to_create: Unable to create - %{errors}
       stickers:
         ensure_sticker_for_current_organization:
@@ -3619,92 +3620,6 @@ en:
       get_in_touch_link: Get in touch
       want_qr_stickers: Want QR stickers? Ask us how their cost offsets the price
         of a package.
-    for_bike_shops:
-      5_ways_to_grow_community_for_your_bike_sh: 5 ways to grow community for your
-        bike shop
-      automatic_registration_at_point_of_sale: Automatic registration at point of
-        sale
-      bike_index_for_bike_shops: Bike Index for Bike Shops
-      bike_shops_deck: bike shop partner deck
-      bikes_before_they: >-
-        Unite against bike theft and protect your customers bikes before they're even
-        out there.
-      build_goodwill_with_your_customers_with_a: >-
-        Build goodwill with your customers with a service you can offer at no cost.
-        Recover a stolen bike, and you'll have a customer for life.
-      check_out: Check out our
-      connect_your_ascend_account_html: >-
-        Connect your Ascend account and your Bike Index shop account. Each night,
-        Ascend will export the bikes you've sold, and we'll import them into Bike
-        Index for your customers. Other than setup, you're done! Learn more about
-        the Ascend integration %{ascend_link}.
-      connect_your_lightspeed_account: connect your Lightspeed account
-      curious_what_information_html: Curious what information is collected? Read about
-        the %{security_link}.
-      do_right_by_your_customers: Do right by your customers in just 5 clicks.
-      dont_use_ascend_or_lightspeed_html: Don't use Ascend or Lightspeed POS? Ask
-        us about %{printed_materials}.
-      driving_service_revenues_with_bicycle_reg: Driving service revenues with bicycle
-        registration
-      embed_a_bike_index_registration_form: Embed a bike registration form on your
-        website
-      for_free_we_provide_you_with_t: >-
-        For free we provide you with the tools needed to automatically register each
-        bike you sell in Bike Index through your POS. All it takes is a few minutes
-        of setup, either with your Ascend or Lightspeed Retail account.
-      here: here
-      join_our_network_link_html: Join our %{network_link}.
-      learn_more: Learn more
-      network_of_shop_partners: network of shop partners
-      or: or
-      our_official_lightspeed_integration_provi: >-
-        Our official Lightspeed integration provides entirely automated registration
-        for every bike you sell. All you have to do is make sure you input the serial
-        number and take the customer's email.
-      printed_materials: printed materials
-      register_bikes_for_your_customers: Register bikes for your customers
-      related_articles: 'Related articles:'
-      security_link_text: security and privacy of the integrations here
-      sign_up_for_a_free_bike_index_account_html: Sign up for a free Bike Index account
-        for your shop %{new_org_link}.
-      sign_up_for_free: Sign up for free
-      trusted_by_bike_shops_everywhere: Trusted by bike shops everywhere
-      use_ascend: Use Ascend?
-      use_lightspeed_retail: Use Lightspeed Retail?
-      used_at_bike_shops_everywhere: Used at bike shops everywhere
-    for_community_groups:
-      bike_index_for_community_groups: Bike Index for Community Groups
-      bike_index_launches_new_ambassadors_progr: Bike Index launches new Ambassadors
-        program
-      bike_index_welcomes_stolen_bikes_nola: Bike Index welcomes Stolen Bikes NOLA
-      embed_a_bike_index_registration_form: Embed a bike registration form on your
-        website
-      gone_are_the_days_where_you_had_to_regist: >-
-        Gone are the days where you had to register your bike in your neighborhood,
-        county, city, state and country. Just register all bikes in Bike Index and
-        a cyclists registration will be valid anywhere. Run registration drives? Host
-        community cycling events? Let us know and we will send you Bike Index materials.
-      help_us_help_you: Help us help you
-      here: here
-      partners_made_in_heaven: Partners made in heaven
-      purchase_a_pack_of_advocacy_html: Purchase a pack of advocacy materials %{link}.
-      registration_drive: Use Bike Index to host a registration drive
-      registrations_are_free_forever_join_bike_: Registrations are free. Forever.
-        Join Bike Index and start registering today.
-      related_articles: 'Related articles:'
-      sign_up_for_free: Sign up for free
-      spread_the_bike_index_word_html: >-
-        Spread the Bike Index word to your constituents to get them riding protected.
-        Create a free organization account %{link}.
-      the_most_widereaching_and_effective_tools: The most wide-reaching and effective
-        tools against bike theft — period.
-      trusted_by_community_groups_everywhere: Trusted by community groups everywhere
-      used_by_community_groups_everywhere: Used by community groups everywhere
-      we_provide_free_and_easy_access_to_our_re: >-
-        We provide free and easy access to our registry for anyone and everyone who
-        rides a bicycle, in any capacity. Bike Index is a community-driven effort
-        in recovering lost and stolen bikes. No matter the type of bike or cyclist,
-        we want to keep all bikes rolling with the owners that need them.
     packages_list:
       forever: Forever
       free: Free
@@ -3826,6 +3741,12 @@ en:
     info_stolen_bikes: What to do if your bike is stolen - next steps Bike Index recommends
       taking.
     info_where: Organizations that use Bike Index to search for and register bikes.
+    landing_pages_for_bike_shops: >-
+      Bike Index connects to your POS and registers every bike you sell, automatically.
+      Free for shops and customers, and we never sell or share customer data.
+    landing_pages_for_community_groups: >-
+      Bike Index is the free, nonprofit bike registry. Help your riders register so
+      a stolen bike has a real path home. Free for community groups, forever.
     landing_pages_for_law_enforcement: >-
       Is your agency equipped to fight bike theft? Bike Index can help officers get
       bikes back into the right hands.
@@ -3842,6 +3763,9 @@ en:
       is registered and one reported stolen can't be listed.
     my_accounts_show: Your bikes on Bike Index
     news_index: Read Bike Index news. Also, periodically, learn magic spells.
+    register_landing: >-
+      Register your bike on Bike Index for free. Get proof it's yours, one-click stolen
+      alerts, and a network of shops, police, and riders watching for it.
     registrations_embed: >-
       Embedable %{organization} Bike Index registration form. Register your bike for
       free, right now
@@ -3892,6 +3816,7 @@ en:
     register_acknowledgment: Safety check for your %{cycle_type}
     register_confirm: Confirming your email
     register_create: Register your vehicle!
+    register_landing: Register your bike for free
     register_report: Tell us what happened
     register_review: Review your %{cycle_type} safety check
     register_show: Your %{cycle_type} registration
@@ -3922,6 +3847,11 @@ en:
       nb: EUR
       nl: EUR
   my_accounts:
+    color_scheme:
+      appearance: Appearance
+      dark: Dark
+      light: Light
+      system: System
     delete_account:
       delete_account: Delete account
       delete_my_account: Delete my account and all my registered bikes
@@ -4337,6 +4267,7 @@ en:
         search: Search
         search_emails: Search emails
         sent: Sent
+        step: Step
         through_org: through %{org_name}
         vehicle_type: Type
       new:
@@ -5003,6 +4934,7 @@ en:
       bulk_import_and_export: Bulk Import & Export
       bulk_imports: Bulk Imports
       discuss: Discuss
+      education_courses: Education courses
       exports: Exports
       getting_started: Getting started
       graduated_notifications: Graduated notifications
@@ -5025,7 +4957,6 @@ en:
       parking_notifications_group: Parking Notifications
       recoveries: Recoveries
       registration_form_settings: Registration form settings
-      registration_sequences: Registration sequences
       registration_stickers: Registration stickers
       registrations_index: Organization Registrations
       reports: Reports

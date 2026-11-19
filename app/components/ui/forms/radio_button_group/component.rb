@@ -5,11 +5,12 @@ module UI
     module RadioButtonGroup
       class Component < ApplicationComponent
         # Template Dependency: UI::ButtonGroup::Component
-        # A <label> never takes focus, so the ring hangs off the radio inside it
+        # A <label> never takes focus, so the ring hangs off the radio inside it - restated
+        # under is-active, which sorts after it, as UI::Button's FOCUS_CLASSES does
         LABEL_CLASSES = [
           "tw:mb-0", # a <label>, which legacy CSS gives a bottom margin
           "tw:relative", # the sr-only radio's containing block, which a scrolling ancestor otherwise doesn't clip
-          "tw:has-[:focus-visible]:outline-none tw:has-[:focus-visible]:ring-3 tw:has-[:focus-visible]:ring-purple-500/40"
+          "tw:has-[:focus-visible]:outline-none tw:has-[:focus-visible]:ring-3 tw:is-active:has-[:focus-visible]:ring-3 tw:has-[:focus-visible]:ring-purple-500/40"
         ].join(" ").freeze
 
         CHIP_CLASSES = [UI::ButtonGroup::Component::CHIP_CLASSES, LABEL_CLASSES].join(" ").freeze

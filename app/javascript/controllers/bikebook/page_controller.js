@@ -1,12 +1,14 @@
 import { Controller } from '@hotwired/stimulus'
+import { Turbo } from '@hotwired/turbo-rails'
 import { CatalogComboboxSource, loadCatalog, renderCounts } from 'bikebook/catalog'
 import { addComparison, hydrate, loadingShell, pickedVehicles, picksShell, rescoredSimilar, unpickedVehicles } from 'bikebook/hydrate'
 import { keepPermanent, renderInto } from 'bikebook/render'
-import { readable } from 'bikebook/replace_url'
+import { readable, replaceUrl } from 'bikebook/replace_url'
 import { NARROWING, comparing, searching } from 'bikebook/query'
 import { collapse } from 'utils/collapse_utils'
 import { SearchLog } from 'bikebook/search_log'
-import { realigned, storePreferredSize, withColorway, withSize } from 'bikebook/sizes'
+import { storePreferredSize } from 'bikebook/sizes'
+import { changedVehicles, realigned, vehicleIds, withColorway, withJson, withSize } from 'bikebook/vehicle_models'
 import { renderClassCards, withClassifications } from 'bikebook/templates/vehicles/class_cards'
 import { uuid } from 'bikebook/templates/helpers'
 
@@ -19,7 +21,7 @@ const stamped = (state) => ({ ...state, bikebook: uuid() })
 // link to this page and each history step render the page afresh from the shell, without a request
 export default class extends Controller {
   static targets = ['shell', 'page', 'status']
-  static values = { manifestUrl: String, jurisdictions: Object, paintColors: Object, failedText: String, title: String, searchLogUrl: String }
+  static values = { manifestUrl: String, market: String, marketName: String, jurisdiction: String, jurisdictions: Object, paintColors: Object, title: String, searchLogUrl: String }
 
   #scrolls = new Map()
   #searchLog
@@ -30,22 +32,60 @@ export default class extends Controller {
   #picks
   #compared
   #renderedCatalog
-  #loadFailed = false
+  #failed
+  #loading
 
   // The loading shell holds the status until the catalog's first render replaces it, and a failure puts it back
   initialize () {
     this.status = this.statusTarget
     this.#searchLog = new SearchLog(this.searchLogUrlValue)
+    this.#localize(this.shellTarget.content)
+    this.#localize(this.pageTarget)
   }
 
-  async connect () {
+  // The server caches the search for every visitor, so it's given theirs here
+  #localize (root) {
+    for (const search of root.querySelectorAll('[data-controller~="bikebook--catalog-filters"]')) {
+      search.setAttribute('data-bikebook--catalog-filters-default-market-value', this.marketValue)
+      search.setAttribute('data-bikebook--catalog-filters-default-jurisdiction-value', this.jurisdictionValue)
+    }
+    for (const name of root.querySelectorAll('[data-bikebook--catalog-filters-target~="marketName"]')) name.textContent = this.marketNameValue
+  }
+
+  // Turbo takes a step back onto an entry it stamped, or stamps a bare one, though drive is off - restoring a body that
+  // has no catalog. This page's steps are its own
+  connect () {
+    Turbo.session.history.stop()
     window.history.scrollRestoration = 'manual'
     this.#stamp()
+    this.#load()
+  }
+
+  disconnect () {
+    this.#loading.abort()
+    Turbo.session.history.start()
+  }
+
+  // Again from the failure's button, or once the browser's back online: the page where the catalog loaded, or the catalog
+  retry () {
+    if (!this.#failed) return
+
+    this.#failed = false
+    this.#showFailure(false)
+    this.catalog ? this.refresh() : this.#load()
+  }
+
+  async #load () {
+    this.#loading?.abort()
+    this.#loading = new AbortController()
+    this.#failed = false
+    this.#picks = null
     const url = new URL(window.location.href)
     this.#render(url)
     try {
-      this.catalog = await loadCatalog(this.manifestUrlValue, url.searchParams.get('vehicle_models')?.split(',') ?? [], this.jurisdictionsValue, this.paintColorsValue, {
+      this.catalog = await loadCatalog(this.manifestUrlValue, vehicleIds(url), this.jurisdictionsValue, this.paintColorsValue, {
         comparing: comparing(url),
+        signal: this.#loading.signal,
         onPicks: (picks) => {
           this.#picks = picks
           this.refresh()
@@ -53,7 +93,6 @@ export default class extends Controller {
       })
       this.#picks = null
     } catch (error) {
-      this.#loadFailed = true
       return this.#fail(error)
     }
     // the URL's filters are the reader's, where the combobox's add the visitor's market
@@ -80,7 +119,7 @@ export default class extends Controller {
     return href && `[href="${CSS.escape(href)}"]`
   }
 
-  // The form's fields over the URL's other params, such as an open panel's, its sizes following their vehicles,
+  // The form's fields over the URL's other params, such as an open panel's, what's picked for each vehicle following it,
   // rendered where the reader is: a pick or a chip's removal is no new page
   visit (event) {
     event.preventDefault()
@@ -125,6 +164,11 @@ export default class extends Controller {
     this.#go(withColorway(new URL(window.location.href), vehicle, target.value), [window.scrollX, window.scrollY], { replace: true })
   }
 
+  // A vehicle's JSON opened or closed, in place
+  toggleJson ({ type, params: { vehicle } }) {
+    replaceUrl(withJson(new URL(window.location.href), vehicle, type === 'ui--collapse:shown'))
+  }
+
   // A filter changes in place, which with nothing picked the featured models and their count follow, and the picked
   // ones a jurisdiction or market, which decide which are out of class and which are sold elsewhere, or while the similar
   // ones are open any that narrows them, unless the page renders or the filters change again first
@@ -144,6 +188,11 @@ export default class extends Controller {
       renderInto(this.pageTarget.querySelector('#similar-adjustments'), adjustments)
       this.#renderedUrl = url
     }
+  }
+
+  async rotate () {
+    await this.catalog.rotate()
+    this.refilter()
   }
 
   // The page as it is, rendered where the reader is, such as once a section that's scored when open first opens
@@ -203,10 +252,10 @@ export default class extends Controller {
     const rendered = this.#renderedUrl ?? url
     for (const name of new Set([...link.searchParams.keys(), ...rendered.searchParams.keys()])) {
       const value = link.searchParams.get(name)
-      if (value === rendered.searchParams.get(name)) continue
+      if (name === 'vehicle_models' || value === rendered.searchParams.get(name)) continue
       value === null ? url.searchParams.delete(name) : url.searchParams.set(name, value)
     }
-    return url
+    return changedVehicles(link, rendered, url)
   }
 
   #go (url, scroll = [0, 0], { replace = false, ...options } = {}) {
@@ -227,7 +276,7 @@ export default class extends Controller {
   async #render (url, scroll, { focus = '[autofocus]', reveal = false } = {}) {
     if (!this.catalog && !this.#picks) {
       this.pageTarget.replaceChildren(loadingShell(this.shellTarget, url, this.status))
-      return this.#loadFailed && this.#fail()
+      return this.#failed && this.#fail()
     }
 
     const render = ++this.#renders
@@ -274,7 +323,9 @@ export default class extends Controller {
       requestAnimationFrame(place)
     }
     this.#addComparison()
-    if (this.#loadFailed) this.#fail()
+    // past any failure once the catalog renders, where the picks alone still show the load's
+    if (catalog) this.#failed = false
+    else if (this.#failed) this.#fail()
   }
 
   // Into a page a catalog without the comparison rendered, whichever of the two lands last
@@ -286,12 +337,20 @@ export default class extends Controller {
     addComparison(this.catalog, this.pageTarget, new URL(window.location.href), () => render === this.#renders)
   }
 
-  // in place of the spinner: below the loading shell's search, where it's still showing, or above any picked vehicles
+  // In place of the spinner, with a way to try again: below the loading shell's search, where it's still showing, above
+  // any picked vehicles, or above the vehicles a render that failed leaves showing
   #fail (error) {
     if (error) console.error(error)
-    this.status.textContent = this.failedTextValue
+    this.#failed = true
+    this.#showFailure(true)
     for (const input of this.pageTarget.querySelectorAll('[data-awaiting-catalog]')) input.placeholder = ''
-    if (this.pageTarget.contains(this.status)) this.status.parentElement.prepend(this.status)
-    else this.pageTarget.replaceChildren(this.status)
+    const place = this.pageTarget.contains(this.status) ? this.status.parentElement : this.pageTarget.querySelector('#vehicle-viewers') ?? this.pageTarget
+    place.prepend(this.status)
+  }
+
+  // the failure and its button that tries again, or the spinner
+  #showFailure (failed) {
+    this.status.querySelector('[data-loading]').hidden = failed
+    this.status.querySelector('[data-failed]').hidden = !failed
   }
 }

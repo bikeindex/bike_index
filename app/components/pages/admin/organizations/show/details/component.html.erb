@@ -1,4 +1,4 @@
-<%= render(UI::TableList::Component.new) do |list| %>
+<%= render(UI::Table::List::Component.new) do |list| %>
   <% list.with_row(label: "ID", value: @organization.id, class: "tw:text-sm only-dev-visible", if: @display_dev_info) %>
 
   <% list.with_row(label: "Short Name") do %>

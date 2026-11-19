@@ -3,7 +3,7 @@
 <%= render(Pages::Admin::Headers::Nav::Component.new(title: "Marketplace Message")) %>
 
 <div class="twwiderow tw:mt-6 tw:items-start">
-  <%= render(UI::TableList::Component.new) do |list| %>
+  <%= render(UI::Table::List::Component.new) do |list| %>
     <% list.with_row(label: "ID", dev_only: true, value: render(UI::Code::Inline::Component.new(text: @marketplace_message.id)), if: display_dev_info?) %>
 
     <% list.with_row(label: "Sender") do %>
@@ -44,7 +44,7 @@
     <% end %>
   <% end %>
 
-  <%= render(UI::TableList::Component.new) do |list| %>
+  <%= render(UI::Table::List::Component.new) do |list| %>
     <% list.with_row(label: "Marketplace Listing") do %>
       <span class="tw:text-sm">
         <%= render(UI::Time::Component.new(time: @marketplace_listing.created_at)) %>

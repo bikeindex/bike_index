@@ -1,5 +1,5 @@
 - if @unregistered_parking_notification
-  - iframe_url = new_iframe_organization_bikes_path(organization_id: current_organization)
+  - iframe_url = new_iframe_organization_bikes_path(organization_id: current_organization, kind: params[:kind].presence_in(ParkingNotification.kinds))
 - else
   - iframe_url = embed_extended_organization_url(current_organization.slug)
 <iframe src="#{iframe_url}" data-controller="org--embed-iframe" data-action="load->org--embed-iframe#fit"></iframe>

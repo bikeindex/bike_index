@@ -1,6 +1,7 @@
-// URLSearchParams escapes the commas joining multiselect values and the slashes in vehicle ids,
-// both readable unescaped in a query
-export const readable = (url) => url.href.replace(/%2[CF]/g, decodeURIComponent)
+// URLSearchParams escapes the commas joining multiselect values, the slashes in vehicle ids and the braces and colons of
+// what's picked for each, all readable unescaped in a query
+export const readably = (text) => text.replace(/%2[CF]|%7[BD]|%3A/g, decodeURIComponent)
+export const readable = (url) => readably(url.href)
 
 export function replaceUrl (url) {
   const href = readable(url)

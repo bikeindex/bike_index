@@ -82,19 +82,17 @@
       Callback urls:
     </h4>
 
-    <table class="table">
-      <tbody>
-        <% @application.redirect_uri.split.each do |uri| %>
-          <tr>
-            <td><%= render(UI::Code::Inline::Component.new(text: uri)) %></td>
+    <% client_id = @application.uid %>
 
-            <td>
-              <%= link_to 'Authorize', oauth_authorization_path(client_id: @application.uid, redirect_uri: uri, response_type: 'code', scope: 'public'), class: 'btn btn-secondary', target: '_blank' %>
-            </td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
+    <%= render(UI::Table::Base::Component.new(records: @application.redirect_uri.split)) do |table| %>
+      <% table.column(label: "URL") do |uri| %>
+        <%= render(UI::Code::Inline::Component.new(text: uri)) %>
+      <% end %>
+
+      <% table.column do |uri| %>
+        <%= link_to 'Authorize', oauth_authorization_path(client_id:, redirect_uri: uri, response_type: 'code', scope: 'public'), class: 'btn btn-secondary', target: '_blank' %>
+      <% end %>
+    <% end %>
   </div>
 
   <div class="col-md-4">

@@ -2,7 +2,7 @@ import { html, nothing } from 'lit-html'
 
 const join = (...classes) => classes.filter(Boolean).join(' ')
 
-// UI::Table::Component bordered and unsorted, with UI::TableColumn::Component's header and cells. A column's `cell`
+// UI::Table::Base::Component bordered and unsorted, with UI::TableColumn::Component's header and cells. A column's `cell`
 // and `cellClass` take the row's record, and a `rowHeader` column's cells are row headers. An `alignKey` names each row's
 // data-align-row
 export const table = ({ records, classes, columns, alignKey }) => html`<div class="twgutter-bleed tw:mb-4 tw:overflow-x-scroll tw:pb-3"

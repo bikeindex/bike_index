@@ -1,4 +1,5 @@
 import { FILTERS, toQuery } from 'bikebook/query'
+import { vehicleEntries } from 'bikebook/vehicle_models'
 
 const LOGGED = [...FILTERS, 'vehicle_models', 'q', 'count']
 // A search is what it asks for, apart from its order and the jurisdiction whose classes it shows
@@ -35,7 +36,9 @@ export class SearchLog {
     this.#pending = undefined
   }
 
-  #send (params) {
+  // the models' ids, without what's picked for each
+  #send ({ vehicle_models: models, ...rest }) {
+    const params = { ...rest, vehicle_models: vehicleEntries(models).map(({ id }) => id).join(',') }
     const pick = (names) => toQuery(Object.fromEntries(names.map((name) => [name, params[name]])))
     const search = pick(SEARCHED)
     if (!search || search === this.#sent) return

@@ -68,8 +68,13 @@ HwComboboxController.prototype._filterAsync = async function (inputType) {
   const source = localSources.get(this.element)
   if (!source) return filterAsync.call(this, inputType)
 
+  // the gem aborts it on the next keystroke, so an answer that lands late doesn't autocomplete over newer typing
+  const filtering = new AbortController()
+  this._filterAbortController = filtering
   const edits = this.edits
-  await source.filter(this, inputType)
+  await source.filter(this, inputType, { signal: filtering.signal })
+  if (filtering.signal.aborted) return
+
   this.answeredEdits = edits
   if (this.enterPending && edits === this.edits) {
     this.enterPending = false

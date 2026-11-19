@@ -71,7 +71,7 @@ RSpec.describe UI::Forms::Files::Upload::Component, type: :component do
 
     context "with an ActiveStorage attachment" do
       # persisted: a blob has no signed_id, and so no URL, until it's saved
-      let(:record) { FactoryBot.create(:registration_sequence_page) }
+      let(:record) { FactoryBot.create(:education_course_page) }
       let(:attribute) { :image }
 
       before { record.image.attach(io: File.open(fixture), filename: "bike.jpg", content_type: "image/jpeg") }

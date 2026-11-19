@@ -5,13 +5,13 @@ require "rails_helper"
 RSpec.describe Pages::Register::Views::StepReport::Component, type: :component do
   let(:current_user) { FactoryBot.create(:user_confirmed) }
   let(:status) { "status_stolen" }
-  let(:sequence) { nil }
+  let(:course) { nil }
   let(:params) { {bike: {owner_email: current_user.email, manufacturer_id: 12, status:}} }
   let(:b_param) { BParam.create(origin: "register_flow", creator_id: current_user.id, params: params.as_json) }
-  let(:flow) { BikeServices::Register.flow(b_param, sequence:) }
+  let(:flow) { BikeServices::Register.flow(b_param, course:) }
 
   it "asks about the theft, and is the last step" do
-    render_inline(described_class.new(b_param:, sequence:, flow:))
+    render_inline(described_class.new(b_param:, course:, flow:))
 
     expect(page).to have_field("report[police_report_number]")
     expect(page).to have_button("Complete Bike Registration")
@@ -37,7 +37,7 @@ RSpec.describe Pages::Register::Views::StepReport::Component, type: :component d
     end
 
     it "shows the report as it was entered" do
-      render_inline(described_class.new(b_param:, sequence:, flow:))
+      render_inline(described_class.new(b_param:, course:, flow:))
 
       date = page.find("input[name='report[date]']")
       # The app's zone, which is what a submission without one is read back in
@@ -56,7 +56,7 @@ RSpec.describe Pages::Register::Views::StepReport::Component, type: :component d
     let(:status) { "status_impounded" }
 
     it "asks about the find instead, in its own words" do
-      render_inline(described_class.new(b_param:, sequence:, flow:))
+      render_inline(described_class.new(b_param:, course:, flow:))
 
       expect(page).to have_field("report[impounded_description]")
       expect(page).to_not have_field("report[theft_description]")
@@ -70,14 +70,14 @@ RSpec.describe Pages::Register::Views::StepReport::Component, type: :component d
 
   context "with acknowledgment pages after it" do
     let(:organization) { FactoryBot.create(:organization) }
-    let!(:sequence) { FactoryBot.create(:registration_sequence_active, :with_pages, organization:) }
+    let!(:course) { FactoryBot.create(:education_course_active, :with_pages, organization:) }
     let(:params) do
       {bike: {owner_email: current_user.email, manufacturer_id: 12, status:, cycle_type: "e-scooter",
               creation_organization_id: organization.id}}
     end
 
     it "doesn't claim to finish the registration" do
-      render_inline(described_class.new(b_param:, sequence:, flow:))
+      render_inline(described_class.new(b_param:, course:, flow:))
 
       expect(page).to have_button("Next")
       expect(page).to_not have_button("Complete e-Scooter Registration")
@@ -86,10 +86,10 @@ RSpec.describe Pages::Register::Views::StepReport::Component, type: :component d
     # The emailed link is clicked after the pages, so the report is what's left - the same
     # step list as above, which is why the button reads off what's been agreed to instead
     context "already acknowledged" do
-      before { FactoryBot.create(:registration_sequence_acknowledgment, b_param:, registration_sequence: sequence) }
+      before { FactoryBot.create(:education_course_acknowledgment, b_param:, education_course: course) }
 
       it "finishes the registration" do
-        render_inline(described_class.new(b_param:, sequence:, flow:))
+        render_inline(described_class.new(b_param:, course:, flow:))
 
         expect(page).to have_button("Complete e-Scooter Registration")
         expect(page).to_not have_button("Next")

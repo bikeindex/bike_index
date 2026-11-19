@@ -9,7 +9,7 @@ export const mockGear: StoredGear[] = [
     brand_name: 'Garmin',
     model_name: 'Edge 530',
     resource_state: 2,
-    athleteId: 12345,
+    athleteId: '12345',
   },
   {
     id: 'b11099574',
@@ -19,7 +19,7 @@ export const mockGear: StoredGear[] = [
     brand_name: 'Peloton',
     model_name: 'Bike',
     resource_state: 2,
-    athleteId: 12345,
+    athleteId: '12345',
   },
   {
     id: 'b14918050',
@@ -29,7 +29,7 @@ export const mockGear: StoredGear[] = [
     brand_name: 'Yuba',
     model_name: 'Longtail',
     resource_state: 2,
-    athleteId: 12345,
+    athleteId: '12345',
   },
   {
     id: 'g21560884',
@@ -39,13 +39,13 @@ export const mockGear: StoredGear[] = [
     brand_name: 'On',
     model_name: 'Cloudvista',
     resource_state: 2,
-    athleteId: 12345,
+    athleteId: '12345',
   },
 ];
 
 // Morning run
 const morningRun: StoredActivity = {
-  id: 16211859713,
+  id: '16211859713',
   strava_id: '16211859713',
   activity_type: 'Run',
   average_speed: 3.421,
@@ -72,13 +72,13 @@ const morningRun: StoredActivity = {
   max_heartrate: 178.0,
   average_heartrate: 154.8,
   start_date_in_zone: '2025-10-21T06:46:45.000-07:00',
-  athleteId: 12345,
+  athleteId: '12345',
   syncedAt: Date.now(),
 };
 
 // Nordic Ski activity
 const nordicSki: StoredActivity = {
-  id: 13329733465,
+  id: '13329733465',
   strava_id: '13329733465',
   activity_type: 'NordicSki',
   average_speed: 2.208,
@@ -110,13 +110,13 @@ const nordicSki: StoredActivity = {
   max_heartrate: 170.0,
   average_heartrate: 132.1,
   start_date_in_zone: '2025-01-11T10:18:07.000-08:00',
-  athleteId: 12345,
+  athleteId: '12345',
   syncedAt: Date.now(),
 };
 
 // Peloton ride (muted)
 const pelotonRide: StoredActivity = {
-  id: 17419209324,
+  id: '17419209324',
   strava_id: '17419209324',
   activity_type: 'VirtualRide',
   average_speed: 8.466,
@@ -145,13 +145,13 @@ const pelotonRide: StoredActivity = {
   max_heartrate: 149.0,
   average_heartrate: 136.2,
   start_date_in_zone: '2026-02-16T12:52:07.000-06:00',
-  athleteId: 12345,
+  athleteId: '12345',
   syncedAt: Date.now(),
 };
 
 // E-Bike ride
 const ebike: StoredActivity = {
-  id: 14473480010,
+  id: '14473480010',
   strava_id: '14473480010',
   activity_type: 'EBikeRide',
   average_speed: 3.018,
@@ -180,13 +180,13 @@ const ebike: StoredActivity = {
   max_heartrate: 176.0,
   average_heartrate: 104.1,
   start_date_in_zone: '2025-05-13T17:40:15.000-07:00',
-  athleteId: 12345,
+  athleteId: '12345',
   syncedAt: Date.now(),
 };
 
 // Long distance ride (400km)
 const rando400k: StoredActivity = {
-  id: 6926691220,
+  id: '6926691220',
   strava_id: '6926691220',
   activity_type: 'Ride',
   average_speed: 6.795,
@@ -229,13 +229,13 @@ const rando400k: StoredActivity = {
   max_heartrate: 178.0,
   average_heartrate: 134.9,
   start_date_in_zone: '2022-04-02T06:36:43.000-07:00',
-  athleteId: 12345,
+  athleteId: '12345',
   syncedAt: Date.now(),
 };
 
 // Berlin fast ride
 const berlinRide: StoredActivity = {
-  id: 9677113832,
+  id: '9677113832',
   strava_id: '9677113832',
   activity_type: 'Ride',
   average_speed: 8.139,
@@ -274,13 +274,13 @@ const berlinRide: StoredActivity = {
   max_heartrate: 193.0,
   average_heartrate: 67.0,
   start_date_in_zone: '2023-08-19T06:50:01.000+02:00',
-  athleteId: 12345,
+  athleteId: '12345',
   syncedAt: Date.now(),
 };
 
 // Multi-state ride (Indiana + Illinois)
 const dunesTrip: StoredActivity = {
-  id: 630203151,
+  id: '630203151',
   strava_id: '630203151',
   activity_type: 'Ride',
   average_speed: 6.154,
@@ -324,7 +324,7 @@ const dunesTrip: StoredActivity = {
   max_heartrate: 167.0,
   average_heartrate: 131.2,
   start_date_in_zone: '2016-07-04T09:36:55.000-05:00',
-  athleteId: 12345,
+  athleteId: '12345',
   syncedAt: Date.now(),
 };
 
@@ -339,7 +339,7 @@ export const mockActivities: StoredActivity[] = [
 ];
 
 export const mockAthlete = {
-  id: 12345,
+  id: '12345',
   username: 'athlete123',
   firstname: 'John',
   lastname: 'Doe',
@@ -351,7 +351,7 @@ export const mockAthlete = {
 };
 
 export const mockSyncState = {
-  athleteId: 12345,
+  athleteId: '12345',
   lastSyncedAt: Date.now() - 1000 * 60 * 30, // 30 minutes ago
   oldestActivityDate: '2020-01-01T00:00:00Z',
   isInitialSyncComplete: true,

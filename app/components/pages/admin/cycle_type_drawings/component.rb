@@ -3,18 +3,18 @@
 module Pages
   module Admin
     module CycleTypeDrawings
-      # Each cycle type's BikeBook drawing at its typical figures, and of a catalog model of that type. The
-      # admin--cycle-type-details controller follows each with its type_details BikeBook draws their own way, whose list is
+      # Each cycle type's Bike Book drawing at its typical figures, and of a catalog model of that type. The
+      # admin--cycle-type-details controller follows each with its type_details Bike Book draws their own way, whose list is
       # the drawings' own
       class Component < ApplicationComponent
         Row = Data.define(:name, :type, :example_model) do
           def collapsed = example_model.nil? || Pages::Admin::CycleTypeDrawings::Component::COLLAPSED_TYPES.include?(type)
         end
 
-        # by BikeBook vehicle type, those that start collapsed though they have a catalog example
+        # by Bike Book vehicle type, those that start collapsed though they have a catalog example
         COLLAPSED_TYPES = %w[skateboard wheelchair unicycle].freeze
 
-        # the CycleType slugs BikeBook's vehicle types name differently
+        # the CycleType slugs Bike Book's vehicle types name differently
         BIKEBOOK_TYPES = {
           trailer: "bike_trailer",
           cargo: "cargo_bike",
@@ -27,7 +27,7 @@ module Pages
           elliptical: "elliptical_bike"
         }.freeze
 
-        # by BikeBook vehicle type, or type/type_detail, the catalog model that fills in the most of its drawing
+        # by Bike Book vehicle type, or type/type_detail, the catalog model that fills in the most of its drawing
         EXAMPLE_MODELS = {
           "bike" => "m/specialized/2025/aethos_comp_shimano_105_di2_ca",
           "bike/step_through" => "m/aventon/2025/level_3_step_through",

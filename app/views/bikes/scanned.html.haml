@@ -28,42 +28,26 @@
         %p
           = t(".or_click_html", bike_sticker_kind: @bike_sticker.kind)
 
-        %table.table.table-striped.table-bordered.table-sm.without-exterior-border
-          %thead.small-header
-            %tr
-              %th.date-added
-                = t(".added")
-                %small.localizeTimezone
-              %th.hidden-xs-down= t(".manufacturer")
-              %th.hidden-xs-down= t(".model")
-              %th.hidden-xs-down= t(".color")
-              %th.hidden-sm-up.hidden-sm-up
-                %small
-                  = t(".mnfg_model_color_html")
-              %th
-                = t(".link_it")
-          %tbody
-            - @bikes.each do |bike|
-              %tr
-                %td
-                  %small
-                    %a.localizeTime{ href: bike_path(bike) }
-                      = l bike.created_at, format: :convert_time
-                %td.hidden-xs-down
-                  = bike.mnfg_name
-                %td.hidden-xs-down
-                  = bike.frame_model
-                %td.hidden-xs-down
-                  = bike.frame_colors.to_sentence
-                %td.hidden-sm-up
-                  %small
-                    = [bike.mnfg_name, bike.frame_model].select(&:present?).join(", ")
-                    %span.less-strong
-                      = bike.frame_colors.to_sentence
-                    %br
-                %td
-                  %small
-                    = link_to t(".link_bike_sticker_kind", bike_sticker_kind: @bike_sticker.kind), bike_sticker_path(id: @bike_sticker.code, organization_id: @bike_sticker.organization_id, bike_id: bike.id), method: :put
+        - bike_sticker = @bike_sticker
+        - link_bike_sticker_kind = t(".link_bike_sticker_kind", bike_sticker_kind: bike_sticker.kind)
+        = render(UI::Table::Base::Component.new(records: @bikes)) do |table|
+          - table.column(label: safe_join([t(".added"), " ", tag.small(class: "localizeTimezone")])) do |bike|
+            %small
+              = link_to render(UI::Time::Component.new(time: bike.created_at)), bike_path(bike), class: "twlink"
+          - table.column(label: t(".manufacturer"), classes: "hidden-xs-down") do |bike|
+            = bike.mnfg_name
+          - table.column(label: t(".model"), classes: "hidden-xs-down") do |bike|
+            = bike.frame_model
+          - table.column(label: t(".color"), classes: "hidden-xs-down") do |bike|
+            = bike.frame_colors.to_sentence
+          - table.column(label: tag.small(t(".mnfg_model_color_html")), classes: "hidden-sm-up") do |bike|
+            %small
+              = [bike.mnfg_name, bike.frame_model].select(&:present?).join(", ")
+              %span.less-strong
+                = bike.frame_colors.to_sentence
+          - table.column(label: t(".link_it")) do |bike|
+            %small
+              = link_to link_bike_sticker_kind, bike_sticker_path(id: bike_sticker.code, organization_id: bike_sticker.organization_id, bike_id: bike.id), method: :put, class: "twlink"
   - else
     %p{ style: "margin-top: 24px;" }
       = t(".to_link_that_card_with_a_bike")

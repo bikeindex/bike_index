@@ -6,7 +6,7 @@
     %p{class: "tw:mb-4"} Here are the values for a few example sticker batches.
     - examples = [{id: 9, name: "#9 (EPS 2)", stickers: ["ED 010 133", "ED 061 132"], prefix: "ED", initial: 10133, count: 51000, length: 6},
       {id: 21, name: "#21 (3rd internal)", stickers: ["A 250 0", "A 309 8"], prefix: "A", initial: 2500, count: 599, length: 4}]
-    = render(UI::Table::Component.new(records: examples)) do |table|
+    = render(UI::Table::Base::Component.new(records: examples)) do |table|
       - table.column(label: "Batch") do |batch|
         = link_to batch[:name], admin_bike_stickers_path(search_bike_sticker_batch_id: batch[:id]), class: "twlink"
       - table.column(label: "First & Last Sticker") do |batch|

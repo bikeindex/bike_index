@@ -1,0 +1,4 @@
+<%= render(Pages::Admin::Organizations::Tabs::Component.new(organization: @organization, active: :education_courses, display_dev_info: display_dev_info?)) %>
+
+<%= render partial: "/admin/education_courses/table",
+      locals: {collection: @organization.education_courses.includes(:education_course_pages).reorder(created_at: :desc)} %>

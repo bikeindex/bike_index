@@ -19,43 +19,29 @@
       = render(UI::TimeRange::Component.new(time_range: @time_range, period: @period))
 
   - skip_location ||= !current_organization&.enabled?("impound_bikes_locations")
-  .full-screen-table
-    %table.table.table-striped.table-bordered.table-sm.without-exterior-border
-      %thead.small-header.hidden-md-down
-        %th
-          %small= sortable "display_id", "Impound&nbsp;ID"
-        %th= sortable "created_at", "Impounded&nbsp;at"
-        %th Bike
-        - unless skip_location
-          %th= sortable "location_id"
-        %th Impounded from
-
-      %tbody
-        - @impound_records.each do |impound_record|
-          %tr
-            %td
-              = impound_record.display_id
-            %td
-              %a.localizeTime.preciseTime
-                = l(impound_record.created_at, format: :convert_time)
-            %td
-              - if impound_record.bike.present?
-                - bike = impound_record.bike
-                %a{ href: bike_path(bike.to_param) }
-                  = bike.frame_colors.to_sentence
-                  %strong
-                    = bike.mnfg_name
-                  - if bike.frame_model.present?
-                    %em
-                      = bike.frame_model_truncated
-                  - unless bike.cycle_type == "bike"
-                    %small= bike.type
-            - unless skip_location
-              %td
-                %small
-                  = impound_record.location&.name
-            %td
-              = impound_record.formatted_address_string(visible_attribute: :street)
+  = render(UI::Table::Base::Component.new(records: @impound_records, render_sortable: true, sort_state:)) do |table|
+    - table.column(sortable: "display_id", label: "Impound&nbsp;ID".html_safe, header_classes: "tw:text-xs") do |impound_record|
+      = impound_record.display_id
+    - table.column(sortable: "created_at", label: "Impounded&nbsp;at".html_safe) do |impound_record|
+      = render(UI::Time::Component.new(time: impound_record.created_at, format: :localize_time_precise))
+    - table.column(label: "Bike") do |impound_record|
+      - if impound_record.bike.present?
+        - bike = impound_record.bike
+        %a.twlink{ href: bike_path(bike.to_param) }
+          = bike.frame_colors.to_sentence
+          %strong
+            = bike.mnfg_name
+          - if bike.frame_model.present?
+            %em
+              = bike.frame_model_truncated
+          - unless bike.cycle_type == "bike"
+            %small= bike.type
+    - unless skip_location
+      - table.column(sortable: "location_id") do |impound_record|
+        %small
+          = impound_record.location&.name
+    - table.column(label: "Impounded from") do |impound_record|
+      = impound_record.formatted_address_string(visible_attribute: :street)
 
   .pt-4.pb-4
     = render(UI::Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg))

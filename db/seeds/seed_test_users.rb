@@ -13,6 +13,7 @@ user_attrs = {
   dev: {name: "Dev User", email: "dev@bikeindex.org", vendor_terms_of_service: true, when_vendor_terms_of_service: Time.current, developer: true},
   member: {name: "Member User", email: "member@brakebills.edu", vendor_terms_of_service: true, when_vendor_terms_of_service: Time.current},
   user: {name: "Test User", email: "user@bikeindex.org"},
+  ios_review: {name: "iOS Review User", email: "ios_review@bikeindex.org"},
   transfer_recipient: {name: "Transfer Recipient", email: "transfer_recipient@bikeindex.org"},
   transfer_provider: {name: "Transfer Provider", email: "transfer_provider@bikeindex.org"},
   api_accessor: {name: "Api Accessor", email: "api@bikeindex.org"},
@@ -34,8 +35,5 @@ superuser_attrs = new_user_attrs.values_at(:admin, :dev).compact
 superuser_attrs.each do |attributes|
   SuperuserAbility.create!(user: User.find_by(email: attributes[:email]))
 end
-
-# Group gate rather than per-actor — opting out writes users.feature_registration_show_legacy
-Flipper.enable_group(:bike_show_redesign_toggle, :superusers) if superuser_attrs.any?
 
 puts "Users added successfully\n"

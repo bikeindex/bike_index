@@ -13,10 +13,6 @@ class BulkImportJob < ApplicationJob
       "#{REDLOCK_PREFIX}-#{organization_id}"
     end
 
-    def new_lock_manager
-      Redlock::Client.new([Bikeindex::Application.config.redis_default_url])
-    end
-
     # This is a little gross. It was added in PR #2911 when adding address records to bikes
     def address_record_attributes(address_string, country_id: nil)
       return {} if address_string.blank?

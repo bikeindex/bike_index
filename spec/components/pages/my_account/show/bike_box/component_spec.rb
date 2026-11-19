@@ -43,7 +43,7 @@ RSpec.describe Pages::MyAccount::Show::BikeBox::Component, type: :component do
     before do
       b_param = FactoryBot.create(:b_param_unfinished_registration, creator: user, created_bike_id: bike.id,
         params: {bike: {manufacturer_id: bike.manufacturer_id, owner_email: user.email}})
-      FactoryBot.create(:registration_sequence_acknowledgment_pending, b_param:, bike:)
+      FactoryBot.create(:education_course_acknowledgment_pending, b_param:, bike:)
     end
 
     it "renders the unfinished registration alert, above the registration" do

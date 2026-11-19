@@ -5,7 +5,7 @@
   = render(UI::Container::Component.new) do
     = render(UI::Card::Component.new(additional_classes: "tw:my-6")) do
       = render(UI::Header::Component.new(text: tag.em("#{@social_account.screen_name} has an Error!", class: UI::Alerts::Base::Component::TEXT_CLASSES[:error]), tag: :h3))
-      = render(UI::TableList::Component.new(classes: "tw:mt-6")) do |list|
+      = render(UI::Table::List::Component.new(classes: "tw:mt-6")) do |list|
         - list.with_row(label: "Error at:", value: render(UI::Time::Component.new(time: @social_account.last_error_at)))
         - list.with_row(label: "Error", value: @social_account.last_error)
       = render(UI::ButtonLink::Component.new(text: "Log in to refresh credentials", href: "/auth/twitter", color: :primary))
@@ -15,7 +15,7 @@
     %small
       = link_to "view on twitter", "https://twitter.com/#{@social_account.screen_name}", target: :_blank, class: "twlink"
 
-    = render(UI::TableList::Component.new(classes: "tw:mt-2")) do |list|
+    = render(UI::Table::List::Component.new(classes: "tw:mt-2")) do |list|
       - %w[created_at updated_at last_error_at].each do |attr|
         - list.with_row(label: attr.humanize, value: render(UI::Time::Component.new(time: @social_account.send(attr))))
       - @social_account.attributes.except("account_info", "last_error_at", "created_at", "updated_at", "last_error").each_pair do |attr, value|
