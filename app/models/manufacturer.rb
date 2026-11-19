@@ -80,7 +80,7 @@ class Manufacturer < ApplicationRecord
     # A previous slug that's another manufacturer's slug or secondary slug, or shared by several manufacturers
     def slug_collisions
       unscoped.joins("CROSS JOIN unnest(manufacturers.previous_slugs) AS previous_slug")
-        .joins("LEFT JOIN manufacturers current ON previous_slug IN (current.slug, current.secondary_slug) AND current.id != manufacturers.id")
+        .joins("LEFT JOIN (SELECT id, name, unnest(ARRAY[slug, secondary_slug]) AS current_slug FROM manufacturers) current ON current.current_slug = previous_slug AND current.id != manufacturers.id")
         .group("previous_slug, current.id, current.name").having("COUNT(*) > 1 OR current.id IS NOT NULL")
         .order("previous_slug")
         .pluck(Arel.sql("previous_slug, current.id, current.name, array_agg(manufacturers.id ORDER BY LOWER(manufacturers.name)), array_agg(manufacturers.name ORDER BY LOWER(manufacturers.name))"))

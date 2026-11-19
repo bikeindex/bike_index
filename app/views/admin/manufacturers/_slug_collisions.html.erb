@@ -17,11 +17,10 @@
           <% if collision[:manufacturer] %>
             belongs to
             <%= link_to(collision[:manufacturer][:name], admin_manufacturer_path(collision[:manufacturer][:id]), class: "twlink-underlined") %>,
-            and is a previous slug of
-          <% else %>
-            is a previous slug of
+            and
           <% end %>
 
+          is a previous slug of
           <%= safe_join(collision[:previous_slug_manufacturers].map { link_to(it[:name], admin_manufacturer_path(it[:id]), class: "twlink-underlined") }, ", ") %>
         </li>
       <% end %>
