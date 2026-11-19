@@ -190,6 +190,11 @@ export default class extends Controller {
     }
   }
 
+  async rotate () {
+    await this.catalog.rotate()
+    this.refilter()
+  }
+
   // The page as it is, rendered where the reader is, such as once a section that's scored when open first opens
   refresh () {
     this.#render(new URL(window.location.href), [window.scrollX, window.scrollY], { focus: false })
