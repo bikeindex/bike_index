@@ -1,0 +1,18 @@
+<h1><%= translation("is_this_the_same", bike_type: @pos_bike.type) %></h1>
+
+<p>
+  <% if shop_name.present? %>
+    <%= translation("shop_registered_it_html", shop_name:, bike_type: @pos_bike.type) %>
+  <% else %>
+    <%= translation("pos_registered_it", bike_type: @pos_bike.type) %>
+  <% end %>
+</p>
+
+<%= render(Emails::Partials::BikeBox::Component.new(bike: @pos_bike, ownership: @pos_bike.current_ownership, bike_url_path: bike_url(@pos_bike))) %>
+<%= render(Emails::Partials::BikeBox::Component.new(bike: @bike, ownership: @bike.current_ownership, bike_url_path: bike_url(@bike))) %>
+
+<p><%= translation("combine_them", bike_type: @pos_bike.type) %></p>
+
+<%= link_to translation("review_and_combine"), my_account_pos_registration_match_url(@pos_registration_match), class: "binx-button" %>
+
+<p><%= translation("if_theyre_different") %></p>

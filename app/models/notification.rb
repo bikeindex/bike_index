@@ -128,7 +128,8 @@ class Notification < ApplicationRecord
 
     def sender_auto_kinds
       donation_kinds + theft_alert_kinds + user_alert_kinds + pos_integration_broken_kinds +
-        %w[bike_possibly_found stolen_twitter_alerter unknown_organization_for_ascend graduated_notification parking_notification]
+        %w[bike_possibly_found stolen_twitter_alerter unknown_organization_for_ascend graduated_notification parking_notification
+          pos_registration_match]
     end
 
     def search_message_channel_target(str)

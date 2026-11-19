@@ -19,12 +19,17 @@ module BikeJobs
       pos_bikes.each do |pos_bike|
         reasons = PosRegistrationMatch.review_reasons_for(bike, pos_bike) + (pos_bikes.many? ? ["multiple_pos_bikes"] : [])
         # Locks the POS bike, so concurrent registrations of it each see the other's match
-        pos_bike.with_lock do
+        match = pos_bike.with_lock do
           other_matches = PosRegistrationMatch.where(pos_bike_id: pos_bike.id).where.not(bike_id: bike.id)
             .where(bike_id: Bike.current_with_user_hidden.select(:id)).to_a
           reasons += ["multiple_registrations"] if other_matches.any?
           other_matches.each { add_reasons(it, ["multiple_registrations"]) }
           record_match(bike, pos_bike, duplicate_bike_group_id, reasons)
+        end
+        # After the lock's transaction commits, so the email job finds the match. Until it's sent, so a failed
+        # enqueue or send is retried while the new registration is still being matched
+        if match.pending? && match.merge_candidate? && !Notification.pos_registration_match.settled.exists?(notifiable: match)
+          EmailJobs::PosRegistrationMatchJob.perform_async(match.id)
         end
       end
     end
@@ -58,6 +63,7 @@ module BikeJobs
       end
       # The group may have been replaced since
       add_reasons(match, reasons, duplicate_bike_group_id:) unless match.previously_new_record?
+      match
     end
 
     def add_reasons(match, reasons, **attributes)
