@@ -3,12 +3,12 @@ require "rails_helper"
 RSpec.describe Backfills::ManufacturerSlugJob, type: :job do
   let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Kona Bicycle Company (Kona Bikes)") }
 
-  it "slugifies, keeping the secondary and old slugs as previous slugs" do
+  it "slugifies, keeping the old slug as a previous slug" do
     manufacturer.update_columns(slug: "kona_old", previous_slugs: [])
 
     described_class.new.perform
     expect(manufacturer.reload.slug).to eq "kona-bicycle-company"
-    expect(manufacturer.previous_slugs).to eq %w[kona kona_old]
+    expect(manufacturer.previous_slugs).to eq %w[kona_old kona]
   end
 
   context "manufacturer that can't be saved" do

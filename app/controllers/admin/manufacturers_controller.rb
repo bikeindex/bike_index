@@ -5,7 +5,7 @@ module Admin
 
     token_accessible :index, :create, :update
 
-    JSON_ATTRIBUTES = %w[id name slug previous_slugs website frame_maker motorized_only priority].freeze
+    JSON_ATTRIBUTES = %w[id name slug secondary_slug previous_slugs website frame_maker motorized_only priority].freeze
 
     before_action :find_manufacturer, only: [:edit, :update, :destroy, :show]
 

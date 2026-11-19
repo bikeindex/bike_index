@@ -2378,6 +2378,7 @@ CREATE TABLE public.manufacturers (
     twitter_name character varying,
     priority integer,
     motorized_only boolean DEFAULT false,
+    secondary_slug character varying,
     previous_slugs character varying[] DEFAULT '{}'::character varying[] NOT NULL
 );
 
@@ -8088,7 +8089,6 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
-('20261119190000'),
 ('20261119180000'),
 ('20261117051637'),
 ('20261116222651'),

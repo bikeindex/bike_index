@@ -5,8 +5,8 @@
   <% end %>
   <%= render(UI::Alerts::Base::Component.new(kind: :warning, header:)) do %>
     <p>
-      A slug finds the manufacturer that has it now. A previous slug several
-      manufacturers share finds the first alphabetically.
+      A slug or secondary slug finds the manufacturer that has it now. A
+      previous slug several manufacturers share finds the first alphabetically.
     </p>
 
     <ul class="tw:list-disc tw:pl-4">
@@ -15,9 +15,9 @@
           <%= render(UI::Code::Inline::Component.new(text: collision[:slug])) %>
 
           <% if collision[:manufacturer] %>
-            is
-            <%= link_to(collision[:manufacturer][:name], admin_manufacturer_path(collision[:manufacturer][:id]), class: "twlink-underlined") %>'s
-            slug, and a previous slug of
+            belongs to
+            <%= link_to(collision[:manufacturer][:name], admin_manufacturer_path(collision[:manufacturer][:id]), class: "twlink-underlined") %>,
+            and is a previous slug of
           <% else %>
             is a previous slug of
           <% end %>

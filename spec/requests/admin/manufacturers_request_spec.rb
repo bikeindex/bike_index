@@ -61,7 +61,7 @@ RSpec.describe Admin::ManufacturersController, type: :request do
         it "renders the manufacturers with their priority" do
           get url, params: token_param.merge(search_with_websites: true)
           expect(response.status).to eq 200
-          expect(json_result["manufacturers"]).to eq([with_website.as_json(only: %w[id name slug previous_slugs website frame_maker motorized_only priority])])
+          expect(json_result["manufacturers"]).to eq([with_website.as_json(only: %w[id name slug secondary_slug previous_slugs website frame_maker motorized_only priority])])
           expect(json_result["slug_collisions"]).to eq([])
         end
 
@@ -146,7 +146,7 @@ RSpec.describe Admin::ManufacturersController, type: :request do
         it "updates" do
           patch url, params: token_param.merge(manufacturer: {name: "Cool Bikes (Rad Bikes)"})
           expect(response.status).to eq 200
-          expect(json_result["manufacturer"]).to include("name" => "Cool Bikes (Rad Bikes)", "slug" => "cool-bikes", "previous_slugs" => %w[rad cool], "priority" => 0)
+          expect(json_result["manufacturer"]).to include("name" => "Cool Bikes (Rad Bikes)", "slug" => "cool-bikes", "secondary_slug" => "rad", "previous_slugs" => %w[cool], "priority" => 0)
         end
 
         context "with a name that is taken" do

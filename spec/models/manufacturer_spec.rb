@@ -36,10 +36,10 @@ RSpec.describe Manufacturer, type: :model do
   end
 
   describe "slug validation" do
-    it "is invalid when the slug is all digits, and drops all-digit previous slugs" do
+    it "is invalid when a slug is all digits" do
       expect(FactoryBot.build(:manufacturer, name: "333")).not_to be_valid
-      expect(FactoryBot.create(:manufacturer, name: "Foo (101)").previous_slugs).to eq []
-      expect(FactoryBot.create(:manufacturer, name: "Bar (101 Bikes)").previous_slugs).to eq ["101_bikes"]
+      expect(FactoryBot.build(:manufacturer, name: "Foo (101)")).not_to be_valid
+      expect(FactoryBot.build(:manufacturer, name: "Foo (101 Bikes)")).to be_valid
     end
   end
 
@@ -77,26 +77,26 @@ RSpec.describe Manufacturer, type: :model do
       expect(mnfg.previous_slugs).to eq ["all_city"]
       expect(Manufacturer.friendly_find("All-city ")&.id).to eq(mnfg.id)
     end
-    it "finds by the secondary name, which is replaced when the name changes" do
+    it "finds in the secondary_slug" do
       mnfg = FactoryBot.create(:manufacturer, name: "S & M (S and M Bikes) ")
       expect(mnfg.secondary_name).to eq "S and M Bikes"
-      expect(mnfg.previous_slugs).to eq %w[s_and_m s_amp_m]
+      expect(mnfg.secondary_slug).to eq "s_and_m"
       expect(Manufacturer.friendly_find("s & m")&.id).to eq mnfg.id
-      expect(Manufacturer.friendly_find("s_and_m")&.id).to eq mnfg.id
+      expect(Manufacturer.find_by_secondary_slug("s_and_m")&.id).to eq mnfg.id
       expect(Manufacturer.friendly_find("s and m bikes")&.id).to eq mnfg.id
       expect(Manufacturer.friendly_find("s and m")&.id).to eq mnfg.id
 
       mnfg.update(name: "S & M (SandM)")
-      expect(mnfg.reload.previous_slugs).to eq %w[sandm s_amp_m]
+      expect(mnfg.reload.secondary_slug).to eq "sandm"
       expect(Manufacturer.friendly_find("s and m")).to be_nil
-      expect(Manufacturer.friendly_find("sandm")&.id).to eq mnfg.id
     end
-    it "keeps the old name's slug when it matches the replaced secondary name's" do
+    it "keeps the old name's slug when it was also the secondary slug" do
       mnfg = FactoryBot.create(:manufacturer, name: "Kona Bicycle Company (Kona)")
-      expect(mnfg.previous_slugs).to eq ["kona"]
+      expect([mnfg.secondary_slug, mnfg.previous_slugs]).to eq ["kona", ["kona"]]
+      expect(mnfg.slug_collisions).to eq []
 
       mnfg.update(name: "Foo")
-      expect(mnfg.reload.previous_slugs).to eq %w[kona-bicycle-company kona]
+      expect(mnfg.reload.previous_slugs).to eq %w[kona kona-bicycle-company]
       expect(Manufacturer.friendly_find("Kona Bikes")).to eq mnfg
     end
     context "name of digits and a removed suffix, where the digits are another manufacturer's id" do
@@ -131,14 +131,17 @@ RSpec.describe Manufacturer, type: :model do
       expect(other.slug_collisions).to eq([])
     end
 
+    it "is a secondary slug that's another manufacturer's previous slug" do
+      zebra = FactoryBot.create(:manufacturer, name: "Zebra (Kona)")
+      expect(Manufacturer.slug_collisions).to eq([{slug: "kona", manufacturer: {id: zebra.id, name: "Zebra (Kona)"},
+                                                   previous_slug_manufacturers: [{id: kona_company.id, name: "Kona Bicycle Company"}]}])
+      expect(Manufacturer.friendly_find("kona bikes")).to eq zebra
+    end
+
     it "is a previous slug several manufacturers share" do
-      zebra = FactoryBot.create(:manufacturer, name: "Zebra (Aardvark)")
-      aardvark = FactoryBot.create(:manufacturer, name: "Aardvark Bicycle Company")
-      expect([zebra.previous_slugs, aardvark.previous_slugs]).to eq [["aardvark"], ["aardvark"]]
-      expect(Manufacturer.slug_collisions).to eq([{slug: "aardvark", manufacturer: nil,
-                                                   previous_slug_manufacturers: [{id: aardvark.id, name: "Aardvark Bicycle Company"}, {id: zebra.id, name: "Zebra (Aardvark)"}]}])
-      expect(Manufacturer.friendly_find("aardvark bikes")).to eq aardvark
-      expect(Manufacturer.friendly_find("zebra")).to eq zebra
+      kona_works = FactoryBot.create(:manufacturer, name: "Kona Works")
+      expect(Manufacturer.slug_collisions).to eq([{slug: "kona", manufacturer: nil,
+                                                   previous_slug_manufacturers: [{id: kona_company.id, name: "Kona Bicycle Company"}, {id: kona_works.id, name: "Kona Works"}]}])
     end
   end
 
