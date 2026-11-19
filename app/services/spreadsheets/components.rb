@@ -46,7 +46,7 @@ module Spreadsheets
     end
 
     def row_for(ctype)
-      [ctype.name, ctype.secondary_name, ctype.has_multiple, ctype.cgroup&.name]
+      [ctype.name, ctype.secondary_name, ctype.has_multiple || nil, ctype.cgroup&.name]
     end
 
     conceal :update_or_create_for!, :find_or_create_cgroup, :row_for
