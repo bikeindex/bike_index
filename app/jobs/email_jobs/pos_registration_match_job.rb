@@ -15,8 +15,9 @@ module EmailJobs
         match.add_review_reasons!(PosRegistrationMatch.review_reasons_for(match.bike, match.pos_bike))
         next unless match.merge_candidate?
 
-        notification = Notification.pos_registration_match.where(notifiable: match)
-          .first_or_create(user: match.bike.user, bike_id: match.pos_bike_id)
+        # The current owner's, in case an earlier failed one was to a former owner
+        notification = Notification.pos_registration_match.where(notifiable: match, user: match.bike.user)
+          .first_or_create(bike_id: match.pos_bike_id)
         # Skips a notification that's already been sent
         Notifications::Deliver.track_email(notification) do
           CustomerMailer.pos_registration_match_email(match, notification.user).deliver_now

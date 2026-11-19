@@ -22,6 +22,13 @@ RSpec.describe EmailJobs::PosRegistrationMatchJob, type: :job do
       bike_id: match.pos_bike_id, delivery_status: "delivery_success")
   end
 
+  it "emails the current owner, not a former owner an earlier email failed to" do
+    Notification.create!(kind: "pos_registration_match", notifiable: match, user: FactoryBot.create(:user_confirmed),
+      delivery_status: "delivery_failure")
+    described_class.new.perform(match.id)
+    expect(ActionMailer::Base.deliveries.map(&:to)).to eq([[user.email]])
+  end
+
   it "emails about a POS registration the owner hid" do
     match.pos_bike.update_column(:user_hidden, true)
     described_class.new.perform(match.id)
