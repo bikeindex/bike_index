@@ -11,7 +11,8 @@
     <link href='https://fonts.googleapis.com/css?family=Anonymous+Pro:400,400italic,700&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
     = javascript_include_tag 'application_revised'
 
-  %body.documentation-authorize{class: ("dark" if current_user&.dark_mode_preview?)}
+  %body.documentation-authorize{class: ("dark" if current_user&.color_scheme_dark?)}
+    = render(SharedBlocks::SystemColorScheme::Component.new(user: current_user))
     .container
       - if @application.present?
         - modal_body = capture_haml do

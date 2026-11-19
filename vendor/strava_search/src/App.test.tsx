@@ -13,13 +13,13 @@ vi.mock('./contexts/AuthContext', () => ({
   useAuth: () => ({
     isLoading: false,
     isAuthenticated: true,
-    athlete: { id: 12345 },
+    athlete: { id: '12345' },
     syncState: { isInitialSyncComplete: true, lastSyncedAt: Date.now() },
   }),
 }));
 
 vi.mock('./contexts/PreferencesContext', () => ({
-  usePreferences: () => ({ units: 'imperial', autoEnrich: false, darkMode: 'system' }),
+  usePreferences: () => ({ units: 'imperial', autoEnrich: false }),
 }));
 
 vi.mock('./hooks/useActivitySync', () => ({

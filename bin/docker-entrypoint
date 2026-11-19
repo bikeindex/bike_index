@@ -40,9 +40,9 @@ SQL
   # test-mode keys, so sync the real prices over the seeded placeholders.
   if [ "$RAILS_ENV" == "sandbox" ]; then
     ./bin/rails runner 'StripeJobs::UpdatePricesJob.perform_async' || true
-    # A runner each, so one seed raising doesn't skip the rest
-    for seed in seed_test_users seed_transfer_bike seed_oauth_app; do
-      ./bin/rails runner "load \"db/seeds/$seed.rb\"" || true
+    # A runner each, so one seed raising doesn't skip the rest or block boot
+    for seed in seed_test_users seed_transfer_bike seed_ios_review_bikes seed_oauth_app; do
+      ./bin/rails runner "load \"db/seeds/$seed.rb\"" || echo "SEED ERROR: $seed.rb failed (exit $?)" >&2
     done
   fi
 fi

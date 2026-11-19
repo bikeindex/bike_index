@@ -1,19 +1,22 @@
 import { html, nothing } from 'lit-html'
 import { listedFigure } from 'bikebook/cycle_drawings'
 import { OVERALL_LENGTH_ESTIMATE } from 'bikebook/frame_geometry'
+import { catalogValue, currentShape } from 'bikebook/legacy_shape'
 import { missing } from 'bikebook/templates/helpers'
 import { table } from 'bikebook/templates/ui/table'
 import { tooltip } from 'bikebook/templates/ui/tooltip'
 import { seriesBorders, wheelName } from 'bikebook/templates/vehicles/geometry_overlay'
-import { cargoAt, isCargo, tireWidth, typeLabel, wheelsAt } from 'bikebook/templates/vehicles/model_viewer'
+import { cargoAt, isCargo, tireWidth, typeLabel, weightLimit, wheelsAt } from 'bikebook/templates/vehicles/model_viewer'
 import { vehicleTitle } from 'bikebook/templates/vehicles/vehicle_title'
-import { array, isNumber, join, present, slice, sum } from 'bikebook/templates/values'
+import { array, isNumber, join, present, sum } from 'bikebook/templates/values'
 
 const GEOMETRY = ['reach', 'stack', 'top_tube_effective', 'head_angle', 'seat_angle', 'chainstay', 'standover', 'wheelbase']
 const BETTER = 'tw:text-green-700 tw:dark:text-green-400'
 const WORSE = 'tw:text-red-700 tw:dark:text-red-400'
 // the size's, so it closes the geometry
 const WEIGHT = { label: 'Weight', read: (vehicle, size) => size?.geometry?.total_weight, better: -1, unit: 'kg' }
+const LIMITS = [['rider', 'Max rider weight'], ['payload', 'Max payload (rider + cargo)']]
+  .map(([load, label]) => ({ label, read: (vehicle, size) => weightLimit(vehicle, load, size), better: 1, unit: 'kg' }))
 
 // The compared models' sizes, wheels and frames side by side in their `sizes`, each column's numbers against the
 // first's, keyed to the overlay by `frames`. `beside` the overlay, it shares a row with it once the window is wide enough.
@@ -22,7 +25,7 @@ const WEIGHT = { label: 'Weight', read: (vehicle, size) => size?.geometry?.total
 // none for a value that isn't compared. `parts` splits a value whose parts are each compared, and `amount` shows a
 // difference, given the number it's of
 export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], market, highlight, beside = false, corner = nothing }) => {
-  const named = vehicles.map(({ data }) => presenter.named(presenter.kit.schemas.vehicle, data))
+  const named = vehicles.map(({ data }) => presenter.named(presenter.kit.schemas.vehicle, currentShape(data)))
   const [first] = named
   const show = (row, value, vehicle) => row.format?.(value, vehicle, presenter) ?? (row.unit ? presenter.measurement(value, row.unit, row.key) : value)
   const geometry = GEOMETRY.map((key) => {
@@ -100,7 +103,7 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], marke
     if (options.length < 2) return options[0]?.name ?? missing
     return html`<select class="twinput tw:w-auto tw:py-1 tw:text-sm" aria-label=${`Size of ${named[index].model}`} data-action="bikebook--page#pickSize"
       data-bikebook--page-vehicle-param=${key} data-bikebook--page-first-param=${index === 0}>${options.map((size) =>
-        html`<option value=${size.name} ?selected=${size === sizes[index]} data-size=${JSON.stringify({ name: size.name, geometry: slice(size.geometry, ['top_tube_effective', 'reach', 'min_rider_height', 'max_rider_height']) })}>${size.name}</option>`)}</select>`
+        html`<option value=${size.name} ?selected=${size === sizes[index]} data-size=${JSON.stringify({ name: size.name, geometry: Object.fromEntries(['top_tube_effective', 'reach', 'rider_height_min', 'rider_height_max'].map((key) => [key, catalogValue(size.geometry, key)])) })}>${size.name}</option>`)}</select>`
   }
 
   const records = (rows) => rows.map((row) => [row, named.map((vehicle, index) => row.read(vehicle, sizes[index]))])
@@ -123,7 +126,7 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], marke
   const cargos = new Map(named.map((vehicle, index) => [vehicle, cargoAt(presenter, vehicles[index].data, sizes[index])]))
   const cargoRows = vehicles.some(({ data }) => isCargo(data)) ? records([{ label: 'Cargo', read: (vehicle) => cargos.get(vehicle) }]) : []
   const typeRows = new Set(named.map(typeLabel)).size > 1 ? records([{ label: 'Vehicle type', read: typeLabel }]) : []
-  const rows = [...typeRows, ...records(wheelRows), ...cargoRows, ...sizeRows, ...records([...geometry, length, WEIGHT])]
+  const rows = [...typeRows, ...records(wheelRows), ...cargoRows, ...sizeRows, ...records([...geometry, length, WEIGHT, ...LIMITS])]
   if (rows.length === 0) return nothing
 
   // Out to the window's edges, the table at least the page's 78rem column and wider as its vehicles need, scrolling

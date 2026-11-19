@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { X, Trash2, RefreshCw, Sun, Moon } from 'lucide-react';
+import { X, Trash2, RefreshCw } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { usePreferences, type DarkMode } from '../contexts/PreferencesContext';
+import { usePreferences } from '../contexts/PreferencesContext';
 import { useActivitySync } from '../hooks/useActivitySync';
 import {
   clearAllData,
@@ -16,7 +16,7 @@ interface SettingsModalProps {
 
 function SettingsModalContent({ onClose }: { onClose: () => void }) {
   const { athlete, syncState } = useAuth();
-  const { units, setUnits, autoEnrich, setAutoEnrich, darkMode, setDarkMode } = usePreferences();
+  const { units, setUnits, autoEnrich, setAutoEnrich } = usePreferences();
   const isDev = import.meta.env.DEV;
   const { isSyncing, progress, syncRecent } = useActivitySync();
   const [activityCount, setActivityCount] = useState(0);
@@ -57,12 +57,6 @@ function SettingsModalContent({ onClose }: { onClose: () => void }) {
     await clearAllData();
     window.location.reload();
   };
-
-  const darkModeOptions: { value: DarkMode; label: string; icon?: typeof Sun }[] = [
-    { value: 'light', label: 'Light', icon: Sun },
-    { value: 'dark', label: 'Dark', icon: Moon },
-    { value: 'system', label: 'System' },
-  ];
 
   return (
     <div data-modal="settings" className="fixed inset-0 bg-black/50 flex items-center justify-center z-[1040] p-4">
@@ -149,27 +143,6 @@ function SettingsModalContent({ onClose }: { onClose: () => void }) {
               >
                 Metric (km, m)
               </button>
-            </div>
-          </div>
-
-          {/* Appearance */}
-          <div>
-            <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-3">Appearance</h3>
-            <div className="flex gap-2">
-              {darkModeOptions.map(({ value, label, icon: Icon }) => (
-                <button
-                  key={value}
-                  onClick={() => setDarkMode(value)}
-                  className={`flex-1 py-2 px-4 rounded-lg border transition-colors ${
-                    darkMode === value
-                      ? 'bg-[#fc4c02] text-white border-[#fc4c02]'
-                      : 'border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 dark:text-gray-300'
-                  }`}
-                >
-                  {Icon && <Icon className="w-4 h-4 inline mr-1.5 align-text-bottom" />}
-                  {label}
-                </button>
-              ))}
             </div>
           </div>
 

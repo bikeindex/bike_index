@@ -4,7 +4,7 @@ module Pages
   module Register
     module Views
       module StepAcknowledgment
-        # One page of an organization's e-vehicle rules, rendered from its live course
+        # One page of an organization's e-vehicle education course, rendered from its live course
         class ComponentPreview < ApplicationComponentPreview
           # Where the flow explains why these pages appeared at all
           # @label Step 1 of 4
@@ -12,7 +12,7 @@ module Pages
             acknowledgment_page(0)
           end
 
-          # The last of the rule pages, with only the review left after it
+          # The last of the education pages, with only the review left after it
           # @label Step 3 of 4
           def step_3_of_4
             acknowledgment_page(2)

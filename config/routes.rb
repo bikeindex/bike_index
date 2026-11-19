@@ -5,6 +5,7 @@ require "sidekiq/web"
 Rails.application.routes.draw do
   # Liveness endpoint (200 if the app boots). Used by the review-app kamal-proxy health check
   get "up", to: "rails/health#show", as: :rails_health_check
+  get "up/bikebook", to: "bikebook#up"
 
   mount Sidekiq::Web => "/sidekiq", :constraints => AuthRestriction::Developer
   mount PgHero::Engine, at: "/pghero", constraints: AuthRestriction::Developer
@@ -53,7 +54,7 @@ Rails.application.routes.draw do
     for_community_groups for_cities for_law_enforcement for_schools].each { get it, controller: "landing_pages", action: it }
   %w[donate support_bike_index support_the_index support_the_bike_index primary_activities
     protect_your_bike serials about where vendor_terms resources privacy terms security
-    how_not_to_buy_stolen lightspeed membership].each { get it, controller: "info", action: it }
+    how_not_to_buy_stolen lightspeed membership wheel_sizes].each { get it, controller: "info", action: it }
   get "recovery_stories", to: "welcome#recovery_stories", as: :recovery_stories
   get "donate/year-end-2026", to: "info#donate_year_end", as: :donate_year_end
   get "donate/year-end", to: redirect(path: "/donate/year-end-2026", status: 302) # a later year's campaign takes it over
@@ -75,7 +76,11 @@ Rails.application.routes.draw do
   end
 
   get "bikebook", to: "bikebook#show"
+  # before the glob below, which would take it for a model
+  get "bikebook/license", to: "bikebook#license", as: :bikebook_license
   get "bikebook/*vehicle_model", to: "bikebook#vehicle", format: false
+  get ":spelling(/*rest)", to: redirect { |params, request| request.fullpath.sub(params[:spelling], "bikebook") },
+    constraints: {spelling: /bike[-_]?book/i}, format: false
   # a catalog model's own id, its manufacturer, year and model
   get "m/*vehicle_model", to: "bikebook#vehicle", format: false, constraints: {vehicle_model: %r{[a-z0-9_]+/\d{4}/[a-z0-9_]+}}
   # an e-vehicle classification's id, whose card the page shows
@@ -566,10 +571,6 @@ Rails.application.routes.draw do
   # old search URLs to new search URLs
   get "/bikes", to: redirect("search/registrations")
   get "/marketplace", to: redirect("search/marketplace")
-
-  # registration sequences became education courses
-  get "*path", to: redirect { |_params, request| request.fullpath.sub("registration_sequence", "education_course") },
-    constraints: {path: %r{(?:admin|o/[^/]+)/registration_sequence.*}}, format: false
 
   # Short bike URLs: /r/<short_id> (and /R/...). The whole path is passed through
   # so ShortId#decode strips the "r/" prefix itself, even when the body starts with "r".

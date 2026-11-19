@@ -5,7 +5,7 @@ priority_manufacturer_names = [
   "Aventón", "Bianchi", "Bridgestone", "Brompton Bicycle", "Cannondale",
   "Canyon bicycles", "Cervélo", "Colnago", "Diamondback", "Electra", "Evil",
   "Felt", "Fit bike Co.", "Focus", "Fuji", "Gary Fisher", "Giant (and LIV)",
-  "GT Bicycles", "Handsome Cycles", "Haro", "Ibis", "Intense", "IZIP", "Jamis",
+  "GT Bicycles", "Handsome Cycles", "Haro", "Ibis", "Intense", "IZIP",
   "Jetson", "Juliana Bicycles", "KHS Bicycles", "Kink", "Kona", "Marin Bikes",
   "Mongoose", "Moots Cycles", "Niner", "Nishiki", "Norco Bikes", "Orbea",
   "Pinarello", "Pivot", "Pure Cycles (Pure Fix Cycles)", "Rad Power Bikes",

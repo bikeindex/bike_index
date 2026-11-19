@@ -22,7 +22,7 @@ module Admin
     def show
     end
 
-    # The faked registrant walk-through, one screen (?page=) per rule page plus the review
+    # The faked registrant walk-through, one screen (?page=) per education page plus the review
     # they end on. page is 1-indexed (Pagy); the preview component's index is 0-based.
     def preview
       screen_count = BikeServices::Register.acknowledgment_step_count(@education_course)

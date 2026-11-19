@@ -15,8 +15,6 @@ export default class extends Controller {
   connect () {
     this.input = this.element.querySelector('.hw-combobox__input')
     this.hiddenField = this.element.querySelector('input[data-hw-combobox-target="hiddenField"]')
-    // Read before the overlay ever paints the input transparent
-    this.caretColor = window.getComputedStyle(this.input).color
     this.events().forEach(([target, event]) => target.addEventListener(event, this.sync))
     // Observing the input rather than the window also measures one that rendered hidden, as it's shown
     this.resizeObserver = new ResizeObserver(this.onResize)
@@ -49,6 +47,8 @@ export default class extends Controller {
     if (!shown) { this.hide(); return }
 
     this.shown = shown
+    // Before the overlay first paints the input transparent. Not on connect, where it forces a style recalc per combobox
+    this.caretColor ??= window.getComputedStyle(this.input).color
     this.overlayTarget.innerHTML = shown.innerHTML
     this.reposition()
     Object.assign(this.input.style, { color: 'transparent', caretColor: this.caretColor })

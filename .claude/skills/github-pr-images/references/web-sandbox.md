@@ -24,7 +24,7 @@ comment — so find out first, before any capture or hosting commit.
    ```
    ## Screenshots
 
-   <img alt="probe" src="https://raw.githubusercontent.com/bikeindex/bike_index/main/app/assets/images/logos/bikebook_icon.png" width="40" />
+   <img alt="probe" src="https://raw.githubusercontent.com/bikeindex/bike_index/main/app/assets/images/logos/bikebook.png" width="40" />
    ```
 
 2. Read it back with `get_comments`. It posted if the body still holds a literal

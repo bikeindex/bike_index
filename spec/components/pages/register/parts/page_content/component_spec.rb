@@ -15,7 +15,7 @@ RSpec.describe Pages::Register::Parts::PageContent::Component, type: :component 
     render_inline(described_class.new(page: page_record))
 
     expect(page).to have_css("h1", text: "Charge safely") # heading_text, big like the flow
-    expect(page).to have_content("Battery safety") # the title labels the rules
+    expect(page).to have_content("Battery safety") # the title labels the bullets
     expect(page).to have_content("Use the right charger")
     expect(page).to have_link("E-Vehicle Acknowledgment FAQ", href: "https://example.com/faq")
     expect(page).to have_content("Set by Brakebills University")
