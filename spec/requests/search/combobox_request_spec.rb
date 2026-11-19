@@ -146,6 +146,22 @@ RSpec.describe Search::ComboboxController, type: :request do
     end
   end
 
+  describe "bikebook_models" do
+    let(:manufacturer) { FactoryBot.create(:manufacturer, name: "Specialized") }
+    before { sync_bikebook_models }
+
+    it "renders the manufacturer's matching model names" do
+      get "/search/combobox/bikebook_models", params: {q: "roll t", manufacturer_id: manufacturer.id, for_id: "test"}, as: :turbo_stream
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("Roll Trike")
+      expect(response.body).to_not include("Roll 1")
+
+      get "/search/combobox/bikebook_models", params: {q: "roll", manufacturer_id: 0, for_id: "test"}, as: :turbo_stream
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to_not include("Roll")
+    end
+  end
+
   describe "chips" do
     let!(:color) { FactoryBot.create(:color, name: "Burgundy") }
     let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Cool Bikes") }

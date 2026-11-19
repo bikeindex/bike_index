@@ -85,7 +85,7 @@ RSpec.describe "Bikes API V2", type: :request do
         }
       end
       it "creates", :flaky do
-        stub_bikebook_catalog
+        sync_bikebook_models
         expect(manufacturer.reload.name).to eq "Specialized"
         expect(Bike.count).to eq 0
         expect {

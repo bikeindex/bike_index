@@ -3,9 +3,18 @@
 
 <%= render Pages::Register::Parts::SectionLabel::Component.new(text: translation(".bike_details", cycle_type:)) %>
 
-<%= render UI::Forms::Group::Component.new(form_builder: @form, attribute: :frame_model,
-    label_text: translation(".model"),
-    html_options: {value: bike["frame_model"], placeholder: translation(".model_placeholder")}) %>
+<% if bikebook_models? %>
+  <%= render(UI::Forms::Group::Component.new(form_builder: @form, attribute: :frame_model, label_text: translation(".model"))) do %>
+    <%= render UI::Forms::Combobox::Component.new(name: @form.field_name(:frame_model),
+        src: search_combobox_bikebook_models_path(manufacturer_id: @b_param.manufacturer_id), free_text: true,
+        no_js: {value: bike["frame_model"]}, dialog_label: translation(".model"),
+        html_options: {id: @form.field_id(:frame_model), value: bike["frame_model"], placeholder: translation(".model_placeholder")}) %>
+  <% end %>
+<% else %>
+  <%= render UI::Forms::Group::Component.new(form_builder: @form, attribute: :frame_model,
+      label_text: translation(".model"),
+      html_options: {value: bike["frame_model"], placeholder: translation(".model_placeholder")}) %>
+<% end %>
 
 <%= render UI::Forms::Group::Component.new(form_builder: @form, attribute: :year,
     label_text: translation(".model_year"),

@@ -6,13 +6,17 @@ module Integrations
     module Data
       extend Functionable
 
-      # nil for a model the catalog lacks, or while it doesn't answer
+      # nil for a model the catalog lacks, or while it doesn't answer. market is a country's ISO code, for its variant
       def get_model(options)
-        options = {manufacturer: options.manufacturer&.name, year: options.year, frame_model: options.frame_model} if options.is_a?(Bike)
+        if options.is_a?(Bike)
+          options = {manufacturer: options.manufacturer&.name, year: options.year, frame_model: options.frame_model,
+                     market: options.address_record&.country&.iso}
+        end
         return unless options.values_at(:manufacturer, :year, :frame_model).all?(&:present?)
 
         year = options[:year].to_i
-        id = Integrations::Bikebook::Catalog.model_id(manufacturer: options[:manufacturer], name: options[:frame_model], year:)
+        id = BikebookModel.catalog_id_for(manufacturer: options[:manufacturer], name: options[:frame_model], year:,
+          market: options[:market])
         record = id && Integrations::Bikebook::Catalog.model(id)
         record && {bike: bike_attributes(record, year), components: component_attributes(record)}.with_indifferent_access
       end

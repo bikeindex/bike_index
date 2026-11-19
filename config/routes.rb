@@ -239,6 +239,8 @@ Rails.application.routes.draw do
     post "combobox/chips", to: "combobox#chips", as: :combobox_chips
     # Autocomplete for the manufacturer combobox (UI::Forms::ComboboxManufacturer)
     get "combobox/manufacturers", to: "combobox#manufacturers", as: :combobox_manufacturers
+    # Autocomplete for the model combobox on registration, from the manufacturer's Bike Book models
+    get "combobox/bikebook_models", to: "combobox#bikebook_models", as: :combobox_bikebook_models
     resources :registrations, only: %i[index] do
       collection do
         get :similar_serials

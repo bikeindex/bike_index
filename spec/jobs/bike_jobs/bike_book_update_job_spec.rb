@@ -18,7 +18,7 @@ RSpec.describe BikeJobs::BikeBookUpdateJob, type: :job do
   end
 
   it "grabs the components but doesn't overwrite components if the bike isn't on bikebook" do
-    stub_bikebook_catalog
+    sync_bikebook_models
     manufacturer = FactoryBot.create(:manufacturer, name: "Specialized")
     bike = FactoryBot.create(:bike, manufacturer:, year: 2025, frame_model: "Haul ST")
     %w[Fork Crankset Saddle].each { FactoryBot.create(:ctype, name: it) }

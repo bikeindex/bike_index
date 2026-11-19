@@ -14,6 +14,12 @@ module BikebookCatalogHelpers
     end
   end
 
+  # The fixture catalog, its index synced to BikebookModel
+  def sync_bikebook_models
+    stub_bikebook_catalog
+    BikebookModelsSyncJob.new.perform
+  end
+
   # For the browser's and the server's both, with no stock photos, which render their placeholder
   def serve_bikebook_catalog(manifest_status: 200)
     stub_bikebook_catalog

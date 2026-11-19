@@ -847,7 +847,7 @@ RSpec.describe BikeServices::Creator do
       expect(instance.send(:add_bike_book_data)).to be_nil
     end
     context "a model in Bike Book" do
-      before { stub_bikebook_catalog }
+      before { sync_bikebook_models }
       let(:manufacturer_name) { "Specialized" }
       let(:bike_params) do
         {

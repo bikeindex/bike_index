@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe Integrations::Bikebook::Data do
-  before { stub_bikebook_catalog }
+  before { sync_bikebook_models }
 
   describe "get_model" do
     let(:options) { {manufacturer: "Specialized", frame_model: "Haul ST", year: 2025} }
@@ -22,6 +22,14 @@ RSpec.describe Integrations::Bikebook::Data do
 
       it "returns the model" do
         expect(result[:bike][:cycle_type]).to eq "cargo"
+      end
+    end
+
+    context "in its market variant's market" do
+      let(:options) { {manufacturer: "Specialized", frame_model: "Haul ST", year: 2025, market: "CA"} }
+
+      it "returns the variant" do
+        expect(result[:bike][:stock_photo_url]).to eq "https://bikebook.bikeindex.org/specialized/2025/haul_st_ca.webp"
       end
     end
 

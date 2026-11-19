@@ -32,11 +32,11 @@ module Integrations
         block && file(block)&.dig("models", id)
       end
 
-      # The id of the manufacturer's model of that name sold in that year, nil for one the catalog lacks
-      def model_id(manufacturer:, name:, year:)
-        name = Slugifyer.book_slug(name)
-        manufacturer_models(Slugifyer.manufacturer(manufacturer))
-          &.find { it["model"] == name && (it["first_year"]..it["final_year"]).cover?(year) }&.dig("id")
+      # The index's models, nil while the catalog doesn't answer. Too big to cache, and only BikebookModelsSyncJob reads it
+      def index_models(path)
+        read(path, timeout: 60)["models"]
+      rescue Faraday::Error, JSON::ParserError, SystemCallError
+        nil
       end
 
       # vehicle_models' entries: each vehicle's id, then in braces what's picked for it, m/trek/2026/marlin_5{size:M}{json}.
@@ -69,34 +69,15 @@ module Integrations
         end || nil
       end
 
-      # The index is too big to cache whole, so it's cached by manufacturer
-      def manufacturer_models(manufacturer)
-        catalog = manifest
-        index = catalog&.dig("index")
-        return unless index && catalog["blocks"].each_key.any? { it.start_with?("#{manufacturer}/") }
-
-        key = ["bikebook_catalog/models", index, manufacturer]
-        Rails.cache.read(key) || cache_index(index)[key]
-      end
-
-      def cache_index(index)
-        read(index)["models"].group_by { it["manufacturer"] }.to_h do |manufacturer, models|
-          [["bikebook_catalog/models", index, manufacturer],
-            models.map { it.slice("id", "first_year", "final_year").merge("model" => Slugifyer.book_slug(it["model"])) }]
-        end.tap { Rails.cache.write_multi(it, expires_in: 1.week) }
-      rescue Faraday::Error, JSON::ParserError, SystemCallError
-        {}
-      end
-
-      def read(path)
-        JSON.parse(LOCAL_DIRECTORY ? File.read(File.join(LOCAL_DIRECTORY, path)) : connection.get(path).body)
-      end
-
       # An uncached file can take over 5s to start answering. A page waits on up to three - the manifest, the
       # vocabulary and a model's block - which give up inside rack-timeout's 30s unless a body trickles in
-      def connection = Faraday.new(url: URL, request: {open_timeout: 2, timeout: 7}) { it.response :raise_error }
+      def read(path, timeout: 7)
+        JSON.parse(LOCAL_DIRECTORY ? File.read(File.join(LOCAL_DIRECTORY, path)) : connection(timeout).get(path).body)
+      end
 
-      conceal :cached, :manufacturer_models, :cache_index, :read, :connection
+      def connection(timeout) = Faraday.new(url: URL, request: {open_timeout: 2, timeout:}) { it.response :raise_error }
+
+      conceal :cached, :read, :connection
     end
   end
 end

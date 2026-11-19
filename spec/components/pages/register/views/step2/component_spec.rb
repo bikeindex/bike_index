@@ -64,6 +64,28 @@ RSpec.describe Pages::Register::Views::Step2::Component, type: :component do
     end
   end
 
+  describe "the model field" do
+    let(:combobox) { "[data-hw-combobox-async-src-value*='bikebook_models']" }
+
+    it "is a text field" do
+      render_step_2
+      expect(page).to have_field("bike[frame_model]", type: "text")
+      expect(page).to_not have_css(combobox)
+    end
+
+    context "for a manufacturer with Bike Book models" do
+      let(:manufacturer) { FactoryBot.create(:manufacturer, name: "Specialized") }
+      let(:params) { {bike: {owner_email: "owner@bikeindex.org", manufacturer_id: manufacturer.id, frame_model: "Haul ST"}} }
+      before { sync_bikebook_models }
+
+      it "autocompletes from them, keeping what was entered" do
+        render_step_2
+        expect(page.find(combobox)["data-hw-combobox-async-src-value"]).to include("manufacturer_id=#{manufacturer.id}")
+        expect(page).to have_field("bike[frame_model]", type: :hidden, with: "Haul ST")
+      end
+    end
+  end
+
   describe "the phone field" do
     def phone_field = status_field("phone")
 
