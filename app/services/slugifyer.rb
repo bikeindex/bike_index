@@ -8,12 +8,12 @@ module Slugifyer
       .gsub(/([^A-Za-z0-9_-]+)/, "") # Remove any weird characters
   end
 
-  # What manufacturer slugs were before they were slugified
+  # The pre-slugify manufacturer slug, minus "Accell", which is appended to many of its brands' names
   def legacy_manufacturer(string)
     return nil unless string
 
     name = remove_parens(string).gsub(/\sco(\.|mpany)/i, " ").gsub(/\s(frame)?works/i, " ")
-    # Accell owns many brands, so it's often added to their names. Manufacturer.friendly_find reads an all-digit string as an id
+    # An empty (bare "Accell") or all-digit slug falls back, since Manufacturer.friendly_find reads digits as an id
     book_slug(name.gsub(/accell/i, "")).then { it.match?(/\D/) ? it : slugify(name).tr("-", "_") }
   end
 
