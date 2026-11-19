@@ -81,6 +81,16 @@ RSpec.describe PrimaryActivity, type: :model do
         end
       end
 
+      context "endurance" do
+        let(:primary_activity_family) { FactoryBot.create(:primary_activity_family, name: "Road Biking") }
+        let(:primary_activity) { FactoryBot.create(:primary_activity, name: "Endurance / Sportive", primary_activity_family:) }
+        it "shortens to Endurance" do
+          expect(primary_activity.reload.short_name).to eq "Endurance"
+          expect(primary_activity.display_name).to eq "Road: Endurance / Sportive"
+          expect(PrimaryActivity.friendly_find_id("Endurance")).to eq primary_activity.id
+        end
+      end
+
       context "track racing" do
         let(:primary_activity_family) { FactoryBot.create(:primary_activity_family, name: "Track racing") }
         let(:primary_activity) { FactoryBot.create(:primary_activity, name: "Pursuit", primary_activity_family:) }

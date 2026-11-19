@@ -22,7 +22,8 @@ class PrimaryActivity < ApplicationRecord
 
   SPECIAL_SHORT_NAMES = {
     "road" => "road-biking",
-    "track" => "track-racing"
+    "track" => "track-racing",
+    "endurance" => "endurance--sportive"
   }.freeze
 
   belongs_to :primary_activity_family, class_name: "PrimaryActivity"
@@ -132,10 +133,7 @@ class PrimaryActivity < ApplicationRecord
   end
 
   def short_name
-    return "Road" if slug == "road-biking"
-    return "Track" if slug == "track-racing"
-
-    super
+    SPECIAL_SHORT_NAMES.key(slug)&.capitalize || super
   end
 
   private

@@ -1,6 +1,23 @@
 require "rails_helper"
 
 RSpec.describe Spreadsheets::WheelSizes do
+  describe "to_csv" do
+    let!(:wheel_size_2) { FactoryBot.create(:wheel_size, name: "21in moto", iso_bsd: 533, priority: :uncommon, description: "21in motorcycle rim (70/100-21, 80/100-21) Stark Varg front (Uncommon)") }
+    let!(:wheel_size_1) { FactoryBot.create(:wheel_size, name: "7.7 x 2.8in", iso_bsd: 53, priority: :rare, description: "7.7 x 2.8in (196 x 71) PU wheel (Rare)") }
+    let(:target) do
+      ["name,iso_bsd,priority,description",
+        "7.7 x 2.8in,53,rare,7.7 x 2.8in (196 x 71) PU wheel (Rare)",
+        "21in moto,533,uncommon,\"21in motorcycle rim (70/100-21, 80/100-21) Stark Varg front (Uncommon)\""]
+    end
+
+    it "generates, ordered by iso_bsd, and re-imports without changes" do
+      csv = described_class.to_csv
+      expect(csv.split("\n")).to eq target
+
+      expect { described_class.import(StringIO.new(csv)) }.not_to change { WheelSize.pluck(:iso_bsd, :name, :priority, :description, :updated_at) }
+    end
+  end
+
   describe "import" do
     let(:csv_content) do
       "name,iso_bsd,priority,description\n" \
