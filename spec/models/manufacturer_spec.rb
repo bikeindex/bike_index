@@ -91,6 +91,14 @@ RSpec.describe Manufacturer, type: :model do
       expect(Manufacturer.friendly_find("s and m")).to be_nil
       expect(Manufacturer.friendly_find("sandm")&.id).to eq mnfg.id
     end
+    it "keeps the old name's slug when it matches the replaced secondary name's" do
+      mnfg = FactoryBot.create(:manufacturer, name: "Kona Bicycle Company (Kona)")
+      expect(mnfg.previous_slugs).to eq ["kona"]
+
+      mnfg.update(name: "Foo")
+      expect(mnfg.reload.previous_slugs).to eq %w[kona-bicycle-company kona]
+      expect(Manufacturer.friendly_find("Kona Bikes")).to eq mnfg
+    end
     context "name of digits and a removed suffix, where the digits are another manufacturer's id" do
       let!(:other_manufacturer) { FactoryBot.create(:manufacturer) }
       let(:name) { "#{other_manufacturer.id} Bikes" }

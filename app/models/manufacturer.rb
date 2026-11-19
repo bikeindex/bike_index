@@ -182,7 +182,7 @@ class Manufacturer < ApplicationRecord
   def calculated_previous_slugs
     previous_secondary_slug = Slugifyer.legacy_manufacturer(Manufacturer.new(name: name_in_database).secondary_name)
     [Slugifyer.legacy_manufacturer(secondary_name), *(previous_slugs - [previous_secondary_slug]),
-      slug_in_database, Slugifyer.legacy_manufacturer(name)].compact_blank.grep_v(/\A\d+\z/).uniq - [slug]
+      slug_in_database, Slugifyer.legacy_manufacturer(name_in_database), Slugifyer.legacy_manufacturer(name)].compact_blank.grep_v(/\A\d+\z/).uniq - [slug]
   end
 
   def run_callback_job
