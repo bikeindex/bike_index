@@ -13,8 +13,8 @@ module Slugifyer
     return nil unless string
 
     name = remove_parens(string).gsub(/\sco(\.|mpany)/i, " ").gsub(/\s(frame)?works/i, " ")
-    # Manufacturer.friendly_find reads an all-digit string as an id
-    book_slug(name).then { it.match?(/\D/) ? it : slugify(name).tr("-", "_") }
+    # Accell owns many brands, so it's often added to their names. Manufacturer.friendly_find reads an all-digit string as an id
+    book_slug(name.gsub(/accell/i, "")).then { it.match?(/\D/) ? it : slugify(name).tr("-", "_") }
   end
 
   # underscores, also removes some extra stuff

@@ -72,7 +72,6 @@ class Manufacturer < ApplicationRecord
       else
         legacy_slug = Slugifyer.legacy_manufacturer(n)
         find_by_slug(Slugifyer.slugify(n)) || find_by_legacy_slug(legacy_slug) ||
-          find_by_legacy_slug(Slugifyer.legacy_manufacturer(legacy_slug.gsub(/accell/i, ""))) ||
           find_by_secondary_slug(legacy_slug)
       end
     end

@@ -81,6 +81,10 @@ RSpec.describe Slugifyer do
       slug = Slugifyer.legacy_manufacturer("Riese & Müller (Riese and Muller)")
       expect(slug).to eq "riese_amp_muller"
     end
+    it "removes accell" do
+      expect(Slugifyer.legacy_manufacturer("Poopy Panters Accell")).to eq "poopy_panters"
+      expect(Slugifyer.legacy_manufacturer("Accell")).to eq "accell"
+    end
     it "keeps the suffix when removing it would leave only digits" do
       expect(Slugifyer.legacy_manufacturer("101 Bikes")).to eq "101_bikes"
       expect(Slugifyer.legacy_manufacturer("101_bikes")).to eq "101_bikes"
