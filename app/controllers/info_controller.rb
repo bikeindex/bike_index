@@ -103,6 +103,12 @@ class InfoController < ApplicationController
     end
   end
 
+  def wheel_sizes
+    respond_to do |format|
+      format.csv { render plain: Spreadsheets::WheelSizes.to_csv }
+    end
+  end
+
   private
 
   def render_donate_page(page)
