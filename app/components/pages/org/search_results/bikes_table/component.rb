@@ -20,13 +20,8 @@ module Pages
           # rather than on the form, which the cached rows would then have to digest
           MULTI_UPDATE_FORM_ID = "impoundRecordsMultiUpdateForm"
 
-          # InCard freezes the first column, which an impound search gives its checkboxes - so View
-          # stands in for them while they're hidden
-          IMPOUND_VIEW_CLASSES = "#{UI::Table::InCard::Component::FROZEN_COLUMN_CLASSES} tw:in-data-multi-update-open:static! " \
-            "tw:in-data-multi-update-open:border-r-0! tw:in-data-multi-update-open:shadow-none!"
-
           # impound_records: an impound search's rows, in place of bikes - which adds the impound
-          # columns and the multi-update checkboxes, shown inside a data-multi-update-open element
+          # columns and the multi-update checkboxes, shown inside a data-table-selecting element
           def initialize(organization:, bikes: [], impound_records: nil,
             render_sortable: false, sort_state: ComponentStructs::SortState.new, bike_sticker: nil, settings: nil)
             @organization = organization

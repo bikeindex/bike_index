@@ -52,10 +52,9 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
       expect(component).to have_css("th.impounded_at_cell a")
       expect(component).not_to have_css("th.manufacturer_cell a")
       expect(component).not_to have_css("th.occurred_at_cell [data-controller='ui--tooltip']")
-      checkbox = component.at_css("td.multi-update-cell input[type='checkbox']")
-      expect(checkbox[:form]).to eq Pages::Org::SearchResults::BikesTable::Component::MULTI_UPDATE_FORM_ID
       # First, so it's the frozen column, and ahead of the hideable ones, which reordering appends after the rest
-      expect(component.css("th").first[:class]).to include("multi-update-cell", "tw:sticky")
+      checkbox = component.at_css("tbody td:first-child input[name='ids[#{impound_record.id}]']")
+      expect(checkbox[:form]).to eq Pages::Org::SearchResults::BikesTable::Component::MULTI_UPDATE_FORM_ID
     end
 
     context "with impound_bikes_locations" do
@@ -83,11 +82,11 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
 
       it "busts the row when a claim is submitted, which leaves the record untouched" do
         render_table(impound_records: [impound_record.reload])
-        expect(page.find("td.multi-update-cell input", visible: :all)["data-update-kinds"]).to include("transferred_to_new_owner")
+        expect(page.find("input[data-update-kinds]", visible: :all)["data-update-kinds"]).to include("transferred_to_new_owner")
 
         FactoryBot.create(:impound_claim, impound_record:, organization:, status: "submitting")
         expect(fragments_written { render_table(impound_records: [impound_record.reload]) }.count).to eq 1
-        expect(page.find("td.multi-update-cell input", visible: :all)["data-update-kinds"]).not_to include("transferred_to_new_owner")
+        expect(page.find("input[data-update-kinds]", visible: :all)["data-update-kinds"]).not_to include("transferred_to_new_owner")
       end
     end
   end

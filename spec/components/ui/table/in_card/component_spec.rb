@@ -69,6 +69,24 @@ RSpec.describe UI::Table::InCard::Component, type: :component do
         expect(component).to have_css("th.hideableColumn.name_cell", text: "Short")
       end
 
+      context "with a toggleable selection column" do
+        let(:component) do
+          render_inline(described_class.new(**options)) do |table|
+            table.selection_column(param: "people", toggleable: true, checkbox_options: ->(record) { {form: "otherForm", data: {kinds: record.id}} })
+            table.column(hideable: :email_cell) { |r| r.email }
+            table.column(hideable: :name_cell, label: "Short") { |r| r.email }
+          end
+        end
+
+        it "hides it outside data-table-selecting, freezing the next column in its place, and merges the checkbox options" do
+          expect(component.css("td").map { it[:class].include?("tw:sticky") }).to eq [true, true, false]
+          expect(component.css("td").first[:class]).to include("tw:hidden")
+          expect(component).to have_field("people[7]", type: :checkbox, visible: :all, with: "7")
+          checkbox = component.at_css("input[name='people[7]']")
+          expect(checkbox.to_h).to include("form" => "otherForm", "data-kinds" => "7", "data-table-multi-checkbox-target" => "checkbox", "aria-label" => "Select person 7")
+        end
+      end
+
       context "with a disabled record" do
         let(:records) { [OpenStruct.new(id: 8, email: "bo@example.com", model_name: OpenStruct.new(human: "Person"))] }
 

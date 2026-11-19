@@ -33,6 +33,11 @@ module UI
         FROZEN_COLUMN_CLASSES = "tw:w-px tw:sticky tw:left-0 tw:z-1 tw:border-r tw:border-r-gray-100 " \
           "tw:group-data-overflowing/table-in-card:shadow-[2px_0_6px_rgba(26,26,31,0.04)] tw:dark:border-r-gray-700"
 
+        # A toggleable selection column's, and the frozen column's beside it, which stands in while it's hidden
+        TOGGLEABLE_SELECTION_CLASSES = "tw:hidden tw:in-data-table-selecting:table-cell"
+        STAND_IN_FROZEN_COLUMN_CLASSES = "#{FROZEN_COLUMN_CLASSES} tw:in-data-table-selecting:static! " \
+          "tw:in-data-table-selecting:border-r-0! tw:in-data-table-selecting:shadow-none!"
+
         # [&>div] is UI::Table::Base's scroller, whose bottom spacing would part the table from what
         # follows it. The after: box mirrors the frozen column's divider and shadow on the right
         # edge while there's more to scroll, except in a full-bleed row that runs off the page
@@ -64,12 +69,16 @@ module UI
         end
 
         # The form's checkboxes, named param[id] for the row's record - or the first of its array, which
-        # disabled is called with. The block renders beside each
-        def selection_column(param:, disabled: nil, &block)
-          column(label: toggle_all_button) do |row|
+        # disabled and checkbox_options (more of check_box_tag's options) are called with. The block renders beside each.
+        # toggleable: shown only inside a data-table-selecting element, the next column frozen while it's hidden - so call it first
+        def selection_column(param:, disabled: nil, checkbox_options: nil, toggleable: false, &block)
+          @toggleable_selection = toggleable
+          select_label = ->(record) { translation(".select_record", record: record.model_name.human.downcase, id: record.id) }
+          column(label: toggle_all_button, classes: (TOGGLEABLE_SELECTION_CLASSES if toggleable)) do |row|
             record = row.is_a?(Array) ? row.first : row
-            checkbox = check_box_tag("#{param}[#{record.id}]", record.id, false, disabled: disabled&.call(record),
-              aria: {label: "Select #{record.model_name.human.downcase} #{record.id}"}, data: {"table-multi-checkbox-target" => "checkbox"})
+            options = {disabled: disabled&.call(record), aria: {label: select_label.call(record)},
+                       data: {"table-multi-checkbox-target" => "checkbox"}}
+            checkbox = check_box_tag("#{param}[#{record.id}]", record.id, false, options.deep_merge(checkbox_options&.call(record) || {}))
             next checkbox unless block
 
             tag.div(safe_join([checkbox, capture { instance_exec(row, &block) }]), class: "tw:flex tw:items-center tw:gap-3")
@@ -83,8 +92,8 @@ module UI
         private
 
         def toggle_all_button
-          render(UI::Button::Component.new(text: check_mark, color: :link, title: "Toggle all checked",
-            aria: {label: "Toggle all checked"}, data: {action: "click->table-multi-checkbox#toggleAll"}))
+          label = translation(".toggle_all_checked")
+          render(UI::Button::Component.new(text: check_mark, color: :link, title: label, aria: {label:}, data: {action: "click->table-multi-checkbox#toggleAll"}))
         end
 
         def wrapper_data
@@ -107,7 +116,12 @@ module UI
         end
 
         def column_options(options, index)
-          options.merge(classes: [(FROZEN_COLUMN_CLASSES if index.zero?), options[:classes]].compact.join(" "))
+          frozen = if index.zero?
+            FROZEN_COLUMN_CLASSES
+          elsif index == 1 && @toggleable_selection
+            STAND_IN_FROZEN_COLUMN_CLASSES
+          end
+          options.merge(classes: [frozen, options[:classes]].compact.join(" "))
         end
       end
     end
