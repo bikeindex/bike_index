@@ -108,6 +108,8 @@ class Bike < ApplicationRecord
   include PgSearch::Model
 
   PUBLIC_COORD_LENGTH = 2 # Truncate public coordinates decimal length
+  # Bike.current, which the default scope uses
+  CURRENT_ATTRIBUTES = {example: false, user_hidden: false, deleted_at: nil, likely_spam: false}.freeze
 
   acts_as_paranoid without_default_scope: true
 
@@ -196,7 +198,7 @@ class Bike < ApplicationRecord
   after_commit :remove_address_record_if_deleted
 
   scope :motorized, -> { where(propulsion_type: PropulsionType::MOTORIZED) }
-  scope :current, -> { where(example: false, user_hidden: false, deleted_at: nil, likely_spam: false) }
+  scope :current, -> { where(CURRENT_ATTRIBUTES) }
   # Starts from unscoped, so it drops anything chained before it - call it on Bike, not an association
   scope :current_with_user_hidden, -> { unscoped.non_example.not_spam.without_deleted }
   scope :claimed, -> { includes(:ownerships).where(ownerships: {claimed: true}) }
