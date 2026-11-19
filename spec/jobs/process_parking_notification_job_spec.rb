@@ -91,6 +91,24 @@ RSpec.describe ProcessParkingNotificationJob, type: :job do
         expect(impound_record.impounded_from_address_record.city).to eq "San Francisco"
         expect(impound_record.impounded_from_address_record.street).to eq "1 Market St"
       end
+
+      context "with a default impound location" do
+        let(:initial) do
+          organization = FactoryBot.create(:organization_with_organization_features,
+            enabled_feature_slugs: %w[parking_notifications impound_bikes impound_bikes_locations])
+          FactoryBot.create(:parking_notification_organized, organization:, created_at: Time.current - 4.days, kind: "appears_abandoned_notification")
+        end
+        let!(:location) { FactoryBot.create(:location, :with_address_record, address_in: :new_york, organization:, impound_location: true, default_impound_location: true) }
+
+        it "holds it at the location, impounded from the parking notification's address" do
+          parking_notification3.save
+          Sidekiq::Testing.inline! { subject.drain }
+          impound_record = parking_notification3.reload.impound_record
+          expect(impound_record.location_id).to eq location.id
+          expect(impound_record.address_record_id).to eq location.address_record_id
+          expect(impound_record.impounded_from_address_record).to have_attributes(kind: "impounded_from", street: "1 Market St", city: "San Francisco")
+        end
+      end
     end
     context "retrieved" do
       it "updates the other parking_notifications" do
