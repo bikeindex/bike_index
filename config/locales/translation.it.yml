@@ -6997,8 +6997,6 @@ it:
           year: Anno
           filter_combobox:
             any: Qualunque
-          byline: Un riferimento gratuito fornito da Bike Index, il registro di biciclette
-            senza scopo di lucro.
           tagline: 'La biblioteca mondiale delle biciclette: cerca, confronta e trova
             la tua prossima bici.'
           activities: Attività
