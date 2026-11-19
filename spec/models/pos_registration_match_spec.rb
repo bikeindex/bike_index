@@ -1,6 +1,26 @@
 require "rails_helper"
 
 RSpec.describe PosRegistrationMatch, type: :model do
+  describe "review_reasons_for" do
+    let(:match) { FactoryBot.create(:pos_registration_match) }
+    let(:reasons) { described_class.review_reasons_for(match.bike, match.pos_bike) }
+
+    it "is empty for a clean pair" do
+      expect(reasons).to eq []
+    end
+
+    it "checks the POS registration's serial for stolen history too" do
+      match.pos_bike.update!(serial_number: "WTU999C9999")
+      FactoryBot.create(:stolen_bike, serial_number: "WTU999C9999")
+      expect(reasons).to eq ["stolen_history"]
+    end
+
+    it "includes bike versions" do
+      FactoryBot.create(:bike_version, bike: match.pos_bike)
+      expect(reasons).to eq ["bike_versions"]
+    end
+  end
+
   describe "bike and pos_bike" do
     let(:match) { FactoryBot.create(:pos_registration_match, status: :merged) }
 
