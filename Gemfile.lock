@@ -160,6 +160,9 @@ GEM
     bullet (8.2.0)
       activesupport (>= 3.0.0)
       uniform_notifier (~> 1.11)
+    bundler-audit (0.9.3)
+      bundler (>= 1.2.0)
+      thor (~> 1.0)
     byebug (13.0.0)
       reline (>= 0.6.0)
     capybara (3.40.0)
@@ -929,6 +932,7 @@ DEPENDENCIES
   bootsnap
   brakeman
   bullet
+  bundler-audit
   capybara
   capybara-playwright-driver
   carrierwave (~> 3.1)
