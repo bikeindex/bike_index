@@ -8,10 +8,10 @@ module Spreadsheets
 
     EXPORT_COLUMNS = %w[name iso_bsd priority description].freeze
 
-    def to_csv(wheel_sizes = WheelSize.all)
+    def to_csv
       CSV.generate do |csv|
         csv << EXPORT_COLUMNS
-        wheel_sizes.each { csv << it.attributes.values_at(*EXPORT_COLUMNS) }
+        WheelSize.pluck(*EXPORT_COLUMNS).each { csv << it }
       end
     end
 
