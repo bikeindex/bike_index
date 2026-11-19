@@ -43,9 +43,10 @@ class PosRegistrationMatch < ApplicationRecord
   enum :status, STATUS_ENUM
 
   belongs_to :duplicate_bike_group
-  # Merged matches have a deleted bike, and POS bikes are often hidden. Without the default scope's includes too
-  belongs_to :bike, -> { unscope(:includes, :order, where: BIKE_SCOPE_COLUMNS) }
-  belongs_to :pos_bike, -> { unscope(:includes, :order, where: BIKE_SCOPE_COLUMNS) }, class_name: "Bike"
+  # Merged matches have a deleted bike, and POS bikes are often hidden. Keeps the default scope's includes,
+  # which the admin table reads
+  belongs_to :bike, -> { unscope(:order, where: BIKE_SCOPE_COLUMNS) }
+  belongs_to :pos_bike, -> { unscope(:order, where: BIKE_SCOPE_COLUMNS) }, class_name: "Bike"
   # Who said to merge them
   belongs_to :merger, class_name: "User", optional: true
 
