@@ -147,7 +147,6 @@ const line = (points) => {
   const slope = mean(points.map(([x, y]) => (x - meanX) * (y - meanY))) / mean(points.map(([x]) => (x - meanX) ** 2))
   return (x) => meanY + slope * (x - meanX)
 }
-const middle = ([min, max]) => (min + max) / 2
 
 // Scores the catalog's `models`, in the index's order, which the comparison's columns are in. Null for a format it
 // doesn't know
@@ -162,32 +161,33 @@ export const scorer = (models, { format, fields }, activities) => {
   const riders = fields.target_riders?.map((each) => each ?? [])
   const kids = riders?.map((each) => each.includes('kid')) ?? unpublished
 
-  const sizeValue = (field, index, size) => fields[field]?.[index]?.[size] ?? null
-  const statedHeights = (index, size) => {
-    const [min, max] = ['size_rider_height_min', 'size_rider_height_max'].map((field) => sizeValue(field, index, size))
-    return min == null && max == null ? null : [min ?? max - SPAN, max ?? min + SPAN]
+  const statedHeight = (index, size) => {
+    const [min, max] = ['size_rider_height_min', 'size_rider_height_max'].map((field) => fields[field]?.[index]?.[size])
+    return min == null && max == null ? null : ((min ?? max - SPAN) + (max ?? min + SPAN)) / 2
   }
-  const kidPoints = kids.flatMap((kid, index) => kid && fields.front_bsd[index] != null
-    ? Array.from(fields.size_names?.[index] ?? [], (_, size) => statedHeights(index, size)).filter(Boolean).map((stated) => [fields.front_bsd[index], middle(stated)])
-    : [])
+  const kidWheels = kids.map((kid, index) => kid ? fields.front_bsd[index] : null)
+  const kidPoints = kidWheels.flatMap((wheel, index) => wheel == null
+    ? []
+    : Array.from(fields.size_names?.[index] ?? [], (_, size) => statedHeight(index, size))
+      .filter((height) => height != null).map((height) => [wheel, height]))
   const kidsLine = kidPoints.length >= MIN_FIT_SIZES ? line(kidPoints) : null
   // Each model's riders' heights, [shortest, tallest], open at an end the catalog leaves open, else a kids' model's about
   // the line through kids' sizes' stated heights by wheel size
   const riderHeights = models.map((_, index) => {
     const [min, max] = [fields.rider_height_min?.[index], fields.rider_height_max?.[index]]
     if (min != null || max != null) return [min ?? -Infinity, max ?? Infinity]
-    const estimate = kids[index] && fields.front_bsd[index] != null && kidsLine?.(fields.front_bsd[index])
+    const estimate = kidWheels[index] != null && kidsLine?.(kidWheels[index])
     return estimate ? [estimate - SPAN / 2, estimate + SPAN / 2] : null
   })
   // The height of the rider of the model's `size`: the middle of those it states, else its place among the model's sizes
   // in the model's range, the first fitting its shortest riders and the last its tallest
   const riderOf = (index, size) => {
-    const stated = statedHeights(index, size)
-    if (stated) return middle(stated)
+    const stated = statedHeight(index, size)
+    if (stated != null) return stated
     const [min, max] = riderHeights[index] ?? []
     if (!Number.isFinite(min) || !Number.isFinite(max)) return null
     const count = fields.size_names?.[index]?.length ?? 0
-    return count > 1 ? min + SPAN / 2 + (max - min - SPAN) * size / (count - 1) : middle([min, max])
+    return count > 1 ? min + SPAN / 2 + (max - min - SPAN) * size / (count - 1) : (min + max) / 2
   }
 
   const columns = {
@@ -221,8 +221,7 @@ export const scorer = (models, { format, fields }, activities) => {
 
   // The `COUNT` models most like the one `id` names by `weights`, narrowed as settingsFrom's settings say, each the
   // closest of its model group and never of its own, of those `included`; and the sliders whose fields it has values for.
-  // One of the other propulsion leaves its e-bike fields unscored, and `sameWheels` requires only the wheels it lists. Its sizes' index
-  // `size` is the rider's, whose fit is scored only where it's shorter or taller than any model fits
+  // One of the other propulsion leaves its e-bike fields unscored, and `sameWheels` requires only the wheels it lists
   return (id, { weights, includeNotCurrent, skipManufacturer, sameConfiguration, sameWheels, size }, included = () => true) => {
     const target = indexes.get(id)
     if (target == null) return null

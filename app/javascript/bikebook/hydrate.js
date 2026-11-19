@@ -106,8 +106,8 @@ export async function unpickedVehicles (catalog, page, url) {
 const pickedOf = (catalog, url, { market }) => catalog.vehicles(vehicleIds(url), { market })
 
 // The models most like the first of `vehicles` where the catalog publishes what it compares, scored once their section
-// is open, of those the `filters` leave, for the rider of the size it's compared in, by its index in its sizes. `waiting`,
-// until the comparison says whether it does
+// is open, of those the `filters` leave, for the rider of the size it's compared in. `waiting`, until the comparison says
+// whether it does
 const similarOf = async (catalog, url, vehicles, filters) => {
   if (catalog.comparable === false || !vehicles.length) return null
   if (catalog.comparable === undefined) return { waiting: true }
