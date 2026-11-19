@@ -16,8 +16,9 @@ module BikeJobs
       duplicate_bike_group_id = bike.normalized_serial_segments.where(segment: bike.serial_normalized_no_space).pick(:duplicate_bike_group_id)
       return if duplicate_bike_group_id.blank?
 
+      multiple_pos_bikes = pos_bikes.many? ? ["multiple_pos_bikes"] : []
       pos_bikes.each do |pos_bike|
-        reasons = PosRegistrationMatch.review_reasons_for(bike, pos_bike) + (pos_bikes.many? ? ["multiple_pos_bikes"] : [])
+        reasons = PosRegistrationMatch.review_reasons_for(bike, pos_bike) + multiple_pos_bikes
         # Locks the POS bike, so concurrent registrations of it each see the other's match
         match = pos_bike.with_lock do
           other_matches = PosRegistrationMatch.where(pos_bike_id: pos_bike.id).where.not(bike_id: bike.id)
