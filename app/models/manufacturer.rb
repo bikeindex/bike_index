@@ -72,7 +72,8 @@ class Manufacturer < ApplicationRecord
       else
         legacy_slug = Slugifyer.legacy_manufacturer(n)
         find_by_slug(Slugifyer.slugify(n)) || find_by_legacy_slug(legacy_slug) ||
-          find_by_legacy_slug(fill_stripped(legacy_slug)) || find_by_secondary_slug(legacy_slug)
+          find_by_legacy_slug(Slugifyer.legacy_manufacturer(legacy_slug.gsub(/accell/i, ""))) ||
+          find_by_secondary_slug(legacy_slug)
       end
     end
 
@@ -95,10 +96,6 @@ class Manufacturer < ApplicationRecord
         manufacturer.short_name
       end.strip.truncate(60)
     end
-
-    private
-
-    def fill_stripped(n) = Slugifyer.legacy_manufacturer(n.gsub(/accell/i, ""))
   end
 
   def to_param
