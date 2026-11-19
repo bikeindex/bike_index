@@ -108,28 +108,26 @@ module BikeJobs
       bike.destroy!
     end
 
-    # An organization on both keeps the more restrictive edit permission. Graduated (deleted) memberships come too,
-    # since a graduated notification's renewal link restores its membership
+    # Graduated (deleted) memberships come too, since a graduated notification's renewal link restores its membership
     def merge_bike_organizations(bike, pos_bike)
+      bike_organizations = BikeOrganization.unscoped.where(bike_id: [bike.id, pos_bike.id]).to_a
       # A current membership over a graduated one
-      pos_bike_organizations = BikeOrganization.unscoped.where(bike_id: pos_bike.id).sort_by { it.deleted? ? 0 : 1 }
+      pos_bike_organizations = bike_organizations.select { it.bike_id == pos_bike.id }.sort_by { it.deleted? ? 0 : 1 }
         .index_by(&:organization_id)
-      BikeOrganization.unscoped.where(bike_id: bike.id).each do |bike_organization|
+      bike_organizations.select { it.bike_id == bike.id }.each do |bike_organization|
         pos_bike_organization = pos_bike_organizations[bike_organization.organization_id]
         if pos_bike_organization.blank? || (pos_bike_organization.deleted? && !bike_organization.deleted?)
-          bike_organization.update_columns(bike_id: pos_bike.id,
-            can_not_edit_claimed: bike_organization.can_not_edit_claimed || !!pos_bike_organization&.can_not_edit_claimed)
-          next
-        end
-
-        # The moved graduated notifications graduate the kept bike from the organization
-        GraduatedNotification.unscoped.where(bike_organization_id: bike_organization.id)
-          .update_all(bike_organization_id: pos_bike_organization.id)
-        # Graduated ones too, since a renewal restores the kept bike's
-        if bike_organization.can_not_edit_claimed && !pos_bike_organization.can_not_edit_claimed
-          pos_bike_organization.update_columns(can_not_edit_claimed: true, updated_at: Time.current)
+          bike_organization.update_columns(bike_id: pos_bike.id)
+        else
+          # The moved graduated notifications graduate the kept bike from the organization
+          GraduatedNotification.unscoped.where(bike_organization_id: bike_organization.id)
+            .update_all(bike_organization_id: pos_bike_organization.id)
         end
       end
+      # The most restrictive edit permission any membership of either bike had, current or graduated
+      restricted_organization_ids = bike_organizations.select(&:can_not_edit_claimed).map(&:organization_id)
+      BikeOrganization.unscoped.where(bike_id: pos_bike.id, organization_id: restricted_organization_ids, can_not_edit_claimed: false)
+        .update_all(can_not_edit_claimed: true, updated_at: Time.current)
     end
 
     def merge_attributes(bike, pos_bike)

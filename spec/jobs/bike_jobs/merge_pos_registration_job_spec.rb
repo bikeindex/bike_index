@@ -179,6 +179,19 @@ RSpec.describe BikeJobs::MergePosRegistrationJob, type: :job do
     expect(bike_organization.reload).to have_attributes(bike_id: pos_bike.id, can_not_edit_claimed: true)
   end
 
+  it "restricts every kept membership an organization had restricted on either bike" do
+    organization = FactoryBot.create(:organization)
+    pos_bike_organization = FactoryBot.create(:bike_organization, bike: pos_bike, organization:)
+    pos_bike_organization.destroy!
+    FactoryBot.create(:bike_organization, bike:, organization:, can_not_edit_claimed: true).destroy!
+    bike_organization = FactoryBot.create(:bike_organization, bike:, organization:)
+
+    instance.perform(match.id)
+    expect(match.reload.status).to eq "merged"
+    expect(BikeOrganization.unscoped.where(bike_id: pos_bike.id, organization:).pluck(:can_not_edit_claimed)).to eq([true, true])
+    expect(bike_organization.reload).to have_attributes(bike_id: pos_bike.id, can_not_edit_claimed: true)
+  end
+
   it "doesn't merge once the POS registration is really deleted" do
     BikeJobs::BikeDeleterJob.new.perform(pos_bike.id, true)
     instance.perform(match.id)
