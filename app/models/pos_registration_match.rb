@@ -54,14 +54,15 @@ class PosRegistrationMatch < ApplicationRecord
     serial = bike.serial_normalized_no_space
     serials = [serial, pos_bike.serial_normalized_no_space].uniq
     bike_ids = [bike.id, pos_bike.id]
+    versions = BikeVersion.unscoped.where(bike_id: bike_ids)
     listings = MarketplaceListing.where(item_type: "Bike", item_id: bike_ids)
-      .or(MarketplaceListing.where(item_type: "BikeVersion", item_id: BikeVersion.unscoped.where(bike_id: bike_ids).select(:id)))
+      .or(MarketplaceListing.where(item_type: "BikeVersion", item_id: versions.select(:id)))
     not_a_serial = BikeDuplicatesServices::Cues.not_a_serial(serial,
       manufacturer_names: BikeDuplicatesServices::Cues.fetch_manufacturer_name_serials)
     ordered_reasons([("stolen_history" if BikeDuplicatesServices::Finder.stolen_serials?(serials)),
       ("impounded" if ImpoundRecord.where(bike_id: bike_ids).exists?),
       ("marketplace_listing" if listings.exists?),
-      ("bike_versions" if BikeVersion.unscoped.where(bike_id: bike_ids).exists?), ("not_a_serial" if not_a_serial)].compact)
+      ("bike_versions" if versions.exists?), ("not_a_serial" if not_a_serial)].compact)
   end
 
   def self.ordered_reasons(reasons) = REVIEW_REASONS.keys & reasons
