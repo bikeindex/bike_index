@@ -37,16 +37,13 @@ class PosRegistrationMatch < ApplicationRecord
     "changed_since_confirmed" => "A registration was edited, removed or transferred after the owner said yes"
   }.freeze
 
-  # Bike's default scope (Bike.current) leaves these out
-  BIKE_SCOPE_COLUMNS = %i[example user_hidden deleted_at likely_spam].freeze
-
   enum :status, STATUS_ENUM
 
   belongs_to :duplicate_bike_group
-  # Merged matches have a deleted bike, and POS bikes are often hidden. Keeps the default scope's includes,
-  # which the admin table reads
-  belongs_to :bike, -> { unscope(:order, where: BIKE_SCOPE_COLUMNS) }
-  belongs_to :pos_bike, -> { unscope(:order, where: BIKE_SCOPE_COLUMNS) }, class_name: "Bike"
+  # Merged matches have a deleted bike, and POS bikes are often hidden. Drops Bike.current from the default
+  # scope but keeps its includes, which the admin table reads
+  belongs_to :bike, -> { unscope(:order, where: Bike::CURRENT_ATTRIBUTES.keys) }
+  belongs_to :pos_bike, -> { unscope(:order, where: Bike::CURRENT_ATTRIBUTES.keys) }, class_name: "Bike"
   # Who said to merge them
   belongs_to :merger, class_name: "User", optional: true
 
