@@ -42,7 +42,6 @@ export const preferences = [
   unseen(({ manufacturer }) => manufacturer),
   unseen(({ primary_activity: activity }) => activity),
   unseen(({ group_key: group }) => group),
-  ({ electric, certifications }) => !electric || Boolean(certifications?.length),
   ({ model_configuration: configuration }) => configuration === 'complete',
   ({ final_year: finalYear }) => finalYear == null
 ]
