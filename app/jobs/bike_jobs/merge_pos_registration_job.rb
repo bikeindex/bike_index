@@ -17,43 +17,58 @@ module BikeJobs
     # Moved over whole
     MOVED_MODELS = [BikeStickerUpdate, Component, CustomerContact, EducationCourseAcknowledgment, GraduatedNotification,
       Notification, OrganizationMessage, ParkingNotification, StolenBikeListing, StolenNotification].freeze
-    # Tables with a bike_id merged by their own method below
-    MERGED_TABLES = %w[address_records bike_organization_notes bike_organizations bike_stickers].freeze
-    # Tables with a bike_id left on the deleted registration
-    LEFT_TABLES = {
-      "ownerships" => "the POS registration's ownership takes the owner's registration info",
-      "normalized_serial_segments" => "removed by DuplicateBikeFinderJob once the registration is deleted",
-      "user_alerts" => "recalculated for the owner by AfterBikeSaveJob",
-      "pos_registration_matches" => "the record of the merge",
-      "stolen_records" => "stolen history is a review reason, so there's none",
-      "theft_alerts" => "these need a stolen record, which is a review reason",
-      "impound_records" => "a review reason",
-      "bike_versions" => "a review reason"
+    # Other columns that can point at a bike, moved below
+    MERGED_COLUMNS = %w[address_records.bike_id b_params.created_bike_id bike_organization_notes.bike_id
+      bike_organizations.bike_id bike_stickers.bike_id graduated_notifications.primary_bike_id
+      impound_claims.bike_submitting_id public_images.imageable_id sales.item_id strava_gears.item_id].freeze
+    # Columns that can point at a bike, left on the deleted registration
+    LEFT_COLUMNS = {
+      "ownerships.bike_id" => "the POS registration's ownership takes the owner's registration info",
+      "normalized_serial_segments.bike_id" => "removed by DuplicateBikeFinderJob once the registration is deleted",
+      "user_alerts.bike_id" => "recalculated for the owner by AfterBikeSaveJob",
+      "pos_registration_matches.bike_id" => "the record of the merge",
+      "pos_registration_matches.pos_bike_id" => "the owner's registration isn't a POS one",
+      "bike_stickers.previous_bike_id" => "where a sticker was before, like a re-claim records",
+      "stolen_records.bike_id" => "stolen history is a review reason, so there's none",
+      "theft_alerts.bike_id" => "these need a stolen record, which is a review reason",
+      "impound_records.bike_id" => "a review reason",
+      "impound_claims.bike_claimed_id" => "the impounded bike, which is a review reason",
+      "bike_versions.bike_id" => "a review reason",
+      "marketplace_listings.item_id" => "a review reason",
+      "notifications.notifiable_id" => "never a bike",
+      "user_alerts.alertable_id" => "never a bike"
     }.freeze
 
     def perform(pos_registration_match_id)
-      merged_match = with_redlock(pos_registration_match_id) do
-        match = PosRegistrationMatch.find_by_id(pos_registration_match_id)
-        next unless match&.merging?
+      match = PosRegistrationMatch.find_by_id(pos_registration_match_id)
+      return unless match&.merging?
 
-        # Rechecked, since a theft, an edit or a transfer can come after the owner's answer
+      merged = ActiveRecord::Base.transaction do
+        # Ownerships before bikes, the order saving an ownership takes them in, since it touches its bike. With the
+        # POS bike locked, as the finder locks it, a new registration of it either is seen here or sees this merge
+        bike_ids = [match.bike_id, match.pos_bike_id]
+        Ownership.current.where(bike_id: bike_ids).order(:id).lock.pluck(:id)
+        Bike.unscoped.where(id: bike_ids).order(:id).lock.pluck(:id)
+        match.reload
+        next false unless match.merging?
+
+        # Rechecked, since a theft, an edit, a transfer or another registration can come after the owner's answer
         reasons = if match.mergeable?
-          PosRegistrationMatch.review_reasons_for(match.bike, match.pos_bike)
+          PosRegistrationMatch.review_reasons_for(match.bike, match.pos_bike) +
+            (PosRegistrationMatch.other_registration_matches(bike_id: match.bike_id, pos_bike_id: match.pos_bike_id)
+              .exists? ? ["multiple_registrations"] : [])
         else
           ["changed_since_confirmed"]
         end
         match.add_review_reasons!(reasons)
-        next unless match.merge_candidate?
+        next false unless match.merge_candidate?
 
-        ActiveRecord::Base.transaction do
-          merge(match.bike, match.pos_bike)
-          match.update!(status: :merged, merged_at: Time.current)
-        end
-        match
+        merge(match.bike, match.pos_bike)
+        match.update!(status: :merged, merged_at: Time.current)
       end
-      return if merged_match.blank?
+      return unless merged
 
-      [merged_match.bike_id, merged_match.pos_bike_id].each { CallbackJobs::AfterBikeSaveJob.perform_async(it) }
+      [match.bike_id, match.pos_bike_id].each { CallbackJobs::AfterBikeSaveJob.perform_async(it) }
     end
 
     private
@@ -61,6 +76,9 @@ module BikeJobs
     def merge(bike, pos_bike)
       MOVED_MODELS.each { it.unscoped.where(bike_id: bike.id).update_all(bike_id: pos_bike.id) }
       GraduatedNotification.unscoped.where(primary_bike_id: bike.id).update_all(primary_bike_id: pos_bike.id)
+      # What they submitted, which a pending education course acknowledgment links to
+      BParam.where(created_bike_id: bike.id).update_all(created_bike_id: pos_bike.id)
+      ImpoundClaim.where(bike_submitting_id: bike.id).update_all(bike_submitting_id: pos_bike.id)
       PublicImage.unscoped.where(imageable: bike).update_all(imageable_id: pos_bike.id)
       Sale.where(item: bike).update_all(item_id: pos_bike.id)
       # Gear is its Strava athlete's
@@ -68,11 +86,11 @@ module BikeJobs
         StravaGear.where(item: bike, strava_integration: StravaIntegration.where(user_id: pos_bike.user_id))
           .update_all(item_id: pos_bike.id)
       end
-      # claim doesn't raise, and a sticker left on the deleted registration would stop working
+      # Moved rather than claimed, which would make the owner its claimer and add organizations. The update has
+      # no user, so it doesn't count toward anyone's unorganized claims
       bike.bike_stickers.each do |bike_sticker|
-        next if bike_sticker.claim(bike: pos_bike, user: bike.user).reload.bike_id == pos_bike.id
-
-        raise ActiveRecord::RecordNotSaved, "Couldn't move BikeSticker #{bike_sticker.id} to Bike #{pos_bike.id}"
+        bike_sticker.update_columns(bike_id: pos_bike.id, previous_bike_id: bike.id, updated_at: Time.current)
+        BikeStickerUpdate.create!(bike_sticker:, bike: pos_bike)
       end
       merge_bike_organizations(bike, pos_bike)
       # One note per organization
