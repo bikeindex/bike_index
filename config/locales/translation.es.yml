@@ -5641,6 +5641,9 @@ es:
         report: Informe
         step_1: Paso 1
         step_2: Paso 2
+      org:
+        impound_current_location:
+          same_as_impounded_from: igual que incautado de
     pages:
       messages:
         thread_show:
@@ -5799,7 +5802,6 @@ es:
             show_location_search: mostrar búsqueda de ubicación
             all_bikes: Todas las bicicletas
             all_statuses: Todos los estados
-            impound_location_cell: Ubicación
             impound_status_cell: Estado de depósito
             impound_updated_at_cell: Incautación actualizada
             impound_updated_at_cell_panel: Hora - Registro de depósito actualizado
@@ -5824,6 +5826,10 @@ es:
               de la búsqueda de registros
             impound_search_columns: Columnas de búsqueda de depósitos
             course_acknowledgment_cell_panel: Tiempo - Curso de educación reconocido
+            current_location_without_locations: No tienes ubicaciones de depósito,
+              así que esto repite principalmente Incautado desde
+            impound_current_location_cell: Ubicación actual
+            impound_notes_cell: Notas de depósito
           column_settings_toggle:
             column_settings: Configuración de columnas
           settings_and_filters:
@@ -5845,6 +5851,7 @@ es:
             view: Vista
             toggle_all_checked: Activar/desactivar todas las selecciones
             course_acknowledgment_title: Reconocimiento del curso de educación en
+            more_notes: "+%{count} más"
           multi_result_chip:
             no_results: no hay coincidencias
           multi_results:
@@ -6051,6 +6058,8 @@ es:
             impounded_from: Incautado de
             last_update_by: Última actualización por
             status: Estado
+            current_location: Ubicación actual
+            notes: Notas
           legacy_view_link:
             switch_to_classic: Volver al visor anterior
             view_in_legacy: Ver %{bike_type} en el visor antiguo
