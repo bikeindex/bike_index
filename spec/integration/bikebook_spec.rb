@@ -18,7 +18,10 @@ RSpec.describe "Bike Book", :js, type: :system do
     page.current_window.resize_to(*size)
   end
 
-  def featured_ids = all("[aria-label='Models to compare'] a").map { it[:href][/vehicle_models=([^&]+)/, 1] }
+  # in one read, as one link at a time can straddle a render and mix two sets of picks
+  def featured_ids = page.evaluate_script(<<~JS)
+    Array.from(document.querySelectorAll("[aria-label='Models to compare'] a"), (link) => new URL(link.href).searchParams.get("vehicle_models"))
+  JS
 
   def featured_prices = all("[aria-label='Models to compare'] li").map { it.text[/\$([\d,]+)/, 1].to_s.delete(",").to_i }
 
