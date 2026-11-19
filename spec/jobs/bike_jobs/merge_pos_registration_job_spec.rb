@@ -91,6 +91,8 @@ RSpec.describe BikeJobs::MergePosRegistrationJob, type: :job do
     b_param = FactoryBot.create(:b_param, created_bike_id: bike.id)
     impound_claim = FactoryBot.create(:impound_claim)
     impound_claim.update_column(:bike_submitting_id, bike.id)
+    user_alert = FactoryBot.create(:user_alert, kind: "unassigned_bike_org", user:, bike:,
+      organization: FactoryBot.create(:organization))
 
     instance.perform(match.id)
     expect(match.reload.status).to eq "merged"
@@ -99,6 +101,7 @@ RSpec.describe BikeJobs::MergePosRegistrationJob, type: :job do
     expect(bike_sticker.bike_sticker_updates.order(:id).last).to have_attributes(bike_id: pos_bike.id, user_id: nil, kind: "re_claim")
     expect(b_param.reload.created_bike_id).to eq pos_bike.id
     expect(impound_claim.reload.bike_submitting_id).to eq pos_bike.id
+    expect(user_alert.reload.resolved?).to be_truthy
   end
 
   it "doesn't merge once there's another registration of the POS registration, and records why" do
@@ -108,6 +111,52 @@ RSpec.describe BikeJobs::MergePosRegistrationJob, type: :job do
     instance.perform(match.id)
     expect(match.reload).to have_attributes(status: "confirmed", review_reasons: ["multiple_registrations"])
     expect(bike.reload.deleted_at).to be_blank
+  end
+
+  it "doesn't merge once a merged registration of the POS registration came first" do
+    other_bike = FactoryBot.create(:bike, :with_ownership_claimed, user:, manufacturer: bike.manufacturer, serial_number: bike.serial_number)
+    FactoryBot.create(:pos_registration_match, pos_bike:, bike: other_bike, status: :merged)
+    other_bike.destroy!
+    instance.perform(match.id)
+    expect(match.reload).to have_attributes(status: "confirmed", review_reasons: ["multiple_registrations"])
+  end
+
+  it "doesn't merge while their registration is mid-transfer" do
+    ownership = bike.current_ownership
+    FactoryBot.create(:ownership, bike:, creator: user, owner_email: "new-owner@example.com")
+    # The new ownership is committed, but its after_commit hasn't pointed the bike at it yet
+    ownership.update_column(:current, true)
+    bike.update_column(:current_ownership_id, ownership.id)
+    instance.perform(match.id)
+    expect(match.reload).to have_attributes(status: "confirmed", review_reasons: ["changed_since_confirmed"])
+    expect(bike.reload.deleted_at).to be_blank
+  end
+
+  it "points a moved graduated notification at the kept bike's organization" do
+    organization = FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["graduated_notifications"],
+      graduated_notification_interval: 1.year)
+    pos_bike_organization = FactoryBot.create(:bike_organization, bike: pos_bike, organization:)
+    bike_organization = FactoryBot.create(:bike_organization, bike:, organization:)
+    graduated_notification = FactoryBot.create(:graduated_notification, bike:, organization:)
+    expect(graduated_notification.reload.bike_organization_id).to eq bike_organization.id
+
+    instance.perform(match.id)
+    expect(match.reload.status).to eq "merged"
+    expect(graduated_notification.reload).to have_attributes(bike_id: pos_bike.id, bike_organization_id: pos_bike_organization.id)
+  end
+
+  it "moves a graduated membership, so its renewal link restores the kept bike's" do
+    organization = FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["graduated_notifications"],
+      graduated_notification_interval: 1.year)
+    bike_organization = FactoryBot.create(:bike_organization, bike:, organization:)
+    graduated_notification = FactoryBot.create(:graduated_notification, bike:, organization:)
+    bike_organization.destroy!
+    expect(graduated_notification.reload.bike_organization_id).to eq bike_organization.id
+
+    instance.perform(match.id)
+    expect(match.reload.status).to eq "merged"
+    expect(BikeOrganization.unscoped.find(bike_organization.id).bike_id).to eq pos_bike.id
+    expect(graduated_notification.reload.bike_id).to eq pos_bike.id
   end
 
   it "doesn't merge once the POS registration is really deleted" do
