@@ -1,6 +1,6 @@
 // How alike catalog models are, from the values the catalog publishes as `comparison`. The weights, scales and
-// presets are ours; the values are worked out by bikebook's Catalog::Comparison, so none is derived again here but
-// the rider heights a size doesn't state.
+// presets are ours; the values are worked out by bikebook's Catalog::Comparison, so none is derived again here but where
+// a size's riders fall in its model's range, and a kids' model's range where the catalog has none.
 // Imported by the catalog's worker too, which has no importmap, so it imports nothing
 
 const FORMAT = 3
@@ -26,7 +26,7 @@ const SHORT = 1650
 const TALL = 1880
 // the span of riders' heights a size fits, where it states only one end or neither
 const SPAN = 100
-// a family with fewer sizes stating their riders than this estimates no others'
+// with fewer kids' sizes stating their riders than this, a kids' model the catalog has no range for gets none
 const MIN_FIT_SIZES = 100
 
 // more than the model's as far as this much of the same less is, as a roomier frame still fits its tires
@@ -147,12 +147,6 @@ const line = (points) => {
   const slope = mean(points.map(([x, y]) => (x - meanX) * (y - meanY))) / mean(points.map(([x]) => (x - meanX) ** 2))
   return (x) => meanY + slope * (x - meanX)
 }
-// each group's line through its [group, x, y] `points`, of the groups with enough of them
-const groupLines = (points) => {
-  const groups = new Map()
-  for (const [group, ...point] of points) groups.get(group)?.push(point) ?? groups.set(group, [point])
-  return new Map([...groups].filter(([, each]) => each.length >= MIN_FIT_SIZES).map(([group, each]) => [group, line(each)]))
-}
 const middle = ([min, max]) => (min + max) / 2
 
 // Scores the catalog's `models`, in the index's order, which the comparison's columns are in. Null for a format it
@@ -168,28 +162,33 @@ export const scorer = (models, { format, fields }, activities) => {
   const riders = fields.target_riders?.map((each) => each ?? [])
   const kids = riders?.map((each) => each.includes('kid')) ?? unpublished
 
-  // Each size's riders' heights, [shortest, tallest], as it states them, else about the line through the middles of
-  // those its family's sizes state, by its stack plus reach, as a mountain bike's frame is longer than a road bike's for
-  // the same rider, or a kids' by its wheel size
   const sizeValue = (field, index, size) => fields[field]?.[index]?.[size] ?? null
   const statedHeights = (index, size) => {
     const [min, max] = ['size_rider_height_min', 'size_rider_height_max'].map((field) => sizeValue(field, index, size))
     return min == null && max == null ? null : [min ?? max - SPAN, max ?? min + SPAN]
   }
-  const measureOf = (index, size) => {
-    if (kids[index]) return fields.front_bsd[index]
-    const [stack, reach] = ['size_stack', 'size_reach'].map((field) => sizeValue(field, index, size))
-    return stack == null || reach == null ? null : stack + reach
+  const kidPoints = kids.flatMap((kid, index) => kid && fields.front_bsd[index] != null
+    ? Array.from(fields.size_names?.[index] ?? [], (_, size) => statedHeights(index, size)).filter(Boolean).map((stated) => [fields.front_bsd[index], middle(stated)])
+    : [])
+  const kidsLine = kidPoints.length >= MIN_FIT_SIZES ? line(kidPoints) : null
+  // Each model's riders' heights, [shortest, tallest], open at an end the catalog leaves open, else a kids' model's about
+  // the line through kids' sizes' stated heights by wheel size
+  const riderHeights = models.map((_, index) => {
+    const [min, max] = [fields.rider_height_min?.[index], fields.rider_height_max?.[index]]
+    if (min != null || max != null) return [min ?? -Infinity, max ?? Infinity]
+    const estimate = kids[index] && fields.front_bsd[index] != null && kidsLine?.(fields.front_bsd[index])
+    return estimate ? [estimate - SPAN / 2, estimate + SPAN / 2] : null
+  })
+  // The height of the rider of the model's `size`: the middle of those it states, else its place among the model's sizes
+  // in the model's range, the first fitting its shortest riders and the last its tallest
+  const riderOf = (index, size) => {
+    const stated = statedHeights(index, size)
+    if (stated) return middle(stated)
+    const [min, max] = riderHeights[index] ?? []
+    if (!Number.isFinite(min) || !Number.isFinite(max)) return null
+    const count = fields.size_names?.[index]?.length ?? 0
+    return count > 1 ? min + SPAN / 2 + (max - min - SPAN) * size / (count - 1) : middle([min, max])
   }
-  const fitFamily = (index) => kids[index] ? 'kid' : families[index]
-  const sizes = models.map((_, index) => Array.from({ length: fields.size_names?.[index]?.length ?? 0 },
-    (_, size) => [statedHeights(index, size), measureOf(index, size)]))
-  const lines = groupLines(sizes.flatMap((each, index) => each.filter(([stated, measure]) => stated && measure != null)
-    .map(([stated, measure]) => [fitFamily(index), measure, middle(stated)])))
-  const heights = sizes.map((each, index) => each.map(([stated, measure]) => {
-    const estimate = measure != null && lines.get(fitFamily(index))?.(measure)
-    return stated ?? (estimate ? [estimate - SPAN / 2, estimate + SPAN / 2] : null)
-  }))
 
   const columns = {
     ...fields,
@@ -204,10 +203,7 @@ export const scorer = (models, { format, fields }, activities) => {
     frame_material: fields.frame_material ?? unpublished,
     kid: kids,
     target_riders: riders?.map((each) => each.filter((rider) => rider !== 'kid')) ?? unpublished,
-    rider_height: heights.map((each) => {
-      const known = each.filter(Boolean)
-      return known.length ? [Math.min(...known.map(([min]) => min)), Math.max(...known.map(([, max]) => max))] : null
-    })
+    rider_height: riderHeights
   }
   const indexes = new Map(models.map((model, index) => [model.id, index]))
 
@@ -233,8 +229,7 @@ export const scorer = (models, { format, fields }, activities) => {
 
     const model = models[target]
     const family = families[target]
-    const range = heights[target][size]
-    const height = range && middle(range)
+    const height = riderOf(target, size)
     const own = {
       ...Object.fromEntries(Object.keys(columns).map((field) => [field, columns[field][target]])),
       rider_height: height && (height < SHORT || height > TALL) ? height : null

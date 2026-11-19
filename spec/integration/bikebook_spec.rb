@@ -2392,8 +2392,9 @@ RSpec.describe "Bike Book", :js, type: :system do
     # and a frame of the same material and bars of the same type closer, and only the same type with its slider at the top. None
     # nearly as far as one it knows nothing about, a groupset's tier however its series is written, and a slider's whole
     # weight on the fields the model lists, a rigid frame's suspension outweighing its material, and its own activity
-    # closer than another of its family. A short rider's fit by a size's stated riders, else its family's line through them
-    # by stack plus reach, and a kids' model farther than a women's
+    # closer than another of its family. A short rider's fit by the catalog's ranges, open where it leaves an end open, the
+    # rider placed by their size's order in the range, a kids' model without one by the line through kids' sizes by wheel
+    # size, and a kids' model farther than a women's
     matched = page.evaluate_script(<<~JS)
       (async () => {
         const { GROUPS, scorer, settingsFrom } = await import('bikebook/similarity')
@@ -2423,22 +2424,24 @@ RSpec.describe "Bike Book", :js, type: :system do
           { tire_clearance: [32, tight, roomy] }))
         const weighed = scoring([model('a', false), model('complete', false), { ...model('frame', false), model_configuration: 'frame_fork' }],
           { total_weight: [10, 3, 3] })
-        const line = Array.from({ length: 100 }, (_, index) => 500 + index)
-        const fits = scoring([model('a', false), model('medium', false), model('small', false), model('estimated', false), model('line', false)], {
-          size_names: [['S', 'M'], ['M'], ['S', 'M'], ['S'], line],
-          size_stack: [null, null, null, [500], line],
-          size_reach: [null, null, null, [450], line.map(() => 400)],
-          size_rider_height_min: [[1500, 1700], [1700], [1500, 1700], null, line.map((stack) => stack + 950)],
-          size_rider_height_max: [[1600, 1800], [1800], [1600, 1800], null, line.map((stack) => stack + 1050)]
+        const fits = scoring([model('a', false), model('medium', false), model('small', false), model('open', false)], {
+          size_names: [['S', 'M'], ['M'], ['S', 'M'], ['S']], rider_height_min: [1500, 1700, 1500, null], rider_height_max: [1800, 1800, 1800, 1600]
+        })
+        const kidSizes = (value) => Array(50).fill(value)
+        const kidFits = scoring([model('a', false), model('small_kids', false), model('large_kids', false), model('fits', false), model('adult', false)], {
+          target_riders: [['kid'], ['kid'], ['kid'], ['kid'], null], front_bsd: [406, 305, 507, 406, 622],
+          size_names: [['One Size'], kidSizes('S'), kidSizes('L'), ['One Size'], ['M']],
+          size_rider_height_min: [null, kidSizes(1000), kidSizes(1300), null, null], size_rider_height_max: [null, kidSizes(1100), kidSizes(1400), null, null],
+          rider_height_min: [null, null, null, 1150, 1600], rider_height_max: [null, null, null, 1300, 1900]
         })
         const riders = scoring([model('a', false), model('kid', false), model('woman', false), model('unisex', false)], { target_riders: [null, ['kid'], ['woman'], null] })
         return [...propulsions, ids(configurations), ids(configurations, 'same_configuration=1'),
           ids(wheels), ids(wheels, 'same_wheels=1'), ...clearances.map((each) => ids(each)), ids(weighed), ids(materials), ids(bars), ids(bars, 'weights=handlebar.4'), ids(far), ids(groupsets), ids(suspensions), ids(activities),
-          ...[1, 0].map((size) => ids(fits, '', size)), ids(fits, 'weights=fit.5', 0), ids(riders), ids(riders, 'weights=riders.5')]
+          ...[1, 0].map((size) => ids(fits, '', size)), ids(fits, 'weights=fit.5', 0), ids(kidFits, 'weights=fit.5', 0), ids(riders), ids(riders, 'weights=riders.5')]
       })()
     JS
     expect(matched).to eq([["other_e", "acoustic"], ["acoustic"], ["complete", "frame"], ["complete"], ["small", "road"], ["road"], ["36", "28"], ["28", "40"], ["frame", "complete"], ["aluminum", "steel"], ["drop"], ["drop", "flat"], ["near"], ["s1000", "tiagra"], ["steel", "full"], ["commuting", "touring"],
-      ["medium", "small", "estimated", "line"], ["small", "estimated", "line", "medium"], ["small", "estimated", "line"], ["unisex", "woman", "kid"], ["unisex"]])
+      ["medium", "small", "open"], ["small", "open", "medium"], ["small", "open"], ["fits"], ["unisex", "woman", "kid"], ["unisex"]])
   end
 
   it "shows what each of the catalog's files allows as it lands, keeping the picked vehicles if the index fails" do
