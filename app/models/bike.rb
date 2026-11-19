@@ -758,7 +758,7 @@ class Bike < ApplicationRecord
   end
 
   def address_hash
-    current_stolen_record&.address_hash || current_impound_record&.address_hash ||
+    current_stolen_record&.address_hash || current_impound_record&.impounded_from_address&.address_hash ||
       address_record&.address_hash
   end
 

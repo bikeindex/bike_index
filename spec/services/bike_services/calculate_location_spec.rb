@@ -146,6 +146,18 @@ RSpec.describe BikeServices::CalculateLocation do
       end
     end
 
+    context "given an impound record held at a location" do
+      let(:location) { FactoryBot.create(:location, :with_address_record, address_in: :new_york) }
+      let(:impound_record) { FactoryBot.create(:impound_record_with_organization, :with_address_record, location:) }
+      let(:bike) { impound_record.bike }
+
+      it "takes location from where it was impounded from" do
+        expect(impound_record.reload.address_record_id).to eq location.address_record_id
+        bike.reload.update(updated_at: Time.current)
+        expect(bike.reload.to_coordinates).to eq impound_record.impounded_from_address_record.to_coordinates
+      end
+    end
+
     context "given no creation org location" do
       let(:city) { "New York" }
       let(:zipcode) { "10011" }
