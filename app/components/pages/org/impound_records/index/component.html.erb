@@ -6,6 +6,7 @@
   data-org--impound-update-multi-open-label-value="<%= multi_update_open_label %>"
   data-org--impound-update-multi-closed-label-value="<%= multi_update_closed_label %>"
   data-org--impound-update-multi-disabled-title-value="<%= translation(".cannot_update_with_kind") %>"
+  <%= tag.attributes(data: {multi_update_open: (true if @multi_update_open)}) %>
 >
   <%= render(Pages::Org::Search::Wrapper::Component.new(
     organization: @current_organization,
@@ -13,7 +14,6 @@
     per_page: @per_page,
     params: @params,
     impound_records: @impound_records,
-    multiselect_visible: @multi_update_open,
     sort_state: @sort_state,
     result_view: @result_view,
     search_page: true

@@ -2,10 +2,11 @@ import { Controller } from '@hotwired/stimulus'
 import { CollapseUtils, collapse } from 'utils/collapse_utils'
 
 // Connects to data-controller='org--impound-update-multi'
-// The impound records index multi-update extras: reveals the update panel and
-// the checkbox column, enables only the checkboxes whose row supports the
-// selected update kind, and blocks submitting with nothing checked. The
-// kind-specific fields are handled by the separate org--impound-update controller.
+// The impound records index multi-update extras: reveals the update panel and,
+// with data-multi-update-open, the checkbox column frozen in place of View's.
+// Enables only the checkboxes whose row supports the selected update kind, and
+// blocks submitting with nothing checked. The kind-specific fields are handled
+// by the separate org--impound-update controller.
 export default class extends Controller {
   static targets = ['toggle', 'panel', 'kindSelect', 'error']
   static values = { openLabel: String, closedLabel: String, disabledTitle: String }
@@ -25,7 +26,7 @@ export default class extends Controller {
 
   openPanel () {
     collapse('show', this.panelTarget)
-    this.cells.forEach(cell => cell.classList.remove('tw:hidden'))
+    this.element.toggleAttribute('data-multi-update-open', true)
     this.refreshChecks()
     this.toggleTarget.textContent = this.openLabelValue
     this.refreshTableEdges()
@@ -34,7 +35,7 @@ export default class extends Controller {
 
   closePanel () {
     collapse('hide', this.panelTarget)
-    this.cells.forEach(cell => cell.classList.add('tw:hidden'))
+    this.element.toggleAttribute('data-multi-update-open', false)
     this.toggleTarget.textContent = this.closedLabelValue
     this.refreshTableEdges()
     this.setUrlParam(false)
