@@ -37,7 +37,7 @@ module MyAccounts
       # Nothing was recorded, e.g. no answer was given
       return redirect_to(my_account_pos_registration_match_path(match)) if match.confirmable?
 
-      combined = (match.merging? || match.merged?) && @pos_bike&.user_id == current_user.id
+      combined = (match.merging? || match.merged?) && @pos_bike.user_id == current_user.id
       key = if answered
         match.declined? ? :kept_separate : :combining_thanks
       elsif combined
@@ -49,7 +49,7 @@ module MyAccounts
       else
         :cant_combine_here
       end
-      flash[answered ? :success : :notice] = translation(key, bike_type: @pos_bike&.type)
+      flash[answered ? :success : :notice] = translation(key, bike_type: @pos_bike.type)
       redirect_to(combined ? bike_path(@pos_bike) : my_account_path)
     end
   end
