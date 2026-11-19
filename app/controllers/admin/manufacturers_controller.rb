@@ -12,9 +12,7 @@ module Admin
     def index
       @manufacturers = searched_manufacturers.reorder(sortable_order(Manufacturer))
       @slug_collisions = Manufacturer.slug_collisions
-      return unless request.format.json?
-
-      render json: {manufacturers: @manufacturers.as_json(only: JSON_ATTRIBUTES), slug_collisions: @slug_collisions}
+      render json: {manufacturers: @manufacturers.as_json(only: JSON_ATTRIBUTES), slug_collisions: @slug_collisions} if request.format.json?
     end
 
     def show

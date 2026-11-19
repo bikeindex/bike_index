@@ -11,8 +11,6 @@
 
     <ul class="tw:list-disc tw:pl-4">
       <% slug_collisions.each do |collision| %>
-        <% previous_links = safe_join(collision[:previous_slug_manufacturers].map { link_to(it[:name], admin_manufacturer_path(it[:id]), class: "twlink-underlined") }, ", ") %>
-
         <li>
           <%= render(UI::Code::Inline::Component.new(text: collision[:slug])) %>
 
@@ -24,7 +22,7 @@
             is a previous slug of
           <% end %>
 
-          <%= previous_links %>
+          <%= safe_join(collision[:previous_slug_manufacturers].map { link_to(it[:name], admin_manufacturer_path(it[:id]), class: "twlink-underlined") }, ", ") %>
         </li>
       <% end %>
     </ul>

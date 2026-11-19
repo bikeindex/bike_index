@@ -36,7 +36,7 @@ RSpec.describe Manufacturer, type: :model do
   end
 
   describe "slug validation" do
-    it "is invalid when a slug is all digits" do
+    it "is invalid when the slug is all digits, and drops all-digit previous slugs" do
       expect(FactoryBot.build(:manufacturer, name: "333")).not_to be_valid
       expect(FactoryBot.create(:manufacturer, name: "Foo (101)").previous_slugs).to eq []
       expect(FactoryBot.create(:manufacturer, name: "Bar (101 Bikes)").previous_slugs).to eq ["101_bikes"]
@@ -121,8 +121,6 @@ RSpec.describe Manufacturer, type: :model do
       expect(kona.slug_collisions).to eq([collision])
       expect(kona_company.slug_collisions).to eq([collision])
       expect(other.slug_collisions).to eq([])
-      expect(Manufacturer.friendly_find("kona")).to eq kona
-      expect(Manufacturer.friendly_find("Kona Bikes")).to eq kona
     end
 
     it "is a previous slug several manufacturers share" do

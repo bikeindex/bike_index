@@ -113,7 +113,7 @@ class Manufacturer < ApplicationRecord
   end
 
   def slug_collisions
-    Manufacturer.slug_collisions.select { [it[:manufacturer], *it[:previous_slug_manufacturers]].compact.pluck(:id).include?(id) }
+    Manufacturer.slug_collisions.select { [slug, *previous_slugs].include?(it[:slug]) }
   end
 
   def official_organization
