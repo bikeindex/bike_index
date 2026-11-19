@@ -72,10 +72,18 @@ class Manufacturer < ApplicationRecord
       else
         slug = Slugifyer.slugify(n)
         legacy_slug = Slugifyer.legacy_manufacturer(n)
-        find_by_slug(slug) ||
-          where(slug: legacy_slug).or(where("previous_slugs && ARRAY[?]::varchar[]", [slug, legacy_slug])).first ||
-          find_by_secondary_slug(legacy_slug)
+        find_by_slug(slug) || find_by_slug(legacy_slug) || find_by_secondary_slug(legacy_slug) ||
+          where("previous_slugs && ARRAY[?]::varchar[]", [slug, legacy_slug]).first
       end
+    end
+
+    # A slug that's also another manufacturer's previous slug. friendly_find returns the manufacturer with the slug
+    def slug_collisions
+      unscoped.joins("JOIN manufacturers previous ON manufacturers.slug = ANY(previous.previous_slugs)")
+        .order(:slug).pluck(:slug, :id, :name, "previous.id", "previous.name")
+        .map do |slug, id, name, previous_id, previous_name|
+          {slug:, manufacturer: {id:, name:}, previous_slug_manufacturer: {id: previous_id, name: previous_name}}
+        end
     end
 
     def friendly_find_id(n)
@@ -106,6 +114,10 @@ class Manufacturer < ApplicationRecord
   # How an async combobox displays an already selected manufacturer
   def to_combobox_display
     name
+  end
+
+  def slug_collisions
+    Manufacturer.slug_collisions.select { [it[:manufacturer][:id], it[:previous_slug_manufacturer][:id]].include?(id) }
   end
 
   def official_organization

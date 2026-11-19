@@ -103,6 +103,34 @@ RSpec.describe Manufacturer, type: :model do
     end
   end
 
+  describe "slug_collisions" do
+    let!(:kona_company) { FactoryBot.create(:manufacturer, name: "Kona Bicycle Company") }
+    let!(:other) { FactoryBot.create(:manufacturer, name: "Cool Bikes") }
+
+    it "is a slug that's another manufacturer's previous slug" do
+      expect(Manufacturer.slug_collisions).to eq([])
+
+      kona = FactoryBot.create(:manufacturer, name: "Kona")
+      collision = {slug: "kona", manufacturer: {id: kona.id, name: "Kona"},
+                   previous_slug_manufacturer: {id: kona_company.id, name: "Kona Bicycle Company"}}
+      expect(Manufacturer.slug_collisions).to eq([collision])
+      expect(kona.slug_collisions).to eq([collision])
+      expect(kona_company.slug_collisions).to eq([collision])
+      expect(other.slug_collisions).to eq([])
+      expect(Manufacturer.friendly_find("kona")).to eq kona
+      expect(Manufacturer.friendly_find("Kona Bikes")).to eq kona
+    end
+
+    it "finds the manufacturer with the slug, whichever sorts first" do
+      aardvark = FactoryBot.create(:manufacturer, name: "Aardvark Bicycle Company")
+      expect(aardvark.previous_slugs).to eq ["aardvark"]
+      zebra = FactoryBot.create(:manufacturer, name: "Zebra (Aardvark)")
+      expect(zebra.secondary_slug).to eq "aardvark"
+      expect(Manufacturer.friendly_find("aardvark bikes")).to eq zebra
+      expect(Manufacturer.friendly_find("aardvark-bicycle-company")).to eq aardvark
+    end
+  end
+
   describe "autocomplete_hash" do
     it "returns what we expect" do
       manufacturer = FactoryBot.create(:manufacturer)

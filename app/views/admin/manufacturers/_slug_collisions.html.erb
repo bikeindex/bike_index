@@ -1,0 +1,24 @@
+<%# locals: (slug_collisions:) %>
+<% if slug_collisions.any? %>
+  <% header = capture do %>
+    <%= number_display(slug_collisions.count) %> <%= "slug collision".pluralize(slug_collisions.count) %>
+  <% end %>
+  <%= render(UI::Alerts::Base::Component.new(kind: :warning, header:)) do %>
+    <p>
+      A slug that was another manufacturer's finds the manufacturer that has it
+      now.
+    </p>
+
+    <ul class="tw:list-disc tw:pl-4">
+      <% slug_collisions.each do |collision| %>
+        <li>
+          <%= render(UI::Code::Inline::Component.new(text: collision[:slug])) %>
+          is
+          <%= link_to(collision[:manufacturer][:name], admin_manufacturer_path(collision[:manufacturer][:id]), class: "twlink-underlined") %>'s
+          slug, and was
+          <%= link_to(collision[:previous_slug_manufacturer][:name], admin_manufacturer_path(collision[:previous_slug_manufacturer][:id]), class: "twlink-underlined") %>'s
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+<% end %>
