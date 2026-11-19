@@ -9,8 +9,7 @@ const MID_PRICE_CENTS = 250000
 const HIGH_PRICE_CENTS = 500000
 const TOP_PRICE_CENTS = 800000
 const MAX_PRICE_CENTS = 1000000
-const EURO = ['EU', 'AT', 'BE', 'CY', 'DE', 'EE', 'ES', 'FI', 'FR', 'GR', 'HR', 'IE', 'IT', 'LT', 'LU', 'LV', 'MT', 'NL', 'PT', 'SI', 'SK']
-const CURRENCIES = { ...Object.fromEntries(EURO.map((market) => [market, 'EUR'])), AU: 'AUD', CA: 'CAD', CH: 'CHF', DK: 'DKK', GB: 'GBP', HK: 'HKD', HU: 'HUF', ID: 'IDR', IN: 'INR', JP: 'JPY', NZ: 'NZD', SE: 'SEK', TW: 'TWD' }
+const CURRENCIES = { EU: 'EUR', AU: 'AUD', CA: 'CAD', CH: 'CHF', GB: 'GBP', HK: 'HKD', ID: 'IDR', IN: 'INR', JP: 'JPY', NZ: 'NZD', TW: 'TWD' }
 const CYCLE_TYPES = ['bike', 'cargo_bike', 'cargo_bike_rear', 'tandem', 'tricycle', 'cargo_tricycle', 'cargo_tricycle_rear', 'recumbent']
 
 // A model whose `key` none of the picks share
@@ -49,10 +48,10 @@ export const preferences = [
 // `share` is the picks' fraction, those it leaves being the other models; `minimum` is a count
 export const quotas = [
   { matches: ({ electric }) => electric, share: 0.5 },
+  { matches: riders('woman'), minimum: 3 },
   { matches: priced(0, LOW_PRICE_CENTS), minimum: 4 },
   { matches: (model) => model.electric && priced(0, LOW_PRICE_CENTS)(model), minimum: 2 },
-  { matches: priced(LOW_PRICE_CENTS, MID_PRICE_CENTS), minimum: 4 },
-  { matches: riders('woman'), minimum: 3 }
+  { matches: priced(LOW_PRICE_CENTS, MID_PRICE_CENTS), minimum: 4 }
 ]
 
 // Each leaves its models out of the picks once they number `maximum`, unless that would leave none

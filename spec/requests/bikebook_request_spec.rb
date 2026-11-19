@@ -30,6 +30,13 @@ RSpec.describe BikebookController, type: :request do
         .and have_text("Learn how to use it or view the raw data.", normalize_ws: true)
     end
 
+    it "sets an EU member's visitor in the EU, which the catalog lists their models under" do
+      get "/bikebook", headers: {"CF-IPCountry" => "FR"}
+      bikebook = Capybara.string(response.body).find("[data-controller='bikebook--page']")
+      expect(bikebook["data-bikebook--page-market-value"]).to eq "EU"
+      expect(bikebook["data-bikebook--page-market-name-value"]).to eq "European Union"
+    end
+
     context "comparing" do
       it "isn't indexed, and shows the search it can't fill in as loading" do
         get "/bikebook", params: {vehicle_models: "m/segway/2025/gt3_pro,m/aventon/2022/level_2"}
