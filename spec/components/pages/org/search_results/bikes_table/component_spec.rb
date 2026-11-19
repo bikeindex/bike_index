@@ -38,7 +38,7 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
        sort_state: ComponentStructs::SortState.new(sort: "impounded_at", direction: "desc")}
     end
 
-    it "renders the record's bike, its impound columns, and a hidden multi-update checkbox" do
+    it "renders the record's bike, its impound columns, and a multi-update checkbox column first" do
       expect(component).to have_css("tbody tr", count: 1)
       expect(component).to have_text(bike.mnfg_name)
       expect(component).to have_css("td.impounded_at_cell a[href*='/impound_records/#{impound_record.display_id}']")
@@ -54,10 +54,8 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
       expect(component).not_to have_css("th.occurred_at_cell [data-controller='ui--tooltip']")
       checkbox = component.at_css("td.multi-update-cell input[type='checkbox']")
       expect(checkbox[:form]).to eq Pages::Org::SearchResults::BikesTable::Component::MULTI_UPDATE_FORM_ID
-      expect(component.at_css("td.multi-update-cell")[:class]).to include("tw:hidden")
       # First, so it's the frozen column, and ahead of the hideable ones, which reordering appends after the rest
       expect(component.css("th").first[:class]).to include("multi-update-cell", "tw:sticky")
-      expect(component.css("th")[1][:class]).to include("tw:sticky", "tw:in-data-multi-update-open:static!")
     end
 
     context "with impound_bikes_locations" do
