@@ -5403,6 +5403,9 @@ nb:
         report: Rapportere
         step_1: Trinn 1
         step_2: Trinn 2
+      org:
+        impound_current_location:
+          same_as_impounded_from: det samme som beslaglagt fra
     pages:
       messages:
         thread_show:
@@ -5557,7 +5560,6 @@ nb:
             show_location_search: vis stedssøk
             all_bikes: Alle sykler
             all_statuses: Alle statuser
-            impound_location_cell: plassering
             impound_status_cell: Status for beslag
             impound_updated_at_cell: Beslaglegging oppdatert
             impound_updated_at_cell_panel: Tid - Beslagsregister oppdatert
@@ -5582,6 +5584,10 @@ nb:
               fra registreringssøk
             impound_search_columns: Beslaglegg søkekolonner
             course_acknowledgment_cell_panel: Tid - Utdanningskurs godkjent
+            current_location_without_locations: Du har ingen beslaglagte steder, så
+              dette gjentar seg stort sett Beslaglagt fra
+            impound_current_location_cell: Nåværende plassering
+            impound_notes_cell: Beslaglegge sedler
           column_settings_toggle:
             column_settings: Kolonneinnstillinger
           settings_and_filters:
@@ -5603,6 +5609,7 @@ nb:
             view: Utsikt
             toggle_all_checked: Slå av/på alle avkryssede
             course_acknowledgment_title: Bekreftelse på utdanningskurs på
+            more_notes: "+%{count} mer"
           multi_result_chip:
             no_results: ingen treff
           multi_results:
@@ -5805,6 +5812,8 @@ nb:
             impounded_from: Beslaglagt fra
             last_update_by: Sist oppdatert av
             status: Status
+            current_location: Nåværende plassering
+            notes: Notater
           legacy_view_link:
             switch_to_classic: Bytt tilbake til den eldre visningsfunksjonen
             view_in_legacy: visning %{bike_type} i eldre visningsprogram

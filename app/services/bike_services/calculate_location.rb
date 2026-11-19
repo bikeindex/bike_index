@@ -59,7 +59,7 @@ module BikeServices
     def location_record_coordinates(bike)
       registration_record = registration_address_record(bike)
       records = [
-        bike.current_impound_record&.address_record,
+        bike.current_impound_record&.impounded_from_address,
         bike.current_parking_notification,
         registration_record,
         bike.creation_organization&.default_address_record

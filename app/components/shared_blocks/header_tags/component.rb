@@ -215,7 +215,7 @@ module SharedBlocks
         elsif bike.status_stolen? && bike.current_stolen_record.present?
           "#{status_prefix}: #{date(bike.current_stolen_record.date_stolen)}, from: #{bike.current_stolen_record.formatted_address_string(render_country: true)}"
         elsif bike.current_impound_record.present?
-          "#{status_prefix}: #{date(bike.current_impound_record.impounded_at)}, in: #{bike.current_impound_record.formatted_address_string}"
+          "#{status_prefix}: #{date(bike.current_impound_record.impounded_at)}, in: #{bike.current_impound_record.impounded_from_address&.formatted_address_string}"
         end
 
         # Don't show serial on bike versions
