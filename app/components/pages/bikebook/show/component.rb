@@ -7,8 +7,6 @@ module Pages
       # The page is a <template> bikebook--page fills in from the URL and the catalog,
       # and renders again for each pick and history step
       class Component < ApplicationComponent
-        # Template Dependency: SharedBlocks::Marketing::InvertedBlock::Component
-
         # market is the visitor's CF-IPCountry, which Cloudflare sends as XX, or T1 over Tor, when it can't
         # tell, and the catalog lists an EU member's models under the EU; state is theirs in the US. framed: in an
         # iframe, whose autofocus would take its host page's focus
