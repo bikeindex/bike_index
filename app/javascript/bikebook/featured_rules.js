@@ -4,6 +4,7 @@
 
 export const COUNT = 12
 
+const MIN_PRICE_CENTS = 60000
 const LOW_PRICE_CENTS = 140000
 const MID_PRICE_CENTS = 250000
 const HIGH_PRICE_CENTS = 500000
@@ -23,7 +24,7 @@ const riders = (rider) => ({ target_riders: targets }) => Boolean(targets?.inclu
 export const requirements = [
   // an incomplete model's listed photo is often missing
   ({ photo, incomplete }) => Boolean(photo) && !incomplete,
-  priced(0),
+  ({ msrp_cents: cents }) => cents >= MIN_PRICE_CENTS,
   ({ vehicle_type: type }) => CYCLE_TYPES.includes(type),
   (model, { legalEbike }) => !model.electric || (legalEbike(model) && !model.e_vehicle_classifications?.includes('evc/out_of_class')),
   ({ target_riders: targets }) => !targets?.includes('kid'),
