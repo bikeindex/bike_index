@@ -45,7 +45,7 @@ Rails.application.routes.draw do
     for_community_groups for_cities for_law_enforcement for_schools].each { get it, controller: "landing_pages", action: it }
   %w[donate support_bike_index support_the_index support_the_bike_index primary_activities
     protect_your_bike serials about where vendor_terms resources privacy terms security
-    how_not_to_buy_stolen lightspeed membership].each { get it, controller: "info", action: it }
+    how_not_to_buy_stolen lightspeed membership wheel_sizes].each { get it, controller: "info", action: it }
   get "recovery_stories", to: "welcome#recovery_stories", as: :recovery_stories
   get "donate/year-end-2026", to: "info#donate_year_end", as: :donate_year_end
   get "donate/year-end", to: redirect(path: "/donate/year-end-2026", status: 302) # a later year's campaign takes it over
@@ -168,7 +168,6 @@ Rails.application.routes.draw do
     resource :membership, only: %i[show], controller: "my_accounts/memberships"
     resources :marketplace_listings, only: %i[update], controller: "my_accounts/marketplace_listings"
     resources :organization_roles, only: %i[update destroy], controller: "my_accounts/organization_roles"
-    resources :pos_registration_matches, only: %i[show update], controller: "my_accounts/pos_registration_matches"
   end
   get "my_account/edit(/:edit_template)", to: "my_accounts#edit", as: :edit_my_account
 

@@ -80,28 +80,12 @@ class PosRegistrationMatch < ApplicationRecord
   # The owner said yes and BikeJobs::MergePosRegistrationJob hasn't run yet
   def merging? = confirmed? && merge_candidate?
 
-  # Whether the owner can still be asked
-  def confirmable? = pending? && mergeable?
-
   # Still the same bike (an edited serial or manufacturer could otherwise slip past the stolen veto), both live,
   # and both theirs
   def mergeable?
     merge_candidate? && [bike, pos_bike].all? { it&.current_with_user_hidden? } &&
       bike.user_id.present? && bike.user_id == pos_bike.user_id &&
       bike.serial_normalized_no_space == pos_bike.serial_normalized_no_space && bike.manufacturer_id == pos_bike.manufacturer_id
-  end
-
-  # The owner's answer, while they can still give one. Returns whether it was recorded. A yes is rechecked and
-  # merged by BikeJobs::MergePosRegistrationJob
-  def answer!(user:, merge:)
-    recorded = with_lock do
-      next false unless confirmable? && bike.user_id == user&.id
-
-      merge ? update!(status: :confirmed, merger: user) : update!(status: :declined)
-    end
-    # After the lock's transaction commits, so the job finds the match confirmed
-    BikeJobs::MergePosRegistrationJob.perform_async(id) if recorded && merge
-    recorded
   end
 
   # Reasons are only added, so a recorded stolen veto is never cleared

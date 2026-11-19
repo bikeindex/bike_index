@@ -348,6 +348,29 @@ RSpec.describe "RegistrationsController#show", type: :request do
     end
   end
 
+  context "merged into its shop's POS registration" do
+    let(:pos_registration_match) { FactoryBot.create(:pos_registration_match, status: :merged) }
+    let(:bike) { pos_registration_match.bike }
+    let(:current_user) { bike.user }
+    before { bike.destroy! }
+
+    it "redirects to the POS registration, keeping the params" do
+      get "#{base_url}/#{bike.id}", params: {parking_notification_retrieved: "token"}
+      expect(response).to redirect_to(registration_path(pos_registration_match.pos_bike_id, parking_notification_retrieved: "token"))
+    end
+
+    # A hidden registration's id isn't revealed by a redirect
+    context "a hidden POS registration, viewed by someone else" do
+      let(:current_user) { FactoryBot.create(:user_confirmed) }
+      before { pos_registration_match.pos_bike.update!(marked_user_hidden: true) }
+
+      it "404s" do
+        get "#{base_url}/#{bike.id}"
+        expect(response.status).to eq 404
+      end
+    end
+  end
+
   # An organization's impound record can't be claimed, so consumer claims are for
   # found bikes - impound records without an organization
   context "found bike, viewed by a non-owner" do

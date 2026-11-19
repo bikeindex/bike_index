@@ -58,18 +58,6 @@ RSpec.describe BikeJobs::PosRegistrationMatchFinderJob, type: :job do
     expect(match.reload.duplicate_bike_group).to be_present
   end
 
-  it "enqueues the owner's email until it's been sent" do
-    perform_for(bike)
-    expect(EmailJobs::PosRegistrationMatchJob.jobs.map { it["args"] }).to eq([[PosRegistrationMatch.sole.id]])
-    notification = Notification.create!(kind: "pos_registration_match", notifiable: PosRegistrationMatch.sole, user:,
-      delivery_status: "delivery_failure")
-    perform_for(bike)
-    expect(EmailJobs::PosRegistrationMatchJob.jobs.size).to eq 2
-    notification.update!(delivery_status: "delivery_success")
-    perform_for(bike)
-    expect(EmailJobs::PosRegistrationMatchJob.jobs.size).to eq 2
-  end
-
   it "doesn't match before the serial is grouped" do
     instance.perform(bike.id)
     expect(PosRegistrationMatch.count).to eq 0
@@ -144,11 +132,6 @@ RSpec.describe BikeJobs::PosRegistrationMatchFinderJob, type: :job do
     before { FactoryBot.create(:stolen_bike, serial_number:) }
 
     include_examples "records a review candidate", ["stolen_history"]
-
-    it "doesn't email" do
-      perform_for(bike)
-      expect(EmailJobs::PosRegistrationMatchJob.jobs.size).to eq 0
-    end
   end
 
   context "registered from a sticker" do
