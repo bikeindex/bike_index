@@ -10,8 +10,9 @@ module Pages
         class Component < ApplicationComponent
           STORAGE_KEY = "orgRegistrationColumns"
 
-          # The impound records search's columns differ, so its choices are kept apart
-          IMPOUND_STORAGE_KEY = "orgImpoundColumns"
+          # The impound records search's columns differ, so its choices are kept apart. A saved
+          # list hides any column added after it, so a new default column bumps the version
+          IMPOUND_STORAGE_KEY = "orgImpoundColumns2"
 
           # Goes on the element holding the panel and its table, which the caller renders
           def self.column_settings_data_attributes(controllers: nil, orderable: true, impound: false)
@@ -37,7 +38,14 @@ module Pages
           def panel_options
             {columns: @settings.panel_columns.to_h { [it, label(it)] }, defaults: @settings.initially_checked_columns,
              always_visible: ComponentStructs::OrgSearchSettings::ALWAYS_VISIBLE_COLUMNS,
-             hints: @settings.panel_hints, orderable: @orderable, **search_panel_options}
+             hints: panel_hints, orderable: @orderable, **search_panel_options}
+          end
+
+          def panel_hints
+            return @settings.panel_hints if !@settings.impound? || @settings.organization.enabled?("impound_bikes_locations")
+
+            @settings.panel_hints.merge("impound_current_location_cell" =>
+              render(UI::Tooltip::Component.new(text: translation(".current_location_without_locations"))))
           end
 
           # Each search copies the other's column order

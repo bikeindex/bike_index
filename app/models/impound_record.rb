@@ -45,6 +45,7 @@ class ImpoundRecord < ApplicationRecord
   has_one :parking_notification
   has_one :ownership
   has_many :impound_record_updates
+  has_many :noted_updates, -> { where("notes ~ '\\S'").order(id: :desc) }, class_name: "ImpoundRecordUpdate"
   has_many :impound_claims
 
   validates_presence_of :user_id
@@ -173,17 +174,15 @@ class ImpoundRecord < ApplicationRecord
     false
   end
 
-  def latitude_public
-    return unless address_record&.latitude.present?
-
-    show_address ? address_record.latitude : address_record.latitude&.round(Bike::PUBLIC_COORD_LENGTH)
+  # A record not saved since impounded_from_address_record was added has it only as address_record
+  def impounded_from_address
+    impounded_from_address_record || (address_record if address_record&.impounded_from?)
   end
 
-  def longitude_public
-    return unless address_record&.latitude.present?
+  # Where it was impounded from, not where it's held
+  def latitude_public = public_coordinate(:latitude)
 
-    show_address ? address_record.longitude : address_record.longitude&.round(Bike::PUBLIC_COORD_LENGTH)
-  end
+  def longitude_public = public_coordinate(:longitude)
 
   def unorganized?
     !organized?
@@ -307,6 +306,13 @@ class ImpoundRecord < ApplicationRecord
   end
 
   private
+
+  def public_coordinate(attribute)
+    coordinate = impounded_from_address&.public_send(attribute)
+    return if coordinate.blank?
+
+    show_address ? coordinate : coordinate.round(Bike::PUBLIC_COORD_LENGTH)
+  end
 
   def set_calculated_display_id
     if organization_id.blank?

@@ -56,13 +56,13 @@
             - time = @stolen_record.present? ? @stolen_record.date_stolen : @bike.current_impound_record.impounded_at
             = l time, format: :convert_time
           %small.localizeTimezone
-          - if @stolen_record&.formatted_address_string.present? || @bike.current_impound_record&.address_present?
+          - if @stolen_record&.formatted_address_string.present? || @bike.current_impound_record&.impounded_from_address&.address_present?
             %strong
               = @bike.status_found? ? t(".in") : t(".from")
             - if @stolen_record.present?
               = @stolen_record.formatted_address_string
             - else
-              = @bike.current_impound_record.formatted_address_string
+              = @bike.current_impound_record.impounded_from_address.formatted_address_string
 
       - if @bike.user&.show_bikes?
         %h4
