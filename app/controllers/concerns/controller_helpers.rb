@@ -113,9 +113,9 @@ module ControllerHelpers
     fail ActiveRecord::RecordNotFound unless merged_into&.visible_by?(current_user)
 
     id_param = request.path_parameters.key?(:bike_id) ? :bike_id : :id
-    # Keeps tokens, e.g. a parking notification's retrieval link, as query params only
+    # Keeps tokens, e.g. a parking notification's retrieval link, as query params only. An id there would win
     redirect_to(url_for(request.path_parameters.merge(id_param => merged_into.id, :only_path => true,
-      :params => request.query_parameters)))
+      :params => request.query_parameters.except("id", "bike_id"))))
   end
 
   def set_reading_role

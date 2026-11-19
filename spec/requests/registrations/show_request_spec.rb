@@ -355,8 +355,8 @@ RSpec.describe "RegistrationsController#show", type: :request do
     before { bike.destroy! }
 
     it "redirects to the POS registration, keeping the query params as query params" do
-      params = {parking_notification_retrieved: "token", id: bike.id, script_name: "//example.com"}
-      get "#{base_url}/#{bike.id}", params: params
+      params = {parking_notification_retrieved: "token", script_name: "//example.com"}
+      get "#{base_url}/#{bike.id}", params: params.merge(id: bike.id, bike_id: bike.id)
       expect(response).to redirect_to(registration_path(pos_registration_match.pos_bike_id, params:))
     end
 
