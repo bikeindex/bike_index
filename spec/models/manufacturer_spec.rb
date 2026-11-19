@@ -38,8 +38,8 @@ RSpec.describe Manufacturer, type: :model do
   describe "slug validation" do
     it "is invalid when a slug is all digits" do
       expect(FactoryBot.build(:manufacturer, name: "333")).not_to be_valid
-      expect(FactoryBot.build(:manufacturer, name: "Foo (101)")).not_to be_valid
-      expect(FactoryBot.build(:manufacturer, name: "Foo (101 Bikes)")).to be_valid
+      expect(FactoryBot.create(:manufacturer, name: "Foo (101)").previous_slugs).to eq []
+      expect(FactoryBot.create(:manufacturer, name: "Bar (101 Bikes)").previous_slugs).to eq ["101_bikes"]
     end
   end
 
@@ -74,18 +74,22 @@ RSpec.describe Manufacturer, type: :model do
     it "finds with dashes" do
       mnfg = FactoryBot.create(:manufacturer, name: "All City")
       expect(mnfg.secondary_name).to be_nil
-      expect(mnfg.secondary_slug).to be_nil
+      expect(mnfg.previous_slugs).to eq ["all_city"]
       expect(Manufacturer.friendly_find("All-city ")&.id).to eq(mnfg.id)
-      expect(Manufacturer.find_by_secondary_slug("All-city ")&.id).to be_nil
     end
-    it "finds in the secondary_slug" do
+    it "finds by the secondary name, which is replaced when the name changes" do
       mnfg = FactoryBot.create(:manufacturer, name: "S & M (S and M Bikes) ")
       expect(mnfg.secondary_name).to eq "S and M Bikes"
-      expect(mnfg.secondary_slug).to eq "s_and_m"
+      expect(mnfg.previous_slugs).to eq %w[s_and_m s_amp_m]
       expect(Manufacturer.friendly_find("s & m")&.id).to eq mnfg.id
-      expect(Manufacturer.find_by_secondary_slug("s_and_m")&.id).to eq mnfg.id
+      expect(Manufacturer.friendly_find("s_and_m")&.id).to eq mnfg.id
       expect(Manufacturer.friendly_find("s and m bikes")&.id).to eq mnfg.id
       expect(Manufacturer.friendly_find("s and m")&.id).to eq mnfg.id
+
+      mnfg.update(name: "S & M (SandM)")
+      expect(mnfg.reload.previous_slugs).to eq %w[sandm s_amp_m]
+      expect(Manufacturer.friendly_find("s and m")).to be_nil
+      expect(Manufacturer.friendly_find("sandm")&.id).to eq mnfg.id
     end
     context "name of digits and a removed suffix, where the digits are another manufacturer's id" do
       let!(:other_manufacturer) { FactoryBot.create(:manufacturer) }
@@ -112,7 +116,7 @@ RSpec.describe Manufacturer, type: :model do
 
       kona = FactoryBot.create(:manufacturer, name: "Kona")
       collision = {slug: "kona", manufacturer: {id: kona.id, name: "Kona"},
-                   previous_slug_manufacturer: {id: kona_company.id, name: "Kona Bicycle Company"}}
+                   previous_slug_manufacturers: [{id: kona_company.id, name: "Kona Bicycle Company"}]}
       expect(Manufacturer.slug_collisions).to eq([collision])
       expect(kona.slug_collisions).to eq([collision])
       expect(kona_company.slug_collisions).to eq([collision])
@@ -121,13 +125,14 @@ RSpec.describe Manufacturer, type: :model do
       expect(Manufacturer.friendly_find("Kona Bikes")).to eq kona
     end
 
-    it "finds the manufacturer with the slug, whichever sorts first" do
-      aardvark = FactoryBot.create(:manufacturer, name: "Aardvark Bicycle Company")
-      expect(aardvark.previous_slugs).to eq ["aardvark"]
+    it "is a previous slug several manufacturers share" do
       zebra = FactoryBot.create(:manufacturer, name: "Zebra (Aardvark)")
-      expect(zebra.secondary_slug).to eq "aardvark"
-      expect(Manufacturer.friendly_find("aardvark bikes")).to eq zebra
-      expect(Manufacturer.friendly_find("aardvark-bicycle-company")).to eq aardvark
+      aardvark = FactoryBot.create(:manufacturer, name: "Aardvark Bicycle Company")
+      expect([zebra.previous_slugs, aardvark.previous_slugs]).to eq [["aardvark"], ["aardvark"]]
+      expect(Manufacturer.slug_collisions).to eq([{slug: "aardvark", manufacturer: nil,
+                                                   previous_slug_manufacturers: [{id: aardvark.id, name: "Aardvark Bicycle Company"}, {id: zebra.id, name: "Zebra (Aardvark)"}]}])
+      expect(Manufacturer.friendly_find("aardvark bikes")).to eq aardvark
+      expect(Manufacturer.friendly_find("zebra")).to eq zebra
     end
   end
 

@@ -15,7 +15,6 @@
 #  open_year          :integer
 #  previous_slugs     :string           default([]), not null, is an Array
 #  priority           :integer
-#  secondary_slug     :string
 #  slug               :string(255)
 #  total_years_active :string(255)
 #  twitter_name       :string
@@ -39,9 +38,8 @@ class Manufacturer < ApplicationRecord
   validates_presence_of :name
   validates_uniqueness_of :name
   validates_uniqueness_of :slug
-  validates_uniqueness_of :secondary_slug, allow_nil: true
   # friendly_find reads an all-digit string as an id
-  validates :slug, :secondary_slug, format: {without: /\A\d+\z/}
+  validates :slug, format: {without: /\A\d+\z/}
   validate :ensure_non_blocking_name
 
   before_validation :set_calculated_attributes
@@ -56,13 +54,6 @@ class Manufacturer < ApplicationRecord
   scope :except_other, -> { where.not(id: Manufacturer.other.id) }
 
   class << self
-    # Secondary_slug is the slug of the stuff in the paretheses
-    def find_by_secondary_slug(str)
-      return nil if str.blank?
-
-      super
-    end
-
     def friendly_find(n)
       n = Binxtils::InputNormalizer.string(n) if n.is_a?(String)
       return nil if n.blank?
@@ -72,17 +63,22 @@ class Manufacturer < ApplicationRecord
       else
         slug = Slugifyer.slugify(n)
         legacy_slug = Slugifyer.legacy_manufacturer(n)
-        find_by_slug(slug) || find_by_slug(legacy_slug) || find_by_secondary_slug(legacy_slug) ||
+        find_by_slug(slug) || find_by_slug(legacy_slug) ||
           where("previous_slugs && ARRAY[?]::varchar[]", [slug, legacy_slug]).first
       end
     end
 
-    # A slug that's also another manufacturer's previous slug. friendly_find returns the manufacturer with the slug
+    # A previous slug that's another manufacturer's slug, or shared by several manufacturers. friendly_find
+    # returns the manufacturer with the slug, or the first alphabetically
     def slug_collisions
-      unscoped.joins("JOIN manufacturers previous ON manufacturers.slug = ANY(previous.previous_slugs)")
-        .order(:slug).pluck(:slug, :id, :name, "previous.id", "previous.name")
-        .map do |slug, id, name, previous_id, previous_name|
-          {slug:, manufacturer: {id:, name:}, previous_slug_manufacturer: {id: previous_id, name: previous_name}}
+      unscoped.joins("CROSS JOIN unnest(manufacturers.previous_slugs) AS previous_slug")
+        .joins("LEFT JOIN manufacturers current ON current.slug = previous_slug")
+        .group("previous_slug, current.id, current.name").having("COUNT(*) > 1 OR current.id IS NOT NULL")
+        .order("previous_slug")
+        .pluck(Arel.sql("previous_slug, current.id, current.name, array_agg(manufacturers.id ORDER BY LOWER(manufacturers.name)), array_agg(manufacturers.name ORDER BY LOWER(manufacturers.name))"))
+        .map do |slug, id, name, previous_ids, previous_names|
+          {slug:, manufacturer: id && {id:, name:},
+           previous_slug_manufacturers: previous_ids.zip(previous_names).map { |id, name| {id:, name:} }}
         end
     end
 
@@ -117,7 +113,7 @@ class Manufacturer < ApplicationRecord
   end
 
   def slug_collisions
-    Manufacturer.slug_collisions.select { [it[:manufacturer][:id], it[:previous_slug_manufacturer][:id]].include?(id) }
+    Manufacturer.slug_collisions.select { [it[:manufacturer], *it[:previous_slug_manufacturers]].compact.pluck(:id).include?(id) }
   end
 
   def official_organization
@@ -135,9 +131,8 @@ class Manufacturer < ApplicationRecord
 
   def set_calculated_attributes
     self.name = Binxtils::InputNormalizer.string(name)
-    self.secondary_slug = Slugifyer.legacy_manufacturer(secondary_name)
     self.slug = Slugifyer.slugify(name)
-    self.previous_slugs = ([*previous_slugs, slug_in_database, Slugifyer.legacy_manufacturer(name)].compact_blank - [slug]).uniq
+    self.previous_slugs = calculated_previous_slugs
     self.website = website.present? ? Urlifyer.urlify(website) : nil
     self.logo_source = logo.present? ? (logo_source || "manual") : nil
     self.twitter_name = twitter_name.present? ? twitter_name.gsub(/\A@/, "") : nil
@@ -183,6 +178,13 @@ class Manufacturer < ApplicationRecord
   end
 
   private
+
+  # The secondary name's slug comes first, and is replaced when the name changes
+  def calculated_previous_slugs
+    previous_secondary_slug = Slugifyer.legacy_manufacturer(Manufacturer.new(name: name_in_database).secondary_name)
+    [Slugifyer.legacy_manufacturer(secondary_name), *(previous_slugs - [previous_secondary_slug]),
+      slug_in_database, Slugifyer.legacy_manufacturer(name)].compact_blank.grep_v(/\A\d+\z/).uniq - [slug]
+  end
 
   def run_callback_job
     return unless @run_callback_job
