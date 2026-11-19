@@ -86,6 +86,17 @@ RSpec.describe MyAccounts::PosRegistrationMatchesController, type: :request do
       end
     end
 
+    context "POS registration transferred after they said yes" do
+      it "doesn't say it's combining" do
+        patch url, params: {answer: "merge"}
+        pos_registration_match.pos_bike.current_ownership.update_column(:user_id, FactoryBot.create(:user).id)
+
+        get url
+        expect(response).to redirect_to(my_account_path)
+        expect(flash[:notice]).to include("couldn't combine")
+      end
+    end
+
     context "a review candidate" do
       before { pos_registration_match.update!(review_reasons: ["impounded"]) }
 
