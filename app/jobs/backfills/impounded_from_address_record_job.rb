@@ -8,7 +8,7 @@ module Backfills
 
     def perform
       ImpoundRecord.where(impounded_from_address_record_id: nil)
-        .where(id: ParkingNotification.where.not(latitude: nil).select(:impound_record_id))
+        .where(id: ParkingNotification.impound_notification.where.not(latitude: nil).select(:impound_record_id))
         .find_each do |impound_record|
           impound_record.skip_update = true
           impound_record.save(touch: false)

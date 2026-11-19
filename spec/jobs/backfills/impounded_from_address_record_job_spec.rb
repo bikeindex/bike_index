@@ -32,5 +32,14 @@ RSpec.describe Backfills::ImpoundedFromAddressRecordJob, type: :job do
       expect(impound_record.address_record_id).to eq location.address_record_id
       expect(impound_record.updated_at).to eq updated_at
     end
+
+    context "when only an earlier notification in the chain has coordinates" do
+      before { parking_notification.update_columns(latitude: nil, longitude: nil) }
+
+      it "skips it" do
+        Sidekiq::Testing.inline! { described_class.perform_async }
+        expect(impound_record.reload.impounded_from_address_record_id).to be_nil
+      end
+    end
   end
 end
