@@ -11,7 +11,7 @@ const HIGH_PRICE_CENTS = 500000
 const TOP_PRICE_CENTS = 800000
 const MAX_PRICE_CENTS = 1000000
 const CURRENCIES = { EU: 'EUR', AU: 'AUD', CA: 'CAD', CH: 'CHF', GB: 'GBP', HK: 'HKD', ID: 'IDR', IN: 'INR', JP: 'JPY', NZ: 'NZD', TW: 'TWD' }
-const CYCLE_TYPES = ['bike', 'cargo_bike', 'cargo_bike_rear', 'tandem', 'tricycle', 'cargo_tricycle', 'cargo_tricycle_rear', 'recumbent']
+const CYCLE_TYPES = ['bike', 'cargo_bike', 'cargo_bike_rear', 'tandem', 'recumbent']
 
 // A model whose `key` none of the picks share
 const unseen = (key) => (model, { picked }) => !picked.some((each) => key(each) === key(model))
