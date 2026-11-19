@@ -1,11 +1,28 @@
 production:
   # Install postgres (to enable db:structure:load) and ripgrep. libheif from its PPA: noble's
-  # 1.17.6 rejects some iPhone HEICs' depth maps (fixed in 1.18), and its HEVC decoder is a plugin
+  # 1.17.6 rejects some iPhone HEICs' depth maps (fixed in 1.18), and its HEVC decoder is a plugin.
+  # Not build_only: that fires on the stack's first build only, never on a server added later.
+  # The waits outlast a new droplet's unattended-upgrades
   first_thing:
-    - command: sudo add-apt-repository -y ppa:strukturag/libheif && sudo apt-get -y install postgresql-client-common ripgrep libvips libheif1 libheif-plugin-libde265
+    - inline: |
+        #!/bin/bash
+        set -euo pipefail
+        packages="postgresql-client-common ripgrep libvips42t64 libheif1 libheif-plugin-libde265"
+        installed() {
+          dpkg -s $packages > /dev/null 2>&1 &&
+            dpkg --compare-versions "$(dpkg-query -W -f='${Version}' libheif1)" ge 1.18
+        }
+        installed && exit 0
+        apt_options="-o DPkg::Lock::Timeout=600 -o Acquire::Retries=3"
+        add-apt-repository -y --no-update ppa:strukturag/libheif
+        for attempt in 1 2 3 4 5; do apt-get $apt_options update && break; sleep 60; done
+        apt-get -y $apt_options install $packages
+        installed
       target: rails
+      run_on: all_servers
       sudo: true
-      apply_during: build_only
+      execute: true
+      apply_during: all
 
   after_symlink:
     # Make skylight pid & daemon files writable
@@ -18,14 +35,6 @@ production:
       target: rails
       run_on: all_servers
       sudo: true
-
-  after_rails:
-    # Make papertrail connected
-    - source: /.cloud66/log_files.yml
-      destination: /etc/log_files.yml
-      sudo: true
-      target: rails
-      apply_during: build_only
 
   last_thing:
     # Trigger honeybadger deploy hook

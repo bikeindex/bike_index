@@ -369,8 +369,12 @@ class ImpoundRecord < ApplicationRecord
       (created_at || Time.current).between?(b_created_at - 1.hour, b_created_at + 1.hour)
   end
 
+  # The whole repeat chain shares impound_record_id, so has_one :parking_notification picks arbitrarily
   def parking_notification_address_record
-    AddressRecord.new(Geocodeable.attrs_to_duplicate(parking_notification)
+    notification = ParkingNotification.impound_notification.order(:id).find_by(impound_record_id: id) if id
+    return unless notification
+
+    AddressRecord.new(Geocodeable.attrs_to_duplicate(notification)
       .merge(kind: :impounded_from, organization_id:, bike_id:))
   end
 end

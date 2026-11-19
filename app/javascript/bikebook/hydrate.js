@@ -35,7 +35,8 @@ const labelSearch = (root, { vehicle_type: types }, [first]) => {
 // The fields as `filters` set them, none of which needs the catalog
 const fillFields = (root, filters) => {
   panelOf(root).setAttribute('data-bikebook--catalog-filters-sort-value', filters.sort === 'price' ? 'price' : 'year')
-  for (const field of ['year', 'price']) panelOf(root).setAttribute(`data-bikebook--catalog-filters-${field}-dir-value`, filters[`${field}_dir`] === 'asc' ? 'asc' : 'desc')
+  panelOf(root).setAttribute('data-bikebook--catalog-filters-year-dir-value', filters.year_dir === 'asc' ? 'asc' : 'desc')
+  panelOf(root).setAttribute('data-bikebook--catalog-filters-price-dir-value', filters.price_dir === 'desc' ? 'desc' : 'asc')
   for (const name of [...LISTS, ...SINGLES]) root.getElementById(`${name}-hw-hidden-field`).setAttribute('value', filters[name])
   for (const name of RANGES) root.querySelector(`input[name="${name}"]`).setAttribute('value', filters[name])
   const scope = root.querySelector(`input[name="market_scope"][value="${CSS.escape(filters.market_scope)}"]`) ?? root.querySelector('input[name="market_scope"][value=""]')
@@ -167,8 +168,8 @@ export function loadingShell (shell, url, status) {
   panel.hidden = !searching(url)
   const filters = urlFilters(root, url)
   fillFields(root, filters)
-  // one holding what only the catalog names, rather than the Any it isn't
-  for (const name of ['vehicle_models', ...LISTS, ...SINGLES].filter((each) => filters[each] ?? url.searchParams.get(each))) {
+  // the search, which answers from the catalog, and a filter holding what only the catalog names, rather than the Any it isn't
+  for (const name of ['vehicle_models', ...[...LISTS, ...SINGLES].filter((each) => filters[each] ?? url.searchParams.get(each))]) {
     const field = combobox(root, name)
     const input = field.querySelector('.hw-combobox__input')
     field.dataset.hwComboboxPrefilledDisplayValue = ''
@@ -203,6 +204,14 @@ export async function picksShell (picks, shell, url, status) {
   return { content: root, title: vehicles[0].display }
 }
 
+const optionFragments = new WeakMap()
+
+// Some thousand options, rendered once for each list of them and cloned for every render after
+const optionsOf = (options) => {
+  if (!optionFragments.has(options)) optionFragments.set(options, fragmentOf(options.map(filterOption)))
+  return optionFragments.get(options).cloneNode(true)
+}
+
 // The page at `url`: the shell, with the catalog's filter options, filled in from the URL. Its
 // comboboxes answer from the catalog: the vehicle combobox through `source`, the filters' chips
 // from their own options
@@ -210,7 +219,7 @@ export async function hydrate (catalog, source, shell, url) {
   const { kit } = catalog
   const root = shell.content.cloneNode(true)
   panelOf(root).hidden = !searching(url)
-  for (const name of [...LISTS, ...SINGLES]) root.getElementById(`${name}-hw-listbox`).append(fragmentOf(catalog.options[name].map(filterOption)))
+  for (const name of [...LISTS, ...SINGLES]) root.getElementById(`${name}-hw-listbox`).append(optionsOf(catalog.options[name]))
 
   // the visitor's country, when it's a market with models
   const panel = panelOf(root)

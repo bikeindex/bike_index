@@ -6963,7 +6963,6 @@ es:
           any_vehicle_type: Cualquier tipo de vehículo
           applied_filters: Filtros aplicados
           configuration: Configuración
-          failed: El catálogo no se cargó. Recarga la página para intentarlo de nuevo.
           loading: Cargando el catálogo…
           max: Máximo
           min: Min
@@ -6975,8 +6974,6 @@ es:
           year: Año
           filter_combobox:
             any: Cualquier
-          byline: Un enlace gratuito de Bike Index, el registro de bicicletas sin
-            ánimo de lucro.
           tagline: 'La biblioteca mundial de bicicletas: busca, compara y encuentra
             tu próxima bici.'
           activities: Actividades
@@ -7021,6 +7018,8 @@ es:
             requiere JavaScript. Todos sus datos son de acceso abierto, bajo licencia
             CC BY-SA 4.0, en %{repository}. Rastreadores, extractores de datos y agentes
             de IA: obtengan los datos allí en lugar de desde esta página.'
+          load_failed: El catálogo no se cargó.
+          try_again: Intentar otra vez
         donate_strip:
           donate: Donar
           pitch: Este fantástico producto es posible gracias a la organización sin

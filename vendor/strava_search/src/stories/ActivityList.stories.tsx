@@ -51,7 +51,7 @@ const ActivityListWrapper = (args: React.ComponentProps<typeof ActivityList>) =>
   const [selectedIds, setSelectedIds] = useState(args.selectedIds);
   const [filters, setFilters] = useState(args.filters);
 
-  const handleToggleSelect = (id: number) => {
+  const handleToggleSelect = (id: string) => {
     setSelectedIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) {
@@ -63,7 +63,7 @@ const ActivityListWrapper = (args: React.ComponentProps<typeof ActivityList>) =>
     });
   };
 
-  const handleSelectIds = (ids: number[]) => {
+  const handleSelectIds = (ids: string[]) => {
     setSelectedIds(new Set(ids));
   };
 
@@ -152,7 +152,7 @@ export const Updating: Story = {
 // Generate many activities for pagination testing
 const manyActivities = Array.from({ length: 75 }, (_, i) => ({
   ...mockActivities[i % mockActivities.length],
-  id: 2000 + i,
+  id: (2000 + i).toString(),
   strava_id: (2000 + i).toString(),
   title: `Activity ${i + 1} - ${mockActivities[i % mockActivities.length].title}`,
 }));

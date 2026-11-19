@@ -34,7 +34,7 @@ describe('strava service', () => {
       accessToken: 'test_token',
       refreshToken: 'test_refresh',
       expiresAt: Date.now() + 3600000, // 1 hour from now
-      athlete: { id: 12345, firstname: 'Test', lastname: 'User' },
+      athlete: { id: '12345', firstname: 'Test', lastname: 'User' },
     });
   });
 
@@ -46,7 +46,7 @@ describe('strava service', () => {
   describe('getAthlete', () => {
     it('returns athlete profile with gear', async () => {
       const mockAthlete = {
-        id: 12345,
+        id: '12345',
         username: 'testuser',
         firstname: 'Test',
         lastname: 'User',
@@ -66,7 +66,7 @@ describe('strava service', () => {
 
       const result = await getAthlete();
 
-      expect(result.id).toBe(12345);
+      expect(result.id).toBe('12345');
       expect(result.bikes).toHaveLength(1);
       expect(result.bikes![0].name).toBe('My Bike');
       expect(result.shoes).toHaveLength(1);
@@ -133,7 +133,7 @@ describe('strava service', () => {
     it('fetches full activity after update to get enriched data', async () => {
       mockPutThenGet();
 
-      const result = await updateActivity(17145907973, { name: 'Updated Name' });
+      const result = await updateActivity('17145907973', { name: 'Updated Name' });
 
       // Verify both proxy calls were made
       expect(global.fetch).toHaveBeenCalledTimes(2);
@@ -149,7 +149,7 @@ describe('strava service', () => {
     it('includes segment locations in response', async () => {
       mockPutThenGet();
 
-      const result = await updateActivity(17145907973, { commute: true });
+      const result = await updateActivity('17145907973', { commute: true });
 
       expect(result.segment_locations).toBeDefined();
       expect(result.segment_locations?.locations).toEqual([
@@ -162,7 +162,7 @@ describe('strava service', () => {
     it('preserves all activity fields in response', async () => {
       mockPutThenGet();
 
-      const result = await updateActivity(17145907973, { gear_id: 'b12345' });
+      const result = await updateActivity('17145907973', { gear_id: 'b12345' });
 
       expect(result.strava_id).toBe('17145907973');
       expect(result.title).toBe('Baby hawk');
@@ -198,7 +198,7 @@ describe('strava service', () => {
           json: () => Promise.resolve(mockActivityResponse),
         });
 
-      const result = await updateActivity(17145907973, { name: 'Updated Name' });
+      const result = await updateActivity('17145907973', { name: 'Updated Name' });
 
       // Should have exchanged session for a new token
       expect(railsApi.exchangeSessionForToken).toHaveBeenCalledTimes(1);
@@ -413,7 +413,7 @@ describe('strava service', () => {
         })
         .mockResolvedValueOnce({
           ok: true,
-          json: () => Promise.resolve({ id: 12345, firstname: 'Test' }),
+          json: () => Promise.resolve({ id: '12345', firstname: 'Test' }),
         });
 
       const resultPromise = getAthlete();
@@ -424,7 +424,7 @@ describe('strava service', () => {
       const result = await resultPromise;
 
       expect(global.fetch).toHaveBeenCalledTimes(2);
-      expect(result.id).toBe(12345);
+      expect(result.id).toBe('12345');
     });
 
     it('respects Retry-After header', async () => {
@@ -439,7 +439,7 @@ describe('strava service', () => {
         })
         .mockResolvedValueOnce({
           ok: true,
-          json: () => Promise.resolve({ id: 12345, firstname: 'Test' }),
+          json: () => Promise.resolve({ id: '12345', firstname: 'Test' }),
         });
 
       const resultPromise = getAthlete();
@@ -449,7 +449,7 @@ describe('strava service', () => {
 
       const result = await resultPromise;
 
-      expect(result.id).toBe(12345);
+      expect(result.id).toBe('12345');
     });
 
     it('throws after max retries exceeded', async () => {

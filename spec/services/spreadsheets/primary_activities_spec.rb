@@ -5,7 +5,7 @@ RSpec.describe Spreadsheets::PrimaryActivities do
   let!(:primary_activity) { FactoryBot.create(:primary_activity, name: "Bike Polo", priority: 1) }
 
   describe "to_csv" do
-    let(:target) { ["flavor,families", "Bike Polo,"] }
+    let(:target) { ["flavor,families,priority,short_name", "Bike Polo,,1,Bike Polo"] }
     it "generates" do
       result = described_class.to_csv.split("\n")
 
@@ -17,7 +17,7 @@ RSpec.describe Spreadsheets::PrimaryActivities do
       let(:primary_activity_family) { FactoryBot.create(:primary_activity_family, name: "ATB (All Terrain Biking)", priority: 10) }
       let!(:primary_activity_2) { FactoryBot.create(:primary_activity, name: "All Road", primary_activity_family:, priority: 4) }
       # The family exports as a flavor-less row (empty flavor column)
-      let(:target) { ["flavor,families", ",ATB (All Terrain Biking)", "All Road,ATB (All Terrain Biking)", "Bike Polo,"] }
+      let(:target) { ["flavor,families,priority,short_name", ",ATB (All Terrain Biking),10,ATB", "All Road,ATB (All Terrain Biking),4,All Road", "Bike Polo,,1,Bike Polo"] }
 
       it "generates" do
         result = described_class.to_csv.split("\n")
@@ -33,11 +33,11 @@ RSpec.describe Spreadsheets::PrimaryActivities do
         let(:primary_activity_family_2) { FactoryBot.create(:primary_activity_family, name: "Road Biking", priority: 9) }
         let!(:primary_activity_3) { FactoryBot.create(:primary_activity, name: "All Road", primary_activity_family: primary_activity_family_2, priority: 3) }
         let(:target) do
-          ["flavor,families",
-            ",ATB (All Terrain Biking)",
-            ",Road Biking",
-            "All Road,ATB (All Terrain Biking) & Road Biking",
-            "Bike Polo,"]
+          ["flavor,families,priority,short_name",
+            ",ATB (All Terrain Biking),10,ATB",
+            ",Road Biking,9,Road",
+            "All Road,ATB (All Terrain Biking) & Road Biking,4,All Road",
+            "Bike Polo,,1,Bike Polo"]
         end
 
         it "generates" do
@@ -66,6 +66,15 @@ RSpec.describe Spreadsheets::PrimaryActivities do
       end
 
       expect(PrimaryActivity.all.map(&:display_name)).to match_array ["Road Biking", "Road: Triathalon", "Bike Polo"]
+    end
+
+    it "restores priorities" do
+      csv = described_class.to_csv
+      PrimaryActivity.update_all(priority: 0)
+
+      described_class.import(StringIO.new(csv))
+
+      expect(described_class.to_csv).to eq csv
     end
   end
 
@@ -107,6 +116,17 @@ RSpec.describe Spreadsheets::PrimaryActivities do
           file.flush
           expect { described_class.import(file.path) }.to raise_error(/Road Biking/)
         end
+      end
+
+      it "sets each row's priority on its own activity, not on the families it lists" do
+        described_class.import(StringIO.new("flavor,families,priority\n,Road Biking,590\nAll Road,ATB (All Terrain Biking) & Road Biking,268\nBike Polo,,401\n"))
+
+        expect(primary_activity.reload.priority).to eq 590
+        all_road = PrimaryActivity.flavor.where(name: "All Road")
+        expect(all_road.pluck(:priority)).to eq [268, 268]
+        atb = PrimaryActivity.family.find_by(name: "ATB (All Terrain Biking)")
+        expect(atb.priority).to_not eq 268
+        expect(PrimaryActivity.flavor.top_level.friendly_find("Bike Polo").priority).to eq 401
       end
 
       it "corrects the stored name of an existing activity (e.g. casing)" do

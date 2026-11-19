@@ -33,7 +33,7 @@ interface UseActivitySyncResult {
   syncAll: () => Promise<void>;
   syncRecent: () => Promise<void>;
   syncEnriched: () => Promise<void>;
-  fetchFullActivityData: (activityIds: number[], isForPage?: boolean) => Promise<void>;
+  fetchFullActivityData: (activityIds: string[], isForPage?: boolean) => Promise<void>;
 }
 
 export function useActivitySync(): UseActivitySyncResult {
@@ -235,14 +235,14 @@ export function useActivitySync(): UseActivitySyncResult {
     }
   }, [athlete, isSyncing, isFetchingFullData, refreshSyncState]);
 
-  const fetchFullActivityData = useCallback(async (activityIds: number[], isForPage: boolean = false) => {
+  const fetchFullActivityData = useCallback(async (activityIds: string[], isForPage: boolean = false) => {
     if (!athlete || isSyncing || isFetchingFullData || activityIds.length === 0) return;
 
     setIsFetchingFullData(true);
     setError(null);
 
     // Filter out activities that already have enriched data
-    const idsToFetch: number[] = [];
+    const idsToFetch: string[] = [];
     let alreadyEnrichedCount = 0;
     for (const id of activityIds) {
       const activity = await getActivityById(id);
@@ -265,7 +265,7 @@ export function useActivitySync(): UseActivitySyncResult {
     const statusPrefix = isForPage ? 'Fetching full data for this page' : 'Fetching full data';
     setProgress({ loaded: 0, total: idsToFetch.length, status: `${statusPrefix}: 0 of ${formatNumber(idsToFetch.length)}` });
 
-    const failedIds: number[] = [];
+    const failedIds: string[] = [];
     try {
       for (let i = 0; i < idsToFetch.length; i++) {
         const activityId = idsToFetch[i];

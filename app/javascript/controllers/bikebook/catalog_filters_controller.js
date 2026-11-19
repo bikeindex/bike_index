@@ -13,7 +13,7 @@ export default class extends Controller {
   static values = {
     sort: { type: String, default: 'year' },
     yearDir: { type: String, default: 'desc' },
-    priceDir: { type: String, default: 'desc' },
+    priceDir: { type: String, default: 'asc' },
     defaultMarket: String,
     defaultJurisdiction: String,
     cycle: { type: Boolean, default: true }
@@ -149,7 +149,7 @@ export default class extends Controller {
       ...filters,
       sort: this.sortValue === 'price' ? 'price' : '',
       year_dir: this.yearDirValue === 'asc' ? 'asc' : '',
-      price_dir: this.priceDirValue === 'asc' ? 'asc' : ''
+      price_dir: this.priceDirValue === 'desc' ? 'desc' : ''
     }
     for (const [key, value] of Object.entries(params)) value ? url.searchParams.set(key, value) : url.searchParams.delete(key)
   }

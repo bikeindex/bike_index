@@ -7,15 +7,17 @@ module Pages
       # The page is a <template> bikebook--page fills in from the URL and the catalog,
       # and renders again for each pick and history step
       class Component < ApplicationComponent
-        # Template Dependency: SharedBlocks::Marketing::InvertedBlock::Component
-
         # market is the visitor's CF-IPCountry, which Cloudflare sends as XX, or T1 over Tor, when it can't
-        # tell; state is theirs in the US. framed: in an iframe, whose autofocus would take its host page's focus
+        # tell, and the catalog lists an EU member's models under the EU; state is theirs in the US. framed: in an
+        # iframe, whose autofocus would take its host page's focus
         def initialize(manifest_url:, market:, state:, query:, paint_colors:, framed: false)
           @manifest_url = manifest_url
           @framed = framed
           @paint_colors = paint_colors
-          @market = %w[XX T1].include?(market) ? "US" : market.presence || "US"
+          @market = if %w[XX T1].include?(market) || market.blank? then "US"
+          elsif EbikeRuleServices::Places::EU_MEMBERS.include?(market) then "EU"
+          else market
+          end
           @jurisdiction = state&.dig(:abbr) || "US"
           @query = query
         end
@@ -43,11 +45,15 @@ module Pages
           "tw:invisible" if @query.except("search", "vehicle_models").any?
         end
 
-        # Saying so where the URL has picks, which wait on the catalog, like loadingShell's. Swapped rather than rendered
+        # The pins preloaded for the bikebook entry point, without the application's that the layout preloads
+        def module_preloads
+          packages = Rails.application.importmap.preloaded_module_packages(resolver: helpers, entry_point: "bikebook", cache_key: "bikebook")
+          helpers.javascript_module_preload_tag(*packages.filter_map { |path, package| path if package.preload == "bikebook" })
+        end
+
+        # Saying so until the catalog loads, which the search waits on, like loadingShell's. Swapped rather than rendered
         # again for the one attribute, as the search is a third of the page's render
         def placeholder_search(search)
-          return search if @query["vehicle_models"].blank?
-
           search.sub(%(placeholder="#{h(translation(".search_placeholder"))}"), %(placeholder="#{h(translation(".loading_placeholder"))}")).html_safe
         end
 
