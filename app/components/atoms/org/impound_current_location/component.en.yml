@@ -1,0 +1,7 @@
+---
+en:
+  components:
+    atoms:
+      org:
+        impound_current_location:
+          same_as_impounded_from: same as impounded from

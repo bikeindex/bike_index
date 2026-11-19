@@ -106,18 +106,6 @@ module ControllerHelpers
       Rack::MiniProfiler.current.present?
   end
 
-  # For a bike the user can't see: a registration merged into its shop's POS registration sends its links to the
-  # same page of that one, if they can see it
-  def redirect_merged_bike_or_not_found(bike)
-    merged_into = PosRegistrationMatch.merged_into(bike) if request.get? || request.head?
-    fail ActiveRecord::RecordNotFound unless merged_into&.visible_by?(current_user)
-
-    id_param = request.path_parameters.key?(:bike_id) ? :bike_id : :id
-    # Keeps tokens, e.g. a parking notification's retrieval link, as query params only. An id there would win
-    redirect_to(url_for(request.path_parameters.merge(id_param => merged_into.id, :only_path => true,
-      :params => request.query_parameters.except("id", "bike_id"))))
-  end
-
   def set_reading_role
     ActiveRecord::Base.connected_to(role: :reading) do
       yield
@@ -371,6 +359,18 @@ module ControllerHelpers
   end
 
   private
+
+  # For a bike the user can't see: a registration merged into its shop's POS registration sends its links to the
+  # same page of that one, if they can see it
+  def redirect_merged_bike_or_not_found(bike)
+    merged_into = PosRegistrationMatch.merged_into(bike) if request.get? || request.head?
+    fail ActiveRecord::RecordNotFound unless merged_into&.visible_by?(current_user)
+
+    id_param = request.path_parameters.key?(:bike_id) ? :bike_id : :id
+    # Keeps tokens, e.g. a parking notification's retrieval link, as query params only. An id there would win
+    redirect_to(url_for(request.path_parameters.merge(id_param => merged_into.id, :only_path => true,
+      :params => request.query_parameters.except("id", "bike_id"))))
+  end
 
   # passive_organization is the organization set for the user - which is persisted in session
   # The user may or may not be interacting with the current_organization in any given request

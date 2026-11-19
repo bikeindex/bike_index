@@ -8,11 +8,17 @@ RSpec.describe BikeJobs::MergePosRegistrationJob, type: :job do
   let(:user) { bike.user }
 
   # Written because UserJobs::MergeAdditionalEmailJob left impound updates and claims on the old user (#4777)
-  it "moves or lists every table with a bike_id" do
-    tables = ActiveRecord::Base.connection.select_values("SELECT table_name FROM information_schema.columns " \
-      "WHERE column_name = 'bike_id' AND table_schema = 'public'")
-    expect(tables).to match_array(described_class::MOVED_MODELS.map(&:table_name) + described_class::MERGED_TABLES +
-      described_class::LEFT_TABLES.keys)
+  it "moves or lists every column that can point at a bike" do
+    bike_id_columns = ActiveRecord::Base.connection.select_rows("SELECT table_name, column_name FROM information_schema.columns " \
+      "WHERE column_name LIKE '%bike_id' AND table_schema = 'public'").map { it.join(".") }
+    # Associations to Bike named something else, e.g. impound_claims.bike_claimed_id, and polymorphic ones
+    Rails.application.eager_load!
+    association_columns = ApplicationRecord.descendants.reject(&:abstract_class?).flat_map do |model|
+      model.reflect_on_all_associations(:belongs_to).select { it.polymorphic? || it.class_name == "Bike" }
+        .map { "#{model.table_name}.#{it.foreign_key}" }
+    end
+    expect((bike_id_columns + association_columns).uniq).to match_array(described_class::MOVED_MODELS.map { "#{it.table_name}.bike_id" } +
+      described_class::MERGED_COLUMNS + described_class::LEFT_COLUMNS.keys)
   end
 
   it "keeps the POS registration, with what the owner added, and deletes theirs" do
@@ -76,11 +82,39 @@ RSpec.describe BikeJobs::MergePosRegistrationJob, type: :job do
     expect(CallbackJobs::AfterBikeSaveJob.jobs).to be_empty
   end
 
-  it "raises when a sticker doesn't move" do
-    FactoryBot.create(:bike_sticker_claimed, bike:, user:)
-    allow_any_instance_of(BikeSticker).to receive(:claim) { |sticker| sticker }
-    expect { instance.perform(match.id) }.to raise_error(ActiveRecord::RecordNotSaved, /Couldn't move BikeSticker/)
-    expect(match.reload.status).to eq "confirmed"
+  # Written because re-claiming a sticker of the POS registration's organization failed the merge on every retry
+  it "moves the shop's sticker without re-claiming it, and the owner's submission and impound claim" do
+    organization = pos_bike.bike_organizations.first.organization
+    sticker_claimer = FactoryBot.create(:user)
+    bike_sticker = FactoryBot.create(:bike_sticker_claimed, bike:, user: sticker_claimer, organization:)
+    claimed_at = bike_sticker.reload.claimed_at
+    b_param = FactoryBot.create(:b_param, created_bike_id: bike.id)
+    impound_claim = FactoryBot.create(:impound_claim)
+    impound_claim.update_column(:bike_submitting_id, bike.id)
+
+    instance.perform(match.id)
+    expect(match.reload.status).to eq "merged"
+    expect(bike_sticker.reload).to have_attributes(bike_id: pos_bike.id, previous_bike_id: bike.id,
+      user_id: sticker_claimer.id, claimed_at:)
+    expect(bike_sticker.bike_sticker_updates.order(:id).last).to have_attributes(bike_id: pos_bike.id, user_id: nil, kind: "re_claim")
+    expect(b_param.reload.created_bike_id).to eq pos_bike.id
+    expect(impound_claim.reload.bike_submitting_id).to eq pos_bike.id
+  end
+
+  it "doesn't merge once there's another registration of the POS registration, and records why" do
+    other_match = FactoryBot.create(:pos_registration_match, pos_bike:,
+      bike: FactoryBot.create(:bike, :with_ownership_claimed, user:, manufacturer: bike.manufacturer, serial_number: bike.serial_number))
+    expect(other_match.reload.review_reasons).to eq []
+    instance.perform(match.id)
+    expect(match.reload).to have_attributes(status: "confirmed", review_reasons: ["multiple_registrations"])
+    expect(bike.reload.deleted_at).to be_blank
+  end
+
+  it "doesn't merge once the POS registration is really deleted" do
+    BikeJobs::BikeDeleterJob.new.perform(pos_bike.id, true)
+    instance.perform(match.id)
+    expect(match.reload).to have_attributes(status: "confirmed", review_reasons: ["changed_since_confirmed"])
+    expect(bike.reload.deleted_at).to be_blank
   end
 
   it "records a theft since the answer and leaves it confirmed" do

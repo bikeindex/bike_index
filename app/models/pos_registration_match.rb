@@ -45,7 +45,7 @@ class PosRegistrationMatch < ApplicationRecord
   belongs_to :bike, -> { unscope(:order, where: Bike::CURRENT_ATTRIBUTES.keys) }
   belongs_to :pos_bike, -> { unscope(:order, where: Bike::CURRENT_ATTRIBUTES.keys) }, class_name: "Bike"
   # Who said to merge them
-  belongs_to :merger, class_name: "User", optional: true
+  belongs_to :merger, class_name: "User"
 
   validates_presence_of :bike_id, :pos_bike_id
 
@@ -70,6 +70,11 @@ class PosRegistrationMatch < ApplicationRecord
   end
 
   def self.ordered_reasons(reasons) = REVIEW_REASONS.keys & reasons
+
+  # Other live registrations matched to the same POS registration, which an admin should sort out
+  def self.other_registration_matches(bike_id:, pos_bike_id:)
+    where(pos_bike_id:).where.not(bike_id:).where(bike_id: Bike.current_with_user_hidden.select(:id))
+  end
 
   # The registration a deleted one was merged into, so its links still go somewhere
   def self.merged_into(bike) = bike.deleted? ? merged.find_by(bike_id: bike.id)&.pos_bike : nil

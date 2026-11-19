@@ -21,8 +21,7 @@ module BikeJobs
         reasons = PosRegistrationMatch.review_reasons_for(bike, pos_bike) + multiple_pos_bikes
         # Locks the POS bike, so concurrent registrations of it each see the other's match
         match = pos_bike.with_lock do
-          other_matches = PosRegistrationMatch.where(pos_bike_id: pos_bike.id).where.not(bike_id: bike.id)
-            .where(bike_id: Bike.current_with_user_hidden.select(:id)).to_a
+          other_matches = PosRegistrationMatch.other_registration_matches(bike_id: bike.id, pos_bike_id: pos_bike.id).to_a
           reasons += ["multiple_registrations"] if other_matches.any?
           other_matches.each { add_reasons(it, ["multiple_registrations"]) }
           record_match(bike, pos_bike, duplicate_bike_group_id, reasons)

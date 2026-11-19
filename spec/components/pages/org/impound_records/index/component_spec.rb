@@ -26,6 +26,6 @@ RSpec.describe Pages::Org::ImpoundRecords::Index::Component, type: :component do
     expect(component).to have_css("form##{Pages::Org::SearchResults::BikesTable::Component::MULTI_UPDATE_FORM_ID}", visible: :all)
     expect(component).to have_link("Cards")
     # Its column choices kept apart from the registrations search's
-    expect(component).to have_css("[data-ui--table-column-settings-storage-key-value='orgImpoundColumns']")
+    expect(component).to have_css("[data-ui--table-column-settings-storage-key-value='orgImpoundColumns2']")
   end
 end
