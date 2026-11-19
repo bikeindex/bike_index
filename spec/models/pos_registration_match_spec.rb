@@ -58,10 +58,15 @@ RSpec.describe PosRegistrationMatch, type: :model do
   describe "bike and pos_bike" do
     let(:match) { FactoryBot.create(:pos_registration_match, status: :merged) }
 
-    it "includes deleted and hidden registrations, preloaded too" do
+    it "includes deleted and hidden registrations, preloaded with Bike's default includes" do
       match.pos_bike.update!(marked_user_hidden: true)
       match.bike.destroy!
-      expect(described_class.includes(:bike, :pos_bike).find(match.id)).to have_attributes(bike: match.bike, pos_bike: match.pos_bike)
+      preloaded = described_class.includes(:bike, :pos_bike).find(match.id)
+      expect(preloaded).to have_attributes(bike: match.bike, pos_bike: match.pos_bike)
+      # The admin table reads these for each row
+      [preloaded.bike, preloaded.pos_bike].each do |bike|
+        expect(%i[primary_frame_color current_stolen_record current_ownership].map { bike.association(it).loaded? }).to all(be true)
+      end
     end
   end
 
