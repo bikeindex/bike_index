@@ -229,8 +229,8 @@ function matching (params) {
   return { filteredCount: filtered.length, matches, unfiltered: Boolean(exact) && matches.length > 0 && !passes(exact) }
 }
 
-// The `count` of models the filters leave, and featured_rules' `COUNT` of them, by its rules, the models tying on them
-// by `chance`, shown cheapest first unless the reader picked a sort.
+// The `count` of models the filters leave, and featured_rules' `COUNT` of the `candidates` its rules leave, the models
+// tying on them by `chance`, shown cheapest first unless the reader picked a sort.
 // `legalClasses` are the e-bike classes legal where the visitor is, by which every e-bike is legal where there are none
 function featured ({ params, legalClasses }) {
   const { COUNT, requirements, preferences, quotas, maximums } = rules
@@ -272,7 +272,12 @@ function featured ({ params, legalClasses }) {
     picked.push(best.model)
   }
   const shown = params.sort || params.year_dir || params.price_dir ? params : { sort: 'price' }
-  return { count: filtered.length, featured: sorted(shown).filter((model) => picked.includes(model)) }
+  return { count: filtered.length, featured: sorted(shown).filter((model) => picked.includes(model)), candidates: candidates.length }
+}
+
+// featured's picks drawn afresh, as a reload would
+function rotate () {
+  for (const model of models) model.chance = Math.random()
 }
 
 // The models of the `model` id's group by year, newest first, each under the newest it's sold in - so each once, and a
@@ -367,7 +372,7 @@ function propelled ({ electric, e_vehicle_classifications: carried = [] }, propu
 
 self.onmessage = async ({ data: { id, type, ...args } }) => {
   try {
-    self.postMessage({ id, result: await { start, load, comparison: compare, search, featured, group, vehicles, displays, similar }[type](args) })
+    self.postMessage({ id, result: await { start, load, comparison: compare, search, featured, rotate, group, vehicles, displays, similar }[type](args) })
   } catch (error) {
     self.postMessage({ id, error: error.message })
   }

@@ -127,12 +127,24 @@ RSpec.describe "Bike Book", :js, type: :system do
     end
     picks = reloaded.find { it.sort != picks.sort }
     expect(picks).to be_present
+    # and others again when rotated, in place, which a few tries make sure of
+    rotated = 3.times.any? do
+      click_on "rotate samples"
+      page.document.synchronize(3) { (featured_ids.sort != picks.sort) || raise(Capybara::ExpectationNotMet) }
+    rescue Capybara::ExpectationNotMet
+      false
+    end
+    expect(rotated).to be true
+    picks = featured_ids
+    expect(featured_prices).to eq featured_prices.sort
     within(tips) { click_on "More filters" }
     expect(page).to have_css("#vehicle-filters", visible: true)
     # which a filter changes in place
     check "Human powered (Acoustic)"
     expect(page).to have_text("15 models match your filters.")
     expect(featured_ids).to eq %w[m/specialized/2025/ruby_sport]
+    # the one the rules leave, which no rotation changes
+    expect(page).to have_no_button("rotate samples")
     # and the same ones again as it's undone
     uncheck "Human powered (Acoustic)"
     expect(page).to have_text("40 models to compare.")
