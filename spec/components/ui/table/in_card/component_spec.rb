@@ -45,7 +45,7 @@ RSpec.describe UI::Table::InCard::Component, type: :component do
       let(:component) do
         render_inline(described_class.new(**options)) do |table|
           table.with_actions { "Approve selected" }
-          table.selection_column(param: "people", disabled: ->(record) { record.id == 8 }) { "View" }
+          table.selection_column(param: "people", checkbox_options: ->(record) { {disabled: record.id == 8} }) { "View" }
           table.column(hideable: :email_cell) { |r| r.email }
           table.column(hideable: :name_cell, label: "Short") { |r| r.email }
         end

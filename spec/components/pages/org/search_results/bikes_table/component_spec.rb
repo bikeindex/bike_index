@@ -52,7 +52,6 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
       expect(component).to have_css("th.impounded_at_cell a")
       expect(component).not_to have_css("th.manufacturer_cell a")
       expect(component).not_to have_css("th.occurred_at_cell [data-controller='ui--tooltip']")
-      # First, so it's the frozen column, and ahead of the hideable ones, which reordering appends after the rest
       checkbox = component.at_css("tbody td:first-child input[name='ids[#{impound_record.id}]']")
       expect(checkbox[:form]).to eq Pages::Org::SearchResults::BikesTable::Component::MULTI_UPDATE_FORM_ID
     end

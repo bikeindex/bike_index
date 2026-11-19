@@ -15,14 +15,13 @@
   <% email_hidden = translation(".email_hidden") %>
   <% view_label = translation(".view") %>
 
-  <%# Before the hideable columns, which ui--table-column-order reorders by appending %>
+  <% column.(label: settings.column_renames[:view_cell]) do |bike| %>
+    <%= render(UI::ButtonLink::Component.new(text: view_label, href: bike_path(bike, organization_id: organization.to_param), size: :sm, data: {turbo_frame: "_top"})) %>
+  <% end %>
+
   <% if impound %>
     <% table.selection_column(param: "ids", toggleable: true,
       checkbox_options: ->(impound_record) { {form: MULTI_UPDATE_FORM_ID, data: {update_kinds: impound_record.update_multi_kinds.join(" ")}} }) %>
-  <% end %>
-
-  <% column.(label: settings.column_renames[:view_cell]) do |bike| %>
-    <%= render(UI::ButtonLink::Component.new(text: view_label, href: bike_path(bike, organization_id: organization.to_param), size: :sm, data: {turbo_frame: "_top"})) %>
   <% end %>
 
   <% column.(label: settings.column_renames[:photo_cell], classes: "hideableColumn photo_cell") do |bike| %>

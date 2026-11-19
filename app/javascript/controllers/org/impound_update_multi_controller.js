@@ -2,11 +2,10 @@ import { Controller } from '@hotwired/stimulus'
 import { CollapseUtils, collapse } from 'utils/collapse_utils'
 
 // Connects to data-controller='org--impound-update-multi'
-// The impound records index multi-update extras: reveals the update panel and,
-// with data-table-selecting, the checkbox column, enables only the checkboxes
-// whose row supports the selected update kind, and blocks submitting with
-// nothing checked. The kind-specific fields are handled by the separate
-// org--impound-update controller.
+// The impound records index multi-update extras: reveals the update panel and
+// the checkbox column, enables only the checkboxes whose row supports the
+// selected update kind, and blocks submitting with nothing checked. The
+// kind-specific fields are handled by the separate org--impound-update controller.
 export default class extends Controller {
   static targets = ['toggle', 'panel', 'kindSelect', 'error']
   static values = { openLabel: String, closedLabel: String, disabledTitle: String }
@@ -82,7 +81,7 @@ export default class extends Controller {
   }
 
   get anyChecked () {
-    return [...this.checkboxes].some(checkbox => checkbox.checked)
+    return !!this.element.querySelector('input[data-update-kinds]:checked')
   }
 
   // Enable only the checkboxes whose row supports the selected kind
