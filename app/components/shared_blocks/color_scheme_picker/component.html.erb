@@ -1,22 +1,27 @@
 <%= tag.div(
-  class: "tw:flex tw:gap-3",
+  class: class_names("tw:flex tw:flex-col tw:gap-1.5", "tw:mx-auto tw:max-w-56" => @compact),
   role: "radiogroup",
   aria: {label: translation(".appearance")},
   data: {controller: "color-scheme", color_scheme_url_value: @url}
 ) do %>
-  <% options.each do |value, name, icon, icon_class| %>
-    <%= tag.label(
-      title: (name if @compact),
-      class: class_names(
-        "tw:relative tw:mb-0 tw:flex tw:cursor-pointer tw:flex-col tw:items-center tw:gap-2 tw:rounded-lg tw:border tw:opacity-60 tw:transition-all tw:hover:border-purple-300 tw:has-[:checked]:opacity-100 tw:has-[:checked]:ring-2 tw:has-[:checked]:ring-purple-400 tw:has-[:focus-visible]:outline-2 tw:has-[:focus-visible]:outline-offset-2 tw:has-[:focus-visible]:outline-purple-500",
-        @compact ? "tw:border-gray-500 tw:p-1.5" : "tw:flex-1 tw:border-gray-200 tw:p-3 tw:dark:border-purple-700"
-      )
-    ) do %>
-      <%# No id: the account page renders this twice, and the wrapping label is what names it %>
-      <%= tag.input(type: "radio", name: "user[color_scheme]", value:, checked: @color_scheme == value, class: "tw:sr-only", data: {action: "change->color-scheme#select"}) %>
-      <%= helpers.inline_svg_tag("icons/#{icon}.svg", class: "tw:size-6 #{icon_class}", aria_hidden: true) %>
-
-      <span class="<%= @compact ? "tw:sr-only" : "tw:text-xs tw:text-gray-600 tw:dark:text-gray-400" %>"><%= name %></span>
-    <% end %>
+  <% if @compact %>
+    <span class="tw:text-xs tw:text-gray-400" aria-hidden="true"><%= translation(".appearance") %></span>
   <% end %>
+
+  <div class="<%= @compact ? "tw:flex tw:gap-1.5" : "tw:flex tw:gap-3" %>">
+    <% options.each do |value, name, icon, icon_class| %>
+      <%= tag.label(
+        class: class_names(
+          "tw:relative tw:mb-0 tw:flex tw:flex-1 tw:cursor-pointer tw:flex-col tw:items-center tw:rounded-lg tw:border tw:opacity-60 tw:transition-all tw:hover:border-purple-300 tw:has-[:checked]:opacity-100 tw:has-[:checked]:ring-2 tw:has-[:checked]:ring-purple-400 tw:has-[:focus-visible]:outline-2 tw:has-[:focus-visible]:outline-offset-2 tw:has-[:focus-visible]:outline-purple-500",
+          @compact ? "tw:gap-1 tw:border-gray-500 tw:px-0.5 tw:py-1.5" : "tw:gap-2 tw:border-gray-200 tw:p-3 tw:dark:border-purple-700"
+        )
+      ) do %>
+        <%# No id: the account page renders this twice, and the wrapping label is what names it %>
+        <%= tag.input(type: "radio", name: "user[color_scheme]", value:, checked: @color_scheme == value, class: "tw:sr-only", data: {action: "change->color-scheme#select"}) %>
+        <%= helpers.inline_svg_tag("icons/#{icon}.svg", class: "tw:size-6 #{icon_class}", aria_hidden: true) %>
+
+        <span class="<%= @compact ? "tw:text-xs tw:text-gray-400" : "tw:text-xs tw:text-gray-600 tw:dark:text-gray-400" %>"><%= name %></span>
+      <% end %>
+    <% end %>
+  </div>
 <% end %>
