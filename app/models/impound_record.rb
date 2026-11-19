@@ -289,7 +289,7 @@ class ImpoundRecord < ApplicationRecord
     self.unregistered_bike ||= calculated_unregistered_bike?
     self.impounded_from_address_record ||= address_record if address_record&.impounded_from?
     # Linked after create, by which point a default impound location already holds address_record
-    self.impounded_from_address_record ||= parking_notification_address_record
+    self.impounded_from_address_record ||= parking_notification_address_record if parking_notification.present?
     if location.present?
       self.address_record_id = location.address_record_id
     else
@@ -365,8 +365,8 @@ class ImpoundRecord < ApplicationRecord
 
   # The whole repeat chain shares impound_record_id, so has_one :parking_notification picks arbitrarily
   def parking_notification_address_record
-    notification = ParkingNotification.impound_notification.order(:id).find_by(impound_record_id: id) if id.present?
-    return if notification.blank?
+    notification = ParkingNotification.impound_notification.order(:id).find_by(impound_record_id: id) if id
+    return unless notification
 
     AddressRecord.new(Geocodeable.attrs_to_duplicate(notification)
       .merge(kind: :impounded_from, organization_id:, bike_id:))
