@@ -33,7 +33,6 @@ RSpec.describe "color scheme switcher", :js, type: :system do
 
     within(".primary-edit-user-form") { choose("Dark", allow_label_click: true) }
     expect(page).to have_css("body.dark")
-    # The footer's picker follows the account form's
     within("footer") { expect(page).to have_checked_field("Dark", visible: :all) }
     wait_for { user.reload.color_scheme_dark? }
     # It's already saved, so leaving the page mustn't warn about unsaved changes
