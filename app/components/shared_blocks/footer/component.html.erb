@@ -182,6 +182,10 @@
                 <% end %>
               </li>
             </ul>
+
+            <div class="tw:clear-both tw:flex tw:justify-center tw:pt-3">
+              <%= render(SharedBlocks::ColorSchemePicker::Component.new(color_scheme: @color_scheme, url: (my_account_path if @current_user), compact: true)) %>
+            </div>
           </nav>
         </div>
       </div>

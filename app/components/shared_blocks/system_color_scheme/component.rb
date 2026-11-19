@@ -3,11 +3,11 @@
 module SharedBlocks
   module SystemColorScheme
     class Component < ApplicationComponent
-      def initialize(user:)
-        @user = user
+      def initialize(color_scheme:)
+        @color_scheme = color_scheme
       end
 
-      def render? = @user&.color_scheme_system?
+      def render? = @color_scheme == "system"
     end
   end
 end
