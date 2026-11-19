@@ -354,9 +354,10 @@ RSpec.describe "RegistrationsController#show", type: :request do
     let(:current_user) { bike.user }
     before { bike.destroy! }
 
-    it "redirects to the POS registration, keeping the params" do
-      get "#{base_url}/#{bike.id}", params: {parking_notification_retrieved: "token"}
-      expect(response).to redirect_to(registration_path(pos_registration_match.pos_bike_id, parking_notification_retrieved: "token"))
+    it "redirects to the POS registration, keeping the query params as query params" do
+      params = {parking_notification_retrieved: "token", id: bike.id, script_name: "//example.com"}
+      get "#{base_url}/#{bike.id}", params: params
+      expect(response).to redirect_to(registration_path(pos_registration_match.pos_bike_id, params:))
     end
 
     # A hidden registration's id isn't revealed by a redirect

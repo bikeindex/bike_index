@@ -112,10 +112,10 @@ module ControllerHelpers
     merged_into = PosRegistrationMatch.merged_into(bike) if request.get? || request.head?
     fail ActiveRecord::RecordNotFound unless merged_into&.visible_by?(current_user)
 
-    id_param = params.key?(:bike_id) ? :bike_id : :id
-    # Keeps tokens, e.g. a parking notification's retrieval link
-    redirect_to(url_for(request.path_parameters.merge(id_param => merged_into.id, :only_path => true)
-      .merge(request.query_parameters)))
+    id_param = request.path_parameters.key?(:bike_id) ? :bike_id : :id
+    # Keeps tokens, e.g. a parking notification's retrieval link, as query params only
+    redirect_to(url_for(request.path_parameters.merge(id_param => merged_into.id, :only_path => true,
+      :params => request.query_parameters)))
   end
 
   def set_reading_role
