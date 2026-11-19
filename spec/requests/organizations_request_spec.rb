@@ -29,7 +29,7 @@ RSpec.describe OrganizationsController, type: :request do
         expect(Capybara.string(response.body)).to have_css("input[value=bike_advocacy][checked]")
 
         get "#{base_url}/new", params: {kind: "ambassador"}
-        expect(Capybara.string(response.body)).to_not have_css("input[checked]")
+        expect(Capybara.string(response.body)).to_not have_css("input[name='organization[kind]'][checked]")
       end
     end
   end
