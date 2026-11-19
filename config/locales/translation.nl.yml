@@ -5561,6 +5561,9 @@ nl:
         report: Rapport
         step_1: Stap 1
         step_2: Stap 2
+      org:
+        impound_current_location:
+          same_as_impounded_from: hetzelfde als in beslag genomen van
     pages:
       messages:
         thread_show:
@@ -5722,7 +5725,6 @@ nl:
             show_location_search: toon locatie zoeken
             all_bikes: Alle fietsen
             all_statuses: Alle statussen
-            impound_location_cell: Plaats
             impound_status_cell: Inbeslagname status
             impound_updated_at_cell: Inbeslagname bijgewerkt
             impound_updated_at_cell_panel: Tijd - Registratie van inbeslagname bijgewerkt
@@ -5747,6 +5749,11 @@ nl:
               uit de zoekopdracht naar registraties.
             impound_search_columns: Inbeslagname zoekkolommen
             course_acknowledgment_cell_panel: Tijd - Erkende onderwijscursus
+            current_location_without_locations: Je hebt geen locaties van inbeslaggenomen
+              voertuigen, dus dit is grotendeels een herhaling van 'Inbeslaggenomen
+              vanuit'.
+            impound_current_location_cell: Huidige locatie
+            impound_notes_cell: Inbeslagname-aantekeningen
           column_settings_toggle:
             column_settings: Kolominstellingen
           settings_and_filters:
@@ -5769,6 +5776,7 @@ nl:
             toggle_all_checked: Alles aangevinkt weergeven/verbergen
             course_acknowledgment_title: Erkenning van deelname aan de onderwijscursus
               bij
+            more_notes: "+%{count} meer"
           multi_result_chip:
             no_results: geen overeenkomsten
           multi_results:
@@ -5976,6 +5984,8 @@ nl:
             impounded_from: In beslag genomen van
             last_update_by: Laatst bijgewerkt door
             status: Toestand
+            current_location: Huidige locatie
+            notes: Notes
           legacy_view_link:
             switch_to_classic: Schakel terug naar de oude viewer.
             view_in_legacy: bekijk %{bike_type} in de oude viewer
