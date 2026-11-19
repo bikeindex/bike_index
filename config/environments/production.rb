@@ -77,9 +77,9 @@ Rails.application.configure do
 
   # Turns away IP-sweeping scanners, which don't send our Host. A direct request that does send
   # it still gets in — the Cloud66 firewall, open only to Cloudflare's IPs, is what stops it.
+  config.hosts = [/(.+\.)?#{Regexp.escape(base_url.host)}/i]
   # kamal-proxy's health check hits /up by container address
-  config.hosts = [base_url.host, /.*\.#{Regexp.escape(base_url.host)}/i]
-  config.host_authorization = {exclude: ->(request) { request.path == "/up" }}
+  config.host_authorization = {exclude: -> { it.path == "/up" }}
 
   # Prepend all log lines with the following tags.
   config.log_tags = [:request_id]
