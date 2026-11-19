@@ -6882,8 +6882,6 @@ nl:
           any_vehicle_type: Elk type voertuig
           applied_filters: Toegepaste filters
           configuration: Configuratie
-          failed: De catalogus is niet geladen. Vernieuw de pagina om het opnieuw
-            te proberen.
           loading: De catalogus wordt geladen…
           max: Max
           min: Min
@@ -6942,6 +6940,8 @@ nl:
             nodig. Alle gegevens zijn openbaar beschikbaar onder CC BY-SA 4.0, te
             vinden op %{repository}. Crawlers, scrapers en AI-agenten: haal de gegevens
             daar vandaan in plaats van op deze pagina.'
+          load_failed: De catalogus kon niet worden geladen.
+          try_again: Probeer het opnieuw
         donate_strip:
           donate: Schenken
           pitch: Dit fantastische product wordt u aangeboden door de non-profitorganisatie

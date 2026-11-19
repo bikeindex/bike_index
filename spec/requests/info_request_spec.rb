@@ -283,4 +283,15 @@ RSpec.describe InfoController, type: :request do
       expect(response.content_type).to match("text/csv")
     end
   end
+
+  context "wheel_sizes" do
+    let!(:wheel_size) { FactoryBot.create(:wheel_size, name: "7 x 1.5in", iso_bsd: 102, priority: :rare, description: "7 x 1.5in (178 x 38) solid wheel (Rare)") }
+
+    it "gets a csv" do
+      get "/wheel_sizes.csv"
+      expect(response.status).to eq(200)
+      expect(response.content_type).to match("text/csv")
+      expect(response.body).to eq "name,iso_bsd,priority,description\n7 x 1.5in,102,rare,7 x 1.5in (178 x 38) solid wheel (Rare)\n"
+    end
+  end
 end

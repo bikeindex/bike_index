@@ -1098,6 +1098,14 @@ RSpec.describe "Bike Book", :js, type: :system do
 
     page.go_back
     expect(page).to have_css("article", count: 1)
+    # and onto the entry it landed on, which Turbo stamped as it started, rendered without a request as the others are
+    requested = []
+    page.driver.with_playwright_page { it.on("request", ->(request) { requested << request.url if URI(request.url).path == bikebook_path }) }
+    page.go_back
+    expect(page).to have_link("Search other bikes")
+    page.go_forward
+    expect(vehicle_field).to be_visible
+    expect(requested).to be_empty
     find("[aria-label='Remove Aventón Level 4 REC Step-Through']").click
     expect(page).to have_no_css("article")
     expect(page).to have_title("Bike Book", exact: true)
@@ -2473,14 +2481,14 @@ RSpec.describe "Bike Book", :js, type: :system do
     not_found = {status: 404, headers: {"access-control-allow-origin" => "*"}, body: ""}
     visit compared
     index.pop(timeout: 10).fulfill(**not_found)
-    expect(page).to have_text("The catalog didn't load. Reload the page to try again.", wait: 10)
+    expect(page).to have_text("The catalog didn't load.", wait: 10).and have_button("Try again")
     kit.pop(timeout: 10).fallback
     expect(page).to have_css("#vehicle-viewers tr", wait: 10)
     expect(page).to have_css(failed, text: "The catalog didn't load.")
     expect(page).to have_field("vehicle_models", placeholder: "", disabled: true)
 
-    # reloaded as it says to, the vehicles in ahead of the failure this time
-    visit page.current_url
+    # tried again, the vehicles in ahead of the failure this time
+    click_on "Try again"
     kit.pop(timeout: 10).fallback
     expect(page).to have_css("#vehicle-viewers tr", wait: 10)
     index.pop(timeout: 10).fulfill(**not_found)
@@ -2491,6 +2499,27 @@ RSpec.describe "Bike Book", :js, type: :system do
     expect(page).to have_current_path(/[?&]view=components\b/)
     expect(page).to have_css(failed, text: "The catalog didn't load.")
     expect(page).to have_field("vehicle_models", placeholder: "", disabled: true)
+
+    # and again once the index answers, in the view it's moved to
+    click_on "Try again"
+    kit.pop(timeout: 10).fallback
+    index.pop(timeout: 10).fallback
+    expect(vehicle_field).to be_visible
+    expect(page).to have_no_css(failed)
+    expect(page).to have_css("nav[aria-label='Views'] a[aria-current='page']", exact_text: "Components")
+
+    # a pick whose block doesn't load keeps the page, saying so above its vehicles, until it's tried again
+    block = hold_bikebook_catalog_file("models/aventon/2024.*")
+    type_into(vehicle_field, "sinch")
+    retry_on_detach { find(vehicle_option, text: "Aventón Sinch 2.5").click }
+    block.pop(timeout: 10).fulfill(**not_found)
+    expect(page).to have_css(failed, text: "The catalog didn't load.", wait: 10)
+    expect(page).to have_css("#vehicle-viewers tr").and have_no_css("#vehicle-viewers", text: "Sinch 2.5")
+    expect(vehicle_field).to be_visible
+    click_on "Try again"
+    block.pop(timeout: 10).fallback
+    expect(page).to have_css("#vehicle-viewers", text: "Sinch 2.5", wait: 10)
+    expect(page).to have_no_css(failed)
   end
 
   it "keeps the search and its filters while the catalog loads, and says so when it doesn't" do
@@ -2504,7 +2533,7 @@ RSpec.describe "Bike Book", :js, type: :system do
     expect(page).to have_field("Vehicle types", placeholder: "Loading…", disabled: true, visible: :all)
     expect(all("[aria-label='Applied filters'] li").map(&:text)).to eq ["Propulsion: e-Vehicle (motorized)"]
     held.pop.fulfill(status: 404, headers: {"access-control-allow-origin" => "*"}, body: "")
-    expect(page).to have_text("The catalog didn't load. Reload the page to try again.", wait: 10)
+    expect(page).to have_text("The catalog didn't load.", wait: 10).and have_button("Try again")
     expect(page).to have_field("Vehicle types", placeholder: "", disabled: true, visible: :all)
     expect(page).to have_css("h1", exact_text: "The world’s bicycle library — search, compare, and find your next ride.")
     # the search waits on the catalog, but the filters work from the URL alone

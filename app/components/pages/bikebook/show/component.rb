@@ -45,11 +45,15 @@ module Pages
           "tw:invisible" if @query.except("search", "vehicle_models").any?
         end
 
-        # Saying so where the URL has picks, which wait on the catalog, like loadingShell's. Swapped rather than rendered
+        # The pins preloaded for the bikebook entry point, without the application's that the layout preloads
+        def module_preloads
+          packages = Rails.application.importmap.preloaded_module_packages(resolver: helpers, entry_point: "bikebook", cache_key: "bikebook")
+          helpers.javascript_module_preload_tag(*packages.filter_map { |path, package| path if package.preload == "bikebook" })
+        end
+
+        # Saying so until the catalog loads, which the search waits on, like loadingShell's. Swapped rather than rendered
         # again for the one attribute, as the search is a third of the page's render
         def placeholder_search(search)
-          return search if @query["vehicle_models"].blank?
-
           search.sub(%(placeholder="#{h(translation(".search_placeholder"))}"), %(placeholder="#{h(translation(".loading_placeholder"))}")).html_safe
         end
 
