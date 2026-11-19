@@ -7,6 +7,7 @@
 #  close_year         :integer
 #  description        :text
 #  frame_maker        :boolean
+#  legacy_slug        :string
 #  logo               :string(255)
 #  logo_source        :string(255)
 #  motorized_only     :boolean          default(FALSE)
@@ -69,9 +70,9 @@ class Manufacturer < ApplicationRecord
       if n.is_a?(Integer) || n.match(/\A\d+\z/).present?
         where(id: n).first
       else
-        ns = Slugifyer.manufacturer(n)
-        find_by_slug(ns) || find_by_slug(fill_stripped(ns)) ||
-          find_by_secondary_slug(ns)
+        legacy_slug = Slugifyer.legacy_manufacturer(n)
+        find_by_slug(Slugifyer.slugify(n)) || find_by_legacy_slug(legacy_slug) ||
+          find_by_legacy_slug(fill_stripped(legacy_slug)) || find_by_secondary_slug(legacy_slug)
       end
     end
 
@@ -85,11 +86,6 @@ class Manufacturer < ApplicationRecord
       @other = where(name: "Other", frame_maker: true).first_or_create
     end
 
-    def fill_stripped(n)
-      n.gsub!(/accell/i, "") if n.match(/accell/i).present?
-      Slugifyer.manufacturer(n)
-    end
-
     def calculated_mnfg_name(manufacturer, manufacturer_other)
       return nil if manufacturer.blank?
 
@@ -99,6 +95,10 @@ class Manufacturer < ApplicationRecord
         manufacturer.short_name
       end.strip.truncate(60)
     end
+
+    private
+
+    def fill_stripped(n) = Slugifyer.legacy_manufacturer(n.gsub(/accell/i, ""))
   end
 
   def to_param
@@ -125,8 +125,9 @@ class Manufacturer < ApplicationRecord
 
   def set_calculated_attributes
     self.name = Binxtils::InputNormalizer.string(name)
-    self.secondary_slug = Slugifyer.manufacturer(secondary_name)
-    self.slug = Slugifyer.manufacturer(name)
+    self.secondary_slug = Slugifyer.legacy_manufacturer(secondary_name)
+    self.slug = Slugifyer.slugify(name)
+    self.legacy_slug = Slugifyer.legacy_manufacturer(name)
     self.website = website.present? ? Urlifyer.urlify(website) : nil
     self.logo_source = logo.present? ? (logo_source || "manual") : nil
     self.twitter_name = twitter_name.present? ? twitter_name.gsub(/\A@/, "") : nil

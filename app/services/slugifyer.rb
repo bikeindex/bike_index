@@ -8,7 +8,8 @@ module Slugifyer
       .gsub(/([^A-Za-z0-9_-]+)/, "") # Remove any weird characters
   end
 
-  def manufacturer(string)
+  # What manufacturer slugs were before they were slugified. Still a lookup key, and bikebook's manufacturer slug
+  def legacy_manufacturer(string)
     return nil unless string
 
     name = remove_parens(string).gsub(/\sco(\.|mpany)/i, " ").gsub(/\s(frame)?works/i, " ")
