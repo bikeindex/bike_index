@@ -193,7 +193,7 @@ RSpec.describe EbikeRulesController, type: :request do
 
       it "asks it once a minute, however much of the page reads it" do
         requests = 0
-        WebMock.stub_request(:get, "#{Integrations::Bikebook::Catalog::URL}manifest.json").to_return do
+        WebMock.stub_request(:get, Integrations::Bikebook::Catalog::MANIFEST_URL).to_return do
           requests += 1
           {status: 503}
         end
@@ -232,6 +232,13 @@ RSpec.describe EbikeRulesController, type: :request do
       expect(page).to have_css("[role='status']", text: "The Specialized Haul ST is classified as an e-bike in Alaska.")
       expect(page.find("#state-ak > h3")).to have_no_text("In review")
       expect(meta("description")).to_not include("still reviewing")
+    end
+
+    it "checks a bike against a state's law in a catalog format /bikebook doesn't read" do
+      stub_const("Integrations::Bikebook::Catalog::FORMAT", 2)
+      get "/ebike-rules/US/AK", params: {vehicle_models: "m/specialized/2025/haul_st"}
+
+      expect(page).to have_css("[role='status']", text: "The Specialized Haul ST is classified as an e-bike in Alaska.")
     end
 
     it "checks a Class 3 with a stock throttle as out of class in California alone" do

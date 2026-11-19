@@ -5,6 +5,7 @@ require "sidekiq/web"
 Rails.application.routes.draw do
   # Liveness endpoint (200 if the app boots). Used by the review-app kamal-proxy health check
   get "up", to: "rails/health#show", as: :rails_health_check
+  get "up/bikebook", to: "bikebook#up"
 
   mount Sidekiq::Web => "/sidekiq", :constraints => AuthRestriction::Developer
   mount PgHero::Engine, at: "/pghero", constraints: AuthRestriction::Developer
@@ -44,7 +45,7 @@ Rails.application.routes.draw do
     for_community_groups for_cities for_law_enforcement for_schools].each { get it, controller: "landing_pages", action: it }
   %w[donate support_bike_index support_the_index support_the_bike_index primary_activities
     protect_your_bike serials about where vendor_terms resources privacy terms security
-    how_not_to_buy_stolen lightspeed membership].each { get it, controller: "info", action: it }
+    how_not_to_buy_stolen lightspeed membership wheel_sizes].each { get it, controller: "info", action: it }
   get "recovery_stories", to: "welcome#recovery_stories", as: :recovery_stories
   get "donate/year-end-2026", to: "info#donate_year_end", as: :donate_year_end
   get "donate/year-end", to: redirect(path: "/donate/year-end-2026", status: 302) # a later year's campaign takes it over

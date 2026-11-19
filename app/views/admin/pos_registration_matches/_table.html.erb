@@ -24,8 +24,7 @@
   <% end %>
 
   <% table.column(label: "Owner") do |match| %>
-    <% bike = match.bike || Bike.unscoped.find_by(id: match.bike_id) %>
-    <%= render Atoms::Admin::TableCells::User::Component.new(user: bike&.user, user_id: bike&.user_id, sort_state:, render_search: true) %>
+    <%= render Atoms::Admin::TableCells::User::Component.new(user: match.bike&.user, user_id: match.bike&.user_id, sort_state:, render_search: true) %>
   <% end %>
 
   <% table.column(sortable: "status", label: "Status") do |match| %>

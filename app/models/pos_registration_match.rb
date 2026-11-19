@@ -29,14 +29,17 @@ class PosRegistrationMatch < ApplicationRecord
     "multiple_registrations" => "More than one new registration matches the POS registration",
     "impounded" => "A registration was impounded",
     "marketplace_listing" => "A registration has a marketplace listing",
+    "bike_versions" => "A registration has versions",
     "not_a_serial" => "Serial is a part number or placeholder"
   }.freeze
 
   enum :status, STATUS_ENUM
 
   belongs_to :duplicate_bike_group
-  belongs_to :bike
-  belongs_to :pos_bike, class_name: "Bike"
+  # Merged matches have a deleted bike, and POS bikes are often hidden. Drops Bike.current from the default
+  # scope but keeps its includes, which the admin table reads
+  belongs_to :bike, -> { unscope(:order, where: Bike::CURRENT_ATTRIBUTES.keys) }
+  belongs_to :pos_bike, -> { unscope(:order, where: Bike::CURRENT_ATTRIBUTES.keys) }, class_name: "Bike"
 
   validates_presence_of :bike_id, :pos_bike_id
 
@@ -44,7 +47,30 @@ class PosRegistrationMatch < ApplicationRecord
   scope :review_candidate, -> { where.not(review_reasons: []) }
   scope :with_review_reason, ->(reason) { where("review_reasons @> ARRAY[?]::text[]", reason) }
 
+  # Stolen history counts any manufacturer's bike with either serial, including deleted and example ones
+  def self.review_reasons_for(bike, pos_bike)
+    serial = bike.serial_normalized_no_space
+    serials = [serial, pos_bike.serial_normalized_no_space].uniq
+    bike_ids = [bike.id, pos_bike.id]
+    versions = BikeVersion.unscoped.where(bike_id: bike_ids)
+    listings = MarketplaceListing.where(item_type: "Bike", item_id: bike_ids)
+      .or(MarketplaceListing.where(item_type: "BikeVersion", item_id: versions.select(:id)))
+    not_a_serial = BikeDuplicatesServices::Cues.not_a_serial(serial,
+      manufacturer_names: BikeDuplicatesServices::Cues.fetch_manufacturer_name_serials)
+    ordered_reasons([("stolen_history" if BikeDuplicatesServices::Finder.stolen_serials?(serials)),
+      ("impounded" if ImpoundRecord.where(bike_id: bike_ids).exists?),
+      ("marketplace_listing" if listings.exists?),
+      ("bike_versions" if versions.exists?), ("not_a_serial" if not_a_serial)].compact)
+  end
+
+  def self.ordered_reasons(reasons) = REVIEW_REASONS.keys & reasons
+
   def merge_candidate? = review_reasons.none?
+
+  # Reasons are only added, so a recorded stolen veto is never cleared
+  def add_review_reasons!(reasons, **attributes)
+    update!(review_reasons: self.class.ordered_reasons(review_reasons + reasons), **attributes)
+  end
 
   def bucket = merge_candidate? ? "merge_candidate" : "review_candidate"
 end

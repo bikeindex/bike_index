@@ -30,6 +30,18 @@ RSpec.describe Pages::Admin::Bikes::Summary::Details::Component, type: :componen
     end
   end
 
+  context "impounded, held at a location" do
+    let(:location) { FactoryBot.create(:location, :with_address_record, address_in: :new_york) }
+    let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, :with_address_record, bike:, location:) }
+
+    it "renders where it was impounded from, not where it's held" do
+      expect(impound_record.reload.address_record_id).to eq location.address_record_id
+      bike.reload
+      expect(component).to have_content("Chicago")
+      expect(component).not_to have_content("New York")
+    end
+  end
+
   context "with a creation organization" do
     let(:bike) { FactoryBot.create(:bike_organized, owner_email: "owner@bikeindex.org") }
 

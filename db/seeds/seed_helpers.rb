@@ -56,8 +56,9 @@ module SeedHelpers
   # Pick a frame maker weighted by priority (popular manufacturers chosen most
   # often), with the long tail of unprioritized makers appearing ~8% of the
   # time. Falls back to uniform when no priorities are set (e.g. fresh import).
+  # Never Jamis: seeds pass it in for a bike whose label must be unique
   def weighted_frame_maker_id
-    makers = Manufacturer.frame_makers.pluck(:id, :priority)
+    makers = Manufacturer.frame_makers.where.not(name: "Jamis").pluck(:id, :priority)
     prioritized = makers.select { |_id, priority| priority.to_i.positive? }
     return makers.sample.first if prioritized.empty?
 

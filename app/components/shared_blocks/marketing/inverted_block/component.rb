@@ -6,6 +6,8 @@ module SharedBlocks
       # A band in the opposite of the page's mode. Content styles itself as for the page - `inverted`
       # flips tw:dark: inside it. layout: :columns puts the content in two columns, :stacked one above another
       class Component < ApplicationComponent
+        # Template Dependency: SharedBlocks::Marketing::Wrapper::Component
+
         BAND_CLASSES = "inverted tw:bg-linear-160 tw:from-white tw:to-gray-100 tw:text-slate-900 " \
           "tw:dark:from-slate-900 tw:dark:to-[#233140] tw:dark:text-white"
 
