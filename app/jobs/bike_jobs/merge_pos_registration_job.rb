@@ -124,8 +124,9 @@ module BikeJobs
         # The moved graduated notifications graduate the kept bike from the organization
         GraduatedNotification.unscoped.where(bike_organization_id: bike_organization.id)
           .update_all(bike_organization_id: pos_bike_organization.id)
-        if !bike_organization.deleted? && bike_organization.can_not_edit_claimed && !pos_bike_organization.can_not_edit_claimed
-          pos_bike_organization.update!(can_not_edit_claimed: true)
+        # Graduated ones too, since a renewal restores the kept bike's
+        if bike_organization.can_not_edit_claimed && !pos_bike_organization.can_not_edit_claimed
+          pos_bike_organization.update_columns(can_not_edit_claimed: true, updated_at: Time.current)
         end
       end
     end
