@@ -131,7 +131,7 @@ RSpec.describe BikeJobs::MergePosRegistrationJob, type: :job do
           instance.perform(match.id)
           expect(match.reload.status).to eq "merged"
           expect(BikeOrganization.unscoped.find(bike_organization.id).bike_id).to eq pos_bike.id
-          expect(graduated_notification.reload.bike_id).to eq pos_bike.id
+          expect(graduated_notification.reload).to have_attributes(bike_id: pos_bike.id, bike_organization_id: bike_organization.id)
         end
       end
     end
