@@ -38,7 +38,7 @@ module Pages
           shown.reject { %i[not_classified throttle_with_class_3_assist].include?(it[:note]) }
         end
 
-        def law = @lookup.law
+        def law = @law ||= @lookup.law
       end
     end
   end

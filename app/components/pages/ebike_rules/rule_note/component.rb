@@ -12,13 +12,13 @@ module Pages
           @state = state
         end
 
-        def call = h((metric_note(@row[:note], args) if @law[:metric]) || us_note(@row, args))
+        def call = h((metric_note if @law[:metric]) || us_note)
 
         private
 
         # classes are names rather than quantities, and a law's date a calendar day
         def args
-          @row[:args].to_h do |key, value|
+          @args ||= @row[:args].to_h do |key, value|
             if key == :e_bike_classes
               [:n, value.to_sentence]
             elsif value.is_a?(Date)
@@ -30,8 +30,8 @@ module Pages
         end
 
         # nil where it reads the same as a US law's
-        def metric_note(note, args)
-          case note
+        def metric_note
+          case @row[:note]
           when :no_e_bike_category then translation(".no_e_bike_category")
           when :no_watt_cap then translation(".no_watt_cap_in_law")
           when :speed_within_cap then translation(".speed_within_cap_kmh_html", **args)
@@ -48,16 +48,16 @@ module Pages
           end
         end
 
-        def us_note(row, args)
-          case row[:note]
-          when :classes_recognized then translation(".classes_recognized", count: row[:args][:e_bike_classes].size, **args)
+        def us_note
+          case @row[:note]
+          when :classes_recognized then translation(".classes_recognized", count: @row[:args][:e_bike_classes].size, **args)
           when :classes_not_recognized
-            translation(".classes_not_recognized_in", count: row[:args][:e_bike_classes].size, state: @state[:name], **args)
+            translation(".classes_not_recognized_in", count: @row[:args][:e_bike_classes].size, state: @state[:name], **args)
           when :optional_classes_not_recognized
-            translation(".optional_classes_not_recognized_in", count: row[:args][:e_bike_classes].size, state: @state[:name], **args)
+            translation(".optional_classes_not_recognized_in", count: @row[:args][:e_bike_classes].size, state: @state[:name], **args)
           when :optional_throttle_not_allowed then translation(".optional_throttle_not_allowed")
           when :classes_not_permitted
-            translation(".classes_not_permitted", classes: row[:args][:e_bike_classes].map { translation(".class_n", n: it) }.to_sentence)
+            translation(".classes_not_permitted", classes: @row[:args][:e_bike_classes].map { translation(".class_n", n: it) }.to_sentence)
           when :not_classified then translation(".not_classified")
           when :class_unknown then translation(".class_unknown_in_bike_book_label")
           when :own_classes then translation(".own_classes")
