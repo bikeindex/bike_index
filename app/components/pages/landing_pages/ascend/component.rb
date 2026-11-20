@@ -3,8 +3,6 @@
 module Pages
   module LandingPages
     module Ascend
-      # The setup page for shops connecting Ascend Retail. Visitors mostly arrive already sold on Bike Index
-      # (from /for_bike_shops or their account), so it argues the effort and the privacy, then walks the setup.
       # has_shop: the visitor is signed in to a shop organization, which finishes step one
       class Component < ApplicationComponent
         SECTION_CLASSES = SharedBlocks::Marketing::Wrapper::Component::CONTAINER_CLASSES
