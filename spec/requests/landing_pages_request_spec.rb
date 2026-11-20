@@ -144,6 +144,25 @@ RSpec.describe LandingPagesController, type: :request do
         expect(response.body).to_not include("Log in to your shop")
       end
 
+      context "when the user is also in another organization that is their default" do
+        let(:police) { FactoryBot.create(:organization, kind: "law_enforcement") }
+        let(:current_user) do
+          FactoryBot.create(:organization_admin, organization: police).tap do |user|
+            FactoryBot.create(:organization_role_claimed, user:, organization: current_organization, role: "admin")
+          end
+        end
+
+        it "connects the shop, not the other organization" do
+          expect(OrganizationRole.default_organization(current_user)&.id).to eq police.id
+
+          get "/lightspeed"
+
+          expect(response.body).to include("You&#39;re logged in to your shop")
+          expect(response.body).to include(%(href="/lightspeed_interface?organization_id=#{current_organization.id}"))
+          expect(response.body).to_not include("organization_id=#{police.id}")
+        end
+      end
+
       context "when the organization isn't a shop" do
         let(:current_organization) { FactoryBot.create(:organization, kind: "law_enforcement") }
 
@@ -153,6 +172,7 @@ RSpec.describe LandingPagesController, type: :request do
           expect(response.status).to eq(200)
           expect(response.body).to include("Create your shop account on Bike Index")
           expect(response.body).to_not include("Log in to your shop")
+          expect(response.body).to include('href="/lightspeed_interface"')
           expect(response.body).to_not include("You&#39;re logged in to your shop")
         end
       end
