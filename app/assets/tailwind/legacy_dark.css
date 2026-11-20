@@ -28,6 +28,19 @@
     @apply tw:md:max-navbar:dark:bg-gray-800 tw:dark:border-gray-700;
   }
 
+  /* The box is .main-form from md up and .sign-in-up-wrap below it */
+  .sign-in-up.not-partner .main-form {
+    @apply tw:md:dark:bg-gray-800 tw:md:dark:border-gray-700;
+  }
+
+  .sign-in-up.not-partner .sign-in-up-wrap {
+    @apply tw:max-md:dark:bg-gray-800 tw:max-md:dark:border-gray-700;
+  }
+
+  .sign-in-up.not-partner .main-form a {
+    @apply tw:dark:text-gray-100;
+  }
+
   .primary-edit-form-well-menu {
     @apply tw:max-md:dark:bg-gray-800;
   }
