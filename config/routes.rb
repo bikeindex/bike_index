@@ -51,10 +51,10 @@ Rails.application.routes.draw do
   end
 
   %w[ambassadors_current ambassadors_how_to ascend bike_shop_packages for_bike_shops
-    for_community_groups for_cities for_law_enforcement for_schools].each { get it, controller: "landing_pages", action: it }
+    for_community_groups for_cities for_law_enforcement for_schools lightspeed].each { get it, controller: "landing_pages", action: it }
   %w[donate support_bike_index support_the_index support_the_bike_index primary_activities
     protect_your_bike serials about where vendor_terms resources privacy terms security
-    how_not_to_buy_stolen lightspeed membership wheel_sizes].each { get it, controller: "info", action: it }
+    how_not_to_buy_stolen membership wheel_sizes].each { get it, controller: "info", action: it }
   get "recovery_stories", to: "welcome#recovery_stories", as: :recovery_stories
   get "donate/year-end-2026", to: "info#donate_year_end", as: :donate_year_end
   get "donate/year-end", to: redirect(path: "/donate/year-end-2026", status: 302) # a later year's campaign takes it over

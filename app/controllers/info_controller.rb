@@ -33,9 +33,6 @@ class InfoController < ApplicationController
   def protect_your_bike
   end
 
-  def lightspeed
-  end
-
   def privacy
   end
 

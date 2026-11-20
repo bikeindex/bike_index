@@ -49,7 +49,7 @@ RSpec.describe InfoController, type: :request do
 
   describe "static pages" do
     pages = %w[about protect_your_bike serials resources security
-      terms vendor_terms privacy lightspeed]
+      terms vendor_terms privacy]
     context "no user" do
       pages.each do |page|
         context "#{page} with revised_layout enabled" do
@@ -251,14 +251,11 @@ RSpec.describe InfoController, type: :request do
       current_user.update_column :alert_slugs, ["theft_alert_without_photo"]
     end
     it "renders with show alert" do
-      get "/lightspeed"
+      get "/privacy"
       expect(response.code).to eq("200")
-      expect(response).to render_template("lightspeed")
+      expect(response).to render_template("privacy")
       expect(flash).to_not be_present
       expect(assigns(:show_general_alert)).to be_truthy
-      # Signing up comes back through the signup's own return_to, not a sign-in's
-      expect(response.body).to include new_organization_signup_path(return_to: lightspeed_interface_path)
-      expect(session[:return_to]).to be_blank
     end
     context "donate" do
       include_context :active_stripe_prices
