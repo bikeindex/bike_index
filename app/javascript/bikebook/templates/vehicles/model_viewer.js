@@ -466,7 +466,7 @@ class ModelViewer {
   #classTiles () {
     if (this.outOfClass === 'stock') return classBadges([`emoto/${this.outOfClassId}`])
     const ids = this.vehicle.classifiedModes.flatMap((mode) => mode.ids)
-    const numbers = [...new Set(ids.map((id) => id.match(US_CLASS)?.[1]).filter(Boolean))].sort()
+    const numbers = this.#classNumbers()
     const optional = this.#optionalClasses()
     const throttled = this.outOfClass === 'throttle'
     const classes = numbers.filter((number) => !(throttled && optional.get(number) === 'throttle'))
@@ -475,11 +475,30 @@ class ModelViewer {
     return tiles.length ? classBadges(tiles) : presence(this.classificationNames(this.#sortedClassifications(this.vehicle)))
   }
 
-  // Its classes beside its /ebike-rules check
+  #classNumbers () {
+    return [...new Set(this.vehicle.classifiedModes.flatMap((mode) => mode.ids).map((id) => id.match(US_CLASS)?.[1]).filter(Boolean))].sort()
+  }
+
+  // Its classes beside its /ebike-rules check, over why it's out of class there
   eVehicleClass () {
     const classes = this.#classTiles()
+    const reason = this.#outOfClassReason()
     return classes && html`<div class="tw:flex tw:flex-wrap tw:items-end tw:gap-x-3 tw:gap-y-1"><div>${classes}</div><a class="twlink tw:text-sm"
-      href=${`/ebike-rules?vehicle_models=${this.data.id}`}>View on e-bike rules</a></div>`
+      href=${`/ebike-rules?vehicle_models=${this.data.id}`}>View on e-bike rules</a></div>${reason
+      ? html`<p class="tw:mt-2 tw:text-sm tw:text-gray-700 tw:dark:text-gray-300">${reason}</p>`
+      : nothing}`
+  }
+
+  // As /ebike-rules' verdict has it, naming the state whose law bars a Class 3's throttle
+  #outOfClassReason () {
+    if (!this.outOfClass) return null
+    const jurisdiction = `US-${this.outOfClassId.split('/').at(-1).toUpperCase()}`
+    const { state } = Object.values(this.presenter.vocabulary.e_vehicle_classifications)
+      .find((record) => record.jurisdiction === jurisdiction && record.class_3_throttle === false)
+    const permitted = this.outOfClass === 'stock'
+      ? `It's a ${andSentence(this.#classNumbers().map((number) => `Class ${number}`))} e-bike, which`
+      : 'Its optional throttle'
+    return `${permitted} isn't permitted in ${state}: a Class 3 can't have a throttle there.`
   }
 
   // As EbikeRuleServices::BikebookVehicles has them: the US classes only a mode it isn't sold with brings, by that mode,
