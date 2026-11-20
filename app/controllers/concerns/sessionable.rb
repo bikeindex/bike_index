@@ -44,6 +44,7 @@ module Sessionable
   def sign_in_user(user)
     confirm_user_from_claim_token(user)
     carry_registration_show_legacy(user)
+    carry_color_scheme(user)
     session[:last_seen] = Time.current
     session[:render_donation_request] = user.render_donation_request if user&.render_donation_request
     set_passive_organization(OrganizationRole.default_organization(user)) # Set that organization!
@@ -74,6 +75,13 @@ module Sessionable
     session.delete(:registration_show_legacy) if user.update(feature_registration_show_legacy: true, skip_update: true)
   end
 
+  # A light or dark picked signed out is what the visitor is looking at, so it outranks
+  # the account's; System is the default, so it isn't a pick worth carrying
+  def carry_color_scheme(user)
+    color_scheme = cookies[:color_scheme].presence_in(%w[light dark])
+    user.update(color_scheme:, skip_update: true) if color_scheme && color_scheme != user.color_scheme
+  end
+
   # SSO orgs force SSO: hand an SSO-managed email off to the IdP rather than let it sign in or
   # sign up any other way. As a before_action the redirect halts the chain; called inline it
   # reports whether it redirected, since a token flow has no email until the token resolves one.
@@ -100,6 +108,27 @@ module Sessionable
   # session[:email] signing in, user[:email] signing up, a bare :email elsewhere.
   def submitted_email
     params.dig(:session, :email).presence || params.dig(:user, :email).presence || params[:email]
+  end
+
+  # For an emailed link that proves the address: its account, created if it doesn't have one yet.
+  # An SSO domain's address signs in at its identity provider instead, which comes back to return_to
+  def sign_in_confirmed_user(email, return_to:)
+    if redirect_forced_saml(email)
+      store_return_to(return_to)
+      return nil
+    end
+
+    user, signed_up = UserServices::PasswordlessCreator.find_or_create(email)
+    if user.blank? || user.banned?
+      flash[:error] = translation(:unable_to_sign_in, scope: [:controllers, :concerns, :sessionable, __method__])
+      return nil
+    end
+
+    # The link proved the address, so an account that had never confirmed it now has
+    user.confirm(user.confirmation_token) unless user.confirmed?
+    sign_in_user(user)
+    set_sign_in_flash(user, signed_up)
+    @current_user = user
   end
 
   # Passwordless users are nudged to set a password, unless their organization is what signs them in.

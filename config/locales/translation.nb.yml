@@ -2214,6 +2214,9 @@ nb:
           already_signed_in: Du er allerede logget på!
         turnstile_verified:
           verify_not_a_robot: Vennligst bekreft at du ikke er en robot
+        sign_in_confirmed_user:
+          unable_to_sign_in: Vi bekreftet e-postadressen din, men kunne ikke logge
+            deg på den kontoen
     feedbacks:
       block_the_spam:
         please_sign_in: Logg på for å sende den meldingen
@@ -2269,18 +2272,14 @@ nb:
         ensure_app_owner!:
           not_your_application: Det er ikke din søknad
     organizations:
-      create:
-        organization_created: Organisasjon opprettet vellykket!
-        must_create_an_account_first: Du må registrere deg for en konto på Bike Index
-          før du kan opprette en organisasjon.
       find_organization:
         not_found: Vi beklager, den organisasjonen er ikke på Bike Index ennå. Send
           e-post til contact@bikeindex.org hvis dette virker som en feil.
       lightspeed_interface:
-        must_create_an_account_first: Du må registrere deg for en konto på Bike Index
-          før du kan koble til Lightspeed
         must_create_an_organization_first: Du må opprette en organisasjon på Bike
           Index før du kan koble deg til Lightspeed
+        sign_in_or_add_organization: Logg inn for å koble organisasjonen din til Lightspeed
+          – eller legg den til her hvis den ikke er på Bike Index ennå.
       set_bparam:
         no_user: Vi beklager, den organisasjonen har ikke en bruker satt opp for å
           registrere sykler gjennom. Send e-post til contact@bikeindex.org hvis dette
@@ -2511,9 +2510,6 @@ nb:
           lenken på nytt for å godta sikkerhetsreglene.
       find_b_param:
         registration_not_found: Vi fant ikke den registreringen – start en ny nedenfor
-      sign_in_confirmed_user:
-        unable_to_sign_in: Vi bekreftet e-postadressen din, men kunne ikke logge deg
-          på den kontoen
       redirect_to_single_page:
         registered_for_owner: "%{bike_display} er registrert – vi har sendt en e-post
           til %{email} slik at de kan gjøre krav på den."
@@ -2531,6 +2527,32 @@ nb:
     memberships:
       create:
         already_a_member: Du har allerede et medlemskap.
+    organization_signup:
+      complete_signup:
+        name_taken_meanwhile: En annen organisasjon tok navnet %{name} mens du registrerte
+          deg. Velg et annet navn for å fullføre – alt annet lagres.
+        unable_to_complete: Vi kunne ikke fullføre oppsettet av organisasjonen din
+          (%{errors}). Kontakt support@bikeindex.org, så ordner vi det.
+      confirm_email:
+        link_invalid: Den lenken fungerer ikke lenger. Bruk den nyeste e-posten vi
+          sendte til %{email}, eller send en ny nedenfor.
+        link_invalid_resent: Den lenken fungerer ikke lenger, så vi har sendt en ny
+          til %{email}.
+        sign_out_to_confirm: Du er logget på som %{email}. Logg ut, og åpne deretter
+          lenken på nytt for å aktivere organisasjonen.
+      find_signup_for_confirmation:
+        signup_not_found: Vi fant ikke den registreringen – start en ny nedenfor
+      redirect_to_organization:
+        already_activated: "%{name} er allerede aktiv"
+      redirect_to_sign_in_for:
+        sign_in_to_manage: "%{name} er aktiv! Logg inn som %{email} for å administrere
+          den."
+      resend:
+        link_recently_sent: Vi sendte en lenke til %{email} i løpet av de siste minuttene
+          – det kan ta litt tid før den kommer frem, så sjekk også spam-mappen din.
+        link_resent: Vi har sendt en ny lenke til %{email}.
+        no_more_links: Vi har allerede sendt flere lenker til %{email}, så vi kan
+          ikke sende en til. Sjekk spam-mappen din, eller kontakt support@bikeindex.org.
   customer_mailer:
     additional_email_confirmation:
       html:
@@ -2839,6 +2861,7 @@ nb:
       write_do_not_register: Hvis en kunde ikke vil at en sykkel skal legges til Bike
         Index, legg til "IKKE REGISTRER" i notatene for salget og sykkelen vil ikke
         bli registrert.
+      add_your_shop: Legg til butikken din i Bike Index
     privacy:
       available_here: tilgjengelig her
       changes: Endringer
@@ -3700,38 +3723,6 @@ nb:
       why_work_with_bike_index: Hvorfor jobbe med sykkelindeks
       you_bring_the_ideas_make_the_connections_: Du kommer med ideene, skaper forbindelsene,
         og vi sørger for at du har ressursene til å få ting gjort.
-    ascend:
-      ascend_knowledge_base_article: Ascends Knowledge Base-artikkel
-      automatic_bicycle_registration: Automatisk sykkelregistrering for sykkelbutikker
-        som bruker Ascend POS
-      email_shops_security_html: Send e-post til %{shops_email_link} hvis du har spørsmål,
-        eller sjekk ut %{security_link}. Takk for at du registrerte sykler i Bike
-        Index!
-      email_us_the_password_to_finish_setting_u: Send oss passordet på e-post for
-        å fullføre konfigureringen!
-      follow_the_setup_instructions_html: Følg oppsettinstruksjonene på <strong>%{ascend_link}</strong>
-        på Bike Index
-      if_your_shop_uses_lightspeed_html: Hvis butikken din bruker Lightspeed, sjekk
-        ut vår Lightspeed POS-integrasjon <a target="none" href="%{lightspeed_path}">her</a>
-        .
-      link_your_ascend_retail_and_bike_index: Koble sammen Ascend Retail- og Bike
-        Index-kontoene dine gratis
-      new_bike_shop_org: ny sykkelbutikkorganisasjon
-      once_youve_set_up_the_trek_ascenwd: Når du har konfigurert Trek Ascend POS-sykkelregistreringen,
-        er du ferdig! Hver dag vil Bike Index hente nysolgt sykkelinformasjon fra
-        Ascend for å opprette Bike Index-kontoer for kundene dine. De nye syklene
-        deres venter på dem ved pålogging. De må bare sjekke e-posten deres, og den
-        nye sykkelen deres venter på dem.
-      security_link_text: Vanlige spørsmål om POS-integrering
-      sign_up_as_a_new_org_html: Registrer deg som en %{new_org_link} på Bike Index
-      then_if_a_customers_bike_goes_missing_html: 'Deretter, hvis en kundes sykkel
-        forsvinner, vil sykkelens informasjon og serienummer bli lagret slik at de
-        kan få tilgang til den. Men ikke bekymre deg: <a target="none" href="%{privacy_path}">vi
-        vil aldri gi ut noen av kundedataene dine</a> .'
-      we_have_a_new_free_bicycle_registration: Vi har gratis sykkelregistrering for
-        sykkelbutikker. Hvis du er en butikk som bruker Ascend som din POS, vil vår
-        nye Ascend-salgsintegrering tillate deg å registrere hver sykkel du selger
-        automatisk. Oppsettet tar omtrent 10 minutter.
     bike_shop_packages:
       bike_index_for_bike_shops: Sykkelindeks for sykkelbutikker
       choose_a_package_size: Velg en pakkestørrelse
@@ -3951,6 +3942,12 @@ nb:
     registration_form_settings: Innstillinger for registreringsskjema
     marketplace_how_it_works: Slik fungerer Bike Index Marketplace
     register_landing: Registrer sykkelen din gratis
+    organization_signup_confirm: Aktiver organisasjonen din
+    organization_signup_create: Legg til organisasjonen din i Bike Index
+    organization_signup_new: Legg til organisasjonen din i Bike Index
+    organization_signup_show: Legg til organisasjonen din i Bike Index
+    organization_signup_update: Legg til organisasjonen din i Bike Index
+    organization_signup_welcome: "%{organization} er aktiv"
   money:
     currencies:
       en: USD
@@ -4102,9 +4099,6 @@ nb:
         marketplace_messages: Markedsplassmeldinger
     color_scheme:
       appearance: Utseende
-      dark: Mørk
-      light: Lys
-      system: System
   news:
     index:
       bike_index_blog: Sykkelindeksblogg
@@ -4142,29 +4136,6 @@ nb:
       handlebar_type: Styre type
       optional: valgfri
       phone_number_owner: Eierens telefon
-    new:
-      bike_index_for_organizations: Sykkelindeks for organisasjoner
-    new_form:
-      add_organization: legge til organisasjon
-      add_your_organization_to_bike_index: 'Legg organisasjonen din til Bike Index,
-        gratis, i tre enkle trinn:'
-      bike_index_account: Bike Index konto
-      confirm_your_email: Bekreft e-posten din
-      fill_out_the_form_that_will_appear: Fyll ut skjemaet som vises på denne siden
-        når du er logget på.
-      filling_out_this_form_will_create_a_new_org: Ved å fylle ut dette skjemaet opprettes
-        en ny, annerledes organisasjon
-      if_you_dont_want_that_to_be_the_case_html: Hvis du ikke vil at det skal være
-        tilfelle, %{logout_link} og registrer deg med e-postadressen du vil bruke
-        i stedet.
-      log_out: Logg ut
-      new_organization: Ny organisasjon
-      organization_kind: Organisasjonsslag
-      organization_name: Organisasjonsnavn
-      sign_up_for_a_new_account_html: Registrer deg for en %{new_account_link}
-      you_are_already_a_member_of_org_html: Du er allerede medlem av %{org_link}.
-      your_current_account_will_be_a_member_html: Din nåværende konto ( <strong>%{user_email}</strong>
-        ) vil være medlem av organisasjonen du oppretter.
     embed_fields:
       add_a_color: Legg til en farge
       additional_serial: Ekstra serie-/klistremerkenummer
@@ -4649,6 +4620,8 @@ nb:
       subject: Fullfør rapporteringen av stjålet %{cycle_type}
     organization_message:
       subject: Melding fra %{organization_name} om din %{bike_type}
+    organization_signup_confirmation:
+      subject: Bekreft e-postadressen din for å aktivere %{name} på Bike Index
   payments:
     form:
       donation_header: Bidra til å støtte vår innsats!
@@ -4988,6 +4961,18 @@ nb:
       add_a_registration: Legg til en registrering
       registration_form_settings: Innstillinger for registreringsskjema
       education_courses: Utdanningskurs
+    organization_signup:
+      address_required: Vennligst skriv inn organisasjonens fullstendige adresse
+      email_required: En gyldig e-postadresse er nødvendig
+      kind_required: Vennligst velg hva slags organisasjon dette er
+      name_required: Organisasjonsnavn er obligatorisk
+      name_reserved: Det navnet er reservert på Bike Index – velg et annet
+      name_taken: Det finnes allerede en organisasjon som heter %{name} på Bike Index.
+        Velg et annet navn, eller kontakt support@bikeindex.org hvis det er din.
+      name_taken_shortened: Det er for nært %{name}, som allerede er på Bike Index
+        – navnene må være forskjellige innenfor de første 30 tegnene. Velg et annet
+        navn, eller kontakt support@bikeindex.org hvis det er ditt.
+      name_too_short: Organisasjonsnavnet må inneholde minst to bokstaver eller tall
   theft_alert_plans:
     theft_alert_plan:
       days: Dager
@@ -5256,6 +5241,14 @@ nb:
           deg en melding om din %{bike_type}:"
         sender_sent_you_a_message_html: "%{sender_email} fra %{organization_name}
           sendte deg en melding om din %{link}:"
+      organization_signup_confirmation:
+        activate_your_organization: Aktiver organisasjonen din
+        confirm_and_activate: Bekreft e-postadressen min og aktiver
+        confirm_to_activate_html: Bekreft denne e-postadressen for å aktivere <strong>%{name}</strong>
+          på Bike Index. Du blir administrator, og du kan invitere resten av teamet
+          ditt når du er inne.
+        link_signs_you_in: Denne lenken logger deg på Bike Index, så ikke videresend
+          den. Den fungerer i %{days} dager.
     ui:
       definition_list:
         row:
@@ -8029,6 +8022,91 @@ nb:
           wholesale: Engroshandel
           your_pos: Ditt salgssted
           youre_in: Du er med.
+        ascend:
+          a_dashboard_for_your_shop: Et dashbord for butikken din
+          a_dashboard_for_your_shop_body: Søk etter syklene du har solgt når du trenger
+            det. Hvis en kundes sykkel forsvinner, lagres detaljene og serienummeret
+            og er klare for politianmeldelse eller tyverimelding.
+          a_free_benefit_for_every_customer: En gratis fordel for hver kunde, for
+            dagen du håper aldri kommer.
+          a_full_suite_of_recovery_tools: En komplett pakke med gjenopprettingsverktøy
+          a_full_suite_of_recovery_tools_body: Bike Index er den eneste organisasjonen
+            som tilbyr et komplett utvalg av verktøy for gjenoppretting av stjålne
+            sykler til forbrukere.
+          a_network_on_their_side: Et nettverk på deres side
+          a_network_on_their_side_body: Vårt store nettverk av ideelle bidragsytere
+            støtter og hjelper med berging av sykkel.
+          about_10_minutes: Omtrent 10 minutter
+          ascend_pos_integration: Ascend POS-integrasjon
+          bikes_waiting_for_customers: Sykler venter på kunder
+          bikes_waiting_for_customers_body: Vi oppretter en Bike Index-konto for hver
+            kunde. De sjekker e-posten sin, logger inn, og den nye sykkelen deres
+            er allerede der. Foretrekker du ikke å motta e-post? Vi kan slå av kundevarsler
+            helt.
+          caped_hero_bike_alt: Kappeheltesykkel
+          create_shop_account: Opprett butikkkonto
+          create_your_shop_account: Opprett din butikkkonto på Bike Index
+          create_your_shop_account_body: Registrer deg som en ny sykkelbutikkorganisasjon.
+            Hvis butikken din allerede har en, logg inn og hopp videre.
+          customers_stay_in_control: Kundene beholder kontrollen
+          customers_stay_in_control_body: Eiere kan oppdatere, overføre eller slette
+            registreringen sin når som helst.
+          email_notifications_off_body: Vi kan slå av e-postvarsler helt. Sykkelen
+            forblir registrert under butikkens e-postadresse i stedet, så hvis politiet
+            finner den igjen, vil de kontakte butikken din, og du vil kontakte kunden.
+            Vi samarbeider gjerne med deg om personverninnstillinger som passer din
+            butikk.
+          email_subject: Ascend-oppsett
+          email_us: Send oss en e-post
+          lightspeed_body_html: Vi har også en %{lightspeed_link}.
+          lightspeed_pos_integration: Lightspeed POS-integrasjon
+          link_your_accounts_once: Koble sammen Ascend Retail- og Bike Index-kontoene
+            dine én gang. Gratis, og oppsettet tar omtrent 10 minutter.
+          never_sold_or_shared: Aldri solgt eller delt
+          never_sold_or_shared_body: Kundenavn og e-postadresser selges, leies ikke
+            ut eller gis videre til tredjeparter.
+          new_bike_sales_get_a_bike_index_account: Nye sykkelsalg får automatisk fordelen
+            av en Bike Index-konto
+          no_marketing_lists: Ingen markedsføringslister
+          no_marketing_lists_body: Vi legger ikke til kundene dine i nyhetsbrev eller
+            sender dem kampanjer.
+          nothing_to_do_at_checkout: Ingenting å gjøre i kassen
+          nothing_to_do_at_checkout_body: Hver dag henter Bike Index nysolgte sykler
+            fra Ascend. De ansatte fortsetter å øke salget slik de allerede gjør.
+          one_email_to_claim_their_bike: Én e-post for å hente sykkelen sin
+          one_email_to_claim_their_bike_body: Kunder får én e-post som informerer
+            dem om at sykkelen de kjøpte fra butikken din er registrert og venter.
+          open_ascend_guide: Åpne Ascend-guiden
+          peace_of_mind: Sinnefred
+          peace_of_mind_body: Sykkeldetaljene deres er allerede lagret, så de trenger
+            aldri å lete etter serienummeret.
+          pos_integration_faq: Vanlige spørsmål om POS-integrering
+          pos_integration_security_faq: Vanlige spørsmål om sikkerhet for POS-integrasjon
+          privacy_intro: Bike Index er en ideell organisasjon. Kundeinformasjon brukes
+            til å registrere sykler og hjelpe dem med å få dem tilbake, og ingenting
+            annet.
+          privacy_policy: Personvernerklæring
+          questions: Spørsmål?
+          questions_body_html: Send en e-post til %{email_link} eller les %{faq_link}.
+          rather_they_didnt_get_an_email: De fikk heller ikke en e-post?
+          register_every_bike_you_sell: Registrer alle sykler du selger, automatisk.
+          send_us_the_password: Send oss passordet
+          send_us_the_password_body: Send den på e-post til %{shops_email}, så fullfører
+            vi tilkoblingen av kontoene dine. Etter det er du ferdig.
+          set_up_in_three_steps: Sett opp i tre trinn
+          start_setup: Start oppsettet
+          turn_on_bike_index_in_ascend: Slå på sykkelindeks i Ascend
+          turn_on_bike_index_in_ascend_body: Følg konfigurasjonsinstruksjonene i Ascends
+            kunnskapsbaseartikkel. Det er her du oppretter passordet for tilkoblingen.
+          using_lightspeed_instead: Bruker du Lightspeed i stedet?
+          we_hope_their_bike_is_never_stolen: Vi håper sykkelen deres aldri blir stjålet.
+            Hvis den blir det, er de forsikret.
+          we_will_never_give_out_customer_data: Vi vil aldri gi ut noen av dine kundedata.
+          what_your_customers_get: Hva kundene dine får
+          your_customers_privacy: Kundenes personvern
+          your_shop_is_on_bike_index: Butikken din er på Bike Index
+          your_shop_is_on_bike_index_body: Du er logget på organisasjonskontoen til
+            butikken din, så dette trinnet er fullført.
       marketplace:
         how_it_works:
           across_town_heading: På tvers av byen eller på tvers av landet
@@ -8141,6 +8219,91 @@ nb:
         stories:
           load_more_stories: Last inn flere historier
           newer_stories: Nyere historier
+      org_signup:
+        views:
+          confirm:
+            activate: Aktiver
+            activate_org: Aktiver %{name}
+            confirm_email_to_activate_html: Bekreft at %{email} er e-postadressen
+              din, så konfigurerer vi organisasjonen med deg som administrator.
+            sign_out_and_activate: Logg ut og aktiver
+            signed_in_as_other: Du er logget på som %{signed_in_as}, men denne lenken
+              er for %{email}. Aktivering logger deg av og inn på %{email}, organisasjonens
+              administrator.
+          step1:
+            activation_link: Vi sender deg en e-post med en lenke for å aktivere organisasjonen
+              – du trenger ikke å vente, fortsett.
+            add_your_organization: Legg til organisasjonen din
+            already_on_bike_index_html: Er organisasjonen din allerede på Bike Index?
+              %{sign_in_link} for å administrere den.
+            already_part_of_html: Du er allerede en del av %{name} – dette oppretter
+              en egen organisasjon.
+            email: Din e-post
+            email_placeholder: du@eksempel.com
+            free_to_start: Gratis å starte, og det tar et par minutter.
+            kind_bike_advocacy: Interessentgruppe
+            kind_bike_manufacturer: Produsent
+            kind_bike_shop: Sykkelbutikk
+            kind_law_enforcement: Rettshåndhevelse
+            kind_municipality: By eller kommune
+            kind_other: Annen
+            kind_property_management: Eiendomsforvaltning
+            kind_school: Skole eller universitet
+            kind_software: Programvare
+            next: Neste
+            organization_kind: Hva slags organisasjon?
+            organization_name: Organisasjonsnavn
+            sign_in: Logg inn
+            signed_in_as_html: Du er logget på som %{email}, som vil være organisasjonens
+              administrator.
+            start_a_different_one: Start heller en annen organisasjon
+            your_info: Din informasjon
+            your_organization: Din organisasjon
+          step2:
+            activation_link_sent: Vi har sendt en e-post til %{email} med en lenke
+              for å aktivere organisasjonen – fullfør her først.
+            contact: Kontakt
+            email_confirmed: E-postadressen din er bekreftet. Legg til hvor %{name}
+              er, så blir den aktiv så snart du er ferdig.
+            finish: Fullfør
+            location: plassering
+            phone: Telefon
+            publicly_visible: Vis denne plasseringen på Bike Index-kartet
+            shown_to_people: Slik at folk som registrerer seg hos deg kan finne deg.
+            website: Nettsted
+            website_placeholder: eksempel.com
+            where_is_org: Hvor er %{name}?
+          step_finished:
+            activate_html: Vi sendte en lenke til %{email} – klikk på den for å aktivere
+              %{name}.
+            activating_lets_you: 'Når den er aktiv, kan du:'
+            change_it: Endre det
+            check_your_email: Sjekk e-posten din
+            invite_your_team: Inviter resten av teamet ditt
+            no_email_yet: Ingen e-post? Det kan ta noen minutter – sjekk spam-mappen
+              din, eller be oss sende den på nytt.
+            register_for_community: Registrer kjøretøy for lokalsamfunnet ditt
+            register_for_residents: Registrer kjøretøy for beboerne dine
+            register_for_students: Registrer kjøretøy for dine elever og ansatte
+            register_for_tenants: Registrer kjøretøy for leietakerne dine
+            register_for_your_customers: Registrer kjøretøy for kundene dine
+            send_it_again: Send det på nytt
+            share_your_link: Del registreringslenken og QR-koden din
+            wrong_address: Feil adresse?
+          welcome:
+            add_a_registration: Legg til en registrering
+            continue_where_you_were: Fortsett der du var
+            copy_registration_link: Kopier registreringslenken
+            get_started: Slik kommer du i gang.
+            invite_your_team: Inviter teamet ditt
+            is_active: "%{name} er aktiv!"
+            no_password_yet: Du logger deg inn med e-postlenker foreløpig.
+            organization_settings: Organisasjonsinnstillinger
+            registration_link_explained: Alle som registrerer seg via denne lenken
+              er registrert i organisasjonen din.
+            set_a_password: Angi et passord
+            show_qr_code: Vis QR-kode
+            your_registration_link: Din registreringslenke
     shared_blocks:
       footer:
         about: Om
@@ -8342,6 +8505,11 @@ nb:
           stat_partners: partnerbutikker, politiavdelinger og byer
           stat_recoveries: stjålne sykler funnet
           stat_value: verdi tilbakeført til eierne
+      color_scheme_picker:
+        appearance: Utseende
+        dark: Mørk
+        light: Lys
+        system: System
   user_emails:
     confirm:
       confirm_email: Bekreft e-post
