@@ -23,7 +23,7 @@ class PrimaryActivity < ApplicationRecord
   SPECIAL_SHORT_NAMES = {
     "road" => "road-biking",
     "track" => "track-racing",
-    "endurance" => "endurance--sportive"
+    "endurance" => "endurance-sportive"
   }.freeze
 
   belongs_to :primary_activity_family, class_name: "PrimaryActivity"

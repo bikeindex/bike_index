@@ -711,6 +711,15 @@ RSpec.describe Organization, type: :model do
       end
     end
 
+    context "no letters" do
+      let(:name) { "$.0. $" }
+      it "replaces the name" do
+        organization.set_calculated_attributes
+        expect(organization.name).to eq "Stop messing about"
+        expect(organization.slug).to eq "stop-messing-about"
+      end
+    end
+
     context "&" do
       let(:name) { "Bikes & Trikes" }
       it "permits & in names" do
@@ -749,7 +758,7 @@ RSpec.describe Organization, type: :model do
       it "truncates without ellipse" do
         organization.set_calculated_attributes
         expect(organization.short_name).to eq "Banff RCMP - Royal Canadian"
-        expect(organization.slug).to eq "banff-rcmp---royal-canadian"
+        expect(organization.slug).to eq "banff-rcmp-royal-canadian"
         expect(organization.name).to eq name
       end
       context "with parens" do

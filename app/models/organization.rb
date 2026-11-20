@@ -606,7 +606,7 @@ class Organization < ApplicationRecord
     return true unless name.present?
 
     self.name = self.class.sanitize_name(name)
-    self.name = "Stop messing about" unless name[/\d|\w/].present?
+    self.name = "Stop messing about" if Slugifyer.slugify(name).length < 2
     self.website = Urlifyer.urlify(website) if website.present?
     self.short_name = name_shortener(short_name.presence || name)
     self.ascend_name = nil if ascend_name.blank?

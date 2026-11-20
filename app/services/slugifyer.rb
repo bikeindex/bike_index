@@ -4,8 +4,9 @@ module Slugifyer
   def slugify(string)
     transliterate(remove_parens(string))
       .gsub("%20", " ").gsub(/\s/, "-")
-      .gsub("-&-", "-amp-") # Replace singular & with amp - since we permit & in names
-      .gsub(/([^A-Za-z0-9_-]+)/, "") # Remove any weird characters
+      .gsub(/&(amp;)?/, "-amp-")
+      .gsub(/[^A-Za-z0-9_-]+/, "")
+      .squeeze("-").delete_prefix("-").delete_suffix("-")
   end
 
   # The pre-slugify manufacturer slug, minus "Accell", which is appended to many of its brands' names

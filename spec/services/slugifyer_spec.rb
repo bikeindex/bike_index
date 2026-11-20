@@ -5,6 +5,14 @@ RSpec.describe Slugifyer do
     it "handles &" do
       expect(Slugifyer.slugify("Bikes &amp; Trikes")).to eq "bikes-amp-trikes"
       expect(Slugifyer.slugify("Bikes & Trikes")).to eq "bikes-amp-trikes"
+      expect(Slugifyer.slugify("B&B")).to eq "b-amp-b"
+      expect(Slugifyer.slugify("Bert's Bikes& Fitness")).to eq "berts-bikes-amp-fitness"
+    end
+    it "squeezes and trims dashes" do
+      expect(Slugifyer.slugify("Foo - Bar")).to eq "foo-bar"
+      expect(Slugifyer.slugify("Trail / All-Mountain")).to eq "trail-all-mountain"
+      expect(Slugifyer.slugify("(Old) Bicycle Security ...")).to eq "bicycle-security"
+      expect(Slugifyer.slugify("foo---bar")).to eq "foo-bar"
     end
     it "handles é" do
       expect(Slugifyer.slugify("paké rum runner")).to eq("pake-rum-runner")
