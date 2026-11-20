@@ -238,11 +238,7 @@ module ControllerHelpers
     fail ActiveRecord::RecordNotFound
   end
 
-  # Only a path of our own, so a link can't send someone off-site. Browsers read a
-  # backslash as a slash and drop tabs and newlines, so "/\evil.com" is "//evil.com" too
-  def local_return_to
-    params[:return_to] if params[:return_to].to_s.match?(%r{\A/(?!/)[^\\[:space:][:cntrl:]]*\z})
-  end
+  def local_return_to = LocalPath.only(params[:return_to])
 
   # Generally this is implicitly set - however! it can also be explicitly set
   def store_return_to(target = nil)
@@ -275,26 +271,24 @@ module ControllerHelpers
         translation(:reset_your_password,
           scope: [:controllers, :concerns, :controller_helpers, __method__])
       render(action: :update_password) && (return true)
-    when /\A#{ENV["BASE_URL"]}/, %r{\A/} # Either starting with our URL or /
-      redirect_to(target) && (return true) if URI.parse(target).relative? || target.include?("/oauth/")
+    when /\A#{ENV["BASE_URL"]}/
+      redirect_to(target) && (return true) if target.include?("/oauth/")
+    when %r{\A/}
+      redirect_to(target) && (return true) if LocalPath.only(target)
     when "https://facebook.com/bikeindex"
       redirect_to(target, allow_other_host: true) && (return true)
     end
   end
 
   # handle_target refuses an off-site target on arrival, too late to keep a caller-chosen
-  # URL out of mail we send. "//host" is off-site despite the leading slash.
-  def emailable_return_to
-    target = session[:return_to]
-    target if target&.start_with?("/") && !target.start_with?("//")
-  end
+  # URL out of mail we send
+  def emailable_return_to = LocalPath.only(session[:return_to])
 
   def permitted_return_to
     target = (session[:return_to] || cookies[:return_to] || params[:return_to])&.downcase
     return nil if invalid_return_to?(target)
 
-    # Either starting with our URL or /
-    target if target.start_with?(/#{ENV["BASE_URL"]}/, "/")
+    target.start_with?(/#{ENV["BASE_URL"]}/) ? target : LocalPath.only(target)
   end
 
   # Wrap `I18n.translate` for use in controllers, abstracting away

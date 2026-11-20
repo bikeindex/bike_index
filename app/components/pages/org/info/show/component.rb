@@ -28,6 +28,9 @@ module Pages
 
           def registration_url = register_organization_url(@organization)
 
+          # is_invoiced? rather than paid_money?, which a $0 invoice - the usual endless one - leaves false
+          def invoiced? = @organization.is_invoiced?
+
           def next_invoice_due_at = @organization.current_invoices.not_endless.minimum(:subscription_end_at)
 
           def endless_invoice? = @organization.current_invoices.endless.any?

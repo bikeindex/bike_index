@@ -31,6 +31,14 @@ RSpec.describe Organization, type: :model do
       expect(register_pages).to include("landing")
       expect(register_pages.map { Organization.name_problem(it) }.uniq).to eq [:reserved]
     end
+
+    # A landing page puts its organization's slug at the top level, beside every other route there
+    it "reserves the top level of routes, other than the landing pages' own" do
+      top_level = Rails.application.routes.routes.filter_map { it.path.spec.to_s[%r{\A/([[:alnum:]][\w-]*)}, 1] }.uniq -
+        LandingPageOrganizations::SLUGS
+      expect(top_level).to include("search", "marketplace", "e-bike-rules")
+      expect(top_level.reject { Organization.name_problem(it).in?(%i[reserved too_short]) }).to eq []
+    end
   end
 
   describe "factory" do

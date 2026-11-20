@@ -37,10 +37,11 @@ RSpec.describe Pages::Org::Info::Show::Component, type: :component do
     let(:invoice) { FactoryBot.create(:invoice_paid, organization:) }
     before { organization.update(updated_at: Time.current) if invoice }
 
-    it "says when the next one is due" do
+    it "says when the next one is due, in place of the next steps" do
       expect(component).to have_text "Your organization has paid functionality."
       expect(component).to have_text "Next invoice due"
       expect(component).to have_css ".localizeTime.withPreposition"
+      expect(component).to_not have_text "Organization set up next steps"
     end
 
     context "endless" do

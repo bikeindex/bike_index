@@ -11,8 +11,20 @@
     </div>
 
     <div>
-      <%= render UI::Header::Component.new(text: translation(".org_is_active", name: @organization.name), html_class: "uncap",
-          subtitle: (translation(".organization_set_up_next_steps") if @few_registrations || @few_members)) %>
+      <%= render UI::Header::Component.new(text: translation(".org_is_active", name: @organization.name), html_class: "uncap#{" tw:mb-1!" if invoiced?}",
+          subtitle: (translation(".organization_set_up_next_steps") if !invoiced? && (@few_registrations || @few_members))) %>
+
+      <% if invoiced? %>
+        <p class="tw:mb-6 tw:text-gray-700 tw:dark:text-gray-300">
+          <%= translation(".has_paid_functionality") %>
+
+          <% if (due_at = next_invoice_due_at) %>
+            <%= translation(".next_invoice_due_html", time: render(UI::Time::Component.new(time: due_at, preposition: true))) %>
+          <% elsif endless_invoice? %>
+            <%= translation(".no_invoices_upcoming") %>
+          <% end %>
+        </p>
+      <% end %>
     </div>
   </div>
 
@@ -48,19 +60,6 @@
     <p class="tw:mt-4 tw:mb-0 tw:text-sm tw:text-gray-500 tw:dark:text-gray-400">
       <%= translation(".get_qr_code_html",
             qr_code_link: link_to(translation(".qr_code"), register_organization_path(@organization, format: :png), class: "twlink")) %>
-    </p>
-  <% end %>
-
-  <%# is_invoiced? rather than paid_money?, which a $0 invoice - the usual endless one - leaves false %>
-  <% if @organization.is_invoiced? %>
-    <p class="tw:mt-6 tw:mb-0 tw:text-gray-500 tw:dark:text-gray-400">
-      <%= translation(".has_paid_functionality") %>
-
-      <% if (due_at = next_invoice_due_at) %>
-        <%= translation(".next_invoice_due_html", time: render(UI::Time::Component.new(time: due_at, preposition: true))) %>
-      <% elsif endless_invoice? %>
-        <%= translation(".no_invoices_upcoming") %>
-      <% end %>
     </p>
   <% end %>
 
