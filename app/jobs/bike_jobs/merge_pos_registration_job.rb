@@ -45,8 +45,7 @@ module BikeJobs
 
       merged = ActiveRecord::Base.transaction do
         # Ownerships before bikes, the order saving an ownership takes them in, since it touches its bike. With the
-        # POS bike locked, as the finder locks it, a new registration of it either is seen here or sees this merge.
-        # With theirs locked, it can't be transferred mid-merge
+        # POS bike locked, as the finder locks it, a new registration of it either is seen here or sees this merge
         bike_ids = [match.bike_id, match.pos_bike_id]
         Ownership.current.where(bike_id: bike_ids).order(:id).lock.pluck(:id)
         Bike.unscoped.where(id: bike_ids).order(:id).lock.pluck(:id)
@@ -111,6 +110,7 @@ module BikeJobs
     # Graduated (deleted) memberships come too, since a graduated notification's renewal link restores its membership
     def merge_bike_organizations(bike, pos_bike)
       bike_organizations = BikeOrganization.unscoped.where(bike_id: [bike.id, pos_bike.id]).to_a
+      merged_organization_ids = bike_organizations.filter_map { it.organization_id if it.bike_id == bike.id }
       # A current membership over a graduated one
       pos_bike_organizations = bike_organizations.select { it.bike_id == pos_bike.id }.sort_by { it.deleted? ? 0 : 1 }
         .index_by(&:organization_id)
@@ -124,8 +124,10 @@ module BikeJobs
             .update_all(bike_organization_id: pos_bike_organization.id)
         end
       end
-      # The most restrictive edit permission any membership of either bike had, current or graduated
-      restricted_organization_ids = bike_organizations.select(&:can_not_edit_claimed).map(&:organization_id)
+      # For organizations the owner's registration was in, the most restrictive edit permission any membership of
+      # either bike had, current or graduated. Other organizations' memberships are the POS registration's own
+      restricted_organization_ids = bike_organizations.select(&:can_not_edit_claimed).map(&:organization_id) &
+        merged_organization_ids
       BikeOrganization.unscoped.where(bike_id: pos_bike.id, organization_id: restricted_organization_ids, can_not_edit_claimed: false)
         .update_all(can_not_edit_claimed: true, updated_at: Time.current)
     end

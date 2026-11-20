@@ -161,6 +161,20 @@ RSpec.describe BikeJobs::MergePosRegistrationJob, type: :job do
         end
       end
 
+      # Written because a graduated restriction of the POS registration's own restricted its current membership
+      context "when only the POS registration was in the organization" do
+        let(:pos_bike_organization) { FactoryBot.create(:bike_organization, bike: pos_bike, organization:) }
+        before { FactoryBot.create(:bike_organization, bike: pos_bike, organization:, can_not_edit_claimed: true).destroy! }
+
+        it "leaves its memberships as they were" do
+          # Re-added after the restricted one graduated
+          expect(pos_bike_organization.can_not_edit_claimed).to be_falsey
+          instance.perform(match.id)
+          expect(match.reload.status).to eq "merged"
+          expect(pos_bike_organization.reload.can_not_edit_claimed).to be_falsey
+        end
+      end
+
       context "when the owner's restricted membership graduated and they rejoined" do
         let(:bike_organization) { FactoryBot.create(:bike_organization, bike:, organization:) }
         before do
