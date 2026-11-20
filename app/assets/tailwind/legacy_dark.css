@@ -41,6 +41,17 @@
     @apply tw:dark:text-gray-100;
   }
 
+  .page-content blockquote {
+    @apply tw:dark:bg-gray-800 tw:dark:border-gray-600;
+
+    /* The closing quote is hidden by matching the background */
+    @variant dark {
+      &::after {
+        color: var(--tw-color-gray-800);
+      }
+    }
+  }
+
   .primary-edit-form-well-menu {
     @apply tw:max-md:dark:bg-gray-800;
   }
