@@ -3,9 +3,7 @@
 
   <%= render UI::Header::Component.new(text: translation(".add_your_organization"), subtitle: translation(".free_to_start_few_minutes")) %>
 
-  <% if @organization_signup.errors.any? %>
-    <%= render UI::Alerts::Base::Component.new(kind: :error, text: @organization_signup.errors.full_messages.to_sentence) %>
-  <% end %>
+  <%= render UI::Alerts::ObjectError::Component.new(object: @organization_signup, name: translation(".signup_name")) %>
 
   <%= form_with(model: @organization_signup, url: organization_signup_path, method: :post, scope: :organization_signup, data: form_data) do |f| %>
     <%= render UI::Forms::Honeypot::Component.new %>
