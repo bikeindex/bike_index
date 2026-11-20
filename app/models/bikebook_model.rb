@@ -25,6 +25,8 @@
 #  index_bikebook_models_on_manufacturer_slug_and_model_slug  (manufacturer_slug,model_slug)
 #
 class BikebookModel < ApplicationRecord
+  # The catalog's manufacturer slugs are Bike Book's, which Slugifyer.legacy_manufacturer reproduces from a name
+  scope :for_manufacturer, ->(name) { where(manufacturer_slug: Slugifyer.legacy_manufacturer(name)) }
   scope :sold_in_year, ->(year) { where(first_year: ..year, final_year: [nil, year..]) }
 
   class << self
@@ -32,14 +34,13 @@ class BikebookModel < ApplicationRecord
     # several, the one sold in `market`, a country's ISO code, then the latest
     def catalog_id_for(manufacturer:, name:, year:, market: nil)
       market = "EU" if EbikeRuleServices::Places::EU_MEMBERS.include?(market)
-      models = where(manufacturer_slug: Slugifyer.manufacturer(manufacturer), model_slug: Slugifyer.book_slug(name))
-        .sold_in_year(year).order(first_year: :desc, catalog_id: :asc).to_a
+      models = for_manufacturer(manufacturer).where(model_slug: Slugifyer.book_slug(name)).sold_in_year(year).order(first_year: :desc, catalog_id: :asc).to_a
       (models.find { it.sold_in?(market) } || models.first)&.catalog_id_in(market)
     end
 
-    # A page of the manufacturer's model names with every word of `query` in them, each name once
-    def names_matching(manufacturer_slug, query, page:, per_page:)
-      query.to_s.split.reduce(where(manufacturer_slug:)) { |models, word| models.where("name ILIKE ?", "%#{sanitize_sql_like(word)}%") }
+    # A page of the model names with every word of `query` in them, each name once
+    def names_matching(query, page:, per_page:)
+      query.to_s.split.reduce(all) { |models, word| models.where("name ILIKE ?", "%#{sanitize_sql_like(word)}%") }
         .distinct.order(:name).offset((page - 1) * per_page).limit(per_page).pluck(:name)
     end
   end

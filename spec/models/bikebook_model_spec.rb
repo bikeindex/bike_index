@@ -23,7 +23,7 @@ RSpec.describe BikebookModel, type: :model do
   end
 
   describe "names_matching" do
-    def names(query, page: 1, per_page: 15) = described_class.names_matching("specialized", query, page:, per_page:)
+    def names(query, page: 1, per_page: 15) = described_class.for_manufacturer("Specialized").names_matching(query, page:, per_page:)
 
     it "is the manufacturer's names with every word in them, a page at a time" do
       expect(names("ro")).to eq ["Roll 1", "Roll 2", "Roll 3", "Roll Trike"]
