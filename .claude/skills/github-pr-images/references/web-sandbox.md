@@ -27,6 +27,10 @@ comment — so find out first, before any capture or hosting commit.
    <img alt="probe" src="https://raw.githubusercontent.com/bikeindex/bike_index/main/app/assets/images/logos/bikebook.png" width="40" />
    ```
 
+   Then `update_issue_comment` it with the same body — the real post is an update, and
+   a session can pass `add_issue_comment` untouched yet rewrite every URL on the update
+   (#4840: the probe's create read back clean, but updating in the real body came back wrapped in backticks).
+
 2. Read it back with `get_comments`. It posted if the body still holds a literal
    `<img ` and no backtick sits beside the URL. It was rewritten if it holds `&lt;img`
    or a backtick before `https://`.
