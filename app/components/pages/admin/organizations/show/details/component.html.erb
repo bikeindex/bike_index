@@ -50,7 +50,7 @@
     <% end %>
   <% end %>
 
-  <% list.with_row(label: "ID", value: @organization.id, class: "tw:text-sm only-dev-visible", if: @display_dev_info) %>
+  <% list.with_row(label: "ID", value: render(UI::Code::Inline::Component.new(text: @organization.id)), class: "tw:text-sm only-dev-visible", if: @display_dev_info) %>
 
   <% list.with_row(label: "Slug") do %>
     <%= @organization.slug %> |
