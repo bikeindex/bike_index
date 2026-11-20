@@ -8,6 +8,11 @@ RSpec.describe Slugifyer do
       expect(Slugifyer.slugify("B&B")).to eq "b-and-b"
       expect(Slugifyer.slugify("Bert's Bikes& Fitness")).to eq "berts-bikes-and-fitness"
     end
+    it "handles + and HTML entities" do
+      expect(Slugifyer.slugify("L100+ Lowstep")).to eq "l100-plus-lowstep"
+      expect(Slugifyer.slugify("Heron Flats + Lofts")).to eq "heron-flats-plus-lofts"
+      expect(Slugifyer.slugify("O&#39;Neil &quot;Bikes&quot;")).to eq "oneil-bikes"
+    end
     it "squeezes and trims dashes" do
       expect(Slugifyer.slugify("Foo - Bar")).to eq "foo-bar"
       expect(Slugifyer.slugify("Trail / All-Mountain")).to eq "trail-all-mountain"
@@ -24,10 +29,10 @@ RSpec.describe Slugifyer do
     end
   end
 
-  describe "lookup_slugs" do
-    it "includes the -and- version of an -amp- slug" do
-      expect(Slugifyer.lookup_slugs("Bikes & Trikes")).to eq ["bikes-and-trikes"]
-      expect(Slugifyer.lookup_slugs("bikes-amp-trikes")).to eq ["bikes-amp-trikes", "bikes-and-trikes"]
+  describe "amp_as_and" do
+    it "converts an -amp- slug" do
+      expect(Slugifyer.amp_as_and("bikes-and-trikes")).to be_nil
+      expect(Slugifyer.amp_as_and("bikes-amp-trikes")).to eq "bikes-and-trikes"
     end
   end
 

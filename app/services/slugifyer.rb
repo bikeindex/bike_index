@@ -2,15 +2,15 @@ module Slugifyer
   extend Functionable
 
   def slugify(string)
-    transliterate(remove_parens(string))
+    transliterate(remove_parens(CGI.unescapeHTML(string.to_s)))
       .gsub("%20", " ").gsub(/\s/, "-")
-      .gsub(/&(amp;)?/, "-and-")
+      .gsub("&", "-and-").gsub("+", "-plus-")
       .gsub(/[^A-Za-z0-9_-]+/, "")
       .squeeze("-").delete_prefix("-").delete_suffix("-")
   end
 
-  # For lookups: & slugified to -amp- before it was -and-
-  def lookup_slugs(string) = slugify(string).then { [it, it.gsub("-amp-", "-and-")].uniq }
+  # & slugified to -amp- before it was -and-; nil unless the slug has one
+  def amp_as_and(slug) = slug.gsub("-amp-", "-and-").then { it unless it == slug }
 
   # The pre-slugify manufacturer slug, minus "Accell", which is appended to many of its brands' names
   def legacy_manufacturer(string)

@@ -258,9 +258,10 @@ class Organization < ApplicationRecord
       return nil if n.blank?
       return find_by_id(n) if integer_string?(n)
 
-      slugs = Slugifyer.lookup_slugs(n)
-      # First try slug, then previous slug, and finally, just give finding by name a shot
-      find_by(slug: slugs) || find_by(previous_slug: slugs) || where("LOWER(name) = LOWER(?)", n.downcase).first
+      slug = Slugifyer.slugify(n)
+      # First try slug, then previous slug, then just give finding by name a shot
+      find_by_slug(slug) || find_by_previous_slug(slug) || where("LOWER(name) = LOWER(?)", n.downcase).first ||
+        Slugifyer.amp_as_and(slug)&.then { friendly_find(it) }
     end
 
     def admin_text_search(n)
