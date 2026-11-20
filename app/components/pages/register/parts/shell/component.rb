@@ -14,7 +14,7 @@ module Pages
           # (register--heading needs both the heading and the form in scope).
           # wide: for a page that isn't a form - the finished theft report's checklist
           # bare: inside a frame or card that supplies the surroundings
-          def initialize(data: {}, wide: false, bare: false, padding_bottom: "tw:pb-10")
+          def initialize(data: {}, wide: false, bare: false, padding_bottom: nil)
             @data = data
             @wide = wide
             @bare = bare
@@ -39,7 +39,7 @@ module Pages
           def shell_class
             return "tw:p-1" if @bare
 
-            "tw:-mt-(--nav-gap) tw:-mb-18 tw:px-4 tw:pt-10 #{@padding_bottom} #{BACKGROUND_CLASSES}"
+            "tw:-mt-(--nav-gap) tw:-mb-18 tw:px-4 tw:pt-10 #{@padding_bottom || "tw:pb-10"} #{BACKGROUND_CLASSES}"
           end
 
           # Revealed by register--retry when a submission can't be retried into working. Ships

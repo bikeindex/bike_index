@@ -11,6 +11,11 @@ RSpec.describe Organized::InfoController, type: :request do
       expect(response.status).to eq 200
       expect(response.body).to include "#{current_organization.name} is active"
       expect(Capybara.string(response.body)).to have_link "Continue where you were", href: "/lightspeed_interface"
+
+      ["//evil.com", "/\\evil.com", "/\t/evil.com", "https://evil.com"].each do |return_to|
+        get base_url, params: {return_to:}
+        expect(response.body).to_not include "Continue where you were"
+      end
     end
   end
 

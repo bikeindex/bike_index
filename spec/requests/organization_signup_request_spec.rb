@@ -368,11 +368,6 @@ RSpec.describe OrganizationSignupController, type: :request do
         get response.location
         expect(response.body).to include "Continue where you were"
         expect(response.body).to include %(href="#{lightspeed_interface_path}")
-
-        ["//evil.com", "/\\evil.com", "/\t/evil.com", "https://evil.com"].each do |return_to|
-          get info_path(organization, return_to:)
-          expect(response.body).to_not include "Continue where you were"
-        end
       end
     end
 
