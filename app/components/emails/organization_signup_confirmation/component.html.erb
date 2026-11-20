@@ -1,0 +1,9 @@
+<h1><%= translation("activate_your_organization") %></h1>
+
+<p>
+  <%= translation("confirm_to_activate_html", name: @organization_signup.name) %>
+</p>
+
+<%= render Emails::Partials::TokenLink::Component.new(href: tokenized_url, text: translation("confirm_and_activate")) %>
+
+<p><%= translation("link_signs_you_in", days: expiration_days) %></p>
