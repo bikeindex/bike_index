@@ -2314,6 +2314,8 @@ nl:
           naar %{email} gemaild.
         sign_out_to_confirm: Je bent ingelogd als %{email}. Log uit en open de link
           opnieuw om de organisatie te activeren.
+        switched_signup: Je bent nu bezig met het afronden van %{name}. Om ook %{replaced_name}
+          af te ronden, open je de link in de bijbehorende e-mail.
       find_signup_for_confirmation:
         signup_not_found: We konden die aanmelding niet vinden — start hieronder een
           nieuwe aanmelding.
@@ -8553,12 +8555,8 @@ nl:
             add_your_organization: Voeg uw organisatie toe
             already_on_bike_index_html: Is uw organisatie al aangesloten bij Bike
               Index? %{sign_in_link} om het te beheren.
-            already_part_of_html: Je maakt al deel uit van %{name} - hiermee creëer
-              je een aparte organisatie.
             email: Uw e-mailadres
             email_placeholder: jij@example.com
-            free_to_start: Het is gratis om te beginnen en het duurt maar een paar
-              minuten.
             kind_bike_advocacy: Belangengroep
             kind_bike_manufacturer: Fabrikant
             kind_bike_shop: Fietsenwinkel
@@ -8572,11 +8570,17 @@ nl:
             organization_kind: Wat voor soort organisatie?
             organization_name: Organisatie naam
             sign_in: Log in
-            signed_in_as_html: Je bent ingelogd als %{email}, wat de beheerder van
-              de organisatie zal zijn.
             start_a_different_one: Begin in plaats daarvan een andere organisatie.
             your_info: Uw gegevens
             your_organization: Uw organisatie
+            already_part_of_organization_html: Je maakt al deel uit van %{organization_link}
+              - hiermee creëer je een aparte organisatie.
+            free_to_start_few_minutes: Het is gratis om te beginnen en duurt slechts
+              een paar minuten.
+            organization_link: "%{name} organisatie"
+            signed_in_as_new_admin_html: Je bent ingelogd als %{email}, wat de beheerder
+              van de nieuwe organisatie zal zijn.
+            signup_name: aanmelden
           step2:
             activation_link_sent: We hebben %{email} een link gemaild om de organisatie
               te activeren — rond dit eerst af.
@@ -8591,6 +8595,10 @@ nl:
             website: Website
             website_placeholder: voorbeeld.com
             where_is_org: Waar is %{name}?
+            out_of_links: We hebben alle mogelijke activeringslinks verstuurd, maar
+              geen enkele is bij %{email} aangekomen. Neem contact op met support@bikeindex.org,
+              dan lossen we het op.
+            signup_name: aanmelden
           step_finished:
             activate_html: We hebben een link naar %{email} verzonden — klik erop
               om %{name} te activeren.
@@ -8608,6 +8616,10 @@ nl:
             send_it_again: Stuur het opnieuw
             share_your_link: Deel je registratielink en QR-code.
             wrong_address: Verkeerd adres?
+            cant_send_another: We kunnen geen andere link versturen.
+            out_of_links_html: We hebben alle mogelijke activeringslinks voor %{name}
+              verstuurd, maar geen enkele is bij %{email} aangekomen. Neem contact
+              op met support@bikeindex.org, dan lossen we het op.
           welcome:
             add_a_registration: Voeg een registratie toe
             continue_where_you_were: Ga verder waar je gebleven was.
