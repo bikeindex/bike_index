@@ -8,7 +8,7 @@ RSpec.describe Admin::ManufacturersController, type: :request do
   let(:permitted_attributes) do
     {
       name: "new name and things",
-      slug: "new_name_and_things",
+      slug: "new-name-and-things",
       website: "http://stuff.com",
       frame_maker: true,
       open_year: 1992,
@@ -17,6 +17,11 @@ RSpec.describe Admin::ManufacturersController, type: :request do
       twitter_name: "cool-name",
       motorized_only: true
     }
+  end
+
+  shared_context :slug_collision do
+    let!(:kona_company) { FactoryBot.create(:manufacturer, name: "Kona Bicycle Company") }
+    let!(:kona) { FactoryBot.create(:manufacturer, name: "Kona") }
   end
 
   describe "index" do
@@ -56,8 +61,30 @@ RSpec.describe Admin::ManufacturersController, type: :request do
         it "renders the manufacturers with their priority" do
           get url, params: token_param.merge(search_with_websites: true)
           expect(response.status).to eq 200
-          expect(json_result["manufacturers"]).to eq([with_website.as_json(only: %w[id name slug secondary_slug website frame_maker motorized_only priority])])
+          expect(json_result["manufacturers"]).to eq([with_website.as_json(only: %w[id name slug secondary_slug previous_slugs website frame_maker motorized_only priority])])
+          expect(json_result["slug_collisions"]).to eq([])
         end
+
+        context "with a slug collision" do
+          include_context :slug_collision
+
+          it "renders the collisions" do
+            get url, params: token_param
+            expect(json_result["slug_collisions"]).to eq([{"slug" => "kona",
+                                                           "manufacturer" => {"id" => kona.id, "name" => "Kona"},
+                                                           "previous_slug_manufacturers" => [{"id" => kona_company.id, "name" => "Kona Bicycle Company"}]}])
+          end
+        end
+      end
+    end
+
+    context "with a slug collision" do
+      include_context :slug_collision
+
+      it "renders an alert" do
+        get base_url
+        expect(response.status).to eq(200)
+        expect(Capybara.string(response.body)).to have_css("h4", text: "1 slug collision")
       end
     end
   end
@@ -67,6 +94,17 @@ RSpec.describe Admin::ManufacturersController, type: :request do
       get "#{base_url}/#{subject.slug}"
       expect(response.status).to eq(200)
       expect(response).to render_template(:show)
+      expect(response.body).not_to match("slug collision")
+    end
+
+    context "with a slug collision" do
+      include_context :slug_collision
+
+      it "renders the collision" do
+        get "#{base_url}/#{kona_company.slug}"
+        expect(response.status).to eq(200)
+        expect(Capybara.string(response.body)).to have_css("h4", text: "1 slug collision")
+      end
     end
   end
 
@@ -108,7 +146,7 @@ RSpec.describe Admin::ManufacturersController, type: :request do
         it "updates" do
           patch url, params: token_param.merge(manufacturer: {name: "Cool Bikes (Rad Bikes)"})
           expect(response.status).to eq 200
-          expect(json_result["manufacturer"]).to include("name" => "Cool Bikes (Rad Bikes)", "slug" => "cool", "secondary_slug" => "rad", "priority" => 0)
+          expect(json_result["manufacturer"]).to include("name" => "Cool Bikes (Rad Bikes)", "slug" => "cool-bikes", "secondary_slug" => "rad", "previous_slugs" => %w[cool], "priority" => 0)
         end
 
         context "with a name that is taken" do
@@ -162,7 +200,7 @@ RSpec.describe Admin::ManufacturersController, type: :request do
             post url, params: token_param.merge(manufacturer: {name: "Cool Bikes", frame_maker: true})
           }.to change(Manufacturer, :count).by 1
           expect(response.status).to eq 200
-          expect(json_result["manufacturer"]).to include("name" => "Cool Bikes", "slug" => "cool", "frame_maker" => true)
+          expect(json_result["manufacturer"]).to include("name" => "Cool Bikes", "slug" => "cool-bikes", "frame_maker" => true)
         end
 
         context "with a name that is taken" do

@@ -1205,8 +1205,12 @@ RSpec.describe "Bike Book", :js, type: :system do
     expect(tiles.call).to eq [["E-moto, not an e-bike"], ["Class 3 e-bike", "E-moto, not an e-bike"]]
     expect(all("[aria-label='Overview comparison'] td button[aria-label$='e-bike'] + [role='tooltip'] code", visible: :all).map { it.text(:all).strip })
       .to eq ["evc/out_of_class/us/ca", "evc/us/class_3", "evc/out_of_class/us/ca"]
+    expect(all("[aria-label='Overview comparison'] td p", text: "a Class 3 can't have a throttle there").map(&:text))
+      .to eq ["It's a Class 2 and Class 3 e-bike, which isn't permitted in California: a Class 3 can't have a throttle there.",
+        "Its optional throttle isn't permitted in California: a Class 3 can't have a throttle there."]
     choose_option("Jurisdiction", "Colorado")
     expect(page).to have_no_css("[aria-label='Overview comparison'] td button[aria-label='E-moto, not an e-bike']")
+    expect(page).to have_no_text("a Class 3 can't have a throttle there")
     expect(tiles.call).to eq [["Class 2 e-bike", "Class 3 e-bike"], ["Class 2 e-bike", "Class 3 e-bike"]]
 
     # a California visitor's e-bikes are legal there, which a Class 3 with a stock throttle isn't
