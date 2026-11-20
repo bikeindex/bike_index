@@ -239,8 +239,12 @@ RSpec.describe OrganizationSignupController, type: :request do
     patch base_url, params: {organization_signup: details_params}
     organization = Organization.last
     expect(organization.organization_roles.first.user.email).to eq "org_admin@bikeindex.org"
-    expect(response).to redirect_to new_session_path
+    expect(response).to redirect_to new_session_path(email: "org_admin@bikeindex.org")
     expect(flash[:notice]).to eq "Shifty Bike Shop is active! Sign in as org_admin@bikeindex.org to manage it."
+    # Signing in picks up where finishing here would have gone
+    expect(session[:return_to]).to eq welcome_path(organization)
+    get response.location
+    expect(Capybara.string(response.body)).to have_field("session[email]", with: "org_admin@bikeindex.org")
 
     # And the phone, still on step 2, goes to the organization
     phone.get "#{base_url}?step=2"
@@ -321,8 +325,9 @@ RSpec.describe OrganizationSignupController, type: :request do
       post "#{base_url}/confirm_email", params: confirm_params
       delete "/session"
       get "#{base_url}/confirm", params: {signup_token: organization_signup.id_token, confirmation_token: token}
-      expect(response).to redirect_to new_session_path
+      expect(response).to redirect_to new_session_path(email: "org_admin@bikeindex.org")
       expect(flash[:notice]).to eq "Shifty Bike Shop is active! Sign in as org_admin@bikeindex.org to manage it."
+      expect(session[:return_to]).to eq organization_manage_path(organization_id: Organization.last.to_param)
     end
   end
 

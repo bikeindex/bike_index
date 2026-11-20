@@ -183,18 +183,19 @@ class OrganizationSignupController < ApplicationController
     end
 
     session.delete(SESSION_KEY)
-    return redirect_to_sign_in_for(organization) if current_user != email_owner
-
     # A page of its own rather than straight to return_to: these submissions are fetched,
     # and a fetch can't follow lightspeed_interface's redirect off-site
-    redirect_to welcome_organization_signup_path(organization_id: organization.to_param, return_to: @signup.return_to)
+    welcome_path = welcome_organization_signup_path(organization_id: organization.to_param, return_to: @signup.return_to)
+    return redirect_to_sign_in_for(organization, after_sign_in: welcome_path) if current_user != email_owner
+
+    redirect_to welcome_path
   end
 
-  def redirect_to_sign_in_for(organization)
-    flash[:notice] = translation(:sign_in_to_manage, controller_method: :redirect_to_sign_in_for, name: organization.name,
-      email: email_owner&.email || @signup.email)
-    store_return_to(organization_manage_path(organization_id: organization.to_param))
-    redirect_to new_session_path
+  def redirect_to_sign_in_for(organization, after_sign_in: organization_manage_path(organization_id: organization.to_param))
+    email = email_owner&.email || @signup.email
+    flash[:notice] = translation(:sign_in_to_manage, controller_method: :redirect_to_sign_in_for, name: organization.name, email:)
+    store_return_to(after_sign_in)
+    redirect_to new_session_path(email:)
   end
 
   # Once its organization exists the signup has nothing left to show, so it goes there instead
