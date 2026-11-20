@@ -18,6 +18,8 @@ module Pages
 
         private
 
+        def security_faq_path = info_path("security-faq-pos-integrations")
+
         def shop_benefits
           [["icons/repeat.svg", translation(".nothing_to_do_at_checkout"), translation(".nothing_to_do_at_checkout_body")],
             ["icons/mail-check.svg", translation(".bikes_waiting_for_customers"), translation(".bikes_waiting_for_customers_body")],

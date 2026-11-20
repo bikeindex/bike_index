@@ -60,7 +60,7 @@
 
         <div class="tw:flex tw:flex-wrap tw:gap-4 tw:text-[15px] tw:font-semibold">
           <%= link_to(translation(".privacy_policy"), privacy_path, class: "twlink tw:py-2.5") %>
-          <%= link_to(translation(".pos_integration_security_faq"), info_path("security-faq-pos-integrations"), class: "twlink tw:py-2.5") %>
+          <%= link_to(translation(".pos_integration_security_faq"), security_faq_path, class: "twlink tw:py-2.5") %>
         </div>
       </div>
 
@@ -166,7 +166,7 @@
       <p class="tw:m-0 tw:leading-relaxed <%= MUTED %>">
         <%= translation(".questions_body_html",
           email_link: mail_to(SHOPS_EMAIL, SHOPS_EMAIL, class: "twlink"),
-          faq_link: link_to(translation(".pos_integration_faq"), info_path("security-faq-pos-integrations"), class: "twlink")) %>
+          faq_link: link_to(translation(".pos_integration_faq"), security_faq_path, class: "twlink")) %>
       </p>
     </div>
 
