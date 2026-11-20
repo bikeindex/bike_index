@@ -1845,6 +1845,9 @@ en:
         sign_out_to_confirm: >-
           You're signed in as %{email}. Sign out, then open the link again to activate
           the organization.
+        switched_signup: >-
+          You're now finishing %{name}. To finish %{replaced_name} too, open the link
+          in its email.
       find_signup_for_confirmation:
         signup_not_found: We couldn't find that signup — start a new one below
       redirect_to_organization:

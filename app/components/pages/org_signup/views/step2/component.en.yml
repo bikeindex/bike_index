@@ -14,6 +14,9 @@ en:
               soon as you finish.
             finish: Finish
             location: Location
+            out_of_links: >-
+              We've sent all the activation links we can, and none of them went to
+              %{email}. Contact support@bikeindex.org and we'll sort it out.
             phone: Phone
             publicly_visible: Show this location on the Bike Index map
             shown_to_people: So people registering with you can find you.
