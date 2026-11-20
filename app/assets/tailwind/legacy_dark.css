@@ -28,6 +28,48 @@
     @apply tw:md:max-navbar:dark:bg-gray-800 tw:dark:border-gray-700;
   }
 
+  /* The box is .main-form from md up and .sign-in-up-wrap below it */
+  .sign-in-up.not-partner .main-form {
+    @apply tw:md:dark:bg-gray-800 tw:md:dark:border-gray-700;
+  }
+
+  .sign-in-up.not-partner .sign-in-up-wrap {
+    @apply tw:max-md:dark:bg-gray-800 tw:max-md:dark:border-gray-700;
+  }
+
+  .sign-in-up.not-partner .main-form a {
+    @apply tw:dark:text-gray-100;
+  }
+
+  #binx_registration_widget {
+    @apply tw:dark:bg-gray-800 tw:dark:border-gray-700 tw:dark:text-gray-100;
+
+    .selectize-dropdown .active {
+      @apply tw:dark:bg-gray-600;
+    }
+
+    /* Selectize copies .form-control onto its taller wrapper, which would show beneath the input */
+    .selectize-control.form-control {
+      @apply tw:dark:bg-transparent tw:dark:border-transparent;
+    }
+  }
+
+  /* A frame whose root scheme differs from the dark page's paints an opaque white canvas */
+  :root:has(> body.dark #binx_registration_widget) {
+    @apply tw:scheme-dark;
+  }
+
+  .page-content blockquote {
+    @apply tw:dark:bg-gray-800 tw:dark:border-gray-600;
+
+    /* The closing quote is hidden by matching the background */
+    @variant dark {
+      &::after {
+        color: var(--tw-color-gray-800);
+      }
+    }
+  }
+
   .primary-edit-form-well-menu {
     @apply tw:max-md:dark:bg-gray-800;
   }
