@@ -19,12 +19,16 @@ backticks, `<img` escaped to `&lt;img`, plain and reference-style links alike, a
 the footer appended. No retry or body form got past it, and nothing here deletes a
 comment — so find out first, before any capture or hosting commit.
 
-1. Create the `## Screenshots` comment — or update the existing one — with this body:
+1. Create the `## Screenshots` comment — or update the existing one — with a body shaped
+   like the real one: an `<img>` whose `src` is a sha-pinned `raw.githubusercontent.com`
+   URL ending `…/tmp/pr_hosted/probe-desktop.png`. The URL doesn't need to exist; the
+   rewrite is textual. A probe on some other URL passes while the real body is still
+   rewritten (#4847: a logo URL passed, the real URLs didn't).
 
    ```
    ## Screenshots
 
-   <img alt="probe" src="https://raw.githubusercontent.com/bikeindex/bike_index/main/app/assets/images/logos/bikebook.png" width="40" />
+   <img alt="probe" src="https://raw.githubusercontent.com/bikeindex/bike_index/0123456789abcdef0123456789abcdef01234567/tmp/pr_hosted/probe-desktop.png" width="40" />
    ```
 
 2. Read it back with `get_comments`. It posted if the body still holds a literal
@@ -44,12 +48,19 @@ comment — so find out first, before any capture or hosting commit.
 bash .claude/skills/github-pr-images/assets/commit_images.sh tmp/pr_screenshots/*.png
 ```
 
-It commits the images, deletes them in a second commit, pushes once, and prints one
-`<img>` per file pinned to the **first** commit's sha:
+It hosts copies under `tmp/pr_hosted/` with the branch prefix and any run of six or more
+digits dropped from the name, and prints one `<img>` per file with the name you passed as
+its `alt`. The rename is load-bearing: in #4847 the comment tools rewrote every URL
+containing the `<branch>-<page>-20261120-174501-…` names `frontend-screenshots` writes
+(`&lt;img`, URL in backticks) while sha-pinned URLs without a digit run came through. The
+digit run is the trigger every rewritten URL shared; it wasn't isolated further. Two
+inputs that reduce to the same name make it stop rather than overwrite one.
+
+It commits the images, deletes them in a second commit, pushes once, and prints:
 
 ```
 hosted at 9223ff3fa4… (branch claude/…)
-<img alt="homepage-desktop.png" src="https://raw.githubusercontent.com/…/9223ff3fa4…/tmp/pr_screenshots/homepage-desktop.png" />
+<img alt="claude-…-homepage-20261120-174501-desktop.png" src="https://raw.githubusercontent.com/…/9223ff3fa4…/tmp/pr_hosted/homepage-desktop.png" />
 ```
 
 The blob stays reachable through the branch's history, so those URLs keep serving
@@ -65,7 +76,7 @@ what the probe below is for.
 two commits and a push, and it refuses on a detached HEAD, so it can't run mid-checkout
 anyway.
 
-It also refuses outside the sandbox, on `main`, on a **tracked** path (the cleanup
+It also refuses outside the sandbox, on `main`, on a **tracked** hosted path (the cleanup
 commit would leave that deleted), and on a **dirty index** (staged changes ride into
 the screenshot commit and survive the cleanup). `git rm --cached` keeps the files on
 disk for a later recapture.
@@ -92,11 +103,14 @@ Find it by `get_me`'s login and a body starting `## Screenshots`, paging through
 | `gh pr comment` | `add_issue_comment` |
 | `gh api -X PATCH …/comments/ID` | `update_issue_comment` |
 
-`add_issue_comment` appends a Claude Code attribution footer the `pr` skill forbids —
-the tell is the session id in its link — and can backtick the URL inside an `<img src>`
-too (#4474), leaving an image with no `src`. `update_issue_comment` does neither, so
-create the comment with `## Screenshots` alone and put the body in with an update, then
-read it back.
+Both comment tools can append a Claude Code attribution footer the `pr` skill forbids
+(the tell is the session id in its link) — `add_issue_comment` always, and
+`update_issue_comment` too in some sessions (#4847, where it re-appended on every write).
+`add_issue_comment` has also backticked the URL inside an `<img src>` (#4474), leaving an
+image with no `src`. So create the comment with `## Screenshots` alone, put the body in
+with an update, and read it back. **If the footer is still there after the update, leave
+it**: no tool here strips it from a comment, and a rewrite only appends another. Say so in
+the summary. (The PR body is different: `update_pull_request` doesn't append one.)
 
 ## Verifying
 

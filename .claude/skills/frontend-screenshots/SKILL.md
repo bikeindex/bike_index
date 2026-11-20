@@ -29,7 +29,7 @@ From a session with history, hand this skill to a subagent the way `AGENTS.md`'s
 
 ## Output filenames (load-bearing — callers parse these)
 
-`tmp/pr_screenshots/<branch>-<page>-<timestamp>-{desktop,mobile}.png`, where `<branch>=$(git rev-parse --abbrev-ref HEAD | tr '/' '-')` and `<timestamp>=$(date +%Y%m%d-%H%M%S)`. Cross-branch shots get an extra `-base-` segment.
+`tmp/pr_screenshots/<branch>-<page>-<timestamp>-{desktop,mobile}.png`, where `<branch>=$(git rev-parse --abbrev-ref HEAD | tr '/' '-')` and `<timestamp>=$(date +%Y%m%d-%H%M%S)`. Cross-branch shots get an extra `-base-` segment. Keep this naming even in the web sandbox: `commit_images.sh` hosts timestamp-free copies itself, because a URL holding the timestamp gets rewritten by some sessions' comment tools.
 
 **Every `browser_take_screenshot` anywhere passes a `filename:` starting with `tmp/`** — including a one-off `tmp/tooltip-hover.png` for visual verification that has nothing to do with a PR. The MCP tool's root is the project root, so a bare `tooltip.png` lands in the working tree and shows up in `git status`; `tmp/` is gitignored.
 

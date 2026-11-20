@@ -68,7 +68,7 @@ Two things the checkout itself does, either side of it:
 
 `browser_close` first — the captures are done and posting doesn't use the browser. Then write the body to a temp file and invoke `github-pr-images` with it. That skill owns the comment — finding the existing one, creating or editing it, verifying it rendered — and it posts what you hand it verbatim. Everything below is what goes *in* the body.
 
-Each `src` is the PNG's repo-relative path (`tmp/pr_screenshots/…png`); `github-pr-images` uploads each one and swaps the path for its asset URL. **In the sandbox**, host both sets in one `commit_images.sh` call first and use the URLs it prints instead.
+Each `src` is the PNG's repo-relative path (`tmp/pr_screenshots/…png`); `github-pr-images` uploads each one and swaps the path for its asset URL. **In the sandbox**, host both sets in one `commit_images.sh` call first and use the URLs it prints instead — match each to its shot by the `alt`, which is the name you passed; the `src` is a shorter, timestamp-free copy on purpose. Use the printed `src` as is: a URL carrying the `<timestamp>` from the original filename gets rewritten by the comment tools. The posted comment may carry an attribution footer you can't strip; leave it and say so in your summary.
 
 Its first line is always `## Screenshots`, because that heading is the handle it's found by next time.
 

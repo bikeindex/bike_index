@@ -9,6 +9,11 @@
 # serving after the deletion - the blob stays reachable through the branch's
 # history - so the PR's Files changed stays empty while the images render.
 #
+# It hosts copies under tmp/pr_hosted/ with the branch prefix and any run of six or more
+# digits dropped from the name: some sessions' comment tools mangle a URL holding the
+# `<branch>-<page>-20261120-174501-desktop.png` names frontend-screenshots writes (#4847).
+# The printed alt keeps the name you passed, so each tag still pairs with its shot.
+#
 # The images live only in the branch's history. This repo squash-merges, so they
 # never reach main; once the branch is deleted they become unreachable, and the
 # URLs last until GitHub garbage-collects them. Good enough for review, not an
@@ -40,6 +45,24 @@ for relative in "${PATHS[@]}"; do
   esac
 done
 cd "$ROOT"
+
+# Host copies under short names; see the header for why
+BRANCH_PREFIX="${BRANCH//\//-}-"
+ORIGINALS=("${PATHS[@]}")
+PATHS=()
+mkdir -p tmp/pr_hosted
+for original in "${ORIGINALS[@]}"; do
+  name=$(basename "$original")
+  name=${name#"$BRANCH_PREFIX"}
+  name=$(printf '%s' "$name" | sed -E 's/-?[0-9]{6,}//g')
+  PATHS+=("tmp/pr_hosted/$name")
+done
+DUPLICATES=$(printf '%s\n' "${PATHS[@]}" | sort | uniq -d)
+[ -z "$DUPLICATES" ] ||
+  { echo "two images would be hosted under the same name: $DUPLICATES" >&2; exit 1; }
+for index in "${!ORIGINALS[@]}"; do
+  [ "${ORIGINALS[$index]}" = "${PATHS[$index]}" ] || cp -f "${ORIGINALS[$index]}" "${PATHS[$index]}"
+done
 
 # A tracked path would be left deleted by the cleanup commit, not restored
 TRACKED=$(git ls-files -- "${PATHS[@]}")
@@ -74,10 +97,11 @@ echo "hosted at $SHA (branch $BRANCH)"
 # HTML rather than `![](url)`: the GitHub MCP server neutralizes a markdown image
 # by backticking its URL, which posts an <img> with no src. Links and <img> survive.
 # Encoding matters here too - a space or `#` in a filename truncates an unescaped src.
-python3 - "$REPO" "$SHA" "${PATHS[@]}" <<'ENCODE'
+python3 - "$REPO" "$SHA" "${#ORIGINALS[@]}" "${ORIGINALS[@]}" "${PATHS[@]}" <<'ENCODE'
 import html, sys, urllib.parse
-repo, sha, *paths = sys.argv[1:]
-for path in paths:
+repo, sha, count, *rest = sys.argv[1:]
+count = int(count)
+for original, path in zip(rest[:count], rest[count:]):
     src = f"https://raw.githubusercontent.com/{repo}/{sha}/{urllib.parse.quote(path)}"
-    print(f'<img alt="{html.escape(path.rsplit("/", 1)[-1], quote=True)}" src="{src}" />')
+    print(f'<img alt="{html.escape(original.rsplit("/", 1)[-1], quote=True)}" src="{src}" />')
 ENCODE
