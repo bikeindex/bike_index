@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://bikebook-catalog.bikeindex.org/not_a_catalog/manifest.json
+    uri: https://bikebook-catalog.bikeindex.org/not_a_catalog/manifest.4.json
     body:
       encoding: US-ASCII
       string: ''
@@ -19,7 +19,7 @@ http_interactions:
       message: Not Found
     headers:
       Date:
-      - Tue, 17 Nov 2026 17:21:48 GMT
+      - Thu, 19 Nov 2026 22:12:37 GMT
       Content-Type:
       - text/html
       Transfer-Encoding:
@@ -33,11 +33,11 @@ http_interactions:
       Server:
       - cloudflare
       Cf-Cache-Status:
-      - DYNAMIC
+      - MISS
       Report-To:
-      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=G0oOBSgrmg8I9pj4vEVBsBnLJ3ie95IHBKIUoNa9wRIpQ7vyPkjdhDmmi2wcwH073BID7GIYcMmFBQjdqxNxgSnFaGbjBHMXP73NPgTMJk12VzuVlZSQR2Gz2G7wUEi27rpvxEpsFXK2s%2FLshzuC8A%3D%3D"}]}'
+      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=%2BQbFHevu0ccWwdugRs2Jf3DaPJHvqf328JqNw3nGfaPWiYYKWPQ9MHh39OVI3RWe1N8bKSCKaOUIVatvsBT%2FxzhwTQD%2BhPHBFNKkChI8GjRUUr3VB4BONv%2B9Vt1qqhA1zQTcUZm2GptB5IaGc6OP%2Bg%3D%3D"}]}'
       Cf-Ray:
-      - a5c069f53ef79c12-ATL
+      - a5d28eb8a961ddff-SJC
     body:
       encoding: ASCII-8BIT
       string: |
@@ -647,5 +647,5 @@ http_interactions:
             </main>
           </body>
         </html>
-  recorded_at: Tue, 17 Nov 2026 17:21:48 GMT
+  recorded_at: Thu, 19 Nov 2026 22:12:37 GMT
 recorded_with: VCR 6.4.0

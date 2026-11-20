@@ -19,7 +19,7 @@ RSpec.describe Spreadsheets::Components do
   describe "row" do
     let(:cgroup) { FactoryBot.create(:cgroup, name: "Frame and Fork") }
     let(:ctype) { FactoryBot.create(:ctype, name: "Stem", secondary_name: "Gooseneck", has_multiple: false, cgroup:) }
-    let(:target) { ["Stem", "Gooseneck", false, "Frame and Fork"] }
+    let(:target) { ["Stem", "Gooseneck", nil, "Frame and Fork"] }
     it "returns expected" do
       expect(described_class.send(:row_for, ctype)).to eq target
     end
@@ -28,7 +28,7 @@ RSpec.describe Spreadsheets::Components do
   describe "import methods" do
     let(:csv_content) do
       "name,secondary_name,has_multiple_locations,group\n" \
-        "Stem,Gooseneck,false,Frame and Fork\n" \
+        "Stem,Gooseneck,,Frame and Fork\n" \
         "Pannier,,true,Cargo\n"
     end
     # fresh StringIO each call, since CSV.foreach consumes it

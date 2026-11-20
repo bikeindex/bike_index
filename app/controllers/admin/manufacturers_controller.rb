@@ -5,13 +5,14 @@ module Admin
 
     token_accessible :index, :create, :update
 
-    JSON_ATTRIBUTES = %w[id name slug secondary_slug website frame_maker motorized_only priority].freeze
+    JSON_ATTRIBUTES = %w[id name slug secondary_slug previous_slugs website frame_maker motorized_only priority].freeze
 
     before_action :find_manufacturer, only: [:edit, :update, :destroy, :show]
 
     def index
       @manufacturers = searched_manufacturers.reorder(sortable_order(Manufacturer))
-      render json: {manufacturers: @manufacturers.as_json(only: JSON_ATTRIBUTES)} if request.format.json?
+      @slug_collisions = Manufacturer.slug_collisions
+      render json: {manufacturers: @manufacturers.as_json(only: JSON_ATTRIBUTES), slug_collisions: @slug_collisions} if request.format.json?
     end
 
     def show
@@ -97,7 +98,7 @@ module Admin
     end
 
     def render_manufacturer_json
-      render json: {manufacturer: @manufacturer.as_json(only: JSON_ATTRIBUTES)}
+      render json: {manufacturer: @manufacturer.as_json(only: JSON_ATTRIBUTES), slug_collisions: @manufacturer.slug_collisions}
     end
 
     def render_errors_json

@@ -575,6 +575,19 @@ RSpec.describe "BikesController#show", type: :request do
     end
   end
 
+  context "with organized impound_record held at a location" do
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
+    let(:current_user) { bike.user }
+    let(:location) { FactoryBot.create(:location, :with_address_record, address_in: :new_york) }
+    let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, :with_address_record, bike:, location:) }
+
+    it "says where it was impounded from, not where it's held" do
+      expect(impound_record.reload.address_record_id).to eq location.address_record_id
+      get "#{base_url}/#{bike.id}"
+      expect(response.body).to match(%r{<strong>\s*from\s*</strong>\s*Chicago, IL 60608\s*</p>})
+    end
+  end
+
   context "with active parking_notification, viewed by the owner" do
     let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
     let(:current_user) { bike.user }

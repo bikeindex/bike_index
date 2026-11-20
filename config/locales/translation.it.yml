@@ -5652,6 +5652,9 @@ it:
         report: Rapporto
         step_1: Passo 1
         step_2: Passo 2
+      org:
+        impound_current_location:
+          same_as_impounded_from: lo stesso di sequestrato da
     pages:
       messages:
         thread_show:
@@ -5812,7 +5815,6 @@ it:
             show_location_search: mostra la ricerca della posizione
             all_bikes: Tutte le biciclette
             all_statuses: Tutti gli stati
-            impound_location_cell: Luogo
             impound_status_cell: stato di sequestro
             impound_updated_at_cell: Blocco aggiornato
             impound_updated_at_cell_panel: Ora - Registro dei sequestri aggiornato
@@ -5837,6 +5839,10 @@ it:
               dalla ricerca delle registrazioni
             impound_search_columns: Colonne di ricerca per i sequestri
             course_acknowledgment_cell_panel: Tempo - Corso di formazione riconosciuto
+            current_location_without_locations: Non hai sedi di deposito, quindi questo
+              si ripete principalmente Sequestrato da
+            impound_current_location_cell: Posizione attuale
+            impound_notes_cell: Banconote sequestrate
           column_settings_toggle:
             column_settings: Impostazioni della colonna
           settings_and_filters:
@@ -5858,6 +5864,7 @@ it:
             view: Visualizzazione
             toggle_all_checked: Seleziona tutto
             course_acknowledgment_title: Riconoscimento del corso di formazione presso
+            more_notes: "+%{count} altro"
           multi_result_chip:
             no_results: nessuna corrispondenza
           multi_results:
@@ -6066,6 +6073,8 @@ it:
             impounded_from: Sequestrato da
             last_update_by: Ultimo aggiornamento di
             status: Stato
+            current_location: Posizione attuale
+            notes: Note
           legacy_view_link:
             switch_to_classic: Torna al visualizzatore precedente
             view_in_legacy: visualizza %{bike_type} nel visualizzatore legacy

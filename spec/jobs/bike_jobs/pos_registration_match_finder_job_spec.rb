@@ -287,7 +287,7 @@ RSpec.describe BikeJobs::PosRegistrationMatchFinderJob, type: :job do
   context "pos bike version with a marketplace listing" do
     before { FactoryBot.create(:marketplace_listing, item: FactoryBot.create(:bike_version, bike: pos_bike)) }
 
-    include_examples "records a review candidate", ["marketplace_listing"]
+    include_examples "records a review candidate", ["marketplace_listing", "bike_versions"]
   end
 
   context "deleted pos bike version with a marketplace listing" do
@@ -297,6 +297,6 @@ RSpec.describe BikeJobs::PosRegistrationMatchFinderJob, type: :job do
       bike_version.update_column(:deleted_at, Time.current)
     end
 
-    include_examples "records a review candidate", ["marketplace_listing"]
+    include_examples "records a review candidate", ["marketplace_listing", "bike_versions"]
   end
 end
