@@ -70,6 +70,12 @@ RSpec.describe AdminHelper, type: :helper do
         expect(admin_path_for_object(UserEmail.new(id: 1, user_id: 42))).to eq admin_user_path(42)
       end
     end
+    context "organization_signup" do
+      it "returns its organization, or the emails to its address" do
+        expect(admin_path_for_object(OrganizationSignup.new(id: 1, email: "a@b.com"))).to eq admin_notifications_path(query: "a@b.com")
+        expect(admin_path_for_object(OrganizationSignup.new(id: 1, organization_id: 42))).to eq admin_organization_path(42)
+      end
+    end
     context "payment" do
       it "returns" do
         expect(admin_path_for_object(Payment.new(id: 412))).to eq admin_payment_path(412)

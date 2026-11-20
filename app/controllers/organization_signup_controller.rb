@@ -47,7 +47,8 @@ class OrganizationSignupController < ApplicationController
     return complete_signup if OrgServices::Signup.ready_to_complete?(@signup)
 
     # Step 2 says the link is on its way, so it goes out here rather than at the end
-    unless OrgServices::Signup.send_confirmation_email(@signup) || @signup.email_confirmation_token.present?
+    OrgServices::Signup.send_confirmation_email(@signup)
+    if OrgServices::Signup.out_of_links?(@signup)
       flash[:error] = translation(:no_more_links, email: @signup.email, controller_method: "resend")
     end
     redirect_to organization_signup_path(step: @signup.details_completed? ? :finished : 2)
@@ -67,6 +68,11 @@ class OrganizationSignupController < ApplicationController
 
   # Rate limited, so a second press says the link is on its way rather than sending another
   def resend
+    # A proven address has nothing to send - what's left is finishing
+    if @signup.email_confirmed?
+      return OrgServices::Signup.ready_to_complete?(@signup) ? complete_signup : redirect_to(organization_signup_path(step: 2))
+    end
+
     if OrgServices::Signup.send_confirmation_email(@signup)
       flash[:success] = translation(:link_resent, email: @signup.email)
     elsif OrgServices::Signup.confirmation_emails_exhausted?(@signup)
@@ -108,9 +114,9 @@ class OrganizationSignupController < ApplicationController
       remove_session
       @current_user = nil
       session[SESSION_KEY] = @signup.id_token
-      return redirect_to(organization_signup_path) if sign_in_confirmed_user(@signup.email).blank?
-    elsif current_user.blank? && sign_in_confirmed_user(@signup.email).blank?
-      return redirect_to(organization_signup_path)
+      return unless sign_in_email_owner
+    elsif current_user.blank?
+      return unless sign_in_email_owner
     end
 
     # Both places this goes say what's next themselves, so signing in doesn't need to
@@ -146,6 +152,19 @@ class OrganizationSignupController < ApplicationController
     params[:return_to] if params[:return_to].to_s.match?(%r{\A/(?!/)[^\\[:space:][:cntrl:]]*\z})
   end
 
+  # An SSO domain's address signs in at its identity provider, which brings them back to this link
+  def sign_in_email_owner
+    if redirect_forced_saml(@signup.email)
+      store_return_to(confirm_organization_signup_path(signup_token: @signup.id_token,
+        confirmation_token: params[:confirmation_token]))
+      return false
+    end
+    return true if sign_in_confirmed_user(@signup.email).present?
+
+    redirect_to(organization_signup_path)
+    false
+  end
+
   def email_owner = @email_owner ||= User.fuzzy_confirmed_or_unconfirmed_email_find(@signup.email)
 
   def signed_in_as_someone_else? = current_user.present? && current_user != email_owner
@@ -154,13 +173,16 @@ class OrganizationSignupController < ApplicationController
   # isn't signed in as it gets the organization made, then has to sign in to manage it
   def complete_signup
     organization = OrgServices::Signup.complete(@signup, user: email_owner)
-    if organization.errors.any?
-      flash[:error] = if organization.errors.include?(:short_name)
-        translation(:name_taken_meanwhile, controller_method: :complete_signup, name: @signup.name)
-      else
-        organization.errors.full_messages.to_sentence
-      end
+    if organization.errors.include?(:short_name)
+      flash[:error] = translation(:name_taken_meanwhile, controller_method: :complete_signup, name: @signup.name)
       return redirect_to(organization_signup_path(step: 1))
+    elsif organization.errors.any?
+      # Step 1 checks the name the way Organization does, so anything else isn't theirs to fix
+      Honeybadger.notify("Organization signup failed to complete",
+        context: {organization_signup_id: @signup.id, errors: organization.errors.full_messages})
+      flash[:error] = translation(:unable_to_complete, controller_method: :complete_signup,
+        errors: organization.errors.full_messages.to_sentence)
+      return redirect_to(organization_signup_path(step: 2))
     end
 
     session.delete(SESSION_KEY)

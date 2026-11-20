@@ -218,10 +218,10 @@ class Organization < ApplicationRecord
       %w[ambassador bike_depot].freeze
     end
 
-    # In the order they're offered: related kinds side by side, other last
+    # Related kinds side by side, then any kind added since, then other
     def user_creatable_kinds
-      %w[bike_shop bike_advocacy law_enforcement school municipality bike_manufacturer software
-        property_management other].freeze
+      order = %w[bike_shop bike_advocacy law_enforcement school municipality bike_manufacturer software property_management]
+      (kinds - admin_required_kinds - ["other"]).sort_by { order.index(it) || order.length } + ["other"]
     end
 
     # What would stop a new organization taking this name: :too_short, :reserved or :taken.
@@ -606,7 +606,7 @@ class Organization < ApplicationRecord
   def set_calculated_attributes
     return true unless name.present?
 
-    self.name = strip_name_tags(name)
+    self.name = self.class.sanitize_name(name)
     self.name = "Stop messing about" unless name[/\d|\w/].present?
     self.website = Urlifyer.urlify(website) if website.present?
     self.short_name = name_shortener(short_name.presence || name)
@@ -714,8 +714,6 @@ class Organization < ApplicationRecord
     self.class.within_bounding_box(bounding_box).where.not(id: child_ids + [id, parent_organization_id])
       .reorder(id: :asc)
   end
-
-  def strip_name_tags(str) = self.class.sanitize_name(name)
 
   def name_shortener(str)
     str = self.class.shorten_name(str)

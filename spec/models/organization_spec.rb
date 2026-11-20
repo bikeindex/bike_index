@@ -4,9 +4,11 @@ RSpec.describe Organization, type: :model do
   it_behaves_like "search_radius_metricable"
 
   describe "user_creatable_kinds" do
-    # Listed by hand for their display order, so a new kind has to be added here
-    it "is every kind but the admin-only ones" do
-      expect(Organization.user_creatable_kinds).to match_array(Organization.kinds - Organization.admin_required_kinds)
+    it "is every kind but the admin-only ones, in display order with other last" do
+      expect(Organization.user_creatable_kinds).to eq %w[bike_shop bike_advocacy law_enforcement school municipality
+        bike_manufacturer software property_management other]
+      stub_const("Organization::KIND_ENUM", Organization::KIND_ENUM.merge(bike_valet: 11))
+      expect(Organization.user_creatable_kinds.last(2)).to eq %w[bike_valet other]
     end
   end
 

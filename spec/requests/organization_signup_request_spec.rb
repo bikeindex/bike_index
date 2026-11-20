@@ -240,10 +240,56 @@ RSpec.describe OrganizationSignupController, type: :request do
       expect(response).to redirect_to "#{base_url}?step=1"
       expect(flash[:error]).to match(/Another organization took the name Shifty Bike Shop/)
 
+      # Nothing to resend to a proven address - it finishes, and says why it can't
+      expect { post "#{base_url}/resend" }.to_not change(EmailJobs::OrganizationSignupConfirmationJob.jobs, :size)
+      expect(response).to redirect_to "#{base_url}?step=1"
+      expect(flash[:error]).to match(/Another organization took the name Shifty Bike Shop/)
+
       post base_url, params: {organization_signup: start_params.merge(name: "Shifty Bikes East")}
       organization = Organization.last
       expect(organization.name).to eq "Shifty Bikes East"
       expect(response).to redirect_to welcome_path(organization)
+    end
+  end
+
+  it "goes back to step 2 from step 1 once the address is confirmed, without asking for another link" do
+    post base_url, params: {organization_signup: start_params}
+    post "#{base_url}/confirm_email", params: confirm_params
+    expect(response).to redirect_to "#{base_url}?step=2"
+
+    expect {
+      post base_url, params: {organization_signup: start_params}
+    }.to_not change(EmailJobs::OrganizationSignupConfirmationJob.jobs, :size)
+    expect(response).to redirect_to "#{base_url}?step=2"
+    expect(flash[:error]).to be_blank
+  end
+
+  it "doesn't tell a filled honeypot that it's out of links" do
+    expect {
+      post base_url, params: {organization_signup: start_params, additional: "filled"}
+    }.to_not change(EmailJobs::OrganizationSignupConfirmationJob.jobs, :size)
+    expect(response).to redirect_to "#{base_url}?step=2"
+    expect(flash[:error]).to be_blank
+  end
+
+  context "an address at an SSO domain" do
+    let(:start_params) { super().merge(email: "admin@sso.edu") }
+    let(:sso_organization) do
+      FactoryBot.create(:organization_with_organization_features,
+        enabled_feature_slugs: ["saml_sso"], user_email_domain: "sso.edu")
+    end
+    before { FactoryBot.create(:organization_saml_configuration, :active, organization: sso_organization) }
+
+    it "signs in at the identity provider, which brings them back to the link" do
+      post base_url, params: {organization_signup: start_params}
+      patch base_url, params: {organization_signup: details_params}
+      link_params = confirm_params
+      expect {
+        post "#{base_url}/confirm_email", params: link_params
+      }.to_not change(User, :count)
+      expect(response).to redirect_to saml_init_path(org_slug: sso_organization.to_param)
+      expect(session[:return_to]).to eq confirm_organization_signup_path(**link_params)
+      expect(organization_signup.reload.email_confirmed?).to be_falsey
     end
   end
 

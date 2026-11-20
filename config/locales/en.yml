@@ -1833,6 +1833,9 @@ en:
         name_taken_meanwhile: >-
           Another organization took the name %{name} while you were signing up. Choose
           another name to finish - everything else is saved.
+        unable_to_complete: >-
+          We couldn't finish setting up your organization (%{errors}). Contact support@bikeindex.org
+          and we'll sort it out.
       confirm_email:
         link_invalid: >-
           That link doesn't work anymore. Use the newest email we sent to %{email},

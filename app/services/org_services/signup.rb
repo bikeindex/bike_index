@@ -84,6 +84,12 @@ module OrgServices
 
     def confirmation_emails_exhausted?(signup) = signup.email_confirmations_sent >= MAX_CONFIRMATION_EMAILS
 
+    # No link outstanding and none left to send. A proven address needs none, and spam isn't told
+    def out_of_links?(signup)
+      confirmation_emails_exhausted?(signup) && signup.email_confirmation_token.blank? &&
+        !signup.email_confirmed? && !signup.likely_spam
+    end
+
     def confirmation_token_valid?(signup, token)
       return false if signup.email_confirmation_token_expired?
 
