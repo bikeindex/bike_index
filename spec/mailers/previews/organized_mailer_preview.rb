@@ -59,6 +59,11 @@ class OrganizedMailerPreview < ActionMailer::Preview
     OrganizedMailer.hot_sheet(sheet)
   end
 
+  def shop_welcome(organization_id: params[:organization_id])
+    organization = organization_id ? Organization.find(organization_id) : Organization.bike_shop.last
+    OrganizedMailer.shop_welcome(organization, organization.auto_user || organization.users.first)
+  end
+
   def impound_claim_submitted(impound_claim_id: params[:impound_claim_id])
     claim = impound_claim_id ? ImpoundClaim.find(impound_claim_id) : ImpoundClaim.submitted.last
     OrganizedMailer.impound_claim_submitted(claim)

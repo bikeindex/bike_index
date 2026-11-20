@@ -218,6 +218,21 @@ RSpec.describe OrgServices::Signup do
       expect(Feedback.last.feedback_type).to eq "organization_created"
     end
 
+    it "sends the shop welcome email a few minutes later" do
+      organization = described_class.complete(organization_signup, user:)
+      expect(EmailJobs::ShopWelcomeJob.jobs.map { it["args"] }).to eq([[organization.id, user.id]])
+      expect(EmailJobs::ShopWelcomeJob.jobs.first["at"]).to be_within(5).of(described_class::SHOP_WELCOME_DELAY.from_now.to_f)
+    end
+
+    context "not a bike shop" do
+      let(:organization_signup) { FactoryBot.create(:organization_signup_details_completed, kind: "school") }
+
+      it "sends no shop welcome email" do
+        expect(described_class.complete(organization_signup, user:)).to be_persisted
+        expect(EmailJobs::ShopWelcomeJob.jobs.count).to eq 0
+      end
+    end
+
     context "the name was taken since step 1" do
       before { FactoryBot.create(:organization, name: "Shifty Bike Shop") }
 

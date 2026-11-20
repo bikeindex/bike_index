@@ -4587,6 +4587,8 @@ en:
       subject: Finish reporting your stolen %{cycle_type}
     partial_registration:
       subject: Finish your %{organization_name}Bike Index registration!
+    shop_welcome:
+      subject: Your Bike Index shop dashboard is ready
   payments:
     form:
       donation_header: Help support our efforts!

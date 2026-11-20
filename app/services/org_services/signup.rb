@@ -9,6 +9,7 @@ module OrgServices
 
     CONFIRMATION_EMAIL_INTERVAL = 5.minutes
     MAX_CONFIRMATION_EMAILS = 5
+    SHOP_WELCOME_DELAY = 5.minutes
     STEPS = %w[1 2 finished].freeze
 
     def find(token)
@@ -119,6 +120,7 @@ module OrgServices
       return organization unless organization.persisted?
 
       AdminNotifier.new.for_organization(organization:, user:, type: "organization_created")
+      EmailJobs::ShopWelcomeJob.perform_in(SHOP_WELCOME_DELAY, organization.id, user.id) if organization.bike_shop?
       organization
     end
 
