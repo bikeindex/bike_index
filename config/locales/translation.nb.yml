@@ -2540,6 +2540,8 @@ nb:
           til %{email}.
         sign_out_to_confirm: Du er logget på som %{email}. Logg ut, og åpne deretter
           lenken på nytt for å aktivere organisasjonen.
+        switched_signup: Du er nå i ferd med å fullføre %{name}. For å fullføre %{replaced_name}
+          også, åpne lenken i e-posten.
       find_signup_for_confirmation:
         signup_not_found: Vi fant ikke den registreringen – start en ny nedenfor
       redirect_to_organization:
@@ -8236,11 +8238,8 @@ nb:
             add_your_organization: Legg til organisasjonen din
             already_on_bike_index_html: Er organisasjonen din allerede på Bike Index?
               %{sign_in_link} for å administrere den.
-            already_part_of_html: Du er allerede en del av %{name} – dette oppretter
-              en egen organisasjon.
             email: Din e-post
             email_placeholder: du@eksempel.com
-            free_to_start: Gratis å starte, og det tar et par minutter.
             kind_bike_advocacy: Interessentgruppe
             kind_bike_manufacturer: Produsent
             kind_bike_shop: Sykkelbutikk
@@ -8254,11 +8253,16 @@ nb:
             organization_kind: Hva slags organisasjon?
             organization_name: Organisasjonsnavn
             sign_in: Logg inn
-            signed_in_as_html: Du er logget på som %{email}, som vil være organisasjonens
-              administrator.
             start_a_different_one: Start heller en annen organisasjon
             your_info: Din informasjon
             your_organization: Din organisasjon
+            already_part_of_organization_html: Du er allerede en del av %{organization_link}
+              – dette vil opprette en egen organisasjon.
+            free_to_start_few_minutes: Gratis å starte, det tar bare noen få minutter.
+            organization_link: "%{name} organisasjon"
+            signed_in_as_new_admin_html: Du er logget på som %{email}, som blir den
+              nye organisasjonens administrator.
+            signup_name: registrering
           step2:
             activation_link_sent: Vi har sendt en e-post til %{email} med en lenke
               for å aktivere organisasjonen – fullfør her først.
@@ -8273,6 +8277,9 @@ nb:
             website: Nettsted
             website_placeholder: eksempel.com
             where_is_org: Hvor er %{name}?
+            out_of_links: Vi har sendt alle aktiveringslenkene vi kan, og ingen av
+              dem gikk til %{email}. Kontakt support@bikeindex.org, så ordner vi det.
+            signup_name: registrering
           step_finished:
             activate_html: Vi sendte en lenke til %{email} – klikk på den for å aktivere
               %{name}.
@@ -8290,6 +8297,10 @@ nb:
             send_it_again: Send det på nytt
             share_your_link: Del registreringslenken og QR-koden din
             wrong_address: Feil adresse?
+            cant_send_another: Vi kan ikke sende en ny lenke
+            out_of_links_html: Vi har sendt alle aktiveringslenkene vi kan for %{name},
+              og ingen av dem gikk til %{email}. Kontakt support@bikeindex.org, så
+              ordner vi det.
           welcome:
             add_a_registration: Legg til en registrering
             continue_where_you_were: Fortsett der du var
