@@ -476,17 +476,16 @@ class ModelViewer {
     return tiles.length ? classBadges(tiles) : presence(this.classificationNames(this.#sortedClassifications(this.vehicle)))
   }
 
-  // Its classes beside its /ebike-rules check, over why it isn't an e-bike in the viewing `state`, or without one, why
-  // it's an e-moto, which /ebike-rules loads. `where` tells apart the views that show it at once
+  // Its classes beside why it isn't an e-bike in the viewing `state`, or without one, why it's an e-moto, which
+  // /ebike-rules loads, over its /ebike-rules check. `where` tells apart the views that show it at once
   eVehicleClass (where) {
     const classes = this.#classTiles()
     const { id } = this.data
     const place = this.state ? `US/${this.state}` : this.#emoto(this.vehicle.classifiedModes.flatMap((mode) => mode.ids)) && 'US'
-    return classes && html`<div class="tw:flex tw:flex-wrap tw:items-end tw:gap-x-3 tw:gap-y-1"><div>${classes}</div><span class="tw:text-sm">Learn more on <a class="twlink"
-      href=${`/ebike-rules?vehicle_models=${id}`}>e-bike rules</a></span></div>${place && id
-      ? html`<turbo-frame id=${`ebike-rules-reasons-${where}-${id.replace(/[^\w-]/g, '-')}`} data-permanent=${place}
+    return classes && html`<div class="tw:flex tw:flex-wrap tw:items-center tw:gap-x-3 tw:gap-y-1"><div>${classes}</div>${place && id
+      ? html`<turbo-frame id=${`ebike-rules-reasons-${where}-${id.replace(/[^\w-]/g, '-')}`} class="tw:min-w-48 tw:flex-1" data-permanent=${place}
         src=${`/ebike-rules/${place}?${new URLSearchParams({ vehicle_models: id })}`}></turbo-frame>`
-      : nothing}`
+      : nothing}</div><p class="tw:mt-2 tw:text-sm">Learn more on <a class="twlink" href=${`/ebike-rules?vehicle_models=${id}`}>e-bike rules</a></p>`
   }
 
   // As EbikeRuleServices::BikebookVehicles has them: the US classes only a mode it isn't sold with brings, by that mode,

@@ -1158,7 +1158,7 @@ RSpec.describe "Bike Book", :js, type: :system do
     overview = find("[aria-label='Overview']")
     expect(overview.all("td button[aria-label$=' e-bike']").map { it[:"aria-label"] }).to eq ["Class 2 e-bike", "Class 3 e-bike"]
     expect(overview).to have_css("td", text: "w/ optional throttle")
-    expect(overview).to have_css("td span", exact_text: "Learn more on e-bike rules")
+    expect(overview).to have_css("td p", exact_text: "Learn more on e-bike rules")
       .and have_link("e-bike rules", href: "/ebike-rules?vehicle_models=m/specialized/2025/haul_st")
     # beside its years, its page on the manufacturer's site, the newest year's still up rather than one archived since
     expect(overview.find("tr", text: /\AYears/)).to have_link("manufacturer's page", href: "https://www.specialized.com/us/en/haul-st/p/277759")

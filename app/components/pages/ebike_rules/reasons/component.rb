@@ -17,7 +17,7 @@ module Pages
 
         def call
           helpers.turbo_frame_tag(@frame_id) do
-            tag.p(safe_join(reasons, " "), class: "tw:mt-2 tw:text-sm tw:text-gray-700 tw:dark:text-gray-300") if reasons.any?
+            tag.p(safe_join(reasons, " "), class: "tw:text-sm tw:text-gray-700 tw:dark:text-gray-300") if reasons.any?
           end
         end
 
