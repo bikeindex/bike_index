@@ -1205,12 +1205,16 @@ RSpec.describe "Bike Book", :js, type: :system do
     expect(tiles.call).to eq [["E-moto, not an e-bike"], ["Class 3 e-bike", "E-moto, not an e-bike"]]
     expect(all("[aria-label='Overview comparison'] td button[aria-label$='e-bike'] + [role='tooltip'] code", visible: :all).map { it.text(:all).strip })
       .to eq ["evc/out_of_class/us/ca", "evc/us/class_3", "evc/out_of_class/us/ca"]
-    expect(all("[aria-label='Overview comparison'] td p", text: "a Class 3 can't have a throttle there").map(&:text))
-      .to eq ["It's a Class 2 and Class 3 e-bike, which isn't permitted in California: a Class 3 can't have a throttle there.",
-        "Its optional throttle isn't permitted in California: a Class 3 can't have a throttle there."]
+    # each with why, from /ebike-rules
+    reasons = "[aria-label='Overview comparison'] td turbo-frame p"
+    expect(page).to have_css(reasons, count: 2)
+    expect(all(reasons).map(&:text)).to eq ["It is a Class 2 and Class 3 e-bike, which is not permitted. Assists to 28 mph, not allowed with a throttle.",
+      "It's legal only without its optional throttle."]
+    choose_option("Jurisdiction", "New Jersey")
+    expect(page).to have_css(reasons, text: "Classes 2 and 3 aren't recognized in New Jersey.", count: 2)
     choose_option("Jurisdiction", "Colorado")
     expect(page).to have_no_css("[aria-label='Overview comparison'] td button[aria-label='E-moto, not an e-bike']")
-    expect(page).to have_no_text("a Class 3 can't have a throttle there")
+    expect(page).to have_no_css(reasons)
     expect(tiles.call).to eq [["Class 2 e-bike", "Class 3 e-bike"], ["Class 2 e-bike", "Class 3 e-bike"]]
 
     # a California visitor's e-bikes are legal there, which a Class 3 with a stock throttle isn't
@@ -1986,7 +1990,8 @@ RSpec.describe "Bike Book", :js, type: :system do
     expect(page).to have_css(".hw-combobox__chip", text: "US Class 3")
     expect(page).to have_current_path(%r{[?&]classifications=evc/us/class_3\b}).and have_current_path(%r{vehicle_models=m/sur_ron/2026/ultra_bee_hp_x_us,m/segway/2025/gt3_pro&})
     cards_asked = []
-    page.driver.with_playwright_page { it.on("request", ->(request) { cards_asked << request.url if request.url.include?(ebike_rules_path) }) }
+    card_frame = Pages::EbikeRules::ClassCard::Component::FRAME_ID
+    page.driver.with_playwright_page { it.on("request", ->(request) { cards_asked << request.url if request.headers["turbo-frame"]&.start_with?(card_frame) }) }
     # a model with classifications isn't alone, so its search, which holds their chips, shows
     visit bikebook_path(vehicle_models: "m/sur_ron/2026/ultra_bee_hp_x_us", classifications: "evc/us/class_3,evc/off_highway_motorcycle", jurisdiction: "CA")
     expect(page).to have_css("#classification-cards [role=button]", text: "California specifics", wait: 10)

@@ -59,7 +59,7 @@ const classified = ({ e_vehicle_classifications: records }, jurisdictions) => Ob
   const label = [state || code, record.name].filter(Boolean).join(' ')
   // "Alabama (AL)", "United States"
   const jurisdictionName = state ? `${state} (${code.slice(3)})` : code && (jurisdictions[code] ?? code)
-  return [id, { ...record, label, state: state || null, jurisdiction_name: jurisdictionName, title: /^Class \d+$/.test(record.name) ? `${label} e-bike` : label }]
+  return [id, { ...record, label, jurisdiction_name: jurisdictionName, title: /^Class \d+$/.test(record.name) ? `${label} e-bike` : label }]
 }))
 
 // What picked vehicles render from, which needs nothing of the index: the blocks `ids` are in, the kit and the vocabulary

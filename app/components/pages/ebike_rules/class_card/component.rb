@@ -48,10 +48,26 @@ module Pages
         end
 
         def emoto_card
+          return barred_throttle_card if barred_throttle_state
+
           rules = @place && EbikeRuleServices::StateLaws.emoto_rules(@place[:abbr]).presence
           {either: true, title: unbroken_hyphen(translation(".not_an_ebike")),
            speed: translation(".emoto_speed"), motor: translation(".emoto_motor"), rules:,
            body: rules ? translation(".emoto_summary") : translation(".emoto_limits_body")}
+        end
+
+        # Its speed and power are a Class 3's, so neither is why
+        def barred_throttle_card
+          {title: unbroken_hyphen(translation(".not_an_ebike")), body: translation(".class_3_throttle_barred", state: barred_throttle_state[:name])}
+        end
+
+        # The state whose out of class marker, as California's evc/out_of_class/us/ca, `catalog_id` is
+        def barred_throttle_state
+          return @barred_throttle_state if defined?(@barred_throttle_state)
+
+          @barred_throttle_state = if EbikeRuleServices::StateLaws.out_of_class_ids.include?(@catalog_id)
+            EbikeRuleServices::StateLaws::STATES.find { EbikeRuleServices::StateLaws.out_of_class_id(it[:abbr]) == @catalog_id }
+          end
         end
 
         # Under its jurisdiction where the catalog names one; a place's own classes leave it out
