@@ -3849,9 +3849,6 @@ en:
   my_accounts:
     color_scheme:
       appearance: Appearance
-      dark: Dark
-      light: Light
-      system: System
     delete_account:
       delete_account: Delete account
       delete_my_account: Delete my account and all my registered bikes

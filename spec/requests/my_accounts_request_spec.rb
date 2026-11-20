@@ -229,8 +229,9 @@ RSpec.describe MyAccountsController, type: :request do
         expect(Capybara.string(response.body)).to have_select("user_preferred_unit_system",
           options: ["Automatic, from your location", "Metric (kilometers, millimeters)", "Imperial (miles, inches)"])
         radios = Nokogiri::HTML(response.body).css("input[type=radio][name='user[color_scheme]']")
-        expect(radios.map { it["value"] }).to eq %w[light dark system]
-        expect(radios.select { it["checked"] }.map { it["value"] }).to eq %w[system]
+        # The account form's picker, then the footer's
+        expect(radios.map { it["value"] }).to eq %w[light dark system] * 2
+        expect(radios.select { it["checked"] }.map { it["value"] }).to eq %w[system] * 2
       end
     end
     context "application layout" do

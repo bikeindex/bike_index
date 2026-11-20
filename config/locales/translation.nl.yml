@@ -1950,18 +1950,15 @@ nl:
       find_lock:
         not_your_lock: Oeps, dat is niet jouw slot!
     organizations:
-      create:
-        organization_created: Organisatie met succes gemaakt!
-        must_create_an_account_first: Je moet eerst een account aanmaken op Bike Index
-          voordat je een organisatie kunt creëren.
       find_organization:
         not_found: Het spijt ons, die organisatie staat nog niet op Bike Index. E-mail
           contact@bikeindex.org als dit op een fout lijkt.
       lightspeed_interface:
-        must_create_an_account_first: Je moet je aanmelden voor een account op Bike
-          Index voordat je verbinding kunt maken met Lightspeed
         must_create_an_organization_first: U moet een organisatie op Bike Index maken
           voordat u verbinding kunt maken met Lightspeed
+        sign_in_or_add_organization: Meld u aan om uw organisatie te koppelen aan
+          Lightspeed - of, als uw organisatie nog niet op Bike Index staat, voeg deze
+          dan hier toe.
       set_bparam:
         no_user: Het spijt ons, die organisatie heeft geen gebruiker ingesteld om
           fietsen te registreren via. E-mail contact@bikeindex.org als dit op een
@@ -2108,6 +2105,9 @@ nl:
           already_signed_in: Je bent al ingelogd!
         turnstile_verified:
           verify_not_a_robot: Bevestig alstublieft dat u geen robot bent.
+        sign_in_confirmed_user:
+          unable_to_sign_in: We hebben je e-mailadres bevestigd, maar konden je niet
+            inloggen op dat account.
     oauth:
       applications:
         ensure_app_owner!:
@@ -2282,9 +2282,6 @@ nl:
       find_b_param:
         registration_not_found: We konden die registratie niet vinden. Start hieronder
           een nieuwe registratie.
-      sign_in_confirmed_user:
-        unable_to_sign_in: We hebben je e-mailadres bevestigd, maar konden je niet
-          inloggen op dat account.
       redirect_to_single_page:
         registered_for_owner: De %{bike_display} is geregistreerd - we hebben %{email}
           een e-mail gestuurd zodat zij het kunnen claimen.
@@ -2303,6 +2300,34 @@ nl:
     memberships:
       create:
         already_a_member: Je hebt al een lidmaatschap.
+    organization_signup:
+      complete_signup:
+        name_taken_meanwhile: Een andere organisatie heeft de naam %{name} al in gebruik
+          genomen tijdens uw registratie. Kies een andere naam om af te ronden - alle
+          andere gegevens worden bewaard.
+        unable_to_complete: Het is ons niet gelukt om uw organisatie (%{errors}) in
+          te stellen. Neem contact op met support@bikeindex.org en we lossen het op.
+      confirm_email:
+        link_invalid: Die link werkt niet meer. Gebruik de meest recente e-mail die
+          we naar %{email} hebben gestuurd, of stuur hieronder een nieuwe e-mail.
+        link_invalid_resent: Die link werkt niet meer, dus we hebben een nieuwe link
+          naar %{email} gemaild.
+        sign_out_to_confirm: Je bent ingelogd als %{email}. Log uit en open de link
+          opnieuw om de organisatie te activeren.
+      find_signup_for_confirmation:
+        signup_not_found: We konden die aanmelding niet vinden — start hieronder een
+          nieuwe aanmelding.
+      redirect_to_organization:
+        already_activated: "%{name} is al actief"
+      redirect_to_sign_in_for:
+        sign_in_to_manage: "%{name} is actief! Meld u aan als %{email} om het te beheren."
+      resend:
+        link_recently_sent: We hebben zojuist een link naar %{email} verzonden. Het
+          kan even duren voordat deze aankomt, dus controleer ook je spammap.
+        link_resent: We hebben een nieuwe link naar %{email} verzonden.
+        no_more_links: We hebben al meerdere links naar %{email} verzonden, dus we
+          kunnen er geen nieuwe meer sturen. Controleer uw spammap of neem contact
+          op met support@bikeindex.org.
   customer_mailer:
     additional_email_confirmation:
       html:
@@ -3240,6 +3265,7 @@ nl:
         register en QR-stickers uitdelen? <strong>Voeg gewoon "Sticker: <em>fietsstickernummer</em>
         " toe aan het einde van de verkoopnota in Lightspeed</strong> en de sticker
         zal naar de fiets linken en de fiets toevoegen aan je lokale register.'
+      add_your_shop: Voeg je winkel toe aan Bike Index
     protect_your_bike:
       211547_bikes_were_reported_stolen: 211.547 fietsen werden als gestolen gemeld
       9_in_10_incidents_of_bike_theft: 9 op 10 incidenten van fietsdiefstal
@@ -3703,6 +3729,12 @@ nl:
     registration_form_settings: Instellingen voor het registratieformulier
     marketplace_how_it_works: Hoe de Bike Index Marketplace werkt
     register_landing: Registreer je fiets gratis
+    organization_signup_confirm: Activeer uw organisatie
+    organization_signup_create: Voeg uw organisatie toe aan Bike Index
+    organization_signup_new: Voeg uw organisatie toe aan Bike Index
+    organization_signup_show: Voeg uw organisatie toe aan Bike Index
+    organization_signup_update: Voeg uw organisatie toe aan Bike Index
+    organization_signup_welcome: "%{organization} is actief"
   organized:
     ambassador_dashboards:
       getting_started:
@@ -4150,6 +4182,8 @@ nl:
       subject: Voltooi de melding van uw gestolen %{cycle_type}
     organization_message:
       subject: Bericht van %{organization_name} over uw %{bike_type}
+    organization_signup_confirmation:
+      subject: Bevestig je e-mailadres om %{name} te activeren op Bike Index
   plan_features:
     automatic_registration_through_pos: Automatische registratie via uw POS
     create_organization_account: Maak een organisatieaccount en neem contact op met
@@ -4428,6 +4462,19 @@ nl:
       add_a_registration: Voeg een registratie toe
       registration_form_settings: Instellingen voor het registratieformulier
       education_courses: Onderwijscursussen
+    organization_signup:
+      address_required: Voer het volledige adres van de organisatie in.
+      email_required: Een geldig e-mailadres is vereist.
+      kind_required: Kies het type organisatie dat dit is.
+      name_required: De naam van de organisatie is verplicht.
+      name_reserved: Die naam is gereserveerd op Bike Index - kies een andere naam.
+      name_taken: Er bestaat al een organisatie met de naam %{name} op Bike Index.
+        Kies een andere naam, of neem contact op met support@bikeindex.org als het
+        uw naam is.
+      name_taken_shortened: Dat lijkt te veel op %{name}, dat al op Bike Index staat
+        - namen moeten binnen de eerste 30 tekens verschillen. Kies een andere naam,
+        of neem contact op met support@bikeindex.org als het uw naam is.
+      name_too_short: De organisatienaam moet minimaal twee letters of cijfers bevatten.
   users:
     accept_terms:
       i_agree_to_tos_html: Ik ga akkoord met de <strong>Servicevoorwaarden van</strong>
@@ -4632,29 +4679,6 @@ nl:
       handlebar_type: Type stuur
       optional: optioneel
       phone_number_owner: Telefoon van de eigenaar
-    new:
-      bike_index_for_organizations: Bike Index voor organisaties
-    new_form:
-      add_organization: Organisatie toevoegen
-      add_your_organization_to_bike_index: 'Voeg uw organisatie gratis toe aan Bike
-        Index in drie eenvoudige stappen:'
-      bike_index_account: Bike Index-account
-      confirm_your_email: bevestig je email
-      fill_out_the_form_that_will_appear: Vul het formulier in dat op deze pagina
-        verschijnt zodra u bent ingelogd.
-      filling_out_this_form_will_create_a_new_org: Als u dit formulier invult, wordt
-        een nieuwe, andere organisatie gecreëerd
-      if_you_dont_want_that_to_be_the_case_html: Als u niet wilt dat dat het geval
-        is, %{logout_link} en meld u aan met de e-mail die u in plaats daarvan wilt
-        gebruiken.
-      log_out: Uitloggen
-      new_organization: Nieuwe organisatie
-      organization_kind: Soort organisatie
-      organization_name: Organisatie naam
-      sign_up_for_a_new_account_html: Meld u aan voor een %{new_account_link}
-      you_are_already_a_member_of_org_html: Je bent al lid van %{org_link}.
-      your_current_account_will_be_a_member_html: Uw huidige account ( <strong>%{user_email}</strong>
-        ) wordt lid van de organisatie die u maakt.
     embed_fields:
       add_a_color: Voeg een kleur toe
       additional_serial: Extra framenummer / stickernummer
@@ -4971,9 +4995,6 @@ nl:
         marketplace_messages: Marktplaatsberichten
     color_scheme:
       appearance: Verschijning
-      dark: Donker
-      light: Licht
-      system: Systeem
   bikes_edit:
     accessories:
       add_a_component: Voeg een component toe
@@ -5412,6 +5433,14 @@ nl:
           je een bericht gestuurd over jouw %{bike_type}:"
         sender_sent_you_a_message_html: "%{sender_email} van %{organization_name}
           heeft je een bericht gestuurd over jouw %{link}:"
+      organization_signup_confirmation:
+        activate_your_organization: Activeer uw organisatie
+        confirm_and_activate: Bevestig mijn e-mailadres en activeer
+        confirm_to_activate_html: Bevestig dit e-mailadres om <strong>%{name}</strong>
+          te activeren op Bike Index. Je wordt de beheerder en kunt de rest van je
+          team uitnodigen zodra je bent ingelogd.
+        link_signs_you_in: Deze link geeft je een account bij Bike Index, dus stuur
+          hem niet door. Hij is %{days} dagen geldig.
     ui:
       definition_list:
         row:
@@ -8448,6 +8477,93 @@ nl:
         stories:
           load_more_stories: Meer verhalen laden
           newer_stories: Nieuwere verhalen
+      org_signup:
+        views:
+          confirm:
+            activate: Activeren
+            activate_org: Activeer %{name}
+            confirm_email_to_activate_html: Bevestig dat %{email} uw e-mailadres is,
+              dan richten we de organisatie in met u als beheerder.
+            sign_out_and_activate: Uitloggen en activeren
+            signed_in_as_other: Je bent ingelogd als %{signed_in_as}, maar deze link
+              is voor %{email}. Door te activeren word je uitgelogd en ingelogd als
+              %{email}, de beheerder van de organisatie.
+          step1:
+            activation_link: We sturen je een link per e-mail om de organisatie te
+              activeren. Je hoeft daar niet op te wachten, je kunt meteen aan de slag.
+            add_your_organization: Voeg uw organisatie toe
+            already_on_bike_index_html: Is uw organisatie al aangesloten bij Bike
+              Index? %{sign_in_link} om het te beheren.
+            already_part_of_html: Je maakt al deel uit van %{name} - hiermee creëer
+              je een aparte organisatie.
+            email: Uw e-mailadres
+            email_placeholder: jij@example.com
+            free_to_start: Het is gratis om te beginnen en het duurt maar een paar
+              minuten.
+            kind_bike_advocacy: Belangengroep
+            kind_bike_manufacturer: Fabrikant
+            kind_bike_shop: Fietsenwinkel
+            kind_law_enforcement: Rechtshandhaving
+            kind_municipality: Stad of gemeente
+            kind_other: Ander
+            kind_property_management: Vastgoedbeheer
+            kind_school: School of universiteit
+            kind_software: Software
+            next: Volgende
+            organization_kind: Wat voor soort organisatie?
+            organization_name: Organisatie naam
+            sign_in: Log in
+            signed_in_as_html: Je bent ingelogd als %{email}, wat de beheerder van
+              de organisatie zal zijn.
+            start_a_different_one: Begin in plaats daarvan een andere organisatie.
+            your_info: Uw gegevens
+            your_organization: Uw organisatie
+          step2:
+            activation_link_sent: We hebben %{email} een link gemaild om de organisatie
+              te activeren — rond dit eerst af.
+            contact: contact
+            email_confirmed: Je e-mailadres is bevestigd. Voeg %{name} toe en het
+              wordt actief zodra je klaar bent.
+            finish: Finish
+            location: Plaats
+            phone: Telefoon
+            publicly_visible: Toon deze locatie op de Bike Index-kaart.
+            shown_to_people: Zo kunnen mensen die zich bij jou registreren je vinden.
+            website: Website
+            website_placeholder: voorbeeld.com
+            where_is_org: Waar is %{name}?
+          step_finished:
+            activate_html: We hebben een link naar %{email} verzonden — klik erop
+              om %{name} te activeren.
+            activating_lets_you: 'Zodra het geactiveerd is, kunt u:'
+            change_it: Verander het
+            check_your_email: Controleer je e-mail.
+            invite_your_team: Nodig de rest van je team uit.
+            no_email_yet: Geen e-mail ontvangen? Het kan een paar minuten duren. Controleer
+              uw spammap of laat ons de e-mail opnieuw versturen.
+            register_for_community: Registreer voertuigen voor uw gemeente.
+            register_for_residents: Registreer voertuigen voor uw inwoners.
+            register_for_students: Registreer voertuigen voor uw leerlingen en personeel.
+            register_for_tenants: Registreer de voertuigen van uw huurders.
+            register_for_your_customers: Registreer voertuigen voor uw klanten
+            send_it_again: Stuur het opnieuw
+            share_your_link: Deel je registratielink en QR-code.
+            wrong_address: Verkeerd adres?
+          welcome:
+            add_a_registration: Voeg een registratie toe
+            continue_where_you_were: Ga verder waar je gebleven was.
+            copy_registration_link: Kopieer de registratielink
+            get_started: Zo ga je van start.
+            invite_your_team: Nodig je team uit
+            is_active: "%{name} is actief!"
+            no_password_yet: Je kunt je voorlopig aanmelden via links die je per e-mail
+              ontvangt.
+            organization_settings: Organisatie-instellingen
+            registration_link_explained: Iedereen die zich via deze link registreert,
+              wordt automatisch bij uw organisatie geregistreerd.
+            set_a_password: Stel een wachtwoord in
+            show_qr_code: QR-code weergeven
+            your_registration_link: Uw registratielink
     shared_blocks:
       footer:
         about: Over
@@ -8651,6 +8767,11 @@ nl:
           stat_partners: partnerwinkels, politiekorpsen en steden
           stat_recoveries: Gestolen fietsen teruggevonden
           stat_value: waarde teruggegeven aan eigenaren
+      color_scheme_picker:
+        appearance: Verschijning
+        dark: Donker
+        light: Licht
+        system: Systeem
   user_emails:
     confirm:
       confirm_email: E-mail bevestigen

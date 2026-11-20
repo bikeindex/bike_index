@@ -19,7 +19,7 @@ module ControllerHelpers
       :page_id, :default_bike_search_path, :every_bike_search_path, :bikehub_url, :show_general_alert,
       :display_dev_info?, :current_country_id, :current_currency, :turbo_request?,
       :render_donation_request?, :old_register_view?, :sort_state, :admin_index_state, :metric_units?,
-      :search_distance_unit, :request_location_hash
+      :search_distance_unit, :request_location_hash, :color_scheme
     before_action :enable_rack_profiler
 
     before_action do
@@ -84,6 +84,11 @@ module ControllerHelpers
 
     # local requests carry no CF country, so development reads as the US
     @metric_units = UnitSystem.metric?(user: current_user, country_id: current_country_id || (Country.united_states_id if Rails.env.development?))
+  end
+
+  # A signed-out visitor's pick is a cookie the color-scheme controller writes
+  def color_scheme
+    current_user&.color_scheme || cookies[:color_scheme].presence_in(User.color_schemes.keys) || "system"
   end
 
   # A searched URL keeps the unit it was searched in
