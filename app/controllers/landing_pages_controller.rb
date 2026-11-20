@@ -1,6 +1,6 @@
 class LandingPagesController < ApplicationController
   before_action :force_html_response
-  before_action :instantiate_feedback, except: %i[show for_community_groups]
+  before_action :instantiate_feedback, except: %i[show for_community_groups ascend]
 
   def show
     raise ActionController::RoutingError, "Not found" unless current_organization.present?
@@ -12,6 +12,12 @@ class LandingPagesController < ApplicationController
 
     render SharedBlocks::Marketing::Wrapper::Component.new(page: Pages::LandingPages::ForCommunityGroups::Component.new(
       recovery_displays: RecoveryDisplay.with_photo.limit(4), sign_up_path:
+    ))
+  end
+
+  def ascend
+    render SharedBlocks::Marketing::Wrapper::Component.new(page: Pages::LandingPages::Ascend::Component.new(
+      has_shop: current_user&.has_shop_organization_role? || false
     ))
   end
 

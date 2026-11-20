@@ -1,0 +1,60 @@
+# frozen_string_literal: true
+
+module Pages
+  module LandingPages
+    module Ascend
+      # The setup page for shops connecting Ascend Retail. Visitors mostly arrive already sold on Bike Index
+      # (from /for_bike_shops or their account), so it argues the effort and the privacy, then walks the setup.
+      # has_shop: the visitor is signed in to a shop organization, which finishes step one
+      class Component < ApplicationComponent
+        SECTION_CLASSES = SharedBlocks::Marketing::Wrapper::Component::CONTAINER_CLASSES
+        MUTED = "tw:text-gray-500 tw:dark:text-gray-400"
+        HEADING_CLASSES = "tw:m-0 tw:font-header tw:font-extrabold"
+        BAND = "tw:border-gray-200 tw:bg-gray-50 tw:dark:border-gray-700 tw:dark:bg-gray-800"
+        ASCEND_GUIDE_URL = "https://help.ascendrms.com/reporting/send-purchase-and-registration-information-to-bike-index"
+        SHOPS_EMAIL = "bikeshops@bikeindex.org"
+        SECURITY_FAQ_PATH = "/info/security-faq-pos-integrations"
+
+        def initialize(has_shop: false)
+          @has_shop = has_shop
+        end
+
+        private
+
+        def shop_benefits
+          [["icons/repeat.svg", translation(".nothing_to_do_at_checkout"), translation(".nothing_to_do_at_checkout_body")],
+            ["icons/mail-check.svg", translation(".bikes_waiting_for_customers"), translation(".bikes_waiting_for_customers_body")],
+            ["icons/lucide-layout-dashboard.svg", translation(".a_dashboard_for_your_shop"), translation(".a_dashboard_for_your_shop_body")]]
+        end
+
+        def privacy_points
+          [["icons/ban.svg", translation(".never_sold_or_shared"), translation(".never_sold_or_shared_body")],
+            ["icons/envelope.svg", translation(".one_email_to_claim_their_bike"), translation(".one_email_to_claim_their_bike_body")],
+            ["icons/megaphone-off.svg", translation(".no_marketing_lists"), translation(".no_marketing_lists_body")],
+            ["icons/user-check.svg", translation(".customers_stay_in_control"), translation(".customers_stay_in_control_body")]]
+        end
+
+        def customer_benefits
+          [["icons/file-check.svg", translation(".peace_of_mind"), translation(".peace_of_mind_body")],
+            ["icons/siren.svg", translation(".a_full_suite_of_recovery_tools"), translation(".a_full_suite_of_recovery_tools_body")],
+            ["icons/users.svg", translation(".a_network_on_their_side"), translation(".a_network_on_their_side_body")]]
+        end
+
+        def steps
+          [step_create_account,
+            {title: translation(".turn_on_bike_index_in_ascend"), body: translation(".turn_on_bike_index_in_ascend_body"),
+             button: {text: translation(".open_ascend_guide"), href: ASCEND_GUIDE_URL, target: "_blank", rel: "noopener"}},
+            {title: translation(".send_us_the_password"), body: translation(".send_us_the_password_body", shops_email: SHOPS_EMAIL),
+             button: {text: translation(".email_us"), href: "mailto:#{SHOPS_EMAIL}?subject=#{ERB::Util.url_encode(translation(".email_subject"))}"}}]
+        end
+
+        def step_create_account
+          return {title: translation(".your_shop_is_on_bike_index"), body: translation(".your_shop_is_on_bike_index_body"), done: true} if @has_shop
+
+          {title: translation(".create_your_shop_account"), body: translation(".create_your_shop_account_body"),
+           button: {text: translation(".create_shop_account"), href: new_organization_path}}
+        end
+      end
+    end
+  end
+end
