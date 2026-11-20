@@ -31,7 +31,8 @@ module OrgServices
     # What Pages::Register::Parts::Progress reads off a flow
     def steps = STEPS
 
-    def position(step) = STEPS.index(step.to_s).to_i + 1
+    # Check your email is still waiting on activation, the last segment
+    def position(step) = (step.to_s == "finished") ? 2 : STEPS.index(step.to_s).to_i + 1
 
     # The step asked for, if the signup has reached it - otherwise the furthest it has.
     # Step 1 is only saved once it's valid, so a name means it's done
@@ -44,13 +45,15 @@ module OrgServices
       ((STEPS.index(step.to_s) || STEPS.count) <= STEPS.index(furthest)) ? step.to_s : furthest
     end
 
-    # A signed in user's own address is the one confirmed - they aren't asked for it.
-    # Changing the address makes the link already sent useless, so it's replaced
+    # A signed in user's own address is the one confirmed - they aren't asked for it, and a
+    # confirmed account has already proven it. Changing the address makes the link already
+    # sent useless, so it's replaced
     def save_start(signup, user:, name:, kind:, email:, additional: nil)
       email = EmailNormalizer.normalize(user&.email || email)
       if email != signup.email
         signup.assign_attributes(email_confirmation_token: nil, email_confirmed_at: nil)
       end
+      signup.email_confirmed_at ||= Time.current if user&.confirmed?
       signup.assign_attributes(name:, email:, kind: (kind if Organization.user_creatable_kinds.include?(kind)),
         likely_spam: signup.likely_spam || additional.present?)
       start_errors(signup).each { signup.errors.add(:base, it) }
@@ -106,7 +109,7 @@ module OrgServices
     # The organization, with its errors if the name was taken since step 1 checked it
     def complete(signup, user:)
       organization = Organization.new(name: signup.name, kind: signup.kind, website: signup.website,
-        auto_user_id: user.id, locations_attributes: [location_attributes(signup)])
+        show_on_map: signup.publicly_visible, auto_user_id: user.id, locations_attributes: [location_attributes(signup)])
       Organization.transaction do
         next unless organization.save
 

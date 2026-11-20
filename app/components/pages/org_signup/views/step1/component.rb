@@ -5,9 +5,10 @@ module Pages
     module Views
       module Step1
         class Component < ApplicationComponent
-          def initialize(organization_signup:, current_user: nil)
+          def initialize(organization_signup:, current_user: nil, focus_email: false)
             @organization_signup = organization_signup
             @current_user = current_user
+            @focus_email = focus_email
           end
 
           private

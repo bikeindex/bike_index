@@ -153,7 +153,7 @@ GEM
       rails-html-sanitizer
     bootsnap (1.25.0)
       msgpack (~> 1.5)
-    brakeman (8.1.0)
+    brakeman (8.1.1)
       racc
     buftok (0.2.0)
     builder (3.3.0)

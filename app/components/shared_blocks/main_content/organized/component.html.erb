@@ -1,23 +1,26 @@
 <div class="organized-wrap tw:[--gutter:15px]">
   <div class="<%= container %>">
-    <%# the layout skips its own spot for this, so it lands inside the content column %>
-    <% if @show_general_alert %>
-      <%= render SharedBlocks::UserAlerts::Wrapper::Component.new(current_user: @current_user, wrapper_class: "tw:my-4") %>
-    <% end %>
+    <%# Without a container, the gutter it would have given the alerts %>
+    <div class="<%= "tw:px-(--gutter)" unless container %>">
+      <%# the layout skips its own spot for this, so it lands inside the content column %>
+      <% if @show_general_alert %>
+        <%= render SharedBlocks::UserAlerts::Wrapper::Component.new(current_user: @current_user, wrapper_class: "tw:my-4") %>
+      <% end %>
 
-    <% if OrgServices::Displayer.law_enforcement_missing_verified_features?(@current_organization) %>
-      <%= render(UI::Alerts::Base::Component.new(kind: :notice, dismissable: true, text: translation(".additional_features_html", email_link: email_link), margin_classes: "tw:mb-10")) %>
-    <% end %>
+      <% if OrgServices::Displayer.law_enforcement_missing_verified_features?(@current_organization) %>
+        <%= render(UI::Alerts::Base::Component.new(kind: :notice, dismissable: true, text: translation(".additional_features_html", email_link: email_link), margin_classes: "tw:mb-20")) %>
+      <% end %>
 
-    <% if OrgServices::Displayer.subscription_expired_alert?(@current_organization) %>
-      <%= render(UI::Alerts::Base::Component.new(kind: :notice, dismissable: true, text: translation(".subscription_expired_html", email_link: email_link), margin_classes: "tw:mb-10")) %>
-    <% end %>
+      <% if OrgServices::Displayer.subscription_expired_alert?(@current_organization) %>
+        <%= render(UI::Alerts::Base::Component.new(kind: :notice, dismissable: true, text: translation(".subscription_expired_html", email_link: email_link), margin_classes: "tw:mb-20")) %>
+      <% end %>
 
-    <%= render SharedBlocks::MainContent::OrganizedShopIntegrationAlert::Component.new(
+      <%= render SharedBlocks::MainContent::OrganizedShopIntegrationAlert::Component.new(
       current_organization: @current_organization,
       controller_name: @controller_name,
       action_name: @action_name
     ) %>
+    </div>
 
     <%= content %>
   </div>
