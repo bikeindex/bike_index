@@ -17,11 +17,27 @@ RSpec.describe Organization, type: :model do
       expect(Organization.name_problem("Shifty Cycles")).to be_nil
       expect(Organization.name_problem(" shifty  BIKE shop")).to eq :taken
       expect(Organization.name_problem("Registrations")).to eq :reserved
+      expect(Organization.name_problem("Signups")).to eq :reserved
       expect(Organization.name_problem("X")).to eq :too_short
       expect(Organization.name_problem("<b></b>!")).to eq :too_short
       # Fine as typed, but not once shortened to its short name, or slugged
       expect(Organization.name_problem("Stolen (Bicycle Recovery Network of Portland)")).to eq :reserved
       expect(Organization.name_problem("Adminx")).to eq :reserved
+    end
+
+    # /register/{slug} is the organization's registration link, unless /register has a page by that name
+    it "reserves the names of /register's pages" do
+      register_pages = Rails.application.routes.routes.filter_map { it.path.spec.to_s[%r{\A/register/(\w+)\(}, 1] if it.verb == "GET" }
+      expect(register_pages).to include("landing")
+      expect(register_pages.map { Organization.name_problem(it) }.uniq).to eq [:reserved]
+    end
+
+    # A landing page puts its organization's slug at the top level, beside every other route there
+    it "reserves the top level of routes, other than the landing pages' own" do
+      top_level = Rails.application.routes.routes.filter_map { it.path.spec.to_s[%r{\A/([[:alnum:]][\w-]*)}, 1] }.uniq -
+        LandingPageOrganizations::SLUGS
+      expect(top_level).to include("search", "marketplace", "e-bike-rules")
+      expect(top_level.reject { Organization.name_problem(it).in?(%i[reserved too_short]) }).to eq []
     end
   end
 

@@ -2329,7 +2329,6 @@ nb:
             (eller ikke-tilordnede). Dette vil ta noen minutter
       manage_impoundings:
         update:
-          could_not_update: Vi beklager, vi hadde problemer med å oppdatere %{org_name}.
           updated_successfully: "%{org_name} ble oppdatert."
       manages:
         destroy:
@@ -2337,7 +2336,6 @@ nb:
             %{org_name}.
           deleted_org: Slettet %{org_name}.
         update:
-          could_not_update: Vi beklager, vi hadde problemer med å oppdatere %{org_name}.
           updated_successfully: "%{org_name} ble oppdatert."
       parking_notifications:
         create:
@@ -2540,6 +2538,8 @@ nb:
           til %{email}.
         sign_out_to_confirm: Du er logget på som %{email}. Logg ut, og åpne deretter
           lenken på nytt for å aktivere organisasjonen.
+        switched_signup: Du er nå i ferd med å fullføre %{name}. For å fullføre %{replaced_name}
+          også, åpne lenken i e-posten.
       find_signup_for_confirmation:
         signup_not_found: Vi fant ikke den registreringen – start en ny nedenfor
       redirect_to_organization:
@@ -4484,14 +4484,14 @@ nb:
         why_no_direct_by_default: Som standard sendes e-poster til sykler som ikke
           er gjort krav på, til organisasjonen din for å gjennomgå og videresende
           til sluttbrukeren, fordi disse brukerne ikke har meldt seg på Bike Index-varsler.
-        send_self_registration_email_html: Send e-post for registreringer sendt til
-          <code>%{email}</code>
         send_self_registration_email_includes_unregistered: Dette inkluderer uregistrerte
           varsler.
         send_self_registration_email_note: Som standard sender ikke Bike Index lenger
           e-post når et kjøretøy registreres til organisasjonens registrerings-e-postadresse.
           Kryss av i denne boksen hvis du vil motta e-post for registreringer med
           eierens e-postadresse %{email}.
+        send_self_registration_email_to_html: Send e-post for registreringer sendt
+          til %{email}
     stickers:
       edit:
         bike: Sykkel
@@ -4961,6 +4961,7 @@ nb:
       add_a_registration: Legg til en registrering
       registration_form_settings: Innstillinger for registreringsskjema
       education_courses: Utdanningskurs
+      org_information: "%{org_name} Informasjon"
     organization_signup:
       address_required: Vennligst skriv inn organisasjonens fullstendige adresse
       email_required: En gyldig e-postadresse er nødvendig
@@ -5672,6 +5673,24 @@ nb:
         education_course:
           page_edit_bullet:
             bullet: kule
+        info:
+          show:
+            add_a_registration: Legg til en registrering
+            associated_with_org_html: Registreringer fra denne lenken er knyttet til
+              <strong>%{org_name}</strong> .
+            continue_where_you_were: Fortsett der du var
+            copy_registration_link: Kopier registreringslenken
+            get_qr_code_html: Få en %{qr_code_link} som åpner lenken når den skannes.
+            has_paid_functionality: Organisasjonen din har betalt funksjonalitet.
+            invite_your_team: Inviter teamet ditt
+            next_invoice_due_html: Neste faktura forfaller %{time}.
+            no_invoices_upcoming: Ingen fakturaer på vei.
+            no_password_yet: Du logger deg inn med e-postlenker foreløpig.
+            org_is_active: "%{name} er aktiv"
+            organization_set_up_next_steps: Neste trinn for oppsett av organisasjonen
+            qr_code: QR-kode
+            set_a_password: Angi et passord
+            your_public_registration_link: Din offentlige registreringslenke
       registrations:
         show:
           bike_details:
@@ -6525,7 +6544,8 @@ nb:
           step1:
             just_the_essentials: Bare det viktigste for å komme i gang.
             register_your_vehicle: Registrer kjøretøyet ditt!
-            register_your_vehicle_with_org: Registrer kjøretøyet ditt med %{org_name}!
+            register_your_vehicle_with_org_html: Registrer kjøretøyet ditt med <strong>%{org_name}</strong>
+              !
           step2:
             add_your_bikes_details: Legg til detaljene dine for %{cycle_type}
             confirmation_link_sent: Vi har sendt en bekreftelseslenke til e-posten
@@ -8236,11 +8256,8 @@ nb:
             add_your_organization: Legg til organisasjonen din
             already_on_bike_index_html: Er organisasjonen din allerede på Bike Index?
               %{sign_in_link} for å administrere den.
-            already_part_of_html: Du er allerede en del av %{name} – dette oppretter
-              en egen organisasjon.
             email: Din e-post
             email_placeholder: du@eksempel.com
-            free_to_start: Gratis å starte, og det tar et par minutter.
             kind_bike_advocacy: Interessentgruppe
             kind_bike_manufacturer: Produsent
             kind_bike_shop: Sykkelbutikk
@@ -8254,11 +8271,16 @@ nb:
             organization_kind: Hva slags organisasjon?
             organization_name: Organisasjonsnavn
             sign_in: Logg inn
-            signed_in_as_html: Du er logget på som %{email}, som vil være organisasjonens
-              administrator.
             start_a_different_one: Start heller en annen organisasjon
             your_info: Din informasjon
             your_organization: Din organisasjon
+            already_part_of_organization_html: Du er allerede en del av %{organization_link}
+              – dette vil opprette en egen organisasjon.
+            free_to_start_few_minutes: Gratis å starte, det tar bare noen få minutter.
+            organization_link: "%{name} organisasjon"
+            signed_in_as_new_admin_html: Du er logget på som %{email}, som blir den
+              nye organisasjonens administrator.
+            signup_name: registrering
           step2:
             activation_link_sent: Vi har sendt en e-post til %{email} med en lenke
               for å aktivere organisasjonen – fullfør her først.
@@ -8273,6 +8295,9 @@ nb:
             website: Nettsted
             website_placeholder: eksempel.com
             where_is_org: Hvor er %{name}?
+            out_of_links: Vi har sendt alle aktiveringslenkene vi kan, og ingen av
+              dem gikk til %{email}. Kontakt support@bikeindex.org, så ordner vi det.
+            signup_name: registrering
           step_finished:
             activate_html: Vi sendte en lenke til %{email} – klikk på den for å aktivere
               %{name}.
@@ -8290,20 +8315,10 @@ nb:
             send_it_again: Send det på nytt
             share_your_link: Del registreringslenken og QR-koden din
             wrong_address: Feil adresse?
-          welcome:
-            add_a_registration: Legg til en registrering
-            continue_where_you_were: Fortsett der du var
-            copy_registration_link: Kopier registreringslenken
-            get_started: Slik kommer du i gang.
-            invite_your_team: Inviter teamet ditt
-            is_active: "%{name} er aktiv!"
-            no_password_yet: Du logger deg inn med e-postlenker foreløpig.
-            organization_settings: Organisasjonsinnstillinger
-            registration_link_explained: Alle som registrerer seg via denne lenken
-              er registrert i organisasjonen din.
-            set_a_password: Angi et passord
-            show_qr_code: Vis QR-kode
-            your_registration_link: Din registreringslenke
+            cant_send_another: Vi kan ikke sende en ny lenke
+            out_of_links_html: Vi har sendt alle aktiveringslenkene vi kan for %{name},
+              og ingen av dem gikk til %{email}. Kontakt support@bikeindex.org, så
+              ordner vi det.
     shared_blocks:
       footer:
         about: Om

@@ -23,7 +23,7 @@
           <% if @login_method == "magic_link" %>
             <%= email_display %>
             <p><%= t("sessions.new.org_uses_passwordless") %></p>
-            <p class="tw:mb-4! tw:text-sm! tw:text-gray-500!">
+            <p class="tw:mb-4! tw:text-sm! tw:text-gray-500! tw:dark:text-gray-400!">
               <%= t("sessions.new.passwordless_help") %>
             </p>
             <%= form_tag create_magic_link_session_path, method: "post" do %>
@@ -38,7 +38,12 @@
               password form; sits above the password input as an alternative sign-in.
             %>
             <%= button_to t("sessions.new.sign_in_without_password"), create_magic_link_session_path, params: {email: @email, remember_me: @remember_me}, form: {class: "tw:mb-0!"}, class: "twlink tw:bg-transparent! tw:border-0! tw:p-0! tw:font-bold! tw:cursor-pointer!" %>
-            <p class="tw:mt-1! tw:mb-8! tw:text-sm! tw:text-gray-500!">
+            <p
+              class="
+                tw:mt-1! tw:mb-8! tw:text-sm! tw:text-gray-500!
+                tw:dark:text-gray-400!
+              "
+            >
               <%= t("sessions.new.passwordless_help") %>
             </p>
             <%= email_display %>
