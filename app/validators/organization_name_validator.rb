@@ -2,11 +2,11 @@ class OrganizationNameValidator < ActiveModel::Validator
   # These were pulled from the top level of routes
   INVALID_NAMES = %w[400 401 404 422 500 about accept_terms accept_vendor_terms admin ambassadors ambassadors_current
     ambassadors_how_to api ascend auth bike_creation_graph bike_shop_packages bike_stickers bikes
-    blogs choose_registration dev_and_design discourse_authentication
-    discuss documentation edit_my_account feedbacks for_bike_shops for_cities for_community_groups
+    blogs choose_registration confirm dev_and_design discourse_authentication
+    discuss documentation edit_my_account embed feedbacks for_bike_shops for_cities for_community_groups
     for_law_enforcement for_schools goodbye help how_not_to_buy_stolen ikes image_resources info
-    integrations lightspeed lightspeed_interface locks logout manufacturers manufacturers_tsv
-    my_account news o oauth organizations ownerships pages payments privacy protect_your_bike
+    integrations landing lightspeed lightspeed_interface locks logout manufacturers manufacturers_tsv
+    my_account new news o oauth organizations ownerships pages payments privacy protect_your_bike
     public_images rails recovery_stories registrations resources serials session shop sidekiq stickers
     stolen stolen_notifications store donate why_donate support_bike_index support_the_bike_index support_the_index terms
     theft_alerts update_browser user_emails user_embeds user_root_url_redirect users vendor_terms where

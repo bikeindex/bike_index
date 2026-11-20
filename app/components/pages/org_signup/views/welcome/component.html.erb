@@ -41,7 +41,7 @@
 
       <p class="tw:mt-2 tw:mb-0 tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">
         <%= translation(".registration_link_explained") %>
-        <%= link_to translation(".show_qr_code"), qr_organization_path(@organization), class: "twlink" %>
+        <%= link_to translation(".show_qr_code"), register_organization_path(@organization, format: :png), class: "twlink" %>
       </p>
     </div>
 

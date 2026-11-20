@@ -11,6 +11,6 @@ RSpec.describe Pages::OrgSignup::Views::Welcome::Component, type: :component do
     registration_url = "http://test.host/register/new?organization_id=#{organization.slug}"
     expect(component).to have_text registration_url
     expect(component).to have_css "button[data-ui--copy-button-text-value='#{registration_url}'][title='Copy registration link']"
-    expect(component).to have_link "Show QR code", href: "/organizations/#{organization.slug}/qr"
+    expect(component).to have_link "Show QR code", href: "/register/#{organization.slug}.png"
   end
 end

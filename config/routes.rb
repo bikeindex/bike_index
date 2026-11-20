@@ -38,7 +38,7 @@ Rails.application.routes.draw do
       get :embed
       get :embed_extended, as: :embed_extended
       get :embed_create_success
-      get :qr
+      get :qr, to: redirect(path: "/register/%{id}.png")
     end
   end
 
@@ -235,6 +235,8 @@ Rails.application.routes.draw do
   # Registration photos - the /register flow's and the embed forms' - upload before
   # there's a session, so they get their own endpoint
   post "/register/direct_uploads" => "register/direct_uploads#create", :as => :register_direct_uploads
+  # After the resource above, so its named actions aren't taken for slugs
+  get "register/:organization_id", to: "register/organizations#show", as: :register_organization
 
   # Shadows ActiveStorage's own route (drawn last, so this wins) so the stock controller, which
   # checks nothing, isn't reachable. Deliberately unnamed - rails_direct_uploads_path still
