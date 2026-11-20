@@ -71,9 +71,10 @@ class PosRegistrationMatch < ApplicationRecord
 
   def self.ordered_reasons(reasons) = REVIEW_REASONS.keys & reasons
 
-  # Other live registrations matched to the same POS registration, which an admin should sort out
+  # Other registrations matched to the same POS registration, which an admin should sort out: live ones, and
+  # merged ones, since a registration whose match was recorded after the merge is a third
   def self.other_registration_matches(bike_id:, pos_bike_id:)
-    where(pos_bike_id:).where.not(bike_id:).where(bike_id: Bike.current_with_user_hidden.select(:id))
+    where(pos_bike_id:).where.not(bike_id:).and(where(bike_id: Bike.current_with_user_hidden.select(:id)).or(merged))
   end
 
   # The registration a deleted one was merged into, so its links still go somewhere

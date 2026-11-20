@@ -25,7 +25,7 @@ module BikeJobs
     LEFT_COLUMNS = {
       "ownerships.bike_id" => "the POS registration's ownership takes the owner's registration info",
       "normalized_serial_segments.bike_id" => "removed by DuplicateBikeFinderJob once the registration is deleted",
-      "user_alerts.bike_id" => "recalculated for the owner by AfterBikeSaveJob",
+      "user_alerts.bike_id" => "resolved, since the registration is gone",
       "pos_registration_matches.bike_id" => "the record of the merge",
       "pos_registration_matches.pos_bike_id" => "the owner's registration isn't a POS one",
       "bike_stickers.previous_bike_id" => "where a sticker was before, like a re-claim records",
@@ -52,8 +52,12 @@ module BikeJobs
         match.reload
         next false unless match.merging?
 
+        # A transfer's new ownership is current before its bike points to it. Read after the bike locks, so one that
+        # committed while this waited is seen
+        transferring = Ownership.current.where(bike_id: bike_ids).order(:id).pluck(:id) !=
+          [match.bike, match.pos_bike].filter_map { it&.current_ownership_id }.sort
         # Rechecked, since a theft, an edit, a transfer or another registration can come after the owner's answer
-        reasons = if match.mergeable?
+        reasons = if match.mergeable? && !transferring
           PosRegistrationMatch.review_reasons_for(match.bike, match.pos_bike) +
             (PosRegistrationMatch.other_registration_matches(bike_id: match.bike_id, pos_bike_id: match.pos_bike_id)
               .exists? ? ["multiple_registrations"] : [])
@@ -79,6 +83,8 @@ module BikeJobs
       # What they submitted, which a pending education course acknowledgment links to
       BParam.where(created_bike_id: bike.id).update_all(created_bike_id: pos_bike.id)
       ImpoundClaim.where(bike_submitting_id: bike.id).update_all(bike_submitting_id: pos_bike.id)
+      # Recalculating alerts only visits live bikes. AfterBikeSaveJob refreshes the owner's alert slugs
+      UserAlert.active.where(bike_id: bike.id).update_all(resolved_at: Time.current, updated_at: Time.current)
       PublicImage.unscoped.where(imageable: bike).update_all(imageable_id: pos_bike.id)
       Sale.where(item: bike).update_all(item_id: pos_bike.id)
       # Gear is its Strava athlete's
@@ -101,17 +107,29 @@ module BikeJobs
       bike.destroy!
     end
 
-    # An organization on both keeps the more restrictive edit permission
+    # Graduated (deleted) memberships come too, since a graduated notification's renewal link restores its membership
     def merge_bike_organizations(bike, pos_bike)
-      pos_bike_organizations = pos_bike.bike_organizations.index_by(&:organization_id)
-      bike.bike_organizations.each do |bike_organization|
+      bike_organizations = BikeOrganization.unscoped.where(bike_id: [bike.id, pos_bike.id]).to_a
+      merged_organization_ids = bike_organizations.filter_map { it.organization_id if it.bike_id == bike.id }
+      # A current membership over a graduated one
+      pos_bike_organizations = bike_organizations.select { it.bike_id == pos_bike.id }.sort_by { it.deleted? ? 0 : 1 }
+        .index_by(&:organization_id)
+      bike_organizations.select { it.bike_id == bike.id }.each do |bike_organization|
         pos_bike_organization = pos_bike_organizations[bike_organization.organization_id]
-        if pos_bike_organization.blank?
+        if pos_bike_organization.blank? || (pos_bike_organization.deleted? && !bike_organization.deleted?)
           bike_organization.update_columns(bike_id: pos_bike.id)
-        elsif bike_organization.can_not_edit_claimed && !pos_bike_organization.can_not_edit_claimed
-          pos_bike_organization.update!(can_not_edit_claimed: true)
+        else
+          # The moved graduated notifications graduate the kept bike from the organization
+          GraduatedNotification.unscoped.where(bike_organization_id: bike_organization.id)
+            .update_all(bike_organization_id: pos_bike_organization.id)
         end
       end
+      # For organizations the owner's registration was in, the most restrictive edit permission any membership of
+      # either bike had, current or graduated. Other organizations' memberships are the POS registration's own
+      restricted_organization_ids = bike_organizations.select(&:can_not_edit_claimed).map(&:organization_id) &
+        merged_organization_ids
+      BikeOrganization.unscoped.where(bike_id: pos_bike.id, organization_id: restricted_organization_ids, can_not_edit_claimed: false)
+        .update_all(can_not_edit_claimed: true, updated_at: Time.current)
     end
 
     def merge_attributes(bike, pos_bike)
