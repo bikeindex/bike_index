@@ -106,6 +106,18 @@ RSpec.describe LandingPagesController, type: :request do
         expect(response.body).to include("Your shop is on Bike Index")
         expect(response.body).to_not include("Create shop account")
       end
+
+      context "when the organization isn't a shop" do
+        let(:current_organization) { FactoryBot.create(:organization, kind: "law_enforcement") }
+
+        it "keeps the account step" do
+          get "/ascend"
+
+          expect(response.status).to eq(200)
+          expect(response.body).to include("Create shop account")
+          expect(response.body).to_not include("Your shop is on Bike Index")
+        end
+      end
     end
   end
 

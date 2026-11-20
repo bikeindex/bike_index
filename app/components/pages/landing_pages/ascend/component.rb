@@ -6,12 +6,11 @@ module Pages
       # has_shop: the visitor is signed in to a shop organization, which finishes step one
       class Component < ApplicationComponent
         SECTION_CLASSES = SharedBlocks::Marketing::Wrapper::Component::CONTAINER_CLASSES
-        MUTED = "tw:text-gray-500 tw:dark:text-gray-400"
-        HEADING_CLASSES = "tw:m-0 tw:font-header tw:font-extrabold"
-        BAND = "tw:border-gray-200 tw:bg-gray-50 tw:dark:border-gray-700 tw:dark:bg-gray-800"
+        MUTED = Pages::LandingPages::ForBikeShops::Component::MUTED
+        HEADING_CLASSES = Pages::LandingPages::ForBikeShops::Component::HEADING_CLASSES
+        BAND = Pages::LandingPages::ForBikeShops::Component::BAND
         ASCEND_GUIDE_URL = "https://help.ascendrms.com/reporting/send-purchase-and-registration-information-to-bike-index"
         SHOPS_EMAIL = "bikeshops@bikeindex.org"
-        SECURITY_FAQ_PATH = "/info/security-faq-pos-integrations"
 
         def initialize(has_shop: false)
           @has_shop = has_shop
@@ -27,7 +26,7 @@ module Pages
 
         def privacy_points
           [["icons/ban.svg", translation(".never_sold_or_shared"), translation(".never_sold_or_shared_body")],
-            ["icons/envelope.svg", translation(".one_email_to_claim_their_bike"), translation(".one_email_to_claim_their_bike_body")],
+            ["icons/envelope.svg", translation(".one_email_to_claim_their_bike"), translation(".one_email_to_claim_their_bike_body"), true],
             ["icons/megaphone-off.svg", translation(".no_marketing_lists"), translation(".no_marketing_lists_body")],
             ["icons/user-check.svg", translation(".customers_stay_in_control"), translation(".customers_stay_in_control_body")]]
         end

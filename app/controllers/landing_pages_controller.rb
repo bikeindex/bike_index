@@ -15,7 +15,7 @@ class LandingPagesController < ApplicationController
 
   def ascend
     render SharedBlocks::Marketing::Wrapper::Component.new(page: Pages::LandingPages::Ascend::Component.new(
-      has_shop: current_user&.has_shop_organization_role? || false
+      has_shop: current_user&.has_shop_organization_role?
     ))
   end
 
