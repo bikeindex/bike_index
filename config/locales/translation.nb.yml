@@ -3723,38 +3723,6 @@ nb:
       why_work_with_bike_index: Hvorfor jobbe med sykkelindeks
       you_bring_the_ideas_make_the_connections_: Du kommer med ideene, skaper forbindelsene,
         og vi sørger for at du har ressursene til å få ting gjort.
-    ascend:
-      ascend_knowledge_base_article: Ascends Knowledge Base-artikkel
-      automatic_bicycle_registration: Automatisk sykkelregistrering for sykkelbutikker
-        som bruker Ascend POS
-      email_shops_security_html: Send e-post til %{shops_email_link} hvis du har spørsmål,
-        eller sjekk ut %{security_link}. Takk for at du registrerte sykler i Bike
-        Index!
-      email_us_the_password_to_finish_setting_u: Send oss passordet på e-post for
-        å fullføre konfigureringen!
-      follow_the_setup_instructions_html: Følg oppsettinstruksjonene på <strong>%{ascend_link}</strong>
-        på Bike Index
-      if_your_shop_uses_lightspeed_html: Hvis butikken din bruker Lightspeed, sjekk
-        ut vår Lightspeed POS-integrasjon <a target="none" href="%{lightspeed_path}">her</a>
-        .
-      link_your_ascend_retail_and_bike_index: Koble sammen Ascend Retail- og Bike
-        Index-kontoene dine gratis
-      new_bike_shop_org: ny sykkelbutikkorganisasjon
-      once_youve_set_up_the_trek_ascenwd: Når du har konfigurert Trek Ascend POS-sykkelregistreringen,
-        er du ferdig! Hver dag vil Bike Index hente nysolgt sykkelinformasjon fra
-        Ascend for å opprette Bike Index-kontoer for kundene dine. De nye syklene
-        deres venter på dem ved pålogging. De må bare sjekke e-posten deres, og den
-        nye sykkelen deres venter på dem.
-      security_link_text: Vanlige spørsmål om POS-integrering
-      sign_up_as_a_new_org_html: Registrer deg som en %{new_org_link} på Bike Index
-      then_if_a_customers_bike_goes_missing_html: 'Deretter, hvis en kundes sykkel
-        forsvinner, vil sykkelens informasjon og serienummer bli lagret slik at de
-        kan få tilgang til den. Men ikke bekymre deg: <a target="none" href="%{privacy_path}">vi
-        vil aldri gi ut noen av kundedataene dine</a> .'
-      we_have_a_new_free_bicycle_registration: Vi har gratis sykkelregistrering for
-        sykkelbutikker. Hvis du er en butikk som bruker Ascend som din POS, vil vår
-        nye Ascend-salgsintegrering tillate deg å registrere hver sykkel du selger
-        automatisk. Oppsettet tar omtrent 10 minutter.
     bike_shop_packages:
       bike_index_for_bike_shops: Sykkelindeks for sykkelbutikker
       choose_a_package_size: Velg en pakkestørrelse
@@ -8054,6 +8022,91 @@ nb:
           wholesale: Engroshandel
           your_pos: Ditt salgssted
           youre_in: Du er med.
+        ascend:
+          a_dashboard_for_your_shop: Et dashbord for butikken din
+          a_dashboard_for_your_shop_body: Søk etter syklene du har solgt når du trenger
+            det. Hvis en kundes sykkel forsvinner, lagres detaljene og serienummeret
+            og er klare for politianmeldelse eller tyverimelding.
+          a_free_benefit_for_every_customer: En gratis fordel for hver kunde, for
+            dagen du håper aldri kommer.
+          a_full_suite_of_recovery_tools: En komplett pakke med gjenopprettingsverktøy
+          a_full_suite_of_recovery_tools_body: Bike Index er den eneste organisasjonen
+            som tilbyr et komplett utvalg av verktøy for gjenoppretting av stjålne
+            sykler til forbrukere.
+          a_network_on_their_side: Et nettverk på deres side
+          a_network_on_their_side_body: Vårt store nettverk av ideelle bidragsytere
+            støtter og hjelper med berging av sykkel.
+          about_10_minutes: Omtrent 10 minutter
+          ascend_pos_integration: Ascend POS-integrasjon
+          bikes_waiting_for_customers: Sykler venter på kunder
+          bikes_waiting_for_customers_body: Vi oppretter en Bike Index-konto for hver
+            kunde. De sjekker e-posten sin, logger inn, og den nye sykkelen deres
+            er allerede der. Foretrekker du ikke å motta e-post? Vi kan slå av kundevarsler
+            helt.
+          caped_hero_bike_alt: Kappeheltesykkel
+          create_shop_account: Opprett butikkkonto
+          create_your_shop_account: Opprett din butikkkonto på Bike Index
+          create_your_shop_account_body: Registrer deg som en ny sykkelbutikkorganisasjon.
+            Hvis butikken din allerede har en, logg inn og hopp videre.
+          customers_stay_in_control: Kundene beholder kontrollen
+          customers_stay_in_control_body: Eiere kan oppdatere, overføre eller slette
+            registreringen sin når som helst.
+          email_notifications_off_body: Vi kan slå av e-postvarsler helt. Sykkelen
+            forblir registrert under butikkens e-postadresse i stedet, så hvis politiet
+            finner den igjen, vil de kontakte butikken din, og du vil kontakte kunden.
+            Vi samarbeider gjerne med deg om personverninnstillinger som passer din
+            butikk.
+          email_subject: Ascend-oppsett
+          email_us: Send oss en e-post
+          lightspeed_body_html: Vi har også en %{lightspeed_link}.
+          lightspeed_pos_integration: Lightspeed POS-integrasjon
+          link_your_accounts_once: Koble sammen Ascend Retail- og Bike Index-kontoene
+            dine én gang. Gratis, og oppsettet tar omtrent 10 minutter.
+          never_sold_or_shared: Aldri solgt eller delt
+          never_sold_or_shared_body: Kundenavn og e-postadresser selges, leies ikke
+            ut eller gis videre til tredjeparter.
+          new_bike_sales_get_a_bike_index_account: Nye sykkelsalg får automatisk fordelen
+            av en Bike Index-konto
+          no_marketing_lists: Ingen markedsføringslister
+          no_marketing_lists_body: Vi legger ikke til kundene dine i nyhetsbrev eller
+            sender dem kampanjer.
+          nothing_to_do_at_checkout: Ingenting å gjøre i kassen
+          nothing_to_do_at_checkout_body: Hver dag henter Bike Index nysolgte sykler
+            fra Ascend. De ansatte fortsetter å øke salget slik de allerede gjør.
+          one_email_to_claim_their_bike: Én e-post for å hente sykkelen sin
+          one_email_to_claim_their_bike_body: Kunder får én e-post som informerer
+            dem om at sykkelen de kjøpte fra butikken din er registrert og venter.
+          open_ascend_guide: Åpne Ascend-guiden
+          peace_of_mind: Sinnefred
+          peace_of_mind_body: Sykkeldetaljene deres er allerede lagret, så de trenger
+            aldri å lete etter serienummeret.
+          pos_integration_faq: Vanlige spørsmål om POS-integrering
+          pos_integration_security_faq: Vanlige spørsmål om sikkerhet for POS-integrasjon
+          privacy_intro: Bike Index er en ideell organisasjon. Kundeinformasjon brukes
+            til å registrere sykler og hjelpe dem med å få dem tilbake, og ingenting
+            annet.
+          privacy_policy: Personvernerklæring
+          questions: Spørsmål?
+          questions_body_html: Send en e-post til %{email_link} eller les %{faq_link}.
+          rather_they_didnt_get_an_email: De fikk heller ikke en e-post?
+          register_every_bike_you_sell: Registrer alle sykler du selger, automatisk.
+          send_us_the_password: Send oss passordet
+          send_us_the_password_body: Send den på e-post til %{shops_email}, så fullfører
+            vi tilkoblingen av kontoene dine. Etter det er du ferdig.
+          set_up_in_three_steps: Sett opp i tre trinn
+          start_setup: Start oppsettet
+          turn_on_bike_index_in_ascend: Slå på sykkelindeks i Ascend
+          turn_on_bike_index_in_ascend_body: Følg konfigurasjonsinstruksjonene i Ascends
+            kunnskapsbaseartikkel. Det er her du oppretter passordet for tilkoblingen.
+          using_lightspeed_instead: Bruker du Lightspeed i stedet?
+          we_hope_their_bike_is_never_stolen: Vi håper sykkelen deres aldri blir stjålet.
+            Hvis den blir det, er de forsikret.
+          we_will_never_give_out_customer_data: Vi vil aldri gi ut noen av dine kundedata.
+          what_your_customers_get: Hva kundene dine får
+          your_customers_privacy: Kundenes personvern
+          your_shop_is_on_bike_index: Butikken din er på Bike Index
+          your_shop_is_on_bike_index_body: Du er logget på organisasjonskontoen til
+            butikken din, så dette trinnet er fullført.
       marketplace:
         how_it_works:
           across_town_heading: På tvers av byen eller på tvers av landet
