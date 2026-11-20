@@ -2,7 +2,7 @@
 
 # Production slugged this one before the name was pluralized, and locks/_form finds it by
 # slug -- deriving it from the name here leaves that page calling .id on a nil
-lock_type_slugs = {"Locking skewers" => "locking-skewer"}
+lock_type_slugs = {"Locking skewers" => "locking_skewer"}
 lock_types = ["U-lock", "Chain with lock", "Cable", "Locking skewers", "Other style", "Battery or e-bike key"]
 lock_types.each do |type_name|
   lock_type = LockType.create(name: type_name, slug: lock_type_slugs[type_name])
