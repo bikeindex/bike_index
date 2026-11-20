@@ -4,19 +4,20 @@ module Pages
   module LandingPages
     module Lightspeed
       # has_shop: the visitor is in a shop organization, which finishes step one;
-      # signed_in without a shop is asked to create one rather than to log in
+      # signed_in without a shop is asked to create one rather than to log in;
+      # organization_id is the one the visitor is working in, which the connection is made for
       class Component < ApplicationComponent
         SECTION_CLASSES = SharedBlocks::Marketing::Wrapper::Component::CONTAINER_CLASSES
         MUTED = Pages::LandingPages::ForBikeShops::Component::MUTED
         HEADING_CLASSES = Pages::LandingPages::ForBikeShops::Component::HEADING_CLASSES
         BAND = Pages::LandingPages::ForBikeShops::Component::BAND
-        CONNECT_URL = "https://posintegration.bikeindex.org/sorrysaccount"
         LIGHTSPEED_URL = "https://www.lightspeedhq.com/pos/retail/bike-shop/?utm_medium=partner&utm_source=Reseller&utm_campaign=001G00000118MwjIAE&ref=001G00000118MwjIAE"
         SUPPORT_EMAIL = "gavin@bikeindex.org"
 
-        def initialize(has_shop: false, signed_in: false)
+        def initialize(has_shop: false, signed_in: false, organization_id: nil)
           @has_shop = has_shop
           @signed_in = signed_in
+          @organization_id = organization_id
         end
 
         private
@@ -48,7 +49,7 @@ module Pages
           [step_log_in,
             {title: translation(".connect_lightspeed_and_turn_on_automatic_registration"),
              body: translation(".connect_lightspeed_body"),
-             button: {text: translation(".connect_lightspeed"), href: CONNECT_URL}}]
+             button: {text: translation(".connect_lightspeed"), href: lightspeed_interface_path(organization_id: @organization_id)}}]
         end
 
         def step_log_in

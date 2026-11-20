@@ -140,6 +140,7 @@ RSpec.describe LandingPagesController, type: :request do
 
         expect(response.status).to eq(200)
         expect(response.body).to include("You&#39;re logged in to your shop")
+        expect(response.body).to include(%(href="/lightspeed_interface?organization_id=#{current_organization.id}"))
         expect(response.body).to_not include("Log in to your shop")
       end
 

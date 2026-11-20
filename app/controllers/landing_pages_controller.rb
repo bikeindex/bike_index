@@ -22,7 +22,8 @@ class LandingPagesController < ApplicationController
   def lightspeed
     render SharedBlocks::Marketing::Wrapper::Component.new(page: Pages::LandingPages::Lightspeed::Component.new(
       has_shop: current_user&.has_shop_organization_role?,
-      signed_in: current_user.present?
+      signed_in: current_user.present?,
+      organization_id: passive_organization&.id
     ))
   end
 
