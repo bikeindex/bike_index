@@ -1861,6 +1861,9 @@ en:
         sign_out_to_confirm: >-
           You're signed in as %{email}. Sign out, then open the link again to activate
           the organization.
+        switched_signup: >-
+          You're now finishing %{name}. To finish %{replaced_name} too, open the link
+          in its email.
       find_signup_for_confirmation:
         signup_not_found: We couldn't find that signup — start a new one below
       redirect_to_organization:
@@ -1946,7 +1949,6 @@ en:
             location.
       manage_impoundings:
         update:
-          could_not_update: We're sorry, we had trouble updating %{org_name}.
           updated_successfully: "%{org_name} updated successfully."
       manages:
         destroy:
@@ -1954,7 +1956,6 @@ en:
             %{org_name}.
           deleted_org: Deleted %{org_name}.
         update:
-          could_not_update: We're sorry, we had trouble updating %{org_name}.
           updated_successfully: "%{org_name} updated successfully."
       organization_messages:
         create:
@@ -4457,13 +4458,14 @@ en:
           Bike Index?
         select_email: Select email
         send_emails_directly: Send emails directly to unclaimed bike owners.
-        send_self_registration_email_html: Send email for registrations sent to <code>%{email}</code>
         send_self_registration_email_includes_unregistered: This includes unregistered
           notifications.
         send_self_registration_email_note: >-
           By default, Bike Index no longer sends email when a vehicle is registered
           to your organization registration email. Check this box if you want to receive
           email for registrations with an owner email of %{email}.
+        send_self_registration_email_to_html: Send email for registrations sent to
+          %{email}
         square_image: Use a square image for best results
         stolen_emails: Stolen emails
         unclaimed_registration_definition: >-
@@ -4942,6 +4944,7 @@ en:
       model_audits: E-Vehicle audits
       multi_search: Multi search
       org_dashboard: "%{org_name} Dashboard"
+      org_information: "%{org_name} Information"
       org_locations: "%{org_name} locations"
       org_profile: "%{org_name} profile"
       org_registrations: "%{org_name} Registrations"
