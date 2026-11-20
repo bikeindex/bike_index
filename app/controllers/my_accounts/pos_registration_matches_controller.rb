@@ -39,21 +39,19 @@ module MyAccounts
 
       # A really deleted POS registration (BikeDeleterJob) leaves no @pos_bike
       combined = (match.merging? || match.merged?) && @pos_bike&.user_id == current_user.id
-      key = if answered
-        match.declined? ? :kept_separate : :combining_thanks
-      elsif combined
-        match.merging? ? :combining : :already_combined
+      flash[answered ? :success : :notice] = if answered
+        match.declined? ? translation(:kept_separate) : translation(:combining_thanks, bike_type: @pos_bike&.type)
       elsif match.merged?
-        # The POS registration has been transferred or deleted since
-        :already_combined
+        translation(:already_combined)
+      elsif combined
+        translation(:combining)
       elsif match.declined?
-        :already_kept_separate
+        translation(:already_kept_separate)
       elsif match.confirmed?
-        :couldnt_combine
+        translation(:couldnt_combine)
       else
-        :cant_combine_here
+        translation(:cant_combine_here)
       end
-      flash[answered ? :success : :notice] = translation(key, bike_type: @pos_bike&.type)
       redirect_to(combined ? bike_path(@pos_bike) : my_account_path)
     end
   end

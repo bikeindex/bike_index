@@ -11,6 +11,8 @@ module Emails
 
       private
 
+      def bike_type = @pos_bike.type
+
       def shop_name = @pos_bike.creation_organization&.short_name
     end
   end
