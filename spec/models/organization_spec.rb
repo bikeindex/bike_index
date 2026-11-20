@@ -17,6 +17,7 @@ RSpec.describe Organization, type: :model do
       expect(Organization.name_problem("Shifty Cycles")).to be_nil
       expect(Organization.name_problem(" shifty  BIKE shop")).to eq :taken
       expect(Organization.name_problem("Registrations")).to eq :reserved
+      expect(Organization.name_problem("Signups")).to eq :reserved
       expect(Organization.name_problem("X")).to eq :too_short
       expect(Organization.name_problem("<b></b>!")).to eq :too_short
       # Fine as typed, but not once shortened to its short name, or slugged

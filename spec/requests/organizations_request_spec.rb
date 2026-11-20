@@ -148,13 +148,6 @@ RSpec.describe OrganizationsController, type: :request do
     end
   end
 
-  describe "qr" do
-    it "redirects to the png, keeping the target" do
-      get "#{base_url}/some-org/qr?target=landing"
-      expect(response).to redirect_to("/register/some-org.png?target=landing")
-    end
-  end
-
   describe "lightspeed_interface" do
     context "with user with organization" do
       include_context :request_spec_logged_in_as_organization_admin

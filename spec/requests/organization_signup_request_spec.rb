@@ -10,7 +10,7 @@ RSpec.describe OrganizationSignupController, type: :request do
 
   def confirm_params = {signup_token: organization_signup.id_token, confirmation_token: organization_signup.reload.email_confirmation_token}
 
-  def welcome_path(organization, **) = welcome_organization_signup_path(organization_id: organization.to_param, **)
+  def info_path(organization, **) = organization_info_path(organization_id: organization.to_param, **)
 
   it "creates the organization, and its admin's account, once the email is confirmed" do
     get "#{base_url}/new"
@@ -67,7 +67,7 @@ RSpec.describe OrganizationSignupController, type: :request do
     post "#{base_url}/confirm_email", params: confirm_params
     organization = Organization.last
     user = User.last
-    expect(response).to redirect_to welcome_path(organization)
+    expect(response).to redirect_to info_path(organization)
     expect(user).to have_attributes(email: "org_admin@bikeindex.org", confirmed?: true)
     expect(organization).to have_attributes(name: "Shifty Bike Shop", kind: "bike_shop", auto_user_id: user.id, show_on_map: true)
     expect(organization.locations.first.address_record).to have_attributes(address)
@@ -78,12 +78,12 @@ RSpec.describe OrganizationSignupController, type: :request do
     get response.location
     expect(response).to redirect_to accept_vendor_terms_path
     patch user_path(user), params: {user: {vendor_terms_of_service: "1"}}
-    expect(response).to redirect_to welcome_path(organization)
+    expect(response).to redirect_to info_path(organization)
     expect(user.reload.accepted_vendor_terms_of_service?).to be_truthy
     get response.location
     expect(response.status).to eq 200
-    expect(response.body).to include "Shifty Bike Shop is active!"
-    expect(response.body).to include new_register_url(organization_id: organization.slug)
+    expect(response.body).to include "Shifty Bike Shop is active"
+    expect(response.body).to include register_organization_url(organization)
 
     post "#{base_url}/confirm_email", params: confirm_params
     expect(response).to redirect_to organization_manage_path(organization_id: organization.to_param)
@@ -224,7 +224,7 @@ RSpec.describe OrganizationSignupController, type: :request do
       expect(response.body).to include "Your email is confirmed"
       patch base_url, params: {organization_signup: details_params}
       organization = Organization.last
-      expect(response).to redirect_to welcome_path(organization)
+      expect(response).to redirect_to info_path(organization)
       expect(organization.organization_roles.first.user_id).to eq User.last.id
     end
   end
@@ -242,7 +242,7 @@ RSpec.describe OrganizationSignupController, type: :request do
     expect(response).to redirect_to new_session_path(email: "org_admin@bikeindex.org")
     expect(flash[:notice]).to eq "Shifty Bike Shop is active! Sign in as org_admin@bikeindex.org to manage it."
     # Signing in picks up where finishing here would have gone
-    expect(session[:return_to]).to eq welcome_path(organization)
+    expect(session[:return_to]).to eq info_path(organization)
     get response.location
     expect(Capybara.string(response.body)).to have_field("session[email]", with: "org_admin@bikeindex.org")
 
@@ -271,7 +271,7 @@ RSpec.describe OrganizationSignupController, type: :request do
       post base_url, params: {organization_signup: start_params.merge(name: "Shifty Bikes East")}
       organization = Organization.last
       expect(organization.name).to eq "Shifty Bikes East"
-      expect(response).to redirect_to welcome_path(organization)
+      expect(response).to redirect_to info_path(organization)
     end
   end
 
@@ -350,7 +350,7 @@ RSpec.describe OrganizationSignupController, type: :request do
 
       patch base_url, params: {organization_signup: details_params}
       organization = Organization.last
-      expect(response).to redirect_to welcome_path(organization)
+      expect(response).to redirect_to info_path(organization)
       expect(organization.organization_roles.first.user_id).to eq current_user.id
     end
 
@@ -364,13 +364,13 @@ RSpec.describe OrganizationSignupController, type: :request do
         patch base_url, params: {organization_signup: details_params}
         current_user.update(accepted_vendor_terms_of_service: true)
         organization = Organization.last
-        expect(response).to redirect_to welcome_path(organization, return_to: lightspeed_interface_path)
+        expect(response).to redirect_to info_path(organization, return_to: lightspeed_interface_path)
         get response.location
         expect(response.body).to include "Continue where you were"
         expect(response.body).to include %(href="#{lightspeed_interface_path}")
 
         ["//evil.com", "/\\evil.com", "/\t/evil.com", "https://evil.com"].each do |return_to|
-          get welcome_path(organization, return_to:)
+          get info_path(organization, return_to:)
           expect(response.body).to_not include "Continue where you were"
         end
       end
@@ -393,7 +393,7 @@ RSpec.describe OrganizationSignupController, type: :request do
         post "#{base_url}/confirm_email", params: confirm_params.merge(confirmation_token: token, sign_out: true)
         organization = Organization.last
         expect(organization.organization_roles.first.user.email).to eq "org_admin@bikeindex.org"
-        expect(response).to redirect_to welcome_path(organization)
+        expect(response).to redirect_to info_path(organization)
       end
     end
   end

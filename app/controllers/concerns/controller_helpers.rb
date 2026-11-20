@@ -238,6 +238,12 @@ module ControllerHelpers
     fail ActiveRecord::RecordNotFound
   end
 
+  # Only a path of our own, so a link can't send someone off-site. Browsers read a
+  # backslash as a slash and drop tabs and newlines, so "/\evil.com" is "//evil.com" too
+  def local_return_to
+    params[:return_to] if params[:return_to].to_s.match?(%r{\A/(?!/)[^\\[:space:][:cntrl:]]*\z})
+  end
+
   # Generally this is implicitly set - however! it can also be explicitly set
   def store_return_to(target = nil)
     # fallback to the return to parameters, or the current path

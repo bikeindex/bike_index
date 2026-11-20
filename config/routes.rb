@@ -30,7 +30,6 @@ Rails.application.routes.draw do
     get :confirm
     post :confirm_email
     post :resend
-    get :welcome
   end
 
   resources :organizations, only: :new do
@@ -38,7 +37,6 @@ Rails.application.routes.draw do
       get :embed
       get :embed_extended, as: :embed_extended
       get :embed_create_success
-      get :qr, to: redirect(path: "/register/%{id}.png")
     end
   end
 
@@ -550,6 +548,7 @@ Rails.application.routes.draw do
       end
     end
     resources :ambassador_task_assignments, only: %i[update]
+    resource :info, only: %i[show], controller: :info
 
     # Organized Admin resources (below here controllers should inherit Organized::AdminController)
     resource :manage, only: %i[show update destroy] do

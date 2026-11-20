@@ -7,7 +7,7 @@ class OrganizationNameValidator < ActiveModel::Validator
     for_law_enforcement for_schools goodbye help how_not_to_buy_stolen ikes image_resources info
     integrations landing lightspeed lightspeed_interface locks logout manufacturers manufacturers_tsv
     my_account new news o oauth organizations ownerships pages payments privacy protect_your_bike
-    public_images rails recovery_stories registrations resources serials session shop sidekiq stickers
+    public_images rails recovery_stories registrations resources serials session shop sidekiq signup stickers
     stolen stolen_notifications store donate why_donate support_bike_index support_the_bike_index support_the_index terms
     theft_alerts update_browser user_emails user_embeds user_root_url_redirect users vendor_terms where
     none false].freeze
