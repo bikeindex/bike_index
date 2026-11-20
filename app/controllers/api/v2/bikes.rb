@@ -101,6 +101,9 @@ module API
           short_id = (params[:prefix].present? ? "#{params[:prefix]}/#{params[:id]}" : params[:id]).to_s
           unless short_id.match?(/\As[\W_]/i)
             @bike = Bike.unscoped.find_id(short_id)
+            # A registration merged into its shop's POS registration is that one now, so an app's saved id still works.
+            # Only followed when it isn't visible, as on the web, so superusers still get the merged registration
+            @bike = PosRegistrationMatch.merged_into(@bike) || @bike unless @bike.visible_by?(current_user)
             raise ActiveRecord::RecordNotFound unless @bike.visible_by?(current_user)
             return @bike
           end
@@ -467,7 +470,7 @@ module API
             # if the application isn't authorized, only send notifications to the user's bikes
             authorize_bike_for_user(" (this application is not approved to send notifications)")
           end
-          stolen_notification = StolenNotification.create(bike_id: params[:id],
+          stolen_notification = StolenNotification.create(bike_id: @bike.id,
             message: params[:message],
             sender: current_user,
             doorkeeper_app_id: doorkeeper_application.id)
