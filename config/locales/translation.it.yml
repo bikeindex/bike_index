@@ -2377,8 +2377,6 @@ it:
             precedenti (o non assegnati). Questa operazione richiederà alcuni minuti.
       manage_impoundings:
         update:
-          could_not_update: Ci dispiace, abbiamo riscontrato un problema durante l'aggiornamento
-            di %{org_name}.
           updated_successfully: "%{org_name} aggiornato correttamente."
       manages:
         destroy:
@@ -2386,8 +2384,6 @@ it:
             per eliminare %{org_name}.
           deleted_org: Eliminato %{org_name}.
         update:
-          could_not_update: Ci dispiace, abbiamo riscontrato un problema durante l'aggiornamento
-            di %{org_name}.
           updated_successfully: "%{org_name} aggiornato correttamente."
       parking_notifications:
         create:
@@ -4704,8 +4700,6 @@ it:
           reclamate vengono inviate alla vostra organizzazione per essere esaminate
           e inoltrate all'utente finale, poiché tali utenti non hanno attivato le
           notifiche di Bike Index.
-        send_self_registration_email_html: Inviare l'email per le registrazioni inviate
-          a <code>%{email}</code>
         send_self_registration_email_includes_unregistered: Ciò include le notifiche
           non registrate.
         send_self_registration_email_note: Per impostazione predefinita, Bike Index
@@ -4713,6 +4707,8 @@ it:
           di registrazione della tua organizzazione. Seleziona questa casella se desideri
           ricevere email per le registrazioni con un indirizzo email del proprietario
           del tipo %{email}.
+        send_self_registration_email_to_html: Inviare l'email per le registrazioni
+          inviate a %{email}
     stickers:
       edit:
         bike: Bicicletta
@@ -5205,6 +5201,7 @@ it:
       add_a_registration: Aggiungi una registrazione
       registration_form_settings: Impostazioni del modulo di registrazione
       education_courses: Corsi di formazione
+      org_information: "%{org_name} Informazioni"
     organization_signup:
       address_required: Inserisci l'indirizzo completo dell'organizzazione.
       email_required: È richiesto un indirizzo email valido
@@ -5934,6 +5931,26 @@ it:
         education_course:
           page_edit_bullet:
             bullet: proiettile
+        info:
+          show:
+            add_a_registration: Aggiungi una registrazione
+            associated_with_org_html: Le registrazioni effettuate tramite questo link
+              sono associate a <strong>%{org_name}</strong> .
+            continue_where_you_were: Continua da dove eri
+            copy_registration_link: Copia il link di registrazione
+            get_qr_code_html: Ottieni un %{qr_code_link} che apre il collegamento
+              quando viene scansionato.
+            has_paid_functionality: La tua organizzazione dispone di funzionalità
+              a pagamento.
+            invite_your_team: Invita la tua squadra
+            next_invoice_due_html: Prossima fattura in scadenza %{time}.
+            no_invoices_upcoming: Nessuna fattura in arrivo.
+            no_password_yet: Per ora, l'accesso avviene tramite link inviati via email.
+            org_is_active: "%{name} è attivo"
+            organization_set_up_next_steps: Prossimi passi per la definizione dell'organizzazione
+            qr_code: codice QR
+            set_a_password: Imposta una password
+            your_public_registration_link: Il tuo link di registrazione pubblica
       registrations:
         show:
           bike_details:
@@ -6823,7 +6840,8 @@ it:
           step1:
             just_the_essentials: Solo l'essenziale per iniziare.
             register_your_vehicle: Registra il tuo veicolo!
-            register_your_vehicle_with_org: Registra il tuo veicolo con %{org_name}!
+            register_your_vehicle_with_org_html: Registra il tuo veicolo con <strong>%{org_name}</strong>
+              !
           step2:
             add_your_bikes_details: Aggiungi i dettagli del tuo %{cycle_type}.
             confirmation_link_sent: 'Ti abbiamo inviato un link di conferma via email.
@@ -8755,20 +8773,6 @@ it:
             out_of_links_html: Abbiamo inviato tutti i link di attivazione possibili
               per %{name}, ma nessuno di essi è arrivato a %{email}. Contatta support@bikeindex.org
               e risolveremo il problema.
-          welcome:
-            add_a_registration: Aggiungi una registrazione
-            continue_where_you_were: Continua da dove eri
-            copy_registration_link: Copia il link di registrazione
-            get_started: Ecco come iniziare.
-            invite_your_team: Invita la tua squadra
-            is_active: "%{name} è attivo!"
-            no_password_yet: Per ora, l'accesso avviene tramite link inviati via email.
-            organization_settings: Impostazioni organizzative
-            registration_link_explained: Chiunque si registri tramite questo link
-              viene registrato presso la vostra organizzazione.
-            set_a_password: Imposta una password
-            show_qr_code: Mostra il codice QR
-            your_registration_link: Il tuo link di registrazione
     shared_blocks:
       footer:
         about: Di

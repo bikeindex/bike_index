@@ -31,6 +31,16 @@
     <%= match.status.humanize %>
   <% end %>
 
+  <% table.column(sortable: "merged_at", label: "Merged") do |match| %>
+    <% if match.merged_at.present? %>
+      <%= render UI::Time::Component.new(time: match.merged_at) %>
+    <% end %>
+
+    <% if match.merger_id.present? %>
+      <span class="tw:block tw:text-xs">by <%= render Atoms::Admin::TableCells::User::Component.new(user: match.merger, user_id: match.merger_id) %></span>
+    <% end %>
+  <% end %>
+
   <% table.column do |match| %>
     <%= link_to "Compare", admin_duplicate_bike_path("compare", bike_ids: [match.pos_bike_id, match.bike_id].join(",")), class: "twlink tw:text-sm" %>
 

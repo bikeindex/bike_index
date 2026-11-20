@@ -9,7 +9,7 @@ module Pages
         class Component < ApplicationComponent
           # bare: in a card on another page, which supplies the shell and the h1
           def initialize(b_param:, flow:, organization: nil, current_user: nil, embed: false,
-            bare: false, skip_heading: false, button_color: nil, button_hover_color: nil, motorized_review: false)
+            bare: false, skip_heading: false, button_color: nil, button_hover_color: nil, motorized_review: false, shell_padding_bottom: nil)
             @b_param = b_param
             @flow = flow
             @organization = organization
@@ -20,6 +20,7 @@ module Pages
             @button_color = button_color
             @button_hover_color = button_hover_color
             @motorized_review = motorized_review
+            @shell_padding_bottom = shell_padding_bottom
           end
 
           private

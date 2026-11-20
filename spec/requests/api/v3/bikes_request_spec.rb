@@ -140,6 +140,51 @@ RSpec.describe "Bikes API V3", type: :request do
       end
     end
 
+    context "merged into its shop's POS registration" do
+      let(:pos_registration_match) { FactoryBot.create(:pos_registration_match, status: :merged, user:) }
+      let(:bike) { pos_registration_match.bike }
+      let(:pos_bike) { pos_registration_match.pos_bike }
+      let(:write_token) { create_doorkeeper_token(scopes: "read_user read_bikes write_bikes") }
+      let(:other_user_token) do
+        Doorkeeper::AccessToken.create!(application_id: doorkeeper_app.id, resource_owner_id: FactoryBot.create(:user_confirmed).id)
+      end
+      before do
+        pos_bike.update!(marked_user_hidden: true)
+        bike.destroy!
+      end
+
+      it "returns and updates the POS registration, only for someone who can see it" do
+        get "/api/v3/bikes/#{bike.id}", params: {format: :json, access_token: token.token}
+        expect(response.code).to eq("200")
+        expect(json_result["bike"]["id"]).to eq pos_bike.id
+
+        put "/api/v3/bikes/#{bike.id}?access_token=#{write_token.token}", params: {year: 1975}.to_json, headers: json_headers
+        expect(response.code).to eq("200")
+        expect(pos_bike.reload.year).to eq 1975
+
+        get "/api/v3/bikes/#{bike.id}", params: {format: :json, access_token: other_user_token.token}
+        expect(response.code).to eq("404")
+      end
+
+      it "returns the merged registration to a superuser" do
+        superuser_token = Doorkeeper::AccessToken.create!(application_id: doorkeeper_app.id,
+          resource_owner_id: FactoryBot.create(:superuser).id)
+        get "/api/v3/bikes/#{bike.id}", params: {format: :json, access_token: superuser_token.token}
+        expect(response.code).to eq("200")
+        expect(json_result["bike"]["id"]).to eq bike.id
+      end
+
+      it "sends a stolen notification to the POS registration" do
+        pos_bike.update!(marked_user_unhidden: true)
+        FactoryBot.create(:stolen_record, bike: pos_bike)
+        expect(pos_bike.reload.status).to eq "status_stolen"
+        post "/api/v3/bikes/#{bike.id}/send_stolen_notification?access_token=#{write_token.token}",
+          params: {message: "Is this yours?"}.to_json, headers: json_headers
+        expect(response.code).to eq("201")
+        expect(StolenNotification.last.bike_id).to eq pos_bike.id
+      end
+    end
+
     context "unconfirmed user's token" do
       let(:user) { FactoryBot.create(:user) }
 
