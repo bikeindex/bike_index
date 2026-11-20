@@ -166,6 +166,14 @@ RSpec.describe "Bikes API V3", type: :request do
         expect(response.code).to eq("404")
       end
 
+      it "returns the merged registration to a superuser" do
+        superuser_token = Doorkeeper::AccessToken.create!(application_id: doorkeeper_app.id,
+          resource_owner_id: FactoryBot.create(:superuser).id)
+        get "/api/v3/bikes/#{bike.id}", params: {format: :json, access_token: superuser_token.token}
+        expect(response.code).to eq("200")
+        expect(json_result["bike"]["id"]).to eq bike.id
+      end
+
       it "sends a stolen notification to the POS registration" do
         pos_bike.update!(marked_user_unhidden: true)
         FactoryBot.create(:stolen_record, bike: pos_bike)
