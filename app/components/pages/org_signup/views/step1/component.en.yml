@@ -15,7 +15,7 @@ en:
               separate organization.
             email: Your email
             email_placeholder: you@example.com
-            free_to_start: Free to start, and it takes a couple of minutes.
+            free_to_start_few_minutes: Free to start, it only takes a few minutes.
             kind_bike_advocacy: Advocacy group
             kind_bike_manufacturer: Manufacturer
             kind_bike_shop: Bike shop
