@@ -30,7 +30,9 @@
         <%= translation(".signed_in_as_new_admin_html", email: tag.strong(@current_user.email)) %>
 
         <% if existing_organization.present? %>
-          <%= translation(".already_part_of_html", name: tag.strong(existing_organization.short_name)) %>
+          <%= translation(".already_part_of_organization_html",
+              organization_link: link_to(translation(".organization_link", name: existing_organization.short_name),
+                organization_root_path(organization_id: existing_organization.to_param), class: "twlink")) %>
         <% end %>
       </p>
     <% else %>

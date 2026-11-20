@@ -11,7 +11,8 @@ en:
             add_your_organization: Add your organization
             already_on_bike_index_html: Is your organization already on Bike Index?
               %{sign_in_link} to manage it.
-            already_part_of_html: You're already part of %{name} - this creates a
+            already_part_of_organization_html: >-
+              You're already part of the %{organization_link} - this will create a
               separate organization.
             email: Your email
             email_placeholder: you@example.com
@@ -27,6 +28,7 @@ en:
             kind_software: Software
             next: Next
             organization_kind: What kind of organization?
+            organization_link: "%{name} organization"
             organization_name: Organization name
             sign_in: Sign in
             signed_in_as_new_admin_html: >-
