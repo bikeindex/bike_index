@@ -15,9 +15,7 @@
   <%= render UI::Header::Component.new(text: translation(".where_is_org", name: @organization_signup.name),
       subtitle: translation(".shown_to_people")) %>
 
-  <% if @organization_signup.errors.any? %>
-    <%= render UI::Alerts::Base::Component.new(kind: :error, text: @organization_signup.errors.full_messages.to_sentence) %>
-  <% end %>
+  <%= render UI::Alerts::ObjectError::Component.new(object: @organization_signup, name: translation(".signup_name")) %>
 
   <%= form_with(model: @organization_signup, url: organization_signup_path, method: :patch, scope: :organization_signup,
       data: {turbo: true, controller: "autofocus form-persist register--retry",
