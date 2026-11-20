@@ -2193,13 +2193,9 @@ nl:
             %{org_name} te verwijderen.
           deleted_org: "%{org_name} verwijderd."
         update:
-          could_not_update: Het spijt ons, we hebben problemen gehad met het bijwerken
-            van %{org_name}.
           updated_successfully: "%{org_name} is succesvol bijgewerkt."
       manage_impoundings:
         update:
-          could_not_update: Het spijt ons, we hebben problemen gehad met het bijwerken
-            van %{org_name}.
           updated_successfully: "%{org_name} is succesvol bijgewerkt."
       impound_records:
         available_impound_records:
@@ -4105,14 +4101,14 @@ nl:
         why_no_direct_by_default: Standaard worden e-mails naar niet-geclaimde fietsen
           naar uw organisatie verzonden om te bekijken en door te sturen naar de eindgebruiker,
           omdat die gebruikers zich niet hebben aangemeld voor Bike Index-meldingen.
-        send_self_registration_email_html: Stuur een e-mail voor aanmeldingen naar
-          <code>%{email}</code>
         send_self_registration_email_includes_unregistered: Dit omvat ook niet-geregistreerde
           meldingen.
         send_self_registration_email_note: Standaard stuurt Bike Index geen e-mails
           meer naar het e-mailadres van uw organisatie wanneer een voertuig wordt
           geregistreerd. Vink dit vakje aan als u e-mails wilt ontvangen voor registraties
           met een eigenaars-e-mailadres van %{email}.
+        send_self_registration_email_to_html: Stuur een e-mail voor aanmeldingen naar
+          %{email}
     manage_impoundings:
       edit:
         impound_settings_html: Beheer <em>%{org_name}</em> inbeslagname-instellingen
@@ -4432,6 +4428,7 @@ nl:
       add_a_registration: Voeg een registratie toe
       registration_form_settings: Instellingen voor het registratieformulier
       education_courses: Onderwijscursussen
+      org_information: "%{org_name} Informatie"
     organization_signup:
       address_required: Voer het volledige adres van de organisatie in.
       email_required: Een geldig e-mailadres is vereist.
@@ -5849,6 +5846,26 @@ nl:
         education_course:
           page_edit_bullet:
             bullet: kogel
+        info:
+          show:
+            add_a_registration: Voeg een registratie toe
+            associated_with_org_html: Registraties via deze link zijn gekoppeld aan
+              <strong>%{org_name}</strong> .
+            continue_where_you_were: Ga verder waar je gebleven was.
+            copy_registration_link: Kopieer de registratielink
+            get_qr_code_html: Ontvang een %{qr_code_link} die de link opent wanneer
+              deze wordt gescand.
+            has_paid_functionality: Uw organisatie beschikt over betaalde functionaliteit.
+            invite_your_team: Nodig je team uit
+            next_invoice_due_html: Volgende factuur verschuldigd %{time}.
+            no_invoices_upcoming: Er komen geen facturen aan.
+            no_password_yet: Je kunt je voorlopig aanmelden via links die je per e-mail
+              ontvangt.
+            org_is_active: "%{name} is actief"
+            organization_set_up_next_steps: Organisatie zet volgende stappen op
+            qr_code: QR-code
+            set_a_password: Stel een wachtwoord in
+            your_public_registration_link: Uw openbare registratielink
       registrations:
         show:
           bike_details:
@@ -6723,7 +6740,8 @@ nl:
           step1:
             just_the_essentials: Om te beginnen alleen de essentiële zaken.
             register_your_vehicle: Registreer uw voertuig!
-            register_your_vehicle_with_org: Registreer uw voertuig met %{org_name}!
+            register_your_vehicle_with_org_html: Registreer uw voertuig met <strong>%{org_name}</strong>
+              !
           step2:
             add_your_bikes_details: Voeg de gegevens van uw %{cycle_type} toe
             confirmation_link_sent: We hebben een bevestigingslink naar je e-mailadres
@@ -8620,21 +8638,6 @@ nl:
             out_of_links_html: We hebben alle mogelijke activeringslinks voor %{name}
               verstuurd, maar geen enkele is bij %{email} aangekomen. Neem contact
               op met support@bikeindex.org, dan lossen we het op.
-          welcome:
-            add_a_registration: Voeg een registratie toe
-            continue_where_you_were: Ga verder waar je gebleven was.
-            copy_registration_link: Kopieer de registratielink
-            get_started: Zo ga je van start.
-            invite_your_team: Nodig je team uit
-            is_active: "%{name} is actief!"
-            no_password_yet: Je kunt je voorlopig aanmelden via links die je per e-mail
-              ontvangt.
-            organization_settings: Organisatie-instellingen
-            registration_link_explained: Iedereen die zich via deze link registreert,
-              wordt automatisch bij uw organisatie geregistreerd.
-            set_a_password: Stel een wachtwoord in
-            show_qr_code: QR-code weergeven
-            your_registration_link: Uw registratielink
     shared_blocks:
       footer:
         about: Over
