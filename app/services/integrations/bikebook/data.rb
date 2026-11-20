@@ -10,7 +10,7 @@ module Integrations
       def get_model(options)
         if options.is_a?(Bike)
           options = {manufacturer: options.manufacturer&.name, year: options.year, frame_model: options.frame_model,
-                     market: options.address_record&.country&.iso}
+                     market: options.address_record&.country_iso}
         end
         return unless options.values_at(:manufacturer, :year, :frame_model).all?(&:present?)
 

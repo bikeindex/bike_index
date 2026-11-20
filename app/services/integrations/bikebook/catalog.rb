@@ -32,7 +32,10 @@ module Integrations
         block && file(block)&.dig("models", id)
       end
 
-      # The index's models, nil while the catalog doesn't answer. Too big to cache, and only BikebookModelsSyncJob reads it
+      # The catalog's market for a country's ISO code: it lists an EU member's models under the EU
+      def market(iso) = EbikeRuleServices::Places::EU_MEMBERS.include?(iso) ? "EU" : iso
+
+      # The index's models, nil while the catalog doesn't answer. Too big to cache, and read by a job, outside rack-timeout
       def index_models(path)
         read(path, timeout: 60)["models"]
       rescue Faraday::Error, JSON::ParserError, SystemCallError

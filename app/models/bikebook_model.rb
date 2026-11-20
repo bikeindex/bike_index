@@ -29,20 +29,18 @@ class BikebookModel < ApplicationRecord
   scope :for_manufacturer, ->(name) { where(manufacturer_slug: Slugifyer.legacy_manufacturer(name)) }
   scope :sold_in_year, ->(year) { where(first_year: ..year, final_year: [nil, year..]) }
 
-  class << self
-    # The catalog id of the manufacturer's model of that name sold in that year, nil for one the catalog lacks. Of
-    # several, the one sold in `market`, a country's ISO code, then the latest
-    def catalog_id_for(manufacturer:, name:, year:, market: nil)
-      market = "EU" if EbikeRuleServices::Places::EU_MEMBERS.include?(market)
-      models = for_manufacturer(manufacturer).where(model_slug: Slugifyer.book_slug(name)).sold_in_year(year).order(first_year: :desc, catalog_id: :asc).to_a
-      (models.find { it.sold_in?(market) } || models.first)&.catalog_id_in(market)
-    end
+  # The catalog id of the manufacturer's model of that name sold in that year, nil for one the catalog lacks. Of
+  # several, the one sold in `market`, a country's ISO code, then the latest
+  def self.catalog_id_for(manufacturer:, name:, year:, market: nil)
+    market = Integrations::Bikebook::Catalog.market(market)
+    models = for_manufacturer(manufacturer).where(model_slug: Slugifyer.book_slug(name)).sold_in_year(year).order(first_year: :desc, catalog_id: :asc).to_a
+    (models.find { it.sold_in?(market) } || models.first)&.catalog_id_in(market)
+  end
 
-    # A page of the model names with every word of `query` in them, each name once
-    def names_matching(query, page:, per_page:)
-      query.to_s.split.reduce(all) { |models, word| models.where("name ILIKE ?", "%#{sanitize_sql_like(word)}%") }
-        .distinct.order(:name).offset((page - 1) * per_page).limit(per_page).pluck(:name)
-    end
+  # A page of the model names with every word of `query` in them, each name once
+  def self.names_matching(query, page:, per_page:)
+    query.to_s.split.reduce(all) { |models, word| models.where("name ILIKE ?", "%#{sanitize_sql_like(word)}%") }
+      .distinct.order(:name).offset((page - 1) * per_page).limit(per_page).pluck(:name)
   end
 
   def sold_in?(market) = [*markets, *variants.flat_map { it["markets"] }].include?(market)

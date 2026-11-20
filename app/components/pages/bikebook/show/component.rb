@@ -8,16 +8,13 @@ module Pages
       # and renders again for each pick and history step
       class Component < ApplicationComponent
         # market is the visitor's CF-IPCountry, which Cloudflare sends as XX, or T1 over Tor, when it can't
-        # tell, and the catalog lists an EU member's models under the EU; state is theirs in the US. framed: in an
+        # tell; state is theirs in the US. framed: in an
         # iframe, whose autofocus would take its host page's focus
         def initialize(manifest_url:, market:, state:, query:, paint_colors:, framed: false)
           @manifest_url = manifest_url
           @framed = framed
           @paint_colors = paint_colors
-          @market = if %w[XX T1].include?(market) || market.blank? then "US"
-          elsif EbikeRuleServices::Places::EU_MEMBERS.include?(market) then "EU"
-          else market
-          end
+          @market = (%w[XX T1].include?(market) || market.blank?) ? "US" : Integrations::Bikebook::Catalog.market(market)
           @jurisdiction = state&.dig(:abbr) || "US"
           @query = query
         end
