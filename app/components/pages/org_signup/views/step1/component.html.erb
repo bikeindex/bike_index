@@ -19,17 +19,11 @@
         label_text: translation(".organization_name"), required: true,
         html_options: {value: @organization_signup.name, required: true, autocomplete: "organization"}) %>
 
-    <div class="tw:mb-4">
-      <span class="twlabel">
-        <%= translation(".organization_kind") %>
-        <%= render UI::Forms::RequiredMarker::Component.new %>
-      </span>
-
-      <div class="tw:mt-2">
-        <%= render UI::Forms::RadioButtonGroup::Component.new(name: "organization_signup[kind]", entries: kind_entries,
-            selected: @organization_signup.kind, html_options: {required: true}) %>
-      </div>
-    </div>
+    <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :kind,
+        label_text: translation(".organization_kind"), required: true)) do %>
+      <%= render UI::Forms::RadioButtonGroup::Component.new(name: "organization_signup[kind]", entries: kind_entries,
+          selected: @organization_signup.kind, html_options: {required: true}) %>
+    <% end %>
 
     <%= render Pages::Register::Parts::SectionLabel::Component.new(text: translation(".your_info"), divider: true) %>
 
