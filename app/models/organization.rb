@@ -340,6 +340,9 @@ class Organization < ApplicationRecord
     slug
   end
 
+  # The slug ORGANIZATIONS_WITH_LANDING_PAGES routes, which can be the previous one
+  def landing_page_slug = [slug, previous_slug].find { LandingPageOrganizations::SLUGS.include?(it) }
+
   def restrict_invitations?
     !enabled?("passwordless_users") && !user_email_domain.present?
   end

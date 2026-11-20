@@ -42,6 +42,24 @@ RSpec.describe Organization, type: :model do
     end
   end
 
+  describe "landing_page_slug" do
+    let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills University", previous_slug:) }
+    let(:previous_slug) { nil }
+
+    it "is nil unless routed" do
+      expect(organization.landing_page_slug).to be_nil
+    end
+
+    context "with a routed previous slug" do
+      let(:previous_slug) { "brakebills" }
+
+      it "is the previous slug" do
+        expect(organization.slug).to eq "brakebills-university"
+        expect(organization.landing_page_slug).to eq "brakebills"
+      end
+    end
+  end
+
   describe "factory" do
     let(:organization) { FactoryBot.create(:organization, :with_invoice) }
     it "is_invoiced and is valid" do
