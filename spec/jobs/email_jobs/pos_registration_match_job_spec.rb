@@ -1,58 +1,110 @@
 require "rails_helper"
 
 RSpec.describe EmailJobs::PosRegistrationMatchJob, type: :job do
+  let(:instance) { described_class.new }
   let(:match) { FactoryBot.create(:pos_registration_match) }
   let(:user) { match.bike.user }
 
   before { ActionMailer::Base.deliveries = [] }
 
-  it "doesn't send while skipped" do
-    stub_const("ENV", ENV.to_h.merge(described_class.skip_env_var => "true"))
-    described_class.new.perform(match.id)
-    expect(ActionMailer::Base.deliveries.count).to eq 0
-  end
-
   it "emails the owner once" do
     expect {
-      described_class.new.perform(match.id)
-      described_class.new.perform(match.id)
+      instance.perform(match.id)
+      instance.perform(match.id)
     }.to change(Notification, :count).by 1
     expect(ActionMailer::Base.deliveries.map(&:to)).to eq([[user.email]])
     expect(Notification.last).to have_attributes(kind: "pos_registration_match", notifiable: match, user_id: user.id,
       bike_id: match.pos_bike_id, delivery_status: "delivery_success")
   end
 
-  it "emails the current owner, not a former owner an earlier email failed to" do
-    Notification.create!(kind: "pos_registration_match", notifiable: match, user: FactoryBot.create(:user_confirmed),
-      delivery_status: "delivery_failure")
-    described_class.new.perform(match.id)
-    expect(ActionMailer::Base.deliveries.map(&:to)).to eq([[user.email]])
+  context "with an earlier failed email to a former owner" do
+    before do
+      Notification.create!(kind: "pos_registration_match", notifiable: match, user: FactoryBot.create(:user_confirmed),
+        delivery_status: "delivery_failure")
+    end
+
+    it "emails the current owner" do
+      instance.perform(match.id)
+      expect(ActionMailer::Base.deliveries.map(&:to)).to eq([[user.email]])
+    end
   end
 
-  it "emails about a POS registration the owner hid" do
-    match.pos_bike.update_column(:user_hidden, true)
-    described_class.new.perform(match.id)
-    expect(ActionMailer::Base.deliveries.count).to eq 1
+  context "with a POS registration the owner hid" do
+    before { match.pos_bike.update_column(:user_hidden, true) }
+
+    it "emails" do
+      instance.perform(match.id)
+      expect(ActionMailer::Base.deliveries.count).to eq 1
+    end
   end
 
-  it "records a theft since the match and doesn't email" do
-    FactoryBot.create(:stolen_bike, serial_number: match.bike.serial_number)
-    described_class.new.perform(match.id)
-    expect(match.reload.review_reasons).to eq ["stolen_history"]
-    expect(ActionMailer::Base.deliveries.count).to eq 0
-  end
+  context "when it doesn't email" do
+    context "while skipped" do
+      before { stub_const("ENV", ENV.to_h.merge(described_class.skip_env_var => "true")) }
 
-  it "doesn't email once the POS registration is someone else's" do
-    BikeServices::OwnershipTransferer.find_or_create(match.pos_bike, updator: user, new_owner_email: "new-owner@example.com")
-    described_class.new.perform(match.id)
-    expect(ActionMailer::Base.deliveries.count).to eq 0
-  end
+      it "doesn't send" do
+        instance.perform(match.id)
+        expect(ActionMailer::Base.deliveries.count).to eq 0
+      end
+    end
 
-  it "doesn't email a review candidate or a match that's no longer pending" do
-    match.update!(review_reasons: ["impounded"])
-    described_class.new.perform(match.id)
-    match.update!(review_reasons: [], status: :declined)
-    described_class.new.perform(match.id)
-    expect(ActionMailer::Base.deliveries.count).to eq 0
+    context "with a theft since the match" do
+      before { FactoryBot.create(:stolen_bike, serial_number: match.bike.serial_number) }
+
+      it "records it" do
+        instance.perform(match.id)
+        expect(match.reload.review_reasons).to eq ["stolen_history"]
+        expect(ActionMailer::Base.deliveries.count).to eq 0
+      end
+    end
+
+    context "when the POS registration is someone else's" do
+      before { BikeServices::OwnershipTransferer.find_or_create(match.pos_bike, updator: user, new_owner_email: "new-owner@example.com") }
+
+      it "doesn't send" do
+        instance.perform(match.id)
+        expect(ActionMailer::Base.deliveries.count).to eq 0
+      end
+    end
+
+    context "when the owner asked for no email but theft alerts" do
+      before { user.update!(no_non_theft_notification: true) }
+
+      it "doesn't send" do
+        instance.perform(match.id)
+        expect(ActionMailer::Base.deliveries.count).to eq 0
+        expect(Notification.count).to eq 0
+      end
+    end
+
+    # Written because the mailer raised on the deleted account's missing user
+    context "when the owner's account is deleted" do
+      before { user.update_column(:deleted_at, Time.current) }
+
+      it "doesn't send" do
+        expect(match.reload.bike.user_id).to be_present
+        instance.perform(match.id)
+        expect(ActionMailer::Base.deliveries.count).to eq 0
+        expect(Notification.count).to eq 0
+      end
+    end
+
+    context "with a review reason" do
+      before { match.update!(review_reasons: ["impounded"]) }
+
+      it "doesn't send" do
+        instance.perform(match.id)
+        expect(ActionMailer::Base.deliveries.count).to eq 0
+      end
+    end
+
+    context "when the match isn't pending" do
+      before { match.update!(status: :declined) }
+
+      it "doesn't send" do
+        instance.perform(match.id)
+        expect(ActionMailer::Base.deliveries.count).to eq 0
+      end
+    end
   end
 end

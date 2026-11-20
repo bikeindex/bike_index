@@ -97,6 +97,19 @@ RSpec.describe MyAccounts::PosRegistrationMatchesController, type: :request do
       end
     end
 
+    context "POS registration transferred after the merge" do
+      before do
+        pos_registration_match.update!(status: :merged, merged_at: Time.current)
+        pos_registration_match.pos_bike.current_ownership.update_column(:user_id, FactoryBot.create(:user).id)
+      end
+
+      it "says they're combined" do
+        get url
+        expect(response).to redirect_to(my_account_path)
+        expect(flash[:notice]).to include("already combined")
+      end
+    end
+
     context "POS registration really deleted" do
       it "sends them to their account" do
         BikeJobs::BikeDeleterJob.new.perform(pos_registration_match.pos_bike_id, true)

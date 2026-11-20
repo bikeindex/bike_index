@@ -43,6 +43,9 @@ module MyAccounts
         match.declined? ? :kept_separate : :combining_thanks
       elsif combined
         match.merging? ? :combining : :already_combined
+      elsif match.merged?
+        # The POS registration has been transferred or deleted since
+        :already_combined
       elsif match.declined?
         :already_kept_separate
       elsif match.confirmed?

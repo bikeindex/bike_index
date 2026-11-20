@@ -15,8 +15,12 @@ module EmailJobs
         match.add_review_reasons!(PosRegistrationMatch.review_reasons_for(match.bike, match.pos_bike))
         next unless match.merge_candidate?
 
+        user = match.bike.user
+        # A deleted account, or one that asked for no email but theft alerts
+        next if user.blank? || user.no_non_theft_notification
+
         # The current owner's, in case an earlier failed one was to a former owner
-        notification = Notification.pos_registration_match.where(notifiable: match, user: match.bike.user)
+        notification = Notification.pos_registration_match.where(notifiable: match, user:)
           .first_or_create(bike_id: match.pos_bike_id)
         # Skips a notification that's already been sent
         Notifications::Deliver.track_email(notification) do
