@@ -34,8 +34,6 @@ class InfoController < ApplicationController
   end
 
   def lightspeed
-    session[:return_to] = lightspeed_url unless current_user.present?
-    @organization = Organization.new
   end
 
   def privacy

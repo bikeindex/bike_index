@@ -14,6 +14,41 @@ RSpec.describe WelcomeController, type: :request do
       expect(flash).to_not be_present
     end
 
+    describe "color scheme" do
+      def body = Capybara.string(response.body)
+
+      it "follows the cookie, and the system without a valid one" do
+        get "/"
+        expect(body).to have_no_css("body.dark")
+        expect(response.body).to include("window.colorSchemeQuery")
+        expect(body).to have_checked_field("System", visible: :all)
+
+        cookies[:color_scheme] = "dark"
+        get "/"
+        expect(body).to have_css("body.dark")
+        expect(response.body).to_not include("window.colorSchemeQuery")
+        expect(body).to have_checked_field("Dark", visible: :all)
+
+        cookies[:color_scheme] = "plaid"
+        get "/"
+        expect(body).to have_no_css("body.dark")
+        expect(response.body).to include("window.colorSchemeQuery")
+      end
+
+      context "signed in" do
+        include_context :request_spec_logged_in_as_user
+
+        it "follows the account over the cookie" do
+          current_user.update(color_scheme: "light")
+          cookies[:color_scheme] = "dark"
+          get "/"
+          expect(body).to have_no_css("body.dark")
+          expect(response.body).to_not include("window.colorSchemeQuery")
+          expect(body).to have_checked_field("Light", visible: :all)
+        end
+      end
+    end
+
     context "organization destroyed after passive_organization was set" do
       include_context :request_spec_logged_in_as_organization_admin
 

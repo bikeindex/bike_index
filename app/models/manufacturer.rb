@@ -13,6 +13,7 @@
 #  name               :string(255)
 #  notes              :text
 #  open_year          :integer
+#  previous_slugs     :string           default([]), not null, is an Array
 #  priority           :integer
 #  secondary_slug     :string
 #  slug               :string(255)
@@ -69,10 +70,24 @@ class Manufacturer < ApplicationRecord
       if n.is_a?(Integer) || n.match(/\A\d+\z/).present?
         where(id: n).first
       else
-        ns = Slugifyer.manufacturer(n)
-        find_by_slug(ns) || find_by_slug(fill_stripped(ns)) ||
-          find_by_secondary_slug(ns)
+        slug = Slugifyer.slugify(n)
+        legacy_slug = Slugifyer.legacy_manufacturer(n)
+        find_by_slug(slug) || find_by_slug(legacy_slug) || find_by_secondary_slug(legacy_slug) ||
+          where("previous_slugs && ARRAY[?]::varchar[]", [slug, legacy_slug]).first
       end
+    end
+
+    # A previous slug that's another manufacturer's slug or secondary slug, or shared by several manufacturers
+    def slug_collisions
+      unscoped.joins("CROSS JOIN unnest(manufacturers.previous_slugs) AS previous_slug")
+        .joins("LEFT JOIN (SELECT id, name, unnest(ARRAY[slug, secondary_slug]) AS current_slug FROM manufacturers) current ON current.current_slug = previous_slug AND current.id != manufacturers.id")
+        .group("previous_slug, current.id, current.name").having("COUNT(*) > 1 OR current.id IS NOT NULL")
+        .order("previous_slug")
+        .pluck(Arel.sql("previous_slug, current.id, current.name, array_agg(manufacturers.id ORDER BY LOWER(manufacturers.name)), array_agg(manufacturers.name ORDER BY LOWER(manufacturers.name))"))
+        .map do |slug, id, name, previous_ids, previous_names|
+          {slug:, manufacturer: id && {id:, name:},
+           previous_slug_manufacturers: previous_ids.zip(previous_names).map { |id, name| {id:, name:} }}
+        end
     end
 
     def friendly_find_id(n)
@@ -83,11 +98,6 @@ class Manufacturer < ApplicationRecord
       return @other if MEMOIZE_OTHER && defined?(@other)
 
       @other = where(name: "Other", frame_maker: true).first_or_create
-    end
-
-    def fill_stripped(n)
-      n.gsub!(/accell/i, "") if n.match(/accell/i).present?
-      Slugifyer.manufacturer(n)
     end
 
     def calculated_mnfg_name(manufacturer, manufacturer_other)
@@ -110,6 +120,10 @@ class Manufacturer < ApplicationRecord
     name
   end
 
+  def slug_collisions
+    Manufacturer.slug_collisions.select { [slug, secondary_slug, *previous_slugs].include?(it[:slug]) }
+  end
+
   def official_organization
     @official_organization ||= Organization.find_by_manufacturer_id(id)
   end
@@ -125,8 +139,9 @@ class Manufacturer < ApplicationRecord
 
   def set_calculated_attributes
     self.name = Binxtils::InputNormalizer.string(name)
-    self.secondary_slug = Slugifyer.manufacturer(secondary_name)
-    self.slug = Slugifyer.manufacturer(name)
+    self.secondary_slug = Slugifyer.legacy_manufacturer(secondary_name)
+    self.slug = Slugifyer.slugify(name)
+    self.previous_slugs = ([*previous_slugs, slug_in_database, Slugifyer.legacy_manufacturer(name)].compact_blank - [slug]).uniq
     self.website = website.present? ? Urlifyer.urlify(website) : nil
     self.logo_source = logo.present? ? (logo_source || "manual") : nil
     self.twitter_name = twitter_name.present? ? twitter_name.gsub(/\A@/, "") : nil

@@ -114,13 +114,13 @@ RSpec.describe "Bike Book", :js, type: :system do
     # and, filtered or not, some of the catalog to start from, cheapest first: each a cycle but a unicycle or trike (so no
     # Kris Holm or Roll Trike) with a photo (so no Reactive Adaptations), complete (so no Roll 2), priced at $600 or more
     # (so no Roll 3, unpriced, or Roll 1) in the visitor's currency (so no Sirrus 2, in francs), not a kid's (so no Jett
-    # 24), each e-bike a class legal where the visitor is (so no Segway GT3 Pro, Haul ST CA or Sur-Ron), none over $10,000
+    # 24), each e-bike a class legal where the visitor is (so no Segway GT3 Pro or Sur-Ron), none over $10,000
     # (so no Crux 5 S-Level), the women's Ruby Sport and the cheapest e-bike
-    expect(page).to have_text("40 models to compare.")
+    expect(page).to have_text("39 models to compare.")
     expect(page).to have_css("[aria-label='Models to compare'] a", count: 12)
     picks = featured_ids
     expect(picks).to include("m/specialized/2025/ruby_sport", "m/aventon/2024/soltera_2_5")
-    expect(picks.grep(%r{\Am/(kris_holm|reactive_adaptations|segway|sur_ron)/|jett_24|haul_st_ca|crux|roll_[123]|roll_trike|sirrus_2})).to be_empty
+    expect(picks.grep(%r{\Am/(kris_holm|reactive_adaptations|segway|sur_ron)/|jett_24|crux|roll_[123]|roll_trike|sirrus_2})).to be_empty
     expect(featured_prices).to eq featured_prices.sort
     # others each page load, which a few tries make sure of, as the fixture's few models could repeat
     reloaded = 3.times.lazy.map do
@@ -148,7 +148,7 @@ RSpec.describe "Bike Book", :js, type: :system do
     expect(page).to have_no_button("rotate samples")
     # and the same ones again as it's undone
     uncheck "Human powered (Acoustic)"
-    expect(page).to have_text("40 models to compare.")
+    expect(page).to have_text("39 models to compare.")
     expect(featured_ids).to match_array(picks)
     check "Human powered (Acoustic)"
     expect(page).to have_text("15 models match your filters.")
@@ -166,7 +166,7 @@ RSpec.describe "Bike Book", :js, type: :system do
     asked.clear
 
     vehicle_field.click
-    expect(page).to have_css(".hw-combobox__group__label", text: /\(40 matching models\)/i)
+    expect(page).to have_css(".hw-combobox__group__label", text: /\(39 matching models\)/i)
     # a query matching nothing says so, and Enter keeps it open to edit
     type_into(vehicle_field, "zzqq")
     expect(page).to have_css(".hw-combobox__group__label", text: /\(0 matching models\)/i)
@@ -764,7 +764,7 @@ RSpec.describe "Bike Book", :js, type: :system do
     expect(page).to have_unchecked_field("US Class 1")
     uncheck "e-Vehicle (motorized)"
     choose "Any market", allow_label_click: true
-    expect(page).to have_css("#vehicle-models-count", exact_text: "(40 matching models)")
+    expect(page).to have_css("#vehicle-models-count", exact_text: "(39 matching models)")
     find_field("Manufacturers").click
     find("#manufacturer-hw-listbox [role='option']", text: "Kris Holm (6)").click
     # picked by a click, it closes the list but keeps the focus, for another pick
@@ -788,7 +788,7 @@ RSpec.describe "Bike Book", :js, type: :system do
     click_on "More filters", match: :first
     within("[aria-label='Applied filters']") { expect(page).to have_text("Kris Holm") }
     click_link "Clear filters"
-    expect(page).to have_css("#vehicle-models-count", exact_text: "(40 matching models)")
+    expect(page).to have_css("#vehicle-models-count", exact_text: "(39 matching models)")
     expect(page).to have_no_link("Clear filters").and have_no_css("[aria-label='Applied filters'] li")
     expect(page).to have_css(".hw-combobox__chip", count: 2).and have_css("[data-comparison] article", count: 2)
     expect(page).to have_no_current_path(/manufacturer|electric/)
@@ -800,13 +800,13 @@ RSpec.describe "Bike Book", :js, type: :system do
     expect(page).to have_css("#vehicle-models-count", exact_text: "(1 matching model)")
     expect(page).to have_current_path(/[?&]frame_material=carbon\b/).and have_current_path(/[?&]handlebar_type=drop_bar\b/)
     within("#vehicle-filters") { click_link "Clear filters" }
-    expect(page).to have_css("#vehicle-models-count", exact_text: "(40 matching models)")
+    expect(page).to have_css("#vehicle-models-count", exact_text: "(39 matching models)")
     # and from the open panel, where the market, how it narrows and e-bike classification are nothing to clear, and stay
     # through a clear
     find_field("Market").click
     find("#market-hw-listbox [role='option']", text: "United States (US)").click
     # any market's models, as the clears above kept it
-    expect(page).to have_css("#vehicle-models-count", exact_text: "(40 matching models)")
+    expect(page).to have_css("#vehicle-models-count", exact_text: "(39 matching models)")
     choose "Only United States", allow_label_click: true
     expect(page).to have_css("#vehicle-models-count", exact_text: "(33 matching models)")
     check "US Class 2"
@@ -893,8 +893,10 @@ RSpec.describe "Bike Book", :js, type: :system do
     visit bikebook_path
     # its own models and those of makers it sells none of, but for e-vehicles
     expect(page).to have_css("#vehicle-models-count", exact_text: "(7 matching models)", wait: 10)
+    # its Canadian model, under the US model's row, which is all the index lists of it
     type_into(vehicle_field, "haul")
-    expect(page).to have_css(vehicle_option, count: 1, text: "$3,599.99").and have_no_css(vehicle_option, text: "(CA)")
+    expect(page).to have_css(vehicle_option, count: 1).and have_css("#{vehicle_option}[data-value='m/specialized/2025/haul_st_ca']")
+    expect(page).to have_no_css(vehicle_option, text: "(CA)")
     # beside its activity, whether it's electric
     expect(find(vehicle_option)).to have_css("span", exact_text: "⚡")
     # nor a maker's sold elsewhere, where it sells its own
@@ -907,7 +909,8 @@ RSpec.describe "Bike Book", :js, type: :system do
     type_into(vehicle_field, "m/specialized/2025/haul_st")
     expect(page).to have_css(".hw-combobox__group__label", exact_text: "(model doesn't match filters)")
     # named for the market it's sold in, which the visitor's isn't
-    expect(page).to have_css(vehicle_option, count: 1, text: "Specialized Haul ST (US)").and have_no_css(vehicle_option, text: "$3,599.99")
+    expect(page).to have_css(vehicle_option, count: 1, text: "Specialized Haul ST (US)")
+      .and have_css("#{vehicle_option}[data-value='m/specialized/2025/haul_st']")
     type_into(vehicle_field, "m/specialized/2025/haul_st_ca")
     expect(page).to have_css(".hw-combobox__group__label", exact_text: "(1 matching model)")
 
@@ -924,14 +927,11 @@ RSpec.describe "Bike Book", :js, type: :system do
     # named for the visitor's market
     expect(page).to have_checked_field("Prefer vehicles sold in Canada", visible: :all)
     choose "Any market", allow_label_click: true
-    expect(page).to have_css("#vehicle-models-count", exact_text: "(40 matching models)")
-    # featuring those priced in the visitor's currency, though the others are in any market's
-    expect(page).to have_css("[aria-label='Models to compare'] a", exact_text: "Specialized Haul ST")
-    expect(featured_ids).to eq %w[m/specialized/2025/haul_st_ca]
+    expect(page).to have_css("#vehicle-models-count", exact_text: "(39 matching models)")
     expect(page).to have_current_path(/[?&]market_scope=any\b/)
     # each re-runs the vehicle combobox's search, logged once it settles, though only the market's scope changed
     page.evaluate_script("new Promise((resolve) => setTimeout(resolve, 1100))")
-    expect(logged.last).to end_with "&market_scope=any&q=Specialized+Haul+ST+%282025%29"
+    expect(logged.last).to end_with "&market_scope=any&q=Specialized+Haul+ST+%28current%29"
     # its own models alone
     choose "Only Canada", allow_label_click: true
     expect(page).to have_css("#vehicle-models-count", exact_text: "(6 matching models)")
@@ -942,7 +942,7 @@ RSpec.describe "Bike Book", :js, type: :system do
     expect(page).to have_checked_field("Only United States", visible: :all).and have_field("Prefer vehicles sold in United States", visible: :all)
     expect(page).to have_current_path(/[?&]market=US\b/)
     page.evaluate_script("new Promise((resolve) => setTimeout(resolve, 1100))")
-    expect(logged.last).to eq "count=0&market=US&market_scope=only&q=Specialized+Haul+ST+%282025%29"
+    expect(logged.last).to eq "count=1&market=US&market_scope=only&q=Specialized+Haul+ST+%28current%29"
     # and stays out of the collapsed filters' summary
     expect(find("[aria-label='Applied filters']", visible: :all).text(:all)).to be_empty
     # a cleared market is the visitor's again once a filter changes, as the URL leaving it out reads
@@ -953,13 +953,13 @@ RSpec.describe "Bike Book", :js, type: :system do
 
     # an older link's every market is any of the visitor's
     visit bikebook_path(market: "all")
-    expect(page).to have_css("#vehicle-models-count", exact_text: "(40 matching models)", wait: 10)
+    expect(page).to have_css("#vehicle-models-count", exact_text: "(39 matching models)", wait: 10)
     expect(page).to have_checked_field("Any market", visible: :all)
 
     # a market the catalog has no models in searches them all, with nothing for it to narrow
     page.driver.with_playwright_page { it.set_extra_http_headers("CF-IPCountry" => "JP") }
     visit bikebook_path
-    expect(page).to have_css("#vehicle-models-count", exact_text: "(40 matching models)", wait: 10)
+    expect(page).to have_css("#vehicle-models-count", exact_text: "(39 matching models)", wait: 10)
     expect(page).to have_css("fieldset[hidden] input[name='market_scope']", count: 3, visible: :all)
 
     # and a visitor Cloudflare can't place searches the US
@@ -981,7 +981,7 @@ RSpec.describe "Bike Book", :js, type: :system do
     expect(page.evaluate_script("document.documentElement.scrollWidth")).to eq 390
     page.current_window.resize_to(*window_size)
 
-    # a model's group leaves out the models the market does, until any market will do
+    # a model's group lists each of its models as the market's
     FactoryBot.create(:color, name: "Silver, gray or bare metal", display: "#bbb")
     visit bikebook_path(search: 1, vehicle_models: "m/specialized/2025/haul_st")
     # under its years, its newest year's colorways to choose between, the first chosen
@@ -1055,9 +1055,9 @@ RSpec.describe "Bike Book", :js, type: :system do
     # its own card the chosen colorway's photo too
     expect(find("#group-m-specialized-2025-haul_st").ancestor("li")).to have_css("img[src$='/haul_st_gloss_white_mountains.png']", visible: :all)
     click_on "More filters", match: :first
-    choose "Any market", allow_label_click: true
-    expect(page).to have_css("[aria-labelledby='model-group-name'] li", count: 2)
-    expect(group_models.call).to match_array(["m-specialized-2025-haul_st", "m-specialized-2025-haul_st_ca"])
+    choose_option("Market", "Canada")
+    expect(page).to have_css("#group-m-specialized-2025-haul_st_ca")
+    expect(group_models.call).to eq(["m-specialized-2025-haul_st_ca"])
 
     # a checked class keeps its jurisdiction in the URL, as another's would uncheck it
     page.driver.with_playwright_page { it.set_extra_http_headers("CF-IPCountry" => "US", "CF-Region" => "New Jersey") }
@@ -1205,8 +1205,12 @@ RSpec.describe "Bike Book", :js, type: :system do
     expect(tiles.call).to eq [["E-moto, not an e-bike"], ["Class 3 e-bike", "E-moto, not an e-bike"]]
     expect(all("[aria-label='Overview comparison'] td button[aria-label$='e-bike'] + [role='tooltip'] code", visible: :all).map { it.text(:all).strip })
       .to eq ["evc/out_of_class/us/ca", "evc/us/class_3", "evc/out_of_class/us/ca"]
+    expect(all("[aria-label='Overview comparison'] td p", text: "a Class 3 can't have a throttle there").map(&:text))
+      .to eq ["It's a Class 2 and Class 3 e-bike, which isn't permitted in California: a Class 3 can't have a throttle there.",
+        "Its optional throttle isn't permitted in California: a Class 3 can't have a throttle there."]
     choose_option("Jurisdiction", "Colorado")
     expect(page).to have_no_css("[aria-label='Overview comparison'] td button[aria-label='E-moto, not an e-bike']")
+    expect(page).to have_no_text("a Class 3 can't have a throttle there")
     expect(tiles.call).to eq [["Class 2 e-bike", "Class 3 e-bike"], ["Class 2 e-bike", "Class 3 e-bike"]]
 
     # a California visitor's e-bikes are legal there, which a Class 3 with a stock throttle isn't
@@ -2284,8 +2288,8 @@ RSpec.describe "Bike Book", :js, type: :system do
     within("#vehicle-filters") { click_link "Clear filters" }
     expect(page).to have_no_current_path(/vehicle_type/).and have_no_css("#similar-m-aventon-2025-abound_lr")
     # the closest of each model group, its own, other propulsions and other vehicle types left out, other activities in
-    expect(cards.call).to eq %w[similar-m-aventon-2026-pace_5_rec_step_through similar-m-aventon-2025-aventure_3_step_through
-      similar-m-aventon-2024-soltera_2_5 similar-m-aventon-2026-ramblas_adv similar-m-aventon-2024-sinch_2_5]
+    expect(cards.call).to eq %w[similar-m-aventon-2026-pace_5_rec_step_through similar-m-aventon-2024-soltera_2_5
+      similar-m-aventon-2025-aventure_3_step_through similar-m-aventon-2026-ramblas_adv similar-m-aventon-2024-sinch_2_5]
     # the propulsions the filters check in place of its own - an e-bike's human powered ones, of which none are near
     check "Human powered (Acoustic)"
     expect(page).to have_current_path(/[?&]electric=0\b/).and have_text("No similar models are in the catalog.")
@@ -2359,18 +2363,13 @@ RSpec.describe "Bike Book", :js, type: :system do
     click_on "Adjust comparison algorithm", wait: 10
     expect(page).to have_field("Select a bike, choose multiple to compare them")
     expect(page).to have_current_path(/[?&]search=1&filters=1&adjust=1\b/)
-    # of the models the search's market and vehicle types leave, as its e-bikes are Canada's, and current ones, as it's
-    # current, those no longer sold included by the first of the other settings - which leaves none, Canada's Haul ST no longer sold
+    # of the models the search's market and vehicle types leave, as its e-bikes are Canada's - the Haul ST as its Canadian
+    # model - and current ones, as it's current, those no longer sold included by the first of the other settings
     visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_rec", market: "CA", similar: 1, skip_manufacturer: 1, vehicle_type: "bike,cargo_bike",
       search: 1, filters: 1, adjust: 1)
-    expect(page).to have_unchecked_field("Include bikes that are not current", wait: 10).and have_text("No similar models are in the catalog.")
-    expect(find("legend", text: /\AOther settings/).ancestor("fieldset").first("label")).to have_text("Include bikes that are not current")
-    # any year's, then Canada's rather than the closer US one, until any market will do
-    check "Include bikes that are not current"
-    expect(page).to have_current_path(/[?&]include_not_current=1\b/)
+    expect(page).to have_unchecked_field("Include bikes that are not current", wait: 10)
     expect(page).to have_css("#similar-m-specialized-2025-haul_st_ca").and have_no_css("#similar-m-specialized-2025-haul_st")
-    choose "Any market", allow_label_click: true
-    expect(page).to have_css("#similar-m-specialized-2025-haul_st").and have_no_css("#similar-m-specialized-2025-haul_st_ca")
+    expect(find("legend", text: /\AOther settings/).ancestor("fieldset").first("label")).to have_text("Include bikes that are not current")
     # and one no longer sold matches any year's by default
     visit bikebook_path(vehicle_models: "m/specialized/2025/haul_st_ca", similar: 1, adjust: 1, search: 1, filters: 1)
     expect(page).to have_checked_field("Include cargo bikes that are not current", wait: 10)
@@ -2388,9 +2387,9 @@ RSpec.describe "Bike Book", :js, type: :system do
         // each alike in its geometry, wheels and weight, as a catalog model lists most of them
         const alike = { head_angle: 70, seat_angle: 74, stack_reach: 1.5, bb_drop: 70, chainstay_gap: 80, front_bsd: 622, rear_bsd: 622, tire_clearance: 45, total_weight: 10 }
         const fields = { ...Object.fromEntries(names.map((name) => [name, [null, null, null]])), ...Object.fromEntries(Object.entries(alike).map(([name, value]) => [name, [value, value, value]])) }
-        const model = (id, electric, handlebar_type, suspension, activity = 'commuting') => ({ id, electric, handlebar_type, suspension, vehicle_type: 'bike', model_configuration: 'complete', manufacturer: id, group_key: id, primary_activity: activity, markets: ['US'] })
+        const model = (id, electric, handlebar_type, suspension, activity = 'commuting') => ({ id, electric, handlebar_type, suspension, vehicle_type: 'bike', model_configuration: 'complete', manufacturer: id, group_key: id, primary_activity: activity, markets: ['US'], variants: [] })
         const urban = [{ slug: 'commuting', family: 'urban' }]
-        const scoring = (models, extra = {}, activities = urban) => scorer(models, { format: 3, fields: { ...fields, ...extra } }, activities)
+        const scoring = (models, extra = {}, activities = urban) => scorer(models, { format: 4, fields: { ...fields, ...extra } }, activities)
         const score = scoring([model('e', true), model('other_e', true), model('acoustic', false)], { battery_size: [500, 500, null] })
         const propulsions = [() => true, ({ electric }) => !electric].map((included) => score('e', settingsFrom(new URLSearchParams()), included).models.map(({ id }) => id))
         const materials = scoring([model('a', false), model('steel', false), model('aluminum', false)], { frame_material: ['aluminum', 'steel', 'aluminum'] })
@@ -2537,7 +2536,7 @@ RSpec.describe "Bike Book", :js, type: :system do
 
   it "keeps the search and its filters while the catalog loads, and says so when it doesn't" do
     serve_bikebook_catalog(manifest_status: 404)
-    held = hold_bikebook_catalog_file("manifest.json")
+    held = hold_bikebook_catalog_file(Integrations::Bikebook::Catalog::MANIFEST)
     # searching, which a model alone would hide
     visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_rec_step_through", electric: "1", search: 1, vehicle_type: "e_scooter")
 

@@ -64,6 +64,7 @@ const WEIGHT_LOADS = {
 const INCLUDED = 'included_not_installed'
 
 export const US_CLASS = /^evc\/us\/class_(\d)$/
+const classNumbers = (mode) => mode.ids.map((id) => id.match(US_CLASS)?.[1]).filter(Boolean)
 // (tire_width / 25.4).round(1) is a Float, so a whole inch still reads 2.0
 const tireInches = (presenter, millimeters) => presenter.labeled(presenter.rounded(millimeters / 25.4).toFixed(1), 'in', presenter.kit.inches)
 const brakeType = (brake) => brake?.type?.replace(/^Disc (\w+)$/, '$1 disc')
@@ -466,7 +467,7 @@ class ModelViewer {
   #classTiles () {
     if (this.outOfClass === 'stock') return classBadges([`emoto/${this.outOfClassId}`])
     const ids = this.vehicle.classifiedModes.flatMap((mode) => mode.ids)
-    const numbers = [...new Set(ids.map((id) => id.match(US_CLASS)?.[1]).filter(Boolean))].sort()
+    const numbers = this.#classNumbers()
     const optional = this.#optionalClasses()
     const throttled = this.outOfClass === 'throttle'
     const classes = numbers.filter((number) => !(throttled && optional.get(number) === 'throttle'))
@@ -475,21 +476,35 @@ class ModelViewer {
     return tiles.length ? classBadges(tiles) : presence(this.classificationNames(this.#sortedClassifications(this.vehicle)))
   }
 
-  // Its classes beside its /ebike-rules check
+  #classNumbers () {
+    return [...new Set(this.vehicle.classifiedModes.flatMap(classNumbers))].sort()
+  }
+
+  // Its classes beside its /ebike-rules check, over why it's out of class there
   eVehicleClass () {
     const classes = this.#classTiles()
     return classes && html`<div class="tw:flex tw:flex-wrap tw:items-end tw:gap-x-3 tw:gap-y-1"><div>${classes}</div><a class="twlink tw:text-sm"
-      href=${`/ebike-rules?vehicle_models=${this.data.id}`}>View on e-bike rules</a></div>`
+      href=${`/ebike-rules?vehicle_models=${this.data.id}`}>View on e-bike rules</a></div>${this.#outOfClassReason()}`
+  }
+
+  // As /ebike-rules' verdict has it
+  #outOfClassReason () {
+    if (!this.outOfClass) return nothing
+    const { state } = Object.values(this.presenter.vocabulary.e_vehicle_classifications)
+      .find(({ jurisdiction }) => jurisdiction === `US-${this.outOfClassId.split('/').at(-1).toUpperCase()}`)
+    const permitted = this.outOfClass === 'stock'
+      ? `It's a ${andSentence(this.#classNumbers().map((number) => `Class ${number}`))} e-bike, which`
+      : 'Its optional throttle'
+    return html`<p class="tw:mt-2 tw:text-sm tw:text-gray-700 tw:dark:text-gray-300">${permitted} isn't permitted in ${state}: a Class 3 can't have a throttle there.</p>`
   }
 
   // As EbikeRuleServices::BikebookVehicles has them: the US classes only a mode it isn't sold with brings, by that mode,
   // and none when every class is
   #optionalClasses () {
-    const numbers = (mode) => mode.ids.map((id) => id.match(US_CLASS)?.[1]).filter(Boolean)
     const modes = this.vehicle.classifiedModes
-    const sold = new Set(modes.filter(stock).flatMap(numbers))
+    const sold = new Set(modes.filter(stock).flatMap(classNumbers))
     if (!sold.size) return new Map()
-    return new Map(modes.filter((mode) => !stock(mode)).flatMap((mode) => numbers(mode).filter((number) => !sold.has(number)).map((number) => [number, mode.mode])))
+    return new Map(modes.filter((mode) => !stock(mode)).flatMap((mode) => classNumbers(mode).filter((number) => !sold.has(number)).map((number) => [number, mode.mode])))
   }
 
   // As /ebike-rules has it (EbikeRuleServices::BikebookVehicles): a classification other than an e-bike law's or a US

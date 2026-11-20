@@ -1,0 +1,100 @@
+---
+en:
+  components:
+    pages:
+      landing_pages:
+        ascend:
+          a_dashboard_for_your_shop: A dashboard for your shop
+          a_dashboard_for_your_shop_body: >-
+            Search the bikes you've sold whenever you need to. If a customer's bike
+            goes missing, its details and serial number are stored and ready for a
+            police report or a stolen listing.
+          a_free_benefit_for_every_customer: A free benefit for every customer, for
+            the day you hope never comes.
+          a_full_suite_of_recovery_tools: A full suite of recovery tools
+          a_full_suite_of_recovery_tools_body: >-
+            Bike Index is the only organization that offers a full suite of stolen
+            bike recovery tools to consumers.
+          a_network_on_their_side: A network on their side
+          a_network_on_their_side_body: >-
+            Our large network of nonprofit contributors helps support and assist with
+            bike recovery.
+          about_10_minutes: About 10 minutes
+          ascend_pos_integration: Ascend POS integration
+          bikes_waiting_for_customers: Bikes waiting for customers
+          bikes_waiting_for_customers_body: >-
+            We create a Bike Index account for each customer. They check their email,
+            log in, and their new bike is already there. Prefer no emails? We can
+            turn customer notifications off entirely.
+          caped_hero_bike_alt: Caped hero bike
+          create_shop_account: Create shop account
+          create_your_shop_account: Create your shop account on Bike Index
+          create_your_shop_account_body: >-
+            Sign up as a new bike shop organization. If your shop already has one,
+            log in and skip ahead.
+          customers_stay_in_control: Customers stay in control
+          customers_stay_in_control_body: Owners can update, transfer, or delete their
+            registration at any time.
+          email_notifications_off_body: >-
+            We can turn email notifications off entirely. The bike stays registered
+            under your shop's email instead, so if police recover it, they'll contact
+            your shop, and you'll reach out to the customer. We're happy to work with
+            you on privacy settings that fit your shop.
+          email_subject: Ascend setup
+          email_us: Email us
+          lightspeed_body_html: We have a %{lightspeed_link} too.
+          lightspeed_pos_integration: Lightspeed POS integration
+          link_your_accounts_once: >-
+            Link your Ascend Retail and Bike Index accounts once. Free, and setup
+            takes about 10 minutes.
+          never_sold_or_shared: Never sold or shared
+          never_sold_or_shared_body: Customer names and emails are not sold, rented,
+            or passed to third parties.
+          new_bike_sales_get_a_bike_index_account: New bike sales automatically get
+            the benefit of a Bike Index account
+          no_marketing_lists: No marketing lists
+          no_marketing_lists_body: We don't add your customers to newsletters or send
+            them promotions.
+          nothing_to_do_at_checkout: Nothing to do at checkout
+          nothing_to_do_at_checkout_body: >-
+            Each day, Bike Index pulls newly sold bikes from Ascend. Your staff keeps
+            ringing up sales the way they already do.
+          one_email_to_claim_their_bike: One email to claim their bike
+          one_email_to_claim_their_bike_body: >-
+            Customers get a single email letting them know the bike they bought from
+            your shop is registered and waiting.
+          open_ascend_guide: Open Ascend guide
+          peace_of_mind: Peace of mind
+          peace_of_mind_body: >-
+            Their bike's details are already stored, so they never have to go searching
+            for a serial number.
+          pos_integration_faq: POS integration FAQ
+          pos_integration_security_faq: POS integration security FAQ
+          privacy_intro: >-
+            Bike Index is a nonprofit. Customer information is used to register bikes
+            and help recover them, and nothing else.
+          privacy_policy: Privacy policy
+          questions: Questions?
+          questions_body_html: Email %{email_link} or read the %{faq_link}.
+          rather_they_didnt_get_an_email: Rather they didn't get an email?
+          register_every_bike_you_sell: Register every bike you sell, automatically.
+          send_us_the_password: Send us the password
+          send_us_the_password_body: >-
+            Email it to %{shops_email} and we'll finish connecting your accounts.
+            After that, you're done.
+          set_up_in_three_steps: Set up in three steps
+          start_setup: Start setup
+          turn_on_bike_index_in_ascend: Turn on Bike Index in Ascend
+          turn_on_bike_index_in_ascend_body: >-
+            Follow the setup instructions in Ascend's knowledge base article. This
+            is where you'll create the password for the connection.
+          using_lightspeed_instead: Using Lightspeed instead?
+          we_hope_their_bike_is_never_stolen: We hope their bike is never stolen.
+            If it is, they're covered.
+          we_will_never_give_out_customer_data: We will never give out any of your
+            customer data.
+          what_your_customers_get: What your customers get
+          your_customers_privacy: Your customers' privacy
+          your_shop_is_on_bike_index: Your shop is on Bike Index
+          your_shop_is_on_bike_index_body: You're signed in to your shop's organization
+            account, so this step is done.

@@ -2261,6 +2261,9 @@ es:
           already_signed_in: "¡Ya has iniciado sesión!"
         turnstile_verified:
           verify_not_a_robot: Por favor, confirma que no eres un robot.
+        sign_in_confirmed_user:
+          unable_to_sign_in: Hemos confirmado tu correo electrónico, pero no pudimos
+            iniciar sesión en esa cuenta.
     feedbacks:
       block_the_spam:
         please_sign_in: Por favor, inicia sesión para enviar ese mensaje.
@@ -2317,18 +2320,14 @@ es:
         ensure_app_owner!:
           not_your_application: Esa no es tu solicitud
     organizations:
-      create:
-        organization_created: "¡Organización creada con éxito!"
-        must_create_an_account_first: Debes registrarte para obtener una cuenta en
-          Bike Index antes de poder crear una organización.
       find_organization:
         not_found: Lo sentimos, esa organización aún no está en Bike Index. Si cree
           que se trata de un error, envíe un correo electrónico a contact@bikeindex.org.
       lightspeed_interface:
-        must_create_an_account_first: Debes crear una cuenta en Bike Index antes de
-          poder conectarte con Lightspeed.
         must_create_an_organization_first: Debes crear una organización en Bike Index
           antes de poder conectarte con Lightspeed.
+        sign_in_or_add_organization: Inicia sesión para conectar tu organización con
+          Lightspeed o, si aún no está en Bike Index, añádela aquí.
       set_bparam:
         no_user: Lo sentimos, esa organización no tiene un usuario configurado para
           registrar bicicletas. Si cree que se trata de un error, envíe un correo
@@ -2576,9 +2575,6 @@ es:
       find_b_param:
         registration_not_found: No pudimos encontrar ese registro; inicie uno nuevo
           a continuación.
-      sign_in_confirmed_user:
-        unable_to_sign_in: Hemos confirmado tu correo electrónico, pero no pudimos
-          iniciar sesión en esa cuenta.
       redirect_to_single_page:
         registered_for_owner: El %{bike_display} está registrado; le hemos enviado
           un correo electrónico a %{email} para que puedan reclamarlo.
@@ -2598,6 +2594,36 @@ es:
     memberships:
       create:
         already_a_member: Ya tienes una membresía.
+    organization_signup:
+      complete_signup:
+        name_taken_meanwhile: Otra organización ya utilizó el nombre %{name} mientras
+          te registrabas. Elige otro nombre para finalizar; el resto del registro
+          se guardará.
+        unable_to_complete: No pudimos finalizar la configuración de tu organización
+          (%{errors}). Ponte en contacto con support@bikeindex.org y lo solucionaremos.
+      confirm_email:
+        link_invalid: Ese enlace ya no funciona. Utilice el correo electrónico más
+          reciente que enviamos a %{email} o envíe otro a la dirección que aparece
+          a continuación.
+        link_invalid_resent: Ese enlace ya no funciona, así que le hemos enviado uno
+          nuevo por correo electrónico a %{email}.
+        sign_out_to_confirm: Has iniciado sesión como %{email}. Cierra sesión y vuelve
+          a abrir el enlace para activar la organización.
+      find_signup_for_confirmation:
+        signup_not_found: No pudimos encontrar ese registro; crea uno nuevo a continuación.
+      redirect_to_organization:
+        already_activated: "%{name} ya está activo"
+      redirect_to_sign_in_for:
+        sign_in_to_manage: "%{name} está activo. Inicia sesión como %{email} para
+          gestionarlo."
+      resend:
+        link_recently_sent: En los últimos minutos enviamos un enlace a %{email};
+          puede tardar un poco en llegar, así que revise también su carpeta de correo
+          no deseado.
+        link_resent: Hemos enviado un nuevo enlace a %{email}.
+        no_more_links: Ya hemos enviado varios enlaces a %{email}, así que no podemos
+          enviar otro. Revisa tu carpeta de correo no deseado o ponte en contacto
+          con support@bikeindex.org.
   customer_mailer:
     additional_email_confirmation:
       html:
@@ -2925,6 +2951,7 @@ es:
       write_do_not_register: Si un cliente no quiere que una bicicleta se añada al
         Índice de Bicicletas, simplemente debe añadir "NO REGISTRAR" en las notas
         de la venta y la bicicleta no se registrará.
+      add_your_shop: Añade tu tienda al Índice de Bicicletas
     privacy:
       available_here: disponible aquí
       changes: Cambios
@@ -3869,39 +3896,6 @@ es:
       you_bring_the_ideas_make_the_connections_: Tú aportas las ideas, tú estableces
         los contactos y nosotros nos aseguraremos de que tengas los recursos necesarios
         para llevar a cabo tus proyectos.
-    ascend:
-      ascend_knowledge_base_article: Artículo de la base de conocimientos de Ascend
-      automatic_bicycle_registration: Registro automático de bicicletas para tiendas
-        de bicicletas que utilizan el sistema POS Ascend.
-      email_shops_security_html: Si tiene alguna pregunta, envíe un correo electrónico
-        a %{shops_email_link} o consulte %{security_link}. ¡Gracias por registrar
-        sus bicicletas en Bike Index!
-      email_us_the_password_to_finish_setting_u: "¡Envíanos la contraseña por correo
-        electrónico para finalizar la configuración!"
-      follow_the_setup_instructions_html: Siga las instrucciones de configuración
-        en <strong>%{ascend_link}</strong> en Bike Index.
-      if_your_shop_uses_lightspeed_html: Si tu tienda utiliza Lightspeed, consulta
-        nuestra integración con Lightspeed POS <a target="none" href="%{lightspeed_path}">aquí</a>
-        .
-      link_your_ascend_retail_and_bike_index: Vincula tus cuentas de Ascend Retail
-        y Bike Index gratis.
-      new_bike_shop_org: nueva organización de tiendas de bicicletas
-      once_youve_set_up_the_trek_ascenwd: Una vez que hayas configurado el registro
-        de bicicletas en el punto de venta de Trek Ascend, ¡listo! Cada día, Bike
-        Index extraerá la información de las bicicletas recién vendidas de Ascend
-        para crear cuentas de Bike Index para tus clientes. Sus nuevas bicicletas
-        estarán esperándolos al iniciar sesión. Solo tienen que revisar su correo
-        electrónico y su nueva bicicleta estará lista.
-      security_link_text: Preguntas frecuentes sobre la integración de puntos de venta
-      sign_up_as_a_new_org_html: Regístrate como %{new_org_link} en Bike Index.
-      then_if_a_customers_bike_goes_missing_html: 'Si un cliente pierde su bicicleta,
-        su información y número de serie se almacenarán para que pueda acceder a ellos.
-        Pero no se preocupe: <a target="none" href="%{privacy_path}">nunca compartiremos
-        sus datos personales</a> .'
-      we_have_a_new_free_bicycle_registration: Ofrecemos un registro gratuito de bicicletas
-        para tiendas de bicicletas. Si tu tienda utiliza Ascend como sistema de punto
-        de venta, nuestra nueva integración con Ascend te permitirá registrar automáticamente
-        cada bicicleta que vendas. La configuración tarda aproximadamente 10 minutos.
     bike_shop_packages:
       bike_index_for_bike_shops: Índice de bicicletas para tiendas de bicicletas
       choose_a_package_size: Seleccione un tamaño de paquete
@@ -4130,6 +4124,12 @@ es:
     registration_form_settings: Configuración del formulario de registro
     marketplace_how_it_works: Cómo funciona el mercado de Bike Index
     register_landing: Registra tu bicicleta gratis
+    organization_signup_confirm: Active su organización
+    organization_signup_create: Añade tu organización al Índice de Bicicletas
+    organization_signup_new: Añade tu organización al Índice de Bicicletas
+    organization_signup_show: Añade tu organización al Índice de Bicicletas
+    organization_signup_update: Añade tu organización al Índice de Bicicletas
+    organization_signup_welcome: "%{organization} está activo"
   money:
     currencies:
       en: Dólar estadounidense
@@ -4288,9 +4288,6 @@ es:
         marketplace_messages: Mensajes del mercado
     color_scheme:
       appearance: Apariencia
-      dark: Oscuro
-      light: Luz
-      system: Sistema
   news:
     index:
       bike_index_blog: Blog de Bike Index
@@ -4330,28 +4327,6 @@ es:
       handlebar_type: Tipo de manillar
       optional: opcional
       phone_number_owner: Teléfono del propietario
-    new:
-      bike_index_for_organizations: Índice de bicicletas para organizaciones
-    new_form:
-      add_organization: agregar organización
-      add_your_organization_to_bike_index: 'Añade tu organización a Bike Index, de
-        forma gratuita, en tres sencillos pasos:'
-      bike_index_account: Cuenta de Bike Index
-      confirm_your_email: Confirma tu correo electrónico
-      fill_out_the_form_that_will_appear: Rellena el formulario que aparecerá en esta
-        página una vez que hayas iniciado sesión.
-      filling_out_this_form_will_create_a_new_org: Al completar este formulario se
-        creará una organización nueva y diferente.
-      if_you_dont_want_that_to_be_the_case_html: Si no quieres que sea así, %{logout_link}
-        y regístrate con el correo electrónico que te gustaría usar en su lugar.
-      log_out: finalizar la sesión
-      new_organization: Nueva organización
-      organization_kind: Tipo de organización
-      organization_name: Nombre de la organización
-      sign_up_for_a_new_account_html: Regístrate para un %{new_account_link}
-      you_are_already_a_member_of_org_html: Ya eres miembro de %{org_link}.
-      your_current_account_will_be_a_member_html: Tu cuenta actual ( <strong>%{user_email}</strong>
-        ) será miembro de la organización que crees.
     embed_fields:
       add_a_color: Añade un color
       additional_serial: Número de serie/etiqueta adicional
@@ -4850,6 +4825,8 @@ es:
       subject: Finaliza la denuncia de tu %{cycle_type} robado.
     organization_message:
       subject: Mensaje de %{organization_name} sobre tu %{bike_type}
+    organization_signup_confirmation:
+      subject: Confirma tu correo electrónico para activar %{name} en Bike Index.
   payments:
     form:
       donation_header: "¡Ayúdanos a apoyar nuestros esfuerzos!"
@@ -5216,6 +5193,19 @@ es:
       add_a_registration: Agregar un registro
       registration_form_settings: Configuración del formulario de registro
       education_courses: cursos de formación
+    organization_signup:
+      address_required: Por favor, introduzca la dirección completa de la organización.
+      email_required: Se requiere un correo electrónico válido.
+      kind_required: Por favor, elija qué tipo de organización es esta.
+      name_required: Se requiere el nombre de la organización.
+      name_reserved: Ese nombre está reservado en Bike Index; por favor, elija otro.
+      name_taken: Ya existe una organización llamada %{name} en Bike Index. Elija
+        otro nombre o póngase en contacto con support@bikeindex.org si es el suyo.
+      name_taken_shortened: Es demasiado parecido a %{name}, que ya está en Bike Index;
+        los nombres deben ser diferentes en sus primeros 30 caracteres. Elija otro
+        nombre o póngase en contacto con support@bikeindex.org si es suyo.
+      name_too_short: El nombre de la organización debe tener al menos dos letras
+        o números.
   theft_alert_plans:
     theft_alert_plan:
       days: Días
@@ -5492,6 +5482,14 @@ es:
           un mensaje sobre tu %{bike_type}:"
         sender_sent_you_a_message_html: "%{sender_email} de %{organization_name} te
           envió un mensaje sobre tu %{link}:"
+      organization_signup_confirmation:
+        activate_your_organization: Active su organización
+        confirm_and_activate: Confirmar mi correo electrónico y activar
+        confirm_to_activate_html: Confirma esta dirección de correo electrónico para
+          activar <strong>%{name}</strong> en Bike Index. Serás su administrador y
+          podrás invitar al resto de tu equipo una vez que hayas iniciado sesión.
+        link_signs_you_in: Este enlace te da acceso a Bike Index, así que no lo reenvíes.
+          Funciona durante %{days} días.
     ui:
       definition_list:
         row:
@@ -8429,6 +8427,102 @@ es:
           wholesale: Al por mayor
           your_pos: Tu TPV
           youre_in: Estás dentro.
+        ascend:
+          a_dashboard_for_your_shop: Un panel de control para tu tienda
+          a_dashboard_for_your_shop_body: Consulta las bicicletas que has vendido
+            cuando lo necesites. Si la bicicleta de un cliente desaparece, sus datos
+            y número de serie se almacenan y están listos para la denuncia policial
+            o para reportarla como robada.
+          a_free_benefit_for_every_customer: Un beneficio gratuito para cada cliente,
+            para ese día que esperas que nunca llegue.
+          a_full_suite_of_recovery_tools: Un conjunto completo de herramientas de
+            recuperación
+          a_full_suite_of_recovery_tools_body: Bike Index es la única organización
+            que ofrece a los consumidores un conjunto completo de herramientas para
+            la recuperación de bicicletas robadas.
+          a_network_on_their_side: Una red de apoyo
+          a_network_on_their_side_body: Nuestra amplia red de colaboradores sin ánimo
+            de lucro ayuda a apoyar y colaborar en la recuperación de bicicletas.
+          about_10_minutes: Aproximadamente 10 minutos
+          ascend_pos_integration: Integración de Ascend POS
+          bikes_waiting_for_customers: Bicicletas esperando a los clientes
+          bikes_waiting_for_customers_body: Creamos una cuenta de Bike Index para
+            cada cliente. Revisan su correo electrónico, inician sesión y su nueva
+            bicicleta ya está registrada. ¿Prefiere no recibir correos electrónicos?
+            Podemos desactivar las notificaciones para clientes por completo.
+          caped_hero_bike_alt: Bicicleta de héroe enmascarado
+          create_shop_account: Crear cuenta de tienda
+          create_your_shop_account: Crea tu cuenta de tienda en Bike Index.
+          create_your_shop_account_body: Regístrate como nueva organización de tienda
+            de bicicletas. Si tu tienda ya tiene una, inicia sesión y continúa.
+          customers_stay_in_control: Los clientes mantienen el control.
+          customers_stay_in_control_body: Los propietarios pueden actualizar, transferir
+            o eliminar su registro en cualquier momento.
+          email_notifications_off_body: Podemos desactivar las notificaciones por
+            correo electrónico por completo. La bicicleta permanecerá registrada con
+            el correo electrónico de tu tienda, así que si la policía la recupera,
+            se pondrán en contacto contigo y tú contactarás con el cliente. Estaremos
+            encantados de ayudarte a configurar los ajustes de privacidad que mejor
+            se adapten a tu tienda.
+          email_subject: Configuración de Ascend
+          email_us: Envíanos un correo electrónico
+          lightspeed_body_html: También tenemos un %{lightspeed_link}.
+          lightspeed_pos_integration: Integración de Lightspeed POS
+          link_your_accounts_once: Vincula tus cuentas de Ascend Retail y Bike Index
+            una sola vez. Es gratis y la configuración tarda unos 10 minutos.
+          never_sold_or_shared: Nunca se vendió ni se compartió.
+          never_sold_or_shared_body: Los nombres y correos electrónicos de los clientes
+            no se venden, alquilan ni ceden a terceros.
+          new_bike_sales_get_a_bike_index_account: Las ventas de bicicletas nuevas
+            se benefician automáticamente de una cuenta de Bike Index.
+          no_marketing_lists: No se aceptan listas de marketing.
+          no_marketing_lists_body: No añadimos a tus clientes a nuestros boletines
+            informativos ni les enviamos promociones.
+          nothing_to_do_at_checkout: No hay nada que hacer al momento de pagar.
+          nothing_to_do_at_checkout_body: Cada día, Bike Index retira de Ascend las
+            bicicletas recién vendidas. Tu personal continúa registrando las ventas
+            como siempre lo hace.
+          one_email_to_claim_their_bike: Un correo electrónico para reclamar su bicicleta
+          one_email_to_claim_their_bike_body: Los clientes reciben un único correo
+            electrónico informándoles de que la bicicleta que compraron en tu tienda
+            está registrada y lista para ser usada.
+          open_ascend_guide: Guía de Open Ascend
+          peace_of_mind: Tranquilidad de espíritu
+          peace_of_mind_body: Los datos de su bicicleta ya están almacenados, por
+            lo que nunca tienen que buscar el número de serie.
+          pos_integration_faq: Preguntas frecuentes sobre la integración de puntos
+            de venta
+          pos_integration_security_faq: Preguntas frecuentes sobre seguridad en la
+            integración de puntos de venta
+          privacy_intro: Bike Index es una organización sin ánimo de lucro. La información
+            de los clientes se utiliza para registrar las bicicletas y ayudar a recuperarlas,
+            y para ningún otro fin.
+          privacy_policy: Política de privacidad
+          questions: "¿Preguntas?"
+          questions_body_html: Envíe un correo electrónico a %{email_link} o lea el
+            %{faq_link}.
+          rather_they_didnt_get_an_email: "¿Prefieren no haber recibido un correo
+            electrónico?"
+          register_every_bike_you_sell: Registra automáticamente cada bicicleta que
+            vendas.
+          send_us_the_password: Envíanos la contraseña
+          send_us_the_password_body: Envíalo por correo electrónico a %{shops_email}
+            y terminaremos de conectar tus cuentas. Después de eso, habrás terminado.
+          set_up_in_three_steps: Configuración en tres pasos
+          start_setup: Iniciar configuración
+          turn_on_bike_index_in_ascend: Activar el índice de bicicletas en Ascend
+          turn_on_bike_index_in_ascend_body: Sigue las instrucciones de configuración
+            que encontrarás en el artículo de la base de conocimientos de Ascend.
+            Aquí es donde crearás la contraseña para la conexión.
+          using_lightspeed_instead: "¿Usar Lightspeed en su lugar?"
+          we_hope_their_bike_is_never_stolen: Esperamos que nunca les roben la bicicleta.
+            Si lo hacen, están cubiertos.
+          we_will_never_give_out_customer_data: Nunca compartiremos sus datos de cliente.
+          what_your_customers_get: Lo que obtienen tus clientes
+          your_customers_privacy: La privacidad de sus clientes
+          your_shop_is_on_bike_index: Tu tienda está en Bike Index.
+          your_shop_is_on_bike_index_body: Has iniciado sesión en la cuenta de organización
+            de tu tienda, así que este paso ya está hecho.
       marketplace:
         how_it_works:
           across_town_heading: Al otro lado de la ciudad o al otro lado del país.
@@ -8554,6 +8648,93 @@ es:
         stories:
           load_more_stories: Cargar más historias
           newer_stories: Historias más recientes
+      org_signup:
+        views:
+          confirm:
+            activate: Activar
+            activate_org: Activar %{name}
+            confirm_email_to_activate_html: Confirma que %{email} es tu correo electrónico
+              y configuraremos la organización contigo como administrador.
+            sign_out_and_activate: Cerrar sesión y activar
+            signed_in_as_other: Has iniciado sesión como %{signed_in_as}, pero este
+              enlace es para %{email}. Al activarlo, se cerrará tu sesión y se iniciará
+              la de %{email}, el administrador de la organización.
+          step1:
+            activation_link: Te enviaremos un enlace por correo electrónico para activar
+              la organización; no es necesario que esperes, continúa.
+            add_your_organization: Añade tu organización
+            already_on_bike_index_html: "¿Su organización ya está en Bike Index? %{sign_in_link}
+              para gestionarla."
+            already_part_of_html: Ya formas parte de %{name}; esto crea una organización
+              separada.
+            email: Tu correo electrónico
+            email_placeholder: tú@ejemplo.com
+            free_to_start: Es gratis empezar y solo lleva un par de minutos.
+            kind_bike_advocacy: Grupo de defensa
+            kind_bike_manufacturer: Fabricante
+            kind_bike_shop: Tienda de bicicletas
+            kind_law_enforcement: fuerzas del orden
+            kind_municipality: Ciudad o municipio
+            kind_other: Otro
+            kind_property_management: administración de propiedades
+            kind_school: Escuela o universidad
+            kind_software: Software
+            next: Próximo
+            organization_kind: "¿Qué tipo de organización?"
+            organization_name: Nombre de la organización
+            sign_in: Iniciar sesión
+            signed_in_as_html: Has iniciado sesión como %{email}, que será el administrador
+              de la organización.
+            start_a_different_one: Crea otra organización en su lugar.
+            your_info: Tu información
+            your_organization: Su organización
+          step2:
+            activation_link_sent: Le hemos enviado por correo electrónico a %{email}
+              un enlace para activar la organización; primero, complete este paso.
+            contact: Contacto
+            email_confirmed: Tu correo electrónico está confirmado. Añade donde está
+              %{name} y se activará en cuanto termines.
+            finish: Finalizar
+            location: Ubicación
+            phone: Teléfono
+            publicly_visible: Mostrar esta ubicación en el mapa del Índice de Bicicletas
+            shown_to_people: Así, las personas que se registren contigo podrán encontrarte.
+            website: Sitio web
+            website_placeholder: ejemplo.com
+            where_is_org: "¿Dónde está %{name}?"
+          step_finished:
+            activate_html: Hemos enviado un enlace a %{email}; haz clic en él para
+              activar %{name}.
+            activating_lets_you: 'Una vez activado, puedes:'
+            change_it: Cámbialo
+            check_your_email: Revisa tu correo electrónico
+            invite_your_team: Invita al resto de tu equipo.
+            no_email_yet: "¿No has recibido el correo? Puede tardar unos minutos;
+              revisa tu carpeta de correo no deseado o pídenos que te lo enviemos
+              de nuevo."
+            register_for_community: Registra los vehículos de tu comunidad.
+            register_for_residents: Registre los vehículos de sus residentes.
+            register_for_students: Registre los vehículos de sus estudiantes y personal.
+            register_for_tenants: Registra los vehículos de tus inquilinos.
+            register_for_your_customers: Registre los vehículos de sus clientes.
+            send_it_again: Envíalo de nuevo
+            share_your_link: Comparte tu enlace de registro y código QR.
+            wrong_address: "¿Dirección equivocada?"
+          welcome:
+            add_a_registration: Agregar un registro
+            continue_where_you_were: Continúa donde estabas
+            copy_registration_link: Copiar enlace de registro
+            get_started: Aquí te explicamos cómo empezar.
+            invite_your_team: Invita a tu equipo
+            is_active: "%{name} está activo!"
+            no_password_yet: Por ahora, inicia sesión con los enlaces que te enviamos
+              por correo electrónico.
+            organization_settings: Configuración de la organización
+            registration_link_explained: Cualquier persona que se registre a través
+              de este enlace quedará registrada en su organización.
+            set_a_password: Establecer una contraseña
+            show_qr_code: Mostrar código QR
+            your_registration_link: Tu enlace de registro
     shared_blocks:
       footer:
         about: Acerca
@@ -8758,6 +8939,11 @@ es:
           stat_partners: tiendas asociadas, departamentos de policía y ciudades
           stat_recoveries: Recuperan bicicletas robadas
           stat_value: valor devuelto a los propietarios
+      color_scheme_picker:
+        appearance: Apariencia
+        dark: Oscuro
+        light: Luz
+        system: Sistema
   user_emails:
     confirm:
       confirm_email: Confirmar correo electrónico

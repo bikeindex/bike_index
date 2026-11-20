@@ -2046,6 +2046,23 @@ RSpec.describe RegisterController, type: :request do
       end
     end
 
+    context "an address at an SSO domain" do
+      let(:owner_email) { "rider@sso.edu" }
+      let(:organization) do
+        FactoryBot.create(:organization_with_organization_features,
+          enabled_feature_slugs: ["saml_sso"], user_email_domain: "sso.edu")
+      end
+      before { FactoryBot.create(:organization_saml_configuration, :active, organization:) }
+
+      it "signs in at the identity provider, which brings them back to the link" do
+        expect { post "#{base_url}/confirm_email", params: confirm_params }
+          .to_not change(User, :count)
+        expect(response).to redirect_to saml_init_path(org_slug: organization.to_param)
+        expect(session[:return_to]).to eq confirm_register_path(**confirm_params)
+        expect(b_param.reload.email_confirmed?).to be_falsey
+      end
+    end
+
     context "unconfirmed account for the address" do
       let!(:unconfirmed_user) { FactoryBot.create(:user, email: owner_email) }
 

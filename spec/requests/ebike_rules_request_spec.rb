@@ -193,7 +193,7 @@ RSpec.describe EbikeRulesController, type: :request do
 
       it "asks it once a minute, however much of the page reads it" do
         requests = 0
-        WebMock.stub_request(:get, "#{Integrations::Bikebook::Catalog::URL}manifest.json").to_return do
+        WebMock.stub_request(:get, Integrations::Bikebook::Catalog::MANIFEST_URL).to_return do
           requests += 1
           {status: 503}
         end
