@@ -1,4 +1,4 @@
-<section class="tw:border-b tw:border-gray-200 tw:dark:border-gray-700">
+<section class="tw:wrap-anywhere tw:border-b tw:border-gray-200 tw:dark:border-gray-700">
   <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-8 tw:py-8 <%= SECTION_CLASSES %>">
     <div class="tw:min-w-0 tw:flex-[1_1_420px]">
       <span class="tw:mb-2 tw:block <%= SharedBlocks::Marketing::SectionHeading::Component.eyebrow_classes(:purple) %>">
@@ -25,7 +25,7 @@
   </div>
 </section>
 
-<section class="tw:pt-12 tw:pb-6 <%= SECTION_CLASSES %>">
+<section class="tw:wrap-anywhere tw:pt-12 tw:pb-6 <%= SECTION_CLASSES %>">
   <%= render(SharedBlocks::Marketing::SectionHeading::Component.new(heading: translation(".new_bike_sales_get_a_bike_index_account"),
     html_class: "tw:mb-6")) %>
 
@@ -36,8 +36,8 @@
   </div>
 </section>
 
-<section class="tw:py-8 <%= SECTION_CLASSES %>">
-  <%= render(UI::Card::Component.new(shadow: :black, additional_classes: "tw:p-8!")) do %>
+<section class="tw:wrap-anywhere tw:py-8 <%= SECTION_CLASSES %>">
+  <%= render(UI::Card::Component.new(shadow: :black, additional_classes: "tw:p-5! tw:sm:p-8!")) do %>
     <div class="twwiderow tw:gap-y-8">
       <div>
         <div class="tw:mb-3 tw:flex tw:items-center tw:gap-2.5">
@@ -52,8 +52,8 @@
           intro: translation(".privacy_intro"), html_class: "tw:mb-4")) %>
 
         <div class="tw:flex tw:flex-wrap tw:gap-4 tw:text-[15px] tw:font-semibold">
-          <%= link_to(translation(".privacy_policy"), privacy_path, class: "twlink") %>
-          <%= link_to(translation(".pos_integration_security_faq"), SECURITY_FAQ_PATH, class: "twlink") %>
+          <%= link_to(translation(".privacy_policy"), privacy_path, class: "twlink tw:py-2.5") %>
+          <%= link_to(translation(".pos_integration_security_faq"), SECURITY_FAQ_PATH, class: "twlink tw:py-2.5") %>
         </div>
       </div>
 
@@ -80,7 +80,7 @@
 
 <section
   id="setup"
-  class="tw:scroll-mt-8 tw:pt-10 tw:pb-14 <%= SECTION_CLASSES %>"
+  class="tw:wrap-anywhere tw:scroll-mt-8 tw:pt-10 tw:pb-14 <%= SECTION_CLASSES %>"
 >
   <div
     class="
@@ -130,7 +130,7 @@
   </ol>
 </section>
 
-<section class="tw:border-t tw:border-gray-200 tw:dark:border-gray-700">
+<section class="tw:wrap-anywhere tw:border-t tw:border-gray-200 tw:dark:border-gray-700">
   <div class="tw:grid tw:items-center tw:gap-10 tw:py-14 tw:lg:grid-cols-2 <%= SECTION_CLASSES %>">
     <div>
       <%= render(SharedBlocks::Marketing::SectionHeading::Component.new(eyebrow: translation(".what_your_customers_get"),
@@ -151,7 +151,7 @@
   </div>
 </section>
 
-<section class="tw:border-t <%= BAND %>">
+<section class="tw:wrap-anywhere tw:border-t <%= BAND %>">
   <div class="tw:grid tw:gap-8 tw:py-10 tw:md:grid-cols-2 <%= SECTION_CLASSES %>">
     <div>
       <h3 class="tw:mb-1.5 tw:text-lg <%= HEADING_CLASSES %>">
