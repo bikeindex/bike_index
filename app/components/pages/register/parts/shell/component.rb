@@ -38,7 +38,7 @@ module Pages
           def shell_class
             return "tw:p-1" if @bare
 
-            "tw:-mt-(--nav-gap) tw:-mb-18 tw:px-4 tw:pt-10 tw:pb-10 #{BACKGROUND_CLASSES}"
+            "tw:-mt-(--nav-gap) tw:-mb-18 tw:px-4 tw:pt-10 tw:pb-24 #{BACKGROUND_CLASSES}"
           end
 
           # Revealed by register--retry when a submission can't be retried into working. Ships
