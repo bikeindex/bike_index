@@ -48,14 +48,8 @@ module Spreadsheets
 
     def row_for(manufacturer)
       export_column_methods.map do |meth|
-        next if meth.blank?
-
-        result = manufacturer.send(meth)
-        if meth == :logo_url && result == ManufacturerLogoUploader::FALLBACK_IMAGE
-          nil
-        else
-          result
-        end
+        result = manufacturer.send(meth) || nil
+        result unless meth == :logo_url && result == ManufacturerLogoUploader::FALLBACK_IMAGE
       end
     end
 
