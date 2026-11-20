@@ -9,6 +9,9 @@ module Slugifyer
       .squeeze("-").delete_prefix("-").delete_suffix("-")
   end
 
+  # For lookups: & slugified to -amp- before it was -and-
+  def lookup_slugs(string) = slugify(string).then { [it, it.gsub("-amp-", "-and-")].uniq }
+
   # The pre-slugify manufacturer slug, minus "Accell", which is appended to many of its brands' names
   def legacy_manufacturer(string)
     return nil unless string

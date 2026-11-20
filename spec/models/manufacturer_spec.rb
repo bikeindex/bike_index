@@ -77,6 +77,11 @@ RSpec.describe Manufacturer, type: :model do
       expect(mnfg.previous_slugs).to eq ["all_city"]
       expect(Manufacturer.friendly_find("All-city ")&.id).to eq(mnfg.id)
     end
+    it "finds an -amp- slug as -and-" do
+      mnfg = FactoryBot.create(:manufacturer, name: "Laurin & Klement")
+      expect(mnfg.slug).to eq "laurin-and-klement"
+      expect(Manufacturer.friendly_find("laurin-amp-klement")&.id).to eq mnfg.id
+    end
     it "finds in the secondary_slug" do
       mnfg = FactoryBot.create(:manufacturer, name: "S & M (S and M Bikes) ")
       expect(mnfg.secondary_name).to eq "S and M Bikes"

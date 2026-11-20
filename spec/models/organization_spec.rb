@@ -293,6 +293,7 @@ RSpec.describe Organization, type: :model do
     let!(:organization) { FactoryBot.create(:organization, short_name: "something cool") }
     let!(:organization2) { FactoryBot.create(:organization, short_name: "Bike Shop", name: "Trek Store of Santa Cruz") }
     let!(:organization3) { FactoryBot.create(:organization, short_name: "BikeEastBay", previous_slug: "ebbc") }
+    let!(:organization4) { FactoryBot.create(:organization, name: "Bike & Trike Shop") }
     it "finds by slug, previous_slug and name" do
       expect(organization2.slug).to eq "bike-shop"
       expect(Organization.friendly_find(" ")).to be_nil
@@ -300,6 +301,7 @@ RSpec.describe Organization, type: :model do
       expect(Organization.friendly_find("bike shop")).to eq organization2
       expect(Organization.friendly_find("trek store of SANTA CRUZ")).to eq organization2
       expect(Organization.friendly_find("bikeeastbay")).to eq organization3
+      expect(Organization.friendly_find("bike-amp-trike-shop")).to eq organization4
       expect(Organization.friendly_find(organization)).to eq organization
     end
     it "scrubs null bytes rather than raising" do

@@ -24,6 +24,13 @@ RSpec.describe Slugifyer do
     end
   end
 
+  describe "lookup_slugs" do
+    it "includes the -and- version of an -amp- slug" do
+      expect(Slugifyer.lookup_slugs("Bikes & Trikes")).to eq ["bikes-and-trikes"]
+      expect(Slugifyer.lookup_slugs("bikes-amp-trikes")).to eq ["bikes-amp-trikes", "bikes-and-trikes"]
+    end
+  end
+
   describe "book_slug" do
     it "removes special characters and downcase" do
       slug = Slugifyer.book_slug("Surly's Cross-check bike (small wheel)")

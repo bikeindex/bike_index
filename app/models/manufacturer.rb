@@ -70,10 +70,10 @@ class Manufacturer < ApplicationRecord
       if n.is_a?(Integer) || n.match(/\A\d+\z/).present?
         where(id: n).first
       else
-        slug = Slugifyer.slugify(n)
+        slugs = Slugifyer.lookup_slugs(n)
         legacy_slug = Slugifyer.legacy_manufacturer(n)
-        find_by_slug(slug) || find_by_slug(legacy_slug) || find_by_secondary_slug(legacy_slug) ||
-          where("previous_slugs && ARRAY[?]::varchar[]", [slug, legacy_slug]).first
+        find_by(slug: slugs) || find_by_slug(legacy_slug) || find_by_secondary_slug(legacy_slug) ||
+          where("previous_slugs && ARRAY[?]::varchar[]", [*slugs, legacy_slug]).first
       end
     end
 
