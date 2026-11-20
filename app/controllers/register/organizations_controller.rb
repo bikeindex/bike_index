@@ -3,12 +3,9 @@
 module Register
   class OrganizationsController < ApplicationController
     def show
-      unless request.format.png?
-        return redirect_to(new_register_path(organization_id: params[:organization_id]), status: :moved_permanently)
-      end
+      return redirect_to(new_register_path(organization_id: params[:organization_id]), status: :moved_permanently) unless request.format.png?
 
-      @organization = Organization.friendly_find(params[:organization_id])
-      return head(:not_found) if @organization.blank?
+      @organization = Organization.friendly_find!(params[:organization_id])
 
       @qr_url = case params[:target]
       when "shop_display" then embed_organization_url(@organization, non_stolen: true, shop_display: true)
