@@ -27,7 +27,7 @@
 
     <% if @current_user.present? %>
       <p class="tw:mb-6 tw:text-sm tw:text-gray-600 tw:dark:text-gray-300">
-        <%= translation(".signed_in_as_html", email: tag.strong(@current_user.email)) %>
+        <%= translation(".signed_in_as_new_admin_html", email: tag.strong(@current_user.email)) %>
 
         <% if existing_organization.present? %>
           <%= translation(".already_part_of_html", name: tag.strong(existing_organization.short_name)) %>
