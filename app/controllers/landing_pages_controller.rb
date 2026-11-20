@@ -1,6 +1,6 @@
 class LandingPagesController < ApplicationController
   before_action :force_html_response
-  before_action :instantiate_feedback, except: %i[show for_community_groups ascend]
+  before_action :instantiate_feedback, except: %i[show for_community_groups ascend lightspeed]
 
   def show
     raise ActionController::RoutingError, "Not found" unless current_organization.present?
@@ -15,6 +15,12 @@ class LandingPagesController < ApplicationController
 
   def ascend
     render SharedBlocks::Marketing::Wrapper::Component.new(page: Pages::LandingPages::Ascend::Component.new(
+      has_shop: current_user&.has_shop_organization_role?
+    ))
+  end
+
+  def lightspeed
+    render SharedBlocks::Marketing::Wrapper::Component.new(page: Pages::LandingPages::Lightspeed::Component.new(
       has_shop: current_user&.has_shop_organization_role?
     ))
   end

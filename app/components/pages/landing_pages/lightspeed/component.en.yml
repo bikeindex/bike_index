@@ -1,0 +1,106 @@
+---
+en:
+  components:
+    pages:
+      landing_pages:
+        lightspeed:
+          a_dashboard_for_your_shop: A dashboard for your shop
+          a_dashboard_for_your_shop_body: >-
+            Search the bikes you've sold whenever you need to. If a customer's bike
+            goes missing, its details and serial number are stored and ready for a
+            police report or a stolen listing.
+          a_free_benefit_for_every_customer: A free benefit for every customer, for
+            the day you hope never comes.
+          a_full_suite_of_recovery_tools: A full suite of recovery tools
+          a_full_suite_of_recovery_tools_body: >-
+            Bike Index is the only organization that offers a full suite of stolen
+            bike recovery tools to consumers.
+          a_network_on_their_side: A network on their side
+          a_network_on_their_side_body: >-
+            Our large network of nonprofit contributors helps support and assist with
+            bike recovery.
+          any_customer_can_opt_out: Any customer can opt out
+          any_customer_can_opt_out_body: >-
+            If a customer doesn't want their bike registered, add "DO NOT REGISTER"
+            to the sale notes and it won't be.
+          ascend_body_html: We have an %{ascend_link} too.
+          ascend_pos_integration: Ascend POS integration
+          bikes_waiting_for_customers: Bikes waiting for customers
+          bikes_waiting_for_customers_body: >-
+            Each owner gets an email with everything they need to log in, plus a PDF
+            copy of their registration. Prefer no emails? We can turn customer notifications
+            off entirely.
+          caped_hero_bike_alt: Caped hero bike
+          connect_lightspeed: Connect Lightspeed
+          connect_lightspeed_and_turn_on_automatic_registration: Connect Lightspeed
+            and turn on automatic registration
+          connect_lightspeed_body: >-
+            Link your Lightspeed Retail account. From then on, every bike you sell
+            is registered automatically.
+          connect_once: >-
+            Connect Lightspeed Retail to Bike Index once. After that, every bike you
+            sell is registered automatically, without getting in the way of selling
+            it. Free for your shop and your customers.
+          create_one_for_free: Create one for free
+          email_notifications_off_body: >-
+            We can turn email notifications off entirely. The bike stays registered
+            under your shop's email instead, so if police recover it, they'll contact
+            your shop, and you'll reach out to the customer. We're happy to work with
+            you on privacy settings that fit your shop.
+          founder_caption_html: "<strong>Seth Herr</strong>, Bike Index co-founder"
+          founder_quote: >-
+            I started Bike Index because I wanted to register bikes for my customers
+            at the shop where I worked – with this integration, we finally give shops
+            a way to register bikes that doesn't interfere with selling them.
+          free: Free
+          lightspeed_retail_for_bike_shops: Lightspeed Retail for bike shops
+          lightspeed_retail_integration: Lightspeed Retail integration
+          log_in: Log in
+          log_in_to_your_dashboard: Log in to your shop's Bike Index dashboard
+          never_sold_or_shared: Never sold or shared
+          never_sold_or_shared_body: Customer names and emails are not sold, rented,
+            or passed to third parties.
+          new_bike_sales_get_a_bike_index_account: New bike sales automatically get
+            the benefit of a Bike Index account
+          new_to_lightspeed: New to Lightspeed?
+          new_to_lightspeed_body_html: Learn more about %{lightspeed_link}.
+          no_shop_account_body_html: Don't have a shop account yet? %{create_link}.
+          one_email_to_claim_their_bike: One email to claim their bike
+          one_email_to_claim_their_bike_body: >-
+            Customers get a single email with their login details and a PDF of their
+            registration.
+          peace_of_mind: Peace of mind
+          peace_of_mind_body: >-
+            Their bike's details are already stored, so they never have to go searching
+            for a serial number.
+          pos_integration_faq: POS integration FAQ
+          pos_integration_security_faq: POS integration security FAQ
+          privacy_intro: >-
+            We know you and your customers care about who can see your sales and customer
+            information. Bike Index is a nonprofit, and we're committed to keeping
+            that information safe and secure.
+          privacy_policy: Privacy policy
+          questions: Questions?
+          questions_body_html: Email %{email_link} with questions or suggestions,
+            or read the %{faq_link}.
+          rather_they_didnt_get_an_email: Rather they didn't get an email?
+          register_every_bike_you_sell: Register every bike you sell, right at checkout.
+          set_up_in_two_steps: Set up in two steps
+          start_setup: Start setup
+          this_step_is_done: This step is done.
+          two_fields_at_checkout: Two fields at checkout
+          two_fields_at_checkout_body: >-
+            Add the customer's email and the bike's serial number during a normal
+            Lightspeed checkout. Bike Index creates the registration for you.
+          using_ascend_instead: Using Ascend instead?
+          we_hope_their_bike_is_never_stolen: We hope their bike is never stolen.
+            If it is, they're covered.
+          we_will_never_send_unsolicited_email: We will never send your customers
+            unsolicited email.
+          what_your_customers_get: What your customers get
+          works_with_your_own_email_flow: Works with your own email flow
+          works_with_your_own_email_flow_body_html: >-
+            Already have an email connection with your customers? Bike Index can integrate
+            with it. Email %{email_link} to set it up.
+          your_customers_privacy: Your customers' privacy
+          youre_logged_in: You're logged in to your shop's dashboard

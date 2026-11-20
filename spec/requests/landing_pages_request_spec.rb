@@ -121,6 +121,42 @@ RSpec.describe LandingPagesController, type: :request do
     end
   end
 
+  describe "#lightspeed" do
+    it "renders the setup steps with the title" do
+      get "/lightspeed"
+
+      expect(response.status).to eq(200)
+      expect(response.body).to match("<title>Lightspeed POS on Bike Index</title>")
+      expect(response.body).to include("Log in to your shop")
+      expect(response.body).to_not include("You&#39;re logged in to your shop")
+    end
+
+    context "with a user in a shop" do
+      include_context :request_spec_logged_in_as_organization_admin
+      let(:current_organization) { FactoryBot.create(:organization, kind: "bike_shop") }
+
+      it "marks the log in step done" do
+        get "/lightspeed"
+
+        expect(response.status).to eq(200)
+        expect(response.body).to include("You&#39;re logged in to your shop")
+        expect(response.body).to_not include("Log in to your shop")
+      end
+
+      context "when the organization isn't a shop" do
+        let(:current_organization) { FactoryBot.create(:organization, kind: "law_enforcement") }
+
+        it "keeps the log in step" do
+          get "/lightspeed"
+
+          expect(response.status).to eq(200)
+          expect(response.body).to include("Log in to your shop")
+          expect(response.body).to_not include("You&#39;re logged in to your shop")
+        end
+      end
+    end
+  end
+
   describe "#for_community_groups" do
     let!(:recovery_display) { FactoryBot.create(:recovery_display_with_photo, quote: "Recovered in under four hours") }
 
