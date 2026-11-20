@@ -4,7 +4,7 @@ module Slugifyer
   def slugify(string)
     transliterate(remove_parens(string))
       .gsub("%20", " ").gsub(/\s/, "-")
-      .gsub(/&(amp;)?/, "-amp-")
+      .gsub(/&(amp;)?/, "-and-")
       .gsub(/[^A-Za-z0-9_-]+/, "")
       .squeeze("-").delete_prefix("-").delete_suffix("-")
   end

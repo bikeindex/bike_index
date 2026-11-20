@@ -88,7 +88,7 @@ RSpec.describe Manufacturer, type: :model do
 
       mnfg.update(name: "S & M (SandM)")
       expect(mnfg.reload.secondary_slug).to eq "sandm"
-      expect(Manufacturer.friendly_find("s and m")).to be_nil
+      expect(Manufacturer.find_by_secondary_slug("s_and_m")).to be_nil
     end
     it "keeps the old name's slug when it was also the secondary slug" do
       mnfg = FactoryBot.create(:manufacturer, name: "Kona Bicycle Company (Kona)")

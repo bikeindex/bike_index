@@ -16,6 +16,7 @@ RSpec.describe Organization, type: :model do
     it "says why a name can't be used" do
       expect(Organization.name_problem("Shifty Cycles")).to be_nil
       expect(Organization.name_problem(" shifty  BIKE shop")).to eq :taken
+      expect(Organization.name_problem("Shifty Bike-Shop!")).to eq :taken
       expect(Organization.name_problem("Registrations")).to eq :reserved
       expect(Organization.name_problem("Signups")).to eq :reserved
       expect(Organization.name_problem("X")).to eq :too_short
@@ -726,7 +727,7 @@ RSpec.describe Organization, type: :model do
         organization.set_calculated_attributes
         expect(organization.name).to eq "Bikes & Trikes"
         expect(organization.short_name).to eq "Bikes & Trikes"
-        expect(organization.slug).to eq "bikes-amp-trikes"
+        expect(organization.slug).to eq "bikes-and-trikes"
       end
     end
 

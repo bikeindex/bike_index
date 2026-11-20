@@ -3,10 +3,10 @@ require "rails_helper"
 RSpec.describe Slugifyer do
   describe "slugify" do
     it "handles &" do
-      expect(Slugifyer.slugify("Bikes &amp; Trikes")).to eq "bikes-amp-trikes"
-      expect(Slugifyer.slugify("Bikes & Trikes")).to eq "bikes-amp-trikes"
-      expect(Slugifyer.slugify("B&B")).to eq "b-amp-b"
-      expect(Slugifyer.slugify("Bert's Bikes& Fitness")).to eq "berts-bikes-amp-fitness"
+      expect(Slugifyer.slugify("Bikes &amp; Trikes")).to eq "bikes-and-trikes"
+      expect(Slugifyer.slugify("Bikes & Trikes")).to eq "bikes-and-trikes"
+      expect(Slugifyer.slugify("B&B")).to eq "b-and-b"
+      expect(Slugifyer.slugify("Bert's Bikes& Fitness")).to eq "berts-bikes-and-fitness"
     end
     it "squeezes and trims dashes" do
       expect(Slugifyer.slugify("Foo - Bar")).to eq "foo-bar"

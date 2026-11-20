@@ -235,8 +235,8 @@ class Organization < ApplicationRecord
       :taken if name_taken_by(name).present?
     end
 
-    # Short names are unique, and cut to 30 characters - so a long name can be taken by a different one
-    def name_taken_by(name) = find_by("LOWER(short_name) = ?", shorten_name(sanitize_name(name)).downcase)
+    # Short names are cut to 30 characters, and slugs drop punctuation - so a name can be taken by a different one
+    def name_taken_by(name) = shorten_name(sanitize_name(name)).then { find_by("LOWER(short_name) = ?", it.downcase) || find_by(slug: slug_for(it)) }
 
     def sanitize_name(str) = Binxtils::InputNormalizer.sanitize(str&.strip).gsub("&amp;", "&")
 
