@@ -14,11 +14,10 @@ module Pages
           # (register--heading needs both the heading and the form in scope).
           # wide: for a page that isn't a form - the finished theft report's checklist
           # bare: inside a frame or card that supplies the surroundings
-          def initialize(data: {}, wide: false, bare: false, padding_bottom: nil)
+          def initialize(data: {}, wide: false, bare: false)
             @data = data
             @wide = wide
             @bare = bare
-            @padding_bottom = padding_bottom
           end
 
           def call
