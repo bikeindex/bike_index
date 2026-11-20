@@ -40,6 +40,22 @@ RSpec.describe Pages::EbikeRules::Reasons::Component, type: :component do
     it "says what's over the state's limits, as its tiles say it's in no class" do
       expect(component).to have_css("turbo-frame p", exact_text: "12,500W motor exceeds the 750W cap. Throttle runs to 59 mph, over the 28 mph limit.")
     end
+
+    context "without a state" do
+      let(:lookup) { super().with(place: nil, errors: [:state]) }
+
+      it "says what's over the US classes' limits" do
+        expect(component).to have_css("turbo-frame p", exact_text: "12,500W motor exceeds the 750W cap. Throttle runs to 59 mph, over the 28 mph limit.")
+      end
+    end
+  end
+
+  context "with an e-bike, without a state" do
+    let(:lookup) { super().with(place: nil, errors: [:state]) }
+
+    it "is an empty frame" do
+      expect(component).to have_css("turbo-frame").and have_no_css("p")
+    end
   end
 
   context "with a Class 3 and a throttle in California" do

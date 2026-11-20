@@ -1216,6 +1216,10 @@ RSpec.describe "Bike Book", :js, type: :system do
     expect(page).to have_no_css("[aria-label='Overview comparison'] td button[aria-label='E-moto, not an e-bike']")
     expect(page).to have_no_css(reasons)
     expect(tiles.call).to eq [["Class 2 e-bike", "Class 3 e-bike"], ["Class 2 e-bike", "Class 3 e-bike"]]
+    # in no state, an e-moto's against the US classes' limits, and an e-bike's none
+    visit bikebook_path(vehicle_models: "m/sur_ron/2026/ultra_bee_hp_x_us,m/specialized/2025/haul_st", jurisdiction: "US")
+    expect(page).to have_css(reasons, exact_text: "Throttle runs to 59 mph, over the 28 mph limit.", wait: 10)
+    expect(page).to have_css("[aria-label='Overview comparison'] td turbo-frame", count: 1)
 
     # a California visitor's e-bikes are legal there, which a Class 3 with a stock throttle isn't
     page.driver.with_playwright_page { it.set_extra_http_headers("CF-IPCountry" => "US", "CF-Region" => "California") }

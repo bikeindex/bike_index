@@ -127,6 +127,9 @@ RSpec.describe EbikeRulesController, type: :request do
         .and have_no_css("[role='status']")
       get "/ebike-rules/US/CO", params: {vehicle_models: "m/specialized/2025/haul_st"}, headers: frame
       expect(page).to have_css("turbo-frame#ebike-rules-reasons-overview-m-specialized-2025-haul_st").and have_no_css("p")
+      # without a state, an e-moto's against the US classes' limits
+      get "/ebike-rules/US", params: {vehicle_models: "m/sur_ron/2026/ultra_bee_hp_x_us"}, headers: frame
+      expect(page).to have_css("turbo-frame p", text: "over the 28 mph limit.")
     end
 
     it "sends a request Cloudflare locates to its state's page, which no cache keeps" do
