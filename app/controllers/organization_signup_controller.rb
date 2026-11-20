@@ -147,15 +147,10 @@ class OrganizationSignupController < ApplicationController
     params[:return_to] if params[:return_to].to_s.match?(%r{\A/(?!/)[^\\[:space:][:cntrl:]]*\z})
   end
 
-  # An SSO domain's address signs in at its identity provider, which brings them back to this link
   def sign_in_email_owner
-    if redirect_forced_saml(@signup.email)
-      store_return_to(confirm_path)
-    elsif sign_in_confirmed_user(@signup.email).blank?
-      redirect_to(organization_signup_path)
-    else
-      return true
-    end
+    return true if sign_in_confirmed_user(@signup.email, return_to: confirm_path).present?
+
+    redirect_to(organization_signup_path) unless performed?
     false
   end
 
