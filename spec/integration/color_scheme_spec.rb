@@ -12,6 +12,7 @@ RSpec.describe "color scheme switcher", :js, type: :system do
   it "keeps a signed-out pick from the footer across pages" do
     emulate_os("light")
     visit "/"
+    wait_for_stimulus("color-scheme")
     within("footer") { choose("Dark", allow_label_click: true) }
     expect(page).to have_css("body.dark")
 
@@ -19,6 +20,7 @@ RSpec.describe "color scheme switcher", :js, type: :system do
     expect(page).to have_css("body.dark")
     within("footer") { expect(page).to have_checked_field("Dark", visible: :all) }
 
+    wait_for_stimulus("color-scheme")
     within("footer") { choose("System", allow_label_click: true) }
     expect(page).to have_no_css("body.dark")
     emulate_os("dark")
@@ -31,6 +33,7 @@ RSpec.describe "color scheme switcher", :js, type: :system do
     expect(page).to have_checked_field("System", visible: :all)
     expect(page).to have_no_css("body.dark")
 
+    wait_for_stimulus("color-scheme")
     within(".primary-edit-user-form") { choose("Dark", allow_label_click: true) }
     expect(page).to have_css("body.dark")
     within("footer") { expect(page).to have_checked_field("Dark", visible: :all) }
