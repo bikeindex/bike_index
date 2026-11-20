@@ -47,6 +47,16 @@
     .selectize-dropdown .active {
       @apply tw:dark:bg-gray-600;
     }
+
+    /* Selectize copies .form-control onto its taller wrapper, which would show beneath the input */
+    .selectize-control.form-control {
+      @apply tw:dark:bg-transparent tw:dark:border-transparent;
+    }
+  }
+
+  /* A frame whose root scheme differs from the dark page's paints an opaque white canvas */
+  :root:has(> body.dark #binx_registration_widget) {
+    @apply tw:scheme-dark;
   }
 
   .page-content blockquote {
