@@ -3,7 +3,8 @@
 module Pages
   module LandingPages
     module Lightspeed
-      # has_shop: the visitor is signed in to a shop organization, which finishes step one
+      # has_shop: the visitor is in a shop organization, which finishes step one;
+      # signed_in without a shop is asked to create one rather than to log in
       class Component < ApplicationComponent
         SECTION_CLASSES = SharedBlocks::Marketing::Wrapper::Component::CONTAINER_CLASSES
         MUTED = Pages::LandingPages::ForBikeShops::Component::MUTED
@@ -13,8 +14,9 @@ module Pages
         LIGHTSPEED_URL = "https://www.lightspeedhq.com/pos/retail/bike-shop/?utm_medium=partner&utm_source=Reseller&utm_campaign=001G00000118MwjIAE&ref=001G00000118MwjIAE"
         SUPPORT_EMAIL = "gavin@bikeindex.org"
 
-        def initialize(has_shop: false)
+        def initialize(has_shop: false, signed_in: false)
           @has_shop = has_shop
+          @signed_in = signed_in
         end
 
         private
@@ -52,9 +54,16 @@ module Pages
         def step_log_in
           return {title: translation(".youre_logged_in"), body: translation(".this_step_is_done"), done: true} if @has_shop
 
+          return step_create_shop if @signed_in
+
           {title: translation(".log_in_to_your_dashboard"),
            body: translation(".no_shop_account_body_html", create_link: link_to(translation(".create_one_for_free"), new_user_path(return_to: new_organization_path), class: "twlink")),
            button: {text: translation(".log_in"), href: new_session_path}}
+        end
+
+        def step_create_shop
+          {title: translation(".create_your_shop_account"), body: translation(".create_your_shop_account_body"),
+           button: {text: translation(".create_shop_account"), href: new_organization_path}}
         end
       end
     end

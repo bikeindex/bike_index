@@ -23,6 +23,20 @@ RSpec.describe Pages::LandingPages::Lightspeed::Component, type: :component do
     expect(component).to_not have_text("This step is done.")
   end
 
+  context "signed in without a shop" do
+    let(:options) { {signed_in: true} }
+
+    it "asks to create a shop account instead of logging in" do
+      expect(component).to have_css("ol > li", count: 2)
+      expect(component).to have_text("Create your shop account on Bike Index")
+      expect(component).to have_text("You're logged in. Sign up your shop as an organization to continue.")
+      expect(component).to have_link("Create shop account", href: "/organizations/new")
+      expect(component).to_not have_link("Log in")
+      expect(component).to_not have_text("This step is done.")
+      expect(component).to have_link("Connect Lightspeed")
+    end
+  end
+
   context "with a shop" do
     let(:options) { {has_shop: true} }
 

@@ -42,6 +42,10 @@ en:
             sell is registered automatically, without getting in the way of selling
             it. Free for your shop and your customers.
           create_one_for_free: Create one for free
+          create_shop_account: Create shop account
+          create_your_shop_account: Create your shop account on Bike Index
+          create_your_shop_account_body: You're logged in. Sign up your shop as an
+            organization to continue.
           email_notifications_off_body: >-
             We can turn email notifications off entirely. The bike stays registered
             under your shop's email instead, so if police recover it, they'll contact

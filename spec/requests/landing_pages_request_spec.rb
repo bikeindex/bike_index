@@ -146,11 +146,12 @@ RSpec.describe LandingPagesController, type: :request do
       context "when the organization isn't a shop" do
         let(:current_organization) { FactoryBot.create(:organization, kind: "law_enforcement") }
 
-        it "keeps the log in step" do
+        it "asks to create a shop account" do
           get "/lightspeed"
 
           expect(response.status).to eq(200)
-          expect(response.body).to include("Log in to your shop")
+          expect(response.body).to include("Create your shop account on Bike Index")
+          expect(response.body).to_not include("Log in to your shop")
           expect(response.body).to_not include("You&#39;re logged in to your shop")
         end
       end
