@@ -617,8 +617,9 @@ class Organization < ApplicationRecord
     self.graduated_notification_interval = nil unless graduated_notification_interval.to_i > 0
     # For now, just use them. However - nesting organizations probably need slightly modified organization_feature slugs
     self.enabled_feature_slugs = calculated_enabled_feature_slugs.compact.sort
-    new_slug = self.class.slug_for(short_name)
-    self.slug = calculated_slug(new_slug) if new_slug != slug&.tr("-", "_")
+    new_slug = calculated_slug(self.class.slug_for(short_name))
+    # A slug from before underscores keeps its dashes, so its links and SAML keep working
+    self.slug = new_slug unless Slugifyer.same_slug?(slug, new_slug)
     self.access_token ||= SecurityTokenizer.new_token
     # NOTE: only organizations with child_organizations feature can be selected in admin view, but this doesn't block assignment
     self.child_ids = calculated_children.pluck(:id).presence || []
@@ -689,11 +690,9 @@ class Organization < ApplicationRecord
     # The unique index counts deleted rows and destroy skips validations, so a deleted
     # organization holds its slug until the organization claiming the name saves it
     holder.save if holder&.deleted?
-    return new_slug if holder.nil? || holder.slug.tr("-", "_") != new_slug
+    return new_slug unless holder && Slugifyer.same_slug?(holder.slug, new_slug)
 
-    # A slug from before underscores keeps its dashes, since SAML pins it
     (2..).lazy.map { "#{new_slug}_#{it}" }.find { |candidate| !orgs.exists?(slug: Slugifyer.lookup_slugs(candidate)) }
-      .then { (it == slug&.tr("-", "_")) ? slug : it }
   end
 
   # The IdP registered the SP entity ID and callback URL, which are built from the slug

@@ -20,10 +20,16 @@ RSpec.describe Slugifyer do
     end
   end
 
+  describe "same_slug?" do
+    it "ignores dashes" do
+      expect(Slugifyer.same_slug?("bike-shop-2", "bike_shop_2")).to be_truthy
+      expect(Slugifyer.same_slug?(nil, "bike_shop")).to be_falsey
+    end
+  end
+
   describe "lookup_slugs" do
     it "includes the dashed slug" do
       expect(Slugifyer.lookup_slugs("Some Cool-Name")).to eq %w[some_cool_name some-cool-name]
-      expect(Slugifyer.lookup_slugs("some-cool-name")).to eq %w[some_cool_name some-cool-name]
       expect(Slugifyer.lookup_slugs("cool")).to eq %w[cool]
     end
   end

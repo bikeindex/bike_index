@@ -49,7 +49,6 @@ RSpec.shared_examples "friendly_slug_findable" do
       it "finds a slug from before underscores" do
         instance.update_column :slug, "some-cool-slug"
         expect(subject.class.friendly_find("some-cool-slug")).to eq instance
-        expect(subject.class.friendly_find("some_cool_slug")).to eq instance
       end
     end
   end

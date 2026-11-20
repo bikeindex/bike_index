@@ -11,7 +11,7 @@ SitemapGenerator::Sitemap.create do
     SitemapPages::INFORMATION.each { |i| add("/#{i}", priority: 0.9, changefreq: "weekly") }
 
     Blog.published.info.find_each do |b|
-      next if Blog.top_level_routed.any? { b.title_slug?(it) }
+      next if Blog.top_level_routed.any? { b.title_slug_matches?(it) }
 
       add("/info/#{b.title_slug}", priority: 0.9, lastmod: b.updated_at)
     end

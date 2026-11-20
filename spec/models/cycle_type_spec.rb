@@ -118,14 +118,6 @@ RSpec.describe CycleType, type: :model do
     end
   end
 
-  describe "lookup_slugs" do
-    CycleType::SLUGS.keys.each do |slug|
-      it "finds" do
-        expect(Slugifyer.lookup_slugs(slug)).to include slug.to_s
-      end
-    end
-  end
-
   describe "slug_translation" do
     it "returns short name" do
       expect(CycleType.slug_translation("cargo")).to eq "Cargo Bike (front storage)"

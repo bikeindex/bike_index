@@ -14,6 +14,8 @@ module Slugifyer
     [slug, slug.tr("_", "-")].uniq
   end
 
+  def same_slug?(slug, other) = slugify(slug) == slugify(other)
+
   # The pre-slugify manufacturer slug, minus "Accell", which is appended to many of its brands' names
   def legacy_manufacturer(string)
     return nil unless string

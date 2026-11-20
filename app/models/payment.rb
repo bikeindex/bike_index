@@ -91,6 +91,7 @@ class Payment < ApplicationRecord
     def admin_search(str)
       return all if str.blank?
 
+      # ILIKE reads "_" as any character, so this matches referral sources saved with dashes too
       where("referral_source ilike ?", "%#{normalize_referral_source(str)}%")
     end
   end

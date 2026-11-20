@@ -205,7 +205,7 @@ class Blog < ApplicationRecord
     end
   end
 
-  def title_slug?(slug) = Slugifyer.lookup_slugs(slug).include?(title_slug)
+  def title_slug_matches?(slug) = Slugifyer.same_slug?(title_slug, slug)
 
   def update_title_save
     return true unless Binxtils::InputNormalizer.boolean(update_title)

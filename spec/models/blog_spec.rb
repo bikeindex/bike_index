@@ -13,7 +13,7 @@ RSpec.describe Blog, type: :model do
       expect(Blog.friendly_find("an elder statesman title").id).to eq blog.id
       blog.update_column :title_slug, "dashed-foo-title"
       expect(Blog.friendly_find("dashed_foo_title").id).to eq blog.id
-      expect(blog.title_slug?("dashed_foo_title")).to be_truthy
+      expect(blog.title_slug_matches?("dashed_foo_title")).to be_truthy
       # These should work, to give us a little bit better edge, but for now, whatever
       # expect(Blog.friendly_find("an-elder-statesman").id).to eq blog.id
       # blog2 = FactoryBot.create(:blog, title: "an elder statesman")

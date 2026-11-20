@@ -72,7 +72,7 @@ class Manufacturer < ApplicationRecord
       else
         slugs = Slugifyer.lookup_slugs(n)
         legacy_slug = Slugifyer.legacy_manufacturer(n)
-        find_by(slug: slugs) || find_by_slug(legacy_slug) || find_by_secondary_slug(legacy_slug) ||
+        find_by(slug: slugs) || (find_by_slug(legacy_slug) unless slugs.include?(legacy_slug)) || find_by_secondary_slug(legacy_slug) ||
           where("previous_slugs && ARRAY[?]::varchar[]", [*slugs, legacy_slug]).first
       end
     end
