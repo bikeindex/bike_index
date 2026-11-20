@@ -180,7 +180,7 @@ RSpec.describe OrganizationSignupController, type: :request do
 
   it "preselects a creatable kind from the link, but keeps one already chosen" do
     get "#{base_url}/new", params: {kind: "ambassador"}
-    expect(Capybara.string(response.body)).to_not have_css("input[checked]")
+    expect(Capybara.string(response.body)).to_not have_css("input[name='organization_signup[kind]'][checked]")
     get "#{base_url}/new", params: {kind: "bike_advocacy"}
     expect(Capybara.string(response.body)).to have_css("input[value=bike_advocacy][checked]")
     expect(OrganizationSignup.count).to eq 0
