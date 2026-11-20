@@ -14,12 +14,12 @@ RSpec.describe Payment, type: :model do
       expect(Payment.normalize_referral_source(" bikeindex.org BIKES ")).to eq "bikes"
     end
     it "replaces slashes and spaces" do
-      expect(Payment.normalize_referral_source("BIKES 12")).to eq "bikes-12"
-      expect(Payment.normalize_referral_source("BIKES/12")).to eq "bikes-12"
-      expect(Payment.normalize_referral_source("BIKES_12")).to eq "bikes-12"
+      expect(Payment.normalize_referral_source("BIKES 12")).to eq "bikes_12"
+      expect(Payment.normalize_referral_source("BIKES/12")).to eq "bikes_12"
+      expect(Payment.normalize_referral_source("BIKES-12")).to eq "bikes_12"
     end
     it "handles ios" do
-      expect(Payment.normalize_referral_source("app-ios-11.2.3")).to eq "app-ios-1123"
+      expect(Payment.normalize_referral_source("app-ios-11.2.3")).to eq "app_ios_1123"
     end
   end
 
@@ -36,12 +36,14 @@ RSpec.describe Payment, type: :model do
     let!(:payment1) { FactoryBot.create(:payment, referral_source: "something%20special") }
     let!(:payment2) { FactoryBot.create(:payment, referral_source: "something/else/special", email: "sTUFF@things.com ", user: nil) }
     it "searches by referral_source" do
-      expect(payment1.reload.referral_source).to eq "something-special"
-      expect(payment2.reload.referral_source).to eq "something-else-special"
+      expect(payment1.reload.referral_source).to eq "something_special"
+      expect(payment2.reload.referral_source).to eq "something_else_special"
       expect(payment2.email).to eq "stuff@things.com"
       expect(Payment.admin_search("special").pluck(:id)).to match_array([payment1.id, payment2.id])
       expect(Payment.admin_search("something_special").pluck(:id)).to match_array([payment1.id])
       expect(Payment.admin_search("\nsomething ").pluck(:id)).to match_array([payment1.id, payment2.id])
+      payment1.update_column :referral_source, "something-special"
+      expect(Payment.admin_search("something-special").pluck(:id)).to match_array([payment1.id])
     end
   end
 

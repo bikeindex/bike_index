@@ -8,7 +8,7 @@ RSpec.describe Admin::ManufacturersController, type: :request do
   let(:permitted_attributes) do
     {
       name: "new name and things",
-      slug: "new-name-and-things",
+      slug: "new_name_and_things",
       website: "http://stuff.com",
       frame_maker: true,
       open_year: 1992,
@@ -146,7 +146,7 @@ RSpec.describe Admin::ManufacturersController, type: :request do
         it "updates" do
           patch url, params: token_param.merge(manufacturer: {name: "Cool Bikes (Rad Bikes)"})
           expect(response.status).to eq 200
-          expect(json_result["manufacturer"]).to include("name" => "Cool Bikes (Rad Bikes)", "slug" => "cool-bikes", "secondary_slug" => "rad", "previous_slugs" => %w[cool], "priority" => 0)
+          expect(json_result["manufacturer"]).to include("name" => "Cool Bikes (Rad Bikes)", "slug" => "cool_bikes", "secondary_slug" => "rad", "previous_slugs" => %w[cool], "priority" => 0)
         end
 
         context "with a name that is taken" do
@@ -200,7 +200,7 @@ RSpec.describe Admin::ManufacturersController, type: :request do
             post url, params: token_param.merge(manufacturer: {name: "Cool Bikes", frame_maker: true})
           }.to change(Manufacturer, :count).by 1
           expect(response.status).to eq 200
-          expect(json_result["manufacturer"]).to include("name" => "Cool Bikes", "slug" => "cool-bikes", "frame_maker" => true)
+          expect(json_result["manufacturer"]).to include("name" => "Cool Bikes", "slug" => "cool_bikes", "frame_maker" => true)
         end
 
         context "with a name that is taken" do

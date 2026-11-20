@@ -50,7 +50,7 @@ RSpec.describe Manufacturer, type: :model do
     end
     it "finds by the slug and the previous slugs" do
       mnfg = FactoryBot.create(:manufacturer, name: "Kona Bicycle Company")
-      expect(mnfg.slug).to eq "kona-bicycle-company"
+      expect(mnfg.slug).to eq "kona_bicycle_company"
       expect(mnfg.previous_slugs).to eq ["kona"]
       expect(Manufacturer.friendly_find("kona-bicycle-company")).to eq mnfg
       expect(Manufacturer.friendly_find("kona")).to eq mnfg
@@ -63,9 +63,16 @@ RSpec.describe Manufacturer, type: :model do
       expect(Manufacturer.friendly_find("kona-bicycle-company")).to eq mnfg
 
       mnfg.update(name: "Kona Bicycle Works")
-      expect(mnfg.reload.slug).to eq "kona-bicycle-works"
-      expect(mnfg.previous_slugs).to eq %w[kona kona-bicycle-company]
+      expect(mnfg.reload.slug).to eq "kona_bicycle_works"
+      expect(mnfg.previous_slugs).to eq %w[kona kona_bicycle_company]
       expect(Manufacturer.friendly_find("kona-bicycle-company")).to eq mnfg
+
+      mnfg.update_columns(slug: "kona-bicycle-works", previous_slugs: %w[kona-bicycle-company])
+      expect(Manufacturer.friendly_find("Kona Bicycle Works")).to eq mnfg
+      expect(Manufacturer.friendly_find("kona-bicycle-company")).to eq mnfg
+      mnfg.update(updated_at: Time.current)
+      expect(mnfg.reload.slug).to eq "kona_bicycle_works"
+      expect(mnfg.previous_slugs).to eq %w[kona-bicycle-company kona-bicycle-works kona]
     end
     it "removes Accell (because it's widespread mnfg)" do
       mnfg = FactoryBot.create(:manufacturer, name: "Poopy PANTERS")
@@ -74,7 +81,8 @@ RSpec.describe Manufacturer, type: :model do
     it "finds with dashes" do
       mnfg = FactoryBot.create(:manufacturer, name: "All City")
       expect(mnfg.secondary_name).to be_nil
-      expect(mnfg.previous_slugs).to eq ["all_city"]
+      expect(mnfg.slug).to eq "all_city"
+      expect(mnfg.previous_slugs).to eq []
       expect(Manufacturer.friendly_find("All-city ")&.id).to eq(mnfg.id)
     end
     it "finds in the secondary_slug" do
@@ -96,7 +104,7 @@ RSpec.describe Manufacturer, type: :model do
       expect(mnfg.slug_collisions).to eq []
 
       mnfg.update(name: "Foo")
-      expect(mnfg.reload.previous_slugs).to eq %w[kona kona-bicycle-company]
+      expect(mnfg.reload.previous_slugs).to eq %w[kona kona_bicycle_company]
       expect(Manufacturer.friendly_find("Kona Bikes")).to eq mnfg
     end
     context "name of digits and a removed suffix, where the digits are another manufacturer's id" do
@@ -105,10 +113,10 @@ RSpec.describe Manufacturer, type: :model do
       let!(:manufacturer) { FactoryBot.create(:manufacturer, name:) }
 
       it "finds each by its own identifier" do
-        expect(manufacturer.to_param).to eq "#{other_manufacturer.id}-bikes"
-        expect(manufacturer.previous_slugs).to eq ["#{other_manufacturer.id}_bikes"]
+        expect(manufacturer.to_param).to eq "#{other_manufacturer.id}_bikes"
+        expect(manufacturer.previous_slugs).to eq []
         expect(Manufacturer.friendly_find(manufacturer.to_param)).to eq manufacturer
-        expect(Manufacturer.friendly_find("#{other_manufacturer.id}_bikes")).to eq manufacturer
+        expect(Manufacturer.friendly_find("#{other_manufacturer.id}-bikes")).to eq manufacturer
         expect(Manufacturer.friendly_find(name)).to eq manufacturer
         expect(Manufacturer.friendly_find(other_manufacturer.id.to_s)).to eq other_manufacturer
       end

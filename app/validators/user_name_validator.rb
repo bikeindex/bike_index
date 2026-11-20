@@ -6,7 +6,7 @@ class UserNameValidator < ActiveModel::Validator
 
   def self.valid?(str)
     return false if str.blank?
-    slugged = Slugifyer.slugify(str).tr("-", "_")
+    slugged = Slugifyer.slugify(str)
     return false if slugged.length < 2
     return false if INVALID_USERNAMES.include?(slugged)
     !BadWordCleaner::BAD_WORDS.include?(slugged)

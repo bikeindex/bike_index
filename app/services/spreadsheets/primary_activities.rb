@@ -56,7 +56,7 @@ module Spreadsheets
     # Slug or exact name, not friendly_find's substring search
     def upsert!(scope, name, priority:, **create_attrs)
       name = name.strip
-      existing = scope.find_by(slug: Slugifyer.slugify(name)) ||
+      existing = scope.find_by(slug: Slugifyer.lookup_slugs(name)) ||
         scope.where("lower(name) = ?", name.downcase).first
       return PrimaryActivity.create!(name:, priority:, **create_attrs) unless existing
 

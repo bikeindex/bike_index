@@ -3,16 +3,28 @@ require "rails_helper"
 RSpec.describe Slugifyer do
   describe "slugify" do
     it "handles &" do
-      expect(Slugifyer.slugify("Bikes &amp; Trikes")).to eq "bikes-amp-trikes"
-      expect(Slugifyer.slugify("Bikes & Trikes")).to eq "bikes-amp-trikes"
+      expect(Slugifyer.slugify("Bikes &amp; Trikes")).to eq "bikes_amp_trikes"
+      expect(Slugifyer.slugify("Bikes & Trikes")).to eq "bikes_amp_trikes"
+    end
+    it "turns dashes into underscores" do
+      expect(Slugifyer.slugify("All-City_Cycles")).to eq "all_city_cycles"
+      expect(Slugifyer.slugify("bikes-amp-trikes")).to eq "bikes_amp_trikes"
     end
     it "handles é" do
-      expect(Slugifyer.slugify("paké rum runner")).to eq("pake-rum-runner")
-      expect(Slugifyer.slugify("pañe rum runner")).to eq("pane-rum-runner")
+      expect(Slugifyer.slugify("paké rum runner")).to eq("pake_rum_runner")
+      expect(Slugifyer.slugify("pañe rum runner")).to eq("pane_rum_runner")
     end
 
     it "removes parens" do
-      expect(Slugifyer.slugify(" Some Cool NAMe (additional info)")).to eq("some-cool-name")
+      expect(Slugifyer.slugify(" Some Cool NAMe (additional info)")).to eq("some_cool_name")
+    end
+  end
+
+  describe "lookup_slugs" do
+    it "includes the dashed slug" do
+      expect(Slugifyer.lookup_slugs("Some Cool-Name")).to eq %w[some_cool_name some-cool-name]
+      expect(Slugifyer.lookup_slugs("some-cool-name")).to eq %w[some_cool_name some-cool-name]
+      expect(Slugifyer.lookup_slugs("cool")).to eq %w[cool]
     end
   end
 

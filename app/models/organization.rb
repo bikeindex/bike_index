@@ -258,9 +258,9 @@ class Organization < ApplicationRecord
       return nil if n.blank?
       return find_by_id(n) if integer_string?(n)
 
-      slug = Slugifyer.slugify(n)
+      slugs = Slugifyer.lookup_slugs(n)
       # First try slug, then previous slug, and finally, just give finding by name a shot
-      find_by_slug(slug) || find_by_previous_slug(slug) || where("LOWER(name) = LOWER(?)", n.downcase).first
+      find_by(slug: slugs) || find_by(previous_slug: slugs) || where("LOWER(name) = LOWER(?)", n.downcase).first
     end
 
     def admin_text_search(n)
@@ -618,7 +618,7 @@ class Organization < ApplicationRecord
     # For now, just use them. However - nesting organizations probably need slightly modified organization_feature slugs
     self.enabled_feature_slugs = calculated_enabled_feature_slugs.compact.sort
     new_slug = self.class.slug_for(short_name)
-    self.slug = calculated_slug(new_slug) if new_slug != slug
+    self.slug = calculated_slug(new_slug) if new_slug != slug&.tr("-", "_")
     self.access_token ||= SecurityTokenizer.new_token
     # NOTE: only organizations with child_organizations feature can be selected in admin view, but this doesn't block assignment
     self.child_ids = calculated_children.pluck(:id).presence || []
@@ -685,13 +685,15 @@ class Organization < ApplicationRecord
 
   def calculated_slug(new_slug)
     orgs = id.present? ? Organization.unscoped.where.not(id:) : Organization.unscoped.all
-    holder = orgs.find_by(slug: new_slug)
+    holder = orgs.find_by(slug: Slugifyer.lookup_slugs(new_slug))
     # The unique index counts deleted rows and destroy skips validations, so a deleted
     # organization holds its slug until the organization claiming the name saves it
     holder.save if holder&.deleted?
-    return new_slug if holder.nil? || holder.slug != new_slug
+    return new_slug if holder.nil? || holder.slug.tr("-", "_") != new_slug
 
-    (2..).lazy.map { "#{new_slug}-#{it}" }.find { |candidate| !orgs.exists?(slug: candidate) }
+    # A slug from before underscores keeps its dashes, since SAML pins it
+    (2..).lazy.map { "#{new_slug}_#{it}" }.find { |candidate| !orgs.exists?(slug: Slugifyer.lookup_slugs(candidate)) }
+      .then { (it == slug&.tr("-", "_")) ? slug : it }
   end
 
   # The IdP registered the SP entity ID and callback URL, which are built from the slug

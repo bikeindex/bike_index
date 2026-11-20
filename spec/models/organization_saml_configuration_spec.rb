@@ -140,7 +140,7 @@ RSpec.describe OrganizationSamlConfiguration, type: :model do
       it "permits the change" do
         expect(organization.block_short_name_edit?).to be_falsey
         expect(organization.update(short_name: "something-else")).to be_truthy
-        expect(organization.reload.slug).to eq "something-else"
+        expect(organization.reload.slug).to eq "something_else"
       end
     end
   end

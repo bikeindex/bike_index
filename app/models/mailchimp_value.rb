@@ -44,7 +44,7 @@ class MailchimpValue < ApplicationRecord
   end
 
   def self.slugify(str)
-    slug = Slugifyer.slugify(str).tr("-", "_")
+    slug = Slugifyer.slugify(str)
     # Make the slugs match organization kinds
     if slug == "school__university"
       "school"

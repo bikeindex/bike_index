@@ -375,6 +375,15 @@ RSpec.describe User, type: :model do
       expect(user2.valid?).to be_falsey
       expect(user2.errors[:username]).to include("has already been taken")
     end
+
+    it "underscores a new username, and keeps one from before underscores" do
+      user = FactoryBot.create(:user, username: "Cool-Name")
+      expect(user.reload.username).to eq("cool_name")
+
+      user.update_column :username, "cool-name"
+      user.update(name: "Cool Name")
+      expect(user.reload.username).to eq("cool-name")
+    end
   end
 
   describe "email and phone" do

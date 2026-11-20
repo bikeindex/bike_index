@@ -118,10 +118,10 @@ RSpec.describe CycleType, type: :model do
     end
   end
 
-  describe "slugify" do
+  describe "lookup_slugs" do
     CycleType::SLUGS.keys.each do |slug|
       it "finds" do
-        expect(Slugifyer.slugify(slug)).to eq slug.to_s
+        expect(Slugifyer.lookup_slugs(slug)).to include slug.to_s
       end
     end
   end

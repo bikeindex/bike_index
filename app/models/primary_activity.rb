@@ -21,9 +21,9 @@ class PrimaryActivity < ApplicationRecord
   include ShortNameable
 
   SPECIAL_SHORT_NAMES = {
-    "road" => "road-biking",
-    "track" => "track-racing",
-    "endurance" => "endurance--sportive"
+    "road" => "road_biking",
+    "track" => "track_racing",
+    "endurance" => "endurance__sportive"
   }.freeze
 
   belongs_to :primary_activity_family, class_name: "PrimaryActivity"
@@ -96,9 +96,9 @@ class PrimaryActivity < ApplicationRecord
 
       # Special short slugs
       special_short_slug = SPECIAL_SHORT_NAMES[str.downcase]
-      return where(slug: special_short_slug).select(*select_attrs).first if special_short_slug.present?
+      return where(slug: Slugifyer.lookup_slugs(special_short_slug)).select(*select_attrs).first if special_short_slug.present?
 
-      by_priority.where(slug: Slugifyer.slugify(str)).select(*select_attrs).first ||
+      by_priority.where(slug: Slugifyer.lookup_slugs(str)).select(*select_attrs).first ||
         by_priority.where("lower(name) = ?", str.downcase).select(*select_attrs).first ||
         by_priority.where("name ILIKE ?", "%#{str}%").select(*select_attrs).first
     end

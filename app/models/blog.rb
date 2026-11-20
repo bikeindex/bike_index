@@ -62,10 +62,9 @@ class Blog < ApplicationRecord
     end
 
     def slugify_title(str)
-      # Truncate, slugify, also - remove last char if a dash (slugify should take care of removing the dash now, but whatever)
       return nil unless str.present?
 
-      Slugifyer.slugify(str)[0, 70].gsub(/-$/, "")
+      Slugifyer.slugify(str)[0, 70].delete_suffix("_")
     end
 
     def integer_slug?(n)
@@ -77,8 +76,8 @@ class Blog < ApplicationRecord
       return nil if str.blank?
       return find_by_id(str) if integer_slug?(str)
 
-      slug = slugify_title(str)
-      find_by_title_slug(slug) || find_by_old_title_slug(slug) ||
+      slugs = Slugifyer.lookup_slugs(slugify_title(str))
+      find_by(title_slug: slugs) || find_by(old_title_slug: slugs) ||
         find_by_title_slug(str) || find_by_title(str) || find_by_secondary_title(str)
     end
 
@@ -205,6 +204,8 @@ class Blog < ApplicationRecord
       Kramdown::Document.new(body).to_html
     end
   end
+
+  def title_slug?(slug) = Slugifyer.lookup_slugs(slug).include?(title_slug)
 
   def update_title_save
     return true unless Binxtils::InputNormalizer.boolean(update_title)

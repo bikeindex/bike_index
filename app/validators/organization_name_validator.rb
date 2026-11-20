@@ -13,7 +13,7 @@ class OrganizationNameValidator < ActiveModel::Validator
     none false].freeze
 
   def self.valid?(str)
-    slugged = Slugifyer.slugify(str).tr("-", "_")
+    slugged = Slugifyer.slugify(str)
     return false if slugged.length < 2 # Gotta be at least 2 characters
     return false if INVALID_NAMES.include?(slugged)
     # If it has one extra letter from an invalid name, reject it too (plurals, etc)

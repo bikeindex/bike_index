@@ -26,7 +26,7 @@ module SharedBlocks
         end
 
         def render_get_your_stolen_bike_back?
-          @blog&.title_slug == Blog.get_your_stolen_bike_back_slug
+          @blog&.title_slug?(Blog.get_your_stolen_bike_back_slug)
         end
       end
     end

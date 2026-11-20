@@ -5,11 +5,15 @@ RSpec.describe Blog, type: :model do
     let(:user) { FactoryBot.create(:user) }
     let!(:blog) { Blog.create(title: "foo title", body: "ummmmm good", user_id: user.id, old_title_slug: "an-elder-statesman-title") }
     it "finds by the things we expect it to" do
-      expect(blog.title_slug).to eq "foo-title"
+      expect(blog.title_slug).to eq "foo_title"
       expect(Blog.friendly_find("foo title").id).to eq blog.id
       expect(Blog.friendly_find("foo-title").id).to eq blog.id
       expect(Blog.friendly_find(blog.id).id).to eq blog.id
       expect(Blog.friendly_find("an-elder-statesman-title").id).to eq blog.id
+      expect(Blog.friendly_find("an elder statesman title").id).to eq blog.id
+      blog.update_column :title_slug, "dashed-foo-title"
+      expect(Blog.friendly_find("dashed_foo_title").id).to eq blog.id
+      expect(blog.title_slug?("dashed_foo_title")).to be_truthy
       # These should work, to give us a little bit better edge, but for now, whatever
       # expect(Blog.friendly_find("an-elder-statesman").id).to eq blog.id
       # blog2 = FactoryBot.create(:blog, title: "an elder statesman")
@@ -24,11 +28,11 @@ RSpec.describe Blog, type: :model do
       @user = FactoryBot.create(:user)
       blog = Blog.new(title: "A really really really really loooooooooooooooooooooooooooooooooooong title that absolutely rocks so hard", body: "some things", user_id: @user.id, published_at: Time.current)
       blog.save
-      expect(blog.title_slug).to eq("a-really-really-really-really-loooooooooooooooooooooooooooooooooooong")
+      expect(blog.title_slug).to eq("a_really_really_really_really_loooooooooooooooooooooooooooooooooooong")
     end
     context "long title" do
       let(:title) { "We made it all the way to Oregon and back without one dysentery scare" }
-      let(:target) { "we-made-it-all-the-way-to-oregon-and-back-without-one-dysentery-scare" }
+      let(:target) { "we_made_it_all_the_way_to_oregon_and_back_without_one_dysentery_scare" }
       let(:legacy_slug) { "we-made-it-all-the-way-to-oregon-and-back-without-" }
       let(:blog) { FactoryBot.create(:blog, title: title, body: "text about making it to Oregon") }
       it "doesn't break things" do
@@ -50,8 +54,8 @@ RSpec.describe Blog, type: :model do
       blog.title = "New Title"
       blog.update_title = "1"
       blog.save
-      expect(blog.title_slug).to eq("new-title")
-      expect(blog.old_title_slug).to eq("a-really-really-really-really-loooooooooooooooooooooooooooooooooooong")
+      expect(blog.title_slug).to eq("new_title")
+      expect(blog.old_title_slug).to eq("a_really_really_really_really_loooooooooooooooooooooooooooooooooooong")
     end
   end
 

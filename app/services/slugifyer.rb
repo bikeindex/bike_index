@@ -3,9 +3,15 @@ module Slugifyer
 
   def slugify(string)
     transliterate(remove_parens(string))
-      .gsub("%20", " ").gsub(/\s/, "-")
-      .gsub("-&-", "-amp-") # Replace singular & with amp - since we permit & in names
-      .gsub(/([^A-Za-z0-9_-]+)/, "") # Remove any weird characters
+      .gsub("%20", " ").gsub(/[\s-]/, "_")
+      .gsub("_&_", "_amp_") # Replace singular & with amp - since we permit & in names
+      .gsub(/([^A-Za-z0-9_]+)/, "") # Remove any weird characters
+  end
+
+  # Slugs made before slugify switched to underscores have dashes
+  def lookup_slugs(string)
+    slug = slugify(string)
+    [slug, slug.tr("_", "-")].uniq
   end
 
   # The pre-slugify manufacturer slug, minus "Accell", which is appended to many of its brands' names
@@ -14,7 +20,7 @@ module Slugifyer
 
     name = remove_parens(string).gsub(/\sco(\.|mpany)/i, " ").gsub(/\s(frame)?works/i, " ")
     # An empty (bare "Accell") or all-digit slug falls back, since Manufacturer.friendly_find reads digits as an id
-    book_slug(name.gsub(/accell/i, "")).then { it.match?(/\D/) ? it : slugify(name).tr("-", "_") }
+    book_slug(name.gsub(/accell/i, "")).then { it.match?(/\D/) ? it : slugify(name) }
   end
 
   # underscores, also removes some extra stuff

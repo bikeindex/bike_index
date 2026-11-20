@@ -48,7 +48,7 @@ RSpec.describe StripeSubscription, type: :model do
           expect(stripe_subscription.referral_source).to eq("some-referral")
 
           payment = stripe_subscription.payments.first
-          expect(payment.referral_source).to eq "some-referral"
+          expect(payment.referral_source).to eq "some_referral"
           expect(payment.stripe_status).to be_blank
           expect(payment.kind).to eq "membership_donation"
 

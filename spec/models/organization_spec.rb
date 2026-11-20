@@ -277,13 +277,18 @@ RSpec.describe Organization, type: :model do
     let!(:organization2) { FactoryBot.create(:organization, short_name: "Bike Shop", name: "Trek Store of Santa Cruz") }
     let!(:organization3) { FactoryBot.create(:organization, short_name: "BikeEastBay", previous_slug: "ebbc") }
     it "finds by slug, previous_slug and name" do
-      expect(organization2.slug).to eq "bike-shop"
+      expect(organization2.slug).to eq "bike_shop"
       expect(Organization.friendly_find(" ")).to be_nil
       expect(Organization.friendly_find("something-cool")).to eq organization
       expect(Organization.friendly_find("bike shop")).to eq organization2
       expect(Organization.friendly_find("trek store of SANTA CRUZ")).to eq organization2
       expect(Organization.friendly_find("bikeeastbay")).to eq organization3
       expect(Organization.friendly_find(organization)).to eq organization
+
+      organization2.update_column :slug, "bike-shop"
+      expect(Organization.friendly_find("bike_shop")).to eq organization2
+      organization2.update(updated_at: Time.current)
+      expect(organization2.reload.slug).to eq "bike-shop"
     end
     it "scrubs null bytes rather than raising" do
       expect(Organization.friendly_find("1\u0000xxx")).to be_nil
@@ -701,7 +706,7 @@ RSpec.describe Organization, type: :model do
         organization.set_calculated_attributes
         expect(organization.name).to eq "Bikes & Trikes"
         expect(organization.short_name).to eq "Bikes & Trikes"
-        expect(organization.slug).to eq "bikes-amp-trikes"
+        expect(organization.slug).to eq "bikes_amp_trikes"
       end
     end
 
@@ -721,10 +726,18 @@ RSpec.describe Organization, type: :model do
       let(:org1) { FactoryBot.create(:organization, name: name) }
       it "protects from name collisions, without erroring because of it's own slug" do
         expect(org1).to be_valid
-        expect(org1.reload.slug).to eq("bicycle-shop")
+        expect(org1.reload.slug).to eq("bicycle_shop")
 
         organization.set_calculated_attributes
-        expect(organization.slug).to eq("bicycle-shop-2")
+        expect(organization.slug).to eq("bicycle_shop_2")
+      end
+      it "counts a slug from before underscores as a collision, and keeps its own" do
+        org1.update_column :slug, "bicycle-shop"
+        org2 = FactoryBot.create(:organization, name: "Bicycle-Shop")
+        expect(org2.slug).to eq("bicycle_shop_2")
+        org2.update_column :slug, "bicycle-shop-2"
+        org2.update(updated_at: Time.current)
+        expect(org2.reload.slug).to eq("bicycle-shop-2")
       end
     end
 
@@ -733,7 +746,7 @@ RSpec.describe Organization, type: :model do
       it "truncates without ellipse" do
         organization.set_calculated_attributes
         expect(organization.short_name).to eq "Banff RCMP - Royal Canadian"
-        expect(organization.slug).to eq "banff-rcmp---royal-canadian"
+        expect(organization.slug).to eq "banff_rcmp___royal_canadian"
         expect(organization.name).to eq name
       end
       context "with parens" do
@@ -741,7 +754,7 @@ RSpec.describe Organization, type: :model do
         it "removes parens" do
           organization.set_calculated_attributes
           expect(organization.short_name).to eq "Banff RCMP"
-          expect(organization.slug).to eq "banff-rcmp"
+          expect(organization.slug).to eq "banff_rcmp"
           expect(organization.name).to eq name
           # And test something with an extra long name and a parens
           xtra_long = "#{name} and something that goes on forever"
@@ -760,15 +773,15 @@ RSpec.describe Organization, type: :model do
         org2 = FactoryBot.create(:organization, name: "buckshot", short_name: "buckshot")
         expect(org2.short_name).to eq "buckshot"
         expect(org2.slug).to eq "buckshot"
-        expect(org1.reload.slug).to eq "buckshot-deleted"
+        expect(org1.reload.slug).to eq "buckshot_deleted"
         expect(org1.short_name).to eq "buckshot-deleted"
 
         org2.delete
         expect(org2.reload.deleted_at).to be_present
         org2.update(updated_at: Time.current)
         expect(org2.reload.short_name).to eq "buckshot-deleted"
-        expect(org2.slug).to eq "buckshot-deleted-2"
-        expect(org1.reload.slug).to eq "buckshot-deleted"
+        expect(org2.slug).to eq "buckshot_deleted_2"
+        expect(org1.reload.slug).to eq "buckshot_deleted"
         expect(org1.short_name).to eq "buckshot-deleted"
       end
 
@@ -941,7 +954,7 @@ RSpec.describe Organization, type: :model do
       organization.update(name: "something else ", short_name: " something cool")
       expect(organization.valid?).to be_truthy
       expect(organization.id).to be_present
-      valid_names = ["something else", "something cool", "something-cool"]
+      valid_names = ["something else", "something cool", "something_cool"]
       expect([organization.name, organization.short_name, organization.slug]).to eq valid_names
 
       expect(organization.update(short_name: "bikes")).to be_falsey

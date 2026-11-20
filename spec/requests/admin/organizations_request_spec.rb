@@ -196,7 +196,7 @@ RSpec.describe Admin::OrganizationsController, type: :request do
         post base_url, params: {organization: create_attributes.merge(short_name: "")}
         expect(Organization.count).to eq 1
         expect(Organization.last).to have_attributes(name: "Organization name", short_name: "Organization name",
-          slug: "organization-name")
+          slug: "organization_name")
       end
     end
 
@@ -455,7 +455,7 @@ RSpec.describe Admin::OrganizationsController, type: :request do
 
         put "#{base_url}/#{organization.to_param}", params: {organization: {organization_saml_configuration_attributes: {id: saml_configuration.id, active: "0"}}}
         put "#{base_url}/#{organization.to_param}", params: {organization: {short_name: "something-else"}}
-        expect(organization.reload.slug).to eq "something-else"
+        expect(organization.reload.slug).to eq "something_else"
       end
     end
     context "updating graduated notifications" do
@@ -558,7 +558,7 @@ RSpec.describe Admin::OrganizationsController, type: :request do
         organization.reload
         expect(organization.name).to eq "new name"
         expect(organization.short_name).to eq "something else"
-        expect(organization.slug).to eq "something-else"
+        expect(organization.slug).to eq "something_else"
       end
     end
   end

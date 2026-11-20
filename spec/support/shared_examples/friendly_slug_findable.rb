@@ -9,14 +9,14 @@ RSpec.shared_examples "friendly_slug_findable" do
     let(:name) { "Some Cool NAMe " }
     it "assigns slug on create" do
       expect(instance.reload.name).to eq "Some Cool NAMe"
-      expect(instance.slug).to eq "some-cool-name"
+      expect(instance.slug).to eq "some_cool_name"
     end
 
     context "with parens" do
       let(:name) { "Some Cool NAMe (additional info)" }
       it "assigns slug without parens" do
         expect(instance.reload.name).to eq name
-        expect(instance.slug).to eq "some-cool-name"
+        expect(instance.slug).to eq "some_cool_name"
       end
     end
   end
@@ -44,6 +44,12 @@ RSpec.shared_examples "friendly_slug_findable" do
         expect(subject.class.friendly_find(" #{instance.name}")).to eq instance
         expect(subject.class.friendly_find!(" #{instance.name}")).to eq instance
         expect(subject.class.friendly_find_id(" #{instance.name}")).to eq instance.id
+      end
+
+      it "finds a slug from before underscores" do
+        instance.update_column :slug, "some-cool-slug"
+        expect(subject.class.friendly_find("some-cool-slug")).to eq instance
+        expect(subject.class.friendly_find("some_cool_slug")).to eq instance
       end
     end
   end
