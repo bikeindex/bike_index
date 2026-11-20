@@ -6,6 +6,8 @@ RSpec.describe Backfills::SquashedSlugJob, type: :job do
   let!(:organization_amp) { FactoryBot.create(:organization, name: "J&J Cycle") }
   let!(:organization_other) { FactoryBot.create(:organization, name: "Some Shop") }
   let!(:organization_unchanged) { FactoryBot.create(:organization, name: "Other Shop", previous_slug: "old-shop") }
+  let!(:organization_hub) { FactoryBot.create(:organization, name: "Bike Hub") }
+  let!(:organization_hub_suffixed) { FactoryBot.create(:organization, name: "Bike Hub!", previous_slug: "old-hub") }
   let!(:primary_activity) { FactoryBot.create(:primary_activity, name: "Keirin / NJS") }
   let!(:ctype) { FactoryBot.create(:ctype, name: "Wheel / Tire") }
   let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Busch + Muller") }
@@ -39,5 +41,25 @@ RSpec.describe Backfills::SquashedSlugJob, type: :job do
     expect(Manufacturer.friendly_find("busch--muller")&.id).to eq manufacturer.id
     expect(manufacturer_amp.reload.slug).to eq "laurin-and-klement"
     expect(Manufacturer.friendly_find("laurin-amp-klement")&.id).to eq manufacturer_amp.id
+    expect(organization_hub_suffixed.reload.slug).to eq "bike-hub-2"
+    expect(organization_hub_suffixed.previous_slug).to eq "old-hub"
+  end
+
+  it "skips an organization with a previous_slug, then raises naming it" do
+    organization_existing = FactoryBot.create(:organization, name: "Bike East Bay", previous_slug: "ebbc")
+    organization_existing.update_columns(slug: "bike--east-bay")
+    organization_amp.update_columns(slug: "jj-cycle")
+    expect { described_class.new.perform }.to raise_error(/previous_slug: #{organization_existing.id}\z/)
+    expect(organization_existing.reload.slug).to eq "bike--east-bay"
+    expect(organization_existing.previous_slug).to eq "ebbc"
+    expect(organization_amp.reload.slug).to eq "j-and-j-cycle"
+    expect(organization_amp.previous_slug).to eq "jj-cycle"
+  end
+
+  it "is safe to run twice" do
+    organization_amp.update_columns(slug: "jj-cycle")
+    2.times { described_class.new.perform }
+    expect(organization_amp.reload.previous_slug).to eq "jj-cycle"
+    expect(Organization.friendly_find("jj-cycle")&.id).to eq organization_amp.id
   end
 end
