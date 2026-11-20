@@ -2609,6 +2609,8 @@ es:
           nuevo por correo electrónico a %{email}.
         sign_out_to_confirm: Has iniciado sesión como %{email}. Cierra sesión y vuelve
           a abrir el enlace para activar la organización.
+        switched_signup: Estás terminando %{name}. Para terminar también %{replaced_name},
+          abre el enlace del correo electrónico.
       find_signup_for_confirmation:
         signup_not_found: No pudimos encontrar ese registro; crea uno nuevo a continuación.
       redirect_to_organization:
@@ -8665,11 +8667,8 @@ es:
             add_your_organization: Añade tu organización
             already_on_bike_index_html: "¿Su organización ya está en Bike Index? %{sign_in_link}
               para gestionarla."
-            already_part_of_html: Ya formas parte de %{name}; esto crea una organización
-              separada.
             email: Tu correo electrónico
             email_placeholder: tú@ejemplo.com
-            free_to_start: Es gratis empezar y solo lleva un par de minutos.
             kind_bike_advocacy: Grupo de defensa
             kind_bike_manufacturer: Fabricante
             kind_bike_shop: Tienda de bicicletas
@@ -8683,11 +8682,16 @@ es:
             organization_kind: "¿Qué tipo de organización?"
             organization_name: Nombre de la organización
             sign_in: Iniciar sesión
-            signed_in_as_html: Has iniciado sesión como %{email}, que será el administrador
-              de la organización.
             start_a_different_one: Crea otra organización en su lugar.
             your_info: Tu información
             your_organization: Su organización
+            already_part_of_organization_html: Ya formas parte de %{organization_link};
+              esto creará una organización separada.
+            free_to_start_few_minutes: Es gratis empezar, solo lleva unos minutos.
+            organization_link: Organización %{name}
+            signed_in_as_new_admin_html: Has iniciado sesión como %{email}, que será
+              el administrador de la nueva organización.
+            signup_name: inscribirse
           step2:
             activation_link_sent: Le hemos enviado por correo electrónico a %{email}
               un enlace para activar la organización; primero, complete este paso.
@@ -8702,6 +8706,10 @@ es:
             website: Sitio web
             website_placeholder: ejemplo.com
             where_is_org: "¿Dónde está %{name}?"
+            out_of_links: Hemos enviado todos los enlaces de activación posibles,
+              pero ninguno llegó a %{email}. Ponte en contacto con support@bikeindex.org
+              y lo solucionaremos.
+            signup_name: inscribirse
           step_finished:
             activate_html: Hemos enviado un enlace a %{email}; haz clic en él para
               activar %{name}.
@@ -8720,6 +8728,10 @@ es:
             send_it_again: Envíalo de nuevo
             share_your_link: Comparte tu enlace de registro y código QR.
             wrong_address: "¿Dirección equivocada?"
+            cant_send_another: No podemos enviar otro enlace
+            out_of_links_html: Hemos enviado todos los enlaces de activación posibles
+              para %{name}, pero ninguno llegó a %{email}. Ponte en contacto con support@bikeindex.org
+              y lo solucionaremos.
           welcome:
             add_a_registration: Agregar un registro
             continue_where_you_were: Continúa donde estabas
