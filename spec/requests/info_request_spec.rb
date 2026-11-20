@@ -256,6 +256,9 @@ RSpec.describe InfoController, type: :request do
       expect(response).to render_template("lightspeed")
       expect(flash).to_not be_present
       expect(assigns(:show_general_alert)).to be_truthy
+      # Signing up comes back through the signup's own return_to, not a sign-in's
+      expect(response.body).to include new_organization_signup_path(return_to: lightspeed_interface_path)
+      expect(session[:return_to]).to be_blank
     end
     context "donate" do
       include_context :active_stripe_prices

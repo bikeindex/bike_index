@@ -29,6 +29,20 @@ module Notifications
       end
     end
 
+    # For a record that only has an address so far, which nobody has proven: a banned domain
+    # deletes the record, and a provisionally banned one holds the email
+    def track_unproven_email(record, email:, kind:, message_channel_target: nil, &)
+      if EmailDomain::VERIFICATION_ENABLED
+        email_domain = EmailDomain.find_or_create_for(email)
+
+        return record.destroy if email_domain&.banned?
+        return if email_domain&.provisional_ban?
+      end
+
+      notification = Notification.create(kind:, message_channel: "email", notifiable: record, message_channel_target:)
+      track_email(notification, &)
+    end
+
     #
     # private below here
     #

@@ -19,15 +19,9 @@ module EmailJobs
       return if kind == "partial_register_confirmation" && b_param.email_confirmation_token.blank?
       return if b_param.likely_spam?
 
-      if EmailDomain::VERIFICATION_ENABLED
-        email_domain = EmailDomain.find_or_create_for(b_param.owner_email)
-
-        return b_param.destroy if email_domain&.banned?
-        return if email_domain&.provisional_ban?
+      Notifications::Deliver.track_unproven_email(b_param, email: b_param.owner_email, kind:) do
+        OrganizedMailer.public_send(kind, b_param).deliver_now
       end
-
-      notification = Notification.create(kind:, message_channel: "email", notifiable: b_param)
-      Notifications::Deliver.track_email(notification) { OrganizedMailer.public_send(kind, b_param).deliver_now }
     end
   end
 end

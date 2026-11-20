@@ -7,11 +7,9 @@ class LandingPagesController < ApplicationController
   end
 
   def for_community_groups
-    organization_path = new_organization_path(kind: "bike_advocacy")
-    sign_up_path = current_user.present? ? organization_path : new_user_path(return_to: organization_path)
-
     render SharedBlocks::Marketing::Wrapper::Component.new(page: Pages::LandingPages::ForCommunityGroups::Component.new(
-      recovery_displays: RecoveryDisplay.with_photo.limit(4), sign_up_path:
+      recovery_displays: RecoveryDisplay.with_photo.limit(4),
+      sign_up_path: new_organization_signup_path(kind: "bike_advocacy")
     ))
   end
 
