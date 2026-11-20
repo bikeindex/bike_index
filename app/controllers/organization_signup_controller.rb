@@ -69,9 +69,7 @@ class OrganizationSignupController < ApplicationController
   # Rate limited, so a second press says the link is on its way rather than sending another
   def resend
     # A proven address has nothing to send - what's left is finishing
-    if @signup.email_confirmed?
-      return OrgServices::Signup.ready_to_complete?(@signup) ? complete_signup : redirect_to(organization_signup_path(step: 2))
-    end
+    return complete_or_details if @signup.email_confirmed?
 
     if OrgServices::Signup.send_confirmation_email(@signup)
       flash[:success] = translation(:link_resent, email: @signup.email)
@@ -107,8 +105,7 @@ class OrganizationSignupController < ApplicationController
     if signed_in_as_someone_else?
       unless params[:sign_out].present?
         flash[:error] = translation(:sign_out_to_confirm, email: current_user.email)
-        return redirect_to(confirm_organization_signup_path(signup_token: @signup.id_token,
-          confirmation_token: params[:confirmation_token]))
+        return redirect_to(confirm_path)
       end
 
       remove_session
@@ -123,9 +120,7 @@ class OrganizationSignupController < ApplicationController
     flash.delete(:notice)
     flash.delete(:success)
     OrgServices::Signup.confirm_email!(@signup)
-    return redirect_to(organization_signup_path(step: 2)) unless @signup.details_completed?
-
-    complete_signup
+    complete_or_details
   end
 
   def welcome
@@ -155,15 +150,20 @@ class OrganizationSignupController < ApplicationController
   # An SSO domain's address signs in at its identity provider, which brings them back to this link
   def sign_in_email_owner
     if redirect_forced_saml(@signup.email)
-      store_return_to(confirm_organization_signup_path(signup_token: @signup.id_token,
-        confirmation_token: params[:confirmation_token]))
-      return false
+      store_return_to(confirm_path)
+    elsif sign_in_confirmed_user(@signup.email).blank?
+      redirect_to(organization_signup_path)
+    else
+      return true
     end
-    return true if sign_in_confirmed_user(@signup.email).present?
-
-    redirect_to(organization_signup_path)
     false
   end
+
+  def confirm_path
+    confirm_organization_signup_path(signup_token: @signup.id_token, confirmation_token: params[:confirmation_token])
+  end
+
+  def complete_or_details = @signup.details_completed? ? complete_signup : redirect_to(organization_signup_path(step: 2))
 
   def email_owner = @email_owner ||= User.fuzzy_confirmed_or_unconfirmed_email_find(@signup.email)
 
@@ -178,10 +178,9 @@ class OrganizationSignupController < ApplicationController
       return redirect_to(organization_signup_path(step: 1))
     elsif organization.errors.any?
       # Step 1 checks the name the way Organization does, so anything else isn't theirs to fix
-      Honeybadger.notify("Organization signup failed to complete",
-        context: {organization_signup_id: @signup.id, errors: organization.errors.full_messages})
-      flash[:error] = translation(:unable_to_complete, controller_method: :complete_signup,
-        errors: organization.errors.full_messages.to_sentence)
+      errors = organization.errors.full_messages
+      Honeybadger.notify("Organization signup failed to complete", context: {organization_signup_id: @signup.id, errors:})
+      flash[:error] = translation(:unable_to_complete, controller_method: :complete_signup, errors: errors.to_sentence)
       return redirect_to(organization_signup_path(step: 2))
     end
 

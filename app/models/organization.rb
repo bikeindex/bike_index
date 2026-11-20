@@ -220,8 +220,8 @@ class Organization < ApplicationRecord
 
     # Related kinds side by side, then any kind added since, then other
     def user_creatable_kinds
-      order = %w[bike_shop bike_advocacy law_enforcement school municipality bike_manufacturer software property_management]
-      (kinds - admin_required_kinds - ["other"]).sort_by { order.index(it) || order.length } + ["other"]
+      (%w[bike_shop bike_advocacy law_enforcement school municipality bike_manufacturer software property_management] |
+        kinds) - admin_required_kinds - ["other"] + ["other"]
     end
 
     # What would stop a new organization taking this name: :too_short, :reserved or :taken.
