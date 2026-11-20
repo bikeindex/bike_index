@@ -124,6 +124,8 @@ If the returned content height is **less than the viewport height**, `browser_re
 
 **At the mobile width a `UI::Forms::Combobox` opens a dialog and its own input goes inert** — clicking `#<id>` works, but typing into it times out on "element is inert". Type into `#<id>-hw-dialog-combobox` instead.
 
+**Navigating to the URL you're already on is a reload, and Chrome restores what you typed.** The second viewport's pass then types onto the first's text (`allez spallez sp`, "No matches") — select the field's text before typing.
+
 **A loading state is captured by holding the request open, not by racing it.** In `browser_run_code_unsafe`, `page.route` the frame's URL and delay with `await page.waitForTimeout(90000)` before `route.continue()` — `setTimeout` isn't defined there — then trigger the fetch the way the frame does, by re-setting its `src`. Load the results first: a frame that goes busy from an empty page captures a header reading "0 matches".
 
 **One capture's `?organization_id=` or `?view_as=<org>` changes what the *next* param-less URL renders.** `set_passive_organization` writes the org into the session, and `/registrations/:id` with no params then resolves through `default_view_for` to that org's admin view — so a `/registrations/54` shot taken after a `view_as=brakebills.staff` one is the org page, in the org layout, at the same URL. Nothing errors, and the pair only looks wrong once you open it. Navigate `?organization_id=false` before any capture whose URL carries no `view_as`, and remember the session survives the base-branch checkout, so the branch and base loops can drift apart on this if their orders differ.
