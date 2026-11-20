@@ -4,12 +4,12 @@ RSpec.describe Spreadsheets::Manufacturers do
   let!(:manufacturer) do
     Manufacturer.destroy_all
     FactoryBot.create(:manufacturer, name: "Riese & Müller (Riese and Muller)", frame_maker: true,
-      motorized_only: true, open_year: 1993, website: "https://www.r-m.de/")
+      motorized_only: false, open_year: 1993, website: "https://www.r-m.de/")
   end
   describe "to_csv" do
     let(:target) do
       ["name,alternate_name,website,makes_frames,ebike_only,open_year,close_year,logo_url",
-        "Riese & Müller,Riese and Muller,https://www.r-m.de/,true,true,1993,,"]
+        "Riese & Müller,Riese and Muller,https://www.r-m.de/,true,,1993,,"]
     end
     it "generates" do
       expect(Manufacturer.other).to be_present
@@ -24,7 +24,7 @@ RSpec.describe Spreadsheets::Manufacturers do
 
   describe "row" do
     let(:target) do
-      ["Riese & Müller", "Riese and Muller", "https://www.r-m.de/", true, true, 1993, nil, nil]
+      ["Riese & Müller", "Riese and Muller", "https://www.r-m.de/", true, nil, 1993, nil, nil]
     end
     it "returns expected" do
       expect(described_class.send(:row_for, manufacturer)).to eq target

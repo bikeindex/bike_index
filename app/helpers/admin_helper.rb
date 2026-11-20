@@ -56,6 +56,9 @@ module AdminHelper
       admin_user_alerts_path(user_id: obj.user_id)
     elsif obj.instance_of?(OrganizationMessage)
       admin_organization_messages_path(search_bike_id: obj.bike_id)
+    elsif obj.instance_of?(OrganizationSignup)
+      # The organization once it exists - until then, the emails sent to the address
+      obj.organization_id.present? ? admin_organization_path(obj.organization_id) : admin_notifications_path(query: obj.email)
     elsif obj.instance_of?(Blog)
       admin_news_path(obj) # blogs are administered as news
     else

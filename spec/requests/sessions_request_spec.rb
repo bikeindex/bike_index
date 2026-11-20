@@ -570,6 +570,22 @@ RSpec.describe SessionsController, type: :request do
       expect(signed_auth_cookie[1]).to eq user.auth_token
       expect(user.last_login_at).to be_within(1.second).of Time.current
       expect(user.last_login_ip).to eq "66.66.66.66"
+      expect(user.color_scheme).to eq "system"
+    end
+    context "with a color scheme picked signed out" do
+      before { user.update(color_scheme: "light") }
+
+      it "carries light or dark onto the account, but not system" do
+        cookies[:color_scheme] = "system"
+        post "/session", params: {session: {email: user.email, password:}}
+        expect(user.reload.color_scheme).to eq "light"
+
+        delete "/session"
+        cookies[:color_scheme] = "dark"
+        post "/session", params: {session: {email: user.email, password:}}
+        expect(response).to redirect_to my_account_url
+        expect(user.reload.color_scheme).to eq "dark"
+      end
     end
     context "unconfirmed" do
       let(:user) { FactoryBot.create(:user, password: password, password_confirmation: password) }

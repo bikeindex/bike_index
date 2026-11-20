@@ -1,10 +1,11 @@
 // Searches the published catalog off the main thread, by the rules the catalog's own search follows
 /* global self */
 
-const FORMAT = 3
+const FORMAT = 4
 
 let models = []
 let byId = new Map()
+let bases = new Map()
 let classifications = {}
 let activities = []
 let manifest = null
@@ -58,7 +59,7 @@ const classified = ({ e_vehicle_classifications: records }, jurisdictions) => Ob
   const label = [state || code, record.name].filter(Boolean).join(' ')
   // "Alabama (AL)", "United States"
   const jurisdictionName = state ? `${state} (${code.slice(3)})` : code && (jurisdictions[code] ?? code)
-  return [id, { ...record, label, jurisdiction_name: jurisdictionName, title: /^Class \d+$/.test(record.name) ? `${label} e-bike` : label }]
+  return [id, { ...record, label, state: state || null, jurisdiction_name: jurisdictionName, title: /^Class \d+$/.test(record.name) ? `${label} e-bike` : label }]
 }))
 
 // What picked vehicles render from, which needs nothing of the index: the blocks `ids` are in, the kit and the vocabulary
@@ -101,7 +102,10 @@ async function load ({ rulesUrl, similarityUrl: similarityModule }) {
     // own changes the same
     chance: Math.random()
   }))
-  byId = new Map(models.map((model) => [model.id, model]))
+  // a market variant is its base's row under its own id and markets
+  const variants = models.flatMap((model) => model.variants.map(({ id, markets }) => [{ ...model, id, markets, variants: [] }, model]))
+  bases = new Map(variants.map(([variant, model]) => [variant.id, model]))
+  byId = new Map([...models, ...variants.map(([variant]) => variant)].map((model) => [model.id, model]))
   // the index labels the out of class markers, which the vocabulary has no record of: "Out of class in California"
   const labels = Object.entries(index.filter_options.e_vehicle_classification).map(([id, label]) => [id, { label, title: label, marker: true }])
   classifications = { ...Object.fromEntries(labels), ...vocabulary.e_vehicle_classifications }
@@ -128,7 +132,7 @@ const named = (name, vocabulary, names) => counted(name, Object.entries(names[vo
 
 // Each filter's choices, with how many models choosing it alone matches. Propulsion's checkboxes show no counts
 function options ({ manufacturers, vehicle_types: vehicleTypes, filter_options: { electric, e_vehicle_classification: classification, market, ...filterOptions } }, names) {
-  const sellers = new Set(models.flatMap(({ markets }) => markets))
+  const sellers = new Set(models.flatMap(marketsOf))
   const perManufacturer = models.reduce((counts, { manufacturer }) => counts.set(manufacturer, (counts.get(manufacturer) ?? 0) + 1), new Map())
   return {
     primary_activity: counted('primary_activity', activities.map(({ slug, name }) => [slug, name])),
@@ -159,19 +163,21 @@ const block = (key) => {
   return blocks.get(key)
 }
 
-// A block leaves out the markets of a model sold in its maker's primary market alone, which the index resolves, and
-// whether it's current. `outsideMarket` where it isn't sold in `market`, blank for any
+const blockData = async (id) => manifest.blocks[blockKey(id)] && (await block(blockKey(id)))[id]
+
+// A block leaves out the markets of a model sold in its maker's primary market alone, which the index resolves. Its final
+// year says whether it's current, which a market variant's row, its base's, doesn't. `outsideMarket` where it isn't sold
+// in `market`, blank for any
 async function vehicles ({ ids, market }) {
   const found = await Promise.all(ids.map(async (value) => {
-    const key = blockKey(value)
-    const data = manifest.blocks[key] && (await block(key))[value]
+    const data = await blockData(value)
     const model = byId.get(value)
     return {
       value,
       display: model?.display,
       data: data && { ...data, markets: data.markets ?? model?.markets },
       outsideMarket: Boolean(market) && !model?.markets.includes(market),
-      current: Boolean(model) && model.final_year == null
+      current: Boolean(model) && data?.final_year == null
     }
   }))
   return found.filter(({ data }) => data)
@@ -192,9 +198,12 @@ async function similar ({ model, settings, filters: { sort, year_dir: yearDir, p
   const score = await scorer()
   const key = JSON.stringify({ model, settings, filters })
   if (lastSimilar?.key !== key) {
-    const own = byId.get(model)
+    const own = baseOf(model)
     const matches = filter({ ...filters, electric: filters.electric || (own?.electric ? '1' : '0'), vehicle_type: filters.vehicle_type || own?.vehicle_type })
-    lastSimilar = { key, result: score?.(model, settings, matches) ?? null }
+    // current as `vehicles` says
+    const includeNotCurrent = settings.includeNotCurrent ?? (await blockData(model))?.final_year != null
+    const result = own && score?.(own.id, { ...settings, includeNotCurrent }, matches)
+    lastSimilar = { key, result: result ? { ...result, models: result.models.map((each) => soldIn(each, filters.market)) } : null }
   }
   return lastSimilar.result
 }
@@ -224,10 +233,11 @@ function matching (params) {
   const needle = (params.q ?? '').trim().toLowerCase()
   const exact = needle.startsWith('m/') && byId.get(needle)
   const words = needle.split(/\s+/).filter(Boolean)
-  const found = exact ? [exact] : filtered.filter(({ searchText }) => words.every((word) => searchText.includes(word)))
+  const found = exact ? [exact] : filtered.filter(({ searchText }) => words.every((word) => searchText.includes(word))).map((model) => soldIn(model, params.market))
   const whole = ({ searchText }) => searchText.includes(needle)
   const matches = needle ? [...found.filter(whole), ...found.filter((model) => !whole(model))] : found
-  return { filteredCount: filtered.length, matches, unfiltered: Boolean(exact) && matches.length > 0 && !passes(exact) }
+  // by its own markets rather than its variants'
+  return { filteredCount: filtered.length, matches, unfiltered: Boolean(exact) && matches.length > 0 && !passes({ ...exact, variants: [] }) }
 }
 
 // The `count` of models the filters leave, and featured_rules' `COUNT` of them, by its rules, the models tying on them
@@ -273,7 +283,8 @@ function featured ({ params, legalClasses }) {
     picked.push(best.model)
   }
   const shown = params.sort || params.year_dir || params.price_dir ? params : { sort: 'price' }
-  return { count: filtered.length, featured: sorted(shown).filter((model) => picked.includes(model)), rotatable: candidates.length > COUNT }
+  const featured = sorted(shown).filter((model) => picked.includes(model)).map((model) => soldIn(model, params.market))
+  return { count: filtered.length, featured, rotatable: candidates.length > COUNT }
 }
 
 // featured's picks drawn afresh, as a reload would
@@ -284,13 +295,13 @@ function rotate () {
 // The models of the `model` id's group by year, newest first, each under the newest it's sold in - so each once, and a
 // current one in this year. Those `market` leaves out by its `scope`, as a search would, but the model itself
 function group ({ model: id, market, scope }) {
-  const model = byId.get(id)
+  const model = baseOf(id)
   if (!model?.model_group) return null
 
   const years = new Map()
   for (const each of sorted({}).filter((each) => each.manufacturer === model.manufacturer && each.model_group === model.model_group && each.first_year &&
     (each === model || !market || inMarket(each, market, scope)))) {
-    years.set(each.sortYear, [...(years.get(each.sortYear) ?? []), each])
+    years.set(each.sortYear, [...(years.get(each.sortYear) ?? []), soldIn(each, market)])
   }
   return {
     name: model.model_group,
@@ -323,14 +334,25 @@ function sorted ({ sort, year_dir: yearDir, price_dir: priceDir }) {
 
 // the manufacturers with models sold in `market`
 const sellingIn = (market) => {
-  if (!sold.has(market)) sold.set(market, new Set(models.filter(({ markets }) => markets.includes(market)).map(({ manufacturer }) => manufacturer)))
+  if (!sold.has(market)) sold.set(market, new Set(models.filter((model) => marketsOf(model).includes(market)).map(({ manufacturer }) => manufacturer)))
   return sold.get(market)
 }
 
 // Its own models alone `only`, or every one for `any`. Preferring it, the default, adds the models sold elsewhere but
 // for e-vehicles, which its own laws class, and the makers it sells any of
-const inMarket = (model, market, scope) => scope === 'any' || model.markets.includes(market) ||
+const inMarket = (model, market, scope) => scope === 'any' || marketsOf(model).includes(market) ||
   (scope !== 'only' && !model.electric && !sellingIn(market).has(model.manufacturer))
+
+const baseOf = (id) => bases.get(id) ?? byId.get(id)
+
+// its own and its market variants'
+const marketsOf = (model) => [...model.markets, ...model.variants.flatMap(({ markets }) => markets)]
+
+// The model's market variant sold in `market`, where it has one
+const soldIn = (model, market) => {
+  const variant = market && model.variants.find(({ markets }) => markets.includes(market))
+  return variant ? byId.get(variant.id) : model
+}
 
 // A family matches its flavors; slugs naming no activity filter nothing
 function filter (params) {

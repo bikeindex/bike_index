@@ -6,7 +6,7 @@ module CallbackJobs
 
     def perform(manufacturer_id)
       manufacturer = Manufacturer.find(manufacturer_id)
-      slugs = [manufacturer.slug, manufacturer.secondary_slug].compact_blank
+      slugs = [Slugifyer.legacy_manufacturer(manufacturer.name), manufacturer.secondary_slug].compact_blank
 
       matching_others(Bike, slugs).find_each { |bike| update_bike(bike, manufacturer_id) }
       matching_others(Component, slugs).find_each { it.update(manufacturer_id:, manufacturer_other: nil) }
@@ -21,7 +21,7 @@ module CallbackJobs
     # Slug match, so "BMC-Switzerland" finds "BMC (BMC Switzerland)"
     def matching_others(klass, slugs)
       others = klass.unscoped.where(manufacturer_id: Manufacturer.other.id)
-      names = others.distinct.pluck(:manufacturer_other).select { slugs.include?(Slugifyer.manufacturer(it)) }
+      names = others.distinct.pluck(:manufacturer_other).select { slugs.include?(Slugifyer.legacy_manufacturer(it)) }
       others.where(manufacturer_other: names)
     end
 
