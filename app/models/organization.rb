@@ -56,18 +56,19 @@ class Organization < ApplicationRecord
   include FriendlyNameFindable
   include SearchRadiusMetricable
 
+  # In display order, so a key's position isn't its stored value
   KIND_ENUM = {
     bike_shop: 0,
     bike_advocacy: 1,
     law_enforcement: 2,
     school: 3,
+    municipality: 10,
     bike_manufacturer: 4,
     software: 5,
     property_management: 6,
     other: 7,
     ambassador: 8,
-    bike_depot: 9,
-    municipality: 10
+    bike_depot: 9
   }.freeze
 
   USER_REGISTRATION_ALL_BIKES_EXCLUDED_IDS = [36, 1].freeze # SBR and BikeIndex
@@ -218,10 +219,8 @@ class Organization < ApplicationRecord
       %w[ambassador bike_depot].freeze
     end
 
-    # Related kinds side by side, then any kind added since, then other
     def user_creatable_kinds
-      (%w[bike_shop bike_advocacy law_enforcement school municipality bike_manufacturer software property_management] |
-        kinds) - admin_required_kinds - ["other"] + ["other"]
+      kinds - admin_required_kinds
     end
 
     # What would stop a new organization taking this name: :too_short, :reserved or :taken.
