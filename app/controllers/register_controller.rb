@@ -191,13 +191,13 @@ class RegisterController < ApplicationController
       # The education course is the owner's to agree to, and spending the link here would leave them no way in
       if @b_param.rules_left_to_owner?(current_user) && @b_param.acknowledgment_pending?
         flash[:error] = translation(:sign_out_to_agree, email: current_user.email)
-        return redirect_to(confirm_register_path(b_param_token: @b_param.id_token,
-          confirmation_token: params[:confirmation_token]))
+        return redirect_to(confirm_path)
       end
 
       flash[:notice] = translation(:signed_in_as_other, email: current_user.email) unless @b_param.self_made?(current_user)
-    elsif sign_in_confirmed_user.blank?
-      return redirect_to_current_step
+    elsif sign_in_confirmed_user(@b_param.owner_email, return_to: confirm_path).blank?
+      # Unless it went to the identity provider
+      return performed? || redirect_to_current_step
     else
       # The filter resolved it signed out, which separate attestation answers with no education course
       find_education_course
@@ -208,6 +208,10 @@ class RegisterController < ApplicationController
   end
 
   private
+
+  def confirm_path
+    confirm_register_path(b_param_token: @b_param.id_token, confirmation_token: params[:confirmation_token])
+  end
 
   # Both read straight from params - update_params is stored as json, which an upload can't be
   def save_details
@@ -230,21 +234,6 @@ class RegisterController < ApplicationController
     return redirect_to_current_step if bike.blank?
 
     redirect_after_bike_creation(bike)
-  end
-
-  # The account the confirmed address belongs to, created if it doesn't have one yet
-  def sign_in_confirmed_user
-    user, signed_up = UserServices::PasswordlessCreator.find_or_create(@b_param.owner_email)
-    if user.blank? || user.banned?
-      flash[:error] = translation(:unable_to_sign_in)
-      return nil
-    end
-
-    # The link proved the address, so an account that had never confirmed it now has
-    user.confirm(user.confirmation_token) unless user.confirmed?
-    sign_in_user(user)
-    set_sign_in_flash(user, signed_up)
-    @current_user = user
   end
 
   # Wherever the registration now stands: the next unacknowledged page, or the review

@@ -9,11 +9,12 @@ module Integrations
       LOCAL_DIRECTORY = (ENV["BIKEBOOK_CATALOG_DIRECTORY"].presence if Rails.env.development?)
       LOCAL_PATH = "/bikebook_catalog"
       URL = "https://bikebook-catalog.bikeindex.org/catalog/"
-      MANIFEST_URL = LOCAL_DIRECTORY ? "#{LOCAL_PATH}/manifest.json" : "#{URL}manifest.json"
+      # the published format bikebook/catalog_worker.js and similarity.js read
+      FORMAT = 4
+      MANIFEST = "manifest.#{FORMAT}.json"
+      MANIFEST_URL = LOCAL_DIRECTORY ? "#{LOCAL_PATH}/#{MANIFEST}" : "#{URL}#{MANIFEST}"
       GITHUB_REPO_URL = "https://github.com/bikeindex/bikebook"
       MODEL_ID = %r{\Am/([a-z0-9_]+/\d{4})/[a-z0-9_]+\z}
-      # the published format bikebook/catalog_worker.js and similarity.js read
-      FORMAT = 3
 
       Unreachable = Class.new(StandardError)
 
@@ -32,7 +33,7 @@ module Integrations
       def vehicle_id(entry) = entry.split("{").first.strip
 
       # nil while the catalog doesn't answer
-      def manifest = cached("bikebook_catalog/manifest", "manifest.json", expires_in: 5.minutes)
+      def manifest = cached(["bikebook_catalog/manifest", MANIFEST], MANIFEST, expires_in: 5.minutes)
 
       # Whether the catalog answers in the format /bikebook reads. The e-bike law pages read the manifest regardless
       def readable? = manifest&.dig("format") == FORMAT

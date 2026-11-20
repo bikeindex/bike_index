@@ -78,7 +78,7 @@ class AmbassadorTaskAssignment < ApplicationRecord
             FROM organization_roles AS m
             JOIN organizations AS o
             ON m.organization_id = o.id
-            WHERE o.kind = #{Organization.kinds.index("ambassador")}
+            WHERE o.kind = #{Organization::KIND_ENUM[:ambassador]}
             AND o.deleted_at IS NULL
             GROUP BY m.user_id
         ) current_ambassadorships
