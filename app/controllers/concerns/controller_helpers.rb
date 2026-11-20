@@ -470,6 +470,8 @@ module ControllerHelpers
 
       flash[:success] = translation(:accept_tos_for_orgs,
         scope: [:controllers, :concerns, :controller_helpers, __method__])
+      # Back here once they've accepted - a POST's path can't be revisited
+      store_return_to(request.fullpath) if request.get?
       redirect_to(accept_vendor_terms_path) && return
     elsif current_user.blank?
       flash[:notice] = translation(:please_sign_in,

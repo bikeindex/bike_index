@@ -48,9 +48,6 @@ class OrganizationSignupController < ApplicationController
 
     # Step 2 says the link is on its way, so it goes out here rather than at the end
     OrgServices::Signup.send_confirmation_email(@signup)
-    if OrgServices::Signup.out_of_links?(@signup)
-      flash[:error] = translation(:no_more_links, email: @signup.email, controller_method: "resend")
-    end
     redirect_to organization_signup_path(step: @signup.details_completed? ? :finished : 2)
   end
 
@@ -99,6 +96,7 @@ class OrganizationSignupController < ApplicationController
       return redirect_to(organization_signup_path)
     end
 
+    replaced = OrgServices::Signup.find(session[SESSION_KEY])
     # The only way back to a signup opened in another browser
     session[SESSION_KEY] = @signup.id_token
 
@@ -119,6 +117,9 @@ class OrganizationSignupController < ApplicationController
     # Both places this goes say what's next themselves, so signing in doesn't need to
     flash.delete(:notice)
     flash.delete(:success)
+    if replaced.present? && replaced != @signup && replaced.organization_id.blank?
+      flash[:notice] = translation(:switched_signup, name: @signup.name, replaced_name: replaced.name)
+    end
     OrgServices::Signup.confirm_email!(@signup)
     complete_or_details
   end
@@ -127,6 +128,7 @@ class OrganizationSignupController < ApplicationController
     @organization = Organization.friendly_find(params[:organization_id])
     return authenticate_user(flash_type: :notice) if current_user.blank?
     return redirect_to(user_root_url) unless current_user.admin_of?(@organization)
+    return unless ensure_member_of!(@organization)
 
     render Pages::OrgSignup::Views::Welcome::Component.new(organization: @organization, current_user:, return_to:)
   end
@@ -135,9 +137,10 @@ class OrganizationSignupController < ApplicationController
 
   def step_page(step)
     case step
-    when "finished" then Pages::OrgSignup::Views::StepFinished::Component.new(organization_signup: @signup)
+    when "finished" then Pages::OrgSignup::Views::StepFinished::Component.new(organization_signup: @signup, current_user:)
     when "2" then Pages::OrgSignup::Views::Step2::Component.new(organization_signup: @signup)
-    else Pages::OrgSignup::Views::Step1::Component.new(organization_signup: @signup, current_user:)
+    else Pages::OrgSignup::Views::Step1::Component.new(organization_signup: @signup, current_user:,
+      focus_email: params[:change_email].present?)
     end
   end
 
@@ -180,18 +183,19 @@ class OrganizationSignupController < ApplicationController
     end
 
     session.delete(SESSION_KEY)
-    return redirect_to_sign_in_for(organization) if current_user != email_owner
-
     # A page of its own rather than straight to return_to: these submissions are fetched,
     # and a fetch can't follow lightspeed_interface's redirect off-site
-    redirect_to welcome_organization_signup_path(organization_id: organization.to_param, return_to: @signup.return_to)
+    welcome_path = welcome_organization_signup_path(organization_id: organization.to_param, return_to: @signup.return_to)
+    return redirect_to_sign_in_for(organization, after_sign_in: welcome_path) if current_user != email_owner
+
+    redirect_to welcome_path
   end
 
-  def redirect_to_sign_in_for(organization)
-    flash[:notice] = translation(:sign_in_to_manage, controller_method: :redirect_to_sign_in_for, name: organization.name,
-      email: email_owner&.email || @signup.email)
-    store_return_to(organization_manage_path(organization_id: organization.to_param))
-    redirect_to new_session_path
+  def redirect_to_sign_in_for(organization, after_sign_in: organization_manage_path(organization_id: organization.to_param))
+    email = email_owner&.email || @signup.email
+    flash[:notice] = translation(:sign_in_to_manage, controller_method: :redirect_to_sign_in_for, name: organization.name, email:)
+    store_return_to(after_sign_in)
+    redirect_to new_session_path(email:)
   end
 
   # Once its organization exists the signup has nothing left to show, so it goes there instead

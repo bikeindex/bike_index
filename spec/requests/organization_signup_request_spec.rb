@@ -69,11 +69,17 @@ RSpec.describe OrganizationSignupController, type: :request do
     user = User.last
     expect(response).to redirect_to welcome_path(organization)
     expect(user).to have_attributes(email: "org_admin@bikeindex.org", confirmed?: true)
-    expect(organization).to have_attributes(name: "Shifty Bike Shop", kind: "bike_shop", auto_user_id: user.id)
+    expect(organization).to have_attributes(name: "Shifty Bike Shop", kind: "bike_shop", auto_user_id: user.id, show_on_map: true)
     expect(organization.locations.first.address_record).to have_attributes(address)
     expect(organization.organization_roles.pluck(:user_id, :role)).to eq([[user.id, "admin"]])
     expect(organization_signup.organization_id).to eq organization.id
 
+    # The organization terms come before anything else, then it's back to welcome
+    get response.location
+    expect(response).to redirect_to accept_vendor_terms_path
+    patch user_path(user), params: {user: {vendor_terms_of_service: "1"}}
+    expect(response).to redirect_to welcome_path(organization)
+    expect(user.reload.accepted_vendor_terms_of_service?).to be_truthy
     get response.location
     expect(response.status).to eq 200
     expect(response.body).to include "Shifty Bike Shop is active!"
@@ -119,6 +125,17 @@ RSpec.describe OrganizationSignupController, type: :request do
     end
   end
 
+  it "says so when a link takes over from the signup this browser was on" do
+    post base_url, params: {organization_signup: start_params}
+    first_confirm_params = confirm_params
+    get "#{base_url}/new", params: {restart: true}
+    post base_url, params: {organization_signup: start_params.merge(name: "Pedal Pushers", email: "pedal@bikeindex.org")}
+
+    post "#{base_url}/confirm_email", params: first_confirm_params
+    expect(response).to redirect_to "#{base_url}?step=2"
+    expect(flash[:notice]).to eq "You're now finishing Shifty Bike Shop. To finish Pedal Pushers too, open the link in its email."
+  end
+
   # Turnstile only challenges risky domains, so the cap is all that's left for the rest
   it "sends a changed address its link straight away, up to the cap" do
     post base_url, params: {organization_signup: start_params}
@@ -131,7 +148,9 @@ RSpec.describe OrganizationSignupController, type: :request do
     end
     expect(EmailJobs::OrganizationSignupConfirmationJob.jobs.count).to eq OrgServices::Signup::MAX_CONFIRMATION_EMAILS
     expect(OrganizationSignup.last.email).to eq "six@bikeindex.org"
-    expect(flash[:error]).to match(/can't send another/)
+    get response.location
+    expect(response.body).to include "none of them went to six@bikeindex.org"
+    expect(response.body).to_not include "emailed six@bikeindex.org"
 
     expect { post "#{base_url}/resend" }.to_not change(EmailJobs::OrganizationSignupConfirmationJob.jobs, :size)
     expect(flash[:error]).to match(/can't send another/)
@@ -220,8 +239,12 @@ RSpec.describe OrganizationSignupController, type: :request do
     patch base_url, params: {organization_signup: details_params}
     organization = Organization.last
     expect(organization.organization_roles.first.user.email).to eq "org_admin@bikeindex.org"
-    expect(response).to redirect_to new_session_path
+    expect(response).to redirect_to new_session_path(email: "org_admin@bikeindex.org")
     expect(flash[:notice]).to eq "Shifty Bike Shop is active! Sign in as org_admin@bikeindex.org to manage it."
+    # Signing in picks up where finishing here would have gone
+    expect(session[:return_to]).to eq welcome_path(organization)
+    get response.location
+    expect(Capybara.string(response.body)).to have_field("session[email]", with: "org_admin@bikeindex.org")
 
     # And the phone, still on step 2, goes to the organization
     phone.get "#{base_url}?step=2"
@@ -302,25 +325,30 @@ RSpec.describe OrganizationSignupController, type: :request do
       post "#{base_url}/confirm_email", params: confirm_params
       delete "/session"
       get "#{base_url}/confirm", params: {signup_token: organization_signup.id_token, confirmation_token: token}
-      expect(response).to redirect_to new_session_path
+      expect(response).to redirect_to new_session_path(email: "org_admin@bikeindex.org")
       expect(flash[:notice]).to eq "Shifty Bike Shop is active! Sign in as org_admin@bikeindex.org to manage it."
+      expect(session[:return_to]).to eq organization_manage_path(organization_id: Organization.last.to_param)
     end
   end
 
   context "signed in" do
     include_context :request_spec_logged_in_as_user
 
-    it "uses their email, and still waits on the link" do
+    it "uses their email, which their account already confirmed" do
       get "#{base_url}/new"
       expect(response.body).to include current_user.email
       expect(response.body).to_not include "organization_signup[email]"
-      post base_url, params: {organization_signup: start_params}
+      expect(response.body).to_not include "We&#39;ll email you a link"
+      expect {
+        post base_url, params: {organization_signup: start_params}
+      }.to_not change(EmailJobs::OrganizationSignupConfirmationJob.jobs, :size)
       expect(organization_signup.email).to eq current_user.email
-      patch base_url, params: {organization_signup: details_params}
-      expect(response).to redirect_to "#{base_url}?step=finished"
-      expect(Organization.count).to eq 0
+      expect(response).to redirect_to "#{base_url}?step=2"
+      get response.location
+      expect(response.body).to_not include "a link to activate"
+      expect(response.body).to_not include "Your email is confirmed"
 
-      post "#{base_url}/confirm_email", params: confirm_params
+      patch base_url, params: {organization_signup: details_params}
       organization = Organization.last
       expect(response).to redirect_to welcome_path(organization)
       expect(organization.organization_roles.first.user_id).to eq current_user.id
@@ -334,7 +362,7 @@ RSpec.describe OrganizationSignupController, type: :request do
         expect(Capybara.string(response.body)).to have_field("return_to", type: :hidden, with: lightspeed_interface_path)
         post base_url, params: {organization_signup: start_params, return_to: lightspeed_interface_path}
         patch base_url, params: {organization_signup: details_params}
-        post "#{base_url}/confirm_email", params: confirm_params
+        current_user.update(accepted_vendor_terms_of_service: true)
         organization = Organization.last
         expect(response).to redirect_to welcome_path(organization, return_to: lightspeed_interface_path)
         get response.location
