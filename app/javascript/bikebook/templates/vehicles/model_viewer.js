@@ -482,8 +482,8 @@ class ModelViewer {
     const classes = this.#classTiles()
     const { id } = this.data
     const place = this.state ? `US/${this.state}` : this.#emoto(this.vehicle.classifiedModes.flatMap((mode) => mode.ids)) && 'US'
-    return classes && html`<div class="tw:flex tw:flex-wrap tw:items-end tw:gap-x-3 tw:gap-y-1"><div>${classes}</div><a class="twlink tw:text-sm"
-      href=${`/ebike-rules?vehicle_models=${id}`}>View on e-bike rules</a></div>${place && id
+    return classes && html`<div class="tw:flex tw:flex-wrap tw:items-end tw:gap-x-3 tw:gap-y-1"><div>${classes}</div><span class="tw:text-sm">Learn more on <a class="twlink"
+      href=${`/ebike-rules?vehicle_models=${id}`}>e-bike rules</a></span></div>${place && id
       ? html`<turbo-frame id=${`ebike-rules-reasons-${where}-${id.replace(/[^\w-]/g, '-')}`} data-permanent=${place}
         src=${`/ebike-rules/${place}?${new URLSearchParams({ vehicle_models: id })}`}></turbo-frame>`
       : nothing}`
