@@ -4149,6 +4149,8 @@ nl:
       subject: Bericht van %{organization_name} over uw %{bike_type}
     organization_signup_confirmation:
       subject: Bevestig je e-mailadres om %{name} te activeren op Bike Index
+    shop_welcome:
+      subject: Uw Bike Index-winkeldashboard is klaar voor gebruik.
   plan_features:
     automatic_registration_through_pos: Automatische registratie via uw POS
     create_organization_account: Maak een organisatieaccount en neem contact op met
@@ -5407,6 +5409,79 @@ nl:
           team uitnodigen zodra je bent ingelogd.
         link_signs_you_in: Deze link geeft je een account bij Bike Index, dus stuur
           hem niet door. Hij is %{days} dagen geldig.
+      shop_welcome:
+        bike_book_body: Vergelijk specificaties, geometrie en tal van andere kenmerken
+          van duizenden fietsmodellen.
+        bookmark_it: Voeg dit toe aan je bladwijzers. Je logt in met dit e-mailadres.
+        browse_bike_book: Bekijk het fietsboek →
+        check_serials: Raadpleeg het register om de inruil van gebruikte fietsen veilig
+          te stellen.
+        check_serials_lead: Controleer de serienummers voordat u koopt.
+        check_your_state: Controleer uw staat →
+        connect_pos_body: Zonder een koppeling met een kassasysteem is het registreren
+          van fietsen afhankelijk van iemand die eraan denkt om het te doen tijdens
+          een drukke dag. Zodra je de koppeling maakt, wordt elke fietsverkoop automatisch
+          een Bike Index-registratie op de achtergrond. Geen extra formulieren aan
+          de kassa en geen personeelstraining nodig. Je klant ontvangt een e-mail
+          om zijn of haar fiets op te halen, met het serienummer en de gegevens al
+          ingevuld.
+        connect_pos_footnote: Hulp nodig? Beantwoord deze e-mail en we helpen je verder.
+          Geen ondersteund kassasysteem? Je kunt fietsen nog steeds registreren via
+          je dashboard.
+        connect_pos_heading: Sluit je kassasysteem aan, zodat geen enkele fiets over
+          het hoofd wordt gezien.
+        connect_pos_impact: Hoe meer fietsen er geregistreerd worden, hoe meer gestolen
+          fietsen herkend en teruggevonden worden, en hoe moeilijker het wordt om
+          gestolen fietsen in je buurt te verkopen.
+        connect_your_pos_now: Sluit uw kassasysteem nu aan.
+        create_your_shop_account: Maak uw winkelaccount aan
+        dashboard_intro: Je winkelaccount is meer dan alleen een aanmelding. Het is
+          je thuisbasis op Bike Index.
+        dashboard_items_heading: Wat je kunt doen vanaf je dashboard
+        ebike_checker: E-bike controleur
+        ebike_checker_body: De regels voor e-bikes verschillen per staat, met betrekking
+          tot de toegestane categorieën, de rijomstandigheden en de vereiste leeftijd
+          en uitrusting. Handig wanneer een klant vraagt wat legaal is voordat hij
+          of zij een e-bike koopt.
+        email_preferences: E-mailvoorkeuren
+        free_tools: Er komen nieuwe exemplaren aan, en winkelaccounts ontvangen ze
+          als eerste.
+        free_tools_heading: Hulpmiddelen om klanten te helpen bij hun keuze.
+        free_tools_intro: Gebruik ze in de winkel of stuur de link naar de klanten.
+        free_tools_lead: Gebruik onze gratis tools.
+        hero_body: "%{name} is ingesteld op Bike Index. Op je dashboard vind je alle
+          fietsen die in je winkel geregistreerd staan."
+        hero_body_connect_pos: "%{name} is ingesteld op Bike Index. Op je dashboard
+          vind je alle fietsen die je winkel registreert. Nog één stap: koppel je
+          kassasysteem zodat elke fiets die je verkoopt automatisch wordt geregistreerd."
+        hero_heading: Je bent binnen. Je winkel heeft een dashboard.
+        included_free: Inbegrepen gratis
+        most_important_next_step: Uw belangrijkste volgende stap
+        nonprofit: Bike Index, een 501(c)(3) non-profitorganisatie
+        open_your_dashboard: Open je dashboard
+        preheader: Je winkeldashboard is live. Elke fiets die je winkel registreert,
+          staat daar.
+        preheader_connect_pos: 'Je winkeldashboard is live. Nog één stap: koppel je
+          kassasysteem zodat elke fiets die je verkoopt geregistreerd wordt.'
+        privacy_policy: Privacybeleid
+        questions: Heeft u vragen over de installatie of uw dashboard? Beantwoord
+          deze e-mail en een medewerker van onze klantenservice helpt u graag verder.
+        receiving_because: Je ontvangt dit bericht omdat je een winkelaccount hebt
+          aangemaakt voor %{name} op Bike Index.
+        see_every_bike: Elke verkoop wordt in één lijst weergegeven, met serienummer
+          en details.
+        see_every_bike_lead: Bekijk alle fietsen die je hebt geregistreerd.
+        shopify_soon: Shopify binnenkort
+        stat_bikes: geregistreerde fietsen
+        stat_partners: partnerwinkels, politie en steden
+        stat_recoveries: Gestolen fietsen teruggevonden
+        sticker_pos_step: Uw kassasysteem aansluiten · duurt ongeveer 10 minuten
+        track_pos: 'Zie hoe het werkt: elke verkoop wordt geregistreerd.'
+        track_pos_lead: Houd uw POS-verbinding in de gaten.
+        why_shops_body: Uw klanten krijgen gratis diefstalbescherming en u wordt een
+          winkel die ze vertrouwen. Het is gratis voor u en voor hen, en we verkopen
+          of delen nooit klantgegevens.
+        why_shops_heading: Waarom winkels Bike Index gebruiken
     ui:
       definition_list:
         row:

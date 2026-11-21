@@ -4826,6 +4826,8 @@ es:
       subject: Mensaje de %{organization_name} sobre tu %{bike_type}
     organization_signup_confirmation:
       subject: Confirma tu correo electrónico para activar %{name} en Bike Index.
+    shop_welcome:
+      subject: El panel de control de tu tienda Bike Index está listo.
   payments:
     form:
       donation_header: "¡Ayúdanos a apoyar nuestros esfuerzos!"
@@ -5490,6 +5492,79 @@ es:
           podrás invitar al resto de tu equipo una vez que hayas iniciado sesión.
         link_signs_you_in: Este enlace te da acceso a Bike Index, así que no lo reenvíes.
           Funciona durante %{days} días.
+      shop_welcome:
+        bike_book_body: Compara las especificaciones, la geometría y muchas otras
+          características de miles de modelos de bicicletas.
+        bookmark_it: Guárdalo en tus favoritos. Iniciarás sesión con esta dirección
+          de correo electrónico.
+        browse_bike_book: Explorar el libro de bicicletas →
+        check_serials: Consulta el registro para mantener seguras las bicicletas usadas
+          que entregues como parte de pago.
+        check_serials_lead: Compruebe los números de serie antes de comprar.
+        check_your_state: Comprueba tu estado →
+        connect_pos_body: Sin conexión a un sistema de punto de venta, registrar las
+          bicicletas depende de que alguien se acuerde de hacerlo durante un día ajetreado.
+          Una vez conectado, cada venta de bicicleta se registra automáticamente en
+          Bike Index. No se necesitan formularios adicionales en el mostrador ni capacitación
+          para el personal. El cliente recibe un correo electrónico para reclamar
+          su bicicleta, con el número de serie y los detalles ya completados.
+        connect_pos_footnote: "¿Necesitas ayuda? Responde a este correo electrónico
+          y te guiaremos. ¿No tienes un TPV compatible? Aún puedes registrar las bicicletas
+          desde tu panel de control."
+        connect_pos_heading: Conecta tu TPV para que no se pierda ninguna bicicleta.
+        connect_pos_impact: Cuantas más bicicletas se registren, más bicicletas robadas
+          se identificarán y se devolverán, y más difícil será vender bicicletas robadas
+          en tu comunidad.
+        connect_your_pos_now: Conecta tu TPV ahora
+        create_your_shop_account: Crea tu cuenta de tienda
+        dashboard_intro: Tu cuenta de tienda es más que un simple registro. Es tu
+          base de operaciones en Bike Index.
+        dashboard_items_heading: Qué puedes hacer desde tu panel de control
+        ebike_checker: comprobador de bicicletas eléctricas
+        ebike_checker_body: Normativa estatal sobre las categorías de bicicletas eléctricas,
+          dónde se pueden usar y requisitos de edad y equipamiento. Muy útil cuando
+          un cliente pregunta qué es legal antes de comprar.
+        email_preferences: Preferencias de correo electrónico
+        free_tools: Pronto habrá novedades, y las cuentas de tienda serán las primeras
+          en recibirlas.
+        free_tools_heading: Herramientas para ayudar a los clientes a elegir
+        free_tools_intro: Úselas en la sala de ventas o envíe el enlace a los clientes.
+        free_tools_lead: Utilice nuestras herramientas gratuitas.
+        hero_body: "%{name} está configurado en Bike Index. En tu panel de control
+          se encuentra cada bicicleta registrada en tu tienda."
+        hero_body_connect_pos: "%{name} está configurado en Bike Index. En tu panel
+          de control se almacenan todas las bicicletas registradas en tu tienda. Solo
+          queda un paso: conecta tu TPV para que cada bicicleta que vendas se registre
+          automáticamente."
+        hero_heading: Ya estás dentro. Tu tienda tiene un panel de control.
+        included_free: Incluido gratis
+        most_important_next_step: Su próximo paso más importante
+        nonprofit: Bike Index, una organización sin fines de lucro 501(c)(3)
+        open_your_dashboard: Abre tu panel de control
+        preheader: El panel de control de tu tienda ya está disponible. Todas las
+          bicicletas registradas en tu tienda aparecen allí.
+        preheader_connect_pos: 'El panel de control de tu tienda ya está activo. Solo
+          queda un paso: conecta tu TPV para que todas las bicicletas que vendas queden
+          registradas.'
+        privacy_policy: Política de privacidad
+        questions: "¿Tienes preguntas sobre la configuración o tu panel de control?
+          Responde a este correo electrónico y un miembro de nuestro equipo de atención
+          al cliente te ayudará."
+        receiving_because: Recibes este mensaje porque creaste una cuenta de tienda
+          para %{name} en Bike Index.
+        see_every_bike: Cada venta aparece en una lista, con número de serie y detalles.
+        see_every_bike_lead: Vea todas las bicicletas que ha registrado.
+        shopify_soon: Shopify próximamente
+        stat_bikes: bicicletas matriculadas
+        stat_partners: tiendas asociadas, policía y ciudades
+        stat_recoveries: Recuperan bicicletas robadas
+        sticker_pos_step: Conecta tu TPV · aproximadamente 10 minutos
+        track_pos: Observa cómo funciona a medida que se registra cada venta.
+        track_pos_lead: Realice un seguimiento de su conexión de punto de venta.
+        why_shops_body: Tus clientes obtienen protección antirrobo gratuita y tu tienda
+          se convierte en un lugar de confianza. Es gratis tanto para ti como para
+          ellos, y nunca vendemos ni compartimos datos de clientes.
+        why_shops_heading: "¿Por qué las tiendas utilizan Bike Index?"
     ui:
       definition_list:
         row:
