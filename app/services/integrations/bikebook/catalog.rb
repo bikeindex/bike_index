@@ -62,10 +62,15 @@ module Integrations
       # so it keeps while it's published
       def file(path) = cached(["bikebook_catalog/file", 2, path], path, expires_in: 1.week)
 
-      # The models of the block `id` is in, by id, empty for one the catalog hasn't. nil while the catalog doesn't answer
+      # The models of the block `id` is in, by id, each type schema 2.0.0's, empty for one the catalog hasn't. nil while the
+      # catalog doesn't answer
       def block_models(id)
         block = manifest&.dig("blocks", id.to_s[MODEL_ID, 1])
-        block ? file(block)&.then { Integrations::Bikebook::MarketVariants.expand(it["models"]) } : {}
+        return {} unless block
+
+        file(block)&.then do |published|
+          Integrations::Bikebook::MarketVariants.expand(published["models"]).transform_values { it.merge("type" => current_slug(it["type"])) }
+        end
       end
 
       # Schema 2.0.0's ids are dashed. An older catalog's are underscored and never dashed, so they read as 2.0.0's

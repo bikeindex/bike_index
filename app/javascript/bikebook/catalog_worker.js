@@ -52,10 +52,11 @@ const fetchJson = async (url) => {
 // Integrations::Bikebook::Catalog.dashed_ids reads them
 // TODO: once the published catalog is at 2.0.0, remove this
 const CATALOG_ID = /^(?:(?:m|c|evc)\/[a-z0-9_/-]+|[a-z0-9_-]+\/\d{4})$/
+const dashed = (value) => typeof value === 'string' ? value.replaceAll('_', '-') : value
 const dashedIds = (value) => {
   if (Array.isArray(value)) return value.map(dashedIds)
   if (value && typeof value === 'object') return Object.fromEntries(Object.entries(value).map(([key, each]) => [dashedIds(key), dashedIds(each)]))
-  return typeof value === 'string' && CATALOG_ID.test(value) ? value.replaceAll('_', '-') : value
+  return typeof value === 'string' && CATALOG_ID.test(value) ? dashed(value) : value
 }
 const fetchCatalog = (url) => fetchJson(url).then(dashedIds)
 
@@ -77,22 +78,18 @@ const RENAMED = {
   carbon: 'composite',
   wood: 'organic'
 }
-const dashed = (value) => typeof value === 'string' ? value.replaceAll('_', '-') : value
 const currentSlug = (value) => Array.isArray(value) ? value.map(currentSlug) : RENAMED[value] ?? dashed(value)
-const SLUGGED = {
-  type: currentSlug,
-  type_detail: currentSlug,
-  primary_activity: currentSlug,
-  drivetrain: currentSlug,
-  frame: (frame) => frame.material ? { ...frame, material: currentSlug(frame.material) } : frame,
-  components: (components) => Array.isArray(components) ? components.map((each) => ({ ...each, type: currentSlug(each.type) })) : components
+// each a record's field, or a field of what it holds, and the vocabulary naming it
+const SLUGGED = ['type', 'type_detail', 'primary_activity', 'drivetrain', 'frame.material', 'components.type']
+const withSlug = (record, [key, field]) => {
+  const value = record[key]
+  if (value == null) return record
+  if (!field) return { ...record, [key]: currentSlug(value) }
+  return { ...record, [key]: Array.isArray(value) ? value.map((each) => withSlug(each, [field])) : withSlug(value, [field]) }
 }
-const withCurrentSlugs = (record) => Object.fromEntries(Object.entries(record).map(([key, value]) => [key, value != null && SLUGGED[key] ? SLUGGED[key](value) : value]))
-const NAMED = ['type', 'type_detail', 'primary_activity', 'drivetrain', 'frame.material', 'components.type']
-const withCurrentNames = (names) => ({
-  ...names,
-  ...Object.fromEntries(NAMED.filter((group) => names[group]).map((group) => [group, Object.fromEntries(Object.entries(names[group]).map(([value, name]) => [currentSlug(value), name]))]))
-})
+const withCurrentSlugs = (record) => SLUGGED.reduce((each, path) => withSlug(each, path.split('.')), record)
+const rekeyed = (names) => Object.fromEntries(Object.entries(names).map(([value, name]) => [currentSlug(value), name]))
+const withCurrentNames = (names) => ({ ...names, ...Object.fromEntries(SLUGGED.filter((path) => names[path]).map((path) => [path, rekeyed(names[path])])) })
 
 const list = (value) => (value ?? '').split(',').filter(Boolean)
 const path = (id) => id.replace(/^m\//, '')
@@ -139,29 +136,35 @@ async function load ({ rulesUrl, similarityUrl: similarityModule }) {
   const activityNames = vocabulary.names.primary_activity ?? {}
   const typeNames = Object.fromEntries(index.vehicle_types.map(({ slug, name }) => [slug, name]))
   activities = index.primary_activities
-  models = index.models.map((model, position) => ({
-    ...model,
+  models = index.models.map((model, position) => {
     // field by field, as walking the whole index takes three times its parse
-    id: dashedIds(model.id),
-    manufacturer: dashed(model.manufacturer),
-    primary_activity: currentSlug(model.primary_activity),
-    vehicle_type: currentSlug(model.vehicle_type),
-    e_vehicle_classifications: dashedIds(model.e_vehicle_classifications),
-    variants: dashedIds(model.variants),
-    position,
-    // an extension at its own path, or the whole URL of a photo it shares with another model, by its published id
-    stock_photo: model.photo && (model.photo.includes('://') ? model.photo : `${index.stock_photos}/${path(model.id)}.${model.photo}`),
-    activity_name: activityNames[currentSlug(model.primary_activity)],
-    type_name: typeNames[currentSlug(model.vehicle_type)],
-    // by its maker, as makers share names, and its first word where it has no group
-    group_key: `${dashed(model.manufacturer)}/${model.model_group ?? model.model.split(' ')[0]}`,
-    searchText: `${model.display}\n${dashedIds(model.id)}`.toLowerCase(),
-    // a current model's first year where it's sold ahead of the calendar
-    sortYear: model.final_year ?? Math.max(model.first_year, currentYear),
-    // drawn per worker, which each page load starts, and again by `rotate`, so a reload features others and the page's
-    // own changes the same
-    chance: Math.random()
-  }))
+    const id = dashedIds(model.id)
+    const manufacturer = dashed(model.manufacturer)
+    const activity = currentSlug(model.primary_activity)
+    const type = currentSlug(model.vehicle_type)
+    return {
+      ...model,
+      id,
+      manufacturer,
+      primary_activity: activity,
+      vehicle_type: type,
+      e_vehicle_classifications: dashedIds(model.e_vehicle_classifications),
+      variants: dashedIds(model.variants),
+      position,
+      // an extension at its own path, or the whole URL of a photo it shares with another model, by its published id
+      stock_photo: model.photo && (model.photo.includes('://') ? model.photo : `${index.stock_photos}/${path(model.id)}.${model.photo}`),
+      activity_name: activityNames[activity],
+      type_name: typeNames[type],
+      // by its maker, as makers share names, and its first word where it has no group
+      group_key: `${manufacturer}/${model.model_group ?? model.model.split(' ')[0]}`,
+      searchText: `${model.display}\n${id}`.toLowerCase(),
+      // a current model's first year where it's sold ahead of the calendar
+      sortYear: model.final_year ?? Math.max(model.first_year, currentYear),
+      // drawn per worker, which each page load starts, and again by `rotate`, so a reload features others and the page's
+      // own changes the same
+      chance: Math.random()
+    }
+  })
   // a market variant is its base's row under its own id and markets
   const variants = models.flatMap((model) => model.variants.map(({ id, markets }) => [{ ...model, id, markets, variants: [] }, model]))
   bases = new Map(variants.map(([variant, model]) => [variant.id, model]))

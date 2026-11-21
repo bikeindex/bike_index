@@ -767,7 +767,7 @@ class ModelViewer {
   clearances (vehicle = this.vehicle) {
     const groups = new Map()
     for (const wheel of array(vehicle.wheels).filter((each) => each.configured === false)) {
-      const clearance = [wheel.bsd ?? null, wheel?.tire_width_max ?? null]
+      const clearance = [wheel.bsd ?? null, wheel.tire_width_max ?? null]
       const key = JSON.stringify(clearance)
       if (!groups.has(key)) groups.set(key, [...clearance, []])
       groups.get(key)[2].push(...array(wheel.position))
@@ -804,7 +804,7 @@ class ModelViewer {
   // `fitting`: how the wheel fits the frame, its cassette, dropout and axle
   wheelSummary (wheel, { fitting = true } = {}) {
     const summary = join(this.wheelParts(wheel, { fitting }).map(([, content]) => content), ', ')
-    const max = wheel?.tire_width_max
+    const max = wheel.tire_width_max
     return max != null ? join([summary, this.tireWidthSummary(max, 'tire max')], html`<br>`) : summary
   }
 
@@ -854,7 +854,7 @@ class ModelViewer {
   // "2.4 in tire max", or "2.4 in front, 2.6 in rear tire max"
   tireMax () {
     const [front, rear] = ['front', 'rear'].map((position) =>
-      highest(this.builtWheels().filter((wheel) => array(wheel.position).includes(position)).map((wheel) => wheel?.tire_width_max)))
+      highest(this.builtWheels().filter((wheel) => array(wheel.position).includes(position)).map((wheel) => wheel.tire_width_max)))
     if (front === rear) return front == null ? null : this.tireWidthSummary(front, 'tire max')
 
     const widths = compact([front != null ? join([this.tireWidthSummary(front, ''), ' front']) : null, rear != null ? join([this.tireWidthSummary(rear, ''), ' rear']) : null])
@@ -871,7 +871,7 @@ class ModelViewer {
   brakeSummary (brake) {
     const typeAndRotor = presence(join(compact([brakeType(brake), this.millimeters(brake.rotor_diameter, ' rotor')]), ', '))
     const summary = join(compact([this.onSizes(typeAndRotor, brake.sizes), presence(brake.caliper_mount?.replace(/^Disc /, '')), brake.anti_lock ? 'ABS' : null]), ', ')
-    const max = brake?.rotor_diameter_max
+    const max = brake.rotor_diameter_max
     return max != null ? join([summary, this.millimeters(max, ' rotor max')], html`<br>`) : summary
   }
 

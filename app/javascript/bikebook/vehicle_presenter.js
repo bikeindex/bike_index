@@ -80,7 +80,7 @@ export class VehiclePresenter {
     }))
   }
 
-  // TODO: once the catalog publishes its 1.0.0 kit, whose mounts have an interface field, `named` names it and this goes
+  // TODO: once the vocabulary names frame.mounts.interface, `named` names it and this goes
   interfaceName (slug) {
     return this.vocabulary.names[INTERFACES][slug] ?? slug
   }

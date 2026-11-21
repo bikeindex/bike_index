@@ -28,7 +28,7 @@ module EbikeRuleServices
         manufacturer_name: record["manufacturer"],
         model: record["model"],
         first_year: record["first_year"],
-        vehicle_type: Integrations::Bikebook::Catalog.current_slug(record["type"]) || "bike",
+        vehicle_type: record["type"] || "bike",
         e_bike_class: e_bike_class(tiers, modes, throttle_modes),
         class_unknown: tiers.none? && mph(modes).nil?,
         e_vehicle_classifications: classifications,
