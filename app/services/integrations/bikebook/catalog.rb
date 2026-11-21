@@ -74,9 +74,11 @@ module Integrations
         end
       end
 
-      # Each schema document's fields, with the count of models holding each value and a few of them
-      # TODO: read the catalog's published file, file(manifest["schema_viewer"]), once it publishes one
-      def schema_viewer = JSON.parse(SCHEMA_VIEWER.read)
+      # Each schema document's fields, with the count of models holding each value and a few of them, and the digest
+      # of its contents that its rendering is cached under
+      # TODO: read the catalog's published file, file(manifest["schema_viewer"]), once it publishes one, whose name
+      # carries its digest
+      def schema_viewer = SCHEMA_VIEWER.read.then { {**JSON.parse(it), "digest" => Digest::SHA256.hexdigest(it)} }
 
       # Schema 2.0.0's ids are dashed. An older catalog's are underscored and never dashed, so they read as 2.0.0's
       # TODO: once the published catalog is at 2.0.0, remove this

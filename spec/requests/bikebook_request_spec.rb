@@ -377,6 +377,31 @@ RSpec.describe BikebookController, type: :request do
         ActionController::Base.cache_store = :null_store
       end
 
+      context "when a new schema file is published" do
+        let(:published) { Pathname(Dir.mktmpdir).join("bikebook_schema_viewer.json") }
+        let(:viewer) { Integrations::Bikebook::Catalog.schema_viewer.except("digest") }
+        # the same published_at, so only its contents tell the two apart
+        let(:republished) { viewer.deep_merge("documents" => {"vehicle_model" => {"fields" => {"manufacturer" => {"models_count" => 12_345_678}}}}) }
+
+        before do
+          published.write(viewer.to_json)
+          stub_const("Integrations::Bikebook::Catalog::SCHEMA_VIEWER", published)
+        end
+
+        it "renders the new file's counts rather than the cached ones" do
+          # model and first_year fill as many models as manufacturer does
+          old_badge = "button[aria-label='#{ActiveSupport::NumberHelper.number_to_delimited(manufacturer_count)} models']"
+          get "/bikebook/schema_viewer"
+          old_badges = Capybara.string(response.body).all(old_badge).count
+
+          published.write(republished.to_json)
+          get "/bikebook/schema_viewer"
+
+          expect(Capybara.string(response.body)).to have_css("button[aria-label='12,345,678 models']")
+            .and have_css(old_badge, count: old_badges - 1)
+        end
+      end
+
       it "renders a field the URL opens anything in afresh, rather than as cached closed" do
         get "/bikebook/schema_viewer"
         expect(Capybara.string(response.body)).to have_css("details:not([open])[data-schema-path='type']")

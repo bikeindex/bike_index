@@ -4,7 +4,7 @@ module Pages
   module Bikebook
     module SchemaFields
       # One level of a schema document's fields, rendering its objects' fields beneath them.
-      # cache_key: the published file's and the document's, under which each field nothing is opened in is cached
+      # cache_key: the published file's digest and the document, under which each field nothing is opened in is cached
       class Component < ApplicationComponent
         # an enum longer than this shows its first few values until opened
         INLINE_ENUM_LIMIT = 6
