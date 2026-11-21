@@ -408,12 +408,12 @@ RSpec.describe BikebookController, type: :request do
       it "caches a field's fields inside its fragment, and on their own only where it renders afresh" do
         written = []
         record = ->(*, payload) { written << payload[:key].to_s }
-        ActiveSupport::Notifications.subscribed(record, "cache_write.active_support") { get "/bikebook/schema_viewer" }
+        ActiveSupport::Notifications.subscribed(record, "cache_write.active_support") { get "/bikebook_schema" }
         expect(written.count { it.include?("/frame/") }).to eq 1
         expect(written.count { it.include?("/frame.mounts/") }).to eq 0
 
         written.clear
-        ActiveSupport::Notifications.subscribed(record, "cache_write.active_support") { get "/bikebook/schema_viewer", params: {open: "frame"} }
+        ActiveSupport::Notifications.subscribed(record, "cache_write.active_support") { get "/bikebook_schema", params: {open: "frame"} }
         expect(written.count { it.include?("/frame.mounts/") }).to eq 1
       end
 
