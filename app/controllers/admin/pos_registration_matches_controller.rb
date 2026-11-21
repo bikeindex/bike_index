@@ -5,7 +5,7 @@ module Admin
     def index
       @per_page = permitted_per_page(default: 50)
       @pagy, @collection = pagy(:countish,
-        matching_pos_registration_matches.includes(:pos_bike, bike: {current_ownership: :user}).reorder(sortable_order(PosRegistrationMatch)),
+        matching_pos_registration_matches.includes(:pos_bike, :merger, bike: {current_ownership: :user}).reorder(sortable_order(PosRegistrationMatch)),
         limit: @per_page,
         page: permitted_page)
     end
@@ -15,7 +15,7 @@ module Admin
     protected
 
     def sortable_columns
-      %w[created_at updated_at status]
+      %w[created_at updated_at status merged_at]
     end
 
     def earliest_period_date

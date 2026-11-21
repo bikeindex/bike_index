@@ -28,16 +28,22 @@ module Pages
             @organization ||= @b_param.creation_organization
           end
 
+          def named_organization? = !@embed && organization.present?
+
           # The step is still asking what's being registered, so the heading can't name the
           # type. Framed, the page around it already says whose registration this is
           def heading_text
-            return translation(".register_your_vehicle") if @embed || organization.blank?
+            return translation(".register_your_vehicle") unless named_organization?
 
-            translation(".register_your_vehicle_with_org", org_name: organization.short_name)
+            translation(".register_your_vehicle_with_org_html", org_name: organization.name)
           end
 
-          # The card's heading sits under the page's h1, at the same size
-          def heading_options = @bare ? {tag: :h2, html_class: "tw:text-2xl!"} : {}
+          # The card's heading sits under the page's h1, at the same size. Named, the organization
+          # is the only bold part, since the heading is already as heavy as it goes
+          def heading_options
+            weight = "tw:font-normal! tw:[&_strong]:font-extrabold" if named_organization?
+            @bare ? {tag: :h2, html_class: "tw:text-2xl! #{weight}"} : {html_class: weight}
+          end
 
           def subtitle
             translation(".just_the_essentials") unless @flow.single_page?
