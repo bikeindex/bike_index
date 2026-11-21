@@ -3,7 +3,8 @@
 module Integrations
   module Bikebook
     # From schema 1.1.0, a market's model sits in its home market's record, under `market_variants` keyed by the market
-    # suffixing its id ("CA" is m/specialized/2025/haul_st_ca), as what differs from it. Before, it's a record of its own.
+    # suffixing its id ("CA" is m/specialized/2025/haul_st_ca, from 2.0.0 m/specialized/2025/haul-st-ca), as what
+    # differs from it. Before, it's a record of its own.
     # catalog_worker.js expands them the same way
     module MarketVariants
       extend Functionable
@@ -22,7 +23,7 @@ module Integrations
         models.flat_map do |id, record|
           home = record.except(KEY)
           variants = record[KEY].to_h.map do |market, changes|
-            variant_id = "#{id}_#{market.downcase}"
+            variant_id = "#{id}#{(record["schema_version"].to_i >= 2) ? "-" : "_"}#{market.downcase}"
             [variant_id, merge(home, changes).merge("id" => variant_id)]
           end
           [[id, home], *variants]

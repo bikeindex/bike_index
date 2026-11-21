@@ -184,7 +184,7 @@ const except = (record, key) => Object.fromEntries(Object.entries(record).filter
 const withMarketVariants = (models) => Object.fromEntries(Object.entries(models).flatMap(([id, record]) => {
   const home = except(record, 'market_variants')
   return [[id, home], ...Object.entries(record.market_variants ?? {}).map(([market, changes]) => {
-    const variantId = `${id}_${market.toLowerCase()}`
+    const variantId = `${id}${parseInt(record.schema_version) >= 2 ? '-' : '_'}${market.toLowerCase()}`
     return [variantId, { ...merged(home, changes), id: variantId }]
   })]
 }))
