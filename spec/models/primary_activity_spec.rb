@@ -39,6 +39,8 @@ RSpec.describe PrimaryActivity, type: :model do
       let(:name) { "All Road" }
       it "is the name with the family" do
         expect(primary_activity.reload.primary_activity_family.short_name).to eq "ATB"
+        expect(primary_activity_family.slug).to eq "atb"
+        expect(primary_activity.slug).to eq "atb-all-road"
         expect(primary_activity.display_name).to eq "ATB: All Road"
         expect(primary_activity.display_name_search).to eq "ATB: ONLY All Road"
         expect(PrimaryActivity.friendly_find_id("ATB")).to eq primary_activity_family.id
