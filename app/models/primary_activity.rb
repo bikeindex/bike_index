@@ -145,7 +145,8 @@ class PrimaryActivity < ApplicationRecord
 
   def set_calculated_attributes
     self.name = name&.strip
-    self.slug = Slugifyer.slugify(display_name)
+    # Everything from the parenthetical on is a gloss: "ATB (All Terrain Biking) — Gravel, Cyclocross, etc." is atb
+    self.slug = Slugifyer.slugify(display_name.sub(/\s?\(.*/, ""))
     self.priority ||= calculated_priority
     # If it doesn't have a family, assign primary_activity_family_id to its own ID, so it's searchable
     # EVEN if it's a flavor
