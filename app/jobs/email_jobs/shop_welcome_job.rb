@@ -7,7 +7,7 @@ module EmailJobs
     def perform(organization_id, user_id)
       organization = Organization.find_by(id: organization_id)
       user = User.find_by(id: user_id)
-      return if organization.blank? || user.blank? || !organization.bike_shop?
+      return unless organization&.bike_shop? && user
 
       # One per organization, so a retry (or a second enqueue) resumes the same delivery
       notification = Notification.find_or_create_by(kind: "shop_welcome", notifiable: organization) { it.user = user }

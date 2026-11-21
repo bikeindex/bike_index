@@ -41,12 +41,11 @@ class OrganizedMailer < ApplicationMailer
     end
   end
 
-  # Replies go to Bike Index rather than the shop's auto user, which is who `reply_to` would pick
   def shop_welcome(organization, user)
     component = Emails::ShopWelcome::Component.new(organization:)
 
     I18n.with_locale(user.preferred_language) do
-      mail(reply_to: CONTACT_EMAIL, to: user.email, subject: I18n.t("organized_mailer.shop_welcome.subject"),
+      mail(reply_to:, to: user.email, subject: I18n.t("organized_mailer.shop_welcome.subject"),
         tag: __callee__) { |format| format.html { render component } }
     end
   end

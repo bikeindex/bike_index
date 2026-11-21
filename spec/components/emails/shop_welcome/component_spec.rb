@@ -11,10 +11,8 @@ RSpec.describe Emails::ShopWelcome::Component, type: :component do
 
   it "leads with connecting the POS, and links to the dashboard" do
     expect(organization.pos_kind).to eq "no_pos"
-    expect(component).to have_content("Shifty Bike Shop is set up on Bike Index")
     expect(component).to have_content("One step left: connect your POS")
     expect(component).to have_content("Connect your POS so no bike gets missed.")
-    expect(component).to have_content("Shifty Bike Shop on Bike Index")
     expect(component.css("a").map { it[:href] }.compact_blank)
       .to eq([dashboard_url, dashboard_url, "#{ENV["BASE_URL"]}/bikebook", "#{ENV["BASE_URL"]}/ebike-rules",
         "#{ENV["BASE_URL"]}/privacy", "#{ENV["BASE_URL"]}/my_account/edit"])

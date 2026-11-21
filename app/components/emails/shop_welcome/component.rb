@@ -2,12 +2,8 @@
 
 module Emails
   module ShopWelcome
-    # The body of the email layout, so the banner, sign-off and footer are the layout's. Table
-    # markup and inline styles, because email clients ignore most else - only stacking on a
-    # narrow screen is a class, in email_components.scss
+    # The body of the email layout, which supplies the banner, sign-off and footer
     class Component < ApplicationComponent
-      FONT = "font-family:Arial,Helvetica,sans-serif;mso-line-height-rule:exactly;"
-
       def initialize(organization:)
         @organization = organization
       end
@@ -15,7 +11,7 @@ module Emails
       private
 
       def font_style(size, line, color, weight: nil, extra: nil)
-        "#{FONT}font-size:#{size}px;line-height:#{line}px;color:#{color};#{"font-weight:#{weight};" if weight}#{extra}"
+        "font-family:Arial,Helvetica,sans-serif;mso-line-height-rule:exactly;font-size:#{size}px;line-height:#{line}px;color:#{color};#{"font-weight:#{weight};" if weight}#{extra}"
       end
 
       # Hidden when the dashboard won't show its POS callout either
@@ -23,12 +19,11 @@ module Emails
 
       def dashboard_url = organization_root_url(organization_id: @organization.to_param)
 
-      # The POS step is the one big button when there is one
       def dashboard_link
         text = translation("open_your_dashboard")
         return link_to(text, dashboard_url, class: "binx-button") unless connect_pos?
 
-        link_to(safe_join([text, "→"], " "), dashboard_url, style: font_style(16, 24, "#016EC2", weight: 700))
+        link_to("#{text} →", dashboard_url, style: font_style(16, 24, "#016EC2", weight: 700))
       end
 
       def preheader = connect_pos? ? translation("preheader_connect_pos") : translation("preheader")
@@ -37,7 +32,6 @@ module Emails
         connect_pos? ? translation("hero_body_connect_pos", name: @organization.name) : translation("hero_body", name: @organization.name)
       end
 
-      # The name, and whether it's live
       def pos_chips = [["Lightspeed", true], ["Ascend", true], [translation("shopify_soon"), false]]
 
       def dashboard_items
