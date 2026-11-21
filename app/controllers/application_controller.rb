@@ -17,6 +17,8 @@ class ApplicationController < ActionController::Base
   rescue_from ActionController::InvalidAuthenticityToken, with: :handle_unverified_request
   # IpSpoofAttackFilter returns the same 403, but only after the request log records the raise as a 500
   rescue_from ActionDispatch::RemoteIp::IpSpoofAttackError, with: :forbid_ip_spoof
+  # An explicit render raises this where an implicit one raises the UnknownFormat Honeybadger ignores
+  rescue_from ActionView::MissingTemplate, with: :not_acceptable_unless_html
 
   def allow_x_frame
     SecureHeaders.opt_out_of_header(request, :x_frame_options)
@@ -68,6 +70,12 @@ class ApplicationController < ActionController::Base
 
   def forbid_ip_spoof
     render plain: "Forbidden", status: :forbidden
+  end
+
+  def not_acceptable_unless_html(exception)
+    raise exception if lookup_context.formats.include?(:html)
+
+    head :not_acceptable
   end
 
   def user_for_paper_trail

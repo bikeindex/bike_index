@@ -13,15 +13,6 @@ RSpec.describe UsersController, type: :request do
       expect(Capybara.string(response.body)).to have_css("[data-controller='ui--forms--email'] input#user_email")
     end
 
-    context "requesting json" do
-      it "renders the html form" do
-        get "#{base_url}/new", headers: {"Accept" => "application/json"}
-        expect(response).to have_http_status(:ok)
-        expect(response.media_type).to eq "text/html"
-        expect(response).to render_template(:new)
-      end
-    end
-
     context "with partner param" do
       it "assigns the email, stores return_to and renders the partner layout" do
         get "#{base_url}/new", params: {email: "seth@bikes.com", return_to: "/bikes/12?contact_owner=true", partner: "bikehub"}

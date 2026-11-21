@@ -1,7 +1,6 @@
 class UsersController < ApplicationController
   include Sessionable
 
-  before_action :force_html_response
   before_action :skip_if_signed_in, only: %i[new]
   # An SSO org owns its domain's accounts, so signing up and asking for a password reset are
   # the IdP's job too — otherwise the sign-in guard is bypassed by whatever link or bookmark
