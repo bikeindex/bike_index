@@ -36,7 +36,7 @@ class OrganizationSignup < ApplicationRecord
 
   enum :kind, Organization::KIND_ENUM
   # What a shop said it uses, rather than Organization#pos_kind's integration status
-  enum :pos_kind, {lightspeed_pos: 0, ascend_pos: 1, shopify_pos: 2, other_or_no_pos: 3}
+  enum :pos_kind, {lightspeed_pos: 0, ascend_pos: 1, shopify_pos: 2, other_or_none_pos: 3}
 
   belongs_to :organization
 

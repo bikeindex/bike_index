@@ -55,7 +55,7 @@ module OrgServices
       end
       signup.email_confirmed_at ||= Time.current if user&.confirmed?
       signup.assign_attributes(name:, email:, kind: (kind if Organization.user_creatable_kinds.include?(kind)),
-        pos_kind: (pos_kind if OrganizationSignup.pos_kinds.key?(pos_kind)), likely_spam: signup.likely_spam || additional.present?)
+        pos_kind: (OrganizationSignup.pos_kinds.key?(pos_kind) ? pos_kind : signup.pos_kind), likely_spam: signup.likely_spam || additional.present?)
       start_errors(signup).each { signup.errors.add(:base, it) }
       signup.errors.none? && signup.save
     end
@@ -118,7 +118,8 @@ module OrgServices
       end
       return organization unless organization.persisted?
 
-      AdminNotifier.new.for_organization(organization:, user:, type: "organization_created", pos_kind: signup.pos_kind)
+      AdminNotifier.new.for_organization(organization:, user:, type: "organization_created",
+        details: ("POS: #{signup.pos_kind.delete_suffix("_pos").humanize}" if signup.pos_kind))
       organization
     end
 

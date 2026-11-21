@@ -44,6 +44,16 @@ RSpec.describe OrgServices::Signup do
         email: "org_admin@bikeindex.org", pos_kind: "ascend_pos", likely_spam: false)
     end
 
+    context "a POS already saved, and none sent" do
+      let(:organization_signup) { FactoryBot.create(:organization_signup, email: nil, pos_kind: "shopify_pos") }
+      let(:start_params) { {name: "Shifty Bike Shop", kind: "bike_shop", email: "org_admin@bikeindex.org"} }
+
+      it "keeps it" do
+        expect(saved).to be_truthy
+        expect(organization_signup.reload.pos_kind).to eq "shopify_pos"
+      end
+    end
+
     context "missing everything" do
       let(:start_params) { {name: " ", kind: "ambassador", email: "not-an-email", pos_kind: "square_pos"} }
 
@@ -52,7 +62,6 @@ RSpec.describe OrgServices::Signup do
         expect(organization_signup.errors.full_messages).to match_array(["Organization name is required",
           "Please choose what kind of organization this is", "A valid email is required"])
         expect(organization_signup.reload.name).to be_nil
-        expect(organization_signup.pos_kind).to be_nil
       end
     end
 
@@ -230,11 +239,11 @@ RSpec.describe OrgServices::Signup do
     end
 
     context "with a POS" do
-      let(:organization_signup) { FactoryBot.create(:organization_signup_details_completed, pos_kind: "lightspeed_pos") }
+      let(:organization_signup) { FactoryBot.create(:organization_signup_details_completed, pos_kind: "other_or_none_pos") }
 
       it "tells the admins which" do
         described_class.complete(organization_signup, user:)
-        expect(Feedback.last.body).to eq "Shifty Bike Shop created an account. POS: Lightspeed"
+        expect(Feedback.last.body).to eq "Shifty Bike Shop created an account. POS: Other or none"
       end
     end
 

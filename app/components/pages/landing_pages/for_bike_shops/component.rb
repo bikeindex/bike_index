@@ -34,7 +34,7 @@ module Pages
 
         def pos_options
           [[translation(".pos_lightspeed"), "lightspeed_pos"], [translation(".pos_ascend"), "ascend_pos"],
-            [translation(".pos_shopify_coming_soon"), "shopify_pos"], [translation(".pos_other_or_none"), "other_or_no_pos"]]
+            [translation(".pos_shopify_coming_soon"), "shopify_pos"], [translation(".pos_other_or_none"), "other_or_none_pos"]]
         end
 
         def form_data
