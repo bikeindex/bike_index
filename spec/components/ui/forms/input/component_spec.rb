@@ -80,8 +80,10 @@ RSpec.describe UI::Forms::Input::Component, type: :component do
 
     it "renders a text input, with the pattern the server checks" do
       expect(component).to have_css("input[type='text'][autocomplete='postal-code']")
-      expect(["97201", "T6E 2A4", "12345-6789"]).to all(match(pattern))
-      expect("1").to_not match(pattern)
+      expect(["T6E 2A4", "t6e2a4", " K1A 0B1 ", "97201", "12345-6789", "SW1A 1AA", "D02 X285", "1012 AB",
+        "01310-100", "C1420ABC", "100-0001", "LV-1050", "SE-123 45", "12345-67890", "AD100", "100", "CAYMAN KY1-1100"])
+        .to all(match(pattern))
+      expect(["1", "12", "T6E 2A4!", "#97201"].grep(pattern)).to be_empty
     end
   end
 
