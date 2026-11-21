@@ -66,6 +66,7 @@ class CycleType
     recumbent tall-bike tandem trail-behind tricycle unicycle].freeze
   ALWAYS_MOTORIZED = %i[e-scooter personal-mobility e-motorcycle e-atv].freeze
   NEVER_MOTORIZED = %i[non-e-scooter non-e-skateboard trail-behind balance-bike].freeze
+  # Bike Book copies this in its catalog slugs: bikebook/hydrate.js and Pages::EbikeRules::BikeSummary
   NOT_CYCLE_TYPE = %i[e-scooter non-e-skateboard personal-mobility stroller wheelchair e-motorcycle e-atv].freeze
 
   class << self
