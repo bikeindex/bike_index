@@ -36,7 +36,7 @@
     These records share the serial because it was entered in place of a frame
     serial, so it says nothing about whether they are the same bicycle. Treat
     each as its own registration. Part numbers are listed in
-    <span class="tw:font-mono">BikeDuplicatesServices::Cues</span>.
+    <%= render(UI::Code::Inline::Component.new(text: "BikeDuplicatesServices::Cues")) %>.
   <% end %>
 <% end %>
 
