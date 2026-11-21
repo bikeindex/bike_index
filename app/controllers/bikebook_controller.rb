@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class BikebookController < ApplicationController
+  before_action :redirect_to_dashed_ids, only: :show
+
   def show
     entries = Integrations::Bikebook::Catalog.vehicle_entries(params[:vehicle_models])
     model = Integrations::Bikebook::Catalog.vehicle_id(entries.first) if entries.one?
@@ -24,7 +26,7 @@ class BikebookController < ApplicationController
       status: up ? :ok : :service_unavailable
   end
 
-  # /bikebook/m/segway/2025/gt3_pro, or without its m/, or its id alone, /m/segway/2025/gt3_pro, picks that vehicle ahead
+  # /bikebook/m/segway/2025/gt3-pro, or without its m/, or its id alone, /m/segway/2025/gt3-pro, picks that vehicle ahead
   # of any already picked, with what's picked for it there
   def vehicle
     id = "m/#{params[:vehicle_model].delete_prefix("m/")}"

@@ -7,7 +7,7 @@ RSpec.describe Pages::EbikeRules::Reasons::Component, type: :component do
 
   let(:bike) do
     EbikeRuleServices::Bike.new(bikebook_id: "m/trek/2025/verve", manufacturer_name: "Trek", model: "Verve+ 2", first_year: 2025, vehicle_type: "bike",
-      e_bike_class: 3, class_unknown: false, e_vehicle_classifications: ["evc/us/class_3"], optional_classes: {}, watts: 750, peak_watts: nil,
+      e_bike_class: 3, class_unknown: false, e_vehicle_classifications: ["evc/us/class-3"], optional_classes: {}, watts: 750, peak_watts: nil,
       top_assist_mph: 28, top_assist_kmh: 45, assists_past_kmh: nil, throttle: false, stock_throttle: false, throttle_mph: nil, throttle_kmh: nil,
       ul2849: :certified, ul2271: :unknown, photo_url: nil)
   end
@@ -33,7 +33,7 @@ RSpec.describe Pages::EbikeRules::Reasons::Component, type: :component do
 
   context "with an e-moto" do
     let(:bike) do
-      super().with(e_bike_class: nil, e_vehicle_classifications: ["evc/off_highway_motorcycle"], watts: 12_500, top_assist_mph: nil,
+      super().with(e_bike_class: nil, e_vehicle_classifications: ["evc/off-highway-motorcycle"], watts: 12_500, top_assist_mph: nil,
         throttle: true, stock_throttle: true, throttle_mph: 59)
     end
 
@@ -61,7 +61,7 @@ RSpec.describe Pages::EbikeRules::Reasons::Component, type: :component do
   context "with a Class 3 and a throttle in California" do
     let(:abbreviation) { "CA" }
     let(:bike) do
-      super().with(e_vehicle_classifications: ["evc/us/class_2", "evc/us/class_3"], throttle: true, stock_throttle: true, throttle_mph: 20)
+      super().with(e_vehicle_classifications: ["evc/us/class-2", "evc/us/class-3"], throttle: true, stock_throttle: true, throttle_mph: 20)
     end
 
     it "says its classes aren't permitted, and why" do

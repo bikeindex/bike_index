@@ -3,7 +3,7 @@ const PARAM = 'vehicle_models'
 const ENTRY = /(?:[^,{]|\{[^}]*\})+/g
 
 // vehicle_models: each vehicle's id, then in braces what's picked for it, which no id or catalog name has a brace of:
-// m/trek/2026/marlin_5{size:M/L}{color:Gloss Black}{json}{group}
+// m/trek/2026/marlin-5{size:M/L}{color:Gloss Black}{json}{group}
 export const vehicleEntries = (value) => (String(value ?? '').match(ENTRY) ?? []).map((entry) => ({
   ...Object.fromEntries([...entry.matchAll(/\{([^}]*)\}/g)].map(([, inside]) => {
     const at = inside.indexOf(':')
@@ -24,7 +24,7 @@ export const withVehicles = (url, entries) => {
   return next
 }
 
-// Each of `ids` as itself, and a model picked again as its id and which time: m/trek/2026/marlin_5#2
+// Each of `ids` as itself, and a model picked again as its id and which time: m/trek/2026/marlin-5#2
 export const vehicleKeys = (ids) => ids.map((id, index) => {
   const time = ids.slice(0, index).filter((each) => each === id).length + 1
   return time > 1 ? `${id}#${time}` : id

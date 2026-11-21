@@ -1,4 +1,3 @@
-import { catalogValue } from 'bikebook/legacy_shape'
 import { array, isNumber } from 'bikebook/templates/values'
 import { TYPICAL_GEOMETRY } from 'bikebook/typical_geometry'
 
@@ -28,7 +27,7 @@ const wheelRadius = (data, size, position) => {
   const wheel = builtWheel(data, size, position)
   const part = (type) => array(data.components).find((each) => each.type === type && (!each.position || array(each.position).includes(position)))?.dimensions
   const tire = part('tire')
-  return outerRadius({ bsd: wheel?.bsd ?? part('wheel')?.diameter ?? tire?.diameter, tire_width: wheel?.tire_width ?? tire?.width ?? catalogValue(wheel, 'tire_width_max') })
+  return outerRadius({ bsd: wheel?.bsd ?? part('wheel')?.diameter ?? tire?.diameter, tire_width: wheel?.tire_width ?? tire?.width ?? wheel?.tire_width_max })
 }
 
 // A size's frame in mm, the bottom bracket at the origin and y up, from the figures it lists and those they work out.
@@ -58,7 +57,7 @@ export const frameGeometry = (data, size) => {
     : null)
   const typicalWheel = (position) => {
     const wheel = builtWheel(data, size, position)
-    return outerRadius({ bsd: wheel?.bsd ?? typical.rim, tire_width: wheel?.tire_width ?? catalogValue(wheel, 'tire_width_max') ?? typical.tire })
+    return outerRadius({ bsd: wheel?.bsd ?? typical.rim, tire_width: wheel?.tire_width ?? wheel?.tire_width_max ?? typical.tire })
   }
   const rear = workedRear ?? typicalWheel('rear')
   const front = workedFront ?? typicalWheel('front')

@@ -48,6 +48,49 @@ const fetchJson = async (url) => {
   }
 }
 
+// Schema 2.0.0's ids are dashed. An older catalog's are underscored and never dashed, so they read as 2.0.0's, as
+// Integrations::Bikebook::Catalog.dashed_ids reads them
+// TODO: once the published catalog is at 2.0.0, remove this
+const CATALOG_ID = /^(?:(?:m|c|evc)\/[a-z0-9_/-]+|[a-z0-9_-]+\/\d{4})$/
+const dashed = (value) => typeof value === 'string' ? value.replaceAll('_', '-') : value
+const dashedIds = (value) => {
+  if (Array.isArray(value)) return value.map(dashedIds)
+  if (value && typeof value === 'object') return Object.fromEntries(Object.entries(value).map(([key, each]) => [dashedIds(key), dashedIds(each)]))
+  return typeof value === 'string' && CATALOG_ID.test(value) ? dashed(value) : value
+}
+const fetchCatalog = (url) => fetchJson(url).then(dashedIds)
+
+// Schema 2.0.0's slugs for the vocabulary Bike Index reads values of, which an older catalog underscores, and where 2.0.0
+// renamed one, names otherwise. Integrations::Bikebook::Catalog.current_slug reads them the same way
+// TODO: once the published catalog is at 2.0.0, remove this
+const RENAMED = {
+  __proto__: null,
+  bike_trailer: 'trailer',
+  cargo_bike: 'cargo',
+  cargo_bike_rear: 'cargo-rear',
+  cargo_tricycle: 'cargo-trike',
+  cargo_tricycle_rear: 'cargo-trike-rear',
+  epamd: 'personal-mobility',
+  scooter: 'non-e-scooter',
+  skateboard: 'non-e-skateboard',
+  elliptical_bike: 'elliptical',
+  road_endurance: 'road-endurance-sportive',
+  carbon: 'composite',
+  wood: 'organic'
+}
+const currentSlug = (value) => Array.isArray(value) ? value.map(currentSlug) : RENAMED[value] ?? dashed(value)
+// each a record's field, or a field of what it holds, and the vocabulary naming it
+const SLUGGED = ['type', 'type_detail', 'primary_activity', 'drivetrain', 'frame.material', 'components.type']
+const withSlug = (record, [key, field]) => {
+  const value = record[key]
+  if (value == null) return record
+  if (!field) return { ...record, [key]: currentSlug(value) }
+  return { ...record, [key]: Array.isArray(value) ? value.map((each) => withSlug(each, [field])) : withSlug(value, [field]) }
+}
+const withCurrentSlugs = (record) => SLUGGED.reduce((each, path) => withSlug(each, path.split('.')), record)
+const rekeyed = (names) => Object.fromEntries(Object.entries(names).map(([value, name]) => [currentSlug(value), name]))
+const withCurrentNames = (names) => ({ ...names, ...Object.fromEntries(SLUGGED.filter((path) => names[path]).map((path) => [path, rekeyed(names[path])])) })
+
 const list = (value) => (value ?? '').split(',').filter(Boolean)
 const path = (id) => id.replace(/^m\//, '')
 const blockKey = (id) => path(id).split('/').slice(0, 2).join('/')
@@ -64,15 +107,15 @@ const classified = ({ e_vehicle_classifications: records }, jurisdictions) => Ob
 
 // What picked vehicles render from, which needs nothing of the index: the blocks `ids` are in, the kit and the vocabulary
 function start ({ manifestUrl, ids, jurisdictions, comparing }) {
-  opened = fetchJson(manifestUrl).then((published) => {
+  opened = fetchCatalog(manifestUrl).then((published) => {
     if (published.format !== FORMAT) throw new Error(`catalog format ${published.format} isn't ${FORMAT}`)
 
     manifest = published
     base = new URL(manifestUrl, self.location)
     ids.map(blockKey).filter((key) => manifest.blocks[key]).forEach((key) => block(key).catch(() => {}))
   })
-  started = opened.then(() => Promise.all([manifest.vocabulary, manifest.kit].map((file) => fetchJson(new URL(file, base)))))
-    .then(([vocabulary, { kit }]) => ({ vocabulary: { ...vocabulary, e_vehicle_classifications: classified(vocabulary, jurisdictions) }, kit }))
+  started = opened.then(() => Promise.all([manifest.vocabulary, manifest.kit].map((file) => fetchCatalog(new URL(file, base)))))
+    .then(([vocabulary, { kit }]) => ({ vocabulary: { ...vocabulary, names: withCurrentNames(vocabulary.names), e_vehicle_classifications: classified(vocabulary, jurisdictions) }, kit }))
   if (comparing) fetchComparison()
   return started
 }
@@ -80,28 +123,48 @@ function start ({ manifestUrl, ids, jurisdictions, comparing }) {
 // After `start`, whose manifest and files it waits on
 async function load ({ rulesUrl, similarityUrl: similarityModule }) {
   similarityUrl = similarityModule
-  const [index, { vocabulary, kit }, featuredRules] = await Promise.all([opened.then(() => fetchJson(new URL(manifest.index, base))), started, import(rulesUrl)])
+  const [published, { vocabulary, kit }, featuredRules] = await Promise.all([opened.then(() => fetchJson(new URL(manifest.index, base))), started, import(rulesUrl)])
+  const index = {
+    ...published,
+    manufacturers: Object.fromEntries(Object.entries(published.manufacturers).map(([slug, name]) => [dashed(slug), name])),
+    primary_activities: published.primary_activities.map((each) => ({ ...each, slug: currentSlug(each.slug), family: currentSlug(each.family) })),
+    vehicle_types: published.vehicle_types.map((each) => ({ ...each, slug: currentSlug(each.slug) })),
+    filter_options: dashedIds(published.filter_options)
+  }
   rules = featuredRules
   const currentYear = new Date().getFullYear()
   const activityNames = vocabulary.names.primary_activity ?? {}
   const typeNames = Object.fromEntries(index.vehicle_types.map(({ slug, name }) => [slug, name]))
   activities = index.primary_activities
-  models = index.models.map((model, position) => ({
-    ...model,
-    position,
-    // an extension at its own path, or the whole URL of a photo it shares with another model
-    stock_photo: model.photo && (model.photo.includes('://') ? model.photo : `${index.stock_photos}/${path(model.id)}.${model.photo}`),
-    activity_name: activityNames[model.primary_activity],
-    type_name: typeNames[model.vehicle_type],
-    // by its maker, as makers share names, and its first word where it has no group
-    group_key: `${model.manufacturer}/${model.model_group ?? model.model.split(' ')[0]}`,
-    searchText: `${model.display}\n${model.id}`.toLowerCase(),
-    // a current model's first year where it's sold ahead of the calendar
-    sortYear: model.final_year ?? Math.max(model.first_year, currentYear),
-    // drawn per worker, which each page load starts, and again by `rotate`, so a reload features others and the page's
-    // own changes the same
-    chance: Math.random()
-  }))
+  models = index.models.map((model, position) => {
+    // field by field, as walking the whole index takes three times its parse
+    const id = dashedIds(model.id)
+    const manufacturer = dashed(model.manufacturer)
+    const activity = currentSlug(model.primary_activity)
+    const type = currentSlug(model.vehicle_type)
+    return {
+      ...model,
+      id,
+      manufacturer,
+      primary_activity: activity,
+      vehicle_type: type,
+      e_vehicle_classifications: dashedIds(model.e_vehicle_classifications),
+      variants: dashedIds(model.variants),
+      position,
+      // an extension at its own path, or the whole URL of a photo it shares with another model, by its published id
+      stock_photo: model.photo && (model.photo.includes('://') ? model.photo : `${index.stock_photos}/${path(model.id)}.${model.photo}`),
+      activity_name: activityNames[activity],
+      type_name: typeNames[type],
+      // by its maker, as makers share names, and its first word where it has no group
+      group_key: `${manufacturer}/${model.model_group ?? model.model.split(' ')[0]}`,
+      searchText: `${model.display}\n${id}`.toLowerCase(),
+      // a current model's first year where it's sold ahead of the calendar
+      sortYear: model.final_year ?? Math.max(model.first_year, currentYear),
+      // drawn per worker, which each page load starts, and again by `rotate`, so a reload features others and the page's
+      // own changes the same
+      chance: Math.random()
+    }
+  })
   // a market variant is its base's row under its own id and markets
   const variants = models.flatMap((model) => model.variants.map(({ id, markets }) => [{ ...model, id, markets, variants: [] }, model]))
   bases = new Map(variants.map(([variant, model]) => [variant.id, model]))
@@ -112,7 +175,8 @@ async function load ({ rulesUrl, similarityUrl: similarityModule }) {
   return { vocabulary: { ...vocabulary, e_vehicle_classifications: classifications }, kit, options: options(index, vocabulary.names) }
 }
 
-const fetchComparison = () => (comparisonFetch ??= opened.then(() => manifest.comparison && fetchJson(new URL(manifest.comparison, base))).catch(() => null))
+const fetchComparison = () => (comparisonFetch ??= opened.then(() => manifest.comparison && fetchJson(new URL(manifest.comparison, base)))
+  .then((published) => published && { ...published, fields: { ...published.fields, frame_material: currentSlug(published.fields.frame_material) } }).catch(() => null))
 
 // The comparison, once the index, whose order it's in, has loaded, for its frame materials as well as how alike models are;
 // without it neither is offered. Fetched when it's asked for, leaving the index the connection, unless `start` is told the
@@ -184,7 +248,7 @@ const except = (record, key) => Object.fromEntries(Object.entries(record).filter
 const withMarketVariants = (models) => Object.fromEntries(Object.entries(models).flatMap(([id, record]) => {
   const home = except(record, 'market_variants')
   return [[id, home], ...Object.entries(record.market_variants ?? {}).map(([market, changes]) => {
-    const variantId = `${id}${parseInt(record.schema_version) >= 2 ? '-' : '_'}${market.toLowerCase()}`
+    const variantId = `${id}-${market.toLowerCase()}`
     return [variantId, { ...merged(home, changes), id: variantId }]
   })]
 }))
@@ -192,7 +256,7 @@ const withMarketVariants = (models) => Object.fromEntries(Object.entries(models)
 // A failed fetch is forgotten, so the next ask tries again
 const block = (key) => {
   if (!blocks.has(key)) {
-    blocks.set(key, fetchJson(new URL(manifest.blocks[key], base)).then(({ models }) => Object.fromEntries(Object.entries(withMarketVariants(models)).map(([id, data]) => [id, withYearRecords(data)])), (error) => {
+    blocks.set(key, fetchCatalog(new URL(manifest.blocks[key], base)).then(({ models }) => Object.fromEntries(Object.entries(withMarketVariants(models)).map(([id, data]) => [id, withYearRecords(withCurrentSlugs(data))])), (error) => {
       blocks.delete(key)
       throw error
     }))
@@ -268,7 +332,7 @@ function matching (params) {
   const passes = filter(params)
   const filtered = sorted(params).filter(passes)
   const needle = (params.q ?? '').trim().toLowerCase()
-  const exact = needle.startsWith('m/') && byId.get(needle)
+  const exact = needle.startsWith('m/') && byId.get(dashedIds(needle))
   const words = needle.split(/\s+/).filter(Boolean)
   const found = exact ? [exact] : filtered.filter(({ searchText }) => words.every((word) => searchText.includes(word))).map((model) => soldIn(model, params.market))
   const whole = ({ searchText }) => searchText.includes(needle)
@@ -420,13 +484,13 @@ function filter (params) {
       (priceMin == null || model.msrp_cents >= priceMin * 100) && (priceMax == null || model.msrp_cents <= priceMax * 100)))
 }
 
-// evc/out_of_class is the catalog's own marker, as a model with no classified mode is unknown rather than out of class,
-// and evc/out_of_class/us/ca its marker for one in no class in that state alone, where it's out of class rather than the US
+// evc/out-of-class is the catalog's own marker, as a model with no classified mode is unknown rather than out of class,
+// and evc/out-of-class/us/ca its marker for one in no class in that state alone, where it's out of class rather than the US
 // classes it carries. A state's class matches the models carrying its groups
 function propelled ({ electric, e_vehicle_classifications: carried = [] }, propulsion, jurisdiction) {
   if (propulsion === '0' || propulsion === '1') return electric === (propulsion === '1')
-  const id = propulsion.replace(/^class_/, 'evc/us/class_')
-  if (/^evc\/(out_of_class|us\/class_\d)$/.test(id) && carried.includes(`evc/out_of_class/us/${jurisdiction?.toLowerCase()}`)) return id === 'evc/out_of_class'
+  const id = propulsion.replace(/^class-/, 'evc/us/class-')
+  if (/^evc\/(out-of-class|us\/class-\d)$/.test(id) && carried.includes(`evc/out-of-class/us/${jurisdiction?.toLowerCase()}`)) return id === 'evc/out-of-class'
   return [id, ...(classifications[id]?.groups ?? [])].some((classification) => carried.includes(classification))
 }
 

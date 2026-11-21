@@ -29,12 +29,12 @@ module Pages
         def catalog_version = @catalog_version ||= EbikeRuleServices::StateLaws.version
 
         # Every visitor's and every query's, which bikebook--page and placeholder_class fill in around them
-        def page_cache_key(*parts) = [self.class.cache_digest, catalog_version, *parts]
+        def page_cache_key(*parts) = child_cache_key(self.class, *parts)
 
         # A component's own fragment inside the page's, under skip_digest: Rails' digest of this template would expire it
         # with any change here. Not cache_on: these also render on /ebike-rules, where the same tile twice would repeat
         # its tooltip's id
-        def child_cache_key(component, *parts) = [component.cache_digest, catalog_version, *parts]
+        def child_cache_key(component, *parts) = [component.cache_digest, 2, catalog_version, *parts]
 
         # The search until bikebook--page fills it in from the URL: hidden as searching() hides a lone model's, and blank
         # where the URL sets anything but picks, which it says are loading
@@ -75,8 +75,8 @@ module Pages
 
         # The US classes, then the states' own, which /ebike-rules shows too; a state without them uses the US ones
         def class_groups
-          us = [{id: "class_1", name: translation(".us_class_1")}, {id: "class_2", name: translation(".us_class_2")},
-            {id: "class_3", name: translation(".us_class_3")}, EbikeRuleServices::StateLaws::NOT_AN_EBIKE]
+          us = [{id: "class-1", name: translation(".us_class_1")}, {id: "class-2", name: translation(".us_class_2")},
+            {id: "class-3", name: translation(".us_class_3")}, EbikeRuleServices::StateLaws::NOT_AN_EBIKE]
           {"US" => us}.merge(EbikeRuleServices::StateLaws.own_classes)
         end
       end
