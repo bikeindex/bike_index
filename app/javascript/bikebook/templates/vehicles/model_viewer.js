@@ -466,13 +466,12 @@ class ModelViewer {
   // that jurisdiction's ID. Without any, its classes' names
   #classTiles () {
     if (this.outOfClass === 'stock') return classBadges([`emoto/${this.outOfClassId}`])
-    const ids = this.vehicle.classifiedModes.flatMap((mode) => mode.ids)
     const numbers = [...new Set(this.vehicle.classifiedModes.flatMap(classNumbers))].sort()
     const optional = this.#optionalClasses()
     const throttled = this.outOfClass === 'throttle'
     const classes = numbers.filter((number) => !(throttled && optional.get(number) === 'throttle'))
       .map((number) => optional.has(number) ? `${number}/${optional.get(number)}` : number)
-    const tiles = [...classes, ...(this.#emoto(ids) ? ['emoto'] : throttled ? [`emoto/throttle/${this.outOfClassId}`] : [])]
+    const tiles = [...classes, ...(this.#emoto() ? ['emoto'] : throttled ? [`emoto/throttle/${this.outOfClassId}`] : [])]
     return tiles.length ? classBadges(tiles) : presence(this.classificationNames(this.#sortedClassifications(this.vehicle)))
   }
 
@@ -481,7 +480,7 @@ class ModelViewer {
   eVehicleClass (where) {
     const classes = this.#classTiles()
     const { id } = this.data
-    const place = this.state ? `US/${this.state}` : this.#emoto(this.vehicle.classifiedModes.flatMap((mode) => mode.ids)) && 'US'
+    const place = this.state ? `US/${this.state}` : this.#emoto() && 'US'
     return classes && html`<div class="tw:flex tw:flex-wrap tw:items-center tw:gap-x-3 tw:gap-y-1"><div>${classes}</div>${place && id
       ? html`<turbo-frame id=${`ebike-rules-reasons-${where}-${id.replace(/[^\w-]/g, '-')}`} class="tw:min-w-48 tw:flex-1" data-permanent=${place}
         src=${`/ebike-rules/${place}?${new URLSearchParams({ vehicle_models: id })}`}></turbo-frame>`
@@ -499,8 +498,8 @@ class ModelViewer {
 
   // As /ebike-rules has it (EbikeRuleServices::BikebookVehicles): a classification other than an e-bike law's or a US
   // class, or with neither, a mode over 28 mph
-  #emoto (ids) {
-    const tiers = ids.filter((id) => !this.presenter.vocabulary.e_vehicle_classifications[id]?.e_bike_law)
+  #emoto () {
+    const tiers = this.vehicle.classifiedModes.flatMap((mode) => mode.ids).filter((id) => !this.presenter.vocabulary.e_vehicle_classifications[id]?.e_bike_law)
     if (tiers.length) return tiers.some((id) => !US_CLASS.test(id))
     const { km, mi } = this.kit.conversions.mm
     return Math.round(modes('max_speed')(this.data) * km / mi) > 28
