@@ -11,7 +11,7 @@ RSpec.describe Pages::Register::Views::Step1::Component, type: :component do
   # the previous render left on the registration
   def render_step_1
     reloaded = b_param.reload
-    render_inline(described_class.new(b_param: reloaded, flow: BikeServices::Register.flow(reloaded, sequence: nil)))
+    render_inline(described_class.new(b_param: reloaded, flow: BikeServices::Register.flow(reloaded, course: nil)))
   end
 
   # Minus the required "*" the label carries
@@ -71,7 +71,7 @@ RSpec.describe Pages::Register::Views::Step1::Component, type: :component do
   context "single_page" do
     let(:component) do
       render_inline(described_class.new(b_param:, current_user: nil,
-        flow: BikeServices::Register.flow(b_param, sequence: nil, single_page: true)))
+        flow: BikeServices::Register.flow(b_param, course: nil, single_page: true)))
     end
 
     def field_names(scope)
@@ -95,7 +95,7 @@ RSpec.describe Pages::Register::Views::Step1::Component, type: :component do
     context "signed in" do
       let(:component) do
         render_inline(described_class.new(b_param:, current_user:,
-          flow: BikeServices::Register.flow(b_param, sequence: nil, single_page: true)))
+          flow: BikeServices::Register.flow(b_param, course: nil, single_page: true)))
       end
       let(:current_user) { FactoryBot.create(:user_confirmed, email: "owner@bikeindex.org") }
       let(:own_emails) { JSON.parse(component.at_css("[data-controller='register--owner-name']")["data-register--owner-name-own-emails-value"]) }
@@ -113,7 +113,7 @@ RSpec.describe Pages::Register::Views::Step1::Component, type: :component do
       end
     end
 
-    # A failed e-vehicle submission re-renders with its sequence resolved, and the electric
+    # A failed e-vehicle submission re-renders with its course resolved, and the electric
     # checkbox, not the server, is what says the safety pages come next
     context "re-rendered with the safety pages resolved" do
       let(:component) do

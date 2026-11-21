@@ -346,13 +346,13 @@ RSpec.describe OrganizationExportJob, type: :job do
           end
         end
         context "including every available field + stickers" do
-          let(:enabled_feature_slugs) { OrganizationFeature::REG_FIELDS + %w[avery_export bike_stickers impound_bikes registration_notes registration_sequences show_partial_registrations] }
+          let(:enabled_feature_slugs) { OrganizationFeature::REG_FIELDS + %w[avery_export bike_stickers impound_bikes registration_notes education_courses show_partial_registrations] }
           let(:export_options) { {headers: Export.permitted_headers(organization)} }
           let!(:bike_organization_note) { FactoryBot.create(:bike_organization_note, bike:, organization:, body: "Sold at the fall swap") }
           let(:acknowledged_at) { Time.current - 1.day }
-          let!(:registration_sequence_acknowledgment) do
-            FactoryBot.create(:registration_sequence_acknowledgment, bike:, acknowledged_at:,
-              registration_sequence: FactoryBot.create(:registration_sequence_active, organization:))
+          let!(:education_course_acknowledgment) do
+            FactoryBot.create(:education_course_acknowledgment, bike:, acknowledged_at:,
+              education_course: FactoryBot.create(:education_course_default_active))
           end
           let(:bike_row_hash) do
             {

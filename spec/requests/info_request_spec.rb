@@ -126,6 +126,43 @@ RSpec.describe InfoController, type: :request do
       end
     end
 
+    describe "donate/year-end-2026" do
+      include_context :active_stripe_prices
+
+      it "renders the year-end page outside the content wrapper, submitting the same forms as /donate" do
+        get "/donate/year-end-2026"
+        expect(response.status).to eq(200)
+        expect(response.body).to include("Make a year-end gift to Bike Index")
+        expect(response.body).to match(/name="payment\[referral_source\]"[^>]*value="eoy-2026"/)
+        expect(response.body).to include('action="/payments"')
+        expect(response.body).to_not include("sidebar-nav")
+      end
+
+      it "passes the email's source on and picks the recovered audience from it" do
+        get "/donate/year-end-2026?source=eoy-2026-recovered"
+        expect(response.body).to include("Your bike made it home")
+        expect(response.body).to match(/name="payment\[referral_source\]"[^>]*value="eoy-2026-recovered"/)
+      end
+
+      it "falls back to the campaign's source for an array param" do
+        get "/donate/year-end-2026?source[]=eoy-2026-recovered"
+        expect(response.status).to eq(200)
+        expect(response.body).to match(/name="payment\[referral_source\]"[^>]*value="eoy-2026"/)
+      end
+
+      it "is where /donate/year-end goes, with the email's params" do
+        get "/donate/year-end?source=eoy-2026-recovered&initial_amount=500"
+        expect(response).to redirect_to("/donate/year-end-2026?initial_amount=500&source=eoy-2026-recovered")
+        expect(response.status).to eq(302)
+      end
+
+      it "redirects the underscored spelling, with the email's params" do
+        get "/donate/year_end_2026?source=eoy-2026-recovered"
+        expect(response).to redirect_to("/donate/year-end-2026?source=eoy-2026-recovered")
+        expect(response.status).to eq(301)
+      end
+    end
+
     # serials is the one static page that links default_bike_search_path
     describe "serials search links" do
       let(:organization) { FactoryBot.create(:organization) }
@@ -202,7 +239,7 @@ RSpec.describe InfoController, type: :request do
       get "/why-donate"
       expect(response).to redirect_to("/donate")
       get "/why_donate"
-      expect(response).to redirect_to("/donate")
+      expect(response).to redirect_to("/why-donate")
       get "/info/#{blog.title_slug}"
       expect(response).to redirect_to("/donate")
     end
@@ -219,6 +256,9 @@ RSpec.describe InfoController, type: :request do
       expect(response).to render_template("lightspeed")
       expect(flash).to_not be_present
       expect(assigns(:show_general_alert)).to be_truthy
+      # Signing up comes back through the signup's own return_to, not a sign-in's
+      expect(response.body).to include new_organization_signup_path(return_to: lightspeed_interface_path)
+      expect(session[:return_to]).to be_blank
     end
     context "donate" do
       include_context :active_stripe_prices
@@ -244,6 +284,17 @@ RSpec.describe InfoController, type: :request do
       get "/primary_activities.csv"
       expect(response.status).to eq(200)
       expect(response.content_type).to match("text/csv")
+    end
+  end
+
+  context "wheel_sizes" do
+    let!(:wheel_size) { FactoryBot.create(:wheel_size, name: "7 x 1.5in", iso_bsd: 102, priority: :rare, description: "7 x 1.5in (178 x 38) solid wheel (Rare)") }
+
+    it "gets a csv" do
+      get "/wheel_sizes.csv"
+      expect(response.status).to eq(200)
+      expect(response.content_type).to match("text/csv")
+      expect(response.body).to eq "name,iso_bsd,priority,description\n7 x 1.5in,102,rare,7 x 1.5in (178 x 38) solid wheel (Rare)\n"
     end
   end
 end

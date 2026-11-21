@@ -10,7 +10,7 @@
 
 <%= render(UI::Header::Component.new(text: "Handlebar Types other", tag: :h2)) %>
 
-<%= render(UI::Table::Component.new(records: @bikes_other_handlebar_type)) do |table| %>
+<%= render(UI::Table::Base::Component.new(records: @bikes_other_handlebar_type)) do |table| %>
   <% table.column(label: "Date") do |bike| %>
     <%= render UI::Time::Component.new(time: bike.created_at) %>
   <% end %>

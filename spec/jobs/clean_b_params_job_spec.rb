@@ -30,7 +30,7 @@ RSpec.describe CleanBParamsJob, type: :job do
           created_at: Time.current - BParam::TOKEN_EXPIRATION - 1.day,
           params: {bike: {manufacturer_id: 1}}.as_json)
       end
-      before { FactoryBot.create(:registration_sequence_acknowledgment_pending, b_param: b_param_pending, bike:) }
+      before { FactoryBot.create(:education_course_acknowledgment_pending, b_param: b_param_pending, bike:) }
 
       it "keeps it, even expired, since its token is how they're resumed" do
         expect { described_class.new.perform }.to change(BParam, :count).by(-2)
@@ -41,13 +41,13 @@ RSpec.describe CleanBParamsJob, type: :job do
 
     context "with an e-vehicle acknowledgment" do
       let!(:acknowledgment) do
-        FactoryBot.create(:registration_sequence_acknowledgment, b_param: b_param_with_bike, bike:)
+        FactoryBot.create(:education_course_acknowledgment, b_param: b_param_with_bike, bike:)
       end
 
       it "sweeps the registration, leaving the acknowledgment record standing" do
         expect { described_class.new.perform }.to change(BParam, :count).by(-2)
         expect(acknowledgment.reload.bike_id).to eq bike.id
-        expect(acknowledgment.acknowledgment_text).to be_present # read off the sequence
+        expect(acknowledgment.acknowledgment_text).to be_present # read off the course
       end
     end
   end

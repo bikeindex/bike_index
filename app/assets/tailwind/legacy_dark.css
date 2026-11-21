@@ -1,9 +1,14 @@
-/* Legacy sorts below this layer and utilities above it; kelsey_styles.css is unlayered, so its pages stay light */
+/* Legacy sorts below this layer and utilities above it; kelsey_styles.css is unlayered, so its pages stay light unless they opt in with .kelsey_styles_dark */
 @layer components {
-  :is(.container, .container-fluid, .bootstrapstyle, .doorkeeper-container) {
+  /* Organizations write their landing page's HTML for a light panel */
+  .organization-landing-page-wrap {
+    @apply tw:scheme-light;
+  }
+
+  :is(.container, .container-fluid, .bootstrapstyle, .doorkeeper-container):not(.organization-landing-page-wrap *) {
     @apply tw:dark:text-gray-100;
 
-    :is(h1, h2, h3, h4, h5, h6):not(.root-landing-who *) {
+    :is(h1, h2, h3, h4, h5, h6) {
       @apply tw:dark:text-inherit;
     }
   }
@@ -28,6 +33,48 @@
     @apply tw:md:max-navbar:dark:bg-gray-800 tw:dark:border-gray-700;
   }
 
+  /* The box is .main-form from md up and .sign-in-up-wrap below it */
+  .sign-in-up.not-partner .main-form {
+    @apply tw:md:dark:bg-gray-800 tw:md:dark:border-gray-700;
+  }
+
+  .sign-in-up.not-partner .sign-in-up-wrap {
+    @apply tw:max-md:dark:bg-gray-800 tw:max-md:dark:border-gray-700;
+  }
+
+  .sign-in-up.not-partner .main-form a {
+    @apply tw:dark:text-gray-100;
+  }
+
+  #binx_registration_widget {
+    @apply tw:dark:bg-gray-800 tw:dark:border-gray-700 tw:dark:text-gray-100;
+
+    .selectize-dropdown .active {
+      @apply tw:dark:bg-gray-600;
+    }
+
+    /* Selectize copies .form-control onto its taller wrapper, which would show beneath the input */
+    .selectize-control.form-control {
+      @apply tw:dark:bg-transparent tw:dark:border-transparent;
+    }
+  }
+
+  /* A frame whose root scheme differs from the dark page's paints an opaque white canvas */
+  :root:has(> body.dark #binx_registration_widget) {
+    @apply tw:scheme-dark;
+  }
+
+  .page-content blockquote {
+    @apply tw:dark:bg-gray-800 tw:dark:border-gray-600;
+
+    /* The closing quote is hidden by matching the background */
+    @variant dark {
+      &::after {
+        color: var(--tw-color-gray-800);
+      }
+    }
+  }
+
   .primary-edit-form-well-menu {
     @apply tw:max-md:dark:bg-gray-800;
   }
@@ -49,28 +96,82 @@
     @apply tw:dark:bg-gray-700 tw:dark:border-gray-600 tw:dark:text-gray-200;
   }
 
+  .input-group-addon {
+    @apply tw:dark:bg-gray-800 tw:dark:border-gray-600 tw:dark:text-gray-300;
+  }
+
+  .nfp-info,
+  .nfp-info a,
   .add_fields,
   .optional-form-block,
   .inline-input-help,
   .right-input-help a,
   .selectize-input input,
-  .close {
+  .close:not(.alert *) {
     @apply tw:dark:text-gray-300;
   }
 
+  /* The can's lines are the surface's color showing through it */
+  .delete-from-index .trash-can-icon {
+    .trash-lid,
+    .trash-container {
+      @apply tw:dark:bg-gray-300 tw:dark:in-[a:hover]:bg-blue-400;
+    }
+
+    span {
+      @apply tw:dark:bg-gray-800;
+    }
+  }
+
   /* These pages stay light, so a margin between their sections mustn't show a dark body */
-  body:has(.kelsey_styles) {
+  body:has(.kelsey_styles:not(.kelsey_styles_dark)) {
     @apply tw:dark:bg-white! tw:dark:text-gray-900!;
   }
 
-  /* The map stays light, so its controls and popups mustn't inherit a dark page's text */
+  /* On <body> rather than the wrapper, since its background reads --redesign-blue-800 too */
+  body:has(.kelsey_styles_dark) {
+    @variant dark {
+      --redesign-surface: var(--tw-color-gray-900);
+      --redesign-gray-50: var(--tw-color-gray-800);
+      --redesign-gray-100: var(--tw-color-gray-800);
+      --redesign-gray-200: var(--tw-color-gray-700);
+      --redesign-gray-500: var(--tw-color-gray-300);
+      --redesign-gray-600: var(--tw-color-gray-300);
+      --redesign-gray-800: var(--tw-color-gray-100);
+      --redesign-blue-800: var(--tw-color-blue-900);
+    }
+  }
+
+  /* The map stays light, so its controls mustn't inherit a dark page's text */
   .maplibregl-map {
     @apply tw:dark:text-gray-900;
   }
 
-  /* !important to beat kelsey_styles.css, away from the homepage's section it leaves light */
-  .kelsey_styles_buttons-grid:not(.for-section *) .category-button:not(:hover) span {
-    @apply tw:dark:text-gray-200!;
+  /* Popups hold page content, so they go dark with the page. MapLibre's stylesheet is unlayered, hence the ! */
+  .maplibregl-popup-content {
+    @apply tw:dark:bg-gray-800! tw:dark:text-gray-100;
+  }
+
+  [class*="maplibregl-popup-anchor-bottom"] .maplibregl-popup-tip {
+    @apply tw:dark:border-t-gray-800!;
+  }
+
+  [class*="maplibregl-popup-anchor-top"] .maplibregl-popup-tip {
+    @apply tw:dark:border-b-gray-800!;
+  }
+
+  .maplibregl-popup-anchor-left .maplibregl-popup-tip {
+    @apply tw:dark:border-r-gray-800!;
+  }
+
+  .maplibregl-popup-anchor-right .maplibregl-popup-tip {
+    @apply tw:dark:border-l-gray-800!;
+  }
+
+  .kelsey_styles_buttons-grid {
+    @variant dark {
+      --redesign-gray-800: var(--tw-color-gray-200);
+    }
   }
 
   .nav-tabs .nav-link:not(.active) {

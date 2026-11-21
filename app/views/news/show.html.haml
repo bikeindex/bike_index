@@ -18,9 +18,9 @@
     %h4.pub-date
       %span.localizeTime= l @blog.published_at, format: :convert_time
 
-    %p.blog-topics-list.mb-3
+    %p.mb-3{class: "tw:text-xs tw:text-gray-600 tw:dark:text-gray-400"}
       Topics:
-      = safe_join(@blog.content_tags.commonness.map { |tag| link_to(tag.name, news_index_path(search_tags: tag.slug), class: "gray-link") }, ", ")
+      = safe_join(@blog.content_tags.commonness.map { |tag| link_to(tag.name, news_index_path(search_tags: tag.slug), class: "twlink-underlined") }, ", ")
   %hr.mb-5.less-strong
 - if @blog.is_listicle
   - @blog.listicles.each_with_index do |list_item, i|

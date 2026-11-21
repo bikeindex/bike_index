@@ -3,8 +3,28 @@ require "rails_helper"
 RSpec.describe Slugifyer do
   describe "slugify" do
     it "handles &" do
-      expect(Slugifyer.slugify("Bikes &amp; Trikes")).to eq "bikes-amp-trikes"
-      expect(Slugifyer.slugify("Bikes & Trikes")).to eq "bikes-amp-trikes"
+      expect(Slugifyer.slugify("Bikes &amp; Trikes")).to eq "bikes-and-trikes"
+      expect(Slugifyer.slugify("Bikes & Trikes")).to eq "bikes-and-trikes"
+      expect(Slugifyer.slugify("B&B")).to eq "b-and-b"
+      expect(Slugifyer.slugify("Bert's Bikes& Fitness")).to eq "berts-bikes-and-fitness"
+    end
+    it "handles + and HTML entities" do
+      expect(Slugifyer.slugify("L100+ Lowstep")).to eq "l100-plus-lowstep"
+      expect(Slugifyer.slugify("Heron Flats + Lofts")).to eq "heron-flats-plus-lofts"
+      expect(Slugifyer.slugify("O&#39;Neil &quot;Bikes&quot;")).to eq "oneil-bikes"
+    end
+    it "drops apostrophes and separates on other punctuation" do
+      expect(Slugifyer.slugify("Craig’s Cycles")).to eq "craigs-cycles"
+      expect(Slugifyer.slugify("27.5")).to eq "27-5"
+      expect(Slugifyer.slugify("Discus 45/40")).to eq "discus-45-40"
+      expect(Slugifyer.slugify("e.bike")).to eq "e-bike"
+      expect(Slugifyer.slugify("Italia_X")).to eq "italia-x"
+    end
+    it "squeezes and trims dashes" do
+      expect(Slugifyer.slugify("Foo - Bar")).to eq "foo-bar"
+      expect(Slugifyer.slugify("Trail / All-Mountain")).to eq "trail-all-mountain"
+      expect(Slugifyer.slugify("(Old) Bicycle Security ...")).to eq "bicycle-security"
+      expect(Slugifyer.slugify("foo---bar")).to eq "foo-bar"
     end
     it "handles é" do
       expect(Slugifyer.slugify("paké rum runner")).to eq("pake-rum-runner")
@@ -13,6 +33,13 @@ RSpec.describe Slugifyer do
 
     it "removes parens" do
       expect(Slugifyer.slugify(" Some Cool NAMe (additional info)")).to eq("some-cool-name")
+    end
+  end
+
+  describe "amp_as_and" do
+    it "converts an -amp- slug" do
+      expect(Slugifyer.amp_as_and("bikes-and-trikes")).to be_nil
+      expect(Slugifyer.amp_as_and("bikes-amp-trikes")).to eq "bikes-and-trikes"
     end
   end
 
@@ -38,48 +65,59 @@ RSpec.describe Slugifyer do
     end
   end
 
-  describe "manufacturer" do
+  describe "legacy_manufacturer" do
     it "removes works rivendell" do
-      slug = Slugifyer.manufacturer("Rivendell Bicycle Works")
+      slug = Slugifyer.legacy_manufacturer("Rivendell Bicycle Works")
       expect(slug).to eq("rivendell")
     end
     it "removes frameworks for legacy" do
-      slug = Slugifyer.manufacturer("Legacy Frameworks")
+      slug = Slugifyer.legacy_manufacturer("Legacy Frameworks")
       expect(slug).to eq("legacy")
     end
     it "removes e-bike" do
-      slug = Slugifyer.manufacturer("AIMA E-Bike")
+      slug = Slugifyer.legacy_manufacturer("AIMA E-Bike")
       expect(slug).to eq("aima")
-      expect(Slugifyer.manufacturer("AIMA EBike")).to eq "aima"
-      expect(Slugifyer.manufacturer("AIMA E Bike")).to eq "aima"
+      expect(Slugifyer.legacy_manufacturer("AIMA EBike")).to eq "aima"
+      expect(Slugifyer.legacy_manufacturer("AIMA E Bike")).to eq "aima"
     end
     it "removes electric bike" do
-      slug = Slugifyer.manufacturer("Pedego Electric Bikes")
+      slug = Slugifyer.legacy_manufacturer("Pedego Electric Bikes")
       expect(slug).to eq("pedego")
     end
     it "removes bicycle company for Kona" do
-      slug = Slugifyer.manufacturer("Kona Bicycle Company")
+      slug = Slugifyer.legacy_manufacturer("Kona Bicycle Company")
       expect(slug).to eq("kona")
     end
     it "does not remove WorkCycles" do
-      slug = Slugifyer.manufacturer("WorkCycles")
+      slug = Slugifyer.legacy_manufacturer("WorkCycles")
       expect(slug).to eq("workcycles")
     end
     it "does not remove haibike" do
-      slug = Slugifyer.manufacturer("Haibike (Currietech)")
+      slug = Slugifyer.legacy_manufacturer("Haibike (Currietech)")
       expect(slug).to eq("haibike")
     end
     it "does not remove worksman" do
-      slug = Slugifyer.manufacturer("Worksman Cycles")
+      slug = Slugifyer.legacy_manufacturer("Worksman Cycles")
       expect(slug).to eq("worksman")
     end
     it "removes parens from EAI" do
-      slug = Slugifyer.manufacturer("EAI (Euro Asia Imports)")
+      slug = Slugifyer.legacy_manufacturer("EAI (Euro Asia Imports)")
       expect(slug).to eq("eai")
     end
     it "handles Riese & Müller (Riese and Muller)" do
-      slug = Slugifyer.manufacturer("Riese & Müller (Riese and Muller)")
+      slug = Slugifyer.legacy_manufacturer("Riese & Müller (Riese and Muller)")
       expect(slug).to eq "riese_amp_muller"
+    end
+    it "removes accell" do
+      expect(Slugifyer.legacy_manufacturer("Poopy Panters Accell")).to eq "poopy_panters"
+      expect(Slugifyer.legacy_manufacturer("Accell")).to eq "accell"
+    end
+    it "keeps the suffix when removing it would leave only digits" do
+      expect(Slugifyer.legacy_manufacturer("101 Bikes")).to eq "101_bikes"
+      expect(Slugifyer.legacy_manufacturer("101_bikes")).to eq "101_bikes"
+      expect(Slugifyer.legacy_manufacturer("101 Electric Bikes (Other Name)")).to eq "101_electric_bikes"
+      expect(Slugifyer.legacy_manufacturer("22 Bicycle Co.")).to eq "22_bicycle"
+      expect(Slugifyer.legacy_manufacturer("24 Seven Bikes")).to eq "24_seven"
     end
   end
 end

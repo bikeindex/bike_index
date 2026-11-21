@@ -36,11 +36,12 @@ module Organized
     end
 
     def new
+      kind = params[:kind].presence_in(ParkingNotification.kinds)
       if old_unregistered_notification_view?
-        return redirect_to(new_organization_bike_path(organization_id: current_organization.to_param, parking_notification: true))
+        return redirect_to(new_organization_bike_path(organization_id: current_organization.to_param, parking_notification: true, kind:))
       end
 
-      render Pages::Org::ParkingNotifications::New::Component.new(organization: current_organization)
+      render Pages::Org::ParkingNotifications::New::Component.new(organization: current_organization, kind:)
     end
 
     def show
@@ -53,10 +54,14 @@ module Organized
         create_and_send_repeats(params[:kind], params[:ids].as_json)
       else
         @parking_notification = ParkingNotification.new(permitted_parameters)
-        if @parking_notification.save
-          flash[:success] = translation(:successfully_created, bike_type: @parking_notification.bike.type)
-        else
+        @parking_notification.skip_update = @parking_notification.impound_notification?
+        if !@parking_notification.save
           flash[:error] = translation(:unable_to_create, errors: @parking_notification.errors.full_messages.to_sentence)
+        elsif @parking_notification.impound_notification?
+          impound_before_redirect
+          flash[:success] = translation(:successfully_impounded, bike_type: @parking_notification.bike.type)
+        else
+          flash[:success] = translation(:successfully_created, bike_type: @parking_notification.bike.type)
         end
       end
       if @redirect_location.present?
@@ -99,6 +104,7 @@ module Organized
         bikes = BikeServices::OrganizedSearch.email_and_name(bikes, params[:search_email])
         notifications = notifications.where(bike_id: bikes.pluck(:id))
       end
+      notifications = notifications.notes_matching(params[:search_notes]) if params[:search_notes].present?
       if @search_bounding_box.present?
         notifications = notifications.search_bounding_box(*@search_bounding_box)
       end
@@ -126,7 +132,7 @@ module Organized
         per_page: @per_page,
         # Symbol keys, or organization_id repeats as a query param beside the path segment
         sort_state: sort_state.with(search_params: sort_state.search_params.to_h.symbolize_keys),
-        interpreted_params: @interpreted_params.merge(search_email: params[:search_email]).compact,
+        interpreted_params: @interpreted_params.merge(search_email: params[:search_email], search_notes: params[:search_notes]).compact,
         search_kind: @search_kind,
         search_status: @search_status,
         search_unregistered: @search_unregistered,
@@ -143,6 +149,14 @@ module Organized
         notifications_failed_resolved: @notifications_failed_resolved,
         repeated_kind: @repeated_kind
       )
+    end
+
+    # Otherwise the redirect beats the job, and the page still offers the form that just
+    # impounded the bike. The email stays in sidekiq, where a failed delivery retries
+    def impound_before_redirect
+      ProcessParkingNotificationJob.new.perform(@parking_notification.id, true)
+    ensure
+      ProcessParkingNotificationJob.perform_async(@parking_notification.id)
     end
 
     def permitted_parameters
@@ -212,8 +226,15 @@ module Organized
 
     def ensure_access_to_parking_notifications!
       return true if current_organization.enabled?("parking_notifications") || current_user.superuser?
+      return true if creating_impound_notification? && current_organization.enabled?("impound_bikes")
 
       raise_do_not_have_access!
+    end
+
+    # params[:kind] sends repeats of existing notifications, which is the parking feature
+    def creating_impound_notification?
+      action_name == "create" && params[:kind].blank? &&
+        params.dig(:parking_notification, :kind) == "impound_notification"
     end
 
     def bike_search_params_present?

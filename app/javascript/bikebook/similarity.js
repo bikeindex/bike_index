@@ -2,7 +2,7 @@
 // presets are ours; the values are worked out by bikebook's Catalog::Comparison, so none is derived again here.
 // Imported by the catalog's worker too, which has no importmap, so it imports nothing
 
-const FORMAT = 2
+const FORMAT = 4
 const COUNT = 12
 export const MAX_WEIGHT = 5
 
@@ -109,7 +109,7 @@ const tier = (name) => {
   const key = name.toLowerCase().replace(/[^a-z0-9]+/g, ' ').replace(SERIES_WORDS, ' ').replace(/\s+/g, ' ').trim()
   if (key in TIERS) return TIERS[key]
   // parsers add spellings, which the table then has to
-  if (!unmapped.has(name)) console.warn(`BikeBook: no groupset tier for "${name}"`)
+  if (!unmapped.has(name)) console.warn(`Bike Book: no groupset tier for "${name}"`)
   unmapped.add(name)
   return null
 }

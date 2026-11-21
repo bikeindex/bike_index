@@ -70,7 +70,7 @@
         %label Kind of notification
         - ParkingNotification.kinds.each do |kind|
           %label.radio-inline
-            = n.radio_button :kind, kind, checked: kind == "appears_abandoned_notification"
+            = n.radio_button :kind, kind, checked: kind == (params[:kind].presence_in(ParkingNotification.kinds) || "appears_abandoned_notification")
             = ParkingNotification.kinds_humanized[kind.to_sym]
 
       .input-group

@@ -42,24 +42,25 @@ module ComponentStructs
       resolved_at_cell
       impound_status_cell
       impound_user_cell
-      impound_location_cell
+      impound_current_location_cell
       impounded_from_cell
+      impound_notes_cell
       unregistered_cell
     ].freeze
 
     # The impound records search's own columns, on by default
     IMPOUND_COLUMNS = %w[impounded_at_cell impound_updated_at_cell resolved_at_cell impound_status_cell
-      impound_user_cell impounded_from_cell unregistered_cell].freeze
+      impound_user_cell impounded_from_cell impound_notes_cell unregistered_cell].freeze
 
-    # Those and its feature-gated ones, which its panel lists apart from the registration columns
-    IMPOUND_PANEL_COLUMNS = ["impound_id_cell", "impound_location_cell", *IMPOUND_COLUMNS].freeze
+    # Those, Impound ID and Current location, which its panel lists apart from the registration columns
+    IMPOUND_PANEL_COLUMNS = ["impound_id_cell", "impound_current_location_cell", *IMPOUND_COLUMNS].freeze
 
     # The panel groups the time columns under "Time - "; the table headers keep the short names
     PANEL_LABEL_KEYS = {
       created_at_cell: :registered_cell_panel,
       updated_at_cell: :registration_updated_cell_panel,
       occurred_at_cell: :status_at_cell_panel,
-      acknowledgment_cell: :acknowledgment_cell_panel,
+      acknowledgment_cell: :course_acknowledgment_cell_panel,
       impounded_at_cell: :impounded_at_cell_panel,
       impound_updated_at_cell: :impound_updated_at_cell_panel,
       resolved_at_cell: :resolved_at_cell_panel
@@ -114,7 +115,7 @@ module ComponentStructs
       "updated_at" => :impound_updated_at_cell,
       "resolved_at" => :resolved_at_cell,
       "user_id" => :impound_user_cell,
-      "location_id" => :impound_location_cell,
+      "location_id" => :impound_current_location_cell,
       "display_id_integer" => :impound_id_cell
     }.freeze
 
@@ -238,7 +239,8 @@ module ComponentStructs
         *DEFAULT_COLUMNS,
         ("sticker_cell" if @organization.enabled?("bike_stickers")),
         *(["impound_id_cell", *IMPOUND_COLUMNS] if @impound),
-        ("impound_location_cell" if @impound && @organization.enabled?("impound_bikes_locations"))
+        # Without locations it mostly repeats Impounded from
+        ("impound_current_location_cell" if @impound && @organization.enabled?("impound_bikes_locations"))
       ].compact
     end
 
@@ -268,8 +270,9 @@ module ComponentStructs
         *additional_registration_fields.map { |field| "#{field}_cell" },
         ("notes_cell" if @organization.enabled?("registration_notes")),
         ("impound_id_cell" if impound_search?),
+        ("impound_current_location_cell" if @impound),
         ("avery_cell" if @organization.enabled?("avery_export")),
-        ("acknowledgment_cell" if @organization.enabled?("registration_sequences"))
+        ("acknowledgment_cell" if @organization.enabled?("education_courses"))
       ].compact.uniq
     end
 

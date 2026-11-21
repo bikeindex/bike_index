@@ -193,6 +193,18 @@ RSpec.describe PublicImage, type: :model do
         expect(public_image.image_url).to eq public_image.image.url
         expect(public_image.image_url(:large)).to eq public_image.image.url(:large)
       end
+
+      context "with REMOTE_IMAGE_FALLBACK_URLS and the file not on this machine" do
+        before { stub_const("PublicImage::REMOTE_IMAGE_FALLBACK_URLS", true) }
+
+        it "returns the production host" do
+          FileUtils.rm(public_image.image.path)
+          public_image.reload # the version url reconstructs from the stored identifier
+          expected_url = public_image.image.url(:small).sub(ENV["BASE_URL"], "https://files.bikeindex.org")
+          expect(expected_url).to start_with("https://files.bikeindex.org/")
+          expect(public_image.image_url(:small)).to eq expected_url
+        end
+      end
     end
 
     context "attached file" do

@@ -76,8 +76,8 @@ en:
           next_oem_parts_title: OEM parts and stock images
           next_versioning_body: Keep a record as your bike changes
           next_versioning_title: Bike versioning
-          official_registry: >-
-            The official registry for more than 1,000 police departments, universities,
+          official_registry_partners: >-
+            The official registry for more than %{partners} police departments, universities,
             cities, and shops
           or_make_a_one_time_donation: Or make a one-time donation
           per_month: "/ month"

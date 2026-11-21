@@ -8,7 +8,7 @@ RSpec.describe Pages::Register::Parts::Step1Submit::Component, type: :component 
 
   def render_step1_submit(**options)
     render_inline(described_class.new(b_param:, **options,
-      flow: BikeServices::Register.flow(b_param, sequence: nil, single_page:)))
+      flow: BikeServices::Register.flow(b_param, course: nil, single_page:)))
   end
 
   context "single_page" do

@@ -380,7 +380,7 @@ RSpec.describe PublicImagesController, type: :request do
         it "redirects" do
           expect(bike.authorized?(current_user)).to be_falsey
           get "#{base_url}/#{public_image.id}/edit"
-          expect(response).to redirect_to bike_path(bike)
+          expect(response).to redirect_to registration_path(bike)
         end
       end
     end

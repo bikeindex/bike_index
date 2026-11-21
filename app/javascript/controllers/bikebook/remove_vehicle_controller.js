@@ -1,6 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
 import { readable } from 'bikebook/replace_url'
-import { realigned } from 'bikebook/sizes'
+import { realigned } from 'bikebook/vehicle_models'
 
 // Lays the href's remaining models over the current URL as it's clicked, keeping URL state set
 // since render and each size with its vehicle. Not through the combobox's chip: chips load after the page,

@@ -5,6 +5,7 @@ import { loadCatalog } from 'bikebook/catalog'
 import { withFigures } from 'bikebook/cycle_drawings'
 import { toQuery } from 'bikebook/query'
 import { chosenSizes } from 'bikebook/sizes'
+import { vehicleModels } from 'bikebook/vehicle_models'
 import { buttonClasses } from 'bikebook/templates/ui/button'
 import { cycleDrawing, letterBackground } from 'bikebook/templates/vehicles/cycle_drawing'
 
@@ -13,7 +14,7 @@ const catalogs = new Map()
 const catalogAt = (manifestUrl) => catalogs.get(manifestUrl) ?? catalogs.set(manifestUrl, loadCatalog(manifestUrl)).get(manifestUrl)
 
 // Its Sizes & geometry view, with the size drawn here picked
-const geometryPath = (id, size) => `/bikebook?${toQuery({ vehicle_models: id, view: 'geometry', vehicle_sizes: size?.name })}`
+const geometryPath = (id, size) => `/bikebook?${toQuery({ vehicle_models: vehicleModels([{ id, size: size?.name }]), view: 'geometry' })}`
 
 // An input's value, set only where it reads otherwise: a half-typed "700." or "-" reads as 700 or '', which writing
 // back would lose
@@ -37,7 +38,7 @@ export default class extends Controller {
     this.figures = {}
     this.highlight = null
     const catalog = await catalogAt(this.manifestUrlValue)
-    // a model in the size BikeBook first shows it in
+    // a model in the size Bike Book first shows it in
     const [found] = this.modelValue ? await catalog.vehicles([this.modelValue]) : [{ data: {} }]
     this.kit = catalog.kit
     this.vehicle = found && { id: found.value, data: found.data, size: found.value && chosenSizes([found])[0] }

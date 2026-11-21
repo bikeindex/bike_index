@@ -130,7 +130,7 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
       expect(instance.panel_labels[:created_at_cell]).to eq "Time - Registered"
       expect(instance.panel_labels[:updated_at_cell]).to eq "Time - Registration Updated"
       expect(instance.panel_labels[:occurred_at_cell]).to eq "Time - Status"
-      expect(instance.panel_labels[:acknowledgment_cell]).to eq "Time - Registration sequence acknowledged"
+      expect(instance.panel_labels[:acknowledgment_cell]).to eq "Time - Education course acknowledged"
       expect(instance.column_renames[:created_at_cell]).to eq "Registered"
       expect(instance.panel_labels[:color_cell]).to eq "Color"
     end
@@ -142,7 +142,7 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
       impound_settings = described_class.new(organization:, impound: true)
       expect(impound_settings.initially_checked_columns).to include("impound_id_cell", *described_class::IMPOUND_COLUMNS)
       expect(impound_settings.panel_columns).to include(*described_class::IMPOUND_COLUMNS)
-      expect(impound_settings.impound_panel_columns).to match_array(["impound_id_cell", *described_class::IMPOUND_COLUMNS])
+      expect(impound_settings.impound_panel_columns).to match_array(["impound_id_cell", "impound_current_location_cell", *described_class::IMPOUND_COLUMNS])
       expect([instance.impound?, impound_settings.impound?]).to eq [false, true]
       expect(instance.impound_search?).to be_falsey
       expect(impound_settings.sort_column_label("user_id")).to eq "Last updator"

@@ -15,26 +15,25 @@
         = render(UI::Alerts::Base::Component.new(header: t(".you_have_a_permitted_domain"), margin_classes: "tw:mt-4",
           text: t(".signing_in_with_permitted_domain_html", email_suffix: "@#{current_organization.user_email_domain}", org_name: current_organization.short_name)))
 
-= form_for @organization_role, { as: :organization_role, url: organization_users_path(organization_id: current_organization.to_param), action: 'create', html: { class: 'organized-form' } } do |f|
+= form_for @organization_role, { as: :organization_role, url: organization_users_path(organization_id: current_organization.to_param), action: 'create', html: { class: 'organized-form', data: {controller: "org--field-expander"} } } do |f|
 
   = render(UI::Alerts::ObjectError::Component.new(object: @organization_role, name: t(".organization_role")))
 
   - display_multi_invite = params[:multiple_emails_invited].present?
-  .form-group.row#singleEmailInvite{ class: display_multi_invite ? "currently-hidden" : "" }
+  .form-group.row{ class: ("tw:hidden" if display_multi_invite), data: {"org--field-expander-target": "collapsed"} }
     = f.label :invited_email, t(".email_youre_inviting"), class: "org-form-label"
     .col-sm-4
       = f.email_field :invited_email, class: "form-control"
       .below-input-help
-        %a#multipleUserSelect{ href: "#" }
-          = t(".invite_multiple_emails")
+        = render(UI::Button::Component.new(text: t(".invite_multiple_emails"), color: :link, data: {action: "org--field-expander#expand"}))
 
-  .form-group.row#multipleEmailInvite{ class: display_multi_invite ? "" : "currently-hidden" }
+  .form-group.row{ class: ("tw:hidden" unless display_multi_invite), data: {"org--field-expander-target": "expanded"} }
     = label_tag :multiple_emails_invited, class: "org-form-label" do
       = t(".multiple_emails")
       %br
       %em.small= t(".1_email_per_line")
 
-    .col-sm-4#multipleEmailInviteField{ class: display_multi_invite ? "" : "currently-hidden" }
+    .col-sm-4
       = text_area_tag :multiple_emails_invited,
         params[:multiple_emails_invited],
         placeholder: "email1@gmail.com\nemail2@gmail.com\nemail3@gmail.com",

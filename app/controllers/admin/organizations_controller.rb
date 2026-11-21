@@ -6,7 +6,7 @@ module Admin
     # picks between them, so only "edit" is an action
     FORM_TABS = %w[edit locations invoice_functionality sso].freeze
     # Like FORM_TABS, each names a template of its own - one #show renders in place of the profile
-    SHOW_TABS = %w[registration_sequences].freeze
+    SHOW_TABS = %w[education_courses].freeze
 
     before_action :find_organization, only: %w[show edit update destroy]
     before_action :set_admin_form_page_id, only: %w[edit new]

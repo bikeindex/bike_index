@@ -18,7 +18,7 @@ module SharedBlocks
           when "edits", "theft_alerts", "recovery"
             :edit_bike
           when "info"
-            :content unless %w[donate terms security vendor_terms privacy support_the_index resources].include?(action_name)
+            :content unless %w[donate donate_year_end terms security vendor_terms privacy support_the_index resources].include?(action_name)
           when "welcome"
             :content if action_name == "goodbye"
           when "organizations"
@@ -103,7 +103,6 @@ module SharedBlocks
           SharedBlocks::MainContent::Organized::Component.new(
             current_organization: @current_organization,
             current_user: @current_user,
-            passive_organization: @passive_organization,
             show_general_alert: @show_general_alert,
             controller_name: @controller_name,
             action_name: @action_name

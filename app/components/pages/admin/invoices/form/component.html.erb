@@ -6,7 +6,7 @@
       <%= f.hidden_field :organization_feature_ids, data: {"admin--invoice-form-target": "featureIds"} %>
       <%= render(UI::Alerts::ObjectError::Component.new(object: @invoice)) %>
 
-      <%= render(UI::Table::Component.new(records: @organization_features)) do |table| %>
+      <%= render(UI::Table::Base::Component.new(records: @organization_features)) do |table| %>
         <% table.column(label: "") do |organization_feature| %>
           <%= component.feature_checkbox(organization_feature) %>
         <% end %>

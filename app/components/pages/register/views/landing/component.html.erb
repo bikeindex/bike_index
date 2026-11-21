@@ -1,0 +1,192 @@
+<section id="register" class="tw:scroll-mt-4 tw:border-b <%= band %>">
+  <%# Phones get the form straight after the pitch, with the checks below it %>
+  <div
+    class="
+      tw:grid tw:items-center tw:gap-8 tw:pt-8 tw:pb-10 tw:sm:pt-10 tw:sm:pb-12 tw:lg:grid-cols-2 tw:lg:gap-x-12 tw:lg:gap-y-5.5 tw:lg:pt-14 tw:lg:pb-16
+      <%= SharedBlocks::Marketing::Wrapper::Component::CONTAINER_CLASSES %>
+    "
+  >
+    <div
+      class="
+        tw:flex tw:flex-col tw:items-start tw:gap-4 tw:sm:gap-5.5
+        tw:lg:self-end
+      "
+    >
+      <%= render(UI::Badge::Component.new(text: translation(".free_nonprofit_worldwide"), color: :empty, size: :lg)) do %>
+        <span class="tw:uppercase"><%= translation(".free_nonprofit_worldwide") %></span>
+      <% end %>
+
+      <h1
+        class="
+          tw:m-0 tw:font-header tw:text-[36px] tw:leading-[1.05]
+          tw:font-extrabold tw:tracking-tight tw:sm:text-[48px]
+          tw:xl:text-[52px]
+        "
+      >
+        <%= translation(".give_your_bike_a_way_home") %>
+      </h1>
+
+      <p
+        class="
+          tw:m-0 tw:max-w-120 tw:text-base tw:leading-[1.55]
+          tw:text-gray-500 tw:sm:text-[19px] tw:dark:text-gray-400
+        "
+      >
+        <%= translation(".lede") %>
+      </p>
+    </div>
+
+    <%= render(UI::Card::Component.new(shadow: :large, additional_classes: "tw:w-full tw:max-w-130 tw:justify-self-center " \
+      "tw:p-5! tw:sm:p-8! tw:lg:col-start-2 tw:lg:row-span-2 tw:lg:row-start-1 tw:lg:justify-self-end")) do %>
+      <%= render(Pages::Register::Views::Step1::Component.new(b_param: @b_param, flow: @flow,
+        current_user: @current_user, bare: true)) %>
+    <% end %>
+
+    <div
+      class="
+        tw:flex tw:flex-col tw:items-start tw:gap-4 tw:sm:gap-5.5
+        tw:lg:self-start
+      "
+    >
+      <ul class="tw:m-0 tw:flex tw:list-none tw:flex-col tw:gap-2 tw:p-0">
+        <% checks.each do |check| %>
+          <li
+            class="
+              tw:flex tw:items-center tw:gap-2.5 tw:text-base
+              tw:text-gray-700 tw:dark:text-gray-300
+            "
+          >
+            <%= helpers.inline_svg_tag("icons/check.svg", class: "tw:size-4.5 tw:shrink-0 tw:text-blue-600", aria_hidden: true) %>
+            <%= check %>
+          </li>
+        <% end %>
+      </ul>
+
+      <%# Only the lg source loads, so phones don't fetch an image they never show %>
+      <picture>
+        <source
+          media="(min-width: 64rem)"
+          srcset="<%= image_path("kelsey/illustrations/comic-assets_bike-hero.png") %>"
+        >
+
+        <%= image_tag(BLANK_IMAGE, alt: "",
+          class: "tw:hidden tw:w-full tw:max-w-75 tw:drop-shadow-[0_8px_16px_rgba(44,62,80,.18)] tw:lg:block") %>
+      </picture>
+    </div>
+  </div>
+</section>
+
+<section class="tw:border-b <%= band %>">
+  <div class="tw:py-7 <%= SharedBlocks::Marketing::Wrapper::Component::CONTAINER_CLASSES %>">
+    <%= render(SharedBlocks::Marketing::RegistryStats::Component.new(layout: :row_from_md)) %>
+  </div>
+</section>
+
+<section>
+  <div class="<%= section_inner %>">
+    <%= render(SharedBlocks::Marketing::SectionHeading::Component.new(heading: translation(".what_registering_gets_you"),
+      intro: translation(".what_registering_subhead"), html_class: "tw:mx-auto tw:mb-8 tw:max-w-160 tw:text-center tw:lg:mb-10")) %>
+
+    <div class="tw:grid tw:gap-3 tw:md:grid-cols-3 tw:md:gap-5 tw:lg:gap-6">
+      <% benefits.each do |benefit| %>
+        <%= render(SharedBlocks::Marketing::IconFeature::Component.new(**benefit, card: true)) %>
+      <% end %>
+    </div>
+  </div>
+</section>
+
+<section class="tw:border-y <%= band %>">
+  <div class="tw:flex tw:flex-col tw:gap-8 tw:lg:gap-10 <%= section_inner %>">
+    <%= render(SharedBlocks::Marketing::SectionHeading::Component.new(heading: translation(".if_the_worst_happens"),
+      html_class: "tw:text-center")) %>
+
+    <ol
+      class="
+        tw:mx-auto tw:my-0 tw:grid tw:w-full tw:max-w-xl tw:list-none
+        tw:gap-5 tw:p-0 tw:lg:max-w-none tw:lg:grid-cols-3 tw:lg:gap-7
+      "
+    >
+      <% stickers.each do |sticker| %>
+        <li>
+          <%= render(UI::Card::Component.new(shadow: :black, additional_classes: "tw:h-full tw:p-5! tw:sm:p-6!")) do %>
+            <div class="tw:mb-3 tw:flex tw:items-center tw:justify-between tw:gap-4">
+              <span
+                class="
+                  tw:font-[Bangers,_cursive] tw:text-[30px] tw:tracking-[.03em] tw:sm:text-[34px]
+                  <%= sticker[:color] %>
+                "
+                aria-hidden="true"
+              >
+                <%= sticker[:sound] %>
+              </span>
+
+              <%= image_tag(sticker[:image], alt: "", class: "tw:h-16 tw:w-auto tw:sm:h-20", loading: "lazy") %>
+            </div>
+
+            <h3 class="tw:m-0 tw:font-header tw:text-xl tw:font-bold">
+              <%= sticker[:title] %>
+            </h3>
+
+            <p
+              class="
+                tw:m-0 tw:mt-2 tw:leading-relaxed tw:text-gray-500
+                tw:dark:text-gray-400
+              "
+            >
+              <%= sticker[:body] %>
+            </p>
+          <% end %>
+        </li>
+      <% end %>
+    </ol>
+
+    <%= link_to(stolen_index_path, class: "twlink tw:self-center tw:text-center tw:text-[15px] tw:font-bold") do %>
+      <%= translation(".bike_already_stolen") %>
+      <span aria-hidden="true">→</span>
+    <% end %>
+  </div>
+</section>
+
+<section>
+  <div
+    class="
+      tw:mx-auto tw:max-w-190 tw:px-5 tw:py-10 tw:sm:py-12 tw:lg:px-6
+      tw:lg:py-18
+    "
+  >
+    <%= render(SharedBlocks::Marketing::SectionHeading::Component.new(heading: translation(".quick_answers"),
+      html_class: "tw:mb-4 tw:text-center")) %>
+
+    <%= render(UI::Accordion::Component.new(items: faqs)) %>
+
+    <div class="tw:mt-6 tw:text-center">
+      <%= render(UI::ButtonLink::Component.new(href: "#register",
+        text: translation(".register_your_bike"), color: :primary, size: :callout)) %>
+    </div>
+  </div>
+</section>
+
+<section class="tw:border-t <%= band %>">
+  <div class="twwiderow tw:items-center tw:gap-x-16 tw:gap-y-8 <%= section_inner %>">
+    <div class="tw:flex tw:flex-col tw:items-start tw:gap-4.5">
+      <%= image_tag("kelsey/illustrations/comic-assets_bike-love-1.png", alt: "",
+        class: "tw:block tw:h-auto tw:w-22 tw:lg:w-30", loading: "lazy") %>
+
+      <%= render(SharedBlocks::Marketing::SectionHeading::Component.new(eyebrow: translation(".keep_it_free"),
+        eyebrow_color: :purple, heading: bikes_registered, intro: translation(".donations_keep_it_free"))) %>
+    </div>
+
+    <%= render(UI::Card::Component.new(additional_classes: "tw:flex tw:flex-col tw:gap-4 tw:p-7!")) do %>
+      <h3
+        class="
+          tw:m-0 tw:font-header tw:text-2xl tw:font-extrabold
+          tw:tracking-tight
+        "
+      >
+        <%= translation(".fund_the_next_recovery") %>
+      </h3>
+
+      <%= render(@donate_form) %>
+    <% end %>
+  </div>
+</section>

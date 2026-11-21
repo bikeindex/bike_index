@@ -43,6 +43,9 @@ class MyAccountsController < ApplicationController
           default_session_set(@user)
         end
       end
+      # A fetch re-sends PATCH to a 302's location, which has no PATCH route
+      return head(successfully_updated ? 204 : 422) if request.format.json?
+
       if successfully_updated
         flash[:success] ||= translation(:successfully_updated)
         # NOTE: switched to edit_template in #2040 (from page), because page is used for pagination
@@ -66,21 +69,6 @@ class MyAccountsController < ApplicationController
       end
       flash[:error] = [error_reason, "Email support@bikeindex.org for help"].join(" ")
       redirect_back(fallback_location: edit_my_account_url(edit_template: @edit_template))
-    end
-  end
-
-  # Returns to the bike in whichever view is now active. skip_update because a view
-  # preference doesn't warrant the mailchimp/address recalculation of AfterUserChangeJob
-  def toggle_show_redesign
-    bike = Bike.unscoped.find_id(params[:bike_id])
-    show_legacy = !current_user.feature_registration_show_legacy?
-    if current_user.update(feature_registration_show_legacy: show_legacy, skip_update: true)
-      redirect_to(show_legacy ? bike_path(bike) : registration_path(bike))
-    else
-      # Unrelated validations (e.g. a preferred_language no longer available) can block
-      # the update, so return to the view they came from rather than bouncing them
-      flash[:error] = "Sorry, unable to update. Email contact@bikeindex.org for help fixing this!"
-      redirect_to(show_legacy ? registration_path(bike) : bike_path(bike))
     end
   end
 
@@ -194,13 +182,14 @@ class MyAccountsController < ApplicationController
       .permit(:name, :username, :notification_newsletters, :notification_unstolen, :no_non_theft_notification,
         :additional_emails, :title, :description, :phone, :avatar, :avatar_cache, :twitter, :show_twitter, :instagram, :show_instagram,
         :show_website, :show_bikes, :show_phone, :my_bikes_link_target, :time_single_format,
-        :my_bikes_link_title, :password, :password_confirmation, :preferred_language, :preferred_unit_system,
+        :my_bikes_link_title, :password, :password_confirmation, :preferred_language, :preferred_unit_system, :color_scheme,
         user_registration_organization_attributes: [:all_bikes, :can_edit_claimed],
         # include address_record id so we don't create new address records
         address_record_attributes: (AddressRecord.permitted_params + [:id]))
     if pparams.key?("username")
       pparams.delete("username") unless pparams["username"].present?
     end
-    pparams
+    # The switcher's json save is a display preference, which AfterUserChangeJob has no work for
+    request.format.json? ? pparams.merge(skip_update: true) : pparams
   end
 end

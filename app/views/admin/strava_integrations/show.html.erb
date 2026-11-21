@@ -1,7 +1,7 @@
 <%= render(Pages::Admin::Headers::Nav::Component.new(title: "Strava Integration")) %>
 
 <div class="twwiderow tw:mt-6 tw:items-start">
-  <%= render(UI::TableList::Component.new) do |list| %>
+  <%= render(UI::Table::List::Component.new) do |list| %>
     <% list.with_row(label: "ID", dev_only: true, if: display_dev_info?) do %>
       <%= render(UI::Code::Inline::Component.new(text: @strava_integration.id)) %>
 
@@ -28,7 +28,7 @@
     <% end %>
   <% end %>
 
-  <%= render(UI::TableList::Component.new) do |list| %>
+  <%= render(UI::Table::List::Component.new) do |list| %>
     <% list.with_row(label: "Status") do %>
       <%# duplicated in strava_integrations/table %>
       <% if @strava_integration.synced? %>

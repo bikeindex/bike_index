@@ -39,15 +39,21 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
     end
 
     it "renders the record's bike, its impound columns, and a hidden multi-update checkbox" do
+      ["Owner emailed", "Owner called", "Owner visited"].each do |notes|
+        FactoryBot.create(:impound_record_update, impound_record:, kind: "note", notes:)
+      end
+      impound_record.reload
       expect(component).to have_css("tbody tr", count: 1)
       expect(component).to have_text(bike.mnfg_name)
       expect(component).to have_css("td.impounded_at_cell a[href*='/impound_records/#{impound_record.display_id}']")
       expect(component).to have_css("td.impound_status_cell", text: impound_record.status_humanized_short)
       expect(component).to have_css("th.resolved_at_cell a", text: "Resolved")
-      expect(component).to have_css("td.impound_id_cell", text: impound_record.display_id)
+      expect(component).to have_css("td.impound_id_cell code", text: impound_record.display_id)
       expect(component).to have_css("td.impound_user_cell", text: impound_record.user.display_name.truncate(20))
       expect(component).to have_css("td.unregistered_cell", text: /\S/)
-      expect(component).not_to have_css("th.impound_location_cell", visible: :all)
+      expect(component).to have_css("th.impound_notes_cell", text: "Impound notes")
+      expect(component.css("td.impound_notes_cell small").map { it.text.strip }).to eq ["Owner visited", "Owner called"]
+      expect(component).to have_css("td.impound_notes_cell a[href*='/impound_records/#{impound_record.display_id}']", text: "+1 more")
       # The search orders by the record, so only its columns sort
       expect(component).to have_css("th.impounded_at_cell a")
       expect(component).not_to have_css("th.manufacturer_cell a")
@@ -59,17 +65,32 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
       expect(component.css("th")[1][:class]).to include("multi-update-cell")
     end
 
-    context "with impound_bikes_locations" do
-      let(:enabled_feature_slugs) { %w[impound_bikes impound_bikes_locations] }
-      let(:location) { FactoryBot.create(:location, organization:, name: "Back lot", impound_location: true) }
-      let(:impound_record) { FactoryBot.create(:impound_record_with_organization, organization:, bike:, location:) }
+    context "impounded from an address" do
+      let(:impound_record) { FactoryBot.create(:impound_record_with_organization, :with_address_record, organization:, bike:) }
 
-      it "renders a sortable location column, checked in the panel" do
-        expect(component).to have_css("th.impound_location_cell a", text: "Location")
-        expect(component).to have_css("td.impound_location_cell", text: "Back lot")
+      it "renders an unsortable current location column, the same as where it was impounded from, off by default" do
+        expect(component).to have_css("th.impound_current_location_cell", text: "Current location")
+        expect(component).not_to have_css("th.impound_current_location_cell a")
+        expect(component).to have_css("td.impound_current_location_cell", text: "same as impounded from")
+        expect(component).to have_css("td.impounded_from_cell", text: "1300 W 14th Pl")
         settings = ComponentStructs::OrgSearchSettings.new(organization:, impound: true)
-        expect(settings.initially_checked_columns).to include("impound_location_cell")
-        expect(settings.sort_column_label("location_id")).to eq "Location"
+        expect(settings.initially_checked_columns).not_to include("impound_current_location_cell")
+        expect(settings.impound_panel_columns).to include("impound_current_location_cell")
+      end
+
+      context "held at a location" do
+        let(:enabled_feature_slugs) { %w[impound_bikes impound_bikes_locations] }
+        let(:location) { FactoryBot.create(:location, :with_address_record, address_in: :new_york, organization:, name: "Back lot", impound_location: true) }
+        let(:impound_record) { FactoryBot.create(:impound_record_with_organization, :with_address_record, organization:, bike:, location:) }
+
+        it "renders the location and its address, sortable and on by default" do
+          expect(component).to have_css("th.impound_current_location_cell a", text: "Current location")
+          expect(component).to have_css("td.impound_current_location_cell", text: /Back lot\s+278 Broadway/)
+          expect(component).to have_css("td.impounded_from_cell", text: "1300 W 14th Pl")
+          settings = ComponentStructs::OrgSearchSettings.new(organization:, impound: true)
+          expect(settings.initially_checked_columns).to include("impound_current_location_cell")
+          expect(settings.sort_column_label("location_id")).to eq "Current location"
+        end
       end
     end
 
@@ -132,7 +153,7 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
 
   context "with every column's feature enabled" do
     let(:enabled_feature_slugs) do
-      %w[avery_export bike_stickers impound_bikes registration_notes registration_sequences
+      %w[avery_export bike_stickers impound_bikes registration_notes education_courses
         reg_address reg_extra_registration_number reg_organization_affiliation reg_phone reg_student_id]
     end
     # The panel builds a checkbox per enabled_columns entry, and ui--table-column-settings
@@ -174,16 +195,16 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
     end
   end
 
-  context "with registration_sequences enabled" do
-    let(:enabled_feature_slugs) { %w[registration_sequences] }
+  context "with education_courses enabled" do
+    let(:enabled_feature_slugs) { %w[education_courses] }
     let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization, propulsion_type: "pedal-assist") }
     let(:unacknowledged_bike) { FactoryBot.create(:bike_organized, creation_organization: organization, propulsion_type: "pedal-assist") }
     let(:bikes) { [bike, unacknowledged_bike] }
-    let(:registration_sequence) { FactoryBot.create(:registration_sequence_active, organization:) }
-    let!(:acknowledgment) { FactoryBot.create(:registration_sequence_acknowledgment, registration_sequence:, bike:) }
+    let(:education_course) { FactoryBot.create(:education_course_active, organization:) }
+    let!(:acknowledgment) { FactoryBot.create(:education_course_acknowledgment, education_course:, bike:) }
 
     it "renders when each bike was acknowledged" do
-      expect(component).to have_css("th.acknowledgment_cell span[title='Registration sequence acknowledgment at']",
+      expect(component).to have_css("th.acknowledgment_cell span[title='Education course acknowledgment at']",
         visible: :all, normalize_ws: true, exact_text: "Reg acknowledged")
       expect(component.css("td.acknowledgment_cell .localizeTime").count).to eq 1
     end
@@ -237,7 +258,7 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
         expect(bike.reload.status_impounded?).to be true
         expect(impound_record.reload.display_id).to be_present
         expect(impound_record.display_id).to_not eq impound_record.id.to_s
-        expect(component.css("td.impound_id_cell").text.strip).to eq impound_record.display_id
+        expect(component.css("td.impound_id_cell code").text).to eq impound_record.display_id
       end
     end
   end

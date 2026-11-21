@@ -1,0 +1,9 @@
+---
+en:
+  components:
+    shared_blocks:
+      color_scheme_picker:
+        appearance: Appearance
+        dark: Dark
+        light: Light
+        system: System

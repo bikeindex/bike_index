@@ -22,7 +22,7 @@ async function refreshToken(): Promise<StoredAuth> {
     accessToken: tokenResponse.access_token,
     refreshToken: '',
     expiresAt: (tokenResponse.created_at + tokenResponse.expires_in) * 1000,
-    athlete: auth?.athlete ?? { id: 0, username: '', firstname: '', lastname: '', city: '', state: '', country: '', profile: '', profile_medium: '' },
+    athlete: auth?.athlete ?? { id: '', username: '', firstname: '', lastname: '', city: '', state: '', country: '', profile: '', profile_medium: '' },
   };
   await saveAuth(newAuth);
   return newAuth;
@@ -173,12 +173,12 @@ export async function getActivities(
   return result;
 }
 
-export async function getActivity(id: number): Promise<StravaActivity> {
+export async function getActivity(id: string): Promise<StravaActivity> {
   return apiRequest<StravaActivity>(`/activities/${id}`);
 }
 
 export async function updateActivity(
-  id: number,
+  id: string,
   updates: UpdatableActivity
 ): Promise<StravaActivity> {
   await apiRequest<StravaActivity>(`/activities/${id}`, {

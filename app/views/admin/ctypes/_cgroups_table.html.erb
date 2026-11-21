@@ -2,7 +2,7 @@
 
 <%= render(UI::Header::Component.new(text: "Component groups", tag: :h2)) %>
 
-<%= render(UI::Table::Component.new(records: cgroups)) do |table| %>
+<%= render(UI::Table::Base::Component.new(records: cgroups)) do |table| %>
   <% table.column(label: "Name") do |cgroup| %>
     <%= cgroup.name.titleize %>
   <% end %>

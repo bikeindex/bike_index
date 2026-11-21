@@ -15,7 +15,7 @@
   </div>
 
   <div class="tw:w-3/4 tw:lg:w-5/12 tw:lg:pr-4">
-    <%= render(UI::TableList::Component.new(classes: "tw:mb-0!")) do |list| %>
+    <%= render(UI::Table::List::Component.new(classes: "tw:mb-0!")) do |list| %>
       <% list.with_row(label: "ID", class: "tw:text-sm", if: @display_dev_info) do %>
         <%= render(UI::Code::Inline::Component.new(text: @bike.id)) %>
 
@@ -100,7 +100,7 @@
   </div>
 
   <div class="tw:w-full tw:lg:w-5/12">
-    <%= render(UI::TableList::Component.new(classes: "tw:mb-0!")) do |list| %>
+    <%= render(UI::Table::List::Component.new(classes: "tw:mb-0!")) do |list| %>
       <% list.with_row(label: "Owner Email") do %>
         <%= @bike.owner_email %>
         <%= link_to helpers.search_emoji, owner_search_url, class: "tw:mx-1" %>

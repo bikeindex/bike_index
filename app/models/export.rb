@@ -48,7 +48,6 @@ class Export < ApplicationRecord
   belongs_to :user # Creator of export
 
   attr_accessor :timezone # permit assignment
-  attr_reader :avery_export
 
   before_validation :set_calculated_attributes, on: :create
   before_validation :set_progress
@@ -113,6 +112,8 @@ class Export < ApplicationRecord
   def avery_export?
     option?("avery_export")
   end
+
+  def avery_export = avery_export?
 
   def bike_code_start
     options["bike_code_start"]

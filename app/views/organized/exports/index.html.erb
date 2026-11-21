@@ -9,7 +9,7 @@
       class: "btn btn-secondary" %>
   </div>
 
-  <div class="full-screen-table mt-4">
+  <div class="mt-4">
     <p style="margin-bottom: 0;">
       <strong>
         <%= pluralize(number_with_delimiter(@pagy.count), t(".export")) %>
@@ -18,84 +18,60 @@
 
     <% show_assigned_bike_codes = current_organization.enabled?("avery_export") || @exports.any? { |e| e.assign_bike_codes? } %>
 
-    <table class="table table-striped table-bordered table-sm without-exterior-border">
-      <thead class="small-header">
-        <th><%= t(".created") %> <small class="localizeTimezone"></small></th>
-        <th><%= t(".creator") %></th>
-        <th><%= t(".progress") %></th>
-        <th>Matching registrations</th>
+    <% organization_id = current_organization.to_param %>
+    <% download = t(".download") %>
+    <% delete = t(".delete") %>
 
-        <% if show_assigned_bike_codes %>
-          <td class="small text-center">
-            <% if current_organization.enabled?("avery_export") %>
-              Avery Export
-            <% else %>
-              <%= t(".stickers_assigned") %>
-            <% end %>
-          </td>
+    <%= render(UI::Table::Base::Component.new(records: @exports)) do |table| %>
+      <% table.column(label: safe_join([t(".created"), " ", tag.small(class: "localizeTimezone")])) do |export| %>
+        <%= link_to render(UI::Time::Component.new(time: export.created_at)), organization_export_path(export, organization_id:), class: "twlink" %>
+      <% end %>
+
+      <% table.column(label: t(".creator")) do |export| %>
+        <%= export&.user&.display_name %>
+      <% end %>
+
+      <% table.column(label: t(".progress")) do |export| %>
+        <span class="<%= helpers.export_progress_class(export) %>">
+          <%= export.calculated_progress %>
+        </span>
+      <% end %>
+
+      <% table.column(label: "Matching registrations") do |export| %>
+        <% if export.only_custom_bike_ids %>
+          <em>only specified</em>
+        <% else %>
+          <%= export.matching_kinds.map(&:to_s).join(", ") %>
         <% end %>
+      <% end %>
 
-        <th><%= t(".bikes_in_export") %></th>
-
-        <td><%= t(".download") %></td>
-        <td></td>
-      </thead>
-
-      <tbody>
-        <% @exports.each do |export| %>
-          <tr>
-            <td>
-              <%= link_to organization_export_path(export, organization_id: current_organization.to_param), class: "localizeTime" do %>
-                <%= l(export.created_at, format: :convert_time) %>
-              <% end %>
-            </td>
-
-            <td><%= export&.user&.display_name %></td>
-
-            <td>
-              <span class="<%= export_progress_class(export) %>">
-                <%= export.calculated_progress %>
-              </span>
-            </td>
-
-            <td>
-              <% if export.only_custom_bike_ids %>
-                <em>only specified</em>
-              <% else %>
-                <%= export.matching_kinds.map(&:to_s).join(", ") %>
-              <% end %>
-            </td>
-
-            <% if show_assigned_bike_codes %>
-              <td class="text-center">
-                <%= check_mark if export.avery_export? || export.assign_bike_codes? %>
-              </td>
-            <% end %>
-
-            <td>
-              <%= number_display(export.rows) if export.finished? %>
-
-              <% if export.assign_bike_codes? %>
-                &nbsp;
-                <%= render UI::Badge::Component.new(size: :sm, **export_stickers_badge_attributes(export)) %>
-              <% end %>
-            </td>
-
-            <td>
-              <%= link_to(t(".download"), export.file.url) if export.file.url.present? %>
-            </td>
-
-            <td>
-              <small>
-                <%= link_to t(".delete"),
-                  organization_export_path(export, organization_id: current_organization.to_param),
-                  method: :delete %>
-              </small>
-            </td>
-          </tr>
+      <% if show_assigned_bike_codes %>
+        <% table.column(label: current_organization.enabled?("avery_export") ? "Avery Export" : t(".stickers_assigned"), classes: "tw:text-center", header_classes: "tw:text-xs") do |export| %>
+          <%= check_mark if export.avery_export? || export.assign_bike_codes? %>
         <% end %>
-      </tbody>
-    </table>
+      <% end %>
+
+      <% table.column(label: t(".bikes_in_export")) do |export| %>
+        <%= number_display(export.rows) if export.finished? %>
+
+        <% if export.assign_bike_codes? %>
+          &nbsp;
+          <%= render UI::Badge::Component.new(size: :sm, **helpers.export_stickers_badge_attributes(export)) %>
+        <% end %>
+      <% end %>
+
+      <% table.column(label: download) do |export| %>
+        <%= link_to(download, export.file.url, class: "twlink") if export.file.url.present? %>
+      <% end %>
+
+      <% table.column do |export| %>
+        <small>
+          <%= link_to delete,
+            organization_export_path(export, organization_id:),
+            method: :delete, class: "twlink" %>
+        </small>
+      <% end %>
+    <% end %>
   </div>
 
   <div class="pb-4 pt-4">

@@ -2,7 +2,7 @@
   = render(Pages::Admin::Headers::Nav::Component.new(title: "Edit Superuser Ability"))
 
 .twwiderow{class: "tw:items-start tw:mb-6"}
-  = render(UI::TableList::Component.new) do |list|
+  = render(UI::Table::List::Component.new) do |list|
     - list.with_row(label: "Created", value: render(UI::Time::Component.new(time: @superuser_ability.created_at)))
     - list.with_row(label: "Updated", value: tag.span(render(UI::Time::Component.new(time: @superuser_ability.updated_at)), class: "tw:text-sm"))
     - list.with_row(label: "Deleted") do
@@ -12,7 +12,7 @@
     - list.with_row(label: "User") do
       = cache(@superuser_ability.user) do
         = render Atoms::Admin::TableCells::User::Component.new(user_id: @superuser_ability.user_id, user: @superuser_ability.user, render_search: false)
-  = render(UI::TableList::Component.new) do |list|
+  = render(UI::Table::List::Component.new) do |list|
     - list.with_row(label: "Kind", value: @superuser_ability.kind.titleize)
     - list.with_row(label: "controller name", value: @superuser_ability.controller_name)
     - list.with_row(label: "Action name", value: @superuser_ability.action_name)

@@ -89,6 +89,9 @@ jobs:
       - name: Scan for common Rails security vulnerabilities using static analysis
         if: success() || failure()
         run: bin/brakeman
+      - name: Scan gems for known vulnerabilities
+        if: success() || failure()
+        run: bundle exec bundler-audit --update
 
       # Eventually this should be added:
       # - name: Scan for security vulnerabilities in JavaScript dependencies
@@ -127,7 +130,7 @@ jobs:
           echo "node_version=$node_version" >> "$GITHUB_OUTPUT"
           echo "image=$REGISTRY/$IMAGE_NAME:$tag" >> "$GITHUB_OUTPUT"
       - name: Log in to GHCR
-        uses: docker/login-action@v4.7.0
+        uses: docker/login-action@v4.8.0
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}

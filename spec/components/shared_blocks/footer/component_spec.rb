@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe SharedBlocks::Footer::Component, type: :component do
-  let(:instance) { described_class.new(current_user: nil, skip_facebook:) }
+  let(:instance) { described_class.new(current_user: nil, color_scheme: "system", skip_facebook:) }
   let(:component) { with_request_url("/") { render_inline(instance) } }
   let(:skip_facebook) { false }
   let(:pixel_id) { SharedBlocks::Footer::Component::FACEBOOK_PIXEL_ID }
@@ -46,7 +46,7 @@ RSpec.describe SharedBlocks::Footer::Component, type: :component do
     # one language serves the footer cached in another. See ApplicationComponentHelper#cache.
     it "varies the cached fragment by locale" do
       en = with_request_url("/") { render_inline(instance) }.to_html
-      nl = I18n.with_locale(:nl) { with_request_url("/") { render_inline(described_class.new(current_user: nil, skip_facebook:)) } }.to_html
+      nl = I18n.with_locale(:nl) { with_request_url("/") { render_inline(described_class.new(current_user: nil, color_scheme: "system", skip_facebook:)) } }.to_html
       expect(en).to include("Privacy policy")
       expect(nl).to_not include("Privacy policy")
     end

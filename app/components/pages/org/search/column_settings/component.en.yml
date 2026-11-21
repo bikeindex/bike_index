@@ -6,7 +6,6 @@ en:
         search:
           column_settings:
             acknowledgment_cell: Reg acknowledged
-            acknowledgment_cell_panel: Time - Registration sequence acknowledged
             address: 'Address:'
             all: all
             all_bikes: All bikes
@@ -17,8 +16,11 @@ en:
               impounded vehicles search
             copy_column_order_from_registrations_search: Copy column order from registrations
               search
+            course_acknowledgment_cell_panel: Time - Education course acknowledged
             created_at_cell: Registered
             creation_description_cell: Source
+            current_location_without_locations: You don't have impound locations,
+              so this mostly repeats Impounded from
             cycle_type_cell: Vehicle type
             filter_impounded_html: only <strong>impounded</strong>
             filter_no_address_html: only <strong>no</strong> address
@@ -31,8 +33,9 @@ en:
             filter_stolen_or_impounded_html: only <strong>stolen</strong> or <strong>impounded</strong>
             filter_with_address_html: only <strong>with</strong> address
             filter_with_stickers_html: only <strong>with</strong> stickers
+            impound_current_location_cell: Current location
             impound_id_cell: Impound ID
-            impound_location_cell: Location
+            impound_notes_cell: Impound notes
             impound_search_columns: Impound search columns
             impound_status_cell: Impound status
             impound_updated_at_cell: Impound updated

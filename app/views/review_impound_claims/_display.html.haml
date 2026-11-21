@@ -8,7 +8,7 @@
 %h3.uncap.mb-0 Claiming bike:
 .row
   .col-md-6.mt-2
-    = render(UI::TableList::Component.new) do |list|
+    = render(UI::Table::List::Component.new) do |list|
       - list.with_row(label: "Claim Created", value: render(UI::Time::Component.new(time: @impound_claim.created_at, format: :localize_time_precise)))
       - list.with_row(label: "Status") do
         %strong
@@ -72,6 +72,12 @@
       %h3.uncap.mt-2.mb-2
         This claim has been updated since it was submitted:
       = render partial: "/organized/impound_records/impound_record_updates_table", locals: {impound_record_updates: @impound_claim.impound_record_updates.reorder(created_at: :desc)}
+      - if @impound_claim.approved? && @impound_record.active? && !@impound_claim.organized? && !block_superuser_update
+        .mt-4.text-center
+          = render UI::ButtonLink::Component.new(text: "Mark returned to owner", href: update_url, method: :patch, params: {submit: "retrieved_by_owner"}, color: :primary, size: :lg)
+        %p.mt-2.text-center
+          %em.less-strong
+            Once the owner has picked up their #{@impound_claim.bike_type}, mark it returned.
 
 %h3.uncap.mb-0.mt-4
   - if @impound_claim.organized?
@@ -81,7 +87,7 @@
   #{@impound_claim.kind.titleize} #{@impound_claim.bike_type}:
 .row
   .col-md-6.mt-2
-    = render(UI::TableList::Component.new) do |list|
+    = render(UI::Table::List::Component.new) do |list|
       - list.with_row(label: "Bike") do
         - if @bike_claimed.present?
           = link_to organized_bike_text(@bike_claimed), bike_path(@bike_claimed, organization_id: current_organization.to_param)

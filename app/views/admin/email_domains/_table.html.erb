@@ -1,6 +1,6 @@
 <%# locals: (collection:, render_sortable: false) %>
 
-<%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
+<%= render(UI::Table::Base::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
   <% table.column(sortable: "created_at", lower_right: ->(email_domain) { content_tag(:span, email_domain.id, class: "only-dev-visible") }) do |email_domain| %>
     <%= link_to admin_email_domain_path(email_domain), class: "twlink" do %>
       <%= render UI::Time::Component.new(time: email_domain.created_at) %>

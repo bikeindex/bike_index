@@ -57,7 +57,7 @@
               <%= translation(".role_html", role: content_tag(:strong, translation(".roles.#{organization_role.role}"))) %>
             </div>
 
-            <div class="tw:text-sm tw:text-gray-600">
+            <div class="tw:text-sm tw:text-gray-600 tw:dark:text-gray-400">
               <%= translation(".joined") %>
               <%= render UI::Time::Component.new(time: organization_role.claimed_at, preposition: true) %>
             </div>

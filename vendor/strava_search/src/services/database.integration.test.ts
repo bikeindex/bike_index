@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
+import Dexie from 'dexie';
 import {
   db,
   saveActivities,
@@ -56,7 +57,7 @@ function createMockGear(overrides: Partial<StravaGear> = {}): StravaGear {
 }
 
 // Helper to create mock auth
-function createMockAuth(athleteId: number): StoredAuth {
+function createMockAuth(athleteId: string): StoredAuth {
   return {
     accessToken: 'test_access_token',
     refreshToken: 'test_refresh_token',
@@ -76,8 +77,8 @@ function createMockAuth(athleteId: number): StoredAuth {
 }
 
 describe('database service integration tests', () => {
-  const testAthleteId = 12345;
-  const otherAthleteId = 67890;
+  const testAthleteId = '12345';
+  const otherAthleteId = '67890';
 
   // Clear database before each test
   beforeEach(async () => {
@@ -120,7 +121,7 @@ describe('database service integration tests', () => {
     });
 
     it('returns empty array when athlete has no activities', async () => {
-      const activities = await getActivitiesForAthlete(99999);
+      const activities = await getActivitiesForAthlete('99999');
       expect(activities).toHaveLength(0);
     });
 
@@ -145,13 +146,13 @@ describe('database service integration tests', () => {
       ];
       await saveActivities(activities, testAthleteId);
 
-      const activity = await getActivityById(100);
+      const activity = await getActivityById('100');
       expect(activity).toBeDefined();
       expect(activity?.title).toBe('Target Activity');
     });
 
     it('returns undefined for non-existent activity', async () => {
-      const activity = await getActivityById(99999);
+      const activity = await getActivityById('99999');
       expect(activity).toBeUndefined();
     });
   });
@@ -161,15 +162,15 @@ describe('database service integration tests', () => {
       const activity = createMockActivity({ strava_id: '100', title: 'Original' });
       await saveActivities([activity], testAthleteId);
 
-      const beforeUpdate = await getActivityById(100);
+      const beforeUpdate = await getActivityById('100');
       const originalSyncedAt = beforeUpdate?.syncedAt;
 
       // Small delay to ensure timestamp changes
       await new Promise((resolve) => setTimeout(resolve, 10));
 
-      await updateActivityInDb(100, { title: 'Updated', description: 'New desc' });
+      await updateActivityInDb('100', { title: 'Updated', description: 'New desc' });
 
-      const updated = await getActivityById(100);
+      const updated = await getActivityById('100');
       expect(updated?.title).toBe('Updated');
       expect(updated?.description).toBe('New desc');
       expect(updated?.syncedAt).toBeGreaterThan(originalSyncedAt!);
@@ -184,9 +185,9 @@ describe('database service integration tests', () => {
       });
       await saveActivities([activity], testAthleteId);
 
-      await updateActivityInDb(100, { title: 'Updated' });
+      await updateActivityInDb('100', { title: 'Updated' });
 
-      const updated = await getActivityById(100);
+      const updated = await getActivityById('100');
       expect(updated?.title).toBe('Updated');
       expect(updated?.distance_meters).toBe(5000);
       expect(updated?.kudos_count).toBe(10);
@@ -284,7 +285,7 @@ describe('database service integration tests', () => {
     });
 
     it('returns undefined for non-existent sync state', async () => {
-      const state = await getSyncState(99999);
+      const state = await getSyncState('99999');
       expect(state).toBeUndefined();
     });
 
@@ -383,7 +384,7 @@ describe('database service integration tests', () => {
       });
 
       await saveActivities([activity], testAthleteId);
-      const retrieved = await getActivityById(100);
+      const retrieved = await getActivityById('100');
 
       expect(retrieved?.title).toBe('Full Activity');
       expect(retrieved?.description).toBe('Description');
@@ -410,7 +411,7 @@ describe('database service integration tests', () => {
       });
 
       await saveActivities([activity], testAthleteId);
-      const retrieved = await getActivityById(100);
+      const retrieved = await getActivityById('100');
 
       expect(retrieved?.photos?.photo_url).toBe('https://example.com/600.jpg');
       expect(retrieved?.photos?.photo_count).toBe(3);
@@ -430,12 +431,43 @@ describe('database service integration tests', () => {
       });
 
       await saveActivities([activity], testAthleteId);
-      const retrieved = await getActivityById(100);
+      const retrieved = await getActivityById('100');
 
       expect(retrieved?.segment_locations?.locations).toEqual([
         { city: 'San Francisco', region: 'CA', country: 'US' },
         { city: 'Sausalito', region: 'CA', country: 'US' },
       ]);
+    });
+  });
+
+  describe('64-bit IDs', () => {
+    it('keeps IDs that round to the same Number as separate activities', async () => {
+      await saveActivities([
+        createMockActivity({ strava_id: '9007199254740992', title: 'First' }),
+        createMockActivity({ strava_id: '9007199254740993', title: 'Second' }),
+      ], testAthleteId);
+
+      expect(await getActivitiesForAthlete(testAthleteId)).toHaveLength(2);
+      expect((await getActivityById('9007199254740993'))?.title).toBe('Second');
+    });
+
+    it('clears version 1 data on upgrade', async () => {
+      await db.delete();
+      const legacy = new Dexie(db.name);
+      legacy.version(1).stores({
+        activities: 'id, athleteId, title, activity_type, sport_type, gear_id, start_date_in_zone, [athleteId+start_date_in_zone]',
+        gear: 'id, athleteId',
+        auth: 'id',
+        syncState: 'athleteId',
+      });
+      await legacy.table('activities').put({ ...createMockActivity({ strava_id: '16211859713' }), id: 16211859713, athleteId: 12345 });
+      await legacy.table('auth').put({ ...createMockAuth('12345'), id: 12345 });
+      legacy.close();
+
+      await db.open();
+
+      expect(await db.activities.count()).toBe(0);
+      expect(await db.auth.count()).toBe(0);
     });
   });
 });

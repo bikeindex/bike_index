@@ -389,6 +389,7 @@ RSpec.describe Organized::BikesController, type: :request do
         get "#{base_url}/incompletes"
         expect(response.status).to eq(200)
         expect(assigns(:b_params).pluck(:id)).to eq([partial_registration.id])
+        expect(response.body).to include("Step 2")
 
         Sidekiq::Testing.inline! do
           expect { post "#{base_url}/#{partial_registration.id}/resend_incomplete_email" }
@@ -456,7 +457,7 @@ RSpec.describe Organized::BikesController, type: :request do
     context "without registration_notes feature" do
       it "redirects with flash error" do
         patch "#{base_url}/#{bike.id}", params: {notes: "test notes"}
-        expect(response).to redirect_to(bike_path(bike))
+        expect(response).to redirect_to(registration_path(bike))
         expect(flash[:error]).to be_present
         expect(BikeOrganizationNote.find_by(bike_id: bike.id, organization_id: current_organization.id)).to be_nil
       end
@@ -470,7 +471,7 @@ RSpec.describe Organized::BikesController, type: :request do
 
         it "updates notes and creates audit trail" do
           patch "#{base_url}/#{bike.id}", params: {notes: "test notes"}
-          expect(response).to redirect_to(bike_path(bike))
+          expect(response).to redirect_to(registration_path(bike))
           expect(flash[:success]).to be_present
           bike_organization_note = BikeOrganizationNote.find_by(bike_id: bike.id, organization_id: current_organization.id)
           expect(bike_organization_note.body).to eq "test notes"
@@ -485,7 +486,7 @@ RSpec.describe Organized::BikesController, type: :request do
         it "updates notes" do
           patch "#{base_url}/#{bike.id}", params: {notes: "test notes"},
             headers: {"Accept" => "text/vnd.turbo-stream.html"}
-          expect(response).to redirect_to(bike_path(bike))
+          expect(response).to redirect_to(registration_path(bike))
           expect(flash[:success]).to be_present
           expect(BikeOrganizationNote.find_by(bike_id: bike.id, organization_id: current_organization.id).body).to eq "test notes"
         end
@@ -498,7 +499,7 @@ RSpec.describe Organized::BikesController, type: :request do
         it "updates note body to nil" do
           expect(bike_organization_note.body).to eq "old note"
           patch "#{base_url}/#{bike.id}", params: {notes: "  "}
-          expect(response).to redirect_to(bike_path(bike))
+          expect(response).to redirect_to(registration_path(bike))
           expect(flash[:success]).to be_present
           bike_organization_note.reload
           expect(bike_organization_note.body).to be_nil
@@ -513,7 +514,7 @@ RSpec.describe Organized::BikesController, type: :request do
         let(:other_bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: bike_user) }
         it "updates notes" do
           patch "#{base_url}/#{other_bike.id}", params: {notes: "test notes"}
-          expect(response).to redirect_to(bike_path(other_bike))
+          expect(response).to redirect_to(registration_path(other_bike))
           expect(flash[:success]).to be_present
           expect(BikeOrganizationNote.find_by(bike_id: other_bike.id, organization_id: current_organization.id).body).to eq "test notes"
         end

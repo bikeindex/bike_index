@@ -1,7 +1,7 @@
 = render partial: "bike_show_overlays"
 
 .container
-  = render(Pages::Registrations::Show::ToggleView::Component.new(bike: @bike, current_user:))
+  = render(Pages::Registrations::Show::ToggleView::Component.new(bike: @bike))
 
   - if current_user.present? # Header row is super admin stuff and credibility badges
     = render partial: "/bikes/header_row"
@@ -56,13 +56,13 @@
             - time = @stolen_record.present? ? @stolen_record.date_stolen : @bike.current_impound_record.impounded_at
             = l time, format: :convert_time
           %small.localizeTimezone
-          - if @stolen_record&.formatted_address_string.present? || @bike.current_impound_record&.address_present?
+          - if @stolen_record&.formatted_address_string.present? || @bike.current_impound_record&.impounded_from_address&.address_present?
             %strong
               = @bike.status_found? ? t(".in") : t(".from")
             - if @stolen_record.present?
               = @stolen_record.formatted_address_string
             - else
-              = @bike.current_impound_record.formatted_address_string
+              = @bike.current_impound_record.impounded_from_address.formatted_address_string
 
       - if @bike.user&.show_bikes?
         %h4

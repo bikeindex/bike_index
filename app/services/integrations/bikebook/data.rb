@@ -4,7 +4,7 @@ module Integrations
       require "net/http"
 
       # Registration blocks on this, so it has to give up well inside rack-timeout's 30s -
-      # Net::HTTP defaults to 60s. Dropping the lookup only costs BikeBook data
+      # Net::HTTP defaults to 60s. Dropping the lookup only costs Bike Book data
       TIMEOUT_SECONDS = 5
 
       def make_request(query, method = nil)
@@ -36,7 +36,7 @@ module Integrations
         return nil unless options[:year].present? && options[:manufacturer].present? && options[:frame_model].present?
 
         # We're book sluging everything because, url safe (It's the same method bikebook uses)
-        query = {manufacturer: Slugifyer.manufacturer(options[:manufacturer]),
+        query = {manufacturer: Slugifyer.legacy_manufacturer(options[:manufacturer]),
                  year: options[:year],
                  frame_model: Slugifyer.book_slug(options[:frame_model])}
 
@@ -46,7 +46,7 @@ module Integrations
       def get_model_list(options = {})
         return nil unless options[:manufacturer].present?
 
-        query = {manufacturer: Slugifyer.manufacturer(options[:manufacturer])}
+        query = {manufacturer: Slugifyer.legacy_manufacturer(options[:manufacturer])}
         query[:year] = options[:year] if options[:year].present?
 
         make_request(query, "/model_list/")

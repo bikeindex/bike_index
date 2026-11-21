@@ -30,7 +30,7 @@ module Pages
         def verdict_label
           case @verdict
           when :green then translation(".legal_to_ride")
-          when :yellow then translation(".legal_with_rules")
+          when :yellow then translation(".classified_with_rules")
           when :red then translation(".not_permitted")
           else translation(".rules_not_on_file")
           end
@@ -40,36 +40,51 @@ module Pages
           name = bike_name
           state = @state[:name]
           case @verdict
-          when :green then @us ? green_headline(name, state) : translation(".green_headline_law", name:, state:, law: @law[:name])
+          when :green then @us ? green_headline(name, state) : translation(".green_summary_law", name:, state:, law: @law[:name])
           when :yellow then @us ? yellow_headline(name, state) : metric_yellow_headline(name, state)
           when :red
             # a hand-entered bike's name is "e-bike", which this headline says it isn't
-            @bike.manual? ? translation(".red_headline_manual", state:) : translation(".not_classified_headline", name:, state:)
+            @bike.manual? ? translation(".red_headline_manual", state:) : translation(".not_classified_summary", name:, state:)
           else translation(".gray_headline", state:)
           end
         end
 
+        def headline_html
+          return unbroken_hyphen(headline) if @verdict != :green || @bike.manual?
+
+          before, name, after = headline.partition(bike_name)
+          safe_join([unbroken_hyphen(before), tag.strong(unbroken_hyphen(name), class: "tw:font-bold"), unbroken_hyphen(after)])
+        end
+
         def green_headline(name, state)
           if @law[:classes].none?
-            translation(".green_headline_no_classes", name:, state:)
+            @bike.manual? ? translation(".green_summary_no_classes_manual", state:) : translation(".green_summary_no_classes", name:, state:)
           elsif optional_clause.present?
-            translation(".class_headline_optional", name:, state:, n: class_numbers, optional: optional_clause)
+            translation(".class_summary_optional", name:, state:, n: class_numbers, optional: optional_clause)
+          elsif @bike.manual?
+            translation(".class_summary_manual", state:, n: class_numbers)
           else
-            translation(".class_headline", name:, state:, n: class_numbers)
+            translation(".class_summary", name:, state:, n: class_numbers)
           end
         end
 
         def yellow_headline(name, state)
           if without_throttle?
-            @law[:classes].none? ? translation(".yellow_headline_no_classes_without_throttle", name:, state:) : translation(".class_headline_without_throttle", name:, state:, n: class_numbers)
+            @law[:classes].none? ? translation(".yellow_summary_no_classes_without_throttle", name:, state:) : translation(".class_summary_without_throttle", name:, state:, n: class_numbers)
           elsif @bike.e_bike_class && @law[:classes].none?
-            translation(".yellow_headline_no_classes", name:, state:, count: rule_count(:check))
+            if @bike.manual?
+              translation(".yellow_summary_no_classes_manual", state:, count: rule_count(:check))
+            else
+              translation(".yellow_summary_no_classes", name:, state:, count: rule_count(:check))
+            end
           elsif @bike.e_bike_class && optional_clause.present?
-            translation(".class_headline_optional_with_rules", name:, state:, n: class_numbers, optional: optional_clause, count: rule_count(:check))
+            translation(".class_summary_optional_with_rules", name:, state:, n: class_numbers, optional: optional_clause, count: rule_count(:check))
+          elsif @bike.e_bike_class && @bike.manual?
+            translation(".class_summary_with_rules_manual", state:, n: class_numbers, count: rule_count(:check))
           elsif @bike.e_bike_class
-            translation(".class_headline_with_rules", name:, state:, n: class_numbers, count: rule_count(:check))
+            translation(".class_summary_with_rules", name:, state:, n: class_numbers, count: rule_count(:check))
           else
-            translation(".yellow_headline_class_unknown", name:, state:, count: rule_count(:check))
+            translation(".yellow_summary_class_unknown", name:, state:, count: rule_count(:check))
           end
         end
 
@@ -77,11 +92,11 @@ module Pages
         def metric_yellow_headline(name, state)
           law = @law[:name]
           if without_throttle?
-            translation(".yellow_headline_law_without_throttle", name:, state:, law:)
+            translation(".yellow_summary_law_without_throttle", name:, state:, law:)
           elsif @law[:motor_vehicle]
-            translation(".yellow_headline_motor_vehicle_law", name:, state:, law:, count: rule_count(:check))
+            translation(".yellow_summary_motor_vehicle_law", name:, state:, law:, count: rule_count(:check))
           else
-            translation(".yellow_headline_law", name:, state:, law:, count: rule_count(:check))
+            translation(".yellow_summary_law", name:, state:, law:, count: rule_count(:check))
           end
         end
 
@@ -119,7 +134,7 @@ module Pages
           }.to_sentence
         end
 
-        # A BikeBook model's maker and model fill in the registration it starts
+        # A Bike Book model's maker and model fill in the registration it starts
         def register_href
           return new_register_path if @bike.manual?
 
@@ -137,9 +152,9 @@ module Pages
 
         def gray_detail
           if @bike.e_bike_class
-            translation(".gray_detail", name: bike_name, n: class_numbers, state: @state[:name])
+            translation(".gray_listed_detail", name: bike_name, n: class_numbers, state: @state[:name])
           else
-            translation(".gray_detail_unclassified", name: bike_name, state: @state[:name])
+            translation(".gray_unlisted_detail", name: bike_name, state: @state[:name])
           end
         end
 
@@ -153,9 +168,9 @@ module Pages
           other_classification[:by_limits] ? translation(".may_fall_under_name", state:, name:) : translation(".falls_under_name", state:, name:)
         end
 
-        def other_classification_eyebrow
-          state = @state[:name]
-          other_classification[:by_limits] ? translation(".rules_that_may_apply", state:) : translation(".rules_that_apply", state:)
+        def other_classification_href
+          query = request.query_parameters.merge(non_e_bike_rules: 1, non_e_bike_type: other_classification[:value])
+          "#{ReadableQuery.path("", query)}##{Pages::EbikeRules::Classes::Component::NON_E_BIKE_RULES_ID}"
         end
 
         def other_classification
@@ -179,7 +194,7 @@ module Pages
         end
 
         def source
-          link = link_to(translation(".bikebook_name"), ReadableQuery.path(bikebook_path, vehicle_models: @law[:id]), class: "twlink")
+          link = link_to(translation(".bike_book_name"), ReadableQuery.path(bikebook_path, vehicle_models: @law[:id]), class: "twlink")
           @us ? translation(".source_html", link:) : translation(".law_source_html", link:)
         end
 
@@ -187,10 +202,6 @@ module Pages
 
         # The headline already says it's in no class, and the classes' note why a Class 3's assist with a throttle isn't permitted
         def notes(status) = @rules.select { it[:status] == status && OUT_OF_CLASS_NOTES.exclude?(it[:note]) }.map { safe_join([note(it), "."]) }
-
-        def subline
-          @bike.manual? ? translation(".manually_entered") : translation(".model_year", year: @bike.first_year)
-        end
 
         def specs
           [
@@ -221,6 +232,7 @@ module Pages
         def throttle_display
           return translation(".answer_no") unless @bike.throttle
           return metric_throttle_display unless @us
+          return translation(".yes_over_mph_html", mph: number_display(@bike.throttle_past_mph)) if @bike.throttle_past_mph
 
           mph = @bike.throttle_mph && number_display(@bike.throttle_mph)
           if @bike.optional_throttle?
@@ -260,83 +272,7 @@ module Pages
           end
         end
 
-        def note(row)
-          # classes are names rather than quantities, and a law's date a calendar day
-          args = row[:args].to_h do |key, value|
-            if key == :e_bike_classes
-              [:n, value.to_sentence]
-            elsif value.is_a?(Date)
-              [key, l(value, format: :long)]
-            else
-              [key, number_display(value)]
-            end
-          end
-          (metric_note(row[:note], args) if @law[:metric]) || us_note(row, args)
-        end
-
-        # nil where it reads the same as a US law's
-        def metric_note(note, args)
-          case note
-          when :no_e_bike_category then translation(".no_e_bike_category")
-          when :no_watt_cap then translation(".no_watt_cap_in_law")
-          when :speed_within_cap then translation(".speed_within_cap_kmh_html", **args)
-          when :speed_over_cap then translation(".speed_over_cap_kmh_html", **args)
-          when :speed_past_cap then translation(".speed_past_cap_kmh_html", **args)
-          when :speed_past then translation(".speed_past_kmh_html", **args)
-          when :speed_to_check then translation(".speed_to_check_kmh_html", **args)
-          when :no_speed_cap then translation(".no_speed_cap_in_law")
-          when :throttle_not_allowed then translation(".throttle_not_allowed_in_law")
-          when :throttle_not_stated then translation(".throttle_not_stated_in_law")
-          when :throttle_allowed then translation(".throttle_allowed_in_law")
-          end
-        end
-
-        def us_note(row, args)
-          case row[:note]
-          when :classes_recognized then translation(".classes_recognized", count: row[:args][:e_bike_classes].size, **args)
-          when :classes_not_recognized
-            translation(".classes_not_recognized_in", count: row[:args][:e_bike_classes].size, state: @state[:name], **args)
-          when :optional_classes_not_recognized
-            translation(".optional_classes_not_recognized_in", count: row[:args][:e_bike_classes].size, state: @state[:name], **args)
-          when :optional_throttle_not_allowed then translation(".optional_throttle_not_allowed")
-          when :classes_not_permitted
-            translation(".classes_not_permitted", classes: row[:args][:e_bike_classes].map { translation(".class_n", n: it) }.to_sentence)
-          when :not_classified then translation(".not_classified")
-          when :class_unknown then translation(".class_unknown_check_label")
-          when :own_classes then translation(".own_classes")
-          when :classes_start_on then translation(".classes_start_on", **args)
-          when :limits_start_on then translation(".limits_start_on", **args)
-          when :watts_within_cap then translation(".watts_within_cap_html", **args)
-          when :watts_over_cap then translation(".watts_over_cap_html", **args)
-          when :watts_to_check then translation(".watts_to_check_html", **args)
-          when :watts_not_provided then translation(".watts_not_provided")
-          when :no_watt_cap then translation(".no_watt_cap")
-          when :speed_within_cap then translation(".speed_within_cap_html", **args)
-          when :throttle_speed_within_cap then translation(".throttle_speed_within_cap_html", **args)
-          when :throttle_speed_over_cap then translation(".throttle_speed_over_cap_html", **args)
-          when :class_3_speed_with_throttle then translation(".class_3_speed_with_throttle_html", **args)
-          when :speed_over_cap then translation(".speed_over_cap_html", **args)
-          when :speed_past_cap then translation(".speed_past_cap_html", **args)
-          when :speed_past then translation(".speed_past_html", **args)
-          when :speed_not_provided then translation(".speed_not_provided")
-          when :no_speed_cap then translation(".no_speed_cap")
-          when :no_throttle then translation(".no_throttle")
-          when :throttle_not_allowed then translation(".throttle_not_allowed")
-          when :throttle_not_stated then translation(".throttle_not_stated")
-          when :class_1_throttle then translation(".class_1_throttle")
-          when :throttle_allowed then translation(".throttle_allowed")
-          when :throttle_with_class_3_assist then translation(".throttle_with_class_3_assist")
-          when :class_3_throttle then translation(".class_3_throttle")
-          when :class_3_throttle_within
-            if @bike.optional_throttle?
-              translation(".class_3_optional_throttle_within_html", **args)
-            else
-              translation(".class_3_throttle_within_html", **args)
-            end
-          when :class_3_throttle_over then translation(".class_3_throttle_over_html", **args)
-          else translation(".has_throttle")
-          end
-        end
+        def note(row) = render(Pages::EbikeRules::RuleNote::Component.new(row:, law: @law, bike: @bike, state: @state))
       end
     end
   end

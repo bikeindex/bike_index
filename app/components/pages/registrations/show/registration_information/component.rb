@@ -83,14 +83,14 @@ module Pages
               OrganizationModelAudit.find_by(organization_id: @organization.id, model_audit_id: @bike.model_audit_id)
           end
 
-          def show_registration_sequence?
-            @bike.registration_sequence_applies? && @organization.enabled?("registration_sequences")
+          def show_education_course?
+            @bike.education_course_applies? && @organization.enabled?("education_courses")
           end
 
           def acknowledgment
             return @acknowledgment if defined?(@acknowledgment)
 
-            @acknowledgment = RegistrationSequenceAcknowledgment.find_for(bike: @bike, organization: @organization)
+            @acknowledgment = EducationCourseAcknowledgment.find_for(bike: @bike, organization: @organization)
           end
 
           # Sticker and phone are shown elsewhere

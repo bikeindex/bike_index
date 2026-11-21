@@ -8,31 +8,17 @@
         = t(".existing_theft_alerts")
     .row
       .col-sm-12
-        %table.table.table-bordered{ style: "background: #fff;" }
-          %thead.small-header
-            %tr
-              %th= t(".created")
-              %th= t(".plan")
-              %th= t(".status")
-              %th= t(".start")
-              %th= t(".end")
-              - if show_creator
-                %th.small=t(".creator")
-
-          %tbody
-            - theft_alerts.each do |theft_alert|
-              %tr
-                %td
-                  %span.localizeTime
-                    = l(theft_alert.created_at, format: :convert_time)
-                %td= theft_alert.theft_alert_plan.name
-                %td= theft_alert.status
-                %td
-                  - if theft_alert.start_at.present?
-                    %span.localizeTime= l(theft_alert.start_at, format: :convert_time)
-                %td
-                  - if theft_alert.end_at.present?
-                    .localizeTime= l(theft_alert.end_at, format: :convert_time)
-                - if show_creator
-                  %td
-                    %small= theft_alert.user&.display_name
+        = render(UI::Table::Base::Component.new(records: theft_alerts)) do |table|
+          - table.column(label: t(".created")) do |theft_alert|
+            = render(UI::Time::Component.new(time: theft_alert.created_at))
+          - table.column(label: t(".plan")) do |theft_alert|
+            = theft_alert.theft_alert_plan.name
+          - table.column(label: t(".status")) do |theft_alert|
+            = theft_alert.status
+          - table.column(label: t(".start")) do |theft_alert|
+            = render(UI::Time::Component.new(time: theft_alert.start_at))
+          - table.column(label: t(".end")) do |theft_alert|
+            = render(UI::Time::Component.new(time: theft_alert.end_at))
+          - if show_creator
+            - table.column(label: t(".creator"), header_classes: "tw:text-xs") do |theft_alert|
+              %small= theft_alert.user&.display_name

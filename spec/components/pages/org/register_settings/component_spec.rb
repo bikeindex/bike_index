@@ -12,13 +12,13 @@ RSpec.describe Pages::Org::RegisterSettings::Component, type: :component do
     expect(component).to have_css("h1", text: "Registration form settings")
     expect(component).to have_text "These settings are just applied to your browser"
 
-    # No safety rules here, so nothing to leave to the registrant
+    # No education course here, so nothing to leave to the registrant
     expect(switches.css("input[type=checkbox]").map { it["name"] }).to eq(%w[old_view single_page])
     expect(switches.css("input[type=checkbox][checked]")).to be_empty
   end
 
-  context "with an active registration sequence, and both set" do
-    let!(:sequence) { FactoryBot.create(:registration_sequence_active, :with_pages, organization:) }
+  context "with an active education course, and both set" do
+    let!(:course) { FactoryBot.create(:education_course_active, :with_pages, organization:) }
     let(:options) { {organization:, old_view: true, single_page: true, separate_attestation: true} }
 
     it "offers the separate attestation switch as well, checking all three" do

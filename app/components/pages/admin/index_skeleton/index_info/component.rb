@@ -16,8 +16,8 @@ module Pages
           private
 
           def rows
-            @rows ||= [user_row, bike_row, marketplace_listing_row, organization_row, membership_row,
-              strava_integration_row, kind_row, primary_activity_row].compact
+            @rows ||= [user_row, bike_row, marketplace_listing_row, organization_row, education_course_row,
+              membership_row, strava_integration_row, kind_row, primary_activity_row].compact
           end
 
           def viewing_for(*subject) = safe_join([@viewing.pluralize, " for ", *subject])
@@ -76,6 +76,14 @@ module Pages
               safe_join(["(#{organization.short_name} is ", tag.em("deleted", class: error_text_class), ") - at ",
                 render(UI::Time::Component.new(time: organization.deleted_at, format: :localize_time_precise))])
             end
+          end
+
+          def education_course_row
+            id = @index.params[:search_education_course_id]
+            return if id.blank?
+
+            {view_all_text: "view for all education courses", key: :search_education_course_id,
+             subject: viewing_for(link_to("Education Course #{id}", admin_education_course_path(id), class: "twlink"))}
           end
 
           def membership_row

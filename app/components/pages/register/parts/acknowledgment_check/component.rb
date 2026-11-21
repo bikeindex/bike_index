@@ -8,8 +8,8 @@ module Pages
         class Component < ApplicationComponent
           # registrant_name: nil in the org's preview, where nobody is signing - a placeholder
           # stands in for whoever will
-          def initialize(sequence:, registrant_name: nil, checkbox_name: nil)
-            @sequence = sequence
+          def initialize(course:, registrant_name: nil, checkbox_name: nil)
+            @course = course
             @registrant_name = registrant_name
             @checkbox_name = checkbox_name
           end

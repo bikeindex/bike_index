@@ -52,7 +52,9 @@
   <% navbar = SharedBlocks::Navbar::Wrapper::Component.new(current_user:, current_user_or_unconfirmed_user:,
     passive_organization:, old_register_view: old_register_view?) %>
 
-  <%= body_tag(html_class: class_names(body_class, "with-org-sidebar" => navbar.org_sidebar?, dark: current_user&.dark_mode_preview?)) do %>
+  <%= body_tag(html_class: class_names(body_class, "with-org-sidebar" => navbar.org_sidebar?, dark: color_scheme == "dark")) do %>
+    <%= render(SharedBlocks::SystemColorScheme::Component.new(color_scheme:)) %>
+
     <a
       href="#main-content"
       class="
@@ -65,7 +67,10 @@
       <%= t(".skip_to_main_content") %>
     </a>
 
-    <%= render(SharedBlocks::ReviewAppBanner::Component.from_env(current_user:, return_to: request.fullpath)) %>
+    <%# Not in a frame, whose crop is measured from production's page %>
+    <% unless request.headers["Sec-Fetch-Dest"] == "iframe" %>
+      <%= render(SharedBlocks::ReviewAppBanner::Component.from_env(current_user:, return_to: request.fullpath)) %>
+    <% end %>
 
     <%= render navbar %>
 
@@ -124,7 +129,7 @@
     <%# auto-sends the URL query string) %>
     <% skip_facebook = controller_namespace.in?(%w[organized org_public oauth]) || controller_name == "organizations" || params.key?(:search_email) || params.key?(:proximity) %>
 
-    <%= render SharedBlocks::Footer::Component.new(current_user:, skip_facebook:) %>
+    <%= render SharedBlocks::Footer::Component.new(current_user:, color_scheme:, skip_facebook:) %>
 
     <script>
   I18n.defaultLocale = <%== I18n.default_locale.to_json %>

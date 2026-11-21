@@ -58,6 +58,9 @@ linter:
     # Commented-out output tags are kept on purpose - a TODO, or what a thing replaced
     erb-no-commented-out-output-tags:
       enabled: false
+    # Reads every `render some_component` as a record's partial
+    actionview-no-implicit-partial:
+      enabled: false
 
     #
     # Rules I'd like to enable but we have legacy things that make it hard
@@ -70,7 +73,7 @@ linter:
     # Disabled: branches often have structurally different content, making extraction impractical
     erb-no-duplicate-branch-elements:
       enabled: false
-    # Disabled: UI::Table column blocks run via instance_exec, so helpers need helpers. prefix
+    # Disabled: UI::Table::Base column blocks run via instance_exec, so helpers need helpers. prefix
     actionview-no-silent-helper:
       enabled: false
     # Every inline <script> would need a nonce, and CSP ignores unsafe_inline once one is

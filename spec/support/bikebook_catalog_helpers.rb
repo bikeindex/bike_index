@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-# The fixture catalog in place of the published one
+# The fixture catalog in place of the published one. Its kit is at the 1.0.0 vehicle schema and its models a mix, as
+# a catalog part way through migrating them publishes: Specialized's 2025 at 0.28.0, Segway's before 0.28.0
 module BikebookCatalogHelpers
   FIXTURES = Rails.root.join("spec/fixtures/bikebook_catalog")
 
@@ -19,7 +20,7 @@ module BikebookCatalogHelpers
     page.driver.with_playwright_page do |playwright_page|
       playwright_page.context.route("#{Integrations::Bikebook::Catalog::URL}**", ->(route, request) {
         path = request.url.delete_prefix(Integrations::Bikebook::Catalog::URL)
-        status = (path == "manifest.json") ? manifest_status : 200
+        status = (path == Integrations::Bikebook::Catalog::MANIFEST) ? manifest_status : 200
         route.fulfill(status:, headers: {"access-control-allow-origin" => "*", "content-type" => "application/json"},
           body: (status == 200) ? FIXTURES.join(path).read : "")
       })

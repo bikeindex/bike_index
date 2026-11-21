@@ -13,7 +13,8 @@ import { setUrlParam } from 'utils/url_param'
 // (?param=1, ?param=0 collapsed) so it survives reloads and navigation; with
 // data-ui--collapse-storage-key-value it persists to localStorage instead, for a panel
 // whose state is the rider's preference rather than part of the address. A toggle that
-// opens it dispatches ui--collapse:shown, for content loaded once it's wanted. Those sharing
+// opens it dispatches ui--collapse:shown, for content loaded once it's wanted, and one that
+// closes it ui--collapse:hidden, for state kept somewhere a param can't. Those sharing
 // data-ui--collapse-group-value, with ui--collapse:shown@window->ui--collapse#closeForGroup,
 // are open one at a time.
 export default class extends Controller {
@@ -85,7 +86,7 @@ export default class extends Controller {
     this.applyExpanded(expanding, duration)
     this.persist(expanding)
     this.keepFocus(expanding)
-    if (expanding) this.dispatch('shown', { detail: { group: this.groupValue } })
+    this.dispatch(expanding ? 'shown' : 'hidden', { detail: { group: this.groupValue } })
   }
 
   // A focused trigger the toggle hides - inside the content it collapses, or in what an open panel hides - hands focus

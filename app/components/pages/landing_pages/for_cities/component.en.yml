@@ -19,8 +19,8 @@ en:
             A free public tool from Bike Index. Riders pick their state and bike and
             see, in under 30 seconds, whether it's legal to ride, what certification
             it carries, and what rules apply. The answer leads straight to registration.
-          checker_point_bikebook: >-
-            Class, motor, top speed, and UL certification from BikeBook's catalog
+          checker_point_bike_book: >-
+            Class, motor, top speed, and UL certification from Bike Book's catalog
             of e-bike models
           checker_point_program: >-
             Inside your program, staff see the class and compliance status of every
@@ -145,28 +145,6 @@ en:
             A printable list of stolen bikes in your area with owner phone numbers,
             updated in real time for your police department.
           hot_sheet_title: Stolen Bike Hot Sheet
-          mock_batteries: Batteries & charging
-          mock_bike_info: Bike info
-          mock_continue: Continue
-          mock_detected: Electric (motorized) detected
-          mock_electric: Electric (motorized)
-          mock_electric_help: Check electric so we flag e-bikes and verify certification.
-          mock_manufacturer: Manufacturer
-          mock_next: Next
-          mock_progress: Progress saved · E-Vehicle Acknowledgment · Step 1 of 4
-          mock_rule_certified: I will use only batteries certified to UL 2849 / UL
-            2271 (or equivalent).
-          mock_rule_charger: >-
-            I will charge only with the manufacturer's charger, never unattended or
-            in a hallway or exit route.
-          mock_rule_report: I will stop using and report any damaged, swollen, or
-            overheating battery.
-          mock_sub: >-
-            Westbrook has a few safety rules to go over before you can complete registration.
-          mock_title: Looks like you have an e-vehicle!
-          mock_traditional_bike: Traditional Bike
-          mock_traditional_bike_note: "(2 wheels, 1 seat, pedals)"
-          mock_vehicle_type: Vehicle type
           nav_checker: State checker
           nav_education: E-bike rules
           nav_faq: FAQ
@@ -245,9 +223,9 @@ en:
             Under two minutes from any phone, through a city-branded landing page,
             a form on your website, or a QR sticker.
           registration_step_1_title: Residents register
-          registration_step_2_body: >-
-            BikeBook identifies the model and its class, and the rider completes your
-            education flow. Regular bikes skip it.
+          registration_step_2_bike_book_body: >-
+            Bike Book identifies the model and its class, and the rider completes
+            your education flow. Regular bikes skip it.
           registration_step_2_title: E-bikes get classified
           registration_step_3_body: >-
             Status (registered, stolen, or recovered), make, model, color, and serial.

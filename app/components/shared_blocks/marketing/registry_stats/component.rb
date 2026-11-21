@@ -4,7 +4,8 @@ module SharedBlocks
   module Marketing
     module RegistryStats
       class Component < ApplicationComponent
-        def initialize(html_class: nil)
+        def initialize(layout: :grid, html_class: nil)
+          @layout = layout
           @html_class = html_class
         end
 
@@ -26,7 +27,7 @@ module SharedBlocks
         def abbreviated(count)
           return number_display(count) if count < 1_000_000
 
-          "#{number_with_precision(count / 1_000_000.0, precision: 1, round_mode: :floor, strip_insignificant_zeros: true)}M+"
+          "#{Counts.in_millions(count)}M+"
         end
       end
     end

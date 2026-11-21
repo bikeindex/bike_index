@@ -13,9 +13,10 @@ RSpec.describe "Organized registrations search", :js, type: :system do
   let!(:bike2) { FactoryBot.create(:bike_organized, creation_organization: organization, owner_email: "bob@example.com", created_at: 3.days.ago) }
 
   before do
-    # Ensure gear types exist so bike show page doesn't write during readonly mode
+    # Ensure these exist so the registration page doesn't write during readonly mode
     RearGearType.fixed
     FrontGearType.fixed
+    Country.united_states
     # Below the sidebar's 760px breakpoint, where it's an overlay behind the top
     # bar's hamburgler. Chrome's --window-size flag is unreliable in headless
     # mode, so resize explicitly.
@@ -188,12 +189,10 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     # clicking a bike navigates to the bike show page with organized panel
     click_link "View", match: :first
 
-    expect(page).to have_current_path(%r{/bikes/\d+}, wait: 10)
+    expect(page).to have_current_path(%r{/registrations/\d+}, wait: 10)
 
-    expect(page).to have_css(".organized-access-panel", text: /Access Panel/i)
-    # Scoped to the panel: unscoped, this matched the navbar's organization name against
-    # the panel's heading, whose own organization is hidden below md
-    expect(page).to have_css(".organized-access-panel", text: organization.name)
+    expect(page).to have_content(/owner & access/i)
+    expect(page).to have_content(organization.short_name)
 
     # Go back
     page.go_back
@@ -270,8 +269,8 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     # cookie — so the cookie override only takes effect while session is empty.
     expect(browser_cookie_value("timezone")).to be_present
 
-    # 5 AM UTC = 9 PM PDT (or 12 AM CDT) the previous day, so PDT and CDT fall on different days.
-    chart_bike_created_at = 14.days.ago.utc.beginning_of_day + 5.hours
+    # 6 AM UTC is past midnight in Chicago and before it in LA, with or without daylight saving
+    chart_bike_created_at = 14.days.ago.utc.beginning_of_day + 6.hours
     bike2.update_columns(created_at: chart_bike_created_at)
     la_date_key = chart_bike_created_at.in_time_zone("America/Los_Angeles").strftime("%Y-%-m-%-d")
     cdt_date_key = chart_bike_created_at.in_time_zone("America/Chicago").strftime("%Y-%-m-%-d")
@@ -816,8 +815,9 @@ RSpec.describe "Organized registrations search", :js, type: :system do
 
       # Click the first "Link" to assign the sticker to a bike
       first("td.assign_bike_sticker_cell a").click
-      expect(page).to have_current_path(%r{/bikes/\d+}, wait: 10)
+      expect(page).to have_current_path(%r{/registrations/\d+}, wait: 10)
       expect(page).to have_content("claimed")
+      expect(page).to have_content(/owner & access/i)
       expect(unlinked_sticker.reload.bike).to be_present
     end
   end

@@ -37,6 +37,10 @@ RSpec.describe "Signup", type: :system do
   context "with JavaScript", :js do
     let(:password) { "a-long-enough-password" }
 
+    # Each submit's click waits out a POST, its redirect and the next page, which a
+    # loaded CI shard can take past the 2s default
+    around { |example| Capybara.using_wait_time(10) { example.run } }
+
     it "sets a password from the nudge, then signs back in with it" do
       user = sign_up_and_confirm
       dismiss_donation_modal

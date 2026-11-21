@@ -44,6 +44,9 @@ class PublicImage < ApplicationRecord
   # No browser renders TIFF and only Safari HEIC, so the job rewrites these as webp
   WEBP_SOURCE_TYPES = %w[image/heic image/heif image/tiff].freeze
 
+  # A production-derived dev database has carrierwave rows whose files are only on S3
+  REMOTE_IMAGE_FALLBACK_URLS = Rails.env.development?
+
   # Direct uploads bypass the uploader, so nothing else holds them to a format we can serve.
   # Wider than carrierwave's whitelist by HEIC - anything we convert has to be permitted
   FILE_CONTENT_TYPES = (ApplicationUploader.extensions.map { Marcel::MimeType.for(extension: it) } +
@@ -125,9 +128,13 @@ class PublicImage < ApplicationRecord
   # Both backends name their sizes the same, so callers pass one either way - the
   # activestorage dimensions are just larger
   def image_url(size = nil)
-    return image.url(*size) unless activestorage?
+    return BlobUrl.for_variant(file, size&.to_sym&.presence_in(VARIANTS.keys)) if activestorage?
 
-    BlobUrl.for_variant(file, size&.to_sym&.presence_in(VARIANTS.keys))
+    url = image.url(*size)
+    # Check the constant first: on fog, image.blank? is an S3 HEAD per call (timed out the API search)
+    return url unless REMOTE_IMAGE_FALLBACK_URLS && url.present? && image.blank?
+
+    url.sub(ENV["BASE_URL"], "https://files.bikeindex.org")
   end
 
   # The blob stores it, but fog resolves it with a request per image - so carrierwave

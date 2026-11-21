@@ -6,7 +6,7 @@ import { collapse } from 'utils/collapse_utils'
 // Pins every loaded notification on the map, and narrows the table to the ones in view
 export default class extends Controller {
   static targets = ['canvas', 'unavailable', 'pin', 'placePin', 'placeForm', 'placeInput', 'redo', 'fit',
-    'visibleCount', 'mapButton', 'empty', 'repeatForm', 'submit']
+    'visibleCount', 'mapButton', 'empty', 'repeatForm']
 
   static values = {
     latitude: Number,
@@ -78,10 +78,6 @@ export default class extends Controller {
     this.element.querySelectorAll('.multiselect-cell').forEach((cell) => cell.classList.remove('tw:hidden'))
     // Revealing a column changes which cell is last-visible, which ui--table styles
     window.dispatchEvent(new Event('ui-table:refresh'))
-  }
-
-  updateSubmitText (event) {
-    this.submitTarget.value = event.target.value === 'mark_retrieved' ? 'Resolve notifications' : 'Create notifications'
   }
 
   #render (maplibregl) {

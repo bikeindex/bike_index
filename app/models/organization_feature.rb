@@ -60,6 +60,8 @@ class OrganizationFeature < ApplicationRecord
     credibility_badges
     csv_exports
     customize_emails
+    education_courses
+    education_courses_edit
     graduated_notifications
     hot_sheet
     impound_bikes_locations
@@ -71,8 +73,6 @@ class OrganizationFeature < ApplicationRecord
     passwordless_users
     regional_bike_counts
     registration_notes
-    registration_sequences
-    registration_sequences_edit
     saml_sso
     show_bulk_import
     show_bulk_import_impound

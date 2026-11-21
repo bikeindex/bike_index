@@ -2,7 +2,7 @@
 
 <% tags_param = params[:search_tags] || [] %>
 
-<%= render(UI::Table::Component.new(records: blogs, render_sortable:, sort_state:)) do |table| %>
+<%= render(UI::Table::Base::Component.new(records: blogs, render_sortable:, sort_state:)) do |table| %>
   <% table.column(sortable: "created_at", lower_right: ->(record) { content_tag(:span, record.id, class: "only-dev-visible") }) do |blog| %>
     <small><%= render UI::Time::Component.new(time: blog.created_at) %></small>
   <% end %>

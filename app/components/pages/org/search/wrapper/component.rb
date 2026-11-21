@@ -104,7 +104,7 @@ module Pages
           # search-results-card is what the results frame reads to leave this card standing while
           # it loads; elsewhere the card stands alone
           def card_classes
-            ["org-search-component", UI::TableInCard::Component::CARD_CLASSES,
+            ["org-search-component", UI::Table::InCard::Component::CARD_CLASSES,
               @search_page ? "search-results-card" : "tw:mt-4"].join(" ")
           end
 

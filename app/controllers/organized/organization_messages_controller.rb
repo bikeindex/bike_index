@@ -8,7 +8,7 @@ module Organized
       else
         flash[:error] = translation(:unable_to_send, errors: organization_message.errors.full_messages.to_sentence)
       end
-      redirect_back(fallback_location: bike_path(organization_message.bike_id))
+      redirect_back(fallback_location: RegistrationView.path(organization_message.bike_id, user: current_user, session:))
     end
 
     private

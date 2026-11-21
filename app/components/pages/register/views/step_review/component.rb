@@ -7,9 +7,9 @@ module Pages
         # The last of the e-vehicle pages: what was acknowledged, and the acknowledgment
         # binding the registrant to it
         class Component < ApplicationComponent
-          def initialize(b_param:, sequence:, flow:, current_user: nil)
+          def initialize(b_param:, course:, flow:, current_user: nil)
             @b_param = b_param
-            @sequence = sequence
+            @course = course
             @flow = flow
             @current_user = current_user
           end
@@ -17,12 +17,12 @@ module Pages
           private
 
           def pages
-            @pages ||= BikeServices::Register.sequence_pages(@sequence)
+            @pages ||= BikeServices::Register.course_pages(@course)
           end
 
           # The review is the last acknowledgment step, so it's both the number and the total
           def acknowledgment_step_count
-            @acknowledgment_step_count ||= BikeServices::Register.acknowledgment_step_count(@sequence)
+            @acknowledgment_step_count ||= BikeServices::Register.acknowledgment_step_count(@course)
           end
 
           def page_path(index)

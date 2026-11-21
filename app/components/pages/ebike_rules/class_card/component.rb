@@ -5,7 +5,7 @@ module Pages
     module ClassCard
       # A class as "E-bike classes, explained" cards it: a US class from its number, any other `classification`, or
       # else the e-moto, each with the `place`'s own rules for it. Unframed, it's a tooltip's body; in a `frame_id`,
-      # the one BikeBook loads. A `catalog_id` closes it, a copy away
+      # the one Bike Book loads. A `catalog_id` closes it, a copy away
       class Component < ApplicationComponent
         FRAME_ID = "ebike-rules-class-card"
 
@@ -48,6 +48,12 @@ module Pages
         end
 
         def emoto_card
+          barred_state = if EbikeRuleServices::StateLaws.out_of_class_ids.include?(@catalog_id)
+            EbikeRuleServices::StateLaws::STATES.find { EbikeRuleServices::StateLaws.out_of_class_id(it[:abbr]) == @catalog_id }
+          end
+          # Its speed and power are a Class 3's, so neither is why
+          return {title: unbroken_hyphen(translation(".not_an_ebike")), body: translation(".class_3_throttle_barred", state: barred_state[:name])} if barred_state
+
           rules = @place && EbikeRuleServices::StateLaws.emoto_rules(@place[:abbr]).presence
           {either: true, title: unbroken_hyphen(translation(".not_an_ebike")),
            speed: translation(".emoto_speed"), motor: translation(".emoto_motor"), rules:,

@@ -108,6 +108,8 @@ class Bike < ApplicationRecord
   include PgSearch::Model
 
   PUBLIC_COORD_LENGTH = 2 # Truncate public coordinates decimal length
+  # Bike.current, which the default scope uses
+  CURRENT_ATTRIBUTES = {example: false, user_hidden: false, deleted_at: nil, likely_spam: false}.freeze
 
   acts_as_paranoid without_default_scope: true
 
@@ -196,7 +198,7 @@ class Bike < ApplicationRecord
   after_commit :remove_address_record_if_deleted
 
   scope :motorized, -> { where(propulsion_type: PropulsionType::MOTORIZED) }
-  scope :current, -> { where(example: false, user_hidden: false, deleted_at: nil, likely_spam: false) }
+  scope :current, -> { where(CURRENT_ATTRIBUTES) }
   # Starts from unscoped, so it drops anything chained before it - call it on Bike, not an association
   scope :current_with_user_hidden, -> { unscoped.non_example.not_spam.without_deleted }
   scope :claimed, -> { includes(:ownerships).where(ownerships: {claimed: true}) }
@@ -419,9 +421,9 @@ class Bike < ApplicationRecord
     errors.full_messages.reject { |m| m[/(bike can.t be blank|are you sure the bike was created)/i] }
   end
 
-  # Have to remove self from duplicate bike groups
+  # A bike matching on two segments joins once per group; DISTINCT can't pluck under the default ORDER BY
   def duplicate_bikes
-    duplicate_bikes_including_self.where.not(id: id)
+    Bike.where(id: duplicate_bikes_including_self.select(:id)).where.not(id:)
   end
 
   def calculated_listing_order
@@ -474,13 +476,12 @@ class Bike < ApplicationRecord
     !impounded? && owner_name.present? && valid_mailing_address?
   end
 
-  # matches current scope
-  def current?
-    !example? && !user_hidden && deleted_at.blank? && !likely_spam
-  end
+  def current_with_user_hidden? = !example? && deleted_at.blank? && !likely_spam
 
-  # The register flow creates the bike ahead of its organization's safety rules
-  def unfinished_registration? = persisted? && RegistrationSequenceAcknowledgment.pending.exists?(bike_id: id)
+  def current? = current_with_user_hidden? && !user_hidden
+
+  # The register flow creates the bike ahead of its organization's education course
+  def unfinished_registration? = persisted? && EducationCourseAcknowledgment.pending.exists?(bike_id: id)
 
   def current_parking_notification
     parking_notifications.current.first
@@ -505,9 +506,9 @@ class Bike < ApplicationRecord
     status_impounded? || unregistered_parking_notification?
   end
 
-  # Only e-vehicles agree to an organization's safety rules, and an unregistered parking
-  # notification has no registrant to agree to them
-  def registration_sequence_applies?
+  # Only e-vehicles agree to an organization's education course, and an unregistered parking
+  # notification has no registrant to agree to it
+  def education_course_applies?
     motorized? && !unregistered_parking_notification?
   end
 
@@ -757,7 +758,7 @@ class Bike < ApplicationRecord
   end
 
   def address_hash
-    current_stolen_record&.address_hash || current_impound_record&.address_hash ||
+    current_stolen_record&.address_hash || current_impound_record&.impounded_from_address&.address_hash ||
       address_record&.address_hash
   end
 

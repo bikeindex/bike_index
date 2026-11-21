@@ -1,0 +1,73 @@
+<%= render Pages::Register::Parts::Shell::Component.new do %>
+  <%= render Pages::Register::Parts::Progress::Component.new(flow: OrgServices::Signup, step: 1) %>
+
+  <%= render UI::Header::Component.new(text: translation(".add_your_organization"), subtitle: translation(".free_to_start_few_minutes")) %>
+
+  <%= render UI::Alerts::ObjectError::Component.new(object: @organization_signup, name: translation(".signup_name")) %>
+
+  <%= form_with(model: @organization_signup, url: organization_signup_path, method: :post, scope: :organization_signup, data: form_data) do |f| %>
+    <%= render UI::Forms::Honeypot::Component.new %>
+
+    <%# Saved with step 1 - until then, nothing else holds it %>
+    <%= hidden_field_tag :return_to, @organization_signup.return_to if @organization_signup.new_record? %>
+
+    <%= render Pages::Register::Parts::SectionLabel::Component.new(text: translation(".your_organization")) %>
+
+    <%= render UI::Forms::Group::Component.new(form_builder: f, attribute: :name,
+        label_text: translation(".organization_name"), required: true,
+        html_options: {value: @organization_signup.name, required: true, autocomplete: "organization"}) %>
+
+    <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :kind,
+        label_text: translation(".organization_kind"), required: true)) do %>
+      <%= render UI::Forms::RadioButtonGroup::Component.new(name: "organization_signup[kind]", entries: kind_entries,
+          selected: @organization_signup.kind, html_options: {required: true}) %>
+    <% end %>
+
+    <%= render Pages::Register::Parts::SectionLabel::Component.new(text: translation(".your_info"), divider: true) %>
+
+    <% if @current_user.present? %>
+      <p class="tw:mb-6 tw:text-sm tw:text-gray-600 tw:dark:text-gray-300">
+        <%= translation(".signed_in_as_new_admin_html", email: tag.strong(@current_user.email)) %>
+
+        <% if existing_organization.present? %>
+          <%= translation(".already_part_of_organization_html",
+              organization_link: link_to(translation(".organization_link", name: existing_organization.short_name),
+                organization_root_path(organization_id: existing_organization.to_param), class: "twlink")) %>
+        <% end %>
+      </p>
+    <% else %>
+      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :email,
+          label_text: translation(".email"), required: true, wrapper_class: "tw:mb-2")) do %>
+        <%= render UI::Forms::Email::Component.new(form_builder: f, attribute: :email, required: true,
+            html_options: {value: @organization_signup.email, placeholder: translation(".email_placeholder"), autofocus: @focus_email}) %>
+      <% end %>
+
+      <p class="tw:mb-6 tw:text-sm tw:text-gray-600 tw:dark:text-gray-300">
+        <%= translation(".already_on_bike_index_html", sign_in_link: link_to(translation(".sign_in"), new_session_path, class: "twlink")) %>
+      </p>
+    <% end %>
+
+    <%= render UI::Forms::Turnstile::Component.new(email: @organization_signup.email, user: @current_user) %>
+
+    <%= render UI::Button::Component.new(text: translation(".next"), color: :primary, size: :lg,
+        type: "submit", spinner: true, html_class: "tw:w-full") %>
+
+    <% unless @organization_signup.email_confirmed? || @current_user&.confirmed? %>
+      <p
+        class="
+          tw:mt-3 tw:text-center tw:text-xs tw:text-gray-500
+          tw:dark:text-gray-400
+        "
+      >
+        <%= translation(".activation_link") %>
+      </p>
+    <% end %>
+
+    <%# Every signup link resumes where this browser left off, so starting another is a choice here %>
+    <% if @organization_signup.name.present? %>
+      <p class="tw:mt-3 tw:mb-0 tw:text-center tw:text-sm">
+        <%= link_to translation(".start_a_different_one"), new_organization_signup_path(restart: true), class: "twlink" %>
+      </p>
+    <% end %>
+  <% end %>
+<% end %>

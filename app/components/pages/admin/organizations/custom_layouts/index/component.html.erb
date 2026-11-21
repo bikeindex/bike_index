@@ -3,7 +3,7 @@
     <%= link_to "Custom layouts version history", version_history_url, class: "twlink" %>
   </p>
 
-  <%= render(UI::TableList::Component.new) do |list| %>
+  <%= render(UI::Table::List::Component.new) do |list| %>
     <% list.with_row(label: "Invoiced") do %>
       <strong><%= @organization.is_invoiced? %></strong>
     <% end %>
