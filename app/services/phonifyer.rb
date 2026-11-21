@@ -1,6 +1,9 @@
 module Phonifyer
   extend Functionable
 
+  # Seven digits, and an extension. Also a pattern attribute, which takes no flags - so no /i
+  REGEX = %r{\A\+?[\s\(\)\.\-\/]*(\d[\s\(\)\.\-\/]*){7,}([eE]?[xX][a-zA-Z]*[\s.:]*\d+)?\z} # rubocop:disable Style/RedundantRegexpEscape -- the v flag needs them
+
   def phonify(string)
     return nil unless string.present?
 

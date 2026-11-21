@@ -11,6 +11,8 @@ RSpec.describe UI::Forms::Input::Component, type: :component do
   let(:attribute) { :name }
   let(:kind) { :text_field }
   let(:html_options) { {} }
+  # As the browser reads it
+  let(:pattern) { Regexp.new("\\A(?:#{component.css("input").first["pattern"]})\\z") }
 
   it "renders a text field, unwrapped" do
     expect(component).to have_css("input[type='text'][name='user[name]']")
@@ -38,8 +40,48 @@ RSpec.describe UI::Forms::Input::Component, type: :component do
   context "when telephone_field" do
     let(:kind) { :telephone_field }
 
-    it "renders a tel input" do
-      expect(component).to have_css("input[type='tel'][name='user[name]']")
+    it "renders a tel input, with the pattern the server checks" do
+      expect(component).to have_css("input[type='tel'][name='user[name]'][autocomplete='tel']")
+      expect(["(718) 383-9999", "+44 20 7946 0958 x12"]).to all(match(pattern))
+      expect("callmemaybe").to_not match(pattern)
+    end
+  end
+
+  # type=url would refuse "example.com"
+  context "when website_field" do
+    let(:kind) { :website_field }
+
+    it "renders a text input, with the pattern the server checks" do
+      expect(component).to have_css("input[type='text'][inputmode='url'][autocomplete='url']")
+      expect(["example.com", "https://www.example.co.uk/shop"]).to all(match(pattern))
+      expect("http://not a website").to_not match(pattern)
+    end
+
+    context "with an autocomplete" do
+      let(:html_options) { {autocomplete: "off"} }
+
+      it "uses it" do
+        expect(component).to have_css("input[autocomplete='off'][pattern]")
+      end
+    end
+  end
+
+  # An invalid pattern is ignored by the browser, rather than erroring
+  it "escapes what the browser's v flag requires escaped in a class" do
+    described_class::KIND_OPTIONS.each_value do |options|
+      options[:pattern].scan(/\[\^?((?:\\.|[^\]\\])*)\]/).flatten.each do |character_class|
+        expect(character_class.gsub(/\\./, "").gsub(/\w-\w/, "")).to_not match(%r{[()\[\]{}/\-|]})
+      end
+    end
+  end
+
+  context "when postal_code_field" do
+    let(:kind) { :postal_code_field }
+
+    it "renders a text input, with the pattern the server checks" do
+      expect(component).to have_css("input[type='text'][autocomplete='postal-code']")
+      expect(["97201", "T6E 2A4", "12345-6789"]).to all(match(pattern))
+      expect("1").to_not match(pattern)
     end
   end
 

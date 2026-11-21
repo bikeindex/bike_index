@@ -32,6 +32,8 @@ class OrganizationSignup < ApplicationRecord
   TOKEN_EXPIRATION = 30.days
   # The state (or region) isn't here: which one a country has is the form's to decide
   REQUIRED_ADDRESS_ATTRS = %w[street city postal_code country_id].freeze
+  # Only blatantly wrong ones - UI::Forms::Input has these as patterns
+  DETAIL_FORMATS = {website: Urlifyer::WEBSITE_REGEX, phone: Phonifyer::REGEX, postal_code: Geocodeable::POSTAL_CODE_REGEX}.freeze
 
   enum :kind, Organization::KIND_ENUM
 
@@ -44,7 +46,14 @@ class OrganizationSignup < ApplicationRecord
 
   def email_confirmed? = email_confirmed_at.present?
 
-  def details_completed? = REQUIRED_ADDRESS_ATTRS.all? { address[it].present? }
+  def details_completed? = address_completed? && malformed_details.none?
+
+  def address_completed? = REQUIRED_ADDRESS_ATTRS.all? { address[it].present? }
+
+  def malformed_details
+    {website:, phone:, postal_code: address["postal_code"]}
+      .filter_map { |attribute, value| attribute if value.present? && !value.strip.match?(DETAIL_FORMATS[attribute]) }
+  end
 
   # A resend reuses the token, so it lasts from the latest email - which promises that long
   def email_confirmation_token_expired?

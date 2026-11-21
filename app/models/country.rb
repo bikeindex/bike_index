@@ -21,10 +21,10 @@ class Country < ApplicationRecord
   validates_uniqueness_of :name, :iso
 
   class << self
+    # Sorted after translating, so the order matches the names shown
     def select_options
-      pluck(:id, :iso, :name).map do |id, iso, name|
-        [I18n.t(iso, scope: :countries, default: name), id]
-      end
+      pluck(:id, :iso, :name).map { |id, iso, name| [I18n.t(iso, scope: :countries, default: name), id] }
+        .sort_by { |name, _id| I18n.transliterate(name).downcase }
     end
 
     def friendly_find(name_or_iso)

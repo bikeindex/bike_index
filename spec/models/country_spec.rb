@@ -22,6 +22,14 @@ RSpec.describe Country, type: :model do
   describe "select_options" do
     let!(:country) { Country.create!(name: "Svenborgia", iso: "SVE") }
 
+    it "is alphabetical by the name shown" do
+      Country.create!(name: "Lebanon", iso: "LB")
+      Country.create!(name: "Åland Islands", iso: "AX")
+      Country.united_states
+      Country.canada
+      expect(Country.select_options.map(&:first)).to eq(["Åland Islands", "Canada", "Lebanon", "Svenborgia", "United States"])
+    end
+
     it "falls back to name when the iso has no translation" do
       expect(Country.select_options).to include(["Svenborgia", country.id])
     end

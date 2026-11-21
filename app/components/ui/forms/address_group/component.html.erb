@@ -34,7 +34,7 @@
   </div>
 
   <div class="twfieldrow">
-    <%= render(UI::Forms::Group::Component.new(form_builder: @form, attribute: :postal_code, kind: :text_field, label_text: translation(".postal_code"), required: @required)) %>
+    <%= render(UI::Forms::Group::Component.new(form_builder: @form, attribute: :postal_code, kind: :postal_code_field, label_text: translation(".postal_code"), required: @required)) %>
 
     <%= render(UI::Forms::Group::Component.new(form_builder: @form, attribute: :country_id, label_text: translation(".country"), required: @required)) do %>
       <%= render(UI::Forms::Select::Component.new(form_builder: @form, attribute: :country_id, required: @required,

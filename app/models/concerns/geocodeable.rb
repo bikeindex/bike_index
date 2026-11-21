@@ -5,6 +5,8 @@ module Geocodeable
 
   RENDER_COUNTRY_OPTIONS = [:if_different, true, false].freeze
   ADDRESS_ATTRS = %i[city country_id postal_code region_record_id region_string street street_2].freeze
+  # Loose enough for every country's. Also a pattern attribute, which takes no flags - so no /i
+  POSTAL_CODE_REGEX = /\A[a-zA-Z0-9][a-zA-Z0-9\s\-]{1,10}[a-zA-Z0-9]\z/ # rubocop:disable Style/RedundantRegexpEscape -- the v flag needs them
   GEO_ATTRS = (ADDRESS_ATTRS + %i[latitude longitude]).freeze
 
   class << self
