@@ -25,6 +25,7 @@ RSpec.describe Backfills::SquashedSlugJob, type: :job do
 
     described_class.new.perform
     expect(organization_dashes.reload.slug).to eq "abq-unm"
+    expect(organization_dashes.previous_slug).to be_nil
     expect(Organization.friendly_find("abq---unm")&.id).to eq organization_dashes.id
     expect(organization_plus.reload.slug).to eq "heron-flats-plus-lofts"
     expect(Organization.friendly_find("heron-flats--lofts")&.id).to eq organization_plus.id
@@ -46,12 +47,16 @@ RSpec.describe Backfills::SquashedSlugJob, type: :job do
   end
 
   it "skips an organization with a previous_slug, then raises naming it" do
-    organization_existing = FactoryBot.create(:organization, name: "Bike East Bay", previous_slug: "ebbc")
-    organization_existing.update_columns(slug: "bike--east-bay")
+    organization_existing = FactoryBot.create(:organization, name: "Bike & Hike", previous_slug: "ebbc")
+    organization_existing.update_columns(slug: "bikehike")
+    organization_dashes.update_columns(slug: "abq---unm", previous_slug: "albuquerque")
     organization_amp.update_columns(slug: "jj-cycle")
     expect { described_class.new.perform }.to raise_error(/previous_slug: #{organization_existing.id}\z/)
-    expect(organization_existing.reload.slug).to eq "bike--east-bay"
+    expect(organization_existing.reload.slug).to eq "bikehike"
     expect(organization_existing.previous_slug).to eq "ebbc"
+    # Its old slug slugifies to the new one, so there's nothing to record
+    expect(organization_dashes.reload.slug).to eq "abq-unm"
+    expect(organization_dashes.previous_slug).to eq "albuquerque"
     expect(organization_amp.reload.slug).to eq "j-and-j-cycle"
     expect(organization_amp.previous_slug).to eq "jj-cycle"
   end

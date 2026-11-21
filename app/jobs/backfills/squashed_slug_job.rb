@@ -8,11 +8,12 @@ module Backfills
       skipped_ids = Organization.unscoped.find_each.filter_map do |organization|
         next if Organization.slug_for(organization.short_name) == organization.slug
 
-        # Lookups slugify what they're given, so a previous slug only matches in slugified form
+        # Lookups slugify what they're given, so a previous slug only matches in slugified form -
+        # and when that's the new slug, lookups already reach it
         previous_slug = Slugifyer.slugify(organization.slug)
         saved = Organization.transaction do
           organization.save!
-          next true unless organization.slug_previously_changed?
+          next true if !organization.slug_previously_changed? || organization.slug == previous_slug
           # previous_slug holds one value - overwriting it would break the older URL
           raise ActiveRecord::Rollback if organization.previous_slug.present? && organization.previous_slug != previous_slug
 
