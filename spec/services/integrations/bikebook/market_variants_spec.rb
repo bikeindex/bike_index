@@ -21,16 +21,11 @@ RSpec.describe Integrations::Bikebook::MarketVariants do
 
       expect(described_class.expand(models)).to eq({
         "m/acme/2025/one" => home,
-        "m/acme/2025/one_ca" => {"id" => "m/acme/2025/one_ca", "markets" => ["CA"], "years" => {"2025" => {"url" => "ca"}},
+        "m/acme/2025/one-ca" => {"id" => "m/acme/2025/one-ca", "markets" => ["CA"], "years" => {"2025" => {"url" => "ca"}},
                                  "wheels" => [{"position" => "front", "bsd" => 406}, {"position" => "rear", "bsd" => 507}],
                                  "motors" => [{"rated_power" => 500, "operating_modes" => [{"mode" => "assist", "max_speed" => 32}, {"mode" => "throttle", "max_speed" => 32}]}]},
         "m/acme/2025/two" => other
       })
-    end
-
-    it "suffixes a 2.0.0 record's id with a dash" do
-      models = {"m/acme/2025/one" => home.merge("schema_version" => "2.0.0", "market_variants" => {"CA" => changes})}
-      expect(described_class.expand(models).keys).to eq %w[m/acme/2025/one m/acme/2025/one-ca]
     end
   end
 end

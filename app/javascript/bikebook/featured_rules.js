@@ -26,7 +26,7 @@ export const requirements = [
   ({ photo, incomplete }) => Boolean(photo) && !incomplete,
   ({ msrp_cents: cents }) => cents >= MIN_PRICE_CENTS,
   ({ vehicle_type: type }) => CYCLE_TYPES.includes(type),
-  (model, { legalEbike }) => !model.electric || (legalEbike(model) && !model.e_vehicle_classifications?.includes('evc/out_of_class')),
+  (model, { legalEbike }) => !model.electric || (legalEbike(model) && !model.e_vehicle_classifications?.includes('evc/out-of-class')),
   ({ target_riders: targets }) => !targets?.includes('kid'),
   ({ primary_activity: activity }) => !activity?.startsWith('bmx'),
   // the market's currency, else the dollar, as the quotas' prices are in it

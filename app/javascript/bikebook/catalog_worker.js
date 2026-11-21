@@ -48,6 +48,17 @@ const fetchJson = async (url) => {
   }
 }
 
+// Schema 2.0.0's ids are dashed. An older catalog's are underscored and never dashed, so they read as 2.0.0's, as
+// Integrations::Bikebook::Catalog.dashed_ids reads them
+// TODO: once the published catalog is at 2.0.0, remove this
+const CATALOG_ID = /^(?:(?:m|c|evc)\/[a-z0-9_/-]+|[a-z0-9_-]+\/\d{4})$/
+const dashedIds = (value) => {
+  if (Array.isArray(value)) return value.map(dashedIds)
+  if (value && typeof value === 'object') return Object.fromEntries(Object.entries(value).map(([key, each]) => [dashedIds(key), dashedIds(each)]))
+  return typeof value === 'string' && CATALOG_ID.test(value) ? value.replaceAll('_', '-') : value
+}
+const fetchCatalog = (url) => fetchJson(url).then(dashedIds)
+
 const list = (value) => (value ?? '').split(',').filter(Boolean)
 const path = (id) => id.replace(/^m\//, '')
 const blockKey = (id) => path(id).split('/').slice(0, 2).join('/')
@@ -64,14 +75,14 @@ const classified = ({ e_vehicle_classifications: records }, jurisdictions) => Ob
 
 // What picked vehicles render from, which needs nothing of the index: the blocks `ids` are in, the kit and the vocabulary
 function start ({ manifestUrl, ids, jurisdictions, comparing }) {
-  opened = fetchJson(manifestUrl).then((published) => {
+  opened = fetchCatalog(manifestUrl).then((published) => {
     if (published.format !== FORMAT) throw new Error(`catalog format ${published.format} isn't ${FORMAT}`)
 
     manifest = published
     base = new URL(manifestUrl, self.location)
     ids.map(blockKey).filter((key) => manifest.blocks[key]).forEach((key) => block(key).catch(() => {}))
   })
-  started = opened.then(() => Promise.all([manifest.vocabulary, manifest.kit].map((file) => fetchJson(new URL(file, base)))))
+  started = opened.then(() => Promise.all([manifest.vocabulary, manifest.kit].map((file) => fetchCatalog(new URL(file, base)))))
     .then(([vocabulary, { kit }]) => ({ vocabulary: { ...vocabulary, e_vehicle_classifications: classified(vocabulary, jurisdictions) }, kit }))
   if (comparing) fetchComparison()
   return started
@@ -80,7 +91,8 @@ function start ({ manifestUrl, ids, jurisdictions, comparing }) {
 // After `start`, whose manifest and files it waits on
 async function load ({ rulesUrl, similarityUrl: similarityModule }) {
   similarityUrl = similarityModule
-  const [index, { vocabulary, kit }, featuredRules] = await Promise.all([opened.then(() => fetchJson(new URL(manifest.index, base))), started, import(rulesUrl)])
+  const [published, { vocabulary, kit }, featuredRules] = await Promise.all([opened.then(() => fetchJson(new URL(manifest.index, base))), started, import(rulesUrl)])
+  const index = { ...published, filter_options: dashedIds(published.filter_options) }
   rules = featuredRules
   const currentYear = new Date().getFullYear()
   const activityNames = vocabulary.names.primary_activity ?? {}
@@ -88,14 +100,18 @@ async function load ({ rulesUrl, similarityUrl: similarityModule }) {
   activities = index.primary_activities
   models = index.models.map((model, position) => ({
     ...model,
+    // field by field, as walking the whole index takes three times its parse
+    id: dashedIds(model.id),
+    e_vehicle_classifications: dashedIds(model.e_vehicle_classifications),
+    variants: dashedIds(model.variants),
     position,
-    // an extension at its own path, or the whole URL of a photo it shares with another model
+    // an extension at its own path, or the whole URL of a photo it shares with another model, by its published id
     stock_photo: model.photo && (model.photo.includes('://') ? model.photo : `${index.stock_photos}/${path(model.id)}.${model.photo}`),
     activity_name: activityNames[model.primary_activity],
     type_name: typeNames[model.vehicle_type],
     // by its maker, as makers share names, and its first word where it has no group
     group_key: `${model.manufacturer}/${model.model_group ?? model.model.split(' ')[0]}`,
-    searchText: `${model.display}\n${model.id}`.toLowerCase(),
+    searchText: `${model.display}\n${dashedIds(model.id)}`.toLowerCase(),
     // a current model's first year where it's sold ahead of the calendar
     sortYear: model.final_year ?? Math.max(model.first_year, currentYear),
     // drawn per worker, which each page load starts, and again by `rotate`, so a reload features others and the page's
@@ -184,7 +200,7 @@ const except = (record, key) => Object.fromEntries(Object.entries(record).filter
 const withMarketVariants = (models) => Object.fromEntries(Object.entries(models).flatMap(([id, record]) => {
   const home = except(record, 'market_variants')
   return [[id, home], ...Object.entries(record.market_variants ?? {}).map(([market, changes]) => {
-    const variantId = `${id}${parseInt(record.schema_version) >= 2 ? '-' : '_'}${market.toLowerCase()}`
+    const variantId = `${id}-${market.toLowerCase()}`
     return [variantId, { ...merged(home, changes), id: variantId }]
   })]
 }))
@@ -192,7 +208,7 @@ const withMarketVariants = (models) => Object.fromEntries(Object.entries(models)
 // A failed fetch is forgotten, so the next ask tries again
 const block = (key) => {
   if (!blocks.has(key)) {
-    blocks.set(key, fetchJson(new URL(manifest.blocks[key], base)).then(({ models }) => Object.fromEntries(Object.entries(withMarketVariants(models)).map(([id, data]) => [id, withYearRecords(data)])), (error) => {
+    blocks.set(key, fetchCatalog(new URL(manifest.blocks[key], base)).then(({ models }) => Object.fromEntries(Object.entries(withMarketVariants(models)).map(([id, data]) => [id, withYearRecords(data)])), (error) => {
       blocks.delete(key)
       throw error
     }))
@@ -268,7 +284,7 @@ function matching (params) {
   const passes = filter(params)
   const filtered = sorted(params).filter(passes)
   const needle = (params.q ?? '').trim().toLowerCase()
-  const exact = needle.startsWith('m/') && byId.get(needle)
+  const exact = needle.startsWith('m/') && byId.get(dashedIds(needle))
   const words = needle.split(/\s+/).filter(Boolean)
   const found = exact ? [exact] : filtered.filter(({ searchText }) => words.every((word) => searchText.includes(word))).map((model) => soldIn(model, params.market))
   const whole = ({ searchText }) => searchText.includes(needle)
@@ -420,13 +436,13 @@ function filter (params) {
       (priceMin == null || model.msrp_cents >= priceMin * 100) && (priceMax == null || model.msrp_cents <= priceMax * 100)))
 }
 
-// evc/out_of_class is the catalog's own marker, as a model with no classified mode is unknown rather than out of class,
-// and evc/out_of_class/us/ca its marker for one in no class in that state alone, where it's out of class rather than the US
+// evc/out-of-class is the catalog's own marker, as a model with no classified mode is unknown rather than out of class,
+// and evc/out-of-class/us/ca its marker for one in no class in that state alone, where it's out of class rather than the US
 // classes it carries. A state's class matches the models carrying its groups
 function propelled ({ electric, e_vehicle_classifications: carried = [] }, propulsion, jurisdiction) {
   if (propulsion === '0' || propulsion === '1') return electric === (propulsion === '1')
-  const id = propulsion.replace(/^class_/, 'evc/us/class_')
-  if (/^evc\/(out_of_class|us\/class_\d)$/.test(id) && carried.includes(`evc/out_of_class/us/${jurisdiction?.toLowerCase()}`)) return id === 'evc/out_of_class'
+  const id = propulsion.replace(/^class-/, 'evc/us/class-')
+  if (/^evc\/(out-of-class|us\/class-\d)$/.test(id) && carried.includes(`evc/out-of-class/us/${jurisdiction?.toLowerCase()}`)) return id === 'evc/out-of-class'
   return [id, ...(classifications[id]?.groups ?? [])].some((classification) => carried.includes(classification))
 }
 
