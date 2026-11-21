@@ -39,7 +39,7 @@ class OrganizationSignupController < ApplicationController
     # First, so its error stops save_start saving - a saved step 1 lets the rest of the flow send the email
     turnstile_verified?(@signup, current_user&.email || start[:email])
     saved = OrgServices::Signup.save_start(@signup, user: current_user, name: start[:name], kind: start[:kind],
-      email: start[:email], additional: params[:additional])
+      email: start[:email], pos_kind: start[:pos_kind], additional: params[:additional])
     return render(step_page("1"), status: :unprocessable_entity) unless saved
 
     session[SESSION_KEY] = @signup.id_token
