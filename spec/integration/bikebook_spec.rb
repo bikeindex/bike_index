@@ -1894,6 +1894,9 @@ RSpec.describe "Bike Book", :js, type: :system do
       expect_template(Atoms::CopyableCode::Component.new(value: "m/trek/2025/fetch", label: "Copy ID"),
         "bikebook/templates/atoms/copyable_code#copyableCode", "{ value: 'm/trek/2025/fetch', label: 'Copy ID' }")
 
+      expect_template(UI::Code::Inline::Component.new(text: "m/trek/2025/fetch"), "bikebook/templates/ui/code/inline#codeInline", "{ text: 'm/trek/2025/fetch' }")
+      expect_template(UI::Code::Inline::Component.new(text: "m/trek/2025/fetch", small: true, word_break: false),
+        "bikebook/templates/ui/code/inline#codeInline", "{ text: 'm/trek/2025/fetch', small: true, wordBreak: false }")
       expect_template(UI::Code::Json::Component.new(data: {model: "Level 2", years: [2022]}, small: true, no_max_height: true),
         "bikebook/templates/ui/code/json#codeJson", "{ data: { model: 'Level 2', years: [2022] }, small: true, noMaxHeight: true }")
       expect_template(UI::Code::Json::Component.new(data: {}), "bikebook/templates/ui/code/json#codeJson", "{ data: {} }")

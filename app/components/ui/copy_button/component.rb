@@ -19,7 +19,7 @@ module UI
         return tag.button(icons, type: "button", class: BUTTON_CLASS, title: @label, data:) unless @tooltip
 
         render(UI::Tooltip::Component.new(text: "#{@label} (#{@value})")) do |tooltip|
-          tooltip.with_body { safe_join([@label, " (", tag.code(@value, class: "tw:font-mono"), ")"]) }
+          tooltip.with_body { safe_join([@label, " (", render(UI::Code::Inline::Component.new(text: @value, small: true)), ")"]) }
           tooltip.with_tooltip_button(class: BUTTON_CLASS, data:) { icons }
         end
       end
