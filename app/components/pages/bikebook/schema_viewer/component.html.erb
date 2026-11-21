@@ -1,9 +1,12 @@
 <div class="tw:mx-auto tw:max-w-6xl tw:px-5 tw:py-10 tw:twtext-color">
-  <%= render(UI::Header::Component.new(text: translation(".title"), subtitle: translation(".subtitle_html",
-    document: render(UI::Code::Inline::Component.new(text: @document)),
-    url: link_to(url, url, class: "twlink tw:break-all tw:underline"), version: @viewer["schema_version"]))) %>
+  <%= render(UI::Header::Component.new(text: translation(".title"))) %>
 
   <%= render(UI::Tabs::Component.new(nav_label: translation(".documents"), tabs:)) %>
+
+  <p class="tw:mb-4">
+    <%= translation(".subtitle_html", document: render(UI::Code::Inline::Component.new(text: @document)),
+      url: link_to(url, url, class: "twlink tw:break-all tw:underline"), version: @viewer["schema_version"]) %>
+  </p>
 
   <div
     class="tw:overflow-x-auto tw:font-mono tw:text-sm tw:leading-6"
