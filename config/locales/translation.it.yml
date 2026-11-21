@@ -7159,6 +7159,21 @@ it:
           pitch: Questo fantastico prodotto è offerto dall'organizzazione no-profit
             Bike Index. Aiutateci a coprire i costi del server.
           region: Fai una donazione a Bike Index
+        schema_fields:
+          by_count: per conteggio
+          by_count_label: "%{path} per conteggio"
+          explain: spiegare
+          less: meno
+          models: "%{number} modelli"
+          more: "+%{count} altro"
+          representative: "(rappresentante)"
+          schema_order: ordine dello schema
+        schema_viewer:
+          documents: Documenti Schema
+          subtitle_html: La forma di un file %{document} nello schema %{version},
+            pubblicato come %{url}
+          title: Schema del libro delle biciclette
+          versioning: 'Versioning:'
       ebike_rules:
         class_tile:
           class: Classe

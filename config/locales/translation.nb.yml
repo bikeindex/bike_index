@@ -6842,6 +6842,21 @@ nb:
           pitch: Dette kule produktet er levert av den ideelle organisasjonen Bike
             Index. Hjelp oss med å betale serverkostnadene våre.
           region: Doner til Bike Index
+        schema_fields:
+          by_count: etter antall
+          by_count_label: "%{path} etter antall"
+          explain: forklare
+          less: mindre
+          models: "%{number}-modeller"
+          more: "+%{count} mer"
+          representative: "(representant)"
+          schema_order: skjemarekkefølge
+        schema_viewer:
+          documents: Skjemadokumenter
+          subtitle_html: Formen på en %{document}-fil på skjema %{version}, publisert
+            som %{url}
+          title: Sykkelbokskjema
+          versioning: 'Versjonering:'
       ebike_rules:
         class_tile:
           class: Klasse
