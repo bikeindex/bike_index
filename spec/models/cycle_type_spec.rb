@@ -78,8 +78,8 @@ RSpec.describe CycleType, type: :model do
       let(:cycle_type) { CycleType.new("e-atv") }
       it "finds by various names" do
         expect(cycle_type.id).to eq 24
-        expect(CycleType.send(:names_and_secondary_names)[23])
-          .to eq(["e-atv", "e-atv (e-quad, electric all-terrain vehicle)", "e-quad", "electric all-terrain vehicle"])
+        expect(CycleType.send(:names_and_secondary_names)[:"e-atv"])
+          .to eq(["e-atv", "e-atv-e-quad-electric-all-terrain-vehicle", "e-quad", "electric-all-terrain-vehicle"])
         expect(CycleType.friendly_find("e-Quad")&.id).to eq cycle_type.id
         expect(CycleType.friendly_find("E-ATV")&.id).to eq cycle_type.id
         expect(CycleType.not_cycle?("e-atv")).to be true
@@ -175,6 +175,16 @@ RSpec.describe CycleType, type: :model do
     end
     it "has the same names as english translations" do
       expect(cycle_type_translations.except("traditional-bike")).to match_hash_indifferently CycleType::NAMES
+    end
+  end
+
+  describe "bikebook_type and from_bikebook_type" do
+    it "maps each slug to its Bike Book vehicle type and back" do
+      expect(CycleType.bikebook_type(:cargo)).to eq "cargo_bike"
+      expect(CycleType.bikebook_type("tall-bike")).to eq "tall_bike"
+      expect(CycleType.slugs_sym.map { CycleType.from_bikebook_type(CycleType.bikebook_type(it)) }).to eq CycleType.slugs_sym
+      expect(CycleType.from_bikebook_type("e_atv")).to eq :"e-atv"
+      expect(CycleType.from_bikebook_type("hovercraft")).to be_nil
     end
   end
 

@@ -68,6 +68,18 @@ class CycleType
   NEVER_MOTORIZED = %i[non-e-scooter non-e-skateboard trail-behind balance-bike].freeze
   # Bike Book copies this in its catalog slugs: bikebook/hydrate.js and Pages::EbikeRules::BikeSummary
   NOT_CYCLE_TYPE = %i[e-scooter non-e-skateboard personal-mobility stroller wheelchair e-motorcycle e-atv].freeze
+  # the slugs Bike Book's vehicle types name differently
+  BIKEBOOK_TYPES = {
+    trailer: "bike_trailer",
+    cargo: "cargo_bike",
+    "cargo-rear": "cargo_bike_rear",
+    "cargo-trike": "cargo_tricycle",
+    "cargo-trike-rear": "cargo_tricycle_rear",
+    "personal-mobility": "epamd",
+    "non-e-scooter": "scooter",
+    "non-e-skateboard": "skateboard",
+    elliptical: "elliptical_bike"
+  }.freeze
 
   class << self
     def slug_translation_short(slug)
@@ -116,6 +128,11 @@ class CycleType
     def default_slug
       "bike"
     end
+
+    def bikebook_type(slug) = BIKEBOOK_TYPES[slug.to_sym] || slug.to_s.underscore
+
+    # nil for a Bike Book type with no cycle type
+    def from_bikebook_type(type) = BIKEBOOK_TYPES.key(type) || find_sym(type)
 
     private
 

@@ -14,19 +14,6 @@ module Pages
         # by Bike Book vehicle type, those that start collapsed though they have a catalog example
         COLLAPSED_TYPES = %w[skateboard wheelchair unicycle].freeze
 
-        # the CycleType slugs Bike Book's vehicle types name differently
-        BIKEBOOK_TYPES = {
-          trailer: "bike_trailer",
-          cargo: "cargo_bike",
-          "cargo-rear": "cargo_bike_rear",
-          "cargo-trike": "cargo_tricycle",
-          "cargo-trike-rear": "cargo_tricycle_rear",
-          "personal-mobility": "epamd",
-          "non-e-scooter": "scooter",
-          "non-e-skateboard": "skateboard",
-          elliptical: "elliptical_bike"
-        }.freeze
-
         # by Bike Book vehicle type, or type/type_detail, the catalog model that fills in the most of its drawing
         EXAMPLE_MODELS = {
           "bike" => "m/specialized/2025/aethos_comp_shimano_105_di2_ca",
@@ -55,7 +42,7 @@ module Pages
 
         def initialize(cycle_types:, manifest_url:)
           @rows = cycle_types.map do |cycle_type|
-            type = BIKEBOOK_TYPES[cycle_type.slug] || cycle_type.slug.to_s.underscore
+            type = CycleType.bikebook_type(cycle_type.slug)
             Row.new(name: cycle_type.name, type:, example_model: EXAMPLE_MODELS[type])
           end.partition { !it.collapsed }.flatten
           @manifest_url = manifest_url
