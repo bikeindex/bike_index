@@ -15,6 +15,7 @@ RSpec.describe Pages::LandingPages::ForBikeShops::Component, type: :component do
     Counts.assign_for("organizations", 1_000)
     expect(component).to have_field("Shop name")
     expect(component).to have_field("Email")
+    expect(component).to have_select("Your POS", with_options: ["Lightspeed", "Ascend", "Shopify (coming soon)", "Other / none"])
     expect(component).to have_text("1.2M+")
     expect(component).to have_text("18,263")
     expect(component).to have_text("$38M+")

@@ -51,6 +51,12 @@
             <% end %>
           <% end %>
 
+          <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :pos_kind,
+            label_text: translation(".your_pos"), required: true)) do %>
+            <%= render(UI::Forms::Select::Component.new(form_builder: f, attribute: :pos_kind, option_tags: pos_options,
+              options: {prompt: translation(".choose_your_pos")}, required: true)) %>
+          <% end %>
+
           <%= render(UI::Forms::Honeypot::Component.new) %>
           <%= f.hidden_field :kind, value: "bike_shop" %>
           <%= render(UI::Forms::Turnstile::Component.new(user: @current_user)) %>

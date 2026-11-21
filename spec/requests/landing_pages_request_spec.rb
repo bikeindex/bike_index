@@ -18,12 +18,19 @@ RSpec.describe LandingPagesController, type: :request do
       get "/for_bike_shops"
       expect(response.body).to match("<title>Bike Index for Bike Shops</title>")
       form = Capybara.string(response.body).find("form[action='/organizations/signup']")
-      fields = form.all("input[name^='organization_signup']", visible: :all).to_h { [it[:name], it[:value]] }
-      expect(fields).to eq("organization_signup[name]" => nil, "organization_signup[email]" => nil, "organization_signup[kind]" => "bike_shop")
+      fields = form.all("[name^='organization_signup']", visible: :all).to_h { [it[:name], it[:value]] }
+      expect(fields.keys).to match_array(%w[name email pos_kind kind].map { "organization_signup[#{it}]" })
+      expect(fields["organization_signup[kind]"]).to eq "bike_shop"
 
-      post "/organizations/signup", params: fields.merge("organization_signup[name]" => "Spoke Shop", "organization_signup[email]" => "shop@example.com")
+      post "/organizations/signup", params: fields.merge("organization_signup[pos_kind]" => "ascend_pos")
+      expect(response.status).to eq 422
+      expect(Capybara.string(response.body)).to have_field("organization_signup[pos_kind]", type: :hidden, with: "ascend_pos")
+
+      post "/organizations/signup", params: fields.merge("organization_signup[name]" => "Spoke Shop",
+        "organization_signup[email]" => "shop@example.com", "organization_signup[pos_kind]" => "ascend_pos")
       expect(response).to redirect_to "/organizations/signup?step=2"
-      expect(OrganizationSignup.last).to have_attributes(name: "Spoke Shop", kind: "bike_shop", email: "shop@example.com")
+      expect(OrganizationSignup.last).to have_attributes(name: "Spoke Shop", kind: "bike_shop", email: "shop@example.com",
+        pos_kind: "ascend_pos")
     end
 
     it "frames the checker on the visitor's place, and California without a location" do

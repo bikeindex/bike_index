@@ -34,24 +34,25 @@ RSpec.describe OrgServices::Signup do
 
   describe "save_start" do
     let(:organization_signup) { FactoryBot.create(:organization_signup, email: nil) }
-    let(:start_params) { {name: "Shifty Bike Shop", kind: "bike_shop", email: " Org_Admin@bikeindex.org"} }
+    let(:start_params) { {name: "Shifty Bike Shop", kind: "bike_shop", email: " Org_Admin@bikeindex.org", pos_kind: "ascend_pos"} }
     let(:user) { nil }
     let(:saved) { described_class.save_start(organization_signup, user:, **start_params) }
 
     it "saves" do
       expect(saved).to be_truthy
       expect(organization_signup.reload).to have_attributes(name: "Shifty Bike Shop", kind: "bike_shop",
-        email: "org_admin@bikeindex.org", likely_spam: false)
+        email: "org_admin@bikeindex.org", pos_kind: "ascend_pos", likely_spam: false)
     end
 
     context "missing everything" do
-      let(:start_params) { {name: " ", kind: "ambassador", email: "not-an-email"} }
+      let(:start_params) { {name: " ", kind: "ambassador", email: "not-an-email", pos_kind: "square_pos"} }
 
       it "doesn't save, with the errors" do
         expect(saved).to be_falsey
         expect(organization_signup.errors.full_messages).to match_array(["Organization name is required",
           "Please choose what kind of organization this is", "A valid email is required"])
         expect(organization_signup.reload.name).to be_nil
+        expect(organization_signup.pos_kind).to be_nil
       end
     end
 
@@ -225,7 +226,16 @@ RSpec.describe OrgServices::Signup do
       UserJobs::ProcessOrganizationRoleJob.drain
       expect(Notification.where(kind: "organization_invitation").count).to eq 0
       expect(organization_signup.reload.organization_id).to eq organization.id
-      expect(Feedback.last.feedback_type).to eq "organization_created"
+      expect(Feedback.last).to have_attributes(feedback_type: "organization_created", body: "Shifty Bike Shop created an account")
+    end
+
+    context "with a POS" do
+      let(:organization_signup) { FactoryBot.create(:organization_signup_details_completed, pos_kind: "lightspeed_pos") }
+
+      it "tells the admins which" do
+        described_class.complete(organization_signup, user:)
+        expect(Feedback.last.body).to eq "Shifty Bike Shop created an account. POS: Lightspeed"
+      end
     end
 
     context "the name was taken since step 1" do

@@ -32,6 +32,11 @@ module Pages
             [number_with_delimiter(0), translation(".customer_records_sold_or_shared")]]
         end
 
+        def pos_options
+          [[translation(".pos_lightspeed"), "lightspeed_pos"], [translation(".pos_ascend"), "ascend_pos"],
+            [translation(".pos_shopify_coming_soon"), "shopify_pos"], [translation(".pos_other_or_none"), "other_or_no_pos"]]
+        end
+
         def form_data
           {controller: "form-persist ui--forms--turnstile",
            **UI::Forms::Turnstile::Component.form_data(user: @current_user),
