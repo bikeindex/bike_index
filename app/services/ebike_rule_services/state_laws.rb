@@ -81,8 +81,8 @@ module EbikeRuleServices
     # The catalog's vocabulary file, whose name is a digest of the laws, to cache what's built from them under. nil while
     # they aren't in. Whether they are is kept on its own, so a page whose fragments are cached doesn't read the laws
     def version
-      path = Integrations::Bikebook::Catalog.head&.dig("vocabulary")
-      path && Rails.cache.fetch(["bikebook_catalog/state_laws_in", path], expires_in: 1.week, skip_nil: true) { path if parsed[:laws].any? }
+      path = Integrations::Bikebook::Catalog.vocabulary
+      path && Integrations::Bikebook::Catalog.cached(["bikebook_catalog/state_laws_in", path], expires_in: 1.week) { path if parsed[:laws].any? }
     end
 
     # By ISO 3166-2 code, each place outside the US the catalog classifies e-vehicles in: its e-bike laws, or without
@@ -140,12 +140,9 @@ module EbikeRuleServices
     # The vocabulary's classifications as the block reads them. Its file name carries its digest, so a republished one
     # is a new key, and the version moves when the block reads different keys
     def vocabulary(name)
-      path = Integrations::Bikebook::Catalog.head&.dig("vocabulary")
-      key = ["bikebook_catalog/#{name}", 2, path]
-      path && Integrations::Bikebook::Catalog.once(key) do
-        Rails.cache.fetch(key, expires_in: 1.week, skip_nil: true) do
-          Integrations::Bikebook::Catalog.file(path)&.dig("e_vehicle_classifications")&.then { yield it }
-        end
+      path = Integrations::Bikebook::Catalog.vocabulary
+      path && Integrations::Bikebook::Catalog.cached(["bikebook_catalog/#{name}", 2, path], expires_in: 1.week) do
+        Integrations::Bikebook::Catalog.file(path)&.dig("e_vehicle_classifications")&.then { yield it }
       end
     end
 

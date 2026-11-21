@@ -17,7 +17,7 @@ module Integrations
       MODEL_ID = %r{\Am/([a-z0-9_]+/\d{4})/[a-z0-9_]+\z}
 
       Unreachable = Class.new(StandardError)
-      FAILURES = [Faraday::Error, JSON::ParserError, SystemCallError].freeze
+      FAILURES = [Faraday::Error, JSON::ParserError, SystemCallError, Unreachable].freeze
 
       # What a request has read, which Rails.cache would unmarshal a fresh copy of on each read
       class Reads < ActiveSupport::CurrentAttributes
@@ -46,20 +46,33 @@ module Integrations
 
       # What every page reads of the manifest - its format, vocabulary file and digest - without the rest of it.
       # nil while the catalog doesn't answer
-      def head = once(:head) { manifest_part(:head) }
+      def head = manifest_part(:head)
 
       # nil while the catalog doesn't answer
-      def manifest = once(MANIFEST) { manifest_part(:manifest) }
+      def manifest = manifest_part(:manifest)
 
-      # Read once a request: Reads resets with each request and job
-      def once(key) = Reads.values.fetch(key) { Reads.values[key] = yield }
+      # The file the catalog's laws and classifications are in, whose name is a digest of them
+      def vocabulary = head&.dig("vocabulary")
 
-      # Whether the catalog answers in the format /bikebook reads. The e-bike law pages read the manifest regardless
+      # Whether the catalog answers in the format /bikebook reads
       def readable? = head&.dig("format") == FORMAT
 
       # A published file, nil while the catalog doesn't answer. Its name is a digest of its contents,
       # so it keeps while it's published
       def file(path) = cached(["bikebook_catalog/file", path], expires_in: 1.week) { read(path) }
+
+      # Read once a request, as Reads resets with each request and job. A failure is kept for a minute, so a page reading
+      # the catalog several times waits on it once, and nil isn't kept
+      def cached(key, expires_in:)
+        once(key) do
+          Rails.cache.fetch(key, expires_in:, skip_nil: true) do |_key, options|
+            yield
+          rescue *FAILURES
+            options.expires_in = 1.minute
+            false
+          end || nil
+        end
+      end
 
       #
       # private below here
@@ -68,18 +81,19 @@ module Integrations
       # The head and the manifest are cached apart but always written together, so neither lags the catalog by more
       # than the 5 minutes each keeps
       def manifest_part(part)
-        Rails.cache.fetch(["bikebook_catalog/#{part}", MANIFEST], expires_in: 5.minutes) do |_key, options|
-          parts = fetched_manifest
-          if parts
-            parts.except(part).each { |other, value| Rails.cache.write(["bikebook_catalog/#{other}", MANIFEST], value, expires_in: 5.minutes) }
-            parts[part]
-          else
-            options.expires_in = 1.minute
-            false
+        cached(manifest_key(part), expires_in: 5.minutes) do
+          parts = fetched_manifest || raise(Unreachable)
+          parts.except(part).each do |other, value|
+            Rails.cache.write(manifest_key(other), value, expires_in: 5.minutes)
+            Reads.values[manifest_key(other)] = value
           end
-        end || nil
+          parts[part]
+        end
       end
 
+      def manifest_key(part) = ["bikebook_catalog/#{part}", MANIFEST]
+
+      # Once a request even when it fails, which cached keeps only under the one key that read it
       def fetched_manifest
         once(:fetched_manifest) do
           body = body(MANIFEST)
@@ -90,15 +104,7 @@ module Integrations
         end
       end
 
-      # A failure is kept for a minute, so a page reading the catalog several times waits on it once
-      def cached(key, expires_in:)
-        Rails.cache.fetch(key, expires_in:) do |_key, options|
-          yield
-        rescue *FAILURES
-          options.expires_in = 1.minute
-          false
-        end || nil
-      end
+      def once(key) = Reads.values.fetch(key) { Reads.values[key] = yield }
 
       def read(path) = JSON.parse(body(path))
 
@@ -108,7 +114,7 @@ module Integrations
       # vocabulary and a model's block - which give up inside rack-timeout's 30s unless a body trickles in
       def connection = Faraday.new(url: URL, request: {open_timeout: 2, timeout: 7}) { it.response :raise_error }
 
-      conceal :manifest_part, :fetched_manifest, :cached, :read, :body, :connection
+      conceal :manifest_part, :manifest_key, :fetched_manifest, :once, :read, :body, :connection
     end
   end
 end

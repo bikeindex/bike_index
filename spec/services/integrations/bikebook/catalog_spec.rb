@@ -6,19 +6,8 @@ RSpec.describe Integrations::Bikebook::Catalog do
   include ActiveSupport::Testing::TimeHelpers
 
   let(:manifest_url) { "#{described_class::URL}#{described_class::MANIFEST}" }
-  let(:fixture_manifest) { JSON.parse(BikebookCatalogHelpers::FIXTURES.join(described_class::MANIFEST).read) }
 
   before { stub_bikebook_catalog }
-
-  # The catalog as it is once it publishes again: a new vocabulary, and Segway's 2025 block with a new description
-  def publish_update
-    block = JSON.parse(BikebookCatalogHelpers::FIXTURES.join("models/segway/2025.json").read)
-    block["models"]["m/segway/2025/gt3_pro"]["description"] = "Updated"
-    WebMock.stub_request(:get, "#{described_class::URL}models/segway/2025.v2.json").to_return(body: block.to_json)
-    updated = fixture_manifest.merge("vocabulary" => "vocabulary.v2.json")
-    updated["blocks"] = updated["blocks"].merge("segway/2025" => "models/segway/2025.v2.json")
-    WebMock.stub_request(:get, manifest_url).to_return(body: updated.to_json)
-  end
 
   describe "manifest" do
     it "is read once a request" do
@@ -36,12 +25,12 @@ RSpec.describe Integrations::Bikebook::Catalog do
       WebMock.stub_request(:get, manifest_url).to_return(status: 503)
       described_class::Reads.reset
 
-      expect(described_class.manifest["blocks"]).to eq fixture_manifest["blocks"]
+      expect(described_class.manifest["blocks"]).to include("segway/2025" => "models/segway/2025.json")
     end
 
     it "takes up a catalog update within 5 minutes, the head with it" do
       digest = described_class.head["digest"]
-      publish_update
+      stub_bikebook_catalog_update
       described_class::Reads.reset
       expect(described_class.head["vocabulary"]).to eq "vocabulary.json"
 
@@ -80,7 +69,7 @@ RSpec.describe Integrations::Bikebook::Catalog do
 
     it "takes up a catalog update within 5 minutes" do
       expect(described_class.vehicle("m/segway/2025/gt3_pro")[:description]).to start_with("Experience elite performance")
-      publish_update
+      stub_bikebook_catalog_update
 
       travel(5.minutes + 1.second) do
         described_class::Reads.reset

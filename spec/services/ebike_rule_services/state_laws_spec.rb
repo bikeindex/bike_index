@@ -21,10 +21,7 @@ RSpec.describe EbikeRuleServices::StateLaws do
 
     it "moves to the new vocabulary within 5 minutes of a catalog update" do
       expect(described_class.version).to eq "vocabulary.json"
-      manifest = JSON.parse(BikebookCatalogHelpers::FIXTURES.join(Integrations::Bikebook::Catalog::MANIFEST).read)
-      WebMock.stub_request(:get, "#{Integrations::Bikebook::Catalog::URL}#{Integrations::Bikebook::Catalog::MANIFEST}")
-        .to_return(body: manifest.merge("vocabulary" => "vocabulary.v2.json").to_json)
-      WebMock.stub_request(:get, "#{Integrations::Bikebook::Catalog::URL}vocabulary.v2.json").to_return(body: BikebookCatalogHelpers::FIXTURES.join("vocabulary.json").read)
+      stub_bikebook_catalog_update
 
       travel(5.minutes + 1.second) do
         Integrations::Bikebook::Catalog::Reads.reset
