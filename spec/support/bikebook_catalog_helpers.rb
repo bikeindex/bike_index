@@ -1,9 +1,8 @@
 # frozen_string_literal: true
 
-# The fixture catalog in place of the published one. Its kit is at the 1.0.0 vehicle schema and its models a mix, as
-# a catalog part way through migrating them publishes: Specialized's 2025 at 0.28.0, Segway's before 0.28.0. The Haul ST
-# CA is in the Haul ST's market_variants, as 1.1.0 holds it, and every other market variant a record of its own. Its
-# ids are dashed, as 2.0.0's are, but Aventon's 2022 models' are underscored, as an older catalog's
+# The fixture catalog in place of the published one, its models at 1.0.0 but the Haul ST, at 1.1.0, whose CA is in
+# its market_variants; every other market variant is a record of its own. Its ids and its vocabulary's names are
+# 2.0.0's, but Aventon's 2022 models' ids and every model's values are 1.x's
 module BikebookCatalogHelpers
   FIXTURES = Rails.root.join("spec/fixtures/bikebook_catalog")
 

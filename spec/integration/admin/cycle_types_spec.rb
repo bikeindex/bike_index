@@ -25,7 +25,7 @@ RSpec.describe "Admin cycle types", :js, type: :system do
     # each type_detail the drawings draw their own way, in a row of its own after its type's
     headers = all("tbody tr th", minimum: CycleType.all.count + 3).map { it.text.squish }
     bike = headers.index { it.start_with?("Bike bike") }
-    expect(headers[bike + 1, 2]).to eq ["Bike bike type detail: step_through", "Bike bike type detail: bench_seat"]
+    expect(headers[bike + 1, 2]).to eq ["Bike bike type detail: step_through", "Bike bike type detail: bench-seat"]
     expect(headers[headers.index { it.start_with?("Tricycle tricycle") } + 1]).to eq "Tricycle tricycle type detail: tadpole"
     expect(headers[headers.index { it.start_with?("Tandem tandem") } + 1]).to start_with "Tandem tandem type detail: step_through"
 
@@ -34,7 +34,7 @@ RSpec.describe "Admin cycle types", :js, type: :system do
       expect(page).to have_css("svg[role='img']", count: 2, wait: 10)
       expect(page).to have_link(href: %r{vehicle_models=m/aventon/2026/level-4-rec-step-through(\{size:[^\}]+\})?&view=geometry})
     end
-    within(row("type detail: bench_seat")) { expect(page).to have_text("No catalog models") }
+    within(row("type detail: bench-seat")) { expect(page).to have_text("No catalog models") }
     within(row("type detail: tadpole")) do
       expect(page).to have_css("svg[role='img']", count: 1)
       expect(page).to have_text("No catalog models")

@@ -32,13 +32,11 @@ export class VehiclePresenter {
     // explains it, and the actual seat angle without the catalog's note on it
     this.kit = {
       ...kit,
-      // TODO: once the catalog publishes its 1.0.0 kit, which has volts, take its units as they are
-      units: { v: { label: 'V', name: 'volts' }, ...kit.units },
       acronyms: { ...kit.acronyms, bb: 'BB' },
       geometry: { ...kit.geometry, labels: { ...kit.geometry.labels, standover_above_bb: 'Standover above BB', seat_angle_actual: 'Seat Angle (actual)' } }
     }
-    // the catalog names carbon "Carbon or Composite", and leaves its top tubes, target riders and rack interfaces unnamed
-    const materials = { ...vocabulary.names[MATERIALS], carbon: 'Carbon/Composite' }
+    // the catalog names composite "Carbon or Composite", and leaves its top tubes, target riders and rack interfaces unnamed
+    const materials = { ...vocabulary.names[MATERIALS], composite: 'Carbon/Composite' }
     const interfaces = { mik: 'MIK', mik_hd: 'MIK HD', racktime_snapit: 'Racktime SnapIt', atranvelo_avs: 'Atranvelo AVS', thule_yepp_easyfit: 'Thule Yepp EasyFit', ...vocabulary.names[INTERFACES] }
     const topTubes = { step_through: 'Step-through', sloping: 'Sloping', horizontal: 'Horizontal', ...vocabulary.names[TOP_TUBES] }
     const riders = { kid: 'Kids', woman: "Women's", adaptive: 'Adaptive', ...vocabulary.names.target_riders }
@@ -82,7 +80,7 @@ export class VehiclePresenter {
     }))
   }
 
-  // TODO: once the catalog publishes its 1.0.0 kit, whose mounts have an interface field, `named` names it and this goes
+  // TODO: once the vocabulary names frame.mounts.interface, `named` names it and this goes
   interfaceName (slug) {
     return this.vocabulary.names[INTERFACES][slug] ?? slug
   }

@@ -14,7 +14,7 @@ const steps = [
 ]
 
 const EXAMPLES = [
-  ['Gravel bikes under $1,500', 'primary_activity=atb_gravel&price_max=1500'],
+  ['Gravel bikes under $1,500', 'primary_activity=atb-gravel&price_max=1500'],
   ['Trek Marlin 5 vs Specialized Rockhopper Sport', 'vehicle_models=m/trek/2026/marlin-5-gen-3,m/specialized/2026/rockhopper-sport'],
   ['RadWagon 4 vs 5 vs 2026', 'vehicle_models=m/rad-power-bikes/2020/radwagon-4,m/rad-power-bikes/2024/radwagon-5,m/rad-power-bikes/2026/radwagon']
 ]
