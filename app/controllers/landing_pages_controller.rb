@@ -1,6 +1,6 @@
 class LandingPagesController < ApplicationController
   before_action :force_html_response
-  before_action :instantiate_feedback, except: %i[show for_bike_shops for_community_groups ascend]
+  before_action :instantiate_feedback, only: %i[bike_shop_packages for_cities for_law_enforcement for_schools]
 
   def show
     raise ActionController::RoutingError, "Not found" unless current_organization.present?

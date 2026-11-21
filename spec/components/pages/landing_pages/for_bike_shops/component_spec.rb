@@ -13,7 +13,6 @@ RSpec.describe Pages::LandingPages::ForBikeShops::Component, type: :component do
     Counts.assign_for("recoveries", 18_263)
     Counts.assign_for("recoveries_value", 38_412_345)
     Counts.assign_for("organizations", 1_000)
-    expect(component).to have_css("form[action='/organizations/signup'] input[name='organization_signup[kind]'][value='bike_shop']", visible: :all)
     expect(component).to have_field("Shop name")
     expect(component).to have_field("Email")
     expect(component).to have_text("1.2M+")

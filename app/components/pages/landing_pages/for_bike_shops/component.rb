@@ -33,9 +33,9 @@ module Pages
         end
 
         def form_data
-          {controller: "form-persist strip-inputs ui--forms--turnstile",
+          {controller: "form-persist ui--forms--turnstile",
            **UI::Forms::Turnstile::Component.form_data(user: @current_user),
-           action: "input->form-persist#save input->ui--forms--turnstile#update submit->strip-inputs#submit submit->form-persist#clear"}
+           action: "input->form-persist#save input->ui--forms--turnstile#update submit->form-persist#clear"}
         end
 
         def integrations
