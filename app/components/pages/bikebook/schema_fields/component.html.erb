@@ -4,7 +4,7 @@
 <% @fields.each do |name, field| %>
   <% path = field_path(name) %>
 
-  <% cache_if(cached?(path), [self.class.cache_digest, *@cache_key, path]) do %>
+  <% cache_if(!@in_cache && cached?(path), [self.class.cache_digest, *@cache_key, path]) do %>
     <% open_bracket, close_bracket = brackets(field) %>
     <% key = tag.span("#{name}:", class: "tw:text-blue-700 tw:dark:text-blue-300") %>
     <% comment = field["description"] && tag.span("// #{field["description"]}", class: "tw:min-w-0 tw:flex-1 tw:truncate #{muted}", title: field["description"]) %>
@@ -34,7 +34,7 @@
 
         <div class="<%= nested %>">
           <%= render(Pages::Bikebook::SchemaFields::Component.new(fields: children(field), open: @open, by_count: @by_count,
-          representative_ids: @representative_ids, cache_key: @cache_key, path:)) %>
+          representative_ids: @representative_ids, cache_key: @cache_key, path:, in_cache: @in_cache || cached?(path))) %>
         </div>
 
         <div><%= close_bracket %></div>

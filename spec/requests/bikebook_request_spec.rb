@@ -405,6 +405,18 @@ RSpec.describe BikebookController, type: :request do
         end
       end
 
+      it "caches a field's fields inside its fragment, and on their own only where it renders afresh" do
+        written = []
+        record = ->(*, payload) { written << payload[:key].to_s }
+        ActiveSupport::Notifications.subscribed(record, "cache_write.active_support") { get "/bikebook/schema_viewer" }
+        expect(written.count { it.include?("/frame/") }).to eq 1
+        expect(written.count { it.include?("/frame.mounts/") }).to eq 0
+
+        written.clear
+        ActiveSupport::Notifications.subscribed(record, "cache_write.active_support") { get "/bikebook/schema_viewer", params: {open: "frame"} }
+        expect(written.count { it.include?("/frame.mounts/") }).to eq 1
+      end
+
       it "renders a field the URL opens anything in afresh, rather than as cached closed" do
         get "/bikebook_schema"
         expect(Capybara.string(response.body)).to have_css("details:not([open])[data-schema-path='type']")
