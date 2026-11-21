@@ -2,6 +2,7 @@
   data-controller="ui--forms--address-group"
   data-ui--forms--address-group-us-id-value="<%= us_country_id %>"
   data-ui--forms--address-group-required-value="<%= @required %>"
+  data-ui--forms--address-group-without-postal-code-ids-value="<%= without_postal_code_ids.to_json %>"
 >
   <%= render(UI::Forms::Group::Component.new(form_builder: @form, attribute: :street, kind: :text_field, label_text: street_label, required: @required)) %>
 
@@ -34,7 +35,10 @@
   </div>
 
   <div class="twfieldrow">
-    <%= render(UI::Forms::Group::Component.new(form_builder: @form, attribute: :postal_code, kind: :postal_code_field, label_text: translation(".postal_code"), required: @required)) %>
+    <div data-ui--forms--address-group-target="postalCode">
+      <%= render(UI::Forms::Group::Component.new(form_builder: @form, attribute: :postal_code, kind: :postal_code_field, label_text: translation(".postal_code"),
+        required: postal_code_required?, required_toggleable: @required)) %>
+    </div>
 
     <%= render(UI::Forms::Group::Component.new(form_builder: @form, attribute: :country_id, label_text: translation(".country"), required: @required)) do %>
       <%= render(UI::Forms::Select::Component.new(form_builder: @form, attribute: :country_id, required: @required,

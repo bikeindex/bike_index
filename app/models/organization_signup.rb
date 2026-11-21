@@ -30,8 +30,9 @@
 class OrganizationSignup < ApplicationRecord
   # How long a signup resumes by token, and its emailed link works, after the latest email
   TOKEN_EXPIRATION = 30.days
-  # The state (or region) isn't here: which one a country has is the form's to decide
-  REQUIRED_ADDRESS_ATTRS = %w[street city postal_code country_id].freeze
+  # The state (or region) isn't here: which one a country has is the form's to decide.
+  # Nor is the postal code, which only some countries have
+  REQUIRED_ADDRESS_ATTRS = %w[street city country_id].freeze
   # Only blatantly wrong ones - UI::Forms::Input has these as patterns
   DETAIL_FORMATS = {website: Urlifyer::WEBSITE_REGEX, phone: Phonifyer::REGEX, postal_code: Geocodeable::POSTAL_CODE_REGEX}.freeze
 
@@ -48,7 +49,10 @@ class OrganizationSignup < ApplicationRecord
 
   def details_completed? = address_completed? && malformed_details.none?
 
-  def address_completed? = REQUIRED_ADDRESS_ATTRS.all? { address[it].present? }
+  def address_completed?
+    REQUIRED_ADDRESS_ATTRS.all? { address[it].present? } &&
+      (address["postal_code"].present? || Country.without_postal_code_ids.include?(address["country_id"].to_i))
+  end
 
   def malformed_details
     {website:, phone:, postal_code: address["postal_code"]}

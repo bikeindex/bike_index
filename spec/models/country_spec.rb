@@ -42,6 +42,18 @@ RSpec.describe Country, type: :model do
     end
   end
 
+  describe "without_postal_code_ids" do
+    it "is the countries without postal codes" do
+      hong_kong = Country.create!(name: "Hong Kong", iso: "HK")
+      Country.canada
+      expect(Country.without_postal_code_ids).to eq([hong_kong.id])
+    end
+
+    it "only names real countries" do
+      expect(Country::WITHOUT_POSTAL_CODE_ISOS - StatesAndCountries.countries.map { it[:iso] }).to eq([])
+    end
+  end
+
   describe "friendly_find" do
     it "finds the country by name or iso" do
       country = Country.create(name: "Svenborgia", iso: "SVE")

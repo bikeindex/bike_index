@@ -176,6 +176,25 @@ RSpec.describe OrgServices::Signup do
       end
     end
 
+    context "without a postal code" do
+      let(:address) { {street: "10544 82 Ave NW", city: "Edmonton", country_id: Country.canada_id.to_s} }
+
+      it "doesn't complete" do
+        expect(saved).to be_falsey
+        expect(organization_signup.errors.full_messages).to eq(["Please enter the organization's full address"])
+      end
+
+      context "in a country without postal codes" do
+        let(:country) { Country.create!(name: "Hong Kong", iso: "HK") }
+        let(:address) { {street: "1 Queen's Road Central", city: "Hong Kong", country_id: country.id.to_s} }
+
+        it "completes" do
+          expect(saved).to be_truthy
+          expect(organization_signup.reload.details_completed?).to be_truthy
+        end
+      end
+    end
+
     context "a malformed website, phone and postal code" do
       let(:address) { {street: "10544 82 Ave NW", city: "Edmonton", postal_code: "1", country_id: Country.canada_id.to_s} }
       let(:saved) do

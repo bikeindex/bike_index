@@ -14,6 +14,9 @@ class Country < ApplicationRecord
 
   UNITED_STATES_ID = Rails.env.test? ? nil : 230
   CANADA_ID = Rails.env.test? ? nil : 38
+  # Addresses there have no postal code to give
+  WITHOUT_POSTAL_CODE_ISOS = %w[AE AG AO AW BF BI BJ BO BQ BS BW BZ CD CF CG CI CK CM CW DJ DM ER FJ GA GD GH GM GQ
+    GY HK KI KM KN KP LY ML MO MR MW NR NU QA RW SB SC SL SR SS ST SX SY TD TF TG TK TL TO TV UG VU YE ZW].freeze
 
   has_many :stolen_records
 
@@ -26,6 +29,8 @@ class Country < ApplicationRecord
       pluck(:id, :iso, :name).map { |id, iso, name| [I18n.t(iso, scope: :countries, default: name), id] }
         .sort_by { |name, _id| I18n.transliterate(name).downcase }
     end
+
+    def without_postal_code_ids = where(iso: WITHOUT_POSTAL_CODE_ISOS).pluck(:id)
 
     def friendly_find(name_or_iso)
       return name_or_iso if name_or_iso.is_a?(Country)
