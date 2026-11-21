@@ -17,7 +17,8 @@
     </div>
 
     <div class="tw:text-xs tw:text-gray-600 tw:dark:text-gray-400">
-      normalized <span class="tw:font-mono"><%= group["serial"] %></span>
+      normalized
+      <%= render(UI::Code::Inline::Component.new(text: group["serial"], small: true)) %>
       <% if bike&.frame_model.present? || bike&.year.present? %>
         · representative model <%= bike.frame_model %> <%= bike.year %>
       <% end %>

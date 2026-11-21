@@ -38,7 +38,7 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
        sort_state: ComponentStructs::SortState.new(sort: "impounded_at", direction: "desc")}
     end
 
-    it "renders the record's bike, its impound columns, and a hidden multi-update checkbox" do
+    it "renders the record's bike, its impound columns, and a multi-update checkbox column first" do
       ["Owner emailed", "Owner called", "Owner visited"].each do |notes|
         FactoryBot.create(:impound_record_update, impound_record:, kind: "note", notes:)
       end
@@ -58,11 +58,8 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
       expect(component).to have_css("th.impounded_at_cell a")
       expect(component).not_to have_css("th.manufacturer_cell a")
       expect(component).not_to have_css("th.occurred_at_cell [data-controller='ui--tooltip']")
-      checkbox = component.at_css("td.multi-update-cell input[type='checkbox']")
+      checkbox = component.at_css("tbody td:first-child input[name='ids[#{impound_record.id}]']")
       expect(checkbox[:form]).to eq Pages::Org::SearchResults::BikesTable::Component::MULTI_UPDATE_FORM_ID
-      expect(component.at_css("td.multi-update-cell")[:class]).to include("tw:hidden")
-      # Ahead of the hideable columns, which reordering appends after the rest
-      expect(component.css("th")[1][:class]).to include("multi-update-cell")
     end
 
     context "impounded from an address" do
@@ -105,11 +102,11 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
 
       it "busts the row when a claim is submitted, which leaves the record untouched" do
         render_table(impound_records: [impound_record.reload])
-        expect(page.find("td.multi-update-cell input", visible: :all)["data-update-kinds"]).to include("transferred_to_new_owner")
+        expect(page.find("input[data-update-kinds]", visible: :all)["data-update-kinds"]).to include("transferred_to_new_owner")
 
         FactoryBot.create(:impound_claim, impound_record:, organization:, status: "submitting")
         expect(fragments_written { render_table(impound_records: [impound_record.reload]) }.count).to eq 1
-        expect(page.find("td.multi-update-cell input", visible: :all)["data-update-kinds"]).not_to include("transferred_to_new_owner")
+        expect(page.find("input[data-update-kinds]", visible: :all)["data-update-kinds"]).not_to include("transferred_to_new_owner")
       end
     end
   end

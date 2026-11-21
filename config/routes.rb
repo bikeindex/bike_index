@@ -76,14 +76,15 @@ Rails.application.routes.draw do
   get "bikebook", to: "bikebook#show"
   # before the glob below, which would take it for a model
   get "bikebook/license", to: "bikebook#license", as: :bikebook_license
+  get "bikebook/schema_viewer", to: "bikebook#schema_viewer", as: :bikebook_schema_viewer
   get "bikebook/*vehicle_model", to: "bikebook#vehicle", format: false
   get ":spelling(/*rest)", to: redirect { |params, request| request.fullpath.sub(params[:spelling], "bikebook") },
     constraints: {spelling: /bike[-_]?book/i}, format: false
   # a catalog model's own id, its manufacturer, year and model
-  get "m/*vehicle_model", to: "bikebook#vehicle", format: false, constraints: {vehicle_model: %r{[a-z0-9_]+/\d{4}/[a-z0-9_]+}}
+  get "m/*vehicle_model", to: "bikebook#vehicle", format: false, constraints: {vehicle_model: %r{[a-z0-9_-]+/\d{4}/[a-z0-9_-]+}}
   # an e-vehicle classification's id, whose card the page shows
   get "evc/*classification", to: redirect(status: 302) { |params, _request| "/bikebook?classifications=evc/#{params[:classification]}" },
-    format: false, constraints: {classification: %r{[a-z0-9_]+(/[a-z0-9_]+)*}}
+    format: false, constraints: {classification: %r{[a-z0-9_-]+(/[a-z0-9_-]+)*}}
   if Integrations::Bikebook::Catalog::LOCAL_DIRECTORY
     mount Rack::Files.new(Integrations::Bikebook::Catalog::LOCAL_DIRECTORY) => Integrations::Bikebook::Catalog::LOCAL_PATH
   end
@@ -145,7 +146,6 @@ Rails.application.routes.draw do
 
   resources :feedbacks, only: %i[index create]
   post "csp_reports", to: "csp_reports#create"
-  get "vendor_signup", to: redirect("/organizations/new")
   get "lightspeed_interface", to: "organizations#lightspeed_interface"
   get "help", to: "feedbacks#index"
   get "feedbacks/new", to: redirect("/help")

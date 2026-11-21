@@ -831,14 +831,15 @@ RSpec.describe Organized::RegistrationsController, type: :request do
                                                    confirmation_token: b_param.email_confirmation_token}
         }.to_not change(User, :count)
         expect(response).to redirect_to confirm_path
-        expect(flash[:error]).to include "signed in as #{current_user.email}"
         expect(b_param.reload).to have_attributes(email_confirmed?: false, email_confirmation_token: be_present)
+        follow_redirect!
+        expect(response.body).to include "Sign out, then open the link again"
 
         # Signed out - log_in stubbed the member's session rather than signing them in
         allow(User).to receive(:from_auth).and_call_original
         expect {
           post "/register/confirm_email", params: {b_param_token: b_param.id_token,
-                                                   confirmation_token: b_param.email_confirmation_token}
+                                                   confirmation_token: b_param.email_confirmation_token, terms_of_service: "1"}
         }.to change(User, :count).by 1
         expect(User.last.email).to eq owner_email
         expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: "3")

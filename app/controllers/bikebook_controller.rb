@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class BikebookController < ApplicationController
+  before_action :redirect_to_dashed_ids, only: :show
+
   def show
     entries = Integrations::Bikebook::Catalog.vehicle_entries(params[:vehicle_models])
     model = Integrations::Bikebook::Catalog.vehicle_id(entries.first) if entries.one?
@@ -17,6 +19,14 @@ class BikebookController < ApplicationController
     @page_url = "https://bikeindex.org/bikebook/license"
   end
 
+  def schema_viewer
+    viewer = Integrations::Bikebook::Catalog.schema_viewer
+    document = viewer["documents"].key?(params[:document]) ? params[:document] : "vehicle_model"
+    @page_title = "Bike Book schema | Bike Index"
+    render Pages::Bikebook::SchemaViewer::Component.new(viewer:, document:, open: params[:open].to_s.split(","),
+      by_count: params[:by_count].to_s.split(","))
+  end
+
   # For uptime monitoring: the page breaks whenever the catalog doesn't answer in the format it reads. Green or red, as /up is
   def up
     up = Integrations::Bikebook::Catalog.readable?
@@ -24,7 +34,7 @@ class BikebookController < ApplicationController
       status: up ? :ok : :service_unavailable
   end
 
-  # /bikebook/m/segway/2025/gt3_pro, or without its m/, or its id alone, /m/segway/2025/gt3_pro, picks that vehicle ahead
+  # /bikebook/m/segway/2025/gt3-pro, or without its m/, or its id alone, /m/segway/2025/gt3-pro, picks that vehicle ahead
   # of any already picked, with what's picked for it there
   def vehicle
     id = "m/#{params[:vehicle_model].delete_prefix("m/")}"

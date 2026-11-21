@@ -1,6 +1,5 @@
 import { html, nothing, render } from 'lit-html'
 import { frameGeometry, OVERALL_LENGTH_ESTIMATE } from 'bikebook/frame_geometry'
-import { catalogValue, currentShape } from 'bikebook/legacy_shape'
 import { missing, numberDisplay } from 'bikebook/templates/helpers'
 import { inlineBadge } from 'bikebook/templates/ui/badge'
 import { collapse } from 'bikebook/templates/ui/collapse'
@@ -61,9 +60,9 @@ const WEIGHT_LOADS = {
   trailer: 'Trailer'
 }
 // In the box rather than on the bike, so listed apart and never compared part by part
-const INCLUDED = 'included_not_installed'
+const INCLUDED = 'included-not-installed'
 
-export const US_CLASS = /^evc\/us\/class_(\d)$/
+export const US_CLASS = /^evc\/us\/class-(\d)$/
 const classNumbers = (mode) => mode.ids.map((id) => id.match(US_CLASS)?.[1]).filter(Boolean)
 // (tire_width / 25.4).round(1) is a Float, so a whole inch still reads 2.0
 const tireInches = (presenter, millimeters) => presenter.labeled(presenter.rounded(millimeters / 25.4).toFixed(1), 'in', presenter.kit.inches)
@@ -76,7 +75,7 @@ export const wheelsAt = (presenter, data, size) => {
   const viewer = new ModelViewer({ presenter, data, others: [] })
   return Object.fromEntries(['front', 'rear'].map((position) => {
     const built = at(viewer.builtWheels(), position, size)[0]
-    const widths = at(viewer.vehicle.wheels, position, size).map((wheel) => catalogValue(wheel, 'tire_width_max')).filter((width) => typeof width === 'number')
+    const widths = at(viewer.vehicle.wheels, position, size).map((wheel) => wheel?.tire_width_max).filter((width) => typeof width === 'number')
     return [position, {
       parts: built && viewer.wheelParts({ ...built, sizes: null }, { fitting: false }).map(([key, content]) => [key, { size: built.bsd, tire: built.tire_width }[key] ?? null, content]),
       maxTire: widths.length ? Math.max(...widths) : null
@@ -88,8 +87,8 @@ const highest = (values) => values.some(isNumber) ? Math.max(...values.filter(is
 // The highest `key` of any of a vehicle's motors' operating modes
 const modes = (key) => (vehicle) => highest(array(vehicle.motors).flatMap((motor) => array(motor.operating_modes)).map((mode) => mode[key]))
 
-// cargo_bike, cargo_tricycle and their _rear kinds
-export const isCargo = (data) => /^cargo_/.test(data.type ?? '')
+// cargo, cargo-trike and their -rear kinds
+export const isCargo = (data) => /^cargo\b/.test(data.type ?? '')
 
 // A vehicle's cargo area in `size`
 export const cargoAt = (presenter, data, size) => new ModelViewer({ presenter, data, others: [] }).cargo(size)
@@ -107,7 +106,7 @@ export const tireWidth = (presenter, width) => new ModelViewer({ presenter, data
 export const wheelSize = (presenter, bsd) => new ModelViewer({ presenter, data: {}, others: [] }).wheelSizeName(bsd)
 
 // A vehicle's names, photo and the fields the Overview lists
-export const basicsOf = ({ presenter, data, outOfClassId }) => new ModelViewer({ presenter, data, others: [], outOfClassId }).basics()
+export const basicsOf = ({ presenter, data, outOfClassId, state }) => new ModelViewer({ presenter, data, others: [], outOfClassId, state }).basics()
 
 // A vehicle's stock photo in `frame`, without the rest of what basicsOf works out
 export const photoOf = ({ presenter, data }, frame) => new ModelViewer({ presenter, data, others: [] }).stockPhoto(frame)
@@ -119,8 +118,8 @@ export const sizesOf = ({ presenter, data, others, selectedSize, sizePath, lette
   new ModelViewer({ presenter, data, others, selectedSize, sizePath, lettering }).sizes()
 
 // A vehicle's electric summary beside its motors, each with its battery, marked where they differ from `others`'
-export const motorsOf = ({ presenter, data, others, outOfClassId }) => {
-  const viewer = new ModelViewer({ presenter, data, others, outOfClassId })
+export const motorsOf = ({ presenter, data, others, outOfClassId, state }) => {
+  const viewer = new ModelViewer({ presenter, data, others, outOfClassId, state })
   return sideBySide([viewer.electricSummary(), viewer.motorSections()])
 }
 
@@ -146,16 +145,16 @@ export const componentsOf = ({ presenter, vehicles, others }) => {
 }
 
 class ModelViewer {
-  // `outOfClassId` the viewing state's out of class marker, evc/out_of_class/us/ca, where its law bars a Class 3's throttle
+  // `outOfClassId` the viewing `state`'s out of class marker, evc/out-of-class/us/ca, where its law bars a Class 3's throttle
   // `jsonOpen` whether its JSON is open, which vehicle_models keeps by its `key`
-  constructor ({ presenter, data, value, key, jsonOpen, market, comparing, idSuffix, others, removePath, selectedSize, sizePath, outOfClassId, lettering }) {
+  constructor ({ presenter, data, value, key, jsonOpen, market, comparing, idSuffix, others, removePath, selectedSize, sizePath, outOfClassId, state, lettering }) {
     this.presenter = presenter
     this.kit = presenter.kit
     this.data = data
     this.vehicle = this.#normalize(data)
     this.outOfClass = outOfClassId ? this.#throttledClass3() : null
     this.others = others.map((other) => this.#normalize(other))
-    Object.assign(this, { value, key, jsonOpen, market, comparing, idSuffix, removePath, selectedSize, sizePath, outOfClassId, lettering })
+    Object.assign(this, { value, key, jsonOpen, market, comparing, idSuffix, removePath, selectedSize, sizePath, outOfClassId, state, lettering })
   }
 
   render () {
@@ -209,7 +208,7 @@ class ModelViewer {
   #normalize (data) {
     const components = array(data.components)
     const vehicle = {
-      ...this.presenter.named(this.kit.schemas.vehicle, { ...currentShape(data), components: components.filter(({ type }) => type !== INCLUDED) }),
+      ...this.presenter.named(this.kit.schemas.vehicle, { ...data, components: components.filter(({ type }) => type !== INCLUDED) }),
       included: components.filter(({ type }) => type === INCLUDED)
     }
     const frame = vehicle.frame && { ...vehicle.frame, ...this.#frameMounts(vehicle.frame, vehicle.sizes) }
@@ -222,7 +221,7 @@ class ModelViewer {
   // with no throttle mode is, or 'throttle' with an optional one
   #throttledClass3 () {
     const modes = this.vehicle.classifiedModes
-    if (!modes.some(({ ids }) => ids.includes('evc/us/class_3'))) return null
+    if (!modes.some(({ ids }) => ids.includes('evc/us/class-3'))) return null
     const throttles = modes.filter(({ mode }) => mode === 'throttle')
     if (throttles.length ? throttles.some(stock) : array(this.data.propulsion).includes('throttle')) return 'stock'
     return throttles.length ? 'throttle' : null
@@ -375,7 +374,7 @@ class ModelViewer {
       years: this.yearRange(),
       vehicle_type: presence(typeLabel(vehicle, { riders: false })),
       type: vehicle.type,
-      e_vehicle_class: this.eVehicleClass(),
+      e_vehicle_class: this.eVehicleClass('overview'),
       cargo_vehicle: isCargo(this.data),
       cargo: this.cargo(),
       // "Kids & Women's MTB: Trail", its riders ahead of the activity rather than in its type
@@ -466,36 +465,25 @@ class ModelViewer {
   // that jurisdiction's ID. Without any, its classes' names
   #classTiles () {
     if (this.outOfClass === 'stock') return classBadges([`emoto/${this.outOfClassId}`])
-    const ids = this.vehicle.classifiedModes.flatMap((mode) => mode.ids)
-    const numbers = this.#classNumbers()
+    const numbers = [...new Set(this.vehicle.classifiedModes.flatMap(classNumbers))].sort()
     const optional = this.#optionalClasses()
     const throttled = this.outOfClass === 'throttle'
     const classes = numbers.filter((number) => !(throttled && optional.get(number) === 'throttle'))
       .map((number) => optional.has(number) ? `${number}/${optional.get(number)}` : number)
-    const tiles = [...classes, ...(this.#emoto(ids) ? ['emoto'] : throttled ? [`emoto/throttle/${this.outOfClassId}`] : [])]
+    const tiles = [...classes, ...(this.#emoto() ? ['emoto'] : throttled ? [`emoto/throttle/${this.outOfClassId}`] : [])]
     return tiles.length ? classBadges(tiles) : presence(this.classificationNames(this.#sortedClassifications(this.vehicle)))
   }
 
-  #classNumbers () {
-    return [...new Set(this.vehicle.classifiedModes.flatMap(classNumbers))].sort()
-  }
-
-  // Its classes beside its /ebike-rules check, over why it's out of class there
-  eVehicleClass () {
+  // Its classes beside why it isn't an e-bike in the viewing `state`, or without one, why it's an e-moto, which
+  // /ebike-rules loads, over its /ebike-rules check. `where` tells apart the views that show it at once
+  eVehicleClass (where) {
     const classes = this.#classTiles()
-    return classes && html`<div class="tw:flex tw:flex-wrap tw:items-end tw:gap-x-3 tw:gap-y-1"><div>${classes}</div><a class="twlink tw:text-sm"
-      href=${`/ebike-rules?vehicle_models=${this.data.id}`}>View on e-bike rules</a></div>${this.#outOfClassReason()}`
-  }
-
-  // As /ebike-rules' verdict has it
-  #outOfClassReason () {
-    if (!this.outOfClass) return nothing
-    const { state } = Object.values(this.presenter.vocabulary.e_vehicle_classifications)
-      .find(({ jurisdiction }) => jurisdiction === `US-${this.outOfClassId.split('/').at(-1).toUpperCase()}`)
-    const permitted = this.outOfClass === 'stock'
-      ? `It's a ${andSentence(this.#classNumbers().map((number) => `Class ${number}`))} e-bike, which`
-      : 'Its optional throttle'
-    return html`<p class="tw:mt-2 tw:text-sm tw:text-gray-700 tw:dark:text-gray-300">${permitted} isn't permitted in ${state}: a Class 3 can't have a throttle there.</p>`
+    const { id } = this.data
+    const place = this.state ? `US/${this.state}` : this.#emoto() && 'US'
+    return classes && html`<div class="tw:flex tw:flex-wrap tw:items-center tw:gap-x-3 tw:gap-y-1"><div>${classes}</div>${place && id
+      ? html`<turbo-frame id=${`ebike-rules-reasons-${where}-${id.replace(/[^\w-]/g, '-')}`} class="tw:min-w-48 tw:flex-1" data-permanent=${place}
+        src=${`/ebike-rules/${place}?${new URLSearchParams({ vehicle_models: id })}`}></turbo-frame>`
+      : nothing}</div><p class="tw:mt-2 tw:text-sm">Learn more on <a class="twlink" href=${`/ebike-rules?vehicle_models=${id}`}>e-bike rules</a></p>`
   }
 
   // As EbikeRuleServices::BikebookVehicles has them: the US classes only a mode it isn't sold with brings, by that mode,
@@ -509,8 +497,8 @@ class ModelViewer {
 
   // As /ebike-rules has it (EbikeRuleServices::BikebookVehicles): a classification other than an e-bike law's or a US
   // class, or with neither, a mode over 28 mph
-  #emoto (ids) {
-    const tiers = ids.filter((id) => !this.presenter.vocabulary.e_vehicle_classifications[id]?.e_bike_law)
+  #emoto () {
+    const tiers = this.vehicle.classifiedModes.flatMap((mode) => mode.ids).filter((id) => !this.presenter.vocabulary.e_vehicle_classifications[id]?.e_bike_law)
     if (tiers.length) return tiers.some((id) => !US_CLASS.test(id))
     const { km, mi } = this.kit.conversions.mm
     return Math.round(modes('max_speed')(this.data) * km / mi) > 28
@@ -621,9 +609,9 @@ class ModelViewer {
     return section({ heading: 'Weight limits', content: join(rows) })
   }
 
-  // Its motors' standards, once each
+  // Its motors' and their batteries' standards, once each
   #certifications () {
-    return [...new Set(array(this.vehicle.motors).flatMap((motor) => array(motor.certifications)))]
+    return [...new Set(array(this.vehicle.motors).flatMap((motor) => [...array(motor.certifications), ...array(motor.battery?.certifications)]))]
   }
 
   suspensionSummary (suspension) {
@@ -722,7 +710,7 @@ class ModelViewer {
     const rated = array(vehicle.motors).map((motor) => motor.rated_power).filter(isNumber)
     const specs = [['Motor', rated.length ? presenter.measurement(sum(rated), 'w') : null], ['Top speed', fastest(of('assist'))], ['Throttle', throttle]]
     const certifications = certificationsOf(this.#certifications())
-    return html`<div class="tw:mb-6">${bikeSummary({ vehicleType: this.data.type, tiles: this.eVehicleClass(), specs, ...certifications })}</div>`
+    return html`<div class="tw:mb-6">${bikeSummary({ vehicleType: this.data.type, tiles: this.eVehicleClass('motors'), specs, ...certifications })}</div>`
   }
 
   // One per motor index across the compared vehicles, motors alike but for their drive wheel as one
@@ -779,7 +767,7 @@ class ModelViewer {
   clearances (vehicle = this.vehicle) {
     const groups = new Map()
     for (const wheel of array(vehicle.wheels).filter((each) => each.configured === false)) {
-      const clearance = [wheel.bsd ?? null, catalogValue(wheel, 'tire_width_max') ?? null]
+      const clearance = [wheel.bsd ?? null, wheel.tire_width_max ?? null]
       const key = JSON.stringify(clearance)
       if (!groups.has(key)) groups.set(key, [...clearance, []])
       groups.get(key)[2].push(...array(wheel.position))
@@ -816,7 +804,7 @@ class ModelViewer {
   // `fitting`: how the wheel fits the frame, its cassette, dropout and axle
   wheelSummary (wheel, { fitting = true } = {}) {
     const summary = join(this.wheelParts(wheel, { fitting }).map(([, content]) => content), ', ')
-    const max = catalogValue(wheel, 'tire_width_max')
+    const max = wheel.tire_width_max
     return max != null ? join([summary, this.tireWidthSummary(max, 'tire max')], html`<br>`) : summary
   }
 
@@ -866,7 +854,7 @@ class ModelViewer {
   // "2.4 in tire max", or "2.4 in front, 2.6 in rear tire max"
   tireMax () {
     const [front, rear] = ['front', 'rear'].map((position) =>
-      highest(this.builtWheels().filter((wheel) => array(wheel.position).includes(position)).map((wheel) => catalogValue(wheel, 'tire_width_max'))))
+      highest(this.builtWheels().filter((wheel) => array(wheel.position).includes(position)).map((wheel) => wheel.tire_width_max)))
     if (front === rear) return front == null ? null : this.tireWidthSummary(front, 'tire max')
 
     const widths = compact([front != null ? join([this.tireWidthSummary(front, ''), ' front']) : null, rear != null ? join([this.tireWidthSummary(rear, ''), ' rear']) : null])
@@ -883,7 +871,7 @@ class ModelViewer {
   brakeSummary (brake) {
     const typeAndRotor = presence(join(compact([brakeType(brake), this.millimeters(brake.rotor_diameter, ' rotor')]), ', '))
     const summary = join(compact([this.onSizes(typeAndRotor, brake.sizes), presence(brake.caliper_mount?.replace(/^Disc /, '')), brake.anti_lock ? 'ABS' : null]), ', ')
-    const max = catalogValue(brake, 'rotor_diameter_max')
+    const max = brake.rotor_diameter_max
     return max != null ? join([summary, this.millimeters(max, ' rotor max')], html`<br>`) : summary
   }
 
@@ -916,7 +904,7 @@ class ModelViewer {
   // Its chainrings by its cogs, "1x9", or "singlespeed" for one of each
   #gearCount () {
     const count = (pattern) => array(this.data.drivetrain).map((each) => String(each).match(pattern)?.[1]).find(Boolean)
-    const [front, rear] = [/^(\d+)_front$/, /^(\d+)_(?:internal_)?rear$/].map(count)
+    const [front, rear] = [/^(\d+)-front$/, /^(\d+)-(?:internal-)?rear$/].map(count)
     if (!front || !rear) return null
     return front === '1' && rear === '1' ? 'singlespeed' : `${front}x${rear}`
   }

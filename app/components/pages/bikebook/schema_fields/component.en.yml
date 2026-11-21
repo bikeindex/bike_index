@@ -1,0 +1,14 @@
+---
+en:
+  components:
+    pages:
+      bikebook:
+        schema_fields:
+          by_count: by count
+          by_count_label: "%{path} by count"
+          explain: explain
+          less: less
+          models: "%{number} models"
+          more: "+%{count} more"
+          representative: "(representative)"
+          schema_order: schema order

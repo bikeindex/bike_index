@@ -279,6 +279,7 @@ RSpec.describe "Register flow", :js, type: :system do
     # The emailed link lands on the interstitial, which waits for a click - confirming
     # proves the address, which leaves the theft it's reporting to tell us about
     visit confirmation_link
+    check "I agree to Bike Index's Terms of Service"
     click_button "Continue"
 
     expect(page).to have_content("Report your stolen bike", wait: 10)
@@ -332,11 +333,8 @@ RSpec.describe "Register flow", :js, type: :system do
     expect(page).to have_css("li.completed-item", text: "Report theft on Bike Index")
     expect(page).to have_link("your Police Report Number")
 
-    # An account nobody signed up for, so the terms are the first thing it's asked
+    # The terms were agreed to with the link, so the account goes straight in
     visit "/my_account"
-    check "user_terms_of_service"
-    click_button "Submit"
-
     expect(page).to have_current_path("/my_account", wait: 5)
     user = User.last
     expect(user).to have_attributes(email: owner_email, confirmed: true, terms_of_service: true)

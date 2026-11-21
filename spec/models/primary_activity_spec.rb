@@ -39,6 +39,8 @@ RSpec.describe PrimaryActivity, type: :model do
       let(:name) { "All Road" }
       it "is the name with the family" do
         expect(primary_activity.reload.primary_activity_family.short_name).to eq "ATB"
+        expect(primary_activity_family.slug).to eq "atb"
+        expect(primary_activity.slug).to eq "atb-all-road"
         expect(primary_activity.display_name).to eq "ATB: All Road"
         expect(primary_activity.display_name_search).to eq "ATB: ONLY All Road"
         expect(PrimaryActivity.friendly_find_id("ATB")).to eq primary_activity_family.id
@@ -50,9 +52,13 @@ RSpec.describe PrimaryActivity, type: :model do
         it "is valid for both" do
           expect(primary_activity).to be_valid
           expect(primary_activity.display_name).to eq "ATB: All Road"
+          expect(primary_activity.slug).to eq "atb-all-road"
 
           expect(primary_activity_2).to be_valid
           expect(primary_activity_2.display_name).to eq "Road: All Road"
+          expect(primary_activity_2.slug).to eq "road-all-road"
+          expect(primary_activity_family_2.slug).to eq "road-biking"
+          expect(PrimaryActivity.friendly_find_id("road-all-road")).to eq primary_activity_2.id
           expect(primary_activity_2.display_name_search).to eq "Road: ONLY All Road"
           expect(primary_activity_family_2.display_name_search).to eq "Road Biking"
           expect(PrimaryActivity.friendly_find_id("Road")).to eq primary_activity_family_2.id
@@ -87,6 +93,7 @@ RSpec.describe PrimaryActivity, type: :model do
         it "shortens to Endurance" do
           expect(primary_activity.reload.short_name).to eq "Endurance"
           expect(primary_activity.display_name).to eq "Road: Endurance / Sportive"
+          expect(primary_activity.slug).to eq "road-endurance-sportive"
           expect(PrimaryActivity.friendly_find_id("Endurance")).to eq primary_activity.id
         end
       end
@@ -102,6 +109,17 @@ RSpec.describe PrimaryActivity, type: :model do
           expect(primary_activity_family.display_name_search).to eq "Track racing"
         end
       end
+    end
+  end
+
+  describe "slug" do
+    let!(:primary_activity) { FactoryBot.create(:primary_activity, name: "ATB Gravel") }
+    let(:primary_activity_family) { FactoryBot.create(:primary_activity_family, name: "ATB (All Terrain Biking)") }
+    it "is unique across families" do
+      expect(primary_activity.slug).to eq "atb-gravel"
+      flavor = FactoryBot.build(:primary_activity, name: "Gravel", primary_activity_family:)
+      expect(flavor).to_not be_valid
+      expect(flavor.errors.full_messages).to eq(["Slug has already been taken"])
     end
   end
 

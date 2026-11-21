@@ -3,6 +3,8 @@
 class EbikeRulesController < ApplicationController
   LOOKUP_PARAMS = %i[vehicle_models manual top_speed watts throttle throttle_speed].freeze
 
+  before_action :redirect_to_dashed_ids, only: :show
+
   def show
     # a form's place - the lookup's without JavaScript, or the country switch's - which can't send it to the place's own page
     query = request.query_parameters
@@ -38,6 +40,10 @@ class EbikeRulesController < ApplicationController
       e_bike_class = params[:e_bike_class].to_i.then { it if (1..3).cover?(it) }
       classification = params[:classification].presence&.then { EbikeRuleServices::StateLaws.classification(it) || raise(ActionController::RoutingError, "Not Found") }
       return render(Pages::EbikeRules::ClassCard::Component.new(e_bike_class:, classification:, place:, frame_id: turbo_frame_request_id))
+    end
+    if turbo_frame_request_id&.start_with?(Pages::EbikeRules::Reasons::Component::FRAME_ID)
+      lookup = EbikeRuleServices::Lookup.from_params(params.permit(*LOOKUP_PARAMS), place:)
+      return render(Pages::EbikeRules::Reasons::Component.new(lookup:, frame_id: turbo_frame_request_id))
     end
 
     detected_place = EbikeRuleServices::Places.from_location(request_location_hash)

@@ -869,6 +869,7 @@ nl:
         traditional_bike: Traditionele fiets (2 wielen, 1 zadel, pedaal)
         elliptical: Elliptische fiets
         balance_bike: Loopfiets
+        e_atv: e-ATV (e-Quad, elektrisch terreinvoertuig)
       frame_material:
         aluminum: Aluminium
         composite: Koolstof of composiet
@@ -2275,8 +2276,7 @@ nl:
         signed_in_as_other: Je bent ingelogd als %{email}, dus we hebben je in dat
           account behouden. De registratiegegevens zijn nog steeds opgeslagen op het
           e-mailadres waarnaar we je hebben gemaild.
-        sign_out_to_agree: Je bent ingelogd als %{email}. Log uit en open de link
-          opnieuw om akkoord te gaan met de veiligheidsregels.
+        accept_terms: Ga akkoord met de gebruiksvoorwaarden om verder te gaan.
       find_b_param:
         registration_not_found: We konden die registratie niet vinden. Start hieronder
           een nieuwe registratie.
@@ -2310,10 +2310,10 @@ nl:
           we naar %{email} hebben gestuurd, of stuur hieronder een nieuwe e-mail.
         link_invalid_resent: Die link werkt niet meer, dus we hebben een nieuwe link
           naar %{email} gemaild.
-        sign_out_to_confirm: Je bent ingelogd als %{email}. Log uit en open de link
-          opnieuw om de organisatie te activeren.
         switched_signup: Je bent nu bezig met het afronden van %{name}. Om ook %{replaced_name}
           af te ronden, open je de link in de bijbehorende e-mail.
+        accept_terms: Ga akkoord met de Servicevoorwaarden en de Servicevoorwaarden
+          voor Organisaties om de organisatie te activeren.
       find_signup_for_confirmation:
         signup_not_found: We konden die aanmelding niet vinden — start hieronder een
           nieuwe aanmelding.
@@ -3590,8 +3590,6 @@ nl:
       dingen.
     feedbacks_new: Neem contact op met Bike Index. Uw woorden zijn onze muze, fluister
       ze in ons oor.
-    feedbacks_vendor_signup: Meld u aan bij Bike Index om de fietsen van uw klanten
-      snel, gemakkelijk en gratis te registreren.
     info_about: Waarom we Bike Index hebben gemaakt en wie we zijn
     info_protect_your_bike: Voorkom fietsdiefstal. Aanbevelingen en best practices
       voor het beschermen van uw fiets tegen dieven.
@@ -3650,7 +3648,6 @@ nl:
     documentation_api_v1: Bike Index API-documentatie
     feedbacks_index: Hulp bij Bike Index
     feedbacks_new: Neem contact op met Bike Index
-    feedbacks_vendor_signup: Winkel aanmelden - Bike Index
     info_about: Bike Index - de fietsregistratie die werkt
     info_serials: Framenummers van de fiets
     info_spokecard: Gesproken kaarten - Bike Index
@@ -4152,6 +4149,8 @@ nl:
       subject: Bericht van %{organization_name} over uw %{bike_type}
     organization_signup_confirmation:
       subject: Bevestig je e-mailadres om %{name} te activeren op Bike Index
+    shop_welcome:
+      subject: Uw Bike Index-winkeldashboard is klaar voor gebruik.
   plan_features:
     automatic_registration_through_pos: Automatische registratie via uw POS
     create_organization_account: Maak een organisatieaccount en neem contact op met
@@ -5410,6 +5409,79 @@ nl:
           team uitnodigen zodra je bent ingelogd.
         link_signs_you_in: Deze link geeft je een account bij Bike Index, dus stuur
           hem niet door. Hij is %{days} dagen geldig.
+      shop_welcome:
+        bike_book_body: Vergelijk specificaties, geometrie en tal van andere kenmerken
+          van duizenden fietsmodellen.
+        bookmark_it: Voeg dit toe aan je bladwijzers. Je logt in met dit e-mailadres.
+        browse_bike_book: Bekijk het fietsboek →
+        check_serials: Raadpleeg het register om de inruil van gebruikte fietsen veilig
+          te stellen.
+        check_serials_lead: Controleer de serienummers voordat u koopt.
+        check_your_state: Controleer uw staat →
+        connect_pos_body: Zonder een koppeling met een kassasysteem is het registreren
+          van fietsen afhankelijk van iemand die eraan denkt om het te doen tijdens
+          een drukke dag. Zodra je de koppeling maakt, wordt elke fietsverkoop automatisch
+          een Bike Index-registratie op de achtergrond. Geen extra formulieren aan
+          de kassa en geen personeelstraining nodig. Je klant ontvangt een e-mail
+          om zijn of haar fiets op te halen, met het serienummer en de gegevens al
+          ingevuld.
+        connect_pos_footnote: Hulp nodig? Beantwoord deze e-mail en we helpen je verder.
+          Geen ondersteund kassasysteem? Je kunt fietsen nog steeds registreren via
+          je dashboard.
+        connect_pos_heading: Sluit je kassasysteem aan, zodat geen enkele fiets over
+          het hoofd wordt gezien.
+        connect_pos_impact: Hoe meer fietsen er geregistreerd worden, hoe meer gestolen
+          fietsen herkend en teruggevonden worden, en hoe moeilijker het wordt om
+          gestolen fietsen in je buurt te verkopen.
+        connect_your_pos_now: Sluit uw kassasysteem nu aan.
+        create_your_shop_account: Maak uw winkelaccount aan
+        dashboard_intro: Je winkelaccount is meer dan alleen een aanmelding. Het is
+          je thuisbasis op Bike Index.
+        dashboard_items_heading: Wat je kunt doen vanaf je dashboard
+        ebike_checker: E-bike controleur
+        ebike_checker_body: De regels voor e-bikes verschillen per staat, met betrekking
+          tot de toegestane categorieën, de rijomstandigheden en de vereiste leeftijd
+          en uitrusting. Handig wanneer een klant vraagt wat legaal is voordat hij
+          of zij een e-bike koopt.
+        email_preferences: E-mailvoorkeuren
+        free_tools: Er komen nieuwe exemplaren aan, en winkelaccounts ontvangen ze
+          als eerste.
+        free_tools_heading: Hulpmiddelen om klanten te helpen bij hun keuze.
+        free_tools_intro: Gebruik ze in de winkel of stuur de link naar de klanten.
+        free_tools_lead: Gebruik onze gratis tools.
+        hero_body: "%{name} is ingesteld op Bike Index. Op je dashboard vind je alle
+          fietsen die in je winkel geregistreerd staan."
+        hero_body_connect_pos: "%{name} is ingesteld op Bike Index. Op je dashboard
+          vind je alle fietsen die je winkel registreert. Nog één stap: koppel je
+          kassasysteem zodat elke fiets die je verkoopt automatisch wordt geregistreerd."
+        hero_heading: Je bent binnen. Je winkel heeft een dashboard.
+        included_free: Inbegrepen gratis
+        most_important_next_step: Uw belangrijkste volgende stap
+        nonprofit: Bike Index, een 501(c)(3) non-profitorganisatie
+        open_your_dashboard: Open je dashboard
+        preheader: Je winkeldashboard is live. Elke fiets die je winkel registreert,
+          staat daar.
+        preheader_connect_pos: 'Je winkeldashboard is live. Nog één stap: koppel je
+          kassasysteem zodat elke fiets die je verkoopt geregistreerd wordt.'
+        privacy_policy: Privacybeleid
+        questions: Heeft u vragen over de installatie of uw dashboard? Beantwoord
+          deze e-mail en een medewerker van onze klantenservice helpt u graag verder.
+        receiving_because: Je ontvangt dit bericht omdat je een winkelaccount hebt
+          aangemaakt voor %{name} op Bike Index.
+        see_every_bike: Elke verkoop wordt in één lijst weergegeven, met serienummer
+          en details.
+        see_every_bike_lead: Bekijk alle fietsen die je hebt geregistreerd.
+        shopify_soon: Shopify binnenkort
+        stat_bikes: geregistreerde fietsen
+        stat_partners: partnerwinkels, politie en steden
+        stat_recoveries: Gestolen fietsen teruggevonden
+        sticker_pos_step: Uw kassasysteem aansluiten · duurt ongeveer 10 minuten
+        track_pos: 'Zie hoe het werkt: elke verkoop wordt geregistreerd.'
+        track_pos_lead: Houd uw POS-verbinding in de gaten.
+        why_shops_body: Uw klanten krijgen gratis diefstalbescherming en u wordt een
+          winkel die ze vertrouwen. Het is gratis voor u en voor hen, en we verkopen
+          of delen nooit klantgegevens.
+        why_shops_heading: Waarom winkels Bike Index gebruiken
     ui:
       definition_list:
         row:
@@ -5526,6 +5598,9 @@ nl:
           none: geen
           return_to_default_column_order: Terug naar de standaard kolomvolgorde
           visible_columns: Zichtbare kolommen
+        in_card:
+          select_record: Selecteer %{record} %{id}
+          toggle_all_checked: Alles aangevinkt weergeven/verbergen
     atoms:
       serial:
         hidden: verborgen
@@ -5771,7 +5846,6 @@ nl:
             hidden: verborgen
             not_registered_with: Verborgen omdat het niet is geregistreerd bij %{org_name}
             view: Weergave
-            toggle_all_checked: Alles aangevinkt weergeven/verbergen
             course_acknowledgment_title: Erkenning van deelname aan de onderwijscursus
               bij
             more_notes: "+%{count} meer"
@@ -6739,6 +6813,14 @@ nl:
             continue: Doorgaan
             continue_where_you_left_off: Ga gerust verder, dan pakken we de draad
               weer op.
+            continuing_keeps_you_signed_in: Door verder te gaan, blijft u ingelogd
+              en wordt uw registratie opgeslagen op het adres waarnaar deze link verwijst.
+            i_agree_to_terms: Ik ga akkoord met de servicevoorwaarden van Bike Index.
+            link_is_for: Deze link is voor
+            read_terms: Lees de gebruiksvoorwaarden.
+            sign_out_to_agree: Voor wie deze link ook bedoeld is, deze moet akkoord
+              gaan met de veiligheidsregels. Log uit en open de link vervolgens opnieuw.
+            signed_in_as: Je bent ingelogd als
           step1:
             just_the_essentials: Om te beginnen alleen de essentiële zaken.
             register_your_vehicle: Registreer uw voertuig!
@@ -7001,17 +7083,11 @@ nl:
           answer_yes: Ja
           being_compiled: De regels voor deze staat worden samengesteld op basis van
             primaire bronnen.
-          class_1_throttle: Motorfietsen van klasse 1 mogen geen gashendel hebben.
-          class_3_throttle: Het gaspedaal moet bij 32 km/u (20 mph) worden uitgeschakeld.
-          classes_start_on: De lessen gaan in %{date}. Tot die tijd kunt u de actuele
-            regels van de staat raadplegen.
           fails_rule: Voldoet niet aan deze regel.
           for_your_information: Ter informatie
           gray_headline: We hebben de e-bike-regels van %{state} nog niet in ons bestand.
-          has_throttle: Heeft een gasklep
           is_registered: Is deze fiets geregistreerd?
           legal_to_ride: Legaal om te rijden
-          limits_start_on: Deze limieten treden in werking %{date}
           manual_bike_name: e-bike
           may_be_moped: Het kan ook zijn dat het voertuig wordt gereguleerd als een
             bromfiets of motorvoertuig, waarvoor registratie en een rijbewijs vereist
@@ -7019,13 +7095,7 @@ nl:
           meets_rule: Voldoet aan deze regel
           motor: Motor
           mph_html: "%{mph} mph"
-          no_speed_cap: Geen snelheidslimiet in de staatswetgeving.
-          no_throttle: Geen gaspedaal
-          no_watt_cap: Geen maximumvermogen in de staatswet
-          not_classified: Het is geen e-bike van klasse 1, 2 of 3.
           not_permitted: Niet toegestaan
-          own_classes: De staat stelt zijn eigen grenzen vast in plaats van de drie
-            standaardklassen.
           recovered_more_often: Gestolen fietsen worden twee keer zo vaak teruggevonden
             als ze geregistreerd zijn.
           register_free: Registreer je gratis op Bike Index
@@ -7033,9 +7103,6 @@ nl:
           rules_not_on_file: Regels niet aanwezig
           source_html: 'Bron: %{link}''s catalogus van staatsrecht. Samenvattingen
             dienen ter referentie en zijn geen juridisch advies.'
-          speed_not_provided: Maximale snelheid niet vermeld
-          speed_over_cap_html: Assisteert tot %{mph} mph, boven de %{cap} mph-limiet
-          speed_within_cap_html: Assistentie tot %{mph} mph, binnen de limiet
           still_reviewing: We zijn de regels van %{state} nog aan het bekijken.
           still_reviewing_body: Raadpleeg de website van de RDW of de wetgevende macht
             van uw staat voor de actuele regelgeving met betrekking tot e-bikes. De
@@ -7043,81 +7110,30 @@ nl:
             en een maximumsnelheid van 20 mph (klasse 1-2) of 28 mph (klasse 3) voor
             trapondersteuning.
           throttle: Elektrisch gaspedaal
-          throttle_allowed: Gashendel toegestaan voor klasse 2
-          throttle_not_allowed: De staat staat geen gashendel toe.
-          throttle_not_stated: De wetgeving van de staat zegt niet of een gasklep
-            is toegestaan.
           top_speed: Topsnelheid
           watts_html: "%{watts}W"
-          watts_not_provided: Motorvermogen niet opgegeven
-          watts_over_cap_html: "%{watts}W motor overschrijdt de %{cap}W capaciteit"
-          watts_within_cap_html: "%{watts}W-motor bevindt zich in de kap"
           yes_to_html: Ja, naar %{mph}
           your_state: Uw staat
-          class_3_throttle_over_html: Het gaspedaal gaat tot %{mph} mph, voorbij de
-            20 mph die het gaspedaal van een klasse 3-voertuig is toegestaan.
-          class_3_throttle_within_html: Gashendel stopt bij %{mph} mph
           over_mph_html: Meer dan %{mph} mph
           red_headline_manual: Dit is geen e-bike volgens de huidige %{state} regels.
-          speed_past_cap_html: Assistentie bij snelheden boven %{past} mph, boven
-            de %{cap} mph-limiet
-          speed_past_html: Ondersteunt voorbij %{past} mph; controleer of het stopt
-            bij %{cap} mph
-          classes_recognized:
-            one: Klasse %{n} wordt herkend
-            other: De klassen %{n} worden erkend.
           answer_optional: Optioneel
-          class_3_optional_throttle_within_html: Optionele gashendel stopt bij %{mph}
-            mph
-          class_3_speed_with_throttle_html: Assistentie tot %{mph} mph, niet toegestaan
-            met gashendel
-          class_n: Klasse %{n}
-          classes_not_permitted: Het is een %{classes} e-bike, wat niet is toegestaan.
           model_year: "%{year} model"
-          optional_throttle_not_allowed: Het is alleen legaal zonder de optionele
-            gasklep.
           optional_to_html: Optioneel, naar %{mph}
-          throttle_with_class_3_assist: Niet toegestaan met assistentie van klasse
-            3
           kmh_html: "%{kmh} km/u"
           law_source_html: 'Bron: %{link}''s catalogus van wetgeving betreffende e-bikes.
             Samenvattingen dienen ter referentie en zijn geen juridisch advies.'
           may_be_moped_canada: Het kan ook zijn dat het voertuig als bromfiets of
             motorvoertuig wordt gereguleerd, waarvoor registratie en een rijbewijs
             vereist kunnen zijn.
-          no_e_bike_category: Er is hier geen aparte categorie voor e-bikes, dus controleer
-            de regels voor rijbewijs, registratie en helmplicht.
-          no_speed_cap_in_law: Er is geen snelheidslimiet in de wetgeving.
-          no_watt_cap_in_law: Er is geen maximumvermogen vastgelegd in de wet.
           optional_to_kmh_html: Optioneel, naar %{kmh} km/u
           over_kmh_html: Meer dan %{kmh} km/u
-          speed_over_cap_kmh_html: Assistentie tot %{kmh} km/u, boven de %{cap} km/u
-            limiet
-          speed_past_cap_kmh_html: Assistentie bij snelheden boven %{past} km/u, boven
-            de %{cap} km/u-limiet
-          speed_past_kmh_html: Assisteert voorbij %{past} km/u; controleer of het
-            stopt bij %{cap} km/u.
-          speed_within_cap_kmh_html: Assistentie tot %{kmh} km/u, binnen de limiet
           still_reviewing_province_body: Raadpleeg het ministerie van Transport van
             uw provincie of territorium voor de actuele regelgeving met betrekking
             tot e-bikes. De meeste ministeries stellen een maximumvermogen van e-bikemotoren
             van 500W en een maximumsnelheid met trapondersteuning van 32 km/u.
-          throttle_allowed_in_law: Gashendel toegestaan
-          throttle_not_allowed_in_law: De wet staat geen gashendel toe.
-          throttle_not_stated_in_law: De wet zegt niet of een gasklep is toegestaan.
-          watts_to_check_html: Controleer of de motor een vermogen heeft van %{cap}W
-            of minder.
           yes_to_kmh_html: Ja, tot %{kmh} km/u
           your_province: Uw provincie of territorium
-          classes_not_recognized_in:
-            one: Klasse %{n} wordt niet herkend in %{state}
-            other: Klassen %{n} worden niet herkend in %{state}
           falls_under_name: In %{state} valt het onder %{name}.
-          optional_classes_not_recognized_in:
-            one: Klasse %{n} wordt niet herkend in %{state}, dus het is alleen legaal
-              zoals het verkocht wordt.
-            other: De klassen %{n} worden niet herkend in %{state}, dus het is alleen
-              legaal zoals het verkocht wordt.
           other_classification_rules: "%{name} regels"
           also_class_with_optional_throttle: is ook een e-bike van klasse %{n} met
             optionele gashendel
@@ -7132,10 +7148,6 @@ nl:
           heading_throttle_not_allowed: Gas geven is niet toegestaan
           heading_vehicle_html: Gereguleerd als %{name}
           may_fall_under_name: In %{state} kan het onder %{name} vallen.
-          throttle_speed_over_cap_html: Het gaspedaal loopt door tot %{mph} mph, boven
-            de %{cap} mph-limiet.
-          throttle_speed_within_cap_html: Gashendel loopt tot %{mph} mph, binnen de
-            limiet
           class_summary: De %{name} is een e-bike van klasse %{n} in %{state}.
           class_summary_optional: De %{name} is een e-bike van klasse %{n} in %{state}
             en %{optional}.
@@ -7186,13 +7198,6 @@ nl:
               regels die gecontroleerd moeten worden.
           yellow_summary_no_classes_without_throttle: De %{name} wordt in %{state}
             als e-bike geclassificeerd, zonder de optionele gashendel.
-          class_3_throttle_past: Het gaspedaal wordt ingedrukt als de snelheid van
-            20 mph (32 km/u) wordt overschreden, de snelheid die is toegestaan voor
-            een voertuig van klasse 3.
-          throttle_past_cap_kmh_html: Het gaspedaal slaat door tot voorbij %{past}
-            km/u, boven de %{cap} km/u limiet.
-          throttle_past_kmh_html: Het gaspedaal slaat door tot voorbij %{past} km/u;
-            controleer of het stopt bij %{cap} km/u.
           yes_over_mph_html: Ja, meer dan %{mph} mph
           class_summary_manual: Deze e-bike is een e-bike van klasse %{n} in %{state}.
           class_summary_with_rules_manual:
@@ -7208,13 +7213,9 @@ nl:
             other: Dit wordt geclassificeerd als een e-bike in %{state}, met %{count}
               regels om te controleren.
           bike_book_name: Fietsboek
-          class_unknown_in_bike_book_label: Bike Book vermeldt de klasse of topsnelheid
-            niet, dus controleer de klasse op het label.
           entered_unverified_by_bike_book: Invoer door u, niet geverifieerd door Bike
             Book.
           full_bike_book_entry: Bekijk het volledige Bike Book-artikel
-          speed_to_check_bike_book_kmh_html: Bike Book vermeldt de topsnelheid niet,
-            dus controleer of de motor stopt bij %{cap} km/u.
         rule_label:
           classes: Erkende klassen
           power: Motorvermogenscapaciteit
@@ -7467,6 +7468,8 @@ nl:
           watts_min: "%{watts}W+"
           copy_id: Kopieer ID
           id: ID
+          class_3_throttle_barred: In %{state} mag een e-bike van klasse 3 geen gashendel
+            hebben, dus een e-bike van klasse 3 met een gashendel is daar geen e-bike.
         bike_summary:
           classification: E-%{vehicle_type} classificatie
           electric_certification: Elektrische certificering
@@ -7475,6 +7478,88 @@ nl:
           outside_checked_countries: De fietscontroles gelden voorlopig alleen in
             Amerikaanse staten en Canadese provincies. De wetgeving voor e-bikes in
             %{place} staat hieronder.
+        rule_note:
+          class_1_throttle: Motorfietsen van klasse 1 mogen geen gashendel hebben.
+          class_3_optional_throttle_within_html: Optionele gashendel stopt bij %{mph}
+            mph
+          class_3_speed_with_throttle_html: Assistentie tot %{mph} mph, niet toegestaan
+            met gashendel
+          class_3_throttle: Het gaspedaal moet bij 32 km/u (20 mph) worden uitgeschakeld.
+          class_3_throttle_over_html: Het gaspedaal gaat tot %{mph} mph, voorbij de
+            20 mph die het gaspedaal van een klasse 3-voertuig is toegestaan.
+          class_3_throttle_past: Het gaspedaal wordt ingedrukt als de snelheid van
+            20 mph (32 km/u) wordt overschreden, de snelheid die is toegestaan voor
+            een voertuig van klasse 3.
+          class_3_throttle_within_html: Gashendel stopt bij %{mph} mph
+          class_n: Klasse %{n}
+          class_unknown_in_bike_book_label: Bike Book vermeldt de klasse of topsnelheid
+            niet, dus controleer de klasse op het label.
+          classes_not_permitted: Het is een %{classes} e-bike, wat niet is toegestaan.
+          classes_not_recognized_in:
+            one: Klasse %{n} wordt niet herkend in %{state}
+            other: Klassen %{n} worden niet herkend in %{state}
+          classes_recognized:
+            one: Klasse %{n} wordt herkend
+            other: De klassen %{n} worden erkend.
+          classes_start_on: De lessen gaan in %{date}. Tot die tijd kunt u de actuele
+            regels van de staat raadplegen.
+          has_throttle: Heeft een gasklep
+          limits_start_on: Deze limieten treden in werking %{date}
+          no_e_bike_category: Er is hier geen aparte categorie voor e-bikes, dus controleer
+            de regels voor rijbewijs, registratie en helmplicht.
+          no_speed_cap: Geen snelheidslimiet in de staatswetgeving.
+          no_speed_cap_in_law: Er is geen snelheidslimiet in de wetgeving.
+          no_throttle: Geen gaspedaal
+          no_watt_cap: Geen maximumvermogen in de staatswet
+          no_watt_cap_in_law: Er is geen maximumvermogen vastgelegd in de wet.
+          not_classified: Het is geen e-bike van klasse 1, 2 of 3.
+          optional_classes_not_recognized_in:
+            one: Klasse %{n} wordt niet herkend in %{state}, dus het is alleen legaal
+              zoals het verkocht wordt.
+            other: De klassen %{n} worden niet herkend in %{state}, dus het is alleen
+              legaal zoals het verkocht wordt.
+          optional_throttle_not_allowed: Het is alleen legaal zonder de optionele
+            gasklep.
+          own_classes: De staat stelt zijn eigen grenzen vast in plaats van de drie
+            standaardklassen.
+          speed_not_provided: Maximale snelheid niet vermeld
+          speed_over_cap_html: Assisteert tot %{mph} mph, boven de %{cap} mph-limiet
+          speed_over_cap_kmh_html: Assistentie tot %{kmh} km/u, boven de %{cap} km/u
+            limiet
+          speed_past_cap_html: Assistentie bij snelheden boven %{past} mph, boven
+            de %{cap} mph-limiet
+          speed_past_cap_kmh_html: Assistentie bij snelheden boven %{past} km/u, boven
+            de %{cap} km/u-limiet
+          speed_past_html: Ondersteunt voorbij %{past} mph; controleer of het stopt
+            bij %{cap} mph
+          speed_past_kmh_html: Assisteert voorbij %{past} km/u; controleer of het
+            stopt bij %{cap} km/u.
+          speed_to_check_bike_book_kmh_html: Bike Book vermeldt de topsnelheid niet,
+            dus controleer of de motor stopt bij %{cap} km/u.
+          speed_within_cap_html: Assistentie tot %{mph} mph, binnen de limiet
+          speed_within_cap_kmh_html: Assistentie tot %{kmh} km/u, binnen de limiet
+          throttle_allowed: Gashendel toegestaan voor klasse 2
+          throttle_allowed_in_law: Gashendel toegestaan
+          throttle_not_allowed: De staat staat geen gashendel toe.
+          throttle_not_allowed_in_law: De wet staat geen gashendel toe.
+          throttle_not_stated: De wetgeving van de staat zegt niet of een gasklep
+            is toegestaan.
+          throttle_not_stated_in_law: De wet zegt niet of een gasklep is toegestaan.
+          throttle_past_cap_kmh_html: Het gaspedaal slaat door tot voorbij %{past}
+            km/u, boven de %{cap} km/u limiet.
+          throttle_past_kmh_html: Het gaspedaal slaat door tot voorbij %{past} km/u;
+            controleer of het stopt bij %{cap} km/u.
+          throttle_speed_over_cap_html: Het gaspedaal loopt door tot %{mph} mph, boven
+            de %{cap} mph-limiet.
+          throttle_speed_within_cap_html: Gashendel loopt tot %{mph} mph, binnen de
+            limiet
+          throttle_with_class_3_assist: Niet toegestaan met assistentie van klasse
+            3
+          watts_not_provided: Motorvermogen niet opgegeven
+          watts_over_cap_html: "%{watts}W motor overschrijdt de %{cap}W capaciteit"
+          watts_to_check_html: Controleer of de motor een vermogen heeft van %{cap}W
+            of minder.
+          watts_within_cap_html: "%{watts}W-motor bevindt zich in de kap"
       memberships:
         new:
           become_a_member: Word lid
@@ -8230,7 +8315,6 @@ nl:
           customer_records_sold_or_shared: klantgegevens verkocht of gedeeld
           data_stays_private: Hun gegevens blijven privé.
           data_stays_private_body: Nooit verkocht, nooit gedeeld.
-          ding: DING!
           ebike_legality_checker: Controle op de legaliteit van e-bikes
           ebike_legality_checker_body: Per staat is er een overzicht van de toegestane
             categorieën e-bikes, waar ze mogen worden gebruikt en de leeftijds- en
@@ -8313,7 +8397,6 @@ nl:
           shop_name_placeholder: Spaak- en kettingfietsen
           sign_up_free: Meld je gratis aan
           sign_up_your_shop: Meld je winkel aan
-          signup_name: aanmelden
           something_else_html: Nog iets anders? %{email_link}.
           step_connect_body: Koppel Lightspeed of Ascend aan je gratis winkelaccount.
             Dit duurt ongeveer 10 minuten.
@@ -8335,11 +8418,11 @@ nl:
           to_set_up: om op te zetten
           used_only_for_bikes: Uitsluitend te gebruiken voor fietsen.
           we_never_sell_or_share: Wij verkopen of delen nooit klantgegevens.
-          well_email_you: We sturen u een e-mail over het koppelen van uw kassasysteem.
           what_your_customers_get: Wat uw klanten krijgen. Wat uw winkel krijgt.
           wholesale: Groothandel
           your_pos: Uw kassasysteem
-          youre_in: Je bent binnen.
+          signed_in_as_admin_html: Je bent ingelogd als %{email}, dit is de beheerder
+            van de winkel.
         ascend:
           a_dashboard_for_your_shop: Een dashboard voor uw winkel
           a_dashboard_for_your_shop_body: Zoek op elk gewenst moment in de fietsen
@@ -8566,9 +8649,15 @@ nl:
             confirm_email_to_activate_html: Bevestig dat %{email} uw e-mailadres is,
               dan richten we de organisatie in met u als beheerder.
             sign_out_and_activate: Uitloggen en activeren
-            signed_in_as_other: Je bent ingelogd als %{signed_in_as}, maar deze link
-              is voor %{email}. Door te activeren word je uitgelogd en ingelogd als
-              %{email}, de beheerder van de organisatie.
+            activating_signs_you_out: Door te activeren wordt u afgemeld en ingelogd
+              als beheerder van de organisatie.
+            i_agree_to_terms: Ik ga akkoord met de Servicevoorwaarden van Bike Index
+              en de Servicevoorwaarden voor Organisaties.
+            link_is_for: Deze link is voor
+            read_terms_html: Lees de %{terms_link} en %{vendor_terms_link}
+            signed_in_as: Je bent ingelogd als
+            terms_of_service: Servicevoorwaarden
+            vendor_terms: Gebruiksvoorwaarden voor organisaties
           step1:
             activation_link: We sturen je een link per e-mail om de organisatie te
               activeren. Je hoeft daar niet op te wachten, je kunt meteen aan de slag.

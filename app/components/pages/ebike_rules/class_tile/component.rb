@@ -6,7 +6,7 @@ module Pages
       # An e-bike class's navy tile, a gray one for a class the catalog can't tell, or the red e-moto tile for a bike with
       # no class. `optional` is the mode - "throttle" or "assist" - that alone brings a class, whose tile is outlined and
       # captioned with it. `explained`, a class's or the e-moto's tile is a tooltip of its card, with its catalog ID: the
-      # e-moto's `out_of_class_id`, evc/out_of_class/us/ca, for a vehicle in no class in that state alone
+      # e-moto's `out_of_class_id`, evc/out-of-class/us/ca, for a vehicle in no class in that state alone
       class Component < ApplicationComponent
         SIZES = {
           md: {tile: "tw:size-14", label: "tw:text-[9px]", number: "tw:text-[28px]", icon: "tw:size-6"},
@@ -41,7 +41,7 @@ module Pages
           end
         end
 
-        def catalog_id = @e_bike_class ? "evc/us/class_#{@e_bike_class}" : @out_of_class_id || EbikeRuleServices::StateLaws::NOT_AN_EBIKE[:id]
+        def catalog_id = @e_bike_class ? "evc/us/class-#{@e_bike_class}" : @out_of_class_id || EbikeRuleServices::StateLaws::NOT_AN_EBIKE[:id]
 
         def caption = (@optional == "throttle") ? translation(".optional_throttle") : translation(".optional_upgrade")
 

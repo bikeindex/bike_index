@@ -14,9 +14,9 @@ const steps = [
 ]
 
 const EXAMPLES = [
-  ['Gravel bikes under $1,500', 'primary_activity=atb_gravel&price_max=1500'],
-  ['Trek Marlin 5 vs Specialized Rockhopper Sport', 'vehicle_models=m/trek/2026/marlin_5_gen_3,m/specialized/2026/rockhopper_sport'],
-  ['RadWagon 4 vs 5 vs 2026', 'vehicle_models=m/rad_power/2020/radwagon_4,m/rad_power/2024/radwagon_5,m/rad_power/2026/radwagon']
+  ['Gravel bikes under $1,500', 'primary_activity=atb-gravel&price_max=1500'],
+  ['Trek Marlin 5 vs Specialized Rockhopper Sport', 'vehicle_models=m/trek/2026/marlin-5-gen-3,m/specialized/2026/rockhopper-sport'],
+  ['RadWagon 4 vs 5 vs 2026', 'vehicle_models=m/rad-power-bikes/2020/radwagon-4,m/rad-power-bikes/2024/radwagon-5,m/rad-power-bikes/2026/radwagon']
 ]
 
 // active while `url` has every param its query sets, as UI::ButtonLink's `active:` renders it

@@ -9,3 +9,13 @@ en:
             continue: Continue
             continue_where_you_left_off: Continue, and we'll pick up where you left
               off.
+            continuing_keeps_you_signed_in: >-
+              Continuing keeps you signed in, and saves the registration to the address
+              this link is for.
+            i_agree_to_terms: I agree to Bike Index's Terms of Service
+            link_is_for: This link is for
+            read_terms: Read the Terms of Service
+            sign_out_to_agree: >-
+              Whoever this link is for has safety rules to agree to. Sign out, then
+              open the link again.
+            signed_in_as: You're signed in as
