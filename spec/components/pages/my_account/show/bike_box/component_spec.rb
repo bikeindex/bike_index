@@ -136,8 +136,9 @@ RSpec.describe Pages::MyAccount::Show::BikeBox::Component, type: :component do
 
     before { UserAlert.refresh_alert_slugs(user) }
 
-    it "renders only this bike's alert" do
+    it "renders only this bike's alert, tucked under the card" do
       expect(component).to have_css("[role=alert]", count: 1)
+      expect(component).to have_css("li > div:last-child.tw\\:-mt-4\\.5 [role=alert].tw\\:pt-6\\.5\\!")
       expect(component).to have_text("associated with Brakebills")
       expect(component).to have_css("form[action='/user_alerts/#{user_alert.id}?add_bike_organization=true'] button", text: "Add it now!")
       expect(component).to have_css("form[action='/user_alerts/#{user_alert.id}?alert_action=dismiss'] button", text: "Ignore this suggestion")
