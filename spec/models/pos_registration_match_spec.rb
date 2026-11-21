@@ -36,4 +36,14 @@ RSpec.describe PosRegistrationMatch, type: :model do
       end
     end
   end
+
+  describe "merged_into" do
+    let(:match) { FactoryBot.create(:pos_registration_match, status: :merged) }
+
+    it "is the POS registration, once the owner's is deleted" do
+      expect(described_class.merged_into(match.bike)).to be_nil
+      match.bike.destroy!
+      expect(described_class.merged_into(Bike.unscoped.find(match.bike_id))).to eq match.pos_bike
+    end
+  end
 end

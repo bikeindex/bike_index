@@ -172,6 +172,16 @@ RSpec.describe LandingPagesController, type: :request do
       expect(response.body).to include "<p>Brakebills welcomes you</p>"
     end
 
+    context "routed by the previous slug" do
+      let!(:organization) { FactoryBot.create(:organization, short_name: "Brakebills University", previous_slug: "brakebills") }
+
+      it "renders" do
+        get "/brakebills"
+        expect(response.status).to eq(200)
+        expect(response.body).to include "<p>Brakebills welcomes you</p>"
+      end
+    end
+
     context "without a landing page" do
       let(:organization_landing_page) { nil }
 

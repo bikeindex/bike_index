@@ -3466,7 +3466,9 @@ CREATE TABLE public.pos_registration_matches (
     status integer DEFAULT 0 NOT NULL,
     review_reasons text[] DEFAULT '{}'::text[] NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    merger_id bigint,
+    merged_at timestamp(6) without time zone
 );
 
 
@@ -7748,6 +7750,13 @@ CREATE INDEX index_pos_registration_matches_on_duplicate_bike_group_id ON public
 
 
 --
+-- Name: index_pos_registration_matches_on_merger_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_pos_registration_matches_on_merger_id ON public.pos_registration_matches USING btree (merger_id);
+
+
+--
 -- Name: index_pos_registration_matches_on_pos_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -8165,6 +8174,7 @@ SET search_path TO "$user", public;
 INSERT INTO "schema_migrations" (version) VALUES
 ('20261119180000'),
 ('20261119102802'),
+('20261118155803'),
 ('20261117051637'),
 ('20261116222651'),
 ('20261111155046'),
