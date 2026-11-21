@@ -171,7 +171,8 @@ class RegisterController < ApplicationController
   def confirm
     @page_title = I18n.t("meta_titles.register_confirm")
     render Pages::Register::Views::Confirm::Component.new(b_param: @b_param, token: params[:confirmation_token],
-      accept_terms: terms_pending?, terms_checked: params[:terms_of_service].present?)
+      accept_terms: terms_pending?, terms_checked: params[:terms_of_service].present?,
+      signed_in_as: (current_user.email if signed_in_as_someone_else?), sign_out_to_agree: sign_out_to_agree?)
   end
 
   # The confirmation itself - the proven address gets an account, created here if
@@ -194,13 +195,10 @@ class RegisterController < ApplicationController
     # Someone else's session stays theirs - the registration is still finished for the
     # address that was emailed, it just isn't that account's own
     if current_user.present?
-      # The education course is the owner's to agree to, and spending the link here would leave them no way in
-      if @b_param.rules_left_to_owner?(current_user) && @b_param.acknowledgment_pending?
-        flash[:error] = translation(:sign_out_to_agree, email: current_user.email)
-        return redirect_to(confirm_path)
-      end
+      # The page says to sign out
+      return redirect_to(confirm_path) if sign_out_to_agree?
 
-      flash[:notice] = translation(:signed_in_as_other, email: current_user.email) unless @b_param.self_made?(current_user)
+      flash[:notice] = translation(:signed_in_as_other, email: current_user.email) if signed_in_as_someone_else?
     elsif sign_in_confirmed_user(@b_param.owner_email, return_to: confirm_path).blank?
       # Unless it went to the identity provider
       return performed? || redirect_to_current_step
@@ -220,6 +218,12 @@ class RegisterController < ApplicationController
     confirm_register_path(b_param_token: @b_param.id_token, confirmation_token: params[:confirmation_token],
       terms_of_service: params[:terms_of_service])
   end
+
+  def signed_in_as_someone_else? = current_user.present? && !@b_param.self_made?(current_user)
+
+  # The education course is the owner's to agree to, and spending the link here would leave them no way in
+  def sign_out_to_agree? = signed_in_as_someone_else? && @b_param.rules_left_to_owner?(current_user) &&
+    @b_param.acknowledgment_pending?
 
   # The account confirming leaves signed in
   def terms_pending?

@@ -2023,6 +2023,8 @@ RSpec.describe RegisterController, type: :request do
         include_context :request_spec_logged_in_as_user
 
         it "keeps their session, creating the bike for the confirmed address" do
+          get "#{base_url}/confirm", params: confirm_params
+          expect(response.body).to include "Continuing keeps you signed in"
           # The registration parked before they signed in, so it's still waiting here
           expect(b_param.reload.created_bike_id).to be_nil
           expect {

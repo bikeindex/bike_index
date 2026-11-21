@@ -69,7 +69,7 @@ RSpec.describe OrganizationSignupController, type: :request do
 
     post "#{base_url}/confirm_email", params: confirm_params
     expect(response).to redirect_to confirm_organization_signup_path(**confirm_params)
-    expect(flash[:error]).to eq "Agree to the Terms of Service to activate the organization"
+    expect(flash[:error]).to eq "Agree to the Terms of Service and the Terms of Service for Organizations to activate the organization"
     expect(organization_signup.email_confirmed?).to be_falsey
     expect(User.count).to eq 0
 
@@ -386,7 +386,8 @@ RSpec.describe OrganizationSignupController, type: :request do
 
         post "#{base_url}/confirm_email", params: accepted_params
         expect(response).to redirect_to confirm_organization_signup_path(**accepted_params)
-        expect(flash[:error]).to match(current_user.email)
+        # The page itself says who's signed in, and offers to sign them out
+        expect(flash[:error]).to be_blank
         expect(organization_signup.reload.email_confirmed?).to be_falsey
 
         post "#{base_url}/confirm_email", params: accepted_params.merge(confirmation_token: token, sign_out: true)

@@ -107,10 +107,8 @@ class OrganizationSignupController < ApplicationController
     session[SESSION_KEY] = @signup.id_token
 
     if signed_in_as_someone_else?
-      unless params[:sign_out].present?
-        flash[:error] = translation(:sign_out_to_confirm, email: current_user.email)
-        return redirect_to(confirm_path)
-      end
+      # The page says who's signed in, and its button signs them out
+      return redirect_to(confirm_path) unless params[:sign_out].present?
 
       remove_session
       @current_user = nil
