@@ -2,11 +2,12 @@ module Slugifyer
   extend Functionable
 
   def slugify(string)
-    transliterate(remove_parens(CGI.unescapeHTML(string.to_s)))
-      .gsub("%20", " ").gsub(/\s/, "-")
+    # Apostrophes are dropped (Craig's is craigs), anything else separates words
+    transliterate(remove_parens(CGI.unescapeHTML(string.to_s).delete("'’‘`´")))
+      .gsub("%20", " ")
       .gsub("&", "-and-").gsub("+", "-plus-")
-      .gsub(/[^A-Za-z0-9_-]+/, "")
-      .squeeze("-").delete_prefix("-").delete_suffix("-")
+      .gsub(/[^A-Za-z0-9_]+/, "-")
+      .delete_prefix("-").delete_suffix("-")
   end
 
   # & slugified to -amp- before it was -and-; nil unless the slug has one

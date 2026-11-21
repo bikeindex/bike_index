@@ -13,6 +13,12 @@ RSpec.describe Slugifyer do
       expect(Slugifyer.slugify("Heron Flats + Lofts")).to eq "heron-flats-plus-lofts"
       expect(Slugifyer.slugify("O&#39;Neil &quot;Bikes&quot;")).to eq "oneil-bikes"
     end
+    it "drops apostrophes and separates on other punctuation" do
+      expect(Slugifyer.slugify("Craig’s Cycles")).to eq "craigs-cycles"
+      expect(Slugifyer.slugify("27.5")).to eq "27-5"
+      expect(Slugifyer.slugify("Discus 45/40")).to eq "discus-45-40"
+      expect(Slugifyer.slugify("e.bike")).to eq "e-bike"
+    end
     it "squeezes and trims dashes" do
       expect(Slugifyer.slugify("Foo - Bar")).to eq "foo-bar"
       expect(Slugifyer.slugify("Trail / All-Mountain")).to eq "trail-all-mountain"
