@@ -3,7 +3,8 @@
 module Pages
   module Bikebook
     module SchemaFields
-      # One level of a schema document's fields, rendering its objects' fields beneath them
+      # One level of a schema document's fields, rendering its objects' fields beneath them.
+      # cache_key: the published file's and the document's, under which each field nothing is opened in is cached
       class Component < ApplicationComponent
         # an enum longer than this shows its first few values until opened
         INLINE_ENUM_LIMIT = 6
@@ -13,15 +14,19 @@ module Pages
         PLACEHOLDERS = {"integer" => "number", "float" => "number"}.freeze
         VALUE_CLASSES = "tw:text-purple-700 tw:dark:text-purple-300"
 
-        def initialize(fields:, open:, by_count:, representative_ids:, path: nil)
+        def initialize(fields:, open:, by_count:, representative_ids:, cache_key:, path: nil)
           @fields = fields
           @open = open
           @by_count = by_count
           @representative_ids = representative_ids
+          @cache_key = cache_key
           @path = path
         end
 
         private
+
+        # open and by_count come from the URL, so they stay out of the key: a field they name anything in renders uncached
+        def cached?(path) = (@open + @by_count).none? { it == path || it.start_with?("#{path}.") }
 
         def field_path(name) = [@path, name].compact.join(".")
 

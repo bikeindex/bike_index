@@ -367,6 +367,30 @@ RSpec.describe BikebookController, type: :request do
       end
     end
 
+    context "with caching" do
+      around do |example|
+        ActionController::Base.perform_caching = true
+        ActionController::Base.cache_store = ActiveSupport::Cache::MemoryStore.new
+        example.run
+      ensure
+        ActionController::Base.perform_caching = false
+        ActionController::Base.cache_store = :null_store
+      end
+
+      it "renders a field the URL opens anything in afresh, rather than as cached closed" do
+        get "/bikebook/schema_viewer"
+        expect(Capybara.string(response.body)).to have_css("details:not([open])[data-schema-path='type']")
+
+        get "/bikebook/schema_viewer", params: {open: "type", by_count: "type"}
+
+        page = Capybara.string(response.body)
+        expect(page).to have_css("details[open][data-schema-path='type']")
+          .and have_css("input[aria-label='type by count'][checked]")
+          .and have_css("details:not([open])[data-schema-path='type_detail']")
+          .and have_css("button[aria-label='#{ActiveSupport::NumberHelper.number_to_delimited(manufacturer_count)} models']")
+      end
+    end
+
     context "with a document the catalog doesn't publish" do
       it "renders the vehicle model's" do
         get "/bikebook/schema_viewer", params: {document: "vocabulary"}

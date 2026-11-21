@@ -15,7 +15,7 @@
 
     <div class="tw:pl-4">
       <%= render(Pages::Bikebook::SchemaFields::Component.new(fields: @viewer.dig("documents", @document, "fields"),
-        open: @open, by_count: @by_count, representative_ids: @viewer["representative_ids"])) %>
+        open: @open, by_count: @by_count, representative_ids: @viewer["representative_ids"], cache_key: [@viewer["published_at"], @document])) %>
     </div>
 
     <div>}</div>
