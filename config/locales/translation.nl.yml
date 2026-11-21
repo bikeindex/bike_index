@@ -2276,8 +2276,7 @@ nl:
         signed_in_as_other: Je bent ingelogd als %{email}, dus we hebben je in dat
           account behouden. De registratiegegevens zijn nog steeds opgeslagen op het
           e-mailadres waarnaar we je hebben gemaild.
-        sign_out_to_agree: Je bent ingelogd als %{email}. Log uit en open de link
-          opnieuw om akkoord te gaan met de veiligheidsregels.
+        accept_terms: Ga akkoord met de gebruiksvoorwaarden om verder te gaan.
       find_b_param:
         registration_not_found: We konden die registratie niet vinden. Start hieronder
           een nieuwe registratie.
@@ -2311,10 +2310,10 @@ nl:
           we naar %{email} hebben gestuurd, of stuur hieronder een nieuwe e-mail.
         link_invalid_resent: Die link werkt niet meer, dus we hebben een nieuwe link
           naar %{email} gemaild.
-        sign_out_to_confirm: Je bent ingelogd als %{email}. Log uit en open de link
-          opnieuw om de organisatie te activeren.
         switched_signup: Je bent nu bezig met het afronden van %{name}. Om ook %{replaced_name}
           af te ronden, open je de link in de bijbehorende e-mail.
+        accept_terms: Ga akkoord met de Servicevoorwaarden en de Servicevoorwaarden
+          voor Organisaties om de organisatie te activeren.
       find_signup_for_confirmation:
         signup_not_found: We konden die aanmelding niet vinden — start hieronder een
           nieuwe aanmelding.
@@ -6737,6 +6736,14 @@ nl:
             continue: Doorgaan
             continue_where_you_left_off: Ga gerust verder, dan pakken we de draad
               weer op.
+            continuing_keeps_you_signed_in: Door verder te gaan, blijft u ingelogd
+              en wordt uw registratie opgeslagen op het adres waarnaar deze link verwijst.
+            i_agree_to_terms: Ik ga akkoord met de servicevoorwaarden van Bike Index.
+            link_is_for: Deze link is voor
+            read_terms: Lees de gebruiksvoorwaarden.
+            sign_out_to_agree: Voor wie deze link ook bedoeld is, deze moet akkoord
+              gaan met de veiligheidsregels. Log uit en open de link vervolgens opnieuw.
+            signed_in_as: Je bent ingelogd als
           step1:
             just_the_essentials: Om te beginnen alleen de essentiële zaken.
             register_your_vehicle: Registreer uw voertuig!
@@ -8567,9 +8574,15 @@ nl:
             confirm_email_to_activate_html: Bevestig dat %{email} uw e-mailadres is,
               dan richten we de organisatie in met u als beheerder.
             sign_out_and_activate: Uitloggen en activeren
-            signed_in_as_other: Je bent ingelogd als %{signed_in_as}, maar deze link
-              is voor %{email}. Door te activeren word je uitgelogd en ingelogd als
-              %{email}, de beheerder van de organisatie.
+            activating_signs_you_out: Door te activeren wordt u afgemeld en ingelogd
+              als beheerder van de organisatie.
+            i_agree_to_terms: Ik ga akkoord met de Servicevoorwaarden van Bike Index
+              en de Servicevoorwaarden voor Organisaties.
+            link_is_for: Deze link is voor
+            read_terms_html: Lees de %{terms_link} en %{vendor_terms_link}
+            signed_in_as: Je bent ingelogd als
+            terms_of_service: Servicevoorwaarden
+            vendor_terms: Gebruiksvoorwaarden voor organisaties
           step1:
             activation_link: We sturen je een link per e-mail om de organisatie te
               activeren. Je hoeft daar niet op te wachten, je kunt meteen aan de slag.
