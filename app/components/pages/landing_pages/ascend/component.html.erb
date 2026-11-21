@@ -1,0 +1,183 @@
+<section class="tw:border-b tw:border-gray-200 tw:wrap-anywhere tw:dark:border-gray-700">
+  <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-8 tw:py-8 <%= SECTION_CLASSES %>">
+    <div class="tw:min-w-0 tw:flex-[1_1_420px]">
+      <span class="tw:mb-2 tw:block <%= SharedBlocks::Marketing::SectionHeading::Component.eyebrow_classes(:purple) %>">
+        <%= translation(".ascend_pos_integration") %>
+      </span>
+
+      <h1
+        class="
+          tw:m-0 tw:mb-2.5 tw:font-header tw:text-4xl tw:leading-[1.1]
+          tw:font-black tw:tracking-tight tw:text-balance
+        "
+      >
+        <%= translation(".register_every_bike_you_sell") %>
+      </h1>
+
+      <p class="tw:m-0 tw:mb-5 tw:max-w-140 tw:text-[17px] tw:leading-[1.55] tw:text-pretty <%= MUTED %>">
+        <%= translation(".link_your_accounts_once") %>
+      </p>
+
+      <%= render(UI::ButtonLink::Component.new(href: "#setup", text: translation(".start_setup"), color: :yellow, size: :callout)) %>
+    </div>
+
+    <picture class="tw:shrink-0">
+      <source
+        media="(prefers-reduced-motion: reduce)"
+        srcset="<%= image_path("kelsey/illustrations/bike-box.png") %>"
+      >
+
+      <%= image_tag("kelsey/illustrations/bike-box-rotating.gif", alt: "", width: 150, height: 150) %>
+    </picture>
+  </div>
+</section>
+
+<section class="tw:pt-12 tw:pb-6 tw:wrap-anywhere <%= SECTION_CLASSES %>">
+  <%= render(SharedBlocks::Marketing::SectionHeading::Component.new(heading: translation(".new_bike_sales_get_a_bike_index_account"),
+    html_class: "tw:mb-6")) %>
+
+  <div class="twwiderow twwiderow-3 tw:gap-y-8">
+    <% shop_benefits.each do |icon, title, body| %>
+      <%= render(SharedBlocks::Marketing::IconFeature::Component.new(icon:, circle: "tw:bg-blue-600", title:, body:)) %>
+    <% end %>
+  </div>
+</section>
+
+<section class="tw:py-8 tw:wrap-anywhere <%= SECTION_CLASSES %>">
+  <%= render(UI::Card::Component.new(shadow: :black, additional_classes: "tw:p-5! tw:sm:p-8!")) do %>
+    <div class="twwiderow tw:gap-y-8">
+      <div>
+        <div class="tw:mb-3 tw:flex tw:items-center tw:gap-2.5">
+          <%= helpers.inline_svg_tag("icons/shield-check.svg", class: "tw:size-7 tw:text-purple-500 tw:dark:text-purple-300", aria_hidden: true) %>
+
+          <span class="<%= SharedBlocks::Marketing::SectionHeading::Component.eyebrow_classes(:purple) %>">
+            <%= translation(".your_customers_privacy") %>
+          </span>
+        </div>
+
+        <%= render(SharedBlocks::Marketing::SectionHeading::Component.new(heading: translation(".we_will_never_give_out_customer_data"),
+          intro: translation(".privacy_intro"), html_class: "tw:mb-4")) %>
+
+        <div class="tw:flex tw:flex-wrap tw:gap-4 tw:text-[15px] tw:font-semibold">
+          <%= link_to(translation(".privacy_policy"), privacy_path, class: "twlink tw:py-2.5") %>
+          <%= link_to(translation(".pos_integration_security_faq"), security_faq_path, class: "twlink tw:py-2.5") %>
+        </div>
+      </div>
+
+      <div class="tw:grid tw:content-start tw:gap-4.5">
+        <% privacy_points.each do |icon, title, body, note| %>
+          <%= render(SharedBlocks::Marketing::IconFeature::Component.new(icon:, circle: "tw:bg-purple-500", title:, body:)) %>
+
+          <% if note %>
+            <p
+              class="
+                tw:m-0 tw:rounded-sm tw:bg-gray-50 tw:px-3 tw:py-2.5
+                tw:text-sm tw:leading-[1.55] tw:sm:ml-14 tw:dark:bg-gray-700
+              "
+            >
+              <strong><%= translation(".rather_they_didnt_get_an_email") %></strong>
+              <%= translation(".email_notifications_off_body") %>
+            </p>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</section>
+
+<section
+  id="setup"
+  class="tw:scroll-mt-8 tw:pt-10 tw:pb-14 tw:wrap-anywhere <%= SECTION_CLASSES %>"
+>
+  <div
+    class="
+      tw:mb-6 tw:flex tw:flex-wrap tw:items-baseline tw:justify-between
+      tw:gap-4
+    "
+  >
+    <%= render(SharedBlocks::Marketing::SectionHeading::Component.new(heading: translation(".set_up_in_three_steps"))) %>
+
+    <span class="tw:text-sm tw:font-semibold <%= MUTED %>"><%= translation(".about_10_minutes") %></span>
+  </div>
+
+  <ol class="tw:m-0 tw:grid tw:list-none tw:gap-4 tw:p-0">
+    <% steps.each_with_index do |step, index| %>
+      <li>
+        <%= render(UI::Card::Component.new(additional_classes: "tw:flex tw:flex-wrap tw:items-center tw:gap-x-5 tw:gap-y-4 tw:p-6! #{"tw:bg-gray-50! tw:dark:bg-gray-900!" if step[:done]}")) do %>
+          <span
+            class="tw:flex tw:size-11 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:text-lg tw:text-white <%= HEADING_CLASSES %> <%= step[:done] ? "tw:bg-gray-500" : "tw:bg-blue-600" %>"
+            aria-hidden="true"
+          >
+            <% if step[:done] %>
+              <%= helpers.inline_svg_tag("icons/check.svg", class: "tw:size-5", aria_hidden: true) %>
+            <% else %>
+              <%= number_display(index + 1) %>
+            <% end %>
+          </span>
+
+          <div class="tw:min-w-0 tw:flex-[1_1_280px]">
+            <h3 class="tw:mb-1 tw:text-lg <%= HEADING_CLASSES %>">
+              <span class="tw:sr-only"><%= number_display(index + 1) %>.</span>
+              <%= step[:title] %>
+            </h3>
+
+            <p class="tw:m-0 tw:leading-[1.55] <%= MUTED %>">
+              <%= step[:body] %>
+            </p>
+          </div>
+
+          <% if step[:button] %>
+            <%= render(UI::ButtonLink::Component.new(color: :primary, size: :lg, **step[:button])) %>
+          <% end %>
+        <% end %>
+      </li>
+    <% end %>
+  </ol>
+</section>
+
+<section class="tw:border-t tw:border-gray-200 tw:wrap-anywhere tw:dark:border-gray-700">
+  <div class="tw:grid tw:items-center tw:gap-10 tw:py-14 tw:lg:grid-cols-2 <%= SECTION_CLASSES %>">
+    <div>
+      <%= render(SharedBlocks::Marketing::SectionHeading::Component.new(eyebrow: translation(".what_your_customers_get"),
+        eyebrow_color: :purple, heading: translation(".a_free_benefit_for_every_customer"),
+        intro: translation(".we_hope_their_bike_is_never_stolen"), html_class: "tw:mb-6")) %>
+
+      <div class="tw:grid tw:gap-5">
+        <% customer_benefits.each do |icon, title, body| %>
+          <%= render(SharedBlocks::Marketing::IconFeature::Component.new(icon:, circle: "tw:bg-blue-600", title:, body:)) %>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="tw:flex tw:justify-center">
+      <%= image_tag("kelsey/illustrations/comic-assets_bike-hero.png", alt: translation(".caped_hero_bike_alt"), loading: "lazy",
+        width: 1768, height: 1320, class: "tw:h-auto tw:w-full tw:max-w-95") %>
+    </div>
+  </div>
+</section>
+
+<section class="tw:border-t tw:wrap-anywhere <%= BAND %>">
+  <div class="tw:grid tw:gap-8 tw:py-10 tw:md:grid-cols-2 <%= SECTION_CLASSES %>">
+    <div>
+      <h3 class="tw:mb-1.5 tw:text-lg <%= HEADING_CLASSES %>">
+        <%= translation(".questions") %>
+      </h3>
+
+      <p class="tw:m-0 tw:leading-relaxed <%= MUTED %>">
+        <%= translation(".questions_body_html",
+          email_link: mail_to(SHOPS_EMAIL, SHOPS_EMAIL, class: "twlink"),
+          faq_link: link_to(translation(".pos_integration_faq"), security_faq_path, class: "twlink")) %>
+      </p>
+    </div>
+
+    <div>
+      <h3 class="tw:mb-1.5 tw:text-lg <%= HEADING_CLASSES %>">
+        <%= translation(".using_lightspeed_instead") %>
+      </h3>
+
+      <p class="tw:m-0 tw:leading-relaxed <%= MUTED %>">
+        <%= translation(".lightspeed_body_html", lightspeed_link: link_to(translation(".lightspeed_pos_integration"), lightspeed_path, class: "twlink")) %>
+      </p>
+    </div>
+  </div>
+</section>

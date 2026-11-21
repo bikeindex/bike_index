@@ -13,7 +13,7 @@ module UserServices
       return [] if organization.nil? || current_user.nil?
 
       # Rails.cache.fetch gets none of the locale ApplicationComponentHelper#cache folds into fragments
-      Rails.cache.fetch(["menu_items_org_v5", organization, current_user,
+      Rails.cache.fetch(["menu_items_org_v6", organization, current_user,
         old_register_view, I18n.locale]) do
         build_items(organization, current_user, old_register_view)
       end
@@ -48,7 +48,7 @@ module UserServices
           graduated_link(organization),
           hot_sheet_link(organization, admin),
           reports_link(organization)],
-        [settings_group(organization, admin)]]
+        [settings_group(organization, admin), info_link(organization)]]
     end
 
     # Leaves the organization interface behind, so it's a section of its own rather than
@@ -230,6 +230,11 @@ module UserServices
         match_paths: ["#{dashboard}/**", org_root(organization)])
     end
 
+    def info_link(organization)
+      ComponentStructs::Shapes.link(translation(:org_information, org_name: organization.short_name),
+        routes.organization_info_path(organization_id: organization.to_param))
+    end
+
     def settings_group(organization, admin)
       return nil unless admin
 
@@ -275,6 +280,6 @@ module UserServices
     conceal :build_items, :organization_sections, :super_admin_link, :ambassador_items,
       :registrations_group, :registrations_links, :add_registration_link, :impounded_group,
       :add_impounded_link, :parking_group, :bulk_group, :lightspeed_link, :messaging_link, :model_audits_link, :graduated_link,
-      :hot_sheet_link, :reports_link, :settings_group, :org_root, :enabled_link, :translation, :routes
+      :hot_sheet_link, :reports_link, :info_link, :settings_group, :org_root, :enabled_link, :translation, :routes
   end
 end

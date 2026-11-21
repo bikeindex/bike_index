@@ -97,7 +97,7 @@ RSpec.describe Organized::ManagesController, type: :request do
         expect(session[:passive_organization_id]).to eq current_organization.id
         expect(assigns(:controller_namespace)).to eq "organized"
         expect(assigns(:page_id)).to eq "organized_manage_show"
-        expect(response.body).to include "<code>#{current_organization.reload.auto_user.email}</code>"
+        expect(Capybara.string(response.body)).to have_css("label code", text: current_organization.reload.auto_user.email)
         expect(response.body).to include 'name="organization[send_self_registration_email]"'
         expect(response.body).to include "owner email of #{current_organization.auto_user.email}"
         expect(response.body).not_to include "This includes unregistered notifications"
@@ -137,12 +137,10 @@ RSpec.describe Organized::ManagesController, type: :request do
 
     describe "update" do
       context "invalid" do
-        it "shows the error on the page it renders, and not the next one" do
+        it "shows the errors in one alert, not a flash besides" do
           put base_url, params: {organization_id: current_organization.to_param, id: current_organization.to_param, organization: {name: "Help"}}
           expect(response).to render_template(:show)
-          expect(flash[:error]).to match(/trouble updating/)
-          get base_url
-          expect(response.status).to eq 200
+          expect(response.body).to include "Invalid name"
           expect(flash[:error]).to be_blank
         end
       end
@@ -382,7 +380,7 @@ RSpec.describe Organized::ManagesController, type: :request do
                 organization: {kind: "property_management", short_name: "cool short name"}
               }
 
-            expect(assigns[:page_errors]).to be_present
+            expect(response.body).to include "1 error prevented this Organization from being saved"
             current_organization.reload
             expect(current_organization.short_name).to_not eq "cool short name"
             expect(current_organization.kind).to_not eq "property_management"

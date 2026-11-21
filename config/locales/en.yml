@@ -1845,6 +1845,9 @@ en:
         sign_out_to_confirm: >-
           You're signed in as %{email}. Sign out, then open the link again to activate
           the organization.
+        switched_signup: >-
+          You're now finishing %{name}. To finish %{replaced_name} too, open the link
+          in its email.
       find_signup_for_confirmation:
         signup_not_found: We couldn't find that signup — start a new one below
       redirect_to_organization:
@@ -1930,7 +1933,6 @@ en:
             location.
       manage_impoundings:
         update:
-          could_not_update: We're sorry, we had trouble updating %{org_name}.
           updated_successfully: "%{org_name} updated successfully."
       manages:
         destroy:
@@ -1938,7 +1940,6 @@ en:
             %{org_name}.
           deleted_org: Deleted %{org_name}.
         update:
-          could_not_update: We're sorry, we had trouble updating %{org_name}.
           updated_successfully: "%{org_name} updated successfully."
       organization_messages:
         create:
@@ -3590,39 +3591,6 @@ en:
       you_bring_the_ideas_make_the_connections_: >-
         You bring the ideas, make the connections, and we’ll make sure you have the
         resources to get stuff done.
-    ascend:
-      ascend_knowledge_base_article: Ascend's Knowledge base article
-      automatic_bicycle_registration: Automatic Bicycle Registration for Bike Shops
-        using Ascend POS
-      email_shops_security_html: >-
-        Email %{shops_email_link} if you have any questions, or check out the %{security_link}.
-        Thank you for registering bikes in Bike Index!
-      email_us_the_password_to_finish_setting_u: Email us the password to finish setting
-        up!
-      follow_the_setup_instructions_html: Follow the setup instructions on <strong>%{ascend_link}</strong>
-        on Bike Index
-      if_your_shop_uses_lightspeed_html: >-
-        If your shop uses Lightspeed, check out our Lightspeed POS integration <a
-        target="none" href="%{lightspeed_path}">here</a>.
-      link_your_ascend_retail_and_bike_index: Link your Ascend Retail and Bike Index
-        Accounts for free
-      new_bike_shop_org: new bike shop organization
-      once_youve_set_up_the_trek_ascenwd: >-
-        Once you’ve set up the Trek Ascend POS bicycle registration, you’re done!
-        Each day, Bike Index will pull newly-sold bike information from Ascend to
-        create Bike Index accounts for your customers. Their new bikes will be waiting
-        for them upon login. They just have to check their email, and their new bike
-        will be waiting for them.
-      security_link_text: POS integration FAQ
-      sign_up_as_a_new_org_html: Sign up as a %{new_org_link} on Bike Index
-      then_if_a_customers_bike_goes_missing_html: >-
-        Then, if a customer’s bike goes missing, their bike’s information and serial
-        number will be stored for them to access. But don’t worry: <a target="none"
-        href="%{privacy_path}">we will never give out any of your customer data</a>.
-      we_have_a_new_free_bicycle_registration: >-
-        We have a free bicycle registration for bike shops. If you’re a shop that
-        uses Ascend as your POS, our new Ascend point of sale integration will allow
-        you to register each bike you sell automatically. Setup takes about 10 minutes.
     bike_shop_packages:
       bike_index_for_bike_shops: Bike Index for bike shops
       choose_a_package_size: Choose a package size
@@ -4472,13 +4440,14 @@ en:
           Bike Index?
         select_email: Select email
         send_emails_directly: Send emails directly to unclaimed bike owners.
-        send_self_registration_email_html: Send email for registrations sent to <code>%{email}</code>
         send_self_registration_email_includes_unregistered: This includes unregistered
           notifications.
         send_self_registration_email_note: >-
           By default, Bike Index no longer sends email when a vehicle is registered
           to your organization registration email. Check this box if you want to receive
           email for registrations with an owner email of %{email}.
+        send_self_registration_email_to_html: Send email for registrations sent to
+          %{email}
         square_image: Use a square image for best results
         stolen_emails: Stolen emails
         unclaimed_registration_definition: >-
@@ -4957,6 +4926,7 @@ en:
       model_audits: E-Vehicle audits
       multi_search: Multi search
       org_dashboard: "%{org_name} Dashboard"
+      org_information: "%{org_name} Information"
       org_locations: "%{org_name} locations"
       org_profile: "%{org_name} profile"
       org_registrations: "%{org_name} Registrations"

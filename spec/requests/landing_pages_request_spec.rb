@@ -69,7 +69,6 @@ RSpec.describe LandingPagesController, type: :request do
     for_cities: "Bike Index for Cities",
     for_law_enforcement: "Bike Index for Law Enforcement",
     for_schools: "Bike Index for Schools",
-    ascend: "Ascend POS on Bike Index",
     ambassadors_current: "Bike Index Ambassadors",
     ambassadors_how_to: "Become a Bike Index Ambassador",
     bike_shop_packages: "Bike Index for Bike Shops - Features and Pricing"
@@ -82,6 +81,42 @@ RSpec.describe LandingPagesController, type: :request do
         expect(response).to render_template(controller_action)
         expect(response.body).to match("<title>#{page_title}</title>")
         expect(response.body).to match('<html lang="en">') # Accessibility
+      end
+    end
+  end
+
+  describe "#ascend" do
+    it "renders the setup steps with the title" do
+      get "/ascend"
+
+      expect(response.status).to eq(200)
+      expect(response.body).to match("<title>Ascend POS on Bike Index</title>")
+      expect(response.body).to include("Create your shop account on Bike Index")
+      expect(response.body).to_not include("Your shop is on Bike Index")
+    end
+
+    context "with a user in a shop" do
+      include_context :request_spec_logged_in_as_organization_admin
+      let(:current_organization) { FactoryBot.create(:organization, kind: "bike_shop") }
+
+      it "marks the account step done" do
+        get "/ascend"
+
+        expect(response.status).to eq(200)
+        expect(response.body).to include("Your shop is on Bike Index")
+        expect(response.body).to_not include("Create shop account")
+      end
+
+      context "when the organization isn't a shop" do
+        let(:current_organization) { FactoryBot.create(:organization, kind: "law_enforcement") }
+
+        it "keeps the account step" do
+          get "/ascend"
+
+          expect(response.status).to eq(200)
+          expect(response.body).to include("Create shop account")
+          expect(response.body).to_not include("Your shop is on Bike Index")
+        end
       end
     end
   end
@@ -135,6 +170,16 @@ RSpec.describe LandingPagesController, type: :request do
       expect(title).to eq "Brakebills Bike Registration"
       expect(assigns(:page_id)).to eq "landing_pages_show"
       expect(response.body).to include "<p>Brakebills welcomes you</p>"
+    end
+
+    context "routed by the previous slug" do
+      let!(:organization) { FactoryBot.create(:organization, short_name: "Brakebills University", previous_slug: "brakebills") }
+
+      it "renders" do
+        get "/brakebills"
+        expect(response.status).to eq(200)
+        expect(response.body).to include "<p>Brakebills welcomes you</p>"
+      end
     end
 
     context "without a landing page" do

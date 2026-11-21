@@ -601,7 +601,7 @@ class User < ApplicationRecord
     self.alert_slugs = (alert_slugs || [])
     # Rather than waiting for twilio to send, immediately update alert_slugs
     self.alert_slugs += ["phone_waiting_confirmation"] if phone_changed?
-    self.username = Slugifyer.slugify(username) if username
+    self.username = Slugifyer.slugify(username) if username && username_changed?
     self.email = EmailNormalizer.normalize(email)
     self.title = Binxtils::InputNormalizer.sanitize(title) if title.present?
     if no_non_theft_notification

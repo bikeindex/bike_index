@@ -334,19 +334,6 @@ $contact-us-gutter: 30px;
       display: none;
     }
   }
-
-  h3.with-landing-pos-logo {
-    margin-top: 6 * $vertical-height;
-    img {
-      max-width: 280px;
-      margin: -43px 0 0 1rem;
-      display: block;
-      float: right;
-    }
-    .landing-ascend-logo {
-      margin-top: -33px; // slightly different aspect ratio
-    }
-  }
 }
 
 .signup-landing-page {

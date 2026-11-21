@@ -10,8 +10,11 @@
   </head>
 
   <body
+    class="<%= class_names(dark: embed_color_scheme == "dark") %>"
     style="background: none; width: 100%; max-width: 500px; margin: 0 auto;"
   >
+    <%= render(SharedBlocks::SystemColorScheme::Component.new(color_scheme: embed_color_scheme)) %>
+
     <div
       class="registration-widget <%= current_organization&.slug %>"
       id="binx_registration_widget"
