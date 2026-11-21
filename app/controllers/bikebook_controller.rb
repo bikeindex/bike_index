@@ -22,7 +22,7 @@ class BikebookController < ApplicationController
   def schema_viewer
     viewer = Integrations::Bikebook::Catalog.schema_viewer
     document = viewer["documents"].key?(params[:document]) ? params[:document] : "vehicle_model"
-    @page_title = "Bike Book schema | Bike Index"
+    @page_title = "Bike Book schemas | Bike Index"
     render Pages::Bikebook::SchemaViewer::Component.new(viewer:, document:, open: params[:open].to_s.split(","),
       by_count: params[:by_count].to_s.split(","))
   end

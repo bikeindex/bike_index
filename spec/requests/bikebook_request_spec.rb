@@ -348,7 +348,7 @@ RSpec.describe BikebookController, type: :request do
 
       expect(response).to have_http_status(:ok)
       page = Capybara.string(response.body)
-      expect(page).to have_title("Bike Book schema | Bike Index", exact: true)
+      expect(page).to have_title("Bike Book schemas | Bike Index", exact: true)
         .and have_css("[aria-current='page']", text: "Vehicle model")
         .and have_css("details[open][data-schema-path='type']")
         .and have_css("details:not([open])[data-schema-path='type_detail']")

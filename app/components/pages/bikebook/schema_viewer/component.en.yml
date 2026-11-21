@@ -5,7 +5,7 @@ en:
       bikebook:
         schema_viewer:
           documents: Schema documents
+          schemas_title: Bike Book schemas
           subtitle_html: The shape of a %{document} file at schema %{version}, published
             as %{url}
-          title: Bike Book schema
           versioning: 'Versioning:'
