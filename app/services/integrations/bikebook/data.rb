@@ -41,6 +41,7 @@ module Integrations
       def component_attributes(record)
         vocabulary = Integrations::Bikebook::Catalog.manifest&.dig("vocabulary")
         names = vocabulary && Integrations::Bikebook::Catalog.file(vocabulary)&.dig("names", "components.type")
+          &.transform_keys { Integrations::Bikebook::Catalog.current_slug(it) }
         record["components"].to_a.map do |component|
           position = Array(component["position"])
           type = Integrations::Bikebook::Catalog.current_slug(component["type"])
