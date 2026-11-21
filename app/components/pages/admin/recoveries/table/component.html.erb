@@ -13,7 +13,7 @@
   <% end %>
 
   <% if @editable %>
-    <% table.selection_column(param: "sr_selected", disabled: ->(recovery) { !recovery.waiting_on_decision? }) do |(recovery)| %>
+    <% table.selection_column(param: "sr_selected", checkbox_options: ->(recovery) { {disabled: !recovery.waiting_on_decision?} }) do |(recovery)| %>
       <%= render(UI::ButtonLink::Component.new(text: "View", href: edit_admin_recovery_path(recovery), size: :sm)) %>
     <% end %>
   <% end %>
