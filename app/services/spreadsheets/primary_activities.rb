@@ -6,7 +6,7 @@ module Spreadsheets
   module PrimaryActivities
     extend Functionable
 
-    EXPORT_COLUMNS = %i[flavor families priority short_name].freeze
+    EXPORT_COLUMNS = %i[flavor families priority short_name slug].freeze
 
     def to_csv(primary_activities = nil)
       primary_activities ||= PrimaryActivity.by_priority.includes(:primary_activity_family)
@@ -30,11 +30,11 @@ module Spreadsheets
     def names_and_families(primary_activities)
       families, flavors = primary_activities.partition(&:family?)
       # A family exports as a flavor-less row; import upserts the family and creates no flavor
-      family_rows = families.map { [nil, it.name, it.priority, it.short_name] }
+      family_rows = families.map { [nil, it.name, it.priority, it.short_name, it.slug] }
       # A flavor in several families exports once, with its first (highest priority) record's attributes
       family_rows + flavors.group_by(&:name).map do |name, records|
         family_names = records.reject(&:top_level?).map(&:family_name).join(" & ").presence
-        [name, family_names, records.first.priority, records.first.short_name]
+        [name, family_names, records.first.priority, records.first.short_name, records.first.slug]
       end
     end
 
