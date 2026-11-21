@@ -42,19 +42,11 @@ module Enumable
       return str.slug if str.instance_of?(self)
       return str if str.is_a?(Symbol) && self::SLUGS.key?(str)
 
-      str = str.to_s.downcase.strip.tr("_", "-") if str.is_a?(String) || str.is_a?(Symbol)
-      if str.is_a?(Integer) || str.match?(/\A\d+\z/)
-        str = str.to_i if str.is_a?(String)
-        matching_sym = self::SLUGS.key(str)
-        return matching_sym if matching_sym.present?
-      end
-      slug = (slugs & [str, str.to_s.tr("-", "_")]).first
-      slug ||= names_and_secondary_names.detect { |names| names.include?(str) }&.first
-      if slug.blank? && str.is_a?(String) && str[/\(/].present?
-        str = str.split("(").first.strip
-        slug = names_and_secondary_names.detect { |names| names.include?(str) }&.first
-      end
-      slug&.to_sym
+      slug = Slugifyer.slugify(str)
+      return self::SLUGS.key(slug.to_i) if slug.match?(/\A\d+\z/)
+
+      ((slugs & [slug, slug.tr("-", "_")]).first ||
+        names_and_secondary_names.detect { it.include?(slug) }&.first)&.to_sym
     end
 
     def friendly_find(str)
@@ -66,10 +58,7 @@ module Enumable
 
     def names_and_secondary_names
       @names_and_secondary_names ||= self::NAMES.map do |k, v|
-        v_down = v.downcase
-        secondary_names = v_down[/\(/].present? ? secondary_names_for(v_down) : []
-
-        ([k.to_s, v_down] + secondary_names).uniq
+        [k.to_s, *[v, *secondary_names_for(v.downcase)].map { Slugifyer.slugify(it) }].uniq
       end
     end
 
