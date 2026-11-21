@@ -170,7 +170,8 @@ class RegisterController < ApplicationController
 
   def confirm
     @page_title = I18n.t("meta_titles.register_confirm")
-    render Pages::Register::Views::Confirm::Component.new(b_param: @b_param, token: params[:confirmation_token])
+    render Pages::Register::Views::Confirm::Component.new(b_param: @b_param, token: params[:confirmation_token],
+      accept_terms: terms_pending?)
   end
 
   # The confirmation itself - the proven address gets an account, created here if
@@ -183,6 +184,11 @@ class RegisterController < ApplicationController
       BikeServices::Register.resend_email_link(@b_param)
       flash[:error] = translation(:confirmation_link_expired)
       return redirect_to_current_step
+    end
+
+    if terms_pending? && !Binxtils::InputNormalizer.boolean(params[:terms_of_service])
+      flash[:error] = translation(:accept_terms)
+      return redirect_to(confirm_path)
     end
 
     # Someone else's session stays theirs - the registration is still finished for the
@@ -203,6 +209,7 @@ class RegisterController < ApplicationController
       find_education_course
     end
 
+    current_user.update(terms_of_service: true) unless current_user.terms_of_service
     @b_param.confirm_email!(creator_id: current_user.id)
     complete_registration
   end
@@ -211,6 +218,11 @@ class RegisterController < ApplicationController
 
   def confirm_path
     confirm_register_path(b_param_token: @b_param.id_token, confirmation_token: params[:confirmation_token])
+  end
+
+  # Whoever confirming leaves signed in - the session's account, or the emailed address's
+  def terms_pending?
+    !(current_user || User.fuzzy_confirmed_or_unconfirmed_email_find(@b_param.owner_email))&.terms_of_service
   end
 
   # Both read straight from params - update_params is stored as json, which an upload can't be

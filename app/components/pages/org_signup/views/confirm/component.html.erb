@@ -14,6 +14,14 @@
       <%= hidden_field_tag :confirmation_token, @token %>
       <%= hidden_field_tag :sign_out, true if @signed_in_as.present? %>
 
+      <% if @accept_terms %>
+        <%= render UI::Forms::Checkbox::Component.new(name: :terms_of_service, required: true,
+            class_name: "tw:my-4 tw:justify-center tw:text-left",
+            label: translation(".i_agree_to_terms_html",
+              terms_link: link_to(translation(".terms_of_service"), terms_path, target: "_blank", class: "twlink"),
+              vendor_terms_link: link_to(translation(".vendor_terms"), vendor_terms_path, target: "_blank", class: "twlink"))) %>
+      <% end %>
+
       <%= render UI::Button::Component.new(type: "submit", color: :primary, size: :lg, spinner: true, html_class: "tw:w-full",
           text: @signed_in_as.present? ? translation(".sign_out_and_activate") : translation(".activate")) %>
     <% end %>

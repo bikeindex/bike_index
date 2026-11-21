@@ -9,3 +9,5 @@ en:
             continue: Continue
             continue_where_you_left_off: Continue, and we'll pick up where you left
               off.
+            i_agree_to_terms_html: I agree to Bike Index's %{terms_link}
+            terms_of_service: Terms of Service

@@ -80,7 +80,7 @@ class OrganizationSignupController < ApplicationController
 
   def confirm
     render Pages::OrgSignup::Views::Confirm::Component.new(organization_signup: @signup, token: params[:confirmation_token],
-      signed_in_as: (current_user.email if signed_in_as_someone_else?))
+      signed_in_as: (current_user.email if signed_in_as_someone_else?), accept_terms: terms_pending?)
   end
 
   def confirm_email
@@ -94,6 +94,11 @@ class OrganizationSignupController < ApplicationController
         translation(:link_invalid, email: @signup.email)
       end
       return redirect_to(organization_signup_path)
+    end
+
+    if terms_pending? && !Binxtils::InputNormalizer.boolean(params[:terms_of_service])
+      flash[:error] = translation(:accept_terms)
+      return redirect_to(confirm_path)
     end
 
     replaced = OrgServices::Signup.find(session[SESSION_KEY])
@@ -120,6 +125,7 @@ class OrganizationSignupController < ApplicationController
     if replaced.present? && replaced != @signup && replaced.organization_id.blank?
       flash[:notice] = translation(:switched_signup, name: @signup.name, replaced_name: replaced.name)
     end
+    current_user.update(terms_of_service: true, accepted_vendor_terms_of_service: true) if terms_pending?
     OrgServices::Signup.confirm_email!(@signup)
     complete_or_details
   end
@@ -166,6 +172,9 @@ class OrganizationSignupController < ApplicationController
   def email_owner = @email_owner ||= User.fuzzy_confirmed_or_unconfirmed_email_find(@signup.email)
 
   def signed_in_as_someone_else? = current_user.present? && current_user != email_owner
+
+  # The email's account is the one confirming signs in, whoever's session it is
+  def terms_pending? = !(email_owner&.terms_of_service && email_owner.accepted_vendor_terms_of_service?)
 
   # The confirmed address's account is the admin, whichever browser finishes - one that
   # isn't signed in as it gets the organization made, then has to sign in to manage it

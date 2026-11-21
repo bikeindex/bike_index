@@ -1837,6 +1837,7 @@ en:
           We couldn't finish setting up your organization (%{errors}). Contact support@bikeindex.org
           and we'll sort it out.
       confirm_email:
+        accept_terms: Agree to the Terms of Service to activate the organization
         link_invalid: >-
           That link doesn't work anymore. Use the newest email we sent to %{email},
           or send another below.
@@ -2007,6 +2008,7 @@ en:
         safety_rules_updated: The safety rules have been updated — please review them
           again
       confirm_email:
+        accept_terms: Agree to the Terms of Service to continue
         confirmation_link_expired: That confirmation link has expired — check your
           email for a new one
         sign_out_to_agree: >-

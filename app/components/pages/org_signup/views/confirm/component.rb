@@ -6,12 +6,14 @@ module Pages
       module Confirm
         # Where the emailed link lands. Confirming is single use and scanners run the
         # page's JS, so the form waits for a click rather than submitting on render.
-        # signed_in_as: someone else's account, which activating signs out of
+        # signed_in_as: someone else's account, which activating signs out of.
+        # accept_terms: the address's account hasn't agreed to both sets of terms yet
         class Component < ApplicationComponent
-          def initialize(organization_signup:, token:, signed_in_as: nil)
+          def initialize(organization_signup:, token:, signed_in_as: nil, accept_terms: false)
             @organization_signup = organization_signup
             @token = token
             @signed_in_as = signed_in_as
+            @accept_terms = accept_terms
           end
         end
       end
