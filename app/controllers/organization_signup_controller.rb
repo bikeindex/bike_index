@@ -80,7 +80,8 @@ class OrganizationSignupController < ApplicationController
 
   def confirm
     render Pages::OrgSignup::Views::Confirm::Component.new(organization_signup: @signup, token: params[:confirmation_token],
-      signed_in_as: (current_user.email if signed_in_as_someone_else?), accept_terms: terms_pending?)
+      signed_in_as: (current_user.email if signed_in_as_someone_else?), accept_terms: terms_pending?,
+      terms_checked: params[:terms_of_service].present?)
   end
 
   def confirm_email
@@ -149,7 +150,8 @@ class OrganizationSignupController < ApplicationController
   end
 
   def confirm_path
-    confirm_organization_signup_path(signup_token: @signup.id_token, confirmation_token: params[:confirmation_token])
+    confirm_organization_signup_path(signup_token: @signup.id_token, confirmation_token: params[:confirmation_token],
+      terms_of_service: params[:terms_of_service])
   end
 
   def complete_or_details = @signup.details_completed? ? complete_signup : redirect_to(organization_signup_path(step: 2))

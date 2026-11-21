@@ -2068,7 +2068,8 @@ RSpec.describe RegisterController, type: :request do
         expect { post "#{base_url}/confirm_email", params: accepted_params }
           .to_not change(User, :count)
         expect(response).to redirect_to saml_init_path(org_slug: organization.to_param)
-        expect(session[:return_to]).to eq confirm_register_path(**confirm_params)
+        # The box they ticked comes back ticked
+        expect(session[:return_to]).to eq confirm_register_path(**accepted_params)
         expect(b_param.reload.email_confirmed?).to be_falsey
       end
     end

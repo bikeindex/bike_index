@@ -9,7 +9,7 @@
       <%= hidden_field_tag :confirmation_token, @token %>
 
       <% if @accept_terms %>
-        <%= render UI::Forms::Checkbox::Component.new(name: :terms_of_service, required: true,
+        <%= render UI::Forms::Checkbox::Component.new(name: :terms_of_service, required: true, checked: @terms_checked,
             class_name: "tw:my-4 tw:justify-center tw:text-left",
             label: translation(".i_agree_to_terms_html",
               terms_link: link_to(translation(".terms_of_service"), terms_path, target: "_blank", class: "twlink"))) %>

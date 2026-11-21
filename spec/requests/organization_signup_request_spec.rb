@@ -315,7 +315,7 @@ RSpec.describe OrganizationSignupController, type: :request do
         post "#{base_url}/confirm_email", params: link_params.merge(terms_of_service: "1")
       }.to_not change(User, :count)
       expect(response).to redirect_to saml_init_path(org_slug: sso_organization.to_param)
-      expect(session[:return_to]).to eq confirm_organization_signup_path(**link_params)
+      expect(session[:return_to]).to eq confirm_organization_signup_path(**link_params, terms_of_service: "1")
       expect(organization_signup.reload.email_confirmed?).to be_falsey
     end
   end
@@ -385,7 +385,7 @@ RSpec.describe OrganizationSignupController, type: :request do
         expect(response.body).to include "Sign out and activate"
 
         post "#{base_url}/confirm_email", params: accepted_params
-        expect(response).to redirect_to "#{base_url}/confirm?confirmation_token=#{token}&signup_token=#{organization_signup.id_token}"
+        expect(response).to redirect_to confirm_organization_signup_path(**accepted_params)
         expect(flash[:error]).to match(current_user.email)
         expect(organization_signup.reload.email_confirmed?).to be_falsey
 

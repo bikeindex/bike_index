@@ -7,10 +7,11 @@ module Pages
         # Where the emailed confirmation link lands. Confirming is single use and scanners run the
         # page's JS, so the form waits for a click rather than submitting on render
         class Component < ApplicationComponent
-          def initialize(b_param:, token:, accept_terms: false)
+          def initialize(b_param:, token:, accept_terms: false, terms_checked: false)
             @b_param = b_param
             @token = token
             @accept_terms = accept_terms
+            @terms_checked = terms_checked
           end
         end
       end

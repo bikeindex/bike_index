@@ -171,7 +171,7 @@ class RegisterController < ApplicationController
   def confirm
     @page_title = I18n.t("meta_titles.register_confirm")
     render Pages::Register::Views::Confirm::Component.new(b_param: @b_param, token: params[:confirmation_token],
-      accept_terms: terms_pending?)
+      accept_terms: terms_pending?, terms_checked: params[:terms_of_service].present?)
   end
 
   # The confirmation itself - the proven address gets an account, created here if
@@ -217,7 +217,8 @@ class RegisterController < ApplicationController
   private
 
   def confirm_path
-    confirm_register_path(b_param_token: @b_param.id_token, confirmation_token: params[:confirmation_token])
+    confirm_register_path(b_param_token: @b_param.id_token, confirmation_token: params[:confirmation_token],
+      terms_of_service: params[:terms_of_service])
   end
 
   # The account confirming leaves signed in
