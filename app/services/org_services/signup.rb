@@ -144,7 +144,8 @@ module OrgServices
 
     # Naming the one that took it - which, past 30 characters, isn't necessarily the name typed
     def taken_name_error(name, existing)
-      return translation(:name_taken, name: existing) if Organization.sanitize_name(name).squish.length <= 30 || existing.casecmp?(Organization.sanitize_name(name))
+      sanitized = Organization.sanitize_name(name)
+      return translation(:name_taken, name: existing) if Organization.shorten_name(sanitized) == sanitized.squish || existing.casecmp?(sanitized)
 
       translation(:name_taken_shortened, name: existing)
     end

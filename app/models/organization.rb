@@ -259,7 +259,7 @@ class Organization < ApplicationRecord
       return find_by_id(n) if integer_string?(n)
 
       slug = Slugifyer.slugify(n)
-      # First try slug, then previous slug, then just give finding by name a shot
+      # The -amp- slug's -and- form goes last, so an exact previous slug wins
       find_by_slug(slug) || find_by_previous_slug(slug) || where("LOWER(name) = LOWER(?)", n.downcase).first ||
         Slugifyer.amp_as_and(slug)&.then { friendly_find(it) }
     end

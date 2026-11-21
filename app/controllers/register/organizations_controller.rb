@@ -9,7 +9,7 @@ module Register
 
       @qr_url = case params[:target]
       when "shop_display" then embed_organization_url(@organization, non_stolen: true, shop_display: true)
-      when "landing" then "#{root_url}#{@organization.landing_page_slug || @organization.to_param}" # not routed unless in LandingPageOrganizations::SLUGS
+      when "landing" then "#{root_url}#{@organization.landing_page_slug || @organization.to_param}"
       else register_organization_url(@organization)
       end
 

@@ -22,12 +22,15 @@ module Backfills
       end
       # FriendlySlugFindable only sets slug on create
       [Cgroup, ContentTag, Ctype, FrontGearType, LockType, PrimaryActivity, RearGearType].each do |klass|
-        klass.find_each { it.update!(slug: Slugifyer.slugify(it.slug)) }
+        klass.find_each do |record|
+          slug = Slugifyer.slugify(record.slug)
+          record.update!(slug:) unless slug == record.slug
+        end
       end
       Manufacturer.find_each do |manufacturer|
         next if Slugifyer.slugify(manufacturer.name) == manufacturer.slug
 
-        manufacturer.update!(previous_slugs: [*manufacturer.previous_slugs, Slugifyer.slugify(manufacturer.slug)])
+        manufacturer.save!
       end
       raise "Skipped organizations with a previous_slug: #{skipped_ids.join(", ")}" if skipped_ids.any?
     end
