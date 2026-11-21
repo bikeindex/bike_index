@@ -8,7 +8,8 @@ RSpec.describe Backfills::ManufacturerSlugJob, type: :job do
 
     described_class.new.perform
     expect(manufacturer.reload.slug).to eq "kona-bicycle-company"
-    expect(manufacturer.previous_slugs).to eq %w[kona_old kona]
+    expect(manufacturer.previous_slugs).to eq %w[kona-old kona]
+    expect(Manufacturer.friendly_find("kona_old")&.id).to eq manufacturer.id
   end
 
   context "manufacturer that can't be saved" do

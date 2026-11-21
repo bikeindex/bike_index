@@ -75,6 +75,22 @@ Doorkeeper.configure do
   # falls back to the `:access_token` or `:bearer_token` params from the `params` object.
   # Check out the wiki for more information on customization
   # access_token_methods :from_bearer_authorization, :from_access_token_param, :from_bearer_param
+  #
+  # Doorkeeper's built-in extractors refuse a token sent by more than one method
+  # (RFC 6750 §2), but API clients send the same token in the query and the body.
+  # Accept that, and refuse only when the tokens differ.
+  access_token_methods(lambda do |request|
+    body = begin
+      request.POST
+    rescue ActionDispatch::Http::Parameters::ParseError
+      {}
+    end
+    tokens = [
+      Doorkeeper::OAuth::Token.from_bearer_authorization(request),
+      *%w[access_token bearer_token].flat_map { |key| [request.GET[key], body[key]] }
+    ].filter_map(&:presence).uniq
+    tokens.first if tokens.one?
+  end)
 
   # Change the native redirect uri for client apps
   # When clients register with the following redirect uri, they won't be redirected to any server and the authorization code will be displayed within the provider

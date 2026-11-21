@@ -16,6 +16,7 @@ RSpec.describe Organization, type: :model do
     it "says why a name can't be used" do
       expect(Organization.name_problem("Shifty Cycles")).to be_nil
       expect(Organization.name_problem(" shifty  BIKE shop")).to eq :taken
+      expect(Organization.name_problem("Shifty Bike-Shop!")).to eq :taken
       expect(Organization.name_problem("Registrations")).to eq :reserved
       expect(Organization.name_problem("Signups")).to eq :reserved
       expect(Organization.name_problem("X")).to eq :too_short
@@ -38,6 +39,24 @@ RSpec.describe Organization, type: :model do
         LandingPageOrganizations::SLUGS
       expect(top_level).to include("search", "marketplace", "e-bike-rules")
       expect(top_level.reject { Organization.name_problem(it).in?(%i[reserved too_short]) }).to eq []
+    end
+  end
+
+  describe "landing_page_slug" do
+    let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills University", previous_slug:) }
+    let(:previous_slug) { nil }
+
+    it "is nil unless routed" do
+      expect(organization.landing_page_slug).to be_nil
+    end
+
+    context "with a routed previous slug" do
+      let(:previous_slug) { "brakebills" }
+
+      it "is the previous slug" do
+        expect(organization.slug).to eq "brakebills-university"
+        expect(organization.landing_page_slug).to eq "brakebills"
+      end
     end
   end
 
@@ -292,6 +311,8 @@ RSpec.describe Organization, type: :model do
     let!(:organization) { FactoryBot.create(:organization, short_name: "something cool") }
     let!(:organization2) { FactoryBot.create(:organization, short_name: "Bike Shop", name: "Trek Store of Santa Cruz") }
     let!(:organization3) { FactoryBot.create(:organization, short_name: "BikeEastBay", previous_slug: "ebbc") }
+    let!(:organization4) { FactoryBot.create(:organization, name: "Bike and Trike Shop") }
+    let!(:organization5) { FactoryBot.create(:organization, name: "Bike & Trike Shop", previous_slug: "bike-amp-trike-shop") }
     it "finds by slug, previous_slug and name" do
       expect(organization2.slug).to eq "bike-shop"
       expect(Organization.friendly_find(" ")).to be_nil
@@ -299,6 +320,10 @@ RSpec.describe Organization, type: :model do
       expect(Organization.friendly_find("bike shop")).to eq organization2
       expect(Organization.friendly_find("trek store of SANTA CRUZ")).to eq organization2
       expect(Organization.friendly_find("bikeeastbay")).to eq organization3
+      expect(organization5.slug).to eq "bike-and-trike-shop-2"
+      expect(Organization.friendly_find("bike-amp-trike-shop-2")).to eq organization5
+      # An exact previous slug beats the -and- version of an -amp- one
+      expect(Organization.friendly_find("bike-amp-trike-shop")).to eq organization5
       expect(Organization.friendly_find(organization)).to eq organization
     end
     it "scrubs null bytes rather than raising" do
@@ -711,13 +736,22 @@ RSpec.describe Organization, type: :model do
       end
     end
 
+    context "no letters" do
+      let(:name) { "$.0. $" }
+      it "replaces the name" do
+        organization.set_calculated_attributes
+        expect(organization.name).to eq "Stop messing about"
+        expect(organization.slug).to eq "stop-messing-about"
+      end
+    end
+
     context "&" do
       let(:name) { "Bikes & Trikes" }
       it "permits & in names" do
         organization.set_calculated_attributes
         expect(organization.name).to eq "Bikes & Trikes"
         expect(organization.short_name).to eq "Bikes & Trikes"
-        expect(organization.slug).to eq "bikes-amp-trikes"
+        expect(organization.slug).to eq "bikes-and-trikes"
       end
     end
 
@@ -749,7 +783,7 @@ RSpec.describe Organization, type: :model do
       it "truncates without ellipse" do
         organization.set_calculated_attributes
         expect(organization.short_name).to eq "Banff RCMP - Royal Canadian"
-        expect(organization.slug).to eq "banff-rcmp---royal-canadian"
+        expect(organization.slug).to eq "banff-rcmp-royal-canadian"
         expect(organization.name).to eq name
       end
       context "with parens" do
