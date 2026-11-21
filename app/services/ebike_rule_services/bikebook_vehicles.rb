@@ -12,6 +12,12 @@ module EbikeRuleServices
       Bike.new(**attributes_from(record)) if record && record["motors"].present?
     end
 
+    # The classifications of the modes the model's record is sold with
+    def stock_classifications(record)
+      updated(Array(record["motors"]).flat_map { Array(it["operating_modes"]) }).select { stock?(it) }
+        .flat_map { Array(it["e_vehicle_classifications"]) }.uniq
+    end
+
     #
     # private below here
     #

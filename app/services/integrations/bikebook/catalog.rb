@@ -18,12 +18,23 @@ module Integrations
 
       Unreachable = Class.new(StandardError)
 
-      # The model's title, description and image_url, nil for one the catalog hasn't. Raises Unreachable when it isn't readable?
-      def vehicle(id)
+      # The model's record, nil for one the catalog hasn't. Raises Unreachable when it isn't readable?
+      def model(id)
         raise Unreachable unless readable?
         block = manifest.dig("blocks", id[MODEL_ID, 1])
-        model = block && (file(block) || raise(Unreachable)).dig("models", id)
-        model && {title: "#{model["manufacturer"]} #{model["model"]}", description: model["description"], image_url: model["stock_photo"]}
+        block && (file(block) || raise(Unreachable)).dig("models", id)
+      end
+
+      # The names a model's values display by, apart from the rest of the vocabulary, nil while the catalog doesn't
+      # answer. Its file name carries its digest, so a republished one is a new key
+      def vocabulary
+        path = manifest&.dig("vocabulary") or return
+        Rails.cache.fetch(["bikebook_catalog/display_names", path], expires_in: 1.week, skip_nil: true) do
+          file(path)&.then do
+            {"names" => it["names"], "currencies" => it["currencies"],
+             "classifications" => it["e_vehicle_classifications"].to_h.transform_values { it["name"] }}
+          end
+        end
       end
 
       # vehicle_models' entries: each vehicle's id, then in braces what's picked for it, m/trek/2026/marlin_5{size:M}{json}.

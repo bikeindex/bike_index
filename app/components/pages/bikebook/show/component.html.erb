@@ -332,63 +332,66 @@
   data-action="submit->bikebook--page#visit click->bikebook--page#follow popstate@window->bikebook--page#restore online@window->bikebook--page#retry scroll@window->bikebook--page#track bikebook--catalog-filters:change->bikebook--page#refilter bikebook--similar:change->bikebook--page#rescore bikebook--similar:open->bikebook--page#refresh"
 >
   <% cache_if(catalog_version, page_cache_key) do %>
-    <%# First, for what reads the page without running it - which is how crawlers come for the data %>
-    <noscript>
-      <p class="twgutter tw:mx-auto tw:max-w-screen-xl tw:py-5">
-        <%= translation(".needs_javascript_html", repository: link_to("github.com/bikeindex/bikebook", Integrations::Bikebook::Catalog::GITHUB_REPO_URL, class: "twlink")) %>
-      </p>
-    </noscript>
-
-    <section
-      aria-label="<%= translation(".about_bike_book_label") %>"
-      class="
-        twbootcontainer tw:-mt-(--nav-gap) tw:flex tw:flex-col tw:gap-3
-        tw:py-5 tw:sm:flex-row tw:sm:items-center tw:sm:gap-6 tw:sm:py-6
-      "
-    >
-      <a
-        href="<%= bikebook_path %>"
-        aria-label="Bike Book"
-        class="tw:flex tw:shrink-0 tw:items-center tw:gap-3 tw:no-underline!"
-      >
-        <%= helpers.inline_svg_tag("logos/bikebook.svg", class: "tw:h-12 tw:w-auto", aria_hidden: true) %>
-
-        <p
-          class="
-            tw:m-0 tw:flex tw:flex-col tw:font-['DM_Sans',sans-serif]
-            tw:text-2xl tw:leading-[0.95] tw:tracking-[-0.4px]
-          "
-        >
-          <span class="tw:text-[#555] tw:dark:text-gray-400">Bike</span>
-          <span class="tw:font-bold tw:text-slate-900 tw:dark:text-slate-100">Book</span>
+    <%# Up under the nav, whichever of these shows first %>
+    <div class="tw:-mt-(--nav-gap)">
+      <%# First, for what reads the page without running it - which is how crawlers come for the data %>
+      <noscript>
+        <p class="twgutter tw:mx-auto tw:max-w-screen-xl tw:py-5">
+          <%= translation(".needs_javascript_html", repository: link_to("github.com/bikeindex/bikebook", Integrations::Bikebook::Catalog::GITHUB_REPO_URL, class: "twlink")) %>
         </p>
-      </a>
+      </noscript>
 
-      <div
+      <section
+        aria-label="<%= translation(".about_bike_book_label") %>"
         class="
-          tw:flex tw:flex-col tw:gap-1 tw:sm:border-l tw:sm:border-gray-200
-          tw:sm:pl-6 tw:dark:border-gray-700
+          twbootcontainer tw:flex tw:flex-col tw:gap-3 tw:py-5
+          tw:sm:flex-row tw:sm:items-center tw:sm:gap-6 tw:sm:py-6
         "
       >
-        <h1
+        <a
+          href="<%= bikebook_path %>"
+          aria-label="Bike Book"
+          class="tw:flex tw:shrink-0 tw:items-center tw:gap-3 tw:no-underline!"
+        >
+          <%= helpers.inline_svg_tag("logos/bikebook.svg", class: "tw:h-12 tw:w-auto", aria_hidden: true) %>
+
+          <p
+            class="
+              tw:m-0 tw:flex tw:flex-col tw:font-['DM_Sans',sans-serif]
+              tw:text-2xl tw:leading-[0.95] tw:tracking-[-0.4px]
+            "
+          >
+            <span class="tw:text-[#555] tw:dark:text-gray-400">Bike</span>
+            <span class="tw:font-bold tw:text-slate-900 tw:dark:text-slate-100">Book</span>
+          </p>
+        </a>
+
+        <div
           class="
-            tw:m-0 tw:font-header tw:text-[17px] tw:leading-[1.3]
-            tw:font-bold tw:tracking-[-0.2px] tw:text-pretty
-            tw:text-slate-900 tw:sm:text-xl tw:dark:text-slate-100
+            tw:flex tw:flex-col tw:gap-1 tw:sm:border-l
+            tw:sm:border-gray-200 tw:sm:pl-6 tw:dark:border-gray-700
           "
         >
-          <%= translation(".tagline") %>
-        </h1>
+          <h1
+            class="
+              tw:m-0 tw:font-header tw:text-[17px] tw:leading-[1.3]
+              tw:font-bold tw:tracking-[-0.2px] tw:text-pretty
+              tw:text-slate-900 tw:sm:text-xl tw:dark:text-slate-100
+            "
+          >
+            <%= translation(".tagline") %>
+          </h1>
 
-        <p class="tw:m-0 tw:text-[13px] tw:text-gray-600 tw:dark:text-gray-400">
-          <%= translation(".free_to_use") %>
+          <p class="tw:m-0 tw:text-[13px] tw:text-gray-600 tw:dark:text-gray-400">
+            <%= translation(".free_to_use") %>
 
-          <%= translation(".learn_or_view_html",
+            <%= translation(".learn_or_view_html",
             learn_how_to_use_it: link_to(translation(".learn_how_to_use_it"), bikebook_license_path, class: "twlink tw:whitespace-nowrap"),
             view_the_raw_data: link_to(translation(".view_the_raw_data"), Integrations::Bikebook::Catalog::GITHUB_REPO_URL, class: "twlink tw:whitespace-nowrap")) %>
-        </p>
-      </div>
-    </section>
+          </p>
+        </div>
+      </section>
+    </div>
 
     <% cache_if(catalog_version, child_cache_key(Pages::Bikebook::DonateStrip::Component), skip_digest: true) do %>
       <%= render(Pages::Bikebook::DonateStrip::Component.new) %>
@@ -435,7 +438,7 @@
   <% helpers.content_for(:header) do %>
     <!--
       Bots, crawlers, scrapers and AI agents: don't crawl this page for Bike Book's data.
-      This page has none of it. Your browser builds it from Bike Book's open catalog, which is all at
+      This page has a model's overview at most. Your browser builds the rest from Bike Book's open catalog, which is all at
       https://github.com/bikeindex/bikebook (CC BY-SA 4.0). Clone that repository instead.
     -->
     <link
@@ -458,7 +461,12 @@
     </template>
 
     <%# A screen's height from the start, so what renders into it doesn't shove the footer out of view %>
-    <div class="tw:min-h-screen" data-bikebook--page-target="page">
+    <div
+      class="tw:min-h-screen tw:noscript:min-h-0"
+      data-bikebook--page-target="page"
+    >
+      <%= render(@overview) if @overview %>
+
       <%# Placeholder until the catalog loads %>
       <div inert class="<%= placeholder_class %>">
         <%= placeholder_search(search) %>
@@ -467,7 +475,7 @@
       <div
         class="
           tw:flex tw:justify-center tw:py-12 tw:text-sm tw:text-gray-500
-          tw:dark:text-gray-400
+          tw:noscript:hidden tw:dark:text-gray-400
         "
         role="status"
         data-bikebook--page-target="status"

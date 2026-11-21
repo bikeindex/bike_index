@@ -39,22 +39,23 @@ class BikebookController < ApplicationController
   # A model picked alone is its own page, canonically without the search's other params
   def render_vehicle(id)
     @page_url = "#{bikebook_url}?vehicle_models=#{id}"
-    vehicle = Integrations::Bikebook::Catalog.vehicle(id) || fail(ActiveRecord::RecordNotFound)
-    @page_description = vehicle[:description]
-    @page_image = vehicle[:image_url]
-    render_page(vehicle[:title])
+    model = Integrations::Bikebook::Catalog.model(id) || fail(ActiveRecord::RecordNotFound)
+    @page_description = model["description"]
+    @page_image = model["stock_photo"]
+    overview = Pages::Bikebook::ModelOverview::Component.new(model:, vocabulary: Integrations::Bikebook::Catalog.vocabulary)
+    render_page(overview.title, overview:)
   rescue Integrations::Bikebook::Catalog::Unreachable
     # the browser loads the catalog itself, and a crawler keeps the model's page and comes back
     render_page(status: :service_unavailable)
   end
 
-  def render_page(title = "Bike Book", status: :ok)
+  def render_page(title = "Bike Book", status: :ok, overview: nil)
     @page_title = title
     # the icon is taller than wide, which the large card crops to a banner
     @twitter_card = "summary" unless @page_image
     @page_image ||= helpers.image_url("logos/bikebook.png")
     render Pages::Bikebook::Show::Component.new(manifest_url: Integrations::Bikebook::Catalog::MANIFEST_URL,
       market: request.env["HTTP_CF_IPCOUNTRY"], state: EbikeRuleServices::StateLaws.state_from_location(request_location_hash),
-      query: request.query_parameters, paint_colors: Color.displays, framed: request.headers["Sec-Fetch-Dest"] == "iframe"), status:
+      query: request.query_parameters, paint_colors: Color.displays, framed: request.headers["Sec-Fetch-Dest"] == "iframe", overview:), status:
   end
 end
