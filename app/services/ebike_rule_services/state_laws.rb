@@ -16,6 +16,7 @@ module EbikeRuleServices
     NAMED_CLASSES = /\bclass(?:es)? ((?:\d\b(?:,? (?:and|or) |, )?)+)/i
     # "Only Class 1 is allowed" tells the other classes they aren't
     ONLY_CLASS = /\bonly class \d|\bclass \d only\b/i
+    US_CLASSES = {classes: [1, 2, 3], mph: 28, watt_cap: 750, throttle: true}.freeze
     # Corrections the catalog doesn't carry yet: `either` limits are alternatives, and NOT_AN_EBIKE folds a
     # class into the one e-moto entry, listed last. New Jersey's law counts an electric motorized bicycle as
     # a motorcycle, and a dirt bike is one too

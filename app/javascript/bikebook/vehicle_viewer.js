@@ -24,12 +24,14 @@ export const MAX_COMPARE = 10
 // The compared vehicles' cards, from catalog blocks
 export class VehicleViewer {
   // `jurisdiction`'s out of class marker, evc/out_of_class/us/ca, where its law bars a Class 3's throttle, as
-  // EbikeRuleServices::StateLaws.out_of_class_ids has them. Model cards name the markets of those `market` doesn't sell
+  // EbikeRuleServices::StateLaws.out_of_class_ids has them, and as a state, whose /ebike-rules says why a model isn't
+  // an e-bike there. Model cards name the markets of those `market` doesn't sell
   constructor (kit, vocabulary, { jurisdiction, market } = {}) {
     this.presenter = new VehiclePresenter(kit, vocabulary)
     const barred = Object.values(vocabulary.e_vehicle_classifications)
       .some((record) => record.jurisdiction === `US-${jurisdiction}` && record.class_3_throttle === false)
     this.outOfClassId = barred ? `evc/out_of_class/us/${jurisdiction.toLowerCase()}` : null
+    this.state = jurisdiction && jurisdiction !== 'US' ? jurisdiction : null
     this.card = { placeholderUrl: kit.placeholder_url, currencies: vocabulary.currencies, market, configurations: kit.model_configurations }
   }
 
@@ -38,7 +40,7 @@ export class VehicleViewer {
   // `search`'s count, whether filters narrow it, and its featured models. `similar` puts the models most like the first
   // above the views, its settings, and its `results` once they're scored
   render (picks, url, preferredSize, search, { group = null, similar } = {}) {
-    const { presenter, outOfClassId } = this
+    const { presenter, outOfClassId, state } = this
     const vehicles = withChosenPhotos(url, picks)
     const photos = pickedPhotos(vehicles)
     const colorways = pickedColorways(url)
@@ -129,7 +131,7 @@ export class VehicleViewer {
     const views = {
       // comparing, the overlay, each column topped and footed in its frame's color
       basics: () => {
-        const overview = { presenter, vehicles, market: this.card.market, outOfClassId, removePath, colorways, groupPath: (value) => pathWith(withGroup(url, value)), shownGroup: group && groupId(url) }
+        const overview = { presenter, vehicles, market: this.card.market, outOfClassId, state, removePath, colorways, groupPath: (value) => pathWith(withGroup(url, value)), shownGroup: group && groupId(url) }
         const groupModels = group ? modelGroup({ group, card: (model) => this.#toggleCard(url, model, 'group', photos) }) : nothing
         if (!comparing) return html`${basics(overview)}${groupModels}`
         return html`${withOverlay((corner) => basics({
@@ -165,10 +167,10 @@ export class VehicleViewer {
         return cardRow('tw:mt-6', cards('components', 'No components listed', (data, key) => components.get(key),
           { lead: (data, key) => runningGearOf({ presenter, data, others: others(key) }) }), true)
       },
-      motors: () => cardRow('tw:mt-6', cards('motors', 'No motor', (data, key) => motorsOf({ presenter, data, others: others(key), outOfClassId }))),
+      motors: () => cardRow('tw:mt-6', cards('motors', 'No motor', (data, key) => motorsOf({ presenter, data, others: others(key), outOfClassId, state }))),
       all: () => {
         const full = vehicles.map(({ data, value, key }, index) => modelViewer({
-          presenter, data, value, key, jsonOpen: Boolean(json[key]), market: this.card.market, comparing, idSuffix: index + 1, others: others(key), removePath: removePath(index), selectedSize: selectedSizes.get(key), sizePath: sizePath(key), outOfClassId
+          presenter, data, value, key, jsonOpen: Boolean(json[key]), market: this.card.market, comparing, idSuffix: index + 1, others: others(key), removePath: removePath(index), selectedSize: selectedSizes.get(key), sizePath: sizePath(key), outOfClassId, state
         }))
         return cardRow('tw:mt-6', full)
       }

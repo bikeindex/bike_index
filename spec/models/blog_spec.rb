@@ -17,6 +17,13 @@ RSpec.describe Blog, type: :model do
       # expect(Blog.friendly_find("an-elder-statesman").id).to eq blog2.id
       expect(Blog.text_search("good").pluck(:id)).to eq([blog.id])
     end
+    context "with an old_title_slug from before dashes were squeezed" do
+      let(:old_title_slug) { "welcomes-our-newest-partner---stolen-bikes-nola" }
+      before { blog.update_column :old_title_slug, old_title_slug }
+      it "finds by the stored slug" do
+        expect(Blog.friendly_find(old_title_slug)&.id).to eq blog.id
+      end
+    end
   end
 
   describe "set_title_slug" do

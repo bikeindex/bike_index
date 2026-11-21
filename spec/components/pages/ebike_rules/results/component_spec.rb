@@ -169,6 +169,11 @@ RSpec.describe Pages::EbikeRules::Results::Component, type: :component do
       expect(component).to have_css("[role='status'] li", text: "In California, it may fall under Moped.")
         .and have_css("[role='status'] a[data-classification='moped']", text: "Moped rules")
         .and have_css("[role='status'] > div > ul > li", text: /\A\s*Riders need a driver's license with an M1 or M2[^§]*\z/)
+      # its e-moto's tooltip says why it's one there, rather than an e-moto's speed and power
+      tooltip = component.css("button[aria-label='E-moto, not an e-bike'] + [role='tooltip']").first
+      expect(tooltip.text).to include("In California, a Class 3 e-bike can't have a throttle, so a Class 3 with a throttle isn't an e-bike there.")
+      expect(tooltip.text).to include("evc/out_of_class/us/ca")
+      expect(tooltip.text).not_to include("28+ mph")
     end
   end
 

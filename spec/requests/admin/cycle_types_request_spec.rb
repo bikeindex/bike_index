@@ -20,7 +20,7 @@ RSpec.describe Admin::CycleTypesController, type: :request do
       # the rows with no catalog example, and skateboard, wheelchair and unicycle, start collapsed at the bottom, each
       # opening both its drawings from its own URL param
       collapsed = rows.select { it["data-controller"] == "ui--collapse" }
-      expect(collapsed.map { it["data-ui--collapse-param-value"] }).to match_array(%w[unicycle stroller wheelchair tall_bike penny_farthing cargo_tricycle_rear pedi_cab skateboard])
+      expect(collapsed.map { it["data-ui--collapse-param-value"] }).to match_array(%w[unicycle stroller wheelchair tall_bike penny_farthing cargo_tricycle_rear pedi_cab skateboard e_atv])
       expect(rows.to_a.last(collapsed.count)).to eq(collapsed)
       expect(collapsed.find { it["data-ui--collapse-param-value"] == "skateboard" }.css("[data-ui--collapse-target='content'] [data-controller='admin--cycle-drawing']").count).to eq 2
     end

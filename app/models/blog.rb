@@ -79,7 +79,8 @@ class Blog < ApplicationRecord
 
       slug = slugify_title(str)
       find_by_title_slug(slug) || find_by_old_title_slug(slug) ||
-        find_by_title_slug(str) || find_by_title(str) || find_by_secondary_title(str)
+        find_by_title_slug(str) || find_by_old_title_slug(str) || find_by_title(str) ||
+        find_by_secondary_title(str)
     end
 
     def theft_rings_id

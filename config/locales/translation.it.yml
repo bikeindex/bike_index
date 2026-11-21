@@ -4028,8 +4028,6 @@ it:
     feedbacks_index: Guida all'utilizzo di Bike Index. Domande frequenti e altro ancora.
     feedbacks_new: Contatta Bike Index. Le tue parole sono la nostra musa ispiratrice,
       sussurrale all'orecchio.
-    feedbacks_vendor_signup: Registrati su Bike Index per registrare le biciclette
-      dei tuoi clienti in modo rapido, semplice e gratuito.
     info_about: Perché abbiamo creato Bike Index e chi siamo
     info_protect_your_bike: Prevenire il furto di biciclette. Consigli e buone pratiche
       per proteggere la tua bici dai ladri.
@@ -4091,7 +4089,6 @@ it:
     documentation_api_v1: Documentazione API di Bike Index
     feedbacks_index: Aiuto con l'indice delle biciclette
     feedbacks_new: Contatta Bike Index
-    feedbacks_vendor_signup: Registrazione negozio - Bike Index
     info_about: Informazioni su Bike Index
     info_serials: Numeri di serie delle biciclette
     info_spokecard: Schede a raggi - Indice biciclette
@@ -7101,30 +7098,19 @@ it:
           answer_yes: Sì
           being_compiled: Le norme per questo stato vengono elaborate a partire da
             fonti primarie.
-          class_1_throttle: Le moto di classe 1 non possono avere l'acceleratore
-          class_3_throttle: L'acceleratore deve disattivarsi a 20 mph
-          classes_start_on: Le lezioni entreranno in vigore %{date}. Nel frattempo,
-            verifica le norme vigenti nello stato.
           fails_rule: Non soddisfa questa regola
           for_your_information: Per vostra informazione
           gray_headline: Non abbiamo ancora in archivio le regole per le e-bike di
             %{state}.
-          has_throttle: Ha un acceleratore
           is_registered: Questa bicicletta è immatricolata?
           legal_to_ride: È legale guidare
-          limits_start_on: Questi limiti entrano in vigore %{date}
           manual_bike_name: e-bike
           may_be_moped: Potrebbe essere regolamentato come ciclomotore o veicolo a
             motore, il che potrebbe richiedere immatricolazione e patente.
           meets_rule: Rispetta questa regola
           motor: Motore
           mph_html: "%{mph} mph"
-          no_speed_cap: Nessun limite di velocità nella legge statale
-          no_throttle: Niente acceleratore
-          no_watt_cap: Nessun limite di potenza nella legge statale
-          not_classified: Non è una e-bike di classe 1, 2 o 3.
           not_permitted: Vietato
-          own_classes: Lo stato stabilisce i propri limiti anziché le tre classi standard
           recovered_more_often: Le biciclette rubate vengono recuperate con una frequenza
             doppia se registrate.
           register_free: Registrati su Bike Index — gratis
@@ -7132,10 +7118,6 @@ it:
           rules_not_on_file: Regole non presenti nel file
           source_html: 'Fonte: catalogo delle leggi statali di %{link}. I riassunti
             sono a scopo di riferimento e non costituiscono consulenza legale.'
-          speed_not_provided: Velocità massima non fornita
-          speed_over_cap_html: Assiste fino a %{mph} mph, oltre il limite di %{cap}
-            mph
-          speed_within_cap_html: Assiste a %{mph} mph, entro il limite
           still_reviewing: Stiamo ancora esaminando le regole di %{state}.
           still_reviewing_body: Consulta il sito web del Dipartimento dei veicoli
             a motore (DMV) o dell'assemblea legislativa del tuo stato per le normative
@@ -7143,76 +7125,29 @@ it:
             dei motori delle e-bike è limitata a 750 W e la velocità assistita a 20
             mph (Classe 1-2) o 28 mph (Classe 3).
           throttle: Acceleratore elettrico
-          throttle_allowed: Acceleratore consentito per la Classe 2
-          throttle_not_allowed: Lo stato non consente un acceleratore
-          throttle_not_stated: La legge statale non specifica se è consentito un acceleratore
           top_speed: Velocità massima
           watts_html: "%{watts}W"
-          watts_not_provided: Potenza del motore non specificata
-          watts_over_cap_html: Il motore %{watts}W supera il limite %{cap}W
-          watts_within_cap_html: "%{watts}Il motore W è all'interno del tappo"
           yes_to_html: Sì, a %{mph}
           your_state: Il tuo stato
-          class_3_throttle_over_html: L'acceleratore funziona fino a %{mph} mph, oltre
-            i 20 mph è consentito l'acceleratore di una Classe 3
-          class_3_throttle_within_html: L'acceleratore si ferma a %{mph} mph
           over_mph_html: Oltre %{mph} mph
           red_headline_manual: Questa non è una e-bike secondo le attuali regole %{state}.
-          speed_past_cap_html: Assiste oltre %{past} mph, oltre il limite %{cap} mph
-          speed_past_html: Assiste oltre %{past} mph; verificare che si fermi entro
-            %{cap} mph
-          classes_recognized:
-            one: La classe %{n} è riconosciuta
-            other: Le classi %{n} sono riconosciute
           answer_optional: Opzionale
-          class_3_optional_throttle_within_html: L'acceleratore opzionale si ferma
-            a %{mph} mph
-          class_3_speed_with_throttle_html: Assiste fino a %{mph} mph, non consentito
-            con un acceleratore
-          class_n: Classe %{n}
-          classes_not_permitted: Si tratta di una e-bike %{classes}, che non è consentita
           model_year: modello %{year}
-          optional_throttle_not_allowed: È legale solo senza l'acceleratore opzionale.
           optional_to_html: Opzionale, per %{mph}
-          throttle_with_class_3_assist: Non consentito con assistenza di Classe 3
           kmh_html: "%{kmh} km/h"
           law_source_html: 'Fonte: catalogo di leggi sulle e-bike di %{link}. I riassunti
             sono a scopo informativo e non costituiscono consulenza legale.'
           may_be_moped_canada: Potrebbe essere regolamentato come ciclomotore o veicolo
             a motore, il che potrebbe richiedere immatricolazione e patente.
-          no_e_bike_category: Qui non esiste una categoria per le e-bike, quindi controlla
-            le norme relative a patente, immatricolazione e casco.
-          no_speed_cap_in_law: Non è previsto alcun limite di velocità nella sua legge.
-          no_watt_cap_in_law: Nessun limite di potenza nella sua legge
           optional_to_kmh_html: Opzionale, fino a %{kmh} km/h
           over_kmh_html: Oltre %{kmh} km/h
-          speed_over_cap_kmh_html: Assiste fino a %{kmh} km/h, oltre il limite di
-            %{cap} km/h
-          speed_past_cap_kmh_html: Assiste oltre %{past} km/h, oltre il limite %{cap}
-            km/h
-          speed_past_kmh_html: Assiste oltre %{past} km/h; verificare che si fermi
-            entro %{cap} km/h
-          speed_within_cap_kmh_html: Assiste fino a %{kmh} km/h, entro il limite
           still_reviewing_province_body: Consulta il ministero dei trasporti della
             tua provincia o territorio per le normative vigenti sulle e-bike. Nella
             maggior parte dei casi, la potenza dei motori delle e-bike è limitata
             a 500 W e la velocità assistita a 32 km/h.
-          throttle_allowed_in_law: Acceleratore consentito
-          throttle_not_allowed_in_law: La sua legge non consente un acceleratore
-          throttle_not_stated_in_law: La sua legge non dice se è consentito un acceleratore
-          watts_to_check_html: Verifica che il suo motore abbia una potenza nominale
-            pari o inferiore a %{cap}W.
           yes_to_kmh_html: Sì, fino a %{kmh} km/h
           your_province: La tua provincia o territorio
-          classes_not_recognized_in:
-            one: La classe %{n} non è riconosciuta in %{state}
-            other: Le classi %{n} non sono riconosciute in %{state}
           falls_under_name: In %{state}, rientra in %{name}.
-          optional_classes_not_recognized_in:
-            one: La classe %{n} non è riconosciuta in %{state}, quindi è legale solo
-              come venduta
-            other: Le classi %{n} non sono riconosciute in %{state}, quindi è legale
-              solo come venduto
           other_classification_rules: "%{name} regole"
           also_class_with_optional_throttle: è anche una e-bike di classe %{n} con
             acceleratore opzionale
@@ -7227,10 +7162,6 @@ it:
           heading_throttle_not_allowed: Acceleratore non consentito
           heading_vehicle_html: Regolamentato come %{name}
           may_fall_under_name: In %{state}, può rientrare in %{name}.
-          throttle_speed_over_cap_html: L'acceleratore raggiunge %{mph} mph, oltre
-            il limite di %{cap} mph.
-          throttle_speed_within_cap_html: L'acceleratore raggiunge %{mph} mph, entro
-            il limite
           class_summary: La %{name} è una e-bike di classe %{n} in %{state}.
           class_summary_optional: La %{name} è una e-bike di classe %{n} in %{state}
             e %{optional}.
@@ -7281,12 +7212,6 @@ it:
               regole da verificare.
           yellow_summary_no_classes_without_throttle: Il modello %{name} è classificato
             come e-bike in %{state}, senza l'acceleratore opzionale.
-          class_3_throttle_past: L'acceleratore supera i 20 mph consentiti per un
-            acceleratore di Classe 3
-          throttle_past_cap_kmh_html: L'acceleratore supera %{past} km/h, oltre il
-            limite %{cap} km/h
-          throttle_past_kmh_html: L'acceleratore supera %{past} km/h; verificare che
-            si fermi a %{cap} km/h
           yes_over_mph_html: Sì, oltre %{mph} mph
           class_summary_manual: Questa e-bike è una e-bike di classe %{n} in %{state}.
           class_summary_with_rules_manual:
@@ -7302,13 +7227,9 @@ it:
             other: Questo è classificato come una e-bike in %{state}, con %{count}
               regole da verificare.
           bike_book_name: Libro di biciclette
-          class_unknown_in_bike_book_label: Bike Book non indica la sua classe o la
-            velocità massima, quindi controlla la classe sull'etichetta.
           entered_unverified_by_bike_book: Dati inseriti da te, non verificati da
             Bike Book.
           full_bike_book_entry: Visualizza la voce completa del Bike Book
-          speed_to_check_bike_book_kmh_html: Bike Book non indica la sua velocità
-            massima, quindi controlla che il motore si fermi a %{cap} km/h
         rule_label:
           classes: Classi riconosciute
           power: Limite di potenza del motore
@@ -7570,6 +7491,9 @@ it:
           watts_min: "%{watts}W+"
           copy_id: Copia ID
           id: ID
+          class_3_throttle_barred: In %{state}, una e-bike di Classe 3 non può avere
+            un acceleratore, quindi una Classe 3 con acceleratore non è considerata
+            una e-bike in quel contesto.
         bike_summary:
           classification: Classificazione E-%{vehicle_type}
           electric_certification: Certificazione elettrica
@@ -7578,6 +7502,83 @@ it:
           outside_checked_countries: Per ora i controlli sulle biciclette riguardano
             gli stati degli Stati Uniti e le province canadesi. Le leggi sulle e-bike
             di %{place} sono riportate di seguito.
+        rule_note:
+          class_1_throttle: Le moto di classe 1 non possono avere l'acceleratore
+          class_3_optional_throttle_within_html: L'acceleratore opzionale si ferma
+            a %{mph} mph
+          class_3_speed_with_throttle_html: Assiste fino a %{mph} mph, non consentito
+            con un acceleratore
+          class_3_throttle: L'acceleratore deve disattivarsi a 20 mph
+          class_3_throttle_over_html: L'acceleratore funziona fino a %{mph} mph, oltre
+            i 20 mph è consentito l'acceleratore di una Classe 3
+          class_3_throttle_past: L'acceleratore supera i 20 mph consentiti per un
+            acceleratore di Classe 3
+          class_3_throttle_within_html: L'acceleratore si ferma a %{mph} mph
+          class_n: Classe %{n}
+          class_unknown_in_bike_book_label: Bike Book non indica la sua classe o la
+            velocità massima, quindi controlla la classe sull'etichetta.
+          classes_not_permitted: Si tratta di una e-bike %{classes}, che non è consentita
+          classes_not_recognized_in:
+            one: La classe %{n} non è riconosciuta in %{state}
+            other: Le classi %{n} non sono riconosciute in %{state}
+          classes_recognized:
+            one: La classe %{n} è riconosciuta
+            other: Le classi %{n} sono riconosciute
+          classes_start_on: Le lezioni entreranno in vigore %{date}. Nel frattempo,
+            verifica le norme vigenti nello stato.
+          has_throttle: Ha un acceleratore
+          limits_start_on: Questi limiti entrano in vigore %{date}
+          no_e_bike_category: Qui non esiste una categoria per le e-bike, quindi controlla
+            le norme relative a patente, immatricolazione e casco.
+          no_speed_cap: Nessun limite di velocità nella legge statale
+          no_speed_cap_in_law: Non è previsto alcun limite di velocità nella sua legge.
+          no_throttle: Niente acceleratore
+          no_watt_cap: Nessun limite di potenza nella legge statale
+          no_watt_cap_in_law: Nessun limite di potenza nella sua legge
+          not_classified: Non è una e-bike di classe 1, 2 o 3.
+          optional_classes_not_recognized_in:
+            one: La classe %{n} non è riconosciuta in %{state}, quindi è legale solo
+              come venduta
+            other: Le classi %{n} non sono riconosciute in %{state}, quindi è legale
+              solo come venduto
+          optional_throttle_not_allowed: È legale solo senza l'acceleratore opzionale.
+          own_classes: Lo stato stabilisce i propri limiti anziché le tre classi standard
+          speed_not_provided: Velocità massima non fornita
+          speed_over_cap_html: Assiste fino a %{mph} mph, oltre il limite di %{cap}
+            mph
+          speed_over_cap_kmh_html: Assiste fino a %{kmh} km/h, oltre il limite di
+            %{cap} km/h
+          speed_past_cap_html: Assiste oltre %{past} mph, oltre il limite %{cap} mph
+          speed_past_cap_kmh_html: Assiste oltre %{past} km/h, oltre il limite %{cap}
+            km/h
+          speed_past_html: Assiste oltre %{past} mph; verificare che si fermi entro
+            %{cap} mph
+          speed_past_kmh_html: Assiste oltre %{past} km/h; verificare che si fermi
+            entro %{cap} km/h
+          speed_to_check_bike_book_kmh_html: Bike Book non indica la sua velocità
+            massima, quindi controlla che il motore si fermi a %{cap} km/h
+          speed_within_cap_html: Assiste a %{mph} mph, entro il limite
+          speed_within_cap_kmh_html: Assiste fino a %{kmh} km/h, entro il limite
+          throttle_allowed: Acceleratore consentito per la Classe 2
+          throttle_allowed_in_law: Acceleratore consentito
+          throttle_not_allowed: Lo stato non consente un acceleratore
+          throttle_not_allowed_in_law: La sua legge non consente un acceleratore
+          throttle_not_stated: La legge statale non specifica se è consentito un acceleratore
+          throttle_not_stated_in_law: La sua legge non dice se è consentito un acceleratore
+          throttle_past_cap_kmh_html: L'acceleratore supera %{past} km/h, oltre il
+            limite %{cap} km/h
+          throttle_past_kmh_html: L'acceleratore supera %{past} km/h; verificare che
+            si fermi a %{cap} km/h
+          throttle_speed_over_cap_html: L'acceleratore raggiunge %{mph} mph, oltre
+            il limite di %{cap} mph.
+          throttle_speed_within_cap_html: L'acceleratore raggiunge %{mph} mph, entro
+            il limite
+          throttle_with_class_3_assist: Non consentito con assistenza di Classe 3
+          watts_not_provided: Potenza del motore non specificata
+          watts_over_cap_html: Il motore %{watts}W supera il limite %{cap}W
+          watts_to_check_html: Verifica che il suo motore abbia una potenza nominale
+            pari o inferiore a %{cap}W.
+          watts_within_cap_html: "%{watts}Il motore W è all'interno del tappo"
       memberships:
         new:
           become_a_member: Diventa membro
