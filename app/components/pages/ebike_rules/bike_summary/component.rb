@@ -9,7 +9,7 @@ module Pages
       # e-vehicle's its own. specs are [label, value] pairs, a blank value not provided; ul2849 and ul2271 are UlBadge
       # statuses, and others any other certification its record lists
       class Component < ApplicationComponent
-        NOT_CYCLES = {"e_scooter" => "scooter", "e_motorcycle" => "motorcycle", "epamd" => "personal mobility"}.freeze
+        NOT_CYCLES = {"e_scooter" => "scooter", "e_motorcycle" => "motorcycle", "e_atv" => "ATV", "epamd" => "personal mobility"}.freeze
 
         renders_one :tiles
 
