@@ -13,7 +13,6 @@ module Pages
         renders_one :pricing
         renders_one :note
 
-        # price: a single figure; pricing: a slot for anything more
         def initialize(name:, category:, sound:, description:, url:, price: nil, flip: false, band: false, id: nil)
           @name = name
           @price = price
