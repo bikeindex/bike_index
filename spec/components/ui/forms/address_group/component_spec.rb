@@ -56,6 +56,18 @@ RSpec.describe UI::Forms::AddressGroup::Component, type: :component do
         expect(component).to have_no_css("[data-ui--forms--address-group-target='state'] [data-controller~='ui--forms--js-required']")
       end
     end
+
+    context "with a country without postal codes" do
+      let!(:country) { FactoryBot.create(:country, name: "Hong Kong", iso: "HK") }
+      let(:address_record) { AddressRecord.new(country_id: country.id) }
+
+      it "leaves the postal code optional, with the marker hidden for JavaScript to show" do
+        expect(component).to have_css("input[name='address_record[postal_code]']:not([required])")
+        postal_code = component.css("[data-ui--forms--address-group-target='postalCode']")
+        expect(postal_code.css("[data-required-marker]").first["hidden"]).to be_present
+        expect(postal_code.css("[data-optional-marker]").first["hidden"]).to be_nil
+      end
+    end
   end
 
   context "with a street_label" do

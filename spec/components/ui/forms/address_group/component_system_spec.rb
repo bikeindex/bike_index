@@ -7,10 +7,12 @@ RSpec.describe UI::Forms::AddressGroup::Component, :js, type: :system do
   let(:state_input) { "[data-ui--forms--address-group-target='state'] .hw-combobox__input" }
   let(:state_value) { "input[type='hidden'][name='address_record[region_record_id]']" }
   let(:region_input) { "input[name='address_record[region_string]']" }
+  let(:postal_code_input) { "input[name='address_record[postal_code]']" }
 
   it "moves required to whichever of the state/region pair the country shows, clearing a state a country leaves" do
     california = FactoryBot.create(:state_california)
     Country.canada
+    FactoryBot.create(:country, name: "Hong Kong", iso: "HK")
     visit(preview_path)
     wait_for_stimulus("ui--forms--address-group")
     expect_axe_clean
@@ -26,6 +28,12 @@ RSpec.describe UI::Forms::AddressGroup::Component, :js, type: :system do
     expect(page).to have_css("#{region_input}[required]")
     expect(page).to have_css("#{state_input}:not([required])", visible: :all)
     expect(find(state_value, visible: :all).value).to eq ""
+    expect(page).to have_css("#{postal_code_input}[required]")
+
+    select "Hong Kong", from: "address_record[country_id]"
+    expect(page).to have_css("#{postal_code_input}:not([required])")
+    expect(page).to have_css("label[for='address_record_postal_code'] .tw\\:text-red-600", visible: :hidden)
+    expect(page).to have_css("label[for='address_record_postal_code']", text: "optional")
 
     select "United States", from: "address_record[country_id]"
     expect(page).to have_css("#{state_input}[required]")
