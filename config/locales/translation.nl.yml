@@ -7057,6 +7057,21 @@ nl:
           pitch: Dit fantastische product wordt u aangeboden door de non-profitorganisatie
             Bike Index. Help ons de serverkosten te dekken.
           region: Doneer aan Bike Index
+        schema_fields:
+          by_count: op aantal
+          by_count_label: "%{path} op basis van telling"
+          explain: uitleggen
+          less: minder
+          models: "%{number} modellen"
+          more: "+%{count} meer"
+          representative: "(vertegenwoordiger)"
+          schema_order: schema volgorde
+        schema_viewer:
+          documents: Schema-documenten
+          subtitle_html: De structuur van een %{document}-bestand op schema %{version},
+            gepubliceerd als %{url}
+          title: Fietsboek schema
+          versioning: 'Versiebeheer:'
       ebike_rules:
         class_tile:
           class: Klas
