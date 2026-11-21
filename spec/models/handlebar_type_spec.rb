@@ -24,7 +24,7 @@ RSpec.describe HandlebarType, type: :model do
     end
 
     it "returns horizontal for its names and former slugs" do
-      ["horizontal", "Riser", " FLAT ", :flat, " BMX ", :bmx, "BMX style"].each do
+      ["horizontal", "Riser", " FLAT ", :flat, " BMX ", :bmx, "BMX style", "bmx-style"].each do
         expect(HandlebarType.friendly_find(it).slug).to eq :horizontal
       end
     end

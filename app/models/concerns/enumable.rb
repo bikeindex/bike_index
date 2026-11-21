@@ -45,8 +45,7 @@ module Enumable
       slug = Slugifyer.slugify(str)
       return self::SLUGS.key(slug.to_i) if slug.match?(/\A\d+\z/)
 
-      ((slugs & [slug, slug.tr("-", "_")]).first ||
-        names_and_secondary_names.detect { it.include?(slug) }&.first)&.to_sym
+      key_for(Slugifyer.slugify(str.to_s.tr("()", " "))) || key_for(slug)
     end
 
     def friendly_find(str)
@@ -56,9 +55,11 @@ module Enumable
 
     private
 
+    def key_for(slug) = names_and_secondary_names.detect { |_, names| names.include?(slug) }&.first
+
     def names_and_secondary_names
-      @names_and_secondary_names ||= self::NAMES.map do |k, v|
-        [k.to_s, *[v, *secondary_names_for(v.downcase)].map { Slugifyer.slugify(it) }].uniq
+      @names_and_secondary_names ||= self::NAMES.to_h do |k, v|
+        [k, [k, v.tr("()", " "), *secondary_names_for(v.downcase)].map { Slugifyer.slugify(it) }.uniq]
       end
     end
 
@@ -67,7 +68,6 @@ module Enumable
     end
 
     def secondary_names_for(name_downcase)
-      return [] unless name_downcase[/\(/].present?
       primary, *secondaries = name_downcase.delete(")").split("(").map(&:strip)
       secondaries = secondaries.map do |str|
         str.split(",").map { it.gsub("e.g.", "").strip }
