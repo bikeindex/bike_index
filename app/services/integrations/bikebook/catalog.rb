@@ -25,10 +25,16 @@ module Integrations
         block && (file(block) || raise(Unreachable)).dig("models", id)
       end
 
-      # The names of the values models' records hold. Raises Unreachable when it isn't readable?
+      # The names a model's values display by, apart from the rest of the vocabulary, nil while the catalog doesn't
+      # answer. Its file name carries its digest, so a republished one is a new key
       def vocabulary
-        raise Unreachable unless readable?
-        file(manifest["vocabulary"]) || raise(Unreachable)
+        path = manifest&.dig("vocabulary") or return
+        Rails.cache.fetch(["bikebook_catalog/display_names", path], expires_in: 1.week, skip_nil: true) do
+          file(path)&.then do
+            {"names" => it["names"], "currencies" => it["currencies"],
+             "classifications" => it["e_vehicle_classifications"].to_h.transform_values { it["name"] }}
+          end
+        end
       end
 
       # vehicle_models' entries: each vehicle's id, then in braces what's picked for it, m/trek/2026/marlin_5{size:M}{json}.
