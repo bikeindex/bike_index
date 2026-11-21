@@ -4,7 +4,8 @@ module Pages
   module Bikebook
     module SchemaFields
       # One level of a schema document's fields, rendering its objects' fields beneath them.
-      # cache_key: the published file's digest and the document, under which each field nothing is opened in is cached
+      # cache_key: the published file's digest and the document, under which each field nothing is opened in is cached.
+      # in_cache: rendering into a field's cached fragment, which holds its fields' without caching each again
       class Component < ApplicationComponent
         # an enum longer than this shows its first few values until opened
         INLINE_ENUM_LIMIT = 6
@@ -14,13 +15,14 @@ module Pages
         PLACEHOLDERS = {"integer" => "number", "float" => "number"}.freeze
         VALUE_CLASSES = "tw:text-purple-700 tw:dark:text-purple-300"
 
-        def initialize(fields:, open:, by_count:, representative_ids:, cache_key:, path: nil)
+        def initialize(fields:, open:, by_count:, representative_ids:, cache_key:, path: nil, in_cache: false)
           @fields = fields
           @open = open
           @by_count = by_count
           @representative_ids = representative_ids
           @cache_key = cache_key
           @path = path
+          @in_cache = in_cache
         end
 
         private
