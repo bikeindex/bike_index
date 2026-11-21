@@ -60,8 +60,11 @@ class OrganizedMailerPreview < ActionMailer::Preview
   end
 
   def shop_welcome(organization_id: params[:organization_id])
-    organization = organization_id ? Organization.find(organization_id) : Organization.bike_shop.last
-    OrganizedMailer.shop_welcome(organization, organization.auto_user || organization.users.first)
+    render_shop_welcome(["no_pos", *Organization.broken_pos_kinds], organization_id:)
+  end
+
+  def shop_welcome_pos_connected(organization_id: params[:organization_id])
+    render_shop_welcome(Organization.with_pos_kinds, organization_id:)
   end
 
   def impound_claim_submitted(impound_claim_id: params[:impound_claim_id])
@@ -79,6 +82,14 @@ class OrganizedMailerPreview < ActionMailer::Preview
   # The link is the whole email, so only a registration still holding a token renders one
   def b_params_awaiting_confirmation
     BParam.where("(params -> 'email_confirmation_token') IS NOT NULL").order(:created_at)
+  end
+
+  def render_shop_welcome(pos_kinds, organization_id:)
+    organization = Organization.find(organization_id) if organization_id
+    organization ||= Organization.bike_shop.where(pos_kind: pos_kinds).last
+    # Unsaved, so a database without a shop in this POS state still renders it
+    organization ||= Organization.bike_shop.last.tap { it.pos_kind = pos_kinds.first }
+    OrganizedMailer.shop_welcome(organization, organization.auto_user || organization.users.first)
   end
 
   def render_finished_registration(bikes, bike_id: nil)
