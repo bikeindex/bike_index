@@ -85,12 +85,15 @@ class OrganizedMailerPreview < ActionMailer::Preview
   end
 
   def render_shop_welcome(connect_pos:, organization_id:)
-    organization = Organization.find(organization_id) if organization_id
-    organization ||= Organization.bike_shop.reorder(id: :desc).limit(100)
-      .find { OrgServices::Displayer.bike_shop_display_integration_alert?(it) == connect_pos }
-    organization ||= Organization.new(name: "Example Bike Shop", slug: "example-bike-shop", kind: "bike_shop",
-      pos_kind: connect_pos ? "no_pos" : "lightspeed_pos")
+    organization = organization_id ? Organization.find(organization_id) : example_shop(connect_pos)
     OrganizedMailer.shop_welcome(organization, organization.auto_user || User.new(email: "shop@example.com"))
+  end
+
+  def example_shop(connect_pos)
+    Organization.bike_shop.reorder(id: :desc).limit(100)
+      .find { OrgServices::Displayer.bike_shop_display_integration_alert?(it) == connect_pos } ||
+      Organization.new(name: "Example Bike Shop", slug: "example-bike-shop", kind: "bike_shop",
+        pos_kind: connect_pos ? "no_pos" : "lightspeed_pos")
   end
 
   def render_finished_registration(bikes, bike_id: nil)
