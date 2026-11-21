@@ -1,0 +1,168 @@
+<% muted = "tw:text-gray-400 tw:dark:text-gray-500" %>
+<% nested = "tw:ml-1 tw:border-l tw:border-gray-200 tw:pl-4 tw:dark:border-gray-700" %>
+
+<% @fields.each do |name, field| %>
+  <% path = field_path(name) %>
+
+  <% cache_if(cached?(path), [self.class.cache_digest, *@cache_key, path]) do %>
+    <% open_bracket, close_bracket = brackets(field) %>
+    <% key = tag.span("#{name}:", class: "tw:text-blue-700 tw:dark:text-blue-300") %>
+    <% comment = field["description"] && tag.span("// #{field["description"]}", class: "tw:min-w-0 tw:flex-1 tw:truncate #{muted}", title: field["description"]) %>
+
+    <% if open_bracket %>
+      <%= tag.details(open: open?(path), data: {schema_path: path, action: "toggle->bikebook--schema-fields#write"}) do %>
+        <summary
+          class="
+            tw:-ml-4 tw:flex tw:cursor-pointer tw:list-none
+            tw:items-baseline tw:gap-2 tw:rounded tw:hover:bg-gray-100
+            tw:dark:hover:bg-gray-800 tw:[&::-webkit-details-marker]:hidden
+          "
+        >
+          <span
+            class="tw:w-2 tw:shrink-0 tw:[details[open]>summary>&]:rotate-90 <%= muted %>"
+            aria-hidden="true"
+          >
+            ▸
+          </span>
+
+          <span class="tw:whitespace-nowrap">
+            <%= key %> <%= open_bracket %><span class="tw:[details[open]>summary_&]:hidden"><span class="<%= muted %>"> … </span><%= close_bracket %></span>
+          </span>
+
+          <%= comment %>
+        </summary>
+
+        <div class="<%= nested %>">
+          <%= render(Pages::Bikebook::SchemaFields::Component.new(fields: children(field), open: @open, by_count: @by_count,
+          representative_ids: @representative_ids, cache_key: @cache_key, path:)) %>
+        </div>
+
+        <div><%= close_bracket %></div>
+      <% end %>
+    <% elsif field["type"] != "bool" && field["values"] && folded?(field) %>
+      <% values = field["values"] %>
+      <% preview = values.first(PREVIEW_ENUM_LENGTH) %>
+      <%# a details' closed content is hidden until-found, so find-in-page searches the values and opens the one it matches %>
+      <%= tag.details(class: "tw:group/enum", open: open?(path), data: {schema_path: path, action: "toggle->bikebook--schema-fields#write"}) do %>
+        <summary
+          class="
+            tw:flex tw:cursor-pointer tw:list-none tw:items-baseline
+            tw:[&::-webkit-details-marker]:hidden
+          "
+        >
+          <span class="tw:whitespace-nowrap">
+            <%= key %>
+            <%= "[" if field["of"] %><span class="tw:group-open/enum:hidden"><%= enum_text(preview) %></span>
+          </span>
+
+          <span class="tw:ml-2 tw:group-open/enum:ml-auto">
+            <%= render(UI::Badge::Component.new(text: nil, color: :purple, size: :sm)) do %>
+              <span class="tw:group-open/enum:hidden"><%= (values.length > PREVIEW_ENUM_LENGTH) ? translation(".more", count: values.length - preview.length) : translation(".explain") %></span>
+              <span class="tw:hidden tw:group-open/enum:inline"><%= translation(".less") %></span>
+            <% end %>
+          </span>
+
+          <% if field["of"] %>
+            <span class="tw:group-open/enum:hidden">]</span>
+          <% end %>
+
+          <% if field["description"] %>
+            <span
+              class="tw:ml-2 tw:min-w-0 tw:flex-1 tw:truncate tw:group-open/enum:hidden <%= muted %>"
+              title="<%= field["description"] %>"
+            >
+              // <%= field["description"] %>
+            </span>
+          <% end %>
+        </summary>
+
+        <div class="<%= nested %>">
+          <div class="tw:flex tw:items-baseline">
+            <% if field["description"] %>
+              <span class="tw:min-w-0 tw:flex-1 <%= muted %>">// <%= field["description"] %></span>
+            <% end %>
+
+            <% if values.any? { it["models_count"] } %>
+              <label
+                class="
+                  tw:ml-auto tw:cursor-pointer tw:select-none
+                  tw:*:cursor-pointer tw:has-focus-visible:*:ring-2
+                "
+              >
+                <%= tag.input(type: "checkbox", class: "tw:sr-only", checked: @by_count.include?(path), aria: {label: translation(".by_count_label", path:)}, data: {schema_by_count: path, action: "bikebook--schema-fields#write"}) %>
+
+                <%= render(UI::Badge::Component.new(text: nil, color: :notice, size: :sm)) do %>
+                  <span class="tw:group-has-[[data-schema-by-count]:checked]/enum:hidden"><%= translation(".by_count") %></span>
+
+                  <span
+                    class="
+                      tw:hidden
+                      tw:group-has-[[data-schema-by-count]:checked]/enum:inline
+                    "
+                  >
+                    <%= translation(".schema_order") %>
+                  </span>
+                <% end %>
+              </label>
+            <% end %>
+          </div>
+
+          <% wrapped = values.length > LINED_ENUM_LIMIT %>
+          <% ranks = count_ranks(values) %>
+
+          <%# a long list wraps as text until it's ordered by count, which lines it up with its comments %>
+          <div class="tw:grid-cols-[max-content_1fr] <%= wrapped ? "tw:flex tw:flex-wrap tw:group-has-[[data-schema-by-count]:checked]/enum:grid tw:group-has-[[data-schema-by-count]:checked]/enum:gap-x-4" : "tw:grid tw:gap-x-4" %>">
+            <% values.each_with_index do |value, index| %>
+              <%= tag.div(style: "--count-rank: #{ranks[value["value"]]}", class: wrapped ? "tw:flex tw:items-baseline tw:group-has-[[data-schema-by-count]:checked]/enum:col-span-2 tw:group-has-[[data-schema-by-count]:checked]/enum:grid tw:group-has-[[data-schema-by-count]:checked]/enum:grid-cols-subgrid tw:group-has-[[data-schema-by-count]:checked]/enum:order-(--count-rank)" : "tw:col-span-2 tw:grid tw:grid-cols-subgrid tw:group-has-[[data-schema-by-count]:checked]/enum:order-(--count-rank)") do %>
+                <span class="tw:whitespace-nowrap">
+                  <span
+                    class="<%= VALUE_CLASSES %>"
+                    title="<%= value["description"] %>"
+                  >
+                    <%= value["value"] %>
+                  </span> <%= count_badge(value) %>
+                </span>
+
+                <% if wrapped && index < values.length - 1 %>
+                  <span
+                    class="
+                      tw:px-2
+                      tw:group-has-[[data-schema-by-count]:checked]/enum:hidden
+                    "
+                  >
+                    |
+                  </span>
+                <% end %>
+
+                <span class="<%= muted %> <%= "tw:hidden tw:group-has-[[data-schema-by-count]:checked]/enum:inline" if wrapped %>"><%= "// #{value["description"]}" if value["description"] %></span>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+
+        <% if field["of"] %>
+          <div>]</div>
+        <% end %>
+      <% end %>
+    <% else %>
+      <div class="tw:flex tw:items-baseline tw:gap-2">
+        <span class="tw:whitespace-nowrap">
+          <%= key %>
+
+          <% if field["type"] == "bool" %>
+            <% field["values"].to_a.each_with_index do |value, index| %>
+              <span class="<%= muted %>"><%= "| " if index > 0 %><%= value["value"] %></span> <%= count_badge(value) %>
+            <% end %>
+          <% elsif field["values"] %>
+            <%= "[" if field["of"] %><%= enum_text(field["values"]) %><%= "]" if field["of"] %>
+          <% else %>
+            <span class="<%= muted %>"><%= field["of"] ? "[#{placeholder(field)}]" : placeholder(field) %></span>
+            <%= count_badge(field) %>
+          <% end %>
+        </span>
+
+        <%= comment %>
+      </div>
+    <% end %>
+  <% end %>
+<% end %>

@@ -337,4 +337,94 @@ RSpec.describe BikebookController, type: :request do
       end
     end
   end
+
+  describe "schema_viewer" do
+    let(:fields) { Integrations::Bikebook::Catalog.schema_viewer.dig("documents", "vehicle_model", "fields") }
+    let(:manufacturer_count) { fields.dig("manufacturer", "models_count") }
+    let(:example_id) { fields.dig("manufacturer", "example_ids").first }
+
+    it "renders the vehicle model's fields with how many models fill each, opening what the URL names and the folds around it" do
+      get "/bikebook/schema_viewer", params: {open: "type,frame.mounts", by_count: "type"}
+
+      expect(response).to have_http_status(:ok)
+      page = Capybara.string(response.body)
+      expect(page).to have_title("Bike Book schema | Bike Index", exact: true)
+        .and have_css("[aria-current='page']", text: "Vehicle model")
+        .and have_css("details[open][data-schema-path='type']")
+        .and have_css("details:not([open])[data-schema-path='type_detail']")
+        # opened around the fold it names, and closed everywhere else
+        .and have_css("details[open][data-schema-path='frame'] details[open][data-schema-path='frame.mounts']")
+        .and have_css("details:not([open])[data-schema-path='wheels']")
+        .and have_css("input[aria-label='type by count'][checked]")
+        .and have_css("button[aria-label='#{ActiveSupport::NumberHelper.number_to_delimited(manufacturer_count)} models']")
+        .and have_link(example_id, href: "/bikebook?vehicle_models=#{example_id}", visible: :all)
+    end
+
+    context "with another document" do
+      it "renders its fields" do
+        get "/bikebook/schema_viewer", params: {document: "e_vehicle_classification"}
+
+        expect(response).to have_http_status(:ok)
+        expect(Capybara.string(response.body)).to have_css("[aria-current='page']", text: "E vehicle classification")
+          .and have_content("jurisdiction:")
+      end
+    end
+
+    context "with caching" do
+      around do |example|
+        ActionController::Base.perform_caching = true
+        ActionController::Base.cache_store = ActiveSupport::Cache::MemoryStore.new
+        example.run
+      ensure
+        ActionController::Base.perform_caching = false
+        ActionController::Base.cache_store = :null_store
+      end
+
+      context "when a new schema file is published" do
+        let(:published) { Pathname(Dir.mktmpdir).join("bikebook_schema_viewer.json") }
+        let(:viewer) { Integrations::Bikebook::Catalog.schema_viewer.except("digest") }
+        # the same published_at, so only its contents tell the two apart
+        let(:republished) { viewer.deep_merge("documents" => {"vehicle_model" => {"fields" => {"manufacturer" => {"models_count" => 12_345_678}}}}) }
+
+        before do
+          published.write(viewer.to_json)
+          stub_const("Integrations::Bikebook::Catalog::SCHEMA_VIEWER", published)
+        end
+
+        it "renders the new file's counts rather than the cached ones" do
+          # model and first_year fill as many models as manufacturer does
+          old_badge = "button[aria-label='#{ActiveSupport::NumberHelper.number_to_delimited(manufacturer_count)} models']"
+          get "/bikebook/schema_viewer"
+          old_badges = Capybara.string(response.body).all(old_badge).count
+
+          published.write(republished.to_json)
+          get "/bikebook/schema_viewer"
+
+          expect(Capybara.string(response.body)).to have_css("button[aria-label='12,345,678 models']")
+            .and have_css(old_badge, count: old_badges - 1)
+        end
+      end
+
+      it "renders a field the URL opens anything in afresh, rather than as cached closed" do
+        get "/bikebook/schema_viewer"
+        expect(Capybara.string(response.body)).to have_css("details:not([open])[data-schema-path='type']")
+
+        get "/bikebook/schema_viewer", params: {open: "type", by_count: "type"}
+
+        page = Capybara.string(response.body)
+        expect(page).to have_css("details[open][data-schema-path='type']")
+          .and have_css("input[aria-label='type by count'][checked]")
+          .and have_css("details:not([open])[data-schema-path='type_detail']")
+          .and have_css("button[aria-label='#{ActiveSupport::NumberHelper.number_to_delimited(manufacturer_count)} models']")
+      end
+    end
+
+    context "with a document the catalog doesn't publish" do
+      it "renders the vehicle model's" do
+        get "/bikebook/schema_viewer", params: {document: "vocabulary"}
+
+        expect(Capybara.string(response.body)).to have_css("[aria-current='page']", text: "Vehicle model")
+      end
+    end
+  end
 end
