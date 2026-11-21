@@ -54,6 +54,12 @@ BLOCKED_EXTERNAL_HOSTS = %w[
   www.facebook.com
 ].freeze
 
+# time-localizer's jsDelivr fetch holds `load` on every page like the hosts above, but
+# application.js imports it at the top level, so aborting it would stop every Stimulus controller
+TIME_LOCALIZER_URL = Rails.application.importmap.packages["@bikeindex/time-localizer"].path
+TIME_LOCALIZER_FIXTURE = Rails.root.join("spec/fixtures/time_localizer-#{TIME_LOCALIZER_URL[/@([\d.]+)\//, 1]}.js")
+raise "#{TIME_LOCALIZER_FIXTURE} is missing - curl -o it from #{TIME_LOCALIZER_URL}" unless TIME_LOCALIZER_FIXTURE.exist?
+
 # Point BASE_URL at Capybara's server for `:js` specs, so `*_url` helpers rendered
 # during the example resolve to it. default_url_options is read off BASE_URL once at
 # boot, so it takes the same treatment -- otherwise a helper called outside a request
@@ -83,6 +89,7 @@ RSpec.configure do |config|
       BLOCKED_EXTERNAL_HOSTS.each do |host|
         playwright_page.route("https://#{host}/**", ->(route, _request) { route.abort })
       end
+      playwright_page.route(TIME_LOCALIZER_URL, ->(route, _request) { route.fulfill(path: TIME_LOCALIZER_FIXTURE.to_s) })
 
       # Capybara reports a nil current_path for three URLs, not just the about:blank one
       # (session.rb: nil for an `about:` scheme, then `path unless path&.empty?`) -- an

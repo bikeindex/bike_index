@@ -21,7 +21,8 @@
     "ignore": [
       "/kelsey_redesign/",
       "/app/assets/",
-      "/public/"
+      "/public/",
+      "/spec/fixtures/"
     ]
   }
 }
