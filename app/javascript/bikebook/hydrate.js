@@ -18,7 +18,7 @@ const combobox = (root, name) => root.getElementById(`${name}-hw-hidden-field`).
 const panelOf = (root) => root.querySelector('[data-controller~="bikebook--catalog-filters"]')
 const MARKET_ATTRIBUTE = 'data-bikebook--catalog-filters-default-market-value'
 // CycleType::NOT_CYCLE_TYPE, by the catalog's slugs
-const NOT_CYCLE_TYPE = ['e_scooter', 'skateboard', 'epamd', 'stroller', 'wheelchair', 'e_motorcycle']
+const NOT_CYCLE_TYPE = ['e_scooter', 'skateboard', 'epamd', 'stroller', 'wheelchair', 'e_motorcycle', 'e_atv']
 const JURISDICTION_ATTRIBUTE = 'data-bikebook--catalog-filters-default-jurisdiction-value'
 
 // "Select an e-scooter, choose multiple to compare them" once the first of `vehicles` is one that isn't a bike, both

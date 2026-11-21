@@ -74,6 +74,18 @@ RSpec.describe CycleType, type: :model do
         expect(CycleType.friendly_find("e-dirt-bike")&.id).to eq cycle_type.id
       end
     end
+    context "e-ATV" do
+      let(:cycle_type) { CycleType.new("e-atv") }
+      it "finds by various names" do
+        expect(cycle_type.id).to eq 24
+        expect(CycleType.send(:names_and_secondary_names)[23])
+          .to eq(["e-atv", "e-atv (e-quad, electric all-terrain vehicle)", "e-quad", "electric all-terrain vehicle"])
+        expect(CycleType.friendly_find("e-Quad")&.id).to eq cycle_type.id
+        expect(CycleType.friendly_find("E-ATV")&.id).to eq cycle_type.id
+        expect(CycleType.not_cycle?("e-atv")).to be true
+        expect(CycleType.strict_motorized("e-atv")).to eq :always
+      end
+    end
     context "not electric" do
       let(:scooter) { CycleType.new("non-e-scooter") }
       let(:skateboard) { CycleType.new("non-e-skateboard") }
@@ -120,7 +132,7 @@ RSpec.describe CycleType, type: :model do
     it "has the values" do
       expect(CycleType.select_options).to include(["Bike", "bike"])
       expect(CycleType.select_options(traditional_bike: true)).to include(trad_bike)
-      expect(CycleType.select_options(traditional_bike: true).uniq.count).to eq 23
+      expect(CycleType.select_options(traditional_bike: true).uniq.count).to eq 24
     end
   end
 
