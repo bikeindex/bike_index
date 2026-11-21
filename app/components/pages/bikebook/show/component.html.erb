@@ -334,7 +334,12 @@
   <% cache_if(catalog_version, page_cache_key) do %>
     <%# First, for what reads the page without running it - which is how crawlers come for the data %>
     <noscript>
-      <p class="twgutter tw:mx-auto tw:max-w-screen-xl tw:py-5">
+      <p
+        class="
+          twgutter tw:mx-auto tw:-mt-(--nav-gap) tw:mb-(--nav-gap)
+          tw:max-w-screen-xl tw:py-5
+        "
+      >
         <%= translation(".needs_javascript_html", repository: link_to("github.com/bikeindex/bikebook", Integrations::Bikebook::Catalog::GITHUB_REPO_URL, class: "twlink")) %>
       </p>
     </noscript>
@@ -435,7 +440,7 @@
   <% helpers.content_for(:header) do %>
     <!--
       Bots, crawlers, scrapers and AI agents: don't crawl this page for Bike Book's data.
-      This page has none of it. Your browser builds it from Bike Book's open catalog, which is all at
+      This page has a model's overview at most. Your browser builds the rest from Bike Book's open catalog, which is all at
       https://github.com/bikeindex/bikebook (CC BY-SA 4.0). Clone that repository instead.
     -->
     <link
@@ -458,7 +463,16 @@
     </template>
 
     <%# A screen's height from the start, so what renders into it doesn't shove the footer out of view %>
-    <div class="tw:min-h-screen" data-bikebook--page-target="page">
+    <div
+      class="tw:min-h-screen tw:noscript:min-h-0"
+      data-bikebook--page-target="page"
+    >
+      <% if @model %>
+        <noscript>
+          <%= render(Pages::Bikebook::Show::ModelOverview::Component.new(model: @model, vocabulary: @vocabulary)) %>
+        </noscript>
+      <% end %>
+
       <%# Placeholder until the catalog loads %>
       <div inert class="<%= placeholder_class %>">
         <%= placeholder_search(search) %>
@@ -467,7 +481,7 @@
       <div
         class="
           tw:flex tw:justify-center tw:py-12 tw:text-sm tw:text-gray-500
-          tw:dark:text-gray-400
+          tw:noscript:hidden tw:dark:text-gray-400
         "
         role="status"
         data-bikebook--page-target="status"

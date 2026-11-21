@@ -9,9 +9,12 @@ module Pages
       class Component < ApplicationComponent
         # market is the visitor's CF-IPCountry, which Cloudflare sends as XX, or T1 over Tor, when it can't
         # tell, and the catalog lists an EU member's models under the EU; state is theirs in the US. framed: in an
-        # iframe, whose autofocus would take its host page's focus
-        def initialize(manifest_url:, market:, state:, query:, paint_colors:, framed: false)
+        # iframe, whose autofocus would take its host page's focus. model: the catalog's record of a model picked alone,
+        # whose overview a browser without JavaScript shows
+        def initialize(manifest_url:, market:, state:, query:, paint_colors:, framed: false, model: nil, vocabulary: nil)
           @manifest_url = manifest_url
+          @model = model
+          @vocabulary = vocabulary
           @framed = framed
           @paint_colors = paint_colors
           @market = if %w[XX T1].include?(market) || market.blank? then "US"

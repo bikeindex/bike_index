@@ -1,0 +1,17 @@
+---
+en:
+  components:
+    pages:
+      bikebook:
+        show:
+          model_overview:
+            current: current
+            description: Description
+            e_vehicle_class: E-vehicle class
+            frame_material: Frame material
+            manufacturers_page: manufacturer's page
+            overview: Overview
+            price: Price
+            primary_activity: Primary activity
+            vehicle_type: Vehicle type
+            years: Years

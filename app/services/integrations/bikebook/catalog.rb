@@ -18,12 +18,17 @@ module Integrations
 
       Unreachable = Class.new(StandardError)
 
-      # The model's title, description and image_url, nil for one the catalog hasn't. Raises Unreachable when it isn't readable?
-      def vehicle(id)
+      # The model's record, nil for one the catalog hasn't. Raises Unreachable when it isn't readable?
+      def model(id)
         raise Unreachable unless readable?
         block = manifest.dig("blocks", id[MODEL_ID, 1])
-        model = block && (file(block) || raise(Unreachable)).dig("models", id)
-        model && {title: "#{model["manufacturer"]} #{model["model"]}", description: model["description"], image_url: model["stock_photo"]}
+        block && (file(block) || raise(Unreachable)).dig("models", id)
+      end
+
+      # The names of the values models' records hold. Raises Unreachable when it isn't readable?
+      def vocabulary
+        raise Unreachable unless readable?
+        file(manifest["vocabulary"]) || raise(Unreachable)
       end
 
       # vehicle_models' entries: each vehicle's id, then in braces what's picked for it, m/trek/2026/marlin_5{size:M}{json}.

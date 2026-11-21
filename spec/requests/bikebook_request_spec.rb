@@ -139,6 +139,30 @@ RSpec.describe BikebookController, type: :request do
         expect(page.find("[inert]", visible: :all)[:class]).to eq "tw:hidden"
       end
 
+      it "renders the model's overview for a browser without JavaScript" do
+        overview = Capybara.string(Nokogiri::HTML5(response.body).at_css("[data-bikebook--page-target='page'] > noscript").inner_html)
+          .find("section[aria-label='Overview']")
+        expect(overview).to have_css("img[src='https://bikebook.bikeindex.org/segway/2025/gt3_pro.png'][alt='Segway GT3 Pro']")
+          .and have_css("h2", text: "GT3 Pro")
+        rows = overview.all("dl > div").to_h { [it.find("dt").text, it.find("dd").text.squish] }
+        expect(rows.except("Description")).to eq("Price" => "$2,699.99", "Years" => "2025 – current manufacturer's page",
+          "Vehicle type" => "e-Scooter", "Primary activity" => "Commuting (Around Town / Hybrid)", "Frame material" => "Steel")
+        expect(rows["Description"]).to start_with("Experience elite performance with the Segway GT3 Pro")
+        expect(overview).to have_link("manufacturer's page", href: "https://store.segway.com/segway-superscooter-gt3-pro")
+      end
+
+      context "electric, with a frame's detail" do
+        let(:params) { {vehicle_models: "m/aventon/2025/abound_lr"} }
+
+        it "names its classes and the frame's detail" do
+          overview = Capybara.string(Nokogiri::HTML5(response.body).at_css("[data-bikebook--page-target='page'] > noscript").inner_html)
+          rows = overview.all("dl > div").to_h { [it.find("dt").text, it.find("dd").text.squish] }
+          expect(rows.slice("Price", "Vehicle type", "Frame material", "E-vehicle class")).to eq("Price" => "$1,999",
+            "Vehicle type" => "Cargo Bike Rear · Long tail", "Frame material" => "Aluminum Gravity Cast 6061 Single-Butted Aluminum",
+            "E-vehicle class" => "Class 2")
+        end
+      end
+
       context "that the catalog hasn't" do
         let(:params) { {vehicle_models: "m/segway/2025/gt9"} }
 
