@@ -57,7 +57,7 @@ module Pages
         # each value's place counting down from the most models, for CSS order to sort the lines by
         def count_ranks(values) = values.sort_by.with_index { |value, index| [-value["models_count"].to_i, index] }.each_with_index.to_h { |value, rank| [value["value"], rank] }
 
-        def placeholder(field) = [PLACEHOLDERS.fetch(field["of"] || field["type"], field["of"] || field["type"]), field["unit"]].compact.join(" ")
+        def placeholder(field) = [(field["of"] || field["type"]).then { PLACEHOLDERS.fetch(it, it) }, field["unit"]].compact.join(" ")
       end
     end
   end
