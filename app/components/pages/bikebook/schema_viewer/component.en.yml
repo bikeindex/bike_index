@@ -8,4 +8,3 @@ en:
           schemas_title: Bike Book schemas
           subtitle_html: The shape of a %{document} file at schema %{version}, published
             as %{url}
-          versioning: 'Versioning:'
