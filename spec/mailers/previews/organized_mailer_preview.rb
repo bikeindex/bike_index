@@ -60,11 +60,11 @@ class OrganizedMailerPreview < ActionMailer::Preview
   end
 
   def shop_welcome(organization_id: params[:organization_id])
-    render_shop_welcome(["no_pos", *Organization.broken_pos_kinds], organization_id:)
+    render_shop_welcome(connect_pos: true, organization_id:)
   end
 
   def shop_welcome_pos_connected(organization_id: params[:organization_id])
-    render_shop_welcome(Organization.with_pos_kinds, organization_id:)
+    render_shop_welcome(connect_pos: false, organization_id:)
   end
 
   def impound_claim_submitted(impound_claim_id: params[:impound_claim_id])
@@ -84,12 +84,13 @@ class OrganizedMailerPreview < ActionMailer::Preview
     BParam.where("(params -> 'email_confirmation_token') IS NOT NULL").order(:created_at)
   end
 
-  def render_shop_welcome(pos_kinds, organization_id:)
+  def render_shop_welcome(connect_pos:, organization_id:)
     organization = Organization.find(organization_id) if organization_id
-    organization ||= Organization.bike_shop.where(pos_kind: pos_kinds).last
-    # Unsaved, so a database without a shop in this POS state still renders it
-    organization ||= Organization.bike_shop.last.tap { it.pos_kind = pos_kinds.first }
-    OrganizedMailer.shop_welcome(organization, organization.auto_user || organization.users.first)
+    organization ||= Organization.bike_shop.reorder(id: :desc).limit(100)
+      .find { OrgServices::Displayer.bike_shop_display_integration_alert?(it) == connect_pos }
+    organization ||= Organization.new(name: "Example Bike Shop", slug: "example-bike-shop", kind: "bike_shop",
+      pos_kind: connect_pos ? "no_pos" : "lightspeed_pos")
+    OrganizedMailer.shop_welcome(organization, organization.auto_user || User.new(email: "shop@example.com"))
   end
 
   def render_finished_registration(bikes, bike_id: nil)

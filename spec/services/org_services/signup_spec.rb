@@ -220,8 +220,9 @@ RSpec.describe OrgServices::Signup do
 
     it "sends the shop welcome email a few minutes later" do
       organization = described_class.complete(organization_signup, user:)
-      expect(EmailJobs::ShopWelcomeJob.jobs.map { it["args"] }).to eq([[organization.id, user.id]])
-      expect(EmailJobs::ShopWelcomeJob.jobs.first["at"]).to be_within(5).of(described_class::SHOP_WELCOME_DELAY.from_now.to_f)
+      expect(organization.reload.auto_user).to eq user
+      expect(EmailJobs::ShopWelcomeJob.jobs.map { it["args"] }).to eq([[organization.id]])
+      expect(EmailJobs::ShopWelcomeJob.jobs.first["at"]).to be_within(5).of(EmailJobs::ShopWelcomeJob::DELAY.from_now.to_f)
     end
 
     context "not a bike shop" do
