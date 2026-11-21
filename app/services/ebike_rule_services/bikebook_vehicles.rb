@@ -7,9 +7,10 @@ module EbikeRuleServices
 
     # nil for an id the catalog lacks, a model with no motor, or a catalog that doesn't answer
     def find(id)
-      block = id.present? && Integrations::Bikebook::Catalog.manifest&.dig("blocks", id[Integrations::Bikebook::Catalog::MODEL_ID, 1])
-      record = block && Integrations::Bikebook::Catalog.file(block)&.dig("models", id)
+      record = Integrations::Bikebook::Catalog.model(id)
       Bike.new(**attributes_from(record)) if record && record["motors"].present?
+    rescue Integrations::Bikebook::Catalog::Unreachable
+      nil
     end
 
     #
