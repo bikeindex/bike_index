@@ -152,10 +152,47 @@ const withYearRecords = (vehicle) => vehicle.years
   ? { ...vehicle, years: Object.entries(vehicle.years).map(([year, record]) => ({ year: Number(year), ...record })).sort((a, b) => b.year - a.year) }
   : vehicle
 
+// An array of these merges item by item, keyed by each item's values for them (an empty list by position); any other
+// array is replaced whole
+const IDENTITIES = {
+  colorways: ['name'],
+  components: ['type', 'position', 'type_detail'],
+  motors: [],
+  operating_modes: ['mode', 'availability', 'markets'],
+  sizes: ['name'],
+  mounts: ['type'],
+  wheels: ['position', 'bsd'],
+  brakes: ['position']
+}
+const isObject = (value) => value != null && typeof value === 'object' && !Array.isArray(value)
+const keyed = (key, items) => Object.fromEntries(items.map((item, index) => [
+  IDENTITIES[key].length ? IDENTITIES[key].map((field) => [item[field] ?? []].flat().join('+')).filter(Boolean).join(' ') : String(index),
+  item
+]))
+
+// false removes an object the home market's has (a year's record, a wheel), null any other value
+const merged = (record, changes) => Object.entries(changes).reduce((out, [key, value]) => {
+  if (value === null || (value === false && isObject(out[key]))) return except(out, key)
+  if (isObject(value) && Array.isArray(out[key])) return { ...out, [key]: Object.values(merged(keyed(key, out[key]), value)) }
+  return { ...out, [key]: isObject(value) && isObject(out[key]) ? merged(out[key], value) : value }
+}, record)
+const except = (record, key) => Object.fromEntries(Object.entries(record).filter(([each]) => each !== key))
+
+// From schema 1.1.0, a market's model sits in its home market's record, under `market_variants` keyed by the market
+// suffixing its id, as what differs from it; before, it's a record of its own. Integrations::Bikebook::MarketVariants
+// expands them the same way
+const withMarketVariants = (models) => Object.fromEntries(Object.entries(models).flatMap(([id, record]) => {
+  const home = except(record, 'market_variants')
+  return [[id, home], ...Object.entries(record.market_variants ?? {}).map(([market, changes]) => {
+    const variantId = `${id}_${market.toLowerCase()}`
+    return [variantId, { ...merged(home, changes), id: variantId }]
+  })]
+}))
+
 // A failed fetch is forgotten, so the next ask tries again
 const block = (key) => {
   if (!blocks.has(key)) {
-    blocks.set(key, fetchJson(new URL(manifest.blocks[key], base)).then(({ models }) => Object.fromEntries(Object.entries(models).map(([id, data]) => [id, withYearRecords(data)])), (error) => {
+    blocks.set(key, fetchJson(new URL(manifest.blocks[key], base)).then(({ models }) => Object.fromEntries(Object.entries(withMarketVariants(models)).map(([id, data]) => [id, withYearRecords(data)])), (error) => {
       blocks.delete(key)
       throw error
     }))
