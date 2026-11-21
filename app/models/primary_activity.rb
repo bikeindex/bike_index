@@ -98,9 +98,11 @@ class PrimaryActivity < ApplicationRecord
       special_short_slug = SPECIAL_SHORT_NAMES[str.downcase]
       return where(slug: special_short_slug).select(*select_attrs).first if special_short_slug.present?
 
-      by_priority.where(slug: Slugifyer.slugify(str)).select(*select_attrs).first ||
+      slug = Slugifyer.slugify(str)
+      by_priority.where(slug:).select(*select_attrs).first ||
         by_priority.where("lower(name) = ?", str.downcase).select(*select_attrs).first ||
-        by_priority.where("name ILIKE ?", "%#{str}%").select(*select_attrs).first
+        by_priority.where("name ILIKE ?", "%#{str}%").select(*select_attrs).first ||
+        Slugifyer.amp_as_and(slug)&.then { friendly_find_with_select(it, select_attrs:) }
     end
   end
 
