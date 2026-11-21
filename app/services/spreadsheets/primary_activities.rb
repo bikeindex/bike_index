@@ -30,11 +30,12 @@ module Spreadsheets
     def names_and_families(primary_activities)
       families, flavors = primary_activities.partition(&:family?)
       # A family exports as a flavor-less row; import upserts the family and creates no flavor
-      family_rows = families.map { [nil, it.name, it.priority, it.short_name, it.slug] }
+      shared = ->(record) { [record.priority, record.short_name, record.slug] }
+      family_rows = families.map { [nil, it.name, *shared.call(it)] }
       # A flavor in several families exports once, with its first (highest priority) record's attributes
       family_rows + flavors.group_by(&:name).map do |name, records|
         family_names = records.reject(&:top_level?).map(&:family_name).join(" & ").presence
-        [name, family_names, records.first.priority, records.first.short_name, records.first.slug]
+        [name, family_names, *shared.call(records.first)]
       end
     end
 
