@@ -2571,8 +2571,7 @@ es:
         signed_in_as_other: Has iniciado sesión como %{email}, por lo que mantuvimos
           tu cuenta. El registro sigue guardado en la dirección de correo electrónico
           que te enviamos.
-        sign_out_to_agree: Has iniciado sesión como %{email}. Cierra sesión y vuelve
-          a abrir el enlace para aceptar las normas de seguridad.
+        accept_terms: Acepta los Términos de servicio para continuar.
       find_b_param:
         registration_not_found: No pudimos encontrar ese registro; inicie uno nuevo
           a continuación.
@@ -2608,10 +2607,10 @@ es:
           a continuación.
         link_invalid_resent: Ese enlace ya no funciona, así que le hemos enviado uno
           nuevo por correo electrónico a %{email}.
-        sign_out_to_confirm: Has iniciado sesión como %{email}. Cierra sesión y vuelve
-          a abrir el enlace para activar la organización.
         switched_signup: Estás terminando %{name}. Para terminar también %{replaced_name},
           abre el enlace del correo electrónico.
+        accept_terms: Acepte los Términos de servicio y los Términos de servicio para
+          organizaciones para activar la organización.
       find_signup_for_confirmation:
         signup_not_found: No pudimos encontrar ese registro; crea uno nuevo a continuación.
       redirect_to_organization:
@@ -5608,6 +5607,9 @@ es:
           none: ninguno
           return_to_default_column_order: Volver al orden de columnas predeterminado
           visible_columns: Columnas visibles
+        in_card:
+          select_record: Seleccione %{record} %{id}
+          toggle_all_checked: Activar/desactivar todas las selecciones
     atoms:
       serial:
         hidden: oculto
@@ -5848,7 +5850,6 @@ es:
             hidden: oculto
             not_registered_with: Oculto porque no está registrado con %{org_name}
             view: Vista
-            toggle_all_checked: Activar/desactivar todas las selecciones
             course_acknowledgment_title: Reconocimiento del curso de educación en
             more_notes: "+%{count} más"
           multi_result_chip:
@@ -6821,6 +6822,15 @@ es:
             confirming_your_email: Confirmando tu correo electrónico
             continue: Continuar
             continue_where_you_left_off: Continúa y retomaremos donde lo dejaste.
+            continuing_keeps_you_signed_in: Si continúas, permanecerás conectado y
+              se guardará el registro en la dirección a la que está dirigido este
+              enlace.
+            i_agree_to_terms: Acepto los Términos de servicio de Bike Index.
+            link_is_for: Este enlace es para
+            read_terms: Lea los Términos de servicio
+            sign_out_to_agree: Quien acceda a este enlace deberá aceptar las normas
+              de seguridad. Cierre sesión y vuelva a abrir el enlace.
+            signed_in_as: Has iniciado sesión como
           step1:
             just_the_essentials: Solo lo esencial para empezar.
             register_your_vehicle: "¡Registra tu vehículo!"
@@ -8339,7 +8349,6 @@ es:
           customer_records_sold_or_shared: registros de clientes vendidos o compartidos
           data_stays_private: Sus datos permanecen privados.
           data_stays_private_body: Nunca vendido, nunca compartido.
-          ding: "¡TIMBRE!"
           ebike_legality_checker: Comprobador de legalidad de bicicletas eléctricas
           ebike_legality_checker_body: Información específica de cada estado sobre
             las categorías de bicicletas eléctricas, dónde se pueden usar y las normas
@@ -8424,7 +8433,6 @@ es:
           shop_name_placeholder: Ciclos de radios y cadena
           sign_up_free: Regístrate gratis
           sign_up_your_shop: Registra tu tienda
-          signup_name: inscribirse
           something_else_html: "¿Algo más? %{email_link}."
           step_connect_body: Vincula Lightspeed o Ascend a tu cuenta gratuita de la
             tienda. Tarda unos 10 minutos.
@@ -8447,13 +8455,12 @@ es:
           used_only_for_bikes: Utilizado únicamente para bicicletas
           we_never_sell_or_share: Nunca vendemos ni compartimos datos de nuestros
             clientes.
-          well_email_you: Le enviaremos un correo electrónico con instrucciones para
-            conectar su terminal de punto de venta (TPV).
           what_your_customers_get: Lo que obtienen tus clientes. Lo que obtiene tu
             tienda.
           wholesale: Al por mayor
           your_pos: Tu TPV
-          youre_in: Estás dentro.
+          signed_in_as_admin_html: Has iniciado sesión como %{email}, que será el
+            administrador de la tienda.
         ascend:
           a_dashboard_for_your_shop: Un panel de control para tu tienda
           a_dashboard_for_your_shop_body: Consulta las bicicletas que has vendido
@@ -8683,9 +8690,15 @@ es:
             confirm_email_to_activate_html: Confirma que %{email} es tu correo electrónico
               y configuraremos la organización contigo como administrador.
             sign_out_and_activate: Cerrar sesión y activar
-            signed_in_as_other: Has iniciado sesión como %{signed_in_as}, pero este
-              enlace es para %{email}. Al activarlo, se cerrará tu sesión y se iniciará
-              la de %{email}, el administrador de la organización.
+            activating_signs_you_out: Al activarlo, se cerrará su sesión y accederá
+              a la cuenta de administrador de la organización.
+            i_agree_to_terms: Acepto los Términos de servicio de Bike Index y los
+              Términos de servicio para organizaciones.
+            link_is_for: Este enlace es para
+            read_terms_html: Lea %{terms_link} y %{vendor_terms_link}
+            signed_in_as: Has iniciado sesión como
+            terms_of_service: Condiciones de servicio
+            vendor_terms: Condiciones de servicio para organizaciones
           step1:
             activation_link: Te enviaremos un enlace por correo electrónico para activar
               la organización; no es necesario que esperes, continúa.

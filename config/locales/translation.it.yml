@@ -2564,8 +2564,7 @@ it:
         signed_in_as_other: Hai effettuato l'accesso come %{email}, quindi ti abbiamo
           mantenuto in quell'account. La registrazione è ancora salvata all'indirizzo
           email che ti abbiamo inviato.
-        sign_out_to_agree: Hai effettuato l'accesso come %{email}. Disconnettiti,
-          quindi apri nuovamente il link per accettare le norme di sicurezza.
+        accept_terms: Accetta i Termini di servizio per continuare
       find_b_param:
         registration_not_found: 'Non abbiamo trovato questa registrazione: avviane
           una nuova qui sotto.'
@@ -2599,10 +2598,10 @@ it:
           inviato a %{email} oppure inviane un'altra tramite il modulo sottostante.
         link_invalid_resent: Quel link non funziona più, quindi ne abbiamo inviato
           uno nuovo via email a %{email}.
-        sign_out_to_confirm: Hai effettuato l'accesso come %{email}. Disconnettiti,
-          quindi apri nuovamente il link per attivare l'organizzazione.
         switched_signup: Stai per terminare %{name}. Per terminare anche %{replaced_name},
           apri il link presente nell'email.
+        accept_terms: Accetta i Termini di servizio e i Termini di servizio per le
+          organizzazioni per attivare l'organizzazione
       find_signup_for_confirmation:
         signup_not_found: 'Non abbiamo trovato la registrazione: creane una nuova
           qui sotto.'
@@ -5613,6 +5612,9 @@ it:
           none: nessuno
           return_to_default_column_order: Ripristina l'ordine predefinito delle colonne
           visible_columns: Colonne visibili
+        in_card:
+          select_record: Seleziona %{record} %{id}
+          toggle_all_checked: Seleziona tutto
     atoms:
       serial:
         hidden: nascosto
@@ -5856,7 +5858,6 @@ it:
             hidden: nascosto
             not_registered_with: Nascosto perché non è registrato con %{org_name}
             view: Visualizzazione
-            toggle_all_checked: Seleziona tutto
             course_acknowledgment_title: Riconoscimento del corso di formazione presso
             more_notes: "+%{count} altro"
           multi_result_chip:
@@ -6837,6 +6838,14 @@ it:
             confirming_your_email: Conferma la tua email
             continue: Continuare
             continue_where_you_left_off: Continua, e riprenderemo da dove hai interrotto.
+            continuing_keeps_you_signed_in: Continuando, rimarrai connesso e la registrazione
+              verrà salvata all'indirizzo a cui si riferisce questo link.
+            i_agree_to_terms: Accetto i Termini di servizio di Bike Index.
+            link_is_for: Questo link è per
+            read_terms: Leggi i Termini di servizio
+            sign_out_to_agree: Chiunque sia il destinatario di questo link deve accettare
+              delle norme di sicurezza. Esci dalla sessione e poi riapri il link.
+            signed_in_as: Hai effettuato l'accesso come
           step1:
             just_the_essentials: Solo l'essenziale per iniziare.
             register_your_vehicle: Registra il tuo veicolo!
@@ -8364,7 +8373,6 @@ it:
           customer_records_sold_or_shared: dati dei clienti venduti o condivisi
           data_stays_private: I loro dati restano privati.
           data_stays_private_body: Mai venduto, mai condiviso.
-          ding: DING!
           ebike_legality_checker: Verificatore di legalità delle e-bike
           ebike_legality_checker_body: Linee guida stato per stato sulle classi di
             e-bike, sui luoghi in cui è consentito circolare e sulle normative relative
@@ -8447,7 +8455,6 @@ it:
           shop_name_placeholder: Cicli a raggi e catena
           sign_up_free: Iscrizione gratuita
           sign_up_your_shop: Registra il tuo negozio
-          signup_name: iscrizione
           something_else_html: Qualcos'altro? %{email_link}.
           step_connect_body: Collega Lightspeed o Ascend al tuo account gratuito del
             negozio. Ci vogliono circa 10 minuti.
@@ -8469,13 +8476,12 @@ it:
           to_set_up: per impostare
           used_only_for_bikes: Utilizzabile solo per biciclette
           we_never_sell_or_share: Non vendiamo né condividiamo mai i dati dei clienti.
-          well_email_you: Ti invieremo un'email con le istruzioni per collegare il
-            tuo sistema POS.
           what_your_customers_get: Ciò che ottengono i tuoi clienti. Ciò che ottiene
             il tuo negozio.
           wholesale: Commercio all'ingrosso
           your_pos: Il tuo POS
-          youre_in: Sei dentro.
+          signed_in_as_admin_html: Hai effettuato l'accesso come %{email}, che corrisponde
+            all'amministratore del negozio.
         ascend:
           a_dashboard_for_your_shop: Una dashboard per il tuo negozio
           a_dashboard_for_your_shop_body: Puoi cercare le biciclette che hai venduto
@@ -8702,9 +8708,15 @@ it:
             confirm_email_to_activate_html: Conferma che %{email} è il tuo indirizzo
               email e configureremo l'organizzazione nominandoti amministratore.
             sign_out_and_activate: Disconnettiti e attiva
-            signed_in_as_other: Hai effettuato l'accesso come %{signed_in_as}, ma
-              questo link è per %{email}. L'attivazione ti disconnetterà e ti consentirà
-              di accedere a %{email}, l'amministratore dell'organizzazione.
+            activating_signs_you_out: L'attivazione ti disconnette da questo account
+              e ti permette di accedere all'account amministratore dell'organizzazione.
+            i_agree_to_terms: Accetto i Termini di servizio di Bike Index e i Termini
+              di servizio per le organizzazioni.
+            link_is_for: Questo link è per
+            read_terms_html: Leggi %{terms_link} e %{vendor_terms_link}
+            signed_in_as: Hai effettuato l'accesso come
+            terms_of_service: Termini di servizio
+            vendor_terms: Termini di servizio per le organizzazioni
           step1:
             activation_link: 'Ti invieremo un''email con un link per attivare l''organizzazione:
               non c''è bisogno di aspettare, continua pure.'

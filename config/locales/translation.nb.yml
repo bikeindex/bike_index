@@ -2507,8 +2507,7 @@ nb:
         signed_in_as_other: Du er logget på som %{email}, så vi beholdt deg på den
           kontoen. Registreringen er fortsatt lagret på adressen vi sendte e-post
           til.
-        sign_out_to_agree: Du er logget på som %{email}. Logg ut, og åpne deretter
-          lenken på nytt for å godta sikkerhetsreglene.
+        accept_terms: Godta tjenestevilkårene for å fortsette
       find_b_param:
         registration_not_found: Vi fant ikke den registreringen – start en ny nedenfor
       redirect_to_single_page:
@@ -2539,10 +2538,10 @@ nb:
           sendte til %{email}, eller send en ny nedenfor.
         link_invalid_resent: Den lenken fungerer ikke lenger, så vi har sendt en ny
           til %{email}.
-        sign_out_to_confirm: Du er logget på som %{email}. Logg ut, og åpne deretter
-          lenken på nytt for å aktivere organisasjonen.
         switched_signup: Du er nå i ferd med å fullføre %{name}. For å fullføre %{replaced_name}
           også, åpne lenken i e-posten.
+        accept_terms: Godta tjenestevilkårene og tjenestevilkårene for organisasjoner
+          for å aktivere organisasjonen
       find_signup_for_confirmation:
         signup_not_found: Vi fant ikke den registreringen – start en ny nedenfor
       redirect_to_organization:
@@ -5366,6 +5365,9 @@ nb:
           none: ingen
           return_to_default_column_order: Gå tilbake til standard kolonnerekkefølge
           visible_columns: Synlige kolonner
+        in_card:
+          select_record: Velg %{record} %{id}
+          toggle_all_checked: Slå av/på alle avkryssede
     atoms:
       serial:
         hidden: skjult
@@ -5601,7 +5603,6 @@ nb:
             hidden: skjult
             not_registered_with: Skjult fordi den ikke er registrert hos %{org_name}
             view: Utsikt
-            toggle_all_checked: Slå av/på alle avkryssede
             course_acknowledgment_title: Bekreftelse på utdanningskurs på
             more_notes: "+%{count} mer"
           multi_result_chip:
@@ -6541,6 +6542,14 @@ nb:
             confirming_your_email: Bekrefter e-postadressen din
             continue: Fortsette
             continue_where_you_left_off: Fortsett, så fortsetter vi der du slapp.
+            continuing_keeps_you_signed_in: Hvis du fortsetter, holder du deg pålogget
+              og lagrer registreringen på adressen denne lenken er til.
+            i_agree_to_terms: Jeg godtar Bike Index sine tjenestevilkår
+            link_is_for: Denne lenken er for
+            read_terms: Les tjenestevilkårene
+            sign_out_to_agree: Den som denne lenken er for, må godta sikkerhetsregler.
+              Logg ut, og åpne deretter lenken på nytt.
+            signed_in_as: Du er logget inn som
           step1:
             just_the_essentials: Bare det viktigste for å komme i gang.
             register_your_vehicle: Registrer kjøretøyet ditt!
@@ -7941,7 +7950,6 @@ nb:
           customer_records_sold_or_shared: kundeoppføringer solgt eller delt
           data_stays_private: Dataene deres forblir private.
           data_stays_private_body: Aldri solgt, aldri delt.
-          ding: DING!
           ebike_legality_checker: Lovlighetssjekker for elsykler
           ebike_legality_checker_body: Veiledning fra stat til stat om elsykkelklasser,
             hvor de kan sykle, og regler for alder og utstyr. Nyttig når en kunde
@@ -8018,7 +8026,6 @@ nb:
           shop_name_placeholder: Eike- og kjedesykler
           sign_up_free: Registrer deg gratis
           sign_up_your_shop: Registrer butikken din
-          signup_name: registrering
           something_else_html: Noe annet? %{email_link}.
           step_connect_body: Koble Lightspeed eller Ascend til din gratis butikkkonto.
             Det tar omtrent 10 minutter.
@@ -8040,11 +8047,11 @@ nb:
           to_set_up: å sette opp
           used_only_for_bikes: Brukes kun til sykler
           we_never_sell_or_share: Vi selger eller deler aldri kundedata.
-          well_email_you: Vi sender deg en e-post om tilkobling av POS-en din.
           what_your_customers_get: Det kundene dine får. Det butikken din får.
           wholesale: Engroshandel
           your_pos: Ditt salgssted
-          youre_in: Du er med.
+          signed_in_as_admin_html: Du er logget inn som %{email}, som vil være butikkens
+            administrator.
         ascend:
           a_dashboard_for_your_shop: Et dashbord for butikken din
           a_dashboard_for_your_shop_body: Søk etter syklene du har solgt når du trenger
@@ -8250,9 +8257,15 @@ nb:
             confirm_email_to_activate_html: Bekreft at %{email} er e-postadressen
               din, så konfigurerer vi organisasjonen med deg som administrator.
             sign_out_and_activate: Logg ut og aktiver
-            signed_in_as_other: Du er logget på som %{signed_in_as}, men denne lenken
-              er for %{email}. Aktivering logger deg av og inn på %{email}, organisasjonens
-              administrator.
+            activating_signs_you_out: Aktivering logger deg ut av den og inn på organisasjonens
+              administratorkonto.
+            i_agree_to_terms: Jeg godtar Bike Index sine tjenestevilkår og tjenestevilkår
+              for organisasjoner
+            link_is_for: Denne lenken er for
+            read_terms_html: Les %{terms_link} og %{vendor_terms_link}
+            signed_in_as: Du er logget inn som
+            terms_of_service: Vilkår for bruk
+            vendor_terms: Vilkår for bruk for organisasjoner
           step1:
             activation_link: Vi sender deg en e-post med en lenke for å aktivere organisasjonen
               – du trenger ikke å vente, fortsett.
