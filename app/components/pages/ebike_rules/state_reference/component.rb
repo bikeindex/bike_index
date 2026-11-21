@@ -22,7 +22,7 @@ module Pages
         def us? = @country == "US"
 
         # A republished vocabulary has a new file name, and a law's dated rules move on each day
-        def cache_key = [self.class.cache_digest, @country, Integrations::Bikebook::Catalog.manifest&.dig("vocabulary"), Time.zone.today]
+        def cache_key = [self.class.cache_digest, @country, Integrations::Bikebook::Catalog.head&.dig("vocabulary"), Time.zone.today]
 
         def states
           @states ||= if us?

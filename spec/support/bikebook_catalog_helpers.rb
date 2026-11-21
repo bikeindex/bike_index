@@ -5,9 +5,11 @@
 module BikebookCatalogHelpers
   FIXTURES = Rails.root.join("spec/fixtures/bikebook_catalog")
 
-  # For the server's reads. The test cache is a file store, so a catalog cached by an earlier run goes first
+  # For the server's reads. The test cache is a file store, so a catalog cached by an earlier run goes first, as does
+  # what an earlier example read outside a request
   def stub_bikebook_catalog(status: 200)
     Rails.cache.clear
+    Integrations::Bikebook::Catalog::Reads.reset
     WebMock.stub_request(:get, /\A#{Regexp.escape(Integrations::Bikebook::Catalog::URL)}/o).to_return do |request|
       file = FIXTURES.join(request.uri.path.delete_prefix(URI(Integrations::Bikebook::Catalog::URL).path))
       file.file? ? {status:, body: file.read} : {status: 404}

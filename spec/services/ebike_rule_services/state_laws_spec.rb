@@ -3,7 +3,43 @@
 require "rails_helper"
 
 RSpec.describe EbikeRuleServices::StateLaws do
+  include ActiveSupport::Testing::TimeHelpers
+
   before { stub_bikebook_catalog }
+
+  describe "version" do
+    let(:vocabulary_url) { "#{Integrations::Bikebook::Catalog::URL}vocabulary.json" }
+
+    it "is the vocabulary file once the laws are in, without reading them again" do
+      expect(described_class.version).to eq "vocabulary.json"
+      Rails.cache.delete(["bikebook_catalog/state_laws_with_rule_categories", 2, "vocabulary.json"])
+      Integrations::Bikebook::Catalog::Reads.reset
+      WebMock.stub_request(:get, vocabulary_url).to_return(status: 503)
+
+      expect(described_class.version).to eq "vocabulary.json"
+    end
+
+    it "moves to the new vocabulary within 5 minutes of a catalog update" do
+      expect(described_class.version).to eq "vocabulary.json"
+      manifest = JSON.parse(BikebookCatalogHelpers::FIXTURES.join(Integrations::Bikebook::Catalog::MANIFEST).read)
+      WebMock.stub_request(:get, "#{Integrations::Bikebook::Catalog::URL}#{Integrations::Bikebook::Catalog::MANIFEST}")
+        .to_return(body: manifest.merge("vocabulary" => "vocabulary.v2.json").to_json)
+      WebMock.stub_request(:get, "#{Integrations::Bikebook::Catalog::URL}vocabulary.v2.json").to_return(body: BikebookCatalogHelpers::FIXTURES.join("vocabulary.json").read)
+
+      travel(5.minutes + 1.second) do
+        Integrations::Bikebook::Catalog::Reads.reset
+        expect(described_class.version).to eq "vocabulary.v2.json"
+      end
+    end
+
+    context "while the laws can't be read" do
+      before { WebMock.stub_request(:get, vocabulary_url).to_return(status: 503) }
+
+      it "is nil" do
+        expect(described_class.version).to be_nil
+      end
+    end
+  end
 
   describe "find" do
     it "reads a state's e-bike law from the catalog" do
@@ -22,6 +58,16 @@ RSpec.describe EbikeRuleServices::StateLaws do
       WebMock.stub_request(:get, "#{Integrations::Bikebook::Catalog::URL}vocabulary.json").to_return(body: vocabulary.to_json)
 
       expect(described_class.find("CO")).to include(watt_cap: 750)
+    end
+
+    it "reads the parsed laws once a request" do
+      expect(described_class.find("CO")).to include(watt_cap: 750)
+      Rails.cache.clear
+      WebMock.stub_request(:get, "#{Integrations::Bikebook::Catalog::URL}vocabulary.json").to_return(status: 503)
+
+      expect(described_class.find("CO")).to include(watt_cap: 750)
+      Integrations::Bikebook::Catalog::Reads.reset
+      expect(described_class.find("CO")).to be_nil
     end
 
     it "has no classes for a law that names none of the three" do
