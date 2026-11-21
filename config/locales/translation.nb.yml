@@ -868,6 +868,7 @@ nb:
         traditional_bike: Tradisjonell sykkel (2 hjul, 1 sete, pedal)
         elliptical: Elliptisk sykkel
         balance_bike: Balansesykkel
+        e_atv: e-ATV (e-Quad, elektrisk terrengkjøretøy)
       frame_material:
         aluminum: Aluminium
         composite: Karbon eller kompositt

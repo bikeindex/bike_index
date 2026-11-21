@@ -874,6 +874,7 @@ it:
         wheelchair: Sedia a rotelle
         elliptical: Bicicletta ellittica
         balance_bike: Bicicletta senza pedali
+        e_atv: e-ATV (e-Quad, veicolo elettrico fuoristrada)
       frame_material:
         aluminum: Alluminio
         composite: Carbonio o composito
